@@ -1,0 +1,810 @@
+/**
+ * Aquibra UX/UI Fixes
+ * Critical fixes for accessibility, consistency, and user feedback
+ *
+ * @license BSD-3-Clause
+ */
+
+/* ============================================
+   ACCESSIBILITY IMPROVEMENTS
+   ============================================ */
+
+/* Focus-visible for keyboard navigation - CRITICAL */
+*:focus-visible {
+  outline: 2px solid var(--aqb-primary);
+  outline-offset: 2px;
+  border-radius: var(--aqb-radius-sm);
+}
+
+/* Remove default focus outline when using mouse */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Ensure all interactive elements have proper focus states */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:not([tabindex="-1"]):focus-visible {
+  outline: 2px solid var(--aqb-primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--aqb-primary-light);
+}
+
+/* Skip links for screen readers */
+.aqb-skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  background: var(--aqb-primary);
+  color: white;
+  padding: 8px 16px;
+  border-radius: var(--aqb-radius-md);
+  z-index: var(--aqb-z-max);
+  text-decoration: none;
+  font-weight: var(--aqb-font-semibold);
+}
+
+.aqb-skip-link:focus {
+  top: 16px;
+  left: 16px;
+}
+
+/* ============================================
+   INPUT IMPROVEMENTS
+   ============================================ */
+
+/* Enhanced input hover states */
+.aqb-input:hover:not(:disabled):not(:focus) {
+  border-color: var(--aqb-input-border-hover);
+  background: var(--aqb-input-bg-hover);
+  transform: translateY(-1px);
+  transition: all 0.15s ease;
+}
+
+/* Better disabled state visibility */
+.aqb-input:disabled,
+.aqb-select:disabled,
+.aqb-textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(0, 0, 0, 0.15);
+  color: var(--aqb-text-disabled);
+  border-style: dashed;
+}
+
+/* Placeholder improvements */
+.aqb-input::placeholder,
+.aqb-textarea::placeholder {
+  color: var(--aqb-text-muted);
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* Input focus improvements - more noticeable */
+.aqb-input:focus,
+.aqb-select:focus,
+.aqb-textarea:focus {
+  border-color: var(--aqb-primary);
+  background: var(--aqb-input-bg-focus);
+  box-shadow:
+    var(--aqb-input-ring),
+    0 4px 12px rgba(59, 130, 246, 0.15);
+  transform: translateY(0);
+  transition: all 0.2s ease;
+}
+
+/* Input error state improvements */
+.aqb-input-error,
+.aqb-input.has-error {
+  border-color: var(--aqb-error);
+  background: rgba(239, 68, 68, 0.05);
+  animation: shake 0.3s ease;
+}
+
+.aqb-input-error:focus,
+.aqb-input.has-error:focus {
+  border-color: var(--aqb-error);
+  box-shadow:
+    var(--aqb-input-ring-error),
+    0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* Input success state (NEW) */
+.aqb-input-success {
+  border-color: var(--aqb-success);
+  background: rgba(34, 197, 94, 0.05);
+}
+
+.aqb-input-success:focus {
+  border-color: var(--aqb-success);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+/* ============================================
+   SELECT IMPROVEMENTS
+   ============================================ */
+
+/* Better select hover state */
+.aqb-select:hover:not(:disabled):not(:focus) {
+  border-color: var(--aqb-input-border-hover);
+  background-color: var(--aqb-input-bg-hover);
+  cursor: pointer;
+  transform: translateY(-1px);
+  transition: all 0.15s ease;
+}
+
+/* Select active state */
+.aqb-select:active:not(:disabled) {
+  transform: translateY(0);
+  border-color: var(--aqb-primary);
+}
+
+/* ============================================
+   BUTTON IMPROVEMENTS
+   ============================================ */
+
+/* All buttons get better feedback */
+button,
+.aqb-btn,
+.pill,
+.aqb-block-card,
+.aqb-page-action-btn {
+  position: relative;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Button hover ripple effect (subtle) */
+button:hover:not(:disabled)::before,
+.aqb-btn:hover:not(:disabled)::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  transform: translate(-50%, -50%);
+  animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+  to {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+  }
+}
+
+/* Button active state feedback */
+button:active:not(:disabled),
+.aqb-btn:active:not(:disabled) {
+  transform: scale(0.97);
+  transition: transform 0.05s ease;
+}
+
+/* Disabled button improvements - very clear */
+button:disabled,
+.aqb-btn:disabled,
+.pill:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.3);
+  position: relative;
+}
+
+button:disabled::after,
+.aqb-btn:disabled::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 4px,
+    rgba(0, 0, 0, 0.05) 4px,
+    rgba(0, 0, 0, 0.05) 8px
+  );
+  pointer-events: none;
+}
+
+/* ============================================
+   SWITCH IMPROVEMENTS
+   ============================================ */
+
+.aqb-switch-track {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.aqb-switch:hover:not(.is-disabled) .aqb-switch-track {
+  border-color: var(--aqb-primary);
+  box-shadow: 0 0 0 3px var(--aqb-primary-light);
+}
+
+.aqb-switch-thumb {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.aqb-switch:hover:not(.is-disabled) .aqb-switch-thumb {
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.35),
+    0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.aqb-switch-input:checked + .aqb-switch-track .aqb-switch-thumb {
+  box-shadow:
+    0 2px 6px rgba(59, 130, 246, 0.5),
+    0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   SLIDER IMPROVEMENTS
+   ============================================ */
+
+.aqb-slider {
+  transition: opacity 0.2s ease;
+}
+
+.aqb-slider:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.aqb-slider::-webkit-slider-thumb {
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.25),
+    0 0 0 4px rgba(59, 130, 246, 0);
+  transition: all 0.2s ease;
+}
+
+.aqb-slider:hover::-webkit-slider-thumb {
+  transform: scale(1.15);
+  box-shadow:
+    0 3px 8px rgba(59, 130, 246, 0.4),
+    0 0 0 6px rgba(59, 130, 246, 0.15);
+}
+
+.aqb-slider:active::-webkit-slider-thumb {
+  transform: scale(1.3);
+  box-shadow:
+    0 4px 12px rgba(59, 130, 246, 0.5),
+    0 0 0 8px rgba(59, 130, 246, 0.2);
+}
+
+.aqb-slider::-moz-range-thumb {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease;
+}
+
+.aqb-slider:hover::-moz-range-thumb {
+  transform: scale(1.15);
+}
+
+/* ============================================
+   COLOR FIELD IMPROVEMENTS
+   ============================================ */
+
+.aqb-color-swatch {
+  transition: all 0.2s ease;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.aqb-color-swatch-wrapper:hover .aqb-color-swatch {
+  transform: scale(1.05);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.aqb-color-preset {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.aqb-color-preset:hover:not(:disabled) {
+  transform: scale(1.15);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.aqb-color-preset:active:not(:disabled) {
+  transform: scale(1.05);
+}
+
+/* ============================================
+   BUTTON GROUP IMPROVEMENTS
+   ============================================ */
+
+.aqb-btn-group {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.aqb-btn-group-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.aqb-btn-group-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.aqb-btn-group-item:hover:not(:disabled)::before {
+  opacity: 1;
+}
+
+.aqb-btn-group-item.is-selected {
+  box-shadow:
+    inset 0 1px 2px rgba(59, 130, 246, 0.3),
+    0 0 0 1px rgba(59, 130, 246, 0.5);
+}
+
+/* ============================================
+   LAYERS PANEL IMPROVEMENTS
+   ============================================ */
+
+.aqb-layer-row {
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.aqb-layer-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--aqb-primary);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.aqb-layer-row:hover::before {
+  opacity: 0.3;
+}
+
+.aqb-layer-row.is-selected::before {
+  opacity: 1;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+.aqb-layer-row:focus-visible {
+  outline: 2px solid var(--aqb-primary);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+/* ============================================
+   BLOCKS PANEL IMPROVEMENTS
+   ============================================ */
+
+.aqb-block-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.aqb-block-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0),
+    rgba(59, 130, 246, 0.1)
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.aqb-block-card:hover::before {
+  opacity: 1;
+}
+
+.aqb-block-card:active {
+  transform: scale(0.97);
+  transition: transform 0.05s ease;
+}
+
+.aqb-block-card:focus-visible {
+  outline: 2px solid var(--aqb-primary);
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+/* Block drag feedback */
+.aqb-block-dragging {
+  opacity: 0.5;
+  transform: scale(0.95) rotate(2deg);
+  transition: all 0.2s ease;
+}
+
+/* ============================================
+   EMPTY STATES IMPROVEMENTS
+   ============================================ */
+
+.aqb-empty-state {
+  text-align: center;
+  padding: var(--aqb-space-8) var(--aqb-space-4);
+  color: var(--aqb-text-muted);
+  animation: fadeIn 0.4s ease;
+}
+
+.aqb-empty-state-icon {
+  font-size: 48px;
+  margin-bottom: var(--aqb-space-4);
+  opacity: 0.4;
+  filter: grayscale(0.3);
+  animation: float 3s ease-in-out infinite;
+}
+
+.aqb-empty-state-title {
+  font-size: var(--aqb-text-lg);
+  font-weight: var(--aqb-font-semibold);
+  color: var(--aqb-text-secondary);
+  margin-bottom: var(--aqb-space-2);
+}
+
+.aqb-empty-state-desc {
+  font-size: var(--aqb-text-base);
+  color: var(--aqb-text-muted);
+  line-height: var(--aqb-leading-relaxed);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Compact empty state */
+.aqb-empty-state-compact {
+  padding: var(--aqb-space-6) var(--aqb-space-3);
+}
+
+.aqb-empty-state-compact .aqb-empty-state-icon {
+  font-size: 32px;
+  margin-bottom: var(--aqb-space-2);
+}
+
+.aqb-empty-state-compact .aqb-empty-state-title {
+  font-size: var(--aqb-text-base);
+}
+
+.aqb-empty-state-compact .aqb-empty-state-desc {
+  font-size: var(--aqb-text-sm);
+}
+
+/* ============================================
+   LOADING STATES (NEW)
+   ============================================ */
+
+.aqb-loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.aqb-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid var(--aqb-primary);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Spinner component */
+.aqb-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.aqb-spinner-sm {
+  width: 12px;
+  height: 12px;
+  border-width: 2px;
+}
+
+.aqb-spinner-lg {
+  width: 24px;
+  height: 24px;
+  border-width: 3px;
+}
+
+/* ============================================
+   TOOLTIP IMPROVEMENTS (NEW)
+   ============================================ */
+
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  font-size: var(--aqb-text-xs);
+  font-weight: var(--aqb-font-medium);
+  white-space: nowrap;
+  border-radius: var(--aqb-radius-md);
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.2s ease;
+  z-index: var(--aqb-z-tooltip);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-tooltip]::after {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.2s ease;
+  z-index: var(--aqb-z-tooltip);
+}
+
+[data-tooltip]:hover::before,
+[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ============================================
+   NOTIFICATION/TOAST IMPROVEMENTS (NEW)
+   ============================================ */
+
+.aqb-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  min-width: 300px;
+  padding: 16px 20px;
+  background: var(--aqb-bg-panel);
+  border: 1px solid var(--aqb-border);
+  border-radius: var(--aqb-radius-lg);
+  box-shadow: var(--aqb-shadow-xl);
+  z-index: var(--aqb-z-toast);
+  animation: slideIn 0.3s ease, fadeIn 0.3s ease;
+}
+
+.aqb-toast-success {
+  border-left: 4px solid var(--aqb-success);
+  background: rgba(34, 197, 94, 0.05);
+}
+
+.aqb-toast-error {
+  border-left: 4px solid var(--aqb-error);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.aqb-toast-warning {
+  border-left: 4px solid var(--aqb-warning);
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.aqb-toast-info {
+  border-left: 4px solid var(--aqb-info);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* ============================================
+   PANEL IMPROVEMENTS
+   ============================================ */
+
+.aqb-panel {
+  transition: all 0.2s ease;
+}
+
+.aqb-panel:hover {
+  border-color: var(--aqb-border-light);
+}
+
+.aqb-panel-header {
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.aqb-panel-header:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.02)
+  );
+}
+
+/* ============================================
+   DRAG AND DROP IMPROVEMENTS
+   ============================================ */
+
+.aqb-drop-zone {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.aqb-drop-zone-active {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: var(--aqb-primary);
+  box-shadow:
+    inset 0 0 0 2px rgba(59, 130, 246, 0.2),
+    0 8px 24px rgba(59, 130, 246, 0.15);
+}
+
+.aqb-drop-zone-active::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px dashed var(--aqb-primary);
+  border-radius: inherit;
+  animation: dashRotate 20s linear infinite;
+}
+
+@keyframes dashRotate {
+  to {
+    stroke-dashoffset: 100;
+  }
+}
+
+/* ============================================
+   CONSISTENCY FIXES
+   ============================================ */
+
+/* Ensure all text inputs have same height */
+.aqb-input,
+.aqb-select,
+button {
+  min-height: 40px;
+}
+
+.aqb-input-sm,
+.aqb-select-sm,
+.aqb-btn-sm {
+  min-height: 32px;
+}
+
+.aqb-input-lg,
+.aqb-select-lg,
+.aqb-btn-lg {
+  min-height: 48px;
+}
+
+/* Ensure consistent border radius */
+.aqb-input,
+.aqb-select,
+.aqb-btn,
+.aqb-panel,
+.aqb-card {
+  border-radius: var(--aqb-radius-md);
+}
+
+/* Ensure consistent spacing */
+.aqb-field + .aqb-field {
+  margin-top: var(--aqb-space-4);
+}
+
+/* ============================================
+   PRINT STYLES (ACCESSIBILITY)
+   ============================================ */
+
+@media print {
+  .aqb-toolbar,
+  .aqb-sidebar,
+  .aqb-panel-header-actions,
+  button,
+  .aqb-btn {
+    display: none !important;
+  }
+
+  .aqb-canvas {
+    background: white !important;
+  }
+
+  * {
+    box-shadow: none !important;
+  }
+}
+
+/* ============================================
+   REDUCED MOTION (ACCESSIBILITY)
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   HIGH CONTRAST MODE (ACCESSIBILITY)
+   ============================================ */
+
+@media (prefers-contrast: high) {
+  .aqb-input,
+  .aqb-select,
+  .aqb-btn {
+    border-width: 2px;
+  }
+
+  .aqb-input:focus,
+  .aqb-select:focus,
+  .aqb-btn:focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+}

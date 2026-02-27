@@ -1,0 +1,258 @@
+/**
+ * LayoutShell CSS - CSS Grid based editor layout
+ * Uses V2 semantic design tokens from default.css
+ *
+ * Grid Structure (IA Redesign 2026):
+ * ┌─────────────────────────────────────────────────────────┐
+ * │                      TopBar (52px)                       │
+ * ├──────┬──────────┬───────────────────────────┬───────────┤
+ * │ Rail │  Drawer  │         Canvas            │ Inspector │
+ * │ 56px │  280px   │          1fr              │   300px   │
+ * │      │ (or 0)   │      + footer 40px        │  (or 0)   │
+ * └──────┴──────────┴───────────────────────────┴───────────┘
+ *
+ * @license BSD-3-Clause
+ */
+
+/* ============================================
+   Layout CSS Custom Properties (IA Redesign 2026)
+   These can be overridden by default.css tokens
+   ============================================ */
+:root {
+  --layout-rail-width: var(--aqb-sidebar-width, 56px);
+  --layout-drawer-width: var(--aqb-sidebar-panel-width, 280px);
+  --layout-inspector-width: var(--aqb-right-panel-width, 300px);
+  --layout-topbar-height: var(--aqb-header-height, 52px);
+  --layout-footer-height: var(--aqb-footer-height, 40px);
+  --layout-gap: var(--aqb-space-3, 12px);
+  --layout-touch-min: var(--aqb-touch-min, 44px);
+}
+
+/* ============================================
+   Main Grid Container
+   ============================================ */
+.layout-shell {
+  display: grid;
+  grid-template-columns:
+    var(--layout-rail-width, 56px)
+    0px
+    1fr
+    0px;
+  grid-template-rows:
+    var(--layout-topbar-height, 52px)
+    1fr;
+  grid-template-areas:
+    "topbar topbar topbar topbar"
+    "rail drawer canvas inspector";
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: var(--surface-base, #0f1115);
+  color: var(--text-primary, #ffffff);
+  font-family: var(--aqb-font-family, "Inter", sans-serif);
+}
+
+/* Drawer open state - expand drawer column */
+.layout-shell--drawer-open {
+  grid-template-columns:
+    var(--layout-rail-width, 56px)
+    var(--layout-drawer-width, 280px)
+    1fr
+    0px;
+}
+
+/* Inspector open state - expand inspector column */
+.layout-shell--inspector-open {
+  grid-template-columns:
+    var(--layout-rail-width, 56px)
+    0px
+    1fr
+    var(--layout-inspector-width, 300px);
+}
+
+/* Both drawer and inspector open */
+.layout-shell--drawer-open.layout-shell--inspector-open {
+  grid-template-columns:
+    var(--layout-rail-width, 56px)
+    var(--layout-drawer-width, 280px)
+    1fr
+    var(--layout-inspector-width, 300px);
+}
+
+/* ============================================
+   TopBar
+   ============================================ */
+.layout-shell__topbar {
+  grid-area: topbar;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--layout-gap, 12px);
+  background: var(--surface-base, #0f1115);
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  z-index: 100;
+}
+
+/* ============================================
+   Left Rail
+   ============================================ */
+.layout-shell__rail {
+  grid-area: rail;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--layout-gap, 12px) 0;
+  background: var(--surface-base, #0f1115);
+  border-right: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  z-index: 90;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Hide scrollbar but keep functionality */
+.layout-shell__rail::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+
+/* ============================================
+   Drawer Panel
+   ============================================ */
+.layout-shell__drawer {
+  grid-area: drawer;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-panel, rgba(28, 30, 36, 0.7));
+  backdrop-filter: var(--glass-blur, blur(12px));
+  -webkit-backdrop-filter: var(--glass-blur, blur(12px));
+  border-right: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  overflow: hidden;
+  z-index: 80;
+
+  /* Slide animation */
+  transform: translateX(-100%);
+  opacity: 0;
+  transition:
+    transform var(--duration-slow, 300ms) var(--ease-bounce, cubic-bezier(0.34, 1.56, 0.64, 1)),
+    opacity var(--duration-fast, 150ms) var(--ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.layout-shell__drawer--open {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* ============================================
+   Canvas Area
+   ============================================ */
+.layout-shell__canvas {
+  grid-area: canvas;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-canvas, #181a20);
+  min-width: 0; /* Prevent grid blowout */
+}
+
+/* Canvas background pattern */
+.layout-shell__canvas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(255, 255, 255, 0.03) 1px,
+    transparent 0
+  );
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============================================
+   Right Inspector
+   ============================================ */
+.layout-shell__inspector {
+  grid-area: inspector;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-panel, rgba(28, 30, 36, 0.7));
+  backdrop-filter: var(--glass-blur, blur(12px));
+  -webkit-backdrop-filter: var(--glass-blur, blur(12px));
+  border-left: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  overflow: hidden;
+  z-index: 80;
+
+  /* Slide animation from right */
+  transform: translateX(100%);
+  opacity: 0;
+  transition:
+    transform var(--duration-slow, 300ms) var(--ease-bounce, cubic-bezier(0.34, 1.56, 0.64, 1)),
+    opacity var(--duration-fast, 150ms) var(--ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.layout-shell__inspector--open {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* ============================================
+   Responsive Behavior (1024px - 1366px)
+   Per COMPONENT_SPECS.md responsive rules
+   ============================================ */
+@media (max-width: 1366px) {
+  /* Inspector overlays canvas instead of taking grid space */
+  .layout-shell--inspector-open {
+    grid-template-columns:
+      var(--layout-rail-width, 56px)
+      0px
+      1fr
+      0px;
+  }
+
+  .layout-shell--drawer-open.layout-shell--inspector-open {
+    grid-template-columns:
+      var(--layout-rail-width, 56px)
+      var(--layout-drawer-width, 280px)
+      1fr
+      0px;
+  }
+
+  .layout-shell__inspector {
+    position: absolute;
+    top: var(--layout-topbar-height, 52px);
+    right: var(--layout-gap, 12px);
+    bottom: var(--layout-gap, 12px);
+    width: var(--layout-inspector-width, 300px);
+    border-radius: var(--aqb-radius-xl, 16px);
+    box-shadow: var(--glass-shadow-lg, 0 8px 32px rgba(0, 0, 0, 0.37));
+    z-index: 200;
+  }
+}
+
+/* Minimum supported width warning */
+@media (max-width: 1024px) {
+  .layout-shell {
+    /* Show warning overlay - handled by component */
+  }
+}
+
+/* ============================================
+   Accessibility
+   ============================================ */
+.layout-shell__rail:focus-visible,
+.layout-shell__drawer:focus-visible,
+.layout-shell__canvas:focus-visible,
+.layout-shell__inspector:focus-visible {
+  outline: 2px solid var(--brand-primary, #3b82f6);
+  outline-offset: -2px;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .layout-shell__drawer,
+  .layout-shell__inspector {
+    transition: opacity var(--duration-fast, 150ms) ease;
+  }
+}

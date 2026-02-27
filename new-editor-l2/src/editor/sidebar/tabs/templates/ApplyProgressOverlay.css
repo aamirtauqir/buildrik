@@ -1,0 +1,140 @@
+/**
+ * ApplyProgressOverlay CSS
+ * Step-by-step progress during template application.
+ * @license BSD-3-Clause
+ */
+
+.tmpl-progress {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 4, 12, 0.92);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  gap: 14px;
+  z-index: 55;
+}
+
+.tmpl-progress__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.tmpl-progress__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+/* ── Progress bar ── */
+.tmpl-progress__bar {
+  width: 100%;
+  max-width: 210px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.tmpl-progress__fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #7c6dfa, #00d4aa);
+  transition: width 0.3s ease;
+}
+
+/* ── Steps list ── */
+.tmpl-progress__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  max-width: 210px;
+}
+
+.tmpl-progress__step {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Step icons */
+.tmpl-progress__icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.tmpl-progress__icon--todo {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tmpl-progress__icon--active {
+  background: rgba(124, 109, 250, 0.18);
+  border: 1px solid rgba(124, 109, 250, 0.4);
+}
+
+.tmpl-progress__icon--done {
+  background: rgba(0, 212, 170, 0.18);
+  border: 1px solid rgba(0, 212, 170, 0.4);
+  color: #00d4aa;
+}
+
+/* Step labels */
+.tmpl-progress__label {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.3;
+}
+
+.tmpl-progress__step--done .tmpl-progress__label {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.tmpl-progress__step--active .tmpl-progress__label {
+  color: #a5b4fc;
+}
+
+/* Spinner for active step */
+.tmpl-progress__spinner {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid rgba(124, 109, 250, 0.3);
+  border-top-color: #7c6dfa;
+  border-radius: 50%;
+  animation: tmpl-spin 0.6s linear infinite;
+}
+
+@keyframes tmpl-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .tmpl-progress__spinner {
+    animation: none;
+  }
+  .tmpl-progress__fill {
+    transition: none;
+  }
+}

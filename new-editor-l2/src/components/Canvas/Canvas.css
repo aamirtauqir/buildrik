@@ -1,0 +1,1323 @@
+/**
+ * Canvas Styles
+ * Main editing canvas styles
+ * @license BSD-3-Clause
+ */
+
+/* ============================================
+   CSS Variables (can be overridden by Global Design Settings)
+   ============================================ */
+:root {
+  /* ============================================
+     AQUIBRA BRAND COLORS - Single Source of Truth
+     Updated: Professional Blue Palette (Phase 4)
+     ============================================ */
+
+  /* Primary Blue (Professional Color) */
+  --aqb-primary: #2563EB;
+  --aqb-primary-light: #3B82F6;
+  --aqb-primary-dark: #1D4ED8;
+  --aqb-primary-subtle: #DBEAFE;
+
+  /* Legacy compatibility */
+  --aqb-secondary: #1D4ED8;
+  --aqb-accent: #10B981;
+
+  /* Canvas Content Colors (Light Theme) */
+  --aqb-bg: #ffffff;
+  --aqb-text: #18181B;
+  --aqb-text-muted: #71717A;
+  --aqb-border: #E4E4E7;
+
+  /* Canvas Wrapper */
+  --aqb-canvas-wrapper: #F8FAFC;
+  --aqb-canvas-content: #FFFFFF;
+  --aqb-font-family: Inter, system-ui, sans-serif;
+  --aqb-heading-font: Inter, system-ui, sans-serif;
+  --aqb-font-size: 16px;
+  --aqb-heading-size: 32px;
+  --aqb-line-height: 1.6;
+  --aqb-spacing-sm: 8px;
+  --aqb-spacing-md: 16px;
+  --aqb-spacing-lg: 24px;
+  --aqb-radius-sm: 4px;
+  --aqb-radius-md: 8px;
+  --aqb-radius-lg: 16px;
+
+  /* ============================================
+     UI Typography Scale (UX-Compliant - WCAG 2.1)
+     Single Source of Truth for all UI components
+     ============================================ */
+  --aqb-font-xs: 12px;      /* Badges, hints (minimum readable) */
+  --aqb-font-sm: 13px;      /* Labels, counts, secondary text */
+  --aqb-font-md: 14px;      /* Body text, inputs, tab labels */
+  --aqb-font-lg: 15px;      /* Section headers */
+  --aqb-font-xl: 16px;      /* Titles, headings */
+
+  /* Font Weights */
+  --aqb-weight-normal: 400;
+  --aqb-weight-medium: 500;
+  --aqb-weight-semibold: 600;
+  --aqb-weight-bold: 700;
+
+  /* UI Text Colors (Dark Theme) */
+  --aqb-text-primary: #f8fafc;
+  --aqb-text-secondary: #a1a1aa;
+  --aqb-text-tertiary: #71717a;
+
+  /* UI Surface Colors (Dark Theme) */
+  --aqb-surface-1: #0d0d1a;     /* Deep background */
+  --aqb-surface-2: #1a1a2e;     /* Panel background */
+  --aqb-surface-3: #252542;     /* Cards, inputs */
+  --aqb-surface-4: #2d2d52;     /* Hover states */
+
+  /* Border Colors */
+  --aqb-border-subtle: rgba(255, 255, 255, 0.06);
+  --aqb-border-default: rgba(255, 255, 255, 0.1);
+  --aqb-border-strong: rgba(255, 255, 255, 0.15);
+
+  /* Accent Colors (Professional Blue) */
+  --aqb-accent-blue: #2563EB;
+  --aqb-accent-blue-alpha: rgba(37, 99, 235, 0.15);
+  --aqb-accent-blue-hover: rgba(37, 99, 235, 0.3);
+  --aqb-accent-blue-light: #3B82F6;
+  --aqb-accent-blue-dark: #1D4ED8;
+  /* Legacy purple aliases (for gradual migration) */
+  --aqb-accent-purple: var(--aqb-accent-blue);
+  --aqb-accent-purple-alpha: var(--aqb-accent-blue-alpha);
+  --aqb-accent-purple-hover: var(--aqb-accent-blue-hover);
+  --aqb-accent-purple-light: var(--aqb-accent-blue-light);
+  --aqb-accent-purple-dark: var(--aqb-accent-blue-dark);
+
+  /* Selection Colors (Clean, Professional) - IA Redesign 2026 Part 5.4 */
+  --aqb-selection-color: #3B82F6;
+  --aqb-selection-alpha-40: rgba(59, 130, 246, 0.4);
+  --aqb-selection-alpha-20: rgba(59, 130, 246, 0.2);
+  --aqb-selection-glow: 0 0 0 1px rgba(59, 130, 246, 0.2), 0 0 20px rgba(59, 130, 246, 0.15);
+  --aqb-selection-glow-sm: 0 2px 8px rgba(59, 130, 246, 0.25);
+  --aqb-selection-glow-strong: 0 0 0 2px rgba(59, 130, 246, 0.4), 0 0 20px rgba(59, 130, 246, 0.2);
+  --aqb-selection-outline: 2px solid #3B82F6;
+  --aqb-handle-gradient: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+
+  /* DevTools Box Model Colors (for Alt+Shift hover inspection) */
+  --aqb-boxmodel-content: rgba(111, 168, 220, 0.66);  /* Blue - content area */
+  --aqb-boxmodel-padding: rgba(147, 196, 125, 0.55);  /* Green - padding */
+  --aqb-boxmodel-margin: rgba(246, 178, 107, 0.66);   /* Orange - margin */
+
+  /* Shadows */
+  --aqb-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --aqb-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --aqb-shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.15);
+  --aqb-shadow-accent: 0 4px 14px rgba(37, 99, 235, 0.3);
+  --aqb-shadow-purple: var(--aqb-shadow-accent); /* Legacy alias */
+  --aqb-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(37, 99, 235, 0.1);
+
+  /* Transitions */
+  --aqb-transition-fast: 150ms ease;
+  --aqb-transition-normal: 200ms ease;
+  --aqb-transition-slow: 300ms ease;
+
+  /* ============================================
+     Status/Badge Colors
+     For inspector badges, annotations, etc.
+     ============================================ */
+  --aqb-badge-tag: #10B981;       /* Emerald - HTML tag badges */
+  --aqb-badge-id: #7c3aed;        /* Purple - ID attribute badges */
+  --aqb-badge-class: #f59e0b;     /* Amber - class badges */
+  --aqb-badge-data: #3b82f6;      /* Blue - data attribute badges */
+  --aqb-badge-default: #94a3b8;   /* Gray - default/custom badges */
+
+  /* ============================================
+     Feedback Colors
+     Success, error, warning, info states
+     ============================================ */
+  --aqb-success: #a6e3a1;         /* Green - success states */
+  --aqb-success-bg: rgba(166, 227, 161, 0.15);
+  --aqb-error: #f38ba8;           /* Red/Pink - error states */
+  --aqb-error-bg: rgba(243, 139, 168, 0.15);
+  --aqb-warning: #f9e2af;         /* Yellow - warning states */
+  --aqb-warning-bg: rgba(249, 226, 175, 0.15);
+  --aqb-info: #89b4fa;            /* Light blue - info states */
+  --aqb-info-bg: rgba(137, 180, 250, 0.15);
+
+  /* ============================================
+     Toolbar Colors (Dark Theme Panels)
+     Specific colors for toolbars and floating UI
+     ============================================ */
+  --aqb-toolbar-bg: #252536;
+  --aqb-toolbar-bg-hover: #3a3a4d;
+  --aqb-toolbar-border: #3a3a4d;
+  --aqb-toolbar-text: #a0a0b0;
+  --aqb-toolbar-text-hover: #e0e0e8;
+  --aqb-toolbar-text-muted: #6c7086;
+  --aqb-toolbar-text-active: #cdd6f4;
+
+  /* ============================================
+     Smart Guides
+     ============================================ */
+  --aqb-guide-color: #FF00FF;     /* Magenta - smart alignment guides */
+  --aqb-guide-color-alt: #89b4fa; /* Light blue - custom guides */
+
+  /* ============================================
+     Drop Feedback Colors - Unified Blue Palette
+     ============================================ */
+  --aqb-drop-valid-border: #3B82F6;
+  --aqb-drop-valid-bg: rgba(59, 130, 246, 0.08);
+  --aqb-drop-invalid-border: #ef4444;
+  --aqb-drop-invalid-bg: rgba(239, 68, 68, 0.1);
+
+  /* ============================================
+     Spacing Indicator Colors
+     ============================================ */
+  --aqb-spacing-margin: #10B981;  /* Emerald - margin indicators */
+  --aqb-spacing-padding: #7c3aed; /* Purple - padding indicators */
+}
+
+/* ============================================
+   Canvas Content Area - Normal Document Flow
+   ============================================ */
+.aqb-canvas {
+  /* Override theme centering - web pages flow top-to-bottom */
+  display: block !important;
+  align-items: initial !important;
+  justify-content: initial !important;
+}
+
+/* Page root should also have normal flow */
+.aqb-page-root {
+  display: block;
+  min-height: 100%;
+}
+
+/* ============================================
+   Base Element Styles
+   ============================================ */
+[data-aqb-id] * {
+  color: inherit;
+}
+
+.aqb-page-root,
+[data-aqb-type="container"] {
+  font-family: var(--aqb-font-family);
+  font-size: var(--aqb-font-size);
+  line-height: var(--aqb-line-height);
+  color: var(--aqb-text);
+}
+
+/* ============================================
+   Always-Visible Element Outlines
+   Shows element boundaries at all times for easier editing
+   ============================================ */
+.aqb-canvas[data-show-outlines="true"] [data-aqb-id] {
+  outline: 1px dashed rgba(59, 130, 246, 0.35);
+  outline-offset: -1px;
+}
+
+/* Stronger outline for layout containers */
+.aqb-canvas[data-show-outlines="true"] [data-aqb-id].container,
+.aqb-canvas[data-show-outlines="true"] [data-aqb-id].section,
+.aqb-canvas[data-show-outlines="true"] [data-aqb-id].row,
+.aqb-canvas[data-show-outlines="true"] [data-aqb-id].col {
+  outline: 1px dashed var(--aqb-accent-purple-45);
+}
+
+/* Hide outline on selected elements (they have selection box already) */
+.aqb-canvas[data-show-outlines="true"] [data-aqb-id][data-selected="true"] {
+  outline: none;
+}
+
+/* ============================================
+   Typography
+   ============================================ */
+[data-aqb-id] h1,
+[data-aqb-id] h2,
+[data-aqb-id] h3,
+[data-aqb-id] h4,
+[data-aqb-id] h5,
+[data-aqb-id] h6 {
+  font-family: var(--aqb-heading-font);
+  color: var(--aqb-text);
+  margin: 0 0 16px 0;
+}
+
+[data-aqb-id] h1 {
+  font-size: calc(var(--aqb-heading-size) * 1.5);
+}
+[data-aqb-id] h2 {
+  font-size: var(--aqb-heading-size);
+}
+[data-aqb-id] h3 {
+  font-size: calc(var(--aqb-heading-size) * 0.75);
+}
+[data-aqb-id] h4 {
+  font-size: calc(var(--aqb-heading-size) * 0.625);
+}
+
+[data-aqb-id] p {
+  color: var(--aqb-text);
+  margin: 0 0 12px 0;
+}
+
+[data-aqb-id] a {
+  color: var(--aqb-primary);
+}
+
+/* ============================================
+   Button Styles
+   ============================================ */
+[data-aqb-id] button {
+  background: var(--aqb-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--aqb-radius-md);
+  padding: var(--aqb-spacing-sm) var(--aqb-spacing-md);
+  font-family: var(--aqb-font-family);
+  cursor: pointer;
+}
+
+[data-aqb-id] button:hover {
+  background: var(--aqb-secondary);
+}
+
+/* ============================================
+   Media Elements
+   ============================================ */
+[data-aqb-id] img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ============================================
+   Form Elements
+   ============================================ */
+[data-aqb-id] input,
+[data-aqb-id] textarea,
+[data-aqb-id] select {
+  color: var(--aqb-text);
+  background: #fff;
+  border: 1px solid var(--aqb-border);
+  border-radius: var(--aqb-radius-sm);
+  padding: var(--aqb-spacing-sm);
+  font-family: var(--aqb-font-family);
+}
+
+/* ============================================
+   Container Elements
+   ============================================ */
+[data-aqb-type="container"]:empty,
+[data-aqb-type="columns"]:empty {
+  min-height: 60px;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    var(--aqb-accent-purple-05) 10px,
+    var(--aqb-accent-purple-05) 20px
+  );
+  border: 2px dashed var(--aqb-accent-purple-30);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-aqb-type="container"]:empty::after,
+[data-aqb-type="columns"]:empty::after {
+  content: "Drop blocks here or use Quick Add above ↑";
+  color: var(--aqb-accent-purple-60);
+  font-size: var(--aqb-text-base);
+  font-weight: 500;
+  text-align: center;
+  padding: 8px 16px;
+}
+
+/* ============================================
+   Columns Layout
+   ============================================ */
+.row,
+[data-aqb-type="columns"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  width: 100%;
+}
+
+.col {
+  flex: 1;
+  min-width: 0;
+  padding: 16px;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    var(--aqb-accent-purple-05) 10px,
+    var(--aqb-accent-purple-05) 20px
+  );
+  border: 2px dashed var(--aqb-accent-purple-30);
+  border-radius: 8px;
+  min-height: 60px;
+}
+
+.col:empty::after {
+  content: "Column";
+  color: var(--aqb-accent-purple-60);
+  font-size: var(--aqb-text-sm-plus);
+}
+
+/* ============================================
+   Text Elements
+   ============================================ */
+[data-aqb-type="text"] {
+  min-height: 1em;
+}
+
+/* ============================================
+   Image Placeholders
+   ============================================ */
+[data-aqb-type="image"]:not([src]),
+[data-aqb-type="image"][src=""] {
+  min-height: 100px;
+  background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+/* ============================================
+   Selection & Interaction States
+   ============================================ */
+
+/* Make all canvas elements draggable */
+[data-aqb-id]:not([data-aqb-root="true"]) {
+  cursor: move;
+}
+
+/* Hover outline handled by React ElementHoverOverlay - only set cursor here */
+[data-aqb-id]:hover {
+  cursor: move;
+}
+
+/* Dragging state */
+[data-aqb-id].dragging {
+  opacity: 0.5;
+  cursor: grabbing !important;
+}
+
+/* Selected state */
+[data-aqb-id][data-selected="true"] {
+  outline: 2px solid var(--aqb-selection-color);
+  outline-offset: 2px;
+  position: relative;
+  z-index: 100;
+}
+
+/* Locked state - prevents accidental selection/modification */
+[data-aqb-id][data-locked="true"] {
+  outline: 2px dotted #f38ba8;
+  cursor: not-allowed !important;
+  user-select: none;
+}
+
+/* Locked element selected - show lock status */
+[data-aqb-id][data-locked="true"][data-selected="true"] {
+  outline: 2px dotted #f38ba8;
+  outline-offset: 2px;
+}
+
+/* Hidden state - reduced visibility, no interactions */
+[data-aqb-id][data-hidden="true"] {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* ============================================
+   Drop Target Indicator
+   ============================================ */
+/* Drop target - simple outline only, overlay handles detailed feedback */
+[data-aqb-id][data-drop-target="true"] {
+  outline: 2px solid var(--aqb-drop-valid-border, #3b82f6);
+  outline-offset: 2px;
+  transition: outline-color 150ms ease;
+}
+
+/* Drop zone at top/bottom of elements - Professional 2px solid */
+.aqb-drop-indicator-top {
+  position: absolute;
+  top: 0;
+  left: -4px;
+  right: -4px;
+  height: 2px;
+  background-color: var(--aqb-drop-valid-border);
+  border-radius: 1px;
+  animation: dropLineFadeIn 150ms ease-out forwards;
+  z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
+}
+
+.aqb-drop-indicator-bottom {
+  position: absolute;
+  bottom: 0;
+  left: -4px;
+  right: -4px;
+  height: 2px;
+  background-color: var(--aqb-drop-valid-border);
+  border-radius: 1px;
+  animation: dropLineFadeIn 150ms ease-out forwards;
+  z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
+}
+
+/* Drop zone indicators at left/right of elements (for horizontal flex/grid layouts) */
+.aqb-drop-indicator-left {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  left: 0;
+  width: 2px;
+  background-color: var(--aqb-drop-valid-border);
+  border-radius: 1px;
+  animation: dropLineFadeIn 150ms ease-out forwards;
+  z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
+}
+
+.aqb-drop-indicator-right {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  right: 0;
+  width: 2px;
+  background-color: var(--aqb-drop-valid-border);
+  border-radius: 1px;
+  animation: dropLineFadeIn 150ms ease-out forwards;
+  z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
+}
+
+/* Style for elements currently being dragged */
+.aqb-dragging {
+  opacity: 0.4 !important;
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+/* Clone mode indicator (Alt+Drag) - shows element is being duplicated */
+.aqb-clone-mode {
+  cursor: copy !important;
+  outline: 2px dashed var(--aqb-selection-color) !important;
+  outline-offset: 2px;
+}
+
+.aqb-clone-mode::before {
+  content: "+";
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 16px;
+  height: 16px;
+  background: var(--aqb-selection-color);
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: var(--aqb-text-md);
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* Valid drop target indicator
+   NOTE: Visual feedback (outline, background) now handled by React DropFeedbackOverlay
+   CSS rules kept minimal to avoid conflicts with overlay positioning */
+[data-aqb-id][data-drop-target="true"],
+[data-aqb-id][data-drop-valid="true"] {
+  /* Let React DropFeedbackOverlay handle visual styling */
+  transition: outline 0.15s ease;
+}
+
+/* Drop target label REMOVED - React DropFeedbackOverlay handles visual feedback
+   This CSS ::before rule was creating a duplicate green "Drop here" label that
+   conflicted with the React-based feedback system. The DropFeedbackOverlay
+   component provides better control over when and how drop feedback appears. */
+
+/* Invalid drop target - simple red outline, overlay handles badge */
+[data-aqb-id][data-drop-invalid="true"] {
+  outline: 2px solid var(--aqb-drop-invalid-border, #dc2626);
+  outline-offset: 2px;
+  cursor: not-allowed !important;
+}
+
+/* BUG-GAP: Invalid cursor during drag (higher specificity than .aqb-dragging)
+   When an element is marked as invalid drop target during drag, cursor must be not-allowed */
+.aqb-canvas[data-drag-active="true"] [data-aqb-id][data-drop-invalid="true"],
+.aqb-canvas[data-drag-active="true"] [data-aqb-id][data-drop-invalid="true"] * {
+  cursor: not-allowed !important;
+}
+
+/* Canvas-wide cursor when dragging over invalid area */
+.aqb-canvas[data-invalid-drop="true"] {
+  cursor: not-allowed !important;
+}
+
+/* ============================================
+   Multi-Select Rectangle (Marquee Selection)
+   Phase 4: Simplified - no infinite animations
+   ============================================ */
+.aqb-selection-box {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1000; /* Z_LAYERS.selectionBox - use unified registry */
+  background: var(--aqb-accent-blue-bg);
+  border: 1px solid var(--aqb-selection-color);
+  border-radius: 4px;
+  box-shadow: var(--aqb-selection-glow);
+  /* NOTE: Removed infinite selectionBoxPulse animation per Phase 4 cleanup */
+}
+
+/* Selection box corner markers */
+.aqb-selection-box::before,
+.aqb-selection-box::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--aqb-selection-color);
+  border-radius: 2px;
+}
+
+.aqb-selection-box::before {
+  top: -3px;
+  left: -3px;
+}
+
+.aqb-selection-box::after {
+  bottom: -3px;
+  right: -3px;
+}
+
+/* Selection count badge */
+.aqb-selection-count {
+  position: absolute;
+  bottom: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--aqb-handle-gradient);
+  color: #ffffff;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: var(--aqb-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px var(--aqb-accent-purple-40);
+}
+
+/* ============================================
+   Empty Canvas State
+   ============================================ */
+.aqb-empty-canvas {
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: #f8fafc;
+  border: 3px dashed #e2e8f0;
+  border-radius: 16px;
+  margin: 20px;
+  transition: all 0.3s ease;
+  animation: emptyCanvasPulse 3s ease-in-out infinite;
+}
+
+@keyframes emptyCanvasPulse {
+  0%, 100% {
+    border-color: #e2e8f0;
+    box-shadow: inset 0 0 0 rgba(139, 92, 246, 0);
+  }
+  50% {
+    border-color: #cbd5e1;
+    box-shadow: inset 0 0 60px var(--aqb-accent-purple-08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aqb-empty-canvas {
+    animation: none;
+  }
+}
+
+.aqb-empty-canvas:hover {
+  border-color: #94a3b8;
+  background: #f1f5f9;
+  animation-play-state: paused;
+}
+
+.aqb-empty-canvas-container {
+  max-width: 400px;
+  text-align: center;
+  animation: aqb-fade-in 0.5s ease-out;
+}
+
+.aqb-empty-icon {
+  font-size: var(--aqb-text-display);
+  margin-bottom: 24px;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));
+}
+
+.aqb-empty-title {
+  font-size: var(--aqb-text-3xl);
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+
+.aqb-empty-text {
+  font-size: var(--aqb-text-md-plus);
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.aqb-empty-hint {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 99px;
+  font-size: var(--aqb-text-base);
+  color: #475569;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.aqb-empty-hint strong {
+  color: #3b82f6;
+}
+
+.aqb-empty-hint kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  font-family: var(--aqb-font-mono, monospace);
+  font-size: var(--aqb-text-sm, 12px);
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--aqb-radius-xs, 4px);
+  box-shadow: 0 1px 0 #d1d5db;
+  color: #374151;
+}
+
+.aqb-empty-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  justify-content: center;
+}
+
+.aqb-shortcut {
+  font-size: var(--aqb-text-sm-plus);
+  color: #94a3b8;
+  padding: 4px 12px;
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+/* Minimal root for empty canvas (React overlay handles CTA) */
+.aqb-empty-canvas-root {
+  min-height: 480px;
+}
+
+/* ============================================
+   Canvas Empty State CTA Overlay (React)
+   Interactive buttons over the empty canvas
+   ============================================ */
+.aqb-canvas-empty-cta {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  text-align: center;
+  padding: 40px;
+  background: rgba(248, 250, 252, 0.85);
+  border: 3px dashed #e2e8f0;
+  border-radius: 16px;
+  margin: 20px;
+  animation: aqb-fade-in 0.4s ease-out;
+}
+
+.aqb-canvas-empty-cta__icon {
+  color: #818cf8;
+  margin-bottom: 16px;
+  opacity: 0.7;
+}
+
+.aqb-canvas-empty-cta__title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 8px;
+}
+
+.aqb-canvas-empty-cta__desc {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 24px;
+  max-width: 280px;
+}
+
+.aqb-canvas-empty-cta__browse {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.aqb-canvas-empty-cta__browse:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.aqb-canvas-empty-cta__blank {
+  margin-top: 12px;
+  padding: 6px 16px;
+  background: transparent;
+  color: #64748b;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.aqb-canvas-empty-cta__blank:hover {
+  color: #475569;
+}
+
+@keyframes aqb-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes aqb-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes aqb-toast-in {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes aqb-toast-out {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(20px); }
+}
+
+/* ============================================
+   Component View Mode
+   ============================================ */
+.aqb-canvas--component-view [data-aqb-type] {
+  position: relative;
+  outline: 1px dashed var(--aqb-accent-purple-60);
+  outline-offset: -1px;
+}
+
+.aqb-canvas--component-view [data-aqb-type]::after {
+  content: attr(data-aqb-type);
+  position: absolute;
+  top: -18px;
+  left: 0;
+  background: rgba(17, 17, 27, 0.85);
+  border: 1px solid var(--aqb-accent-purple-50);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: var(--aqb-text-xs);
+  font-weight: 600;
+  color: var(--aqb-selection-color);
+  pointer-events: none;
+  z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+
+.aqb-canvas--component-view [data-aqb-type] [data-aqb-type] {
+  outline-color: var(--aqb-accent-purple-35);
+}
+
+/* ============================================
+   Selection Animations (Single-run only)
+   ============================================ */
+/* NOTE: Removed infinite aqb-selection-pulse animation for better performance
+   and cleaner visual design per UX plan "Hybrid 2: Minimal + Smart Escalation" */
+
+/* Selection animations removed - instant selection prevents jerk/race conditions */
+
+/* ============================================
+   Drop Feedback Overlay Styles
+   ============================================ */
+
+/* CSS Variables for drop feedback colors */
+.aqb-canvas {
+  --aqb-drop-valid-border: var(--aqb-selection-color);
+  --aqb-drop-valid-bg: var(--aqb-accent-purple-08);
+  --aqb-drop-invalid-border: #dc2626;
+  --aqb-drop-invalid-bg: rgba(220, 38, 38, 0.04);
+}
+
+/* Professional single-run animations (no infinite loops) */
+@keyframes dropLineFadeIn {
+  from { opacity: 0; transform: scaleX(0.8); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+
+@keyframes badgeFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slotFadeIn {
+  from { opacity: 0; transform: scaleY(0); }
+  to { opacity: 1; transform: scaleY(1); }
+}
+
+@keyframes slotFadeInHorizontal {
+  from { opacity: 0; transform: scaleX(0); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+
+/* Invalid drop feedback badge - corner positioned, fade in */
+.aqb-drop-feedback-badge.invalid {
+  animation: badgeFadeIn 150ms ease-out forwards;
+}
+
+/* Drop feedback target overlay - valid state */
+.aqb-drop-feedback-target.valid {
+  border-color: var(--aqb-drop-valid-border) !important;
+  background: var(--aqb-drop-valid-bg) !important;
+}
+
+/* Drop feedback target overlay - invalid state */
+.aqb-drop-feedback-target.invalid {
+  border-color: var(--aqb-drop-invalid-border) !important;
+  background: var(--aqb-drop-invalid-bg) !important;
+}
+
+/* Position line animation - single run fade in */
+.aqb-drop-position-line {
+  animation: dropLineFadeIn 150ms ease-out forwards;
+}
+
+/* ============================================
+   Visual Drag Handles (Phase 2)
+   6-dot grip icon on element hover
+   ============================================ */
+
+.aqb-drag-handle {
+  animation: dragHandleFadeIn 0.15s ease-out;
+}
+
+@keyframes dragHandleFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+}
+
+/* ============================================
+   Layer Panel Hover Highlight (Phase 8)
+   Bidirectional hover-to-highlight
+   ============================================ */
+
+/* Highlight element when hovering its layer in the panel */
+.aqb-layer-hover-highlight {
+  outline: 1px solid var(--aqb-selection-color) !important;
+  outline-offset: 1px;
+  background: var(--aqb-accent-purple-05) !important;
+  /* NOTE: Removed infinite layerHoverPulse animation - static highlight is cleaner */
+}
+
+/* ============================================
+   Drop Slot Preview Styles (Professional)
+   ============================================ */
+
+/* Drop slot preview - simple dashed outline */
+.aqb-drop-slot-preview {
+  animation: slotFadeIn 150ms ease-out forwards;
+}
+
+/* ============================================
+   Drop Zone Breadcrumb Trail
+   Shows element hierarchy during drag operations
+   ============================================ */
+
+@keyframes breadcrumbFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.aqb-drop-breadcrumb {
+  animation: breadcrumbFadeIn 150ms ease-out forwards;
+  font-family: var(--aqb-font-family, Inter, system-ui, sans-serif);
+}
+
+/* Depth badge for nesting level indicator */
+.aqb-depth-badge {
+  font-family: var(--aqb-font-family, Inter, system-ui, sans-serif);
+}
+
+/* ============================================
+   Valid Drop Container Glow Effect
+   Subtle glow animation for valid drop targets
+   ============================================ */
+
+/* Valid drop target - subtle blue glow effect */
+[data-aqb-id][data-drop-target="true"][data-drop-valid="true"] {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3),
+              0 0 12px rgba(59, 130, 246, 0.1);
+  transition: box-shadow 150ms ease, outline 150ms ease;
+}
+
+/* Container expansion hint - "+" indicator for containers with children */
+[data-aqb-id][data-drop-target="true"][data-drop-valid="true"][data-has-children="true"]::after {
+  content: '+';
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--aqb-drop-valid-border, #3B82F6);
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: var(--aqb-text-md);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+  z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
+  pointer-events: none;
+}
+
+/* Accessibility: Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .aqb-drop-feedback-badge,
+  .aqb-drop-feedback-target,
+  .aqb-drop-position-line,
+  .aqb-drop-slot-preview,
+  .aqb-drop-breadcrumb,
+  .aqb-depth-badge {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* ============================================
+   Phase 4: Micro-interactions
+   Flash + settle animations on drop
+   ============================================ */
+
+@keyframes flashOnDrop {
+  0% {
+    box-shadow: 0 0 0 0 rgba(166, 227, 161, 0.8);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(166, 227, 161, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(166, 227, 161, 0);
+  }
+}
+
+@keyframes settleElement {
+  0% {
+    transform: scale(1.02);
+    opacity: 0.8;
+  }
+  60% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.aqb-element-flash {
+  animation: flashOnDrop 0.4s ease-out;
+}
+
+.aqb-element-settle {
+  animation: settleElement 0.3s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aqb-element-flash,
+  .aqb-element-settle {
+    animation: none !important;
+  }
+}
+
+/* ============================================
+   Phase 9: X-Ray / Outline Mode
+   Shows all element boundaries with labels
+   ============================================ */
+
+.aqb-canvas[data-xray-mode="true"] [data-aqb-id] {
+  outline: 1px dashed var(--aqb-accent-purple-50) !important;
+  outline-offset: -1px;
+  background: var(--aqb-accent-purple-05) !important;
+  position: relative;
+}
+
+.aqb-canvas[data-xray-mode="true"] [data-aqb-id]::before {
+  content: attr(data-aqb-type);
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: var(--aqb-text-2xs-plus);
+  font-family: monospace;
+  background: rgba(30, 30, 46, 0.9);
+  color: var(--aqb-selection-color);
+  padding: 1px 4px;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
+  text-transform: lowercase;
+  white-space: nowrap;
+}
+
+/* Different colors for different element types */
+.aqb-canvas[data-xray-mode="true"] [data-aqb-type="container"]::before {
+  background: rgba(180, 190, 254, 0.9);
+  color: #1e1e2e;
+}
+
+.aqb-canvas[data-xray-mode="true"] [data-aqb-type="columns"]::before,
+.aqb-canvas[data-xray-mode="true"] .row::before {
+  background: rgba(203, 166, 247, 0.9);
+  color: #1e1e2e;
+}
+
+.aqb-canvas[data-xray-mode="true"] .col::before {
+  background: rgba(245, 194, 231, 0.9);
+  color: #1e1e2e;
+}
+
+.aqb-canvas[data-xray-mode="true"] [data-aqb-type="text"]::before,
+.aqb-canvas[data-xray-mode="true"] [data-aqb-type="heading"]::before {
+  background: rgba(148, 226, 213, 0.9);
+  color: #1e1e2e;
+}
+
+.aqb-canvas[data-xray-mode="true"] [data-aqb-type="button"]::before {
+  background: rgba(166, 227, 161, 0.9);
+  color: #1e1e2e;
+}
+
+.aqb-canvas[data-xray-mode="true"] [data-aqb-type="image"]::before {
+  background: rgba(250, 179, 135, 0.9);
+  color: #1e1e2e;
+}
+
+/* Hide X-Ray labels on selected elements (they have their own badge) */
+.aqb-canvas[data-xray-mode="true"] [data-aqb-id][data-selected="true"]::before {
+  display: none;
+}
+
+/* Nested elements get slightly different outline colors for depth perception */
+.aqb-canvas[data-xray-mode="true"] [data-aqb-id] [data-aqb-id] {
+  outline-color: rgba(180, 190, 254, 0.4) !important;
+}
+
+.aqb-canvas[data-xray-mode="true"] [data-aqb-id] [data-aqb-id] [data-aqb-id] {
+  outline-color: rgba(203, 166, 247, 0.4) !important;
+}
+
+/* ============================================
+   Inline Text Editing Mode
+   Visual feedback when double-clicking to edit text
+   ============================================ */
+[data-aqb-id][contenteditable="true"] {
+  outline: 2px solid var(--aqb-primary, #667eea) !important;
+  outline-offset: 2px;
+  background: rgba(102, 126, 234, 0.05) !important;
+  cursor: text !important;
+  caret-color: var(--aqb-primary, #667eea);
+  min-height: 1em;
+  border-radius: 2px;
+}
+
+/* Placeholder for empty editable elements */
+[data-aqb-id][contenteditable="true"]:empty::before {
+  content: 'Type here...';
+  color: var(--aqb-text-muted, #6b7280);
+  font-style: italic;
+  pointer-events: none;
+}
+
+/* Ensure text selection is visible */
+[data-aqb-id][contenteditable="true"]::selection {
+  background: rgba(102, 126, 234, 0.3);
+}
+
+/* Flash animation for newly dropped elements */
+@keyframes aqb-element-flash {
+  0% {
+    background-color: rgba(102, 126, 234, 0.3);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.4);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+.aqb-element-flash {
+  animation: aqb-element-flash 0.5s ease-out forwards;
+}
+
+/* ============================================
+   Accessibility: Focus Visible States (WCAG 2.1 AA)
+   ============================================ */
+
+/* Global focus-visible outline for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--aqb-primary, #667eea);
+  outline-offset: 2px;
+}
+
+/* Canvas element focus (keyboard navigation) */
+[data-aqb-id]:focus-visible {
+  outline: 3px solid var(--aqb-primary, #667eea);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+}
+
+/* Toolbar button focus */
+.aqb-toolbar-button:focus-visible,
+.aqb-icon-button:focus-visible {
+  outline: 2px solid var(--aqb-primary, #667eea);
+  outline-offset: 2px;
+  background: rgba(102, 126, 234, 0.1);
+}
+
+/* Panel tab focus */
+.aqb-tab:focus-visible,
+.aqb-sidebar-tab:focus-visible {
+  outline: 2px solid var(--aqb-primary, #667eea);
+  outline-offset: -2px;
+  background: rgba(102, 126, 234, 0.1);
+}
+
+/* Layer tree item focus */
+.aqb-layer-item:focus-visible {
+  outline: 2px solid var(--aqb-primary, #667eea);
+  outline-offset: -1px;
+  background: rgba(102, 126, 234, 0.1);
+}
+
+/* Block card focus */
+.aqb-block-card:focus-visible {
+  outline: 2px solid var(--aqb-primary, #667eea);
+  outline-offset: 2px;
+  transform: scale(1.02);
+}
+
+/* Input field focus */
+.aqb-input:focus-visible,
+.aqb-select:focus-visible,
+.aqb-textarea:focus-visible {
+  outline: 2px solid var(--aqb-primary, #667eea);
+  outline-offset: 0;
+  border-color: var(--aqb-primary, #667eea);
+}
+
+/* Skip link for screen readers */
+.aqb-skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  background: var(--aqb-primary, #667eea);
+  color: white;
+  padding: 8px 16px;
+  z-index: 10000;
+  text-decoration: none;
+  border-radius: 0 0 4px 0;
+}
+
+.aqb-skip-link:focus {
+  top: 0;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :focus-visible {
+    outline: 3px solid CanvasText;
+    outline-offset: 2px;
+  }
+
+  [data-aqb-id][data-selected="true"] {
+    outline: 3px solid Highlight;
+  }
+}
+
+/* ============================================
+   Accessibility: Reduced Motion Preferences
+   Phase 4: Comprehensive motion reduction
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  /* Disable all focus animations */
+  :focus-visible {
+    transition: none;
+  }
+
+  /* Disable selection and interaction animations */
+  .aqb-selection-box,
+  .aqb-selection-box--appearing,
+  .aqb-drag-handle,
+  .aqb-drop-indicator-top,
+  .aqb-drop-indicator-bottom,
+  .aqb-drop-indicator-left,
+  .aqb-drop-indicator-right,
+  .aqb-layer-hover-highlight {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Disable canvas state transitions */
+  [data-aqb-id],
+  [data-aqb-id]:hover,
+  [data-aqb-id][data-selected="true"],
+  [data-aqb-id][data-drop-target="true"] {
+    transition: none !important;
+  }
+
+  /* Disable transform effects */
+  .aqb-block-card:focus-visible {
+    transform: none !important;
+  }
+
+  /* Ensure all overlays appear instantly */
+  .aqb-hover-overlay,
+  .aqb-drop-feedback-badge,
+  .aqb-drop-feedback-target {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+  }
+}

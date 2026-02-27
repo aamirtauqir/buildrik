@@ -1,0 +1,651 @@
+/* ===========================================
+   LAYERS PANEL - Extracted CSS Module
+
+   Purpose: Styles for the Layer tree view,
+   DOM hierarchy, and layer management UI.
+
+   Extracted from LeftSidebar.css as part of
+   CSS modularization (Task 9 - UX Audit 2026)
+   =========================================== */
+
+/* ─────────────────────────────────────────────
+   LAYER CSS VARIABLES
+   ───────────────────────────────────────────── */
+.aqb-layers-panel {
+  /* Layer Colors - Using theme variables */
+  --layer-accent: var(--aqb-info);
+  --layer-accent-alpha: rgba(59, 130, 246, 0.15);
+  --layer-accent-soft: rgba(59, 130, 246, 0.2);
+  --layer-success: var(--aqb-success);
+  --layer-success-alpha: rgba(34, 197, 94, 0.15);
+  --layer-warning: var(--aqb-accent-amber);
+  --layer-warning-alpha: rgba(251, 191, 36, 0.15);
+  --layer-muted: var(--aqb-text-tertiary);
+  --layer-muted-alpha: rgba(100, 116, 139, 0.15);
+
+  /* Row Sizing - Compact for content density */
+  --layer-row-height: 30px;
+  --layer-row-gap: 1px;
+
+  /* Minimal Tree: Full height, no chrome */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Minimal Tree Variant - Maximum content space */
+.aqb-layers-minimal {
+  padding: 0;
+}
+
+/* ─────────────────────────────────────────────
+   MINIMAL SEARCH ROW (Search + Settings only)
+   ───────────────────────────────────────────── */
+.aqb-layers-search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--aqb-border);
+  flex-shrink: 0;
+}
+
+.aqb-layers-search-row .aqb-search-container {
+  flex: 1;
+}
+
+/* ─────────────────────────────────────────────
+   MINIMAL TREE VIEW (Full height, scrollable)
+   ───────────────────────────────────────────── */
+.aqb-layers-tree-minimal {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+/* ─────────────────────────────────────────────
+   LAYER PANEL HEADER
+   ───────────────────────────────────────────── */
+.aqb-layers-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--aqb-surface-3);
+  border-radius: var(--aqb-radius-md);
+  margin-bottom: 8px;
+}
+
+.aqb-layers-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.aqb-layers-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--aqb-font-sm);
+  font-weight: 600;
+  color: var(--aqb-text-primary);
+}
+
+.aqb-layers-header-icon {
+  color: var(--aqb-text-tertiary);
+}
+
+.aqb-layers-header-count {
+  font-size: var(--aqb-font-xs);
+  font-weight: 500;
+  padding: 2px 8px;
+  background: var(--aqb-accent-purple-alpha);
+  color: var(--aqb-accent-purple);
+  border-radius: 10px;
+}
+
+.aqb-layers-header-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.aqb-layers-settings-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  border-radius: var(--aqb-radius-sm);
+  color: var(--aqb-text-tertiary);
+  cursor: pointer;
+  transition: var(--aqb-transition-fast);
+}
+
+.aqb-layers-settings-btn:hover {
+  background: var(--aqb-surface-4);
+  color: var(--aqb-text-primary);
+}
+
+/* ─────────────────────────────────────────────
+   FILTER CHIPS
+   ───────────────────────────────────────────── */
+.aqb-filter-chips {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.aqb-filter-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--aqb-surface-4);
+  border: 1px solid transparent;
+  border-radius: var(--aqb-radius-full);
+  font-size: var(--aqb-font-xs);
+  font-weight: 500;
+  color: var(--aqb-text-secondary);
+  cursor: pointer;
+  transition: var(--aqb-transition-fast);
+}
+
+.aqb-filter-chip:hover {
+  background: var(--aqb-surface-5);
+  color: var(--aqb-text-primary);
+}
+
+.aqb-filter-chip.active {
+  background: var(--aqb-accent-purple-alpha);
+  border-color: var(--aqb-accent-purple);
+  color: var(--aqb-accent-purple);
+}
+
+.aqb-filter-chip-icon {
+  font-size: var(--aqb-text-sm-plus);
+}
+
+/* ─────────────────────────────────────────────
+   LAYER ROW (Updated with CSS vars)
+   ───────────────────────────────────────────── */
+.aqb-layer-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--layer-row-height);
+  padding: 0 8px;
+  border-radius: var(--aqb-radius-sm);
+  cursor: pointer;
+  transition: var(--aqb-transition-fast);
+}
+
+.aqb-layer-row:hover {
+  background: var(--aqb-surface-3);
+}
+
+.aqb-layer-row.is-selected {
+  background: var(--layer-accent-alpha);
+  outline: 1px solid var(--layer-accent);
+}
+
+.aqb-layer-row.is-dragging {
+  opacity: 0.5;
+}
+
+/* WCAG 2.1 AA: Focus visible for keyboard navigation in layer tree */
+.aqb-layer-row:focus-visible {
+  outline: 2px solid var(--aqb-primary);
+  outline-offset: -2px;
+  border-radius: var(--aqb-radius-sm);
+  z-index: 1;
+}
+
+/* ─────────────────────────────────────────────
+   DEPTH BARS
+   ───────────────────────────────────────────── */
+.aqb-depth-bars {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.aqb-depth-bar {
+  width: var(--layer-depth-bar-width);
+  height: 16px;
+  border-radius: 2px;
+  opacity: 0.7;
+}
+
+.aqb-depth-bar--1 { background: var(--layer-depth-1); }
+.aqb-depth-bar--2 { background: var(--layer-depth-2); }
+.aqb-depth-bar--3 { background: var(--layer-depth-3); }
+.aqb-depth-bar--4 { background: var(--layer-depth-4); }
+
+/* Fade effect for deeper nesting */
+.aqb-depth-bar:nth-child(n+4) {
+  opacity: 0.4;
+}
+
+/* ─────────────────────────────────────────────
+   LAYER TOGGLE (Expand/Collapse)
+   ───────────────────────────────────────────── */
+.aqb-layer-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  border-radius: var(--aqb-radius-xs);
+  color: var(--aqb-text-tertiary);
+  cursor: pointer;
+  transition: var(--aqb-transition-fast);
+  flex-shrink: 0;
+}
+
+.aqb-layer-toggle:hover {
+  background: var(--aqb-surface-4);
+  color: var(--aqb-text-primary);
+}
+
+.aqb-layer-toggle svg {
+  transition: transform 0.15s ease;
+}
+
+.aqb-layer-toggle.collapsed svg {
+  transform: rotate(-90deg);
+}
+
+/* Placeholder for leaf nodes (no children) */
+.aqb-layer-toggle-placeholder {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--aqb-text-muted);
+  font-size: var(--aqb-text-2xs);
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────
+   LAYER ICON (Type-based)
+   ───────────────────────────────────────────── */
+.aqb-layer-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--aqb-radius-xs);
+  flex-shrink: 0;
+  font-size: var(--aqb-text-sm-plus);
+  transition: var(--aqb-transition-fast);
+}
+
+/* ─────────────────────────────────────────────
+   LAYER NAME & TYPE TAG
+   ───────────────────────────────────────────── */
+.aqb-layer-name {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--aqb-font-xs);
+  font-weight: 500;
+  color: var(--aqb-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.aqb-layer-type {
+  font-size: var(--aqb-text-xs);
+  font-weight: 500;
+  color: var(--aqb-text-muted);
+  padding: 1px 6px;
+  background: var(--aqb-surface-4);
+  border-radius: var(--aqb-radius-xs);
+  flex-shrink: 0;
+}
+
+.aqb-layer-id {
+  font-size: var(--aqb-text-2xs-plus);
+  color: var(--aqb-text-muted);
+  font-family: var(--aqb-font-mono);
+  opacity: 0.6;
+}
+
+/* ─────────────────────────────────────────────
+   COMPONENT BADGE
+   ───────────────────────────────────────────── */
+.aqb-component-badge {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  background: var(--aqb-accent-purple-alpha);
+  color: var(--aqb-accent-purple);
+  border-radius: var(--aqb-radius-xs);
+  font-size: var(--aqb-text-2xs-plus);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.aqb-component-badge-icon {
+  font-size: var(--aqb-text-xs);
+}
+
+/* ─────────────────────────────────────────────
+   LAYER ACTIONS (Show on hover)
+   ───────────────────────────────────────────── */
+.aqb-layer-actions {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.aqb-layer-row:hover .aqb-layer-actions,
+.aqb-layer-row.is-selected .aqb-layer-actions {
+  opacity: 1;
+}
+
+.aqb-layer-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: transparent;
+  border-radius: var(--aqb-radius-xs);
+  cursor: pointer;
+  color: var(--layer-accent);
+  opacity: 0.6;
+  transition: var(--aqb-transition-fast);
+}
+
+.aqb-layer-action-btn:hover {
+  background: var(--layer-accent-alpha);
+  color: var(--layer-accent);
+  opacity: 1;
+}
+
+/* ─────────────────────────────────────────────
+   HIDDEN STATE - Orange styling
+   ───────────────────────────────────────────── */
+.aqb-layer-row.is-hidden {
+  opacity: 0.5;
+}
+
+.aqb-layer-row.is-hidden .aqb-layer-name {
+  color: var(--aqb-text-muted);
+}
+
+.aqb-layer-row.is-hidden .aqb-layer-action-btn:first-child {
+  color: var(--layer-warning);
+  opacity: 1;
+}
+
+.aqb-layer-row.is-hidden .aqb-layer-action-btn:first-child:hover {
+  background: var(--layer-warning-alpha);
+}
+
+.aqb-layer-row.is-hidden .aqb-layer-actions {
+  opacity: 1;
+}
+
+/* ─────────────────────────────────────────────
+   LOCKED STATE - Gray styling
+   ───────────────────────────────────────────── */
+.aqb-layer-row.is-locked {
+  cursor: not-allowed;
+}
+
+.aqb-layer-row.is-locked .aqb-layer-action-btn:last-child {
+  color: var(--layer-muted);
+  opacity: 1;
+}
+
+.aqb-layer-row.is-locked .aqb-layer-action-btn:last-child:hover {
+  background: var(--layer-muted-alpha);
+}
+
+.aqb-layer-row.is-locked .aqb-layer-actions {
+  opacity: 1;
+}
+
+/* ─────────────────────────────────────────────
+   DROP INDICATORS (Using CSS vars)
+   ───────────────────────────────────────────── */
+.aqb-drop-indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.aqb-drop-before {
+  top: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--layer-success) 0%, var(--aqb-accent-cyan) 50%, var(--layer-success) 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--layer-success-alpha);
+}
+
+.aqb-drop-after {
+  bottom: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--layer-success) 0%, var(--aqb-accent-cyan) 50%, var(--layer-success) 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--layer-success-alpha);
+}
+
+.aqb-drop-inside {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border: 2px solid var(--layer-success);
+  background: var(--layer-success-alpha);
+  border-radius: var(--aqb-radius-sm);
+}
+
+/* ─────────────────────────────────────────────
+   BIDIRECTIONAL HOVER HIGHLIGHT
+   ───────────────────────────────────────────── */
+.aqb-layer-row.is-canvas-hovered,
+.aqb-layer-row.is-layer-hovered {
+  background: var(--layer-accent-alpha) !important;
+  outline: 1px solid var(--layer-accent);
+  outline-offset: -1px;
+}
+
+.aqb-layer-row.is-canvas-hovered::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--layer-accent);
+  border-radius: 0 2px 2px 0;
+}
+
+/* ─────────────────────────────────────────────
+   LAYER NAME INPUT (Editing)
+   ───────────────────────────────────────────── */
+.aqb-layer-name-input {
+  width: 100%;
+  padding: 2px 6px;
+  border: 1px solid var(--layer-accent);
+  border-radius: var(--aqb-radius-xs);
+  background: var(--layer-accent-alpha);
+  color: inherit;
+  font-size: var(--aqb-font-xs);
+  outline: none;
+}
+
+.aqb-layer-name-input:focus {
+  border-color: var(--layer-success);
+  box-shadow: 0 0 0 2px var(--layer-success-alpha);
+}
+
+/* ─────────────────────────────────────────────
+   TREE DEPTH LINES
+   ───────────────────────────────────────────── */
+.aqb-layer-tree-lines {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.aqb-tree-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--layer-accent-soft);
+}
+
+/* ─────────────────────────────────────────────
+   MULTI-SELECT TOOLBAR
+   ───────────────────────────────────────────── */
+.aqb-multiselect-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--aqb-surface-4);
+  border-radius: var(--aqb-radius-md);
+  margin-bottom: 8px;
+}
+
+.aqb-multiselect-count {
+  font-size: var(--aqb-font-xs);
+  font-weight: 500;
+  color: var(--aqb-text-secondary);
+}
+
+.aqb-multiselect-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.aqb-multiselect-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--aqb-surface-3);
+  border: none;
+  border-radius: var(--aqb-radius-sm);
+  font-size: var(--aqb-font-xs);
+  color: var(--aqb-text-primary);
+  cursor: pointer;
+  transition: var(--aqb-transition-fast);
+}
+
+.aqb-multiselect-btn:hover {
+  background: var(--aqb-accent-purple-alpha);
+  color: var(--aqb-accent-purple);
+}
+
+.aqb-multiselect-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  border-radius: var(--aqb-radius-xs);
+  color: var(--aqb-text-muted);
+  cursor: pointer;
+  transition: var(--aqb-transition-fast);
+}
+
+.aqb-multiselect-close:hover {
+  background: var(--aqb-surface-3);
+  color: var(--aqb-text-primary);
+}
+
+/* ─────────────────────────────────────────────
+   LAYERS BOTTOM TAB BAR
+   ───────────────────────────────────────────── */
+.aqb-layers-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  border-top: 1px solid var(--aqb-border);
+  margin-top: auto;
+}
+
+.aqb-layers-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: var(--aqb-radius-md);
+  font-size: var(--aqb-font-xs);
+  font-weight: 500;
+  color: var(--aqb-text-secondary);
+  cursor: pointer;
+  transition: var(--aqb-transition-fast);
+}
+
+.aqb-layers-tab:hover {
+  background: var(--aqb-surface-3);
+  color: var(--aqb-text-primary);
+}
+
+.aqb-layers-tab.active {
+  background: var(--aqb-surface-4);
+  color: var(--aqb-text-primary);
+  border-bottom: 2px solid var(--aqb-accent-purple);
+}
+
+.aqb-layers-tab-badge {
+  font-size: var(--aqb-text-xs);
+  padding: 1px 5px;
+  background: var(--aqb-surface-4);
+  border-radius: 8px;
+}
+
+.aqb-layers-tab.active .aqb-layers-tab-badge {
+  background: var(--aqb-accent-purple-alpha);
+  color: var(--aqb-accent-purple);
+}
+
+/* Add Page Button */
+.aqb-add-page-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: transparent;
+  border: 1px dashed var(--aqb-border);
+  border-radius: var(--aqb-radius-md);
+  font-size: var(--aqb-font-xs);
+  color: var(--aqb-text-muted);
+  cursor: pointer;
+  transition: var(--aqb-transition-fast);
+}
+
+.aqb-add-page-btn:hover {
+  background: var(--aqb-surface-3);
+  border-color: var(--aqb-accent-purple);
+  color: var(--aqb-accent-purple);
+}
