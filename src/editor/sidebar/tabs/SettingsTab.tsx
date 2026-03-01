@@ -27,6 +27,7 @@ import {
   CATEGORY_CHIPS,
   CARD_CATEGORIES,
   SCREEN_PLAN_REQUIREMENTS,
+  FEATURE_FLAGS,
   containerStyles,
   homeStyles,
   contentStyles,
@@ -36,15 +37,14 @@ import {
   ExportIcon,
   IntegrationsIcon,
   AdvancedIcon,
-  HistoryIcon,
   SiteSettingsScreen,
   DomainsScreen,
   AnalyticsScreen,
   ExportScreen,
   IntegrationsScreen,
   AdvancedScreen,
-  VersionHistoryScreen,
   LockedScreen,
+  SettingsNavGuard,
 } from "./settings";
 
 // Navigation screens for this tab (Settings)
@@ -56,7 +56,6 @@ const SETTINGS_SCREENS = [
   { id: "export", title: "Export", parentId: "home" },
   { id: "integrations", title: "Integrations", parentId: "home" },
   { id: "advanced", title: "Advanced", parentId: "home" },
-  { id: "version-history", title: "Version History", parentId: "home" },
 ];
 
 // ============================================
@@ -79,6 +78,16 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
 
   // Category filter state
   const [categoryFilter, setCategoryFilter] = React.useState<SettingsCategory>("all");
+
+  // Dirty state lifted from active sub-screen — used by DrillInHeader guard
+  const [screenIsDirty, setScreenIsDirty] = React.useState(false);
+  const [guardOpen, setGuardOpen] = React.useState(false);
+
+  // Reset dirty state on screen change
+  React.useEffect(() => {
+    setScreenIsDirty(false);
+    setGuardOpen(false);
+  }, [currentScreen]);
 
   const isScreenLocked = (screenId: string) => {
     const required = SCREEN_PLAN_REQUIREMENTS[screenId];
@@ -108,14 +117,6 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
       />
 
       <FeatureCardGrid>
-        {shouldShowCard("export") && (
-          <FeatureCard
-            title="Export"
-            subtitle="HTML, React, Vue, Next.js"
-            icon={<ExportIcon />}
-            onClick={() => navigateTo("export")}
-          />
-        )}
         {shouldShowCard("site-settings") && (
           <FeatureCard
             title="Site Settings"
@@ -130,6 +131,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             subtitle="Custom domain + SSL"
             icon={<DomainIcon />}
             onClick={() => navigateTo("domains")}
+            badge={!FEATURE_FLAGS.domains ? "Coming Soon" : undefined}
           />
         )}
         {shouldShowCard("analytics") && (
@@ -158,12 +160,13 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             badge={isScreenLocked("advanced") ? "Pro" : undefined}
           />
         )}
-        {shouldShowCard("version-history") && (
+        {shouldShowCard("export") && (
           <FeatureCard
-            title="Version History"
-            subtitle="Restore, compare versions"
-            icon={<HistoryIcon />}
-            onClick={() => navigateTo("version-history")}
+            title="Export"
+            subtitle="Download source code for self-hosting"
+            icon={<ExportIcon />}
+            onClick={() => navigateTo("export")}
+            badge={!FEATURE_FLAGS.export ? "Coming Soon" : undefined}
           />
         )}
       </FeatureCardGrid>
@@ -174,24 +177,22 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
   const renderContent = () => {
     if (isScreenLocked(currentScreen)) {
       const requiredPlan = SCREEN_PLAN_REQUIREMENTS[currentScreen];
-      return <LockedScreen plan={requiredPlan} />;
+      return <LockedScreen variant={requiredPlan} />;
     }
 
     switch (currentScreen) {
       case "site-settings":
-        return <SiteSettingsScreen composer={composer} />;
+        return <SiteSettingsScreen composer={composer} onDirtyChange={setScreenIsDirty} />;
       case "domains":
         return <DomainsScreen />;
       case "analytics":
-        return <AnalyticsScreen composer={composer} />;
+        return <AnalyticsScreen composer={composer} onDirtyChange={setScreenIsDirty} />;
       case "export":
         return <ExportScreen />;
       case "integrations":
         return <IntegrationsScreen />;
       case "advanced":
-        return <AdvancedScreen composer={composer} />;
-      case "version-history":
-        return <VersionHistoryScreen composer={composer} />;
+        return <AdvancedScreen composer={composer} onDirtyChange={setScreenIsDirty} />;
       default:
         return null;
     }
@@ -206,12 +207,23 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             parentName="Settings"
             breadcrumb={breadcrumb}
             onBack={goBack}
+            isDirty={screenIsDirty}
+            onBackAttempt={() => setGuardOpen(true)}
             isPinned={isPinned}
             onPinToggle={onPinToggle}
             onHelpClick={onHelpClick}
             onClose={onClose}
           />
           <div style={contentStyles}>{renderContent()}</div>
+          <SettingsNavGuard
+            isOpen={guardOpen}
+            onDiscard={() => {
+              setGuardOpen(false);
+              setScreenIsDirty(false);
+              goBack();
+            }}
+            onCancel={() => setGuardOpen(false)}
+          />
         </>
       ) : (
         <>

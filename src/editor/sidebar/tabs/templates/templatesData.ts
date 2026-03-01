@@ -12,8 +12,8 @@ export interface RecentTemplate {
   id: string;
   name: string;
   icon: string;
-  html: string;
   usedAt: number;
+  /** @deprecated html is no longer stored — look up via getTemplateById(id).html */
 }
 
 export interface TemplateItem {
@@ -52,15 +52,12 @@ export function getRecentTemplates(): RecentTemplate[] {
 }
 
 /** Add template to recent list */
-export function addRecentTemplate(template: {
-  id: string;
-  name: string;
-  icon: string;
-  html: string;
-}): void {
+export function addRecentTemplate(template: { id: string; name: string; icon: string }): void {
   const recent = getRecentTemplates();
   const newRecent: RecentTemplate = {
-    ...template,
+    id: template.id,
+    name: template.name,
+    icon: template.icon,
     usedAt: Date.now(),
   };
   const filtered = recent.filter((t) => t.id !== template.id);

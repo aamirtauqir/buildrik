@@ -95,8 +95,22 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
   const contrastValue = parseFloat(parseFilter(styles.filter, "contrast", "100%").replace("%", ""));
   const grayscaleValue = parseFloat(parseFilter(styles.filter, "grayscale", "0%").replace("%", ""));
 
+  // Count shadows for preview
+  const shadows = styles["box-shadow"] ? styles["box-shadow"].split("),").length : 0;
+  const effectsPreview =
+    shadows > 0 ? (
+      <span style={{ fontSize: 9, color: "var(--aqb-text-tertiary)" }}>
+        {shadows} shadow{shadows !== 1 ? "s" : ""}
+      </span>
+    ) : undefined;
+
   return (
-    <Section title="Effects" icon="Sparkles">
+    <Section
+      title="Effects"
+      icon="Sparkles"
+      preview={effectsPreview}
+      id="inspector-section-effects"
+    >
       {/* Opacity */}
       <SliderInput
         label="Opacity"

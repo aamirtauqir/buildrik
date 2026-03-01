@@ -102,13 +102,14 @@ export function useDragSession(): UseDragSessionResult {
    * Reset all session state to initial values
    */
   const resetSession = React.useCallback(() => {
-    setIsDragOver(false);
-    setDropTargetId(null);
-    setDropPosition(null);
-    setIsValidDrop(true);
-    setInvalidDropReason(null);
-    setDropSlotRect(null);
-    setDropTargetPath([]);
+    setIsDragOver(initialState.isDragOver);
+    setDropTargetId(initialState.dropTargetId);
+    setDropPosition(initialState.dropPosition);
+    setDraggingElementId(initialState.draggingElementId);
+    setIsValidDrop(initialState.isValidDrop);
+    setInvalidDropReason(initialState.invalidDropReason);
+    setDropSlotRect(initialState.dropSlotRect);
+    setDropTargetPath(initialState.dropTargetPath);
   }, []);
 
   return {

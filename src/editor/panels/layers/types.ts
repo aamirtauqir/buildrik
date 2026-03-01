@@ -34,6 +34,8 @@ export interface LayerItem {
   customName?: string;
   /** Whether this layer is a component instance */
   isComponent?: boolean;
+  /** Breakpoint-specific visibility overrides */
+  breakpointOverrides?: Record<string, { hidden?: boolean }>;
 }
 
 /** Drag state for layer reordering */
@@ -114,4 +116,46 @@ export const typeAccents: Record<string, { soft: string; solid: string }> = {
   footer: { soft: "rgba(148, 163, 184, 0.18)", solid: "#94a3b8" },
   // Default - blue
   default: { soft: "rgba(59, 130, 246, 0.16)", solid: "#3b82f6" },
+};
+
+/** Display preferences for the Layers panel (persisted to localStorage) */
+export interface LayerDisplayPrefs {
+  /** Show raw HTML tag badges (div, section, h1). Default: false */
+  showHtmlBadges: boolean;
+  /** Show element IDs (#w83sqctx format). Default: false */
+  showElementIds: boolean;
+  /** Compact row density. Default: "comfortable" */
+  treeDensity: "comfortable" | "compact";
+}
+
+/** State for the right-click context menu */
+export interface LayerContextMenuState {
+  x: number;
+  y: number;
+  nodeId: string;
+  nodeName: string;
+  isHidden: boolean;
+  isLocked: boolean;
+  childCount: number;
+}
+
+/** Actions available in the right-click context menu */
+export type LayerAction =
+  | "rename"
+  | "duplicate"
+  | "hide"
+  | "show"
+  | "lock"
+  | "unlock"
+  | "delete"
+  | "group"
+  | "selectChildren"
+  | "moveToTop"
+  | "moveToBottom";
+
+/** Default display preferences — HTML badges OFF by default */
+export const DEFAULT_DISPLAY_PREFS: LayerDisplayPrefs = {
+  showHtmlBadges: false,
+  showElementIds: false,
+  treeDensity: "comfortable",
 };

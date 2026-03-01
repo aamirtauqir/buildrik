@@ -93,7 +93,12 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
   };
 
   return (
-    <Section title="Interactions" icon="MousePointer" defaultOpen={interactions.length > 0}>
+    <Section
+      title="Interactions"
+      icon="MousePointer"
+      defaultOpen={interactions.length > 0}
+      id="inspector-section-interactions"
+    >
       <div style={styles.container}>
         {/* Existing Interactions */}
         {interactions.map((interaction) => (

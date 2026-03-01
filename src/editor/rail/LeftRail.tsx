@@ -280,7 +280,6 @@ export const LeftRail: React.FC<LeftRailProps> = ({
             />
           );
         })}
-
       </div>
 
       {/* FOOTER — Utility buttons (Layers, History) */}

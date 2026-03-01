@@ -95,7 +95,7 @@ export const GridSection: React.FC<GridSectionProps> = ({
   }
 
   return (
-    <Section title="CSS Grid" icon="Grid3X3" defaultOpen>
+    <Section title="CSS Grid" icon="Grid3X3" defaultOpen id="inspector-section-grid">
       {/* GRID CONTAINER CONTROLS */}
       {isGridContainer && (
         <>

@@ -112,7 +112,7 @@ export class Composer extends EventEmitter {
     super();
     this.config = this.normalizeConfig(config);
     this.state = this.createInitialState();
-    this.applyProjectSettings(this.projectSettings, {
+    this.applyProjectSettings({}, this.projectSettings, {
       emitProjectChanged: false,
       emitSettingsChange: false,
     });
@@ -298,7 +298,9 @@ export class Composer extends EventEmitter {
     }
 
     // Import project settings
-    this.applyProjectSettings(data.settings ?? {}, { emitProjectChanged: false });
+    this.applyProjectSettings(this.projectSettings, data.settings ?? {}, {
+      emitProjectChanged: false,
+    });
 
     // Import project metadata
     if (data.metadata) {
@@ -370,17 +372,20 @@ ${html}
    * Apply project settings and update dependent integrations
    */
   private applyProjectSettings(
+    prev: ProjectSettings,
     settings: ProjectSettings,
     options?: { emitProjectChanged?: boolean; emitSettingsChange?: boolean }
   ): void {
     this.projectSettings = settings ?? {};
 
-    // Configure email marketing integration so form submissions can subscribe
+    // Only reconfigure email marketing when the email integration settings actually changed
     const emailConfig = this.projectSettings.integrations?.email || {
       provider: "none",
       enabled: false,
     };
-    emailMarketingService.configure(emailConfig);
+    if (JSON.stringify(prev.integrations?.email) !== JSON.stringify(settings.integrations?.email)) {
+      emailMarketingService.configure(emailConfig);
+    }
 
     // Configure form email notification service
     // Maps project settings to the form email service format
@@ -410,8 +415,9 @@ ${html}
    * Set project-wide settings (analytics, integrations, design tokens)
    */
   setProjectSettings(settings: ProjectSettings): void {
+    const prev = this.projectSettings;
     this.markDirty(); // Mark dirty BEFORE applyProjectSettings emits PROJECT_CHANGED
-    this.applyProjectSettings(settings);
+    this.applyProjectSettings(prev, settings);
   }
 
   /**

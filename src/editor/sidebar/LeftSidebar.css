@@ -16,7 +16,7 @@
 @import "./tabs/history/styles/history.css";
 @import "./tabs/settings/styles/settings.css";
 @import "./tabs/design/styles/design-tokens.css";
-@import "./tabs/media/media.css";
+@import "./tabs/media/MediaTab.css";
 
 /* ─────────────────────────────────────────────
    MEDIA TAB ACCENT TOKENS

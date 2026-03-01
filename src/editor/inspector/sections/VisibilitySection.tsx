@@ -178,7 +178,7 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
   const hiddenCount = BREAKPOINTS.filter((bp) => !getVisibility(bp.id)).length;
 
   return (
-    <Section title="Visibility" icon="Eye" isOpen={isOpen}>
+    <Section title="Visibility" icon="Eye" isOpen={isOpen} id="inspector-section-visibility">
       <div style={styles.container}>
         {BREAKPOINTS.map((bp) => {
           const isVisible = getVisibility(bp.id);

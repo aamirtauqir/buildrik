@@ -5,10 +5,7 @@
  * @license BSD-3-Clause
  */
 
-import * as React from "react";
-import { BREAKPOINTS } from "../../../shared/constants/breakpoints";
 import type { PseudoStateId } from "../../../shared/types";
-import type { BreakpointId } from "../../../shared/types/breakpoints";
 
 // ============================================================================
 // SPACING CONSTANTS (4px base grid)
@@ -158,7 +155,7 @@ export const panelStyles = {
     height: 32,
     borderRadius: 6,
     background: "var(--aqb-error-light)",
-    border: "1px solid rgba(239,68,68,0.3)",
+    border: "1px solid var(--aqb-error-border, rgba(239,68,68,0.3))",
     color: "var(--aqb-error)",
     cursor: "pointer" as const,
     display: "flex" as const,
@@ -224,62 +221,3 @@ export const panelStyles = {
 // ============================================================================
 
 // ELEMENT_ICONS removed - replaced by components/ui/Icons
-
-// ============================================================================
-// RENDER HELPERS
-// ============================================================================
-
-/**
- * Renders the pseudo-state selector buttons
- */
-export function renderPseudoStateSelector(
-  currentPseudoState: PseudoStateId,
-  setCurrentPseudoState: (state: PseudoStateId) => void
-): React.ReactElement {
-  return (
-    <div style={panelStyles.stateSelector}>
-      <span style={{ fontSize: 10, color: "#6c7086", marginRight: 4 }}>State:</span>
-      {(["normal", "hover", "focus", "active", "disabled"] as const).map((state) => (
-        <button
-          key={state}
-          onClick={() => setCurrentPseudoState(state)}
-          style={panelStyles.stateBtn(currentPseudoState === state, state)}
-          title={state === "normal" ? "Default state" : `:${state} state`}
-        >
-          {state === "normal" ? "Default" : `:${state}`}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-/**
- * Renders the breakpoint indicator for non-desktop breakpoints
- */
-export function renderBreakpointIndicator(
-  currentBreakpoint: BreakpointId
-): React.ReactElement | null {
-  if (currentBreakpoint === "desktop") return null;
-
-  const isTablet = currentBreakpoint === "tablet";
-  return (
-    <div
-      style={{
-        ...panelStyles.breakpointIndicator,
-        background: isTablet ? "rgba(245, 158, 11, 0.15)" : "rgba(236, 72, 153, 0.15)",
-        border: isTablet
-          ? "1px solid rgba(245, 158, 11, 0.3)"
-          : "1px solid rgba(236, 72, 153, 0.3)",
-        color: isTablet ? "#f59e0b" : "#ec4899",
-      }}
-    >
-      <span style={{ fontSize: 14 }}>{isTablet ? "📱" : "📲"}</span>
-      <span>
-        Editing styles for <strong>{BREAKPOINTS[currentBreakpoint].name}</strong>
-      </span>
-      <span style={{ marginLeft: "auto", fontSize: 9, opacity: 0.8 }}>
-        &le;{BREAKPOINTS[currentBreakpoint].maxWidth}px
-      </span>
-    </div>
-  );
-}

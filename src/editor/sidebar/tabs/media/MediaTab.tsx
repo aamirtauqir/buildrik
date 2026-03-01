@@ -1,22 +1,25 @@
 /**
  * Media Tab — Shell Component
- * 5 fixed zones: header, source bar, type pills, body, upload zone.
+ * 7 fixed zones: header, subtitle, source bar, type pills, search, body, upload zone.
  * All state lives in useMediaState. No state in this component.
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 import type { Composer } from "../../../../engine/Composer";
 import { PanelHeader } from "../../shared/PanelHeader";
-import { DiscoveryView } from "./DiscoveryView";
-import { LibraryView } from "./LibraryView";
-import { MEDIA_TIPS } from "./mediaData";
-import type { LibraryItem } from "./mediaTypes";
-import { fmtDur, fmtSize } from "./mediaUtils";
-import { TypePills } from "./TypePills";
-import { UploadZone } from "./UploadZone";
-import { useMediaState } from "./useMediaState";
+import { AssetDetailOverlay } from "./components/AssetDetailOverlay";
+import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
+import { DiscoveryView } from "./components/DiscoveryView";
+import { LibraryView } from "./components/LibraryView";
+import { OnboardingEmptyState } from "./components/OnboardingEmptyState";
+import { SelectionBanner } from "./components/SelectionBanner";
+import { TypePills } from "./components/TypePills";
+import { UploadZone } from "./components/UploadZone";
+import { MEDIA_TIP_TEXT } from "./data/mediaData";
+import { useMediaState } from "./hooks/useMediaState";
+import "./MediaTab.css";
 
 interface MediaTabProps {
   composer: Composer | null;
@@ -37,11 +40,23 @@ export function MediaTab({ composer, isPinned, onPinToggle, onHelpClick, onClose
           onHelpClick={onHelpClick}
           onClose={onClose}
         />
+        <div
+          style={{
+            padding: "24px 16px",
+            textAlign: "center",
+            color: "var(--aqb-text-muted)",
+            fontSize: 13,
+            lineHeight: 1.6,
+          }}
+        >
+          Open a project to manage your media files.
+        </div>
       </div>
     );
   }
+
   return (
-    <MediaTabInner
+    <MediaTabWithComposer
       composer={composer}
       isPinned={isPinned}
       onPinToggle={onPinToggle}
@@ -51,7 +66,7 @@ export function MediaTab({ composer, isPinned, onPinToggle, onHelpClick, onClose
   );
 }
 
-function MediaTabInner({
+function MediaTabWithComposer({
   composer,
   isPinned,
   onPinToggle,
@@ -59,24 +74,66 @@ function MediaTabInner({
   onClose,
 }: Omit<MediaTabProps, "composer"> & { composer: Composer }) {
   const state = useMediaState(composer);
-  const [searchVal, setSearchVal] = useState(state.searchQuery);
   const isDisc = state.source === "disc";
+  const ctxMenuRef = useRef<HTMLDivElement>(null);
 
-  // Sync search field → state (with local controlled value for responsiveness)
-  const handleSearch = (q: string) => {
-    setSearchVal(q);
-    state.setSearch(q);
-    if (isDisc) state.discSearchAll(q);
-  };
+  useEffect(() => {
+    if (!state.ctxMenu) return;
+    // Focus first item when menu opens
+    const firstItem = ctxMenuRef.current?.querySelector<HTMLButtonElement>("[role='menuitem']");
+    firstItem?.focus();
 
-  const tipText = MEDIA_TIPS[state.tipIdx % MEDIA_TIPS.length]?.text ?? "";
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        state.closeCtxMenu();
+      }
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        const items = Array.from(
+          ctxMenuRef.current?.querySelectorAll<HTMLButtonElement>("[role='menuitem']") ?? []
+        );
+        const current = document.activeElement as HTMLButtonElement;
+        const idx = items.indexOf(current);
+        const next =
+          e.key === "ArrowDown"
+            ? items[(idx + 1) % items.length]
+            : items[(idx - 1 + items.length) % items.length];
+        next?.focus();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [state.ctxMenu, state.closeCtxMenu]);
+  const isFull = state.storage.used >= state.storage.total;
+  const isEmpty = state.libraryItems.length === 0 && state.uploadQueue.length === 0;
+
+  const handleLibrarySearch = (q: string) => state.setLibrarySearch(q);
+  const handleDiscSearch = (q: string) => state.discSearchAll(q);
 
   return (
     <div
       className="med-tab"
-      style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        overflow: "hidden",
+        position: "relative",
+      }}
+      onDragEnter={state.handlePanelDragEnter}
+      onDragLeave={state.handlePanelDragLeave}
+      onDragOver={state.handlePanelDragOver}
+      onDrop={state.handlePanelDrop}
     >
-      {/* ── Zone 1: Header ── */}
+      {/* Panel drag overlay */}
+      {state.panelDragOver && (
+        <div className="med-drag-overlay" aria-hidden="true">
+          <div className="med-drag-label">Drop to upload</div>
+        </div>
+      )}
+
+      {/* Zone 1: Header */}
       <PanelHeader
         title="Media"
         isPinned={isPinned}
@@ -85,7 +142,10 @@ function MediaTabInner({
         onClose={onClose}
       />
 
-      {/* ── Zone 2: Source bar (My Library | Discovery) ── */}
+      {/* Zone 2: Subtitle */}
+      <p className="med-subtitle">Click to insert · Drag to canvas</p>
+
+      {/* Zone 3: Source bar */}
       <div className="med-source-bar">
         <button
           className={`med-src-btn${!isDisc ? " active" : ""}`}
@@ -103,43 +163,7 @@ function MediaTabInner({
         </button>
       </div>
 
-      {/* ── Search (Library only) ── */}
-      {!isDisc && (
-        <div className="med-search-row">
-          <div className="med-search">
-            <svg
-              className="med-search-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              aria-hidden="true"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-            <input
-              type="search"
-              placeholder="Search my files…"
-              value={searchVal}
-              onChange={(e) => handleSearch(e.target.value)}
-              aria-label="Search library"
-            />
-            {searchVal && (
-              <button
-                className="med-search-clear"
-                onClick={() => handleSearch("")}
-                aria-label="Clear search"
-              >
-                ×
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── Zone 3: Type pills ── */}
+      {/* Zone 4: Type pills */}
       <TypePills
         activeType={state.activeType}
         counts={state.counts}
@@ -147,7 +171,44 @@ function MediaTabInner({
         onTypeChange={state.setType}
       />
 
-      {/* ── Zone 4: Body (scrollable) ── */}
+      {/* Zone 5: Search (independent state per source) */}
+      <div className="med-search-row">
+        <div className="med-search">
+          <svg
+            className="med-search-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
+          <input
+            type="search"
+            placeholder={isDisc ? "Search coming soon…" : "Search my files…"}
+            value={isDisc ? state.discoverySearch : state.librarySearch}
+            disabled={isDisc}
+            onChange={(e) =>
+              isDisc ? handleDiscSearch(e.target.value) : handleLibrarySearch(e.target.value)
+            }
+            aria-label={isDisc ? "Search Discovery (coming soon)" : "Search library"}
+          />
+          {(isDisc ? state.discoverySearch : state.librarySearch) && (
+            <button
+              className="med-search-clear"
+              onClick={() => (isDisc ? handleDiscSearch("") : handleLibrarySearch(""))}
+              aria-label="Clear search"
+            >
+              ×
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Zone 6: Body */}
       {isDisc ? (
         <DiscoveryView
           activeType={state.activeType}
@@ -156,11 +217,17 @@ function MediaTabInner({
           icons={state.discIcons}
           fonts={state.discFonts}
           loading={state.discLoading}
-          searchQuery={searchVal}
-          onSearch={handleSearch}
+          searchQuery={state.discoverySearch}
+          onSearch={handleDiscSearch}
           onLoadMore={state.loadMoreDisc}
           onSave={state.saveToLibrary}
           onInsert={state.insertToCanvas}
+        />
+      ) : isEmpty && !state.selMode ? (
+        <OnboardingEmptyState
+          activeType={state.activeType}
+          onUpload={state.upload}
+          onDiscovery={() => state.setSource("disc")}
         />
       ) : (
         <LibraryView
@@ -174,246 +241,143 @@ function MediaTabInner({
           fmtFilter={state.fmtFilter}
           selMode={state.selMode}
           selectedKeys={state.selectedKeys}
-          searchQuery={state.searchQuery}
+          searchQuery={state.librarySearch}
           onSort={state.setSort}
           onGridN={state.setGridN}
           onFmt={state.setFmtFilter}
           onSelToggle={state.toggleSelMode}
           onSelect={state.toggleSelect}
           onSelectAll={state.selectAll}
-          onBulkDelete={state.bulkDelete}
-          onDelete={state.deleteItem}
+          onRequestBulkDelete={state.requestBulkDelete}
+          onRequestDelete={state.requestDelete}
           onInsert={state.insertToCanvas}
-          onRename={state.renameItem}
           onCtxMenu={state.openCtxMenu}
           onDetail={state.openDetail}
         />
       )}
 
-      {/* ── Zone 5: Upload zone (Library only) ── */}
+      {/* Zone 7: Upload zone (Library only) */}
       {!isDisc && (
         <UploadZone
           storage={state.storage}
           onUpload={state.upload}
           uploadQueue={state.uploadQueue}
+          disabled={isFull}
         />
       )}
 
-      {/* ── Tip footer ── */}
-      {!state.tipDismissed && tipText && (
+      {/* Dismissable single tip footer */}
+      {!state.tipDismissed && !isDisc && (
         <div className="med-tip-footer">
           <div className="med-tip-row">
             <div className="med-tip-icon" aria-hidden="true">
               💡
             </div>
-            <p className="med-tip-text">{tipText}</p>
-            <button
-              className="med-tip-dismiss"
-              onClick={state.dismissTips}
-              aria-label="Dismiss tips"
-            >
+            <p className="med-tip-text">{MEDIA_TIP_TEXT}</p>
+            <button className="med-tip-dismiss" onClick={state.dismissTip} aria-label="Dismiss tip">
               ×
             </button>
           </div>
-          <div className="med-tip-dots" aria-hidden="true">
-            {MEDIA_TIPS.map((_, i) => (
-              <div
-                key={i}
-                className={`med-tip-dot${i === state.tipIdx % MEDIA_TIPS.length ? " active" : ""}`}
-              />
-            ))}
-          </div>
         </div>
       )}
 
-      {/* ── Context menu overlay ── */}
+      {/* Context menu */}
       {state.ctxMenu && (
-        <div
-          className="med-ctx-menu"
-          style={{ left: state.ctxMenu.x, top: state.ctxMenu.y }}
-          role="menu"
-        >
+        <>
           <div
-            className="med-ctx-item"
-            role="menuitem"
-            onClick={() => {
-              state.insertToCanvas(state.ctxMenu!.item.key);
-              state.closeCtxMenu();
-            }}
+            ref={ctxMenuRef}
+            className="med-ctx-menu"
+            style={{ left: state.ctxMenu.x, top: state.ctxMenu.y }}
+            role="menu"
+            aria-label="Asset options"
           >
-            Insert to canvas
+            <button
+              className="med-ctx-item"
+              role="menuitem"
+              tabIndex={-1}
+              onClick={() => {
+                state.insertToCanvas(state.ctxMenu!.item.key);
+                state.closeCtxMenu();
+              }}
+            >
+              Add to page
+            </button>
+            <button
+              className="med-ctx-item"
+              role="menuitem"
+              tabIndex={-1}
+              onClick={() => {
+                state.openDetail(state.ctxMenu!.item);
+                state.closeCtxMenu();
+              }}
+            >
+              Rename…
+            </button>
+            <div className="med-ctx-sep" />
+            <button
+              className="med-ctx-item"
+              role="menuitem"
+              tabIndex={-1}
+              onClick={() => {
+                state.copyUrl(state.ctxMenu!.item.src);
+                state.closeCtxMenu();
+              }}
+            >
+              Copy URL
+            </button>
+            <div className="med-ctx-sep" />
+            <button
+              className="med-ctx-item danger"
+              role="menuitem"
+              tabIndex={-1}
+              onClick={() => {
+                state.requestDelete(state.ctxMenu!.item.key);
+                state.closeCtxMenu();
+              }}
+            >
+              Delete
+            </button>
           </div>
           <div
-            className="med-ctx-item"
-            role="menuitem"
-            onClick={() => {
-              navigator.clipboard?.writeText(state.ctxMenu!.item.name);
-              state.closeCtxMenu();
-            }}
-          >
-            Copy name
-          </div>
-          <div className="med-ctx-sep" />
-          <div
-            className="med-ctx-item danger"
-            role="menuitem"
-            onClick={() => {
-              state.deleteItem(state.ctxMenu!.item.key);
-              state.closeCtxMenu();
-            }}
-          >
-            Delete
-          </div>
-        </div>
+            style={{ position: "fixed", inset: 0, zIndex: 8999 }}
+            onClick={state.closeCtxMenu}
+            aria-hidden="true"
+          />
+        </>
       )}
 
-      {/* Backdrop to close context menu */}
-      {state.ctxMenu && (
-        <div
-          style={{ position: "fixed", inset: 0, zIndex: 8999 }}
-          onClick={state.closeCtxMenu}
-          aria-hidden="true"
+      {/* Overlays */}
+      {state.selMode && (
+        <SelectionBanner
+          count={state.selectedKeys.size}
+          onExit={state.toggleSelMode}
+          onDelete={() => {
+            const selectedItems = state.libraryItems.filter((i) => state.selectedKeys.has(i.key));
+            state.requestBulkDelete(selectedItems);
+          }}
         />
       )}
 
-      {/* ── Detail overlay ── */}
+      {state.confirmDelete && (
+        <ConfirmDeleteModal
+          payload={state.confirmDelete}
+          onConfirm={state.executeDelete}
+          onCancel={state.cancelDelete}
+        />
+      )}
+
       {state.detailItem && (
-        <DetailOverlay
+        <AssetDetailOverlay
           item={state.detailItem}
-          onRename={state.renameItem}
-          onDelete={state.deleteItem}
           onInsert={state.insertToCanvas}
+          onRename={state.renameItem}
+          onDelete={(key) => {
+            state.requestDelete(key);
+            state.closeDetail();
+          }}
           onClose={state.closeDetail}
         />
       )}
-    </div>
-  );
-}
-
-// ─── Detail overlay (inline — no separate file needed) ─────────────────────
-
-function DetailOverlay({
-  item,
-  onRename,
-  onDelete,
-  onInsert,
-  onClose,
-}: {
-  item: LibraryItem;
-  onRename(key: string, name: string): void;
-  onDelete(key: string): void;
-  onInsert(key: string): void;
-  onClose(): void;
-}) {
-  const [name, setName] = useState(item.name);
-
-  const commit = () => {
-    if (name.trim() && name !== item.name) onRename(item.key, name.trim());
-  };
-
-  return (
-    <div className="med-detail-overlay">
-      <div className="med-detail-preview">
-        {item.type === "vid" ? (
-          <video src={item.src} controls style={{ maxWidth: "100%", maxHeight: "100%" }} />
-        ) : (
-          <img src={item.thumb ?? item.src} alt={item.name} />
-        )}
-      </div>
-
-      <div className="med-detail-body">
-        {/* Editable name */}
-        <div className="med-detail-name-row">
-          <input
-            className="med-detail-name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onBlur={commit}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") commit();
-              if (e.key === "Escape") {
-                setName(item.name);
-                (e.target as HTMLInputElement).blur();
-              }
-            }}
-            aria-label="File name"
-          />
-        </div>
-
-        {/* Meta rows */}
-        <div className="med-detail-meta">
-          <div className="med-detail-row">
-            <span className="med-detail-key">Size</span>
-            <span className="med-detail-val">{fmtSize(item.size)}</span>
-          </div>
-          {item.width && item.height && (
-            <div className="med-detail-row">
-              <span className="med-detail-key">Dimensions</span>
-              <span className="med-detail-val">
-                {item.width} × {item.height}
-              </span>
-            </div>
-          )}
-          {item.duration != null && (
-            <div className="med-detail-row">
-              <span className="med-detail-key">Duration</span>
-              <span className="med-detail-val">{fmtDur(item.duration as number)}</span>
-            </div>
-          )}
-          <div className="med-detail-row">
-            <span className="med-detail-key">Type</span>
-            <span className="med-detail-val">{item.mimeType}</span>
-          </div>
-          <div className="med-detail-row">
-            <span className="med-detail-key">Added</span>
-            <span className="med-detail-val">{new Date(item.createdAt).toLocaleDateString()}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer actions */}
-      <div className="med-upload-zone" style={{ flexShrink: 0 }}>
-        <div style={{ display: "flex", gap: 6 }}>
-          <button
-            className="med-upload-btn"
-            style={{ flex: 1, height: 30 }}
-            onClick={() => onInsert(item.key)}
-          >
-            Insert to canvas
-          </button>
-          <button
-            className="med-bulk-btn danger"
-            style={{ height: 30 }}
-            onClick={() => {
-              onDelete(item.key);
-              onClose();
-            }}
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-
-      {/* Back button */}
-      <button
-        className="med-detail-back"
-        style={{
-          position: "absolute",
-          top: 8,
-          left: 8,
-          background: "rgba(0,0,0,.5)",
-          border: "none",
-          borderRadius: 6,
-          color: "#fff",
-          padding: "4px 8px",
-          cursor: "pointer",
-          fontSize: 11,
-        }}
-        onClick={onClose}
-        aria-label="Back"
-      >
-        ← Back
-      </button>
     </div>
   );
 }

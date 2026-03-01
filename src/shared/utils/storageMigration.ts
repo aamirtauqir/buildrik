@@ -40,6 +40,9 @@ const MIGRATION_MAP: Record<string, string> = {
   "aquibra-elements-tip-dismissed": STORAGE_KEYS.ELEMENTS_TIP_DISMISSED,
   "aquibra-elements-expanded-category": STORAGE_KEYS.ELEMENTS_EXPANDED_CATEGORY,
 
+  // Build tab
+  bld_favs: STORAGE_KEYS.BUILD_FAVORITES,
+
   // Components tab
   "aquibra-component-favorites": STORAGE_KEYS.COMPONENT_FAVORITES,
 

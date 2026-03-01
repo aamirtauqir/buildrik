@@ -10,7 +10,7 @@ import { Section, Field } from "../shared";
 import { screenStyles, inputStyles } from "../styles";
 import type { ScreenProps } from "../types";
 
-export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
+export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) => {
   const [name, setName] = React.useState("");
   const [favicon, setFavicon] = React.useState("");
   const [language, setLanguage] = React.useState("en");
@@ -19,6 +19,11 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
   const [linkedin, setLinkedin] = React.useState("");
   const [hasChanges, setHasChanges] = React.useState(false);
   const hasLoadedRef = React.useRef(false);
+
+  // Notify shell of dirty state for nav guard
+  React.useEffect(() => {
+    onDirtyChange?.(hasChanges);
+  }, [hasChanges, onDirtyChange]);
 
   // Load settings from project
   const loadSettings = React.useCallback(() => {

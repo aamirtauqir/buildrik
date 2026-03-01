@@ -7,8 +7,6 @@
 import { runTransaction } from "../../../../shared/utils/helpers";
 import type { ContextAction } from "../contextMenuRegistry";
 
-let styleClipboard: Record<string, string> | null = null;
-
 export const quickStyleSubmenu: ContextAction[] = [
   {
     id: "style-padding",
@@ -66,8 +64,8 @@ export const quickStyleSubmenu: ContextAction[] = [
     icon: "clipboard",
     group: "Quick Style",
     shortcut: "Cmd+Shift+C",
-    handler: ({ element }) => {
-      styleClipboard = element.getStyles?.() || {};
+    handler: ({ composer, element }) => {
+      composer.styleClipboard = element.getStyles?.() || {};
     },
   },
   {
@@ -76,11 +74,13 @@ export const quickStyleSubmenu: ContextAction[] = [
     icon: "clipboard-paste",
     group: "Quick Style",
     shortcut: "Cmd+Shift+V",
-    isEnabled: () => Boolean(styleClipboard && Object.keys(styleClipboard).length),
+    isEnabled: ({ composer }) =>
+      Boolean(composer.styleClipboard && Object.keys(composer.styleClipboard).length),
     handler: ({ composer, element }) => {
-      if (!styleClipboard) return;
+      if (!composer.styleClipboard) return;
+      const styles = composer.styleClipboard;
       runTransaction(composer, "context-paste-styles", () => {
-        element.setStyles?.(styleClipboard as Record<string, string>);
+        element.setStyles?.(styles);
       });
     },
   },

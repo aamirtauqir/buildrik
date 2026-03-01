@@ -27,3 +27,4 @@ export { useDataManager, type UseDataManagerResult } from "./useDataManager";
 export { useTemplateManager, type UseTemplateManagerResult } from "./useTemplateManager";
 export { useMediaManager, type UseMediaManagerResult } from "./useMediaManager";
 export { useSyncStatus, type UseSyncStatusResult } from "./useSyncStatus";
+export { useBlockInsertion, type UseBlockInsertionResult } from "./useBlockInsertion";

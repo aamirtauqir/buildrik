@@ -4,14 +4,25 @@
  * @license BSD-3-Clause
  */
 
-.tmpl-preview {
-  position: absolute;
+/* ── Backdrop (portal to body) ── */
+.tmpl-preview-backdrop {
+  position: fixed;
   inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tmpl-preview {
+  position: relative;
+  width: min(1100px, 92vw);
+  height: min(780px, 88vh);
   background: #080810;
-  z-index: 60;
   display: flex;
   flex-direction: column;
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
   animation: tmpl-preview-in 0.15s ease;
 }

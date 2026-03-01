@@ -10,6 +10,9 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { Element } from "../../../engine/elements/Element";
 
+/** Minimum drag distance (px) in X or Y before a marquee is confirmed and selection is cleared */
+const MARQUEE_MIN_DRAG = 5;
+
 export interface MarqueeState {
   start: { x: number; y: number };
   current: { x: number; y: number };
@@ -44,6 +47,8 @@ export function useCanvasMarquee({
 }: UseCanvasMarqueeOptions): UseCanvasMarqueeResult {
   const [marquee, setMarquee] = React.useState<MarqueeState | null>(null);
   const marqueeStartRef = React.useRef<{ x: number; y: number } | null>(null);
+  /** Tracks whether clear() has already been called for the current marquee gesture */
+  const hasClearedRef = React.useRef(false);
 
   // Start marquee selection
   const handleMarqueeStart = React.useCallback(
@@ -69,12 +74,10 @@ export function useCanvasMarquee({
       const y = e.clientY - rect.top;
 
       marqueeStartRef.current = { x, y };
+      hasClearedRef.current = false;
       setMarquee({ start: { x, y }, current: { x, y } });
-
-      // Clear existing selection when starting marquee
-      clear();
     },
-    [isEditing, isDragOver, draggingElementId, clear, canvasRef]
+    [isEditing, isDragOver, draggingElementId, canvasRef]
   );
 
   // Update marquee during mouse move
@@ -89,12 +92,23 @@ export function useCanvasMarquee({
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
+      // Defer clear() until the drag exceeds the minimum threshold — prevents
+      // accidental deselection on unintentional micro-drags (mousedown + immediate mouseup).
+      if (!hasClearedRef.current) {
+        const dx = Math.abs(x - marqueeStartRef.current.x);
+        const dy = Math.abs(y - marqueeStartRef.current.y);
+        if (dx >= MARQUEE_MIN_DRAG || dy >= MARQUEE_MIN_DRAG) {
+          clear();
+          hasClearedRef.current = true;
+        }
+      }
+
       setMarquee({
         start: marqueeStartRef.current,
         current: { x, y },
       });
     },
-    [canvasRef]
+    [canvasRef, clear]
   );
 
   // End marquee and select intersecting elements
@@ -167,6 +181,7 @@ export function useCanvasMarquee({
     }
 
     marqueeStartRef.current = null;
+    hasClearedRef.current = false;
     setMarquee(null);
   }, [marquee, composer, canvasRef]);
 

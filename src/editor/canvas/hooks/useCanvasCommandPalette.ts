@@ -75,6 +75,7 @@ export function useCanvasCommandPalette({
         category: "Edit",
         shortcut: "Cmd+D",
         icon: "\u29c9",
+        requiresSelection: true,
         handler: () => selectedId && composer.elements.duplicateElement(selectedId),
       },
       {
@@ -83,6 +84,7 @@ export function useCanvasCommandPalette({
         category: "Edit",
         shortcut: "Del",
         icon: "\ud83d\uddd1",
+        requiresSelection: true,
         handler: () => selectedId && composer.elements.removeElement(selectedId),
       },
       {

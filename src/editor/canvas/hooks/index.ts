@@ -163,3 +163,6 @@ export { useCanvasInlineCommands } from "./useCanvasInlineCommands";
 
 // Canvas size tracking
 export { useCanvasSize } from "./useCanvasSize";
+
+// Accessibility — aria-live selection announcements (WCAG 4.1.3)
+export { useSelectionAnnouncement } from "./useSelectionAnnouncement";

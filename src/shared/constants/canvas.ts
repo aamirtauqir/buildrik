@@ -373,7 +373,7 @@ export const DEVICE_PRESETS = [
 // ZOOM PRESETS
 // ============================================
 
-export const ZOOM_PRESETS = [10, 25, 50, 75, 100, 125, 150, 200, 300, 400] as const;
+export const ZOOM_PRESETS = [10, 25, 50, 75, 100, 125, 150, 200, 300] as const;
 
 export const ZOOM_LIMITS = {
   min: 10,

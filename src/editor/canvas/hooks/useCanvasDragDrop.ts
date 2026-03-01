@@ -188,7 +188,8 @@ export function useCanvasDragDrop({
           const rect = targetEl.getBoundingClientRect();
           const canvasRect = canvasRef.current?.getBoundingClientRect();
 
-          // Calculate drop position
+          // Both e.clientX/clientY and rect (from getBoundingClientRect) are in
+          // viewport space — already scroll-invariant. No scroll correction needed.
           const { position, isParentHorizontal } = calculateDropPositionFromCursor(
             e.clientX,
             e.clientY,
@@ -403,7 +404,8 @@ export function useCanvasDragDrop({
         return;
       }
 
-      // Calculate fresh drop target at drop time
+      // Both e.clientX/clientY and rects (from getBoundingClientRect) are in
+      // viewport space — already scroll-invariant. No scroll correction needed.
       const { targetId: freshTargetId, dropPosition: freshDropPosition } = calculateFreshDropTarget(
         e.clientX,
         e.clientY,

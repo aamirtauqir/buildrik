@@ -4,6 +4,7 @@
  * @license BSD-3-Clause
  */
 
+import { ChevronDown } from "lucide-react";
 import * as React from "react";
 import { Icon, type IconName } from "../../../../shared/ui";
 import { baseStyles } from "./controlStyles";
@@ -22,6 +23,10 @@ export interface SectionProps {
   isOpen?: boolean;
   /** Callback when section is toggled */
   onToggle?: (isOpen: boolean) => void;
+  /** ID placed on root div — used by sub-nav scroll anchors */
+  id?: string;
+  /** Preview shown next to label when section is collapsed */
+  preview?: React.ReactNode;
   children: React.ReactNode;
 }
 
@@ -35,15 +40,17 @@ export const Section: React.FC<SectionProps> = ({
   defaultOpen = false,
   isOpen: controlledIsOpen,
   onToggle,
+  id,
+  preview,
   children,
 }) => {
   const [internalIsOpen, setInternalIsOpen] = React.useState(defaultOpen);
 
-  // Use controlled state if provided, otherwise use internal state
   const isControlled = controlledIsOpen !== undefined;
   const isOpen = isControlled ? controlledIsOpen : internalIsOpen;
 
   // Sync internal state when controlled prop changes
+  // Note: L-03 — this sync may cause an extra render; tracked in backlog
   React.useEffect(() => {
     if (isControlled) {
       setInternalIsOpen(controlledIsOpen);
@@ -58,18 +65,20 @@ export const Section: React.FC<SectionProps> = ({
     onToggle?.(newState);
   };
 
+  const contentId = `section-content-${title.toLowerCase().replace(/\s+/g, "-")}`;
+
   return (
-    <div style={baseStyles.section}>
+    <div style={baseStyles.section} id={id}>
       <button
         style={baseStyles.sectionHeader(isOpen)}
         onClick={handleToggle}
         aria-expanded={isOpen}
-        aria-controls={`section-content-${title.toLowerCase().replace(/\s+/g, "-")}`}
+        aria-controls={contentId}
+        aria-label={`${title} section, ${isOpen ? "expanded" : "collapsed"}`}
       >
         <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {icon && (
             <span style={{ display: "flex", alignItems: "center" }}>
-              {/* Check if icon is a Lucide icon name (PascalCase) or emoji */}
               {typeof icon === "string" && /^[A-Z]/.test(icon) ? (
                 <Icon name={icon as IconName} size="sm" color="inherit" />
               ) : (
@@ -79,21 +88,25 @@ export const Section: React.FC<SectionProps> = ({
           )}
           {title}
         </span>
-        <span
-          style={{
-            transform: isOpen ? "rotate(180deg)" : "rotate(0)",
-            transition: "transform 0.2s",
-            fontSize: 10,
-          }}
-        >
-          ▼
+        <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          {!isOpen && preview && (
+            <span aria-hidden="true" style={{ display: "flex", alignItems: "center" }}>
+              {preview}
+            </span>
+          )}
+          <ChevronDown
+            size={12}
+            aria-hidden={true}
+            style={{
+              transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.2s",
+              color: "var(--aqb-text-tertiary)",
+            }}
+          />
         </span>
       </button>
       {isOpen && (
-        <div
-          id={`section-content-${title.toLowerCase().replace(/\s+/g, "-")}`}
-          style={baseStyles.sectionContent}
-        >
+        <div id={contentId} style={baseStyles.sectionContent}>
           {children}
         </div>
       )}

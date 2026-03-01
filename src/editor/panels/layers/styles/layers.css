@@ -649,3 +649,240 @@
   border-color: var(--aqb-accent-purple);
   color: var(--aqb-accent-purple);
 }
+
+/* ─────────────────────────────────────────────
+   DISPLAY SETTINGS POPOVER
+   ───────────────────────────────────────────── */
+.aqb-layer-display-settings {
+  position: absolute;
+  top: 44px;
+  right: 8px;
+  z-index: 200;
+  background: var(--aqb-surface-2, #1e2130);
+  border: 1px solid var(--aqb-border);
+  border-radius: var(--aqb-radius-md, 8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  min-width: 220px;
+  padding: 4px 0 8px;
+}
+.aqb-lds-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--aqb-border);
+  margin-bottom: 4px;
+}
+.aqb-lds-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--aqb-text-primary);
+}
+.aqb-lds-close {
+  background: none;
+  border: none;
+  color: var(--aqb-text-tertiary);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 4px;
+}
+.aqb-lds-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  cursor: pointer;
+  gap: 8px;
+}
+.aqb-lds-row:hover {
+  background: var(--aqb-surface-hover, rgba(255,255,255,0.04));
+}
+.aqb-lds-label {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 12px;
+  color: var(--aqb-text-primary);
+}
+.aqb-lds-hint {
+  font-size: 10px;
+  color: var(--aqb-text-tertiary);
+}
+
+/* ─────────────────────────────────────────────
+   HEADER ROW (count + expand/collapse buttons)
+   ───────────────────────────────────────────── */
+.aqb-layers-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 12px 0;
+}
+.aqb-layers-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.aqb-layers-count {
+  font-size: 11px;
+  color: var(--aqb-text-tertiary);
+  margin-left: 4px;
+}
+
+/* ─────────────────────────────────────────────
+   CONTEXT MENU
+   ───────────────────────────────────────────── */
+.aqb-layer-ctx-menu {
+  background: var(--aqb-surface-2, #1e2130);
+  border: 1px solid var(--aqb-border);
+  border-radius: var(--aqb-radius-md, 8px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  min-width: 190px;
+  padding: 4px 0;
+  user-select: none;
+}
+.aqb-layer-ctx-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 12px;
+  background: none;
+  border: none;
+  color: var(--aqb-text-primary);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+  gap: 16px;
+}
+.aqb-layer-ctx-item:hover {
+  background: var(--aqb-surface-hover, rgba(255,255,255,0.06));
+}
+.aqb-layer-ctx-item--danger { color: var(--aqb-error, #ef4444); }
+.aqb-layer-ctx-item--danger:hover { background: rgba(239,68,68,0.1); }
+.aqb-layer-ctx-divider {
+  height: 1px;
+  background: var(--aqb-border);
+  margin: 4px 0;
+}
+.aqb-ctx-hint {
+  color: var(--aqb-text-tertiary);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────
+   MULTI-SELECT BANNER
+   ───────────────────────────────────────────── */
+.aqb-layer-sel-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--aqb-info-bg, rgba(59,130,246,0.12));
+  border-bottom: 1px solid var(--aqb-info, #3b82f6);
+  flex-shrink: 0;
+}
+.aqb-sel-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--aqb-info, #3b82f6);
+  flex: 1;
+}
+.aqb-sel-btn {
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--aqb-border);
+  background: var(--aqb-surface-2);
+  color: var(--aqb-text-primary);
+  font-size: 11px;
+  cursor: pointer;
+}
+.aqb-sel-btn:hover { background: var(--aqb-surface-hover); }
+.aqb-sel-btn--danger { border-color: var(--aqb-error, #ef4444); color: var(--aqb-error, #ef4444); }
+.aqb-sel-btn--muted { color: var(--aqb-text-tertiary); }
+/* Multi-selected row styling */
+.aqb-layer-row.is-multi-selected {
+  background: rgba(59, 130, 246, 0.12) !important;
+  outline: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* ─────────────────────────────────────────────
+   BREADCRUMB
+   ───────────────────────────────────────────── */
+.aqb-layer-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 4px 12px;
+  border-bottom: 1px solid var(--aqb-border);
+  background: var(--aqb-surface-1);
+  flex-shrink: 0;
+}
+.aqb-bc-crumb {
+  background: none;
+  border: none;
+  color: var(--aqb-text-tertiary);
+  font-size: 10px;
+  cursor: pointer;
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+.aqb-bc-crumb:hover { color: var(--aqb-text-primary); background: var(--aqb-surface-hover); }
+.aqb-bc-sep { color: var(--aqb-text-tertiary); font-size: 10px; }
+.aqb-bc-current { font-size: 10px; font-weight: 600; color: var(--aqb-text-primary); }
+
+/* ─────────────────────────────────────────────
+   SEARCH EMPTY STATE
+   ───────────────────────────────────────────── */
+.aqb-layers-empty-search {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+  gap: 8px;
+  text-align: center;
+}
+.aqb-les-icon { font-size: 24px; }
+.aqb-les-title { font-size: 12px; color: var(--aqb-text-secondary); margin: 0; }
+.aqb-les-clear {
+  padding: 4px 12px;
+  border-radius: 4px;
+  background: var(--aqb-surface-2);
+  border: 1px solid var(--aqb-border);
+  color: var(--aqb-text-primary);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* ─────────────────────────────────────────────
+   COMPACT DENSITY MODE
+   ───────────────────────────────────────────── */
+.aqb-layers-compact .aqb-layer-row {
+  --layer-row-height: 24px;
+  font-size: 11px;
+}
+
+/* ─────────────────────────────────────────────
+   BREAKPOINT VISIBILITY CHIPS
+   ───────────────────────────────────────────── */
+.aqb-layer-bp-chip {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+.aqb-bp-mobile {
+  background: rgba(241, 196, 15, 0.2);
+  color: #f1c40f;
+  border: 1px solid rgba(241, 196, 15, 0.3);
+}
+.aqb-bp-tablet {
+  background: rgba(52, 152, 219, 0.2);
+  color: #3498db;
+  border: 1px solid rgba(52, 152, 219, 0.3);
+}

@@ -23,8 +23,25 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
 }) => {
   const [bgType, setBgType] = React.useState<"color" | "gradient" | "image">("color");
 
+  // Compute color preview from styles
+  const bgColor = styles["background-color"] || styles["backgroundColor"] || styles["background"];
+  const preview = bgColor ? (
+    <span
+      style={{
+        display: "inline-block",
+        width: 14,
+        height: 14,
+        borderRadius: 3,
+        background: bgColor,
+        border: "1px solid rgba(255,255,255,0.15)",
+        flexShrink: 0,
+      }}
+      title={bgColor}
+    />
+  ) : undefined;
+
   return (
-    <Section title="Background" icon="Palette">
+    <Section title="Background" icon="Palette" preview={preview} id="inspector-section-background">
       {/* Background Type Selector */}
       <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
         {(["color", "gradient", "image"] as const).map((type) => (

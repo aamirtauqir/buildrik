@@ -73,8 +73,28 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
     onPreview?.();
   };
 
+  // Show animation type name as preview when enabled
+  const animPreview =
+    enabled && localAnimation.type ? (
+      <span
+        style={{
+          fontSize: 9,
+          color: "var(--aqb-text-tertiary)",
+          fontFamily: "var(--aqb-font-mono)",
+        }}
+      >
+        {localAnimation.type}
+      </span>
+    ) : undefined;
+
   return (
-    <Section title="Animation" icon="Zap" defaultOpen={isOpen}>
+    <Section
+      title="Animation"
+      icon="Zap"
+      defaultOpen={isOpen}
+      preview={animPreview}
+      id="inspector-section-animation"
+    >
       {/* Enable/Disable Toggle */}
       <div
         style={{

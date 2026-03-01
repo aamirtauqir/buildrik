@@ -36,6 +36,12 @@ export interface CommandAction {
   handler: () => void;
   /** Search keywords */
   keywords?: string[];
+  /**
+   * When true, this command requires a selected element to execute.
+   * The palette renders it as visually disabled (with a hint) when
+   * selectedId === null, but keeps it visible so users know it exists.
+   */
+  requiresSelection?: boolean;
 }
 
 export interface CommandPaletteProps {
@@ -45,6 +51,11 @@ export interface CommandPaletteProps {
   onClose: () => void;
   /** Available commands */
   commands: CommandAction[];
+  /**
+   * The currently selected element ID.
+   * Commands with requiresSelection=true are shown as disabled when this is null.
+   */
+  selectedId: string | null;
 }
 
 // =============================================================================
@@ -112,7 +123,12 @@ export function useCommandPalette(): UseCommandPaletteResult {
 // COMPONENT
 // =============================================================================
 
-export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, commands }) => {
+export const CommandPalette: React.FC<CommandPaletteProps> = ({
+  isOpen,
+  onClose,
+  commands,
+  selectedId,
+}) => {
   const [query, setQuery] = React.useState("");
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [recentIds, setRecentIds] = React.useState<string[]>([]);
@@ -184,14 +200,16 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
     const list = listRef.current;
     if (!list) return;
     const selected = list.children[selectedIndex] as HTMLElement;
-    if (selected) {
+    if (selected && typeof selected.scrollIntoView === "function") {
       selected.scrollIntoView({ block: "nearest" });
     }
   }, [selectedIndex]);
 
-  // Execute command
+  // Execute command — no-op when the command requires selection and none is active
   const executeCommand = React.useCallback(
     (cmd: CommandAction) => {
+      if (cmd.requiresSelection && selectedId === null) return;
+
       // Update recent commands
       const newRecent = [cmd.id, ...recentIds.filter((id) => id !== cmd.id)].slice(0, MAX_RECENT);
       setRecentIds(newRecent);
@@ -201,7 +219,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
       cmd.handler();
       onClose();
     },
-    [recentIds, onClose]
+    [recentIds, onClose, selectedId]
   );
 
   // Keyboard navigation
@@ -340,32 +358,37 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                   const globalIndex = filteredCommands.indexOf(cmd);
                   const isSelected = globalIndex === selectedIndex;
                   const isRecent = recentIds.includes(cmd.id);
+                  const isDisabled = Boolean(cmd.requiresSelection && selectedId === null);
 
                   return (
                     <button
                       key={cmd.id}
                       onClick={() => executeCommand(cmd)}
+                      disabled={isDisabled}
+                      aria-disabled={isDisabled}
                       style={{
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
                         width: "100%",
                         padding: "10px 12px",
-                        background: isSelected ? CANVAS_COLORS.bgHover : "transparent",
+                        background:
+                          isSelected && !isDisabled ? CANVAS_COLORS.bgHover : "transparent",
                         border: "none",
                         borderRadius: 6,
                         color: CANVAS_COLORS.textPrimary,
                         fontSize: 13,
-                        cursor: "pointer",
+                        cursor: isDisabled ? "default" : "pointer",
                         textAlign: "left",
                         transition: "background 0.1s",
+                        opacity: isDisabled ? 0.4 : 1,
                       }}
-                      onMouseEnter={() => setSelectedIndex(globalIndex)}
+                      onMouseEnter={() => !isDisabled && setSelectedIndex(globalIndex)}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         {cmd.icon && <span style={{ fontSize: 16, opacity: 0.8 }}>{cmd.icon}</span>}
                         <span>{cmd.label}</span>
-                        {isRecent && (
+                        {isRecent && !isDisabled && (
                           <span
                             style={{
                               fontSize: 10,
@@ -378,9 +401,21 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                             Recent
                           </span>
                         )}
+                        {isDisabled && (
+                          <span
+                            data-testid="selection-hint"
+                            style={{
+                              fontSize: 11,
+                              color: CANVAS_COLORS.textMuted,
+                              fontStyle: "italic",
+                            }}
+                          >
+                            (Select an element first)
+                          </span>
+                        )}
                       </div>
 
-                      {cmd.shortcut && <ShortcutBadge shortcut={cmd.shortcut} />}
+                      {cmd.shortcut && !isDisabled && <ShortcutBadge shortcut={cmd.shortcut} />}
                     </button>
                   );
                 })}

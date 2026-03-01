@@ -6,6 +6,39 @@
  *
  * @license BSD-3-Clause
  */
+import type { CSSProperties } from "react";
+
+/** Visually-hidden style for screen reader announcements (WCAG 4.1.3). */
+export const SR_ONLY_STYLE: CSSProperties = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: "hidden",
+  clip: "rect(0,0,0,0)",
+  whiteSpace: "nowrap",
+  border: 0,
+};
+
+/** Returns inline style object for the drop-feedback toast. */
+export function getDropFeedbackStyle(type: "error" | "info"): CSSProperties {
+  const e = type === "error";
+  return {
+    padding: "8px 12px",
+    margin: "0 8px 8px",
+    fontSize: "var(--aqb-text-xs,12px)",
+    borderRadius: "var(--aqb-radius-sm,4px)",
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    background: e
+      ? "var(--aqb-error-bg,rgba(239,68,68,0.1))"
+      : "var(--aqb-info-bg,rgba(59,130,246,0.1))",
+    color: e ? "var(--aqb-error,#ef4444)" : "var(--aqb-info,#3b82f6)",
+    border: `1px solid ${e ? "var(--aqb-error,#ef4444)" : "var(--aqb-info,#3b82f6)"}`,
+  };
+}
 
 export const layersPanelStyles = `
   /* ═══════════════════════════════════════════════════════════════════════════

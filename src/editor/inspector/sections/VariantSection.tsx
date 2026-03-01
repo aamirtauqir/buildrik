@@ -173,7 +173,7 @@ export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elemen
   };
 
   return (
-    <Section title="Variants" icon="Layers" isOpen={isOpen}>
+    <Section title="Variants" icon="Layers" isOpen={isOpen} id="inspector-section-variants">
       <div style={styles.container}>
         {/* Component name badge */}
         <div style={styles.componentName}>

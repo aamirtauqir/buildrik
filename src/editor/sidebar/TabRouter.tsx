@@ -10,10 +10,9 @@ import * as React from "react";
 import type { Composer } from "../../engine";
 import type { GroupedTabId } from "../../shared/constants/tabs";
 import type { BlockData } from "../../shared/types";
-import type { TemplateItem } from "./tabs/templates";
 
 // Lazy-loaded tab components (code splitting)
-const BuildTab = React.lazy(() => import("./tabs/BuildTab"));
+const BuildTab = React.lazy(() => import("./tabs/build").then((m) => ({ default: m.BuildTab })));
 const TemplatesTab = React.lazy(() => import("./tabs/templates/TemplatesTab"));
 const LayersTab = React.lazy(() => import("./tabs/LayersTab"));
 const PagesTab = React.lazy(() => import("./tabs/PagesTab"));
@@ -37,8 +36,6 @@ export interface TabRouterProps {
   };
   onBlockClick?: (data: BlockData) => void;
   onElementSelect?: (id: string) => void;
-  onTemplateSelect?: (item: TemplateItem | null) => void;
-  selectedTemplateId?: string | null;
   canvasHoveredId?: string | null;
   onSwitchToAdd: () => void;
   onCreateComponent: () => void;
@@ -50,33 +47,16 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   commonTabProps,
   onBlockClick,
   onElementSelect,
-  onTemplateSelect,
-  selectedTemplateId,
   canvasHoveredId,
   onSwitchToAdd,
   onCreateComponent,
 }) => {
   switch (activeTab) {
     case "add":
-      return (
-        <BuildTab
-          composer={composer}
-          onBlockClick={onBlockClick}
-          onTemplateSelect={onTemplateSelect}
-          selectedTemplateId={selectedTemplateId}
-          {...commonTabProps}
-        />
-      );
+      return <BuildTab composer={composer} onBlockClick={onBlockClick} {...commonTabProps} />;
 
     case "templates":
-      return (
-        <TemplatesTab
-          searchQuery=""
-          composer={composer}
-          onTemplateSelect={onTemplateSelect}
-          selectedTemplateId={selectedTemplateId}
-        />
-      );
+      return <TemplatesTab composer={composer} />;
 
     case "layers":
       return (

@@ -255,11 +255,17 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
               <button
                 key={preset}
                 type="button"
-                onClick={() => { onZoomChange(preset); setShowPresets(false); }}
+                onClick={() => {
+                  onZoomChange(preset);
+                  setShowPresets(false);
+                }}
                 style={{
                   ...presetItemStyles,
                   background: Math.round(zoom) === preset ? "var(--aqb-surface-3)" : "transparent",
-                  color: Math.round(zoom) === preset ? "var(--aqb-text-primary)" : "var(--aqb-text-secondary)",
+                  color:
+                    Math.round(zoom) === preset
+                      ? "var(--aqb-text-primary)"
+                      : "var(--aqb-text-secondary)",
                 }}
               >
                 {preset}%
@@ -270,7 +276,10 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                 <div style={presetDividerStyles} />
                 <button
                   type="button"
-                  onClick={() => { onFitToScreen(); setShowPresets(false); }}
+                  onClick={() => {
+                    onFitToScreen();
+                    setShowPresets(false);
+                  }}
                   style={presetItemStyles}
                 >
                   Fit to screen

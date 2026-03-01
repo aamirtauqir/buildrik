@@ -48,6 +48,21 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
 
   const radiusValues = parseRadius();
 
+  // Compute border preview
+  const borderStyle = styles["border-style"] || (styles["border"] ? "set" : undefined);
+  const borderPreview = borderStyle ? (
+    <span
+      style={{
+        fontSize: 9,
+        color: "var(--aqb-text-tertiary)",
+        fontFamily: "var(--aqb-font-mono)",
+        whiteSpace: "nowrap" as const,
+      }}
+    >
+      {styles["border"] || `${borderStyle}`}
+    </span>
+  ) : undefined;
+
   const handleRadiusChange = (corner: "tl" | "tr" | "br" | "bl", value: string) => {
     if (radiusLinked) {
       onChange("border-radius", value);
@@ -63,7 +78,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
   };
 
   return (
-    <Section title="Border" icon="Square">
+    <Section title="Border" icon="Square" preview={borderPreview} id="inspector-section-border">
       {/* Border Width */}
       <InputWithUnit
         label="Width"

@@ -179,6 +179,7 @@ export function useCanvasInlineEdit({
     };
 
     const handleDocMouseDown = (evt: MouseEvent) => {
+      if (evt.button !== 0) return; // only left-click commits; right/middle/aux buttons do not
       const target = evt.target as HTMLElement | null;
       if (!target) return;
 

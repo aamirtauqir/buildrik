@@ -59,13 +59,6 @@ const toggleStyles = {
     transition: "left 0.2s ease, background 0.2s ease",
     boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
   }),
-  indicator: (enabled: boolean): React.CSSProperties => ({
-    width: 6,
-    height: 6,
-    borderRadius: "50%",
-    background: enabled ? "#22c55e" : INSPECTOR_TOKENS.textTertiary,
-    marginLeft: 4,
-  }),
 };
 
 // ============================================================================
@@ -89,7 +82,6 @@ export const DevModeToggle: React.FC<DevModeToggleProps> = ({ enabled, onToggle 
       >
         <span style={toggleStyles.knob(enabled)} />
       </button>
-      <span style={toggleStyles.indicator(enabled)} />
     </div>
   );
 };

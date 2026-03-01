@@ -110,90 +110,112 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
     setTargetRect(target);
   }, [isDragOver, dropTargetId, canvasRef]);
 
-  // Don't render if not dragging over or no target
-  if (!isDragOver || !dropTargetId || !targetRect || !canvasRect) {
-    return null;
-  }
+  // Announcement text for screen readers (WCAG 4.1.3 — assertive for time-sensitive drag feedback)
+  // Announce invalid reason when dragging over an invalid target; clear otherwise.
+  const liveText =
+    isDragOver && !isValidDrop && invalidReason ? INVALID_DROP_MESSAGES[invalidReason] : "";
 
-  // Calculate relative position
-  const relativeRect = {
-    left: targetRect.left - canvasRect.left,
-    top: targetRect.top - canvasRect.top,
-    width: targetRect.width,
-    height: targetRect.height,
-  };
+  // Visual overlay is only rendered when there is a valid drag state with measured rects.
+  const showVisual = isDragOver && dropTargetId && targetRect && canvasRect;
 
   const message = invalidReason ? INVALID_DROP_MESSAGES[invalidReason] : null;
 
-  // Get target element name for destination label
-  const targetElement = canvasRef.current?.querySelector(
-    `[data-aqb-id="${dropTargetId}"]`
-  ) as HTMLElement | null;
+  // Calculate relative position only when visual is shown
+  const relativeRect = showVisual
+    ? {
+        left: targetRect.left - canvasRect.left,
+        top: targetRect.top - canvasRect.top,
+        width: targetRect.width,
+        height: targetRect.height,
+      }
+    : null;
+
+  // Get target element name for destination label (only when visual is needed)
+  const targetElement = showVisual
+    ? (canvasRef.current?.querySelector(`[data-aqb-id="${dropTargetId}"]`) as HTMLElement | null)
+    : null;
   const targetName = getElementName(targetElement);
 
   return (
-    <div
-      className="aqb-drop-feedback-overlay"
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        pointerEvents: "none",
-        zIndex: Z_LAYERS.dropFeedback,
-      }}
-    >
-      {/* Target highlight overlay - 2px solid border */}
-      {/* BUG-009 FIX: Added z-index and pointerEvents to prevent visual overlap with text */}
-      <div
-        className={`aqb-drop-feedback-target ${isValidDrop ? "valid" : "invalid"}`}
-        style={{
-          position: "absolute",
-          left: relativeRect.left,
-          top: relativeRect.top,
-          width: relativeRect.width,
-          height: relativeRect.height,
-          border: `2px solid ${isValidDrop ? COLORS.valid.border : COLORS.invalid.border}`,
-          backgroundColor: isValidDrop ? COLORS.valid.bg : COLORS.invalid.bg,
-          borderRadius: 4,
-          transition: "border-color 150ms ease, background-color 150ms ease",
-          boxSizing: "border-box",
-          zIndex: 1,
-          pointerEvents: "none",
-        }}
-      />
+    <>
+      {/* Aria-live region — always in DOM so screen readers observe it (WCAG 4.1.3).
+          assertive priority because drop feedback is time-sensitive: once the user
+          releases the mouse the moment to announce has passed. aria-atomic ensures
+          the full message is read even if it changes rapidly. */}
+      <div aria-live="assertive" aria-atomic="true" className="aqb-sr-only">
+        {liveText}
+      </div>
 
-      {/* Drop position indicator line - 2px solid */}
-      {dropPosition && dropPosition !== "inside" && (
-        <DropPositionLine position={dropPosition} targetRect={relativeRect} isValid={isValidDrop} />
+      {/* Visual overlay — only rendered when rects are measured */}
+      {showVisual && relativeRect && (
+        <div
+          className="aqb-drop-feedback-overlay"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            pointerEvents: "none",
+            zIndex: Z_LAYERS.dropFeedback,
+          }}
+        >
+          {/* Target highlight overlay - 2px solid border */}
+          {/* BUG-009 FIX: Added z-index and pointerEvents to prevent visual overlap with text */}
+          <div
+            className={`aqb-drop-feedback-target ${isValidDrop ? "valid" : "invalid"}`}
+            style={{
+              position: "absolute",
+              left: relativeRect.left,
+              top: relativeRect.top,
+              width: relativeRect.width,
+              height: relativeRect.height,
+              border: `2px solid ${isValidDrop ? COLORS.valid.border : COLORS.invalid.border}`,
+              backgroundColor: isValidDrop ? COLORS.valid.bg : COLORS.invalid.bg,
+              borderRadius: 4,
+              transition: "border-color 150ms ease, background-color 150ms ease",
+              boxSizing: "border-box",
+              zIndex: 1,
+              pointerEvents: "none",
+            }}
+          />
+
+          {/* Drop position indicator line - 2px solid */}
+          {dropPosition && dropPosition !== "inside" && (
+            <DropPositionLine
+              position={dropPosition}
+              targetRect={relativeRect}
+              isValid={isValidDrop}
+            />
+          )}
+
+          {/* Animated drop slot preview - simple dashed outline */}
+          {dropSlotRect && isValidDrop && <DropSlotPreview slotRect={dropSlotRect} />}
+
+          {/* Destination label - for valid drops, shows where element will go */}
+          {isValidDrop && dropPosition && (
+            <DestinationLabel
+              targetRect={relativeRect}
+              targetName={targetName}
+              position={dropPosition}
+            />
+          )}
+
+          {/* Feedback badge - only for invalid drops, corner positioned */}
+          {!isValidDrop && <DropFeedbackBadge targetRect={relativeRect} message={message} />}
+
+          {/* Breadcrumb trail - shows element hierarchy during drag */}
+          {isValidDrop && dropTargetPath.length > 1 && (
+            <DropBreadcrumb path={dropTargetPath} targetRect={relativeRect} />
+          )}
+
+          {/* Depth badge - shows nesting level for deep drops */}
+          {isValidDrop && dropTargetPath.length > 2 && (
+            <DepthBadge depth={dropTargetPath.length} targetRect={relativeRect} />
+          )}
+        </div>
       )}
-
-      {/* Animated drop slot preview - simple dashed outline */}
-      {dropSlotRect && isValidDrop && <DropSlotPreview slotRect={dropSlotRect} />}
-
-      {/* Destination label - for valid drops, shows where element will go */}
-      {isValidDrop && dropPosition && (
-        <DestinationLabel
-          targetRect={relativeRect}
-          targetName={targetName}
-          position={dropPosition}
-        />
-      )}
-
-      {/* Feedback badge - only for invalid drops, corner positioned */}
-      {!isValidDrop && <DropFeedbackBadge targetRect={relativeRect} message={message} />}
-
-      {/* Breadcrumb trail - shows element hierarchy during drag */}
-      {isValidDrop && dropTargetPath.length > 1 && (
-        <DropBreadcrumb path={dropTargetPath} targetRect={relativeRect} />
-      )}
-
-      {/* Depth badge - shows nesting level for deep drops */}
-      {isValidDrop && dropTargetPath.length > 2 && (
-        <DepthBadge depth={dropTargetPath.length} targetRect={relativeRect} />
-      )}
-    </div>
+    </>
   );
 };
 

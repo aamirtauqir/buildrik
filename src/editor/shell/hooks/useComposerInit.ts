@@ -10,9 +10,8 @@ import * as React from "react";
 import { createComposer, Composer } from "../../../engine";
 import { ProductCollectionService } from "../../../engine/cms";
 import type { Element } from "../../../engine/elements/Element";
+import { THRESHOLDS } from "../../../shared/constants/config";
 import type { ComposerConfig, ProjectData, DeviceType, ElementType } from "../../../shared/types";
-
-const AUTO_SAVE_DEBOUNCE_MS = 1500;
 
 export type ComposerOptions = Partial<ComposerConfig> & {
   project?: {
@@ -199,7 +198,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
               error: err?.message || "Auto-save failed",
             }));
           });
-      }, AUTO_SAVE_DEBOUNCE_MS);
+      }, THRESHOLDS.AUTOSAVE_DEBOUNCE);
     };
     composer.on("project:changed", handler);
     return () => {

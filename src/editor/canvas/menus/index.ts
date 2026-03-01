@@ -5,7 +5,6 @@
  */
 
 export { ElementContextMenu } from "./ElementContextMenu";
-export { FloatingPropertiesPanel } from "./FloatingPropertiesPanel";
 export { MenuIcon } from "./MenuIcon";
 export { MenuItem } from "./MenuItem";
 export { SubmenuItem } from "./SubmenuItem";

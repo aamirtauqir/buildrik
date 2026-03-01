@@ -24,9 +24,6 @@ export type { UnifiedSelectionToolbarProps } from "./UnifiedSelectionToolbar";
 export { InspectorToggle, useInspectorMode } from "./InspectorToggle";
 export type { InspectorToggleProps } from "./InspectorToggle";
 
-export { FloatingHelper } from "./FloatingHelper";
-export type { FloatingHelperProps, HelperAction } from "./FloatingHelper";
-
 export { CommandPalette, useCommandPalette } from "./CommandPalette";
 export type { CommandPaletteProps, CommandAction, UseCommandPaletteResult } from "./CommandPalette";
 

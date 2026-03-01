@@ -27,7 +27,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
   const reason = (prop: string) => propertyStates[prop]?.reason;
 
   return (
-    <Section title="Size" icon="Ruler" isOpen={isOpen}>
+    <Section title="Size" icon="Ruler" isOpen={isOpen} id="inspector-section-size">
       {/* Width */}
       {!hidden("width") && (
         <InputWithUnit

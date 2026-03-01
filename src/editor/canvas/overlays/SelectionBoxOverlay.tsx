@@ -63,6 +63,8 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
   const [elementRects, setElementRects] = React.useState<Map<string, SelectionRect>>(new Map());
   // Rotation state for rotation handle - isRotating reserved for future cursor/animation feedback
   const [_isRotating, setIsRotating] = React.useState(false);
+  // Current rotation angle for aria-valuenow (WCAG 4.1.2 requires it on role="slider")
+  const [rotationDegrees, setRotationDegrees] = React.useState(0);
 
   // Animation ref for GSAP
   const selectionBorderRef = React.useRef<HTMLDivElement>(null);
@@ -88,6 +90,31 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
     composer.on("element:updated", refresh);
     return () => {
       composer.off("element:updated", refresh);
+    };
+  }, [composer, elementId]);
+
+  // Read current rotation from element style so aria-valuenow stays accurate.
+  // Subscribes to element:updated so the value updates live during active rotation drag.
+  React.useEffect(() => {
+    const readRotation = () => {
+      if (!composer || !elementId) {
+        setRotationDegrees(0);
+        return;
+      }
+      const el = composer.elements.getElement(elementId);
+      if (!el) {
+        setRotationDegrees(0);
+        return;
+      }
+      const transform = (el.getStyle?.("transform") ?? "") as string;
+      const match = transform.match(/rotate\((-?[\d.]+)deg\)/);
+      setRotationDegrees(match ? Math.round(parseFloat(match[1])) : 0);
+    };
+
+    readRotation(); // read once on mount/element change
+    composer?.on("element:updated", readRotation);
+    return () => {
+      composer?.off("element:updated", readRotation);
     };
   }, [composer, elementId]);
 
@@ -416,14 +443,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
           }}
           aria-label="Element is locked"
         >
-          <svg
-            width="8"
-            height="8"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="white"
-            strokeWidth="3"
-          >
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
           </svg>
@@ -486,6 +506,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
           role="slider"
           aria-valuemin={0}
           aria-valuemax={360}
+          aria-valuenow={((rotationDegrees % 360) + 360) % 360}
         />
       )}
 

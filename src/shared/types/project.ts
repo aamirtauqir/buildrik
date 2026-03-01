@@ -108,6 +108,10 @@ export interface PageSettings {
   head?: string;
   /** SEO metadata */
   seo?: PageSEO;
+  /** Page visibility / publication status */
+  visibility?: "live" | "hidden" | "password";
+  /** Access password (used when visibility = "password") */
+  password?: string;
 }
 
 /**
@@ -162,13 +166,23 @@ export interface ProjectSettings {
   designTokens?: DesignTokenRecord[];
   /** Theme mode preference */
   themeMode?: "light" | "dark" | "system";
+  /** Custom code injection (head scripts, body scripts, global CSS) */
+  customCode?: CustomCodeConfig;
 }
 
 /** Serializable design token for project settings */
 export interface DesignTokenRecord {
   name: string;
   value: string;
-  category: "colors" | "typography" | "spacing" | "effects" | "layout" | "icons" | "buttons" | "forms";
+  category:
+    | "colors"
+    | "typography"
+    | "spacing"
+    | "effects"
+    | "layout"
+    | "icons"
+    | "buttons"
+    | "forms";
 }
 
 /**
@@ -250,4 +264,13 @@ export interface EmailServiceConfig {
   listId?: string;
   /** Whether email integration is enabled */
   enabled: boolean;
+}
+
+/**
+ * Custom code injection configuration
+ */
+export interface CustomCodeConfig {
+  headScripts: string;
+  bodyScripts: string;
+  globalCss: string;
 }

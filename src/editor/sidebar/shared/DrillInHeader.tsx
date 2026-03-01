@@ -16,8 +16,12 @@ export interface DrillInHeaderProps {
   parentName: string;
   /** Breadcrumb path (e.g., ["Build", "Elements"]) */
   breadcrumb?: string[];
-  /** Callback when back button is clicked */
+  /** Callback when back button is clicked (and no dirty state) */
   onBack: () => void;
+  /** True if the current screen has unsaved changes */
+  isDirty?: boolean;
+  /** Fires instead of onBack when isDirty=true — use to show an unsaved-changes guard */
+  onBackAttempt?: () => void;
   /** Whether the panel is pinned */
   isPinned?: boolean;
   /** Callback when pin button is clicked */
@@ -33,11 +37,21 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
   parentName,
   breadcrumb,
   onBack,
+  isDirty,
+  onBackAttempt,
   isPinned = false,
   onPinToggle,
   onHelpClick,
   onClose,
 }) => {
+  const handleBackClick = () => {
+    if (isDirty && onBackAttempt) {
+      onBackAttempt();
+    } else {
+      onBack();
+    }
+  };
+
   // Focus back button on mount for keyboard accessibility
   const backBtnRef = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
@@ -54,13 +68,17 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
         if (tag === "INPUT" || tag === "TEXTAREA" || target.isContentEditable) {
           return; // Let the input handle Escape (blur/clear)
         }
-        onBack();
+        if (isDirty && onBackAttempt) {
+          onBackAttempt();
+        } else {
+          onBack();
+        }
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onBack]);
+  }, [onBack, isDirty, onBackAttempt]);
 
   const breadcrumbPath = breadcrumb || [parentName, title];
 
@@ -70,7 +88,7 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
       <div style={leftSectionStyles}>
         <button
           ref={backBtnRef}
-          onClick={onBack}
+          onClick={handleBackClick}
           className="aqb-back-btn"
           style={backButtonStyles}
           title={`Back to ${parentName}`}

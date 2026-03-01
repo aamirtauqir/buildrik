@@ -10,6 +10,7 @@
  */
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import "./ApplyProgressOverlay.css";
 
 // ============================================================================
@@ -19,6 +20,8 @@ import "./ApplyProgressOverlay.css";
 export interface ApplyProgressOverlayProps {
   templateName: string;
   onComplete: () => void;
+  onCancel?: () => void;
+  onError?: (err: Error) => void;
 }
 
 type StepStatus = "todo" | "active" | "done";
@@ -50,6 +53,8 @@ const COMPLETE_DELAY = 800; // ms to show "ready" state before firing onComplete
 export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
   templateName,
   onComplete,
+  onCancel,
+  onError,
 }) => {
   const [activeStep, setActiveStep] = React.useState(0);
 
@@ -57,7 +62,9 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
   // re-run when the parent re-renders and passes a new function reference.
   // This prevents the completion timer from being canceled mid-flight.
   const onCompleteRef = React.useRef(onComplete);
-  React.useLayoutEffect(() => { onCompleteRef.current = onComplete; });
+  React.useLayoutEffect(() => {
+    onCompleteRef.current = onComplete;
+  });
 
   // Derived — never goes back to false, so the completion effect below fires
   // exactly once and its cleanup only runs on unmount (not on each re-render).
@@ -79,6 +86,13 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
     return () => clearTimeout(timer);
   }, [isComplete]);
 
+  // FIX-2: 15-second timeout — fire onError if apply takes too long
+  React.useEffect(() => {
+    if (!onError) return;
+    const timer = setTimeout(() => onError(new Error("Apply timed out")), 15000);
+    return () => clearTimeout(timer);
+  }, [onError]);
+
   const getStatus = (index: number): StepStatus => {
     if (index < activeStep) return "done";
     if (index === activeStep) return "active";
@@ -87,7 +101,7 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
 
   const progressPercent = Math.min(100, (activeStep / STEPS.length) * 100);
 
-  return (
+  return createPortal(
     <div className="tmpl-progress" role="status" aria-label="Applying template">
       <div className="tmpl-progress__inner">
         {/* Title */}
@@ -117,8 +131,16 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
             );
           })}
         </div>
+
+        {/* FIX-10: Cancel link — visible only during first 2 steps */}
+        {activeStep < 2 && onCancel && (
+          <button className="tmpl-progress__cancel" onClick={onCancel}>
+            Cancel
+          </button>
+        )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

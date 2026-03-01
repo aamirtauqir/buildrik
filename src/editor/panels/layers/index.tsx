@@ -1,12 +1,6 @@
 /**
- * LayersPanel - Minimal Tree Design
- * Maximum content, minimum chrome. Search + Tree only.
- *
- * @deprecated This standalone component is deprecated. Use NavigatorTab
- * (packages/editor/src/components/Panels/LeftSidebar/tabs/NavigatorTab.tsx)
- * which is the canonical layers view integrated into the sidebar.
- * This file will be removed in a future version.
- *
+ * LayersPanel - Minimal Tree Design. Search + Tree only.
+ * @deprecated Use NavigatorTab (canonical layers view in sidebar). Removed in future.
  * @license BSD-3-Clause
  */
 
@@ -16,9 +10,14 @@ import type { ElementType } from "../../../shared/types";
 import { EmptyState } from "../../../shared/ui/EmptyState";
 import { IconTree, IconSearch, IconSettings, IconPlus } from "../../../shared/ui/Icons";
 import { canNestElement, canHaveChildren } from "../../../shared/utils/nesting";
+import { LayerBreadcrumb } from "./components/LayerBreadcrumb";
+import { LayerContextMenu } from "./components/LayerContextMenu";
+import { LayerDisplaySettings } from "./components/LayerDisplaySettings";
+import { LayerSelectionBanner } from "./components/LayerSelectionBanner";
+import { useLayerContextActions } from "./hooks/useLayerContextActions";
 import { useLayersState } from "./hooks/useLayersState";
 import { LayerTreeItem } from "./LayerTreeItem";
-import { layersPanelStyles } from "./styles";
+import { layersPanelStyles, SR_ONLY_STYLE, getDropFeedbackStyle } from "./styles";
 import type { LayersPanelProps } from "./types";
 
 export type { LayersPanelProps, SelectedElementInfo } from "./types";
@@ -31,6 +30,17 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   onAddBlockClick,
 }) => {
   const state = useLayersState({ composer, canvasHoveredId });
+
+  // Auto-expand ancestors of matching layers during search
+  const { getAncestorIdsForMatches, isSearching } = state.searchHook;
+  const { layers: treeLayers, expandIds } = state.treeHook;
+  const { filterTree } = state; // 1-arg wrapper that injects customNames
+  React.useEffect(() => {
+    if (!isSearching) return;
+    const filtered = filterTree(treeLayers);
+    const ancestorIds = getAncestorIdsForMatches(filtered, treeLayers);
+    expandIds(ancestorIds);
+  }, [isSearching, filterTree, treeLayers, getAncestorIdsForMatches, expandIds]);
 
   // Feedback message for invalid drop operations (UX improvement)
   const [dropFeedback, setDropFeedback] = React.useState<{
@@ -107,17 +117,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         const targetIndex = parent.getChildIndex(targetEl);
         const dropIndex = position === "before" ? targetIndex : targetIndex + 1;
 
-        // Reordering within same parent: index needs correction if moving forward
-        const sourceParent = sourceEl.getParent();
-        if (sourceParent && sourceParent.getId() === parent.getId()) {
-          const sourceIndex = parent.getChildIndex(sourceEl);
-          if (sourceIndex < targetIndex && position === "after") {
-            // No change needed, targetIndex already shifted
-          } else if (sourceIndex < targetIndex && position === "before") {
-            // No change needed
-          }
-        }
-
         newParent = parent;
         index = dropIndex;
       }
@@ -142,38 +141,32 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     if (layerRow) layerRow.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [state.treeContainerRef]);
 
-  // Auto-scroll to selected element on selection change
+  // Auto-expand ancestors + scroll to selected element on selection change
   React.useEffect(() => {
-    if (!selectedElement?.id || !state.treeContainerRef.current || !composer) return;
-
+    if (!selectedElement?.id || !composer) return;
+    // Collect ancestor IDs walking up the element tree (visited guards against cycles)
     const ancestorIds: string[] = [];
+    const visited = new Set<string>();
     let current = composer.elements.getElement(selectedElement.id);
-    while (current) {
+    while (current && !visited.has(current.getId())) {
+      visited.add(current.getId());
       const parent = current.getParent?.();
-      if (parent) ancestorIds.unshift(parent.getId());
-      current = parent ?? undefined;
+      if (!parent) break;
+      ancestorIds.unshift(parent.getId());
+      current = parent;
     }
-
-    if (ancestorIds.length > 0) {
-      state.expandedIds.forEach(() => {}); // Trigger re-render with expanded ancestors
-    }
-
+    if (ancestorIds.length > 0) state.treeHook.expandIds(ancestorIds);
     const scrollTimeout = setTimeout(scrollToSelection, 50);
     return () => clearTimeout(scrollTimeout);
-  }, [selectedElement?.id, composer, state.expandedIds, state.treeContainerRef, scrollToSelection]);
+  }, [selectedElement?.id, composer, state.treeHook, scrollToSelection]);
 
-  // Listen for explicit scroll requests (Phase 6: "Show in Layers" button)
+  // Listen for explicit scroll requests ("Show in Layers" button)
   React.useEffect(() => {
     if (!composer) return;
-
-    const handleScrollRequest = () => {
-      // Small delay to ensure DOM is ready
-      setTimeout(scrollToSelection, 50);
-    };
-
-    composer.on("layers:scroll-to-selection", handleScrollRequest);
+    const onScroll = () => setTimeout(scrollToSelection, 50);
+    composer.on("layers:scroll-to-selection", onScroll);
     return () => {
-      composer.off("layers:scroll-to-selection", handleScrollRequest);
+      composer.off("layers:scroll-to-selection", onScroll);
     };
   }, [composer, scrollToSelection]);
 
@@ -254,12 +247,10 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   );
 
   const handleSelect = React.useCallback(
-    (id: string) => {
-      if (!composer) return;
-      const el = composer.elements.getElement(id);
-      if (el) composer.selection.select(el);
+    (id: string, modifiers: { shift?: boolean; meta?: boolean } = {}) => {
+      state.selectionHook.selectLayer(id, modifiers);
     },
-    [composer]
+    [state.selectionHook]
   );
 
   const handleMouseEnter = React.useCallback(
@@ -275,13 +266,63 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
     onLayerHover?.(null);
   }, [state, onLayerHover]);
 
+  const handleContextAction = useLayerContextActions(state);
+
+  const handleBannerGroup = React.useCallback(() => {
+    state.actionsHook.groupLayers([...state.selectionHook.selectedIds], state.treeHook.layers);
+  }, [state.actionsHook, state.selectionHook, state.treeHook]);
+
+  const handleBannerHide = React.useCallback(() => {
+    state.actionsHook.hideMultiple([...state.selectionHook.selectedIds]);
+  }, [state.actionsHook, state.selectionHook]);
+
+  const handleBannerDelete = React.useCallback(() => {
+    if (!composer) return;
+    const ids = [...state.selectionHook.selectedIds];
+    if (!window.confirm(`Delete ${ids.length} layer${ids.length === 1 ? "" : "s"}?`)) return;
+    composer.beginTransaction("delete-layers");
+    ids.forEach((id) => composer.elements.removeElement(id));
+    composer.endTransaction();
+    state.selectionHook.clearSelection();
+  }, [composer, state.selectionHook]);
+
   // Filter tree by search only (no category filters in Minimal Tree design)
   const filteredLayers = state.filterTree(state.layers);
 
   return (
     <div className="aqb-layers-panel aqb-layers-minimal">
-      {/* Minimal Search Bar + Settings */}
+      {/* Search Bar + Settings */}
       <div className="aqb-layers-search-row">
+        {/* Header row: expand/collapse + count */}
+        <div className="aqb-layers-header-row">
+          <div className="aqb-layers-header-actions">
+            <button
+              className="aqb-layers-settings-btn"
+              title="Expand all layers (Alt+→)"
+              aria-label="Expand all layers"
+              onClick={() => state.treeHook.expandAll()}
+            >
+              ⊞
+            </button>
+            <button
+              className="aqb-layers-settings-btn"
+              title="Collapse all layers (Alt+←)"
+              aria-label="Collapse all layers"
+              onClick={() => state.treeHook.collapseAll()}
+            >
+              ⊟
+            </button>
+            <span
+              className="aqb-layers-count"
+              aria-live="polite"
+              aria-label={`${state.treeHook.totalCount} layers`}
+            >
+              {state.treeHook.totalCount > 0 ? `· ${state.treeHook.totalCount}` : ""}
+            </span>
+          </div>
+        </div>
+
+        {/* Search input */}
         <div className="aqb-search-container">
           <span className="aqb-search-icon" aria-hidden>
             <IconSearch size="sm" />
@@ -305,32 +346,39 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             </button>
           )}
         </div>
-        <button
-          className="aqb-layers-settings-btn"
-          title="Layer settings"
-          aria-label="Layer settings"
-        >
-          <IconSettings size="sm" />
-        </button>
+
+        {/* Gear icon — now wired to display settings */}
+        <div style={{ position: "relative" }}>
+          <button
+            className="aqb-layers-settings-btn"
+            title="Display settings"
+            aria-label="Layer display settings"
+            aria-expanded={state.displaySettingsOpen}
+            onClick={() => state.setDisplaySettingsOpen((prev: boolean) => !prev)}
+          >
+            <IconSettings size="sm" />
+          </button>
+          {state.displaySettingsOpen && (
+            <LayerDisplaySettings
+              prefs={state.displayPrefs}
+              onChange={state.updateDisplayPrefs}
+              onClose={() => state.setDisplaySettingsOpen(false)}
+            />
+          )}
+        </div>
       </div>
 
+      {state.selectionHook.selectedIds.size === 1 && (
+        <LayerBreadcrumb
+          selectedId={[...state.selectionHook.selectedIds][0]}
+          layers={state.treeHook.layers}
+          customNames={state.actionsHook.customNames}
+          onSelect={state.selectionHook.selectLayer}
+        />
+      )}
+
       {/* Screen reader announcement for search results (WCAG 4.1.3) */}
-      <div
-        aria-live="polite"
-        aria-atomic="true"
-        className="aqb-sr-only"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          padding: 0,
-          margin: -1,
-          overflow: "hidden",
-          clip: "rect(0, 0, 0, 0)",
-          whiteSpace: "nowrap",
-          border: 0,
-        }}
-      >
+      <div aria-live="polite" aria-atomic="true" className="aqb-sr-only" style={SR_ONLY_STYLE}>
         {state.search && filteredLayers.length > 0
           ? `${filteredLayers.length} layer${filteredLayers.length === 1 ? "" : "s"} found`
           : state.search && filteredLayers.length === 0
@@ -340,38 +388,25 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
 
       {/* Drop feedback message (UX improvement - Phase 3) */}
       {dropFeedback && (
-        <div
-          role="alert"
-          aria-live="assertive"
-          style={{
-            padding: "8px 12px",
-            margin: "0 8px 8px",
-            fontSize: "var(--aqb-text-xs, 12px)",
-            borderRadius: "var(--aqb-radius-sm, 4px)",
-            background:
-              dropFeedback.type === "error"
-                ? "var(--aqb-error-bg, rgba(239, 68, 68, 0.1))"
-                : "var(--aqb-info-bg, rgba(59, 130, 246, 0.1))",
-            color:
-              dropFeedback.type === "error"
-                ? "var(--aqb-error, #ef4444)"
-                : "var(--aqb-info, #3b82f6)",
-            border: `1px solid ${dropFeedback.type === "error" ? "var(--aqb-error, #ef4444)" : "var(--aqb-info, #3b82f6)"}`,
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-          }}
-        >
+        <div role="alert" aria-live="assertive" style={getDropFeedbackStyle(dropFeedback.type)}>
           <span aria-hidden>{dropFeedback.type === "error" ? "⚠️" : "ℹ️"}</span>
           {dropFeedback.message}
         </div>
       )}
 
+      <LayerSelectionBanner
+        count={state.selectionHook.selectedIds.size}
+        onGroup={handleBannerGroup}
+        onHide={handleBannerHide}
+        onDelete={handleBannerDelete}
+        onExit={state.selectionHook.clearSelection}
+      />
+
       {/* Clean Tree View - Maximum space for content */}
       <div
         ref={state.treeContainerRef}
         id="aqb-layers-tree"
-        className="aqb-layers-tree aqb-layers-tree-minimal"
+        className={`aqb-layers-tree aqb-layers-tree-minimal${state.displayPrefs.treeDensity === "compact" ? " aqb-layers-compact" : ""}`}
         role="tree"
         aria-label="Page structure"
       >
@@ -381,13 +416,23 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             title="No layers yet"
             description="Add blocks to start building your page"
             action={{
-              label: "Add Block",
+              label: "Open Build Panel →",
               onClick: onAddBlockClick || (() => {}),
               icon: <IconPlus size="sm" />,
             }}
             size="sm"
             className="aqb-layers-empty-state"
           />
+        )}
+
+        {state.searchHook.isSearching && filteredLayers.length === 0 && (
+          <div className="aqb-layers-empty-search" role="status">
+            <span className="aqb-les-icon">🔍</span>
+            <p className="aqb-les-title">No layers match &quot;{state.search}&quot;</p>
+            <button className="aqb-les-clear" onClick={() => state.setSearch("")}>
+              Clear search
+            </button>
+          </div>
         )}
 
         {filteredLayers.map((layer) => (
@@ -400,6 +445,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             dragState={state.dragState}
             hiddenIds={state.hiddenIds}
             lockedIds={state.lockedIds}
+            selectedIds={state.selectionHook.selectedIds}
             customNames={state.customNames}
             canvasHoveredId={canvasHoveredId ?? null}
             hoveredLayerId={state.hoveredLayerId}
@@ -411,6 +457,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             onToggleLock={state.toggleLock}
             onStartEditing={state.startEditing}
             onSaveEditedName={state.saveEditedName}
+            onCancelEditing={state.cancelEditing}
             onEditingNameChange={state.setEditingName}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -420,10 +467,27 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onSelect={handleSelect}
+            onContextMenu={state.openContextMenu}
             getVisibleLayerIds={state.getVisibleLayerIds}
+            displayPrefs={state.displayPrefs}
           />
         ))}
       </div>
+
+      {state.contextMenu && (
+        <LayerContextMenu
+          x={state.contextMenu.x}
+          y={state.contextMenu.y}
+          nodeId={state.contextMenu.nodeId}
+          nodeName={state.contextMenu.nodeName}
+          isHidden={state.contextMenu.isHidden}
+          isLocked={state.contextMenu.isLocked}
+          childCount={state.contextMenu.childCount}
+          selectedCount={state.selectionHook.selectedIds.size}
+          onAction={handleContextAction}
+          onClose={state.closeContextMenu}
+        />
+      )}
 
       <style>{layersPanelStyles}</style>
     </div>

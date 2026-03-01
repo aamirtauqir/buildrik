@@ -35,6 +35,7 @@ export const FeatureCard = React.memo<FeatureCardProps>(
           ...(disabled ? cardDisabledStyles : {}),
         }}
         aria-current={isActive ? "page" : undefined}
+        aria-label={`${title}${subtitle ? ` — ${subtitle}` : ""}${badge ? ` (${badge})` : ""}`}
       >
         {/* Icon container */}
         <div style={iconContainerStyles}>{icon}</div>
@@ -51,7 +52,11 @@ export const FeatureCard = React.memo<FeatureCardProps>(
             <span
               style={{
                 ...badgeStyles,
-                ...(typeof badge === "string" ? planBadgeStyles : {}),
+                ...(badge === "Coming Soon"
+                  ? comingSoonBadgeStyles
+                  : typeof badge === "string"
+                    ? planBadgeStyles
+                    : {}),
               }}
             >
               {typeof badge === "number" ? (badge > 99 ? "99+" : badge) : badge}
@@ -203,6 +208,14 @@ const badgeStyles: React.CSSProperties = {
 const planBadgeStyles: React.CSSProperties = {
   background: "var(--aqb-primary-light, rgba(124, 125, 255, 0.15))",
   color: "var(--aqb-primary)",
+  fontSize: 10,
+  textTransform: "uppercase",
+  letterSpacing: "0.3px",
+};
+
+const comingSoonBadgeStyles: React.CSSProperties = {
+  background: "#FEF3C7",
+  color: "#92400E",
   fontSize: 10,
   textTransform: "uppercase",
   letterSpacing: "0.3px",

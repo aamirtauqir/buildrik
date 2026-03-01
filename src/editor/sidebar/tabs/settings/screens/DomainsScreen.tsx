@@ -5,6 +5,7 @@
 
 import * as React from "react";
 import { Button } from "../../../../../shared/ui/Button";
+import { FEATURE_FLAGS } from "../constants";
 import { Section, Field } from "../shared";
 import {
   screenStyles,
@@ -17,32 +18,49 @@ import {
   dnsHelpStyles,
   codeStyles,
 } from "../styles";
-
-const comingSoonStyles: React.CSSProperties = {
-  marginTop: 8,
-  padding: "8px 10px",
-  background: "rgba(245,158,11,0.12)",
-  borderRadius: 6,
-  fontSize: 11,
-  color: "var(--aqb-warning, #f59e0b)",
-  lineHeight: 1.4,
-};
+import { LockedScreen } from "./LockedScreen";
 
 export const DomainsScreen: React.FC = () => {
   const [domain, setDomain] = React.useState("");
-  const [showComingSoon, setShowComingSoon] = React.useState(false);
   const [copied, setCopied] = React.useState(false);
+  const copyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText("project.builder.aquibra.com");
+    try {
+      await navigator.clipboard.writeText("project.builder.aquibra.com");
+    } catch {
+      return; // Clipboard API unavailable — graceful no-op
+    }
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
   };
+
+  React.useEffect(
+    () => () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    },
+    []
+  );
 
   const handleConnect = () => {
     if (!domain.trim()) return;
-    setShowComingSoon(true);
+    // TODO: call domain connection API when FEATURE_FLAGS.domains = true
   };
+
+  if (!FEATURE_FLAGS.domains) {
+    return (
+      <LockedScreen
+        variant="coming-soon"
+        title="Custom Domains"
+        message="Connect your own domain like www.yourbusiness.com to your Aquibra site. Make sure to publish your site first."
+        waitlistLabel="Get notified when custom domains launch →"
+        onWaitlist={() => {
+          // TODO: integrate with waitlist/email capture when available
+        }}
+      />
+    );
+  }
 
   return (
     <div style={screenStyles}>
@@ -52,9 +70,13 @@ export const DomainsScreen: React.FC = () => {
           <button
             style={{ ...copyBtnStyles, color: copied ? "var(--aqb-success)" : undefined }}
             onClick={handleCopy}
+            aria-label={copied ? "Copied to clipboard" : "Copy default domain to clipboard"}
           >
             {copied ? "✓ Copied" : "Copy"}
           </button>
+          <span aria-live="assertive" aria-atomic="true" style={srOnlyStyles}>
+            {copied ? "Copied to clipboard" : ""}
+          </span>
         </div>
       </Section>
 
@@ -63,28 +85,14 @@ export const DomainsScreen: React.FC = () => {
           <input
             type="text"
             value={domain}
-            onChange={(e) => {
-              setDomain(e.target.value);
-              setShowComingSoon(false);
-            }}
+            onChange={(e) => setDomain(e.target.value)}
             placeholder="www.example.com"
             style={inputStyles}
           />
         </Field>
-        <Button
-          onClick={handleConnect}
-          disabled={!domain.trim()}
-          variant="primary"
-          fullWidth
-        >
+        <Button onClick={handleConnect} disabled={!domain.trim()} variant="primary" fullWidth>
           Connect Domain
         </Button>
-        {showComingSoon && (
-          <div style={comingSoonStyles}>
-            Custom domain connection is coming soon. Publish your site first, then return here to
-            connect your domain.
-          </div>
-        )}
         <div style={dnsHelpStyles}>
           <p>Point your domain to:</p>
           <code style={codeStyles}>CNAME: builder.aquibra.com</code>
@@ -99,4 +107,12 @@ export const DomainsScreen: React.FC = () => {
       </Section>
     </div>
   );
+};
+
+const srOnlyStyles: React.CSSProperties = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  overflow: "hidden",
+  clip: "rect(0,0,0,0)",
 };

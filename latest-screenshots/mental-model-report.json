@@ -1,0 +1,3374 @@
+{
+  "generated": "2026-03-01T16:41:12.165Z",
+  "avgAlignmentScore": 4,
+  "totalEntries": 336,
+  "totalGaps": 0,
+  "gapsByViewport": {
+    "desktop-1440x900": [],
+    "laptop-1280x720": [],
+    "tablet-834x1112": [],
+    "mobile-390x844": []
+  },
+  "fullLog": [
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P0-loading",
+      "shot": "000_loading-state",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P2-base",
+      "shot": "001_editor-base_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P2-base",
+      "shot": "002_canvas_idle",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P2-base",
+      "shot": "003_workspace_overview",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "010_untitled-project_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "010_untitled-project_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "011_undo-last-action_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "011_undo-last-action_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "012_redo-last-action_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "012_redo-last-action_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "013_desktop_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "013_desktop_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "014_1_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "014_1_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "015_preview_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "015_preview_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "016_publish_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "016_publish_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "017_templatestemplatest_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "017_templatestemplatest_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "018_pagespagesp_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "018_pagespagesp_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "019_buildbuilda_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "019_buildbuilda_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "020_mediamedia-libraryj_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "020_mediamedia-libraryj_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "021_globaldesign-systemd_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "021_globaldesign-systemd_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "022_configconfig-launchs_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "022_configconfig-launchs_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "023_layers_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "023_layers_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "024_history_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "024_history_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "025__default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "025__open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "026_snap-guides_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "026_snap-guides_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "027_spacing_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "027_spacing_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "028_grid_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "028_grid_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "029_badges_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "029_badges_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "030_x-ray_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "030_x-ray_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "031__default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "031__open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "032_100_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "032_100_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "033_open-build-panel_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "033_open-build-panel_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "034_browse-templates_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "034_browse-templates_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "035_skip_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "035_skip_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "036_next_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "036_next_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "037__default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "037__open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "038_get-started0-of-9-complete_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "038_get-started0-of-9-complete_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "039_page-1_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "039_page-1_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle",
+      "shot": "040_element-selected",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-templatestemplatest",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-pagespagesp",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-buildbuilda",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-mediamedia-libraryj",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-globaldesign-systemd",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle",
+      "shot": "049_after-selection",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P5-undo-redo",
+      "shot": "050_after-undo",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P5-undo-redo",
+      "shot": "051_after-redo",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays",
+      "shot": "060_toast-notification",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-1",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-2",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-3",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-4",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-5",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-top",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-mid",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-bottom",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P8-special",
+      "shot": "080_focus-first",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P8-special",
+      "shot": "081_focus-second",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "desktop-1440x900",
+      "phase": "P8-special",
+      "shot": "082_empty-state",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P0-loading",
+      "shot": "000_loading-state",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P2-base",
+      "shot": "001_editor-base_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P2-base",
+      "shot": "002_canvas_idle",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P2-base",
+      "shot": "003_workspace_overview",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "010_untitled-project_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "010_untitled-project_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "011_undo-last-action_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "011_undo-last-action_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "012_redo-last-action_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "012_redo-last-action_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "013_desktop_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "013_desktop_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "014_1_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "014_1_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "015_preview_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "015_preview_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "016_publish_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "016_publish_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "017_templatestemplatest_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "017_templatestemplatest_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "018_pagespagesp_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "018_pagespagesp_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "019_buildbuilda_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "019_buildbuilda_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "020_mediamedia-libraryj_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "020_mediamedia-libraryj_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "021_globaldesign-systemd_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "021_globaldesign-systemd_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "022_configconfig-launchs_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "022_configconfig-launchs_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "023_layers_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "023_layers_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "024_history_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "024_history_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "025__default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "025__open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "026_snap-guides_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "026_snap-guides_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "027_spacing_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "027_spacing_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "028_grid_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "028_grid_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "029_badges_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "029_badges_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "030_x-ray_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "030_x-ray_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "031__default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "031__open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "032_100_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "032_100_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "033_open-build-panel_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "033_open-build-panel_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "034_browse-templates_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "034_browse-templates_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "035_skip_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "035_skip_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "036_next_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "036_next_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "037__default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "037__open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "038_get-started0-of-9-complete_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "038_get-started0-of-9-complete_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "039_page-1_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "039_page-1_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle",
+      "shot": "040_element-selected",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-templatestemplatest",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-pagespagesp",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-buildbuilda",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-mediamedia-libraryj",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-globaldesign-systemd",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle",
+      "shot": "049_after-selection",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P5-undo-redo",
+      "shot": "050_after-undo",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P5-undo-redo",
+      "shot": "051_after-redo",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays",
+      "shot": "060_toast-notification",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-1",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-2",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-3",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-4",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-5",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-top",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-mid",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-bottom",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P8-special",
+      "shot": "080_focus-first",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P8-special",
+      "shot": "081_focus-second",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "laptop-1280x720",
+      "phase": "P8-special",
+      "shot": "082_empty-state",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P0-loading",
+      "shot": "000_loading-state",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P2-base",
+      "shot": "001_editor-base_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P2-base",
+      "shot": "002_canvas_idle",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P2-base",
+      "shot": "003_workspace_overview",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "010_untitled-project_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "010_untitled-project_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "011_undo-last-action_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "011_undo-last-action_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "012_redo-last-action_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "012_redo-last-action_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "013_desktop_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "013_desktop_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "014_preview_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "014_preview_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "015_publish_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "015_publish_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "016_templatestemplatest_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "016_templatestemplatest_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "017_pagespagesp_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "017_pagespagesp_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "018_buildbuilda_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "018_buildbuilda_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "019_mediamedia-libraryj_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "019_mediamedia-libraryj_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "020_globaldesign-systemd_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "020_globaldesign-systemd_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "021_configconfig-launchs_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "021_configconfig-launchs_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "022_layers_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "022_layers_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "023_history_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "023_history_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "024__default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "024__open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "025_snap-guides_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "025_snap-guides_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "026_spacing_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "026_spacing_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "027_grid_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "027_grid_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "028_badges_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "028_badges_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "029_x-ray_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "029_x-ray_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "030__default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "030__open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "031_100_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "031_100_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "032_open-build-panel_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "032_open-build-panel_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "033_browse-templates_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "033_browse-templates_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "034_skip_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "034_skip_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "035_next_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "035_next_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "036__default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "036__open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "037_get-started0-of-9-complete_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "037_get-started0-of-9-complete_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "038_page-1_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "038_page-1_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle",
+      "shot": "040_element-selected",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-templatestemplatest",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-pagespagesp",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-buildbuilda",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-mediamedia-libraryj",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-globaldesign-systemd",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle",
+      "shot": "049_after-selection",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P5-undo-redo",
+      "shot": "050_after-undo",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P5-undo-redo",
+      "shot": "051_after-redo",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays",
+      "shot": "060_toast-notification",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-1",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-2",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-3",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-4",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-5",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-top",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-mid",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-bottom",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P8-special",
+      "shot": "080_focus-first",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P8-special",
+      "shot": "081_focus-second",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "tablet-834x1112",
+      "phase": "P8-special",
+      "shot": "082_empty-state",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P0-loading",
+      "shot": "000_loading-state",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P2-base",
+      "shot": "001_editor-base_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P2-base",
+      "shot": "002_canvas_idle",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P2-base",
+      "shot": "003_workspace_overview",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "010_untitled-project_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "010_untitled-project_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "011_undo-last-action_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "011_undo-last-action_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "012_redo-last-action_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "012_redo-last-action_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "013_desktop_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "013_desktop_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "014_preview_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "014_preview_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "015_publish_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "015_publish_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "016_templatestemplatest_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "016_templatestemplatest_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "017_pagespagesp_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "017_pagespagesp_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "018_buildbuilda_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "018_buildbuilda_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "019_mediamedia-libraryj_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "019_mediamedia-libraryj_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "020_globaldesign-systemd_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "020_globaldesign-systemd_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "021_configconfig-launchs_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "021_configconfig-launchs_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "022_layers_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "022_layers_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "023_history_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "023_history_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "024__default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "024__open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "025_snap-guides_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "025_snap-guides_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "026_spacing_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "026_spacing_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "027_grid_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "027_grid_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "028_badges_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "028_badges_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "029_x-ray_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "029_x-ray_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "030__default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "030__open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "031_100_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "031_100_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "032_open-build-panel_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "032_open-build-panel_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "033_browse-templates_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "033_browse-templates_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "034_skip_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "034_skip_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "035_next_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "035_next_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "036__default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "036__open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "037_get-started0-of-9-complete_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "037_get-started0-of-9-complete_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "038_page-1_default",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "038_page-1_open",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle",
+      "shot": "040_element-selected",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-templatestemplatest",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-pagespagesp",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-buildbuilda",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-mediamedia-libraryj",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-globaldesign-systemd",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle",
+      "shot": "049_after-selection",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P5-undo-redo",
+      "shot": "050_after-undo",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P5-undo-redo",
+      "shot": "051_after-redo",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays",
+      "shot": "060_toast-notification",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-1",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-2",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-3",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-4",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-5",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-top",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-mid",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-bottom",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P8-special",
+      "shot": "080_focus-first",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P8-special",
+      "shot": "081_focus-second",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "phase": "P8-special",
+      "shot": "082_empty-state",
+      "referenceTool": "Figma/VS Code baseline",
+      "gapType": "none",
+      "severity": "none",
+      "alignmentScore": 4,
+      "notes": "Captured successfully"
+    }
+  ]
+}

@@ -71,7 +71,12 @@ interface ToggleProps {
   onChange?: (value: boolean) => void;
 }
 
-export const Toggle: React.FC<ToggleProps> = ({ label, defaultChecked, checked: checkedProp, onChange }) => {
+export const Toggle: React.FC<ToggleProps> = ({
+  label,
+  defaultChecked,
+  checked: checkedProp,
+  onChange,
+}) => {
   const [internalChecked, setInternalChecked] = React.useState(defaultChecked ?? false);
   const isControlled = checkedProp !== undefined;
   const checked = isControlled ? checkedProp : internalChecked;
@@ -86,6 +91,8 @@ export const Toggle: React.FC<ToggleProps> = ({ label, defaultChecked, checked: 
     <label style={toggleRowStyles}>
       <span>{label}</span>
       <button
+        role="switch"
+        aria-checked={checked}
         onClick={handleClick}
         style={{
           ...toggleStyles,
@@ -105,6 +112,105 @@ export const Toggle: React.FC<ToggleProps> = ({ label, defaultChecked, checked: 
 
 /** @deprecated Use Toggle with checked + onChange props instead */
 export const ToggleControlled = Toggle;
+
+// ============================================
+// SettingsNavGuard — unsaved changes modal
+// ============================================
+
+interface SettingsNavGuardProps {
+  isOpen: boolean;
+  onDiscard: () => void;
+  onCancel: () => void;
+}
+
+export const SettingsNavGuard: React.FC<SettingsNavGuardProps> = ({
+  isOpen,
+  onDiscard,
+  onCancel,
+}) => {
+  if (!isOpen) return null;
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="nav-guard-title"
+      style={guardOverlayStyle}
+      onClick={onCancel}
+    >
+      <div style={guardModalStyle} onClick={(e) => e.stopPropagation()}>
+        <h3 id="nav-guard-title" style={guardTitleStyle}>
+          Unsaved changes
+        </h3>
+        <p style={guardBodyStyle}>
+          You have unsaved changes. If you leave now, your changes will be lost.
+        </p>
+        <div style={guardActionsStyle}>
+          <button onClick={onCancel} style={guardKeepBtnStyle}>
+            Keep editing
+          </button>
+          <button onClick={onDiscard} style={guardDiscardBtnStyle}>
+            Discard changes
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const guardOverlayStyle: React.CSSProperties = {
+  position: "fixed",
+  inset: 0,
+  background: "rgba(0,0,0,0.4)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 9999,
+};
+
+const guardModalStyle: React.CSSProperties = {
+  background: "var(--aqb-surface, #fff)",
+  borderRadius: 8,
+  padding: "24px",
+  width: 320,
+  boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+};
+
+const guardTitleStyle: React.CSSProperties = {
+  fontSize: "var(--aqb-font-lg, 15px)",
+  fontWeight: 600,
+  margin: "0 0 8px",
+};
+
+const guardBodyStyle: React.CSSProperties = {
+  fontSize: "var(--aqb-font-sm, 13px)",
+  color: "var(--aqb-text-muted, #666)",
+  margin: "0 0 20px",
+};
+
+const guardActionsStyle: React.CSSProperties = {
+  display: "flex",
+  gap: 8,
+  justifyContent: "flex-end",
+};
+
+const guardKeepBtnStyle: React.CSSProperties = {
+  fontSize: 13,
+  padding: "6px 12px",
+  background: "transparent",
+  border: "1px solid var(--aqb-border)",
+  borderRadius: 4,
+  cursor: "pointer",
+};
+
+const guardDiscardBtnStyle: React.CSSProperties = {
+  fontSize: 13,
+  padding: "6px 12px",
+  color: "#dc2626",
+  background: "transparent",
+  border: "1px solid #dc2626",
+  borderRadius: 4,
+  cursor: "pointer",
+};
 
 // ============================================
 // Integration Card Component

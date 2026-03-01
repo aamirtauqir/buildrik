@@ -237,9 +237,9 @@
   cursor: grabbing;
   transform: scale(0.95);
 }
-.bld-el-card.dragging {
-  opacity: 0.3;
-  background: rgba(124, 109, 250, 0.1);
+.bld-el-card--dragging {
+  opacity: 0.5;
+  cursor: grabbing;
 }
 .bld-el-icon {
   width: 32px;
@@ -268,7 +268,7 @@
   stroke: #a5b4fc;
 }
 .bld-el-name {
-  font-size: 9.5px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.35);
   font-weight: 500;
   text-align: center;
@@ -289,7 +289,7 @@
   text-align: center;
   margin-top: -2px;
 }
-/* ⭐ star button */
+/* ⭐ star button — 25% visible at rest, 100% on hover/favorited */
 .bld-el-fav {
   position: absolute;
   top: 3px;
@@ -299,7 +299,7 @@
   border: none;
   background: transparent;
   cursor: pointer;
-  opacity: 0;
+  opacity: 0.25;
   transition: opacity 0.12s;
   padding: 0;
   display: flex;
@@ -307,7 +307,8 @@
   justify-content: center;
   border-radius: 4px;
 }
-.bld-el-card:hover .bld-el-fav {
+.bld-el-card:hover .bld-el-fav,
+.bld-el-fav.bld-el-fav--on {
   opacity: 1;
 }
 .bld-el-fav:hover {
@@ -322,12 +323,9 @@
   stroke-linecap: round;
   pointer-events: none;
 }
-.bld-el-fav.on svg {
+.bld-el-fav.bld-el-fav--on svg {
   fill: #f59e0b;
   stroke: #f59e0b;
-}
-.bld-el-fav.on {
-  opacity: 1;
 }
 /* ✕ remove button (inside fav zone) */
 .bld-fav-remove {
@@ -513,6 +511,8 @@
   padding: 9px 12px 11px;
   flex-shrink: 0;
   background: var(--aqb-surface-2);
+  overflow: hidden;
+  transition: max-height 200ms ease;
 }
 .bld-tips-hd {
   display: flex;
@@ -587,4 +587,152 @@
   background: var(--aqb-primary);
   width: 10px;
   border-radius: 2px;
+}
+
+/* ── Build Tab v7 additions ────────────────────────────────────────────────── */
+
+/* Drag handle — visible on card hover */
+.bld-el-drag-handle {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.18);
+  opacity: 0;
+  transition: opacity 0.12s;
+  pointer-events: none;
+  line-height: 1;
+  user-select: none;
+}
+.bld-el-card:hover .bld-el-drag-handle {
+  opacity: 1;
+}
+
+/* Category sub-label (always visible) */
+.bld-cat-sub {
+  font-size: 10px;
+  color: var(--aqb-text-muted);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Search grouped results */
+.bld-search-results {
+  padding: 0 8px 8px;
+}
+.bld-search-group {
+  margin-bottom: 10px;
+}
+.bld-search-group-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 4px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--aqb-text-muted);
+}
+.bld-search-group-count {
+  font-family: monospace;
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--aqb-border);
+}
+.bld-search-empty-hint {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.18);
+  margin-top: 4px;
+}
+
+/* Onboarding tip banner */
+.bld-tip-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 4px 8px 2px;
+  background: rgba(124, 109, 250, 0.06);
+  border: 1px solid rgba(124, 109, 250, 0.15);
+  border-radius: 7px;
+  min-height: 44px;
+}
+.bld-tip-banner-text {
+  flex: 1;
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.5;
+}
+.bld-tip-banner-dismiss {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  font-size: 10px;
+  color: rgba(124, 109, 250, 0.6);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.1s;
+  white-space: nowrap;
+}
+.bld-tip-banner-dismiss:hover {
+  background: rgba(124, 109, 250, 0.1);
+  color: #a5b4fc;
+}
+
+/* Keyboard focus rings */
+.bld-el-card:focus-visible,
+.bld-cat-row:focus-visible,
+.bld-mycomp-hdr:focus-visible,
+.bld-fav-hdr:focus-visible {
+  outline: 2px solid var(--aqb-accent-purple, #7c6dfa);
+  outline-offset: 2px;
+}
+.bld-el-card:focus:not(:focus-visible) { outline: none; }
+
+/* Disabled element card (Coming Soon state) */
+.bld-el-card--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: auto; /* keep so title tooltip shows */
+}
+
+.bld-el-card--disabled:hover {
+  background: inherit;
+}
+
+.bld-el-soon {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--aqb-text-muted);
+  text-transform: uppercase;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Insertion context indicator */
+.bld-insert-ctx {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px 2px;
+  font-size: var(--aqb-font-xs, 12px);
+  color: var(--aqb-text-muted);
+  flex-shrink: 0;
+}
+
+.bld-insert-ctx-icon {
+  font-size: 10px;
+  line-height: 1;
+}
+
+.bld-insert-ctx-text strong {
+  color: var(--aqb-text-secondary);
+  font-weight: 500;
 }

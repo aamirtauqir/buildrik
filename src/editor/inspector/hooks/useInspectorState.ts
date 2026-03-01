@@ -47,146 +47,24 @@ export interface InspectorState {
 }
 
 // ============================================================================
-// ELEMENT TO TAB MAPPING (Legacy fallback - now uses config/elementProfiles.ts)
-// ============================================================================
-
-const ELEMENT_TO_TAB_MAP: Record<string, TabName> = {
-  // Text elements -> Design tab (Typography)
-  heading: "design",
-  text: "design",
-  paragraph: "design",
-  link: "settings",
-  h1: "design",
-  h2: "design",
-  h3: "design",
-  h4: "design",
-  h5: "design",
-  h6: "design",
-  p: "design",
-  span: "design",
-  a: "settings",
-  // Layout/Container elements -> Layout tab
-  container: "layout",
-  section: "layout",
-  div: "layout",
-  header: "layout",
-  footer: "layout",
-  main: "layout",
-  article: "layout",
-  nav: "layout",
-  aside: "layout",
-  grid: "layout",
-  flex: "layout",
-  columns: "layout",
-  hero: "layout",
-  navbar: "settings",
-  // Media elements -> Settings tab (for src/alt)
-  image: "settings",
-  video: "settings",
-  iframe: "layout",
-  img: "settings",
-  // Form elements -> Settings tab
-  input: "settings",
-  button: "settings",
-  form: "settings",
-  textarea: "settings",
-  select: "settings",
-  checkbox: "settings",
-  radio: "settings",
-  // Complex components -> Settings tab
-  modal: "settings",
-  tabs: "settings",
-  accordion: "settings",
-  slider: "settings",
-  // Default
-  default: "layout",
-};
-
-// ============================================================================
-// ELEMENT TO SECTION MAPPING
-// ============================================================================
-
-const ELEMENT_TO_SECTION_MAP: Record<string, AutoExpandSection> = {
-  // Text elements -> Typography section
-  heading: "typography",
-  text: "typography",
-  paragraph: "typography",
-  link: "typography",
-  h1: "typography",
-  h2: "typography",
-  h3: "typography",
-  h4: "typography",
-  h5: "typography",
-  h6: "typography",
-  p: "typography",
-  span: "typography",
-  a: "typography",
-  // Layout/Container elements -> Layout section
-  container: "layout",
-  section: "layout",
-  div: "layout",
-  header: "layout",
-  footer: "layout",
-  main: "layout",
-  article: "layout",
-  nav: "layout",
-  aside: "layout",
-  grid: "layout",
-  flex: "layout",
-  columns: "layout",
-  hero: "layout",
-  navbar: "layout",
-  // Media elements -> Size section
-  image: "size",
-  video: "size",
-  iframe: "size",
-  img: "size",
-  // Form elements -> Element Properties section
-  input: "elementProperties",
-  button: "elementProperties",
-  form: "elementProperties",
-  textarea: "elementProperties",
-  select: "elementProperties",
-  checkbox: "elementProperties",
-  radio: "elementProperties",
-};
-
-// ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
 
 /**
  * Get the recommended tab for an element type (internal helper)
- * Now uses config/elementProfiles.ts as primary source
+ * Uses config/elementProfiles.ts as sole source (ARCH-02 fix: ELEMENT_TO_TAB_MAP deleted)
  */
-function getRecommendedTab(elementType: string, tagName?: string): TabName {
-  // Try config-based lookup first (from elementProfiles.ts)
-  const configTab = getDefaultTab(elementType);
-  if (configTab) {
-    return configTab;
-  }
-
-  // Legacy fallback for tag-based lookups
-  if (tagName) {
-    const tagLower = tagName.toLowerCase();
-    if (ELEMENT_TO_TAB_MAP[tagLower]) {
-      return ELEMENT_TO_TAB_MAP[tagLower];
-    }
-  }
-  return ELEMENT_TO_TAB_MAP[elementType] || ELEMENT_TO_TAB_MAP.default;
+function getRecommendedTab(elementType: string, _tagName?: string): TabName {
+  return getDefaultTab(elementType) ?? "layout";
 }
 
 /**
  * Get the recommended section to auto-expand for an element type (internal helper)
+ * Section auto-expand is handled by elementProfiles.ts defaultOpenGroups
+ * ELEMENT_TO_SECTION_MAP was deleted (ARCH-02 fix) — see design doc backlog BL-01
  */
-function getAutoExpandSection(elementType: string, tagName?: string): AutoExpandSection {
-  if (tagName) {
-    const tagLower = tagName.toLowerCase();
-    if (ELEMENT_TO_SECTION_MAP[tagLower]) {
-      return ELEMENT_TO_SECTION_MAP[tagLower];
-    }
-  }
-  return ELEMENT_TO_SECTION_MAP[elementType] || null;
+function getAutoExpandSection(_elementType: string, _tagName?: string): AutoExpandSection {
+  return null;
 }
 
 // ============================================================================

@@ -46,7 +46,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
   );
 
   return (
-    <Section title="Typography" icon="Type" isOpen={isOpen}>
+    <Section title="Typography" icon="Type" isOpen={isOpen} id="inspector-section-typography">
       {/* Font Family Picker - AQUI-032 */}
       <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} />
 

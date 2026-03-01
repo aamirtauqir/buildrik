@@ -42,12 +42,14 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({
 }) => {
   return (
     <div className={className} style={containerStyles}>
-      {hasChanges && (
-        <div style={indicatorStyles}>
-          <span style={dotStyles} />
-          <span>Unsaved changes</span>
-        </div>
-      )}
+      <div aria-live="polite" aria-atomic="true" style={indicatorStyles}>
+        {hasChanges && (
+          <>
+            <span style={dotStyles} />
+            <span>Unsaved changes</span>
+          </>
+        )}
+      </div>
       <div style={buttonsStyles}>
         {secondaryLabel && onSecondary && (
           <button style={secondaryBtnStyles} onClick={onSecondary}>
@@ -61,6 +63,7 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({
           }}
           onClick={onPrimary}
           disabled={disabled}
+          aria-disabled={disabled}
         >
           {primaryLabel}
         </button>

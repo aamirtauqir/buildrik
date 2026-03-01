@@ -7,7 +7,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { getElementIcon } from "../../../shared/ui/Icons";
-import type { LayerItem, DragState } from "./types";
+import type { LayerItem, DragState, LayerDisplayPrefs } from "./types";
 
 export interface LayerTreeItemProps {
   layer: LayerItem;
@@ -17,6 +17,7 @@ export interface LayerTreeItemProps {
   dragState: DragState;
   hiddenIds: Set<string>;
   lockedIds: Set<string>;
+  selectedIds: Set<string>;
   customNames: Map<string, string>;
   canvasHoveredId: string | null;
   hoveredLayerId: string | null;
@@ -30,6 +31,7 @@ export interface LayerTreeItemProps {
   onToggleLock: (id: string, e: React.MouseEvent) => void;
   onStartEditing: (id: string, currentName: string, e: React.MouseEvent) => void;
   onSaveEditedName: () => void;
+  onCancelEditing: () => void;
   onEditingNameChange: (value: string) => void;
   onMouseEnter: (id: string) => void;
   onMouseLeave: () => void;
@@ -38,8 +40,10 @@ export interface LayerTreeItemProps {
   onDragOver: (e: React.DragEvent, layerId: string, layerType: string) => void;
   onDragLeave: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent, targetId: string) => void;
-  onSelect: (id: string) => void;
+  onSelect: (id: string, modifiers: { shift?: boolean; meta?: boolean }) => void;
+  onContextMenu: (e: React.MouseEvent, id: string) => void;
   getVisibleLayerIds: () => string[];
+  displayPrefs: LayerDisplayPrefs;
 }
 
 export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
@@ -50,6 +54,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
   dragState,
   hiddenIds,
   lockedIds,
+  selectedIds,
   customNames,
   canvasHoveredId,
   hoveredLayerId,
@@ -61,6 +66,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
   onToggleLock,
   onStartEditing,
   onSaveEditedName,
+  onCancelEditing,
   onEditingNameChange,
   onMouseEnter,
   onMouseLeave,
@@ -70,7 +76,9 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
   onDragLeave,
   onDrop,
   onSelect,
+  onContextMenu,
   getVisibleLayerIds,
+  displayPrefs,
 }) => {
   const isSelected = selectedElementId === layer.id;
   const isExpanded = expandedIds.has(layer.id);
@@ -105,6 +113,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
     isLocked ? "is-locked" : "",
     isCanvasHovered ? "is-canvas-hovered" : "",
     isLayerHovered ? "is-layer-hovered" : "",
+    selectedIds.has(layer.id) && layer.id !== selectedElementId ? "is-multi-selected" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -112,7 +121,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      onSelect(layer.id);
+      onSelect(layer.id, {});
     } else if (e.key === "F2") {
       e.preventDefault();
       if (!isLocked) {
@@ -132,7 +141,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
       const delta = e.key === "ArrowDown" ? 1 : -1;
       const nextIndex = (currentIndex + delta + visibleIds.length) % visibleIds.length;
       const nextId = visibleIds[nextIndex];
-      if (nextId) onSelect(nextId);
+      if (nextId) onSelect(nextId, {});
     }
   };
 
@@ -157,7 +166,13 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
         onDragOver={(e) => onDragOver(e, layer.id, layer.type)}
         onDragLeave={onDragLeave}
         onDrop={(e) => onDrop(e, layer.id)}
-        onClick={() => onSelect(layer.id)}
+        onClick={(e) => {
+          onSelect(layer.id, { shift: e.shiftKey, meta: e.metaKey || e.ctrlKey });
+        }}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          onContextMenu(e, layer.id);
+        }}
         onDoubleClick={(e) => {
           if (!isLocked) onStartEditing(layer.id, displayName, e);
         }}
@@ -201,7 +216,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
               onBlur={onSaveEditedName}
               onKeyDown={(e) => {
                 if (e.key === "Enter") onSaveEditedName();
-                else if (e.key === "Escape") onSaveEditedName();
+                else if (e.key === "Escape") onCancelEditing();
                 e.stopPropagation();
               }}
               onClick={(e) => e.stopPropagation()}
@@ -209,12 +224,42 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
           ) : (
             <>
               <span className="aqb-layer-name">{displayName}</span>
-              {/* Type Tag */}
-              <span className="aqb-layer-type">{layer.tagName}</span>
+              {/* Type Tag - conditional on displayPrefs */}
+              {displayPrefs.showHtmlBadges && (
+                <span className="aqb-layer-type" aria-hidden>
+                  {layer.tagName}
+                </span>
+              )}
+              {displayPrefs.showElementIds && (
+                <span className="aqb-layer-type aqb-layer-id" aria-hidden>
+                  #{layer.id.slice(0, 8)}
+                </span>
+              )}
               {/* Component Badge */}
               {layer.isComponent && (
                 <span className="aqb-component-badge" title="Component instance">
                   ⚡
+                </span>
+              )}
+              {/* Breakpoint override chips */}
+              {layer.breakpointOverrides?.mobile?.hidden && (
+                <span
+                  className="aqb-layer-bp-chip aqb-bp-mobile"
+                  title="Hidden on mobile"
+                  role="img"
+                  aria-label="Hidden on mobile"
+                >
+                  M
+                </span>
+              )}
+              {layer.breakpointOverrides?.tablet?.hidden && (
+                <span
+                  className="aqb-layer-bp-chip aqb-bp-tablet"
+                  title="Hidden on tablet"
+                  role="img"
+                  aria-label="Hidden on tablet"
+                >
+                  T
                 </span>
               )}
             </>
@@ -254,6 +299,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
               dragState={dragState}
               hiddenIds={hiddenIds}
               lockedIds={lockedIds}
+              selectedIds={selectedIds}
               customNames={customNames}
               canvasHoveredId={canvasHoveredId}
               hoveredLayerId={hoveredLayerId}
@@ -265,6 +311,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
               onToggleLock={onToggleLock}
               onStartEditing={onStartEditing}
               onSaveEditedName={onSaveEditedName}
+              onCancelEditing={onCancelEditing}
               onEditingNameChange={onEditingNameChange}
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
@@ -274,7 +321,9 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
               onDragLeave={onDragLeave}
               onDrop={onDrop}
               onSelect={onSelect}
+              onContextMenu={onContextMenu}
               getVisibleLayerIds={getVisibleLayerIds}
+              displayPrefs={displayPrefs}
             />
           ))}
         </div>

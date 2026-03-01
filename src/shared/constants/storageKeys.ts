@@ -58,6 +58,18 @@ export const STORAGE_KEYS = {
   /** Which element category is expanded in the panel */
   ELEMENTS_EXPANDED_CATEGORY: "aqb-elements-expanded-category",
 
+  // ─── Build Tab ────────────────────────────────────────────────
+  /** Favorite element names in the Build tab */
+  BUILD_FAVORITES: "aqb-build-favorites",
+  /** Recently used element IDs in the Build tab (max 8) */
+  BUILD_RECENT: "aqb-build-recent",
+  /** Open category IDs in Build tab accordion (sessionStorage) */
+  BUILD_OPEN_CATS: "aqb-build-open-cats",
+  /** Whether the onboarding tip in Build tab has been dismissed */
+  BUILD_TIP_DISMISSED: "aqb-build-tip-dismissed",
+  /** Whether the user has been informed that favorites are browser-local only */
+  BUILD_FAVS_INFORMED: "aqb-build-favs-informed",
+
   // ─── Components Tab ───────────────────────────────────────────
   /** Favorite component IDs in the components library */
   COMPONENT_FAVORITES: "aqb-component-favorites",
@@ -69,12 +81,28 @@ export const STORAGE_KEYS = {
   SAVED_TEMPLATES: "aqb-saved-templates",
   /** Alias for SAVED_TEMPLATES */
   MY_TEMPLATES: "aqb-my-templates",
+  /** Last applied site-template ID (sessionStorage — survives tab close) */
+  APPLIED_TEMPLATE_ID: "aqb-applied-template-id",
 
   // ─── Media / Assets ───────────────────────────────────────────
   /** Asset library data */
   ASSETS: "aqb-assets",
   /** Copied style (for paste-style functionality) */
   COPIED_STYLE: "aqb-copied-style",
+  /** Media library sort field (name | date | size | type) */
+  MEDIA_SORT: "med_sort",
+  /** Media library sort direction (asc | desc) */
+  MEDIA_SORT_DIR: "med_sort_dir",
+  /** Media library grid columns (2 | 3 | 4) */
+  MEDIA_GRID_N: "med_grid_n",
+  /** Media library active type filter (all | img | vid | ico | fnt) */
+  MEDIA_ACTIVE_TYPE: "med_active_type",
+  /** Whether the media panel tip has been dismissed */
+  MEDIA_TIP_DISMISSED: "med_tip_dismissed",
+  /** Media library search query persistence */
+  MEDIA_LIB_SEARCH: "med_lib_search",
+  /** Media discovery search query persistence */
+  MEDIA_DISC_SEARCH: "med_disc_search",
 
   // ─── History & AI ─────────────────────────────────────────────
   /** Undo history (if persisted to storage) */

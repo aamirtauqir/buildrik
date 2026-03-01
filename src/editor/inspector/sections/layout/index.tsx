@@ -52,7 +52,13 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
   }, [showAdvancedProp]);
 
   return (
-    <Section title="Layout" icon="LayoutGrid" defaultOpen isOpen={isOpen}>
+    <Section
+      title="Layout"
+      icon="LayoutGrid"
+      defaultOpen
+      isOpen={isOpen}
+      id="inspector-section-display"
+    >
       {/* ═══════════════════════════════════════════════════════════════════
           ESSENTIALS - Always visible
           ═══════════════════════════════════════════════════════════════════ */}

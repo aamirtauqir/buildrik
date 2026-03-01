@@ -191,7 +191,7 @@ export const LinkSection: React.FC<LinkSectionProps> = ({ selectedElement, compo
   ];
 
   return (
-    <Section title="Link Settings" icon="Link2" defaultOpen>
+    <Section title="Link Settings" icon="Link2" defaultOpen id="inspector-section-link">
       <SelectRow
         label="Link Type"
         value={linkType}

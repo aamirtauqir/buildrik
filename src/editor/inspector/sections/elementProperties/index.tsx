@@ -219,7 +219,13 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
   }
 
   return (
-    <Section title="Element Properties" icon="Settings" defaultOpen isOpen={isOpen}>
+    <Section
+      title="Element Properties"
+      icon="Settings"
+      defaultOpen
+      isOpen={isOpen}
+      id="inspector-section-element-properties"
+    >
       {/* Icon Picker Button for icon elements */}
       {selectedElement.type === "icon" && onOpenIconPicker && (
         <IconPickerButton

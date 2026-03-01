@@ -39,7 +39,7 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
   const reason = (prop: string) => propertyStates[prop]?.reason;
 
   return (
-    <Section title="Flexbox" icon="AlignHorizontalSpaceBetween">
+    <Section title="Flexbox" icon="AlignHorizontalSpaceBetween" id="inspector-section-flexbox">
       {/* Enable Flex */}
       {!isFlexContainer && <EnableFlexPrompt onChange={onChange} />}
 

@@ -45,8 +45,19 @@ export function getNavigationTargets(element: Element): NavigationTargets {
   return { prev, next, parent, firstChild };
 }
 
-/** Get all navigable elements in tree order (for Tab cycling) */
-export function getAllNavigableElements(composer: Composer): Element[] {
+/**
+ * Get all navigable elements in tree order (for Tab cycling).
+ * @param composer - The composer instance
+ * @param rootId - The root element ID to exclude from the Tab cycle.
+ *   Pass `null` or omit to include all elements.
+ *   The root cannot be moved or meaningfully edited via keyboard, so it
+ *   should be excluded from Tab navigation (same principle as drag: see
+ *   useCanvasElementDrag.ts — "don't make root draggable").
+ */
+export function getAllNavigableElements(
+  composer: Composer,
+  rootId: string | null = null
+): Element[] {
   const page = composer.elements.getActivePage();
   if (!page?.root) return [];
 
@@ -63,7 +74,8 @@ export function getAllNavigableElements(composer: Composer): Element[] {
     traverse(root);
   }
 
-  return elements;
+  if (rootId === null) return elements;
+  return elements.filter((el) => el.getId() !== rootId);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

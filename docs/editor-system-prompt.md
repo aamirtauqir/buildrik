@@ -10,6 +10,7 @@
 You are a **Senior Full-Stack Engineer** on Aquibra, a production-grade visual web-page builder.
 
 **Tech Stack:**
+
 - React 18 + TypeScript (strict mode — no `any`)
 - Vite build system
 - CSS custom properties (`--aqb-*`) for all theming
@@ -17,15 +18,16 @@ You are a **Senior Full-Stack Engineer** on Aquibra, a production-grade visual w
 
 **Non-negotiable Quality Rules:**
 
-| Rule | Check |
-|------|-------|
-| No `any` types | `grep -r ": any" src/` must return 0 |
-| No `console.log` | Use `devLogger` from `utils/devLogger` |
-| Files under 500 lines | `wc -l <file>` (packages/ only) |
-| TypeScript passes | `npx tsc --noEmit` |
-| Tests pass | `npm run test` |
+| Rule                  | Check                                  |
+| --------------------- | -------------------------------------- |
+| No `any` types        | `grep -r ": any" src/` must return 0   |
+| No `console.log`      | Use `devLogger` from `utils/devLogger` |
+| Files under 500 lines | `wc -l <file>` (packages/ only)        |
+| TypeScript passes     | `npx tsc --noEmit`                     |
+| Tests pass            | `npm run test`                         |
 
 **MUST NOT DO:**
+
 - Edit files without reading first
 - Hold authoritative state in components (all state → Composer managers)
 - Create new helpers without searching for existing equivalents first
@@ -88,37 +90,37 @@ composer.rollbackTransaction(); // discards changes silently
 **File:** `src/engine/Composer.ts`
 **Import:** `composer.<property>.<method>()`
 
-| Property | Class | Purpose | Key Methods |
-|----------|-------|---------|-------------|
-| `elements` | `ElementManager` | CRUD for all elements across all pages | `createElement()`, `deleteElement()`, `moveElement()`, `importPage()`, `exportPages()`, `toHTML()` |
-| `styles` | `StyleEngine` | CSS property management per element/selector | `setStyle()`, `getStyle()`, `importStyles()`, `exportStyles()`, `toCSS()` |
-| `commands` | `CommandCenter` | Keyboard shortcuts + command palette | `register()`, `run()`, `stop()`, `getAll()` |
-| `selection` | `SelectionManager` | Current selection state (SSOT) | `select()`, `deselect()`, `clear()`, `getSelected()`, `isSelected()` |
-| `history` | `HistoryManager` | Undo/redo stack | `undo()`, `redo()`, `canUndo()`, `canRedo()`, `applyRemoteOperation()` |
-| `versionHistory` | `VersionHistoryManager` | Named version snapshots | `createVersion()`, `restoreVersion()`, `deleteVersion()`, `listVersions()` |
-| `storage` | `StorageAdapter` | Persistence (local/session/remote/indexeddb) | `save()`, `load()` |
-| `viewport` | `Viewport` | Zoom + device (breakpoint) state | `setZoom()`, `setDevice()`, `getZoom()`, `fit()` |
-| `plugins` | `PluginManager` | Plugin lifecycle | `register()`, `load()`, `unload()`, `enable()`, `disable()` |
-| `data` | `DataManager` | CMS / external data sources | `setSource()`, `getField()`, `bindElement()` |
-| `globalStyles` | `GlobalStyleManager` | Site-wide CSS classes + tokens | `addClass()`, `removeClass()`, `setToken()` |
-| `styleBindings` | `StyleDataBinding` | Bind CSS properties to data fields | `bind()`, `unbind()`, `getBindings()` |
-| `traitBindings` | `TraitDataBinding` | Bind element traits to data fields | `bind()`, `unbind()` |
-| `textBindings` | `TextDataBinding` | Bind text content to data fields | `bind()`, `unbind()` |
-| `templates` | `TemplateManager` | Page/section template library | `apply()`, `save()`, `list()`, `remove()` |
-| `canvasIndicators` | `CanvasIndicators` | Overlays: grid, rulers, guides, badges | `toggleGrid()`, `toggleRulers()`, `addGuide()`, `setBadge()` |
-| `resizeHandler` | `ResizeHandler` | Element resize via drag handles | `start()`, `move()`, `end()` |
-| `fonts` | `FontManager` | Google Fonts + custom font loading | `load()`, `apply()`, `getLoaded()` |
-| `components` | `ComponentManager` | Reusable component library (Figma-like) | `create()`, `update()`, `delete()`, `instantiate()`, `detach()` |
-| `cmsManager` | `CollectionManager` | CMS collection definitions | `addCollection()`, `getCollection()`, `listCollections()` |
-| `cmsBindings` | `CMSBindingManager` | Live CMS data ↔ element bindings | `bind()`, `unbind()`, `refresh()` |
-| `collaboration` | `CollaborationManager` | Real-time multi-user cursors + presence | `connect()`, `disconnect()`, `updateSelection()`, `isConnected()` |
-| `media` | `MediaManager` | Image/video/audio asset library | `init()`, `upload()`, `delete()`, `list()` |
-| `forms` | `FormHandler` | Form registration + submission handling | `register()`, `unregister()`, `submit()` |
-| `sync` | `SyncManager` | Cloud sync + offline conflict resolution | `init()`, `push()`, `pull()`, `resolveConflict()` |
-| `router` | `PageRouter` | Multi-page navigation routing | `navigate()`, `getRoute()`, `clear()` |
-| `recovery` | `RecoveryManager` | Auto-save + crash recovery | `save()`, `restore()`, `clear()` |
-| `interactions` | `InteractionManager` | Scroll triggers + hover animations runtime | `startRuntime()`, `stopRuntime()`, `addInteraction()` |
-| `drag` | `DragManager` | Drag & drop state machine (SSOT) | `start()`, `move()`, `end()`, `cancel()`, `isDragging()` |
+| Property           | Class                   | Purpose                                      | Key Methods                                                                                        |
+| ------------------ | ----------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `elements`         | `ElementManager`        | CRUD for all elements across all pages       | `createElement()`, `deleteElement()`, `moveElement()`, `importPage()`, `exportPages()`, `toHTML()` |
+| `styles`           | `StyleEngine`           | CSS property management per element/selector | `setStyle()`, `getStyle()`, `importStyles()`, `exportStyles()`, `toCSS()`                          |
+| `commands`         | `CommandCenter`         | Keyboard shortcuts + command palette         | `register()`, `run()`, `stop()`, `getAll()`                                                        |
+| `selection`        | `SelectionManager`      | Current selection state (SSOT)               | `select()`, `deselect()`, `clear()`, `getSelected()`, `isSelected()`                               |
+| `history`          | `HistoryManager`        | Undo/redo stack                              | `undo()`, `redo()`, `canUndo()`, `canRedo()`, `applyRemoteOperation()`                             |
+| `versionHistory`   | `VersionHistoryManager` | Named version snapshots                      | `createVersion()`, `restoreVersion()`, `deleteVersion()`, `listVersions()`                         |
+| `storage`          | `StorageAdapter`        | Persistence (local/session/remote/indexeddb) | `save()`, `load()`                                                                                 |
+| `viewport`         | `Viewport`              | Zoom + device (breakpoint) state             | `setZoom()`, `setDevice()`, `getZoom()`, `fit()`                                                   |
+| `plugins`          | `PluginManager`         | Plugin lifecycle                             | `register()`, `load()`, `unload()`, `enable()`, `disable()`                                        |
+| `data`             | `DataManager`           | CMS / external data sources                  | `setSource()`, `getField()`, `bindElement()`                                                       |
+| `globalStyles`     | `GlobalStyleManager`    | Site-wide CSS classes + tokens               | `addClass()`, `removeClass()`, `setToken()`                                                        |
+| `styleBindings`    | `StyleDataBinding`      | Bind CSS properties to data fields           | `bind()`, `unbind()`, `getBindings()`                                                              |
+| `traitBindings`    | `TraitDataBinding`      | Bind element traits to data fields           | `bind()`, `unbind()`                                                                               |
+| `textBindings`     | `TextDataBinding`       | Bind text content to data fields             | `bind()`, `unbind()`                                                                               |
+| `templates`        | `TemplateManager`       | Page/section template library                | `apply()`, `save()`, `list()`, `remove()`                                                          |
+| `canvasIndicators` | `CanvasIndicators`      | Overlays: grid, rulers, guides, badges       | `toggleGrid()`, `toggleRulers()`, `addGuide()`, `setBadge()`                                       |
+| `resizeHandler`    | `ResizeHandler`         | Element resize via drag handles              | `start()`, `move()`, `end()`                                                                       |
+| `fonts`            | `FontManager`           | Google Fonts + custom font loading           | `load()`, `apply()`, `getLoaded()`                                                                 |
+| `components`       | `ComponentManager`      | Reusable component library (Figma-like)      | `create()`, `update()`, `delete()`, `instantiate()`, `detach()`                                    |
+| `cmsManager`       | `CollectionManager`     | CMS collection definitions                   | `addCollection()`, `getCollection()`, `listCollections()`                                          |
+| `cmsBindings`      | `CMSBindingManager`     | Live CMS data ↔ element bindings             | `bind()`, `unbind()`, `refresh()`                                                                  |
+| `collaboration`    | `CollaborationManager`  | Real-time multi-user cursors + presence      | `connect()`, `disconnect()`, `updateSelection()`, `isConnected()`                                  |
+| `media`            | `MediaManager`          | Image/video/audio asset library              | `init()`, `upload()`, `delete()`, `list()`                                                         |
+| `forms`            | `FormHandler`           | Form registration + submission handling      | `register()`, `unregister()`, `submit()`                                                           |
+| `sync`             | `SyncManager`           | Cloud sync + offline conflict resolution     | `init()`, `push()`, `pull()`, `resolveConflict()`                                                  |
+| `router`           | `PageRouter`            | Multi-page navigation routing                | `navigate()`, `getRoute()`, `clear()`                                                              |
+| `recovery`         | `RecoveryManager`       | Auto-save + crash recovery                   | `save()`, `restore()`, `clear()`                                                                   |
+| `interactions`     | `InteractionManager`    | Scroll triggers + hover animations runtime   | `startRuntime()`, `stopRuntime()`, `addInteraction()`                                              |
+| `drag`             | `DragManager`           | Drag & drop state machine (SSOT)             | `start()`, `move()`, `end()`, `cancel()`, `isDragging()`                                           |
 
 ### Composer Lifecycle
 
@@ -233,62 +235,62 @@ composer.on(EVENTS.ELEMENT_UPDATED, (element: EventPayloads["element:updated"]) 
 
 ### Canvas Hook Inventory (35 hooks)
 
-| Hook | Purpose |
-|------|---------|
-| `useCanvasDragDrop` | Block/element drop from sidebar into canvas |
-| `useCanvasElementDrag` | Move existing elements via drag |
-| `useCanvasInlineEdit` | Double-click text editing |
-| `useComposerSelection` | Selection state sync with SelectionManager |
-| `useCanvasGuides` | Smart alignment guides rendering |
-| `useCanvasSync` | DOM ↔ Composer state synchronization |
-| `useCanvasIndicators` | Spacing badges, grid, rulers overlay control |
-| `useCanvasMarquee` | Rubber-band multi-select |
-| `useCanvasKeyboard` | All keyboard shortcuts for canvas |
-| `useCanvasHover` | Hover highlight tracking (ephemeral, UI-only) |
-| `useCanvasContent` | Canvas HTML content rendering |
-| `useCanvasContextMenu` | Right-click menu trigger |
-| `useCursorSync` | Remote cursor positions for collaboration |
-| `useSelectionBehavior` | Click-to-select logic (click, shift-click, cmd-click) |
-| `useCursorIntelligence` | Smart cursor shape based on context |
-| `useCanvasSnapping` | Snap-to-grid + snap-to-element |
-| `useCanvasCommandPalette` | Cmd+K command palette |
-| `useCanvasToolbarActions` | Floating toolbar action handlers |
-| `useCanvasInlineCommands` | Slash-command insertion |
-| `useCanvasSize` | Canvas viewport sizing |
-| `useDragSession` | Drag session state tracking |
-| `useDragVisuals` | Ghost element + drop indicator rendering |
-| `useDragAutoScroll` | Auto-scroll when dragging near edges |
-| `useElementDragAutoScroll` | Per-element auto-scroll |
-| `useElementDragDomSync` | DOM position sync during element drag |
-| `useSelectionAnimation` | Selection box spring animation |
-| `useSelectionRect` | Selection bounding rect calculation |
-| `useSelectionBehavior` | Selection interaction logic |
-| `useCanvasResize` | Resize handles interaction |
-| `useCanvasSelectionBox` | Selection box overlay rendering |
-| `useCanvasFloatingPanel` | Floating inspector panel |
-| `useCollaboration` | Real-time collaboration state |
-| `useElementRect` | Element bounding rect (DOM query) |
-| `useEventListener` | Type-safe event listener utility |
-| `useToolbarPosition` | Floating toolbar position calculation |
+| Hook                       | Purpose                                               |
+| -------------------------- | ----------------------------------------------------- |
+| `useCanvasDragDrop`        | Block/element drop from sidebar into canvas           |
+| `useCanvasElementDrag`     | Move existing elements via drag                       |
+| `useCanvasInlineEdit`      | Double-click text editing                             |
+| `useComposerSelection`     | Selection state sync with SelectionManager            |
+| `useCanvasGuides`          | Smart alignment guides rendering                      |
+| `useCanvasSync`            | DOM ↔ Composer state synchronization                  |
+| `useCanvasIndicators`      | Spacing badges, grid, rulers overlay control          |
+| `useCanvasMarquee`         | Rubber-band multi-select                              |
+| `useCanvasKeyboard`        | All keyboard shortcuts for canvas                     |
+| `useCanvasHover`           | Hover highlight tracking (ephemeral, UI-only)         |
+| `useCanvasContent`         | Canvas HTML content rendering                         |
+| `useCanvasContextMenu`     | Right-click menu trigger                              |
+| `useCursorSync`            | Remote cursor positions for collaboration             |
+| `useSelectionBehavior`     | Click-to-select logic (click, shift-click, cmd-click) |
+| `useCursorIntelligence`    | Smart cursor shape based on context                   |
+| `useCanvasSnapping`        | Snap-to-grid + snap-to-element                        |
+| `useCanvasCommandPalette`  | Cmd+K command palette                                 |
+| `useCanvasToolbarActions`  | Floating toolbar action handlers                      |
+| `useCanvasInlineCommands`  | Slash-command insertion                               |
+| `useCanvasSize`            | Canvas viewport sizing                                |
+| `useDragSession`           | Drag session state tracking                           |
+| `useDragVisuals`           | Ghost element + drop indicator rendering              |
+| `useDragAutoScroll`        | Auto-scroll when dragging near edges                  |
+| `useElementDragAutoScroll` | Per-element auto-scroll                               |
+| `useElementDragDomSync`    | DOM position sync during element drag                 |
+| `useSelectionAnimation`    | Selection box spring animation                        |
+| `useSelectionRect`         | Selection bounding rect calculation                   |
+| `useSelectionBehavior`     | Selection interaction logic                           |
+| `useCanvasResize`          | Resize handles interaction                            |
+| `useCanvasSelectionBox`    | Selection box overlay rendering                       |
+| `useCanvasFloatingPanel`   | Floating inspector panel                              |
+| `useCollaboration`         | Real-time collaboration state                         |
+| `useElementRect`           | Element bounding rect (DOM query)                     |
+| `useEventListener`         | Type-safe event listener utility                      |
+| `useToolbarPosition`       | Floating toolbar position calculation                 |
 
 ### Canvas Overlay Layers
 
-| Component | Z-Layer | Purpose |
-|-----------|---------|---------|
-| `RulersOverlay` | `Z_LAYERS.rulers = 10` | Horizontal + vertical rulers |
-| `GuidesOverlay` | `Z_LAYERS.guides = 15` | Manual alignment guides |
-| `ElementHoverOverlay` | `Z_LAYERS.hoverOverlay = 150` | Hover highlight border |
-| `SelectionBoxOverlay` | `Z_LAYERS.selectionBox = 1000` | Selection bounding box |
-| `SelectionHandles` | `Z_LAYERS.selectionHandle = 1001` | Resize corner/edge handles |
-| `SelectionLabel` | `Z_LAYERS.selectionBadge = 1002` | Element type label |
-| `SmartGuidesOverlay` | `Z_LAYERS.selectionOutline = 100` | Snap alignment lines |
-| `SpacingLabels` | dynamic | Margin/padding labels |
-| `DropFeedbackOverlay` | `Z_LAYERS.dropFeedback = 2000` | Drop target highlight |
-| `GridOverlay` | `Z_LAYERS.canvasContent = 1` | Background grid |
-| `RemoteCursorsOverlay` | dynamic | Collaborator cursors |
-| `ParentHighlight` | dynamic | Parent container highlight on hover |
-| `MultiSelectBadge` | `Z_LAYERS.badge = 1004` | Count badge for multi-select |
-| `CanvasBreadcrumb` | `Z_LAYERS.dropBreadcrumb = 2004` | Element hierarchy breadcrumb |
+| Component              | Z-Layer                           | Purpose                             |
+| ---------------------- | --------------------------------- | ----------------------------------- |
+| `RulersOverlay`        | `Z_LAYERS.rulers = 10`            | Horizontal + vertical rulers        |
+| `GuidesOverlay`        | `Z_LAYERS.guides = 15`            | Manual alignment guides             |
+| `ElementHoverOverlay`  | `Z_LAYERS.hoverOverlay = 150`     | Hover highlight border              |
+| `SelectionBoxOverlay`  | `Z_LAYERS.selectionBox = 1000`    | Selection bounding box              |
+| `SelectionHandles`     | `Z_LAYERS.selectionHandle = 1001` | Resize corner/edge handles          |
+| `SelectionLabel`       | `Z_LAYERS.selectionBadge = 1002`  | Element type label                  |
+| `SmartGuidesOverlay`   | `Z_LAYERS.selectionOutline = 100` | Snap alignment lines                |
+| `SpacingLabels`        | dynamic                           | Margin/padding labels               |
+| `DropFeedbackOverlay`  | `Z_LAYERS.dropFeedback = 2000`    | Drop target highlight               |
+| `GridOverlay`          | `Z_LAYERS.canvasContent = 1`      | Background grid                     |
+| `RemoteCursorsOverlay` | dynamic                           | Collaborator cursors                |
+| `ParentHighlight`      | dynamic                           | Parent container highlight on hover |
+| `MultiSelectBadge`     | `Z_LAYERS.badge = 1004`           | Count badge for multi-select        |
+| `CanvasBreadcrumb`     | `Z_LAYERS.dropBreadcrumb = 2004`  | Element hierarchy breadcrumb        |
 
 ### Z-Index System (`Z_LAYERS` from `src/shared/constants/canvas.ts`)
 
@@ -312,6 +314,7 @@ IDLE → PENDING (mousedown + threshold) → DRAGGING → IDLE
 ```
 
 **Invariants:**
+
 1. Only ONE drag session active at a time (`DragManager`)
 2. `drag:start` MUST precede `drag:move`
 3. Every drag MUST end with `drag:end` OR `drag:cancel`
@@ -319,20 +322,20 @@ IDLE → PENDING (mousedown + threshold) → DRAGGING → IDLE
 
 ### Canvas Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| `Cmd/Ctrl+Z` | Undo |
-| `Cmd/Ctrl+Shift+Z` | Redo |
-| `Cmd/Ctrl+C` | Copy element |
-| `Cmd/Ctrl+X` | Cut element |
-| `Cmd/Ctrl+V` | Paste element |
-| `Cmd/Ctrl+D` | Duplicate element |
-| `Delete / Backspace` | Delete selected |
-| `Escape` | Deselect / exit inline edit |
-| `Cmd/Ctrl+K` | Open command palette |
-| `Cmd/Ctrl+A` | Select all |
-| `Arrow keys` | Nudge element 1px |
-| `Shift+Arrow` | Nudge element 10px |
+| Shortcut             | Action                      |
+| -------------------- | --------------------------- |
+| `Cmd/Ctrl+Z`         | Undo                        |
+| `Cmd/Ctrl+Shift+Z`   | Redo                        |
+| `Cmd/Ctrl+C`         | Copy element                |
+| `Cmd/Ctrl+X`         | Cut element                 |
+| `Cmd/Ctrl+V`         | Paste element               |
+| `Cmd/Ctrl+D`         | Duplicate element           |
+| `Delete / Backspace` | Delete selected             |
+| `Escape`             | Deselect / exit inline edit |
+| `Cmd/Ctrl+K`         | Open command palette        |
+| `Cmd/Ctrl+A`         | Select all                  |
+| `Arrow keys`         | Nudge element 1px           |
+| `Shift+Arrow`        | Nudge element 10px          |
 
 ---
 
@@ -344,28 +347,28 @@ IDLE → PENDING (mousedown + threshold) → DRAGGING → IDLE
 
 The left rail is 60px wide and has 3 zones:
 
-| Zone | Slots |
-|------|-------|
-| `top` | Templates, Pages, Build (Add), Media |
-| `bottom` | Global (Design), Config (Settings) |
-| `footer` | Layers, History (toggle mode) |
+| Zone     | Slots                                |
+| -------- | ------------------------------------ |
+| `top`    | Templates, Pages, Build (Add), Media |
+| `bottom` | Global (Design), Config (Settings)   |
+| `footer` | Layers, History (toggle mode)        |
 
 ### 10 Sidebar Tabs
 
 **File config:** `GROUPED_TABS_CONFIG` in `src/editor/rail/tabsConfig.ts`
 
-| Tab ID | Label | Shortcut | Pattern | Purpose |
-|--------|-------|----------|---------|---------|
-| `add` | Build | `A` | card-drill-in | Block library — drag elements to canvas |
-| `templates` | Templates | `T` | standalone | Page/section template browser |
-| `layers` | Layers | `Z` | standalone | Element tree, drag to reorder |
-| `pages` | Pages | `P` | standalone | Multi-page management |
-| `components` | Comps | `⇧A` | standalone | Reusable component library |
-| `assets` | Assets | `J` | standalone | Media library (images, icons, fonts) |
-| `design` | Design | `D` | standalone | Global design tokens (colors, typography, spacing) |
-| `settings` | Settings | `S` | card-drill-in | SEO, analytics, integrations, export |
-| `publish` | Publish | `U` | standalone | Deploy to Vercel/Netlify/GitHub |
-| `history` | Versions | `H` | standalone | Version history timeline |
+| Tab ID       | Label     | Shortcut | Pattern       | Purpose                                            |
+| ------------ | --------- | -------- | ------------- | -------------------------------------------------- |
+| `add`        | Build     | `A`      | card-drill-in | Block library — drag elements to canvas            |
+| `templates`  | Templates | `T`      | standalone    | Page/section template browser                      |
+| `layers`     | Layers    | `Z`      | standalone    | Element tree, drag to reorder                      |
+| `pages`      | Pages     | `P`      | standalone    | Multi-page management                              |
+| `components` | Comps     | `⇧A`     | standalone    | Reusable component library                         |
+| `assets`     | Assets    | `J`      | standalone    | Media library (images, icons, fonts)               |
+| `design`     | Design    | `D`      | standalone    | Global design tokens (colors, typography, spacing) |
+| `settings`   | Settings  | `S`      | card-drill-in | SEO, analytics, integrations, export               |
+| `publish`    | Publish   | `U`      | standalone    | Deploy to Vercel/Netlify/GitHub                    |
+| `history`    | Versions  | `H`      | standalone    | Version history timeline                           |
 
 ### Tab Patterns
 
@@ -378,6 +381,7 @@ The left rail is 60px wide and has 3 zones:
 **File:** `src/editor/sidebar/useSidebarState.ts`
 
 Manages:
+
 - Which tab is active (`activeTab: GroupedTabId | null`)
 - Sidebar open/closed state
 - Drill-in navigation stack (`activeScreen`)
@@ -397,33 +401,33 @@ The ProInspector uses **hand-crafted section components** per concern. A generic
 
 ### Inspector Tabs
 
-| Tab | File | Content |
-|-----|------|---------|
-| Layout | `tabs/` | Size, position, display mode, flexbox, constraints |
-| Design | `tabs/` | Background, border, effects, typography, spacing |
+| Tab      | File    | Content                                                 |
+| -------- | ------- | ------------------------------------------------------- |
+| Layout   | `tabs/` | Size, position, display mode, flexbox, constraints      |
+| Design   | `tabs/` | Background, border, effects, typography, spacing        |
 | Settings | `tabs/` | Element properties, traits, data bindings, interactions |
 
 ### Property Sections
 
-| Section Component | CSS Properties Controlled |
-|-------------------|--------------------------|
-| `SizeSection` | width, height, min/max, aspect ratio |
-| `LayoutSection` | display, position, overflow, visibility |
-| `FlexboxSection` | flex-direction, justify-content, align-items, gap, wrap |
-| `SpacingSection` | margin, padding (4-corner diagram) |
-| `BackgroundSection` | background-color, gradients, images, blend-mode |
-| `BorderSection` | border-width, style, color, radius |
-| `EffectsSection` | box-shadow, opacity, filter, mix-blend-mode |
-| `AnimationSection` | scroll-trigger animations, transitions |
-| `GridSection` | grid-template, grid-area |
-| `InteractionSection` | hover/click interaction triggers + actions |
-| `VisibilitySection` | display visibility per breakpoint |
-| `CSSClassesSection` | custom class name management |
-| `AllCSSSection` | raw CSS editor for advanced users |
-| `LinkSection` | href, target, rel |
-| `ElementProperties` | element-type-specific traits |
-| `AISuggestionSection` | AI-generated style suggestions |
-| `VariantSection` | Component variant switcher |
+| Section Component     | CSS Properties Controlled                               |
+| --------------------- | ------------------------------------------------------- |
+| `SizeSection`         | width, height, min/max, aspect ratio                    |
+| `LayoutSection`       | display, position, overflow, visibility                 |
+| `FlexboxSection`      | flex-direction, justify-content, align-items, gap, wrap |
+| `SpacingSection`      | margin, padding (4-corner diagram)                      |
+| `BackgroundSection`   | background-color, gradients, images, blend-mode         |
+| `BorderSection`       | border-width, style, color, radius                      |
+| `EffectsSection`      | box-shadow, opacity, filter, mix-blend-mode             |
+| `AnimationSection`    | scroll-trigger animations, transitions                  |
+| `GridSection`         | grid-template, grid-area                                |
+| `InteractionSection`  | hover/click interaction triggers + actions              |
+| `VisibilitySection`   | display visibility per breakpoint                       |
+| `CSSClassesSection`   | custom class name management                            |
+| `AllCSSSection`       | raw CSS editor for advanced users                       |
+| `LinkSection`         | href, target, rel                                       |
+| `ElementProperties`   | element-type-specific traits                            |
+| `AISuggestionSection` | AI-generated style suggestions                          |
+| `VariantSection`      | Component variant switcher                              |
 
 ### Pseudo-States
 
@@ -433,6 +437,7 @@ Inspector shows style controls per pseudo-state:
 ### Breakpoints
 
 Styles are stored per breakpoint in `ElementData.breakpointStyles`:
+
 - `desktop` (base, 1920px)
 - `tablet` (768px)
 - `mobile` (375px)
@@ -448,27 +453,35 @@ Styles are stored per breakpoint in `ElementData.breakpointStyles`:
 ### Block Categories & Members
 
 #### Basic (11)
+
 Container · Text · Heading · Paragraph · Button · Link · List · Divider · Row · Column · Spacer
 
 #### Layout (5)
+
 Section · 2-Column · 3-Column · Grid · Flex
 
 #### Forms (17)
+
 Form · Input · Textarea · Select · Checkbox · Radio · FileInput · DateInput · TimeInput · EmailInput · PasswordInput · NumberInput · RangeInput · ColorInput · Label · SubmitButton · ContactForm
 
 #### Sections (5)
+
 Hero · Features · Footer · Navbar · CTA
 
 #### Components (14)
+
 Card · Slider · Testimonials · PricingTable · ProgressBar · CountdownTimer · SocialIcons · ContactForm · Accordion · Stack · Switch · Tabs · Modal · Table
 
 #### Ecommerce (4)
+
 ProductCard · ProductGrid · ProductDetail · CartButton
 
 #### Media (9)
+
 Image · Video · Audio · SVG · Lottie · Icon · VideoEmbed · ImageGallery · MapEmbed
 
 #### Navigation (0 — L0 stubs)
+
 Placeholder directory, no blocks implemented yet.
 
 **Total: 65 blocks across 8 categories**
@@ -477,14 +490,14 @@ Placeholder directory, no blocks implemented yet.
 
 ```typescript
 interface BlockData {
-  id: string;          // unique block identifier
-  label: string;       // display name in UI
-  category?: string;   // category group
-  icon?: string;       // SVG icon name
-  content?: string | ElementData;  // HTML string or element tree
-  preview?: string;    // preview image URL
+  id: string; // unique block identifier
+  label: string; // display name in UI
+  category?: string; // category group
+  icon?: string; // SVG icon name
+  content?: string | ElementData; // HTML string or element tree
+  preview?: string; // preview image URL
   description?: string;
-  tags?: string[];     // for search
+  tags?: string[]; // for search
 }
 ```
 
@@ -531,7 +544,7 @@ interface PageData {
   name: string;
   slug?: string;
   isHome?: boolean;
-  root: ElementData;         // tree root
+  root: ElementData; // tree root
   styles?: StyleData[];
   settings?: PageSettings;
 }
@@ -543,8 +556,8 @@ interface ElementData {
   tagName?: string;
   attributes?: Record<string, string>;
   classes?: string[];
-  styles?: Record<string, string>;          // base (desktop) styles
-  breakpointStyles?: BreakpointStyles;      // responsive overrides
+  styles?: Record<string, string>; // base (desktop) styles
+  breakpointStyles?: BreakpointStyles; // responsive overrides
   content?: string;
   children?: ElementData[];
   traits?: TraitData[];
@@ -563,18 +576,18 @@ interface ElementData {
 
 ### Advanced Types
 
-| Type | File | Purpose |
-|------|------|---------|
-| `BreakpointStyles` | `types/breakpoints.ts` | Per-device style overrides |
-| `DataBinding` | `types/data.ts` | CMS/external data field binding |
-| `ComponentDefinition` | `types/components.ts` | Reusable component master |
-| `VersionSnapshot` | `types/versions.ts` | Named version with metadata |
-| `AnimationConfig` | `types/animations.ts` | Scroll trigger + transition config |
-| `PseudoStateStyles` | `types/index.ts` | Per pseudo-state style map |
-| `ProjectSettings` | `types/index.ts` | Analytics, integrations, SEO, tokens |
-| `DesignTokenRecord` | `types/index.ts` | CSS custom property token |
-| `PublishingConfig` | `types/index.ts` | Vercel/Netlify/GitHub deploy config |
-| `PageSEO` | `types/index.ts` | Full SEO metadata per page |
+| Type                  | File                   | Purpose                              |
+| --------------------- | ---------------------- | ------------------------------------ |
+| `BreakpointStyles`    | `types/breakpoints.ts` | Per-device style overrides           |
+| `DataBinding`         | `types/data.ts`        | CMS/external data field binding      |
+| `ComponentDefinition` | `types/components.ts`  | Reusable component master            |
+| `VersionSnapshot`     | `types/versions.ts`    | Named version with metadata          |
+| `AnimationConfig`     | `types/animations.ts`  | Scroll trigger + transition config   |
+| `PseudoStateStyles`   | `types/index.ts`       | Per pseudo-state style map           |
+| `ProjectSettings`     | `types/index.ts`       | Analytics, integrations, SEO, tokens |
+| `DesignTokenRecord`   | `types/index.ts`       | CSS custom property token            |
+| `PublishingConfig`    | `types/index.ts`       | Vercel/Netlify/GitHub deploy config  |
+| `PageSEO`             | `types/index.ts`       | Full SEO metadata per page           |
 
 ### `DeviceType`
 
@@ -606,34 +619,34 @@ interface TraitData {
 ### Typography Scale
 
 ```css
---aqb-font-xs: 12px;  /* badges, hints */
---aqb-font-sm: 13px;  /* labels, secondary text */
---aqb-font-md: 14px;  /* body, inputs */
---aqb-font-lg: 15px;  /* section headers */
---aqb-font-xl: 16px;  /* titles */
+--aqb-font-xs: 12px; /* badges, hints */
+--aqb-font-sm: 13px; /* labels, secondary text */
+--aqb-font-md: 14px; /* body, inputs */
+--aqb-font-lg: 15px; /* section headers */
+--aqb-font-xl: 16px; /* titles */
 ```
 
 ### Brand Color System (`src/shared/constants/canvas.ts`)
 
 ```typescript
-BRAND_PURPLE.DEFAULT  // var(--aqb-primary)        #2563EB  brand blue
-BRAND_PURPLE.light    // var(--aqb-primary-light)   #3B82F6  hover
-BRAND_PURPLE.dark     // var(--aqb-primary-dark)    #1D4ED8  active
-BRAND_PURPLE.subtle   // var(--aqb-primary-subtle)  #DBEAFE  tint
+BRAND_PURPLE.DEFAULT; // var(--aqb-primary)        #2563EB  brand blue
+BRAND_PURPLE.light; // var(--aqb-primary-light)   #3B82F6  hover
+BRAND_PURPLE.dark; // var(--aqb-primary-dark)    #1D4ED8  active
+BRAND_PURPLE.subtle; // var(--aqb-primary-subtle)  #DBEAFE  tint
 
-SELECTION_COLORS.outline       // var(--aqb-selection-color)
-SELECTION_COLORS.glow          // var(--aqb-selection-glow)
+SELECTION_COLORS.outline; // var(--aqb-selection-color)
+SELECTION_COLORS.glow; // var(--aqb-selection-glow)
 ```
 
 ### CSS File Ownership
 
-| File | Owner | Purpose |
-|------|-------|---------|
-| `Canvas.css` | Canvas module | Canvas layout, overlays, device frames |
-| `LayoutShell.css` | Shell module | Rail + sidebar layout grid |
-| `LeftRail.css` | Rail module | Rail icon button styles |
-| `design-tokens.css` | Design system tab | Design token panel UI |
-| `themes/default.css` | Global | All `--aqb-*` variable definitions |
+| File                 | Owner             | Purpose                                |
+| -------------------- | ----------------- | -------------------------------------- |
+| `Canvas.css`         | Canvas module     | Canvas layout, overlays, device frames |
+| `LayoutShell.css`    | Shell module      | Rail + sidebar layout grid             |
+| `LeftRail.css`       | Rail module       | Rail icon button styles                |
+| `design-tokens.css`  | Design system tab | Design token panel UI                  |
+| `themes/default.css` | Global            | All `--aqb-*` variable definitions     |
 
 ### Status Colors
 
@@ -647,8 +660,8 @@ info:    #3B82F6  (blue)
 ### Canvas Surface
 
 ```typescript
-CANVAS_SURFACE.wrapper   = "#F8FAFC"  // outer grey area
-CANVAS_SURFACE.content   = "#FFFFFF"  // white editing area
+CANVAS_SURFACE.wrapper = "#F8FAFC"; // outer grey area
+CANVAS_SURFACE.content = "#FFFFFF"; // white editing area
 ```
 
 ---
@@ -657,25 +670,25 @@ CANVAS_SURFACE.content   = "#FFFFFF"  // white editing area
 
 ### SSOT Ownership Table
 
-| State Domain | Owner Manager | Access Pattern | NEVER store locally |
-|-------------|---------------|----------------|---------------------|
-| Selected elements | `SelectionManager` | `composer.selection.*` | ✗ local `useState` |
-| Element tree | `ElementManager` | `composer.elements.*` | ✗ derived copy |
-| CSS styles | `StyleEngine` | `composer.styles.*` | ✗ inline style objects |
-| Undo/redo | `HistoryManager` | `composer.history.*` | ✗ manual snapshots |
-| Drag state | `DragManager` | `composer.drag.*` | ✗ local drag flags |
-| Viewport/zoom | `Viewport` | `composer.viewport.*` | ✗ local zoom state |
-| Clipboard | Composer directly | `composer.clipboard` | ✗ component state |
+| State Domain      | Owner Manager      | Access Pattern         | NEVER store locally    |
+| ----------------- | ------------------ | ---------------------- | ---------------------- |
+| Selected elements | `SelectionManager` | `composer.selection.*` | ✗ local `useState`     |
+| Element tree      | `ElementManager`   | `composer.elements.*`  | ✗ derived copy         |
+| CSS styles        | `StyleEngine`      | `composer.styles.*`    | ✗ inline style objects |
+| Undo/redo         | `HistoryManager`   | `composer.history.*`   | ✗ manual snapshots     |
+| Drag state        | `DragManager`      | `composer.drag.*`      | ✗ local drag flags     |
+| Viewport/zoom     | `Viewport`         | `composer.viewport.*`  | ✗ local zoom state     |
+| Clipboard         | Composer directly  | `composer.clipboard`   | ✗ component state      |
 
 **Hover state** is the ONLY UI concern allowed as local component state (`useCanvasHover`).
 
 ### Integration Completeness Levels
 
-| Level | Status | Criteria |
-|-------|--------|----------|
-| **L0** | Dead code | Function exists, never called from any UI |
+| Level  | Status     | Criteria                                                          |
+| ------ | ---------- | ----------------------------------------------------------------- |
+| **L0** | Dead code  | Function exists, never called from any UI                         |
 | **L1** | Half-wired | UI triggers action, but missing: history, panel refresh, or event |
-| **L2** | Production | UI → SSOT → event → history → render → panel — all wired |
+| **L2** | Production | UI → SSOT → event → history → render → panel — all wired          |
 
 **Never mark a feature done at L1. All shipped features MUST be L2.**
 
@@ -707,12 +720,12 @@ If multiple functions do the same thing, **pick ONE and delete the rest**.
 
 ```typescript
 // ✗ WRONG — three ways to select
-selectElement(id)
-setSelectedElement(id)
-updateSelection([id])
+selectElement(id);
+setSelectedElement(id);
+updateSelection([id]);
 
 // ✓ CORRECT — one canonical way
-composer.selection.select(id)
+composer.selection.select(id);
 ```
 
 ### Orphan Prevention
@@ -728,22 +741,24 @@ npx ts-prune packages/new-editor-l2/src
 ### Duplicate Utility Gate
 
 Before writing any new helper:
+
 ```bash
 grep -r "functionName\|similarPattern" src/
 ```
+
 If 80%+ similar exists → extend it, don't create a new one.
 
 ### Legacy Failure Scenarios to Watch For
 
-| # | Problem | Detection |
-|---|---------|-----------|
-| 1 | Same feature, different pipelines | Multiple state sources for one domain |
-| 2 | Event name drift | Same action, different event strings |
-| 3 | Registry bypassed | Hardcoded if/else instead of registry lookup |
-| 4 | Half-integrated (L1) | Works but no undo, or panel not refreshing |
-| 5 | TODO left in code | `grep -r "TODO\|FIXME" src/` |
-| 6 | CSS vs JS conflict | Multiple owners for one visual property |
-| 7 | Memory leak | `useEffect` without cleanup returning listeners |
+| #   | Problem                           | Detection                                       |
+| --- | --------------------------------- | ----------------------------------------------- |
+| 1   | Same feature, different pipelines | Multiple state sources for one domain           |
+| 2   | Event name drift                  | Same action, different event strings            |
+| 3   | Registry bypassed                 | Hardcoded if/else instead of registry lookup    |
+| 4   | Half-integrated (L1)              | Works but no undo, or panel not refreshing      |
+| 5   | TODO left in code                 | `grep -r "TODO\|FIXME" src/`                    |
+| 6   | CSS vs JS conflict                | Multiple owners for one visual property         |
+| 7   | Memory leak                       | `useEffect` without cleanup returning listeners |
 
 ---
 
@@ -751,27 +766,27 @@ If 80%+ similar exists → extend it, don't create a new one.
 
 ### Critical File Paths
 
-| File | Purpose |
-|------|---------|
-| `src/engine/Composer.ts` | Central orchestrator, all 29 managers |
-| `src/shared/constants/events.ts` | All 150+ typed events |
-| `src/shared/constants/canvas.ts` | Z_LAYERS, brand colors, device presets |
-| `src/shared/types/index.ts` | All core types (re-exports sub-files) |
-| `src/editor/rail/tabsConfig.ts` | 10 sidebar tabs + rail slots config |
-| `src/editor/canvas/Canvas.tsx` | Main editing canvas, 35+ hooks |
-| `src/editor/canvas/overlays/` | All canvas overlay components |
-| `src/editor/canvas/Canvas.css` | Canvas layout + overlay styles |
-| `src/editor/rail/LayoutShell.tsx` | Editor shell layout grid |
-| `src/editor/sidebar/useSidebarState.ts` | Sidebar navigation state |
-| `src/editor/sidebar/tabs/design/` | Design system tab (color/type/spacing tokens) |
-| `src/blocks/blockRegistry.ts` | Block registration |
-| `src/blocks/index.ts` | All block exports |
-| `src/components/Panels/ProInspector/` | Right panel sections |
-| `src/components/Panels/ProInspector/sections/` | All property section components |
-| `src/engine/elements/ElementManager.ts` | Element CRUD operations |
-| `src/engine/styles/StyleEngine.ts` | CSS property management |
-| `src/engine/SelectionManager.ts` | Selection SSOT |
-| `src/engine/HistoryManager.ts` | Undo/redo |
+| File                                           | Purpose                                       |
+| ---------------------------------------------- | --------------------------------------------- |
+| `src/engine/Composer.ts`                       | Central orchestrator, all 29 managers         |
+| `src/shared/constants/events.ts`               | All 150+ typed events                         |
+| `src/shared/constants/canvas.ts`               | Z_LAYERS, brand colors, device presets        |
+| `src/shared/types/index.ts`                    | All core types (re-exports sub-files)         |
+| `src/editor/rail/tabsConfig.ts`                | 10 sidebar tabs + rail slots config           |
+| `src/editor/canvas/Canvas.tsx`                 | Main editing canvas, 35+ hooks                |
+| `src/editor/canvas/overlays/`                  | All canvas overlay components                 |
+| `src/editor/canvas/Canvas.css`                 | Canvas layout + overlay styles                |
+| `src/editor/rail/LayoutShell.tsx`              | Editor shell layout grid                      |
+| `src/editor/sidebar/useSidebarState.ts`        | Sidebar navigation state                      |
+| `src/editor/sidebar/tabs/design/`              | Design system tab (color/type/spacing tokens) |
+| `src/blocks/blockRegistry.ts`                  | Block registration                            |
+| `src/blocks/index.ts`                          | All block exports                             |
+| `src/components/Panels/ProInspector/`          | Right panel sections                          |
+| `src/components/Panels/ProInspector/sections/` | All property section components               |
+| `src/engine/elements/ElementManager.ts`        | Element CRUD operations                       |
+| `src/engine/styles/StyleEngine.ts`             | CSS property management                       |
+| `src/engine/SelectionManager.ts`               | Selection SSOT                                |
+| `src/engine/HistoryManager.ts`                 | Undo/redo                                     |
 
 ### Common Commands
 
@@ -826,16 +841,16 @@ After completing **any** UI/UX task:
 
 ### Agent Routing Reference
 
-| Keyword | Agent | Role |
-|---------|-------|------|
-| engine, manager, type, event, architecture | `/core` | TypeScript, Engine |
-| canvas, drag, drop, select, overlay, zoom | `/drago` | Canvas, 60fps |
-| UX, UI, component, panel, form, button | `/shadow` | UX/UI, Frontend |
-| API, backend, fetch, database | `/stack` | Backend, API |
-| AI, OpenAI, prompt, LLM | `/ai-wala` | AI Engineer |
-| test, bug, QA, coverage | `/hunter` | Testing |
-| review, refactor, cleanup | `/clean-uncle` | Code Review |
-| plan, coordinate, multi-domain | `/shahg` | Coordination |
+| Keyword                                    | Agent          | Role               |
+| ------------------------------------------ | -------------- | ------------------ |
+| engine, manager, type, event, architecture | `/core`        | TypeScript, Engine |
+| canvas, drag, drop, select, overlay, zoom  | `/drago`       | Canvas, 60fps      |
+| UX, UI, component, panel, form, button     | `/shadow`      | UX/UI, Frontend    |
+| API, backend, fetch, database              | `/stack`       | Backend, API       |
+| AI, OpenAI, prompt, LLM                    | `/ai-wala`     | AI Engineer        |
+| test, bug, QA, coverage                    | `/hunter`      | Testing            |
+| review, refactor, cleanup                  | `/clean-uncle` | Code Review        |
+| plan, coordinate, multi-domain             | `/shahg`       | Coordination       |
 
 ---
 
@@ -850,11 +865,13 @@ After completing **any** UI/UX task:
 ### 13.1 — Critical UX Gaps (Must Fix Before Ship)
 
 #### GAP-C1: ProInspector Has No Empty State
+
 **Severity: CRITICAL**
 
 When no element is selected, the right panel is empty or undefined. Users have no idea what the panel is for.
 
 **What MUST happen:**
+
 ```
 No selection → Inspector shows:
   Heading: "Nothing selected"
@@ -863,6 +880,7 @@ No selection → Inspector shows:
 ```
 
 **Implementation contract:**
+
 - `ProInspector` reads `composer.selection.getSelected()`
 - If `[]` → render `<EmptyInspectorState />`
 - If `[id]` → render full inspector for that element
@@ -871,9 +889,11 @@ No selection → Inspector shows:
 ---
 
 #### GAP-C2: Style Changes Have No Defined Apply/Save/Reset Model
+
 **Severity: CRITICAL**
 
 The current system applies style changes **immediately** (live preview). But there is no:
+
 - Visual confirmation that a change was saved
 - Undo prompt after an accidental change
 - Reset-to-default button per property
@@ -881,16 +901,17 @@ The current system applies style changes **immediately** (live preview). But the
 
 **Defined contract:**
 
-| Action | Behavior | Feedback |
-|--------|----------|---------|
-| User types in an input | Debounce 300ms → `composer.styles.setStyle()` | Input border goes blue while typing |
-| Change applied | `style:changed` event → canvas re-renders | Input border returns to default |
-| Invalid value entered | Input turns red, tooltip shows "Invalid CSS value", change NOT applied | Error state on input |
-| User presses Escape | Revert input to last valid value | Input returns to pre-edit value |
-| Undo (Cmd+Z) | Reverts last style change | Toast: "Style change undone" |
-| Reset property | Right-click input → "Reset to default" | Property removed, inherits from parent |
+| Action                 | Behavior                                                               | Feedback                               |
+| ---------------------- | ---------------------------------------------------------------------- | -------------------------------------- |
+| User types in an input | Debounce 300ms → `composer.styles.setStyle()`                          | Input border goes blue while typing    |
+| Change applied         | `style:changed` event → canvas re-renders                              | Input border returns to default        |
+| Invalid value entered  | Input turns red, tooltip shows "Invalid CSS value", change NOT applied | Error state on input                   |
+| User presses Escape    | Revert input to last valid value                                       | Input returns to pre-edit value        |
+| Undo (Cmd+Z)           | Reverts last style change                                              | Toast: "Style change undone"           |
+| Reset property         | Right-click input → "Reset to default"                                 | Property removed, inherits from parent |
 
 **All style changes MUST go through:**
+
 ```typescript
 // ✓ Correct — live update with history
 composer.beginTransaction("style:edit");
@@ -904,31 +925,35 @@ element.style.fontSize = "16px";
 ---
 
 #### GAP-C3: Multi-Select Inspector Behavior Undefined
+
 **Severity: CRITICAL**
 
 When 2+ elements are selected, the ProInspector must show a coherent state — not crash or show nothing.
 
 **Defined contract:**
 
-| Scenario | Display |
-|----------|---------|
-| All selected elements share same value | Show that value normally |
-| Values differ across selection | Show `--` (mixed) as placeholder |
-| User edits a `--` field | Apply the typed value to ALL selected elements |
-| Properties not applicable to all types | Hide those sections entirely |
+| Scenario                               | Display                                        |
+| -------------------------------------- | ---------------------------------------------- |
+| All selected elements share same value | Show that value normally                       |
+| Values differ across selection         | Show `--` (mixed) as placeholder               |
+| User edits a `--` field                | Apply the typed value to ALL selected elements |
+| Properties not applicable to all types | Hide those sections entirely                   |
 
 **Microcopy:**
+
 - Input placeholder: `Mixed`
 - Section header suffix: `(3 elements)`
 
 ---
 
 #### GAP-C4: Breakpoint Context Not Visible During Editing
+
 **Severity: CRITICAL**
 
 A user editing `font-size` may not know if they're editing the Desktop, Tablet, or Mobile breakpoint. Wrong breakpoint edits are one of the most common sources of confusion in responsive editors.
 
 **Defined contract:**
+
 - Active breakpoint MUST be visible at all times in the ProInspector header
 - Color-coded: Desktop = blue, Tablet = amber, Mobile = green
 - If a property has a breakpoint override (differs from desktop), show a small colored dot next to the input
@@ -940,19 +965,20 @@ A user editing `font-size` may not know if they're editing the Desktop, Tablet, 
 ---
 
 #### GAP-C5: No Feedback for Locked Elements
+
 **Severity: CRITICAL**
 
 If `element.locked = true`, user interactions (drag, resize, inline edit) should be blocked with clear feedback — not silently ignored.
 
 **Defined contract:**
 
-| Interaction on Locked Element | Response |
-|-------------------------------|----------|
-| Click | Show selection box with lock icon badge |
-| Drag attempt | Cursor = `not-allowed`, toast: "Element is locked" |
-| Resize handle drag | No handles shown |
-| ProInspector edit | All inputs `disabled`, banner: "This element is locked. Unlock it to edit." |
-| Double-click (inline edit) | No-op, toast: "Unlock to edit text" |
+| Interaction on Locked Element | Response                                                                    |
+| ----------------------------- | --------------------------------------------------------------------------- |
+| Click                         | Show selection box with lock icon badge                                     |
+| Drag attempt                  | Cursor = `not-allowed`, toast: "Element is locked"                          |
+| Resize handle drag            | No handles shown                                                            |
+| ProInspector edit             | All inputs `disabled`, banner: "This element is locked. Unlock it to edit." |
+| Double-click (inline edit)    | No-op, toast: "Unlock to edit text"                                         |
 
 **Microcopy for unlock button:** "Unlock Element" (not "Edit")
 
@@ -961,11 +987,13 @@ If `element.locked = true`, user interactions (drag, resize, inline edit) should
 ### 13.2 — Medium UX Gaps (Fix This Sprint)
 
 #### GAP-M1: Input Validation Is Not Standardized
+
 **Severity: MEDIUM**
 
 Different inputs handle invalid values inconsistently (some crash, some accept silently, some do nothing).
 
 **Standard for all ProInspector inputs:**
+
 ```
 1. On blur (or Enter): Validate the value
 2. If invalid CSS value → red border + tooltip "Not a valid [property] value"
@@ -975,6 +1003,7 @@ Different inputs handle invalid values inconsistently (some crash, some accept s
 ```
 
 **Edge cases:**
+
 - Negative width/height → reject, show "Must be ≥ 0"
 - Non-numeric in numeric field → reject with tooltip
 - Color input with invalid hex → keep field red until valid 6-char hex entered
@@ -983,11 +1012,13 @@ Different inputs handle invalid values inconsistently (some crash, some accept s
 ---
 
 #### GAP-M2: Template Apply Has No Confirmation
+
 **Severity: MEDIUM**
 
 Applying a template from the Templates tab replaces the current page content. This is a **destructive, non-obvious** action.
 
 **Defined contract:**
+
 ```
 User clicks "Apply" on template →
   Modal: "Replace current page?"
@@ -1003,6 +1034,7 @@ User clicks "Apply" on template →
 ---
 
 #### GAP-M3: Publish Flow Has No Status Feedback
+
 **Severity: MEDIUM**
 
 The Publish tab initiates a deploy to Vercel/Netlify/GitHub. Without proper state feedback, users click "Publish" multiple times or don't know if it worked.
@@ -1031,11 +1063,13 @@ Error →
 ---
 
 #### GAP-M4: Drag-to-Reorder in Layers Has No Drop Confirmation
+
 **Severity: MEDIUM**
 
 When reordering elements in the Layers panel, the drop target is not clearly communicated — especially for nested drops.
 
 **Defined contract:**
+
 - Drop-between: Show a 2px blue line between elements
 - Drop-inside: Show element row highlighted with blue background + "Drop inside [name]" label
 - After drop: Brief pulse animation on the moved item to confirm placement
@@ -1044,11 +1078,13 @@ When reordering elements in the Layers panel, the drop target is not clearly com
 ---
 
 #### GAP-M5: Undo Does Not Show What Will Be Undone
+
 **Severity: MEDIUM**
 
 `Cmd+Z` just silently reverts. Users don't know what they're undoing, especially after several actions.
 
 **Defined contract:**
+
 - History tab shows a labeled timeline (already exists via `VersionHistoryManager`)
 - Undo tooltip on `Cmd+Z`: "Undo: [action label]" (e.g., "Undo: Changed font-size to 18px")
 - History entry labels MUST be human-readable — set via `composer.beginTransaction("Changed font-size")`
@@ -1059,22 +1095,26 @@ When reordering elements in the Layers panel, the drop target is not clearly com
 ### 13.3 — Low UX Gaps (Fix Next Sprint)
 
 #### GAP-L1: Keyboard Accessibility in ProInspector
+
 - All inputs must be reachable via `Tab`
 - Section expand/collapse via `Space`
 - Property reset via context menu triggered by `Shift+F10`
 - Inspector tab switching (`Layout` / `Design` / `Settings`) via `Alt+1`, `Alt+2`, `Alt+3`
 
 #### GAP-L2: Long Values Overflow Without Truncation
+
 - Font family names, class names, URLs can overflow inputs
 - All text inputs: `overflow: hidden; text-overflow: ellipsis` when not focused
 - On focus: show full value, allow horizontal scroll
 
 #### GAP-L3: Small-Screen Warning (< 1024px viewport)
+
 - Editor is not usable below 1024px wide
 - Below threshold: show overlay "Aquibra works best on screens wider than 1024px. Consider using a larger display."
 - Do NOT silently degrade — tell the user
 
 #### GAP-L4: Missing "No Changes" State on Save
+
 - If user clicks Save with no changes (project not dirty): button should be disabled or show tooltip "No unsaved changes"
 - `composer.isDirty()` → if `false`, Save button is disabled
 
@@ -1084,17 +1124,17 @@ When reordering elements in the Layers panel, the drop target is not clearly com
 
 All UI text MUST follow these conventions:
 
-| Context | ✓ Correct | ✗ Wrong |
-|---------|-----------|---------|
-| Empty state heading | "Nothing selected" | "No Selection" |
-| Save success | "Changes saved" | "Success" |
-| Delete confirmation | "Delete [Element Name]?" | "Are you sure?" |
-| Undo toast | "Undo: [action]" | "Undone" |
-| Error | "Could not save. Try again." | "Error 500" |
-| Locked element | "Element is locked" | "Cannot edit" |
-| Loading | "Saving your design…" | "Loading…" |
-| Publish success | "Your site is live" | "Done" |
-| Mixed values | `Mixed` (italic in input) | `undefined` or blank |
+| Context             | ✓ Correct                    | ✗ Wrong              |
+| ------------------- | ---------------------------- | -------------------- |
+| Empty state heading | "Nothing selected"           | "No Selection"       |
+| Save success        | "Changes saved"              | "Success"            |
+| Delete confirmation | "Delete [Element Name]?"     | "Are you sure?"      |
+| Undo toast          | "Undo: [action]"             | "Undone"             |
+| Error               | "Could not save. Try again." | "Error 500"          |
+| Locked element      | "Element is locked"          | "Cannot edit"        |
+| Loading             | "Saving your design…"        | "Loading…"           |
+| Publish success     | "Your site is live"          | "Done"               |
+| Mixed values        | `Mixed` (italic in input)    | `undefined` or blank |
 
 ---
 
@@ -1103,38 +1143,45 @@ All UI text MUST follow these conventions:
 Every new feature MUST pass these journey tests:
 
 **Opening a tab:**
+
 - [ ] Tab opens in ≤ 150ms (no visible flash)
 - [ ] Empty state shown if no content
 - [ ] Active state highlighted in rail
 
 **Editing a value:**
+
 - [ ] Live preview updates within 300ms
 - [ ] Invalid input shows error state (not silent)
 - [ ] Pressing Escape reverts to previous value
 - [ ] History entry created after edit
 
 **Previewing changes:**
+
 - [ ] Canvas reflects change immediately (no manual refresh)
 - [ ] Breakpoint indicator shows which device is active
 - [ ] Affected element highlighted briefly after change
 
 **Saving / applying:**
+
 - [ ] Dirty indicator shows when changes are unsaved
 - [ ] Save action clears dirty state
 - [ ] Auto-save every 5s (StorageAdapter)
 - [ ] Success feedback shown
 
 **Resetting:**
+
 - [ ] Per-property reset available (right-click or icon)
 - [ ] Full undo via Cmd+Z with labeled toast
 - [ ] Reset removes override, inherits from parent
 
 **Handling errors:**
+
 - [ ] Network error → retry option shown, not silent fail
 - [ ] Invalid value → red input + tooltip, NOT applied
 - [ ] Crash recovery → RecoveryManager restores last snapshot
 
 **Confirming success:**
+
 - [ ] Destructive actions (delete, replace, reset all) require confirmation modal
 - [ ] Non-destructive changes give brief success feedback (150–300ms)
 - [ ] Toast messages auto-dismiss in 3s
@@ -1174,9 +1221,15 @@ A class whose only job is to delegate all calls to another class.
 ```typescript
 // ✗ FORBIDDEN — SelectionProxy does nothing
 class SelectionProxy {
-  select(id: string) { this.manager.select(id); }
-  deselect(id: string) { this.manager.deselect(id); }
-  clear() { this.manager.clear(); }
+  select(id: string) {
+    this.manager.select(id);
+  }
+  deselect(id: string) {
+    this.manager.deselect(id);
+  }
+  clear() {
+    this.manager.clear();
+  }
   // ... all methods just delegate to manager
 }
 
@@ -1194,13 +1247,21 @@ Two functions that do the same thing with different names.
 
 ```typescript
 // ✗ FORBIDDEN — same logic, different names
-function getSelectedElement() { return composer.selection.getSelected()[0]; }
-function fetchCurrentElement() { return composer.selection.getSelected()[0]; }
-function activeElement() { return composer.selection.getSelected()[0]; }
+function getSelectedElement() {
+  return composer.selection.getSelected()[0];
+}
+function fetchCurrentElement() {
+  return composer.selection.getSelected()[0];
+}
+function activeElement() {
+  return composer.selection.getSelected()[0];
+}
 
 // ✓ CORRECT — one canonical function, documented
 /** Returns the first selected element, or null if nothing is selected. */
-function getPrimarySelection() { return composer.selection.getSelected()[0] ?? null; }
+function getPrimarySelection() {
+  return composer.selection.getSelected()[0] ?? null;
+}
 ```
 
 **Before writing any new utility:** `grep -r "functionName\|sameLogic" src/` must return 0 matches.
@@ -1221,7 +1282,7 @@ useEffect(() => {
 }, []);
 
 // ✓ CORRECT — read directly from manager on each render trigger
-const [_, forceUpdate] = useReducer(x => x + 1, 0);
+const [_, forceUpdate] = useReducer((x) => x + 1, 0);
 useEffect(() => {
   composer.on(EVENTS.SELECTION_CHANGED, forceUpdate);
   return () => composer.off(EVENTS.SELECTION_CHANGED, forceUpdate);
@@ -1271,6 +1332,7 @@ export class LegacyPropertyRenderer { ... } // abandoned
 ```
 
 **Detection before every PR:**
+
 ```bash
 npx ts-prune packages/new-editor-l2/src
 # Must return 0 unused exports
@@ -1342,6 +1404,7 @@ import { clamp, slugify } from "../utils/math";
 ```
 
 **Module dependency rules:**
+
 - `engine/` → imports from `shared/` only
 - `components/` → imports from `engine/` (via hooks) and `shared/`
 - `shared/` → imports from nothing else in the project
@@ -1353,15 +1416,15 @@ import { clamp, slugify } from "../utils/math";
 
 Signs that the folder structure has lost ownership clarity:
 
-| Warning Sign | Correct Fix |
-|-------------|-------------|
+| Warning Sign                                           | Correct Fix                                             |
+| ------------------------------------------------------ | ------------------------------------------------------- |
 | `utils/` folder with 30+ files, mixed responsibilities | Split into `utils/dom/`, `utils/math/`, `utils/format/` |
-| `components/shared/` containing business logic | Move logic to appropriate manager |
-| `hooks/` at project root (not co-located) | Co-locate hooks next to the component that owns them |
-| `types/` in multiple locations | Canonical types in `shared/types/` only |
-| `index.ts` that re-exports everything from 20+ files | Each module exports only its public API |
-| Manager importing a component | **Never** — managers must not know about React |
-| Component importing another component's internal hook | Use events or props only |
+| `components/shared/` containing business logic         | Move logic to appropriate manager                       |
+| `hooks/` at project root (not co-located)              | Co-locate hooks next to the component that owns them    |
+| `types/` in multiple locations                         | Canonical types in `shared/types/` only                 |
+| `index.ts` that re-exports everything from 20+ files   | Each module exports only its public API                 |
+| Manager importing a component                          | **Never** — managers must not know about React          |
+| Component importing another component's internal hook  | Use events or props only                                |
 
 **Folder ownership rules:**
 
@@ -1378,6 +1441,7 @@ src/
 ```
 
 **Cross-boundary import rules (HARD RULES):**
+
 ```
 engine → shared ✓
 editor → engine, shared ✓
@@ -1392,6 +1456,7 @@ blocks → engine ✗  (blocks are data, not logic)
 ```
 
 **Detection:**
+
 ```bash
 # Find engine files importing from components
 grep -r "from.*components" src/engine/
@@ -1437,4 +1502,4 @@ grep -r "TODO\|FIXME" packages/new-editor-l2/src/
 
 ---
 
-*Updated with UX standards and forbidden patterns — 2026-02-27*
+_Updated with UX standards and forbidden patterns — 2026-02-27_

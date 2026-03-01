@@ -241,7 +241,9 @@ export function calculateFreshDropTarget(
     freshTargetId = page?.root?.id || null;
   }
 
-  // Calculate fresh drop position
+  // Calculate fresh drop position.
+  // Both clientX/clientY and rect (from getBoundingClientRect) are in viewport
+  // space — already scroll-invariant. No scroll offset correction needed.
   let freshDropPosition: DropPosition = "inside";
   if (freshTargetId && canvasRef.current) {
     const targetDomEl = canvasRef.current.querySelector(

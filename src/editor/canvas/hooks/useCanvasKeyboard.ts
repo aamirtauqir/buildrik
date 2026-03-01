@@ -1,22 +1,8 @@
 /**
- * Canvas Keyboard Hook
- * WCAG 2.1 AA compliant keyboard navigation for canvas elements
- *
- * Keyboard Map:
- * - Tab/Shift+Tab: Cycle through ALL elements
- * - ↑/↓ Arrow: Select previous/next sibling
- * - ←/→ Arrow: Select parent / first child
- * - Alt+↑/↓: Reorder element (move up/down)
- * - Alt+Home/End: Move to first/last position
- * - Cmd/Ctrl+Arrow: Move element position by 1px
- * - Shift+Arrow: Move element position by 10px
- * - Home/End: Select first/last sibling
- * - Delete/Backspace: Delete element (focus moves to next)
- * - Escape: Clear selection
- * - Shift+F10: Open context menu (standard a11y shortcut)
- * - Ctrl+D: Duplicate element
- * - Ctrl+A: Select all elements
- *
+ * Canvas Keyboard Hook — WCAG 2.1 AA keyboard navigation for canvas elements.
+ * Keys: Tab/Shift+Tab (cycle) | Arrows (navigate) | Alt+Arrows (reorder)
+ * Ctrl+Arrow (move 1px) | Shift+Arrow (10px) | Del (delete) | Esc (clear)
+ * Ctrl+D (duplicate) | Ctrl+A (select all) | Shift+F10 (context menu)
  * @license BSD-3-Clause
  */
 
@@ -40,6 +26,7 @@ import {
 export interface UseCanvasKeyboardOptions {
   composer: Composer | null;
   selectedId: string | null;
+  selectedIds?: string[]; // ADD: full multi-select set
   editingId: string | null;
   select: (elementOrId: Element | string | null) => void;
   clear: () => void;
@@ -69,6 +56,7 @@ export interface UseCanvasKeyboardResult {
 export function useCanvasKeyboard({
   composer,
   selectedId,
+  selectedIds = [],
   editingId,
   select,
   clear,
@@ -89,10 +77,11 @@ export function useCanvasKeyboard({
         return;
       }
 
-      // Tab: Cycle through ALL elements
+      // Tab: Cycle through ALL elements (root excluded — cannot be moved/edited)
       if (e.key === "Tab") {
         e.preventDefault();
-        const allElements = getAllNavigableElements(composer);
+        const tabRootId = composer.elements.getActivePage()?.root?.id ?? null;
+        const allElements = getAllNavigableElements(composer, tabRootId);
         if (allElements.length === 0) return;
 
         const currentIndex = selectedId
@@ -126,6 +115,58 @@ export function useCanvasKeyboard({
 
       // Handle delete with focus management and undo toast
       if (e.key === "Delete" || e.key === "Backspace") {
+        // Multi-select delete: remove all selected elements in a single transaction
+        if (selectedIds.length > 1) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          // Get root ID to exclude it from deletion
+          const page = composer.elements.getActivePage();
+          const rootId = page?.root?.id;
+
+          // Take immutable snapshot, filter out root and locked elements
+          const idsToDelete = [...selectedIds]
+            .filter((id) => id !== rootId)
+            .filter((id) => {
+              const el = composer.elements.getElement(id);
+              return el && !el.isLocked?.();
+            });
+
+          if (idsToDelete.length === 0) return;
+
+          devLogger.keyboard("delete-multi", { count: idsToDelete.length });
+
+          composer.beginTransaction("delete-element");
+          try {
+            idsToDelete.forEach((id) => {
+              composer.elements.removeElement(id);
+            });
+          } finally {
+            composer.endTransaction();
+          }
+
+          composer.selection.clear();
+          syncFromComposer(); // force React to re-read SSOT after mutation
+
+          if (addToast) {
+            addToast({
+              message: `Deleted ${idsToDelete.length} elements`,
+              variant: "info",
+              duration: 4000,
+              action: {
+                label: "Undo",
+                onClick: () => {
+                  composer.history.undo();
+                  syncFromComposer();
+                },
+              },
+            });
+          }
+
+          return;
+        }
+
+        // Single-select delete: preserve focus management and child count toast
         if (!selectedId) return;
         devLogger.keyboard("delete", { elementId: selectedId });
 
@@ -436,7 +477,17 @@ export function useCanvasKeyboard({
           break;
       }
     },
-    [composer, selectedId, editingId, select, clear, syncFromComposer, onOpenContextMenu, addToast]
+    [
+      composer,
+      selectedId,
+      selectedIds,
+      editingId,
+      select,
+      clear,
+      syncFromComposer,
+      onOpenContextMenu,
+      addToast,
+    ]
   );
 
   return { handleKeyDown };

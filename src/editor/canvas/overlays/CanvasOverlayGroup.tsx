@@ -227,6 +227,7 @@ export function CanvasOverlayGroup({
           altHeld={cursorState.altHeld}
           shiftHeld={cursorState.shiftHeld}
           inspectorEnabled={isInspectorEnabled || devMode}
+          isCloneMode={cursorState.ctrlHeld}
         />
       )}
 
@@ -235,19 +236,18 @@ export function CanvasOverlayGroup({
         <RemoteCursorsOverlay composer={composer} zoom={zoom} />
       )}
 
-      {/* Drop feedback */}
-      {isDragOver && dropTargetId && (
-        <DropFeedbackOverlay
-          isDragOver={isDragOver}
-          dropTargetId={dropTargetId}
-          dropPosition={dropPosition}
-          isValidDrop={isValidDrop}
-          invalidReason={invalidDropReason}
-          canvasRef={canvasRef as React.RefObject<HTMLDivElement>}
-          dropSlotRect={dropSlotRect}
-          dropTargetPath={dropTargetPath}
-        />
-      )}
+      {/* Drop feedback — always rendered so the aria-live region stays in the DOM.
+          Visual content is conditionally shown inside the component (WCAG 4.1.3). */}
+      <DropFeedbackOverlay
+        isDragOver={isDragOver}
+        dropTargetId={dropTargetId}
+        dropPosition={dropPosition}
+        isValidDrop={isValidDrop}
+        invalidReason={invalidDropReason}
+        canvasRef={canvasRef as React.RefObject<HTMLDivElement>}
+        dropSlotRect={dropSlotRect}
+        dropTargetPath={dropTargetPath}
+      />
 
       {/* Marquee selection box */}
       {marquee && <div aria-hidden style={getMarqueeStyles(marquee)} />}

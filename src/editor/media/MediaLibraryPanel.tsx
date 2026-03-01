@@ -13,7 +13,6 @@ import type { MediaAsset, MediaAssetType, MediaViewMode } from "../../shared/typ
 import { Modal, Tabs, Button, Spinner } from "../../shared/ui";
 import { useMediaManager } from "../shell/hooks";
 import { AssetCard } from "./AssetCard";
-import { ImageEditorModal } from "./ImageEditorModal";
 import { mediaLibraryStyles as styles } from "./MediaLibraryStyles";
 import { OptimizationPanel } from "./OptimizationPanel";
 import { VideoPreview } from "./VideoPreview";
@@ -50,16 +49,16 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
     isLoading,
     uploadFile,
     deleteAsset,
+    updateAsset,
     getAssets,
   } = useMediaManager(composer);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = React.useState("library");
   const [viewMode, setViewMode] = React.useState<MediaViewMode>("grid");
-  const [urlInput, setUrlInput] = React.useState("");
   const [previewVideo, setPreviewVideo] = React.useState<MediaAsset | null>(null);
-  const [editingAsset, setEditingAsset] = React.useState<MediaAsset | null>(null);
   const [uploading, setUploading] = React.useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = React.useState<string | null>(null);
 
   // Get filtered assets based on search and type
   const assets = React.useMemo(() => {
@@ -81,20 +80,20 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
     }
   };
 
-  const handleUrlAdd = async () => {
-    if (!urlInput.trim()) return;
-    setUrlInput("");
-    setActiveTab("library");
+  const handleDelete = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setPendingDeleteId(id);
   };
 
-  const handleDelete = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    await deleteAsset(id);
+  const confirmDeleteAsset = async () => {
+    if (!pendingDeleteId) return;
+    await deleteAsset(pendingDeleteId);
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      next.delete(id);
+      next.delete(pendingDeleteId);
       return next;
     });
+    setPendingDeleteId(null);
   };
 
   const handleSelect = (asset: MediaAsset) => {
@@ -120,15 +119,6 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
       onSelect(selected[0]);
       onClose();
     }
-  };
-
-  const handleImageEdited = (editedSrc: string) => {
-    if (editingAsset) {
-      // Update the asset with the new edited source
-      editingAsset.src = editedSrc;
-      editingAsset.updatedAt = new Date().toISOString();
-    }
-    setEditingAsset(null);
   };
 
   const filteredAssets = assets.filter((asset) => allowedTypes.includes(asset.type));
@@ -216,16 +206,14 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
         )}
 
         {activeTab === "url" && (
-          <div style={styles.uploadArea}>
-            <InputField
-              label="Asset URL"
-              value={urlInput}
-              onChange={(e) => setUrlInput(e.target.value)}
-              placeholder="https://example.com/image.jpg"
-            />
-            <Button onClick={handleUrlAdd} disabled={!urlInput.trim()} style={{ marginTop: 12 }}>
-              Add Asset
-            </Button>
+          <div style={{ ...styles.uploadArea, textAlign: "center", padding: "40px 24px" }}>
+            <div style={{ fontSize: 40, marginBottom: 16 }}>🔗</div>
+            <div style={{ fontWeight: 600, marginBottom: 8 }}>Import from URL — coming soon</div>
+            <div style={{ fontSize: 13, color: "var(--aqb-text-muted)", lineHeight: 1.5 }}>
+              Paste an image or video URL to import it directly.
+              <br />
+              This feature is launching soon.
+            </div>
           </div>
         )}
 
@@ -239,9 +227,11 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
                     return (
                       <OptimizationPanel
                         imageSrc={selectedAsset.src}
-                        onOptimized={(src) => {
-                          selectedAsset.src = src;
-                          selectedAsset.updatedAt = new Date().toISOString();
+                        onOptimized={async (src) => {
+                          await updateAsset(selectedAsset.id, {
+                            src,
+                            updatedAt: new Date().toISOString(),
+                          });
                           setActiveTab("library");
                         }}
                         onClose={() => setActiveTab("library")}
@@ -289,15 +279,54 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
         />
       )}
 
-      {/* Image Editor Modal */}
-      {editingAsset && (
-        <ImageEditorModal
-          isOpen={!!editingAsset}
-          imageSrc={editingAsset.src}
-          onSave={handleImageEdited}
-          onClose={() => setEditingAsset(null)}
-        />
-      )}
+      {/* Delete Confirmation */}
+      {pendingDeleteId &&
+        (() => {
+          const asset = filteredAssets.find((a) => a.id === pendingDeleteId);
+          return (
+            <div
+              style={{
+                position: "fixed",
+                inset: 0,
+                zIndex: 9999,
+                background: "rgba(0,0,0,0.5)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <div
+                style={{
+                  background: "var(--aqb-surface)",
+                  borderRadius: 8,
+                  padding: 24,
+                  width: 320,
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+                }}
+              >
+                <h3 style={{ margin: "0 0 8px", fontSize: 15, fontWeight: 600 }}>Delete file?</h3>
+                <p
+                  style={{
+                    margin: "0 0 20px",
+                    fontSize: 13,
+                    color: "var(--aqb-text-secondary)",
+                  }}
+                >
+                  &quot;{asset?.name ?? "This file"}&quot; will be permanently deleted. This cannot
+                  be undone.
+                </p>
+                <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                  <Button variant="ghost" size="sm" onClick={() => setPendingDeleteId(null)}>
+                    Cancel
+                  </Button>
+                  <Button variant="danger" size="sm" onClick={confirmDeleteAsset}>
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
     </Modal>
   );
 };

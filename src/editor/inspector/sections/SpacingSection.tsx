@@ -109,7 +109,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
   const disabledPadding = (side: string) => propertyStates[`padding-${side}`];
 
   return (
-    <Section title="Spacing" icon="MoveHorizontal" defaultOpen>
+    <Section title="Spacing" icon="MoveHorizontal" defaultOpen id="inspector-section-spacing">
       {/* Visual Box Model */}
       <div
         style={{

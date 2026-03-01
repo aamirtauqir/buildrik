@@ -5,7 +5,7 @@
  */
 
 .tmpl-progress {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: rgba(4, 4, 12, 0.92);
   backdrop-filter: blur(4px);
@@ -15,7 +15,7 @@
   justify-content: center;
   padding: 24px;
   gap: 14px;
-  z-index: 55;
+  z-index: 1050;
 }
 
 .tmpl-progress__inner {
@@ -128,6 +128,20 @@
 @keyframes tmpl-spin {
   to { transform: rotate(360deg); }
 }
+
+/* FIX-10: Cancel button */
+.tmpl-progress__cancel {
+  margin-top: 12px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: underline;
+  transition: color 0.12s;
+}
+.tmpl-progress__cancel:hover { color: rgba(255,255,255,0.55); }
 
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {

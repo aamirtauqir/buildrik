@@ -1,704 +1,2386 @@
-[
-  {
-    "file": "0000-app-load.png",
-    "section": "Entry",
-    "state": "Initial app load",
-    "how_to_reproduce": "Navigate to http://localhost:5173"
-  },
-  {
-    "file": "0010-dashboard.png",
-    "section": "Entry",
-    "state": "Dashboard / project list",
-    "how_to_reproduce": "Loaded app root URL"
-  },
-  {
-    "file": "0099-editor-full-overview.png",
-    "section": "Editor",
-    "state": "Editor full overview with Pages tab open",
-    "how_to_reproduce": "Editor with Pages tab, canvas visible, inspector empty"
-  },
-  {
-    "file": "0099b-editor-overview-final.png",
-    "section": "Editor",
-    "state": "Editor final overview \u2014 Pages tab open",
-    "how_to_reproduce": "Final state with Pages tab, canvas visible"
-  },
-  {
-    "file": "0099c-editor-full-template.png",
-    "section": "Editor",
-    "state": "Editor full state \u2014 Pages tab, template applied",
-    "how_to_reproduce": "Full editor view after template was applied"
-  },
-  {
-    "file": "0099d-editor-final.png",
-    "section": "Editor",
-    "state": "Editor \u2014 final state after template applied",
-    "how_to_reproduce": "Full editor with Pages tab, template-filled canvas, inspector"
-  },
-  {
-    "file": "0099e-editor-after-templates.png",
-    "section": "Editor",
-    "state": "Editor after multiple template applies",
-    "how_to_reproduce": "Final editor state after template workflow"
-  },
-  {
-    "file": "0099f-editor-template-complete.png",
-    "section": "Editor",
-    "state": "Editor with template applied \u2014 complete state",
-    "how_to_reproduce": "Final editor state"
-  },
-  {
-    "file": "0100-editor-default.png",
-    "section": "Editor",
-    "state": "Default layout \u2014 clean state",
-    "how_to_reproduce": "Editor opened, nothing selected"
-  },
-  {
-    "file": "0100b-editor-after-template.png",
-    "section": "Editor",
-    "state": "Editor with template content applied",
-    "how_to_reproduce": "After applying a template \u2014 canvas shows real content"
-  },
-  {
-    "file": "0100c-editor-after-template-applied.png",
-    "section": "Editor",
-    "state": "Editor after template applied",
-    "how_to_reproduce": "Click 'Use This \u2192' on template \u2014 canvas fills with template content"
-  },
-  {
-    "file": "0100d-canvas-with-template.png",
-    "section": "Canvas",
-    "state": "Canvas with template elements loaded",
-    "how_to_reproduce": "Canvas filled with template content"
-  },
-  {
-    "file": "0101-editor-topbar.png",
-    "section": "Topbar",
-    "state": "Topbar close-up",
-    "how_to_reproduce": "Top 60px of editor viewport"
-  },
-  {
-    "file": "0110-rail-tooltip-templates.png",
-    "section": "Left Rail",
-    "state": "Tooltip for Templates",
-    "how_to_reproduce": "Hover over rail icon id=rail-tab-templates"
-  },
-  {
-    "file": "0111-rail-tooltip-pages.png",
-    "section": "Left Rail",
-    "state": "Tooltip for Pages",
-    "how_to_reproduce": "Hover over rail icon id=rail-tab-pages"
-  },
-  {
-    "file": "0112-rail-tooltip-build.png",
-    "section": "Left Rail",
-    "state": "Tooltip for Build",
-    "how_to_reproduce": "Hover over rail icon id=rail-tab-add"
-  },
-  {
-    "file": "0113-rail-tooltip-media.png",
-    "section": "Left Rail",
-    "state": "Tooltip for Media Library",
-    "how_to_reproduce": "Hover over rail icon id=rail-tab-assets"
-  },
-  {
-    "file": "0114-rail-tooltip-design.png",
-    "section": "Left Rail",
-    "state": "Tooltip for Design System",
-    "how_to_reproduce": "Hover over rail icon id=rail-tab-design"
-  },
-  {
-    "file": "0115-rail-tooltip-settings.png",
-    "section": "Left Rail",
-    "state": "Tooltip for Config & Launch",
-    "how_to_reproduce": "Hover over rail icon id=rail-tab-settings"
-  },
-  {
-    "file": "0116-rail-tooltip-layers.png",
-    "section": "Left Rail",
-    "state": "Tooltip for Layers",
-    "how_to_reproduce": "Hover over rail icon id=rail-tab-layers"
-  },
-  {
-    "file": "0117-rail-tooltip-history.png",
-    "section": "Left Rail",
-    "state": "Tooltip for Version history",
-    "how_to_reproduce": "Hover over rail icon id=rail-tab-history"
-  },
-  {
-    "file": "0120-leftpanel-tab-templates.png",
-    "section": "Left Sidebar",
-    "state": "Templates panel open",
-    "how_to_reproduce": "Click rail-tab-templates"
-  },
-  {
-    "file": "0121-leftpanel-tab-pages.png",
-    "section": "Left Sidebar",
-    "state": "Pages panel open",
-    "how_to_reproduce": "Click rail-tab-pages"
-  },
-  {
-    "file": "0122-leftpanel-tab-build.png",
-    "section": "Left Sidebar",
-    "state": "Build (Add Elements) panel open",
-    "how_to_reproduce": "Click rail-tab-add"
-  },
-  {
-    "file": "0122b-leftpanel-build-detailed.png",
-    "section": "Left Sidebar",
-    "state": "Build panel with element cards",
-    "how_to_reproduce": "Click Build rail tab \u2014 shows element cards"
-  },
-  {
-    "file": "0123-leftpanel-tab-media.png",
-    "section": "Left Sidebar",
-    "state": "Media Library panel open",
-    "how_to_reproduce": "Click rail-tab-assets"
-  },
-  {
-    "file": "0124-leftpanel-tab-design.png",
-    "section": "Left Sidebar",
-    "state": "Design System panel open",
-    "how_to_reproduce": "Click rail-tab-design"
-  },
-  {
-    "file": "0125-leftpanel-tab-settings.png",
-    "section": "Left Sidebar",
-    "state": "Settings panel open",
-    "how_to_reproduce": "Click rail-tab-settings"
-  },
-  {
-    "file": "0126-leftpanel-tab-layers.png",
-    "section": "Left Sidebar",
-    "state": "Layers panel open",
-    "how_to_reproduce": "Click rail-tab-layers"
-  },
-  {
-    "file": "0126c-leftpanel-layers-full.png",
-    "section": "Layers",
-    "state": "Layers panel full \u2014 close-up",
-    "how_to_reproduce": "Layers panel content showing page structure"
-  },
-  {
-    "file": "0127-leftpanel-tab-history.png",
-    "section": "Left Sidebar",
-    "state": "History panel open",
-    "how_to_reproduce": "Click rail-tab-history"
-  },
-  {
-    "file": "0127b-leftpanel-history-full.png",
-    "section": "History",
-    "state": "History panel full \u2014 close-up",
-    "how_to_reproduce": "History panel content showing undo stack"
-  },
-  {
-    "file": "0130-templates-browse.png",
-    "section": "Templates",
-    "state": "Browse grid view",
-    "how_to_reproduce": "Click Templates rail tab"
-  },
-  {
-    "file": "0130b-templates-card-selected.png",
-    "section": "Templates",
-    "state": "Templates tab \u2014 card selected, nudge active",
-    "how_to_reproduce": "Click template card \u2192 nudge bar shows 'Use This \u2192'"
-  },
-  {
-    "file": "0131-templates-card-hover.png",
-    "section": "Templates",
-    "state": "Template card hover state",
-    "how_to_reproduce": "Hover over first template card"
-  },
-  {
-    "file": "0132-templates-search-active.png",
-    "section": "Templates",
-    "state": "Search field focused",
-    "how_to_reproduce": "Click input[placeholder*=\"Search\" i]"
-  },
-  {
-    "file": "0133-templates-preview-modal-desktop.png",
-    "section": "Templates",
-    "state": "Template preview modal",
-    "how_to_reproduce": "JS-dispatched click on Preview button"
-  },
-  {
-    "file": "0134-templates-preview-modal-tablet.png",
-    "section": "Templates",
-    "state": "Preview modal \u2014 Tablet",
-    "how_to_reproduce": "Tablet viewport"
-  },
-  {
-    "file": "0135-templates-preview-modal-mobile.png",
-    "section": "Templates",
-    "state": "Preview modal \u2014 Mobile",
-    "how_to_reproduce": "Mobile viewport"
-  },
-  {
-    "file": "0136-templates-category-filtered.png",
-    "section": "Templates",
-    "state": "Templates filtered by category",
-    "how_to_reproduce": "Click 'Landing' category pill"
-  },
-  {
-    "file": "0137-templates-replace-modal.png",
-    "section": "Templates",
-    "state": "Template Replace confirmation modal",
-    "how_to_reproduce": "Canvas has content \u2192 'Use This \u2192' \u2192 Replace modal (.tpl-modal-overlay)"
-  },
-  {
-    "file": "0138-templates-pro-card.png",
-    "section": "Templates",
-    "state": "PRO/locked template card",
-    "how_to_reproduce": "Template card with PRO badge and lock overlay"
-  },
-  {
-    "file": "0139-templates-apply-progress.png",
-    "section": "Templates",
-    "state": "Template apply progress overlay (ApplyProgressOverlay)",
-    "how_to_reproduce": "After Replace confirmed (or direct apply) \u2192 progress animation shows"
-  },
-  {
-    "file": "0140-pages-tab.png",
-    "section": "Pages",
-    "state": "Pages panel open",
-    "how_to_reproduce": "Click Pages rail tab"
-  },
-  {
-    "file": "0141-pages-context-menu.png",
-    "section": "Pages",
-    "state": "Page row context menu open",
-    "how_to_reproduce": "Click kebab menu on [class*='page'] button[aria-label*='more' i]"
-  },
-  {
-    "file": "0142-pages-settings-drawer-seo.png",
-    "section": "Pages",
-    "state": "Page settings drawer - SEO tab",
-    "how_to_reproduce": "Click [aria-label*=\"Page settings\" i]"
-  },
-  {
-    "file": "0143-pages-settings-drawer-social.png",
-    "section": "Pages",
-    "state": "Page settings drawer - Social tab",
-    "how_to_reproduce": "Click Social tab"
-  },
-  {
-    "file": "0144-pages-settings-drawer-advanced.png",
-    "section": "Pages",
-    "state": "Page settings drawer - Advanced tab",
-    "how_to_reproduce": "Click Advanced tab"
-  },
-  {
-    "file": "0150-media-library-view.png",
-    "section": "Media",
-    "state": "Library view default",
-    "how_to_reproduce": "Click Media (Assets) rail tab"
-  },
-  {
-    "file": "0150b-media-panel-detail.png",
-    "section": "Media",
-    "state": "Media panel full view",
-    "how_to_reproduce": "Media tab open showing all controls"
-  },
-  {
-    "file": "0151-media-discovery-view.png",
-    "section": "Media",
-    "state": "Media Discovery view (stock assets)",
-    "how_to_reproduce": "Click Discovery tab in media panel"
-  },
-  {
-    "file": "0152-media-type-filter.png",
-    "section": "Media",
-    "state": "Images type filter active",
-    "how_to_reproduce": "Click Images filter pill in media tab"
-  },
-  {
-    "file": "0153-media-upload-zone.png",
-    "section": "Media",
-    "state": "Media panel with upload zone",
-    "how_to_reproduce": "Media tab scrolled to show upload area"
-  },
-  {
-    "file": "0160-design-colors-tab.png",
-    "section": "Design System",
-    "state": "Colors tab (default)",
-    "how_to_reproduce": "Click Design System rail tab"
-  },
-  {
-    "file": "0161-design-type-tab.png",
-    "section": "Design System",
-    "state": "Type tokens tab",
-    "how_to_reproduce": "Click button:has-text(\"Type\")"
-  },
-  {
-    "file": "0162-design-spacing-tab.png",
-    "section": "Design System",
-    "state": "Spacing tokens tab",
-    "how_to_reproduce": "Click button:has-text(\"Spacing\")"
-  },
-  {
-    "file": "0163-design-color-picker.png",
-    "section": "Design System",
-    "state": "Color picker open",
-    "how_to_reproduce": "Click color swatch in Design System tab"
-  },
-  {
-    "file": "0164-design-export-dropdown.png",
-    "section": "Design System",
-    "state": "Export dropdown open",
-    "how_to_reproduce": "Click button:has-text(\"Export\")"
-  },
-  {
-    "file": "0170-settings-home.png",
-    "section": "Settings",
-    "state": "Settings home \u2014 feature cards",
-    "how_to_reproduce": "Click Settings rail tab"
-  },
-  {
-    "file": "0171-settings-site-settings.png",
-    "section": "Settings",
-    "state": "Site Settings",
-    "how_to_reproduce": "Click 'Site Settings' feature card"
-  },
-  {
-    "file": "0172-settings-domains.png",
-    "section": "Settings",
-    "state": "Domains",
-    "how_to_reproduce": "Click 'Domains' feature card"
-  },
-  {
-    "file": "0173-settings-analytics.png",
-    "section": "Settings",
-    "state": "Analytics",
-    "how_to_reproduce": "Click 'Analytics' feature card"
-  },
-  {
-    "file": "0174-settings-export.png",
-    "section": "Settings",
-    "state": "Export settings screen",
-    "how_to_reproduce": "Click Export feature card in Settings"
-  },
-  {
-    "file": "0175-settings-integrations.png",
-    "section": "Settings",
-    "state": "Integrations settings screen (may be locked)",
-    "how_to_reproduce": "Click Integrations feature card in Settings"
-  },
-  {
-    "file": "0176-settings-advanced.png",
-    "section": "Settings",
-    "state": "Advanced (may be locked)",
-    "how_to_reproduce": "Click 'Advanced' feature card"
-  },
-  {
-    "file": "0177-settings-version-history.png",
-    "section": "Settings",
-    "state": "Version History",
-    "how_to_reproduce": "Click 'Version History' feature card"
-  },
-  {
-    "file": "0180-publish-tab.png",
-    "section": "Publish",
-    "state": "Publish panel/state",
-    "how_to_reproduce": "Visible via button:has-text(\"Publish\")"
-  },
-  {
-    "file": "0180c-config-launch-tab.png",
-    "section": "Publish",
-    "state": "Config & Launch panel \u2014 full close-up",
-    "how_to_reproduce": "Click Config & Launch rail tab (settings)"
-  },
-  {
-    "file": "0180d-config-launch-full.png",
-    "section": "Publish",
-    "state": "Config & Launch \u2014 full editor view",
-    "how_to_reproduce": "Config & Launch tab with full editor context"
-  },
-  {
-    "file": "0200-topbar-default.png",
-    "section": "Topbar",
-    "state": "Topbar at rest state",
-    "how_to_reproduce": "Topbar with undo/redo, device selector, publish button"
-  },
-  {
-    "file": "0200b-topbar-with-content.png",
-    "section": "Topbar",
-    "state": "Topbar with template content applied",
-    "how_to_reproduce": "Topbar strip showing all controls after template apply"
-  },
-  {
-    "file": "0201-topbar-breakpoint-dropdown.png",
-    "section": "Topbar",
-    "state": "Breakpoint dropdown open",
-    "how_to_reproduce": "Clicked button:has-text(\"Desktop\")"
-  },
-  {
-    "file": "0201b-topbar-undo-redo.png",
-    "section": "Topbar",
-    "state": "Undo/Redo buttons close-up",
-    "how_to_reproduce": "Topbar undo/redo button area"
-  },
-  {
-    "file": "0202-topbar-breakpoint-tablet.png",
-    "section": "Topbar",
-    "state": "Tablet breakpoint active",
-    "how_to_reproduce": "Selected Tablet in breakpoint dropdown"
-  },
-  {
-    "file": "0203-topbar-breakpoint-mobile.png",
-    "section": "Topbar",
-    "state": "Mobile breakpoint active",
-    "how_to_reproduce": "Click device selector \u2192 Mobile"
-  },
-  {
-    "file": "0205-topbar-project-menu.png",
-    "section": "Topbar",
-    "state": "Project menu dropdown open",
-    "how_to_reproduce": "Click project name \u2192 dropdown menu with project options"
-  },
-  {
-    "file": "0206-topbar-sync-status.png",
-    "section": "Topbar",
-    "state": "Sync status indicator",
-    "how_to_reproduce": "Status indicator in topbar area"
-  },
-  {
-    "file": "0210-footer-toolbar-default.png",
-    "section": "Canvas Footer",
-    "state": "Footer toolbar default \u2014 all overlays off",
-    "how_to_reproduce": "View canvas footer area"
-  },
-  {
-    "file": "0211-footer-toolbar-guides-on.png",
-    "section": "Canvas Footer",
-    "state": "Snap Guides toggled on",
-    "how_to_reproduce": "Click 'Snap Guides' overlay button"
-  },
-  {
-    "file": "0212-footer-toolbar-spacing-on.png",
-    "section": "Canvas Footer",
-    "state": "Spacing overlay toggled on",
-    "how_to_reproduce": "Click 'Spacing' overlay button"
-  },
-  {
-    "file": "0213-footer-toolbar-grid-on.png",
-    "section": "Canvas Footer",
-    "state": "Grid overlay toggled on",
-    "how_to_reproduce": "Click 'Grid' overlay button"
-  },
-  {
-    "file": "0214-footer-toolbar-badges-on.png",
-    "section": "Canvas Footer",
-    "state": "Badges overlay toggled on",
-    "how_to_reproduce": "Click 'Badges' overlay button"
-  },
-  {
-    "file": "0215-footer-toolbar-xray-on.png",
-    "section": "Canvas Footer",
-    "state": "X-Ray overlay toggled on",
-    "how_to_reproduce": "Click 'X-Ray' overlay button"
-  },
-  {
-    "file": "0216-footer-zoom-dropdown.png",
-    "section": "Canvas Footer",
-    "state": "Zoom preset dropdown open",
-    "how_to_reproduce": "Click zoom % button"
-  },
-  {
-    "file": "0217-footer-zoom-area.png",
-    "section": "Canvas Footer",
-    "state": "Zoom controls close-up",
-    "how_to_reproduce": "Footer zoom area crop"
-  },
-  {
-    "file": "0220-footer-all-overlays-on.png",
-    "section": "Canvas Footer",
-    "state": "Guides + Spacing + Grid overlays all active",
-    "how_to_reproduce": "Click Snap Guides, Spacing, Grid buttons to enable all"
-  },
-  {
-    "file": "0300-canvas-empty.png",
-    "section": "Canvas",
-    "state": "Canvas with nothing selected",
-    "how_to_reproduce": "Click empty canvas area below elements"
-  },
-  {
-    "file": "0301-canvas-element-selected.png",
-    "section": "Canvas",
-    "state": "Canvas element selected",
-    "how_to_reproduce": "Click canvas element to select it"
-  },
-  {
-    "file": "0301b-canvas-element-selected-rich.png",
-    "section": "Canvas",
-    "state": "Canvas element selected \u2014 rich template",
-    "how_to_reproduce": "Click element in canvas after template applied"
-  },
-  {
-    "file": "0302-canvas-selection-handles.png",
-    "section": "Canvas",
-    "state": "Selection handles visible",
-    "how_to_reproduce": "Element selected showing resize handles"
-  },
-  {
-    "file": "0303-canvas-multiselect.png",
-    "section": "Canvas",
-    "state": "Multiple elements selected",
-    "how_to_reproduce": "Click element, then Shift+click second element"
-  },
-  {
-    "file": "0303b-canvas-multiselect-real.png",
-    "section": "Canvas",
-    "state": "Canvas multiselect \u2014 real template elements",
-    "how_to_reproduce": "Shift+click 2 canvas elements after template apply"
-  },
-  {
-    "file": "0303c-canvas-multiselect-confirmed.png",
-    "section": "Canvas",
-    "state": "Canvas multiselect \u2014 template elements",
-    "how_to_reproduce": "Shift+click 2 template elements"
-  },
-  {
-    "file": "0304-canvas-context-menu.png",
-    "section": "Canvas",
-    "state": "Canvas context menu (empty area)",
-    "how_to_reproduce": "Right-click empty canvas area"
-  },
-  {
-    "file": "0305-canvas-element-context-menu.png",
-    "section": "Canvas",
-    "state": "Element right-click context menu",
-    "how_to_reproduce": "Right-click selected element"
-  },
-  {
-    "file": "0305b-canvas-element-context-menu-rich.png",
-    "section": "Canvas",
-    "state": "Element context menu on rich content",
-    "how_to_reproduce": "Right-click template element \u2192 full context menu"
-  },
-  {
-    "file": "0306-canvas-hover-overlay.png",
-    "section": "Canvas",
-    "state": "Element hover overlay",
-    "how_to_reproduce": "Hover over canvas element"
-  },
-  {
-    "file": "0307-canvas-drag-in-progress.png",
-    "section": "Canvas",
-    "state": "Element drag in progress",
-    "how_to_reproduce": "Click element \u2192 mouse drag 50px"
-  },
-  {
-    "file": "0400-inspector-empty.png",
-    "section": "Inspector",
-    "state": "Empty state \u2014 no element selected",
-    "how_to_reproduce": "Click empty canvas area to deselect all"
-  },
-  {
-    "file": "0400b-inspector-empty-close-up.png",
-    "section": "Inspector",
-    "state": "Inspector empty state \u2014 close-up",
-    "how_to_reproduce": "No element selected \u2014 CTAs visible"
-  },
-  {
-    "file": "0401-inspector-layout-tab.png",
-    "section": "Inspector",
-    "state": "Inspector Layout & Size tab",
-    "how_to_reproduce": "Element selected \u2192 Layout & Size tab active"
-  },
-  {
-    "file": "0401b-inspector-panel-full.png",
-    "section": "Inspector",
-    "state": "Inspector panel close-up",
-    "how_to_reproduce": "Element selected \u2014 inspector panel crop"
-  },
-  {
-    "file": "0401c-inspector-with-element.png",
-    "section": "Inspector",
-    "state": "Inspector with element selected \u2014 rich state",
-    "how_to_reproduce": "Element selected from template canvas"
-  },
-  {
-    "file": "0402-inspector-design-tab.png",
-    "section": "Inspector",
-    "state": "Inspector Style tab",
-    "how_to_reproduce": "Click Style tab in inspector"
-  },
-  {
-    "file": "0402b-inspector-style-tab.png",
-    "section": "Inspector",
-    "state": "Style tab content",
-    "how_to_reproduce": "Click Style tab in inspector"
-  },
-  {
-    "file": "0402c-inspector-style-tab-full.png",
-    "section": "Inspector",
-    "state": "Inspector Style tab \u2014 full panel crop",
-    "how_to_reproduce": "Element selected \u2192 Style tab \u2192 full inspector panel"
-  },
-  {
-    "file": "0403-inspector-settings-tab.png",
-    "section": "Inspector",
-    "state": "Inspector Advanced tab",
-    "how_to_reproduce": "Click Advanced tab in inspector"
-  },
-  {
-    "file": "0404-inspector-pseudostate-dropdown.png",
-    "section": "Inspector",
-    "state": "Pseudostate selector (Default selected)",
-    "how_to_reproduce": "Click Default pseudo-state button in inspector header"
-  },
-  {
-    "file": "0405-inspector-color-picker.png",
-    "section": "Inspector",
-    "state": "Color picker in inspector",
-    "how_to_reproduce": "Click color swatch in inspector Style tab"
-  },
-  {
-    "file": "0406-inspector-multiselect-toolbar.png",
-    "section": "Inspector",
-    "state": "Inspector with multiple elements selected",
-    "how_to_reproduce": "Select 2+ elements, inspector shows multi-select controls"
-  },
-  {
-    "file": "0500-modal-keyboard-shortcuts.png",
-    "section": "Modals",
-    "state": "Keyboard shortcuts modal",
-    "how_to_reproduce": "Press ? or click help button"
-  },
-  {
-    "file": "0502-modal-export.png",
-    "section": "Modals",
-    "state": "Export modal/dialog",
-    "how_to_reproduce": "Settings \u2192 Export \u2192 click Export/Download button"
-  },
-  {
-    "file": "0600-toast-notification.png",
-    "section": "Notifications",
-    "state": "Toast notification (undo)",
-    "how_to_reproduce": "Press Cmd+Z \u2192 undo toast appears"
-  },
-  {
-    "file": "0700-empty-inspector.png",
-    "section": "Empty States",
-    "state": "Inspector empty state visible with Build panel",
-    "how_to_reproduce": "Open Add panel, no element selected"
-  },
-  {
-    "file": "0720-leftpanel-layers-detail.png",
-    "section": "Layers",
-    "state": "Layers tree panel",
-    "how_to_reproduce": "Click Layers rail button (footer)"
-  },
-  {
-    "file": "0720b-leftpanel-layers-rich.png",
-    "section": "Layers",
-    "state": "Layers panel \u2014 0 layer items",
-    "how_to_reproduce": "Layers panel after template applied showing page structure"
-  },
-  {
-    "file": "0730-leftpanel-history-detail.png",
-    "section": "History",
-    "state": "History / versions panel",
-    "how_to_reproduce": "Click History rail button (footer)"
-  }
-]
+{
+  "generated": "2026-03-01T16:41:12.161Z",
+  "totalScreenshots": 340,
+  "screenshots": [
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/000_loading-state.png",
+      "label": "000_loading-state",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P0-loading"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/001_editor-base_default.png",
+      "label": "001_editor-base_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P2-base"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/002_canvas_idle.png",
+      "label": "002_canvas_idle",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P2-base"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/003_workspace_overview.png",
+      "label": "003_workspace_overview",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P2-base"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/010_untitled-project_default.png",
+      "label": "010_untitled-project_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/010_untitled-project_open.png",
+      "label": "010_untitled-project_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/011_undo-last-action_default.png",
+      "label": "011_undo-last-action_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/011_undo-last-action_open.png",
+      "label": "011_undo-last-action_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/012_redo-last-action_default.png",
+      "label": "012_redo-last-action_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/012_redo-last-action_open.png",
+      "label": "012_redo-last-action_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/013_desktop_default.png",
+      "label": "013_desktop_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/013_desktop_open.png",
+      "label": "013_desktop_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/014_1_default.png",
+      "label": "014_1_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/014_1_open.png",
+      "label": "014_1_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/015_preview_default.png",
+      "label": "015_preview_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/015_preview_open.png",
+      "label": "015_preview_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/016_publish_default.png",
+      "label": "016_publish_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/016_publish_open.png",
+      "label": "016_publish_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/017_templatestemplatest_default.png",
+      "label": "017_templatestemplatest_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/017_templatestemplatest_open.png",
+      "label": "017_templatestemplatest_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/04-pages/018_pagespagesp_default.png",
+      "label": "018_pagespagesp_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/04-pages/018_pagespagesp_open.png",
+      "label": "018_pagespagesp_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/019_buildbuilda_default.png",
+      "label": "019_buildbuilda_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/019_buildbuilda_open.png",
+      "label": "019_buildbuilda_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/020_mediamedia-libraryj_default.png",
+      "label": "020_mediamedia-libraryj_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/020_mediamedia-libraryj_open.png",
+      "label": "020_mediamedia-libraryj_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/07-design/021_globaldesign-systemd_default.png",
+      "label": "021_globaldesign-systemd_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/07-design/021_globaldesign-systemd_open.png",
+      "label": "021_globaldesign-systemd_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/022_configconfig-launchs_default.png",
+      "label": "022_configconfig-launchs_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/022_configconfig-launchs_open.png",
+      "label": "022_configconfig-launchs_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/03-layers/023_layers_default.png",
+      "label": "023_layers_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/03-layers/023_layers_open.png",
+      "label": "023_layers_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/024_history_default.png",
+      "label": "024_history_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/024_history_open.png",
+      "label": "024_history_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/025__default.png",
+      "label": "025__default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/025__open.png",
+      "label": "025__open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/026_snap-guides_default.png",
+      "label": "026_snap-guides_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/026_snap-guides_open.png",
+      "label": "026_snap-guides_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/027_spacing_default.png",
+      "label": "027_spacing_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/027_spacing_open.png",
+      "label": "027_spacing_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/028_grid_default.png",
+      "label": "028_grid_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/028_grid_open.png",
+      "label": "028_grid_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/029_badges_default.png",
+      "label": "029_badges_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/029_badges_open.png",
+      "label": "029_badges_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/030_x-ray_default.png",
+      "label": "030_x-ray_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/030_x-ray_open.png",
+      "label": "030_x-ray_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/031__default.png",
+      "label": "031__default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/031__open.png",
+      "label": "031__open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/032_100_default.png",
+      "label": "032_100_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/032_100_open.png",
+      "label": "032_100_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/033_open-build-panel_default.png",
+      "label": "033_open-build-panel_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/033_open-build-panel_open.png",
+      "label": "033_open-build-panel_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/034_browse-templates_default.png",
+      "label": "034_browse-templates_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/034_browse-templates_open.png",
+      "label": "034_browse-templates_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/035_skip_default.png",
+      "label": "035_skip_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/035_skip_open.png",
+      "label": "035_skip_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/036_next_default.png",
+      "label": "036_next_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/036_next_open.png",
+      "label": "036_next_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/037__default.png",
+      "label": "037__default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/037__open.png",
+      "label": "037__open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/038_get-started0-of-9-complete_default.png",
+      "label": "038_get-started0-of-9-complete_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/01-editor-base/038_get-started0-of-9-complete_open.png",
+      "label": "038_get-started0-of-9-complete_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/04-pages/039_page-1_default.png",
+      "label": "039_page-1_default",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/04-pages/039_page-1_open.png",
+      "label": "039_page-1_open",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/11-element-lifecycle/040_element-selected.png",
+      "label": "040_element-selected",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/11-element-lifecycle/041_panel-tab-templatestemplatest.png",
+      "label": "panel-tab-templatestemplatest",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/11-element-lifecycle/042_panel-tab-pagespagesp.png",
+      "label": "panel-tab-pagespagesp",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/11-element-lifecycle/043_panel-tab-buildbuilda.png",
+      "label": "panel-tab-buildbuilda",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/11-element-lifecycle/044_panel-tab-mediamedia-libraryj.png",
+      "label": "panel-tab-mediamedia-libraryj",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/11-element-lifecycle/045_panel-tab-globaldesign-systemd.png",
+      "label": "panel-tab-globaldesign-systemd",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/11-element-lifecycle/049_after-selection.png",
+      "label": "049_after-selection",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/12-undo-redo/050_after-undo.png",
+      "label": "050_after-undo",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P5-undo-redo"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/12-undo-redo/051_after-redo.png",
+      "label": "051_after-redo",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P5-undo-redo"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/13-overlays/060_toast-notification.png",
+      "label": "060_toast-notification",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/13-overlays/061_tooltip-btn1.png",
+      "label": "tooltip-btn-1",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/13-overlays/062_tooltip-btn2.png",
+      "label": "tooltip-btn-2",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/13-overlays/063_tooltip-btn3.png",
+      "label": "tooltip-btn-3",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/13-overlays/064_tooltip-btn4.png",
+      "label": "tooltip-btn-4",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/13-overlays/065_tooltip-btn5.png",
+      "label": "tooltip-btn-5",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/14-scroll/070_panel1-top.png",
+      "label": "panel1-scroll-top",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P7-scroll"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/14-scroll/071_panel1-mid.png",
+      "label": "panel1-scroll-mid",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P7-scroll"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/14-scroll/072_panel1-bottom.png",
+      "label": "panel1-scroll-bottom",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P7-scroll"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/15-special-states/080_focus-first.png",
+      "label": "080_focus-first",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P8-special"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/15-special-states/081_focus-second.png",
+      "label": "081_focus-second",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P8-special"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/15-special-states/082_empty-state.png",
+      "label": "082_empty-state",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P8-special"
+    },
+    {
+      "file": "latest-screenshots/desktop-1440x900/15-special-states/083_full-viewport.png",
+      "label": "083_full-viewport",
+      "result": "OK",
+      "viewport": "desktop-1440x900",
+      "phase": "P8-special"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/000_loading-state.png",
+      "label": "000_loading-state",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P0-loading"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/001_editor-base_default.png",
+      "label": "001_editor-base_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P2-base"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/002_canvas_idle.png",
+      "label": "002_canvas_idle",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P2-base"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/003_workspace_overview.png",
+      "label": "003_workspace_overview",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P2-base"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/010_untitled-project_default.png",
+      "label": "010_untitled-project_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/010_untitled-project_open.png",
+      "label": "010_untitled-project_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/011_undo-last-action_default.png",
+      "label": "011_undo-last-action_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/011_undo-last-action_open.png",
+      "label": "011_undo-last-action_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/012_redo-last-action_default.png",
+      "label": "012_redo-last-action_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/012_redo-last-action_open.png",
+      "label": "012_redo-last-action_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/013_desktop_default.png",
+      "label": "013_desktop_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/013_desktop_open.png",
+      "label": "013_desktop_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/014_1_default.png",
+      "label": "014_1_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/014_1_open.png",
+      "label": "014_1_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/015_preview_default.png",
+      "label": "015_preview_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/015_preview_open.png",
+      "label": "015_preview_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/016_publish_default.png",
+      "label": "016_publish_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/016_publish_open.png",
+      "label": "016_publish_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/017_templatestemplatest_default.png",
+      "label": "017_templatestemplatest_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/017_templatestemplatest_open.png",
+      "label": "017_templatestemplatest_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/04-pages/018_pagespagesp_default.png",
+      "label": "018_pagespagesp_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/04-pages/018_pagespagesp_open.png",
+      "label": "018_pagespagesp_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/019_buildbuilda_default.png",
+      "label": "019_buildbuilda_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/019_buildbuilda_open.png",
+      "label": "019_buildbuilda_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/020_mediamedia-libraryj_default.png",
+      "label": "020_mediamedia-libraryj_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/020_mediamedia-libraryj_open.png",
+      "label": "020_mediamedia-libraryj_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/07-design/021_globaldesign-systemd_default.png",
+      "label": "021_globaldesign-systemd_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/07-design/021_globaldesign-systemd_open.png",
+      "label": "021_globaldesign-systemd_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/022_configconfig-launchs_default.png",
+      "label": "022_configconfig-launchs_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/022_configconfig-launchs_open.png",
+      "label": "022_configconfig-launchs_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/03-layers/023_layers_default.png",
+      "label": "023_layers_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/03-layers/023_layers_open.png",
+      "label": "023_layers_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/024_history_default.png",
+      "label": "024_history_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/024_history_open.png",
+      "label": "024_history_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/025__default.png",
+      "label": "025__default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/025__open.png",
+      "label": "025__open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/026_snap-guides_default.png",
+      "label": "026_snap-guides_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/026_snap-guides_open.png",
+      "label": "026_snap-guides_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/027_spacing_default.png",
+      "label": "027_spacing_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/027_spacing_open.png",
+      "label": "027_spacing_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/028_grid_default.png",
+      "label": "028_grid_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/028_grid_open.png",
+      "label": "028_grid_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/029_badges_default.png",
+      "label": "029_badges_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/029_badges_open.png",
+      "label": "029_badges_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/030_x-ray_default.png",
+      "label": "030_x-ray_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/030_x-ray_open.png",
+      "label": "030_x-ray_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/031__default.png",
+      "label": "031__default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/031__open.png",
+      "label": "031__open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/032_100_default.png",
+      "label": "032_100_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/032_100_open.png",
+      "label": "032_100_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/033_open-build-panel_default.png",
+      "label": "033_open-build-panel_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/033_open-build-panel_open.png",
+      "label": "033_open-build-panel_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/034_browse-templates_default.png",
+      "label": "034_browse-templates_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/034_browse-templates_open.png",
+      "label": "034_browse-templates_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/035_skip_default.png",
+      "label": "035_skip_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/035_skip_open.png",
+      "label": "035_skip_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/036_next_default.png",
+      "label": "036_next_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/036_next_open.png",
+      "label": "036_next_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/037__default.png",
+      "label": "037__default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/037__open.png",
+      "label": "037__open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/038_get-started0-of-9-complete_default.png",
+      "label": "038_get-started0-of-9-complete_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/01-editor-base/038_get-started0-of-9-complete_open.png",
+      "label": "038_get-started0-of-9-complete_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/04-pages/039_page-1_default.png",
+      "label": "039_page-1_default",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/04-pages/039_page-1_open.png",
+      "label": "039_page-1_open",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/11-element-lifecycle/040_element-selected.png",
+      "label": "040_element-selected",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/11-element-lifecycle/041_panel-tab-templatestemplatest.png",
+      "label": "panel-tab-templatestemplatest",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/11-element-lifecycle/042_panel-tab-pagespagesp.png",
+      "label": "panel-tab-pagespagesp",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/11-element-lifecycle/043_panel-tab-buildbuilda.png",
+      "label": "panel-tab-buildbuilda",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/11-element-lifecycle/044_panel-tab-mediamedia-libraryj.png",
+      "label": "panel-tab-mediamedia-libraryj",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/11-element-lifecycle/045_panel-tab-globaldesign-systemd.png",
+      "label": "panel-tab-globaldesign-systemd",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/11-element-lifecycle/049_after-selection.png",
+      "label": "049_after-selection",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/12-undo-redo/050_after-undo.png",
+      "label": "050_after-undo",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P5-undo-redo"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/12-undo-redo/051_after-redo.png",
+      "label": "051_after-redo",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P5-undo-redo"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/13-overlays/060_toast-notification.png",
+      "label": "060_toast-notification",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/13-overlays/061_tooltip-btn1.png",
+      "label": "tooltip-btn-1",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/13-overlays/062_tooltip-btn2.png",
+      "label": "tooltip-btn-2",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/13-overlays/063_tooltip-btn3.png",
+      "label": "tooltip-btn-3",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/13-overlays/064_tooltip-btn4.png",
+      "label": "tooltip-btn-4",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/13-overlays/065_tooltip-btn5.png",
+      "label": "tooltip-btn-5",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/14-scroll/070_panel1-top.png",
+      "label": "panel1-scroll-top",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P7-scroll"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/14-scroll/071_panel1-mid.png",
+      "label": "panel1-scroll-mid",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P7-scroll"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/14-scroll/072_panel1-bottom.png",
+      "label": "panel1-scroll-bottom",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P7-scroll"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/15-special-states/080_focus-first.png",
+      "label": "080_focus-first",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P8-special"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/15-special-states/081_focus-second.png",
+      "label": "081_focus-second",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P8-special"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/15-special-states/082_empty-state.png",
+      "label": "082_empty-state",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P8-special"
+    },
+    {
+      "file": "latest-screenshots/laptop-1280x720/15-special-states/083_full-viewport.png",
+      "label": "083_full-viewport",
+      "result": "OK",
+      "viewport": "laptop-1280x720",
+      "phase": "P8-special"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/000_loading-state.png",
+      "label": "000_loading-state",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P0-loading"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/001_editor-base_default.png",
+      "label": "001_editor-base_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P2-base"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/002_canvas_idle.png",
+      "label": "002_canvas_idle",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P2-base"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/003_workspace_overview.png",
+      "label": "003_workspace_overview",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P2-base"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/010_untitled-project_default.png",
+      "label": "010_untitled-project_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/010_untitled-project_open.png",
+      "label": "010_untitled-project_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/011_undo-last-action_default.png",
+      "label": "011_undo-last-action_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/011_undo-last-action_open.png",
+      "label": "011_undo-last-action_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/012_redo-last-action_default.png",
+      "label": "012_redo-last-action_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/012_redo-last-action_open.png",
+      "label": "012_redo-last-action_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/013_desktop_default.png",
+      "label": "013_desktop_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/013_desktop_open.png",
+      "label": "013_desktop_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/014_preview_default.png",
+      "label": "014_preview_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/014_preview_open.png",
+      "label": "014_preview_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/015_publish_default.png",
+      "label": "015_publish_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/015_publish_open.png",
+      "label": "015_publish_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/016_templatestemplatest_default.png",
+      "label": "016_templatestemplatest_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/016_templatestemplatest_open.png",
+      "label": "016_templatestemplatest_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/04-pages/017_pagespagesp_default.png",
+      "label": "017_pagespagesp_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/04-pages/017_pagespagesp_open.png",
+      "label": "017_pagespagesp_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/018_buildbuilda_default.png",
+      "label": "018_buildbuilda_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/018_buildbuilda_open.png",
+      "label": "018_buildbuilda_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/019_mediamedia-libraryj_default.png",
+      "label": "019_mediamedia-libraryj_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/019_mediamedia-libraryj_open.png",
+      "label": "019_mediamedia-libraryj_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/07-design/020_globaldesign-systemd_default.png",
+      "label": "020_globaldesign-systemd_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/07-design/020_globaldesign-systemd_open.png",
+      "label": "020_globaldesign-systemd_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/021_configconfig-launchs_default.png",
+      "label": "021_configconfig-launchs_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/021_configconfig-launchs_open.png",
+      "label": "021_configconfig-launchs_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/03-layers/022_layers_default.png",
+      "label": "022_layers_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/03-layers/022_layers_open.png",
+      "label": "022_layers_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/023_history_default.png",
+      "label": "023_history_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/023_history_open.png",
+      "label": "023_history_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/024__default.png",
+      "label": "024__default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/024__open.png",
+      "label": "024__open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/025_snap-guides_default.png",
+      "label": "025_snap-guides_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/025_snap-guides_open.png",
+      "label": "025_snap-guides_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/026_spacing_default.png",
+      "label": "026_spacing_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/026_spacing_open.png",
+      "label": "026_spacing_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/027_grid_default.png",
+      "label": "027_grid_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/027_grid_open.png",
+      "label": "027_grid_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/028_badges_default.png",
+      "label": "028_badges_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/028_badges_open.png",
+      "label": "028_badges_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/029_x-ray_default.png",
+      "label": "029_x-ray_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/029_x-ray_open.png",
+      "label": "029_x-ray_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/030__default.png",
+      "label": "030__default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/030__open.png",
+      "label": "030__open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/031_100_default.png",
+      "label": "031_100_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/031_100_open.png",
+      "label": "031_100_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/032_open-build-panel_default.png",
+      "label": "032_open-build-panel_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/032_open-build-panel_open.png",
+      "label": "032_open-build-panel_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/033_browse-templates_default.png",
+      "label": "033_browse-templates_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/033_browse-templates_open.png",
+      "label": "033_browse-templates_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/034_skip_default.png",
+      "label": "034_skip_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/034_skip_open.png",
+      "label": "034_skip_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/035_next_default.png",
+      "label": "035_next_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/035_next_open.png",
+      "label": "035_next_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/036__default.png",
+      "label": "036__default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/036__open.png",
+      "label": "036__open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/037_get-started0-of-9-complete_default.png",
+      "label": "037_get-started0-of-9-complete_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/01-editor-base/037_get-started0-of-9-complete_open.png",
+      "label": "037_get-started0-of-9-complete_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/04-pages/038_page-1_default.png",
+      "label": "038_page-1_default",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/04-pages/038_page-1_open.png",
+      "label": "038_page-1_open",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/11-element-lifecycle/040_element-selected.png",
+      "label": "040_element-selected",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/11-element-lifecycle/041_panel-tab-templatestemplatest.png",
+      "label": "panel-tab-templatestemplatest",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/11-element-lifecycle/042_panel-tab-pagespagesp.png",
+      "label": "panel-tab-pagespagesp",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/11-element-lifecycle/043_panel-tab-buildbuilda.png",
+      "label": "panel-tab-buildbuilda",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/11-element-lifecycle/044_panel-tab-mediamedia-libraryj.png",
+      "label": "panel-tab-mediamedia-libraryj",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/11-element-lifecycle/045_panel-tab-globaldesign-systemd.png",
+      "label": "panel-tab-globaldesign-systemd",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/11-element-lifecycle/049_after-selection.png",
+      "label": "049_after-selection",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/12-undo-redo/050_after-undo.png",
+      "label": "050_after-undo",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P5-undo-redo"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/12-undo-redo/051_after-redo.png",
+      "label": "051_after-redo",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P5-undo-redo"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/13-overlays/060_toast-notification.png",
+      "label": "060_toast-notification",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/13-overlays/061_tooltip-btn1.png",
+      "label": "tooltip-btn-1",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/13-overlays/062_tooltip-btn2.png",
+      "label": "tooltip-btn-2",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/13-overlays/063_tooltip-btn3.png",
+      "label": "tooltip-btn-3",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/13-overlays/064_tooltip-btn4.png",
+      "label": "tooltip-btn-4",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/13-overlays/065_tooltip-btn5.png",
+      "label": "tooltip-btn-5",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/14-scroll/070_panel1-top.png",
+      "label": "panel1-scroll-top",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P7-scroll"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/14-scroll/071_panel1-mid.png",
+      "label": "panel1-scroll-mid",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P7-scroll"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/14-scroll/072_panel1-bottom.png",
+      "label": "panel1-scroll-bottom",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P7-scroll"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/15-special-states/080_focus-first.png",
+      "label": "080_focus-first",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P8-special"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/15-special-states/081_focus-second.png",
+      "label": "081_focus-second",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P8-special"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/15-special-states/082_empty-state.png",
+      "label": "082_empty-state",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P8-special"
+    },
+    {
+      "file": "latest-screenshots/tablet-834x1112/15-special-states/083_full-viewport.png",
+      "label": "083_full-viewport",
+      "result": "OK",
+      "viewport": "tablet-834x1112",
+      "phase": "P8-special"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/000_loading-state.png",
+      "label": "000_loading-state",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P0-loading"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/001_editor-base_default.png",
+      "label": "001_editor-base_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P2-base"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/002_canvas_idle.png",
+      "label": "002_canvas_idle",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P2-base"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/003_workspace_overview.png",
+      "label": "003_workspace_overview",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P2-base"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/010_untitled-project_default.png",
+      "label": "010_untitled-project_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/010_untitled-project_open.png",
+      "label": "010_untitled-project_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/011_undo-last-action_default.png",
+      "label": "011_undo-last-action_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/011_undo-last-action_open.png",
+      "label": "011_undo-last-action_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/012_redo-last-action_default.png",
+      "label": "012_redo-last-action_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/012_redo-last-action_open.png",
+      "label": "012_redo-last-action_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/013_desktop_default.png",
+      "label": "013_desktop_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/013_desktop_open.png",
+      "label": "013_desktop_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/014_preview_default.png",
+      "label": "014_preview_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/014_preview_open.png",
+      "label": "014_preview_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/015_publish_default.png",
+      "label": "015_publish_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/015_publish_open.png",
+      "label": "015_publish_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/016_templatestemplatest_default.png",
+      "label": "016_templatestemplatest_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/016_templatestemplatest_open.png",
+      "label": "016_templatestemplatest_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/04-pages/017_pagespagesp_default.png",
+      "label": "017_pagespagesp_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/04-pages/017_pagespagesp_open.png",
+      "label": "017_pagespagesp_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/018_buildbuilda_default.png",
+      "label": "018_buildbuilda_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/018_buildbuilda_open.png",
+      "label": "018_buildbuilda_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/019_mediamedia-libraryj_default.png",
+      "label": "019_mediamedia-libraryj_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/019_mediamedia-libraryj_open.png",
+      "label": "019_mediamedia-libraryj_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/07-design/020_globaldesign-systemd_default.png",
+      "label": "020_globaldesign-systemd_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/07-design/020_globaldesign-systemd_open.png",
+      "label": "020_globaldesign-systemd_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/021_configconfig-launchs_default.png",
+      "label": "021_configconfig-launchs_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/021_configconfig-launchs_open.png",
+      "label": "021_configconfig-launchs_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/03-layers/022_layers_default.png",
+      "label": "022_layers_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/03-layers/022_layers_open.png",
+      "label": "022_layers_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/023_history_default.png",
+      "label": "023_history_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/023_history_open.png",
+      "label": "023_history_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/024__default.png",
+      "label": "024__default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/024__open.png",
+      "label": "024__open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/025_snap-guides_default.png",
+      "label": "025_snap-guides_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/025_snap-guides_open.png",
+      "label": "025_snap-guides_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/026_spacing_default.png",
+      "label": "026_spacing_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/026_spacing_open.png",
+      "label": "026_spacing_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/027_grid_default.png",
+      "label": "027_grid_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/027_grid_open.png",
+      "label": "027_grid_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/028_badges_default.png",
+      "label": "028_badges_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/028_badges_open.png",
+      "label": "028_badges_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/029_x-ray_default.png",
+      "label": "029_x-ray_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/029_x-ray_open.png",
+      "label": "029_x-ray_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/030__default.png",
+      "label": "030__default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/030__open.png",
+      "label": "030__open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/031_100_default.png",
+      "label": "031_100_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/031_100_open.png",
+      "label": "031_100_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/032_open-build-panel_default.png",
+      "label": "032_open-build-panel_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/032_open-build-panel_open.png",
+      "label": "032_open-build-panel_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/033_browse-templates_default.png",
+      "label": "033_browse-templates_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/033_browse-templates_open.png",
+      "label": "033_browse-templates_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/034_skip_default.png",
+      "label": "034_skip_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/034_skip_open.png",
+      "label": "034_skip_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/035_next_default.png",
+      "label": "035_next_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/035_next_open.png",
+      "label": "035_next_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/036__default.png",
+      "label": "036__default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/036__open.png",
+      "label": "036__open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/037_get-started0-of-9-complete_default.png",
+      "label": "037_get-started0-of-9-complete_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/01-editor-base/037_get-started0-of-9-complete_open.png",
+      "label": "037_get-started0-of-9-complete_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/04-pages/038_page-1_default.png",
+      "label": "038_page-1_default",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/04-pages/038_page-1_open.png",
+      "label": "038_page-1_open",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/11-element-lifecycle/040_element-selected.png",
+      "label": "040_element-selected",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/11-element-lifecycle/041_panel-tab-templatestemplatest.png",
+      "label": "panel-tab-templatestemplatest",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/11-element-lifecycle/042_panel-tab-pagespagesp.png",
+      "label": "panel-tab-pagespagesp",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/11-element-lifecycle/043_panel-tab-buildbuilda.png",
+      "label": "panel-tab-buildbuilda",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/11-element-lifecycle/044_panel-tab-mediamedia-libraryj.png",
+      "label": "panel-tab-mediamedia-libraryj",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/11-element-lifecycle/045_panel-tab-globaldesign-systemd.png",
+      "label": "panel-tab-globaldesign-systemd",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/11-element-lifecycle/049_after-selection.png",
+      "label": "049_after-selection",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/12-undo-redo/050_after-undo.png",
+      "label": "050_after-undo",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P5-undo-redo"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/12-undo-redo/051_after-redo.png",
+      "label": "051_after-redo",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P5-undo-redo"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/13-overlays/060_toast-notification.png",
+      "label": "060_toast-notification",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/13-overlays/061_tooltip-btn1.png",
+      "label": "tooltip-btn-1",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/13-overlays/062_tooltip-btn2.png",
+      "label": "tooltip-btn-2",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/13-overlays/063_tooltip-btn3.png",
+      "label": "tooltip-btn-3",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/13-overlays/064_tooltip-btn4.png",
+      "label": "tooltip-btn-4",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/13-overlays/065_tooltip-btn5.png",
+      "label": "tooltip-btn-5",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/14-scroll/070_panel1-top.png",
+      "label": "panel1-scroll-top",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P7-scroll"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/14-scroll/071_panel1-mid.png",
+      "label": "panel1-scroll-mid",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P7-scroll"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/14-scroll/072_panel1-bottom.png",
+      "label": "panel1-scroll-bottom",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P7-scroll"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/15-special-states/080_focus-first.png",
+      "label": "080_focus-first",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P8-special"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/15-special-states/081_focus-second.png",
+      "label": "081_focus-second",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P8-special"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/15-special-states/082_empty-state.png",
+      "label": "082_empty-state",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P8-special"
+    },
+    {
+      "file": "latest-screenshots/mobile-390x844/15-special-states/083_full-viewport.png",
+      "label": "083_full-viewport",
+      "result": "OK",
+      "viewport": "mobile-390x844",
+      "phase": "P8-special"
+    }
+  ]
+}

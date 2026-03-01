@@ -106,6 +106,13 @@ export const MEDIA_EVENTS = {
 export type MediaEventName = (typeof MEDIA_EVENTS)[keyof typeof MEDIA_EVENTS];
 
 // ============================================
+// Storage Quota
+// ============================================
+
+/** Total storage quota per user — single source of truth */
+export const STORAGE_QUOTA_BYTES = 1_073_741_824; // 1 GB
+
+// ============================================
 // Default Values
 // ============================================
 

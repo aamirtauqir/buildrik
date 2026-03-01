@@ -13,6 +13,12 @@ import { Z_LAYERS } from "../../../shared/constants/canvas";
 import { getBoxModel, getElementInfo } from "../utils/elementInfo";
 import type { BoxModel, ElementInfo } from "../utils/elementInfo";
 import { DragHandle } from "./DragHandle";
+import {
+  MarginBoxes,
+  PaddingBoxes,
+  InfoBadge,
+  TextEditHint,
+} from "./ElementHoverOverlaySubComponents";
 import { SpacingLabels } from "./SpacingLabels";
 
 // =============================================================================
@@ -32,6 +38,8 @@ export interface ElementHoverOverlayProps {
   inspectorEnabled?: boolean;
   /** Parent hierarchy for Alt+Hover display */
   parentHierarchy?: Array<{ id: string; type: string; label: string }>;
+  /** Ctrl/Cmd held — signals that drag will clone instead of move */
+  isCloneMode?: boolean;
 }
 
 // =============================================================================
@@ -55,6 +63,9 @@ const COLORS = {
   hierarchyBg: "rgba(30, 30, 46, 0.95)",
   hierarchyText: "var(--aqb-text-secondary)",
   hierarchyCurrent: "var(--aqb-primary-light)",
+
+  // Clone mode badge background
+  cloneMode: "var(--aqb-success, #22c55e)",
 };
 
 // =============================================================================
@@ -86,6 +97,7 @@ const ElementHoverOverlayComponent: React.FC<ElementHoverOverlayProps> = ({
   shiftHeld = false,
   inspectorEnabled = false,
   parentHierarchy = [],
+  isCloneMode = false,
 }) => {
   const [overlayData, setOverlayData] = React.useState<{
     rect: DOMRect;
@@ -147,7 +159,12 @@ const ElementHoverOverlayComponent: React.FC<ElementHoverOverlayProps> = ({
     >
       {/* Level 1: Minimal - Dashed outline + tiny label */}
       {hoverLevel === "minimal" && (
-        <MinimalOverlay rect={rect} info={info} hoveredElementId={hoveredElementId} />
+        <MinimalOverlay
+          rect={rect}
+          info={info}
+          hoveredElementId={hoveredElementId}
+          isCloneMode={isCloneMode}
+        />
       )}
 
       {/* Level 3: Hierarchy - Show parent chain */}
@@ -157,6 +174,7 @@ const ElementHoverOverlayComponent: React.FC<ElementHoverOverlayProps> = ({
           info={info}
           parentHierarchy={parentHierarchy}
           hoveredElementId={hoveredElementId}
+          isCloneMode={isCloneMode}
         />
       )}
 
@@ -167,6 +185,7 @@ const ElementHoverOverlayComponent: React.FC<ElementHoverOverlayProps> = ({
           boxModel={boxModel}
           info={info}
           hoveredElementId={hoveredElementId}
+          isCloneMode={isCloneMode}
         />
       )}
     </div>
@@ -181,9 +200,15 @@ interface MinimalOverlayProps {
   rect: DOMRect;
   info: ElementInfo;
   hoveredElementId: string | null;
+  isCloneMode: boolean;
 }
 
-const MinimalOverlay: React.FC<MinimalOverlayProps> = ({ rect, info, hoveredElementId }) => (
+const MinimalOverlay: React.FC<MinimalOverlayProps> = ({
+  rect,
+  info,
+  hoveredElementId,
+  isCloneMode,
+}) => (
   <>
     {/* Dashed outline */}
     <div
@@ -221,6 +246,9 @@ const MinimalOverlay: React.FC<MinimalOverlayProps> = ({ rect, info, hoveredElem
 
     {/* Small drag handle (4x4) */}
     <DragHandle rect={rect} elementId={hoveredElementId || ""} size="small" />
+
+    {/* Clone mode badge — visible when Ctrl/Cmd held, signals Ctrl/Cmd+drag will clone */}
+    {isCloneMode && <CloneBadge rect={rect} />}
   </>
 );
 
@@ -233,6 +261,7 @@ interface HierarchyOverlayProps {
   info: ElementInfo;
   parentHierarchy: Array<{ id: string; type: string; label: string }>;
   hoveredElementId: string | null;
+  isCloneMode: boolean;
 }
 
 const HierarchyOverlay: React.FC<HierarchyOverlayProps> = ({
@@ -240,6 +269,7 @@ const HierarchyOverlay: React.FC<HierarchyOverlayProps> = ({
   info,
   parentHierarchy,
   hoveredElementId,
+  isCloneMode,
 }) => (
   <>
     {/* Solid outline */}
@@ -304,6 +334,9 @@ const HierarchyOverlay: React.FC<HierarchyOverlayProps> = ({
 
     {/* Drag handle */}
     <DragHandle rect={rect} elementId={hoveredElementId || ""} />
+
+    {/* Clone mode badge */}
+    {isCloneMode && <CloneBadge rect={rect} />}
   </>
 );
 
@@ -316,6 +349,7 @@ interface BoxModelOverlayProps {
   boxModel: BoxModel;
   info: ElementInfo;
   hoveredElementId: string | null;
+  isCloneMode: boolean;
 }
 
 const BoxModelOverlay: React.FC<BoxModelOverlayProps> = ({
@@ -323,16 +357,17 @@ const BoxModelOverlay: React.FC<BoxModelOverlayProps> = ({
   boxModel,
   info,
   hoveredElementId,
+  isCloneMode,
 }) => {
   const { margin, padding } = boxModel;
 
   return (
     <>
       {/* Margin boxes (orange) */}
-      <MarginBoxes rect={rect} margin={margin} />
+      <MarginBoxes rect={rect} margin={margin} colors={COLORS} />
 
       {/* Padding boxes (green) */}
-      <PaddingBoxes rect={rect} padding={padding} />
+      <PaddingBoxes rect={rect} padding={padding} colors={COLORS} />
 
       {/* Content area (blue) */}
       <div
@@ -360,7 +395,7 @@ const BoxModelOverlay: React.FC<BoxModelOverlayProps> = ({
       />
 
       {/* Full info badge */}
-      <InfoBadge rect={rect} info={info} />
+      <InfoBadge rect={rect} info={info} colors={COLORS} />
 
       {/* Drag handle */}
       <DragHandle rect={rect} elementId={hoveredElementId || ""} />
@@ -369,215 +404,43 @@ const BoxModelOverlay: React.FC<BoxModelOverlayProps> = ({
       <SpacingLabels rect={rect} margin={margin} padding={padding} />
 
       {/* Double-click hint for text */}
-      {info.isTextElement && <TextEditHint rect={rect} />}
+      {info.isTextElement && <TextEditHint rect={rect} colors={COLORS} />}
+
+      {/* Clone mode badge */}
+      {isCloneMode && <CloneBadge rect={rect} />}
     </>
   );
 };
 
-// =============================================================================
-// SUB-COMPONENTS
-// =============================================================================
-
-const MarginBoxes: React.FC<{ rect: DOMRect; margin: BoxModel["margin"] }> = ({ rect, margin }) => {
-  if (margin.top === 0 && margin.right === 0 && margin.bottom === 0 && margin.left === 0) {
-    return null;
-  }
-
-  return (
-    <>
-      {margin.top > 0 && (
-        <div
-          style={{
-            position: "absolute",
-            left: rect.left - margin.left,
-            top: rect.top - margin.top,
-            width: rect.width + margin.left + margin.right,
-            height: margin.top,
-            background: COLORS.margin,
-          }}
-        />
-      )}
-      {margin.right > 0 && (
-        <div
-          style={{
-            position: "absolute",
-            left: rect.left + rect.width,
-            top: rect.top,
-            width: margin.right,
-            height: rect.height,
-            background: COLORS.margin,
-          }}
-        />
-      )}
-      {margin.bottom > 0 && (
-        <div
-          style={{
-            position: "absolute",
-            left: rect.left - margin.left,
-            top: rect.top + rect.height,
-            width: rect.width + margin.left + margin.right,
-            height: margin.bottom,
-            background: COLORS.margin,
-          }}
-        />
-      )}
-      {margin.left > 0 && (
-        <div
-          style={{
-            position: "absolute",
-            left: rect.left - margin.left,
-            top: rect.top,
-            width: margin.left,
-            height: rect.height,
-            background: COLORS.margin,
-          }}
-        />
-      )}
-    </>
-  );
-};
-
-const PaddingBoxes: React.FC<{ rect: DOMRect; padding: BoxModel["padding"] }> = ({
-  rect,
-  padding,
-}) => {
-  if (padding.top === 0 && padding.right === 0 && padding.bottom === 0 && padding.left === 0) {
-    return null;
-  }
-
-  return (
-    <>
-      {padding.top > 0 && (
-        <div
-          style={{
-            position: "absolute",
-            left: rect.left,
-            top: rect.top,
-            width: rect.width,
-            height: padding.top,
-            background: COLORS.padding,
-          }}
-        />
-      )}
-      {padding.right > 0 && (
-        <div
-          style={{
-            position: "absolute",
-            left: rect.left + rect.width - padding.right,
-            top: rect.top + padding.top,
-            width: padding.right,
-            height: Math.max(0, rect.height - padding.top - padding.bottom),
-            background: COLORS.padding,
-          }}
-        />
-      )}
-      {padding.bottom > 0 && (
-        <div
-          style={{
-            position: "absolute",
-            left: rect.left,
-            top: rect.top + rect.height - padding.bottom,
-            width: rect.width,
-            height: padding.bottom,
-            background: COLORS.padding,
-          }}
-        />
-      )}
-      {padding.left > 0 && (
-        <div
-          style={{
-            position: "absolute",
-            left: rect.left,
-            top: rect.top + padding.top,
-            width: padding.left,
-            height: Math.max(0, rect.height - padding.top - padding.bottom),
-            background: COLORS.padding,
-          }}
-        />
-      )}
-    </>
-  );
-};
-
-const InfoBadge: React.FC<{ rect: DOMRect; info: ElementInfo }> = ({ rect, info }) => (
+/**
+ * CloneBadge — small "⊕" pill rendered at the top-right corner of the
+ * hovered element's bounding box when Ctrl/Cmd is held (clone mode).
+ * Signals that the upcoming drag will clone the element rather than move it.
+ */
+const CloneBadge: React.FC<{ rect: DOMRect }> = ({ rect }) => (
   <div
+    data-testid="clone-badge"
+    aria-label="Clone mode"
     style={{
       position: "absolute",
-      left: rect.left,
-      top: rect.top - (info.parentName ? 38 : 22),
-      background: "#3b3b3b",
-      color: "white",
-      padding: "4px 8px",
-      borderRadius: 4,
+      top: rect.top - 9,
+      left: rect.left + rect.width - 9,
+      width: 18,
+      height: 18,
+      background: COLORS.cloneMode,
+      color: "var(--aqb-text-on-color, #ffffff)",
+      borderRadius: "50%",
       fontSize: 11,
+      fontWeight: 700,
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      whiteSpace: "nowrap",
       display: "flex",
-      flexDirection: "column",
-      gap: 2,
-      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1,
+      userSelect: "none",
     }}
   >
-    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-      <span style={{ color: COLORS.hierarchyCurrent, fontWeight: 600 }}>{info.friendlyName}</span>
-      {info.hasLink && (
-        <span style={{ fontSize: 10 }} title="Has link">
-          🔗
-        </span>
-      )}
-      {info.hasCMSBinding && (
-        <span style={{ fontSize: 10 }} title="CMS bound">
-          📊
-        </span>
-      )}
-      {info.isFlexContainer && (
-        <span
-          style={{
-            background: "var(--aqb-primary)",
-            padding: "0 4px",
-            borderRadius: 2,
-            fontSize: 9,
-          }}
-        >
-          flex{info.flexDirection === "column" ? "↓" : "→"}
-        </span>
-      )}
-      {info.isGridContainer && (
-        <span style={{ background: "#ec4899", padding: "0 4px", borderRadius: 2, fontSize: 9 }}>
-          grid
-        </span>
-      )}
-    </div>
-    <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 10 }}>
-      {info.parentName && <span style={{ color: "#6c7086" }}>in {info.parentName}</span>}
-      <span style={{ color: "#a5f3fc", fontFamily: "monospace" }}>
-        {info.dimensions.width} × {info.dimensions.height}
-      </span>
-      {info.classes.length > 0 && info.classes[0] && (
-        <span style={{ color: "#f9e2af", opacity: 0.8 }}>.{info.classes[0]}</span>
-      )}
-    </div>
-  </div>
-);
-
-const TextEditHint: React.FC<{ rect: DOMRect }> = ({ rect }) => (
-  <div
-    style={{
-      position: "absolute",
-      left: rect.left + rect.width - 4,
-      top: rect.top + rect.height + 4,
-      transform: "translateX(-100%)",
-      background: COLORS.outline,
-      color: COLORS.labelText,
-      padding: "3px 8px",
-      borderRadius: 4,
-      fontSize: 10,
-      fontWeight: 500,
-      whiteSpace: "nowrap",
-      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
-    }}
-  >
-    Double-click to edit
+    ⊕
   </div>
 );
 

@@ -1,10 +1,11 @@
 /**
- * Export screen — L1: format selection UI, download coming soon
- * Real export API not yet available; shows format options and a clear status.
+ * Export screen
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import type { ExportFormat } from "../../../../../shared/types/export";
+import { FEATURE_FLAGS } from "../constants";
 import { Section } from "../shared";
 import {
   screenStyles,
@@ -13,8 +14,7 @@ import {
   activeExportOptionStyles,
   noteStyles,
 } from "../styles";
-
-type ExportFormat = "html" | "react" | "vue" | "nextjs";
+import { LockedScreen } from "./LockedScreen";
 
 interface FormatOption {
   id: ExportFormat;
@@ -30,40 +30,28 @@ const FORMAT_OPTIONS: FormatOption[] = [
   { id: "nextjs", emoji: "▲", label: "Next.js", hint: "Next.js 14" },
 ];
 
-const optionLabelStyles: React.CSSProperties = {
-  marginTop: 8,
-  fontSize: 11,
-  fontWeight: 600,
-  color: "var(--aqb-text-primary)",
-};
-
-const optionHintStyles: React.CSSProperties = {
-  marginTop: 2,
-  fontSize: 10,
-  color: "var(--aqb-text-muted)",
-  textAlign: "center",
-};
-
-const comingSoonStyles: React.CSSProperties = {
-  marginTop: 4,
-  padding: "10px 12px",
-  background: "rgba(245,158,11,0.12)",
-  borderRadius: 6,
-  fontSize: 11,
-  color: "var(--aqb-warning, #f59e0b)",
-  lineHeight: 1.4,
-  textAlign: "center",
-};
-
 export const ExportScreen: React.FC = () => {
   const [selectedFormat, setSelectedFormat] = React.useState<ExportFormat>("html");
-  const [showDownloadNotice, setShowDownloadNotice] = React.useState(false);
-
-  const handleDownload = () => {
-    setShowDownloadNotice(true);
-  };
 
   const selectedOption = FORMAT_OPTIONS.find((f) => f.id === selectedFormat);
+
+  const handleDownload = () => {
+    // TODO: implement download API when FEATURE_FLAGS.export = true
+  };
+
+  if (!FEATURE_FLAGS.export) {
+    return (
+      <LockedScreen
+        variant="coming-soon"
+        title="Export Code"
+        message="Download your site as clean HTML, React, Vue, or Next.js — ready to host anywhere you like."
+        waitlistLabel="Get notified when code export launches →"
+        onWaitlist={() => {
+          // TODO: integrate with waitlist when available
+        }}
+      />
+    );
+  }
 
   return (
     <div style={screenStyles}>
@@ -76,10 +64,7 @@ export const ExportScreen: React.FC = () => {
                 ...exportOptionStyles,
                 ...(selectedFormat === fmt.id ? activeExportOptionStyles : {}),
               }}
-              onClick={() => {
-                setSelectedFormat(fmt.id);
-                setShowDownloadNotice(false);
-              }}
+              onClick={() => setSelectedFormat(fmt.id)}
               aria-pressed={selectedFormat === fmt.id}
               title={fmt.hint}
             >
@@ -99,18 +84,26 @@ export const ExportScreen: React.FC = () => {
         >
           ⬇ Download as {selectedOption?.label} (ZIP)
         </button>
-        {showDownloadNotice && (
-          <div style={comingSoonStyles}>
-            {selectedOption?.label} export is coming soon. Publish your site to get a shareable link
-            in the meantime.
-          </div>
-        )}
         <div style={noteStyles}>
           💡 Export generates clean, production-ready code you can host anywhere.
         </div>
       </Section>
     </div>
   );
+};
+
+const optionLabelStyles: React.CSSProperties = {
+  marginTop: 8,
+  fontSize: 11,
+  fontWeight: 600,
+  color: "var(--aqb-text-primary)",
+};
+
+const optionHintStyles: React.CSSProperties = {
+  marginTop: 2,
+  fontSize: 10,
+  color: "var(--aqb-text-muted)",
+  textAlign: "center",
 };
 
 const downloadBtnStyles: React.CSSProperties = {

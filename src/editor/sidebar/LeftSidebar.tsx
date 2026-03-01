@@ -22,7 +22,6 @@ import type { BlockData } from "../../shared/types";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
 import { TabRouter } from "./TabRouter";
-import type { TemplateItem } from "./tabs/templates";
 import { useSidebarKeyboard } from "./useSidebarKeyboard";
 import { useSidebarState } from "./useSidebarState";
 
@@ -45,8 +44,6 @@ export interface LeftSidebarProps {
     projectName?: string;
   }>;
   canvasHoveredId?: string | null;
-  onTemplateSelect?: (template: TemplateItem | null) => void;
-  selectedTemplateId?: string | null;
   /** @deprecated No longer used — LeftRail handles icons */
   showIconRail?: boolean;
   /** Use minimal styles when parent handles layout (e.g. LayoutShell) */
@@ -65,8 +62,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   isPanelPinned: controlledPinned,
   onPanelPinnedChange,
   canvasHoveredId,
-  onTemplateSelect,
-  selectedTemplateId,
   useMinimalContainer = false,
 }) => {
   // State: tab selection, expand/collapse, pin, persistence
@@ -139,8 +134,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   commonTabProps={commonTabProps}
                   onBlockClick={onBlockClick}
                   onElementSelect={onElementSelect}
-                  onTemplateSelect={onTemplateSelect}
-                  selectedTemplateId={selectedTemplateId}
                   canvasHoveredId={canvasHoveredId}
                   onSwitchToAdd={() => state.handlePrimaryTabChange("add")}
                   onCreateComponent={handleCreateComponent}

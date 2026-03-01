@@ -25,6 +25,8 @@ export interface SettingsTabProps {
 
 export interface ScreenProps {
   composer: Composer | null;
+  /** Called when the screen's unsaved-changes state changes — used by shell to show nav guard */
+  onDirtyChange?: (isDirty: boolean) => void;
 }
 
 // ============================================
@@ -50,7 +52,7 @@ export const CARD_CATEGORIES: Record<string, SettingsCategory[]> = {
   "version-history": ["project"],
 };
 
-export const SCREEN_PLAN_REQUIREMENTS: Record<string, PlanTier> = {
+export const SCREEN_PLAN_REQUIREMENTS: Record<string, "pro" | "enterprise"> = {
   advanced: "pro",
   integrations: "pro",
 };

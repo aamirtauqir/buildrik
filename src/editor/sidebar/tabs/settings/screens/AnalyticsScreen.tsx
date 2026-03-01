@@ -1,5 +1,5 @@
 /**
- * Analytics screen (L1→L2: Wired to project settings)
+ * Analytics screen (L2: Wired to project settings)
  * @license BSD-3-Clause
  */
 
@@ -16,33 +16,16 @@ import {
 } from "../styles";
 import type { ScreenProps } from "../types";
 
-export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
-  // Load initial values from project settings
-  const initialSettings = React.useMemo(() => {
-    if (!composer)
-      return {
-        gaId: "",
-        gaEnabled: false,
-        metaPixelId: "",
-        metaPixelEnabled: false,
-        cookieBanner: true,
-      };
-    const settings = composer.getProjectSettings();
-    const analytics = settings.analytics ?? {};
-    return {
-      gaId: analytics.googleAnalytics?.measurementId ?? "",
-      gaEnabled: analytics.googleAnalytics?.enabled ?? false,
-      metaPixelId: analytics.facebookPixel?.pixelId ?? "",
-      metaPixelEnabled: analytics.facebookPixel?.enabled ?? false,
-      cookieBanner: analytics.cookieConsent?.enabled ?? true,
-    };
-  }, [composer]);
+// GA4 measurement ID: exactly G- followed by 10 alphanumeric characters (EC-05)
+const GA_ID_REGEX = /^G-[A-Z0-9]{10}$/i;
 
-  const [gaId, setGaId] = React.useState(initialSettings.gaId);
-  const [gaEnabled, setGaEnabled] = React.useState(initialSettings.gaEnabled);
-  const [metaPixelId, setMetaPixelId] = React.useState(initialSettings.metaPixelId);
-  const [metaPixelEnabled, setMetaPixelEnabled] = React.useState(initialSettings.metaPixelEnabled);
-  const [cookieBanner, setCookieBanner] = React.useState(initialSettings.cookieBanner);
+export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) => {
+  // Simple defaults — loadSettings populates on mount via useEffect (removes double-init)
+  const [gaId, setGaId] = React.useState("");
+  const [gaEnabled, setGaEnabled] = React.useState(false);
+  const [metaPixelId, setMetaPixelId] = React.useState("");
+  const [metaPixelEnabled, setMetaPixelEnabled] = React.useState(false);
+  const [cookieBanner, setCookieBanner] = React.useState(true);
   const [hasChanges, setHasChanges] = React.useState(false);
 
   // Load settings from project
@@ -57,6 +40,11 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
     setCookieBanner(analytics.cookieConsent?.enabled ?? true);
     setHasChanges(false);
   }, [composer]);
+
+  // Notify shell of dirty state for nav guard
+  React.useEffect(() => {
+    onDirtyChange?.(hasChanges);
+  }, [hasChanges, onDirtyChange]);
 
   // Re-sync on mount and when project loads
   React.useEffect(() => {
@@ -73,8 +61,10 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
   }, [composer, loadSettings]);
 
   // Validation
-  const isValidGA = !gaId || /^G-[A-Z0-9]{8,}$/i.test(gaId);
-  const isValidPixel = !metaPixelId || /^\d{15,16}$/.test(metaPixelId);
+  const gaError = gaId && !GA_ID_REGEX.test(gaId);
+  const pixelError = metaPixelId && !/^\d{15,16}$/.test(metaPixelId);
+  const isValidGA = !gaError;
+  const isValidPixel = !pixelError;
 
   const handleSave = () => {
     if (!composer) return;
@@ -101,8 +91,12 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
   return (
     <div style={screenStyles}>
       <Section title="Google Analytics">
-        <Field label="Measurement ID" hint="Format: G-XXXXXXXXXX">
+        <Field
+          label="Google Analytics ID"
+          hint="Find this in Google Analytics → Admin → Data Streams → your stream → Measurement ID"
+        >
           <input
+            id="ga-measurement-id"
             type="text"
             value={gaId}
             onChange={(e) => {
@@ -110,9 +104,19 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
               setHasChanges(true);
             }}
             placeholder="G-XXXXXXXXXX"
-            style={{ ...inputStyles, borderColor: !isValidGA ? "var(--aqb-error)" : undefined }}
+            style={{ ...inputStyles, borderColor: gaError ? "var(--aqb-error)" : undefined }}
+            aria-describedby={gaError ? "ga-error" : "ga-hint"}
+            aria-invalid={!!gaError}
           />
-          {!isValidGA && <span style={errorHintStyles}>Invalid format. Use G-XXXXXXXXXX</span>}
+          <span id="ga-hint" style={hintTextStyles}>
+            Find this in Google Analytics → Admin → Data Streams → your stream → Measurement ID
+          </span>
+          {gaError && (
+            <span id="ga-error" role="alert" style={errorHintStyles}>
+              This doesn&apos;t look right. Your Google Analytics ID should start with G- followed
+              by 10 characters, like G-ABCD123456.
+            </span>
+          )}
         </Field>
         <ToggleControlled
           label="Enable Google Analytics"
@@ -122,14 +126,20 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
             setHasChanges(true);
           }}
         />
-        {gaEnabled && gaId && (
-          <div style={successNoteStyles}>✓ Will be injected into exported HTML</div>
+        {gaEnabled && gaId && isValidGA && (
+          <div style={successNoteStyles}>
+            ✓ Tracking will be added to your published site automatically
+          </div>
         )}
       </Section>
 
       <Section title="Meta Pixel">
-        <Field label="Pixel ID" hint="15-16 digit number">
+        <Field
+          label="Meta (Facebook) Pixel ID"
+          hint="15–16 digit number from your Meta Events Manager"
+        >
           <input
+            id="meta-pixel-id"
             type="text"
             value={metaPixelId}
             onChange={(e) => {
@@ -137,9 +147,18 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
               setHasChanges(true);
             }}
             placeholder="1234567890123456"
-            style={{ ...inputStyles, borderColor: !isValidPixel ? "var(--aqb-error)" : undefined }}
+            style={{ ...inputStyles, borderColor: pixelError ? "var(--aqb-error)" : undefined }}
+            aria-describedby={pixelError ? "pixel-error" : "pixel-hint"}
+            aria-invalid={!!pixelError}
           />
-          {!isValidPixel && <span style={errorHintStyles}>Invalid format. Use 15-16 digits</span>}
+          <span id="pixel-hint" style={hintTextStyles}>
+            Find this in Meta Events Manager → your Pixel → Pixel ID
+          </span>
+          {pixelError && (
+            <span id="pixel-error" role="alert" style={errorHintStyles}>
+              Pixel IDs are 15 or 16 digits. Check your Meta Events Manager for the correct ID.
+            </span>
+          )}
         </Field>
         <ToggleControlled
           label="Enable Meta Pixel"
@@ -149,8 +168,10 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
             setHasChanges(true);
           }}
         />
-        {metaPixelEnabled && metaPixelId && (
-          <div style={successNoteStyles}>✓ Will be injected into exported HTML</div>
+        {metaPixelEnabled && metaPixelId && isValidPixel && (
+          <div style={successNoteStyles}>
+            ✓ Tracking will be added to your published site automatically
+          </div>
         )}
       </Section>
 
@@ -163,7 +184,10 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
             setHasChanges(true);
           }}
         />
-        <div style={noteStyles}>💡 GDPR compliant cookie consent banner</div>
+        <div style={noteStyles}>
+          💡 Displays a banner asking visitors to accept cookies before tracking begins. Required in
+          the EU (GDPR) and recommended everywhere else.
+        </div>
       </Section>
 
       <StickyFooter
@@ -174,4 +198,12 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
       />
     </div>
   );
+};
+
+const hintTextStyles: React.CSSProperties = {
+  display: "block",
+  fontSize: 11,
+  color: "var(--aqb-text-muted)",
+  marginTop: 4,
+  lineHeight: 1.4,
 };

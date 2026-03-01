@@ -7,6 +7,7 @@
  * @license BSD-3-Clause
  */
 
+import { Trash2 } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../engine";
 import { isValidBreakpoint } from "../../shared/constants/breakpoints";
@@ -14,20 +15,23 @@ import type { DeviceType } from "../../shared/types";
 import type { BreakpointId } from "../../shared/types/breakpoints";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
 import { getElementIcon } from "../../shared/ui/Icons";
-import { Modal } from "../../shared/ui/Modal";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
+import { BreakpointIndicator } from "./components/BreakpointIndicator";
+import { DeleteConfirmModal } from "./components/DeleteConfirmModal";
 import { ElementBreadcrumb } from "./components/ElementBreadcrumb";
 import { InspectorControls } from "./components/InspectorControls";
 import { InspectorEmptyState } from "./components/InspectorEmptyState";
 import { InspectorErrorBoundary } from "./components/InspectorErrorBoundary";
+import { InspectorSubNav } from "./components/InspectorSubNav";
 import { MultiSelectToolbar } from "./components/MultiSelectToolbar";
+import { PseudoStateSelector } from "./components/PseudoStateSelector";
 import { useInspectorState, useStyleHandlers, useInspectorSections, TOTAL_SECTIONS } from "./hooks";
 import { KeyboardHintsSection } from "./sections/KeyboardHintsSection";
 import { VariantSection } from "./sections/VariantSection";
 // AISuggestionSection moved to SettingsTab only (IA Redesign 2026 - Task 0.10)
 import { deriveCssContext, getPropertyStates } from "./shared/cssContext";
 import { DevModeToggle } from "./shared/DevModeToggle";
-import { panelStyles, renderPseudoStateSelector, renderBreakpointIndicator } from "./styles";
+import { panelStyles } from "./styles";
 import { LayoutTab, DesignTab, SettingsTab } from "./tabs";
 
 // ============================================================================
@@ -96,6 +100,24 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     overriddenProperties,
   } = useStyleHandlers(selectedElement, composer, currentBreakpoint, currentPseudoState);
 
+  // Detect which pseudo-states have at least one overridden style
+  const statesWithOverrides = React.useMemo<Set<import("../../shared/types").PseudoStateId>>(
+    () => {
+      if (!selectedElement?.id || !composer?.styles) return new Set();
+      const pseudoStates = ["hover", "focus", "active", "disabled"] as const;
+      const withOverrides = new Set<import("../../shared/types").PseudoStateId>();
+      pseudoStates.forEach((state) => {
+        const rule = composer.styles.getRule(`[data-aqb-id="${selectedElement.id}"]:${state}`);
+        if (rule && Object.keys(rule.properties ?? {}).length > 0) {
+          withOverrides.add(state);
+        }
+      });
+      return withOverrides;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedElement?.id, composer, styles_state]
+  );
+
   // Section expand/collapse — extracted to useInspectorSections
   const { expandedSections, expandedCount, collapseAll, expandAll } = useInspectorSections({
     selectedElement,
@@ -112,6 +134,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
 
   // P0 Fix: Delete confirmation modal
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
+  const [idCopied, setIdCopied] = React.useState(false);
 
   // Multi-select detection via same hook as Canvas (proven to work)
   const { selectedIds, isMultiSelect } = useComposerSelection({ composer: composer ?? null });
@@ -217,11 +240,48 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           </div>
           <div>
             <div style={panelStyles.elementName}>{elementLabel}</div>
-            <div style={panelStyles.elementId}>
-              #{selectedElement.id.slice(-8)}
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(`#${selectedElement.id}`);
+                    setIdCopied(true);
+                    setTimeout(() => setIdCopied(false), 1500);
+                  } catch {
+                    // clipboard API not available — silently skip
+                  }
+                }}
+                aria-label="Copy element ID"
+                title={idCopied ? "Copied!" : "Click to copy element ID"}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: 0,
+                  fontFamily: "var(--aqb-font-mono)",
+                  fontSize: "var(--aqb-text-sm)",
+                  color: idCopied ? "var(--aqb-success)" : "var(--aqb-text-tertiary)",
+                  transition: "color 0.2s",
+                }}
+              >
+                #{selectedElement.id.slice(-8)}
+              </button>
               {selectedElement.tagName && (
                 <span style={panelStyles.tagBadge}>
                   &lt;{selectedElement.tagName.toLowerCase()}&gt;
+                </span>
+              )}
+              {idCopied && (
+                <span
+                  aria-live="polite"
+                  style={{
+                    fontSize: 9,
+                    color: "var(--aqb-success)",
+                    fontWeight: 600,
+                  }}
+                >
+                  Copied!
                 </span>
               )}
             </div>
@@ -235,68 +295,28 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             title="Delete element"
             aria-label="Delete selected element"
           >
-            🗑️
+            <Trash2 size={14} aria-hidden="true" />
           </button>
         )}
 
         {/* P0 Fix: Delete Confirmation Modal */}
-        <Modal
+        <DeleteConfirmModal
           isOpen={showDeleteConfirm}
           onClose={() => setShowDeleteConfirm(false)}
-          title="Delete Element?"
-          size="sm"
-        >
-          <div style={{ padding: "var(--aqb-space-4)" }}>
-            <p
-              style={{
-                margin: "0 0 var(--aqb-space-4)",
-                color: "var(--aqb-text-secondary)",
-                fontSize: "var(--aqb-text-md)",
-                lineHeight: 1.5,
-              }}
-            >
-              Are you sure you want to delete <strong>{elementLabel}</strong>? This action cannot be
-              undone.
-            </p>
-            <div style={{ display: "flex", gap: "var(--aqb-space-3)", justifyContent: "flex-end" }}>
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                style={{
-                  padding: "8px 16px",
-                  background: "var(--aqb-surface-4)",
-                  border: "1px solid var(--aqb-border)",
-                  borderRadius: "var(--aqb-radius-md)",
-                  color: "var(--aqb-text-primary)",
-                  cursor: "pointer",
-                  fontWeight: 500,
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  onDelete?.(selectedElement.id);
-                  setShowDeleteConfirm(false);
-                }}
-                style={{
-                  padding: "8px 16px",
-                  background: "var(--aqb-error)",
-                  border: "none",
-                  borderRadius: "var(--aqb-radius-md)",
-                  color: "white",
-                  cursor: "pointer",
-                  fontWeight: 600,
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </Modal>
+          onConfirm={() => {
+            onDelete?.(selectedElement.id);
+            setShowDeleteConfirm(false);
+          }}
+          elementLabel={elementLabel}
+        />
 
         <ElementBreadcrumb selectedElement={selectedElement} composer={composer} />
-        {renderBreakpointIndicator(currentBreakpoint)}
-        {renderPseudoStateSelector(currentPseudoState, setCurrentPseudoState)}
+        <BreakpointIndicator currentBreakpoint={currentBreakpoint} />
+        <PseudoStateSelector
+          currentPseudoState={currentPseudoState}
+          onChange={setCurrentPseudoState}
+          statesWithOverrides={statesWithOverrides}
+        />
       </div>
 
       {/* Phase 7: Inspector Controls - Search, Collapse/Expand, Dev Mode */}
@@ -322,22 +342,52 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         <DevModeToggle enabled={devMode} onToggle={setDevMode} />
       </div>
 
-      {/* Tabs - Layout / Design / Settings */}
-      <div style={panelStyles.tabs}>
+      {/* Tabs - Layout / Design / Settings (C-01 fix: role="tablist") */}
+      <div
+        role="tablist"
+        aria-label="Inspector sections"
+        style={panelStyles.tabs}
+        onKeyDown={(e) => {
+          const tabIds = ["layout", "design", "settings"] as const;
+          const tabButtons = (e.currentTarget as HTMLDivElement).querySelectorAll('[role="tab"]');
+          const focusedIndex = Array.from(tabButtons).indexOf(e.target as HTMLButtonElement);
+          if (focusedIndex === -1) return;
+          if (e.key === "ArrowRight") {
+            e.preventDefault();
+            const nextIndex = (focusedIndex + 1) % tabIds.length;
+            setActiveTab(tabIds[nextIndex]);
+            (tabButtons[nextIndex] as HTMLButtonElement)?.focus();
+          } else if (e.key === "ArrowLeft") {
+            e.preventDefault();
+            const prevIndex = (focusedIndex - 1 + tabIds.length) % tabIds.length;
+            setActiveTab(tabIds[prevIndex]);
+            (tabButtons[prevIndex] as HTMLButtonElement)?.focus();
+          }
+        }}
+      >
         {(["layout", "design", "settings"] as const).map((tab) => {
-          const sectionCounts = { layout: 6, design: 6, settings: 6 };
+          // Badge shows count of sections available in each tab (not hardcoded)
+          const sectionCounts = {
+            layout: 7, // Display, Size, Position, Spacing, Flexbox, Grid, Visibility
+            design: 6, // Typography, Background, Border, Effects, Animation, Interactions
+            settings: 3, // Properties, Link, Classes (+ conditional Form, AI, CSS)
+          };
           return (
             <button
               key={tab}
+              role="tab"
+              id={`inspector-tab-${tab}`}
+              aria-selected={activeTab === tab}
+              aria-controls={`inspector-tabpanel-${tab}`}
+              tabIndex={activeTab === tab ? 0 : -1}
               style={panelStyles.tab(activeTab === tab)}
               onClick={() => setActiveTab(tab)}
-              aria-pressed={activeTab === tab}
               aria-label={
                 tab === "layout"
-                  ? "Layout & Size tab - Position, Display, Spacing, Flexbox, Grid"
+                  ? "Layout & Size tab — Position, Display, Spacing, Flexbox, Grid"
                   : tab === "design"
-                    ? "Style tab - Typography, Colors, Background, Border, Effects"
-                    : "Advanced tab - Element Properties, Bindings, Interactions"
+                    ? "Style tab — Typography, Colors, Background, Border, Effects"
+                    : "Advanced tab — Element Properties, Bindings, Interactions"
               }
             >
               <span>
@@ -363,25 +413,17 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         })}
       </div>
 
-      {/* Section summary for current tab */}
-      <div
-        style={{
-          padding: "6px 12px",
-          fontSize: 10,
-          color: "var(--aqb-text-tertiary)",
-          borderBottom: "1px solid var(--aqb-border-subtle)",
-          background: "var(--aqb-surface-2)",
-        }}
-      >
-        {activeTab === "layout" && "Position • Display • Spacing • Flexbox • Grid • Visibility"}
-        {activeTab === "design" &&
-          "Typography • Background • Border • Effects • Animation • Interactions"}
-        {activeTab === "settings" &&
-          "Properties • Navigation • Form • Classes • CSS • AI Suggestions"}
-      </div>
+      {/* Sub-nav — clickable section jump links (H-02 fix) */}
+      <InspectorSubNav activeTab={activeTab} contentRef={contentRef} />
 
       {/* Content */}
-      <div ref={contentRef} style={panelStyles.content}>
+      <div
+        ref={contentRef}
+        role="tabpanel"
+        id={`inspector-tabpanel-${activeTab}`}
+        aria-labelledby={`inspector-tab-${activeTab}`}
+        style={panelStyles.content}
+      >
         <InspectorErrorBoundary>
           {activeTab === "layout" && (
             <>

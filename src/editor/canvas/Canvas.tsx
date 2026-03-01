@@ -42,6 +42,7 @@ import {
   useCanvasToolbarActions,
   useCanvasInlineCommands,
   useCanvasSize,
+  useSelectionAnnouncement,
 } from "./hooks";
 import type { DropError, DropSuccess } from "./hooks/useCanvasDragDrop";
 import { ElementContextMenu } from "./menus";
@@ -252,15 +253,21 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     const { handleKeyDown } = useCanvasKeyboard({
       composer,
       selectedId,
+      selectedIds,
       editingId: editing.id,
       select,
       clear,
       syncFromComposer,
       addToast,
+      onOpenContextMenu: (elementId, position) => {
+        // elementStack omitted: keyboard target is unambiguous (selectedId),
+        // unlike right-click where multiple elements may overlap
+        setContextMenu({ x: position.x, y: position.y, elementId });
+      },
     });
 
-    // Content with selection states
-    const { displayContent } = useCanvasContent({ composer, content, selectedId, dropTargetId });
+    // Content with CMS bindings resolved — selection/drop highlighting handled by overlay layer
+    const { displayContent } = useCanvasContent({ composer, content });
 
     // Empty canvas CTA overlay state
     const [emptyDismissed, setEmptyDismissed] = React.useState(false);
@@ -299,6 +306,9 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     React.useEffect(() => {
       closeContextMenu();
     }, [selectedId, closeContextMenu]);
+
+    // ── Aria-live selection announcements (WCAG 4.1.3) ──────────────────────
+    const liveAnnouncement = useSelectionAnnouncement({ composer, selectedId, selectedIds });
 
     // Canvas click handler - wraps selection behavior with focus management
     const handleCanvasClick = React.useCallback(
@@ -465,10 +475,20 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         )}
 
         {/* Command Palette (Cmd+Shift+P) */}
-        <CommandPalette isOpen={isPaletteOpen} onClose={closePalette} commands={commands} />
+        <CommandPalette
+          isOpen={isPaletteOpen}
+          onClose={closePalette}
+          commands={commands}
+          selectedId={selectedId}
+        />
 
         {/* Keyboard Cheat Sheet ('?' key) */}
         <KeyboardCheatSheet isOpen={isCheatSheetOpen} onClose={closeCheatSheet} />
+
+        {/* Aria-live region for selection announcements (WCAG 4.1.3 — always in DOM) */}
+        <div aria-live="polite" aria-atomic="true" className="aqb-sr-only">
+          {liveAnnouncement}
+        </div>
       </div>
     );
   }
