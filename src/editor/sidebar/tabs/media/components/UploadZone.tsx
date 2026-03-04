@@ -98,7 +98,7 @@ export function UploadZone({ storage, onUpload, uploadQueue, disabled = false }:
           {storageLabel}
           <span style={{ opacity: 0.6, marginLeft: 4 }}>(Free plan)</span>
         </span>
-        {isNearFull && !isFull && (
+        {isNearFull && (
           <a
             href="#upgrade"
             onClick={(e) => e.preventDefault()}
