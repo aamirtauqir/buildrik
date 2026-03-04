@@ -5,6 +5,7 @@
 
 import * as React from "react";
 import type { CustomCodeConfig } from "../../../../../shared/types/project";
+import { validateHtml, type HtmlValidationResult } from "../../../../../shared/utils/validateHtml";
 import { StickyFooter } from "../../../shared/StickyFooter";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { Section } from "../shared";
@@ -28,6 +29,19 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
   const [bodyCode, setBodyCode] = React.useState(savedCode.bodyScripts);
   const [cssCode, setCssCode] = React.useState(savedCode.globalCss);
   const [isDirty, setIsDirty] = React.useState(false);
+  const [headValidation, setHeadValidation] = React.useState<HtmlValidationResult | null>(null);
+
+  // Debounced validation for head code
+  React.useEffect(() => {
+    if (!headCode.trim()) {
+      setHeadValidation(null);
+      return;
+    }
+    const timer = setTimeout(() => {
+      setHeadValidation(validateHtml(headCode));
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [headCode]);
 
   // Sync local state when savedCode loads from composer
   React.useEffect(() => {
@@ -64,9 +78,23 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
             setIsDirty(true);
           }}
           aria-label="Head Scripts"
+          aria-describedby="head-validation-feedback"
           placeholder={"<script>...</script>\n<link>...</link>"}
           style={{ ...inputStyles, minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
         />
+        {headValidation && (
+          <div id="head-validation-feedback" role="status" aria-live="polite" style={validationContainerStyles}>
+            {headValidation.errors.map((err, i) => (
+              <div key={`e${i}`} style={validationErrorStyles}>✗ {err}</div>
+            ))}
+            {headValidation.warnings.map((warn, i) => (
+              <div key={`w${i}`} style={validationWarningStyles}>⚠ {warn}</div>
+            ))}
+            {headValidation.valid && headValidation.warnings.length === 0 && (
+              <div style={validationSuccessStyles}>✓ HTML looks good</div>
+            )}
+          </div>
+        )}
       </Section>
 
       <Section title="Body Scripts (End)">
@@ -100,4 +128,25 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
       <StickyFooter primaryLabel="Save" onPrimary={handleSave} hasChanges={isDirty} />
     </div>
   );
+};
+
+const validationContainerStyles: React.CSSProperties = {
+  marginTop: 8,
+  fontSize: 12,
+  lineHeight: 1.5,
+};
+
+const validationErrorStyles: React.CSSProperties = {
+  color: "#EF4444",
+  padding: "2px 0",
+};
+
+const validationWarningStyles: React.CSSProperties = {
+  color: "#F59E0B",
+  padding: "2px 0",
+};
+
+const validationSuccessStyles: React.CSSProperties = {
+  color: "#22C55E",
+  padding: "2px 0",
 };
