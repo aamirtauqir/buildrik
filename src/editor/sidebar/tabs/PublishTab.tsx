@@ -371,6 +371,18 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </div>
         )}
       </div>
+
+      {/* Privacy & Terms footer */}
+      <div style={privacyFooterStyles}>
+        By publishing, your site is hosted on Buildrik servers.{" "}
+        <a href="https://buildrik.com/privacy" target="_blank" rel="noopener noreferrer" style={privacyLinkStyles}>
+          Privacy policy
+        </a>
+        {" · "}
+        <a href="https://buildrik.com/terms" target="_blank" rel="noopener noreferrer" style={privacyLinkStyles}>
+          Terms of service
+        </a>
+      </div>
     </div>
   );
 };
@@ -547,6 +559,20 @@ const errorDismissStyles: React.CSSProperties = {
   color: "inherit",
   cursor: "pointer",
   flexShrink: 0,
+};
+
+const privacyFooterStyles: React.CSSProperties = {
+  padding: "10px 16px",
+  borderTop: "1px solid var(--aqb-border)",
+  fontSize: 12,
+  lineHeight: 1.5,
+  color: "var(--aqb-text-muted)",
+  textAlign: "center",
+};
+
+const privacyLinkStyles: React.CSSProperties = {
+  color: "var(--aqb-primary, #3b82f6)",
+  textDecoration: "none",
 };
 
 export default PublishTab;
