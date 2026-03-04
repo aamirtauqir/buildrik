@@ -36,6 +36,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
   const [editingPageId, setEditingPageId] = React.useState<string | null>(null);
   const [editName, setEditName] = React.useState("");
   const [deleteConfirmPageId, setDeleteConfirmPageId] = React.useState<string | null>(null);
+  const [dirtyPages, setDirtyPages] = React.useState<Set<string>>(new Set());
   const { addToast } = useToast();
 
   /** Generate URL slug from page name */
@@ -77,6 +78,31 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
     evs.forEach((ev) => composer.on(ev as string, syncPages));
     return () => {
       evs.forEach((ev) => composer.off(ev as string, syncPages));
+    };
+  }, [composer]);
+
+  // Track dirty (unsaved) pages — mark active page dirty on element changes, clear on save
+  React.useEffect(() => {
+    if (!composer) return;
+    const markDirty = () => {
+      const active = composer.elements.getActivePage();
+      if (active) {
+        setDirtyPages((prev) => {
+          if (prev.has(active.id)) return prev;
+          const next = new Set(prev);
+          next.add(active.id);
+          return next;
+        });
+      }
+    };
+    const clearDirty = () => setDirtyPages(new Set());
+    composer.on(EVENTS.ELEMENT_UPDATED, markDirty);
+    composer.on(EVENTS.ELEMENT_DELETED, markDirty);
+    composer.on(EVENTS.PROJECT_SAVED, clearDirty);
+    return () => {
+      composer.off(EVENTS.ELEMENT_UPDATED, markDirty);
+      composer.off(EVENTS.ELEMENT_DELETED, markDirty);
+      composer.off(EVENTS.PROJECT_SAVED, clearDirty);
     };
   }, [composer]);
 
@@ -204,7 +230,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
               role="tab"
               tabIndex={page.id === activePageId ? 0 : -1}
               aria-selected={page.id === activePageId}
-              aria-label={`${page.name}${page.isHome ? ", Homepage" : ""}`}
+              aria-label={`${page.name}${page.isHome ? ", Homepage" : ""}${dirtyPages.has(page.id) ? ", unsaved changes" : ""}`}
               onClick={() => handleTabClick(page.id)}
               onContextMenu={(e) => handleContextMenu(e, page.id)}
               onKeyDown={(e) => {
@@ -298,6 +324,9 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
                 </span>
               ) : (
                 <span style={tabNameStyles}>{page.name}</span>
+              )}
+              {dirtyPages.has(page.id) && (
+                <span style={dirtyDotStyles} aria-hidden="true" title="Unsaved changes" />
               )}
             </div>
           ))}
@@ -445,6 +474,14 @@ const tabNameStyles: React.CSSProperties = {
   overflow: "hidden",
   textOverflow: "ellipsis",
   verticalAlign: "middle",
+};
+
+const dirtyDotStyles: React.CSSProperties = {
+  width: 6,
+  height: 6,
+  borderRadius: "50%",
+  background: "var(--aqb-primary, #3b82f6)",
+  flexShrink: 0,
 };
 
 const inputStyles: React.CSSProperties = {
