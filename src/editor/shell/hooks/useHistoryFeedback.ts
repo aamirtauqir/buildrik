@@ -39,6 +39,14 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   paste: "Pasted element",
 };
 
+/** Labels that represent destructive operations where undo is especially useful */
+const DESTRUCTIVE_LABELS = new Set([
+  "delete-element",
+  "context-delete",
+  "cut-element",
+  "batch-style",
+]);
+
 export function useHistoryFeedback(
   composer: Composer | null,
   addToast: (params: {
@@ -46,6 +54,7 @@ export function useHistoryFeedback(
     message: string;
     variant: "info" | "success" | "warning" | "error";
     duration?: number;
+    action?: { label: string; onClick: () => void };
   }) => void
 ) {
   React.useEffect(() => {
@@ -85,21 +94,29 @@ export function useHistoryFeedback(
 
     const handleUndo = (data: { entry: { label?: string } }) => {
       const action = formatLabel(data.entry.label);
+      const isDestructive = DESTRUCTIVE_LABELS.has(data.entry.label?.toLowerCase() ?? "");
       addToast({
         title: "↩ Undo",
         message: action,
         variant: "info",
-        duration: 2500,
+        duration: isDestructive ? 4000 : 2500,
+        ...(isDestructive && {
+          action: { label: "Redo", onClick: () => composer.history.redo() },
+        }),
       });
     };
 
     const handleRedo = (data: { entry: { label?: string } }) => {
       const action = formatLabel(data.entry.label);
+      const isDestructive = DESTRUCTIVE_LABELS.has(data.entry.label?.toLowerCase() ?? "");
       addToast({
         title: "↪ Redo",
         message: action,
         variant: "info",
-        duration: 2500,
+        duration: isDestructive ? 4000 : 2500,
+        ...(isDestructive && {
+          action: { label: "Undo", onClick: () => composer.history.undo() },
+        }),
       });
     };
 
