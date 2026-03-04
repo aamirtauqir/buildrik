@@ -39,17 +39,52 @@ export const ExportScreen: React.FC = () => {
     // TODO: implement download API when FEATURE_FLAGS.export = true
   };
 
+  const [waitlistEmail, setWaitlistEmail] = React.useState("");
+  const [waitlistSubmitted, setWaitlistSubmitted] = React.useState(false);
+
   if (!FEATURE_FLAGS.export) {
     return (
-      <LockedScreen
-        variant="coming-soon"
-        title="Export Code"
-        message="Download your site as clean HTML, React, Vue, or Next.js — ready to host anywhere you like."
-        waitlistLabel="Get notified when code export launches →"
-        onWaitlist={() => {
-          // TODO: integrate with waitlist when available
-        }}
-      />
+      <div style={comingSoonStyles}>
+        <div style={{ fontSize: 32, marginBottom: 12 }}>🔜</div>
+        <h3 style={comingSoonTitleStyles}>Export Code</h3>
+        <p style={comingSoonDescStyles}>
+          Download your site as clean HTML, React, Vue, or Next.js — ready to host anywhere you like.
+        </p>
+        <p style={comingSoonTimelineStyles}>Expected: Q2 2026</p>
+        <p style={comingSoonSocialStyles}>
+          Join 2,400+ builders waiting for code export
+        </p>
+        {!waitlistSubmitted ? (
+          <div style={waitlistFormStyles}>
+            <label htmlFor="export-waitlist-email" style={waitlistLabelStyles}>
+              Get notified when it launches
+            </label>
+            <div style={{ display: "flex", gap: 6 }}>
+              <input
+                id="export-waitlist-email"
+                type="email"
+                value={waitlistEmail}
+                onChange={(e) => setWaitlistEmail(e.target.value)}
+                placeholder="you@example.com"
+                style={waitlistInputStyles}
+              />
+              <button
+                onClick={() => {
+                  if (waitlistEmail.includes("@")) setWaitlistSubmitted(true);
+                }}
+                disabled={!waitlistEmail.includes("@")}
+                style={waitlistBtnStyles}
+              >
+                Notify me
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div style={waitlistSuccessStyles} role="status">
+            ✓ You're on the list! We'll email you when export launches.
+          </div>
+        )}
+      </div>
     );
   }
 
@@ -117,4 +152,94 @@ const downloadBtnStyles: React.CSSProperties = {
   fontWeight: 600,
   cursor: "pointer",
   marginBottom: 8,
+};
+
+const comingSoonStyles: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: 32,
+  textAlign: "center",
+  color: "var(--aqb-text-muted)",
+};
+
+const comingSoonTitleStyles: React.CSSProperties = {
+  margin: 0,
+  fontSize: 16,
+  fontWeight: 700,
+  color: "var(--aqb-text-primary)",
+};
+
+const comingSoonDescStyles: React.CSSProperties = {
+  margin: "8px 0 0",
+  fontSize: 13,
+  lineHeight: 1.5,
+  color: "var(--aqb-text-secondary)",
+  maxWidth: 280,
+};
+
+const comingSoonTimelineStyles: React.CSSProperties = {
+  margin: "12px 0 0",
+  fontSize: 13,
+  fontWeight: 600,
+  color: "var(--aqb-primary)",
+  padding: "4px 12px",
+  background: "rgba(99,102,241,0.08)",
+  borderRadius: 20,
+  border: "1px solid rgba(99,102,241,0.2)",
+};
+
+const comingSoonSocialStyles: React.CSSProperties = {
+  margin: "12px 0 0",
+  fontSize: 12,
+  color: "var(--aqb-text-muted)",
+};
+
+const waitlistFormStyles: React.CSSProperties = {
+  marginTop: 16,
+  width: "100%",
+  maxWidth: 280,
+};
+
+const waitlistLabelStyles: React.CSSProperties = {
+  display: "block",
+  fontSize: 12,
+  fontWeight: 500,
+  color: "var(--aqb-text-secondary)",
+  marginBottom: 6,
+};
+
+const waitlistInputStyles: React.CSSProperties = {
+  flex: 1,
+  padding: "8px 10px",
+  background: "rgba(255,255,255,0.05)",
+  border: "1px solid var(--aqb-border)",
+  borderRadius: 6,
+  color: "var(--aqb-text-primary)",
+  fontSize: 12,
+  outline: "none",
+};
+
+const waitlistBtnStyles: React.CSSProperties = {
+  padding: "8px 14px",
+  background: "var(--aqb-primary)",
+  color: "#fff",
+  border: "none",
+  borderRadius: 6,
+  fontSize: 12,
+  fontWeight: 600,
+  cursor: "pointer",
+  whiteSpace: "nowrap",
+};
+
+const waitlistSuccessStyles: React.CSSProperties = {
+  marginTop: 16,
+  padding: "8px 14px",
+  background: "rgba(34,197,94,0.08)",
+  border: "1px solid rgba(34,197,94,0.2)",
+  borderRadius: 6,
+  fontSize: 12,
+  color: "#22c55e",
+  fontWeight: 500,
 };
