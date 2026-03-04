@@ -257,6 +257,10 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         modals.setShowShortcuts(false);
         modals.setShowAI(false);
       }
+      if (e.key === "?" && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        modals.setShowShortcuts(true);
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
