@@ -123,9 +123,10 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
       </Section>
 
       <Section title="Social Links">
-        <Field label="Twitter">
+        <Field label="Twitter" htmlFor="social-twitter">
           <input
-            type="text"
+            id="social-twitter"
+            type="url"
             value={twitter}
             onChange={(e) => {
               setTwitter(e.target.value);
@@ -135,9 +136,10 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
             style={inputStyles}
           />
         </Field>
-        <Field label="Facebook">
+        <Field label="Facebook" htmlFor="social-facebook">
           <input
-            type="text"
+            id="social-facebook"
+            type="url"
             value={facebook}
             onChange={(e) => {
               setFacebook(e.target.value);
@@ -147,9 +149,10 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
             style={inputStyles}
           />
         </Field>
-        <Field label="LinkedIn">
+        <Field label="LinkedIn" htmlFor="social-linkedin">
           <input
-            type="text"
+            id="social-linkedin"
+            type="url"
             value={linkedin}
             onChange={(e) => {
               setLinkedin(e.target.value);

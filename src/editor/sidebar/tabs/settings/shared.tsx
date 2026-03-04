@@ -42,12 +42,13 @@ export const Section: React.FC<SectionProps> = ({ title, children }) => (
 interface FieldProps {
   label: string;
   hint?: string;
+  htmlFor?: string;
   children: React.ReactNode;
 }
 
-export const Field: React.FC<FieldProps> = ({ label, hint, children }) => (
+export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, children }) => (
   <div style={fieldStyles}>
-    <label style={labelStyles}>
+    <label style={labelStyles} htmlFor={htmlFor}>
       {label}
       {hint && <span style={hintStyles}>{hint}</span>}
     </label>
