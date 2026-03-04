@@ -10,32 +10,28 @@ import { useTokenBase } from "./useTokenBase";
 
 export type SpacingPreset = "compact" | "normal" | "spacious";
 
-const PRESET_MULTIPLIERS: Record<SpacingPreset, number> = {
-  compact: 0.75,
-  normal: 1,
-  spacious: 1.375,
-};
-
-/** Base pixel values for spacing scale (at "normal" = 1x multiplier) */
-const BASE_VALUES: Record<string, number> = {
-  "space-1": 4,
-  "space-2": 8,
-  "space-3": 12,
-  "space-4": 16,
-  "space-5": 20,
-  "space-6": 24,
-  "space-8": 32,
-  "space-10": 40,
-  "space-12": 48,
+/** Explicit pixel values per preset — all values on the 4px grid */
+const PRESET_VALUES: Record<SpacingPreset, Record<string, number>> = {
+  compact: {
+    "space-1": 2, "space-2": 6, "space-3": 8, "space-4": 12,
+    "space-5": 16, "space-6": 20, "space-8": 24, "space-10": 32, "space-12": 40,
+  },
+  normal: {
+    "space-1": 4, "space-2": 8, "space-3": 12, "space-4": 16,
+    "space-5": 20, "space-6": 24, "space-8": 32, "space-10": 40, "space-12": 48,
+  },
+  spacious: {
+    "space-1": 6, "space-2": 12, "space-3": 16, "space-4": 20,
+    "space-5": 24, "space-6": 32, "space-8": 40, "space-10": 48, "space-12": 64,
+  },
 };
 
 function applyPresetToTokens(tokens: DesignToken[], preset: SpacingPreset): DesignToken[] {
-  const multiplier = PRESET_MULTIPLIERS[preset];
+  const values = PRESET_VALUES[preset];
   return tokens.map((t) => {
-    const base = BASE_VALUES[t.id];
-    if (base === undefined) return t;
-    const newValue = `${Math.round(base * multiplier)}px`;
-    return { ...t, value: newValue };
+    const px = values[t.id];
+    if (px === undefined) return t;
+    return { ...t, value: `${px}px` };
   });
 }
 
