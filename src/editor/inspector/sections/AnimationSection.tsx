@@ -78,7 +78,7 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
     enabled && localAnimation.type ? (
       <span
         style={{
-          fontSize: 9,
+          fontSize: 12,
           color: "var(--aqb-text-tertiary)",
           fontFamily: "var(--aqb-font-mono)",
         }}
@@ -127,7 +127,7 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
             border: "none",
             borderRadius: 6,
             color: enabled ? "#0073E6" : "#a1a1aa",
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: 600,
             cursor: "pointer",
             transition: "all 0.15s",
@@ -154,7 +154,7 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
               background: "rgba(0, 0, 0, 0.2)",
               borderRadius: 8,
               fontFamily: "var(--aqb-font-mono, 'Fira Code', monospace)",
-              fontSize: 10,
+              fontSize: 12,
               color: "#71717a",
               wordBreak: "break-all",
             }}
@@ -173,7 +173,7 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
             background: "rgba(245, 158, 11, 0.08)",
             border: "1px solid rgba(245, 158, 11, 0.2)",
             borderRadius: 8,
-            fontSize: 11,
+            fontSize: 12,
             color: "#f59e0b",
             lineHeight: 1.5,
           }}

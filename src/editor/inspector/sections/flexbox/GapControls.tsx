@@ -43,7 +43,7 @@ export const GapControls: React.FC<GapControlsProps> = ({
   >
     <div
       style={{
-        fontSize: 10,
+        fontSize: 12,
         color: INSPECTOR_TOKENS.textTertiary,
         marginBottom: 8,
       }}
@@ -69,7 +69,7 @@ export const GapControls: React.FC<GapControlsProps> = ({
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
         <span
           style={{
-            fontSize: 9,
+            fontSize: 12,
             color: INSPECTOR_TOKENS.textMuted,
             width: 24,
           }}
@@ -87,7 +87,7 @@ export const GapControls: React.FC<GapControlsProps> = ({
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
         <span
           style={{
-            fontSize: 9,
+            fontSize: 12,
             color: INSPECTOR_TOKENS.textMuted,
             width: 24,
           }}

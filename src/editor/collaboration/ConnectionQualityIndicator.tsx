@@ -31,7 +31,7 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 4,
     backgroundColor: "var(--aqb-bg-panel-secondary)",
     cursor: "default",
-    fontSize: 11,
+    fontSize: 12,
   },
   dot: {
     width: 8,

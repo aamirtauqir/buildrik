@@ -38,7 +38,7 @@ const styles = {
     gap: 6,
   },
   propertyLabel: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: 500,
     color: "var(--aqb-text-secondary)",
     textTransform: "uppercase" as const,
@@ -86,7 +86,7 @@ const styles = {
     color: "var(--aqb-text-primary)",
   },
   hint: {
-    fontSize: 10,
+    fontSize: 12,
     color: "var(--aqb-text-muted)",
     padding: "8px 0 0",
     borderTop: "1px solid var(--aqb-border)",

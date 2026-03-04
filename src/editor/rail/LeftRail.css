@@ -181,7 +181,7 @@
    Label — v16: 9px, no opacity hack
    ============================================ */
 .left-rail__label {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   text-align: center;
   line-height: 1;
@@ -259,7 +259,7 @@
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 5px;
   padding: 2px 6px;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--rail-text-hover, #7c88a0);
   font-family: var(--aqb-font-mono, 'JetBrains Mono', monospace);
 }
@@ -393,7 +393,7 @@
 }
 
 .left-rail__footer-label {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1;
 }

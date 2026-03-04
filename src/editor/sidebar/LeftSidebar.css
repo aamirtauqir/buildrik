@@ -2891,7 +2891,7 @@
   border-radius: 6px;
   background: rgba(99, 102, 241, 0.9);
   color: #fff;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   opacity: 0;
@@ -4498,7 +4498,7 @@
 }
 
 .tmpl-preview__count {
-  font-size: 11px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.4);
 }
 
@@ -4517,7 +4517,7 @@
   border-radius: 4px;
   background: transparent;
   color: rgba(255, 255, 255, 0.4);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
@@ -4752,7 +4752,7 @@
 
 /* Step label */
 .tmpl-progress__label {
-  font-size: 11px;
+  font-size: 12px;
   color: #a1a5b3;
 }
 
@@ -4790,7 +4790,7 @@
 }
 
 .tmpl-applied-banner__name {
-  font-size: 11px;
+  font-size: 12px;
   color: rgba(74, 222, 128, 0.7);
   margin-bottom: 8px;
 }
@@ -4805,7 +4805,7 @@
   display: block;
   width: 100%;
   padding: 5px 8px;
-  font-size: 11px;
+  font-size: 12px;
   font-family: inherit;
   color: #a5b4fc;
   background: rgba(99, 102, 241, 0.08);
@@ -4964,7 +4964,7 @@
 
 /* Tooltip header */
 .tmpl-onboarding__header {
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   color: rgba(124, 109, 250, 0.7);
   text-transform: uppercase;
@@ -4974,7 +4974,7 @@
 
 /* Tooltip body */
 .tmpl-onboarding__body {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.5;
   color: #c7cad6;
   margin: 0 0 10px;
@@ -4989,7 +4989,7 @@
 }
 
 .tmpl-onboarding__skip {
-  font-size: 10px;
+  font-size: 12px;
   font-family: inherit;
   color: rgba(255, 255, 255, 0.3);
   background: none;
@@ -5019,7 +5019,7 @@
 }
 
 .tmpl-onboarding__next {
-  font-size: 10px;
+  font-size: 12px;
   font-family: inherit;
   font-weight: 600;
   color: #a5b4fc;
@@ -5057,7 +5057,7 @@
 }
 
 .tmpl-error-banner__desc {
-  font-size: 11px;
+  font-size: 12px;
   color: rgba(248, 113, 113, 0.7);
   margin-bottom: 8px;
   line-height: 1.4;
@@ -5071,7 +5071,7 @@
 .tmpl-error-banner__retry {
   flex: 1;
   padding: 5px 8px;
-  font-size: 11px;
+  font-size: 12px;
   font-family: inherit;
   font-weight: 600;
   color: #fff;
@@ -5088,7 +5088,7 @@
 
 .tmpl-error-banner__dismiss {
   padding: 5px 8px;
-  font-size: 11px;
+  font-size: 12px;
   font-family: inherit;
   color: rgba(255, 255, 255, 0.4);
   background: none;
@@ -5142,7 +5142,7 @@
 }
 
 .tmpl-pro-modal__desc {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.5;
   color: #8b90a3;
   margin: 0 0 16px;
@@ -5175,7 +5175,7 @@
 .tmpl-pro-modal__cancel {
   width: 100%;
   padding: 6px 12px;
-  font-size: 11px;
+  font-size: 12px;
   font-family: inherit;
   color: rgba(255, 255, 255, 0.4);
   background: none;

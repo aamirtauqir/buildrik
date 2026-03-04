@@ -78,7 +78,7 @@ const styles = {
     border: "none",
     borderRadius: 4,
     color: "#89b4fa",
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: "monospace",
     cursor: "pointer",
     transition: "all 0.15s ease",
@@ -94,13 +94,13 @@ const styles = {
   },
   separator: {
     color: "rgba(255, 255, 255, 0.3)",
-    fontSize: 10,
+    fontSize: 12,
     userSelect: "none" as const,
   },
   emptyState: {
     padding: "8px 12px",
     color: "#6c7086",
-    fontSize: 11,
+    fontSize: 12,
     fontStyle: "italic" as const,
   },
   showInLayersBtn: {
@@ -112,7 +112,7 @@ const styles = {
     border: "1px solid rgba(137, 180, 250, 0.3)",
     borderRadius: 6,
     color: "#89b4fa",
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: 500,
     cursor: "pointer",
     transition: "all 0.15s ease",

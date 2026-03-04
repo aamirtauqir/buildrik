@@ -78,7 +78,7 @@ const styles = {
     justifyContent: "center",
   },
   sectionCount: {
-    fontSize: 10,
+    fontSize: 12,
     color: "#6c7086",
     whiteSpace: "nowrap" as const,
   },
@@ -88,7 +88,7 @@ const styles = {
     border: "1px solid rgba(255, 255, 255, 0.1)",
     borderRadius: 4,
     color: "#6c7086",
-    fontSize: 11,
+    fontSize: 12,
     cursor: "pointer",
     transition: "all 0.15s",
     display: "flex",

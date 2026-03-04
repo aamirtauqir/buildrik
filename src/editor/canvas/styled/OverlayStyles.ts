@@ -37,7 +37,7 @@ export const InfoBadge = styled.div<{ variant?: "primary" | "secondary" }>`
     props.variant === "secondary" ? colors.surface.background : colors.primary.default};
   border-radius: ${radius.md}px;
   color: ${colors.text.onPrimary};
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
   box-shadow: ${shadows.badge};
@@ -169,7 +169,7 @@ export const ParentHighlightBadge = styled.div`
   padding: 2px ${spacing.md}px;
   background: ${colors.primary.alpha15};
   border-radius: ${radius.sm}px;
-  font-size: 10px;
+  font-size: 12px;
   color: rgba(139, 92, 246, 0.8);
   font-weight: 500;
   white-space: nowrap;
@@ -261,7 +261,7 @@ export const BreadcrumbSeparator = styled.span`
 export const BreadcrumbHint = styled.div`
   display: flex;
   gap: ${spacing.lg}px;
-  font-size: 10px;
+  font-size: 12px;
   color: ${colors.text.muted};
   white-space: nowrap;
 `;

@@ -118,7 +118,7 @@ export const panelStyles = {
     padding: "2px 6px",
     background: "var(--aqb-primary-light)",
     borderRadius: 4,
-    fontSize: 9,
+    fontSize: 12,
     color: "var(--aqb-primary)",
   },
   tabs: {

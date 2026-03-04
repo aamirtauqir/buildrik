@@ -85,7 +85,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
     <Section title="CSS Classes" icon="Tag" defaultOpen id="inspector-section-css-classes">
       {/* Applied Classes */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 10, color: "var(--aqb-text-tertiary)", marginBottom: 8 }}>
+        <div style={{ fontSize: 12, color: "var(--aqb-text-tertiary)", marginBottom: 8 }}>
           Applied Classes
         </div>
         <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 6 }}>
@@ -98,7 +98,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
                   background: "rgba(0,115,230,0.15)",
                   border: "1px solid rgba(0,115,230,0.3)",
                   borderRadius: 6,
-                  fontSize: 11,
+                  fontSize: 12,
                   color: "#0073E6",
                   display: "flex",
                   alignItems: "center",
@@ -125,7 +125,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
               </span>
             ))
           ) : (
-            <span style={{ fontSize: 11, color: "var(--aqb-text-tertiary)", fontStyle: "italic" }}>
+            <span style={{ fontSize: 12, color: "var(--aqb-text-tertiary)", fontStyle: "italic" }}>
               No classes applied yet
             </span>
           )}
@@ -219,7 +219,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
                   border: "none",
                   borderBottom: "1px solid var(--aqb-border-subtle)",
                   color: "var(--aqb-text-primary)",
-                  fontSize: 11,
+                  fontSize: 12,
                   textAlign: "left" as const,
                   cursor: "pointer",
                 }}

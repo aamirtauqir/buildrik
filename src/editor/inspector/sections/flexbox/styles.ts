@@ -17,7 +17,7 @@ export const visualBtn = (active: boolean): React.CSSProperties => ({
     : `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
   borderRadius: 6,
   color: active ? INSPECTOR_TOKENS.accent : INSPECTOR_TOKENS.textMuted,
-  fontSize: 9,
+  fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
   transition: "all 0.15s",

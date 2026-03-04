@@ -190,7 +190,7 @@ const actionsStyles: React.CSSProperties = {
 };
 
 const chevronStyles: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 12,
   color: "var(--aqb-text-tertiary, rgba(255,255,255,0.5))",
 };
 
@@ -245,7 +245,7 @@ const stepLabelStyles: React.CSSProperties = {
 };
 
 const stepDescStyles: React.CSSProperties = {
-  fontSize: 11,
+  fontSize: 12,
   color: "var(--aqb-text-tertiary, rgba(255,255,255,0.5))",
   lineHeight: 1.4,
 };

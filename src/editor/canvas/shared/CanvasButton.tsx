@@ -21,7 +21,7 @@ export interface CanvasButtonProps extends React.ButtonHTMLAttributes<HTMLButton
 }
 
 const SIZE_STYLES: Record<string, React.CSSProperties> = {
-  sm: { padding: "4px 8px", fontSize: 11 },
+  sm: { padding: "4px 8px", fontSize: 12 },
   md: { padding: "6px 10px", fontSize: 12 },
   lg: { padding: "8px 14px", fontSize: 13 },
 };

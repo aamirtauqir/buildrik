@@ -19,7 +19,7 @@ export const styles = {
   } as React.CSSProperties,
 
   sectionTitle: {
-    fontSize: 11,
+    fontSize: 12,
     color: INSPECTOR_TOKENS.textTertiary,
     fontWeight: 500,
     marginBottom: 12,
@@ -42,7 +42,7 @@ export const styles = {
   } as React.CSSProperties,
 
   iconHint: {
-    fontSize: 10,
+    fontSize: 12,
     color: INSPECTOR_TOKENS.textMuted,
     marginTop: 6,
     textAlign: "center" as const,
@@ -56,7 +56,7 @@ export const styles = {
   } as React.CSSProperties,
 
   checkboxLabel: {
-    fontSize: 11,
+    fontSize: 12,
     color: INSPECTOR_TOKENS.textTertiary,
     fontWeight: 500,
     minWidth: 70,
@@ -70,7 +70,7 @@ export const styles = {
   } as React.CSSProperties,
 
   checkboxText: {
-    fontSize: 11,
+    fontSize: 12,
     color: INSPECTOR_TOKENS.textPrimary,
   } as React.CSSProperties,
 
@@ -87,7 +87,7 @@ export const styles = {
     border: `1px solid ${INSPECTOR_TOKENS.accentAlpha30}`,
     borderRadius: 6,
     color: INSPECTOR_TOKENS.accent,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: 600,
     cursor: "pointer",
     whiteSpace: "nowrap" as const,

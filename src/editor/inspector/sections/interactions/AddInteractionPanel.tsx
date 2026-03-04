@@ -60,7 +60,7 @@ const styles = {
     marginBottom: 12,
   },
   groupLabel: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: 600,
     textTransform: "uppercase" as const,
     color: INSPECTOR_TOKENS.textMuted,
@@ -80,7 +80,7 @@ const styles = {
     border: "none",
     borderRadius: 6,
     color: INSPECTOR_TOKENS.textSecondary,
-    fontSize: 11,
+    fontSize: 12,
     cursor: "pointer",
     transition: "all 0.15s ease",
   } as React.CSSProperties,

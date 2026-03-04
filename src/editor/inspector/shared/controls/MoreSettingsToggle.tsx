@@ -44,7 +44,7 @@ const toggleStyles = {
     cursor: "pointer",
     transition: "all 0.15s ease",
     color: isOpen ? INSPECTOR_TOKENS.accent : INSPECTOR_TOKENS.textSecondary,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: 500,
   }),
   label: {
@@ -56,11 +56,11 @@ const toggleStyles = {
     background: "rgba(255, 255, 255, 0.06)",
     padding: "2px 6px",
     borderRadius: 4,
-    fontSize: 10,
+    fontSize: 12,
     color: INSPECTOR_TOKENS.textTertiary,
   } as React.CSSProperties,
   chevron: (isOpen: boolean): React.CSSProperties => ({
-    fontSize: 10,
+    fontSize: 12,
     transform: isOpen ? "rotate(90deg)" : "rotate(0)",
     transition: "transform 0.15s ease",
   }),

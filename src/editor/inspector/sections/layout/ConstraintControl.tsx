@@ -51,7 +51,7 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
 
   return (
     <div style={{ marginBottom: 10 }}>
-      <div style={{ fontSize: 10, color: INSPECTOR_TOKENS.textTertiary, marginBottom: 6 }}>
+      <div style={{ fontSize: 12, color: INSPECTOR_TOKENS.textTertiary, marginBottom: 6 }}>
         {label}
       </div>
       <div style={{ display: "flex", gap: 4 }}>
@@ -133,7 +133,7 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
             gap: 4,
           }}
         >
-          <span style={{ fontSize: 9, color: INSPECTOR_TOKENS.textMuted, width: 32 }}>
+          <span style={{ fontSize: 12, color: INSPECTOR_TOKENS.textMuted, width: 32 }}>
             {isWidth ? "W" : "H"}
           </span>
           <input

@@ -398,7 +398,7 @@ export function handleBlockDrop(e: React.DragEvent, ctx: DropContext): boolean {
       const menuItems: ContextMenuItem[] = [1, 2, 3, 4, 5, 6].map((level) => ({
         id: `h${level}`,
         label: `Heading ${level}`,
-        icon: <span style={{ fontSize: 10, fontWeight: 700 }}> H{level} </span>,
+        icon: <span style={{ fontSize: 12, fontWeight: 700 }}> H{level} </span>,
         onClick: () => {
           composer.beginTransaction("insert-heading");
           try {

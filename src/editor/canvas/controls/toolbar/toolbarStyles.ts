@@ -50,7 +50,7 @@ export const nameBtnStyles: React.CSSProperties = {
 };
 
 export const nameTextStyles: React.CSSProperties = {
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 500,
   letterSpacing: "0.2px",
   maxWidth: 100,
@@ -124,7 +124,7 @@ export const menuItemStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
   color: colors.text.secondary,
-  fontSize: 11,
+  fontSize: 12,
   textAlign: "left",
   cursor: "pointer",
   transition: `all ${animation.duration.fast}`,

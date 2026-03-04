@@ -200,7 +200,7 @@ const badgeStyles: React.CSSProperties = {
   padding: "0 6px",
   background: "var(--aqb-surface-4)",
   borderRadius: 10,
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 600,
   color: "var(--aqb-text-secondary)",
 };
@@ -208,7 +208,7 @@ const badgeStyles: React.CSSProperties = {
 const planBadgeStyles: React.CSSProperties = {
   background: "var(--aqb-primary-light, rgba(124, 125, 255, 0.15))",
   color: "var(--aqb-primary)",
-  fontSize: 10,
+  fontSize: 12,
   textTransform: "uppercase",
   letterSpacing: "0.3px",
 };
@@ -216,7 +216,7 @@ const planBadgeStyles: React.CSSProperties = {
 const comingSoonBadgeStyles: React.CSSProperties = {
   background: "#FEF3C7",
   color: "#92400E",
-  fontSize: 10,
+  fontSize: 12,
   textTransform: "uppercase",
   letterSpacing: "0.3px",
 };

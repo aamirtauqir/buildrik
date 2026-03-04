@@ -195,7 +195,7 @@ export const historyEntryLabelStyles: React.CSSProperties = {
 };
 
 export const checkpointBadgeStyles: React.CSSProperties = {
-  fontSize: 9,
+  fontSize: 12,
   padding: "1px 4px",
   background: "rgba(124, 125, 255, 0.15)",
   color: "var(--aqb-primary)",
@@ -205,7 +205,7 @@ export const checkpointBadgeStyles: React.CSSProperties = {
 };
 
 export const historyEntryMetaStyles: React.CSSProperties = {
-  fontSize: 11,
+  fontSize: 12,
   color: "var(--aqb-text-muted)",
   marginTop: 2,
 };
@@ -215,7 +215,7 @@ export const changeCountStyles: React.CSSProperties = {
 };
 
 export const currentIndicatorStyles: React.CSSProperties = {
-  fontSize: 9,
+  fontSize: 12,
   padding: "2px 6px",
   background: "var(--aqb-success, #10b981)",
   color: "#fff",
@@ -240,7 +240,7 @@ export const diffRowStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "baseline",
   gap: 6,
-  fontSize: 11,
+  fontSize: 12,
   fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
   padding: "3px 6px",
   background: "rgba(255, 255, 255, 0.02)",

@@ -83,7 +83,7 @@ export const PointerBadge: React.FC<PointerBadgeProps> = ({
         padding: "2px 8px",
         background: color,
         color: "#fff",
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: 600,
         borderRadius: 4,
         whiteSpace: "nowrap",

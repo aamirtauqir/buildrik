@@ -99,7 +99,7 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: "center" as const,
   },
   statLabel: {
-    fontSize: 10,
+    fontSize: 12,
     color: "var(--aqb-text-muted)",
     textTransform: "uppercase" as const,
     marginBottom: 4,
@@ -130,7 +130,7 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 4,
   },
   previewLabel: {
-    fontSize: 10,
+    fontSize: 12,
     color: "var(--aqb-text-muted)",
     marginTop: 6,
   },

@@ -52,13 +52,13 @@ const styles = {
     color: INSPECTOR_TOKENS.textPrimary,
   },
   type: {
-    fontSize: 11,
+    fontSize: 12,
     color: INSPECTOR_TOKENS.textMuted,
   },
   arrow: (isEditing: boolean): React.CSSProperties => ({
     transform: isEditing ? "rotate(90deg)" : "none",
     color: INSPECTOR_TOKENS.textMuted,
-    fontSize: 10,
+    fontSize: 12,
   }),
 };
 

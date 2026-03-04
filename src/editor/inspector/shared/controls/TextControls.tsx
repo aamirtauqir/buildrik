@@ -34,7 +34,7 @@ export const TextInputRow: React.FC<TextInputRowProps> = ({
         marginBottom: 8,
       }}
     >
-      <span style={{ fontSize: 10, color: "#71717a", minWidth: labelWidth }}>{label}</span>
+      <span style={{ fontSize: 12, color: "#71717a", minWidth: labelWidth }}>{label}</span>
       <input
         type="text"
         value={value}
@@ -47,7 +47,7 @@ export const TextInputRow: React.FC<TextInputRowProps> = ({
           border: "1px solid rgba(255,255,255,0.1)",
           borderRadius: 4,
           color: "#e4e4e7",
-          fontSize: 11,
+          fontSize: 12,
           outline: "none",
         }}
       />
@@ -85,7 +85,7 @@ export const InlineInput: React.FC<InlineInputProps> = ({
     >
       <label
         style={{
-          fontSize: 10,
+          fontSize: 12,
           color: "#71717a",
           fontWeight: 500,
           minWidth: labelWidth,
@@ -105,7 +105,7 @@ export const InlineInput: React.FC<InlineInputProps> = ({
           border: "1px solid rgba(255,255,255,0.1)",
           borderRadius: 4,
           color: "#e4e4e7",
-          fontSize: 10,
+          fontSize: 12,
           outline: "none",
         }}
       />
@@ -126,7 +126,7 @@ export const SectionLabel: React.FC<SectionLabelProps> = ({ children, style }) =
   return (
     <label
       style={{
-        fontSize: 11,
+        fontSize: 12,
         color: "#71717a",
         fontWeight: 500,
         display: "block",
@@ -150,7 +150,7 @@ export interface SubSectionTitleProps {
 export const SubSectionTitle: React.FC<SubSectionTitleProps> = ({ children }) => (
   <div
     style={{
-      fontSize: 9,
+      fontSize: 12,
       color: "#52525b",
       fontWeight: 600,
       marginBottom: 8,

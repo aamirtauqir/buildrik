@@ -22,7 +22,7 @@ export const SidebarErrorFallback: React.FC<{ onRetry: () => void }> = ({ onRetr
   <div style={{ padding: 24, textAlign: "center", color: "var(--aqb-text-secondary)" }}>
     <div style={{ fontSize: 32, marginBottom: 12 }}>!</div>
     <div style={{ fontWeight: 600, marginBottom: 8, fontSize: 13 }}>Something went wrong</div>
-    <div style={{ fontSize: 11, marginBottom: 16, color: "var(--aqb-text-muted)" }}>
+    <div style={{ fontSize: 12, marginBottom: 16, color: "var(--aqb-text-muted)" }}>
       This panel encountered an error. Your work is safe.
     </div>
     <button

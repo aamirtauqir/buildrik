@@ -30,7 +30,7 @@ export const EnableFlexPrompt: React.FC<EnableFlexPromptProps> = ({ onChange }) 
   >
     <div
       style={{
-        fontSize: 10,
+        fontSize: 12,
         color: INSPECTOR_TOKENS.textMuted,
         marginBottom: 6,
       }}
@@ -45,7 +45,7 @@ export const EnableFlexPrompt: React.FC<EnableFlexPromptProps> = ({ onChange }) 
         border: "none",
         borderRadius: 4,
         color: "#fff",
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: 600,
         cursor: "pointer",
       }}

@@ -44,7 +44,7 @@ export const SliderInput: React.FC<SliderInputProps> = ({
       />
       <span
         style={{
-          fontSize: 11,
+          fontSize: 12,
           color: "#71717a",
           minWidth: 40,
           textAlign: "right" as const,
@@ -93,7 +93,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
         marginBottom: 8,
       }}
     >
-      <span style={{ fontSize: 10, color: "#71717a", minWidth: labelWidth }}>{label}</span>
+      <span style={{ fontSize: 12, color: "#71717a", minWidth: labelWidth }}>{label}</span>
       <input
         type="range"
         min={min}
@@ -103,7 +103,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
         onChange={(e) => onChange(Number(e.target.value))}
         style={{ flex: 1 }}
       />
-      <span style={{ fontSize: 10, color: "#71717a", minWidth: valueWidth }}>
+      <span style={{ fontSize: 12, color: "#71717a", minWidth: valueWidth }}>
         {value}
         {unit}
       </span>

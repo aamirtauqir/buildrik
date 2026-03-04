@@ -38,7 +38,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
     <div>
       <div
         style={{
-          fontSize: 10,
+          fontSize: 12,
           color: INSPECTOR_TOKENS.textTertiary,
           marginBottom: 6,
         }}
@@ -59,7 +59,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
       <div style={{ marginBottom: 8 }}>
         <div
           style={{
-            fontSize: 9,
+            fontSize: 12,
             color: INSPECTOR_TOKENS.textMuted,
             marginBottom: 4,
           }}
@@ -95,7 +95,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
       <div>
         <div
           style={{
-            fontSize: 9,
+            fontSize: 12,
             color: INSPECTOR_TOKENS.textMuted,
             marginBottom: 4,
           }}

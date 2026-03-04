@@ -209,7 +209,7 @@ const percentButtonStyles: React.CSSProperties = {
   border: "none",
   borderRadius: "var(--aqb-radius-sm)",
   color: "var(--aqb-text-secondary)",
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
   textAlign: "center",

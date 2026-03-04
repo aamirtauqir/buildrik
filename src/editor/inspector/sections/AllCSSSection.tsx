@@ -40,13 +40,13 @@ const styles = {
   } as React.CSSProperties,
   propertyName: {
     flex: "0 0 100px",
-    fontSize: 11,
+    fontSize: 12,
     color: INSPECTOR_TOKENS.textSecondary,
     fontFamily: "monospace",
   } as React.CSSProperties,
   propertyValue: {
     flex: 1,
-    fontSize: 11,
+    fontSize: 12,
     color: INSPECTOR_TOKENS.textPrimary,
     fontFamily: "monospace",
     background: "rgba(255,255,255,0.03)",
@@ -77,7 +77,7 @@ const styles = {
     borderRadius: 6,
     padding: "8px 10px",
     color: INSPECTOR_TOKENS.textPrimary,
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: "monospace",
   } as React.CSSProperties,
   addBtn: {
@@ -86,7 +86,7 @@ const styles = {
     border: "1px solid rgba(0, 115, 230, 0.3)",
     borderRadius: 6,
     color: "#0073E6",
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: 600,
     cursor: "pointer",
   } as React.CSSProperties,
@@ -99,7 +99,7 @@ const styles = {
     border: "1px solid rgba(234, 179, 8, 0.3)",
     borderRadius: 4,
     color: "#eab308",
-    fontSize: 9,
+    fontSize: 12,
     fontWeight: 600,
     marginLeft: 8,
   } as React.CSSProperties,
@@ -165,7 +165,7 @@ export const AllCSSSection: React.FC<AllCSSSectionProps> = ({ selectedElement, c
     <Section title="All CSS" icon="Code" defaultOpen={false}>
       {/* Existing properties */}
       {cssProperties.length === 0 ? (
-        <div style={{ color: INSPECTOR_TOKENS.textTertiary, fontSize: 11, padding: "8px 0" }}>
+        <div style={{ color: INSPECTOR_TOKENS.textTertiary, fontSize: 12, padding: "8px 0" }}>
           No inline styles applied
         </div>
       ) : (

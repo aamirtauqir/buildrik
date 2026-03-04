@@ -76,7 +76,7 @@ const styles = {
   },
   categoryBtn: {
     padding: "4px 10px",
-    fontSize: 11,
+    fontSize: 12,
     border: "1px solid var(--aqb-border)",
     borderRadius: 16,
     background: "transparent",
@@ -90,7 +90,7 @@ const styles = {
     color: "#fff",
   },
   sectionTitle: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: 600,
     color: "var(--aqb-text-secondary)",
     textTransform: "uppercase" as const,
@@ -153,7 +153,7 @@ const styles = {
     marginBottom: 4,
   },
   previewTags: {
-    fontSize: 11,
+    fontSize: 12,
     color: "var(--aqb-text-muted)",
   },
   controls: {
@@ -167,7 +167,7 @@ const styles = {
     gap: 4,
   },
   controlLabel: {
-    fontSize: 10,
+    fontSize: 12,
     color: "var(--aqb-text-muted)",
     textTransform: "uppercase" as const,
   },
@@ -477,7 +477,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
 
         {/* Footer */}
         <div style={styles.footer}>
-          <span style={{ fontSize: 11, color: "var(--aqb-text-muted)" }}>
+          <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>
             Powered by Lucide Icons
           </span>
           <div style={{ display: "flex", gap: 8 }}>

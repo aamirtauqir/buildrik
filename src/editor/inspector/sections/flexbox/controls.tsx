@@ -159,7 +159,7 @@ export const GapSlider: React.FC<GapSliderProps> = ({ value, onChange, disabled 
           border: `1px solid ${INSPECTOR_TOKENS.borderInput}`,
           borderRadius: 4,
           color: INSPECTOR_TOKENS.textPrimary,
-          fontSize: 10,
+          fontSize: 12,
           textAlign: "center" as const,
           outline: "none",
           opacity: disabled ? 0.5 : 1,

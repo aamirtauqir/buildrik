@@ -72,7 +72,7 @@ export const InspectorSubNav: React.FC<InspectorSubNavProps> = ({ activeTab, con
               background: "transparent",
               border: "none",
               padding: "2px 4px",
-              fontSize: 10,
+              fontSize: 12,
               color: "var(--aqb-text-tertiary)",
               cursor: "pointer",
               borderRadius: 3,
@@ -83,7 +83,7 @@ export const InspectorSubNav: React.FC<InspectorSubNavProps> = ({ activeTab, con
           {i < activeSections.length - 1 && (
             <span
               aria-hidden="true"
-              style={{ color: "var(--aqb-border)", fontSize: 10, lineHeight: "20px" }}
+              style={{ color: "var(--aqb-border)", fontSize: 12, lineHeight: "20px" }}
             >
               •
             </span>

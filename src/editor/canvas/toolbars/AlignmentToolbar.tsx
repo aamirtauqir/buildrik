@@ -63,7 +63,7 @@ const styles = {
     color: colors.text.onPrimary,
   },
   groupLabel: {
-    fontSize: 9,
+    fontSize: 12,
     color: colors.text.muted,
     fontWeight: 600,
     textTransform: "uppercase" as const,

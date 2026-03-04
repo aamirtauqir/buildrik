@@ -157,7 +157,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
                   borderRadius: 6,
                   color: cmsSettings.mode === mode ? "#fff" : "var(--aqb-text)",
                   cursor: "pointer",
-                  fontSize: 11,
+                  fontSize: 12,
                 }}
               >
                 {mode === "none" ? "None" : mode === "static" ? "Embed Data" : "Template"}
@@ -170,7 +170,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
               <label
                 style={{
                   display: "block",
-                  fontSize: 11,
+                  fontSize: 12,
                   marginBottom: 6,
                   color: "var(--aqb-text-muted)",
                 }}
@@ -191,7 +191,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
                       borderRadius: 4,
                       color: cmsSettings.syntax === syntax ? "#1e1e2e" : "var(--aqb-text)",
                       cursor: "pointer",
-                      fontSize: 11,
+                      fontSize: 12,
                       textTransform: "capitalize",
                     }}
                   >
@@ -202,7 +202,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
             </div>
           )}
 
-          <div style={{ fontSize: 11, color: "var(--aqb-text-muted)", marginTop: 8 }}>
+          <div style={{ fontSize: 12, color: "var(--aqb-text-muted)", marginTop: 8 }}>
             {cmsSettings.mode === "none" && "CMS bindings will not be resolved in export."}
             {cmsSettings.mode === "static" && "CMS data will be embedded directly in HTML."}
             {cmsSettings.mode === "template" &&

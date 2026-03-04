@@ -64,7 +64,7 @@ export const CompactButtonGroup: React.FC<CompactButtonGroupProps> = ({
     border: active ? "1px solid rgba(0,115,230,0.3)" : "1px solid transparent",
     borderRadius: 4,
     color: active ? "#0073E6" : "#71717a",
-    fontSize: 9,
+    fontSize: 12,
     fontWeight: 500,
     cursor: "pointer",
   });
@@ -81,7 +81,7 @@ export const CompactButtonGroup: React.FC<CompactButtonGroupProps> = ({
       {label && (
         <span
           style={{
-            fontSize: 10,
+            fontSize: 12,
             color: "#71717a",
             fontWeight: 500,
             minWidth: labelWidth,

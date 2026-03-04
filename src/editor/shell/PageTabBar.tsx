@@ -374,7 +374,7 @@ const activeTabStyles: React.CSSProperties = {
 };
 
 const homeIconStyles: React.CSSProperties = {
-  fontSize: 11,
+  fontSize: 12,
 };
 
 const tabNameStyles: React.CSSProperties = {

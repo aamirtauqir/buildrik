@@ -30,7 +30,7 @@ export const sectionStyles: React.CSSProperties = {
 };
 export const sectionTitleStyles: React.CSSProperties = {
   margin: "0 0 12px",
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 600,
   color: "var(--aqb-text-muted)",
   textTransform: "uppercase",
@@ -50,7 +50,7 @@ export const labelStyles: React.CSSProperties = {
 };
 export const hintStyles: React.CSSProperties = {
   display: "block",
-  fontSize: 10,
+  fontSize: 12,
   fontWeight: 400,
   color: "var(--aqb-text-muted)",
 };
@@ -107,7 +107,7 @@ export const successBadgeStyles: React.CSSProperties = {
   background: "var(--aqb-success)",
   color: "#fff",
   borderRadius: 4,
-  fontSize: 10,
+  fontSize: 12,
   fontWeight: 600,
 };
 export const mutedStyles: React.CSSProperties = { color: "var(--aqb-text-muted)" };
@@ -120,7 +120,7 @@ export const copyBtnStyles: React.CSSProperties = {
   border: "none",
   borderRadius: 6,
   color: "var(--aqb-text-primary)",
-  fontSize: 11,
+  fontSize: 12,
   cursor: "pointer",
   transition: "color 0.15s",
 };
@@ -130,7 +130,7 @@ export const noteStyles: React.CSSProperties = {
   padding: 12,
   background: "rgba(124,125,255,0.1)",
   borderRadius: 8,
-  fontSize: 11,
+  fontSize: 12,
   color: "var(--aqb-text-secondary)",
   marginTop: 8,
 };
@@ -138,12 +138,12 @@ export const warningStyles: React.CSSProperties = {
   padding: 12,
   background: "rgba(245,158,11,0.15)",
   borderRadius: 8,
-  fontSize: 11,
+  fontSize: 12,
   color: "var(--aqb-warning)",
 };
 export const errorHintStyles: React.CSSProperties = {
   display: "block",
-  fontSize: 10,
+  fontSize: 12,
   color: "var(--aqb-error, #ef4444)",
   marginTop: 4,
 };
@@ -151,7 +151,7 @@ export const successNoteStyles: React.CSSProperties = {
   padding: 8,
   background: "rgba(34,197,94,0.1)",
   borderRadius: 6,
-  fontSize: 11,
+  fontSize: 12,
   color: "var(--aqb-success, #22c55e)",
   marginTop: 8,
 };
@@ -162,7 +162,7 @@ export const dnsHelpStyles: React.CSSProperties = {
   padding: 12,
   background: "var(--aqb-surface-3)",
   borderRadius: 6,
-  fontSize: 11,
+  fontSize: 12,
 };
 export const codeStyles: React.CSSProperties = {
   display: "block",
@@ -171,7 +171,7 @@ export const codeStyles: React.CSSProperties = {
   background: "var(--aqb-surface-2)",
   borderRadius: 4,
   fontFamily: "monospace",
-  fontSize: 11,
+  fontSize: 12,
 };
 
 // Export screen styles
@@ -219,7 +219,7 @@ export const integrationNameStyles: React.CSSProperties = {
   color: "var(--aqb-text-primary)",
 };
 export const integrationDescStyles: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 12,
   color: "var(--aqb-text-muted)",
 };
 
@@ -239,7 +239,7 @@ export const versionRowStyles: React.CSSProperties = {
   marginBottom: 8,
 };
 export const versionDateStyles: React.CSSProperties = {
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 500,
   color: "var(--aqb-text-primary)",
 };
@@ -249,7 +249,7 @@ export const versionDescStyles: React.CSSProperties = {
   marginTop: 2,
 };
 export const versionAuthorStyles: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 12,
   color: "var(--aqb-text-muted)",
   marginTop: 2,
 };

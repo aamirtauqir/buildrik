@@ -343,7 +343,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 <div
                   style={{
                     padding: "6px 8px",
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: 600,
                     color: CANVAS_COLORS.textMuted,
                     textTransform: "uppercase",
@@ -391,7 +391,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                         {isRecent && !isDisabled && (
                           <span
                             style={{
-                              fontSize: 10,
+                              fontSize: 12,
                               color: CANVAS_COLORS.textMuted,
                               background: "rgba(255,255,255,0.06)",
                               padding: "2px 6px",
@@ -405,7 +405,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                           <span
                             data-testid="selection-hint"
                             style={{
-                              fontSize: 11,
+                              fontSize: 12,
                               color: CANVAS_COLORS.textMuted,
                               fontStyle: "italic",
                             }}
@@ -431,7 +431,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             borderTop: `1px solid ${CANVAS_COLORS.border}`,
             display: "flex",
             justifyContent: "space-between",
-            fontSize: 11,
+            fontSize: 12,
             color: CANVAS_COLORS.textMuted,
           }}
         >
@@ -461,7 +461,7 @@ const ShortcutBadge: React.FC<{ shortcut: string }> = ({ shortcut }) => {
   return (
     <span
       style={{
-        fontSize: 11,
+        fontSize: 12,
         color: CANVAS_COLORS.textMuted,
         fontFamily: "system-ui, -apple-system, sans-serif",
         background: "rgba(255,255,255,0.06)",

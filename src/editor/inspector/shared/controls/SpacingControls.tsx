@@ -46,7 +46,7 @@ export const FourSideInput: React.FC<FourSideInputProps> = ({
     border: "1px solid rgba(255,255,255,0.1)",
     borderRadius: 4,
     color: "#e4e4e7",
-    fontSize: 11,
+    fontSize: 12,
     textAlign: "center",
     outline: "none",
   };
@@ -160,7 +160,7 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
     border: "1px solid rgba(255,255,255,0.1)",
     borderRadius: 4,
     color: "#e4e4e7",
-    fontSize: 11,
+    fontSize: 12,
     textAlign: "center",
     outline: "none",
   };

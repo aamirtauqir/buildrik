@@ -58,7 +58,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                   : "1px solid rgba(255,255,255,0.06)",
               borderRadius: 6,
               color: bgType === type ? "#0073E6" : "#71717a",
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: 500,
               cursor: "pointer",
               textTransform: "capitalize",
@@ -84,7 +84,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           <div style={{ marginBottom: 12 }}>
             <label
               style={{
-                fontSize: 11,
+                fontSize: 12,
                 color: "#71717a",
                 fontWeight: 500,
                 display: "block",
@@ -107,7 +107,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                   border: "1px solid rgba(255,255,255,0.1)",
                   borderRadius: 6,
                   cursor: "pointer",
-                  fontSize: 10,
+                  fontSize: 12,
                   color: "#fff",
                 }}
               >
@@ -126,7 +126,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                   border: "1px solid rgba(255,255,255,0.1)",
                   borderRadius: 6,
                   cursor: "pointer",
-                  fontSize: 10,
+                  fontSize: 12,
                   color: "#fff",
                 }}
               >
@@ -172,7 +172,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           >
             <label
               style={{
-                fontSize: 11,
+                fontSize: 12,
                 color: "#71717a",
                 fontWeight: 500,
                 minWidth: 70,
@@ -190,7 +190,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               }}
               style={{ flex: 1 }}
             />
-            <span style={{ fontSize: 11, color: "#71717a", minWidth: 40 }}>90°</span>
+            <span style={{ fontSize: 12, color: "#71717a", minWidth: 40 }}>90°</span>
           </div>
         </>
       )}
@@ -220,7 +220,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                   border: "1px solid rgba(0, 115, 230, 0.3)",
                   borderRadius: 6,
                   color: "#0073E6",
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: 600,
                   cursor: "pointer",
                   whiteSpace: "nowrap",

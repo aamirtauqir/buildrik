@@ -130,7 +130,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
         >
           <div
             style={{
-              fontSize: 9,
+              fontSize: 12,
               color: "#FFC107",
               marginBottom: 8,
               textTransform: "uppercase",
@@ -150,7 +150,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
           >
             <div
               style={{
-                fontSize: 9,
+                fontSize: 12,
                 color: "#28A745",
                 marginBottom: 8,
                 textTransform: "uppercase",
@@ -167,7 +167,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
                 borderRadius: 4,
                 padding: 16,
                 textAlign: "center",
-                fontSize: 10,
+                fontSize: 12,
                 color: "#0073E6",
               }}
             >

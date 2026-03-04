@@ -99,7 +99,7 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
   const shadows = styles["box-shadow"] ? styles["box-shadow"].split("),").length : 0;
   const effectsPreview =
     shadows > 0 ? (
-      <span style={{ fontSize: 9, color: "var(--aqb-text-tertiary)" }}>
+      <span style={{ fontSize: 12, color: "var(--aqb-text-tertiary)" }}>
         {shadows} shadow{shadows !== 1 ? "s" : ""}
       </span>
     ) : undefined;

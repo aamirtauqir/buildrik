@@ -76,7 +76,7 @@ export const PseudoStateSelector: React.FC<PseudoStateSelectorProps> = ({
     >
       <span
         style={{
-          fontSize: 10,
+          fontSize: 12,
           color: "var(--aqb-text-tertiary)",
           marginRight: 4,
           flexShrink: 0,

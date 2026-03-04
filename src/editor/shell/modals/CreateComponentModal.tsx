@@ -265,7 +265,7 @@ const textareaStyles: React.CSSProperties = {
 };
 
 const hintStyles: React.CSSProperties = {
-  fontSize: 11,
+  fontSize: 12,
   color: "var(--aqb-text-muted)",
   marginTop: 4,
   display: "block",
@@ -321,7 +321,7 @@ const variantChipStyles: React.CSSProperties = {
 };
 
 const variantChipValuesStyles: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 12,
   opacity: 0.7,
   marginLeft: 2,
 };

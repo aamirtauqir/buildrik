@@ -276,7 +276,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
                 <span
                   aria-live="polite"
                   style={{
-                    fontSize: 9,
+                    fontSize: 12,
                     color: "var(--aqb-success)",
                     fontWeight: 600,
                   }}
@@ -398,7 +398,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               <span
                 style={{
                   marginLeft: 6,
-                  fontSize: 10,
+                  fontSize: 12,
                   padding: "2px 6px",
                   borderRadius: 10,
                   background:

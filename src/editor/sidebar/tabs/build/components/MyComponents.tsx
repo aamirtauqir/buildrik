@@ -47,11 +47,11 @@ export const MyComponents: React.FC<MyComponentsProps> = ({ open, onToggle, comp
       <div className={`bld-mycomp-body${open ? " open" : ""}`}>
         <div className="bld-empty-comp">
           {!hasApi ? (
-            <span style={{ fontSize: 11, color: "var(--aqb-text-muted)", lineHeight: 1.5 }}>
+            <span style={{ fontSize: 12, color: "var(--aqb-text-muted)", lineHeight: 1.5 }}>
               Components feature coming soon.
             </span>
           ) : (
-            <span style={{ fontSize: 11, color: "var(--aqb-text-muted)", lineHeight: 1.5 }}>
+            <span style={{ fontSize: 12, color: "var(--aqb-text-muted)", lineHeight: 1.5 }}>
               No saved components yet. Select an element → right-click → Save as Component.
             </span>
           )}

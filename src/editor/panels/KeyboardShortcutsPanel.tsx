@@ -157,7 +157,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
                         {keyIdx < shortcut.keys.length - 1 && (
                           <span
                             style={{
-                              fontSize: 10,
+                              fontSize: 12,
                               color: "var(--aqb-text-muted)",
                             }}
                           >

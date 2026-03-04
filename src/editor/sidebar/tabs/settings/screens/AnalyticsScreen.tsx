@@ -202,7 +202,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
 
 const hintTextStyles: React.CSSProperties = {
   display: "block",
-  fontSize: 11,
+  fontSize: 12,
   color: "var(--aqb-text-muted)",
   marginTop: 4,
   lineHeight: 1.4,

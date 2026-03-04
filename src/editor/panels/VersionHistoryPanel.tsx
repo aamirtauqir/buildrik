@@ -335,7 +335,7 @@ const dateGroupStyles: React.CSSProperties = { marginBottom: 16 };
 
 const dateGroupHeaderStyles: React.CSSProperties = {
   padding: "4px 0 8px",
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 600,
   color: "var(--aqb-text-muted)",
   textTransform: "uppercase",
@@ -386,7 +386,7 @@ const versionNameStyles: React.CSSProperties = {
 };
 
 const versionMetaStyles: React.CSSProperties = {
-  fontSize: 11,
+  fontSize: 12,
   color: "var(--aqb-text-muted)",
   display: "flex",
   alignItems: "center",
@@ -397,7 +397,7 @@ const autoBadgeStyles: React.CSSProperties = {
   padding: "1px 4px",
   background: "rgba(255,255,255,0.08)",
   borderRadius: 4,
-  fontSize: 9,
+  fontSize: 12,
   textTransform: "uppercase",
 };
 
@@ -415,7 +415,7 @@ const restoreBtnStyles: React.CSSProperties = {
   border: "1px solid rgba(124,125,255,0.3)",
   borderRadius: 6,
   cursor: "pointer",
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 500,
 };
 
@@ -457,7 +457,7 @@ const emptyMessageStyles: React.CSSProperties = {
   color: "var(--aqb-text-secondary)",
 };
 
-const emptyHintStyles: React.CSSProperties = { fontSize: 11, marginTop: 4 };
+const emptyHintStyles: React.CSSProperties = { fontSize: 12, marginTop: 4 };
 
 const inputStyles: React.CSSProperties = {
   width: "100%",

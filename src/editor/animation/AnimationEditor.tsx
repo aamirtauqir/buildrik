@@ -118,7 +118,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
                 border: "none",
                 borderRadius: 8,
                 color: animation.type === anim.value ? "#fff" : "var(--aqb-text-secondary)",
-                fontSize: 11,
+                fontSize: 12,
                 cursor: "pointer",
                 transition: "all 0.15s ease",
               }}
@@ -133,7 +133,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
       <div style={{ marginTop: 24 }}>
         <div
           style={{
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: 600,
             textTransform: "uppercase",
             color: "var(--aqb-text-muted)",
@@ -185,7 +185,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
       <div style={{ marginTop: 24 }}>
         <div
           style={{
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: 600,
             textTransform: "uppercase",
             color: "var(--aqb-text-muted)",
@@ -249,7 +249,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
             background: "var(--aqb-bg-dark)",
             borderRadius: 8,
             fontFamily: "var(--aqb-font-mono)",
-            fontSize: 11,
+            fontSize: 12,
             color: "var(--aqb-text-muted)",
           }}
         >

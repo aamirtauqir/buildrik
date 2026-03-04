@@ -56,7 +56,7 @@ const labelStyle: React.CSSProperties = {
   marginTop: -4,
   padding: "2px 6px",
   borderRadius: 4,
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 500,
   color: "#fff",
   whiteSpace: "nowrap",

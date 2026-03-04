@@ -92,7 +92,7 @@ const indicatorStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 6,
-  fontSize: 11,
+  fontSize: 12,
   color: "var(--aqb-warning)",
 };
 

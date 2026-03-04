@@ -41,7 +41,7 @@ const styles = {
     cursor: "pointer",
   } as React.CSSProperties,
   hint: {
-    fontSize: 10,
+    fontSize: 12,
     color: "#52525b",
   } as React.CSSProperties,
 };

@@ -44,7 +44,7 @@ export const DisplayControls: React.FC<DisplayControlsProps> = ({ display, onCha
       {/* Section label with help tooltip */}
       <div
         style={{
-          fontSize: 10,
+          fontSize: 12,
           color: INSPECTOR_TOKENS.textTertiary,
           marginBottom: 8,
           display: "flex",

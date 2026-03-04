@@ -67,7 +67,7 @@
   background: transparent;
   border: none;
   outline: none;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--aqb-text, #EEF2FF);
   font-family: inherit;
 }
@@ -111,7 +111,7 @@
   border: 1px solid rgba(255,255,255,0.08);
   background: transparent;
   color: rgba(255,255,255,0.3);
-  font-size: 10px;
+  font-size: 12px;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
@@ -135,7 +135,7 @@
   border: 1px solid rgba(248,113,113,0.2);
   background: rgba(248,113,113,0.08);
   color: rgba(248,113,113,0.65);
-  font-size: 10px;
+  font-size: 12px;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
@@ -184,7 +184,7 @@
 .tab-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 
 .tab-title {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: #4ADE80;
   overflow: hidden;
@@ -210,7 +210,7 @@
 
 /* amber warning when applied card is filtered out */
 .tab-filtered-warn {
-  font-size: 9px;
+  font-size: 12px;
   color: rgba(245,158,11,0.65);
   font-style: italic;
   margin-top: 2px;
@@ -261,7 +261,7 @@
   background: rgba(248,113,113,0.08);
   border: 1px solid rgba(248,113,113,0.2);
   border-radius: 7px;
-  font-size: 10px;
+  font-size: 12px;
   color: rgba(248,113,113,0.8);
   flex-shrink: 0;
 }
@@ -438,7 +438,7 @@
   border-radius: 50%;
   background: var(--aqb-accent, #7C6DFA);
   color: #fff;
-  font-size: 10px;
+  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -516,7 +516,7 @@
 }
 
 .tpl-empty-clear {
-  font-size: 10px;
+  font-size: 12px;
   background: none;
   border: none;
   color: var(--aqb-accent-light, #818CF8);
@@ -556,7 +556,7 @@
 .tpl-nudge-text { flex: 1; min-width: 0; }
 
 .tpl-nudge-name {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--aqb-text, #EEF2FF);
   overflow: hidden;
@@ -565,7 +565,7 @@
 }
 
 .tpl-nudge-meta {
-  font-size: 9px;
+  font-size: 12px;
   color: var(--aqb-text-muted, #3D4A5C);
   margin-top: 2px;
   font-family: var(--aqb-font-mono, monospace);
@@ -580,7 +580,7 @@
   background: rgba(255,255,255,0.08);
   color: var(--aqb-text-muted, #3D4A5C);
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -600,7 +600,7 @@
   border: none;
   background: var(--aqb-accent, #7C6DFA);
   color: #fff;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   flex-shrink: 0;
@@ -633,7 +633,7 @@
 
 .tpl-insight-txt {
   flex: 1;
-  font-size: 9px;
+  font-size: 12px;
   color: var(--aqb-text-muted, #3D4A5C);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -686,7 +686,7 @@
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.07);
   margin-bottom: 12px;
-  font-size: 10px;
+  font-size: 12px;
   color: rgba(255,255,255,0.5);
   line-height: 1.8;
 }
@@ -726,7 +726,7 @@
 }
 
 .tpl-modal-hint {
-  font-size: 10px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.35);
   margin-top: -4px;
   padding: 0 2px;
@@ -759,7 +759,7 @@
   margin-bottom: 12px;
 }
 
-.tpl-pro-details-title { font-size: 10px; color: #fbbf24; font-weight: 600; margin-bottom: 5px; }
+.tpl-pro-details-title { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 5px; }
 .tpl-pro-details-list { font-size: 9.5px; color: rgba(255, 255, 255, 0.4); line-height: 1.7; }
 
 /* ── Canvas selection banner — portal to body ── */

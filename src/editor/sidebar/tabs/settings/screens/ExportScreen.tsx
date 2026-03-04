@@ -94,14 +94,14 @@ export const ExportScreen: React.FC = () => {
 
 const optionLabelStyles: React.CSSProperties = {
   marginTop: 8,
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 600,
   color: "var(--aqb-text-primary)",
 };
 
 const optionHintStyles: React.CSSProperties = {
   marginTop: 2,
-  fontSize: 10,
+  fontSize: 12,
   color: "var(--aqb-text-muted)",
   textAlign: "center",
 };

@@ -261,7 +261,7 @@ const checkboxStyles: React.CSSProperties = {
 };
 
 const hintStyles: React.CSSProperties = {
-  fontSize: 11,
+  fontSize: 12,
   color: "var(--aqb-text-muted)",
   marginTop: 4,
 };

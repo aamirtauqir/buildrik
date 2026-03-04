@@ -20,7 +20,7 @@ export const cardBtn = (active: boolean): React.CSSProperties => ({
     : `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
   borderRadius: 6,
   color: active ? INSPECTOR_TOKENS.accent : INSPECTOR_TOKENS.textTertiary,
-  fontSize: 9,
+  fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
   transition: "all 0.15s",
@@ -44,7 +44,7 @@ export const constraintBtnStyle = (active: boolean): React.CSSProperties => ({
     : `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
   borderRadius: 6,
   color: active ? INSPECTOR_TOKENS.accent : INSPECTOR_TOKENS.textTertiary,
-  fontSize: 9,
+  fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
   transition: "all 0.15s",
@@ -65,7 +65,7 @@ export const fixedInputStyle: React.CSSProperties = {
   border: `1px solid ${INSPECTOR_TOKENS.borderInput}`,
   borderRadius: 4,
   color: INSPECTOR_TOKENS.textPrimary,
-  fontSize: 10,
+  fontSize: 12,
   outline: "none",
 };
 
@@ -102,6 +102,6 @@ export const tipBoxStyle: React.CSSProperties = {
   background: INSPECTOR_TOKENS.accentAlpha08,
   borderRadius: 4,
   marginBottom: 10,
-  fontSize: 9,
+  fontSize: 12,
   color: INSPECTOR_TOKENS.accent,
 };

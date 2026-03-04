@@ -44,7 +44,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
   >
     <div
       style={{
-        fontSize: 10,
+        fontSize: 12,
         color: INSPECTOR_TOKENS.textMuted,
         fontWeight: 600,
         marginBottom: 8,
@@ -66,7 +66,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
         <span
           style={{
-            fontSize: 9,
+            fontSize: 12,
             color: INSPECTOR_TOKENS.textMuted,
             width: 30,
           }}
@@ -91,7 +91,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
         <span
           style={{
-            fontSize: 9,
+            fontSize: 12,
             color: INSPECTOR_TOKENS.textMuted,
             width: 30,
           }}
@@ -116,7 +116,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
         <span
           style={{
-            fontSize: 9,
+            fontSize: 12,
             color: INSPECTOR_TOKENS.textMuted,
             width: 30,
           }}

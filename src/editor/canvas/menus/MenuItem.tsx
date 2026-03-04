@@ -66,7 +66,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
           <span
             style={{
               color: CANVAS_COLORS.textMuted,
-              fontSize: 10,
+              fontSize: 12,
               marginLeft: 4,
             }}
           >
@@ -99,7 +99,7 @@ const KeyboardHint: React.FC<KeyboardHintProps> = ({ shortcut }) => {
   return (
     <span
       style={{
-        fontSize: 11,
+        fontSize: 12,
         color: CANVAS_COLORS.textMuted,
         fontFamily: "system-ui, -apple-system, sans-serif",
         letterSpacing: 0.5,

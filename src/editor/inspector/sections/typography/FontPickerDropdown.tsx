@@ -81,7 +81,7 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({ selected, onSelect }
           border: "none",
           borderRadius: 4,
           color: selected === cat ? INSPECTOR_TOKENS.accent : INSPECTOR_TOKENS.textTertiary,
-          fontSize: 10,
+          fontSize: 12,
           cursor: "pointer",
           whiteSpace: "nowrap",
         }}
@@ -119,7 +119,7 @@ export const FontList: React.FC<FontListProps> = ({
       <div style={{ padding: "4px 8px" }}>
         <div
           style={{
-            fontSize: 9,
+            fontSize: 12,
             color: INSPECTOR_TOKENS.textMuted,
             textTransform: "uppercase",
             letterSpacing: "0.5px",
@@ -160,7 +160,7 @@ export const FontList: React.FC<FontListProps> = ({
     <div style={{ padding: "4px 8px" }}>
       <div
         style={{
-          fontSize: 9,
+          fontSize: 12,
           color: INSPECTOR_TOKENS.textMuted,
           textTransform: "uppercase",
           letterSpacing: "0.5px",
@@ -194,7 +194,7 @@ export const FontList: React.FC<FontListProps> = ({
         >
           <span>{font.family}</span>
           <span
-            style={{ fontSize: 9, color: INSPECTOR_TOKENS.textMuted, textTransform: "uppercase" }}
+            style={{ fontSize: 12, color: INSPECTOR_TOKENS.textMuted, textTransform: "uppercase" }}
           >
             {font.category}
           </span>

@@ -65,7 +65,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
           }}
           aria-label="Head Scripts"
           placeholder={"<script>...</script>\n<link>...</link>"}
-          style={{ ...inputStyles, minHeight: 120, fontFamily: "monospace", fontSize: 11 }}
+          style={{ ...inputStyles, minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
         />
       </Section>
 
@@ -79,7 +79,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
           }}
           aria-label="Body Scripts"
           placeholder={"<script>...</script>"}
-          style={{ ...inputStyles, minHeight: 120, fontFamily: "monospace", fontSize: 11 }}
+          style={{ ...inputStyles, minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
         />
       </Section>
 
@@ -93,7 +93,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
           }}
           aria-label="Global CSS"
           placeholder={"/* Custom CSS */\n.my-class { color: red; }"}
-          style={{ ...inputStyles, minHeight: 100, fontFamily: "monospace", fontSize: 11 }}
+          style={{ ...inputStyles, minHeight: 100, fontFamily: "monospace", fontSize: 12 }}
         />
       </Section>
 

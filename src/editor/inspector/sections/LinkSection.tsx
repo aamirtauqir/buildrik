@@ -267,7 +267,7 @@ const hintStyles: React.CSSProperties = {
   padding: "8px 12px",
   background: "rgba(0, 115, 230, 0.1)",
   borderRadius: 6,
-  fontSize: 10,
+  fontSize: 12,
   color: "#6c7086",
   lineHeight: 1.4,
 };

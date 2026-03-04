@@ -31,7 +31,7 @@ const toggleStyles = {
     gap: 6,
   } as React.CSSProperties,
   label: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: 500,
     color: INSPECTOR_TOKENS.textTertiary,
     textTransform: "uppercase" as const,

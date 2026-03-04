@@ -71,7 +71,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   presetBtn: {
     padding: "4px 10px",
-    fontSize: 11,
+    fontSize: 12,
     background: "var(--aqb-bg-panel-secondary)",
     border: "1px solid var(--aqb-border)",
     borderRadius: 4,
@@ -296,7 +296,7 @@ export const CropOverlay: React.FC<CropOverlayProps> = ({
               color: "#fff",
               padding: "2px 6px",
               borderRadius: 3,
-              fontSize: 10,
+              fontSize: 12,
               fontFamily: "monospace",
             }}
           >

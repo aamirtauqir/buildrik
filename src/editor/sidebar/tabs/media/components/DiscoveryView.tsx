@@ -246,7 +246,7 @@ export function DiscoveryView({
             {/* Attribution badge removed until Unsplash API is wired */}
             <div className="med-sec-spacer" />
             {loading.img && (
-              <span className="med-empty-sub" style={{ fontSize: 9 }}>
+              <span className="med-empty-sub" style={{ fontSize: 12 }}>
                 Loading…
               </span>
             )}
@@ -268,7 +268,7 @@ export function DiscoveryView({
             {/* Attribution badge removed until Pexels API is wired */}
             <div className="med-sec-spacer" />
             {loading.vid && (
-              <span className="med-empty-sub" style={{ fontSize: 9 }}>
+              <span className="med-empty-sub" style={{ fontSize: 12 }}>
                 Loading…
               </span>
             )}

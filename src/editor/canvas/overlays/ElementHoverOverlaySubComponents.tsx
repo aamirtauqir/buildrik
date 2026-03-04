@@ -187,7 +187,7 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
       color: "white",
       padding: "4px 8px",
       borderRadius: 4,
-      fontSize: 11,
+      fontSize: 12,
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       whiteSpace: "nowrap",
       display: "flex",
@@ -199,12 +199,12 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
       <span style={{ color: colors.hierarchyCurrent, fontWeight: 600 }}>{info.friendlyName}</span>
       {info.hasLink && (
-        <span style={{ fontSize: 10 }} title="Has link">
+        <span style={{ fontSize: 12 }} title="Has link">
           🔗
         </span>
       )}
       {info.hasCMSBinding && (
-        <span style={{ fontSize: 10 }} title="CMS bound">
+        <span style={{ fontSize: 12 }} title="CMS bound">
           📊
         </span>
       )}
@@ -214,19 +214,19 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
             background: "var(--aqb-primary)",
             padding: "0 4px",
             borderRadius: 2,
-            fontSize: 9,
+            fontSize: 12,
           }}
         >
           flex{info.flexDirection === "column" ? "↓" : "→"}
         </span>
       )}
       {info.isGridContainer && (
-        <span style={{ background: "#ec4899", padding: "0 4px", borderRadius: 2, fontSize: 9 }}>
+        <span style={{ background: "#ec4899", padding: "0 4px", borderRadius: 2, fontSize: 12 }}>
           grid
         </span>
       )}
     </div>
-    <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 10 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
       {info.parentName && <span style={{ color: "#6c7086" }}>in {info.parentName}</span>}
       <span style={{ color: "#a5f3fc", fontFamily: "monospace" }}>
         {info.dimensions.width} × {info.dimensions.height}
@@ -258,7 +258,7 @@ export const TextEditHint: React.FC<TextEditHintProps> = ({ rect, colors }) => (
       color: colors.labelText,
       padding: "3px 8px",
       borderRadius: 4,
-      fontSize: 10,
+      fontSize: 12,
       fontWeight: 500,
       whiteSpace: "nowrap",
       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",

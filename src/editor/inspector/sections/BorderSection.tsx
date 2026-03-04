@@ -53,7 +53,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
   const borderPreview = borderStyle ? (
     <span
       style={{
-        fontSize: 9,
+        fontSize: 12,
         color: "var(--aqb-text-tertiary)",
         fontFamily: "var(--aqb-font-mono)",
         whiteSpace: "nowrap" as const,
@@ -124,7 +124,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
       <div style={{ marginTop: 16 }}>
         <div
           style={{
-            fontSize: 11,
+            fontSize: 12,
             color: "#71717a",
             fontWeight: 500,
             marginBottom: 12,
@@ -145,7 +145,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
           >
             <span
               style={{
-                fontSize: 10,
+                fontSize: 12,
                 color: "#71717a",
                 minWidth: 50,
                 textTransform: "capitalize",
@@ -165,7 +165,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
                 border: "1px solid rgba(255,255,255,0.1)",
                 borderRadius: 4,
                 color: "#e4e4e7",
-                fontSize: 11,
+                fontSize: 12,
                 outline: "none",
               }}
             />
@@ -183,7 +183,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
       >
         <div
           style={{
-            fontSize: 11,
+            fontSize: 12,
             color: "#71717a",
             fontWeight: 500,
             marginBottom: 12,

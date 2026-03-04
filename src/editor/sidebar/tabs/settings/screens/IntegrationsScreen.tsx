@@ -34,7 +34,7 @@ const descStyles: React.CSSProperties = {
 };
 
 const badgeStyles: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 12,
   fontWeight: 600,
   padding: "2px 6px",
   borderRadius: 4,

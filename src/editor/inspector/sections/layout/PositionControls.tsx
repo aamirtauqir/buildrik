@@ -59,7 +59,7 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
       {/* Section label with help tooltip */}
       <div
         style={{
-          fontSize: 10,
+          fontSize: 12,
           color: INSPECTOR_TOKENS.textTertiary,
           marginBottom: 6,
           display: "flex",
@@ -148,7 +148,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
 
   return (
     <div style={positionOffsetContainerStyle}>
-      <div style={{ fontSize: 9, color: INSPECTOR_TOKENS.textMuted, marginBottom: 6 }}>
+      <div style={{ fontSize: 12, color: INSPECTOR_TOKENS.textMuted, marginBottom: 6 }}>
         Position Offset
       </div>
 

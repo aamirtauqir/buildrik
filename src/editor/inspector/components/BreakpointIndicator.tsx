@@ -46,7 +46,7 @@ export const BreakpointIndicator: React.FC<BreakpointIndicatorProps> = ({ curren
       <span>
         Editing styles for <strong>{BREAKPOINTS[currentBreakpoint].name}</strong>
       </span>
-      <span style={{ marginLeft: "auto", fontSize: 9, opacity: 0.8 }}>
+      <span style={{ marginLeft: "auto", fontSize: 12, opacity: 0.8 }}>
         &le;{BREAKPOINTS[currentBreakpoint].maxWidth}px
       </span>
     </div>

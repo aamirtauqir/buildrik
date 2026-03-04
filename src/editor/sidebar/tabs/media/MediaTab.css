@@ -159,7 +159,7 @@
   border: 1px solid transparent;
   background: transparent;
   color: var(--aqb-text-muted);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
@@ -184,7 +184,7 @@
 .med-pill[data-type="fnt"].active { background: rgba(0,201,160,.08); border-color: rgba(0,201,160,.20); color: var(--media-fnt); }
 
 .med-pill-count {
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 600;
   padding: 0 4px;
   border-radius: 4px;
@@ -197,7 +197,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1;
 }
 
@@ -221,7 +221,7 @@
 }
 
 .med-sec-label {
-  font-size: 9px;
+  font-size: 12px;
   font-family: var(--aqb-font-mono, monospace);
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -231,7 +231,7 @@
 }
 
 .med-sec-count {
-  font-size: 9px;
+  font-size: 12px;
   font-family: var(--aqb-font-mono, monospace);
   color: var(--aqb-text-muted);
   background: var(--aqb-surface-3);
@@ -243,7 +243,7 @@
 
 /* Sort dropdown trigger */
 .med-sort-chk {
-  font-size: 9px;
+  font-size: 12px;
   color: var(--aqb-text-muted);
   margin-left: 2px;
 }
@@ -253,7 +253,7 @@
   align-items: center;
   gap: 3px;
   cursor: pointer;
-  font-size: 9px;
+  font-size: 12px;
   font-family: var(--aqb-font-mono, monospace);
   color: var(--aqb-text-muted);
   transition: color var(--aqb-transition-fast);
@@ -493,7 +493,7 @@
   display: none;
   align-items: center;
   justify-content: center;
-  font-size: 9px;
+  font-size: 12px;
   flex-shrink: 0;
 }
 
@@ -694,7 +694,7 @@
 }
 
 .med-upload-ghost-pct {
-  font-size: 9px;
+  font-size: 12px;
   font-family: var(--aqb-font-mono, monospace);
   color: var(--aqb-text-muted);
 }
@@ -750,7 +750,7 @@
   border: 1px dashed rgba(107, 94, 237, 0.3);
   background: rgba(107, 94, 237, 0.07);
   color: #a49bff;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
@@ -789,7 +789,7 @@
 }
 
 .med-storage-label {
-  font-size: 9px;
+  font-size: 12px;
   font-family: var(--aqb-font-mono, monospace);
   color: var(--aqb-text-muted);
   white-space: nowrap;
@@ -985,7 +985,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .med-tip-text {
@@ -1000,7 +1000,7 @@
   border: none;
   color: var(--aqb-text-muted);
   cursor: pointer;
-  font-size: 10px;
+  font-size: 12px;
   padding: 0;
   flex-shrink: 0;
   transition: color var(--aqb-transition-fast);
@@ -1091,7 +1091,7 @@
   border: none;
   color: var(--aqb-text-muted);
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
   padding: 2px 4px;
   border-radius: 3px;
   margin-left: 2px;
@@ -1131,7 +1131,7 @@
   color: #fff;
   padding: 4px 8px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
   z-index: 1;
 }
 .med-detail-actions {
@@ -1245,14 +1245,14 @@
   font-size: var(--aqb-font-xs, 12px);
   color: var(--aqb-text-secondary, #94a3b8);
 }
-.med-modal-file-icon { font-size: 11px; }
+.med-modal-file-icon { font-size: 12px; }
 .med-modal-file-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .med-modal-name-more {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--aqb-text-muted);
   padding: 2px 0;
 }

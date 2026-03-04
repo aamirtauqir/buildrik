@@ -59,7 +59,7 @@ export class InspectorErrorBoundary extends React.Component<
           }}
         >
           <div style={{ fontWeight: 600, marginBottom: 8, fontSize: 13 }}>Inspector Error</div>
-          <div style={{ fontSize: 11, color: "#f87171", marginBottom: 12 }}>
+          <div style={{ fontSize: 12, color: "#f87171", marginBottom: 12 }}>
             {this.state.message}
           </div>
           <button
@@ -70,7 +70,7 @@ export class InspectorErrorBoundary extends React.Component<
               border: "1px solid rgba(239, 68, 68, 0.3)",
               borderRadius: 4,
               color: "#fca5a5",
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: 500,
               cursor: "pointer",
             }}

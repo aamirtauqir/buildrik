@@ -44,7 +44,7 @@ const styles = {
   },
   label: {
     display: "block",
-    fontSize: 11,
+    fontSize: 12,
     color: INSPECTOR_TOKENS.textMuted,
     marginBottom: 4,
   },

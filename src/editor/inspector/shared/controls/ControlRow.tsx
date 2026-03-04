@@ -150,7 +150,7 @@ export interface SubTitleProps {
 export const SubTitle: React.FC<SubTitleProps> = ({ children, marginTop = 12 }) => (
   <div
     style={{
-      fontSize: 9,
+      fontSize: 12,
       color: INSPECTOR_TOKENS.textMuted,
       fontWeight: 600,
       marginBottom: 8,

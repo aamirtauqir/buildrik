@@ -74,7 +74,7 @@ const KeyboardKey: React.FC<{ children: string }> = ({ children }) => (
       background: "rgba(255, 255, 255, 0.08)",
       border: "1px solid rgba(255, 255, 255, 0.15)",
       borderRadius: 4,
-      fontSize: 11,
+      fontSize: 12,
       fontWeight: 600,
       fontFamily: "system-ui, sans-serif",
       color: "#cdd6f4",
@@ -154,7 +154,7 @@ export const KeyboardHintsSection: React.FC<KeyboardHintsSectionProps> = ({ sele
                   <React.Fragment key={keyIdx}>
                     <KeyboardKey>{key}</KeyboardKey>
                     {keyIdx < shortcut.keys.length - 1 && (
-                      <span style={{ fontSize: 9, color: "#585b70" }}>+</span>
+                      <span style={{ fontSize: 12, color: "#585b70" }}>+</span>
                     )}
                   </React.Fragment>
                 ))}

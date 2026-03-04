@@ -306,7 +306,7 @@ export function useCanvasElementDrag({
         color: #1e1e2e;
         padding: 2px 10px;
         border-radius: 4px;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 600;
         text-transform: uppercase;
         white-space: nowrap;

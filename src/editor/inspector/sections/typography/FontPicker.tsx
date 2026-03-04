@@ -98,7 +98,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
     <div style={{ marginBottom: 12 }}>
       <label
         style={{
-          fontSize: 11,
+          fontSize: 12,
           color: INSPECTOR_TOKENS.textTertiary,
           fontWeight: 500,
           display: "block",
@@ -131,7 +131,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
         }}
       >
         <span>{currentFontName}</span>
-        <span style={{ fontSize: 10, color: INSPECTOR_TOKENS.textTertiary }}>
+        <span style={{ fontSize: 12, color: INSPECTOR_TOKENS.textTertiary }}>
           {showFontPicker ? "\u25B2" : "\u25BC"}
         </span>
       </button>
@@ -162,7 +162,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
           <div
             style={{
               padding: "6px 8px",
-              fontSize: 10,
+              fontSize: 12,
               color: INSPECTOR_TOKENS.textTertiary,
               borderBottom: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
             }}

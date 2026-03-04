@@ -224,7 +224,7 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({
                 paddingLeft: 8 + i * 12,
               }}
             >
-              <span style={{ opacity: 0.5, marginRight: 6, fontSize: 10 }}>
+              <span style={{ opacity: 0.5, marginRight: 6, fontSize: 12 }}>
                 {getTypeIcon(ancestor.type)}
               </span>
               {ancestor.name}
@@ -240,11 +240,11 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({
               cursor: "default",
             }}
           >
-            <span style={{ opacity: 0.7, marginRight: 6, fontSize: 10 }}>
+            <span style={{ opacity: 0.7, marginRight: 6, fontSize: 12 }}>
               {getTypeIcon(elementType)}
             </span>
             {elementName}
-            <span style={{ marginLeft: "auto", fontSize: 9, opacity: 0.6 }}>current</span>
+            <span style={{ marginLeft: "auto", fontSize: 12, opacity: 0.6 }}>current</span>
           </div>
         </div>
       )}

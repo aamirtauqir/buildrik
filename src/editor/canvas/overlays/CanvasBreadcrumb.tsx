@@ -85,10 +85,10 @@ function getTypeIcon(type: string): React.ReactNode {
     );
   }
   if (["heading", "h1", "h2", "h3", "h4", "h5", "h6"].includes(t)) {
-    return <span style={{ fontWeight: 700, fontSize: 10 }}>H</span>;
+    return <span style={{ fontWeight: 700, fontSize: 12 }}>H</span>;
   }
   if (["paragraph", "p", "text"].includes(t)) {
-    return <span style={{ fontWeight: 500, fontSize: 10 }}>T</span>;
+    return <span style={{ fontWeight: 500, fontSize: 12 }}>T</span>;
   }
   if (["image", "img"].includes(t)) {
     return (

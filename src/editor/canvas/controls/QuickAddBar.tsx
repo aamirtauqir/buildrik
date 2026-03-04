@@ -57,7 +57,7 @@ export const QuickAddBar: React.FC<QuickAddBarProps> = ({ blocks, onAdd, disable
           alignItems: "center",
           padding: "0 8px 0 4px",
           color: "var(--aqb-text-muted)",
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: 600,
           textTransform: "uppercase",
           letterSpacing: "0.5px",

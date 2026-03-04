@@ -388,7 +388,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               >
                 {v.name}
                 {isCurrent && (
-                  <span style={{ marginLeft: 8, fontSize: 11, color: "var(--aqb-primary)" }}>
+                  <span style={{ marginLeft: 8, fontSize: 12, color: "var(--aqb-primary)" }}>
                     (current)
                   </span>
                 )}
@@ -416,7 +416,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               {state.duplicateInfo?.copyName}&quot;
             </li>
           </ol>
-          <p style={{ margin: "12px 0 0", fontSize: 11, color: "var(--aqb-text-muted)" }}>
+          <p style={{ margin: "12px 0 0", fontSize: 12, color: "var(--aqb-text-muted)" }}>
             This ensures a proper deep copy with new element IDs.
           </p>
         </div>

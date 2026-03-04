@@ -92,7 +92,7 @@ export const PresetButtonGrid: React.FC<PresetButtonGridProps> = ({
             border: "1px solid rgba(255,255,255,0.06)",
             borderRadius: 4,
             color: currentValue === preset.value ? "#0073E6" : "#71717a",
-            fontSize: 10,
+            fontSize: 12,
             cursor: "pointer",
           }}
         >

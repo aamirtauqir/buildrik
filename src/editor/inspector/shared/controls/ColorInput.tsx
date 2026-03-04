@@ -105,7 +105,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
               >
                 <div
                   style={{
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: 600,
                     color: "var(--aqb-text-secondary)",
                     marginBottom: 8,
@@ -187,7 +187,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
 
 /** Style for CSS keyword badge */
 const keywordBadgeStyles: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 12,
   color: "#6c7086",
   background: "rgba(108, 112, 134, 0.15)",
   padding: "2px 6px",

@@ -220,25 +220,25 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
             <div style={styles.toolbar}>
               <button style={styles.toolBtn} onClick={() => handleRotate(-90)}>
                 <span style={{ fontSize: 20 }}>↺</span>
-                <span style={{ fontSize: 11 }}>Rotate Left</span>
+                <span style={{ fontSize: 12 }}>Rotate Left</span>
               </button>
               <button style={styles.toolBtn} onClick={() => handleRotate(90)}>
                 <span style={{ fontSize: 20 }}>↻</span>
-                <span style={{ fontSize: 11 }}>Rotate Right</span>
+                <span style={{ fontSize: 12 }}>Rotate Right</span>
               </button>
               <button
                 style={{ ...styles.toolBtn, ...(flipH ? styles.toolBtnActive : {}) }}
                 onClick={() => setFlipH(!flipH)}
               >
                 <span style={{ fontSize: 20 }}>⇆</span>
-                <span style={{ fontSize: 11 }}>Flip H</span>
+                <span style={{ fontSize: 12 }}>Flip H</span>
               </button>
               <button
                 style={{ ...styles.toolBtn, ...(flipV ? styles.toolBtnActive : {}) }}
                 onClick={() => setFlipV(!flipV)}
               >
                 <span style={{ fontSize: 20 }}>⇅</span>
-                <span style={{ fontSize: 11 }}>Flip V</span>
+                <span style={{ fontSize: 12 }}>Flip V</span>
               </button>
             </div>
           )}

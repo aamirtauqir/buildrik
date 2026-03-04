@@ -97,7 +97,7 @@ export const SelectionBadge = styled.div`
   background: ${selection.handleGradient};
   border-radius: ${radius.md}px;
   color: ${colors.text.onPrimary};
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
   box-shadow: ${shadows.badge};

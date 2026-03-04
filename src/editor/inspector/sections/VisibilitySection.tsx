@@ -98,7 +98,7 @@ const styles = {
     color: "#e4e4e7",
   },
   range: {
-    fontSize: 9,
+    fontSize: 12,
     color: "#52525b",
   },
   toggle: (isVisible: boolean): React.CSSProperties => ({
@@ -123,10 +123,10 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: 10,
+    fontSize: 12,
   }),
   hint: {
-    fontSize: 10,
+    fontSize: 12,
     color: "#52525b",
     padding: "8px 0 0",
     borderTop: "1px solid rgba(255,255,255,0.06)",
@@ -139,7 +139,7 @@ const styles = {
     padding: "2px 6px",
     background: "rgba(239,68,68,0.15)",
     borderRadius: 4,
-    fontSize: 9,
+    fontSize: 12,
     color: "#ef4444",
     marginTop: 8,
   },
