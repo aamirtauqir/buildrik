@@ -231,7 +231,27 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   // RENDER: Inspector
   // ============================================================================
   return (
-    <div style={panelStyles.panel}>
+    <div style={panelStyles.panel} aria-live="polite">
+      {/* Page settings link — visible when element is selected */}
+      <button
+        type="button"
+        onClick={() => composer?.selection?.clear()}
+        aria-label="Switch to page settings"
+        style={{
+          background: "none",
+          border: "none",
+          padding: "6px 12px",
+          fontSize: 12,
+          color: "var(--aqb-text-muted)",
+          cursor: "pointer",
+          textAlign: "left",
+          width: "100%",
+        }}
+        onMouseEnter={(e) => { (e.target as HTMLElement).style.color = "var(--aqb-primary)"; }}
+        onMouseLeave={(e) => { (e.target as HTMLElement).style.color = "var(--aqb-text-muted)"; }}
+      >
+        ← Page settings
+      </button>
       {/* Header */}
       <div style={{ ...panelStyles.header, position: "relative" as const }}>
         <div style={panelStyles.elementInfo}>
