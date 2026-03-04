@@ -6,6 +6,7 @@
 
 import * as React from "react";
 import { useRef } from "react";
+import { Upload } from "lucide-react";
 import { EMPTY_MSGS } from "../data/mediaData";
 import type { MediaTypeFilter } from "../data/mediaTypes";
 
@@ -28,9 +29,12 @@ export function OnboardingEmptyState({
   };
 
   return (
-    <div className="med-onboarding-empty">
+    <div
+      className="med-onboarding-empty"
+      aria-label="Upload area — drag files here or click to browse"
+    >
       <div className="med-empty-icon" aria-hidden="true">
-        🖼
+        <Upload size={48} color="var(--aqb-text-muted)" />
       </div>
       <h3 className="med-empty-title">{msg.title}</h3>
       <p className="med-empty-sub">{msg.sub}</p>

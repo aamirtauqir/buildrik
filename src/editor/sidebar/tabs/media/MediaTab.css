@@ -1321,8 +1321,11 @@
   gap: 10px;
   padding: 24px 16px;
   text-align: center;
+  border: 2px dashed var(--aqb-border-muted, #334155);
+  border-radius: 12px;
+  margin: 12px;
 }
-.med-empty-icon { font-size: 32px; line-height: 1; }
+.med-empty-icon { display: flex; align-items: center; justify-content: center; line-height: 1; }
 .med-empty-upload {
   margin-top: 4px;
   width: 100%;

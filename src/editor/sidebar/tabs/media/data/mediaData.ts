@@ -63,24 +63,24 @@ export interface EmptyMsg {
 
 export const EMPTY_MSGS: Record<MediaTypeFilter, EmptyMsg> = {
   all: {
-    title: "No files yet",
-    sub: "Upload images, videos, icons, or fonts to get started.",
+    title: "Your media library is empty",
+    sub: "Drag files here or click Upload. Supports PNG, JPG, SVG, MP4, WebM, TTF, OTF \u2014 max 10 MB each.",
   },
   img: {
     title: "No images",
-    sub: "Upload JPG, PNG, WebP, GIF, or SVG files.",
+    sub: "Drag or upload JPG, PNG, WebP, GIF, or SVG \u2014 max 10 MB.",
   },
   vid: {
     title: "No videos",
-    sub: "Upload MP4 or WebM files.",
+    sub: "Drag or upload MP4 or WebM \u2014 max 10 MB.",
   },
   ico: {
     title: "No icons",
-    sub: "Upload SVG files to use as icons.",
+    sub: "Drag or upload SVG files to use as icons.",
   },
   fnt: {
     title: "No fonts",
-    sub: "Upload TTF or OTF font files.",
+    sub: "Drag or upload TTF, OTF, WOFF, or WOFF2 font files.",
   },
 };
 
