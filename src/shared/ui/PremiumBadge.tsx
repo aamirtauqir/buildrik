@@ -58,7 +58,7 @@ const baseStyle: React.CSSProperties = {
 
 const SIZES = {
   sm: {
-    container: { gap: 2, padding: "2px 6px", fontSize: 10 } as React.CSSProperties,
+    container: { gap: 2, padding: "2px 6px", fontSize: 12 } as React.CSSProperties,
     iconSize: 10,
   },
   md: {

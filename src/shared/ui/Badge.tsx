@@ -31,8 +31,8 @@ export const Badge: React.FC<BadgeProps> = ({
   };
 
   const sizeStyles = {
-    sm: { padding: "2px 6px", fontSize: 10 },
-    md: { padding: "4px 8px", fontSize: 11 },
+    sm: { padding: "2px 6px", fontSize: 12 },
+    md: { padding: "4px 8px", fontSize: 12 },
   };
 
   if (dot) {

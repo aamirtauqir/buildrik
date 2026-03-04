@@ -70,7 +70,7 @@ export const TabGuardModal: React.FC<{
               border: "1px solid var(--aqb-border)",
               borderRadius: 6,
               color: "var(--aqb-text-secondary)",
-              fontSize: 11,
+              fontSize: 12,
               cursor: "pointer",
             }}
           >
@@ -84,7 +84,7 @@ export const TabGuardModal: React.FC<{
               border: "none",
               borderRadius: 6,
               color: "#fff",
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: 600,
               cursor: "pointer",
             }}
@@ -99,7 +99,7 @@ export const TabGuardModal: React.FC<{
               border: "none",
               borderRadius: 6,
               color: "#fff",
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: 600,
               cursor: "pointer",
             }}

@@ -251,8 +251,8 @@ export const ColorPalette: React.FC<ColorPaletteProps> = ({ onApplyColor }) => {
                 border: "2px solid var(--aqb-border)",
               }}
             />
-            <div style={{ fontSize: 10, color: "var(--aqb-text-muted)" }}>{swatch.name}</div>
-            <div style={{ fontSize: 11, fontFamily: "monospace" }}>{swatch.hex}</div>
+            <div style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>{swatch.name}</div>
+            <div style={{ fontSize: 12, fontFamily: "monospace" }}>{swatch.hex}</div>
           </div>
         ))}
       </div>

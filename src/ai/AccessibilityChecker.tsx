@@ -228,15 +228,15 @@ export const AccessibilityChecker: React.FC<AccessibilityCheckerProps> = ({
       >
         <div style={{ textAlign: "center", flex: 1 }}>
           <div style={{ fontSize: 24, fontWeight: 700, color: "#ef4444" }}>{errorCount}</div>
-          <div style={{ fontSize: 11, color: "var(--aqb-text-muted)" }}>Errors</div>
+          <div style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>Errors</div>
         </div>
         <div style={{ textAlign: "center", flex: 1 }}>
           <div style={{ fontSize: 24, fontWeight: 700, color: "#eab308" }}>{warningCount}</div>
-          <div style={{ fontSize: 11, color: "var(--aqb-text-muted)" }}>Warnings</div>
+          <div style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>Warnings</div>
         </div>
         <div style={{ textAlign: "center", flex: 1 }}>
           <div style={{ fontSize: 24, fontWeight: 700, color: "#3b82f6" }}>{infoCount}</div>
-          <div style={{ fontSize: 11, color: "var(--aqb-text-muted)" }}>Info</div>
+          <div style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>Info</div>
         </div>
       </div>
 

@@ -28,7 +28,7 @@ const DIFF_ROW_STYLE: React.CSSProperties = {
 };
 
 const DIFF_SECTION_HEADER: React.CSSProperties = {
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 700,
   color: "var(--aqb-text-muted)",
   marginBottom: 8,
@@ -96,7 +96,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
         >
           Review changes
         </div>
-        <div style={{ fontSize: 11, color: "var(--aqb-text-muted)", marginBottom: 14 }}>
+        <div style={{ fontSize: 12, color: "var(--aqb-text-muted)", marginBottom: 14 }}>
           {totalChanges} token{totalChanges !== 1 ? "s" : ""} will be updated
         </div>
 
@@ -149,7 +149,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                         flexShrink: 0,
                       }}
                     />
-                    <span style={{ fontSize: 11, color: "var(--aqb-text-primary)", flex: 1 }}>
+                    <span style={{ fontSize: 12, color: "var(--aqb-text-primary)", flex: 1 }}>
                       {token?.name ?? diff.tokenId}
                     </span>
                   </div>
@@ -167,12 +167,12 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               const savedVal = typeSavedTokens.find((s) => s.id === t.id)?.value ?? "—";
               return (
                 <div key={t.id} style={DIFF_ROW_STYLE}>
-                  <span style={{ fontSize: 11, color: "var(--aqb-text-primary)", flex: 1 }}>
+                  <span style={{ fontSize: 12, color: "var(--aqb-text-primary)", flex: 1 }}>
                     {t.name}
                   </span>
                   <span
                     style={{
-                      fontSize: 11,
+                      fontSize: 12,
                       fontFamily: "monospace",
                       color: "var(--aqb-text-muted)",
                       textDecoration: "line-through",
@@ -180,10 +180,10 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                   >
                     {savedVal}
                   </span>
-                  <span style={{ fontSize: 10, color: "var(--aqb-text-muted)" }}>→</span>
+                  <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>→</span>
                   <span
                     style={{
-                      fontSize: 11,
+                      fontSize: 12,
                       fontFamily: "monospace",
                       color: "var(--aqb-color-success)",
                     }}
@@ -204,12 +204,12 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               const savedVal = spacingSavedTokens.find((s) => s.id === t.id)?.value ?? "—";
               return (
                 <div key={t.id} style={DIFF_ROW_STYLE}>
-                  <span style={{ fontSize: 11, color: "var(--aqb-text-primary)", flex: 1 }}>
+                  <span style={{ fontSize: 12, color: "var(--aqb-text-primary)", flex: 1 }}>
                     {t.name}
                   </span>
                   <span
                     style={{
-                      fontSize: 11,
+                      fontSize: 12,
                       fontFamily: "monospace",
                       color: "var(--aqb-text-muted)",
                       textDecoration: "line-through",
@@ -217,10 +217,10 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                   >
                     {savedVal}
                   </span>
-                  <span style={{ fontSize: 10, color: "var(--aqb-text-muted)" }}>→</span>
+                  <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>→</span>
                   <span
                     style={{
-                      fontSize: 11,
+                      fontSize: 12,
                       fontFamily: "monospace",
                       color: "var(--aqb-color-success)",
                     }}
@@ -243,7 +243,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               border: "1px solid var(--aqb-border)",
               borderRadius: 6,
               color: "var(--aqb-text-secondary)",
-              fontSize: 11,
+              fontSize: 12,
               cursor: "pointer",
             }}
           >
@@ -257,7 +257,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               border: "none",
               borderRadius: 6,
               color: "#fff",
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: 600,
               cursor: "pointer",
             }}

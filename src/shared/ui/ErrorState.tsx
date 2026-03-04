@@ -137,7 +137,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 10,
+            fontSize: 12,
             fontWeight: "bold",
             flexShrink: 0,
           }}
@@ -283,7 +283,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
             background: "rgba(0, 0, 0, 0.3)",
             borderRadius: "var(--aqb-radius-md, 8px)",
             border: "1px solid var(--aqb-border, #334155)",
-            fontSize: 11,
+            fontSize: 12,
             fontFamily: "var(--aqb-font-mono, monospace)",
             color: "var(--aqb-text-secondary, #94a3b8)",
             textAlign: "left",

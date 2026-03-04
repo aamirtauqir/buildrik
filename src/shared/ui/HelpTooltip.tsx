@@ -51,7 +51,7 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({
             display: "block",
             marginTop: 4,
             color: "var(--aqb-accent-blue)",
-            fontSize: 11,
+            fontSize: 12,
             textDecoration: "none",
           }}
           onClick={(e) => e.stopPropagation()}

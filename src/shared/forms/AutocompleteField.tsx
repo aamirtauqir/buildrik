@@ -197,7 +197,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
               <div>
                 <div style={{ fontSize: 13, fontWeight: 500 }}>{option.label}</div>
                 {option.description && (
-                  <div style={{ fontSize: 11, color: "var(--aqb-text-muted)" }}>
+                  <div style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>
                     {option.description}
                   </div>
                 )}
@@ -208,7 +208,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
       )}
 
       {error && (
-        <div style={{ fontSize: 11, color: "var(--aqb-danger)", marginTop: 4 }}>{error}</div>
+        <div style={{ fontSize: 12, color: "var(--aqb-danger)", marginTop: 4 }}>{error}</div>
       )}
     </div>
   );

@@ -118,7 +118,7 @@ export const SliderInput: React.FC<SliderInputProps> = ({
   };
 
   const labelStyles: React.CSSProperties = {
-    fontSize: 11,
+    fontSize: 12,
     color: "var(--aqb-text-tertiary)",
     fontWeight: 500,
     textTransform: "uppercase",
@@ -180,7 +180,7 @@ export const SliderInput: React.FC<SliderInputProps> = ({
   };
 
   const unitStyles: React.CSSProperties = {
-    fontSize: 11,
+    fontSize: 12,
     color: "var(--aqb-text-muted)",
     marginLeft: 2,
   };

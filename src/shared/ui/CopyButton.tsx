@@ -33,7 +33,7 @@ const styles = {
   } as React.CSSProperties,
   sm: {
     padding: "4px 8px",
-    fontSize: 11,
+    fontSize: 12,
   } as React.CSSProperties,
   md: {
     padding: "6px 12px",

@@ -451,7 +451,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
       <div
         style={{
           padding: "5px 12px",
-          fontSize: 10,
+          fontSize: 12,
           color: "var(--aqb-text-muted)",
           background: "var(--aqb-surface-2)",
           borderBottom: "1px solid var(--aqb-border)",
@@ -483,7 +483,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                 borderRadius: 8,
               }}
             >
-              <span style={{ fontSize: 10, color: "rgba(124,109,250,0.9)", lineHeight: 1.6 }}>
+              <span style={{ fontSize: 12, color: "rgba(124,109,250,0.9)", lineHeight: 1.6 }}>
                 These are your site's default design tokens. Customize them and click{" "}
                 <strong>Review &amp; Apply</strong> to go live.
               </span>

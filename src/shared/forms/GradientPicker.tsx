@@ -175,7 +175,7 @@ export const GradientPicker: React.FC<GradientPickerProps> = ({
             marginBottom: 8,
           }}
         >
-          <span style={{ fontSize: 11, color: "var(--aqb-text-muted)" }}>Color Stops</span>
+          <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>Color Stops</span>
           <button
             onClick={addStop}
             disabled={disabled}
@@ -185,7 +185,7 @@ export const GradientPicker: React.FC<GradientPickerProps> = ({
               border: "none",
               borderRadius: 4,
               color: "var(--aqb-text-secondary)",
-              fontSize: 11,
+              fontSize: 12,
               cursor: "pointer",
             }}
           >
@@ -237,7 +237,7 @@ export const GradientPicker: React.FC<GradientPickerProps> = ({
                 fontSize: 12,
               }}
             />
-            <span style={{ fontSize: 11, color: "var(--aqb-text-muted)" }}>%</span>
+            <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>%</span>
             {stops.length > 2 && (
               <button
                 onClick={() => removeStop(i)}

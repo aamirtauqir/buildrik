@@ -229,7 +229,7 @@ const activeModeBtnStyles: React.CSSProperties = {
 const shortcutStyles: React.CSSProperties = {
   background: "rgba(255, 255, 255, 0.08)",
   color: "rgba(255, 255, 255, 0.4)",
-  fontSize: 11,
+  fontSize: 12,
   padding: "2px 6px",
   borderRadius: 4,
   fontWeight: 700,
@@ -249,7 +249,7 @@ const creditsStyles: React.CSSProperties = {
   borderRadius: 8,
   background: "rgba(255, 255, 255, 0.06)",
   color: "rgba(255, 255, 255, 0.5)",
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 600,
   whiteSpace: "nowrap",
   flexShrink: 0,

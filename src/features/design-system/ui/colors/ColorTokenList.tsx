@@ -48,7 +48,7 @@ const GroupHeader: React.FC<{ label: string; subtext?: string }> = ({ label, sub
       <h3
         style={{
           margin: 0,
-          fontSize: 10,
+          fontSize: 12,
           fontWeight: 600,
           color: "var(--aqb-text-muted)",
           textTransform: "uppercase",
@@ -60,7 +60,7 @@ const GroupHeader: React.FC<{ label: string; subtext?: string }> = ({ label, sub
       <div style={{ flex: 1, height: 1, background: "var(--aqb-border)" }} />
     </div>
     {subtext && (
-      <div style={{ fontSize: 9, color: "var(--aqb-text-muted)", marginTop: 2, lineHeight: 1.4 }}>
+      <div style={{ fontSize: 12, color: "var(--aqb-text-muted)", marginTop: 2, lineHeight: 1.4 }}>
         {subtext}
       </div>
     )}
@@ -163,7 +163,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
               border: "1px solid var(--aqb-border)",
               borderRadius: 6,
               color: "var(--aqb-text-primary)",
-              fontSize: 11,
+              fontSize: 12,
               boxSizing: "border-box",
               outline: "none",
             }}
@@ -175,7 +175,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             padding: "4px 10px",
             borderRadius: 20,
             border: "1px solid",
-            fontSize: 10,
+            fontSize: 12,
             fontWeight: 600,
             cursor: "pointer",
             background: filterMode === "all" ? "var(--aqb-primary)" : "transparent",
@@ -191,7 +191,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             padding: "4px 10px",
             borderRadius: 20,
             border: "1px solid",
-            fontSize: 10,
+            fontSize: 12,
             fontWeight: 600,
             cursor: "pointer",
             background: filterMode === "issues" ? "#ef4444" : "transparent",
@@ -215,7 +215,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             marginBottom: 8,
           }}
         >
-          <span style={{ fontSize: 10, color: "rgba(239,68,68,0.9)", lineHeight: 1.5 }}>
+          <span style={{ fontSize: 12, color: "rgba(239,68,68,0.9)", lineHeight: 1.5 }}>
             {issuesCount} token{issuesCount !== 1 ? "s" : ""} with low contrast against dark
             backgrounds — fails WCAG AA.
           </span>
@@ -229,7 +229,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
           <div style={{ fontSize: 12, color: "var(--aqb-color-success)", fontWeight: 600 }}>
             All colors pass WCAG
           </div>
-          <div style={{ fontSize: 11, color: "var(--aqb-text-muted)", marginTop: 4 }}>
+          <div style={{ fontSize: 12, color: "var(--aqb-text-muted)", marginTop: 4 }}>
             No contrast issues found
           </div>
         </div>
@@ -288,7 +288,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
           border: "1px dashed var(--aqb-border)",
           borderRadius: 6,
           color: "var(--aqb-text-muted)",
-          fontSize: 11,
+          fontSize: 12,
           cursor: "pointer",
         }}
       >

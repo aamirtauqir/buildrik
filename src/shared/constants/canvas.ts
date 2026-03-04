@@ -236,12 +236,12 @@ export const DROPDOWN_STYLE: React.CSSProperties = {
 };
 
 export const LABEL_STYLE: React.CSSProperties = {
-  fontSize: 11,
+  fontSize: 12,
   color: CANVAS_COLORS.textMuted,
 };
 
 export const GROUP_HEADER_STYLE: React.CSSProperties = {
-  fontSize: 11,
+  fontSize: 12,
   textTransform: "uppercase",
   letterSpacing: 0.6,
   color: CANVAS_COLORS.textMuted,

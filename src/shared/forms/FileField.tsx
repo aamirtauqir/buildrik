@@ -147,7 +147,7 @@ export const FileField: React.FC<FileFieldProps> = ({
               >
                 {file.name}
               </span>
-              <span style={{ fontSize: 11, color: "var(--aqb-text-muted)" }}>
+              <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>
                 {formatSize(file.size)}
               </span>
               <button
@@ -177,7 +177,7 @@ export const FileField: React.FC<FileFieldProps> = ({
           style={{
             display: "block",
             marginTop: 4,
-            fontSize: 11,
+            fontSize: 12,
             color: "var(--aqb-error)",
           }}
         >

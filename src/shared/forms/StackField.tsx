@@ -198,7 +198,7 @@ export const StackField: React.FC<StackFieldProps> = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 10,
+            fontSize: 12,
             color: "var(--aqb-text-muted)",
           }}
         >

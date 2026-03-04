@@ -161,7 +161,7 @@ export const FormField: React.FC<FormFieldProps> = ({
           {optional && !required && (
             <span
               style={{
-                fontSize: 10,
+                fontSize: 12,
                 color: "var(--aqb-text-muted, #64748b)",
                 background: "rgba(255, 255, 255, 0.05)",
                 padding: "2px 6px",

@@ -76,7 +76,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
 
         <label
           style={{
-            fontSize: 11,
+            fontSize: 12,
             color: "var(--aqb-text-muted)",
             display: "block",
             marginBottom: 4,
@@ -102,12 +102,12 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
           }}
         />
         {nameError && (
-          <div style={{ fontSize: 10, color: "#ef4444", marginBottom: 8 }}>{nameError}</div>
+          <div style={{ fontSize: 12, color: "#ef4444", marginBottom: 8 }}>{nameError}</div>
         )}
 
         <label
           style={{
-            fontSize: 11,
+            fontSize: 12,
             color: "var(--aqb-text-muted)",
             display: "block",
             marginBottom: 4,
@@ -145,7 +145,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
           />
         </div>
         {hexError && (
-          <div style={{ fontSize: 10, color: "#ef4444", marginBottom: 8 }}>{hexError}</div>
+          <div style={{ fontSize: 12, color: "#ef4444", marginBottom: 8 }}>{hexError}</div>
         )}
 
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
@@ -157,7 +157,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
               border: "1px solid var(--aqb-border)",
               borderRadius: 6,
               color: "var(--aqb-text-secondary)",
-              fontSize: 11,
+              fontSize: 12,
               cursor: "pointer",
             }}
           >
@@ -171,7 +171,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
               border: "none",
               borderRadius: 6,
               color: "#fff",
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: 600,
               cursor: "pointer",
             }}

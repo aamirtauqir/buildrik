@@ -57,7 +57,7 @@ export const TextareaField: React.FC<TextareaFieldProps> = ({
           style={{
             display: "block",
             marginTop: 4,
-            fontSize: 11,
+            fontSize: 12,
             color: error ? "var(--aqb-error)" : "var(--aqb-text-muted)",
           }}
         >

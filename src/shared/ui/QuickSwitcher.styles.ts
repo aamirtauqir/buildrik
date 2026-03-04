@@ -83,7 +83,7 @@ export const sectionHeaderStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   padding: "10px 8px 6px",
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 600,
   color: "var(--aqb-text-muted, #6b7280)",
   textTransform: "uppercase",
@@ -136,7 +136,7 @@ export const labelStyles: React.CSSProperties = {
 };
 
 export const subtitleStyles: React.CSSProperties = {
-  fontSize: 11,
+  fontSize: 12,
   color: "var(--aqb-text-muted, #6b7280)",
   whiteSpace: "nowrap",
   overflow: "hidden",
@@ -145,7 +145,7 @@ export const subtitleStyles: React.CSSProperties = {
 };
 
 export const shortcutStyles: React.CSSProperties = {
-  fontSize: 11,
+  fontSize: 12,
   color: "var(--aqb-text-muted, #6b7280)",
   fontFamily: "system-ui, -apple-system, sans-serif",
   background: "rgba(255, 255, 255, 0.06)",
@@ -159,7 +159,7 @@ export const footerStyles: React.CSSProperties = {
   borderTop: "1px solid var(--aqb-border, rgba(255, 255, 255, 0.08))",
   display: "flex",
   justifyContent: "space-between",
-  fontSize: 11,
+  fontSize: 12,
   color: "var(--aqb-text-muted, #6b7280)",
 };
 
@@ -179,6 +179,6 @@ export const hintKeyStyles: React.CSSProperties = {
   padding: "0 5px",
   background: "rgba(255, 255, 255, 0.06)",
   borderRadius: 3,
-  fontSize: 10,
+  fontSize: 12,
   marginRight: 4,
 };

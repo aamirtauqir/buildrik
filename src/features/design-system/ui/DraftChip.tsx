@@ -12,7 +12,7 @@ export const DraftChip: React.FC<{ state: DraftState; count: number }> = ({ stat
     return (
       <span
         style={{
-          fontSize: 10,
+          fontSize: 12,
           color: "var(--aqb-color-success)",
           fontWeight: 500,
           padding: "2px 8px",
@@ -28,7 +28,7 @@ export const DraftChip: React.FC<{ state: DraftState; count: number }> = ({ stat
   return (
     <span
       style={{
-        fontSize: 10,
+        fontSize: 12,
         color: "#f59e0b",
         fontWeight: 600,
         padding: "2px 8px",

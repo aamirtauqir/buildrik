@@ -173,7 +173,7 @@ export const SelectFontField: React.FC<SelectFontFieldProps> = ({
                 border: "none",
                 borderRadius: 4,
                 color: !activeCategory ? "#fff" : "var(--aqb-text-muted)",
-                fontSize: 11,
+                fontSize: 12,
                 cursor: "pointer",
               }}
             >
@@ -190,7 +190,7 @@ export const SelectFontField: React.FC<SelectFontFieldProps> = ({
                   border: "none",
                   borderRadius: 4,
                   color: activeCategory === cat ? "#fff" : "var(--aqb-text-muted)",
-                  fontSize: 11,
+                  fontSize: 12,
                   cursor: "pointer",
                   textTransform: "capitalize",
                 }}
@@ -226,7 +226,7 @@ export const SelectFontField: React.FC<SelectFontFieldProps> = ({
                 >
                   {font.family}
                 </span>
-                <span style={{ fontSize: 10, color: "var(--aqb-text-muted)" }}>
+                <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>
                   {categoryIcons[font.category]}
                 </span>
               </div>

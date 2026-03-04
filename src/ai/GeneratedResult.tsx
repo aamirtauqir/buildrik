@@ -24,7 +24,7 @@ export const GeneratedResult: React.FC<GeneratedResultProps> = ({
     <div style={{ marginTop: 20 }}>
       <div
         style={{
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: 600,
           textTransform: "uppercase",
           color: "var(--aqb-text-muted)",

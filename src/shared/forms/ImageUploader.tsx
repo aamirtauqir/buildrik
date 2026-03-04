@@ -286,7 +286,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                 disabled={disabled}
                 style={{
                   padding: "4px 10px",
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: 500,
                   color: "var(--aqb-text-primary)",
                   background: "var(--aqb-bg-panel)",

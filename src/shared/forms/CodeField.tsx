@@ -62,7 +62,7 @@ export const CodeField: React.FC<CodeFieldProps> = ({
           <label style={{ fontSize: 12, color: "var(--aqb-text-secondary)" }}>{label}</label>
           <span
             style={{
-              fontSize: 10,
+              fontSize: 12,
               color: "var(--aqb-text-muted)",
               background: "var(--aqb-bg-panel-secondary)",
               padding: "2px 6px",

@@ -56,7 +56,7 @@ const ScoreCircle: React.FC<{ score: number; label: string }> = ({ score, label 
       <div
         style={{
           marginTop: 12,
-          fontSize: 11,
+          fontSize: 12,
           color: "var(--aqb-text-muted)",
           textTransform: "uppercase",
         }}

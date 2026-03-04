@@ -71,7 +71,7 @@ const StyleToggle: React.FC<{
       borderColor: active ? "var(--aqb-primary)" : "var(--aqb-border)",
       background: active ? "rgba(59,130,246,0.15)" : "transparent",
       color: active ? "var(--aqb-primary)" : "var(--aqb-text-muted)",
-      fontSize: 11,
+      fontSize: 12,
       fontWeight: 700,
       cursor: "pointer",
       ...fontStyle,
@@ -137,10 +137,10 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
     >
       {/* Semantic label */}
       <div style={{ width: 64, flexShrink: 0 }}>
-        <div style={{ fontSize: 11, fontWeight: 500, color: "var(--aqb-text-primary)" }}>
+        <div style={{ fontSize: 12, fontWeight: 500, color: "var(--aqb-text-primary)" }}>
           {info?.semantic ?? token.name}
         </div>
-        <div style={{ fontSize: 9, color: "var(--aqb-text-muted)", marginTop: 1 }}>{token.id}</div>
+        <div style={{ fontSize: 12, color: "var(--aqb-text-muted)", marginTop: 1 }}>{token.id}</div>
       </div>
 
       {/* Size input */}
@@ -158,12 +158,12 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
           border: "1px solid var(--aqb-border)",
           borderRadius: 4,
           color: "var(--aqb-text-primary)",
-          fontSize: 11,
+          fontSize: 12,
           textAlign: "right",
           flexShrink: 0,
         }}
       />
-      <span style={{ fontSize: 10, color: "var(--aqb-text-muted)", flexShrink: 0 }}>{unit}</span>
+      <span style={{ fontSize: 12, color: "var(--aqb-text-muted)", flexShrink: 0 }}>{unit}</span>
 
       {/* Style toggles */}
       <div style={{ display: "flex", gap: 3 }}>
@@ -291,7 +291,7 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange }) => {
       }}
     >
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 11, fontWeight: 500, color: "var(--aqb-text-primary)" }}>
+        <div style={{ fontSize: 12, fontWeight: 500, color: "var(--aqb-text-primary)" }}>
           {token.name}
         </div>
         <div
@@ -305,7 +305,7 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange }) => {
           Aa Bb Cc 123
         </div>
         {fontLoadFailed && (
-          <div style={{ fontSize: 9, color: "#f59e0b", marginTop: 2 }}>
+          <div style={{ fontSize: 12, color: "#f59e0b", marginTop: 2 }}>
             Font unavailable — may fall back to system font
           </div>
         )}
@@ -319,7 +319,7 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange }) => {
           border: "1px solid var(--aqb-border)",
           borderRadius: 6,
           color: "var(--aqb-text-primary)",
-          fontSize: 11,
+          fontSize: 12,
           cursor: "pointer",
         }}
       >
@@ -405,7 +405,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
       </div>
       <div
         style={{
-          fontSize: 9,
+          fontSize: 12,
           color: "var(--aqb-text-muted)",
           textAlign: "right",
           letterSpacing: "0.3px",
@@ -420,7 +420,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
 // ─── TypeTokenList ────────────────────────────────────────────────────────────
 
 const SECTION_HEADER: React.CSSProperties = {
-  fontSize: 10,
+  fontSize: 12,
   fontWeight: 600,
   color: "var(--aqb-text-muted)",
   textTransform: "uppercase",
@@ -446,7 +446,7 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
     <div style={{ display: "flex", flexDirection: "column" }}>
       {/* Device hint */}
       <div
-        style={{ fontSize: 10, color: "var(--aqb-text-muted)", marginBottom: 6, lineHeight: 1.5 }}
+        style={{ fontSize: 12, color: "var(--aqb-text-muted)", marginBottom: 6, lineHeight: 1.5 }}
       >
         Type scale per device — changes here only affect the selected breakpoint.
       </div>
@@ -469,7 +469,7 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
             borderColor: responsiveMode === "desktop" ? "var(--aqb-primary)" : "var(--aqb-border)",
             background: responsiveMode === "desktop" ? "rgba(59,130,246,0.12)" : "transparent",
             color: responsiveMode === "desktop" ? "var(--aqb-primary)" : "var(--aqb-text-muted)",
-            fontSize: 11,
+            fontSize: 12,
             cursor: "pointer",
           }}
         >
@@ -489,7 +489,7 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
             borderColor: responsiveMode === "mobile" ? "var(--aqb-primary)" : "var(--aqb-border)",
             background: responsiveMode === "mobile" ? "rgba(59,130,246,0.12)" : "transparent",
             color: responsiveMode === "mobile" ? "var(--aqb-primary)" : "var(--aqb-text-muted)",
-            fontSize: 11,
+            fontSize: 12,
             cursor: "pointer",
           }}
         >

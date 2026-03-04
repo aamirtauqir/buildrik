@@ -52,7 +52,7 @@ const WcagBadge: React.FC<{ level: WcagLevel }> = ({ level }) => (
     title={wcagTooltip(level)}
     style={{
       ...WCAG_BADGE_STYLES[level],
-      fontSize: 9,
+      fontSize: 12,
       fontWeight: 700,
       padding: "1px 5px",
       borderRadius: 4,
@@ -249,7 +249,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
               padding: 0,
               cursor: "pointer",
               color: copied ? "var(--aqb-color-success)" : "var(--aqb-text-muted)",
-              fontSize: 10,
+              fontSize: 12,
               fontFamily: "monospace",
               letterSpacing: "0.3px",
             }}
@@ -287,11 +287,11 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
                 {wcagLevel === "fail" ? (
                   <>
                     <div
-                      style={{ fontSize: 11, fontWeight: 600, color: "#ef4444", marginBottom: 4 }}
+                      style={{ fontSize: 12, fontWeight: 600, color: "#ef4444", marginBottom: 4 }}
                     >
                       Low contrast
                     </div>
-                    <div style={{ fontSize: 10, color: "var(--aqb-text-muted)", lineHeight: 1.5 }}>
+                    <div style={{ fontSize: 12, color: "var(--aqb-text-muted)", lineHeight: 1.5 }}>
                       This color may be hard to read. Ratio:{" "}
                       {calcContrastRatio(token.value, "#0A0A0A").toFixed(1)}:1 — needs 4.5:1 for AA.
                     </div>
@@ -300,7 +300,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
                   <>
                     <div
                       style={{
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: 600,
                         color: "var(--aqb-color-success, #22c55e)",
                         marginBottom: 4,
@@ -308,7 +308,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
                     >
                       Good contrast ✓
                     </div>
-                    <div style={{ fontSize: 10, color: "var(--aqb-text-muted)", lineHeight: 1.5 }}>
+                    <div style={{ fontSize: 12, color: "var(--aqb-text-muted)", lineHeight: 1.5 }}>
                       Meets WCAG {wcagLevel?.toUpperCase()}. Ratio:{" "}
                       {calcContrastRatio(token.value, "#0A0A0A").toFixed(1)}:1.
                     </div>

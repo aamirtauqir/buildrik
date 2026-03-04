@@ -104,7 +104,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
                 marginLeft: 8,
                 opacity: 0.7,
                 fontFamily: "system-ui, -apple-system, sans-serif",
-                fontSize: 11,
+                fontSize: 12,
               }}
             >
               ({shortcut})

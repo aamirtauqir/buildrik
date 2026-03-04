@@ -41,7 +41,7 @@ export const ExportDropdown: React.FC<{
           border: "1px solid var(--aqb-border)",
           borderRadius: 6,
           color: "var(--aqb-text-secondary)",
-          fontSize: 11,
+          fontSize: 12,
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
@@ -84,7 +84,7 @@ export const ExportDropdown: React.FC<{
                 background: "rgba(245,158,11,0.06)",
               }}
             >
-              <div style={{ fontSize: 10, color: "#f59e0b", marginBottom: 6, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 12, color: "#f59e0b", marginBottom: 6, lineHeight: 1.5 }}>
                 ⚠ Exporting unsaved changes — not yet live on your site.
               </div>
               <button
@@ -93,7 +93,7 @@ export const ExportDropdown: React.FC<{
                   onSaveFirst();
                 }}
                 style={{
-                  fontSize: 10,
+                  fontSize: 12,
                   color: "var(--aqb-primary)",
                   background: "none",
                   border: "none",
@@ -125,7 +125,7 @@ export const ExportDropdown: React.FC<{
               }}
             >
               <div style={{ fontSize: 12, color: "var(--aqb-text-primary)" }}>{label}</div>
-              <div style={{ fontSize: 10, color: "var(--aqb-text-muted)", marginTop: 1 }}>
+              <div style={{ fontSize: 12, color: "var(--aqb-text-muted)", marginTop: 1 }}>
                 {desc}
               </div>
             </button>

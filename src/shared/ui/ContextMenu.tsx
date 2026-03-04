@@ -131,7 +131,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ items, x, y, onClose }
             </span>
             <span style={{ flex: 1 }}>{item.label}</span>
             {item.shortcut && (
-              <span style={{ color: "var(--aqb-text-muted)", fontSize: 11 }}>{item.shortcut}</span>
+              <span style={{ color: "var(--aqb-text-muted)", fontSize: 12 }}>{item.shortcut}</span>
             )}
             {item.children && <span>▶</span>}
           </button>

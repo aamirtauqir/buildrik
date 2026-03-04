@@ -29,7 +29,7 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
       flexShrink: 0,
     }}
   >
-    <div style={{ flex: 1, fontSize: 11, color: "var(--aqb-text-muted)" }}>
+    <div style={{ flex: 1, fontSize: 12, color: "var(--aqb-text-muted)" }}>
       {isDirty ? `${dirtyCount} unsaved change${dirtyCount !== 1 ? "s" : ""}` : "All changes saved"}
     </div>
     <button
@@ -41,7 +41,7 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
         border: "1px solid var(--aqb-border)",
         borderRadius: 6,
         color: isDirty ? "#ef4444" : "var(--aqb-text-muted)",
-        fontSize: 11,
+        fontSize: 12,
         cursor: isDirty ? "pointer" : "default",
         opacity: isDirty ? 1 : 0.4,
       }}
@@ -57,7 +57,7 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
         border: "none",
         borderRadius: 6,
         color: isDirty ? "#fff" : "var(--aqb-text-muted)",
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: 600,
         cursor: isDirty ? "pointer" : "default",
         opacity: isDirty ? 1 : 0.5,

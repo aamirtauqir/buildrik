@@ -461,7 +461,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   headerBadge: {
     padding: "2px 8px",
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: 500,
     borderRadius: 10,
     background: "var(--aqb-accent)",

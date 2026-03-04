@@ -94,7 +94,7 @@ const SpacingRow: React.FC<SpacingRowProps> = ({
         style={{
           width: 28,
           flexShrink: 0,
-          fontSize: 9,
+          fontSize: 12,
           fontWeight: 700,
           color: barColor,
           letterSpacing: "0.3px",
@@ -109,7 +109,7 @@ const SpacingRow: React.FC<SpacingRowProps> = ({
         style={{
           width: 64,
           flexShrink: 0,
-          fontSize: 10,
+          fontSize: 12,
           color: "var(--aqb-text-muted)",
           fontFamily: "monospace",
           overflow: "hidden",
@@ -157,12 +157,12 @@ const SpacingRow: React.FC<SpacingRowProps> = ({
           border: "1px solid var(--aqb-border)",
           borderRadius: 4,
           color: "var(--aqb-text-primary)",
-          fontSize: 11,
+          fontSize: 12,
           textAlign: "right",
           flexShrink: 0,
         }}
       />
-      <span style={{ fontSize: 10, color: "var(--aqb-text-muted)", flexShrink: 0 }}>px</span>
+      <span style={{ fontSize: 12, color: "var(--aqb-text-muted)", flexShrink: 0 }}>px</span>
 
       {/* Zero-spacing warning */}
       {size === 0 && (
@@ -237,7 +237,7 @@ const PresetChip: React.FC<{
       borderColor: isActive ? "var(--aqb-primary)" : "var(--aqb-border)",
       background: isActive ? "rgba(59,130,246,0.15)" : "transparent",
       color: isActive ? "var(--aqb-primary)" : "var(--aqb-text-muted)",
-      fontSize: 11,
+      fontSize: 12,
       fontWeight: isActive ? 600 : 400,
       cursor: "pointer",
     }}
@@ -263,7 +263,7 @@ const SpacingDiagram: React.FC<{ tokens: DesignToken[] }> = ({ tokens }) => {
     >
       <div
         style={{
-          fontSize: 10,
+          fontSize: 12,
           fontWeight: 600,
           color: "var(--aqb-text-muted)",
           marginBottom: 8,
@@ -351,7 +351,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
           border: "1px solid rgba(255,255,255,0.1)",
           borderRadius: 20,
           color: "var(--aqb-text-muted)",
-          fontSize: 10,
+          fontSize: 12,
           cursor: "pointer",
           marginLeft: "auto",
         }}
@@ -374,7 +374,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
           gap: 6,
         }}
       >
-        <span style={{ fontSize: 10, color: "rgba(245,158,11,0.9)", lineHeight: 1.5 }}>
+        <span style={{ fontSize: 12, color: "rgba(245,158,11,0.9)", lineHeight: 1.5 }}>
           ⚠ {tokens.length} spacing tokens updated. Review before applying.
         </span>
       </div>

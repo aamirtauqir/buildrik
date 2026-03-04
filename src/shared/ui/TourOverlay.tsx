@@ -214,7 +214,7 @@ const headerStyles: React.CSSProperties = {
 };
 
 const stepIndicatorStyles: React.CSSProperties = {
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 600,
   textTransform: "uppercase",
   letterSpacing: 0.5,
