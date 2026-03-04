@@ -44,6 +44,15 @@ const BAR_COLORS: Record<"xs" | "sm" | "md" | "lg" | "xl", string> = {
   xl: "#ef4444",
 };
 
+/** Opacity variation per size — provides non-color differentiation for color-blind users */
+const BAR_OPACITY: Record<"xs" | "sm" | "md" | "lg" | "xl", number> = {
+  xs: 0.4,
+  sm: 0.55,
+  md: 0.7,
+  lg: 0.85,
+  xl: 1.0,
+};
+
 // ─── Spacing row ──────────────────────────────────────────────────────────────
 
 interface SpacingRowProps {
@@ -66,6 +75,7 @@ const SpacingRow: React.FC<SpacingRowProps> = ({
   const meta = SPACE_META[token.id];
   const size = parseFloat(token.value);
   const barColor = meta ? BAR_COLORS[meta.size] : "#3b82f6";
+  const barOpacity = meta ? BAR_OPACITY[meta.size] : 0.7;
 
   // Bar width: capped at 120px representing 48px spacing
   const maxPx = 48;
@@ -88,6 +98,7 @@ const SpacingRow: React.FC<SpacingRowProps> = ({
         padding: "7px 0",
         borderBottom: "1px solid rgba(255,255,255,0.04)",
       }}
+      aria-label={`${meta?.semantic ?? token.id} spacing: ${token.value}`}
     >
       {/* Semantic label */}
       <div
@@ -121,8 +132,9 @@ const SpacingRow: React.FC<SpacingRowProps> = ({
         {displayLabel}
       </div>
 
-      {/* Colored bar */}
+      {/* Colored bar — opacity varies by size for non-color differentiation */}
       <div
+        aria-hidden="true"
         style={{
           flex: 1,
           height: 6,
@@ -136,8 +148,9 @@ const SpacingRow: React.FC<SpacingRowProps> = ({
             width: barWidth,
             height: "100%",
             background: barColor,
+            opacity: barOpacity,
             borderRadius: 3,
-            transition: "width 0.2s",
+            transition: "width 0.2s, opacity 0.2s",
           }}
         />
       </div>
