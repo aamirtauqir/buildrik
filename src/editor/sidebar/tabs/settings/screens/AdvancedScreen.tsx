@@ -78,7 +78,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
             setIsDirty(true);
           }}
           aria-label="Head Scripts"
-          aria-describedby="head-validation-feedback"
+          aria-describedby={headValidation ? "head-validation-feedback" : undefined}
           placeholder={"<script>...</script>\n<link>...</link>"}
           style={{ ...inputStyles, minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
         />
