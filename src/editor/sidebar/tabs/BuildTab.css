@@ -163,8 +163,15 @@
 .bld-cat-row.open .bld-cat-name {
   color: rgba(255, 255, 255, 0.88);
 }
+.bld-cat-thumb {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  margin-right: 4px;
+}
 .bld-cat-count {
-  font-size: 9.5px;
+  font-size: 12px;
   font-family: monospace;
   color: var(--aqb-text-muted);
   background: rgba(255, 255, 255, 0.04);

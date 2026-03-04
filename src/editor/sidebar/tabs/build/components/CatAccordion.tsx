@@ -10,6 +10,42 @@ import { flatCatalog } from "../catalog/catalog";
 import { ElCard } from "./ElCard";
 import { SvgIcon } from "./SvgIcon";
 
+/** Tiny CSS thumbnail previews for each category */
+const CAT_THUMBNAILS: Record<string, React.ReactNode> = {
+  basic: (
+    <span aria-hidden="true" style={{ display: "inline-flex", gap: 2, alignItems: "center" }}>
+      <span style={{ width: 18, height: 6, borderRadius: 1, background: "var(--aqb-text-muted)", opacity: 0.5 }} />
+      <span style={{ width: 12, height: 8, borderRadius: 2, background: "var(--aqb-primary)", opacity: 0.5 }} />
+    </span>
+  ),
+  layout: (
+    <span aria-hidden="true" style={{ display: "inline-flex", gap: 1, alignItems: "center" }}>
+      <span style={{ width: 10, height: 12, borderRadius: 1, border: "1px solid var(--aqb-text-muted)", opacity: 0.4 }} />
+      <span style={{ width: 10, height: 12, borderRadius: 1, border: "1px solid var(--aqb-text-muted)", opacity: 0.4 }} />
+    </span>
+  ),
+  media: (
+    <span aria-hidden="true" style={{ display: "inline-flex", alignItems: "center" }}>
+      <span style={{ width: 16, height: 12, borderRadius: 2, background: "var(--aqb-text-muted)", opacity: 0.3, position: "relative", overflow: "hidden" }}>
+        <span style={{ position: "absolute", bottom: 0, left: 2, width: 4, height: 4, borderRadius: "50%", background: "var(--aqb-text-muted)", opacity: 0.6 }} />
+      </span>
+    </span>
+  ),
+  form: (
+    <span aria-hidden="true" style={{ display: "inline-flex", flexDirection: "column", gap: 1, alignItems: "stretch" }}>
+      <span style={{ width: 20, height: 4, borderRadius: 1, border: "1px solid var(--aqb-text-muted)", opacity: 0.4 }} />
+      <span style={{ width: 20, height: 4, borderRadius: 1, border: "1px solid var(--aqb-text-muted)", opacity: 0.4 }} />
+    </span>
+  ),
+  navigation: (
+    <span aria-hidden="true" style={{ display: "inline-flex", gap: 2, alignItems: "center" }}>
+      <span style={{ width: 6, height: 1, background: "var(--aqb-text-muted)", opacity: 0.5 }} />
+      <span style={{ width: 6, height: 1, background: "var(--aqb-text-muted)", opacity: 0.5 }} />
+      <span style={{ width: 6, height: 1, background: "var(--aqb-text-muted)", opacity: 0.5 }} />
+    </span>
+  ),
+};
+
 interface CatAccordionProps {
   cat: CatEntry;
   isOpen: boolean;
@@ -57,6 +93,9 @@ export const CatAccordion: React.FC<CatAccordionProps> = ({
           <div className="bld-cat-name">{cat.name}</div>
           <div className="bld-cat-sub">{cat.sub}</div>
         </div>
+        {CAT_THUMBNAILS[cat.id] && (
+          <span className="bld-cat-thumb">{CAT_THUMBNAILS[cat.id]}</span>
+        )}
         <span className="bld-cat-count">{cat.elements.length}</span>
         <svg className="bld-cat-chev" viewBox="0 0 24 24">
           <path d="M9 18l6-6-6-6" />

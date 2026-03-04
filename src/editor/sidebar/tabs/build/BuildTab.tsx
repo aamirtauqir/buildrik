@@ -95,6 +95,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           </span>
         </div>
       )}
+      <OnboardingTip dismissed={tab.tipDismissed} onDismiss={tab.dismissTip} />
       <div className="bld-shell">
         <div className="bld-elements-zone">
           {isSearching ? (
@@ -108,7 +109,6 @@ export const BuildTab: React.FC<BuildTabProps> = ({
             />
           ) : (
             <>
-              <OnboardingTip dismissed={tab.tipDismissed} onDismiss={tab.dismissTip} />
               <MyComponents
                 open={tab.myCompOpen}
                 onToggle={() => tab.setMyCompOpen(!tab.myCompOpen)}
