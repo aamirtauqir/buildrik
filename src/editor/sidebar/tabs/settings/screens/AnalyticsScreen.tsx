@@ -91,7 +91,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
   return (
     <div style={screenStyles}>
       <Section title="Google Analytics">
-        <p style={privacyNoteStyles} aria-describedby="ga-measurement-id">
+        <p id="ga-privacy-note" style={privacyNoteStyles}>
           Track visitor behavior on your published site. When enabled, Google&apos;s analytics
           script is added to every page — visitors&apos; page views, clicks, and sessions are sent
           to your Google Analytics account.
@@ -139,7 +139,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
       </Section>
 
       <Section title="Meta Pixel">
-        <p style={privacyNoteStyles} aria-describedby="meta-pixel-id">
+        <p id="meta-privacy-note" style={privacyNoteStyles}>
           Measure ad performance and build retargeting audiences. When enabled, Meta&apos;s
           tracking pixel is loaded on every page — visitor interactions are reported to your
           Meta Events Manager.

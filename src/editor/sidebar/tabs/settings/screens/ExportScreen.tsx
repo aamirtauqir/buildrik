@@ -14,7 +14,7 @@ import {
   activeExportOptionStyles,
   noteStyles,
 } from "../styles";
-import { LockedScreen } from "./LockedScreen";
+
 
 interface FormatOption {
   id: ExportFormat;
