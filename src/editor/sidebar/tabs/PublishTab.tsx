@@ -48,6 +48,7 @@ export interface PublishTabProps {
 
 const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
   <span
+    aria-label={`Publication status: ${isPublished ? "Published" : "Draft"}`}
     style={{
       display: "inline-flex",
       alignItems: "center",
@@ -59,8 +60,8 @@ const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
       letterSpacing: "0.02em",
       background: isPublished
         ? "var(--aqb-success-light, rgba(34, 197, 94, 0.12))"
-        : "var(--aqb-muted-light, rgba(161, 161, 170, 0.12))",
-      color: isPublished ? "var(--aqb-success, #22c55e)" : "var(--aqb-text-muted, #71717a)",
+        : "rgba(245, 158, 11, 0.15)",
+      color: isPublished ? "var(--aqb-success, #22c55e)" : "#F59E0B",
     }}
   >
     <span
@@ -70,11 +71,59 @@ const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
         borderRadius: "50%",
         background: isPublished
           ? "var(--aqb-success, #22c55e)"
-          : "var(--aqb-text-disabled, #52525b)",
+          : "#F59E0B",
       }}
     />
-    {isPublished ? "Live" : "Not Published"}
+    {isPublished ? "Published" : "Draft"}
   </span>
+);
+
+const ChecklistItem: React.FC<{
+  label: string;
+  ok: boolean;
+  required?: boolean;
+  hint?: string;
+}> = ({ label, ok, required, hint }) => (
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      padding: "6px 8px",
+      borderRadius: 6,
+      background: ok ? "rgba(34,197,94,0.06)" : "rgba(255,255,255,0.02)",
+      border: `1px solid ${ok ? "rgba(34,197,94,0.15)" : "var(--aqb-border)"}`,
+      fontSize: 12,
+    }}
+    aria-label={`${label}: ${ok ? "complete" : "incomplete"}`}
+  >
+    <span
+      style={{
+        width: 16,
+        height: 16,
+        borderRadius: "50%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 12,
+        background: ok ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.06)",
+        color: ok ? "#22c55e" : "var(--aqb-text-muted)",
+        flexShrink: 0,
+      }}
+      aria-hidden="true"
+    >
+      {ok ? "✓" : "○"}
+    </span>
+    <span style={{ flex: 1, color: ok ? "var(--aqb-text-secondary)" : "var(--aqb-text-primary)" }}>
+      {label}
+    </span>
+    {required && !ok && (
+      <span style={{ fontSize: 12, color: "#ef4444", fontWeight: 500 }}>Required</span>
+    )}
+    {hint && !ok && (
+      <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>{hint}</span>
+    )}
+  </div>
 );
 
 const UrlDisplay: React.FC<{ url: string }> = ({ url }) => {
@@ -240,6 +289,23 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </section>
         )}
 
+        {/* Pre-Publish Checklist */}
+        <section style={sectionStyles}>
+          <h3 style={sectionTitleStyles}>Pre-publish checklist</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <ChecklistItem label="Template applied" ok={true} required />
+            <ChecklistItem label="Content edited" ok={true} required />
+            <ChecklistItem label="SEO title set" ok={false} hint="Pages → SEO" />
+            <ChecklistItem label="Meta description added" ok={false} hint="Pages → SEO" />
+            <ChecklistItem label="Social preview configured" ok={false} hint="Pages → Social" />
+          </div>
+          {projectId && (
+            <p style={{ ...metaTextStyles, marginTop: 4 }}>
+              Publishing to <strong style={{ color: "var(--aqb-text-primary)" }}>buildrik.app/{projectId}</strong>
+            </p>
+          )}
+        </section>
+
         {/* Actions */}
         <section style={sectionStyles}>
           {!isPublished ? (
@@ -280,7 +346,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             <p style={infoDescStyles}>
               {isPublished
                 ? "Changes made after publishing require an update to go live."
-                : "Publish your site to make it accessible via a public URL."}
+                : "Complete the checklist above, then hit Publish to make your site public."}
             </p>
           </div>
         </section>
