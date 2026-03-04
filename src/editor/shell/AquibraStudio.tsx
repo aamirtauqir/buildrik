@@ -247,6 +247,10 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       }
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
+        canvasRef.current?.openCommandPalette();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === "j") {
+        e.preventDefault();
         modals.setShowAI((prev) => !prev);
       }
       if (e.key === "Escape") {

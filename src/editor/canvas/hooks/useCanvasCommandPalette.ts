@@ -168,6 +168,56 @@ export function useCanvasCommandPalette({
         keywords: ["template", "start", "design", "layout"],
         handler: () => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, {}),
       },
+      // Settings navigation
+      {
+        id: "open-analytics",
+        label: "Open Analytics Settings",
+        category: "Navigate",
+        icon: "\ud83d\udcca",
+        keywords: ["analytics", "google", "tracking", "pixel"],
+        handler: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "analytics" }),
+      },
+      {
+        id: "open-seo",
+        label: "Open SEO Settings",
+        category: "Navigate",
+        icon: "\ud83d\udd0d",
+        keywords: ["seo", "meta", "title", "description", "search"],
+        handler: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "pages", screen: "seo" }),
+      },
+      {
+        id: "open-export",
+        label: "Open Export Settings",
+        category: "Navigate",
+        icon: "\ud83d\udce6",
+        keywords: ["export", "code", "download"],
+        handler: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "export" }),
+      },
+      {
+        id: "open-integrations",
+        label: "Open Integrations",
+        category: "Navigate",
+        icon: "\ud83d\udd17",
+        keywords: ["integrations", "api", "connect", "third-party"],
+        handler: () => composer.emit(EVENTS.UI_PANEL_OPEN, { panel: "settings", screen: "integrations" }),
+      },
+      {
+        id: "toggle-layers",
+        label: "Toggle Layers Panel",
+        category: "Navigate",
+        icon: "\u2630",
+        keywords: ["layers", "tree", "structure"],
+        handler: () => composer.emit(EVENTS.UI_TOGGLE_LAYERS, {}),
+      },
+      {
+        id: "toggle-preview",
+        label: "Preview Site",
+        category: "Navigate",
+        shortcut: "Cmd+P",
+        icon: "\u25b6",
+        keywords: ["preview", "view", "live"],
+        handler: () => composer.emit(EVENTS.UI_TOGGLE_PREVIEW, {}),
+      },
     ];
   }, [composer, selectedId, clear]);
 
