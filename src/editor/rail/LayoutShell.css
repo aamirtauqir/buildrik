@@ -19,7 +19,7 @@
    These can be overridden by default.css tokens
    ============================================ */
 :root {
-  --layout-rail-width: var(--aqb-sidebar-width, 60px);
+  --layout-rail-width: var(--aqb-sidebar-width, 68px);
   --layout-drawer-width: var(--aqb-sidebar-panel-width, 280px);
   --layout-inspector-width: var(--aqb-right-panel-width, 300px);
   --layout-topbar-height: var(--aqb-header-height, 52px);
@@ -34,7 +34,7 @@
 .layout-shell {
   display: grid;
   grid-template-columns:
-    var(--layout-rail-width, 60px)
+    var(--layout-rail-width, 68px)
     0px
     1fr
     0px;
@@ -62,7 +62,7 @@
 /* Drawer open state - expand drawer column */
 .layout-shell--drawer-open {
   grid-template-columns:
-    var(--layout-rail-width, 60px)
+    var(--layout-rail-width, 68px)
     var(--layout-drawer-width, 280px)
     1fr
     0px;
@@ -71,7 +71,7 @@
 /* Inspector open state - expand inspector column */
 .layout-shell--inspector-open {
   grid-template-columns:
-    var(--layout-rail-width, 60px)
+    var(--layout-rail-width, 68px)
     0px
     1fr
     var(--layout-inspector-width, 300px);
@@ -80,7 +80,7 @@
 /* Both drawer and inspector open */
 .layout-shell--drawer-open.layout-shell--inspector-open {
   grid-template-columns:
-    var(--layout-rail-width, 60px)
+    var(--layout-rail-width, 68px)
     var(--layout-drawer-width, 280px)
     1fr
     var(--layout-inspector-width, 300px);
@@ -212,7 +212,7 @@
   /* Inspector overlays canvas instead of taking grid space */
   .layout-shell--inspector-open {
     grid-template-columns:
-      var(--layout-rail-width, 60px)
+      var(--layout-rail-width, 68px)
       0px
       1fr
       0px;
@@ -220,7 +220,7 @@
 
   .layout-shell--drawer-open.layout-shell--inspector-open {
     grid-template-columns:
-      var(--layout-rail-width, 60px)
+      var(--layout-rail-width, 68px)
       var(--layout-drawer-width, 280px)
       1fr
       0px;

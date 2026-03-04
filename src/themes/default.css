@@ -427,7 +427,7 @@
   --glass-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
 
   /* Layout Shell Dimensions */
-  --layout-rail-width: 60px;                  /* Left icon rail */
+  --layout-rail-width: 68px;                  /* Left icon rail */
   --layout-drawer-width: 250px;               /* Sliding drawer panel (Refined) */
   --layout-inspector-width: 280px;            /* Right inspector panel (Refined) */
   --layout-topbar-height: 52px;               /* Top bar height */
