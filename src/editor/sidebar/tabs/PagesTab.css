@@ -1549,8 +1549,8 @@
   flex-shrink: 0;
 }
 
-.pg-seo__score-num { font-size: 22px; font-weight: 700; color: var(--aqb-primary, #6366F1); line-height: 1; }
-.pg-seo__score-label { font-size: 8.5px; color: var(--aqb-text-muted); margin-top: 2px; }
+.pg-seo__score-num { font-size: 22px; font-weight: 700; line-height: 1; }
+.pg-seo__score-label { font-size: 12px; color: var(--aqb-text-muted); margin-top: 2px; }
 
 .pg-seo__score-checks {
   flex: 1;

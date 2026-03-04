@@ -32,6 +32,18 @@ const rangeLabel: Record<TitleRange, string> = {
   long: " · Too long",
 };
 
+function scoreColor(score: number): string {
+  if (score <= 40) return "#EF4444";
+  if (score <= 70) return "#F59E0B";
+  return "#22C55E";
+}
+
+function scoreLabel(score: number): string {
+  if (score <= 40) return "Needs work";
+  if (score <= 70) return "Getting there";
+  return "Great";
+}
+
 export const SeoTab: React.FC<Props> = ({ s, page }) => {
   const domain = s.domain ?? "yourdomain.com";
   const previewSlug = s.slug || page.slug || page.id;
@@ -72,15 +84,17 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             <div
               className="pg-seo__score-badge"
               aria-live="polite"
-              aria-label={`SEO Score: ${s.seoScore} out of 100`}
+              aria-label={`SEO Score: ${s.seoScore} out of 100 — ${scoreLabel(s.seoScore)}`}
             >
-              <span className="pg-seo__score-num">{s.seoScore}</span>
-              <span className="pg-seo__score-label">SEO Score</span>
+              <span className="pg-seo__score-num" style={{ color: scoreColor(s.seoScore) }}>{s.seoScore}</span>
+              <span className="pg-seo__score-label">{scoreLabel(s.seoScore)}</span>
             </div>
             <div className="pg-seo__score-checks">
               <SeoCheck ok={s.seoChecks.indexingOn} label="Allow indexing" hint="Required" />
               <SeoCheck ok={s.seoChecks.titleSet} label="Page title" hint="+20 pts" />
               <SeoCheck ok={s.seoChecks.descSet} label="Meta description" hint="+30 pts" />
+              <SeoCheck ok={s.seoChecks.slugClean} label="Clean URL slug" hint="+20 pts" />
+              <SeoCheck ok={s.seoTitle.length >= 30} label="Detailed title (30+ chars)" hint="+10 pts" />
             </div>
           </div>
           {s.seoScore < 80 && (
