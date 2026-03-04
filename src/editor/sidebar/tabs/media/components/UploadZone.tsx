@@ -94,7 +94,26 @@ export function UploadZone({ storage, onUpload, uploadQueue, disabled = false }:
         <div className="med-storage-track">
           <div className="med-storage-fill" style={{ width: `${pct}%` }} />
         </div>
-        <span className="med-storage-label">{storageLabel}</span>
+        <span className="med-storage-label">
+          {storageLabel}
+          <span style={{ opacity: 0.6, marginLeft: 4 }}>(Free plan)</span>
+        </span>
+        {isNearFull && !isFull && (
+          <a
+            href="#upgrade"
+            onClick={(e) => e.preventDefault()}
+            style={{
+              fontSize: 12,
+              color: "var(--aqb-primary, #3b82f6)",
+              textDecoration: "none",
+              marginLeft: 6,
+              flexShrink: 0,
+            }}
+            aria-label="Upgrade storage plan"
+          >
+            Upgrade
+          </a>
+        )}
       </div>
     </div>
   );
