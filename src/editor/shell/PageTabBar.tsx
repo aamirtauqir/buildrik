@@ -38,6 +38,23 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
   const [deleteConfirmPageId, setDeleteConfirmPageId] = React.useState<string | null>(null);
   const { addToast } = useToast();
 
+  /** Generate URL slug from page name */
+  const toSlug = (name: string): string =>
+    name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+  /** Validation state derived from editName */
+  const nameValidation = React.useMemo<{
+    error?: string;
+    warning?: string;
+    slug: string;
+  }>(() => {
+    const trimmed = editName.trim();
+    const slug = toSlug(trimmed);
+    if (!trimmed) return { error: "Page name is required", slug: "" };
+    if (trimmed.length < 3) return { warning: "Short name — consider 3+ characters", slug };
+    return { slug };
+  }, [editName]);
+
   // Sync pages from composer — subscribe to all page events
   React.useEffect(() => {
     if (!composer) return;
@@ -105,7 +122,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
   };
 
   const handleRenameSubmit = () => {
-    if (editingPageId && editName.trim() && composer) {
+    if (editingPageId && editName.trim() && !nameValidation.error && composer) {
       composer.elements.updatePage(editingPageId, { name: editName.trim() });
     }
     setEditingPageId(null);
@@ -215,25 +232,70 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
             >
               {page.isHome && <span style={homeIconStyles}>🏠</span>}
               {editingPageId === page.id ? (
-                <input
-                  type="text"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  onBlur={handleRenameSubmit}
-                  onKeyDown={(e) => {
-                    // Stop bubbling to tab/tablist handlers — arrows would move tab focus,
-                    // F2 would reset editName to page.name, losing in-progress text
-                    e.stopPropagation();
-                    if (e.key === "Enter") handleRenameSubmit();
-                    if (e.key === "Escape") {
-                      setEditingPageId(null);
-                      setEditName("");
-                    }
-                  }}
-                  autoFocus
-                  style={inputStyles}
-                  onClick={(e) => e.stopPropagation()}
-                />
+                <span style={{ position: "relative" }}>
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    onBlur={handleRenameSubmit}
+                    onKeyDown={(e) => {
+                      // Stop bubbling to tab/tablist handlers — arrows would move tab focus,
+                      // F2 would reset editName to page.name, losing in-progress text
+                      e.stopPropagation();
+                      if (e.key === "Enter" && !nameValidation.error) handleRenameSubmit();
+                      if (e.key === "Escape") {
+                        setEditingPageId(null);
+                        setEditName("");
+                      }
+                    }}
+                    autoFocus
+                    aria-describedby="ptb-rename-feedback"
+                    aria-invalid={!!nameValidation.error}
+                    style={{
+                      ...inputStyles,
+                      borderColor: nameValidation.error
+                        ? "#EF4444"
+                        : nameValidation.warning
+                        ? "#F59E0B"
+                        : "var(--aqb-accent, #3b82f6)",
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  <span
+                    id="ptb-rename-feedback"
+                    role={nameValidation.error ? "alert" : undefined}
+                    style={{
+                      position: "absolute",
+                      top: "100%",
+                      left: 0,
+                      zIndex: 100,
+                      background: "var(--aqb-surface, #1a1a2e)",
+                      border: "1px solid var(--aqb-border)",
+                      borderRadius: 4,
+                      padding: "4px 8px",
+                      marginTop: 2,
+                      whiteSpace: "nowrap",
+                      fontSize: 12,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {nameValidation.error && (
+                      <span style={{ color: "#EF4444", display: "block" }}>
+                        {nameValidation.error}
+                      </span>
+                    )}
+                    {nameValidation.warning && (
+                      <span style={{ color: "#F59E0B", display: "block" }}>
+                        {nameValidation.warning}
+                      </span>
+                    )}
+                    {nameValidation.slug && (
+                      <span style={{ color: "var(--aqb-text-muted)", display: "block" }}>
+                        /{nameValidation.slug}
+                      </span>
+                    )}
+                  </span>
+                </span>
               ) : (
                 <span style={tabNameStyles}>{page.name}</span>
               )}
