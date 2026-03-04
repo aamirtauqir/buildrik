@@ -6,7 +6,8 @@
 
 import * as React from "react";
 import type { DesignToken, TokenDiff } from "../../types";
-import { calcWcagLevel } from "../../utils/colorUtils";
+import { calcWcagLevel, calcContrastRatio } from "../../utils/colorUtils";
+import { suggestContrastFix } from "../../utils/contrastFix";
 import { ColorTokenRow } from "./ColorTokenRow";
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -121,10 +122,28 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
       }));
   }, [visibleTokens]);
 
+  const BG = "#0A0A0A";
+
   const issuesCount = React.useMemo(
-    () => tokens.filter((t) => calcWcagLevel(t.value, "#0A0A0A") === "fail").length,
+    () => tokens.filter((t) => calcWcagLevel(t.value, BG) === "fail").length,
     [tokens]
   );
+
+  /** Map of token id → suggested fix hex for all failing tokens */
+  const contrastFixes = React.useMemo(() => {
+    const fixes: Record<string, string> = {};
+    tokens.forEach((t) => {
+      if (calcWcagLevel(t.value, BG) === "fail") {
+        const fix = suggestContrastFix(t.value, BG);
+        if (fix) fixes[t.id] = fix;
+      }
+    });
+    return fixes;
+  }, [tokens]);
+
+  const applyAllFixes = () => {
+    Object.entries(contrastFixes).forEach(([id, hex]) => onColorChange(id, hex));
+  };
 
   const handleSwatchClick = (id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -215,10 +234,31 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             marginBottom: 8,
           }}
         >
-          <span style={{ fontSize: 12, color: "rgba(239,68,68,0.9)", lineHeight: 1.5 }}>
-            {issuesCount} token{issuesCount !== 1 ? "s" : ""} with low contrast against dark
-            backgrounds — fails WCAG AA.
-          </span>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+            <span style={{ fontSize: 12, color: "rgba(239,68,68,0.9)", lineHeight: 1.5 }}>
+              {issuesCount} token{issuesCount !== 1 ? "s" : ""} with low contrast — fails WCAG AA.
+            </span>
+            {Object.keys(contrastFixes).length > 0 && (
+              <button
+                onClick={applyAllFixes}
+                style={{
+                  padding: "3px 10px",
+                  borderRadius: 4,
+                  border: "1px solid rgba(34,197,94,0.4)",
+                  background: "rgba(34,197,94,0.1)",
+                  color: "#22C55E",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+                aria-label={`Fix all ${Object.keys(contrastFixes).length} contrast issues`}
+              >
+                Fix all ({Object.keys(contrastFixes).length})
+              </button>
+            )}
+          </div>
         </div>
       )}
 
@@ -253,22 +293,71 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                 {group.tokens.map((token) => {
                   const diff = pendingDiff[token.id];
+                  const fix = filterMode === "issues" ? contrastFixes[token.id] : undefined;
+                  const ratio = filterMode === "issues" ? calcContrastRatio(token.value, BG) : undefined;
                   return (
-                    <ColorTokenRow
-                      key={token.id}
-                      token={token}
-                      isChanged={!!diff}
-                      isExpanded={expandedId === token.id}
-                      onSwatchClick={() => handleSwatchClick(token.id)}
-                      onColorChange={onColorChange}
-                      onPickerCancel={() => setExpandedId(null)}
-                      onPickerSave={handlePickerSave}
-                      onUndo={onUndo}
-                      onRedo={onRedo}
-                      canUndo={canUndo(token.id)}
-                      canRedo={canRedo(token.id)}
-                      previousValue={diff?.previousValue}
-                    />
+                    <React.Fragment key={token.id}>
+                      <ColorTokenRow
+                        token={token}
+                        isChanged={!!diff}
+                        isExpanded={expandedId === token.id}
+                        onSwatchClick={() => handleSwatchClick(token.id)}
+                        onColorChange={onColorChange}
+                        onPickerCancel={() => setExpandedId(null)}
+                        onPickerSave={handlePickerSave}
+                        onUndo={onUndo}
+                        onRedo={onRedo}
+                        canUndo={canUndo(token.id)}
+                        canRedo={canRedo(token.id)}
+                        previousValue={diff?.previousValue}
+                      />
+                      {fix && ratio !== undefined && (
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            padding: "4px 8px 4px 28px",
+                            fontSize: 12,
+                            color: "var(--aqb-text-muted)",
+                          }}
+                        >
+                          <span>Ratio: {ratio.toFixed(1)}:1 → needs 4.5:1</span>
+                          <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                            Suggested:
+                            <span
+                              style={{
+                                display: "inline-block",
+                                width: 14,
+                                height: 14,
+                                borderRadius: 3,
+                                background: fix,
+                                border: "1px solid var(--aqb-border)",
+                                verticalAlign: "middle",
+                              }}
+                              aria-hidden="true"
+                            />
+                            <code style={{ fontSize: 12 }}>{fix}</code>
+                          </span>
+                          <button
+                            onClick={() => onColorChange(token.id, fix)}
+                            style={{
+                              padding: "2px 8px",
+                              borderRadius: 3,
+                              border: "1px solid rgba(34,197,94,0.4)",
+                              background: "rgba(34,197,94,0.1)",
+                              color: "#22C55E",
+                              fontSize: 12,
+                              fontWeight: 600,
+                              cursor: "pointer",
+                            }}
+                            aria-label={`Fix contrast for ${token.name}`}
+                          >
+                            Fix
+                          </button>
+                        </div>
+                      )}
+                    </React.Fragment>
                   );
                 })}
               </div>
