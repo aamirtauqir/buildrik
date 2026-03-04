@@ -49,7 +49,7 @@ export const DraftChip: React.FC<{ state: DraftState; count: number }> = ({ stat
           animation: "aqb-dot-pulse 1.5s infinite",
         }}
       />
-      {count} unsaved
+      {count} previewing
     </span>
   );
 };

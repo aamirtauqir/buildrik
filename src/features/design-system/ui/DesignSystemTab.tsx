@@ -242,7 +242,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
       spacingState.markSaved();
       setShowReview(false); // close modal on success
       setIsFirstLoad(false);
-      addToast({ message: "Design tokens applied — changes live on canvas", variant: "success" });
+      addToast({ message: "Design tokens applied successfully", variant: "success" });
     } catch {
       addToast({ message: "Failed to apply tokens. Try again.", variant: "error" });
     }

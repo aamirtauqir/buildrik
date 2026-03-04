@@ -30,7 +30,7 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
     }}
   >
     <div style={{ flex: 1, fontSize: 12, color: "var(--aqb-text-muted)" }}>
-      {isDirty ? `${dirtyCount} unsaved change${dirtyCount !== 1 ? "s" : ""}` : "All changes saved"}
+      {isDirty ? `${dirtyCount} previewing` : "All changes saved"}
     </div>
     <button
       onClick={onDiscard}
@@ -46,7 +46,7 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
         opacity: isDirty ? 1 : 0.4,
       }}
     >
-      Revert
+      Discard
     </button>
     <button
       onClick={onReview}
@@ -63,7 +63,7 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
         opacity: isDirty ? 1 : 0.5,
       }}
     >
-      Review & Save
+      Apply Changes
     </button>
   </div>
 );
