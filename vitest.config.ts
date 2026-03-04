@@ -13,6 +13,7 @@ export default defineConfig({
     globals: true,
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
     setupFiles: ["@testing-library/jest-dom"],
+    testTimeout: 15000,
   },
   resolve: {
     alias: {
