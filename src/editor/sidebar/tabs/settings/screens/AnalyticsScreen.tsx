@@ -91,6 +91,11 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
   return (
     <div style={screenStyles}>
       <Section title="Google Analytics">
+        <p style={privacyNoteStyles} aria-describedby="ga-measurement-id">
+          Track visitor behavior on your published site. When enabled, Google&apos;s analytics
+          script is added to every page — visitors&apos; page views, clicks, and sessions are sent
+          to your Google Analytics account.
+        </p>
         <Field
           label="Google Analytics ID"
           hint="Find this in Google Analytics → Admin → Data Streams → your stream → Measurement ID"
@@ -134,6 +139,11 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
       </Section>
 
       <Section title="Meta Pixel">
+        <p style={privacyNoteStyles} aria-describedby="meta-pixel-id">
+          Measure ad performance and build retargeting audiences. When enabled, Meta&apos;s
+          tracking pixel is loaded on every page — visitor interactions are reported to your
+          Meta Events Manager.
+        </p>
         <Field
           label="Meta (Facebook) Pixel ID"
           hint="15–16 digit number from your Meta Events Manager"
@@ -198,6 +208,13 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
       />
     </div>
   );
+};
+
+const privacyNoteStyles: React.CSSProperties = {
+  margin: "0 0 12px",
+  fontSize: 13,
+  lineHeight: 1.5,
+  color: "var(--aqb-text-secondary)",
 };
 
 const hintTextStyles: React.CSSProperties = {
