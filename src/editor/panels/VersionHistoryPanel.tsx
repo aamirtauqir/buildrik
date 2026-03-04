@@ -36,6 +36,23 @@ function formatTime(timestamp: number): string {
   return new Date(timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
+function relativeTime(timestamp: number): string {
+  const diff = Date.now() - timestamp;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins} minute${mins !== 1 ? "s" : ""} ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days !== 1 ? "s" : ""} ago`;
+}
+
+function countElements(version: NamedVersion): number {
+  const pages = version.snapshot?.pages;
+  if (!pages || !Array.isArray(pages)) return 0;
+  return pages.reduce((acc: number, p: { elements?: unknown[] }) => acc + (p.elements?.length ?? 0), 0);
+}
+
 function groupVersionsByDate(versions: NamedVersion[]): Map<string, NamedVersion[]> {
   const groups = new Map<string, NamedVersion[]>();
   versions.forEach((v) => {
@@ -226,35 +243,53 @@ interface VersionRowProps {
   onDelete: () => void;
 }
 
-const VersionRow: React.FC<VersionRowProps> = ({ version, isRestoring, onRestore, onDelete }) => (
-  <div style={versionRowStyles}>
-    <div style={versionRowLeftStyles}>
-      <div style={avatarStyles}>
-        <UserIcon />
-      </div>
-      <div style={versionInfoStyles}>
-        <div style={versionNameStyles}>{version.name}</div>
-        <div style={versionMetaStyles}>
-          {formatTime(version.createdAt)}
-          {version.isAutoCheckpoint && <span style={autoBadgeStyles}>Auto</span>}
+const VersionRow: React.FC<VersionRowProps> = ({ version, isRestoring, onRestore, onDelete }) => {
+  const elementCount = countElements(version);
+  const relative = relativeTime(version.createdAt);
+  return (
+    <div
+      style={versionRowStyles}
+      aria-label={`Version "${version.name}" from ${relative}${elementCount > 0 ? `, ${elementCount} elements` : ""}${version.isAutoCheckpoint ? ", auto-saved" : ""}`}
+    >
+      <div style={versionRowLeftStyles}>
+        <div style={avatarStyles}>
+          <UserIcon />
+        </div>
+        <div style={versionInfoStyles}>
+          <div style={versionNameStyles}>{version.name}</div>
+          <div style={versionMetaStyles}>
+            {formatTime(version.createdAt)}
+            <span style={{ color: "var(--aqb-text-muted)", fontSize: 12 }}>{relative}</span>
+            {elementCount > 0 && (
+              <span style={changeBadgeStyles} aria-label={`${elementCount} elements`}>
+                {elementCount} el
+              </span>
+            )}
+            {version.isAutoCheckpoint && <span style={autoBadgeStyles}>Auto</span>}
+          </div>
         </div>
       </div>
+      <div style={versionActionsStyles}>
+        <button
+          onClick={onRestore}
+          style={restoreBtnStyles}
+          disabled={isRestoring}
+          aria-label={`Restore version "${version.name}"`}
+        >
+          {isRestoring ? "..." : "Restore"}
+        </button>
+        <button
+          onClick={onDelete}
+          style={deleteBtnStyles}
+          title="Delete"
+          aria-label={`Delete version "${version.name}"`}
+        >
+          ×
+        </button>
+      </div>
     </div>
-    <div style={versionActionsStyles}>
-      <button onClick={onRestore} style={restoreBtnStyles} disabled={isRestoring}>
-        {isRestoring ? "..." : "Restore"}
-      </button>
-      <button
-        onClick={onDelete}
-        style={deleteBtnStyles}
-        title="Delete"
-        aria-label="Delete this version"
-      >
-        ×
-      </button>
-    </div>
-  </div>
-);
+  );
+};
 
 // ============================================
 // Empty State
@@ -391,6 +426,15 @@ const versionMetaStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 6,
+};
+
+const changeBadgeStyles: React.CSSProperties = {
+  padding: "1px 6px",
+  background: "rgba(99,102,241,0.12)",
+  color: "var(--aqb-primary)",
+  borderRadius: 4,
+  fontSize: 12,
+  fontWeight: 500,
 };
 
 const autoBadgeStyles: React.CSSProperties = {
