@@ -158,7 +158,7 @@
 }
 
 .pages-add-item__sub {
-  font-size: 9.5px;
+  font-size: 10px;
   color: var(--aqb-text-muted);
   margin-top: 1px;
 }
@@ -257,7 +257,7 @@
 
 .pages-limit-banner__icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
 .pages-limit-banner__title { font-size: 10.5px; font-weight: 600; color: var(--pg-hidden, #F59E0B); }
-.pages-limit-banner__sub { font-size: 9.5px; color: rgba(245, 158, 11, 0.55); margin-top: 2px; line-height: 1.4; }
+.pages-limit-banner__sub { font-size: 10px; color: rgba(245, 158, 11, 0.55); margin-top: 2px; line-height: 1.4; }
 
 /* ─── ④ Pages list (flex:1 scrollable body) ────────────────────────────────── */
 .pages-list {
@@ -420,7 +420,7 @@
 
 /* Badges */
 .pages-row__home {
-  font-size: 7.5px;
+  font-size: 10px;
   font-family: var(--aqb-font-mono, monospace);
   font-weight: 600;
   background: rgba(34, 197, 94, 0.1);
@@ -667,7 +667,7 @@
 }
 
 .pages-drawer__section-title {
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 600;
   color: var(--aqb-text-muted);
   text-transform: uppercase;
@@ -786,7 +786,7 @@
 }
 
 .pages-drawer__tog-sub {
-  font-size: 9.5px;
+  font-size: 10px;
   color: var(--aqb-text-muted);
   margin-top: 2px;
 }
@@ -1516,7 +1516,7 @@
 .pg-seo { padding: 12px 13px 20px; }
 
 .pg-seo__section-label {
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 600;
   color: var(--aqb-text-muted);
   text-transform: uppercase;
@@ -1702,7 +1702,7 @@
 }
 
 .pg-social__section-sub {
-  font-size: 9.5px;
+  font-size: 10px;
   color: var(--aqb-text-muted);
   font-weight: 400;
 }
@@ -1734,7 +1734,7 @@
 }
 
 .pg-social__preview-body { padding: 8px 10px; }
-.pg-social__preview-domain { font-size: 9.5px; color: var(--aqb-text-muted); margin-bottom: 2px; }
+.pg-social__preview-domain { font-size: 10px; color: var(--aqb-text-muted); margin-bottom: 2px; }
 .pg-social__preview-title { font-size: 11.5px; font-weight: 600; color: var(--aqb-text-primary); margin-bottom: 2px; }
 .pg-social__preview-desc { font-size: 12px; color: var(--aqb-text-muted); }
 .pg-social__preview--fallback { opacity: 0.7; }
@@ -1860,7 +1860,7 @@
 }
 
 .pg-advanced__toggle-hint {
-  font-size: 9.5px;
+  font-size: 10px;
   color: var(--aqb-text-muted);
   margin-top: 2px;
   line-height: 1.4;

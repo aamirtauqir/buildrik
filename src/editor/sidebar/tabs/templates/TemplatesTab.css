@@ -156,7 +156,7 @@
 }
 
 .tpl-meta-count {
-  font-size: 9.5px;
+  font-size: 10px;
   color: var(--aqb-text-muted, #3D4A5C);
   font-family: var(--aqb-font-mono, monospace);
 }
@@ -192,7 +192,7 @@
   white-space: nowrap;
 }
 
-.tab-sub { font-size: 9.5px; color: rgba(74,222,128,0.45); }
+.tab-sub { font-size: 10px; color: rgba(74,222,128,0.45); }
 
 .tpl-banner-dismiss {
   flex-shrink: 0;
@@ -276,7 +276,7 @@
   border: 1px solid rgba(248,113,113,0.25);
   color: rgba(248,113,113,0.85);
   cursor: pointer;
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 600;
   font-family: inherit;
   border-radius: 4px;
@@ -477,7 +477,7 @@
 
 .tcard-name {
   flex: 1;
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 500;
   color: rgba(255,255,255,0.55);
   overflow: hidden;
@@ -494,7 +494,7 @@
 }
 
 .tcard-badge {
-  font-size: 7.5px;
+  font-size: 10px;
   font-weight: 600;
   padding: 2px 5px;
   border-radius: 20px;
@@ -543,7 +543,7 @@
 /* FIX-6: context-aware empty state classes */
 .tpl-empty-icon { font-size: 22px; }
 .tpl-empty-hint {
-  font-size: 9.5px;
+  font-size: 10px;
   color: rgba(255,255,255,0.3);
   margin-bottom: 8px;
 }
@@ -715,7 +715,7 @@
 }
 
 .tpl-modal-info-text {
-  font-size: 9.5px;
+  font-size: 10px;
   color: rgba(0, 212, 170, 0.7);
   line-height: 1.6;
 }
@@ -775,7 +775,7 @@
 }
 
 .tpl-pro-details-title { font-size: 12px; color: #fbbf24; font-weight: 600; margin-bottom: 5px; }
-.tpl-pro-details-list { font-size: 9.5px; color: rgba(255, 255, 255, 0.4); line-height: 1.7; }
+.tpl-pro-details-list { font-size: 10px; color: rgba(255, 255, 255, 0.4); line-height: 1.7; }
 
 /* ── Canvas selection banner — portal to body ── */
 .tpl-canvas-banner {
@@ -842,7 +842,7 @@
   border: 1px solid rgba(124,109,250,0.25);
   color: #a5b4fc;
   cursor: pointer;
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 600;
   font-family: inherit;
   border-radius: 5px;
