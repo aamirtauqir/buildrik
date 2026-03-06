@@ -164,6 +164,30 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
         </Field>
       </Section>
 
+      <Section title="Legal">
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <a
+            href="/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontSize: 13, color: "var(--aqb-primary, #6366f1)", textDecoration: "none" }}
+          >
+            Privacy Policy →
+          </a>
+          <a
+            href="/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontSize: 13, color: "var(--aqb-primary, #6366f1)", textDecoration: "none" }}
+          >
+            Terms of Service →
+          </a>
+          <span style={{ fontSize: 12, color: "var(--aqb-text-muted)", marginTop: 4 }}>
+            Your data is stored securely. We do not sell or share your site data.
+          </span>
+        </div>
+      </Section>
+
       <StickyFooter primaryLabel="Save" onPrimary={handleSave} hasChanges={hasChanges} />
     </div>
   );

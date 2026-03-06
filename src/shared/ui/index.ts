@@ -96,3 +96,11 @@ export {
   type UseQuickSwitcherResult,
 } from "./QuickSwitcher";
 export type { QuickSwitcherSection } from "./QuickSwitcher.types";
+export {
+  InfoBanner,
+  Tip,
+  WarningBanner,
+  type InfoBannerProps,
+  type TipProps,
+  type WarningBannerProps,
+} from "./InfoBanner";

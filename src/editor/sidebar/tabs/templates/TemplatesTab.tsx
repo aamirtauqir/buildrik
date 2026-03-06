@@ -581,7 +581,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({ composer, onTemplate
                     <div className="tcard-line tcard-line--xs" />
                     {isLocked ? (
                       <div className="tcard-lock-ov">
-                        <span className="tcard-lock-lbl">🔒 PRO</span>
+                        <span className="tcard-lock-lbl" title="PRO plan required" aria-label="PRO plan required">🔒 PRO</span>
                         <button
                           className="tcard-prev-btn"
                           onClick={(e) => {

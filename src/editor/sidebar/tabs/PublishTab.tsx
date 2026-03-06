@@ -306,6 +306,14 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           )}
         </section>
 
+        {/* Trust signal */}
+        <div style={trustBadgeStyles}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" style={{ flexShrink: 0, color: "var(--aqb-success, #22c55e)" }}>
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          <span>Your site data is encrypted and stored securely.</span>
+        </div>
+
         {/* Actions */}
         <section style={sectionStyles}>
           {!isPublished ? (
@@ -559,6 +567,19 @@ const errorDismissStyles: React.CSSProperties = {
   color: "inherit",
   cursor: "pointer",
   flexShrink: 0,
+};
+
+const trustBadgeStyles: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 6,
+  padding: "7px 10px",
+  background: "rgba(34, 197, 94, 0.06)",
+  borderRadius: "var(--aqb-radius-md, 8px)",
+  border: "1px solid rgba(34, 197, 94, 0.15)",
+  fontSize: 12,
+  color: "var(--aqb-text-muted)",
+  lineHeight: 1.4,
 };
 
 const privacyFooterStyles: React.CSSProperties = {

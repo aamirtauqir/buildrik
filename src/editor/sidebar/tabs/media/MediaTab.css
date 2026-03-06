@@ -1331,6 +1331,12 @@
   width: 100%;
   max-width: 180px;
 }
+.med-empty-formats {
+  margin: 0;
+  font-size: 11px;
+  color: var(--aqb-text-disabled, #6b6963);
+  letter-spacing: 0.02em;
+}
 .med-disc-cta {
   background: transparent;
   border: none;

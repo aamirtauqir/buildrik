@@ -57,6 +57,12 @@ export function OnboardingEmptyState({
       />
 
       {activeType === "all" && (
+        <p className="med-empty-formats" aria-label="Supported file formats">
+          JPG · PNG · SVG · GIF · MP4 · PDF
+        </p>
+      )}
+
+      {activeType === "all" && (
         <button
           className="med-disc-cta"
           onClick={onDiscovery}
