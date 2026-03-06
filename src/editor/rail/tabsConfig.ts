@@ -194,7 +194,7 @@ export const RAIL_SLOTS: RailSlot[] = [
   // ── BOTTOM zone ─────────────────────────────────────────────────────────────
   {
     tabId: "design",
-    label: "Global",
+    label: "Design",
     iconName: "SvgGlobe",
     ariaLabel: "Design System",
     zone: "bottom",

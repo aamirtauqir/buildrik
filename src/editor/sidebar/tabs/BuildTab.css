@@ -86,8 +86,8 @@
   gap: 6px;
   height: 26px;
   padding: 0 9px;
-  background: rgba(124, 109, 250, 0.08);
-  border: 1px solid rgba(124, 109, 250, 0.2);
+  background: var(--aqb-accent-purple-8);
+  border: 1px solid var(--aqb-accent-purple-20);
   border-radius: 6px;
   cursor: pointer;
   font-size: 10.5px;
@@ -95,8 +95,8 @@
   transition: all 0.1s;
 }
 .bld-comp-chip:hover {
-  background: rgba(124, 109, 250, 0.15);
-  border-color: rgba(124, 109, 250, 0.35);
+  background: var(--aqb-accent-purple-15);
+  border-color: var(--aqb-accent-purple-35);
   color: #a5b4fc;
 }
 
@@ -120,7 +120,7 @@
   background: rgba(255, 255, 255, 0.02);
 }
 .bld-cat-row.open {
-  background: rgba(124, 109, 250, 0.055);
+  background: var(--aqb-accent-purple-5);
 }
 .bld-cat-icon {
   width: 28px;
@@ -144,8 +144,8 @@
   stroke-linejoin: round;
 }
 .bld-cat-row.open .bld-cat-icon {
-  background: rgba(124, 109, 250, 0.1);
-  border-color: rgba(124, 109, 250, 0.22);
+  background: var(--aqb-accent-purple-10);
+  border-color: var(--aqb-accent-purple-22);
 }
 .bld-cat-row.open .bld-cat-icon svg {
   stroke: #818cf8;
@@ -183,8 +183,8 @@
 }
 .bld-cat-row.open .bld-cat-count {
   color: #a5b4fc;
-  border-color: rgba(124, 109, 250, 0.25);
-  background: rgba(124, 109, 250, 0.08);
+  border-color: var(--aqb-accent-purple-25);
+  background: var(--aqb-accent-purple-8);
 }
 .bld-cat-chev {
   width: 11px;
@@ -200,7 +200,7 @@
 }
 .bld-cat-row.open .bld-cat-chev {
   transform: rotate(90deg);
-  color: rgba(124, 109, 250, 0.55);
+  color: var(--aqb-accent-purple-55);
 }
 .bld-cat-body {
   overflow: hidden;
@@ -235,8 +235,8 @@
   user-select: none;
 }
 .bld-el-card:hover {
-  background: rgba(124, 109, 250, 0.07);
-  border-color: rgba(124, 109, 250, 0.18);
+  background: var(--aqb-accent-purple-7);
+  border-color: var(--aqb-accent-purple-20);
   transform: translateY(-1px);
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28);
 }
@@ -269,7 +269,7 @@
   transition: stroke 0.12s;
 }
 .bld-el-card:hover .bld-el-icon {
-  background: rgba(124, 109, 250, 0.1);
+  background: var(--aqb-accent-purple-10);
 }
 .bld-el-card:hover .bld-el-icon svg {
   stroke: #a5b4fc;
@@ -561,9 +561,9 @@
   color: var(--aqb-text-secondary);
 }
 .bld-tip-card {
-  background: rgba(124, 109, 250, 0.05);
-  border: 1px solid rgba(124, 109, 250, 0.12);
-  border-left: 2px solid rgba(124, 109, 250, 0.35);
+  background: var(--aqb-accent-purple-5);
+  border: 1px solid var(--aqb-accent-purple-12);
+  border-left: 2px solid var(--aqb-accent-purple-35);
   border-radius: 6px;
   padding: 7px 9px;
   font-size: 12px;
@@ -664,8 +664,8 @@
   gap: 8px;
   padding: 8px 12px;
   margin: 4px 8px 2px;
-  background: rgba(124, 109, 250, 0.06);
-  border: 1px solid rgba(124, 109, 250, 0.15);
+  background: var(--aqb-accent-purple-5);
+  border: 1px solid var(--aqb-accent-purple-15);
   border-radius: 7px;
   min-height: 44px;
 }
@@ -680,7 +680,7 @@
   border: none;
   background: transparent;
   font-size: 12px;
-  color: rgba(124, 109, 250, 0.6);
+  color: var(--aqb-accent-purple-60);
   cursor: pointer;
   padding: 2px 6px;
   border-radius: 4px;
@@ -688,7 +688,7 @@
   white-space: nowrap;
 }
 .bld-tip-banner-dismiss:hover {
-  background: rgba(124, 109, 250, 0.1);
+  background: var(--aqb-accent-purple-10);
   color: #a5b4fc;
 }
 

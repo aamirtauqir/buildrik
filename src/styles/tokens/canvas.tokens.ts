@@ -14,15 +14,15 @@ export const canvasTokens = {
   colors: {
     // Premium Aquibra Blue Palette
     primary: {
-      default: "#00A3FF", // Bright Aquibra Blue
-      light: "#33B5FF",
-      dark: "#0082CC",
-      subtle: "rgba(0, 163, 255, 0.1)",
-      alpha10: "rgba(0, 163, 255, 0.1)",
-      alpha15: "rgba(0, 163, 255, 0.15)",
-      alpha20: "rgba(0, 163, 255, 0.2)",
-      alpha30: "rgba(0, 163, 255, 0.3)",
-      alpha40: "rgba(0, 163, 255, 0.4)",
+      default: "#2563EB", // Aquibra Blue (aligned with CSS token)
+      light: "#3B82F6",
+      dark: "#1D4ED8",
+      subtle: "rgba(37, 99, 235, 0.1)",
+      alpha10: "rgba(37, 99, 235, 0.1)",
+      alpha15: "rgba(37, 99, 235, 0.15)",
+      alpha20: "rgba(37, 99, 235, 0.2)",
+      alpha30: "rgba(37, 99, 235, 0.3)",
+      alpha40: "rgba(37, 99, 235, 0.4)",
     },
 
     // Obsidian Surface Colors
@@ -49,7 +49,7 @@ export const canvasTokens = {
       success: "#10B981",
       error: "#EF4444",
       warning: "#F59E0B",
-      info: "#00A3FF",
+      info: "#2563EB",
       errorBg: "rgba(239, 68, 68, 0.1)",
       errorBorder: "rgba(239, 68, 68, 0.3)",
     },
@@ -89,8 +89,8 @@ export const canvasTokens = {
 
   // Selection Effects
   selection: {
-    outline: "#00A3FF",
-    handleGradient: "linear-gradient(135deg, #00A3FF 0%, #33B5FF 100%)",
+    outline: "#2563EB",
+    handleGradient: "linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)",
     glow: "0 0 0 3px rgba(0, 163, 255, 0.2)",
     glowStrong: "0 0 0 4px rgba(0, 163, 255, 0.4)",
     glowSubtle: "0 0 0 2px rgba(0, 163, 255, 0.15)",

@@ -7,6 +7,7 @@
 
 import gsap from "gsap";
 import * as React from "react";
+import { useReducedMotion } from "@shared/hooks";
 
 interface Rect {
   left: number;
@@ -20,6 +21,7 @@ export function useSelectionAnimation(
   rect: Rect | null
 ) {
   const lastRectRef = React.useRef<Rect | null>(null);
+  const prefersReduced = useReducedMotion();
 
   React.useEffect(() => {
     if (!targetRef.current || !rect) {
@@ -44,8 +46,8 @@ export function useSelectionAnimation(
         {
           opacity: 1,
           scale: 1,
-          duration: 0.4,
-          ease: "elastic.out(1, 0.75)",
+          duration: prefersReduced ? 0 : 0.2,
+          ease: "back.out(1.4)",
         }
       );
     } else {
@@ -55,12 +57,12 @@ export function useSelectionAnimation(
         top: top - 1,
         width: width + 2,
         height: height + 2,
-        duration: 0.5,
+        duration: prefersReduced ? 0 : 0.25,
         ease: "power4.out", // Smooth deceleration
         overwrite: "auto",
       });
     }
 
     lastRectRef.current = rect;
-  }, [rect, targetRef]);
+  }, [rect, targetRef, prefersReduced]);
 }
