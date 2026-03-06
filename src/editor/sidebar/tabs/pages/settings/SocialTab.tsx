@@ -7,6 +7,7 @@
  */
 
 import * as React from "react";
+import { Tooltip } from "@shared/ui/Tooltip";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 
@@ -34,6 +35,45 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
       {/* ── SECTION LABEL ────────────────────────────────────────────────── */}
       <div className="pg-social__section-label">
         Social Share Preview
+        <Tooltip
+          content={
+            <span style={{ display: "block", whiteSpace: "normal", maxWidth: 240 }}>
+              Open Graph (OG) is a standard that controls how your page appears when shared on
+              Facebook, LinkedIn, Twitter/X, and other social platforms
+            </span>
+          }
+          position="right"
+          delay={200}
+        >
+          <button
+            type="button"
+            aria-label="About Open Graph metadata"
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "0 0 0 4px",
+              color: "var(--aqb-text-muted)",
+              display: "inline-flex",
+              verticalAlign: "middle",
+              lineHeight: 0,
+            }}
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </button>
+        </Tooltip>
         <span className="pg-social__section-sub">Open Graph metadata</span>
       </div>
 

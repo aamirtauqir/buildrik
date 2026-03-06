@@ -8,6 +8,7 @@
  */
 
 import * as React from "react";
+import { Tooltip } from "@shared/ui/Tooltip";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 
@@ -138,6 +139,45 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         <div className="pg-seo__field-header">
           <label className="pg-seo__label" htmlFor="seo-desc">
             Meta Description
+            <Tooltip
+              content={
+                <span style={{ display: "block", whiteSpace: "normal", maxWidth: 240 }}>
+                  A short summary of your page shown in Google search results (keep under 160
+                  characters)
+                </span>
+              }
+              position="right"
+              delay={200}
+            >
+              <button
+                type="button"
+                aria-label="About Meta Description"
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: "0 0 0 4px",
+                  color: "var(--aqb-text-muted)",
+                  display: "inline-flex",
+                  verticalAlign: "middle",
+                  lineHeight: 0,
+                }}
+              >
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+              </button>
+            </Tooltip>
           </label>
           <span
             className={`pg-seo__counter ${

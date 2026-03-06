@@ -37,11 +37,28 @@ const formatLastSaved = (timestamp: number | undefined): string => {
 };
 
 const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, onRetry }) => {
+  const [justSaved, setJustSaved] = React.useState(false);
+  const prevStatusRef = React.useRef(status);
+
+  // Detect saving → idle transition and show "Saved ✓" briefly
+  React.useEffect(() => {
+    if (prevStatusRef.current === "saving" && status === "idle") {
+      setJustSaved(true);
+      const timer = setTimeout(() => setJustSaved(false), 2000);
+      prevStatusRef.current = status;
+      return () => clearTimeout(timer);
+    }
+    prevStatusRef.current = status;
+  }, [status]);
+
+  // Hide when idle and not just saved — avoids cluttering the topbar
+  if (status === "idle" && !justSaved) return null;
+
   const statusConfig = {
     idle: {
       color: "var(--status-saved, #22c55e)",
       bg: "rgba(34, 197, 94, 0.1)",
-      label: "Saved",
+      label: "Saved ✓",
       icon: <SvgCheck />,
     },
     saving: {
@@ -53,7 +70,7 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
     error: {
       color: "var(--status-error, #ef4444)",
       bg: "rgba(239, 68, 68, 0.1)",
-      label: "Error",
+      label: "Save failed",
       icon: <SvgWarning />,
     },
   };
@@ -61,7 +78,7 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
   const config = statusConfig[status];
   const tooltipContent =
     status === "error"
-      ? "Save failed - click to retry"
+      ? "Save failed — click to retry"
       : status === "saving"
         ? "Saving changes..."
         : `Last saved: ${formatLastSaved(lastSavedAt)}`;
@@ -70,6 +87,8 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
     <Tooltip content={tooltipContent}>
       <div
         className="status-indicator save-status"
+        role="status"
+        aria-live="polite"
         style={{
           display: "flex",
           alignItems: "center",
@@ -80,11 +99,12 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
           fontWeight: 600,
           color: config.color,
           background: config.bg,
-          transition: "all 0.2s ease",
+          transition: "all 0.2s ease, opacity 0.3s ease",
           cursor: status === "error" ? "pointer" : "default",
+          opacity: justSaved ? 1 : undefined,
+          animation: justSaved ? "aqb-fade-out 0.3s ease 1.7s forwards" : undefined,
         }}
         onClick={status === "error" ? onRetry : undefined}
-        role={status === "error" ? "button" : undefined}
         tabIndex={status === "error" ? 0 : undefined}
       >
         <span
@@ -241,6 +261,8 @@ export const StatusIndicators: React.FC<StatusIndicatorsProps> = ({
   return (
     <div
       className="status-indicators"
+      aria-live="polite"
+      aria-label="Project status"
       style={{
         display: "flex",
         alignItems: "center",

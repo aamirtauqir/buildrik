@@ -3032,6 +3032,11 @@
   }
 }
 
+@keyframes aqb-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
 @keyframes aqb-popover-in {
   from {
     opacity: 0;
