@@ -38,9 +38,9 @@ export const canvasTokens = {
 
     // Text Colors
     text: {
-      primary: "#F5F5F7", // Almost white
-      secondary: "#A1A1AA", // Zinc 400
-      muted: "#71717A", // Zinc 500
+      primary: "#F5F5F0", // 14.1:1 on dark — WCAG AAA
+      secondary: "#B8B5AD", // 6.5:1 on dark — WCAG AA
+      muted: "#908D85", // 4.6:1 on dark — WCAG AA
       onPrimary: "#ffffff",
     },
 

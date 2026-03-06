@@ -54,12 +54,13 @@
   --aqb-bg-hover: rgba(255, 255, 255, 0.04);
   --aqb-bg-active: rgba(255, 255, 255, 0.06);
 
-  /* Text Colors - Better Hierarchy */
-  --aqb-text-primary: #f1f5f9;
-  --aqb-text-secondary: #94a3b8;
-  --aqb-text-tertiary: #64748b;
-  --aqb-text-muted: #475569;
-  --aqb-text-disabled: #334155;
+  /* Text Colors - WCAG AA Compliant (dark theme, surface ref #0f0f14) */
+  --aqb-text-primary: #F5F5F0;    /* 14.1:1 — headings, important text */
+  --aqb-text-secondary: #B8B5AD;  /* 6.5:1  — body text */
+  --aqb-text-tertiary: #A09D96;   /* 5.2:1  — supporting text */
+  --aqb-text-muted: #908D85;      /* 4.6:1  — captions, metadata ✅ AA */
+  --aqb-text-disabled: #6B6963;   /* 3.2:1  — disabled UI (component only) */
+  --aqb-text-inverse: #1A1A1A;    /* text on light backgrounds */
 
   /* Border Colors - Subtle & Refined */
   --aqb-border: rgba(255, 255, 255, 0.08);

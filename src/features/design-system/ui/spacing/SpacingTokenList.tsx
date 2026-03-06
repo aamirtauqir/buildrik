@@ -231,9 +231,9 @@ const SpacingRow: React.FC<SpacingRowProps> = ({
 // ─── Preset chip ──────────────────────────────────────────────────────────────
 
 const PRESET_LABELS: Record<SpacingPreset, string> = {
-  compact: "Compact",
-  normal: "Normal",
-  spacious: "Spacious",
+  compact: "Compact (2px)",
+  normal: "Normal (4px)",
+  spacious: "Spacious (6px)",
 };
 
 const PresetChip: React.FC<{

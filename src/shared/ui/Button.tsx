@@ -42,39 +42,50 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       cursor: disabled || loading ? "not-allowed" : "pointer",
       fontFamily: "inherit",
       fontWeight: 500,
-      transition: "all 0.15s ease",
-      opacity: disabled ? 0.5 : 1,
+      transition: "background 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease",
+      opacity: disabled || loading ? 0.4 : 1,
+      pointerEvents: disabled || loading ? "none" : "auto",
       width: fullWidth ? "100%" : "auto",
       whiteSpace: "nowrap",
+      boxSizing: "border-box",
     };
 
     const sizeStyles: Record<string, React.CSSProperties> = {
-      sm: { padding: "6px 12px", fontSize: 12 },
-      md: { padding: "8px 16px", fontSize: 14 },
-      lg: { padding: "12px 24px", fontSize: 16 },
+      sm: { height: 28, padding: "0 10px", fontSize: 12, fontWeight: 500 },
+      md: { height: 36, padding: "0 16px", fontSize: 14, fontWeight: 500 },
+      lg: { height: 44, padding: "0 20px", fontSize: 16, fontWeight: 500 },
     };
 
     const variantStyles: Record<string, React.CSSProperties> = {
+      // Tier 1 — Primary CTA (Publish, Save)
       primary: {
-        background: "linear-gradient(135deg, var(--aqb-primary), var(--aqb-primary-hover))",
+        background: "var(--aqb-primary)",
         color: "#fff",
+        fontWeight: 600,
+        border: "none",
+        boxShadow: "0 2px 8px rgba(99, 102, 241, 0.25)",
       },
+      // Tier 2 — Secondary (Preview, Export, Cancel)
       secondary: {
-        background: "var(--aqb-bg-panel-secondary)",
-        color: "var(--aqb-text-primary)",
-        border: "1px solid var(--aqb-border)",
-      },
-      ghost: {
         background: "transparent",
         color: "var(--aqb-text-secondary)",
+        border: "1px solid var(--aqb-border)",
+      },
+      // Tier 3 — Ghost (inline actions, toolbar)
+      ghost: {
+        background: "transparent",
+        color: "var(--aqb-text-muted)",
+        border: "none",
       },
       danger: {
         background: "var(--aqb-error)",
         color: "#fff",
+        border: "none",
       },
       success: {
         background: "var(--aqb-success)",
         color: "#fff",
+        border: "none",
       },
     };
 
