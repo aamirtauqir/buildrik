@@ -224,6 +224,7 @@ const overlayStyles: React.CSSProperties = {
 
 const cardStyles: React.CSSProperties = {
   position: "absolute",
+  zIndex: 9999,
   width: 400,
   background: "var(--aqb-bg-panel)",
   border: "1px solid var(--aqb-border)",
