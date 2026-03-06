@@ -405,7 +405,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
               "elements" in composer &&
               typeof composer.elements?.createPage === "function"
             ) {
-              composer.elements.createPage("Untitled Page");
+              composer.elements.createPage("Home");
             }
           }}
           onOpenProjectSettings={modals.openProjectSettings}

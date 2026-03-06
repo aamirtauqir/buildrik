@@ -10,6 +10,7 @@ import { EVENTS } from "../../shared/constants";
 import type { PageData } from "../../shared/types";
 import { ConfirmDialog } from "../../shared/ui/Modal";
 import { useToast } from "../../shared/ui/Toast";
+import { getDefaultPageName } from "../../shared/utils/pageUtils";
 
 // ============================================================================
 // TYPES
@@ -124,8 +125,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
 
   const handleAddPage = () => {
     if (!composer) return;
-    const pageCount = pages.length + 1;
-    composer.elements.createPage(`Page ${pageCount}`);
+    composer.elements.createPage(getDefaultPageName(pages));
   };
 
   const handleContextMenu = (e: React.MouseEvent, pageId: string) => {

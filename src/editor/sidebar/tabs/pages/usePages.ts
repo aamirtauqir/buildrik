@@ -22,6 +22,7 @@ import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
 import { useToast } from "../../../../shared/ui/Toast";
+import { getDefaultPageName } from "../../../../shared/utils/pageUtils";
 import type { PageItem } from "./types";
 
 interface ContextMenuState {
@@ -133,7 +134,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
 
   const addPage = React.useCallback(() => {
     if (!composer) return;
-    const name = `Page ${pages.length + 1}`;
+    const name = getDefaultPageName(pages);
     const slug = name.toLowerCase().replace(/\s+/g, "-");
     composer.elements.createPage(name, { slug });
     setTimeout(() => {
