@@ -1,6 +1,6 @@
 /**
  * TourOverlay - Onboarding tour for new users
- * Shows a 3-step guide: Canvas -> Left Sidebar -> Inspector
+ * 3-step spotlight guide: Templates → Canvas → Publish
  * @license BSD-3-Clause
  */
 
@@ -8,7 +8,7 @@ import * as React from "react";
 import { Button } from "./Button";
 
 export interface TourStep {
-  /** data-tour-target attribute value to find the element */
+  /** Element id to target (empty string = canvas center) */
   target: string;
   title: string;
   description: string;
@@ -17,26 +17,26 @@ export interface TourStep {
 
 const TOUR_STEPS: TourStep[] = [
   {
-    target: "main-canvas",
-    title: "Welcome to Aquibra",
-    description:
-      "This is your canvas. Elements you add will appear here. You can drag, resize, and edit them visually.",
-    position: "center",
-  },
-  {
-    target: "left-sidebar",
-    title: "Add Elements",
-    description: "Use the left sidebar to add blocks, components, and manage your page structure.",
+    target: "rail-tab-templates",
+    title: "Choose a template",
+    description: "Start with a professionally designed template or build from scratch.",
     position: "right",
   },
   {
-    target: "properties-panel",
-    title: "Style & Edit",
-    description:
-      "Select an element to customize its properties, styles, and interactions in this panel.",
-    position: "left",
+    target: "",
+    title: "Edit your page",
+    description: "Click any element to edit. Drag to rearrange.",
+    position: "center",
+  },
+  {
+    target: ".pillPublish",
+    title: "Publish when ready",
+    description: "Hit Publish to make your site live.",
+    position: "bottom",
   },
 ];
+
+const STORAGE_KEY = "buildrik_onboarding_tour_v1";
 
 export const TourOverlay: React.FC = () => {
   const [currentStepIndex, setCurrentStepIndex] = React.useState(0);
@@ -45,12 +45,12 @@ export const TourOverlay: React.FC = () => {
     top: 0,
     left: 0,
   });
+  const [spotlightRect, setSpotlightRect] = React.useState<DOMRect | null>(null);
 
   // Check if user has already seen the tour
   React.useEffect(() => {
-    const seen = localStorage.getItem("aquibra_tour_seen");
+    const seen = localStorage.getItem(STORAGE_KEY);
     if (!seen) {
-      // Small delay to ensure UI is ready
       const timer = setTimeout(() => {
         setIsVisible(true);
       }, 1000);
@@ -68,6 +68,16 @@ export const TourOverlay: React.FC = () => {
     return () => window.removeEventListener("replay-tour", handler);
   }, []);
 
+  // Escape key skips tour
+  React.useEffect(() => {
+    if (!isVisible) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleFinish();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [isVisible]);
+
   const currentStep = TOUR_STEPS[currentStepIndex];
 
   // Calculate position based on target
@@ -75,7 +85,8 @@ export const TourOverlay: React.FC = () => {
     if (!isVisible) return;
 
     const calculatePosition = () => {
-      if (currentStep.position === "center") {
+      if (!currentStep.target || currentStep.position === "center") {
+        setSpotlightRect(null);
         setPosition({
           top: window.innerHeight / 2 - 100,
           left: window.innerWidth / 2 - 200,
@@ -83,18 +94,20 @@ export const TourOverlay: React.FC = () => {
         return;
       }
 
-      const target = document.querySelector<HTMLElement>(
-        `[data-tour-target="${currentStep.target}"]`
-      );
+      const target = currentStep.target.startsWith(".")
+        ? document.querySelector<HTMLElement>(currentStep.target)
+        : document.getElementById(currentStep.target);
       if (target) {
         const rect = target.getBoundingClientRect();
-        let top = rect.top + rect.height / 2 - 100; // Vertical center
+        setSpotlightRect(rect);
+
+        let top = rect.top + rect.height / 2 - 100;
         let left = 0;
 
         if (currentStep.position === "right") {
           left = rect.right + 24;
         } else if (currentStep.position === "left") {
-          left = rect.left - 424; // Width (400) + gap (24)
+          left = rect.left - 424;
         } else if (currentStep.position === "bottom") {
           left = rect.left + rect.width / 2 - 200;
           top = rect.bottom + 24;
@@ -105,12 +118,18 @@ export const TourOverlay: React.FC = () => {
         left = Math.max(24, Math.min(window.innerWidth - 424, left));
 
         setPosition({ top, left });
+      } else {
+        // Target not found — fall back to center
+        setSpotlightRect(null);
+        setPosition({
+          top: window.innerHeight / 2 - 100,
+          left: window.innerWidth / 2 - 200,
+        });
       }
     };
 
     calculatePosition();
     window.addEventListener("resize", calculatePosition);
-    // Recalculate periodically in case of layout shifts
     const interval = setInterval(calculatePosition, 500);
 
     return () => {
@@ -128,7 +147,7 @@ export const TourOverlay: React.FC = () => {
   };
 
   const handleFinish = () => {
-    localStorage.setItem("aquibra_tour_seen", "true");
+    localStorage.setItem(STORAGE_KEY, "true");
     setIsVisible(false);
   };
 
@@ -136,22 +155,38 @@ export const TourOverlay: React.FC = () => {
 
   return (
     <div style={overlayStyles}>
-      {/* Spotlight/Highlight effect could go here (masked SVG) - keeping it simple for now */}
+      {/* Spotlight — darkens everything except target element */}
+      {spotlightRect && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: "fixed",
+            top: spotlightRect.top - 8,
+            left: spotlightRect.left - 8,
+            width: spotlightRect.width + 16,
+            height: spotlightRect.height + 16,
+            borderRadius: 8,
+            boxShadow: "0 0 0 9999px rgba(0,0,0,0.55)",
+            pointerEvents: "none",
+            zIndex: 9998,
+          }}
+        />
+      )}
 
-      {/* Card */}
+      {/* Tooltip card */}
       <div
         style={{
           ...cardStyles,
           top: position.top,
           left: position.left,
-          opacity: position.top === 0 ? 0 : 1, // Hide until positioned
+          opacity: position.top === 0 && position.left === 0 ? 0 : 1,
         }}
       >
         <div style={headerStyles}>
           <div style={stepIndicatorStyles}>
             Step {currentStepIndex + 1} of {TOUR_STEPS.length}
           </div>
-          <button onClick={handleFinish} style={skipButtonStyles}>
+          <button onClick={handleFinish} style={skipButtonStyles} aria-label="Skip tour">
             Skip
           </button>
         </div>
@@ -184,17 +219,13 @@ const overlayStyles: React.CSSProperties = {
   position: "fixed",
   inset: 0,
   zIndex: 9999,
-  pointerEvents: "none", // Let clicks pass through to UI? No, usually block interactions.
-  // Actually for a guide, we might want to block interactions or allow them.
-  // For this simple version, let's allow clicking through OUTSIDE the card, but card consumes clicks.
-  // But wait, if we block pointer events on overlay, we can't click the card.
-  // We'll set pointer-events: none on wrapper, and auto on card.
+  pointerEvents: "none",
 };
 
 const cardStyles: React.CSSProperties = {
   position: "absolute",
   width: 400,
-  background: "var(--aqb-bg-panel)", // Solid background
+  background: "var(--aqb-bg-panel)",
   border: "1px solid var(--aqb-border)",
   borderRadius: 16,
   boxShadow: "0 20px 50px rgba(0,0,0,0.5), 0 0 0 1px inset rgba(255,255,255,0.05)",
