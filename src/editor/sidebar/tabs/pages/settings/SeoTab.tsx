@@ -137,8 +137,11 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
       {/* ── 4. META DESCRIPTION ─────────────────────────────────────────── */}
       <div className="pg-seo__field">
         <div className="pg-seo__field-header">
-          <label className="pg-seo__label" htmlFor="seo-desc">
-            Meta Description
+          {/* label + info icon in a flex row — button must NOT be inside <label> (HTML spec) */}
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <label className="pg-seo__label" htmlFor="seo-desc">
+              Meta Description
+            </label>
             <Tooltip
               content={
                 <span style={{ display: "block", whiteSpace: "normal", maxWidth: 240 }}>
@@ -156,10 +159,9 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
                   background: "none",
                   border: "none",
                   cursor: "pointer",
-                  padding: "0 0 0 4px",
+                  padding: 2,
                   color: "var(--aqb-text-muted)",
                   display: "inline-flex",
-                  verticalAlign: "middle",
                   lineHeight: 0,
                 }}
               >
@@ -178,7 +180,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
                 </svg>
               </button>
             </Tooltip>
-          </label>
+          </div>
           <span
             className={`pg-seo__counter ${
               s.seoDesc.length > 160

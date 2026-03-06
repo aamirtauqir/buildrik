@@ -87,8 +87,9 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
     <Tooltip content={tooltipContent}>
       <div
         className="status-indicator save-status"
-        role="status"
-        aria-live="polite"
+        // role="button" for error (interactive) — role="status" for saving/saved (live region,
+        // implies aria-live="polite" — no explicit aria-live needed to avoid double announcements)
+        role={status === "error" ? "button" : "status"}
         style={{
           display: "flex",
           alignItems: "center",
@@ -261,7 +262,6 @@ export const StatusIndicators: React.FC<StatusIndicatorsProps> = ({
   return (
     <div
       className="status-indicators"
-      aria-live="polite"
       aria-label="Project status"
       style={{
         display: "flex",
