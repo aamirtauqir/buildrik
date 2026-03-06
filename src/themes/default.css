@@ -4533,3 +4533,26 @@ textarea:disabled {
 .aqb-icon-btn:focus:not(:focus-visible) {
   outline: none !important;
 }
+
+/* ============================================
+   Click Feedback (P-36)
+   ============================================ */
+@keyframes aqb-flash {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .aqb-element-flash {
+    animation: aqb-flash 0.3s ease-out;
+  }
+}
+
+.aqb-btn:active {
+  transform: scale(0.97);
+}
+
+.aqb-icon-btn:active {
+  transform: scale(0.95);
+}
