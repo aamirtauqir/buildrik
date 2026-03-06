@@ -53,6 +53,7 @@ export interface RailSlot {
   zone: RailZone;
   variant: RailVariant;
   toggleMode?: boolean;
+  subtitle?: string;
 }
 
 // ─── Sidebar Tab Data ─────────────────────────────────────────────────────────
@@ -166,6 +167,7 @@ export const RAIL_SLOTS: RailSlot[] = [
     ariaLabel: "Templates",
     zone: "top",
     variant: "rtab",
+    subtitle: "Browse page templates",
   },
   {
     tabId: "pages",
@@ -174,6 +176,7 @@ export const RAIL_SLOTS: RailSlot[] = [
     ariaLabel: "Pages",
     zone: "top",
     variant: "rtab",
+    subtitle: "Manage site pages",
   },
   {
     tabId: "add",
@@ -182,6 +185,7 @@ export const RAIL_SLOTS: RailSlot[] = [
     ariaLabel: "Build",
     zone: "top",
     variant: "rtab",
+    subtitle: "Add elements and components",
   },
   {
     tabId: "assets",
@@ -190,6 +194,7 @@ export const RAIL_SLOTS: RailSlot[] = [
     ariaLabel: "Media Library",
     zone: "top",
     variant: "rtab",
+    subtitle: "Images, videos, and files",
   },
   // ── BOTTOM zone ─────────────────────────────────────────────────────────────
   {
@@ -199,6 +204,7 @@ export const RAIL_SLOTS: RailSlot[] = [
     ariaLabel: "Design System",
     zone: "bottom",
     variant: "rtab",
+    subtitle: "Colors, typography, and spacing",
   },
   {
     tabId: "settings",
@@ -207,6 +213,7 @@ export const RAIL_SLOTS: RailSlot[] = [
     ariaLabel: "Config & Launch",
     zone: "bottom",
     variant: "rtab",
+    subtitle: "Site settings and SEO",
   },
   // ── FOOTER zone ─────────────────────────────────────────────────────────────
   {

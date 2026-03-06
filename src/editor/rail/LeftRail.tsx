@@ -117,9 +117,14 @@ const RailTab: React.FC<RailTabProps> = ({ slot, icon: Icon, isActive, badge, on
 
       {/* CSS-driven tooltip — always in DOM, shown via :hover opacity */}
       <span className="left-rail__tooltip" role="tooltip">
-        <span className="left-rail__tooltip-name">{slot.ariaLabel}</span>
-        {TAB_SHORTCUTS[slot.tabId] && (
-          <span className="left-rail__tooltip-kbd">{TAB_SHORTCUTS[slot.tabId]}</span>
+        <span className="left-rail__tooltip-name">
+          {slot.ariaLabel}
+          {TAB_SHORTCUTS[slot.tabId] && (
+            <span className="left-rail__tooltip-kbd">{TAB_SHORTCUTS[slot.tabId]}</span>
+          )}
+        </span>
+        {slot.subtitle && (
+          <span className="left-rail__tooltip-sub">{slot.subtitle}</span>
         )}
       </span>
 
