@@ -413,17 +413,17 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
               key={tab.id}
               onClick={() => handleTabClick(tab.id)}
               style={{
-                padding: "6px 14px",
+                padding: "8px 12px",
                 borderRadius: "6px 6px 0 0",
                 border: "none",
-                background: activeTab === tab.id ? "var(--aqb-surface-3)" : "transparent",
+                background: "transparent",
                 color: activeTab === tab.id ? "var(--aqb-text-primary)" : "var(--aqb-text-muted)",
-                fontSize: 12,
-                fontWeight: activeTab === tab.id ? 600 : 400,
+                fontSize: 13,
+                fontWeight: activeTab === tab.id ? 600 : 500,
                 cursor: "pointer",
                 borderBottom:
                   activeTab === tab.id ? "2px solid var(--aqb-primary)" : "2px solid transparent",
-                transition: "color 0.15s, background 0.15s",
+                transition: "color 0.15s",
                 display: "flex",
                 alignItems: "center",
                 gap: 5,

@@ -290,7 +290,7 @@
   color: rgba(165, 180, 252, 0.82);
 }
 .bld-el-cat-badge {
-  font-size: 8px;
+  font-size: 10px;
   font-family: monospace;
   color: var(--aqb-text-muted);
   text-align: center;

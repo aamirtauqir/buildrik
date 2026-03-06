@@ -8,7 +8,7 @@ import * as React from "react";
 export interface BadgeProps {
   children: React.ReactNode;
   variant?: "default" | "primary" | "success" | "warning" | "error" | "info";
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "lg";
   dot?: boolean;
 }
 
@@ -18,21 +18,24 @@ export const Badge: React.FC<BadgeProps> = ({
   size = "md",
   dot = false,
 }) => {
+  const isStatus = variant !== "default";
+
   const variantStyles: Record<string, React.CSSProperties> = {
     default: {
-      background: "var(--aqb-bg-panel-secondary)",
-      color: "var(--aqb-text-secondary)",
+      background: "var(--aqb-surface-2)",
+      color: "var(--aqb-text-muted)",
     },
-    primary: { background: "var(--aqb-primary)", color: "#fff" },
-    success: { background: "var(--aqb-success)", color: "#fff" },
-    warning: { background: "var(--aqb-warning)", color: "#fff" },
-    error: { background: "var(--aqb-error)", color: "#fff" },
-    info: { background: "var(--aqb-info)", color: "#fff" },
+    primary: { background: "rgba(99, 102, 241, 0.12)", color: "var(--aqb-primary, #6366F1)" },
+    success: { background: "rgba(34, 197, 94, 0.12)", color: "var(--aqb-success, #22c55e)" },
+    warning: { background: "rgba(245, 158, 11, 0.12)", color: "var(--aqb-warning, #f59e0b)" },
+    error: { background: "rgba(239, 68, 68, 0.12)", color: "var(--aqb-error, #ef4444)" },
+    info: { background: "rgba(75, 141, 255, 0.12)", color: "var(--blue, #4b8dff)" },
   };
 
-  const sizeStyles = {
-    sm: { padding: "2px 6px", fontSize: 12 },
-    md: { padding: "4px 8px", fontSize: 12 },
+  const sizeStyles: Record<string, React.CSSProperties> = {
+    sm: { padding: "0 6px", height: 18, fontSize: 11, lineHeight: "18px" },
+    md: { padding: "0 8px", height: 22, fontSize: 11, lineHeight: "22px" },
+    lg: { padding: "0 10px", height: 26, fontSize: 12, lineHeight: "26px" },
   };
 
   if (dot) {
@@ -56,8 +59,10 @@ export const Badge: React.FC<BadgeProps> = ({
       style={{
         display: "inline-flex",
         alignItems: "center",
-        borderRadius: 100,
-        fontWeight: 600,
+        borderRadius: 4,
+        fontWeight: isStatus ? 600 : 500,
+        textTransform: isStatus ? "uppercase" : undefined,
+        letterSpacing: isStatus ? "0.5px" : undefined,
         ...sizeStyles[size],
         ...variantStyles[variant],
       }}

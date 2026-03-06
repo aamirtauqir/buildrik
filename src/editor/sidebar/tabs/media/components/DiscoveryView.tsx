@@ -6,6 +6,7 @@
  */
 
 import * as React from "react";
+import { Skeleton } from "@shared/ui/Skeleton";
 import { DISC_SECTION_LABELS } from "../data/mediaData";
 import type {
   DiscFont,
@@ -31,8 +32,10 @@ function PhotoGrid({
 }) {
   if (loading && photos.length === 0) {
     return (
-      <div className="med-empty">
-        <span className="med-empty-sub">Loading…</span>
+      <div className="med-grid" data-cols="3" aria-busy="true" aria-label="Loading photos">
+        {Array.from({ length: 9 }).map((_, i) => (
+          <Skeleton key={i} width="100%" height="auto" radius="sm" style={{ aspectRatio: "1 / 1" }} />
+        ))}
       </div>
     );
   }

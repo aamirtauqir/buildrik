@@ -81,7 +81,7 @@
   background: rgba(255,255,255,0.1);
   color: rgba(255,255,255,0.4);
   cursor: pointer;
-  font-size: 8px;
+  font-size: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -437,7 +437,7 @@
 .tcard--locked:hover .tcard-lock-ov { opacity: 1; }
 
 .tcard-lock-lbl {
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
   color: #F59E0B;
@@ -487,7 +487,7 @@
 }
 
 .tcard-pg {
-  font-size: 8.5px;
+  font-size: 10px;
   color: var(--aqb-text-muted, #3D4A5C);
   font-family: var(--aqb-font-mono, monospace);
   flex-shrink: 0;
