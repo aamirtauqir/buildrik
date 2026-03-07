@@ -25,15 +25,15 @@ export interface SpacingTokenListProps {
 // ─── Semantic labels for spacing tokens ───────────────────────────────────────
 
 const SPACE_META: Record<string, { semantic: string; size: "xs" | "sm" | "md" | "lg" | "xl" }> = {
-  "space-1": { semantic: "XS", size: "xs" },
-  "space-2": { semantic: "SM", size: "sm" },
-  "space-3": { semantic: "SM", size: "sm" },
-  "space-4": { semantic: "MD", size: "md" },
-  "space-5": { semantic: "MD", size: "md" },
-  "space-6": { semantic: "LG", size: "lg" },
-  "space-8": { semantic: "LG", size: "lg" },
-  "space-10": { semantic: "XL", size: "xl" },
-  "space-12": { semantic: "XL", size: "xl" },
+  "space-1":  { semantic: "XS",  size: "xs" },
+  "space-2":  { semantic: "SM",  size: "sm" },
+  "space-3":  { semantic: "SM+", size: "sm" },
+  "space-4":  { semantic: "MD",  size: "md" },
+  "space-5":  { semantic: "MD+", size: "md" },
+  "space-6":  { semantic: "LG",  size: "lg" },
+  "space-8":  { semantic: "LG+", size: "lg" },
+  "space-10": { semantic: "XL",  size: "xl" },
+  "space-12": { semantic: "XL+", size: "xl" },
 };
 
 const BAR_COLORS: Record<"xs" | "sm" | "md" | "lg" | "xl", string> = {
