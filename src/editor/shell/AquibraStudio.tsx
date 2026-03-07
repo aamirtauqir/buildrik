@@ -21,7 +21,6 @@ import { migrateStorageKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { OnboardingProgress } from "../onboarding";
-import { OnboardingModal, isOnboardingComplete, markOnboardingComplete } from "../onboarding/OnboardingModal";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
@@ -116,13 +115,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   const composerContainerRef = React.useRef<HTMLDivElement | null>(null);
   const hasManuallyToggledSpacing = React.useRef(false);
   const { addToast } = useToast();
-  const [showOnboarding, setShowOnboarding] = React.useState(() => !isOnboardingComplete());
-
-  const handleOnboardingDone = React.useCallback(() => {
-    markOnboardingComplete();
-    setShowOnboarding(false);
-  }, []);
-
   // Use extracted hooks
   const state = useStudioState();
   const modals = useStudioModals();
@@ -457,9 +449,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         composerContainerRef={composerContainerRef}
       />
       <TourOverlay />
-      {showOnboarding && (
-        <OnboardingModal onComplete={handleOnboardingDone} onSkip={handleOnboardingDone} />
-      )}
 
       <StudioModals
         composer={composer}

@@ -41,7 +41,7 @@ const DEFAULT_STEPS: OnboardingStep[] = [
   {
     id: "add-element",
     label: "Add an element",
-    description: "Drag an element from the Add panel to your canvas",
+    description: "Drag an element from the Build panel to your canvas",
     completed: false,
   },
   {
@@ -57,33 +57,9 @@ const DEFAULT_STEPS: OnboardingStep[] = [
     completed: false,
   },
   {
-    id: "add-page",
-    label: "Create a page",
-    description: "Add a new page from the Pages panel",
-    completed: false,
-  },
-  {
     id: "preview",
     label: "Preview your site",
-    description: "Click the preview button to see your site on different devices",
-    completed: false,
-  },
-  {
-    id: "save-component",
-    label: "Save a component",
-    description: "Select elements and save them as a reusable component",
-    completed: false,
-  },
-  {
-    id: "use-history",
-    label: "Use undo/redo",
-    description: "Press Cmd+Z to undo or Cmd+Shift+Z to redo",
-    completed: false,
-  },
-  {
-    id: "use-shortcut",
-    label: "Use a shortcut",
-    description: "Try a keyboard shortcut like A (Add) or Z (Layers)",
+    description: "Click Preview to see your site across devices",
     completed: false,
   },
   {
