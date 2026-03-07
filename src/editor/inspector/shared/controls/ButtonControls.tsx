@@ -29,6 +29,8 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({ label, value, onChange
             style={baseStyles.buttonGroupItem(value === opt.value)}
             onClick={() => onChange(opt.value)}
             title={opt.label}
+            aria-label={opt.label}
+            aria-pressed={value === opt.value}
           >
             {opt.icon || opt.label}
           </button>
@@ -96,6 +98,9 @@ export const CompactButtonGroup: React.FC<CompactButtonGroupProps> = ({
             key={opt.value}
             style={compactBtnStyle(value === opt.value)}
             onClick={() => onChange(opt.value)}
+            title={opt.label}
+            aria-label={opt.label}
+            aria-pressed={value === opt.value}
           >
             {opt.label}
           </button>

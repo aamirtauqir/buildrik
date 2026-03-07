@@ -55,6 +55,8 @@ export const OverflowControls: React.FC<OverflowVisibilityControlsProps> = ({
               style={compactBtn(styles.overflow === option.value)}
               onClick={() => onChange("overflow", option.value)}
               title={option.tooltip}
+              aria-label={option.tooltip}
+              aria-pressed={styles.overflow === option.value}
             >
               {option.label}
             </button>
@@ -98,7 +100,7 @@ const OverflowXYControls: React.FC<OverflowXYControlsProps> = ({
         onChange={(e) => onChange("overflow-x", e.target.value)}
         style={{ ...inputStyle, cursor: "pointer" }}
       >
-        <option value="">—</option>
+        <option value="">Default</option>
         <option value="visible">visible</option>
         <option value="hidden">hidden</option>
         <option value="scroll">scroll</option>
@@ -112,7 +114,7 @@ const OverflowXYControls: React.FC<OverflowXYControlsProps> = ({
         onChange={(e) => onChange("overflow-y", e.target.value)}
         style={{ ...inputStyle, cursor: "pointer" }}
       >
-        <option value="">—</option>
+        <option value="">Default</option>
         <option value="visible">visible</option>
         <option value="hidden">hidden</option>
         <option value="scroll">scroll</option>

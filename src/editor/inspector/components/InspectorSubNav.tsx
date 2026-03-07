@@ -16,10 +16,13 @@ const LAYOUT_SECTIONS = [
   { label: "Visibility", id: "inspector-section-visibility" },
 ] as const;
 
-const DESIGN_SECTIONS = [
+const APPEARANCE_SECTIONS = [
   { label: "Typography", id: "inspector-section-typography" },
   { label: "Background", id: "inspector-section-background" },
   { label: "Border", id: "inspector-section-border" },
+] as const;
+
+const EFFECTS_SECTIONS = [
   { label: "Effects", id: "inspector-section-effects" },
   { label: "Animation", id: "inspector-section-animation" },
   { label: "Interactions", id: "inspector-section-interactions" },
@@ -32,17 +35,18 @@ const SETTINGS_SECTIONS = [
 ] as const;
 
 export interface InspectorSubNavProps {
-  activeTab: "layout" | "design" | "settings";
+  activeTab: "layout" | "appearance" | "effects" | "settings";
   contentRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export const InspectorSubNav: React.FC<InspectorSubNavProps> = ({ activeTab, contentRef }) => {
-  const activeSections =
-    activeTab === "layout"
-      ? LAYOUT_SECTIONS
-      : activeTab === "design"
-        ? DESIGN_SECTIONS
-        : SETTINGS_SECTIONS;
+  const sectionMap = {
+    layout: LAYOUT_SECTIONS,
+    appearance: APPEARANCE_SECTIONS,
+    effects: EFFECTS_SECTIONS,
+    settings: SETTINGS_SECTIONS,
+  } as const;
+  const activeSections = sectionMap[activeTab];
 
   const scrollToSection = (sectionId: string) => {
     const el = contentRef.current?.querySelector(`#${sectionId}`);

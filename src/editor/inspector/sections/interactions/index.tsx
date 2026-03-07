@@ -127,7 +127,7 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
         {/* Empty State */}
         {interactions.length === 0 && !showAddPanel && (
           <div style={styles.emptyState}>
-            No interactions yet. Add one to bring your element to life.
+            No interactions yet — click Add Interaction to trigger animations on hover, click, or scroll.
           </div>
         )}
       </div>

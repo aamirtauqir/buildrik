@@ -18,7 +18,7 @@ import type { TabName } from "../hooks/useInspectorState";
 
 export interface GroupConfig {
   id: string;
-  tab: "layout" | "design" | "settings";
+  tab: "layout" | "appearance" | "effects" | "settings";
   title: string;
   showIf: string;
   essentialsProps: string[];
@@ -31,7 +31,8 @@ export interface GroupConfig {
 
 export const BASE_GROUPS_ALWAYS_ON = {
   layout: ["Display", "Spacing", "Size", "Position", "Overflow"],
-  design: ["Colors", "Background", "BorderRadius", "Shadow", "Effects", "Motion"],
+  appearance: ["Colors", "Background", "BorderRadius"],
+  effects: ["Shadow", "Effects", "Motion"],
   settings: [
     "Attributes",
     "Accessibility",
@@ -140,11 +141,11 @@ export const GROUPS: GroupConfig[] = [
   },
 
   // ─────────────────────────────────────────────────────────────────────────
-  // DESIGN TAB - Conditional Group (Typography)
+  // APPEARANCE TAB - Conditional Group (Typography)
   // ─────────────────────────────────────────────────────────────────────────
   {
     id: "Typography",
-    tab: "design",
+    tab: "appearance",
     title: "Typography",
     showIf: "ctx.isTextLike == true",
     essentialsProps: [
@@ -167,11 +168,11 @@ export const GROUPS: GroupConfig[] = [
   },
 
   // ─────────────────────────────────────────────────────────────────────────
-  // DESIGN TAB - Base Groups (always)
+  // APPEARANCE TAB - Base Groups (always)
   // ─────────────────────────────────────────────────────────────────────────
   {
     id: "Colors",
-    tab: "design",
+    tab: "appearance",
     title: "Colors",
     showIf: "always",
     essentialsProps: ["colors.textColor", "colors.backgroundColor", "colors.borderColor"],
@@ -179,7 +180,7 @@ export const GROUPS: GroupConfig[] = [
   },
   {
     id: "Background",
-    tab: "design",
+    tab: "appearance",
     title: "Background",
     showIf: "always",
     essentialsProps: [
@@ -198,7 +199,7 @@ export const GROUPS: GroupConfig[] = [
   },
   {
     id: "BorderRadius",
-    tab: "design",
+    tab: "appearance",
     title: "Border & Radius",
     showIf: "always",
     essentialsProps: ["border.border", "border.radius"],
@@ -213,7 +214,7 @@ export const GROUPS: GroupConfig[] = [
   },
   {
     id: "Shadow",
-    tab: "design",
+    tab: "effects",
     title: "Shadow",
     showIf: "always",
     essentialsProps: ["effects.shadowPreset"],
@@ -221,7 +222,7 @@ export const GROUPS: GroupConfig[] = [
   },
   {
     id: "Effects",
-    tab: "design",
+    tab: "effects",
     title: "Effects",
     showIf: "always",
     essentialsProps: ["effects.opacity", "effects.transformPreset"],
@@ -234,7 +235,7 @@ export const GROUPS: GroupConfig[] = [
   },
   {
     id: "Motion",
-    tab: "design",
+    tab: "effects",
     title: "Motion",
     showIf: "always",
     essentialsProps: ["motion.transitionPreset"],
@@ -242,11 +243,11 @@ export const GROUPS: GroupConfig[] = [
   },
 
   // ─────────────────────────────────────────────────────────────────────────
-  // DESIGN TAB - Conditional (Icon)
+  // APPEARANCE TAB - Conditional (Icon)
   // ─────────────────────────────────────────────────────────────────────────
   {
     id: "Icon",
-    tab: "design",
+    tab: "appearance",
     title: "Icon",
     showIf: "ctx.elementType == 'icon'",
     essentialsProps: ["icon.pick", "icon.size", "icon.strokeWidth", "colors.textColor"],

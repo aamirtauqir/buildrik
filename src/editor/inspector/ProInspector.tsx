@@ -32,7 +32,7 @@ import { VariantSection } from "./sections/VariantSection";
 import { deriveCssContext, getPropertyStates } from "./shared/cssContext";
 import { DevModeToggle } from "./shared/DevModeToggle";
 import { panelStyles } from "./styles";
-import { LayoutTab, DesignTab, SettingsTab } from "./tabs";
+import { LayoutTab, AppearanceTab, EffectsTab, SettingsTab } from "./tabs";
 
 // ============================================================================
 // TYPES
@@ -55,12 +55,6 @@ export interface ProInspectorProps {
     currentIcon: IconConfig | undefined,
     onSelect: (icon: IconConfig) => void
   ) => void;
-  /** Opens the Build panel in the left sidebar */
-  onOpenBuildPanel?: () => void;
-  /** Opens the Templates browser */
-  onBrowseTemplates?: () => void;
-  /** Phase 7: Opens the Design/Global Styles panel */
-  onOpenDesignPanel?: () => void;
 }
 
 // ============================================================================
@@ -74,9 +68,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   onDelete,
   onOpenMediaLibrary,
   onOpenIconPicker,
-  onOpenBuildPanel,
-  onBrowseTemplates,
-  onOpenDesignPanel,
 }) => {
   // Convert DeviceType to BreakpointId
   const currentBreakpoint: BreakpointId = isValidBreakpoint(currentBreakpointProp)
@@ -219,11 +210,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   // ============================================================================
   if (!selectedElement) {
     return (
-      <InspectorEmptyState
-        onOpenBuildPanel={onOpenBuildPanel}
-        onBrowseTemplates={onBrowseTemplates}
-        onOpenDesignPanel={onOpenDesignPanel}
-      />
+      <InspectorEmptyState composer={composer} />
     );
   }
 
@@ -362,13 +349,13 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         <DevModeToggle enabled={devMode} onToggle={setDevMode} />
       </div>
 
-      {/* Tabs - Layout / Design / Settings (C-01 fix: role="tablist") */}
+      {/* Tabs - Layout / Appearance / Effects / Element (C-01 fix: role="tablist") */}
       <div
         role="tablist"
         aria-label="Inspector sections"
         style={panelStyles.tabs}
         onKeyDown={(e) => {
-          const tabIds = ["layout", "design", "settings"] as const;
+          const tabIds = ["layout", "appearance", "effects", "settings"] as const;
           const tabButtons = (e.currentTarget as HTMLDivElement).querySelectorAll('[role="tab"]');
           const focusedIndex = Array.from(tabButtons).indexOf(e.target as HTMLButtonElement);
           if (focusedIndex === -1) return;
@@ -385,12 +372,24 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           }
         }}
       >
-        {(["layout", "design", "settings"] as const).map((tab) => {
-          // Badge shows count of sections available in each tab (not hardcoded)
+        {(["layout", "appearance", "effects", "settings"] as const).map((tab) => {
           const sectionCounts = {
             layout: 7, // Display, Size, Position, Spacing, Flexbox, Grid, Visibility
-            design: 6, // Typography, Background, Border, Effects, Animation, Interactions
+            appearance: 3, // Typography, Background, Border
+            effects: 3, // Effects, Animation, Interactions
             settings: 3, // Properties, Link, Classes (+ conditional Form, AI, CSS)
+          };
+          const tabLabels = {
+            layout: "Layout",
+            appearance: "Appearance",
+            effects: "Effects",
+            settings: "Element",
+          };
+          const tabAriaLabels = {
+            layout: "Layout tab — Position, Display, Spacing, Flexbox, Grid",
+            appearance: "Appearance tab — Typography, Background, Border",
+            effects: "Effects tab — Shadows, Transforms, Animation, Interactions",
+            settings: "Element tab — Properties, Link, Classes",
           };
           return (
             <button
@@ -402,20 +401,11 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               tabIndex={activeTab === tab ? 0 : -1}
               style={panelStyles.tab(activeTab === tab)}
               onClick={() => setActiveTab(tab)}
-              aria-label={
-                tab === "layout"
-                  ? "Layout & Size tab — Position, Display, Spacing, Flexbox, Grid"
-                  : tab === "design"
-                    ? "Style tab — Typography, Colors, Background, Border, Effects"
-                    : "Advanced tab — Element Properties, Bindings, Interactions"
-              }
+              aria-label={tabAriaLabels[tab]}
             >
-              <span>
-                {tab === "layout" && "Layout & Size"}
-                {tab === "design" && "Style"}
-                {tab === "settings" && "Advanced"}
-              </span>
+              <span>{tabLabels[tab]}</span>
               <span
+                title={`${sectionCounts[tab]} sections in this tab`}
                 style={{
                   marginLeft: 6,
                   fontSize: 12,
@@ -467,8 +457,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             </>
           )}
 
-          {activeTab === "design" && (
-            <DesignTab
+          {activeTab === "appearance" && (
+            <AppearanceTab
               composer={composer}
               selectedElement={selectedElement}
               currentPseudoState={currentPseudoState}
@@ -479,6 +469,18 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               autoExpandSection={autoExpandSection as "typography" | null}
               searchQuery={searchQuery}
               cssContext={contextState}
+            />
+          )}
+
+          {activeTab === "effects" && (
+            <EffectsTab
+              composer={composer}
+              selectedElement={selectedElement}
+              currentPseudoState={currentPseudoState}
+              styles={styles_state}
+              onChange={handleStyleChange}
+              onBatchChange={handleBatchStyleChange}
+              searchQuery={searchQuery}
             />
           )}
 

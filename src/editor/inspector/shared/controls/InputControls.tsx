@@ -247,6 +247,8 @@ export interface SelectRowProps {
   options: { value: string; label: string }[];
   isOverridden?: boolean;
   helperText?: string;
+  /** Label for the empty/unset option. Defaults to "Default". */
+  placeholder?: string;
 }
 
 export const SelectRow: React.FC<SelectRowProps> = ({
@@ -256,6 +258,7 @@ export const SelectRow: React.FC<SelectRowProps> = ({
   options,
   isOverridden,
   helperText,
+  placeholder = "Default",
 }) => {
   return (
     <div style={baseStyles.row}>
@@ -271,7 +274,7 @@ export const SelectRow: React.FC<SelectRowProps> = ({
         )}
       </label>
       <select value={value} onChange={(e) => onChange(e.target.value)} style={baseStyles.select}>
-        <option value="">—</option>
+        <option value="">{placeholder}</option>
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}

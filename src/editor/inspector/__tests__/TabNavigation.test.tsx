@@ -27,7 +27,7 @@ describe("Inspector tabs — ARIA roles", () => {
 
   it("each tab button has role=tab", () => {
     render(<ProInspector selectedElement={el as never} composer={makeComposer() as never} />);
-    expect(screen.getAllByRole("tab")).toHaveLength(3);
+    expect(screen.getAllByRole("tab")).toHaveLength(4);
   });
 
   it("active tab has aria-selected=true", () => {

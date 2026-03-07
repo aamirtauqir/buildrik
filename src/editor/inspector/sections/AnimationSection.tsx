@@ -178,8 +178,8 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
             lineHeight: 1.5,
           }}
         >
-          <strong>Tip:</strong> Enable animation to add entrance, attention, or exit effects to this
-          element.
+          Click <strong>Enable</strong> above to add entrance, attention, or exit effects to this
+          element. Choose from presets like fade, slide, bounce, and more.
         </div>
       )}
     </Section>

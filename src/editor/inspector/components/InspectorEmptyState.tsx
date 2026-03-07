@@ -1,22 +1,19 @@
 import * as React from "react";
+import type { Composer } from "../../../engine";
+import { EVENTS } from "../../../shared/constants/events";
 import { SvgPointer } from "../../../shared/ui/Icons";
 
 /**
  * Empty state shown when no element is selected in the Inspector.
- * Provides CTA buttons to guide users to the Build panel or Templates.
+ * Emits Composer events to open Build panel, Templates, or Design panel.
  */
 
 export interface InspectorEmptyStateProps {
-  onOpenBuildPanel?: () => void;
-  onBrowseTemplates?: () => void;
-  /** Phase 7: Callback to switch to Global Styles tab */
-  onOpenDesignPanel?: () => void;
+  composer?: Composer | null;
 }
 
 export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
-  onOpenBuildPanel,
-  onBrowseTemplates,
-  onOpenDesignPanel,
+  composer,
 }) => {
   // Phase 7: Check if template was recently applied
   const [appliedName, setAppliedName] = React.useState<string | null>(null);
@@ -47,9 +44,9 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
           <p style={{ ...descriptionStyle, color: "rgba(74, 222, 128, 0.7)", marginBottom: 12 }}>
             {appliedName}
           </p>
-          {onOpenDesignPanel && (
+          {composer && (
             <button
-              onClick={onOpenDesignPanel}
+              onClick={() => composer.emit(EVENTS.UI_OPEN_DESIGN_PANEL, {})}
               style={appliedActionStyle}
               aria-label="Set brand colors in Global Styles"
             >
@@ -83,36 +80,36 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
 
       {/* CTA Buttons */}
       <div style={ctaContainerStyle}>
-        {onOpenBuildPanel && (
-          <button
-            onClick={onOpenBuildPanel}
-            style={primaryButtonStyle}
-            aria-label="Open Build panel to add elements"
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+        {composer && (
+          <>
+            <button
+              onClick={() => composer.emit(EVENTS.UI_OPEN_BUILD_PANEL, {})}
+              style={primaryButtonStyle}
+              aria-label="Open Build panel to add elements"
             >
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Open Build Panel
-          </button>
-        )}
-        {onBrowseTemplates && (
-          <button
-            onClick={onBrowseTemplates}
-            style={secondaryButtonStyle}
-            aria-label="Browse available templates"
-          >
-            Browse Templates
-          </button>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Open Build Panel
+            </button>
+            <button
+              onClick={() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, {})}
+              style={secondaryButtonStyle}
+              aria-label="Browse available templates"
+            >
+              Browse Templates
+            </button>
+          </>
         )}
       </div>
 

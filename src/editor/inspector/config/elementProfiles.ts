@@ -44,7 +44,7 @@ interface RawProfile {
 
 const RAW_PROFILES: Record<string, RawProfile> = {
   text: {
-    defaultTab: "design",
+    defaultTab: "appearance",
     essentials: {
       design: [
         "content.text",
@@ -134,7 +134,7 @@ const RAW_PROFILES: Record<string, RawProfile> = {
   video: { inherits: "image" },
 
   icon: {
-    defaultTab: "design",
+    defaultTab: "appearance",
     essentials: {
       design: ["icon.pick", "icon.size", "colors.textColor", "icon.strokeWidth"],
       layout: ["spacing.margin", "spacing.padding"],

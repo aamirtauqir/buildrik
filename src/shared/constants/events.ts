@@ -354,6 +354,10 @@ export const EVENTS = {
   SHOW_IN_LAYERS: "ui:show-in-layers",
   /** Trigger scroll to selected element in Layers panel */
   LAYERS_SCROLL_TO_SELECTION: "layers:scroll-to-selection",
+  /** Open the Build/Add panel in the left sidebar */
+  UI_OPEN_BUILD_PANEL: "ui:open-build-panel",
+  /** Open the Design/Global Styles panel in the left sidebar */
+  UI_OPEN_DESIGN_PANEL: "ui:open-design-panel",
 
   // ============================================
   // Additional Style Events

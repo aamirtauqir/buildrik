@@ -13,7 +13,7 @@ import { getDefaultTab } from "../config";
 // TYPES
 // ============================================================================
 
-export type TabName = "layout" | "design" | "settings";
+export type TabName = "layout" | "appearance" | "effects" | "settings";
 
 export type AutoExpandSection =
   | "typography"

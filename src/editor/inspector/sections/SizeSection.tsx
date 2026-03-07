@@ -138,7 +138,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
             }}
             disabled={disabled("object-fit")}
           >
-            <option value="">—</option>
+            <option value="">Default</option>
             <option value="fill">Fill</option>
             <option value="contain">Contain</option>
             <option value="cover">Cover</option>

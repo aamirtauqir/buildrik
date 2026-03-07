@@ -126,7 +126,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
             ))
           ) : (
             <span style={{ fontSize: 12, color: "var(--aqb-text-tertiary)", fontStyle: "italic" }}>
-              No classes applied yet
+              No classes applied — type a name below and click Add
             </span>
           )}
         </div>

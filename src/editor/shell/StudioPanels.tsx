@@ -7,6 +7,7 @@
 
 import * as React from "react";
 import type { Composer } from "../../engine";
+import { EVENTS } from "../../shared/constants/events";
 import type { GroupedTabId } from "../../shared/constants/tabs";
 import type { BlockData, DeviceType } from "../../shared/types";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
@@ -166,33 +167,26 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   // Track canvas hovered element for LayersPanel sync
   const [canvasHoveredId, setCanvasHoveredId] = React.useState<string | null>(null);
 
-  // Callbacks for inspector empty state CTAs
-  const handleOpenBuildPanel = React.useCallback(() => {
-    onLeftPanelTabChange?.("add");
-    if (!isLeftPanelOpen) onLeftPanelToggle?.();
-  }, [onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle]);
-
-  const handleBrowseTemplates = React.useCallback(() => {
-    onLeftPanelTabChange?.("add");
-    if (!isLeftPanelOpen) onLeftPanelToggle?.();
-  }, [onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle]);
-
-  // Phase 7: Open Design/Global Styles panel
-  const handleOpenDesignPanel = React.useCallback(() => {
-    onLeftPanelTabChange?.("design");
-    if (!isLeftPanelOpen) onLeftPanelToggle?.();
-  }, [onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle]);
-
-  // Listen for canvas "Browse Templates" event (from empty state CTA + command palette)
+  // Listen for inspector empty-state Composer events (replaces callback props)
   React.useEffect(() => {
     if (!composer) return;
-    const handler = () => {
+
+    const openBuild = () => {
       onLeftPanelTabChange?.("add");
       if (!isLeftPanelOpen) onLeftPanelToggle?.();
     };
-    composer.on("ui:browse-templates", handler);
+    const openDesign = () => {
+      onLeftPanelTabChange?.("design");
+      if (!isLeftPanelOpen) onLeftPanelToggle?.();
+    };
+
+    composer.on(EVENTS.UI_OPEN_BUILD_PANEL, openBuild);
+    composer.on(EVENTS.UI_BROWSE_TEMPLATES, openBuild);
+    composer.on(EVENTS.UI_OPEN_DESIGN_PANEL, openDesign);
     return () => {
-      composer.off("ui:browse-templates", handler);
+      composer.off(EVENTS.UI_OPEN_BUILD_PANEL, openBuild);
+      composer.off(EVENTS.UI_BROWSE_TEMPLATES, openBuild);
+      composer.off(EVENTS.UI_OPEN_DESIGN_PANEL, openDesign);
     };
   }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle]);
 
@@ -376,9 +370,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           onDelete={handleDelete}
           onOpenMediaLibrary={onOpenMediaLibrary}
           onOpenIconPicker={onOpenIconPicker}
-          onOpenBuildPanel={handleOpenBuildPanel}
-          onBrowseTemplates={handleBrowseTemplates}
-          onOpenDesignPanel={handleOpenDesignPanel}
         />
       </LayoutShell.Inspector>
     </LayoutShell>
