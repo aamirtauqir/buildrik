@@ -87,9 +87,9 @@ const DEFAULT_STEPS: OnboardingStep[] = [
     completed: false,
   },
   {
-    id: "export",
-    label: "Export your work",
-    description: "Go to Settings to export or publish your site",
+    id: "publish",
+    label: "Publish your site",
+    description: "Click the Publish button at the top right to make your site live",
     completed: false,
   },
 ];
