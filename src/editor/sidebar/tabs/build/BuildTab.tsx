@@ -109,11 +109,6 @@ export const BuildTab: React.FC<BuildTabProps> = ({
             />
           ) : (
             <>
-              <MyComponents
-                open={tab.myCompOpen}
-                onToggle={() => tab.setMyCompOpen(!tab.myCompOpen)}
-                composer={composer}
-              />
               {CATALOG.map((cat) => (
                 <CatAccordion
                   key={cat.id}
@@ -126,6 +121,11 @@ export const BuildTab: React.FC<BuildTabProps> = ({
                   onToggleFav={handleToggleFav}
                 />
               ))}
+              <MyComponents
+                open={tab.myCompOpen}
+                onToggle={() => tab.setMyCompOpen(!tab.myCompOpen)}
+                composer={composer}
+              />
             </>
           )}
         </div>
