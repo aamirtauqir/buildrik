@@ -27,7 +27,7 @@ const STEPS = [
   },
   {
     title: "Preview & Publish",
-    body: "Preview your site across devices, then publish with one click. Your site goes live instantly on your custom domain.",
+    body: "Preview your site across devices, then publish with one click. Your site gets a free Buildrik URL. Custom domain support coming soon.",
     icon: "🚀",
   },
 ] as const;
