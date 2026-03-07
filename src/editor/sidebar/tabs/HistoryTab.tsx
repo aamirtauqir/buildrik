@@ -141,7 +141,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
     <div style={containerStyles}>
       {/* Panel Header */}
       <PanelHeader
-        title="Versions"
+        title="History"
         isPinned={isPinned}
         onPinToggle={onPinToggle}
         onHelpClick={onHelpClick}
