@@ -448,7 +448,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         canvasRef={canvasRef}
         composerContainerRef={composerContainerRef}
       />
-      <TourOverlay />
+      <TourOverlay
+        onNameProject={(name) => {
+          composer?.updateProjectMetadata?.({ name });
+        }}
+        initialProjectName={
+          composer?.getProjectMetadata?.()?.name || "Untitled Project"
+        }
+      />
 
       <StudioModals
         composer={composer}

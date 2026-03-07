@@ -13,9 +13,18 @@ export interface TourStep {
   title: string;
   description: string;
   position: "center" | "right" | "left" | "bottom";
+  /** If true, renders a project name text input */
+  hasNameInput?: boolean;
 }
 
 const TOUR_STEPS: TourStep[] = [
+  {
+    target: "",
+    title: "Name your project",
+    description: "Give your project a name — it becomes the browser tab title and SEO site name.",
+    position: "center",
+    hasNameInput: true,
+  },
   {
     target: "rail-tab-templates",
     title: "Choose a template",
@@ -38,9 +47,20 @@ const TOUR_STEPS: TourStep[] = [
 
 const STORAGE_KEY = "buildrik_onboarding_tour_v1";
 
-export const TourOverlay: React.FC = () => {
+export interface TourOverlayProps {
+  /** Called when user submits a project name from the naming step */
+  onNameProject?: (name: string) => void;
+  /** Current project name (pre-fills the input) */
+  initialProjectName?: string;
+}
+
+export const TourOverlay: React.FC<TourOverlayProps> = ({
+  onNameProject,
+  initialProjectName = "Untitled Project",
+}) => {
   const [currentStepIndex, setCurrentStepIndex] = React.useState(0);
   const [isVisible, setIsVisible] = React.useState(false);
+  const [nameInput, setNameInput] = React.useState(initialProjectName);
   const [position, setPosition] = React.useState<{ top: number; left: number }>({
     top: 0,
     left: 0,
@@ -139,6 +159,9 @@ export const TourOverlay: React.FC = () => {
   }, [currentStepIndex, isVisible, currentStep]);
 
   const handleNext = () => {
+    if (currentStep.hasNameInput) {
+      onNameProject?.(nameInput.trim() || "Untitled Project");
+    }
     if (currentStepIndex < TOUR_STEPS.length - 1) {
       setCurrentStepIndex((prev) => prev + 1);
     } else {
@@ -193,6 +216,34 @@ export const TourOverlay: React.FC = () => {
 
         <h3 style={titleStyles}>{currentStep.title}</h3>
         <p style={descStyles}>{currentStep.description}</p>
+
+        {currentStep.hasNameInput && (
+          <input
+            type="text"
+            value={nameInput}
+            onChange={(e) => setNameInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                onNameProject?.(nameInput.trim() || "Untitled Project");
+                handleNext();
+              }
+            }}
+            placeholder="My Portfolio Website"
+            aria-label="Project name"
+            style={{
+              width: "100%",
+              padding: "8px 12px",
+              borderRadius: 8,
+              border: "1px solid var(--aqb-border)",
+              background: "var(--aqb-bg-input, rgba(255,255,255,0.06))",
+              color: "var(--aqb-text-primary)",
+              fontSize: 14,
+              outline: "none",
+              boxSizing: "border-box",
+            }}
+            autoFocus
+          />
+        )}
 
         <div style={footerStyles}>
           <div style={dotsContainerStyles}>
