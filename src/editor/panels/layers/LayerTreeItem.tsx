@@ -9,6 +9,64 @@ import type { Composer } from "../../../engine";
 import { getElementIcon } from "../../../shared/ui/Icons";
 import type { LayerItem, DragState, LayerDisplayPrefs } from "./types";
 
+/** Maps raw type/tagName values to user-friendly display labels */
+const TYPE_DISPLAY_NAMES: Record<string, string> = {
+  // HTML heading tags
+  h1: "Heading 1",
+  h2: "Heading 2",
+  h3: "Heading 3",
+  h4: "Heading 4",
+  h5: "Heading 5",
+  h6: "Heading 6",
+  // HTML block elements
+  p: "Paragraph",
+  div: "Container",
+  span: "Text",
+  section: "Section",
+  nav: "Navbar",
+  header: "Header",
+  footer: "Footer",
+  main: "Main",
+  article: "Article",
+  aside: "Sidebar",
+  // HTML inline / media
+  a: "Link",
+  img: "Image",
+  video: "Video",
+  // HTML form elements
+  button: "Button",
+  input: "Input",
+  textarea: "Textarea",
+  select: "Select",
+  form: "Form",
+  // HTML list elements
+  ul: "List",
+  ol: "Ordered List",
+  li: "List Item",
+  // Semantic type aliases used by the engine (already friendly — just capitalize)
+  heading: "Heading",
+  paragraph: "Paragraph",
+  container: "Container",
+  text: "Text",
+  image: "Image",
+  link: "Link",
+  navbar: "Navbar",
+  hero: "Hero",
+  features: "Features",
+  grid: "Grid",
+  flex: "Flex",
+  icon: "Icon",
+};
+
+/** Returns a user-friendly display name for a layer type */
+function getLayerDisplayName(type: string): string {
+  return (
+    TYPE_DISPLAY_NAMES[type] ??
+    // Fallback: capitalize first letter of unknown types
+    type.charAt(0).toUpperCase() + type.slice(1)
+  );
+}
+
 export interface LayerTreeItemProps {
   layer: LayerItem;
   composer: Composer | null;
@@ -90,7 +148,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
   const isHidden = hiddenIds.has(layer.id);
   const isLocked = lockedIds.has(layer.id);
   const isEditing = editingId === layer.id;
-  const displayName = customNames.get(layer.id) || layer.type;
+  const displayName = customNames.get(layer.id) || getLayerDisplayName(layer.type);
   const isCanvasHovered = canvasHoveredId === layer.id;
   const isLayerHovered = hoveredLayerId === layer.id;
   const canDrag = !!(composer && layer.depth > 0 && !isLocked);
