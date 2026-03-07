@@ -31,7 +31,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     target: ".pillPublish",
     title: "Publish when ready",
-    description: "Hit Publish to make your site live.",
+    description: "Your work saves automatically. Hit Publish only when you're ready to go live.",
     position: "bottom",
   },
 ];
