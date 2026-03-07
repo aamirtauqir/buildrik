@@ -256,8 +256,8 @@ function MediaTabWithComposer({
         />
       )}
 
-      {/* Zone 7: Upload zone (Library only) */}
-      {!isDisc && (
+      {/* Zone 7: Upload zone (Library only) — hide when empty-state already shows upload button */}
+      {!isDisc && !(isEmpty && !state.selMode) && (
         <UploadZone
           storage={state.storage}
           onUpload={state.upload}
