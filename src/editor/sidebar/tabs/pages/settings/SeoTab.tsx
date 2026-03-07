@@ -90,6 +90,32 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
               <span className="pg-seo__score-num" style={{ color: scoreColor(s.seoScore) }}>{s.seoScore}</span>
               <span className="pg-seo__score-label">{scoreLabel(s.seoScore)}</span>
             </div>
+            <Tooltip
+              content="SEO score measures how well search engines can find and understand your page. Aim for 80+ before publishing. Completing the checklist below will raise your score."
+              position="right"
+            >
+              <span
+                aria-label="What is SEO score?"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 16,
+                  height: 16,
+                  borderRadius: "50%",
+                  border: "1px solid var(--aqb-text-muted, #64748b)",
+                  color: "var(--aqb-text-muted, #64748b)",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  cursor: "help",
+                  flexShrink: 0,
+                  lineHeight: 1,
+                  userSelect: "none",
+                }}
+              >
+                ?
+              </span>
+            </Tooltip>
             <div className="pg-seo__score-checks">
               <SeoCheck ok={s.seoChecks.indexingOn} label="Allow indexing" hint="Required" />
               <SeoCheck ok={s.seoChecks.titleSet} label="Page title" hint="+20 pts" />
