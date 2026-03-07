@@ -208,9 +208,9 @@ export const RAIL_SLOTS: RailSlot[] = [
   },
   {
     tabId: "settings",
-    label: "Config",
+    label: "Settings",
     iconName: "SvgSettings",
-    ariaLabel: "Config & Launch",
+    ariaLabel: "Settings",
     zone: "bottom",
     variant: "rtab",
     subtitle: "Site settings and SEO",
