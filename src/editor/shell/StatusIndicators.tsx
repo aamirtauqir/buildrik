@@ -51,15 +51,12 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
     prevStatusRef.current = status;
   }, [status]);
 
-  // Hide when idle and not just saved — avoids cluttering the topbar
-  if (status === "idle" && !justSaved) return null;
-
   const statusConfig = {
     idle: {
-      color: "var(--status-saved, #22c55e)",
-      bg: "rgba(34, 197, 94, 0.1)",
-      label: "Saved ✓",
-      icon: <SvgCheck />,
+      color: justSaved ? "var(--status-saved, #22c55e)" : "var(--aqb-text-secondary, #94a3b8)",
+      bg: justSaved ? "rgba(34, 197, 94, 0.1)" : "transparent",
+      label: justSaved ? "Saved ✓" : `Saved ${formatLastSaved(lastSavedAt)}`,
+      icon: justSaved ? <SvgCheck /> : <SvgSave />,
     },
     saving: {
       color: "var(--blue, #4b8dff)",
