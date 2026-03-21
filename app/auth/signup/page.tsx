@@ -33,7 +33,7 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    signupMutation.mutate({ fullName, email, password });
+    signupMutation.mutate({ fullName, email, password, termsAccepted: termsAccepted as true });
   };
 
   return (

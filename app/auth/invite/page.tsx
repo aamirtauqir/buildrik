@@ -46,14 +46,14 @@ export default function InvitePage() {
       <div className="h-6" />
       <AuthButton
         loading={acceptInviteMutation.isPending}
-        onClick={() => acceptInviteMutation.mutate({ token })}
+        onClick={() => acceptInviteMutation.mutate({ token: token || "" })}
       >
         Accept Invite
       </AuthButton>
       <div className="h-3" />
       <AuthButtonSecondary
-        loading={declineInviteMutation.isPending}
-        onClick={() => declineInviteMutation.mutate({ token })}
+        disabled={declineInviteMutation.isPending}
+        onClick={() => declineInviteMutation.mutate({ token: token || "" })}
       >
         Decline
       </AuthButtonSecondary>

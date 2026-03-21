@@ -27,7 +27,7 @@ export default function TwoFAPage() {
 
   const handleVerify = async () => {
     if (code.length < 6) return;
-    verify2FAMutation.mutate({ token, code });
+    verify2FAMutation.mutate({ twoFactorToken: token || "", code });
   };
 
   return (

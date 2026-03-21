@@ -45,7 +45,7 @@ export default function VerifyEmailPage() {
 
         <div className="h-6" />
 
-        <AuthButton href="/auth/login">Go to Sign In</AuthButton>
+        <AuthButton onClick={() => router.push("/auth/login")}>Go to Sign In</AuthButton>
 
         <div className="h-4" />
 

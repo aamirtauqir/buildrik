@@ -49,7 +49,7 @@ export default function ResetPasswordPage() {
     }
 
     setErrors({});
-    resetPasswordMutation.mutate({ token: token ?? "", newPassword });
+    resetPasswordMutation.mutate({ token: token ?? "", newPassword, confirmPassword });
   };
 
   return (

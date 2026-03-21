@@ -27,9 +27,11 @@ export default function MagicLinkPage() {
 
       <div className="h-6" />
 
-      <AuthButton as="a" href="mailto:">
-        Open Email App
-      </AuthButton>
+      <a href="mailto:" className="w-full">
+        <AuthButton type="button">
+          Open Email App
+        </AuthButton>
+      </a>
 
       <div className="h-4" />
 

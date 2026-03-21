@@ -25,7 +25,7 @@ export default function BackupCodePage() {
   });
 
   const handleVerify = async () => {
-    verifyBackupCodeMutation.mutate({ token, backupCode });
+    verifyBackupCodeMutation.mutate({ twoFactorToken: token || "", backupCode });
   };
 
   return (
