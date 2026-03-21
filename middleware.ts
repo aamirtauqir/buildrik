@@ -1,41 +1,22 @@
-import { auth } from "@/server/auth";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-const publicAuthRoutes = [
-  "/auth",
-  "/auth/login",
-  "/auth/signup",
-  "/auth/forgot-password",
-  "/auth/check-inbox",
-  "/auth/reset-password",
-  "/auth/password-changed",
-  "/auth/verify-email",
-  "/auth/2fa",
-  "/auth/magic-link",
-  "/auth/otp",
-  "/auth/splash",
-  "/auth/callback",
-  "/auth/invite",
-  "/auth/error",
-];
+const authenticatedAuthRoutes = ["/auth/workspace-select", "/auth/success"];
 
-const authenticatedAuthRoutes = [
-  "/auth/workspace-select",
-  "/auth/success",
-];
-
-export default auth((req) => {
+export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const isLoggedIn = !!req.auth;
+  const sessionToken =
+    req.cookies.get("next-auth.session-token")?.value ||
+    req.cookies.get("__Secure-next-auth.session-token")?.value;
+  const isLoggedIn = !!sessionToken;
 
-  const isPublicAuth = publicAuthRoutes.some(
-    (route) => pathname === route || pathname.startsWith(route + "/")
-  );
+  // Auth pages: redirect logged-in users to dashboard
+  const isAuthRoute = pathname.startsWith("/auth");
   const isAuthenticatedAuth = authenticatedAuthRoutes.some(
     (route) => pathname === route || pathname.startsWith(route + "/")
   );
 
-  if (isPublicAuth && isLoggedIn) {
+  if (isAuthRoute && !isAuthenticatedAuth && isLoggedIn) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
@@ -43,12 +24,13 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
+  // Dashboard: redirect unauthenticated users to login
   if (pathname.startsWith("/dashboard") && !isLoggedIn) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/auth/:path*", "/dashboard/:path*"],
