@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
@@ -9,20 +10,24 @@ import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthButton } from "@/components/auth/auth-button";
 import { OTPInput } from "@/components/auth/otp-input";
 import { ResendTimer } from "@/components/auth/resend-timer";
+import { trpc } from "@/lib/trpc/client";
 
 export default function TwoFAPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
 
   const [code, setCode] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  const verify2FAMutation = trpc.auth.verify2FA.useMutation({
+    onSuccess: () => {
+      router.push("/dashboard");
+    },
+  });
 
   const handleVerify = async () => {
     if (code.length < 6) return;
-    setLoading(true);
-    // TODO: wire to tRPC
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
+    verify2FAMutation.mutate({ token, code });
   };
 
   return (
@@ -49,7 +54,7 @@ export default function TwoFAPage() {
       <div className="h-5" />
 
       <AuthButton
-        loading={loading}
+        loading={verify2FAMutation.isPending}
         disabled={code.length < 6}
         onClick={handleVerify}
       >

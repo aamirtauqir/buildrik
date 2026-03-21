@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthLogo } from "@/components/auth/auth-logo";
@@ -10,22 +11,29 @@ import { AuthDivider } from "@/components/auth/auth-divider";
 import { FormBanner } from "@/components/auth/form-banner";
 import { PasswordStrength } from "@/components/auth/password-strength";
 import { SocialButton } from "@/components/auth/social-button";
+import { trpc } from "@/lib/trpc/client";
 
 export default function SignupPage() {
+  const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const signupMutation = trpc.auth.signup.useMutation({
+    onSuccess: () => {
+      router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
+    },
+    onError: (err) => {
+      setError(err.message);
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setLoading(true);
-    // TODO: wire to tRPC
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
+    signupMutation.mutate({ fullName, email, password });
   };
 
   return (
@@ -107,7 +115,7 @@ export default function SignupPage() {
 
         <div className="h-5" />
 
-        <AuthButton type="submit" disabled={!termsAccepted} loading={loading}>
+        <AuthButton type="submit" disabled={!termsAccepted} loading={signupMutation.isPending}>
           Create Account
         </AuthButton>
 

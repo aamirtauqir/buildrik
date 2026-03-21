@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
@@ -8,19 +9,23 @@ import { AuthLogo } from "@/components/auth/auth-logo";
 import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthButton } from "@/components/auth/auth-button";
 import { AuthInput } from "@/components/auth/auth-input";
+import { trpc } from "@/lib/trpc/client";
 
 export default function BackupCodePage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
 
   const [backupCode, setBackupCode] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  const verifyBackupCodeMutation = trpc.auth.verifyBackupCode.useMutation({
+    onSuccess: () => {
+      router.push("/dashboard");
+    },
+  });
 
   const handleVerify = async () => {
-    setLoading(true);
-    // TODO: wire to tRPC
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
+    verifyBackupCodeMutation.mutate({ token, backupCode });
   };
 
   return (
@@ -46,7 +51,7 @@ export default function BackupCodePage() {
 
       <div className="h-5" />
 
-      <AuthButton loading={loading} onClick={handleVerify}>
+      <AuthButton loading={verifyBackupCodeMutation.isPending} onClick={handleVerify}>
         Verify Backup Code
       </AuthButton>
 

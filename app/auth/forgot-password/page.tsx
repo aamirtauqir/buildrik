@@ -8,18 +8,21 @@ import { AuthLogo } from "@/components/auth/auth-logo";
 import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthButton } from "@/components/auth/auth-button";
+import { trpc } from "@/lib/trpc/client";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  const forgotPasswordMutation = trpc.auth.forgotPassword.useMutation({
+    onSuccess: () => {
+      router.push(`/auth/check-inbox?email=${encodeURIComponent(email)}&type=reset`);
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
-    router.push(`/auth/check-inbox?email=${encodeURIComponent(email)}&type=reset`);
+    forgotPasswordMutation.mutate({ email });
   };
 
   return (
@@ -46,7 +49,7 @@ export default function ForgotPasswordPage() {
 
         <div className="h-5" />
 
-        <AuthButton type="submit" loading={loading}>
+        <AuthButton type="submit" loading={forgotPasswordMutation.isPending}>
           Send Reset Email
         </AuthButton>
       </form>

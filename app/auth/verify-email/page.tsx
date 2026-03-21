@@ -9,6 +9,7 @@ import { AuthLogo } from "@/components/auth/auth-logo";
 import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthButton } from "@/components/auth/auth-button";
 import { ResendTimer } from "@/components/auth/resend-timer";
+import { trpc } from "@/lib/trpc/client";
 
 export default function VerifyEmailPage() {
   const searchParams = useSearchParams();
@@ -18,6 +19,8 @@ export default function VerifyEmailPage() {
   const isVerified = status === "verified";
 
   const [countdown, setCountdown] = useState(5);
+
+  const resendMutation = trpc.auth.resendVerification.useMutation();
 
   useEffect(() => {
     if (!isVerified) return;
@@ -82,7 +85,7 @@ export default function VerifyEmailPage() {
 
       <div className="h-5" />
 
-      <ResendTimer initialSeconds={60} onResend={() => console.log("resend")} />
+      <ResendTimer initialSeconds={60} onResend={() => resendMutation.mutate({ email })} />
 
       <div className="h-5" />
 

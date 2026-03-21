@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthLogo } from "@/components/auth/auth-logo";
@@ -9,21 +10,32 @@ import { AuthInput } from "@/components/auth/auth-input";
 import { AuthDivider } from "@/components/auth/auth-divider";
 import { FormBanner } from "@/components/auth/form-banner";
 import { SocialButton } from "@/components/auth/social-button";
+import { trpc } from "@/lib/trpc/client";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const loginMutation = trpc.auth.login.useMutation({
+    onSuccess: (data) => {
+      if (data.requiresTwoFactor) {
+        router.push(`/auth/2fa?token=${data.tempToken}`);
+      } else {
+        router.push("/dashboard");
+      }
+    },
+    onError: (err) => {
+      setError(err.message);
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setLoading(true);
-    // TODO: wire to tRPC
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
+    loginMutation.mutate({ email, password, rememberMe });
   };
 
   return (
@@ -89,7 +101,7 @@ export default function LoginPage() {
 
         <div className="h-5" />
 
-        <AuthButton type="submit" loading={loading}>
+        <AuthButton type="submit" loading={loginMutation.isPending}>
           Sign In
         </AuthButton>
 

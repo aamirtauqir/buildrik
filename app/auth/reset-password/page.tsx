@@ -11,6 +11,7 @@ import { AuthInput } from "@/components/auth/auth-input";
 import { AuthButton } from "@/components/auth/auth-button";
 import { PasswordStrength } from "@/components/auth/password-strength";
 import { InlineError } from "@/components/auth/inline-error";
+import { trpc } from "@/lib/trpc/client";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -20,7 +21,19 @@ export default function ResetPasswordPage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<{ confirm?: string }>({});
-  const [loading, setLoading] = useState(false);
+
+  const resetPasswordMutation = trpc.auth.resetPassword.useMutation({
+    onSuccess: () => {
+      router.push("/auth/password-changed");
+    },
+    onError: (err) => {
+      if (err.message.includes("expired")) {
+        router.push("/auth/error/expired-link?type=reset");
+      } else {
+        setErrors({ confirm: err.message });
+      }
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,10 +49,7 @@ export default function ResetPasswordPage() {
     }
 
     setErrors({});
-    setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
-    router.push("/auth/password-changed");
+    resetPasswordMutation.mutate({ token: token ?? "", newPassword });
   };
 
   return (
@@ -97,7 +107,7 @@ export default function ResetPasswordPage() {
 
         <div className="h-5" />
 
-        <AuthButton type="submit" loading={loading}>
+        <AuthButton type="submit" loading={resetPasswordMutation.isPending}>
           Reset Password
         </AuthButton>
       </form>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { AuthLogo } from "@/components/auth/auth-logo";
 import { AuthIcon } from "@/components/auth/auth-icon";
@@ -7,10 +8,24 @@ import { AuthCard } from "@/components/auth/auth-card";
 import { AuthButton } from "@/components/auth/auth-button";
 import { AuthButtonSecondary } from "@/components/auth/auth-button-secondary";
 import Link from "next/link";
+import { trpc } from "@/lib/trpc/client";
 
 export default function InvitePage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
+  const token = searchParams.get("token") ?? "";
+
+  const acceptInviteMutation = trpc.auth.acceptInvite.useMutation({
+    onSuccess: () => {
+      router.push("/dashboard");
+    },
+  });
+
+  const declineInviteMutation = trpc.auth.declineInvite.useMutation({
+    onSuccess: () => {
+      router.push("/auth/login");
+    },
+  });
 
   return (
     <AuthCard>
@@ -29,9 +44,19 @@ export default function InvitePage() {
         </span>
       </div>
       <div className="h-6" />
-      <AuthButton>Accept Invite</AuthButton>
+      <AuthButton
+        loading={acceptInviteMutation.isPending}
+        onClick={() => acceptInviteMutation.mutate({ token })}
+      >
+        Accept Invite
+      </AuthButton>
       <div className="h-3" />
-      <AuthButtonSecondary>Decline</AuthButtonSecondary>
+      <AuthButtonSecondary
+        loading={declineInviteMutation.isPending}
+        onClick={() => declineInviteMutation.mutate({ token })}
+      >
+        Decline
+      </AuthButtonSecondary>
       <div className="h-4" />
       <Link href="/auth/login" className="text-auth-link text-sm hover:underline">
         ← Back to sign in
