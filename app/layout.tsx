@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { TRPCProvider } from "@/lib/trpc/client";
 
 export const metadata: Metadata = {
   title: "Buildrik",
@@ -13,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        <TRPCProvider>{children}</TRPCProvider>
+      </body>
     </html>
   );
 }
