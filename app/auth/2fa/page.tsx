@@ -1,0 +1,90 @@
+"use client";
+
+import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { AuthCard } from "@/components/auth/auth-card";
+import { AuthLogo } from "@/components/auth/auth-logo";
+import { AuthIcon } from "@/components/auth/auth-icon";
+import { AuthButton } from "@/components/auth/auth-button";
+import { OTPInput } from "@/components/auth/otp-input";
+import { ResendTimer } from "@/components/auth/resend-timer";
+
+export default function TwoFAPage() {
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token") ?? "";
+
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleVerify = async () => {
+    if (code.length < 6) return;
+    setLoading(true);
+    // TODO: wire to tRPC
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setLoading(false);
+  };
+
+  return (
+    <AuthCard>
+      <AuthLogo />
+      <AuthIcon name="shield" color="blue" />
+
+      <h1 className="text-auth-title text-auth-text-primary text-center">
+        Two-factor authentication
+      </h1>
+      <p className="text-auth-subtitle text-auth-text-muted text-center mt-1">
+        Enter the 6-digit code from your authenticator app or the code sent to
+        your phone.
+      </p>
+
+      <div className="h-6" />
+
+      <OTPInput length={6} value={code} onChange={setCode} />
+
+      <div className="h-4" />
+
+      <ResendTimer initialSeconds={287} onResend={() => console.log("resend")} />
+
+      <div className="h-5" />
+
+      <AuthButton
+        loading={loading}
+        disabled={code.length < 6}
+        onClick={handleVerify}
+      >
+        Verify Code
+      </AuthButton>
+
+      <div className="h-3" />
+
+      <p className="text-auth-subtitle text-auth-text-placeholder text-center">
+        or
+      </p>
+
+      <div className="h-3" />
+
+      <p className="text-auth-subtitle text-auth-text-muted text-center">
+        Didn&apos;t get a code? Resend (45s)
+      </p>
+
+      <div className="h-3" />
+
+      <Link
+        href={`/auth/2fa/backup${token ? `?token=${token}` : ""}`}
+        className="text-auth-link hover:underline text-center block"
+      >
+        Use a recovery code instead
+      </Link>
+
+      <div className="h-2" />
+
+      <Link
+        href="/auth/login"
+        className="text-auth-label text-auth-link hover:underline text-center block"
+      >
+        ← Back to sign in
+      </Link>
+    </AuthCard>
+  );
+}
