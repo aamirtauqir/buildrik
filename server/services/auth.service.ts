@@ -5,8 +5,15 @@ import { generateToken, validateToken, invalidateToken } from "./token.service";
 import { isAccountLocked, incrementFailedAttempts, resetFailedAttempts } from "./rate-limit.service";
 import { sendVerificationEmail, sendPasswordResetEmail, sendMagicLinkEmail } from "./email.service";
 
-// Dummy hash for timing-safe comparison when user not found
+// Dummy hash for timing-safe comparison when user not found (prevents timing-based email enumeration)
 const DUMMY_HASH = "$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ012";
+
+// Safe user fields to return from service functions — NEVER include passwordHash, twoFactorSecret, backupCodes
+const SAFE_USER_SELECT = {
+  id: true, email: true, fullName: true, displayName: true, avatar: true,
+  emailVerified: true, twoFactorEnabled: true, provider: true,
+  createdAt: true, updatedAt: true,
+} as const;
 
 export async function login(email: string, password: string) {
   const user = await prisma.user.findUnique({ where: { email } });
@@ -18,8 +25,7 @@ export async function login(email: string, password: string) {
   if (!user || !user.passwordHash || !valid) {
     // Only increment failed attempts if user exists
     if (user) {
-      const remaining = await incrementFailedAttempts(user.id);
-      throw new AuthError("INVALID_CREDENTIALS", "Incorrect email or password", 401, { attemptsRemaining: remaining });
+      await incrementFailedAttempts(user.id);
     }
     throw new AuthError("INVALID_CREDENTIALS", "Incorrect email or password");
   }
@@ -36,11 +42,13 @@ export async function login(email: string, password: string) {
     return { requiresTwoFactor: true, tempToken };
   }
 
-  return { requiresTwoFactor: false, user };
+  // Return safe fields only
+  const safeUser = await prisma.user.findUnique({ where: { id: user.id }, select: SAFE_USER_SELECT });
+  return { requiresTwoFactor: false, user: safeUser! };
 }
 
 export async function signup(fullName: string, email: string, password: string) {
-  const existing = await prisma.user.findUnique({ where: { email } });
+  const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } });
   if (existing) {
     throw new AuthError("EMAIL_EXISTS", "Email already registered", 409);
   }
@@ -48,6 +56,7 @@ export async function signup(fullName: string, email: string, password: string) 
   const passwordHash = await bcrypt.hash(password, 10);
   const user = await prisma.user.create({
     data: { fullName, email, passwordHash },
+    select: SAFE_USER_SELECT,
   });
 
   const token = await generateToken("email_verify", user.id, 60 * 24); // 24h
@@ -71,6 +80,7 @@ export async function verifyEmail(token: string) {
   const user = await prisma.user.update({
     where: { id: userId },
     data: { emailVerified: new Date() },
+    select: SAFE_USER_SELECT,
   });
 
   return user;
@@ -128,7 +138,7 @@ export async function verifyMagicLink(token: string) {
   }
 
   await invalidateToken(token);
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: SAFE_USER_SELECT });
   return user;
 }
 
@@ -138,17 +148,23 @@ export async function verify2FA(tempToken: string, code: string) {
     throw new AuthError("INVALID_2FA_CODE", "Invalid or expired token", 401);
   }
 
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user?.twoFactorSecret) {
+  // Need twoFactorSecret for validation — internal only
+  const internal = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { twoFactorSecret: true },
+  });
+  if (!internal?.twoFactorSecret) {
     throw new AuthError("INVALID_2FA_CODE", "2FA not configured", 401);
   }
 
-  const valid = authenticator.verify({ token: code, secret: user.twoFactorSecret });
+  const valid = authenticator.verify({ token: code, secret: internal.twoFactorSecret });
   if (!valid) {
     throw new AuthError("INVALID_2FA_CODE", "Invalid code", 401);
   }
 
   await invalidateToken(tempToken);
+  // Return safe fields only
+  const user = await prisma.user.findUniqueOrThrow({ where: { id: userId }, select: SAFE_USER_SELECT });
   return user;
 }
 
@@ -158,18 +174,22 @@ export async function verifyBackupCode(tempToken: string, backupCode: string) {
     throw new AuthError("INVALID_2FA_CODE", "Invalid or expired token", 401);
   }
 
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) {
+  // Need backupCodes for validation — internal only
+  const internal = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { backupCodes: true },
+  });
+  if (!internal) {
     throw new AuthError("INVALID_2FA_CODE", "User not found", 401);
   }
 
-  const codeIndex = user.backupCodes.indexOf(backupCode);
+  const codeIndex = internal.backupCodes.indexOf(backupCode);
   if (codeIndex === -1) {
     throw new AuthError("INVALID_2FA_CODE", "Invalid backup code", 401);
   }
 
   // Remove used code
-  const updatedCodes = [...user.backupCodes];
+  const updatedCodes = [...internal.backupCodes];
   updatedCodes.splice(codeIndex, 1);
 
   await prisma.user.update({
@@ -178,6 +198,8 @@ export async function verifyBackupCode(tempToken: string, backupCode: string) {
   });
 
   await invalidateToken(tempToken);
+  // Return safe fields only
+  const user = await prisma.user.findUniqueOrThrow({ where: { id: userId }, select: SAFE_USER_SELECT });
   return { user, backupCodesRemaining: updatedCodes.length };
 }
 

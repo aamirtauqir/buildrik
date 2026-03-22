@@ -8,9 +8,11 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Validate JWT properly instead of just checking cookie existence
-  const sessionToken =
-    req.cookies.get("next-auth.session-token")?.value ||
-    req.cookies.get("__Secure-next-auth.session-token")?.value;
+  const isSecure = process.env.NODE_ENV === "production";
+  const cookieName = isSecure
+    ? "__Secure-next-auth.session-token"
+    : "next-auth.session-token";
+  const sessionToken = req.cookies.get(cookieName)?.value;
 
   let isLoggedIn = false;
   if (sessionToken) {
@@ -18,6 +20,7 @@ export async function middleware(req: NextRequest) {
       const decoded = await decode({
         token: sessionToken,
         secret: process.env.NEXTAUTH_SECRET!,
+        salt: cookieName,
       });
       isLoggedIn = !!decoded?.sub;
     } catch {
