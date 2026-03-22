@@ -32,7 +32,7 @@ export async function login(email: string, password: string) {
   await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
 
   if (user.twoFactorEnabled) {
-    const tempToken = await generateToken("2fa_temp", user.id, 10);
+    const tempToken = await generateToken("2fa_temp", user.id, 5);
     return { requiresTwoFactor: true, tempToken };
   }
 
@@ -92,7 +92,7 @@ export async function forgotPassword(email: string) {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return; // always return success, prevent enumeration
 
-  const token = await generateToken("password_reset", user.id, 60); // 1h
+  const token = await generateToken("password_reset", user.id, 30); // 30min
   await sendPasswordResetEmail(email, token);
 }
 
