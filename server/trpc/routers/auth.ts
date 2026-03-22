@@ -36,7 +36,7 @@ export const authRouter = router({
         if (result.requiresTwoFactor) {
           return { requiresTwoFactor: true as const, tempToken: result.tempToken };
         }
-        return { requiresTwoFactor: false as const, user: { id: result.user.id, email: result.user.email } };
+        return { requiresTwoFactor: false as const, user: { id: result.user!.id, email: result.user!.email } };
       } catch (err) {
         handleAuthError(err);
       }
@@ -161,17 +161,5 @@ export const authRouter = router({
     .mutation(async ({ input }) => {
       await invalidateToken(input.token);
       return { message: "Invite declined" };
-    }),
-
-  verifyDevice: publicProcedure
-    .input(z.object({ token: z.string().min(1), code: z.string().length(6) }))
-    .mutation(async () => {
-      return { success: true };
-    }),
-
-  reportSuspiciousLogin: publicProcedure
-    .input(z.object({ token: z.string().min(1) }))
-    .mutation(async () => {
-      return { message: "Report received. Account secured." };
     }),
 });
