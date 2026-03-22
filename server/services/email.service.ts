@@ -1,49 +1,45 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
+import { render } from "@react-email/render";
+import VerifyEmail from "@/emails/verify-email";
+import ResetPassword from "@/emails/reset-password";
+import MagicLink from "@/emails/magic-link";
+import TeamInvite from "@/emails/team-invite";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _transport: nodemailer.Transporter | null = null;
+function getTransport() {
+  if (!_transport) {
+    _transport = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT) || 2525,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+  }
+  return _transport;
+}
+
 const FROM = process.env.EMAIL_FROM || "noreply@buildrik.app";
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
+async function sendEmail(to: string, subject: string, html: string) {
+  await getTransport().sendMail({ from: FROM, to, subject, html });
+}
+
 export async function sendVerificationEmail(to: string, token: string) {
-  await resend.emails.send({
-    from: FROM,
-    to,
-    subject: "Verify your email — Buildrik",
-    html: `
-      <h2>Verify your email</h2>
-      <p>Click the link below to verify your email address:</p>
-      <a href="${BASE_URL}/auth/verify-email?token=${token}" style="display:inline-block;padding:12px 24px;background:#6366F1;color:white;border-radius:8px;text-decoration:none;">Verify Email Address</a>
-      <p style="color:#64748B;font-size:12px;margin-top:16px;">This link expires in 24 hours.</p>
-    `,
-  });
+  const html = await render(VerifyEmail({ verifyUrl: `${BASE_URL}/auth/verify-email?token=${encodeURIComponent(token)}` }));
+  await sendEmail(to, "Verify your email — Buildrik", html);
 }
 
 export async function sendPasswordResetEmail(to: string, token: string) {
-  await resend.emails.send({
-    from: FROM,
-    to,
-    subject: "Reset your password — Buildrik",
-    html: `
-      <h2>Reset your password</h2>
-      <p>Click the link below to reset your password:</p>
-      <a href="${BASE_URL}/auth/reset-password?token=${token}" style="display:inline-block;padding:12px 24px;background:#6366F1;color:white;border-radius:8px;text-decoration:none;">Reset Password</a>
-      <p style="color:#64748B;font-size:12px;margin-top:16px;">This link expires in 1 hour. If you didn't request this, you can safely ignore this email.</p>
-    `,
-  });
+  const html = await render(ResetPassword({ resetUrl: `${BASE_URL}/auth/reset-password?token=${encodeURIComponent(token)}` }));
+  await sendEmail(to, "Reset your password — Buildrik", html);
 }
 
 export async function sendMagicLinkEmail(to: string, token: string) {
-  await resend.emails.send({
-    from: FROM,
-    to,
-    subject: "Sign in to Buildrik",
-    html: `
-      <h2>Sign in to Buildrik</h2>
-      <p>Click the link below to sign in:</p>
-      <a href="${BASE_URL}/auth/callback?token=${token}" style="display:inline-block;padding:12px 24px;background:#6366F1;color:white;border-radius:8px;text-decoration:none;">Sign In</a>
-      <p style="color:#64748B;font-size:12px;margin-top:16px;">This link expires in 15 minutes.</p>
-    `,
-  });
+  const html = await render(MagicLink({ signInUrl: `${BASE_URL}/auth/callback?token=${encodeURIComponent(token)}` }));
+  await sendEmail(to, "Sign in to Buildrik", html);
 }
 
 export async function sendTeamInviteEmail(
@@ -52,15 +48,10 @@ export async function sendTeamInviteEmail(
   inviterName: string,
   token: string
 ) {
-  await resend.emails.send({
-    from: FROM,
-    to,
-    subject: `${inviterName} invited you to ${workspaceName} — Buildrik`,
-    html: `
-      <h2>You've been invited!</h2>
-      <p>${inviterName} invited you to join <strong>${workspaceName}</strong> on Buildrik.</p>
-      <a href="${BASE_URL}/auth/invite?token=${token}" style="display:inline-block;padding:12px 24px;background:#6366F1;color:white;border-radius:8px;text-decoration:none;">Accept Invite</a>
-      <p style="color:#64748B;font-size:12px;margin-top:16px;">This invite expires in 7 days.</p>
-    `,
-  });
+  const html = await render(TeamInvite({
+    inviteUrl: `${BASE_URL}/auth/invite?token=${encodeURIComponent(token)}`,
+    inviterName,
+    workspaceName,
+  }));
+  await sendEmail(to, `${inviterName} invited you to ${workspaceName} — Buildrik`, html);
 }
