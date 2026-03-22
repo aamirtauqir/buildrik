@@ -57,14 +57,17 @@ export async function login(email: string, password: string) {
     if (user) {
       await incrementFailedAttempts(user.id);
     }
+    await logAuditEvent("LOGIN_FAILED", "failure", { email });
     throw new AuthError("INVALID_CREDENTIALS", "Incorrect email or password");
   }
 
   if (await isAccountLocked(user.id)) {
+    await logAuditEvent("LOGIN_LOCKED", "failure", { userId: user.id, email });
     throw new AuthError("ACCOUNT_LOCKED", "Account locked. Try again later.", 423);
   }
 
   await resetFailedAttempts(user.id);
+  await logAuditEvent("LOGIN_SUCCESS", "success", { userId: user.id, email });
   await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
 
   if (user.twoFactorEnabled) {
@@ -88,6 +91,8 @@ export async function signup(fullName: string, email: string, password: string) 
     data: { fullName, email, passwordHash },
     select: SAFE_USER_SELECT,
   });
+
+  await logAuditEvent("SIGNUP", "success", { userId: user.id, email });
 
   const token = await generateToken("email_verify", user.id, 60 * 24); // 24h
   try {
@@ -113,6 +118,8 @@ export async function verifyEmail(token: string) {
     select: SAFE_USER_SELECT,
   });
 
+  await logAuditEvent("EMAIL_VERIFIED", "success", { userId });
+
   return user;
 }
 
@@ -134,6 +141,7 @@ export async function forgotPassword(email: string) {
 
   const token = await generateToken("password_reset", user.id, 30); // 30min
   await sendPasswordResetEmail(email, token);
+  await logAuditEvent("PASSWORD_RESET_REQUESTED", "success", { email });
 }
 
 export async function resetPassword(token: string, newPassword: string) {
@@ -148,6 +156,8 @@ export async function resetPassword(token: string, newPassword: string) {
     where: { id: userId },
     data: { passwordHash },
   });
+
+  await logAuditEvent("PASSWORD_RESET_COMPLETED", "success", { userId });
 
   // Invalidate all sessions
   await prisma.session.deleteMany({ where: { userId } });
@@ -196,6 +206,7 @@ export async function verify2FA(tempToken: string, code: string) {
   }
 
   await invalidateToken(tempToken);
+  await logAuditEvent("2FA_VERIFIED", "success", { userId });
   // Return safe fields only
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId }, select: SAFE_USER_SELECT });
   return user;
@@ -231,6 +242,7 @@ export async function verifyBackupCode(tempToken: string, backupCode: string) {
   });
 
   await invalidateToken(tempToken);
+  await logAuditEvent("BACKUP_CODE_USED", "success", { userId });
   // Return safe fields only
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId }, select: SAFE_USER_SELECT });
   return { user, backupCodesRemaining: updatedCodes.length };
