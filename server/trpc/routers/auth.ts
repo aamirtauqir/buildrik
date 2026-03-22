@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, publicProcedure } from "../trpc";
+import { router, publicProcedure, protectedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import {
   login, signup, verifyEmail, resendVerification,
@@ -32,7 +32,11 @@ export const authRouter = router({
     .input(loginSchema)
     .mutation(async ({ input }) => {
       try {
-        return await login(input.email, input.password);
+        const result = await login(input.email, input.password);
+        if (result.requiresTwoFactor) {
+          return { requiresTwoFactor: true as const, tempToken: result.tempToken };
+        }
+        return { requiresTwoFactor: false as const, user: { id: result.user.id, email: result.user.email } };
       } catch (err) {
         handleAuthError(err);
       }
@@ -134,7 +138,10 @@ export const authRouter = router({
       }
     }),
 
-  logout: publicProcedure.mutation(async () => {
+  logout: protectedProcedure.mutation(async ({ ctx }) => {
+    if (ctx.session?.user?.id) {
+      await ctx.prisma.session.deleteMany({ where: { userId: ctx.session.user.id } });
+    }
     return { success: true };
   }),
 
