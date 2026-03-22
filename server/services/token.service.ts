@@ -1,5 +1,10 @@
 import { prisma } from "@/lib/prisma";
+import { createHash } from "crypto";
 import { randomUUID } from "crypto";
+
+function hashToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
+}
 
 export async function generateToken(
   type: "email_verify" | "password_reset" | "magic_link" | "invite" | "2fa_temp" | "session_grant",
@@ -7,18 +12,20 @@ export async function generateToken(
   expiryMinutes: number
 ) {
   const token = randomUUID();
+  const hashedToken = hashToken(token);
   const expires = new Date(Date.now() + expiryMinutes * 60 * 1000);
 
   await prisma.verificationToken.create({
-    data: { identifier, token, type, expires },
+    data: { identifier, token: hashedToken, type, expires },
   });
 
-  return token;
+  return token; // Return raw token to user, store hash in DB
 }
 
 export async function validateToken(token: string, type: string) {
+  const hashedToken = hashToken(token);
   const record = await prisma.verificationToken.findFirst({
-    where: { token, type, used: false },
+    where: { token: hashedToken, type, used: false },
   });
 
   if (!record) return null;
@@ -28,8 +35,9 @@ export async function validateToken(token: string, type: string) {
 }
 
 export async function invalidateToken(token: string) {
+  const hashedToken = hashToken(token);
   await prisma.verificationToken.updateMany({
-    where: { token },
+    where: { token: hashedToken },
     data: { used: true },
   });
 }

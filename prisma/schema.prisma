@@ -80,6 +80,7 @@ model VerificationToken {
   createdAt  DateTime @default(now())
 
   @@unique([identifier, token])
+  @@index([token, type, used])
   @@map("verification_tokens")
 }
 
