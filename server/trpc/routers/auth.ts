@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, publicProcedure, protectedProcedure } from "../trpc";
+import { router, publicProcedure, protectedProcedure, createRateLimitedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import {
   login, signup, verifyEmail, resendVerification,
@@ -11,6 +11,11 @@ import {
   resetPasswordSchema, otpSchema, backupCodeSchema, magicLinkSchema,
 } from "@/lib/validations/auth";
 import { generateToken, validateToken, invalidateToken } from "@/server/services/token.service";
+
+// Strict: 5 attempts per 15 min (login, 2FA, token verification)
+const strictRateLimit = createRateLimitedProcedure(5, 15 * 60 * 1000);
+// Normal: 10 attempts per 15 min (signup, resend, forgot password)
+const normalRateLimit = createRateLimitedProcedure(10, 15 * 60 * 1000);
 
 function handleAuthError(err: unknown): never {
   if (err instanceof AuthError) {
@@ -28,7 +33,7 @@ function handleAuthError(err: unknown): never {
 }
 
 export const authRouter = router({
-  login: publicProcedure
+  login: strictRateLimit
     .input(loginSchema)
     .mutation(async ({ input }) => {
       try {
@@ -42,7 +47,7 @@ export const authRouter = router({
       }
     }),
 
-  signup: publicProcedure
+  signup: normalRateLimit
     .input(signupSchema)
     .mutation(async ({ input }) => {
       try {
@@ -53,7 +58,7 @@ export const authRouter = router({
       }
     }),
 
-  verifyEmail: publicProcedure
+  verifyEmail: normalRateLimit
     .input(z.object({ token: z.string().uuid() }))
     .mutation(async ({ input }) => {
       try {
@@ -64,21 +69,21 @@ export const authRouter = router({
       }
     }),
 
-  resendVerification: publicProcedure
+  resendVerification: normalRateLimit
     .input(z.object({ email: z.string().email() }))
     .mutation(async ({ input }) => {
       await resendVerification(input.email);
       return { message: "If an account exists, a verification email has been sent" };
     }),
 
-  forgotPassword: publicProcedure
+  forgotPassword: normalRateLimit
     .input(forgotPasswordSchema)
     .mutation(async ({ input }) => {
       await forgotPassword(input.email);
       return { message: "If an account exists, a reset email has been sent" };
     }),
 
-  resetPassword: publicProcedure
+  resetPassword: strictRateLimit
     .input(resetPasswordSchema)
     .mutation(async ({ input }) => {
       try {
@@ -89,14 +94,14 @@ export const authRouter = router({
       }
     }),
 
-  magicLink: publicProcedure
+  magicLink: normalRateLimit
     .input(magicLinkSchema)
     .mutation(async ({ input }) => {
       await sendMagicLink(input.email);
       return { message: "Magic link sent" };
     }),
 
-  verifyMagicLink: publicProcedure
+  verifyMagicLink: strictRateLimit
     .input(z.object({ token: z.string().uuid() }))
     .mutation(async ({ input }) => {
       try {
@@ -109,7 +114,7 @@ export const authRouter = router({
       }
     }),
 
-  verify2FA: publicProcedure
+  verify2FA: strictRateLimit
     .input(z.object({ twoFactorToken: z.string().uuid(), code: z.string().length(6).regex(/^\d{6}$/, "Code must be 6 digits") }))
     .mutation(async ({ input }) => {
       try {
@@ -121,7 +126,7 @@ export const authRouter = router({
       }
     }),
 
-  verifyBackupCode: publicProcedure
+  verifyBackupCode: strictRateLimit
     .input(z.object({ twoFactorToken: z.string().uuid(), backupCode: z.string().regex(/^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/, "Invalid backup code format") }))
     .mutation(async ({ input }) => {
       try {
@@ -145,7 +150,7 @@ export const authRouter = router({
     return { success: true };
   }),
 
-  acceptInvite: publicProcedure
+  acceptInvite: normalRateLimit
     .input(z.object({ token: z.string().uuid() }))
     .mutation(async ({ input }) => {
       const identifier = await validateToken(input.token, "invite");
