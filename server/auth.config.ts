@@ -32,11 +32,8 @@ export const authConfig: NextAuthConfig = {
 
         if (user.lockedUntil && user.lockedUntil > new Date()) return null;
 
-        const isSessionGrant = password === process.env.SESSION_GRANT_SECRET;
-        if (!isSessionGrant) {
-          const valid = await bcrypt.compare(password, user.passwordHash);
-          if (!valid) return null;
-        }
+        const valid = await bcrypt.compare(password, user.passwordHash);
+        if (!valid) return null;
 
         return { id: user.id, email: user.email, name: user.fullName };
       },
