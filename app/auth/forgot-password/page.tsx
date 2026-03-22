@@ -16,7 +16,7 @@ export default function ForgotPasswordPage() {
 
   const forgotPasswordMutation = trpc.auth.forgotPassword.useMutation({
     onSuccess: () => {
-      router.push(`/auth/check-inbox?email=${encodeURIComponent(email)}&type=reset`);
+      router.push("/auth/check-inbox?type=reset");
     },
   });
 

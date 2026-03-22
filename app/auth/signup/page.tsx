@@ -11,6 +11,7 @@ import { AuthDivider } from "@/components/auth/auth-divider";
 import { FormBanner } from "@/components/auth/form-banner";
 import { PasswordStrength } from "@/components/auth/password-strength";
 import { SocialButton } from "@/components/auth/social-button";
+import { signIn } from "next-auth/react";
 import { trpc } from "@/lib/trpc/client";
 
 export default function SignupPage() {
@@ -23,7 +24,7 @@ export default function SignupPage() {
 
   const signupMutation = trpc.auth.signup.useMutation({
     onSuccess: () => {
-      router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
+      router.push("/auth/verify-email");
     },
     onError: (err) => {
       setError(err.message);
@@ -125,11 +126,11 @@ export default function SignupPage() {
 
         <div className="h-6" />
 
-        <SocialButton provider="google" />
+        <SocialButton provider="google" onClick={() => signIn("google", { callbackUrl: "/dashboard" })} />
 
         <div className="h-2" />
 
-        <SocialButton provider="github" />
+        <SocialButton provider="github" onClick={() => signIn("github", { callbackUrl: "/dashboard" })} />
 
         <div className="h-6" />
 
