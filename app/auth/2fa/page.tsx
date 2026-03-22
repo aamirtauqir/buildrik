@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -12,7 +12,7 @@ import { OTPInput } from "@/components/auth/otp-input";
 import { ResendTimer } from "@/components/auth/resend-timer";
 import { trpc } from "@/lib/trpc/client";
 
-export default function TwoFAPage() {
+function TwoFAContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
@@ -20,8 +20,15 @@ export default function TwoFAPage() {
   const [code, setCode] = useState("");
 
   const verify2FAMutation = trpc.auth.verify2FA.useMutation({
-    onSuccess: () => {
-      router.push("/dashboard");
+    onSuccess: async (data) => {
+      const res = await fetch("/api/auth/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionToken: data.sessionToken }),
+      });
+      if (res.ok) {
+        router.push("/dashboard");
+      }
     },
   });
 
@@ -91,5 +98,13 @@ export default function TwoFAPage() {
         ← Back to sign in
       </Link>
     </AuthCard>
+  );
+}
+
+export default function TwoFAPage() {
+  return (
+    <Suspense fallback={null}>
+      <TwoFAContent />
+    </Suspense>
   );
 }

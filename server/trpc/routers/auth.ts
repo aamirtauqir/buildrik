@@ -10,6 +10,7 @@ import {
   loginSchema, signupSchema, forgotPasswordSchema,
   resetPasswordSchema, otpSchema, backupCodeSchema, magicLinkSchema,
 } from "@/lib/validations/auth";
+import { generateToken, validateToken, invalidateToken } from "@/server/services/token.service";
 
 function handleAuthError(err: unknown): never {
   if (err instanceof AuthError) {
@@ -107,7 +108,8 @@ export const authRouter = router({
     .mutation(async ({ input }) => {
       try {
         const user = await verify2FA(input.twoFactorToken, input.code);
-        return { success: true, user: { id: user.id, email: user.email } };
+        const sessionToken = await generateToken("session_grant", user.id, 5);
+        return { success: true, sessionToken, user: { id: user.id, email: user.email } };
       } catch (err) {
         handleAuthError(err);
       }
@@ -118,8 +120,10 @@ export const authRouter = router({
     .mutation(async ({ input }) => {
       try {
         const result = await verifyBackupCode(input.twoFactorToken, input.backupCode);
+        const sessionToken = await generateToken("session_grant", result.user.id, 5);
         return {
           success: true,
+          sessionToken,
           user: { id: result.user.id, email: result.user.email },
           backupCodesRemaining: result.backupCodesRemaining,
         };

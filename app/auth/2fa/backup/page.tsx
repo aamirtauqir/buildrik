@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -11,7 +11,7 @@ import { AuthButton } from "@/components/auth/auth-button";
 import { AuthInput } from "@/components/auth/auth-input";
 import { trpc } from "@/lib/trpc/client";
 
-export default function BackupCodePage() {
+function BackupCodeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
@@ -19,8 +19,15 @@ export default function BackupCodePage() {
   const [backupCode, setBackupCode] = useState("");
 
   const verifyBackupCodeMutation = trpc.auth.verifyBackupCode.useMutation({
-    onSuccess: () => {
-      router.push("/dashboard");
+    onSuccess: async (data) => {
+      const res = await fetch("/api/auth/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionToken: data.sessionToken }),
+      });
+      if (res.ok) {
+        router.push("/dashboard");
+      }
     },
   });
 
@@ -73,5 +80,13 @@ export default function BackupCodePage() {
         ← Back to sign in
       </Link>
     </AuthCard>
+  );
+}
+
+export default function BackupCodePage() {
+  return (
+    <Suspense fallback={null}>
+      <BackupCodeContent />
+    </Suspense>
   );
 }
