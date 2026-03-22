@@ -9,7 +9,7 @@ import { AuthLogo } from "@/components/auth/auth-logo";
 import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthButton } from "@/components/auth/auth-button";
 import { OTPInput } from "@/components/auth/otp-input";
-import { ResendTimer } from "@/components/auth/resend-timer";
+
 import { trpc } from "@/lib/trpc/client";
 
 function TwoFAContent() {
@@ -56,7 +56,9 @@ function TwoFAContent() {
 
       <div className="h-4" />
 
-      <ResendTimer initialSeconds={287} onResend={() => console.log("resend")} />
+      <p className="text-auth-subtitle text-auth-text-muted text-center">
+        Open your authenticator app to get the code.
+      </p>
 
       <div className="h-5" />
 

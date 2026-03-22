@@ -49,7 +49,12 @@ export async function signup(fullName: string, email: string, password: string) 
   });
 
   const token = await generateToken("email_verify", user.id, 60 * 24); // 24h
-  await sendVerificationEmail(email, token);
+  try {
+    await sendVerificationEmail(email, token);
+  } catch {
+    // User is created but email failed (e.g., missing RESEND_API_KEY in dev).
+    // Don't roll back — let them resend verification later.
+  }
 
   return user;
 }
@@ -74,7 +79,11 @@ export async function resendVerification(email: string) {
   if (!user) return; // silent fail, prevent enumeration
 
   const token = await generateToken("email_verify", user.id, 60 * 24);
-  await sendVerificationEmail(email, token);
+  try {
+    await sendVerificationEmail(email, token);
+  } catch {
+    // Email failed but don't crash — user can retry
+  }
 }
 
 export async function forgotPassword(email: string) {

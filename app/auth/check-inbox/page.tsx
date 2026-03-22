@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Mail } from "lucide-react";
@@ -7,11 +8,14 @@ import { AuthCard } from "@/components/auth/auth-card";
 import { AuthLogo } from "@/components/auth/auth-logo";
 import { AuthIcon } from "@/components/auth/auth-icon";
 import { ResendTimer } from "@/components/auth/resend-timer";
+import { trpc } from "@/lib/trpc/client";
 
-export default function CheckInboxPage() {
+function CheckInboxContent() {
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
   const email = searchParams.get("email") ?? "";
+
+  const resendMutation = trpc.auth.forgotPassword.useMutation();
 
   const subtitle =
     type === "reset"
@@ -50,7 +54,11 @@ export default function CheckInboxPage() {
 
       <ResendTimer
         initialSeconds={60}
-        onResend={() => console.log("resend")}
+        onResend={() => {
+          if (type === "reset" && email) {
+            resendMutation.mutate({ email });
+          }
+        }}
       />
 
       <div className="h-3" />
@@ -75,5 +83,13 @@ export default function CheckInboxPage() {
         </Link>
       </div>
     </AuthCard>
+  );
+}
+
+export default function CheckInboxPage() {
+  return (
+    <Suspense fallback={null}>
+      <CheckInboxContent />
+    </Suspense>
   );
 }

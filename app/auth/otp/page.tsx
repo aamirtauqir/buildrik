@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
@@ -10,7 +10,7 @@ import { AuthButton } from "@/components/auth/auth-button";
 import { OTPInput } from "@/components/auth/otp-input";
 import { ResendTimer } from "@/components/auth/resend-timer";
 
-export default function OTPPage() {
+function OTPContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
 
@@ -53,7 +53,9 @@ export default function OTPPage() {
 
       <div className="h-4" />
 
-      <ResendTimer initialSeconds={60} onResend={() => console.log("resend")} />
+      <ResendTimer initialSeconds={60} onResend={() => {
+        // TODO: wire to actual resend when OTP flow is implemented
+      }} />
 
       <div className="h-3" />
 
@@ -64,5 +66,13 @@ export default function OTPPage() {
         ← Back to sign in
       </Link>
     </AuthCard>
+  );
+}
+
+export default function OTPPage() {
+  return (
+    <Suspense fallback={null}>
+      <OTPContent />
+    </Suspense>
   );
 }
