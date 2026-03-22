@@ -1,5 +1,68 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+@theme inline {
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  /* Auth colors */
+  --color-auth-cta: #EF4444;
+  --color-auth-cta-hover: #DC2626;
+  --color-auth-input-border: #E2E8F0;
+  --color-auth-input-focus: #3B82F6;
+  --color-auth-input-error: #EF4444;
+  --color-auth-text-primary: #0F172A;
+  --color-auth-text-body: #1E293B;
+  --color-auth-text-secondary: #334155;
+  --color-auth-text-muted: #64748B;
+  --color-auth-text-placeholder: #94A3B8;
+  --color-auth-link: #3B82F6;
+  --color-auth-success-bg: #F0FDF4;
+  --color-auth-success-border: #BBF7D0;
+  --color-auth-success-text: #166534;
+  --color-auth-error-bg: #FEF2F2;
+  --color-auth-error-border: #FECACA;
+  --color-auth-error-text: #991B1B;
+  --color-auth-strength-bg: #F8FAFC;
+  --color-auth-strength-pass: #16A34A;
+
+  /* Auth shadows */
+  --shadow-auth-card: 0 4px 24px rgba(0, 0, 0, 0.08);
+
+  /* Auth border radius */
+  --radius-auth-card: 16px;
+  --radius-auth-input: 8px;
+  --radius-auth-btn: 8px;
+
+  /* Auth max-width */
+  --container-auth-card: 420px;
+
+  /* Auth spacing/height */
+  --spacing-auth-input: 44px;
+  --spacing-auth-btn: 44px;
+
+  /* Auth font sizes */
+  --text-auth-title: 22px;
+  --text-auth-title--line-height: 1.3;
+  --text-auth-title--font-weight: 700;
+  --text-auth-subtitle: 14px;
+  --text-auth-subtitle--line-height: 1.5;
+  --text-auth-subtitle--font-weight: 400;
+  --text-auth-label: 13px;
+  --text-auth-label--line-height: 1.4;
+  --text-auth-label--font-weight: 500;
+  --text-auth-input: 14px;
+  --text-auth-input--line-height: 1.5;
+  --text-auth-input--font-weight: 400;
+  --text-auth-btn: 14px;
+  --text-auth-btn--line-height: 1;
+  --text-auth-btn--font-weight: 600;
+  --text-auth-link: 14px;
+  --text-auth-link--line-height: 1.5;
+  --text-auth-link--font-weight: 500;
+  --text-auth-error: 13px;
+  --text-auth-error--line-height: 1.4;
+  --text-auth-error--font-weight: 400;
+  --text-auth-fine: 12px;
+  --text-auth-fine--line-height: 1.5;
+  --text-auth-fine--font-weight: 400;
+}
