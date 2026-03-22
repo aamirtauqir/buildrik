@@ -25,7 +25,7 @@ export const forgotPasswordSchema = z.object({
 });
 
 export const resetPasswordSchema = z.object({
-  token: z.string().min(1),
+  token: z.string().uuid(),
   newPassword: passwordRules,
   confirmPassword: z.string(),
 }).refine((data) => data.newPassword === data.confirmPassword, {

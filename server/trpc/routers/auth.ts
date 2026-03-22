@@ -54,7 +54,7 @@ export const authRouter = router({
     }),
 
   verifyEmail: publicProcedure
-    .input(z.object({ token: z.string().min(1) }))
+    .input(z.object({ token: z.string().uuid() }))
     .mutation(async ({ input }) => {
       try {
         const user = await verifyEmail(input.token);
@@ -97,7 +97,7 @@ export const authRouter = router({
     }),
 
   verifyMagicLink: publicProcedure
-    .input(z.object({ token: z.string().min(1) }))
+    .input(z.object({ token: z.string().uuid() }))
     .mutation(async ({ input }) => {
       try {
         const user = await verifyMagicLink(input.token);
@@ -110,7 +110,7 @@ export const authRouter = router({
     }),
 
   verify2FA: publicProcedure
-    .input(z.object({ twoFactorToken: z.string().min(1), code: z.string().length(6) }))
+    .input(z.object({ twoFactorToken: z.string().uuid(), code: z.string().length(6) }))
     .mutation(async ({ input }) => {
       try {
         const user = await verify2FA(input.twoFactorToken, input.code);
@@ -122,7 +122,7 @@ export const authRouter = router({
     }),
 
   verifyBackupCode: publicProcedure
-    .input(z.object({ twoFactorToken: z.string().min(1), backupCode: z.string().min(1) }))
+    .input(z.object({ twoFactorToken: z.string().uuid(), backupCode: z.string().min(1) }))
     .mutation(async ({ input }) => {
       try {
         const result = await verifyBackupCode(input.twoFactorToken, input.backupCode);
@@ -146,7 +146,7 @@ export const authRouter = router({
   }),
 
   acceptInvite: publicProcedure
-    .input(z.object({ token: z.string().min(1) }))
+    .input(z.object({ token: z.string().uuid() }))
     .mutation(async ({ input }) => {
       const identifier = await validateToken(input.token, "invite");
       if (!identifier) {
@@ -157,7 +157,7 @@ export const authRouter = router({
     }),
 
   declineInvite: publicProcedure
-    .input(z.object({ token: z.string().min(1) }))
+    .input(z.object({ token: z.string().uuid() }))
     .mutation(async ({ input }) => {
       await invalidateToken(input.token);
       return { message: "Invite declined" };
