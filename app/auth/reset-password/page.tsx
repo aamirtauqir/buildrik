@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { AlertTriangle } from "lucide-react";
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthLogo } from "@/components/auth/auth-logo";
 import { AuthIcon } from "@/components/auth/auth-icon";
@@ -13,10 +12,27 @@ import { PasswordStrength } from "@/components/auth/password-strength";
 import { InlineError } from "@/components/auth/inline-error";
 import { trpc } from "@/lib/trpc/client";
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+
+  if (!token) {
+    return (
+      <AuthCard>
+        <AuthLogo />
+        <AuthIcon name="warning" color="red" />
+        <h1 className="text-auth-title text-auth-text-primary text-center">Invalid link</h1>
+        <p className="text-auth-subtitle text-auth-text-muted text-center mt-1">
+          This reset link is invalid. Please request a new one.
+        </p>
+        <div className="h-6" />
+        <AuthButton onClick={() => router.push("/auth/forgot-password")}>
+          Request New Link
+        </AuthButton>
+      </AuthCard>
+    );
+  }
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -63,13 +79,6 @@ export default function ResetPasswordPage() {
       <p className="text-auth-subtitle text-auth-text-muted text-center mt-1 mb-6">
         Must be at least 8 characters
       </p>
-
-      <div className="h-4" />
-
-      <div className="bg-blue-50 border border-blue-200 rounded-auth-input px-4 py-2 text-auth-label text-blue-700 w-full flex items-center gap-2">
-        <AlertTriangle className="w-4 h-4 shrink-0" />
-        Resetting password for sarah@acmecorp.com
-      </div>
 
       <div className="h-4" />
 
@@ -120,5 +129,13 @@ export default function ResetPasswordPage() {
         </Link>
       </div>
     </AuthCard>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }
