@@ -1,9 +1,39 @@
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
+import { createCipheriv, createDecipheriv, randomBytes } from "crypto";
 import { generateToken, validateToken, invalidateToken } from "./token.service";
 import { isAccountLocked, incrementFailedAttempts, resetFailedAttempts } from "./rate-limit.service";
 import { sendVerificationEmail, sendPasswordResetEmail, sendMagicLinkEmail } from "./email.service";
+import { logAuditEvent } from "./audit.service";
+
+async function hashBackupCodes(codes: string[]): Promise<string[]> {
+  return Promise.all(codes.map(code => bcrypt.hash(code, 10)));
+}
+
+async function findMatchingBackupCode(plainCode: string, hashedCodes: string[]): Promise<number> {
+  for (let i = 0; i < hashedCodes.length; i++) {
+    if (await bcrypt.compare(plainCode, hashedCodes[i])) return i;
+  }
+  return -1;
+}
+
+function encryptSecret(plaintext: string): string {
+  const key = Buffer.from(process.env.NEXTAUTH_SECRET!.slice(0, 64), 'hex'); // 32 bytes from NEXTAUTH_SECRET
+  const iv = randomBytes(12);
+  const cipher = createCipheriv('aes-256-gcm', key, iv);
+  const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  return `${iv.toString('hex')}:${tag.toString('hex')}:${encrypted.toString('hex')}`;
+}
+
+function decryptSecret(ciphertext: string): string {
+  const key = Buffer.from(process.env.NEXTAUTH_SECRET!.slice(0, 64), 'hex');
+  const [ivHex, tagHex, encHex] = ciphertext.split(':');
+  const decipher = createDecipheriv('aes-256-gcm', key, Buffer.from(ivHex, 'hex'));
+  decipher.setAuthTag(Buffer.from(tagHex, 'hex'));
+  return decipher.update(Buffer.from(encHex, 'hex')) + decipher.final('utf8');
+}
 
 // Dummy hash for timing-safe comparison when user not found (prevents timing-based email enumeration)
 const DUMMY_HASH = "$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ012";
@@ -157,7 +187,10 @@ export async function verify2FA(tempToken: string, code: string) {
     throw new AuthError("INVALID_2FA_CODE", "2FA not configured", 401);
   }
 
-  const valid = authenticator.verify({ token: code, secret: internal.twoFactorSecret });
+  const secret = internal.twoFactorSecret.includes(':')
+    ? decryptSecret(internal.twoFactorSecret)
+    : internal.twoFactorSecret; // backwards compat with unencrypted
+  const valid = authenticator.verify({ token: code, secret });
   if (!valid) {
     throw new AuthError("INVALID_2FA_CODE", "Invalid code", 401);
   }
@@ -183,7 +216,7 @@ export async function verifyBackupCode(tempToken: string, backupCode: string) {
     throw new AuthError("INVALID_2FA_CODE", "User not found", 401);
   }
 
-  const codeIndex = internal.backupCodes.indexOf(backupCode);
+  const codeIndex = await findMatchingBackupCode(backupCode, internal.backupCodes);
   if (codeIndex === -1) {
     throw new AuthError("INVALID_2FA_CODE", "Invalid backup code", 401);
   }
@@ -202,6 +235,8 @@ export async function verifyBackupCode(tempToken: string, backupCode: string) {
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId }, select: SAFE_USER_SELECT });
   return { user, backupCodesRemaining: updatedCodes.length };
 }
+
+export { encryptSecret, hashBackupCodes };
 
 // Custom error class
 export class AuthError extends Error {
