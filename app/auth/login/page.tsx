@@ -10,6 +10,7 @@ import { AuthInput } from "@/components/auth/auth-input";
 import { AuthDivider } from "@/components/auth/auth-divider";
 import { FormBanner } from "@/components/auth/form-banner";
 import { SocialButton } from "@/components/auth/social-button";
+import { signIn } from "next-auth/react";
 import { trpc } from "@/lib/trpc/client";
 
 export default function LoginPage() {
@@ -20,11 +21,20 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data.requiresTwoFactor) {
         router.push(`/auth/2fa?token=${data.tempToken}`);
       } else {
-        router.push("/dashboard");
+        const result = await signIn("credentials", {
+          email,
+          password,
+          redirect: false,
+        });
+        if (result?.error) {
+          setError(result.error);
+        } else {
+          router.push("/dashboard");
+        }
       }
     },
     onError: (err) => {
