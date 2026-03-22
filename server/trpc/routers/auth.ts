@@ -97,7 +97,9 @@ export const authRouter = router({
     .mutation(async ({ input }) => {
       try {
         const user = await verifyMagicLink(input.token);
-        return { success: true, user: user ? { id: user.id, email: user.email } : null };
+        if (!user) throw new AuthError("TOKEN_EXPIRED", "Magic link expired", 410);
+        const sessionToken = await generateToken("session_grant", user.id, 5);
+        return { success: true, sessionToken, user: { id: user.id, email: user.email } };
       } catch (err) {
         handleAuthError(err);
       }
