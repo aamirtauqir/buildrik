@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { randomUUID } from "crypto";
 
 export async function generateToken(
-  type: "email_verify" | "password_reset" | "magic_link" | "invite" | "2fa_temp",
+  type: "email_verify" | "password_reset" | "magic_link" | "invite" | "2fa_temp" | "session_grant",
   identifier: string,
   expiryMinutes: number
 ) {
