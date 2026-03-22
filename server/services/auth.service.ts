@@ -5,25 +5,27 @@ import { generateToken, validateToken, invalidateToken } from "./token.service";
 import { isAccountLocked, incrementFailedAttempts, resetFailedAttempts } from "./rate-limit.service";
 import { sendVerificationEmail, sendPasswordResetEmail, sendMagicLinkEmail } from "./email.service";
 
+// Dummy hash for timing-safe comparison when user not found
+const DUMMY_HASH = "$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ012";
+
 export async function login(email: string, password: string) {
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user || !user.passwordHash) {
+
+  // Always run bcrypt to prevent timing-based email enumeration
+  const hashToCompare = user?.passwordHash || DUMMY_HASH;
+  const valid = await bcrypt.compare(password, hashToCompare);
+
+  if (!user || !user.passwordHash || !valid) {
+    // Only increment failed attempts if user exists
+    if (user) {
+      const remaining = await incrementFailedAttempts(user.id);
+      throw new AuthError("INVALID_CREDENTIALS", "Incorrect email or password", 401, { attemptsRemaining: remaining });
+    }
     throw new AuthError("INVALID_CREDENTIALS", "Incorrect email or password");
   }
 
   if (await isAccountLocked(user.id)) {
     throw new AuthError("ACCOUNT_LOCKED", "Account locked. Try again later.", 423);
-  }
-
-  const valid = await bcrypt.compare(password, user.passwordHash);
-  if (!valid) {
-    const remaining = await incrementFailedAttempts(user.id);
-    throw new AuthError(
-      "INVALID_CREDENTIALS",
-      "Incorrect email or password",
-      401,
-      { attemptsRemaining: remaining }
-    );
   }
 
   await resetFailedAttempts(user.id);
