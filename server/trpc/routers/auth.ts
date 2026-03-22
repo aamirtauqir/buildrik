@@ -110,7 +110,7 @@ export const authRouter = router({
     }),
 
   verify2FA: publicProcedure
-    .input(z.object({ twoFactorToken: z.string().uuid(), code: z.string().length(6) }))
+    .input(z.object({ twoFactorToken: z.string().uuid(), code: z.string().length(6).regex(/^\d{6}$/, "Code must be 6 digits") }))
     .mutation(async ({ input }) => {
       try {
         const user = await verify2FA(input.twoFactorToken, input.code);
@@ -122,7 +122,7 @@ export const authRouter = router({
     }),
 
   verifyBackupCode: publicProcedure
-    .input(z.object({ twoFactorToken: z.string().uuid(), backupCode: z.string().min(1) }))
+    .input(z.object({ twoFactorToken: z.string().uuid(), backupCode: z.string().regex(/^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/, "Invalid backup code format") }))
     .mutation(async ({ input }) => {
       try {
         const result = await verifyBackupCode(input.twoFactorToken, input.backupCode);
