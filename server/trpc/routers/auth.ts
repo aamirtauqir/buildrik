@@ -11,6 +11,7 @@ import {
   resetPasswordSchema, otpSchema, backupCodeSchema, magicLinkSchema,
 } from "@/lib/validations/auth";
 import { generateToken, validateToken, invalidateToken } from "@/server/services/token.service";
+import { logAuditEvent } from "@/server/services/audit.service";
 
 // Strict: 5 attempts per 15 min (login, 2FA, token verification)
 const strictRateLimit = createRateLimitedProcedure(5, 15 * 60 * 1000);
@@ -108,6 +109,7 @@ export const authRouter = router({
         const user = await verifyMagicLink(input.token);
         if (!user) throw new AuthError("TOKEN_EXPIRED", "Magic link expired", 410);
         const sessionToken = await generateToken("session_grant", user.id, 5);
+        await logAuditEvent("MAGIC_LINK_VERIFIED", "success", { userId: user.id, email: user.email });
         return { success: true, sessionToken, user: { id: user.id, email: user.email } };
       } catch (err) {
         handleAuthError(err);
@@ -147,6 +149,7 @@ export const authRouter = router({
     if (ctx.session?.user?.id) {
       await ctx.prisma.session.deleteMany({ where: { userId: ctx.session.user.id } });
     }
+    await logAuditEvent("LOGOUT", "success", { userId: ctx.session?.user?.id });
     return { success: true };
   }),
 
@@ -158,6 +161,7 @@ export const authRouter = router({
         throw new TRPCError({ code: "NOT_FOUND", message: "Invite expired or invalid" });
       }
       await invalidateToken(input.token);
+      await logAuditEvent("INVITE_ACCEPTED", "success");
       return { success: true, message: "Invite accepted" };
     }),
 
@@ -165,6 +169,7 @@ export const authRouter = router({
     .input(z.object({ token: z.string().uuid() }))
     .mutation(async ({ input }) => {
       await invalidateToken(input.token);
+      await logAuditEvent("INVITE_DECLINED", "success");
       return { message: "Invite declined" };
     }),
 });

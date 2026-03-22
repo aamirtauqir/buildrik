@@ -7,6 +7,8 @@ type AuditAction =
   | "MAGIC_LINK_REQUESTED" | "MAGIC_LINK_VERIFIED"
   | "2FA_VERIFIED" | "2FA_FAILED"
   | "BACKUP_CODE_USED"
+  | "INVITE_ACCEPTED"
+  | "INVITE_DECLINED"
   | "LOGOUT";
 
 export async function logAuditEvent(
