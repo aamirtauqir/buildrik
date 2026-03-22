@@ -1,14 +1,29 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { decode } from "next-auth/jwt";
 
 const authenticatedAuthRoutes = ["/auth/workspace-select", "/auth/success"];
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  // Validate JWT properly instead of just checking cookie existence
   const sessionToken =
     req.cookies.get("next-auth.session-token")?.value ||
     req.cookies.get("__Secure-next-auth.session-token")?.value;
-  const isLoggedIn = !!sessionToken;
+
+  let isLoggedIn = false;
+  if (sessionToken) {
+    try {
+      const decoded = await decode({
+        token: sessionToken,
+        secret: process.env.NEXTAUTH_SECRET!,
+      });
+      isLoggedIn = !!decoded?.sub;
+    } catch {
+      isLoggedIn = false;
+    }
+  }
 
   // Auth pages: redirect logged-in users to dashboard
   const isAuthRoute = pathname.startsWith("/auth");
