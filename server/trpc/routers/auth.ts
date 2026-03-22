@@ -139,13 +139,18 @@ export const authRouter = router({
   acceptInvite: publicProcedure
     .input(z.object({ token: z.string().min(1) }))
     .mutation(async ({ input }) => {
-      // Placeholder — will validate invite token and add user to workspace
-      return { workspace: { name: "Workspace" }, role: "editor", requiresSignup: false };
+      const identifier = await validateToken(input.token, "invite");
+      if (!identifier) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Invite expired or invalid" });
+      }
+      await invalidateToken(input.token);
+      return { success: true, message: "Invite accepted" };
     }),
 
   declineInvite: publicProcedure
     .input(z.object({ token: z.string().min(1) }))
-    .mutation(async () => {
+    .mutation(async ({ input }) => {
+      await invalidateToken(input.token);
       return { message: "Invite declined" };
     }),
 

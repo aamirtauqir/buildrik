@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { AuthLogo } from "@/components/auth/auth-logo";
@@ -10,7 +11,7 @@ import { AuthButtonSecondary } from "@/components/auth/auth-button-secondary";
 import Link from "next/link";
 import { trpc } from "@/lib/trpc/client";
 
-export default function InvitePage() {
+function InviteContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
@@ -37,11 +38,8 @@ export default function InvitePage() {
       </p>
       <div className="h-6" />
       <div className="bg-gray-50 rounded-lg p-4 w-full">
-        <p className="font-bold">Acme Corp</p>
-        <p className="text-sm text-gray-600">Invited by John Doe</p>
-        <span className="inline-block mt-2 bg-blue-100 text-blue-700 rounded px-2 py-0.5 text-xs font-medium">
-          Editor
-        </span>
+        <p className="font-bold">Team Invitation</p>
+        <p className="text-sm text-gray-600">You have been invited to join a workspace</p>
       </div>
       <div className="h-6" />
       <AuthButton
@@ -62,5 +60,13 @@ export default function InvitePage() {
         ← Back to sign in
       </Link>
     </AuthCard>
+  );
+}
+
+export default function InvitePage() {
+  return (
+    <Suspense fallback={null}>
+      <InviteContent />
+    </Suspense>
   );
 }
