@@ -25,6 +25,8 @@ model User {
   lockedUntil      DateTime?
   failedAttempts   Int       @default(0)
   lastLoginAt      DateTime?
+  emailBounceCount Int       @default(0)
+  deletedAt        DateTime?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
@@ -85,30 +87,46 @@ model VerificationToken {
 }
 
 model WorkspaceMember {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
   workspaceId String
-  role        String   @default("editor")
-  joinedAt    DateTime @default(now())
+  role        String    @default("EDITOR")
+  status      String    @default("ACTIVE")
+  invitedBy   String?
+  lastActiveAt DateTime?
+  suspendedAt DateTime?
+  joinedAt    DateTime  @default(now())
 
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace       Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  sitePermissions SitePermission[]
 
   @@unique([userId, workspaceId])
   @@map("workspace_members")
 }
 
 model Workspace {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
-  ownerId   String
-  plan      String   @default("free")
-  url       String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                   String    @id @default(cuid())
+  name                 String
+  slug                 String    @unique
+  ownerId              String
+  plan                 String    @default("FREE")
+  defaultLanguage      String    @default("en")
+  timezone             String    @default("UTC")
+  stripeCustomerId     String?   @unique
+  deletionScheduledAt  DateTime?
+  deletedAt            DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
-  members WorkspaceMember[]
+  members       WorkspaceMember[]
+  sites         Site[]
+  invites       Invite[]
+  subscription  Subscription?
+  integrations  WorkspaceIntegration[]
+  sharingSettings WSSharingSettings?
+  folders       Folder[]
+  activityLogs  ActivityLog[]
 
   @@map("workspaces")
 }
@@ -128,4 +146,572 @@ model AuditLog {
   @@index([action])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+model Site {
+  id                String    @id @default(cuid())
+  workspaceId       String
+  name              String
+  slug              String    @unique
+  status            String    @default("DRAFT")
+  template          String?
+  creationMethod    String    @default("BLANK")
+  thumbnail         String?
+  pages             Int       @default(0)
+  aiJobId           String?
+  lastEditedAt      DateTime  @default(now())
+  lastPublishedAt   DateTime?
+  lastPublishError  String?
+  publishedUrl      String?
+  createdBy         String
+  headCode          String?
+  bodyCode          String?
+  socialLinks       Json?
+  publishedPassword String?
+  metaTitleTemplate String?
+  touchIcon         String?
+  folderId          String?
+  lastPublishedBy   String?
+  deletedAt         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  folder         Folder?         @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  sitePages      Page[]
+  domains        Domain[]
+  shareLinks     ShareLink[]
+  permissions    SitePermission[]
+  analytics      SiteAnalytics[]
+  formBlocks     FormBlock[]
+  formSubmissions FormSubmission[]
+  redirects      Redirect[]
+  slugHistory    SlugHistory[]
+  publishJobs    PublishBuildJob[]
+  analyticsEvents AnalyticsEvent[]
+
+  @@index([workspaceId, status])
+  @@map("sites")
+}
+
+model Page {
+  id             String   @id @default(cuid())
+  siteId         String
+  name           String   @db.VarChar(100)
+  slug           String   @db.VarChar(100)
+  position       Int
+  blocks         Json     @default("[]")
+  isHomePage     Boolean  @default(false)
+  seoTitle       String?  @db.VarChar(60)
+  seoDescription String?  @db.VarChar(160)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, slug])
+  @@map("pages")
+}
+
+model Domain {
+  id            String    @id @default(cuid())
+  siteId        String
+  domain        String    @unique
+  status        String    @default("PENDING")
+  sslStatus     String    @default("PENDING")
+  sslExpiresAt  DateTime?
+  lastCheckedAt DateTime?
+  autoRenewSsl  Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+
+  site       Site        @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  dnsRecords DnsRecord[]
+
+  @@map("domains")
+}
+
+model DnsRecord {
+  id       String  @id @default(cuid())
+  domainId String
+  type     String
+  host     String
+  value    String
+  verified Boolean @default(false)
+
+  domain Domain @relation(fields: [domainId], references: [id], onDelete: Cascade)
+
+  @@map("dns_records")
+}
+
+model Folder {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  sites     Site[]
+
+  @@index([workspaceId])
+  @@map("folders")
+}
+
+model Invite {
+  id          String   @id @default(cuid())
+  workspaceId String
+  email       String
+  role        String   @default("EDITOR")
+  message     String?
+  token       String   @unique
+  status      String   @default("PENDING")
+  invitedBy   String
+  siteIds     String[]
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, status])
+  @@map("invites")
+}
+
+model ShareLink {
+  id           String    @id @default(cuid())
+  siteId       String
+  name         String
+  token        String    @unique
+  passwordHash String?
+  expiresAt    DateTime?
+  viewCount    Int       @default(0)
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId, isActive])
+  @@map("share_links")
+}
+
+model SitePermission {
+  id           String   @id @default(cuid())
+  memberId     String
+  siteId       String
+  roleOverride String
+  grantedBy    String
+  grantedByName String?
+  createdAt    DateTime @default(now())
+
+  member WorkspaceMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  site   Site            @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, siteId])
+  @@map("site_permissions")
+}
+
+model Subscription {
+  id                        String   @id @default(cuid())
+  workspaceId               String   @unique
+  stripeSubscriptionId      String   @unique
+  stripeCurrentPeriodStart  DateTime
+  stripeCurrentPeriodEnd    DateTime
+  stripePriceId             String
+  plan                      String   @default("FREE")
+  status                    String   @default("ACTIVE")
+  interval                  String   @default("MONTHLY")
+  price                     Int
+  currency                  String   @default("usd")
+  cancelAtPeriodEnd         Boolean  @default(false)
+  isGrandfathered           Boolean  @default(false)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  workspace     Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  paymentMethod PaymentMethod?
+
+  @@map("subscriptions")
+}
+
+model PaymentMethod {
+  id                     String @id @default(cuid())
+  subscriptionId         String @unique
+  stripePaymentMethodId  String
+  type                   String
+  brand                  String
+  last4                  String
+  expMonth               Int
+  expYear                Int
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@map("payment_methods")
+}
+
+model Invoice {
+  id              String    @id @default(cuid())
+  workspaceId     String
+  stripeInvoiceId String    @unique
+  amount          Int
+  currency        String    @default("usd")
+  status          String    @default("PENDING")
+  pdfUrl          String?
+  periodStart     DateTime
+  periodEnd       DateTime
+  paidAt          DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@index([workspaceId])
+  @@map("invoices")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  actorId   String?
+  actorName String?
+  message   String
+  actionUrl String?
+  read      Boolean  @default(false)
+  emailSent Boolean  @default(false)
+  priority  String   @default("medium")
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+  @@map("notifications")
+}
+
+model NotificationPref {
+  id       String  @id @default(cuid())
+  userId   String
+  category String
+  inApp    Boolean @default(true)
+  email    String  @default("instant")
+
+  @@unique([userId, category])
+  @@map("notification_prefs")
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  workspaceId String
+  siteId      String?
+  actorId     String?
+  action      String
+  targetType  String?
+  targetId    String?
+  description String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, createdAt])
+  @@map("activity_logs")
+}
+
+model OnboardingState {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  role           String?
+  step           String?
+  projectName    String?
+  method         String?
+  dashboardTasks Json?
+  editorTasks    Json?
+  tourStep       Int      @default(0)
+  tourCompleted  Boolean  @default(false)
+  completed      Boolean  @default(false)
+  dismissed      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("onboarding_states")
+}
+
+model SiteAnalytics {
+  id             String   @id @default(cuid())
+  siteId         String
+  date           DateTime @db.Date
+  visitors       Int      @default(0)
+  uniqueVisitors Int      @default(0)
+  pageViews      Int      @default(0)
+  avgSession     Float    @default(0)
+  bounceRate     Float    @default(0)
+  topPages       Json?
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, date])
+  @@map("site_analytics")
+}
+
+model AnalyticsEvent {
+  id            String   @id @default(cuid())
+  siteId        String
+  path          String
+  referrer      String?
+  sessionId     String?
+  userAgent     String?
+  country       String?
+  viewportWidth Int?
+  createdAt     DateTime @default(now())
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId, createdAt])
+  @@map("analytics_events")
+}
+
+model FormBlock {
+  id              String   @id @default(cuid())
+  siteId          String
+  pageId          String?
+  blockId         String
+  name            String
+  fields          Json
+  submitButtonText String @default("Submit")
+  successMessage  String?
+  notifyEmail     String?
+  webhookUrl      String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  site        Site             @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  submissions FormSubmission[]
+
+  @@map("form_blocks")
+}
+
+model FormSubmission {
+  id          String   @id @default(cuid())
+  formBlockId String
+  siteId      String
+  data        Json
+  sourceUrl   String?
+  deviceInfo  String?
+  ip          String?
+  isRead      Boolean  @default(false)
+  isSpam      Boolean  @default(false)
+  isArchived  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  formBlock FormBlock @relation(fields: [formBlockId], references: [id], onDelete: Cascade)
+  site      Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId, createdAt])
+  @@index([siteId, formBlockId])
+  @@map("form_submissions")
+}
+
+model Template {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  category    String
+  description String?
+  thumbnail   String?
+  previewUrl  String?
+  pages       Json
+  usageCount  Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("templates")
+}
+
+model AIGenerationJob {
+  id            String    @id @default(cuid())
+  workspaceId   String
+  siteId        String?
+  userId        String
+  status        String    @default("QUEUED")
+  businessType  String
+  description   String?
+  selectedPages String[]
+  progress      Int       @default(0)
+  steps         Json?
+  metadata      Json?
+  error         String?
+  completedAt   DateTime?
+  cancelledAt   DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@map("ai_generation_jobs")
+}
+
+model WorkspaceIntegration {
+  id          String   @id @default(cuid())
+  workspaceId String
+  provider    String
+  config      Json
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("workspace_integrations")
+}
+
+model WSSharingSettings {
+  id                String  @id @default(cuid())
+  workspaceId       String  @unique
+  defaultExpiration String?
+  requirePw         Boolean @default(false)
+  allowEditors      Boolean @default(true)
+  notify            Boolean @default(true)
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("ws_sharing_settings")
+}
+
+model HelpArticle {
+  id         String   @id @default(cuid())
+  title      String
+  slug       String   @unique
+  category   String
+  content    String
+  excerpt    String?
+  readTime   Int      @default(5)
+  helpfulYes Int      @default(0)
+  helpfulNo  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("help_articles")
+}
+
+model SupportTicket {
+  id          String   @id @default(cuid())
+  userId      String
+  subject     String
+  category    String
+  description String
+  status      String   @default("OPEN")
+  attachments String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("support_tickets")
+}
+
+model ExportJob {
+  id          String    @id @default(cuid())
+  userId      String
+  status      String    @default("PENDING")
+  downloadUrl String?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@map("export_jobs")
+}
+
+model UserPreference {
+  id             String  @id @default(cuid())
+  userId         String  @unique
+  siteViewMode   String  @default("grid")
+  siteViewSort   String?
+  analyticsRange String  @default("7d")
+  theme          String  @default("light")
+  locale         String?
+
+  @@map("user_preferences")
+}
+
+model SlugHistory {
+  id        String   @id @default(cuid())
+  siteId    String
+  oldSlug   String   @unique
+  newSlug   String
+  createdAt DateTime @default(now())
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("slug_history")
+}
+
+model WorkspaceTransfer {
+  id          String   @id @default(cuid())
+  workspaceId String
+  fromUserId  String
+  toUserId    String?
+  toEmail     String
+  token       String   @unique
+  status      String   @default("PENDING")
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@map("workspace_transfers")
+}
+
+model AccountDeletionReq {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  reason      String?
+  scheduledAt DateTime
+  cancelledAt DateTime?
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@map("account_deletion_requests")
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  userId    String?
+  email     String
+  ipAddress String?
+  userAgent String?
+  result    String
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+  @@map("login_attempts")
+}
+
+model PublishBuildJob {
+  id           String    @id @default(cuid())
+  siteId       String
+  workspaceId  String
+  status       String    @default("QUEUED")
+  progress     Int       @default(0)
+  steps        Json?
+  log          Json?
+  deploymentId String?
+  error        String?
+  startedAt    DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("publish_build_jobs")
+}
+
+model Redirect {
+  id        String   @id @default(cuid())
+  siteId    String
+  fromPath  String
+  toUrl     String
+  type      String   @default("301")
+  createdAt DateTime @default(now())
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId])
+  @@map("redirects")
+}
+
+model ConnectedAccount {
+  id             String @id @default(cuid())
+  userId         String
+  provider       String
+  providerUserId String
+  tokens         Json?
+
+  @@map("connected_accounts")
 }
