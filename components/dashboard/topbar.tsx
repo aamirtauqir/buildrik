@@ -1,6 +1,7 @@
 "use client";
 
-import { Search, Bell, HelpCircle, ChevronDown } from "lucide-react";
+import { Search, Bell, HelpCircle } from "lucide-react";
+import { AvatarDropdown } from "./avatar-dropdown";
 
 export function Topbar() {
   return (
@@ -17,10 +18,7 @@ export function Topbar() {
         <button className="rounded-lg p-2 transition-colors hover:bg-[#F4F4F4]" style={{ color: "#7A7A7A" }} aria-label="Help">
           <HelpCircle className="h-5 w-5" />
         </button>
-        <button className="ml-2 flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-[#F4F4F4]">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white" style={{ backgroundColor: "#E42313" }}>U</div>
-          <ChevronDown className="h-4 w-4" style={{ color: "#7A7A7A" }} />
-        </button>
+        <AvatarDropdown initials="U" name="User" email="user@example.com" />
       </div>
     </header>
   );
