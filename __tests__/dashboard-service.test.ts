@@ -1,0 +1,152 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    site: { count: vi.fn(), findMany: vi.fn() },
+    workspaceMember: { count: vi.fn(), findFirst: vi.fn() },
+    invite: { count: vi.fn() },
+    activityLog: { findMany: vi.fn() },
+    siteAnalytics: { aggregate: vi.fn() },
+    aIGenerationJob: { count: vi.fn() },
+  },
+}));
+
+import { prisma } from "@/lib/prisma";
+import {
+  getDashboardStats,
+  getRecentSites,
+  getActivityFeed,
+  getWorkspaceHealth,
+  getQuickActions,
+} from "@/server/services/dashboard.service";
+
+describe("Dashboard Service", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe("getDashboardStats", () => {
+    it("returns correct stat structure", async () => {
+      vi.mocked(prisma.site.count)
+        .mockResolvedValueOnce(5)
+        .mockResolvedValueOnce(3)
+        .mockResolvedValueOnce(1)
+        .mockResolvedValueOnce(1);
+      vi.mocked(prisma.workspaceMember.count).mockResolvedValue(3);
+      vi.mocked(prisma.invite.count).mockResolvedValue(1);
+      vi.mocked(prisma.siteAnalytics.aggregate).mockResolvedValue({
+        _sum: { visitors: 1200 },
+        _count: 0,
+        _avg: {},
+        _min: {},
+        _max: {},
+      } as any);
+      vi.mocked(prisma.site.findMany).mockResolvedValue([
+        { name: "Portfolio", lastPublishedAt: new Date("2026-03-20") },
+      ] as any);
+
+      const stats = await getDashboardStats("ws_123");
+      expect(stats.totalSites).toBe(5);
+      expect(stats.publishedSites).toBe(3);
+      expect(stats.collaborators).toBe(3);
+      expect(stats.pendingInvites).toBe(1);
+      expect(stats.lastPublishedSiteName).toBe("Portfolio");
+    });
+  });
+
+  describe("getRecentSites", () => {
+    it("returns sites ordered by lastEditedAt", async () => {
+      const mockSites = [
+        {
+          id: "s1",
+          name: "Site 1",
+          slug: "site-1",
+          status: "PUBLISHED",
+          thumbnail: null,
+          pages: 5,
+          lastEditedAt: new Date(),
+          publishedUrl: "https://site-1.buildrik.app",
+        },
+      ];
+      vi.mocked(prisma.site.findMany).mockResolvedValue(mockSites as any);
+      const sites = await getRecentSites("ws_123");
+      expect(sites).toHaveLength(1);
+      expect(sites[0].id).toBe("s1");
+    });
+  });
+
+  describe("getActivityFeed", () => {
+    it("returns activity entries", async () => {
+      vi.mocked(prisma.activityLog.findMany).mockResolvedValue([
+        {
+          id: "a1",
+          action: "SITE_PUBLISHED",
+          actorId: "u1",
+          description: 'Published "Portfolio"',
+          siteId: "s1",
+          createdAt: new Date(),
+          metadata: null,
+        },
+      ] as any);
+      const activity = await getActivityFeed("ws_123");
+      expect(activity).toHaveLength(1);
+      expect(activity[0].action).toBe("SITE_PUBLISHED");
+    });
+  });
+
+  describe("getQuickActions", () => {
+    it("returns new user actions when 0 sites", () => {
+      const actions = getQuickActions({
+        siteCount: 0,
+        hasPendingInvites: false,
+        isNearLimit: false,
+        isDunning: false,
+      });
+      expect(actions).toHaveLength(4);
+      expect(actions[0].label).toBe("Create Site");
+    });
+    it("returns active user actions when 5+ sites", () => {
+      const actions = getQuickActions({
+        siteCount: 5,
+        hasPendingInvites: false,
+        isNearLimit: false,
+        isDunning: false,
+      });
+      expect(actions[0].label).toBe("New Site");
+    });
+    it("returns near-limit actions", () => {
+      const actions = getQuickActions({
+        siteCount: 3,
+        hasPendingInvites: false,
+        isNearLimit: true,
+        isDunning: false,
+      });
+      expect(
+        actions.some((a: { label: string }) => a.label === "Upgrade Plan")
+      ).toBe(true);
+    });
+    it("returns dunning actions", () => {
+      const actions = getQuickActions({
+        siteCount: 5,
+        hasPendingInvites: false,
+        isNearLimit: false,
+        isDunning: true,
+      });
+      expect(actions[0].label).toBe("Update Payment");
+    });
+  });
+
+  describe("getWorkspaceHealth", () => {
+    it("returns health metrics", async () => {
+      vi.mocked(prisma.site.count).mockResolvedValue(2);
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
+        workspace: { plan: "FREE" },
+      } as any);
+      vi.mocked(prisma.aIGenerationJob.count).mockResolvedValue(1);
+      const health = await getWorkspaceHealth("ws_123", "u1");
+      expect(health.sites.used).toBe(2);
+      expect(health.sites.limit).toBe(3);
+      expect(health.aiCredits.used).toBe(1);
+    });
+  });
+});
