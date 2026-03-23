@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { TRPCProvider } from "@/lib/trpc/client";
+import { AgentationWrapper } from "@/components/agentation-wrapper";
+import { ToastProvider } from "@/components/dashboard/toast-provider";
 
 export const metadata: Metadata = {
   title: "Buildrik",
@@ -15,7 +17,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <TRPCProvider>{children}</TRPCProvider>
+        <TRPCProvider><ToastProvider>{children}</ToastProvider></TRPCProvider>
+        <AgentationWrapper />
       </body>
     </html>
   );
