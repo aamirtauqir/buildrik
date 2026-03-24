@@ -349,6 +349,7 @@ export async function getWorkspaceHealth(
   const limits = PLAN_LIMITS[plan];
 
   return {
+    plan,
     sites: {
       used: siteCount,
       limit: limits.sites as number,

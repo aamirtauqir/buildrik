@@ -52,6 +52,7 @@ export const activityFeedSchema = z.object({
 });
 
 export const workspaceHealthSchema = z.object({
+  plan: z.enum(["FREE", "PRO", "BUSINESS"]),
   sites: z.object({ used: z.number(), limit: z.number() }),
   storage: z.object({ usedMB: z.number(), limitMB: z.number() }),
   aiCredits: z.object({ used: z.number(), limit: z.number() }),

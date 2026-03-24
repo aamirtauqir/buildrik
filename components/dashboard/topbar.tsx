@@ -1,13 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { Search } from "lucide-react";
 import { AvatarDropdown } from "./avatar-dropdown";
 import { ContextualHelp } from "@/components/help/contextual-help";
 import { NotificationDropdown } from "@/components/notifications/notification-dropdown";
 import { CommandPalette } from "@/components/search/command-palette";
 
+function getInitials(name: string | null | undefined): string {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return name[0].toUpperCase();
+}
+
 export function Topbar() {
+  const { data: session } = useSession();
   const [paletteOpen, setPaletteOpen] = useState(false);
 
   useEffect(() => {
@@ -20,6 +29,10 @@ export function Topbar() {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  const userName = session?.user?.name ?? "User";
+  const userEmail = session?.user?.email ?? "";
+  const initials = getInitials(session?.user?.name);
 
   return (
     <>
@@ -36,7 +49,7 @@ export function Topbar() {
         <div className="flex items-center gap-1">
           <NotificationDropdown />
           <ContextualHelp />
-          <AvatarDropdown initials="U" name="User" email="user@example.com" />
+          <AvatarDropdown initials={initials} name={userName} email={userEmail} />
         </div>
       </header>
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
