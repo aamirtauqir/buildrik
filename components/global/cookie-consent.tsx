@@ -23,26 +23,34 @@ export const CONSENT_OPTIONS = [
   { value: "manage", label: "Manage Preferences" },
 ] as const;
 
+function getConsentCookie(): string | null {
+  const match = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("buildrik_consent="));
+  if (!match) return null;
+  return decodeURIComponent(match.split("=")[1]);
+}
+
+function setConsentCookie(value: { essential: boolean; analytics: boolean }) {
+  const encoded = encodeURIComponent(JSON.stringify(value));
+  const maxAge = 365 * 24 * 60 * 60;
+  document.cookie = `buildrik_consent=${encoded}; path=/; max-age=${maxAge}; SameSite=Lax`;
+}
+
 export function CookieConsent() {
   const [show, setShow] = useState(false);
   const [showManage, setShowManage] = useState(false);
   const [analytics, setAnalytics] = useState(true);
 
   useEffect(() => {
-    const consent = localStorage.getItem("buildrik_consent");
+    const consent = getConsentCookie();
     if (!consent) setShow(true);
   }, []);
 
   const saveConsent = (choice: string) => {
-    localStorage.setItem(
-      "buildrik_consent",
-      JSON.stringify({
-        choice,
-        analytics:
-          choice === "accept_all" || (choice === "manage" && analytics),
-        timestamp: new Date().toISOString(),
-      }),
-    );
+    const analyticsEnabled =
+      choice === "accept_all" || (choice === "manage" && analytics);
+    setConsentCookie({ essential: true, analytics: analyticsEnabled });
     setShow(false);
     setShowManage(false);
   };
@@ -106,10 +114,10 @@ export function CookieConsent() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-[9998] border-t bg-white px-6 py-4 shadow-lg"
+      className="fixed bottom-0 left-0 right-0 z-[9998] flex h-16 items-center border-t bg-white px-6 shadow-lg"
       style={{ borderColor: "#E8E8E8" }}
     >
-      <div className="mx-auto flex max-w-[1220px] items-center justify-between">
+      <div className="mx-auto flex w-full max-w-[1220px] items-center justify-between">
         <div className="flex items-center gap-3">
           <Shield className="h-5 w-5 shrink-0" style={{ color: "#7A7A7A" }} />
           <p className="text-sm" style={{ color: "#0D0D0D" }}>
@@ -137,7 +145,7 @@ export function CookieConsent() {
             className="text-sm font-medium underline"
             style={{ color: "#7A7A7A" }}
           >
-            Manage
+            Manage Preferences
           </button>
         </div>
       </div>
