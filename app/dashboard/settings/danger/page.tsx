@@ -22,6 +22,7 @@ export default function DangerZonePage() {
       onExport={() => exportMutation.mutate()}
       onDelete={(reason) => deleteMutation.mutate({ reason })}
       isExporting={exportMutation.isPending}
+      estimatedSize="~2 MB"
     />
   );
 }

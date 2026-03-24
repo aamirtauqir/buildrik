@@ -1,41 +1,58 @@
 "use client";
 
+import Link from "next/link";
+
 interface GenerationRecord {
   id: string;
-  siteName: string;
-  date: string;
-  status: "completed" | "failed" | "processing";
+  siteId: string | null;
+  createdAt: Date;
+  status: string;
   businessType: string;
 }
 
 interface AICreditsTabProps {
-  creditsUsed?: number;
-  creditsTotal?: number;
-  generationHistory?: GenerationRecord[];
-  onGenerateNew?: () => void;
+  used?: number;
+  limit?: number;
+  history?: GenerationRecord[];
 }
 
 const COMING_SOON_TOOLS = [
-  { name: "AI Copywriter", description: "Generate page copy from a brief" },
-  { name: "AI Image Generator", description: "Create custom images for your sites" },
-  { name: "AI SEO Optimizer", description: "Auto-optimize meta tags and content" },
-  { name: "AI Form Builder", description: "Build smart forms from descriptions" },
+  { name: "Content Generation", description: "Generate page copy, headlines, and CTAs from a brief" },
+  { name: "Design Suggestions", description: "Get AI-powered layout and color scheme recommendations" },
+  { name: "Page Creation", description: "Build entire pages from a text description" },
+  { name: "SEO Optimization", description: "Auto-optimize meta tags, alt text, and content for search" },
 ];
 
-const STATUS_STYLES: Record<GenerationRecord["status"], { bg: string; color: string; label: string }> = {
-  completed: { bg: "#dcfce7", color: "#16a34a", label: "Completed" },
-  failed: { bg: "#fee2e2", color: "#991b1b", label: "Failed" },
-  processing: { bg: "#fef9c3", color: "#854d0e", label: "Processing" },
+const STATUS_MAP: Record<string, { bg: string; color: string; label: string }> = {
+  COMPLETED: { bg: "#dcfce7", color: "#16a34a", label: "Completed" },
+  FAILED: { bg: "#fee2e2", color: "#991b1b", label: "Failed" },
+  QUEUED: { bg: "#fef9c3", color: "#854d0e", label: "In Progress" },
+  PROCESSING: { bg: "#fef9c3", color: "#854d0e", label: "In Progress" },
 };
 
+const DEFAULT_STATUS = { bg: "#f3f4f6", color: "#6b7280", label: "Unknown" };
+
+function getBarColor(percent: number): string {
+  if (percent > 85) return "#dc2626";
+  if (percent > 60) return "#ca8a04";
+  return "#16a34a";
+}
+
+function formatDate(date: Date): string {
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 export function AICreditsTab({
-  creditsUsed = 0,
-  creditsTotal = 10,
-  generationHistory = [],
-  onGenerateNew,
+  used = 0,
+  limit = 10,
+  history = [],
 }: AICreditsTabProps) {
-  const creditsRemaining = Math.max(0, creditsTotal - creditsUsed);
-  const usagePercent = Math.min(100, (creditsUsed / creditsTotal) * 100);
+  const remaining = Math.max(0, limit - used);
+  const usagePercent = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
 
   return (
     <div className="space-y-8">
@@ -49,19 +66,18 @@ export function AICreditsTab({
         >
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm" style={{ color: "#0D0D0D" }}>
-              <span className="font-semibold text-lg">{creditsRemaining}</span> remaining this month
+              <span className="font-semibold text-lg">{remaining}</span> remaining this month
             </p>
-            <p className="text-xs" style={{ color: "#7A7A7A" }}>
-              {creditsUsed} / {creditsTotal} used
+            <p className="text-sm font-medium" style={{ color: "#7A7A7A" }}>
+              {used}/{limit} credits used
             </p>
           </div>
-          <div className="h-2 w-full rounded-full" style={{ backgroundColor: "#E8E8E8" }}>
+          <div className="h-2.5 w-full rounded-full" style={{ backgroundColor: "#E8E8E8" }}>
             <div
-              className="h-2 rounded-full transition-all"
+              className="h-2.5 rounded-full transition-all"
               style={{
                 width: `${usagePercent}%`,
-                backgroundColor: usagePercent >= 90 ? "#E42313" : "#E42313",
-                opacity: usagePercent >= 90 ? 1 : 0.7,
+                backgroundColor: getBarColor(usagePercent),
               }}
             />
           </div>
@@ -71,15 +87,16 @@ export function AICreditsTab({
         </div>
 
         <div className="flex justify-end mt-3">
-          <button
-            type="button"
-            onClick={onGenerateNew}
-            disabled={creditsRemaining === 0}
-            className="px-4 py-2 text-sm font-medium rounded-md text-white disabled:opacity-50"
+          <Link
+            href="/dashboard/sites/new?method=ai"
+            className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white ${
+              remaining === 0 ? "pointer-events-none opacity-50" : ""
+            }`}
             style={{ backgroundColor: "#E42313" }}
+            aria-disabled={remaining === 0}
           >
-            Generate new site
-          </button>
+            Generate New Site
+          </Link>
         </div>
       </section>
 
@@ -95,21 +112,21 @@ export function AICreditsTab({
             <thead>
               <tr style={{ borderBottom: "1px solid #E8E8E8", backgroundColor: "#fafafa" }}>
                 <th className="text-left px-4 py-2.5 font-medium" style={{ color: "#7A7A7A" }}>
-                  Site name
+                  Date
                 </th>
                 <th className="text-left px-4 py-2.5 font-medium" style={{ color: "#7A7A7A" }}>
-                  Date
+                  Business Type
                 </th>
                 <th className="text-left px-4 py-2.5 font-medium" style={{ color: "#7A7A7A" }}>
                   Status
                 </th>
                 <th className="text-left px-4 py-2.5 font-medium" style={{ color: "#7A7A7A" }}>
-                  Business type
+                  Site
                 </th>
               </tr>
             </thead>
             <tbody>
-              {generationHistory.length === 0 && (
+              {history.length === 0 && (
                 <tr>
                   <td
                     colSpan={4}
@@ -120,26 +137,44 @@ export function AICreditsTab({
                   </td>
                 </tr>
               )}
-              {generationHistory.map((record) => {
-                const style = STATUS_STYLES[record.status];
+              {history.map((record) => {
+                const statusStyle = STATUS_MAP[record.status] ?? DEFAULT_STATUS;
+                const isComplete = record.status === "COMPLETED";
+                const isProcessing = record.status === "QUEUED" || record.status === "PROCESSING";
                 return (
                   <tr key={record.id} style={{ borderBottom: "1px solid #E8E8E8" }}>
-                    <td className="px-4 py-3 font-medium" style={{ color: "#0D0D0D" }}>
-                      {record.siteName}
+                    <td className="px-4 py-3" style={{ color: "#7A7A7A" }}>
+                      {formatDate(record.createdAt)}
                     </td>
                     <td className="px-4 py-3" style={{ color: "#7A7A7A" }}>
-                      {record.date}
+                      {record.businessType}
                     </td>
                     <td className="px-4 py-3">
                       <span
                         className="text-xs font-medium px-2 py-0.5 rounded-full"
-                        style={{ backgroundColor: style.bg, color: style.color }}
+                        style={{ backgroundColor: statusStyle.bg, color: statusStyle.color }}
                       >
-                        {style.label}
+                        {statusStyle.label}
                       </span>
                     </td>
-                    <td className="px-4 py-3" style={{ color: "#7A7A7A" }}>
-                      {record.businessType}
+                    <td className="px-4 py-3">
+                      {isComplete && record.siteId ? (
+                        <Link
+                          href={`/dashboard/sites/${record.siteId}`}
+                          className="text-sm font-medium"
+                          style={{ color: "#E42313" }}
+                        >
+                          View site
+                        </Link>
+                      ) : isProcessing ? (
+                        <span className="text-xs" style={{ color: "#854d0e" }}>
+                          Generating...
+                        </span>
+                      ) : (
+                        <span className="text-xs" style={{ color: "#B0B0B0" }}>
+                          --
+                        </span>
+                      )}
                     </td>
                   </tr>
                 );
@@ -157,8 +192,9 @@ export function AICreditsTab({
           {COMING_SOON_TOOLS.map((tool) => (
             <div
               key={tool.name}
-              className="relative p-4 rounded-lg border overflow-hidden"
-              style={{ borderColor: "#E8E8E8", opacity: 0.7 }}
+              className="relative p-4 rounded-lg border cursor-default select-none"
+              style={{ borderColor: "#E8E8E8", opacity: 0.6 }}
+              aria-disabled="true"
             >
               <div className="absolute top-3 right-3">
                 <span
