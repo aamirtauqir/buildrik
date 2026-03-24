@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { trpc } from "@/lib/trpc/client";
-import { StatCard } from "@/components/dashboard/stat-card";
+import { StatCard, MiniDonut, Sparkline, AvatarStack, TrendArrow } from "@/components/dashboard/stat-card";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { RecentSites } from "@/components/dashboard/recent-sites";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
@@ -83,6 +83,15 @@ export default function DashboardPage() {
               value={`${stats.data?.totalSites ?? 0} sites`}
               subtitle={`${stats.data?.publishedSites ?? 0} published · ${stats.data?.draftSites ?? 0} draft`}
               href="/dashboard/sites"
+              visual={
+                <MiniDonut
+                  segments={[
+                    { value: stats.data?.publishedSites ?? 0, color: "#22C55E" },
+                    { value: stats.data?.draftSites ?? 0, color: "#EAB308" },
+                    { value: stats.data?.archivedSites ?? 0, color: "#7A7A7A" },
+                  ]}
+                />
+              }
             />
             <StatCard
               title="Published"
@@ -95,12 +104,27 @@ export default function DashboardPage() {
               value={stats.data?.monthlyVisits ?? 0}
               href="/dashboard/sites"
               trend={stats.data?.visitsChange !== undefined ? { value: stats.data.visitsChange, label: "vs last month" } : undefined}
+              visual={
+                <div className="flex flex-col items-end gap-1">
+                  {stats.data?.dailyVisitors && stats.data.dailyVisitors.length >= 2 && (
+                    <Sparkline data={stats.data.dailyVisitors} />
+                  )}
+                  {stats.data?.visitsChange !== undefined && (
+                    <TrendArrow value={stats.data.visitsChange} />
+                  )}
+                </div>
+              }
             />
             <StatCard
               title="Collaborators"
               value={`${stats.data?.collaborators ?? 0} active`}
               subtitle={stats.data?.pendingInvites ? `${stats.data.pendingInvites} pending` : undefined}
               href="/dashboard/team"
+              visual={
+                stats.data?.memberAvatars && stats.data.memberAvatars.length > 0
+                  ? <AvatarStack avatars={stats.data.memberAvatars} />
+                  : undefined
+              }
             />
           </div>
 
