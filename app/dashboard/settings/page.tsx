@@ -1,5 +1,19 @@
+"use client";
+
+import { trpc } from "@/lib/trpc/client";
+import { useToast } from "@/components/dashboard/toast-provider";
+import { ProfileForm } from "@/components/settings/profile-form";
+
 export default function SettingsProfilePage() {
-  return (
-    <p className="text-sm" style={{ color: "#7A7A7A" }}>Profile settings will be implemented in Sub-Project 8.</p>
-  );
+  const { addToast } = useToast();
+  const profileQuery = trpc.account.profile.get.useQuery();
+  const updateMutation = trpc.account.profile.update.useMutation({
+    onSuccess: () => { profileQuery.refetch(); addToast("success", "Profile updated"); },
+    onError: (err) => addToast("error", "Failed", err.message),
+  });
+
+  if (profileQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />;
+  if (!profileQuery.data) return null;
+
+  return <ProfileForm profile={profileQuery.data} onSave={(data) => updateMutation.mutate(data)} />;
 }
