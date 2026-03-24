@@ -2,6 +2,7 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import {
   listNotifications, getUnreadCount, markAsRead, markAllAsRead, getRecentNotifications,
+  listGroupedNotifications,
 } from "@/server/services/notification.service";
 import { listNotificationsSchema } from "@/lib/validations/notifications";
 
@@ -23,4 +24,7 @@ export const notificationsRouter = router({
   recent: protectedProcedure.query(async ({ ctx }) => {
     return getRecentNotifications(ctx.session.user.id);
   }),
+  listGrouped: protectedProcedure
+    .input(z.object({ filter: z.enum(["all", "unread", "mentions"]).optional().default("all") }))
+    .query(async ({ ctx, input }) => listGroupedNotifications(ctx.session.user.id, input.filter)),
 });
