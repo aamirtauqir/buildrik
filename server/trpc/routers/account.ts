@@ -5,7 +5,7 @@ import {
   getProfile, updateProfile, changePassword, getActiveSessions, revokeSession,
   revokeAllOtherSessions, getLoginHistory, getNotificationPrefs,
   updateNotificationPref, requestAccountDeletion, requestDataExport, getAICreditsInfo,
-  getPreferences, updatePreferences,
+  getPreferences, updatePreferences, enable2FA, confirm2FA, disable2FA,
 } from "@/server/services/account.service";
 import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings } from "@/server/services/workspace-settings.service";
 import { listIntegrations, addIntegration, removeIntegration } from "@/server/services/integrations.service";
@@ -34,6 +34,23 @@ export const accountRouter = router({
       if (e instanceof Error && e.message === "WRONG_PASSWORD") throw new TRPCError({ code: "UNAUTHORIZED", message: "Current password is incorrect." });
       throw e;
     }
+  }),
+  twoFactor: router({
+    enable: protectedProcedure.mutation(({ ctx }) => enable2FA(ctx.session.user.id)),
+    confirm: protectedProcedure
+      .input(z.object({ code: z.string().length(6) }))
+      .mutation(({ ctx, input }) => confirm2FA(ctx.session.user.id, input.code)),
+    disable: protectedProcedure
+      .input(z.object({ password: z.string().optional().default("") }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          return await disable2FA(ctx.session.user.id, input.password);
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === "WRONG_PASSWORD") throw new TRPCError({ code: "UNAUTHORIZED", message: "Password is incorrect." });
+          if (e instanceof Error && e.message === "USER_NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "User not found." });
+          throw e;
+        }
+      }),
   }),
   sessions: router({
     list: protectedProcedure.query(({ ctx }) => getActiveSessions(ctx.session.user.id)),

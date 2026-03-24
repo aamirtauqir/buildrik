@@ -342,7 +342,7 @@ export async function verifyBackupCode(tempToken: string, backupCode: string) {
   return { user, backupCodesRemaining: updatedCodes.length };
 }
 
-export { encryptSecret, hashBackupCodes };
+export { encryptSecret, decryptSecret, hashBackupCodes };
 
 // Custom error class
 export class AuthError extends Error {

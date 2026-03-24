@@ -27,6 +27,7 @@ export async function getProfile(userId: string) {
       email: true,
       avatar: true,
       bio: true,
+      twoFactorEnabled: true,
       language: true,
       timezone: true,
     },
@@ -131,6 +132,63 @@ export async function updatePreferences(userId: string, data: UpdatePreferencesI
     create: { userId, ...data },
     update: data,
   });
+}
+
+export async function enable2FA(userId: string) {
+  const { authenticator } = await import("otplib");
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
+  if (!user) throw new Error("USER_NOT_FOUND");
+
+  const secret = authenticator.generateSecret();
+  const otpauth = authenticator.keyuri(user.email, "Buildrik", secret);
+
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const randomChars = (n: number) =>
+    Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  const codes = Array.from({ length: 10 }, () => `${randomChars(4)}-${randomChars(4)}-${randomChars(4)}`);
+
+  const { encryptSecret, hashBackupCodes } = await import("@/server/services/auth.service");
+  await prisma.user.update({
+    where: { id: userId },
+    data: { twoFactorSecret: encryptSecret(secret), backupCodes: await hashBackupCodes(codes) },
+  });
+
+  return { otpauth, secret, backupCodes: codes };
+}
+
+export async function confirm2FA(userId: string, code: string) {
+  const { authenticator } = await import("otplib");
+  const { decryptSecret } = await import("@/server/services/auth.service");
+
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { twoFactorSecret: true } });
+  if (!user?.twoFactorSecret) throw new Error("2FA_NOT_SETUP");
+
+  const secret = user.twoFactorSecret.includes(":")
+    ? decryptSecret(user.twoFactorSecret)
+    : user.twoFactorSecret;
+
+  const valid = authenticator.verify({ token: code, secret });
+  if (!valid) throw new Error("INVALID_CODE");
+
+  await prisma.user.update({ where: { id: userId }, data: { twoFactorEnabled: true } });
+  return { success: true };
+}
+
+export async function disable2FA(userId: string, password: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new Error("USER_NOT_FOUND");
+
+  if (user.passwordHash) {
+    const bcrypt = await import("bcryptjs");
+    const valid = await bcrypt.compare(password, user.passwordHash);
+    if (!valid) throw new Error("WRONG_PASSWORD");
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { twoFactorEnabled: false, twoFactorSecret: null, backupCodes: [] },
+  });
+  return { success: true };
 }
 
 export async function getAICreditsInfo(workspaceId: string, plan: PlanName) {
