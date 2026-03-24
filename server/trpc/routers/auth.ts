@@ -107,11 +107,13 @@ export const authRouter = router({
     .input(z.object({ token: z.string().uuid() }))
     .mutation(async ({ input }) => {
       try {
-        const user = await verifyMagicLink(input.token);
-        if (!user) throw new AuthError("TOKEN_EXPIRED", "Magic link expired", 410);
-        const sessionToken = await generateToken("session_grant", user.id, 5);
-        await logAuditEvent("MAGIC_LINK_VERIFIED", "success", { userId: user.id, email: user.email });
-        return { success: true, sessionToken, user: { id: user.id, email: user.email } };
+        const result = await verifyMagicLink(input.token);
+        if (result.requiresTwoFactor) {
+          return { requiresTwoFactor: true as const, tempToken: result.tempToken };
+        }
+        const sessionToken = await generateToken("session_grant", result.user.id, 5);
+        await logAuditEvent("MAGIC_LINK_VERIFIED", "success", { userId: result.user.id, email: result.user.email });
+        return { requiresTwoFactor: false as const, sessionToken, user: { id: result.user.id, email: result.user.email } };
       } catch (err) {
         handleAuthError(err);
       }

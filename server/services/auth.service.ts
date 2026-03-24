@@ -220,8 +220,26 @@ export async function verifyMagicLink(token: string) {
   }
 
   await invalidateToken(token);
+
+  // Set emailVerified if not already set
+  await prisma.user.updateMany({
+    where: { id: userId, emailVerified: null },
+    data: { emailVerified: new Date() },
+  });
+
+  // Check if 2FA is enabled
+  const internal = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { twoFactorEnabled: true },
+  });
+
+  if (internal?.twoFactorEnabled) {
+    const tempToken = await generateToken("2fa_temp", userId, 5);
+    return { requiresTwoFactor: true as const, tempToken, userId };
+  }
+
   const user = await prisma.user.findUnique({ where: { id: userId }, select: SAFE_USER_SELECT });
-  return user;
+  return { requiresTwoFactor: false as const, user: user! };
 }
 
 export async function verify2FA(tempToken: string, code: string) {

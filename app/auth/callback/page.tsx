@@ -17,6 +17,10 @@ function CallbackContent() {
 
   const verifyMutation = trpc.auth.verifyMagicLink.useMutation({
     onSuccess: async (data) => {
+      if (data.requiresTwoFactor) {
+        router.push(`/auth/2fa?token=${data.tempToken}`);
+        return;
+      }
       const res = await fetch("/api/auth/create-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
