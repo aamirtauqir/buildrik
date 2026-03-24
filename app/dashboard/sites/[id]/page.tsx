@@ -10,24 +10,17 @@ export default function SiteOverviewPage() {
 
   const overview = trpc.siteDetail.overview.useQuery({ siteId });
 
-  if (overview.isLoading) {
-    return (
-      <div className="grid grid-cols-3 gap-4">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div key={i} className="h-24 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />
-        ))}
-      </div>
-    );
-  }
-
-  if (!overview.data) return null;
-
   return (
     <OverviewTab
       siteId={siteId}
-      stats={overview.data.stats}
-      activity={overview.data.recentActivity}
-      lastPublishedAt={overview.data.site.lastPublishedAt}
+      stats={overview.data?.stats ?? { totalPages: 0, monthlyVisitors: 0, visitorsChange: 0, teamMembers: 0, formSubmissions: 0, unreadSubmissions: 0, healthScore: 0, healthBreakdown: { seo: 0, content: 0, ssl: 0, favicon: 0 } }}
+      activity={overview.data?.recentActivity ?? []}
+      lastPublishedAt={overview.data?.site.lastPublishedAt ?? null}
+      lastPublishedBy={overview.data?.site.lastPublishedBy}
+      formBlocks={overview.data?.formBlocks ?? []}
+      isLoading={overview.isLoading}
+      isError={overview.isError}
+      onRetry={() => overview.refetch()}
     />
   );
 }

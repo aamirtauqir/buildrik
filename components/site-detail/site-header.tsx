@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { ArrowLeft, Pencil, Globe, MoreHorizontal } from "lucide-react";
+import { ArrowLeft, Pencil, Globe, MoreHorizontal, ExternalLink } from "lucide-react";
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   PUBLISHED: { bg: "#DCFCE7", text: "#166534" },
@@ -32,6 +32,25 @@ export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
           )}
         </div>
         <div className="flex items-center gap-2">
+          {site.status === "PUBLISHED" && site.publishedUrl ? (
+            <a
+              href={site.publishedUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium"
+              style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+            >
+              <ExternalLink className="h-4 w-4" />View Site
+            </a>
+          ) : (
+            <span
+              className="flex cursor-not-allowed items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium opacity-50"
+              style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}
+              title="Publish your site first"
+            >
+              <ExternalLink className="h-4 w-4" />View Site
+            </span>
+          )}
           <Link href={`/editor/${site.id}`} className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "#E42313" }}>
             <Pencil className="h-4 w-4" />Edit in Editor
           </Link>
