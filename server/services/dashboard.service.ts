@@ -8,7 +8,8 @@ import type {
 } from "@/lib/validations/dashboard";
 
 export async function getDashboardStats(
-  workspaceId: string
+  workspaceId: string,
+  memberRole: string,
 ): Promise<DashboardStats> {
   const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000);
   const sixtyDaysAgo = new Date(Date.now() - 60 * 86400000);
@@ -96,6 +97,7 @@ export async function getDashboardStats(
     pendingInvites,
     lastPublishedSiteName: lastSite?.name ?? null,
     lastPublishedAt: lastSite?.lastPublishedAt ?? null,
+    memberRole,
   };
 }
 

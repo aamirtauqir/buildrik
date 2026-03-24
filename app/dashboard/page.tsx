@@ -7,7 +7,8 @@ import { QuickActions } from "@/components/dashboard/quick-actions";
 import { RecentSites } from "@/components/dashboard/recent-sites";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { WorkspaceHealth } from "@/components/dashboard/workspace-health";
-import { EmptyState } from "@/components/dashboard/empty-state";
+import { EmptyState, type EmptyStateVariant } from "@/components/dashboard/empty-state";
+import { DunningBanner } from "@/components/dashboard/dunning-banner";
 import { DashboardChecklist } from "@/components/onboarding/dashboard-checklist";
 import Link from "next/link";
 import { Plus } from "lucide-react";
@@ -34,6 +35,7 @@ export default function DashboardPage() {
   const recentSites = trpc.dashboard.recentSites.useQuery();
   const activity = trpc.dashboard.activity.useQuery({ filter: activityFilter });
   const health = trpc.dashboard.health.useQuery();
+  const billingOverview = trpc.billing.overview.useQuery();
   const onboardingState = trpc.onboarding.getState.useQuery();
   const dismissOnboarding = trpc.onboarding.dismiss.useMutation({
     onSuccess: () => onboardingState.refetch(),
@@ -43,7 +45,28 @@ export default function DashboardPage() {
   const isLoading = stats.isLoading || recentSites.isLoading;
   const isEmpty = stats.data?.totalSites === 0;
 
+  // Determine empty state variant based on role
+  const memberRole = stats.data?.memberRole;
+  const emptyVariant: EmptyStateVariant | null = isEmpty
+    ? memberRole === "OWNER"
+      ? (stats.data?.archivedSites ?? 0) > 0
+        ? "owner_empty"
+        : "owner_new"
+      : memberRole === "EDITOR"
+        ? "editor_no_sites"
+        : "viewer"
+    : null;
+
   const quickActions = isEmpty ? QUICK_ACTIONS_NEW_USER : QUICK_ACTIONS_ACTIVE;
+
+  // Only show workspace health when any metric exceeds 50%
+  const showHealth = health.data && (
+    health.data.sites.used / health.data.sites.limit > 0.5 ||
+    health.data.storage.usedMB / health.data.storage.limitMB > 0.5 ||
+    health.data.aiCredits.used / health.data.aiCredits.limit > 0.5
+  );
+
+  const isPastDue = billingOverview.data?.status === "PAST_DUE";
 
   if (isLoading) {
     return (
@@ -51,10 +74,28 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>Dashboard</h1>
         </div>
+        {/* Stat cards skeleton */}
         <div className="mt-6 grid grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="h-28 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />
           ))}
+        </div>
+        {/* Quick actions skeleton */}
+        <div className="mt-6 grid grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-16 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />
+          ))}
+        </div>
+        {/* Recent sites skeleton */}
+        <div className="mt-6 grid grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-40 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />
+          ))}
+        </div>
+        {/* Activity + Health skeleton */}
+        <div className="mt-6 grid grid-cols-3 gap-6">
+          <div className="col-span-2 h-48 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />
+          <div className="h-48 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />
         </div>
       </div>
     );
@@ -62,6 +103,13 @@ export default function DashboardPage() {
 
   return (
     <div>
+      {/* Dunning Banner */}
+      {isPastDue && (
+        <div className="mb-6">
+          <DunningBanner />
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>Dashboard</h1>
@@ -70,9 +118,9 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {isEmpty ? (
+      {emptyVariant ? (
         <div className="mt-8">
-          <EmptyState variant="owner_new" />
+          <EmptyState variant={emptyVariant} />
         </div>
       ) : (
         <div className="mt-6 space-y-8">
@@ -157,7 +205,7 @@ export default function DashboardPage() {
               <ActivityFeed feed={activity.data ?? { groups: [] }} />
             </div>
             <div>
-              {health.data && <WorkspaceHealth data={health.data} />}
+              {showHealth && health.data && <WorkspaceHealth data={health.data} />}
             </div>
           </div>
         </div>

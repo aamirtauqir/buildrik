@@ -12,10 +12,10 @@ export const dashboardRouter = router({
   stats: protectedProcedure.query(async ({ ctx }) => {
     const member = await ctx.prisma.workspaceMember.findFirst({
       where: { userId: ctx.session.user.id },
-      select: { workspaceId: true },
+      select: { workspaceId: true, role: true },
     });
     if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
-    return getDashboardStats(member.workspaceId);
+    return getDashboardStats(member.workspaceId, member.role);
   }),
 
   recentSites: protectedProcedure.query(async ({ ctx }) => {

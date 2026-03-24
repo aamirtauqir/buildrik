@@ -18,6 +18,7 @@ export const dashboardStatsSchema = z.object({
   pendingInvites: z.number(),
   lastPublishedSiteName: z.string().nullable(),
   lastPublishedAt: z.date().nullable(),
+  memberRole: z.string(),
 });
 
 export const recentSiteSchema = z.object({
