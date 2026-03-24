@@ -106,7 +106,7 @@ export default function BillingPage() {
             last4={overview.paymentMethod.last4}
             expMonth={overview.paymentMethod.expMonth}
             expYear={overview.paymentMethod.expYear}
-            onUpdate={() => addToast("info", "Payment method update coming soon")}
+            onUpdate={() => addToast("info", "Stripe Elements integration required — see PRD BIL-5")}
           />
         )}
         {invoicesQuery.data && invoicesQuery.data.data.length > 0 && (

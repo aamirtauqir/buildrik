@@ -23,7 +23,7 @@ export default function SecurityPage() {
       twoFactorEnabled={false}
       sessions={sessionsQuery.data ?? []}
       loginHistory={historyQuery.data ?? []}
-      onToggle2FA={() => addToast("info", "2FA setup coming soon")}
+      onToggle2FA={() => addToast("info", "2FA setup modal is not yet implemented — see PRD ACCT-3 for the 3-step flow")}
       onRevokeSession={(id) => revokeMutation.mutate({ sessionId: id })}
       onRevokeAllSessions={(currentId) => revokeAllMutation.mutate({ currentSessionId: currentId })}
     />

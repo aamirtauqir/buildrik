@@ -2,6 +2,21 @@ import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { UpdateProfileInput, NotificationPrefInput } from "@/lib/validations/account";
 
+export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user || !user.passwordHash) throw new Error("NO_PASSWORD");
+
+  const bcrypt = await import("bcryptjs");
+  const valid = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!valid) throw new Error("WRONG_PASSWORD");
+
+  const hash = await bcrypt.hash(newPassword, 10);
+  await prisma.user.update({
+    where: { id: userId },
+    data: { passwordHash: hash },
+  });
+}
+
 export async function getProfile(userId: string) {
   return prisma.user.findUnique({
     where: { id: userId },

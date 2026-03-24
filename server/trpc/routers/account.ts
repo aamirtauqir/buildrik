@@ -2,13 +2,13 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import {
-  getProfile, updateProfile, getActiveSessions, revokeSession,
+  getProfile, updateProfile, changePassword, getActiveSessions, revokeSession,
   revokeAllOtherSessions, getLoginHistory, getNotificationPrefs,
   updateNotificationPref, requestAccountDeletion, requestDataExport, getAICreditsInfo,
 } from "@/server/services/account.service";
 import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings } from "@/server/services/workspace-settings.service";
 import { listIntegrations, addIntegration, removeIntegration } from "@/server/services/integrations.service";
-import { updateProfileSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema } from "@/lib/validations/account";
+import { updateProfileSchema, changePasswordSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema } from "@/lib/validations/account";
 
 async function getWorkspaceCtx(ctx: any): Promise<{ workspaceId: string; plan: string }> {
   const member = await ctx.prisma.workspaceMember.findFirst({
@@ -23,6 +23,16 @@ export const accountRouter = router({
   profile: router({
     get: protectedProcedure.query(({ ctx }) => getProfile(ctx.session.user.id)),
     update: protectedProcedure.input(updateProfileSchema).mutation(({ ctx, input }) => updateProfile(ctx.session.user.id, input)),
+  }),
+  changePassword: protectedProcedure.input(changePasswordSchema).mutation(async ({ ctx, input }) => {
+    try {
+      await changePassword(ctx.session.user.id, input.currentPassword, input.newPassword);
+      return { ok: true };
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message === "NO_PASSWORD") throw new TRPCError({ code: "BAD_REQUEST", message: "Account has no password set. Use social login." });
+      if (e instanceof Error && e.message === "WRONG_PASSWORD") throw new TRPCError({ code: "UNAUTHORIZED", message: "Current password is incorrect." });
+      throw e;
+    }
   }),
   sessions: router({
     list: protectedProcedure.query(({ ctx }) => getActiveSessions(ctx.session.user.id)),

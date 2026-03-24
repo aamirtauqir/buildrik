@@ -3,7 +3,7 @@ import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import {
   getTeamStats, listMembers, inviteMembers, changeRole,
-  revokeMember, deleteMember, listPendingInvites, revokeInvite, getTeamActivity,
+  revokeMember, deleteMember, listPendingInvites, revokeInvite, resendInvite, getTeamActivity,
 } from "@/server/services/team.service";
 import { inviteMembersSchema, listMembersSchema } from "@/lib/validations/team";
 
@@ -57,6 +57,7 @@ export const teamRouter = router({
     return listPendingInvites(workspaceId);
   }),
   revokeInvite: protectedProcedure.input(z.object({ inviteId: z.string() })).mutation(async ({ input }) => revokeInvite(input.inviteId)),
+  resendInvite: protectedProcedure.input(z.object({ inviteId: z.string() })).mutation(async ({ input }) => resendInvite(input.inviteId)),
   activity: protectedProcedure.query(async ({ ctx }) => {
     const { workspaceId } = await getWorkspaceCtx(ctx);
     return getTeamActivity(workspaceId);

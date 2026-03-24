@@ -176,6 +176,16 @@ export async function revokeInvite(inviteId: string) {
   return prisma.invite.delete({ where: { id: inviteId } });
 }
 
+export async function resendInvite(inviteId: string) {
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7);
+
+  return prisma.invite.update({
+    where: { id: inviteId },
+    data: { expiresAt },
+  });
+}
+
 export async function getTeamActivity(workspaceId: string, limit = 5) {
   return prisma.activityLog.findMany({
     where: {

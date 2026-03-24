@@ -15,9 +15,7 @@ export default function SuspiciousPage() {
   const handleVerify = async () => {
     if (code.length < 6) return;
     setLoading(true);
-    // TODO: wire to tRPC
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
+    window.location.href = `/auth/2fa?code=${encodeURIComponent(code)}`;
   };
 
   return (

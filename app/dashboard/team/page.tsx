@@ -65,6 +65,14 @@ export default function TeamPage() {
     },
   });
 
+  const resendInviteMutation = trpc.team.resendInvite.useMutation({
+    onSuccess: () => {
+      pendingQuery.refetch();
+      addToast("success", "Invitation resent");
+    },
+    onError: (err) => addToast("error", "Failed to resend", err.message),
+  });
+
   const handleMemberAction = useCallback(
     (action: string, memberId: string) => {
       switch (action) {
@@ -135,7 +143,7 @@ export default function TeamPage() {
             <PendingInvites
               invites={pendingQuery.data}
               onRevoke={(inviteId) => revokeInviteMutation.mutate({ inviteId })}
-              onResend={() => addToast("info", "Resend not yet implemented")}
+              onResend={(inviteId) => resendInviteMutation.mutate({ inviteId })}
             />
           )}
 

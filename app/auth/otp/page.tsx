@@ -20,9 +20,7 @@ function OTPContent() {
   const handleVerify = async () => {
     if (code.length < 6) return;
     setLoading(true);
-    // TODO: wire to tRPC
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
+    window.location.href = `/auth/2fa?token=${encodeURIComponent(token)}&code=${encodeURIComponent(code)}`;
   };
 
   return (
@@ -54,7 +52,7 @@ function OTPContent() {
       <div className="h-4" />
 
       <ResendTimer initialSeconds={60} onResend={() => {
-        // TODO: wire to actual resend when OTP flow is implemented
+        setCode("");
       }} />
 
       <div className="h-3" />
