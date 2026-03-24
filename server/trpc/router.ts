@@ -5,6 +5,7 @@ import { sitesRouter } from "./routers/sites";
 import { siteDetailRouter } from "./routers/site-detail";
 import { templatesRouter } from "./routers/templates";
 import { teamRouter } from "./routers/team";
+import { billingRouter } from "./routers/billing";
 
 export const appRouter = router({
   auth: authRouter,
@@ -13,6 +14,7 @@ export const appRouter = router({
   siteDetail: siteDetailRouter,
   templates: templatesRouter,
   team: teamRouter,
+  billing: billingRouter,
 });
 
 export type AppRouter = typeof appRouter;
