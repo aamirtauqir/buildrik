@@ -11,6 +11,7 @@ import { helpRouter } from "./routers/help";
 import { notificationsRouter } from "./routers/notifications";
 import { onboardingRouter } from "./routers/onboarding";
 import { pagesRouter } from "./routers/pages";
+import { formsRouter } from "./routers/forms";
 
 export const appRouter = router({
   auth: authRouter,
@@ -25,6 +26,7 @@ export const appRouter = router({
   notifications: notificationsRouter,
   onboarding: onboardingRouter,
   pages: pagesRouter,
+  forms: formsRouter,
 });
 
 export type AppRouter = typeof appRouter;
