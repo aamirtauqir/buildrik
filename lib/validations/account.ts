@@ -19,6 +19,8 @@ export const updateWorkspaceSchema = z.object({
   slug: z.string().min(3).max(30).optional(),
   defaultLanguage: z.string().optional(),
   timezone: z.string().optional(),
+  iconUrl: z.string().url().nullable().optional(),
+  accentColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color").optional(),
 });
 
 export const workspaceSharingSettingsSchema = z.object({
