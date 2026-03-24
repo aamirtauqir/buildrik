@@ -66,6 +66,7 @@ export async function listSubmissions(input: ListSubmissionsInput) {
     prisma.formSubmission.count({ where }),
     prisma.formSubmission.findMany({
       where,
+      include: { formBlock: { select: { name: true } } },
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * perPage,
       take: perPage,

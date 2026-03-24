@@ -12,7 +12,7 @@ export const TONE_OPTIONS = [
 ] as const;
 
 export const CONTENT_OPTIONS = [
-  { value: "generate", label: "Generate placeholder" },
+  { value: "generate", label: "Generate placeholder content" },
   { value: "lorem", label: "Use lorem ipsum" },
   { value: "empty", label: "Leave empty" },
 ] as const;
@@ -71,7 +71,7 @@ export function StepPages({ businessType, suggestedPages, onBack, onGenerate }: 
       {/* Description */}
       <div className="mt-6">
         <label className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Describe your business (optional)</label>
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} maxLength={500} rows={3} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "#E8E8E8" }} placeholder="Tell us about your business..." />
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} maxLength={500} rows={3} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "#E8E8E8" }} placeholder="Describe your business (optional)" />
         <p className="mt-1 text-xs text-right" style={{ color: description.length > 450 ? "#E42313" : "#B0B0B0" }}>{description.length}/500</p>
       </div>
 

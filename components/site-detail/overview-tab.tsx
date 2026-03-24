@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import {
   FileText,
@@ -11,13 +11,20 @@ import {
   Heart,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
   RefreshCw,
   ArrowLeft,
   Shield,
   Image,
   Search,
   FileCheck,
+  Download,
 } from "lucide-react";
+import { trpc } from "@/lib/trpc/client";
+import {
+  SubmissionDrawer,
+  type FormSubmissionData,
+} from "@/components/site-detail/submission-drawer";
 
 export const HEALTH_METRICS = [
   { label: "SEO", key: "seo" as const, icon: Search, tab: "settings" },
@@ -82,6 +89,88 @@ export function OverviewTab({
 }: OverviewTabProps) {
   const [healthExpanded, setHealthExpanded] = useState(false);
   const [expandedFormId, setExpandedFormId] = useState<string | null>(null);
+  const [submissionsPage, setSubmissionsPage] = useState(1);
+  const [filterFormBlockId, setFilterFormBlockId] = useState<string | undefined>(undefined);
+  const [drawerSubmission, setDrawerSubmission] = useState<FormSubmissionData | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const submissionsQuery = trpc.forms.listSubmissions.useQuery(
+    { siteId, formBlockId: filterFormBlockId, page: submissionsPage, perPage: 20 },
+    { enabled: formBlocks.length > 0 },
+  );
+
+  const utils = trpc.useUtils();
+
+  const updateMutation = trpc.forms.updateSubmission.useMutation({
+    onSuccess: () => {
+      utils.forms.listSubmissions.invalidate();
+    },
+  });
+
+  const deleteMutation = trpc.forms.deleteSubmission.useMutation({
+    onSuccess: () => {
+      utils.forms.listSubmissions.invalidate();
+      setDrawerOpen(false);
+      setDrawerSubmission(null);
+    },
+  });
+
+  const handleDrawerUpdate = useCallback(
+    (id: string, data: Partial<{ isRead: boolean; isSpam: boolean; isArchived: boolean }>) => {
+      updateMutation.mutate({ id, ...data });
+      if (drawerSubmission && drawerSubmission.id === id) {
+        setDrawerSubmission({ ...drawerSubmission, ...data });
+      }
+    },
+    [updateMutation, drawerSubmission],
+  );
+
+  const handleDrawerDelete = useCallback(
+    (id: string) => {
+      deleteMutation.mutate({ id });
+    },
+    [deleteMutation],
+  );
+
+  const handleOpenDrawer = useCallback((sub: FormSubmissionData) => {
+    setDrawerSubmission(sub);
+    setDrawerOpen(true);
+    if (!sub.isRead) {
+      updateMutation.mutate({ id: sub.id, isRead: true });
+    }
+  }, [updateMutation]);
+
+  const handleExportCsv = useCallback(() => {
+    const submissions = submissionsQuery.data?.data;
+    if (!submissions || submissions.length === 0) return;
+
+    const allKeys = Array.from(
+      new Set(submissions.flatMap((s) => Object.keys(s.data as Record<string, string>))),
+    );
+    const headers = ["ID", "Submitted", "Form", ...allKeys, "Read", "Spam", "Archived"];
+    const rows = submissions.map((s) => {
+      const data = s.data as Record<string, string>;
+      const formName = (s as FormSubmissionData).formBlock?.name ?? "";
+      return [
+        s.id,
+        new Date(s.createdAt).toISOString(),
+        formName,
+        ...allKeys.map((k) => data[k] ?? ""),
+        String(s.isRead),
+        String(s.isSpam),
+        String(s.isArchived),
+      ].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",");
+    });
+
+    const csv = [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `submissions-${siteId}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [submissionsQuery.data, siteId]);
 
   if (isLoading) return <OverviewSkeleton />;
 
@@ -278,6 +367,165 @@ export function OverviewTab({
           </div>
         </div>
       )}
+
+      {/* Submissions Table */}
+      {formBlocks.length > 0 && (
+        <div className="rounded-xl border bg-white" style={{ borderColor: "#E8E8E8" }}>
+          <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: "#E8E8E8" }}>
+            <h3 className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>All Submissions</h3>
+            <div className="flex items-center gap-3">
+              <select
+                value={filterFormBlockId ?? ""}
+                onChange={(e) => {
+                  setFilterFormBlockId(e.target.value || undefined);
+                  setSubmissionsPage(1);
+                }}
+                className="rounded-lg border px-3 py-1.5 text-xs"
+                style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+              >
+                <option value="">All Forms</option>
+                {formBlocks.map((fb) => (
+                  <option key={fb.id} value={fb.id}>{fb.name}</option>
+                ))}
+              </select>
+              <button
+                onClick={handleExportCsv}
+                disabled={!submissionsQuery.data?.data.length}
+                className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-gray-50 disabled:opacity-40"
+                style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}
+              >
+                <Download className="h-3.5 w-3.5" />
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          {submissionsQuery.isLoading ? (
+            <div className="px-5 py-8">
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-10 w-full animate-pulse rounded" style={{ backgroundColor: "#F4F4F4" }} />
+                ))}
+              </div>
+            </div>
+          ) : submissionsQuery.data && submissionsQuery.data.data.length > 0 ? (
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b" style={{ borderColor: "#F4F4F4" }}>
+                      <th className="px-5 py-3 text-xs font-medium" style={{ color: "#7A7A7A" }}>Submitted</th>
+                      <th className="px-5 py-3 text-xs font-medium" style={{ color: "#7A7A7A" }}>Form</th>
+                      <th className="px-5 py-3 text-xs font-medium" style={{ color: "#7A7A7A" }}>Data Preview</th>
+                      <th className="px-5 py-3 text-xs font-medium" style={{ color: "#7A7A7A" }}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {submissionsQuery.data.data.map((sub) => {
+                      const s = sub as unknown as FormSubmissionData;
+                      const dataEntries = Object.entries(s.data);
+                      const preview = dataEntries
+                        .slice(0, 2)
+                        .map(([k, v]) => `${k}: ${String(v).slice(0, 30)}${String(v).length > 30 ? "\u2026" : ""}`)
+                        .join(" | ");
+                      return (
+                        <tr
+                          key={s.id}
+                          onClick={() => handleOpenDrawer(s)}
+                          className="cursor-pointer border-b transition-colors hover:bg-gray-50"
+                          style={{ borderColor: "#F4F4F4" }}
+                        >
+                          <td className="whitespace-nowrap px-5 py-3 text-xs" style={{ color: "#0D0D0D" }}>
+                            {new Date(s.createdAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </td>
+                          <td className="px-5 py-3 text-xs" style={{ color: "#7A7A7A" }}>
+                            {s.formBlock?.name ?? "Unknown"}
+                          </td>
+                          <td className="max-w-[300px] truncate px-5 py-3 text-xs" style={{ color: "#7A7A7A" }}>
+                            {preview || "\u2014"}
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="flex items-center gap-1.5">
+                              {!s.isRead && (
+                                <span
+                                  className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+                                  style={{ backgroundColor: "#DBEAFE", color: "#2563EB" }}
+                                >
+                                  Unread
+                                </span>
+                              )}
+                              {s.isSpam && (
+                                <span
+                                  className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+                                  style={{ backgroundColor: "#FEF2F2", color: "#E42313" }}
+                                >
+                                  Spam
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination */}
+              {submissionsQuery.data.total > 20 && (
+                <div
+                  className="flex items-center justify-between border-t px-5 py-3"
+                  style={{ borderColor: "#E8E8E8" }}
+                >
+                  <p className="text-xs" style={{ color: "#7A7A7A" }}>
+                    Page {submissionsQuery.data.page} of {Math.ceil(submissionsQuery.data.total / 20)}
+                    {" "}({submissionsQuery.data.total} total)
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setSubmissionsPage((p) => Math.max(1, p - 1))}
+                      disabled={submissionsPage <= 1}
+                      className="rounded-lg border p-1.5 transition-colors hover:bg-gray-50 disabled:opacity-40"
+                      style={{ borderColor: "#E8E8E8" }}
+                    >
+                      <ChevronLeft className="h-4 w-4" style={{ color: "#7A7A7A" }} />
+                    </button>
+                    <button
+                      onClick={() => setSubmissionsPage((p) => p + 1)}
+                      disabled={submissionsPage >= Math.ceil(submissionsQuery.data.total / 20)}
+                      className="rounded-lg border p-1.5 transition-colors hover:bg-gray-50 disabled:opacity-40"
+                      style={{ borderColor: "#E8E8E8" }}
+                    >
+                      <ChevronRight className="h-4 w-4" style={{ color: "#7A7A7A" }} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="px-5 py-8 text-center">
+              <p className="text-sm" style={{ color: "#B0B0B0" }}>No submissions found.</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Submission Drawer */}
+      <SubmissionDrawer
+        open={drawerOpen}
+        onClose={() => {
+          setDrawerOpen(false);
+          setDrawerSubmission(null);
+        }}
+        submission={drawerSubmission}
+        onUpdate={handleDrawerUpdate}
+        onDelete={handleDrawerDelete}
+      />
 
       {/* Recent Activity */}
       <div className="rounded-xl border bg-white p-5" style={{ borderColor: "#E8E8E8" }}>
