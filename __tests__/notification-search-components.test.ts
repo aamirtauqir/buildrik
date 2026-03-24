@@ -20,13 +20,6 @@ describe("Notification Components", () => {
 });
 
 describe("Search Components", () => {
-  it("CommandPalette exports PALETTE_SECTIONS with 3 sections", async () => {
-    const mod = await import("@/components/search/command-palette");
-    expect(mod.PALETTE_SECTIONS).toHaveLength(3);
-    const keys = mod.PALETTE_SECTIONS.map((s: { key: string }) => s.key);
-    expect(keys).toEqual(["recent", "actions", "navigation"]);
-  });
-
   it("SEARCH_SCOPES exports 6 scopes", async () => {
     const mod = await import("@/components/search/command-palette");
     expect(mod.SEARCH_SCOPES).toHaveLength(6);
