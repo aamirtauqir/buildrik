@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { AccessTab } from "@/components/site-detail/access-tab";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
 export default function SiteAccessPage() {
   const params = useParams();
@@ -11,6 +12,9 @@ export default function SiteAccessPage() {
   const { addToast } = useToast();
 
   const linksQuery = trpc.siteDetail.sharing.list.useQuery({ siteId });
+  const overviewQuery = trpc.siteDetail.overview.useQuery({ siteId });
+  const plan = (overviewQuery.data as { plan?: string } | undefined)?.plan ?? "FREE";
+  const planLimits = PLAN_LIMITS[plan as PlanName] ?? PLAN_LIMITS.FREE;
 
   const createMutation = trpc.siteDetail.sharing.create.useMutation({
     onSuccess: () => {
@@ -36,6 +40,8 @@ export default function SiteAccessPage() {
       shareLinks={linksQuery.data ?? []}
       onCreateLink={(data) => createMutation.mutate({ siteId, ...data })}
       onRevokeLink={(id) => revokeMutation.mutate({ id })}
+      maxExpiryDays={planLimits.shareLinkExpiryMaxDays as number}
+      allowPasswords={!!planLimits.shareLinkPasswords}
     />
   );
 }

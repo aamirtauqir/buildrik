@@ -33,3 +33,10 @@ export async function connectDomain(siteId: string, domain: string) {
 export async function removeDomain(id: string) {
   return prisma.domain.delete({ where: { id } });
 }
+
+export async function setPrimaryDomain(id: string, siteId: string) {
+  return prisma.$transaction([
+    prisma.domain.updateMany({ where: { siteId }, data: { isPrimary: false } }),
+    prisma.domain.update({ where: { id }, data: { isPrimary: true } }),
+  ]);
+}

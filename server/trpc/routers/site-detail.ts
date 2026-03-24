@@ -3,11 +3,12 @@ import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { getSiteOverview } from "@/server/services/site-detail.service";
 import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
-import { listRedirects, createRedirect, updateRedirect, deleteRedirect } from "@/server/services/redirect.service";
-import { listDomains, connectDomain, removeDomain } from "@/server/services/domain.service";
+import { listRedirects, createRedirect, updateRedirect, deleteRedirect, importRedirects, exportRedirects } from "@/server/services/redirect.service";
+import { listDomains, connectDomain, removeDomain, setPrimaryDomain } from "@/server/services/domain.service";
 import { listShareLinks, createShareLink, revokeShareLink } from "@/server/services/share-link.service";
 import { getSiteAnalytics } from "@/server/services/analytics.service";
 import { updateSiteSettingsSchema, createRedirectSchema, connectDomainSchema, createShareLinkSchema, siteAnalyticsQuerySchema } from "@/lib/validations/site-detail";
+import type { PlanName } from "@/lib/constants/plan-limits";
 
 export const siteDetailRouter = router({
   overview: protectedProcedure
@@ -59,6 +60,27 @@ export const siteDetailRouter = router({
     delete: protectedProcedure
       .input(z.object({ id: z.string() }))
       .mutation(async ({ input }) => deleteRedirect(input.id)),
+
+    import_csv: protectedProcedure
+      .input(z.object({ siteId: z.string(), csv: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        const member = await ctx.prisma.workspaceMember.findFirst({
+          where: { userId: ctx.session.user!.id },
+          include: { workspace: { select: { plan: true } } },
+        });
+        const plan = (member?.workspace?.plan ?? "FREE") as PlanName;
+        try {
+          return await importRedirects(input.siteId, input.csv, plan);
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === "REDIRECT_LIMIT")
+            throw new TRPCError({ code: "FORBIDDEN", message: "Redirect limit exceeded." });
+          throw e;
+        }
+      }),
+
+    export_csv: protectedProcedure
+      .input(z.object({ siteId: z.string() }))
+      .query(async ({ input }) => ({ csv: await exportRedirects(input.siteId) })),
   }),
 
   domains: router({
@@ -81,6 +103,10 @@ export const siteDetailRouter = router({
     remove: protectedProcedure
       .input(z.object({ id: z.string() }))
       .mutation(async ({ input }) => removeDomain(input.id)),
+
+    setPrimary: protectedProcedure
+      .input(z.object({ id: z.string(), siteId: z.string() }))
+      .mutation(async ({ input }) => setPrimaryDomain(input.id, input.siteId)),
   }),
 
   sharing: router({
