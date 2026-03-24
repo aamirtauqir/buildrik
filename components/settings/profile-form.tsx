@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const LANGUAGES = [
   { value: "en", label: "English" },
@@ -25,14 +25,29 @@ const TIMEZONES = [
   { value: "Australia/Sydney", label: "Sydney (AEST)" },
 ];
 
+const INITIALS_COLORS = [
+  "#E42313", "#3b82f6", "#8b5cf6", "#059669", "#d97706",
+  "#dc2626", "#7c3aed", "#0891b2", "#be185d", "#4f46e5",
+];
+
+function getInitialsColor(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return INITIALS_COLORS[Math.abs(hash) % INITIALS_COLORS.length];
+}
+
 interface ProfileFormProps {
   initialData?: {
     fullName?: string;
     displayName?: string;
+    email?: string;
     bio?: string;
     language?: string;
     timezone?: string;
     initials?: string;
+    avatarUrl?: string;
   };
   onSave?: (data: {
     fullName: string;
@@ -41,15 +56,19 @@ interface ProfileFormProps {
     language: string;
     timezone: string;
   }) => void;
+  onAvatarUpload?: (file: File) => void;
+  onAvatarRemove?: () => void;
   saving?: boolean;
 }
 
-export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
+export function ProfileForm({ initialData, onSave, onAvatarUpload, onAvatarRemove, saving }: ProfileFormProps) {
   const [fullName, setFullName] = useState(initialData?.fullName ?? "");
   const [displayName, setDisplayName] = useState(initialData?.displayName ?? "");
   const [bio, setBio] = useState(initialData?.bio ?? "");
   const [language, setLanguage] = useState(initialData?.language ?? "en");
   const [timezone, setTimezone] = useState(initialData?.timezone ?? "UTC");
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(initialData?.avatarUrl ?? null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const initials = (initialData?.initials ?? fullName)
     .split(" ")
@@ -57,6 +76,22 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
     .join("")
     .toUpperCase()
     .slice(0, 2);
+
+  const initialsColor = getInitialsColor(initialData?.initials ?? fullName);
+
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setAvatarPreview(url);
+    onAvatarUpload?.(file);
+  }
+
+  function handleRemovePhoto() {
+    setAvatarPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    onAvatarRemove?.();
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -66,20 +101,48 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="flex items-center gap-5">
-        <div
-          className="w-20 h-20 rounded-full flex items-center justify-center text-white text-xl font-semibold select-none flex-shrink-0"
-          style={{ backgroundColor: "#E42313" }}
-        >
-          {initials || "?"}
-        </div>
-        <div>
-          <button
-            type="button"
-            className="text-sm font-medium px-3 py-1.5 rounded-md border"
-            style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+        {avatarPreview ? (
+          <img
+            src={avatarPreview}
+            alt="Avatar"
+            className="w-20 h-20 rounded-full object-cover flex-shrink-0"
+          />
+        ) : (
+          <div
+            className="w-20 h-20 rounded-full flex items-center justify-center text-white text-xl font-semibold select-none flex-shrink-0"
+            style={{ backgroundColor: initialsColor }}
           >
-            Upload photo
-          </button>
+            {initials || "?"}
+          </div>
+        )}
+        <div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="text-sm font-medium px-3 py-1.5 rounded-md border"
+              style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+            >
+              Upload photo
+            </button>
+            {avatarPreview && (
+              <button
+                type="button"
+                onClick={handleRemovePhoto}
+                className="text-sm font-medium px-3 py-1.5 rounded-md border"
+                style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}
+              >
+                Remove photo
+              </button>
+            )}
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/gif"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
           <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
             JPG, PNG or GIF. Max 2 MB.
           </p>
@@ -100,7 +163,7 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
             style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
           />
           <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
-            Used on invoices and legal documents.
+            Appears on published sites.
           </p>
         </div>
 
@@ -117,9 +180,25 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
             style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
           />
           <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
-            Shown to teammates and in comments.
+            Shown to team members.
           </p>
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1" style={{ color: "#0D0D0D" }}>
+          Email
+        </label>
+        <input
+          type="email"
+          value={initialData?.email ?? ""}
+          readOnly
+          className="w-full px-3 py-2 text-sm rounded-md border outline-none"
+          style={{ borderColor: "#E8E8E8", color: "#7A7A7A", backgroundColor: "#FAFAFA" }}
+        />
+        <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
+          Read-only. Change in Account tab.
+        </p>
       </div>
 
       <div>
@@ -131,12 +210,12 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
           onChange={(e) => setBio(e.target.value)}
           rows={3}
           maxLength={500}
-          placeholder="A short bio about yourself…"
+          placeholder="A short bio about yourself..."
           className="w-full px-3 py-2 text-sm rounded-md border outline-none focus:ring-2 resize-none"
           style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
         />
         <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
-          {bio.length}/500 characters. Visible on your public profile.
+          Optional. Shown on your profile. {bio.length}/500
         </p>
       </div>
 
@@ -158,7 +237,7 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
             ))}
           </select>
           <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
-            Controls the interface language.
+            Used for email and date formatting.
           </p>
         </div>
 
@@ -179,7 +258,7 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
             ))}
           </select>
           <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
-            Used for scheduling and date display.
+            Used for email and date formatting.
           </p>
         </div>
       </div>
@@ -191,7 +270,7 @@ export function ProfileForm({ initialData, onSave, saving }: ProfileFormProps) {
           className="px-4 py-2 text-sm font-medium rounded-md text-white disabled:opacity-60"
           style={{ backgroundColor: "#E42313" }}
         >
-          {saving ? "Saving…" : "Save changes"}
+          {saving ? "Saving..." : "Save changes"}
         </button>
       </div>
     </form>
