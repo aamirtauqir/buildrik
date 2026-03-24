@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { trpc } from "@/lib/trpc/client";
 import { ViewToggle } from "@/components/sites/view-toggle";
 import { SiteFilters } from "@/components/sites/site-filters";
@@ -18,14 +18,27 @@ import { Plus } from "lucide-react";
 export default function SitesPage() {
   const { addToast } = useToast();
 
+  // Preferences
+  const prefs = trpc.account.preferences.get.useQuery();
+  const updatePrefs = trpc.account.preferences.update.useMutation();
+
   // View state
   const [viewMode, setViewMode] = useState("grid");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<string | undefined>(undefined);
   const [sort, setSort] = useState("lastEdited");
+  const [page, setPage] = useState(1);
   const [folderId, setFolderId] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // Initialize from saved preferences
+  useEffect(() => {
+    if (prefs.data) {
+      if (prefs.data.siteViewMode) setViewMode(prefs.data.siteViewMode);
+      if (prefs.data.siteViewSort) setSort(prefs.data.siteViewSort);
+    }
+  }, [prefs.data]);
 
   // Modal state
   const [createOpen, setCreateOpen] = useState(false);
@@ -40,7 +53,7 @@ export default function SitesPage() {
 
   // Queries
   const sitesQuery = trpc.sites.list.useQuery({
-    page: 1,
+    page,
     perPage: 12,
     status: showArchived ? "ARCHIVED" : status,
     sort: sort as
@@ -203,7 +216,10 @@ export default function SitesPage() {
           My Sites
         </h1>
         <div className="flex items-center gap-3">
-          <ViewToggle value={viewMode} onChange={setViewMode} />
+          <ViewToggle value={viewMode} onChange={(mode) => {
+            setViewMode(mode);
+            updatePrefs.mutate({ siteViewMode: mode as "grid" | "list" });
+          }} />
           <button
             onClick={() => setCreateOpen(true)}
             className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
@@ -223,6 +239,7 @@ export default function SitesPage() {
           onSelect={(id) => {
             setFolderId(id);
             setShowArchived(false);
+            setPage(1);
           }}
           onCreateFolder={() => {
             const name = prompt("Folder name:");
@@ -234,6 +251,7 @@ export default function SitesPage() {
           onToggleArchived={() => {
             setShowArchived(!showArchived);
             setFolderId(null);
+            setPage(1);
           }}
         />
       </div>
@@ -242,11 +260,15 @@ export default function SitesPage() {
       <div className="mt-4">
         <SiteFilters
           search={search}
-          onSearchChange={setSearch}
+          onSearchChange={(val) => { setSearch(val); setPage(1); }}
           status={status}
-          onStatusChange={setStatus}
+          onStatusChange={(val) => { setStatus(val); setPage(1); }}
           sort={sort}
-          onSortChange={setSort}
+          onSortChange={(val) => {
+            setSort(val);
+            setPage(1);
+            updatePrefs.mutate({ siteViewSort: val });
+          }}
         />
       </div>
 
@@ -311,6 +333,33 @@ export default function SitesPage() {
               onAction={handleSiteAction}
             />
           )}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {sitesQuery.data && sitesQuery.data.totalPages > 1 && (
+        <div className="flex items-center justify-between mt-6">
+          <p className="text-sm" style={{ color: "#7A7A7A" }}>
+            Page {page} of {sitesQuery.data.totalPages} ({sitesQuery.data.total} sites)
+          </p>
+          <div className="flex gap-2">
+            <button
+              disabled={page <= 1}
+              onClick={() => setPage(p => p - 1)}
+              className="px-3 py-1.5 text-sm rounded-lg border disabled:opacity-50"
+              style={{ borderColor: "#E8E8E8" }}
+            >
+              Previous
+            </button>
+            <button
+              disabled={page >= sitesQuery.data.totalPages}
+              onClick={() => setPage(p => p + 1)}
+              className="px-3 py-1.5 text-sm rounded-lg border disabled:opacity-50"
+              style={{ borderColor: "#E8E8E8" }}
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
 
