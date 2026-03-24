@@ -38,6 +38,23 @@ export async function updateSiteSettings(
     touchIcon?: string | null;
   }
 ) {
+  // If slug is being changed, record the old slug for 301 redirects
+  if (data.slug) {
+    const current = await prisma.site.findUnique({
+      where: { id: siteId },
+      select: { slug: true },
+    });
+    if (current && current.slug !== data.slug) {
+      await prisma.slugHistory.create({
+        data: {
+          siteId,
+          oldSlug: current.slug,
+          newSlug: data.slug,
+        },
+      }).catch(() => {});
+    }
+  }
+
   return prisma.site.update({
     where: { id: siteId },
     data,
