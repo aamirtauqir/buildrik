@@ -7,9 +7,11 @@ type Role = "ADMIN" | "EDITOR" | "VIEWER";
 export interface PendingInvite {
   id: string;
   email: string;
-  role: Role;
-  sentAt: Date;
+  role: string;
+  createdAt: Date;
   expiresAt: Date;
+  resendCount: number;
+  [key: string]: unknown;
 }
 
 const ROLE_BADGE: Record<Role, { bg: string; color: string }> = {
@@ -17,6 +19,8 @@ const ROLE_BADGE: Record<Role, { bg: string; color: string }> = {
   EDITOR: { bg: "#F0FDF4", color: "#22C55E" },
   VIEWER: { bg: "#F3F4F6", color: "#7A7A7A" },
 };
+
+const MAX_RESENDS = 2;
 
 function daysUntil(date: Date): number {
   return Math.max(0, Math.ceil((new Date(date).getTime() - Date.now()) / 86400000));
@@ -48,7 +52,7 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-[#E8E8E8]" style={{ backgroundColor: "#FAFAFA" }}>
-            {["Email", "Role", "Sent", "Expires In", ""].map((h) => (
+            {["Email", "Role", "Sent", "Expires In", "Resends", ""].map((h) => (
               <th
                 key={h}
                 className={cn(
@@ -64,9 +68,10 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
         </thead>
         <tbody>
           {invites.map((invite) => {
-            const badge = ROLE_BADGE[invite.role];
+            const badge = ROLE_BADGE[invite.role as Role] ?? ROLE_BADGE.VIEWER;
             const days = daysUntil(invite.expiresAt);
             const expiringSoon = days <= 2;
+            const resendDisabled = invite.resendCount >= MAX_RESENDS;
 
             return (
               <tr key={invite.id} className="border-b border-[#E8E8E8] transition-colors last:border-0 hover:bg-[#FAFAFA]">
@@ -82,20 +87,24 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
                   </span>
                 </td>
                 <td className="px-4 py-3 text-xs" style={{ color: "#7A7A7A" }}>
-                  {formatDate(invite.sentAt)}
+                  {formatDate(invite.createdAt)}
                 </td>
                 <td className="px-4 py-3 text-xs font-medium" style={{ color: expiringSoon ? "#E42313" : "#7A7A7A" }}>
-                  {days === 0 ? "Expires today" : `${days}d`}
+                  {days === 0 ? "Expires today" : `Expires in ${days}d`}
+                </td>
+                <td className="px-4 py-3 text-xs" style={{ color: resendDisabled ? "#E42313" : "#7A7A7A" }}>
+                  Resent {invite.resendCount}/{MAX_RESENDS} times
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-2">
                     <button
                       onClick={() => onResend(invite.id)}
-                      disabled={!!resendingId}
+                      disabled={!!resendingId || resendDisabled}
                       className="rounded-lg border border-[#E8E8E8] px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[#F4F4F4] disabled:opacity-50"
                       style={{ color: "#0D0D0D" }}
+                      title={resendDisabled ? "Maximum resends reached" : undefined}
                     >
-                      {resendingId === invite.id ? "Sending…" : "Resend"}
+                      {resendingId === invite.id ? "Sending..." : "Resend"}
                     </button>
                     <button
                       onClick={() => onRevoke(invite.id)}
@@ -103,7 +112,7 @@ export function PendingInvites({ invites, onResend, onRevoke, resendingId, revok
                       className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-red-50 disabled:opacity-50"
                       style={{ borderColor: "#E42313", color: "#E42313" }}
                     >
-                      {revokingId === invite.id ? "Revoking…" : "Revoke"}
+                      {revokingId === invite.id ? "Revoking..." : "Revoke"}
                     </button>
                   </div>
                 </td>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { trpc } from "@/lib/trpc/client";
 import { useToast } from "@/components/dashboard/toast-provider";
 import { TeamStatCards } from "@/components/team/stat-cards";
@@ -11,6 +12,7 @@ import { TeamEmptyState } from "@/components/team/team-empty-state";
 import { UserPlus } from "lucide-react";
 
 export default function TeamPage() {
+  const { data: session } = useSession();
   const { addToast } = useToast();
   const [inviteOpen, setInviteOpen] = useState(false);
 
@@ -89,6 +91,7 @@ export default function TeamPage() {
 
   const isLoading = statsQuery.isLoading || membersQuery.isLoading;
   const isEmpty = (statsQuery.data?.total ?? 0) <= 1;
+  const currentUserId = session?.user?.id ?? "";
 
   if (isLoading) {
     return (
@@ -125,12 +128,13 @@ export default function TeamPage() {
       ) : (
         <div className="mt-6 space-y-8">
           {/* Stats */}
-          {statsQuery.data && <TeamStatCards stats={statsQuery.data} />}
+          {statsQuery.data && <TeamStatCards {...statsQuery.data} />}
 
           {/* Members Table */}
           {membersQuery.data && (
             <MembersTable
               members={membersQuery.data.data}
+              currentUserId={currentUserId}
               onAction={handleMemberAction}
               onChangeRole={(memberId, role) =>
                 changeRoleMutation.mutate({ memberId, role: role as "ADMIN" | "EDITOR" | "VIEWER" })
@@ -140,11 +144,14 @@ export default function TeamPage() {
 
           {/* Pending Invites */}
           {pendingQuery.data && pendingQuery.data.length > 0 && (
-            <PendingInvites
-              invites={pendingQuery.data}
-              onRevoke={(inviteId) => revokeInviteMutation.mutate({ inviteId })}
-              onResend={(inviteId) => resendInviteMutation.mutate({ inviteId })}
-            />
+            <div>
+              <h2 className="mb-3 text-base font-semibold" style={{ color: "#0D0D0D" }}>Pending Invitations</h2>
+              <PendingInvites
+                invites={pendingQuery.data}
+                onRevoke={(inviteId) => revokeInviteMutation.mutate({ inviteId })}
+                onResend={(inviteId) => resendInviteMutation.mutate({ inviteId })}
+              />
+            </div>
           )}
 
           {/* Team Activity */}
@@ -177,6 +184,7 @@ export default function TeamPage() {
           inviteMutation.mutate({
             emails: data.emails,
             role: data.role as "ADMIN" | "EDITOR" | "VIEWER",
+            siteIds: data.siteIds,
             message: data.message,
           })
         }
