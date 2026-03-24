@@ -2,7 +2,7 @@ import type { PrismaClient } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
-import { createCipheriv, createDecipheriv, randomBytes } from "crypto";
+import { createCipheriv, createDecipheriv, createHash, randomBytes, randomUUID } from "crypto";
 import { generateToken, validateToken, invalidateToken } from "./token.service";
 import { isAccountLocked, incrementFailedAttempts, resetFailedAttempts } from "./rate-limit.service";
 import { sendVerificationEmail, sendPasswordResetEmail, sendMagicLinkEmail } from "./email.service";
@@ -189,7 +189,7 @@ export async function forgotPassword(email: string) {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return; // always return success, prevent enumeration
 
-  const token = await generateToken("password_reset", user.id, 30); // 30min
+  const token = await generateToken("password_reset", user.id, 60); // 1 hour per PRD
   await sendPasswordResetEmail(email, token);
   await logAuditEvent("PASSWORD_RESET_REQUESTED", "success", { email });
 }
@@ -257,7 +257,17 @@ export async function verify2FA(tempToken: string, code: string) {
     throw new AuthError("INVALID_2FA_CODE", "Invalid or expired token", 401);
   }
 
-  // Need twoFactorSecret for validation — internal only
+  // Check 2FA attempt count
+  const hashedTemp = createHash("sha256").update(tempToken).digest("hex");
+  const attemptCount = await prisma.verificationToken.count({
+    where: { type: "2fa_attempt", identifier: hashedTemp, used: false, expires: { gt: new Date() } },
+  });
+  if (attemptCount >= 5) {
+    await invalidateToken(tempToken);
+    await logAuditEvent("2FA_LOCKED", "failure", { userId });
+    throw new AuthError("2FA_LOCKED", "Too many failed attempts. Please log in again.", 423);
+  }
+
   const internal = await prisma.user.findUnique({
     where: { id: userId },
     select: { twoFactorSecret: true },
@@ -270,19 +280,27 @@ export async function verify2FA(tempToken: string, code: string) {
   try {
     secret = internal.twoFactorSecret.includes(':')
       ? decryptSecret(internal.twoFactorSecret)
-      : internal.twoFactorSecret; // backwards compat with unencrypted
+      : internal.twoFactorSecret;
   } catch {
     throw new AuthError("INVALID_2FA_CODE", "Invalid 2FA configuration", 401);
   }
   const valid = authenticator.verify({ token: code, secret });
   if (!valid) {
+    // Record failed attempt
+    await prisma.verificationToken.create({
+      data: {
+        identifier: hashedTemp,
+        token: randomUUID(),
+        type: "2fa_attempt",
+        expires: new Date(Date.now() + 5 * 60 * 1000),
+      },
+    });
     await logAuditEvent("2FA_FAILED", "failure", { userId });
     throw new AuthError("INVALID_2FA_CODE", "Invalid code", 401);
   }
 
   await invalidateToken(tempToken);
   await logAuditEvent("2FA_VERIFIED", "success", { userId });
-  // Return safe fields only
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId }, select: SAFE_USER_SELECT });
   return user;
 }

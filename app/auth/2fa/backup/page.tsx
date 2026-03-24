@@ -9,6 +9,7 @@ import { AuthLogo } from "@/components/auth/auth-logo";
 import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthButton } from "@/components/auth/auth-button";
 import { AuthInput } from "@/components/auth/auth-input";
+import { FormBanner } from "@/components/auth/form-banner";
 import { trpc } from "@/lib/trpc/client";
 
 function BackupCodeContent() {
@@ -17,17 +18,23 @@ function BackupCodeContent() {
   const token = searchParams.get("token") ?? "";
 
   const [backupCode, setBackupCode] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const verifyBackupCodeMutation = trpc.auth.verifyBackupCode.useMutation({
     onSuccess: async (data) => {
-      const res = await fetch("/api/auth/session", {
+      const res = await fetch("/api/auth/create-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionToken: data.sessionToken }),
       });
       if (res.ok) {
-        router.push("/dashboard");
+        router.push("/auth/redirect");
+      } else {
+        setError("Failed to create session");
       }
+    },
+    onError: (err) => {
+      setError(err.message);
     },
   });
 
@@ -48,6 +55,13 @@ function BackupCodeContent() {
       </p>
 
       <div className="h-6" />
+
+      {error && (
+        <>
+          <FormBanner variant="error" title={error} />
+          <div className="h-4" />
+        </>
+      )}
 
       <AuthInput
         label="Backup Code"
