@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc/client";
 import { ViewToggle } from "@/components/sites/view-toggle";
 import { SiteFilters } from "@/components/sites/site-filters";
 import { FolderTabs } from "@/components/sites/folder-tabs";
 import { SiteGrid } from "@/components/sites/site-grid";
 import { SiteListView } from "@/components/sites/site-list-view";
-import { BulkActionBar } from "@/components/sites/bulk-action-bar";
+import { BulkActionBar, BULK_SELECTION_CAP } from "@/components/sites/bulk-action-bar";
 import { CreateSiteModal } from "@/components/sites/create-site-modal";
 import { RenameModal } from "@/components/sites/rename-modal";
 import { DeleteConfirmModal } from "@/components/sites/delete-confirm-modal";
+import { TransferModal } from "@/components/sites/transfer-modal";
 import { useToast } from "@/components/dashboard/toast-provider";
 import Link from "next/link";
 import { Plus } from "lucide-react";
@@ -31,6 +32,14 @@ export default function SitesPage() {
   const [folderId, setFolderId] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const lastSelectedIdRef = useRef<string | null>(null);
+
+  // Advanced filter state
+  const [createdBy, setCreatedBy] = useState<string | undefined>(undefined);
+  const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d" | undefined>(undefined);
+  const [templateUsed, setTemplateUsed] = useState<string | undefined>(undefined);
+  const [hasCustomDomain, setHasCustomDomain] = useState<boolean | undefined>(undefined);
+  const [hasTraffic, setHasTraffic] = useState<"none" | "1-100" | "100-1000" | "1000+" | undefined>(undefined);
 
   // Initialize from saved preferences
   useEffect(() => {
@@ -50,12 +59,16 @@ export default function SitesPage() {
     id: string;
     name: string;
   } | null>(null);
+  const [transferTarget, setTransferTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   // Queries
   const sitesQuery = trpc.sites.list.useQuery({
     page,
     perPage: 12,
-    status: showArchived ? "ARCHIVED" : status,
+    status: showArchived ? "ARCHIVED" as const : status as "PUBLISHED" | "DRAFT" | "ARCHIVED" | undefined,
     sort: sort as
       | "lastEdited"
       | "name"
@@ -65,6 +78,11 @@ export default function SitesPage() {
       | "published",
     search: search || undefined,
     folderId: showArchived ? undefined : folderId,
+    createdBy,
+    dateRange,
+    templateUsed,
+    hasCustomDomain,
+    hasTraffic,
   });
 
   const foldersQuery = trpc.sites.folders.list.useQuery();
@@ -119,22 +137,73 @@ export default function SitesPage() {
     },
   });
 
-  // Selection handlers
-  const handleSelect = useCallback((id: string) => {
+  const moveMutation = trpc.sites.folders.moveSite.useMutation({
+    onSuccess: () => {
+      sitesQuery.refetch();
+      addToast("success", "Sites moved to folder");
+    },
+    onError: (err: { message: string }) => addToast("error", "Failed to move sites", err.message),
+  });
+
+  // Selection handler with shift+click range selection
+  const handleSelect = useCallback((id: string, event?: React.MouseEvent) => {
+    const sites = sitesQuery.data?.data ?? [];
+
+    if (event?.shiftKey && lastSelectedIdRef.current) {
+      const siteIds = sites.map((s) => s.id);
+      const lastIdx = siteIds.indexOf(lastSelectedIdRef.current);
+      const currentIdx = siteIds.indexOf(id);
+      if (lastIdx !== -1 && currentIdx !== -1) {
+        const start = Math.min(lastIdx, currentIdx);
+        const end = Math.max(lastIdx, currentIdx);
+        const rangeIds = siteIds.slice(start, end + 1);
+
+        setSelectedIds((prev) => {
+          const next = new Set(prev);
+          for (const rangeId of rangeIds) {
+            if (next.size >= BULK_SELECTION_CAP && !next.has(rangeId)) {
+              addToast("warning", `Selection capped at ${BULK_SELECTION_CAP} items`);
+              break;
+            }
+            next.add(rangeId);
+          }
+          return next;
+        });
+        lastSelectedIdRef.current = id;
+        return;
+      }
+    }
+
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        if (next.size >= BULK_SELECTION_CAP) {
+          addToast("warning", `Selection capped at ${BULK_SELECTION_CAP} items`);
+          return prev;
+        }
+        next.add(id);
+      }
       return next;
     });
-  }, []);
+    lastSelectedIdRef.current = id;
+  }, [sitesQuery.data, addToast]);
 
   const handleSelectAll = useCallback(() => {
     if (!sitesQuery.data) return;
     const allIds = sitesQuery.data.data.map((s) => s.id);
     const allSelected = allIds.every((id) => selectedIds.has(id));
-    setSelectedIds(allSelected ? new Set() : new Set(allIds));
-  }, [sitesQuery.data, selectedIds]);
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      const capped = allIds.slice(0, BULK_SELECTION_CAP);
+      if (allIds.length > BULK_SELECTION_CAP) {
+        addToast("warning", `Selection capped at ${BULK_SELECTION_CAP} items`);
+      }
+      setSelectedIds(new Set(capped));
+    }
+  }, [sitesQuery.data, selectedIds, addToast]);
 
   // Context menu action handler
   const handleSiteAction = useCallback(
@@ -159,6 +228,9 @@ export default function SitesPage() {
         case "delete":
           if (site) setDeleteTarget({ id: siteId, name: site.name });
           break;
+        case "transfer":
+          if (site) setTransferTarget({ id: siteId, name: site.name });
+          break;
         case "copyUrl":
           if (site) {
             navigator.clipboard.writeText(`${site.slug}.buildrik.app`);
@@ -175,8 +247,15 @@ export default function SitesPage() {
 
   // Bulk action handler
   const handleBulkAction = useCallback(
-    (action: string) => {
+    (action: string, folderId?: string) => {
       const ids = Array.from(selectedIds);
+      if (action === "move" && folderId) {
+        for (const siteId of ids) {
+          moveMutation.mutate({ siteId, folderId });
+        }
+        setSelectedIds(new Set());
+        return;
+      }
       if (action === "delete" || action === "publish" || action === "unpublish" || action === "archive" || action === "unarchive") {
         bulkMutation.mutate({
           action: action as "archive" | "delete" | "unarchive" | "publish" | "unpublish",
@@ -184,7 +263,7 @@ export default function SitesPage() {
         });
       }
     },
-    [selectedIds, bulkMutation]
+    [selectedIds, bulkMutation, moveMutation]
   );
 
   // Folder tabs
@@ -200,6 +279,11 @@ export default function SitesPage() {
       count: f._count?.sites ?? 0,
     })) ?? []),
   ];
+
+  const folders = (foldersQuery.data ?? []).map((f: { id: string; name: string }) => ({
+    id: f.id,
+    name: f.name,
+  }));
 
   const sites = sitesQuery.data?.data ?? [];
   const allSelected =
@@ -269,6 +353,16 @@ export default function SitesPage() {
             setPage(1);
             updatePrefs.mutate({ siteViewSort: val });
           }}
+          createdBy={createdBy}
+          onCreatedByChange={(val) => { setCreatedBy(val); setPage(1); }}
+          dateRange={dateRange}
+          onDateRangeChange={(val) => { setDateRange(val); setPage(1); }}
+          templateUsed={templateUsed}
+          onTemplateUsedChange={(val) => { setTemplateUsed(val); setPage(1); }}
+          hasCustomDomain={hasCustomDomain}
+          onHasCustomDomainChange={(val) => { setHasCustomDomain(val); setPage(1); }}
+          hasTraffic={hasTraffic}
+          onHasTrafficChange={(val) => { setHasTraffic(val); setPage(1); }}
         />
       </div>
 
@@ -368,6 +462,7 @@ export default function SitesPage() {
         selectedCount={selectedIds.size}
         onAction={handleBulkAction}
         onClear={() => setSelectedIds(new Set())}
+        folders={folders}
       />
 
       {/* Modals */}
@@ -404,6 +499,15 @@ export default function SitesPage() {
               confirmName: name,
             })
           }
+        />
+      )}
+
+      {transferTarget && (
+        <TransferModal
+          open={true}
+          siteId={transferTarget.id}
+          siteName={transferTarget.name}
+          onClose={() => setTransferTarget(null)}
         />
       )}
     </div>

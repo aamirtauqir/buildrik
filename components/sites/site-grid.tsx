@@ -2,9 +2,9 @@
 import { SiteCardFull } from "./site-card-full";
 
 interface SiteGridProps {
-  sites: Array<{ id: string; name: string; slug: string; status: string; thumbnail: string | null; pages: number; lastEditedAt: Date; publishedUrl: string | null }>;
+  sites: Array<{ id: string; name: string; slug: string; status: string; thumbnail: string | null; pages: number; lastEditedAt: Date; publishedUrl: string | null; visitors30d: number; createdBy: string; domain: string | null }>;
   selectedIds: Set<string>;
-  onSelect: (id: string) => void;
+  onSelect: (id: string, event?: React.MouseEvent) => void;
   onAction: (action: string, siteId: string) => void;
 }
 

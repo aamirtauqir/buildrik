@@ -1,5 +1,6 @@
 "use client";
-import { Send, EyeOff, Archive, FolderInput, Trash2, Download, X } from "lucide-react";
+import { useState } from "react";
+import { Send, EyeOff, Archive, FolderInput, Trash2, Download, X, ChevronDown } from "lucide-react";
 
 export const BULK_ACTIONS = [
   { label: "Publish All", action: "publish", icon: "Send" },
@@ -10,16 +11,27 @@ export const BULK_ACTIONS = [
   { label: "Export All", action: "export", icon: "Download" },
 ] as const;
 
+export const BULK_SELECTION_CAP = 25;
+
 const iconMap = { Send, EyeOff, Archive, FolderInput, Trash2, Download } as const;
+
+interface Folder {
+  id: string;
+  name: string;
+}
 
 interface BulkActionBarProps {
   selectedCount: number;
-  onAction: (action: string) => void;
+  onAction: (action: string, folderId?: string) => void;
   onClear: () => void;
+  folders?: Folder[];
 }
 
-export function BulkActionBar({ selectedCount, onAction, onClear }: BulkActionBarProps) {
+export function BulkActionBar({ selectedCount, onAction, onClear, folders = [] }: BulkActionBarProps) {
+  const [folderDropdownOpen, setFolderDropdownOpen] = useState(false);
+
   if (selectedCount === 0) return null;
+
   return (
     <div className="fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-xl border bg-white px-4 py-2.5 shadow-xl" style={{ borderColor: "#E8E8E8" }}>
       <span className="text-sm font-medium" style={{ color: "#0D0D0D" }}>{selectedCount} selected</span>
@@ -27,10 +39,45 @@ export function BulkActionBar({ selectedCount, onAction, onClear }: BulkActionBa
       {BULK_ACTIONS.map((item) => {
         const Icon = iconMap[item.icon as keyof typeof iconMap];
         const isDestructive = item.action === "delete";
+        const isMove = item.action === "move";
         return (
-          <button key={item.action} onClick={() => onAction(item.action)} className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[#F4F4F4]" style={{ color: isDestructive ? "#E42313" : "#7A7A7A" }}>
-            <Icon className="h-3.5 w-3.5" />{item.label}
-          </button>
+          <div key={item.action} className="relative">
+            <button
+              onClick={() => {
+                if (isMove) {
+                  setFolderDropdownOpen(!folderDropdownOpen);
+                } else {
+                  onAction(item.action);
+                }
+              }}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[#F4F4F4]"
+              style={{ color: isDestructive ? "#E42313" : "#7A7A7A" }}
+            >
+              <Icon className="h-3.5 w-3.5" />{item.label}
+              {isMove && <ChevronDown className="h-3 w-3" />}
+            </button>
+            {isMove && folderDropdownOpen && (
+              <div className="absolute bottom-full left-0 mb-2 w-48 rounded-lg border bg-white py-1 shadow-lg" style={{ borderColor: "#E8E8E8" }}>
+                {folders.length === 0 && (
+                  <p className="px-3 py-2 text-xs" style={{ color: "#7A7A7A" }}>No folders available</p>
+                )}
+                {folders.map((folder) => (
+                  <button
+                    key={folder.id}
+                    onClick={() => {
+                      onAction("move", folder.id);
+                      setFolderDropdownOpen(false);
+                    }}
+                    className="flex w-full items-center gap-2 px-3 py-1.5 text-xs transition-colors hover:bg-[#F4F4F4]"
+                    style={{ color: "#0D0D0D" }}
+                  >
+                    <FolderInput className="h-3.5 w-3.5" style={{ color: "#7A7A7A" }} />
+                    {folder.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         );
       })}
       <button onClick={onClear} className="ml-1 rounded p-1 hover:bg-[#F4F4F4]"><X className="h-4 w-4" style={{ color: "#7A7A7A" }} /></button>
