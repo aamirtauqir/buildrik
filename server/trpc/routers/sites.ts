@@ -19,10 +19,18 @@ import {
   moveSiteToFolder,
 } from "@/server/services/folder.service";
 import {
+  runPrePublishChecks,
+  startPublish,
+  getPublishStatus,
+  cancelPublish,
+  unpublishSite,
+} from "@/server/services/publish.service";
+import {
   listSitesSchema,
   createSiteSchema,
   bulkActionSchema,
 } from "@/lib/validations/sites";
+import { prePublishCheckSchema } from "@/lib/validations/publish";
 
 async function getWorkspaceId(ctx: {
   prisma: { workspaceMember: { findFirst: Function } };
@@ -122,6 +130,57 @@ export const sitesRouter = router({
     .mutation(async ({ ctx, input }) => {
       const workspaceId = await getWorkspaceId(ctx);
       return bulkAction(workspaceId, input);
+    }),
+
+  prePublishChecks: protectedProcedure
+    .input(prePublishCheckSchema)
+    .query(async ({ input }) => {
+      return runPrePublishChecks(input.siteId);
+    }),
+
+  publish: protectedProcedure
+    .input(z.object({ siteId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const workspaceId = await getWorkspaceId(ctx);
+      try {
+        return await startPublish(input.siteId, workspaceId, ctx.session.user.id);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "ALREADY_PUBLISHING")
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "A publish job is already in progress.",
+          });
+        throw e;
+      }
+    }),
+
+  publishStatus: protectedProcedure
+    .input(z.object({ jobId: z.string() }))
+    .query(async ({ input }) => {
+      const job = await getPublishStatus(input.jobId);
+      if (!job) throw new TRPCError({ code: "NOT_FOUND" });
+      return job;
+    }),
+
+  cancelPublish: protectedProcedure
+    .input(z.object({ jobId: z.string() }))
+    .mutation(async ({ input }) => {
+      try {
+        return await cancelPublish(input.jobId);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "NOT_CANCELLABLE")
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "This job cannot be cancelled.",
+          });
+        throw e;
+      }
+    }),
+
+  unpublish: protectedProcedure
+    .input(z.object({ siteId: z.string() }))
+    .mutation(async ({ input }) => {
+      return unpublishSite(input.siteId);
     }),
 
   folders: router({
