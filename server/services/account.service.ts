@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import type { UpdateProfileInput, NotificationPrefInput } from "@/lib/validations/account";
+import type { UpdateProfileInput, NotificationPrefInput, UpdatePreferencesInput } from "@/lib/validations/account";
 
 export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -111,6 +111,25 @@ export async function requestDataExport(userId: string) {
       userId,
       status: "PENDING",
     },
+  });
+}
+
+export async function getPreferences(userId: string) {
+  const prefs = await prisma.userPreference.findUnique({ where: { userId } });
+  return prefs ?? {
+    siteViewMode: "grid",
+    siteViewSort: null,
+    analyticsRange: "7d",
+    theme: "light",
+    locale: null,
+  };
+}
+
+export async function updatePreferences(userId: string, data: UpdatePreferencesInput) {
+  return prisma.userPreference.upsert({
+    where: { userId },
+    create: { userId, ...data },
+    update: data,
   });
 }
 

@@ -43,8 +43,17 @@ export const deleteAccountSchema = z.object({
   reason: z.string().max(500).optional(),
 });
 
+export const updatePreferencesSchema = z.object({
+  siteViewMode: z.enum(["grid", "list"]).optional(),
+  siteViewSort: z.string().optional(),
+  analyticsRange: z.enum(["7d", "30d", "90d"]).optional(),
+  theme: z.enum(["light"]).optional(),
+  locale: z.string().optional(),
+});
+
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type UpdateWorkspaceInput = z.infer<typeof updateWorkspaceSchema>;
 export type AddIntegrationInput = z.infer<typeof addIntegrationSchema>;
 export type NotificationPrefInput = z.infer<typeof notificationPrefSchema>;
+export type UpdatePreferencesInput = z.infer<typeof updatePreferencesSchema>;

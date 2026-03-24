@@ -5,10 +5,11 @@ import {
   getProfile, updateProfile, changePassword, getActiveSessions, revokeSession,
   revokeAllOtherSessions, getLoginHistory, getNotificationPrefs,
   updateNotificationPref, requestAccountDeletion, requestDataExport, getAICreditsInfo,
+  getPreferences, updatePreferences,
 } from "@/server/services/account.service";
 import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings } from "@/server/services/workspace-settings.service";
 import { listIntegrations, addIntegration, removeIntegration } from "@/server/services/integrations.service";
-import { updateProfileSchema, changePasswordSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema } from "@/lib/validations/account";
+import { updateProfileSchema, changePasswordSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema } from "@/lib/validations/account";
 
 async function getWorkspaceCtx(ctx: any): Promise<{ workspaceId: string; plan: string }> {
   const member = await ctx.prisma.workspaceMember.findFirst({
@@ -43,6 +44,12 @@ export const accountRouter = router({
   notifications: router({
     list: protectedProcedure.query(({ ctx }) => getNotificationPrefs(ctx.session.user.id)),
     update: protectedProcedure.input(notificationPrefSchema).mutation(({ ctx, input }) => updateNotificationPref(ctx.session.user.id, input)),
+  }),
+  preferences: router({
+    get: protectedProcedure.query(({ ctx }) => getPreferences(ctx.session.user.id)),
+    update: protectedProcedure
+      .input(updatePreferencesSchema)
+      .mutation(({ ctx, input }) => updatePreferences(ctx.session.user.id, input)),
   }),
   workspace: router({
     get: protectedProcedure.query(async ({ ctx }) => {
