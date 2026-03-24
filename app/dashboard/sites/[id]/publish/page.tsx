@@ -1,14 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { PrePublishChecks } from "@/components/publish/pre-publish-checks";
 import { PublishProgress } from "@/components/publish/publish-progress";
 import { PublishSuccess } from "@/components/publish/publish-success";
-import { PUBLISH_STEPS } from "@/components/publish/publish-progress";
 
-type Phase = "checks" | "publishing" | "success";
+type Phase = "checks" | "publishing" | "success" | "error";
 
 export default function PublishPage() {
   const params = useParams();
@@ -16,7 +15,10 @@ export default function PublishPage() {
   const siteId = params.id as string;
   const [phase, setPhase] = useState<Phase>("checks");
   const [jobId, setJobId] = useState<string | null>(null);
+  const [publishError, setPublishError] = useState<string | null>(null);
 
+  const site = trpc.sites.get.useQuery({ id: siteId });
+  const domains = trpc.siteDetail.domains.list.useQuery({ siteId });
   const checks = trpc.sites.prePublishChecks.useQuery(
     { siteId },
     { enabled: phase === "checks" }
@@ -26,43 +28,35 @@ export default function PublishPage() {
     onSuccess(data) {
       setJobId(data.id);
       setPhase("publishing");
+      setPublishError(null);
+    },
+    onError(err) {
+      setPublishError(err.message);
+      setPhase("error");
     },
   });
-
-  const cancelMutation = trpc.sites.cancelPublish.useMutation({
-    onSuccess() {
-      setPhase("checks");
-      setJobId(null);
-    },
-  });
-
-  const status = trpc.sites.publishStatus.useQuery(
-    { jobId: jobId! },
-    {
-      enabled: phase === "publishing" && !!jobId,
-      refetchInterval: 2000,
-      refetchIntervalInBackground: false,
-    }
-  );
-
-  const isComplete = status.data?.status === "COMPLETED";
-  if (isComplete && phase === "publishing") {
-    setPhase("success");
-  }
 
   function handlePublish() {
     publishMutation.mutate({ siteId });
   }
 
+  const handleComplete = useCallback(() => {
+    setPhase("success");
+  }, []);
+
   function handleCancelPublish() {
-    if (jobId) cancelMutation.mutate({ jobId });
+    setPhase("checks");
+    setJobId(null);
   }
 
-  function currentStep(): number {
-    if (!status.data) return 0;
-    const progress = status.data.progress;
-    return Math.min(Math.floor((progress / 100) * PUBLISH_STEPS.length), PUBLISH_STEPS.length - 1);
+  function handleRetryFromError() {
+    setPublishError(null);
+    setPhase("checks");
   }
+
+  // Derive domain from site data
+  const slug = site.data?.slug ?? "";
+  const customDomain = domains.data?.find((d) => d.status === "VERIFIED")?.domain ?? null;
 
   if (phase === "checks") {
     if (checks.isLoading) {
@@ -76,20 +70,38 @@ export default function PublishPage() {
     return (
       <PrePublishChecks
         checks={checks.data}
-        onPublish={() => handlePublish()}
+        onPublish={handlePublish}
         onCancel={() => router.back()}
       />
     );
   }
 
-  if (phase === "publishing") {
+  if (phase === "publishing" && jobId) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <PublishProgress
-          progress={status.data?.progress ?? 0}
-          currentStep={currentStep()}
+          jobId={jobId}
+          onComplete={handleComplete}
           onCancel={handleCancelPublish}
         />
+      </div>
+    );
+  }
+
+  if (phase === "error") {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <div className="mx-auto max-w-lg text-center">
+          <p className="text-sm font-semibold" style={{ color: "#E42313" }}>Publish Error</p>
+          <p className="mt-2 text-sm" style={{ color: "#7A7A7A" }}>{publishError ?? "Something went wrong."}</p>
+          <button
+            onClick={handleRetryFromError}
+            className="mt-4 rounded-xl px-4 py-2.5 text-sm font-semibold text-white"
+            style={{ backgroundColor: "#E42313" }}
+          >
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }
@@ -98,8 +110,8 @@ export default function PublishPage() {
     <div className="flex min-h-[400px] items-center justify-center">
       <PublishSuccess
         siteId={siteId}
-        publicUrl={status.data?.deploymentId ? `https://${status.data.deploymentId}.buildrik.com` : ""}
-        lighthouseScore={null}
+        slug={slug}
+        customDomain={customDomain}
       />
     </div>
   );
