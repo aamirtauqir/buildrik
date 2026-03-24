@@ -4,6 +4,21 @@ import VerifyEmail from "@/emails/verify-email";
 import ResetPassword from "@/emails/reset-password";
 import MagicLink from "@/emails/magic-link";
 import TeamInvite from "@/emails/team-invite";
+import EmailChanged from "@/emails/email-changed";
+import PaymentFailed from "@/emails/payment-failed";
+import DunningReminder from "@/emails/dunning-reminder";
+import AutoDowngrade from "@/emails/auto-downgrade";
+import ExportReady from "@/emails/export-ready";
+import AccountDeletion from "@/emails/account-deletion";
+import AiComplete from "@/emails/ai-complete";
+import AiFailed from "@/emails/ai-failed";
+import WsTransferOut from "@/emails/ws-transfer-out";
+import WsTransferIn from "@/emails/ws-transfer-in";
+import SslExpiring from "@/emails/ssl-expiring";
+import PlanLimitWarning from "@/emails/plan-limit-warning";
+import WsTransferInvite from "@/emails/ws-transfer-invite";
+import FormSubmission from "@/emails/form-submission";
+import SiteTransferred from "@/emails/site-transferred";
 
 let _transport: nodemailer.Transporter | null = null;
 function getTransport() {
@@ -54,4 +69,84 @@ export async function sendTeamInviteEmail(
     workspaceName,
   }));
   await sendEmail(to, `${inviterName} invited you to ${workspaceName} — Buildrik`, html);
+}
+
+export async function sendEmailChangedEmail(to: string, token: string) {
+  const html = await render(EmailChanged({ verifyUrl: `${BASE_URL}/auth/verify-email?token=${encodeURIComponent(token)}` }));
+  await sendEmail(to, "Verify your new email — Buildrik", html);
+}
+
+export async function sendPaymentFailedEmail(to: string) {
+  const html = await render(PaymentFailed({ updateUrl: `${BASE_URL}/settings/billing` }));
+  await sendEmail(to, "Your payment failed — Buildrik", html);
+}
+
+export async function sendDunningReminderEmail(to: string, daysLeft: number) {
+  const html = await render(DunningReminder({ daysLeft, updateUrl: `${BASE_URL}/settings/billing` }));
+  await sendEmail(to, `${daysLeft} days until downgrade — Buildrik`, html);
+}
+
+export async function sendAutoDowngradeEmail(to: string) {
+  const html = await render(AutoDowngrade({ reactivateUrl: `${BASE_URL}/settings/billing` }));
+  await sendEmail(to, "Your plan has been downgraded — Buildrik", html);
+}
+
+export async function sendExportReadyEmail(to: string, downloadUrl: string) {
+  const html = await render(ExportReady({ downloadUrl }));
+  await sendEmail(to, "Your data export is ready — Buildrik", html);
+}
+
+export async function sendAccountDeletionEmail(to: string, deletionDate: string) {
+  const html = await render(AccountDeletion({ deletionDate, cancelUrl: `${BASE_URL}/settings/danger-zone` }));
+  await sendEmail(to, "Account deletion scheduled — Buildrik", html);
+}
+
+export async function sendAICompleteEmail(to: string, siteName: string, siteId: string) {
+  const html = await render(AiComplete({ siteName, viewUrl: `${BASE_URL}/sites/${encodeURIComponent(siteId)}` }));
+  await sendEmail(to, `Your site "${siteName}" is ready — Buildrik`, html);
+}
+
+export async function sendAIFailedEmail(to: string) {
+  const html = await render(AiFailed({ retryUrl: `${BASE_URL}/sites/new` }));
+  await sendEmail(to, "Site generation failed — Buildrik", html);
+}
+
+export async function sendWSTransferOutEmail(to: string, workspaceName: string, newOwnerEmail: string) {
+  const html = await render(WsTransferOut({ workspaceName, newOwnerEmail }));
+  await sendEmail(to, `Workspace transfer initiated — Buildrik`, html);
+}
+
+export async function sendWSTransferInEmail(to: string, workspaceName: string) {
+  const html = await render(WsTransferIn({ workspaceName, manageUrl: `${BASE_URL}/settings/workspace` }));
+  await sendEmail(to, `You now own "${workspaceName}" — Buildrik`, html);
+}
+
+export async function sendSSLExpiringEmail(to: string, domain: string, domainId: string) {
+  const html = await render(SslExpiring({ domain, renewUrl: `${BASE_URL}/domains/${encodeURIComponent(domainId)}` }));
+  await sendEmail(to, `SSL certificate expiring for ${domain} — Buildrik`, html);
+}
+
+export async function sendPlanLimitWarningEmail(to: string, resource: string) {
+  const html = await render(PlanLimitWarning({ resource, upgradeUrl: `${BASE_URL}/settings/billing` }));
+  await sendEmail(to, `You're approaching your ${resource} limit — Buildrik`, html);
+}
+
+export async function sendWSTransferInviteEmail(to: string, workspaceName: string, token: string) {
+  const html = await render(WsTransferInvite({ workspaceName, acceptUrl: `${BASE_URL}/transfer/accept?token=${encodeURIComponent(token)}` }));
+  await sendEmail(to, `Accept ownership of "${workspaceName}" — Buildrik`, html);
+}
+
+export async function sendFormSubmissionEmail(
+  to: string,
+  siteName: string,
+  fields: { label: string; value: string }[],
+  submissionId: string
+) {
+  const html = await render(FormSubmission({ siteName, fields, viewUrl: `${BASE_URL}/forms/${encodeURIComponent(submissionId)}` }));
+  await sendEmail(to, `New form submission on ${siteName} — Buildrik`, html);
+}
+
+export async function sendSiteTransferredEmail(to: string, fromName: string, siteName: string, siteId: string) {
+  const html = await render(SiteTransferred({ fromName, siteName, viewUrl: `${BASE_URL}/sites/${encodeURIComponent(siteId)}` }));
+  await sendEmail(to, `Site "${siteName}" transferred to you — Buildrik`, html);
 }
