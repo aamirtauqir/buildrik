@@ -11,11 +11,16 @@ export async function getSiteSettings(siteId: string) {
       headCode: true,
       bodyCode: true,
       socialLinks: true,
+      publishedPassword: true,
+      touchIcon: true,
+      workspace: { select: { plan: true } },
     },
   });
 
   if (!site) throw new Error("SITE_NOT_FOUND");
-  return site;
+
+  const { workspace, ...rest } = site;
+  return { ...rest, plan: workspace.plan };
 }
 
 export async function updateSiteSettings(
@@ -29,6 +34,8 @@ export async function updateSiteSettings(
     headCode?: string;
     bodyCode?: string;
     socialLinks?: Record<string, string>;
+    publishedPassword?: string | null;
+    touchIcon?: string | null;
   }
 ) {
   return prisma.site.update({

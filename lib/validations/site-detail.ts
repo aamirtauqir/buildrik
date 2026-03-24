@@ -49,6 +49,8 @@ export const updateSiteSettingsSchema = z.object({
   headCode: z.string().max(10240).optional(),
   bodyCode: z.string().max(10240).optional(),
   socialLinks: z.record(z.string()).optional(),
+  publishedPassword: z.string().nullable().optional(),
+  touchIcon: z.string().nullable().optional(),
 });
 
 export const createRedirectSchema = z.object({
