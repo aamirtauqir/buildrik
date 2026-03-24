@@ -138,6 +138,7 @@ export function StatCard({ title, value, subtitle, href, trend, visual }: StatCa
   return (
     <Link
       href={href}
+      aria-label={`View ${title} details`}
       className="block rounded-xl border border-[#E8E8E8] bg-white p-5 hover:border-[#E42313]/30 transition-colors"
     >
       <div className="flex items-start justify-between">

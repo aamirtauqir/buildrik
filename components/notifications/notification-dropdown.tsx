@@ -51,7 +51,7 @@ export function NotificationDropdown() {
         onClick={() => setOpen((o) => !o)}
         className="relative rounded-lg p-2 transition-colors hover:bg-[#F4F4F4]"
         style={{ color: "#7A7A7A" }}
-        aria-label="Notifications"
+        aria-label={`Notifications${(unreadCount ?? 0) > 0 ? ` (${unreadCount} unread)` : ""}`}
       >
         <Bell className="h-5 w-5" />
         {(unreadCount ?? 0) > 0 && (

@@ -42,6 +42,7 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-auth-text-placeholder hover:text-auth-text-secondary"
+              aria-label="Toggle password visibility"
               tabIndex={-1}
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}

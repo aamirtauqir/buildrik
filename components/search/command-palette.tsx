@@ -346,6 +346,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             }}
             onKeyDown={handleKeyDown}
             placeholder="Search or jump to..."
+            aria-label="Search Buildrik"
             className="flex-1 border-0 bg-transparent py-3 text-sm outline-none"
             style={{ color: "#0D0D0D" }}
           />

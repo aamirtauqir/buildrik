@@ -57,6 +57,7 @@ export function OTPInput({ length = 6, value, onChange }: OTPInputProps) {
           inputMode="numeric"
           maxLength={1}
           value={digits[i] || ""}
+          aria-label={`Digit ${i + 1} of verification code`}
           onChange={(e) => handleChange(i, e.target.value)}
           onKeyDown={(e) => handleKeyDown(i, e)}
           className={cn(
