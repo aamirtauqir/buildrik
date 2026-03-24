@@ -36,6 +36,22 @@ export const bulkActionSchema = z.object({
   siteIds: z.array(z.string()).min(1).max(25),
 });
 
+export const transferSiteSchema = z.object({
+  siteId: z.string(),
+  newOwnerId: z.string(),
+});
+
+export const checkSlugSchema = z.object({
+  slug: z
+    .string()
+    .min(3)
+    .max(50)
+    .regex(
+      /^[a-z0-9-]+$/,
+      "Slug must be lowercase alphanumeric with hyphens"
+    ),
+});
+
 export type CreateSiteInput = z.infer<typeof createSiteSchema>;
 export type ListSitesInput = z.infer<typeof listSitesSchema>;
 export type BulkActionInput = z.infer<typeof bulkActionSchema>;

@@ -14,16 +14,13 @@ function slugify(name: string): string {
     .replace(/-{2,}/g, "-");
 }
 
-async function generateUniqueSlug(
-  name: string,
-  workspaceId: string
-): Promise<string> {
+async function generateUniqueSlug(name: string): Promise<string> {
   const base = slugify(name);
   let candidate = base;
 
   for (let i = 0; i < 10; i++) {
     const existing = await prisma.site.findFirst({
-      where: { slug: candidate, workspaceId },
+      where: { slug: candidate },
     });
     if (!existing) return candidate;
     candidate = `${base}-${i + 2}`;
@@ -110,7 +107,7 @@ export async function createSite(
     throw new Error("SITE_LIMIT");
   }
 
-  const slug = await generateUniqueSlug(input.name, workspaceId);
+  const slug = await generateUniqueSlug(input.name);
 
   return prisma.site.create({
     data: {
@@ -123,6 +120,54 @@ export async function createSite(
       lastEditedAt: new Date(),
     },
   });
+}
+
+export async function checkSlugAvailability(slug: string): Promise<boolean> {
+  const existing = await prisma.site.findFirst({ where: { slug } });
+  return !existing;
+}
+
+export async function transferSite(
+  siteId: string,
+  newOwnerId: string,
+  currentUserId: string
+) {
+  const site = await prisma.site.findUnique({ where: { id: siteId } });
+  if (!site) throw new Error("SITE_NOT_FOUND");
+  if (site.createdBy !== currentUserId) throw new Error("NOT_OWNER");
+
+  const currentMember = await prisma.workspaceMember.findFirst({
+    where: { userId: currentUserId, workspaceId: site.workspaceId },
+  });
+  const newOwnerMember = await prisma.workspaceMember.findFirst({
+    where: { userId: newOwnerId, workspaceId: site.workspaceId },
+  });
+  if (!newOwnerMember) throw new Error("MEMBER_NOT_FOUND");
+
+  await prisma.$transaction([
+    prisma.site.update({
+      where: { id: siteId },
+      data: { createdBy: newOwnerId },
+    }),
+    ...(currentMember
+      ? [
+          prisma.sitePermission.upsert({
+            where: {
+              memberId_siteId: { memberId: currentMember.id, siteId },
+            },
+            create: {
+              memberId: currentMember.id,
+              siteId,
+              roleOverride: "EDITOR",
+              grantedBy: currentUserId,
+            },
+            update: { roleOverride: "EDITOR" },
+          }),
+        ]
+      : []),
+  ]);
+
+  return { success: true };
 }
 
 export async function getSite(siteId: string) {
@@ -164,7 +209,7 @@ export async function duplicateSite(
   }
 
   const copyName = `${original.name} (Copy)`;
-  const slug = await generateUniqueSlug(copyName, workspaceId);
+  const slug = await generateUniqueSlug(copyName);
 
   return prisma.site.create({
     data: {

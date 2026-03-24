@@ -11,12 +11,15 @@ import {
   unarchiveSite,
   deleteSite,
   bulkAction,
+  checkSlugAvailability,
+  transferSite,
 } from "@/server/services/sites.service";
 import {
   listFolders,
   createFolder,
   deleteFolder,
   moveSiteToFolder,
+  renameFolder,
 } from "@/server/services/folder.service";
 import {
   runPrePublishChecks,
@@ -29,6 +32,8 @@ import {
   listSitesSchema,
   createSiteSchema,
   bulkActionSchema,
+  transferSiteSchema,
+  checkSlugSchema,
 } from "@/lib/validations/sites";
 import { prePublishCheckSchema } from "@/lib/validations/publish";
 
@@ -132,6 +137,36 @@ export const sitesRouter = router({
       return bulkAction(workspaceId, input);
     }),
 
+  checkSlug: protectedProcedure
+    .input(checkSlugSchema)
+    .query(async ({ input }) => ({
+      available: await checkSlugAvailability(input.slug),
+    })),
+
+  transfer: protectedProcedure
+    .input(transferSiteSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        return await transferSite(
+          input.siteId,
+          input.newOwnerId,
+          ctx.session.user.id
+        );
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "NOT_OWNER")
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only the site owner can transfer.",
+          });
+        if (e instanceof Error && e.message === "MEMBER_NOT_FOUND")
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Member not found in workspace.",
+          });
+        throw e;
+      }
+    }),
+
   prePublishChecks: protectedProcedure
     .input(prePublishCheckSchema)
     .query(async ({ input }) => {
@@ -208,6 +243,10 @@ export const sitesRouter = router({
     delete: protectedProcedure
       .input(z.object({ id: z.string() }))
       .mutation(async ({ input }) => deleteFolder(input.id)),
+
+    rename: protectedProcedure
+      .input(z.object({ id: z.string(), name: z.string().min(1).max(50) }))
+      .mutation(async ({ input }) => renameFolder(input.id, input.name)),
 
     moveSite: protectedProcedure
       .input(

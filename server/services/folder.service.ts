@@ -31,6 +31,10 @@ export async function deleteFolder(folderId: string) {
   return prisma.folder.delete({ where: { id: folderId } });
 }
 
+export async function renameFolder(folderId: string, name: string) {
+  return prisma.folder.update({ where: { id: folderId }, data: { name } });
+}
+
 export async function moveSiteToFolder(
   siteId: string,
   folderId: string | null
