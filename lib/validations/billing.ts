@@ -34,15 +34,17 @@ export const upgradeSchema = z.object({
   interval: z.enum(["MONTHLY", "YEARLY"]),
 });
 
+export const cancelReasonSchema = z.enum([
+  "TOO_EXPENSIVE",
+  "MISSING_FEATURES",
+  "SWITCHING",
+  "NOT_USING",
+  "TEMPORARY",
+  "OTHER",
+]);
+
 export const cancelSchema = z.object({
-  reason: z.enum([
-    "TOO_EXPENSIVE",
-    "MISSING_FEATURES",
-    "SWITCHING",
-    "NOT_USING",
-    "TEMPORARY",
-    "OTHER",
-  ]),
+  reason: cancelReasonSchema,
   feedback: z.string().max(500).optional(),
 });
 

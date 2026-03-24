@@ -166,6 +166,9 @@ export async function upgradePlan(workspaceId: string, input: UpgradeInput) {
   const priceKey = `${input.planId}_${input.interval}`;
   const price = PRICE_MAP[priceKey];
 
+  // TODO: Replace with real Stripe API when stripe@^17 is installed:
+  // const customer = workspace.stripeCustomerId ?? await createStripeCustomer(workspace);
+  // const subscription = await stripe.subscriptions.create({ customer, items: [{ price: stripePriceId }] });
   const subscription = await prisma.subscription.create({
     data: {
       workspaceId,
@@ -203,6 +206,7 @@ export async function cancelSubscription(
     throw new Error("ALREADY_CANCELLED");
   }
 
+  // TODO: await stripe.subscriptions.update(subscription.stripeSubscriptionId, { cancel_at_period_end: true });
   return prisma.subscription.update({
     where: { workspaceId },
     data: {
@@ -226,6 +230,7 @@ export async function reactivateSubscription(workspaceId: string) {
     throw new Error("NOT_CANCELLED");
   }
 
+  // TODO: await stripe.subscriptions.update(subscription.stripeSubscriptionId, { cancel_at_period_end: false });
   return prisma.subscription.update({
     where: { workspaceId },
     data: {
