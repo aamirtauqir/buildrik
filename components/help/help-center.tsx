@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, Rocket, Globe, Users, CreditCard, Link, Pencil, MessageCircle, Mail, Printer } from "lucide-react";
 import { HELP_CATEGORIES } from "@/lib/validations/help";
 
@@ -36,9 +36,22 @@ interface HelpCenterProps {
 
 export function HelpCenter({ onSearch, onContactLiveChat, onContactEmail, searchQuery = "" }: HelpCenterProps) {
   const [query, setQuery] = useState(searchQuery);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!query.trim()) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      onSearch(query.trim());
+    }, 300);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [query, onSearch]);
 
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     if (query.trim()) onSearch(query.trim());
   }
 

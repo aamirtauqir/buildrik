@@ -1,29 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { trpc } from "@/lib/trpc/client";
 import { HelpCenter } from "@/components/help/help-center";
 import { ArticleList } from "@/components/help/article-list";
 import { TicketForm } from "@/components/help/ticket-form";
 import { useToast } from "@/components/dashboard/toast-provider";
-import type { HelpArticleData } from "@/lib/validations/help";
 
-type View = "home" | "search" | "ticket" | "article";
+type View = "home" | "search" | "ticket";
 
 export default function HelpPage() {
   const { addToast } = useToast();
   const [view, setView] = useState<View>("home");
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeSlug, setActiveSlug] = useState("");
 
   const searchResults = trpc.help.search.useQuery(
     { query: searchQuery },
     { enabled: view === "search" && searchQuery.length > 0 }
-  );
-
-  const articleQuery = trpc.help.article.useQuery(
-    { slug: activeSlug },
-    { enabled: view === "article" && activeSlug.length > 0 }
   );
 
   const createTicketMutation = trpc.help.createTicket.useMutation({
@@ -34,60 +27,10 @@ export default function HelpPage() {
     onError: (err) => addToast("error", "Failed to submit ticket", err.message),
   });
 
-  function handleSearch(query: string) {
+  const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
     setView("search");
-  }
-
-  function handleArticleSelect(article: HelpArticleData) {
-    setActiveSlug(article.slug);
-    setView("article");
-  }
-
-  if (view === "article") {
-    const article = articleQuery.data;
-    return (
-      <div>
-        <div className="mb-6 flex items-center gap-3">
-          <button
-            onClick={() => setView("home")}
-            className="text-sm transition-colors hover:underline"
-            style={{ color: "#7A7A7A" }}
-          >
-            Help Center
-          </button>
-          <span style={{ color: "#E8E8E8" }}>/</span>
-          <span className="text-sm font-medium" style={{ color: "#0D0D0D" }}>{article?.title ?? "Loading..."}</span>
-        </div>
-        {articleQuery.isLoading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-6 animate-pulse rounded" style={{ backgroundColor: "#F4F4F4" }} />
-            ))}
-          </div>
-        ) : articleQuery.error ? (
-          <p className="text-sm" style={{ color: "#E42313" }}>Article not found.</p>
-        ) : article ? (
-          <div>
-            <h1 className="mb-2 text-[22px] font-bold" style={{ color: "#0D0D0D" }}>{article.title}</h1>
-            {article.readTime > 0 && (
-              <p className="mb-6 text-xs" style={{ color: "#B0B0B0" }}>{article.readTime} min read</p>
-            )}
-            <p className="text-sm leading-relaxed" style={{ color: "#4A4A4A" }}>
-              {(article as any).content ?? article.excerpt ?? ""}
-            </p>
-          </div>
-        ) : null}
-        <button
-          onClick={() => setView("home")}
-          className="mt-6 text-sm transition-colors hover:underline"
-          style={{ color: "#E42313" }}
-        >
-          Back to Help Center
-        </button>
-      </div>
-    );
-  }
+  }, []);
 
   if (view === "ticket") {
     return (
@@ -136,10 +79,7 @@ export default function HelpPage() {
             ))}
           </div>
         ) : (
-          <ArticleList
-            articles={searchResults.data ?? []}
-            onSelect={handleArticleSelect}
-          />
+          <ArticleList articles={searchResults.data ?? []} />
         )}
         <button
           onClick={() => setView("home")}

@@ -1,14 +1,16 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Clock, BookOpen } from "lucide-react";
 import type { HelpArticleData } from "@/lib/validations/help";
 
 interface ArticleListProps {
   articles: HelpArticleData[];
-  onSelect?: (article: HelpArticleData) => void;
 }
 
-export function ArticleList({ articles, onSelect }: ArticleListProps) {
+export function ArticleList({ articles }: ArticleListProps) {
+  const router = useRouter();
+
   if (articles.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -24,7 +26,7 @@ export function ArticleList({ articles, onSelect }: ArticleListProps) {
       {articles.map((article) => (
         <button
           key={article.id}
-          onClick={() => onSelect?.(article)}
+          onClick={() => router.push(`/dashboard/help/${article.slug}`)}
           className="flex w-full flex-col gap-2 px-1 py-4 text-left transition-colors hover:bg-[#FFF5F4]"
         >
           <div className="flex items-start justify-between gap-3">
