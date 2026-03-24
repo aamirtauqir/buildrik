@@ -116,6 +116,8 @@ model Workspace {
   stripeCustomerId     String?   @unique
   deletionScheduledAt  DateTime?
   deletedAt            DateTime?
+  iconUrl              String?
+  accentColor          String?
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
@@ -268,6 +270,7 @@ model Invite {
   status      String   @default("PENDING")
   invitedBy   String
   siteIds     String[]
+  resendCount Int      @default(0)
   expiresAt   DateTime
   createdAt   DateTime @default(now())
 
