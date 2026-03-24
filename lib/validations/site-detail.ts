@@ -19,7 +19,18 @@ export const siteOverviewSchema = z.object({
     formSubmissions: z.number(),
     unreadSubmissions: z.number(),
     healthScore: z.number(),
+    healthBreakdown: z.object({
+      seo: z.number(),
+      content: z.number(),
+      ssl: z.number(),
+      favicon: z.number(),
+    }),
   }),
+  formBlocks: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    _count: z.object({ submissions: z.number() }),
+  })),
   recentActivity: z.array(z.object({
     id: z.string(),
     action: z.string(),

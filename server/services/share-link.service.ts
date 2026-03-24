@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
+import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
 export async function listShareLinks(siteId: string) {
   return prisma.shareLink.findMany({
@@ -12,6 +13,16 @@ export async function createShareLink(
   siteId: string,
   data: { name: string; password?: string; expiresInDays?: number }
 ) {
+  const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
+  if (!site) throw new Error("SITE_NOT_FOUND");
+  const ws = await prisma.workspace.findUnique({ where: { id: site.workspaceId }, select: { plan: true } });
+  const plan = (ws?.plan ?? "FREE") as PlanName;
+  const maxDays = PLAN_LIMITS[plan].shareLinkExpiryMaxDays as number;
+
+  if (data.expiresInDays && data.expiresInDays > maxDays) {
+    throw new Error("EXPIRY_EXCEEDS_PLAN");
+  }
+
   const token = crypto.randomUUID();
 
   let passwordHash: string | undefined;

@@ -1,7 +1,16 @@
 import { prisma } from "@/lib/prisma";
+import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
 type AnalyticsRange = "today" | "yesterday" | "7d" | "30d" | "90d";
 type AnalyticsGranularity = "hourly" | "daily" | "weekly" | "monthly";
+
+const RANGE_TO_DAYS: Record<AnalyticsRange, number> = {
+  today: 1,
+  yesterday: 1,
+  "7d": 7,
+  "30d": 30,
+  "90d": 90,
+};
 
 function computeDateRange(range: AnalyticsRange): { start: Date; end: Date } {
   const now = new Date();
@@ -32,11 +41,26 @@ function computeDateRange(range: AnalyticsRange): { start: Date; end: Date } {
   return { start, end };
 }
 
+function clampRange(range: AnalyticsRange, maxDays: number): AnalyticsRange {
+  const requested = RANGE_TO_DAYS[range];
+  if (requested <= maxDays) return range;
+  if (maxDays >= 90) return "90d";
+  if (maxDays >= 30) return "30d";
+  return "7d";
+}
+
 export async function getSiteAnalytics(
   siteId: string,
   query: { range: AnalyticsRange; granularity: AnalyticsGranularity }
 ) {
-  const { start, end } = computeDateRange(query.range);
+  const siteRecord = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
+  if (!siteRecord) throw new Error("SITE_NOT_FOUND");
+  const ws = await prisma.workspace.findUnique({ where: { id: siteRecord.workspaceId }, select: { plan: true } });
+  const plan = (ws?.plan ?? "FREE") as PlanName;
+  const maxDays = PLAN_LIMITS[plan].analyticsRetentionDays as number;
+
+  const clampedRange = clampRange(query.range, maxDays);
+  const { start, end } = computeDateRange(clampedRange);
 
   const [timeSeries, trafficSourcesRaw, countriesRaw] = await Promise.all([
     prisma.siteAnalytics.findMany({
@@ -66,6 +90,7 @@ export async function getSiteAnalytics(
   }));
 
   return {
+    clampedRange,
     timeSeries: timeSeries.map((row) => ({
       date: row.date,
       visitors: row.visitors,

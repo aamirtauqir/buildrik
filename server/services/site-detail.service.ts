@@ -14,6 +14,7 @@ export async function getSiteOverview(siteId: string): Promise<SiteOverview> {
       lastPublishedBy: true,
       createdAt: true,
       workspaceId: true,
+      touchIcon: true,
     },
   });
 
@@ -33,6 +34,10 @@ export async function getSiteOverview(siteId: string): Promise<SiteOverview> {
     formSubmissions,
     unreadSubmissions,
     recentActivity,
+    pagesWithSeo,
+    pagesWithContent,
+    sslDomain,
+    formBlocks,
   ] = await Promise.all([
     prisma.page.count({ where: { siteId } }),
     prisma.siteAnalytics.aggregate({
@@ -54,6 +59,17 @@ export async function getSiteOverview(siteId: string): Promise<SiteOverview> {
       take: 5,
       select: { id: true, action: true, description: true, createdAt: true },
     }),
+    prisma.page.count({
+      where: { siteId, seoTitle: { not: null }, seoDescription: { not: null } },
+    }),
+    prisma.page.count({
+      where: { siteId, NOT: { blocks: { equals: [] } } },
+    }),
+    prisma.domain.findFirst({ where: { siteId, sslStatus: "ACTIVE" } }),
+    prisma.formBlock.findMany({
+      where: { siteId, isActive: true },
+      select: { id: true, name: true, _count: { select: { submissions: true } } },
+    }),
   ]);
 
   const monthlyVisitors = currentMonthAgg._sum.visitors ?? 0;
@@ -62,12 +78,11 @@ export async function getSiteOverview(siteId: string): Promise<SiteOverview> {
     ? Math.round(((monthlyVisitors - previousVisitors) / previousVisitors) * 100)
     : 0;
 
-  const hasPages = totalPages > 0;
-  const hasPublished = site.status === "PUBLISHED";
-  const hasDomain = !!site.publishedUrl;
-  const healthScore = Math.round(
-    ((hasPages ? 40 : 0) + (hasPublished ? 30 : 0) + (hasDomain ? 30 : 0))
-  );
+  const seoScore = totalPages > 0 ? Math.round((pagesWithSeo / totalPages) * 100) : 0;
+  const contentScore = totalPages > 0 ? Math.round((pagesWithContent / totalPages) * 100) : 0;
+  const sslScore = sslDomain ? 100 : 0;
+  const faviconScore = site.touchIcon ? 100 : 0;
+  const healthScore = Math.round(seoScore * 0.3 + contentScore * 0.3 + sslScore * 0.2 + faviconScore * 0.2);
 
   return {
     site: {
@@ -88,7 +103,9 @@ export async function getSiteOverview(siteId: string): Promise<SiteOverview> {
       formSubmissions,
       unreadSubmissions,
       healthScore,
+      healthBreakdown: { seo: seoScore, content: contentScore, ssl: sslScore, favicon: faviconScore },
     },
+    formBlocks,
     recentActivity,
   };
 }
