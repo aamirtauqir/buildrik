@@ -353,10 +353,24 @@ export async function deleteSite(siteId: string, confirmName: string) {
     throw new Error("NAME_MISMATCH");
   }
 
-  return prisma.site.update({
-    where: { id: siteId },
-    data: { deletedAt: new Date() },
-  });
+  const now = new Date();
+
+  await prisma.$transaction([
+    prisma.site.update({
+      where: { id: siteId },
+      data: { deletedAt: now },
+    }),
+    prisma.shareLink.updateMany({
+      where: { siteId },
+      data: { isActive: false },
+    }),
+    prisma.formBlock.updateMany({
+      where: { siteId },
+      data: { isActive: false },
+    }),
+  ]);
+
+  return { success: true };
 }
 
 export async function bulkAction(

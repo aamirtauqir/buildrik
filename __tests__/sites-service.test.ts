@@ -24,25 +24,34 @@ vi.mock("@/lib/prisma", () => ({
     page: {
       createMany: vi.fn(),
     },
-    $transaction: vi.fn((fn: any) =>
-      fn({
-        site: {
-          count: vi.fn().mockResolvedValue(0),
-          create: vi.fn().mockResolvedValue({
-            id: "new-site",
-            name: "Test",
-            slug: "test",
-            status: "DRAFT",
-            pages: 0,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            lastEditedAt: new Date(),
-          }),
-          update: vi.fn(),
-          updateMany: vi.fn(),
-        },
-      })
-    ),
+    shareLink: {
+      updateMany: vi.fn(),
+    },
+    formBlock: {
+      updateMany: vi.fn(),
+    },
+    $transaction: vi.fn((input: any) => {
+      if (typeof input === "function") {
+        return input({
+          site: {
+            count: vi.fn().mockResolvedValue(0),
+            create: vi.fn().mockResolvedValue({
+              id: "new-site",
+              name: "Test",
+              slug: "test",
+              status: "DRAFT",
+              pages: 0,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              lastEditedAt: new Date(),
+            }),
+            update: vi.fn(),
+            updateMany: vi.fn(),
+          },
+        });
+      }
+      return Promise.all(input);
+    }),
   },
 }));
 
@@ -78,7 +87,11 @@ describe("Sites Service", () => {
           lastEditedAt: new Date(),
           publishedUrl: null,
           createdAt: new Date(),
+          createdBy: null,
+          template: null,
           folderId: null,
+          domains: [],
+          analytics: [],
         },
         {
           id: "s2",
@@ -90,7 +103,11 @@ describe("Sites Service", () => {
           lastEditedAt: new Date(),
           publishedUrl: null,
           createdAt: new Date(),
+          createdBy: null,
+          template: null,
           folderId: null,
+          domains: [],
+          analytics: [],
         },
       ] as any);
 
@@ -188,19 +205,14 @@ describe("Sites Service", () => {
   });
 
   describe("deleteSite", () => {
-    it("soft-deletes when name matches", async () => {
+    it("soft-deletes when name matches using transaction", async () => {
       vi.mocked(prisma.site.findUnique).mockResolvedValue({
         id: "s1",
         name: "My Site",
       } as any);
-      vi.mocked(prisma.site.update).mockResolvedValue({ id: "s1" } as any);
-      await deleteSite("s1", "My Site");
-      expect(prisma.site.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { id: "s1" },
-          data: expect.objectContaining({ deletedAt: expect.any(Date) }),
-        })
-      );
+      const result = await deleteSite("s1", "My Site");
+      expect(prisma.$transaction).toHaveBeenCalled();
+      expect(result).toEqual({ success: true });
     });
 
     it("throws when name does not match", async () => {
