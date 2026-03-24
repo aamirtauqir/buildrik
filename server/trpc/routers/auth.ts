@@ -10,7 +10,7 @@ import {
   loginSchema, signupSchema, forgotPasswordSchema,
   resetPasswordSchema, otpSchema, backupCodeSchema, magicLinkSchema,
 } from "@/lib/validations/auth";
-import { generateToken, validateToken, invalidateToken } from "@/server/services/token.service";
+import { generateToken } from "@/server/services/token.service";
 import { logAuditEvent } from "@/server/services/audit.service";
 
 // Strict: 5 attempts per 15 min (login, 2FA, token verification)
@@ -42,7 +42,8 @@ export const authRouter = router({
         if (result.requiresTwoFactor) {
           return { requiresTwoFactor: true as const, tempToken: result.tempToken };
         }
-        return { requiresTwoFactor: false as const, user: { id: result.user!.id, email: result.user!.email } };
+        const sessionToken = await generateToken("session_grant", result.user!.id, 5);
+        return { requiresTwoFactor: false as const, sessionToken, user: { id: result.user!.id, email: result.user!.email } };
       } catch (err) {
         handleAuthError(err);
       }
@@ -117,7 +118,7 @@ export const authRouter = router({
     }),
 
   verify2FA: strictRateLimit
-    .input(z.object({ twoFactorToken: z.string().uuid(), code: z.string().length(6).regex(/^\d{6}$/, "Code must be 6 digits") }))
+    .input(z.object({ twoFactorToken: z.string().uuid() }).merge(otpSchema))
     .mutation(async ({ input }) => {
       try {
         const user = await verify2FA(input.twoFactorToken, input.code);
@@ -129,7 +130,7 @@ export const authRouter = router({
     }),
 
   verifyBackupCode: strictRateLimit
-    .input(z.object({ twoFactorToken: z.string().uuid(), backupCode: z.string().regex(/^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/, "Invalid backup code format") }))
+    .input(z.object({ twoFactorToken: z.string().uuid() }).merge(backupCodeSchema))
     .mutation(async ({ input }) => {
       try {
         const result = await verifyBackupCode(input.twoFactorToken, input.backupCode);
@@ -153,22 +154,88 @@ export const authRouter = router({
     return { success: true };
   }),
 
-  acceptInvite: normalRateLimit
-    .input(z.object({ token: z.string().uuid() }))
-    .mutation(async ({ input }) => {
-      const identifier = await validateToken(input.token, "invite");
-      if (!identifier) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Invite expired or invalid" });
+  getInviteDetails: publicProcedure
+    .input(z.object({ token: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const invite = await ctx.prisma.invite.findUnique({
+        where: { token: input.token },
+        include: { workspace: { select: { name: true } } },
+      });
+      if (!invite) {
+        return { found: false as const };
       }
-      await invalidateToken(input.token);
-      await logAuditEvent("INVITE_ACCEPTED", "success");
-      return { success: true, message: "Invite accepted" };
+      const inviter = await ctx.prisma.user.findUnique({
+        where: { id: invite.invitedBy },
+        select: { fullName: true },
+      });
+      return {
+        found: true as const,
+        workspaceName: invite.workspace.name,
+        inviterName: inviter?.fullName ?? "A team member",
+        role: invite.role,
+        expired: invite.status !== "PENDING" || invite.expiresAt < new Date(),
+      };
+    }),
+
+  acceptInvite: protectedProcedure
+    .input(z.object({ token: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const invite = await ctx.prisma.invite.findUnique({
+        where: { token: input.token },
+        include: { workspace: { select: { name: true } } },
+      });
+      if (!invite || invite.status !== "PENDING") {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Invite not found or already used" });
+      }
+      if (invite.expiresAt < new Date()) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Invite has expired" });
+      }
+
+      const user = ctx.session.user;
+      if (!user?.id) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Not authenticated" });
+      }
+      const userId = user.id;
+      const existing = await ctx.prisma.workspaceMember.findUnique({
+        where: { userId_workspaceId: { userId, workspaceId: invite.workspaceId } },
+      });
+      if (existing) {
+        throw new TRPCError({ code: "CONFLICT", message: "You are already a member of this workspace" });
+      }
+
+      await ctx.prisma.$transaction(async (tx) => {
+        const member = await tx.workspaceMember.create({
+          data: { userId, workspaceId: invite.workspaceId, role: invite.role, invitedBy: invite.invitedBy },
+        });
+        if (invite.siteIds.length > 0) {
+          await tx.sitePermission.createMany({
+            data: invite.siteIds.map((siteId) => ({
+              memberId: member.id,
+              siteId,
+              roleOverride: invite.role,
+              grantedBy: invite.invitedBy,
+            })),
+          });
+        }
+        await tx.invite.update({ where: { id: invite.id }, data: { status: "ACCEPTED" } });
+      });
+
+      if (invite.email !== user.email) {
+        await logAuditEvent("INVITE_EMAIL_MISMATCH", "success", {
+          userId, metadata: { inviteEmail: invite.email, userEmail: user.email },
+        });
+      }
+      await logAuditEvent("INVITE_ACCEPTED", "success", { userId, metadata: { workspaceId: invite.workspaceId } });
+      return { success: true, workspaceId: invite.workspaceId, workspaceName: invite.workspace.name };
     }),
 
   declineInvite: publicProcedure
-    .input(z.object({ token: z.string().uuid() }))
-    .mutation(async ({ input }) => {
-      await invalidateToken(input.token);
+    .input(z.object({ token: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const invite = await ctx.prisma.invite.findUnique({ where: { token: input.token } });
+      if (invite && invite.status === "PENDING") {
+        await ctx.prisma.invite.update({ where: { id: invite.id }, data: { status: "DECLINED" } });
+      }
       await logAuditEvent("INVITE_DECLINED", "success");
       return { message: "Invite declined" };
     }),
