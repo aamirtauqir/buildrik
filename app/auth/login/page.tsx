@@ -10,7 +10,7 @@ import { AuthInput } from "@/components/auth/auth-input";
 import { AuthDivider } from "@/components/auth/auth-divider";
 import { FormBanner } from "@/components/auth/form-banner";
 import { SocialButton } from "@/components/auth/social-button";
-import { signIn } from "next-auth/react";
+import { signIn } from "next-auth/react"; // used for social login
 import { trpc } from "@/lib/trpc/client";
 
 export default function LoginPage() {
@@ -25,15 +25,15 @@ export default function LoginPage() {
       if (data.requiresTwoFactor) {
         router.push(`/auth/2fa?token=${data.tempToken}`);
       } else {
-        const result = await signIn("credentials", {
-          email,
-          password,
-          redirect: false,
+        const res = await fetch("/api/auth/create-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionToken: data.sessionToken }),
         });
-        if (result?.error) {
-          setError(result.error);
-        } else {
+        if (res.ok) {
           router.push("/dashboard");
+        } else {
+          setError("Failed to create session");
         }
       }
     },
@@ -130,11 +130,11 @@ export default function LoginPage() {
 
         <div className="h-6" />
 
-        <SocialButton provider="google" />
+        <SocialButton provider="google" onClick={() => signIn("google", { callbackUrl: "/auth/redirect" })} />
 
         <div className="h-2" />
 
-        <SocialButton provider="github" />
+        <SocialButton provider="github" onClick={() => signIn("github", { callbackUrl: "/auth/redirect" })} />
 
         <div className="h-6" />
 

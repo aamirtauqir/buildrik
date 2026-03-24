@@ -8,6 +8,7 @@ import { AuthButton } from "@/components/auth/auth-button";
 import { AuthButtonSecondary } from "@/components/auth/auth-button-secondary";
 import { AuthDivider } from "@/components/auth/auth-divider";
 import { SocialButton } from "@/components/auth/social-button";
+import { signIn } from "next-auth/react";
 
 export default function AuthLandingPage() {
   const router = useRouter();
@@ -40,11 +41,11 @@ export default function AuthLandingPage() {
 
         <div className="h-6" />
 
-        <SocialButton provider="google" />
+        <SocialButton provider="google" onClick={() => signIn("google", { callbackUrl: "/auth/redirect" })} />
 
         <div className="h-2" />
 
-        <SocialButton provider="github" />
+        <SocialButton provider="github" onClick={() => signIn("github", { callbackUrl: "/auth/redirect" })} />
       </AuthCard>
 
       <p className="text-auth-fine text-auth-text-placeholder text-center mt-6">
