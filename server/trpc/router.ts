@@ -10,6 +10,7 @@ import { accountRouter } from "./routers/account";
 import { helpRouter } from "./routers/help";
 import { notificationsRouter } from "./routers/notifications";
 import { onboardingRouter } from "./routers/onboarding";
+import { pagesRouter } from "./routers/pages";
 
 export const appRouter = router({
   auth: authRouter,
@@ -23,6 +24,7 @@ export const appRouter = router({
   help: helpRouter,
   notifications: notificationsRouter,
   onboarding: onboardingRouter,
+  pages: pagesRouter,
 });
 
 export type AppRouter = typeof appRouter;
