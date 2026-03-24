@@ -3,6 +3,7 @@ import "./globals.css";
 import { TRPCProvider } from "@/lib/trpc/client";
 import { AgentationWrapper } from "@/components/agentation-wrapper";
 import { ToastProvider } from "@/components/dashboard/toast-provider";
+import { GlobalProviders } from "@/components/global/global-providers";
 
 export const metadata: Metadata = {
   title: "Buildrik",
@@ -17,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <TRPCProvider><ToastProvider>{children}</ToastProvider></TRPCProvider>
+        <TRPCProvider><ToastProvider><GlobalProviders>{children}</GlobalProviders></ToastProvider></TRPCProvider>
         <AgentationWrapper />
       </body>
     </html>
