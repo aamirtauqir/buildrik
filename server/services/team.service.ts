@@ -1,0 +1,188 @@
+import crypto from "crypto";
+import { prisma } from "@/lib/prisma";
+import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
+import type { ListMembersInput, InviteMembersInput, MemberData } from "@/lib/validations/team";
+
+const TEAM_ACTIONS = [
+  "MEMBER_INVITED",
+  "MEMBER_JOINED",
+  "MEMBER_REMOVED",
+  "MEMBER_ROLE_CHANGED",
+];
+
+export async function getTeamStats(workspaceId: string) {
+  const [total, active, pending] = await Promise.all([
+    prisma.workspaceMember.count({ where: { workspaceId } }),
+    prisma.workspaceMember.count({ where: { workspaceId, status: "ACTIVE" } }),
+    prisma.invite.count({ where: { workspaceId, status: "PENDING" } }),
+  ]);
+  return { total, active, pending };
+}
+
+export async function listMembers(
+  workspaceId: string,
+  input: ListMembersInput,
+) {
+  const { page = 1, perPage = 20, role, status } = input;
+
+  const where: Record<string, unknown> = { workspaceId };
+  if (role) where.role = role;
+  if (status) where.status = status;
+
+  const [total, members] = await Promise.all([
+    prisma.workspaceMember.count({ where }),
+    prisma.workspaceMember.findMany({
+      where,
+      include: { user: { select: { fullName: true, email: true, avatar: true } } },
+      skip: (page - 1) * perPage,
+      take: perPage,
+      orderBy: { joinedAt: "desc" },
+    }),
+  ]);
+
+  const data: MemberData[] = members.map((m: any) => ({
+    id: m.id,
+    userId: m.userId,
+    fullName: m.user.fullName,
+    email: m.user.email,
+    avatar: m.user.avatar,
+    role: m.role,
+    status: m.status,
+    lastActiveAt: m.lastActiveAt,
+    joinedAt: m.joinedAt,
+  }));
+
+  return { data, total, page, perPage };
+}
+
+export async function inviteMembers(
+  workspaceId: string,
+  inviterId: string,
+  input: InviteMembersInput,
+  plan: PlanName,
+) {
+  const limit = PLAN_LIMITS[plan].teamMembers as number;
+  const currentCount = await prisma.workspaceMember.count({ where: { workspaceId } });
+
+  const existingMembers = await prisma.workspaceMember.findMany({
+    where: { workspaceId },
+    select: { user: { select: { email: true } } },
+  });
+  const memberEmails = new Set(existingMembers.map((m: any) => m.user.email));
+
+  const pendingInvites = await prisma.invite.findMany({
+    where: { workspaceId, status: "PENDING" },
+    select: { email: true },
+  });
+  const pendingEmails = new Set(pendingInvites.map((i: any) => i.email));
+
+  const toInvite: string[] = [];
+  let skipped = 0;
+  const errors: string[] = [];
+
+  for (const email of input.emails) {
+    if (memberEmails.has(email) || pendingEmails.has(email)) {
+      skipped++;
+      continue;
+    }
+    toInvite.push(email);
+  }
+
+  const effectiveLimit = limit as number;
+  if (effectiveLimit > 0 && currentCount + toInvite.length + pendingEmails.size > effectiveLimit) {
+    errors.push(`Plan limit reached (${effectiveLimit} members)`);
+  }
+
+  for (const email of toInvite) {
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    await prisma.invite.create({
+      data: {
+        workspaceId,
+        email,
+        role: input.role,
+        message: input.message,
+        token: crypto.randomUUID(),
+        status: "PENDING",
+        invitedBy: inviterId,
+        siteIds: input.siteIds ?? [],
+        expiresAt,
+      },
+    });
+  }
+
+  return { sent: toInvite.length, skipped, errors };
+}
+
+export async function changeRole(
+  memberId: string,
+  role: string,
+  actorId: string,
+) {
+  const member = await prisma.workspaceMember.findUnique({
+    where: { id: memberId },
+  });
+  if (!member) throw new Error("MEMBER_NOT_FOUND");
+  if (member.role === "OWNER") throw new Error("CANNOT_CHANGE_OWNER");
+
+  if (member.role === "ADMIN" && role !== "ADMIN") {
+    const adminCount = await prisma.workspaceMember.count({
+      where: {
+        workspaceId: member.workspaceId,
+        role: { in: ["ADMIN", "OWNER"] },
+      },
+    });
+    if (adminCount <= 1) throw new Error("LAST_ADMIN");
+  }
+
+  return prisma.workspaceMember.update({
+    where: { id: memberId },
+    data: { role },
+  });
+}
+
+export async function revokeMember(memberId: string) {
+  const member = await prisma.workspaceMember.findUnique({
+    where: { id: memberId },
+  });
+  if (!member) throw new Error("MEMBER_NOT_FOUND");
+  if (member.role === "OWNER") throw new Error("CANNOT_REVOKE_OWNER");
+
+  return prisma.workspaceMember.update({
+    where: { id: memberId },
+    data: { status: "SUSPENDED", suspendedAt: new Date() },
+  });
+}
+
+export async function deleteMember(memberId: string) {
+  const member = await prisma.workspaceMember.findUnique({
+    where: { id: memberId },
+  });
+  if (!member) throw new Error("MEMBER_NOT_FOUND");
+  if (member.role === "OWNER") throw new Error("CANNOT_DELETE_OWNER");
+
+  return prisma.workspaceMember.delete({ where: { id: memberId } });
+}
+
+export async function listPendingInvites(workspaceId: string) {
+  return prisma.invite.findMany({
+    where: { workspaceId, status: "PENDING" },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function revokeInvite(inviteId: string) {
+  return prisma.invite.delete({ where: { id: inviteId } });
+}
+
+export async function getTeamActivity(workspaceId: string, limit = 5) {
+  return prisma.activityLog.findMany({
+    where: {
+      workspaceId,
+      action: { in: TEAM_ACTIONS },
+    },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+  });
+}
