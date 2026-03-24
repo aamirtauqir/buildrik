@@ -1,3 +1,4 @@
+import type { PrismaClient } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { authenticator } from "otplib";
@@ -45,25 +46,61 @@ const SAFE_USER_SELECT = {
   createdAt: true, updatedAt: true,
 } as const;
 
+type TxClient = Parameters<Parameters<PrismaClient['$transaction']>[0]>[0];
+
+function generateSlug(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 30) || "workspace";
+}
+
+async function generateUniqueSlug(tx: TxClient, name: string): Promise<string> {
+  const base = generateSlug(name);
+  const existing = await tx.workspace.findUnique({ where: { slug: base } });
+  if (!existing) return base;
+
+  for (let i = 0; i < 3; i++) {
+    const suffix = Math.random().toString(36).slice(2, 6);
+    const candidate = `${base}-${suffix}`.slice(0, 35);
+    const found = await tx.workspace.findUnique({ where: { slug: candidate } });
+    if (!found) return candidate;
+  }
+  throw new AuthError("SLUG_COLLISION", "Unable to generate workspace URL. Please try again.", 500);
+}
+
+export async function createWorkspaceForUser(
+  tx: TxClient,
+  userId: string,
+  fullName: string,
+): Promise<{ workspaceId: string }> {
+  const slug = await generateUniqueSlug(tx, fullName);
+  const workspace = await tx.workspace.create({
+    data: { name: `${fullName}'s Workspace`, slug, ownerId: userId },
+  });
+  await tx.workspaceMember.create({
+    data: { userId, workspaceId: workspace.id, role: "OWNER" },
+  });
+  await tx.onboardingState.create({ data: { userId } });
+  return { workspaceId: workspace.id };
+}
+
 export async function login(email: string, password: string) {
   const user = await prisma.user.findUnique({ where: { email } });
+
+  // Check lockout BEFORE expensive bcrypt — fail fast for locked accounts
+  if (user && await isAccountLocked(user.id)) {
+    await logAuditEvent("LOGIN_LOCKED", "failure", { userId: user.id, email });
+    throw new AuthError("ACCOUNT_LOCKED", "Account locked. Try again later.", 423);
+  }
 
   // Always run bcrypt to prevent timing-based email enumeration
   const hashToCompare = user?.passwordHash || DUMMY_HASH;
   const valid = await bcrypt.compare(password, hashToCompare);
 
   if (!user || !user.passwordHash || !valid) {
-    // Only increment failed attempts if user exists
     if (user) {
       await incrementFailedAttempts(user.id);
     }
     await logAuditEvent("LOGIN_FAILED", "failure", { email });
     throw new AuthError("INVALID_CREDENTIALS", "Incorrect email or password");
-  }
-
-  if (await isAccountLocked(user.id)) {
-    await logAuditEvent("LOGIN_LOCKED", "failure", { userId: user.id, email });
-    throw new AuthError("ACCOUNT_LOCKED", "Account locked. Try again later.", 423);
   }
 
   await resetFailedAttempts(user.id);
@@ -87,9 +124,14 @@ export async function signup(fullName: string, email: string, password: string) 
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = await prisma.user.create({
-    data: { fullName, email, passwordHash },
-    select: SAFE_USER_SELECT,
+
+  const { user, workspaceId } = await prisma.$transaction(async (tx) => {
+    const user = await tx.user.create({
+      data: { fullName, email, passwordHash },
+      select: SAFE_USER_SELECT,
+    });
+    const { workspaceId } = await createWorkspaceForUser(tx, user.id, fullName);
+    return { user, workspaceId };
   });
 
   await logAuditEvent("SIGNUP", "success", { userId: user.id, email });
@@ -98,8 +140,7 @@ export async function signup(fullName: string, email: string, password: string) 
   try {
     await sendVerificationEmail(email, token);
   } catch {
-    // User is created but email failed (e.g., missing RESEND_API_KEY in dev).
-    // Don't roll back — let them resend verification later.
+    // User is created but email failed — let them resend verification later.
   }
 
   return user;
@@ -169,6 +210,7 @@ export async function sendMagicLink(email: string) {
 
   const token = await generateToken("magic_link", user.id, 15); // 15min
   await sendMagicLinkEmail(email, token);
+  await logAuditEvent("MAGIC_LINK_REQUESTED", "success", { email });
 }
 
 export async function verifyMagicLink(token: string) {
@@ -197,11 +239,17 @@ export async function verify2FA(tempToken: string, code: string) {
     throw new AuthError("INVALID_2FA_CODE", "2FA not configured", 401);
   }
 
-  const secret = internal.twoFactorSecret.includes(':')
-    ? decryptSecret(internal.twoFactorSecret)
-    : internal.twoFactorSecret; // backwards compat with unencrypted
+  let secret: string;
+  try {
+    secret = internal.twoFactorSecret.includes(':')
+      ? decryptSecret(internal.twoFactorSecret)
+      : internal.twoFactorSecret; // backwards compat with unencrypted
+  } catch {
+    throw new AuthError("INVALID_2FA_CODE", "Invalid 2FA configuration", 401);
+  }
   const valid = authenticator.verify({ token: code, secret });
   if (!valid) {
+    await logAuditEvent("2FA_FAILED", "failure", { userId });
     throw new AuthError("INVALID_2FA_CODE", "Invalid code", 401);
   }
 
@@ -229,6 +277,7 @@ export async function verifyBackupCode(tempToken: string, backupCode: string) {
 
   const codeIndex = await findMatchingBackupCode(backupCode, internal.backupCodes);
   if (codeIndex === -1) {
+    await logAuditEvent("BACKUP_CODE_FAILED", "failure", { userId });
     throw new AuthError("INVALID_2FA_CODE", "Invalid backup code", 401);
   }
 
