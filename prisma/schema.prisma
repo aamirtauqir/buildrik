@@ -222,6 +222,7 @@ model Domain {
   sslExpiresAt  DateTime?
   lastCheckedAt DateTime?
   autoRenewSsl  Boolean   @default(true)
+  isPrimary     Boolean   @default(false)
   createdAt     DateTime  @default(now())
 
   site       Site        @relation(fields: [siteId], references: [id], onDelete: Cascade)
@@ -513,6 +514,7 @@ model Template {
   description String?
   thumbnail   String?
   previewUrl  String?
+  difficulty    String    @default("BEGINNER")
   pages       Json
   usageCount  Int      @default(0)
   isActive    Boolean  @default(true)
