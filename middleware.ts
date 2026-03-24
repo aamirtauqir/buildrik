@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { decode } from "next-auth/jwt";
 
-const authenticatedAuthRoutes = ["/auth/workspace-select", "/auth/success"];
+const authenticatedAuthRoutes = ["/auth/workspace-select", "/auth/success", "/auth/redirect"];
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -47,9 +47,14 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
+  // Onboarding: redirect unauthenticated users to login
+  if (pathname.startsWith("/onboarding") && !isLoggedIn) {
+    return NextResponse.redirect(new URL("/auth/login", req.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/auth/:path*", "/dashboard/:path*"],
+  matcher: ["/auth/:path*", "/dashboard/:path*", "/onboarding/:path*"],
 };

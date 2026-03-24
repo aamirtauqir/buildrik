@@ -17,13 +17,13 @@ function CallbackContent() {
 
   const verifyMutation = trpc.auth.verifyMagicLink.useMutation({
     onSuccess: async (data) => {
-      const res = await fetch("/api/auth/session", {
+      const res = await fetch("/api/auth/create-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionToken: data.sessionToken }),
       });
       if (res.ok) {
-        router.push("/dashboard");
+        router.push("/auth/redirect");
       } else {
         setError("Failed to create session");
       }

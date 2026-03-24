@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useOnboardingFlow } from "@/lib/hooks/use-onboarding-flow";
 
-export default function OnboardingPage() {
+export default function AuthRedirectPage() {
   const { isLoading, navigateToCurrentStep } = useOnboardingFlow();
 
   useEffect(() => {
@@ -13,10 +13,10 @@ export default function OnboardingPage() {
   }, [isLoading, navigateToCurrentStep]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: "#0D0D0D" }}>
+    <div className="flex min-h-screen items-center justify-center bg-white">
       <div className="text-center">
-        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white border-t-transparent" />
-        <p className="mt-4 text-sm text-white/60">Loading...</p>
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[#E42313] border-t-transparent" />
+        <p className="mt-4 text-sm" style={{ color: "#7A7A7A" }}>Signing you in...</p>
       </div>
     </div>
   );

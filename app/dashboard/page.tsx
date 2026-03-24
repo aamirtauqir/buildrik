@@ -7,6 +7,7 @@ import { RecentSites } from "@/components/dashboard/recent-sites";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { WorkspaceHealth } from "@/components/dashboard/workspace-health";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { DashboardChecklist } from "@/components/onboarding/dashboard-checklist";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
@@ -29,6 +30,11 @@ export default function DashboardPage() {
   const recentSites = trpc.dashboard.recentSites.useQuery();
   const activity = trpc.dashboard.activity.useQuery();
   const health = trpc.dashboard.health.useQuery();
+  const onboardingState = trpc.onboarding.getState.useQuery();
+  const dismissOnboarding = trpc.onboarding.dismiss.useMutation({
+    onSuccess: () => onboardingState.refetch(),
+  });
+  const showChecklist = onboardingState.data && !onboardingState.data.completed && !onboardingState.data.dismissed;
 
   const isLoading = stats.isLoading || recentSites.isLoading;
   const isEmpty = stats.data?.totalSites === 0;
@@ -112,6 +118,12 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+      )}
+      {showChecklist && (
+        <DashboardChecklist
+          completedIds={onboardingState.data?.dashboardTasks as string[] | undefined}
+          onDismiss={() => dismissOnboarding.mutate()}
+        />
       )}
     </div>
   );

@@ -2,11 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { OnboardingRoleSelect } from "@/components/onboarding/role-select";
-import { api } from "@/lib/trpc/client";
+import { trpc } from "@/lib/trpc/client";
 
 export default function OnboardingRolePage() {
   const router = useRouter();
-  const selectRole = api.onboarding.selectRole.useMutation({
+  const selectRole = trpc.onboarding.selectRole.useMutation({
     onSuccess: () => router.push("/onboarding/setup"),
   });
 
