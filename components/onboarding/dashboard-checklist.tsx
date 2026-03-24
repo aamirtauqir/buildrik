@@ -3,50 +3,111 @@
 import { useState } from "react";
 import { CheckCircle2, Circle, ChevronUp, ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { trpc } from "@/lib/trpc/client";
 
-export const DASHBOARD_CHECKLIST_ITEMS = [
+export const FULL_CHECKLIST_ITEMS = [
   {
-    id: "create-site",
-    label: "Create your first site",
-    description: "Get started with a template or AI",
+    id: "add-text-block",
+    label: "Add your first text block",
+    description: "Start building with content",
   },
   {
-    id: "customize",
-    label: "Customize your site",
-    description: "Edit content and design",
+    id: "upload-image",
+    label: "Upload an image",
+    description: "Add visuals to your site",
   },
   {
-    id: "publish",
-    label: "Publish your site",
-    description: "Make it live for the world",
+    id: "change-site-name",
+    label: "Change your site name",
+    description: "Make it yours",
   },
   {
-    id: "invite",
+    id: "add-second-page",
+    label: "Add a second page",
+    description: "Expand your site structure",
+  },
+  {
+    id: "preview-site",
+    label: "Preview your site",
+    description: "See how it looks to visitors",
+  },
+  {
+    id: "invite-team-member",
     label: "Invite a team member",
     description: "Collaborate with others",
   },
   {
-    id: "domain",
-    label: "Connect a custom domain",
-    description: "Use your own URL",
+    id: "publish-site",
+    label: "Publish your site",
+    description: "Make it live for the world",
   },
 ] as const;
 
-type ChecklistItemId = (typeof DASHBOARD_CHECKLIST_ITEMS)[number]["id"];
+export const INVITED_CHECKLIST_ITEMS = [
+  {
+    id: "edit-page",
+    label: "Edit a page",
+    description: "Make changes to existing content",
+  },
+  {
+    id: "preview-site",
+    label: "Preview your site",
+    description: "See how it looks to visitors",
+  },
+  {
+    id: "invite-team-member",
+    label: "Invite a team member",
+    description: "Collaborate with others",
+  },
+] as const;
+
+/** @deprecated Use FULL_CHECKLIST_ITEMS or INVITED_CHECKLIST_ITEMS */
+export const DASHBOARD_CHECKLIST_ITEMS = FULL_CHECKLIST_ITEMS;
+
+type FullChecklistItemId = (typeof FULL_CHECKLIST_ITEMS)[number]["id"];
+type InvitedChecklistItemId = (typeof INVITED_CHECKLIST_ITEMS)[number]["id"];
+export type ChecklistItemId = FullChecklistItemId | InvitedChecklistItemId;
 
 interface DashboardChecklistProps {
-  completedIds?: ChecklistItemId[];
+  variant?: "full" | "invited";
+  completedIds?: string[];
   onDismiss?: () => void;
 }
 
-export function DashboardChecklist({ completedIds = [], onDismiss }: DashboardChecklistProps) {
+export function DashboardChecklist({
+  variant = "full",
+  completedIds = [],
+  onDismiss,
+}: DashboardChecklistProps) {
   const [collapsed, setCollapsed] = useState(false);
+
+  const items = variant === "invited" ? INVITED_CHECKLIST_ITEMS : FULL_CHECKLIST_ITEMS;
   const completedSet = new Set(completedIds);
-  const completedCount = DASHBOARD_CHECKLIST_ITEMS.filter((item) =>
-    completedSet.has(item.id)
-  ).length;
-  const total = DASHBOARD_CHECKLIST_ITEMS.length;
+  const completedCount = items.filter((item) => completedSet.has(item.id)).length;
+  const total = items.length;
   const progressPct = Math.round((completedCount / total) * 100);
+
+  const utils = trpc.useUtils();
+  const completeStepMutation = trpc.onboarding.completeStep.useMutation({
+    onSuccess: () => {
+      utils.onboarding.getState.invalidate();
+    },
+  });
+  const dismissMutation = trpc.onboarding.dismiss.useMutation({
+    onSuccess: () => {
+      utils.onboarding.getState.invalidate();
+      onDismiss?.();
+    },
+  });
+
+  function handleTaskClick(itemId: string) {
+    if (completedSet.has(itemId)) return;
+    completeStepMutation.mutate({ step: itemId });
+  }
+
+  function handleDismiss() {
+    dismissMutation.mutate();
+  }
 
   return (
     <div className="fixed bottom-6 right-6 z-50 w-80 rounded-2xl border border-[#E8E8E8] bg-white shadow-lg">
@@ -70,15 +131,13 @@ export function DashboardChecklist({ completedIds = [], onDismiss }: DashboardCh
               <ChevronDown className="h-4 w-4" />
             )}
           </button>
-          {onDismiss && (
-            <button
-              onClick={onDismiss}
-              className="rounded-md p-1 text-[#7A7A7A] hover:bg-[#F4F4F4] transition-colors"
-              aria-label="Dismiss checklist"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
+          <button
+            onClick={handleDismiss}
+            className="rounded-md p-1 text-[#7A7A7A] hover:bg-[#F4F4F4] transition-colors"
+            aria-label="Dismiss checklist"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
       </div>
 
@@ -95,10 +154,17 @@ export function DashboardChecklist({ completedIds = [], onDismiss }: DashboardCh
       {/* Items */}
       {!collapsed && (
         <ul className="px-4 pb-4 pt-2 space-y-2">
-          {DASHBOARD_CHECKLIST_ITEMS.map((item) => {
+          {items.map((item) => {
             const done = completedSet.has(item.id);
             return (
-              <li key={item.id} className="flex items-start gap-3">
+              <li
+                key={item.id}
+                className={cn(
+                  "flex items-start gap-3",
+                  !done && "cursor-pointer"
+                )}
+                onClick={() => handleTaskClick(item.id)}
+              >
                 {done ? (
                   <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
                 ) : (
