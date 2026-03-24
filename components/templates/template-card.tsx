@@ -2,13 +2,33 @@
 import { Globe } from "lucide-react";
 
 interface TemplateCardProps {
-  template: { id: string; name: string; category: string; thumbnail: string | null; usageCount: number };
+  template: {
+    id: string;
+    name: string;
+    category: string;
+    thumbnail: string | null;
+    usageCount: number;
+    difficulty: string;
+  };
   onPreview: (id: string) => void;
   onUse: (id: string) => void;
 }
 
+function formatCount(n: number): string {
+  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K`;
+  return String(n);
+}
+
+const DIFFICULTY_STYLES: Record<string, { bg: string; text: string; label: string }> = {
+  BEGINNER: { bg: "#DCFCE7", text: "#166534", label: "Beginner" },
+  INTERMEDIATE: { bg: "#DBEAFE", text: "#1E40AF", label: "Intermediate" },
+  ADVANCED: { bg: "#FEF3C7", text: "#92400E", label: "Advanced" },
+};
+
 export function TemplateCard({ template, onPreview, onUse }: TemplateCardProps) {
-  const count = template.usageCount >= 1000 ? `${(template.usageCount / 1000).toFixed(1)}K` : String(template.usageCount);
+  const count = formatCount(template.usageCount);
+  const diff = DIFFICULTY_STYLES[template.difficulty] ?? DIFFICULTY_STYLES.BEGINNER;
+
   return (
     <div className="group relative overflow-hidden rounded-xl border bg-white transition-shadow hover:shadow-md" style={{ borderColor: "#E8E8E8" }}>
       <div className="flex h-44 items-center justify-center" style={{ backgroundColor: "#F4F4F4" }}>
@@ -18,6 +38,7 @@ export function TemplateCard({ template, onPreview, onUse }: TemplateCardProps) 
         <h3 className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>{template.name}</h3>
         <div className="mt-1 flex items-center gap-2">
           <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "#F4F4F4", color: "#7A7A7A" }}>{template.category.toLowerCase()}</span>
+          <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: diff.bg, color: diff.text }}>{diff.label}</span>
           <span className="text-xs" style={{ color: "#B0B0B0" }}>{count} sites</span>
         </div>
       </div>

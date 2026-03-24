@@ -42,7 +42,7 @@ export async function listSites(
   workspaceId: string,
   filters: ListSitesInput
 ) {
-  const { page, perPage, status, sort, search, folderId } = filters;
+  const { page, perPage, status, sort, search, folderId, createdBy, dateRange, templateUsed, hasCustomDomain, hasTraffic } = filters;
   const skip = (page - 1) * perPage;
 
   const where: Record<string, unknown> = {
@@ -53,6 +53,14 @@ export async function listSites(
   if (status) where.status = status;
   if (search) where.name = { contains: search, mode: "insensitive" };
   if (folderId !== undefined) where.folderId = folderId;
+  if (createdBy) where.createdBy = createdBy;
+  if (dateRange) {
+    const days = dateRange === "7d" ? 7 : dateRange === "30d" ? 30 : 90;
+    where.createdAt = { gte: new Date(Date.now() - days * 86400000) };
+  }
+  if (templateUsed) where.template = templateUsed;
+  if (hasCustomDomain === true) where.domains = { some: {} };
+  if (hasCustomDomain === false) where.domains = { none: {} };
 
   const orderBy = SORT_MAP[sort] ?? SORT_MAP.lastEdited;
 
@@ -73,16 +81,56 @@ export async function listSites(
         lastEditedAt: true,
         publishedUrl: true,
         createdAt: true,
+        createdBy: true,
+        template: true,
         folderId: true,
+        domains: { take: 1, select: { domain: true, isPrimary: true } },
+        analytics: {
+          where: { date: { gte: new Date(Date.now() - 30 * 86400000) } },
+          select: { visitors: true },
+        },
       },
     }),
   ]);
 
+  const enriched = data.map((site) => {
+    const visitors30d = site.analytics.reduce((sum, a) => sum + a.visitors, 0);
+    const domain = site.domains[0]?.domain ?? null;
+    return {
+      id: site.id,
+      name: site.name,
+      slug: site.slug,
+      status: site.status,
+      thumbnail: site.thumbnail,
+      pages: site.pages,
+      lastEditedAt: site.lastEditedAt,
+      publishedUrl: site.publishedUrl,
+      createdAt: site.createdAt,
+      createdBy: site.createdBy,
+      template: site.template,
+      folderId: site.folderId,
+      domain,
+      visitors30d,
+    };
+  });
+
+  const filtered = hasTraffic
+    ? enriched.filter((s) => {
+        switch (hasTraffic) {
+          case "none": return s.visitors30d === 0;
+          case "1-100": return s.visitors30d >= 1 && s.visitors30d <= 100;
+          case "100-1000": return s.visitors30d > 100 && s.visitors30d <= 1000;
+          case "1000+": return s.visitors30d > 1000;
+          default: return true;
+        }
+      })
+    : enriched;
+
   return {
-    data,
-    total,
+    data: filtered,
+    total: hasTraffic ? filtered.length : total,
     page,
-    totalPages: Math.ceil(total / perPage),
+    totalPages: Math.ceil((hasTraffic ? filtered.length : total) / perPage),
   };
 }
 
@@ -108,6 +156,65 @@ export async function createSite(
   }
 
   const slug = await generateUniqueSlug(input.name);
+
+  if (input.method === "template" && input.templateId) {
+    const template = await prisma.template.findUnique({
+      where: { id: input.templateId },
+    });
+    if (!template) throw new Error("TEMPLATE_NOT_FOUND");
+
+    const site = await prisma.$transaction(async (tx) => {
+      const created = await tx.site.create({
+        data: {
+          name: input.name,
+          slug,
+          status: "DRAFT",
+          workspaceId,
+          createdBy: userId,
+          creationMethod: "TEMPLATE",
+          template: input.templateId,
+          pages: 0,
+          lastEditedAt: new Date(),
+        },
+      });
+
+      const templatePages =
+        (template.pages as Array<{
+          name: string;
+          slug: string;
+          blocks: unknown;
+          isHomePage?: boolean;
+        }>) ?? [];
+
+      for (let i = 0; i < templatePages.length; i++) {
+        const tp = templatePages[i];
+        await tx.page.create({
+          data: {
+            siteId: created.id,
+            name: tp.name,
+            slug: tp.slug,
+            position: i,
+            blocks: tp.blocks ?? [],
+            isHomePage: tp.isHomePage ?? i === 0,
+          },
+        });
+      }
+
+      await tx.site.update({
+        where: { id: created.id },
+        data: { pages: templatePages.length },
+      });
+
+      await tx.template.update({
+        where: { id: input.templateId! },
+        data: { usageCount: { increment: 1 } },
+      });
+
+      return created;
+    });
+
+    return site;
+  }
 
   return prisma.site.create({
     data: {

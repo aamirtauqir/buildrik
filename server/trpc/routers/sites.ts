@@ -81,6 +81,11 @@ export const sitesRouter = router({
             code: "FORBIDDEN",
             message: "Site limit reached. Upgrade your plan.",
           });
+        if (e instanceof Error && e.message === "TEMPLATE_NOT_FOUND")
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Template not found.",
+          });
         throw e;
       }
     }),

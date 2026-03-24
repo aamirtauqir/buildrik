@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
-import { X, Plus, LayoutTemplate, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Plus, LayoutTemplate, Sparkles, Check, Lock } from "lucide-react";
+import { trpc } from "@/lib/trpc/client";
 
 interface CreateSiteModalProps {
   open: boolean;
@@ -8,11 +9,33 @@ interface CreateSiteModalProps {
   onSubmit: (data: { name: string; method: string }) => void;
 }
 
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProps) {
   const [name, setName] = useState("My New Site");
+  const [debouncedSlug, setDebouncedSlug] = useState("");
+
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedSlug(slugify(name)), 300);
+    return () => clearTimeout(id);
+  }, [name]);
+
+  const slugCheck = trpc.sites.checkSlug.useQuery(
+    { slug: debouncedSlug },
+    { enabled: open && debouncedSlug.length >= 3 }
+  );
+
+  const health = trpc.dashboard.health.useQuery(undefined, { enabled: open });
+  const aiCredits = health.data?.aiCredits;
+
   if (!open) return null;
 
-  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const slug = slugify(name);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "#0000004D" }} onClick={onClose}>
@@ -24,7 +47,20 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
         <div className="mt-4">
           <label className="text-sm font-medium" style={{ color: "#7A7A7A" }}>Site Name</label>
           <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }} />
-          <p className="mt-1 text-xs" style={{ color: "#B0B0B0" }}>{slug}.buildrik.app</p>
+          <div className="mt-1 flex items-center gap-2">
+            <p className="text-xs" style={{ color: "#B0B0B0" }}>{slug}.buildrik.app</p>
+            {debouncedSlug.length >= 3 && slugCheck.data && (
+              slugCheck.data.available ? (
+                <span className="flex items-center gap-1 text-xs text-green-600">
+                  <Check className="h-3 w-3" /> Available
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 text-xs text-red-500">
+                  <X className="h-3 w-3" /> Taken
+                </span>
+              )
+            )}
+          </div>
         </div>
         <div className="mt-6 space-y-3">
           <button onClick={() => onSubmit({ name, method: "template" })} className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors hover:bg-[#F4F4F4]" style={{ borderColor: "#E8E8E8" }}>
@@ -33,7 +69,23 @@ export function CreateSiteModal({ open, onClose, onSubmit }: CreateSiteModalProp
           </button>
           <button onClick={() => onSubmit({ name, method: "ai" })} className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors hover:bg-red-50/50" style={{ borderColor: "#E8E8E8" }}>
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#FEF2F2" }}><Sparkles className="h-5 w-5" style={{ color: "#E42313" }} /></div>
-            <div><p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Generate with AI</p><p className="text-xs" style={{ color: "#7A7A7A" }}>AI-powered site creation</p></div>
+            <div className="flex-1">
+              <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Generate with AI</p>
+              <p className="text-xs" style={{ color: "#7A7A7A" }}>AI-powered site creation</p>
+            </div>
+            {aiCredits && (
+              <div className="text-right">
+                {aiCredits.used < aiCredits.limit ? (
+                  <p className="text-xs" style={{ color: "#7A7A7A" }}>
+                    {aiCredits.used}/{aiCredits.limit} credits remaining
+                  </p>
+                ) : (
+                  <p className="flex items-center gap-1 text-xs" style={{ color: "#B0B0B0" }}>
+                    <Lock className="h-3 w-3" /> Upgrade for more
+                  </p>
+                )}
+              </div>
+            )}
           </button>
           <button onClick={() => onSubmit({ name, method: "blank" })} className="flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors hover:bg-[#F4F4F4]" style={{ borderColor: "#E8E8E8" }}>
             <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#F4F4F4" }}><Plus className="h-5 w-5" style={{ color: "#7A7A7A" }} /></div>
