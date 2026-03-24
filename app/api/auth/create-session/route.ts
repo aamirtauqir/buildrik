@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { createHash } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { validateToken, invalidateToken } from "@/server/services/token.service";
 import { encode } from "next-auth/jwt";
@@ -7,6 +8,7 @@ import { logAuditEvent } from "@/server/services/audit.service";
 
 const createSessionSchema = z.object({
   sessionToken: z.string().uuid(),
+  rememberMe: z.boolean().optional().default(false),
 });
 
 export async function POST(req: NextRequest) {
@@ -15,7 +17,7 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 });
   }
-  const { sessionToken } = parsed.data;
+  const { sessionToken, rememberMe } = parsed.data;
 
   // CSRF: verify request comes from same origin
   const origin = req.headers.get("origin");
@@ -33,18 +35,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
 
-  await invalidateToken(sessionToken);
-
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  // Create JWT token directly instead of using signIn("credentials")
+  await invalidateToken(sessionToken);
+
   const isSecure = process.env.NODE_ENV === "production";
   const cookieName = isSecure
     ? "__Secure-next-auth.session-token"
     : "next-auth.session-token";
+
+  const maxAge = rememberMe ? 30 * 24 * 60 * 60 : undefined;
 
   const token = await encode({
     token: {
@@ -57,16 +60,40 @@ export async function POST(req: NextRequest) {
     salt: cookieName,
   });
 
-  await logAuditEvent("LOGIN_SUCCESS", "success", { userId: user.id, email: user.email });
+  // Create Session DB record for session management + active sessions display
+  const hashedJWT = createHash("sha256").update(token).digest("hex");
+  const expires = new Date(Date.now() + (maxAge ?? 24 * 60 * 60) * 1000);
+  await prisma.session.create({
+    data: {
+      userId: user.id,
+      sessionToken: hashedJWT,
+      expires,
+      device: req.headers.get("user-agent") ?? undefined,
+      ip: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? undefined,
+      current: true,
+    },
+  });
 
-  // Set the session cookie
+  // Enforce session limit: max 10 active sessions
+  const sessions = await prisma.session.findMany({
+    where: { userId: user.id, expires: { gt: new Date() } },
+    orderBy: { createdAt: "asc" },
+    select: { id: true },
+  });
+  if (sessions.length > 10) {
+    const toDelete = sessions.slice(0, sessions.length - 10).map((s) => s.id);
+    await prisma.session.deleteMany({ where: { id: { in: toDelete } } });
+  }
+
+  await logAuditEvent("SESSION_CREATED", "success", { userId: user.id, email: user.email });
+
   const response = NextResponse.json({ success: true });
   response.cookies.set(cookieName, token, {
     httpOnly: true,
     secure: isSecure,
-    sameSite: "lax",
+    sameSite: "lax" as const,
     path: "/",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    ...(maxAge !== undefined ? { maxAge } : {}),
   });
 
   return response;

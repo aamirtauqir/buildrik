@@ -28,7 +28,7 @@ export default function LoginPage() {
         const res = await fetch("/api/auth/create-session", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionToken: data.sessionToken }),
+          body: JSON.stringify({ sessionToken: data.sessionToken, rememberMe }),
         });
         if (res.ok) {
           router.push("/auth/redirect");
