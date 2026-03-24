@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { ListMembersInput, InviteMembersInput, MemberData } from "@/lib/validations/team";
+import { sendTeamInviteEmail } from "@/server/services/email.service";
 
 const TEAM_ACTIONS = [
   "MEMBER_INVITED",
@@ -29,18 +30,22 @@ export async function listMembers(
   if (role) where.role = role;
   if (status) where.status = status;
 
-  const [total, members] = await Promise.all([
+  const [total, members, totalSites] = await Promise.all([
     prisma.workspaceMember.count({ where }),
     prisma.workspaceMember.findMany({
       where,
-      include: { user: { select: { fullName: true, email: true, avatar: true } } },
+      include: {
+        user: { select: { fullName: true, email: true, avatar: true } },
+        sitePermissions: { select: { id: true } },
+      },
       skip: (page - 1) * perPage,
       take: perPage,
       orderBy: { joinedAt: "desc" },
     }),
+    prisma.site.count({ where: { workspaceId, deletedAt: null } }),
   ]);
 
-  const data: MemberData[] = members.map((m: any) => ({
+  const data: MemberData[] = members.map((m) => ({
     id: m.id,
     userId: m.userId,
     fullName: m.user.fullName,
@@ -50,6 +55,7 @@ export async function listMembers(
     status: m.status,
     lastActiveAt: m.lastActiveAt,
     joinedAt: m.joinedAt,
+    sitesAccess: m.sitePermissions.length === 0 ? "All sites" : `${m.sitePermissions.length} of ${totalSites}`,
   }));
 
   return { data, total, page, perPage };
@@ -93,11 +99,14 @@ export async function inviteMembers(
     errors.push(`Plan limit reached (${effectiveLimit} members)`);
   }
 
+  const workspace = await prisma.workspace.findUnique({ where: { id: workspaceId }, select: { name: true } });
+  const inviter = await prisma.user.findUnique({ where: { id: inviterId }, select: { fullName: true } });
+
   for (const email of toInvite) {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
-    await prisma.invite.create({
+    const invite = await prisma.invite.create({
       data: {
         workspaceId,
         email,
@@ -110,6 +119,10 @@ export async function inviteMembers(
         expiresAt,
       },
     });
+
+    try {
+      await sendTeamInviteEmail(email, workspace?.name ?? "Workspace", inviter?.fullName ?? "A team member", invite.token);
+    } catch { /* Email failure shouldn't block invite */ }
   }
 
   return { sent: toInvite.length, skipped, errors };
@@ -177,12 +190,16 @@ export async function revokeInvite(inviteId: string) {
 }
 
 export async function resendInvite(inviteId: string) {
+  const invite = await prisma.invite.findUnique({ where: { id: inviteId } });
+  if (!invite) throw new Error("INVITE_NOT_FOUND");
+  if (invite.resendCount >= 2) throw new Error("MAX_RESENDS");
+
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);
 
   return prisma.invite.update({
     where: { id: inviteId },
-    data: { expiresAt },
+    data: { expiresAt, resendCount: { increment: 1 } },
   });
 }
 

@@ -29,6 +29,7 @@ export const memberSchema = z.object({
   status: z.string(),
   lastActiveAt: z.date().nullable(),
   joinedAt: z.date(),
+  sitesAccess: z.string(),
 });
 
 export const teamStatsSchema = z.object({
