@@ -88,6 +88,9 @@ export async function login(email: string, password: string) {
   // Check lockout BEFORE expensive bcrypt — fail fast for locked accounts
   if (user && await isAccountLocked(user.id)) {
     await logAuditEvent("LOGIN_LOCKED", "failure", { userId: user.id, email });
+    await prisma.loginAttempt.create({
+      data: { email, userId: user.id, ipAddress: "", result: "LOCKED" },
+    }).catch(() => {});
     throw new AuthError("ACCOUNT_LOCKED", "Account locked. Try again later.", 423);
   }
 
@@ -99,6 +102,9 @@ export async function login(email: string, password: string) {
     if (user) {
       const remaining = await incrementFailedAttempts(user.id);
       await logAuditEvent("LOGIN_FAILED", "failure", { email, metadata: { attemptsRemaining: remaining } });
+      await prisma.loginAttempt.create({
+        data: { email, userId: user.id, ipAddress: "", result: "FAILED" },
+      }).catch(() => {});
       const lockedUser = remaining <= 0
         ? await prisma.user.findUnique({ where: { id: user.id }, select: { lockedUntil: true } })
         : null;
@@ -109,11 +115,17 @@ export async function login(email: string, password: string) {
       });
     }
     await logAuditEvent("LOGIN_FAILED", "failure", { email });
+    await prisma.loginAttempt.create({
+      data: { email, ipAddress: "", result: "FAILED" },
+    }).catch(() => {});
     throw new AuthError("INVALID_CREDENTIALS", "Incorrect email or password");
   }
 
   await resetFailedAttempts(user.id);
   await logAuditEvent("LOGIN_SUCCESS", "success", { userId: user.id, email });
+  await prisma.loginAttempt.create({
+    data: { email, userId: user.id, ipAddress: "", result: "SUCCESS" },
+  }).catch(() => {});
   await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
 
   if (user.twoFactorEnabled) {
