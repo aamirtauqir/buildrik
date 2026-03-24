@@ -1,6 +1,7 @@
 "use client";
 
-import { Eye, EyeOff } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Eye, EyeOff, MoreHorizontal } from "lucide-react";
 import type { NotificationData } from "@/lib/validations/notifications";
 
 function timeAgo(date: Date): string {
@@ -17,15 +18,49 @@ function timeAgo(date: Date): string {
 interface NotificationItemProps {
   notification: NotificationData;
   onToggleRead: (id: string, read: boolean) => void;
+  onMuteType?: (type: string) => void;
+  onDelete?: (id: string) => void;
 }
 
-export function NotificationItem({ notification, onToggleRead }: NotificationItemProps) {
+export function NotificationItem({
+  notification,
+  onToggleRead,
+  onMuteType,
+  onDelete,
+}: NotificationItemProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen]);
+
+  function handleClick() {
+    if (notification.actionUrl) {
+      if (!notification.read) {
+        onToggleRead(notification.id, true);
+      }
+      window.location.href = notification.actionUrl;
+    }
+  }
+
   return (
     <div
       className="group flex items-start gap-3 px-4 py-3 transition-colors hover:bg-[#F4F4F4]"
       style={{
         borderLeft: notification.read ? "3px solid transparent" : "3px solid #6366F1",
+        backgroundColor: notification.read ? undefined : "#EEF2FF",
+        opacity: notification.read ? 0.6 : 1,
+        cursor: notification.actionUrl ? "pointer" : "default",
       }}
+      onClick={handleClick}
     >
       <div className="flex-1 min-w-0">
         <p className="text-sm" style={{ color: "#0D0D0D" }}>
@@ -43,20 +78,58 @@ export function NotificationItem({ notification, onToggleRead }: NotificationIte
               href={notification.actionUrl}
               className="text-xs font-medium hover:underline"
               style={{ color: "#6366F1" }}
+              onClick={(e) => e.stopPropagation()}
             >
               View
             </a>
           )}
         </div>
       </div>
-      <button
-        onClick={() => onToggleRead(notification.id, !notification.read)}
-        className="hidden shrink-0 rounded p-1 transition-colors hover:bg-[#E8E8E8] group-hover:block"
-        style={{ color: "#7A7A7A" }}
-        aria-label={notification.read ? "Mark as unread" : "Mark as read"}
-      >
-        {notification.read ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-      </button>
+      <div className="hidden shrink-0 items-center gap-1 group-hover:flex" onClick={(e) => e.stopPropagation()}>
+        <button
+          onClick={() => onToggleRead(notification.id, !notification.read)}
+          className="rounded p-1 transition-colors hover:bg-[#E8E8E8]"
+          style={{ color: "#7A7A7A" }}
+          aria-label={notification.read ? "Mark as unread" : "Mark as read"}
+        >
+          {notification.read ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </button>
+        <div className="relative" ref={menuRef}>
+          <button
+            onClick={() => setMenuOpen((o) => !o)}
+            className="rounded p-1 transition-colors hover:bg-[#E8E8E8]"
+            style={{ color: "#7A7A7A" }}
+            aria-label="More actions"
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </button>
+          {menuOpen && (
+            <div
+              className="absolute right-0 top-full z-10 mt-1 w-44 overflow-hidden rounded-lg border bg-white shadow-lg"
+              style={{ borderColor: "#E8E8E8" }}
+            >
+              {onMuteType && (
+                <button
+                  onClick={() => { onMuteType(notification.type); setMenuOpen(false); }}
+                  className="w-full px-3 py-2 text-left text-sm transition-colors hover:bg-[#F4F4F4]"
+                  style={{ color: "#0D0D0D" }}
+                >
+                  Mute this type
+                </button>
+              )}
+              {onDelete && (
+                <button
+                  onClick={() => { onDelete(notification.id); setMenuOpen(false); }}
+                  className="w-full px-3 py-2 text-left text-sm transition-colors hover:bg-[#F4F4F4]"
+                  style={{ color: "#E42313" }}
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

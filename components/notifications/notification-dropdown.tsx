@@ -19,12 +19,14 @@ export function NotificationDropdown() {
     onSuccess: () => {
       utils.notifications.recent.invalidate();
       utils.notifications.unreadCount.invalidate();
+      utils.notifications.listGrouped.invalidate();
     },
   });
   const markAllRead = trpc.notifications.markAllRead.useMutation({
     onSuccess: () => {
       utils.notifications.recent.invalidate();
       utils.notifications.unreadCount.invalidate();
+      utils.notifications.listGrouped.invalidate();
     },
   });
 
@@ -38,9 +40,9 @@ export function NotificationDropdown() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const notifications = (recentData ?? []).map((n: any) => ({
+  const notifications = (recentData ?? []).map((n) => ({
     ...n,
-    createdAt: new Date(n.createdAt),
+    createdAt: n.createdAt instanceof Date ? n.createdAt : new Date(n.createdAt as string),
   }));
 
   return (
@@ -79,7 +81,7 @@ export function NotificationDropdown() {
                 No notifications yet
               </p>
             ) : (
-              notifications.map((n: any) => (
+              notifications.map((n) => (
                 <NotificationItem
                   key={n.id}
                   notification={n}
