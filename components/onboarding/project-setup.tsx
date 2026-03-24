@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, LayoutTemplate, Plus, ArrowLeft } from "lucide-react";
+import { Sparkles, LayoutTemplate, File, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const CREATION_METHODS = [
@@ -23,14 +23,14 @@ export const CREATION_METHODS = [
     value: "blank",
     label: "Start Blank",
     description: "Full creative control",
-    icon: "Plus",
+    icon: "File",
     primary: false,
   },
 ] as const;
 
 type MethodValue = (typeof CREATION_METHODS)[number]["value"];
 
-const iconMap = { Sparkles, LayoutTemplate, Plus } as const;
+const iconMap = { Sparkles, LayoutTemplate, File } as const;
 
 interface OnboardingProjectSetupProps {
   onContinue: (data: { projectName: string; method: MethodValue }) => void;
@@ -55,7 +55,7 @@ export function OnboardingProjectSetup({ onContinue, onBack, loading }: Onboardi
           Back
         </button>
 
-        <h1 className="text-2xl font-bold text-[#0D0D0D] mb-2 text-center">
+        <h1 className="text-2xl font-bold text-[#0D0D0D] mb-2 text-center font-[family-name:var(--font-space-grotesk)]">
           Set up your first project
         </h1>
         <p className="text-sm text-[#7A7A7A] text-center mb-8">

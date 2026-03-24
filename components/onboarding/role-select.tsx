@@ -8,19 +8,19 @@ export const ONBOARDING_ROLES = [
   {
     value: "FREELANCER",
     label: "Freelancer",
-    description: "Building sites for yourself",
+    description: "Independent professional",
     icon: "User",
   },
   {
     value: "SMALL_TEAM",
     label: "Small Team",
-    description: "Collaborating with a few people",
+    description: "2-10 people",
     icon: "Users",
   },
   {
     value: "AGENCY",
     label: "Agency",
-    description: "Managing multiple client projects",
+    description: "Client work at scale",
     icon: "Building2",
   },
 ] as const;
@@ -40,7 +40,7 @@ export function OnboardingRoleSelect({ onContinue, loading }: OnboardingRoleSele
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <div className="w-full max-w-md px-4">
-        <h1 className="text-2xl font-bold text-[#0D0D0D] mb-2 text-center">
+        <h1 className="text-2xl font-bold text-[#0D0D0D] mb-2 text-center font-[family-name:var(--font-space-grotesk)]">
           How will you use Buildrik?
         </h1>
         <p className="text-sm text-[#7A7A7A] text-center mb-8">
