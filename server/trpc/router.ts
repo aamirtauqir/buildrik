@@ -12,6 +12,7 @@ import { notificationsRouter } from "./routers/notifications";
 import { onboardingRouter } from "./routers/onboarding";
 import { pagesRouter } from "./routers/pages";
 import { formsRouter } from "./routers/forms";
+import { uploadRouter } from "./routers/upload";
 
 export const appRouter = router({
   auth: authRouter,
@@ -27,6 +28,7 @@ export const appRouter = router({
   onboarding: onboardingRouter,
   pages: pagesRouter,
   forms: formsRouter,
+  upload: uploadRouter,
 });
 
 export type AppRouter = typeof appRouter;
