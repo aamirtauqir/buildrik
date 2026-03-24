@@ -16,6 +16,9 @@ export interface Invoice {
 
 interface InvoiceTableProps {
   invoices: Invoice[];
+  page?: number;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
 }
 
 const STATUS_BADGE: Record<InvoiceStatus, { bg: string; color: string; label: string }> = {
@@ -37,7 +40,7 @@ function formatPeriod(start: Date, end: Date): string {
   return `${formatDate(start)} – ${formatDate(end)}`;
 }
 
-export function InvoiceTable({ invoices }: InvoiceTableProps) {
+export function InvoiceTable({ invoices, page = 1, totalPages = 1, onPageChange }: InvoiceTableProps) {
   if (invoices.length === 0) {
     return (
       <div className="rounded-xl border border-[#E8E8E8] bg-white px-6 py-12 text-center text-sm" style={{ color: "#7A7A7A" }}>
@@ -104,6 +107,30 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
           })}
         </tbody>
       </table>
+
+      {totalPages > 1 && onPageChange && (
+        <div className="flex items-center justify-between border-t border-[#E8E8E8] px-4 py-3">
+          <button
+            onClick={() => onPageChange(page - 1)}
+            disabled={page <= 1}
+            className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[#FAFAFA] disabled:opacity-40"
+            style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+          >
+            Previous
+          </button>
+          <span className="text-xs" style={{ color: "#7A7A7A" }}>
+            Page {page} of {totalPages}
+          </span>
+          <button
+            onClick={() => onPageChange(page + 1)}
+            disabled={page >= totalPages}
+            className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[#FAFAFA] disabled:opacity-40"
+            style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
