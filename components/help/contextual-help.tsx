@@ -11,33 +11,40 @@ interface ContextualArticle {
   readTime: number;
 }
 
-const PAGE_ARTICLES: Record<string, ContextualArticle[]> = {
-  "/dashboard": [
-    { title: "Getting started with Buildrik", slug: "getting-started", readTime: 3 },
-    { title: "Understanding your dashboard", slug: "dashboard-overview", readTime: 2 },
-    { title: "Creating your first site", slug: "create-first-site", readTime: 4 },
-  ],
-  "/dashboard/sites": [
-    { title: "Managing your sites", slug: "managing-sites", readTime: 3 },
-    { title: "Publishing a site", slug: "publishing-sites", readTime: 2 },
-    { title: "Organising sites into folders", slug: "site-folders", readTime: 2 },
-  ],
-  "/dashboard/team": [
-    { title: "Inviting team members", slug: "invite-team", readTime: 3 },
-    { title: "Understanding roles & permissions", slug: "roles-permissions", readTime: 4 },
-    { title: "Managing team access", slug: "team-access", readTime: 2 },
-  ],
-  "/dashboard/billing": [
-    { title: "Plans and pricing overview", slug: "plans-pricing", readTime: 3 },
-    { title: "Upgrading your plan", slug: "upgrade-plan", readTime: 2 },
-    { title: "Managing invoices", slug: "invoices", readTime: 2 },
-  ],
-  "/dashboard/settings": [
-    { title: "Account settings guide", slug: "account-settings", readTime: 3 },
-    { title: "Workspace settings", slug: "workspace-settings", readTime: 2 },
-    { title: "Security & two-factor authentication", slug: "2fa-setup", readTime: 4 },
-  ],
+const CONTEXT_MAP: Record<string, string[]> = {
+  "/dashboard": ["getting-started", "dashboard-guide", "quick-actions"],
+  "/dashboard/sites": ["managing-sites", "publishing", "templates"],
+  "/dashboard/team": ["team-permissions", "inviting-members", "roles"],
+  "/dashboard/billing": ["billing-plans", "payment-methods", "invoices"],
+  "/dashboard/settings": ["account-settings", "security", "workspace"],
 };
+
+const ARTICLE_META: Record<string, ContextualArticle> = {
+  "getting-started": { title: "Getting started with Buildrik", slug: "getting-started", readTime: 3 },
+  "dashboard-guide": { title: "Understanding your dashboard", slug: "dashboard-guide", readTime: 2 },
+  "quick-actions": { title: "Quick actions reference", slug: "quick-actions", readTime: 2 },
+  "managing-sites": { title: "Managing your sites", slug: "managing-sites", readTime: 3 },
+  "publishing": { title: "Publishing a site", slug: "publishing", readTime: 2 },
+  "templates": { title: "Using site templates", slug: "templates", readTime: 3 },
+  "team-permissions": { title: "Understanding permissions", slug: "team-permissions", readTime: 4 },
+  "inviting-members": { title: "Inviting team members", slug: "inviting-members", readTime: 3 },
+  "roles": { title: "Managing roles", slug: "roles", readTime: 2 },
+  "billing-plans": { title: "Plans and pricing overview", slug: "billing-plans", readTime: 3 },
+  "payment-methods": { title: "Managing payment methods", slug: "payment-methods", readTime: 2 },
+  "invoices": { title: "Managing invoices", slug: "invoices", readTime: 2 },
+  "account-settings": { title: "Account settings guide", slug: "account-settings", readTime: 3 },
+  "security": { title: "Security & two-factor auth", slug: "security", readTime: 4 },
+  "workspace": { title: "Workspace settings", slug: "workspace", readTime: 2 },
+};
+
+function getArticlesForRoute(pathname: string): ContextualArticle[] {
+  const slugs = CONTEXT_MAP[pathname];
+  if (!slugs) return DEFAULT_ARTICLES;
+  return slugs
+    .map((s) => ARTICLE_META[s])
+    .filter((a): a is ContextualArticle => !!a)
+    .slice(0, 3);
+}
 
 const DEFAULT_ARTICLES: ContextualArticle[] = [
   { title: "Getting started with Buildrik", slug: "getting-started", readTime: 3 },
@@ -50,7 +57,7 @@ export function ContextualHelp() {
   const ref = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
-  const articles = PAGE_ARTICLES[pathname] ?? DEFAULT_ARTICLES;
+  const articles = getArticlesForRoute(pathname);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -85,7 +92,7 @@ export function ContextualHelp() {
             {articles.map((article) => (
               <Link
                 key={article.slug}
-                href={`/dashboard/help?article=${article.slug}`}
+                href={`/dashboard/help/${article.slug}`}
                 onClick={() => setOpen(false)}
                 className="flex flex-col gap-1 px-4 py-3 transition-colors hover:bg-[#FFF5F4]"
               >

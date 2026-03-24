@@ -19,14 +19,6 @@ export default function HelpPage() {
     { enabled: view === "search" && searchQuery.length > 0 }
   );
 
-  const createTicketMutation = trpc.help.createTicket.useMutation({
-    onSuccess: () => {
-      addToast("success", "Support ticket submitted", "We'll get back to you within 24 hours");
-      setView("home");
-    },
-    onError: (err) => addToast("error", "Failed to submit ticket", err.message),
-  });
-
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
     setView("search");
@@ -48,10 +40,7 @@ export default function HelpPage() {
         </div>
         <div className="max-w-lg">
           <h1 className="mb-6 text-[22px] font-bold" style={{ color: "#0D0D0D" }}>Submit a Support Ticket</h1>
-          <TicketForm
-            onSubmit={(data) => createTicketMutation.mutate(data)}
-            isSubmitting={createTicketMutation.isPending}
-          />
+          <TicketForm />
         </div>
       </div>
     );
