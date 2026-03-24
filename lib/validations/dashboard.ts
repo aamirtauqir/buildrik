@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+export const memberAvatarSchema = z.object({
+  name: z.string(),
+  avatar: z.string().nullable(),
+});
+
 export const dashboardStatsSchema = z.object({
   totalSites: z.number(),
   publishedSites: z.number(),
@@ -7,6 +12,8 @@ export const dashboardStatsSchema = z.object({
   archivedSites: z.number(),
   monthlyVisits: z.number(),
   visitsChange: z.number(),
+  dailyVisitors: z.array(z.number()),
+  memberAvatars: z.array(memberAvatarSchema),
   collaborators: z.number(),
   pendingInvites: z.number(),
   lastPublishedSiteName: z.string().nullable(),
@@ -28,9 +35,19 @@ export const activityEntrySchema = z.object({
   id: z.string(),
   action: z.string(),
   actorName: z.string().nullable(),
+  actorAvatar: z.string().nullable(),
   description: z.string().nullable(),
   siteId: z.string().nullable(),
   createdAt: z.date(),
+});
+
+export const activityGroupSchema = z.object({
+  label: z.string(),
+  entries: z.array(activityEntrySchema),
+});
+
+export const activityFeedSchema = z.object({
+  groups: z.array(activityGroupSchema),
 });
 
 export const workspaceHealthSchema = z.object({
@@ -43,4 +60,7 @@ export const workspaceHealthSchema = z.object({
 export type DashboardStats = z.infer<typeof dashboardStatsSchema>;
 export type RecentSite = z.infer<typeof recentSiteSchema>;
 export type ActivityEntry = z.infer<typeof activityEntrySchema>;
+export type ActivityGroup = z.infer<typeof activityGroupSchema>;
+export type ActivityFeed = z.infer<typeof activityFeedSchema>;
+export type MemberAvatar = z.infer<typeof memberAvatarSchema>;
 export type WorkspaceHealth = z.infer<typeof workspaceHealthSchema>;

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { trpc } from "@/lib/trpc/client";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { QuickActions } from "@/components/dashboard/quick-actions";
@@ -10,6 +11,8 @@ import { EmptyState } from "@/components/dashboard/empty-state";
 import { DashboardChecklist } from "@/components/onboarding/dashboard-checklist";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+
+type ActivityFilter = "all" | "mine" | "team";
 
 const QUICK_ACTIONS_NEW_USER = [
   { label: "Create Site", href: "/dashboard/sites/new", icon: "Plus" as const, description: "Start from scratch" },
@@ -26,9 +29,10 @@ const QUICK_ACTIONS_ACTIVE = [
 ];
 
 export default function DashboardPage() {
+  const [activityFilter, setActivityFilter] = useState<ActivityFilter>("all");
   const stats = trpc.dashboard.stats.useQuery();
   const recentSites = trpc.dashboard.recentSites.useQuery();
-  const activity = trpc.dashboard.activity.useQuery();
+  const activity = trpc.dashboard.activity.useQuery({ filter: activityFilter });
   const health = trpc.dashboard.health.useQuery();
   const onboardingState = trpc.onboarding.getState.useQuery();
   const dismissOnboarding = trpc.onboarding.dismiss.useMutation({
@@ -111,7 +115,22 @@ export default function DashboardPage() {
           {/* Activity + Health side by side */}
           <div className="grid grid-cols-3 gap-6">
             <div className="col-span-2">
-              <ActivityFeed entries={activity.data ?? []} />
+              <div className="mb-2 flex gap-1">
+                {(["all", "mine", "team"] as const).map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setActivityFilter(f)}
+                    className={
+                      activityFilter === f
+                        ? "rounded-lg bg-[#F4F4F4] px-3 py-1 text-xs font-medium text-[#0D0D0D]"
+                        : "rounded-lg px-3 py-1 text-xs text-[#7A7A7A] hover:bg-[#F4F4F4]"
+                    }
+                  >
+                    {f === "all" ? "All" : f === "mine" ? "My Activity" : "Team"}
+                  </button>
+                ))}
+              </div>
+              <ActivityFeed feed={activity.data ?? { groups: [] }} />
             </div>
             <div>
               {health.data && <WorkspaceHealth data={health.data} />}
