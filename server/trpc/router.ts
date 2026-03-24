@@ -7,6 +7,9 @@ import { templatesRouter } from "./routers/templates";
 import { teamRouter } from "./routers/team";
 import { billingRouter } from "./routers/billing";
 import { accountRouter } from "./routers/account";
+import { helpRouter } from "./routers/help";
+import { notificationsRouter } from "./routers/notifications";
+import { onboardingRouter } from "./routers/onboarding";
 
 export const appRouter = router({
   auth: authRouter,
@@ -17,6 +20,9 @@ export const appRouter = router({
   team: teamRouter,
   billing: billingRouter,
   account: accountRouter,
+  help: helpRouter,
+  notifications: notificationsRouter,
+  onboarding: onboardingRouter,
 });
 
 export type AppRouter = typeof appRouter;

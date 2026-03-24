@@ -1,0 +1,171 @@
+"use client";
+
+import { useState } from "react";
+import { Search, Rocket, Globe, Users, CreditCard, Link, Pencil, MessageCircle, Mail, Printer } from "lucide-react";
+import { HELP_CATEGORIES } from "@/lib/validations/help";
+
+export const HELP_CATEGORY_LIST = HELP_CATEGORIES.map((c) => ({ ...c }));
+
+export const KEYBOARD_SHORTCUTS = [
+  { keys: ["⌘", "K"], description: "Open search" },
+  { keys: ["⌘", "N"], description: "New site" },
+  { keys: ["⌘", ","], description: "Open settings" },
+  { keys: ["Esc"], description: "Close modal / dialog" },
+  { keys: ["?"], description: "Open help center" },
+  { keys: ["G", "D"], description: "Go to Dashboard" },
+  { keys: ["G", "S"], description: "Go to Sites" },
+  { keys: ["G", "T"], description: "Go to Team" },
+  { keys: ["G", "B"], description: "Go to Billing" },
+];
+
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  Rocket,
+  Globe,
+  Users,
+  CreditCard,
+  Link,
+  Pencil,
+};
+
+interface HelpCenterProps {
+  onSearch: (query: string) => void;
+  onContactLiveChat: () => void;
+  onContactEmail: () => void;
+  searchQuery?: string;
+}
+
+export function HelpCenter({ onSearch, onContactLiveChat, onContactEmail, searchQuery = "" }: HelpCenterProps) {
+  const [query, setQuery] = useState(searchQuery);
+
+  function handleSearchSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (query.trim()) onSearch(query.trim());
+  }
+
+  function handlePrint() {
+    window.print();
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Search */}
+      <form onSubmit={handleSearchSubmit}>
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2" style={{ color: "#7A7A7A" }} />
+          <input
+            type="text"
+            placeholder="Search help articles..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full rounded-xl border py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2"
+            style={{
+              borderColor: "#E8E8E8",
+              color: "#0D0D0D",
+              focusRingColor: "#E42313",
+            }}
+          />
+          {query && (
+            <button
+              type="submit"
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg px-3 py-1 text-xs font-medium text-white"
+              style={{ backgroundColor: "#E42313" }}
+            >
+              Search
+            </button>
+          )}
+        </div>
+      </form>
+
+      {/* Categories */}
+      <section>
+        <h2 className="mb-4 text-base font-semibold" style={{ color: "#0D0D0D" }}>Browse by Category</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {HELP_CATEGORY_LIST.map((cat) => {
+            const Icon = ICON_MAP[cat.icon];
+            return (
+              <div
+                key={cat.key}
+                className="flex cursor-pointer flex-col gap-2 rounded-xl border p-4 transition-colors hover:border-[#E42313]/30 hover:bg-[#FFF5F4]"
+                style={{ borderColor: "#E8E8E8" }}
+              >
+                {Icon && <Icon className="h-5 w-5" style={{ color: "#E42313" }} />}
+                <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>{cat.label}</p>
+                <p className="text-xs" style={{ color: "#7A7A7A" }}>Coming soon</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Contact Support */}
+      <section>
+        <h2 className="mb-4 text-base font-semibold" style={{ color: "#0D0D0D" }}>Contact Support</h2>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <button
+            onClick={onContactLiveChat}
+            className="flex items-center gap-4 rounded-xl border p-4 text-left transition-colors hover:border-[#E42313]/30 hover:bg-[#FFF5F4]"
+            style={{ borderColor: "#E8E8E8" }}
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#FFF5F4" }}>
+              <MessageCircle className="h-5 w-5" style={{ color: "#E42313" }} />
+            </div>
+            <div>
+              <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Live Chat</p>
+              <p className="text-xs" style={{ color: "#7A7A7A" }}>Chat with our support team</p>
+            </div>
+          </button>
+          <button
+            onClick={onContactEmail}
+            className="flex items-center gap-4 rounded-xl border p-4 text-left transition-colors hover:border-[#E42313]/30 hover:bg-[#FFF5F4]"
+            style={{ borderColor: "#E8E8E8" }}
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: "#FFF5F4" }}>
+              <Mail className="h-5 w-5" style={{ color: "#E42313" }} />
+            </div>
+            <div>
+              <p className="text-sm font-medium" style={{ color: "#0D0D0D" }}>Email Support</p>
+              <p className="text-xs" style={{ color: "#7A7A7A" }}>Get a reply within 24 hours</p>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      {/* Keyboard Shortcuts */}
+      <section>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-base font-semibold" style={{ color: "#0D0D0D" }}>Keyboard Shortcuts</h2>
+          <button
+            onClick={handlePrint}
+            className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[#F4F4F4]"
+            style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}
+          >
+            <Printer className="h-3.5 w-3.5" />
+            Print
+          </button>
+        </div>
+        <div className="rounded-xl border" style={{ borderColor: "#E8E8E8" }}>
+          {KEYBOARD_SHORTCUTS.map((shortcut, i) => (
+            <div
+              key={i}
+              className="flex items-center justify-between px-4 py-3"
+              style={{ borderBottom: i < KEYBOARD_SHORTCUTS.length - 1 ? "1px solid #E8E8E8" : "none" }}
+            >
+              <span className="text-sm" style={{ color: "#0D0D0D" }}>{shortcut.description}</span>
+              <div className="flex items-center gap-1">
+                {shortcut.keys.map((key, ki) => (
+                  <kbd
+                    key={ki}
+                    className="rounded border px-1.5 py-0.5 text-xs font-medium"
+                    style={{ borderColor: "#E8E8E8", color: "#7A7A7A", backgroundColor: "#F4F4F4" }}
+                  >
+                    {key}
+                  </kbd>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
