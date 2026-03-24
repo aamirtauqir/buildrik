@@ -83,6 +83,7 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@index([token, type, used])
+  @@index([expires])
   @@map("verification_tokens")
 }
 
@@ -192,6 +193,7 @@ model Site {
   publishJobs    PublishBuildJob[]
   analyticsEvents AnalyticsEvent[]
 
+  @@index([workspaceId])
   @@index([workspaceId, status])
   @@map("sites")
 }
@@ -418,7 +420,7 @@ model OnboardingState {
   id             String   @id @default(cuid())
   userId         String   @unique
   role           String?
-  step           String?
+  step           String   @default("ROLE_SELECT")
   projectName    String?
   method         String?
   dashboardTasks Json?
@@ -446,6 +448,7 @@ model SiteAnalytics {
 
   site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
+  @@index([siteId, date])
   @@unique([siteId, date])
   @@map("site_analytics")
 }
