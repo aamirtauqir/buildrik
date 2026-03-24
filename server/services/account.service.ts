@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { UpdateProfileInput, NotificationPrefInput, UpdatePreferencesInput } from "@/lib/validations/account";
+import { sendAccountDeletionEmail } from "@/server/services/email.service";
+import { createNotification } from "@/server/services/notification.trigger";
 
 export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -15,6 +17,13 @@ export async function changePassword(userId: string, currentPassword: string, ne
     where: { id: userId },
     data: { passwordHash: hash },
   });
+
+  createNotification({
+    userId,
+    type: "SECURITY_PASSWORD_CHANGED",
+    message: "Your password was changed",
+    priority: "high",
+  }).catch(() => {});
 }
 
 export async function getProfile(userId: string) {
@@ -97,13 +106,20 @@ export async function requestAccountDeletion(userId: string, reason?: string) {
   const scheduledAt = new Date();
   scheduledAt.setDate(scheduledAt.getDate() + 30);
 
-  return prisma.accountDeletionReq.create({
+  const req = await prisma.accountDeletionReq.create({
     data: {
       userId,
       reason,
       scheduledAt,
     },
   });
+
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
+  if (user) {
+    sendAccountDeletionEmail(user.email, req.scheduledAt.toISOString()).catch(() => {});
+  }
+
+  return req;
 }
 
 export async function requestDataExport(userId: string) {
@@ -171,6 +187,14 @@ export async function confirm2FA(userId: string, code: string) {
   if (!valid) throw new Error("INVALID_CODE");
 
   await prisma.user.update({ where: { id: userId }, data: { twoFactorEnabled: true } });
+
+  createNotification({
+    userId,
+    type: "SECURITY_2FA_CHANGED",
+    message: "Two-factor authentication was enabled on your account",
+    priority: "high",
+  }).catch(() => {});
+
   return { success: true };
 }
 
@@ -188,6 +212,14 @@ export async function disable2FA(userId: string, password: string) {
     where: { id: userId },
     data: { twoFactorEnabled: false, twoFactorSecret: null, backupCodes: [] },
   });
+
+  createNotification({
+    userId,
+    type: "SECURITY_2FA_CHANGED",
+    message: "Two-factor authentication was disabled on your account",
+    priority: "high",
+  }).catch(() => {});
+
   return { success: true };
 }
 
