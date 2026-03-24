@@ -25,6 +25,11 @@ export const listSitesSchema = z.object({
     .default("lastEdited"),
   search: z.string().optional(),
   folderId: z.string().nullable().optional(),
+  createdBy: z.string().optional(),
+  dateRange: z.enum(["7d", "30d", "90d"]).optional(),
+  templateUsed: z.string().optional(),
+  hasCustomDomain: z.boolean().optional(),
+  hasTraffic: z.enum(["none", "1-100", "100-1000", "1000+"]).optional(),
 });
 
 export const createFolderSchema = z.object({
