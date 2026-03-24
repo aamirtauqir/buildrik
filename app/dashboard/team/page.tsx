@@ -155,15 +155,20 @@ export default function TeamPage() {
           )}
 
           {/* Team Activity */}
-          {activityQuery.data && activityQuery.data.length > 0 && (
-            <div className="rounded-xl border bg-white p-5" style={{ borderColor: "#E8E8E8" }}>
-              <h3 className="mb-3 text-sm font-semibold" style={{ color: "#0D0D0D" }}>Team Activity</h3>
+          <div className="rounded-xl border bg-white p-5" style={{ borderColor: "#E8E8E8" }}>
+            <h3 className="mb-3 text-sm font-semibold" style={{ color: "#0D0D0D" }}>Team Activity</h3>
+            {activityQuery.data && activityQuery.data.length > 0 ? (
               <div className="space-y-3">
-                {activityQuery.data.map((entry: { id: string; action: string; description: string | null; createdAt: Date }) => (
+                {activityQuery.data.map((entry) => (
                   <div key={entry.id} className="flex items-start gap-2">
                     <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: "#E42313" }} />
                     <div>
-                      <p className="text-sm" style={{ color: "#0D0D0D" }}>{entry.description ?? entry.action}</p>
+                      <p className="text-sm" style={{ color: "#0D0D0D" }}>
+                        {entry.actorName && (
+                          <span className="font-medium">{entry.actorName} </span>
+                        )}
+                        {entry.description ?? entry.action}
+                      </p>
                       <p className="text-xs" style={{ color: "#B0B0B0" }}>
                         {new Date(entry.createdAt).toLocaleDateString()}
                       </p>
@@ -171,8 +176,10 @@ export default function TeamPage() {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <p className="text-sm" style={{ color: "#7A7A7A" }}>No team activity yet</p>
+            )}
+          </div>
         </div>
       )}
 

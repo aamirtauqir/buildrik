@@ -204,7 +204,7 @@ export async function resendInvite(inviteId: string) {
 }
 
 export async function getTeamActivity(workspaceId: string, limit = 5) {
-  return prisma.activityLog.findMany({
+  const logs = await prisma.activityLog.findMany({
     where: {
       workspaceId,
       action: { in: TEAM_ACTIONS },
@@ -212,4 +212,15 @@ export async function getTeamActivity(workspaceId: string, limit = 5) {
     orderBy: { createdAt: "desc" },
     take: limit,
   });
+
+  const actorIds = [...new Set(logs.map((l) => l.actorId).filter(Boolean))] as string[];
+  const actors = actorIds.length > 0
+    ? await prisma.user.findMany({ where: { id: { in: actorIds } }, select: { id: true, fullName: true } })
+    : [];
+  const actorMap = new Map(actors.map((a) => [a.id, a.fullName]));
+
+  return logs.map((log) => ({
+    ...log,
+    actorName: (log.actorId && actorMap.get(log.actorId)) ?? null,
+  }));
 }

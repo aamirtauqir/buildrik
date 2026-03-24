@@ -1,25 +1,35 @@
 "use client";
 
-import { Users } from "lucide-react";
+import { Users, Crown, ShieldCheck, Pencil, Eye } from "lucide-react";
 
 const ROLE_CARDS = [
   {
+    role: "Owner",
+    description: "Full control of workspace, billing, and settings",
+    bg: "#FEF2F2",
+    color: "#E42313",
+    Icon: Crown,
+  },
+  {
     role: "Admin",
-    description: "Can manage everything except billing",
+    description: "Manage team members, sites, and settings. No billing access.",
     bg: "#EFF6FF",
     color: "#3B82F6",
+    Icon: ShieldCheck,
   },
   {
     role: "Editor",
-    description: "Can edit sites they have access to",
+    description: "Create and edit sites. Cannot publish or manage team.",
     bg: "#F0FDF4",
     color: "#22C55E",
+    Icon: Pencil,
   },
   {
     role: "Viewer",
-    description: "Can only view published sites",
+    description: "View published sites only. Read-only access.",
     bg: "#F3F4F6",
     color: "#7A7A7A",
+    Icon: Eye,
   },
 ];
 
@@ -52,19 +62,22 @@ export function TeamEmptyState({ onInvite }: TeamEmptyStateProps) {
         Invite Team Members
       </button>
 
-      <div className="mt-10 grid w-full max-w-lg gap-3 sm:grid-cols-3">
+      <div className="mt-10 grid w-full max-w-2xl gap-3 grid-cols-2 sm:grid-cols-4">
         {ROLE_CARDS.map((card) => (
           <div
             key={card.role}
             className="rounded-xl border border-[#E8E8E8] p-4"
           >
-            <span
-              className="inline-block rounded-full px-2.5 py-1 text-xs font-semibold"
-              style={{ backgroundColor: card.bg, color: card.color }}
+            <div
+              className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg"
+              style={{ backgroundColor: card.bg }}
             >
+              <card.Icon className="h-4 w-4" style={{ color: card.color }} />
+            </div>
+            <p className="text-sm font-bold" style={{ color: "#0D0D0D" }}>
               {card.role}
-            </span>
-            <p className="mt-2 text-xs" style={{ color: "#7A7A7A" }}>
+            </p>
+            <p className="mt-1 text-xs" style={{ color: "#7A7A7A" }}>
               {card.description}
             </p>
           </div>
