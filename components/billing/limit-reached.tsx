@@ -1,11 +1,15 @@
 "use client";
 
+type Role = "owner" | "editor";
+
 export interface LimitReachedProps {
   resource: string;
   used: number;
   limit: number;
   unit?: string;
-  isOwner: boolean;
+  role: Role;
+  upgradePlanName?: string;
+  upgradePlanPrice?: string;
   onUpgrade?: () => void;
   onComparePlans?: () => void;
 }
@@ -15,17 +19,34 @@ function formatValue(value: number, unit?: string): string {
   return `${value} ${unit}`;
 }
 
-export function LimitReached({ resource, used, limit, unit, isOwner, onUpgrade, onComparePlans }: LimitReachedProps) {
+export function LimitReached({
+  resource,
+  used,
+  limit,
+  unit,
+  role,
+  upgradePlanName = "Pro",
+  upgradePlanPrice = "$29/mo",
+  onUpgrade,
+  onComparePlans,
+}: LimitReachedProps) {
   const pct = limit === 0 ? 100 : Math.min(100, Math.round((used / limit) * 100));
 
   return (
     <div className="rounded-2xl border border-[#E8E8E8] bg-white p-6">
       <div className="flex items-start gap-4">
         <div
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
           style={{ backgroundColor: "#FEF2F2" }}
         >
-          🔒
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M10 2a3 3 0 0 0-3 3v3H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1V5a3 3 0 0 0-3-3ZM9 5a1 1 0 1 1 2 0v3H9V5Zm1 7a1 1 0 0 0-1 1v2a1 1 0 1 0 2 0v-2a1 1 0 0 0-1-1Z"
+              fill="#E42313"
+            />
+          </svg>
         </div>
         <div className="flex-1">
           <h3 className="text-base font-semibold" style={{ color: "#0D0D0D" }}>
@@ -49,7 +70,7 @@ export function LimitReached({ resource, used, limit, unit, isOwner, onUpgrade, 
           </div>
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            {isOwner ? (
+            {role === "owner" ? (
               <>
                 {onUpgrade && (
                   <button
@@ -57,7 +78,7 @@ export function LimitReached({ resource, used, limit, unit, isOwner, onUpgrade, 
                     className="rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
                     style={{ backgroundColor: "#E42313" }}
                   >
-                    Upgrade to Pro
+                    Upgrade to {upgradePlanName} &mdash; {upgradePlanPrice}
                   </button>
                 )}
                 {onComparePlans && (

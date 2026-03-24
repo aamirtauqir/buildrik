@@ -15,6 +15,7 @@ type CancelReason = (typeof CANCEL_REASONS)[number]["value"];
 
 interface CancelModalProps {
   periodEnd: Date;
+  planFeatures?: string[];
   onConfirm: (reason: CancelReason, feedback?: string) => void;
   onClose: () => void;
   isLoading?: boolean;
@@ -24,7 +25,7 @@ function formatDate(date: Date): string {
   return new Date(date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 }
 
-export function CancelModal({ periodEnd, onConfirm, onClose, isLoading = false }: CancelModalProps) {
+export function CancelModal({ periodEnd, planFeatures = [], onConfirm, onClose, isLoading = false }: CancelModalProps) {
   const [reason, setReason] = useState<CancelReason | "">("");
   const [feedback, setFeedback] = useState("");
 
@@ -57,6 +58,22 @@ export function CancelModal({ periodEnd, onConfirm, onClose, isLoading = false }
         <div className="mb-5 rounded-lg border border-[#FEE2E2] bg-[#FEF2F2] px-4 py-3 text-sm" style={{ color: "#B91C1C" }}>
           Your plan features will remain active until <strong>{formatDate(periodEnd)}</strong>. After that, your workspace will be downgraded to Free.
         </div>
+
+        {planFeatures.length > 0 && (
+          <div className="mb-5">
+            <h3 className="mb-2 text-sm font-semibold" style={{ color: "#0D0D0D" }}>
+              Features you'll lose
+            </h3>
+            <ul className="space-y-1.5">
+              {planFeatures.map((feature) => (
+                <li key={feature} className="flex items-center gap-2 text-sm" style={{ color: "#7A7A7A" }}>
+                  <span style={{ color: "#EF4444" }}>✕</span>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <fieldset className="mb-4">
           <legend className="mb-2 text-sm font-semibold" style={{ color: "#0D0D0D" }}>
@@ -105,18 +122,18 @@ export function CancelModal({ periodEnd, onConfirm, onClose, isLoading = false }
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 rounded-lg border py-2.5 text-sm font-semibold transition-colors hover:bg-[#FAFAFA]"
-            style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+            className="flex-1 rounded-lg border py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            style={{ backgroundColor: "#E42313", borderColor: "#E42313" }}
           >
-            Keep subscription
+            Keep My Plan
           </button>
           <button
             onClick={handleSubmit}
             disabled={!reason || isLoading}
-            className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40"
-            style={{ backgroundColor: "#E42313" }}
+            className="flex-1 rounded-lg border py-2.5 text-sm font-semibold transition-colors hover:bg-[#FEF2F2] disabled:opacity-40"
+            style={{ borderColor: "#EF4444", color: "#EF4444" }}
           >
-            {isLoading ? "Cancelling…" : "Cancel subscription"}
+            {isLoading ? "Cancelling..." : "Cancel Plan"}
           </button>
         </div>
       </div>

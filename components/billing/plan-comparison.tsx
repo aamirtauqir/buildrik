@@ -32,16 +32,53 @@ const PLAN_BADGE: Record<PlanKey, { bg: string; color: string; label: string }> 
   BUSINESS: { bg: "#F5F3FF", color: "#8B5CF6", label: "Business" },
 };
 
+export interface UsageMetric {
+  label: string;
+  used: number;
+  limit: number;
+}
+
 interface PlanComparisonProps {
   currentPlan: PlanKey;
   nearLimitFeatures?: string[];
+  usage?: UsageMetric[];
   onSelectPlan?: (plan: PlanKey, interval: "MONTHLY" | "YEARLY") => void;
 }
 
-export function PlanComparison({ currentPlan, nearLimitFeatures = [], onSelectPlan }: PlanComparisonProps) {
+function getWarningPercent(usage: UsageMetric[], label: string): number | null {
+  const metric = usage.find((m) => m.label === label);
+  if (!metric || metric.limit <= 0) return null;
+  return Math.round((metric.used / metric.limit) * 100);
+}
+
+function findBestForYou(
+  currentPlan: PlanKey,
+  nearLimitFeatures: string[],
+): PlanKey | null {
+  if (nearLimitFeatures.length === 0) return null;
+
+  const planOrder: PlanKey[] = ["FREE", "PRO", "BUSINESS"];
+  const currentIdx = planOrder.indexOf(currentPlan);
+
+  // Find the cheapest plan above current that covers all warned metrics
+  // For simplicity, if current is FREE and there are warnings, PRO is best
+  // If current is PRO, BUSINESS is best
+  if (currentIdx < planOrder.length - 1) {
+    return planOrder[currentIdx + 1];
+  }
+  return null;
+}
+
+export function PlanComparison({
+  currentPlan,
+  nearLimitFeatures = [],
+  usage = [],
+  onSelectPlan,
+}: PlanComparisonProps) {
   const [yearly, setYearly] = useState(false);
   const interval = yearly ? "YEARLY" : "MONTHLY";
   const plans: PlanKey[] = ["FREE", "PRO", "BUSINESS"];
+  const bestForYou = findBestForYou(currentPlan, nearLimitFeatures);
 
   return (
     <div>
@@ -67,11 +104,12 @@ export function PlanComparison({ currentPlan, nearLimitFeatures = [], onSelectPl
         </button>
         <span className="flex items-center gap-1.5 text-sm font-medium" style={{ color: yearly ? "#0D0D0D" : "#7A7A7A" }}>
           Yearly
-          {yearly && (
-            <span className="rounded-full px-2 py-0.5 text-xs font-semibold" style={{ backgroundColor: "#F0FDF4", color: "#22C55E" }}>
-              Save ~20%
-            </span>
-          )}
+          <span
+            className="rounded-full px-2 py-0.5 text-xs font-semibold"
+            style={{ backgroundColor: "#F0FDF4", color: "#22C55E" }}
+          >
+            Save 20%
+          </span>
         </span>
       </div>
 
@@ -86,12 +124,21 @@ export function PlanComparison({ currentPlan, nearLimitFeatures = [], onSelectPl
                 const badge = PLAN_BADGE[plan];
                 const price = PLAN_PRICES[plan][yearly ? "yearly" : "monthly"];
                 const isCurrent = plan === currentPlan;
+                const isBest = plan === bestForYou;
                 return (
                   <th
                     key={plan}
-                    className={cn("px-6 py-4 text-center", isCurrent && "bg-[#FEF2F2]")}
+                    className={cn("relative px-6 py-4 text-center", isCurrent && "bg-[#FEF2F2]")}
                   >
                     <div className="flex flex-col items-center gap-1">
+                      {isBest && (
+                        <span
+                          className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide"
+                          style={{ backgroundColor: "#F0FDF4", color: "#22C55E" }}
+                        >
+                          Best for you
+                        </span>
+                      )}
                       <span
                         className="rounded-full px-2.5 py-1 text-xs font-semibold"
                         style={{ backgroundColor: badge.bg, color: badge.color }}
@@ -115,6 +162,8 @@ export function PlanComparison({ currentPlan, nearLimitFeatures = [], onSelectPl
           <tbody>
             {PLAN_FEATURES.map((row, i) => {
               const isNearLimit = nearLimitFeatures.includes(row.label);
+              const pct = getWarningPercent(usage, row.label);
+              const showWarning = isNearLimit || (pct !== null && pct >= 80);
               return (
                 <tr
                   key={row.label}
@@ -126,9 +175,17 @@ export function PlanComparison({ currentPlan, nearLimitFeatures = [], onSelectPl
                   <td className="px-6 py-3 font-medium" style={{ color: "#0D0D0D" }}>
                     <span className="flex items-center gap-2">
                       {row.label}
-                      {isNearLimit && (
-                        <span className="rounded px-1.5 py-0.5 text-[10px] font-semibold" style={{ backgroundColor: "#FEF9C3", color: "#A16207" }}>
-                          Near limit
+                      {showWarning && (
+                        <span
+                          className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold"
+                          style={{ backgroundColor: "#FEF9C3", color: "#A16207" }}
+                          title={pct !== null ? `${pct}% used` : "Near limit"}
+                        >
+                          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M8 1L15 14H1L8 1Z" fill="#EAB308" stroke="#A16207" strokeWidth="1" />
+                            <text x="8" y="12" textAnchor="middle" fontSize="8" fill="#A16207" fontWeight="bold">!</text>
+                          </svg>
+                          {pct !== null ? `${pct}%` : "Near limit"}
                         </span>
                       )}
                     </span>
@@ -156,15 +213,19 @@ export function PlanComparison({ currentPlan, nearLimitFeatures = [], onSelectPl
                 <td className="px-6 py-4" />
                 {plans.map((plan) => {
                   const isCurrent = plan === currentPlan;
+                  const isBest = plan === bestForYou;
                   return (
                     <td key={plan} className={cn("px-6 py-4 text-center", isCurrent && "bg-[#FEF2F2]")}>
                       {!isCurrent && plan !== "FREE" && (
                         <button
                           onClick={() => onSelectPlan(plan, interval)}
-                          className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                          className={cn(
+                            "rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90",
+                            isBest && "ring-2 ring-[#22C55E] ring-offset-2"
+                          )}
                           style={{ backgroundColor: "#E42313" }}
                         >
-                          Upgrade
+                          {isBest ? "Upgrade — Best for you" : "Upgrade"}
                         </button>
                       )}
                       {isCurrent && (

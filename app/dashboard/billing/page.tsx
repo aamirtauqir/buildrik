@@ -6,10 +6,53 @@ import { useToast } from "@/components/dashboard/toast-provider";
 import { PlanCard } from "@/components/billing/plan-card";
 import { PlanComparison } from "@/components/billing/plan-comparison";
 import { UsageBars } from "@/components/billing/usage-bars";
+import type { UsageItem } from "@/components/billing/usage-bars";
 import { InvoiceTable } from "@/components/billing/invoice-table";
+import type { Invoice } from "@/components/billing/invoice-table";
 import { PaymentMethodCard } from "@/components/billing/payment-method-card";
 import { CancelModal } from "@/components/billing/cancel-modal";
 import { DunningBanner } from "@/components/dashboard/dunning-banner";
+
+type PlanKey = "FREE" | "PRO" | "BUSINESS";
+
+const PLAN_NAMES: Record<string, string> = {
+  FREE: "Free",
+  PRO: "Pro",
+  BUSINESS: "Business",
+};
+
+const PLAN_FEATURES_MAP: Record<string, string[]> = {
+  PRO: [
+    "15 sites", "5 team members", "3 custom domains",
+    "5 GB storage", "10 GB bandwidth", "20 AI generations/mo",
+  ],
+  BUSINESS: [
+    "50 sites", "25 team members", "20 custom domains",
+    "50 GB storage", "100 GB bandwidth", "Unlimited AI generations",
+  ],
+};
+
+function toUsageItems(usage: {
+  sites: { used: number; limit: number };
+  bandwidth: { usedMB: number; limitMB: number };
+  storage: { usedMB: number; limitMB: number };
+  teamMembers: { used: number; limit: number };
+  domains: { used: number; limit: number };
+  aiCredits: { used: number; limit: number };
+  formSubmissions: { used: number; limit: number };
+  redirects: { used: number; limit: number };
+}): UsageItem[] {
+  return [
+    { label: "Sites", used: usage.sites.used, limit: usage.sites.limit },
+    { label: "Bandwidth", used: usage.bandwidth.usedMB, limit: usage.bandwidth.limitMB, unit: "MB" },
+    { label: "Team members", used: usage.teamMembers.used, limit: usage.teamMembers.limit },
+    { label: "Custom domains", used: usage.domains.used, limit: usage.domains.limit },
+    { label: "Storage", used: usage.storage.usedMB, limit: usage.storage.limitMB, unit: "MB" },
+    { label: "AI credits", used: usage.aiCredits.used, limit: usage.aiCredits.limit },
+    { label: "Form submissions", used: usage.formSubmissions.used, limit: usage.formSubmissions.limit },
+    { label: "Redirects", used: usage.redirects.used, limit: usage.redirects.limit },
+  ];
+}
 
 export default function BillingPage() {
   const { addToast } = useToast();
@@ -47,6 +90,7 @@ export default function BillingPage() {
   const overview = overviewQuery.data;
   const isLoading = overviewQuery.isLoading;
   const isDunning = overview?.status === "PAST_DUE";
+  const planKey = (overview?.plan ?? "FREE") as PlanKey;
 
   if (isLoading) {
     return (
@@ -70,9 +114,9 @@ export default function BillingPage() {
         </div>
         <div className="mt-6">
           <PlanComparison
-            currentPlan={overview?.plan ?? "FREE"}
-            onUpgrade={(planId, interval) =>
-              upgradeMutation.mutate({ planId: planId as "PRO" | "BUSINESS", interval: interval as "MONTHLY" | "YEARLY" })
+            currentPlan={planKey}
+            onSelectPlan={(selectedPlan, interval) =>
+              upgradeMutation.mutate({ planId: selectedPlan as "PRO" | "BUSINESS", interval })
             }
           />
         </div>
@@ -87,40 +131,39 @@ export default function BillingPage() {
       <div className="mt-6 space-y-6">
         {overview && (
           <PlanCard
-            plan={overview.plan}
+            planId={planKey}
+            name={PLAN_NAMES[planKey] ?? planKey}
             price={overview.price}
-            interval={overview.interval}
+            interval={overview.interval as "MONTHLY" | "YEARLY"}
             currency={overview.currency}
-            cancelAtPeriodEnd={overview.cancelAtPeriodEnd}
+            features={PLAN_FEATURES_MAP[planKey] ?? []}
+            isCurrent
             isGrandfathered={overview.isGrandfathered}
-            currentPeriodEnd={overview.currentPeriodEnd}
             onChangePlan={() => setShowPlans(true)}
-            onCancel={() => setShowCancel(true)}
-            onReactivate={() => reactivateMutation.mutate()}
           />
         )}
-        {overview && <UsageBars usage={overview.usage} />}
+        {overview && <UsageBars items={toUsageItems(overview.usage)} />}
         {overview?.paymentMethod && (
           <PaymentMethodCard
-            brand={overview.paymentMethod.brand}
-            last4={overview.paymentMethod.last4}
-            expMonth={overview.paymentMethod.expMonth}
-            expYear={overview.paymentMethod.expYear}
+            paymentMethod={overview.paymentMethod}
             onUpdate={() => addToast("info", "Stripe Elements integration required — see PRD BIL-5")}
           />
         )}
         {invoicesQuery.data && invoicesQuery.data.data.length > 0 && (
-          <InvoiceTable invoices={invoicesQuery.data.data} />
+          <InvoiceTable invoices={invoicesQuery.data.data as Invoice[]} />
         )}
       </div>
-      <CancelModal
-        open={showCancel}
-        onClose={() => setShowCancel(false)}
-        onConfirm={(reason, feedback) =>
-          cancelMutation.mutate({ reason: reason as "TOO_EXPENSIVE" | "MISSING_FEATURES" | "SWITCHING" | "NOT_USING" | "TEMPORARY" | "OTHER", feedback })
-        }
-        periodEnd={overview?.currentPeriodEnd ?? new Date()}
-      />
+      {showCancel && (
+        <CancelModal
+          onClose={() => setShowCancel(false)}
+          onConfirm={(reason, feedback) =>
+            cancelMutation.mutate({ reason, feedback })
+          }
+          periodEnd={overview?.currentPeriodEnd ?? new Date()}
+          planFeatures={PLAN_FEATURES_MAP[planKey] ?? []}
+          isLoading={cancelMutation.isPending}
+        />
+      )}
     </div>
   );
 }

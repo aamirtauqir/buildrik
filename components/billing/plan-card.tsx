@@ -68,9 +68,9 @@ export function PlanCard({
           {isGrandfathered && (
             <span
               className="rounded-full px-2.5 py-1 text-xs font-semibold"
-              style={{ backgroundColor: "#FEF9C3", color: "#A16207" }}
+              style={{ backgroundColor: "#FEF3C7", color: "#92400E" }}
             >
-              Grandfathered
+              Legacy pricing
             </span>
           )}
         </div>
@@ -85,7 +85,7 @@ export function PlanCard({
       <ul className="mt-5 space-y-2">
         {features.map((feature) => (
           <li key={feature} className="flex items-center gap-2 text-sm" style={{ color: "#0D0D0D" }}>
-            <span style={{ color: "#22C55E" }}>✓</span>
+            <span style={{ color: "#22C55E" }}>&#10003;</span>
             {feature}
           </li>
         ))}

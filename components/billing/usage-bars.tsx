@@ -11,13 +11,24 @@ export interface UsageItem {
   ctaHref?: string;
 }
 
+const DEFAULT_USAGE_ITEMS: Pick<UsageItem, "label" | "ctaLabel" | "ctaHref">[] = [
+  { label: "Sites", ctaLabel: "Create site", ctaHref: "/dashboard/sites/new" },
+  { label: "Bandwidth", ctaLabel: "View usage", ctaHref: "/dashboard/settings/billing" },
+  { label: "Team members", ctaLabel: "Invite member", ctaHref: "/dashboard/settings/team" },
+  { label: "Custom domains", ctaLabel: "Connect domain", ctaHref: "/dashboard/domains" },
+  { label: "Storage", ctaLabel: "Manage files", ctaHref: "/dashboard/settings/billing" },
+  { label: "AI credits", ctaLabel: "View usage", ctaHref: "/dashboard/settings/billing" },
+  { label: "Form submissions", ctaLabel: "View forms", ctaHref: "/dashboard/forms" },
+  { label: "Redirects", ctaLabel: "Manage redirects", ctaHref: "/dashboard/redirects" },
+];
+
 interface UsageBarsProps {
   items: UsageItem[];
 }
 
 function barColor(pct: number): string {
-  if (pct >= 85) return "#E42313";
-  if (pct >= 60) return "#F59E0B";
+  if (pct >= 85) return "#EF4444";
+  if (pct >= 60) return "#EAB308";
   return "#3B82F6";
 }
 
@@ -30,6 +41,10 @@ function BarItem({ item }: { item: UsageItem }) {
   const pct = item.limit === 0 ? 0 : Math.min(100, Math.round((item.used / item.limit) * 100));
   const color = barColor(pct);
   const isNearLimit = pct >= 60;
+
+  const defaultCta = DEFAULT_USAGE_ITEMS.find((d) => d.label === item.label);
+  const ctaLabel = item.ctaLabel ?? defaultCta?.ctaLabel;
+  const ctaHref = item.ctaHref ?? defaultCta?.ctaHref;
 
   return (
     <div>
@@ -47,13 +62,13 @@ function BarItem({ item }: { item: UsageItem }) {
           style={{ width: `${pct}%`, backgroundColor: color }}
         />
       </div>
-      {item.ctaLabel && item.ctaHref && (
+      {ctaLabel && ctaHref && (
         <a
-          href={item.ctaHref}
+          href={ctaHref}
           className="mt-1 inline-block text-xs font-medium underline-offset-2 hover:underline"
           style={{ color: "#7A7A7A" }}
         >
-          {item.ctaLabel}
+          {ctaLabel}
         </a>
       )}
     </div>
