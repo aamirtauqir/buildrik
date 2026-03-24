@@ -31,14 +31,23 @@ export default function LoginPage() {
           body: JSON.stringify({ sessionToken: data.sessionToken }),
         });
         if (res.ok) {
-          router.push("/dashboard");
+          router.push("/auth/redirect");
         } else {
           setError("Failed to create session");
         }
       }
     },
     onError: (err) => {
-      setError(err.message);
+      const cause = (err.data as Record<string, unknown>)?.cause as { attemptsRemaining?: number; locked?: boolean; lockedUntil?: string } | undefined;
+      if (cause?.locked && cause.lockedUntil) {
+        router.push(`/auth/error/locked?until=${encodeURIComponent(cause.lockedUntil)}`);
+        return;
+      }
+      if (cause?.attemptsRemaining !== undefined && cause.attemptsRemaining > 0) {
+        setError(`Incorrect email or password — ${cause.attemptsRemaining} more attempt${cause.attemptsRemaining === 1 ? "" : "s"}`);
+      } else {
+        setError(err.message);
+      }
     },
   });
 

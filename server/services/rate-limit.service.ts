@@ -28,7 +28,7 @@ export async function incrementFailedAttempts(userId: string) {
     });
   }
 
-  return MAX_ATTEMPTS - user.failedAttempts;
+  return Math.max(0, MAX_ATTEMPTS - user.failedAttempts);
 }
 
 export async function resetFailedAttempts(userId: string) {

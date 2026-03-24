@@ -97,7 +97,16 @@ export async function login(email: string, password: string) {
 
   if (!user || !user.passwordHash || !valid) {
     if (user) {
-      await incrementFailedAttempts(user.id);
+      const remaining = await incrementFailedAttempts(user.id);
+      await logAuditEvent("LOGIN_FAILED", "failure", { email, metadata: { attemptsRemaining: remaining } });
+      const lockedUser = remaining <= 0
+        ? await prisma.user.findUnique({ where: { id: user.id }, select: { lockedUntil: true } })
+        : null;
+      throw new AuthError("INVALID_CREDENTIALS", "Incorrect email or password", 401, {
+        attemptsRemaining: remaining,
+        locked: remaining <= 0,
+        lockedUntil: lockedUser?.lockedUntil?.toISOString() ?? null,
+      });
     }
     await logAuditEvent("LOGIN_FAILED", "failure", { email });
     throw new AuthError("INVALID_CREDENTIALS", "Incorrect email or password");
