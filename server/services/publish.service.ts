@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { PrePublishChecksResult } from "@/lib/validations/publish";
+import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 
 export async function runPrePublishChecks(siteId: string): Promise<PrePublishChecksResult> {
   const [pageCount, site, domain, emptyPages] = await Promise.all([
@@ -66,6 +67,11 @@ export async function startPublish(siteId: string, workspaceId: string, userId: 
     throw new Error("ALREADY_PUBLISHING");
   }
 
+  const site = await prisma.site.findUnique({
+    where: { id: siteId },
+    select: { name: true },
+  });
+
   const job = await prisma.publishBuildJob.create({
     data: {
       siteId,
@@ -84,6 +90,13 @@ export async function startPublish(siteId: string, workspaceId: string, userId: 
       lastPublishedBy: userId,
     },
   });
+
+  notifyWorkspaceOwner(
+    workspaceId,
+    "SITE_PUBLISHED",
+    `Site "${site?.name ?? "Untitled"}" publish started`,
+    `/dashboard/sites/${siteId}`,
+  ).catch(() => {});
 
   return job;
 }

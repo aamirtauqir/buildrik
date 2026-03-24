@@ -12,6 +12,7 @@ import {
 } from "@/lib/validations/auth";
 import { generateToken } from "@/server/services/token.service";
 import { logAuditEvent } from "@/server/services/audit.service";
+import { createNotification } from "@/server/services/notification.trigger";
 
 // Strict: 5 attempts per 15 min (login, 2FA, token verification)
 const strictRateLimit = createRateLimitedProcedure(5, 15 * 60 * 1000);
@@ -228,6 +229,15 @@ export const authRouter = router({
         });
       }
       await logAuditEvent("INVITE_ACCEPTED", "success", { userId, metadata: { workspaceId: invite.workspaceId } });
+
+      createNotification({
+        userId: invite.invitedBy,
+        type: "MEMBER_JOINED",
+        message: `${user.email} joined the workspace`,
+        actorId: userId,
+        actionUrl: "/dashboard/team",
+      }).catch(() => {});
+
       return { success: true, workspaceId: invite.workspaceId, workspaceName: invite.workspace.name };
     }),
 

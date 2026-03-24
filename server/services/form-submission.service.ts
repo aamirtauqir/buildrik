@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { FormSubmissionInput, ListSubmissionsInput } from "@/lib/validations/forms";
+import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 
 type UpdateInput = {
   id: string;
@@ -26,7 +27,7 @@ export async function submitForm(
 
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    select: { workspaceId: true },
+    select: { workspaceId: true, name: true },
   });
 
   const member = await prisma.workspaceMember.findFirst({
@@ -46,9 +47,18 @@ export async function submitForm(
     if (count >= limit) throw new Error("FORM_SUBMISSION_LIMIT");
   }
 
-  return prisma.formSubmission.create({
+  const submission = await prisma.formSubmission.create({
     data: { formBlockId, siteId, data: input.data, ip },
   });
+
+  notifyWorkspaceOwner(
+    site!.workspaceId,
+    "FORM_SUBMISSION_RECEIVED",
+    `New form submission on "${site!.name}"`,
+    `/dashboard/sites/${siteId}`,
+  ).catch(() => {});
+
+  return submission;
 }
 
 export async function listSubmissions(input: ListSubmissionsInput) {
