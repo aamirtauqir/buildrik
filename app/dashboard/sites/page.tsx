@@ -14,7 +14,7 @@ import { DeleteConfirmModal } from "@/components/sites/delete-confirm-modal";
 import { TransferModal } from "@/components/sites/transfer-modal";
 import { useToast } from "@/components/dashboard/toast-provider";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 
 export default function SitesPage() {
   const { addToast } = useToast();
@@ -380,7 +380,17 @@ export default function SitesPage() {
       )}
 
       {/* Content */}
-      {!sitesQuery.isLoading && sites.length === 0 && (
+      {!sitesQuery.isLoading && sites.length === 0 && (search || status || createdBy || dateRange || templateUsed || hasCustomDomain !== undefined || hasTraffic) && (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <Search className="h-10 w-10 mb-4" style={{ color: "#B0B0B0" }} />
+          <h3 className="text-base font-semibold" style={{ color: "#0D0D0D" }}>No sites found</h3>
+          <p className="text-sm mt-1" style={{ color: "#7A7A7A" }}>
+            Try a different search term or filter.
+          </p>
+        </div>
+      )}
+
+      {!sitesQuery.isLoading && sites.length === 0 && !search && !status && !createdBy && !dateRange && !templateUsed && hasCustomDomain === undefined && !hasTraffic && (
         <div
           className="mt-8 flex flex-col items-center rounded-xl border-2 border-dashed py-16 text-center"
           style={{ borderColor: "#E8E8E8" }}

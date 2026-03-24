@@ -1,5 +1,7 @@
 "use client";
 
+import { BarChart3 } from "lucide-react";
+
 export const DATE_RANGE_OPTIONS = [
   { value: "today", label: "Today" },
   { value: "yesterday", label: "Yesterday" },
@@ -42,7 +44,17 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
         </div>
       )}
 
-      {!isLoading && data && (
+      {!isLoading && data && data.timeSeries.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <BarChart3 className="h-10 w-10 mb-4" style={{ color: "#B0B0B0" }} />
+          <h3 className="text-base font-semibold" style={{ color: "#0D0D0D" }}>No analytics data yet</h3>
+          <p className="text-sm mt-1 max-w-sm" style={{ color: "#7A7A7A" }}>
+            Analytics will appear here once your site starts receiving visitors.
+          </p>
+        </div>
+      )}
+
+      {!isLoading && data && data.timeSeries.length > 0 && (
         <>
           {/* Metric Cards */}
           <div className="grid grid-cols-3 gap-4">
