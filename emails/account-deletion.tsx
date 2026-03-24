@@ -1,0 +1,33 @@
+import { Html, Head, Body, Container, Heading, Text, Button, Section, Hr } from "@react-email/components";
+
+interface AccountDeletionProps {
+  deletionDate: string;
+  cancelUrl: string;
+}
+
+export default function AccountDeletion({ deletionDate = "April 7, 2026", cancelUrl = "https://app.buildrik.app/settings/danger-zone" }: AccountDeletionProps) {
+  return (
+    <Html>
+      <Head />
+      <Body style={{ fontFamily: "system-ui, sans-serif", backgroundColor: "#f8fafc" }}>
+        <Container style={{ maxWidth: "600px", margin: "0 auto", backgroundColor: "white", borderRadius: "8px", padding: "40px" }}>
+          <Heading style={{ fontSize: "20px", fontWeight: "700", color: "#0F172A", textAlign: "center" as const }}>
+            Account deletion scheduled
+          </Heading>
+          <Text style={{ fontSize: "14px", color: "#64748B", textAlign: "center" as const }}>
+            Your account is scheduled for permanent deletion on {deletionDate}. All data will be removed. If this was a mistake, you can cancel below.
+          </Text>
+          <Section style={{ textAlign: "center" as const, marginTop: "24px" }}>
+            <Button href={cancelUrl} style={{ backgroundColor: "#EF4444", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
+              Cancel Deletion
+            </Button>
+          </Section>
+          <Hr style={{ borderColor: "#E2E8F0", marginTop: "32px" }} />
+          <Text style={{ fontSize: "12px", color: "#94A3B8", textAlign: "center" as const }}>
+            Sent by Buildrik
+          </Text>
+        </Container>
+      </Body>
+    </Html>
+  );
+}
