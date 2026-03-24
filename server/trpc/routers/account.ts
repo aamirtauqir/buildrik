@@ -7,7 +7,7 @@ import {
   updateNotificationPref, requestAccountDeletion, requestDataExport, getAICreditsInfo,
   getPreferences, updatePreferences, enable2FA, confirm2FA, disable2FA,
 } from "@/server/services/account.service";
-import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings } from "@/server/services/workspace-settings.service";
+import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings, deleteWorkspace, cancelWorkspaceDeletion } from "@/server/services/workspace-settings.service";
 import { listIntegrations, addIntegration, removeIntegration } from "@/server/services/integrations.service";
 import { updateProfileSchema, changePasswordSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema } from "@/lib/validations/account";
 
@@ -81,6 +81,19 @@ export const accountRouter = router({
       const { workspaceId } = await getWorkspaceCtx(ctx);
       return updateSharingSettings(workspaceId, input);
     }),
+    delete: protectedProcedure
+      .input(z.object({ confirmName: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        const { workspaceId } = await getWorkspaceCtx(ctx);
+        const ws = await ctx.prisma.workspace.findUnique({ where: { id: workspaceId } });
+        if (!ws || ws.name !== input.confirmName) throw new TRPCError({ code: "BAD_REQUEST", message: "Name does not match" });
+        if (ws.ownerId !== ctx.session.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the owner can delete" });
+        return deleteWorkspace(workspaceId);
+      }),
+    cancelDelete: protectedProcedure.mutation(async ({ ctx }) => {
+      const { workspaceId } = await getWorkspaceCtx(ctx);
+      return cancelWorkspaceDeletion(workspaceId);
+    }),
   }),
   integrations: router({
     list: protectedProcedure.query(async ({ ctx }) => {
@@ -102,7 +115,19 @@ export const accountRouter = router({
     return getAICreditsInfo(workspaceId, plan);
   }),
   dangerZone: router({
+    pendingDeletion: protectedProcedure.query(({ ctx }) => {
+      return ctx.prisma.accountDeletionReq.findFirst({
+        where: { userId: ctx.session.user.id, processedAt: null, cancelledAt: null },
+        select: { id: true, scheduledAt: true },
+      });
+    }),
     exportData: protectedProcedure.mutation(({ ctx }) => requestDataExport(ctx.session.user.id)),
     deleteAccount: protectedProcedure.input(z.object({ reason: z.string().max(500).optional() })).mutation(({ ctx, input }) => requestAccountDeletion(ctx.session.user.id, input.reason)),
+    cancelAccountDeletion: protectedProcedure.mutation(({ ctx }) => {
+      return ctx.prisma.accountDeletionReq.updateMany({
+        where: { userId: ctx.session.user.id, processedAt: null, cancelledAt: null },
+        data: { cancelledAt: new Date() },
+      });
+    }),
   }),
 });

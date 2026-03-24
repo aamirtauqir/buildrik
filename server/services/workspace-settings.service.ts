@@ -15,6 +15,22 @@ export async function updateWorkspaceSettings(workspaceId: string, data: UpdateW
   });
 }
 
+export async function deleteWorkspace(workspaceId: string) {
+  const scheduledAt = new Date(Date.now() + 30 * 86400000);
+  await prisma.workspace.update({
+    where: { id: workspaceId },
+    data: { deletionScheduledAt: scheduledAt },
+  });
+  return { scheduledAt };
+}
+
+export async function cancelWorkspaceDeletion(workspaceId: string) {
+  return prisma.workspace.update({
+    where: { id: workspaceId },
+    data: { deletionScheduledAt: null },
+  });
+}
+
 export async function updateSharingSettings(
   workspaceId: string,
   data: { defaultExpiration?: string | null; requirePw?: boolean; allowEditors?: boolean; notify?: boolean },

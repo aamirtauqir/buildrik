@@ -35,6 +35,10 @@ export default function DashboardPage() {
   const recentSites = trpc.dashboard.recentSites.useQuery();
   const activity = trpc.dashboard.activity.useQuery({ filter: activityFilter });
   const health = trpc.dashboard.health.useQuery();
+  const wsData = trpc.account.workspace.get.useQuery();
+  const pendingDeletion = trpc.account.dangerZone.pendingDeletion.useQuery();
+  const cancelWsDelete = trpc.account.workspace.cancelDelete.useMutation({ onSuccess: () => wsData.refetch() });
+  const cancelAcctDelete = trpc.account.dangerZone.cancelAccountDeletion.useMutation({ onSuccess: () => pendingDeletion.refetch() });
   const billingOverview = trpc.billing.overview.useQuery();
   const onboardingState = trpc.onboarding.getState.useQuery();
   const dismissOnboarding = trpc.onboarding.dismiss.useMutation({
@@ -107,6 +111,40 @@ export default function DashboardPage() {
       {isPastDue && (
         <div className="mb-6">
           <DunningBanner />
+        </div>
+      )}
+
+      {/* Workspace Deletion Grace Period Banner */}
+      {wsData.data?.deletionScheduledAt && (
+        <div className="mb-4 rounded-lg p-4" style={{ backgroundColor: "#FEF2F2", borderLeft: "3px solid #EF4444" }}>
+          <p className="text-sm font-medium" style={{ color: "#991B1B" }}>
+            Your workspace is scheduled for deletion on {new Date(wsData.data.deletionScheduledAt).toLocaleDateString()}.
+          </p>
+          <button
+            onClick={() => cancelWsDelete.mutate()}
+            disabled={cancelWsDelete.isPending}
+            className="mt-2 text-sm font-semibold underline"
+            style={{ color: "#E42313" }}
+          >
+            {cancelWsDelete.isPending ? "Cancelling..." : "Cancel Deletion"}
+          </button>
+        </div>
+      )}
+
+      {/* Account Deletion Grace Period Banner */}
+      {pendingDeletion.data && (
+        <div className="mb-4 rounded-lg p-4" style={{ backgroundColor: "#FEF2F2", borderLeft: "3px solid #EF4444" }}>
+          <p className="text-sm font-medium" style={{ color: "#991B1B" }}>
+            Your account is scheduled for deletion on {new Date(pendingDeletion.data.scheduledAt).toLocaleDateString()}.
+          </p>
+          <button
+            onClick={() => cancelAcctDelete.mutate()}
+            disabled={cancelAcctDelete.isPending}
+            className="mt-2 text-sm font-semibold underline"
+            style={{ color: "#E42313" }}
+          >
+            {cancelAcctDelete.isPending ? "Cancelling..." : "Cancel Deletion"}
+          </button>
         </div>
       )}
 
