@@ -1,8 +1,362 @@
+"use client";
+
+import { useState, useCallback } from "react";
+import { trpc } from "@/lib/trpc/client";
+import { ViewToggle } from "@/components/sites/view-toggle";
+import { SiteFilters } from "@/components/sites/site-filters";
+import { FolderTabs } from "@/components/sites/folder-tabs";
+import { SiteGrid } from "@/components/sites/site-grid";
+import { SiteListView } from "@/components/sites/site-list-view";
+import { BulkActionBar } from "@/components/sites/bulk-action-bar";
+import { CreateSiteModal } from "@/components/sites/create-site-modal";
+import { RenameModal } from "@/components/sites/rename-modal";
+import { DeleteConfirmModal } from "@/components/sites/delete-confirm-modal";
+import { useToast } from "@/components/dashboard/toast-provider";
+import Link from "next/link";
+import { Plus } from "lucide-react";
+
 export default function SitesPage() {
+  const { addToast } = useToast();
+
+  // View state
+  const [viewMode, setViewMode] = useState("grid");
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<string | undefined>(undefined);
+  const [sort, setSort] = useState("lastEdited");
+  const [folderId, setFolderId] = useState<string | null>(null);
+  const [showArchived, setShowArchived] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // Modal state
+  const [createOpen, setCreateOpen] = useState(false);
+  const [renameTarget, setRenameTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+
+  // Queries
+  const sitesQuery = trpc.sites.list.useQuery({
+    page: 1,
+    perPage: 12,
+    status: showArchived ? "ARCHIVED" : status,
+    sort: sort as
+      | "lastEdited"
+      | "name"
+      | "created"
+      | "traffic"
+      | "pages"
+      | "published",
+    search: search || undefined,
+    folderId: showArchived ? undefined : folderId,
+  });
+
+  const foldersQuery = trpc.sites.folders.list.useQuery();
+
+  // Mutations
+  const createMutation = trpc.sites.create.useMutation({
+    onSuccess: () => {
+      sitesQuery.refetch();
+      setCreateOpen(false);
+      addToast("success", "Site created");
+    },
+    onError: (err) => addToast("error", "Failed to create site", err.message),
+  });
+
+  const renameMutation = trpc.sites.rename.useMutation({
+    onSuccess: () => {
+      sitesQuery.refetch();
+      setRenameTarget(null);
+      addToast("success", "Site renamed");
+    },
+  });
+
+  const deleteMutation = trpc.sites.delete.useMutation({
+    onSuccess: () => {
+      sitesQuery.refetch();
+      setDeleteTarget(null);
+      addToast("success", "Site deleted");
+    },
+    onError: (err) => addToast("error", "Failed to delete", err.message),
+  });
+
+  const archiveMutation = trpc.sites.archive.useMutation({
+    onSuccess: () => {
+      sitesQuery.refetch();
+      addToast("success", "Site archived");
+    },
+  });
+
+  const duplicateMutation = trpc.sites.duplicate.useMutation({
+    onSuccess: () => {
+      sitesQuery.refetch();
+      addToast("success", "Site duplicated");
+    },
+    onError: (err) => addToast("error", "Failed to duplicate", err.message),
+  });
+
+  const bulkMutation = trpc.sites.bulk.useMutation({
+    onSuccess: () => {
+      sitesQuery.refetch();
+      setSelectedIds(new Set());
+      addToast("success", "Bulk action completed");
+    },
+  });
+
+  // Selection handlers
+  const handleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const handleSelectAll = useCallback(() => {
+    if (!sitesQuery.data) return;
+    const allIds = sitesQuery.data.data.map((s) => s.id);
+    const allSelected = allIds.every((id) => selectedIds.has(id));
+    setSelectedIds(allSelected ? new Set() : new Set(allIds));
+  }, [sitesQuery.data, selectedIds]);
+
+  // Context menu action handler
+  const handleSiteAction = useCallback(
+    (action: string, siteId: string) => {
+      const site = sitesQuery.data?.data.find((s) => s.id === siteId);
+      switch (action) {
+        case "edit":
+          window.location.href = `/editor/${siteId}`;
+          break;
+        case "manage":
+          window.location.href = `/dashboard/sites/${siteId}`;
+          break;
+        case "rename":
+          if (site) setRenameTarget({ id: siteId, name: site.name });
+          break;
+        case "duplicate":
+          duplicateMutation.mutate({ id: siteId });
+          break;
+        case "archive":
+          archiveMutation.mutate({ id: siteId });
+          break;
+        case "delete":
+          if (site) setDeleteTarget({ id: siteId, name: site.name });
+          break;
+        case "copyUrl":
+          if (site) {
+            navigator.clipboard.writeText(`${site.slug}.buildrik.app`);
+            addToast("success", "URL copied to clipboard");
+          }
+          break;
+        case "viewPublished":
+          if (site?.publishedUrl) window.open(site.publishedUrl, "_blank");
+          break;
+      }
+    },
+    [sitesQuery.data, duplicateMutation, archiveMutation, addToast]
+  );
+
+  // Bulk action handler
+  const handleBulkAction = useCallback(
+    (action: string) => {
+      const ids = Array.from(selectedIds);
+      if (action === "delete" || action === "publish" || action === "unpublish" || action === "archive" || action === "unarchive") {
+        bulkMutation.mutate({
+          action: action as "archive" | "delete" | "unarchive" | "publish" | "unpublish",
+          siteIds: ids,
+        });
+      }
+    },
+    [selectedIds, bulkMutation]
+  );
+
+  // Folder tabs
+  const folderTabs = [
+    {
+      id: null,
+      name: "All Sites",
+      count: sitesQuery.data?.total ?? 0,
+    },
+    ...(foldersQuery.data?.map((f: { id: string; name: string; _count?: { sites: number } }) => ({
+      id: f.id,
+      name: f.name,
+      count: f._count?.sites ?? 0,
+    })) ?? []),
+  ];
+
+  const sites = sitesQuery.data?.data ?? [];
+  const allSelected =
+    sites.length > 0 && sites.every((s) => selectedIds.has(s.id));
+
   return (
     <div>
-      <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>My Sites</h1>
-      <p className="mt-2 text-sm" style={{ color: "#7A7A7A" }}>Sites list will be implemented in Sub-Project 3.</p>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1
+          className="text-[22px] font-bold"
+          style={{ color: "#0D0D0D" }}
+        >
+          My Sites
+        </h1>
+        <div className="flex items-center gap-3">
+          <ViewToggle value={viewMode} onChange={setViewMode} />
+          <button
+            onClick={() => setCreateOpen(true)}
+            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
+            style={{ backgroundColor: "#E42313" }}
+          >
+            <Plus className="h-4 w-4" />
+            New Site
+          </button>
+        </div>
+      </div>
+
+      {/* Folder Tabs */}
+      <div className="mt-4">
+        <FolderTabs
+          tabs={folderTabs}
+          activeId={folderId}
+          onSelect={(id) => {
+            setFolderId(id);
+            setShowArchived(false);
+          }}
+          onCreateFolder={() => {
+            const name = prompt("Folder name:");
+            if (name)
+              trpc.useUtils().client.sites.folders.create.mutate({ name });
+          }}
+          archivedCount={0}
+          showArchived={showArchived}
+          onToggleArchived={() => {
+            setShowArchived(!showArchived);
+            setFolderId(null);
+          }}
+        />
+      </div>
+
+      {/* Filters */}
+      <div className="mt-4">
+        <SiteFilters
+          search={search}
+          onSearchChange={setSearch}
+          status={status}
+          onStatusChange={setStatus}
+          sort={sort}
+          onSortChange={setSort}
+        />
+      </div>
+
+      {/* Loading */}
+      {sitesQuery.isLoading && (
+        <div className="mt-6 grid grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div
+              key={i}
+              className="h-52 animate-pulse rounded-xl"
+              style={{ backgroundColor: "#F4F4F4" }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Content */}
+      {!sitesQuery.isLoading && sites.length === 0 && (
+        <div
+          className="mt-8 flex flex-col items-center rounded-xl border-2 border-dashed py-16 text-center"
+          style={{ borderColor: "#E8E8E8" }}
+        >
+          <p
+            className="text-base font-semibold"
+            style={{ color: "#0D0D0D" }}
+          >
+            No sites yet
+          </p>
+          <p
+            className="mt-1 text-sm"
+            style={{ color: "#7A7A7A" }}
+          >
+            Create your first site to get started.
+          </p>
+          <button
+            onClick={() => setCreateOpen(true)}
+            className="mt-4 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white"
+            style={{ backgroundColor: "#E42313" }}
+          >
+            <Plus className="h-4 w-4" />
+            Create Site
+          </button>
+        </div>
+      )}
+
+      {!sitesQuery.isLoading && sites.length > 0 && (
+        <div className="mt-6">
+          {viewMode === "grid" ? (
+            <SiteGrid
+              sites={sites}
+              selectedIds={selectedIds}
+              onSelect={handleSelect}
+              onAction={handleSiteAction}
+            />
+          ) : (
+            <SiteListView
+              sites={sites}
+              selectedIds={selectedIds}
+              onSelect={handleSelect}
+              onSelectAll={handleSelectAll}
+              allSelected={allSelected}
+              onAction={handleSiteAction}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Bulk Action Bar */}
+      <BulkActionBar
+        selectedCount={selectedIds.size}
+        onAction={handleBulkAction}
+        onClear={() => setSelectedIds(new Set())}
+      />
+
+      {/* Modals */}
+      <CreateSiteModal
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onSubmit={(data) =>
+          createMutation.mutate({
+            name: data.name,
+            method: data.method as "blank" | "template" | "ai",
+          })
+        }
+      />
+
+      {renameTarget && (
+        <RenameModal
+          open={true}
+          currentName={renameTarget.name}
+          onClose={() => setRenameTarget(null)}
+          onSubmit={(name) =>
+            renameMutation.mutate({ id: renameTarget.id, name })
+          }
+        />
+      )}
+
+      {deleteTarget && (
+        <DeleteConfirmModal
+          open={true}
+          siteName={deleteTarget.name}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={(name) =>
+            deleteMutation.mutate({
+              id: deleteTarget.id,
+              confirmName: name,
+            })
+          }
+        />
+      )}
     </div>
   );
 }
