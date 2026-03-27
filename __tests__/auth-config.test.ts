@@ -23,11 +23,6 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-// Mock bcryptjs (needed by auth.config.ts credentials provider)
-vi.mock("bcryptjs", () => ({
-  default: { compare: vi.fn() },
-}));
-
 // Mock audit service
 vi.mock("@/server/services/audit.service", () => ({
   logAuditEvent: vi.fn(),
@@ -106,15 +101,7 @@ describe("OAuth signIn callback", () => {
     expect(userObj.id).toBe("existing-db-id");
   });
 
-  it("allows credentials sign-in without creating user", async () => {
-    const signInCallback = authConfig.callbacks!.signIn!;
-    const result = await signInCallback({
-      user: { id: "user-id", email: "test@example.com" },
-      account: { provider: "credentials", type: "credentials" } as any,
-      credentials: {} as any,
-    } as any);
-
-    expect(result).toBe(true);
-    expect(mockPrisma.user.findUnique).not.toHaveBeenCalled();
+  it("credentials provider is absent from authConfig.providers", () => {
+    expect(authConfig.providers.some(p => (p as { id?: string }).id === "credentials")).toBe(false);
   });
 });

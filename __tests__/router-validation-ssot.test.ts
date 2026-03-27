@@ -26,7 +26,7 @@ describe("Router validation SSOT", () => {
   it("verifyBackupCode uses backupCodeSchema instead of inline validation", () => {
     const backupSection = routerSource.slice(
       routerSource.indexOf("verifyBackupCode:"),
-      routerSource.indexOf("logout:")
+      routerSource.indexOf("getInviteDetails:")
     );
 
     // Should NOT have inline regex for backup code
