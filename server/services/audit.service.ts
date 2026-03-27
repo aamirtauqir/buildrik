@@ -10,6 +10,7 @@ type AuditAction =
   | "INVITE_ACCEPTED" | "INVITE_DECLINED" | "INVITE_EMAIL_MISMATCH"
   | "SESSION_CREATED"
   | "OAUTH_LOGIN" | "OAUTH_SIGNUP"
+  | "EMAIL_CHANGED"
   | "LOGOUT";
 
 export async function logAuditEvent(

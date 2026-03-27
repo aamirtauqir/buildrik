@@ -8,6 +8,7 @@ import {
   getPreferences, updatePreferences, enable2FA, confirm2FA, disable2FA,
 } from "@/server/services/account.service";
 import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings, deleteWorkspace, cancelWorkspaceDeletion } from "@/server/services/workspace-settings.service";
+import { initiateTransfer, acceptTransfer, cancelTransfer, getPendingTransfer } from "@/server/services/workspace-transfer.service";
 import { listIntegrations, addIntegration, removeIntegration } from "@/server/services/integrations.service";
 import { updateProfileSchema, changePasswordSchema, changeEmailSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema } from "@/lib/validations/account";
 
@@ -103,6 +104,45 @@ export const accountRouter = router({
     cancelDelete: protectedProcedure.mutation(async ({ ctx }) => {
       const { workspaceId } = await getWorkspaceCtx(ctx);
       return cancelWorkspaceDeletion(workspaceId);
+    }),
+    transfer: router({
+      pending: protectedProcedure.query(async ({ ctx }) => {
+        const { workspaceId } = await getWorkspaceCtx(ctx);
+        return getPendingTransfer(workspaceId);
+      }),
+      initiate: protectedProcedure
+        .input(z.object({ toEmail: z.string().email() }))
+        .mutation(async ({ ctx, input }) => {
+          const { workspaceId } = await getWorkspaceCtx(ctx);
+          try {
+            return await initiateTransfer(workspaceId, ctx.session.user.id, input.toEmail);
+          } catch (e: unknown) {
+            if (e instanceof Error && e.message === "NOT_OWNER") throw new TRPCError({ code: "FORBIDDEN", message: "Only the owner can transfer the workspace." });
+            if (e instanceof Error && e.message === "TRANSFER_PENDING") throw new TRPCError({ code: "CONFLICT", message: "A transfer is already pending." });
+            throw e;
+          }
+        }),
+      accept: protectedProcedure
+        .input(z.object({ token: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+          try {
+            return await acceptTransfer(input.token, ctx.session.user.id);
+          } catch (e: unknown) {
+            if (e instanceof Error && e.message === "TRANSFER_NOT_FOUND") throw new TRPCError({ code: "NOT_FOUND", message: "Transfer not found or already completed." });
+            if (e instanceof Error && e.message === "TRANSFER_EXPIRED") throw new TRPCError({ code: "BAD_REQUEST", message: "Transfer invitation has expired." });
+            if (e instanceof Error && e.message === "EMAIL_MISMATCH") throw new TRPCError({ code: "FORBIDDEN", message: "This transfer was not sent to your email address." });
+            throw e;
+          }
+        }),
+      cancel: protectedProcedure.mutation(async ({ ctx }) => {
+        const { workspaceId } = await getWorkspaceCtx(ctx);
+        try {
+          return await cancelTransfer(workspaceId, ctx.session.user.id);
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === "NOT_OWNER") throw new TRPCError({ code: "FORBIDDEN", message: "Only the owner can cancel the transfer." });
+          throw e;
+        }
+      }),
     }),
   }),
   integrations: router({
