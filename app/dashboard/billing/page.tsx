@@ -85,14 +85,11 @@ export default function BillingPage() {
   const invoicesQuery = trpc.billing.invoices.useQuery({ page: invoicePage, perPage: 10 });
 
   const upgradeMutation = trpc.billing.upgrade.useMutation({
-    onSuccess: (data) => {
-      if (data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
-        return;
-      }
+    onSuccess: () => {
       overviewQuery.refetch();
       setUpgradeConfirm(null);
       setShowPlans(false);
+      addToast("success", "Plan upgraded successfully");
     },
     onError: (err) => addToast("error", "Upgrade failed", err.message),
   });

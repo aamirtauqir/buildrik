@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    subscription: { findUnique: vi.fn(), update: vi.fn(), create: vi.fn(), upsert: vi.fn() },
+    subscription: { findUnique: vi.fn(), update: vi.fn(), create: vi.fn() },
     paymentMethod: { findUnique: vi.fn(), upsert: vi.fn() },
     invoice: { findMany: vi.fn(), count: vi.fn() },
     site: { count: vi.fn() },
@@ -11,28 +11,8 @@ vi.mock("@/lib/prisma", () => ({
     aIGenerationJob: { count: vi.fn() },
     formSubmission: { count: vi.fn() },
     redirect: { count: vi.fn() },
-    workspace: { findUnique: vi.fn(), findUniqueOrThrow: vi.fn(), update: vi.fn() },
+    workspace: { findUnique: vi.fn(), update: vi.fn() },
     $transaction: vi.fn((ops: unknown[]) => Promise.all(ops)),
-  },
-}));
-
-vi.mock("@/lib/stripe", () => ({
-  getStripe: vi.fn(() => ({
-    customers: { create: vi.fn().mockResolvedValue({ id: "cus_test123" }) },
-    subscriptions: {
-      update: vi.fn().mockResolvedValue({}),
-    },
-    checkout: {
-      sessions: {
-        create: vi.fn().mockResolvedValue({ url: "https://checkout.stripe.com/test_session" }),
-      },
-    },
-  })),
-  STRIPE_PRICE_IDS: {
-    PRO_MONTHLY: "price_pro_monthly",
-    PRO_YEARLY: "price_pro_yearly",
-    BUSINESS_MONTHLY: "price_business_monthly",
-    BUSINESS_YEARLY: "price_business_yearly",
   },
 }));
 
@@ -141,21 +121,23 @@ describe("Billing Service", () => {
   });
 
   describe("upgradePlan", () => {
-    it("creates Stripe checkout session for free user", async () => {
+    it("creates subscription for free user", async () => {
       const { upgradePlan } = await import(
         "@/server/services/billing.service"
       );
       vi.mocked(prisma.subscription.findUnique).mockResolvedValue(null);
-      vi.mocked(prisma.workspace.findUniqueOrThrow).mockResolvedValue({
-        id: "ws1", stripeCustomerId: null, name: "Test Workspace",
+      vi.mocked(prisma.subscription.create).mockResolvedValue({
+        id: "sub1",
+        plan: "PRO",
+        status: "ACTIVE",
+        interval: "MONTHLY",
+        price: 2900,
       } as any);
-      vi.mocked(prisma.workspace.update).mockResolvedValue({} as any);
-
       const result = await upgradePlan("ws1", {
         planId: "PRO",
         interval: "MONTHLY",
       });
-      expect(result.checkoutUrl).toBe("https://checkout.stripe.com/test_session");
+      expect(result.plan).toBe("PRO");
     });
 
     it("throws if already subscribed", async () => {

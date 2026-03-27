@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { UpgradeInput, CancelInput } from "@/lib/validations/billing";
-import { getStripe, STRIPE_PRICE_IDS } from "@/lib/stripe";
 
 const PRICE_MAP: Record<string, number> = {
   PRO_MONTHLY: 2900,
@@ -165,43 +164,34 @@ export async function upgradePlan(workspaceId: string, input: UpgradeInput) {
   }
 
   const priceKey = `${input.planId}_${input.interval}`;
-  const priceId = STRIPE_PRICE_IDS[priceKey];
-  if (!priceId) throw new Error("INVALID_PRICE");
+  const price = PRICE_MAP[priceKey];
 
-  const stripe = getStripe();
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-
-  // Get or create Stripe customer for this workspace
-  const workspace = await prisma.workspace.findUniqueOrThrow({
-    where: { id: workspaceId },
-    select: { stripeCustomerId: true, name: true },
-  });
-
-  let customerId = workspace.stripeCustomerId;
-  if (!customerId) {
-    const customer = await stripe.customers.create({
-      name: workspace.name,
-      metadata: { workspaceId },
-    });
-    customerId = customer.id;
-    await prisma.workspace.update({
+  const [subscription] = await prisma.$transaction([
+    prisma.subscription.create({
+      data: {
+        workspaceId,
+        plan: input.planId,
+        status: "ACTIVE",
+        interval: input.interval,
+        price,
+        currency: "usd",
+        cancelAtPeriodEnd: false,
+        isGrandfathered: false,
+        stripeSubscriptionId: `placeholder_${workspaceId}_${Date.now()}`,
+        stripePriceId: `placeholder_price_${priceKey}`,
+        stripeCurrentPeriodStart: new Date(),
+        stripeCurrentPeriodEnd: new Date(
+          Date.now() + (input.interval === "YEARLY" ? 365 : 30) * 86400000,
+        ),
+      },
+    }),
+    prisma.workspace.update({
       where: { id: workspaceId },
-      data: { stripeCustomerId: customerId },
-    });
-  }
+      data: { plan: input.planId },
+    }),
+  ]);
 
-  const session = await stripe.checkout.sessions.create({
-    customer: customerId,
-    mode: "subscription",
-    line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${baseUrl}/dashboard/billing?upgraded=1`,
-    cancel_url: `${baseUrl}/dashboard/billing`,
-    subscription_data: {
-      metadata: { workspaceId, planId: input.planId, interval: input.interval },
-    },
-  });
-
-  return { checkoutUrl: session.url! };
+  return subscription;
 }
 
 export async function cancelSubscription(
@@ -219,10 +209,6 @@ export async function cancelSubscription(
   if (subscription.cancelAtPeriodEnd) {
     throw new Error("ALREADY_CANCELLED");
   }
-
-  await getStripe().subscriptions.update(subscription.stripeSubscriptionId, {
-    cancel_at_period_end: true,
-  });
 
   return prisma.subscription.update({
     where: { workspaceId },
@@ -246,10 +232,6 @@ export async function reactivateSubscription(workspaceId: string) {
   if (!subscription.cancelAtPeriodEnd) {
     throw new Error("NOT_CANCELLED");
   }
-
-  await getStripe().subscriptions.update(subscription.stripeSubscriptionId, {
-    cancel_at_period_end: false,
-  });
 
   return prisma.subscription.update({
     where: { workspaceId },

@@ -6,7 +6,6 @@ import {
   upgradePlan, cancelSubscription, reactivateSubscription, getPlans,
 } from "@/server/services/billing.service";
 import { upgradeSchema, cancelSchema } from "@/lib/validations/billing";
-import { getStripe, STRIPE_PRICE_IDS } from "@/lib/stripe";
 
 async function getWorkspaceId(ctx: any): Promise<string> {
   const member = await ctx.prisma.workspaceMember.findFirst({
@@ -56,24 +55,9 @@ export const billingRouter = router({
       const wsId = await getWorkspaceId(ctx);
       const subscription = await ctx.prisma.subscription.findUnique({ where: { workspaceId: wsId } });
       if (!subscription) throw new TRPCError({ code: "NOT_FOUND", message: "No subscription" });
-
-      const priceKey = `${subscription.plan}_${input.interval}`;
-      const newPriceId = STRIPE_PRICE_IDS[priceKey];
-      if (!newPriceId) throw new TRPCError({ code: "BAD_REQUEST", message: "Price not configured." });
-
-      const stripe = getStripe();
-      const stripeSub = await stripe.subscriptions.retrieve(subscription.stripeSubscriptionId);
-      const itemId = stripeSub.items.data[0]?.id;
-      if (itemId) {
-        await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
-          items: [{ id: itemId, price: newPriceId }],
-          proration_behavior: "always_invoice",
-        });
-      }
-
       return ctx.prisma.subscription.update({
         where: { workspaceId: wsId },
-        data: { interval: input.interval, stripePriceId: newPriceId },
+        data: { interval: input.interval },
       });
     }),
   reactivate: protectedProcedure.mutation(async ({ ctx }) => {

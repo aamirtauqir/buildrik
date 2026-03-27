@@ -1,87 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { sendPaymentFailedEmail } from "@/server/services/email.service";
-import { getStripe } from "@/lib/stripe";
-import { PLAN_LIMITS } from "@/lib/constants/plan-limits";
 
 const STRIPE_STATUS_MAP: Record<string, string> = {
   active: "ACTIVE",
   past_due: "PAST_DUE",
   canceled: "CANCELLED",
 };
-
-export async function handleCheckoutCompleted(sessionId: string): Promise<void> {
-  const stripe = getStripe();
-  const session = await stripe.checkout.sessions.retrieve(sessionId, {
-    expand: ["subscription"],
-  });
-
-  if (session.mode !== "subscription" || !session.subscription) return;
-
-  const sub = session.subscription as import("stripe").Stripe.Subscription;
-  const meta = sub.metadata ?? {};
-  const workspaceId = meta.workspaceId;
-  const planId = (meta.planId ?? "PRO") as string;
-  const interval = (meta.interval ?? "MONTHLY") as string;
-
-  if (!workspaceId) return;
-
-  const priceItem = sub.items.data[0];
-  const priceId = priceItem?.price.id ?? "";
-  const unitAmount = priceItem?.price.unit_amount ?? 0;
-
-  await prisma.$transaction([
-    prisma.subscription.upsert({
-      where: { workspaceId },
-      create: {
-        workspaceId,
-        plan: planId,
-        status: "ACTIVE",
-        interval,
-        price: unitAmount,
-        currency: sub.currency ?? "usd",
-        cancelAtPeriodEnd: false,
-        isGrandfathered: false,
-        stripeSubscriptionId: sub.id,
-        stripePriceId: priceId,
-        stripeCurrentPeriodStart: new Date(sub.current_period_start * 1000),
-        stripeCurrentPeriodEnd: new Date(sub.current_period_end * 1000),
-      },
-      update: {
-        plan: planId,
-        status: "ACTIVE",
-        interval,
-        price: unitAmount,
-        stripeSubscriptionId: sub.id,
-        stripePriceId: priceId,
-        stripeCurrentPeriodStart: new Date(sub.current_period_start * 1000),
-        stripeCurrentPeriodEnd: new Date(sub.current_period_end * 1000),
-        cancelAtPeriodEnd: false,
-      },
-    }),
-    prisma.workspace.update({
-      where: { id: workspaceId },
-      data: { plan: planId },
-    }),
-  ]);
-}
-
-export async function handleCheckoutExpired(sessionId: string): Promise<void> {
-  // Clean up stripeCustomerId if the customer was just created and checkout was abandoned
-  const stripe = getStripe();
-  const session = await stripe.checkout.sessions.retrieve(sessionId);
-  if (!session.customer || !session.metadata?.workspaceId) return;
-
-  const existing = await prisma.subscription.findUnique({
-    where: { workspaceId: session.metadata.workspaceId },
-  });
-  // Only clear if no active subscription exists yet (first checkout attempt)
-  if (!existing) {
-    await prisma.workspace.updateMany({
-      where: { id: session.metadata.workspaceId, stripeCustomerId: String(session.customer) },
-      data: { stripeCustomerId: null },
-    });
-  }
-}
 
 export async function handleChargeFailed(stripeSubscriptionId: string): Promise<void> {
   const subscription = await prisma.subscription.findUnique({
