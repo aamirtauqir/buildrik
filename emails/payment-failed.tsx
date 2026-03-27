@@ -17,7 +17,7 @@ export default function PaymentFailed({ updateUrl = "https://app.buildrik.app/se
             We were unable to process your latest payment. Please update your payment method to keep your plan active.
           </Text>
           <Section style={{ textAlign: "center" as const, marginTop: "24px" }}>
-            <Button href={updateUrl} style={{ backgroundColor: "#6366F1", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
+            <Button href={updateUrl} style={{ backgroundColor: "#E42313", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
               Update Payment
             </Button>
           </Section>

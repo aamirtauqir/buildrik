@@ -8,15 +8,20 @@ import { AuthLogo } from "@/components/auth/auth-logo";
 import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthButton } from "@/components/auth/auth-button";
+import { FormBanner } from "@/components/auth/form-banner";
 import { trpc } from "@/lib/trpc/client";
 
 export default function MagicLinkRequestPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const magicLinkMutation = trpc.auth.magicLink.useMutation({
     onSuccess: () => {
       router.push(`/auth/magic-link/sent?email=${encodeURIComponent(email)}`);
+    },
+    onError: (err) => {
+      setError(err.message);
     },
   });
 
@@ -36,6 +41,12 @@ export default function MagicLinkRequestPage() {
         We'll email you a link to sign in without a password
       </p>
       <div className="h-6" />
+      {error && (
+        <>
+          <FormBanner variant="error" title={error} />
+          <div className="h-4" />
+        </>
+      )}
       <form onSubmit={handleSubmit} className="w-full">
         <AuthInput
           label="Email"

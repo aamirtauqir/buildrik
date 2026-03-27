@@ -1,0 +1,1102 @@
+{
+  "project": {
+    "root": "/Users/shahg/Desktop/pencil/buildrik",
+    "name": "buildrik",
+    "framework": "next",
+    "detected_frameworks": [
+      "react",
+      "next"
+    ],
+    "key_dependencies": {
+      "@auth/prisma-adapter": "^2.0.0",
+      "@prisma/client": "^5.22.0",
+      "@tanstack/react-query": "^5.60.0",
+      "tailwind-merge": "^2.5.0",
+      "@tailwindcss/postcss": "^4.0.0",
+      "prisma": "^5.22.0",
+      "tailwindcss": "^4.0.0"
+    },
+    "stack_type": "frontend"
+  },
+  "structure": {
+    "total_files": 315,
+    "components": {
+      "modules": 131,
+      "components": 184
+    },
+    "route_dirs": [
+      "/Users/shahg/Desktop/pencil/buildrik/app"
+    ],
+    "api_dirs": [],
+    "state_dirs": [],
+    "i18n_dirs": [],
+    "controller_dirs": [],
+    "model_dirs": [],
+    "dto_dirs": []
+  },
+  "routes": {
+    "count": 75,
+    "frontend_pages": [
+      {
+        "path": "/api/auth/*nextauth/route",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/api/auth/[...nextauth]/route.ts",
+        "filesystem": true
+      },
+      {
+        "path": "/api/auth/create-session/route",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/api/auth/create-session/route.ts",
+        "filesystem": true
+      },
+      {
+        "path": "/api/auth/logout/route",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/api/auth/logout/route.ts",
+        "filesystem": true
+      },
+      {
+        "path": "/api/public/forms/:siteId/:formBlockId/route",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/api/public/forms/[siteId]/[formBlockId]/route.ts",
+        "filesystem": true
+      },
+      {
+        "path": "/api/share/:token/verify-password/route",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/api/share/[token]/verify-password/route.ts",
+        "filesystem": true
+      },
+      {
+        "path": "/api/trpc/:trpc/route",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/api/trpc/[trpc]/route.ts",
+        "filesystem": true
+      },
+      {
+        "path": "/api/webhooks/stripe/route",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/api/webhooks/stripe/route.ts",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/2fa/backup/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/2fa/backup/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/2fa/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/2fa/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/callback/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/callback/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/check-inbox/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/check-inbox/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/2fa-locked/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/2fa-locked/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/access-denied/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/access-denied/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/captcha/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/captcha/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/disabled/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/disabled/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/expired-link/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/expired-link/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/invite-expired/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/invite-expired/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/locked/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/locked/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/rate-limited/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/rate-limited/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/session-expired/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/session-expired/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/social-error/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/social-error/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/suspicious/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/suspicious/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/forgot-password/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/forgot-password/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/invite/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/invite/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/layout",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/layout.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/login/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/login/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/magic-link/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/magic-link/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/magic-link/sent/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/magic-link/sent/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/otp/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/otp/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/password-changed/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/password-changed/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/redirect/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/redirect/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/reset-password/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/reset-password/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/signup/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/signup/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/splash/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/splash/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/success/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/success/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/verify-email/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/verify-email/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/workspace-select/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/workspace-select/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/billing/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/billing/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/error",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/error.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/help/:slug/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/help/[slug]/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/help/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/help/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/layout",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/layout.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/notifications/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/notifications/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/account/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/account/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/ai/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/ai/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/danger/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/danger/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/integrations/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/integrations/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/layout",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/layout.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/notifications/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/notifications/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/security/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/security/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/workspace/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/workspace/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/:id/access/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/[id]/access/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/:id/analytics/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/[id]/analytics/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/:id/domains/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/[id]/domains/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/:id/layout",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/[id]/layout.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/:id/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/[id]/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/:id/publish/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/[id]/publish/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/:id/seo/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/[id]/seo/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/:id/settings/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/[id]/settings/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/new/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/new/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/team/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/team/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/error",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/error.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/layout",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/layout.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/maintenance/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/maintenance/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/not-found",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/not-found.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/onboarding/layout",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/onboarding/layout.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/onboarding/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/onboarding/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/onboarding/role/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/onboarding/role/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/onboarding/setup/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/onboarding/setup/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/share/:token/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/share/[token]/page.tsx",
+        "filesystem": true
+      }
+    ],
+    "backend_endpoints": [],
+    "pages": [
+      {
+        "path": "/api/auth/*nextauth/route",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/api/auth/[...nextauth]/route.ts",
+        "filesystem": true
+      },
+      {
+        "path": "/api/auth/create-session/route",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/api/auth/create-session/route.ts",
+        "filesystem": true
+      },
+      {
+        "path": "/api/auth/logout/route",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/api/auth/logout/route.ts",
+        "filesystem": true
+      },
+      {
+        "path": "/api/public/forms/:siteId/:formBlockId/route",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/api/public/forms/[siteId]/[formBlockId]/route.ts",
+        "filesystem": true
+      },
+      {
+        "path": "/api/share/:token/verify-password/route",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/api/share/[token]/verify-password/route.ts",
+        "filesystem": true
+      },
+      {
+        "path": "/api/trpc/:trpc/route",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/api/trpc/[trpc]/route.ts",
+        "filesystem": true
+      },
+      {
+        "path": "/api/webhooks/stripe/route",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/api/webhooks/stripe/route.ts",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/2fa/backup/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/2fa/backup/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/2fa/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/2fa/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/callback/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/callback/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/check-inbox/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/check-inbox/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/2fa-locked/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/2fa-locked/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/access-denied/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/access-denied/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/captcha/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/captcha/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/disabled/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/disabled/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/expired-link/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/expired-link/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/invite-expired/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/invite-expired/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/locked/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/locked/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/rate-limited/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/rate-limited/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/session-expired/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/session-expired/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/social-error/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/social-error/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/error/suspicious/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/error/suspicious/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/forgot-password/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/forgot-password/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/invite/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/invite/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/layout",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/layout.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/login/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/login/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/magic-link/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/magic-link/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/magic-link/sent/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/magic-link/sent/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/otp/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/otp/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/password-changed/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/password-changed/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/redirect/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/redirect/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/reset-password/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/reset-password/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/signup/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/signup/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/splash/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/splash/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/success/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/success/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/verify-email/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/verify-email/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/auth/workspace-select/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/workspace-select/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/billing/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/billing/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/error",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/error.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/help/:slug/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/help/[slug]/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/help/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/help/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/layout",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/layout.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/notifications/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/notifications/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/account/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/account/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/ai/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/ai/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/danger/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/danger/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/integrations/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/integrations/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/layout",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/layout.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/notifications/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/notifications/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/security/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/security/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/settings/workspace/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/settings/workspace/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/:id/access/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/[id]/access/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/:id/analytics/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/[id]/analytics/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/:id/domains/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/[id]/domains/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/:id/layout",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/[id]/layout.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/:id/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/[id]/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/:id/publish/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/[id]/publish/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/:id/seo/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/[id]/seo/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/:id/settings/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/[id]/settings/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/new/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/new/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/sites/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/sites/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/dashboard/team/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/dashboard/team/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/error",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/error.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/layout",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/layout.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/maintenance/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/maintenance/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/not-found",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/not-found.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/onboarding/layout",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/onboarding/layout.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/onboarding/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/onboarding/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/onboarding/role/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/onboarding/role/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/onboarding/setup/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/onboarding/setup/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/page.tsx",
+        "filesystem": true
+      },
+      {
+        "path": "/share/:token/page",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/share/[token]/page.tsx",
+        "filesystem": true
+      }
+    ]
+  },
+  "apis": {
+    "total": 8,
+    "integrated": 4,
+    "mock": 0,
+    "endpoints": [
+      {
+        "path": "/api/auth/create-session",
+        "method": "UNKNOWN",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/auth/2fa/page.tsx",
+        "line": 26,
+        "integrated": true,
+        "mock_detected": false
+      },
+      {
+        "path": "/api/auth/logout",
+        "method": "UNKNOWN",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/components/dashboard/avatar-dropdown.tsx",
+        "line": 45,
+        "integrated": true,
+        "mock_detected": false
+      },
+      {
+        "path": "/api/health",
+        "method": "UNKNOWN",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/maintenance/page.tsx",
+        "line": 12,
+        "integrated": true,
+        "mock_detected": false
+      },
+      {
+        "path": "/api/share/",
+        "method": "UNKNOWN",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/share/[token]/page.tsx",
+        "line": 19,
+        "integrated": true,
+        "mock_detected": false
+      },
+      {
+        "path": "/api/trpc",
+        "method": "UNKNOWN",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/app/api/trpc/[trpc]/route.ts",
+        "line": 7,
+        "integrated": false,
+        "mock_detected": false
+      },
+      {
+        "path": "/onboarding/create",
+        "method": "UNKNOWN",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/components/onboarding/onboarding-sidebar.tsx",
+        "line": 10,
+        "integrated": false,
+        "mock_detected": false
+      },
+      {
+        "path": "/onboarding/role",
+        "method": "UNKNOWN",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/components/onboarding/onboarding-sidebar.tsx",
+        "line": 8,
+        "integrated": false,
+        "mock_detected": false
+      },
+      {
+        "path": "/onboarding/setup",
+        "method": "UNKNOWN",
+        "source": "/Users/shahg/Desktop/pencil/buildrik/components/onboarding/onboarding-sidebar.tsx",
+        "line": 9,
+        "integrated": false,
+        "mock_detected": false
+      }
+    ]
+  },
+  "enums": {
+    "count": 18,
+    "definitions": [
+      {
+        "name": "DEFAULT_STATUS",
+        "type": "constant_map",
+        "values": {
+          "bg": "#f3f4f6",
+          "color": "#6b7280",
+          "label": "Unknown"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/components/settings/ai-credits-tab.tsx"
+      },
+      {
+        "name": "colorMap",
+        "type": "constant_map",
+        "values": {
+          "blue": "text-blue-500",
+          "red": "text-red-500",
+          "green": "text-green-500",
+          "gray": "text-gray-400"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/components/auth/auth-icon.tsx"
+      },
+      {
+        "name": "STATUS_ICON",
+        "type": "constant_map",
+        "values": {
+          "color": "#22C55E"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/components/publish/pre-publish-checks.tsx"
+      },
+      {
+        "name": "mockState",
+        "type": "constant_map",
+        "values": {
+          "id": "obs_1",
+          "userId": "user_1",
+          "step": "ROLE_SELECT"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/__tests__/onboarding-service.test.ts"
+      },
+      {
+        "name": "UserRole",
+        "type": "constant_map",
+        "values": {
+          "OWNER": "OWNER",
+          "ADMIN": "ADMIN",
+          "EDITOR": "EDITOR",
+          "VIEWER": "VIEWER"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/lib/constants/enums.ts"
+      },
+      {
+        "name": "SiteStatus",
+        "type": "constant_map",
+        "values": {
+          "DRAFT": "DRAFT",
+          "PUBLISHED": "PUBLISHED",
+          "ARCHIVED": "ARCHIVED"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/lib/constants/enums.ts"
+      },
+      {
+        "name": "InviteStatus",
+        "type": "constant_map",
+        "values": {
+          "PENDING": "PENDING",
+          "ACCEPTED": "ACCEPTED",
+          "DECLINED": "DECLINED",
+          "EXPIRED": "EXPIRED"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/lib/constants/enums.ts"
+      },
+      {
+        "name": "MemberStatus",
+        "type": "constant_map",
+        "values": {
+          "ACTIVE": "ACTIVE",
+          "SUSPENDED": "SUSPENDED"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/lib/constants/enums.ts"
+      },
+      {
+        "name": "SubscriptionStatus",
+        "type": "constant_map",
+        "values": {
+          "ACTIVE": "ACTIVE",
+          "PAST_DUE": "PAST_DUE",
+          "CANCELLED": "CANCELLED",
+          "INCOMPLETE": "INCOMPLETE"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/lib/constants/enums.ts"
+      },
+      {
+        "name": "InvoiceStatus",
+        "type": "constant_map",
+        "values": {
+          "PAID": "PAID",
+          "FAILED": "FAILED",
+          "PENDING": "PENDING",
+          "REFUNDED": "REFUNDED"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/lib/constants/enums.ts"
+      },
+      {
+        "name": "DomainStatus",
+        "type": "constant_map",
+        "values": {
+          "PENDING": "PENDING",
+          "VERIFIED": "VERIFIED",
+          "FAILED": "FAILED"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/lib/constants/enums.ts"
+      },
+      {
+        "name": "SslStatus",
+        "type": "constant_map",
+        "values": {
+          "PENDING": "PENDING",
+          "ACTIVE": "ACTIVE",
+          "EXPIRED": "EXPIRED"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/lib/constants/enums.ts"
+      },
+      {
+        "name": "NotificationType",
+        "type": "constant_map",
+        "values": {
+          "SITE_PUBLISHED": "SITE_PUBLISHED",
+          "SITE_PUBLISH_FAILED": "SITE_PUBLISH_FAILED",
+          "SITE_TRANSFERRED": "SITE_TRANSFERRED",
+          "SITE_ARCHIVED": "SITE_ARCHIVED",
+          "SITE_DUPLICATED": "SITE_DUPLICATED",
+          "MEMBER_JOINED": "MEMBER_JOINED",
+          "MEMBER_REMOVED": "MEMBER_REMOVED",
+          "MEMBER_ROLE_CHANGED": "MEMBER_ROLE_CHANGED",
+          "PAYMENT_FAILED": "PAYMENT_FAILED",
+          "PLAN_LIMIT_WARNING": "PLAN_LIMIT_WARNING",
+          "SUBSCRIPTION_CHANGED": "SUBSCRIPTION_CHANGED",
+          "DOMAIN_VERIFIED": "DOMAIN_VERIFIED",
+          "DOMAIN_ERROR": "DOMAIN_ERROR",
+          "DOMAIN_SSL_EXPIRING": "DOMAIN_SSL_EXPIRING",
+          "SHARE_LINK_VIEWED": "SHARE_LINK_VIEWED",
+          "FORM_SUBMISSION_RECEIVED": "FORM_SUBMISSION_RECEIVED",
+          "AI_GENERATION_COMPLETE": "AI_GENERATION_COMPLETE",
+          "AI_GENERATION_FAILED": "AI_GENERATION_FAILED",
+          "SECURITY_LOGIN_NEW_DEVICE": "SECURITY_LOGIN_NEW_DEVICE",
+          "SECURITY_PASSWORD_CHANGED": "SECURITY_PASSWORD_CHANGED",
+          "SECURITY_2FA_CHANGED": "SECURITY_2FA_CHANGED"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/lib/constants/enums.ts"
+      },
+      {
+        "name": "OnboardingRole",
+        "type": "constant_map",
+        "values": {
+          "FREELANCER": "FREELANCER",
+          "SMALL_TEAM": "SMALL_TEAM",
+          "AGENCY": "AGENCY"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/lib/constants/enums.ts"
+      },
+      {
+        "name": "TicketStatus",
+        "type": "constant_map",
+        "values": {
+          "OPEN": "OPEN",
+          "IN_PROGRESS": "IN_PROGRESS",
+          "RESOLVED": "RESOLVED",
+          "CLOSED": "CLOSED"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/lib/constants/enums.ts"
+      },
+      {
+        "name": "AIJobStatus",
+        "type": "constant_map",
+        "values": {
+          "QUEUED": "QUEUED",
+          "GENERATING_STRUCTURE": "GENERATING_STRUCTURE",
+          "GENERATING_CONTENT": "GENERATING_CONTENT",
+          "GENERATING_STYLES": "GENERATING_STYLES",
+          "COMPLETED": "COMPLETED",
+          "FAILED": "FAILED",
+          "CANCELLED": "CANCELLED"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/lib/constants/enums.ts"
+      },
+      {
+        "name": "BlockType",
+        "type": "constant_map",
+        "values": {
+          "HEADING": "HEADING",
+          "PARAGRAPH": "PARAGRAPH",
+          "IMAGE": "IMAGE",
+          "VIDEO": "VIDEO",
+          "BUTTON": "BUTTON",
+          "COLUMNS": "COLUMNS",
+          "HERO": "HERO",
+          "GALLERY": "GALLERY",
+          "FORM": "FORM",
+          "DIVIDER": "DIVIDER",
+          "EMBED": "EMBED",
+          "CODE": "CODE"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/lib/constants/enums.ts"
+      },
+      {
+        "name": "VerificationTokenType",
+        "type": "constant_map",
+        "values": {
+          "EMAIL_VERIFY": "EMAIL_VERIFY",
+          "PASSWORD_RESET": "PASSWORD_RESET",
+          "MAGIC_LINK": "MAGIC_LINK",
+          "EMAIL_CHANGE": "EMAIL_CHANGE"
+        },
+        "source": "/Users/shahg/Desktop/pencil/buildrik/lib/constants/enums.ts"
+      }
+    ]
+  },
+  "models": {
+    "count": 0,
+    "definitions": []
+  },
+  "summary": {
+    "pages": 75,
+    "backend_endpoints": 0,
+    "api_endpoints": 8,
+    "api_integrated": 4,
+    "api_mock": 0,
+    "enums": 18,
+    "models": 0,
+    "has_i18n": false,
+    "has_state_management": false,
+    "stack_type": "frontend"
+  }
+}

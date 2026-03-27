@@ -19,6 +19,7 @@ export default function PublishPage() {
 
   const site = trpc.sites.get.useQuery({ id: siteId });
   const domains = trpc.siteDetail.domains.list.useQuery({ siteId });
+  const billing = trpc.billing.overview.useQuery();
   const checks = trpc.sites.prePublishChecks.useQuery(
     { siteId },
     { enabled: phase === "checks" }
@@ -54,9 +55,9 @@ export default function PublishPage() {
     setPhase("checks");
   }
 
-  // Derive domain from site data
   const slug = site.data?.slug ?? "";
-  const customDomain = domains.data?.find((d) => d.status === "VERIFIED")?.domain ?? null;
+  const customDomain = domains.data?.find((d: { status: string; domain: string }) => d.status === "VERIFIED")?.domain ?? null;
+  const plan = billing.data?.plan ?? "FREE";
 
   if (phase === "checks") {
     if (checks.isLoading) {
@@ -112,6 +113,7 @@ export default function PublishPage() {
         siteId={siteId}
         slug={slug}
         customDomain={customDomain}
+        plan={plan}
       />
     </div>
   );

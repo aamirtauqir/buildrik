@@ -56,6 +56,6 @@ describe("AI Wizard Components", () => {
   it("exports GenerationProgress component", async () => {
     const mod = await import("@/components/ai-wizard/generation-progress");
     expect(mod.GenerationProgress).toBeDefined();
-    expect(mod.GENERATION_STEPS).toHaveLength(4);
+    expect(mod.GENERATION_STEPS).toHaveLength(5);
   });
 });

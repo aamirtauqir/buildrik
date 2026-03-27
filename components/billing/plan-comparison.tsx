@@ -27,9 +27,9 @@ const PLAN_PRICES: Record<PlanKey, { monthly: number; yearly: number }> = {
 };
 
 const PLAN_BADGE: Record<PlanKey, { bg: string; color: string; label: string }> = {
-  FREE: { bg: "#F3F4F6", color: "#7A7A7A", label: "Free" },
-  PRO: { bg: "#EFF6FF", color: "#3B82F6", label: "Pro" },
-  BUSINESS: { bg: "#F5F3FF", color: "#8B5CF6", label: "Business" },
+  FREE: { bg: "#F4F4F4", color: "#7A7A7A", label: "Free" },
+  PRO: { bg: "#F4F4F4", color: "#0D0D0D", label: "Pro" },
+  BUSINESS: { bg: "#0D0D0D", color: "#FFFFFF", label: "Business" },
 };
 
 export interface UsageMetric {

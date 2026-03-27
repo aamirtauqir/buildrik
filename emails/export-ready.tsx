@@ -17,7 +17,7 @@ export default function ExportReady({ downloadUrl = "https://app.buildrik.app/se
             The data export you requested has been generated. Click below to download it. The link expires in 7 days.
           </Text>
           <Section style={{ textAlign: "center" as const, marginTop: "24px" }}>
-            <Button href={downloadUrl} style={{ backgroundColor: "#6366F1", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
+            <Button href={downloadUrl} style={{ backgroundColor: "#E42313", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
               Download
             </Button>
           </Section>

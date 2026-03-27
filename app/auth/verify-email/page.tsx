@@ -1,46 +1,62 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthLogo } from "@/components/auth/auth-logo";
 import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthButton } from "@/components/auth/auth-button";
 import { ResendTimer } from "@/components/auth/resend-timer";
+import { FormBanner } from "@/components/auth/form-banner";
 import { trpc } from "@/lib/trpc/client";
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const token = searchParams.get("token") ?? "";
   const email = searchParams.get("email") ?? "";
-  const status = searchParams.get("status");
-  const isVerified = status === "verified";
 
+  const [verified, setVerified] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(5);
+
+  const verifyMutation = trpc.auth.verifyEmail.useMutation({
+    onSuccess: () => setVerified(true),
+    onError: (err) => setError(err.message),
+  });
 
   const resendMutation = trpc.auth.resendVerification.useMutation();
 
+  // Auto-verify when token is present
   useEffect(() => {
-    if (!isVerified) return;
+    if (token && !verified && !error) {
+      verifyMutation.mutate({ token });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
+  // Redirect countdown after verification
+  useEffect(() => {
+    if (!verified) return;
     if (countdown <= 0) {
       router.push("/auth/login");
       return;
     }
     const timer = setInterval(() => setCountdown((c) => c - 1), 1000);
     return () => clearInterval(timer);
-  }, [isVerified, countdown, router]);
+  }, [verified, countdown, router]);
 
-  if (isVerified) {
+  // Verified state
+  if (verified) {
     return (
       <AuthCard>
         <AuthIcon name="check" color="green" />
         <h1 className="text-auth-title text-auth-text-primary text-center">
-          Email already verified
+          Email verified
         </h1>
         <p className="text-auth-subtitle text-auth-text-muted text-center mt-1">
-          Your email has been verified. You can sign in.
+          Your email has been verified. You can now sign in.
         </p>
 
         <div className="h-6" />
@@ -56,6 +72,59 @@ export default function VerifyEmailPage() {
     );
   }
 
+  // Verifying in progress (has token)
+  if (token && !error) {
+    return (
+      <AuthCard>
+        <AuthLogo />
+        <AuthIcon name="mail" color="blue" />
+        <h1 className="text-auth-title text-auth-text-primary text-center">
+          Verifying your email…
+        </h1>
+        <p className="text-auth-subtitle text-auth-text-muted text-center mt-1">
+          Please wait while we verify your email address.
+        </p>
+      </AuthCard>
+    );
+  }
+
+  // Error state (token expired, invalid, etc.)
+  if (error) {
+    return (
+      <AuthCard>
+        <AuthLogo />
+        <AuthIcon name="warning" color="red" />
+        <h1 className="text-auth-title text-auth-text-primary text-center">
+          Verification failed
+        </h1>
+
+        <div className="h-4" />
+
+        <FormBanner variant="error" title={error} />
+
+        <div className="h-5" />
+
+        {email ? (
+          <ResendTimer initialSeconds={60} onResend={() => resendMutation.mutate({ email })} />
+        ) : (
+          <Link href="/auth/signup" className="text-auth-link hover:underline text-center block">
+            Try signing up again
+          </Link>
+        )}
+
+        <div className="h-4" />
+
+        <Link
+          href="/auth/login"
+          className="text-auth-label text-auth-link hover:underline text-center block"
+        >
+          ← Back to sign in
+        </Link>
+      </AuthCard>
+    );
+  }
+
+  // Default: "check your inbox" (no token, came from signup)
   return (
     <AuthCard>
       <AuthLogo />
@@ -105,5 +174,13 @@ export default function VerifyEmailPage() {
         ← Back to sign in
       </Link>
     </AuthCard>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={null}>
+      <VerifyEmailContent />
+    </Suspense>
   );
 }

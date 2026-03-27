@@ -10,7 +10,7 @@ export default function DashboardLayout({
     <div className="min-h-screen" style={{ backgroundColor: "#FAFAFA" }}>
       <Sidebar />
       <Topbar />
-      <main className="ml-[220px] pt-14">
+      <main className="pt-14 lg:ml-[220px]">
         <div className="mx-auto max-w-[1220px] p-8">{children}</div>
       </main>
     </div>

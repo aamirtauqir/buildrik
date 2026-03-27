@@ -222,7 +222,7 @@ export function getQuickActions(input: QuickActionInput): QuickAction[] {
       },
       {
         label: "View Billing",
-        href: "/dashboard/billing",
+        href: "/dashboard/billing?tab=overview",
         icon: "BarChart3",
         description: "Review your billing details",
       },
@@ -263,7 +263,7 @@ export function getQuickActions(input: QuickActionInput): QuickAction[] {
       },
       {
         label: "View Usage",
-        href: "/dashboard/billing",
+        href: "/dashboard/billing?tab=usage",
         icon: "BarChart3",
         description: "Check your resource usage",
       },
@@ -308,13 +308,13 @@ export function getQuickActions(input: QuickActionInput): QuickAction[] {
     },
     {
       label: "View Analytics",
-      href: "/dashboard/sites",
+      href: "/dashboard/sites?view=analytics",
       icon: "BarChart3",
       description: "Check your site performance",
     },
     {
       label: "Manage Domains",
-      href: "/dashboard/sites",
+      href: "/dashboard/sites?view=domains",
       icon: "Globe",
       description: "Configure custom domains",
     },

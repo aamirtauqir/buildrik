@@ -55,8 +55,7 @@ export function NotificationItem({
     <div
       className="group flex items-start gap-3 px-4 py-3 transition-colors hover:bg-[#F4F4F4]"
       style={{
-        borderLeft: notification.read ? "3px solid transparent" : "3px solid #6366F1",
-        backgroundColor: notification.read ? undefined : "#EEF2FF",
+        backgroundColor: notification.read ? undefined : "#F4F4F4",
         opacity: notification.read ? 0.6 : 1,
         cursor: notification.actionUrl ? "pointer" : "default",
       }}
@@ -77,7 +76,7 @@ export function NotificationItem({
             <a
               href={notification.actionUrl}
               className="text-xs font-medium hover:underline"
-              style={{ color: "#6366F1" }}
+              style={{ color: "#E42313" }}
               onClick={(e) => e.stopPropagation()}
             >
               View

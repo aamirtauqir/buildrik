@@ -18,7 +18,7 @@ export default function WsTransferIn({ workspaceName = "My Workspace", manageUrl
             Workspace ownership has been transferred to you. You can manage billing, members, and settings.
           </Text>
           <Section style={{ textAlign: "center" as const, marginTop: "24px" }}>
-            <Button href={manageUrl} style={{ backgroundColor: "#6366F1", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
+            <Button href={manageUrl} style={{ backgroundColor: "#E42313", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
               Manage Workspace
             </Button>
           </Section>

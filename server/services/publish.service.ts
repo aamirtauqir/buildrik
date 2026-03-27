@@ -84,11 +84,7 @@ export async function startPublish(siteId: string, workspaceId: string, userId: 
 
   await prisma.site.update({
     where: { id: siteId },
-    data: {
-      status: "PUBLISHED",
-      lastPublishedAt: new Date(),
-      lastPublishedBy: userId,
-    },
+    data: { status: "PUBLISHING", lastPublishedBy: userId },
   });
 
   notifyWorkspaceOwner(
@@ -110,25 +106,37 @@ export async function cancelPublish(jobId: string) {
   if (!job || !["QUEUED", "BUILDING"].includes(job.status)) {
     throw new Error("NOT_CANCELLABLE");
   }
-  return prisma.publishBuildJob.update({
-    where: { id: jobId },
-    data: { status: "CANCELLED" },
-  });
+  const [updated] = await prisma.$transaction([
+    prisma.publishBuildJob.update({
+      where: { id: jobId },
+      data: { status: "CANCELLED" },
+    }),
+    prisma.site.update({
+      where: { id: job.siteId },
+      data: { status: "DRAFT" },
+    }),
+  ]);
+  return updated;
 }
 
 export async function completePublish(jobId: string, publicUrl: string) {
   const job = await prisma.publishBuildJob.findUnique({ where: { id: jobId } });
   if (!job) throw new Error("JOB_NOT_FOUND");
 
-  const updated = await prisma.publishBuildJob.update({
-    where: { id: jobId },
-    data: { status: "COMPLETED", completedAt: new Date() },
-  });
-
-  await prisma.site.update({
-    where: { id: job.siteId },
-    data: { publishedUrl: publicUrl },
-  });
+  const [updated] = await prisma.$transaction([
+    prisma.publishBuildJob.update({
+      where: { id: jobId },
+      data: { status: "COMPLETED", completedAt: new Date() },
+    }),
+    prisma.site.update({
+      where: { id: job.siteId },
+      data: {
+        status: "PUBLISHED",
+        publishedUrl: publicUrl,
+        lastPublishedAt: new Date(),
+      },
+    }),
+  ]);
 
   return updated;
 }

@@ -70,7 +70,7 @@ export function NotificationDropdown() {
             <button
               onClick={() => markAllRead.mutate()}
               className="text-xs font-medium hover:underline"
-              style={{ color: "#6366F1" }}
+              style={{ color: "#7A7A7A" }}
             >
               Mark all read
             </button>
@@ -94,7 +94,7 @@ export function NotificationDropdown() {
             <a
               href="/dashboard/notifications"
               className="text-xs font-medium hover:underline"
-              style={{ color: "#6366F1" }}
+              style={{ color: "#7A7A7A" }}
             >
               View All &rarr;
             </a>

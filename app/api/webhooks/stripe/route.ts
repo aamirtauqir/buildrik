@@ -1,3 +1,4 @@
+import { createHmac, timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import {
   handleChargeFailed,
@@ -5,6 +6,23 @@ import {
   handleSubscriptionDeleted,
   handleInvoicePaid,
 } from "@/server/services/stripe-webhook.service";
+
+function verifyStripeSignature(body: string, sig: string, secret: string): boolean {
+  // Stripe signature format: t=<timestamp>,v1=<hmac>
+  const parts = Object.fromEntries(sig.split(",").map((p) => p.split("=")));
+  const timestamp = parts["t"];
+  const v1 = parts["v1"];
+  if (!timestamp || !v1) return false;
+
+  const signed = `${timestamp}.${body}`;
+  const expected = createHmac("sha256", secret).update(signed, "utf8").digest("hex");
+
+  try {
+    return timingSafeEqual(Buffer.from(v1, "hex"), Buffer.from(expected, "hex"));
+  } catch {
+    return false;
+  }
+}
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -14,7 +32,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing signature" }, { status: 400 });
   }
 
-  // TODO: verify signature with stripe.webhooks.constructEvent(body, sig, endpointSecret) once Stripe SDK is installed
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!endpointSecret) {
+    console.error("STRIPE_WEBHOOK_SECRET not set");
+    return NextResponse.json({ error: "Webhook not configured" }, { status: 500 });
+  }
+
+  if (!verifyStripeSignature(body, sig, endpointSecret)) {
+    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+  }
+
   let event: { type: string; data: { object: any } };
   try {
     event = JSON.parse(body);

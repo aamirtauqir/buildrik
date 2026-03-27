@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
@@ -34,7 +35,7 @@ function VerifyVariant() {
         This link has expired. Request a new verification email.
       </p>
       <div className="h-4" />
-      <AuthButton onClick={() => console.log("Resend verification email")}>
+      <AuthButton onClick={() => (window.location.href = "/auth/signup")}>
         Resend Verification Email
       </AuthButton>
     </>
@@ -51,7 +52,7 @@ function MagicLinkVariant() {
         This link has expired (15 min limit). Request a new one.
       </p>
       <div className="h-4" />
-      <AuthButton onClick={() => console.log("Request new magic link")}>
+      <AuthButton onClick={() => (window.location.href = "/auth/magic-link")}>
         Request New Magic Link
       </AuthButton>
       <div className="h-3" />
@@ -65,7 +66,7 @@ function MagicLinkVariant() {
   );
 }
 
-export default function ExpiredLinkPage() {
+function ExpiredLinkContent() {
   const searchParams = useSearchParams();
   const type = searchParams.get("type") ?? "reset";
 
@@ -90,5 +91,13 @@ export default function ExpiredLinkPage() {
         ← Back to sign in
       </Link>
     </AuthCard>
+  );
+}
+
+export default function ExpiredLinkPage() {
+  return (
+    <Suspense fallback={null}>
+      <ExpiredLinkContent />
+    </Suspense>
   );
 }

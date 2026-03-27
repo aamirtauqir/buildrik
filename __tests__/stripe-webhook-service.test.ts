@@ -6,7 +6,12 @@ vi.mock("@/lib/prisma", () => ({
     invoice: { upsert: vi.fn() },
     workspace: { findFirst: vi.fn(), update: vi.fn() },
     notification: { create: vi.fn() },
+    user: { findUnique: vi.fn() },
   },
+}));
+
+vi.mock("@/server/services/email.service", () => ({
+  sendPaymentFailedEmail: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { prisma } from "@/lib/prisma";

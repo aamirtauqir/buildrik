@@ -65,6 +65,13 @@ function getConfig(variant: EmptyStateVariant): EmptyStateConfig {
 
 export type EmptyStateVariant = "owner_new" | "owner_empty" | "editor_no_sites" | "viewer";
 
+export const EMPTY_STATE_CONFIGS: Record<string, EmptyStateConfig> = {
+  owner_new: getConfig("owner_new"),
+  owner_empty: getConfig("owner_empty"),
+  editor: getConfig("editor_no_sites"),
+  viewer: getConfig("viewer"),
+};
+
 type EmptyStateProps = {
   variant: EmptyStateVariant;
 };

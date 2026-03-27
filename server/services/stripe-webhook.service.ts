@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { sendPaymentFailedEmail } from "@/server/services/email.service";
 
 const STRIPE_STATUS_MAP: Record<string, string> = {
   active: "ACTIVE",
@@ -32,6 +33,14 @@ export async function handleChargeFailed(stripeSubscriptionId: string): Promise<
       message: "Your payment failed. Please update your payment method to avoid service interruption.",
     },
   });
+
+  const owner = await prisma.user.findUnique({
+    where: { id: workspace.ownerId },
+    select: { email: true },
+  });
+  if (owner?.email) {
+    sendPaymentFailedEmail(owner.email).catch(() => {});
+  }
 }
 
 export async function handleSubscriptionUpdated(

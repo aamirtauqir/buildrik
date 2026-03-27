@@ -2,15 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, Copy, ExternalLink, Share2, BarChart3, Pencil, LayoutDashboard, Globe, Loader2 } from "lucide-react";
+import { CheckCircle2, Copy, ExternalLink, Share2, BarChart3, Pencil, LayoutDashboard, Globe, Loader2, ArrowUpRight } from "lucide-react";
 
 interface PublishSuccessProps {
   siteId: string;
   slug: string;
   customDomain?: string | null;
+  plan?: string;
 }
 
-export function PublishSuccess({ siteId, slug, customDomain }: PublishSuccessProps) {
+export function PublishSuccess({ siteId, slug, customDomain, plan = "FREE" }: PublishSuccessProps) {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
   const buildrikUrl = `https://${slug}.buildrik.app`;
@@ -44,6 +45,26 @@ export function PublishSuccess({ siteId, slug, customDomain }: PublishSuccessPro
           isCopied={copiedUrl === domainUrl}
           onCopy={() => handleCopy(domainUrl)}
         />
+      )}
+
+      {/* Custom domain upgrade nudge for FREE plan users without a custom domain */}
+      {plan === "FREE" && !customDomain && (
+        <div className="mt-4 rounded-xl border p-4 text-left" style={{ borderColor: "#E8E8E8", backgroundColor: "#FAFAFA" }}>
+          <p className="text-sm font-semibold" style={{ color: "#0D0D0D" }}>
+            Your site is live on <span style={{ color: "#E42313" }}>{slug}.buildrik.app</span>
+          </p>
+          <p className="mt-1 text-sm" style={{ color: "#7A7A7A" }}>
+            Upgrade to PRO to connect your own domain — your client will never see buildrik.app.
+          </p>
+          <Link
+            href="/dashboard/billing"
+            className="mt-3 inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold text-white"
+            style={{ backgroundColor: "#E42313" }}
+          >
+            Connect a custom domain
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
       )}
 
       {/* Lighthouse placeholder */}

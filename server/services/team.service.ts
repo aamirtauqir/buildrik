@@ -84,7 +84,6 @@ export async function inviteMembers(
 
   const toInvite: string[] = [];
   let skipped = 0;
-  const errors: string[] = [];
 
   for (const email of input.emails) {
     if (memberEmails.has(email) || pendingEmails.has(email)) {
@@ -96,7 +95,7 @@ export async function inviteMembers(
 
   const effectiveLimit = limit as number;
   if (effectiveLimit > 0 && currentCount + toInvite.length + pendingEmails.size > effectiveLimit) {
-    errors.push(`Plan limit reached (${effectiveLimit} members)`);
+    throw new Error("TEAM_LIMIT");
   }
 
   const workspace = await prisma.workspace.findUnique({ where: { id: workspaceId }, select: { name: true } });
@@ -125,7 +124,7 @@ export async function inviteMembers(
     } catch { /* Email failure shouldn't block invite */ }
   }
 
-  return { sent: toInvite.length, skipped, errors };
+  return { sent: toInvite.length, skipped };
 }
 
 export async function changeRole(

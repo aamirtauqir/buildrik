@@ -8,15 +8,20 @@ import { AuthLogo } from "@/components/auth/auth-logo";
 import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthButton } from "@/components/auth/auth-button";
+import { FormBanner } from "@/components/auth/form-banner";
 import { trpc } from "@/lib/trpc/client";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const forgotPasswordMutation = trpc.auth.forgotPassword.useMutation({
     onSuccess: () => {
-      router.push("/auth/check-inbox?type=reset");
+      router.push(`/auth/check-inbox?type=reset&email=${encodeURIComponent(email)}`);
+    },
+    onError: (err) => {
+      setError(err.message);
     },
   });
 
@@ -36,6 +41,13 @@ export default function ForgotPasswordPage() {
       <p className="text-auth-subtitle text-auth-text-muted text-center mt-1 mb-6">
         No worries, we&apos;ll send you reset instructions
       </p>
+
+      {error && (
+        <>
+          <FormBanner variant="error" title={error} />
+          <div className="h-4" />
+        </>
+      )}
 
       <form onSubmit={handleSubmit}>
         <AuthInput

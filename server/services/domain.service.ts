@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
 export async function listDomains(siteId: string) {
   return prisma.domain.findMany({
@@ -8,6 +9,18 @@ export async function listDomains(siteId: string) {
 }
 
 export async function connectDomain(siteId: string, domain: string) {
+  const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
+  if (!site) throw new Error("SITE_NOT_FOUND");
+
+  const ws = await prisma.workspace.findUnique({ where: { id: site.workspaceId }, select: { plan: true } });
+  const plan = (ws?.plan ?? "FREE") as PlanName;
+  const maxDomains = PLAN_LIMITS[plan].customDomains as number;
+
+  if (maxDomains === 0) throw new Error("DOMAIN_LIMIT");
+
+  const currentDomainCount = await prisma.domain.count({ where: { site: { workspaceId: site.workspaceId } } });
+  if (maxDomains > 0 && currentDomainCount >= maxDomains) throw new Error("DOMAIN_LIMIT");
+
   const existing = await prisma.domain.findFirst({ where: { domain } });
   if (existing) throw new Error("DOMAIN_IN_USE");
 

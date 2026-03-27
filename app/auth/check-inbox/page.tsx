@@ -15,7 +15,8 @@ function CheckInboxContent() {
   const type = searchParams.get("type");
   const email = searchParams.get("email") ?? "";
 
-  const resendMutation = trpc.auth.forgotPassword.useMutation();
+  const resendResetMutation = trpc.auth.forgotPassword.useMutation();
+  const resendVerificationMutation = trpc.auth.resendVerification.useMutation();
 
   const subtitle =
     type === "reset"
@@ -56,7 +57,9 @@ function CheckInboxContent() {
         initialSeconds={60}
         onResend={() => {
           if (type === "reset" && email) {
-            resendMutation.mutate({ email });
+            resendResetMutation.mutate({ email });
+          } else if (type === "verify" && email) {
+            resendVerificationMutation.mutate({ email });
           }
         }}
       />

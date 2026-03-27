@@ -23,7 +23,7 @@ export default function TeamInvite({
             {inviterName} invited you to join {workspaceName} on Buildrik.
           </Text>
           <Section style={{ textAlign: "center" as const, marginTop: "24px" }}>
-            <Button href={inviteUrl} style={{ backgroundColor: "#6366F1", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
+            <Button href={inviteUrl} style={{ backgroundColor: "#E42313", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
               Accept Invite
             </Button>
           </Section>

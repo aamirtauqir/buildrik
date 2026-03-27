@@ -19,6 +19,7 @@ vi.mock("@/lib/prisma", () => ({
       create: vi.fn(),
       update: vi.fn(),
     },
+    $transaction: vi.fn((ops: unknown[]) => Promise.all(ops)),
   },
 }));
 
@@ -141,7 +142,7 @@ describe("Publish Service", () => {
         expect.objectContaining({
           where: { id: "s1" },
           data: expect.objectContaining({
-            status: "PUBLISHED",
+            status: "PUBLISHING",
             lastPublishedBy: "user1",
           }),
         })

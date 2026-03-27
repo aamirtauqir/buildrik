@@ -17,7 +17,7 @@ export default function VerifyEmail({ verifyUrl = "https://app.buildrik.app/auth
             Click the button below to verify your email address and activate your Buildrik account.
           </Text>
           <Section style={{ textAlign: "center" as const, marginTop: "24px" }}>
-            <Button href={verifyUrl} style={{ backgroundColor: "#6366F1", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
+            <Button href={verifyUrl} style={{ backgroundColor: "#E42313", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
               Verify Email Address
             </Button>
           </Section>

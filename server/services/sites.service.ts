@@ -5,6 +5,7 @@ import type {
   ListSitesInput,
   BulkActionInput,
 } from "@/lib/validations/sites";
+import { sendSiteTransferredEmail } from "@/server/services/email.service";
 
 function slugify(name: string): string {
   return name
@@ -274,12 +275,25 @@ export async function transferSite(
       : []),
   ]);
 
+  const [fromUser, toUser] = await Promise.all([
+    prisma.user.findUnique({ where: { id: currentUserId }, select: { fullName: true } }),
+    prisma.user.findUnique({ where: { id: newOwnerId }, select: { email: true } }),
+  ]);
+  if (toUser?.email) {
+    sendSiteTransferredEmail(
+      toUser.email,
+      fromUser?.fullName ?? "A team member",
+      site.name,
+      siteId,
+    ).catch(() => {});
+  }
+
   return { success: true };
 }
 
 export async function getSite(siteId: string) {
-  return prisma.site.findUnique({
-    where: { id: siteId },
+  return prisma.site.findFirst({
+    where: { id: siteId, deletedAt: null },
     include: { folder: true },
   });
 }
@@ -318,17 +332,40 @@ export async function duplicateSite(
   const copyName = `${original.name} (Copy)`;
   const slug = await generateUniqueSlug(copyName);
 
-  return prisma.site.create({
+  const originalPages = await prisma.page.findMany({
+    where: { siteId },
+    orderBy: { position: "asc" },
+  });
+
+  const newSite = await prisma.site.create({
     data: {
       name: copyName,
       slug,
       status: "DRAFT",
       workspaceId,
       createdBy: userId,
-      pages: original.pages,
+      pages: originalPages.length,
       lastEditedAt: new Date(),
     },
   });
+
+  if (originalPages.length > 0) {
+    await prisma.page.createMany({
+      data: originalPages.map((p) => ({
+        siteId: newSite.id,
+        name: p.name,
+        slug: p.slug,
+        position: p.position,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        blocks: (p.blocks ?? []) as any,
+        isHomePage: p.isHomePage,
+        seoTitle: p.seoTitle,
+        seoDescription: p.seoDescription,
+      })),
+    });
+  }
+
+  return newSite;
 }
 
 export async function archiveSite(siteId: string) {

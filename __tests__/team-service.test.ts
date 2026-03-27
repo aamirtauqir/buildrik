@@ -3,10 +3,16 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     workspaceMember: { findMany: vi.fn(), findUnique: vi.fn(), count: vi.fn(), update: vi.fn(), delete: vi.fn() },
-    invite: { findMany: vi.fn(), create: vi.fn(), createMany: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
-    user: { findUnique: vi.fn() },
+    invite: { findMany: vi.fn(), create: vi.fn(), createMany: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn(), findUnique: vi.fn() },
+    user: { findUnique: vi.fn(), findMany: vi.fn() },
+    workspace: { findUnique: vi.fn() },
+    site: { count: vi.fn() },
     activityLog: { findMany: vi.fn(), create: vi.fn() },
   },
+}));
+
+vi.mock("@/server/services/email.service", () => ({
+  sendTeamInviteEmail: vi.fn(),
 }));
 
 import { prisma } from "@/lib/prisma";
@@ -33,9 +39,10 @@ describe("Team Service", () => {
       const { listMembers } = await import("@/server/services/team.service");
       vi.mocked(prisma.workspaceMember.count).mockResolvedValue(3);
       vi.mocked(prisma.workspaceMember.findMany).mockResolvedValue([
-        { id: "m1", userId: "u1", role: "OWNER", status: "ACTIVE", lastActiveAt: new Date(), joinedAt: new Date(), user: { fullName: "Ali Khan", email: "ali@test.com", avatar: null } },
-        { id: "m2", userId: "u2", role: "EDITOR", status: "ACTIVE", lastActiveAt: null, joinedAt: new Date(), user: { fullName: "Sara Ahmed", email: "sara@test.com", avatar: null } },
+        { id: "m1", userId: "u1", role: "OWNER", status: "ACTIVE", lastActiveAt: new Date(), joinedAt: new Date(), user: { fullName: "Ali Khan", email: "ali@test.com", avatar: null }, sitePermissions: [] },
+        { id: "m2", userId: "u2", role: "EDITOR", status: "ACTIVE", lastActiveAt: null, joinedAt: new Date(), user: { fullName: "Sara Ahmed", email: "sara@test.com", avatar: null }, sitePermissions: [] },
       ] as any);
+      vi.mocked(prisma.site.count).mockResolvedValue(5);
       const result = await listMembers("ws1", { page: 1, perPage: 20 });
       expect(result.data).toHaveLength(2);
       expect(result.data[0].fullName).toBe("Ali Khan");
@@ -49,13 +56,15 @@ describe("Team Service", () => {
       vi.mocked(prisma.workspaceMember.count).mockResolvedValue(1);
       vi.mocked(prisma.workspaceMember.findMany).mockResolvedValue([]);
       vi.mocked(prisma.invite.findMany).mockResolvedValue([]);
+      vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ id: "ws1", name: "Test WS" } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: "u1", fullName: "Inviter" } as any);
       vi.mocked(prisma.invite.create)
-        .mockResolvedValueOnce({ id: "inv1", email: "bob@test.com", status: "PENDING" } as any)
-        .mockResolvedValueOnce({ id: "inv2", email: "carol@test.com", status: "PENDING" } as any);
+        .mockResolvedValueOnce({ id: "inv1", email: "bob@test.com", status: "PENDING", token: "t1" } as any)
+        .mockResolvedValueOnce({ id: "inv2", email: "carol@test.com", status: "PENDING", token: "t2" } as any);
       const result = await inviteMembers("ws1", "u1", {
         emails: ["bob@test.com", "carol@test.com"],
         role: "EDITOR",
-      }, "FREE");
+      }, "PRO");
       expect(result.sent).toBe(2);
       expect(result.skipped).toBe(0);
     });
@@ -67,11 +76,13 @@ describe("Team Service", () => {
         { user: { email: "bob@test.com" } },
       ] as any);
       vi.mocked(prisma.invite.findMany).mockResolvedValue([]);
-      vi.mocked(prisma.invite.create).mockResolvedValue({ id: "inv1" } as any);
+      vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ id: "ws1", name: "Test WS" } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: "u1", fullName: "Inviter" } as any);
+      vi.mocked(prisma.invite.create).mockResolvedValue({ id: "inv1", token: "t1" } as any);
       const result = await inviteMembers("ws1", "u1", {
         emails: ["bob@test.com", "carol@test.com"],
         role: "EDITOR",
-      }, "FREE");
+      }, "PRO");
       expect(result.sent).toBe(1);
       expect(result.skipped).toBe(1);
     });

@@ -6,7 +6,7 @@ import { trpc } from "@/lib/trpc/client";
 import { NotificationItem } from "./notification-item";
 import type { NotificationData } from "@/lib/validations/notifications";
 
-const NOTIFICATION_TABS = [
+export const NOTIFICATION_TABS = [
   { key: "all" as const, label: "All" },
   { key: "unread" as const, label: "Unread" },
   { key: "mentions" as const, label: "Mentions" },
@@ -73,7 +73,7 @@ export function NotificationPage() {
         <button
           onClick={() => markAllRead.mutate()}
           className="rounded-lg px-3 py-1.5 text-sm font-medium transition-colors hover:bg-[#F4F4F4]"
-          style={{ color: "#6366F1" }}
+          style={{ color: "#7A7A7A" }}
         >
           Mark All Read
         </button>
@@ -129,7 +129,7 @@ export function NotificationPage() {
                 <button
                   onClick={() => toggleGroup(group.id)}
                   className="flex w-full items-center gap-1 px-4 py-1.5 text-xs font-medium transition-colors hover:bg-[#F4F4F4]"
-                  style={{ color: "#6366F1" }}
+                  style={{ color: "#7A7A7A" }}
                 >
                   {isExpanded ? (
                     <ChevronUp className="h-3 w-3" />

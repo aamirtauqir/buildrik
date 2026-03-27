@@ -33,7 +33,7 @@ export default function FormSubmission({
             )}
           </Section>
           <Section style={{ textAlign: "center" as const, marginTop: "24px" }}>
-            <Button href={viewUrl} style={{ backgroundColor: "#6366F1", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
+            <Button href={viewUrl} style={{ backgroundColor: "#E42313", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
               View Submission
             </Button>
           </Section>

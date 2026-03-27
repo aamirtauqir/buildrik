@@ -31,8 +31,12 @@ function encryptSecret(plaintext: string): string {
 function decryptSecret(ciphertext: string): string {
   const key = Buffer.from(process.env.NEXTAUTH_SECRET!.slice(0, 64), 'hex');
   const [ivHex, tagHex, encHex] = ciphertext.split(':');
+  const tag = Buffer.from(tagHex, 'hex');
+  if (tag.length !== 16) {
+    throw new Error('Invalid auth tag length');
+  }
   const decipher = createDecipheriv('aes-256-gcm', key, Buffer.from(ivHex, 'hex'));
-  decipher.setAuthTag(Buffer.from(tagHex, 'hex'));
+  decipher.setAuthTag(tag);
   return decipher.update(Buffer.from(encHex, 'hex')) + decipher.final('utf8');
 }
 

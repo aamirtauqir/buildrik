@@ -328,6 +328,8 @@ model Subscription {
   price                     Int
   currency                  String   @default("usd")
   cancelAtPeriodEnd         Boolean  @default(false)
+  cancelReason              String?
+  cancelFeedback            String?
   isGrandfathered           Boolean  @default(false)
   createdAt                 DateTime @default(now())
   updatedAt                 DateTime @updatedAt

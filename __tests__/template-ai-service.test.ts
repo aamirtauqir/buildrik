@@ -7,6 +7,7 @@ vi.mock("@/lib/prisma", () => ({
     page: { createMany: vi.fn() },
     aIGenerationJob: { create: vi.fn(), findUnique: vi.fn(), update: vi.fn(), count: vi.fn() },
     workspaceMember: { findFirst: vi.fn() },
+    workspace: { findUnique: vi.fn() },
   },
 }));
 
@@ -70,6 +71,7 @@ describe("AI Generation Service", () => {
   describe("createGenerationJob", () => {
     it("creates a generation job", async () => {
       const { createGenerationJob } = await import("@/server/services/ai-generation.service");
+      vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ plan: "PRO" } as any);
       vi.mocked(prisma.aIGenerationJob.count).mockResolvedValue(0);
       vi.mocked(prisma.aIGenerationJob.create).mockResolvedValue({
         id: "job1", status: "QUEUED", progress: 0, workspaceId: "ws1", userId: "u1",
@@ -86,7 +88,10 @@ describe("AI Generation Service", () => {
 
     it("throws when rate limited (3/hr)", async () => {
       const { createGenerationJob } = await import("@/server/services/ai-generation.service");
-      vi.mocked(prisma.aIGenerationJob.count).mockResolvedValue(3);
+      vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ plan: "PRO" } as any);
+      vi.mocked(prisma.aIGenerationJob.count)
+        .mockResolvedValueOnce(0)  // monthly check passes
+        .mockResolvedValueOnce(3); // hourly check hits limit
       await expect(createGenerationJob("ws1", "u1", {
         name: "My AI Site", businessType: "PORTFOLIO", pages: ["Home"],
       })).rejects.toThrow("AI_RATE_LIMITED");

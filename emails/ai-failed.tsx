@@ -17,7 +17,7 @@ export default function AiFailed({ retryUrl = "https://app.buildrik.app/sites/ne
             Something went wrong while generating your site. Please try again or contact support if the issue persists.
           </Text>
           <Section style={{ textAlign: "center" as const, marginTop: "24px" }}>
-            <Button href={retryUrl} style={{ backgroundColor: "#6366F1", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
+            <Button href={retryUrl} style={{ backgroundColor: "#E42313", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
               Try Again
             </Button>
           </Section>

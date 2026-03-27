@@ -65,6 +65,27 @@
   --text-auth-fine: 12px;
   --text-auth-fine--line-height: 1.5;
   --text-auth-fine--font-weight: 400;
+
+  /* Dashboard colors */
+  --color-primary: #E42313;
+  --color-primary-hover: #CC1F10;
+  --color-destructive: #7F1D1D;
+  --color-bg-page: #FAFAFA;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-subtle: #F4F4F4;
+  --color-border-default: #E8E8E8;
+  --color-border-strong: #D4D4D4;
+  --color-text-primary: #0D0D0D;
+  --color-text-secondary: #7A7A7A;
+  --color-text-muted: #B0B0B0;
+  --color-success: #22C55E;
+  --color-warning: #EA580C;
+  --color-error: #E42313;
+  --color-info: #3B82F6;
+
+  /* Dashboard layout */
+  --sidebar-width: 220px;
+  --topbar-height: 56px;
 }
 
 /* Focus indicators */

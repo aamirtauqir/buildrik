@@ -22,7 +22,7 @@ async function getUsageCounts(workspaceId: string) {
         where: { workspaceId, createdAt: { gte: startOfMonth } },
       }),
       prisma.formSubmission.count({
-        where: { form: { site: { workspaceId } }, createdAt: { gte: startOfMonth } },
+        where: { formBlock: { site: { workspaceId } }, createdAt: { gte: startOfMonth } },
       }),
       prisma.redirect.count({ where: { site: { workspaceId } } }),
     ]);
@@ -169,23 +169,30 @@ export async function upgradePlan(workspaceId: string, input: UpgradeInput) {
   // TODO: Replace with real Stripe API when stripe@^17 is installed:
   // const customer = workspace.stripeCustomerId ?? await createStripeCustomer(workspace);
   // const subscription = await stripe.subscriptions.create({ customer, items: [{ price: stripePriceId }] });
-  const subscription = await prisma.subscription.create({
-    data: {
-      workspaceId,
-      plan: input.planId,
-      status: "ACTIVE",
-      interval: input.interval,
-      price,
-      currency: "usd",
-      cancelAtPeriodEnd: false,
-      isGrandfathered: false,
-      stripeSubscriptionId: `placeholder_${workspaceId}_${Date.now()}`,
-      stripePriceId: `placeholder_price_${priceKey}`,
-      stripeCurrentPeriodEnd: new Date(
-        Date.now() + (input.interval === "YEARLY" ? 365 : 30) * 86400000,
-      ),
-    },
-  });
+  const [subscription] = await prisma.$transaction([
+    prisma.subscription.create({
+      data: {
+        workspaceId,
+        plan: input.planId,
+        status: "ACTIVE",
+        interval: input.interval,
+        price,
+        currency: "usd",
+        cancelAtPeriodEnd: false,
+        isGrandfathered: false,
+        stripeSubscriptionId: `placeholder_${workspaceId}_${Date.now()}`,
+        stripePriceId: `placeholder_price_${priceKey}`,
+        stripeCurrentPeriodStart: new Date(),
+        stripeCurrentPeriodEnd: new Date(
+          Date.now() + (input.interval === "YEARLY" ? 365 : 30) * 86400000,
+        ),
+      },
+    }),
+    prisma.workspace.update({
+      where: { id: workspaceId },
+      data: { plan: input.planId },
+    }),
+  ]);
 
   return subscription;
 }

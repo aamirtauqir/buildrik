@@ -18,7 +18,7 @@ export default function SslExpiring({ domain = "example.com", renewUrl = "https:
             The SSL certificate for {domain} will expire soon. Renew it to keep your site secure and accessible.
           </Text>
           <Section style={{ textAlign: "center" as const, marginTop: "24px" }}>
-            <Button href={renewUrl} style={{ backgroundColor: "#6366F1", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
+            <Button href={renewUrl} style={{ backgroundColor: "#E42313", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
               Renew
             </Button>
           </Section>

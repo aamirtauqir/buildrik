@@ -44,7 +44,7 @@ export function QuickActions({ actions }: QuickActionsProps) {
         const Icon = QUICK_ACTION_ICONS[action.icon] ?? Plus;
         return (
           <Link
-            key={action.href}
+            key={action.label}
             href={action.href}
             className="flex flex-1 items-center gap-3 rounded-xl border border-[#E8E8E8] bg-white p-4 hover:border-[#E42313]/30 transition-colors"
           >

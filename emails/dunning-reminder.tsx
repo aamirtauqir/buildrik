@@ -18,7 +18,7 @@ export default function DunningReminder({ daysLeft = 3, updateUrl = "https://app
             Your payment is still outstanding. If not resolved within {daysLeft} days, your account will be downgraded to the Free plan.
           </Text>
           <Section style={{ textAlign: "center" as const, marginTop: "24px" }}>
-            <Button href={updateUrl} style={{ backgroundColor: "#6366F1", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
+            <Button href={updateUrl} style={{ backgroundColor: "#E42313", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
               Update Payment
             </Button>
           </Section>

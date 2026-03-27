@@ -11,7 +11,8 @@ vi.mock("@/lib/prisma", () => ({
     aIGenerationJob: { count: vi.fn() },
     formSubmission: { count: vi.fn() },
     redirect: { count: vi.fn() },
-    workspace: { findUnique: vi.fn() },
+    workspace: { findUnique: vi.fn(), update: vi.fn() },
+    $transaction: vi.fn((ops: unknown[]) => Promise.all(ops)),
   },
 }));
 

@@ -1,23 +1,35 @@
 import { prisma } from "@/lib/prisma";
+import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { GenerateSiteInput } from "@/lib/validations/templates";
 
-const RATE_LIMIT_PER_HOUR = 3;
+const HOURLY_ANTI_ABUSE_LIMIT = 3;
 
 export async function createGenerationJob(
   workspaceId: string,
   userId: string,
   input: GenerateSiteInput
 ) {
-  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  const ws = await prisma.workspace.findUnique({ where: { id: workspaceId }, select: { plan: true } });
+  const plan = (ws?.plan ?? "FREE") as PlanName;
+  const monthlyLimit = PLAN_LIMITS[plan].aiGenerations as number;
 
+  // Monthly plan limit check (-1 = unlimited)
+  if (monthlyLimit >= 0) {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthlyCount = await prisma.aIGenerationJob.count({
+      where: { workspaceId, createdAt: { gte: startOfMonth } },
+    });
+    if (monthlyCount >= monthlyLimit) throw new Error("AI_MONTHLY_LIMIT");
+  }
+
+  // Hourly anti-abuse throttle (applies to all plans)
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
   const recentCount = await prisma.aIGenerationJob.count({
-    where: {
-      workspaceId,
-      createdAt: { gte: oneHourAgo },
-    },
+    where: { workspaceId, createdAt: { gte: oneHourAgo } },
   });
 
-  if (recentCount >= RATE_LIMIT_PER_HOUR) {
+  if (recentCount >= HOURLY_ANTI_ABUSE_LIMIT) {
     throw new Error("AI_RATE_LIMITED");
   }
 
@@ -35,7 +47,8 @@ export async function createGenerationJob(
       businessType: input.businessType,
       selectedPages: input.pages,
       description: input.description ?? null,
-      metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      metadata: Object.keys(metadata).length > 0 ? (metadata as any) : undefined,
     },
   });
 }

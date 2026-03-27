@@ -8,9 +8,11 @@ vi.mock("@/lib/prisma", () => ({
     activityLog: { findMany: vi.fn() },
     workspaceMember: { count: vi.fn() },
     formSubmission: { count: vi.fn() },
+    formBlock: { findMany: vi.fn() },
     redirect: { findMany: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
-    domain: { findMany: vi.fn(), create: vi.fn(), delete: vi.fn(), findFirst: vi.fn() },
-    shareLink: { findMany: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn() },
+    domain: { findMany: vi.fn(), create: vi.fn(), delete: vi.fn(), findFirst: vi.fn(), count: vi.fn() },
+    workspace: { findUnique: vi.fn() },
+    shareLink: { findMany: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
     analyticsEvent: { findMany: vi.fn(), groupBy: vi.fn() },
     dnsRecord: { createMany: vi.fn() },
   },
@@ -27,13 +29,20 @@ describe("Site Detail Service", () => {
       vi.mocked(prisma.site.findUnique).mockResolvedValue({
         id: "s1", name: "Portfolio", slug: "portfolio", status: "PUBLISHED",
         publishedUrl: "https://portfolio.buildrik.app", lastPublishedAt: new Date(),
-        lastPublishedBy: null, createdAt: new Date(), workspaceId: "ws1",
+        lastPublishedBy: null, createdAt: new Date(), workspaceId: "ws1", touchIcon: null,
       } as any);
-      vi.mocked(prisma.page.count).mockResolvedValue(5);
-      vi.mocked(prisma.siteAnalytics.aggregate).mockResolvedValue({ _sum: { visitors: 300 } } as any);
+      vi.mocked(prisma.page.count)
+        .mockResolvedValueOnce(5)   // totalPages
+        .mockResolvedValueOnce(3)   // pagesWithSeo
+        .mockResolvedValueOnce(4);  // pagesWithContent
+      vi.mocked(prisma.siteAnalytics.aggregate)
+        .mockResolvedValueOnce({ _sum: { visitors: 300 } } as any)   // current month
+        .mockResolvedValueOnce({ _sum: { visitors: 200 } } as any);  // previous month
       vi.mocked(prisma.workspaceMember.count).mockResolvedValue(3);
       vi.mocked(prisma.formSubmission.count).mockResolvedValueOnce(15).mockResolvedValueOnce(4);
       vi.mocked(prisma.activityLog.findMany).mockResolvedValue([]);
+      vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.formBlock.findMany).mockResolvedValue([]);
 
       const result = await getSiteOverview("s1");
       expect(result.site.name).toBe("Portfolio");
@@ -87,6 +96,9 @@ describe("Site Detail Service", () => {
 
     it("connectDomain creates domain with DNS records", async () => {
       const { connectDomain } = await import("@/server/services/domain.service");
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ id: "s1", workspaceId: "ws1" } as any);
+      vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ plan: "PRO" } as any);
+      vi.mocked(prisma.domain.count).mockResolvedValue(0);
       vi.mocked(prisma.domain.findFirst).mockResolvedValue(null);
       vi.mocked(prisma.domain.create).mockResolvedValue({
         id: "d2", domain: "example.com", status: "PENDING", sslStatus: "PENDING",
@@ -99,6 +111,9 @@ describe("Site Detail Service", () => {
 
     it("rejects duplicate domain", async () => {
       const { connectDomain } = await import("@/server/services/domain.service");
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ id: "s1", workspaceId: "ws1" } as any);
+      vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ plan: "PRO" } as any);
+      vi.mocked(prisma.domain.count).mockResolvedValue(0);
       vi.mocked(prisma.domain.findFirst).mockResolvedValue({ id: "d1" } as any);
       await expect(connectDomain("s1", "example.com")).rejects.toThrow("DOMAIN_IN_USE");
     });
@@ -116,6 +131,9 @@ describe("Site Detail Service", () => {
 
     it("createShareLink generates token", async () => {
       const { createShareLink } = await import("@/server/services/share-link.service");
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ id: "s1", workspaceId: "ws1" } as any);
+      vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ id: "ws1", plan: "FREE" } as any);
+      vi.mocked(prisma.shareLink.count).mockResolvedValue(0);
       vi.mocked(prisma.shareLink.create).mockResolvedValue({
         id: "sl2", name: "New Link", token: "xyz789", viewCount: 0, isActive: true,
       } as any);
@@ -128,6 +146,8 @@ describe("Site Detail Service", () => {
   describe("Analytics Service", () => {
     it("getSiteAnalytics returns metrics", async () => {
       const { getSiteAnalytics } = await import("@/server/services/analytics.service");
+      vi.mocked(prisma.site.findUnique).mockResolvedValue({ id: "s1", workspaceId: "ws1" } as any);
+      vi.mocked(prisma.workspace.findUnique).mockResolvedValue({ id: "ws1", plan: "FREE" } as any);
       vi.mocked(prisma.siteAnalytics.findMany).mockResolvedValue([
         { date: new Date("2026-03-20"), visitors: 100, uniqueVisitors: 80, pageViews: 200, avgSession: 120, bounceRate: 0.4, topPages: null },
       ] as any);

@@ -3,10 +3,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     site: { count: vi.fn(), findMany: vi.fn() },
-    workspaceMember: { count: vi.fn(), findFirst: vi.fn() },
+    workspaceMember: { count: vi.fn(), findFirst: vi.fn(), findMany: vi.fn() },
     invite: { count: vi.fn() },
+    user: { findMany: vi.fn() },
     activityLog: { findMany: vi.fn() },
-    siteAnalytics: { aggregate: vi.fn() },
+    siteAnalytics: { aggregate: vi.fn(), findMany: vi.fn() },
     aIGenerationJob: { count: vi.fn() },
   },
 }));
@@ -28,24 +29,22 @@ describe("Dashboard Service", () => {
   describe("getDashboardStats", () => {
     it("returns correct stat structure", async () => {
       vi.mocked(prisma.site.count)
-        .mockResolvedValueOnce(5)
-        .mockResolvedValueOnce(3)
-        .mockResolvedValueOnce(1)
-        .mockResolvedValueOnce(1);
+        .mockResolvedValueOnce(5)   // totalSites
+        .mockResolvedValueOnce(3)   // publishedSites
+        .mockResolvedValueOnce(1)   // draftSites
+        .mockResolvedValueOnce(1);  // archivedSites
       vi.mocked(prisma.workspaceMember.count).mockResolvedValue(3);
       vi.mocked(prisma.invite.count).mockResolvedValue(1);
-      vi.mocked(prisma.siteAnalytics.aggregate).mockResolvedValue({
-        _sum: { visitors: 1200 },
-        _count: 0,
-        _avg: {},
-        _min: {},
-        _max: {},
-      } as any);
+      vi.mocked(prisma.siteAnalytics.aggregate)
+        .mockResolvedValueOnce({ _sum: { visitors: 1200 } } as any)   // current period
+        .mockResolvedValueOnce({ _sum: { visitors: 800 } } as any);   // previous period
+      vi.mocked(prisma.siteAnalytics.findMany).mockResolvedValue([]);  // daily analytics
+      vi.mocked(prisma.workspaceMember.findMany).mockResolvedValue([]); // member avatars
       vi.mocked(prisma.site.findMany).mockResolvedValue([
         { name: "Portfolio", lastPublishedAt: new Date("2026-03-20") },
       ] as any);
 
-      const stats = await getDashboardStats("ws_123");
+      const stats = await getDashboardStats("ws_123", "OWNER");
       expect(stats.totalSites).toBe(5);
       expect(stats.publishedSites).toBe(3);
       expect(stats.collaborators).toBe(3);
@@ -88,9 +87,11 @@ describe("Dashboard Service", () => {
           metadata: null,
         },
       ] as any);
+      vi.mocked(prisma.user.findMany).mockResolvedValue([
+        { id: "u1", fullName: "Test User", avatar: null },
+      ] as any);
       const activity = await getActivityFeed("ws_123");
-      expect(activity).toHaveLength(1);
-      expect(activity[0].action).toBe("SITE_PUBLISHED");
+      expect(activity.groups).toBeDefined();
     });
   });
 

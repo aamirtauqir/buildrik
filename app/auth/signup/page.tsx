@@ -24,7 +24,7 @@ export default function SignupPage() {
 
   const signupMutation = trpc.auth.signup.useMutation({
     onSuccess: () => {
-      router.push("/auth/verify-email");
+      router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
     },
     onError: (err) => {
       setError(err.message);
@@ -126,11 +126,11 @@ export default function SignupPage() {
 
         <div className="h-6" />
 
-        <SocialButton provider="google" onClick={() => signIn("google", { callbackUrl: "/dashboard" })} />
+        <SocialButton provider="google" onClick={() => signIn("google", { callbackUrl: "/auth/redirect" })} />
 
         <div className="h-2" />
 
-        <SocialButton provider="github" onClick={() => signIn("github", { callbackUrl: "/dashboard" })} />
+        <SocialButton provider="github" onClick={() => signIn("github", { callbackUrl: "/auth/redirect" })} />
 
         <div className="h-6" />
 

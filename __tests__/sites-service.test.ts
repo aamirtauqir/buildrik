@@ -160,7 +160,7 @@ describe("Sites Service", () => {
 
   describe("getSite", () => {
     it("returns site by id", async () => {
-      vi.mocked(prisma.site.findUnique).mockResolvedValue({
+      vi.mocked(prisma.site.findFirst).mockResolvedValue({
         id: "s1",
         name: "My Site",
         slug: "my-site",

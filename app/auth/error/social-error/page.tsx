@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
@@ -7,7 +8,7 @@ import { AuthLogo } from "@/components/auth/auth-logo";
 import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthButton } from "@/components/auth/auth-button";
 
-export default function SocialErrorPage() {
+function SocialErrorContent() {
   const searchParams = useSearchParams();
   const provider = searchParams.get("provider") ?? "the provider";
   const providerLabel =
@@ -51,5 +52,13 @@ export default function SocialErrorPage() {
         ← Back to sign in
       </Link>
     </AuthCard>
+  );
+}
+
+export default function SocialErrorPage() {
+  return (
+    <Suspense fallback={null}>
+      <SocialErrorContent />
+    </Suspense>
   );
 }

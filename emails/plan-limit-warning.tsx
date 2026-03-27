@@ -18,7 +18,7 @@ export default function PlanLimitWarning({ resource = "storage", upgradeUrl = "h
             You&apos;re approaching the {resource} limit on your current plan. Upgrade to avoid service interruptions.
           </Text>
           <Section style={{ textAlign: "center" as const, marginTop: "24px" }}>
-            <Button href={upgradeUrl} style={{ backgroundColor: "#6366F1", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
+            <Button href={upgradeUrl} style={{ backgroundColor: "#E42313", color: "white", padding: "12px 24px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}>
               Upgrade
             </Button>
           </Section>

@@ -31,6 +31,7 @@ export function SocialButton({ provider, onClick, disabled }: SocialButtonProps)
 
   return (
     <button
+      type="button"
       onClick={onClick}
       disabled={disabled}
       className={cn(

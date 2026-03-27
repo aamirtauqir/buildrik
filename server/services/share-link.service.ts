@@ -17,10 +17,23 @@ export async function createShareLink(
   if (!site) throw new Error("SITE_NOT_FOUND");
   const ws = await prisma.workspace.findUnique({ where: { id: site.workspaceId }, select: { plan: true } });
   const plan = (ws?.plan ?? "FREE") as PlanName;
-  const maxDays = PLAN_LIMITS[plan].shareLinkExpiryMaxDays as number;
+  const limits = PLAN_LIMITS[plan];
+  const maxDays = limits.shareLinkExpiryMaxDays as number;
+  const allowPasswords = limits.shareLinkPasswords as boolean;
 
   if (data.expiresInDays && data.expiresInDays > maxDays) {
     throw new Error("EXPIRY_EXCEEDS_PLAN");
+  }
+
+  if (data.password && !allowPasswords) {
+    throw new Error("PASSWORD_LINKS_NOT_AVAILABLE");
+  }
+
+  // FREE plan: max 3 share links per site; PRO/BUSINESS: unlimited
+  const shareLinkLimit = plan === "FREE" ? 3 : -1;
+  if (shareLinkLimit > 0) {
+    const shareLinksOnSite = await prisma.shareLink.count({ where: { siteId, isActive: true } });
+    if (shareLinksOnSite >= shareLinkLimit) throw new Error("SHARE_LINK_LIMIT");
   }
 
   const token = crypto.randomUUID();

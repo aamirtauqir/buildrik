@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { FormSubmissionInput, ListSubmissionsInput } from "@/lib/validations/forms";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
+import { sendFormSubmissionEmail } from "@/server/services/email.service";
 
 type UpdateInput = {
   id: string;
@@ -57,6 +58,17 @@ export async function submitForm(
     `New form submission on "${site!.name}"`,
     `/dashboard/sites/${siteId}`,
   ).catch(() => {});
+
+  prisma.workspaceMember.findFirst({
+    where: { workspaceId: site!.workspaceId, role: "OWNER" },
+    select: { user: { select: { email: true } } },
+  }).then((owner) => {
+    if (!owner?.user.email) return;
+    const fields = Object.entries((input.data ?? {}) as Record<string, unknown>).map(
+      ([label, value]) => ({ label, value: String(value) }),
+    );
+    return sendFormSubmissionEmail(owner.user.email, site!.name, fields, submission.id);
+  }).catch(() => {});
 
   return submission;
 }

@@ -18,9 +18,9 @@ export interface PlanCardProps {
 }
 
 const PLAN_BADGE: Record<PlanId, { bg: string; color: string }> = {
-  FREE: { bg: "#F3F4F6", color: "#7A7A7A" },
-  PRO: { bg: "#EFF6FF", color: "#3B82F6" },
-  BUSINESS: { bg: "#F5F3FF", color: "#8B5CF6" },
+  FREE: { bg: "#F4F4F4", color: "#7A7A7A" },
+  PRO: { bg: "#F4F4F4", color: "#0D0D0D" },
+  BUSINESS: { bg: "#0D0D0D", color: "#FFFFFF" },
 };
 
 function formatPrice(price: number, currency: string, interval: Interval): string {
