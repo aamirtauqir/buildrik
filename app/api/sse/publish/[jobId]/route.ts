@@ -14,6 +14,7 @@ export async function GET(
   if (!session?.user?.id) {
     return new Response("Unauthorized", { status: 401 });
   }
+  const userId = session.user.id;
 
   const { jobId } = await params;
   const encoder = new TextEncoder();
@@ -30,6 +31,17 @@ export async function GET(
       let job = await prisma.publishBuildJob.findUnique({ where: { id: jobId } });
       if (!job) {
         send("error", { message: "Job not found" });
+        controller.close();
+        return;
+      }
+
+      // Verify the requesting user is a member of the job's workspace
+      const isMember = await prisma.workspaceMember.findFirst({
+        where: { workspaceId: job.workspaceId, userId },
+        select: { id: true },
+      });
+      if (!isMember) {
+        send("error", { message: "Forbidden" });
         controller.close();
         return;
       }

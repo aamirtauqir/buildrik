@@ -27,6 +27,16 @@ export async function GET(req: NextRequest) {
     },
   });
 
+  // Batch owner lookup
+  const ownerIds = [...new Set(
+    overdueSubscriptions.map((s) => s.workspace?.ownerId).filter((id): id is string => !!id),
+  )];
+  const owners = await prisma.user.findMany({
+    where: { id: { in: ownerIds } },
+    select: { id: true, email: true },
+  });
+  const ownerEmailById = new Map(owners.map((o) => [o.id, o.email]));
+
   let notified = 0;
 
   for (const sub of overdueSubscriptions) {
@@ -39,15 +49,10 @@ export async function GET(req: NextRequest) {
     if (!shouldNotify) continue;
 
     const ownerId = sub.workspace?.ownerId;
-    if (!ownerId) continue;
+    const email = ownerId ? ownerEmailById.get(ownerId) : null;
+    if (!email) continue;
 
-    const owner = await prisma.user.findUnique({
-      where: { id: ownerId },
-      select: { email: true },
-    });
-    if (!owner?.email) continue;
-
-    await sendDunningReminderEmail(owner.email, daysLeft).catch(() => {});
+    await sendDunningReminderEmail(email, daysLeft).catch(() => {});
     notified++;
   }
 

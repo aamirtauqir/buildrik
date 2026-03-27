@@ -7,17 +7,29 @@ export function useNotificationSSE() {
   const utils = trpc.useUtils();
 
   useEffect(() => {
-    const es = new EventSource("/api/sse/notifications");
+    let es: EventSource;
+    let retryTimeout: ReturnType<typeof setTimeout>;
 
-    es.addEventListener("unread", () => {
-      utils.notifications.unreadCount.invalidate();
-      utils.notifications.recent.invalidate();
-    });
+    function connect() {
+      es = new EventSource("/api/sse/notifications");
 
-    es.onerror = () => {
-      es.close();
+      es.addEventListener("unread", () => {
+        utils.notifications.unreadCount.invalidate();
+        utils.notifications.recent.invalidate();
+      });
+
+      es.onerror = () => {
+        es.close();
+        // Reconnect after 5 seconds on error
+        retryTimeout = setTimeout(connect, 5000);
+      };
+    }
+
+    connect();
+
+    return () => {
+      clearTimeout(retryTimeout);
+      es?.close();
     };
-
-    return () => es.close();
   }, [utils]);
 }

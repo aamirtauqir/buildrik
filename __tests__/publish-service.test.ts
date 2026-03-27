@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+// Prevent startPublish from making real HTTP calls to the worker
+vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true }));
+
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     site: {

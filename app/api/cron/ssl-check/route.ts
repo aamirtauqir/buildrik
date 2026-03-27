@@ -27,6 +27,16 @@ export async function GET(req: NextRequest) {
     },
   });
 
+  // Batch owner lookup
+  const ownerIds = [...new Set(
+    expiringDomains.map((d) => d.site.workspace?.ownerId).filter((id): id is string => !!id),
+  )];
+  const owners = await prisma.user.findMany({
+    where: { id: { in: ownerIds } },
+    select: { id: true, email: true },
+  });
+  const ownerEmailById = new Map(owners.map((o) => [o.id, o.email]));
+
   let notified = 0;
 
   for (const domain of expiringDomains) {
@@ -37,15 +47,10 @@ export async function GET(req: NextRequest) {
     if (!shouldNotify) continue;
 
     const ownerId = domain.site.workspace?.ownerId;
-    if (!ownerId) continue;
+    const email = ownerId ? ownerEmailById.get(ownerId) : null;
+    if (!email) continue;
 
-    const owner = await prisma.user.findUnique({
-      where: { id: ownerId },
-      select: { email: true },
-    });
-    if (!owner?.email) continue;
-
-    await sendSSLExpiringEmail(owner.email, domain.domain, domain.id).catch(() => {});
+    await sendSSLExpiringEmail(email, domain.domain, domain.id).catch(() => {});
     notified++;
   }
 
