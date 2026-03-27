@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockSiteFindUnique = vi.fn();
+const mockSiteUpdate = vi.fn();
 const mockWorkspaceFindUnique = vi.fn();
 const mockWorkspaceMemberFindFirst = vi.fn();
 const mockShareLinkCount = vi.fn();
@@ -8,7 +9,7 @@ const mockShareLinkCreate = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    site: { findUnique: mockSiteFindUnique },
+    site: { findUnique: mockSiteFindUnique, update: mockSiteUpdate },
     workspace: { findUnique: mockWorkspaceFindUnique },
     workspaceMember: { findFirst: mockWorkspaceMemberFindFirst },
     shareLink: { count: mockShareLinkCount, create: mockShareLinkCreate },
@@ -18,46 +19,38 @@ vi.mock("@/lib/prisma", () => ({
 describe("Custom code plan gate", () => {
   beforeEach(() => { vi.clearAllMocks(); });
 
-  it("FREE plan + headCode in settings.update → FORBIDDEN", async () => {
+  it("FREE plan + headCode in settings.update → throws CUSTOM_CODE_NOT_AVAILABLE", async () => {
     mockSiteFindUnique.mockResolvedValue({
-      id: "s1",
+      slug: "my-site",
       workspace: { plan: "FREE" },
     });
 
-    // Replicate the plan-gate logic from the router
-    const input = { id: "s1", headCode: "<script>test</script>" };
-    const site = await mockSiteFindUnique({ where: { id: input.id }, include: { workspace: { select: { plan: true } } } });
-    expect(site).not.toBeNull();
-    const { z } = await import("zod");
-    const planResult = z.enum(["FREE", "PRO", "BUSINESS"]).safeParse(site.workspace.plan);
-    const plan = planResult.success ? planResult.data : "FREE";
-    expect(plan).toBe("FREE");
-    expect(() => {
-      if (plan === "FREE") throw new Error("FORBIDDEN");
-    }).toThrow("FORBIDDEN");
+    const { updateSiteSettings } = await import("@/server/services/site-settings.service");
+    await expect(
+      updateSiteSettings("s1", { headCode: "<script>test</script>" })
+    ).rejects.toThrow("CUSTOM_CODE_NOT_AVAILABLE");
   });
 
   it("PRO plan + headCode → should succeed (no throw)", async () => {
     mockSiteFindUnique.mockResolvedValue({
-      id: "s1",
+      slug: "my-site",
       workspace: { plan: "PRO" },
     });
+    mockSiteUpdate.mockResolvedValue({ id: "s1", headCode: "<script>test</script>" });
 
-    const input = { id: "s1", headCode: "<script>test</script>" };
-    const site = await mockSiteFindUnique({ where: { id: input.id }, include: { workspace: { select: { plan: true } } } });
-    const { z } = await import("zod");
-    const planResult = z.enum(["FREE", "PRO", "BUSINESS"]).safeParse(site.workspace.plan);
-    const plan = planResult.success ? planResult.data : "FREE";
-    expect(plan).toBe("PRO");
-    expect(() => {
-      if (plan === "FREE") throw new Error("FORBIDDEN");
-    }).not.toThrow();
+    const { updateSiteSettings } = await import("@/server/services/site-settings.service");
+    await expect(
+      updateSiteSettings("s1", { headCode: "<script>test</script>" })
+    ).resolves.toBeDefined();
   });
 
   it("headCode not provided → no plan check runs (even on FREE)", async () => {
-    const input = { id: "s1", name: "My Site" };
-    const shouldCheck = (input as any).headCode !== undefined || (input as any).bodyCode !== undefined;
-    expect(shouldCheck).toBe(false);
+    mockSiteUpdate.mockResolvedValue({ id: "s1", name: "My Site" });
+
+    const { updateSiteSettings } = await import("@/server/services/site-settings.service");
+    await expect(
+      updateSiteSettings("s1", { name: "My Site" })
+    ).resolves.toBeDefined();
     expect(mockSiteFindUnique).not.toHaveBeenCalled();
   });
 });
@@ -67,10 +60,9 @@ describe("Share link allowEditors gate", () => {
 
   it("allowEditors=false, member role=EDITOR → throws EDITORS_CANNOT_CREATE_LINKS", async () => {
     mockSiteFindUnique.mockResolvedValue({ workspaceId: "ws1" });
-    mockWorkspaceFindUnique.mockResolvedValue({ plan: "PRO" });
     mockWorkspaceMemberFindFirst.mockResolvedValue({
       role: "EDITOR",
-      workspace: { sharingSettings: { allowEditors: false } },
+      workspace: { plan: "PRO", sharingSettings: { allowEditors: false } },
     });
     mockShareLinkCount.mockResolvedValue(0);
 
@@ -82,10 +74,9 @@ describe("Share link allowEditors gate", () => {
 
   it("allowEditors=true, member role=EDITOR → does NOT throw", async () => {
     mockSiteFindUnique.mockResolvedValue({ workspaceId: "ws1" });
-    mockWorkspaceFindUnique.mockResolvedValue({ plan: "PRO" });
     mockWorkspaceMemberFindFirst.mockResolvedValue({
       role: "EDITOR",
-      workspace: { sharingSettings: { allowEditors: true } },
+      workspace: { plan: "PRO", sharingSettings: { allowEditors: true } },
     });
     mockShareLinkCount.mockResolvedValue(0);
     mockShareLinkCreate.mockResolvedValue({ id: "sl1" });
@@ -98,10 +89,9 @@ describe("Share link allowEditors gate", () => {
 
   it("allowEditors=false, member role=ADMIN → does NOT throw", async () => {
     mockSiteFindUnique.mockResolvedValue({ workspaceId: "ws1" });
-    mockWorkspaceFindUnique.mockResolvedValue({ plan: "PRO" });
     mockWorkspaceMemberFindFirst.mockResolvedValue({
       role: "ADMIN",
-      workspace: { sharingSettings: { allowEditors: false } },
+      workspace: { plan: "PRO", sharingSettings: { allowEditors: false } },
     });
     mockShareLinkCount.mockResolvedValue(0);
     mockShareLinkCreate.mockResolvedValue({ id: "sl1" });
@@ -123,5 +113,15 @@ describe("Share link allowEditors gate", () => {
       createShareLink("s1", { name: "Test" })
     ).resolves.toBeDefined();
     expect(mockWorkspaceMemberFindFirst).not.toHaveBeenCalled();
+  });
+
+  it("userId provided but user is not an active member → throws NOT_WORKSPACE_MEMBER", async () => {
+    mockSiteFindUnique.mockResolvedValue({ workspaceId: "ws1" });
+    mockWorkspaceMemberFindFirst.mockResolvedValue(null);
+
+    const { createShareLink } = await import("@/server/services/share-link.service");
+    await expect(
+      createShareLink("s1", { name: "Test" }, "user1")
+    ).rejects.toThrow("NOT_WORKSPACE_MEMBER");
   });
 });
