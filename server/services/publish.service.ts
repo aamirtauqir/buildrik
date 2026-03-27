@@ -94,6 +94,13 @@ export async function startPublish(siteId: string, workspaceId: string, userId: 
     `/dashboard/sites/${siteId}`,
   ).catch(() => {});
 
+  // Fire-and-forget: kick off the publish pipeline worker
+  const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+  fetch(`${baseUrl}/api/workers/publish/${job.id}`, {
+    method: "POST",
+    headers: { "x-worker-secret": process.env.CRON_SECRET ?? "" },
+  }).catch(() => {});
+
   return job;
 }
 
