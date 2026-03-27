@@ -1,6 +1,8 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import {
+  handleCheckoutCompleted,
+  handleCheckoutExpired,
   handleChargeFailed,
   handleSubscriptionUpdated,
   handleSubscriptionDeleted,
@@ -51,6 +53,14 @@ export async function POST(req: NextRequest) {
 
   try {
     switch (event.type) {
+      case "checkout.session.completed": {
+        await handleCheckoutCompleted(event.data.object.id);
+        break;
+      }
+      case "checkout.session.expired": {
+        await handleCheckoutExpired(event.data.object.id);
+        break;
+      }
       case "charge.failed": {
         const subscriptionId = event.data.object.subscription;
         if (subscriptionId) await handleChargeFailed(subscriptionId);
