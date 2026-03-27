@@ -22,25 +22,27 @@ export async function GET(req: NextRequest) {
 
   let deleted = 0;
 
-  for (const req of pending) {
+  for (const deletionReq of pending) {
     const userExists = await prisma.user.findUnique({
-      where: { id: req.userId },
+      where: { id: deletionReq.userId },
       select: { id: true },
     });
     if (!userExists) {
       await prisma.accountDeletionReq.update({
-        where: { id: req.id },
+        where: { id: deletionReq.id },
         data: { processedAt: now },
       });
       continue;
     }
 
-    await prisma.workspace.deleteMany({ where: { ownerId: req.userId } });
-    await prisma.workspaceMember.deleteMany({ where: { userId: req.userId } });
-    await prisma.user.delete({ where: { id: req.userId } });
-    await prisma.accountDeletionReq.update({
-      where: { id: req.id },
-      data: { processedAt: now },
+    await prisma.$transaction(async (tx) => {
+      await tx.workspace.deleteMany({ where: { ownerId: deletionReq.userId } });
+      await tx.workspaceMember.deleteMany({ where: { userId: deletionReq.userId } });
+      await tx.user.delete({ where: { id: deletionReq.userId } });
+      await tx.accountDeletionReq.update({
+        where: { id: deletionReq.id },
+        data: { processedAt: now },
+      });
     });
     deleted++;
   }

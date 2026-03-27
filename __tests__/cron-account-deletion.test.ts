@@ -3,6 +3,9 @@ import { type NextRequest } from "next/server";
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    $transaction: vi.fn(async (fn: (tx: unknown) => Promise<unknown>) => {
+      return fn(prisma);
+    }),
     accountDeletionReq: {
       findMany: vi.fn(),
       update: vi.fn(),
@@ -24,6 +27,7 @@ import { prisma } from "@/lib/prisma";
 import { GET } from "@/app/api/cron/account-deletion/route";
 
 const mockPrisma = prisma as typeof prisma & {
+  $transaction: ReturnType<typeof vi.fn>;
   accountDeletionReq: {
     findMany: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
@@ -72,6 +76,7 @@ describe("account-deletion cron", () => {
     const body = await res.json();
     expect(body).toEqual({ ok: true, deleted: 1 });
 
+    expect(mockPrisma.$transaction).toHaveBeenCalledOnce();
     expect(mockPrisma.workspace.deleteMany).toHaveBeenCalledWith({ where: { ownerId: "user1" } });
     expect(mockPrisma.workspaceMember.deleteMany).toHaveBeenCalledWith({ where: { userId: "user1" } });
     expect(mockPrisma.user.delete).toHaveBeenCalledWith({ where: { id: "user1" } });
