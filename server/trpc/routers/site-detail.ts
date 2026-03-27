@@ -47,6 +47,18 @@ export const siteDetailRouter = router({
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
+        if (input.headCode !== undefined || input.bodyCode !== undefined) {
+          const site = await ctx.prisma.site.findUnique({
+            where: { id: input.id },
+            include: { workspace: { select: { plan: true } } },
+          });
+          if (!site) throw new TRPCError({ code: "NOT_FOUND" });
+          const planResult = z.enum(["FREE", "PRO", "BUSINESS"]).safeParse(site.workspace.plan);
+          const plan: PlanName = planResult.success ? planResult.data : "FREE";
+          if (plan === "FREE") {
+            throw new TRPCError({ code: "FORBIDDEN", message: "Custom code requires Pro or above" });
+          }
+        }
         const { id, ...data } = input;
         return updateSiteSettings(id, data);
       }),
@@ -244,7 +256,13 @@ export const siteDetailRouter = router({
           throw e;
         }
         const { siteId, ...data } = input;
-        return createShareLink(siteId, data);
+        try {
+          return await createShareLink(siteId, data, ctx.session.user.id);
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === "EDITORS_CANNOT_CREATE_LINKS")
+            throw new TRPCError({ code: "FORBIDDEN", message: "Editors cannot create share links for this workspace" });
+          throw e;
+        }
       }),
 
     revoke: protectedProcedure

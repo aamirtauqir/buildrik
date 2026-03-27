@@ -11,10 +11,23 @@ export async function listShareLinks(siteId: string) {
 
 export async function createShareLink(
   siteId: string,
-  data: { name: string; password?: string; expiresInDays?: number }
+  data: { name: string; password?: string; expiresInDays?: number },
+  userId?: string
 ) {
   const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
   if (!site) throw new Error("SITE_NOT_FOUND");
+  if (userId) {
+    const member = await prisma.workspaceMember.findFirst({
+      where: { userId, workspaceId: site.workspaceId, status: "ACTIVE" },
+      include: { workspace: { include: { sharingSettings: true } } },
+    });
+    if (member) {
+      const settings = member.workspace?.sharingSettings;
+      if (member.role === "EDITOR" && settings?.allowEditors === false) {
+        throw new Error("EDITORS_CANNOT_CREATE_LINKS");
+      }
+    }
+  }
   const ws = await prisma.workspace.findUnique({ where: { id: site.workspaceId }, select: { plan: true } });
   const plan = (ws?.plan ?? "FREE") as PlanName;
   const limits = PLAN_LIMITS[plan];
