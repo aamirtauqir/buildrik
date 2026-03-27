@@ -8,6 +8,11 @@ export const updateProfileSchema = z.object({
   timezone: z.string().optional(),
 });
 
+export const changeEmailSchema = z.object({
+  newEmail: z.string().email(),
+  password: z.string().optional().default(""),
+});
+
 export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1),
   newPassword: z.string().min(8).regex(/[A-Z]/).regex(/[0-9]/).regex(/[!@#$%^&*()]/),

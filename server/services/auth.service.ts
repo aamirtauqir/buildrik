@@ -173,7 +173,23 @@ export async function signup(fullName: string, email: string, password: string) 
 
 export async function verifyEmail(token: string) {
   const userId = await validateToken(token, "email_verify");
+
   if (!userId) {
+    // Check if this is an email change verification
+    const changeIdentifier = await validateToken(token, "email_change");
+    if (changeIdentifier) {
+      await invalidateToken(token);
+      const colonIndex = changeIdentifier.indexOf(":");
+      const uid = changeIdentifier.slice(0, colonIndex);
+      const newEmail = changeIdentifier.slice(colonIndex + 1);
+      await prisma.user.update({
+        where: { id: uid },
+        data: { email: newEmail, emailVerified: new Date() },
+      });
+      await logAuditEvent("EMAIL_CHANGED", "success", { userId: uid });
+      const safeUser = await prisma.user.findUnique({ where: { id: uid }, select: SAFE_USER_SELECT });
+      return safeUser!;
+    }
     throw new AuthError("TOKEN_EXPIRED", "Verification link expired", 410);
   }
 

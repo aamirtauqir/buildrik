@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { UpdateProfileInput, NotificationPrefInput, UpdatePreferencesInput } from "@/lib/validations/account";
-import { sendAccountDeletionEmail } from "@/server/services/email.service";
+import { sendAccountDeletionEmail, sendEmailChangedEmail } from "@/server/services/email.service";
 import { createNotification } from "@/server/services/notification.trigger";
+import { generateToken } from "@/server/services/token.service";
 
 export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -24,6 +25,23 @@ export async function changePassword(userId: string, currentPassword: string, ne
     message: "Your password was changed",
     priority: "high",
   }).catch(() => {});
+}
+
+export async function requestEmailChange(userId: string, newEmail: string, password: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new Error("USER_NOT_FOUND");
+
+  if (user.passwordHash) {
+    const bcrypt = await import("bcryptjs");
+    const valid = await bcrypt.compare(password, user.passwordHash);
+    if (!valid) throw new Error("WRONG_PASSWORD");
+  }
+
+  const taken = await prisma.user.findUnique({ where: { email: newEmail }, select: { id: true } });
+  if (taken) throw new Error("EMAIL_TAKEN");
+
+  const token = await generateToken("email_change", `${userId}:${newEmail}`, 60 * 24); // 24h
+  sendEmailChangedEmail(newEmail, token).catch(() => {});
 }
 
 export async function getProfile(userId: string) {

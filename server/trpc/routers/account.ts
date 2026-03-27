@@ -2,14 +2,14 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import {
-  getProfile, updateProfile, changePassword, getActiveSessions, revokeSession,
+  getProfile, updateProfile, changePassword, requestEmailChange, getActiveSessions, revokeSession,
   revokeAllOtherSessions, getLoginHistory, getNotificationPrefs,
   updateNotificationPref, requestAccountDeletion, requestDataExport, getAICreditsInfo,
   getPreferences, updatePreferences, enable2FA, confirm2FA, disable2FA,
 } from "@/server/services/account.service";
 import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings, deleteWorkspace, cancelWorkspaceDeletion } from "@/server/services/workspace-settings.service";
 import { listIntegrations, addIntegration, removeIntegration } from "@/server/services/integrations.service";
-import { updateProfileSchema, changePasswordSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema } from "@/lib/validations/account";
+import { updateProfileSchema, changePasswordSchema, changeEmailSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema } from "@/lib/validations/account";
 
 async function getWorkspaceCtx(ctx: any): Promise<{ workspaceId: string; plan: string }> {
   const member = await ctx.prisma.workspaceMember.findFirst({
@@ -24,6 +24,16 @@ export const accountRouter = router({
   profile: router({
     get: protectedProcedure.query(({ ctx }) => getProfile(ctx.session.user.id)),
     update: protectedProcedure.input(updateProfileSchema).mutation(({ ctx, input }) => updateProfile(ctx.session.user.id, input)),
+  }),
+  changeEmail: protectedProcedure.input(changeEmailSchema).mutation(async ({ ctx, input }) => {
+    try {
+      await requestEmailChange(ctx.session.user.id, input.newEmail, input.password);
+      return { ok: true };
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message === "WRONG_PASSWORD") throw new TRPCError({ code: "UNAUTHORIZED", message: "Password is incorrect." });
+      if (e instanceof Error && e.message === "EMAIL_TAKEN") throw new TRPCError({ code: "CONFLICT", message: "Email already in use." });
+      throw e;
+    }
   }),
   changePassword: protectedProcedure.input(changePasswordSchema).mutation(async ({ ctx, input }) => {
     try {
