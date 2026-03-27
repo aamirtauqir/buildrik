@@ -149,6 +149,26 @@ describe("dns-verify cron", () => {
     expect(mockPrisma.dnsRecord.update).not.toHaveBeenCalled();
   });
 
+  it("leaves record unverified when CNAME resolves to a non-exact buildrik subdomain (e.g. cdn.buildrik.app)", async () => {
+    mockPrisma.dnsRecord.findMany.mockResolvedValue([
+      {
+        id: "rec6",
+        domainId: "dom6",
+        type: "CNAME",
+        host: "www",
+        verified: false,
+        domain: { domain: "example.com" },
+      },
+    ]);
+    mockDns.resolve.mockResolvedValue(["cdn.buildrik.app"]);
+
+    const res = await GET(makeReq("Bearer test-secret"));
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body).toEqual({ ok: true, verified: 0 });
+    expect(mockPrisma.dnsRecord.update).not.toHaveBeenCalled();
+  });
+
   it("skips non-CNAME record types without calling resolve", async () => {
     mockPrisma.dnsRecord.findMany.mockResolvedValue([
       {

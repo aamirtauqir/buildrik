@@ -20,36 +20,37 @@ export async function GET(req: NextRequest) {
   let verified = 0;
 
   for (const record of unverified) {
+    if (record.type !== "CNAME") continue;
+
+    const hostname =
+      record.host === "@"
+        ? record.domain.domain
+        : `${record.host}.${record.domain.domain}`;
+
+    let results: string[];
     try {
-      if (record.type !== "CNAME") continue;
-
-      const hostname =
-        record.host === "@"
-          ? record.domain.domain
-          : `${record.host}.${record.domain.domain}`;
-
-      const results = await dns.resolve(hostname, "CNAME");
-
-      if (results.some((r) => r === "sites.buildrik.app" || r.endsWith(".buildrik.app"))) {
-        await prisma.dnsRecord.update({
-          where: { id: record.id },
-          data: { verified: true },
-        });
-        verified++;
-
-        const remaining = await prisma.dnsRecord.count({
-          where: { domainId: record.domainId, verified: false },
-        });
-        if (remaining === 0) {
-          await prisma.domain.update({
-            where: { id: record.domainId },
-            data: { status: "VERIFIED", lastCheckedAt: new Date() },
-          });
-        }
-      }
+      results = await dns.resolve(hostname, "CNAME");
     } catch {
-      // DNS resolution failures (ENOTFOUND, ENODATA, SERVFAIL) are expected
-      // for propagating records — skip and retry next run
+      // DNS resolution failures (ENOTFOUND, ENODATA, SERVFAIL) are expected during propagation
+      continue;
+    }
+
+    if (results.some((r) => r === "sites.buildrik.app")) {
+      await prisma.dnsRecord.update({
+        where: { id: record.id },
+        data: { verified: true },
+      });
+      verified++;
+
+      const remaining = await prisma.dnsRecord.count({
+        where: { domainId: record.domainId, verified: false },
+      });
+      if (remaining === 0) {
+        await prisma.domain.update({
+          where: { id: record.domainId },
+          data: { status: "VERIFIED", lastCheckedAt: new Date() },
+        });
+      }
     }
   }
 
