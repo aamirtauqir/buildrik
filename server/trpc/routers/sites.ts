@@ -411,18 +411,50 @@ export const sitesRouter = router({
 
     delete: protectedProcedure
       .input(z.object({ id: z.string() }))
-      .mutation(async ({ input }) => deleteFolder(input.id)),
+      .mutation(async ({ ctx, input }) => {
+        const folder = await ctx.prisma.folder.findUnique({
+          where: { id: input.id },
+          select: { workspaceId: true },
+        });
+        if (!folder) throw new TRPCError({ code: "NOT_FOUND" });
+        const member = await ctx.prisma.workspaceMember.findFirst({
+          where: { userId: ctx.session.user.id, workspaceId: folder.workspaceId, status: "ACTIVE" },
+          select: { role: true },
+        });
+        if (!member || (member.role !== "ADMIN" && member.role !== "OWNER"))
+          throw new TRPCError({ code: "FORBIDDEN", message: "Insufficient permissions" });
+        return deleteFolder(input.id);
+      }),
 
     rename: protectedProcedure
       .input(z.object({ id: z.string(), name: z.string().min(1).max(50) }))
-      .mutation(async ({ input }) => renameFolder(input.id, input.name)),
+      .mutation(async ({ ctx, input }) => {
+        const folder = await ctx.prisma.folder.findUnique({
+          where: { id: input.id },
+          select: { workspaceId: true },
+        });
+        if (!folder) throw new TRPCError({ code: "NOT_FOUND" });
+        const member = await ctx.prisma.workspaceMember.findFirst({
+          where: { userId: ctx.session.user.id, workspaceId: folder.workspaceId, status: "ACTIVE" },
+          select: { role: true },
+        });
+        if (!member || (member.role !== "ADMIN" && member.role !== "OWNER"))
+          throw new TRPCError({ code: "FORBIDDEN", message: "Insufficient permissions" });
+        return renameFolder(input.id, input.name);
+      }),
 
     moveSite: protectedProcedure
       .input(
         z.object({ siteId: z.string(), folderId: z.string().nullable() })
       )
-      .mutation(async ({ input }) =>
-        moveSiteToFolder(input.siteId, input.folderId)
-      ),
+      .mutation(async ({ ctx, input }) => {
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
+        return moveSiteToFolder(input.siteId, input.folderId);
+      }),
   }),
 });

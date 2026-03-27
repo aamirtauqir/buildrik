@@ -15,6 +15,20 @@ export class PermissionError extends Error {
   }
 }
 
+export async function assertSiteAccess(
+  db: PrismaClient,
+  userId: string,
+  siteId: string
+): Promise<void> {
+  const site = await db.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
+  if (!site) throw new PermissionError("NOT_FOUND");
+  const member = await db.workspaceMember.findFirst({
+    where: { userId, workspaceId: site.workspaceId, status: "ACTIVE" },
+    select: { id: true },
+  });
+  if (!member) throw new PermissionError("FORBIDDEN");
+}
+
 export async function checkSiteRole(
   db: PrismaClient,
   userId: string,

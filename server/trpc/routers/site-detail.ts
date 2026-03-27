@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { checkSiteRole, PermissionError } from "@/server/services/permission.service";
+import { checkSiteRole, assertSiteAccess, PermissionError } from "@/server/services/permission.service";
+import type { PlanName } from "@/lib/constants/plan-limits";
 import { getSiteOverview } from "@/server/services/site-detail.service";
 import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
 import { listRedirects, createRedirect, updateRedirect, deleteRedirect, importRedirects, exportRedirects } from "@/server/services/redirect.service";
@@ -14,12 +15,28 @@ import type { PlanName } from "@/lib/constants/plan-limits";
 export const siteDetailRouter = router({
   overview: protectedProcedure
     .input(z.object({ siteId: z.string() }))
-    .query(async ({ input }) => getSiteOverview(input.siteId)),
+    .query(async ({ ctx, input }) => {
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      return getSiteOverview(input.siteId);
+    }),
 
   settings: router({
     get: protectedProcedure
       .input(z.object({ siteId: z.string() }))
-      .query(async ({ input }) => getSiteSettings(input.siteId)),
+      .query(async ({ ctx, input }) => {
+        try {
+          await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
+        return getSiteSettings(input.siteId);
+      }),
 
     update: protectedProcedure
       .input(updateSiteSettingsSchema)
@@ -38,7 +55,15 @@ export const siteDetailRouter = router({
   redirects: router({
     list: protectedProcedure
       .input(z.object({ siteId: z.string() }))
-      .query(async ({ input }) => listRedirects(input.siteId)),
+      .query(async ({ ctx, input }) => {
+        try {
+          await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
+        return listRedirects(input.siteId);
+      }),
 
     create: protectedProcedure
       .input(createRedirectSchema)
@@ -111,7 +136,8 @@ export const siteDetailRouter = router({
           where: { userId: ctx.session.user!.id },
           include: { workspace: { select: { plan: true } } },
         });
-        const plan = (member?.workspace?.plan ?? "FREE") as PlanName;
+        const planResult = z.enum(["FREE", "PRO", "BUSINESS"]).safeParse(member?.workspace?.plan ?? "FREE");
+        const plan: PlanName = planResult.success ? planResult.data : "FREE";
         try {
           return await importRedirects(input.siteId, input.csv, plan);
         } catch (e: unknown) {
@@ -123,13 +149,29 @@ export const siteDetailRouter = router({
 
     export_csv: protectedProcedure
       .input(z.object({ siteId: z.string() }))
-      .query(async ({ input }) => ({ csv: await exportRedirects(input.siteId) })),
+      .query(async ({ ctx, input }) => {
+        try {
+          await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
+        return { csv: await exportRedirects(input.siteId) };
+      }),
   }),
 
   domains: router({
     list: protectedProcedure
       .input(z.object({ siteId: z.string() }))
-      .query(async ({ input }) => listDomains(input.siteId)),
+      .query(async ({ ctx, input }) => {
+        try {
+          await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
+        return listDomains(input.siteId);
+      }),
 
     connect: protectedProcedure
       .input(connectDomainSchema)
@@ -182,7 +224,15 @@ export const siteDetailRouter = router({
   sharing: router({
     list: protectedProcedure
       .input(z.object({ siteId: z.string() }))
-      .query(async ({ input }) => listShareLinks(input.siteId)),
+      .query(async ({ ctx, input }) => {
+        try {
+          await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
+        return listShareLinks(input.siteId);
+      }),
 
     create: protectedProcedure
       .input(createShareLinkSchema)
@@ -217,7 +267,13 @@ export const siteDetailRouter = router({
 
   analytics: protectedProcedure
     .input(siteAnalyticsQuerySchema)
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       const { siteId, ...params } = input;
       return getSiteAnalytics(siteId, params);
     }),
