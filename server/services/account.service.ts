@@ -75,9 +75,9 @@ export async function getActiveSessions(userId: string) {
   });
 }
 
-export async function revokeSession(sessionId: string) {
-  return prisma.session.delete({
-    where: { id: sessionId },
+export async function revokeSession(sessionId: string, userId: string) {
+  return prisma.session.deleteMany({
+    where: { id: sessionId, userId },
   });
 }
 

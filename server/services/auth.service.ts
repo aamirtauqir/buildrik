@@ -125,6 +125,11 @@ export async function login(email: string, password: string) {
     throw new AuthError("INVALID_CREDENTIALS", "Incorrect email or password");
   }
 
+  if (!user.emailVerified) {
+    await logAuditEvent("LOGIN_UNVERIFIED", "failure", { userId: user.id, email });
+    throw new AuthError("EMAIL_NOT_VERIFIED", "Please verify your email before logging in.", 403);
+  }
+
   await resetFailedAttempts(user.id);
   await logAuditEvent("LOGIN_SUCCESS", "success", { userId: user.id, email });
   await prisma.loginAttempt.create({

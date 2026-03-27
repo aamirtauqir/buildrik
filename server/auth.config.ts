@@ -1,8 +1,7 @@
 import type { NextAuthConfig } from "next-auth";
-import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
-import bcrypt from "bcryptjs";
+import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { logAuditEvent } from "@/server/services/audit.service";
 import { createWorkspaceForUser } from "@/server/services/auth.service";
@@ -17,29 +16,6 @@ export const authConfig: NextAuthConfig = {
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
-    Credentials({
-      name: "credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        const email = credentials?.email as string | undefined;
-        const password = credentials?.password as string | undefined;
-
-        if (!email || !password) return null;
-
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user || !user.passwordHash) return null;
-
-        if (user.lockedUntil && user.lockedUntil > new Date()) return null;
-
-        const valid = await bcrypt.compare(password, user.passwordHash);
-        if (!valid) return null;
-
-        return { id: user.id, email: user.email, name: user.fullName };
-      },
-    }),
   ],
   session: { strategy: "jwt" },
   pages: {
@@ -48,8 +24,6 @@ export const authConfig: NextAuthConfig = {
   },
   callbacks: {
     async signIn({ user, account }) {
-      if (account?.provider === "credentials") return true;
-
       if (account && user.email) {
         const existing = await prisma.user.findUnique({ where: { email: user.email } });
         if (!existing) {
@@ -75,9 +49,32 @@ export const authConfig: NextAuthConfig = {
       }
       return true;
     },
-    async jwt({ token, user }) {
-      if (user) {
+    async jwt({ token, user, account }) {
+      if (user?.id && account?.provider) {
         token.userId = user.id;
+        const sessionId = randomUUID();
+        token.dbSessionId = sessionId;
+        try {
+          await prisma.session.create({
+            data: {
+              userId: user.id,
+              sessionToken: sessionId,
+              expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+              current: true,
+            },
+          });
+          const sessions = await prisma.session.findMany({
+            where: { userId: user.id, expires: { gt: new Date() } },
+            orderBy: { createdAt: "asc" },
+            select: { id: true },
+          });
+          if (sessions.length > 10) {
+            const toDelete = sessions.slice(0, sessions.length - 10).map(s => s.id);
+            await prisma.session.deleteMany({ where: { id: { in: toDelete } } });
+          }
+        } catch (err) {
+          console.error("[auth] Failed to create OAuth session record:", err);
+        }
       }
       return token;
     },
