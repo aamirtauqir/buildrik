@@ -19,7 +19,7 @@ export const TEMPLATE_SORT_OPTIONS = [
   { value: "alphabetical", label: "A-Z" },
 ] as const;
 
-interface Template { id: string; name: string; category: string; thumbnail: string | null; usageCount: number; }
+interface Template { id: string; name: string; category: string; thumbnail: string | null; usageCount: number; difficulty: string; }
 
 interface TemplateGalleryProps {
   open: boolean;

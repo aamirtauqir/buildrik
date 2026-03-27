@@ -103,7 +103,7 @@ export async function useTemplate(
     slug: string;
     position: number;
     isHomePage: boolean;
-    blocks: unknown[];
+    blocks: any[];
   }>;
 
   const site = await prisma.site.create({

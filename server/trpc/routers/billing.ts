@@ -6,6 +6,7 @@ import {
   upgradePlan, cancelSubscription, reactivateSubscription, getPlans,
 } from "@/server/services/billing.service";
 import { upgradeSchema, cancelSchema } from "@/lib/validations/billing";
+import { type PlanName } from "@/lib/constants/plan-limits";
 
 async function getWorkspaceId(ctx: any): Promise<string> {
   const member = await ctx.prisma.workspaceMember.findFirst({
@@ -25,7 +26,7 @@ export const billingRouter = router({
   usage: protectedProcedure.query(async ({ ctx }) => {
     const wsId = await getWorkspaceId(ctx);
     const overview = await getBillingOverview(wsId);
-    return getUsageDetails(wsId, overview.plan);
+    return getUsageDetails(wsId, overview.plan as PlanName);
   }),
   invoices: protectedProcedure
     .input(z.object({ page: z.number().min(1).default(1), perPage: z.number().default(10) }))

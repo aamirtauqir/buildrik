@@ -13,10 +13,10 @@ export const DATE_RANGE_OPTIONS = [
 interface MetricCard { label: string; value: string | number; change?: number; }
 
 interface AnalyticsData {
-  timeSeries: Array<{ date: string; visitors: number; pageViews: number }>;
-  metrics: MetricCard[];
-  trafficSources: Array<{ source: string; count: number; percentage: number }>;
-  countries: Array<{ country: string; count: number; percentage: number }>;
+  timeSeries: Array<{ date: string | Date; visitors: number; pageViews: number }>;
+  metrics?: MetricCard[];
+  trafficSources: Array<{ source: string; count: number; percentage?: number }>;
+  countries: Array<{ country: string; count: number; percentage?: number }>;
 }
 
 interface AnalyticsTabProps {
@@ -57,15 +57,17 @@ export function AnalyticsTab({ data, range, onRangeChange, isLoading }: Analytic
       {!isLoading && data && data.timeSeries.length > 0 && (
         <>
           {/* Metric Cards */}
-          <div className="grid grid-cols-3 gap-4">
-            {data.metrics.map((m) => (
-              <div key={m.label} className="rounded-xl border bg-white p-4" style={{ borderColor: "#E8E8E8" }}>
-                <p className="text-xs font-medium" style={{ color: "#7A7A7A" }}>{m.label}</p>
-                <p className="mt-1 text-xl font-bold" style={{ color: "#0D0D0D" }}>{m.value}</p>
-                {m.change !== undefined && <p className="mt-1 text-xs font-medium" style={{ color: m.change >= 0 ? "#22C55E" : "#E42313" }}>{m.change >= 0 ? "↑" : "↓"} {Math.abs(m.change)}%</p>}
-              </div>
-            ))}
-          </div>
+          {data.metrics && (
+            <div className="grid grid-cols-3 gap-4">
+              {data.metrics.map((m) => (
+                <div key={m.label} className="rounded-xl border bg-white p-4" style={{ borderColor: "#E8E8E8" }}>
+                  <p className="text-xs font-medium" style={{ color: "#7A7A7A" }}>{m.label}</p>
+                  <p className="mt-1 text-xl font-bold" style={{ color: "#0D0D0D" }}>{m.value}</p>
+                  {m.change !== undefined && <p className="mt-1 text-xs font-medium" style={{ color: m.change >= 0 ? "#22C55E" : "#E42313" }}>{m.change >= 0 ? "↑" : "↓"} {Math.abs(m.change)}%</p>}
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Chart placeholder */}
           <div className="rounded-xl border bg-white p-5" style={{ borderColor: "#E8E8E8" }}>

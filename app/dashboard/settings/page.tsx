@@ -15,5 +15,12 @@ export default function SettingsProfilePage() {
   if (profileQuery.isLoading) return <div className="h-64 animate-pulse rounded-xl" style={{ backgroundColor: "#F4F4F4" }} />;
   if (!profileQuery.data) return null;
 
-  return <ProfileForm profile={profileQuery.data} onSave={(data) => updateMutation.mutate(data)} />;
+  const { fullName, displayName, email, bio, language, timezone, avatar } = profileQuery.data;
+  return (
+    <ProfileForm
+      initialData={{ fullName, email, bio: bio ?? undefined, language, timezone, displayName: displayName ?? undefined, avatarUrl: avatar ?? undefined }}
+      onSave={(data) => updateMutation.mutate(data)}
+      saving={updateMutation.isPending}
+    />
+  );
 }

@@ -5,7 +5,7 @@ vi.mock("@/lib/prisma", () => ({
     page: { findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
     site: { findUnique: vi.fn(), update: vi.fn() },
     workspaceMember: { findFirst: vi.fn() },
-    formSubmission: { deleteMany: vi.fn() },
+    formBlock: { deleteMany: vi.fn() },
   },
 }));
 
@@ -78,7 +78,7 @@ describe("Page Service", () => {
       const { deletePage } = await import("@/server/services/page.service");
       vi.mocked(prisma.page.count).mockResolvedValue(3);
       vi.mocked(prisma.page.findUnique).mockResolvedValue({ id: "p1", siteId: "s1" } as any);
-      vi.mocked(prisma.formSubmission.deleteMany).mockResolvedValue({ count: 0 });
+      vi.mocked(prisma.formBlock.deleteMany).mockResolvedValue({ count: 0 });
       vi.mocked(prisma.page.delete).mockResolvedValue({ id: "p1" } as any);
       vi.mocked(prisma.site.update).mockResolvedValue({} as any);
 

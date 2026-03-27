@@ -13,7 +13,7 @@ export const updatePageSchema = z.object({
   siteId: z.string(),
   name: z.string().min(1).max(100).optional(),
   slug: z.string().max(100).optional(),
-  blocks: z.unknown().optional(),
+  blocks: z.any().optional(),
   position: z.number().optional(),
   isHomePage: z.boolean().optional(),
   seoTitle: z.string().max(60).optional(),

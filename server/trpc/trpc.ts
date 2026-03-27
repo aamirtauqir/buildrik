@@ -28,7 +28,7 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
   if (!ctx.session?.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
-  return next({ ctx: { ...ctx, session: ctx.session } });
+  return next({ ctx: { ...ctx, session: { ...ctx.session, user: ctx.session.user } } });
 });
 
 export function createRateLimitedProcedure(maxAttempts: number, windowMs: number) {

@@ -98,7 +98,7 @@ export async function deletePage(input: DeletePageInput) {
   const page = await prisma.page.findUnique({ where: { id: input.pageId } });
   if (!page) throw new Error("NOT_FOUND");
 
-  await prisma.formSubmission.deleteMany({ where: { pageId: input.pageId } });
+  await prisma.formBlock.deleteMany({ where: { pageId: input.pageId } });
   await prisma.page.delete({ where: { id: input.pageId } });
   await prisma.site.update({
     where: { id: input.siteId },

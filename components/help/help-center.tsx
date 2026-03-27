@@ -18,7 +18,7 @@ export const KEYBOARD_SHORTCUTS = [
   { keys: ["G", "B"], description: "Go to Billing" },
 ];
 
-const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
   Rocket,
   Globe,
   Users,
@@ -74,7 +74,6 @@ export function HelpCenter({ onSearch, onContactLiveChat, onContactEmail, search
             style={{
               borderColor: "#E8E8E8",
               color: "#0D0D0D",
-              focusRingColor: "#E42313",
             }}
           />
           {query && (

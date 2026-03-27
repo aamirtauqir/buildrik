@@ -11,14 +11,15 @@ import { getWorkspaceSettings, updateWorkspaceSettings, updateSharingSettings, d
 import { initiateTransfer, acceptTransfer, cancelTransfer, getPendingTransfer } from "@/server/services/workspace-transfer.service";
 import { listIntegrations, addIntegration, removeIntegration } from "@/server/services/integrations.service";
 import { updateProfileSchema, changePasswordSchema, changeEmailSchema, updateWorkspaceSchema, workspaceSharingSettingsSchema, addIntegrationSchema, notificationPrefSchema, updatePreferencesSchema } from "@/lib/validations/account";
+import { type PlanName } from "@/lib/constants/plan-limits";
 
-async function getWorkspaceCtx(ctx: any): Promise<{ workspaceId: string; plan: string }> {
+async function getWorkspaceCtx(ctx: any): Promise<{ workspaceId: string; plan: PlanName }> {
   const member = await ctx.prisma.workspaceMember.findFirst({
     where: { userId: ctx.session.user.id },
     include: { workspace: { select: { plan: true } } },
   });
   if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
-  return { workspaceId: member.workspaceId, plan: member.workspace.plan };
+  return { workspaceId: member.workspaceId, plan: member.workspace.plan as PlanName };
 }
 
 export const accountRouter = router({

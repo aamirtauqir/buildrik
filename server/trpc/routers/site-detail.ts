@@ -40,7 +40,7 @@ export const siteDetailRouter = router({
           where: { userId: ctx.session.user.id },
           include: { workspace: { select: { plan: true } } },
         });
-        const plan = member?.workspace?.plan ?? "FREE";
+        const plan = (member?.workspace?.plan ?? "FREE") as PlanName;
         try {
           return await createRedirect(input.siteId, { fromPath: input.fromPath, toUrl: input.toUrl, type: input.type }, plan);
         } catch (e: unknown) {

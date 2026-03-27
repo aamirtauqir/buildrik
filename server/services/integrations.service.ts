@@ -22,7 +22,7 @@ export async function addIntegration(workspaceId: string, input: AddIntegrationI
     data: {
       workspaceId,
       provider: input.provider,
-      config: input.config,
+      config: input.config as Record<string, string>,
       isActive: true,
     },
   });

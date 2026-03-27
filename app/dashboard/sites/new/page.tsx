@@ -168,7 +168,7 @@ export default function NewSitePage() {
   if (view === "preview" && previewQuery.data) {
     return (
       <TemplatePreview
-        template={previewQuery.data}
+        template={previewQuery.data as any}
         onBack={() => setView("templates")}
         onUse={() => useTemplateMutation.mutate({ templateId: previewQuery.data!.id, siteName })}
       />
@@ -203,7 +203,11 @@ export default function NewSitePage() {
             generateMutation.mutate({
               name: siteName,
               businessType: businessType as "PORTFOLIO" | "BUSINESS" | "BLOG" | "RESTAURANT" | "AGENCY" | "ECOMMERCE",
-              ...data,
+              pages: data.pages,
+              description: data.description,
+              tone: data.tone as "bold" | "professional" | "casual" | "creative" | "minimal" | "playful" | undefined,
+              content: data.content as "generate" | "lorem" | "empty" | undefined,
+              images: data.images as "stock" | "placeholders" | "none" | undefined,
             })
           }
         />
@@ -220,7 +224,7 @@ export default function NewSitePage() {
         <GenerationProgress
           status={status?.status ?? "QUEUED"}
           progress={status?.progress ?? 0}
-          steps={status?.steps ?? null}
+          steps={(status?.steps ?? null) as { step: string; status: string }[] | null}
           error={status?.error ?? null}
           siteId={status?.siteId ?? null}
           onCancel={() => cancelMutation.mutate({ jobId })}

@@ -6,14 +6,15 @@ import {
   revokeMember, deleteMember, listPendingInvites, revokeInvite, resendInvite, getTeamActivity,
 } from "@/server/services/team.service";
 import { inviteMembersSchema, listMembersSchema } from "@/lib/validations/team";
+import { type PlanName } from "@/lib/constants/plan-limits";
 
-async function getWorkspaceCtx(ctx: any): Promise<{ workspaceId: string; plan: string }> {
+async function getWorkspaceCtx(ctx: any): Promise<{ workspaceId: string; plan: PlanName }> {
   const member = await ctx.prisma.workspaceMember.findFirst({
     where: { userId: ctx.session.user.id },
     include: { workspace: { select: { plan: true } } },
   });
   if (!member) throw new TRPCError({ code: "NOT_FOUND", message: "No workspace found" });
-  return { workspaceId: member.workspaceId, plan: member.workspace.plan };
+  return { workspaceId: member.workspaceId, plan: member.workspace.plan as PlanName };
 }
 
 export const teamRouter = router({
