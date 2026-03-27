@@ -149,14 +149,6 @@ export const authRouter = router({
       }
     }),
 
-  logout: protectedProcedure.mutation(async ({ ctx }) => {
-    if (ctx.session?.user?.id) {
-      await ctx.prisma.session.deleteMany({ where: { userId: ctx.session.user.id } });
-    }
-    await logAuditEvent("LOGOUT", "success", { userId: ctx.session?.user?.id });
-    return { success: true };
-  }),
-
   getInviteDetails: publicProcedure
     .input(z.object({ token: z.string() }))
     .query(async ({ input, ctx }) => {
