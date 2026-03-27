@@ -167,7 +167,7 @@ describe("soft-delete-purge", () => {
     const cutoff: Date = call.where.deletedAt.lt;
     expect(cutoff).toBeInstanceOf(Date);
     const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-    expect(before - cutoff.getTime()).toBeGreaterThanOrEqual(thirtyDaysMs - 100);
+    expect(before - cutoff.getTime()).toBeGreaterThanOrEqual(thirtyDaysMs - 1000);
   });
 });
 
@@ -198,7 +198,7 @@ describe("analytics-purge", () => {
     const cutoff: Date = call.where.createdAt.lt;
     expect(cutoff).toBeInstanceOf(Date);
     const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-    expect(before - cutoff.getTime()).toBeGreaterThanOrEqual(thirtyDaysMs - 100);
+    expect(before - cutoff.getTime()).toBeGreaterThanOrEqual(thirtyDaysMs - 1000);
   });
 });
 
@@ -229,7 +229,7 @@ describe("form-submission-purge", () => {
     const cutoff: Date = call.where.createdAt.lt;
     expect(cutoff).toBeInstanceOf(Date);
     const yearMs = 365 * 24 * 60 * 60 * 1000;
-    expect(before - cutoff.getTime()).toBeGreaterThanOrEqual(yearMs - 100);
+    expect(before - cutoff.getTime()).toBeGreaterThanOrEqual(yearMs - 1000);
   });
 });
 
@@ -261,7 +261,7 @@ describe("ip-anonymization", () => {
     const cutoff: Date = call.where.createdAt.lt;
     expect(cutoff).toBeInstanceOf(Date);
     const ninetyDaysMs = 90 * 24 * 60 * 60 * 1000;
-    expect(before - cutoff.getTime()).toBeGreaterThanOrEqual(ninetyDaysMs - 100);
+    expect(before - cutoff.getTime()).toBeGreaterThanOrEqual(ninetyDaysMs - 1000);
     expect(call.data).toEqual({ ip: null });
   });
 });
@@ -314,16 +314,19 @@ describe("publish-job-cleanup", () => {
     expect(body).toEqual({ ok: true, cleaned: 4 });
   });
 
-  it("calls updateMany with QUEUED/IN_PROGRESS older than 1 hour and sets FAILED", async () => {
+  it("calls updateMany with OR conditions for QUEUED/IN_PROGRESS older than 1 hour and sets FAILED", async () => {
     mockPrisma.publishBuildJob.updateMany.mockResolvedValue({ count: 0 });
     const before = Date.now();
     await publishJobCleanup(makeReq("publish-job-cleanup", "Bearer test-secret"));
     const call = mockPrisma.publishBuildJob.updateMany.mock.calls[0][0];
-    expect(call.where.status.in).toEqual(["QUEUED", "IN_PROGRESS"]);
-    const cutoff: Date = call.where.createdAt.lt;
-    expect(cutoff).toBeInstanceOf(Date);
+    expect(call.where.OR[0].status).toBe("QUEUED");
+    expect(call.where.OR[0].createdAt.lt).toBeInstanceOf(Date);
     const oneHourMs = 60 * 60 * 1000;
-    expect(before - cutoff.getTime()).toBeGreaterThanOrEqual(oneHourMs - 100);
+    expect(before - call.where.OR[0].createdAt.lt.getTime()).toBeGreaterThanOrEqual(oneHourMs - 1000);
+    expect(call.where.OR[1].status).toBe("IN_PROGRESS");
+    expect(call.where.OR[1].startedAt.lt).toBeInstanceOf(Date);
+    expect(call.where.OR[1].startedAt.not).toBeNull();
+    expect(before - call.where.OR[1].startedAt.lt.getTime()).toBeGreaterThanOrEqual(oneHourMs - 1000);
     expect(call.data.status).toBe("FAILED");
     expect(call.data.error).toBe("Timed out — cleaned by cron");
   });

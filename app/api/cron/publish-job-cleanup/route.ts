@@ -10,12 +10,17 @@ export async function GET(req: NextRequest) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const cutoff = new Date(Date.now() - 60 * 60 * 1000);
+  const now = new Date();
+  const cutoff = new Date(now.getTime() - 60 * 60 * 1000); // 1 hour ago
 
   const { count } = await prisma.publishBuildJob.updateMany({
     where: {
-      status: { in: ["QUEUED", "IN_PROGRESS"] },
-      createdAt: { lt: cutoff },
+      OR: [
+        // QUEUED jobs stuck for over 1 hour (never started)
+        { status: "QUEUED", createdAt: { lt: cutoff } },
+        // IN_PROGRESS jobs running for over 1 hour (started but not finished)
+        { status: "IN_PROGRESS", startedAt: { lt: cutoff, not: null } },
+      ],
     },
     data: { status: "FAILED", error: "Timed out — cleaned by cron" },
   });
