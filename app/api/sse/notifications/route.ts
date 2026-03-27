@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
       let lastCount: number;
       try {
         lastCount = await prisma.notification.count({
-          where: { userId, isRead: false },
+          where: { userId, read: false },
         });
         send("unread", { count: lastCount });
       } catch {
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
       const interval = setInterval(async () => {
         try {
           const count = await prisma.notification.count({
-            where: { userId, isRead: false },
+            where: { userId, read: false },
           });
           if (count !== lastCount) {
             lastCount = count;
