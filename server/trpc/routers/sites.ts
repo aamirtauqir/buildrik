@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
+import { checkSiteRole, PermissionError } from "@/server/services/permission.service";
 import {
   listSites,
   createSite,
@@ -96,13 +97,25 @@ export const sitesRouter = router({
 
   rename: protectedProcedure
     .input(z.object({ id: z.string(), name: z.string().min(2).max(100) }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        throw e;
+      }
       return renameSite(input.id, input.name);
     }),
 
   duplicate: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        throw e;
+      }
       const workspaceId = await getWorkspaceId(ctx);
       try {
         return await duplicateSite(input.id, workspaceId, ctx.session.user.id);
@@ -118,15 +131,37 @@ export const sitesRouter = router({
 
   archive: protectedProcedure
     .input(z.object({ id: z.string() }))
-    .mutation(async ({ input }) => archiveSite(input.id)),
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "ADMIN");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        throw e;
+      }
+      return archiveSite(input.id);
+    }),
 
   unarchive: protectedProcedure
     .input(z.object({ id: z.string() }))
-    .mutation(async ({ input }) => unarchiveSite(input.id)),
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "ADMIN");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        throw e;
+      }
+      return unarchiveSite(input.id);
+    }),
 
   delete: protectedProcedure
     .input(z.object({ id: z.string(), confirmName: z.string() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "OWNER");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        throw e;
+      }
       try {
         await deleteSite(input.id, input.confirmName);
       } catch (e: unknown) {
@@ -155,6 +190,12 @@ export const sitesRouter = router({
   transfer: protectedProcedure
     .input(transferSiteSchema)
     .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "OWNER");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        throw e;
+      }
       try {
         return await transferSite(
           input.siteId,
@@ -241,6 +282,12 @@ export const sitesRouter = router({
   publish: protectedProcedure
     .input(z.object({ siteId: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "ADMIN");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        throw e;
+      }
       const workspaceId = await getWorkspaceId(ctx);
       try {
         return await startPublish(input.siteId, workspaceId, ctx.session.user.id);
@@ -264,7 +311,18 @@ export const sitesRouter = router({
 
   cancelPublish: protectedProcedure
     .input(z.object({ jobId: z.string() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      const job = await ctx.prisma.publishBuildJob.findUnique({
+        where: { id: input.jobId },
+        select: { siteId: true },
+      });
+      if (!job) throw new TRPCError({ code: "NOT_FOUND" });
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, job.siteId, "ADMIN");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        throw e;
+      }
       try {
         return await cancelPublish(input.jobId);
       } catch (e: unknown) {
@@ -279,7 +337,13 @@ export const sitesRouter = router({
 
   unpublish: protectedProcedure
     .input(z.object({ siteId: z.string() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "ADMIN");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        throw e;
+      }
       return unpublishSite(input.siteId);
     }),
 

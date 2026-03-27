@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
+import { checkSiteRole, PermissionError } from "@/server/services/permission.service";
 import { getSiteOverview } from "@/server/services/site-detail.service";
 import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
 import { listRedirects, createRedirect, updateRedirect, deleteRedirect, importRedirects, exportRedirects } from "@/server/services/redirect.service";
@@ -22,7 +23,13 @@ export const siteDetailRouter = router({
 
     update: protectedProcedure
       .input(updateSiteSettingsSchema)
-      .mutation(async ({ input }) => {
+      .mutation(async ({ ctx, input }) => {
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "ADMIN");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          throw e;
+        }
         const { id, ...data } = input;
         return updateSiteSettings(id, data);
       }),
@@ -36,6 +43,12 @@ export const siteDetailRouter = router({
     create: protectedProcedure
       .input(createRedirectSchema)
       .mutation(async ({ ctx, input }) => {
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          throw e;
+        }
         const member = await ctx.prisma.workspaceMember.findFirst({
           where: { userId: ctx.session.user.id },
           include: { workspace: { select: { plan: true } } },
@@ -52,18 +65,48 @@ export const siteDetailRouter = router({
 
     update: protectedProcedure
       .input(z.object({ id: z.string(), fromPath: z.string().optional(), toUrl: z.string().optional(), type: z.enum(["301", "302"]).optional() }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ ctx, input }) => {
+        const redirect = await ctx.prisma.redirect.findUnique({
+          where: { id: input.id },
+          select: { siteId: true },
+        });
+        if (!redirect) throw new TRPCError({ code: "NOT_FOUND" });
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, redirect.siteId, "EDITOR");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          throw e;
+        }
         const { id, ...data } = input;
         return updateRedirect(id, data);
       }),
 
     delete: protectedProcedure
       .input(z.object({ id: z.string() }))
-      .mutation(async ({ input }) => deleteRedirect(input.id)),
+      .mutation(async ({ ctx, input }) => {
+        const redirect = await ctx.prisma.redirect.findUnique({
+          where: { id: input.id },
+          select: { siteId: true },
+        });
+        if (!redirect) throw new TRPCError({ code: "NOT_FOUND" });
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, redirect.siteId, "EDITOR");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          throw e;
+        }
+        return deleteRedirect(input.id);
+      }),
 
     import_csv: protectedProcedure
       .input(z.object({ siteId: z.string(), csv: z.string() }))
       .mutation(async ({ ctx, input }) => {
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          throw e;
+        }
         const member = await ctx.prisma.workspaceMember.findFirst({
           where: { userId: ctx.session.user!.id },
           include: { workspace: { select: { plan: true } } },
@@ -90,7 +133,13 @@ export const siteDetailRouter = router({
 
     connect: protectedProcedure
       .input(connectDomainSchema)
-      .mutation(async ({ input }) => {
+      .mutation(async ({ ctx, input }) => {
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "ADMIN");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          throw e;
+        }
         try {
           return await connectDomain(input.siteId, input.domain);
         } catch (e: unknown) {
@@ -102,11 +151,32 @@ export const siteDetailRouter = router({
 
     remove: protectedProcedure
       .input(z.object({ id: z.string() }))
-      .mutation(async ({ input }) => removeDomain(input.id)),
+      .mutation(async ({ ctx, input }) => {
+        const domain = await ctx.prisma.domain.findUnique({
+          where: { id: input.id },
+          select: { siteId: true },
+        });
+        if (!domain) throw new TRPCError({ code: "NOT_FOUND" });
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, domain.siteId, "ADMIN");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          throw e;
+        }
+        return removeDomain(input.id);
+      }),
 
     setPrimary: protectedProcedure
       .input(z.object({ id: z.string(), siteId: z.string() }))
-      .mutation(async ({ input }) => setPrimaryDomain(input.id, input.siteId)),
+      .mutation(async ({ ctx, input }) => {
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "ADMIN");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          throw e;
+        }
+        return setPrimaryDomain(input.id, input.siteId);
+      }),
   }),
 
   sharing: router({
@@ -116,14 +186,33 @@ export const siteDetailRouter = router({
 
     create: protectedProcedure
       .input(createShareLinkSchema)
-      .mutation(async ({ input }) => {
+      .mutation(async ({ ctx, input }) => {
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          throw e;
+        }
         const { siteId, ...data } = input;
         return createShareLink(siteId, data);
       }),
 
     revoke: protectedProcedure
       .input(z.object({ id: z.string() }))
-      .mutation(async ({ input }) => revokeShareLink(input.id)),
+      .mutation(async ({ ctx, input }) => {
+        const shareLink = await ctx.prisma.shareLink.findUnique({
+          where: { id: input.id },
+          select: { siteId: true },
+        });
+        if (!shareLink) throw new TRPCError({ code: "NOT_FOUND" });
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user!.id!, shareLink.siteId, "ADMIN");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          throw e;
+        }
+        return revokeShareLink(input.id);
+      }),
   }),
 
   analytics: protectedProcedure
