@@ -101,7 +101,7 @@ export const sitesRouter = router({
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "EDITOR");
       } catch (e) {
-        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
       return renameSite(input.id, input.name);
@@ -113,7 +113,7 @@ export const sitesRouter = router({
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "EDITOR");
       } catch (e) {
-        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
       const workspaceId = await getWorkspaceId(ctx);
@@ -135,7 +135,7 @@ export const sitesRouter = router({
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "ADMIN");
       } catch (e) {
-        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
       return archiveSite(input.id);
@@ -147,7 +147,7 @@ export const sitesRouter = router({
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "ADMIN");
       } catch (e) {
-        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
       return unarchiveSite(input.id);
@@ -159,7 +159,7 @@ export const sitesRouter = router({
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "OWNER");
       } catch (e) {
-        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
       try {
@@ -178,6 +178,22 @@ export const sitesRouter = router({
     .input(bulkActionSchema)
     .mutation(async ({ ctx, input }) => {
       const workspaceId = await getWorkspaceId(ctx);
+
+      const minRole = input.action === "delete" ? "OWNER"
+        : ["archive", "unarchive", "publish", "unpublish"].includes(input.action) ? "ADMIN"
+        : "EDITOR";
+
+      try {
+        await Promise.all(
+          input.siteIds.map((siteId: string) =>
+            checkSiteRole(ctx.prisma, ctx.session.user.id, siteId, minRole)
+          )
+        );
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+
       return bulkAction(workspaceId, input);
     }),
 
@@ -193,7 +209,7 @@ export const sitesRouter = router({
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "OWNER");
       } catch (e) {
-        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
       try {
@@ -285,7 +301,7 @@ export const sitesRouter = router({
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "ADMIN");
       } catch (e) {
-        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
       const workspaceId = await getWorkspaceId(ctx);
@@ -320,7 +336,7 @@ export const sitesRouter = router({
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user!.id!, job.siteId, "ADMIN");
       } catch (e) {
-        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
       try {
@@ -341,7 +357,7 @@ export const sitesRouter = router({
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "ADMIN");
       } catch (e) {
-        if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
       return unpublishSite(input.siteId);

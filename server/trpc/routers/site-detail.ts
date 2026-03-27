@@ -27,7 +27,7 @@ export const siteDetailRouter = router({
         try {
           await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "ADMIN");
         } catch (e) {
-          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
         const { id, ...data } = input;
@@ -46,7 +46,7 @@ export const siteDetailRouter = router({
         try {
           await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
         } catch (e) {
-          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
         const member = await ctx.prisma.workspaceMember.findFirst({
@@ -74,7 +74,7 @@ export const siteDetailRouter = router({
         try {
           await checkSiteRole(ctx.prisma, ctx.session.user!.id!, redirect.siteId, "EDITOR");
         } catch (e) {
-          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
         const { id, ...data } = input;
@@ -92,7 +92,7 @@ export const siteDetailRouter = router({
         try {
           await checkSiteRole(ctx.prisma, ctx.session.user!.id!, redirect.siteId, "EDITOR");
         } catch (e) {
-          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
         return deleteRedirect(input.id);
@@ -104,7 +104,7 @@ export const siteDetailRouter = router({
         try {
           await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
         } catch (e) {
-          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
         const member = await ctx.prisma.workspaceMember.findFirst({
@@ -137,7 +137,7 @@ export const siteDetailRouter = router({
         try {
           await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "ADMIN");
         } catch (e) {
-          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
         try {
@@ -160,7 +160,7 @@ export const siteDetailRouter = router({
         try {
           await checkSiteRole(ctx.prisma, ctx.session.user!.id!, domain.siteId, "ADMIN");
         } catch (e) {
-          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
         return removeDomain(input.id);
@@ -172,7 +172,7 @@ export const siteDetailRouter = router({
         try {
           await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "ADMIN");
         } catch (e) {
-          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
         return setPrimaryDomain(input.id, input.siteId);
@@ -190,7 +190,7 @@ export const siteDetailRouter = router({
         try {
           await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "EDITOR");
         } catch (e) {
-          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
         const { siteId, ...data } = input;
@@ -208,7 +208,7 @@ export const siteDetailRouter = router({
         try {
           await checkSiteRole(ctx.prisma, ctx.session.user!.id!, shareLink.siteId, "ADMIN");
         } catch (e) {
-          if (e instanceof PermissionError) throw new TRPCError({ code: e.code });
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
         return revokeShareLink(input.id);
