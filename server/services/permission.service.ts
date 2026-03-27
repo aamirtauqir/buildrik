@@ -1,6 +1,7 @@
 import type { PrismaClient } from "@prisma/client";
+import type { UserRoleType } from "@/lib/constants/enums";
 
-const ROLE_RANK: Record<string, number> = {
+const ROLE_RANK: Record<UserRoleType, number> = {
   VIEWER: 0,
   EDITOR: 1,
   ADMIN: 2,
@@ -18,18 +19,18 @@ export async function checkSiteRole(
   db: PrismaClient,
   userId: string,
   siteId: string,
-  minRole: "EDITOR" | "ADMIN" | "OWNER"
+  minRole: Exclude<UserRoleType, "VIEWER">
 ): Promise<void> {
   const site = await db.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
   if (!site) throw new PermissionError("NOT_FOUND");
 
   const member = await db.workspaceMember.findFirst({
-    where: { userId, workspaceId: site.workspaceId },
+    where: { userId, workspaceId: site.workspaceId, status: "ACTIVE" },
     include: { sitePermissions: { where: { siteId } } },
   });
   if (!member) throw new PermissionError("FORBIDDEN");
 
-  const effectiveRole = member.sitePermissions[0]?.roleOverride ?? member.role;
+  const effectiveRole = (member.sitePermissions[0]?.roleOverride ?? member.role) as UserRoleType;
   if ((ROLE_RANK[effectiveRole] ?? -1) < ROLE_RANK[minRole]) {
     throw new PermissionError("FORBIDDEN", "Insufficient permissions");
   }

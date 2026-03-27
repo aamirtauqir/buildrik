@@ -78,6 +78,17 @@ describe("checkSiteRole", () => {
     });
   });
 
+  it("throws FORBIDDEN for a SUSPENDED member", async () => {
+    // The ACTIVE filter causes findFirst to return null for suspended members
+    const db = {
+      site: { findUnique: vi.fn().mockResolvedValue({ workspaceId: "ws1" }) },
+      workspaceMember: { findFirst: vi.fn().mockResolvedValue(null) },
+    } as unknown as PrismaClient;
+    await expect(checkSiteRole(db, "u1", "s1", "EDITOR")).rejects.toMatchObject({
+      code: "FORBIDDEN",
+    });
+  });
+
   it("multi-workspace isolation: ADMIN in workspace-A cannot access site in workspace-B", async () => {
     const db = {
       site: {
