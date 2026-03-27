@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { CheckCircle2, Loader2, Circle, XCircle, RotateCcw } from "lucide-react";
 import { trpc } from "@/lib/trpc/client";
+import { usePublishSSE } from "@/lib/hooks/use-publish-sse";
 
 export const PUBLISH_STEPS = [
   "Generating pages",
@@ -21,9 +22,11 @@ interface PublishProgressProps {
 export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgressProps) {
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const status = trpc.sites.publishStatus.useQuery(
+  const sseJob = usePublishSSE(jobId);
+  // Fall back to tRPC polling if SSE hasn't delivered data yet
+  const pollStatus = trpc.sites.publishStatus.useQuery(
     { jobId },
-    { refetchInterval: 2000, enabled: !!jobId }
+    { refetchInterval: sseJob ? false : 2000, enabled: !sseJob }
   );
 
   const cancelMutation = trpc.sites.cancelPublish.useMutation({
@@ -32,7 +35,7 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
     },
   });
 
-  const job = status.data;
+  const job = sseJob ?? pollStatus.data;
   const progress = job?.progress ?? 0;
   const isFailed = job?.status === "FAILED";
   const isCompleted = job?.status === "COMPLETED";
@@ -54,7 +57,7 @@ export function PublishProgress({ jobId, onComplete, onCancel }: PublishProgress
   }
 
   function handleRetry() {
-    status.refetch();
+    pollStatus.refetch();
   }
 
   return (

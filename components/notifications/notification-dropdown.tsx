@@ -4,10 +4,13 @@ import { useState, useRef, useEffect } from "react";
 import { Bell } from "lucide-react";
 import { trpc } from "@/lib/trpc/client";
 import { NotificationItem } from "./notification-item";
+import { useNotificationSSE } from "@/lib/hooks/use-notification-sse";
 
 export function NotificationDropdown() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  useNotificationSSE();
 
   const { data: recentData } = trpc.notifications.recent.useQuery(undefined, {
     enabled: open,
