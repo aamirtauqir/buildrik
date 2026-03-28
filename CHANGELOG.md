@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.1.2] — 2026-03-28
+
+### Security
+
+- **OAuth 2FA gate** — `signIn` callback in `auth.config.ts` now checks `twoFactorEnabled` for OAuth accounts and returns a `/auth/2fa?token=<2fa_temp>` redirect string instead of granting a session directly; OAuth logins no longer bypass 2FA
+- **Real session revocation** — `protectedProcedure` in `trpc.ts` queries the `Session` DB table on every request using `dbSessionId` embedded in the JWT; revoked sessions are rejected mid-flight with `UNAUTHORIZED`; legacy sessions without `dbSessionId` are allowed through for backward compat
+- **`dbSessionId` in JWT** — `/api/auth/create-session` now generates a UUID via `randomUUID()` (replacing the prior SHA-256 of the JWT), embeds it in the JWT payload, and stores it as `Session.sessionToken` in the DB; enables DB-side revocation without knowing the raw JWT
+- **`returnUrl` open redirect prevention** — `/auth/redirect` validates `returnUrl` via same-origin check (`new URL(url, window.location.origin).origin === window.location.origin`) before redirecting; cross-origin URLs are silently ignored
+
+### Features
+
+- **Account deletion cron** — `GET /api/cron/account-deletion` processes `AccountDeletionReq` records past `scheduledAt`; runs user deletion and marks `processedAt` in a single `$transaction`; authenticated via `CRON_SECRET` bearer token
+- **SecurityTab currentSessionId** — `settings/security/page.tsx` is now a Server Component that reads `session.user.dbSessionId` from NextAuth and threads it to `SecurityTab`; "Current device" badge and "Revoke all other sessions" now work correctly
+
+### Tests
+
+- 18 regression tests in `__tests__/auth-hardening-v2.test.ts` covering: OAuth 2FA gate ordering, DB session check source structure, `randomUUID` in `create-session`, `returnUrl` same-origin validation, account deletion cron auth/query/transaction/behavioral
+
 ## [0.1.1] — 2026-03-28
 
 ### Security
