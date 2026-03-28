@@ -50,7 +50,7 @@ export default function SiteDomainsPage() {
     <DomainsTab
       domains={domainsQuery.data ?? []}
       onConnect={(domain) => connectMutation.mutate({ siteId, domain })}
-      onRemove={(id) => removeMutation.mutate({ id })}
+      onRemove={(id) => removeMutation.mutate({ id, siteId })}
       onSetPrimary={(id) => setPrimaryMutation.mutate({ id, siteId })}
     />
   );

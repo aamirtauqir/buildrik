@@ -39,7 +39,7 @@ export default function SiteAccessPage() {
     <AccessTab
       shareLinks={linksQuery.data ?? []}
       onCreateLink={(data) => createMutation.mutate({ siteId, ...data })}
-      onRevokeLink={(id) => revokeMutation.mutate({ id })}
+      onRevokeLink={(id) => revokeMutation.mutate({ id, siteId })}
       maxExpiryDays={planLimits.shareLinkExpiryMaxDays as number}
       allowPasswords={!!planLimits.shareLinkPasswords}
     />
