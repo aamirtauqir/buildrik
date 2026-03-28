@@ -19,8 +19,9 @@ describe("Login non-2FA session creation", () => {
     expect(usesSignInCredentials).toBe(false);
   });
 
-  it("login page calls /api/auth/create-session for non-2FA success", () => {
-    expect(loginPageSource).toContain("/api/auth/create-session");
+  it("login page calls createClientSession for non-2FA success", () => {
+    // Page uses the createClientSession helper which internally calls /api/auth/create-session
+    expect(loginPageSource).toContain("createClientSession");
   });
 
   it("router returns sessionToken for non-2FA login", () => {
