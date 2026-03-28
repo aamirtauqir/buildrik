@@ -144,11 +144,17 @@ function LoginContent() {
 
         <div className="h-6" />
 
-        <SocialButton provider="google" onClick={() => signIn("google", { callbackUrl: "/auth/redirect" })} />
+        <SocialButton provider="google" onClick={() => {
+          try { if (rememberMe) sessionStorage.setItem("buildrik_rememberMe", "true"); } catch { /* private browsing */ }
+          signIn("google");
+        }} />
 
         <div className="h-2" />
 
-        <SocialButton provider="github" onClick={() => signIn("github", { callbackUrl: "/auth/redirect" })} />
+        <SocialButton provider="github" onClick={() => {
+          try { if (rememberMe) sessionStorage.setItem("buildrik_rememberMe", "true"); } catch { /* private browsing */ }
+          signIn("github");
+        }} />
 
         <div className="h-6" />
 

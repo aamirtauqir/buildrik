@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4] — 2026-03-29
+
+### Security / UX
+
+- **OAuth session duration now respects `rememberMe`** — `signIn` callback generates a `session_grant` token for non-2FA OAuth users and redirects to `/auth/oauth-redirect` instead of returning `true`. The new page reads `buildrik_rememberMe` from sessionStorage (stored by the login page before the provider redirect) and calls `createClientSession`. OAuth and credential sessions now go through an identical path with the same cookie lifetime logic.
+- Login page stores `buildrik_rememberMe` in sessionStorage before initiating Google/GitHub OAuth redirect.
+
 ## [0.1.3] — 2026-03-28
 
 ### Features

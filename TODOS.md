@@ -2,13 +2,8 @@
 
 ## Auth
 
-### OAuth session cookie duration is not user-controllable
-**What:** OAuth logins (Google, GitHub) always set a 30-day session cookie. Credential logins respect a `rememberMe` flag. The two paths behave inconsistently.
-**Why:** `authConfig.cookies.sessionToken.maxAge` is hard-coded to 30 days. NextAuth doesn't give a clean hook to vary cookie duration per-sign-in for OAuth.
-**Pros:** Giving users control over session duration improves security hygiene.
-**Cons:** Requires either a custom OAuth session handler or a post-login "active session" UI to let users manage session length.
-**Context:** Credential login uses `rememberMe` (boolean) passed to `/api/auth/create-session`. OAuth flow goes through NextAuth directly and sets the cookie in `authConfig.cookies`. The fix would need to intercept the NextAuth session token being set for OAuth, which may require a custom cookie handler or redirecting OAuth post-login through the same `/api/auth/create-session` endpoint.
-**Depends on:** Nothing blocking. Can be tackled whenever UX polish is prioritized.
+### ~~OAuth session cookie duration is not user-controllable~~ DONE (v0.1.4)
+`auth.config.ts` signIn callback now generates a `session_grant` token for non-2FA OAuth users and returns `/auth/oauth-redirect?token=...` instead of `true`. The new `/auth/oauth-redirect` page reads `buildrik_rememberMe` from sessionStorage (stored by the login page before the OAuth redirect) and calls `createClientSession`. OAuth and credential sessions now go through the identical path.
 
 ### ~~DB session check in protectedProcedure for real session revocation~~ DONE (v0.1.2)
 `protectedProcedure` in `server/trpc/trpc.ts` now checks `Session` DB record on each request using `dbSessionId` embedded in JWT. Legacy sessions without `dbSessionId` are allowed through for backward compat.

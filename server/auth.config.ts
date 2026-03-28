@@ -59,6 +59,11 @@ export const authConfig: NextAuthConfig = {
           const tempToken = await generateToken("2fa_temp", user.id as string, 5);
           return `/auth/2fa?token=${tempToken}`;
         }
+
+        // Route all OAuth logins through createClientSession so rememberMe is
+        // respected and session duration is consistent with credential logins.
+        const sessionGrant = await generateToken("session_grant", user.id as string, 5);
+        return `/auth/oauth-redirect?token=${sessionGrant}`;
       }
       return true;
     },

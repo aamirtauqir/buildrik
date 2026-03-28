@@ -19,6 +19,9 @@ vi.mock("@/lib/prisma", () => ({
     account: {
       findFirst: vi.fn(),
     },
+    verificationToken: {
+      create: vi.fn().mockResolvedValue({}),
+    },
     $transaction: vi.fn(async (cb: (tx: typeof txClient) => Promise<unknown>) => cb(txClient)),
   },
 }));
@@ -48,8 +51,11 @@ describe("OAuth signIn callback", () => {
   });
 
   it("creates a new user when OAuth user does not exist in DB and sets user.id to DB id", async () => {
-    // User not found in DB
-    mockPrisma.user.findUnique.mockResolvedValue(null);
+    // First findUnique: user lookup (returns null — new user)
+    // Second findUnique: twoFactorEnabled check (returns user without 2FA)
+    mockPrisma.user.findUnique
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ twoFactorEnabled: false });
     txUserCreate.mockResolvedValue({
       id: "new-db-user-id",
       email: "oauth@example.com",
@@ -65,7 +71,9 @@ describe("OAuth signIn callback", () => {
       credentials: undefined as any,
     } as any);
 
-    expect(result).toBe(true);
+    // signIn now routes OAuth through /auth/oauth-redirect for consistent session handling
+    expect(typeof result).toBe("string");
+    expect(result as string).toMatch(/^\/auth\/oauth-redirect\?token=/);
     expect(txUserCreate).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
@@ -76,15 +84,15 @@ describe("OAuth signIn callback", () => {
         }),
       })
     );
-    // Critical: user.id must be set to our DB id for jwt callback
+    // Critical: user.id must be set to our DB id before session_grant is generated
     expect(userObj.id).toBe("new-db-user-id");
   });
 
   it("sets user.id to DB id when OAuth user already exists", async () => {
-    mockPrisma.user.findUnique.mockResolvedValue({
-      id: "existing-db-id",
-      email: "oauth@example.com",
-    } as any);
+    // First findUnique: user lookup; second: twoFactorEnabled check
+    mockPrisma.user.findUnique
+      .mockResolvedValueOnce({ id: "existing-db-id", email: "oauth@example.com" } as any)
+      .mockResolvedValueOnce({ twoFactorEnabled: false });
 
     const signInCallback = authConfig.callbacks!.signIn!;
     const userObj = { id: "provider-id", email: "oauth@example.com", name: "OAuth User" } as any;
@@ -95,9 +103,10 @@ describe("OAuth signIn callback", () => {
       credentials: undefined as any,
     } as any);
 
-    expect(result).toBe(true);
+    expect(typeof result).toBe("string");
+    expect(result as string).toMatch(/^\/auth\/oauth-redirect\?token=/);
     expect(mockPrisma.user.create).not.toHaveBeenCalled();
-    // Critical: user.id must be set to our DB id for jwt callback
+    // Critical: user.id must be set to our DB id before session_grant is generated
     expect(userObj.id).toBe("existing-db-id");
   });
 
