@@ -10,21 +10,11 @@
 **Context:** Credential login uses `rememberMe` (boolean) passed to `/api/auth/create-session`. OAuth flow goes through NextAuth directly and sets the cookie in `authConfig.cookies`. The fix would need to intercept the NextAuth session token being set for OAuth, which may require a custom cookie handler or redirecting OAuth post-login through the same `/api/auth/create-session` endpoint.
 **Depends on:** Nothing blocking. Can be tackled whenever UX polish is prioritized.
 
-### DB session check in protectedProcedure for real session revocation
-**What:** Add a DB `Session` lookup to `protectedProcedure` in `server/trpc/trpc.ts` on each request. Reject if no active session record found.
-**Why:** JWT strategy is stateless — deleting `Session` rows does NOT revoke other devices. "Logout everywhere" and "revoke session" are currently display-only controls. A user on another device remains authenticated until their JWT expires even after you delete their DB record.
-**Pros:** Real session revocation. "Logout everywhere" actually logs out everywhere. Session limit enforcement has teeth.
-**Cons:** One DB read per authenticated request (~3-5ms). Must handle gracefully if session record missing (legacy OAuth sessions before Approach A fix).
-**Context:** This is Approach B scope in the auth hardening plan. Tracked at `~/.gstack/projects/buildrik/2026-03-28-design-auth-hardening.md`. The `Session.sessionToken` field stores sha256(JWT) for credential sessions. For OAuth sessions (after Approach A), it stores a `dbSessionId` UUID embedded in the JWT. The lookup would use `token.dbSessionId` for OAuth and reconstruct sha256(cookie) for credential sessions.
-**Depends on:** Approach A (auth-hardening) must ship first to ensure OAuth users have DB Session records.
+### ~~DB session check in protectedProcedure for real session revocation~~ DONE (v0.1.2)
+`protectedProcedure` in `server/trpc/trpc.ts` now checks `Session` DB record on each request using `dbSessionId` embedded in JWT. Legacy sessions without `dbSessionId` are allowed through for backward compat.
 
-### Fix SecurityTab currentSessionId to display active session correctly
-**What:** `components/settings/security-tab.tsx` accepts a `currentSessionId` prop but `app/dashboard/settings/security/page.tsx` never passes it. The "current" session indicator is always empty.
-**Why:** After Approach A, OAuth sessions will have a `dbSessionId` embedded in the JWT. Credential sessions have `sha256(JWT)` as the session token. The page needs to read the current session identifier from the JWT and pass it to `SecurityTab`.
-**Pros:** Users can see which session is "this device."
-**Cons:** Requires reading the JWT on the server side in the settings page. For credential sessions, this means decoding the cookie and hashing it.
-**Context:** The `current` DB field is set correctly after Approach A. The missing piece is threading the identifier through to the UI.
-**Depends on:** Approach A (auth-hardening) + DB session check in protectedProcedure.
+### ~~Fix SecurityTab currentSessionId to display active session correctly~~ DONE (v0.1.2)
+`security/page.tsx` is now a Server Component that reads `session.user.dbSessionId` from NextAuth and passes it to `SecurityTab`. "Current device" highlights correctly and "Revoke all other sessions" works.
 
 
 ### Email-first unified auth flow (Phase 2)
@@ -35,21 +25,11 @@
 **Context:** Identified during CEO review of auth UX (2026-03-28). Deferred from the auth-ux-hardening scope to ship as Phase 2 after the conversion bug fixes land. CEO plan at `~/.gstack/projects/buildrik/ceo-plans/2026-03-28-auth-ux-hardening.md`.
 **Depends on:** Auth UX hardening (auto-login, smart error CTA, etc.) should ship first.
 
-### OAuth logins bypass 2FA entirely
-**What:** Social sign-in (Google, GitHub) via NextAuth never checks `twoFactorEnabled` on the User model. A user who enables 2FA for their account can still be logged in without a TOTP challenge via OAuth.
-**Why:** The current OAuth flow goes through NextAuth's `signIn()` callback, which creates a session immediately without any 2FA gate. The credential login flow checks `twoFactorEnabled` and redirects to `/auth/2fa`, but OAuth has no equivalent check.
-**Pros:** Fixing this ensures 2FA enforcement is consistent across all login methods. Users who enable 2FA expect it to apply everywhere.
-**Cons:** Requires intercepting the OAuth callback, checking `twoFactorEnabled`, and redirecting to the 2FA page if enabled. This may require storing a pending OAuth session and completing it after 2FA verification.
-**Context:** Identified by Codex during CEO review of auth UX (2026-03-28). This blocks the "trust this device" feature because trust device adds complexity to a 2FA flow that isn't enforced for all paths.
-**Depends on:** Nothing blocking. Should be P1 since it's a real security gap.
+### ~~OAuth logins bypass 2FA entirely~~ DONE (v0.1.2)
+`auth.config.ts` signIn callback now checks `twoFactorEnabled` after resolving the user. If true, returns `/auth/2fa?token=<2fa_temp>` — OAuth login redirects to the 2FA page instead of creating a session directly. Same TOTP flow as credential login.
 
-### returnUrl is ignored across all auth pages
-**What:** When users arrive at `/auth/login?returnUrl=/invite/abc`, the returnUrl is dropped after login. Users always land in the default dashboard flow instead of the intended destination.
-**Why:** `login/page.tsx`, `2fa/page.tsx`, `magic-link/page.tsx`, and `redirect/page.tsx` all ignore `returnUrl` from search params. The onboarding flow in `use-onboarding-flow.ts` routes to default destinations.
-**Pros:** Fixing this makes invite links, shared links, and any deep-link-to-login flow work correctly. Users land where they intended to go.
-**Cons:** Requires threading returnUrl through login → 2FA → redirect → final destination. Need to validate returnUrl to prevent open redirect attacks (only allow same-origin URLs).
-**Context:** Identified by Codex during CEO review (2026-03-28). Currently breaks invite-to-workspace flow.
-**Depends on:** Nothing blocking. Can be done alongside or after auth UX hardening.
+### ~~returnUrl is ignored across all auth pages~~ DONE (v0.1.2)
+`app/auth/redirect/page.tsx` now reads `?returnUrl=` from search params. Same-origin validated (prevents open redirect). When onboarding is complete and returnUrl is present, redirects there instead of /dashboard.
 
 ### 2FA "Trust this device" cookie
 **What:** Add a "Trust this device for 30 days" checkbox on the 2FA page. When checked, set an HMAC-signed cookie that bypasses 2FA on subsequent logins from the same browser.

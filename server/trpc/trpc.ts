@@ -28,6 +28,21 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
   if (!ctx.session?.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+
+  // Verify DB session is still active — enables real session revocation.
+  // Sessions without a dbSessionId are legacy pre-v0.1.1 tokens; allow them through
+  // so existing sessions aren't broken on deploy.
+  const dbSessionId = ctx.session.user.dbSessionId;
+  if (dbSessionId) {
+    const activeSession = await ctx.prisma.session.findFirst({
+      where: { sessionToken: dbSessionId, expires: { gt: new Date() } },
+      select: { id: true },
+    });
+    if (!activeSession) {
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "Session expired or revoked" });
+    }
+  }
+
   return next({ ctx: { ...ctx, session: { ...ctx.session, user: ctx.session.user } } });
 });
 

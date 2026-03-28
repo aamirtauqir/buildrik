@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createHash } from "crypto";
+import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { validateToken, invalidateToken } from "@/server/services/token.service";
 import { encode } from "next-auth/jwt";
@@ -47,24 +47,28 @@ export async function POST(req: NextRequest) {
 
   const maxAge = rememberMe ? 30 * 24 * 60 * 60 : undefined;
 
+  // Use a UUID as the session identifier — embedded in JWT and stored in DB.
+  // This allows protectedProcedure to verify the session is still active on each request.
+  const dbSessionId = randomUUID();
+
   const token = await encode({
     token: {
       sub: user.id,
       email: user.email,
       name: user.fullName,
       userId: user.id,
+      dbSessionId,
     },
     secret: process.env.NEXTAUTH_SECRET!,
     salt: cookieName,
   });
 
   // Create Session DB record for session management + active sessions display
-  const hashedJWT = createHash("sha256").update(token).digest("hex");
   const expires = new Date(Date.now() + (maxAge ?? 24 * 60 * 60) * 1000);
   await prisma.session.create({
     data: {
       userId: user.id,
-      sessionToken: hashedJWT,
+      sessionToken: dbSessionId,
       expires,
       device: req.headers.get("user-agent") ?? undefined,
       ip: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? undefined,

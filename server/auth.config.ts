@@ -5,6 +5,7 @@ import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { logAuditEvent } from "@/server/services/audit.service";
 import { createWorkspaceForUser } from "@/server/services/auth.service";
+import { generateToken } from "@/server/services/token.service";
 
 export const authConfig: NextAuthConfig = {
   providers: [
@@ -46,6 +47,18 @@ export const authConfig: NextAuthConfig = {
           await prisma.user.update({ where: { id: existing.id }, data: { lastLoginAt: new Date() } });
           await logAuditEvent("OAUTH_LOGIN", "success", { userId: existing.id, email: user.email });
         }
+
+        // Gate OAuth login behind 2FA if user has it enabled.
+        // Return a redirect URL — NextAuth will redirect without creating a session.
+        // The 2FA page completes login via createClientSession (same as credential flow).
+        const resolvedUser = await prisma.user.findUnique({
+          where: { id: user.id as string },
+          select: { twoFactorEnabled: true },
+        });
+        if (resolvedUser?.twoFactorEnabled) {
+          const tempToken = await generateToken("2fa_temp", user.id as string, 5);
+          return `/auth/2fa?token=${tempToken}`;
+        }
       }
       return true;
     },
@@ -76,11 +89,17 @@ export const authConfig: NextAuthConfig = {
           console.error("[auth] Failed to create OAuth session record:", err);
         }
       }
+      if (token.dbSessionId) {
+        token.dbSessionId = token.dbSessionId;
+      }
       return token;
     },
     async session({ session, token }) {
       if (token.userId) {
         session.user.id = token.userId as string;
+      }
+      if (token.dbSessionId) {
+        session.user.dbSessionId = token.dbSessionId as string;
       }
       return session;
     },
