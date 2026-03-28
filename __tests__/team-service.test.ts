@@ -89,34 +89,34 @@ describe("Team Service", () => {
   });
 
   describe("changeRole", () => {
-    it("updates member role", async () => {
+    it("updates member role, scoped to workspaceId", async () => {
       const { changeRole } = await import("@/server/services/team.service");
-      vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
         id: "m1", role: "EDITOR", userId: "u2", workspaceId: "ws1",
       } as any);
       vi.mocked(prisma.workspaceMember.count).mockResolvedValue(2);
-      vi.mocked(prisma.workspaceMember.update).mockResolvedValue({
-        id: "m1", role: "ADMIN",
-      } as any);
-      const result = await changeRole("m1", "ADMIN", "u1");
-      expect(result.role).toBe("ADMIN");
+      vi.mocked(prisma.workspaceMember.updateMany).mockResolvedValue({ count: 1 });
+      await changeRole("m1", "ws1", "ADMIN", "u1");
+      expect(prisma.workspaceMember.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: "m1", workspaceId: "ws1" } })
+      );
     });
 
     it("prevents changing owner role", async () => {
       const { changeRole } = await import("@/server/services/team.service");
-      vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
-        id: "m1", role: "OWNER", userId: "u1",
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
+        id: "m1", role: "OWNER", userId: "u1", workspaceId: "ws1",
       } as any);
-      await expect(changeRole("m1", "EDITOR", "u2")).rejects.toThrow("CANNOT_CHANGE_OWNER");
+      await expect(changeRole("m1", "ws1", "EDITOR", "u2")).rejects.toThrow("CANNOT_CHANGE_OWNER");
     });
 
     it("prevents demoting last admin", async () => {
       const { changeRole } = await import("@/server/services/team.service");
-      vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
         id: "m1", role: "ADMIN", userId: "u2", workspaceId: "ws1",
       } as any);
       vi.mocked(prisma.workspaceMember.count).mockResolvedValue(1);
-      await expect(changeRole("m1", "EDITOR", "u1")).rejects.toThrow("LAST_ADMIN");
+      await expect(changeRole("m1", "ws1", "EDITOR", "u1")).rejects.toThrow("LAST_ADMIN");
     });
   });
 
