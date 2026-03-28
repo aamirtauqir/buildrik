@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.1.3] — 2026-03-28
+
+### Features
+
+- **2FA "Trust this device" cookie** — HMAC-SHA256 cookie (`buildrik_trust_device`) lets users skip TOTP for 30 days on trusted browsers. `checkTrustDevice` tRPC mutation validates the cookie server-side and returns a `session_grant` directly. The 2FA page and backup-code page both show a "Trust this device for 30 days" checkbox. Cookie is auto-revoked when the user changes their password (`passwordChangedAt` field added to User model).
+
+### Security
+
+- **`passwordChangedAt` stamped on password change** — `changePassword` in `account.service.ts` now writes `passwordChangedAt: new Date()` to the user record, enabling trust-device cookies to be invalidated after a password reset.
+- **Trust cookie is `SameSite=strict` + `httpOnly`** — prevents CSRF and JS access; cookie is verified server-side via `ctx.headers` in the tRPC mutation.
+- **`2fa_temp` token consumed on trusted bypass** — `checkTrustDevice` calls `invalidateToken` before returning the `session_grant`, preventing token replay.
+
+### Schema
+
+- Added `passwordChangedAt DateTime?` to the `User` model. Run `npx prisma db push` to apply.
+
+### Tests
+
+- 23 tests in `__tests__/trust-device.test.ts`: unit tests for `signTrustDevice`/`verifyTrustDevice`/`parseTrustDeviceCookie`, source analysis for `create-session` cookie setting, 2FA/backup page checkbox + auto-bypass, `checkTrustDevice` mutation structure, `changePassword` stamping
+
 ## [0.1.2] — 2026-03-28
 
 ### Security

@@ -10,9 +10,10 @@ import {
   loginSchema, signupSchema, forgotPasswordSchema,
   resetPasswordSchema, otpSchema, backupCodeSchema, magicLinkSchema,
 } from "@/lib/validations/auth";
-import { generateToken } from "@/server/services/token.service";
+import { generateToken, validateToken, invalidateToken } from "@/server/services/token.service";
 import { logAuditEvent } from "@/server/services/audit.service";
 import { createNotification } from "@/server/services/notification.trigger";
+import { verifyTrustDevice, parseTrustDeviceCookie } from "@/server/services/trust-device.service";
 
 // Strict: 5 attempts per 15 min (login, 2FA, token verification)
 const strictRateLimit = createRateLimitedProcedure(5, 15 * 60 * 1000);
@@ -250,5 +251,36 @@ export const authRouter = router({
       }
       await logAuditEvent("INVITE_DECLINED", "success");
       return { message: "Invite declined" };
+    }),
+
+  /**
+   * Checks if the current browser has a valid "trust this device" cookie for the
+   * user behind the given 2FA temp token. If trusted, consumes the temp token and
+   * returns a session_grant token so the 2FA page can skip TOTP entry entirely.
+   */
+  checkTrustDevice: strictRateLimit
+    .input(z.object({ twoFactorToken: z.string().uuid() }))
+    .mutation(async ({ input, ctx }) => {
+      const userId = await validateToken(input.twoFactorToken, "2fa_temp");
+      if (!userId) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid or expired token" });
+      }
+
+      const cookieHeader = ctx.headers?.get("cookie");
+      const cookieValue = parseTrustDeviceCookie(cookieHeader);
+
+      const user = await ctx.prisma.user.findUnique({
+        where: { id: userId },
+        select: { passwordChangedAt: true },
+      });
+
+      if (!verifyTrustDevice(userId, cookieValue, user?.passwordChangedAt)) {
+        return { trusted: false, sessionToken: null };
+      }
+
+      // Consume the 2FA temp token so it cannot be replayed
+      await invalidateToken(input.twoFactorToken);
+      const sessionToken = await generateToken("session_grant", userId, 5);
+      return { trusted: true, sessionToken };
     }),
 });

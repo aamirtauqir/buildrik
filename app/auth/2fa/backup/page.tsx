@@ -21,6 +21,7 @@ function BackupCodeContent() {
   const [backupCode, setBackupCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
+  const [trustDevice, setTrustDevice] = useState(false);
 
   useEffect(() => {
     try {
@@ -33,7 +34,7 @@ function BackupCodeContent() {
 
   const verifyBackupCodeMutation = trpc.auth.verifyBackupCode.useMutation({
     onSuccess: async (data) => {
-      const ok = await createClientSession(data.sessionToken, rememberMe);
+      const ok = await createClientSession(data.sessionToken, rememberMe, trustDevice);
       if (ok) {
         router.push("/auth/redirect");
       } else {
@@ -76,6 +77,20 @@ function BackupCodeContent() {
         value={backupCode}
         onChange={(e) => setBackupCode(e.target.value.toUpperCase())}
       />
+
+      <div className="h-4" />
+
+      <label className="flex items-center gap-2 cursor-pointer select-none">
+        <input
+          type="checkbox"
+          checked={trustDevice}
+          onChange={(e) => setTrustDevice(e.target.checked)}
+          className="h-4 w-4 rounded border-gray-300 accent-[#E42313]"
+        />
+        <span className="text-auth-label text-auth-text-muted">
+          Trust this device for 30 days
+        </span>
+      </label>
 
       <div className="h-5" />
 

@@ -21,6 +21,8 @@ function TwoFAContent() {
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
+  const [trustDevice, setTrustDevice] = useState(false);
+  const [checkingTrust, setCheckingTrust] = useState(true);
 
   useEffect(() => {
     try {
@@ -31,9 +33,34 @@ function TwoFAContent() {
     }
   }, []);
 
+  const checkTrustMutation = trpc.auth.checkTrustDevice.useMutation({
+    onSuccess: async (data) => {
+      if (data.trusted && data.sessionToken) {
+        const ok = await createClientSession(data.sessionToken, rememberMe);
+        if (ok) {
+          router.push("/auth/redirect");
+          return;
+        }
+      }
+      setCheckingTrust(false);
+    },
+    onError: () => {
+      setCheckingTrust(false);
+    },
+  });
+
+  useEffect(() => {
+    if (token) {
+      checkTrustMutation.mutate({ twoFactorToken: token });
+    } else {
+      setCheckingTrust(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
   const verify2FAMutation = trpc.auth.verify2FA.useMutation({
     onSuccess: async (data) => {
-      const ok = await createClientSession(data.sessionToken, rememberMe);
+      const ok = await createClientSession(data.sessionToken, rememberMe, trustDevice);
       if (ok) {
         router.push("/auth/redirect");
       } else {
@@ -53,6 +80,16 @@ function TwoFAContent() {
     if (code.length < 6) return;
     verify2FAMutation.mutate({ twoFactorToken: token || "", code });
   };
+
+  if (checkingTrust) {
+    return (
+      <AuthCard>
+        <div className="flex min-h-[200px] items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#E42313] border-t-transparent" />
+        </div>
+      </AuthCard>
+    );
+  }
 
   return (
     <AuthCard>
@@ -82,6 +119,20 @@ function TwoFAContent() {
       <p className="text-auth-subtitle text-auth-text-muted text-center">
         Open your authenticator app to get the code.
       </p>
+
+      <div className="h-4" />
+
+      <label className="flex items-center gap-2 cursor-pointer select-none">
+        <input
+          type="checkbox"
+          checked={trustDevice}
+          onChange={(e) => setTrustDevice(e.target.checked)}
+          className="h-4 w-4 rounded border-gray-300 accent-[#E42313]"
+        />
+        <span className="text-auth-label text-auth-text-muted">
+          Trust this device for 30 days
+        </span>
+      </label>
 
       <div className="h-5" />
 

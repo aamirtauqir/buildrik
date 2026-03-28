@@ -24,9 +24,10 @@ model User {
   provider         String    @default("email")
   lockedUntil      DateTime?
   failedAttempts   Int       @default(0)
-  lastLoginAt      DateTime?
-  emailBounceCount Int       @default(0)
-  deletedAt        DateTime?
+  lastLoginAt        DateTime?
+  passwordChangedAt  DateTime?
+  emailBounceCount   Int       @default(0)
+  deletedAt          DateTime?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 

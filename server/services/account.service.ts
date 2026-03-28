@@ -17,7 +17,7 @@ export async function changePassword(userId: string, currentPassword: string, ne
   const hash = await bcrypt.hash(newPassword, 10);
   await prisma.user.update({
     where: { id: userId },
-    data: { passwordHash: hash },
+    data: { passwordHash: hash, passwordChangedAt: new Date() },
   });
 
   createNotification({

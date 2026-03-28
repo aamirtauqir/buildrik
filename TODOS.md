@@ -31,13 +31,8 @@
 ### ~~returnUrl is ignored across all auth pages~~ DONE (v0.1.2)
 `app/auth/redirect/page.tsx` now reads `?returnUrl=` from search params. Same-origin validated (prevents open redirect). When onboarding is complete and returnUrl is present, redirects there instead of /dashboard.
 
-### 2FA "Trust this device" cookie
-**What:** Add a "Trust this device for 30 days" checkbox on the 2FA page. When checked, set an HMAC-signed cookie that bypasses 2FA on subsequent logins from the same browser.
-**Why:** Daily TOTP entry for the same device is friction that doesn't add security. Users on trusted devices should be able to skip 2FA.
-**Pros:** Reduces daily friction for 2FA users. Standard feature in most SaaS products. HMAC-signed cookie means no DB migration needed.
-**Cons:** Adds a 2FA bypass path that must be audited. Requires passwordChangedAt field on User model to auto-revoke on password change. No per-device revocation without a DB-backed approach.
-**Context:** Accepted in CEO review scope, then deferred after Codex review found that OAuth bypasses 2FA entirely. Trust device should not be built until OAuth 2FA enforcement is fixed.
-**Depends on:** OAuth 2FA enforcement fix (above). Also needs passwordChangedAt Prisma migration.
+### ~~2FA "Trust this device" cookie~~ DONE (v0.1.3)
+`server/services/trust-device.service.ts` signs/verifies an HMAC-SHA256 cookie (`buildrik_trust_device`). `checkTrustDevice` tRPC mutation reads the cookie from `ctx.headers`, verifies it, and returns a `session_grant` token if trusted — the 2FA page auto-redirects without showing TOTP. Cookie is auto-revoked on password change via `passwordChangedAt` field on User. Checkbox on both 2FA and backup-code pages.
 
 ### OAuth email-only account linking may allow account takeover
 **What:** `server/auth.config.ts` signIn callback links OAuth users to existing accounts by matching email only. No `Account` model linkage, no verified-email proof beyond trusting the provider. If a new OAuth provider account is created with the same email as an existing credential account, the OAuth login silently gains access.

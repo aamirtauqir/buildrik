@@ -5,10 +5,12 @@ import { prisma } from "@/lib/prisma";
 import { validateToken, invalidateToken } from "@/server/services/token.service";
 import { encode } from "next-auth/jwt";
 import { logAuditEvent } from "@/server/services/audit.service";
+import { signTrustDevice, TRUST_DEVICE_COOKIE } from "@/server/services/trust-device.service";
 
 const createSessionSchema = z.object({
   sessionToken: z.string().uuid(),
   rememberMe: z.boolean().optional().default(false),
+  trustDevice: z.boolean().optional().default(false),
 });
 
 export async function POST(req: NextRequest) {
@@ -17,7 +19,7 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 });
   }
-  const { sessionToken, rememberMe } = parsed.data;
+  const { sessionToken, rememberMe, trustDevice } = parsed.data;
 
   // CSRF: verify request comes from same origin
   const origin = req.headers.get("origin");
@@ -100,6 +102,16 @@ export async function POST(req: NextRequest) {
     path: "/",
     ...(maxAge !== undefined ? { maxAge } : {}),
   });
+
+  if (trustDevice) {
+    response.cookies.set(TRUST_DEVICE_COOKIE, signTrustDevice(user.id), {
+      httpOnly: true,
+      secure: isSecure,
+      sameSite: "strict" as const,
+      path: "/",
+      maxAge: 30 * 24 * 60 * 60,
+    });
+  }
 
   return response;
 }

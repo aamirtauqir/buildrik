@@ -63,11 +63,12 @@ describe("F5: 2FA and backup pages handle create-session failure", () => {
   const backupSrc = readPage("app/auth/2fa/backup/page.tsx");
 
   it("2FA page handles !res.ok from create-session", () => {
-    // Should have else clause after res.ok check
-    const onSuccessSection = twoFASrc.slice(
-      twoFASrc.indexOf("onSuccess:"),
-      twoFASrc.indexOf("onError:")
-    );
+    // verify2FAMutation.onSuccess must have setError fallback.
+    // Use the last onSuccess: before verify2FAMutation's onError: block.
+    const verify2FAStart = twoFASrc.indexOf("verify2FAMutation");
+    const onSuccessPos = twoFASrc.indexOf("onSuccess:", verify2FAStart);
+    const onErrorPos = twoFASrc.indexOf("onError:", verify2FAStart);
+    const onSuccessSection = twoFASrc.slice(onSuccessPos, onErrorPos);
     expect(onSuccessSection).toContain("setError");
   });
 
