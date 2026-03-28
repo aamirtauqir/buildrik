@@ -9,10 +9,10 @@ vi.mock("@/lib/prisma", () => ({
     workspaceMember: { count: vi.fn() },
     formSubmission: { count: vi.fn() },
     formBlock: { findMany: vi.fn() },
-    redirect: { findMany: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
-    domain: { findMany: vi.fn(), create: vi.fn(), delete: vi.fn(), findFirst: vi.fn(), count: vi.fn() },
+    redirect: { findMany: vi.fn(), create: vi.fn(), update: vi.fn(), updateMany: vi.fn(), delete: vi.fn(), deleteMany: vi.fn(), count: vi.fn() },
+    domain: { findMany: vi.fn(), create: vi.fn(), delete: vi.fn(), deleteMany: vi.fn(), findFirst: vi.fn(), count: vi.fn() },
     workspace: { findUnique: vi.fn() },
-    shareLink: { findMany: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
+    shareLink: { findMany: vi.fn(), create: vi.fn(), update: vi.fn(), updateMany: vi.fn(), delete: vi.fn(), count: vi.fn() },
     analyticsEvent: { findMany: vi.fn(), groupBy: vi.fn() },
     dnsRecord: { createMany: vi.fn() },
   },
@@ -155,6 +155,54 @@ describe("Site Detail Service", () => {
       const result = await getSiteAnalytics("s1", { range: "7d", granularity: "daily" });
       expect(result.timeSeries).toHaveLength(1);
       expect(result.timeSeries[0].visitors).toBe(100);
+    });
+  });
+});
+
+// --- IDOR regression tests: siteId scoping on delete/update operations ---
+
+describe("IDOR: domain, redirect, share-link operations scoped to siteId", () => {
+  beforeEach(() => { vi.clearAllMocks(); });
+
+  it("removeDomain passes siteId to deleteMany so foreign domains are not deleted", async () => {
+    const { prisma } = await import("@/lib/prisma");
+    vi.mocked(prisma.domain.deleteMany).mockResolvedValue({ count: 1 });
+    const { removeDomain } = await import("@/server/services/domain.service");
+    await removeDomain("domain-1", "site-owned");
+    expect(prisma.domain.deleteMany).toHaveBeenCalledWith({
+      where: { id: "domain-1", siteId: "site-owned" },
+    });
+  });
+
+  it("deleteRedirect passes siteId to deleteMany so foreign redirects are not deleted", async () => {
+    const { prisma } = await import("@/lib/prisma");
+    vi.mocked(prisma.redirect.deleteMany).mockResolvedValue({ count: 1 });
+    const { deleteRedirect } = await import("@/server/services/redirect.service");
+    await deleteRedirect("redirect-1", "site-owned");
+    expect(prisma.redirect.deleteMany).toHaveBeenCalledWith({
+      where: { id: "redirect-1", siteId: "site-owned" },
+    });
+  });
+
+  it("updateRedirect passes siteId to updateMany so foreign redirects are not modified", async () => {
+    const { prisma } = await import("@/lib/prisma");
+    vi.mocked(prisma.redirect.updateMany).mockResolvedValue({ count: 1 });
+    const { updateRedirect } = await import("@/server/services/redirect.service");
+    await updateRedirect("redirect-1", "site-owned", { fromPath: "/new" });
+    expect(prisma.redirect.updateMany).toHaveBeenCalledWith({
+      where: { id: "redirect-1", siteId: "site-owned" },
+      data: { fromPath: "/new" },
+    });
+  });
+
+  it("revokeShareLink passes siteId to updateMany so foreign share-links are not revoked", async () => {
+    const { prisma } = await import("@/lib/prisma");
+    vi.mocked(prisma.shareLink.updateMany).mockResolvedValue({ count: 1 });
+    const { revokeShareLink } = await import("@/server/services/share-link.service");
+    await revokeShareLink("link-1", "site-owned");
+    expect(prisma.shareLink.updateMany).toHaveBeenCalledWith({
+      where: { id: "link-1", siteId: "site-owned" },
+      data: { isActive: false },
     });
   });
 });
