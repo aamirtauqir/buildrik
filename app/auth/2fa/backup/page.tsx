@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -10,6 +10,7 @@ import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthButton } from "@/components/auth/auth-button";
 import { AuthInput } from "@/components/auth/auth-input";
 import { FormBanner } from "@/components/auth/form-banner";
+import { createClientSession } from "@/lib/auth/create-session";
 import { trpc } from "@/lib/trpc/client";
 
 function BackupCodeContent() {
@@ -19,15 +20,21 @@ function BackupCodeContent() {
 
   const [backupCode, setBackupCode] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  useEffect(() => {
+    try {
+      setRememberMe(sessionStorage.getItem("buildrik_rememberMe") === "true");
+      sessionStorage.removeItem("buildrik_rememberMe");
+    } catch {
+      // private browsing — default false
+    }
+  }, []);
 
   const verifyBackupCodeMutation = trpc.auth.verifyBackupCode.useMutation({
     onSuccess: async (data) => {
-      const res = await fetch("/api/auth/create-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionToken: data.sessionToken }),
-      });
-      if (res.ok) {
+      const ok = await createClientSession(data.sessionToken, rememberMe);
+      if (ok) {
         router.push("/auth/redirect");
       } else {
         setError("Failed to create session");

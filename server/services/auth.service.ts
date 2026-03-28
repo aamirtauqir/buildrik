@@ -193,7 +193,7 @@ export async function verifyEmail(token: string) {
       });
       await logAuditEvent("EMAIL_CHANGED", "success", { userId: uid });
       const safeUser = await prisma.user.findUnique({ where: { id: uid }, select: SAFE_USER_SELECT });
-      return safeUser!;
+      return { user: safeUser!, tokenType: "email_change" as const };
     }
     throw new AuthError("TOKEN_EXPIRED", "Verification link expired", 410);
   }
@@ -207,12 +207,13 @@ export async function verifyEmail(token: string) {
 
   await logAuditEvent("EMAIL_VERIFIED", "success", { userId });
 
-  return user;
+  return { user, tokenType: "email_verify" as const };
 }
 
 export async function resendVerification(email: string) {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return; // silent fail, prevent enumeration
+  if (user.emailVerified) return; // already verified — don't issue a new verify token (prevents 2FA bypass via verify link)
 
   const token = await generateToken("email_verify", user.id, 60 * 24);
   try {

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthLogo } from "@/components/auth/auth-logo";
 import { AuthButton } from "@/components/auth/auth-button";
+import { AuthButtonSecondary } from "@/components/auth/auth-button-secondary";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthDivider } from "@/components/auth/auth-divider";
 import { FormBanner } from "@/components/auth/form-banner";
@@ -21,19 +22,31 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isConflict, setIsConflict] = useState(false);
 
   const signupMutation = trpc.auth.signup.useMutation({
     onSuccess: () => {
       router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
     },
     onError: (err) => {
-      setError(err.message);
+      if (err.data?.code === "CONFLICT") {
+        setIsConflict(true);
+      } else {
+        setError(err.message);
+      }
+    },
+  });
+
+  const resendMutation = trpc.auth.resendVerification.useMutation({
+    onSuccess: () => {
+      router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
     },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsConflict(false);
     signupMutation.mutate({ fullName, email, password, termsAccepted: termsAccepted as true });
   };
 
@@ -58,6 +71,31 @@ export default function SignupPage() {
           </>
         )}
 
+        {isConflict && (
+          <>
+            <FormBanner variant="error" title="That email is already registered." />
+            <div className="h-4" />
+            <AuthButtonSecondary
+              type="button"
+              onClick={() => router.push(`/auth/login?email=${encodeURIComponent(email)}`)}
+            >
+              Sign in instead
+            </AuthButtonSecondary>
+            <div className="h-2" />
+            <button
+              type="button"
+              className="text-auth-link text-auth-label hover:underline"
+              onClick={() => {
+                setIsConflict(false);
+                resendMutation.mutate({ email });
+              }}
+            >
+              Resend verification email
+            </button>
+            <div className="h-4" />
+          </>
+        )}
+
         <AuthInput
           label="Full Name"
           type="text"
@@ -74,7 +112,7 @@ export default function SignupPage() {
           type="email"
           placeholder="you@example.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => { setEmail(e.target.value); setIsConflict(false); }}
           autoComplete="email"
         />
 

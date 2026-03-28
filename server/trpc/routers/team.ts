@@ -38,8 +38,9 @@ export const teamRouter = router({
   changeRole: protectedProcedure
     .input(z.object({ memberId: z.string(), role: z.enum(["ADMIN", "EDITOR", "VIEWER"]) }))
     .mutation(async ({ ctx, input }) => {
+      const { workspaceId } = await getWorkspaceCtx(ctx);
       try {
-        return await changeRole(input.memberId, input.role, ctx.session.user.id);
+        return await changeRole(input.memberId, workspaceId, input.role, ctx.session.user.id);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "CANNOT_CHANGE_OWNER") throw new TRPCError({ code: "FORBIDDEN", message: "Cannot change owner role." });
         if (e instanceof Error && e.message === "LAST_ADMIN") throw new TRPCError({ code: "FORBIDDEN", message: "Cannot demote last admin." });

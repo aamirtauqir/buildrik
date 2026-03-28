@@ -129,11 +129,12 @@ export async function inviteMembers(
 
 export async function changeRole(
   memberId: string,
+  workspaceId: string,
   role: string,
   actorId: string,
 ) {
-  const member = await prisma.workspaceMember.findUnique({
-    where: { id: memberId },
+  const member = await prisma.workspaceMember.findFirst({
+    where: { id: memberId, workspaceId },
   });
   if (!member) throw new Error("MEMBER_NOT_FOUND");
   if (member.role === "OWNER") throw new Error("CANNOT_CHANGE_OWNER");
@@ -148,8 +149,8 @@ export async function changeRole(
     if (adminCount <= 1) throw new Error("LAST_ADMIN");
   }
 
-  return prisma.workspaceMember.update({
-    where: { id: memberId },
+  return prisma.workspaceMember.updateMany({
+    where: { id: memberId, workspaceId },
     data: { role },
   });
 }

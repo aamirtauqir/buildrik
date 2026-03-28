@@ -40,8 +40,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  await invalidateToken(sessionToken);
-
   const isSecure = process.env.NODE_ENV === "production";
   const cookieName = isSecure
     ? "__Secure-next-auth.session-token"
@@ -84,6 +82,9 @@ export async function POST(req: NextRequest) {
     const toDelete = sessions.slice(0, sessions.length - 10).map((s) => s.id);
     await prisma.session.deleteMany({ where: { id: { in: toDelete } } });
   }
+
+  // Invalidate after session is durably created — prevents stranded users if DB fails mid-flow
+  await invalidateToken(sessionToken);
 
   await logAuditEvent("SESSION_CREATED", "success", { userId: user.id, email: user.email });
 

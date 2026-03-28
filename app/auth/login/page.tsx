@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthLogo } from "@/components/auth/auth-logo";
@@ -10,12 +10,14 @@ import { AuthInput } from "@/components/auth/auth-input";
 import { AuthDivider } from "@/components/auth/auth-divider";
 import { FormBanner } from "@/components/auth/form-banner";
 import { SocialButton } from "@/components/auth/social-button";
+import { createClientSession } from "@/lib/auth/create-session";
 import { signIn } from "next-auth/react"; // used for social login
 import { trpc } from "@/lib/trpc/client";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const searchParams = useSearchParams();
+  const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,14 +25,17 @@ export default function LoginPage() {
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: async (data) => {
       if (data.requiresTwoFactor) {
+        if (rememberMe) {
+          try {
+            sessionStorage.setItem("buildrik_rememberMe", "true");
+          } catch {
+            // private browsing — ignore
+          }
+        }
         router.push(`/auth/2fa?token=${data.tempToken}`);
       } else {
-        const res = await fetch("/api/auth/create-session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionToken: data.sessionToken, rememberMe }),
-        });
-        if (res.ok) {
+        const ok = await createClientSession(data.sessionToken, rememberMe);
+        if (ok) {
           router.push("/auth/redirect");
         } else {
           setError("Failed to create session");
@@ -155,5 +160,13 @@ export default function LoginPage() {
         </p>
       </form>
     </AuthCard>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginContent />
+    </Suspense>
   );
 }

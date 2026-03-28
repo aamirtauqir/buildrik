@@ -10,6 +10,21 @@ import { AuthIcon } from "@/components/auth/auth-icon";
 import { ResendTimer } from "@/components/auth/resend-timer";
 import { trpc } from "@/lib/trpc/client";
 
+function getInboxUrl(email: string): { url: string; label: string } | null {
+  const domain = email.split("@")[1]?.toLowerCase();
+  if (!domain) return null;
+  if (domain === "gmail.com" || domain === "googlemail.com") {
+    return { url: "https://mail.google.com", label: "Open Gmail" };
+  }
+  if (["outlook.com", "hotmail.com", "live.com", "msn.com"].includes(domain)) {
+    return { url: "https://outlook.live.com", label: "Open Outlook" };
+  }
+  if (domain === "yahoo.com") {
+    return { url: "https://mail.yahoo.com", label: "Open Yahoo Mail" };
+  }
+  return null;
+}
+
 function CheckInboxContent() {
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
@@ -22,6 +37,9 @@ function CheckInboxContent() {
     type === "reset"
       ? "We sent password reset instructions to"
       : "We sent a verification link to";
+
+  const inbox = email ? getInboxUrl(email) : null;
+  const backHref = type === "reset" ? "/auth/forgot-password" : "/auth/signup";
 
   return (
     <AuthCard>
@@ -44,12 +62,20 @@ function CheckInboxContent() {
 
       <div className="h-4" />
 
-      <a
-        href="mailto:"
-        className="w-full h-auth-btn rounded-auth-btn text-auth-btn text-white font-semibold bg-auth-cta hover:bg-auth-cta-hover transition-colors flex items-center justify-center gap-2"
-      >
-        Open Email App
-      </a>
+      {inbox ? (
+        <a
+          href={inbox.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full h-auth-btn rounded-auth-btn text-auth-btn text-white font-semibold bg-auth-cta hover:bg-auth-cta-hover transition-colors flex items-center justify-center gap-2"
+        >
+          {inbox.label}
+        </a>
+      ) : (
+        <p className="text-auth-subtitle text-auth-text-muted text-center">
+          Open your email app to find the link.
+        </p>
+      )}
 
       <div className="h-4" />
 
@@ -67,7 +93,7 @@ function CheckInboxContent() {
       <div className="h-3" />
 
       <div className="flex justify-center">
-        <Link href="/auth/forgot-password" className="text-auth-link text-auth-link hover:underline text-center">
+        <Link href={backHref} className="text-auth-link text-auth-link hover:underline text-center">
           ← Use a different email
         </Link>
       </div>

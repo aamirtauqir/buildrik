@@ -1,8 +1,10 @@
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SocialButtonProps {
   provider: "google" | "github";
-  onClick?: () => void;
+  onClick?: () => Promise<void>;
   disabled?: boolean;
 }
 
@@ -26,24 +28,46 @@ function GitHubIcon() {
 }
 
 export function SocialButton({ provider, onClick, disabled }: SocialButtonProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
   const label = provider === "google" ? "Continue with Google" : "Continue with GitHub";
+  const providerLabel = provider === "google" ? "Google" : "GitHub";
   const Icon = provider === "google" ? GoogleIcon : GitHubIcon;
 
+  const handleClick = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    setErrorMsg(null);
+    try {
+      await onClick?.();
+    } catch {
+      setErrorMsg(`Could not connect to ${providerLabel}. Please try again.`);
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={cn(
-        "w-full h-auth-btn rounded-auth-btn text-sm font-medium",
-        "text-auth-text-secondary bg-white",
-        "border border-auth-input-border hover:bg-gray-50 transition-colors",
-        "flex items-center justify-center gap-3",
-        "disabled:opacity-50 disabled:cursor-not-allowed"
+    <div className="w-full">
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={disabled || isLoading}
+        aria-busy={isLoading}
+        className={cn(
+          "w-full h-auth-btn rounded-auth-btn text-sm font-medium",
+          "text-auth-text-secondary bg-white",
+          "border border-auth-input-border hover:bg-gray-50 transition-colors",
+          "flex items-center justify-center gap-3",
+          "disabled:opacity-50 disabled:cursor-not-allowed"
+        )}
+      >
+        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : <Icon />}
+        {label}
+      </button>
+      {errorMsg && (
+        <p className="text-auth-error text-xs text-center mt-2">{errorMsg}</p>
       )}
-    >
-      <Icon />
-      {label}
-    </button>
+    </div>
   );
 }

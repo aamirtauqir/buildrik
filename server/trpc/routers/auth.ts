@@ -65,8 +65,16 @@ export const authRouter = router({
     .input(z.object({ token: z.string().uuid() }))
     .mutation(async ({ input }) => {
       try {
-        const user = await verifyEmail(input.token);
-        return { success: true, user: { id: user.id, email: user.email } };
+        const { user, tokenType } = await verifyEmail(input.token);
+        let sessionToken: string | null = null;
+        if (tokenType === "email_verify") {
+          try {
+            sessionToken = await generateToken("session_grant", user.id, 5);
+          } catch {
+            // generateToken failed after email already verified — return gracefully
+          }
+        }
+        return { success: true, user: { id: user.id, email: user.email }, sessionToken };
       } catch (err) {
         handleAuthError(err);
       }
@@ -220,11 +228,6 @@ export const authRouter = router({
         await tx.invite.update({ where: { id: invite.id }, data: { status: "ACCEPTED" } });
       });
 
-      if (invite.email !== user.email) {
-        await logAuditEvent("INVITE_EMAIL_MISMATCH", "success", {
-          userId, metadata: { inviteEmail: invite.email, userEmail: user.email },
-        });
-      }
       await logAuditEvent("INVITE_ACCEPTED", "success", { userId, metadata: { workspaceId: invite.workspaceId } });
 
       createNotification({

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -10,7 +10,7 @@ import { AuthIcon } from "@/components/auth/auth-icon";
 import { AuthButton } from "@/components/auth/auth-button";
 import { OTPInput } from "@/components/auth/otp-input";
 import { FormBanner } from "@/components/auth/form-banner";
-
+import { createClientSession } from "@/lib/auth/create-session";
 import { trpc } from "@/lib/trpc/client";
 
 function TwoFAContent() {
@@ -20,15 +20,21 @@ function TwoFAContent() {
 
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  useEffect(() => {
+    try {
+      setRememberMe(sessionStorage.getItem("buildrik_rememberMe") === "true");
+      sessionStorage.removeItem("buildrik_rememberMe");
+    } catch {
+      // private browsing — default false
+    }
+  }, []);
 
   const verify2FAMutation = trpc.auth.verify2FA.useMutation({
     onSuccess: async (data) => {
-      const res = await fetch("/api/auth/create-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionToken: data.sessionToken }),
-      });
-      if (res.ok) {
+      const ok = await createClientSession(data.sessionToken, rememberMe);
+      if (ok) {
         router.push("/auth/redirect");
       } else {
         setError("Failed to create session");
@@ -57,8 +63,7 @@ function TwoFAContent() {
         Two-factor authentication
       </h1>
       <p className="text-auth-subtitle text-auth-text-muted text-center mt-1">
-        Enter the 6-digit code from your authenticator app or the code sent to
-        your phone.
+        Enter the 6-digit code from your authenticator app.
       </p>
 
       <div className="h-6" />
@@ -96,17 +101,11 @@ function TwoFAContent() {
 
       <div className="h-3" />
 
-      <p className="text-auth-subtitle text-auth-text-muted text-center">
-        Didn&apos;t get a code? Resend (45s)
-      </p>
-
-      <div className="h-3" />
-
       <Link
         href={`/auth/2fa/backup${token ? `?token=${token}` : ""}`}
         className="text-auth-link hover:underline text-center block"
       >
-        Use a recovery code instead
+        Having trouble? Use a recovery code instead
       </Link>
 
       <div className="h-2" />
