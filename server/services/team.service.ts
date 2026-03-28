@@ -154,27 +154,27 @@ export async function changeRole(
   });
 }
 
-export async function revokeMember(memberId: string) {
-  const member = await prisma.workspaceMember.findUnique({
-    where: { id: memberId },
+export async function revokeMember(memberId: string, workspaceId: string) {
+  const member = await prisma.workspaceMember.findFirst({
+    where: { id: memberId, workspaceId },
   });
   if (!member) throw new Error("MEMBER_NOT_FOUND");
   if (member.role === "OWNER") throw new Error("CANNOT_REVOKE_OWNER");
 
-  return prisma.workspaceMember.update({
-    where: { id: memberId },
+  return prisma.workspaceMember.updateMany({
+    where: { id: memberId, workspaceId },
     data: { status: "SUSPENDED", suspendedAt: new Date() },
   });
 }
 
-export async function deleteMember(memberId: string) {
-  const member = await prisma.workspaceMember.findUnique({
-    where: { id: memberId },
+export async function deleteMember(memberId: string, workspaceId: string) {
+  const member = await prisma.workspaceMember.findFirst({
+    where: { id: memberId, workspaceId },
   });
   if (!member) throw new Error("MEMBER_NOT_FOUND");
   if (member.role === "OWNER") throw new Error("CANNOT_DELETE_OWNER");
 
-  return prisma.workspaceMember.delete({ where: { id: memberId } });
+  return prisma.workspaceMember.deleteMany({ where: { id: memberId, workspaceId } });
 }
 
 export async function listPendingInvites(workspaceId: string) {
@@ -184,20 +184,20 @@ export async function listPendingInvites(workspaceId: string) {
   });
 }
 
-export async function revokeInvite(inviteId: string) {
-  return prisma.invite.delete({ where: { id: inviteId } });
+export async function revokeInvite(inviteId: string, workspaceId: string) {
+  return prisma.invite.deleteMany({ where: { id: inviteId, workspaceId } });
 }
 
-export async function resendInvite(inviteId: string) {
-  const invite = await prisma.invite.findUnique({ where: { id: inviteId } });
+export async function resendInvite(inviteId: string, workspaceId: string) {
+  const invite = await prisma.invite.findFirst({ where: { id: inviteId, workspaceId } });
   if (!invite) throw new Error("INVITE_NOT_FOUND");
   if (invite.resendCount >= 2) throw new Error("MAX_RESENDS");
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);
 
-  return prisma.invite.update({
-    where: { id: inviteId },
+  return prisma.invite.updateMany({
+    where: { id: inviteId, workspaceId },
     data: { expiresAt, resendCount: { increment: 1 } },
   });
 }

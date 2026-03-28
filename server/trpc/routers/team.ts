@@ -46,9 +46,13 @@ export const teamRouter = router({
         throw e;
       }
     }),
-  revoke: protectedProcedure.input(z.object({ memberId: z.string() })).mutation(async ({ input }) => revokeMember(input.memberId)),
-  delete: protectedProcedure.input(z.object({ memberId: z.string() })).mutation(async ({ input }) => {
-    try { await deleteMember(input.memberId); } catch (e: unknown) {
+  revoke: protectedProcedure.input(z.object({ memberId: z.string() })).mutation(async ({ input, ctx }) => {
+    const { workspaceId } = await getWorkspaceCtx(ctx);
+    return revokeMember(input.memberId, workspaceId);
+  }),
+  delete: protectedProcedure.input(z.object({ memberId: z.string() })).mutation(async ({ input, ctx }) => {
+    const { workspaceId } = await getWorkspaceCtx(ctx);
+    try { await deleteMember(input.memberId, workspaceId); } catch (e: unknown) {
       if (e instanceof Error && e.message === "CANNOT_DELETE_OWNER") throw new TRPCError({ code: "FORBIDDEN", message: "Cannot remove workspace owner." });
       throw e;
     }
@@ -57,8 +61,14 @@ export const teamRouter = router({
     const { workspaceId } = await getWorkspaceCtx(ctx);
     return listPendingInvites(workspaceId);
   }),
-  revokeInvite: protectedProcedure.input(z.object({ inviteId: z.string() })).mutation(async ({ input }) => revokeInvite(input.inviteId)),
-  resendInvite: protectedProcedure.input(z.object({ inviteId: z.string() })).mutation(async ({ input }) => resendInvite(input.inviteId)),
+  revokeInvite: protectedProcedure.input(z.object({ inviteId: z.string() })).mutation(async ({ input, ctx }) => {
+    const { workspaceId } = await getWorkspaceCtx(ctx);
+    return revokeInvite(input.inviteId, workspaceId);
+  }),
+  resendInvite: protectedProcedure.input(z.object({ inviteId: z.string() })).mutation(async ({ input, ctx }) => {
+    const { workspaceId } = await getWorkspaceCtx(ctx);
+    return resendInvite(input.inviteId, workspaceId);
+  }),
   activity: protectedProcedure.query(async ({ ctx }) => {
     const { workspaceId } = await getWorkspaceCtx(ctx);
     return getTeamActivity(workspaceId);

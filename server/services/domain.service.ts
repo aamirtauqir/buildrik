@@ -43,8 +43,8 @@ export async function connectDomain(siteId: string, domain: string) {
   return created;
 }
 
-export async function removeDomain(id: string) {
-  return prisma.domain.delete({ where: { id } });
+export async function removeDomain(id: string, siteId: string) {
+  return prisma.domain.deleteMany({ where: { id, siteId } });
 }
 
 export async function setPrimaryDomain(id: string, siteId: string) {

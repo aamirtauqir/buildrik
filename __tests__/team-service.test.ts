@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    workspaceMember: { findMany: vi.fn(), findUnique: vi.fn(), count: vi.fn(), update: vi.fn(), delete: vi.fn() },
-    invite: { findMany: vi.fn(), create: vi.fn(), createMany: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn(), findUnique: vi.fn() },
+    workspaceMember: { findMany: vi.fn(), findUnique: vi.fn(), findFirst: vi.fn(), count: vi.fn(), update: vi.fn(), updateMany: vi.fn(), delete: vi.fn(), deleteMany: vi.fn() },
+    invite: { findMany: vi.fn(), create: vi.fn(), createMany: vi.fn(), update: vi.fn(), updateMany: vi.fn(), delete: vi.fn(), deleteMany: vi.fn(), count: vi.fn(), findUnique: vi.fn(), findFirst: vi.fn() },
     user: { findUnique: vi.fn(), findMany: vi.fn() },
     workspace: { findUnique: vi.fn() },
     site: { count: vi.fn() },
@@ -121,36 +121,36 @@ describe("Team Service", () => {
   });
 
   describe("revokeMember", () => {
-    it("sets member status to SUSPENDED", async () => {
+    it("sets member status to SUSPENDED, scoped to workspaceId", async () => {
       const { revokeMember } = await import("@/server/services/team.service");
-      vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
-        id: "m1", role: "EDITOR",
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
+        id: "m1", role: "EDITOR", workspaceId: "ws1",
       } as any);
-      vi.mocked(prisma.workspaceMember.update).mockResolvedValue({
-        id: "m1", status: "SUSPENDED",
-      } as any);
-      const result = await revokeMember("m1");
-      expect(result.status).toBe("SUSPENDED");
+      vi.mocked(prisma.workspaceMember.updateMany).mockResolvedValue({ count: 1 });
+      await revokeMember("m1", "ws1");
+      expect(prisma.workspaceMember.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: "m1", workspaceId: "ws1" } })
+      );
     });
   });
 
   describe("deleteMember", () => {
-    it("removes member from workspace", async () => {
+    it("removes member from workspace, scoped to workspaceId", async () => {
       const { deleteMember } = await import("@/server/services/team.service");
-      vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
-        id: "m1", role: "EDITOR",
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
+        id: "m1", role: "EDITOR", workspaceId: "ws1",
       } as any);
-      vi.mocked(prisma.workspaceMember.delete).mockResolvedValue({ id: "m1" } as any);
-      await deleteMember("m1");
-      expect(prisma.workspaceMember.delete).toHaveBeenCalledWith({ where: { id: "m1" } });
+      vi.mocked(prisma.workspaceMember.deleteMany).mockResolvedValue({ count: 1 });
+      await deleteMember("m1", "ws1");
+      expect(prisma.workspaceMember.deleteMany).toHaveBeenCalledWith({ where: { id: "m1", workspaceId: "ws1" } });
     });
 
     it("prevents deleting owner", async () => {
       const { deleteMember } = await import("@/server/services/team.service");
-      vi.mocked(prisma.workspaceMember.findUnique).mockResolvedValue({
-        id: "m1", role: "OWNER",
+      vi.mocked(prisma.workspaceMember.findFirst).mockResolvedValue({
+        id: "m1", role: "OWNER", workspaceId: "ws1",
       } as any);
-      await expect(deleteMember("m1")).rejects.toThrow("CANNOT_DELETE_OWNER");
+      await expect(deleteMember("m1", "ws1")).rejects.toThrow("CANNOT_DELETE_OWNER");
     });
   });
 
@@ -166,11 +166,11 @@ describe("Team Service", () => {
   });
 
   describe("revokeInvite", () => {
-    it("deletes invite", async () => {
+    it("deletes invite, scoped to workspaceId", async () => {
       const { revokeInvite } = await import("@/server/services/team.service");
-      vi.mocked(prisma.invite.delete).mockResolvedValue({ id: "inv1" } as any);
-      await revokeInvite("inv1");
-      expect(prisma.invite.delete).toHaveBeenCalled();
+      vi.mocked(prisma.invite.deleteMany).mockResolvedValue({ count: 1 });
+      await revokeInvite("inv1", "ws1");
+      expect(prisma.invite.deleteMany).toHaveBeenCalledWith({ where: { id: "inv1", workspaceId: "ws1" } });
     });
   });
 

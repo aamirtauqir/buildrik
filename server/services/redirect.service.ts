@@ -32,13 +32,14 @@ export async function createRedirect(
 
 export async function updateRedirect(
   id: string,
+  siteId: string,
   data: { fromPath?: string; toUrl?: string; type?: string }
 ) {
-  return prisma.redirect.update({ where: { id }, data });
+  return prisma.redirect.updateMany({ where: { id, siteId }, data });
 }
 
-export async function deleteRedirect(id: string) {
-  return prisma.redirect.delete({ where: { id } });
+export async function deleteRedirect(id: string, siteId: string) {
+  return prisma.redirect.deleteMany({ where: { id, siteId } });
 }
 
 export async function importRedirects(siteId: string, csv: string, plan: PlanName) {

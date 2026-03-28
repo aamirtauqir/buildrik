@@ -61,9 +61,9 @@ export async function createShareLink(
   });
 }
 
-export async function revokeShareLink(id: string) {
-  return prisma.shareLink.update({
-    where: { id },
+export async function revokeShareLink(id: string, siteId: string) {
+  return prisma.shareLink.updateMany({
+    where: { id, siteId },
     data: { isActive: false },
   });
 }

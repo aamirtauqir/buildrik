@@ -156,3 +156,42 @@ describe("emailVerified check in login()", () => {
     expect(bcryptPos).toBeLessThan(verifiedCheckPos);
   });
 });
+
+// --- Test 7: AES-256-GCM key uses sha256 hash, not hex-slice (source analysis) ---
+describe("AES key derivation uses createHash, not hex slice", () => {
+  it("encryptSecret derives key via sha256 digest, not Buffer.from hex", () => {
+    expect(authServiceSource).toContain("createHash('sha256').update(process.env.NEXTAUTH_SECRET!).digest()");
+    expect(authServiceSource).not.toContain("slice(0, 64), 'hex'");
+  });
+});
+
+// --- Test 8: backup codes use crypto.randomInt (source analysis) ---
+describe("backup codes use CSPRNG", () => {
+  it("randomInt from crypto replaces Math.random in enable2FA", () => {
+    const accountSource = readFileSync(
+      path.resolve(__dirname, "../server/services/account.service.ts"),
+      "utf-8"
+    );
+    expect(accountSource).toContain("randomInt(0, chars.length)");
+    expect(accountSource).not.toContain("Math.random()");
+  });
+});
+
+// --- Test 9: acceptInvite IDOR — email check throws before transaction ---
+describe("IDOR: acceptInvite rejects email mismatch before granting access", () => {
+  it("FORBIDDEN is thrown before the workspaceMember transaction when emails differ", () => {
+    const authRouterSource = readFileSync(
+      path.resolve(__dirname, "../server/trpc/routers/auth.ts"),
+      "utf-8"
+    );
+    const acceptInviteStart = authRouterSource.indexOf("acceptInvite:");
+    const acceptInviteSection = authRouterSource.slice(acceptInviteStart, acceptInviteStart + 1500);
+
+    const forbiddenPos = acceptInviteSection.indexOf("FORBIDDEN");
+    const transactionPos = acceptInviteSection.indexOf("$transaction");
+
+    expect(forbiddenPos).toBeGreaterThan(-1);
+    expect(transactionPos).toBeGreaterThan(-1);
+    expect(forbiddenPos).toBeLessThan(transactionPos);
+  });
+});

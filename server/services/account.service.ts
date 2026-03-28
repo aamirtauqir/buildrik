@@ -1,3 +1,4 @@
+import { randomInt } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type { UpdateProfileInput, NotificationPrefInput, UpdatePreferencesInput } from "@/lib/validations/account";
@@ -178,7 +179,7 @@ export async function enable2FA(userId: string) {
 
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   const randomChars = (n: number) =>
-    Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+    Array.from({ length: n }, () => chars[randomInt(0, chars.length)]).join("");
   const codes = Array.from({ length: 10 }, () => `${randomChars(4)}-${randomChars(4)}-${randomChars(4)}`);
 
   const { encryptSecret, hashBackupCodes } = await import("@/server/services/auth.service");

@@ -191,6 +191,11 @@ export const authRouter = router({
         throw new TRPCError({ code: "UNAUTHORIZED", message: "Not authenticated" });
       }
       const userId = user.id;
+
+      if (invite.email && invite.email !== user.email) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "This invitation was sent to a different email address." });
+      }
+
       const existing = await ctx.prisma.workspaceMember.findUnique({
         where: { userId_workspaceId: { userId, workspaceId: invite.workspaceId } },
       });

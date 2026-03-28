@@ -20,7 +20,7 @@ async function findMatchingBackupCode(plainCode: string, hashedCodes: string[]):
 }
 
 function encryptSecret(plaintext: string): string {
-  const key = Buffer.from(process.env.NEXTAUTH_SECRET!.slice(0, 64), 'hex'); // 32 bytes from NEXTAUTH_SECRET
+  const key = createHash('sha256').update(process.env.NEXTAUTH_SECRET!).digest();
   const iv = randomBytes(12);
   const cipher = createCipheriv('aes-256-gcm', key, iv);
   const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
@@ -29,7 +29,7 @@ function encryptSecret(plaintext: string): string {
 }
 
 function decryptSecret(ciphertext: string): string {
-  const key = Buffer.from(process.env.NEXTAUTH_SECRET!.slice(0, 64), 'hex');
+  const key = createHash('sha256').update(process.env.NEXTAUTH_SECRET!).digest();
   const [ivHex, tagHex, encHex] = ciphertext.split(':');
   const tag = Buffer.from(tagHex, 'hex');
   if (tag.length !== 16) {

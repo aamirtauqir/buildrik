@@ -51,15 +51,15 @@ export const siteDetailRouter = router({
       }),
 
     update: protectedProcedure
-      .input(z.object({ id: z.string(), fromPath: z.string().optional(), toUrl: z.string().optional(), type: z.enum(["301", "302"]).optional() }))
+      .input(z.object({ id: z.string(), siteId: z.string(), fromPath: z.string().optional(), toUrl: z.string().optional(), type: z.enum(["301", "302"]).optional() }))
       .mutation(async ({ input }) => {
-        const { id, ...data } = input;
-        return updateRedirect(id, data);
+        const { id, siteId, ...data } = input;
+        return updateRedirect(id, siteId, data);
       }),
 
     delete: protectedProcedure
-      .input(z.object({ id: z.string() }))
-      .mutation(async ({ input }) => deleteRedirect(input.id)),
+      .input(z.object({ id: z.string(), siteId: z.string() }))
+      .mutation(async ({ input }) => deleteRedirect(input.id, input.siteId)),
 
     import_csv: protectedProcedure
       .input(z.object({ siteId: z.string(), csv: z.string() }))
@@ -101,12 +101,16 @@ export const siteDetailRouter = router({
       }),
 
     remove: protectedProcedure
-      .input(z.object({ id: z.string() }))
-      .mutation(async ({ input }) => removeDomain(input.id)),
+      .input(z.object({ id: z.string(), siteId: z.string() }))
+      .mutation(async ({ input }) => removeDomain(input.id, input.siteId)),
 
     setPrimary: protectedProcedure
       .input(z.object({ id: z.string(), siteId: z.string() }))
-      .mutation(async ({ input }) => setPrimaryDomain(input.id, input.siteId)),
+      .mutation(async ({ ctx, input }) => {
+        const domain = await ctx.prisma.domain.findFirst({ where: { id: input.id, siteId: input.siteId } });
+        if (!domain) throw new TRPCError({ code: "NOT_FOUND", message: "Domain not found" });
+        return setPrimaryDomain(input.id, input.siteId);
+      }),
   }),
 
   sharing: router({
@@ -122,8 +126,8 @@ export const siteDetailRouter = router({
       }),
 
     revoke: protectedProcedure
-      .input(z.object({ id: z.string() }))
-      .mutation(async ({ input }) => revokeShareLink(input.id)),
+      .input(z.object({ id: z.string(), siteId: z.string() }))
+      .mutation(async ({ input }) => revokeShareLink(input.id, input.siteId)),
   }),
 
   analytics: protectedProcedure

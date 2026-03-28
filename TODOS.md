@@ -26,25 +26,6 @@
 **Context:** The `current` DB field is set correctly after Approach A. The missing piece is threading the identifier through to the UI.
 **Depends on:** Approach A (auth-hardening) + DB session check in protectedProcedure.
 
-### AES-256-GCM key derivation breaks for non-hex NEXTAUTH_SECRET (P0 — 2FA non-functional)
-**What:** `server/services/auth.service.ts:23` derives the AES key via `Buffer.from(process.env.NEXTAUTH_SECRET!.slice(0, 64), 'hex')`. If `NEXTAUTH_SECRET` contains non-hex characters (base64, random ASCII — the common case), `Buffer.from(..., 'hex')` silently drops invalid pairs, producing a key shorter than 32 bytes. `createCipheriv('aes-256-gcm', ...)` requires exactly 32 bytes and throws `Invalid key length` at runtime. All 2FA enrollment and verification fails silently for any deployment whose secret is not a pure lowercase hex string.
-**Fix:** Replace with `createHash('sha256').update(process.env.NEXTAUTH_SECRET!).digest()` to always produce 32 bytes. Or add a separate `TOTP_ENCRYPTION_KEY` env var (32 hex bytes, documented).
-**Depends on:** Nothing blocking. Fix before any real user enrolls in 2FA.
-
-### Math.random() used to generate backup codes — not cryptographically secure (P0)
-**What:** `server/services/account.service.ts` generates 2FA backup codes using `Math.floor(Math.random() * chars.length)`. `Math.random()` is not a CSPRNG. Backup codes are emergency authentication credentials.
-**Fix:** Replace with `crypto.randomInt(0, chars.length)` (Node 14.10+) or generate via `crypto.randomBytes`.
-**Depends on:** Nothing blocking.
-
-### acceptInvite IDOR — any authenticated user can join any workspace by knowing the invite token (P0)
-**What:** `server/trpc/routers/auth.ts` `acceptInvite` only logs a warning when the authenticated user's email doesn't match the invite's email, then grants workspace access anyway. Any authenticated user who knows or guesses an invite token can join any workspace.
-**Fix:** Throw `TRPCError({ code: "FORBIDDEN" })` when `invite.email !== ctx.session.user.email`.
-**Depends on:** Nothing blocking. High-risk on any shared deployment.
-
-### Multiple IDOR holes in team and site-detail routers (P0)
-**What:** `revokeInvite`, `resendInvite`, `revokeMember`, `deleteMember` (team.ts), and `updateRedirect`, `deleteRedirect`, `removeDomain`, `setPrimaryDomain`, `revokeShareLink` (site-detail.ts) accept bare IDs without verifying the caller owns the target resource. Any authenticated user can modify another workspace's resources.
-**Fix:** Pass `workspaceId` from `getWorkspaceCtx` into each service function and add it to the `where` clause.
-**Depends on:** Nothing blocking.
 
 ### OAuth email-only account linking may allow account takeover
 **What:** `server/auth.config.ts` signIn callback links OAuth users to existing accounts by matching email only. No `Account` model linkage, no verified-email proof beyond trusting the provider. If a new OAuth provider account is created with the same email as an existing credential account, the OAuth login silently gains access.
