@@ -382,7 +382,7 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
                   IP address
                 </th>
                 <th className="text-left px-4 py-2.5 font-medium" style={{ color: "#7A7A7A" }}>
-                  Last active
+                  Sign-in
                 </th>
                 <th />
               </tr>

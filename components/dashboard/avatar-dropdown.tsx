@@ -42,7 +42,11 @@ export function AvatarDropdown({ initials, name, email, loading = false }: Avata
 
   async function handleLogout(e: React.MouseEvent) {
     e.preventDefault();
-    await fetch("/api/auth/logout", { method: "POST" });
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {
+      // best-effort: redirect regardless
+    }
     router.push("/auth");
   }
 
