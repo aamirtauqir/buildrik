@@ -22,7 +22,8 @@ export default function NewSitePage() {
   const [view, setView] = useState<View>(
     initialMethod === "template" ? "templates" : initialMethod === "ai" ? "ai-type" : "choose"
   );
-  const [siteName] = useState("My New Site");
+
+  const [siteName, setSiteName] = useState(searchParams.get("name") ?? "My New Site");
 
   // Template state
   const [templateCategory, setTemplateCategory] = useState("ALL");
@@ -98,7 +99,18 @@ export default function NewSitePage() {
         <p className="mt-2 text-sm" style={{ color: "#7A7A7A" }}>
           Choose how you want to get started
         </p>
-        <div className="mt-8 space-y-3">
+        <div className="mt-6 text-left">
+          <label className="text-sm font-medium" style={{ color: "#7A7A7A" }}>Site name</label>
+          <input
+            type="text"
+            value={siteName}
+            onChange={(e) => setSiteName(e.target.value)}
+            className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[#E42313]"
+            style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+            placeholder="My New Site"
+          />
+        </div>
+        <div className="mt-6 space-y-3">
           <button
             onClick={() => setView("templates")}
             className="flex w-full items-center gap-4 rounded-xl border p-5 text-left transition-colors hover:bg-[#FAFAFA]"
@@ -126,8 +138,9 @@ export default function NewSitePage() {
             </div>
           </button>
           <button
-            onClick={() => createSiteMutation.mutate({ name: siteName, method: "blank" })}
-            className="flex w-full items-center gap-4 rounded-xl border p-5 text-left transition-colors hover:bg-[#FAFAFA]"
+            onClick={() => createSiteMutation.mutate({ name: siteName.trim() || "My New Site", method: "blank" })}
+            disabled={createSiteMutation.isPending}
+            className="flex w-full items-center gap-4 rounded-xl border p-5 text-left transition-colors hover:bg-[#FAFAFA] disabled:opacity-50"
             style={{ borderColor: "#E8E8E8" }}
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-lg" style={{ backgroundColor: "#F4F4F4" }}>

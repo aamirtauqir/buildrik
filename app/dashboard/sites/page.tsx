@@ -13,11 +13,13 @@ import { RenameModal } from "@/components/sites/rename-modal";
 import { DeleteConfirmModal } from "@/components/sites/delete-confirm-modal";
 import { TransferModal } from "@/components/sites/transfer-modal";
 import { useToast } from "@/components/dashboard/toast-provider";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus, Search } from "lucide-react";
 
 export default function SitesPage() {
   const { addToast } = useToast();
+  const router = useRouter();
 
   // Preferences
   const prefs = trpc.account.preferences.get.useQuery();
@@ -376,7 +378,7 @@ export default function SitesPage() {
 
       {/* Loading */}
       {sitesQuery.isLoading && (
-        <div className="mt-6 grid grid-cols-3 gap-4">
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div
               key={i}
@@ -487,12 +489,14 @@ export default function SitesPage() {
       <CreateSiteModal
         open={createOpen}
         onClose={() => setCreateOpen(false)}
-        onSubmit={(data) =>
-          createMutation.mutate({
-            name: data.name,
-            method: data.method as "blank" | "template" | "ai",
-          })
-        }
+        onSubmit={(data) => {
+          if (data.method === "blank") {
+            createMutation.mutate({ name: data.name, method: "blank" });
+          } else {
+            setCreateOpen(false);
+            router.push(`/dashboard/sites/new?method=${data.method}&name=${encodeURIComponent(data.name)}`);
+          }
+        }}
       />
 
       {renameTarget && (
