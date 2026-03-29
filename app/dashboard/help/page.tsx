@@ -95,7 +95,7 @@ export default function HelpPage() {
       </div>
       <HelpCenter
         onSearch={handleSearch}
-        onContactLiveChat={() => addToast("info", "Live chat coming soon")}
+        onContactLiveChat={() => setView("ticket")}
         onContactEmail={() => setView("ticket")}
       />
     </div>

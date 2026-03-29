@@ -45,7 +45,7 @@ export async function requestEmailChange(userId: string, newEmail: string, passw
 }
 
 export async function getProfile(userId: string) {
-  return prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
       id: true,
@@ -57,8 +57,21 @@ export async function getProfile(userId: string) {
       twoFactorEnabled: true,
       language: true,
       timezone: true,
+      passwordHash: true,
+      accounts: { select: { provider: true } },
     },
   });
+  if (!user) return null;
+  const { passwordHash, accounts, ...rest } = user;
+  return {
+    ...rest,
+    hasPassword: passwordHash !== null,
+    connectedAccounts: accounts
+      .filter((a): a is { provider: "google" | "github" } =>
+        a.provider === "google" || a.provider === "github"
+      )
+      .map((a) => ({ provider: a.provider, email: user.email })),
+  };
 }
 
 export async function updateProfile(userId: string, data: UpdateProfileInput) {

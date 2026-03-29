@@ -15,19 +15,6 @@ import { Plus } from "lucide-react";
 
 type ActivityFilter = "all" | "mine" | "team";
 
-const QUICK_ACTIONS_NEW_USER = [
-  { label: "Create Site", href: "/dashboard/sites/new", icon: "Plus" as const, description: "Start from scratch" },
-  { label: "Set Up Profile", href: "/dashboard/settings", icon: "Settings" as const, description: "Personalize your account" },
-  { label: "Explore Templates", href: "/dashboard/sites/new?method=template", icon: "LayoutTemplate" as const, description: "Browse 50+ templates" },
-  { label: "Invite Team", href: "/dashboard/team", icon: "UserPlus" as const, description: "Collaborate together" },
-];
-
-const QUICK_ACTIONS_ACTIVE = [
-  { label: "New Site", href: "/dashboard/sites/new", icon: "Plus" as const, description: "Create a new site" },
-  { label: "View Analytics", href: "/dashboard/sites", icon: "BarChart3" as const, description: "Check site performance" },
-  { label: "Manage Domains", href: "/dashboard/sites", icon: "Globe" as const, description: "Connect custom domains" },
-  { label: "Invite Member", href: "/dashboard/team", icon: "UserPlus" as const, description: "Add team members" },
-];
 
 export default function DashboardPage() {
   const [activityFilter, setActivityFilter] = useState<ActivityFilter>("all");
@@ -35,6 +22,7 @@ export default function DashboardPage() {
   const recentSites = trpc.dashboard.recentSites.useQuery();
   const activity = trpc.dashboard.activity.useQuery({ filter: activityFilter });
   const health = trpc.dashboard.health.useQuery();
+  const quickActionsQuery = trpc.dashboard.quickActions.useQuery();
   const wsData = trpc.account.workspace.get.useQuery();
   const pendingDeletion = trpc.account.dangerZone.pendingDeletion.useQuery();
   const cancelWsDelete = trpc.account.workspace.cancelDelete.useMutation({ onSuccess: () => wsData.refetch() });
@@ -61,7 +49,7 @@ export default function DashboardPage() {
         : "viewer"
     : null;
 
-  const quickActions = isEmpty ? QUICK_ACTIONS_NEW_USER : QUICK_ACTIONS_ACTIVE;
+  const quickActions = quickActionsQuery.data ?? [];
 
   // Only show workspace health when any metric exceeds 50%
   const showHealth = health.data && (
