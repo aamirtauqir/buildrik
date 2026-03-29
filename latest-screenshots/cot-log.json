@@ -1,0 +1,3366 @@
+{
+  "generated": "2026-03-01T16:41:12.166Z",
+  "totalEntries": 336,
+  "log": [
+    {
+      "ts": "2026-03-01T16:38:34.422Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P0-loading",
+      "shot": "000_loading-state",
+      "expected": "App loading or editor ready",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/000_loading-state.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:34.540Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P2-base",
+      "shot": "001_editor-base_default",
+      "expected": "Full editor default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/001_editor-base_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:34.949Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P2-base",
+      "shot": "002_canvas_idle",
+      "expected": "Canvas idle, nothing selected",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/002_canvas_idle.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:35.052Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P2-base",
+      "shot": "003_workspace_overview",
+      "expected": "Full workspace overview",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/003_workspace_overview.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:35.148Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "010_untitled-project_default",
+      "expected": "\"Untitled Project▾\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/010_untitled-project_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:35.647Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "010_untitled-project_open",
+      "expected": "\"Untitled Project▾\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/010_untitled-project_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:35.945Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "011_undo-last-action_default",
+      "expected": "\"Undo last action\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/011_undo-last-action_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:36.497Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "011_undo-last-action_open",
+      "expected": "\"Undo last action\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/011_undo-last-action_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:36.818Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "012_redo-last-action_default",
+      "expected": "\"Redo last action\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/012_redo-last-action_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:37.320Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "012_redo-last-action_open",
+      "expected": "\"Redo last action\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/012_redo-last-action_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:37.634Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "013_desktop_default",
+      "expected": "\"Desktop▾\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/013_desktop_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:38.134Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "013_desktop_open",
+      "expected": "\"Desktop▾\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/013_desktop_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:38.445Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "014_1_default",
+      "expected": "\"1\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/014_1_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:38.946Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "014_1_open",
+      "expected": "\"1\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/014_1_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:39.260Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "015_preview_default",
+      "expected": "\"Preview\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/015_preview_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:39.946Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "015_preview_open",
+      "expected": "\"Preview\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/015_preview_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:40.250Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "016_publish_default",
+      "expected": "\"Publish\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/016_publish_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:40.757Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "016_publish_open",
+      "expected": "\"Publish\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/016_publish_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:41.068Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "017_templatestemplatest_default",
+      "expected": "\"TemplatesTemplatesT\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/017_templatestemplatest_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:41.639Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "017_templatestemplatest_open",
+      "expected": "\"TemplatesTemplatesT\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/017_templatestemplatest_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:41.982Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "018_pagespagesp_default",
+      "expected": "\"PagesPagesP\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/04-pages/018_pagespagesp_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:42.487Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "018_pagespagesp_open",
+      "expected": "\"PagesPagesP\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/04-pages/018_pagespagesp_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:42.799Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "019_buildbuilda_default",
+      "expected": "\"BuildBuildA\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/019_buildbuilda_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:43.318Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "019_buildbuilda_open",
+      "expected": "\"BuildBuildA\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/019_buildbuilda_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:43.623Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "020_mediamedia-libraryj_default",
+      "expected": "\"MediaMedia LibraryJ\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/020_mediamedia-libraryj_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:44.149Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "020_mediamedia-libraryj_open",
+      "expected": "\"MediaMedia LibraryJ\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/020_mediamedia-libraryj_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:44.456Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "021_globaldesign-systemd_default",
+      "expected": "\"GlobalDesign SystemD\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/07-design/021_globaldesign-systemd_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:44.997Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "021_globaldesign-systemd_open",
+      "expected": "\"GlobalDesign SystemD\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/07-design/021_globaldesign-systemd_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:45.306Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "022_configconfig-launchs_default",
+      "expected": "\"ConfigConfig & LaunchS\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/022_configconfig-launchs_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:45.821Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "022_configconfig-launchs_open",
+      "expected": "\"ConfigConfig & LaunchS\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/022_configconfig-launchs_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:46.120Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "023_layers_default",
+      "expected": "\"Layers\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/03-layers/023_layers_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:46.628Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "023_layers_open",
+      "expected": "\"Layers\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/03-layers/023_layers_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:46.937Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "024_history_default",
+      "expected": "\"History\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/024_history_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:47.468Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "024_history_open",
+      "expected": "\"History\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/024_history_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:47.772Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "025__default",
+      "expected": "\"+\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/025__default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:48.284Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "025__open",
+      "expected": "\"+\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/025__open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:48.596Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "026_snap-guides_default",
+      "expected": "\"Snap Guides✓\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/026_snap-guides_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:49.127Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "026_snap-guides_open",
+      "expected": "\"Snap Guides✓\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/026_snap-guides_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:49.454Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "027_spacing_default",
+      "expected": "\"Spacing\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/027_spacing_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:49.975Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "027_spacing_open",
+      "expected": "\"Spacing\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/027_spacing_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:50.301Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "028_grid_default",
+      "expected": "\"Grid\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/028_grid_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:50.837Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "028_grid_open",
+      "expected": "\"Grid\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/028_grid_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:51.161Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "029_badges_default",
+      "expected": "\"Badges\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/029_badges_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:51.711Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "029_badges_open",
+      "expected": "\"Badges\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/029_badges_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:52.024Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "030_x-ray_default",
+      "expected": "\"X-Ray\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/030_x-ray_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:52.539Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "030_x-ray_open",
+      "expected": "\"X-Ray\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/030_x-ray_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:52.859Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "031__default",
+      "expected": "\"−\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/031__default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:53.413Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "031__open",
+      "expected": "\"−\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/031__open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:53.728Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "032_100_default",
+      "expected": "\"100%\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/032_100_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:54.235Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "032_100_open",
+      "expected": "\"100%\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/032_100_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:54.535Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "033_open-build-panel_default",
+      "expected": "\"Open Build Panel\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/033_open-build-panel_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:55.096Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "033_open-build-panel_open",
+      "expected": "\"Open Build Panel\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/033_open-build-panel_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:55.407Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "034_browse-templates_default",
+      "expected": "\"Browse Templates\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/034_browse-templates_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:55.928Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "034_browse-templates_open",
+      "expected": "\"Browse Templates\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/034_browse-templates_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:56.242Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "035_skip_default",
+      "expected": "\"Skip\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/035_skip_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:56.751Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "035_skip_open",
+      "expected": "\"Skip\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/035_skip_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:57.038Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "036_next_default",
+      "expected": "\"Next\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/036_next_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:57.539Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "036_next_open",
+      "expected": "\"Next\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/036_next_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:57.848Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "037__default",
+      "expected": "\"✕\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/037__default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:58.339Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "037__open",
+      "expected": "\"✕\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/037__open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:58.652Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "038_get-started0-of-9-complete_default",
+      "expected": "\"Get started0 of 9 complete!▼✕\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/038_get-started0-of-9-complete_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:59.156Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "038_get-started0-of-9-complete_open",
+      "expected": "\"Get started0 of 9 complete!▼✕\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/01-editor-base/038_get-started0-of-9-complete_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:59.455Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "039_page-1_default",
+      "expected": "\"Page 1\" default state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/04-pages/039_page-1_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:38:59.973Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P3-discovery",
+      "shot": "039_page-1_open",
+      "expected": "\"Page 1\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/04-pages/039_page-1_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:00.789Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle",
+      "shot": "040_element-selected",
+      "expected": "Element selected with handles",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/11-element-lifecycle/040_element-selected.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:01.232Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-templatestemplatest",
+      "expected": "Panel tab \"TemplatesTemplatesT\" active",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/11-element-lifecycle/041_panel-tab-templatestemplatest.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:01.628Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-pagespagesp",
+      "expected": "Panel tab \"PagesPagesP\" active",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/11-element-lifecycle/042_panel-tab-pagespagesp.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:02.063Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-buildbuilda",
+      "expected": "Panel tab \"BuildBuildA\" active",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/11-element-lifecycle/043_panel-tab-buildbuilda.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:02.469Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-mediamedia-libraryj",
+      "expected": "Panel tab \"MediaMedia LibraryJ\" active",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/11-element-lifecycle/044_panel-tab-mediamedia-libraryj.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:02.888Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-globaldesign-systemd",
+      "expected": "Panel tab \"GlobalDesign SystemD\" active",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/11-element-lifecycle/045_panel-tab-globaldesign-systemd.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:02.972Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P4-lifecycle",
+      "shot": "049_after-selection",
+      "expected": "Final lifecycle state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/11-element-lifecycle/049_after-selection.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:03.507Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P5-undo-redo",
+      "shot": "050_after-undo",
+      "expected": "State after Cmd+Z undo",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/12-undo-redo/050_after-undo.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:04.019Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P5-undo-redo",
+      "shot": "051_after-redo",
+      "expected": "State after Cmd+Shift+Z redo",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/12-undo-redo/051_after-redo.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:04.116Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays",
+      "shot": "060_toast-notification",
+      "expected": "Toast/notification visible",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/13-overlays/060_toast-notification.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:05.021Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-1",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/13-overlays/061_tooltip-btn1.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:05.924Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-2",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/13-overlays/062_tooltip-btn2.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:06.834Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-3",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/13-overlays/063_tooltip-btn3.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:07.739Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-4",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/13-overlays/064_tooltip-btn4.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:08.639Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-5",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/13-overlays/065_tooltip-btn5.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:08.937Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-top",
+      "expected": "Panel at top",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/14-scroll/070_panel1-top.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:09.255Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-mid",
+      "expected": "Panel at middle",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/14-scroll/071_panel1-mid.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:09.565Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-bottom",
+      "expected": "Panel at bottom",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/14-scroll/072_panel1-bottom.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:09.871Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P8-special",
+      "shot": "080_focus-first",
+      "expected": "First focusable element focused",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/15-special-states/080_focus-first.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:10.173Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P8-special",
+      "shot": "081_focus-second",
+      "expected": "Second focusable element focused",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/15-special-states/081_focus-second.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:10.569Z",
+      "viewport": "desktop-1440x900",
+      "phase": "P8-special",
+      "shot": "082_empty-state",
+      "expected": "Empty/deselected state",
+      "actual": "Screenshot captured: latest-screenshots/desktop-1440x900/15-special-states/082_empty-state.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:16.753Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P0-loading",
+      "shot": "000_loading-state",
+      "expected": "App loading or editor ready",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/000_loading-state.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:16.833Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P2-base",
+      "shot": "001_editor-base_default",
+      "expected": "Full editor default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/001_editor-base_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:17.219Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P2-base",
+      "shot": "002_canvas_idle",
+      "expected": "Canvas idle, nothing selected",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/002_canvas_idle.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:17.302Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P2-base",
+      "shot": "003_workspace_overview",
+      "expected": "Full workspace overview",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/003_workspace_overview.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:17.382Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "010_untitled-project_default",
+      "expected": "\"Untitled Project▾\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/010_untitled-project_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:17.866Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "010_untitled-project_open",
+      "expected": "\"Untitled Project▾\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/010_untitled-project_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:18.166Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "011_undo-last-action_default",
+      "expected": "\"Undo last action\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/011_undo-last-action_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:18.708Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "011_undo-last-action_open",
+      "expected": "\"Undo last action\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/011_undo-last-action_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:19.002Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "012_redo-last-action_default",
+      "expected": "\"Redo last action\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/012_redo-last-action_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:19.500Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "012_redo-last-action_open",
+      "expected": "\"Redo last action\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/012_redo-last-action_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:19.784Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "013_desktop_default",
+      "expected": "\"Desktop▾\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/013_desktop_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:20.275Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "013_desktop_open",
+      "expected": "\"Desktop▾\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/013_desktop_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:20.556Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "014_1_default",
+      "expected": "\"1\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/014_1_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:21.059Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "014_1_open",
+      "expected": "\"1\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/014_1_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:21.339Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "015_preview_default",
+      "expected": "\"Preview\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/015_preview_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:22.005Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "015_preview_open",
+      "expected": "\"Preview\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/015_preview_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:22.300Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "016_publish_default",
+      "expected": "\"Publish\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/016_publish_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:22.829Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "016_publish_open",
+      "expected": "\"Publish\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/016_publish_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:23.112Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "017_templatestemplatest_default",
+      "expected": "\"TemplatesTemplatesT\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/017_templatestemplatest_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:23.661Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "017_templatestemplatest_open",
+      "expected": "\"TemplatesTemplatesT\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/017_templatestemplatest_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:23.979Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "018_pagespagesp_default",
+      "expected": "\"PagesPagesP\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/04-pages/018_pagespagesp_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:24.482Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "018_pagespagesp_open",
+      "expected": "\"PagesPagesP\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/04-pages/018_pagespagesp_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:24.770Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "019_buildbuilda_default",
+      "expected": "\"BuildBuildA\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/019_buildbuilda_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:25.275Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "019_buildbuilda_open",
+      "expected": "\"BuildBuildA\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/019_buildbuilda_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:25.576Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "020_mediamedia-libraryj_default",
+      "expected": "\"MediaMedia LibraryJ\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/020_mediamedia-libraryj_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:26.099Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "020_mediamedia-libraryj_open",
+      "expected": "\"MediaMedia LibraryJ\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/020_mediamedia-libraryj_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:26.396Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "021_globaldesign-systemd_default",
+      "expected": "\"GlobalDesign SystemD\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/07-design/021_globaldesign-systemd_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:26.907Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "021_globaldesign-systemd_open",
+      "expected": "\"GlobalDesign SystemD\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/07-design/021_globaldesign-systemd_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:27.218Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "022_configconfig-launchs_default",
+      "expected": "\"ConfigConfig & LaunchS\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/022_configconfig-launchs_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:27.727Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "022_configconfig-launchs_open",
+      "expected": "\"ConfigConfig & LaunchS\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/022_configconfig-launchs_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:28.030Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "023_layers_default",
+      "expected": "\"Layers\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/03-layers/023_layers_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:28.540Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "023_layers_open",
+      "expected": "\"Layers\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/03-layers/023_layers_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:28.833Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "024_history_default",
+      "expected": "\"History\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/024_history_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:29.340Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "024_history_open",
+      "expected": "\"History\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/024_history_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:29.645Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "025__default",
+      "expected": "\"+\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/025__default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:30.145Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "025__open",
+      "expected": "\"+\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/025__open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:30.439Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "026_snap-guides_default",
+      "expected": "\"Snap Guides✓\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/026_snap-guides_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:30.941Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "026_snap-guides_open",
+      "expected": "\"Snap Guides✓\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/026_snap-guides_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:31.241Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "027_spacing_default",
+      "expected": "\"Spacing\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/027_spacing_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:31.759Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "027_spacing_open",
+      "expected": "\"Spacing\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/027_spacing_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:32.057Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "028_grid_default",
+      "expected": "\"Grid\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/028_grid_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:32.588Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "028_grid_open",
+      "expected": "\"Grid\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/028_grid_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:32.894Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "029_badges_default",
+      "expected": "\"Badges\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/029_badges_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:33.427Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "029_badges_open",
+      "expected": "\"Badges\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/029_badges_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:33.731Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "030_x-ray_default",
+      "expected": "\"X-Ray\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/030_x-ray_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:34.242Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "030_x-ray_open",
+      "expected": "\"X-Ray\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/030_x-ray_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:34.541Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "031__default",
+      "expected": "\"−\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/031__default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:35.055Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "031__open",
+      "expected": "\"−\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/031__open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:35.357Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "032_100_default",
+      "expected": "\"100%\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/032_100_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:35.860Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "032_100_open",
+      "expected": "\"100%\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/032_100_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:36.165Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "033_open-build-panel_default",
+      "expected": "\"Open Build Panel\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/033_open-build-panel_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:36.715Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "033_open-build-panel_open",
+      "expected": "\"Open Build Panel\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/033_open-build-panel_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:37.007Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "034_browse-templates_default",
+      "expected": "\"Browse Templates\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/034_browse-templates_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:37.536Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "034_browse-templates_open",
+      "expected": "\"Browse Templates\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/034_browse-templates_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:37.843Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "035_skip_default",
+      "expected": "\"Skip\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/035_skip_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:38.335Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "035_skip_open",
+      "expected": "\"Skip\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/035_skip_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:38.631Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "036_next_default",
+      "expected": "\"Next\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/036_next_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:39.136Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "036_next_open",
+      "expected": "\"Next\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/036_next_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:39.431Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "037__default",
+      "expected": "\"✕\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/037__default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:39.910Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "037__open",
+      "expected": "\"✕\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/037__open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:40.198Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "038_get-started0-of-9-complete_default",
+      "expected": "\"Get started0 of 9 complete!▼✕\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/038_get-started0-of-9-complete_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:40.684Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "038_get-started0-of-9-complete_open",
+      "expected": "\"Get started0 of 9 complete!▼✕\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/01-editor-base/038_get-started0-of-9-complete_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:40.977Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "039_page-1_default",
+      "expected": "\"Page 1\" default state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/04-pages/039_page-1_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:41.478Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P3-discovery",
+      "shot": "039_page-1_open",
+      "expected": "\"Page 1\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/04-pages/039_page-1_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:42.275Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle",
+      "shot": "040_element-selected",
+      "expected": "Element selected with handles",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/11-element-lifecycle/040_element-selected.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:42.699Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-templatestemplatest",
+      "expected": "Panel tab \"TemplatesTemplatesT\" active",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/11-element-lifecycle/041_panel-tab-templatestemplatest.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:43.089Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-pagespagesp",
+      "expected": "Panel tab \"PagesPagesP\" active",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/11-element-lifecycle/042_panel-tab-pagespagesp.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:43.511Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-buildbuilda",
+      "expected": "Panel tab \"BuildBuildA\" active",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/11-element-lifecycle/043_panel-tab-buildbuilda.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:43.910Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-mediamedia-libraryj",
+      "expected": "Panel tab \"MediaMedia LibraryJ\" active",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/11-element-lifecycle/044_panel-tab-mediamedia-libraryj.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:44.313Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-globaldesign-systemd",
+      "expected": "Panel tab \"GlobalDesign SystemD\" active",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/11-element-lifecycle/045_panel-tab-globaldesign-systemd.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:44.394Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P4-lifecycle",
+      "shot": "049_after-selection",
+      "expected": "Final lifecycle state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/11-element-lifecycle/049_after-selection.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:44.921Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P5-undo-redo",
+      "shot": "050_after-undo",
+      "expected": "State after Cmd+Z undo",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/12-undo-redo/050_after-undo.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:45.428Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P5-undo-redo",
+      "shot": "051_after-redo",
+      "expected": "State after Cmd+Shift+Z redo",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/12-undo-redo/051_after-redo.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:45.513Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays",
+      "shot": "060_toast-notification",
+      "expected": "Toast/notification visible",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/13-overlays/060_toast-notification.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:46.414Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-1",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/13-overlays/061_tooltip-btn1.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:47.312Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-2",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/13-overlays/062_tooltip-btn2.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:48.212Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-3",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/13-overlays/063_tooltip-btn3.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:49.120Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-4",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/13-overlays/064_tooltip-btn4.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:50.010Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-5",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/13-overlays/065_tooltip-btn5.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:50.299Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-top",
+      "expected": "Panel at top",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/14-scroll/070_panel1-top.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:50.572Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-mid",
+      "expected": "Panel at middle",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/14-scroll/071_panel1-mid.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:50.861Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-bottom",
+      "expected": "Panel at bottom",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/14-scroll/072_panel1-bottom.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:51.144Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P8-special",
+      "shot": "080_focus-first",
+      "expected": "First focusable element focused",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/15-special-states/080_focus-first.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:51.431Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P8-special",
+      "shot": "081_focus-second",
+      "expected": "Second focusable element focused",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/15-special-states/081_focus-second.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:51.808Z",
+      "viewport": "laptop-1280x720",
+      "phase": "P8-special",
+      "shot": "082_empty-state",
+      "expected": "Empty/deselected state",
+      "actual": "Screenshot captured: latest-screenshots/laptop-1280x720/15-special-states/082_empty-state.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:58.958Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P0-loading",
+      "shot": "000_loading-state",
+      "expected": "App loading or editor ready",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/000_loading-state.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:59.048Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P2-base",
+      "shot": "001_editor-base_default",
+      "expected": "Full editor default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/001_editor-base_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:59.433Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P2-base",
+      "shot": "002_canvas_idle",
+      "expected": "Canvas idle, nothing selected",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/002_canvas_idle.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:59.520Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P2-base",
+      "shot": "003_workspace_overview",
+      "expected": "Full workspace overview",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/003_workspace_overview.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:39:59.600Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "010_untitled-project_default",
+      "expected": "\"Untitled Project▾\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/010_untitled-project_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:00.083Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "010_untitled-project_open",
+      "expected": "\"Untitled Project▾\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/010_untitled-project_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:00.360Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "011_undo-last-action_default",
+      "expected": "\"Undo last action\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/011_undo-last-action_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:00.886Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "011_undo-last-action_open",
+      "expected": "\"Undo last action\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/011_undo-last-action_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:01.196Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "012_redo-last-action_default",
+      "expected": "\"Redo last action\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/012_redo-last-action_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:01.701Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "012_redo-last-action_open",
+      "expected": "\"Redo last action\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/012_redo-last-action_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:01.978Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "013_desktop_default",
+      "expected": "\"Desktop▾\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/013_desktop_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:02.464Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "013_desktop_open",
+      "expected": "\"Desktop▾\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/013_desktop_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:02.753Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "014_preview_default",
+      "expected": "\"Preview\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/014_preview_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:03.390Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "014_preview_open",
+      "expected": "\"Preview\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/014_preview_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:03.675Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "015_publish_default",
+      "expected": "\"Publish\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/015_publish_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:04.182Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "015_publish_open",
+      "expected": "\"Publish\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/015_publish_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:04.464Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "016_templatestemplatest_default",
+      "expected": "\"TemplatesTemplatesT\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/016_templatestemplatest_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:05.006Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "016_templatestemplatest_open",
+      "expected": "\"TemplatesTemplatesT\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/016_templatestemplatest_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:05.342Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "017_pagespagesp_default",
+      "expected": "\"PagesPagesP\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/04-pages/017_pagespagesp_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:05.834Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "017_pagespagesp_open",
+      "expected": "\"PagesPagesP\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/04-pages/017_pagespagesp_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:06.138Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "018_buildbuilda_default",
+      "expected": "\"BuildBuildA\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/018_buildbuilda_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:06.680Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "018_buildbuilda_open",
+      "expected": "\"BuildBuildA\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/018_buildbuilda_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:06.974Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "019_mediamedia-libraryj_default",
+      "expected": "\"MediaMedia LibraryJ\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/019_mediamedia-libraryj_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:07.491Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "019_mediamedia-libraryj_open",
+      "expected": "\"MediaMedia LibraryJ\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/019_mediamedia-libraryj_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:07.787Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "020_globaldesign-systemd_default",
+      "expected": "\"GlobalDesign SystemD\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/07-design/020_globaldesign-systemd_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:08.297Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "020_globaldesign-systemd_open",
+      "expected": "\"GlobalDesign SystemD\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/07-design/020_globaldesign-systemd_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:08.590Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "021_configconfig-launchs_default",
+      "expected": "\"ConfigConfig & LaunchS\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/021_configconfig-launchs_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:09.087Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "021_configconfig-launchs_open",
+      "expected": "\"ConfigConfig & LaunchS\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/021_configconfig-launchs_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:09.370Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "022_layers_default",
+      "expected": "\"Layers\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/03-layers/022_layers_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:09.867Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "022_layers_open",
+      "expected": "\"Layers\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/03-layers/022_layers_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:10.154Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "023_history_default",
+      "expected": "\"History\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/023_history_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:10.652Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "023_history_open",
+      "expected": "\"History\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/023_history_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:10.957Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "024__default",
+      "expected": "\"+\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/024__default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:11.515Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "024__open",
+      "expected": "\"+\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/024__open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:11.800Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "025_snap-guides_default",
+      "expected": "\"Snap Guides✓\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/025_snap-guides_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:12.301Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "025_snap-guides_open",
+      "expected": "\"Snap Guides✓\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/025_snap-guides_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:12.600Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "026_spacing_default",
+      "expected": "\"Spacing\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/026_spacing_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:13.107Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "026_spacing_open",
+      "expected": "\"Spacing\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/026_spacing_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:13.400Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "027_grid_default",
+      "expected": "\"Grid\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/027_grid_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:13.936Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "027_grid_open",
+      "expected": "\"Grid\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/027_grid_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:14.280Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "028_badges_default",
+      "expected": "\"Badges\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/028_badges_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:14.789Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "028_badges_open",
+      "expected": "\"Badges\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/028_badges_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:15.097Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "029_x-ray_default",
+      "expected": "\"X-Ray\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/029_x-ray_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:15.603Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "029_x-ray_open",
+      "expected": "\"X-Ray\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/029_x-ray_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:15.922Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "030__default",
+      "expected": "\"−\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/030__default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:16.504Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "030__open",
+      "expected": "\"−\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/030__open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:16.811Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "031_100_default",
+      "expected": "\"100%\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/031_100_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:17.305Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "031_100_open",
+      "expected": "\"100%\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/031_100_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:17.631Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "032_open-build-panel_default",
+      "expected": "\"Open Build Panel\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/032_open-build-panel_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:18.160Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "032_open-build-panel_open",
+      "expected": "\"Open Build Panel\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/032_open-build-panel_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:18.461Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "033_browse-templates_default",
+      "expected": "\"Browse Templates\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/033_browse-templates_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:18.960Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "033_browse-templates_open",
+      "expected": "\"Browse Templates\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/033_browse-templates_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:19.263Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "034_skip_default",
+      "expected": "\"Skip\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/034_skip_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:19.751Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "034_skip_open",
+      "expected": "\"Skip\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/034_skip_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:20.081Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "035_next_default",
+      "expected": "\"Next\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/035_next_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:20.595Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "035_next_open",
+      "expected": "\"Next\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/035_next_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:20.903Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "036__default",
+      "expected": "\"✕\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/036__default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:21.435Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "036__open",
+      "expected": "\"✕\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/036__open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:21.738Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "037_get-started0-of-9-complete_default",
+      "expected": "\"Get started0 of 9 complete!▼✕\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/037_get-started0-of-9-complete_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:22.265Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "037_get-started0-of-9-complete_open",
+      "expected": "\"Get started0 of 9 complete!▼✕\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/01-editor-base/037_get-started0-of-9-complete_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:22.570Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "038_page-1_default",
+      "expected": "\"Page 1\" default state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/04-pages/038_page-1_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:23.091Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P3-discovery",
+      "shot": "038_page-1_open",
+      "expected": "\"Page 1\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/04-pages/038_page-1_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:23.941Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle",
+      "shot": "040_element-selected",
+      "expected": "Element selected with handles",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/11-element-lifecycle/040_element-selected.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:24.398Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-templatestemplatest",
+      "expected": "Panel tab \"TemplatesTemplatesT\" active",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/11-element-lifecycle/041_panel-tab-templatestemplatest.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:24.813Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-pagespagesp",
+      "expected": "Panel tab \"PagesPagesP\" active",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/11-element-lifecycle/042_panel-tab-pagespagesp.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:25.233Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-buildbuilda",
+      "expected": "Panel tab \"BuildBuildA\" active",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/11-element-lifecycle/043_panel-tab-buildbuilda.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:25.628Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-mediamedia-libraryj",
+      "expected": "Panel tab \"MediaMedia LibraryJ\" active",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/11-element-lifecycle/044_panel-tab-mediamedia-libraryj.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:26.031Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-globaldesign-systemd",
+      "expected": "Panel tab \"GlobalDesign SystemD\" active",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/11-element-lifecycle/045_panel-tab-globaldesign-systemd.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:26.125Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P4-lifecycle",
+      "shot": "049_after-selection",
+      "expected": "Final lifecycle state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/11-element-lifecycle/049_after-selection.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:26.683Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P5-undo-redo",
+      "shot": "050_after-undo",
+      "expected": "State after Cmd+Z undo",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/12-undo-redo/050_after-undo.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:27.199Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P5-undo-redo",
+      "shot": "051_after-redo",
+      "expected": "State after Cmd+Shift+Z redo",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/12-undo-redo/051_after-redo.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:27.285Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays",
+      "shot": "060_toast-notification",
+      "expected": "Toast/notification visible",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/13-overlays/060_toast-notification.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:28.183Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-1",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/13-overlays/061_tooltip-btn1.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:29.084Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-2",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/13-overlays/062_tooltip-btn2.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:29.981Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-3",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/13-overlays/063_tooltip-btn3.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:30.891Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-4",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/13-overlays/064_tooltip-btn4.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:31.797Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-5",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/13-overlays/065_tooltip-btn5.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:32.082Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-top",
+      "expected": "Panel at top",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/14-scroll/070_panel1-top.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:32.364Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-mid",
+      "expected": "Panel at middle",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/14-scroll/071_panel1-mid.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:32.648Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-bottom",
+      "expected": "Panel at bottom",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/14-scroll/072_panel1-bottom.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:32.932Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P8-special",
+      "shot": "080_focus-first",
+      "expected": "First focusable element focused",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/15-special-states/080_focus-first.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:33.212Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P8-special",
+      "shot": "081_focus-second",
+      "expected": "Second focusable element focused",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/15-special-states/081_focus-second.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:33.598Z",
+      "viewport": "tablet-834x1112",
+      "phase": "P8-special",
+      "shot": "082_empty-state",
+      "expected": "Empty/deselected state",
+      "actual": "Screenshot captured: latest-screenshots/tablet-834x1112/15-special-states/082_empty-state.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:39.967Z",
+      "viewport": "mobile-390x844",
+      "phase": "P0-loading",
+      "shot": "000_loading-state",
+      "expected": "App loading or editor ready",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/000_loading-state.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:40.013Z",
+      "viewport": "mobile-390x844",
+      "phase": "P2-base",
+      "shot": "001_editor-base_default",
+      "expected": "Full editor default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/001_editor-base_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:40.382Z",
+      "viewport": "mobile-390x844",
+      "phase": "P2-base",
+      "shot": "002_canvas_idle",
+      "expected": "Canvas idle, nothing selected",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/002_canvas_idle.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:40.447Z",
+      "viewport": "mobile-390x844",
+      "phase": "P2-base",
+      "shot": "003_workspace_overview",
+      "expected": "Full workspace overview",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/003_workspace_overview.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:40.497Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "010_untitled-project_default",
+      "expected": "\"Untitled Project▾\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/010_untitled-project_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:40.966Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "010_untitled-project_open",
+      "expected": "\"Untitled Project▾\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/010_untitled-project_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:41.232Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "011_undo-last-action_default",
+      "expected": "\"Undo last action\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/011_undo-last-action_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:41.850Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "011_undo-last-action_open",
+      "expected": "\"Undo last action\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/011_undo-last-action_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:42.097Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "012_redo-last-action_default",
+      "expected": "\"Redo last action\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/012_redo-last-action_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:42.731Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "012_redo-last-action_open",
+      "expected": "\"Redo last action\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/012_redo-last-action_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:42.981Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "013_desktop_default",
+      "expected": "\"Desktop▾\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/013_desktop_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:43.508Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "013_desktop_open",
+      "expected": "\"Desktop▾\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/013_desktop_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:43.841Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "014_preview_default",
+      "expected": "\"Preview\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/014_preview_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:44.515Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "014_preview_open",
+      "expected": "\"Preview\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/014_preview_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:44.819Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "015_publish_default",
+      "expected": "\"Publish\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/015_publish_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:45.285Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "015_publish_open",
+      "expected": "\"Publish\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/015_publish_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:45.532Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "016_templatestemplatest_default",
+      "expected": "\"TemplatesTemplatesT\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/016_templatestemplatest_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:46.011Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "016_templatestemplatest_open",
+      "expected": "\"TemplatesTemplatesT\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/016_templatestemplatest_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:46.271Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "017_pagespagesp_default",
+      "expected": "\"PagesPagesP\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/04-pages/017_pagespagesp_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:46.736Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "017_pagespagesp_open",
+      "expected": "\"PagesPagesP\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/04-pages/017_pagespagesp_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:46.999Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "018_buildbuilda_default",
+      "expected": "\"BuildBuildA\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/018_buildbuilda_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:47.465Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "018_buildbuilda_open",
+      "expected": "\"BuildBuildA\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/018_buildbuilda_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:47.730Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "019_mediamedia-libraryj_default",
+      "expected": "\"MediaMedia LibraryJ\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/019_mediamedia-libraryj_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:48.205Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "019_mediamedia-libraryj_open",
+      "expected": "\"MediaMedia LibraryJ\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/019_mediamedia-libraryj_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:48.467Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "020_globaldesign-systemd_default",
+      "expected": "\"GlobalDesign SystemD\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/07-design/020_globaldesign-systemd_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:48.990Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "020_globaldesign-systemd_open",
+      "expected": "\"GlobalDesign SystemD\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/07-design/020_globaldesign-systemd_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:49.276Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "021_configconfig-launchs_default",
+      "expected": "\"ConfigConfig & LaunchS\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/021_configconfig-launchs_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:49.759Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "021_configconfig-launchs_open",
+      "expected": "\"ConfigConfig & LaunchS\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/021_configconfig-launchs_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:50.080Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "022_layers_default",
+      "expected": "\"Layers\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/03-layers/022_layers_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:50.555Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "022_layers_open",
+      "expected": "\"Layers\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/03-layers/022_layers_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:50.820Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "023_history_default",
+      "expected": "\"History\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/023_history_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:51.286Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "023_history_open",
+      "expected": "\"History\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/023_history_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:51.535Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "024__default",
+      "expected": "\"+\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/024__default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:51.996Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "024__open",
+      "expected": "\"+\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/024__open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:52.280Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "025_snap-guides_default",
+      "expected": "\"Snap Guides✓\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/025_snap-guides_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:52.734Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "025_snap-guides_open",
+      "expected": "\"Snap Guides✓\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/025_snap-guides_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:53.000Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "026_spacing_default",
+      "expected": "\"Spacing\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/026_spacing_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:53.452Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "026_spacing_open",
+      "expected": "\"Spacing\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/026_spacing_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:53.700Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "027_grid_default",
+      "expected": "\"Grid\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/027_grid_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:54.155Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "027_grid_open",
+      "expected": "\"Grid\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/027_grid_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:54.420Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "028_badges_default",
+      "expected": "\"Badges\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/028_badges_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:54.889Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "028_badges_open",
+      "expected": "\"Badges\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/028_badges_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:55.162Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "029_x-ray_default",
+      "expected": "\"X-Ray\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/029_x-ray_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:55.610Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "029_x-ray_open",
+      "expected": "\"X-Ray\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/029_x-ray_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:55.868Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "030__default",
+      "expected": "\"−\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/030__default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:56.316Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "030__open",
+      "expected": "\"−\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/030__open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:56.583Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "031_100_default",
+      "expected": "\"100%\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/031_100_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:57.033Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "031_100_open",
+      "expected": "\"100%\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/031_100_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:57.323Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "032_open-build-panel_default",
+      "expected": "\"Open Build Panel\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/032_open-build-panel_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:57.778Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "032_open-build-panel_open",
+      "expected": "\"Open Build Panel\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/032_open-build-panel_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:58.040Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "033_browse-templates_default",
+      "expected": "\"Browse Templates\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/033_browse-templates_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:58.493Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "033_browse-templates_open",
+      "expected": "\"Browse Templates\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/033_browse-templates_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:58.743Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "034_skip_default",
+      "expected": "\"Skip\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/034_skip_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:59.192Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "034_skip_open",
+      "expected": "\"Skip\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/034_skip_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:59.442Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "035_next_default",
+      "expected": "\"Next\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/035_next_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:40:59.902Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "035_next_open",
+      "expected": "\"Next\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/035_next_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:00.152Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "036__default",
+      "expected": "\"✕\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/036__default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:00.618Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "036__open",
+      "expected": "\"✕\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/036__open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:00.886Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "037_get-started0-of-9-complete_default",
+      "expected": "\"Get started0 of 9 complete!▼✕\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/037_get-started0-of-9-complete_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:01.333Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "037_get-started0-of-9-complete_open",
+      "expected": "\"Get started0 of 9 complete!▼✕\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/01-editor-base/037_get-started0-of-9-complete_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:01.603Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "038_page-1_default",
+      "expected": "\"Page 1\" default state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/04-pages/038_page-1_default.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:02.050Z",
+      "viewport": "mobile-390x844",
+      "phase": "P3-discovery",
+      "shot": "038_page-1_open",
+      "expected": "\"Page 1\" open/active state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/04-pages/038_page-1_open.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:02.819Z",
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle",
+      "shot": "040_element-selected",
+      "expected": "Element selected with handles",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/11-element-lifecycle/040_element-selected.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:03.204Z",
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-templatestemplatest",
+      "expected": "Panel tab \"TemplatesTemplatesT\" active",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/11-element-lifecycle/041_panel-tab-templatestemplatest.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:03.567Z",
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-pagespagesp",
+      "expected": "Panel tab \"PagesPagesP\" active",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/11-element-lifecycle/042_panel-tab-pagespagesp.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:03.932Z",
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-buildbuilda",
+      "expected": "Panel tab \"BuildBuildA\" active",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/11-element-lifecycle/043_panel-tab-buildbuilda.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:04.300Z",
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-mediamedia-libraryj",
+      "expected": "Panel tab \"MediaMedia LibraryJ\" active",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/11-element-lifecycle/044_panel-tab-mediamedia-libraryj.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:04.667Z",
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle",
+      "shot": "panel-tab-globaldesign-systemd",
+      "expected": "Panel tab \"GlobalDesign SystemD\" active",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/11-element-lifecycle/045_panel-tab-globaldesign-systemd.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:04.718Z",
+      "viewport": "mobile-390x844",
+      "phase": "P4-lifecycle",
+      "shot": "049_after-selection",
+      "expected": "Final lifecycle state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/11-element-lifecycle/049_after-selection.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:05.199Z",
+      "viewport": "mobile-390x844",
+      "phase": "P5-undo-redo",
+      "shot": "050_after-undo",
+      "expected": "State after Cmd+Z undo",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/12-undo-redo/050_after-undo.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:05.666Z",
+      "viewport": "mobile-390x844",
+      "phase": "P5-undo-redo",
+      "shot": "051_after-redo",
+      "expected": "State after Cmd+Shift+Z redo",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/12-undo-redo/051_after-redo.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:05.718Z",
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays",
+      "shot": "060_toast-notification",
+      "expected": "Toast/notification visible",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/13-overlays/060_toast-notification.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:06.585Z",
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-1",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/13-overlays/061_tooltip-btn1.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:07.455Z",
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-2",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/13-overlays/062_tooltip-btn2.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:08.317Z",
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-3",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/13-overlays/063_tooltip-btn3.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:09.187Z",
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-4",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/13-overlays/064_tooltip-btn4.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:10.052Z",
+      "viewport": "mobile-390x844",
+      "phase": "P6-overlays",
+      "shot": "tooltip-btn-5",
+      "expected": "Tooltip on button hover",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/13-overlays/065_tooltip-btn5.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:10.322Z",
+      "viewport": "mobile-390x844",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-top",
+      "expected": "Panel at top",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/14-scroll/070_panel1-top.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:10.587Z",
+      "viewport": "mobile-390x844",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-mid",
+      "expected": "Panel at middle",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/14-scroll/071_panel1-mid.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:10.851Z",
+      "viewport": "mobile-390x844",
+      "phase": "P7-scroll",
+      "shot": "panel1-scroll-bottom",
+      "expected": "Panel at bottom",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/14-scroll/072_panel1-bottom.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:11.122Z",
+      "viewport": "mobile-390x844",
+      "phase": "P8-special",
+      "shot": "080_focus-first",
+      "expected": "First focusable element focused",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/15-special-states/080_focus-first.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:11.384Z",
+      "viewport": "mobile-390x844",
+      "phase": "P8-special",
+      "shot": "081_focus-second",
+      "expected": "Second focusable element focused",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/15-special-states/081_focus-second.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    },
+    {
+      "ts": "2026-03-01T16:41:11.749Z",
+      "viewport": "mobile-390x844",
+      "phase": "P8-special",
+      "shot": "082_empty-state",
+      "expected": "Empty/deselected state",
+      "actual": "Screenshot captured: latest-screenshots/mobile-390x844/15-special-states/082_empty-state.png",
+      "anomaly": "none",
+      "decision": "proceed"
+    }
+  ]
+}

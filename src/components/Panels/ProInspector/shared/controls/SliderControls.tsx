@@ -1,0 +1,6 @@
+/**
+ * SliderControls — redirect barrel
+ * Canonical: editor/inspector/shared/controls/SliderControls.tsx
+ * @license BSD-3-Clause
+ */
+export * from "../../../../../editor/inspector/shared/controls/SliderControls";
