@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthLogo } from "@/components/auth/auth-logo";
@@ -22,10 +22,12 @@ type AuthStep =
   | { type: "oauth_only"; email: string; providers: ("google" | "github")[] }
   | { type: "signup_new"; email: string };
 
-export default function AuthPage() {
+function AuthPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const prefillEmail = searchParams.get("email") ?? "";
   const [step, setStep] = useState<AuthStep>({ type: "email_entry" });
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(prefillEmail);
   const [rememberMe, setRememberMe] = useState(false);
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -111,6 +113,17 @@ export default function AuthPage() {
     },
     onError: (err) => setError(err.message),
   });
+
+  // If the page loaded with ?email= (e.g. redirect from /auth/login), skip the
+  // email entry step and run checkEmail immediately on mount.
+  useEffect(() => {
+    if (prefillEmail && step.type === "email_entry") {
+      setStep({ type: "checking" });
+      checkEmailMutation.mutate({ email: prefillEmail });
+    }
+    // Only runs on mount — prefillEmail is stable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleEmailSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -467,5 +480,13 @@ export default function AuthPage() {
         .
       </p>
     </>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense>
+      <AuthPageContent />
+    </Suspense>
   );
 }
