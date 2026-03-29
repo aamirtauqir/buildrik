@@ -16,7 +16,7 @@ function getInitials(name: string | null | undefined): string {
 }
 
 export function Topbar() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [paletteOpen, setPaletteOpen] = useState(false);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export function Topbar() {
         <div className="flex items-center gap-1">
           <NotificationDropdown />
           <ContextualHelp />
-          <AvatarDropdown initials={initials} name={userName} email={userEmail} />
+          <AvatarDropdown initials={initials} name={userName} email={userEmail} loading={status === "loading"} />
         </div>
       </header>
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />

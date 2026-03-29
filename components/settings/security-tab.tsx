@@ -8,6 +8,8 @@ function parseUserAgent(ua: string | null | undefined): string {
   const browsers: [RegExp, string][] = [
     [/Edg\//, "Edge"],
     [/OPR\/|Opera\//, "Opera"],
+    [/CriOS\//, "Chrome"],
+    [/FxiOS\//, "Firefox"],
     [/Chrome\//, "Chrome"],
     [/Firefox\//, "Firefox"],
     [/Safari\//, "Safari"],

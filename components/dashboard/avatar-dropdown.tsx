@@ -22,9 +22,10 @@ type AvatarDropdownProps = {
   initials: string;
   name: string;
   email: string;
+  loading?: boolean;
 };
 
-export function AvatarDropdown({ initials, name, email }: AvatarDropdownProps) {
+export function AvatarDropdown({ initials, name, email, loading = false }: AvatarDropdownProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -48,10 +49,14 @@ export function AvatarDropdown({ initials, name, email }: AvatarDropdownProps) {
   return (
     <div ref={ref} className="relative">
       <button
-        onClick={() => setOpen((prev) => !prev)}
-        className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E42313] text-sm font-bold text-white"
+        onClick={() => !loading && setOpen((prev) => !prev)}
+        disabled={loading}
+        className={loading
+          ? "h-9 w-9 animate-pulse rounded-full bg-[#F4F4F4]"
+          : "flex h-9 w-9 items-center justify-center rounded-full bg-[#E42313] text-sm font-bold text-white"
+        }
       >
-        {initials}
+        {!loading && initials}
       </button>
 
       {open && (

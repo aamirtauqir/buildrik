@@ -100,23 +100,25 @@ export function Sidebar() {
               {PLAN_LABELS[plan] ?? plan}
             </span>
           </div>
-          <div className="space-y-1">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px]" style={{ color: "#7A7A7A" }}>Sites</span>
-              <span className="text-[11px] font-medium" style={{ color: "#0D0D0D" }}>
-                {sitesUsed}/{sitesLimit}
-              </span>
+          {!health.isLoading && (
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px]" style={{ color: "#7A7A7A" }}>Sites</span>
+                <span className="text-[11px] font-medium" style={{ color: "#0D0D0D" }}>
+                  {sitesUsed}/{sitesLimit}
+                </span>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#E8E8E8]">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{
+                    width: `${usagePct}%`,
+                    backgroundColor: usagePct >= 85 ? "#EF4444" : usagePct >= 60 ? "#EAB308" : "#22C55E",
+                  }}
+                />
+              </div>
             </div>
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#E8E8E8]">
-              <div
-                className="h-full rounded-full transition-all"
-                style={{
-                  width: `${usagePct}%`,
-                  backgroundColor: usagePct >= 85 ? "#EF4444" : usagePct >= 60 ? "#EAB308" : "#22C55E",
-                }}
-              />
-            </div>
-          </div>
+          )}
           {plan === "FREE" && (
             <Link
               href="/dashboard/billing"
