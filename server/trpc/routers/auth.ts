@@ -158,6 +158,53 @@ export const authRouter = router({
       }
     }),
 
+  /**
+   * Email-first flow prerequisite: reveals whether an account exists for the given
+   * email and what auth methods are available (password / which OAuth providers).
+   *
+   * This endpoint is intentionally an "oracle" — the email-first UX requires it.
+   * Mitigations:
+   *   1. Strict rate limit (5 / 15 min per IP) — bulk enumeration is infeasible.
+   *   2. Constant-time floor (200 ms) — timing attacks cannot distinguish a DB hit
+   *      from a miss, and cannot probe cache behavior.
+   */
+  checkEmail: strictRateLimit
+    .input(z.object({ email: z.string().email() }))
+    .mutation(async ({ input, ctx }) => {
+      const MIN_RESPONSE_MS = 200;
+      const start = Date.now();
+
+      const user = await ctx.prisma.user.findUnique({
+        where: { email: input.email },
+        select: { id: true, passwordHash: true },
+      });
+
+      const providers: ("google" | "github")[] = [];
+      if (user) {
+        const accounts = await ctx.prisma.account.findMany({
+          where: { userId: user.id },
+          select: { provider: true },
+        });
+        for (const a of accounts) {
+          if (a.provider === "google" || a.provider === "github") {
+            providers.push(a.provider);
+          }
+        }
+      }
+
+      // Enforce minimum response time regardless of DB speed.
+      const elapsed = Date.now() - start;
+      if (elapsed < MIN_RESPONSE_MS) {
+        await new Promise<void>((r) => setTimeout(r, MIN_RESPONSE_MS - elapsed));
+      }
+
+      return {
+        exists: !!user,
+        hasPassword: !!user?.passwordHash,
+        providers,
+      };
+    }),
+
   getInviteDetails: publicProcedure
     .input(z.object({ token: z.string() }))
     .query(async ({ input, ctx }) => {
