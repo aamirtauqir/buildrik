@@ -51,6 +51,8 @@ export default function SitesPage() {
 
   // Modal state
   const [createOpen, setCreateOpen] = useState(false);
+  const [createFolderOpen, setCreateFolderOpen] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
   const [renameTarget, setRenameTarget] = useState<{
     id: string;
     name: string;
@@ -143,6 +145,16 @@ export default function SitesPage() {
       addToast("success", "Sites moved to folder");
     },
     onError: (err: { message: string }) => addToast("error", "Failed to move sites", err.message),
+  });
+
+  const createFolderMutation = trpc.sites.folders.create.useMutation({
+    onSuccess: () => {
+      foldersQuery.refetch();
+      setCreateFolderOpen(false);
+      setNewFolderName("");
+      addToast("success", "Folder created");
+    },
+    onError: (err: { message: string }) => addToast("error", "Failed to create folder", err.message),
   });
 
   // Selection handler with shift+click range selection
@@ -325,11 +337,7 @@ export default function SitesPage() {
             setShowArchived(false);
             setPage(1);
           }}
-          onCreateFolder={() => {
-            const name = prompt("Folder name:");
-            if (name)
-              trpc.useUtils().client.sites.folders.create.mutate({ name });
-          }}
+          onCreateFolder={() => setCreateFolderOpen(true)}
           archivedCount={0}
           showArchived={showArchived}
           onToggleArchived={() => {
@@ -519,6 +527,50 @@ export default function SitesPage() {
           siteName={transferTarget.name}
           onClose={() => setTransferTarget(null)}
         />
+      )}
+
+      {createFolderOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+            <h2 className="text-lg font-bold" style={{ color: "#0D0D0D" }}>New Folder</h2>
+            <input
+              type="text"
+              value={newFolderName}
+              onChange={(e) => setNewFolderName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && newFolderName.trim()) {
+                  createFolderMutation.mutate({ name: newFolderName.trim() });
+                } else if (e.key === "Escape") {
+                  setCreateFolderOpen(false);
+                  setNewFolderName("");
+                }
+              }}
+              placeholder="Folder name"
+              autoFocus
+              className="mt-4 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-[#E42313]"
+              style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+            />
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => { setCreateFolderOpen(false); setNewFolderName(""); }}
+                className="flex-1 rounded-lg border py-2.5 text-sm font-medium transition-colors hover:bg-[#FAFAFA]"
+                style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (newFolderName.trim()) createFolderMutation.mutate({ name: newFolderName.trim() });
+                }}
+                disabled={!newFolderName.trim() || createFolderMutation.isPending}
+                className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                style={{ backgroundColor: "#E42313" }}
+              >
+                {createFolderMutation.isPending ? "Creating..." : "Create Folder"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
