@@ -81,9 +81,9 @@ describe("OAuth 2FA gate: signIn callback checks twoFactorEnabled", () => {
 
   // Test 32
   it("2FA redirect comes before the function returns true (gate fires before session grant)", () => {
-    // Use full file positions — the signIn callback is ~1700 chars so slice by 2500
+    // Use full file positions — slice large enough to cover the full signIn callback
     const signInStart = authConfigSource.indexOf("async signIn(");
-    const signInSection = authConfigSource.slice(signInStart, signInStart + 2500);
+    const signInSection = authConfigSource.slice(signInStart, signInStart + 11000);
     const twoFARedirectPos = signInSection.indexOf("/auth/2fa?token=");
     const returnTruePos = signInSection.indexOf("return true");
     expect(twoFARedirectPos).toBeGreaterThan(-1);
@@ -239,5 +239,44 @@ describe("account-deletion cron: processes pending deletions", () => {
 
     const res = await GET(req as any);
     expect(res.status).toBe(401);
+  });
+});
+
+// ========================================================================
+// checkEmail: rate-limit + constant-time floor (Phase 3 prerequisite)
+// ========================================================================
+
+describe("auth.checkEmail: enumeration-safe email lookup", () => {
+  const authRouterSource = readFileSync(
+    path.join(__dirname, "..", "server/trpc/routers/auth.ts"),
+    "utf-8"
+  );
+  const checkEmailStart = authRouterSource.indexOf("checkEmail:");
+  const checkEmailSection = authRouterSource.slice(checkEmailStart, checkEmailStart + 2000);
+
+  it("checkEmail uses strictRateLimit (5 / 15 min)", () => {
+    // strictRateLimit is declared at the top of the router and applied here
+    const strictRateLimitPos = authRouterSource.indexOf("const strictRateLimit");
+    const checkEmailPos = authRouterSource.indexOf("checkEmail:");
+    expect(strictRateLimitPos).toBeGreaterThan(-1);
+    expect(checkEmailPos).toBeGreaterThan(-1);
+    // strictRateLimit must be referenced in the checkEmail block
+    expect(checkEmailSection).toContain("strictRateLimit");
+  });
+
+  it("checkEmail enforces a constant-time floor (MIN_RESPONSE_MS)", () => {
+    expect(checkEmailSection).toContain("MIN_RESPONSE_MS");
+    expect(checkEmailSection).toContain("setTimeout");
+    expect(checkEmailSection).toContain("elapsed");
+  });
+
+  it("checkEmail returns exists, hasPassword, and providers fields", () => {
+    expect(checkEmailSection).toContain("exists:");
+    expect(checkEmailSection).toContain("hasPassword:");
+    expect(checkEmailSection).toContain("providers");
+  });
+
+  it("checkEmail queries Account model to populate providers", () => {
+    expect(checkEmailSection).toContain("account.findMany");
   });
 });

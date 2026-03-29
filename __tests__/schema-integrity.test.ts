@@ -9,7 +9,7 @@ describe("Prisma Schema Integrity", () => {
     "utf-8"
   );
 
-  it("schema contains all 41 models from PRD", () => {
+  it("schema contains all 40 models from PRD", () => {
     const expectedModels = [
       "User", "Account", "Session", "VerificationToken",
       "WorkspaceMember", "Workspace", "AuditLog",
@@ -22,13 +22,14 @@ describe("Prisma Schema Integrity", () => {
       "WorkspaceIntegration", "WSSharingSettings",
       "HelpArticle", "SupportTicket", "ExportJob", "UserPreference",
       "SlugHistory", "WorkspaceTransfer", "AccountDeletionReq",
-      "LoginAttempt", "PublishBuildJob", "Redirect", "ConnectedAccount",
+      "LoginAttempt", "PublishBuildJob", "Redirect",
+      // ConnectedAccount removed — dead schema, superseded by Account model
     ];
 
     for (const model of expectedModels) {
       expect(schema, `Missing model: ${model}`).toContain(`model ${model}`);
     }
-    expect(expectedModels).toHaveLength(41);
+    expect(expectedModels).toHaveLength(40);
   });
 
   it("schema has required unique constraints", () => {
