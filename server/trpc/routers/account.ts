@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
+import { generateToken } from "@/server/services/token.service";
+import { logAuditEvent } from "@/server/services/audit.service";
 import {
   getProfile, updateProfile, changePassword, requestEmailChange, getActiveSessions, revokeSession,
   revokeAllOtherSessions, getLoginHistory, getNotificationPrefs,
@@ -23,6 +25,58 @@ async function getWorkspaceCtx(ctx: any): Promise<{ workspaceId: string; plan: P
 }
 
 export const accountRouter = router({
+  linkedProviders: protectedProcedure.query(({ ctx }) =>
+    ctx.prisma.account.findMany({
+      where: { userId: ctx.session.user.id },
+      select: { provider: true, createdAt: true },
+      orderBy: { createdAt: "asc" },
+    })
+  ),
+  initiateLinking: protectedProcedure
+    .input(z.object({ provider: z.enum(["google", "github"]) }))
+    .mutation(async ({ ctx, input }) => {
+      const existing = await ctx.prisma.account.findFirst({
+        where: { userId: ctx.session.user.id, provider: input.provider },
+      });
+      if (existing) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: `${input.provider === "google" ? "Google" : "GitHub"} is already connected.`,
+        });
+      }
+      const linkToken = await generateToken("link_token", ctx.session.user.id, 5);
+      return { linkToken, provider: input.provider };
+    }),
+  unlinkProvider: protectedProcedure
+    .input(z.object({ provider: z.enum(["google", "github"]) }))
+    .mutation(async ({ ctx, input }) => {
+      // Guard: must have another auth method before unlinking
+      const user = await ctx.prisma.user.findUnique({
+        where: { id: ctx.session.user.id },
+        select: { passwordHash: true },
+      });
+      const otherAccounts = await ctx.prisma.account.findMany({
+        where: { userId: ctx.session.user.id },
+        select: { provider: true },
+      });
+      const remainingAfterUnlink = otherAccounts.filter(
+        (a) => a.provider !== input.provider
+      );
+      if (!user?.passwordHash && remainingAfterUnlink.length === 0) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Set a password before removing your only sign-in method.",
+        });
+      }
+      await ctx.prisma.account.deleteMany({
+        where: { userId: ctx.session.user.id, provider: input.provider },
+      });
+      await logAuditEvent("OAUTH_UNLINK", "success", {
+        userId: ctx.session.user.id,
+        metadata: { provider: input.provider },
+      });
+      return { ok: true };
+    }),
   profile: router({
     get: protectedProcedure.query(({ ctx }) => getProfile(ctx.session.user.id)),
     update: protectedProcedure.input(updateProfileSchema).mutation(({ ctx, input }) => updateProfile(ctx.session.user.id, input)),

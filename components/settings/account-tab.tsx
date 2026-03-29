@@ -4,7 +4,7 @@ import { useState } from "react";
 
 interface ConnectedAccount {
   provider: "google" | "github";
-  email: string;
+  createdAt: Date | string;
 }
 
 interface AccountTabProps {
@@ -12,7 +12,9 @@ interface AccountTabProps {
   connectedAccounts?: ConnectedAccount[];
   onChangePassword?: (data: { currentPassword: string; newPassword: string }) => void;
   onSetPassword?: (data: { newPassword: string }) => void;
+  onConnectAccount?: (provider: "google" | "github") => void;
   onDisconnectAccount?: (provider: "google" | "github") => void;
+  connectingProvider?: "google" | "github" | null;
   saving?: boolean;
 }
 
@@ -67,7 +69,9 @@ export function AccountTab({
   connectedAccounts = [],
   onChangePassword,
   onSetPassword,
+  onConnectAccount,
   onDisconnectAccount,
+  connectingProvider = null,
   saving,
 }: AccountTabProps) {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -208,7 +212,12 @@ export function AccountTab({
                   </span>
                   {connected ? (
                     <span className="text-sm" style={{ color: "#7A7A7A" }}>
-                      {connected.email}
+                      Connected{" "}
+                      {new Date(connected.createdAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
                     </span>
                   ) : (
                     <span
@@ -231,10 +240,12 @@ export function AccountTab({
                 ) : (
                   <button
                     type="button"
-                    className="text-sm px-3 py-1 rounded-md border"
+                    onClick={() => onConnectAccount?.(provider)}
+                    disabled={connectingProvider === provider}
+                    className="text-sm px-3 py-1 rounded-md border disabled:opacity-50"
                     style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
                   >
-                    Connect
+                    {connectingProvider === provider ? "Connecting..." : "Connect"}
                   </button>
                 )}
               </div>
