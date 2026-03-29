@@ -161,16 +161,15 @@ export const authRouter = router({
 
       const user = await ctx.prisma.user.findUnique({
         where: { email: input.email },
-        select: { id: true, passwordHash: true },
+        select: {
+          passwordHash: true,
+          accounts: { select: { provider: true } },
+        },
       });
 
       const providers: ("google" | "github")[] = [];
       if (user) {
-        const accounts = await ctx.prisma.account.findMany({
-          where: { userId: user.id },
-          select: { provider: true },
-        });
-        for (const a of accounts) {
+        for (const a of user.accounts) {
           if (a.provider === "google" || a.provider === "github") {
             providers.push(a.provider);
           }
@@ -183,8 +182,8 @@ export const authRouter = router({
       }
 
       return {
-        exists: !!user,
-        hasPassword: !!user?.passwordHash,
+        exists: user !== null,
+        hasPassword: user?.passwordHash !== null && user?.passwordHash !== undefined,
         providers,
       };
     }),

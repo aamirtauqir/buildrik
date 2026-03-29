@@ -36,10 +36,6 @@ vi.mock("@/server/services/audit.service", () => ({
   logAuditEvent: vi.fn(),
 }));
 
-import { initTRPC } from "@trpc/server";
-import { z } from "zod";
-import superjson from "superjson";
-
 // Build a minimal test caller that executes the checkEmail logic directly
 // without going through the full router (avoids circular import chains).
 async function callCheckEmail(email: string, prismaCtx: {

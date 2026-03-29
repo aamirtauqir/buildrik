@@ -33,14 +33,17 @@ export default function AuthPage() {
   const [error, setError] = useState<string | null>(null);
 
   const checkEmailMutation = trpc.auth.checkEmail.useMutation({
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
+      // Use variables.email (what was actually sent) not the current input state,
+      // which may have changed while the request was in-flight.
+      const resolvedEmail = variables.email;
       setError(null);
       if (!data.exists) {
-        setStep({ type: "signup_new", email });
+        setStep({ type: "signup_new", email: resolvedEmail });
       } else if (data.hasPassword) {
-        setStep({ type: "login_password", email, providers: data.providers });
+        setStep({ type: "login_password", email: resolvedEmail, providers: data.providers });
       } else {
-        setStep({ type: "oauth_only", email, providers: data.providers });
+        setStep({ type: "oauth_only", email: resolvedEmail, providers: data.providers });
       }
     },
     onError: (err) => {
@@ -92,10 +95,10 @@ export default function AuthPage() {
   });
 
   const magicLinkMutation = trpc.auth.magicLink.useMutation({
-    onSuccess: () => {
-      if (step.type === "oauth_only") {
-        router.push(`/auth/check-inbox?email=${encodeURIComponent(step.email)}`);
-      }
+    onSuccess: (_data, variables) => {
+      // Use variables.email (captured at call time) not step.email from closure,
+      // which may be stale if the user changed state before the response arrived.
+      router.push(`/auth/check-inbox?email=${encodeURIComponent(variables.email)}`);
     },
     onError: (err) => setError(err.message),
   });
@@ -111,6 +114,7 @@ export default function AuthPage() {
 
   function handleEmailSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (step.type === "checking") return;
     setError(null);
     setStep({ type: "checking" });
     checkEmailMutation.mutate({ email });
