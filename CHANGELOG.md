@@ -1,5 +1,53 @@
 # Changelog
 
+## [0.1.7] — 2026-03-29
+
+### Features
+
+- **`auth.checkEmail`** — New tRPC mutation for the Phase 3 email-first flow. Returns `{ exists, hasPassword, providers }` so the entry page knows whether to show sign-in or sign-up. Protected by `strictRateLimit` (5 attempts / 15 min per IP) and a 200ms constant-time floor to prevent bulk enumeration and timing-based probing.
+
+### Fixes
+
+- **Audit type completeness** — `OAUTH_LINK` and `OAUTH_UNLINK` added to `AuditAction` union. `logAuditEvent` calls in `auth.config.ts` that passed `provider`/`reason` as top-level fields now correctly pass them inside `metadata`.
+- **`unlinkProvider` audit trail** — `account.unlinkProvider` now emits `OAUTH_UNLINK` on success.
+
+## [0.1.6] — 2026-03-29
+
+### Features
+
+- **Connected accounts panel** — Account settings now shows which OAuth providers (Google, GitHub) are linked to your account with the date they were connected. Live data via `trpc.account.linkedProviders`.
+- **Connect provider** — "Connect" button in Account settings initiates an OAuth flow that links the provider to your existing account. Email match enforced. Single-use link_token with 5-minute TTL. Fail-closed: a broken handshake never creates a session.
+- **Disconnect provider** — "Disconnect" button unlinks a provider. Guard prevents removing your only auth method if no password is set.
+- **`link_error` / `linked` toast feedback** — OAuth redirect result params shown as toasts on return.
+
+### Schema
+
+- Added `createdAt DateTime @default(now())` to `Account` model.
+
+### Tests
+
+- 17 tests in `__tests__/auth-config.test.ts` (added 6 Phase 2b tests: valid link, invalid token, email mismatch, email_verified false, P2002, fail-closed session guard).
+
+## [0.1.5] — 2026-03-29
+
+### Security
+
+- **OAuth Account-first lookup** — `signIn` callback now resolves users by `(provider, providerAccountId)` before falling back to email. Closes the email-only account linking vulnerability: any future OAuth provider that doesn't verify email can no longer cause account takeover.
+- **Account model backfill** — `prisma.account.upsert` runs on every OAuth sign-in. Existing credential users who log in via OAuth for the first time get their Account row created automatically (lazy backfill, no migration needed).
+- **`email_verified` guard** — Explicit `false` from a provider is now rejected before any user resolution. GitHub's missing `email_verified` (undefined) is treated as verified.
+- **`emailVerified` stamp on OAuth login** — If an existing user had a null `emailVerified` (signed up but never verified email), OAuth login now stamps it — OAuth proves email ownership.
+- **Duplicate provider guard** — Added `@@unique([userId, provider])` to the `Account` model at the DB level. A user cannot link two Google accounts to the same Buildrik account.
+- **Dead schema removed** — `ConnectedAccount` model deleted. Was never written to; would have confused Phase 2a implementers.
+
+### Schema
+
+- Added `@@unique([userId, provider])` to `Account` model. Run `npx prisma db push` to apply.
+- Removed unused `ConnectedAccount` model.
+
+### Tests
+
+- 11 tests in `__tests__/auth-config.test.ts`: full coverage of Account-first path, email-fallback paths, email_verified guard, emailVerified stamp, P2002 conflict handling, and transaction upsert.
+
 ## [0.1.4] — 2026-03-29
 
 ### Security / UX
