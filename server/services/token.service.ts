@@ -7,7 +7,7 @@ function hashToken(token: string): string {
 }
 
 export async function generateToken(
-  type: "email_verify" | "password_reset" | "magic_link" | "invite" | "2fa_temp" | "session_grant" | "email_change",
+  type: "email_verify" | "password_reset" | "magic_link" | "invite" | "2fa_temp" | "session_grant" | "email_change" | "link_token",
   identifier: string,
   expiryMinutes: number
 ) {

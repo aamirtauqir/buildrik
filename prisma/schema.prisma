@@ -39,7 +39,7 @@ model User {
 }
 
 model Account {
-  id                String  @id @default(cuid())
+  id                String   @id @default(cuid())
   userId            String
   type              String
   provider          String
@@ -50,10 +50,12 @@ model Account {
   token_type        String?
   scope             String?
   id_token          String?
+  createdAt         DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@unique([userId, provider])
   @@map("accounts")
 }
 
@@ -717,12 +719,3 @@ model Redirect {
   @@map("redirects")
 }
 
-model ConnectedAccount {
-  id             String @id @default(cuid())
-  userId         String
-  provider       String
-  providerUserId String
-  tokens         Json?
-
-  @@map("connected_accounts")
-}
