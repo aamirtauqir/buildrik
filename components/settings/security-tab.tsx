@@ -3,6 +3,27 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc/client";
 
+function parseUserAgent(ua: string | null | undefined): string {
+  if (!ua) return "Unknown device";
+  const browsers: [RegExp, string][] = [
+    [/Edg\//, "Edge"],
+    [/OPR\/|Opera\//, "Opera"],
+    [/Chrome\//, "Chrome"],
+    [/Firefox\//, "Firefox"],
+    [/Safari\//, "Safari"],
+  ];
+  const os: [RegExp, string][] = [
+    [/Windows NT/, "Windows"],
+    [/Macintosh|Mac OS X/, "macOS"],
+    [/Linux/, "Linux"],
+    [/Android/, "Android"],
+    [/iPhone|iPad/, "iOS"],
+  ];
+  const browser = browsers.find(([r]) => r.test(ua))?.[1] ?? "Browser";
+  const system = os.find(([r]) => r.test(ua))?.[1] ?? "Unknown OS";
+  return `${browser} on ${system}`;
+}
+
 type SetupStep = "idle" | "qr" | "backup" | "verify";
 
 export function SecurityTab({ currentSessionId }: { currentSessionId?: string }) {
@@ -385,7 +406,7 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
                   <tr key={session.id} style={{ borderBottom: "1px solid #E8E8E8" }}>
                     <td className="px-4 py-3" style={{ color: "#0D0D0D" }}>
                       <div className="flex items-center gap-2">
-                        {session.device ?? "Unknown device"}
+                        {parseUserAgent(session.device)}
                         {isCurrent && (
                           <span
                             className="text-xs px-1.5 py-0.5 rounded-full font-medium"
@@ -477,7 +498,7 @@ export function SecurityTab({ currentSessionId }: { currentSessionId?: string })
                     </span>
                   </td>
                   <td className="px-4 py-3" style={{ color: "#7A7A7A" }}>
-                    {attempt.userAgent ?? "Unknown"}
+                    {parseUserAgent(attempt.userAgent)}
                   </td>
                   <td className="px-4 py-3" style={{ color: "#7A7A7A" }}>
                     {attempt.ipAddress ?? "-"}

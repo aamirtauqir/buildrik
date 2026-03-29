@@ -9,7 +9,7 @@ import { NotificationDropdown } from "@/components/notifications/notification-dr
 import { CommandPalette } from "@/components/search/command-palette";
 
 function getInitials(name: string | null | undefined): string {
-  if (!name) return "?";
+  if (!name) return "";
   const parts = name.trim().split(/\s+/);
   if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
   return name[0].toUpperCase();

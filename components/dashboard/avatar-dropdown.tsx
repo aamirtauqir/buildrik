@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { User, Settings, CreditCard, HelpCircle, LogOut, type LucideIcon } from "lucide-react";
+import { Settings, CreditCard, HelpCircle, LogOut, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type MenuItem = {
@@ -12,7 +12,6 @@ type MenuItem = {
 };
 
 export const AVATAR_MENU_ITEMS: MenuItem[] = [
-  { label: "Profile", href: "/dashboard/settings", icon: User },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
   { label: "Billing", href: "/dashboard/billing", icon: CreditCard },
   { label: "Help", href: "/dashboard/help", icon: HelpCircle },
@@ -43,7 +42,7 @@ export function AvatarDropdown({ initials, name, email }: AvatarDropdownProps) {
   async function handleLogout(e: React.MouseEvent) {
     e.preventDefault();
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/auth/login");
+    router.push("/auth");
   }
 
   return (

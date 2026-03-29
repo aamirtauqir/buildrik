@@ -164,7 +164,18 @@ export default function BillingPage() {
 
   return (
     <div>
-      <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>Billing</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>Billing</h1>
+        {planKey === "FREE" && (
+          <button
+            onClick={() => setShowPlans(true)}
+            className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            style={{ backgroundColor: "#E42313" }}
+          >
+            View Plans
+          </button>
+        )}
+      </div>
 
       {/* D) Dunning countdown */}
       {isDunning && <div className="mt-4"><DunningBanner /></div>}

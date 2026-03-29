@@ -61,7 +61,7 @@ export function Sidebar() {
 
   const plan = health.data?.plan ?? "FREE";
   const sitesUsed = health.data?.sites.used ?? 0;
-  const sitesLimit = health.data?.sites.limit ?? 5;
+  const sitesLimit = health.data?.sites.limit ?? 0;
   const usagePct = sitesLimit > 0 ? Math.min((sitesUsed / sitesLimit) * 100, 100) : 0;
 
   return (
