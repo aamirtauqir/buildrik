@@ -1,161 +1,120 @@
-# Editor–Dashboard Integration Design
+# Editor–Dashboard Integration Design (Revised after CEO Review)
 
 **Date:** 2026-04-01
-**Scope:** Folder restructure + API wiring + auth sharing — no rewrite
+**Scope:** Phased monorepo integration — persistence contract first, then structure
+**Review:** CEO Review (EXPANSION mode) + Codex outside voice
 
 ---
 
 ## Goal
 
-Integrate the editor module with the dashboard so that sites created in the dashboard can be edited in the editor, both sharing the same backend APIs and auth session. No code rewrite on either side.
+Integrate the editor module with the dashboard so sites created in the dashboard can be edited in the editor. Both share the same backend APIs and auth session. No code rewrite on either side.
 
 ---
 
-## Part 1 — Folder Restructure
+## Key Findings from Review
 
-### Current Structure
-```
-buildrik/
-  app/              ← Next.js pages (auth + dashboard)
-  components/       ← Dashboard UI components (loose at root)
-  emails/           ← Email templates (loose at root)
-  editor/           ← Editor module (Vite app)
-  server/           ← tRPC routers + services
-  lib/              ← Shared utilities
-  prisma/           ← DB schema
-  types/            ← Shared types
-```
-
-### Target Structure
-```
-buildrik/
-  app/                    ← Next.js routes (must stay at root)
-    auth/
-    dashboard/
-    api/
-  dashboard/              ← Dashboard module
-    components/           ← Moved from /components
-    emails/               ← Moved from /emails
-  editor/                 ← Editor module (UNTOUCHED)
-    src/
-    demo/
-    vite.config.ts
-  server/                 ← Shared backend (both modules use)
-    trpc/routers/
-    services/
-    auth.ts
-    auth.config.ts
-  lib/                    ← Shared utilities
-    prisma.ts
-    utils.ts
-    trpc/client.tsx
-    validations/
-  prisma/                 ← Shared DB schema
-  types/                  ← Shared types
-  middleware.ts
-  next.config.mjs
-  package.json
-  tsconfig.json
-```
-
-### Moves
-| From | To |
-|---|---|
-| `/components/` | `/dashboard/components/` |
-| `/emails/` | `/dashboard/emails/` |
-
-### Deletes
-| File/Folder | Reason |
-|---|---|
-| `/demo/` | Editor demo lives at `/editor/demo/` |
-| `/vite.config.ts` (root) | Editor config lives at `/editor/vite.config.ts` |
-
-### Import Updates
-- All `@/components/...` imports → `@/dashboard/components/...`
-- All `@/emails/...` imports → `@/dashboard/emails/...`
-- `tsconfig.json` paths remain `@/*: ["./*"]` — no change needed since paths are relative to root
-
-### Untouched
-- `app/`, `server/`, `lib/`, `prisma/`, `types/`, `editor/`, `__tests__/`
-- `middleware.ts`, `next.config.mjs`, `vitest.config.ts`
+1. **Editor saves whole ProjectData snapshots** (not page deltas). The editor's Composer exports entire project state via `exportProject()`. This means the persistence contract is project-level, not page-level.
+2. **Editor already has sync infrastructure**: CloudSyncService, SyncManager, OfflineQueue. Use these instead of building new retry/offline logic.
+3. **React version mismatch**: Dashboard = React 19, Editor = React 18. Must resolve before workspace sharing.
+4. **Two separate package-lock.json files** with same package name. Must fix before pnpm workspace migration.
+5. **server/ is tangled with Next.js runtime** — not a clean package extraction yet.
+6. **Design tokens are two unrelated systems** (Tailwind `@theme` vs editor `--aqb-*`). Cannot just package them together.
 
 ---
 
-## Part 2 — API Wiring
+## Revised Phasing
 
-### Principle
-Editor already has backend integration infrastructure. Dashboard already has all needed tRPC endpoints. No new files — just connect the two.
+### Phase 0: Foundation Decisions (Week 1)
+Before any restructuring, resolve:
+1. **Persistence contract**: Editor saves ProjectData snapshots. Define how this maps to dashboard's Page model (one tRPC endpoint: `sites.saveProject(siteId, ProjectData)` that upserts pages from the snapshot)
+2. **Deployment topology**: Decide Option A (editor served under same Vercel domain via rewrites) vs Option B (separate subdomain). This determines auth strategy.
+3. **React version alignment**: Upgrade editor to React 19 or pin both apps to compatible versions
+4. **Package naming**: Fix duplicate `"name": "buildrik"` in both package.json files
+5. **Dev proxy**: Configure Vite dev server to proxy `/api/*` to Next.js dev server (solves cross-origin cookie issue during development)
 
-### Editor's Existing Infrastructure
-| File | What it does |
-|---|---|
-| `engine/storage/StorageAdapter.ts` | Multi-mode storage — supports `remote` with custom handlers |
-| `services/CloudSyncService.ts` | Cloud sync with auth headers |
-| `services/ai/AIServiceClient.ts` | AI endpoint calls (`/api/ai/*`) |
-| `services/EmailService.ts` | Backend proxy (`/api/email/send`) |
-| `services/FormSubmissionService.ts` | Webhooks + form data |
-| `shared/constants/config.ts` | Centralized API endpoints: `/api`, `/api/ai`, `/api/assets`, `/api/templates`, `/api/export` |
+### Phase 1: Wiring Without Restructure (Week 1-2)
+Connect editor to dashboard backend WITHOUT moving any folders:
+- Configure editor's existing CloudSyncService with a custom provider that calls dashboard tRPC endpoints
+- Editor reads `siteId` from URL query params on mount
+- `load()` handler: calls `sites.get(siteId)` + `pages.list(siteId)`, assembles into ProjectData
+- `save()` handler: receives ProjectData snapshot, calls new `sites.saveProject(siteId, data)` endpoint
+- Auth: dev proxy for localhost, same domain for production
+- **Milestone:** Editor can load and save a real site. No folder changes.
 
-### Dashboard's Existing tRPC Endpoints (Editor Will Use)
-| Editor needs | tRPC endpoint | Purpose |
-|---|---|---|
-| Load site | `sites.get` | Site metadata |
-| List pages | `pages.list` | All pages for a site |
-| Get page content | `pages.get` | Single page blocks/content |
-| Save page | `pages.update` | Save edited page |
-| Create page | `pages.create` | Add new page |
-| Delete page | `pages.delete` | Remove page |
-| Upload file | `upload.presign` + `upload.confirm` | Image/asset uploads |
-| Site settings | `siteDetail.settings.get` | Load site config |
-| Save settings | `siteDetail.settings.update` | Save site config |
-| AI credits | `account.aiCredits` | Check available AI credits |
-| Templates | `templates.list` + `templates.get` | Load templates |
+### Phase 2: Monorepo Structure (Week 2-3)
+Now that wiring works, restructure:
+- Create `pnpm-workspace.yaml` at root
+- Move `editor/` → `packages/editor/`
+- Move `components/`, `emails/` → `packages/dashboard/components/`, `packages/dashboard/emails/`
+- Move `app/`, `middleware.ts`, `next.config.mjs` → `packages/dashboard/`
+- Extract transport-safe types into `packages/shared/` (API client + Zod schemas ONLY — no Prisma types, no design tokens)
+- Keep `server/` at root for now (tangled with Next.js, not ready for extraction)
+- Update all imports
+- **Milestone:** pnpm workspace works, both apps build independently
 
-### How It Connects
-1. Editor opens with URL: `/editor?siteId=xxx`
-2. Editor's `config.ts` base URL points to dashboard API (`/api/trpc`)
-3. `StorageAdapter` remote handlers call existing tRPC endpoints via fetch
-4. Auth cookie sent automatically (same domain)
+### Phase 3: Shared Types + Tooling (Week 3-4)
+- Set up tRPC vanilla client in `packages/shared/` for type-safe editor API calls
+- Turborepo pipeline: `pnpm dev`, `pnpm test`, `pnpm build`
+- Cross-app navigation: "Back to Dashboard" / "Open in Editor" links
+- Unified GitHub Actions CI/CD
+- **Milestone:** Full monorepo with typed contracts, unified dev/build/CI
 
-### Changes Required
-- `editor/src/shared/constants/config.ts` — set `BASE_URL` to dashboard API origin
-- `StorageAdapter` init — configure remote handlers to call `pages.*` and `sites.*` endpoints
-- No new service files, no new wrapper functions
-
----
-
-## Part 3 — Auth Sharing
-
-### Same Domain Deployment
-Both apps deployed on same domain:
-- Dashboard: `buildrik.com/dashboard`
-- Editor: `buildrik.com/editor`
-- API: `buildrik.com/api/trpc`
-
-NextAuth session cookie is automatically available to both. No extra auth code needed.
-
-### Cross-Subdomain (if needed later)
-If deployed on separate subdomains (`app.buildrik.com` / `editor.buildrik.com`):
-- Set cookie domain to `.buildrik.com` in NextAuth config
-- One line change: `cookies.sessionToken.options.domain: ".buildrik.com"`
-
-### No New Auth Flow
-- No token exchange
-- No separate login screen in editor
-- No auth wrapper/middleware in editor
-- Editor's existing services already send auth headers with requests
+### Phase 4: Polish (Future)
+- Extract `server/` into `@buildrik/server` workspace package (after untangling Next.js dependencies)
+- Shared design tokens (after reconciling Tailwind `@theme` and editor `--aqb-*` systems)
+- Real-time collaboration, version history, asset CDN
 
 ---
 
-## Data Flow
+## Architecture (Target after Phase 2)
 
 ```
-Dashboard (Next.js)              Editor (Vite)
-       │                              │
-       │  tRPC React hooks            │  fetch via StorageAdapter
-       │                              │
-       └──────────┐      ┌────────────┘
-                  ▼      ▼
+buildrik/                          (pnpm workspace root)
+├── packages/
+│   ├── dashboard/                 (Next.js 16 app)
+│   │   ├── app/                   ← Routes (auth, dashboard, api/trpc)
+│   │   ├── components/            ← Dashboard UI
+│   │   ├── emails/                ← React Email templates
+│   │   ├── middleware.ts
+│   │   ├── next.config.mjs
+│   │   └── package.json           ← "@buildrik/dashboard"
+│   │
+│   ├── editor/                    (Vite + React app — moved, not rewritten)
+│   │   ├── src/                   ← 371+ components, 25+ managers
+│   │   ├── demo/                  ← Dev entry point
+│   │   ├── vite.config.ts
+│   │   └── package.json           ← "@buildrik/editor"
+│   │
+│   └── shared/                    (Transport-safe contracts ONLY)
+│       ├── api-client.ts          ← tRPC vanilla client (no React Query)
+│       ├── schemas/               ← Zod schemas for API contracts
+│       └── package.json           ← "@buildrik/shared"
+│
+├── server/                        (Stays at root — NOT a workspace package yet)
+│   ├── trpc/routers/
+│   ├── services/
+│   ├── auth.ts
+│   └── auth.config.ts
+│
+├── prisma/                        (Shared DB)
+├── lib/                           (Dashboard + server utilities)
+├── pnpm-workspace.yaml
+├── turbo.json
+└── package.json
+```
+
+### Data Flow
+
+```
+Editor (Vite SPA)                   Dashboard (Next.js)
+       │                                   │
+       │  CloudSyncService                 │  tRPC React hooks
+       │  → custom buildrik provider       │
+       │  → tRPC vanilla client            │
+       │                                   │
+       └──────────┐          ┌─────────────┘
+                  ▼          ▼
          /api/trpc (Next.js API route)
                     │
                     ▼
@@ -168,32 +127,105 @@ Dashboard (Next.js)              Editor (Vite)
               Prisma → PostgreSQL
 ```
 
+### Editor Persistence Contract
+
+```
+LOAD:
+  Editor mount → read siteId from URL (?siteId=xxx)
+  → CloudSyncService.pull(siteId)
+  → custom provider calls: sites.get(siteId) + pages.list(siteId)
+  → assembles response into ProjectData format
+  → Composer.importProject(projectData)
+
+SAVE:
+  Composer auto-save (every 5s if dirty) or manual save
+  → Composer.exportProject() → full ProjectData snapshot
+  → CloudSyncService.push(siteId, projectData)
+  → custom provider calls: sites.saveProject(siteId, projectData)
+  → Server: diff ProjectData.pages vs DB pages, upsert changed, delete removed
+
+ERROR HANDLING (via existing CloudSyncService):
+  → 401: CloudSyncService emits 'auth-error' → editor redirects to /auth/login
+  → Network fail: OfflineQueue buffers saves, replays on reconnect
+  → Conflict: SyncManager handles merge (already implemented)
+```
+
+### New tRPC Endpoint
+
+```
+sites.saveProject (mutation)
+  Input: { siteId: string, projectData: ProjectData }
+  Logic:
+    1. Verify user owns site
+    2. Diff projectData.pages vs existing DB pages
+    3. Upsert changed pages (bulk Prisma transaction)
+    4. Delete removed pages
+    5. Update site.lastEditedAt
+  Output: { success: boolean, savedAt: Date }
+```
+
 ---
 
-## User Flow
+## Auth Strategy
 
-1. User logs into dashboard (`/auth/login`)
-2. Goes to sites list (`/dashboard/sites`)
-3. Creates new site → `sites.create` mutation
-4. Clicks "Edit" → navigates to `/editor?siteId=xxx`
-5. Editor loads → `StorageAdapter` calls `sites.get` + `pages.list`
-6. User edits content
-7. Save → `StorageAdapter` calls `pages.update`
-8. User goes back to dashboard → changes reflected
+**Production:** Same domain (`buildrik.com/dashboard` + `buildrik.com/editor`). NextAuth session cookie sent automatically.
+
+**Development:** Vite dev proxy in `editor/vite.config.ts`:
+```ts
+server: {
+  proxy: { '/api': 'http://localhost:3000' }
+}
+```
+This routes editor's API calls to the Next.js dev server, solving cross-origin cookie issues.
 
 ---
 
 ## What Does NOT Change
 - Editor source code structure (371+ components, 25+ engine managers)
 - Dashboard page logic
-- tRPC router/service implementation
-- Prisma schema
-- Auth flow
-- Build pipeline (Next.js + Vite remain separate)
+- Existing tRPC router/service implementation
+- Prisma schema (no migrations)
+- Auth flow (NextAuth stays as-is)
 
-## What Changes (Minimal)
-- Folder moves: `components/` and `emails/` into `dashboard/`
-- Import path updates (bulk find-replace)
-- Delete: root `demo/`, root `vite.config.ts`
-- Editor `config.ts`: base URL update
-- Editor `StorageAdapter` init: remote handlers configured
+## What Changes
+
+### Phase 0 (decisions only, no code):
+- Persistence contract defined
+- Deployment topology decided
+- React version alignment plan
+
+### Phase 1 (minimal code):
+- New tRPC endpoint: `sites.saveProject` (~30 lines in router + service)
+- Editor CloudSyncService: new buildrik provider (~50 lines)
+- Editor vite.config.ts: dev proxy config (~5 lines)
+
+### Phase 2 (folder restructure):
+- git mv operations + import updates
+- `pnpm-workspace.yaml` + `turbo.json`
+- `packages/shared/api-client.ts` (tRPC vanilla client)
+- CLAUDE.md update for new paths
+
+### Phase 3 (tooling):
+- Turborepo pipeline config
+- GitHub Actions workflow
+- Cross-app navigation links
+
+---
+
+## NOT in scope
+- server/ extraction to workspace package (tangled with Next.js, deferred to Phase 4)
+- Shared design tokens (two unrelated token systems, deferred to Phase 4)
+- Real-time collaboration
+- Version history
+- Asset CDN pipeline
+
+## What already exists
+- Editor CloudSyncService with custom provider support
+- Editor SyncManager with conflict resolution
+- Editor OfflineQueue for buffered saves
+- All tRPC endpoints for sites, pages, uploads, settings
+- NextAuth session with cookie-based auth
+- Editor StorageAdapter with remote mode
+
+## Dream state delta
+This plan gets us from "two disconnected apps" to "editor loads and saves real site data with typed contracts and unified dev/CI." The 12-month ideal (real-time collab, version history, asset CDN) becomes a natural extension once Phase 2's monorepo structure is in place.
