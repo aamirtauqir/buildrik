@@ -12,6 +12,7 @@ import { ProductCollectionService } from "../../../engine/cms";
 import type { Element } from "../../../engine/elements/Element";
 import { THRESHOLDS } from "../../../shared/constants/config";
 import type { ComposerConfig, ProjectData, DeviceType, ElementType } from "../../../shared/types";
+import { getSiteIdFromUrl, loadProject, saveProject } from "@/services/BuildrikSyncProvider";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
   project?: {
@@ -83,8 +84,40 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     // Store event handlers for proper cleanup
     const composerReadyHandler = () => {
       onReady?.(instance);
+
+      const siteId = getSiteIdFromUrl();
+
+      if (siteId) {
+        loadProject(siteId)
+          .then((data) => {
+            instance.importProject(data);
+            addToast({
+              title: "Project loaded",
+              message: "Loaded from dashboard.",
+              variant: "success",
+            });
+          })
+          .catch((err) => {
+            console.error("[BuildrikSync] load failed:", err);
+            addToast({
+              title: "Load failed",
+              message: "Could not load project from dashboard. Falling back to local.",
+              variant: "warning",
+            });
+            loadFromLocalStorage(instance, projectConfig);
+          });
+        return;
+      }
+
+      loadFromLocalStorage(instance, projectConfig);
+    };
+
+    function loadFromLocalStorage(
+      inst: Composer,
+      config: typeof projectConfig
+    ) {
       let loadedFromStorage = false;
-      instance
+      inst
         .loadProject()
         .then((data) => {
           if (data) loadedFromStorage = true;
@@ -103,10 +136,10 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             if (savedRaw) {
               const saved = JSON.parse(savedRaw);
               if (saved.project) {
-                instance.importProject(saved.project);
+                inst.importProject(saved.project);
                 loadedFromStorage = true;
               } else if (saved.content) {
-                instance.elements.importHTMLToActivePage(saved.content);
+                inst.elements.importHTMLToActivePage(saved.content);
                 loadedFromStorage = true;
               }
             }
@@ -114,17 +147,17 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             // Ignore parse errors from malformed localStorage data
           }
           if (loadedFromStorage) return;
-          const existingPages = instance.elements.getAllPages();
-          if (!existingPages || existingPages.length === 0) instance.elements.createPage("Page 1");
-          projectConfig?.default?.pages?.forEach((page) => {
-            const p = instance.elements.createPage(page.name);
+          const existingPages = inst.elements.getAllPages();
+          if (!existingPages || existingPages.length === 0) inst.elements.createPage("Page 1");
+          config?.default?.pages?.forEach((page) => {
+            const p = inst.elements.createPage(page.name);
             if (page.component && p.root?.id) {
-              const root = instance.elements.getElement(p.root.id);
+              const root = inst.elements.getElement(p.root.id);
               root?.setContent(page.component);
             }
           });
         });
-    };
+    }
 
     // Note: setCanUndo/setCanRedo are intentionally NOT called here to avoid duplicate updates.
     // These are managed by a separate useEffect (lines 130-144) that handles undo/redo state changes.
@@ -176,27 +209,42 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Intentionally empty - initialize only once on mount
 
-  // Auto-save on project changes
+  // Auto-save on project changes (dashboard sync when siteId present, localStorage otherwise)
   React.useEffect(() => {
     if (!composer) return;
+    const siteId = getSiteIdFromUrl();
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
     const handler = () => {
       setIsDirty(true);
       if (timeoutId) clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
         setSaveState((prev) => ({ ...prev, status: "saving", error: undefined }));
-        composer
-          .saveProject()
+
+        const savePromise = siteId
+          ? saveProject(siteId, composer.exportProject()).then(() => undefined)
+          : composer.saveProject();
+
+        savePromise
           .then(() => {
             setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
             setIsDirty(false);
           })
           .catch((err) => {
+            const message = err instanceof Error ? err.message : "Auto-save failed";
+            console.error("[BuildrikSync] auto-save failed:", message);
             setSaveState((prev) => ({
               ...prev,
               status: "error",
-              error: err?.message || "Auto-save failed",
+              error: message,
             }));
+            if (siteId) {
+              addToast({
+                title: "Save failed",
+                message: "Could not save to dashboard. Changes are unsaved.",
+                variant: "error",
+              });
+            }
           });
       }, THRESHOLDS.AUTOSAVE_DEBOUNCE);
     };
@@ -205,7 +253,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       composer.off("project:changed", handler);
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [composer, setIsDirty, setSaveState]);
+  }, [composer, setIsDirty, setSaveState, addToast]);
 
   // Track undo/redo state
   React.useEffect(() => {

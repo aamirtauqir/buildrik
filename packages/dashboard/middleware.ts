@@ -4,8 +4,24 @@ import { decode } from "next-auth/jwt";
 
 const authenticatedAuthRoutes = ["/auth/workspace-select", "/auth/success", "/auth/redirect"];
 
+const EDITOR_ORIGIN = process.env.EDITOR_ORIGIN || "http://localhost:5050";
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  // Handle CORS preflight for API routes (editor cross-origin tRPC calls)
+  if (pathname.startsWith("/api/") && req.method === "OPTIONS") {
+    return new NextResponse(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": EDITOR_ORIGIN,
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Max-Age": "86400",
+      },
+    });
+  }
 
   // Validate JWT properly instead of just checking cookie existence
   const isSecure = process.env.NODE_ENV === "production";
@@ -56,5 +72,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/auth/:path*", "/dashboard/:path*", "/onboarding/:path*"],
+  matcher: ["/api/:path*", "/auth/:path*", "/dashboard/:path*", "/onboarding/:path*"],
 };
