@@ -17,6 +17,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus, Search } from "lucide-react";
 
+const editorUrl = process.env.NEXT_PUBLIC_EDITOR_URL || "http://localhost:5050";
+
 export default function SitesPage() {
   const { addToast } = useToast();
   const router = useRouter();
@@ -225,7 +227,7 @@ export default function SitesPage() {
       const site = sitesQuery.data?.data.find((s) => s.id === siteId);
       switch (action) {
         case "edit":
-          window.location.href = `/editor/${siteId}`;
+          window.location.href = `${editorUrl}/?siteId=${siteId}`;
           break;
         case "manage":
           window.location.href = `/dashboard/sites/${siteId}`;

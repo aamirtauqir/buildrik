@@ -11,6 +11,8 @@ import { StepType, BUSINESS_TYPES } from "@/components/ai-wizard/step-type";
 import { StepPages } from "@/components/ai-wizard/step-pages";
 import { GenerationProgress } from "@/components/ai-wizard/generation-progress";
 
+const editorUrl = process.env.NEXT_PUBLIC_EDITOR_URL || "http://localhost:5050";
+
 type View = "choose" | "templates" | "preview" | "ai-type" | "ai-pages" | "ai-progress";
 
 export default function NewSitePage() {
@@ -60,7 +62,7 @@ export default function NewSitePage() {
   const useTemplateMutation = trpc.templates.use.useMutation({
     onSuccess: (site) => {
       addToast("success", "Site created from template");
-      router.push(`/editor/${site.id}`);
+      window.location.href = `${editorUrl}/?siteId=${site.id}`;
     },
     onError: (err) => addToast("error", "Failed", err.message),
   });
@@ -68,7 +70,7 @@ export default function NewSitePage() {
   const createSiteMutation = trpc.sites.create.useMutation({
     onSuccess: (site) => {
       addToast("success", "Blank site created");
-      router.push(`/editor/${site.id}`);
+      window.location.href = `${editorUrl}/?siteId=${site.id}`;
     },
     onError: (err) => addToast("error", "Failed", err.message),
   });
@@ -245,7 +247,7 @@ export default function NewSitePage() {
             setJobId(null);
             setView("ai-pages");
           }}
-          onViewSite={(siteId) => router.push(`/editor/${siteId}`)}
+          onViewSite={(siteId) => { window.location.href = `${editorUrl}/?siteId=${siteId}`; }}
         />
       </div>
     );

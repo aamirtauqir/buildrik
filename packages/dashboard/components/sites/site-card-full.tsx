@@ -4,6 +4,8 @@ import { Globe, FileText, Pencil, Settings, Users, Clock } from "lucide-react";
 import { cn } from "@lib/utils";
 import { ContextMenu } from "./context-menu";
 
+const editorUrl = process.env.NEXT_PUBLIC_EDITOR_URL || "http://localhost:5050";
+
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   PUBLISHED: { bg: "#DCFCE7", text: "#166534" },
   DRAFT: { bg: "#FEF9C3", text: "#854D0E" },
@@ -59,9 +61,9 @@ export function SiteCardFull({ site, selected, onSelect, onAction }: SiteCardFul
         </div>
       </Link>
       <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 rounded-b-xl bg-white/95 px-4 py-3 opacity-0 transition-opacity group-hover:opacity-100" style={{ borderTop: "1px solid #E8E8E8" }}>
-        <Link href={`/editor/${site.id}`} className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white" style={{ backgroundColor: "#E42313" }}>
+        <a href={`${editorUrl}/?siteId=${site.id}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-white" style={{ backgroundColor: "#E42313" }}>
           <Pencil className="h-3 w-3" />Edit
-        </Link>
+        </a>
         <Link href={`/dashboard/sites/${site.id}`} className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium" style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}>
           <Settings className="h-3 w-3" />Manage
         </Link>

@@ -11,6 +11,8 @@ export const GENERATION_STEPS = [
   { key: "COMPLETED", label: "Finalizing site" },
 ] as const;
 
+const editorUrl = process.env.NEXT_PUBLIC_EDITOR_URL || "http://localhost:5050";
+
 type StepKey = (typeof GENERATION_STEPS)[number]["key"];
 
 const STEP_ORDER: StepKey[] = ["QUEUED", "GENERATING_STRUCTURE", "GENERATING_CONTENT", "GENERATING_STYLES", "COMPLETED"];
@@ -82,7 +84,7 @@ export function GenerationProgress({
   useEffect(() => {
     if (isComplete && siteId) {
       const timeout = setTimeout(() => {
-        router.push(`/editor/${siteId}`);
+        window.location.href = `${editorUrl}/?siteId=${siteId}`;
       }, 1500);
       return () => clearTimeout(timeout);
     }

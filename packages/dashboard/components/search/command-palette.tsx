@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 
+const editorUrl = process.env.NEXT_PUBLIC_EDITOR_URL || "http://localhost:5050";
 const RECENT_ITEMS_KEY = "buildrik_recent_items";
 const MAX_RECENT = 5;
 
@@ -206,7 +207,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             id: `page-${s.id}`,
             label: `${s.name} — Pages`,
             description: "Open in editor",
-            href: `/dashboard/sites/${s.id}/editor`,
+            href: `${editorUrl}/?siteId=${s.id}`,
             scope: "pages",
           })),
         });

@@ -7,6 +7,8 @@ import { Globe, Pencil, ArrowRight, Upload, Link2, Check } from "lucide-react";
 import { cn } from "@lib/utils";
 import type { RecentSite } from "@buildrik/shared/schemas/dashboard";
 
+const editorUrl = process.env.NEXT_PUBLIC_EDITOR_URL || "http://localhost:5050";
+
 const STATUS_STYLES: Record<string, string> = {
   published: "bg-[#DCFCE7] text-[#166534]",
   draft: "bg-[#FEF9C3] text-[#854D0E]",
@@ -58,13 +60,15 @@ export function SiteCard({ site }: SiteCardProps) {
 
         {/* Hover overlay */}
         <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-          <Link
-            href={`/editor/${site.id}`}
+          <a
+            href={`${editorUrl}/?siteId=${site.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex items-center gap-1.5 rounded-lg bg-[#E42313] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#C91F10] transition-colors"
           >
             <Pencil className="h-3 w-3" />
             Edit
-          </Link>
+          </a>
           <Link
             href={`/dashboard/sites/${site.id}`}
             className="flex items-center gap-1.5 rounded-lg border border-white/30 bg-white/10 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/20 transition-colors"

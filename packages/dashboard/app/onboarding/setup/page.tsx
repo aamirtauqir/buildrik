@@ -4,10 +4,12 @@ import { useRouter } from "next/navigation";
 import { OnboardingProjectSetup } from "@/components/onboarding/project-setup";
 import { trpc } from "@lib/trpc/client";
 
+const editorUrl = process.env.NEXT_PUBLIC_EDITOR_URL || "http://localhost:5050";
+
 export default function OnboardingSetupPage() {
   const router = useRouter();
   const createSite = trpc.sites.create.useMutation({
-    onSuccess: (site) => router.push(`/editor/${site.id}`),
+    onSuccess: (site) => { window.location.href = `${editorUrl}/?siteId=${site.id}`; },
   });
   const setupProject = trpc.onboarding.setupProject.useMutation({
     onSuccess: (_data, variables) => {

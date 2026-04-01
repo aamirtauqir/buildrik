@@ -22,6 +22,8 @@ import { BreakpointDropdown } from "./BreakpointDropdown";
 import type { SyncStatus, Issue } from "./hooks/useStudioState";
 import { StatusIndicators } from "./StatusIndicators";
 
+const dashboardUrl = import.meta.env.VITE_DASHBOARD_URL || "http://localhost:3000";
+
 // ─────────────────────────────────────────────
 // Device Switcher Pill
 // ─────────────────────────────────────────────
@@ -311,6 +313,33 @@ export const Topbar: React.FC<TopbarProps> = ({
         ═══════════════════════════════════════════════════════════════════ */}
         <div className="left">
           <div className="leftRow">
+            {/* Back to Dashboard */}
+            <Tooltip content="Back to Dashboard">
+              <a
+                href={`${dashboardUrl}/dashboard/sites`}
+                className="pill pillIconOnly"
+                aria-label="Back to Dashboard"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textDecoration: "none",
+                  color: "var(--aqb-text-muted)",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "var(--aqb-text-primary)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "var(--aqb-text-muted)";
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10 12L6 8l4-4" />
+                </svg>
+              </a>
+            </Tooltip>
+
             {/* Brand + Project Name */}
             <button
               className="brand"
