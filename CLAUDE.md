@@ -7,24 +7,23 @@ Next.js 16 (App Router, Turbopack) | React 19 | Tailwind CSS 4 | tRPC 11 | NextA
 ## Architecture
 
 ```
-app/                → Pages & API routes only. No business logic.
-components/         → Reusable UI. Each component = one visual job.
+packages/
+  dashboard/          → Next.js app (pages, components, emails)
+  editor/             → Vite editor app (untouched source)
+  shared/             → Transport-safe contracts (API client, Zod schemas)
 server/
-  auth.ts           → NextAuth init
-  auth.config.ts    → NextAuth providers config
+  auth.ts             → NextAuth init
+  auth.config.ts      → NextAuth providers config
   trpc/
-    trpc.ts         → tRPC context & base procedures
-    router.ts       → Router aggregation (single export)
-    routers/        → One file per domain (auth.ts, etc.)
-  services/         → Business logic. One file per domain.
+    trpc.ts           → tRPC context & base procedures
+    router.ts         → Router aggregation (single export)
+    routers/          → One file per domain (auth.ts, etc.)
+  services/           → Business logic. One file per domain.
 lib/
-  prisma.ts         → Prisma singleton
-  utils.ts          → Shared pure utilities (cn, etc.)
-  trpc/client.tsx   → tRPC client + React Query provider
-  validations/      → Zod schemas (one file per domain)
-emails/             → React Email templates
-prisma/             → Schema & migrations
-middleware.ts       → Edge middleware (auth redirects)
+  prisma.ts           → Prisma singleton
+  utils.ts            → Shared pure utilities (cn, etc.)
+  trpc/client.tsx     → tRPC client + React Query provider
+prisma/               → Schema & migrations
 ```
 
 ## Data Flow (one direction, no shortcuts)
@@ -50,10 +49,10 @@ No file should exist only to re-export from another file. If `router.ts` just re
 If two places do the same thing with different variable names, extract to one source. But don't extract things that merely look similar — only extract when the duplication is semantic (same intent, same rules).
 
 ### Single Source of Truth (SSOT)
-- Zod schemas live in `lib/validations/`. Don't recreate validation logic in services or routers.
+- Zod schemas live in `packages/shared/schemas/`. Don't recreate validation logic in services or routers.
 - DB schema is Prisma. Don't maintain parallel type definitions.
 - Auth config lives in `server/auth.config.ts`. Don't scatter provider logic.
-- Email templates live in `emails/`. Don't inline HTML in services.
+- Email templates live in `packages/dashboard/emails/`. Don't inline HTML in services.
 
 ### One file = one job
 - A service file handles one domain (auth, email, token, rate-limit).
@@ -99,7 +98,7 @@ Prefer `app/auth/login/page.tsx` over `app/auth/flows/credential/login/page.tsx`
 - **Naming:** Files are `kebab-case`. Components are `PascalCase`. Functions/variables are `camelCase`.
 - **Env vars:** Never instantiate external clients at module level. Always lazy-init: `let _client; function getClient() { if (!_client) _client = new Client(key); return _client; }`
 - **Error handling:** Services throw domain errors (`AuthError`). Routers catch and translate to tRPC errors. Pages show user-friendly messages. Don't swallow errors silently.
-- **Imports:** Use `@/` path alias. No relative imports that go up more than one level (`../../` is banned).
+- **Imports:** Dashboard uses `@server/` and `@lib/` path aliases for root-level shared code. Editor uses `@/` alias pointing to `packages/editor/src/`. No relative imports that go up more than one level (`../../` is banned).
 
 ## Don'ts
 
