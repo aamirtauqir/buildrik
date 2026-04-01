@@ -13,6 +13,7 @@ import {
   bulkAction,
   checkSlugAvailability,
   transferSite,
+  saveProjectData,
 } from "@/server/services/sites.service";
 import {
   listFolders,
@@ -167,6 +168,62 @@ export const sitesRouter = router({
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Member not found in workspace.",
+          });
+        throw e;
+      }
+    }),
+
+  saveProject: protectedProcedure
+    .input(
+      z.object({
+        siteId: z.string(),
+        projectData: z.object({
+          version: z.string(),
+          pages: z.array(
+            z.object({
+              id: z.string(),
+              name: z.string(),
+              slug: z.string().optional(),
+              isHome: z.boolean().optional(),
+              root: z.any(),
+              styles: z.any().optional(),
+              settings: z.any().optional(),
+            })
+          ),
+          styles: z.array(z.any()),
+          assets: z.array(z.any()),
+          metadata: z.any().optional(),
+          settings: z.any().optional(),
+        }),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const site = await ctx.prisma.site.findUnique({
+        where: { id: input.siteId },
+        select: { workspaceId: true },
+      });
+      if (!site)
+        throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
+
+      const member = await ctx.prisma.workspaceMember.findFirst({
+        where: {
+          workspaceId: site.workspaceId,
+          userId: ctx.session.user.id,
+        },
+      });
+      if (!member)
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Not authorized",
+        });
+
+      try {
+        return await saveProjectData(input.siteId, input.projectData);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Site not found",
           });
         throw e;
       }

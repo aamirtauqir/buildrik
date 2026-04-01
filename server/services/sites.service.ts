@@ -410,6 +410,76 @@ export async function deleteSite(siteId: string, confirmName: string) {
   return { success: true };
 }
 
+export async function saveProjectData(
+  siteId: string,
+  projectData: {
+    version: string;
+    pages: Array<{
+      id: string;
+      name: string;
+      slug?: string;
+      isHome?: boolean;
+      root: unknown;
+    }>;
+    styles: unknown[];
+    assets: unknown[];
+    metadata?: unknown;
+    settings?: unknown;
+  }
+) {
+  const site = await prisma.site.findUnique({ where: { id: siteId } });
+  if (!site) throw new Error("SITE_NOT_FOUND");
+
+  const savedAt = new Date();
+
+  await prisma.$transaction(async (tx) => {
+    const existingPages = await tx.page.findMany({
+      where: { siteId },
+      select: { id: true },
+    });
+
+    const incomingPageIds = new Set(projectData.pages.map((p) => p.id));
+    const pagesToDelete = existingPages.filter((p) => !incomingPageIds.has(p.id));
+
+    if (pagesToDelete.length > 0) {
+      await tx.page.deleteMany({
+        where: { id: { in: pagesToDelete.map((p) => p.id) } },
+      });
+    }
+
+    for (const [index, page] of projectData.pages.entries()) {
+      await tx.page.upsert({
+        where: { id: page.id },
+        create: {
+          id: page.id,
+          siteId,
+          name: page.name,
+          slug: page.slug || page.name.toLowerCase().replace(/\s+/g, "-"),
+          position: index,
+          isHomePage: page.isHome || false,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          blocks: page.root as any,
+        },
+        update: {
+          name: page.name,
+          slug: page.slug || page.name.toLowerCase().replace(/\s+/g, "-"),
+          position: index,
+          isHomePage: page.isHome || false,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          blocks: page.root as any,
+        },
+      });
+    }
+
+    await tx.site.update({
+      where: { id: siteId },
+      data: { lastEditedAt: savedAt, pages: projectData.pages.length },
+    });
+  });
+
+  return { success: true, savedAt };
+}
+
 export async function bulkAction(
   workspaceId: string,
   input: BulkActionInput
