@@ -10,3 +10,5 @@ next-env.d.ts
 .gstack/
 .playwright-mcp/
 docs/designs/
+latest-screenshots/
+dist/

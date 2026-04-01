@@ -1,0 +1,26 @@
+name,reach,impact,confidence,effort,description
+Auth + User Management (signup/login/OAuth),20000,massive,high,l,Zero auth system exists - no signup no login no sessions no user management
+Multi-project Dashboard,18000,massive,high,m,Users need home screen to create/manage/list all projects - currently single project only
+Server-side Persistence + API,20000,massive,high,xl,Everything is localStorage - need REST API + database + real persistence layer
+Pricing Tiers + Billing Integration,15000,massive,high,l,No pricing model no Stripe no billing - UpgradeModal exists but leads nowhere
+Custom Domains + SSL,12000,high,high,l,Marked Coming Soon but table stakes for any site builder - DNS verification SSL provisioning CDN
+CMS Record Management UI,8000,high,medium,m,CMS bindings work but no CRUD for managing actual collection records - add/edit/delete data
+Publish Checklist Wiring,15000,high,high,xs,3 of 4 checklist items hardcoded to false with TODO comments - broken publish flow
+Team Invite + Collaboration Permissions,6000,high,medium,m,CollaborationManager exists but no invite flow no permission model no role-based access
+Site Analytics Dashboard,10000,high,medium,m,Users expect page views visitor counts traffic sources - only GA ID input exists
+AI Provider Integration Backend,8000,high,low,l,4 AI modules defined in engine but no backend provider integration - no API keys no cost model
+Export React/Vue/Next.js,5000,medium,low,xl,4 formats marked Coming Soon - only HTML+CSS works - missed revenue opportunity
+Template Marketplace,10000,high,medium,l,Templates exist but no user-submitted templates no marketplace no categories beyond current
+Plugin Extension Ecosystem,3000,medium,low,xl,PluginManager exists in engine but zero ecosystem zero documentation zero marketplace
+White-label Configuration,4000,high,medium,l,PRD mentions SaaS teams embedding as white-label but no config API no theming no branding controls
+Webhook + Headless API,3000,medium,low,l,Developer audience needs programmatic access - no webhooks no public API no SDK
+Media Storage Backend (S3/R2),15000,massive,high,m,Media uploads go nowhere - need cloud storage CDN delivery bandwidth management
+CDN + Edge Deployment for Published Sites,12000,high,high,m,Published sites need real hosting infrastructure not just buildrik.app slug
+Error/Loading State System,10000,medium,high,s,PRD own audit says 5% designed - no systematic error or loading state design
+Onboarding Flow Completion,8000,medium,high,s,WelcomeModal and checklist spec'd but multiple steps reference unbuilt components
+Offline-first Editing + Recovery,5000,medium,medium,l,What happens when user goes offline mid-edit - RecoveryManager exists but no offline strategy
+PRD Pixel Specs to Design System Migration,8000,medium,high,m,3400 lines of CSS in PRD need to move to design tokens/Figma - PRD unmaintainable as-is
+Inspector Multi-select + Empty States,6000,medium,high,s,Inspector IS-3 and IS-1 states partially designed but not implemented
+CMS Surfaces Full Design,8000,high,medium,l,PRD own audit says 0% designed for CMS surfaces - collection CRUD binding preview all missing
+Collaboration Cursor + Conflict UI,4000,medium,medium,m,Live cursors spec'd but conflict resolution is toast-only - structural conflicts unhandled
+Version History Compare View,4000,medium,medium,m,Compare flow spec'd at UI level but diff engine + split view rendering not architected

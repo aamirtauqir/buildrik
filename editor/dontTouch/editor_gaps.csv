@@ -1,0 +1,55 @@
+name,reach,impact,confidence,effort,description
+Publish Checklist Hardcoded False,20000,high,high,xs,3 of 4 checklist items hardcoded false with TODO - hasSeoTitle hasMetaDesc hasSocialImg all broken
+CMS Surfaces 0% Designed,15000,massive,high,l,PRD own audit says CMS surfaces 0% - no collection CRUD no record management no data preview mode
+Inspector Multi-select State IS-3,12000,high,high,m,MultiSelectToolbar designed but not implemented - align distribute size-match all missing
+Inspector Empty State IS-1,10000,medium,high,s,When nothing selected page-level properties tips shortcuts display - partially spec'd not built
+Canvas Empty State CanvasEmptyCTA,12000,medium,high,s,New project shows nothing - empty CTA with Browse Templates and Start Blank not implemented
+Error State System,15000,high,high,m,PRD audit says 5% designed - save error publish error upload error toast stacking all missing
+Loading State System,15000,high,high,m,No skeleton screens no publishing-in-progress no template applying overlay no systematic approach
+Inline Text Editing Mode CS-6,12000,high,high,m,Double-click text editing with formatting toolbar bold italic link color - spec'd not built
+Marquee Selection CS-9,8000,medium,high,s,Drag on empty canvas to multi-select - useCanvasMarquee hook mentioned but not implemented
+Drag from Sidebar to Canvas CS-7,18000,massive,high,m,Ghost preview drop zones invalid targets insert indicator - core feature partially working
+Element Drag Within Canvas CS-8,15000,high,high,m,Reposition elements by drag - snap lines original position ghost - partially implemented
+X-Ray Mode CS-11,5000,medium,medium,s,Wireframe view of all elements with type labels - toggle exists but visual not implemented
+Dev Mode Inspector CS-12,6000,medium,medium,m,Raw CSS properties panel computed values monospace editor - DevModeToggle exists content missing
+Pseudo-State Editing,10000,high,high,l,Hover focus active disabled state editing - amber banner override indicators canvas preview - complex flow
+Breakpoint Override Indicators,10000,high,high,m,Blue dots showing which properties differ at tablet/mobile - tooltip with desktop value - not built
+Context Menu Full Content,10000,medium,high,s,Right-click menu with Select from Stack and AI Improve - partially implemented
+Command Palette Ctrl+K,12000,high,high,m,Fuzzy search across all commands with groups Recent Navigation Edit View - not implemented
+Keyboard Cheat Sheet Modal,6000,low,high,xs,Two-column shortcut reference triggered by ? key - simple modal not built
+AI Assistant Bar Ctrl+J,10000,high,medium,l,Bottom slide-up prompt input contextual suggestions generate/apply/reject flow - not built
+AI Copilot Modal,8000,high,low,l,Full-screen page generation modal with preview accept/reject - not built
+AI Suggestions in Inspector,6000,medium,low,m,Effects tab Section 5 try-this style suggestions per element - not built
+Collection Setup Modal,10000,high,high,m,Field definition UI with types required toggle drag reorder validation - not built
+CMS Binding Flow,10000,high,high,m,Chain icon on inspector fields collection/field picker live preview with first record - not built
+CMS Preview Mode,8000,high,medium,m,Record navigator above CMS List showing Record 1 of N with prev/next arrows - not built
+Collaboration Live Cursors,5000,medium,medium,m,Other users cursors as colored arrows with name label fade behavior - not built
+Collaboration Selection Awareness,4000,medium,medium,s,Other users selected elements shown with colored outline and name badge - not built
+Version History Compare View,5000,medium,medium,l,Split canvas view with diff highlighting changed/added/removed elements - not built
+Version History Named Saves,8000,high,high,s,Save current version with name restore flow with auto-save-first - partially implemented
+Template Preview Modal,10000,medium,high,s,Full-screen preview with Use This Template CTA and replace/add-as-section drawer - not built
+Template Apply Progress,8000,medium,high,xs,Spinner overlay Applying template during template application - trivial not built
+Component Detail Screen,6000,medium,medium,m,DrillIn view with preview edit duplicate delete usage count - not built
+Component Create Flow,8000,high,high,s,CreateComponent modal from context menu or Components tab - not built
+Page Settings Drawer 3 Tabs,10000,high,high,m,SEO Social Advanced sub-tabs with fields for title meta og-image slug noindex - not built
+Design System Review Modal,6000,medium,high,s,Before/after side-by-side diff for token changes Apply All Cancel - not built
+Design System Tab Guard,4000,low,high,xs,Unsaved token changes warning on tab switch - simple confirm dialog
+Canvas Footer Toolbar,12000,high,high,s,Overlay toggles Guides Spacing Grid Badges X-Ray Rulers plus zoom controls - partially built
+Floating Element Toolbar,15000,high,high,m,Toolbar above selected element with parent duplicate move copy wrap delete - not built
+Resize Handles 8-Point,12000,high,high,m,8 resize handles with modifier keys Shift=ratio Alt=symmetric and live dimension label
+Snap Lines During Drag,8000,medium,high,s,Horizontal vertical snap lines at 6px threshold with distance labels - not built
+Drop Zone Highlighting,10000,high,high,s,Valid target teal dashed invalid target red with Cannot Drop Here label - not built
+Onboarding WelcomeModal,8000,medium,high,s,First visit modal with name input Browse Templates Start Blank CTAs - not built
+Onboarding Checklist 5-step,8000,medium,high,m,Floating panel with auto-completing steps minimize/restore progress ring - not built
+Onboarding Spotlight,6000,medium,medium,s,Dark overlay with target cutout and Explore Freely escape link - not built
+Onboarding Achievement Prompt,4000,low,medium,xs,Step completion celebration micro-animation auto-dismiss - trivial
+Settings Drill-in Screens,8000,medium,high,m,6 sub-screens Site Settings Domains Analytics Integrations Advanced Export - partially built
+UpgradeModal Design,5000,medium,high,s,Gradient header feature list Upgrade CTA Maybe Later - not built
+Image Editor Modal,4000,medium,medium,l,Crop adjust filters with canvas API processing preview and apply - not built
+Icon Picker Modal,5000,medium,high,s,1000+ Lucide icons grid search categories size stroke selection - not built
+Save Version Modal,6000,medium,high,xs,Name input for version save simple dialog - not built
+Project Settings Modal,6000,medium,high,m,General SEO Domain Advanced tabs with favicon logo social links - not built
+Panel Pin/Unpin State Machine,8000,medium,high,s,Pinned panels stay open on outside click unpinned close - state machine not fully implemented
+Panel Resize Drag,5000,low,high,s,Drag right edge of sidebar 280-400px with cursor ew-resize - not implemented
+Layers Drag to Reorder,8000,medium,high,s,Drag nodes in layer tree to reorder elements z-index - not implemented
+Layers Bi-directional Sync,10000,high,high,m,Canvas hover syncs to layers and layers hover syncs to canvas - events exist partially wired

@@ -1,0 +1,509 @@
+/**
+ * LeftRail CSS — v16 Design (3-Zone Structure)
+ * Rail navigation with indigo active state, left indicator bar,
+ * CSS-driven tooltips with keyboard shortcuts, badge system,
+ * footer zone with teal active, overflow popover.
+ *
+ * Zones: TOP (rtab) → SEP → BOTTOM (rtab) → FOOTER (rfbtn)
+ *
+ * WCAG: Active color #818CF8 = 5.3:1 contrast on #0c0c12
+ * Critical: overflow:visible on nav for left bar rendering
+ *
+ * @license BSD-3-Clause
+ */
+
+/* ============================================
+   Rail Container
+   ============================================ */
+.left-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: var(--layout-rail-width, 60px);
+  height: 100%;
+  background: var(--rail-bg, #0c0c12);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  position: relative;
+  z-index: 20;
+}
+
+/* ============================================
+   Logo Mark
+   ============================================ */
+.left-rail__logo {
+  width: 100%;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.left-rail__logo-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 22px rgba(99, 102, 241, 0.5);
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.left-rail__logo-mark:hover {
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.65);
+}
+
+.left-rail__logo-mark::after {
+  content: '';
+  display: block;
+  width: 14px;
+  height: 14px;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5' stroke='white' fill='none' stroke-width='2.2' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+
+/* ============================================
+   Rail Nav — main scrollable area (TOP + SEP + BOTTOM)
+   ============================================ */
+.left-rail__nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 6px;
+  gap: 2px;
+  width: 100%;
+  overflow: visible; /* CRITICAL: left active bar extends outside */
+}
+
+/* Spacer pushes bottom section down */
+.left-rail__spacer {
+  flex: 1;
+  min-height: 8px;
+}
+
+/* ============================================
+   Section Divider — v16: solid line, no gradient
+   ============================================ */
+.left-rail__divider {
+  width: 22px;
+  height: 1px;
+  margin: 3px auto;
+  background: rgba(255, 255, 255, 0.07);
+  flex-shrink: 0;
+}
+
+/* ============================================
+   Rail Item (Icon Button + Label) — rtab variant
+   ============================================ */
+.left-rail__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 100%;
+  height: 44px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+  color: var(--rail-text-default, #3d4a5c);
+  font-family: inherit;
+}
+
+/* Hover state — subtle, NO scale */
+.left-rail__item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--rail-text-hover, #7c88a0);
+}
+
+/* Active/Selected state — indigo */
+.left-rail__item--active {
+  background: var(--rail-active-bg, rgba(99, 102, 241, 0.09));
+  color: var(--rail-active, #818CF8);
+}
+
+.left-rail__item--active:hover {
+  background: var(--rail-active-bg-hover, rgba(99, 102, 241, 0.13));
+  color: var(--rail-active, #818CF8);
+}
+
+/* Active left indicator bar — extends outside via overflow:visible */
+.left-rail__item--active::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 16px;
+  background: var(--rail-active-bar, #6366F1);
+  border-radius: 0 2px 2px 0;
+}
+
+/* Focus state — teal */
+.left-rail__item:focus-visible {
+  outline: 2px solid var(--rail-focus, #00d4aa);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   Icon — v16: 17x17
+   Both class-based and descendant selectors for
+   robust targeting (icons use SVG width/height attrs)
+   ============================================ */
+.left-rail__icon,
+.left-rail__item > svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.left-rail__item:active .left-rail__icon,
+.left-rail__item:active > svg {
+  transform: scale(0.92);
+}
+
+/* ============================================
+   Label — v16: 9px, no opacity hack
+   ============================================ */
+.left-rail__label {
+  font-size: 9px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.left-rail__item--active .left-rail__label {
+  color: var(--rail-active, #818CF8);
+}
+
+/* ============================================
+   Tooltip — v16: CSS-driven, no React state
+   Always in DOM, shown via :hover opacity
+   ============================================ */
+.left-rail__tooltip {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--rail-tooltip-bg, #161620);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  padding: 5px 10px;
+  border-radius: 7px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  /* CSS-driven show/hide */
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.left-rail__item:hover .left-rail__tooltip,
+.left-rail__item:focus-visible .left-rail__tooltip {
+  opacity: 1;
+}
+
+/* Tooltip arrow — outer border triangle */
+.left-rail__tooltip::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 5px solid transparent;
+  border-right-color: rgba(255, 255, 255, 0.10);
+}
+
+/* Tooltip arrow — inner fill triangle */
+.left-rail__tooltip::after {
+  content: '';
+  position: absolute;
+  right: calc(100% - 1px);
+  top: 50%;
+  transform: translateY(-50%);
+  border: 5px solid transparent;
+  border-right-color: var(--rail-tooltip-bg, #161620);
+}
+
+.left-rail__tooltip-name {
+  font-size: 11px;
+  font-weight: 500;
+  color: #eef2ff;
+}
+
+.left-rail__tooltip-kbd {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 9px;
+  color: var(--rail-text-hover, #7c88a0);
+  font-family: var(--aqb-font-mono, 'JetBrains Mono', monospace);
+}
+
+/* ============================================
+   Badge System — v16: 7px dot indicators
+   ============================================ */
+.left-rail__badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1.5px solid var(--rail-bg, #0c0c12);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.left-rail__badge--warn {
+  background: var(--rail-badge-warn, #f59e0b);
+}
+
+.left-rail__badge--info {
+  background: var(--rail-badge-info, #6366f1);
+}
+
+.left-rail__badge--ok {
+  background: var(--rail-badge-ok, #00d4aa);
+}
+
+/* ============================================
+   Progress Ring — v16: SVG stroke-dasharray
+   ============================================ */
+.left-rail__progress {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+}
+
+.left-rail__progress svg {
+  width: 10px;
+  height: 10px;
+  display: block;
+}
+
+.left-rail__progress-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 2;
+}
+
+.left-rail__progress-fill {
+  fill: none;
+  stroke: var(--rail-badge-warn, #f59e0b);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 0 25.13;
+  stroke-dashoffset: 0;
+  transform: rotate(-90deg);
+  transform-origin: 5px 5px;
+  transition: stroke-dasharray 0.6s ease;
+}
+
+/* ============================================
+   Footer — v16: utility buttons (Layers, History)
+   Border-top separator, teal active state
+   ============================================ */
+.left-rail__footer {
+  width: 100%;
+  padding: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.left-rail__footer-btn {
+  width: 100%;
+  height: 38px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--rail-text-default, #3d4a5c);
+  background: transparent;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+  font-family: inherit;
+}
+
+.left-rail__footer-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--rail-text-hover, #7c88a0);
+}
+
+.left-rail__footer-btn--active {
+  color: var(--rail-focus, #00d4aa);
+  background: rgba(0, 212, 170, 0.08);
+}
+
+.left-rail__footer-btn--active:hover {
+  color: var(--rail-focus, #00d4aa);
+  background: rgba(0, 212, 170, 0.12);
+}
+
+.left-rail__footer-btn:focus-visible {
+  outline: 2px solid var(--rail-focus, #00d4aa);
+  outline-offset: 2px;
+}
+
+.left-rail__footer-icon,
+.left-rail__footer-btn > svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.left-rail__footer-label {
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* ============================================
+   Overflow Menu — "More" popover
+   ============================================ */
+.left-rail__overflow {
+  position: relative;
+  width: 100%;
+}
+
+.left-rail__overflow-menu {
+  position: absolute;
+  left: calc(100% + 8px);
+  bottom: 0;
+  background: var(--rail-tooltip-bg, #161620);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 10px;
+  padding: 4px;
+  min-width: 180px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.left-rail__overflow-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--rail-text-hover, #7c88a0);
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.left-rail__overflow-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #eef2ff;
+}
+
+.left-rail__overflow-item--active {
+  color: var(--rail-active, #818CF8);
+}
+
+.left-rail__overflow-item--active:hover {
+  color: var(--rail-active, #818CF8);
+  background: var(--rail-active-bg, rgba(99, 102, 241, 0.09));
+}
+
+.left-rail__overflow-icon,
+.left-rail__overflow-item > svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.left-rail__overflow-label {
+  font-size: 12px;
+  font-weight: 500;
+  flex: 1;
+}
+
+.left-rail__overflow-kbd {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 9px;
+  color: var(--rail-text-default, #3d4a5c);
+  font-family: var(--aqb-font-mono, 'JetBrains Mono', monospace);
+}
+
+/* ============================================
+   Accessibility — Reduced Motion
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .left-rail__item,
+  .left-rail__footer-btn {
+    transition: none;
+  }
+
+  .left-rail__tooltip {
+    transition: none;
+  }
+
+  .left-rail__logo-mark {
+    transition: none;
+  }
+
+  .left-rail__icon,
+  .left-rail__footer-icon {
+    transition: none;
+  }
+
+  .left-rail__progress-fill {
+    transition: none;
+  }
+}
