@@ -28,3 +28,5 @@ export type { CanvasBreadcrumbProps } from "./CanvasBreadcrumb";
 export { SmartGuidesOverlay } from "./SmartGuidesOverlay";
 export { CanvasOverlayGroup } from "./CanvasOverlayGroup";
 export type { CanvasOverlayGroupProps } from "./CanvasOverlayGroup";
+export { SectionReorderHandles } from "./SectionReorderHandles";
+export type { SectionReorderHandlesProps } from "./SectionReorderHandles";
