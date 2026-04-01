@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buildrik Developer Validation Test</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0b1220;
+    --bg-card: #131c2e;
+    --bg-hover: #1a2540;
+    --text: #eaf2ff;
+    --text-muted: #8892a4;
+    --primary: #6366f1;
+    --primary-hover: #818cf8;
+    --buildrik: #6366f1;
+    --vscode: #22c55e;
+    --star: #facc15;
+    --border: #1e2d45;
+    --danger: #ef4444;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; }
+  h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .task-spec {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin: 1.25rem 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .task-spec strong { color: var(--text); }
+
+  .btn-row { display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; }
+
+  button {
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  button:active { transform: scale(0.97); }
+
+  .btn-buildrik { background: var(--buildrik); color: #fff; }
+  .btn-buildrik:hover { background: var(--primary-hover); }
+
+  .btn-vscode { background: var(--vscode); color: #0b1220; }
+  .btn-vscode:hover { background: #4ade80; }
+
+  .btn-done { background: var(--danger); color: #fff; }
+  .btn-done:hover { background: #f87171; }
+
+  .btn-submit { background: var(--primary); color: #fff; }
+  .btn-submit:hover { background: var(--primary-hover); }
+
+  .btn-secondary {
+    background: var(--bg-hover);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: #243050; }
+
+  .btn-small { padding: 0.5rem 1rem; font-size: 0.85rem; }
+
+  /* Timer bar */
+  .timer-bar {
+    position: fixed;
+    top: 0; right: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0 0 0 12px;
+    z-index: 100;
+    font-weight: 700;
+    font-size: 1.5rem;
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .timer-bar.buildrik { background: var(--buildrik); color: #fff; }
+  .timer-bar.vscode { background: var(--vscode); color: #0b1220; }
+  .timer-bar .method-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; }
+
+  /* Stars */
+  .stars { display: flex; gap: 0.35rem; margin: 0.5rem 0; }
+  .star {
+    font-size: 1.75rem;
+    cursor: pointer;
+    color: var(--border);
+    transition: color 0.1s;
+    user-select: none;
+  }
+  .star.active { color: var(--star); }
+  .star:hover { color: var(--star); }
+
+  /* Radio group */
+  .radio-group { display: flex; gap: 0.75rem; margin: 0.5rem 0; flex-wrap: wrap; }
+  .radio-group label {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.15s;
+  }
+  .radio-group label:hover { border-color: var(--primary); }
+  .radio-group input { display: none; }
+  .radio-group label.selected {
+    border-color: var(--primary);
+    background: rgba(99,102,241,0.15);
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 80px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: vertical;
+    margin: 0.5rem 0;
+  }
+  textarea:focus { outline: none; border-color: var(--primary); }
+
+  .form-group { margin-bottom: 1.25rem; }
+  .form-label { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem; }
+
+  /* Admin table */
+  .admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 1rem 0; }
+  .admin-table th, .admin-table td {
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .admin-table th { color: var(--text-muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .admin-table tr:hover td { background: var(--bg-hover); }
+
+  .stat-row { display: flex; gap: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .stat-box {
+    flex: 1;
+    min-width: 140px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .stat-value { font-size: 1.5rem; font-weight: 700; }
+  .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.25rem; }
+
+  .hidden { display: none !important; }
+
+  .success-msg {
+    text-align: center;
+    padding: 2rem;
+  }
+  .success-msg .checkmark { font-size: 3rem; margin-bottom: 1rem; }
+
+  @media (max-width: 500px) {
+    .container { padding: 1.5rem 1rem; }
+    .btn-row { flex-direction: column; }
+    .btn-row button { width: 100%; }
+    .timer-bar { font-size: 1.25rem; padding: 0.5rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SCREEN: Landing -->
+<div id="screen-landing" class="container">
+  <div style="text-align:center; margin-bottom: 2rem;">
+    <span class="badge" style="background:rgba(99,102,241,0.2); color:var(--primary); margin-bottom:0.75rem;">Developer Validation Test</span>
+    <h1>Buildrik Speed Test</h1>
+    <p style="color:var(--text-muted); max-width:480px; margin:0.5rem auto 0;">
+      Build the page described below using your assigned method. We're measuring time-to-completion and perceived quality.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Task Brief</h3>
+    <div class="task-spec">
+      Build a <strong>landing page for an AI-powered code review tool called "ReviewBot"</strong>. The page needs:
+      <br><br>
+      <strong>1.</strong> Hero section with headline and CTA button<br>
+      <strong>2.</strong> Features section (3 key features with icons/descriptions)<br>
+      <strong>3.</strong> Pricing section (3 tiers: Free, Pro, Enterprise)<br>
+      <strong>4.</strong> Testimonials section (at least 2 testimonials)<br>
+      <strong>5.</strong> Footer with links and copyright
+      <br><br>
+      Content can be placeholder text. Focus on layout, structure, and visual polish.
+    </div>
+  </div>
+
+  <div class="card" style="text-align:center;">
+    <h3>Choose your method to start the timer</h3>
+    <div class="btn-row" style="justify-content:center;">
+      <button class="btn-buildrik" onclick="startTest('buildrik')">Start with Buildrik</button>
+      <button class="btn-vscode" onclick="startTest('vscode')">Start with VS Code</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: Timer (active test) -->
+<div id="screen-timer" class="container hidden">
+  <div class="timer-bar" id="timer-bar">
+    <div>
+      <div class="method-label" id="timer-method-label"></div>
+      <div id="timer-display">00:00</div>
+    </div>
+    <button class="btn-done btn-small" onclick="stopTest()">I'm Done</button>
+  </div>
+
+  <div style="margin-top: 4rem;">
+    <div class="card">
+      <h3>Task Brief</h3>
+      <div class="task-spec">
+        Build a <strong>landing page for "ReviewBot"</strong> (AI code review tool):<br>
+        Hero + CTA, 3 Features, 3 Pricing tiers, Testimonials, Footer.
+      </div>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-top:0.75rem;">
+        Click <strong>"I'm Done"</strong> in the top-right when you've finished building the page.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: Survey -->
+<div id="screen-survey" class="container hidden">
+  <div style="text-align:center; margin-bottom:1.5rem;">
+    <h1>Nice work!</h1>
+    <p style="color:var(--text-muted);">
+      You finished in <strong id="final-time"></strong> using <strong id="final-method"></strong>.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="form-group">
+      <div class="form-label">Rate the output quality</div>
+      <div class="stars" id="stars">
+        <span class="star" data-value="1">&#9733;</span>
+        <span class="star" data-value="2">&#9733;</span>
+        <span class="star" data-value="3">&#9733;</span>
+        <span class="star" data-value="4">&#9733;</span>
+        <span class="star" data-value="5">&#9733;</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">Would you use this tool again?</div>
+      <div class="radio-group" id="reuse-group">
+        <label onclick="selectReuse(this, 'yes')"><input type="radio" name="reuse" value="yes"><span>Yes</span></label>
+        <label onclick="selectReuse(this, 'maybe')"><input type="radio" name="reuse" value="maybe"><span>Maybe</span></label>
+        <label onclick="selectReuse(this, 'no')"><input type="radio" name="reuse" value="no"><span>No</span></label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="form-label">Any comments?</div>
+      <textarea id="comments" placeholder="Optional feedback..."></textarea>
+    </div>
+
+    <button class="btn-submit" style="width:100%;" onclick="submitSurvey()">Submit Results</button>
+  </div>
+</div>
+
+<!-- SCREEN: Success -->
+<div id="screen-success" class="container hidden">
+  <div class="card success-msg">
+    <div class="checkmark">&#10003;</div>
+    <h2>Results saved</h2>
+    <p style="color:var(--text-muted); margin-bottom:1.5rem;">Thank you for participating in the test.</p>
+    <div class="btn-row" style="justify-content:center;">
+      <button class="btn-secondary btn-small" onclick="downloadResults()">Download Results (JSON)</button>
+      <button class="btn-buildrik btn-small" onclick="resetTest()">Run Another Test</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: Admin -->
+<div id="screen-admin" class="container hidden">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:0.75rem;">
+    <h1>Admin: Test Results</h1>
+    <button class="btn-secondary btn-small" onclick="downloadResults()">Download JSON</button>
+  </div>
+
+  <div class="stat-row" id="admin-stats"></div>
+
+  <div class="card" style="overflow-x:auto;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Tester</th>
+          <th>Method</th>
+          <th>Time</th>
+          <th>Quality</th>
+          <th>Reuse</th>
+          <th>Comments</th>
+        </tr>
+      </thead>
+      <tbody id="admin-tbody"></tbody>
+    </table>
+    <p id="admin-empty" class="hidden" style="color:var(--text-muted); text-align:center; padding:2rem 0;">No results yet.</p>
+  </div>
+</div>
+
+<script>
+(function() {
+  var state = {
+    method: null,
+    startTime: null,
+    elapsed: 0,
+    timerInterval: null,
+    quality: 0,
+    reuse: null
+  };
+
+  var STORAGE_KEY = 'buildrik_test_results';
+
+  function getResults() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch(e) { return []; }
+  }
+
+  function saveResult(result) {
+    var results = getResults();
+    results.push(result);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(results));
+  }
+
+  function showScreen(id) {
+    ['screen-landing','screen-timer','screen-survey','screen-success','screen-admin'].forEach(function(s) {
+      document.getElementById(s).classList.add('hidden');
+    });
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  function formatTime(seconds) {
+    var m = Math.floor(seconds / 60);
+    var s = seconds % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function updateTimer() {
+    state.elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+    document.getElementById('timer-display').textContent = formatTime(state.elapsed);
+  }
+
+  function escapeHtml(str) {
+    var d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function createStatBox(value, label, color) {
+    var box = document.createElement('div');
+    box.className = 'stat-box';
+
+    var valEl = document.createElement('div');
+    valEl.className = 'stat-value';
+    valEl.style.color = color;
+    valEl.textContent = value;
+    box.appendChild(valEl);
+
+    var labEl = document.createElement('div');
+    labEl.className = 'stat-label';
+    labEl.textContent = label;
+    box.appendChild(labEl);
+
+    return box;
+  }
+
+  function createResultRow(r) {
+    var tr = document.createElement('tr');
+
+    var tdTester = document.createElement('td');
+    tdTester.textContent = r.tester;
+    tr.appendChild(tdTester);
+
+    var tdMethod = document.createElement('td');
+    var badge = document.createElement('span');
+    badge.className = 'badge';
+    badge.style.background = r.method === 'buildrik' ? 'rgba(99,102,241,0.2)' : 'rgba(34,197,94,0.2)';
+    badge.style.color = r.method === 'buildrik' ? 'var(--buildrik)' : 'var(--vscode)';
+    badge.textContent = r.method;
+    tdMethod.appendChild(badge);
+    tr.appendChild(tdMethod);
+
+    var tdTime = document.createElement('td');
+    tdTime.textContent = formatTime(r.time_seconds);
+    tr.appendChild(tdTime);
+
+    var tdQuality = document.createElement('td');
+    tdQuality.textContent = '\u2605'.repeat(r.quality);
+    tr.appendChild(tdQuality);
+
+    var tdReuse = document.createElement('td');
+    tdReuse.textContent = r.reuse;
+    tr.appendChild(tdReuse);
+
+    var tdComments = document.createElement('td');
+    tdComments.style.maxWidth = '200px';
+    tdComments.style.overflow = 'hidden';
+    tdComments.style.textOverflow = 'ellipsis';
+    tdComments.style.whiteSpace = 'nowrap';
+    tdComments.textContent = r.comments || '-';
+    tr.appendChild(tdComments);
+
+    return tr;
+  }
+
+  // Exposed functions
+  window.startTest = function(method) {
+    state.method = method;
+    state.startTime = Date.now();
+    state.elapsed = 0;
+    state.quality = 0;
+    state.reuse = null;
+
+    var bar = document.getElementById('timer-bar');
+    bar.className = 'timer-bar ' + method;
+    document.getElementById('timer-method-label').textContent = method === 'buildrik' ? 'Buildrik' : 'VS Code';
+    document.getElementById('timer-display').textContent = '00:00';
+
+    showScreen('screen-timer');
+    state.timerInterval = setInterval(updateTimer, 1000);
+  };
+
+  window.stopTest = function() {
+    clearInterval(state.timerInterval);
+    updateTimer();
+
+    document.getElementById('final-time').textContent = formatTime(state.elapsed);
+    document.getElementById('final-method').textContent = state.method === 'buildrik' ? 'Buildrik' : 'VS Code';
+
+    // Reset survey state
+    document.querySelectorAll('#stars .star').forEach(function(s) { s.classList.remove('active'); });
+    document.querySelectorAll('#reuse-group label').forEach(function(l) { l.classList.remove('selected'); });
+    document.getElementById('comments').value = '';
+    state.quality = 0;
+    state.reuse = null;
+
+    document.getElementById('timer-bar').className = 'timer-bar hidden';
+    showScreen('screen-survey');
+  };
+
+  window.selectReuse = function(label, value) {
+    state.reuse = value;
+    document.querySelectorAll('#reuse-group label').forEach(function(l) { l.classList.remove('selected'); });
+    label.classList.add('selected');
+  };
+
+  window.submitSurvey = function() {
+    if (state.quality === 0) { alert('Please rate the output quality.'); return; }
+    if (!state.reuse) { alert('Please answer "Would you use this tool again?"'); return; }
+
+    var result = {
+      method: state.method,
+      time_seconds: state.elapsed,
+      quality: state.quality,
+      reuse: state.reuse,
+      comments: document.getElementById('comments').value.trim(),
+      timestamp: new Date().toISOString(),
+      tester: 'anonymous'
+    };
+
+    saveResult(result);
+    showScreen('screen-success');
+  };
+
+  window.downloadResults = function() {
+    var results = getResults();
+    var blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'buildrik-test-results.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  window.resetTest = function() {
+    state.method = null;
+    state.startTime = null;
+    state.elapsed = 0;
+    showScreen('screen-landing');
+  };
+
+  // Star rating
+  document.getElementById('stars').addEventListener('click', function(e) {
+    var star = e.target.closest('.star');
+    if (!star) return;
+    var val = parseInt(star.getAttribute('data-value'));
+    state.quality = val;
+    document.querySelectorAll('#stars .star').forEach(function(s) {
+      s.classList.toggle('active', parseInt(s.getAttribute('data-value')) <= val);
+    });
+  });
+
+  // Star hover
+  document.getElementById('stars').addEventListener('mouseover', function(e) {
+    var star = e.target.closest('.star');
+    if (!star) return;
+    var val = parseInt(star.getAttribute('data-value'));
+    document.querySelectorAll('#stars .star').forEach(function(s) {
+      s.classList.toggle('active', parseInt(s.getAttribute('data-value')) <= val);
+    });
+  });
+  document.getElementById('stars').addEventListener('mouseout', function() {
+    var val = state.quality;
+    document.querySelectorAll('#stars .star').forEach(function(s) {
+      s.classList.toggle('active', parseInt(s.getAttribute('data-value')) <= val);
+    });
+  });
+
+  // Admin view
+  function renderAdmin() {
+    var results = getResults();
+    var tbody = document.getElementById('admin-tbody');
+    var empty = document.getElementById('admin-empty');
+    var statsEl = document.getElementById('admin-stats');
+
+    tbody.replaceChildren();
+    statsEl.replaceChildren();
+
+    if (results.length === 0) {
+      empty.classList.remove('hidden');
+      return;
+    }
+
+    empty.classList.add('hidden');
+
+    results.forEach(function(r) {
+      tbody.appendChild(createResultRow(r));
+    });
+
+    // Stats
+    var buildrik = results.filter(function(r) { return r.method === 'buildrik'; });
+    var vscode = results.filter(function(r) { return r.method === 'vscode'; });
+
+    function avg(arr, key) {
+      if (arr.length === 0) return 0;
+      return arr.reduce(function(sum, r) { return sum + r[key]; }, 0) / arr.length;
+    }
+
+    var bAvgTime = avg(buildrik, 'time_seconds');
+    var vAvgTime = avg(vscode, 'time_seconds');
+    var bAvgQual = avg(buildrik, 'quality');
+    var vAvgQual = avg(vscode, 'quality');
+
+    statsEl.appendChild(createStatBox(formatTime(Math.round(bAvgTime)), 'Avg Buildrik Time', 'var(--buildrik)'));
+    statsEl.appendChild(createStatBox(formatTime(Math.round(vAvgTime)), 'Avg VS Code Time', 'var(--vscode)'));
+    statsEl.appendChild(createStatBox(bAvgQual.toFixed(1) + ' / 5', 'Avg Buildrik Quality', 'var(--buildrik)'));
+    statsEl.appendChild(createStatBox(vAvgQual.toFixed(1) + ' / 5', 'Avg VS Code Quality', 'var(--vscode)'));
+    statsEl.appendChild(createStatBox(results.length.toString(), 'Total Tests', 'var(--text)'));
+  }
+
+  // Route
+  if (window.location.search.indexOf('admin=true') !== -1) {
+    showScreen('screen-admin');
+    renderAdmin();
+  }
+})();
+</script>
+</body>
+</html>
