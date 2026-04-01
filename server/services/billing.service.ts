@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import type { UpgradeInput, CancelInput } from "@/lib/validations/billing";
+import type { UpgradeInput, CancelInput } from "@buildrik/shared/schemas/billing";
 
 const PRICE_MAP: Record<string, number> = {
   PRO_MONTHLY: 2900,

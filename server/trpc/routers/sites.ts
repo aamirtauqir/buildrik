@@ -35,8 +35,8 @@ import {
   bulkActionSchema,
   transferSiteSchema,
   checkSlugSchema,
-} from "@/lib/validations/sites";
-import { prePublishCheckSchema } from "@/lib/validations/publish";
+} from "@buildrik/shared/schemas/sites";
+import { prePublishCheckSchema } from "@buildrik/shared/schemas/publish";
 
 async function getWorkspaceId(ctx: {
   prisma: { workspaceMember: { findFirst: Function } };

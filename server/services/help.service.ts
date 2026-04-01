@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { HELP_CATEGORIES, type SupportTicketInput } from "@/lib/validations/help";
+import { HELP_CATEGORIES, type SupportTicketInput } from "@buildrik/shared/schemas/help";
 
 export function listCategories() {
   return HELP_CATEGORIES.map((c) => ({ ...c }));

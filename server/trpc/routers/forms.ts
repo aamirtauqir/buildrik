@@ -8,7 +8,7 @@ import {
   deleteSubmission,
   exportSubmissions,
 } from "@/server/services/form-submission.service";
-import { listSubmissionsSchema, updateSubmissionSchema } from "@/lib/validations/forms";
+import { listSubmissionsSchema, updateSubmissionSchema } from "@buildrik/shared/schemas/forms";
 
 export const formsRouter = router({
   listBlocks: protectedProcedure

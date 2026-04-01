@@ -4,7 +4,7 @@ import type {
   CreateSiteInput,
   ListSitesInput,
   BulkActionInput,
-} from "@/lib/validations/sites";
+} from "@buildrik/shared/schemas/sites";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 
 function slugify(name: string): string {

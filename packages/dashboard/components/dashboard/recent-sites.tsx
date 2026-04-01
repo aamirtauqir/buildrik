@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import type { RecentSite } from "@lib/validations/dashboard";
+import type { RecentSite } from "@buildrik/shared/schemas/dashboard";
 import { SiteCard } from "@/components/dashboard/site-card";
 
 type RecentSitesProps = {

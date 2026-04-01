@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { Clock, BookOpen } from "lucide-react";
-import type { HelpArticleData } from "@lib/validations/help";
+import type { HelpArticleData } from "@buildrik/shared/schemas/help";
 
 interface ArticleListProps {
   articles: HelpArticleData[];

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { listPages, getPage, createPage, updatePage, deletePage } from "@/server/services/page.service";
-import { createPageSchema, updatePageSchema, deletePageSchema } from "@/lib/validations/pages";
+import { createPageSchema, updatePageSchema, deletePageSchema } from "@buildrik/shared/schemas/pages";
 
 export const pagesRouter = router({
   list: protectedProcedure.input(z.object({ siteId: z.string() })).query(({ input }) => listPages(input.siteId)),

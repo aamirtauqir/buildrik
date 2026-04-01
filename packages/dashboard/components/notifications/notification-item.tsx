@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Eye, EyeOff, MoreHorizontal } from "lucide-react";
-import type { NotificationData } from "@lib/validations/notifications";
+import type { NotificationData } from "@buildrik/shared/schemas/notifications";
 
 function timeAgo(date: Date): string {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);

@@ -4,7 +4,7 @@ import {
   listNotifications, getUnreadCount, markAsRead, markAllAsRead, getRecentNotifications,
   listGroupedNotifications,
 } from "@/server/services/notification.service";
-import { listNotificationsSchema } from "@/lib/validations/notifications";
+import { listNotificationsSchema } from "@buildrik/shared/schemas/notifications";
 
 export const notificationsRouter = router({
   list: protectedProcedure.input(listNotificationsSchema).query(async ({ ctx, input }) => {

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import type { UpdateProfileInput, NotificationPrefInput, UpdatePreferencesInput } from "@/lib/validations/account";
+import type { UpdateProfileInput, NotificationPrefInput, UpdatePreferencesInput } from "@buildrik/shared/schemas/account";
 import { sendAccountDeletionEmail, sendEmailChangedEmail } from "@/server/services/email.service";
 import { createNotification } from "@/server/services/notification.trigger";
 import { generateToken } from "@/server/services/token.service";

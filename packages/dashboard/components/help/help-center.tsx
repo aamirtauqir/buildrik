@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Search, Rocket, Globe, Users, CreditCard, Link, Pencil, MessageCircle, Mail, Printer } from "lucide-react";
-import { HELP_CATEGORIES } from "@lib/validations/help";
+import { HELP_CATEGORIES } from "@buildrik/shared/schemas/help";
 
 export const HELP_CATEGORY_LIST = HELP_CATEGORIES.map((c) => ({ ...c }));
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { CheckCircle2, AlertTriangle, XCircle, X } from "lucide-react";
-import type { PrePublishChecksResult } from "@lib/validations/publish";
+import type { PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
 
 const STATUS_ICON = {
   pass: <CheckCircle2 className="h-5 w-5" style={{ color: "#22C55E" }} />,

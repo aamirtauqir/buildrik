@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { WorkspaceHealth as WorkspaceHealthData } from "@lib/validations/dashboard";
+import type { WorkspaceHealth as WorkspaceHealthData } from "@buildrik/shared/schemas/dashboard";
 
 export function getHealthColor(pct: number): "green" | "yellow" | "red" {
   if (pct >= 85) return "red";

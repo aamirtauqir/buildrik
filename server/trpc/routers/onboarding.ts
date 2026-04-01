@@ -10,7 +10,7 @@ import {
   completeTourStep,
   completeTour,
 } from "@/server/services/onboarding.service";
-import { selectRoleSchema, setupProjectSchema } from "@/lib/validations/onboarding";
+import { selectRoleSchema, setupProjectSchema } from "@buildrik/shared/schemas/onboarding";
 
 export const onboardingRouter = router({
   getState: protectedProcedure.query(async ({ ctx }) => {

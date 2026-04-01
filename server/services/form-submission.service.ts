@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import type { FormSubmissionInput, ListSubmissionsInput } from "@/lib/validations/forms";
+import type { FormSubmissionInput, ListSubmissionsInput } from "@buildrik/shared/schemas/forms";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 import { sendFormSubmissionEmail } from "@/server/services/email.service";
 

@@ -7,7 +7,7 @@ import { listRedirects, createRedirect, updateRedirect, deleteRedirect, importRe
 import { listDomains, connectDomain, removeDomain, setPrimaryDomain } from "@/server/services/domain.service";
 import { listShareLinks, createShareLink, revokeShareLink } from "@/server/services/share-link.service";
 import { getSiteAnalytics } from "@/server/services/analytics.service";
-import { updateSiteSettingsSchema, createRedirectSchema, connectDomainSchema, createShareLinkSchema, siteAnalyticsQuerySchema } from "@/lib/validations/site-detail";
+import { updateSiteSettingsSchema, createRedirectSchema, connectDomainSchema, createShareLinkSchema, siteAnalyticsQuerySchema } from "@buildrik/shared/schemas/site-detail";
 import type { PlanName } from "@/lib/constants/plan-limits";
 
 export const siteDetailRouter = router({

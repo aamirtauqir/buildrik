@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { Paperclip, X, CheckCircle } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
-import type { SupportTicketInput } from "@lib/validations/help";
+import type { SupportTicketInput } from "@buildrik/shared/schemas/help";
 
 const TICKET_CATEGORIES: { value: SupportTicketInput["category"]; label: string }[] = [
   { value: "GENERAL", label: "General Question" },

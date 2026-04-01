@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import type { AddIntegrationInput } from "@/lib/validations/account";
+import type { AddIntegrationInput } from "@buildrik/shared/schemas/account";
 
 export async function listIntegrations(workspaceId: string) {
   return prisma.workspaceIntegration.findMany({

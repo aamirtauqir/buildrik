@@ -3,7 +3,7 @@ import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { listTemplates, getTemplate, useTemplate } from "@/server/services/template.service";
 import { createGenerationJob, getJobStatus, cancelJob } from "@/server/services/ai-generation.service";
-import { listTemplatesSchema, generateSiteSchema } from "@/lib/validations/templates";
+import { listTemplatesSchema, generateSiteSchema } from "@buildrik/shared/schemas/templates";
 
 async function getWorkspaceId(ctx: {
   prisma: { workspaceMember: { findFirst: Function } };

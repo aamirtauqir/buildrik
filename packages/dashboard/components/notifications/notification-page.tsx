@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
 import { NotificationItem } from "./notification-item";
-import type { NotificationData } from "@lib/validations/notifications";
+import type { NotificationData } from "@buildrik/shared/schemas/notifications";
 
 export const NOTIFICATION_TABS = [
   { key: "all" as const, label: "All" },

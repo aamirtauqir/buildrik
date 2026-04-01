@@ -1,6 +1,6 @@
 "use client";
 
-import type { ActivityFeed as ActivityFeedData, ActivityEntry } from "@lib/validations/dashboard";
+import type { ActivityFeed as ActivityFeedData, ActivityEntry } from "@buildrik/shared/schemas/dashboard";
 
 function timeAgo(date: Date): string {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);

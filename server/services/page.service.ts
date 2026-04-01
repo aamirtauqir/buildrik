@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, PlanName } from "@/lib/constants/plan-limits";
-import type { CreatePageInput, UpdatePageInput } from "@/lib/validations/pages";
+import type { CreatePageInput, UpdatePageInput } from "@buildrik/shared/schemas/pages";
 
 type DeletePageInput = { pageId: string; siteId: string };
 

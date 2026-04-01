@@ -9,7 +9,7 @@ import {
 import {
   loginSchema, signupSchema, forgotPasswordSchema,
   resetPasswordSchema, otpSchema, backupCodeSchema, magicLinkSchema,
-} from "@/lib/validations/auth";
+} from "@buildrik/shared/schemas/auth";
 import { generateToken } from "@/server/services/token.service";
 import { logAuditEvent } from "@/server/services/audit.service";
 import { createNotification } from "@/server/services/notification.trigger";

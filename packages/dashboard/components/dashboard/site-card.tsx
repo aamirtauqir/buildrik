@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Globe, Pencil, ArrowRight, Upload, Link2, Check } from "lucide-react";
 import { cn } from "@lib/utils";
-import type { RecentSite } from "@lib/validations/dashboard";
+import type { RecentSite } from "@buildrik/shared/schemas/dashboard";
 
 const STATUS_STYLES: Record<string, string> = {
   published: "bg-[#DCFCE7] text-[#166534]",

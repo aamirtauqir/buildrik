@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { PrePublishChecksResult } from "@/lib/validations/publish";
+import type { PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 
 export async function runPrePublishChecks(siteId: string): Promise<PrePublishChecksResult> {
