@@ -1,0 +1,114 @@
+<h2>Option A vs Option B — Full Comparison</h2>
+<p class="subtitle">Editor-Dashboard Integration Approaches</p>
+
+<div class="section">
+  <h3>Option A — Embed Editor Inside Next.js</h3>
+  <p class="label">Single app, single deploy, editor lives at /dashboard/sites/[siteId]/editor</p>
+
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>Advantages</h4>
+      <ul>
+        <li><strong>Single deploy</strong> — ek hi Vercel/server pe sab kuch</li>
+        <li><strong>Shared auth</strong> — NextAuth session directly available, koi extra setup nahi</li>
+        <li><strong>tRPC direct access</strong> — editor mein tRPC hooks seedha use ho sakte hain</li>
+        <li><strong>No CORS issues</strong> — same origin, koi cross-domain masla nahi</li>
+        <li><strong>Seamless UX</strong> — user ko tab switch nahi karna, same app mein rehta hai</li>
+        <li><strong>Shared components</strong> — dashboard ke UI components (modals, toasts, sidebar) reuse</li>
+        <li><strong>Single routing</strong> — ek hi router, deep linking easy</li>
+        <li><strong>Simpler DevOps</strong> — ek build pipeline, ek CI/CD</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>Disadvantages</h4>
+      <ul>
+        <li><strong>Build complexity</strong> — Emotion CSS (editor) + Tailwind 4 (dashboard) ek saath configure karna</li>
+        <li><strong>SSR conflicts</strong> — Editor purely client-side hai, Next.js SSR se conflict hoga (dynamic import + ssr:false lagega)</li>
+        <li><strong>Bundle size</strong> — Editor ka poora code dashboard bundle mein aayega (~2MB+), initial load slow</li>
+        <li><strong>Migration effort</strong> — Vite-specific features (import.meta, env vars) ko Next.js compatible banana</li>
+        <li><strong>Tight coupling</strong> — editor update = dashboard redeploy, dono tied hain</li>
+        <li><strong>Dev experience</strong> — Turbopack + Emotion HMR issues possible</li>
+        <li><strong>Risk</strong> — Editor ke 371+ components mein koi bhi break ho sakta hai migration mein</li>
+        <li><strong>Timeline</strong> — Estimated 3-6 weeks sirf build integration ka kaam</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Option B — Separate Apps, API Bridge</h3>
+  <p class="label">Editor stays Vite app, connects to dashboard via API, same domain pe deploy</p>
+
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>Advantages</h4>
+      <ul>
+        <li><strong>Zero editor rewrite</strong> — editor jaise hai waise kaam karta rehta hai</li>
+        <li><strong>Fast to ship</strong> — sirf API bridge banana hai, 1-2 weeks</li>
+        <li><strong>Independent deploys</strong> — editor fix = editor deploy, dashboard untouched</li>
+        <li><strong>StorageAdapter ready</strong> — editor mein already "remote" mode hai with custom handlers</li>
+        <li><strong>Performance</strong> — editor ka bundle alag load hota hai, dashboard fast rehta hai</li>
+        <li><strong>Team independence</strong> — editor aur dashboard teams alag kaam kar sakti hain</li>
+        <li><strong>Low risk</strong> — existing code mein minimal changes</li>
+        <li><strong>Rollback easy</strong> — kuch break ho toh sirf ek app rollback</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>Disadvantages</h4>
+      <ul>
+        <li><strong>Auth sharing setup</strong> — session cookie sharing chahiye (same domain pe solve hota hai)</li>
+        <li><strong>Two deploys</strong> — dashboard.buildrik.com + editor.buildrik.com manage karna</li>
+        <li><strong>Tab switch UX</strong> — user new tab mein jaata hai editor ke liye</li>
+        <li><strong>API duplication</strong> — editor mein fetch calls banana for tRPC endpoints</li>
+        <li><strong>State sync</strong> — dashboard aur editor ke beech state changes sync karna (e.g., site renamed)</li>
+        <li><strong>DevOps overhead</strong> — do CI/CD pipelines, do builds, do monitoring setups</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="background: rgba(99,102,241,0.08); border-radius: 12px; padding: 20px; margin-top: 24px;">
+  <h3 style="margin-top:0">Summary</h3>
+  <table style="width:100%; border-collapse:collapse; font-size:14px;">
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+      <td style="padding:8px; font-weight:600;">Criteria</td>
+      <td style="padding:8px; text-align:center; font-weight:600;">Option A</td>
+      <td style="padding:8px; text-align:center; font-weight:600;">Option B</td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+      <td style="padding:8px;">Ship time</td>
+      <td style="padding:8px; text-align:center;">3-6 weeks</td>
+      <td style="padding:8px; text-align:center; color:#4ade80;">1-2 weeks</td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+      <td style="padding:8px;">Risk level</td>
+      <td style="padding:8px; text-align:center; color:#f87171;">High</td>
+      <td style="padding:8px; text-align:center; color:#4ade80;">Low</td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+      <td style="padding:8px;">User experience</td>
+      <td style="padding:8px; text-align:center; color:#4ade80;">Seamless</td>
+      <td style="padding:8px; text-align:center;">Tab switch</td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+      <td style="padding:8px;">Auth complexity</td>
+      <td style="padding:8px; text-align:center; color:#4ade80;">None (shared)</td>
+      <td style="padding:8px; text-align:center;">Cookie sharing</td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+      <td style="padding:8px;">Editor code changes</td>
+      <td style="padding:8px; text-align:center; color:#f87171;">Major rewrite</td>
+      <td style="padding:8px; text-align:center; color:#4ade80;">Minimal</td>
+    </tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+      <td style="padding:8px;">Future flexibility</td>
+      <td style="padding:8px; text-align:center;">Locked together</td>
+      <td style="padding:8px; text-align:center; color:#4ade80;">Independent</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;">Bundle size impact</td>
+      <td style="padding:8px; text-align:center; color:#f87171;">Dashboard +2MB</td>
+      <td style="padding:8px; text-align:center; color:#4ade80;">No impact</td>
+    </tr>
+  </table>
+</div>
