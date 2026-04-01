@@ -1,5 +1,5 @@
 {
-  "name": "buildrik",
+  "name": "@buildrik/editor",
   "version": "1.0.0",
   "type": "module",
   "description": "Aquibra Editor — L2 production-wired extraction",

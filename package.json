@@ -1,5 +1,5 @@
 {
-  "name": "buildrik",
+  "name": "@buildrik/dashboard",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -58,5 +58,15 @@
     "tsx": "^4.19.0",
     "typescript": "^5.6.0",
     "vitest": "^4.1.1"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma",
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ]
   }
 }
