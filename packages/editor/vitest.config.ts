@@ -23,6 +23,7 @@ export default defineConfig({
       "@utils": resolve(__dirname, "./src/utils"),
       "@features": resolve(__dirname, "./src/features"),
       "@shared": resolve(__dirname, "./src/shared"),
+      "@buildrik/shared": resolve(__dirname, "../shared"),
     },
   },
 });

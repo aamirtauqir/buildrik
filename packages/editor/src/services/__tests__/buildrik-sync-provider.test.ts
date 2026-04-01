@@ -5,6 +5,26 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
+// Mock must use inline functions (no external refs) to avoid hoisting issues
+const mocks = {
+  sitesGetQuery: vi.fn(),
+  pagesListQuery: vi.fn(),
+  saveProjectMutate: vi.fn(),
+};
+
+vi.mock("@buildrik/shared", () => ({
+  createBuildrikApiClient: () => ({
+    sites: {
+      get: { query: (...args: any[]) => mocks.sitesGetQuery(...args) },
+      saveProject: { mutate: (...args: any[]) => mocks.saveProjectMutate(...args) },
+    },
+    pages: {
+      list: { query: (...args: any[]) => mocks.pagesListQuery(...args) },
+    },
+  }),
+}));
+
 import {
   loadProject,
   saveProject,
@@ -13,25 +33,16 @@ import {
   initBuildrikSync,
 } from "../BuildrikSyncProvider";
 
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
-
-function jsonResponse(data: unknown, status = 200) {
-  return {
-    ok: status >= 200 && status < 300,
-    status,
-    json: () => Promise.resolve({ result: { data } }),
-  };
-}
-
 beforeEach(() => {
-  mockFetch.mockReset();
+  mocks.sitesGetQuery.mockReset();
+  mocks.pagesListQuery.mockReset();
+  mocks.saveProjectMutate.mockReset();
 });
 
 describe("loadProject", () => {
   it("assembles ProjectData from sites.get + pages.list responses", async () => {
-    const site = { id: "site-1", name: "My Site" };
-    const pages = [
+    mocks.sitesGetQuery.mockResolvedValue({ id: "site-1", name: "My Site" });
+    mocks.pagesListQuery.mockResolvedValue([
       {
         id: "p2",
         name: "About",
@@ -48,11 +59,7 @@ describe("loadProject", () => {
         blocks: { id: "root-1", type: "container", children: [] },
         position: 1,
       },
-    ];
-
-    mockFetch
-      .mockResolvedValueOnce(jsonResponse(site))
-      .mockResolvedValueOnce(jsonResponse(pages));
+    ]);
 
     const project = await loadProject("site-1");
 
@@ -64,28 +71,22 @@ describe("loadProject", () => {
     expect(project.pages[0].isHome).toBe(true);
     expect(project.pages[1].id).toBe("p2");
 
-    // Verify fetch calls
-    expect(mockFetch).toHaveBeenCalledTimes(2);
-    const [sitesCall] = mockFetch.mock.calls[0];
-    expect(sitesCall).toContain("/api/trpc/sites.get");
-    expect(sitesCall).toContain("site-1");
+    expect(mocks.sitesGetQuery).toHaveBeenCalledWith({ id: "site-1" });
+    expect(mocks.pagesListQuery).toHaveBeenCalledWith({ siteId: "site-1" });
   });
 
   it("uses default root when page blocks are null", async () => {
-    mockFetch
-      .mockResolvedValueOnce(jsonResponse({ id: "s1", name: "Test" }))
-      .mockResolvedValueOnce(
-        jsonResponse([
-          {
-            id: "p1",
-            name: "Home",
-            slug: "/",
-            isHomePage: true,
-            blocks: null,
-            position: 1,
-          },
-        ])
-      );
+    mocks.sitesGetQuery.mockResolvedValue({ id: "s1", name: "Test" });
+    mocks.pagesListQuery.mockResolvedValue([
+      {
+        id: "p1",
+        name: "Home",
+        slug: "/",
+        isHomePage: true,
+        blocks: null,
+        position: 1,
+      },
+    ]);
 
     const project = await loadProject("s1");
     expect(project.pages[0].root).toEqual({
@@ -95,42 +96,15 @@ describe("loadProject", () => {
     });
   });
 
-  it("redirects to /auth/login on 401", async () => {
-    const originalLocation = window.location;
-    const mockLocation = { ...originalLocation, href: "" };
-    Object.defineProperty(window, "location", {
-      value: mockLocation,
-      writable: true,
-    });
+  it("throws when sites.get fails", async () => {
+    mocks.sitesGetQuery.mockRejectedValue(new Error("NOT_FOUND"));
 
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      status: 401,
-      json: () => Promise.resolve({}),
-    });
-
-    await expect(loadProject("site-1")).rejects.toThrow("AUTH_EXPIRED");
-    expect(mockLocation.href).toBe("/auth/login");
-
-    Object.defineProperty(window, "location", {
-      value: originalLocation,
-      writable: true,
-    });
-  });
-
-  it("throws on non-401 API errors", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-      json: () => Promise.resolve({}),
-    });
-
-    await expect(loadProject("site-1")).rejects.toThrow("API_ERROR_500");
+    await expect(loadProject("bad-id")).rejects.toThrow("NOT_FOUND");
   });
 });
 
 describe("saveProject", () => {
-  it("POSTs projectData to sites.saveProject with credentials", async () => {
+  it("calls sites.saveProject.mutate with siteId and projectData", async () => {
     const projectData = {
       version: "1.0" as const,
       pages: [],
@@ -138,20 +112,13 @@ describe("saveProject", () => {
       assets: [],
       metadata: { name: "Test" },
     };
-    const saveResponse = { success: true, savedAt: "2026-04-01T00:00:00Z" };
-
-    mockFetch.mockResolvedValueOnce(jsonResponse(saveResponse));
+    const saveResponse = { success: true, savedAt: new Date("2026-04-01") };
+    mocks.saveProjectMutate.mockResolvedValue(saveResponse);
 
     const result = await saveProject("site-1", projectData);
 
     expect(result.success).toBe(true);
-    expect(result.savedAt).toBe("2026-04-01T00:00:00Z");
-
-    const [url, options] = mockFetch.mock.calls[0];
-    expect(url).toBe("/api/trpc/sites.saveProject");
-    expect(options.method).toBe("POST");
-    expect(options.credentials).toBe("include");
-    expect(JSON.parse(options.body)).toEqual({
+    expect(mocks.saveProjectMutate).toHaveBeenCalledWith({
       siteId: "site-1",
       projectData,
     });
@@ -192,13 +159,10 @@ describe("getSiteIdFromUrl", () => {
 
 describe("getBuildrikStorageHandlers", () => {
   it("returns load/save handlers bound to siteId", async () => {
-    const site = { id: "s1", name: "Test" };
-    const pages = [
+    mocks.sitesGetQuery.mockResolvedValue({ id: "s1", name: "Test" });
+    mocks.pagesListQuery.mockResolvedValue([
       { id: "p1", name: "Home", slug: "/", isHomePage: true, blocks: null, position: 1 },
-    ];
-    mockFetch
-      .mockResolvedValueOnce(jsonResponse(site))
-      .mockResolvedValueOnce(jsonResponse(pages));
+    ]);
 
     const handlers = getBuildrikStorageHandlers("s1");
     const data = await handlers.load();
@@ -208,13 +172,10 @@ describe("getBuildrikStorageHandlers", () => {
 
 describe("initBuildrikSync", () => {
   it("loads project into composer and sets up auto-save listener", async () => {
-    const site = { id: "s1", name: "Sync Test" };
-    const pages = [
+    mocks.sitesGetQuery.mockResolvedValue({ id: "s1", name: "Sync Test" });
+    mocks.pagesListQuery.mockResolvedValue([
       { id: "p1", name: "Home", slug: "/", isHomePage: true, blocks: null, position: 1 },
-    ];
-    mockFetch
-      .mockResolvedValueOnce(jsonResponse(site))
-      .mockResolvedValueOnce(jsonResponse(pages));
+    ]);
 
     const mockComposer = {
       importProject: vi.fn(),
