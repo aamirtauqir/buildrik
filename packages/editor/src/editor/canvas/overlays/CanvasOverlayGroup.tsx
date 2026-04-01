@@ -26,6 +26,7 @@ import type { EditingState } from "../hooks/useCanvasInlineEdit";
 import type { MarqueeState } from "../hooks/useCanvasMarquee";
 import type { SnapLine } from "../hooks/useCanvasSnapping";
 import type { CursorState } from "../hooks/useCursorIntelligence";
+import type { SectionBoundary, SectionDragState } from "../hooks/useSectionReorder";
 import { GuideLines } from "../shared";
 import { CanvasSpotSpacing } from "../spots";
 import { AlignmentToolbar } from "../toolbars";
@@ -40,6 +41,7 @@ import {
   RemoteCursorsOverlay,
   CanvasBreadcrumb,
   SmartGuidesOverlay,
+  SectionReorderHandles,
 } from "./";
 
 // ─── Props ───────────────────────────────────────────────────────────────────
@@ -96,6 +98,16 @@ export interface CanvasOverlayGroupProps {
   dropSlotRect: DropSlotRect | null;
   dropTargetPath: BreadcrumbItem[];
 
+  // Section reorder
+  sectionBoundaries: SectionBoundary[];
+  sectionDragState: SectionDragState | null;
+  hoveredSectionBoundary: string | null;
+  onSectionStartDrag: (sectionId: string, index: number) => void;
+  onSectionUpdateDrag: (clientY: number) => void;
+  onSectionCompleteDrag: () => void;
+  onSectionCancelDrag: () => void;
+  onSectionHoverBoundary: (id: string | null) => void;
+
   // Misc
   marquee: MarqueeState | null;
   editing: EditingState;
@@ -150,6 +162,14 @@ export function CanvasOverlayGroup({
   invalidDropReason,
   dropSlotRect,
   dropTargetPath,
+  sectionBoundaries,
+  sectionDragState,
+  hoveredSectionBoundary,
+  onSectionStartDrag,
+  onSectionUpdateDrag,
+  onSectionCompleteDrag,
+  onSectionCancelDrag,
+  onSectionHoverBoundary,
   marquee,
   editing,
   onInlineCommand,
@@ -247,6 +267,18 @@ export function CanvasOverlayGroup({
         canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
         dropSlotRect={dropSlotRect}
         dropTargetPath={dropTargetPath}
+      />
+
+      {/* Section reorder grab handles */}
+      <SectionReorderHandles
+        boundaries={sectionBoundaries}
+        dragState={sectionDragState}
+        hoveredBoundary={hoveredSectionBoundary}
+        onStartDrag={onSectionStartDrag}
+        onUpdateDrag={onSectionUpdateDrag}
+        onCompleteDrag={onSectionCompleteDrag}
+        onCancelDrag={onSectionCancelDrag}
+        onHoverBoundary={onSectionHoverBoundary}
       />
 
       {/* Marquee selection box */}

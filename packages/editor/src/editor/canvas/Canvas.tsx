@@ -13,6 +13,7 @@ import type { CanvasProps, CanvasRef } from "./Canvas.types";
 import { DEVICE_SIZES } from "./Canvas.types";
 import { CanvasEmptyCTA } from "./CanvasEmptyCTA";
 import { CanvasFooterToolbar } from "./CanvasFooterToolbar";
+import { DeviceFramePreview, DeviceFrameToggle } from "./DeviceFramePreview";
 import {
   wrapperStyles,
   getCanvasStyles,
@@ -43,6 +44,7 @@ import {
   useCanvasInlineCommands,
   useCanvasSize,
   useSelectionAnnouncement,
+  useSectionReorder,
 } from "./hooks";
 import type { DropError, DropSuccess } from "./hooks/useCanvasDragDrop";
 import { ElementContextMenu } from "./menus";
@@ -266,6 +268,21 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       },
     });
 
+    // Device frame preview toggle
+    const [deviceFrameActive, setDeviceFrameActive] = React.useState(false);
+
+    // Section reorder
+    const {
+      boundaries: sectionBoundaries,
+      dragState: sectionDragState,
+      hoveredBoundary: hoveredSectionBoundary,
+      startDrag: sectionStartDrag,
+      updateDrag: sectionUpdateDrag,
+      completeDrag: sectionCompleteDrag,
+      cancelDrag: sectionCancelDrag,
+      setHoveredBoundary: setSectionHoveredBoundary,
+    } = useSectionReorder({ composer, canvasRef });
+
     // Content with CMS bindings resolved — selection/drop highlighting handled by overlay layer
     const { displayContent } = useCanvasContent({ composer, content });
 
@@ -354,6 +371,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
 
     return (
       <div ref={wrapperRef} tabIndex={0} onKeyDown={handleKeyDown} style={wrapperStyles}>
+        <DeviceFramePreview device={device} active={deviceFrameActive}>
         <div
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -439,11 +457,20 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             invalidDropReason={invalidDropReason}
             dropSlotRect={dropSlotRect}
             dropTargetPath={dropTargetPath}
+            sectionBoundaries={sectionBoundaries}
+            sectionDragState={sectionDragState}
+            hoveredSectionBoundary={hoveredSectionBoundary}
+            onSectionStartDrag={sectionStartDrag}
+            onSectionUpdateDrag={sectionUpdateDrag}
+            onSectionCompleteDrag={sectionCompleteDrag}
+            onSectionCancelDrag={sectionCancelDrag}
+            onSectionHoverBoundary={setSectionHoveredBoundary}
             marquee={marquee}
             editing={editing}
             onInlineCommand={handleInlineCommand}
           />
         </div>
+        </DeviceFramePreview>
 
         {/* Canvas Footer Toolbar - Overlays & Zoom (IA Redesign 2026) */}
         {showFooterToolbar && onZoomChange && onOverlayChange && (
@@ -460,6 +487,11 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
               onOverlayChange={onOverlayChange}
               onZoomChange={onZoomChange}
               onHelpClick={openCheatSheet}
+            />
+            <DeviceFrameToggle
+              active={deviceFrameActive}
+              onToggle={() => setDeviceFrameActive((v) => !v)}
+              device={device}
             />
           </div>
         )}

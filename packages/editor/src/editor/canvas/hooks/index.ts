@@ -166,3 +166,12 @@ export { useCanvasSize } from "./useCanvasSize";
 
 // Accessibility — aria-live selection announcements (WCAG 4.1.3)
 export { useSelectionAnnouncement } from "./useSelectionAnnouncement";
+
+// Section reordering
+export {
+  useSectionReorder,
+  type SectionBoundary,
+  type SectionDragState,
+  type UseSectionReorderOptions,
+  type UseSectionReorderResult,
+} from "./useSectionReorder";
