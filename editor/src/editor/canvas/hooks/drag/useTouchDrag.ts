@@ -41,7 +41,7 @@ const LONG_PRESS_DELAY = 500;
 
 export interface UseTouchDragOptions {
   composer: Composer | null;
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
   rootIdRef: React.MutableRefObject<string | null>;
   showGuides?: boolean;
   onDraggingChange: (elementId: string | null) => void;

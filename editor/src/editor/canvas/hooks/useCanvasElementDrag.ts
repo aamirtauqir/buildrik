@@ -40,7 +40,7 @@ type AxisConstraint = "none" | "horizontal" | "vertical";
 
 export interface UseCanvasElementDragOptions {
   composer: Composer | null;
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
   showGuides?: boolean;
   onDraggingChange: (elementId: string | null) => void;
   onSnapLinesChange: (lines: import("./useCanvasSnapping").SnapLine[]) => void;

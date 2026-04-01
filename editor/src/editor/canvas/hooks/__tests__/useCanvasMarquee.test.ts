@@ -18,7 +18,7 @@ function makeMouseEvent(clientX: number, clientY: number): React.MouseEvent {
 }
 
 /** Create a canvas div whose getBoundingClientRect() reports origin (0,0) */
-function makeCanvasRef(): React.RefObject<HTMLDivElement> {
+function makeCanvasRef(): React.RefObject<HTMLDivElement | null> {
   const div = document.createElement("div");
   div.getBoundingClientRect = () =>
     ({
@@ -32,7 +32,7 @@ function makeCanvasRef(): React.RefObject<HTMLDivElement> {
       y: 0,
       toJSON: () => ({}),
     }) as DOMRect;
-  return { current: div } as React.RefObject<HTMLDivElement>;
+  return { current: div } as React.RefObject<HTMLDivElement | null>;
 }
 
 function makeOptions(overrides: Partial<UseCanvasMarqueeOptions> = {}): UseCanvasMarqueeOptions {

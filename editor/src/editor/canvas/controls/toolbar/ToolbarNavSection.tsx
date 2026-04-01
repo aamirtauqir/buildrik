@@ -19,7 +19,7 @@ export interface ToolbarNavSectionProps {
   elementName: string;
   ancestors: Array<{ id: string; name: string }>;
   showAncestorMenu: boolean;
-  ancestorMenuRef: React.RefObject<HTMLDivElement>;
+  ancestorMenuRef: React.RefObject<HTMLDivElement | null>;
   onSelectParent: () => void;
   onAncestorMenuToggle: () => void;
   onSelectAncestor: (id: string) => void;

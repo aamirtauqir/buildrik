@@ -210,7 +210,7 @@ export function calculateFreshDropTarget(
   clientX: number,
   clientY: number,
   composer: Composer,
-  canvasRef: React.RefObject<HTMLDivElement>,
+  canvasRef: React.RefObject<HTMLDivElement | null>,
   findDropTargetElement: (x: number, y: number) => HTMLElement | null
 ): FreshDropTargetResult {
   let freshDropTarget = findDropTargetElement(clientX, clientY);

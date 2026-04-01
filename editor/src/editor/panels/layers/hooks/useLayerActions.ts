@@ -28,7 +28,7 @@ export interface UseLayerActionsReturn {
   customNames: Map<string, string>;
   editingId: string | null;
   editingName: string;
-  editInputRef: React.RefObject<HTMLInputElement>;
+  editInputRef: React.RefObject<HTMLInputElement | null>;
   setEditingName: (value: string) => void;
   hydrateFromStorage: (pageId: string) => void;
   toggleVisibility: (id: string, e: React.MouseEvent) => void;

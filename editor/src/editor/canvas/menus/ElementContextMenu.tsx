@@ -30,7 +30,7 @@ export const ElementContextMenu: React.FC<ElementContextMenuProps> = ({
   const menuRef = React.useRef<HTMLDivElement | null>(null);
   const [activeSubmenu, setActiveSubmenu] = React.useState<string | null>(null);
   const [focusedIndex, setFocusedIndex] = React.useState<number>(0);
-  const submenuTimeoutRef = React.useRef<ReturnType<typeof setTimeout>>();
+  const submenuTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useClickOutside(menuRef, onClose);
 

@@ -27,7 +27,7 @@ export interface SelectionRect {
 
 export interface UseCanvasSelectionBoxOptions {
   composer: Composer | null;
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
   enabled?: boolean;
   onSelectionChange?: (elementIds: string[]) => void;
 }

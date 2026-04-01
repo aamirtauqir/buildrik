@@ -45,7 +45,7 @@ export interface CursorState {
 }
 
 export interface UseCursorIntelligenceOptions {
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
   /** Whether drag operation is active */
   isDragging?: boolean;
   /** Whether current drop is invalid */

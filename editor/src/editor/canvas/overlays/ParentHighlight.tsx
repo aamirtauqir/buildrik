@@ -12,7 +12,7 @@ import { ParentHighlightBox, ParentHighlightBadge } from "../styled";
 export interface ParentHighlightProps {
   composer: Composer;
   childElementId: string;
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
 }
 
 interface ParentRect {

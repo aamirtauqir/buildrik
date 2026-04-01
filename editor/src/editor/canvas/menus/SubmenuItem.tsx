@@ -33,7 +33,7 @@ export const SubmenuItem: React.FC<SubmenuItemProps> = ({
 }) => {
   const itemRef = React.useRef<HTMLDivElement>(null);
   const [submenuPosition, setSubmenuPosition] = React.useState({ x: 0, y: 0 });
-  const activateTimeoutRef = React.useRef<ReturnType<typeof setTimeout>>();
+  const activateTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleMouseEnter = () => {
     // Clear any pending activation

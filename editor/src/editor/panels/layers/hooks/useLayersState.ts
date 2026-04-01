@@ -84,8 +84,8 @@ export interface UseLayersStateReturn {
   lockedIds: Set<string>;
   customNames: Map<string, string>;
   hoveredLayerId: string | null;
-  treeContainerRef: React.RefObject<HTMLDivElement>;
-  editInputRef: React.RefObject<HTMLInputElement>;
+  treeContainerRef: React.RefObject<HTMLDivElement | null>;
+  editInputRef: React.RefObject<HTMLInputElement | null>;
   toggleExpand: (id: string) => void;
   toggleVisibility: (id: string, e: React.MouseEvent) => void;
   toggleLock: (id: string, e: React.MouseEvent) => void;

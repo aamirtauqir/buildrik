@@ -9,7 +9,7 @@ import * as React from "react";
 import type { DeviceType } from "../../../shared/types";
 
 interface UseCanvasSizeOptions {
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
   content: string;
   device: DeviceType;
   zoom: number;

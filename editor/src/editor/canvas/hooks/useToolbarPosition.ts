@@ -53,7 +53,7 @@ const DEFAULT_OPTIONS: Required<UseToolbarPositionOptions> = {
  */
 export function useToolbarPosition(
   elementId: string | null,
-  canvasRef: React.RefObject<HTMLElement>,
+  canvasRef: React.RefObject<HTMLElement | null>,
   options: UseToolbarPositionOptions = {}
 ): ToolbarPosition | null {
   const opts = { ...DEFAULT_OPTIONS, ...options };
@@ -114,7 +114,7 @@ export function useToolbarPosition(
  */
 export function useToolbarPositionAbove(
   elementId: string | null,
-  canvasRef: React.RefObject<HTMLElement>,
+  canvasRef: React.RefObject<HTMLElement | null>,
   offsetY = 8
 ): ToolbarPosition | null {
   return useToolbarPosition(elementId, canvasRef, {
@@ -128,7 +128,7 @@ export function useToolbarPositionAbove(
  */
 export function useToolbarPositionBelow(
   elementId: string | null,
-  canvasRef: React.RefObject<HTMLElement>,
+  canvasRef: React.RefObject<HTMLElement | null>,
   offsetY = 8
 ): ToolbarPosition | null {
   return useToolbarPosition(elementId, canvasRef, {

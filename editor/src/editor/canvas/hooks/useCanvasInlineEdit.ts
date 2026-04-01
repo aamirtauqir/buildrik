@@ -17,7 +17,7 @@ export interface EditingState {
 
 export interface UseCanvasInlineEditOptions {
   composer: Composer | null;
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export interface UseCanvasInlineEditResult {

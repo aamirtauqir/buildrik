@@ -20,7 +20,7 @@ import { canNestElement } from "../../../shared/utils/nesting";
 
 export interface UseElementDragDomSyncOptions {
   composer: Composer | null;
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
   rootIdRef: React.MutableRefObject<string | null>;
   isDraggingRef: React.MutableRefObject<boolean>;
   draggingElementRef: React.MutableRefObject<HTMLElement | null>;

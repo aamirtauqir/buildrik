@@ -21,7 +21,7 @@ const { colors } = canvasTokens;
 
 export interface ToolbarActionsSectionProps {
   showMoreMenu: boolean;
-  moreMenuRef: React.RefObject<HTMLDivElement>;
+  moreMenuRef: React.RefObject<HTMLDivElement | null>;
   onAdd: () => void;
   onDuplicate: () => void;
   onDelete: () => void;

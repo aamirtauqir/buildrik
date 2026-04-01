@@ -29,7 +29,7 @@ interface SidebarState {
   handlePinToggle: () => void;
   handlePanelClose: () => void;
   /** Ref for focus management on panel expand */
-  panelContentRef: React.RefObject<HTMLDivElement>;
+  panelContentRef: React.RefObject<HTMLDivElement | null>;
   /** Error boundary reset key */
   errorKey: number;
   resetError: () => void;

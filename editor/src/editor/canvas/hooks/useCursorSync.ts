@@ -17,7 +17,7 @@ export interface UseCursorSyncOptions {
   /** Composer instance */
   composer: Composer | null;
   /** Reference to canvas element for coordinate calculation */
-  canvasRef: React.RefObject<HTMLElement>;
+  canvasRef: React.RefObject<HTMLElement | null>;
   /** Throttle interval in ms (default: 50) */
   throttleMs?: number;
 }

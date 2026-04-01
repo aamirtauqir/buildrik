@@ -16,7 +16,7 @@ vi.mock("../../utils/elementInfo", () => ({
  * element for `[data-aqb-id="el-1"]` with stable getBoundingClientRect values,
  * so the overlay can measure a non-null rect.
  */
-function makeCanvasRef(elementId: string): React.RefObject<HTMLDivElement> {
+function makeCanvasRef(elementId: string): React.RefObject<HTMLDivElement | null> {
   const fakeElementRect = new DOMRect(100, 100, 200, 80);
   const fakeCanvasRect = new DOMRect(0, 0, 800, 600);
 
@@ -35,7 +35,7 @@ function makeCanvasRef(elementId: string): React.RefObject<HTMLDivElement> {
     },
   } as unknown as HTMLDivElement;
 
-  return { current: fakeCanvas } as React.RefObject<HTMLDivElement>;
+  return { current: fakeCanvas } as React.RefObject<HTMLDivElement | null>;
 }
 
 // ─── Tests ───────────────────────────────────────────────────────────────────

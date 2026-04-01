@@ -48,7 +48,7 @@ const DEFAULT_OPTIONS: UseElementRectOptions = {
  */
 export function useElementRect(
   elementId: string | null,
-  canvasRef: React.RefObject<HTMLElement>,
+  canvasRef: React.RefObject<HTMLElement | null>,
   options: UseElementRectOptions = {}
 ): ElementRect | null {
   const opts = { ...DEFAULT_OPTIONS, ...options };
@@ -183,7 +183,7 @@ export function useElementRect(
  */
 export function useMultipleElementRects(
   elementIds: string[],
-  canvasRef: React.RefObject<HTMLElement>
+  canvasRef: React.RefObject<HTMLElement | null>
 ): Map<string, ElementRect> {
   const [rects, setRects] = React.useState<Map<string, ElementRect>>(new Map());
   const rafIdRef = React.useRef<number | null>(null);

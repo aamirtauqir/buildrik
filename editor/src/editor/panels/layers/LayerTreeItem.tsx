@@ -24,7 +24,7 @@ export interface LayerTreeItemProps {
   hoveredLayerId: string | null;
   editingId: string | null;
   editingName: string;
-  editInputRef: React.RefObject<HTMLInputElement>;
+  editInputRef: React.RefObject<HTMLInputElement | null>;
 
   // Handlers
   onToggleExpand: (id: string) => void;

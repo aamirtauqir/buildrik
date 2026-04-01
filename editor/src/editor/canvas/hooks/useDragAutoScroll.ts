@@ -26,7 +26,7 @@ const AUTO_SCROLL_ACCELERATION = 1.2;
 // =============================================================================
 
 export interface UseDragAutoScrollOptions {
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export interface UseDragAutoScrollResult {

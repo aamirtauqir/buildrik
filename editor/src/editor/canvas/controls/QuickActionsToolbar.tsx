@@ -18,7 +18,7 @@ const { colors, shadows } = canvasTokens;
 export interface QuickActionsToolbarProps {
   composer: Composer;
   elementId: string;
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
   onOpenAddMenu?: () => void;
 }
 

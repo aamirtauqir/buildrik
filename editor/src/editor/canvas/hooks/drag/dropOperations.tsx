@@ -31,7 +31,7 @@ import type { DropPosition } from "../useDragSession";
 
 export interface DropContext {
   composer: Composer;
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
   freshTargetId: string | null;
   freshDropPosition: DropPosition;
   onDropError?: (error: DropError) => void;

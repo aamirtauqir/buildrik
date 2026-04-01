@@ -22,7 +22,7 @@ describe("useCanvasInlineEdit — non-left-click guard (EC-06)", () => {
   let canvasDiv: HTMLDivElement;
   let editableEl: HTMLParagraphElement;
   let outsideEl: HTMLDivElement;
-  let canvasRef: React.RefObject<HTMLDivElement>;
+  let canvasRef: React.RefObject<HTMLDivElement | null>;
 
   beforeEach(() => {
     // Build a minimal canvas DOM: a wrapper div containing a <p data-aqb-id="el-1">
@@ -38,7 +38,7 @@ describe("useCanvasInlineEdit — non-left-click guard (EC-06)", () => {
     document.body.appendChild(outsideEl);
 
     // Create a ref that points to canvasDiv
-    canvasRef = { current: canvasDiv } as React.RefObject<HTMLDivElement>;
+    canvasRef = { current: canvasDiv } as React.RefObject<HTMLDivElement | null>;
   });
 
   afterEach(() => {

@@ -20,7 +20,7 @@ export interface MarqueeState {
 
 export interface UseCanvasMarqueeOptions {
   composer: Composer | null;
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
   isEditing: boolean;
   isDragOver: boolean;
   draggingElementId: string | null;

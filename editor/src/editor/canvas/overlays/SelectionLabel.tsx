@@ -13,7 +13,7 @@ import { getElementNameFromType, getTypeIcon } from "../utils/elementInfo";
 export interface SelectionLabelProps {
   composer: Composer;
   elementId: string;
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
   onSelectParent: () => void;
   onOpenSettings?: () => void;
   onAncestorClick?: (ancestorId: string) => void;

@@ -16,7 +16,7 @@ import type { DropPosition } from "./useDragSession";
 // =============================================================================
 
 export interface UseDragVisualsOptions {
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export interface UseDragVisualsResult {

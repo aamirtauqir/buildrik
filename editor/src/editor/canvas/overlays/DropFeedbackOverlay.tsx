@@ -39,7 +39,7 @@ export interface DropFeedbackOverlayProps {
   /** Reason for invalid drop (if not valid) */
   invalidReason: InvalidDropReason;
   /** Reference to canvas element */
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
   /** Animated drop slot preview rect */
   dropSlotRect?: DropSlotRect | null;
   /** Breadcrumb path (kept for API compatibility but not rendered) */

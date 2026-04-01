@@ -17,7 +17,7 @@ import { AUTO_SCROLL_CONFIG } from "./elementDragTypes";
 // =============================================================================
 
 export interface UseElementDragAutoScrollOptions {
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export interface UseElementDragAutoScrollResult {

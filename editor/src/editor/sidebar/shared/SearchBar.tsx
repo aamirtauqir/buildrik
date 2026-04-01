@@ -26,7 +26,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
   // Internal state for instant visual feedback
   const [inputValue, setInputValue] = React.useState(value);
-  const timerRef = React.useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Sync internal state when parent value changes (e.g., external clear)
   React.useEffect(() => {

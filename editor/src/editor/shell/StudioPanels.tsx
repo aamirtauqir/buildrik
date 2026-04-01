@@ -90,9 +90,9 @@ export interface StudioPanelsProps {
     onSelect: (icon: IconConfig) => void
   ) => void;
   /** Canvas ref for undo/redo access */
-  canvasRef?: React.RefObject<CanvasRef>;
+  canvasRef?: React.RefObject<CanvasRef | null>;
   /** Container ref for canvas area */
-  composerContainerRef?: React.RefObject<HTMLDivElement>;
+  composerContainerRef?: React.RefObject<HTMLDivElement | null>;
   /** Called when user clicks "Get Started Tour" in Settings — triggers orchestrator replayTour */
   onReplayTour?: () => void;
   /** Opens the CMS collection setup modal (forwarded to inspector BindingPopover) */

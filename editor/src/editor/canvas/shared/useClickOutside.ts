@@ -20,7 +20,7 @@ import * as React from "react";
  * ```
  */
 export function useClickOutside(
-  ref: React.RefObject<HTMLElement>,
+  ref: React.RefObject<HTMLElement | null>,
   onClose: () => void,
   enabled: boolean = true
 ): void {

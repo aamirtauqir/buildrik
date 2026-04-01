@@ -62,7 +62,7 @@ export interface DropSuccess {
 
 export interface UseCanvasDragDropOptions {
   composer: Composer | null;
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
   showGuides: boolean;
   isEditing: boolean;
   onSnapLinesChange: (lines: import("./useCanvasSnapping").SnapLine[]) => void;

@@ -25,7 +25,7 @@ export interface UnifiedSelectionToolbarProps {
   /** ID of the selected element */
   elementId: string;
   /** Reference to canvas container */
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
 
   // Action callbacks (Clean Layer Architecture).
   // When provided, these override direct composer access.

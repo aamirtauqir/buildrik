@@ -44,7 +44,7 @@ vi.mock("../SpacingLabels", () => ({
  * fake element for `[data-aqb-id="el-1"]`, with stable getBoundingClientRect
  * values so the overlay computes a non-null rect.
  */
-function makeCanvasRef(elementId: string): React.RefObject<HTMLDivElement> {
+function makeCanvasRef(elementId: string): React.RefObject<HTMLDivElement | null> {
   const fakeElementRect = new DOMRect(50, 50, 100, 50);
   const fakeCanvasRect = new DOMRect(0, 0, 800, 600);
 
@@ -65,7 +65,7 @@ function makeCanvasRef(elementId: string): React.RefObject<HTMLDivElement> {
     },
   } as unknown as HTMLDivElement;
 
-  return { current: fakeCanvas } as React.RefObject<HTMLDivElement>;
+  return { current: fakeCanvas } as React.RefObject<HTMLDivElement | null>;
 }
 
 // ─── Tests ───────────────────────────────────────────────────────────────────

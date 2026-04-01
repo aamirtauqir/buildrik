@@ -16,7 +16,7 @@ export interface ModalProps {
   closeOnOverlay?: boolean;
   closeOnEscape?: boolean;
   showCloseButton?: boolean;
-  initialFocusRef?: React.RefObject<HTMLElement>;
+  initialFocusRef?: React.RefObject<HTMLElement | null>;
 }
 
 const sizeMap = {

@@ -198,7 +198,7 @@ export function CanvasOverlayGroup({
             <UnifiedSelectionToolbar
               composer={composer}
               elementId={selectedId}
-              canvasRef={canvasRef as React.RefObject<HTMLDivElement>}
+              canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
               onSelectParent={onSelectParent}
               onSelectAncestor={onSelectAncestor}
               onDuplicate={onDuplicate}
@@ -223,7 +223,7 @@ export function CanvasOverlayGroup({
       {shouldShowHover && (
         <ElementHoverOverlay
           hoveredElementId={hoveredElementId}
-          canvasRef={canvasRef as React.RefObject<HTMLDivElement>}
+          canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
           altHeld={cursorState.altHeld}
           shiftHeld={cursorState.shiftHeld}
           inspectorEnabled={isInspectorEnabled || devMode}
@@ -244,7 +244,7 @@ export function CanvasOverlayGroup({
         dropPosition={dropPosition}
         isValidDrop={isValidDrop}
         invalidReason={invalidDropReason}
-        canvasRef={canvasRef as React.RefObject<HTMLDivElement>}
+        canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
         dropSlotRect={dropSlotRect}
         dropTargetPath={dropTargetPath}
       />

@@ -29,7 +29,7 @@ export type HoverLevel = "minimal" | "hierarchy" | "boxmodel";
 
 export interface ElementHoverOverlayProps {
   hoveredElementId: string | null;
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
   /** Alt key held - show hierarchy */
   altHeld?: boolean;
   /** Shift key held (with Alt) - show box model */

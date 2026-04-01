@@ -20,7 +20,7 @@ export interface UseLayerTreeReturn {
   layers: LayerItem[];
   expandedIds: Set<string>;
   currentPageId: string | null;
-  treeContainerRef: React.RefObject<HTMLDivElement>;
+  treeContainerRef: React.RefObject<HTMLDivElement | null>;
   toggleExpand: (id: string) => void;
   expandIds: (ids: string[]) => void;
   expandAll: () => void;
