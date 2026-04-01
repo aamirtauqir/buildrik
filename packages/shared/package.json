@@ -3,5 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "main": "index.ts",
-  "types": "index.ts"
+  "types": "index.ts",
+  "dependencies": {
+    "@trpc/client": "^11.16.0",
+    "superjson": "^2.2.6"
+  }
 }
