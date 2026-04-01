@@ -57,6 +57,24 @@ export const checkSlugSchema = z.object({
     ),
 });
 
+export const saveProjectDataSchema = z.object({
+  siteId: z.string(),
+  pages: z.array(
+    z.object({
+      id: z.string(),
+      blocks: z.unknown(),
+    })
+  ),
+  styles: z.unknown().optional(),
+  assets: z.unknown().optional(),
+  settings: z.unknown().optional(),
+});
+
+export const getProjectDataSchema = z.object({
+  siteId: z.string(),
+});
+
 export type CreateSiteInput = z.infer<typeof createSiteSchema>;
 export type ListSitesInput = z.infer<typeof listSitesSchema>;
 export type BulkActionInput = z.infer<typeof bulkActionSchema>;
+export type SaveProjectDataInput = z.infer<typeof saveProjectDataSchema>;

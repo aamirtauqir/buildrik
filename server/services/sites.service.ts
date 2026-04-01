@@ -1,9 +1,11 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type {
   CreateSiteInput,
   ListSitesInput,
   BulkActionInput,
+  SaveProjectDataInput,
 } from "@buildrik/shared/schemas/sites";
 import { sendSiteTransferredEmail } from "@/server/services/email.service";
 
@@ -345,6 +347,9 @@ export async function duplicateSite(
       workspaceId,
       createdBy: userId,
       pages: originalPages.length,
+      projectStyles: (original.projectStyles as Prisma.InputJsonValue) ?? undefined,
+      projectAssets: (original.projectAssets as Prisma.InputJsonValue) ?? undefined,
+      projectSettings: (original.projectSettings as Prisma.InputJsonValue) ?? undefined,
       lastEditedAt: new Date(),
     },
   });
@@ -356,8 +361,7 @@ export async function duplicateSite(
         name: p.name,
         slug: p.slug,
         position: p.position,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        blocks: (p.blocks ?? []) as any,
+        blocks: (p.blocks ?? []) as Prisma.InputJsonValue,
         isHomePage: p.isHomePage,
         seoTitle: p.seoTitle,
         seoDescription: p.seoDescription,
@@ -525,4 +529,69 @@ export async function bulkAction(
     default:
       throw new Error("INVALID_ACTION");
   }
+}
+
+export async function saveProjectData(input: SaveProjectDataInput) {
+  const site = await prisma.site.findUnique({ where: { id: input.siteId } });
+  if (!site) throw new Error("SITE_NOT_FOUND");
+
+  await prisma.$transaction(async (tx) => {
+    // Update each page's blocks
+    for (const page of input.pages) {
+      await tx.page.update({
+        where: { id: page.id },
+        data: { blocks: page.blocks as Prisma.InputJsonValue },
+      });
+    }
+
+    // Save project-level styles, assets, and settings on the site
+    await tx.site.update({
+      where: { id: input.siteId },
+      data: {
+        projectStyles: (input.styles as Prisma.InputJsonValue) ?? Prisma.DbNull,
+        projectAssets: (input.assets as Prisma.InputJsonValue) ?? Prisma.DbNull,
+        projectSettings: (input.settings as Prisma.InputJsonValue) ?? Prisma.DbNull,
+        lastEditedAt: new Date(),
+      },
+    });
+  });
+
+  return { success: true };
+}
+
+export async function getProjectData(siteId: string) {
+  const site = await prisma.site.findUnique({
+    where: { id: siteId },
+    select: {
+      id: true,
+      name: true,
+      projectStyles: true,
+      projectAssets: true,
+      projectSettings: true,
+      sitePages: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          position: true,
+          blocks: true,
+          isHomePage: true,
+          seoTitle: true,
+          seoDescription: true,
+        },
+        orderBy: { position: "asc" },
+      },
+    },
+  });
+
+  if (!site) throw new Error("SITE_NOT_FOUND");
+
+  return {
+    siteId: site.id,
+    name: site.name,
+    pages: site.sitePages,
+    styles: site.projectStyles ?? [],
+    assets: site.projectAssets ?? [],
+    settings: site.projectSettings ?? {},
+  };
 }

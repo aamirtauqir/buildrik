@@ -14,6 +14,7 @@ import {
   checkSlugAvailability,
   transferSite,
   saveProjectData,
+  getProjectData,
 } from "@/server/services/sites.service";
 import {
   listFolders,
@@ -35,6 +36,8 @@ import {
   bulkActionSchema,
   transferSiteSchema,
   checkSlugSchema,
+  saveProjectDataSchema,
+  getProjectDataSchema,
 } from "@buildrik/shared/schemas/sites";
 import { prePublishCheckSchema } from "@buildrik/shared/schemas/publish";
 
@@ -278,6 +281,30 @@ export const sitesRouter = router({
     .input(z.object({ siteId: z.string() }))
     .mutation(async ({ input }) => {
       return unpublishSite(input.siteId);
+    }),
+
+  saveProjectData: protectedProcedure
+    .input(saveProjectDataSchema)
+    .mutation(async ({ input }) => {
+      try {
+        return await saveProjectData(input);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
+        throw e;
+      }
+    }),
+
+  getProjectData: protectedProcedure
+    .input(getProjectDataSchema)
+    .query(async ({ input }) => {
+      try {
+        return await getProjectData(input.siteId);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
+        throw e;
+      }
     }),
 
   folders: router({

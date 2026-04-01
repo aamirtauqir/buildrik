@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, PlanName } from "@/lib/constants/plan-limits";
 import type { CreatePageInput, UpdatePageInput } from "@buildrik/shared/schemas/pages";
@@ -83,11 +84,14 @@ export async function updatePage(input: UpdatePageInput) {
     throw new Error("CONFLICT");
   }
 
-  const { pageId, siteId: _siteId, updatedAt: _updatedAt, ...fields } = input;
+  const { pageId, siteId: _siteId, updatedAt: _updatedAt, blocks, ...fields } = input;
 
   return prisma.page.update({
     where: { id: pageId },
-    data: fields,
+    data: {
+      ...fields,
+      ...(blocks !== undefined ? { blocks: blocks as Prisma.InputJsonValue } : {}),
+    },
   });
 }
 
