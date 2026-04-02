@@ -15,12 +15,10 @@ import { useElementFlash } from "../../shared/hooks";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
 import { StudioSkeleton } from "../../shared/ui/Skeleton";
 import { ToastProvider, useToast } from "../../shared/ui/Toast";
-import { TourOverlay } from "../../shared/ui/TourOverlay";
 import { UpgradeModal } from "../../shared/ui/UpgradeModal";
 import { migrateStorageKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
-import { OnboardingProgress } from "../onboarding";
 import { PageWizard } from "../wizard/PageWizard";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
@@ -478,14 +476,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         canvasRef={canvasRef}
         composerContainerRef={composerContainerRef}
       />
-      <TourOverlay
-        onNameProject={(name) => {
-          composer?.updateProjectMetadata?.({ name });
-        }}
-        initialProjectName={
-          composer?.getProjectMetadata?.()?.name || "Untitled Project"
-        }
-      />
+      {/* Tour overlay removed — onboarding handled by orchestrator */}
 
       <StudioModals
         composer={composer}
@@ -538,8 +529,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         composer={composer}
       />
 
-      {/* Onboarding Progress Tracker - shown for new users */}
-      <OnboardingProgress />
+      {/* Onboarding is managed by useOnboardingOrchestrator */}
 
       {/* Page Wizard - shown on first load for blank canvas */}
       {showWizard && (
