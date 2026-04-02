@@ -192,7 +192,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
       case "analytics":
         return <AnalyticsScreen composer={composer} onDirtyChange={setScreenIsDirty} />;
       case "export":
-        return <ExportScreen />;
+        return <ExportScreen composer={composer} />;
       case "integrations":
         return <IntegrationsScreen />;
       case "advanced":

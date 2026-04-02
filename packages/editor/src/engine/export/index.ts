@@ -5,6 +5,7 @@
  */
 
 export { ExportEngine } from "./ExportEngine";
+export { ReactExporter } from "./ReactExporter";
 export { AssetBundler } from "./AssetBundler";
 export { SitemapGenerator } from "./SitemapGenerator";
 export { generateStripeScripts, isValidStripePublishableKey } from "./StripeInjector";
