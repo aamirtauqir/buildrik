@@ -9,7 +9,7 @@
  */
 export const FEATURE_FLAGS = {
   domains: false,
-  export: false,
+  export: true,
   integrations: false,
 } as const;
 
