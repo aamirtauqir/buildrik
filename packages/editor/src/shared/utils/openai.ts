@@ -1,6 +1,6 @@
 /**
  * AI API Service Facade for Aquibra
- * Delegating to modular services under src/services/ai/
+ * Delegating to tRPC-backed AI client under src/services/ai/
  *
  * @module utils/openai
  * @license BSD-3-Clause
@@ -24,7 +24,7 @@ import {
   TONE_INSTRUCTIONS,
   CONTENT_TYPE_PROMPTS,
 } from "../../services/ai/AIPromptLibrary";
-import { aiClient, AIRequestOptions, AIResponse } from "../../services/ai/AIServiceClient";
+import { aiTrpcClient, type AIRequestOptions, type AIResponse } from "../../services/ai/AiTrpcClient";
 
 // Re-exports
 export type {
@@ -47,7 +47,6 @@ export { CONTENT_TYPES, TONES, TONE_INSTRUCTIONS, CONTENT_TYPE_PROMPTS, createAI
 // CONFIGURATION & CONSTANTS
 // =============================================================================
 
-const API_BASE = "/api/ai";
 const FALLBACK_IMAGE_BASE = "https://picsum.photos/800/600?random=";
 
 // =============================================================================
@@ -83,18 +82,6 @@ export interface StreamCallbacks {
   onError?: (error: AIError) => void;
 }
 
-// -----------------------------------------------------------------------------
-// PRIVATE HELPERS
-// -----------------------------------------------------------------------------
-
-async function apiRequest<T>(
-  endpoint: string,
-  body: Record<string, unknown>,
-  options: AIRequestOptions = {}
-): Promise<AIResponse<T>> {
-  return aiClient.apiRequest<T>(endpoint, body, options);
-}
-
 // =============================================================================
 // PUBLIC API - CONTENT GENERATION
 // =============================================================================
@@ -114,13 +101,11 @@ export async function generateContent(
       ? buildEnhancedPrompt(prompt, contentType, tone)
       : prompt;
 
-  const response = await apiRequest<{ content: string }>(
-    "/content",
+  const response = await aiTrpcClient.generateContent(
     {
       prompt: enhancedPrompt,
-      contentType,
-      tone,
-      originalPrompt: prompt,
+      type: "content",
+      options: { tone: tone as string },
     },
     options
   );
@@ -152,8 +137,11 @@ export async function generateLayout(
   style?: LayoutStyle,
   options?: AIRequestOptions
 ): Promise<string> {
-  const response = await apiRequest<{ content: string }>("/layout", { prompt, style }, options);
-  return response.data.content;
+  const response = await aiTrpcClient.generateLayout(
+    { prompt, sectionType: style },
+    options
+  );
+  return response.data.html;
 }
 
 /**
@@ -161,19 +149,11 @@ export async function generateLayout(
  */
 export async function generateImagePrompt(
   description: string,
-  imageOptions?: { size?: ImageSize; style?: ImageStyle },
-  options?: AIRequestOptions
+  _imageOptions?: { size?: ImageSize; style?: ImageStyle },
+  _options?: AIRequestOptions
 ): Promise<string> {
-  try {
-    const response = await apiRequest<{ url?: string }>(
-      "/image",
-      { prompt: description, ...imageOptions },
-      options
-    );
-    return response.data.url || `${FALLBACK_IMAGE_BASE}${Date.now()}`;
-  } catch {
-    return `${FALLBACK_IMAGE_BASE}${Date.now()}`;
-  }
+  // Image generation not yet supported via tRPC; return fallback
+  return `${FALLBACK_IMAGE_BASE}${Date.now()}`;
 }
 
 /**
@@ -182,12 +162,14 @@ export async function generateImagePrompt(
 export async function generateCode(
   prompt: string,
   language: ProgrammingLanguage | string,
-  style?: CodeStyle,
+  _style?: CodeStyle,
   options?: AIRequestOptions
 ): Promise<string> {
-  const response = await apiRequest<{ content: string }>(
-    "/code",
-    { prompt, language, style },
+  const response = await aiTrpcClient.generateContent(
+    {
+      prompt: `Generate ${language} code: ${prompt}`,
+      type: "content",
+    },
     options
   );
   return response.data.content;
@@ -201,9 +183,11 @@ export async function improveContent(
   instruction: string,
   options?: AIRequestOptions
 ): Promise<string> {
-  const response = await apiRequest<{ content: string }>(
-    "/improve",
-    { content, instruction },
+  const response = await aiTrpcClient.generateContent(
+    {
+      prompt: `Improve the following content. Instruction: ${instruction}\n\nContent:\n${content}`,
+      type: "content",
+    },
     options
   );
   return response.data.content;
@@ -217,9 +201,11 @@ export async function translateContent(
   targetLanguage: string,
   options?: AIRequestOptions
 ): Promise<string> {
-  const response = await apiRequest<{ content: string }>(
-    "/translate",
-    { content, targetLanguage },
+  const response = await aiTrpcClient.generateContent(
+    {
+      prompt: `Translate the following content to ${targetLanguage}:\n\n${content}`,
+      type: "content",
+    },
     options
   );
   return response.data.content;
@@ -233,9 +219,13 @@ export async function summarizeContent(
   maxLength?: number,
   options?: AIRequestOptions
 ): Promise<string> {
-  const response = await apiRequest<{ content: string }>(
-    "/summarize",
-    { content, maxLength },
+  const lengthHint = maxLength ? ` in approximately ${maxLength} characters` : "";
+  const response = await aiTrpcClient.generateContent(
+    {
+      prompt: `Summarize the following content${lengthHint}:\n\n${content}`,
+      type: "content",
+      options: { length: "short" },
+    },
     options
   );
   return response.data.content;
@@ -248,16 +238,23 @@ export async function generateSEO(
   pageContent: string,
   options?: AIRequestOptions
 ): Promise<{ title: string; description: string; keywords: string[] }> {
-  const response = await apiRequest<{
-    title: string;
-    description: string;
-    keywords: string[];
-  }>("/seo", { content: pageContent }, options);
-  return response.data;
+  const response = await aiTrpcClient.generateContent(
+    {
+      prompt: `Generate SEO metadata (title, description, keywords) as JSON for:\n\n${pageContent}`,
+      type: "content",
+    },
+    options
+  );
+  try {
+    return JSON.parse(response.data.content);
+  } catch {
+    return { title: "", description: "", keywords: [] };
+  }
 }
 
 /**
  * Stream content generation (for real-time updates)
+ * Note: Streaming not yet supported via tRPC mutations; falls back to non-streaming.
  */
 export async function streamContent(
   prompt: string,
@@ -266,39 +263,9 @@ export async function streamContent(
   callbacks: StreamCallbacks
 ): Promise<void> {
   try {
-    const response = await fetch(`${API_BASE}/content/stream`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt, contentType, tone }),
-    });
-
-    if (!response.ok) {
-      const error = createAIError("Stream request failed", "API_ERROR", {
-        status: response.status,
-      });
-      callbacks.onError?.(error);
-      return;
-    }
-
-    const reader = response.body?.getReader();
-    if (!reader) {
-      callbacks.onError?.(createAIError("No response body", "API_ERROR"));
-      return;
-    }
-
-    const decoder = new TextDecoder();
-    let fullContent = "";
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      const chunk = decoder.decode(value, { stream: true });
-      fullContent += chunk;
-      callbacks.onChunk?.(chunk);
-    }
-
-    callbacks.onComplete?.(fullContent);
+    const content = await generateContent(prompt, contentType, tone);
+    callbacks.onChunk?.(content);
+    callbacks.onComplete?.(content);
   } catch (err) {
     const error =
       err instanceof Error && (err as AIError).code
@@ -326,21 +293,33 @@ export async function batchRequests(
   requests: BatchRequest[],
   options?: AIRequestOptions
 ): Promise<BatchResult[]> {
-  const endpoints: Record<string, string> = {
-    content: "/content",
-    layout: "/layout",
-    code: "/code",
-    improve: "/improve",
-  };
-
   const promises = requests.map(async (req) => {
     try {
-      const response = await apiRequest<{ content: string }>(
-        endpoints[req.type],
-        req.params,
-        options
-      );
-      return { success: true, data: response.data.content };
+      let content: string;
+      if (req.type === "layout") {
+        content = await generateLayout(req.params.prompt as string, undefined, options);
+      } else if (req.type === "code") {
+        content = await generateCode(
+          req.params.prompt as string,
+          req.params.language as string,
+          undefined,
+          options
+        );
+      } else if (req.type === "improve") {
+        content = await improveContent(
+          req.params.content as string,
+          req.params.instruction as string,
+          options
+        );
+      } else {
+        content = await generateContent(
+          req.params.prompt as string,
+          (req.params.contentType as string) || "content",
+          (req.params.tone as string) || "professional",
+          options
+        );
+      }
+      return { success: true, data: content };
     } catch (err) {
       return {
         success: false,
@@ -409,8 +388,8 @@ export function getErrorMessage(error: AIError): string {
  */
 export function getRateLimitStatus(): { remaining: number; retryAfter: number } {
   return {
-    remaining: 30 - aiClient.getRateLimitCount(),
-    retryAfter: aiClient.getRetryAfter(),
+    remaining: 30 - aiTrpcClient.getRateLimitCount(),
+    retryAfter: aiTrpcClient.getRetryAfter(),
   };
 }
 
@@ -418,12 +397,12 @@ export function getRateLimitStatus(): { remaining: number; retryAfter: number } 
  * Get request queue length
  */
 export function getQueueLength(): number {
-  return aiClient.getQueueLength();
+  return aiTrpcClient.getQueueLength();
 }
 
 /**
  * Clear pending requests
  */
 export function clearQueue(): void {
-  aiClient.clearQueue();
+  aiTrpcClient.clearQueue();
 }
