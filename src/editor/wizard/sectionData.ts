@@ -1,0 +1,69 @@
+/**
+ * Section template data accessor for PageWizard
+ * Imports SectionTemplates data without pulling in React component.
+ *
+ * @license BSD-3-Clause
+ */
+
+import type { SectionTemplate } from "../../templates/SectionTemplates";
+
+/**
+ * Hardcoded section template catalog used by the Page Wizard.
+ * Matches the IDs in SectionTemplates.tsx so the wizard inserts
+ * real, renderable HTML sections into the canvas.
+ */
+const WIZARD_SECTIONS: SectionTemplate[] = [
+  {
+    id: "nav-simple",
+    name: "Simple Nav",
+    type: "navigation",
+    icon: "",
+    html: `<nav style="display:flex;justify-content:space-between;align-items:center;padding:20px 40px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,0.08)"><div style="font-weight:bold;font-size:24px;color:#667eea">Brand</div><div style="display:flex;gap:32px"><a href="#" style="text-decoration:none;color:#333;font-weight:500">Home</a><a href="#" style="text-decoration:none;color:#333;font-weight:500">About</a><a href="#" style="text-decoration:none;color:#333;font-weight:500">Contact</a></div><button style="padding:12px 24px;background:#667eea;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer">Get Started</button></nav>`,
+  },
+  {
+    id: "hero-centered",
+    name: "Centered Hero",
+    type: "hero",
+    icon: "",
+    html: `<section style="padding:120px 40px;text-align:center;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff"><h1 style="font-size:56px;margin:0 0 24px;font-weight:800">Your Headline Here</h1><p style="font-size:20px;margin:0 0 40px;opacity:0.9;max-width:600px;margin-left:auto;margin-right:auto">A compelling description that captures attention and drives action.</p><div style="display:flex;gap:16px;justify-content:center"><button style="padding:16px 32px;background:#fff;color:#667eea;border:none;border-radius:8px;font-weight:600;cursor:pointer">Primary CTA</button><button style="padding:16px 32px;background:transparent;color:#fff;border:2px solid #fff;border-radius:8px;font-weight:600;cursor:pointer">Secondary</button></div></section>`,
+  },
+  {
+    id: "features-3col",
+    name: "3-Column Features",
+    type: "features",
+    icon: "",
+    html: `<section style="padding:80px 40px;background:#f8fafc"><h2 style="text-align:center;font-size:36px;margin:0 0 48px;color:#1a1a2e">Our Features</h2><div style="display:flex;gap:32px;max-width:1000px;margin:0 auto"><div style="flex:1;text-align:center;padding:32px"><div style="font-size:40px;margin-bottom:16px">&#9889;</div><h3 style="margin:0 0 12px;color:#1a1a2e">Fast</h3><p style="margin:0;color:#64748b">Lightning quick performance</p></div><div style="flex:1;text-align:center;padding:32px"><div style="font-size:40px;margin-bottom:16px">&#128274;</div><h3 style="margin:0 0 12px;color:#1a1a2e">Secure</h3><p style="margin:0;color:#64748b">Enterprise-grade security</p></div><div style="flex:1;text-align:center;padding:32px"><div style="font-size:40px;margin-bottom:16px">&#128241;</div><h3 style="margin:0 0 12px;color:#1a1a2e">Responsive</h3><p style="margin:0;color:#64748b">Works on all devices</p></div></div></section>`,
+  },
+  {
+    id: "pricing-3tier",
+    name: "3-Tier Pricing",
+    type: "pricing",
+    icon: "",
+    html: `<section style="padding:80px 40px;background:#f8fafc"><h2 style="text-align:center;font-size:36px;margin:0 0 48px">Simple Pricing</h2><div style="display:flex;gap:24px;justify-content:center;max-width:900px;margin:0 auto"><div style="flex:1;background:#fff;padding:32px;border-radius:16px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.06)"><h3 style="margin:0 0 8px">Basic</h3><div style="font-size:40px;font-weight:bold;margin:16px 0">$9<span style="font-size:14px;color:#666">/mo</span></div><button style="width:100%;padding:12px;background:#e2e8f0;color:#333;border:none;border-radius:8px;font-weight:600;cursor:pointer">Start Free</button></div><div style="flex:1;background:#667eea;padding:32px;border-radius:16px;text-align:center;color:#fff;transform:scale(1.05)"><h3 style="margin:0 0 8px">Pro</h3><div style="font-size:40px;font-weight:bold;margin:16px 0">$29<span style="font-size:14px;opacity:0.8">/mo</span></div><button style="width:100%;padding:12px;background:#fff;color:#667eea;border:none;border-radius:8px;font-weight:600;cursor:pointer">Get Started</button></div><div style="flex:1;background:#fff;padding:32px;border-radius:16px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.06)"><h3 style="margin:0 0 8px">Enterprise</h3><div style="font-size:40px;font-weight:bold;margin:16px 0">$99<span style="font-size:14px;color:#666">/mo</span></div><button style="width:100%;padding:12px;background:#e2e8f0;color:#333;border:none;border-radius:8px;font-weight:600;cursor:pointer">Contact Us</button></div></div></section>`,
+  },
+  {
+    id: "testimonials-cards",
+    name: "Testimonial Cards",
+    type: "testimonials",
+    icon: "",
+    html: `<section style="padding:80px 40px;background:#fff"><h2 style="text-align:center;font-size:36px;margin:0 0 48px;color:#1a1a2e">What Customers Say</h2><div style="display:flex;gap:24px;max-width:1000px;margin:0 auto"><div style="flex:1;background:#f8fafc;padding:32px;border-radius:16px"><div style="font-size:32px;color:#667eea;margin-bottom:12px">"</div><p style="color:#475569;line-height:1.7;margin:0 0 20px">Amazing product! It has transformed how we work.</p><div style="display:flex;align-items:center;gap:12px"><div style="width:40px;height:40px;border-radius:50%;background:#667eea"></div><div><div style="font-weight:600">Sarah J.</div><div style="font-size:12px;color:#64748b">CEO, TechCorp</div></div></div></div><div style="flex:1;background:#f8fafc;padding:32px;border-radius:16px"><div style="font-size:32px;color:#667eea;margin-bottom:12px">"</div><p style="color:#475569;line-height:1.7;margin:0 0 20px">Best decision we ever made. Highly recommend!</p><div style="display:flex;align-items:center;gap:12px"><div style="width:40px;height:40px;border-radius:50%;background:#f093fb"></div><div><div style="font-weight:600">Mike C.</div><div style="font-size:12px;color:#64748b">Designer</div></div></div></div></div></section>`,
+  },
+  {
+    id: "cta-gradient",
+    name: "Gradient CTA",
+    type: "cta",
+    icon: "",
+    html: `<section style="padding:80px 40px;background:linear-gradient(135deg,#667eea,#764ba2);text-align:center"><h2 style="font-size:40px;margin:0 0 16px;color:#fff;font-weight:800">Ready to Get Started?</h2><p style="font-size:18px;color:rgba(255,255,255,0.9);margin:0 0 32px">Join thousands of happy customers today.</p><button style="padding:16px 40px;background:#fff;color:#667eea;border:none;border-radius:50px;font-size:16px;font-weight:700;cursor:pointer">Start Free Trial</button></section>`,
+  },
+  {
+    id: "footer-4col",
+    name: "4-Column Footer",
+    type: "footer",
+    icon: "",
+    html: `<footer style="padding:60px 40px 30px;background:#1a1a2e;color:#fff"><div style="display:flex;gap:40px;max-width:1000px;margin:0 auto 40px"><div style="flex:2"><div style="font-size:24px;font-weight:bold;margin-bottom:16px">Brand</div><p style="color:#94a3b8;line-height:1.6;max-width:250px">Building the future, one pixel at a time.</p></div><div style="flex:1"><h4 style="margin:0 0 16px">Product</h4><div style="display:flex;flex-direction:column;gap:8px"><a href="#" style="color:#94a3b8;text-decoration:none">Features</a><a href="#" style="color:#94a3b8;text-decoration:none">Pricing</a></div></div><div style="flex:1"><h4 style="margin:0 0 16px">Company</h4><div style="display:flex;flex-direction:column;gap:8px"><a href="#" style="color:#94a3b8;text-decoration:none">About</a><a href="#" style="color:#94a3b8;text-decoration:none">Contact</a></div></div><div style="flex:1"><h4 style="margin:0 0 16px">Legal</h4><div style="display:flex;flex-direction:column;gap:8px"><a href="#" style="color:#94a3b8;text-decoration:none">Privacy</a><a href="#" style="color:#94a3b8;text-decoration:none">Terms</a></div></div></div><div style="border-top:1px solid #334155;padding-top:20px;text-align:center;color:#64748b;font-size:13px">&#169; 2024 Brand. All rights reserved.</div></footer>`,
+  },
+];
+
+export function getSectionTemplates(): SectionTemplate[] {
+  return WIZARD_SECTIONS;
+}

@@ -12,6 +12,9 @@ import { useToast } from "../shared/ui/Toast";
 import { devError } from "../shared/utils/devLogger";
 import { generateContent, generateLayout } from "../shared/utils/openai";
 
+/** Feature flag: set to true to enable the AI assistant bar */
+export const AI_AVAILABLE = true;
+
 export interface AIAssistantBarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -90,7 +93,7 @@ export const AIAssistantBar: React.FC<AIAssistantBarProps> = ({ isOpen, onClose,
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !AI_AVAILABLE) return null;
 
   return (
     <div style={containerStyles}>

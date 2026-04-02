@@ -21,6 +21,7 @@ import { migrateStorageKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { OnboardingProgress } from "../onboarding";
+import { PageWizard } from "../wizard/PageWizard";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
@@ -115,6 +116,10 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   const composerContainerRef = React.useRef<HTMLDivElement | null>(null);
   const hasManuallyToggledSpacing = React.useRef(false);
   const { addToast } = useToast();
+
+  // Wizard state: show on first load when canvas is blank
+  const [showWizard, setShowWizard] = React.useState(true);
+
   // Use extracted hooks
   const state = useStudioState();
   const modals = useStudioModals();
@@ -257,6 +262,30 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [saveProject, composer, modals]);
+
+  // Export HTML as zip download
+  const handleExportHTML = React.useCallback(async () => {
+    if (!composer) return;
+    modals.setExportLoading(true);
+    try {
+      const exportEngine = new ExportEngine(composer);
+      await exportEngine.downloadZip("site-export.zip");
+      addToast({
+        title: "Export complete",
+        message: "Your site has been downloaded as a zip file.",
+        variant: "success",
+        duration: 3000,
+      });
+    } catch (err) {
+      addToast({
+        title: "Export failed",
+        message: err instanceof Error ? err.message : "Could not export your site.",
+        variant: "error",
+      });
+    } finally {
+      modals.setExportLoading(false);
+    }
+  }, [composer, addToast, modals]);
 
   // Export handler for Vercel deployment
   const handleExportForDeploy = React.useCallback(async () => {
@@ -407,6 +436,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onOpenHistory={() => state.openLeftPanelToTab("history")}
           onOpenIssues={() => state.openLeftPanelToTab("settings")}
           onSave={saveProject}
+          onExportHTML={handleExportHTML}
           addToast={addToast}
         />
       </header>
@@ -510,6 +540,15 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
       {/* Onboarding Progress Tracker - shown for new users */}
       <OnboardingProgress />
+
+      {/* Page Wizard - shown on first load for blank canvas */}
+      {showWizard && (
+        <PageWizard
+          composer={composer}
+          onComplete={() => setShowWizard(false)}
+          onSkip={() => setShowWizard(false)}
+        />
+      )}
     </div>
   );
 };

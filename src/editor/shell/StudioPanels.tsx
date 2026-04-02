@@ -293,7 +293,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   }, [canvasRef]);
 
   return (
-    <LayoutShell drawerOpen={isLeftPanelOpen} inspectorOpen={true} style={styles.container}>
+    <LayoutShell drawerOpen={isLeftPanelOpen} inspectorOpen={!!selectedElement} style={styles.container}>
       {/* Left Rail - 60px icon navigation (new LayoutShell) */}
       <LayoutShell.Rail>
         <LeftRail
