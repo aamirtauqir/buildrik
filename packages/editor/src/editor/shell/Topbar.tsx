@@ -245,10 +245,10 @@ export interface TopbarProps {
   zoom?: number;
   /** @deprecated Zoom now in Canvas Footer */
   onZoomChange?: (z: number) => void;
-  /** @deprecated Export merged into Settings > Export */
+  /** Export HTML as zip */
   exportLoading?: boolean;
-  /** @deprecated Export merged into Settings > Export */
-  onExport?: () => void;
+  /** Export handler */
+  onExportHTML?: () => void;
   /** @deprecated Add Page in Pages tab */
   onAddPage?: () => void;
   /** @deprecated Templates in Add tab */
@@ -291,6 +291,7 @@ export const Topbar: React.FC<TopbarProps> = ({
   lastSavedAt,
   previewLoading,
   publishLoading = false,
+  exportLoading = false,
   syncStatus = "connected",
   issues = [],
   collaborationSlot,
@@ -303,6 +304,7 @@ export const Topbar: React.FC<TopbarProps> = ({
   onSave,
   onOpenIssues,
   onProjectNameClick,
+  onExportHTML,
 }) => {
   return (
     <div className="navWrap">
@@ -460,6 +462,45 @@ export const Topbar: React.FC<TopbarProps> = ({
             Width: auto (content-based)
         ═══════════════════════════════════════════════════════════════════ */}
         <div className="right">
+          {/* Export Button */}
+          {onExportHTML && (
+            <Tooltip content="Export as HTML">
+              <button
+                className="pill"
+                onClick={onExportHTML}
+                disabled={exportLoading}
+                aria-disabled={exportLoading}
+                aria-label="Export as HTML zip"
+                style={{
+                  opacity: exportLoading ? 0.6 : 1,
+                  cursor: exportLoading ? "wait" : "pointer",
+                }}
+              >
+                <span className="ico" aria-hidden="true">
+                  {exportLoading ? (
+                    <LoadingSpinner size={16} />
+                  ) : (
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                  )}
+                </span>
+                {exportLoading ? "Exporting..." : "Export"}
+              </button>
+            </Tooltip>
+          )}
+
           {/* Preview Button (Secondary) */}
           <Tooltip content="Preview" shortcut="⌘P">
             <button

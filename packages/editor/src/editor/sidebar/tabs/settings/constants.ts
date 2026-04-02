@@ -11,6 +11,10 @@ export const FEATURE_FLAGS = {
   domains: false,
   export: true,
   integrations: false,
+  cmsTab: false,
+  collaborationTab: false,
+  componentsTab: false,
+  domainsTab: false,
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURE_FLAGS;

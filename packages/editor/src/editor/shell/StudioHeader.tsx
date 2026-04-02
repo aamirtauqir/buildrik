@@ -93,6 +93,9 @@ export interface StudioHeaderProps {
   // Core actions
   onSave: () => void;
 
+  /** Export HTML as zip download */
+  onExportHTML?: () => void;
+
   // Toast notifications
   addToast: (params: ToastParams) => void;
 }
@@ -139,6 +142,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onOpenHistory,
   onOpenIssues,
   onSave,
+  onExportHTML,
   addToast,
 }) => {
   // Collaboration state
@@ -247,7 +251,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       onShowCopilot={onShowCopilot}
       onPreview={handlePreview}
       onPublish={onOpenPublish || handleExport}
-      onExport={handleExport}
+      onExportHTML={onExportHTML}
       onSave={onSave}
       onToggleXRay={onToggleXRay}
       onToggleDevMode={onToggleDevMode}

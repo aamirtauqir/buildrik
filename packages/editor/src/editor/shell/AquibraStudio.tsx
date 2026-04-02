@@ -15,12 +15,13 @@ import { useElementFlash } from "../../shared/hooks";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
 import { StudioSkeleton } from "../../shared/ui/Skeleton";
 import { ToastProvider, useToast } from "../../shared/ui/Toast";
+import { TourOverlay } from "../../shared/ui/TourOverlay";
 import { UpgradeModal } from "../../shared/ui/UpgradeModal";
 import { migrateStorageKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
-import { useOnboardingOrchestrator } from "../onboarding";
-import { sanitizeHTMLForPreview, setupPreviewWindow } from "../export/ExportUtils";
+import { OnboardingProgress } from "../onboarding";
+import { PageWizard } from "../wizard/PageWizard";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
@@ -115,10 +116,13 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   const composerContainerRef = React.useRef<HTMLDivElement | null>(null);
   const hasManuallyToggledSpacing = React.useRef(false);
   const { addToast } = useToast();
+
+  // Wizard state: show on first load when canvas is blank
+  const [showWizard, setShowWizard] = React.useState(true);
+
   // Use extracted hooks
   const state = useStudioState();
   const modals = useStudioModals();
-  const orchestrator = useOnboardingOrchestrator();
   const blocks: BlockData[] = React.useMemo(() => getBlockDefinitions(), []);
 
   // Initialize composer with hooks
@@ -169,41 +173,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   // Enable descriptive history toasts
   useHistoryFeedback(composer, addToast);
-
-  // Wire composer events → onboarding step auto-completion.
-  // Only active while user hasn't finished onboarding.
-  React.useEffect(() => {
-    if (!composer || orchestrator.phase !== "active") return;
-
-    const onElementCreated = () => orchestrator.completeStep("add-element");
-    const onEditInline = () => orchestrator.completeStep("edit-text");
-    const onStyleChanged = () => orchestrator.completeStep("change-style");
-    const onPreview = () => orchestrator.completeStep("preview");
-
-    composer.on(EVENTS.ELEMENT_CREATED, onElementCreated);
-    composer.on(EVENTS.ELEMENT_EDIT_INLINE, onEditInline);
-    composer.on(EVENTS.STYLE_CHANGED, onStyleChanged);
-    composer.on(EVENTS.UI_TOGGLE_PREVIEW, onPreview);
-
-    return () => {
-      composer.off(EVENTS.ELEMENT_CREATED, onElementCreated);
-      composer.off(EVENTS.ELEMENT_EDIT_INLINE, onEditInline);
-      composer.off(EVENTS.STYLE_CHANGED, onStyleChanged);
-      composer.off(EVENTS.UI_TOGGLE_PREVIEW, onPreview);
-    };
-  }, [composer, orchestrator.phase, orchestrator.completeStep]);
-
-  // Phase 1a: Show template picker on first load when no project template has been picked yet.
-  // Uses its own localStorage key so it's independent of the onboarding system.
-  const TEMPLATE_FIRST_RUN_KEY = "aqb-template-first-run";
-  React.useEffect(() => {
-    if (!localStorage.getItem(TEMPLATE_FIRST_RUN_KEY)) {
-      localStorage.setItem(TEMPLATE_FIRST_RUN_KEY, "1");
-      modals.openTemplates();
-    }
-  // Run once on mount only
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Save function
   // P1-4: Enhanced error messages with "why" context
@@ -275,28 +244,15 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       }
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
-        modals.openCommandPalette();
+        canvasRef.current?.openCommandPalette();
       }
       if ((e.ctrlKey || e.metaKey) && e.key === "j") {
         e.preventDefault();
         modals.setShowAI((prev) => !prev);
       }
-      if ((e.ctrlKey || e.metaKey) && e.key === "p") {
-        e.preventDefault();
-        const rawHtml =
-          composer?.exportHTML().combined ||
-          "<!DOCTYPE html><html><body>No content</body></html>";
-        const html = sanitizeHTMLForPreview(rawHtml);
-        const previewWindow = window.open("", "_blank", "noopener");
-        if (previewWindow) {
-          setupPreviewWindow(previewWindow, html);
-        }
-        composer?.emit(EVENTS.UI_TOGGLE_PREVIEW, {});
-      }
       if (e.key === "Escape") {
         modals.setShowShortcuts(false);
         modals.setShowAI(false);
-        modals.closeCommandPalette();
       }
       if (e.key === "?" && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
@@ -306,6 +262,30 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [saveProject, composer, modals]);
+
+  // Export HTML as zip download
+  const handleExportHTML = React.useCallback(async () => {
+    if (!composer) return;
+    modals.setExportLoading(true);
+    try {
+      const exportEngine = new ExportEngine(composer);
+      await exportEngine.downloadZip("site-export.zip");
+      addToast({
+        title: "Export complete",
+        message: "Your site has been downloaded as a zip file.",
+        variant: "success",
+        duration: 3000,
+      });
+    } catch (err) {
+      addToast({
+        title: "Export failed",
+        message: err instanceof Error ? err.message : "Could not export your site.",
+        variant: "error",
+      });
+    } finally {
+      modals.setExportLoading(false);
+    }
+  }, [composer, addToast, modals]);
 
   // Export handler for Vercel deployment
   const handleExportForDeploy = React.useCallback(async () => {
@@ -382,11 +362,12 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   return (
     <div
-      className={`aqb-studio light-theme ${className}`}
+      className={`aqb-studio ${className}`}
       style={{
         display: "flex",
         flexDirection: "column",
         height: "100%",
+        background: "#0A0A0A",
         color: "var(--aqb-text-primary)",
         fontFamily: "var(--aqb-font-family)",
         position: "relative",
@@ -449,17 +430,13 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
             }
           }}
           onOpenProjectSettings={modals.openProjectSettings}
-          onOpenDesignSystem={() => state.openLeftPanelToTab("design")}
-          onOpenPublish={() => {
-            state.openLeftPanelToTab("publish");
-            if (orchestrator.phase === "active") {
-              orchestrator.completeStep("publish");
-            }
-          }}
+          onOpenDesignSystem={() => state.openLeftPanelToTab("styling")}
+          onOpenPublish={() => state.openLeftPanelToTab("publish")}
           onOpenPlugins={() => state.openLeftPanelToTab("settings", "plugins")}
           onOpenHistory={() => state.openLeftPanelToTab("history")}
           onOpenIssues={() => state.openLeftPanelToTab("settings")}
           onSave={saveProject}
+          onExportHTML={handleExportHTML}
           addToast={addToast}
         />
       </header>
@@ -471,10 +448,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onZoomChange={state.setZoom}
         isLeftPanelOpen={state.isLeftPanelOpen}
         onLeftPanelToggle={() => state.setIsLeftPanelOpen((v) => !v)}
-        isPanelPinned={state.panelPinned}
-        onPanelPinnedChange={state.setPanelPinned}
-        panelSizeMode={state.panelSizeMode}
-        onPanelSizeModeChange={state.setPanelSizeMode}
         leftPanelTab={state.leftPanelTab}
         leftPanelSubTab={state.leftPanelSubTabs[state.leftPanelTab]}
         onLeftPanelTabChange={state.setLeftPanelTab}
@@ -500,11 +473,20 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onAIRequest={handlers.handleAIRequest}
         onOpenMediaLibrary={modals.openMediaLibrary}
         onOpenIconPicker={modals.openIconPicker}
+        onOpenTemplates={modals.openTemplates}
+        onExportForDeploy={handleExportForDeploy}
         canvasRef={canvasRef}
         composerContainerRef={composerContainerRef}
-        onReplayTour={orchestrator.replayAll}
-        onOpenCreateCollection={modals.openCMSCollectionSetup}
       />
+      <TourOverlay
+        onNameProject={(name) => {
+          composer?.updateProjectMetadata?.({ name });
+        }}
+        initialProjectName={
+          composer?.getProjectMetadata?.()?.name || "Untitled Project"
+        }
+      />
+
       <StudioModals
         composer={composer}
         selectedElement={selectedElement}
@@ -546,10 +528,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         createComponentContext={modals.createComponentContext}
         showProjectSettings={modals.showProjectSettings}
         onCloseProjectSettings={modals.closeProjectSettings}
-        showCMSCollectionSetup={modals.showCMSCollectionSetup}
-        onCloseCMSCollectionSetup={modals.closeCMSCollectionSetup}
-        showCommandPalette={modals.showCommandPalette}
-        onCloseCommandPalette={modals.closeCommandPalette}
       />
 
       <UpgradeModal />
@@ -560,9 +538,17 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         composer={composer}
       />
 
-      {/* Phase 1a: WelcomeModal, OnboardingChecklist, SpotlightOverlay, and AchievementPrompt
-          removed — template picker on first load (aqb-template-first-run key) is the new
-          entry point. Onboarding orchestrator is kept intact for future use. */}
+      {/* Onboarding Progress Tracker - shown for new users */}
+      <OnboardingProgress />
+
+      {/* Page Wizard - shown on first load for blank canvas */}
+      {showWizard && (
+        <PageWizard
+          composer={composer}
+          onComplete={() => setShowWizard(false)}
+          onSkip={() => setShowWizard(false)}
+        />
+      )}
     </div>
   );
 };

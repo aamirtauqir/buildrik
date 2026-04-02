@@ -8,10 +8,9 @@
 import * as React from "react";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants/events";
-import type { GroupedTabId } from "../rail/tabsConfig";
+import type { GroupedTabId } from "../../shared/constants/tabs";
 import type { BlockData, DeviceType } from "../../shared/types";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
-import type { PanelSizeMode } from "../../shared/types/ui";
 import { useToast } from "../../shared/ui/Toast";
 import { Canvas, type CanvasRef } from "../canvas/Canvas";
 import { CanvasFooterToolbar, type CanvasOverlayState } from "../canvas/CanvasFooterToolbar";
@@ -20,7 +19,6 @@ import { LayoutShell } from "../rail/LayoutShell";
 import { LeftRail } from "../rail/LeftRail";
 import { LeftSidebar } from "../sidebar/LeftSidebar";
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
-import { CMSPreviewBar } from "./CMSPreviewBar";
 import { PageTabBar } from "./PageTabBar";
 
 // ============================================================================
@@ -46,20 +44,12 @@ export interface StudioPanelsProps {
   isLeftPanelOpen: boolean;
   /** Callback to toggle left panel visibility */
   onLeftPanelToggle?: () => void;
-  /** Whether the left panel is pinned (takes grid space) or overlays the canvas */
-  isPanelPinned?: boolean;
-  /** Callback when pin state changes */
-  onPanelPinnedChange?: (pinned: boolean) => void;
-  /** Drawer width preset */
-  panelSizeMode?: PanelSizeMode;
-  /** Callback when size mode changes */
-  onPanelSizeModeChange?: (mode: PanelSizeMode) => void;
   /** Active primary tab in left sidebar */
-  leftPanelTab?: GroupedTabId;
+  leftPanelTab?: string;
   /** Active sub-tab per primary tab */
   leftPanelSubTab?: string;
   /** Callback to change primary tab */
-  onLeftPanelTabChange?: (tab: GroupedTabId) => void;
+  onLeftPanelTabChange?: (tab: string) => void;
   /** Callback to change sub-tab */
   onLeftPanelSubTabChange?: (tab: string) => void;
   /** Block definitions for quick add */
@@ -89,14 +79,17 @@ export interface StudioPanelsProps {
     currentIcon: IconConfig | undefined,
     onSelect: (icon: IconConfig) => void
   ) => void;
+  /** Opens template library modal */
+  onOpenTemplates?: () => void;
+  /** Export handler for Vercel deployment */
+  onExportForDeploy?: () => Promise<{
+    files: Array<{ path: string; content: string }>;
+    projectName?: string;
+  }>;
   /** Canvas ref for undo/redo access */
-  canvasRef?: React.RefObject<CanvasRef | null>;
+  canvasRef?: React.RefObject<CanvasRef>;
   /** Container ref for canvas area */
-  composerContainerRef?: React.RefObject<HTMLDivElement | null>;
-  /** Called when user clicks "Get Started Tour" in Settings — triggers orchestrator replayTour */
-  onReplayTour?: () => void;
-  /** Opens the CMS collection setup modal (forwarded to inspector BindingPopover) */
-  onOpenCreateCollection?: () => void;
+  composerContainerRef?: React.RefObject<HTMLDivElement>;
 }
 
 // ============================================================================
@@ -146,10 +139,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   onZoomChange,
   isLeftPanelOpen,
   onLeftPanelToggle,
-  isPanelPinned = true,
-  onPanelPinnedChange,
-  panelSizeMode = "normal",
-  onPanelSizeModeChange,
   leftPanelTab,
   leftPanelSubTab: _leftPanelSubTab,
   onLeftPanelTabChange,
@@ -167,10 +156,10 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   onAIRequest,
   onOpenMediaLibrary,
   onOpenIconPicker,
+  onOpenTemplates,
+  onExportForDeploy,
   canvasRef,
   composerContainerRef,
-  onReplayTour,
-  onOpenCreateCollection,
 }) => {
   const { addToast } = useToast();
   const { handleBlockClick } = useBlockInsertion(composer);
@@ -198,6 +187,19 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       composer.off(EVENTS.UI_OPEN_BUILD_PANEL, openBuild);
       composer.off(EVENTS.UI_BROWSE_TEMPLATES, openBuild);
       composer.off(EVENTS.UI_OPEN_DESIGN_PANEL, openDesign);
+    };
+  }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle]);
+
+  // Phase 7: Listen for tab switch events (from post-apply quick actions)
+  React.useEffect(() => {
+    if (!composer) return;
+    const handler = (data: { tab: string }) => {
+      onLeftPanelTabChange?.(data.tab);
+      if (!isLeftPanelOpen) onLeftPanelToggle?.();
+    };
+    composer.on("ui:switch-tab", handler);
+    return () => {
+      composer.off("ui:switch-tab", handler);
     };
   }, [composer, onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle]);
 
@@ -291,17 +293,11 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   }, [canvasRef]);
 
   return (
-    <LayoutShell
-      drawerOpen={isLeftPanelOpen}
-      drawerPinned={isPanelPinned}
-      drawerSizeMode={panelSizeMode}
-      inspectorOpen={true}
-      style={styles.container}
-    >
+    <LayoutShell drawerOpen={isLeftPanelOpen} inspectorOpen={!!selectedElement} style={styles.container}>
       {/* Left Rail - 60px icon navigation (new LayoutShell) */}
       <LayoutShell.Rail>
         <LeftRail
-          activeTab={leftPanelTab || "add"}
+          activeTab={(leftPanelTab as GroupedTabId) || "add"}
           onTabChange={handleRailTabChange}
           drawerOpen={isLeftPanelOpen}
           onDrawerToggle={onLeftPanelToggle}
@@ -315,25 +311,21 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           composer={composer}
           onElementSelect={handleElementSelect}
           onBlockClick={handleBlockClick}
-          activePrimaryTab={leftPanelTab}
+          onOpenTemplates={onOpenTemplates}
+          onExportForDeploy={onExportForDeploy}
+          activePrimaryTab={leftPanelTab as GroupedTabId}
           onPrimaryTabChange={onLeftPanelTabChange}
           canvasHoveredId={canvasHoveredId}
           isPanelExpanded={isLeftPanelOpen}
           onPanelExpandedChange={onLeftPanelToggle ? () => onLeftPanelToggle() : undefined}
-          isPanelPinned={isPanelPinned}
-          onPanelPinnedChange={onPanelPinnedChange}
-          panelSizeMode={panelSizeMode}
-          onPanelSizeModeChange={onPanelSizeModeChange}
+          showIconRail={false}
           useMinimalContainer={true}
-          onReplayTour={onReplayTour}
         />
       </LayoutShell.Drawer>
 
       {/* Canvas Area - Main editing surface */}
       <LayoutShell.Canvas>
         <PageTabBar composer={composer} />
-        {/* CMS Preview Bar — shown when collections exist (PRD §12.4) */}
-        <CMSPreviewBar composer={composer} />
 
         <div style={styles.canvasPattern} />
         <div ref={composerContainerRef} style={styles.canvasContent}>
@@ -353,22 +345,20 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           />
         </div>
 
-        {/* Footer Toolbar — centered floating pill (PRD §10.7) */}
-        <div style={{ display: "flex", justifyContent: "center", padding: "0 0 8px", flexShrink: 0 }}>
-          <CanvasFooterToolbar
-            overlays={{
-              guides: showGuides,
-              spacing: showSpacingIndicators,
-              grid: showGrid,
-              badges: showBadges,
-              xray: showXRay,
-            }}
-            zoom={zoom}
-            onOverlayChange={onOverlayChange ?? (() => {})}
-            onZoomChange={handleZoomChange}
-            onFitToScreen={handleFitToScreen}
-          />
-        </div>
+        {/* Footer Toolbar — overlay toggles + zoom */}
+        <CanvasFooterToolbar
+          overlays={{
+            guides: showGuides,
+            spacing: showSpacingIndicators,
+            grid: showGrid,
+            badges: showBadges,
+            xray: showXRay,
+          }}
+          zoom={zoom}
+          onOverlayChange={onOverlayChange ?? (() => {})}
+          onZoomChange={handleZoomChange}
+          onFitToScreen={handleFitToScreen}
+        />
       </LayoutShell.Canvas>
 
       {/* Right Inspector - 300px property panel */}
@@ -380,7 +370,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           onDelete={handleDelete}
           onOpenMediaLibrary={onOpenMediaLibrary}
           onOpenIconPicker={onOpenIconPicker}
-          onOpenCreateCollection={onOpenCreateCollection}
         />
       </LayoutShell.Inspector>
     </LayoutShell>

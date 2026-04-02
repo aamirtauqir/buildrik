@@ -1,6 +1,6 @@
 /**
  * AIAssistantBar - Floating AI Command Bar
- * Restyled per PRD §14.1 — pill shape, design tokens, availability gate.
+ * Glassmorphism CMD+K style input for AI tasks
  *
  * @license BSD-3-Clause
  */
@@ -12,13 +12,8 @@ import { useToast } from "../shared/ui/Toast";
 import { devError } from "../shared/utils/devLogger";
 import { generateContent, generateLayout } from "../shared/utils/openai";
 
-// ─── Gate ────────────────────────────────────────────────────────────────────
-// Flip to `true` once an AI server endpoint is wired in.
-export const AI_AVAILABLE = false;
-
-// =============================================================================
-// TYPES
-// =============================================================================
+/** Feature flag: set to true to enable the AI assistant bar */
+export const AI_AVAILABLE = true;
 
 export interface AIAssistantBarProps {
   isOpen: boolean;
@@ -30,10 +25,6 @@ export interface AIAssistantBarProps {
 interface AiCreditsEventDetail {
   remaining: number;
 }
-
-// =============================================================================
-// COMPONENT
-// =============================================================================
 
 export const AIAssistantBar: React.FC<AIAssistantBarProps> = ({ isOpen, onClose, composer }) => {
   const [prompt, setPrompt] = React.useState("");
@@ -56,13 +47,13 @@ export const AIAssistantBar: React.FC<AIAssistantBarProps> = ({ isOpen, onClose,
   }, []);
 
   React.useEffect(() => {
-    if (isOpen && AI_AVAILABLE) {
+    if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen]);
 
   const handleGenerate = async () => {
-    if (!AI_AVAILABLE || !prompt.trim() || !composer) return;
+    if (!prompt.trim() || !composer) return;
     setIsGenerating(true);
 
     try {
@@ -102,109 +93,64 @@ export const AIAssistantBar: React.FC<AIAssistantBarProps> = ({ isOpen, onClose,
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !AI_AVAILABLE) return null;
 
   return (
     <div style={containerStyles}>
       <div style={barStyles}>
-        {/* AI sparkle icon */}
-        <div style={iconStyles} aria-hidden="true">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
+        <div style={iconStyles}>✨</div>
+        <div style={modeToggleStyles}>
+          <button
+            style={{ ...modeBtnStyles, ...(activeMode === "content" ? activeModeBtnStyles : {}) }}
+            onClick={() => setActiveMode("content")}
           >
-            <path
-              d="M8 1L9.5 5.5L14 7L9.5 8.5L8 13L6.5 8.5L2 7L6.5 5.5L8 1Z"
-              fill="var(--aqb-primary)"
-            />
-          </svg>
+            Content
+          </button>
+          <button
+            style={{ ...modeBtnStyles, ...(activeMode === "layout" ? activeModeBtnStyles : {}) }}
+            onClick={() => setActiveMode("layout")}
+          >
+            Layout
+          </button>
         </div>
-
-        {AI_AVAILABLE ? (
-          <>
-            {/* Mode toggle */}
-            <div style={modeToggleStyles}>
-              <button
-                style={{ ...modeBtnStyles, ...(activeMode === "content" ? activeModeBtnStyles : {}) }}
-                onClick={() => setActiveMode("content")}
-              >
-                Content
-              </button>
-              <button
-                style={{ ...modeBtnStyles, ...(activeMode === "layout" ? activeModeBtnStyles : {}) }}
-                onClick={() => setActiveMode("layout")}
-              >
-                Layout
-              </button>
-            </div>
-
-            {/* Input */}
-            <input
-              ref={inputRef}
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Ask AI to help you build..."
-              style={inputStyles}
-              aria-label="AI assistant prompt"
-            />
-
-            {/* Send / Loading */}
-            {isGenerating ? (
-              <div style={loaderStyles}>
-                <Spinner size={16} />
-              </div>
-            ) : (
-              <button
-                style={sendBtnStyles}
-                onClick={handleGenerate}
-                disabled={!prompt.trim()}
-                aria-label="Send to AI"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path d="M1 7h12M7 1l6 6-6 6" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-            )}
-
-            {/* AI Credits Indicator */}
-            {aiCredits !== null && (
-              <div
-                style={creditsStyles}
-                title={`${aiCredits} AI credits remaining`}
-                aria-label={`${aiCredits} AI credits remaining`}
-              >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  aria-hidden="true"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 6v6l4 2" />
-                </svg>
-                <span>{aiCredits}</span>
-              </div>
-            )}
-          </>
+        <input
+          ref={inputRef}
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={
+            activeMode === "content" ? "Write a headline..." : "Create a hero section..."
+          }
+          style={inputStyles}
+        />
+        {isGenerating ? (
+          <div style={loaderStyles}>
+            <Spinner size={16} />
+          </div>
         ) : (
-          /* Unavailable state */
-          <span style={unavailableTextStyles}>
-            AI features require a server connection.
-          </span>
+          <div style={shortcutStyles}>⏎</div>
+        )}
+        {/* AI Credits Indicator */}
+        {aiCredits !== null && (
+          <div
+            style={creditsStyles}
+            title={`${aiCredits} AI credits remaining`}
+            aria-label={`${aiCredits} AI credits remaining`}
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 6v6l4 2" />
+            </svg>
+            <span>{aiCredits}</span>
+          </div>
         )}
       </div>
       <div style={overlayStyles} onClick={onClose} />
@@ -212,10 +158,7 @@ export const AIAssistantBar: React.FC<AIAssistantBarProps> = ({ isOpen, onClose,
   );
 };
 
-// =============================================================================
-// STYLES — use var(--aqb-*) tokens only
-// =============================================================================
-
+// Styles
 const containerStyles: React.CSSProperties = {
   position: "fixed",
   bottom: 0,
@@ -233,79 +176,72 @@ const containerStyles: React.CSSProperties = {
 const barStyles: React.CSSProperties = {
   width: "100%",
   maxWidth: 600,
-  height: 40,
-  background: "var(--aqb-surface-3)",
-  border: "1px solid var(--aqb-border)",
-  borderRadius: "var(--aqb-radius-xl)",
+  background: "rgba(10, 10, 10, 0.8)",
+  backdropFilter: "blur(20px)",
+  WebkitBackdropFilter: "blur(20px)",
+  borderRadius: 20,
+  border: "1px solid rgba(255, 255, 255, 0.1)",
+  boxShadow: "0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)",
   display: "flex",
   alignItems: "center",
-  padding: "0 16px",
-  gap: 8,
+  padding: "8px 16px",
+  gap: 12,
   pointerEvents: "auto",
-  opacity: AI_AVAILABLE ? 1 : 0.6,
+  animation: "aqb-bar-slide-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
 };
 
 const iconStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  flexShrink: 0,
+  fontSize: 20,
+  filter: "drop-shadow(0 0 8px rgba(0, 163, 255, 0.5))",
 };
 
 const inputStyles: React.CSSProperties = {
   flex: 1,
   background: "transparent",
   border: "none",
-  color: "var(--aqb-text-primary)",
-  fontSize: 13,
+  color: "#fff",
+  fontSize: 15,
   outline: "none",
-  padding: 0,
-  minWidth: 0,
+  padding: "10px 0",
 };
 
 const modeToggleStyles: React.CSSProperties = {
   display: "flex",
-  background: "var(--aqb-surface-2)",
-  borderRadius: "var(--aqb-radius-md)",
+  background: "rgba(255, 255, 255, 0.05)",
+  borderRadius: 12,
   padding: 2,
-  flexShrink: 0,
 };
 
 const modeBtnStyles: React.CSSProperties = {
-  padding: "4px 10px",
+  padding: "6px 12px",
   border: "none",
   background: "transparent",
-  color: "var(--aqb-text-muted)",
-  fontSize: 11,
+  color: "rgba(255, 255, 255, 0.5)",
+  fontSize: 12,
   fontWeight: 600,
-  borderRadius: "var(--aqb-radius-sm)",
+  borderRadius: 10,
   cursor: "pointer",
+  transition: "all 0.2s",
 };
 
 const activeModeBtnStyles: React.CSSProperties = {
-  background: "var(--aqb-surface-1)",
-  color: "var(--aqb-text-primary)",
+  background: "rgba(255, 255, 255, 0.1)",
+  color: "#fff",
 };
 
-const sendBtnStyles: React.CSSProperties = {
-  width: 28,
-  height: 28,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  background: "var(--aqb-primary)",
-  border: "none",
-  borderRadius: "var(--aqb-radius-md)",
-  cursor: "pointer",
-  flexShrink: 0,
+const shortcutStyles: React.CSSProperties = {
+  background: "rgba(255, 255, 255, 0.08)",
+  color: "rgba(255, 255, 255, 0.4)",
+  fontSize: 12,
+  padding: "2px 6px",
+  borderRadius: 4,
+  fontWeight: 700,
 };
 
 const loaderStyles: React.CSSProperties = {
-  width: 28,
-  height: 28,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  flexShrink: 0,
 };
 
 const creditsStyles: React.CSSProperties = {
@@ -313,19 +249,13 @@ const creditsStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 4,
   padding: "4px 8px",
-  borderRadius: "var(--aqb-radius-sm)",
-  background: "var(--aqb-surface-2)",
-  color: "var(--aqb-text-muted)",
+  borderRadius: 8,
+  background: "rgba(255, 255, 255, 0.06)",
+  color: "rgba(255, 255, 255, 0.5)",
   fontSize: 12,
   fontWeight: 600,
   whiteSpace: "nowrap",
   flexShrink: 0,
-};
-
-const unavailableTextStyles: React.CSSProperties = {
-  flex: 1,
-  fontSize: 13,
-  color: "var(--aqb-text-muted)",
 };
 
 const overlayStyles: React.CSSProperties = {
