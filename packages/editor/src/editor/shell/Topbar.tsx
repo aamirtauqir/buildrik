@@ -1,21 +1,12 @@
 /**
- * Aquibra Studio - Topbar Component (IA Redesign 2026)
- * Clean 5-section layout: Project | Undo/Redo | Device | Preview | Publish
- *
- * REMOVED (per IA Redesign):
- * - History button → Now in Settings tab (Version History)
- * - Settings button → Now in sidebar Settings tab
- * - Zoom controls → Moved to Canvas Footer Toolbar
- * - DevMode/XRay/Suggestions toggles → Moved to Canvas Footer or Inspector
- * - Theme toggle → Moved to Design tab
+ * Buildrik Editor Topbar — New Design 2026
+ * Light theme: #F8FAFC bg, 56px height
+ * Layout: Left (back + undo/redo) | Center (device + status) | Right (collab + actions)
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import previewIcon from "../../assets/icons/navbar/preview.svg";
-import redoIcon from "../../assets/icons/navbar/redo.svg";
-import undoIcon from "../../assets/icons/navbar/undo.svg";
 import type { Composer } from "../../engine";
 import { Tooltip } from "../../shared/ui/Tooltip";
 import { BreakpointDropdown } from "./BreakpointDropdown";
@@ -25,34 +16,88 @@ import { StatusIndicators } from "./StatusIndicators";
 const dashboardUrl = import.meta.env.VITE_DASHBOARD_URL || "http://localhost:3000";
 
 // ─────────────────────────────────────────────
-// Device Switcher Pill
+// Icon helpers (inline SVG — no external dep)
+// ─────────────────────────────────────────────
+
+const IconArrowLeft: React.FC = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M10 12L6 8l4-4" />
+  </svg>
+);
+
+const IconUndo: React.FC = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M9 14 4 9l5-5" />
+    <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+  </svg>
+);
+
+const IconRedo: React.FC = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="m15 14 5-5-5-5" />
+    <path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13" />
+  </svg>
+);
+
+const IconKeyboard: React.FC = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="2" y="6" width="20" height="12" rx="2" />
+    <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8" />
+  </svg>
+);
+
+const IconExternalLink: React.FC = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    <polyline points="15 3 21 3 21 9" />
+    <line x1="10" y1="14" x2="21" y2="3" />
+  </svg>
+);
+
+const IconRocket: React.FC = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+    <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+    <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+    <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+  </svg>
+);
+
+const IconChevronDown: React.FC = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+
+const IconUser: React.FC = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
+
+const IconSpinner: React.FC<{ size?: number }> = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" style={{ animation: "tbSpin 1s linear infinite" }}>
+    <circle cx="12" cy="12" r="10" opacity="0.25" />
+    <path d="M12 2a10 10 0 0 1 10 10" />
+  </svg>
+);
+
+// ─────────────────────────────────────────────
+// Device Switcher Pill (light theme)
 // ─────────────────────────────────────────────
 
 type PillDevice = "mobile" | "tablet" | "desktop" | "wide";
 
-const PILL_SEGMENTS: Array<{
-  id: PillDevice;
-  label: string;
-  ariaLabel: string;
-  icon: React.ReactNode;
-}> = [
+const DEVICE_SEGMENTS: Array<{ id: PillDevice; label: string; ariaLabel: string; icon: React.ReactNode }> = [
   {
     id: "mobile",
     label: "Mobile",
     ariaLabel: "Mobile (375px)",
     icon: (
-      // Tall narrow rect — mobile phone
-      <svg width="9" height="14" viewBox="0 0 9 14" fill="none" aria-hidden="true">
-        <rect
-          x="0.75"
-          y="0.75"
-          width="7.5"
-          height="12.5"
-          rx="1.5"
-          stroke="currentColor"
-          strokeWidth="1.5"
-        />
-        <rect x="3.5" y="11" width="2" height="1" rx="0.5" fill="currentColor" />
+      <svg width="9" height="13" viewBox="0 0 9 13" fill="none" aria-hidden="true">
+        <rect x="0.75" y="0.75" width="7.5" height="11.5" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
+        <rect x="3.5" y="10" width="2" height="1" rx="0.5" fill="currentColor" />
       </svg>
     ),
   },
@@ -61,18 +106,9 @@ const PILL_SEGMENTS: Array<{
     label: "Tablet",
     ariaLabel: "Tablet (768px)",
     icon: (
-      // Medium rect — tablet
-      <svg width="12" height="14" viewBox="0 0 12 14" fill="none" aria-hidden="true">
-        <rect
-          x="0.75"
-          y="0.75"
-          width="10.5"
-          height="12.5"
-          rx="1.5"
-          stroke="currentColor"
-          strokeWidth="1.5"
-        />
-        <rect x="4.5" y="11.5" width="3" height="1" rx="0.5" fill="currentColor" />
+      <svg width="11" height="13" viewBox="0 0 11 13" fill="none" aria-hidden="true">
+        <rect x="0.75" y="0.75" width="9.5" height="11.5" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
+        <rect x="4" y="10.5" width="3" height="1" rx="0.5" fill="currentColor" />
       </svg>
     ),
   },
@@ -81,23 +117,9 @@ const PILL_SEGMENTS: Array<{
     label: "Desktop",
     ariaLabel: "Desktop (1280px)",
     icon: (
-      // Wide rect with stand — monitor
-      <svg width="16" height="14" viewBox="0 0 16 14" fill="none" aria-hidden="true">
-        <rect
-          x="0.75"
-          y="0.75"
-          width="14.5"
-          height="9.5"
-          rx="1.25"
-          stroke="currentColor"
-          strokeWidth="1.5"
-        />
-        <path
-          d="M5.5 13h5M8 10.25V13"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
+      <svg width="16" height="13" viewBox="0 0 16 13" fill="none" aria-hidden="true">
+        <rect x="0.75" y="0.75" width="14.5" height="9" rx="1.25" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M5.5 12h5M8 9.75V12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -106,113 +128,59 @@ const PILL_SEGMENTS: Array<{
     label: "Wide",
     ariaLabel: "Wide (1920px)",
     icon: (
-      // Wider rect with stand — wide monitor
-      <svg width="18" height="14" viewBox="0 0 18 14" fill="none" aria-hidden="true">
-        <rect
-          x="0.75"
-          y="0.75"
-          width="16.5"
-          height="9.5"
-          rx="1.25"
-          stroke="currentColor"
-          strokeWidth="1.5"
-        />
-        <path
-          d="M6.5 13h5M9 10.25V13"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
+      <svg width="18" height="13" viewBox="0 0 18 13" fill="none" aria-hidden="true">
+        <rect x="0.75" y="0.75" width="16.5" height="9" rx="1.25" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M6.5 12h5M9 9.75V12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     ),
   },
 ];
 
-const DeviceSwitcherPill: React.FC<{
-  device: PillDevice;
-  onDeviceChange: (d: PillDevice) => void;
-}> = ({ device, onDeviceChange }) => {
-  return (
-    <div
-      role="group"
-      aria-label="Device breakpoint"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        height: 30,
-        padding: 3,
-        background: "var(--aqb-surface-3)",
-        border: "1px solid var(--aqb-border)",
-        borderRadius: "var(--aqb-radius-md)",
-        gap: 1,
-      }}
-    >
-      {PILL_SEGMENTS.map((seg) => {
-        const isActive = seg.id === device;
-        return (
-          <Tooltip key={seg.id} content={seg.ariaLabel}>
-            <button
-              onClick={() => onDeviceChange(seg.id)}
-              aria-label={seg.ariaLabel}
-              aria-pressed={isActive}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 5,
-                minWidth: 40,
-                height: 24,
-                padding: "0 10px",
-                background: isActive ? "var(--aqb-surface-5)" : "transparent",
-                border: "none",
-                borderRadius: "var(--aqb-radius-sm)",
-                color: isActive ? "var(--aqb-text-primary)" : "var(--aqb-text-muted)",
-                fontSize: 12,
-                fontWeight: 500,
-                cursor: "pointer",
-                boxShadow: isActive ? "var(--aqb-shadow-xs)" : "none",
-                transition: "background 0.12s ease, color 0.12s ease",
-                flexShrink: 0,
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.color = "var(--aqb-text-secondary)";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.color = "var(--aqb-text-muted)";
-                }
-              }}
-            >
-              {seg.icon}
-            </button>
-          </Tooltip>
-        );
-      })}
-    </div>
-  );
-};
-
-/** Simple loading spinner for button states */
-const LoadingSpinner: React.FC<{ size?: number }> = ({ size = 16 }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    style={{ animation: "spin 1s linear infinite" }}
+const DeviceSwitcherPill: React.FC<{ device: PillDevice; onDeviceChange: (d: PillDevice) => void }> = ({ device, onDeviceChange }) => (
+  <div
+    role="group"
+    aria-label="Device breakpoint"
+    style={{ display: "flex", alignItems: "center", height: 28, padding: 2, background: "#F1F5F9", border: "1px solid #D1D9E6", borderRadius: 8, gap: 1 }}
   >
-    <circle cx="12" cy="12" r="10" opacity="0.25" />
-    <path d="M12 2a10 10 0 0 1 10 10" />
-  </svg>
+    {DEVICE_SEGMENTS.map((seg) => {
+      const isActive = seg.id === device;
+      return (
+        <Tooltip key={seg.id} content={seg.ariaLabel}>
+          <button
+            onClick={() => onDeviceChange(seg.id)}
+            aria-label={seg.ariaLabel}
+            aria-pressed={isActive}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minWidth: 36,
+              height: 22,
+              padding: "0 8px",
+              background: isActive ? "#FFFFFF" : "transparent",
+              border: "none",
+              borderRadius: 6,
+              color: isActive ? "#334155" : "#94A3B8",
+              cursor: "pointer",
+              boxShadow: isActive ? "0 1px 2px rgba(0,0,0,0.08)" : "none",
+              transition: "background 0.12s ease, color 0.12s ease",
+              flexShrink: 0,
+            }}
+          >
+            {seg.icon}
+          </button>
+        </Tooltip>
+      );
+    })}
+  </div>
 );
 
+// ─────────────────────────────────────────────
+// Topbar Props
+// ─────────────────────────────────────────────
+
 export interface TopbarProps {
-  composer: Composer | null;
+  composer?: Composer | null;
   device: string;
   canUndo: boolean;
   canRedo: boolean;
@@ -222,13 +190,11 @@ export interface TopbarProps {
   previewLoading: boolean;
   publishLoading?: boolean;
   isPublished?: boolean;
-  selectedElement: { id: string; type: string; tagName?: string } | null;
-  // Status
+  exportLoading?: boolean;
   syncStatus?: SyncStatus;
   issues?: Issue[];
-  /** Slot for rendering collaboration presence indicators */
+  /** Collaboration presence indicators rendered in right section */
   collaborationSlot?: React.ReactNode;
-  /** Project name for display */
   projectName?: string;
   // Handlers
   onDeviceChange: (d: "desktop" | "tablet" | "mobile" | "wide") => void;
@@ -239,49 +205,36 @@ export interface TopbarProps {
   onSave: () => void;
   onOpenIssues?: () => void;
   onProjectNameClick?: () => void;
-
-  // Legacy props (kept for backward compatibility, but unused in new layout)
-  /** @deprecated Zoom now in Canvas Footer */
-  zoom?: number;
-  /** @deprecated Zoom now in Canvas Footer */
-  onZoomChange?: (z: number) => void;
-  /** Export HTML as zip */
-  exportLoading?: boolean;
-  /** Export handler */
+  onCommandPalette?: () => void;
+  onHelp?: () => void;
+  onAccount?: () => void;
+  onInvite?: () => void;
   onExportHTML?: () => void;
-  /** @deprecated Add Page in Pages tab */
-  onAddPage?: () => void;
-  /** @deprecated Templates in Add tab */
-  onShowTemplates?: () => void;
-  /** @deprecated AI in Inspector */
-  onShowAI?: () => void;
-  /** @deprecated Copilot in Inspector */
-  onShowCopilot?: () => void;
-  /** @deprecated X-Ray in Canvas Footer */
+  // Legacy props (kept for StudioHeader compatibility — unused in new layout)
+  zoom?: number;
+  onZoomChange?: (z: number) => void;
+  selectedElement?: { id: string; type: string; tagName?: string } | null;
   showXRay?: boolean;
-  /** @deprecated DevMode in Canvas Footer */
   devMode?: boolean;
-  /** @deprecated Suggestions in Inspector */
   showSuggestions?: boolean;
-  /** @deprecated Toggle in Canvas Footer */
   onToggleXRay?: () => void;
-  /** @deprecated Toggle in Canvas Footer */
   onToggleDevMode?: () => void;
-  /** @deprecated Toggle in Inspector */
   onToggleSuggestions?: () => void;
-  /** @deprecated Settings in sidebar */
   onOpenProjectSettings?: () => void;
-  /** @deprecated Design in sidebar */
   onOpenDesignSystem?: () => void;
-  /** @deprecated History in sidebar */
-  onOpenHistory?: () => void;
-  /** @deprecated AI in Inspector */
-  onOpenAI?: () => void;
-  /** @deprecated Plugins in Settings */
-  onOpenPlugins?: () => void;
-  /** @deprecated Merged into onPublish */
   onOpenPublish?: () => void;
+  onOpenPlugins?: () => void;
+  onOpenHistory?: () => void;
+  onOpenAI?: () => void;
+  onShowTemplates?: () => void;
+  onShowAI?: () => void;
+  onShowCopilot?: () => void;
+  onAddPage?: () => void;
 }
+
+// ─────────────────────────────────────────────
+// Topbar Component
+// ─────────────────────────────────────────────
 
 export const Topbar: React.FC<TopbarProps> = ({
   device,
@@ -291,11 +244,10 @@ export const Topbar: React.FC<TopbarProps> = ({
   lastSavedAt,
   previewLoading,
   publishLoading = false,
-  exportLoading = false,
+  isPublished = false,
   syncStatus = "connected",
   issues = [],
   collaborationSlot,
-  projectName = "Untitled Project",
   onDeviceChange,
   onUndo,
   onRedo,
@@ -303,268 +255,152 @@ export const Topbar: React.FC<TopbarProps> = ({
   onPublish,
   onSave,
   onOpenIssues,
-  onProjectNameClick,
-  onExportHTML,
-}) => {
-  return (
-    <div className="navWrap">
-      <div className="navBar">
-        {/* ═══════════════════════════════════════════════════════════════════
-            LEFT SECTION: Project + Undo/Redo + Device Switcher
-            Width: auto (content-based)
-        ═══════════════════════════════════════════════════════════════════ */}
-        <div className="left">
-          <div className="leftRow">
-            {/* Back to Dashboard */}
-            <Tooltip content="Back to Dashboard">
-              <a
-                href={`${dashboardUrl}/dashboard/sites`}
-                className="pill pillIconOnly"
-                aria-label="Back to Dashboard"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  textDecoration: "none",
-                  color: "var(--aqb-text-muted)",
-                  cursor: "pointer",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "var(--aqb-text-primary)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "var(--aqb-text-muted)";
-                }}
-              >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M10 12L6 8l4-4" />
-                </svg>
-              </a>
-            </Tooltip>
+  onCommandPalette,
+  onHelp,
+  onAccount,
+  onInvite,
+}) => (
+  <div className="tbWrap">
+    <div className="tbBar">
 
-            {/* Brand + Project Name */}
-            <button
-              className="brand"
-              id="topbar-btn-project"
-              onClick={onProjectNameClick}
-              style={{ cursor: onProjectNameClick ? "pointer" : "default" }}
-              aria-label="Project menu"
-            >
-              <div className="brandMark" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M20 4c-7 1-12 6-13 13 7-1 12-6 13-13Z"
-                    stroke="var(--aqb-brand-accent)"
-                    strokeWidth="1.8"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M7 17c2-5 6-9 13-13"
-                    stroke="var(--aqb-brand-accent)"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </div>
-              <div className="brandName">
-                {projectName}
-                <span className="brandChevron" aria-hidden="true">
-                  ▾
-                </span>
-              </div>
-            </button>
+      {/* ── LEFT: Back · Divider · Undo · Redo ── */}
+      <div className="tbLeft">
+        <Tooltip content="Back to Dashboard">
+          <a
+            href={`${dashboardUrl}/dashboard/sites`}
+            className="tbCircleBtn"
+            aria-label="Back to Dashboard"
+          >
+            <IconArrowLeft />
+          </a>
+        </Tooltip>
 
-            {/* Undo/Redo */}
-            <div className="leftRowScrollable">
-              <Tooltip content="Undo" shortcut="⌘Z">
-                <button
-                  className="pill pillIconOnly"
-                  onClick={onUndo}
-                  disabled={!canUndo}
-                  aria-disabled={!canUndo}
-                  aria-label="Undo last action"
-                  style={{
-                    opacity: canUndo ? 1 : 0.4,
-                    cursor: canUndo ? "pointer" : "not-allowed",
-                    filter: canUndo ? "none" : "grayscale(100%)",
-                  }}
-                >
-                  <span className="ico" aria-hidden="true">
-                    <img src={undoIcon} alt="" className="navbar-icon" />
-                  </span>
-                </button>
-              </Tooltip>
+        <div className="tbDivider" role="separator" />
 
-              <Tooltip content="Redo" shortcut="⌘⇧Z">
-                <button
-                  className="pill pillIconOnly"
-                  onClick={onRedo}
-                  disabled={!canRedo}
-                  aria-disabled={!canRedo}
-                  aria-label="Redo last action"
-                  style={{
-                    opacity: canRedo ? 1 : 0.4,
-                    cursor: canRedo ? "pointer" : "not-allowed",
-                    filter: canRedo ? "none" : "grayscale(100%)",
-                  }}
-                >
-                  <span className="ico" aria-hidden="true">
-                    <img src={redoIcon} alt="" className="navbar-icon" />
-                  </span>
-                </button>
-              </Tooltip>
+        <Tooltip content="Undo" shortcut="⌘Z">
+          <button
+            className="tbCircleBtn"
+            onClick={onUndo}
+            disabled={!canUndo}
+            aria-label="Undo last action"
+            aria-disabled={!canUndo}
+          >
+            <IconUndo />
+          </button>
+        </Tooltip>
 
-              {/* Divider */}
-              <div className="navDivider" />
-
-              {/* Device breakpoint pill — 4 segments: Mobile | Tablet | Desktop | Wide */}
-              <DeviceSwitcherPill
-                device={(device as PillDevice) || "desktop"}
-                onDeviceChange={onDeviceChange}
-              />
-
-              {/* Viewport width display + custom size dropdown */}
-              <BreakpointDropdown
-                device={
-                  (device === "watch" ? "desktop" : device) as
-                    | "desktop"
-                    | "tablet"
-                    | "mobile"
-                    | "wide"
-                }
-                onDeviceChange={onDeviceChange}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* ═══════════════════════════════════════════════════════════════════
-            CENTER SECTION: Spacer + Status
-            Width: flex-1 (fills remaining space)
-        ═══════════════════════════════════════════════════════════════════ */}
-        <div className="center" style={{ flex: 1, justifyContent: "center" }}>
-          {/* Status Indicators (centered) */}
-          <StatusIndicators
-            saveStatus={saveStatus}
-            lastSavedAt={lastSavedAt}
-            syncStatus={syncStatus}
-            issues={issues}
-            onSaveRetry={onSave}
-            onIssuesClick={onOpenIssues}
-          />
-
-          {/* Collaboration Presence Indicators */}
-          {collaborationSlot}
-        </div>
-
-        {/* ═══════════════════════════════════════════════════════════════════
-            RIGHT SECTION: Preview + Publish
-            Width: auto (content-based)
-        ═══════════════════════════════════════════════════════════════════ */}
-        <div className="right">
-          {/* Export Button */}
-          {onExportHTML && (
-            <Tooltip content="Export as HTML">
-              <button
-                className="pill"
-                onClick={onExportHTML}
-                disabled={exportLoading}
-                aria-disabled={exportLoading}
-                aria-label="Export as HTML zip"
-                style={{
-                  opacity: exportLoading ? 0.6 : 1,
-                  cursor: exportLoading ? "wait" : "pointer",
-                }}
-              >
-                <span className="ico" aria-hidden="true">
-                  {exportLoading ? (
-                    <LoadingSpinner size={16} />
-                  ) : (
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                      <polyline points="7 10 12 15 17 10" />
-                      <line x1="12" y1="15" x2="12" y2="3" />
-                    </svg>
-                  )}
-                </span>
-                {exportLoading ? "Exporting..." : "Export"}
-              </button>
-            </Tooltip>
-          )}
-
-          {/* Preview Button (Secondary) */}
-          <Tooltip content="Preview" shortcut="⌘P">
-            <button
-              className="pill"
-              id="topbar-btn-preview"
-              onClick={onPreview}
-              disabled={previewLoading}
-              aria-disabled={previewLoading}
-              aria-label="Preview in browser"
-              style={{
-                opacity: previewLoading ? 0.6 : 1,
-                cursor: previewLoading ? "wait" : "pointer",
-              }}
-            >
-              <span className="ico" aria-hidden="true">
-                {previewLoading ? (
-                  <LoadingSpinner size={16} />
-                ) : (
-                  <img src={previewIcon} alt="" className="navbar-icon" />
-                )}
-              </span>
-              {previewLoading ? "Loading..." : "Preview"}
-            </button>
-          </Tooltip>
-
-          {/* Publish Button (Primary CTA) — opens Publish sidebar tab */}
-          <Tooltip content="Publish your site">
-            <button
-              className="pill pillPublish"
-              id="topbar-btn-publish"
-              data-tour-target="publish"
-              onClick={onPublish}
-              disabled={publishLoading}
-              aria-disabled={publishLoading}
-              aria-label="Publish site"
-              style={{
-                opacity: publishLoading ? 0.6 : 1,
-                cursor: publishLoading ? "wait" : "pointer",
-              }}
-            >
-              <span className="ico" aria-hidden="true">
-                {publishLoading ? (
-                  <LoadingSpinner size={16} />
-                ) : (
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  >
-                    <path d="M3 11c-1 .84-1.33 3.33-1.33 3.33s2.5-.33 3.33-1.33c.47-.56.47-1.42-.06-1.94a1.45 1.45 0 00-1.94-.06z" />
-                    <path d="M8 10l-2-2a14.67 14.67 0 011.33-2.63A8.59 8.59 0 0114.67 1.33c0 1.81-.52 5-4 7.34A14.9 14.9 0 018 10z" />
-                  </svg>
-                )}
-              </span>
-              {publishLoading ? "Publishing..." : "Publish"}
-            </button>
-          </Tooltip>
-        </div>
+        <Tooltip content="Redo" shortcut="⌘⇧Z">
+          <button
+            className="tbCircleBtn"
+            onClick={onRedo}
+            disabled={!canRedo}
+            aria-label="Redo last action"
+            aria-disabled={!canRedo}
+          >
+            <IconRedo />
+          </button>
+        </Tooltip>
       </div>
+
+      {/* ── CENTER: Device switcher + Save status ── */}
+      <div className="tbCenter">
+        <DeviceSwitcherPill
+          device={(device as PillDevice) || "desktop"}
+          onDeviceChange={onDeviceChange}
+        />
+        <BreakpointDropdown
+          device={(device === "watch" ? "desktop" : device) as "desktop" | "tablet" | "mobile" | "wide"}
+          onDeviceChange={onDeviceChange}
+        />
+        <StatusIndicators
+          saveStatus={saveStatus}
+          lastSavedAt={lastSavedAt}
+          syncStatus={syncStatus}
+          issues={issues}
+          onSaveRetry={onSave}
+          onIssuesClick={onOpenIssues}
+        />
+      </div>
+
+      {/* ── RIGHT: Collab · Invite · ⌘K · Preview · Publish · Help · Account ── */}
+      <div className="tbRight">
+        {collaborationSlot}
+
+        <Tooltip content="Invite collaborators">
+          <button
+            className="tbBtn tbBtnGhost"
+            onClick={onInvite}
+            aria-label="Invite collaborators"
+          >
+            + Invite
+          </button>
+        </Tooltip>
+
+        <Tooltip content="Command palette" shortcut="⌘K">
+          <button
+            className="tbBtn"
+            onClick={onCommandPalette}
+            aria-label="Open command palette"
+          >
+            <IconKeyboard />
+            <span style={{ color: "#475569" }}>⌘K</span>
+          </button>
+        </Tooltip>
+
+        <Tooltip content="Preview" shortcut="⌘P">
+          <button
+            className="tbBtn"
+            onClick={onPreview}
+            disabled={previewLoading}
+            aria-label="Preview in browser"
+            aria-disabled={previewLoading}
+          >
+            {previewLoading ? <IconSpinner /> : <IconExternalLink />}
+            <span>{previewLoading ? "Loading…" : "Preview"}</span>
+          </button>
+        </Tooltip>
+
+        <Tooltip content="Publish site">
+          <button
+            className="tbBtnPublish"
+            onClick={onPublish}
+            disabled={publishLoading}
+            aria-label="Publish site"
+            aria-disabled={publishLoading}
+          >
+            {publishLoading ? <IconSpinner /> : <IconRocket />}
+            <span>{publishLoading ? "Publishing…" : "Publish"}</span>
+            {!isPublished && !publishLoading && (
+              <span className="tbDraftBadge">Draft</span>
+            )}
+            {!publishLoading && <IconChevronDown />}
+          </button>
+        </Tooltip>
+
+        <Tooltip content="Help">
+          <button
+            className="tbSquareBtn"
+            onClick={onHelp}
+            aria-label="Help"
+          >
+            ?
+          </button>
+        </Tooltip>
+
+        <Tooltip content="Account">
+          <a
+            href={`${dashboardUrl}/account`}
+            className="tbSquareBtn"
+            aria-label="Account settings"
+            onClick={onAccount ? (e) => { e.preventDefault(); onAccount(); } : undefined}
+          >
+            <IconUser />
+          </a>
+        </Tooltip>
+      </div>
+
     </div>
-  );
-};
+  </div>
+);
 
 export default Topbar;

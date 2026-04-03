@@ -40,7 +40,7 @@ Element-level editing **Right Bar** (Inspector) mein hai.
 ### Rail Layout (Top → Bottom)
 
 ```
-TOP ZONE:
+TOP ZONE (primary — large icons, full opacity):
   [+]   Add
   [⊞]   Templates
   [⊟]   Layers
@@ -50,7 +50,7 @@ TOP ZONE:
 
   ─────  (divider)
 
-BOTTOM ZONE:
+BOTTOM ZONE (secondary — smaller icons, 70% opacity):
   [🎨]  Design Tokens
   [⚙]   Settings
   [🕐]  History
@@ -58,6 +58,14 @@ BOTTOM ZONE:
 FOOTER ZONE:
   [?]   Help (external docs link, not a tab)
 ```
+
+### Visual Hierarchy
+
+**Two-tier rail:** TOP ZONE and BOTTOM ZONE icons are visually distinct.
+- **TOP ZONE (primary):** Full icon size, 100% opacity, prominent. These are used 10–100x per session.
+- **BOTTOM ZONE (secondary):** Icon size 20% smaller, 70% opacity at rest (100% on hover/active). These are configuration/utility tabs used 1–5x per session.
+- The divider line visually separates the two tiers.
+- All 9 tabs remain keyboard-accessible and function identically. The hierarchy is visual only — it does not change access.
 
 ### Rail Behavior
 
@@ -77,7 +85,7 @@ FOOTER ZONE:
 
 ### Keyboard Shortcuts (all global, not in input fields, not during canvas text editing)
 
-| Tab | Shortcut |
+| Tab / Action | Shortcut |
 |---|---|
 | Add | A |
 | Templates | T |
@@ -88,10 +96,17 @@ FOOTER ZONE:
 | Design Tokens | D |
 | Settings | S |
 | History | H |
+| Select parent element | Escape (first press when element selected) |
+| Deselect all | Escape (second press, or first press at root) |
 
 **Shortcut fire conditions:** Shortcuts only fire when:
 - No canvas element is selected AND user is not in any inline editing mode (text edit, rename inputs)
 - ⌘S / Ctrl+S is reserved for global Save — the "S" shortcut for Settings ONLY fires on bare "S" key with no modifier. No conflict with ⌘S.
+
+**Escape key — select parent behavior:**
+- When an element is selected on canvas: first Escape = select that element's parent. Layers panel scrolls to and highlights the parent if Layers is open.
+- Second Escape (or first Escape when already at root level) = deselect all.
+- Matches Figma behavior. Works regardless of whether the Layers panel is open.
 
 ### Panel Size Controls
 
@@ -104,7 +119,11 @@ Bottom of panel (when size control is enabled):
 ### Panel Pin
 
 - Pin icon in panel header — keeps panel open at all times (doesn't auto-collapse on canvas click)
-- Default: unpinned — panel collapses when user clicks canvas (but NOT during drag — see Drag Lock Rule)
+- **Screen-aware default:**
+  - Viewport > 1200px → panel is **pinned by default** (panel pushes canvas). Matches how Figma, Webflow, Framer behave on desktop.
+  - Viewport ≤ 1200px → panel is **unpinned by default** (panel overlays canvas — space is tight).
+- Default changed from previous: old default was unpinned on all screens. New default is pinned on wide screens.
+- User can toggle pin manually at any time. Pin state persists in localStorage per viewport category (wide vs. narrow).
 - Pinned state persists in localStorage
 
 ### Scroll Position Preservation
@@ -166,10 +185,12 @@ Search inputs in Add, Media, Components tabs are **cleared when the tab is unmou
 - Default: all categories expanded
 
 **Favorites:**
-- Top 6 most frequently dragged elements auto-appear here
-- **Manual pin:** Right-click any element → "Pin to Favorites" — adds it to favorites regardless of usage frequency
-- First visit: no favorites shown — section hidden
-- Remove via right-click → "Remove from Favorites"
+- An element auto-appears in Favorites after it has been dragged or clicked **3 or more times** (tracked per-user in localStorage)
+- Maximum 6 elements shown — if more than 6 qualify, show the 6 with the highest usage count
+- **Manual pin:** Right-click any element → "Pin to Favorites" — adds it immediately regardless of usage count
+- First visit (or count below threshold for all elements): Favorites section is hidden entirely
+- Favorites section appears as soon as at least 1 element reaches the threshold
+- Remove via right-click → "Remove from Favorites" (resets usage count to 0 for that element)
 
 **Drag to canvas:**
 - Click and hold element card → drag to canvas
@@ -220,6 +241,10 @@ Search inputs in Add, Media, Components tabs are **cleared when the tab is unmou
   - Replace current page
   - Add as new page
 - Confirmation step before replace: `"This will replace all content on the current page. [Replace] [Cancel]"`
+
+**Search empty state:**
+- No results → show: `"No templates found for '[query]'"` centered in panel
+- Clear search: `"Clear search"` link below the empty state message
 
 **Apply progress overlay:**
 - Applying hone ke dauraan: `"Applying template..."` loading overlay
@@ -363,11 +388,13 @@ Search inputs in Add, Media, Components tabs are **cleared when the tab is unmou
 - Last remaining page delete attempt → toast: `"Can't delete the only page."`
 - All other pages: `"Delete [Name]? This cannot be undone. [Delete] [Cancel]"`
 
-**Page Settings (drill-in pattern):**
-- Clicking "Page Settings →" from context menu replaces the panel content — NOT a side drawer sliding onto the canvas
-- Header shows: `"← Pages · About"` (back navigation + page name)
+**Page Settings (full-page pattern):**
+- Clicking "Page Settings →" from context menu opens a **full-page view inside the editor** — same pattern as Site Settings tab
+- Top-left: `"← Back to Editor · About"` button (page name in the breadcrumb)
 - Tabs within the settings view: **SEO** · **Social** · **Advanced**
-- "← Pages" back link closes settings view and returns to page list
+- "← Back to Editor" returns to the canvas with Pages panel still active
+- **Rationale:** Page Settings has 8+ fields across 3 tabs. The 280px panel drill-in is too cramped. Full-page is consistent with Site Settings and gives fields room to breathe.
+- **Unsaved changes guard:** If any screen has unsaved changes and user clicks back: `"Save changes before leaving? [Save & Go Back] [Discard & Go Back] [Stay]"`
 
 **Page SEO:**
 - Page title — meta title
@@ -405,6 +432,11 @@ Search inputs in Add, Media, Components tabs are **cleared when the tab is unmou
 - Real-time filter by component name
 - Search resets on tab switch
 
+**Empty state (no components yet):**
+- Illustration + message: `"No components yet"`
+- Sub-text: `"Select elements on the canvas and right-click → Create Component"`
+- "+ Create Component" button (same action as the header button)
+
 **Component library:**
 - List view — naam, snapshot thumbnail (last-saved visual)
 - Click → Component Detail Screen
@@ -433,6 +465,8 @@ Search inputs in Add, Media, Components tabs are **cleared when the tab is unmou
 - If component exists on the current page → directly enters component edit mode
 - If component does NOT exist on current page → `"Hero Card is not on this page. Switch to Home to edit it? [Switch & Edit] [Cancel]"`
 - If component exists on multiple pages → navigates to the page it was originally created on
+- **If the original page was deleted:** Auto-navigate to the first page that has an instance of this component. No dialog, no dead end.
+- **If ALL pages with this component were deleted (zero instances remain):** Toast: `"This component has no instances on any page. Drop it onto the canvas to use it."`
 
 **Component delete — warning rewritten for clarity:**
 `"Deleting this component won't remove it from your pages. All 3 instances will become regular elements — they'll stay on canvas but will no longer update together when you make changes. [Delete] [Cancel]"`
@@ -470,7 +504,7 @@ Search inputs in Add, Media, Components tabs are **cleared when the tab is unmou
 - Ya panel mein drag & drop — files drop karo directly
 - Multiple files ek saath — progress shown per file with: filename, progress bar, size
 - **File size limit:** 50MB per file. On exceed: `"[filename] is too large. Maximum size is 50MB. Try compressing the file first."`
-- **Upload failure state:** Per-file error indicator: 🔴 filename, error reason (network error / unsupported format / quota full), "Retry" button
+- **Upload failure state:** Per-file error indicator: 🔴 filename, error reason (network error / unsupported format / quota full), "Retry" button. When 2 or more files have failed: a **"Retry All Failed"** button appears above the failed file list — retries all failed uploads in one click.
 - Supported: JPG, PNG, WebP, SVG, GIF, MP4, WebM
 
 **Drag from Media to canvas:**
@@ -586,9 +620,10 @@ T body-md        Inter 16px Regular ✎ 🗑
 - Export always exports **last published/reviewed** token state — not the current draft
 - If tokens are in Draft state, a note appears: `"Draft changes not included. Review & Publish tokens first to export latest values."`
 
-**Tab guard (unsaved warning):**
-- Agar unsaved token changes hain aur user dusra tab switch karna chahta hai → dialog:
-  `"You have unsaved token changes. Switching tabs will discard them. [Discard & Switch] [Stay]"`
+**Tab guard (REMOVED):**
+- No dialog fires when user switches away from Design Tokens with unreview changes. Draft auto-saves to server continuously — nothing is lost.
+- The **Draft chip** in the panel header is the visual signal that uncommitted changes exist. It stays visible regardless of which tab is active.
+- **Browser close guard only:** If Draft changes exist when user closes/refreshes the browser tab, a standard `beforeunload` browser warning fires: "Changes you made may not be saved." This is the only guard.
 
 ---
 
@@ -690,8 +725,9 @@ Workspace-level settings jo saari sites pe same hain — billing, team members, 
 ### Dirty state protection
 
 - Settings mein unsaved changes hain aur user dusra tab switch karne ki koshish kare → confirmation dialog:
-  `"You have unsaved changes. Switching tabs will discard them. [Discard & Switch] [Stay]"`
-- Same guard applies to "← Back to Editor" navigation (see above)
+  `"Save changes before switching? [Save & Switch] [Discard & Switch] [Stay]"`
+  *(Note: unlike Design Tokens — which auto-save Draft — Settings changes are NOT auto-persisted. This guard is legitimate.)*
+- Same guard applies to "← Back to Editor" navigation: `"Save changes before leaving? [Save & Go Back] [Discard & Go Back] [Stay]"`
 
 ---
 
@@ -747,7 +783,7 @@ Auto-saves between manual saves do NOT create separate history entries — they 
 - "Revert to this version" button → confirmation dialog:
   `"Revert to [timestamp]? Current unsaved changes will be lost. [Revert] [Cancel]"`
 - **On revert: a NEW entry is added to the timeline** — `"Reverted to version from [time]"`. History entries after the reverted-to point are NOT deleted. Forward history is preserved.
-- Toast: `"Reverted to version from [time] · undo"`
+- Toast: `"Reverted to version from [time]"` (no undo — the confirmation dialog already protects against accidental reverts)
 
 ### Branching (Phase 1)
 
@@ -771,8 +807,9 @@ Auto-saves between manual saves do NOT create separate history entries — they 
 
 **Merge branch:**
 - "Merge into main" button — accessible via branch row "···" context menu (not a visible button to avoid accidental clicks)
-- **Merge confirmation:** `"Merge feature/hero-redesign into main? This will update main with your branch changes. The branch will be deleted after merge. [Merge] [Keep Branch & Merge] [Cancel]"`
-  - "Keep Branch & Merge" → merges but keeps the branch (for reference)
+- **Merge confirmation:** `"Merge feature/hero-redesign into main? This will update main with your branch changes. [Keep Branch & Merge] [Merge & Delete Branch] [Cancel]"`
+  - **Primary CTA: "Keep Branch & Merge"** — merges changes into main, branch stays (for reference/rollback). Default choice. Non-destructive.
+  - **Secondary: "Merge & Delete Branch"** — merges and deletes the branch. Destructive action, secondary position.
 - Phase 1: non-conflicting changes only
 - **Merge conflict handling (Phase 1 — improved):** Instead of "Contact support", show which elements conflict:
   `"Can't auto-merge. Conflict on: Hero Section, Navbar. Both branches edited these elements. [Keep main version for conflicts] [Keep branch version for conflicts] [Cancel]"` — per-conflict resolution in Phase 2
@@ -803,8 +840,9 @@ Auto-saves between manual saves do NOT create separate history entries — they 
 
 ### Auto-collapse
 
-- Unpinned panel: canvas click karo → panel auto-collapses
-- Pinned panel: never auto-collapses
+- **Unpinned panel:** canvas click → panel auto-collapses
+- **Pinned panel:** never auto-collapses
+- **Default state:** On viewport > 1200px, panel starts pinned (no auto-collapse). On ≤ 1200px, panel starts unpinned.
 - **Exception 1:** Drag in progress → no collapse (Drag Lock Rule)
 - **Exception 2:** Inline rename input focused → no collapse
 
@@ -839,15 +877,16 @@ Auto-saves between manual saves do NOT create separate history entries — they 
 - Settings tab: read-only — save buttons disabled with tooltip: `"Cannot save while offline"`. Domain verification polling paused.
 - History tab: still browsable (cached), revert disabled with tooltip: `"Revert unavailable while offline"`
 
-### Small screen (< 1200px viewport):
+### Small screen (≤ 1200px viewport):
 - Panel defaults to compact (280px) size mode
-- Pin is off by default (space is tight)
+- **Pin is OFF by default** (space is tight — panel overlays canvas)
 - Rail always visible, panel overlays canvas (doesn't push canvas)
 
-### Large screen (> 1600px viewport):
+### Medium/Large screen (> 1200px viewport):
 - Panel defaults to normal (320px)
-- Pin defaults to on (enough space)
+- **Pin is ON by default** (enough space — panel pushes canvas to the right)
 - Panel pushes canvas (doesn't overlay)
+- This is the standard behavior of Figma, Webflow, Framer on desktop
 
 ### Multiple users editing same page:
 - Layers tab: real-time sync — if Ayesha adds an element, it appears in Shah's Layers panel in real-time
@@ -889,11 +928,18 @@ Auto-saves between manual saves do NOT create separate history entries — they 
 | Component Variants selector | Right Bar Inspector (Advanced tab) | Selection-dependent — not Left Bar |
 | Templates tab kept | Yes, in Left Bar | Canvas-direct — templates drop onto canvas |
 | Design Tokens tab kept | Yes, in Left Bar | Canvas-direct — tokens applied to canvas elements |
-| Page Settings pattern | Drill-in (replaces panel content) | Side drawer onto canvas = too disruptive |
+| Page Settings pattern | Full-page view (same as Site Settings) | 8+ fields in 280px panel = too cramped; full-page is consistent |
 | Panel collapse during drag | Never collapses | Drag is the primary Add/Media/Component workflow |
-| Revert behavior | Adds new history entry, never deletes forward history | Preserves ability to undo the revert |
+| Revert behavior | Adds new history entry, never deletes forward history | Preserves ability to re-revert to any version |
+| Revert undo toast | Removed | Confirmation dialog already protects. Undo would add noise to history |
 | Branch merge conflict Phase 1 | Show which elements conflict + simple keep-main/keep-branch choice | "Contact support" was a dead end |
 | Token "Draft" semantics | Real-time canvas update + Draft = uncommitted set | Users need live preview; Export/Publish use committed version |
+| Token tab guard | Removed | Draft auto-saves to server; "discard" dialog was misleading. Draft chip is the signal |
+| Panel pin default | Pinned on > 1200px, unpinned on ≤ 1200px | Desktop users need panel open constantly; small screens need the space |
+| Rail visual hierarchy | 2-tier: top 6 primary (large), bottom 3 secondary (small/dim) | 9 equal icons create discovery problems; hierarchy matches usage frequency |
+| Branch merge primary CTA | "Keep Branch & Merge" = primary | Deleting a branch is irreversible; conservative action should be default |
+| Add Favorites threshold | 3 uses of same element | Predictable, not too aggressive, not too slow |
+| Escape key behavior | First = select parent, second = deselect | Power user navigation; matches Figma muscle memory |
 
 ---
 
