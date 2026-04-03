@@ -1686,27 +1686,90 @@
   color: #94A3B8;
 }
 
-/* ── Account button — 32×32, user icon ── */
+/* ── Account button — 32×32, dark avatar style (#1F2937) ── */
 .tbAccountBtn {
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: #FFFFFF;
-  border: 1px solid #CBD5E1;
+  background: #1F2937;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #334155;
+  color: #E5E7EB;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 0.12s ease, border-color 0.12s ease;
+  transition: background 0.12s ease;
   text-decoration: none;
   padding: 0;
+  font-family: inherit;
 }
 
 .tbAccountBtn:hover {
-  background: #F1F5F9;
-  border-color: #94A3B8;
+  background: #374151;
+}
+
+/* ── Compact state (States 3-6: in-review, approved, published, offline) ──
+   Buttons shrink to 28×28 and become pill-shaped (999px radius).           */
+.tbBar--compact .tbIconBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+}
+
+.tbBar--compact .tbInviteBtn {
+  height: 28px;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.tbBar--compact .tbCmdBtn {
+  height: 28px;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.tbBar--compact .tbPreviewBtn {
+  height: 28px;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.tbBar--compact .tbHelpBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+}
+
+.tbBar--compact .tbAccountBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+}
+
+/* ── Offline state (State 6) ── */
+.tbBar--offline .tbIconBtn:nth-child(3),
+.tbBar--offline .tbIconBtn:nth-child(4) {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Offline tooltip below publish button */
+.tbOfflineTooltip {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  white-space: nowrap;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #FCA5A5;
+  pointer-events: none;
+  z-index: 100;
 }
 
 /* ── Topbar spinner keyframe (for loading states) ── */

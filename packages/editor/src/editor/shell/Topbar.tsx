@@ -9,6 +9,7 @@ import * as React from "react";
 import type { Composer } from "../../engine";
 import { Tooltip } from "../../shared/ui/Tooltip";
 import type { Issue } from "./hooks/useStudioState";
+import { AccountModal } from "./AccountModal";
 import { CommandPalette } from "./CommandPalette";
 import { InviteModal } from "./InviteModal";
 import { PublishDropdown, type PublishState } from "./PublishDropdown";
@@ -77,6 +78,7 @@ export interface TopbarProps {
   publishState?: PublishState;
   publishLoading?: boolean;
   isPublished?: boolean;
+  isOffline?: boolean;
 
   // Preview
   previewLoading?: boolean;
@@ -136,6 +138,7 @@ export const Topbar: React.FC<TopbarProps> = ({
   pageName = "Home",
   publishState = "draft",
   publishLoading = false,
+  isOffline = false,
   previewLoading = false,
   collaborationSlot,
   onUndo,
@@ -149,6 +152,10 @@ export const Topbar: React.FC<TopbarProps> = ({
 }) => {
   const [cmdOpen, setCmdOpen] = React.useState(false);
   const [inviteOpen, setInviteOpen] = React.useState(false);
+  const [accountOpen, setAccountOpen] = React.useState(false);
+
+  // Compact state: in-review, approved, published, offline
+  const isCompact = publishState !== "draft" || isOffline;
 
   // ⌘K global shortcut
   React.useEffect(() => {
@@ -175,7 +182,7 @@ export const Topbar: React.FC<TopbarProps> = ({
   return (
     <>
       <div className="tbWrap">
-        <div className="tbBar">
+        <div className={["tbBar", isCompact && "tbBar--compact", isOffline && "tbBar--offline"].filter(Boolean).join(" ")}>
 
           {/* ── LEFT: Back · Divider · Undo · Redo ── */}
           <div className="tbLeft">
@@ -278,12 +285,19 @@ export const Topbar: React.FC<TopbarProps> = ({
               </button>
             </Tooltip>
 
-            <PublishDropdown
-              publishState={publishState}
-              loading={publishLoading}
-              onPublish={onPublish}
-              onSave={onSave}
-            />
+            <div style={{ position: "relative" }}>
+              <PublishDropdown
+                publishState={publishState}
+                loading={publishLoading}
+                onPublish={onPublish}
+                onSave={onSave}
+              />
+              {isOffline && (
+                <div className="tbOfflineTooltip">
+                  Cannot publish while offline
+                </div>
+              )}
+            </div>
 
             <Tooltip content="Help">
               <button
@@ -296,14 +310,13 @@ export const Topbar: React.FC<TopbarProps> = ({
             </Tooltip>
 
             <Tooltip content="Account settings">
-              <a
-                href={`${dashboardUrl}/account`}
+              <button
                 className="tbAccountBtn"
                 aria-label="Account settings"
-                onClick={onAccount ? (e) => { e.preventDefault(); onAccount(); } : undefined}
+                onClick={() => { setAccountOpen(true); onAccount?.(); }}
               >
                 <IconUser />
-              </a>
+              </button>
             </Tooltip>
           </div>
 
@@ -317,6 +330,10 @@ export const Topbar: React.FC<TopbarProps> = ({
 
       {inviteOpen && (
         <InviteModal onClose={() => setInviteOpen(false)} />
+      )}
+
+      {accountOpen && (
+        <AccountModal onClose={() => setAccountOpen(false)} />
       )}
     </>
   );

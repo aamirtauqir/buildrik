@@ -264,20 +264,9 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       onOpenAI={onShowAI}
       onOpenIssues={onOpenIssues}
       collaborationSlot={
-        <>
-          <SyncStatusIndicator
-            status={syncStatus}
-            managerState={syncManagerState}
-            onSync={handleSync}
-            compact
-          />
-          {hasTransport && (
-            <ConnectionQualityIndicator stats={connectionStats} isConnected={isConnected} />
-          )}
-          {hasTransport && (
-            <PresenceIndicators users={users} currentUser={currentUser} state={collaborationState} />
-          )}
-        </>
+        hasTransport ? (
+          <PresenceIndicators users={users} currentUser={currentUser} state={collaborationState} />
+        ) : undefined
       }
     />
   );
