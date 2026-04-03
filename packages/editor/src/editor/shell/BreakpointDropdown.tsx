@@ -100,29 +100,30 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
           gap: 4,
           height: 30,
           padding: "0 10px",
-          background: "var(--aqb-surface-3)",
-          border: "1px solid var(--aqb-border)",
-          borderRadius: "var(--aqb-radius-md)",
-          color: "var(--aqb-text-primary)",
+          background: "#FFFFFF",
+          border: "1px solid #D1D9E6",
+          borderRadius: 8,
+          color: "#334155",
           fontSize: 12,
           fontWeight: 500,
           cursor: "pointer",
           whiteSpace: "nowrap",
-          transition: "border-color 0.15s ease",
+          transition: "border-color 0.12s ease",
+          fontFamily: "inherit",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = "var(--aqb-border-hover)";
+          e.currentTarget.style.borderColor = "#94A3B8";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = "var(--aqb-border)";
+          e.currentTarget.style.borderColor = "#D1D9E6";
         }}
       >
-        <span style={{ color: "var(--aqb-text-primary)", fontSize: 12, fontWeight: 500 }}>
+        <span style={{ color: "#334155", fontSize: 12, fontWeight: 500 }}>
           {currentWidth}px
         </span>
         <span
           style={{
-            color: "var(--aqb-text-muted)",
+            color: "#94A3B8",
             fontSize: 10,
             lineHeight: 1,
             marginLeft: 2,
@@ -143,10 +144,10 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
             top: buttonRef.current.getBoundingClientRect().bottom + 6,
             left: buttonRef.current.getBoundingClientRect().left,
             width: 200,
-            background: "var(--aqb-surface-3)",
-            border: "1px solid var(--aqb-border-light)",
-            borderRadius: "var(--aqb-radius-md)",
-            boxShadow: "var(--aqb-shadow-lg)",
+            background: "#FFFFFF",
+            border: "1px solid #D1D9E6",
+            borderRadius: 8,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
             overflow: "hidden",
             zIndex: 10000,
           }}
@@ -170,9 +171,9 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
                     width: "100%",
                     height: 32,
                     padding: "0 12px",
-                    background: isActive ? "var(--aqb-primary-subtle)" : "transparent",
+                    background: isActive ? "#EFF6FF" : "transparent",
                     border: "none",
-                    color: isActive ? "var(--aqb-primary)" : "var(--aqb-text-secondary)",
+                    color: isActive ? "#2563EB" : "#475569",
                     fontSize: 13,
                     cursor: "pointer",
                     textAlign: "left",
@@ -180,24 +181,22 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.background = "var(--aqb-bg-hover)";
+                      e.currentTarget.style.background = "#F1F5F9";
                     }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = isActive
-                      ? "var(--aqb-primary-subtle)"
-                      : "transparent";
+                    e.currentTarget.style.background = isActive ? "#EFF6FF" : "transparent";
                   }}
                 >
                   <span style={{ flex: 1 }}>{preset.label}</span>
-                  <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>
+                  <span style={{ fontSize: 12, color: "#94A3B8" }}>
                     {preset.width}px
                   </span>
                   {isActive && (
                     <span
                       style={{
                         marginLeft: 8,
-                        color: "var(--aqb-primary)",
+                        color: "#2563EB",
                         fontSize: 11,
                         flexShrink: 0,
                       }}
@@ -211,20 +210,14 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
           </div>
 
           {/* Divider */}
-          <div
-            style={{
-              height: 1,
-              background: "var(--aqb-border)",
-              margin: "0",
-            }}
-          />
+          <div style={{ height: 1, background: "#E2E8F0", margin: "0" }} />
 
           {/* Custom size input */}
           <div style={{ padding: "8px 12px" }}>
             <div
               style={{
                 fontSize: 11,
-                color: "var(--aqb-text-muted)",
+                color: "#94A3B8",
                 marginBottom: 6,
                 fontWeight: 500,
                 textTransform: "uppercase",
@@ -248,16 +241,16 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
                   flex: 1,
                   height: 28,
                   padding: "0 8px",
-                  background: "var(--aqb-surface-2)",
-                  border: "1px solid var(--aqb-border)",
-                  borderRadius: "var(--aqb-radius-sm)",
-                  color: "var(--aqb-text-primary)",
+                  background: "#F8FAFC",
+                  border: "1px solid #D1D9E6",
+                  borderRadius: 6,
+                  color: "#334155",
                   fontSize: 12,
                   outline: "none",
                   MozAppearance: "textfield" as React.CSSProperties["MozAppearance"],
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "var(--aqb-border-focus)";
+                  e.currentTarget.style.borderColor = "#2563EB";
                 }}
                 aria-label="Custom viewport width in pixels"
               />
