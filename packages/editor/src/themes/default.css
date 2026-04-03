@@ -1446,6 +1446,7 @@
 /* ============================================
    Topbar — New Design 2026
    Light theme: #F8FAFC bg, 56px, tb-* classes
+   Spec: Component/Topbar/Main — left icon-btns (r=8) | breadcrumb | collab+actions
    ============================================ */
 
 /* Outer shell */
@@ -1454,7 +1455,7 @@
   height: 56px;
   min-height: 56px;
   background: #F8FAFC;
-  border-bottom: 1px solid #D1D9E6;
+  border-bottom: 1px solid #CBD5E1;
   flex-shrink: 0;
   box-sizing: border-box;
 }
@@ -1481,7 +1482,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -1489,15 +1489,208 @@
 .tbRight {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex: 0 0 auto;
 }
 
-/* Circle button — 32×32 (back, undo, redo) */
-.tbCircleBtn {
+/* ── Icon button — 32×32, cornerRadius 8 (back, undo, redo) ── */
+.tbIconBtn {
   width: 32px;
   height: 32px;
+  border-radius: 8px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #334155;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s ease, border-color 0.12s ease;
+  text-decoration: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.tbIconBtn:hover:not(:disabled) {
+  background: #F1F5F9;
+  border-color: #94A3B8;
+}
+
+.tbIconBtn:active:not(:disabled) {
+  background: #E2E8F0;
+}
+
+.tbIconBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ── Vertical divider ── */
+.tbDivider {
+  width: 1px;
+  height: 20px;
+  background: #CBD5E1;
+  flex-shrink: 0;
+}
+
+/* ── Breadcrumb (center, default state) ── */
+.tbBreadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tbBreadcrumb-project {
+  font-size: 13px;
+  font-weight: 400;
+  color: #64748B;
+  white-space: nowrap;
+}
+
+.tbBreadcrumb-sep {
+  font-size: 13px;
+  color: #CBD5E1;
+}
+
+.tbBreadcrumb-page {
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  white-space: nowrap;
+}
+
+/* ── Issues badge (center, State 2) ── */
+.tbIssuesBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: #3F1D1D;
+  border: 1px solid #B91C1C;
   border-radius: 999px;
+  color: #FCA5A5;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: background 0.12s ease;
+}
+
+.tbIssuesBadge:hover {
+  background: #4D1F1F;
+}
+
+/* ── Invite ghost button ── */
+.tbInviteBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: transparent;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  color: #CBD5E1;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.tbInviteBtn:hover {
+  background: #F8FAFC;
+  border-color: #94A3B8;
+  color: #64748B;
+}
+
+/* ── Command palette button (⌘K) ── */
+.tbCmdBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.tbCmdBtn:hover {
+  background: #F1F5F9;
+  border-color: #94A3B8;
+}
+
+.tbCmdText {
+  font-size: 12px;
+  font-weight: 600;
+  color: #CBD5E1;
+}
+
+/* ── Preview button ── */
+.tbPreviewBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.tbPreviewBtn:hover:not(:disabled) {
+  background: #F1F5F9;
+  border-color: #94A3B8;
+}
+
+.tbPreviewBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Help button — 32×32, muted "?" ── */
+.tbHelpBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #CBD5E1;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  font-family: inherit;
+  padding: 0;
+}
+
+.tbHelpBtn:hover {
+  background: #F1F5F9;
+  border-color: #94A3B8;
+  color: #94A3B8;
+}
+
+/* ── Account button — 32×32, user icon ── */
+.tbAccountBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   background: #FFFFFF;
   border: 1px solid #CBD5E1;
   display: flex;
@@ -1511,143 +1704,12 @@
   padding: 0;
 }
 
-.tbCircleBtn:hover:not(:disabled) {
+.tbAccountBtn:hover {
   background: #F1F5F9;
   border-color: #94A3B8;
 }
 
-.tbCircleBtn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-/* Vertical divider */
-.tbDivider {
-  width: 1px;
-  height: 20px;
-  background: #CBD5E1;
-  flex-shrink: 0;
-}
-
-/* Standard inline button (preview, ⌘K) */
-.tbBtn {
-  height: 30px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 10px;
-  background: #FFFFFF;
-  border: 1px solid #D1D9E6;
-  border-radius: 8px;
-  color: #334155;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.12s ease, border-color 0.12s ease;
-  font-family: inherit;
-}
-
-.tbBtn:hover:not(:disabled) {
-  background: #F1F5F9;
-  border-color: #94A3B8;
-}
-
-.tbBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Ghost variant — Invite */
-.tbBtnGhost {
-  background: transparent;
-  border-color: #CBD5E1;
-  color: #94A3B8;
-}
-
-.tbBtnGhost:hover:not(:disabled) {
-  background: #F8FAFC;
-  border-color: #94A3B8;
-  color: #64748B;
-}
-
-/* Publish CTA */
-.tbBtnPublish {
-  height: 30px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 10px;
-  background: #2563EB;
-  border: none;
-  border-radius: 10px;
-  color: #FFFFFF;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.12s ease, transform 0.12s ease, box-shadow 0.12s ease;
-  font-family: inherit;
-}
-
-.tbBtnPublish:hover:not(:disabled) {
-  background: #1D4ED8;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
-}
-
-.tbBtnPublish:active:not(:disabled) {
-  background: #1E40AF;
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-.tbBtnPublish:disabled {
-  opacity: 0.6;
-  cursor: wait;
-}
-
-/* Draft badge inside publish button */
-.tbDraftBadge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px 6px;
-  background: #1E3A8A;
-  border-radius: 999px;
-  color: #BFDBFE;
-  font-size: 10px;
-  font-weight: 700;
-  line-height: 1;
-}
-
-/* Square icon button — 30×30 (help, account) */
-.tbSquareBtn {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  background: #FFFFFF;
-  border: 1px solid #D1D9E6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #334155;
-  cursor: pointer;
-  flex-shrink: 0;
-  font-size: 14px;
-  font-weight: 700;
-  transition: background 0.12s ease, border-color 0.12s ease;
-  font-family: inherit;
-  text-decoration: none;
-  padding: 0;
-}
-
-.tbSquareBtn:hover {
-  background: #F1F5F9;
-  border-color: #94A3B8;
-}
-
-/* Topbar spinner keyframe */
+/* ── Topbar spinner keyframe (for loading states) ── */
 @keyframes tbSpin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
