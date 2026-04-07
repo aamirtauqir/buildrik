@@ -286,9 +286,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
           onDrawerToggle={onLeftPanelToggle ?? (() => {})}
           isPinned={panelPinned}
-          onPinToggle={onLeftPanelToggle ? () => {
-            // Pin toggle — future: separate pin state management
-          } : undefined}
           onElementSelect={handleElementSelect}
           onBlockClick={handleBlockClick}
           canvasHoveredId={canvasHoveredId}

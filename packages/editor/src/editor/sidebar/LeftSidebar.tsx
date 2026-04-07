@@ -11,7 +11,7 @@ import "./LeftSidebar.css";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants/events";
 import type { GroupedTabId, TabZone } from "../rail/tabsConfig";
-import { getTabWidth, getTabConfig, getTabsByZone, GROUPED_TABS_CONFIG } from "../rail/tabsConfig";
+import { getTabWidth, getTabConfig, getTabsByZone } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
 import type { PublishResult } from "../../shared/hooks/usePublish";
 import { ConfirmDialog } from "../../shared/ui/Modal";
@@ -130,8 +130,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onTabChange,
   drawerOpen,
   onDrawerToggle,
-  isPinned = true,
-  onPinToggle,
+  isPinned: controlledPinned,
+  onPinToggle: controlledPinToggle,
   onElementSelect,
   onBlockClick,
   canvasHoveredId,
@@ -144,6 +144,11 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const navRef = React.useRef<HTMLElement>(null);
   const panelContentRef = React.useRef<HTMLDivElement>(null);
   const [errorKey, setErrorKey] = React.useState(0);
+
+  // Internal pin state (when not controlled externally)
+  const [internalPinned, setInternalPinned] = React.useState(true);
+  const isPinned = controlledPinned ?? internalPinned;
+  const onPinToggle = controlledPinToggle ?? (() => setInternalPinned((p) => !p));
 
   // Settings dirty-state guard
   const [settingsDirty, setSettingsDirty] = React.useState(false);
@@ -306,15 +311,13 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         <div className="ls-panel-header">
           <span className="ls-panel-title">{panelTitle}</span>
           <div className="ls-panel-header-spacer" />
-          {onPinToggle && (
-            <button
-              className="ls-panel-icon-btn"
-              onClick={onPinToggle}
-              aria-label={isPinned ? "Unpin panel" : "Pin panel"}
-            >
-              <Pin size={16} />
-            </button>
-          )}
+          <button
+            className="ls-panel-icon-btn"
+            onClick={onPinToggle}
+            aria-label={isPinned ? "Unpin panel" : "Pin panel"}
+          >
+            <Pin size={16} />
+          </button>
           <button
             className="ls-panel-icon-btn"
             onClick={onDrawerToggle}
