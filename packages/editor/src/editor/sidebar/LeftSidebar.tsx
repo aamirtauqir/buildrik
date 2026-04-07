@@ -1,14 +1,7 @@
 /**
- * LeftSidebar — Expandable panel container for the 9-tab system
- *
- * Responsibilities (thin wrapper):
- * 1. Compose extracted modules: TabRouter, useSidebarState, useSidebarKeyboard
- * 2. Render panel shell with error boundary + suspense
- * 3. Pass common props down to active tab
- *
- * 9-TAB STRUCTURE (IA Redesign 2026):
- * TOP: Add | Layers | Pages | Components | Assets
- * BOTTOM: Design | Settings | Publish | History
+ * LeftSidebar — Merged rail + panel component
+ * Rail: 60px icon navigation with 3 zones (creation, structure, config)
+ * Panel: Variable-width drawer with header, pin, close, and tab content
  *
  * @license BSD-3-Clause
  */
@@ -17,7 +10,8 @@ import * as React from "react";
 import "./LeftSidebar.css";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants/events";
-import type { GroupedTabId } from "../rail/tabsConfig";
+import type { GroupedTabId, TabZone } from "../rail/tabsConfig";
+import { getTabWidth, getTabConfig, getTabsByZone, GROUPED_TABS_CONFIG } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
 import type { PublishResult } from "../../shared/hooks/usePublish";
 import { ConfirmDialog } from "../../shared/ui/Modal";
@@ -25,124 +19,222 @@ import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBo
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
 import { TabRouter } from "./TabRouter";
 import { useSidebarKeyboard } from "./useSidebarKeyboard";
-import { useSidebarState } from "./useSidebarState";
-import { LAYOUT } from "../../shared/constants/layout";
-import type { PanelSizeMode } from "../../shared/types/ui";
+import {
+  Plus,
+  LayoutGrid,
+  Image,
+  Layers,
+  File,
+  Diamond,
+  Settings,
+  Timer,
+  Info,
+  Pin,
+  X,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+// ============================================
+// Icon map — lucide icon name → component
+// ============================================
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  Plus,
+  LayoutGrid,
+  Image,
+  Layers,
+  File,
+  Diamond,
+  Settings,
+  Timer,
+  Info,
+};
+
+// ============================================
+// Types
+// ============================================
 
 export interface LeftSidebarProps {
   composer: Composer | null;
+  activeTab: GroupedTabId;
+  onTabChange: (tab: GroupedTabId) => void;
+  drawerOpen: boolean;
+  onDrawerToggle: () => void;
+  isPinned?: boolean;
+  onPinToggle?: () => void;
   onElementSelect?: (elementId: string) => void;
   onBlockClick?: (block: BlockData) => void;
-  activePrimaryTab?: GroupedTabId;
-  onPrimaryTabChange?: (tab: GroupedTabId) => void;
-  isPanelExpanded?: boolean;
-  onPanelExpandedChange?: (expanded: boolean) => void;
-  isPanelPinned?: boolean;
-  onPanelPinnedChange?: (pinned: boolean) => void;
-  panelSizeMode?: PanelSizeMode;
-  onPanelSizeModeChange?: (mode: PanelSizeMode) => void;
   canvasHoveredId?: string | null;
-  /** Use minimal styles when parent handles layout (e.g. LayoutShell) */
-  useMinimalContainer?: boolean;
-  onOpenCommandPalette?: () => void;
   onReplayTour?: () => void;
   projectId?: string | null;
   onPublish?: (projectId: string) => Promise<PublishResult>;
   onUnpublish?: (projectId: string) => Promise<void>;
+  onExportForDeploy?: () => Promise<{
+    files: Array<{ path: string; content: string }>;
+    projectName?: string;
+  }>;
 }
+
+// ============================================
+// Zone rendering
+// ============================================
+
+const ZONES: TabZone[] = ["creation", "structure", "config"];
+
+function RailZone({
+  zone,
+  activeTab,
+  drawerOpen,
+  onBtnClick,
+}: {
+  zone: TabZone;
+  activeTab: GroupedTabId;
+  drawerOpen: boolean;
+  onBtnClick: (tabId: GroupedTabId) => void;
+}) {
+  const tabs = React.useMemo(() => getTabsByZone(zone), [zone]);
+
+  return (
+    <div className="ls-zone">
+      {tabs.map((tab) => {
+        const Icon = ICON_MAP[tab.iconName];
+        if (!Icon) return null;
+        const isActive = tab.id === activeTab && drawerOpen;
+
+        return (
+          <button
+            key={tab.id}
+            className={`ls-btn${isActive ? " ls-btn--active" : ""}`}
+            onClick={() => onBtnClick(tab.id)}
+            role="tab"
+            aria-selected={isActive}
+            aria-label={tab.ariaLabel}
+            data-tab={tab.id}
+          >
+            {isActive && <div className="ls-btn-bar" />}
+            <Icon size={20} />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ============================================
+// LeftSidebar Component
+// ============================================
 
 export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   composer,
+  activeTab,
+  onTabChange,
+  drawerOpen,
+  onDrawerToggle,
+  isPinned = true,
+  onPinToggle,
   onElementSelect,
   onBlockClick,
-  activePrimaryTab: controlledPrimaryTab,
-  onPrimaryTabChange,
-  isPanelExpanded: controlledExpanded,
-  onPanelExpandedChange,
-  isPanelPinned: controlledPinned,
-  onPanelPinnedChange,
-  panelSizeMode,
-  onPanelSizeModeChange,
   canvasHoveredId,
-  useMinimalContainer = false,
   onReplayTour,
   projectId,
   onPublish,
   onUnpublish,
+  onExportForDeploy,
 }) => {
-  // State: tab selection, expand/collapse, pin, persistence
-  const state = useSidebarState({
-    controlledPrimaryTab,
-    onPrimaryTabChange,
-    controlledExpanded,
-    onPanelExpandedChange,
-    controlledPinned,
-    onPanelPinnedChange,
-  });
+  const navRef = React.useRef<HTMLElement>(null);
+  const panelContentRef = React.useRef<HTMLDivElement>(null);
+  const [errorKey, setErrorKey] = React.useState(0);
 
-  // Settings dirty-state guard — intercept tab switches when a sub-screen has unsaved changes
+  // Settings dirty-state guard
   const [settingsDirty, setSettingsDirty] = React.useState(false);
-  const [tabGuard, setTabGuard] = React.useState<{ open: boolean; pendingTab: GroupedTabId | null }>({
-    open: false,
-    pendingTab: null,
-  });
+  const [tabGuard, setTabGuard] = React.useState<{
+    open: boolean;
+    pendingTab: GroupedTabId | null;
+  }>({ open: false, pendingTab: null });
 
-  // Intercept programmatic tab changes (keyboard shortcuts, internal nav)
   const safeTabChange = React.useCallback(
     (tab: GroupedTabId) => {
-      if (state.activePrimaryTab === "settings" && settingsDirty) {
+      if (activeTab === "settings" && settingsDirty) {
         setTabGuard({ open: true, pendingTab: tab });
       } else {
-        state.handlePrimaryTabChange(tab);
+        onTabChange(tab);
       }
     },
-    [state, settingsDirty]
+    [activeTab, onTabChange, settingsDirty]
   );
-
-  // Detect rail-driven (prop-driven) tab switch away from Settings while dirty
-  const prevActiveTabRef = React.useRef<GroupedTabId>(state.activePrimaryTab);
-  React.useEffect(() => {
-    const prev = prevActiveTabRef.current;
-    prevActiveTabRef.current = state.activePrimaryTab;
-    if (prev === "settings" && state.activePrimaryTab !== "settings" && settingsDirty) {
-      setTabGuard({ open: true, pendingTab: state.activePrimaryTab });
-    }
-  }, [state.activePrimaryTab, settingsDirty]);
 
   const confirmTabSwitch = React.useCallback(() => {
     const dest = tabGuard.pendingTab;
     setTabGuard({ open: false, pendingTab: null });
     setSettingsDirty(false);
-    if (dest) state.handlePrimaryTabChange(dest);
-  }, [tabGuard.pendingTab, state]);
+    if (dest) onTabChange(dest);
+  }, [tabGuard.pendingTab, onTabChange]);
 
   const cancelTabSwitch = React.useCallback(() => {
     setTabGuard({ open: false, pendingTab: null });
-    // If rail already switched, revert back to Settings
-    if (state.activePrimaryTab !== "settings") {
-      state.handlePrimaryTabChange("settings");
+    if (activeTab !== "settings") {
+      onTabChange("settings");
     }
-  }, [state]);
+  }, [activeTab, onTabChange]);
 
-  // Keyboard shortcuts (A=Add, Z=Layers, P=Pages, etc.)
+  // Rail button click: toggle drawer if same tab, else switch tab
+  const handleBtnClick = React.useCallback(
+    (tabId: GroupedTabId) => {
+      if (tabId === activeTab) {
+        onDrawerToggle();
+      } else {
+        safeTabChange(tabId);
+      }
+    },
+    [activeTab, onDrawerToggle, safeTabChange]
+  );
+
+  // Keyboard nav within rail
+  const handleKeyDown = React.useCallback(
+    (e: React.KeyboardEvent) => {
+      const buttons = navRef.current?.querySelectorAll<HTMLElement>('[role="tab"]');
+      if (!buttons || buttons.length === 0) return;
+      const arr = Array.from(buttons);
+      const idx = arr.indexOf(document.activeElement as HTMLElement);
+      if (idx === -1) return;
+
+      let nextIdx = idx;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        nextIdx = (idx + 1) % arr.length;
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        nextIdx = (idx - 1 + arr.length) % arr.length;
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        nextIdx = 0;
+      } else if (e.key === "End") {
+        e.preventDefault();
+        nextIdx = arr.length - 1;
+      }
+
+      if (nextIdx !== idx) {
+        const nextButton = arr[nextIdx];
+        const tabId = nextButton.dataset.tab as GroupedTabId | undefined;
+        if (tabId) safeTabChange(tabId);
+        nextButton.focus();
+      }
+    },
+    [safeTabChange]
+  );
+
+  // Global keyboard shortcuts (A, T, Z, etc.)
   useSidebarKeyboard(safeTabChange);
 
-  // Help click handler
-  const handleHelpClick = React.useCallback(() => {
-    window.open("https://docs.aquibra.com", "_blank");
-  }, []);
-
-  // Create component handler
+  // Component creation handler
   const handleCreateComponent = React.useCallback(() => {
     if (!composer) return;
     const hasComponentsApi =
       typeof (composer?.elements as unknown as Record<string, unknown> | undefined)?.[
         "getComponents"
       ] === "function";
-    if (!hasComponentsApi) {
-      // Components API not ready — do not create orphaned data
-      return;
-    }
+    if (!hasComponentsApi) return;
     const selectedIds = composer.selection.getSelectedIds();
     const elementId = selectedIds[0];
     if (elementId) {
@@ -150,54 +242,97 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
     }
   }, [composer]);
 
-  // Common props passed to every tab
+  // Panel header info
+  const tabConfig = getTabConfig(activeTab);
+  const panelWidth = getTabWidth(activeTab);
+  const panelTitle = tabConfig?.label ?? "Panel";
+
   const commonTabProps = {
-    isPinned: state.isPanelPinned,
-    onPinToggle: state.handlePinToggle,
-    onHelpClick: handleHelpClick,
-    onClose: state.handlePanelClose,
+    isPinned,
+    onPinToggle: onPinToggle ?? (() => {}),
+    onHelpClick: () => window.open("https://docs.buildrik.com", "_blank"),
+    onClose: onDrawerToggle,
   };
 
-  // Container + panel styles
-  const containerStyle = useMinimalContainer ? minimalFillStyles : containerStyles;
-
-  // When size controls footer is shown, tabpanel must flex-grow instead of height:100%
-  const hasSizeControls = Boolean(onPanelSizeModeChange);
-  const panelStyle = useMinimalContainer
-    ? hasSizeControls
-      ? { ...minimalFillStyles, height: "auto", flex: 1, minHeight: 0 }
-      : minimalFillStyles
-    : {
-        ...panelStyles,
-        width: state.isPanelExpanded ? LAYOUT.DRAWER_WIDTH : 0,
-        opacity: state.isPanelExpanded ? 1 : 0,
-        overflow: state.isPanelExpanded ? ("visible" as const) : ("hidden" as const),
-      };
-
   return (
-    <nav role="region" aria-label="Editor Navigation Panel" style={containerStyle}>
-        <div
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
-          style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap' }}
-        />
-      <div
-        style={panelStyle}
-        role="tabpanel"
-        id={`sidebar-panel-${state.activePrimaryTab}`}
-        aria-labelledby={`sidebar-tab-${state.activePrimaryTab}`}
-        aria-hidden={!state.isPanelExpanded && !useMinimalContainer}
+    <div className="ls-root">
+      {/* Rail */}
+      <nav
+        ref={navRef}
+        className="ls-rail"
+        role="tablist"
+        aria-label="Editor navigation"
+        aria-orientation="vertical"
+        onKeyDown={handleKeyDown}
       >
-        <div ref={state.panelContentRef} style={contentStyles} tabIndex={-1}>
-          <InspectorErrorBoundary
-            key={state.errorKey}
-            fallback={<SidebarErrorFallback onRetry={state.resetError} />}
+        <div className="ls-logo">
+          <Layers size={28} />
+        </div>
+
+        <div className="ls-divider" />
+
+        {ZONES.map((zone, i) => (
+          <React.Fragment key={zone}>
+            <RailZone
+              zone={zone}
+              activeTab={activeTab}
+              drawerOpen={drawerOpen}
+              onBtnClick={handleBtnClick}
+            />
+            {i < ZONES.length - 1 && <div className="ls-divider" />}
+          </React.Fragment>
+        ))}
+
+        <div className="ls-spacer" />
+
+        <a
+          className="ls-btn ls-btn--help"
+          href="https://docs.buildrik.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Help and documentation"
+        >
+          <Info size={20} />
+        </a>
+      </nav>
+
+      {/* Panel */}
+      <div
+        className={`ls-panel${!drawerOpen ? " ls-panel--closed" : ""}`}
+        style={{ width: drawerOpen ? panelWidth : 0 }}
+        role="tabpanel"
+        aria-hidden={!drawerOpen}
+      >
+        <div className="ls-panel-header">
+          <span className="ls-panel-title">{panelTitle}</span>
+          <div className="ls-panel-header-spacer" />
+          {onPinToggle && (
+            <button
+              className="ls-panel-icon-btn"
+              onClick={onPinToggle}
+              aria-label={isPinned ? "Unpin panel" : "Pin panel"}
+            >
+              <Pin size={16} />
+            </button>
+          )}
+          <button
+            className="ls-panel-icon-btn"
+            onClick={onDrawerToggle}
+            aria-label="Close panel"
           >
-            <div key={state.activePrimaryTab} className="aqb-panel-animate">
+            <X size={16} />
+          </button>
+        </div>
+
+        <div ref={panelContentRef} className="ls-panel-content" tabIndex={-1}>
+          <InspectorErrorBoundary
+            key={errorKey}
+            fallback={<SidebarErrorFallback onRetry={() => setErrorKey((k) => k + 1)} />}
+          >
+            <div key={activeTab} className="ls-panel-animate">
               <React.Suspense fallback={<PanelSkeleton />}>
                 <TabRouter
-                  activeTab={state.activePrimaryTab}
+                  activeTab={activeTab}
                   composer={composer}
                   commonTabProps={commonTabProps}
                   onBlockClick={onBlockClick}
@@ -211,35 +346,15 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onPublish={onPublish}
                   onUnpublish={onUnpublish}
                   onSettingsDirtyChange={setSettingsDirty}
-                  onTemplatesSwitchTab={(tab) => safeTabChange(tab as import("../rail/tabsConfig").GroupedTabId)}
+                  onTemplatesSwitchTab={(tab) => safeTabChange(tab as GroupedTabId)}
                 />
               </React.Suspense>
             </div>
           </InspectorErrorBoundary>
         </div>
       </div>
-      {hasSizeControls && (
-        <div style={sizeModeBarStyles} role="toolbar" aria-label="Panel width">
-          {(["compact", "normal", "extended"] as const).map((mode) => (
-            <button
-              key={mode}
-              onClick={() => onPanelSizeModeChange!(mode)}
-              className={`aqb-icon-btn${panelSizeMode === mode ? " aqb-icon-btn--active" : ""}`}
-              title={
-                mode === "compact"
-                  ? "Compact (280px)"
-                  : mode === "normal"
-                    ? "Normal (320px)"
-                    : "Wide (400px)"
-              }
-              aria-pressed={panelSizeMode === mode}
-              style={sizeModeButtonStyles}
-            >
-              <SizeModeIcon mode={mode} active={panelSizeMode === mode} />
-            </button>
-          ))}
-        </div>
-      )}
+
+      {/* Settings dirty guard */}
       <ConfirmDialog
         isOpen={tabGuard.open}
         onClose={cancelTabSwitch}
@@ -249,111 +364,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         confirmText="Discard & Switch"
         variant="danger"
       />
-    </nav>
-  );
-};
-
-// ============================================
-// Styles
-// ============================================
-
-const containerStyles: React.CSSProperties = {
-  position: "absolute",
-  top: "var(--aqb-header-height)",
-  bottom: "var(--aqb-footer-height)",
-  left: "var(--aqb-layout-gap)",
-  display: "flex",
-  flexDirection: "row",
-  height: "calc(100% - calc(var(--aqb-header-height) + var(--aqb-footer-height)))",
-  background: "var(--aqb-sidebar-glass-bg)",
-  backdropFilter: "var(--aqb-sidebar-glass-blur)",
-  WebkitBackdropFilter: "var(--aqb-sidebar-glass-blur)",
-  borderRadius: "var(--aqb-radius-xl)",
-  border: "1px solid var(--aqb-sidebar-glass-border)",
-  boxShadow: "var(--aqb-sidebar-glass-shadow)",
-  transition: "width 0.3s var(--aqb-ease-bounce)",
-  zIndex: 2000,
-  overflow: "hidden",
-};
-
-const panelStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  transition: "width 0.2s ease, opacity 0.15s ease",
-};
-
-const contentStyles: React.CSSProperties = {
-  flex: 1,
-  overflow: "hidden",
-  display: "flex",
-  flexDirection: "column",
-};
-
-const minimalFillStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  width: "100%",
-  height: "100%",
-  overflow: "hidden",
-};
-
-const sizeModeBarStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: 2,
-  height: 32,
-  minHeight: 32,
-  borderTop: "1px solid var(--aqb-border)",
-  background: "var(--aqb-surface-2)",
-  flexShrink: 0,
-};
-
-const sizeModeButtonStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: 28,
-  height: 24,
-  padding: 0,
-};
-
-// ============================================
-// SizeModeIcon — inline SVG icons for S/M/L panel widths
-// ============================================
-const SizeModeIcon: React.FC<{ mode: PanelSizeMode; active: boolean }> = ({ mode }) => {
-  // Three vertical bars representing relative panel widths
-  const bars = {
-    compact: [{ h: 10 }, { h: 6 }, { h: 8 }],
-    normal: [{ h: 10 }, { h: 9 }, { h: 10 }],
-    extended: [{ h: 10 }, { h: 10 }, { h: 10 }],
-  };
-
-  if (mode === "compact") {
-    return (
-      <svg width="14" height="11" viewBox="0 0 14 11" fill="currentColor" aria-hidden="true">
-        <rect x="0" y="1" width="5" height="9" rx="1" />
-        <rect x="6" y="3" width="3" height="7" rx="0.5" opacity="0.4" />
-        <rect x="10" y="3" width="3" height="7" rx="0.5" opacity="0.4" />
-      </svg>
-    );
-  }
-  if (mode === "normal") {
-    return (
-      <svg width="14" height="11" viewBox="0 0 14 11" fill="currentColor" aria-hidden="true">
-        <rect x="0" y="1" width="7" height="9" rx="1" />
-        <rect x="8" y="3" width="2.5" height="7" rx="0.5" opacity="0.4" />
-        <rect x="11" y="3" width="2.5" height="7" rx="0.5" opacity="0.4" />
-      </svg>
-    );
-  }
-  // extended
-  void bars;
-  return (
-    <svg width="14" height="11" viewBox="0 0 14 11" fill="currentColor" aria-hidden="true">
-      <rect x="0" y="1" width="10" height="9" rx="1" />
-      <rect x="11" y="3" width="3" height="7" rx="0.5" opacity="0.4" />
-    </svg>
+    </div>
   );
 };
 
