@@ -1,17 +1,18 @@
 /**
  * LayoutShell - Main CSS Grid container for the editor
- * Implements the IA Redesign 2026 layout specification
  *
- * Grid Structure:
- * - Columns: Rail (56px) | Drawer (280px) | Canvas (1fr) | Inspector (300px)
- * - Rows: TopBar (52px) | Main Content (1fr) | Footer (40px in canvas)
+ * Grid Structure (panel mode):
+ * - Columns: Rail (60px) | Drawer (variable) | Canvas (1fr) | Inspector (280px)
+ * - Rows: TopBar (52px) | Main Content (1fr)
+ *
+ * Grid Structure (fullpage mode):
+ * - Columns: Rail (60px) | FullPage (spans remaining)
+ * - Canvas + Inspector hidden via visibility:hidden (preserves WebGL/iframe state)
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import type { PanelSizeMode } from "../../shared/types/ui";
-import { DRAWER_SIZE_WIDTHS } from "../../shared/constants/layout";
 import "./LayoutShell.css";
 
 // ============================================
@@ -19,33 +20,24 @@ import "./LayoutShell.css";
 // ============================================
 
 export interface LayoutShellProps {
-  /** Children to render in the layout slots */
   children: React.ReactNode;
-  /** Whether the drawer panel is open */
+  /** Whether the drawer panel is open (panel mode only) */
   drawerOpen: boolean;
   /** Whether the drawer is pinned (takes grid space) or overlays the canvas */
   drawerPinned?: boolean;
-  /** Drawer width preset: compact=280px | normal=320px | extended=400px */
-  drawerSizeMode?: PanelSizeMode;
+  /** Drawer width in pixels (200 or 280, per-tab) */
+  drawerWidth?: number;
+  /** Whether a fullpage tab is active (Templates, Settings, History) */
+  fullPageMode?: boolean;
   /** Whether the inspector panel is visible */
   inspectorOpen?: boolean;
-  /** Custom class name for the shell */
   className?: string;
-  /** Custom styles */
   style?: React.CSSProperties;
 }
 
-/**
- * Slot components for named children placement
- * Usage:
- *   <LayoutShell drawerOpen={true}>
- *     <LayoutShell.TopBar>...</LayoutShell.TopBar>
- *     <LayoutShell.Rail>...</LayoutShell.Rail>
- *     <LayoutShell.Drawer>...</LayoutShell.Drawer>
- *     <LayoutShell.Canvas>...</LayoutShell.Canvas>
- *     <LayoutShell.Inspector>...</LayoutShell.Inspector>
- *   </LayoutShell>
- */
+// ============================================
+// Slot Components
+// ============================================
 
 interface SlotProps {
   children: React.ReactNode;
@@ -53,7 +45,6 @@ interface SlotProps {
   style?: React.CSSProperties;
 }
 
-// Named slot components
 const TopBar: React.FC<SlotProps> = ({ children, className = "", style }) => (
   <header
     className={`layout-shell__topbar ${className}`}
@@ -112,6 +103,19 @@ const Drawer: React.FC<DrawerSlotProps> = ({
 );
 Drawer.displayName = "LayoutShell.Drawer";
 
+const Sidebar: React.FC<SlotProps> = ({ children, className = "", style }) => (
+  <aside
+    data-tour-target="left-sidebar"
+    className={`layout-shell__sidebar ${className}`}
+    style={style}
+    role="navigation"
+    aria-label="Editor sidebar"
+  >
+    {children}
+  </aside>
+);
+Sidebar.displayName = "LayoutShell.Sidebar";
+
 const Canvas: React.FC<SlotProps> = ({ children, className = "", style }) => (
   <main
     id="layout-canvas"
@@ -151,49 +155,59 @@ const Inspector: React.FC<InspectorSlotProps> = ({
 );
 Inspector.displayName = "LayoutShell.Inspector";
 
+/** FullPage slot — replaces Canvas+Inspector when a fullpage tab is active */
+const FullPage: React.FC<SlotProps> = ({ children, className = "", style }) => (
+  <div
+    className={`layout-shell__fullpage ${className}`}
+    style={style}
+    role="region"
+    aria-label="Full-page view"
+  >
+    {children}
+  </div>
+);
+FullPage.displayName = "LayoutShell.FullPage";
+
 // ============================================
 // Main Component
 // ============================================
 
-/**
- * LayoutShell - CSS Grid based editor layout
- *
- * Implements the IA Redesign 2026 layout:
- * - 56px Left Rail (touch-optimized icon navigation)
- * - 280px Drawer (contextual panel, slides in/out)
- * - Flexible Canvas (main editing area + 40px footer toolbar)
- * - 300px Right Inspector (property panel with AI suggestions)
- */
 export const LayoutShell: React.FC<LayoutShellProps> & {
   TopBar: typeof TopBar;
   Rail: typeof Rail;
   Drawer: typeof Drawer;
+  Sidebar: typeof Sidebar;
   Canvas: typeof Canvas;
   Inspector: typeof Inspector;
+  FullPage: typeof FullPage;
 } = ({
   children,
   drawerOpen,
   drawerPinned = true,
-  drawerSizeMode = "normal",
+  drawerWidth = 280,
+  fullPageMode = false,
   inspectorOpen = true,
   className = "",
   style,
 }) => {
-  // Parse children to find slot components
   const slots = React.useMemo(() => {
     const result: {
       topBar: React.ReactNode | null;
       rail: React.ReactNode | null;
       drawer: React.ReactNode | null;
+      sidebar: React.ReactNode | null;
       canvas: React.ReactNode | null;
       inspector: React.ReactNode | null;
+      fullPage: React.ReactNode | null;
       other: React.ReactNode[];
     } = {
       topBar: null,
       rail: null,
       drawer: null,
+      sidebar: null,
       canvas: null,
       inspector: null,
+      fullPage: null,
       other: [],
     };
 
@@ -218,6 +232,9 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
             overlay: !drawerPinned,
           });
           break;
+        case "LayoutShell.Sidebar":
+          result.sidebar = child;
+          break;
         case "LayoutShell.Canvas":
           result.canvas = child;
           break;
@@ -225,6 +242,9 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
           result.inspector = React.cloneElement(child as React.ReactElement<InspectorSlotProps>, {
             open: inspectorOpen,
           });
+          break;
+        case "LayoutShell.FullPage":
+          result.fullPage = child;
           break;
         default:
           result.other.push(child);
@@ -234,57 +254,53 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
     return result;
   }, [children, drawerOpen, inspectorOpen]);
 
-  // Build CSS class for grid state
   const shellClass = [
     "layout-shell",
     !slots.topBar ? "layout-shell--no-topbar" : "",
-    drawerOpen ? "layout-shell--drawer-open" : "",
-    drawerOpen && !drawerPinned ? "layout-shell--drawer-overlay" : "",
-    inspectorOpen ? "layout-shell--inspector-open" : "",
+    slots.sidebar ? "layout-shell--has-sidebar" : "",
+    fullPageMode ? "layout-shell--fullpage" : "",
+    !fullPageMode && !slots.sidebar && drawerOpen ? "layout-shell--drawer-open" : "",
+    !fullPageMode && !slots.sidebar && drawerOpen && !drawerPinned ? "layout-shell--drawer-overlay" : "",
+    !fullPageMode && inspectorOpen ? "layout-shell--inspector-open" : "",
     className,
   ]
     .filter(Boolean)
     .join(" ");
 
-  // Apply drawer width as CSS custom property (overrides :root default)
   const shellStyle = {
     ...style,
-    "--layout-drawer-width": DRAWER_SIZE_WIDTHS[drawerSizeMode],
+    "--layout-drawer-width": `${drawerWidth}px`,
   } as React.CSSProperties;
 
   return (
     <div className={shellClass} style={shellStyle}>
-      {/* Skip Link - WCAG 2.4.1 compliance */}
       <a href="#layout-canvas" className="aqb-skip-link">
         Skip to Canvas
       </a>
 
-      {/* Top Bar - spans full width */}
       {slots.topBar}
-
-      {/* Left Rail - always visible */}
+      {slots.sidebar}
       {slots.rail}
 
-      {/* Drawer Panel - slides in/out */}
+      {/* Panel mode: Drawer + Canvas + Inspector */}
       {slots.drawer}
-
-      {/* Canvas Area - flexible */}
       {slots.canvas}
-
-      {/* Right Inspector - contextual properties */}
       {slots.inspector}
 
-      {/* Any other children (modals, overlays, etc.) */}
+      {/* Fullpage mode: FullPage slot spans columns 2-4 */}
+      {slots.fullPage}
+
       {slots.other}
     </div>
   );
 };
 
-// Attach slot components to LayoutShell
 LayoutShell.TopBar = TopBar;
 LayoutShell.Rail = Rail;
 LayoutShell.Drawer = Drawer;
+LayoutShell.Sidebar = Sidebar;
 LayoutShell.Canvas = Canvas;
 LayoutShell.Inspector = Inspector;
+LayoutShell.FullPage = FullPage;
 
 export default LayoutShell;
