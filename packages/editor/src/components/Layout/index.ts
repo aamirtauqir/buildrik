@@ -7,9 +7,3 @@
 
 export { LayoutShell } from "../../editor/rail/LayoutShell";
 export type { LayoutShellProps } from "../../editor/rail/LayoutShell";
-
-export { LeftRail } from "../../editor/rail/LeftRail";
-export type { LeftRailProps } from "../../editor/rail/LeftRail";
-
-export { DrawerPanel } from "../../editor/rail/DrawerPanel";
-export type { DrawerPanelProps } from "../../editor/rail/DrawerPanel";

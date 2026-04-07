@@ -1,7 +1,6 @@
 /**
- * LeftRail — redirect barrel
- * Canonical: editor/rail/LeftRail.tsx
+ * LeftRail — REMOVED
+ * The LeftRail component has been merged into editor/sidebar/LeftSidebar.tsx
+ * This file is kept empty to prevent import errors from legacy code.
  * @license BSD-3-Clause
  */
-export * from "../../editor/rail/LeftRail";
-export { default } from "../../editor/rail/LeftRail";
