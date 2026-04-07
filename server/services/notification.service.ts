@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { ListNotificationsInput } from "@/lib/validations/notifications";
+import type { ListNotificationsInput } from "@buildrik/shared/schemas/notifications";
 
 export async function listNotifications(userId: string, input: ListNotificationsInput) {
   const { page = 1, perPage = 20, filter = "all" } = input;

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import type { ListTemplatesInput } from "@/lib/validations/templates";
+import type { ListTemplatesInput } from "@buildrik/shared/schemas/templates";
 
 const SORT_MAP: Record<string, Record<string, string>> = {
   popular: { usageCount: "desc" },

@@ -1,4 +1,4 @@
-import { CDN_PATHS, UPLOAD_LIMITS, type PresignInput } from "@/lib/validations/upload";
+import { CDN_PATHS, UPLOAD_LIMITS, type PresignInput } from "@buildrik/shared/schemas/upload";
 
 type PendingUpload = {
   fileName: string;

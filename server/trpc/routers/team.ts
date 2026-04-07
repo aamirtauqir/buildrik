@@ -5,7 +5,7 @@ import {
   getTeamStats, listMembers, inviteMembers, changeRole,
   revokeMember, deleteMember, listPendingInvites, revokeInvite, resendInvite, getTeamActivity,
 } from "@/server/services/team.service";
-import { inviteMembersSchema, listMembersSchema } from "@/lib/validations/team";
+import { inviteMembersSchema, listMembersSchema } from "@buildrik/shared/schemas/team";
 import { type PlanName } from "@/lib/constants/plan-limits";
 
 async function getWorkspaceCtx(ctx: any): Promise<{ workspaceId: string; plan: PlanName }> {

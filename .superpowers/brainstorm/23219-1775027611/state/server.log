@@ -1,0 +1,4 @@
+{"type":"server-started","port":54665,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:54665","screen_dir":"/Users/shahg/Desktop/pencil/buildrik/.superpowers/brainstorm/23219-1775027611/content","state_dir":"/Users/shahg/Desktop/pencil/buildrik/.superpowers/brainstorm/23219-1775027611/state"}
+{"type":"screen-added","file":"/Users/shahg/Desktop/pencil/buildrik/.superpowers/brainstorm/23219-1775027611/content/approach-comparison.html"}
+{"type":"screen-added","file":"/Users/shahg/Desktop/pencil/buildrik/.superpowers/brainstorm/23219-1775027611/content/structure-recommendation.html"}
+{"type":"server-stopped","reason":"idle timeout"}

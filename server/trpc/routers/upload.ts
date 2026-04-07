@@ -1,7 +1,7 @@
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { createPresignedUrl, confirmUpload, getUploadLimits } from "@/server/services/upload.service";
-import { presignSchema, confirmSchema } from "@/lib/validations/upload";
+import { presignSchema, confirmSchema } from "@buildrik/shared/schemas/upload";
 
 async function getWorkspaceId(ctx: any): Promise<string> {
   const member = await ctx.prisma.workspaceMember.findFirst({

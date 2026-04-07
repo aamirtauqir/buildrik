@@ -1,0 +1,192 @@
+{
+  "project": {
+    "root": "/Users/shahg/Desktop/test/buildrik",
+    "name": "buildrik",
+    "framework": "react",
+    "detected_frameworks": [
+      "react"
+    ],
+    "key_dependencies": {},
+    "stack_type": "frontend"
+  },
+  "structure": {
+    "total_files": 1274,
+    "components": {
+      "modules": 659,
+      "components": 595
+    },
+    "route_dirs": [],
+    "api_dirs": [
+      "/Users/shahg/Desktop/test/buildrik/src/services"
+    ],
+    "state_dirs": [],
+    "i18n_dirs": [],
+    "controller_dirs": [],
+    "model_dirs": [],
+    "dto_dirs": []
+  },
+  "routes": {
+    "count": 0,
+    "frontend_pages": [],
+    "backend_endpoints": [],
+    "pages": []
+  },
+  "apis": {
+    "total": 0,
+    "integrated": 0,
+    "mock": 0,
+    "endpoints": []
+  },
+  "enums": {
+    "count": 10,
+    "definitions": [
+      {
+        "name": "ratioMap",
+        "type": "constant_map",
+        "values": {
+          "9": "56.25%",
+          "3": "75%",
+          "1": "100%"
+        },
+        "source": "/Users/shahg/Desktop/test/buildrik/src/blocks/Media/VideoEmbed.tsx"
+      },
+      {
+        "name": "aspectRatioMap",
+        "type": "constant_map",
+        "values": {
+          "square": "1 / 1",
+          "3": "4 / 3",
+          "9": "16 / 9",
+          "auto": "auto"
+        },
+        "source": "/Users/shahg/Desktop/test/buildrik/src/blocks/Media/ImageGallery.tsx"
+      },
+      {
+        "name": "mapEmbedBlockConfig",
+        "type": "constant_map",
+        "values": {
+          "id": "map-embed",
+          "label": "Map Embed",
+          "category": "Media",
+          "icon": "🗺️",
+          "elementType": "map-embed",
+          "content": "<div class="
+        },
+        "source": "/Users/shahg/Desktop/test/buildrik/src/blocks/Media/MapEmbed.tsx"
+      },
+      {
+        "name": "alignMap",
+        "type": "constant_map",
+        "values": {
+          "left": "flex-start",
+          "center": "center",
+          "right": "flex-end",
+          "between": "space-between"
+        },
+        "source": "/Users/shahg/Desktop/test/buildrik/src/shared/ui/Card.tsx"
+      },
+      {
+        "name": "sizeMap",
+        "type": "constant_map",
+        "values": {
+          "full": "90vw"
+        },
+        "source": "/Users/shahg/Desktop/test/buildrik/src/shared/ui/Modal.tsx"
+      },
+      {
+        "name": "radiusMap",
+        "type": "constant_map",
+        "values": {
+          "sm": "var(--aqb-radius-sm, 4px)",
+          "md": "var(--aqb-radius-md, 8px)",
+          "lg": "var(--aqb-radius-lg, 12px)",
+          "full": "9999px"
+        },
+        "source": "/Users/shahg/Desktop/test/buildrik/src/shared/ui/Skeleton.tsx"
+      },
+      {
+        "name": "MIME_TYPES",
+        "type": "constant_map",
+        "values": {
+          "ELEMENT": "application/x-aquibra-element",
+          "BLOCK": "application/x-aquibra-block",
+          "MULTI": "application/x-aquibra-multi",
+          "TEMPLATE": "application/x-aquibra-template",
+          "ASSET": "application/x-aquibra-asset",
+          "TEXT": "text/plain",
+          "HTML": "text/html",
+          "JSON": "application/json"
+        },
+        "source": "/Users/shahg/Desktop/test/buildrik/src/shared/constants/config.ts"
+      },
+      {
+        "name": "ElementCategory",
+        "type": "enum",
+        "values": {
+          "CONTAINER": "container",
+          "BLOCK": "block",
+          "INLINE": "inline",
+          "INTERACTIVE": "interactive",
+          "FORM": "form",
+          "MEDIA": "media",
+          "SECTION": "section",
+          "TEXT": "text",
+          "VOID": "void",
+          "FLOW": "flow",
+          "PHRASING": "phrasing",
+          "EMBEDDED": "embedded",
+          "HEADING": "heading",
+          "SECTIONING": "sectioning",
+          "METADATA": "metadata",
+          "TRANSPARENT": "transparent",
+          "LANDMARK": "landmark",
+          "NAVIGATION": "navigation",
+          "STRUCTURAL": "structural"
+        },
+        "source": "/Users/shahg/Desktop/test/buildrik/src/shared/utils/nesting/types.ts"
+      },
+      {
+        "name": "LandmarkRole",
+        "type": "enum",
+        "values": {
+          "BANNER": "banner",
+          "COMPLEMENTARY": "complementary",
+          "CONTENTINFO": "contentinfo",
+          "FORM": "form",
+          "MAIN": "main",
+          "NAVIGATION": "navigation",
+          "REGION": "region",
+          "SEARCH": "search"
+        },
+        "source": "/Users/shahg/Desktop/test/buildrik/src/shared/utils/nesting/types.ts"
+      },
+      {
+        "name": "map",
+        "type": "constant_map",
+        "values": {
+          "tl": "border-top-left-radius",
+          "tr": "border-top-right-radius",
+          "br": "border-bottom-right-radius",
+          "bl": "border-bottom-left-radius"
+        },
+        "source": "/Users/shahg/Desktop/test/buildrik/src/editor/inspector/sections/BorderSection.tsx"
+      }
+    ]
+  },
+  "models": {
+    "count": 0,
+    "definitions": []
+  },
+  "summary": {
+    "pages": 0,
+    "backend_endpoints": 0,
+    "api_endpoints": 0,
+    "api_integrated": 0,
+    "api_mock": 0,
+    "enums": 10,
+    "models": 0,
+    "has_i18n": false,
+    "has_state_management": false,
+    "stack_type": "frontend"
+  }
+}

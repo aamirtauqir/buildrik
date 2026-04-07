@@ -7,3 +7,8 @@ node_modules/
 next-env.d.ts
 .DS_Store
 .worktrees/
+.gstack/
+.playwright-mcp/
+docs/designs/
+latest-screenshots/
+dist/

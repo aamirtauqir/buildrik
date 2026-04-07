@@ -98,6 +98,7 @@ export const authConfig: NextAuthConfig = {
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax" as const,
         path: "/",
+        domain: process.env.COOKIE_DOMAIN || undefined,
         maxAge: 30 * 24 * 60 * 60,
       },
     },

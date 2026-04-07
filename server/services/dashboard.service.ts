@@ -5,7 +5,7 @@ import type {
   RecentSite,
   ActivityFeed,
   WorkspaceHealth,
-} from "@/lib/validations/dashboard";
+} from "@buildrik/shared/schemas/dashboard";
 
 export async function getDashboardStats(
   workspaceId: string,

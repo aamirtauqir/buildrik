@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { UpdateWorkspaceInput } from "@/lib/validations/account";
+import type { UpdateWorkspaceInput } from "@buildrik/shared/schemas/account";
 
 export async function getWorkspaceSettings(workspaceId: string) {
   return prisma.workspace.findUnique({

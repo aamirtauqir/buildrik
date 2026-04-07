@@ -1,0 +1,510 @@
+/**
+ * AccountModal — Full-screen account settings overlay
+ * 4 tabs: Profile, Team & Access, Collaboration Settings, Plans & Billing.
+ *
+ * @license BSD-3-Clause
+ */
+
+import * as React from "react";
+
+type Tab = "profile" | "team" | "collaboration" | "billing";
+type Role = "Editor" | "Admin" | "Viewer";
+
+interface Member {
+  name: string;
+  email: string;
+  role: Role;
+  avatarColor: string;
+  initials: string;
+}
+
+const MOCK_MEMBERS: Member[] = [
+  { name: "Sarah Chen",  email: "sarah@acme.io",         role: "Editor", avatarColor: "#3B82F6", initials: "SC" },
+  { name: "Mike Rosa",   email: "mike.rosa@acme.io",     role: "Admin",  avatarColor: "#8B5CF6", initials: "MR" },
+  { name: "Nora Patel",  email: "nora.patel@acme.io",    role: "Viewer", avatarColor: "#10B981", initials: "NP" },
+];
+
+const ROLE_COLORS: Record<Role, { bg: string; text: string }> = {
+  Editor: { bg: "#EFF6FF", text: "#1D4ED8" },
+  Admin:  { bg: "#FEF3C7", text: "#92400E" },
+  Viewer: { bg: "#F1F5F9", text: "#475569" },
+};
+
+const NAV_ITEMS: { id: Tab; label: string }[] = [
+  { id: "profile",       label: "Profile" },
+  { id: "team",          label: "Team & Access" },
+  { id: "collaboration", label: "Collaboration Settings" },
+  { id: "billing",       label: "Plans & Billing" },
+];
+
+interface AccountModalProps {
+  onClose: () => void;
+}
+
+// ─── Toggle ───────────────────────────────────────────────────────────────────
+
+const Toggle: React.FC<{ on: boolean }> = ({ on }) => (
+  <button
+    style={{
+      height: 20,
+      width: 40,
+      borderRadius: 999,
+      background: on ? "#2563EB" : "#E2E8F0",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+      border: "none",
+      color: on ? "#FFFFFF" : "#94A3B8",
+      fontSize: 11,
+      fontWeight: 700,
+      fontFamily: "inherit",
+    }}
+  >
+    {on ? "On" : "Off"}
+  </button>
+);
+
+// ─── Tab: Profile ─────────────────────────────────────────────────────────────
+
+const TabProfile: React.FC = () => (
+  <>
+    <div>
+      <div style={{ fontSize: 24, fontWeight: 700, color: "#111827", fontFamily: "Inter, sans-serif" }}>
+        Profile
+      </div>
+      <div style={{ fontSize: 13, fontWeight: 500, color: "#64748B", marginTop: 4 }}>
+        Manage your personal account settings
+      </div>
+    </div>
+
+    {/* Avatar row */}
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: 999,
+          background: "#8B5CF6",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        <span style={{ fontSize: 20, fontWeight: 700, color: "#FFFFFF", fontFamily: "Inter, sans-serif" }}>
+          AS
+        </span>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "#111827" }}>Aamir Siddiqui</div>
+        <button
+          style={{
+            fontSize: 12,
+            color: "#2563EB",
+            cursor: "pointer",
+            background: "none",
+            border: "none",
+            padding: 0,
+            fontFamily: "inherit",
+          }}
+        >
+          Change photo
+        </button>
+      </div>
+    </div>
+
+    {/* Email field */}
+    <div>
+      <label
+        style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#475569", marginBottom: 6 }}
+      >
+        Email
+      </label>
+      <input
+        type="email"
+        placeholder="aamir@buildrik.app"
+        readOnly
+        style={{
+          height: 40,
+          border: "1px solid #D1D5DB",
+          borderRadius: 8,
+          padding: "0 12px",
+          fontSize: 13,
+          color: "#111827",
+          background: "#F8FAFC",
+          width: "100%",
+          boxSizing: "border-box",
+          outline: "none",
+          fontFamily: "inherit",
+        }}
+      />
+    </div>
+
+    {/* Notification preferences */}
+    <div>
+      <div style={{ fontSize: 14, fontWeight: 600, color: "#0F172A", marginBottom: 8 }}>
+        Notification preferences
+      </div>
+      <div
+        style={{
+          background: "#FFFFFF",
+          border: "1px solid #D1D5DB",
+          borderRadius: 8,
+          padding: 12,
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontSize: 13, fontWeight: 500, color: "#64748B" }}>Email notifications</span>
+          <Toggle on={true} />
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontSize: 13, fontWeight: 500, color: "#64748B" }}>Push notifications</span>
+          <Toggle on={false} />
+        </div>
+      </div>
+    </div>
+
+    {/* Save button */}
+    <button
+      style={{
+        background: "#2563EB",
+        height: 38,
+        borderRadius: 8,
+        color: "#FFFFFF",
+        fontSize: 13,
+        fontWeight: 700,
+        padding: "0 16px",
+        width: "100%",
+        cursor: "pointer",
+        border: "none",
+        fontFamily: "inherit",
+      }}
+    >
+      Save Changes
+    </button>
+  </>
+);
+
+// ─── Tab: Team & Access ───────────────────────────────────────────────────────
+
+const TabTeam: React.FC = () => (
+  <>
+    <div style={{ fontSize: 24, fontWeight: 700, color: "#111827" }}>Team & Access</div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      {MOCK_MEMBERS.map((m) => {
+        const roleStyle = ROLE_COLORS[m.role];
+        return (
+          <div
+            key={m.email}
+            style={{
+              background: "#FFFFFF",
+              border: "1px solid #E2E8F0",
+              borderRadius: 8,
+              padding: "10px 12px",
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 999,
+                background: m.avatarColor,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#FFFFFF" }}>{m.initials}</span>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: "#111827" }}>{m.name}</div>
+              <div style={{ fontSize: 11, color: "#94A3B8" }}>{m.email}</div>
+            </div>
+            <span
+              style={{
+                padding: "2px 8px",
+                borderRadius: 999,
+                fontSize: 11,
+                fontWeight: 600,
+                background: roleStyle.bg,
+                color: roleStyle.text,
+              }}
+            >
+              {m.role}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  </>
+);
+
+// ─── Tab: Collaboration Settings ──────────────────────────────────────────────
+
+const TabCollaboration: React.FC = () => (
+  <>
+    <div style={{ fontSize: 24, fontWeight: 700, color: "#111827" }}>Collaboration Settings</div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div
+        style={{
+          background: "#FFFFFF",
+          border: "1px solid #E2E8F0",
+          borderRadius: 8,
+          height: 48,
+          padding: "0 14px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <span style={{ fontSize: 13, fontWeight: 500, color: "#374151" }}>Allow comments</span>
+        <Toggle on={true} />
+      </div>
+      <div
+        style={{
+          background: "#FFFFFF",
+          border: "1px solid #E2E8F0",
+          borderRadius: 8,
+          height: 48,
+          padding: "0 14px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          opacity: 0.5,
+        }}
+      >
+        <span style={{ fontSize: 13, fontWeight: 500, color: "#374151" }}>Guest access</span>
+        <Toggle on={false} />
+      </div>
+    </div>
+  </>
+);
+
+// ─── Tab: Plans & Billing ─────────────────────────────────────────────────────
+
+const TabBilling: React.FC = () => (
+  <>
+    <div style={{ fontSize: 24, fontWeight: 700, color: "#111827" }}>Plans & Billing</div>
+
+    {/* Plan card */}
+    <div
+      style={{
+        background: "#FFFFFF",
+        border: "1px solid #CBD5E1",
+        borderRadius: 10,
+        padding: 16,
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
+      }}
+    >
+      <div style={{ fontSize: 16, fontWeight: 700, color: "#111827" }}>Pro Plan</div>
+      <div style={{ fontSize: 13, color: "#64748B" }}>Everything you need for professional sites</div>
+      <div>
+        <div style={{ fontSize: 12, color: "#64748B", marginBottom: 6 }}>Sites: 2 of 5</div>
+        <div
+          style={{
+            background: "#E2E8F0",
+            height: 6,
+            borderRadius: 999,
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              background: "#2563EB",
+              width: "40%",
+              height: "100%",
+              borderRadius: 999,
+            }}
+          />
+        </div>
+      </div>
+    </div>
+
+    {/* Payment Method */}
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ fontSize: 13, fontWeight: 600, color: "#374151" }}>Payment Method</div>
+      <div
+        style={{
+          background: "#F8FAFC",
+          borderRadius: 8,
+          padding: "10px 12px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <span style={{ fontSize: 13, fontWeight: 500, color: "#111827" }}>
+          •••• •••• •••• 4242{"  "}Visa
+        </span>
+        <span style={{ fontSize: 11, color: "#94A3B8" }}>Exp 12/27</span>
+      </div>
+    </div>
+
+    {/* Billing History */}
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ fontSize: 13, fontWeight: 600, color: "#374151" }}>Billing History</div>
+      {[
+        { amount: "$12.00", detail: "Mar 3, 2026 · Pro Plan" },
+        { amount: "$12.00", detail: "Feb 3, 2026 · Pro Plan" },
+      ].map((inv) => (
+        <div
+          key={inv.detail}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "8px 0",
+            borderBottom: "1px solid #F1F5F9",
+          }}
+        >
+          <span style={{ fontSize: 13, fontWeight: 500, color: "#111827" }}>{inv.amount}</span>
+          <span style={{ fontSize: 11, color: "#64748B" }}>{inv.detail}</span>
+        </div>
+      ))}
+    </div>
+  </>
+);
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
+export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
+  const [activeTab, setActiveTab] = React.useState<Tab>("profile");
+
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  const renderContent = () => {
+    if (activeTab === "profile")       return <TabProfile />;
+    if (activeTab === "team")          return <TabTeam />;
+    if (activeTab === "collaboration") return <TabCollaboration />;
+    return <TabBilling />;
+  };
+
+  return (
+    <div
+      role="dialog"
+      aria-label="Account Settings"
+      aria-modal="true"
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 20001,
+        background: "#F8FAFC",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* Top bar */}
+      <div
+        style={{
+          height: 64,
+          flexShrink: 0,
+          background: "#FFFFFF",
+          borderBottom: "1px solid #D1D5DB",
+          padding: "0 16px",
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+        }}
+      >
+        <button
+          onClick={onClose}
+          style={{
+            fontSize: 13,
+            fontWeight: 500,
+            color: "#111827",
+            background: "#FFFFFF",
+            border: "1px solid #CBD5E1",
+            borderRadius: 8,
+            padding: "8px 10px",
+            cursor: "pointer",
+            fontFamily: "inherit",
+          }}
+        >
+          ← Back to Editor
+        </button>
+        <div style={{ fontSize: 16, fontWeight: 600, color: "#0F172A", fontFamily: "Inter, sans-serif" }}>
+          Account Settings
+        </div>
+      </div>
+
+      {/* Content area */}
+      <div style={{ display: "flex", flex: 1, overflow: "hidden", minHeight: 0 }}>
+
+        {/* Left sidebar nav */}
+        <div
+          style={{
+            width: 280,
+            flexShrink: 0,
+            background: "#FFFFFF",
+            borderRight: "1px solid #D1D5DB",
+            padding: "20px 16px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 6,
+          }}
+        >
+          {NAV_ITEMS.map((item) => {
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                style={{
+                  height: 36,
+                  borderRadius: 8,
+                  padding: "0 12px",
+                  display: "flex",
+                  alignItems: "center",
+                  cursor: "pointer",
+                  border: isActive ? "1px solid #BFDBFE" : "1px solid transparent",
+                  width: "100%",
+                  textAlign: "left",
+                  fontFamily: "inherit",
+                  fontSize: 13,
+                  fontWeight: isActive ? 600 : 500,
+                  background: isActive ? "#EFF6FF" : "transparent",
+                  color: isActive ? "#1D4ED8" : "#64748B",
+                }}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Right content area */}
+        <div
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            padding: "24px 28px",
+            background: "#F8FAFC",
+            display: "flex",
+            flexDirection: "column",
+            gap: 20,
+          }}
+        >
+          {renderContent()}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AccountModal;

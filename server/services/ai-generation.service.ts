@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import type { GenerateSiteInput } from "@/lib/validations/templates";
+import type { GenerateSiteInput } from "@buildrik/shared/schemas/templates";
 
 const HOURLY_ANTI_ABUSE_LIMIT = 3;
 

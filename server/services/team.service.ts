@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
-import type { ListMembersInput, InviteMembersInput, MemberData } from "@/lib/validations/team";
+import type { ListMembersInput, InviteMembersInput, MemberData } from "@buildrik/shared/schemas/team";
 import { sendTeamInviteEmail } from "@/server/services/email.service";
 
 const TEAM_ACTIONS = [

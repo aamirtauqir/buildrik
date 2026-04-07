@@ -1,0 +1,287 @@
+import OpenAI from "openai";
+
+let _openai: OpenAI;
+function getOpenAI(): OpenAI {
+  if (!_openai) _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  return _openai;
+}
+
+const MODEL = "gpt-4o-mini";
+
+const SECTION_SCHEMAS: Record<
+  string,
+  { fields: string[]; constraints: string }
+> = {
+  hero: {
+    fields: [
+      "headline",
+      "subheadline",
+      "ctaText",
+      "ctaUrl",
+      "backgroundStyle",
+    ],
+    constraints:
+      "Asymmetric layout. Product screenshot or illustration. NOT centered text on gradient.",
+  },
+  features: {
+    fields: ["items[].title", "items[].description", "items[].icon"],
+    constraints:
+      "NOT 3 icons in circles. Use 2-column with illustration or single-feature highlight.",
+  },
+  pricing: {
+    fields: [
+      "tiers[].name",
+      "tiers[].price",
+      "tiers[].features[]",
+      "tiers[].cta",
+    ],
+    constraints:
+      "Visual emphasis on recommended tier. NOT identical 3-column cards.",
+  },
+  testimonials: {
+    fields: ["quotes[].text", "quotes[].author", "quotes[].role"],
+    constraints:
+      "Real-feeling quotes. NOT centered cards with quotation marks.",
+  },
+  cta: {
+    fields: ["headline", "description", "ctaText", "ctaUrl"],
+    constraints:
+      "Bold, clear action. NOT generic 'Get Started' on gradient.",
+  },
+  footer: {
+    fields: ["links[]", "copyright", "social[]"],
+    constraints: "Functional, organized. Multi-column.",
+  },
+  nav: {
+    fields: ["logo", "links[]", "ctaText"],
+    constraints: "Clean, minimal. Logo left, links center or right.",
+  },
+  logoBar: {
+    fields: ["logos[]"],
+    constraints: "Grayscale logos in a row. Simple.",
+  },
+};
+
+const ANTI_SLOP_INSTRUCTIONS = `ANTI-SLOP RULES (mandatory):
+- Do NOT use centered text on gradient backgrounds
+- Do NOT use 3 icons in circles for features
+- Do NOT use identical 3-column pricing cards
+- Do NOT use centered cards with large quotation marks for testimonials
+- Do NOT use generic "Get Started" or "Sign Up" CTAs on gradient backgrounds
+- Do NOT use cookie-cutter symmetric layouts
+- Use asymmetric, visually interesting compositions
+- Use real-feeling content, not placeholder lorem ipsum
+- Each section must feel distinct and purposeful`;
+
+const PAGE_SECTION_ORDER: Record<string, string[]> = {
+  landing: [
+    "nav",
+    "hero",
+    "logoBar",
+    "features",
+    "testimonials",
+    "pricing",
+    "cta",
+    "footer",
+  ],
+  portfolio: [
+    "nav",
+    "hero",
+    "features",
+    "testimonials",
+    "cta",
+    "footer",
+    "logoBar",
+    "footer",
+  ],
+  product: [
+    "nav",
+    "hero",
+    "features",
+    "logoBar",
+    "pricing",
+    "testimonials",
+    "cta",
+    "footer",
+  ],
+  pricing: [
+    "nav",
+    "hero",
+    "pricing",
+    "features",
+    "testimonials",
+    "cta",
+    "logoBar",
+    "footer",
+  ],
+  blog: [
+    "nav",
+    "hero",
+    "features",
+    "testimonials",
+    "cta",
+    "logoBar",
+    "cta",
+    "footer",
+  ],
+};
+
+export interface ContentGenerationInput {
+  prompt: string;
+  type: "content" | "layout" | "section";
+  options?: { tone?: string; length?: string };
+}
+
+export interface ContentGenerationResult {
+  content: string;
+  tokensUsed: number;
+}
+
+export interface PageGenerationInput {
+  pageType: "landing" | "portfolio" | "product" | "pricing" | "blog";
+  description: string;
+  style: "modern" | "minimal" | "bold";
+}
+
+export interface PageSection {
+  type: string;
+  html: string;
+  css?: string;
+}
+
+export interface PageGenerationResult {
+  sections: PageSection[];
+}
+
+export interface LayoutGenerationInput {
+  prompt: string;
+  sectionType?: string;
+}
+
+export interface LayoutGenerationResult {
+  html: string;
+  css?: string;
+}
+
+export async function generateContent(
+  input: ContentGenerationInput
+): Promise<ContentGenerationResult> {
+  const systemPrompt = buildContentSystemPrompt(input.type, input.options);
+
+  const completion = await getOpenAI().chat.completions.create({
+    model: MODEL,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: input.prompt },
+    ],
+    max_tokens: input.options?.length === "short" ? 500 : 2000,
+    temperature: 0.7,
+  });
+
+  const content = completion.choices[0]?.message?.content ?? "";
+  const tokensUsed = completion.usage?.total_tokens ?? 0;
+
+  return { content, tokensUsed };
+}
+
+export async function generatePage(
+  input: PageGenerationInput
+): Promise<PageGenerationResult> {
+  const sectionTypes = PAGE_SECTION_ORDER[input.pageType];
+  const sections: PageSection[] = [];
+
+  for (const sectionType of sectionTypes) {
+    const schema = SECTION_SCHEMAS[sectionType];
+    if (!schema) continue;
+
+    const systemPrompt = `You are a web designer generating a ${sectionType} section for a ${input.pageType} page.
+Style: ${input.style}.
+Required fields: ${schema.fields.join(", ")}.
+Constraints: ${schema.constraints}
+
+${ANTI_SLOP_INSTRUCTIONS}
+
+Return ONLY valid HTML with inline Tailwind CSS classes. No markdown, no code fences, no explanation.
+The HTML should be a single self-contained <section> element.`;
+
+    const completion = await getOpenAI().chat.completions.create({
+      model: MODEL,
+      messages: [
+        { role: "system", content: systemPrompt },
+        {
+          role: "user",
+          content: `Generate a ${sectionType} section for: ${input.description}`,
+        },
+      ],
+      max_tokens: 2000,
+      temperature: 0.8,
+    });
+
+    const html = completion.choices[0]?.message?.content ?? "";
+    sections.push({ type: sectionType, html: html.trim() });
+  }
+
+  return { sections };
+}
+
+export async function generateLayout(
+  input: LayoutGenerationInput
+): Promise<LayoutGenerationResult> {
+  const sectionContext = input.sectionType
+    ? SECTION_SCHEMAS[input.sectionType]
+    : null;
+
+  const systemPrompt = `You are a web layout generator.
+${sectionContext ? `Section type: ${input.sectionType}. Fields: ${sectionContext.fields.join(", ")}. Constraints: ${sectionContext.constraints}` : "Generate a flexible layout structure."}
+
+${ANTI_SLOP_INSTRUCTIONS}
+
+Return ONLY valid HTML with inline Tailwind CSS classes. No markdown, no code fences, no explanation.
+The HTML should be a single self-contained <section> element with a clear layout structure.`;
+
+  const completion = await getOpenAI().chat.completions.create({
+    model: MODEL,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: input.prompt },
+    ],
+    max_tokens: 2000,
+    temperature: 0.7,
+  });
+
+  const html = completion.choices[0]?.message?.content ?? "";
+  return { html: html.trim() };
+}
+
+function buildContentSystemPrompt(
+  type: "content" | "layout" | "section",
+  options?: { tone?: string; length?: string }
+): string {
+  const toneInstruction = options?.tone
+    ? `Tone: ${options.tone}.`
+    : "Tone: professional and clear.";
+
+  const lengthInstruction = options?.length
+    ? `Length: ${options.length}.`
+    : "";
+
+  switch (type) {
+    case "content":
+      return `You are a copywriting assistant for a website builder. Generate compelling, original web content.
+${toneInstruction} ${lengthInstruction}
+${ANTI_SLOP_INSTRUCTIONS}
+Return only the generated text content. No markdown formatting, no code fences.`;
+
+    case "layout":
+      return `You are a web layout generator. Create HTML layout structures with Tailwind CSS.
+${toneInstruction}
+${ANTI_SLOP_INSTRUCTIONS}
+Return ONLY valid HTML with Tailwind classes. No markdown, no code fences, no explanation.`;
+
+    case "section":
+      return `You are a web section generator. Create complete HTML sections with Tailwind CSS.
+${toneInstruction} ${lengthInstruction}
+${ANTI_SLOP_INSTRUCTIONS}
+Return ONLY a single <section> element with Tailwind classes. No markdown, no code fences.`;
+  }
+}

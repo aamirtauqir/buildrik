@@ -13,6 +13,7 @@ import { onboardingRouter } from "./routers/onboarding";
 import { pagesRouter } from "./routers/pages";
 import { formsRouter } from "./routers/forms";
 import { uploadRouter } from "./routers/upload";
+import { aiRouter } from "./routers/ai";
 
 export const appRouter = router({
   auth: authRouter,
@@ -29,6 +30,7 @@ export const appRouter = router({
   pages: pagesRouter,
   forms: formsRouter,
   upload: uploadRouter,
+  ai: aiRouter,
 });
 
 export type AppRouter = typeof appRouter;

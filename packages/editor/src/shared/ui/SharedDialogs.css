@@ -1,0 +1,105 @@
+/* SharedDialogs — Editor-wide modal dialog styles
+   Uses aqb-* tokens (dark theme) since dialogs overlay the full editor.
+   Prefix: sd-* */
+
+.sd-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.sd-dialog {
+  background: var(--aqb-surface-3, #1e1e2e);
+  border-radius: 12px;
+  border: 1px solid var(--aqb-border, rgba(255, 255, 255, 0.08));
+  padding: 20px 24px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.sd-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--aqb-text-primary, #F5F5F0);
+  margin: 0;
+}
+
+.sd-body {
+  font-size: 13px;
+  color: var(--aqb-text-secondary, #B8B5AD);
+  margin: 8px 0 16px;
+  line-height: 1.5;
+}
+
+.sd-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.sd-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+}
+
+.sd-btn--primary {
+  background: var(--aqb-primary, #6366f1);
+  color: #fff;
+}
+
+.sd-btn--primary:hover { opacity: 0.9; }
+
+.sd-btn--secondary {
+  border: 1px solid var(--aqb-border, rgba(255, 255, 255, 0.08));
+  background: transparent;
+  color: var(--aqb-text-secondary, #B8B5AD);
+}
+
+.sd-btn--secondary:hover {
+  background: var(--aqb-surface-4, #2e2e38);
+}
+
+.sd-btn--danger {
+  background: var(--aqb-error, #ef4444);
+  color: #fff;
+}
+
+.sd-btn--danger:hover { opacity: 0.9; }
+
+/* Form fields (AddPageDialog) */
+.sd-form { display: flex; flex-direction: column; gap: 12px; margin: 12px 0; }
+
+.sd-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--aqb-text-secondary, #B8B5AD);
+  margin-bottom: 4px;
+}
+
+.sd-input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--aqb-border, rgba(255, 255, 255, 0.08));
+  background: var(--aqb-surface-2, #1a1a24);
+  color: var(--aqb-text-primary, #F5F5F0);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.sd-input:focus {
+  border-color: var(--aqb-primary, #6366f1);
+}

@@ -1,0 +1,344 @@
+/* ===========================================
+   LEFT SIDEBAR — Light Theme Redesign
+   Merged rail + panel. Source: new.left.pen
+   Prefix: ls-*
+   =========================================== */
+
+/* ─────────────────────────────────────────────
+   EXTRACTED CSS MODULES (imported)
+   ───────────────────────────────────────────── */
+@import "../panels/layers/styles/layers.css";
+@import "./tabs/history/styles/history.css";
+@import "./tabs/settings/styles/settings.css";
+@import "./tabs/design/styles/design-tokens.css";
+@import "./tabs/media/MediaTab.css";
+@import "./shared/SkeletonStates.css";
+@import "./shared/EmptyStates.css";
+
+/* ─────────────────────────────────────────────
+   FULLPAGE CONTAINER
+   ───────────────────────────────────────────── */
+.ls-fullpage-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ─────────────────────────────────────────────
+   MEDIA TAB ACCENT TOKENS
+   ───────────────────────────────────────────── */
+:root {
+  --media-img: #3b82f6;
+  --media-vid: #f97316;
+  --media-ico: #f59e0b;
+  --media-fnt: #10b981;
+}
+
+/* ─────────────────────────────────────────────
+   DESIGN TOKENS (from new.left.pen variables)
+   ───────────────────────────────────────────── */
+:root {
+  --ls-bg-panel: #F8FAFC;
+  --ls-bg-card: #FFFFFF;
+  --ls-bg-subtle: #F1F5F9;
+  --ls-accent: #1D4ED8;
+  --ls-accent-bg: #DBEAFE;
+  --ls-accent-txt: #1E40AF;
+  --ls-text-primary: #0F172A;
+  --ls-text-secondary: #334155;
+  --ls-text-medium: #374151;
+  --ls-text-muted: #475569;
+  --ls-text-subtle: #64748B;
+  --ls-text-lighter: #94A3B8;
+  --ls-text-ghost: #CBD5E1;
+  --ls-border-card: #D1D9E6;
+  --ls-border-light: #E2E8F0;
+  --ls-border-soft: #CBD5E1;
+}
+
+/* ─────────────────────────────────────────────
+   ROOT — horizontal flex: rail + panel
+   ───────────────────────────────────────────── */
+.ls-root {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ─────────────────────────────────────────────
+   RAIL — 60px vertical icon navigation
+   ───────────────────────────────────────────── */
+.ls-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 60px;
+  min-width: 60px;
+  height: 100%;
+  background: var(--ls-bg-panel);
+  border-right: 1px solid var(--ls-border-card);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────
+   LOGO — 52px centered icon
+   ───────────────────────────────────────────── */
+.ls-logo {
+  width: 100%;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--ls-accent);
+}
+
+/* ─────────────────────────────────────────────
+   DIVIDER — 1px horizontal line
+   ───────────────────────────────────────────── */
+.ls-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--ls-border-light);
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────
+   ZONE — vertical group of rail buttons
+   ───────────────────────────────────────────── */
+.ls-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0;
+  width: 100%;
+}
+
+/* ─────────────────────────────────────────────
+   SPACER — pushes help to bottom
+   ───────────────────────────────────────────── */
+.ls-spacer {
+  flex: 1;
+  min-height: 8px;
+}
+
+/* ─────────────────────────────────────────────
+   RAIL BUTTON — 40px icon button
+   ───────────────────────────────────────────── */
+.ls-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 40px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--ls-text-subtle);
+  font-family: inherit;
+  padding: 0;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.ls-btn:hover {
+  background: var(--ls-bg-subtle);
+  color: var(--ls-text-medium);
+}
+
+.ls-btn:focus-visible {
+  outline: 2px solid var(--ls-accent);
+  outline-offset: -2px;
+}
+
+.ls-btn:active svg {
+  transform: scale(0.92);
+}
+
+/* Icon sizing */
+.ls-btn > svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  stroke-width: 1.6;
+}
+
+/* ─────────────────────────────────────────────
+   ACTIVE BUTTON — blue bg + left accent bar
+   ───────────────────────────────────────────── */
+.ls-btn--active {
+  background: var(--ls-accent-bg);
+  color: var(--ls-accent);
+}
+
+.ls-btn--active:hover {
+  background: var(--ls-accent-bg);
+  color: var(--ls-accent);
+}
+
+/* Left accent bar — 3px, full height */
+.ls-btn-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--ls-accent);
+}
+
+/* ─────────────────────────────────────────────
+   HELP BUTTON — static footer link
+   ───────────────────────────────────────────── */
+.ls-btn--help {
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────
+   PANEL — variable width drawer
+   ───────────────────────────────────────────── */
+.ls-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--ls-bg-panel);
+  border-right: 1px solid var(--ls-border-card);
+  overflow: hidden;
+  transition: width 0.2s ease, opacity 0.15s ease;
+}
+
+.ls-panel--closed {
+  width: 0 !important;
+  opacity: 0;
+  overflow: hidden;
+}
+
+/* ─────────────────────────────────────────────
+   PANEL HEADER — 44px with title, pin, close
+   ───────────────────────────────────────────── */
+.ls-panel-header {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--ls-border-light);
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.ls-panel-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ls-text-primary);
+  white-space: nowrap;
+}
+
+.ls-panel-header-spacer {
+  flex: 1;
+}
+
+.ls-panel-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--ls-text-subtle);
+  padding: 0;
+  border-radius: 4px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.ls-panel-icon-btn:hover {
+  background: var(--ls-bg-subtle);
+  color: var(--ls-text-medium);
+}
+
+.ls-panel-icon-btn:focus-visible {
+  outline: 2px solid var(--ls-accent);
+  outline-offset: -2px;
+}
+
+.ls-panel-icon-btn > svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ─────────────────────────────────────────────
+   PANEL CONTENT — scrollable area
+   ───────────────────────────────────────────── */
+.ls-panel-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--ls-bg-panel);
+}
+
+.ls-panel-content--no-padding {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
+/* Scrollbar styling */
+.ls-panel-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ls-panel-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ls-panel-content::-webkit-scrollbar-thumb {
+  background: var(--ls-border-soft);
+  border-radius: 2px;
+}
+
+.ls-panel-content::-webkit-scrollbar-thumb:hover {
+  background: var(--ls-text-lighter);
+}
+
+/* ─────────────────────────────────────────────
+   PANEL ANIMATION
+   ───────────────────────────────────────────── */
+.ls-panel-animate {
+  animation: ls-fade-in 0.15s ease;
+}
+
+@keyframes ls-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─────────────────────────────────────────────
+   ACCESSIBILITY — Reduced Motion
+   ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ls-btn,
+  .ls-panel,
+  .ls-panel-icon-btn {
+    transition: none;
+  }
+
+  .ls-panel-animate {
+    animation: none;
+  }
+
+  .ls-btn:active svg {
+    transform: none;
+  }
+}

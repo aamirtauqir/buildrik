@@ -9,7 +9,7 @@ import {
 import {
   loginSchema, signupSchema, forgotPasswordSchema,
   resetPasswordSchema, otpSchema, backupCodeSchema, magicLinkSchema,
-} from "@/lib/validations/auth";
+} from "@buildrik/shared/schemas/auth";
 import { generateToken } from "@/server/services/token.service";
 import { logAuditEvent } from "@/server/services/audit.service";
 import { createNotification } from "@/server/services/notification.trigger";
@@ -147,6 +147,45 @@ export const authRouter = router({
       } catch (err) {
         handleAuthError(err);
       }
+    }),
+
+  /**
+   * Email-first flow: reveals whether an account exists and what auth methods are available.
+   * Strict rate limit (5/15 min) + 200ms constant-time floor prevent bulk enumeration.
+   */
+  checkEmail: strictRateLimit
+    .input(z.object({ email: z.string().email() }))
+    .mutation(async ({ input, ctx }) => {
+      const MIN_RESPONSE_MS = 200;
+      const start = Date.now();
+
+      const user = await ctx.prisma.user.findUnique({
+        where: { email: input.email },
+        select: {
+          passwordHash: true,
+          accounts: { select: { provider: true } },
+        },
+      });
+
+      const providers: ("google" | "github")[] = [];
+      if (user) {
+        for (const a of user.accounts) {
+          if (a.provider === "google" || a.provider === "github") {
+            providers.push(a.provider);
+          }
+        }
+      }
+
+      const elapsed = Date.now() - start;
+      if (elapsed < MIN_RESPONSE_MS) {
+        await new Promise<void>((r) => setTimeout(r, MIN_RESPONSE_MS - elapsed));
+      }
+
+      return {
+        exists: user !== null,
+        hasPassword: user?.passwordHash !== null && user?.passwordHash !== undefined,
+        providers,
+      };
     }),
 
   logout: protectedProcedure.mutation(async ({ ctx }) => {

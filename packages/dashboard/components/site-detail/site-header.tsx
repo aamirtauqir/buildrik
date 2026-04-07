@@ -1,0 +1,70 @@
+"use client";
+import Link from "next/link";
+import { ArrowLeft, Pencil, Globe, MoreHorizontal, ExternalLink } from "lucide-react";
+
+const editorUrl = process.env.NEXT_PUBLIC_EDITOR_URL || "http://localhost:5050";
+
+const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
+  PUBLISHED: { bg: "#DCFCE7", text: "#166534" },
+  DRAFT: { bg: "#FEF9C3", text: "#854D0E" },
+  ARCHIVED: { bg: "#FED7AA", text: "#9A3412" },
+};
+
+interface SiteHeaderProps {
+  site: { id: string; name: string; slug: string; status: string; publishedUrl: string | null };
+  onPublish?: () => void;
+  onUnpublish?: () => void;
+}
+
+export function SiteHeader({ site, onPublish, onUnpublish }: SiteHeaderProps) {
+  const sc = STATUS_COLORS[site.status] ?? STATUS_COLORS.DRAFT;
+  return (
+    <div>
+      <Link href="/dashboard/sites" className="mb-3 inline-flex items-center gap-1 text-sm transition-colors hover:underline" style={{ color: "#7A7A7A" }}>
+        <ArrowLeft className="h-4 w-4" />Back to My Sites
+      </Link>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <h1 className="text-[22px] font-bold" style={{ color: "#0D0D0D" }}>{site.name}</h1>
+          <span className="rounded-full px-2.5 py-0.5 text-xs font-medium" style={{ backgroundColor: sc.bg, color: sc.text }}>{site.status.toLowerCase()}</span>
+          {site.publishedUrl && (
+            <a href={site.publishedUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs hover:underline" style={{ color: "#7A7A7A" }}>
+              <Globe className="h-3 w-3" />{site.slug}.buildrik.app
+            </a>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {site.status === "PUBLISHED" && site.publishedUrl ? (
+            <a
+              href={site.publishedUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium"
+              style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}
+            >
+              <ExternalLink className="h-4 w-4" />View Site
+            </a>
+          ) : (
+            <span
+              className="flex cursor-not-allowed items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium opacity-50"
+              style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}
+              title="Publish your site first"
+            >
+              <ExternalLink className="h-4 w-4" />View Site
+            </span>
+          )}
+          <a href={`${editorUrl}/?siteId=${site.id}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white" style={{ backgroundColor: "#E42313" }}>
+            <Pencil className="h-4 w-4" />Edit in Editor
+          </a>
+          {site.status === "DRAFT" && onPublish && (
+            <button onClick={onPublish} className="rounded-lg border px-4 py-2 text-sm font-medium" style={{ borderColor: "#E8E8E8", color: "#0D0D0D" }}>Publish</button>
+          )}
+          {site.status === "PUBLISHED" && onUnpublish && (
+            <button onClick={onUnpublish} className="rounded-lg border px-4 py-2 text-sm font-medium" style={{ borderColor: "#E8E8E8", color: "#7A7A7A" }}>Unpublish</button>
+          )}
+          <button className="rounded-lg border p-2" style={{ borderColor: "#E8E8E8" }}><MoreHorizontal className="h-4 w-4" style={{ color: "#7A7A7A" }} /></button>
+        </div>
+      </div>
+    </div>
+  );
+}

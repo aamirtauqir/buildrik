@@ -13,6 +13,8 @@ import {
   bulkAction,
   checkSlugAvailability,
   transferSite,
+  saveProjectData,
+  getProjectData,
 } from "@/server/services/sites.service";
 import {
   listFolders,
@@ -34,8 +36,10 @@ import {
   bulkActionSchema,
   transferSiteSchema,
   checkSlugSchema,
-} from "@/lib/validations/sites";
-import { prePublishCheckSchema } from "@/lib/validations/publish";
+  saveProjectDataSchema,
+  getProjectDataSchema,
+} from "@buildrik/shared/schemas/sites";
+import { prePublishCheckSchema } from "@buildrik/shared/schemas/publish";
 
 async function getWorkspaceId(ctx: {
   prisma: { workspaceMember: { findFirst: Function } };
@@ -172,6 +176,62 @@ export const sitesRouter = router({
       }
     }),
 
+  saveProject: protectedProcedure
+    .input(
+      z.object({
+        siteId: z.string(),
+        projectData: z.object({
+          version: z.string(),
+          pages: z.array(
+            z.object({
+              id: z.string(),
+              name: z.string(),
+              slug: z.string().optional(),
+              isHome: z.boolean().optional(),
+              root: z.any(),
+              styles: z.any().optional(),
+              settings: z.any().optional(),
+            })
+          ),
+          styles: z.array(z.any()),
+          assets: z.array(z.any()),
+          metadata: z.any().optional(),
+          settings: z.any().optional(),
+        }),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const site = await ctx.prisma.site.findUnique({
+        where: { id: input.siteId },
+        select: { workspaceId: true },
+      });
+      if (!site)
+        throw new TRPCError({ code: "NOT_FOUND", message: "Site not found" });
+
+      const member = await ctx.prisma.workspaceMember.findFirst({
+        where: {
+          workspaceId: site.workspaceId,
+          userId: ctx.session.user.id,
+        },
+      });
+      if (!member)
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Not authorized",
+        });
+
+      try {
+        return await saveProjectData(input.siteId, input.projectData);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Site not found",
+          });
+        throw e;
+      }
+    }),
+
   prePublishChecks: protectedProcedure
     .input(prePublishCheckSchema)
     .query(async ({ input }) => {
@@ -221,6 +281,30 @@ export const sitesRouter = router({
     .input(z.object({ siteId: z.string() }))
     .mutation(async ({ input }) => {
       return unpublishSite(input.siteId);
+    }),
+
+  saveProjectData: protectedProcedure
+    .input(saveProjectDataSchema)
+    .mutation(async ({ input }) => {
+      try {
+        return await saveProjectData(input);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
+        throw e;
+      }
+    }),
+
+  getProjectData: protectedProcedure
+    .input(getProjectDataSchema)
+    .query(async ({ input }) => {
+      try {
+        return await getProjectData(input.siteId);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "SITE_NOT_FOUND")
+          throw new TRPCError({ code: "NOT_FOUND", message: "Site not found." });
+        throw e;
+      }
     }),
 
   folders: router({

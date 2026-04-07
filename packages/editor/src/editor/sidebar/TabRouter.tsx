@@ -1,0 +1,109 @@
+/**
+ * TabRouter — Panel-mode tab routing for LeftSidebar
+ * Maps GroupedTabId to lazy-loaded panel tab components.
+ * Only handles panel-mode tabs (Add, Media, Layers, Pages, Components).
+ * Fullpage tabs (Templates, Settings, History, Design) are handled by FullPageRouter.
+ *
+ * @license BSD-3-Clause
+ */
+
+import * as React from "react";
+import type { Composer } from "../../engine";
+import type { GroupedTabId } from "../rail/tabsConfig";
+import type { BlockData } from "../../shared/types";
+import type { PublishResult } from "../../shared/hooks/usePublish";
+
+// Lazy-loaded panel tab components (code splitting)
+const BuildTab = React.lazy(() => import("./tabs/build").then((m) => ({ default: m.BuildTab })));
+const LayersTab = React.lazy(() => import("./tabs/layers/LayersTab"));
+const PagesTab = React.lazy(() => import("./tabs/pages/PagesTab"));
+const ComponentsTab = React.lazy(() => import("./tabs/ComponentsTab"));
+const MediaTab = React.lazy(() =>
+  import("./tabs/media/MediaTab").then((m) => ({ default: m.MediaTab }))
+);
+const PublishTab = React.lazy(() => import("./tabs/publish/PublishTab"));
+
+export interface TabRouterProps {
+  activeTab: GroupedTabId;
+  composer: Composer | null;
+  commonTabProps: {
+    isPinned: boolean;
+    onPinToggle: () => void;
+    onHelpClick: () => void;
+    onClose: () => void;
+  };
+  onBlockClick?: (data: BlockData) => void;
+  onElementSelect?: (id: string) => void;
+  canvasHoveredId?: string | null;
+  onSwitchToAdd: () => void;
+  onSwitchToTemplates?: () => void;
+  onCreateComponent: () => void;
+  onReplayTour?: () => void;
+  projectId?: string | null;
+  onPublish?: (projectId: string) => Promise<PublishResult>;
+  onUnpublish?: (projectId: string) => Promise<void>;
+  onSettingsDirtyChange?: (dirty: boolean) => void;
+  onTemplatesSwitchTab?: (tab: string) => void;
+}
+
+export const TabRouter: React.FC<TabRouterProps> = ({
+  activeTab,
+  composer,
+  commonTabProps,
+  onBlockClick,
+  onElementSelect,
+  canvasHoveredId,
+  onSwitchToAdd,
+  onSwitchToTemplates,
+  onCreateComponent,
+  projectId,
+  onPublish,
+  onUnpublish,
+}) => {
+  switch (activeTab) {
+    case "add":
+      return <BuildTab composer={composer} onBlockClick={onBlockClick} {...commonTabProps} />;
+
+    case "layers":
+      return (
+        <LayersTab
+          composer={composer}
+          onElementSelect={onElementSelect}
+          canvasHoveredId={canvasHoveredId}
+          onAddBlockClick={onSwitchToAdd}
+          {...commonTabProps}
+        />
+      );
+
+    case "pages":
+      return (
+        <PagesTab
+          composer={composer}
+          {...commonTabProps}
+          onRequestTemplates={onSwitchToTemplates}
+        />
+      );
+
+    case "components":
+      return (
+        <ComponentsTab composer={composer} onCreateNew={onCreateComponent} {...commonTabProps} />
+      );
+
+    case "assets":
+      return <MediaTab composer={composer} {...commonTabProps} />;
+
+    case "publish":
+      return (
+        <PublishTab
+          composer={composer}
+          {...commonTabProps}
+          projectId={projectId}
+          onPublish={onPublish}
+          onUnpublish={onUnpublish}
+        />
+      );
+
+    default:
+      return null;
+  }
+};

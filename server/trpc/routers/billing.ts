@@ -5,7 +5,7 @@ import {
   getBillingOverview, getUsageDetails, listInvoices,
   upgradePlan, cancelSubscription, reactivateSubscription, getPlans,
 } from "@/server/services/billing.service";
-import { upgradeSchema, cancelSchema } from "@/lib/validations/billing";
+import { upgradeSchema, cancelSchema } from "@buildrik/shared/schemas/billing";
 import { type PlanName } from "@/lib/constants/plan-limits";
 
 async function getWorkspaceId(ctx: any): Promise<string> {

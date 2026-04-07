@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { SiteOverview } from "@/lib/validations/site-detail";
+import type { SiteOverview } from "@buildrik/shared/schemas/site-detail";
 
 export async function getSiteOverview(siteId: string): Promise<SiteOverview> {
   const site = await prisma.site.findUnique({

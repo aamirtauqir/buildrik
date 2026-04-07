@@ -8,7 +8,7 @@ import {
   submitFeedback,
   createTicket,
 } from "@/server/services/help.service";
-import { supportTicketSchema } from "@/lib/validations/help";
+import { supportTicketSchema } from "@buildrik/shared/schemas/help";
 
 export const helpRouter = router({
   categories: publicProcedure.query(() => listCategories()),
