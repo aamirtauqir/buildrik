@@ -17,13 +17,11 @@ export { DrawerPanel } from "./DrawerPanel";
 export type { DrawerPanelProps } from "./DrawerPanel";
 
 // Rail + tab configuration
-export { RAIL_SLOTS, GROUPED_TABS_CONFIG, getSlotsByZone } from "./tabsConfig";
+export { GROUPED_TABS_CONFIG, getTabsByZone } from "./tabsConfig";
 export type {
-  RailSlot,
-  RailZone,
-  RailVariant,
   GroupedTabId,
   GroupedTabConfig,
   TabPattern,
   TabSection,
+  TabZone,
 } from "./tabsConfig";

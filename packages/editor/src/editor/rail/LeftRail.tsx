@@ -1,65 +1,58 @@
 /**
- * LeftRail — v16 thin icon navigation bar
+ * LeftRail — 3-zone icon navigation bar
  *
- * 2-ZONE STRUCTURE (RF-6 Section C IA Redesign 2026):
- * Width: 60px | rtab: 44px height, 17px icons
+ * 3-ZONE STRUCTURE (2026-04-07 redesign):
+ * Width: 60px | rtab: 40px height, 20px lucide icons
  *
  * Structure:
- * - LOGO: Gem mark with indigo gradient glow
- * - TOP: Add | Media | Layers | Templates | Pages (content creation + structure)
- * - SEPARATOR: solid line
- * - BOTTOM: Design | Settings | History (configuration, pushed to bottom via flex)
- *
- * v16 changes:
- * - Indigo #7c6dfa active + 3px left bar
- * - CSS-driven tooltips with keyboard shortcuts (no React state)
- * - Badge dots (warn/info/ok) + progress ring API
+ * - LOGO: Layers mark with accent glow
+ * - CREATION: Add | Templates | Media
+ * - ── divider ──
+ * - STRUCTURE: Layers | Pages | Components
+ * - ── divider ──
+ * - CONFIG: Settings | History
+ * - [spacer]
+ * - HELP: static footer link
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import "./LeftRail.css";
-import type { GroupedTabId } from "./tabsConfig";
+import type { GroupedTabId, GroupedTabConfig } from "./tabsConfig";
+import { getTabsByZone, GROUPED_TABS_CONFIG } from "./tabsConfig";
 import {
-  SvgShapes,
-  SvgLayers,
-  SvgPages,
-  SvgClock,
-  SvgSettings,
-  SvgPlusCircle,
-  SvgImage,
-  SvgGlobe,
-  SvgTemplates,
-  SvgRocket,
-  SvgPalette,
-} from "../../shared/ui/Icons";
-import { getSlotsByZone, GROUPED_TABS_CONFIG } from "./tabsConfig";
-import type { RailSlot } from "./tabsConfig";
+  Plus,
+  LayoutGrid,
+  Image,
+  Layers,
+  File,
+  Diamond,
+  Settings,
+  Timer,
+  Info,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 // Shortcut lookup — GROUPED_TABS_CONFIG is the SSOT for keyboard shortcuts.
-// Rail button tooltips read from here instead of duplicating values in RAIL_SLOTS.
 const TAB_SHORTCUTS: Partial<Record<string, string>> = Object.fromEntries(
   GROUPED_TABS_CONFIG.flatMap((t) => (t.shortcut ? [[t.id, t.shortcut]] : []))
 );
 
 // ============================================
-// Icon Mapping — v16 names → React components
+// Icon Mapping — lucide icon name → component
 // ============================================
 
-const ICON_MAP: Record<string, React.FC<{ className?: string }>> = {
-  SvgPlus: SvgPlusCircle,
-  SvgPlusCircle: SvgPlusCircle,
-  SvgLayers: SvgLayers,
-  SvgPages: SvgPages,
-  SvgImage: SvgImage,
-  SvgClock: SvgClock,
-  SvgSettings: SvgSettings,
-  SvgShapes: SvgShapes,
-  SvgGlobe: SvgGlobe,
-  SvgTemplates: SvgTemplates,
-  SvgRocket: SvgRocket,
-  SvgPalette: SvgPalette,
+const ICON_MAP: Record<string, LucideIcon> = {
+  Plus,
+  LayoutGrid,
+  Image,
+  Layers,
+  File,
+  Diamond,
+  Settings,
+  Timer,
+  Info,
 };
 
 // ============================================
@@ -72,15 +65,12 @@ export interface LeftRailProps {
   drawerOpen?: boolean;
   onDrawerToggle?: () => void;
   className?: string;
-  /** Kept for backward compat — no longer rendered in rail */
-  onOpenCommandPalette?: () => void;
 }
 
 type BadgeType = "warn" | "info" | "ok";
 
 interface RailTabProps {
-  slot: RailSlot;
-  icon: React.FC<{ className?: string }>;
+  slot: GroupedTabConfig;
   isActive: boolean;
   badge?: BadgeType | null;
   onClick: () => void;
@@ -90,7 +80,10 @@ interface RailTabProps {
 // RailTab — main nav button (rtab variant)
 // ============================================
 
-const RailTab: React.FC<RailTabProps> = ({ slot, icon: Icon, isActive, badge, onClick }) => {
+const RailTab: React.FC<RailTabProps> = ({ slot, isActive, badge, onClick }) => {
+  const Icon = ICON_MAP[slot.iconName];
+  if (!Icon) return null;
+
   const itemClass = ["left-rail__item", isActive ? "left-rail__item--active" : ""]
     .filter(Boolean)
     .join(" ");
@@ -100,27 +93,23 @@ const RailTab: React.FC<RailTabProps> = ({ slot, icon: Icon, isActive, badge, on
       className={itemClass}
       onClick={onClick}
       role="tab"
-      id={`rail-tab-${slot.tabId}`}
-      data-tab={slot.tabId}
+      id={`rail-tab-${slot.id}`}
+      data-tab={slot.id}
       aria-selected={isActive}
-      aria-controls={`rail-panel-${slot.tabId}`}
+      aria-controls={`rail-panel-${slot.id}`}
       aria-label={slot.ariaLabel}
       tabIndex={isActive ? 0 : -1}
     >
-      <Icon className="left-rail__icon" />
-      <span className="left-rail__label">{slot.label}</span>
+      <Icon className="left-rail__icon" size={20} />
 
       {/* CSS-driven tooltip — always in DOM, shown via :hover opacity */}
       <span className="left-rail__tooltip" role="tooltip">
         <span className="left-rail__tooltip-name">
           {slot.ariaLabel}
-          {TAB_SHORTCUTS[slot.tabId] && (
-            <span className="left-rail__tooltip-kbd">{TAB_SHORTCUTS[slot.tabId]}</span>
+          {TAB_SHORTCUTS[slot.id] && (
+            <span className="left-rail__tooltip-kbd">{TAB_SHORTCUTS[slot.id]}</span>
           )}
         </span>
-        {slot.subtitle && (
-          <span className="left-rail__tooltip-sub">{slot.subtitle}</span>
-        )}
       </span>
 
       {/* Badge dot */}
@@ -132,7 +121,27 @@ const RailTab: React.FC<RailTabProps> = ({ slot, icon: Icon, isActive, badge, on
 };
 
 // ============================================
-// LeftRail Component — v16 2-zone structure
+// Zone rendering helper
+// ============================================
+
+function renderZone(
+  slots: GroupedTabConfig[],
+  activeTab: GroupedTabId,
+  drawerOpen: boolean,
+  onSlotClick: (slot: GroupedTabConfig) => void
+) {
+  return slots.map((slot) => (
+    <RailTab
+      key={slot.id}
+      slot={slot}
+      isActive={slot.id === activeTab && drawerOpen}
+      onClick={() => onSlotClick(slot)}
+    />
+  ));
+}
+
+// ============================================
+// LeftRail Component — 3-zone structure
 // ============================================
 
 export const LeftRail: React.FC<LeftRailProps> = ({
@@ -144,17 +153,17 @@ export const LeftRail: React.FC<LeftRailProps> = ({
 }) => {
   const navRef = React.useRef<HTMLElement>(null);
 
-  // Derive zone slots from config
-  const topSlots = React.useMemo(() => getSlotsByZone("top"), []);
-  const bottomSlots = React.useMemo(() => getSlotsByZone("bottom"), []);
+  // Derive zone tabs from config
+  const creationSlots = React.useMemo(() => getTabsByZone("creation"), []);
+  const structureSlots = React.useMemo(() => getTabsByZone("structure"), []);
+  const configSlots = React.useMemo(() => getTabsByZone("config"), []);
 
   const handleSlotClick = React.useCallback(
-    (slot: RailSlot) => {
-      if (slot.tabId === activeTab && onDrawerToggle) {
-        // Clicking already-active tab toggles drawer
+    (slot: GroupedTabConfig) => {
+      if (slot.id === activeTab && onDrawerToggle) {
         onDrawerToggle();
       } else {
-        onTabChange(slot.tabId);
+        onTabChange(slot.id);
       }
     },
     [activeTab, onTabChange, onDrawerToggle]
@@ -207,61 +216,46 @@ export const LeftRail: React.FC<LeftRailProps> = ({
     >
       {/* Logo Mark */}
       <div className="left-rail__logo">
-        <div className="left-rail__logo-mark" title="Aquibra Studio" />
+        <Layers className="left-rail__logo-icon" size={28} />
       </div>
 
-      {/* TOP — Content Creation (flex: 0) */}
-      <div className="left-rail__nav">
-        {topSlots.map((slot) => {
-          const Icon = ICON_MAP[slot.iconName] ?? SvgShapes;
-          return (
-            <RailTab
-              key={slot.tabId}
-              slot={slot}
-              icon={Icon}
-              isActive={slot.tabId === activeTab && drawerOpen}
-              onClick={() => handleSlotClick(slot)}
-            />
-          );
-        })}
+      <div className="left-rail__divider" role="separator" aria-hidden="true" />
 
-        {/* Separator */}
-        <div className="left-rail__divider" role="separator" aria-hidden="true" />
-
-        {/* BOTTOM — Configuration (pushed down via spacer) */}
-        <div className="left-rail__spacer" />
-        {bottomSlots.map((slot) => {
-          const Icon = ICON_MAP[slot.iconName] ?? SvgShapes;
-          return (
-            <RailTab
-              key={slot.tabId}
-              slot={slot}
-              icon={Icon}
-              isActive={slot.tabId === activeTab && drawerOpen}
-              onClick={() => handleSlotClick(slot)}
-            />
-          );
-        })}
-
-        {/* Help — static footer button (not a sidebar tab) */}
-        <a
-          href="https://docs.buildrik.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="left-rail__item left-rail__item--help"
-          aria-label="Help and documentation"
-        >
-          <svg className="left-rail__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="8" cy="8" r="6.5" />
-            <path d="M6 6.5a2 2 0 1 1 2.5 1.94V9.5" />
-            <circle cx="8" cy="11.5" r="0.75" fill="currentColor" stroke="none" />
-          </svg>
-          <span className="left-rail__label">Help</span>
-          <span className="left-rail__tooltip" role="tooltip">
-            <span className="left-rail__tooltip-name">Help &amp; Docs</span>
-          </span>
-        </a>
+      {/* CREATION — Add, Templates, Media */}
+      <div className="left-rail__zone" data-zone="creation">
+        {renderZone(creationSlots, activeTab, drawerOpen, handleSlotClick)}
       </div>
+
+      <div className="left-rail__divider" role="separator" aria-hidden="true" />
+
+      {/* STRUCTURE — Layers, Pages, Components */}
+      <div className="left-rail__zone" data-zone="structure">
+        {renderZone(structureSlots, activeTab, drawerOpen, handleSlotClick)}
+      </div>
+
+      <div className="left-rail__divider" role="separator" aria-hidden="true" />
+
+      {/* CONFIG — Settings, History */}
+      <div className="left-rail__zone" data-zone="config">
+        {renderZone(configSlots, activeTab, drawerOpen, handleSlotClick)}
+      </div>
+
+      {/* Spacer pushes Help to bottom */}
+      <div className="left-rail__spacer" />
+
+      {/* Help — static footer button (not a sidebar tab) */}
+      <a
+        href="https://docs.buildrik.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="left-rail__item left-rail__item--help"
+        aria-label="Help and documentation"
+      >
+        <Info className="left-rail__icon" size={20} />
+        <span className="left-rail__tooltip" role="tooltip">
+          <span className="left-rail__tooltip-name">Help &amp; Docs</span>
+        </span>
+      </a>
     </nav>
   );
 };
