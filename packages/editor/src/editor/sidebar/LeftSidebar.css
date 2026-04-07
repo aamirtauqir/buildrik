@@ -12,6 +12,19 @@
 @import "./tabs/settings/styles/settings.css";
 @import "./tabs/design/styles/design-tokens.css";
 @import "./tabs/media/MediaTab.css";
+@import "./shared/SkeletonStates.css";
+@import "./shared/EmptyStates.css";
+
+/* ─────────────────────────────────────────────
+   FULLPAGE CONTAINER
+   ───────────────────────────────────────────── */
+.ls-fullpage-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
 
 /* ─────────────────────────────────────────────
    MEDIA TAB ACCENT TOKENS

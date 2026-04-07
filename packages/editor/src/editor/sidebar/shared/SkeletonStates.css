@@ -1,0 +1,115 @@
+/* SkeletonStates — Light theme skeletons for sidebar panels
+   Uses ls-* tokens to match LeftSidebar light theme.
+   Prefix: skel-* */
+
+@keyframes skel-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.15; }
+}
+
+.skel-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--ls-bg-panel, #F8FAFC);
+}
+
+.skel-bar {
+  border-radius: 4px;
+  background: var(--ls-border-light, #E2E8F0);
+  animation: skel-pulse 1.5s ease-in-out infinite;
+}
+
+.skel-header {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--ls-border-light, #E2E8F0);
+}
+
+.skel-header .skel-bar {
+  width: 80px;
+  height: 14px;
+}
+
+.skel-search {
+  padding: 8px 12px;
+}
+
+.skel-search .skel-bar {
+  height: 36px;
+  border-radius: 6px;
+}
+
+.skel-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Add tab skeleton */
+.skel-add-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skel-add-body .skel-label { width: 100px; height: 10px; }
+.skel-add-body .skel-grid { display: flex; gap: 8px; }
+.skel-add-body .skel-card { width: 50%; height: 64px; border-radius: 8px; }
+
+/* Layers tab skeleton */
+.skel-tree { padding: 8px 12px; display: flex; flex-direction: column; gap: 4px; }
+.skel-tree-indent-1 { padding-left: 16px; }
+.skel-tree-indent-2 { padding-left: 32px; }
+
+/* Pages tab skeleton */
+.skel-pages { padding: 8px 12px; display: flex; flex-direction: column; gap: 8px; }
+
+/* Media tab skeleton */
+.skel-media-body { padding: 8px 12px; display: flex; flex-direction: column; gap: 10px; }
+.skel-media-upload { height: 80px; border-radius: 8px; }
+.skel-media-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+.skel-media-thumb { width: 72px; height: 72px; border-radius: 6px; }
+
+/* Components tab skeleton */
+.skel-comps { padding: 8px 12px; display: flex; flex-direction: column; gap: 8px; }
+
+/* Templates tab skeleton (fullpage — wider layout) */
+.skel-tpl-header {
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--ls-border-light, #E2E8F0);
+}
+.skel-tpl-header .skel-bar { width: 120px; height: 18px; }
+.skel-tpl-search { padding: 10px 24px; }
+.skel-tpl-pills { padding: 10px 24px; display: flex; gap: 8px; }
+.skel-tpl-pill { width: 80px; height: 28px; border-radius: 14px; }
+.skel-tpl-grid { padding: 16px 24px; display: flex; gap: 16px; flex-wrap: wrap; }
+.skel-tpl-card { width: calc(50% - 8px); height: 180px; border-radius: 8px; }
+
+/* Settings tab skeleton (fullpage — 2-column layout) */
+.skel-settings { display: flex; height: 100%; }
+.skel-settings-nav {
+  width: 220px;
+  border-right: 1px solid var(--ls-border-light, #E2E8F0);
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.skel-settings-form {
+  flex: 1;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* History tab skeleton (fullpage) */
+.skel-hist-header {
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--ls-border-light, #E2E8F0);
+}
+.skel-hist-header .skel-bar { width: 100px; height: 18px; }
+.skel-hist-tabs { padding: 10px 24px; display: flex; gap: 24px; }
+.skel-hist-tab { width: 80px; height: 14px; }
+.skel-hist-rows { padding: 12px 24px; display: flex; flex-direction: column; gap: 12px; }

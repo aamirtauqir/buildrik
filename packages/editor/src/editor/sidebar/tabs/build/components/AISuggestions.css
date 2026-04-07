@@ -1,0 +1,89 @@
+/* AISuggestions — AI suggestion cards in Add tab
+   Uses ls-* tokens to match sidebar light theme.
+   Prefix: ai-sug-* */
+
+.ai-sug-container {
+  margin: 0 10px 8px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--ls-accent-bg, #DBEAFE);
+  border: 1px solid color-mix(in srgb, var(--ls-accent, #1D4ED8) 20%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-sug-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ai-sug-header-icon {
+  color: var(--ls-accent, #1D4ED8);
+}
+
+.ai-sug-header-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ls-text-secondary, #334155);
+  flex: 1;
+}
+
+.ai-sug-dismiss {
+  background: none;
+  border: none;
+  color: var(--ls-text-muted, #475569);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.ai-sug-dismiss:hover {
+  color: var(--ls-text-primary, #0F172A);
+}
+
+.ai-sug-cards {
+  display: flex;
+  gap: 8px;
+}
+
+.ai-sug-card {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 6px;
+  background: var(--ls-bg-card, #FFFFFF);
+  border: 1px solid var(--ls-border-light, #E2E8F0);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.ai-sug-card:hover {
+  background: var(--ls-bg-subtle, #F1F5F9);
+  border-color: var(--ls-accent, #1D4ED8);
+}
+
+.ai-sug-card-icon {
+  color: var(--ls-accent, #1D4ED8);
+  flex-shrink: 0;
+}
+
+.ai-sug-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ls-text-primary, #0F172A);
+  line-height: 1.3;
+}
+
+.ai-sug-card-desc {
+  font-size: 11px;
+  color: var(--ls-text-muted, #475569);
+  margin-top: 2px;
+}
