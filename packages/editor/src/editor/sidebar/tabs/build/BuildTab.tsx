@@ -17,6 +17,7 @@ import { FavZone } from "./components/FavZone";
 import { MyComponents } from "./components/MyComponents";
 import { OnboardingTip } from "./components/OnboardingTip";
 import { SearchResults } from "./components/SearchResults";
+import { AISuggestions } from "./components/AISuggestions";
 import "./BuildTab.css";
 
 export interface BuildTabProps {
@@ -86,6 +87,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           debounceMs={0}
         />
       </div>
+      <AISuggestions />
       {tab.insertionContext && (
         <div className="bld-insert-ctx" aria-live="polite">
           <span className="bld-insert-ctx-icon">↳</span>
@@ -163,8 +165,8 @@ const containerStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   height: "100%",
-  background: "var(--aqb-surface-2)",
+  background: "var(--ls-bg-panel, #F8FAFC)",
 };
-const searchWrapStyles: React.CSSProperties = { padding: "6px 10px", flexShrink: 0 };
+const searchWrapStyles: React.CSSProperties = { padding: "8px 12px", flexShrink: 0 };
 
 export default BuildTab;

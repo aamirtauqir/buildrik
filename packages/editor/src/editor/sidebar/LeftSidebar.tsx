@@ -29,8 +29,6 @@ import {
   Settings,
   Timer,
   Info,
-  Pin,
-  X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -145,7 +143,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const panelContentRef = React.useRef<HTMLDivElement>(null);
   const [errorKey, setErrorKey] = React.useState(0);
 
-  // Internal pin state (when not controlled externally)
+  // Pin state (controlled or internal fallback)
   const [internalPinned, setInternalPinned] = React.useState(true);
   const isPinned = controlledPinned ?? internalPinned;
   const onPinToggle = controlledPinToggle ?? (() => setInternalPinned((p) => !p));
@@ -308,26 +306,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         role="tabpanel"
         aria-hidden={!drawerOpen}
       >
-        <div className="ls-panel-header">
-          <span className="ls-panel-title">{panelTitle}</span>
-          <div className="ls-panel-header-spacer" />
-          <button
-            className="ls-panel-icon-btn"
-            onClick={onPinToggle}
-            aria-label={isPinned ? "Unpin panel" : "Pin panel"}
-          >
-            <Pin size={16} />
-          </button>
-          <button
-            className="ls-panel-icon-btn"
-            onClick={onDrawerToggle}
-            aria-label="Close panel"
-          >
-            <X size={16} />
-          </button>
-        </div>
-
-        <div ref={panelContentRef} className="ls-panel-content" tabIndex={-1}>
+        <div ref={panelContentRef} className="ls-panel-content ls-panel-content--no-padding" tabIndex={-1}>
           <InspectorErrorBoundary
             key={errorKey}
             fallback={<SidebarErrorFallback onRetry={() => setErrorKey((k) => k + 1)} />}

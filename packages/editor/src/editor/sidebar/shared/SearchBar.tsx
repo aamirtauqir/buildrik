@@ -116,13 +116,14 @@ const ClearIcon = () => (
 const containerStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  gap: 6,
+  gap: 8,
   margin: 0,
-  padding: "8px 12px",
-  background: "var(--aqb-surface-3)",
-  border: "1px solid var(--aqb-bg-active)",
-  borderRadius: 12,
-  color: "var(--aqb-text-muted)",
+  padding: "0 8px",
+  height: 36,
+  background: "var(--ls-bg-card, #FFFFFF)",
+  border: "1px solid var(--ls-border-card, #D1D9E6)",
+  borderRadius: 4,
+  color: "var(--ls-text-lighter, #94A3B8)",
   transition: "border-color 0.15s ease, box-shadow 0.15s ease",
 };
 
@@ -130,10 +131,11 @@ const inputStyles: React.CSSProperties = {
   flex: 1,
   background: "transparent",
   border: "none",
-  color: "var(--aqb-text-primary)",
-  fontSize: "var(--aqb-text-base)",
+  color: "var(--ls-text-primary, #0F172A)",
+  fontSize: 13,
   outline: "none",
   lineHeight: "18px",
+  fontFamily: "'Inter', sans-serif",
 };
 
 const clearButtonStyles: React.CSSProperties = {
@@ -144,8 +146,8 @@ const clearButtonStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
   cursor: "pointer",
-  color: "var(--aqb-text-muted)",
-  borderRadius: "var(--aqb-radius-sm)",
+  color: "var(--ls-text-subtle, #64748B)",
+  borderRadius: 4,
 };
 
 export default SearchBar;

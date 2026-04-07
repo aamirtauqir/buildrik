@@ -65,21 +65,21 @@ const headerContainerStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
-  height: 48,
-  minHeight: 48,
-  padding: "0 10px 0 12px",
-  borderBottom: "1px solid var(--aqb-border)",
-  background: "var(--aqb-surface-1, #0f0f14)",
+  height: 44,
+  minHeight: 44,
+  padding: "0 12px",
+  borderBottom: "1px solid var(--ls-border-light, #E2E8F0)",
+  background: "var(--ls-bg-panel, #F8FAFC)",
   flexShrink: 0,
 };
 
 const titleStyles: React.CSSProperties = {
   margin: 0,
   flex: 1,
-  fontSize: "var(--aqb-text-md, 14px)",
+  fontSize: 14,
   fontWeight: 600,
   lineHeight: "20px",
-  color: "var(--aqb-text-primary, #F5F5F0)",
+  color: "var(--ls-text-primary, #0F172A)",
   letterSpacing: "-0.01em",
 };
 
@@ -99,9 +99,9 @@ const iconBtnStyles: React.CSSProperties = {
   padding: 0,
   border: "none",
   background: "transparent",
-  borderRadius: "var(--aqb-radius-sm, 4px)",
+  borderRadius: 4,
   cursor: "pointer",
-  color: "var(--aqb-text-muted, #908D85)",
+  color: "var(--ls-text-subtle, #64748B)",
 };
 
 // ============================================
@@ -132,8 +132,8 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
         style={{
           ...iconBtnStyles,
           color: isPinned
-            ? "var(--aqb-primary, #7C6DFA)"
-            : "var(--aqb-text-muted, #908D85)",
+            ? "var(--ls-accent, #1D4ED8)"
+            : "var(--ls-text-subtle, #64748B)",
         }}
         title={isPinned ? "Unpin panel" : "Pin panel"}
         aria-label={isPinned ? "Unpin panel" : "Pin panel"}
@@ -208,7 +208,7 @@ export const PanelHeader: React.FC<PanelHeaderProps> = ({
             display: "flex",
             alignItems: "center",
             marginRight: 8,
-            color: "var(--aqb-text-secondary, #B8B5AD)",
+            color: "var(--ls-text-subtle, #64748B)",
             flexShrink: 0,
             width: 16,
             height: 16,

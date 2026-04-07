@@ -275,6 +275,12 @@
   background: var(--ls-bg-panel);
 }
 
+.ls-panel-content--no-padding {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
 /* Scrollbar styling */
 .ls-panel-content::-webkit-scrollbar {
   width: 4px;
