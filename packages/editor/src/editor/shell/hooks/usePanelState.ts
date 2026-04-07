@@ -1,20 +1,29 @@
 /**
- * usePanelState - Hook for managing left/right panel open/closed and tab state
+ * usePanelState - Sole authority for panel state management
  *
- * Handles leftPanelTab, leftPanelSubTabs, rightPanelTab, isLeftPanelOpen,
- * and localStorage persistence for all panel state.
+ * Manages: leftPanelTab, leftPanelSubTabs, rightPanelTab, isLeftPanelOpen,
+ * panelPinned, and derived values (isFullPageMode, drawerWidth).
+ * localStorage persistence for all panel state.
  *
- * @module Editor/hooks/usePanelState
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { GroupedTabId } from "../../rail/tabsConfig";
+import { getTabMode, getTabWidth } from "../../rail/tabsConfig";
 import { migrateLegacyPanelState } from "./panelStateMigration";
-import type { PanelState, PanelSizeMode } from "./useStudioState";
 
 /** LocalStorage key for panel state persistence */
 const PANEL_STATE_KEY = "aqb-panel-state";
+
+/** Persisted panel state structure */
+interface PanelState {
+  leftPanelTab?: string;
+  leftPanelSubTabs?: Record<string, string>;
+  rightPanelTab?: string;
+  isLeftPanelOpen?: boolean;
+  panelPinned?: boolean;
+}
 
 /**
  * Load saved panel state from localStorage
@@ -24,11 +33,10 @@ function getSavedPanelState(): PanelState | null {
     const saved = localStorage.getItem(PANEL_STATE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved) as PanelState;
-      // Migrate legacy state to new grouped structure
-      return migrateLegacyPanelState(parsed);
+      return migrateLegacyPanelState(parsed) as PanelState;
     }
   } catch {
-    // Ignore parse errors
+    // Corrupted JSON — fall back to defaults
   }
   return null;
 }
@@ -61,40 +69,36 @@ export interface UsePanelStateReturn {
   openLayers: () => void;
   panelPinned: boolean;
   setPanelPinned: (pinned: boolean) => void;
-  panelSizeMode: PanelSizeMode;
-  setPanelSizeMode: (mode: PanelSizeMode) => void;
+  /** Whether the active tab is a fullpage tab (Templates, Settings, History, Design) */
+  isFullPageMode: boolean;
+  /** Panel width in pixels for the active tab (200 or 280) */
+  drawerWidth: number;
 }
 
 /**
- * Manages left/right panel open state, active tabs, and localStorage persistence
+ * Manages all panel state with localStorage persistence.
+ * Derives isFullPageMode and drawerWidth from the active tab's config.
  */
 export function usePanelState(): UsePanelStateReturn {
-  // Load saved panel state once on mount
   const savedState = React.useMemo(() => getSavedPanelState(), []);
 
-  // Panel state with persistence
-  // savedState?.leftPanelTab may be a legacy string from localStorage; cast after migration guarantees GroupedTabId
   const [leftPanelTab, _setLeftPanelTab] = React.useState<GroupedTabId>(
     (savedState?.leftPanelTab as GroupedTabId) || "add"
   );
   const [leftPanelSubTabs, _setLeftPanelSubTabs] = React.useState<Record<string, string>>(
-    savedState?.leftPanelSubTabs || {
-      build: "elements",
-      structure: "layers",
-      content: "cms",
-      ai: "ai-assistant",
-    }
+    savedState?.leftPanelSubTabs || {}
   );
   const [rightPanelTab, _setRightPanelTab] = React.useState(
     savedState?.rightPanelTab || "inspector"
   );
   const [isLeftPanelOpen, setIsLeftPanelOpen] = React.useState(savedState?.isLeftPanelOpen ?? false);
   const [panelPinned, _setPanelPinned] = React.useState<boolean>(savedState?.panelPinned ?? true);
-  const [panelSizeMode, _setPanelSizeMode] = React.useState<PanelSizeMode>(
-    savedState?.panelSizeMode ?? "normal"
-  );
 
-  // Persist panel state to localStorage when it changes
+  // Derived state from active tab config
+  const isFullPageMode = getTabMode(leftPanelTab) === "fullpage";
+  const drawerWidth = getTabWidth(leftPanelTab);
+
+  // Persist to localStorage
   React.useEffect(() => {
     savePanelState({
       leftPanelTab,
@@ -102,11 +106,9 @@ export function usePanelState(): UsePanelStateReturn {
       rightPanelTab,
       isLeftPanelOpen,
       panelPinned,
-      panelSizeMode,
     });
-  }, [leftPanelTab, leftPanelSubTabs, rightPanelTab, isLeftPanelOpen, panelPinned, panelSizeMode]);
+  }, [leftPanelTab, leftPanelSubTabs, rightPanelTab, isLeftPanelOpen, panelPinned]);
 
-  // Wrapped setters that update state and trigger persistence
   const setLeftPanelTab = React.useCallback((tab: GroupedTabId) => {
     _setLeftPanelTab(tab);
   }, []);
@@ -126,20 +128,13 @@ export function usePanelState(): UsePanelStateReturn {
     _setPanelPinned(pinned);
   }, []);
 
-  const setPanelSizeMode = React.useCallback((mode: PanelSizeMode) => {
-    _setPanelSizeMode(mode);
-  }, []);
-
-  // Convenience handler for opening left panel
   const openLeftPanel = React.useCallback(() => {
     setIsLeftPanelOpen(true);
   }, []);
 
-  // Navigation functions for specific panel tabs
   const openLeftPanelToTab = React.useCallback((primaryTab: GroupedTabId, subTab?: string) => {
     setIsLeftPanelOpen(true);
     _setLeftPanelTab(primaryTab);
-
     if (subTab) {
       _setLeftPanelSubTabs((prev) => ({
         ...prev,
@@ -157,7 +152,6 @@ export function usePanelState(): UsePanelStateReturn {
   }, [openLeftPanelToTab]);
 
   const openLayers = React.useCallback(() => {
-    // 8-tab structure: 'layers' is a standalone tab, no subtab needed
     openLeftPanelToTab("layers");
   }, [openLeftPanelToTab]);
 
@@ -177,7 +171,7 @@ export function usePanelState(): UsePanelStateReturn {
     openLayers,
     panelPinned,
     setPanelPinned,
-    panelSizeMode,
-    setPanelSizeMode,
+    isFullPageMode,
+    drawerWidth,
   };
 }

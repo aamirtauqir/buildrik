@@ -178,14 +178,9 @@ export function useStudioState(): UseStudioStateReturn {
   const [zoom, setZoom] = React.useState(100);
 
   // Panel state with persistence
-  const [leftPanelTab, _setLeftPanelTab] = React.useState(savedState?.leftPanelTab || "build");
+  const [leftPanelTab, _setLeftPanelTab] = React.useState(savedState?.leftPanelTab || "add");
   const [leftPanelSubTabs, _setLeftPanelSubTabs] = React.useState<Record<string, string>>(
-    savedState?.leftPanelSubTabs || {
-      build: "elements",
-      structure: "layers",
-      content: "cms",
-      ai: "ai-assistant",
-    }
+    savedState?.leftPanelSubTabs || {}
   );
   const [rightPanelTab, _setRightPanelTab] = React.useState(
     savedState?.rightPanelTab || "inspector"
@@ -264,11 +259,11 @@ export function useStudioState(): UseStudioStateReturn {
   }, []);
 
   const openBlocks = React.useCallback(() => {
-    openLeftPanelToTab("build", "elements");
+    openLeftPanelToTab("add");
   }, [openLeftPanelToTab]);
 
   const openPages = React.useCallback(() => {
-    openLeftPanelToTab("structure", "pages");
+    openLeftPanelToTab("pages");
   }, [openLeftPanelToTab]);
 
   const openLayers = React.useCallback(() => {

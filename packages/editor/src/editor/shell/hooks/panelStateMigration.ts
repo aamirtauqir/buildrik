@@ -10,24 +10,29 @@ import type { PanelState } from "./useStudioState";
 // Migration Mapping
 // ============================================
 
-/** Migration mapping from legacy tab IDs to grouped structure */
-const TAB_MIGRATION: Record<string, { primary: string; sub: string }> = {
-  elements: { primary: "build", sub: "elements" },
-  components: { primary: "build", sub: "components" },
-  templates: { primary: "build", sub: "templates" },
-  layers: { primary: "structure", sub: "layers" },
-  pages: { primary: "structure", sub: "pages" },
-  assets: { primary: "structure", sub: "assets" },
-  cms: { primary: "content", sub: "cms" },
-  // Legacy tabs moved to global settings menu - default to build/elements
-  design: { primary: "build", sub: "elements" }, // Design System now in top bar
-  tokens: { primary: "build", sub: "elements" }, // Design Tokens now in top bar
-  settings: { primary: "build", sub: "elements" }, // Project Settings now in top bar
-  plugins: { primary: "build", sub: "elements" }, // Plugins now in top bar
-  history: { primary: "build", sub: "elements" }, // History now in top bar
-  publish: { primary: "build", sub: "elements" }, // Publish now in top bar
-  deploy: { primary: "build", sub: "elements" }, // Deploy now in top bar
-  ai: { primary: "build", sub: "elements" }, // AI Assistant now in top bar
+/** Migration mapping from legacy tab IDs to current GroupedTabId values */
+const TAB_MIGRATION: Record<string, string> = {
+  // Direct mappings — legacy ID → current GroupedTabId
+  elements: "add",
+  components: "components",
+  templates: "templates",
+  layers: "layers",
+  pages: "pages",
+  assets: "assets",
+  cms: "add",           // CMS removed, default to Add
+  // Legacy tabs that moved to fullpage mode
+  design: "design",
+  tokens: "design",
+  settings: "settings",
+  history: "history",
+  publish: "publish",
+  deploy: "settings",   // Deploy merged into Settings
+  plugins: "settings",  // Plugins merged into Settings
+  ai: "add",            // AI merged into Add tab
+  // Legacy 3-tab grouped IDs (from prior migration)
+  build: "add",
+  structure: "layers",
+  content: "add",
 };
 
 // ============================================
@@ -35,37 +40,30 @@ const TAB_MIGRATION: Record<string, { primary: string; sub: string }> = {
 // ============================================
 
 /**
- * Migrate legacy panel state to new grouped structure
+ * Migrate legacy panel state to current GroupedTabId values.
+ * Handles both old single-tab IDs and the intermediate 3-tab grouped IDs
+ * (build/structure/content) that were used briefly before the 10-tab rewrite.
  */
 export function migrateLegacyPanelState(saved: PanelState): PanelState {
-  // If no leftPanelTab, nothing to migrate
   if (!saved.leftPanelTab) {
     return saved;
   }
 
-  // If already has leftPanelSubTabs, already migrated
-  if (saved.leftPanelSubTabs) {
+  // Map legacy tab ID to current GroupedTabId
+  const mapped = TAB_MIGRATION[saved.leftPanelTab];
+  if (mapped) {
+    return { ...saved, leftPanelTab: mapped };
+  }
+
+  // If the tab ID is already a valid GroupedTabId, keep it
+  const VALID_TABS = new Set([
+    "add", "templates", "layers", "pages", "components",
+    "assets", "design", "settings", "publish", "history",
+  ]);
+  if (VALID_TABS.has(saved.leftPanelTab)) {
     return saved;
   }
 
-  // Look up migration for legacy tab
-  const migration = TAB_MIGRATION[saved.leftPanelTab];
-  if (migration) {
-    return {
-      ...saved,
-      leftPanelTab: migration.primary,
-      leftPanelSubTabs: {
-        [migration.primary]: migration.sub,
-      },
-    };
-  }
-
-  // Unknown tab ID, use default
-  return {
-    ...saved,
-    leftPanelTab: "build",
-    leftPanelSubTabs: {
-      build: "elements",
-    },
-  };
+  // Unknown tab ID, default to "add"
+  return { ...saved, leftPanelTab: "add" };
 }

@@ -152,3 +152,20 @@ export const BillingIcon: React.FC = () => (
     <line x1="1" y1="10" x2="23" y2="10" />
   </svg>
 );
+
+export const DesignSystemIcon: React.FC = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+  >
+    <circle cx="13.5" cy="6.5" r="2.5" />
+    <circle cx="6.5" cy="13.5" r="2.5" />
+    <circle cx="17.5" cy="17.5" r="2.5" />
+    <path d="M13.5 9v2a2 2 0 0 1-2 2H9" />
+    <path d="M15.5 8.5l2 2" />
+  </svg>
+);

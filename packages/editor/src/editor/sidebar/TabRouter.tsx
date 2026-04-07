@@ -1,7 +1,8 @@
 /**
- * TabRouter — Switch/case tab routing for LeftSidebar
- * Maps GroupedTabId to lazy-loaded tab components.
- * All 10 tabs wired: add | templates | layers | pages | components | assets | design | settings | publish | history
+ * TabRouter — Panel-mode tab routing for LeftSidebar
+ * Maps GroupedTabId to lazy-loaded panel tab components.
+ * Only handles panel-mode tabs (Add, Media, Layers, Pages, Components).
+ * Fullpage tabs (Templates, Settings, History, Design) are handled by FullPageRouter.
  *
  * @license BSD-3-Clause
  */
@@ -12,19 +13,15 @@ import type { GroupedTabId } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
 import type { PublishResult } from "../../shared/hooks/usePublish";
 
-// Lazy-loaded tab components (code splitting)
+// Lazy-loaded panel tab components (code splitting)
 const BuildTab = React.lazy(() => import("./tabs/build").then((m) => ({ default: m.BuildTab })));
-const TemplatesTab = React.lazy(() => import("./tabs/templates/TemplatesTab"));
 const LayersTab = React.lazy(() => import("./tabs/layers/LayersTab"));
 const PagesTab = React.lazy(() => import("./tabs/pages/PagesTab"));
 const ComponentsTab = React.lazy(() => import("./tabs/ComponentsTab"));
 const MediaTab = React.lazy(() =>
   import("./tabs/media/MediaTab").then((m) => ({ default: m.MediaTab }))
 );
-const DesignSystemTab = React.lazy(() => import("./tabs/DesignSystemTab"));
-const SettingsTab = React.lazy(() => import("./tabs/settings/SettingsTab"));
 const PublishTab = React.lazy(() => import("./tabs/publish/PublishTab"));
-const HistoryTab = React.lazy(() => import("./tabs/history/HistoryTab"));
 
 export interface TabRouterProps {
   activeTab: GroupedTabId;
@@ -59,26 +56,13 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   onSwitchToAdd,
   onSwitchToTemplates,
   onCreateComponent,
-  onReplayTour,
   projectId,
   onPublish,
   onUnpublish,
-  onSettingsDirtyChange,
-  onTemplatesSwitchTab,
 }) => {
   switch (activeTab) {
     case "add":
       return <BuildTab composer={composer} onBlockClick={onBlockClick} {...commonTabProps} />;
-
-    case "templates":
-      return (
-        <TemplatesTab
-          composer={composer}
-          onTemplateUsed={onSwitchToAdd}
-          onSwitchTab={onTemplatesSwitchTab}
-          {...commonTabProps}
-        />
-      );
 
     case "layers":
       return (
@@ -108,12 +92,6 @@ export const TabRouter: React.FC<TabRouterProps> = ({
     case "assets":
       return <MediaTab composer={composer} {...commonTabProps} />;
 
-    case "design":
-      return <DesignSystemTab composer={composer} {...commonTabProps} />;
-
-    case "settings":
-      return <SettingsTab composer={composer} onReplayTour={onReplayTour} {...commonTabProps} projectId={projectId} onDirtyChange={onSettingsDirtyChange} />;
-
     case "publish":
       return (
         <PublishTab
@@ -124,9 +102,6 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           onUnpublish={onUnpublish}
         />
       );
-
-    case "history":
-      return <HistoryTab composer={composer} {...commonTabProps} projectId={projectId} />;
 
     default:
       return null;

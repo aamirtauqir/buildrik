@@ -16,6 +16,7 @@
  */
 
 import * as React from "react";
+const DesignSystemScreen = React.lazy(() => import("../DesignSystemTab"));
 import { DrillInHeader } from "../../shared/DrillInHeader";
 import { FeatureCard, FeatureCardGrid } from "../../shared/FeatureCard";
 import { PanelHeader } from "../../shared/PanelHeader";
@@ -33,6 +34,7 @@ import {
   TourIcon,
   SeoIcon,
   BillingIcon,
+  DesignSystemIcon,
   SiteSettingsScreen,
   DomainsScreen,
   AnalyticsScreen,
@@ -56,6 +58,7 @@ const SETTINGS_SCREENS = [
   { id: "advanced", title: "Advanced", parentId: "home" },
   { id: "seo", title: "SEO", parentId: "home" },
   { id: "billing", title: "Billing", parentId: "home" },
+  { id: "design-system", title: "Design System", parentId: "home" },
 ];
 
 // ============================================
@@ -112,6 +115,12 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
           subtitle="Name, favicon, language"
           icon={<SiteSettingsIcon />}
           onClick={() => navigateTo("site-settings")}
+        />
+        <FeatureCard
+          title="Design System"
+          subtitle="Colors, fonts, spacing tokens"
+          icon={<DesignSystemIcon />}
+          onClick={() => navigateTo("design-system")}
         />
         <FeatureCard
           title="Domains"
@@ -201,6 +210,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
         return <SeoScreen composer={composer} onDirtyChange={setScreenIsDirty} />;
       case "billing":
         return <BillingScreen userPlan={userPlan} />;
+      case "design-system":
+        return <DesignSystemScreen composer={composer} />;
       default:
         return null;
     }

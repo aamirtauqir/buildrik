@@ -53,9 +53,6 @@ export interface PanelConfig {
   collapsed?: boolean;
 }
 
-/** Panel width preset modes */
-export type PanelSizeMode = "compact" | "normal" | "extended";
-
 export interface ToolbarItem {
   /** Item ID */
   id: string;

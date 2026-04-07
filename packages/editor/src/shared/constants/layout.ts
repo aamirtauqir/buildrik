@@ -8,23 +8,14 @@
  * @license BSD-3-Clause
  */
 export const LAYOUT = {
-  /** Left icon rail width in pixels — PRD §8: 56px */
-  RAIL_WIDTH: 56,
-  /** Sliding drawer panel width in pixels (normal mode = 280px) — PRD §9.3 */
+  /** Left icon rail width in pixels — 60px (2026-04-07 redesign) */
+  RAIL_WIDTH: 60,
+  /** Default drawer panel width in pixels (Add, Media) */
   DRAWER_WIDTH: 280,
-  /** Drawer width presets for size modes */
-  DRAWER_WIDTH_COMPACT: 280,
-  DRAWER_WIDTH_NORMAL: 320,
-  DRAWER_WIDTH_EXTENDED: 400,
-  /** Right inspector panel width in pixels — PRD §11: 280px */
+  /** Narrow drawer width for structure tabs (Layers, Pages, Components) */
+  DRAWER_WIDTH_NARROW: 200,
+  /** Right inspector panel width in pixels */
   INSPECTOR_WIDTH: 280,
-  /** Top header bar height in pixels — PRD §7: 52px */
+  /** Top header bar height in pixels */
   HEADER_HEIGHT: 52,
 } as const;
-
-/** Drawer width CSS strings keyed by size mode — use in inline styles / CSS var injection */
-export const DRAWER_SIZE_WIDTHS: Record<"compact" | "normal" | "extended", string> = {
-  compact: `${LAYOUT.DRAWER_WIDTH_COMPACT}px`,
-  normal: `${LAYOUT.DRAWER_WIDTH_NORMAL}px`,
-  extended: `${LAYOUT.DRAWER_WIDTH_EXTENDED}px`,
-};
