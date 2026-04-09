@@ -6,34 +6,40 @@
 
 import * as React from "react";
 import type { SearchGroup } from "../catalog/types";
-import type { DragStartFn, ElClickFn, ToggleFavFn } from "../hooks/useBuildTab";
+import type { DragStartFn, ElClickFn } from "../hooks/useBuildTab";
 import { ElCard } from "./ElCard";
 
 interface SearchResultsProps {
   query: string;
   groups: SearchGroup[];
-  favs: Set<string>;
   onDragStart: DragStartFn;
   onElClick: ElClickFn;
-  onToggleFav: ToggleFavFn;
 }
 
 export const SearchResults: React.FC<SearchResultsProps> = ({
   query,
   groups,
-  favs,
   onDragStart,
   onElClick,
-  onToggleFav,
 }) => {
   if (!groups.length) {
     return (
-      <div className="bld-search-empty" role="status" aria-live="polite">
-        <span>🔍</span>
-        <span>No elements matching &ldquo;{query}&rdquo;</span>
-        <span className="bld-search-empty-hint">
-          Try: heading, button, hero, form, image, grid
-        </span>
+      <div className="bld-no-results" role="status" aria-live="polite">
+        {/* Sparkle icon — 28px, #94A3B8 */}
+        <svg className="bld-no-results-icon" width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"
+            stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+        </svg>
+        <p className="bld-no-results-headline">No matching block in Add</p>
+
+        {/* AI suggestion card */}
+        <div className="bld-ai-card">
+          <p className="bld-ai-card-body">
+            Try describing what you need — AI can suggest or create a custom block for you.
+          </p>
+        </div>
+
+        <p className="bld-no-results-shortcut">/ opens AI outside the sidebar.</p>
       </div>
     );
   }
@@ -56,10 +62,8 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
               <ElCard
                 key={`${el.catId}-${el.name}`}
                 el={el}
-                isFav={favs.has(el.name)}
                 onDragStart={onDragStart}
                 onClick={onElClick}
-                onToggleFav={onToggleFav}
               />
             ))}
           </div>
