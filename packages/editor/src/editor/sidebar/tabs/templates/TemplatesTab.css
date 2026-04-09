@@ -708,3 +708,61 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+
+/* ── New page context header ── */
+.tpl-newpage-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tpl-header-title--sm {
+  font-size: 15px;
+}
+.tpl-newpage-chip {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--ls-accent-bg, #DBEAFE);
+  color: var(--ls-accent-txt, #1E40AF);
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* ── Create flow modal variants ── */
+.tpl-modal--create {
+  width: 420px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--ls-shadow-dialog, 0 4px 24px rgba(0, 0, 0, 0.2));
+  border-color: var(--ls-border-dialog, #D8E0EA);
+}
+.tpl-modal-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tpl-modal-row-text {
+  font-size: 13px;
+  color: var(--ls-text-subtle, #64748B);
+}
+.tpl-modal-icon {
+  display: flex;
+  justify-content: center;
+}
+.tpl-modal-icon--success svg {
+  stroke: var(--ls-success-text, #166534);
+}
+.tpl-modal-title--lg {
+  font-size: 18px;
+}
+.tpl-modal-desc {
+  font-size: 13px;
+  color: var(--ls-text-subtle, #64748B);
+  line-height: 1.5;
+  margin: 0;
+}

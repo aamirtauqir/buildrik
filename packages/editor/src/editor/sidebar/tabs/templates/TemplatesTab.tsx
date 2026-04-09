@@ -10,7 +10,7 @@ import type { Composer } from "../../../../engine";
 import { useToast } from "../../../../shared/ui/Toast";
 import { type TemplateItem, SITE_CATEGORY_PILLS, SITE_TEMPLATES, TEMPLATE_TYPE_PILLS, SUB_CATEGORY_TAGS, type SiteCategory, type TemplateType } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
-import { ReplaceModal, ProModal } from "./TemplatesTabModals";
+import { ReplaceModal, ProModal, CreatePageConfirmModal, CreatePageSuccessModal, CreatePageErrorModal } from "./TemplatesTabModals";
 import { useTemplatePersistence } from "./hooks/useTemplatePersistence";
 import { useTemplateApply } from "./hooks/useTemplateApply";
 import { useTemplateSelection } from "./hooks/useTemplateSelection";
@@ -28,16 +28,20 @@ export interface TemplatesTabProps {
   onTemplateUsed?: () => void;
   onSwitchTab?: (tab: string) => void;
   onClose?: () => void;
+  newPageMode?: boolean;
 }
 
 export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   composer,
   onTemplateUsed,
   onClose,
+  newPageMode = false,
 }) => {
   const { addToast } = useToast();
   const [showSearch, setShowSearch] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [showCreateConfirm, setShowCreateConfirm] = React.useState(false);
+  const [createResult, setCreateResult] = React.useState<"success" | "error" | null>(null);
 
   React.useEffect(() => {
     const t = setTimeout(() => setIsLoading(false), 800);
@@ -86,7 +90,11 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     addAsNewPageRef.current = true;
     pendingId.current = id;
     sel.setDetailId(null);
-    startApply();
+    if (newPageMode) {
+      setShowCreateConfirm(true);
+    } else {
+      startApply();
+    }
   }
 
   function handleProgressComplete() {
@@ -156,6 +164,11 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
               <path d="M9 18l6-6-6-6" />
             </svg>
             <span className="tpl-breadcrumb-cat">{detailTemplate.category ?? "All"}</span>
+          </div>
+        ) : newPageMode ? (
+          <div className="tpl-newpage-header">
+            <h2 className="tpl-header-title tpl-header-title--sm">Choose a template for your new page</h2>
+            <div className="tpl-newpage-chip">New Page</div>
           </div>
         ) : (
           <h2 className="tpl-header-title">Templates</h2>
@@ -355,6 +368,29 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
             sel.setShowUpgrade(false);
             window.open("/dashboard/settings/billing", "_blank");
           }}
+        />
+      )}
+      {showCreateConfirm && (
+        <CreatePageConfirmModal
+          templateName={tName}
+          onCancel={() => setShowCreateConfirm(false)}
+          onConfirm={() => {
+            setShowCreateConfirm(false);
+            startApply();
+            setCreateResult("success");
+          }}
+        />
+      )}
+      {createResult === "success" && (
+        <CreatePageSuccessModal
+          onClose={() => { setCreateResult(null); onTemplateUsed?.(); }}
+          onGoToPage={() => { setCreateResult(null); onTemplateUsed?.(); }}
+        />
+      )}
+      {createResult === "error" && (
+        <CreatePageErrorModal
+          onCancel={() => setCreateResult(null)}
+          onRetry={() => { setCreateResult(null); startApply(); }}
         />
       )}
       {showProgress && (
