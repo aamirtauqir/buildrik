@@ -17,6 +17,13 @@ export default defineConfig({
       "@lib": path.resolve(__dirname, "lib"),
       "@/server": path.resolve(__dirname, "server"),
       "@/lib": path.resolve(__dirname, "lib"),
+      // Editor package aliases — needed for editor tests run from repo root
+      "@shared": path.resolve(__dirname, "packages/editor/src/shared"),
+      "@features": path.resolve(__dirname, "packages/editor/src/features"),
+      "@hooks": path.resolve(__dirname, "packages/editor/src/hooks"),
+      "@utils": path.resolve(__dirname, "packages/editor/src/utils"),
+      "@components": path.resolve(__dirname, "packages/editor/src/components"),
+      // Keep this last — most general match
       "@": path.resolve(__dirname, "."),
     },
   },

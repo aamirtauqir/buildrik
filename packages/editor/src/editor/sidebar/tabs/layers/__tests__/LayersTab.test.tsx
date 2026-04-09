@@ -1,34 +1,41 @@
+// @vitest-environment jsdom
 /**
  * LayersTab — tests for Pencil screens R6Odi, IR82U, R4Pf4, uHSyK alignment
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from "vitest";
 import { render, screen, act } from "@testing-library/react";
 import { LayerSelectionBanner } from "../../../../panels/layers/components/LayerSelectionBanner";
 
-// Patch window.matchMedia (jsdom doesn't implement it)
-Object.defineProperty(window, "matchMedia", {
-  writable: true,
-  value: vi.fn((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-});
-
-// Mock deep dependencies before importing LayersTab
-vi.mock("@/editor/panels/layers/index", () => ({
-  LayersPanel: () => <div data-testid="layers-panel-mock" />,
+// Mock the canonical PanelHeader source so the @shared/ui/PanelHeader alias
+// resolves in the test env (alias works but the real file may import Emotion
+// or other deps that break under jsdom).
+vi.mock("@shared/ui/PanelHeader", () => ({
+  PanelHeader: ({ title }: { title: string }) => {
+    const React = require("react");
+    return React.createElement("div", { "data-testid": "panel-header" }, title);
+  },
+  HeaderActions: () => null,
+  default: ({ title }: { title: string }) => {
+    const React = require("react");
+    return React.createElement("div", { "data-testid": "panel-header" }, title);
+  },
 }));
 
 vi.mock("@/editor/sidebar/shared/PanelHeader", () => ({
-  PanelHeader: ({ title }: { title: string }) => <div>{title}</div>,
+  PanelHeader: ({ title }: { title: string }) => {
+    const React = require("react");
+    return React.createElement("div", { "data-testid": "panel-header" }, title);
+  },
   HeaderActions: () => null,
+}));
+
+// Mock deep dependencies before importing LayersTab
+vi.mock("@/editor/panels/layers/index", () => ({
+  LayersPanel: () => {
+    const React = require("react");
+    return React.createElement("div", { "data-testid": "layers-panel-mock" });
+  },
 }));
 
 vi.mock("@/editor/canvas/hooks/useComposerSelection", () => ({
@@ -37,6 +44,25 @@ vi.mock("@/editor/canvas/hooks/useComposerSelection", () => ({
 
 // Import after mocks are registered
 import { LayersTab } from "../LayersTab";
+
+// Patch window.matchMedia (jsdom doesn't implement it) — runs after env init
+beforeAll(() => {
+  if (typeof globalThis.window !== "undefined") {
+    Object.defineProperty(globalThis.window, "matchMedia", {
+      writable: true,
+      value: vi.fn((query: string) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
+  }
+});
 
 // ─── LayersTab null-composer skeleton ─────────────────────────────────────────
 

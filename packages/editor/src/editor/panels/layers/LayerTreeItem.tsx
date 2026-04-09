@@ -114,7 +114,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
     isDropTarget ? "is-drop-target" : "",
     dropPosition ? `drop-${dropPosition}` : "",
     isHidden ? "is-hidden lyr-row--hidden" : "",
-    isLocked ? "is-locked" : "",
+    isLocked ? "is-locked lyr-row--locked" : "",
     isEditing ? "lyr-row--rename" : "",
     isCanvasHovered ? "is-canvas-hovered" : "",
     isLayerHovered ? "is-layer-hovered" : "",

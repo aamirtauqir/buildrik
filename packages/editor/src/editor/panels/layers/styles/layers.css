@@ -872,6 +872,9 @@
    (Steps 2.2–2.5: lyr-row states, action bar, sync banner)
    ───────────────────────────────────────────── */
 
+/* lyr-* classes override aqb-layer-row where both are applied (transitional dual-class pattern).
+   lyr-row values (32px height, 13px font) match the new pencil spec and take precedence. */
+
 /* Row base */
 .lyr-row {
   display: flex;
@@ -896,23 +899,24 @@
 .lyr-row--hidden {
   opacity: 0.45;
 }
+.lyr-row--locked .lyr-row__drag-handle {
+  display: none;
+}
 
-/* Rename state: hide name span, show input */
-.lyr-row--rename .lyr-row__name {
+/* Rename state: hide name span, show input.
+   Targets the actual class names used in LayerTreeItem.tsx JSX:
+   .aqb-layer-name (the display span) and .aqb-layer-name-input (the edit input). */
+.lyr-row--rename .aqb-layer-name {
   display: none;
 }
-.lyr-row--rename .lyr-row__rename-input {
+.lyr-row--rename .aqb-layer-name-input {
   display: block;
-}
-.lyr-row__rename-input {
-  display: none;
-  width: 100%;
   font-size: 13px;
   border: 1px solid var(--ls-accent, #1D4ED8);
   border-radius: 4px;
   padding: 0 4px;
   outline: none;
-  background: white;
+  background: var(--ls-bg-card, #FFFFFF);
   color: var(--ls-text-primary, #0F172A);
 }
 
@@ -947,7 +951,7 @@
   background: var(--ls-bg-subtle, #F1F5F9);
 }
 .lyr-action-bar__delete {
-  color: var(--ls-danger, #DC2626) !important;
+  color: var(--ls-danger, #DC2626);
 }
 
 /* Selection synced banner (Screen uHSyK) */
