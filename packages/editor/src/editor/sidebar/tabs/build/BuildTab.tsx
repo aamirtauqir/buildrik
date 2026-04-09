@@ -1,23 +1,22 @@
 /**
- * BuildTab — element catalog shell (~90 lines)
- * All state via useBuildTab; sub-components handle rendering.
+ * BuildTab — Quick-Grid element catalog shell
+ * Matches .pen screens: RzB6V, nTVi6, SDgR2, fsI8j, GmdOe, QFUVG
  * @license BSD-3-Clause
  */
 
+import { Settings } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import type { BlockData } from "../../../../shared/types";
-import { useToast } from "../../../../shared/ui/Toast";
 import { PanelHeader } from "../../shared/PanelHeader";
 import { SearchBar } from "../../shared/SearchBar";
 import { CATALOG } from "./catalog/catalog";
 import { useBuildTab } from "./hooks/useBuildTab";
+import type { DragStartFn, ElClickFn } from "./hooks/useBuildTab";
 import { CatAccordion } from "./components/CatAccordion";
-import { FavZone } from "./components/FavZone";
-import { MyComponents } from "./components/MyComponents";
-import { OnboardingTip } from "./components/OnboardingTip";
+import { QuickPicks } from "./components/QuickPicks";
+import { PinPopover } from "./components/PinPopover";
 import { SearchResults } from "./components/SearchResults";
-import { AISuggestions } from "./components/AISuggestions";
 import "./BuildTab.css";
 
 export interface BuildTabProps {
@@ -34,139 +33,190 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   onBlockClick,
   isPinned,
   onPinToggle,
-  onHelpClick,
   onClose,
 }) => {
   const tab = useBuildTab(composer, onBlockClick);
-  const { addToast } = useToast();
   const isSearching = tab.searchQuery.trim().length > 0;
 
-  const handleToggleFav = React.useCallback(
-    (name: string) => {
-      tab.toggleFav(name);
-      if (!tab.favsInformed) {
-        tab.markFavsInformed();
-        addToast({
-          message: "Favorites are saved in this browser only.",
-          variant: "info",
-          duration: 4000,
-        });
-      }
-    },
-    [tab, addToast]
-  );
-
-  const handleClearFavs = React.useCallback(() => {
-    const snapshot = new Set(tab.favs);
-    tab.clearFavs();
-    addToast({
-      message: "Favorites cleared",
-      variant: "info",
-      duration: 5000,
-      action: {
-        label: "Undo",
-        onClick: () => tab.restoreFavs(snapshot),
-      },
-    });
-  }, [tab, addToast]);
-
   return (
-    <div style={containerStyles}>
-      <PanelHeader
-        title="Add"
-        isPinned={isPinned}
-        onPinToggle={onPinToggle}
-        onHelpClick={onHelpClick}
-        onClose={onClose}
-      />
-      <div style={searchWrapStyles}>
-        <SearchBar
-          value={tab.searchQuery}
-          onChange={tab.setSearchQuery}
-          placeholder="Search elements..."
-          debounceMs={0}
-        />
-      </div>
-      <AISuggestions />
-      {tab.insertionContext && (
-        <div className="bld-insert-ctx" aria-live="polite">
-          <span className="bld-insert-ctx-icon">↳</span>
-          <span className="bld-insert-ctx-text">
-            Inserting into <strong>{tab.insertionContext.label}</strong>
-          </span>
+    <div className="bld-container">
+      <PanelHeader title="Add" isPinned={isPinned} onPinToggle={onPinToggle} onClose={onClose}>
+        <button
+          className="bld-gear-btn"
+          onClick={() => tab.setPinPopoverOpen(!tab.pinPopoverOpen)}
+          title="Quick Picks settings"
+          aria-label="Quick Picks settings"
+        >
+          <Settings size={16} />
+        </button>
+      </PanelHeader>
+
+      <div className="bld-content">
+        <div className="bld-search-wrap">
+          <SearchBar
+            value={tab.searchQuery}
+            onChange={tab.setSearchQuery}
+            placeholder="Search elements..."
+            debounceMs={0}
+          />
         </div>
-      )}
-      <OnboardingTip dismissed={tab.tipDismissed} onDismiss={tab.dismissTip} />
-      <div className="bld-shell">
-        <div className="bld-elements-zone">
-          {isSearching ? (
+
+        {/* Mode Switch — Elements | Sections */}
+        {!isSearching && (
+          <div className="bld-mode-switch" role="tablist" aria-label="Add tab mode">
+            <button
+              className={`bld-mode-pill${tab.mode === "elements" ? " bld-mode-pill--active" : ""}`}
+              onClick={() => tab.setMode("elements")}
+              role="tab"
+              aria-selected={tab.mode === "elements"}
+            >
+              Elements
+            </button>
+            <button
+              className={`bld-mode-pill${tab.mode === "sections" ? " bld-mode-pill--active" : ""}`}
+              onClick={() => tab.setMode("sections")}
+              role="tab"
+              aria-selected={tab.mode === "sections"}
+            >
+              Sections
+            </button>
+          </div>
+        )}
+
+        {isSearching ? (
+          <div className="bld-scroll">
             <SearchResults
               query={tab.searchQuery}
               groups={tab.searchResults}
-              favs={tab.favs}
               onDragStart={tab.handleDragStart}
               onElClick={tab.handleElClick}
-              onToggleFav={handleToggleFav}
             />
-          ) : (
-            <>
-              {CATALOG.map((cat, i) => {
-                const isFirstSections =
-                  cat.tier === "sections" &&
-                  (i === 0 || CATALOG[i - 1].tier !== "sections");
-                return (
-                  <React.Fragment key={cat.id}>
-                    {isFirstSections && (
-                      <div className="bld-tier-sep" role="separator" aria-label="Page Sections">
-                        <span className="bld-tier-sep-line" />
-                        <span className="bld-tier-sep-lbl">Page Sections</span>
-                        <span className="bld-tier-sep-line" />
-                      </div>
-                    )}
-                    <CatAccordion
-                      cat={cat}
-                      isOpen={tab.openCats.has(cat.id)}
-                      onToggle={() => tab.toggleCat(cat.id)}
-                      favs={tab.favs}
-                      onDragStart={tab.handleDragStart}
-                      onElClick={tab.handleElClick}
-                      onToggleFav={handleToggleFav}
-                    />
-                  </React.Fragment>
-                );
-              })}
-              <MyComponents
-                open={tab.myCompOpen}
-                onToggle={() => tab.setMyCompOpen(!tab.myCompOpen)}
-                composer={composer}
+          </div>
+        ) : tab.mode === "sections" ? (
+          <div className="bld-scroll">
+            <SectionsMode
+              onDragStart={tab.handleDragStart}
+              onElClick={tab.handleElClick}
+            />
+          </div>
+        ) : (
+          <div className="bld-scroll">
+            <div className="bld-qp-wrap">
+              <QuickPicks
+                picks={tab.quickPicks}
+                onRemove={tab.removeQuickPick}
+                onPlusClick={() => tab.setPinPopoverOpen(true)}
+                onDragStart={tab.handleDragStart}
+                onElClick={tab.handleElClick}
+                ftueSeen={tab.ftueSeen}
+                onDismissFtue={tab.dismissFtue}
               />
-            </>
-          )}
-        </div>
-        {!isSearching && (
-          <FavZone
-            favs={tab.favs}
-            allElements={tab.allElements}
-            open={tab.favOpen}
-            onToggle={() => tab.setFavOpen(!tab.favOpen)}
-            onRemoveFav={handleToggleFav}
-            onClearAll={handleClearFavs}
-            onDragStart={tab.handleDragStart}
-            onElClick={tab.handleElClick}
-          />
+              <PinPopover
+                open={tab.pinPopoverOpen}
+                onClose={() => tab.setPinPopoverOpen(false)}
+                onPin={(blockId) => {
+                  tab.addQuickPick(blockId);
+                  if (!tab.ftueSeen) tab.dismissFtue();
+                }}
+                currentPicks={tab.quickPicks}
+              />
+            </div>
+
+            <div className="bld-divider" />
+
+            <div className="bld-cats">
+              <div className="bld-sec-label">CATEGORIES</div>
+              {CATALOG.map((cat) => (
+                <CatAccordion
+                  key={cat.id}
+                  cat={cat}
+                  isOpen={tab.openCats.has(cat.id)}
+                  onToggle={() => tab.toggleCat(cat.id)}
+                  onDragStart={tab.handleDragStart}
+                  onElClick={tab.handleElClick}
+                />
+              ))}
+            </div>
+          </div>
         )}
-        {/* Phase 1a: Pro Tips carousel removed — adds noise without value for new users. */}
       </div>
     </div>
   );
 };
 
-const containerStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  height: "100%",
-  background: "var(--ls-bg-panel, #F8FAFC)",
+// ── Sections Mode Content (SDgR2) ──────────────────────────────────────────
+
+const SECTION_FAMILIES = [
+  { id: "hero", label: "Hero" },
+  { id: "features", label: "Features" },
+  { id: "pricing", label: "Pricing" },
+  { id: "faq", label: "FAQ" },
+  { id: "cta", label: "CTA" },
+  { id: "footers", label: "Footers" },
+];
+
+const SECTION_CARDS = [
+  { id: "hero-split", name: "Hero split", sub: "Two-column intro with CTA" },
+  { id: "feature-band", name: "Feature band", sub: "Three feature cards with icons" },
+  { id: "pricing-stack", name: "Pricing stack", sub: "Tiered pricing with comparison cards" },
+];
+
+interface SectionsModeProps {
+  onDragStart: DragStartFn;
+  onElClick: ElClickFn;
+}
+
+const SectionsMode: React.FC<SectionsModeProps> = ({ onDragStart: _onDragStart, onElClick: _onElClick }) => {
+  const [activeFamily, setActiveFamily] = React.useState("hero");
+
+  return (
+    <>
+      {/* Section families chips row */}
+      <div className="bld-sec-label">SECTION FAMILIES</div>
+      <div className="bld-sec-chips">
+        {SECTION_FAMILIES.map((f) => (
+          <button
+            key={f.id}
+            className={`bld-sec-chip${activeFamily === f.id ? " bld-sec-chip--active" : ""}`}
+            onClick={() => setActiveFamily(f.id)}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Section cards */}
+      <div className="bld-sec-label" style={{ marginTop: 12 }}>READY TO INSERT</div>
+      <div className="bld-sec-cards">
+        {SECTION_CARDS.map((card) => (
+          <div
+            key={card.id}
+            className="bld-sec-card"
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData("block", JSON.stringify({ id: card.id, label: card.name, category: "sections" }));
+              e.dataTransfer.setData("text/plain", card.id);
+              e.dataTransfer.effectAllowed = "copy";
+            }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") e.preventDefault();
+            }}
+          >
+            <div className="bld-sec-card-name">{card.name}</div>
+            <div className="bld-sec-card-sub">{card.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Bottom hint */}
+      <div className="bld-sec-hint">
+        <span className="bld-sec-hint-primary">Sections insert into the current page.</span>
+        <span className="bld-sec-hint-muted">Use New Page › Templates for full-page starts.</span>
+      </div>
+    </>
+  );
 };
-const searchWrapStyles: React.CSSProperties = { padding: "8px 12px", flexShrink: 0 };
 
 export default BuildTab;
