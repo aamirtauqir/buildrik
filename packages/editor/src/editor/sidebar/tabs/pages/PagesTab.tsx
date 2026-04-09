@@ -102,6 +102,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           <PageList
             pages={p.pages}
             renamingPageId={p.renamingPageId}
+            nameError={nameError}
             canSearch={p.canSearch}
             openContextMenuPageId={p.contextMenu?.pageId ?? null}
             requestExpandPageId={p.settingsPageId}
@@ -115,11 +116,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onRenameCancel={() => { setNameError(null); p.cancelRename(); }}
             onRequestTemplates={onRequestTemplates}
           />
-          {nameError && (
-            <div className="pg-name-error" role="alert" aria-live="assertive">
-              {nameError}
-            </div>
-          )}
         </>
       )}
 

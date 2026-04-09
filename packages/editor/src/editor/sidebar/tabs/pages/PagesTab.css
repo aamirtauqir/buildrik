@@ -1176,6 +1176,43 @@
   background: var(--ls-bg-subtle, #F1F5F9);
 }
 
+/* ── pg-empty: empty state when no pages exist ───────────────────────────── */
+.pg-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px 16px;
+  text-align: center;
+}
+
+.pg-empty__icon {
+  opacity: 0.5;
+}
+
+.pg-empty__label {
+  font-size: 13px;
+  color: var(--ls-text-muted, #64748B);
+  margin: 0;
+}
+
+.pg-empty__cta {
+  margin-top: 4px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ls-accent, #3B82F6);
+  background: var(--ls-accent-bg, #DBEAFE);
+  border: 1px solid var(--ls-accent-border, #BFDBFE);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.pg-empty__cta:hover {
+  background: var(--ls-accent-bg-hover, #BFDBFE);
+}
+
 /* ── pg-name-error: name conflict inline error (Screen GoEJk) ───────────── */
 .pg-name-error {
   padding: 6px 12px;

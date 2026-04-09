@@ -14,6 +14,7 @@ import { PageRow } from "./PageRow";
 interface Props {
   pages: PageItem[];
   renamingPageId: string | null;
+  nameError: string | null;
   canSearch: boolean;
   openContextMenuPageId?: string | null;
   /**
@@ -35,6 +36,7 @@ interface Props {
 export const PageList: React.FC<Props> = ({
   pages,
   renamingPageId,
+  nameError,
   canSearch,
   openContextMenuPageId = null,
   requestExpandPageId = null,
@@ -71,6 +73,23 @@ export const PageList: React.FC<Props> = ({
     },
     [onSettingsClick]
   );
+
+  // Empty state — no pages exist yet
+  if (pages.length === 0) {
+    return (
+      <div className="pg-list">
+        <div className="pg-empty">
+          <svg className="pg-empty__icon" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="8" y="6" width="32" height="36" rx="3" fill="var(--ls-border-soft, #E2E8F0)" />
+            <rect x="14" y="14" width="20" height="2" rx="1" fill="var(--ls-text-muted, #94A3B8)" />
+            <rect x="14" y="20" width="14" height="2" rx="1" fill="var(--ls-text-muted, #94A3B8)" />
+          </svg>
+          <p className="pg-empty__label">No pages yet</p>
+          <button className="pg-empty__cta" onClick={onAddPage}>Create your first page</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pg-list">
@@ -129,6 +148,7 @@ export const PageList: React.FC<Props> = ({
               pages={pages}
               composer={composer}
               isRenaming={renamingPageId === page.id}
+              nameError={renamingPageId === page.id ? nameError : null}
               isContextMenuOpen={openContextMenuPageId === page.id}
               isExpanded={expandedPageId === page.id}
               onSelect={() => onSelectPage(page.id)}

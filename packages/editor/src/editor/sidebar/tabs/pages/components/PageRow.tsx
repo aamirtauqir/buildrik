@@ -21,6 +21,7 @@ interface Props {
   pages: PageItem[];
   composer: Composer | null;
   isRenaming: boolean;
+  nameError?: string | null;
   isContextMenuOpen?: boolean;
   isExpanded: boolean;
   onSelect: () => void;
@@ -167,6 +168,7 @@ export const PageRow = React.memo<Props>(
     pages,
     composer,
     isRenaming,
+    nameError = null,
     isContextMenuOpen = false,
     isExpanded,
     onSelect,
@@ -278,16 +280,23 @@ export const PageRow = React.memo<Props>(
 
           {/* Name or inline rename input */}
           {isRenaming ? (
-            <input
-              ref={inputRef}
-              className="pg-row__rename"
-              value={renameValue}
-              onChange={(e) => setRenameValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onBlur={() => onRenameCommit(renameValue.trim() || page.name)}
-              onClick={(e) => e.stopPropagation()}
-              aria-label="Rename page"
-            />
+            <>
+              <input
+                ref={inputRef}
+                className="pg-row__rename"
+                value={renameValue}
+                onChange={(e) => setRenameValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onBlur={() => onRenameCommit(renameValue.trim() || page.name)}
+                onClick={(e) => e.stopPropagation()}
+                aria-label="Rename page"
+              />
+              {nameError && (
+                <div className="pg-name-error" role="alert" aria-live="assertive">
+                  {nameError}
+                </div>
+              )}
+            </>
           ) : (
             <div
               className="pg-row__name"
