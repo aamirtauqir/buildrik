@@ -1101,3 +1101,93 @@
   color: var(--ls-text-muted, #475569);
   margin: 0;
 }
+
+/* ── Upload success banner (hoPrk) ── */
+.med-success-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 10px;
+  background: var(--ls-success-bg, #DCFCE7);
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.med-success-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ls-success-text, #166534);
+}
+.med-success-action {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ls-success-text, #166534);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+/* ── Upload partial failure banner (pd04L) ── */
+.med-warning-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 10px;
+  background: var(--ls-warning-bg, #FEF3C7);
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.med-warning-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ls-warning-text, #92400E);
+}
+.med-warning-action {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ls-warning-text, #92400E);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+/* Shared spacer */
+.med-strip-spacer {
+  flex: 1;
+}
+
+/* ── Search result count (65ma7) ── */
+.med-search-count {
+  padding: 4px 0 4px 10px;
+  font-size: 9px;
+  color: var(--ls-text-muted, #475569);
+  flex-shrink: 0;
+}
+
+/* ── Search no results (fVg54) ── */
+.med-search-noresults {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 26px 16px;
+  gap: 8px;
+  text-align: center;
+}
+.med-search-noresults-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ls-text-primary, #0F172A);
+  margin: 0;
+}
+.med-search-noresults-sub {
+  font-size: 10px;
+  color: var(--ls-text-muted, #475569);
+  margin: 0;
+}

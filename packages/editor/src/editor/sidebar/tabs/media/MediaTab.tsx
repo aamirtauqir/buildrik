@@ -112,6 +112,26 @@ function MediaTabInner({
           />
         </div>
 
+        {/* Search result count (65ma7) */}
+        {state.librarySearch.trim().length > 0 && state.libraryItems.length > 0 && (
+          <div className="med-search-count">
+            {state.libraryItems.length} result{state.libraryItems.length !== 1 ? "s" : ""} for &ldquo;{state.librarySearch.trim()}&rdquo;
+          </div>
+        )}
+
+        {/* Search no results (fVg54) */}
+        {state.librarySearch.trim().length > 0 && state.libraryItems.length === 0 && (
+          <div className="med-search-noresults">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ls-text-lighter, #94A3B8)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              <line x1="8" y1="11" x2="14" y2="11" />
+            </svg>
+            <p className="med-search-noresults-title">No media for &ldquo;{state.librarySearch.trim()}&rdquo;</p>
+            <p className="med-search-noresults-sub">Try a different search term or clear the query.</p>
+          </div>
+        )}
+
         {/* Upload zone — always visible at top */}
         {!state.selMode && (
           <UploadZone
@@ -143,6 +163,39 @@ function MediaTabInner({
             </button>
             <button className="med-failure-dismiss" onClick={() => state.dismissFailedUploads()} aria-label="Dismiss">
               <Trash2 size={14} />
+            </button>
+          </div>
+        )}
+
+        {/* Success banner (hoPrk) — all uploads completed */}
+        {state.uploadQueue.length > 0 && state.uploadQueue.every((u) => u.status === "complete") && (
+          <div className="med-success-strip">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ls-success-text, #166534)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            <span className="med-success-text">
+              {state.uploadQueue.filter((u) => u.status === "complete").length} file{state.uploadQueue.filter((u) => u.status === "complete").length !== 1 ? "s" : ""} uploaded
+            </span>
+            <span className="med-strip-spacer" />
+            <button className="med-success-action">View newest</button>
+          </div>
+        )}
+
+        {/* Amber partial failure banner (pd04L) */}
+        {state.uploadQueue.some((u) => u.status === "complete") && state.failedUploads.length > 0 && (
+          <div className="med-warning-strip">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ls-warning-text, #92400E)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            <span className="med-warning-text">
+              {state.uploadQueue.filter((u) => u.status === "complete").length} uploaded, {state.failedUploads.length} failed
+            </span>
+            <span className="med-strip-spacer" />
+            <button className="med-warning-action" onClick={() => state.dismissFailedUploads()}>
+              Retry failed
             </button>
           </div>
         )}
