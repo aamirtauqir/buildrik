@@ -1,6 +1,6 @@
 /**
- * Media Tab — Selection Banner + Upload Progress Banner
- * Bottom bar matching .pen Screen 8i / 8m design.
+ * Media Tab — Selection Banner (XSWRz spec)
+ * Fill #DBEAFE, Move/Download/Deselect all/More buttons
  * @license BSD-3-Clause
  */
 
@@ -14,7 +14,7 @@ interface SelectionBannerProps {
 
 interface UploadProgressBannerProps {
   fileName: string;
-  progress: number; // 0-100
+  progress: number;
   showCancel?: boolean;
   onCancel?: () => void;
 }
@@ -45,17 +45,12 @@ export function SelectionBanner({ count, onExit, onDelete }: SelectionBannerProp
 
   return (
     <div className="med-selection-banner" role="status" aria-live="polite">
-      <span className="med-selection-count">
-        {count === 0 ? "No files selected" : `${count} selected`}
-      </span>
-      <button
-        className="med-selection-delete"
-        onClick={onDelete}
-        disabled={count === 0}
-        aria-label={`Delete ${count} selected files`}
-      >
-        Delete
-      </button>
+      <span className="med-selection-count">{count} selected</span>
+      <button className="med-selection-action">Move</button>
+      <button className="med-selection-action">Download</button>
+      <span className="med-strip-spacer" />
+      <button className="med-selection-secondary" onClick={onExit}>Deselect all</button>
+      <button className="med-selection-more">More</button>
     </div>
   );
 }

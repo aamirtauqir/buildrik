@@ -242,34 +242,102 @@
   color: var(--ls-text-lighter, #94A3B8);
 }
 
-/* ── Selection banner (bottom) ── */
+/* ── Item action bar (t8D67) ── */
+.med-action-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 10px;
+  background: var(--ls-bg-subtle, #F1F5F9);
+  border-top: 1px solid var(--ls-border-light, #E2E8F0);
+  flex-shrink: 0;
+}
+.med-action-bar-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ls-text-primary, #0F172A);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100px;
+}
+.med-action-btn {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ls-accent, #1D4ED8);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-family: inherit;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.med-action-btn:hover {
+  background: var(--ls-accent-bg, #DBEAFE);
+}
+.med-action-btn--danger {
+  color: var(--ls-destructive, #EF4444);
+  font-weight: 600;
+}
+.med-action-btn--danger:hover {
+  background: var(--ls-error-bg, #FEE2E2);
+}
+
+/* ── Multi-select banner redesign (XSWRz) ── */
 .med-selection-banner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  background: var(--ls-bg-card, #FFFFFF);
-  border-top: 1px solid var(--ls-border-light, #E2E8F0);
+  gap: 10px;
+  height: 40px;
+  padding: 0 10px;
+  background: var(--ls-accent-bg, #DBEAFE);
   flex-shrink: 0;
 }
 .med-selection-count {
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--ls-accent, #1D4ED8);
 }
-.med-selection-delete {
-  font-size: 12px;
+.med-selection-action {
+  font-size: 11px;
   font-weight: 500;
-  color: var(--ls-danger, #DC2626);
+  color: var(--ls-accent-txt, #1E40AF);
   background: none;
   border: none;
   cursor: pointer;
+  padding: 2px 4px;
   font-family: inherit;
-  padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 3px;
 }
-.med-selection-delete:hover {
-  background: var(--ls-danger-bg, #FEF2F2);
+.med-selection-action:hover {
+  background: rgba(29, 78, 216, 0.1);
+}
+.med-selection-secondary {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ls-text-secondary, #334155);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-family: inherit;
+  border-radius: 3px;
+}
+.med-selection-secondary:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+.med-selection-more {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ls-text-secondary, #334155);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-family: inherit;
+  border-radius: 3px;
 }
 
 /* ── Empty state ── */

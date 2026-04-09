@@ -17,6 +17,7 @@ import { OnboardingEmptyState } from "./components/OnboardingEmptyState";
 import { SelectionBanner, UploadProgressBanner } from "./components/SelectionBanner";
 import { UploadZone } from "./components/UploadZone";
 import { useMediaState } from "./hooks/useMediaState";
+import type { LibraryItem } from "./data/mediaTypes";
 import "./MediaTab.css";
 
 interface MediaTabProps {
@@ -57,6 +58,7 @@ function MediaTabInner({
 }: Omit<MediaTabProps, "composer"> & { composer: Composer }) {
   const state = useMediaState(composer);
   const ctxMenuRef = React.useRef<HTMLDivElement>(null);
+  const [actionBarItem, setActionBarItem] = React.useState<LibraryItem | null>(null);
 
   const isEmpty = state.libraryItems.length === 0 && state.uploadQueue.length === 0;
 
@@ -229,7 +231,7 @@ function MediaTabInner({
             onRequestBulkDelete={state.requestBulkDelete}
             onRequestDelete={state.requestDelete}
             onInsert={state.insertToCanvas}
-            onCtxMenu={state.openCtxMenu}
+            onCtxMenu={(e, item) => { state.openCtxMenu(e, item); setActionBarItem(item); }}
             onDetail={state.openDetail}
           />
         )}
@@ -245,6 +247,20 @@ function MediaTabInner({
             state.requestBulkDelete(selectedItems);
           }}
         />
+      )}
+
+      {/* Item action bar (t8D67) — shown when item is right-clicked */}
+      {!state.selMode && actionBarItem && (
+        <div className="med-action-bar">
+          <span className="med-action-bar-name">{actionBarItem.name}</span>
+          <span className="med-strip-spacer" />
+          <button className="med-action-btn" onClick={() => state.openDetail(actionBarItem)}>Preview</button>
+          <button className="med-action-btn" onClick={() => state.openDetail(actionBarItem)}>Rename</button>
+          <button className="med-action-btn med-action-btn--danger" onClick={() => {
+            state.requestDelete(actionBarItem.key);
+            setActionBarItem(null);
+          }}>Delete</button>
+        </div>
       )}
 
       {/* Context menu */}

@@ -94,15 +94,15 @@ describe("SelectionBanner", () => {
     expect(screen.getByText("3 selected")).toBeTruthy();
   });
 
-  it("shows 'No files selected' when count is 0", () => {
+  it("shows '0 selected' when count is 0", () => {
     render(<SelectionBanner count={0} onExit={vi.fn()} onDelete={vi.fn()} />);
-    expect(screen.getByText("No files selected")).toBeTruthy();
+    expect(screen.getByText("0 selected")).toBeTruthy();
   });
 
-  it("calls onDelete when Delete button clicked", async () => {
+  it("calls onDelete via Delete key when count > 0", async () => {
     const onDelete = vi.fn();
     render(<SelectionBanner count={2} onExit={vi.fn()} onDelete={onDelete} />);
-    await userEvent.click(screen.getByText("Delete"));
+    await userEvent.keyboard("{Delete}");
     expect(onDelete).toHaveBeenCalledTimes(1);
   });
 
@@ -113,10 +113,10 @@ describe("SelectionBanner", () => {
     expect(onExit).toHaveBeenCalledTimes(1);
   });
 
-  it("delete button is disabled when count is 0", () => {
-    render(<SelectionBanner count={0} onExit={vi.fn()} onDelete={vi.fn()} />);
-    const btn = screen.getByRole("button", { name: /delete/i });
-    expect((btn as HTMLButtonElement).disabled).toBe(true);
+  it("shows Move and Download action buttons", () => {
+    render(<SelectionBanner count={2} onExit={vi.fn()} onDelete={vi.fn()} />);
+    expect(screen.getByText("Move")).toBeTruthy();
+    expect(screen.getByText("Download")).toBeTruthy();
   });
 });
 
