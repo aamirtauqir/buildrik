@@ -108,7 +108,7 @@
   gap: 6px;
   padding: 6px 12px;
   background: #FEF2F2;
-  border-bottom: 1px solid #FECACA;
+  border: 1px solid #FECACA;
   flex-shrink: 0;
   font-size: 12px;
   color: #DC2626;

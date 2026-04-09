@@ -128,7 +128,8 @@ function MediaTabInner({
             key={u.fileName}
             fileName={u.fileName}
             progress={u.progress}
-            onCancel={state.dismissFailedUploads}
+            // TODO: wire to engine upload cancel API when composer.media.cancelUpload(fileName) is available
+            onCancel={() => {}}
           />
         ))}
 
