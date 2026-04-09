@@ -274,17 +274,19 @@ function MediaTabInner({
             aria-label="Asset options"
           >
             <button className="med-ctx-item" role="menuitem" tabIndex={-1}
-              onClick={() => { state.insertToCanvas(state.ctxMenu!.item.key); state.closeCtxMenu(); }}>
-              Add to page
+              onClick={() => { state.copyUrl(state.ctxMenu!.item.src); state.closeCtxMenu(); }}>
+              Copy URL
+            </button>
+            <button className="med-ctx-item" role="menuitem" tabIndex={-1}
+              onClick={() => {
+                navigator.clipboard?.writeText(state.ctxMenu!.item.name).catch(() => {});
+                state.closeCtxMenu();
+              }}>
+              Copy Name
             </button>
             <button className="med-ctx-item" role="menuitem" tabIndex={-1}
               onClick={() => { state.openDetail(state.ctxMenu!.item); state.closeCtxMenu(); }}>
               Rename...
-            </button>
-            <div className="med-ctx-sep" />
-            <button className="med-ctx-item" role="menuitem" tabIndex={-1}
-              onClick={() => { state.copyUrl(state.ctxMenu!.item.src); state.closeCtxMenu(); }}>
-              Copy URL
             </button>
             <div className="med-ctx-sep" />
             <button className="med-ctx-item med-ctx-item--danger" role="menuitem" tabIndex={-1}
