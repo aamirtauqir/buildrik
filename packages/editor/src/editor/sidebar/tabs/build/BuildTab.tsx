@@ -12,7 +12,6 @@ import { PanelHeader } from "../../shared/PanelHeader";
 import { SearchBar } from "../../shared/SearchBar";
 import { CATALOG } from "./catalog/catalog";
 import { useBuildTab } from "./hooks/useBuildTab";
-import type { DragStartFn, ElClickFn } from "./hooks/useBuildTab";
 import { CatAccordion } from "./components/CatAccordion";
 import { QuickPicks } from "./components/QuickPicks";
 import { PinPopover } from "./components/PinPopover";
@@ -94,10 +93,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           </div>
         ) : tab.mode === "sections" ? (
           <div className="bld-scroll">
-            <SectionsMode
-              onDragStart={tab.handleDragStart}
-              onElClick={tab.handleElClick}
-            />
+            <SectionsMode />
           </div>
         ) : (
           <div className="bld-scroll">
@@ -161,12 +157,7 @@ const SECTION_CARDS = [
   { id: "pricing-stack", name: "Pricing stack", sub: "Tiered pricing with comparison cards" },
 ];
 
-interface SectionsModeProps {
-  onDragStart: DragStartFn;
-  onElClick: ElClickFn;
-}
-
-const SectionsMode: React.FC<SectionsModeProps> = ({ onDragStart: _onDragStart, onElClick: _onElClick }) => {
+const SectionsMode: React.FC = () => {
   const [activeFamily, setActiveFamily] = React.useState("hero");
 
   return (
@@ -186,7 +177,7 @@ const SectionsMode: React.FC<SectionsModeProps> = ({ onDragStart: _onDragStart, 
       </div>
 
       {/* Section cards */}
-      <div className="bld-sec-label" style={{ marginTop: 12 }}>READY TO INSERT</div>
+      <div className="bld-sec-label">READY TO INSERT</div>
       <div className="bld-sec-cards">
         {SECTION_CARDS.map((card) => (
           <div
@@ -200,9 +191,6 @@ const SectionsMode: React.FC<SectionsModeProps> = ({ onDragStart: _onDragStart, 
             }}
             role="button"
             tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") e.preventDefault();
-            }}
           >
             <div className="bld-sec-card-name">{card.name}</div>
             <div className="bld-sec-card-sub">{card.sub}</div>

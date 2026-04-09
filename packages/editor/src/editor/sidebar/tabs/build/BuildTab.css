@@ -60,6 +60,10 @@
   margin-bottom: 6px;
 }
 
+.bld-sec-label + .bld-sec-label {
+  margin-top: 12px;
+}
+
 /* ── Divider ── */
 .bld-divider {
   height: 1px;
@@ -519,9 +523,10 @@
   color: var(--ls-accent, #1D4ED8);
 }
 .bld-sec-chip--active {
-  background: var(--ls-bg-card, #FFFFFF);
-  border-color: var(--ls-border-card, #D1D9E6);
-  color: var(--ls-text-primary, #0F172A);
+  background: var(--ls-accent-bg, #DBEAFE);
+  border-color: var(--ls-accent, #1D4ED8);
+  color: var(--ls-accent, #1D4ED8);
+  font-weight: 600;
 }
 
 /* ── Section preview cards ── */
