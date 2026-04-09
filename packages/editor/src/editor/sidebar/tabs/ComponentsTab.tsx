@@ -30,6 +30,7 @@ import {
 import type { ComponentsTabProps } from "./component-library/types";
 import { useComponentsState } from "./component-library/useComponentsState";
 import { type ComponentFilter, FILTER_CHIPS } from "./componentsData";
+import "./component-library/ComponentsTab.css";
 
 export type { ComponentsTabProps };
 
@@ -219,10 +220,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               </button>
             </div>
           )}
-          <div className="aqb-empty-state aqb-comp-empty-state">
-            <ComponentIcon />
-            <p className="aqb-empty-state-title aqb-comp-empty-title">No components yet</p>
-            <p className="aqb-empty-state-desc aqb-comp-empty-desc">
+          <div className="aqb-empty-state aqb-comp-empty-state comp-empty">
+            <span className="comp-empty__icon" aria-hidden="true">◇</span>
+            <p className="aqb-empty-state-title aqb-comp-empty-title comp-empty__title">No components yet</p>
+            <p className="aqb-empty-state-desc aqb-comp-empty-desc comp-empty__body">
               Select elements on the canvas and save them as reusable components.
             </p>
             <a href="#" className="aqb-comp-learn-more-btn" onClick={(e) => e.preventDefault()}>
