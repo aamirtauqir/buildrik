@@ -153,7 +153,7 @@ export const PageList: React.FC<Props> = ({
       </div>
 
       {/* Add Page CTA — sticky bottom */}
-      <AddPageButton onClick={onAddPage} />
+      <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} />
     </div>
   );
 };

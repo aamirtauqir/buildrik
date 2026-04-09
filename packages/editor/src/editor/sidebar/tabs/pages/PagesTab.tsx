@@ -46,6 +46,27 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   const [deleteTargetId, setDeleteTargetId] = React.useState<string | null>(null);
   const deleteTarget = p.pages.find((pg) => pg.id === deleteTargetId);
 
+  // Name conflict error state (Screen GoEJk)
+  const [nameError, setNameError] = React.useState<string | null>(null);
+
+  const handleRenameCommit = React.useCallback(
+    (pageId: string, name: string) => {
+      const trimmed = name.trim();
+      if (trimmed) {
+        const exists = p.pages.some(
+          (pg) => pg.id !== pageId && pg.name.toLowerCase() === trimmed.toLowerCase()
+        );
+        if (exists) {
+          setNameError("A page with this name already exists");
+          return;
+        }
+      }
+      setNameError(null);
+      p.commitRename(pageId, name);
+    },
+    [p]
+  );
+
   const handleDeleteRequest = (pageId: string) => {
     const page = p.pages.find((pg) => pg.id === pageId);
     if (!page) return;
@@ -77,22 +98,29 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           </button>
         </div>
       ) : (
-        <PageList
-          pages={p.pages}
-          renamingPageId={p.renamingPageId}
-          canSearch={p.canSearch}
-          openContextMenuPageId={p.contextMenu?.pageId ?? null}
-          requestExpandPageId={p.settingsPageId}
-          composer={composer}
-          onAddPage={p.addPage}
-          onSelectPage={p.selectPage}
-          onContextMenu={p.openContextMenu}
-          onSettingsClick={p.openSettings}
-          onRenameStart={p.startRename}
-          onRenameCommit={p.commitRename}
-          onRenameCancel={p.cancelRename}
-          onRequestTemplates={onRequestTemplates}
-        />
+        <>
+          <PageList
+            pages={p.pages}
+            renamingPageId={p.renamingPageId}
+            canSearch={p.canSearch}
+            openContextMenuPageId={p.contextMenu?.pageId ?? null}
+            requestExpandPageId={p.settingsPageId}
+            composer={composer}
+            onAddPage={p.addPage}
+            onSelectPage={p.selectPage}
+            onContextMenu={p.openContextMenu}
+            onSettingsClick={p.openSettings}
+            onRenameStart={p.startRename}
+            onRenameCommit={handleRenameCommit}
+            onRenameCancel={() => { setNameError(null); p.cancelRename(); }}
+            onRequestTemplates={onRequestTemplates}
+          />
+          {nameError && (
+            <div className="pg-name-error" role="alert" aria-live="assertive">
+              {nameError}
+            </div>
+          )}
+        </>
       )}
 
       {/* Context menu (portal) */}
