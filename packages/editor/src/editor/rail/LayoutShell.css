@@ -53,8 +53,8 @@
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: var(--surface-base, #0f1115);
-  color: var(--text-primary, #ffffff);
+  background: var(--surface-base, #F0F4F8);
+  color: var(--ls-text-primary, #0F172A);
   font-family: var(--aqb-font-family, "Inter", sans-serif);
 }
 
@@ -139,8 +139,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 0;                                   /* navWrap handles own padding */
-  background: var(--aqb-bg-dark, #0c0c14);     /* PRD §7: topbar bg */
-  border-bottom: 1px solid var(--aqb-border, rgba(255, 255, 255, 0.08));
+  background: var(--ls-topbar-bg, #FFFFFF);
+  border-bottom: 1px solid var(--ls-topbar-border, #E2E8F0);
   z-index: 100;
 }
 
@@ -197,13 +197,25 @@
     var(--layout-inspector-width, 280px);
 }
 
-/* Fullpage mode with sidebar */
+/* Fullpage mode with sidebar — sidebar shrinks to rail-only, fullpage fills rest.
+   Single-row areas because no TopBar slot is rendered (--no-topbar is active). */
 .layout-shell--has-sidebar.layout-shell--fullpage {
   grid-template-columns:
     auto
-    0px
+    1fr
     0px
     0px;
+  grid-template-rows: 1fr;
+  grid-template-areas: "sidebar fullpage fullpage fullpage";
+}
+
+/* Constrain sidebar to column 1 only so it doesn't overlap fullpage content */
+.layout-shell--has-sidebar.layout-shell--fullpage .layout-shell__sidebar {
+  grid-area: sidebar;
+}
+
+.layout-shell--has-sidebar.layout-shell--fullpage .layout-shell__fullpage {
+  grid-area: fullpage;
 }
 
 /* ============================================
@@ -240,18 +252,18 @@
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  background: var(--surface-canvas, #181a20);
+  background: var(--surface-canvas, #EEF2F7);
   min-width: 0; /* Prevent grid blowout */
 }
 
-/* Canvas background pattern */
+/* Canvas background pattern — dark dots on light background */
 .layout-shell__canvas::before {
   content: "";
   position: absolute;
   inset: 0;
   background-image: radial-gradient(
     circle at 1px 1px,
-    rgba(255, 255, 255, 0.03) 1px,
+    var(--ls-canvas-dot, rgba(100, 116, 139, 0.1)) 1px,
     transparent 0
   );
   background-size: 24px 24px;
@@ -266,8 +278,8 @@
   grid-area: inspector;
   display: flex;
   flex-direction: column;
-  background: var(--aqb-bg-panel, #14141f);     /* PRD §11: inspector bg */
-  border-left: 1px solid var(--aqb-border, rgba(255, 255, 255, 0.08));
+  background: var(--ls-inspector-bg, #F8FAFC);
+  border-left: 1px solid var(--ls-inspector-border, #D1D9E6);
   overflow: hidden;
   z-index: 80;
 
@@ -292,16 +304,18 @@
 .layout-shell--fullpage {
   grid-template-columns:
     var(--layout-rail-width, 60px)
-    0px
+    1fr
     0px
     0px;
+  grid-template-rows: 1fr;
+  grid-template-areas: "rail fullpage fullpage fullpage";
 }
 
 .layout-shell__fullpage {
-  grid-area: 2 / 2 / -1 / -1; /* spans columns 2-4, row 2 */
+  grid-area: fullpage;
   display: flex;
   flex-direction: column;
-  background: var(--surface-canvas, #181a20);
+  background: var(--ls-bg-card, #FFFFFF);
   overflow: hidden;
   min-width: 0;
 }

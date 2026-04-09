@@ -56,6 +56,20 @@
   --ls-border-card: #D1D9E6;
   --ls-border-light: #E2E8F0;
   --ls-border-soft: #CBD5E1;
+  --ls-danger: #DC2626;
+  --ls-danger-bg: #FEF2F2;
+  --ls-danger-border: #FECACA;
+  --ls-dirty: #F59E0B;
+
+  /* ── Global light surface overrides ──────────────────────────────────────── */
+  /* These override the dark fallbacks used in LayoutShell.css                 */
+  --surface-base: #F0F4F8;
+  --surface-canvas: #EEF2F7;
+  --ls-topbar-bg: #FFFFFF;
+  --ls-inspector-bg: #F8FAFC;
+  --ls-inspector-border: #D1D9E6;
+  --ls-topbar-border: #E2E8F0;
+  --ls-canvas-dot: rgba(100, 116, 139, 0.1);
 }
 
 /* ─────────────────────────────────────────────
