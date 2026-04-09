@@ -423,7 +423,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                   fontSize: 13,
                   cursor: "pointer",
                   textAlign: "left" as const,
-                  background: isCurrent ? "rgba(59,130,246,0.15)" : "var(--aqb-surface-3)",
+                  background: isCurrent ? "var(--aqb-primary-alpha-15, rgba(59,130,246,0.15))" : "var(--aqb-surface-3)",
                   border: isCurrent
                     ? "1px solid var(--aqb-primary)"
                     : "1px solid var(--aqb-border)",

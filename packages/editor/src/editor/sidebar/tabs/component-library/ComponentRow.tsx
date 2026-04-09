@@ -8,7 +8,6 @@ import { MoreHorizontal, Plus, Copy, Trash2, RefreshCw, Star, Edit3 } from "luci
 import * as React from "react";
 import type { ComponentDefinition } from "../../../../shared/types/components";
 import { ComponentIcon } from "./ComponentIcon";
-import "./ComponentsTab.css";
 
 export interface ComponentRowProps {
   component: ComponentDefinition;
@@ -46,7 +45,10 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
   onDelete,
 }) => (
   <div
-    className={`aqb-component-row comp-row ${isSelected ? "selected comp-row--selected" : ""}`}
+    className={[
+      "aqb-component-row comp-row",
+      isSelected && "selected comp-row--selected",
+    ].filter(Boolean).join(" ")}
     draggable
     onDragStart={(e) => onDragStart(e, component)}
     onClick={() => onViewDetail(component)}
