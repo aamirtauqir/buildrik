@@ -17,6 +17,7 @@ import { useTemplateSelection } from "./hooks/useTemplateSelection";
 import { TemplateCard } from "./components/TemplateCard";
 import { TemplateDetail } from "./components/TemplateDetail";
 import { TemplatePagination } from "./components/TemplatePagination";
+import { ApplyProgressOverlay } from "./ApplyProgressOverlay";
 import "./TemplatesTab.css";
 
 // Re-export for external consumers
@@ -394,16 +395,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         />
       )}
       {showProgress && (
-        <div className="tpl-apply-overlay">
-          <div className="tpl-apply-card">
-            <div className="tpl-apply-spinner" />
-            <h3 className="tpl-apply-title">Applying template...</h3>
-            <div className="tpl-apply-bar">
-              <div className="tpl-apply-bar-fill" />
-            </div>
-            <p className="tpl-apply-sub">Please wait, do not close this window.</p>
-          </div>
-        </div>
+        <ApplyProgressOverlay templateName={tName} onComplete={handleProgressComplete} />
       )}
     </div>
   );

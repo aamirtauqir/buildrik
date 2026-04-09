@@ -60,6 +60,10 @@ function MediaTabInner({
   const ctxMenuRef = React.useRef<HTMLDivElement>(null);
   const [actionBarItem, setActionBarItem] = React.useState<LibraryItem | null>(null);
 
+  React.useEffect(() => {
+    if (!state.ctxMenu) setActionBarItem(null);
+  }, [state.ctxMenu]);
+
   const isEmpty = state.libraryItems.length === 0 && state.uploadQueue.length === 0;
 
   // Context menu keyboard navigation
@@ -180,7 +184,7 @@ function MediaTabInner({
               {state.uploadQueue.filter((u) => u.status === "complete").length} file{state.uploadQueue.filter((u) => u.status === "complete").length !== 1 ? "s" : ""} uploaded
             </span>
             <span className="med-strip-spacer" />
-            <button className="med-success-action">View newest</button>
+            <button className="med-success-action" onClick={() => {/* TODO: scroll to newest item */}}>View newest</button>
           </div>
         )}
 
