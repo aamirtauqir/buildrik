@@ -75,13 +75,13 @@
   --ls-canvas-dot: rgba(100, 116, 139, 0.1);
 
   /* ── Status tokens ──────────────────────────────────────────────────────── */
-  --ls-success-bg: #dcfce7;
+  --ls-success-bg: #DCFCE7;
   --ls-success-text: #166534;
   --ls-success-text-dark: #4ADE80;
   --ls-warning-bg: #FEF3C7;
   --ls-warning-text: #92400E;
   --ls-error-bg: #FEE2E2;
-  --ls-error-text: #FCA5A5;
+  --ls-error-text: #DC2626;
   --ls-destructive: #EF4444;
   --ls-green-check: #22C55E;
   --ls-border-dialog: #D8E0EA;
