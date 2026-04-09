@@ -25,4 +25,8 @@ export interface HistoryTabProps {
 export interface ActivityViewProps {
   composer: Composer | null;
   searchQuery?: string;
+  /** Error message to display in the error state */
+  error?: string | null;
+  /** Retry callback for the error state */
+  onRetry?: () => void;
 }

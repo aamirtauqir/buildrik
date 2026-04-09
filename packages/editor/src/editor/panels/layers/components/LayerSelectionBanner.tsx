@@ -32,32 +32,34 @@ export function LayerSelectionBanner({
 
   return (
     <div
-      className="aqb-layer-sel-banner"
+      className="aqb-layer-sel-banner lyr-action-bar"
       role="status"
       aria-live="polite"
       aria-label={`${count} layers selected`}
     >
-      <span className="aqb-sel-count">{count} selected</span>
-      <button className="aqb-sel-btn" onClick={onGroup} title="Wrap in container (⌘G)">
-        Group
-      </button>
-      <button className="aqb-sel-btn" onClick={onHide} title="Hide all selected">
-        Hide
-      </button>
-      <button
-        className="aqb-sel-btn aqb-sel-btn--danger"
-        onClick={onDelete}
-        title={`Delete ${count} layers`}
-      >
-        Delete
-      </button>
-      <button
-        className="aqb-sel-btn aqb-sel-btn--muted"
-        onClick={onExit}
-        title="Exit selection (Esc)"
-      >
-        Done
-      </button>
+      <span className="aqb-sel-count lyr-action-bar__count">{count} selected</span>
+      <div className="lyr-action-bar__actions">
+        <button className="aqb-sel-btn" onClick={onGroup} title="Wrap in container (⌘G)">
+          Group
+        </button>
+        <button className="aqb-sel-btn" onClick={onHide} title="Hide all selected">
+          Hide
+        </button>
+        <button
+          className="aqb-sel-btn aqb-sel-btn--danger lyr-action-bar__delete"
+          onClick={onDelete}
+          title={`Delete ${count} layers`}
+        >
+          Delete
+        </button>
+        <button
+          className="aqb-sel-btn aqb-sel-btn--muted"
+          onClick={onExit}
+          title="Exit selection (Esc)"
+        >
+          Done
+        </button>
+      </div>
     </div>
   );
 }

@@ -1104,12 +1104,28 @@
 }
 
 .pg-list__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-size: 12px;
   font-family: var(--aqb-font-mono, monospace);
   color: var(--aqb-text-muted);
   padding: 6px 14px;
   border-top: 1px solid var(--aqb-border);
   flex-shrink: 0;
+}
+
+.pg-list__from-template {
+  font-size: 12px;
+  color: var(--ls-accent, #3B82F6);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.pg-list__from-template:hover {
+  text-decoration: underline;
 }
 
 /* ── pg-add-btn: AddPageButton ─────────────────────────────────────────── */
@@ -1139,6 +1155,90 @@
   border-color: rgba(99,102,241,0.5);
 }
 
+/* ── pg-add-wrapper / popover (Pencil screens c0ad1, QHkn0) ────────────── */
+.pg-add-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.pg-add-popover {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 8px;
+  right: 8px;
+  background: var(--ls-bg-card, #FFFFFF);
+  border: 1px solid var(--ls-border-card, #D1D9E6);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.pg-add-option {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 13px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ls-text-primary, #0F172A);
+  font-family: inherit;
+  transition: background 100ms ease;
+}
+
+.pg-add-option:hover {
+  background: var(--ls-bg-subtle, #F1F5F9);
+}
+
+/* ── pg-empty: empty state when no pages exist ───────────────────────────── */
+.pg-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px 16px;
+  text-align: center;
+}
+
+.pg-empty__icon {
+  opacity: 0.5;
+}
+
+.pg-empty__label {
+  font-size: 13px;
+  color: var(--ls-text-muted, #64748B);
+  margin: 0;
+}
+
+.pg-empty__cta {
+  margin-top: 4px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ls-accent, #3B82F6);
+  background: var(--ls-accent-bg, #DBEAFE);
+  border: 1px solid var(--ls-accent-border, #BFDBFE);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.pg-empty__cta:hover {
+  background: var(--ls-accent-bg-hover, #BFDBFE);
+}
+
+/* ── pg-name-error: name conflict inline error (Screen GoEJk) ───────────── */
+.pg-name-error {
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--ls-danger, #DC2626);
+  background: var(--ls-danger-bg, #FEF2F2);
+  border-top: 1px solid var(--ls-danger-border, #FECACA);
+  flex-shrink: 0;
+}
+
 /* ── pg-row: new PageRow (WS-6a restyled) ─────────────────────────────── */
 .pg-row {
   height: 32px;
@@ -1156,9 +1256,11 @@
 
 .pg-row:hover { background: var(--aqb-bg-hover); }
 
-/* Active page: left 2px bar var(--aqb-primary) */
+/* Active page: blue left border indicator (Pencil screen VIyme) */
 .pg-row--active {
-  background: var(--aqb-bg-hover);
+  background: var(--ls-accent-bg, var(--aqb-bg-hover, #DBEAFE));
+  color: var(--ls-accent-txt, #1E40AF);
+  font-weight: 500;
   border-color: transparent;
 }
 
@@ -1166,11 +1268,11 @@
   content: "";
   position: absolute;
   left: 0;
-  top: 7px;
-  bottom: 7px;
-  width: 2px;
-  background: var(--aqb-primary, #6366F1);
-  border-radius: 1px;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: var(--ls-accent, var(--aqb-primary, #1D4ED8));
+  border-radius: 0 2px 2px 0;
 }
 
 /* Page thumbnail: 24×18px rounded rect */
@@ -1296,6 +1398,18 @@
   color: var(--aqb-text-primary);
 }
 
+/* pg-row__gear — visible-on-hover gear alias (Pencil screen VIyme) */
+.pg-row__gear {
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity 100ms ease;
+  color: var(--ls-text-muted, #475569);
+}
+
+.pg-row:hover .pg-row__gear {
+  opacity: 1;
+}
+
 /* ── pg-ctx-menu: PageContextMenu ─────────────────────────────────────── */
 .pg-ctx-menu {
   width: 200px;
@@ -1305,11 +1419,6 @@
   padding: 4px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.5);
   animation: pg-ctx-in 0.12s ease;
-}
-
-@keyframes pg-ctx-in {
-  from { opacity: 0; transform: scale(0.94) translateY(-3px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .pg-ctx-item {
@@ -1440,11 +1549,6 @@
 .pg-drawer__save--error {
   background: var(--aqb-error, #EF4444);
   color: #fff;
-}
-
-@keyframes pg-save-pulse {
-  0%,100% { box-shadow: 0 0 0 2px rgba(99,102,241,0.35); }
-  50%      { box-shadow: 0 0 0 4px rgba(99,102,241,0.12); }
 }
 
 .pg-drawer__save:disabled { cursor: default; }

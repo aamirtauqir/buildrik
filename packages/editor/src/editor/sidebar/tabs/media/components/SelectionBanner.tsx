@@ -1,11 +1,10 @@
 /**
- * Media Tab — Selection Banner
- * Fixed bottom bar during multi-select mode.
+ * Media Tab — Selection Banner + Upload Progress Banner
+ * Bottom bar matching .pen Screen 8i / 8m design.
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { useEffect } from "react";
 
 interface SelectionBannerProps {
   count: number;
@@ -13,9 +12,29 @@ interface SelectionBannerProps {
   onDelete(): void;
 }
 
+interface UploadProgressBannerProps {
+  fileName: string;
+  progress: number; // 0-100
+  showCancel?: boolean;
+  onCancel?: () => void;
+}
+
+export function UploadProgressBanner({ fileName, progress, showCancel = false, onCancel }: UploadProgressBannerProps) {
+  return (
+    <div className="med-banner--upload">
+      <span className="med-banner__label">{fileName}</span>
+      <div className="med-progress">
+        <div className="med-progress__bar" style={{ width: `${progress}%` }} />
+      </div>
+      {showCancel && (
+        <button className="med-banner__cancel" onClick={onCancel} aria-label="Cancel upload">✕</button>
+      )}
+    </div>
+  );
+}
+
 export function SelectionBanner({ count, onExit, onDelete }: SelectionBannerProps) {
-  // Escape exits selection mode; Delete key deletes selected items
-  useEffect(() => {
+  React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onExit();
       if (e.key === "Delete" && count > 0) onDelete();
@@ -26,23 +45,17 @@ export function SelectionBanner({ count, onExit, onDelete }: SelectionBannerProp
 
   return (
     <div className="med-selection-banner" role="status" aria-live="polite">
-      <span className="med-sel-count">
+      <span className="med-selection-count">
         {count === 0 ? "No files selected" : `${count} selected`}
       </span>
-      <div className="med-sel-actions">
-        <button className="med-sel-exit" onClick={onExit} aria-label="Exit selection mode">
-          Done
-        </button>
-        <button
-          className="med-sel-delete danger"
-          onClick={onDelete}
-          disabled={count === 0}
-          aria-disabled={count === 0}
-          aria-label={`Delete ${count} selected files`}
-        >
-          Delete{count > 0 ? ` (${count})` : ""}
-        </button>
-      </div>
+      <button
+        className="med-selection-delete"
+        onClick={onDelete}
+        disabled={count === 0}
+        aria-label={`Delete ${count} selected files`}
+      >
+        Delete
+      </button>
     </div>
   );
 }

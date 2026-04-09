@@ -107,13 +107,15 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
 
   const rowClassNames = [
     "aqb-layer-row",
+    "lyr-row",
     hasChildren ? "has-children" : "",
-    isSelected ? "is-selected" : "",
+    isSelected ? "is-selected lyr-row--selected" : "",
     isDragging ? "is-dragging" : "",
     isDropTarget ? "is-drop-target" : "",
     dropPosition ? `drop-${dropPosition}` : "",
-    isHidden ? "is-hidden" : "",
-    isLocked ? "is-locked" : "",
+    isHidden ? "is-hidden lyr-row--hidden" : "",
+    isLocked ? "is-locked lyr-row--locked" : "",
+    isEditing ? "lyr-row--rename" : "",
     isCanvasHovered ? "is-canvas-hovered" : "",
     isLayerHovered ? "is-layer-hovered" : "",
     selectedIds.has(layer.id) && layer.id !== selectedElementId ? "is-multi-selected" : "",

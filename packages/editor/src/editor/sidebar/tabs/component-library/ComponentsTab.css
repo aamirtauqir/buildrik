@@ -1,0 +1,75 @@
+/**
+ * ComponentsTab — light-theme CSS (comp-* namespace)
+ *
+ * Dual-class pattern: comp-* classes are added alongside existing aqb-* classes.
+ * All colors use var(--ls-TOKEN, #fallback) — no raw hex.
+ *
+ * Pencil screens: gIKXw (list), E2jan (detail), 65J2Q (empty state)
+ */
+
+/* ── comp-row: single component row ─────────────────────────────────────── */
+.comp-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 36px;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--ls-text-primary, #0F172A);
+  transition: background 100ms ease;
+}
+
+.comp-row:hover {
+  background: var(--ls-bg-subtle, #F1F5F9);
+}
+
+.comp-row--selected {
+  background: var(--ls-accent-bg, #DBEAFE);
+  color: var(--ls-accent-txt, #1E40AF);
+}
+
+/* ── comp-count-badge: usage count "6x" pill ────────────────────────────── */
+.comp-count-badge {
+  margin-left: auto;
+  padding: 2px 6px;
+  background: var(--ls-bg-subtle, #F1F5F9);
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--ls-text-muted, #64748B);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* ── comp-empty: empty state (Screen 65J2Q) ──────────────────────────────── */
+.comp-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 20px;
+  text-align: center;
+}
+
+.comp-empty__icon {
+  font-size: 32px;
+  color: var(--ls-text-ghost, #CBD5E1);
+  line-height: 1;
+}
+
+.comp-empty__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ls-text-primary, #0F172A);
+  margin: 0;
+}
+
+.comp-empty__body {
+  font-size: 12px;
+  color: var(--ls-text-muted, #64748B);
+  margin: 0;
+  max-width: 200px;
+  line-height: 1.5;
+}

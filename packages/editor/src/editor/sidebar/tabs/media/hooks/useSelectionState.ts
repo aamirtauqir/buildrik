@@ -51,9 +51,9 @@ export function useSelectionState(
     });
   }, []);
 
-  const selectAll = useCallback((allKeys: string[]) => {
-    setSelectedKeys(new Set(allKeys));
-  }, []);
+  const selectAll = useCallback(() => {
+    setSelectedKeys(new Set(libraryItems.map((i) => i.key)));
+  }, [libraryItems]);
 
   const requestDelete = useCallback(
     (key: string) => {

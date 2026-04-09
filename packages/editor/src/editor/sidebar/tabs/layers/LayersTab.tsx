@@ -88,6 +88,24 @@ export const LayersTab: React.FC<LayersTabProps> = ({
     [composer]
   );
 
+  // Selection synced banner (Screen uHSyK): show briefly when canvas selects a layer
+  const [selectionSynced, setSelectionSynced] = React.useState(false);
+  const syncTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  React.useEffect(() => {
+    if (!composer) return;
+    const onCanvasSelect = () => {
+      setSelectionSynced(true);
+      if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+      syncTimerRef.current = setTimeout(() => setSelectionSynced(false), 2500);
+    };
+    composer.on(EVENTS.ELEMENT_SELECTED, onCanvasSelect);
+    return () => {
+      composer.off(EVENTS.ELEMENT_SELECTED, onCanvasSelect);
+      if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+    };
+  }, [composer]);
+
   if (!composer) {
     return (
       <div style={containerStyles}>
@@ -139,6 +157,13 @@ export const LayersTab: React.FC<LayersTabProps> = ({
         onHelpClick={onHelpClick}
         onClose={onClose}
       />
+
+      {/* Selection synced banner — Screen uHSyK */}
+      {selectionSynced && (
+        <div className="lyr-sync-banner" role="status" aria-live="polite">
+          Selection synced from canvas
+        </div>
+      )}
 
       {/* Tree Content - LayersPanel has its own integrated search */}
       <div style={contentStyles}>

@@ -9,10 +9,8 @@ import * as React from "react";
 import { useCallback, useState } from "react";
 import type { Composer } from "../../../../../engine/Composer";
 import { STORAGE_QUOTA_BYTES } from "../../../../../shared/constants/media";
-import { STORAGE_KEYS } from "../../../../../shared/constants/storageKeys";
 import { useToast } from "../../../../../shared/ui/Toast";
-import type { CtxMenuState, LibraryItem, MediaSource, MediaStateResult } from "../data/mediaTypes";
-import { useDiscoveryState } from "./useDiscoveryState";
+import type { CtxMenuState, LibraryItem, MediaStateResult } from "../data/mediaTypes";
 import { useLibraryState } from "./useLibraryState";
 import { useSelectionState } from "./useSelectionState";
 import { useUploadState } from "./useUploadState";
@@ -28,22 +26,13 @@ export function useMediaState(composer: Composer): MediaStateResult {
   );
 
   // Navigation
-  const [source, setSourceState] = useState<MediaSource>("mine");
   const [detailItem, setDetailItem] = useState<LibraryItem | null>(null);
   const [ctxMenu, setCtxMenu] = useState<CtxMenuState | null>(null);
-  const [tipDismissed, setTipDismissed] = useState(
-    () => localStorage.getItem(STORAGE_KEYS.MEDIA_TIP_DISMISSED) === "1"
-  );
 
   // Sub-hooks
   const library = useLibraryState(composer);
   const upload = useUploadState(composer, showToast);
   const selection = useSelectionState(composer, library.libraryItems, showToast);
-  const discovery = useDiscoveryState(composer, showToast);
-
-  const setSource = useCallback((src: MediaSource) => {
-    setSourceState(src);
-  }, []);
 
   const insertToCanvas = useCallback(
     async (key: string) => {
@@ -91,11 +80,6 @@ export function useMediaState(composer: Composer): MediaStateResult {
     [showToast]
   );
 
-  const dismissTip = useCallback(() => {
-    setTipDismissed(true);
-    localStorage.setItem(STORAGE_KEYS.MEDIA_TIP_DISMISSED, "1");
-  }, []);
-
   const openCtxMenu = useCallback((e: React.MouseEvent, item: LibraryItem) => {
     e.preventDefault();
     // Clamp position so menu doesn't render off-screen (~160px wide, ~140px tall)
@@ -112,10 +96,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
 
   return {
     // Navigation
-    source,
     activeType: library.activeType,
-    setSource,
-    setType: library.setActiveType,
 
     // Library
     libraryItems: library.libraryItems,
@@ -132,7 +113,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
     setFmtFilter: library.setFmtFilter,
     toggleSelMode: selection.toggleSelMode,
     toggleSelect: selection.toggleSelect,
-    selectAll: () => selection.selectAll(library.libraryItems.map((i) => i.key)),
+    selectAll: selection.selectAll,
     failedUploads: upload.failedUploads,
     dismissFailedUploads: upload.dismissFailedUploads,
     upload: upload.upload,
@@ -151,17 +132,6 @@ export function useMediaState(composer: Composer): MediaStateResult {
     handlePanelDragOver: upload.handlePanelDragOver,
     handlePanelDrop: upload.handlePanelDrop,
 
-    // Discovery
-    stockPhotos: discovery.stockPhotos,
-    stockVideos: discovery.stockVideos,
-    discIcons: discovery.discIcons,
-    discFonts: discovery.discFonts,
-    discLoading: discovery.discLoading,
-    discoverySearch: discovery.discoverySearch,
-    discSearchAll: discovery.discSearchAll,
-    loadMoreDisc: discovery.loadMoreDisc,
-    saveToLibrary: discovery.saveToLibrary,
-
     // Shared
     librarySearch: library.librarySearch,
     setLibrarySearch: library.setLibrarySearch,
@@ -177,9 +147,5 @@ export function useMediaState(composer: Composer): MediaStateResult {
     detailItem,
     openDetail,
     closeDetail,
-
-    // Tips
-    tipDismissed,
-    dismissTip,
   };
 }

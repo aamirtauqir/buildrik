@@ -1,31 +1,17 @@
 /**
- * Media Tab — Upload Zone + Storage Bar
- * Visible in My Library view only.
- * Storage thresholds: <80% green, ≥80% yellow, 100% red + disabled.
+ * Media Tab — Upload Zone
+ * Dashed drop area matching .pen Screen 8 design.
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { useRef } from "react";
+import { Upload } from "lucide-react";
 import type { UploadZoneProps } from "../data/mediaTypes";
-import { fmtSize } from "../data/mediaUtils";
 
-export function UploadZone({ storage, onUpload, uploadQueue, disabled = false }: UploadZoneProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+export function UploadZone({ storage, onUpload, disabled = false }: UploadZoneProps) {
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = React.useState(false);
-  const pct = Math.min(100, (storage.used / storage.total) * 100);
   const isFull = storage.used >= storage.total;
-  const isNearFull = pct >= 80;
-  const remaining = storage.total - storage.used;
-  const isUploading = uploadQueue.length > 0;
-
-  // Average progress across active uploads for the progress bar
-  const avgProgress =
-    isUploading
-      ? Math.round(
-          uploadQueue.reduce((sum, u) => sum + (u.progress ?? 0), 0) / uploadQueue.length
-        )
-      : 0;
 
   const handleFiles = (files: FileList | null) => {
     if (!files?.length || disabled || isFull) return;
@@ -38,75 +24,22 @@ export function UploadZone({ storage, onUpload, uploadQueue, disabled = false }:
     if (!isFull) handleFiles(e.dataTransfer.files);
   };
 
-  const storageClass = isFull
-    ? "med-storage-bar--full"
-    : isNearFull
-      ? "med-storage-bar--near-full"
-      : "";
-
-  const storageLabel = isFull
-    ? "Storage full — delete files to free space"
-    : isNearFull
-      ? `Almost full — ${fmtSize(remaining)} remaining`
-      : `${fmtSize(storage.used)} / ${fmtSize(storage.total)}`;
-
   return (
-    <div className="med-upload-zone">
-      {/* Upload button */}
-      <button
-        className={[
-          "med-upload-btn",
-          isDragOver ? "drag-over" : "",
-          isUploading ? "uploading" : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        onClick={() => !isFull && !isUploading && inputRef.current?.click()}
-        onDragOver={(e) => {
-          e.preventDefault();
-          setIsDragOver(true);
-        }}
-        onDragLeave={() => setIsDragOver(false)}
-        onDrop={handleDrop}
-        disabled={isFull || disabled}
-        aria-disabled={isFull || disabled}
-        aria-label={isFull ? "Storage full" : isUploading ? "Uploading…" : "Upload files"}
-      >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          aria-hidden="true"
-        >
-          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-          <polyline points="17 8 12 3 7 8" />
-          <line x1="12" y1="3" x2="12" y2="15" />
-        </svg>
-        <span>
-          {isUploading
-            ? `Uploading… ${avgProgress}%`
-            : isFull
-              ? "Storage full"
-              : "Drop files here or click to upload"}
-        </span>
-        {isUploading && (
-          <div
-            className="med-upload-progress-bar"
-            style={{ width: `${avgProgress}%` }}
-            role="progressbar"
-            aria-valuenow={avgProgress}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label={`Upload progress ${avgProgress}%`}
-          />
-        )}
-      </button>
-
-      {/* Hidden file input */}
+    <div
+      className={`med-upload-zone${disabled || isFull ? " med-upload-zone--disabled" : ""}${isDragOver ? " med-upload-zone--drag-active" : ""}`}
+      onClick={() => !isFull && !disabled && inputRef.current?.click()}
+      onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+      onDragLeave={() => setIsDragOver(false)}
+      onDrop={handleDrop}
+      role="button"
+      tabIndex={0}
+      aria-label={isFull ? "Storage full" : "Drop files or click to browse"}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inputRef.current?.click(); } }}
+    >
+      <Upload size={20} className="med-upload-zone-icon" />
+      <span className="med-upload-zone__label">
+        {isFull ? "Storage full" : "Drag files or click to browse"}
+      </span>
       <input
         ref={inputRef}
         type="file"
@@ -115,40 +48,6 @@ export function UploadZone({ storage, onUpload, uploadQueue, disabled = false }:
         style={{ display: "none" }}
         onChange={(e) => handleFiles(e.target.files)}
       />
-
-      {/* Storage bar */}
-      <div
-        className={`med-storage-bar ${storageClass}`}
-        role="meter"
-        aria-valuenow={pct}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label="Storage usage"
-      >
-        <div className="med-storage-track">
-          <div className="med-storage-fill" style={{ width: `${pct}%` }} />
-        </div>
-        <span className="med-storage-label">
-          {storageLabel}
-          <span style={{ opacity: 0.6, marginLeft: 4 }}>(Free plan)</span>
-        </span>
-        {isNearFull && (
-          <a
-            href="#upgrade"
-            onClick={(e) => e.preventDefault()}
-            style={{
-              fontSize: 12,
-              color: "var(--aqb-primary, #3b82f6)",
-              textDecoration: "none",
-              marginLeft: 6,
-              flexShrink: 0,
-            }}
-            aria-label="Upgrade storage plan"
-          >
-            Upgrade
-          </a>
-        )}
-      </div>
     </div>
   );
 }

@@ -79,16 +79,23 @@ export interface LeftSidebarProps {
 
 const ZONES: TabZone[] = ["creation", "structure", "config"];
 
+// Stable empty set — avoids allocating a new Set on every render
+const EMPTY_SET: ReadonlySet<string> = new Set();
+// Stable set for when settings tab has unsaved changes
+const SETTINGS_DIRTY_SET: ReadonlySet<string> = new Set(["settings"]);
+
 function RailZone({
   zone,
   activeTab,
   drawerOpen,
   onBtnClick,
+  dirtyTabIds,
 }: {
   zone: TabZone;
   activeTab: GroupedTabId;
   drawerOpen: boolean;
   onBtnClick: (tabId: GroupedTabId) => void;
+  dirtyTabIds?: ReadonlySet<string>;
 }) {
   const tabs = React.useMemo(() => getTabsByZone(zone), [zone]);
 
@@ -98,6 +105,7 @@ function RailZone({
         const Icon = ICON_MAP[tab.iconName];
         if (!Icon) return null;
         const isActive = tab.id === activeTab && drawerOpen;
+        const isDirty = dirtyTabIds?.has(tab.id) ?? false;
 
         return (
           <button
@@ -110,6 +118,7 @@ function RailZone({
             data-tab={tab.id}
           >
             {isActive && <div className="ls-btn-bar" />}
+            {isDirty && <div className="ls-btn__dirty-dot" aria-hidden="true" />}
             <Icon size={20} />
           </button>
         );
@@ -281,6 +290,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
               activeTab={activeTab}
               drawerOpen={drawerOpen}
               onBtnClick={handleBtnClick}
+              dirtyTabIds={settingsDirty ? SETTINGS_DIRTY_SET : EMPTY_SET}
             />
             {i < ZONES.length - 1 && <div className="ls-divider" />}
           </React.Fragment>

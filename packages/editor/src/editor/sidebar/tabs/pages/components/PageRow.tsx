@@ -21,6 +21,7 @@ interface Props {
   pages: PageItem[];
   composer: Composer | null;
   isRenaming: boolean;
+  nameError?: string | null;
   isContextMenuOpen?: boolean;
   isExpanded: boolean;
   onSelect: () => void;
@@ -96,8 +97,6 @@ const InlineSettings: React.FC<InlineSettingsProps> = ({ page, pages, composer, 
     return () => document.removeEventListener("keydown", onKey);
   }, [s]);
 
-  const handleClose = () => { onClose(); };
-
   return (
     <div className="pg-row-settings" role="region" aria-label={`${page.name} Settings`}>
       {/* Save row */}
@@ -113,7 +112,7 @@ const InlineSettings: React.FC<InlineSettingsProps> = ({ page, pages, composer, 
         </div>
         <button
           className="pg-row-settings__close"
-          onClick={handleClose}
+          onClick={onClose}
           aria-label="Close page settings"
           title="Close settings"
         >
@@ -129,7 +128,7 @@ const InlineSettings: React.FC<InlineSettingsProps> = ({ page, pages, composer, 
         <summary className="pg-row-settings__summary">
           SEO
           {s.seoScore < 80 && (
-            <span className="pg-row-settings__score-chip" style={{ color: s.seoScore <= 40 ? "#EF4444" : "#F59E0B" }}>
+            <span className="pg-row-settings__score-chip" style={{ color: s.seoScore <= 40 ? "var(--pg-error, #EF4444)" : "var(--pg-hidden, #F59E0B)" }}>
               {s.seoScore}
             </span>
           )}
@@ -167,6 +166,7 @@ export const PageRow = React.memo<Props>(
     pages,
     composer,
     isRenaming,
+    nameError = null,
     isContextMenuOpen = false,
     isExpanded,
     onSelect,
@@ -278,16 +278,23 @@ export const PageRow = React.memo<Props>(
 
           {/* Name or inline rename input */}
           {isRenaming ? (
-            <input
-              ref={inputRef}
-              className="pg-row__rename"
-              value={renameValue}
-              onChange={(e) => setRenameValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onBlur={() => onRenameCommit(renameValue.trim() || page.name)}
-              onClick={(e) => e.stopPropagation()}
-              aria-label="Rename page"
-            />
+            <>
+              <input
+                ref={inputRef}
+                className="pg-row__rename"
+                value={renameValue}
+                onChange={(e) => setRenameValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onBlur={() => onRenameCommit(renameValue.trim() || page.name)}
+                onClick={(e) => e.stopPropagation()}
+                aria-label="Rename page"
+              />
+              {nameError && (
+                <div className="pg-name-error" role="alert" aria-live="assertive">
+                  {nameError}
+                </div>
+              )}
+            </>
           ) : (
             <div
               className="pg-row__name"

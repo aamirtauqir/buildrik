@@ -110,7 +110,7 @@ export interface SelectionStateResult {
   confirmDelete: ConfirmDeletePayload | null;
   toggleSelMode(): void;
   toggleSelect(key: string): void;
-  selectAll(allKeys: string[]): void;
+  selectAll(): void;
   requestDelete(key: string): void;
   requestBulkDelete(items: LibraryItem[]): void;
   executeDelete(): Promise<void>;
@@ -134,10 +134,7 @@ export interface DiscoveryStateResult {
 
 export interface MediaStateResult {
   // Navigation
-  source: MediaSource;
   activeType: MediaTypeFilter;
-  setSource(src: MediaSource): void;
-  setType(t: MediaTypeFilter): void;
 
   // Library
   libraryItems: LibraryItem[];
@@ -173,17 +170,6 @@ export interface MediaStateResult {
   handlePanelDragOver(e: React.DragEvent): void;
   handlePanelDrop(e: React.DragEvent): void;
 
-  // Discovery
-  stockPhotos: StockPhoto[];
-  stockVideos: StockVideo[];
-  discIcons: DiscIcon[];
-  discFonts: DiscFont[];
-  discLoading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
-  discoverySearch: string;
-  discSearchAll(query: string): void;
-  loadMoreDisc(type: "img" | "vid"): void;
-  saveToLibrary(type: "img" | "vid", item: StockPhoto | StockVideo): void;
-
   // Shared
   librarySearch: string;
   setLibrarySearch(q: string): void;
@@ -199,10 +185,6 @@ export interface MediaStateResult {
   detailItem: LibraryItem | null;
   openDetail(item: LibraryItem): void;
   closeDetail(): void;
-
-  // Tips
-  tipDismissed: boolean;
-  dismissTip(): void;
 }
 
 // --- Prop slices ---
@@ -256,6 +238,5 @@ export interface DiscoveryViewProps {
 export interface UploadZoneProps {
   storage: { used: number; total: number };
   onUpload(files: File[]): void;
-  uploadQueue: UploadProgress[];
   disabled?: boolean;
 }

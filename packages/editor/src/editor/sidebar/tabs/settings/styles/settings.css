@@ -363,6 +363,25 @@
   color: var(--aqb-text-muted);
 }
 
+/* ── sett-save-error: inline error banner after failed save (Screen 17-28) ── */
+.sett-save-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--ls-danger-bg, #FEF2F2);
+  border: 1px solid var(--ls-danger-border, #FECACA);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--ls-danger, #DC2626);
+  margin: 0 12px 4px;
+}
+
+.sett-save-error__icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
 /* Locked screen */
 .aqb-st-locked {
   display: flex;

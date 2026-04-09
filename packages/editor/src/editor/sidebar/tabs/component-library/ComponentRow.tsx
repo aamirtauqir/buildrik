@@ -45,7 +45,10 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
   onDelete,
 }) => (
   <div
-    className={`aqb-component-row ${isSelected ? "selected" : ""}`}
+    className={[
+      "aqb-component-row comp-row",
+      isSelected && "selected comp-row--selected",
+    ].filter(Boolean).join(" ")}
     draggable
     onDragStart={(e) => onDragStart(e, component)}
     onClick={() => onViewDetail(component)}
@@ -60,10 +63,10 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
 
     {instanceCount > 0 && (
       <span
-        className="aqb-instance-badge"
+        className="aqb-instance-badge comp-count-badge"
         title={`${instanceCount} instance${instanceCount !== 1 ? "s" : ""} on canvas`}
       >
-        {instanceCount} inst
+        {instanceCount}x
       </span>
     )}
 
