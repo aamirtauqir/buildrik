@@ -866,3 +866,100 @@
   color: #3498db;
   border: 1px solid rgba(52, 152, 219, 0.3);
 }
+
+/* ─────────────────────────────────────────────
+   LYR-* — Pencil component-library spec classes
+   (Steps 2.2–2.5: lyr-row states, action bar, sync banner)
+   ───────────────────────────────────────────── */
+
+/* Row base */
+.lyr-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--ls-text-primary, #0F172A);
+  transition: background 100ms ease;
+  user-select: none;
+}
+.lyr-row:hover {
+  background: var(--ls-bg-subtle, #F1F5F9);
+}
+.lyr-row--selected {
+  background: var(--ls-accent-bg, #DBEAFE);
+  color: var(--ls-accent-txt, #1E40AF);
+}
+.lyr-row--hidden {
+  opacity: 0.45;
+}
+
+/* Rename state: hide name span, show input */
+.lyr-row--rename .lyr-row__name {
+  display: none;
+}
+.lyr-row--rename .lyr-row__rename-input {
+  display: block;
+}
+.lyr-row__rename-input {
+  display: none;
+  width: 100%;
+  font-size: 13px;
+  border: 1px solid var(--ls-accent, #1D4ED8);
+  border-radius: 4px;
+  padding: 0 4px;
+  outline: none;
+  background: white;
+  color: var(--ls-text-primary, #0F172A);
+}
+
+/* Multi-select action bar (Screen R4Pf4) */
+.lyr-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-top: 1px solid var(--ls-border-light, #E2E8F0);
+  background: var(--ls-bg-card, #FFFFFF);
+  font-size: 12px;
+}
+.lyr-action-bar__count {
+  color: var(--ls-text-muted, #475569);
+  font-weight: 500;
+}
+.lyr-action-bar__actions {
+  display: flex;
+  gap: 8px;
+}
+.lyr-action-bar__actions button {
+  font-size: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ls-text-secondary, #334155);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.lyr-action-bar__actions button:hover {
+  background: var(--ls-bg-subtle, #F1F5F9);
+}
+.lyr-action-bar__delete {
+  color: var(--ls-danger, #DC2626) !important;
+}
+
+/* Selection synced banner (Screen uHSyK) */
+.lyr-sync-banner {
+  padding: 6px 12px;
+  background: var(--ls-accent-bg, #DBEAFE);
+  color: var(--ls-accent-txt, #1E40AF);
+  font-size: 12px;
+  border-bottom: 1px solid var(--ls-border-light, #E2E8F0);
+  animation: lyr-fade-in 200ms ease;
+}
+@keyframes lyr-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
