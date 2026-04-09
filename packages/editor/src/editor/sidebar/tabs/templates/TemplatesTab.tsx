@@ -1,66 +1,50 @@
 /**
- * TemplatesTab v3 — UI shell
- * All state/logic via hooks; this file renders only.
- * UX fixes applied: C4 C5 H5 H6 M5 M6 M8 L4 L5
+ * TemplatesTab v4 — Full-page template browser matching .pen Screens 4-7.
+ * Light theme, 4-column grid, pagination, inline detail panel, two-stage filtering.
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { createPortal } from "react-dom";
+import { Search, X } from "lucide-react";
 import type { Composer } from "../../../../engine";
-import { PanelHeader } from "../../shared/PanelHeader";
 import { useToast } from "../../../../shared/ui/Toast";
-import { ApplyProgressOverlay } from "./ApplyProgressOverlay";
-import { TemplatePreviewModal } from "./TemplatePreviewModal";
-import { type TemplateItem, SITE_CATEGORY_PILLS, SITE_TEMPLATES } from "./templatesData";
+import { type TemplateItem, SITE_CATEGORY_PILLS, SITE_TEMPLATES, TEMPLATE_TYPE_PILLS, SUB_CATEGORY_TAGS, type SiteCategory, type TemplateType } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
 import { ReplaceModal, ProModal } from "./TemplatesTabModals";
 import { useTemplatePersistence } from "./hooks/useTemplatePersistence";
 import { useTemplateApply } from "./hooks/useTemplateApply";
 import { useTemplateSelection } from "./hooks/useTemplateSelection";
+import { TemplateCard } from "./components/TemplateCard";
+import { TemplateDetail } from "./components/TemplateDetail";
+import { TemplatePagination } from "./components/TemplatePagination";
 import "./TemplatesTab.css";
 
 // Re-export for external consumers
 export type { TemplateItem, RecentTemplate } from "./templatesData";
 export { getRecentTemplates, addRecentTemplate, getTemplateById } from "./templatesData";
 
-// ── Constants ────────────────────────────────────────────────────────
-const INSIGHTS: Record<string, string> = {
-  all: "SaaS templates most used in your niche",
-  landing: "Landing pages with video hero convert 3× better",
-  portfolio: "Portfolios with 6–12 projects get best client responses",
-  blog: "Blogs with featured images get 2× more shares",
-  ecommerce: "Product pages with 4+ images see higher conversion rates",
-  saas: "SaaS pricing pages with 3 tiers convert best",
-};
-
-const GLOW: Record<string, string> = {
-  "site-saas-landing": "#7C6DFA", "site-portfolio": "#0EA5E9", "site-blog": "#F59E0B",
-  "site-ecommerce": "#22C55E", "site-agency": "#F87171", "site-startup": "#A78BFA",
-  "site-minimal": "#E879F9", "site-restaurant": "#FB923C", "site-saas-pro": "#38BDF8",
-  "site-coming-soon": "#818CF8",
-};
-
-// ── Props ────────────────────────────────────────────────────────────
 export interface TemplatesTabProps {
   composer: Composer | null;
   onTemplateUsed?: () => void;
-  /** Called when a quick-action button wants to switch to another tab (replaces composer event bus) */
   onSwitchTab?: (tab: string) => void;
-  isPinned?: boolean;
-  onPinToggle?: () => void;
-  onHelpClick?: () => void;
   onClose?: () => void;
 }
 
-// ── Component ────────────────────────────────────────────────────────
 export const TemplatesTab: React.FC<TemplatesTabProps> = ({
-  composer, onTemplateUsed, onSwitchTab, isPinned, onPinToggle, onHelpClick, onClose,
+  composer,
+  onTemplateUsed,
+  onClose,
 }) => {
   const { addToast } = useToast();
-  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const [showSearch, setShowSearch] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
 
-  // ── Hooks ──────────────────────────────────────────────────────────
+  React.useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(t);
+  }, []);
+
+  // ── Hooks ──
   const { appliedId, setAppliedId } = useTemplatePersistence();
 
   const {
@@ -74,85 +58,35 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     handleRetry,
   } = useTemplateApply(composer);
 
-  const {
-    selectedId, setSelectedId,
-    previewId, setPreviewId,
-    showReplace, setShowReplace,
-    showUpgrade, setShowUpgrade,
-    searchQ, setSearchQ,
-    activeFilter, setActiveFilter,
-    filteredTemplates,
-    clearAll,
-  } = useTemplateSelection(showProgress);
+  const sel = useTemplateSelection(showProgress);
 
-  // ── Derived ────────────────────────────────────────────────────────
-  const total = SITE_TEMPLATES.length;
-  const isFiltered = Boolean(searchQ.trim() || activeFilter !== "all");
-  const headerCount = isFiltered ? `${filteredTemplates.length} of ${total}` : `${total}`;
-  const metaCount = isFiltered ? `${filteredTemplates.length} of ${total} templates` : `${total} templates`;
-  const selectedTpl = selectedId ? (SITE_TEMPLATES.find((t) => t.id === selectedId) ?? null) : null;
-  const appliedTpl = appliedId ? (SITE_TEMPLATES.find((t) => t.id === appliedId) ?? null) : null;
-  const appliedInView = appliedId ? filteredTemplates.some((t) => t.id === appliedId) : false;
-  const previewTpl = previewId ? (SITE_TEMPLATES.find((t) => t.id === previewId) ?? null) : null;
-  const isAppliedSel = Boolean(appliedId && selectedId === appliedId);
-  const tName = pendingId.current
-    ? (SITE_TEMPLATES.find((t) => t.id === pendingId.current)?.name ?? "Template")
-    : "Template";
-  const nudgeMeta = !selectedTpl
-    ? "Select a template to get started"
-    : isAppliedSel
-      ? "Applied · want to replace it?"
-      : `${selectedTpl.pageCount ?? 1} pages · ${selectedTpl.status === "premium" ? "Pro" : "Free"} · click the button to apply`;
-  const nudgeBtnLabel = isAppliedSel ? "Replace →" : hasExistingContent ? "Replace with This →" : "Apply Template →";
+  // ── Derived ──
+  const detailTemplate = sel.detailId
+    ? SITE_TEMPLATES.find((t) => t.id === sel.detailId) ?? null
+    : null;
 
-  // ── Handlers ───────────────────────────────────────────────────────
+  // Track whether apply is "add as new page" mode
+  const addAsNewPageRef = React.useRef(false);
 
-  // Enter to apply selected, Cmd+Enter to open preview
-  React.useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (showProgress || previewId) return;
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA") return;
-      if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && selectedId) {
-        setPreviewId(selectedId);
-      } else if (e.key === "Enter" && selectedId && !showReplace && !showUpgrade) {
-        handleUseThis();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showProgress, previewId, selectedId, showReplace, showUpgrade]);
-
-  function selectTemplate(id: string) {
-    setPreviewId(id);
-  }
-
-  function handleUseThis() {
-    if (!selectedId) return;
-    const t = SITE_TEMPLATES.find((x) => x.id === selectedId);
-    if (!t) return;
-    if (t.status === "premium") { setShowUpgrade(true); return; }
-    pendingId.current = selectedId;
-    setShowReplace(false);
-    hasExistingContent ? setShowReplace(true) : startApply();
-  }
-
-  function handleUseFromPreview() {
-    if (!previewId) return;
-    const id = previewId;
+  // ── Handlers ──
+  function handleApplyToCurrent(id: string) {
     const t = SITE_TEMPLATES.find((x) => x.id === id);
     if (!t) return;
-    if (t.status === "premium") {
-      pendingId.current = id;
-      setShowUpgrade(true);
-      setPreviewId(null);
-      return;
-    }
-    setSelectedId(id);
-    setPreviewId(null);
+    if (t.status === "premium") { sel.setShowUpgrade(true); return; }
+    addAsNewPageRef.current = false;
     pendingId.current = id;
-    hasExistingContent ? setShowReplace(true) : startApply();
+    sel.setDetailId(null);
+    hasExistingContent ? sel.setShowReplace(true) : startApply();
+  }
+
+  function handleAddAsNewPage(id: string) {
+    const t = SITE_TEMPLATES.find((x) => x.id === id);
+    if (!t) return;
+    if (t.status === "premium") { sel.setShowUpgrade(true); return; }
+    addAsNewPageRef.current = true;
+    pendingId.current = id;
+    sel.setDetailId(null);
+    startApply();
   }
 
   function handleProgressComplete() {
@@ -163,228 +97,278 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     if (!t) return;
     if (!composer) { setApplyError("Editor not ready — please reload and try again"); return; }
     if (!t.html) { setApplyError("Template has no content"); return; }
+
     try {
+      if (addAsNewPageRef.current) {
+        composer.elements.createPage(t.name);
+      }
       if (resetStyles) composer.styles.clear();
       composer.elements.importHTMLToActivePage(t.html);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to apply";
       setCanRetry(true);
       setApplyError(msg);
-      addToast({ message: "Template apply failed — nothing was changed", variant: "error",
-        action: { label: "Retry", onClick: handleRetry } });
+      addToast({
+        message: "Template apply failed — nothing was changed",
+        variant: "error",
+        action: { label: "Retry", onClick: handleRetry },
+      });
       return;
     }
+
     pendingId.current = null;
+    addAsNewPageRef.current = false;
     setAppliedId(null);
     requestAnimationFrame(() => {
       setAppliedId(id);
-      setSelectedId(null);
+      sel.setSelectedId(null);
       setResetStyles(false);
-      addToast({ message: `"${t.name}" applied successfully`, variant: "success",
-        action: { label: "Undo", onClick: () => { composer?.history?.undo?.(); setAppliedId(null); clearAppliedId(); } } });
+      addToast({ message: `"${t.name}" applied successfully`, variant: "success" });
       recordTemplateApplied(t);
       saveAppliedId(id);
       onTemplateUsed?.();
-      requestAnimationFrame(() => {
-        const card = scrollRef.current?.querySelector(`[data-id="${id}"]`) as HTMLElement | null;
-        card?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      });
     });
   }
 
-  // ── Render ─────────────────────────────────────────────────────────
+  // ── Render ──
+  const tName = pendingId.current
+    ? (SITE_TEMPLATES.find((t) => t.id === pendingId.current)?.name ?? "Template")
+    : "Template";
+
   return (
     <div className="tpl-shell">
-      <PanelHeader title="Templates" isPinned={isPinned} onPinToggle={onPinToggle}
-        onHelpClick={onHelpClick} onClose={onClose}>
-        <small className="tpl-count">{headerCount}</small>
-      </PanelHeader>
-
-      {/* Search */}
-      <div className="tpl-search">
-        <div className="tpl-search-box">
-          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input className="tpl-search-input" placeholder="Search templates..." value={searchQ}
-            onChange={(e) => setSearchQ(e.target.value)} aria-label="Search templates" />
-          {searchQ.length > 0 && (
-            <button className="tpl-search-clear" onClick={() => setSearchQ("")} aria-label="Clear search">×</button>
+      {/* Header — 48px, title 18px/600 */}
+      <div className="tpl-header">
+        {detailTemplate ? (
+          /* Breadcrumb (Screen cV3OT) */
+          <div className="tpl-breadcrumb">
+            <button
+              className="tpl-breadcrumb-back"
+              onClick={() => sel.setDetailId(null)}
+              aria-label="Back to grid"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              <span>Back to grid</span>
+            </button>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--ls-text-lighter, #94A3B8)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+            <span className="tpl-breadcrumb-cat">{detailTemplate.category ?? "All"}</span>
+          </div>
+        ) : (
+          <h2 className="tpl-header-title">Templates</h2>
+        )}
+        <div className="tpl-header-actions">
+          <button
+            className="tpl-header-btn"
+            onClick={() => setShowSearch(!showSearch)}
+            aria-label={showSearch ? "Close search" : "Search templates"}
+          >
+            <Search size={16} />
+          </button>
+          {onClose && (
+            <button className="tpl-header-btn" onClick={onClose} aria-label="Close templates">
+              <X size={16} />
+            </button>
           )}
         </div>
       </div>
 
-      {/* Filter pills */}
-      <div className="tpl-filters" role="tablist" aria-label="Template categories">
-        {SITE_CATEGORY_PILLS.map((pill) => (
-          <button key={pill.id} className={`tpl-pill${activeFilter === pill.id ? " tpl-pill--on" : ""}`}
-            onClick={() => setActiveFilter(pill.id)} role="tab" aria-selected={activeFilter === pill.id}>
-            {pill.label}
-          </button>
-        ))}
-        {isFiltered && (
-          <button className="tpl-pill-clear" onClick={clearAll} aria-label="Clear all filters">× Clear all</button>
-        )}
-      </div>
-
-      {/* Meta */}
-      <div className="tpl-meta"><span className="tpl-meta-count">{metaCount}</span></div>
-
-      {/* Applied banner */}
-      {appliedTpl && (
-        <div className="tpl-applied-banner">
-          <span className="tab-icon">🎉</span>
-          <div className="tab-body">
-            <div className="tab-title">{appliedTpl.name} applied!</div>
-            <div className="tab-sub">Just now · {appliedTpl.pageCount ?? 1} pages ready</div>
-            {!appliedInView && isFiltered && <div className="tab-filtered-warn">↑ Currently filtered out — clear filters to see it</div>}
+      {/* Search input */}
+      {showSearch && (
+        <div className="tpl-search-wrap">
+          <div className="tpl-search-input-box">
+            <Search size={16} className="tpl-search-icon" />
+            <input
+              className="tpl-search-input"
+              placeholder="Search templates..."
+              value={sel.searchQ}
+              onChange={(e) => sel.setSearchQ(e.target.value)}
+              aria-label="Search templates"
+              autoFocus
+            />
+            {sel.searchQ.length > 0 && (
+              <button
+                className="tpl-search-clear"
+                onClick={() => sel.setSearchQ("")}
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
-          <button className="tpl-undo-btn" onClick={() => { composer?.history?.undo?.(); setAppliedId(null); clearAppliedId(); }} aria-label="Undo template apply">↩ Undo</button>
-          <button className="tpl-banner-dismiss" onClick={() => { setAppliedId(null); clearAppliedId(); }} aria-label="Dismiss">×</button>
         </div>
       )}
 
-      {/* Quick actions post-apply */}
-      {appliedTpl && (
-        <div className="tpl-quick-actions">
-          <button className="tql-action" onClick={() => onSwitchTab?.("design")}>
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
-            Customize global styles
-          </button>
-          <button className="tql-action" onClick={() => onSwitchTab?.("history")}>
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-            View version history
-          </button>
-          <div className="tql-sep" />
+      {/* Main content — skeleton on mount */}
+      {isLoading ? (
+        <div className="tpl-skeleton-wrap">
+          <div className="tpl-skeleton-pills">
+            {[80, 110, 95, 85, 100, 90, 70, 105].map((w, i) => (
+              <div key={i} className="tpl-skeleton-pill" style={{ width: w }} />
+            ))}
+          </div>
+          <div className="tpl-skeleton-grid">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="tpl-skeleton-card" />
+            ))}
+          </div>
         </div>
+      ) : (
+      <>
+
+      {/* Filter pills — two-stage */}
+      {sel.templateType === null ? (
+        <div className="tpl-pills" role="tablist" aria-label="Template categories">
+          {SITE_CATEGORY_PILLS.map((pill) => (
+            <button
+              key={pill.id}
+              className={`tpl-pill${sel.activeFilter === pill.id ? " tpl-pill--active" : ""}`}
+              onClick={() => sel.setActiveFilter(pill.id)}
+              role="tab"
+              aria-selected={sel.activeFilter === pill.id}
+            >
+              {pill.label}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <>
+          {/* Type toggle — Page Templates / Section Templates */}
+          <div className="tpl-pills" role="tablist" aria-label="Template type">
+            {TEMPLATE_TYPE_PILLS.map((pill) => (
+              <button
+                key={pill.id}
+                className={`tpl-pill${sel.templateType === pill.id ? " tpl-pill--active" : ""}`}
+                onClick={() => sel.setTemplateType(pill.id)}
+                role="tab"
+                aria-selected={sel.templateType === pill.id}
+              >
+                {pill.label}
+              </button>
+            ))}
+          </div>
+          {/* Sub-category tags */}
+          <div className="tpl-tags">
+            {SUB_CATEGORY_TAGS.map((tag) => (
+              <button
+                key={tag.id}
+                className={`tpl-tag${sel.subCategory === tag.id ? " tpl-tag--active" : ""}`}
+                onClick={() => sel.setSubCategory(sel.subCategory === tag.id ? null : tag.id)}
+              >
+                {tag.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Content area */}
+      <div className="tpl-content">
+        {sel.paginatedTemplates.length === 0 ? (
+          <div className="tpl-empty">
+            <Search size={32} className="tpl-empty-icon" />
+            <p className="tpl-empty-text">
+              {sel.searchQ.trim()
+                ? `No templates found for "${sel.searchQ}"`
+                : "No templates in this category"}
+            </p>
+            <button className="tpl-empty-btn" onClick={sel.clearAll}>
+              {sel.searchQ.trim() ? "Clear search" : "Show all templates"}
+            </button>
+          </div>
+        ) : (
+          <div className={`tpl-content-inner${sel.detailId ? " tpl-content-inner--with-detail" : ""}`}>
+            <div className={`tpl-grid-area${sel.detailId ? " tpl-grid-area--dimmed" : ""}`}>
+              <div className="tpl-grid" role="listbox" aria-label="Available templates">
+                {sel.paginatedTemplates.map((tpl) => (
+                  <TemplateCard
+                    key={tpl.id}
+                    template={tpl}
+                    isSelected={sel.detailId === tpl.id}
+                    onClick={(id) => sel.setDetailId(sel.detailId === id ? null : id)}
+                  />
+                ))}
+              </div>
+            </div>
+            {detailTemplate && (
+              <TemplateDetail
+                template={detailTemplate}
+                onApplyToCurrent={handleApplyToCurrent}
+                onAddAsNewPage={handleAddAsNewPage}
+                onCancel={() => sel.setDetailId(null)}
+              />
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Pagination */}
+      <TemplatePagination
+        currentPage={sel.currentPage}
+        totalPages={sel.totalPages}
+        onChange={sel.setCurrentPage}
+      />
+
+      </>
       )}
 
       {/* Error banner */}
       {applyError && (
         <div className="tpl-error-banner">
-          <span>⚠️ {applyError}</span>
+          <span>{applyError}</span>
           <div className="tpl-error-actions">
-            {canRetry && <button className="tpl-error-retry" onClick={handleRetry}>Retry</button>}
-            <button className="tpl-error-dismiss" onClick={() => { setApplyError(null); setCanRetry(false); }}>✕</button>
+            {canRetry && (
+              <button className="tpl-error-retry" onClick={handleRetry}>
+                Try again
+              </button>
+            )}
+            <button
+              className="tpl-error-dismiss"
+              onClick={() => { setApplyError(null); setCanRetry(false); }}
+              aria-label="Dismiss error"
+            >
+              <X size={14} />
+            </button>
           </div>
         </div>
       )}
-
-      {/* Cards */}
-      <div className="tpl-cards-scroll" ref={scrollRef}>
-        {filteredTemplates.length === 0 ? (
-          <div className="tpl-empty">
-            {searchQ.trim() ? (
-              <><div className="tpl-empty-icon">🔍</div>
-                <p className="tpl-empty-txt">No templates found for <strong>"{searchQ}"</strong></p>
-                <p className="tpl-empty-hint">Try: Landing, SaaS, Portfolio, Blog</p>
-                <button className="tpl-empty-clear" onClick={() => setSearchQ("")}>Clear search</button></>
-            ) : (
-              <><div className="tpl-empty-icon">📂</div>
-                <p className="tpl-empty-txt">No templates in this category</p>
-                <button className="tpl-empty-clear" onClick={clearAll}>Show all templates</button></>
-            )}
-          </div>
-        ) : (
-          <div className="tpl-cards-grid" role="listbox" aria-label="Available templates" aria-multiselectable="false">
-            {filteredTemplates.map((tpl) => {
-              const isLocked = tpl.status === "premium";
-              const isSel = tpl.id === selectedId;
-              const isAppl = tpl.id === appliedId;
-              const glow = GLOW[tpl.id] ?? "#7C6DFA";
-              return (
-                <div key={tpl.id} data-id={tpl.id}
-                  className={["tcard", isSel ? "tcard--sel" : "", isAppl ? "tcard--applied" : "", isLocked ? "tcard--locked" : ""].filter(Boolean).join(" ")}
-                  onClick={() => selectTemplate(tpl.id)} role="option" tabIndex={0} aria-selected={isSel}
-                  aria-label={`${tpl.name} template, ${tpl.pageCount ?? 1} pages, ${tpl.status === "premium" ? "Pro plan required" : "Free"}`}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") { e.preventDefault(); setPreviewId(tpl.id); if (!isLocked) setSelectedId(tpl.id); }
-                    if (e.key === " ") { e.preventDefault(); selectTemplate(tpl.id); }
-                  }}
-                >
-                  <div className="tcard-thumb" style={{ background: tpl.gradient ?? "linear-gradient(145deg,#0d0d14,#181820)" }}>
-                    <div className="tcard-glow" style={{ background: glow }} />
-                    <div className="tcard-line tcard-line--h" style={{ background: `${glow}55` }} />
-                    <div className="tcard-line" /><div className="tcard-line tcard-line--s" /><div className="tcard-line tcard-line--xs" />
-                    {isLocked ? (
-                      <div className="tcard-lock-ov">
-                        <span className="tcard-lock-lbl" title="PRO plan required" aria-label="PRO plan required">🔒 PRO</span>
-                        <button className="tcard-prev-btn" onClick={(e) => { e.stopPropagation(); setPreviewId(tpl.id); }}>Preview</button>
-                        <button className="tcard-use-btn" onClick={(e) => { e.stopPropagation(); setShowUpgrade(true); }}>Upgrade →</button>
-                      </div>
-                    ) : (
-                      <div className="tcard-hover-ov">
-                        <button className="tcard-prev-btn" onClick={(e) => { e.stopPropagation(); setPreviewId(tpl.id); }}>Preview</button>
-                        <button className="tcard-use-btn" onClick={(e) => { e.stopPropagation(); setSelectedId(tpl.id); pendingId.current = tpl.id; setShowReplace(false); hasExistingContent ? setShowReplace(true) : startApply(); }}>Use this →</button>
-                      </div>
-                    )}
-                    <div className="tcard-check">✓</div>
-                  </div>
-                  <div className="tcard-info">
-                    <div className="tcard-name" title={tpl.name}>{tpl.name}</div>
-                    {tpl.pageCount !== undefined && <div className="tcard-pg">{tpl.pageCount}pg</div>}
-                    <div className={`tcard-badge ${tpl.status === "premium" ? "tcard-badge--pro" : "tcard-badge--free"}`}>
-                      {tpl.status === "premium" ? "PRO" : "FREE"}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Nudge bar */}
-      <div className="tpl-nudge">
-        <div className="tpl-nudge-info">
-          <div className="tpl-nudge-text">
-            <div className="tpl-nudge-name">{selectedTpl ? selectedTpl.name : "Select a template"}</div>
-            <div className="tpl-nudge-meta">{nudgeMeta}</div>
-          </div>
-          {selectedId && <button className="tpl-deselect" onClick={() => setSelectedId(null)} aria-label="Deselect template">×</button>}
-        </div>
-        <button className="tpl-nudge-btn" disabled={!selectedTpl} onClick={handleUseThis}>{nudgeBtnLabel}</button>
-      </div>
-
-      {/* Insight bar */}
-      <div className="tpl-insight">
-        <div className="tpl-insight-dot" />
-        <span className="tpl-insight-txt">{INSIGHTS[activeFilter] ?? INSIGHTS.all}</span>
-      </div>
 
       {/* Modals */}
-      {showReplace && selectedTpl && (
-        <ReplaceModal template={selectedTpl} currentPageCount={composer?.elements?.getAllPages?.()?.length ?? 1}
-          resetGlobalStyles={resetStyles} onResetChange={setResetStyles}
-          onCancel={() => setShowReplace(false)} onApply={() => { setShowReplace(false); startApply(); }} />
+      {sel.showReplace && (
+        <ReplaceModal
+          template={SITE_TEMPLATES.find((t) => t.id === pendingId.current) ?? SITE_TEMPLATES[0]}
+          currentPageCount={composer?.elements?.getAllPages?.()?.length ?? 1}
+          resetGlobalStyles={resetStyles}
+          onResetChange={setResetStyles}
+          onCancel={() => sel.setShowReplace(false)}
+          onApply={() => { sel.setShowReplace(false); startApply(); }}
+        />
       )}
-      {showUpgrade && (
-        <ProModal templateName={SITE_TEMPLATES.find((t) => t.id === pendingId.current)?.name ?? "Pro Template"}
-          onCancel={() => setShowUpgrade(false)}
-          onUpgrade={() => { setShowUpgrade(false); window.open("/dashboard/settings/billing", "_blank"); }} />
+      {sel.showUpgrade && (
+        <ProModal
+          templateName={SITE_TEMPLATES.find((t) => t.id === pendingId.current)?.name ?? "Pro Template"}
+          onCancel={() => sel.setShowUpgrade(false)}
+          onUpgrade={() => {
+            sel.setShowUpgrade(false);
+            window.open("/dashboard/settings/billing", "_blank");
+          }}
+        />
       )}
       {showProgress && (
-        <ApplyProgressOverlay templateName={tName} onComplete={handleProgressComplete}
-          onCancel={() => { setShowProgress(false); pendingId.current = null; addToast({ message: "Template apply cancelled", variant: "info" }); }}
-          onError={(err) => { setShowProgress(false); setCanRetry(true); setApplyError(err.message);
-            addToast({ message: "Template apply failed — nothing was changed", variant: "error",
-              action: { label: "Retry", onClick: handleRetry } }); }} />
+        <div className="tpl-apply-overlay">
+          <div className="tpl-apply-card">
+            <div className="tpl-apply-spinner" />
+            <h3 className="tpl-apply-title">Applying template...</h3>
+            <div className="tpl-apply-bar">
+              <div className="tpl-apply-bar-fill" />
+            </div>
+            <p className="tpl-apply-sub">Please wait, do not close this window.</p>
+          </div>
+        </div>
       )}
-      {previewTpl && (
-        <TemplatePreviewModal template={previewTpl} onBack={() => setPreviewId(null)}
-          onUseTemplate={(_t: TemplateItem) => handleUseFromPreview()} hasExistingContent={hasExistingContent} />
-      )}
-
-      {/* Canvas selection banner — portal */}
-      {selectedTpl && !showProgress && !showReplace && !showUpgrade &&
-        createPortal(
-          <div className="tpl-canvas-banner" role="status">
-            <span className="tpl-canvas-banner__label">Previewing: <strong>{selectedTpl.name}</strong> — not applied yet</span>
-            <button className="tpl-canvas-banner__apply" onClick={handleUseThis}>Apply Template →</button>
-            <button className="tpl-canvas-banner__cancel" onClick={() => setSelectedId(null)}>Cancel</button>
-          </div>,
-          document.body
-        )}
     </div>
   );
 };
