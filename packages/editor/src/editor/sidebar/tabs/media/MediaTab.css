@@ -1060,11 +1060,11 @@
   font-family: inherit;
 }
 .med-bulk-btn.danger {
-  border-color: #DC2626;
-  color: #DC2626;
+  border-color: var(--ls-danger, #DC2626);
+  color: var(--ls-danger, #DC2626);
 }
 .med-bulk-btn.danger:hover {
-  background: #FEE2E2;
+  background: var(--ls-danger-bg, #FEF2F2);
 }
 
 /* ── Upload ghost card ── */
