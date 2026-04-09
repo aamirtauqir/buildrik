@@ -72,100 +72,12 @@
   flex-shrink: 0;
 }
 
-/* ── Quick Picks grid ── */
+/* ── Quick Picks ── */
 .bld-qp {
   margin-bottom: 4px;
 }
 .bld-qp-wrap {
   position: relative;
-}
-.bld-qp-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-}
-.bld-qp-slot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  height: 58px;
-  border-radius: 4px;
-  background: var(--ls-bg-subtle, #F1F5F9);
-  padding: 8px 4px;
-  cursor: grab;
-  user-select: none;
-  transition: all 0.12s;
-}
-.bld-qp-slot:hover {
-  background: var(--ls-accent-bg, #DBEAFE);
-}
-.bld-qp-slot:hover .bld-qp-icon svg {
-  stroke: var(--ls-accent, #1D4ED8);
-  color: var(--ls-accent, #1D4ED8);
-}
-.bld-qp-slot:hover .bld-qp-name {
-  color: var(--ls-accent, #1D4ED8);
-}
-.bld-qp-slot:active {
-  cursor: grabbing;
-  transform: scale(0.95);
-}
-.bld-qp-slot:focus-visible {
-  outline: 2px solid var(--ls-accent, #1D4ED8);
-  outline-offset: 2px;
-}
-
-/* Empty slot */
-.bld-qp-slot--empty {
-  background: transparent;
-  cursor: default;
-}
-.bld-qp-slot--empty:hover {
-  background: transparent;
-}
-
-/* "+" add slot */
-.bld-qp-slot--add {
-  border: 1px dashed var(--ls-border-light, #E2E8F0);
-  background: transparent;
-  cursor: pointer;
-  color: var(--ls-text-lighter, #94A3B8);
-}
-.bld-qp-slot--add:hover {
-  border-color: var(--ls-accent, #1D4ED8);
-  color: var(--ls-accent, #1D4ED8);
-  background: var(--ls-accent-bg, #DBEAFE);
-}
-
-/* Quick Pick icon & name */
-.bld-qp-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.bld-qp-icon svg {
-  width: 20px;
-  height: 20px;
-  color: var(--ls-text-muted, #475569);
-  stroke: var(--ls-text-muted, #475569);
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transition: stroke 0.12s, color 0.12s;
-}
-.bld-qp-name {
-  font-size: 11px;
-  font-weight: 400;
-  color: var(--ls-text-muted, #475569);
-  text-align: center;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-  transition: color 0.12s;
 }
 
 /* ── FTUE tooltip ── */
@@ -582,4 +494,76 @@
 .bld-sec-hint-muted {
   font-size: 10px;
   color: var(--ls-text-subtle, #64748B);
+}
+
+/* ── Quick Pick chips (pill style, flex-wrap) ── */
+.bld-qp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.bld-qp-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: grab;
+  user-select: none;
+  transition: all 0.12s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.bld-qp-chip:active {
+  cursor: grabbing;
+  transform: scale(0.96);
+}
+.bld-qp-chip:focus-visible {
+  outline: 2px solid var(--ls-accent, #1D4ED8);
+  outline-offset: 2px;
+}
+
+/* Filled chip — white fill, border */
+.bld-qp-chip--filled {
+  background: var(--ls-bg-card, #FFFFFF);
+  border: 1px solid var(--ls-border-card, #D1D9E6);
+  color: var(--ls-text-muted, #475569);
+}
+.bld-qp-chip--filled:hover {
+  border-color: var(--ls-accent, #1D4ED8);
+  color: var(--ls-accent, #1D4ED8);
+  background: var(--ls-accent-bg, #DBEAFE);
+}
+.bld-qp-chip--filled .bld-qp-chip-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.12s;
+}
+
+/* "+" chip — subtle fill */
+.bld-qp-chip--add {
+  background: var(--ls-bg-subtle, #F1F5F9);
+  border: none;
+  color: var(--ls-text-lighter, #94A3B8);
+  cursor: pointer;
+}
+.bld-qp-chip--add:hover {
+  background: var(--ls-accent-bg, #DBEAFE);
+  color: var(--ls-accent, #1D4ED8);
+}
+.bld-qp-chip-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bld-qp-chip-name {
+  font-size: 12px;
+  line-height: 1;
 }
