@@ -18,6 +18,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
   const [facebook, setFacebook] = React.useState("");
   const [linkedin, setLinkedin] = React.useState("");
   const [hasChanges, setHasChanges] = React.useState(false);
+  const [saveError, setSaveError] = React.useState<string | null>(null);
   const hasLoadedRef = React.useRef(false);
 
   // Notify shell of dirty state for nav guard
@@ -61,18 +62,23 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
 
   const handleSave = () => {
     if (!composer) return;
-    const current = composer.getProjectSettings();
-    composer.setProjectSettings({
-      ...current,
-      seo: {
-        ...current.seo,
-        siteName: name,
-        favicon,
-        language,
-        socialLinks: { twitter, facebook, linkedin },
-      },
-    });
-    setHasChanges(false);
+    try {
+      const current = composer.getProjectSettings();
+      composer.setProjectSettings({
+        ...current,
+        seo: {
+          ...current.seo,
+          siteName: name,
+          favicon,
+          language,
+          socialLinks: { twitter, facebook, linkedin },
+        },
+      });
+      setSaveError(null);
+      setHasChanges(false);
+    } catch {
+      setSaveError("Failed to save settings. Please try again.");
+    }
   };
 
   return (
@@ -187,6 +193,13 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
           </span>
         </div>
       </Section>
+
+      {saveError && (
+        <div className="sett-save-error" role="alert">
+          <span className="sett-save-error__icon" aria-hidden="true">⚠</span>
+          {saveError}
+        </div>
+      )}
 
       <StickyFooter primaryLabel="Save" onPrimary={handleSave} hasChanges={hasChanges} />
     </div>
