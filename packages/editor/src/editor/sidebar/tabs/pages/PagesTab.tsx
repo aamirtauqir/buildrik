@@ -28,8 +28,6 @@ export interface PagesTabProps {
   onClose?: () => void;
   /** Called when user clicks "From Template" — parent should switch to Templates tab */
   onRequestTemplates?: () => void;
-  /** Called when user clicks the upgrade CTA */
-  onUpgradeClick?: () => void;
 }
 
 export const PagesTab: React.FC<PagesTabProps> = ({

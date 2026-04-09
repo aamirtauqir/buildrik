@@ -97,8 +97,6 @@ const InlineSettings: React.FC<InlineSettingsProps> = ({ page, pages, composer, 
     return () => document.removeEventListener("keydown", onKey);
   }, [s]);
 
-  const handleClose = () => { onClose(); };
-
   return (
     <div className="pg-row-settings" role="region" aria-label={`${page.name} Settings`}>
       {/* Save row */}
@@ -114,7 +112,7 @@ const InlineSettings: React.FC<InlineSettingsProps> = ({ page, pages, composer, 
         </div>
         <button
           className="pg-row-settings__close"
-          onClick={handleClose}
+          onClick={onClose}
           aria-label="Close page settings"
           title="Close settings"
         >
@@ -130,7 +128,7 @@ const InlineSettings: React.FC<InlineSettingsProps> = ({ page, pages, composer, 
         <summary className="pg-row-settings__summary">
           SEO
           {s.seoScore < 80 && (
-            <span className="pg-row-settings__score-chip" style={{ color: s.seoScore <= 40 ? "#EF4444" : "#F59E0B" }}>
+            <span className="pg-row-settings__score-chip" style={{ color: s.seoScore <= 40 ? "var(--pg-error, #EF4444)" : "var(--pg-hidden, #F59E0B)" }}>
               {s.seoScore}
             </span>
           )}

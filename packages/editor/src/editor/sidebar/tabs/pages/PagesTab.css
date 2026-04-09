@@ -1104,12 +1104,28 @@
 }
 
 .pg-list__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-size: 12px;
   font-family: var(--aqb-font-mono, monospace);
   color: var(--aqb-text-muted);
   padding: 6px 14px;
   border-top: 1px solid var(--aqb-border);
   flex-shrink: 0;
+}
+
+.pg-list__from-template {
+  font-size: 12px;
+  color: var(--ls-accent, #3B82F6);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.pg-list__from-template:hover {
+  text-decoration: underline;
 }
 
 /* ── pg-add-btn: AddPageButton ─────────────────────────────────────────── */
@@ -1405,11 +1421,6 @@
   animation: pg-ctx-in 0.12s ease;
 }
 
-@keyframes pg-ctx-in {
-  from { opacity: 0; transform: scale(0.94) translateY(-3px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
-}
-
 .pg-ctx-item {
   display: flex;
   align-items: center;
@@ -1538,11 +1549,6 @@
 .pg-drawer__save--error {
   background: var(--aqb-error, #EF4444);
   color: #fff;
-}
-
-@keyframes pg-save-pulse {
-  0%,100% { box-shadow: 0 0 0 2px rgba(99,102,241,0.35); }
-  50%      { box-shadow: 0 0 0 4px rgba(99,102,241,0.12); }
 }
 
 .pg-drawer__save:disabled { cursor: default; }

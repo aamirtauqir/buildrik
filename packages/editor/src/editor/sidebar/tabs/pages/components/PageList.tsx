@@ -56,10 +56,8 @@ export const PageList: React.FC<Props> = ({
 
   // Sync expansion when context menu "Page Settings" triggers openSettings externally
   React.useEffect(() => {
-    if (requestExpandPageId && requestExpandPageId !== expandedPageId) {
-      setExpandedPageId(requestExpandPageId);
-    }
-  }, [requestExpandPageId]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (requestExpandPageId) setExpandedPageId(requestExpandPageId);
+  }, [requestExpandPageId]);
 
   const visible = search
     ? pages.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
