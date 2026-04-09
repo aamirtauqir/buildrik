@@ -5,6 +5,7 @@
 
 import * as React from "react";
 import { createRoot } from "react-dom/client";
+import { Agentation } from "agentation";
 import { AquibraStudio } from "../src/components/Editor/AquibraStudio";
 import type { Composer } from "../src/engine/Composer";
 import { applyTheme } from "../src/themes/index";
@@ -18,7 +19,6 @@ const App: React.FC = () => {
 
   React.useEffect(() => {
     applyTheme();
-    document.documentElement.classList.add("aqb-dark");
   }, []);
 
   return (
@@ -41,6 +41,7 @@ const App: React.FC = () => {
         }}
         style={{ height: "100vh" }}
       />
+      {import.meta.env.DEV && <Agentation />}
     </div>
   );
 };

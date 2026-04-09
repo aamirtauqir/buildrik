@@ -73,6 +73,21 @@
   --ls-inspector-border: #D1D9E6;
   --ls-topbar-border: #E2E8F0;
   --ls-canvas-dot: rgba(100, 116, 139, 0.1);
+
+  /* ── Status tokens ──────────────────────────────────────────────────────── */
+  --ls-success-bg: #dcfce7;
+  --ls-success-text: #166534;
+  --ls-success-text-dark: #4ADE80;
+  --ls-warning-bg: #FEF3C7;
+  --ls-warning-text: #92400E;
+  --ls-error-bg: #FEE2E2;
+  --ls-error-text: #FCA5A5;
+  --ls-destructive: #EF4444;
+  --ls-green-check: #22C55E;
+  --ls-border-dialog: #D8E0EA;
+  --ls-overlay: rgba(0, 0, 0, 0.4);
+  --ls-shadow-menu: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --ls-shadow-dialog: 0 4px 24px rgba(0, 0, 0, 0.2);
 }
 
 /* ─────────────────────────────────────────────

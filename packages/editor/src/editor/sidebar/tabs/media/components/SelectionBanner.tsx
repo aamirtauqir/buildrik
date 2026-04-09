@@ -26,7 +26,7 @@ export function UploadProgressBanner({ fileName, progress, showCancel = false, o
       <div className="med-progress">
         <div className="med-progress__bar" style={{ width: `${progress}%` }} />
       </div>
-      {showCancel && (
+      {(showCancel || onCancel != null) && (
         <button className="med-banner__cancel" onClick={onCancel} aria-label="Cancel upload">✕</button>
       )}
     </div>
