@@ -107,21 +107,21 @@
   justify-content: space-between;
   gap: 6px;
   padding: 6px 12px;
-  background: #FEF2F2;
-  border: 1px solid #FECACA;
+  background: var(--ls-danger-bg, #FEF2F2);
+  border: 1px solid var(--ls-danger-border, #FECACA);
   flex-shrink: 0;
   font-size: 12px;
-  color: #DC2626;
+  color: var(--ls-danger, #DC2626);
 }
 .med-failure-icon {
-  color: #DC2626;
+  color: var(--ls-danger, #DC2626);
   flex-shrink: 0;
 }
 .med-failure-text {
   flex: 1;
   font-size: 12px;
   font-weight: 500;
-  color: #991B1B;
+  color: var(--ls-danger-dark, #991B1B);
 }
 .med-failure-retry {
   font-size: 11px;
@@ -144,14 +144,14 @@
   justify-content: center;
   background: none;
   border: none;
-  color: #991B1B;
+  color: var(--ls-danger-dark, #991B1B);
   cursor: pointer;
   padding: 2px;
   border-radius: 4px;
   flex-shrink: 0;
 }
 .med-failure-dismiss:hover {
-  background: #FECACA;
+  background: var(--ls-danger-border, #FECACA);
 }
 
 /* ── Media grid ── */
@@ -242,38 +242,6 @@
   color: var(--ls-text-lighter, #94A3B8);
 }
 
-/* ── Upload progress bar (bottom) ── */
-.med-upload-bar {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 8px 12px;
-  background: var(--ls-bg-card, #FFFFFF);
-  border-top: 1px solid var(--ls-border-light, #E2E8F0);
-  flex-shrink: 0;
-}
-.med-upload-bar-text {
-  font-size: 12px;
-  color: var(--ls-text-muted, #475569);
-}
-.med-upload-bar-track {
-  height: 3px;
-  border-radius: 2px;
-  background: var(--ls-bg-subtle, #F1F5F9);
-  overflow: hidden;
-}
-.med-upload-bar-fill {
-  height: 100%;
-  border-radius: 2px;
-  background: var(--ls-accent, #1D4ED8);
-  animation: med-progress 2s ease-in-out infinite;
-}
-@keyframes med-progress {
-  0% { width: 0%; }
-  50% { width: 70%; }
-  100% { width: 100%; }
-}
-
 /* ── Selection banner (bottom) ── */
 .med-selection-banner {
   display: flex;
@@ -292,7 +260,7 @@
 .med-selection-delete {
   font-size: 12px;
   font-weight: 500;
-  color: #DC2626;
+  color: var(--ls-danger, #DC2626);
   background: none;
   border: none;
   cursor: pointer;
@@ -301,7 +269,7 @@
   border-radius: 4px;
 }
 .med-selection-delete:hover {
-  background: #FEE2E2;
+  background: var(--ls-danger-bg, #FEF2F2);
 }
 
 /* ── Empty state ── */
@@ -380,10 +348,10 @@
   outline: none;
 }
 .med-ctx-item--danger {
-  color: #DC2626;
+  color: var(--ls-danger, #DC2626);
 }
 .med-ctx-item--danger:hover {
-  background: #FEE2E2;
+  background: var(--ls-danger-bg, #FEF2F2);
 }
 .med-ctx-sep {
   height: 1px;
@@ -450,7 +418,7 @@
   background: var(--ls-bg-subtle, #F1F5F9);
 }
 .med-modal-btn--danger {
-  background: #DC2626;
+  background: var(--ls-danger, #DC2626);
   border: none;
   color: white;
 }
@@ -558,11 +526,11 @@
 }
 .med-detail-btn--danger {
   background: transparent;
-  border: 1px solid #FECACA;
-  color: #DC2626;
+  border: 1px solid var(--ls-danger-border, #FECACA);
+  color: var(--ls-danger, #DC2626);
 }
 .med-detail-btn--danger:hover {
-  background: #FEE2E2;
+  background: var(--ls-danger-bg, #FEF2F2);
 }
 
 /* ── Skeleton loading ── */
@@ -586,11 +554,6 @@
   border-radius: 4px;
   background: var(--ls-bg-subtle, #F1F5F9);
   animation: med-pulse 1.5s ease-in-out infinite;
-}
-
-/* ── Library view toolbar (simplified) ── */
-.med-toolbar {
-  display: none; /* Hidden in v2 — no sort/filter controls in .pen design */
 }
 
 /* ── No results state ── */

@@ -117,7 +117,6 @@ function MediaTabInner({
           <UploadZone
             storage={state.storage}
             onUpload={state.upload}
-            uploadQueue={state.uploadQueue}
             disabled={state.storage.used >= state.storage.total}
           />
         )}
@@ -128,8 +127,7 @@ function MediaTabInner({
             key={u.fileName}
             fileName={u.fileName}
             progress={u.progress}
-            // TODO: wire to engine upload cancel API when composer.media.cancelUpload(fileName) is available
-            onCancel={() => {}}
+            showCancel={false}
           />
         ))}
 

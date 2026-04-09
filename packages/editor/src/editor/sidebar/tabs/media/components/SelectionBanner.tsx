@@ -15,17 +15,20 @@ interface SelectionBannerProps {
 interface UploadProgressBannerProps {
   fileName: string;
   progress: number; // 0-100
-  onCancel: () => void;
+  showCancel?: boolean;
+  onCancel?: () => void;
 }
 
-export function UploadProgressBanner({ fileName, progress, onCancel }: UploadProgressBannerProps) {
+export function UploadProgressBanner({ fileName, progress, showCancel = false, onCancel }: UploadProgressBannerProps) {
   return (
-    <div className="med-banner med-banner--upload">
+    <div className="med-banner--upload">
       <span className="med-banner__label">{fileName}</span>
       <div className="med-progress">
         <div className="med-progress__bar" style={{ width: `${progress}%` }} />
       </div>
-      <button className="med-banner__cancel" onClick={onCancel} aria-label="Cancel upload">✕</button>
+      {showCancel && (
+        <button className="med-banner__cancel" onClick={onCancel} aria-label="Cancel upload">✕</button>
+      )}
     </div>
   );
 }
