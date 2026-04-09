@@ -427,7 +427,7 @@
 .med-ctx-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 8999;
+  z-index: 199;
 }
 
 /* ── Confirm delete modal ── */
