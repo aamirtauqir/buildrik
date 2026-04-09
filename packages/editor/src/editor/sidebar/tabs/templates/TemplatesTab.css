@@ -277,6 +277,10 @@
   border-radius: 6px;
   background: var(--ls-bg-subtle, #F1F5F9);
   flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tpl-detail-info {
@@ -765,4 +769,31 @@
   color: var(--ls-text-subtle, #64748B);
   line-height: 1.5;
   margin: 0;
+}
+
+/* ── Detail preview loading/error states (Ba4uo / Onr0C) ── */
+.tpl-detail-preview-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.tpl-detail-preview-retry {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1px solid var(--ls-accent, #1D4ED8);
+  background: transparent;
+  color: var(--ls-accent, #1D4ED8);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 6px;
+}
+.tpl-detail-preview-retry:hover {
+  background: var(--ls-accent-bg, #DBEAFE);
 }
