@@ -4,6 +4,19 @@
  * Only handles panel-mode tabs (Add, Media, Layers, Pages, Components).
  * Fullpage tabs (Templates, Settings, History, Design) are handled by FullPageRouter.
  *
+ * Tab lifecycle note: this router mounts one panel tab at a time via a
+ * `switch` and unmounts the previous tab on every nav click. An earlier
+ * revision tried to keep-mount tabs across switches using a
+ * `display: contents` wrapper, but that broke the flex height chain of
+ * the enclosing `.ls-panel-animate` → `.bld-container` layout, collapsing
+ * the scroll area to ~16px. The perf win from cross-tab caching was not
+ * worth the layout regression, so we keep the simple switch.
+ *
+ * The per-tab bottlenecks previously hidden by this remount pattern are
+ * addressed at the component level instead (SvgIcon memoization, catalog
+ * pre-grouping, conditional CatAccordion mounts, lazy SectionsMode), so
+ * reopening Add/Layers is now cheap even with a fresh mount.
+ *
  * @license BSD-3-Clause
  */
 
