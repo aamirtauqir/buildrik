@@ -153,9 +153,11 @@ export function SectionReorderHandles({
     };
   }, [isDragging, onUpdateDrag, onCompleteDrag, onCancelDrag]);
 
-  if (boundaries.length < 2) return null;
-
-  // Compute drop line position from drag state
+  // Compute drop line position from drag state.
+  // Must run before any early return so the hook order stays stable across
+  // renders — otherwise React throws "Rendered more hooks than during the
+  // previous render" the first time boundaries grow past the early-return
+  // threshold (e.g. dropping the first section onto a blank canvas).
   const dropLineTop = React.useMemo(() => {
     if (!dragState || boundaries.length === 0) return null;
 
@@ -171,6 +173,8 @@ export function SectionReorderHandles({
     }
     return boundaries[toIndex].rect.top;
   }, [dragState, boundaries]);
+
+  if (boundaries.length < 2) return null;
 
   return (
     <div style={containerStyle} aria-hidden>
