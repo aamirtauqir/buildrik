@@ -45,16 +45,24 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
     if (timerRef.current) clearTimeout(timerRef.current);
 
+    // Telemetry fires regardless of debounce mode. The previous version only
+    // fired inside the debounced branch, so any consumer passing debounceMs=0
+    // silently lost all search analytics.
+    const fireTelemetry = () => {
+      if (newValue.length > 0) {
+        trackSidebar("search", { query_length: newValue.length });
+      }
+    };
+
     if (debounceMs <= 0) {
       onChange(newValue);
+      fireTelemetry();
       return;
     }
 
     timerRef.current = setTimeout(() => {
       onChange(newValue);
-      if (newValue.length > 0) {
-        trackSidebar("search", { query_length: newValue.length });
-      }
+      fireTelemetry();
     }, debounceMs);
   };
 
@@ -132,10 +140,10 @@ const inputStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
   color: "var(--ls-text-primary, #0F172A)",
-  fontSize: 13,
+  fontSize: 12,
   outline: "none",
   lineHeight: "18px",
-  fontFamily: "'Inter', sans-serif",
+  fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
 };
 
 const clearButtonStyles: React.CSSProperties = {

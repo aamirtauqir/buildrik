@@ -1,10 +1,11 @@
 /**
- * BuildTab — Quick-Grid element catalog shell
- * Matches .pen screens: RzB6V, nTVi6, SDgR2, fsI8j, GmdOe, QFUVG
+ * BuildTab — Add tab shell
+ * Matches §10.1 visual hierarchy: Mode switch → Search → Quick Picks (always) → Category browse
+ * Screens: RzB6V, nTVi6, SDgR2, fsI8j, GmdOe, gnyrB, QFUVG
  * @license BSD-3-Clause
  */
 
-import { Settings } from "lucide-react";
+import { Plus } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import type { BlockData } from "../../../../shared/types";
@@ -17,6 +18,21 @@ import { QuickPicks } from "./components/QuickPicks";
 import { PinPopover } from "./components/PinPopover";
 import { SearchResults } from "./components/SearchResults";
 import "./BuildTab.css";
+
+// SectionsMode pulls in ~92 KB of inline HTML (54 section templates).
+// Lazy-load it so users who stay in Elements mode never pay that cost.
+// The chunk is fetched on first click of the "Sections" mode tab.
+const SectionsMode = React.lazy(() =>
+  import("./components/SectionsMode").then((m) => ({ default: m.SectionsMode }))
+);
+
+const SectionsFallback: React.FC = () => (
+  <div className="bld-sections-mode" aria-busy="true">
+    <div className="bld-sections-scroll">
+      <div className="bld-sections-family-header">Loading sections...</div>
+    </div>
+  </div>
+);
 
 export interface BuildTabProps {
   composer: Composer | null;
@@ -39,171 +55,133 @@ export const BuildTab: React.FC<BuildTabProps> = ({
 
   return (
     <div className="bld-container">
-      <PanelHeader title="Add" isPinned={isPinned} onPinToggle={onPinToggle} onClose={onClose}>
-        <button
-          className="bld-gear-btn"
-          onClick={() => tab.setPinPopoverOpen(!tab.pinPopoverOpen)}
-          title="Quick Picks settings"
-          aria-label="Quick Picks settings"
-        >
-          <Settings size={16} />
-        </button>
-      </PanelHeader>
+      <PanelHeader title="Add" isPinned={isPinned} onPinToggle={onPinToggle} onClose={onClose} />
+
+      {/* Pin Popover — Screen fsI8j */}
+      <PinPopover
+        open={tab.pinPopoverOpen}
+        onClose={() => tab.setPinPopoverOpen(false)}
+        onPin={tab.addQuickPick}
+        currentPicks={tab.quickPicks}
+      />
 
       <div className="bld-content">
-        <div className="bld-search-wrap">
+        {/* 1. Mode Switch — top of panel per design (RzB6V, nTVi6, SDgR2)
+            Arrow keys, Home/End per §10.1 keyboard spec. */}
+        <div className="bld-mode-switch" role="tablist" aria-label="Add tab mode">
+          {(["elements", "sections"] as const).map((m) => (
+            <button
+              key={m}
+              className={`bld-mode-tab${tab.mode === m ? " bld-mode-tab--active" : ""}`}
+              onClick={() => tab.setMode(m)}
+              role="tab"
+              aria-selected={tab.mode === m}
+              tabIndex={tab.mode === m ? 0 : -1}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+                  e.preventDefault();
+                  tab.setMode(m === "elements" ? "sections" : "elements");
+                } else if (e.key === "Home") {
+                  e.preventDefault();
+                  tab.setMode("elements");
+                } else if (e.key === "End") {
+                  e.preventDefault();
+                  tab.setMode("sections");
+                }
+              }}
+            >
+              {m === "elements" ? "Elements" : "Sections"}
+            </button>
+          ))}
+        </div>
+
+        {/* 2. Search bar — Escape clears query */}
+        <div
+          className="bld-search-wrap"
+          onKeyDown={(e) => {
+            if (e.key === "Escape" && tab.searchQuery.length > 0) {
+              e.stopPropagation();
+              tab.setSearchQuery("");
+            }
+          }}
+        >
           <SearchBar
             value={tab.searchQuery}
             onChange={tab.setSearchQuery}
-            placeholder="Search elements..."
-            debounceMs={0}
+            placeholder={tab.mode === "sections" ? "Search sections..." : "Search elements..."}
+            debounceMs={150}
           />
         </div>
 
-        {/* Mode Switch — Elements | Sections */}
-        {!isSearching && (
-          <div className="bld-mode-switch" role="tablist" aria-label="Add tab mode">
-            <button
-              className={`bld-mode-pill${tab.mode === "elements" ? " bld-mode-pill--active" : ""}`}
-              onClick={() => tab.setMode("elements")}
-              role="tab"
-              aria-selected={tab.mode === "elements"}
-            >
-              Elements
-            </button>
-            <button
-              className={`bld-mode-pill${tab.mode === "sections" ? " bld-mode-pill--active" : ""}`}
-              onClick={() => tab.setMode("sections")}
-              role="tab"
-              aria-selected={tab.mode === "sections"}
-            >
-              Sections
-            </button>
-          </div>
-        )}
-
-        {isSearching ? (
+        {/* 3. Scrollable content area — mode-aware:
+              - Sections mode ALWAYS renders SectionsMode (pass searchQuery so
+                it can filter sections inline when user types in the search bar).
+              - Elements mode: search renders SearchResults, else renders browse. */}
+        {tab.mode === "sections" ? (
+          <React.Suspense fallback={<SectionsFallback />}>
+            <SectionsMode composer={composer} searchQuery={tab.searchQuery} />
+          </React.Suspense>
+        ) : isSearching ? (
           <div className="bld-scroll">
             <SearchResults
               query={tab.searchQuery}
               groups={tab.searchResults}
               onDragStart={tab.handleDragStart}
               onElClick={tab.handleElClick}
+              onClearSearch={() => tab.setSearchQuery("")}
             />
           </div>
-        ) : tab.mode === "sections" ? (
-          <div className="bld-scroll">
-            <SectionsMode />
-          </div>
         ) : (
-          <div className="bld-scroll">
-            <div className="bld-qp-wrap">
+          <>
+            {/* Quick Picks — always visible (§10.1 visual hierarchy: 3rd item)
+                The + button is the single header-level pinning entry point. */}
+            <div className="bld-qp-section">
+              <div className="bld-qp-header">
+                <div className="bld-sec-label">Quick Picks</div>
+                <button
+                  type="button"
+                  className="bld-qp-add-btn"
+                  onClick={() => tab.setPinPopoverOpen(true)}
+                  aria-label="Pin element"
+                  title="Pin an element"
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
               <QuickPicks
                 picks={tab.quickPicks}
                 onRemove={tab.removeQuickPick}
-                onPlusClick={() => tab.setPinPopoverOpen(true)}
+                onRestore={tab.restoreQuickPick}
+                onReorder={tab.reorderQuickPicks}
                 onDragStart={tab.handleDragStart}
                 onElClick={tab.handleElClick}
                 ftueSeen={tab.ftueSeen}
                 onDismissFtue={tab.dismissFtue}
               />
-              <PinPopover
-                open={tab.pinPopoverOpen}
-                onClose={() => tab.setPinPopoverOpen(false)}
-                onPin={(blockId) => {
-                  tab.addQuickPick(blockId);
-                  if (!tab.ftueSeen) tab.dismissFtue();
-                }}
-                currentPicks={tab.quickPicks}
-              />
             </div>
 
             <div className="bld-divider" />
 
-            <div className="bld-cats">
-              <div className="bld-sec-label">CATEGORIES</div>
-              {CATALOG.map((cat) => (
-                <CatAccordion
-                  key={cat.id}
-                  cat={cat}
-                  isOpen={tab.openCats.has(cat.id)}
-                  onToggle={() => tab.toggleCat(cat.id)}
-                  onDragStart={tab.handleDragStart}
-                  onElClick={tab.handleElClick}
-                />
-              ))}
+            {/* Category Browse — scrollable area, sticky header above stays fixed */}
+            <div className="bld-cats-scroll">
+              <div className="bld-cats">
+                <div className="bld-sec-label">Browse</div>
+                {CATALOG.map((cat) => (
+                  <CatAccordion
+                    key={cat.id}
+                    cat={cat}
+                    isOpen={tab.openCats.has(cat.id)}
+                    onToggle={() => tab.toggleCat(cat.id)}
+                    onDragStart={tab.handleDragStart}
+                    onElClick={tab.handleElClick}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>
-  );
-};
-
-// ── Sections Mode Content (SDgR2) ──────────────────────────────────────────
-
-const SECTION_FAMILIES = [
-  { id: "hero", label: "Hero" },
-  { id: "features", label: "Features" },
-  { id: "pricing", label: "Pricing" },
-  { id: "faq", label: "FAQ" },
-  { id: "cta", label: "CTA" },
-  { id: "footers", label: "Footers" },
-];
-
-const SECTION_CARDS = [
-  { id: "hero-split", name: "Hero split", sub: "Two-column intro with CTA" },
-  { id: "feature-band", name: "Feature band", sub: "Three feature cards with icons" },
-  { id: "pricing-stack", name: "Pricing stack", sub: "Tiered pricing with comparison cards" },
-];
-
-const SectionsMode: React.FC = () => {
-  const [activeFamily, setActiveFamily] = React.useState("hero");
-
-  return (
-    <>
-      {/* Section families chips row */}
-      <div className="bld-sec-label">SECTION FAMILIES</div>
-      <div className="bld-sec-chips">
-        {SECTION_FAMILIES.map((f) => (
-          <button
-            key={f.id}
-            className={`bld-sec-chip${activeFamily === f.id ? " bld-sec-chip--active" : ""}`}
-            onClick={() => setActiveFamily(f.id)}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Section cards */}
-      <div className="bld-sec-label">READY TO INSERT</div>
-      <div className="bld-sec-cards">
-        {SECTION_CARDS.map((card) => (
-          <div
-            key={card.id}
-            className="bld-sec-card"
-            draggable
-            onDragStart={(e) => {
-              e.dataTransfer.setData("block", JSON.stringify({ id: card.id, label: card.name, category: "sections" }));
-              e.dataTransfer.setData("text/plain", card.id);
-              e.dataTransfer.effectAllowed = "copy";
-            }}
-            role="button"
-            tabIndex={0}
-          >
-            <div className="bld-sec-card-name">{card.name}</div>
-            <div className="bld-sec-card-sub">{card.sub}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Bottom hint */}
-      <div className="bld-sec-hint">
-        <span className="bld-sec-hint-primary">Sections insert into the current page.</span>
-        <span className="bld-sec-hint-muted">Use New Page › Templates for full-page starts.</span>
-      </div>
-    </>
   );
 };
 
