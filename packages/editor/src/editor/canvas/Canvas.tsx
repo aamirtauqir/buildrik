@@ -286,6 +286,19 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     // Content with CMS bindings resolved — selection/drop highlighting handled by overlay layer
     const { displayContent } = useCanvasContent({ composer, content });
 
+    // Memoize the inner-HTML prop object so its reference is stable across
+    // renders when `displayContent` hasn't actually changed. Without this,
+    // React's DOM reconciler sees a new object on every render and rewrites
+    // `canvas.innerHTML` from scratch on unrelated state updates like
+    // `setIsDragOver`. That wipe detaches the DOM node the user is currently
+    // dragging over, so the subsequent `drop` event fires on an orphaned node
+    // and the React handler never runs. It also thrashes layout 60+ times/sec
+    // during drag (measurable performance bottleneck).
+    //
+    // displayContent is produced by useCanvasContent which resolves CMS bindings
+    // from composer element tree HTML — already the sanitized editor source.
+    const canvasInnerHtml = React.useMemo(() => ({ __html: displayContent }), [displayContent]);
+
     // Empty canvas CTA overlay state
     const [emptyDismissed, setEmptyDismissed] = React.useState(false);
     React.useEffect(() => {
@@ -403,7 +416,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             data-drag-active={isDragOver ? "true" : undefined}
             data-invalid-drop={isDragOver && !isValidDrop ? "true" : undefined}
             style={contentStyles}
-            dangerouslySetInnerHTML={{ __html: displayContent }}
+            dangerouslySetInnerHTML={canvasInnerHtml}
           />
 
           {isCanvasEmpty && (
