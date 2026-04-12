@@ -13,7 +13,7 @@ import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop";
 import {
   X, RotateCcw, RotateCw, FlipHorizontal, FlipVertical,
-  Crop, SlidersHorizontal, Maximize, Download,
+  Crop, SlidersHorizontal, Maximize, Download, AlertTriangle,
 } from "lucide-react";
 import "./ImageEditorModal.css";
 
@@ -139,6 +139,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
 }) => {
   const [tab, setTab] = React.useState<EditorTab>("crop");
   const [saving, setSaving] = React.useState(false);
+  const [imageError, setImageError] = React.useState(false);
 
   // Crop state
   const [crop, setCrop] = React.useState<Point>({ x: 0, y: 0 });
@@ -158,7 +159,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
   const [resizeW, setResizeW] = React.useState<number | undefined>();
   const [resizeH, setResizeH] = React.useState<number | undefined>();
 
-  // Reset on open
+  // Reset on open / image change
   React.useEffect(() => {
     if (isOpen) {
       setCrop({ x: 0, y: 0 });
@@ -171,7 +172,17 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
       setResizeW(undefined);
       setResizeH(undefined);
       setTab("crop");
+      setImageError(false);
     }
+  }, [isOpen, imageSrc]);
+
+  // Probe image load — detects stale blob URLs or CORS failures early
+  React.useEffect(() => {
+    if (!isOpen || !imageSrc) return;
+    const img = new Image();
+    img.onload = () => setImageError(false);
+    img.onerror = () => setImageError(true);
+    img.src = imageSrc;
   }, [isOpen, imageSrc]);
 
   // Escape to close
@@ -244,27 +255,38 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
         <div className="ie-body">
           {/* Canvas area */}
           <div className="ie-canvas">
-            <div
-              className="ie-cropper-wrap"
-              style={{
-                transform: `scaleX(${flipH ? -1 : 1}) scaleY(${flipV ? -1 : 1})`,
-              }}
-            >
-              <Cropper
-                image={imageSrc}
-                crop={crop}
-                zoom={zoom}
-                rotation={rotation}
-                aspect={aspect}
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onRotationChange={setRotation}
-                onCropComplete={onCropComplete}
-                style={{
-                  mediaStyle: { filter: filterStyle },
-                }}
-              />
-            </div>
+            {!imageError && (
+              <div className="ie-cropper-wrap">
+                <Cropper
+                  image={imageSrc}
+                  crop={crop}
+                  zoom={zoom}
+                  rotation={rotation}
+                  aspect={aspect}
+                  onCropChange={setCrop}
+                  onZoomChange={setZoom}
+                  onRotationChange={setRotation}
+                  onCropComplete={onCropComplete}
+                  onMediaLoaded={() => setImageError(false)}
+                  style={{
+                    mediaStyle: {
+                      filter: filterStyle,
+                      transform: `scaleX(${flipH ? -1 : 1}) scaleY(${flipV ? -1 : 1})`,
+                      transformOrigin: "center center",
+                    },
+                  }}
+                />
+              </div>
+            )}
+            {imageError && (
+              <div className="ie-canvas-error">
+                <AlertTriangle size={40} />
+                <div style={{ fontWeight: 600, fontSize: 14 }}>Image failed to load</div>
+                <div style={{ opacity: 0.7, maxWidth: 400 }}>
+                  The asset's URL may be stale or inaccessible. Try reloading the page, or re-upload the image.
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Sidebar controls */}

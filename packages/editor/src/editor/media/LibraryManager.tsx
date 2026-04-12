@@ -203,13 +203,20 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   }, [onOpenIconPicker, composer, addToast]);
 
   // Bug #1 fix: Edit button → open image editor, save as new version
+  // Resolves fresh blob URL via getAssetSrc (item.src may be stale after page reload)
   const handleEditImage = React.useCallback(
-    (item: LibraryItem) => {
+    async (item: LibraryItem) => {
       if (!onOpenImageEditor) {
         addToast({ message: "Image editor unavailable", variant: "error" });
         return;
       }
-      onOpenImageEditor(item.src, async (editedSrc) => {
+      if (item.type !== "img") {
+        addToast({ message: "Only images can be edited", variant: "info" });
+        return;
+      }
+      // Resolve to a fresh blob URL — the stored src may be dead across sessions
+      const freshSrc = (await composer.media.getAssetSrc(item.key)) || item.src;
+      onOpenImageEditor(freshSrc, async (editedSrc) => {
         try {
           const res = await fetch(editedSrc);
           const blob = await res.blob();
@@ -225,7 +232,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         }
       });
     },
-    [onOpenImageEditor, state, addToast]
+    [onOpenImageEditor, state, addToast, composer]
   );
 
   // Collect all unique tags from assets (Bug #9 fix)
@@ -832,11 +839,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                     <Download size={12} />
                     Insert
                   </button>
-                  {/* Bug #1 fix: Edit → image editor for img/vid, rename overlay otherwise */}
+                  {/* Bug #1 fix: Edit → image editor for images, rename overlay otherwise */}
                   <button
                     className="mgr-btn"
                     onClick={() => {
-                      if (selectedItem.type === "img" || selectedItem.type === "vid") {
+                      if (selectedItem.type === "img") {
                         handleEditImage(selectedItem);
                       } else {
                         state.openDetail(selectedItem);
@@ -844,7 +851,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                     }}
                   >
                     <Pencil size={12} />
-                    Edit
+                    {selectedItem.type === "img" ? "Edit" : "Rename"}
                   </button>
                   {/* Bug #5 fix: Replace all opens library picker instead of URL prompt */}
                   {usageCount > 0 && (

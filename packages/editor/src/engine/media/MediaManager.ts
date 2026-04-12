@@ -24,8 +24,11 @@ import {
   getMediaDimensions,
   generateThumbnail,
   generateMediaId,
+  blobToDataURL,
 } from "./MediaHelpers";
 import { MediaStorage } from "./MediaStorage";
+import { MediaOptimizer } from "./MediaOptimizer";
+import { stockService } from "../../editor/sidebar/tabs/media/api/StockService";
 
 // --- Discovery stub types ---
 
@@ -70,6 +73,7 @@ interface UploadOptions {
   readonly folderId?: string;
   readonly tags?: string[];
   readonly generateThumbnail?: boolean;
+  readonly autoOptimize?: boolean;
 }
 
 /**
@@ -77,13 +81,44 @@ interface UploadOptions {
  */
 export class MediaManager extends MediaEventEmitter {
   private storage: MediaStorage;
+  private optimizer: MediaOptimizer;
   private state: MediaLibraryState;
   private initialized = false;
+  private blobUrlMap = new Map<string, string>();
 
   constructor() {
     super();
     this.storage = new MediaStorage();
+    this.optimizer = new MediaOptimizer();
     this.state = this.createInitialState();
+  }
+
+  /**
+   * Get a temporary source URL for an asset (cached Object URL)
+   */
+  async getAssetSrc(id: string): Promise<string | null> {
+    const asset = this.state.assets.find((a) => a.id === id);
+    if (!asset) return null;
+
+    // Already a remote URL or data URL
+    if (asset.src.startsWith("http") || asset.src.startsWith("data:")) {
+      return asset.src;
+    }
+
+    // Return cached blob URL
+    if (this.blobUrlMap.has(id)) {
+      return this.blobUrlMap.get(id)!;
+    }
+
+    // Load from binary storage and create URL
+    const blob = await this.storage.getBlob(id);
+    if (blob) {
+      const url = URL.createObjectURL(blob);
+      this.blobUrlMap.set(id, url);
+      return url;
+    }
+
+    return asset.src;
   }
 
   /**
@@ -102,6 +137,28 @@ export class MediaManager extends MediaEventEmitter {
       this.storage.getAllAssets(),
       this.storage.getAllFolders(),
     ]);
+
+    // Rebuild blob URLs — stored src values are stale blob URLs from previous
+    // sessions (blob: URLs are tied to the Window object and die on reload).
+    // Without this, ImageEditorModal and any consumer of asset.src sees dead URLs.
+    await Promise.all(
+      assets.map(async (asset) => {
+        if (asset.src.startsWith("http") || asset.src.startsWith("data:")) {
+          return; // Remote or inline — already valid
+        }
+        try {
+          const blob = await this.storage.getBlob(asset.id);
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            this.blobUrlMap.set(asset.id, url);
+            asset.src = url;
+          }
+        } catch {
+          // Leave stale src; UI will render broken image placeholder
+        }
+      })
+    );
+
     this.state.assets = assets;
     this.state.folders = folders;
   }
@@ -153,40 +210,67 @@ export class MediaManager extends MediaEventEmitter {
       progress.progress = 50;
       this.emit(MEDIA_EVENTS.UPLOAD_PROGRESS, progress);
 
-      const dimensions = await getMediaDimensions(file, src);
+      let finalBlob: Blob = file;
+      let finalMime = file.type;
+      let finalSize = file.size;
+      let finalDimensions = await getMediaDimensions(file, src);
+
+      // Auto-optimization
+      if (
+        options.autoOptimize !== false &&
+        file.type.startsWith("image/") &&
+        file.type !== "image/svg+xml"
+      ) {
+        progress.status = "optimizing";
+        this.emit(MEDIA_EVENTS.UPLOAD_PROGRESS, progress);
+
+        const optimizationResult = await this.optimizer.convertToWebP(src);
+        if (optimizationResult.success && optimizationResult.blob) {
+          finalBlob = optimizationResult.blob;
+          finalMime = "image/webp";
+          finalSize = optimizationResult.blob.size;
+          finalDimensions = optimizationResult.dimensions;
+        }
+      }
 
       progress.status = "processing";
       progress.progress = 75;
       this.emit(MEDIA_EVENTS.UPLOAD_PROGRESS, progress);
 
+      // Create Object URL for session preview
+      const previewUrl = URL.createObjectURL(finalBlob);
+
       let thumbnailSrc: string | undefined;
-      if (options.generateThumbnail !== false && file.type.startsWith("image/")) {
-        thumbnailSrc = await generateThumbnail(src, dimensions);
+      if (options.generateThumbnail !== false && finalMime.startsWith("image/")) {
+        thumbnailSrc = await generateThumbnail(previewUrl, finalDimensions);
       }
 
+      const assetId = generateMediaId();
       const asset: MediaAsset = {
-        id: generateMediaId(),
-        type: getAssetTypeFromMime(file.type) || "image",
+        id: assetId,
+        type: getAssetTypeFromMime(finalMime) || "image",
         name: file.name.replace(/\.[^/.]+$/, ""),
         originalName: file.name,
-        src,
+        src: previewUrl, // Use blob URL for current session
         thumbnailSrc,
-        mimeType: file.type,
-        size: file.size,
-        width: dimensions?.width,
-        height: dimensions?.height,
+        mimeType: finalMime,
+        size: finalSize,
+        width: finalDimensions?.width,
+        height: finalDimensions?.height,
         tags: options.tags || [],
         folderId: options.folderId,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
 
-      await this.storage.saveAsset(asset);
+      // Save both metadata and binary blob
+      await this.storage.saveAsset(asset, finalBlob);
+      this.blobUrlMap.set(assetId, previewUrl);
       this.state.assets.push(asset);
 
       progress.status = "complete";
       progress.progress = 100;
-      progress.assetId = asset.id;
+      progress.assetId = assetId;
       this.emit(MEDIA_EVENTS.UPLOAD_PROGRESS, progress);
       this.emit(MEDIA_EVENTS.UPLOAD_COMPLETE, { success: true, asset, fileName: file.name });
       this.emit(MEDIA_EVENTS.MEDIA_ADDED, asset);
@@ -205,6 +289,13 @@ export class MediaManager extends MediaEventEmitter {
     await this.storage.deleteAsset(id);
     this.state.assets = this.state.assets.filter((a) => a.id !== id);
     this.state.selectedAssetIds = this.state.selectedAssetIds.filter((sid) => sid !== id);
+
+    // Revoke object URL to free memory
+    if (this.blobUrlMap.has(id)) {
+      URL.revokeObjectURL(this.blobUrlMap.get(id)!);
+      this.blobUrlMap.delete(id);
+    }
+
     this.emit(MEDIA_EVENTS.MEDIA_DELETED, { id });
   }
 
@@ -280,6 +371,37 @@ export class MediaManager extends MediaEventEmitter {
     return folder;
   }
 
+  async deleteFolder(id: string): Promise<void> {
+    await this.storage.deleteFolder(id);
+    this.state.folders = this.state.folders.filter((f) => f.id !== id);
+
+    // Orphaned assets move to root
+    const orphaned = this.state.assets.filter((a) => a.folderId === id);
+    for (const asset of orphaned) {
+      await this.updateAsset(asset.id, { folderId: undefined });
+    }
+
+    this.emit(MEDIA_EVENTS.FOLDER_DELETED, { id });
+  }
+
+  getFolders(parentId: string | null = null): MediaFolder[] {
+    return this.state.folders.filter((f) => f.parentId === parentId);
+  }
+
+  /**
+   * Automatically ensure a folder exists for the current project.
+   * Creates it at the root level if not found.
+   */
+  async ensureProjectFolder(projectName: string): Promise<string> {
+    const existing = this.state.folders.find(
+      (f) => f.name === projectName && f.parentId === null
+    );
+    if (existing) return existing.id;
+
+    const folder = await this.createFolder(projectName, null);
+    return folder.id;
+  }
+
   // ============================================
   // Selection & Sorting
   // ============================================
@@ -317,29 +439,58 @@ export class MediaManager extends MediaEventEmitter {
     });
   }
 
-  // --- Discovery Stubs (wire to real APIs later) ---
+  // --- Discovery Stubs (wired with mock data for "functional" feel) ---
 
   /**
    * Search stock photos (Unsplash) or videos (Pexels).
-   * Stub returns empty array until API is wired.
    */
-  async searchStock(_type: "img" | "vid", _query: string): Promise<StockPhoto[] | StockVideo[]> {
-    return [];
+  async searchStock(
+    type: "img" | "vid", 
+    query: string, 
+    orientation?: string, 
+    color?: string
+  ): Promise<StockPhoto[] | StockVideo[]> {
+    if (!query) return [];
+
+    if (type === "img") {
+      return await stockService.searchPhotos(query, 1, orientation, color);
+    } else {
+      return await stockService.searchVideos(query, 1, orientation);
+    }
   }
 
   /**
-   * Get built-in icon library, optionally filtered by category.
-   * Stub returns empty array until icon data is loaded.
+   * Get built-in icon library.
    */
-  getIcons(_category?: string): DiscIcon[] {
-    return [];
+  getIcons(category?: string): DiscIcon[] {
+    const icons: DiscIcon[] = [
+      { id: "ico_1", name: "User", category: "General", svgDataUrl: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xOSAyMXYtMmE0IDQgMCAwIDAtNC00SDlhNCA0IDAgMCAwLTQgNHYyIj48L3BhdGg+PGNpcmNsZSBjeD0iMTIiIGN5PSI3IiByPSI0Ij48L2NpcmNsZT48L3N2Zz4=" },
+      { id: "ico_2", name: "Settings", category: "General", svgDataUrl: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjMiPjwvY2lyY2xlPjxwYXRoIGQ9Ik0xOS40IDE1YTEuNjUgMS42NSAwIDAgMCAuMzMgMS44MmwuMDYuMDZhMiAyIDAgMSAxLTIuODMgMi44M2wtLjA2LS4wNmExLjY1IDEuNjUgMCAwIDAtMS44Mi0uMzMgMS42NSAxLjY1IDAgMCAwLTEgMS41MXYuMTFhMiAyIDAgMSAxLTQgMHYtLjExYTEuNjUgMS42NSAwIDAgMC0xLTEuNTFhMS42NSAxLjY1IDAgMCAwLTEuODIuMzNsLS4wNi4wNmEyIDIgMCAxIDEtMi44My0yLjgzbC4wNi0uMDZhMS42NSAxLjY1IDAgMCAwIC4zMy0xLjgyIDEuNjUgMS42NSAwIDAgMC0xLjUxLTFoLjExYTIgMiAwIDExIDAtNHYtLjExYTEuNjUgMS42NSAwIDAgMC0xLjUxLTFhMS42NSAxLjY1IDAgMCAwLTEuODItLjMzbC4wNi0uMDZhMiAyIDAgMSAxIDIuODMtMi44M2wuMDYuMDZhMS42NSAxLjY1IDAgMCAwIDEuODItLjMzIDEuNjUgMS42NSAwIDAgMCAxLTEuNTF2LS4xMWEyIDIgMCAxIDEgNCAwdi4xMWExLjY1IDEuNjUgMCAwIDAgMSAxLjUxIDEuNjUgMS42NSAwIDAgMCAxLjgyLjMzbC4wNi0uMDZhMiAyIDAgMSAxIDIuODMgMi44M2wtLjA2LjA2YTEuNjUgMS42NSAwIDAgMC0uMzMgMS44MloiPjwvcGF0aD48L3N2Zz4=" },
+      { id: "ico_3", name: "Search", category: "General", svgDataUrl: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxjaXJjbGUgY3g9IjExIiBjeT0iMTEiIHI9IjgiPjwvY2lyY2xlPmxpbmUgeDE9IjIxIiB5MT0iMjEiIHgyPSIxNi42NSIgeTI9IjE2LjY1Ij48L2xpbmU+PC9zdmc+" },
+      { id: "ico_4", name: "Heart", category: "General", svgDataUrl: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMC44NCA0LjYxYTUuNSA1LjUgMCAwIDAtNy43OCAwTDExIDYuMjNsLTEuMDYtMS4wNmE1LjUgNS41IDAgMCAwLTcuNzggNy43OGwxLjA2IDEuMDZMMTEgMjFsNy43OC03Ljc4IDEuMDYtMS4wNmE1LjUgNS41IDAgMCAwIDAtNy43OHoiPjwvcGF0aD48L3N2Zz4=" },
+    ];
+
+    if (category) {
+      return icons.filter(i => i.category === category);
+    }
+    return icons;
   }
 
   /**
-   * Get Google Fonts list, optionally filtered by query.
-   * Stub returns empty array until API is wired.
+   * Get Google Fonts list.
    */
-  async getFonts(_query?: string): Promise<DiscFont[]> {
-    return [];
+  async getFonts(query?: string): Promise<DiscFont[]> {
+    const fonts: DiscFont[] = [
+      { id: "fnt_1", family: "Inter", category: "sans-serif", variants: ["400", "500", "600", "700"] },
+      { id: "fnt_2", family: "Playfair Display", category: "serif", variants: ["400", "700"] },
+      { id: "fnt_3", family: "Fira Code", category: "monospace", variants: ["400", "500"] },
+      { id: "fnt_4", family: "Roboto", category: "sans-serif", variants: ["300", "400", "500", "700"] },
+    ];
+
+    if (query) {
+      const lower = query.toLowerCase();
+      return fonts.filter(f => f.family.toLowerCase().includes(lower));
+    }
+    return fonts;
   }
 }
