@@ -21,6 +21,14 @@ export type { StockPhoto, StockVideo, DiscIcon, DiscFont };
 export type MediaSource = "mine" | "disc";
 export type MediaTypeFilter = "all" | "img" | "vid" | "ico" | "fnt";
 
+export interface MediaFolder {
+  id: string;
+  name: string;
+  parentId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // --- Library ---
 
 /** Count per type — shown in TypePill badges */
@@ -43,6 +51,7 @@ export interface LibraryItem {
   duration?: number; // seconds, video only
   width?: number;
   height?: number;
+  altText?: string;
   createdAt: string;
   mimeType: string;
 }
@@ -89,6 +98,7 @@ export interface LibraryStateResult {
   setFmtFilter(f: string): void;
   setActiveType(t: MediaTypeFilter): void;
   renameItem(key: string, name: string): Promise<void>;
+  updateItem(key: string, updates: Partial<LibraryItem>): Promise<void>;
 }
 
 export interface UploadStateResult {
@@ -125,7 +135,11 @@ export interface DiscoveryStateResult {
   discLoading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
   discoverySearch: string;
   isDiscoveryEmpty: boolean;
-  discSearchAll(query: string): void;
+  discOrientation: DiscOrientation;
+  discColor: DiscColor;
+  discSearchAll(query: string, orientation?: DiscOrientation, color?: DiscColor): void;
+  setDiscOrientation(o: DiscOrientation): void;
+  setDiscColor(c: DiscColor): void;
   loadMoreDisc(type: "img" | "vid"): Promise<void>;
   saveToLibrary(type: "img" | "vid", item: StockPhoto | StockVideo): Promise<void>;
 }
@@ -135,9 +149,17 @@ export interface DiscoveryStateResult {
 export interface MediaStateResult {
   // Navigation
   activeType: MediaTypeFilter;
+  source: MediaSource;
+  setSource(s: MediaSource): void;
+  currentFolderId: string | null;
+  setCurrentFolderId(id: string | null): void;
 
   // Library
   libraryItems: LibraryItem[];
+  folders: MediaFolder[];
+  createFolder(name: string): Promise<void>;
+  deleteFolder(id: string): Promise<void>;
+  moveAsset(assetId: string, folderId: string | null): Promise<void>;
   uploadQueue: UploadProgress[];
   counts: TypeCounts;
   sort: MediaSortBy;
@@ -162,6 +184,22 @@ export interface MediaStateResult {
   confirmDelete: ConfirmDeletePayload | null;
   insertToCanvas(key: string): void;
   renameItem(key: string, name: string): Promise<void>;
+
+  // Discovery
+  stockPhotos: StockPhoto[];
+  stockVideos: StockVideo[];
+  discIcons: DiscIcon[];
+  discFonts: DiscFont[];
+  discLoading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
+  discoverySearch: string;
+  isDiscoveryEmpty: boolean;
+  discOrientation: DiscOrientation;
+  discColor: DiscColor;
+  discSearchAll(query: string, orientation?: DiscOrientation, color?: DiscColor): void;
+  setDiscOrientation(o: DiscOrientation): void;
+  setDiscColor(c: DiscColor): void;
+  loadMoreDisc(type: "img" | "vid"): Promise<void>;
+  saveToLibrary(type: "img" | "vid", item: StockPhoto | StockVideo): Promise<void>;
 
   // Panel drag
   panelDragOver: boolean;
@@ -221,6 +259,21 @@ export interface LibraryViewProps {
   onDetail(item: LibraryItem): void;
 }
 
+export type DiscOrientation = "all" | "landscape" | "portrait" | "squarish";
+export type DiscColor =
+  | "all"
+  | "black_and_white"
+  | "black"
+  | "white"
+  | "yellow"
+  | "orange"
+  | "red"
+  | "purple"
+  | "magenta"
+  | "green"
+  | "teal"
+  | "blue";
+
 export interface DiscoveryViewProps {
   activeType: MediaTypeFilter;
   photos: StockPhoto[];
@@ -229,7 +282,11 @@ export interface DiscoveryViewProps {
   fonts: DiscFont[];
   loading: Record<"img" | "vid" | "ico" | "fnt", boolean>;
   searchQuery: string;
-  onSearch(q: string): void;
+  orientation: DiscOrientation;
+  color: DiscColor;
+  onSearch(q: string, orientation?: DiscOrientation, color?: DiscColor): void;
+  onSetOrientation(o: DiscOrientation): void;
+  onSetColor(c: DiscColor): void;
   onLoadMore(type: "img" | "vid"): void;
   onSave(type: "img" | "vid", item: StockPhoto | StockVideo): void;
   onInsert(filename: string): void;

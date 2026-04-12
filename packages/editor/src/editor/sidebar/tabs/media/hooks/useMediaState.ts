@@ -6,14 +6,15 @@
  */
 
 import * as React from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Composer } from "../../../../../engine/Composer";
 import { STORAGE_QUOTA_BYTES } from "../../../../../shared/constants/media";
 import { useToast } from "../../../../../shared/ui/Toast";
-import type { CtxMenuState, LibraryItem, MediaStateResult } from "../data/mediaTypes";
+import type { CtxMenuState, LibraryItem, MediaStateResult, MediaSource, MediaTypeFilter } from "../data/mediaTypes";
 import { useLibraryState } from "./useLibraryState";
 import { useSelectionState } from "./useSelectionState";
 import { useUploadState } from "./useUploadState";
+import { useDiscoveryState } from "./useDiscoveryState";
 
 export function useMediaState(composer: Composer): MediaStateResult {
   const { addToast } = useToast();
@@ -26,44 +27,121 @@ export function useMediaState(composer: Composer): MediaStateResult {
   );
 
   // Navigation
+  const [source, setSource] = useState<MediaSource>("mine");
   const [detailItem, setDetailItem] = useState<LibraryItem | null>(null);
   const [ctxMenu, setCtxMenu] = useState<CtxMenuState | null>(null);
+  const [selectionContext, setSelectionContext] = useState<{ elementId: string; label?: string } | null>(null);
 
   // Sub-hooks
   const library = useLibraryState(composer);
-  const upload = useUploadState(composer, showToast);
+  const upload = useUploadState(composer, showToast, library.currentFolderId);
   const selection = useSelectionState(composer, library.libraryItems, showToast);
+  const discovery = useDiscoveryState(composer, showToast);
+
+  // Listen for selection mode requests from other parts of the UI
+  useEffect(() => {
+    const handler = (data: { elementId: string; label?: string }) => {
+      setSelectionContext(data);
+      
+      // Semantic Search: Use label/context to pre-fill discovery search
+      if (data.label && data.label.length > 2) {
+        discovery.discSearchAll(data.label);
+        setSource("disc"); // Open discovery tab for AI suggestions
+      } else {
+        setSource("mine"); // Default to library if no context
+      }
+      
+      // Open Media Tab in Sidebar
+      composer.emit("ui:switch-tab", { tab: "assets" });
+    };
+    composer.on("ui:media-selection-request", handler);
+    return () => composer.off("ui:media-selection-request", handler);
+  }, [composer, discovery]);
+
+  const autoSaveStockToLibrary = useCallback(async (src: string, name: string) => {
+    try {
+      const res = await fetch(src);
+      const blob = await res.blob();
+      const file = new File([blob], `imported-${name.substring(0, 10)}.webp`, { type: "image/webp" });
+      upload.upload([file]);
+    } catch (err) {
+      console.error("Silent save failed:", err);
+    }
+  }, [upload]);
 
   const insertToCanvas = useCallback(
     async (key: string) => {
-      const asset = composer.media.getAsset(key);
+      let asset: { src: string; type: string; name: string } | undefined = composer.media.getAsset(key);
+      let isStock = false;
+
+      // If not in library, check discovery stubs (icons/fonts)
+      if (!asset) {
+        const icon = discovery.discIcons.find((i) => i.id === key);
+        if (icon) {
+          asset = { src: icon.svgDataUrl, type: "ico", name: icon.name };
+        } else {
+          const photo = discovery.stockPhotos.find(p => p.id === key);
+          if (photo) {
+            asset = { src: photo.url, type: "img", name: photo.alt };
+            isStock = true;
+          } else {
+            const font = discovery.discFonts.find((f) => f.id === key);
+            if (font) {
+              showToast(
+                `To use ${font.family}: select text on canvas → Inspector → Font → My Fonts`,
+                "info"
+              );
+              return;
+            }
+          }
+        }
+      }
+
       if (!asset) return;
 
-      // Fonts cannot be placed as canvas elements — guide user to the correct flow
-      if (asset.type === "font") {
+      // Silent save stock photo to library
+      if (isStock && asset.type === "img") {
+        autoSaveStockToLibrary(asset.src, asset.name);
+      }
+
+      // Fonts cannot be placed as canvas elements
+      if (asset.type === "font" || asset.type === "fnt") {
         showToast("To use this font: select text on canvas → Inspector → Font → My Fonts", "info");
         setDetailItem(null);
         return;
       }
 
       try {
-        if (typeof (composer.elements as { insertMedia?: unknown })?.insertMedia === "function") {
-          const newId = await (
-            composer.elements as unknown as {
-              insertMedia: (src: string, type: string) => Promise<string>;
+        if (selectionContext) {
+          // SELECTION MODE: Replace existing element's media via command layer
+          const result = composer.mediaCommands.replaceMedia(
+            selectionContext.elementId,
+            asset.src
+          );
+          if (result) {
+            showToast(`${asset.name} applied ✓`, "success");
+            composer.emit("ui:switch-tab", { tab: "add" });
+            setSelectionContext(null);
+          }
+        } else {
+          // STANDARD MODE: Insert new element via command layer
+          const mediaType = asset.type === "fnt" ? "image" : asset.type as
+            "image" | "video" | "audio" | "svg" | "icon" | "lottie";
+          const result = composer.mediaCommands.insertMedia(asset.src, mediaType);
+          if (result) {
+            const insertedEl = composer.elements.getElement(result.elementId);
+            if (insertedEl) {
+              composer.selection.select(insertedEl);
             }
-          ).insertMedia(asset.src, asset.type);
-          if (newId && typeof (composer.selection as { select?: unknown })?.select === "function") {
-            (composer.selection as unknown as { select: (id: string) => void }).select(newId);
+            showToast(`${asset.name} added to page ✓`, "success");
           }
         }
-        showToast(`${asset.name} added to page ✓`, "success");
       } catch {
-        showToast("Could not insert — try again", "error");
+        showToast("Could not apply media — try again", "error");
       }
       setDetailItem(null);
     },
-    [composer, showToast]
+    [composer, showToast, discovery.discIcons, discovery.discFonts, discovery.stockPhotos, selectionContext, autoSaveStockToLibrary]
   );
 
   const copyUrl = useCallback(
@@ -78,6 +156,16 @@ export function useMediaState(composer: Composer): MediaStateResult {
       );
     },
     [showToast]
+  );
+
+  const setUnifiedSearch = useCallback(
+    (q: string) => {
+      library.setLibrarySearch(q);
+      if (q.trim().length > 2) {
+        discovery.discSearchAll(q);
+      }
+    },
+    [library.setLibrarySearch, discovery.discSearchAll]
   );
 
   const openCtxMenu = useCallback((e: React.MouseEvent, item: LibraryItem) => {
@@ -97,9 +185,17 @@ export function useMediaState(composer: Composer): MediaStateResult {
   return {
     // Navigation
     activeType: library.activeType,
+    source,
+    setSource,
+    currentFolderId: library.currentFolderId,
+    setCurrentFolderId: library.setCurrentFolderId,
 
     // Library
     libraryItems: library.libraryItems,
+    folders: library.folders,
+    createFolder: library.createFolder,
+    deleteFolder: library.deleteFolder,
+    moveAsset: library.moveAsset,
     uploadQueue: upload.uploadQueue,
     counts: library.counts,
     sort: library.sort,
@@ -111,6 +207,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
     setSort: library.setSort,
     setGridN: library.setGridN,
     setFmtFilter: library.setFmtFilter,
+    setType: library.setActiveType,
     toggleSelMode: selection.toggleSelMode,
     toggleSelect: selection.toggleSelect,
     selectAll: selection.selectAll,
@@ -124,6 +221,19 @@ export function useMediaState(composer: Composer): MediaStateResult {
     confirmDelete: selection.confirmDelete,
     insertToCanvas,
     renameItem: library.renameItem,
+    updateItem: library.updateItem,
+
+    // Discovery
+    stockPhotos: discovery.stockPhotos,
+    stockVideos: discovery.stockVideos,
+    discIcons: discovery.discIcons,
+    discFonts: discovery.discFonts,
+    discLoading: discovery.discLoading,
+    discoverySearch: discovery.discoverySearch,
+    isDiscoveryEmpty: discovery.isDiscoveryEmpty,
+    discSearchAll: discovery.discSearchAll,
+    loadMoreDisc: discovery.loadMoreDisc,
+    saveToLibrary: discovery.saveToLibrary,
 
     // Panel drag
     panelDragOver: upload.panelDragOver,
@@ -134,7 +244,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
 
     // Shared
     librarySearch: library.librarySearch,
-    setLibrarySearch: library.setLibrarySearch,
+    setLibrarySearch: setUnifiedSearch,
     storage: { used: upload.storageUsed, total: STORAGE_QUOTA_BYTES },
 
     // Clipboard
@@ -147,5 +257,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
     detailItem,
     openDetail,
     closeDetail,
+    selectionContext,
+    setSelectionContext,
   };
 }

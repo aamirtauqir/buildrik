@@ -218,6 +218,41 @@ export function useCanvasCommandPalette({
         keywords: ["preview", "view", "live"],
         handler: () => composer.emit(EVENTS.UI_TOGGLE_PREVIEW, {}),
       },
+      // Media commands
+      {
+        id: "open-media",
+        label: "Open Media Library",
+        category: "Media",
+        icon: "\ud83d\uddbc",
+        keywords: ["assets", "images", "videos", "library"],
+        handler: () => composer.emit("ui:switch-tab", { tab: "assets" }),
+      },
+      {
+        id: "replace-media",
+        label: "Replace Selected Media",
+        category: "Media",
+        icon: "\ud83d\udd04",
+        requiresSelection: true,
+        keywords: ["change", "swap", "image", "replace"],
+        handler: () => {
+          if (!selectedId) return;
+          const el = composer.elements.getElement(selectedId);
+          composer.emit("ui:media-selection-request", {
+            elementId: selectedId,
+            label: el?.getType() === "image" ? "Image" : "Element",
+          });
+        },
+      },
+      {
+        id: "search-stock",
+        label: "Search Stock Photos",
+        category: "Media",
+        icon: "\ud83d\udd0d",
+        keywords: ["unsplash", "stock", "find", "discovery"],
+        handler: () => {
+          composer.emit("ui:switch-tab", { tab: "assets" });
+        },
+      },
     ];
   }, [composer, selectedId, clear]);
 

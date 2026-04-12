@@ -64,7 +64,7 @@ export interface StudioPanelsProps {
     currentIcon: IconConfig | undefined,
     onSelect: (icon: IconConfig) => void
   ) => void;
-  onOpenTemplates?: () => void;
+  onOpenImageEditor?: (imageSrc: string, onSave: (editedSrc: string) => void) => void;
   onExportForDeploy?: () => Promise<{
     files: Array<{ path: string; content: string }>;
     projectName?: string;
@@ -76,12 +76,44 @@ export interface StudioPanelsProps {
   /** Drawer width in pixels for the active tab (derived from usePanelState) */
   drawerWidth?: number;
   panelPinned?: boolean;
+  onPanelPinnedToggle?: () => void;
   projectId?: string | null;
 }
 
 // ============================================================================
 // STYLES
 // ============================================================================
+
+const previewBannerStyle: React.CSSProperties = {
+  position: "absolute",
+  top: 12,
+  left: "50%",
+  transform: "translateX(-50%)",
+  display: "flex",
+  alignItems: "center",
+  gap: 6,
+  padding: "6px 14px",
+  background: "rgba(0,0,0,0.82)",
+  border: "1px solid rgba(255,255,255,0.12)",
+  borderRadius: 8,
+  color: "var(--text-primary, #fff)",
+  fontSize: 13,
+  zIndex: 50,
+  pointerEvents: "auto",
+  backdropFilter: "blur(6px)",
+  userSelect: "none",
+};
+
+const previewExitBtnStyle: React.CSSProperties = {
+  marginLeft: 8,
+  padding: "2px 10px",
+  border: "1px solid rgba(255,255,255,0.2)",
+  borderRadius: 5,
+  background: "transparent",
+  color: "inherit",
+  fontSize: 12,
+  cursor: "pointer",
+};
 
 const styles = {
   container: {
@@ -140,23 +172,38 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   onAIRequest,
   onOpenMediaLibrary,
   onOpenIconPicker,
-  onOpenTemplates,
+  onOpenImageEditor,
   onExportForDeploy,
   canvasRef,
   composerContainerRef,
   isFullPageMode = false,
   drawerWidth = 280,
   panelPinned = true,
+  onPanelPinnedToggle,
   projectId,
 }) => {
   const { addToast } = useToast();
   const { handleBlockClick } = useBlockInsertion(composer);
 
   const [canvasHoveredId, setCanvasHoveredId] = React.useState<string | null>(null);
+  const [isVersionPreview, setIsVersionPreview] = React.useState(false);
+
+  // Media tab dual-mode: panel (slim launcher) or fullpage (library manager)
+  const [mediaFullPage, setMediaFullPage] = React.useState(false);
 
   // Derive fullpage mode from tab if not explicitly passed
   const activeTabId = (leftPanelTab as GroupedTabId) || "add";
-  const effectiveFullPageMode = isFullPageMode || getTabMode(activeTabId) === "fullpage";
+  const effectiveFullPageMode =
+    isFullPageMode ||
+    getTabMode(activeTabId) === "fullpage" ||
+    (activeTabId === "assets" && mediaFullPage);
+
+  // Reset media fullpage override when switching away from assets tab
+  React.useEffect(() => {
+    if (activeTabId !== "assets" && mediaFullPage) {
+      setMediaFullPage(false);
+    }
+  }, [activeTabId, mediaFullPage]);
 
   // Listen for panel open events from composer
   React.useEffect(() => {
@@ -203,6 +250,19 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     composer.on("canvas:hover", handleCanvasHover);
     return () => {
       composer.off("canvas:hover", handleCanvasHover);
+    };
+  }, [composer]);
+
+  // Version preview mode — dims canvas and shows "Preview" banner while hovering a version row
+  React.useEffect(() => {
+    if (!composer) return;
+    const handlePreviewStarted = () => setIsVersionPreview(true);
+    const handlePreviewCleared = () => setIsVersionPreview(false);
+    composer.on(EVENTS.VERSION_PREVIEW_STARTED, handlePreviewStarted);
+    composer.on(EVENTS.VERSION_PREVIEW_CLEARED, handlePreviewCleared);
+    return () => {
+      composer.off(EVENTS.VERSION_PREVIEW_STARTED, handlePreviewStarted);
+      composer.off(EVENTS.VERSION_PREVIEW_CLEARED, handlePreviewCleared);
     };
   }, [composer]);
 
@@ -264,9 +324,38 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   );
 
   const handleFullPageClose = React.useCallback(() => {
-    // Return to last panel tab (default: Add)
-    onLeftPanelTabChange?.("add");
-  }, [onLeftPanelTabChange]);
+    if (activeTabId === "assets" && mediaFullPage) {
+      // Media dual-mode: return to panel (slim launcher), don't switch tabs
+      setMediaFullPage(false);
+    } else {
+      // Return to last panel tab (default: Add)
+      onLeftPanelTabChange?.("add");
+    }
+  }, [activeTabId, mediaFullPage, onLeftPanelTabChange]);
+
+  const handleOpenLibrary = React.useCallback(() => {
+    setMediaFullPage(true);
+  }, []);
+
+  const handleEditMedia = React.useCallback(
+    (item: { key: string; src: string; name: string }) => {
+      if (!onOpenImageEditor || !composer) return;
+      onOpenImageEditor(item.src, async (editedSrc) => {
+        try {
+          const res = await fetch(editedSrc);
+          const blob = await res.blob();
+          const file = new File([blob], `edited-${item.name}.webp`, { type: "image/webp" });
+          const result = await composer.media.uploadFile(file);
+          if (result.success && result.asset) {
+            composer.elements.getElement(item.key)?.setAttribute("src", result.asset.src);
+          }
+        } catch (err) {
+          console.error("Failed to save edited canvas media:", err);
+        }
+      });
+    },
+    [onOpenImageEditor, composer]
+  );
 
   return (
     <LayoutShell
@@ -286,10 +375,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
           onDrawerToggle={onLeftPanelToggle ?? (() => {})}
           isPinned={panelPinned}
+          onPinToggle={onPanelPinnedToggle}
           onElementSelect={handleElementSelect}
           onBlockClick={handleBlockClick}
           canvasHoveredId={canvasHoveredId}
           projectId={projectId}
+          onOpenLibrary={handleOpenLibrary}
         />
       </LayoutShell.Sidebar>
 
@@ -311,7 +402,22 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             showXRay={showXRay}
             devMode={devMode}
             onAIRequest={onAIRequest}
+            onOpenImageEditor={handleEditMedia}
           />
+          {isVersionPreview && (
+            <div style={previewBannerStyle}>
+              <span style={{ fontWeight: 500 }}>Preview</span>
+              <span style={{ color: "var(--text-muted, rgba(255,255,255,0.45))", fontSize: 12 }}>
+                — not saved
+              </span>
+              <button
+                style={previewExitBtnStyle}
+                onClick={() => composer?.versionHistory?.clearPreview()}
+              >
+                Exit
+              </button>
+            </div>
+          )}
         </div>
         <CanvasFooterToolbar
           overlays={{
@@ -349,6 +455,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           onSwitchToAdd={() => onLeftPanelTabChange?.("add")}
           onReplayTour={undefined}
           projectId={projectId}
+          onOpenImageEditor={onOpenImageEditor}
+          onOpenIconPicker={onOpenIconPicker}
         />
       </LayoutShell.FullPage>
     </LayoutShell>

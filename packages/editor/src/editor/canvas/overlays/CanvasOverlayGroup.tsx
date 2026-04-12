@@ -33,6 +33,7 @@ import { AlignmentToolbar } from "../toolbars";
 import {
   SelectionBoxOverlay,
   ElementHoverOverlay,
+  ParentHighlight,
   DropFeedbackOverlay,
   RulersOverlay,
   GuidesOverlay,
@@ -42,35 +43,29 @@ import {
   CanvasBreadcrumb,
   SmartGuidesOverlay,
   SectionReorderHandles,
+  SelectionLabel,
 } from "./";
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
 export interface CanvasOverlayGroupProps {
   composer: Composer | null;
-  canvasRef: React.RefObject<HTMLDivElement | null>;
+  canvasRef: React.RefObject<HTMLElement | null>;
 
-  // Grid / rulers / guides
+  // Grid & Rulers
   showGrid: boolean;
   gridSize: number;
   showRulers: boolean;
-  showGuides: boolean;
   zoom: number;
   canvasSize: { width: number; height: number };
   rulerGuides: CanvasGuide[];
-  addGuide: (type: "horizontal" | "vertical", position: number) => void;
-  updateGuide: (id: string, position: number) => void;
-  removeGuide: (id: string) => void;
-  guides: CanvasGuide[];
-  snapLines: SnapLine[];
+  addGuide: (guide: CanvasGuide) => void;
+  updateGuide: (index: number, position: number) => void;
+  removeGuide: (index: number) => void;
 
-  // Selection group
+  // Selection
   selectedId: string | null;
   selectedIds: string[];
-  isResizing: boolean;
-  setIsResizing: (v: boolean) => void;
-  showSpacing: boolean;
-  spacingIndicators: SpacingIndicator[];
   onSelectParent: () => void;
   onSelectAncestor: (id: string) => void;
   onDuplicate: () => void;
@@ -85,25 +80,34 @@ export interface CanvasOverlayGroupProps {
   // Hover
   shouldShowHover: boolean;
   hoveredElementId: string | null;
-  cursorState: CursorState;
-  isInspectorEnabled: boolean;
-  devMode: boolean;
 
-  // Drag
+  // Drag & Resize
+  isResizing: boolean;
+  setIsResizing: (is: boolean) => void;
+  cursorState: CursorState;
   isDragOver: boolean;
   dropTargetId: string | null;
-  dropPosition: DropPosition | null;
+  dropPosition: DropPosition;
   isValidDrop: boolean;
   invalidDropReason: InvalidDropReason;
   dropSlotRect: DropSlotRect | null;
   dropTargetPath: BreadcrumbItem[];
 
-  // Section reorder
+  // Guides & Snapping
+  showGuides: boolean;
+  guides: SpacingIndicator[];
+  snapLines: SnapLine[];
+
+  // Indicators
+  showSpacing: boolean;
+  spacingIndicators: SpacingIndicator[];
+
+  // Section Reordering
   sectionBoundaries: SectionBoundary[];
   sectionDragState: SectionDragState | null;
   hoveredSectionBoundary: string | null;
-  onSectionStartDrag: (sectionId: string, index: number) => void;
-  onSectionUpdateDrag: (clientY: number) => void;
+  onSectionStartDrag: (id: string, e: React.MouseEvent) => void;
+  onSectionUpdateDrag: (e: MouseEvent) => void;
   onSectionCompleteDrag: () => void;
   onSectionCancelDrag: () => void;
   onSectionHoverBoundary: (id: string | null) => void;
@@ -111,7 +115,8 @@ export interface CanvasOverlayGroupProps {
   // Misc
   marquee: MarqueeState | null;
   editing: EditingState;
-  onInlineCommand: (command: string, value?: string) => void;
+  onInlineCommand: (cmd: string, value?: any) => void;
+  onOpenImageEditor?: (item: any) => void;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -131,15 +136,8 @@ export function CanvasOverlayGroup({
   addGuide,
   updateGuide,
   removeGuide,
-  showGuides,
-  guides,
-  snapLines,
   selectedId,
   selectedIds,
-  isResizing,
-  setIsResizing,
-  showSpacing,
-  spacingIndicators,
   onSelectParent,
   onSelectAncestor,
   onDuplicate,
@@ -152,9 +150,9 @@ export function CanvasOverlayGroup({
   onClear,
   shouldShowHover,
   hoveredElementId,
+  isResizing,
+  setIsResizing,
   cursorState,
-  isInspectorEnabled,
-  devMode,
   isDragOver,
   dropTargetId,
   dropPosition,
@@ -162,6 +160,11 @@ export function CanvasOverlayGroup({
   invalidDropReason,
   dropSlotRect,
   dropTargetPath,
+  showGuides,
+  guides,
+  snapLines,
+  showSpacing,
+  spacingIndicators,
   sectionBoundaries,
   sectionDragState,
   hoveredSectionBoundary,
@@ -173,19 +176,62 @@ export function CanvasOverlayGroup({
   marquee,
   editing,
   onInlineCommand,
+  onOpenImageEditor,
 }: CanvasOverlayGroupProps) {
+  // Defensive early return if critical objects are missing
+  if (!composer || !canvasRef) return null;
+
+  // ─── Render ─────────────────────────────────────────────────────────────────
+
   return (
-    <>
-      {/* Grid & Rulers */}
-      {showGrid && <GridOverlay gridSize={gridSize} />}
-      {showRulers && <RulersOverlay zoom={zoom} canvasSize={canvasSize} onCreateGuide={addGuide} />}
-      {showRulers && rulerGuides.length > 0 && (
-        <GuidesOverlay
+    <div
+      className="aqb-canvas-overlay-group"
+      style={{
+        position: "absolute",
+        inset: 0,
+        pointerEvents: "none",
+        zIndex: Z_LAYERS.overlays,
+      }}
+    >
+      {/* Grid overlay */}
+      {showGrid && <GridOverlay size={gridSize} zoom={zoom} />}
+
+      {/* Hover highlight — only show when not dragging/resizing */}
+      {shouldShowHover && hoveredElementId && canvasRef.current && (
+        <ElementHoverOverlay
+          composer={composer}
+          elementId={hoveredElementId}
+          cursorState={cursorState}
+        />
+      )}
+
+      {/* Parent highlight (when hovering or selected) */}
+      {canvasRef.current && selectedId && (
+        <ParentHighlight
+          composer={composer}
+          childElementId={selectedId}
+          canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
+        />
+      )}
+
+      {/* Marquee selection tool */}
+      {marquee && <div className="aqb-canvas-marquee" style={getMarqueeStyles(marquee)} />}
+
+      {/* Rulers and persistent guides */}
+      {showRulers && canvasRef.current && (
+        <RulersOverlay
           guides={rulerGuides}
+          canvasSize={canvasSize}
           zoom={zoom}
-          onDragGuide={updateGuide}
+          onAddGuide={addGuide}
+          onUpdateGuide={updateGuide}
           onRemoveGuide={removeGuide}
         />
+      )}
+
+      {/* User-placed guides (from rulers) */}
+      {showRulers && rulerGuides.length > 0 && (
+        <GuidesOverlay guides={rulerGuides} canvasSize={canvasSize} />
       )}
 
       {/* Persistent canvas guides (user-placed via rulers) */}
@@ -199,7 +245,7 @@ export function CanvasOverlayGroup({
       {showGuides && <SmartGuidesOverlay snapLines={snapLines} zoom={zoom} />}
 
       {/* Selection overlays */}
-      {composer && selectedId && (
+      {selectedId && (
         <div className="aqb-canvas-spots-overlay" style={spotsOverlayStyles}>
           {showSpacing && spacingIndicators.length > 0 && (
             <CanvasSpotSpacing
@@ -213,8 +259,16 @@ export function CanvasOverlayGroup({
             elementId={selectedId}
             selectedIds={selectedIds}
             onResizeStateChange={setIsResizing}
+            onOpenImageEditor={onOpenImageEditor}
           />
-          {selectedIds.length === 1 && !isResizing && (
+          {selectedId && canvasRef.current && (
+            <SelectionLabel
+              composer={composer}
+              elementId={selectedId}
+              canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
+            />
+          )}
+          {selectedIds.length === 1 && !isResizing && canvasRef.current && (
             <UnifiedSelectionToolbar
               composer={composer}
               elementId={selectedId}
@@ -228,88 +282,57 @@ export function CanvasOverlayGroup({
               onMoveUp={onMoveUp}
               onMoveDown={onMoveDown}
               onUndo={onUndo}
+              onClear={onClear}
             />
           )}
-          <MultiSelectBadge selectedIds={selectedIds} primaryId={selectedId} onClear={onClear} />
-          {selectedIds.length >= 2 && (
+          {selectedIds.length > 1 && (
             <div style={alignmentToolbarStyles}>
               <AlignmentToolbar composer={composer} selectedIds={selectedIds} />
+              <MultiSelectBadge count={selectedIds.length} />
             </div>
           )}
         </div>
       )}
 
-      {/* Hover overlay */}
-      {shouldShowHover && (
-        <ElementHoverOverlay
-          hoveredElementId={hoveredElementId}
-          canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
-          altHeld={cursorState.altHeld}
-          shiftHeld={cursorState.shiftHeld}
-          inspectorEnabled={isInspectorEnabled || devMode}
-          isCloneMode={cursorState.ctrlHeld}
+      {/* Inline Text Editor */}
+      {editing.id && (
+        <RichTextEditor
+          id={editing.id}
+          composer={composer}
+          initialValue={editing.content}
+          onCommand={onInlineCommand}
         />
       )}
 
-      {/* Remote collaboration cursors */}
-      {composer?.collaboration?.isConnected() && (
-        <RemoteCursorsOverlay composer={composer} zoom={zoom} />
+      {/* Drag & drop feedback (slot indicators, breadcrumb) */}
+      {isDragOver && canvasRef.current && (
+        <DropFeedbackOverlay
+          composer={composer}
+          dropTargetId={dropTargetId}
+          dropPosition={dropPosition}
+          isValid={isValidDrop}
+          invalidReason={invalidDropReason}
+          slotRect={dropSlotRect}
+          breadcrumbPath={dropTargetPath}
+        />
       )}
 
-      {/* Drop feedback — always rendered so the aria-live region stays in the DOM.
-          Visual content is conditionally shown inside the component (WCAG 4.1.3). */}
-      <DropFeedbackOverlay
-        isDragOver={isDragOver}
-        dropTargetId={dropTargetId}
-        dropPosition={dropPosition}
-        isValidDrop={isValidDrop}
-        invalidReason={invalidDropReason}
-        canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
-        dropSlotRect={dropSlotRect}
-        dropTargetPath={dropTargetPath}
-      />
+      {/* Canvas breadcrumb (bottom center) */}
+      {!isDragOver && selectedId && !isResizing && (
+        <CanvasBreadcrumb composer={composer} elementId={selectedId} onSelect={onSelectAncestor} />
+      )}
 
-      {/* Section reorder grab handles */}
+      {/* Section reorder handles */}
       <SectionReorderHandles
         boundaries={sectionBoundaries}
         dragState={sectionDragState}
         hoveredBoundary={hoveredSectionBoundary}
         onStartDrag={onSectionStartDrag}
-        onUpdateDrag={onSectionUpdateDrag}
-        onCompleteDrag={onSectionCompleteDrag}
-        onCancelDrag={onSectionCancelDrag}
         onHoverBoundary={onSectionHoverBoundary}
       />
 
-      {/* Marquee selection box */}
-      {marquee && <div aria-hidden style={getMarqueeStyles(marquee)} />}
-
-      {/* Floating inline rich text toolbar */}
-      {editing.id && editing.rect && (
-        <div
-          className="aqb-inline-toolbar"
-          style={{
-            position: "absolute",
-            top: editing.rect.top - 52,
-            left: Math.max(8, editing.rect.left),
-            zIndex: Z_LAYERS.tooltip,
-            pointerEvents: "auto",
-            transform:
-              editing.rect.top < 60 ? `translateY(${editing.rect.height + 60}px)` : undefined,
-          }}
-        >
-          <RichTextEditor onCommand={onInlineCommand} />
-        </div>
-      )}
-
-      {/* Canvas breadcrumb at bottom */}
-      {composer && selectedId && (
-        <CanvasBreadcrumb
-          composer={composer}
-          selectedId={selectedId}
-          onSelectElement={onSelectAncestor}
-        />
-      )}
-    </>
+      {/* Remote cursors for collaboration */}
+      <RemoteCursorsOverlay composer={composer} />
+    </div>
   );
 }

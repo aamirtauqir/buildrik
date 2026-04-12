@@ -25,6 +25,7 @@ import {
   handleTemplateDrop,
   handleBlockDrop,
   type DropContext,
+  type DropPayloads,
 } from "./drag/dropOperations";
 import { useDragAutoScroll } from "./useDragAutoScroll";
 import { useDragSession } from "./useDragSession";
@@ -136,6 +137,26 @@ export function useCanvasDragDrop({
   const lastSnapCalcRef = React.useRef<number>(0);
   const SNAP_THROTTLE_MS = 50;
 
+  // Track the currently highlighted drop-affordance element so we can remove
+  // the `.aqb-drop-target--active` class when the target changes or drag ends.
+  const dropAffordanceElRef = React.useRef<HTMLElement | null>(null);
+  const applyDropAffordance = React.useCallback((el: HTMLElement | null) => {
+    if (dropAffordanceElRef.current === el) return;
+    if (dropAffordanceElRef.current) {
+      dropAffordanceElRef.current.classList.remove("aqb-drop-target--active");
+    }
+    if (el) {
+      el.classList.add("aqb-drop-target--active");
+    }
+    dropAffordanceElRef.current = el;
+  }, []);
+  const clearDropAffordance = React.useCallback(() => {
+    if (dropAffordanceElRef.current) {
+      dropAffordanceElRef.current.classList.remove("aqb-drop-target--active");
+      dropAffordanceElRef.current = null;
+    }
+  }, []);
+
   // Refs for callbacks to avoid recreating handlers
   const onSnapLinesChangeRef = React.useRef(onSnapLinesChange);
   const onDropErrorRef = React.useRef(onDropError);
@@ -185,6 +206,7 @@ export function useCanvasDragDrop({
         ) as HTMLElement | null;
 
         if (targetEl) {
+          applyDropAffordance(targetEl);
           const rect = targetEl.getBoundingClientRect();
           const canvasRect = canvasRef.current?.getBoundingClientRect();
 
@@ -247,6 +269,7 @@ export function useCanvasDragDrop({
           setDropTargetPath([]);
           visuals.clearDropTarget();
           visuals.clearInvalidTarget();
+          clearDropAffordance();
         }
       } else {
         setDropTargetId(null);
@@ -256,6 +279,7 @@ export function useCanvasDragDrop({
         setDropSlotRect(null);
         setDropTargetPath([]);
         visuals.clearDropTarget();
+        clearDropAffordance();
       }
 
       // Skip expensive snap calculation if throttled
@@ -266,7 +290,17 @@ export function useCanvasDragDrop({
       // Auto-scroll when near canvas edges
       autoScroll.handleAutoScroll(e.clientX, e.clientY);
     },
-    [composer, showGuides, draggingElementId, isEditing, canvasRef, visuals, autoScroll]
+    [
+      composer,
+      showGuides,
+      draggingElementId,
+      isEditing,
+      canvasRef,
+      visuals,
+      autoScroll,
+      applyDropAffordance,
+      clearDropAffordance,
+    ]
   );
 
   // Snap guide calculation (extracted for readability)
@@ -376,11 +410,12 @@ export function useCanvasDragDrop({
         resetSession();
         onSnapLinesChangeRef.current([]);
         visuals.clearAllIndicators();
+        clearDropAffordance();
         autoScroll.stopCurrentAutoScroll();
         composer?.drag?.cancel("Left canvas");
       }
     },
-    [composer, resetSession, visuals, autoScroll]
+    [composer, resetSession, visuals, autoScroll, clearDropAffordance]
   );
 
   // ==========================================================================
@@ -389,9 +424,26 @@ export function useCanvasDragDrop({
   const handleDrop = React.useCallback(
     async (e: React.DragEvent) => {
       e.preventDefault();
+
+      // =========================================================================
+      // CRITICAL: Snapshot every DataTransfer channel SYNCHRONOUSLY, BEFORE any
+      // React state updates, awaits, or sub-handler calls. In real browsers the
+      // DataTransfer object is only reliably readable inside the synchronous
+      // native drop handler — a single microtask boundary (e.g. `await`) zeros
+      // it out. We pre-read once and pass the cached payloads down.
+      // =========================================================================
+      const payloads: DropPayloads = {
+        multiData: e.dataTransfer.getData("application/x-aquibra-multi"),
+        elementData: e.dataTransfer.getData("element"),
+        componentId: e.dataTransfer.getData("application/x-aquibra-component"),
+        templateData: e.dataTransfer.getData("application/aquibra-template"),
+        blockData: e.dataTransfer.getData("block"),
+      };
+
       resetSession();
       onSnapLinesChangeRef.current([]);
       visuals.clearAllIndicators();
+      clearDropAffordance();
       autoScroll.stopCurrentAutoScroll();
 
       if (!composer || isEditing) {
@@ -424,25 +476,141 @@ export function useCanvasDragDrop({
         onDropSuccess: onDropSuccessRef.current,
       };
 
+      // =========================================================================
+      // OS FILE DROP HANDLER (Desktop-to-Canvas Direct Drop)
+      // =========================================================================
+      if (e.dataTransfer.files.length > 0) {
+        const files = Array.from(e.dataTransfer.files);
+        const imageFiles = files.filter((f) => f.type.startsWith("image/"));
+
+        if (imageFiles.length > 0) {
+          const { targetId: freshTargetId } = calculateFreshDropTarget(
+            e.clientX,
+            e.clientY,
+            composer,
+            canvasRef,
+            findDropTargetElement
+          );
+
+          if (freshTargetId) {
+            const el = composer.elements.getElement(freshTargetId);
+            if (el) {
+              // Upload and apply first image to target element
+              const file = imageFiles[0];
+              onDropSuccessRef.current?.({
+                elementLabel: `Uploading ${file.name}...`,
+                elementType: "image",
+              });
+
+              try {
+                const result = await composer.media.uploadFile(file);
+                if (result.success && result.asset) {
+                  el.setAttribute("src", result.asset.src);
+                  onDropSuccessRef.current?.({
+                    elementLabel: `${file.name} applied ✓`,
+                    elementType: "image",
+                  });
+                }
+              } catch (err) {
+                onDropErrorRef.current?.({
+                  type: "INSERT_FAILED",
+                  message: "Could not upload dropped image",
+                });
+              }
+            }
+          }
+          return;
+        }
+      }
+
       // Try each drop type in order
       let dropSucceeded = false;
-      if (handleMultiElementDrop(e, ctx)) {
+      if (handleMultiElementDrop(e, ctx, payloads)) {
         dropSucceeded = true;
-      } else if (handleElementDrop(e, ctx, dropTargetId)) {
+      } else if (handleElementDrop(e, ctx, dropTargetId, payloads)) {
         dropSucceeded = true;
-      } else if (await handleComponentDrop(e, ctx)) {
+      } else if (await handleComponentDrop(e, ctx, payloads)) {
         dropSucceeded = true;
-      } else if (handleTemplateDrop(e, ctx)) {
+      } else if (handleTemplateDrop(e, ctx, payloads)) {
         dropSucceeded = true;
       } else {
-        handleBlockDrop(e, ctx);
+        handleBlockDrop(e, ctx, payloads);
         dropSucceeded = true;
       }
 
       // Notify DragManager SSOT
       composer.drag?.end(dropSucceeded);
     },
-    [composer, isEditing, dropTargetId, canvasRef, resetSession, visuals, autoScroll]
+    [
+      composer,
+      isEditing,
+      dropTargetId,
+      canvasRef,
+      resetSession,
+      visuals,
+      autoScroll,
+      clearDropAffordance,
+    ]
+  );
+
+  const handleInternalMediaDrop = React.useCallback(
+    async (e: React.DragEvent) => {
+      const src = e.dataTransfer.getData("application/x-aquibra-media-src");
+      const type = e.dataTransfer.getData("application/x-aquibra-media-type");
+      const name = e.dataTransfer.getData("application/x-aquibra-media-name");
+
+      if (src && composer) {
+        const { targetId } = calculateFreshDropTarget(
+          e.clientX,
+          e.clientY,
+          composer,
+          canvasRef,
+          findDropTargetElement
+        );
+
+        if (targetId) {
+          const el = composer.elements.getElement(targetId);
+          if (el) {
+            if (el.getType() === "section" || el.getStyle("background-image")) {
+              el.setStyle("background-image", `url(${src})`);
+            } else {
+              el.setAttribute("src", src);
+            }
+
+            onDropSuccessRef.current?.({
+              elementLabel: `${name || 'Media'} applied ✓`,
+              elementType: type || "image",
+            });
+
+            // Auto-save discovery asset to library
+            if (type === "img" && src.startsWith("http")) {
+              try {
+                const res = await fetch(src);
+                const blob = await res.blob();
+                const file = new File([blob], `imported-${(name || 'img').substring(0, 10)}.webp`, { type: "image/webp" });
+                await composer.media.uploadFile(file);
+              } catch (err) {
+                console.error("Discovery auto-save failed:", err);
+              }
+            }
+          }
+        }
+      }
+    },
+    [composer, canvasRef]
+  );
+
+  const handleDropWithInternal = React.useCallback(
+    async (e: React.DragEvent) => {
+      const internalSrc = e.dataTransfer.getData("application/x-aquibra-media-src");
+      if (internalSrc) {
+        e.preventDefault();
+        await handleInternalMediaDrop(e);
+        return;
+      }
+      await handleDrop(e);
+    },
+    [handleDrop, handleInternalMediaDrop]
   );
 
   // ==========================================================================
@@ -459,6 +627,7 @@ export function useCanvasDragDrop({
     const handleGlobalDragEnd = () => {
       onSnapLinesChangeRef.current([]);
       visuals.clearAllIndicators();
+      clearDropAffordance();
       resetSession();
       autoScroll.stopCurrentAutoScroll();
       composer?.drag?.cancel("Global dragend");
@@ -466,7 +635,7 @@ export function useCanvasDragDrop({
 
     document.addEventListener("dragend", handleGlobalDragEnd);
     return () => document.removeEventListener("dragend", handleGlobalDragEnd);
-  }, [visuals, resetSession, autoScroll]);
+  }, [visuals, resetSession, autoScroll, clearDropAffordance, composer]);
 
   return {
     isDragOver,
@@ -479,7 +648,7 @@ export function useCanvasDragDrop({
     dropTargetPath,
     handleDragOver,
     handleDragLeave,
-    handleDrop,
+    handleDrop: handleDropWithInternal,
     setDraggingElementId,
   };
 }

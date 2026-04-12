@@ -1,24 +1,31 @@
 /**
- * Media Tab v2 — Simplified shell matching .pen Screen 8 design.
- * Removed: Discovery view, Source bar, Type pills, subtitle, tip footer.
- * Light theme with ls- tokens.
+ * Media Tab — Standardized Rebuild (10-Star Experience)
+ * Flattened hierarchy, canonical SearchBar integration, and high-visibility Bulk Actions.
+ * Matches BuildTab vertical rhythm.
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Upload, AlertCircle, Trash2 } from "lucide-react";
+import { Upload } from "lucide-react";
 import type { Composer } from "../../../../engine/Composer";
 import { PanelHeader } from "../../shared/PanelHeader";
 import { SearchBar } from "../../shared/SearchBar";
+import { Tabs } from "../../../../shared/ui/Tabs";
 import { AssetDetailOverlay } from "./components/AssetDetailOverlay";
 import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
+import { DiscoveryView } from "./components/DiscoveryView";
 import { LibraryView } from "./components/LibraryView";
+import { MediaContextMenu } from "./components/MediaContextMenu";
 import { OnboardingEmptyState } from "./components/OnboardingEmptyState";
-import { SelectionBanner, UploadProgressBanner } from "./components/SelectionBanner";
+import { SelectionBanner } from "./components/SelectionBanner";
+import { TypePills } from "./components/TypePills";
 import { UploadZone } from "./components/UploadZone";
 import { useMediaState } from "./hooks/useMediaState";
-import type { LibraryItem } from "./data/mediaTypes";
+import { SlimLauncher } from "./components/SlimLauncher";
 import "./MediaTab.css";
+import { useToast } from "../../../../shared/ui/Toast";
+import type { LibraryItem } from "./data/mediaTypes";
+import type { IconConfig } from "../../../../../shared/types/media";
 
 interface MediaTabProps {
   composer: Composer | null;
@@ -26,66 +33,98 @@ interface MediaTabProps {
   onPinToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
+  onOpenImageEditor?: (imageSrc: string, onSave: (editedSrc: string) => void) => void;
+  onOpenIconPicker?: (
+    currentIcon: IconConfig | undefined,
+    onSelect: (icon: IconConfig) => void
+  ) => void;
+  /** When provided, MediaTab renders as the slim 280px launcher (panel mode). */
+  onOpenLibrary?: () => void;
 }
 
-export function MediaTab({ composer, isPinned, onPinToggle, onHelpClick, onClose }: MediaTabProps) {
-  if (!composer) {
+export function MediaTab(props: MediaTabProps) {
+  if (!props.composer) {
     return (
       <div className="med-tab">
-        <PanelHeader title="Media" isPinned={isPinned} onPinToggle={onPinToggle} onClose={onClose} />
-        <div className="med-no-project">Open a project to manage your media files.</div>
+        <PanelHeader title="Media" {...props} />
+        <div className="med-no-project">Open a project to manage media.</div>
       </div>
     );
   }
-
-  return (
-    <MediaTabInner
-      composer={composer}
-      isPinned={isPinned}
-      onPinToggle={onPinToggle}
-      onHelpClick={onHelpClick}
-      onClose={onClose}
-    />
-  );
+  return <MediaTabWithComposer {...props} composer={props.composer} />;
 }
 
-function MediaTabInner({
+function MediaTabWithComposer({
   composer,
-  isPinned,
-  onPinToggle,
-  onHelpClick,
   onClose,
+  onOpenImageEditor,
+  onOpenIconPicker,
+  onOpenLibrary,
 }: Omit<MediaTabProps, "composer"> & { composer: Composer }) {
   const state = useMediaState(composer);
-  const ctxMenuRef = React.useRef<HTMLDivElement>(null);
-  const [actionBarItem, setActionBarItem] = React.useState<LibraryItem | null>(null);
+  const isDisc = state.source === "disc";
+  const { addToast } = useToast();
 
-  React.useEffect(() => {
-    if (!state.ctxMenu) setActionBarItem(null);
-  }, [state.ctxMenu]);
+  const showToast = React.useCallback((msg: string, type: "success" | "error" | "info") => {
+    addToast({ message: msg, variant: type });
+  }, [addToast]);
 
-  const isEmpty = state.libraryItems.length === 0 && state.uploadQueue.length === 0;
+  const handleEditImage = React.useCallback(
+    (item: LibraryItem) => {
+      if (!onOpenImageEditor) return;
+      onOpenImageEditor(item.src, async (editedSrc) => {
+        try {
+          // Convert data URL to Blob
+          const res = await fetch(editedSrc);
+          const blob = await res.blob();
+          
+          // Non-destructive: Create a new filename with version/timestamp
+          const timestamp = new Date().getTime();
+          const cleanName = item.name.replace(/(_v\d+)?$/, ""); // Remove old version tag if any
+          const fileName = `${cleanName}_v${timestamp % 10000}`;
+          
+          const file = new File([blob], `${fileName}.${blob.type.split('/')[1]}`, { type: blob.type });
+          
+          // Upload new file
+          state.upload([file]);
+          showToast(`New version of ${item.name} created ✓`, "success");
+        } catch (err) {
+          console.error("Failed to process edited image:", err);
+          showToast("Could not save edited version", "error");
+        }
+      });
+    },
+    [onOpenImageEditor, state, showToast]
+  );
 
-  // Context menu keyboard navigation
-  React.useEffect(() => {
-    if (!state.ctxMenu) return;
-    const firstItem = ctxMenuRef.current?.querySelector<HTMLButtonElement>("[role='menuitem']");
-    firstItem?.focus();
+  // ─── Panel mode: render slim launcher ──────────────────────���──────
+  if (onOpenLibrary) {
+    return (
+      <SlimLauncher
+        composer={composer}
+        libraryItems={state.libraryItems}
+        onInsert={state.insertToCanvas}
+        onOpenLibrary={onOpenLibrary}
+        onUpload={state.upload}
+        onClose={onClose}
+      />
+    );
+  }
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { e.preventDefault(); state.closeCtxMenu(); }
-      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-        e.preventDefault();
-        const items = Array.from(ctxMenuRef.current?.querySelectorAll<HTMLButtonElement>("[role='menuitem']") ?? []);
-        const current = document.activeElement as HTMLButtonElement;
-        const idx = items.indexOf(current);
-        const next = e.key === "ArrowDown" ? items[(idx + 1) % items.length] : items[(idx - 1 + items.length) % items.length];
-        next?.focus();
+  // ─── Fullpage mode: render full manager content ──────────────────
+  const handleOpenIconPicker = React.useCallback(() => {
+    if (!onOpenIconPicker) return;
+    onOpenIconPicker(undefined, (icon) => {
+      try {
+        const result = composer.mediaCommands.insertMedia(icon.name, "icon");
+        if (result) {
+          showToast(`${icon.name} icon added ✓`, "success");
+        }
+      } catch {
+        showToast("Could not add icon", "error");
       }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [state.ctxMenu, state.closeCtxMenu]);
+    });
+  }, [onOpenIconPicker, composer, showToast]);
 
   return (
     <div
@@ -95,133 +134,97 @@ function MediaTabInner({
       onDragOver={state.handlePanelDragOver}
       onDrop={state.handlePanelDrop}
     >
-      {/* Drag overlay */}
-      {state.panelDragOver && (
-        <div className="med-drag-overlay" aria-hidden="true">
-          <Upload size={24} />
-          <span className="med-drag-label">Drop to upload</span>
+      {/* 0. Selection Mode Header (Snap-back context) */}
+      {state.selectionContext && (
+        <div className="med-selection-bar" style={{
+          background: 'var(--ls-accent, #1D4ED8)',
+          color: 'white',
+          padding: '8px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontSize: 13,
+          fontWeight: 500
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'rgba(255,255,255,0.6)', animation: 'pulse 2s infinite' }} />
+            Selecting image for: <span style={{ opacity: 0.9 }}>{state.selectionContext.label || 'Canvas Element'}</span>
+          </div>
+          <button 
+            onClick={() => state.setSelectionContext(null)}
+            style={{
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              color: 'white',
+              padding: '2px 10px',
+              borderRadius: 4,
+              fontSize: 11,
+              cursor: 'pointer'
+            }}
+          >
+            Cancel Selection
+          </button>
         </div>
       )}
 
-      {/* Header */}
-      <PanelHeader title="Media" isPinned={isPinned} onPinToggle={onPinToggle} onHelpClick={onHelpClick} onClose={onClose} />
-
-      {/* Content */}
-      <div className="med-content">
-        {/* Search */}
-        <div className="med-search-wrap">
-          <SearchBar
-            value={state.librarySearch}
-            onChange={state.setLibrarySearch}
-            placeholder="Search..."
-            debounceMs={0}
+      {/* 1. Primary Source Navigation (Full Width) */}
+      <div className="med-tabs-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 48 }}>
+        <Tabs
+          activeTab={state.source}
+          onChange={(id) => state.setSource(id as "mine" | "disc")}
+          tabs={[
+            { id: "mine", label: "My Library" },
+            { id: "disc", label: "Discovery" },
+          ]}
+        />
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <TypePills
+            activeType={state.activeType}
+            counts={state.counts}
+            discMode={isDisc}
+            onTypeChange={state.setType}
           />
+          <div style={{ width: 1, height: 24, background: 'var(--ls-border-light)' }} />
+          <button onClick={onClose} style={{ 
+            background: 'none', border: 'none', color: 'var(--ls-text-subtle)', 
+            cursor: 'pointer', padding: 4, display: 'flex' 
+          }}>
+            <Upload size={18} style={{ transform: 'rotate(180deg)' }} />
+          </button>
         </div>
+      </div>
 
-        {/* Search result count (65ma7) */}
-        {state.librarySearch.trim().length > 0 && state.libraryItems.length > 0 && (
-          <div className="med-search-count">
-            {state.libraryItems.length} result{state.libraryItems.length !== 1 ? "s" : ""} for &ldquo;{state.librarySearch.trim()}&rdquo;
-          </div>
-        )}
-
-        {/* Search no results (fVg54) */}
-        {state.librarySearch.trim().length > 0 && state.libraryItems.length === 0 && (
-          <div className="med-search-noresults">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ls-text-lighter, #94A3B8)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              <line x1="8" y1="11" x2="14" y2="11" />
-            </svg>
-            <p className="med-search-noresults-title">No media for &ldquo;{state.librarySearch.trim()}&rdquo;</p>
-            <p className="med-search-noresults-sub">Try a different search term or clear the query.</p>
-          </div>
-        )}
-
-        {/* Upload zone — always visible at top */}
-        {!state.selMode && (
-          <UploadZone
-            storage={state.storage}
-            onUpload={state.upload}
-            disabled={state.storage.used >= state.storage.total}
-          />
-        )}
-
-        {/* Upload progress — per-file banner (Screen 8m) */}
-        {state.uploadQueue.filter((u) => u.status !== "complete" && u.status !== "error").slice(0, 1).map((u) => (
-          <UploadProgressBanner
-            key={u.fileName}
-            fileName={u.fileName}
-            progress={u.progress}
-            showCancel={false}
-          />
-        ))}
-
-        {/* Failure strip (Screen 8n — pd04L) */}
-        {state.failedUploads.length > 0 && (
-          <div className="med-failure-strip">
-            <AlertCircle size={14} className="med-failure-icon" />
-            <span className="med-failure-text">
-              {state.failedUploads.length} upload{state.failedUploads.length !== 1 ? "s" : ""} failed
-            </span>
-            <button className="med-failure-retry" onClick={() => state.dismissFailedUploads()}>
-              Retry All
-            </button>
-            <button className="med-failure-dismiss" onClick={() => state.dismissFailedUploads()} aria-label="Dismiss">
-              <Trash2 size={14} />
-            </button>
-          </div>
-        )}
-
-        {/* Success banner (hoPrk) — all uploads completed */}
-        {state.uploadQueue.length > 0 && state.uploadQueue.every((u) => u.status === "complete") && (
-          <div className="med-success-strip">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ls-success-text, #166534)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-              <polyline points="22 4 12 14.01 9 11.01" />
-            </svg>
-            <span className="med-success-text">
-              {state.uploadQueue.filter((u) => u.status === "complete").length} file{state.uploadQueue.filter((u) => u.status === "complete").length !== 1 ? "s" : ""} uploaded
-            </span>
-            <span className="med-strip-spacer" />
-            <button className="med-success-action" onClick={() => {/* TODO: scroll to newest item */}}>View newest</button>
-          </div>
-        )}
-
-        {/* Amber partial failure banner (pd04L) */}
-        {state.uploadQueue.some((u) => u.status === "complete") && state.failedUploads.length > 0 && (
-          <div className="med-warning-strip">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ls-warning-text, #92400E)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-              <line x1="12" y1="9" x2="12" y2="13" />
-              <line x1="12" y1="17" x2="12.01" y2="17" />
-            </svg>
-            <span className="med-warning-text">
-              {state.uploadQueue.filter((u) => u.status === "complete").length} uploaded, {state.failedUploads.length} failed
-            </span>
-            <span className="med-strip-spacer" />
-            <button className="med-warning-action" onClick={() => state.dismissFailedUploads()}>
-              Retry failed
-            </button>
-          </div>
-        )}
-
-        {/* Body — empty state or grid */}
-        {isEmpty && !state.selMode ? (
-          <OnboardingEmptyState
-            activeType="all"
-            onUpload={state.upload}
-            onBrowseStock={() => {}}
+      {/* 2. Body Area */}
+      <div className="med-content">
+        {isDisc ? (
+          <DiscoveryView
+            activeType={state.activeType}
+            photos={state.stockPhotos}
+            videos={state.stockVideos}
+            icons={state.discIcons}
+            fonts={state.discFonts}
+            loading={state.discLoading}
+            searchQuery={state.discoverySearch}
+            orientation={state.discOrientation}
+            color={state.discColor}
+            onSearch={state.discSearchAll}
+            onSetOrientation={state.setDiscOrientation}
+            onSetColor={state.setDiscColor}
+            onLoadMore={state.loadMoreDisc}
+            onSave={state.saveToLibrary}
+            onInsert={state.insertToCanvas}
+            onOpenIconPicker={handleOpenIconPicker}
           />
         ) : (
           <LibraryView
             items={state.libraryItems}
             uploadQueue={state.uploadQueue}
-            activeType="all"
+            activeType={state.activeType}
             counts={state.counts}
             sort={state.sort}
             sortDir={state.sortDir}
-            gridN={3}
+            gridN={state.gridN}
             fmtFilter={state.fmtFilter}
             selMode={state.selMode}
             selectedKeys={state.selectedKeys}
@@ -235,74 +238,58 @@ function MediaTabInner({
             onRequestBulkDelete={state.requestBulkDelete}
             onRequestDelete={state.requestDelete}
             onInsert={state.insertToCanvas}
-            onCtxMenu={(e, item) => { state.openCtxMenu(e, item); setActionBarItem(item); }}
+            onCtxMenu={state.openCtxMenu}
             onDetail={state.openDetail}
+            onSearchChange={state.setLibrarySearch}
+            folders={state.folders}
+            currentFolderId={state.currentFolderId}
+            setCurrentFolderId={state.setCurrentFolderId}
+            onCreateFolder={state.createFolder}
+            onDeleteFolder={state.deleteFolder}
+            onMoveAsset={state.moveAsset}
+            stockPhotos={state.stockPhotos}
+            stockVideos={state.stockVideos}
+            discLoading={state.discLoading}
+            onSaveToLibrary={state.saveToLibrary}
+            onEditImage={handleEditImage}
           />
         )}
       </div>
 
-      {/* Selection banner — bottom */}
-      {state.selMode && (
-        <SelectionBanner
-          count={state.selectedKeys.size}
-          onExit={state.toggleSelMode}
-          onDelete={() => {
-            const selectedItems = state.libraryItems.filter((i) => state.selectedKeys.has(i.key));
-            state.requestBulkDelete(selectedItems);
-          }}
+      {/* 5. Upload Zone (Library only) */}
+      {!isDisc && (
+        <UploadZone
+          storage={state.storage}
+          onUpload={state.upload}
+          uploadQueue={state.uploadQueue}
+          disabled={state.storage.used >= state.storage.total}
         />
       )}
 
-      {/* Item action bar (t8D67) — shown when item is right-clicked */}
-      {!state.selMode && actionBarItem && (
-        <div className="med-action-bar">
-          <span className="med-action-bar-name">{actionBarItem.name}</span>
-          <span className="med-strip-spacer" />
-          <button className="med-action-btn" onClick={() => state.openDetail(actionBarItem)}>Preview</button>
-          <button className="med-action-btn" onClick={() => state.openDetail(actionBarItem)}>Rename</button>
-          <button className="med-action-btn med-action-btn--danger" onClick={() => {
-            state.requestDelete(actionBarItem.key);
-            setActionBarItem(null);
-          }}>Delete</button>
+      {/* Drag Feedback Overlay */}
+      {state.panelDragOver && (
+        <div className="med-drag-overlay">
+          <Upload size={24} />
+          <div className="med-drag-label">Drop to upload to Library</div>
         </div>
       )}
 
-      {/* Context menu */}
+      {/* Action Modals */}
       {state.ctxMenu && (
-        <>
-          <div
-            ref={ctxMenuRef}
-            className="med-ctx-menu"
-            style={{ left: state.ctxMenu.x, top: state.ctxMenu.y }}
-            role="menu"
-            aria-label="Asset options"
-          >
-            <button className="med-ctx-item" role="menuitem" tabIndex={-1}
-              onClick={() => { state.copyUrl(state.ctxMenu!.item.src); state.closeCtxMenu(); }}>
-              Copy URL
-            </button>
-            <button className="med-ctx-item" role="menuitem" tabIndex={-1}
-              onClick={() => {
-                navigator.clipboard?.writeText(state.ctxMenu!.item.name).catch(() => {});
-                state.closeCtxMenu();
-              }}>
-              Copy Name
-            </button>
-            <button className="med-ctx-item" role="menuitem" tabIndex={-1}
-              onClick={() => { state.openDetail(state.ctxMenu!.item); state.closeCtxMenu(); }}>
-              Rename...
-            </button>
-            <div className="med-ctx-sep" />
-            <button className="med-ctx-item med-ctx-item--danger" role="menuitem" tabIndex={-1}
-              onClick={() => { state.requestDelete(state.ctxMenu!.item.key); state.closeCtxMenu(); }}>
-              Delete
-            </button>
-          </div>
-          <div className="med-ctx-backdrop" onClick={state.closeCtxMenu} aria-hidden="true" />
-        </>
+        <MediaContextMenu
+          x={state.ctxMenu.x}
+          y={state.ctxMenu.y}
+          item={state.ctxMenu.item}
+          folders={state.folders}
+          onRename={state.openDetail}
+          onMove={(item, fid) => state.moveAsset(item.key, fid)}
+          onDelete={(item) => state.requestDelete(item.key)}
+          onCopyUrl={state.copyUrl}
+          onClose={state.closeCtxMenu}
+          onEditImage={handleEditImage}
+        />
       )}
 
-      {/* Overlays */}
       {state.confirmDelete && (
         <ConfirmDeleteModal
           payload={state.confirmDelete}
@@ -316,8 +303,13 @@ function MediaTabInner({
           item={state.detailItem}
           onInsert={state.insertToCanvas}
           onRename={state.renameItem}
-          onDelete={(key) => { state.requestDelete(key); state.closeDetail(); }}
+          onUpdate={state.updateItem}
+          onDelete={(key) => {
+            state.requestDelete(key);
+            state.closeDetail();
+          }}
           onClose={state.closeDetail}
+          onEditImage={handleEditImage}
         />
       )}
     </div>
