@@ -97,6 +97,9 @@ export interface MediaAsset {
   /** Display name */
   name: string;
 
+  /** Alt text for accessibility/SEO */
+  altText?: string;
+
   /** Original file name */
   readonly originalName: string;
 
@@ -117,6 +120,9 @@ export interface MediaAsset {
 
   /** Height in pixels (for images/videos) */
   readonly height?: number;
+
+  /** Asset origin: uploaded by user, saved from stock, or AI-generated */
+  assetSource?: "uploaded" | "stock" | "ai";
 
   /** User-defined tags for organization */
   tags: string[];

@@ -46,6 +46,10 @@ export const EVENTS = {
   ELEMENT_ADD_LINK: "element:add-link",
   /** Replace the image of an image element */
   ELEMENT_CHANGE_IMAGE: "element:change-image",
+  /** New media element inserted (from ElementManager.insertMedia) */
+  ELEMENT_INSERTED: "element:inserted",
+  /** Empty media element needs an asset (Build tab → Media tab contract) */
+  ELEMENT_NEEDS_ASSET: "element:needs-asset",
   /** Edit alt text of an image element */
   ELEMENT_EDIT_ALT: "element:edit-alt",
 
@@ -53,6 +57,8 @@ export const EVENTS = {
   // Layer Panel Events
   // ============================================
   LAYER_HOVER: "layer:hover",
+  /** Fired after toggling layer visibility — carries undo action */
+  LAYER_VISIBILITY_TOGGLED: "layer:visibility-toggled",
 
   // ============================================
   // Selection Events
@@ -99,6 +105,15 @@ export const EVENTS = {
   VERSION_EXPORTED: "version:exported",
   VERSION_IMPORTED: "version:imported",
   VERSION_LIST_UPDATED: "version:list:updated",
+  VERSION_LOAD_ERROR: "version:load:error",
+  /** Emitted by VersionRow on mouseenter after 300ms — consumed by VersionHistoryManager */
+  VERSION_PREVIEW: "version:preview",
+  /** Emitted by VersionRow on mouseleave — consumed by VersionHistoryManager */
+  VERSION_PREVIEW_CLEAR: "version:preview-clear",
+  /** Emitted by VersionHistoryManager once preview snapshot is applied to canvas */
+  VERSION_PREVIEW_STARTED: "version:preview:started",
+  /** Emitted by VersionHistoryManager once original state is restored after preview */
+  VERSION_PREVIEW_CLEARED: "version:preview:cleared",
 
   // ============================================
   // Component Events (AQUI-027)
@@ -486,6 +501,7 @@ export interface EventPayloads {
 
   // Layer Panel Events
   [EVENTS.LAYER_HOVER]: { id: string | null };
+  [EVENTS.LAYER_VISIBILITY_TOGGLED]: { id: string; hidden: boolean; undo: () => void };
 
   // Selection Events
   [EVENTS.SELECTION_CHANGED]: { selected: string[] };
@@ -508,6 +524,11 @@ export interface EventPayloads {
   [EVENTS.VERSION_EXPORTED]: import("../types/versions").VersionExportPayload;
   [EVENTS.VERSION_IMPORTED]: import("../types/versions").VersionExportPayload;
   [EVENTS.VERSION_LIST_UPDATED]: { versions: import("../types/versions").NamedVersion[] };
+  [EVENTS.VERSION_LOAD_ERROR]: { error: string };
+  [EVENTS.VERSION_PREVIEW]: { versionId: string; snapshot: import("../types").ProjectData };
+  [EVENTS.VERSION_PREVIEW_CLEAR]: Record<string, never>;
+  [EVENTS.VERSION_PREVIEW_STARTED]: { versionId: string };
+  [EVENTS.VERSION_PREVIEW_CLEARED]: void;
 
   // Component Events (AQUI-027)
   [EVENTS.COMPONENT_CREATED]: import("../types/components").ComponentCreatedPayload;

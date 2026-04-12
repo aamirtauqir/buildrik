@@ -225,6 +225,107 @@ export class ElementManager {
     return element.getDescendants();
   }
 
+  // ============================================
+  // Media Operations
+  // ============================================
+
+  /**
+   * Insert a media element onto the active page.
+   * Creates the right element type based on the media asset type,
+   * sets its src, and adds it to the page root.
+   * Returns the new element's ID, or null if the page has no root.
+   */
+  insertMedia(
+    src: string,
+    type: "image" | "video" | "audio" | "svg" | "icon" | "lottie"
+  ): string | null {
+    const page = this.getActivePage();
+    if (!page) return null;
+
+    const elementTypeMap: Record<string, ElementData["type"]> = {
+      image: "image",
+      video: "video",
+      audio: "audio",
+      svg: "svg",
+      icon: "icon",
+      lottie: "lottie",
+    };
+
+    const elementType = elementTypeMap[type];
+    if (!elementType) return null;
+
+    const element = this.createElement(elementType, {
+      attributes: { src },
+      styles: type === "image" || type === "video"
+        ? { width: "auto", "max-width": "100%" }
+        : {},
+    });
+
+    const rootId = page.root?.id;
+    if (!rootId) return null;
+
+    // Smart insert: selected empty container > selected parent > root
+    let parentId = rootId;
+    let insertIndex: number | undefined;
+
+    const selectedIds = this.composer.selection?.getSelectedIds?.() ?? [];
+    if (selectedIds.length === 1) {
+      const sel = this.getElement(selectedIds[0]);
+      if (sel) {
+        // If selected element is a container without src (empty block), insert into it
+        const selSrc = sel.getAttribute("src");
+        const selChildren = sel.getChildren?.() ?? [];
+        if (!selSrc && selChildren.length === 0) {
+          parentId = sel.getId();
+        } else {
+          // Insert after the selected element's position in its parent
+          const parent = sel.getParent();
+          if (parent) {
+            const siblings = parent.getChildren();
+            const idx = siblings.findIndex((c) => c.getId() === sel.getId());
+            parentId = parent.getId();
+            insertIndex = idx >= 0 ? idx + 1 : undefined;
+          }
+        }
+      }
+    }
+
+    const added = this.addElement(element, parentId, insertIndex);
+    if (!added) return null;
+
+    this.composer.emit("element:inserted", {
+      elementId: element.getId(),
+      type: elementType,
+      src,
+    });
+
+    return element.getId();
+  }
+
+  /**
+   * Find all elements on the active page that reference a given media src.
+   * Checks both the `src` attribute and `background-image` CSS property.
+   */
+  findByMediaSrc(src: string): Element[] {
+    const results: Element[] = [];
+    if (!src) return results;
+
+    for (const element of this.elements.values()) {
+      const elSrc = element.getAttribute("src");
+      if (elSrc === src) {
+        results.push(element);
+        continue;
+      }
+
+      const bgImage = element.getStyle("background-image");
+      if (bgImage && bgImage.includes(src)) {
+        results.push(element);
+      }
+    }
+
+    return results;
+  }
+
   /**
    * Clear all elements
    */

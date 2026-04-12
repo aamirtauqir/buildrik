@@ -10,7 +10,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { Composer } from "../../../../../engine/Composer";
 import { STORAGE_QUOTA_BYTES } from "../../../../../shared/constants/media";
 import { useToast } from "../../../../../shared/ui/Toast";
-import type { CtxMenuState, LibraryItem, MediaStateResult, MediaSource, MediaTypeFilter } from "../data/mediaTypes";
+import type { CtxMenuState, LibraryItem, MediaStateResult, MediaTypeFilter } from "../data/mediaTypes";
 import { useLibraryState } from "./useLibraryState";
 import { useSelectionState } from "./useSelectionState";
 import { useUploadState } from "./useUploadState";
@@ -27,7 +27,6 @@ export function useMediaState(composer: Composer): MediaStateResult {
   );
 
   // Navigation
-  const [source, setSource] = useState<MediaSource>("mine");
   const [detailItem, setDetailItem] = useState<LibraryItem | null>(null);
   const [ctxMenu, setCtxMenu] = useState<CtxMenuState | null>(null);
   const [selectionContext, setSelectionContext] = useState<{ elementId: string; label?: string } | null>(null);
@@ -43,20 +42,48 @@ export function useMediaState(composer: Composer): MediaStateResult {
     const handler = (data: { elementId: string; label?: string }) => {
       setSelectionContext(data);
       
-      // Semantic Search: Use label/context to pre-fill discovery search
+      // Semantic Search: Use label/context to pre-fill library search
       if (data.label && data.label.length > 2) {
-        discovery.discSearchAll(data.label);
-        setSource("disc"); // Open discovery tab for AI suggestions
-      } else {
-        setSource("mine"); // Default to library if no context
+        library.setLibrarySearch(data.label);
       }
       
       // Open Media Tab in Sidebar
       composer.emit("ui:switch-tab", { tab: "assets" });
     };
     composer.on("ui:media-selection-request", handler);
-    return () => composer.off("ui:media-selection-request", handler);
-  }, [composer, discovery]);
+
+    // Build tab contract: empty media element dropped → open Media picker
+    const needsAssetHandler = (data: { elementId: string; type: string }) => {
+      setSelectionContext({ elementId: data.elementId, label: data.type });
+      library.setActiveType(
+        data.type === "image" ? "img"
+          : data.type === "video" ? "vid"
+          : data.type === "icon" ? "ico"
+          : "all"
+      );
+      composer.emit("ui:switch-tab", { tab: "assets" });
+    };
+    composer.on("element:needs-asset", needsAssetHandler);
+
+    // Contextual panel: when canvas selection changes, hint the type filter
+    const selectionHandler = (data: { id?: string; type?: string }) => {
+      if (!data.type) return;
+      const typeMap: Record<string, typeof library.activeType> = {
+        image: "img", video: "vid", icon: "ico", svg: "img",
+      };
+      const mapped = typeMap[data.type];
+      if (mapped && library.activeType === "all") {
+        library.setActiveType(mapped);
+      }
+    };
+    composer.on("element:selected", selectionHandler);
+
+    return () => {
+      composer.off("ui:media-selection-request", handler);
+      composer.off("element:needs-asset", needsAssetHandler);
+      composer.off("element:selected", selectionHandler);
+    };
+  }, [composer, library]);
 
   const autoSaveStockToLibrary = useCallback(async (src: string, name: string) => {
     try {
@@ -124,9 +151,16 @@ export function useMediaState(composer: Composer): MediaStateResult {
             setSelectionContext(null);
           }
         } else {
-          // STANDARD MODE: Insert new element via command layer
-          const mediaType = asset.type === "fnt" ? "image" : asset.type as
-            "image" | "video" | "audio" | "svg" | "icon" | "lottie";
+          // STANDARD MODE: Insert new element via command layer (type-aware)
+          const typeMap: Record<string, "image" | "video" | "audio" | "svg" | "icon" | "lottie"> = {
+            img: "image", image: "image",
+            vid: "video", video: "video",
+            aud: "audio", audio: "audio",
+            ico: "icon", icon: "icon",
+            svg: "svg",
+            lottie: "lottie",
+          };
+          const mediaType = typeMap[asset.type] || "image";
           const result = composer.mediaCommands.insertMedia(asset.src, mediaType);
           if (result) {
             const insertedEl = composer.elements.getElement(result.elementId);
@@ -185,8 +219,6 @@ export function useMediaState(composer: Composer): MediaStateResult {
   return {
     // Navigation
     activeType: library.activeType,
-    source,
-    setSource,
     currentFolderId: library.currentFolderId,
     setCurrentFolderId: library.setCurrentFolderId,
 
@@ -196,6 +228,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
     createFolder: library.createFolder,
     deleteFolder: library.deleteFolder,
     moveAsset: library.moveAsset,
+    bulkMoveAssets: library.bulkMoveAssets,
     uploadQueue: upload.uploadQueue,
     counts: library.counts,
     sort: library.sort,
@@ -232,6 +265,10 @@ export function useMediaState(composer: Composer): MediaStateResult {
     discoverySearch: discovery.discoverySearch,
     isDiscoveryEmpty: discovery.isDiscoveryEmpty,
     discSearchAll: discovery.discSearchAll,
+    discOrientation: discovery.discOrientation,
+    discColor: discovery.discColor,
+    setDiscOrientation: discovery.setDiscOrientation,
+    setDiscColor: discovery.setDiscColor,
     loadMoreDisc: discovery.loadMoreDisc,
     saveToLibrary: discovery.saveToLibrary,
 

@@ -54,6 +54,7 @@ export interface LibraryItem {
   altText?: string;
   createdAt: string;
   mimeType: string;
+  assetSource?: "uploaded" | "stock" | "ai";
 }
 
 // --- Delete confirmation ---
@@ -85,6 +86,13 @@ export interface CtxMenuState {
 export interface LibraryStateResult {
   rawAssets: MediaAsset[];
   libraryItems: LibraryItem[];
+  folders: MediaFolder[];
+  currentFolderId: string | null;
+  setCurrentFolderId(id: string | null): void;
+  createFolder(name: string): Promise<void>;
+  deleteFolder(id: string): Promise<void>;
+  moveAsset(assetId: string, folderId: string | null): Promise<void>;
+  bulkMoveAssets(assetIds: string[], folderId: string | null): Promise<void>;
   counts: TypeCounts;
   sort: MediaSortBy;
   sortDir: SortDirection;
@@ -149,8 +157,7 @@ export interface DiscoveryStateResult {
 export interface MediaStateResult {
   // Navigation
   activeType: MediaTypeFilter;
-  source: MediaSource;
-  setSource(s: MediaSource): void;
+  setType(t: MediaTypeFilter): void;
   currentFolderId: string | null;
   setCurrentFolderId(id: string | null): void;
 
@@ -160,6 +167,7 @@ export interface MediaStateResult {
   createFolder(name: string): Promise<void>;
   deleteFolder(id: string): Promise<void>;
   moveAsset(assetId: string, folderId: string | null): Promise<void>;
+  bulkMoveAssets(assetIds: string[], folderId: string | null): Promise<void>;
   uploadQueue: UploadProgress[];
   counts: TypeCounts;
   sort: MediaSortBy;
@@ -184,6 +192,7 @@ export interface MediaStateResult {
   confirmDelete: ConfirmDeletePayload | null;
   insertToCanvas(key: string): void;
   renameItem(key: string, name: string): Promise<void>;
+  updateItem(key: string, updates: Partial<LibraryItem>): Promise<void>;
 
   // Discovery
   stockPhotos: StockPhoto[];
@@ -223,6 +232,10 @@ export interface MediaStateResult {
   detailItem: LibraryItem | null;
   openDetail(item: LibraryItem): void;
   closeDetail(): void;
+
+  // Selection context (canvas → media replace flow)
+  selectionContext: { elementId: string; label?: string } | null;
+  setSelectionContext(ctx: { elementId: string; label?: string } | null): void;
 }
 
 // --- Prop slices ---

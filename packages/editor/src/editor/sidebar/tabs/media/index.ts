@@ -5,4 +5,4 @@
  */
 
 export { MediaTab } from "./MediaTab";
-export type { MediaSource, MediaTypeFilter, LibraryItem } from "./data/mediaTypes";
+export type { MediaTypeFilter, LibraryItem } from "./data/mediaTypes";

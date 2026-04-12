@@ -14,11 +14,19 @@ const TemplatesTab = React.lazy(() => import("./tabs/templates/TemplatesTab"));
 const DesignSystemTab = React.lazy(() => import("./tabs/DesignSystemTab"));
 const SettingsTab = React.lazy(() => import("./tabs/settings/SettingsTab"));
 const HistoryTab = React.lazy(() => import("./tabs/history/HistoryTab"));
+const LibraryManager = React.lazy(() =>
+  import("../media/LibraryManager").then((m) => ({ default: m.LibraryManager }))
+);
 
 /** Props shared across all fullpage tabs (no pin concept in fullpage mode) */
 export interface FullPageCommonProps {
   onHelpClick: () => void;
   onClose: () => void;
+  onOpenImageEditor?: (imageSrc: string, onSave: (editedSrc: string) => void) => void;
+  onOpenIconPicker?: (
+    currentIcon: IconConfig | undefined,
+    onSelect: (icon: IconConfig) => void
+  ) => void;
 }
 
 export interface FullPageRouterProps {
@@ -29,7 +37,6 @@ export interface FullPageRouterProps {
   onReplayTour?: () => void;
   projectId?: string | null;
   onSettingsDirtyChange?: (dirty: boolean) => void;
-  onTemplatesSwitchTab?: (tab: string) => void;
 }
 
 export const FullPageRouter: React.FC<FullPageRouterProps> = ({
@@ -40,7 +47,6 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
   onReplayTour,
   projectId,
   onSettingsDirtyChange,
-  onTemplatesSwitchTab,
 }) => {
   switch (activeTab) {
     case "templates":
@@ -48,7 +54,6 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
         <TemplatesTab
           composer={composer}
           onTemplateUsed={onSwitchToAdd}
-          onSwitchTab={onTemplatesSwitchTab}
           {...commonTabProps}
         />
       );
@@ -69,6 +74,16 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
 
     case "history":
       return <HistoryTab composer={composer} {...commonTabProps} projectId={projectId} />;
+
+    case "assets":
+      return composer ? (
+        <LibraryManager
+          composer={composer}
+          onClose={commonTabProps.onClose}
+          onOpenImageEditor={commonTabProps.onOpenImageEditor}
+          onOpenIconPicker={commonTabProps.onOpenIconPicker}
+        />
+      ) : null;
 
     default:
       return null;

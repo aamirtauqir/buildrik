@@ -9,7 +9,7 @@ import type { Composer } from "../../../../../engine/Composer";
 import { MEDIA_EVENTS } from "../../../../../shared/constants/media";
 import { STORAGE_KEYS } from "../../../../../shared/constants/storageKeys";
 import type { MediaSortBy, SortDirection } from "../../../../../shared/types/media";
-import type { LibraryStateResult, MediaTypeFilter } from "../data/mediaTypes";
+import type { LibraryItem, LibraryStateResult, MediaTypeFilter } from "../data/mediaTypes";
 import {
   countByType,
   filterByFmt,
@@ -20,6 +20,8 @@ import {
 
 export function useLibraryState(composer: Composer): LibraryStateResult {
   const [rawAssets, setRawAssets] = useState(() => composer.media.getAssets());
+  const [folders, setFolders] = useState(() => composer.media.getFolders());
+  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [sort, setSort_] = useState<MediaSortBy>(
     () => (localStorage.getItem(STORAGE_KEYS.MEDIA_SORT) as MediaSortBy | null) ?? "date"
   );
@@ -39,16 +41,27 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
   // Subscribe to engine events
   useEffect(() => {
     const reload = () => setRawAssets([...composer.media.getAssets()]);
+    const reloadFolders = () => setFolders([...composer.media.getFolders()]);
+
     reload();
+    reloadFolders();
+
     composer.media.on(MEDIA_EVENTS.MEDIA_ADDED, reload);
     composer.media.on(MEDIA_EVENTS.MEDIA_UPDATED, reload);
     composer.media.on(MEDIA_EVENTS.MEDIA_DELETED, reload);
     composer.media.on(MEDIA_EVENTS.UPLOAD_COMPLETE, reload);
+
+    composer.media.on(MEDIA_EVENTS.FOLDER_CREATED, reloadFolders);
+    composer.media.on(MEDIA_EVENTS.FOLDER_DELETED, reloadFolders);
+
     return () => {
       composer.media.off(MEDIA_EVENTS.MEDIA_ADDED, reload);
       composer.media.off(MEDIA_EVENTS.MEDIA_UPDATED, reload);
       composer.media.off(MEDIA_EVENTS.MEDIA_DELETED, reload);
       composer.media.off(MEDIA_EVENTS.UPLOAD_COMPLETE, reload);
+
+      composer.media.off(MEDIA_EVENTS.FOLDER_CREATED, reloadFolders);
+      composer.media.off(MEDIA_EVENTS.FOLDER_DELETED, reloadFolders);
     };
   }, [composer]);
 
@@ -56,7 +69,14 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
 
   const libraryItems = useMemo(() => {
     const d = sortDir === "asc" ? 1 : -1;
-    const byType = filterByType(allLibraryItems, activeType);
+    
+    // Filter by folder first
+    const inFolder = allLibraryItems.filter(i => {
+      const raw = rawAssets.find(ra => ra.id === i.key);
+      return (raw?.folderId || null) === currentFolderId;
+    });
+
+    const byType = filterByType(inFolder, activeType);
     const byFmt = filterByFmt(byType, fmtFilter);
     const bySearch = filterBySearch(byFmt, librarySearch);
     return [...bySearch].sort((a, b) => {
@@ -106,6 +126,39 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
 
   const setLibrarySearch = useCallback((q: string) => setLibrarySearch_(q), []);
 
+  const createFolder = useCallback(async (name: string) => {
+    await composer.media.createFolder(name, currentFolderId);
+  }, [composer, currentFolderId]);
+
+  const deleteFolder = useCallback(async (id: string) => {
+    // Cascade-delete safety: check for assets in the folder
+    const assetsInFolder = composer.media.getAssets({ folderId: id });
+    const subFolders = composer.media.getFolders(id);
+    if (assetsInFolder.length > 0 || subFolders.length > 0) {
+      const count = assetsInFolder.length;
+      const subCount = subFolders.length;
+      const confirmed = window.confirm(
+        `This folder contains ${count} asset${count !== 1 ? "s" : ""}${
+          subCount > 0 ? ` and ${subCount} subfolder${subCount !== 1 ? "s" : ""}` : ""
+        }. Assets will be moved to the root folder. Delete anyway?`
+      );
+      if (!confirmed) return;
+    }
+    await composer.media.deleteFolder(id);
+  }, [composer]);
+
+  const moveAsset = useCallback(async (assetId: string, folderId: string | null) => {
+    await composer.media.updateAsset(assetId, { folderId: folderId ?? undefined });
+  }, [composer]);
+
+  const bulkMoveAssets = useCallback(async (assetIds: string[], folderId: string | null) => {
+    await Promise.all(
+      assetIds.map((id) =>
+        composer.media.updateAsset(id, { folderId: folderId ?? undefined })
+      )
+    );
+  }, [composer]);
+
   const renameItem = useCallback(
     async (key: string, name: string) => {
       await composer.media.updateAsset(key, { name });
@@ -113,9 +166,26 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     [composer]
   );
 
+  const updateItem = useCallback(
+    async (key: string, updates: Partial<LibraryItem>) => {
+      const assetUpdates: any = {};
+      if (updates.name) assetUpdates.name = updates.name;
+      if (updates.altText !== undefined) assetUpdates.altText = updates.altText;
+      await composer.media.updateAsset(key, assetUpdates);
+    },
+    [composer]
+  );
+
   return {
     rawAssets,
     libraryItems,
+    folders,
+    currentFolderId,
+    setCurrentFolderId,
+    createFolder,
+    deleteFolder,
+    moveAsset,
+    bulkMoveAssets,
     counts,
     sort,
     sortDir,
@@ -129,5 +199,6 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     setFmtFilter,
     setActiveType,
     renameItem,
+    updateItem,
   };
 }

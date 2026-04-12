@@ -6,18 +6,15 @@
  */
 
 import * as React from "react";
-import { Upload } from "lucide-react";
+import { Upload, Plus } from "lucide-react";
 import type { Composer } from "../../../../engine/Composer";
 import { PanelHeader } from "../../shared/PanelHeader";
 import { SearchBar } from "../../shared/SearchBar";
-import { Tabs } from "../../../../shared/ui/Tabs";
 import { AssetDetailOverlay } from "./components/AssetDetailOverlay";
 import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
-import { DiscoveryView } from "./components/DiscoveryView";
 import { LibraryView } from "./components/LibraryView";
 import { MediaContextMenu } from "./components/MediaContextMenu";
-import { OnboardingEmptyState } from "./components/OnboardingEmptyState";
-import { SelectionBanner } from "./components/SelectionBanner";
+import { StockSourceModal } from "./components/StockSourceModal";
 import { TypePills } from "./components/TypePills";
 import { UploadZone } from "./components/UploadZone";
 import { useMediaState } from "./hooks/useMediaState";
@@ -62,8 +59,8 @@ function MediaTabWithComposer({
   onOpenLibrary,
 }: Omit<MediaTabProps, "composer"> & { composer: Composer }) {
   const state = useMediaState(composer);
-  const isDisc = state.source === "disc";
   const { addToast } = useToast();
+  const [stockModalOpen, setStockModalOpen] = React.useState(false);
 
   const showToast = React.useCallback((msg: string, type: "success" | "error" | "info") => {
     addToast({ message: msg, variant: type });
@@ -167,97 +164,72 @@ function MediaTabWithComposer({
         </div>
       )}
 
-      {/* 1. Primary Source Navigation (Full Width) */}
+      {/* 1. Header bar — type pills + stock button + close */}
       <div className="med-tabs-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 48 }}>
-        <Tabs
-          activeTab={state.source}
-          onChange={(id) => state.setSource(id as "mine" | "disc")}
-          tabs={[
-            { id: "mine", label: "My Library" },
-            { id: "disc", label: "Discovery" },
-          ]}
+        <TypePills
+          activeType={state.activeType}
+          counts={state.counts}
+          discMode={false}
+          onTypeChange={state.setType}
         />
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <TypePills
-            activeType={state.activeType}
-            counts={state.counts}
-            discMode={isDisc}
-            onTypeChange={state.setType}
-          />
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button className="med-stock-btn" onClick={() => setStockModalOpen(true)}>
+            <Plus size={14} />
+            Add from Stock
+          </button>
           <div style={{ width: 1, height: 24, background: 'var(--ls-border-light)' }} />
-          <button onClick={onClose} style={{ 
-            background: 'none', border: 'none', color: 'var(--ls-text-subtle)', 
-            cursor: 'pointer', padding: 4, display: 'flex' 
+          <button onClick={onClose} style={{
+            background: 'none', border: 'none', color: 'var(--ls-text-subtle)',
+            cursor: 'pointer', padding: 4, display: 'flex'
           }}>
             <Upload size={18} style={{ transform: 'rotate(180deg)' }} />
           </button>
         </div>
       </div>
 
-      {/* 2. Body Area */}
+      {/* 2. Unified Library */}
       <div className="med-content">
-        {isDisc ? (
-          <DiscoveryView
-            activeType={state.activeType}
-            photos={state.stockPhotos}
-            videos={state.stockVideos}
-            icons={state.discIcons}
-            fonts={state.discFonts}
-            loading={state.discLoading}
-            searchQuery={state.discoverySearch}
-            orientation={state.discOrientation}
-            color={state.discColor}
-            onSearch={state.discSearchAll}
-            onSetOrientation={state.setDiscOrientation}
-            onSetColor={state.setDiscColor}
-            onLoadMore={state.loadMoreDisc}
-            onSave={state.saveToLibrary}
-            onInsert={state.insertToCanvas}
-            onOpenIconPicker={handleOpenIconPicker}
-          />
-        ) : (
-          <LibraryView
-            items={state.libraryItems}
-            uploadQueue={state.uploadQueue}
-            activeType={state.activeType}
-            counts={state.counts}
-            sort={state.sort}
-            sortDir={state.sortDir}
-            gridN={state.gridN}
-            fmtFilter={state.fmtFilter}
-            selMode={state.selMode}
-            selectedKeys={state.selectedKeys}
-            searchQuery={state.librarySearch}
-            onSort={state.setSort}
-            onGridN={state.setGridN}
-            onFmt={state.setFmtFilter}
-            onSelToggle={state.toggleSelMode}
-            onSelect={state.toggleSelect}
-            onSelectAll={state.selectAll}
-            onRequestBulkDelete={state.requestBulkDelete}
-            onRequestDelete={state.requestDelete}
-            onInsert={state.insertToCanvas}
-            onCtxMenu={state.openCtxMenu}
-            onDetail={state.openDetail}
-            onSearchChange={state.setLibrarySearch}
-            folders={state.folders}
-            currentFolderId={state.currentFolderId}
-            setCurrentFolderId={state.setCurrentFolderId}
-            onCreateFolder={state.createFolder}
-            onDeleteFolder={state.deleteFolder}
-            onMoveAsset={state.moveAsset}
-            stockPhotos={state.stockPhotos}
-            stockVideos={state.stockVideos}
-            discLoading={state.discLoading}
-            onSaveToLibrary={state.saveToLibrary}
-            onEditImage={handleEditImage}
-          />
-        )}
+        <LibraryView
+          items={state.libraryItems}
+          uploadQueue={state.uploadQueue}
+          activeType={state.activeType}
+          counts={state.counts}
+          sort={state.sort}
+          sortDir={state.sortDir}
+          gridN={state.gridN}
+          fmtFilter={state.fmtFilter}
+          selMode={state.selMode}
+          selectedKeys={state.selectedKeys}
+          searchQuery={state.librarySearch}
+          onSort={state.setSort}
+          onGridN={state.setGridN}
+          onFmt={state.setFmtFilter}
+          onSelToggle={state.toggleSelMode}
+          onSelect={state.toggleSelect}
+          onSelectAll={state.selectAll}
+          onRequestBulkDelete={state.requestBulkDelete}
+          onRequestDelete={state.requestDelete}
+          onInsert={state.insertToCanvas}
+          onCtxMenu={state.openCtxMenu}
+          onDetail={state.openDetail}
+          onSearchChange={state.setLibrarySearch}
+          folders={state.folders}
+          currentFolderId={state.currentFolderId}
+          setCurrentFolderId={state.setCurrentFolderId}
+          onCreateFolder={state.createFolder}
+          onDeleteFolder={state.deleteFolder}
+          onMoveAsset={state.moveAsset}
+          stockPhotos={state.stockPhotos}
+          stockVideos={state.stockVideos}
+          discLoading={state.discLoading}
+          onSaveToLibrary={state.saveToLibrary}
+          onEditImage={handleEditImage}
+        />
       </div>
 
       {/* 5. Upload Zone (Library only) */}
-      {!isDisc && (
+      {(
         <UploadZone
           storage={state.storage}
           onUpload={state.upload}
@@ -312,6 +284,31 @@ function MediaTabWithComposer({
           onEditImage={handleEditImage}
         />
       )}
+
+      {/* Stock Source Modal — replaces old Discovery tab */}
+      <StockSourceModal
+        open={stockModalOpen}
+        onClose={() => setStockModalOpen(false)}
+        activeType={state.activeType}
+        photos={state.stockPhotos}
+        videos={state.stockVideos}
+        icons={state.discIcons}
+        fonts={state.discFonts}
+        loading={state.discLoading}
+        searchQuery={state.discoverySearch}
+        orientation={state.discOrientation}
+        color={state.discColor}
+        onSearch={state.discSearchAll}
+        onSetOrientation={state.setDiscOrientation}
+        onSetColor={state.setDiscColor}
+        onLoadMore={state.loadMoreDisc}
+        onSave={(type, item) => {
+          state.saveToLibrary(type, item);
+          // Don't close modal — let user save multiple items
+        }}
+        onInsert={state.insertToCanvas}
+        onOpenIconPicker={handleOpenIconPicker}
+      />
     </div>
   );
 }

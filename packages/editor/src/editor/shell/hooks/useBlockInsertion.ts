@@ -12,6 +12,7 @@ import { getBlockDefinitions, insertBlock } from "../../../blocks/blockRegistry"
 import type { Composer } from "../../../engine";
 import type { BlockData } from "../../../shared/types";
 import { useToast } from "../../../shared/ui/Toast";
+import { animateDropSuccess } from "../../../shared/utils/dragDrop/animations";
 import { canNestElement, getSuggestedParents } from "../../../shared/utils/nesting";
 
 export interface UseBlockInsertionResult {
@@ -83,6 +84,23 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
         if (insertedId) {
           const el = composer.elements.getElement(insertedId);
           if (el) composer.selection.select(el);
+          // Post-insert highlight flash — parity with drag-drop success animation.
+          setTimeout(() => {
+            const domEl = document.querySelector(
+              `[data-aqb-id="${insertedId}"]`
+            ) as HTMLElement | null;
+            if (domEl) void animateDropSuccess(domEl);
+          }, 0);
+
+          // Media elements without a src need an asset — open Media tab picker
+          const mediaTypes = new Set(["image", "video", "audio", "icon", "svg", "lottie"]);
+          if (mediaTypes.has(def.elementType) && el && !el.getAttribute("src")) {
+            composer.emit("element:needs-asset", {
+              elementId: insertedId,
+              type: def.elementType,
+            });
+          }
+
           addToast({ message: `Inserted: ${block.label}`, variant: "success", duration: 2000 });
         } else {
           // Build contextual nesting error message
