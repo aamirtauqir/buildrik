@@ -1,0 +1,305 @@
+/**
+ * Image Editor Modal — react-easy-crop + CSS filters
+ * @license BSD-3-Clause
+ */
+
+.ie-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.ie-modal {
+  width: min(1100px, 95vw);
+  height: min(720px, 90vh);
+  background: var(--ls-bg-panel, #F8FAFC);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ─── Header ──────────────────────────────────── */
+
+.ie-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--ls-border-light, #E2E8F0);
+  background: var(--ls-bg-card, #fff);
+}
+
+.ie-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ls-text-primary, #0F172A);
+}
+
+.ie-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ie-btn-ghost {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1px solid var(--ls-border-soft, #D1D9E6);
+  background: var(--ls-bg-card, #fff);
+  color: var(--ls-text-medium, #475569);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.ie-btn-ghost:hover { background: var(--ls-bg-subtle, #F1F5F9); }
+
+.ie-btn-primary {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 6px;
+  border: 1px solid var(--ls-accent, #1D4ED8);
+  background: var(--ls-accent, #1D4ED8);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.ie-btn-primary:hover { filter: brightness(0.92); }
+.ie-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.ie-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--ls-border-soft);
+  background: var(--ls-bg-card);
+  color: var(--ls-text-ghost);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.ie-close:hover { background: var(--ls-bg-subtle); color: var(--ls-text-primary); }
+
+/* ─── Body ────────────────────────────────────── */
+
+.ie-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  min-height: 0;
+}
+
+/* ─── Canvas (left) ───────────────────────────── */
+
+.ie-canvas {
+  position: relative;
+  background: #1a1a2e;
+  overflow: hidden;
+}
+
+.ie-cropper-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+/* Override react-easy-crop container */
+.ie-cropper-wrap .reactEasyCrop_Container {
+  position: absolute;
+  inset: 0;
+}
+
+/* ─── Sidebar (right) ─────────────────────────── */
+
+.ie-sidebar {
+  background: var(--ls-bg-panel);
+  border-left: 1px solid var(--ls-border-light);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ie-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--ls-border-light);
+  padding: 0;
+}
+
+.ie-tab {
+  flex: 1;
+  padding: 10px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ls-text-ghost, #CBD5E1);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.12s;
+}
+.ie-tab:hover { color: var(--ls-text-secondary); }
+.ie-tab.active {
+  color: var(--ls-accent, #1D4ED8);
+  border-bottom-color: var(--ls-accent, #1D4ED8);
+  font-weight: 600;
+}
+
+.ie-controls {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+/* ─── Controls shared ─────────────────────────── */
+
+.ie-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ls-text-ghost);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  margin-top: 16px;
+}
+.ie-section-label:first-child { margin-top: 0; }
+
+.ie-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.ie-slider {
+  flex: 1;
+  height: 4px;
+  appearance: none;
+  background: var(--ls-border-light, #E2E8F0);
+  border-radius: 2px;
+  outline: none;
+}
+.ie-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--ls-accent, #1D4ED8);
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.ie-slider-val {
+  width: 40px;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ls-text-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Crop presets ────────────────────────────── */
+
+.ie-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.ie-preset {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid var(--ls-border-soft);
+  background: var(--ls-bg-card);
+  color: var(--ls-text-medium);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ie-preset:hover { background: var(--ls-bg-subtle); }
+.ie-preset.active {
+  background: var(--ls-accent-bg, #DBEAFE);
+  color: var(--ls-accent-txt, #1E40AF);
+  border-color: var(--ls-accent, #1D4ED8);
+}
+
+/* ─── Transform buttons ──────────────────────── */
+
+.ie-transform-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.ie-tool-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--ls-border-soft);
+  background: var(--ls-bg-card);
+  color: var(--ls-text-medium);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.ie-tool-btn:hover { background: var(--ls-bg-subtle); }
+.ie-tool-btn.active {
+  background: var(--ls-accent-bg);
+  color: var(--ls-accent-txt);
+  border-color: var(--ls-accent);
+}
+
+/* ─── Resize ──────────────────────────────────── */
+
+.ie-resize-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ie-resize-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ls-text-ghost);
+}
+.ie-resize-field input {
+  width: 80px;
+  height: 32px;
+  border: 1px solid var(--ls-border-soft);
+  border-radius: 4px;
+  background: var(--ls-bg-card);
+  color: var(--ls-text-primary);
+  font-size: 13px;
+  padding: 0 8px;
+  text-align: center;
+  outline: none;
+}
+.ie-resize-field input:focus {
+  border-color: var(--ls-accent);
+}
+
+.ie-resize-x {
+  font-size: 14px;
+  color: var(--ls-text-ghost);
+}
