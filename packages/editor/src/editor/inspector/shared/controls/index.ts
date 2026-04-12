@@ -13,7 +13,7 @@ export type { ControlRowProps, SubTitleProps } from "./ControlRow";
 
 // Section wrapper
 export { Section } from "./Section";
-export type { SectionProps } from "./Section";
+export type { SectionProps, SectionTier } from "./Section";
 
 // Input controls
 export { InputRow, InputWithUnit, SelectRow } from "./InputControls";
@@ -34,6 +34,10 @@ export type { SliderInputProps, RangeSliderProps } from "./SliderControls";
 // Spacing controls
 export { FourSideInput, CornerRadiusInput } from "./SpacingControls";
 export type { FourSideInputProps, CornerRadiusInputProps } from "./SpacingControls";
+
+// Linked gap input (flex + grid)
+export { LinkedGapInput } from "./LinkedGapInput";
+export type { LinkedGapInputProps } from "./LinkedGapInput";
 
 // Alignment grid
 export { AlignmentGrid } from "./AlignmentGrid";

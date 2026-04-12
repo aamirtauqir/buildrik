@@ -25,7 +25,10 @@
 :root {
   --layout-rail-width: var(--aqb-sidebar-width, 60px);
   --layout-drawer-width: var(--aqb-sidebar-panel-width, 280px);
-  --layout-inspector-width: var(--aqb-right-panel-width, 280px);
+  /* Inspector: widened from 280 → 320 so labels + inputs + units breathe.
+     At 280px with 16px padding × 2 and a 64px label column, inputs had <170px —
+     multi-button groups and unit pickers were crushed. */
+  --layout-inspector-width: var(--aqb-right-panel-width, 320px);
   --layout-topbar-height: var(--aqb-header-height, 52px);
   --layout-footer-height: var(--aqb-footer-height, 40px);
   --layout-gap: var(--aqb-space-3, 12px);
@@ -170,7 +173,7 @@
    Sidebar (merged rail + panel)
    ============================================ */
 .layout-shell__sidebar {
-  grid-area: rail / rail / rail / drawer;
+  grid-area: rail;
   display: flex;
   flex-direction: row;
   overflow: hidden;

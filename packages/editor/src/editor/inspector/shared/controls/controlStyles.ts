@@ -43,35 +43,37 @@ export const baseStyles = {
   section: {
     borderBottom: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
   },
+  // Calmer header: bigger hit area, no hard inner divider when open, no loud
+  // left accent bar. The section's own borderBottom provides the only divider.
   sectionHeader: (isOpen: boolean): React.CSSProperties => ({
     width: "100%",
-    padding: isOpen ? "7px 12px 7px 10px" : "7px 12px",
+    padding: "10px 14px",
     background: "transparent",
-    borderBottom: isOpen ? `1px solid ${INSPECTOR_TOKENS.borderSubtle}` : "none",
-    borderLeft: isOpen ? `2px solid ${INSPECTOR_TOKENS.accent}` : "2px solid transparent",
-    color: isOpen ? INSPECTOR_TOKENS.accent : INSPECTOR_TOKENS.textSecondary,
-    fontSize: 11,
+    border: "none",
+    color: isOpen ? INSPECTOR_TOKENS.textPrimary : INSPECTOR_TOKENS.textSecondary,
+    fontSize: 12,
     fontWeight: 600,
+    letterSpacing: "0.01em",
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    transition: "all 0.2s",
+    transition: "color 0.15s",
   }),
   sectionContent: {
-    padding: "8px 12px",
+    padding: "4px 14px 14px",
   },
   row: {
     display: "flex" as const,
     alignItems: "center" as const,
-    gap: 6,
-    marginBottom: 4,
+    gap: 8,
+    marginBottom: 8,
   },
   label: {
-    fontSize: 11.5,
+    fontSize: 12,
     color: INSPECTOR_TOKENS.textTertiary,
     fontWeight: 500,
-    minWidth: 64,
+    minWidth: 60,
     flexShrink: 0,
   },
   input: {

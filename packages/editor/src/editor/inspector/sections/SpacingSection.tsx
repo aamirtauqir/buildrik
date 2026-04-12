@@ -3,13 +3,19 @@
  */
 
 import * as React from "react";
-import { Section, FourSideInput, InputWithUnit, MoreSettingsToggle } from "../shared/controls";
+import { Section, FourSideInput, InputWithUnit, MoreSettingsToggle, type SectionTier } from "../shared/controls";
 
-interface SpacingSectionProps {
+export interface SpacingSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
   onBatchChange: (changes: Record<string, string>) => void;
   propertyStates?: Record<string, { hidden?: boolean; disabled?: boolean; reason?: string }>;
+  /** Controlled open state for auto-expand functionality */
+  isOpen?: boolean;
+  /** Called when the section header is toggled */
+  onToggle?: (open: boolean) => void;
+  /** Visual weight tier — threaded from the registry-driven renderer. */
+  tier?: SectionTier;
   /** Whether advanced settings (row-gap, column-gap) are expanded */
   advancedExpanded?: boolean;
   /** Called when the More settings toggle is clicked */
@@ -21,6 +27,9 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
   onChange,
   onBatchChange,
   propertyStates = {},
+  isOpen,
+  onToggle,
+  tier = "secondary",
   advancedExpanded = false,
   onAdvancedToggle,
 }) => {
@@ -114,8 +123,52 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
   const disabledMargin = (side: string) => propertyStates[`margin-${side}`];
   const disabledPadding = (side: string) => propertyStates[`padding-${side}`];
 
+  // Collapsed preview: "m:16 p:8" summary. Collapses the four sides into the
+  // single shorthand if all sides match; otherwise shows "mixed".
+  const collapseSides = (t: string, r: string, b: string, l: string): string | null => {
+    if (!t && !r && !b && !l) return null;
+    if (t === r && r === b && b === l && t) return t;
+    return "·";
+  };
+  const marginSummary = collapseSides(
+    marginValues.top,
+    marginValues.right,
+    marginValues.bottom,
+    marginValues.left
+  );
+  const paddingSummary = collapseSides(
+    paddingValues.top,
+    paddingValues.right,
+    paddingValues.bottom,
+    paddingValues.left
+  );
+  const spacingPreview =
+    marginSummary || paddingSummary ? (
+      <span
+        style={{
+          fontSize: 11,
+          color: "var(--aqb-text-tertiary)",
+          fontFamily: "var(--aqb-font-mono)",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {marginSummary ? `m:${marginSummary}` : ""}
+        {marginSummary && paddingSummary ? " " : ""}
+        {paddingSummary ? `p:${paddingSummary}` : ""}
+      </span>
+    ) : undefined;
+
   return (
-    <Section title="Spacing" icon="MoveHorizontal" defaultOpen id="inspector-section-spacing">
+    <Section
+      title="Spacing"
+      icon="MoveHorizontal"
+      defaultOpen
+      isOpen={isOpen}
+      onToggle={onToggle}
+      preview={spacingPreview}
+      tier={tier}
+      id="inspector-section-spacing"
+    >
       {/* Margin Controls */}
       <FourSideInput
         label="Margin"

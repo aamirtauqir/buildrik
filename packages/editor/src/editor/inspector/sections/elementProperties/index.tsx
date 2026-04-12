@@ -7,7 +7,7 @@
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../../../shared/types/media";
-import { Section } from "../../shared/controls";
+import { Section, type SectionTier } from "../../shared/controls";
 import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 import { getPropertiesForType } from "./config";
 import { DataAttributeEditor } from "./DataAttributeEditor";
@@ -75,6 +75,10 @@ export interface ElementPropertiesSectionProps {
   composer?: Composer | null;
   /** Controlled open state for auto-expand functionality */
   isOpen?: boolean;
+  /** Called when the section header is toggled. */
+  onToggle?: (open: boolean) => void;
+  /** Visual weight tier — threaded from the registry-driven renderer. */
+  tier?: SectionTier;
   /** Opens media library for asset selection */
   onOpenMediaLibrary?: (
     allowedTypes: MediaAssetType[],
@@ -128,6 +132,8 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
   selectedElement,
   composer,
   isOpen,
+  onToggle,
+  tier = "secondary",
   onOpenMediaLibrary,
   onOpenIconPicker,
 }) => {
@@ -262,6 +268,8 @@ export const ElementPropertiesSection: React.FC<ElementPropertiesSectionProps> =
       icon="Settings"
       defaultOpen
       isOpen={isOpen}
+      onToggle={onToggle}
+      tier={tier}
       id="inspector-section-element-properties"
     >
       {/* Icon Picker Button for icon elements */}

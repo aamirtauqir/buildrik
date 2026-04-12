@@ -18,6 +18,10 @@ export interface UseAdvancedSettingsOptions {
   searchQuery?: string;
   /** List of advanced property IDs per group for search matching */
   advancedPropsMap?: Record<string, string[]>;
+  /** Current element styles — used to auto-expand groups whose advanced props have values */
+  styles?: Record<string, string>;
+  /** Selected element id — auto-expand runs once per element so user collapses stick */
+  elementId?: string | null;
 }
 
 export interface UseAdvancedSettingsReturn {
@@ -69,11 +73,16 @@ function matchesAdvancedProps(
 export function useAdvancedSettings(
   options: UseAdvancedSettingsOptions = {}
 ): UseAdvancedSettingsReturn {
-  const { defaultExpanded = [], searchQuery, advancedPropsMap } = options;
+  const { defaultExpanded = [], searchQuery, advancedPropsMap, styles, elementId } = options;
 
   const [expandedGroups, setExpandedGroups] = React.useState<Set<string>>(
     () => new Set(defaultExpanded)
   );
+
+  // Track which element IDs we've already auto-expanded for. Running once per
+  // element ID means a user collapse sticks for the rest of that selection —
+  // but re-selecting the element (or selecting a different one) re-computes.
+  const autoExpandedIdsRef = React.useRef<Set<string>>(new Set());
 
   // Auto-expand groups when search matches their advanced props
   React.useEffect(() => {
@@ -94,6 +103,34 @@ export function useAdvancedSettings(
       });
     }
   }, [searchQuery, advancedPropsMap]);
+
+  // Auto-expand groups whose advanced props already have non-empty values. Runs
+  // once per element ID change so user collapses aren't overridden on every render.
+  React.useEffect(() => {
+    if (!elementId || !advancedPropsMap || !styles) return;
+    if (autoExpandedIdsRef.current.has(elementId)) return;
+    autoExpandedIdsRef.current.add(elementId);
+
+    const groupsToExpand: string[] = [];
+    for (const [groupId, props] of Object.entries(advancedPropsMap)) {
+      const hasValue = props.some((prop) => {
+        // advancedPropsMap sometimes uses dotted ids (e.g., "position.zIndex"); match
+        // against the tail of the path, which is the CSS property name.
+        const tail = prop.split(".").pop() ?? prop;
+        const val = styles[tail];
+        return val !== undefined && val !== "" && val !== "0" && val !== "none";
+      });
+      if (hasValue) groupsToExpand.push(groupId);
+    }
+
+    if (groupsToExpand.length > 0) {
+      setExpandedGroups((prev) => {
+        const next = new Set(prev);
+        groupsToExpand.forEach((id) => next.add(id));
+        return next;
+      });
+    }
+  }, [elementId, advancedPropsMap, styles]);
 
   const isExpanded = React.useCallback(
     (groupId: string) => expandedGroups.has(groupId),

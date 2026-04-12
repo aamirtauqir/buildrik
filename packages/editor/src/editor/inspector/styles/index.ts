@@ -79,7 +79,7 @@ export const panelStyles = {
     color: "var(--aqb-text-tertiary)",
   },
   header: {
-    padding: "12px 14px",
+    padding: "10px 14px",
     background: "var(--aqb-surface-2)",
     borderBottom: "1px solid var(--aqb-border)",
     position: "sticky" as const,
@@ -91,19 +91,22 @@ export const panelStyles = {
     alignItems: "center" as const,
     gap: 10,
   },
+  // Compact icon — 36 was visually dominant in a 320px panel and forced the
+  // name/id badges into a cramped column. 28 keeps the element identifiable
+  // without stealing header real estate.
   elementIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
+    width: 28,
+    height: 28,
+    borderRadius: 6,
     background: "var(--aqb-surface-3)",
     display: "flex" as const,
     alignItems: "center" as const,
     justifyContent: "center" as const,
-    fontSize: 18,
+    fontSize: 14,
     flexShrink: 0,
   },
   elementName: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 700,
     color: "var(--aqb-text-primary)",
     marginBottom: 2,

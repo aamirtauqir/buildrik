@@ -13,7 +13,12 @@ import { getDefaultTab } from "../config";
 // TYPES
 // ============================================================================
 
-export type TabName = "layout" | "appearance" | "effects";
+/**
+ * Tab ids — renamed in the Phase 6 restructure from CSS-category axis
+ * (Layout / Appearance / Effects) to concept axis (Style / Element / Effects).
+ * Any persisted old value is migrated once at hook mount.
+ */
+export type TabName = "style" | "element" | "effects";
 
 export type AutoExpandSection =
   | "typography"
@@ -55,7 +60,7 @@ export interface InspectorState {
  * Uses config/elementProfiles.ts as sole source (ARCH-02 fix: ELEMENT_TO_TAB_MAP deleted)
  */
 function getRecommendedTab(elementType: string, _tagName?: string): TabName {
-  return getDefaultTab(elementType) ?? "layout";
+  return getDefaultTab(elementType) ?? "style";
 }
 
 /**
@@ -76,7 +81,7 @@ function getAutoExpandSection(_elementType: string, _tagName?: string): AutoExpa
  * Handles tab navigation, pseudo-state selection, and smart section auto-expand
  */
 export function useInspectorState(selectedElement: SelectedElement | null): InspectorState {
-  const [activeTab, setActiveTab] = useState<TabName>("layout");
+  const [activeTab, setActiveTab] = useState<TabName>("style");
   const [currentPseudoState, setCurrentPseudoState] = useState<PseudoStateId>("normal");
   const [autoExpandSection, setAutoExpandSection] = useState<AutoExpandSection>(null);
   const [devMode, setDevMode] = useState<boolean>(false);

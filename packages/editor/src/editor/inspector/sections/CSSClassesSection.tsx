@@ -9,19 +9,28 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { devWarn } from "../../../shared/utils/devLogger";
 import { runTransaction } from "../../../shared/utils/helpers";
-import { Section } from "../shared/controls";
+import { Section, type SectionTier } from "../shared/controls";
 
-interface CSSClassesSectionProps {
+export interface CSSClassesSectionProps {
   selectedElement: {
     id: string;
     type: string;
   };
   composer?: Composer | null;
+  /** Controlled open state for the section wrapper. */
+  isOpen?: boolean;
+  /** Called when the section header is toggled. */
+  onToggle?: (open: boolean) => void;
+  /** Visual weight tier — threaded from the registry-driven renderer. */
+  tier?: SectionTier;
 }
 
 export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
   selectedElement,
   composer,
+  isOpen,
+  onToggle,
+  tier = "secondary",
 }) => {
   const [newClass, setNewClass] = React.useState("");
   const [showSuggestions, setShowSuggestions] = React.useState(false);
@@ -82,7 +91,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
   }, [newClass, globalClasses, classes]);
 
   return (
-    <Section title="CSS Classes" icon="Tag" defaultOpen id="inspector-section-css-classes">
+    <Section title="CSS Classes" icon="Tag" defaultOpen isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-css-classes">
       {/* Applied Classes */}
       <div style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 12, color: "var(--aqb-text-tertiary)", marginBottom: 8 }}>

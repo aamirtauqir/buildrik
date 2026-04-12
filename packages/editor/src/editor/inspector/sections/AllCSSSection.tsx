@@ -7,7 +7,7 @@
 
 import * as React from "react";
 import type { Composer } from "../../../engine";
-import { Section } from "../shared/controls";
+import { Section, type SectionTier } from "../shared/controls";
 import { INSPECTOR_TOKENS } from "../shared/controls/controlStyles";
 
 // ============================================================================
@@ -20,6 +20,12 @@ export interface AllCSSSectionProps {
     type: string;
   };
   composer: Composer | null | undefined;
+  /** Controlled open state for the section wrapper. */
+  isOpen?: boolean;
+  /** Called when the section header is toggled. */
+  onToggle?: (open: boolean) => void;
+  /** Visual weight tier — threaded from the registry-driven renderer. */
+  tier?: SectionTier;
 }
 
 interface CSSProperty {
@@ -109,7 +115,13 @@ const styles = {
 // COMPONENT
 // ============================================================================
 
-export const AllCSSSection: React.FC<AllCSSSectionProps> = ({ selectedElement, composer }) => {
+export const AllCSSSection: React.FC<AllCSSSectionProps> = ({
+  selectedElement,
+  composer,
+  isOpen,
+  onToggle,
+  tier = "tertiary",
+}) => {
   const [newProperty, setNewProperty] = React.useState("");
   const [newValue, setNewValue] = React.useState("");
 
@@ -162,7 +174,7 @@ export const AllCSSSection: React.FC<AllCSSSectionProps> = ({ selectedElement, c
   };
 
   return (
-    <Section title="All CSS" icon="Code" defaultOpen={false}>
+    <Section title="All CSS" icon="Code" defaultOpen={false} isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-all-css">
       {/* Existing properties */}
       {cssProperties.length === 0 ? (
         <div style={{ color: INSPECTOR_TOKENS.textTertiary, fontSize: 12, padding: "8px 0" }}>

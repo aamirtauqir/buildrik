@@ -8,14 +8,20 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants";
 import type { PageData } from "../../../shared/types";
-import { Section, SelectRow, InputRow } from "../shared/controls";
+import { Section, SelectRow, InputRow, type SectionTier } from "../shared/controls";
 
-interface LinkSectionProps {
+export interface LinkSectionProps {
   selectedElement: {
     id: string;
     type: string;
   };
   composer?: Composer | null;
+  /** Controlled open state for the section wrapper. */
+  isOpen?: boolean;
+  /** Called when the section header is toggled. */
+  onToggle?: (open: boolean) => void;
+  /** Visual weight tier — threaded from the registry-driven renderer. */
+  tier?: SectionTier;
 }
 
 type LinkType = "none" | "page" | "url" | "email" | "phone" | "anchor";
@@ -34,7 +40,13 @@ const TARGET_OPTIONS = [
   { value: "_blank", label: "New Tab" },
 ];
 
-export const LinkSection: React.FC<LinkSectionProps> = ({ selectedElement, composer }) => {
+export const LinkSection: React.FC<LinkSectionProps> = ({
+  selectedElement,
+  composer,
+  isOpen,
+  onToggle,
+  tier = "secondary",
+}) => {
   const [linkType, setLinkType] = React.useState<LinkType>("none");
   const [pages, setPages] = React.useState<PageData[]>([]);
   const [selectedPageId, setSelectedPageId] = React.useState("");
@@ -45,7 +57,7 @@ export const LinkSection: React.FC<LinkSectionProps> = ({ selectedElement, compo
   const [target, setTarget] = React.useState("_self");
 
   // Only show for link/button elements
-  const isLinkable = ["link", "button", "a"].includes(selectedElement.type);
+  const isLinkable = ["link", "button", "a", "cta"].includes(selectedElement.type);
 
   // Load pages from composer
   React.useEffect(() => {
@@ -191,7 +203,7 @@ export const LinkSection: React.FC<LinkSectionProps> = ({ selectedElement, compo
   ];
 
   return (
-    <Section title="Link Settings" icon="Link2" defaultOpen id="inspector-section-link">
+    <Section title="Link Settings" icon="Link2" defaultOpen isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-link">
       <SelectRow
         label="Link Type"
         value={linkType}

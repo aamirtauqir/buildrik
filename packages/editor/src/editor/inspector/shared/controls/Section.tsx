@@ -13,6 +13,14 @@ import { baseStyles } from "./controlStyles";
 // TYPES
 // ============================================================================
 
+/**
+ * Visual weight tier — computed from an element profile's section order at
+ * render time and threaded through each outer section component to the
+ * underlying `<Section>` wrapper. Index 0 of the visible list is primary,
+ * indices 1-2 secondary, 3+ tertiary.
+ */
+export type SectionTier = "primary" | "secondary" | "tertiary";
+
 export interface SectionProps {
   title: string;
   /** Icon - either an emoji string or a Lucide icon name */
@@ -27,8 +35,35 @@ export interface SectionProps {
   id?: string;
   /** Preview shown next to label when section is collapsed */
   preview?: React.ReactNode;
+  /**
+   * Visual weight tier. Primary sections are rendered slightly larger and
+   * brighter so the user's eye finds them first; tertiary sections are dimmer
+   * and smaller. Defaults to `secondary` for backwards compatibility.
+   */
+  tier?: SectionTier;
   children: React.ReactNode;
 }
+
+/**
+ * Visual weight per tier. Applied on top of baseStyles.sectionHeader(isOpen)
+ * so the existing padding/layout logic is preserved — only font size, weight,
+ * and color shift per tier.
+ */
+const TIER_STYLES: Record<SectionTier, React.CSSProperties> = {
+  primary: {
+    fontSize: 13,
+    fontWeight: 700,
+  },
+  secondary: {
+    fontSize: 12,
+    fontWeight: 600,
+  },
+  tertiary: {
+    fontSize: 11,
+    fontWeight: 600,
+    opacity: 0.85,
+  },
+};
 
 // ============================================================================
 // COMPONENT
@@ -42,6 +77,7 @@ export const Section: React.FC<SectionProps> = ({
   onToggle,
   id,
   preview,
+  tier = "secondary",
   children,
 }) => {
   const [internalIsOpen, setInternalIsOpen] = React.useState(defaultOpen);
@@ -70,7 +106,7 @@ export const Section: React.FC<SectionProps> = ({
   return (
     <div style={baseStyles.section} id={id}>
       <button
-        style={baseStyles.sectionHeader(isOpen)}
+        style={{ ...baseStyles.sectionHeader(isOpen), ...TIER_STYLES[tier] }}
         onClick={handleToggle}
         aria-expanded={isOpen}
         aria-controls={contentId}
@@ -106,13 +142,7 @@ export const Section: React.FC<SectionProps> = ({
         </span>
       </button>
       {isOpen && (
-        <div
-          id={contentId}
-          style={{
-            ...baseStyles.sectionContent,
-            background: "rgba(99,102,241,0.04)",
-          }}
-        >
+        <div id={contentId} style={baseStyles.sectionContent}>
           {children}
         </div>
       )}

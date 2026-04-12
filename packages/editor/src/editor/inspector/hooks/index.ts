@@ -22,3 +22,6 @@ export type {
   UseInspectorSectionsOptions,
   UseInspectorSectionsResult,
 } from "./useInspectorSections";
+
+export { useBatchStyleHandler } from "./useBatchStyleHandler";
+export type { UseBatchStyleHandlerResult } from "./useBatchStyleHandler";

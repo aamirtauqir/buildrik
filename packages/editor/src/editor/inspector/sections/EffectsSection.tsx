@@ -11,11 +11,18 @@ import {
   RangeSlider,
   TextInputRow,
   PresetButtonGrid,
+  type SectionTier,
 } from "../shared/controls";
 
-interface EffectsSectionProps {
+export interface EffectsSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
+  /** Controlled open state for auto-expand functionality */
+  isOpen?: boolean;
+  /** Called when the section header is toggled */
+  onToggle?: (open: boolean) => void;
+  /** Visual weight tier — threaded from the registry-driven renderer. */
+  tier?: SectionTier;
 }
 
 // Shadow presets
@@ -74,7 +81,7 @@ const parseFilter = (filter: string | undefined, type: string, defaultValue: str
   return match?.[1] || defaultValue;
 };
 
-export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange }) => {
+export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange, isOpen, onToggle, tier = "tertiary" }) => {
   // Parse opacity
   const opacity = styles.opacity ? parseFloat(styles.opacity) * 100 : 100;
 
@@ -95,12 +102,28 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
   const contrastValue = parseFloat(parseFilter(styles.filter, "contrast", "100%").replace("%", ""));
   const grayscaleValue = parseFloat(parseFilter(styles.filter, "grayscale", "0%").replace("%", ""));
 
-  // Count shadows for preview
+  // Build the collapsed preview — prioritize the most visually impactful effect.
+  // Shows shadow count OR "blur 4px" OR opacity % OR "scaled/rotated" — whichever
+  // is the dominant signal for this element. Only one badge, not all four, so it
+  // stays scannable.
   const shadows = styles["box-shadow"] ? styles["box-shadow"].split("),").length : 0;
+  const hasTransform = styles.transform && styles.transform !== "none";
+  const previewParts: string[] = [];
+  if (shadows > 0) previewParts.push(`${shadows} shadow${shadows !== 1 ? "s" : ""}`);
+  if (blurValue > 0) previewParts.push(`blur ${blurValue}`);
+  if (opacity < 100) previewParts.push(`${Math.round(opacity)}%`);
+  if (hasTransform && !previewParts.length) previewParts.push("transform");
   const effectsPreview =
-    shadows > 0 ? (
-      <span style={{ fontSize: 12, color: "var(--aqb-text-tertiary)" }}>
-        {shadows} shadow{shadows !== 1 ? "s" : ""}
+    previewParts.length > 0 ? (
+      <span
+        style={{
+          fontSize: 11,
+          color: "var(--aqb-text-tertiary)",
+          fontFamily: "var(--aqb-font-mono)",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {previewParts.slice(0, 2).join(" · ")}
       </span>
     ) : undefined;
 
@@ -109,6 +132,9 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
       title="Effects"
       icon="Sparkles"
       preview={effectsPreview}
+      isOpen={isOpen}
+      onToggle={onToggle}
+      tier={tier}
       id="inspector-section-effects"
     >
       {/* Opacity */}

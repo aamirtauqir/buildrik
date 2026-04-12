@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { ProInspector } from "../ProInspector";
 
@@ -19,14 +19,17 @@ const makeComposer = () => ({
 
 const el = { id: "abc12345678", type: "container" };
 
-describe("Delete button — SVG not emoji", () => {
-  it("renders delete button with SVG icon, not emoji", () => {
-    const { container: _container } = render(
+describe("Element actions overflow menu — delete entry", () => {
+  it("exposes a Delete menu item with an SVG icon (not emoji)", () => {
+    render(
       <ProInspector selectedElement={el} composer={makeComposer() as never} onDelete={vi.fn()} />
     );
-    const deleteBtn = screen.getByRole("button", { name: /delete selected element/i });
-    // Should contain SVG, not the trash emoji text
-    expect(deleteBtn.querySelector("svg")).not.toBeNull();
-    expect(deleteBtn.textContent?.trim()).not.toBe("🗑️");
+
+    // The standalone delete button was replaced by a three-dot overflow menu.
+    // Open the menu and assert the Delete option is present.
+    fireEvent.click(screen.getByRole("button", { name: /element actions/i }));
+    const deleteItem = screen.getByRole("menuitem", { name: /^delete$/i });
+    expect(deleteItem.querySelector("svg")).not.toBeNull();
+    expect(deleteItem.textContent?.trim()).not.toBe("🗑️");
   });
 });

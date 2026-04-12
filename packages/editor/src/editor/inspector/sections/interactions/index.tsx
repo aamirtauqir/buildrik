@@ -48,6 +48,9 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
   onInteractionsChange,
   onPreview,
   onOpenTimeline,
+  isOpen,
+  onToggle,
+  tier = "tertiary",
 }) => {
   const [showAddPanel, setShowAddPanel] = React.useState(false);
   const [editingId, setEditingId] = React.useState<string | null>(null);
@@ -97,6 +100,9 @@ export const InteractionsSection: React.FC<InteractionsSectionProps> = ({
       title="Interactions"
       icon="MousePointer"
       defaultOpen={interactions.length > 0}
+      isOpen={isOpen}
+      onToggle={onToggle}
+      tier={tier}
       id="inspector-section-interactions"
     >
       <div style={styles.container}>

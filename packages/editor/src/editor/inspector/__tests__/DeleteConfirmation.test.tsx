@@ -23,6 +23,14 @@ const makeComposer = () => ({
 
 const selectedElement = { id: "abc12345678", type: "container", tag: "div" };
 
+// Helper: open the element actions menu then click Delete. Replaces the old
+// direct "delete selected element" button that was absorbed into the overflow
+// menu in Phase 5.
+const openDeleteConfirmation = () => {
+  fireEvent.click(screen.getByRole("button", { name: /element actions/i }));
+  fireEvent.click(screen.getByRole("menuitem", { name: /^delete$/i }));
+};
+
 describe("Delete confirmation modal — copy", () => {
   it("does NOT say 'cannot be undone'", () => {
     render(
@@ -32,7 +40,7 @@ describe("Delete confirmation modal — copy", () => {
         onDelete={vi.fn()}
       />
     );
-    fireEvent.click(screen.getByRole("button", { name: /delete selected element/i }));
+    openDeleteConfirmation();
     expect(screen.queryByText(/cannot be undone/i)).not.toBeInTheDocument();
   });
 
@@ -44,7 +52,7 @@ describe("Delete confirmation modal — copy", () => {
         onDelete={vi.fn()}
       />
     );
-    fireEvent.click(screen.getByRole("button", { name: /delete selected element/i }));
+    openDeleteConfirmation();
     expect(screen.getByRole("alert")).toHaveTextContent(/ctrl\+z/i);
   });
 });

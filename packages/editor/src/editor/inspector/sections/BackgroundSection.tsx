@@ -4,9 +4,9 @@
 
 import * as React from "react";
 import type { MediaAsset, MediaAssetType } from "../../../shared/types/media";
-import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle } from "../shared/controls";
+import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type SectionTier } from "../shared/controls";
 
-interface BackgroundSectionProps {
+export interface BackgroundSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
   /** Opens media library for asset selection */
@@ -14,6 +14,12 @@ interface BackgroundSectionProps {
     allowedTypes: MediaAssetType[],
     onSelect: (asset: MediaAsset) => void
   ) => void;
+  /** Controlled open state for auto-expand functionality */
+  isOpen?: boolean;
+  /** Called when the section header is toggled */
+  onToggle?: (open: boolean) => void;
+  /** Visual weight tier — threaded from the registry-driven renderer. */
+  tier?: SectionTier;
   /** Whether advanced settings (size/position/repeat/attachment for image bg) are expanded */
   advancedExpanded?: boolean;
   /** Called when the More settings toggle is clicked */
@@ -24,6 +30,9 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
   styles,
   onChange,
   onOpenMediaLibrary,
+  isOpen,
+  onToggle,
+  tier = "primary",
   advancedExpanded = false,
   onAdvancedToggle,
 }) => {
@@ -47,7 +56,15 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
   ) : undefined;
 
   return (
-    <Section title="Background" icon="Palette" preview={preview} id="inspector-section-background">
+    <Section
+      title="Background"
+      icon="Palette"
+      preview={preview}
+      isOpen={isOpen}
+      onToggle={onToggle}
+      tier={tier}
+      id="inspector-section-background"
+    >
       {/* Background Type Selector */}
       <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
         {(["color", "gradient", "image"] as const).map((type) => (

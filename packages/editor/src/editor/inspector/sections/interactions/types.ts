@@ -46,6 +46,13 @@ export interface InteractionsSectionProps {
   onPreview?: (interaction: Interaction) => void;
   /** Open timeline editor */
   onOpenTimeline?: (interaction: Interaction) => void;
+  /** Controlled open state for auto-expand functionality */
+  isOpen?: boolean;
+  /** Called when the section header is toggled */
+  onToggle?: (open: boolean) => void;
+  /** Visual weight tier — threaded from the registry-driven renderer.
+   *  Defaults to "tertiary" to match Phase 2 visual hierarchy. */
+  tier?: "primary" | "secondary" | "tertiary";
 }
 
 // ============================================================================

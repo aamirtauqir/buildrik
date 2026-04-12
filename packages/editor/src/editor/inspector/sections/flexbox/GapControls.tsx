@@ -1,11 +1,16 @@
 /**
- * GapControls - Gap slider and row/column gap inputs
+ * GapControls - Thin wrapper around LinkedGapInput with a section label.
+ *
+ * Previously had its own link toggle logic and split row/col layout. Replaced
+ * with the shared LinkedGapInput primitive so flex + grid share one source of
+ * truth for the linked/unlinked gap UX.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { LinkedGapInput } from "../../shared/controls";
 import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
-import { GapSlider } from "./controls";
 
 // ============================================================================
 // TYPES
@@ -14,10 +19,14 @@ import { GapSlider } from "./controls";
 export interface GapControlsProps {
   styles: Record<string, string>;
   onChange: (prop: string, val: string) => void;
+  onBatchChange?: (changes: Record<string, string>) => void;
   disabled: (prop: string) => boolean | undefined;
-  inputStyle: React.CSSProperties;
-  rowStyle: React.CSSProperties;
-  labelStyle: React.CSSProperties;
+  /** Unused after migration — kept for call-site compatibility. */
+  inputStyle?: React.CSSProperties;
+  /** Unused after migration — kept for call-site compatibility. */
+  rowStyle?: React.CSSProperties;
+  /** Unused after migration — kept for call-site compatibility. */
+  labelStyle?: React.CSSProperties;
 }
 
 // ============================================================================
@@ -27,10 +36,8 @@ export interface GapControlsProps {
 export const GapControls: React.FC<GapControlsProps> = ({
   styles,
   onChange,
+  onBatchChange,
   disabled,
-  inputStyle,
-  rowStyle,
-  labelStyle,
 }) => (
   <div
     style={{
@@ -41,68 +48,12 @@ export const GapControls: React.FC<GapControlsProps> = ({
       border: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
     }}
   >
-    <div
-      style={{
-        fontSize: 12,
-        color: INSPECTOR_TOKENS.textTertiary,
-        marginBottom: 8,
-      }}
-    >
-      Gap
-    </div>
-    <div style={rowStyle}>
-      <label style={{ ...labelStyle, minWidth: 30 }}>All</label>
-      <GapSlider
-        value={styles.gap || "0"}
-        onChange={(val) => onChange("gap", val)}
-        disabled={disabled("gap")}
-      />
-    </div>
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: 8,
-        marginTop: 6,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-        <span
-          style={{
-            fontSize: 12,
-            color: INSPECTOR_TOKENS.textMuted,
-            width: 24,
-          }}
-        >
-          Row
-        </span>
-        <input
-          type="text"
-          value={styles["row-gap"] || ""}
-          onChange={(e) => onChange("row-gap", e.target.value)}
-          placeholder="0"
-          style={{ ...inputStyle, padding: "4px 5px" }}
-        />
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-        <span
-          style={{
-            fontSize: 12,
-            color: INSPECTOR_TOKENS.textMuted,
-            width: 24,
-          }}
-        >
-          Col
-        </span>
-        <input
-          type="text"
-          value={styles["column-gap"] || ""}
-          onChange={(e) => onChange("column-gap", e.target.value)}
-          placeholder="0"
-          style={{ ...inputStyle, padding: "4px 5px" }}
-        />
-      </div>
-    </div>
+    <LinkedGapInput
+      styles={styles}
+      onChange={onChange}
+      onBatchChange={onBatchChange}
+      disabled={disabled("gap")}
+    />
   </div>
 );
 

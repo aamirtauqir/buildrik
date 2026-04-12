@@ -7,7 +7,7 @@
  * @license BSD-3-Clause
  */
 
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { BindingPopover } from "./components/BindingPopover";
 import * as React from "react";
 import type { Composer } from "../../engine";
@@ -21,17 +21,20 @@ import { BreakpointIndicator } from "./components/BreakpointIndicator";
 import { DeleteConfirmModal } from "./components/DeleteConfirmModal";
 import { ElementBreadcrumb } from "./components/ElementBreadcrumb";
 import { InspectorControls } from "./components/InspectorControls";
+import { InspectorElementMenu } from "./components/InspectorElementMenu";
 import { InspectorEmptyState } from "./components/InspectorEmptyState";
 import { InspectorErrorBoundary } from "./components/InspectorErrorBoundary";
-import { InspectorSubNav } from "./components/InspectorSubNav";
 import { MultiSelectToolbar } from "./components/MultiSelectToolbar";
+import { PropertySearchResults } from "./components/PropertySearchResults";
 import { PseudoStateSelector } from "./components/PseudoStateSelector";
-import { useInspectorState, useStyleHandlers, useInspectorSections, TOTAL_SECTIONS } from "./hooks";
+import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hooks";
+import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
 import { VariantSection } from "./sections/VariantSection";
+import { buildAdvancedPropsMapFromRegistry } from "./sections/registry";
 import { deriveCssContext, getPropertyStates } from "./config/cssContext";
 import { DevModeToggle } from "./shared/DevModeToggle";
 import { panelStyles } from "./styles";
-import { LayoutTab, AppearanceTab, EffectsTab } from "./tabs";
+import { InspectorTabContent } from "./tabs/InspectorTabContent";
 
 // ============================================================================
 // TYPES
@@ -112,13 +115,24 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   );
 
   // Section expand/collapse — extracted to useInspectorSections
-  const { expandedSections, expandedCount, collapseAll, expandAll } = useInspectorSections({
+  const { expandedSections, collapseAll, expandAll, toggleSection } = useInspectorSections({
     selectedElement,
     composer,
   });
-  void expandedSections; // consumed by child sections when they support controlled expansion
 
   const [searchQuery, setSearchQuery] = React.useState("");
+
+  // Advanced-disclosure state lifted to ProInspector so the registry-driven
+  // InspectorTabContent can share a single UseAdvancedSettingsReturn across
+  // every section. The prop map is derived from the registry — any section
+  // that declares an `advancedKey` is automatically part of the union.
+  const advancedPropsMap = React.useMemo(() => buildAdvancedPropsMapFromRegistry(), []);
+  const advancedState = useAdvancedSettings({
+    advancedPropsMap,
+    searchQuery,
+    styles: styles_state,
+    elementId: selectedElement?.id ?? null,
+  });
   const contentRef = React.useRef<HTMLDivElement>(null);
 
   // Scroll position persistence (Gap 2 fix - UX Strategy)
@@ -128,6 +142,36 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   // P0 Fix: Delete confirmation modal
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
   const [idCopied, setIdCopied] = React.useState(false);
+
+  // Pseudo-state selector visibility — hide unless the user is actively editing
+  // a non-normal state or has an existing override on this element. Users can
+  // still opt in via the "+ state override" affordance. Reset per selection.
+  const [stateSelectorManuallyShown, setStateSelectorManuallyShown] = React.useState(false);
+  React.useEffect(() => {
+    setStateSelectorManuallyShown(false);
+  }, [selectedElement?.id]);
+
+  // Global "/" shortcut: focus the inspector search. Only fires when focus is
+  // not already inside an input/textarea/contentEditable so it doesn't steal
+  // keystrokes from any form the user is actively typing in.
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== "/") return;
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const tag = target.tagName;
+      const inTypingContext =
+        tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
+      if (inTypingContext) return;
+      const input = document.getElementById("inspector-search-input") as HTMLInputElement | null;
+      if (!input) return;
+      e.preventDefault();
+      input.focus();
+      input.select();
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
 
   // Multi-select detection via same hook as Canvas (proven to work)
   const { selectedIds, isMultiSelect } = useComposerSelection({ composer: composer ?? null });
@@ -269,53 +313,58 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           <div style={panelStyles.elementIcon}>
             <ElementIcon size="lg" />
           </div>
-          <div>
+          <div style={{ minWidth: 0, flex: 1 }}>
             <div style={panelStyles.elementName}>{elementLabel}</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <button
-                type="button"
-                onClick={async () => {
-                  try {
-                    await navigator.clipboard.writeText(`#${selectedElement.id}`);
-                    setIdCopied(true);
-                    setTimeout(() => setIdCopied(false), 1500);
-                  } catch {
-                    // clipboard API not available — silently skip
-                  }
-                }}
-                aria-label="Copy element ID"
-                title={idCopied ? "Copied!" : "Click to copy element ID"}
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: 0,
-                  fontFamily: "var(--aqb-font-mono)",
-                  fontSize: "var(--aqb-text-sm)",
-                  color: idCopied ? "var(--aqb-success)" : "var(--aqb-text-tertiary)",
-                  transition: "color 0.2s",
-                }}
-              >
-                #{selectedElement.id.slice(-8)}
-              </button>
+            {/* Compact meta row — tag and ID live inline as a single mono-font
+                line. Click copies the id. Keeps header tight on narrow panels. */}
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(`#${selectedElement.id}`);
+                  setIdCopied(true);
+                  setTimeout(() => setIdCopied(false), 1500);
+                } catch {
+                  // clipboard API not available — silently skip
+                }
+              }}
+              aria-label="Copy element ID"
+              title={idCopied ? "Copied!" : "Click to copy element ID"}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+                fontFamily: "var(--aqb-font-mono)",
+                fontSize: 11,
+                color: idCopied ? "var(--aqb-success)" : "var(--aqb-text-tertiary)",
+                transition: "color 0.2s",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                maxWidth: "100%",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+              }}
+            >
               {selectedElement.tagName && (
-                <span style={panelStyles.tagBadge}>
+                <span style={{ opacity: 0.7 }}>
                   &lt;{selectedElement.tagName.toLowerCase()}&gt;
                 </span>
               )}
+              <span>#{selectedElement.id.slice(-6)}</span>
               {idCopied && (
                 <span
                   aria-live="polite"
                   style={{
-                    fontSize: 12,
                     color: "var(--aqb-success)",
                     fontWeight: 600,
                   }}
                 >
-                  Copied!
+                  · Copied
                 </span>
               )}
-            </div>
+            </button>
           </div>
         </div>
 
@@ -326,18 +375,17 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           onOpenCreateCollection={onOpenCreateCollection}
         />
 
+        {/* Element actions overflow menu — Duplicate / Copy styles / Paste styles / Delete.
+            Replaces the standalone delete button. */}
         {onDelete && (
-          <button
-            style={panelStyles.deleteBtn}
-            onClick={() => setShowDeleteConfirm(true)}
-            title="Delete element"
-            aria-label="Delete selected element"
-          >
-            <Trash2 size={14} aria-hidden="true" />
-          </button>
+          <InspectorElementMenu
+            composer={composer}
+            selectedElementId={selectedElement.id}
+            onRequestDelete={() => setShowDeleteConfirm(true)}
+          />
         )}
 
-        {/* P0 Fix: Delete Confirmation Modal */}
+        {/* Delete confirmation modal — still driven by the overflow menu above. */}
         <DeleteConfirmModal
           isOpen={showDeleteConfirm}
           onClose={() => setShowDeleteConfirm(false)}
@@ -350,11 +398,45 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
 
         <ElementBreadcrumb selectedElement={selectedElement} composer={composer} />
         <BreakpointIndicator currentBreakpoint={currentBreakpoint} />
-        <PseudoStateSelector
-          currentPseudoState={currentPseudoState}
-          onChange={setCurrentPseudoState}
-          statesWithOverrides={statesWithOverrides}
-        />
+        {currentPseudoState !== "normal" ||
+        statesWithOverrides.size > 0 ||
+        stateSelectorManuallyShown ? (
+          <PseudoStateSelector
+            currentPseudoState={currentPseudoState}
+            onChange={setCurrentPseudoState}
+            statesWithOverrides={statesWithOverrides}
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setStateSelectorManuallyShown(true)}
+            aria-label="Show state override selector"
+            title="Add hover / focus / active styles"
+            style={{
+              marginTop: 6,
+              padding: "4px 10px",
+              background: "transparent",
+              border: "1px dashed var(--aqb-border)",
+              borderRadius: 6,
+              color: "var(--aqb-text-tertiary)",
+              fontSize: 11,
+              fontWeight: 500,
+              cursor: "pointer",
+              width: "fit-content",
+              transition: "color 0.15s, border-color 0.15s",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.color = "var(--aqb-text-primary)";
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--aqb-text-tertiary)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.color = "var(--aqb-text-tertiary)";
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--aqb-border)";
+            }}
+          >
+            + state override
+          </button>
+        )}
       </div>
 
       {/* Inspector Controls - Search, Collapse/Expand, Dev Mode */}
@@ -370,8 +452,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           <InspectorControls
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
-            expandedCount={expandedCount}
-            totalCount={TOTAL_SECTIONS}
             onCollapseAll={collapseAll}
             onExpandAll={expandAll}
           />
@@ -379,11 +459,12 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         <DevModeToggle enabled={devMode} onToggle={setDevMode} />
       </div>
 
-      {/* Tabs - Layout / Appearance / Effects (pill segment control) */}
+      {/* Tabs — Style / Element / Effects (pill segment control).
+          Axis changed in Phase 6 from CSS-category to concept. */}
       <div
         style={panelStyles.tabs}
         onKeyDown={(e) => {
-          const tabIds = ["layout", "appearance", "effects"] as const;
+          const tabIds = ["style", "element", "effects"] as const;
           const tabButtons = (e.currentTarget as HTMLDivElement).querySelectorAll('[role="tab"]');
           const focusedIndex = Array.from(tabButtons).indexOf(e.target as HTMLButtonElement);
           if (focusedIndex === -1) return;
@@ -405,15 +486,15 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           aria-label="Inspector sections"
           style={panelStyles.tabGroup}
         >
-          {(["layout", "appearance", "effects"] as const).map((tab) => {
+          {(["style", "element", "effects"] as const).map((tab) => {
             const tabLabels = {
-              layout: "Layout",
-              appearance: "Style",
+              style: "Style",
+              element: "Element",
               effects: "Effects",
             };
             const tabAriaLabels = {
-              layout: "Layout tab — Position, Display, Spacing, Flexbox, Grid",
-              appearance: "Style tab — Typography, Background, Border",
+              style: "Style tab — Layout, Size, Spacing, Typography, Background, Border",
+              element: "Element tab — Link, CSS classes, element properties",
               effects: "Effects tab — Shadows, Transforms, Animation, Interactions",
             };
             return (
@@ -435,10 +516,9 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         </div>
       </div>
 
-      {/* Sub-nav — clickable section jump links (H-02 fix) */}
-      <InspectorSubNav activeTab={activeTab} contentRef={contentRef} />
-
-      {/* Content */}
+      {/* Content — single InspectorTabContent renderer replaces the three
+          old per-tab components. The search overlay still pre-empts the
+          tab content when a query is active. */}
       <div
         ref={contentRef}
         role="tabpanel"
@@ -447,63 +527,41 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         style={panelStyles.content}
       >
         <InspectorErrorBoundary>
-          {activeTab === "layout" && (
+          {searchQuery.trim() ? (
+            <PropertySearchResults
+              searchQuery={searchQuery}
+              styles={styles_state}
+              onChange={handleStyleChange}
+            />
+          ) : (
             <>
-              <LayoutTab
+              <InspectorTabContent
+                tabId={activeTab}
                 composer={composer}
                 selectedElement={selectedElement}
-                currentPseudoState={currentPseudoState}
                 styles={styles_state}
                 onChange={handleStyleChange}
                 onBatchChange={handleBatchStyleChange}
-                propertyStates={propertyStates}
-                autoExpandSection={autoExpandSection as "layout" | "size" | null}
                 cssContext={contextState}
-                searchQuery={searchQuery}
+                propertyStates={propertyStates}
+                expandedSections={expandedSections}
+                onToggleSection={toggleSection}
+                advancedState={advancedState}
                 onOpenMediaLibrary={onOpenMediaLibrary}
                 onOpenIconPicker={onOpenIconPicker}
                 devMode={devMode}
               />
-              <VariantSection
-                composer={composer ?? null}
-                elementId={selectedElement?.id ?? null}
-                isOpen={autoExpandSection === "variants"}
-              />
+              {/* VariantSection lives outside the registry because its data
+                  model is tied to component instances, not element types. */}
+              {activeTab === "style" && (
+                <VariantSection
+                  composer={composer ?? null}
+                  elementId={selectedElement?.id ?? null}
+                  isOpen={autoExpandSection === "variants"}
+                />
+              )}
             </>
           )}
-
-          {activeTab === "appearance" && (
-            <AppearanceTab
-              composer={composer}
-              selectedElement={selectedElement}
-              currentPseudoState={currentPseudoState}
-              styles={styles_state}
-              onChange={handleStyleChange}
-              onBatchChange={handleBatchStyleChange}
-              onOpenMediaLibrary={onOpenMediaLibrary}
-              onOpenIconPicker={onOpenIconPicker}
-              autoExpandSection={autoExpandSection as "typography" | null}
-              searchQuery={searchQuery}
-              cssContext={contextState}
-              devMode={devMode}
-            />
-          )}
-
-          {activeTab === "effects" && (
-            <EffectsTab
-              composer={composer}
-              selectedElement={selectedElement}
-              currentPseudoState={currentPseudoState}
-              styles={styles_state}
-              onChange={handleStyleChange}
-              onBatchChange={handleBatchStyleChange}
-              searchQuery={searchQuery}
-              onOpenMediaLibrary={onOpenMediaLibrary}
-              onOpenIconPicker={onOpenIconPicker}
-              devMode={devMode}
-            />
-          )}
-
         </InspectorErrorBoundary>
       </div>
     </div>

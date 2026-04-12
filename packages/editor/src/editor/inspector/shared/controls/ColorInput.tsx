@@ -4,6 +4,7 @@
  * @license BSD-3-Clause
  */
 
+import { X } from "lucide-react";
 import * as React from "react";
 import { ColorSwatch, ColorSwatchGroup } from "../../../../shared/ui/ColorSwatch";
 import { Popover } from "../../../../shared/ui/Popover";
@@ -53,11 +54,17 @@ export interface ColorInputProps {
 export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }) => {
   const isKeyword = value && !isValidHexColor(value);
   const nativeInputRef = React.useRef<HTMLInputElement>(null);
+  const [isRowHovered, setIsRowHovered] = React.useState(false);
 
   const displayValue = isValidHexColor(value) ? value : "#000000";
+  const showReset = !!value && isRowHovered;
 
   return (
-    <div style={baseStyles.row}>
+    <div
+      style={{ ...baseStyles.row, position: "relative" }}
+      onMouseEnter={() => setIsRowHovered(true)}
+      onMouseLeave={() => setIsRowHovered(false)}
+    >
       <label style={baseStyles.label}>{label}</label>
       <div style={{ display: "flex", gap: 8, flex: 1, alignItems: "center" }}>
         {/* Instant Popover Picker */}
@@ -166,14 +173,52 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
           }
         />
 
-        {/* Text Input for direct editing */}
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="#000000"
-          style={{ ...baseStyles.input, flex: 1 }}
-        />
+        {/* Text Input for direct editing — wrapped so the reset × can sit
+            inside its right edge without overlapping the keyword badge. */}
+        <div style={{ position: "relative", flex: 1, display: "flex" }}>
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="#000000"
+            style={{
+              ...baseStyles.input,
+              flex: 1,
+              // Leave room for the reset × so it doesn't sit on top of text.
+              paddingRight: showReset ? 22 : undefined,
+            }}
+          />
+          {showReset && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange("");
+              }}
+              aria-label={`Reset ${label}`}
+              title={`Reset ${label}`}
+              style={{
+                position: "absolute",
+                right: 4,
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: 18,
+                height: 18,
+                padding: 0,
+                background: "rgba(0,0,0,0.3)",
+                border: "none",
+                borderRadius: 4,
+                color: "var(--aqb-text-tertiary)",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <X size={11} aria-hidden="true" />
+            </button>
+          )}
+        </div>
 
         {isKeyword && (
           <span style={keywordBadgeStyles} title="CSS keyword">

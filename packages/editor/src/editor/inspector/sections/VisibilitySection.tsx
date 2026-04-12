@@ -7,17 +7,21 @@
 import * as React from "react";
 import { BREAKPOINTS as SHARED_BREAKPOINTS } from "../../../shared/constants/breakpoints";
 import { baseStyles } from "../shared/controls/controlStyles";
-import { Section } from "../shared/controls/Section";
+import { Section, type SectionTier } from "../shared/controls/Section";
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-interface VisibilitySectionProps {
+export interface VisibilitySectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
   /** Controlled open state for auto-expand functionality */
   isOpen?: boolean;
+  /** Called when the section header is toggled */
+  onToggle?: (open: boolean) => void;
+  /** Visual weight tier — threaded from the registry-driven renderer. */
+  tier?: SectionTier;
 }
 
 // ============================================================================
@@ -133,6 +137,8 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
   styles: elementStyles,
   onChange,
   isOpen,
+  onToggle,
+  tier = "tertiary",
 }) => {
   // Parse visibility from custom CSS property or class names
   // Using data attributes for breakpoint visibility
@@ -158,7 +164,14 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
   const hiddenCount = VISIBILITY_BREAKPOINTS.filter((bp) => !getVisibility(bp.id)).length;
 
   return (
-    <Section title="Visibility" icon="Eye" isOpen={isOpen} id="inspector-section-visibility">
+    <Section
+      title="Visibility"
+      icon="Eye"
+      isOpen={isOpen}
+      onToggle={onToggle}
+      tier={tier}
+      id="inspector-section-visibility"
+    >
       <div style={styles.container}>
         {VISIBILITY_BREAKPOINTS.map((bp) => {
           const isVisible = getVisibility(bp.id);

@@ -5,15 +5,16 @@
  * @license BSD-3-Clause
  */
 
-// Element Profiles
+// Element Profiles — rewritten in Phase 6 restructure. The old
+// essentials/defaultOpenGroups concept is gone; profiles now declare
+// per-tab section order for the contextual InspectorTabContent renderer.
 export {
-  getElementProfile,
+  getProfileFor,
   getDefaultTab,
-  getEssentialsForTab,
-  getDefaultOpenGroups,
-  isEssentialProperty,
+  ALL_PROFILE_ELEMENT_TYPES,
+  PROFILE_MAP,
 } from "./elementProfiles";
-export type { ElementProfile, EssentialsConfig, DefaultOpenGroups } from "./elementProfiles";
+export type { ElementProfile } from "./elementProfiles";
 
 // Groups Configuration
 export {
@@ -63,22 +64,10 @@ export type {
 export { deriveCssContext, getPropertyStates } from "./cssContext";
 export type { CssContext } from "./cssContext";
 
-// Section IDs — canonical list for expandAll and expand tracking
-/** Canonical list of all inspector section IDs — used by expandAll() */
-export const ALL_SECTION_IDS = [
-  "layout",
-  "size",
-  "spacing",
-  "typography",
-  "background",
-  "border",
-  "effects",
-  "animation",
-  "interactions",
-  "visibility",
-] as const;
-
-export type SectionId = (typeof ALL_SECTION_IDS)[number];
+// SectionId and the canonical section list now live in
+// `sections/registry.tsx` — see `ALL_REGISTRY_SECTION_IDS` and `SectionId`
+// exports there. The old `ALL_SECTION_IDS` const here was removed during
+// the Phase 6 restructure because it duplicated registry state and drifted.
 
 // Context Evaluator
 export {

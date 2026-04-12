@@ -10,21 +10,25 @@ import * as React from "react";
 import type { AnimationConfig } from "../../../shared/types/animations";
 import { DEFAULT_ANIMATION, generateAnimationCSS } from "../../../shared/types/animations";
 import { AnimationEditor } from "../../animation/AnimationEditor";
-import { Section } from "../shared/controls";
+import { Section, type SectionTier } from "../shared/controls";
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-interface AnimationSectionProps {
+export interface AnimationSectionProps {
   /** Current animation config from element */
   animation?: AnimationConfig | null;
   /** Handler for animation changes */
   onAnimationChange: (animation: AnimationConfig | null) => void;
   /** Preview animation handler */
   onPreview?: () => void;
-  /** Whether section is open by default */
+  /** Controlled open state for auto-expand functionality */
   isOpen?: boolean;
+  /** Called when the section header is toggled */
+  onToggle?: (open: boolean) => void;
+  /** Visual weight tier — threaded from the registry-driven renderer. */
+  tier?: SectionTier;
 }
 
 // ============================================================================
@@ -36,6 +40,8 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
   onAnimationChange,
   onPreview,
   isOpen,
+  onToggle,
+  tier = "tertiary",
 }) => {
   const [localAnimation, setLocalAnimation] = React.useState<AnimationConfig>(
     animation || DEFAULT_ANIMATION
@@ -91,8 +97,10 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
     <Section
       title="Animation"
       icon="Zap"
-      defaultOpen={isOpen}
+      isOpen={isOpen}
+      onToggle={onToggle}
       preview={animPreview}
+      tier={tier}
       id="inspector-section-animation"
     >
       {/* Enable/Disable Toggle */}

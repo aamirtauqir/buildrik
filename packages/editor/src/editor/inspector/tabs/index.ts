@@ -1,18 +1,13 @@
 /**
  * ProInspector Tabs - Barrel Export
- * Part of AQUI-036: ProInspector refactoring
  *
- * @module components/Panels/ProInspector/tabs
+ * Phase 6 restructure replaced the three per-tab components
+ * (LayoutTab / AppearanceTab / EffectsTab) with a single declarative
+ * InspectorTabContent renderer that reads from the section registry and
+ * element profile. See sections/registry.tsx and config/elementProfiles.ts.
+ *
  * @license BSD-3-Clause
  */
 
-export { LayoutTab } from "./LayoutTab";
-export type { LayoutTabProps } from "./LayoutTab";
-
-export { AppearanceTab } from "./AppearanceTab";
-export type { AppearanceTabProps } from "./AppearanceTab";
-
-export { EffectsTab } from "./EffectsTab";
-export type { EffectsTabProps } from "./EffectsTab";
-
-
+export { InspectorTabContent } from "./InspectorTabContent";
+export type { InspectorTabContentProps } from "./InspectorTabContent";

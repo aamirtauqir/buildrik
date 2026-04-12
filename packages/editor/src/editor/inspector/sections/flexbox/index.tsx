@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { Section, baseStyles } from "../../shared/controls";
+import { Section, baseStyles, type SectionTier } from "../../shared/controls";
 import { AlignmentSection } from "./AlignmentSection";
 import { DirectionControls } from "./DirectionControls";
 import { EnableFlexPrompt } from "./EnableFlexPrompt";
@@ -18,7 +18,17 @@ import { GapControls } from "./GapControls";
 export interface FlexboxSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
+  /** Batch handler for atomic updates (used by LinkedGapInput toggle). */
+  onBatchChange?: (changes: Record<string, string>) => void;
   propertyStates?: Record<string, { hidden?: boolean; disabled?: boolean; reason?: string }>;
+  /** True when this element's parent is a flex container — required to render flex-item controls. */
+  isFlexItem?: boolean;
+  /** Controlled open state — driven by collapse/expand all */
+  isOpen?: boolean;
+  /** Called when section header is toggled */
+  onToggle?: (open: boolean) => void;
+  /** Visual weight tier — threaded from the registry-driven renderer. */
+  tier?: SectionTier;
 }
 
 // Use shared styles
@@ -31,15 +41,59 @@ const { compactBtn, row: rowStyle, label: labelStyle, input: inputStyle } = base
 export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
   styles,
   onChange,
+  onBatchChange,
   propertyStates = {},
+  isFlexItem = false,
+  isOpen,
+  onToggle,
+  tier = "secondary",
 }) => {
   const isFlexContainer = styles.display === "flex" || styles.display === "inline-flex";
 
   const disabled = (prop: string) => propertyStates[prop]?.disabled;
   const reason = (prop: string) => propertyStates[prop]?.reason;
 
+  // Collapsed preview: for containers show "row · center", for children show
+  // "self: center" or grow value. Helps users tell configured vs default state.
+  const buildFlexPreview = (): string | null => {
+    if (isFlexContainer) {
+      const direction = styles["flex-direction"] === "column" ? "col" : "row";
+      const justify = (styles["justify-content"] || "").replace("flex-", "") || "";
+      if (justify) return `${direction} · ${justify}`;
+      return direction;
+    }
+    if (isFlexItem) {
+      const grow = styles["flex-grow"];
+      const self = (styles["align-self"] || "").replace("flex-", "");
+      if (grow && grow !== "0") return `grow ${grow}`;
+      if (self && self !== "auto") return `self: ${self}`;
+    }
+    return null;
+  };
+  const flexPreviewText = buildFlexPreview();
+  const flexPreview = flexPreviewText ? (
+    <span
+      style={{
+        fontSize: 11,
+        color: "var(--aqb-text-tertiary)",
+        fontFamily: "var(--aqb-font-mono)",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {flexPreviewText}
+    </span>
+  ) : undefined;
+
   return (
-    <Section title="Flexbox" icon="AlignHorizontalSpaceBetween" id="inspector-section-flexbox">
+    <Section
+      title="Flexbox"
+      icon="AlignHorizontalSpaceBetween"
+      id="inspector-section-flexbox"
+      isOpen={isOpen}
+      onToggle={onToggle}
+      preview={flexPreview}
+      tier={tier}
+    >
       {/* Enable Flex */}
       {!isFlexContainer && <EnableFlexPrompt onChange={onChange} />}
 
@@ -71,10 +125,8 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
           <GapControls
             styles={styles}
             onChange={onChange}
+            onBatchChange={onBatchChange}
             disabled={disabled}
-            inputStyle={inputStyle}
-            rowStyle={rowStyle}
-            labelStyle={labelStyle}
           />
 
           {/* Align Content */}
@@ -107,17 +159,19 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
         </>
       )}
 
-      {/* Flex Item Properties */}
-      <FlexItemControls
-        styles={styles}
-        onChange={onChange}
-        disabled={disabled}
-        reason={reason}
-        inputStyle={inputStyle}
-        rowStyle={rowStyle}
-        labelStyle={labelStyle}
-        compactBtn={compactBtn}
-      />
+      {/* Flex Item Properties — only meaningful when this element's parent is a flex container */}
+      {isFlexItem && (
+        <FlexItemControls
+          styles={styles}
+          onChange={onChange}
+          disabled={disabled}
+          reason={reason}
+          inputStyle={inputStyle}
+          rowStyle={rowStyle}
+          labelStyle={labelStyle}
+          compactBtn={compactBtn}
+        />
+      )}
     </Section>
   );
 };

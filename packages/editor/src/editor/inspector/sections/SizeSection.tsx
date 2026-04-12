@@ -3,9 +3,9 @@
  */
 
 import * as React from "react";
-import { Section, InputWithUnit, MoreSettingsToggle } from "../shared/controls";
+import { Section, InputWithUnit, MoreSettingsToggle, type SectionTier } from "../shared/controls";
 
-interface SizeSectionProps {
+export interface SizeSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
   propertyStates?: Record<
@@ -14,6 +14,10 @@ interface SizeSectionProps {
   >;
   /** Controlled open state for auto-expand functionality */
   isOpen?: boolean;
+  /** Called when the section header is toggled */
+  onToggle?: (open: boolean) => void;
+  /** Visual weight tier — threaded from the registry-driven renderer. */
+  tier?: SectionTier;
   /** Whether advanced settings (min/max/ratio) are expanded */
   advancedExpanded?: boolean;
   /** Called when the More settings toggle is clicked */
@@ -25,6 +29,8 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
   onChange,
   propertyStates = {},
   isOpen,
+  onToggle,
+  tier = "secondary",
   advancedExpanded = false,
   onAdvancedToggle,
 }) => {
@@ -32,8 +38,35 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
   const disabled = (prop: string) => propertyStates[prop]?.disabled;
   const reason = (prop: string) => propertyStates[prop]?.reason;
 
+  // Inline preview shown when the section is collapsed: "W × H" so users can
+  // scan the size without expanding. Only renders when at least one dimension
+  // is set — otherwise the default "auto × auto" is noise.
+  const w = styles.width || "";
+  const h = styles.height || "";
+  const sizePreview =
+    w || h ? (
+      <span
+        style={{
+          fontSize: 11,
+          color: "var(--aqb-text-tertiary)",
+          fontFamily: "var(--aqb-font-mono)",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {w || "auto"} × {h || "auto"}
+      </span>
+    ) : undefined;
+
   return (
-    <Section title="Size" icon="Ruler" isOpen={isOpen} id="inspector-section-size">
+    <Section
+      title="Size"
+      icon="Ruler"
+      isOpen={isOpen}
+      onToggle={onToggle}
+      preview={sizePreview}
+      tier={tier}
+      id="inspector-section-size"
+    >
       {/* Width */}
       {!hidden("width") && (
         <InputWithUnit

@@ -10,12 +10,19 @@ import {
   InputWithUnit,
   CornerRadiusInput,
   MoreSettingsToggle,
+  type SectionTier,
 } from "../shared/controls";
 
-interface BorderSectionProps {
+export interface BorderSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
   onBatchChange: (changes: Record<string, string>) => void;
+  /** Controlled open state for auto-expand functionality */
+  isOpen?: boolean;
+  /** Called when the section header is toggled */
+  onToggle?: (open: boolean) => void;
+  /** Visual weight tier — threaded from the registry-driven renderer. */
+  tier?: SectionTier;
   /** Whether advanced settings (individual borders + outline) are expanded */
   advancedExpanded?: boolean;
   /** Called when the More settings toggle is clicked */
@@ -26,6 +33,9 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
   styles,
   onChange,
   // onBatchChange - reserved for batch border operations
+  isOpen,
+  onToggle,
+  tier = "secondary",
   advancedExpanded = false,
   onAdvancedToggle,
 }) => {
@@ -85,7 +95,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
   };
 
   return (
-    <Section title="Border" icon="Square" preview={borderPreview} id="inspector-section-border">
+    <Section title="Border" icon="Square" preview={borderPreview} isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-border">
       {/* Border Width */}
       <InputWithUnit
         label="Width"

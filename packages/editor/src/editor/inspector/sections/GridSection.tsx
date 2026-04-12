@@ -12,16 +12,26 @@ import {
   InlineInput,
   CompactButtonGroup,
   AlignmentGrid,
+  LinkedGapInput,
   SubSectionTitle,
   TemplateButtonGrid,
   SectionLabel,
+  type SectionTier,
 } from "../shared/controls";
 
-interface GridSectionProps {
+export interface GridSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
+  /** Batch handler for atomic updates (used by LinkedGapInput toggle). */
+  onBatchChange?: (changes: Record<string, string>) => void;
   isGridContainer: boolean;
   isGridItem: boolean;
+  /** Controlled open state — driven by collapse/expand all */
+  isOpen?: boolean;
+  /** Called when section header is toggled */
+  onToggle?: (open: boolean) => void;
+  /** Visual weight tier — threaded from the registry-driven renderer. */
+  tier?: SectionTier;
 }
 
 // Grid column templates
@@ -86,16 +96,54 @@ const compactInputStyle: React.CSSProperties = {
 export const GridSection: React.FC<GridSectionProps> = ({
   styles,
   onChange,
+  onBatchChange,
   isGridContainer,
   isGridItem,
+  isOpen,
+  onToggle,
+  tier = "secondary",
 }) => {
   // Only show if grid-related
   if (!isGridContainer && !isGridItem) {
     return null;
   }
 
+  // Collapsed preview: rough column/row count from grid-template-* values so
+  // users can see "3 × 2" without expanding. Falls back to "auto" when the
+  // template uses functions like repeat(auto-fit, ...).
+  const countGridTracks = (template: string | undefined): string => {
+    if (!template) return "—";
+    if (/auto-fit|auto-fill/.test(template)) return "auto";
+    const repeatMatch = template.match(/repeat\((\d+)/);
+    if (repeatMatch) return repeatMatch[1];
+    const tracks = template.trim().split(/\s+/).filter(Boolean).length;
+    return String(tracks || 1);
+  };
+  const gridPreview = isGridContainer ? (
+    <span
+      style={{
+        fontSize: 11,
+        color: "var(--aqb-text-tertiary)",
+        fontFamily: "var(--aqb-font-mono)",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {countGridTracks(styles["grid-template-columns"])} ×{" "}
+      {countGridTracks(styles["grid-template-rows"])}
+    </span>
+  ) : undefined;
+
   return (
-    <Section title="CSS Grid" icon="Grid3X3" defaultOpen id="inspector-section-grid">
+    <Section
+      title="CSS Grid"
+      icon="Grid3X3"
+      defaultOpen
+      isOpen={isOpen}
+      onToggle={onToggle}
+      preview={gridPreview}
+      tier={tier}
+      id="inspector-section-grid"
+    >
       {/* GRID CONTAINER CONTROLS */}
       {isGridContainer && (
         <>
@@ -136,52 +184,13 @@ export const GridSection: React.FC<GridSectionProps> = ({
             onChange={(v) => onChange("grid-auto-flow", v)}
           />
 
-          {/* Gap Controls */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr 1fr",
-              gap: "var(--aqb-space-1)",
-              marginBottom: "var(--aqb-space-2)",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-              <span style={{ fontSize: "var(--aqb-text-2xs)", color: "var(--aqb-text-muted)" }}>
-                Gap
-              </span>
-              <input
-                type="text"
-                value={styles.gap || ""}
-                onChange={(e) => onChange("gap", e.target.value)}
-                placeholder="0"
-                style={compactInputStyle}
-              />
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-              <span style={{ fontSize: "var(--aqb-text-2xs)", color: "var(--aqb-text-muted)" }}>
-                Row
-              </span>
-              <input
-                type="text"
-                value={styles["row-gap"] || ""}
-                onChange={(e) => onChange("row-gap", e.target.value)}
-                placeholder="0"
-                style={compactInputStyle}
-              />
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-              <span style={{ fontSize: "var(--aqb-text-2xs)", color: "var(--aqb-text-muted)" }}>
-                Col
-              </span>
-              <input
-                type="text"
-                value={styles["column-gap"] || ""}
-                onChange={(e) => onChange("column-gap", e.target.value)}
-                placeholder="0"
-                style={compactInputStyle}
-              />
-            </div>
-          </div>
+          {/* Gap controls — shared LinkedGapInput primitive handles linked vs.
+              unlinked state and clears the shadowed properties on toggle. */}
+          <LinkedGapInput
+            styles={styles}
+            onChange={onChange}
+            onBatchChange={onBatchChange}
+          />
 
           {/* Visual Alignment Grid */}
           <SectionLabel

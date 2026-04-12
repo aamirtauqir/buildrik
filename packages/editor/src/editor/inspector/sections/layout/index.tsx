@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Section, baseStyles, MoreSettingsToggle } from "../../shared/controls";
+import { Section, baseStyles, MoreSettingsToggle, type SectionTier } from "../../shared/controls";
 import { ConstraintControl } from "./ConstraintControl";
 import { DisplayControls } from "./DisplayControls";
 import { OverflowControls, VisibilityFloatControls } from "./OverflowVisibilityControls";
@@ -22,6 +22,11 @@ export interface LayoutSectionProps {
   propertyStates?: Record<string, { hidden?: boolean; disabled?: boolean; reason?: string }>;
   /** Controlled open state for auto-expand functionality */
   isOpen?: boolean;
+  /** Called when the section header is toggled (so parent can sync collapse state) */
+  onToggle?: (open: boolean) => void;
+  /** Visual weight tier — threaded from the registry-driven renderer. Defaults
+   *  to "primary" so standalone usages still match Phase 2 styling. */
+  tier?: SectionTier;
   /** Whether advanced settings (overflow/visibility) are expanded */
   advancedExpanded?: boolean;
   /** Called when the More settings toggle is clicked */
@@ -41,9 +46,32 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
   // onBatchChange - reserved for future batch operations
   propertyStates = {},
   isOpen,
+  onToggle,
+  tier = "primary",
   advancedExpanded = false,
   onAdvancedToggle,
 }) => {
+  // Collapsed preview: show the display type so users can see "flex" vs "grid"
+  // vs "block" at a glance without expanding. Position is also load-bearing —
+  // if it's anything other than static, tag it too.
+  const display = styles.display || "";
+  const position = styles.position || "";
+  const layoutPreviewParts: string[] = [];
+  if (display) layoutPreviewParts.push(display);
+  if (position && position !== "static") layoutPreviewParts.push(position);
+  const layoutPreview =
+    layoutPreviewParts.length > 0 ? (
+      <span
+        style={{
+          fontSize: 11,
+          color: "var(--aqb-text-tertiary)",
+          fontFamily: "var(--aqb-font-mono)",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {layoutPreviewParts.join(" · ")}
+      </span>
+    ) : undefined;
 
   return (
     <Section
@@ -51,6 +79,9 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
       icon="LayoutGrid"
       defaultOpen
       isOpen={isOpen}
+      onToggle={onToggle}
+      preview={layoutPreview}
+      tier={tier}
       id="inspector-section-display"
     >
       {/* ═══════════════════════════════════════════════════════════════════

@@ -4,6 +4,7 @@
  * @license BSD-3-Clause
  */
 
+import { X } from "lucide-react";
 import * as React from "react";
 import { IconInfo } from "../../../../shared/ui/Icons";
 import { Tooltip } from "../../../../shared/ui/Tooltip";
@@ -18,6 +19,58 @@ const overrideDotStyle: React.CSSProperties = {
   display: "inline-block",
   verticalAlign: "middle",
 };
+
+/**
+ * ResetButton — hover-revealed × that clears the current value.
+ * Rendered inside a row that has `position: relative`. Visibility driven by
+ * the row's hover state via a parent-scoped CSS class (`aqb-row`) whose hover
+ * selector toggles `opacity` on `.aqb-reset`. Falls back to always-visible for
+ * keyboard-only users via `:focus-visible`.
+ */
+const resetButtonStyle: React.CSSProperties = {
+  position: "absolute",
+  right: 4,
+  top: "50%",
+  transform: "translateY(-50%)",
+  width: 18,
+  height: 18,
+  padding: 0,
+  background: "rgba(0,0,0,0.3)",
+  border: "none",
+  borderRadius: 4,
+  color: "var(--aqb-text-tertiary)",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  opacity: 0,
+  transition: "opacity 0.12s, color 0.12s",
+  pointerEvents: "none",
+};
+
+const ResetButton: React.FC<{
+  onReset: () => void;
+  label?: string;
+  visible: boolean;
+}> = ({ onReset, label = "Reset to default", visible }) => (
+  <button
+    type="button"
+    onClick={(e) => {
+      e.stopPropagation();
+      onReset();
+    }}
+    aria-label={label}
+    title={label}
+    className="aqb-reset"
+    style={{
+      ...resetButtonStyle,
+      opacity: visible ? 1 : 0,
+      pointerEvents: visible ? "auto" : "none",
+    }}
+  >
+    <X size={11} aria-hidden="true" />
+  </button>
+);
 
 // ============================================================================
 // INPUT ROW
@@ -110,6 +163,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   isOverridden,
   helperText,
 }) => {
+  const [isRowHovered, setIsRowHovered] = React.useState(false);
   // Parse value and unit
   const parseValue = (val: string): { num: string; unit: string } => {
     if (val === "auto" || val === "none" || val === "inherit") {
@@ -186,8 +240,15 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
       : {}),
   };
 
+  const hasValue = !disabled && value !== "" && value !== undefined;
+  const showReset = hasValue && isRowHovered;
+
   return (
-    <div style={baseStyles.row}>
+    <div
+      style={{ ...baseStyles.row, position: "relative" }}
+      onMouseEnter={() => setIsRowHovered(true)}
+      onMouseLeave={() => setIsRowHovered(false)}
+    >
       <label style={baseStyles.label} title={disabledReason}>
         {label}
         {isOverridden && <span style={overrideDotStyle} />}
@@ -208,17 +269,32 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
         }}
         title={isInvalid ? "Invalid number — press Escape to revert" : disabledReason}
       >
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => handleInputChange(e.target.value)}
-          onBlur={handleInputBlur}
-          onKeyDown={handleInputKeyDown}
-          placeholder={placeholder}
-          style={inputStyle}
-          disabled={disabled || unit === "auto" || unit === "none" || unit === "inherit"}
-          aria-invalid={isInvalid}
-        />
+        <div style={{ position: "relative", flex: 1, display: "flex" }}>
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => handleInputChange(e.target.value)}
+            onBlur={handleInputBlur}
+            onKeyDown={handleInputKeyDown}
+            placeholder={placeholder}
+            style={{
+              ...inputStyle,
+              // Reserve space for the reset × so it never sits on top of text.
+              paddingRight: showReset ? 22 : inputStyle.paddingRight,
+            }}
+            disabled={disabled || unit === "auto" || unit === "none" || unit === "inherit"}
+            aria-invalid={isInvalid}
+          />
+          <ResetButton
+            onReset={() => {
+              setInputValue("");
+              setIsInvalid(false);
+              onChange("");
+            }}
+            label={`Reset ${label}`}
+            visible={showReset}
+          />
+        </div>
         <select
           value={unit}
           onChange={(e) => handleUnitChange(e.target.value)}

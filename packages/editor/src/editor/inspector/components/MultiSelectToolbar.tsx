@@ -17,6 +17,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { AlignmentHandler } from "../../../engine/canvas/AlignmentHandler";
 import { IconButton } from "../../../shared/ui/IconButton";
+import { BatchStylePanel } from "./BatchStylePanel";
 
 // ============================================================================
 // TYPES
@@ -263,17 +264,8 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
         </div>
       </div>
 
-      {/* Hint text */}
-      <p
-        style={{
-          fontSize: "var(--aqb-text-xs)",
-          color: "var(--aqb-text-muted)",
-          margin: 0,
-          lineHeight: 1.5,
-        }}
-      >
-        Select a single element to edit its properties, or use the alignment tools above.
-      </p>
+      {/* Batch style editor — apply common style changes to all selected elements */}
+      <BatchStylePanel composer={composer} selectedIds={selectedIds} />
     </div>
   );
 };
