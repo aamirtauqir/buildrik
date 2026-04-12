@@ -8,20 +8,23 @@
 
 import * as React from "react";
 import {
-  Upload, Plus, X, Search, FolderOpen, Clock, Star, CheckCircle,
+  Upload, Plus, X, Search, FolderOpen, Clock, CheckCircle,
   MinusCircle, ChevronDown, ChevronRight, Trash2, Download, Pencil,
-  Replace, Grid2X2, List, SlidersHorizontal, AlertCircle,
+  Replace, Grid2X2, List, SlidersHorizontal, AlertCircle, Check,
 } from "lucide-react";
 import type { Composer } from "../../engine/Composer";
 import { useMediaState } from "../sidebar/tabs/media/hooks/useMediaState";
 import { StockSourceModal } from "../sidebar/tabs/media/components/StockSourceModal";
 import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDeleteModal";
 import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextMenu";
+import { AssetDetailOverlay } from "../sidebar/tabs/media/components/AssetDetailOverlay";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
 import { useToast } from "../../shared/ui/Toast";
 import type { LibraryItem } from "../sidebar/tabs/media/data/mediaTypes";
 import type { IconConfig } from "../../shared/types/media";
 import "./LibraryManager.css";
+
+type SmartFolder = null | "recent" | "in-use" | "unused";
 
 interface LibraryManagerProps {
   composer: Composer;
@@ -63,6 +66,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   const [selectedAssetId, setSelectedAssetId] = React.useState<string | null>(null);
   const [detailTab, setDetailTab] = React.useState<"details" | "versions" | "used">("details");
   const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
+  const [sortMenuOpen, setSortMenuOpen] = React.useState(false);
+  const [smartFolder, setSmartFolder] = React.useState<SmartFolder>(null);
+  const [collapsedFolders, setCollapsedFolders] = React.useState<Set<string>>(new Set());
+  const [bulkMovePickerOpen, setBulkMovePickerOpen] = React.useState(false);
+  const [replaceAllPickerOpen, setReplaceAllPickerOpen] = React.useState(false);
   const searchRef = React.useRef<HTMLInputElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -88,6 +96,33 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     }
     return map;
   }, [state.libraryItems, composer]);
+
+  // Apply smart folder filter on top of state.libraryItems
+  const visibleItems = React.useMemo(() => {
+    let items = state.libraryItems;
+    if (smartFolder === "recent") {
+      const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000; // last 7 days
+      items = items
+        .filter((i) => new Date(i.createdAt).getTime() >= cutoff)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    } else if (smartFolder === "in-use") {
+      items = items.filter((i) => (usageMap.get(i.key) ?? 0) > 0);
+    } else if (smartFolder === "unused") {
+      items = items.filter((i) => (usageMap.get(i.key) ?? 0) === 0);
+    }
+    return items;
+  }, [state.libraryItems, smartFolder, usageMap]);
+
+  // In-use/unused counts for badges
+  const inUseCount = React.useMemo(
+    () => state.libraryItems.filter((i) => (usageMap.get(i.key) ?? 0) > 0).length,
+    [state.libraryItems, usageMap]
+  );
+  const unusedCount = state.libraryItems.length - inUseCount;
+  const recentCount = React.useMemo(() => {
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return state.libraryItems.filter((i) => new Date(i.createdAt).getTime() >= cutoff).length;
+  }, [state.libraryItems]);
 
   // Selected asset details
   const selectedItem = React.useMemo(() => {
@@ -167,37 +202,83 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     });
   }, [onOpenIconPicker, composer, addToast]);
 
-  // Collect all unique tags from assets
+  // Bug #1 fix: Edit button → open image editor, save as new version
+  const handleEditImage = React.useCallback(
+    (item: LibraryItem) => {
+      if (!onOpenImageEditor) {
+        addToast({ message: "Image editor unavailable", variant: "error" });
+        return;
+      }
+      onOpenImageEditor(item.src, async (editedSrc) => {
+        try {
+          const res = await fetch(editedSrc);
+          const blob = await res.blob();
+          const timestamp = Date.now();
+          const cleanName = item.name.replace(/_v\d+$/, "");
+          const ext = (blob.type.split("/")[1] || "webp").replace("+xml", "");
+          const fileName = `${cleanName}_v${timestamp % 10000}.${ext}`;
+          const file = new File([blob], fileName, { type: blob.type });
+          state.upload([file]);
+          addToast({ message: `New version of ${item.name} saved`, variant: "success" });
+        } catch {
+          addToast({ message: "Could not save edited version", variant: "error" });
+        }
+      });
+    },
+    [onOpenImageEditor, state, addToast]
+  );
+
+  // Collect all unique tags from assets (Bug #9 fix)
   const allTags = React.useMemo(() => {
     const tagSet = new Set<string>();
-    for (const asset of state.libraryItems) {
-      // Tags would come from the asset metadata — for now use alt text keywords
+    const assets = composer.media.getAssets();
+    for (const asset of assets) {
+      if (Array.isArray(asset.tags)) {
+        for (const tag of asset.tags) {
+          if (tag && typeof tag === "string") tagSet.add(tag);
+        }
+      }
     }
-    return Array.from(tagSet);
-  }, [state.libraryItems]);
+    return Array.from(tagSet).sort();
+  }, [state.libraryItems, composer]);
 
-  // Recursive folder tree renderer
+  const toggleCollapsed = React.useCallback((folderId: string) => {
+    setCollapsedFolders((prev) => {
+      const next = new Set(prev);
+      if (next.has(folderId)) next.delete(folderId);
+      else next.add(folderId);
+      return next;
+    });
+  }, []);
+
+  // Recursive folder tree renderer (Bug #8 fix: expand/collapse)
   const renderFolderTree = React.useCallback(
     (parentId: string | null, depth: number): React.ReactNode => {
       const children = state.folders.filter((f) => f.parentId === parentId);
       if (children.length === 0) return null;
       const FOLDER_COLORS = ["#F59E0B", "#10B981", "#EC4899", "#8B5CF6", "#0EA5E9"];
-      return children.map((folder, i) => (
-        <React.Fragment key={folder.id}>
-          <TreeNode
-            icon={<div className="mgr-folder-dot" style={{ background: FOLDER_COLORS[i % FOLDER_COLORS.length] }} />}
-            label={folder.name}
-            active={state.currentFolderId === folder.id}
-            expandable={state.folders.some((f) => f.parentId === folder.id)}
-            depth={depth}
-            onClick={() => state.setCurrentFolderId(folder.id)}
-            onDelete={() => state.deleteFolder(folder.id)}
-          />
-          {renderFolderTree(folder.id, depth + 1)}
-        </React.Fragment>
-      ));
+      return children.map((folder, i) => {
+        const hasChildren = state.folders.some((f) => f.parentId === folder.id);
+        const isCollapsed = collapsedFolders.has(folder.id);
+        return (
+          <React.Fragment key={folder.id}>
+            <TreeNode
+              icon={<div className="mgr-folder-dot" style={{ background: FOLDER_COLORS[i % FOLDER_COLORS.length] }} />}
+              label={folder.name}
+              active={state.currentFolderId === folder.id}
+              expandable={hasChildren}
+              expanded={!isCollapsed}
+              depth={depth}
+              onClick={() => { setSmartFolder(null); state.setCurrentFolderId(folder.id); }}
+              onToggleExpand={hasChildren ? () => toggleCollapsed(folder.id) : undefined}
+              onDelete={() => state.deleteFolder(folder.id)}
+            />
+            {!isCollapsed && renderFolderTree(folder.id, depth + 1)}
+          </React.Fragment>
+        );
+      });
     },
-    [state.folders, state.currentFolderId, state.deleteFolder, state.setCurrentFolderId]
+    [state.folders, state.currentFolderId, state.deleteFolder, state.setCurrentFolderId, collapsedFolders, toggleCollapsed]
   );
 
   const storageUsedPct = Math.min(100, (state.storage.used / state.storage.total) * 100);
@@ -277,25 +358,27 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           </div>
 
           <div className="mgr-tree">
-            {/* Smart folders */}
+            {/* Smart folders (Bugs #6, #7 fix: actually filter) */}
             <TreeNode
               icon={<Clock size={14} style={{ color: "#0EA5E9" }} />}
               label="Recent"
-              count={state.counts.all}
-              active={!state.currentFolderId && state.activeType === "all"}
-              onClick={() => { state.setCurrentFolderId(null); state.setType("all"); }}
+              count={recentCount}
+              active={smartFolder === "recent"}
+              onClick={() => { setSmartFolder("recent"); state.setCurrentFolderId(null); }}
             />
             <TreeNode
               icon={<CheckCircle size={14} style={{ color: "#10B981" }} />}
               label="In use"
-              active={false}
-              onClick={() => addToast({ message: "In-use filter coming soon", variant: "info" })}
+              count={inUseCount}
+              active={smartFolder === "in-use"}
+              onClick={() => { setSmartFolder("in-use"); state.setCurrentFolderId(null); }}
             />
             <TreeNode
               icon={<MinusCircle size={14} style={{ color: "var(--ls-text-ghost)" }} />}
               label="Unused"
-              active={false}
-              onClick={() => addToast({ message: "Unused filter coming soon", variant: "info" })}
+              count={unusedCount}
+              active={smartFolder === "unused"}
+              onClick={() => { setSmartFolder("unused"); state.setCurrentFolderId(null); }}
             />
 
             <hr className="mgr-tree-sep" />
@@ -305,9 +388,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
               icon={<FolderOpen size={14} />}
               label="All assets"
               count={state.counts.all}
-              active={!state.currentFolderId}
-              onClick={() => state.setCurrentFolderId(null)}
-              expandable
+              active={!state.currentFolderId && !smartFolder}
+              onClick={() => { setSmartFolder(null); state.setCurrentFolderId(null); }}
             />
 
             <hr className="mgr-tree-sep" />
@@ -357,16 +439,48 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           {state.selMode && state.selectedKeys.size > 0 && (
             <div className="mgr-bulk-bar">
               <span className="mgr-bulk-count">{state.selectedKeys.size} selected</span>
-              <button className="mgr-btn" onClick={() => {
-                const folderId = window.prompt("Move to folder ID (or leave empty for root):");
-                if (folderId !== null) {
-                  state.bulkMoveAssets(Array.from(state.selectedKeys), folderId || null);
-                  addToast({ message: `Moved ${state.selectedKeys.size} assets`, variant: "success" });
-                  state.toggleSelMode();
-                }
-              }}>
-                <FolderOpen size={12} /> Move
-              </button>
+              {/* Bug #4 fix: Move → folder picker popover */}
+              <div className="mgr-sort-wrap">
+                <button className="mgr-btn" onClick={() => setBulkMovePickerOpen((o) => !o)}>
+                  <FolderOpen size={12} /> Move to...
+                </button>
+                {bulkMovePickerOpen && (
+                  <>
+                    <div className="mgr-sort-scrim" onClick={() => setBulkMovePickerOpen(false)} />
+                    <div className="mgr-sort-menu" style={{ minWidth: 200, maxHeight: 280, overflowY: "auto" }}>
+                      <button
+                        className="mgr-sort-item"
+                        onClick={() => {
+                          const keys = Array.from(state.selectedKeys);
+                          state.bulkMoveAssets(keys, null);
+                          addToast({ message: `Moved ${keys.length} to root`, variant: "success" });
+                          setBulkMovePickerOpen(false);
+                          state.toggleSelMode();
+                        }}
+                      >
+                        <FolderOpen size={12} /> Root
+                      </button>
+                      {state.folders.length > 0 && <div className="mgr-sort-sep" />}
+                      {state.folders.map((folder) => (
+                        <button
+                          key={folder.id}
+                          className="mgr-sort-item"
+                          onClick={() => {
+                            const keys = Array.from(state.selectedKeys);
+                            state.bulkMoveAssets(keys, folder.id);
+                            addToast({ message: `Moved ${keys.length} to ${folder.name}`, variant: "success" });
+                            setBulkMovePickerOpen(false);
+                            state.toggleSelMode();
+                          }}
+                        >
+                          <div className="mgr-folder-dot" style={{ background: "#F59E0B" }} />
+                          {folder.name}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
               <button
                 className="mgr-btn danger"
                 onClick={() => {
@@ -398,11 +512,44 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
               ))}
             </div>
             <div className="mgr-spacer" />
-            <button className="mgr-sort">
-              <SlidersHorizontal size={12} />
-              Sort: {SORT_OPTIONS.find((o) => o.value === state.sort)?.label || "Recent"}
-              <ChevronDown size={12} />
-            </button>
+            {/* Bug #3 fix: Sort dropdown */}
+            <div className="mgr-sort-wrap">
+              <button className="mgr-sort" onClick={() => setSortMenuOpen((o) => !o)}>
+                <SlidersHorizontal size={12} />
+                Sort: {SORT_OPTIONS.find((o) => o.value === state.sort)?.label || "Recent"}
+                <ChevronDown size={12} />
+              </button>
+              {sortMenuOpen && (
+                <>
+                  <div className="mgr-sort-scrim" onClick={() => setSortMenuOpen(false)} />
+                  <div className="mgr-sort-menu">
+                    {SORT_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        className={`mgr-sort-item${state.sort === opt.value ? " active" : ""}`}
+                        onClick={() => {
+                          state.setSort(opt.value, state.sortDir);
+                          setSortMenuOpen(false);
+                        }}
+                      >
+                        {opt.label}
+                        {state.sort === opt.value && <Check size={12} />}
+                      </button>
+                    ))}
+                    <div className="mgr-sort-sep" />
+                    <button
+                      className="mgr-sort-item"
+                      onClick={() => {
+                        state.setSort(state.sort, state.sortDir === "asc" ? "desc" : "asc");
+                        setSortMenuOpen(false);
+                      }}
+                    >
+                      {state.sortDir === "asc" ? "Ascending ↑" : "Descending ↓"}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
             <div className="mgr-view-toggle">
               <button
                 className={viewMode === "grid" ? "active" : ""}
@@ -421,9 +568,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             </div>
           </div>
 
-          {state.libraryItems.length > 0 ? (
+          {visibleItems.length > 0 ? (
             <div className={viewMode === "grid" ? "mgr-grid" : "mgr-list"}>
-              {state.libraryItems.map((item) => {
+              {visibleItems.map((item) => {
                 const isSelected = selectedAssetId === item.key;
                 const thumbContent = (item.type === "img" || item.type === "vid") && item.thumb
                   ? <img src={item.thumb || item.src} alt={item.name} loading="lazy" />
@@ -447,9 +594,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                       key={item.key}
                       className={`mgr-list-row${isSelected ? " selected" : ""}`}
                       onClick={(e) => {
+                      // Bug #10 fix: Cmd/Ctrl enters multi-select; in selMode, regular click toggles
                       if (e.metaKey || e.ctrlKey) {
-                        // Multi-select: toggle via Cmd/Ctrl+click
                         if (!state.selMode) state.toggleSelMode();
+                        state.toggleSelect(item.key);
+                      } else if (state.selMode) {
                         state.toggleSelect(item.key);
                       } else {
                         setSelectedAssetId(item.key);
@@ -476,9 +625,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                     key={item.key}
                     className={`mgr-asset${isSelected ? " selected" : ""}`}
                     onClick={(e) => {
+                      // Bug #10 fix: Cmd/Ctrl enters multi-select; in selMode, regular click toggles
                       if (e.metaKey || e.ctrlKey) {
-                        // Multi-select: toggle via Cmd/Ctrl+click
                         if (!state.selMode) state.toggleSelMode();
+                        state.toggleSelect(item.key);
+                      } else if (state.selMode) {
                         state.toggleSelect(item.key);
                       } else {
                         setSelectedAssetId(item.key);
@@ -546,8 +697,10 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
 
           <div className="mgr-grid-foot">
             <span>
-              Showing <strong>{state.libraryItems.length}</strong> of {state.counts.all}
-              {state.currentFolderId && breadcrumbPath.length > 1
+              Showing <strong>{visibleItems.length}</strong> of {state.counts.all}
+              {smartFolder
+                ? ` in ${smartFolder === "in-use" ? "In use" : smartFolder === "unused" ? "Unused" : "Recent"}`
+                : state.currentFolderId && breadcrumbPath.length > 1
                 ? ` in ${breadcrumbPath[breadcrumbPath.length - 1].name}`
                 : ""}
             </span>
@@ -679,30 +832,25 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                     <Download size={12} />
                     Insert
                   </button>
-                  <button className="mgr-btn" onClick={() => state.openDetail(selectedItem)}>
+                  {/* Bug #1 fix: Edit → image editor for img/vid, rename overlay otherwise */}
+                  <button
+                    className="mgr-btn"
+                    onClick={() => {
+                      if (selectedItem.type === "img" || selectedItem.type === "vid") {
+                        handleEditImage(selectedItem);
+                      } else {
+                        state.openDetail(selectedItem);
+                      }
+                    }}
+                  >
                     <Pencil size={12} />
                     Edit
                   </button>
+                  {/* Bug #5 fix: Replace all opens library picker instead of URL prompt */}
                   {usageCount > 0 && (
                     <button
                       className="mgr-btn"
-                      onClick={() => {
-                        const newUrl = window.prompt("New asset URL to replace with:");
-                        if (!newUrl?.trim()) return;
-                        const result = composer.mediaCommands.replaceAcross(selectedItem.src, newUrl.trim());
-                        if (result.replaced.length > 0) {
-                          addToast({
-                            message: `Replaced in ${result.replaced.length} element${result.replaced.length > 1 ? "s" : ""}`,
-                            variant: "success",
-                          });
-                        }
-                        if (result.failed.length > 0) {
-                          addToast({
-                            message: `${result.failed.length} replacement${result.failed.length > 1 ? "s" : ""} failed`,
-                            variant: "error",
-                          });
-                        }
-                      }}
+                      onClick={() => setReplaceAllPickerOpen(true)}
                     >
                       <Replace size={12} />
                       Replace all
@@ -796,7 +944,87 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onDelete={(item) => state.requestDelete(item.key)}
           onCopyUrl={state.copyUrl}
           onClose={state.closeCtxMenu}
+          onEditImage={handleEditImage}
         />
+      )}
+
+      {/* Bug #2 fix: mount AssetDetailOverlay so rename from context menu actually shows */}
+      {state.detailItem && (
+        <AssetDetailOverlay
+          item={state.detailItem}
+          onInsert={state.insertToCanvas}
+          onRename={state.renameItem}
+          onUpdate={state.updateItem}
+          onDelete={(key) => {
+            state.requestDelete(key);
+            state.closeDetail();
+          }}
+          onClose={state.closeDetail}
+          onEditImage={handleEditImage}
+        />
+      )}
+
+      {/* Bug #5 fix: Replace-all picker modal (select asset from library) */}
+      {replaceAllPickerOpen && selectedItem && (
+        <div className="stock-modal-backdrop" onClick={() => setReplaceAllPickerOpen(false)}>
+          <div
+            className="stock-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ width: "min(640px, 90vw)" }}
+          >
+            <div className="stock-modal-header">
+              <h3 className="stock-modal-title">Replace "{selectedItem.name}" across {usageCount} use{usageCount !== 1 ? "s" : ""}</h3>
+              <button className="stock-modal-close" onClick={() => setReplaceAllPickerOpen(false)}>
+                <X size={18} />
+              </button>
+            </div>
+            <div className="stock-modal-content">
+              <p style={{ fontSize: 12, color: "var(--ls-text-ghost)", marginBottom: 12 }}>
+                Pick a replacement asset. All canvas usages will be swapped atomically (one undo reverses everything).
+              </p>
+              <div className="med-grid" data-cols="3">
+                {state.libraryItems
+                  .filter((i) => i.key !== selectedItem.key && i.type === selectedItem.type)
+                  .map((i) => (
+                    <div
+                      key={i.key}
+                      className="med-img-card"
+                      onClick={() => {
+                        const result = composer.mediaCommands.replaceAcross(selectedItem.src, i.src);
+                        if (result.replaced.length > 0) {
+                          addToast({
+                            message: `Replaced in ${result.replaced.length} element${result.replaced.length > 1 ? "s" : ""}`,
+                            variant: "success",
+                          });
+                        }
+                        if (result.failed.length > 0) {
+                          addToast({
+                            message: `${result.failed.length} replacement${result.failed.length > 1 ? "s" : ""} failed`,
+                            variant: "error",
+                          });
+                        }
+                        setReplaceAllPickerOpen(false);
+                      }}
+                    >
+                      <div className="med-img-card-bg">
+                        {i.thumb || (i.type === "img" || i.type === "vid") ? (
+                          <img src={i.thumb || i.src} alt={i.name} loading="lazy" />
+                        ) : null}
+                      </div>
+                      <div style={{ padding: "4px 6px", fontSize: 11, color: "var(--ls-text-medium)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {i.name}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+              {state.libraryItems.filter((i) => i.key !== selectedItem.key && i.type === selectedItem.type).length === 0 && (
+                <div className="stock-empty">
+                  No other {selectedItem.type === "img" ? "images" : "assets of the same type"} in your library.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -810,17 +1038,28 @@ interface TreeNodeProps {
   count?: number;
   active: boolean;
   expandable?: boolean;
+  expanded?: boolean;
   depth?: number;
   onClick: () => void;
+  onToggleExpand?: () => void;
   onDelete?: () => void;
 }
 
-function TreeNode({ icon, label, count, active, expandable, depth = 0, onClick, onDelete }: TreeNodeProps) {
+function TreeNode({
+  icon, label, count, active, expandable, expanded = true, depth = 0,
+  onClick, onToggleExpand, onDelete,
+}: TreeNodeProps) {
   const depthClass = depth === 1 ? " depth-1" : depth === 2 ? " depth-2" : "";
   return (
     <div className={`mgr-node${active ? " active" : ""}${depthClass}`} onClick={onClick}>
       {expandable ? (
-        <ChevronDown size={12} className="mgr-chev" />
+        <button
+          className="mgr-chev-btn"
+          onClick={(e) => { e.stopPropagation(); onToggleExpand?.(); }}
+          aria-label={expanded ? "Collapse" : "Expand"}
+        >
+          {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+        </button>
       ) : (
         <span className="mgr-chev hidden" style={{ width: 12, height: 12 }} />
       )}
@@ -829,11 +1068,9 @@ function TreeNode({ icon, label, count, active, expandable, depth = 0, onClick, 
       {count !== undefined && <span className="mgr-node-count">{count}</span>}
       {onDelete && (
         <button
+          className="mgr-node-del"
           onClick={(e) => { e.stopPropagation(); onDelete(); }}
-          style={{
-            background: "none", border: "none", color: "var(--ls-text-ghost)",
-            cursor: "pointer", padding: 2, display: "flex", opacity: 0.5,
-          }}
+          aria-label="Delete folder"
         >
           <Trash2 size={11} />
         </button>
