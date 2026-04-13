@@ -122,6 +122,15 @@ export class ElementManager {
     return this.elementCRUD.getElement(id);
   }
 
+  /**
+   * Get every registered element, across all pages.
+   * Used by `useUsageMap` to build a `Map<src, count>` in one pass instead
+   * of re-scanning per asset.
+   */
+  getAllElements(): Element[] {
+    return Array.from(this.elements.values());
+  }
+
   /** Register an element (internal use) */
   registerElement(element: Element): void {
     this.elementCRUD.registerElement(element);
