@@ -95,6 +95,8 @@ export const EVENTS = {
   HISTORY_CHANGED: "history:changed",
   HISTORY_CLEARED: "history:cleared",
   HISTORY_RECORDED: "history:recorded",
+  /** Undo stack reached 90% capacity — Screen TA4V8 */
+  HISTORY_CAPACITY_WARNING: "history:capacity-warning",
 
   // ============================================
   // Version History Events (AQUI-031)
