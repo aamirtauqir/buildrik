@@ -7,6 +7,7 @@
 
 import * as React from "react";
 import type { Composer } from "../../../engine";
+import { InputField } from "../../../shared/forms/InputField";
 import { devWarn } from "../../../shared/utils/devLogger";
 import { runTransaction } from "../../../shared/utils/helpers";
 import { Section, type SectionTier } from "../shared/controls";
@@ -144,7 +145,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
       {/* Add Class Input */}
       <div style={{ position: "relative" as const }}>
         <div style={{ display: "flex", gap: 8 }}>
-          <input
+          <InputField
             type="text"
             value={newClass}
             onChange={(e) => {
@@ -158,24 +159,12 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
                 e.preventDefault();
                 addClass(newClass);
               }
-              // M-08 fix: Tab should NOT submit — just move focus
               if (e.key === "Tab") {
                 setShowSuggestions(false);
-                // default Tab behavior (focus moves to next element) is preserved
               }
             }}
             placeholder="Add class name…"
             aria-label="Add CSS class"
-            style={{
-              flex: 1,
-              padding: "10px 12px",
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: 6,
-              color: "var(--aqb-text-primary)",
-              fontSize: 12,
-              outline: "none",
-            }}
           />
           <button
             type="button"
