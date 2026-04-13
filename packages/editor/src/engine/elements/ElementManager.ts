@@ -234,13 +234,84 @@ export class ElementManager {
    * Creates the right element type based on the media asset type,
    * sets its src, and adds it to the page root.
    * Returns the new element's ID, or null if the page has no root.
+   *
+   * Thin alias for `insertMediaAt` without placement hints — kept for
+   * backward compatibility with existing call sites.
    */
   insertMedia(
     src: string,
     type: "image" | "video" | "audio" | "svg" | "icon" | "lottie"
   ): string | null {
+    const result = this.insertMediaAt(src, type);
+    return result && result.kind === "element" ? result.elementId : null;
+  }
+
+  /**
+   * Result of insertMediaAt. `kind: "element"` means a new element was
+   * created; `kind: "font-applied"` means a font was applied to selected
+   * text (no new element); `null` means the operation failed and the
+   * caller should emit INSERT_FAILED with the given reason.
+   */
+  // ... see type in ../../shared/types/media.ts if exported; kept inline for now
+
+  /**
+   * Insert a media element onto the active page with optional placement hints.
+   *
+   * @param src  URL or data: URI of the asset
+   * @param type Asset type. Images/video/icon/svg/audio/lottie create an
+   *             element. `font` applies `font-family: <src>` to the
+   *             selected text element(s) — no element is created.
+   * @param opts Placement hints. `x`/`y` set the element's position (image
+   *             and video elements only). `targetElementId` inserts into
+   *             or replaces the src of a specific element. If omitted, the
+   *             same smart-insert logic as `insertMedia` applies.
+   * @returns    Result describing what happened, or `null` with
+   *             `reason` set so the caller can emit INSERT_FAILED.
+   */
+  insertMediaAt(
+    src: string,
+    type: "image" | "video" | "audio" | "svg" | "icon" | "lottie" | "font",
+    opts?: {
+      x?: number;
+      y?: number;
+      targetElementId?: string;
+    },
+  ):
+    | { kind: "element"; elementId: string }
+    | { kind: "font-applied"; elementIds: string[] }
+    | { kind: "failed"; reason: "no-active-page" | "invalid-type" | "no-text-selected" }
+    | null {
     const page = this.getActivePage();
-    if (!page) return null;
+    if (!page) return { kind: "failed", reason: "no-active-page" };
+
+    // Font type: apply font-family to selected text instead of creating an element.
+    if (type === "font") {
+      const selectedIds = this.composer.selection?.getSelectedIds?.() ?? [];
+      if (selectedIds.length === 0) {
+        return { kind: "failed", reason: "no-text-selected" };
+      }
+      const applied: string[] = [];
+      for (const id of selectedIds) {
+        const el = this.getElement(id);
+        if (!el) continue;
+        const elType = el.getType?.();
+        // Accept any text-bearing element type. Conservative list keeps
+        // this safe against future element types.
+        if (elType === "text" || elType === "heading" || elType === "paragraph") {
+          el.setStyle("font-family", src);
+          applied.push(id);
+        }
+      }
+      if (applied.length === 0) {
+        return { kind: "failed", reason: "no-text-selected" };
+      }
+      this.composer.emit("element:style-updated", {
+        elementIds: applied,
+        property: "font-family",
+        value: src,
+      });
+      return { kind: "font-applied", elementIds: applied };
+    }
 
     const elementTypeMap: Record<string, ElementData["type"]> = {
       image: "image",
@@ -252,39 +323,70 @@ export class ElementManager {
     };
 
     const elementType = elementTypeMap[type];
-    if (!elementType) return null;
+    if (!elementType) return { kind: "failed", reason: "invalid-type" };
+
+    // If target is specified, replace its src instead of creating a new element.
+    if (opts?.targetElementId) {
+      const target = this.getElement(opts.targetElementId);
+      if (target) {
+        const bgImage = target.getStyle("background-image");
+        if (bgImage && bgImage.includes("url(")) {
+          target.setStyle("background-image", `url(${src})`);
+        } else {
+          target.setAttribute("src", src);
+        }
+        this.composer.emit("element:style-updated", {
+          elementIds: [opts.targetElementId],
+          property: "src",
+          value: src,
+        });
+        return { kind: "element", elementId: opts.targetElementId };
+      }
+      // Fall through if the target doesn't exist — create a new element.
+    }
+
+    // Build placement styles. Coords only apply to visually-positioned
+    // elements (image, video). Audio/icon/svg/lottie use default layout.
+    const placementStyles: Record<string, string> = {};
+    if ((type === "image" || type === "video") && (opts?.x !== undefined || opts?.y !== undefined)) {
+      placementStyles.position = "absolute";
+      if (opts.x !== undefined) placementStyles.left = `${opts.x}px`;
+      if (opts.y !== undefined) placementStyles.top = `${opts.y}px`;
+    }
 
     const element = this.createElement(elementType, {
       attributes: { src },
       styles: type === "image" || type === "video"
-        ? { width: "auto", "max-width": "100%" }
-        : {},
+        ? { width: "auto", "max-width": "100%", ...placementStyles }
+        : placementStyles,
     });
 
     const rootId = page.root?.id;
-    if (!rootId) return null;
+    if (!rootId) return { kind: "failed", reason: "no-active-page" };
 
-    // Smart insert: selected empty container > selected parent > root
+    // Smart insert: selected empty container > selected parent > root.
+    // Skipped when coords are given — coords imply absolute placement on the page root.
     let parentId = rootId;
     let insertIndex: number | undefined;
 
-    const selectedIds = this.composer.selection?.getSelectedIds?.() ?? [];
-    if (selectedIds.length === 1) {
-      const sel = this.getElement(selectedIds[0]);
-      if (sel) {
-        // If selected element is a container without src (empty block), insert into it
-        const selSrc = sel.getAttribute("src");
-        const selChildren = sel.getChildren?.() ?? [];
-        if (!selSrc && selChildren.length === 0) {
-          parentId = sel.getId();
-        } else {
-          // Insert after the selected element's position in its parent
-          const parent = sel.getParent();
-          if (parent) {
-            const siblings = parent.getChildren();
-            const idx = siblings.findIndex((c) => c.getId() === sel.getId());
-            parentId = parent.getId();
-            insertIndex = idx >= 0 ? idx + 1 : undefined;
+    const hasCoords = opts?.x !== undefined || opts?.y !== undefined;
+    if (!hasCoords) {
+      const selectedIds = this.composer.selection?.getSelectedIds?.() ?? [];
+      if (selectedIds.length === 1) {
+        const sel = this.getElement(selectedIds[0]);
+        if (sel) {
+          const selSrc = sel.getAttribute("src");
+          const selChildren = sel.getChildren?.() ?? [];
+          if (!selSrc && selChildren.length === 0) {
+            parentId = sel.getId();
+          } else {
+            const parent = sel.getParent();
+            if (parent) {
+              const siblings = parent.getChildren();
+              const idx = siblings.findIndex((c) => c.getId() === sel.getId());
+              parentId = parent.getId();
+              insertIndex = idx >= 0 ? idx + 1 : undefined;
+            }
           }
         }
       }
@@ -299,7 +401,7 @@ export class ElementManager {
       src,
     });
 
-    return element.getId();
+    return { kind: "element", elementId: element.getId() };
   }
 
   /**
