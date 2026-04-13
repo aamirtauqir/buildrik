@@ -350,6 +350,42 @@ export class HistoryManager {
     return true;
   }
 
+  /**
+   * Restore to a specific index in the undo stack (Rollback)
+   * Moves intervening entries to the redo stack.
+   */
+  restoreToIndex(index: number): boolean {
+    if (index < 0 || index >= this.undoStack.length) return false;
+
+    // Roll back multiple steps if needed
+    while (this.undoStack.length - 1 > index) {
+      const entry = this.undoStack.pop()!;
+      if (entry.type === "checkpoint") {
+        const previousState = this.reconstructState(this.undoStack.length - 1);
+        const patch = createPatch(previousState, entry.snapshot);
+        this.redoStack.push({
+          type: "patch",
+          timestamp: Date.now(),
+          patch,
+          reversePatch: reversePatch(patch),
+          label: entry.label,
+        });
+      } else {
+        this.redoStack.push(entry);
+      }
+    }
+
+    const state = this.reconstructState(index);
+    this.restoreSnapshot(state);
+    this.updatePatchCounter();
+
+    this.composer.emit(EVENTS.HISTORY_UNDO, {
+      entry: { timestamp: Date.now(), snapshot: state, label: "Rollback" },
+    });
+
+    return true;
+  }
+
   // ─── Stack management ───────────────────────────────────────────────────────
 
   private updatePatchCounter(): void {
@@ -361,6 +397,15 @@ export class HistoryManager {
   }
 
   private trimHistory(): void {
+    const capacityThreshold = Math.floor(this.config.maxHistory * 0.9);
+    if (this.undoStack.length >= capacityThreshold) {
+      this.composer.emit(EVENTS.HISTORY_CAPACITY_WARNING, {
+        count: this.undoStack.length,
+        max: this.config.maxHistory,
+        percentage: 90,
+      });
+    }
+
     while (this.undoStack.length > this.config.maxHistory) {
       const removed = this.undoStack.shift();
 

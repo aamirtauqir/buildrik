@@ -14,6 +14,7 @@ import { usePublish, type PublishResult } from "../../../../shared/hooks/usePubl
 import { Button } from "../../../../shared/ui/Button";
 import { useToast } from "../../../../shared/ui/Toast";
 import { PanelHeader } from "../../shared/PanelHeader";
+import { useSettingsScreen } from "../settings/hooks/useSettingsScreen";
 
 // ============================================
 // Types
@@ -199,6 +200,28 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   isProjectPublished,
 }) => {
   const { addToast } = useToast();
+  const { value: publishingSettings } = useSettingsScreen(
+    _composer,
+    (settings) => ({
+      defaultDomain: settings.publishing?.defaultDomain ?? null,
+      customDomain: settings.publishing?.customDomain ?? null,
+    }),
+    { defaultDomain: null, customDomain: null }
+  );
+
+  const configuredDomain = React.useMemo(() => {
+    if (publishingSettings.customDomain?.status === "connected") {
+      return publishingSettings.customDomain.hostname;
+    }
+    if (publishingSettings.defaultDomain) {
+      return publishingSettings.defaultDomain;
+    }
+    if (projectId) {
+      return `buildrik.app/${projectId}`;
+    }
+    return null;
+  }, [publishingSettings, projectId]);
+
   const {
     publish,
     unpublish,
@@ -212,7 +235,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
     onPublish,
     onUnpublish,
     initialState: {
-      publishedUrl: initialUrl,
+      publishedUrl: initialUrl ?? (configuredDomain ? `https://${configuredDomain}` : null),
       isPublished: isProjectPublished,
     },
   });
@@ -225,6 +248,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
     clearError();
     const success = await publish();
     if (success) {
+      // GAP-FIX: Record publish event in history for rollback support
+      if (_composer?.history) {
+        _composer.history.forceCheckpoint("Project Published");
+      }
+
       addToast?.({
         message: "Site published successfully",
         variant: "success",
@@ -324,16 +352,32 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </div>
 
           {lastPublishedAt && (
-            <p style={metaTextStyles}>
-              Last published:{" "}
-              {lastPublishedAt.toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+              <p style={metaTextStyles}>
+                Last published:{" "}
+                {lastPublishedAt.toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+              <button
+                onClick={() => _composer?.emit(EVENTS.UI_PANEL_OPEN, { panel: "history", searchQuery: "published" })}
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  color: "var(--ls-accent, #1D4ED8)",
+                  fontSize: 11,
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                }}
+              >
+                See history
+              </button>
+            </div>
           )}
         </section>
 
@@ -354,9 +398,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
             <ChecklistItem label="SEO title set" ok={checks.hasSeoTitle} hint="Pages → SEO" />
             <ChecklistItem label="Meta description added" ok={checks.hasMetaDesc} hint="Pages → SEO" />
           </div>
-          {projectId && (
+          {configuredDomain && (
             <p style={{ ...metaTextStyles, marginTop: 4 }}>
-              Publishing to <strong style={{ color: "var(--aqb-text-primary)" }}>buildrik.app/{projectId}</strong>
+              Publishing to <strong style={{ color: "var(--aqb-text-primary)" }}>{configuredDomain}</strong>
             </p>
           )}
         </section>

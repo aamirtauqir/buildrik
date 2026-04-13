@@ -1,0 +1,1378 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings Workspace Redesign Prototype</title>
+    <style>
+      :root {
+        --bg: #f3f6fb;
+        --panel: #ffffff;
+        --panel-soft: #eef3f8;
+        --line: #d8e0ea;
+        --text: #122033;
+        --muted: #607286;
+        --accent: #175cd3;
+        --accent-soft: #e7f0ff;
+        --success: #16794d;
+        --success-soft: #e7f7ef;
+        --warn: #b45309;
+        --warn-soft: #fff1db;
+        --danger: #b42318;
+        --danger-soft: #ffe7e5;
+        --shadow: 0 18px 40px rgba(18, 32, 51, 0.08);
+        --radius-lg: 24px;
+        --radius-md: 16px;
+        --radius-sm: 12px;
+        --font-ui: "Avenir Next", "IBM Plex Sans", "Segoe UI", sans-serif;
+        --font-display: "Iowan Old Style", "Palatino Linotype", serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--font-ui);
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(23, 92, 211, 0.08), transparent 28%),
+          radial-gradient(circle at top right, rgba(22, 121, 77, 0.08), transparent 22%),
+          linear-gradient(180deg, #f7f9fc 0%, #eef3f9 100%);
+        min-height: 100vh;
+      }
+
+      .page {
+        max-width: 1540px;
+        margin: 0 auto;
+        padding: 28px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 18px;
+        margin-bottom: 22px;
+      }
+
+      .hero-card,
+      .workspace,
+      .prototype-card {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(14px);
+        border: 1px solid rgba(216, 224, 234, 0.92);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+      }
+
+      .hero-card {
+        padding: 28px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 18px 0 10px;
+        font-family: var(--font-display);
+        font-size: 46px;
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+      }
+
+      .hero-copy {
+        max-width: 760px;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.65;
+      }
+
+      .review-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 22px;
+      }
+
+      .review-pill {
+        padding: 14px;
+        border-radius: 16px;
+        background: var(--panel-soft);
+        border: 1px solid var(--line);
+      }
+
+      .review-pill strong {
+        display: block;
+        font-size: 22px;
+        margin-bottom: 4px;
+      }
+
+      .review-pill span {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .hero-side {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .hero-side h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .hero-side p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .ceo-list,
+      .design-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .signal {
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: #fbfcfe;
+        font-size: 14px;
+      }
+
+      .signal strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .workspace {
+        overflow: hidden;
+      }
+
+      .workspace-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 22px 24px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .workspace-title h2 {
+        margin: 0;
+        font-size: 28px;
+        letter-spacing: -0.02em;
+      }
+
+      .workspace-title p {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .top-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: flex-end;
+      }
+
+      .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: var(--panel-soft);
+        border: 1px solid var(--line);
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .meta-chip strong {
+        color: var(--text);
+      }
+
+      .health-strip {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr 1fr 1fr;
+        gap: 14px;
+        padding: 18px 24px;
+        background: linear-gradient(180deg, rgba(231, 240, 255, 0.55), rgba(247, 249, 252, 0));
+        border-bottom: 1px solid var(--line);
+      }
+
+      .health-card {
+        padding: 16px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid var(--line);
+        min-height: 104px;
+      }
+
+      .health-card h3 {
+        margin: 0 0 6px;
+        font-size: 14px;
+      }
+
+      .health-card p {
+        margin: 0;
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .health-card--primary {
+        background: linear-gradient(135deg, #17304f, #22446f);
+        border-color: transparent;
+        color: white;
+      }
+
+      .health-card--primary h3,
+      .health-card--primary p,
+      .health-card--primary strong {
+        color: white;
+      }
+
+      .workspace-shell {
+        display: grid;
+        grid-template-columns: 272px 1fr 320px;
+        min-height: 920px;
+      }
+
+      .sidebar {
+        padding: 22px 18px;
+        border-right: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.82);
+      }
+
+      .sidebar-section {
+        margin-bottom: 20px;
+      }
+
+      .sidebar-label {
+        margin: 0 0 10px;
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 700;
+      }
+
+      .nav {
+        display: grid;
+        gap: 6px;
+      }
+
+      .nav button {
+        width: 100%;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        padding: 12px 14px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        cursor: pointer;
+        text-align: left;
+        transition: 160ms ease;
+      }
+
+      .nav button:hover {
+        background: #edf2f7;
+      }
+
+      .nav button.active {
+        background: linear-gradient(180deg, #eef4ff, #e5eefc);
+        box-shadow: inset 0 0 0 1px rgba(23, 92, 211, 0.12);
+      }
+
+      .nav-main {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .nav-title {
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .nav-sub {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .nav-status {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 5px 8px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .status-ok {
+        background: var(--success-soft);
+        color: var(--success);
+      }
+
+      .status-warn {
+        background: var(--warn-soft);
+        color: var(--warn);
+      }
+
+      .status-danger {
+        background: var(--danger-soft);
+        color: var(--danger);
+      }
+
+      .content {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .panel {
+        display: none;
+        gap: 18px;
+      }
+
+      .panel.active {
+        display: grid;
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .panel-header h3 {
+        margin: 0;
+        font-size: 30px;
+        line-height: 1;
+        letter-spacing: -0.03em;
+      }
+
+      .panel-header p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        max-width: 760px;
+        line-height: 1.55;
+      }
+
+      .panel-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        border: 0;
+        border-radius: 999px;
+        padding: 11px 16px;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: white;
+      }
+
+      .btn-soft {
+        background: var(--panel-soft);
+        color: var(--text);
+        border: 1px solid var(--line);
+      }
+
+      .panel-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 18px;
+      }
+
+      .card-wide {
+        grid-column: 1 / -1;
+      }
+
+      .card h4 {
+        margin: 0 0 10px;
+        font-size: 16px;
+      }
+
+      .card p,
+      .card li,
+      .field-label,
+      .field-note {
+        color: var(--muted);
+      }
+
+      .card p,
+      .field-note {
+        margin: 0;
+        line-height: 1.55;
+        font-size: 14px;
+      }
+
+      .metric-row,
+      .link-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 0;
+        border-top: 1px solid #edf2f7;
+      }
+
+      .metric-row:first-of-type,
+      .link-row:first-of-type {
+        border-top: 0;
+        padding-top: 0;
+      }
+
+      .metric-name {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .metric-value {
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .health-list,
+      .signal-list {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .health-list li,
+      .signal-list li {
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: #fafcff;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .field {
+        display: grid;
+        gap: 7px;
+      }
+
+      .field.span-2 {
+        grid-column: 1 / -1;
+      }
+
+      .field-label {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .field-note {
+        font-size: 12px;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #fbfdff;
+        color: var(--text);
+        padding: 12px 14px;
+        font: inherit;
+        resize: vertical;
+      }
+
+      .inline-action {
+        display: flex;
+        gap: 10px;
+      }
+
+      .notice {
+        border-radius: 16px;
+        padding: 14px 16px;
+        font-size: 14px;
+      }
+
+      .notice.warn {
+        background: var(--warn-soft);
+        color: var(--warn);
+      }
+
+      .notice.success {
+        background: var(--success-soft);
+        color: var(--success);
+      }
+
+      .notice.danger {
+        background: var(--danger-soft);
+        color: var(--danger);
+      }
+
+      .activity-rail {
+        padding: 24px 20px;
+        border-left: 1px solid var(--line);
+        background: rgba(252, 253, 255, 0.9);
+        display: grid;
+        align-content: start;
+        gap: 16px;
+      }
+
+      .rail-card {
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: white;
+      }
+
+      .rail-card h4 {
+        margin: 0 0 10px;
+        font-size: 15px;
+      }
+
+      .savebar {
+        position: sticky;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 18px 24px;
+        margin-top: auto;
+        border-top: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(10px);
+      }
+
+      .savebar strong {
+        display: block;
+      }
+
+      .savebar small {
+        color: var(--muted);
+      }
+
+      .savebar-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .prototype-footer {
+        margin-top: 18px;
+        padding: 18px 22px;
+        border-radius: 18px;
+        background: rgba(18, 32, 51, 0.94);
+        color: rgba(255, 255, 255, 0.82);
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        font-size: 14px;
+      }
+
+      .prototype-footer strong {
+        color: white;
+      }
+
+      @media (max-width: 1260px) {
+        .hero,
+        .workspace-shell,
+        .health-strip {
+          grid-template-columns: 1fr;
+        }
+
+        .activity-rail {
+          border-left: 0;
+          border-top: 1px solid var(--line);
+        }
+
+        .form-grid,
+        .panel-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 900px) {
+        .page {
+          padding: 16px;
+        }
+
+        .workspace-top,
+        .savebar {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .top-meta,
+        .panel-actions,
+        .savebar-actions {
+          justify-content: stretch;
+        }
+
+        .top-meta > *,
+        .panel-actions > *,
+        .savebar-actions > * {
+          flex: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <div class="hero-card">
+          <div class="eyebrow">Plan Design Review + CEO Review</div>
+          <h1>Settings should feel like the operating system of the project, not a buried form drawer.</h1>
+          <p class="hero-copy">
+            This HTML wireframe/prototype reframes Settings as a persistent workspace with health, readiness,
+            trust, and cross-feature coherence built in. The redesign turns disconnected screens into one
+            visible control system for Site, Domain, Publish, SEO, Analytics, Integrations, Export, Advanced,
+            and Billing.
+          </p>
+          <div class="review-grid">
+            <div class="review-pill">
+              <strong>6 → 9</strong>
+              <span>IA clarity via persistent nav and status</span>
+            </div>
+            <div class="review-pill">
+              <strong>5 → 8</strong>
+              <span>Editing flow via master-detail layout</span>
+            </div>
+            <div class="review-pill">
+              <strong>6 → 8</strong>
+              <span>Visual hierarchy via health strip</span>
+            </div>
+            <div class="review-pill">
+              <strong>4 → 8</strong>
+              <span>Trust via state, validation, save model</span>
+            </div>
+            <div class="review-pill">
+              <strong>5 → 9</strong>
+              <span>Coherence via Publish/SEO/Domain links</span>
+            </div>
+          </div>
+        </div>
+        <aside class="hero-card hero-side">
+          <h2>CEO expansion that should not be missed</h2>
+          <div class="ceo-list">
+            <div class="signal">
+              <strong>Promote setup health to first-class product surface</strong>
+              Settings should answer: what is broken, what blocks publish, what needs trust work.
+            </div>
+            <div class="signal">
+              <strong>Collapse the gap between Domain and Publish</strong>
+              Users should not mentally model these as separate places.
+            </div>
+            <div class="signal">
+              <strong>Make related systems visible without forcing context switching</strong>
+              SEO should point to Pages. Billing should show account-level handoff. Analytics should expose consent risk.
+            </div>
+          </div>
+          <h2>Plan design review fixes</h2>
+          <div class="design-list">
+            <div class="signal">
+              <strong>Persistent section nav</strong>
+              Removes back-button friction and improves orientation.
+            </div>
+            <div class="signal">
+              <strong>Status language everywhere</strong>
+              Draft, connected, pending, missing, published.
+            </div>
+            <div class="signal">
+              <strong>Explicit panel save model</strong>
+              Avoids hidden auto-save complexity and restores trust.
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="workspace">
+        <div class="workspace-top">
+          <div class="workspace-title">
+            <h2>Settings Workspace</h2>
+            <p>High-level structural redesign prototype. Switch sections in the left rail to review all states.</p>
+          </div>
+          <div class="top-meta">
+            <div class="meta-chip"><strong>Project:</strong> Acme Studio</div>
+            <div class="meta-chip"><strong>Save model:</strong> explicit per panel</div>
+            <div class="meta-chip"><strong>Current target:</strong> acme.com</div>
+          </div>
+        </div>
+
+        <div class="health-strip">
+          <article class="health-card health-card--primary">
+            <h3>Setup Health</h3>
+            <p><strong>3 issues blocking a clean publish.</strong><br />Favicon missing, DNS pending, meta defaults incomplete.</p>
+          </article>
+          <article class="health-card">
+            <h3>Publish readiness</h3>
+            <p>Score: <strong>72/100</strong><br />Good foundation, but trust and discovery need work.</p>
+          </article>
+          <article class="health-card">
+            <h3>Last saved</h3>
+            <p>2 minutes ago<br />Domains, Stripe, and SEO changed in this session.</p>
+          </article>
+          <article class="health-card">
+            <h3>Cross-feature handoffs</h3>
+            <p>Pages SEO, Publish history, billing dashboard, consent readiness.</p>
+          </article>
+        </div>
+
+        <div class="workspace-shell">
+          <aside class="sidebar">
+            <div class="sidebar-section">
+              <p class="sidebar-label">Workspace</p>
+              <div class="nav" id="settings-nav">
+                <button class="active" data-panel="overview">
+                  <span class="nav-main">
+                    <span class="nav-title">Overview</span>
+                    <span class="nav-sub">Health, quick actions, recent state</span>
+                  </span>
+                  <span class="nav-status status-warn">3 issues</span>
+                </button>
+                <button data-panel="site">
+                  <span class="nav-main">
+                    <span class="nav-title">Site</span>
+                    <span class="nav-sub">Identity, language, social</span>
+                  </span>
+                  <span class="nav-status status-warn">needs favicon</span>
+                </button>
+                <button data-panel="domain">
+                  <span class="nav-main">
+                    <span class="nav-title">Domain &amp; Publish</span>
+                    <span class="nav-sub">Custom domain, SSL, live target</span>
+                  </span>
+                  <span class="nav-status status-warn">pending dns</span>
+                </button>
+                <button data-panel="seo">
+                  <span class="nav-main">
+                    <span class="nav-title">SEO</span>
+                    <span class="nav-sub">Site defaults and page handoff</span>
+                  </span>
+                  <span class="nav-status status-warn">2 gaps</span>
+                </button>
+                <button data-panel="analytics">
+                  <span class="nav-main">
+                    <span class="nav-title">Analytics &amp; Consent</span>
+                    <span class="nav-sub">Tracking, pixel, privacy</span>
+                  </span>
+                  <span class="nav-status status-warn">consent review</span>
+                </button>
+                <button data-panel="integrations">
+                  <span class="nav-main">
+                    <span class="nav-title">Integrations</span>
+                    <span class="nav-sub">Stripe, email, external connectors</span>
+                  </span>
+                  <span class="nav-status status-ok">core wired</span>
+                </button>
+                <button data-panel="export">
+                  <span class="nav-main">
+                    <span class="nav-title">Export</span>
+                    <span class="nav-sub">Code output defaults</span>
+                  </span>
+                  <span class="nav-status status-ok">available</span>
+                </button>
+                <button data-panel="advanced">
+                  <span class="nav-main">
+                    <span class="nav-title">Advanced</span>
+                    <span class="nav-sub">Custom code, reset, danger zone</span>
+                  </span>
+                  <span class="nav-status status-danger">high risk</span>
+                </button>
+                <button data-panel="billing">
+                  <span class="nav-main">
+                    <span class="nav-title">Billing</span>
+                    <span class="nav-sub">Plan status, account handoff</span>
+                  </span>
+                  <span class="nav-status status-ok">pro</span>
+                </button>
+              </div>
+            </div>
+          </aside>
+
+          <main class="content">
+            <section class="panel active" id="panel-overview">
+              <div class="panel-header">
+                <div>
+                  <h3>Overview</h3>
+                  <p>
+                    The old Settings home was just a launcher. This redesign turns it into an operating dashboard:
+                    what is healthy, what blocks publish, what requires trust work, and where the user should go next.
+                  </p>
+                </div>
+                <div class="panel-actions">
+                  <button class="btn btn-primary" data-jump="domain">Fix domain</button>
+                  <button class="btn btn-soft" data-jump="seo">Review SEO</button>
+                </div>
+              </div>
+              <div class="panel-grid">
+                <article class="card">
+                  <h4>Setup health</h4>
+                  <ul class="health-list">
+                    <li><strong>Missing favicon</strong><br />Site panel should show this as a required trust surface, not an optional detail.</li>
+                    <li><strong>Domain not verified</strong><br />Publish should inherit the same status and not pretend the site is fully ready.</li>
+                    <li><strong>Meta defaults incomplete</strong><br />SEO should expose global defaults plus page-level handoff.</li>
+                  </ul>
+                </article>
+                <article class="card">
+                  <h4>Quick actions</h4>
+                  <ul class="signal-list">
+                    <li><strong>Verify custom domain</strong><br />Jump to Domain &amp; Publish with DNS instructions already visible.</li>
+                    <li><strong>Open Publish workflow</strong><br />Use the same connected domain, not a separate hidden state.</li>
+                    <li><strong>Resolve consent warning</strong><br />Go straight to Analytics &amp; Consent and show publish consequences.</li>
+                  </ul>
+                </article>
+                <article class="card card-wide">
+                  <h4>Related systems</h4>
+                  <div class="metric-row">
+                    <span class="metric-name">Pages SEO</span>
+                    <span class="metric-value">Uses site defaults, overrides locally</span>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-name">Publish readiness</span>
+                    <span class="metric-value">Reads domain, favicon, title, and consent state</span>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-name">Billing</span>
+                    <span class="metric-value">Shown here, but handed off to account context</span>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section class="panel" id="panel-site">
+              <div class="panel-header">
+                <div>
+                  <h3>Site</h3>
+                  <p>Identity should feel editorial and trustworthy. This panel owns site name, favicon, language, and social surfaces.</p>
+                </div>
+                <div class="panel-actions">
+                  <button class="btn btn-primary js-save">Save panel</button>
+                  <button class="btn btn-soft">Preview social card</button>
+                </div>
+              </div>
+              <div class="panel-grid">
+                <article class="card card-wide">
+                  <h4>Identity</h4>
+                  <div class="form-grid">
+                    <label class="field">
+                      <span class="field-label">Site name</span>
+                      <input value="Acme Studio" />
+                    </label>
+                    <label class="field">
+                      <span class="field-label">Language</span>
+                      <select>
+                        <option>English</option>
+                        <option>Urdu</option>
+                        <option>Arabic</option>
+                      </select>
+                    </label>
+                    <label class="field span-2">
+                      <span class="field-label">Favicon URL</span>
+                      <input placeholder="https://example.com/favicon.ico" />
+                      <span class="field-note">Missing right now. This should stay on the setup health list until saved.</span>
+                    </label>
+                  </div>
+                </article>
+                <article class="card">
+                  <h4>Social profiles</h4>
+                  <div class="form-grid">
+                    <label class="field"><span class="field-label">Twitter</span><input value="https://x.com/acme" /></label>
+                    <label class="field"><span class="field-label">LinkedIn</span><input value="https://linkedin.com/company/acme" /></label>
+                    <label class="field span-2"><span class="field-label">Facebook</span><input placeholder="https://facebook.com/acme" /></label>
+                  </div>
+                </article>
+                <article class="card">
+                  <h4>Trust surfaces</h4>
+                  <p>Privacy and Terms should remain visible but secondary. The product should not confuse legal links with core site setup.</p>
+                </article>
+              </div>
+            </section>
+
+            <section class="panel" id="panel-domain">
+              <div class="panel-header">
+                <div>
+                  <h3>Domain &amp; Publish</h3>
+                  <p>
+                    This is the most important coherence fix. Settings should not configure one domain while Publish shows another.
+                    Domain state and publish target belong to the same workspace.
+                  </p>
+                </div>
+                <div class="panel-actions">
+                  <button class="btn btn-primary js-verify-domain">Verify DNS</button>
+                  <button class="btn btn-soft">Open Publish</button>
+                </div>
+              </div>
+              <div class="panel-grid">
+                <article class="card">
+                  <h4>Connected domain</h4>
+                  <div class="metric-row">
+                    <span class="metric-name">Active hostname</span>
+                    <span class="metric-value" id="active-domain">acme.com</span>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-name">SSL status</span>
+                    <span class="metric-value" id="ssl-state">Pending</span>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-name">Publish target</span>
+                    <span class="metric-value">https://acme.com</span>
+                  </div>
+                </article>
+                <article class="card">
+                  <h4>DNS verification</h4>
+                  <label class="field">
+                    <span class="field-label">Custom domain</span>
+                    <input id="domain-input" value="acme.com" />
+                  </label>
+                  <div class="notice warn" id="dns-notice">
+                    DNS still pending. CNAME should point to <strong>builder.aquibra.com</strong>.
+                  </div>
+                </article>
+                <article class="card card-wide">
+                  <h4>Publish relationship</h4>
+                  <div class="link-row">
+                    <span class="metric-name">Live site</span>
+                    <span class="metric-value">https://acme.com</span>
+                  </div>
+                  <div class="link-row">
+                    <span class="metric-name">Fallback domain</span>
+                    <span class="metric-value">project.builder.aquibra.com</span>
+                  </div>
+                  <div class="link-row">
+                    <span class="metric-name">History</span>
+                    <span class="metric-value">Last publish 42 minutes ago</span>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section class="panel" id="panel-seo">
+              <div class="panel-header">
+                <div>
+                  <h3>SEO</h3>
+                  <p>Site defaults should be strong enough that every page starts from a competent baseline, while still making per-page overrides obvious.</p>
+                </div>
+                <div class="panel-actions">
+                  <button class="btn btn-primary js-save">Save panel</button>
+                  <button class="btn btn-soft">Open Pages SEO</button>
+                </div>
+              </div>
+              <div class="panel-grid">
+                <article class="card card-wide">
+                  <h4>Site defaults</h4>
+                  <div class="form-grid">
+                    <label class="field">
+                      <span class="field-label">Site name</span>
+                      <input value="Acme Studio" />
+                    </label>
+                    <label class="field">
+                      <span class="field-label">Twitter handle</span>
+                      <input value="@acmestudio" />
+                    </label>
+                    <label class="field span-2">
+                      <span class="field-label">Default OG image</span>
+                      <input placeholder="https://example.com/og-cover.jpg" />
+                    </label>
+                  </div>
+                </article>
+                <article class="card">
+                  <h4>What is missing</h4>
+                  <ul class="signal-list">
+                    <li><strong>Default description missing</strong><br />This should stay on the health bar until fixed.</li>
+                    <li><strong>No fallback social image</strong><br />Lowers share quality across pages without custom overrides.</li>
+                  </ul>
+                </article>
+                <article class="card">
+                  <h4>Pages handoff</h4>
+                  <p>Every page can override title, description, robots, and image. Settings owns the default posture, not every page detail.</p>
+                </article>
+              </div>
+            </section>
+
+            <section class="panel" id="panel-analytics">
+              <div class="panel-header">
+                <div>
+                  <h3>Analytics &amp; Consent</h3>
+                  <p>
+                    Tracking should not be shown as a neutral form. The panel should explain what is configured, what is risky,
+                    and what will affect publish readiness.
+                  </p>
+                </div>
+                <div class="panel-actions">
+                  <button class="btn btn-primary js-save">Save panel</button>
+                  <button class="btn btn-soft">Open Publish readiness</button>
+                </div>
+              </div>
+              <div class="panel-grid">
+                <article class="card">
+                  <h4>Google Analytics</h4>
+                  <div class="form-grid">
+                    <label class="field span-2">
+                      <span class="field-label">Measurement ID</span>
+                      <input value="G-ABCD123456" />
+                    </label>
+                  </div>
+                  <div class="notice success">Enabled and valid. Ready to ship.</div>
+                </article>
+                <article class="card">
+                  <h4>Meta Pixel</h4>
+                  <div class="form-grid">
+                    <label class="field span-2">
+                      <span class="field-label">Pixel ID</span>
+                      <input placeholder="1234567890123456" />
+                    </label>
+                  </div>
+                  <div class="notice warn">Missing. This should not block publish, but should remain visible as a setup gap.</div>
+                </article>
+                <article class="card card-wide">
+                  <h4>Cookie consent</h4>
+                  <div class="metric-row">
+                    <span class="metric-name">Banner state</span>
+                    <span class="metric-value">On</span>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-name">Categories</span>
+                    <span class="metric-value">Necessary / Analytics / Marketing</span>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-name">Publish impact</span>
+                    <span class="metric-value">Warn if tracking exists without consent copy</span>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section class="panel" id="panel-integrations">
+              <div class="panel-header">
+                <div>
+                  <h3>Integrations</h3>
+                  <p>Only integrations backed by the current data model should be editable here. Everything else stays clearly marked as external setup.</p>
+                </div>
+                <div class="panel-actions">
+                  <button class="btn btn-primary js-save">Save panel</button>
+                  <button class="btn btn-soft">View external docs</button>
+                </div>
+              </div>
+              <div class="panel-grid">
+                <article class="card">
+                  <h4>Stripe</h4>
+                  <div class="form-grid">
+                    <label class="field span-2"><span class="field-label">Publishable key</span><input value="pk_test_123" /></label>
+                    <label class="field"><span class="field-label">Checkout mode</span><select><option>Payment links</option><option>API</option></select></label>
+                    <label class="field"><span class="field-label">Currency</span><select><option>USD</option><option>EUR</option></select></label>
+                  </div>
+                </article>
+                <article class="card">
+                  <h4>Email marketing</h4>
+                  <div class="form-grid">
+                    <label class="field"><span class="field-label">Provider</span><select><option>Mailchimp</option><option>Sendgrid</option><option>Resend</option></select></label>
+                    <label class="field"><span class="field-label">List ID</span><input value="list_123" /></label>
+                    <label class="field span-2"><span class="field-label">API key</span><input value="api-key-123" /></label>
+                  </div>
+                </article>
+                <article class="card card-wide">
+                  <h4>External connectors</h4>
+                  <p>Zapier, Formspree, and Netlify Forms should stay as docs-linked cards until their runtime/config model actually exists.</p>
+                </article>
+              </div>
+            </section>
+
+            <section class="panel" id="panel-export">
+              <div class="panel-header">
+                <div>
+                  <h3>Export</h3>
+                  <p>Export should feel like a product preference panel, not a dead-end. Defaults belong here, generation actions belong in Export flow.</p>
+                </div>
+                <div class="panel-actions">
+                  <button class="btn btn-primary js-save">Save panel</button>
+                </div>
+              </div>
+              <div class="panel-grid">
+                <article class="card card-wide">
+                  <h4>Export defaults</h4>
+                  <div class="form-grid">
+                    <label class="field"><span class="field-label">Primary format</span><select><option>HTML</option><option>React</option></select></label>
+                    <label class="field"><span class="field-label">CSS style</span><select><option>External</option><option>Inline</option></select></label>
+                    <label class="field"><span class="field-label">Include comments</span><select><option>Off</option><option>On</option></select></label>
+                    <label class="field"><span class="field-label">Minify output</span><select><option>Off</option><option>On</option></select></label>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section class="panel" id="panel-advanced">
+              <div class="panel-header">
+                <div>
+                  <h3>Advanced</h3>
+                  <p>Advanced should be powerful but clearly segregated. Safe actions, risky actions, and destructive actions should not visually blend together.</p>
+                </div>
+                <div class="panel-actions">
+                  <button class="btn btn-primary js-save">Save panel</button>
+                </div>
+              </div>
+              <div class="panel-grid">
+                <article class="card card-wide">
+                  <h4>Custom code</h4>
+                  <div class="form-grid">
+                    <label class="field span-2">
+                      <span class="field-label">Head scripts</span>
+                      <textarea rows="5">&lt;script src="https://example.com/tracking.js"&gt;&lt;/script&gt;</textarea>
+                    </label>
+                    <label class="field span-2">
+                      <span class="field-label">Global CSS</span>
+                      <textarea rows="5">.cta-button { letter-spacing: 0.08em; }</textarea>
+                    </label>
+                  </div>
+                </article>
+                <article class="card">
+                  <h4>Reset &amp; debugging</h4>
+                  <div class="metric-row">
+                    <span class="metric-name">Replay onboarding</span>
+                    <span class="metric-value">Available</span>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-name">Debug mode</span>
+                    <span class="metric-value">Off</span>
+                  </div>
+                </article>
+                <article class="card">
+                  <h4>Danger zone</h4>
+                  <div class="notice danger">Delete project should never sit beside ordinary form fields. It needs a dedicated destructive pattern.</div>
+                </article>
+              </div>
+            </section>
+
+            <section class="panel" id="panel-billing">
+              <div class="panel-header">
+                <div>
+                  <h3>Billing</h3>
+                  <p>Billing belongs in the settings workspace for awareness, but detailed management should hand off to account context cleanly.</p>
+                </div>
+                <div class="panel-actions">
+                  <button class="btn btn-primary">Open billing dashboard</button>
+                </div>
+              </div>
+              <div class="panel-grid">
+                <article class="card">
+                  <h4>Current plan</h4>
+                  <div class="metric-row">
+                    <span class="metric-name">Plan</span>
+                    <span class="metric-value">Pro</span>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-name">Custom domains</span>
+                    <span class="metric-value">Included</span>
+                  </div>
+                  <div class="metric-row">
+                    <span class="metric-name">Advanced settings</span>
+                    <span class="metric-value">Included</span>
+                  </div>
+                </article>
+                <article class="card">
+                  <h4>Account-level handoff</h4>
+                  <p>Use this panel to explain current entitlements and next steps, then route users to account management without mixing project state and billing workflows.</p>
+                </article>
+              </div>
+            </section>
+
+            <div class="savebar">
+              <div>
+                <strong id="savebar-title">Overview is read-only</strong>
+                <small id="savebar-copy">Switch into an editable panel to prototype save behavior.</small>
+              </div>
+              <div class="savebar-actions">
+                <button class="btn btn-soft">Cancel</button>
+                <button class="btn btn-primary js-save">Save changes</button>
+              </div>
+            </div>
+          </main>
+
+          <aside class="activity-rail">
+            <div class="rail-card">
+              <h4>Why this architecture is better</h4>
+              <p>It removes navigation amnesia. The user always knows where they are, what state each section is in, and what affects publish confidence.</p>
+            </div>
+            <div class="rail-card">
+              <h4>Prototype interactions</h4>
+              <p>Use the left rail to switch panels. Use “Verify DNS” to simulate a state change. Use “Save panel” to simulate save feedback and update the global chip.</p>
+            </div>
+            <div class="rail-card">
+              <h4>No-miss checklist</h4>
+              <div class="metric-row"><span class="metric-name">Site</span><span class="metric-value">included</span></div>
+              <div class="metric-row"><span class="metric-name">Domains + Publish</span><span class="metric-value">unified</span></div>
+              <div class="metric-row"><span class="metric-name">SEO + Pages handoff</span><span class="metric-value">included</span></div>
+              <div class="metric-row"><span class="metric-name">Analytics + consent</span><span class="metric-value">included</span></div>
+              <div class="metric-row"><span class="metric-name">Integrations</span><span class="metric-value">included</span></div>
+              <div class="metric-row"><span class="metric-name">Export</span><span class="metric-value">included</span></div>
+              <div class="metric-row"><span class="metric-name">Advanced</span><span class="metric-value">included</span></div>
+              <div class="metric-row"><span class="metric-name">Billing handoff</span><span class="metric-value">included</span></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="prototype-footer">
+        <div>
+          <strong>Wireframe output</strong><br />
+          Structural redesign prototype in HTML, not Pencil. Built to follow plan-design-review plus CEO expansion.
+        </div>
+        <div>
+          <strong>Next step if approved</strong><br />
+          Convert this prototype into real editor shell architecture and map existing settings screens into the new workspace.
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const navButtons = Array.from(document.querySelectorAll("#settings-nav button"));
+      const panels = Array.from(document.querySelectorAll(".panel"));
+      const savebarTitle = document.getElementById("savebar-title");
+      const savebarCopy = document.getElementById("savebar-copy");
+      const topMeta = document.querySelector(".top-meta");
+      const topMetaChips = topMeta ? Array.from(topMeta.querySelectorAll(".meta-chip")) : [];
+      const jumpButtons = Array.from(document.querySelectorAll("[data-jump]"));
+      const saveButtons = Array.from(document.querySelectorAll(".js-save"));
+      const verifyButton = document.querySelector(".js-verify-domain");
+
+      const panelMeta = {
+        overview: {
+          title: "Overview is read-only",
+          copy: "Use this panel to understand the system, not to edit every field."
+        },
+        site: {
+          title: "Site has unsaved changes",
+          copy: "Identity edits should save explicitly and clear the health chip only after success."
+        },
+        domain: {
+          title: "Domain & Publish has unsaved changes",
+          copy: "This panel owns publish target coherence, DNS state, and SSL messaging."
+        },
+        seo: {
+          title: "SEO has unsaved changes",
+          copy: "Site defaults should save here; page-level overrides stay in Pages."
+        },
+        analytics: {
+          title: "Analytics & Consent has unsaved changes",
+          copy: "Tracking and consent need explicit trust language before publish."
+        },
+        integrations: {
+          title: "Integrations has unsaved changes",
+          copy: "Only supported runtime-backed integrations should be editable here."
+        },
+        export: {
+          title: "Export has unsaved changes",
+          copy: "Settings control defaults. Export flow handles generation."
+        },
+        advanced: {
+          title: "Advanced has unsaved changes",
+          copy: "Keep risky and destructive actions visually separated."
+        },
+        billing: {
+          title: "Billing is informational",
+          copy: "Detailed billing still hands off to account context."
+        }
+      };
+
+      function activatePanel(name) {
+        navButtons.forEach((button) => {
+          button.classList.toggle("active", button.dataset.panel === name);
+        });
+
+        panels.forEach((panel) => {
+          panel.classList.toggle("active", panel.id === `panel-${name}`);
+        });
+
+        const meta = panelMeta[name];
+        if (meta) {
+          savebarTitle.textContent = meta.title;
+          savebarCopy.textContent = meta.copy;
+        }
+      }
+
+      navButtons.forEach((button) => {
+        button.addEventListener("click", () => activatePanel(button.dataset.panel));
+      });
+
+      jumpButtons.forEach((button) => {
+        button.addEventListener("click", () => activatePanel(button.dataset.jump));
+      });
+
+      saveButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          if (topMetaChips[1]) {
+            topMetaChips[1].innerHTML = "<strong>Save model:</strong> saved just now";
+          }
+          savebarTitle.textContent = "Changes saved";
+          savebarCopy.textContent = "Prototype interaction only. In the real product this would reconcile panel state and health chips.";
+        });
+      });
+
+      if (verifyButton) {
+        verifyButton.addEventListener("click", () => {
+          const dnsNotice = document.getElementById("dns-notice");
+          const sslState = document.getElementById("ssl-state");
+          const domainStatus = navButtons.find((button) => button.dataset.panel === "domain")?.querySelector(".nav-status");
+
+          if (dnsNotice) {
+            dnsNotice.className = "notice success";
+            dnsNotice.innerHTML = "DNS verified. SSL provisioning can now complete and Publish should inherit the connected domain.";
+          }
+
+          if (sslState) {
+            sslState.textContent = "Active";
+          }
+
+          if (domainStatus) {
+            domainStatus.textContent = "connected";
+            domainStatus.className = "nav-status status-ok";
+          }
+
+          if (topMetaChips[2]) {
+            topMetaChips[2].innerHTML = "<strong>Current target:</strong> acme.com";
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

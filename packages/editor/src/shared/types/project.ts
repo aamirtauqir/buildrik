@@ -160,6 +160,8 @@ export interface ProjectSettings {
   integrations?: IntegrationsConfig;
   /** Site-level SEO defaults */
   seo?: SiteSEO;
+  /** Cookie banner and consent copy/settings */
+  cookie?: CookieConfig;
   /** Publishing configuration */
   publishing?: PublishingConfig;
   /** Design tokens (CSS custom properties) */
@@ -207,12 +209,34 @@ export interface SiteSEO {
   };
 }
 
+export interface CookieConfig {
+  categories?: {
+    necessary: boolean;
+    analytics: boolean;
+    marketing: boolean;
+  };
+  labels?: {
+    acceptAll: string;
+    savePreferences: string;
+    declineAll: string;
+  };
+}
+
 /**
  * Publishing configuration for deployment integrations
  */
 export interface PublishingConfig {
   /** Active provider */
   provider?: "vercel" | "netlify" | "github";
+  /** Default hosted subdomain for this project */
+  defaultDomain?: string;
+  /** Connected custom domain state */
+  customDomain?: {
+    hostname: string;
+    status: "connected" | "pending" | "error";
+    dnsTarget?: string;
+    sslStatus?: "active" | "pending" | "error";
+  };
   /** Last deployment info */
   lastDeployment?: {
     id: string;

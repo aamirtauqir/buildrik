@@ -7,6 +7,7 @@
 
 import * as React from "react";
 import { EVENTS } from "../../../../shared/constants";
+import { useToast } from "../../../../shared/ui/Toast";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
 import { PanelHeader } from "../../shared/PanelHeader";
 import { SearchBar } from "../../shared/SearchBar";
@@ -67,6 +68,31 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
 
   // Clear confirmation inline state
   const [showClearConfirm, setShowClearConfirm] = React.useState(false);
+
+  const { addToast } = useToast();
+
+  // Listen for capacity warning
+  React.useEffect(() => {
+    if (!composer) return;
+
+    const handleCapacityWarning = () => {
+      addToast({
+        title: "History almost full",
+        message: "You've reached 90% of your undo history. Save a version to preserve your work.",
+        variant: "warning",
+        duration: 6000,
+        action: {
+          label: "Save Version",
+          onClick: () => setActiveView("versions"),
+        },
+      });
+    };
+
+    composer.on(EVENTS.HISTORY_CAPACITY_WARNING, handleCapacityWarning);
+    return () => {
+      composer.off(EVENTS.HISTORY_CAPACITY_WARNING, handleCapacityWarning);
+    };
+  }, [composer, addToast]);
 
   // Persist view changes
   React.useEffect(() => {

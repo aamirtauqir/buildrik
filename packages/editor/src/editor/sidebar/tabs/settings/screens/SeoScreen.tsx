@@ -6,49 +6,37 @@
  */
 
 import * as React from "react";
-import { EVENTS } from "../../../../../shared/constants/events";
 import { StickyFooter } from "../../../shared/StickyFooter";
+import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { Section, Field } from "../shared";
 import type { ScreenProps } from "../types";
 
 export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) => {
+  const { value: savedSeo } = useSettingsScreen(
+    composer,
+    (settings) => ({
+      siteName: settings.seo?.siteName ?? "",
+      twitterHandle: settings.seo?.twitterHandle ?? "",
+      defaultOgImage: settings.seo?.defaultOgImage ?? "",
+    }),
+    { siteName: "", twitterHandle: "", defaultOgImage: "" }
+  );
+
   const [siteName, setSiteName] = React.useState("");
   const [twitterHandle, setTwitterHandle] = React.useState("");
   const [defaultOgImage, setDefaultOgImage] = React.useState("");
   const [hasChanges, setHasChanges] = React.useState(false);
-  const hasLoadedRef = React.useRef(false);
 
   React.useEffect(() => {
     onDirtyChange?.(hasChanges);
   }, [hasChanges, onDirtyChange]);
 
-  const loadSettings = React.useCallback(() => {
-    if (!composer) return;
-    const settings = composer.getProjectSettings();
-    const seo = settings.seo ?? {};
-    setSiteName(seo.siteName ?? "");
-    setTwitterHandle(seo.twitterHandle ?? "");
-    setDefaultOgImage(seo.defaultOgImage ?? "");
-    hasLoadedRef.current = true;
-    setHasChanges(false);
-  }, [composer]);
-
   React.useEffect(() => {
-    if (!composer) return;
-    loadSettings();
-
-    const handleProjectLoaded = () => {
-      if (!hasLoadedRef.current) loadSettings();
-    };
-
-    composer.on(EVENTS.PROJECT_LOADED, handleProjectLoaded);
-    composer.on(EVENTS.SETTINGS_CHANGE, loadSettings);
-
-    return () => {
-      composer.off(EVENTS.PROJECT_LOADED, handleProjectLoaded);
-      composer.off(EVENTS.SETTINGS_CHANGE, loadSettings);
-    };
-  }, [composer, loadSettings]);
+    setSiteName(savedSeo.siteName);
+    setTwitterHandle(savedSeo.twitterHandle);
+    setDefaultOgImage(savedSeo.defaultOgImage);
+    setHasChanges(false);
+  }, [savedSeo]);
 
   const handleSave = () => {
     if (!composer) return;

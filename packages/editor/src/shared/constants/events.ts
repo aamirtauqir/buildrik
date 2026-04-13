@@ -517,6 +517,7 @@ export interface EventPayloads {
     entry: { timestamp: number; snapshot: import("../types").ProjectData; label?: string };
   };
   [EVENTS.HISTORY_RECORDED]: { label?: string };
+  [EVENTS.HISTORY_CAPACITY_WARNING]: { count: number; max: number; percentage: number };
   [EVENTS.HISTORY_CLEARED]: void;
 
   // Version History Events (AQUI-031)

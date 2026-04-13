@@ -284,6 +284,12 @@ export class Composer extends EventEmitter {
   importProject(data: ProjectData): void {
     this.emit(EVENTS.PROJECT_LOADED, { importing: true, data });
 
+    // Clear selection FIRST: any selected Element refs are about to be
+    // destroyed by elements.clear(). Without this, undo/redo/load leaves
+    // the inspector holding orphaned Element instances and rendering stale
+    // data for elements that no longer exist (CAN-006).
+    this.selection?.clear();
+
     // Clear current state
     this.elements.clear();
     this.styles.clear();

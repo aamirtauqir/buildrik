@@ -4,13 +4,37 @@
  */
 
 import * as React from "react";
-import { EVENTS } from "../../../../../shared/constants/events";
 import { StickyFooter } from "../../../shared/StickyFooter";
+import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { Section, Field } from "../shared";
 
 import type { ScreenProps } from "../types";
 
 export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) => {
+  const { value: savedSiteSettings } = useSettingsScreen(
+    composer,
+    (settings) => ({
+      siteName: settings.seo?.siteName ?? "",
+      favicon: settings.seo?.favicon ?? "",
+      language: settings.seo?.language ?? "en",
+      socialLinks: {
+        twitter: settings.seo?.socialLinks?.twitter ?? "",
+        facebook: settings.seo?.socialLinks?.facebook ?? "",
+        linkedin: settings.seo?.socialLinks?.linkedin ?? "",
+      },
+    }),
+    {
+      siteName: "",
+      favicon: "",
+      language: "en",
+      socialLinks: {
+        twitter: "",
+        facebook: "",
+        linkedin: "",
+      },
+    }
+  );
+
   const [name, setName] = React.useState("");
   const [favicon, setFavicon] = React.useState("");
   const [language, setLanguage] = React.useState("en");
@@ -19,46 +43,21 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
   const [linkedin, setLinkedin] = React.useState("");
   const [hasChanges, setHasChanges] = React.useState(false);
   const [saveError, setSaveError] = React.useState<string | null>(null);
-  const hasLoadedRef = React.useRef(false);
 
   // Notify shell of dirty state for nav guard
   React.useEffect(() => {
     onDirtyChange?.(hasChanges);
   }, [hasChanges, onDirtyChange]);
 
-  // Load settings from project
-  const loadSettings = React.useCallback(() => {
-    if (!composer) return;
-    const settings = composer.getProjectSettings();
-    const seo = settings.seo ?? {};
-
-    setName(seo.siteName ?? "");
-    setFavicon(seo.favicon ?? "");
-    setLanguage(seo.language ?? "en");
-    setTwitter(seo.socialLinks?.twitter ?? "");
-    setFacebook(seo.socialLinks?.facebook ?? "");
-    setLinkedin(seo.socialLinks?.linkedin ?? "");
-    hasLoadedRef.current = true;
-    setHasChanges(false);
-  }, [composer]);
-
-  // Load on mount and when project loads
   React.useEffect(() => {
-    if (!composer) return;
-    loadSettings();
-
-    const handleProjectLoaded = () => {
-      if (!hasLoadedRef.current) loadSettings();
-    };
-
-    composer.on(EVENTS.PROJECT_LOADED, handleProjectLoaded);
-    composer.on(EVENTS.SETTINGS_CHANGE, loadSettings);
-
-    return () => {
-      composer.off(EVENTS.PROJECT_LOADED, handleProjectLoaded);
-      composer.off(EVENTS.SETTINGS_CHANGE, loadSettings);
-    };
-  }, [composer, loadSettings]);
+    setName(savedSiteSettings.siteName);
+    setFavicon(savedSiteSettings.favicon);
+    setLanguage(savedSiteSettings.language);
+    setTwitter(savedSiteSettings.socialLinks.twitter);
+    setFacebook(savedSiteSettings.socialLinks.facebook);
+    setLinkedin(savedSiteSettings.socialLinks.linkedin);
+    setHasChanges(false);
+  }, [savedSiteSettings]);
 
   const handleSave = () => {
     if (!composer) return;
@@ -84,8 +83,9 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
   return (
     <div className="aqb-st-screen">
       <Section title="Site Identity">
-        <Field label="Site Name">
+        <Field label="Site Name" htmlFor="site-settings-name">
           <input
+            id="site-settings-name"
             type="text"
             value={name}
             onChange={(e) => {
@@ -96,8 +96,9 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
             className="aqb-st-input"
           />
         </Field>
-        <Field label="Favicon URL">
+        <Field label="Favicon URL" htmlFor="site-settings-favicon">
           <input
+            id="site-settings-favicon"
             type="text"
             value={favicon}
             onChange={(e) => {
@@ -108,8 +109,9 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
             className="aqb-st-input"
           />
         </Field>
-        <Field label="Site Language">
+        <Field label="Site Language" htmlFor="site-settings-language">
           <select
+            id="site-settings-language"
             value={language}
             onChange={(e) => {
               setLanguage(e.target.value);

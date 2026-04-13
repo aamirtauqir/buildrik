@@ -13,7 +13,12 @@ import type { Composer } from "../../../engine";
 import type { BlockData } from "../../../shared/types";
 import { useToast } from "../../../shared/ui/Toast";
 import { animateDropSuccess } from "../../../shared/utils/dragDrop/animations";
-import { canNestElement, getSuggestedParents } from "../../../shared/utils/nesting";
+import {
+  canNestElement,
+  getSuggestedParents,
+  ELEMENT_CATEGORIES,
+  ElementCategory,
+} from "../../../shared/utils/nesting";
 
 export interface UseBlockInsertionResult {
   handleBlockClick: (block: BlockData) => void;
@@ -63,7 +68,15 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
           const selectedEl = composer.elements.getElement(selectedIds[0]);
           if (selectedEl) {
             const selectedType = selectedEl.getType();
-            const canContain = canNestElement(def.elementType, selectedType);
+            // Only auto-nest inside layout containers (container, flex, grid, section…).
+            // For text/interactive leaves like heading/button/link, canNestElement is
+            // HTML-permissive and would incorrectly parent a sibling click under the
+            // current selection. Sibling-insert instead matches the click-to-stack UX.
+            const selectedIsContainer = ELEMENT_CATEGORIES[selectedType]?.includes(
+              ElementCategory.CONTAINER
+            );
+            const canContain =
+              selectedIsContainer && canNestElement(def.elementType, selectedType);
             if (canContain) {
               parentId = selectedEl.getId();
               insertIndex = selectedEl.getChildCount?.() ?? 0;

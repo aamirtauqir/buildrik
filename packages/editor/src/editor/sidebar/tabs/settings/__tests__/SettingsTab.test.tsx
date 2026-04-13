@@ -6,6 +6,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import * as React from "react";
+import { DomainsScreen } from "../screens/DomainsScreen";
+import { IntegrationsScreen } from "../screens/IntegrationsScreen";
 import { SiteSettingsScreen } from "../screens/SiteSettingsScreen";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -141,5 +143,85 @@ describe("SiteSettingsScreen save error state", () => {
     fireEvent.click(saveBtn);
 
     expect(onDirtyChange).toHaveBeenLastCalledWith(false);
+  });
+});
+
+describe("DomainsScreen", () => {
+  it("saves normalized custom domain into publishing settings", () => {
+    const composer = makeComposer({
+      getProjectSettings: vi.fn(() => ({
+        seo: {},
+        publishing: {
+          provider: "netlify",
+        },
+      })),
+    });
+
+    render(<DomainsScreen composer={composer as never} onDirtyChange={vi.fn()} />);
+
+    fireEvent.change(screen.getByPlaceholderText(/www.example.com/i), {
+      target: { value: "HTTPS://WWW.Example.com/" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /connect domain/i }));
+    fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+
+    expect(composer.setProjectSettings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        publishing: expect.objectContaining({
+          provider: "netlify",
+          customDomain: expect.objectContaining({
+            hostname: "www.example.com",
+            status: "pending",
+          }),
+        }),
+      })
+    );
+  });
+});
+
+describe("IntegrationsScreen", () => {
+  it("saves stripe and email integration settings", () => {
+    const composer = makeComposer({
+      getProjectSettings: vi.fn(() => ({
+        seo: {},
+        integrations: {},
+      })),
+    });
+
+    render(<IntegrationsScreen composer={composer as never} onDirtyChange={vi.fn()} />);
+
+    fireEvent.click(screen.getByRole("switch", { name: /enable stripe/i }));
+    fireEvent.change(screen.getByLabelText(/stripe publishable key/i), {
+      target: { value: "pk_test_123" },
+    });
+
+    fireEvent.change(screen.getByLabelText(/email provider/i), {
+      target: { value: "mailchimp" },
+    });
+    fireEvent.change(screen.getByLabelText(/email api key/i), {
+      target: { value: "api-key-123" },
+    });
+    fireEvent.change(screen.getByLabelText(/audience or list id/i), {
+      target: { value: "list_123" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
+
+    expect(composer.setProjectSettings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        integrations: expect.objectContaining({
+          stripe: expect.objectContaining({
+            enabled: true,
+            publishableKey: "pk_test_123",
+          }),
+          email: expect.objectContaining({
+            enabled: true,
+            provider: "mailchimp",
+            apiKey: "api-key-123",
+            listId: "list_123",
+          }),
+        }),
+      })
+    );
   });
 });

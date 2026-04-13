@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buildrik - Integrated History Prototype</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ls-bg-editor: #F1F5F9;
+            --ls-bg-panel: #F8FAFC;
+            --ls-bg-card: #FFFFFF;
+            --ls-border-card: #D1D9E6;
+            --ls-text-primary: #0F172A;
+            --ls-text-secondary: #334155;
+            --ls-text-subtle: #64748B;
+            --ls-accent: #1D4ED8;
+            --ls-accent-bg: #DBEAFE;
+            --ls-error: #DC2626;
+            --ls-success: #16A34A;
+            --ls-warning: #F59E0B;
+            --topbar-height: 48px;
+            --rail-width: 56px;
+            --sidebar-width: 320px;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background: var(--ls-bg-editor); height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        /* --- PROTOTYPE CONTROLS --- */
+        .proto-nav {
+            background: #0f172a; color: #fff; padding: 12px;
+            display: flex; justify-content: center; gap: 15px; z-index: 1000;
+        }
+        .proto-nav span { font-size: 12px; font-weight: 700; color: var(--ls-accent-bg); text-transform: uppercase; margin-right: 10px; }
+        .proto-nav button {
+            background: #334155; color: #fff; border: 1px solid #475569; padding: 6px 14px;
+            border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;
+        }
+        .proto-nav button:hover { background: #475569; }
+
+        /* --- EDITOR SHELL --- */
+        .topbar {
+            height: var(--topbar-height); background: #FFF; border-bottom: 1px solid var(--ls-border-card);
+            display: flex; align-items: center; padding: 0 16px; justify-content: space-between;
+        }
+        .editor-body { flex: 1; display: flex; overflow: hidden; position: relative; }
+        .rail {
+            width: var(--rail-width); background: #FFF; border-right: 1px solid var(--ls-border-card);
+            display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 16px;
+        }
+        .rail-item { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--ls-text-subtle); }
+        .rail-item.active { background: var(--ls-accent-bg); color: var(--ls-accent); }
+
+        /* --- CONTENT AREAS --- */
+        .sidebar { width: var(--sidebar-width); border-right: 1px solid var(--ls-border-card); background: #FFF; display: flex; flex-direction: column; }
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--ls-bg-panel); }
+
+        /* --- COMPONENTS --- */
+        .panel-header { height: 48px; padding: 0 16px; border-bottom: 1px solid var(--ls-border-card); display: flex; align-items: center; justify-content: space-between; background: #FFF; }
+        .section-label { padding: 8px 16px; font-size: 11px; font-weight: 700; color: var(--ls-text-subtle); text-transform: uppercase; background: #F1F5F9; border-bottom: 1px solid var(--ls-border-card); }
+        
+        .activity-item { 
+            padding: 12px 16px; border-bottom: 1px solid var(--ls-border-card); 
+            display: flex; align-items: center; gap: 12px; background: #FFF;
+            transition: all 0.2s; position: relative;
+        }
+        .activity-item:hover { background: #F8FAFC; }
+        
+        .rollback-btn {
+            position: absolute; right: 16px; opacity: 0;
+            background: #FFF; border: 1px solid var(--ls-border-card);
+            padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;
+            color: var(--ls-accent); cursor: pointer; transition: all 0.2s;
+        }
+        .activity-item:hover .rollback-btn { opacity: 1; right: 12px; }
+        .rollback-btn:hover { background: var(--ls-accent); color: #FFF; border-color: var(--ls-accent); }
+
+        .badge-live { background: var(--ls-accent); color: #FFF; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; }
+        .badge-curr { background: var(--ls-success); color: #FFF; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; }
+
+        /* --- TOAST SIMULATION --- */
+        .toast-container {
+            position: absolute; bottom: 24px; right: 24px; z-index: 2000;
+            display: none; width: 340px;
+        }
+        .toast {
+            background: #FFF; border-left: 4px solid var(--ls-warning);
+            padding: 16px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: flex; flex-direction: column; gap: 10px; animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        .toast-title { font-weight: 700; font-size: 14px; color: var(--ls-text-primary); display: flex; align-items: center; gap: 8px; }
+        .toast-msg { font-size: 13px; color: var(--ls-text-secondary); line-height: 1.4; }
+        .toast-action { align-self: flex-end; background: var(--ls-accent); color: #FFF; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+        /* --- DIFF BOX --- */
+        .diff-box { padding: 8px 12px; background: #F1F5F9; border-radius: 6px; font-family: monospace; font-size: 11px; margin-top: 8px; width: 100%; }
+    </style>
+</head>
+<body>
+
+    <nav class="proto-nav">
+        <span>CEO Plan Simulation:</span>
+        <button onclick="toggleToast()">1. Trigger 90% Warning</button>
+        <button onclick="highlightLive()">2. Identify LIVE Deploy</button>
+        <button onclick="showRollback()">3. Demo Rollback UI</button>
+    </nav>
+
+    <div class="topbar">
+        <div style="font-weight:800; color:var(--ls-accent); font-size:18px;">Buildrik</div>
+        <div style="display:flex; gap:8px;">
+            <div style="width:32px; height:32px; border:1px solid #D1D9E6; border-radius:6px; display:flex; align-items:center; justify-content:center; color: var(--ls-text-subtle);">↶</div>
+            <div style="width:32px; height:32px; border:1px solid #D1D9E6; border-radius:6px; display:flex; align-items:center; justify-content:center; color: var(--ls-text-subtle);">↷</div>
+        </div>
+        <button style="background:var(--ls-accent); color:#fff; border:none; padding:6px 16px; border-radius:6px; font-weight:600;">Publish</button>
+    </div>
+
+    <div class="editor-body">
+        <div class="rail">
+            <div class="rail-item">➕</div>
+            <div class="rail-item">📑</div>
+            <div class="rail-item active">🕒</div>
+            <div class="rail-item">⚙️</div>
+        </div>
+
+        <div class="sidebar">
+            <div class="panel-header"><h2>History</h2></div>
+            <div style="padding:12px 16px; border-bottom:1px solid #D1D9E6;">
+                <div style="background:#F1F5F9; height:34px; border-radius:6px; display:flex; align-items:center; padding:0 10px; font-size:12px; color:#64748B;">🔍 Search activity...</div>
+            </div>
+            <div style="flex:1; overflow-y:auto;">
+                <div class="section-label">Today</div>
+                
+                <!-- CURRENT ITEM -->
+                <div class="activity-item">
+                    <div style="flex:1">
+                        <div style="font-size:13px; font-weight:600;">Changed hero color</div>
+                        <div style="font-size:11px; color:#64748B;">Just now · 2 changes</div>
+                    </div>
+                    <div class="badge-curr">CURRENT</div>
+                </div>
+
+                <!-- LIVE ITEM ( CEO PLAN ) -->
+                <div class="activity-item" id="liveItem">
+                    <div style="flex:1">
+                        <div style="font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px;">
+                            Project Published <span class="badge-live">LIVE</span>
+                        </div>
+                        <div style="font-size:11px; color:#64748B;">10:45 AM · Deployment Checkpoint</div>
+                    </div>
+                    <button class="rollback-btn">Rollback</button>
+                </div>
+
+                <div class="activity-item">
+                    <div style="flex:1">
+                        <div style="font-size:13px; font-weight:600;">Updated pricing text</div>
+                        <div style="font-size:11px; color:#64748B;">10:12 AM · 1 change</div>
+                    </div>
+                    <button class="rollback-btn">Rollback</button>
+                </div>
+
+                <div class="section-label">Yesterday</div>
+                
+                <div class="activity-item">
+                    <div style="flex:1">
+                        <div style="font-size:13px; font-weight:600;">Initial Page Setup</div>
+                        <div style="font-size:11px; color:#64748B;">Apr 12 · 150 elements</div>
+                    </div>
+                    <button class="rollback-btn">Rollback</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="panel-header" style="background:transparent; border:none;">
+                <h2>Unified Review Activity</h2>
+                <div style="display:flex; gap:8px;">
+                    <div style="background:#FFF; border:1px solid #D1D9E6; padding:6px 12px; border-radius:8px; font-size:12px;">Last 7 Days ▾</div>
+                    <div style="background:#FFF; border:1px solid #D1D9E6; padding:6px 12px; border-radius:8px; font-size:12px;">Filter: All ▾</div>
+                </div>
+            </div>
+            
+            <div style="padding:20px;">
+                <div style="background:#FFF; border:1px solid #D1D9E6; border-radius:12px; padding:24px; box-shadow:0 4px 6px rgba(0,0,0,0.02);">
+                    <div style="font-weight:700; font-size:16px; margin-bottom:12px;">Deployment Details: Project Published</div>
+                    <div style="font-size:13px; color:#64748B; margin-bottom:20px;">This snapshot was deployed to <b>buildrik.app/p-123</b> by <b>You</b> at 10:45 AM.</div>
+                    
+                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:#94A3B8; margin-bottom:10px;">Changes in this deployment</div>
+                    <div class="diff-box">
+                        <div style="color:var(--ls-success)">+ Added "Pricing Table" component</div>
+                        <div style="color:var(--ls-success)">+ Added "Testimonial Slider"</div>
+                        <div style="color:var(--ls-error)">- Removed "Legacy Banner"</div>
+                    </div>
+
+                    <button style="margin-top:24px; background:var(--ls-accent-bg); color:var(--ls-accent); border:1px solid var(--ls-accent); padding:10px 20px; border-radius:8px; font-weight:700; cursor:pointer;">
+                        Restore Live Canvas to this State
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 90% WARNING TOAST ( CEO PLAN ) -->
+        <div class="toast-container" id="warnToast">
+            <div class="toast">
+                <div class="toast-title">⚠️ History almost full</div>
+                <div class="toast-msg">You've reached 90% of your undo history. Save a named version now to ensure you don't lose any work.</div>
+                <button class="toast-action">Save Version</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleToast() {
+            const t = document.getElementById('warnToast');
+            t.style.display = t.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function highlightLive() {
+            const live = document.getElementById('liveItem');
+            live.style.transition = 'all 0.5s';
+            live.style.background = '#DBEAFE';
+            setTimeout(() => live.style.background = '#FFF', 2000);
+        }
+
+        function showRollback() {
+            alert("This simulates the 'Strategic Safety Net'. Clicking Rollback would trigger the restoreToIndex() engine method, instantly reverting the canvas to this point in time.");
+        }
+    </script>
+</body>
+</html>

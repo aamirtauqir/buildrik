@@ -4,16 +4,42 @@
  */
 
 import * as React from "react";
-import { EVENTS } from "../../../../../shared/constants/events";
+import type { AnalyticsConfig } from "../../../../../shared/types/project";
 import { StickyFooter } from "../../../shared/StickyFooter";
+import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { Section, Field, ToggleControlled } from "../shared";
 import type { ScreenProps } from "../types";
 
 // GA4 measurement ID: exactly G- followed by 10 alphanumeric characters (EC-05)
 const GA_ID_REGEX = /^G-[A-Z0-9]{10}$/i;
 
+const DEFAULT_ANALYTICS_SETTINGS: Required<
+  Pick<AnalyticsConfig, "googleAnalytics" | "facebookPixel" | "cookieConsent">
+> = {
+  googleAnalytics: {
+    enabled: false,
+    measurementId: "",
+  },
+  facebookPixel: {
+    enabled: false,
+    pixelId: "",
+  },
+  cookieConsent: {
+    enabled: true,
+  },
+};
+
 export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) => {
-  // Simple defaults — loadSettings populates on mount via useEffect (removes double-init)
+  const { value: savedAnalytics } = useSettingsScreen(
+    composer,
+    (settings) => ({
+      googleAnalytics: settings.analytics?.googleAnalytics ?? DEFAULT_ANALYTICS_SETTINGS.googleAnalytics,
+      facebookPixel: settings.analytics?.facebookPixel ?? DEFAULT_ANALYTICS_SETTINGS.facebookPixel,
+      cookieConsent: settings.analytics?.cookieConsent ?? DEFAULT_ANALYTICS_SETTINGS.cookieConsent,
+    }),
+    DEFAULT_ANALYTICS_SETTINGS
+  );
+
   const [gaId, setGaId] = React.useState("");
   const [gaEnabled, setGaEnabled] = React.useState(false);
   const [metaPixelId, setMetaPixelId] = React.useState("");
@@ -21,37 +47,19 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
   const [cookieBanner, setCookieBanner] = React.useState(true);
   const [hasChanges, setHasChanges] = React.useState(false);
 
-  // Load settings from project
-  const loadSettings = React.useCallback(() => {
-    if (!composer) return;
-    const settings = composer.getProjectSettings();
-    const analytics = settings.analytics ?? {};
-    setGaId(analytics.googleAnalytics?.measurementId ?? "");
-    setGaEnabled(analytics.googleAnalytics?.enabled ?? false);
-    setMetaPixelId(analytics.facebookPixel?.pixelId ?? "");
-    setMetaPixelEnabled(analytics.facebookPixel?.enabled ?? false);
-    setCookieBanner(analytics.cookieConsent?.enabled ?? true);
-    setHasChanges(false);
-  }, [composer]);
-
   // Notify shell of dirty state for nav guard
   React.useEffect(() => {
     onDirtyChange?.(hasChanges);
   }, [hasChanges, onDirtyChange]);
 
-  // Re-sync on mount and when project loads
   React.useEffect(() => {
-    if (!composer) return;
-    loadSettings();
-
-    composer.on(EVENTS.PROJECT_LOADED, loadSettings);
-    composer.on(EVENTS.SETTINGS_CHANGE, loadSettings);
-
-    return () => {
-      composer.off(EVENTS.PROJECT_LOADED, loadSettings);
-      composer.off(EVENTS.SETTINGS_CHANGE, loadSettings);
-    };
-  }, [composer, loadSettings]);
+    setGaId(savedAnalytics.googleAnalytics.measurementId);
+    setGaEnabled(savedAnalytics.googleAnalytics.enabled);
+    setMetaPixelId(savedAnalytics.facebookPixel.pixelId);
+    setMetaPixelEnabled(savedAnalytics.facebookPixel.enabled);
+    setCookieBanner(savedAnalytics.cookieConsent.enabled);
+    setHasChanges(false);
+  }, [savedAnalytics]);
 
   // Validation
   const gaError = gaId && !GA_ID_REGEX.test(gaId);
@@ -65,6 +73,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
     composer.setProjectSettings({
       ...current,
       analytics: {
+        ...current.analytics,
         googleAnalytics: {
           enabled: gaEnabled && !!gaId,
           measurementId: gaId,
@@ -92,6 +101,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
         <Field
           label="Google Analytics ID"
           hint="Find this in Google Analytics → Admin → Data Streams → your stream → Measurement ID"
+          htmlFor="ga-measurement-id"
         >
           <input
             id="ga-measurement-id"
@@ -140,6 +150,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange
         <Field
           label="Meta (Facebook) Pixel ID"
           hint="15–16 digit number from your Meta Events Manager"
+          htmlFor="meta-pixel-id"
         >
           <input
             id="meta-pixel-id"

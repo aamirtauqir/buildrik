@@ -67,6 +67,8 @@ export const STORAGE_KEYS = {
   BUILD_FAVS_INFORMED: "aqb-build-favs-informed",
   /** Whether the Pro Tips footer is collapsed */
   BUILD_TIPS_COLLAPSED: "aqb-build-tips-collapsed",
+  /** Add tab mode: "elements" | "sections" (sessionStorage) */
+  BUILD_MODE: "aqb-build-mode",
 
   // ─── Components Tab ───────────────────────────────────────────
   /** Favorite component IDs in the components library */

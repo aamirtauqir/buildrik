@@ -133,7 +133,9 @@ export const ActivityView: React.FC<ActivityViewProps> = ({ composer, searchQuer
                     <div className="aqb-ht-entry__label">
                       {entry.label}
                       {entry.type === "checkpoint" && (
-                        <span className="aqb-ht-entry__badge">checkpoint</span>
+                        <span className="aqb-ht-entry__badge">
+                          {entry.label === "Project Published" ? "LIVE" : "checkpoint"}
+                        </span>
                       )}
                     </div>
                     <div className="aqb-ht-entry__meta hist-event-row__time">
@@ -146,8 +148,24 @@ export const ActivityView: React.FC<ActivityViewProps> = ({ composer, searchQuer
                     </div>
                   </div>
 
-                  {/* Current indicator (first entry overall = most recent) */}
-                  {isFirst && <div className="aqb-ht-entry__current">Current</div>}
+                  {/* Actions */}
+                  <div className="aqb-ht-entry__actions">
+                    {!isFirst && (
+                      <button
+                        className="aqb-ht-rollback-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (composer?.history) {
+                            composer.history.restoreToIndex(entry.index);
+                          }
+                        }}
+                        title={`Roll back to this ${entry.type}`}
+                      >
+                        Rollback
+                      </button>
+                    )}
+                    {isFirst && <div className="aqb-ht-entry__current">Current</div>}
+                  </div>
                 </div>
 
                 {/* Expanded Diff Details */}

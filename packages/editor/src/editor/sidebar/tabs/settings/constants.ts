@@ -8,9 +8,9 @@
  * Change to true when the feature ships.
  */
 export const FEATURE_FLAGS = {
-  domains: false,
+  domains: true,
   export: true,
-  integrations: false,
+  integrations: true,
   cmsTab: false,
   collaborationTab: false,
   componentsTab: false,
