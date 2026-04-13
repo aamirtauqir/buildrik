@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1.0] - 2026-04-13
+
+### Added
+- Templates tab: TemplateCard and TemplatePagination components plus pagination, sub-category, and Page/Section type filters in `useTemplateSelection`. Templates browser now opens cleanly with grid + paging (CAN-002).
+- Sections mode in the Add tab: implemented `useSectionInsert` so clicking a section card inserts production HTML into the active page root inside a single history transaction (CAN-003).
+- Settings → Export: shared screen-style module (`settings/styles/index.ts`) with `screenStyles`, `exportOptionsStyles`, `exportOptionStyles`, `activeExportOptionStyles`, `noteStyles`. Settings tab no longer crashes on open (CAN-004).
+- Build tab Elements/Sections mode-switch hook fields (`mode`, `setMode`) wired to sessionStorage so the active mode survives sidebar re-opens.
+
+### Fixed
+- Editor failed to boot due to missing `PinPopover` import in `BuildTab.tsx`. Stripped the half-landed Quick Picks + Pin feature so the editor renders (CAN-001). Quick Picks can be rebuilt on its own branch when ready.
+- Click-to-insert nested elements inside the wrong parent: clicking Heading then Button produced `div > h2 > span` ("HeadingClick Me" jammed on one line). `useBlockInsertion` now only auto-nests when the selection is a layout `CONTAINER`; otherwise inserts as a sibling. Matches click-to-stack UX without distorting HTML validation (CAN-005).
+- Inspector showed stale element data after undo. `Composer.importProject` now clears selection before clearing elements, so the inspector's React state cascades to no-selection through the existing `selection:cleared` event (CAN-006).
+- Test/implementation drift in two existing test files: `catalog.test.ts` expected 7 categories (catalog has 6), `SearchResults.test.tsx` referenced removed copy. Both updated to match current implementation.
+
+### Tests
+- 16 new tests covering `useBlockInsertion` smart-placement (4), `Composer.importProject` selection-clear ordering (2), `TemplateCard` (9 — existing spec), and refreshed `SearchResults` (4).
+- Full editor suite now green: 405 passing, 0 failing.
+
 ## [0.2.0.0] - 2026-04-13
 
 ### Added

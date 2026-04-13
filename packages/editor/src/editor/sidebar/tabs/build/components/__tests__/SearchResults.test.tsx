@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import * as React from "react";
 import { SearchResults } from "../SearchResults";
 
@@ -14,8 +14,8 @@ vi.mock("../ElCard", () => ({
 
 const noop = vi.fn();
 
-describe("SearchResults — no results / AI handoff", () => {
-  it("renders no-results message when query has no matches", () => {
+describe("SearchResults — no results state", () => {
+  it("renders the no-results headline when the query has no matches", () => {
     render(
       <SearchResults
         query="foobar"
@@ -24,57 +24,47 @@ describe("SearchResults — no results / AI handoff", () => {
         onElClick={noop}
       />
     );
-    // The component renders `Nothing matches "{query}"` with HTML entity
-    // left/right double quotes (&ldquo;/&rdquo;). Match the stable prefix
-    // so the test doesn't break on copy tweaks or query interpolation.
-    expect(screen.getByText(/Nothing matches/)).toBeInTheDocument();
+    expect(screen.getByText("No matching block in Add")).toBeInTheDocument();
     expect(screen.getByRole("status")).toBeInTheDocument();
   });
 
-  it("shows AI handoff section with Sparkles icon", () => {
+  it("renders the AI suggestion card body", () => {
+    render(
+      <SearchResults
+        query="xyz"
+        groups={[]}
+        onDragStart={noop}
+        onElClick={noop}
+      />
+    );
+    expect(
+      screen.getByText(/Try describing what you need/)
+    ).toBeInTheDocument();
+  });
+
+  it("renders the slash-shortcut hint", () => {
+    render(
+      <SearchResults
+        query="xyz"
+        groups={[]}
+        onDragStart={noop}
+        onElClick={noop}
+      />
+    );
+    expect(
+      screen.getByText("/ opens AI outside the sidebar.")
+    ).toBeInTheDocument();
+  });
+
+  it("renders the no-results sparkle icon", () => {
     const { container } = render(
       <SearchResults
         query="xyz"
         groups={[]}
         onDragStart={noop}
         onElClick={noop}
-        onAiHandoff={noop}
       />
     );
-    // Component uses `Can&rsquo;t` (HTML entity), which renders as the
-    // curly right single quote (U+2019), not a straight ASCII apostrophe.
-    expect(screen.getByText("Can\u2019t find what you need?")).toBeInTheDocument();
-    expect(container.querySelector(".bld-ai-handoff-icon")).toBeTruthy();
-  });
-
-  it("shows Try AI card with Cmd+K shortcut badge", () => {
-    render(
-      <SearchResults
-        query="xyz"
-        groups={[]}
-        onDragStart={noop}
-        onElClick={noop}
-        onAiHandoff={noop}
-      />
-    );
-    expect(
-      screen.getByText("Try AI to generate custom elements")
-    ).toBeInTheDocument();
-    expect(screen.getByText("\u2318 + K")).toBeInTheDocument();
-  });
-
-  it("calls onAiHandoff when AI card clicked", () => {
-    const onAiHandoff = vi.fn();
-    render(
-      <SearchResults
-        query="xyz"
-        groups={[]}
-        onDragStart={noop}
-        onElClick={noop}
-        onAiHandoff={onAiHandoff}
-      />
-    );
-    fireEvent.click(screen.getByText("Try AI to generate custom elements"));
-    expect(onAiHandoff).toHaveBeenCalledTimes(1);
+    expect(container.querySelector(".bld-no-results-icon")).toBeTruthy();
   });
 });
