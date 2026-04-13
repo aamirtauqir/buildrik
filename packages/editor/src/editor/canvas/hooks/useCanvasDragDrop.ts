@@ -556,48 +556,86 @@ export function useCanvasDragDrop({
   const handleInternalMediaDrop = React.useCallback(
     async (e: React.DragEvent) => {
       const src = e.dataTransfer.getData("application/x-aquibra-media-src");
-      const type = e.dataTransfer.getData("application/x-aquibra-media-type");
+      const rawType = e.dataTransfer.getData("application/x-aquibra-media-type");
       const name = e.dataTransfer.getData("application/x-aquibra-media-name");
+      if (!src || !composer) return;
 
-      if (src && composer) {
-        const { targetId } = calculateFreshDropTarget(
-          e.clientX,
-          e.clientY,
-          composer,
-          canvasRef,
-          findDropTargetElement
-        );
+      // Translate drop viewport coords to canvas-space coords. If we're
+      // over a specific element (section with bg-image, img placeholder),
+      // prefer that as targetElementId so the src replaces rather than
+      // creates a new element. Otherwise fall back to coords-on-root.
+      const { targetId } = calculateFreshDropTarget(
+        e.clientX,
+        e.clientY,
+        composer,
+        canvasRef,
+        findDropTargetElement,
+      );
 
-        if (targetId) {
-          const el = composer.elements.getElement(targetId);
-          if (el) {
-            if (el.getType() === "section" || el.getStyle("background-image")) {
-              el.setStyle("background-image", `url(${src})`);
-            } else {
-              el.setAttribute("src", src);
-            }
+      const canvasEl = canvasRef.current;
+      const rect = canvasEl?.getBoundingClientRect();
+      const x = rect ? Math.round(e.clientX - rect.left) : undefined;
+      const y = rect ? Math.round(e.clientY - rect.top) : undefined;
 
-            onDropSuccessRef.current?.({
-              elementLabel: `${name || 'Media'} applied ✓`,
-              elementType: type || "image",
-            });
+      // Normalize the legacy "img"/"vid"/"ico"/"fnt" filter keys to the
+      // engine's MediaInsertType vocabulary.
+      const insertType =
+        rawType === "img"
+          ? "image"
+          : rawType === "vid"
+            ? "video"
+            : rawType === "ico"
+              ? "icon"
+              : rawType === "fnt"
+                ? "font"
+                : (rawType as "image" | "video" | "icon" | "svg" | "audio" | "lottie" | "font");
 
-            // Auto-save discovery asset to library
-            if (type === "img" && src.startsWith("http")) {
-              try {
-                const res = await fetch(src);
-                const blob = await res.blob();
-                const file = new File([blob], `imported-${(name || 'img').substring(0, 10)}.webp`, { type: "image/webp" });
-                await composer.media.uploadFile(file);
-              } catch (err) {
-                console.error("Discovery auto-save failed:", err);
-              }
-            }
-          }
+      try {
+        const result = composer.mediaCommands.insertMediaAt(src, insertType, {
+          x,
+          y,
+          targetElementId: targetId ?? undefined,
+          path: "drag",
+        });
+
+        if (result) {
+          onDropSuccessRef.current?.({
+            elementLabel: `${name || "Media"} ${targetId ? "applied" : "added"} ✓`,
+            elementType: insertType,
+          });
+        } else {
+          onDropErrorRef.current?.({
+            type: "INSERT_FAILED",
+            message: "Could not place media",
+          });
+        }
+      } catch (err) {
+        // MediaNoActivePageError and friends land here.
+        onDropErrorRef.current?.({
+          type: "INSERT_FAILED",
+          message: err instanceof Error ? err.message : String(err),
+        });
+      }
+
+      // Auto-save remote (stock/discovery) assets to the library so the
+      // user's next session has them locally.
+      if ((insertType === "image" || rawType === "img") && src.startsWith("http")) {
+        try {
+          const res = await fetch(src);
+          const blob = await res.blob();
+          const file = new File(
+            [blob],
+            `imported-${(name || "img").substring(0, 10)}.webp`,
+            { type: blob.type || "image/webp" },
+          );
+          await composer.media.uploadFile(file);
+        } catch (err) {
+          // Non-fatal — drop already succeeded, library is just the cache.
+          console.warn("Media auto-save to library failed:", err);
         }
       }
     },
-    [composer, canvasRef]
+    [composer, canvasRef],
   );
 
   const handleDropWithInternal = React.useCallback(
