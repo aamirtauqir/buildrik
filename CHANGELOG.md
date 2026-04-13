@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0.0] - 2026-04-13
+
+### Added
+- Media tab is functional end-to-end: drag-drop, click-insert, search, maximize, and quick-upload all work from the slim launcher
+- Drop images at the exact cursor position on the canvas — no more center-placed images
+- Type-aware insert: fonts apply to selected text; images/video/icons/SVG/audio/lottie each create the right element
+- Replace-across-canvas dialog surfaces partial failures with a "Retry failed" action (previously silent)
+- Storage quota, invalid file, and no-active-page errors now show specific, actionable toasts instead of a generic error
+- SVG uploads are sanitized on write — stored cross-site scripting via malicious SVG is blocked
+- Usage counts in the library are memoized — library panels render instantly with large asset counts
+
+### Fixed
+- Media tab could not load at all: the `composer.mediaCommands` object was called from 8 sites but never defined. Created `MediaCommandLayer` to back those calls.
+- Three UI components (`SlimLauncher`, `TypePills`, `MediaContextMenu`) were imported but never shipped — the module tree could not mount. Components added with the expected prop contracts.
+- Blob URLs no longer leak across library mount cycles; ref-counted and revoked on delete
+
+### Changed
+- `composer.elements.insertMedia(src, type)` extended to `insertMediaAt(src, type, opts?)` with coordinates, a target-element hint, and a `font` type that applies to selected text. Original signature kept as an alias.
+
 ## [0.1.0.0] - 2026-04-08
 
 ### Added
