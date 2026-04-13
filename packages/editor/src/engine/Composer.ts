@@ -37,6 +37,7 @@ import { HistoryManager } from "./HistoryManager";
 import { emailMarketingService } from "./integrations";
 import { InteractionManager } from "./interactions/InteractionManager";
 import { MediaManager } from "./media/MediaManager";
+import { MediaCommandLayer } from "./media/MediaCommandLayer";
 import { PluginManager } from "./PluginManager";
 import { RecoveryManager } from "./recovery/RecoveryManager";
 import { PageRouter } from "./routing/PageRouter";
@@ -101,6 +102,7 @@ export class Composer extends EventEmitter {
   readonly cmsBindings!: CMSBindingManager;
   readonly collaboration!: CollaborationManager;
   readonly media!: MediaManager;
+  readonly mediaCommands!: MediaCommandLayer;
   readonly forms!: FormHandler;
   readonly sync!: SyncManager;
   readonly router!: PageRouter;
@@ -141,6 +143,7 @@ export class Composer extends EventEmitter {
     this.cmsBindings = new CMSBindingManager(this, this.cmsManager);
     this.collaboration = new CollaborationManager(this);
     this.media = new MediaManager();
+    this.mediaCommands = new MediaCommandLayer(this);
     this.forms = new FormHandler(this);
     this.sync = new SyncManager(this);
     this.router = new PageRouter();
