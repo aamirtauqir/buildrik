@@ -67,14 +67,21 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
 
   const allLibraryItems = useMemo(() => rawAssets.map(toLibraryItem), [rawAssets]);
 
+  // Folder lookup map — avoids O(n*m) `rawAssets.find` per item per render.
+  // Keyed by asset id, value is folderId or null for root.
+  const folderByAssetId = useMemo(() => {
+    const m = new Map<string, string | null>();
+    for (const a of rawAssets) m.set(a.id, a.folderId || null);
+    return m;
+  }, [rawAssets]);
+
   const libraryItems = useMemo(() => {
     const d = sortDir === "asc" ? 1 : -1;
-    
-    // Filter by folder first
-    const inFolder = allLibraryItems.filter(i => {
-      const raw = rawAssets.find(ra => ra.id === i.key);
-      return (raw?.folderId || null) === currentFolderId;
-    });
+
+    // Filter by folder first — O(n) lookup via Map (was O(n*m) via .find)
+    const inFolder = allLibraryItems.filter(
+      (i) => folderByAssetId.get(i.key) === currentFolderId,
+    );
 
     const byType = filterByType(inFolder, activeType);
     const byFmt = filterByFmt(byType, fmtFilter);
@@ -93,7 +100,16 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
           return 0;
       }
     });
-  }, [allLibraryItems, activeType, fmtFilter, librarySearch, sort, sortDir]);
+  }, [
+    allLibraryItems,
+    folderByAssetId,
+    currentFolderId,
+    activeType,
+    fmtFilter,
+    librarySearch,
+    sort,
+    sortDir,
+  ]);
 
   // Counts from ALL items (for pills when no filter active)
   const totalCounts = useMemo(() => countByType(allLibraryItems), [allLibraryItems]);
@@ -130,22 +146,42 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     await composer.media.createFolder(name, currentFolderId);
   }, [composer, currentFolderId]);
 
-  const deleteFolder = useCallback(async (id: string) => {
-    // Cascade-delete safety: check for assets in the folder
-    const assetsInFolder = composer.media.getAssets({ folderId: id });
-    const subFolders = composer.media.getFolders(id);
-    if (assetsInFolder.length > 0 || subFolders.length > 0) {
-      const count = assetsInFolder.length;
-      const subCount = subFolders.length;
-      const confirmed = window.confirm(
-        `This folder contains ${count} asset${count !== 1 ? "s" : ""}${
-          subCount > 0 ? ` and ${subCount} subfolder${subCount !== 1 ? "s" : ""}` : ""
-        }. Assets will be moved to the root folder. Delete anyway?`
-      );
-      if (!confirmed) return;
-    }
-    await composer.media.deleteFolder(id);
-  }, [composer]);
+  /**
+   * Inspect a folder before deleting. Returns counts so the caller (component
+   * layer) can prompt the user via a real dialog, then call `deleteFolder`
+   * with `force: true` to commit the deletion.
+   *
+   * Pure read — no side effects, safe to call in render.
+   */
+  const inspectFolder = useCallback(
+    (id: string): { assetCount: number; subFolderCount: number } => {
+      const assetsInFolder = composer.media.getAssets({ folderId: id });
+      const subFolders = composer.media.getFolders(id);
+      return { assetCount: assetsInFolder.length, subFolderCount: subFolders.length };
+    },
+    [composer],
+  );
+
+  /**
+   * Delete a folder. If the folder is non-empty and `force` is not true, the
+   * call is rejected — caller should call `inspectFolder` first, prompt the
+   * user with their preferred dialog, and re-call with `force: true` on confirm.
+   * This keeps UI dialog logic out of the hook (testable, SSR-safe).
+   */
+  const deleteFolder = useCallback(
+    async (id: string, opts: { force?: boolean } = {}) => {
+      if (!opts.force) {
+        const { assetCount, subFolderCount } = inspectFolder(id);
+        if (assetCount > 0 || subFolderCount > 0) {
+          throw new Error(
+            "FOLDER_NOT_EMPTY: call inspectFolder first, prompt the user, retry with force:true",
+          );
+        }
+      }
+      await composer.media.deleteFolder(id);
+    },
+    [composer, inspectFolder],
+  );
 
   const moveAsset = useCallback(async (assetId: string, folderId: string | null) => {
     await composer.media.updateAsset(assetId, { folderId: folderId ?? undefined });
@@ -183,6 +219,7 @@ export function useLibraryState(composer: Composer): LibraryStateResult {
     currentFolderId,
     setCurrentFolderId,
     createFolder,
+    inspectFolder,
     deleteFolder,
     moveAsset,
     bulkMoveAssets,

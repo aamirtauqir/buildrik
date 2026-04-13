@@ -20,6 +20,7 @@
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
 import { MEDIA_EVENTS } from "../../shared/constants/media";
+import { isSafeSrc } from "./MediaHelpers";
 import {
   MediaNoActivePageError,
   MediaReplacePartialError,
@@ -260,11 +261,20 @@ export class MediaCommandLayer {
     return "";
   }
 
+  private isSafeSrc(src: string): boolean {
+    return isSafeSrc(src);
+  }
+
   /**
    * Write newSrc onto an element. If the element uses background-image,
    * rewrite that; otherwise set the `src` attribute.
    */
   private setElementSrc(element: Element, oldSrc: string, newSrc: string): void {
+    if (!this.isSafeSrc(newSrc)) {
+      throw new Error(
+        `Refusing to set unsafe src: scheme not in allowlist (http/https/blob/data:image)`,
+      );
+    }
     const bgImage = element.getStyle("background-image");
     if (bgImage && bgImage.includes("url(")) {
       // If oldSrc is present in the bg-image, scope the replacement to it
