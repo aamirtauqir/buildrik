@@ -18,6 +18,7 @@ import {
   SectionLabel,
   type SectionTier,
 } from "../shared/controls";
+import { InputField } from "../../../shared/forms/InputField";
 
 export interface GridSectionProps {
   styles: Record<string, string>;
@@ -81,17 +82,6 @@ const SELF_OPTIONS = [
   { value: "stretch", label: "str" },
 ];
 
-// Compact input style for gap controls
-const compactInputStyle: React.CSSProperties = {
-  flex: 1,
-  padding: "var(--aqb-space-1)",
-  background: "rgba(255,255,255,0.05)",
-  border: "1px solid var(--aqb-border)",
-  borderRadius: "var(--aqb-radius-xs)",
-  color: "var(--aqb-text-primary)",
-  fontSize: "var(--aqb-text-xs)",
-  outline: "none",
-};
 
 export const GridSection: React.FC<GridSectionProps> = ({
   styles,
@@ -184,13 +174,37 @@ export const GridSection: React.FC<GridSectionProps> = ({
             onChange={(v) => onChange("grid-auto-flow", v)}
           />
 
-          {/* Gap controls — shared LinkedGapInput primitive handles linked vs.
-              unlinked state and clears the shadowed properties on toggle. */}
-          <LinkedGapInput
-            styles={styles}
-            onChange={onChange}
-            onBatchChange={onBatchChange}
-          />
+          {/* Gap Controls */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr",
+              gap: "var(--aqb-space-1)",
+              marginBottom: "var(--aqb-space-2)",
+            }}
+          >
+            <InputField
+              label="Gap"
+              type="text"
+              value={styles.gap || ""}
+              onChange={(e) => onChange("gap", e.target.value)}
+              placeholder="0"
+            />
+            <InputField
+              label="Row"
+              type="text"
+              value={styles["row-gap"] || ""}
+              onChange={(e) => onChange("row-gap", e.target.value)}
+              placeholder="0"
+            />
+            <InputField
+              label="Col"
+              type="text"
+              value={styles["column-gap"] || ""}
+              onChange={(e) => onChange("column-gap", e.target.value)}
+              placeholder="0"
+            />
+          </div>
 
           {/* Visual Alignment Grid */}
           <SectionLabel
@@ -235,42 +249,20 @@ export const GridSection: React.FC<GridSectionProps> = ({
               marginBottom: "var(--aqb-space-2)",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-              <span
-                style={{
-                  fontSize: "var(--aqb-text-2xs)",
-                  color: "var(--aqb-text-muted)",
-                  width: "var(--aqb-space-8)",
-                }}
-              >
-                Col
-              </span>
-              <input
-                type="text"
-                value={styles["grid-column"] || ""}
-                onChange={(e) => onChange("grid-column", e.target.value)}
-                placeholder="auto"
-                style={compactInputStyle}
-              />
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-              <span
-                style={{
-                  fontSize: "var(--aqb-text-2xs)",
-                  color: "var(--aqb-text-muted)",
-                  width: "var(--aqb-space-8)",
-                }}
-              >
-                Row
-              </span>
-              <input
-                type="text"
-                value={styles["grid-row"] || ""}
-                onChange={(e) => onChange("grid-row", e.target.value)}
-                placeholder="auto"
-                style={compactInputStyle}
-              />
-            </div>
+            <InputField
+              label="Col"
+              type="text"
+              value={styles["grid-column"] || ""}
+              onChange={(e) => onChange("grid-column", e.target.value)}
+              placeholder="auto"
+            />
+            <InputField
+              label="Row"
+              type="text"
+              value={styles["grid-row"] || ""}
+              onChange={(e) => onChange("grid-row", e.target.value)}
+              placeholder="auto"
+            />
           </div>
 
           {/* Column Span shortcuts */}
