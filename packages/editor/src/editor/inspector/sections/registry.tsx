@@ -219,11 +219,18 @@ export function defineSection<P extends object>(
   return {
     render: (ctx) => {
       const Component = entry.Component;
-      const props = entry.adaptProps(ctx);
+      // Slice ctx.styles to only the keys this section cares about so that
+      // an edit to an unrelated property doesn't force a re-render here.
+      const slicedCtx: SectionContext =
+        entry.styleKeys.length > 0
+          ? { ...ctx, styles: pickKeys(ctx.styles, entry.styleKeys) as Record<string, string> }
+          : ctx;
+      const props = entry.adaptProps(slicedCtx);
       return <Component {...props} />;
     },
     shouldRender: entry.shouldRender,
     advancedKey: entry.advancedKey,
+    styleKeys: entry.styleKeys,
   };
 }
 
@@ -264,6 +271,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
 
   "quick-actions": defineSection({
     Component: QuickActionsSection,
+    styleKeys: ["display", "position", "width", "height", "background-color", "color"],
     adaptProps: (ctx) => ({
       styles: ctx.styles,
       onBatchChange: ctx.onBatchChange,
@@ -274,6 +282,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
   layout: defineSection({
     Component: LayoutSection,
     advancedKey: "layout",
+    styleKeys: ["display", "position", "top", "right", "bottom", "left", "z-index", "overflow", "float", "clear", "visibility"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onBatchChange: ctx.onBatchChange,
@@ -286,6 +295,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
   size: defineSection({
     Component: SizeSection,
     advancedKey: "size",
+    styleKeys: ["width", "height", "min-width", "min-height", "max-width", "max-height", "aspect-ratio"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       propertyStates: ctx.propertyStates,
@@ -297,6 +307,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
   spacing: defineSection({
     Component: SpacingSection,
     advancedKey: "spacing",
+    styleKeys: ["padding", "padding-top", "padding-right", "padding-bottom", "padding-left", "margin", "margin-top", "margin-right", "margin-bottom", "margin-left", "gap"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onBatchChange: ctx.onBatchChange,
@@ -308,6 +319,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
 
   flex: defineSection({
     Component: FlexboxSection,
+    styleKeys: ["flex-direction", "justify-content", "align-items", "align-content", "gap", "flex-wrap", "flex-grow", "flex-shrink", "flex-basis"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onBatchChange: ctx.onBatchChange,
@@ -322,6 +334,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
 
   grid: defineSection({
     Component: GridSection,
+    styleKeys: ["grid-template-columns", "grid-template-rows", "grid-gap", "grid-column", "grid-row", "grid-auto-flow"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onBatchChange: ctx.onBatchChange,
@@ -335,6 +348,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
   typography: defineSection({
     Component: TypographySection,
     advancedKey: "typography",
+    styleKeys: ["font-family", "font-size", "font-weight", "line-height", "letter-spacing", "color", "text-align", "text-transform", "text-decoration"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       advancedExpanded: ctx.advancedExpanded,
@@ -348,6 +362,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
   background: defineSection({
     Component: BackgroundSection,
     advancedKey: "background",
+    styleKeys: ["background-color", "background-image", "background-size", "background-position", "background-repeat"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onOpenMediaLibrary: ctx.onOpenMediaLibrary,
@@ -359,6 +374,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
   border: defineSection({
     Component: BorderSection,
     advancedKey: "border",
+    styleKeys: ["border", "border-width", "border-style", "border-color", "border-radius"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onBatchChange: ctx.onBatchChange,
@@ -371,6 +387,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
 
   link: defineSection({
     Component: LinkSection,
+    styleKeys: [],
     adaptProps: (ctx) => ({
       selectedElement: ctx.selectedElement,
       composer: ctx.composer,
@@ -387,6 +404,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
 
   "element-properties": defineSection({
     Component: ElementPropertiesSection,
+    styleKeys: [],
     adaptProps: (ctx) => ({
       selectedElement: ctx.selectedElement,
       composer: ctx.composer,
@@ -404,6 +422,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
 
   "css-classes": defineSection({
     Component: CSSClassesSection,
+    styleKeys: [],
     adaptProps: (ctx) => ({
       selectedElement: ctx.selectedElement,
       composer: ctx.composer,
@@ -416,6 +435,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
 
   "all-css": defineSection({
     Component: AllCSSSection,
+    styleKeys: [],
     adaptProps: (ctx) => ({
       selectedElement: ctx.selectedElement,
       composer: ctx.composer ?? null,
@@ -431,11 +451,13 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
 
   effects: defineSection({
     Component: EffectsSection,
+    styleKeys: ["opacity", "box-shadow", "filter", "transform", "transition"],
     adaptProps: adaptBaseStyleProps,
   }),
 
   animation: defineSection({
     Component: AnimationSection,
+    styleKeys: [],
     adaptProps: (ctx) => {
       // Pull the live animation config from the element each render. This
       // is the same pattern the old EffectsTab used — reads via composer
@@ -486,6 +508,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
 
   interactions: defineSection({
     Component: InteractionsSection,
+    styleKeys: [],
     adaptProps: (ctx) => {
       const getInteractions = (): Interaction[] => {
         if (!ctx.composer || !ctx.selectedElement) return [];
@@ -529,6 +552,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
 
   visibility: defineSection({
     Component: VisibilitySection,
+    styleKeys: ["display", "visibility", "opacity", "pointer-events"],
     adaptProps: adaptBaseStyleProps,
   }),
 };
@@ -537,11 +561,24 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
 // DERIVED HELPERS
 // ============================================================================
 
+// Stamp each entry with its own id so consumers (tests, devtools) can
+// reference it without needing the enclosing Record key.
+(Object.keys(SECTION_REGISTRY) as SectionId[]).forEach((id) => {
+  SECTION_REGISTRY[id].id = id;
+});
+
 /**
  * All section ids in registry declaration order. Useful for `expandAll` and
  * integrity tests — the source of truth for "every section that exists."
  */
 export const ALL_REGISTRY_SECTION_IDS = Object.keys(SECTION_REGISTRY) as SectionId[];
+
+/**
+ * Flat array of all registry entries with their ids stamped in.
+ * Useful for tests and tooling that need to iterate or find by id.
+ */
+export const SECTION_REGISTRY_LIST: (AnySectionEntry & { id: SectionId })[] =
+  ALL_REGISTRY_SECTION_IDS.map((id) => SECTION_REGISTRY[id] as AnySectionEntry & { id: SectionId });
 
 /**
  * Build the advanced-prop map that `useAdvancedSettings` takes as input.
