@@ -5,7 +5,6 @@
  * @license BSD-3-Clause
  */
 
-import { Plus } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import type { BlockData } from "../../../../shared/types";
@@ -14,8 +13,6 @@ import { SearchBar } from "../../shared/SearchBar";
 import { CATALOG } from "./catalog/catalog";
 import { useBuildTab } from "./hooks/useBuildTab";
 import { CatAccordion } from "./components/CatAccordion";
-import { QuickPicks } from "./components/QuickPicks";
-import { PinPopover } from "./components/PinPopover";
 import { SearchResults } from "./components/SearchResults";
 import "./BuildTab.css";
 
@@ -56,14 +53,6 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   return (
     <div className="bld-container">
       <PanelHeader title="Add" isPinned={isPinned} onPinToggle={onPinToggle} onClose={onClose} />
-
-      {/* Pin Popover — Screen fsI8j */}
-      <PinPopover
-        open={tab.pinPopoverOpen}
-        onClose={() => tab.setPinPopoverOpen(false)}
-        onPin={tab.addQuickPick}
-        currentPicks={tab.quickPicks}
-      />
 
       <div className="bld-content">
         {/* 1. Mode Switch — top of panel per design (RzB6V, nTVi6, SDgR2)
@@ -133,36 +122,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           </div>
         ) : (
           <>
-            {/* Quick Picks — always visible (§10.1 visual hierarchy: 3rd item)
-                The + button is the single header-level pinning entry point. */}
-            <div className="bld-qp-section">
-              <div className="bld-qp-header">
-                <div className="bld-sec-label">Quick Picks</div>
-                <button
-                  type="button"
-                  className="bld-qp-add-btn"
-                  onClick={() => tab.setPinPopoverOpen(true)}
-                  aria-label="Pin element"
-                  title="Pin an element"
-                >
-                  <Plus size={14} />
-                </button>
-              </div>
-              <QuickPicks
-                picks={tab.quickPicks}
-                onRemove={tab.removeQuickPick}
-                onRestore={tab.restoreQuickPick}
-                onReorder={tab.reorderQuickPicks}
-                onDragStart={tab.handleDragStart}
-                onElClick={tab.handleElClick}
-                ftueSeen={tab.ftueSeen}
-                onDismissFtue={tab.dismissFtue}
-              />
-            </div>
-
-            <div className="bld-divider" />
-
-            {/* Category Browse — scrollable area, sticky header above stays fixed */}
+            {/* Category Browse — scrollable area */}
             <div className="bld-cats-scroll">
               <div className="bld-cats">
                 <div className="bld-sec-label">Browse</div>

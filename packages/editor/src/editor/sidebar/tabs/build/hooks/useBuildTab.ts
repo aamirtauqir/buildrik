@@ -60,6 +60,7 @@ const ls = {
 export type DragStartFn = (e: React.DragEvent, el: FlatElEntry) => void;
 export type ElClickFn = (el: FlatElEntry) => void;
 export type ToggleFavFn = (name: string) => void;
+export type BuildMode = "elements" | "sections";
 
 export interface UseBuildTabReturn {
   // State
@@ -74,7 +75,9 @@ export interface UseBuildTabReturn {
   allElements: FlatElEntry[];
   composer: Composer | null;
   tipIdx: number;
+  mode: BuildMode;
   // Handlers
+  setMode: (m: BuildMode) => void;
   setSearchQuery: (q: string) => void;
   toggleFav: ToggleFavFn;
   toggleCat: (catId: string) => void;
@@ -122,6 +125,19 @@ export function useBuildTab(
   const [myCompOpen, setMyCompOpen] = React.useState(false);
   const [favOpen, setFavOpen] = React.useState(false);
   const [tipIdx, setTipIdx] = React.useState(0);
+  const [mode, setModeRaw] = React.useState<BuildMode>(() => {
+    const v = sessionStorage.getItem(STORAGE_KEYS.BUILD_MODE);
+    return v === "sections" ? "sections" : "elements";
+  });
+
+  const setMode = React.useCallback((m: BuildMode) => {
+    setModeRaw(m);
+    try {
+      sessionStorage.setItem(STORAGE_KEYS.BUILD_MODE, m);
+    } catch {
+      // storage may be full
+    }
+  }, []);
 
   // Persist favs
   React.useEffect(() => {
@@ -255,6 +271,8 @@ export function useBuildTab(
     searchResults,
     allElements: flatCatalog,
     composer,
+    mode,
+    setMode,
     setSearchQuery,
     toggleFav,
     toggleCat,

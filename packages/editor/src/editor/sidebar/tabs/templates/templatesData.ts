@@ -85,6 +85,23 @@ export const SITE_CATEGORY_PILLS: { id: SiteCategory; label: string }[] = [
   { id: "ecommerce", label: "E-comm" },
 ];
 
+export type TemplateType = "page" | "section";
+
+export const TEMPLATE_TYPE_PILLS: { id: TemplateType; label: string }[] = [
+  { id: "page", label: "Page Templates" },
+  { id: "section", label: "Section Templates" },
+];
+
+export const SUB_CATEGORY_TAGS: { id: string; label: string }[] = [
+  { id: "hero", label: "Hero" },
+  { id: "features", label: "Features" },
+  { id: "pricing", label: "Pricing" },
+  { id: "testimonials", label: "Testimonials" },
+  { id: "cta", label: "CTA" },
+  { id: "footer", label: "Footer" },
+  { id: "contact", label: "Contact" },
+];
+
 export const SITE_TEMPLATES: TemplateItem[] = [
   {
     id: "site-saas-landing",
