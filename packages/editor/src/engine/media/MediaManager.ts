@@ -6,6 +6,7 @@
  * @license BSD-3-Clause
  */
 
+import DOMPurify from "dompurify";
 import { MEDIA_DEFAULTS, MEDIA_EVENTS, getAssetTypeFromMime } from "../../shared/constants/media";
 import type {
   MediaAsset,
@@ -85,6 +86,14 @@ export class MediaManager extends MediaEventEmitter {
   private state: MediaLibraryState;
   private initialized = false;
   private blobUrlMap = new Map<string, string>();
+  /**
+   * Ref-count for blob URLs. Each getAssetSrc() increments the count for
+   * an id; each releaseAssetSrc() decrements. When count hits zero and
+   * the asset still exists, the URL stays alive (cheap to keep). It is
+   * revoked only when the asset is deleted (deleteAsset). Purely defensive
+   * against long sessions that open and close the library many times.
+   */
+  private blobUrlRefs = new Map<string, number>();
 
   constructor() {
     super();
@@ -94,23 +103,36 @@ export class MediaManager extends MediaEventEmitter {
   }
 
   /**
-   * Get a temporary source URL for an asset (cached Object URL)
+   * Public event emitter for callers outside the MediaManager class
+   * (e.g. MediaCommandLayer). Keeps MediaEventEmitter's `emit` protected
+   * while still allowing sibling engine classes to emit media events.
+   */
+  emitEvent(event: string, payload: unknown): void {
+    this.emit(event, payload);
+  }
+
+  /**
+   * Get a temporary source URL for an asset (cached Object URL).
+   * Increments the ref count. Callers should call `releaseAssetSrc(id)`
+   * in cleanup when the URL is no longer needed.
    */
   async getAssetSrc(id: string): Promise<string | null> {
     const asset = this.state.assets.find((a) => a.id === id);
     if (!asset) return null;
 
-    // Already a remote URL or data URL
+    // Already a remote URL or data URL — no blob to manage.
     if (asset.src.startsWith("http") || asset.src.startsWith("data:")) {
       return asset.src;
     }
 
-    // Return cached blob URL
+    this.blobUrlRefs.set(id, (this.blobUrlRefs.get(id) ?? 0) + 1);
+
+    // Return cached blob URL.
     if (this.blobUrlMap.has(id)) {
       return this.blobUrlMap.get(id)!;
     }
 
-    // Load from binary storage and create URL
+    // Load from binary storage and create URL.
     const blob = await this.storage.getBlob(id);
     if (blob) {
       const url = URL.createObjectURL(blob);
@@ -119,6 +141,25 @@ export class MediaManager extends MediaEventEmitter {
     }
 
     return asset.src;
+  }
+
+  /**
+   * Decrement the ref count for a blob URL. Called from UI cleanup
+   * (useEffect return, component unmount) to mark that the caller is
+   * done with the URL. We never revoke on zero — blob URLs are cheap
+   * to keep, and revoking mid-session would break any stale <img src>
+   * still pointing at the URL. Actual revocation happens in deleteAsset.
+   *
+   * No-op for unknown ids and for data/http URLs (which never got refs).
+   */
+  releaseAssetSrc(id: string): void {
+    const current = this.blobUrlRefs.get(id);
+    if (!current) return;
+    if (current <= 1) {
+      this.blobUrlRefs.delete(id);
+    } else {
+      this.blobUrlRefs.set(id, current - 1);
+    }
   }
 
   /**
@@ -215,6 +256,30 @@ export class MediaManager extends MediaEventEmitter {
       let finalSize = file.size;
       let finalDimensions = await getMediaDimensions(file, src);
 
+      // SVG sanitization — strip <script>, event handlers, external refs, etc.
+      // DOMPurify's USE_PROFILES:{svg,svgFilters} keeps drawing instructions
+      // and drops anything executable. Runs before storage and before any
+      // consumer renders the file.
+      if (file.type === "image/svg+xml") {
+        const raw = await file.text();
+        const clean = DOMPurify.sanitize(raw, {
+          USE_PROFILES: { svg: true, svgFilters: true },
+        });
+        if (!clean || !clean.trim().startsWith("<")) {
+          this.emit(MEDIA_EVENTS.UPLOAD_ERROR, {
+            fileName: file.name,
+            error: "SVG rejected: no drawable content after sanitization",
+          });
+          return {
+            success: false,
+            error: "SVG rejected: no drawable content after sanitization",
+            fileName: file.name,
+          };
+        }
+        finalBlob = new Blob([clean], { type: "image/svg+xml" });
+        finalSize = finalBlob.size;
+      }
+
       // Auto-optimization
       if (
         options.autoOptimize !== false &&
@@ -295,6 +360,7 @@ export class MediaManager extends MediaEventEmitter {
       URL.revokeObjectURL(this.blobUrlMap.get(id)!);
       this.blobUrlMap.delete(id);
     }
+    this.blobUrlRefs.delete(id);
 
     this.emit(MEDIA_EVENTS.MEDIA_DELETED, { id });
   }
