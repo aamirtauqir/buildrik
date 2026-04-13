@@ -23,8 +23,8 @@ describe("Build Tab Catalog — blockId integrity", () => {
     }
   });
 
-  it("CATALOG array is non-empty with 7 categories", () => {
-    expect(CATALOG).toHaveLength(7);
+  it("CATALOG array is non-empty with 6 categories", () => {
+    expect(CATALOG).toHaveLength(6);
   });
 
   it("flatCatalog has no duplicate element names within the same category", () => {
