@@ -8,7 +8,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { InputField } from "../../../shared/forms/InputField";
-import { Section } from "../shared/controls";
+import { Section, type SectionTier } from "../shared/controls";
 import { INSPECTOR_TOKENS } from "../shared/controls/controlStyles";
 
 // ============================================================================
