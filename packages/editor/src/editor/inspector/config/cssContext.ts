@@ -1,4 +1,4 @@
-import type { Composer } from "../../../engine";
+import type { Composer, Element } from "../../../engine";
 import type { InspectorContext } from "../config";
 import { buildInspectorContext } from "../config";
 
@@ -17,6 +17,16 @@ export interface CssContext {
   isMedia: boolean;
   /** Extended context for showIf evaluation */
   inspectorContext: InspectorContext;
+  /**
+   * All selected elements — 1 item on single-select, 2+ on multi-select.
+   * Sections read this to drive mixed-value detection and batch writes.
+   */
+  selectedElements: readonly Element[];
+  /**
+   * CSS property keys with differing values across selectedElements.
+   * Sections show a MixedValueBadge for any key in this set.
+   */
+  mixedKeys: ReadonlySet<string>;
 }
 
 export interface PropertyState {
@@ -57,6 +67,8 @@ export function deriveCssContext(
     isPositioned: false,
     isMedia: ["image", "video"].includes(elementType),
     inspectorContext,
+    selectedElements: [],
+    mixedKeys: new Set(),
   };
 
   if (!selectedElement?.id || !composer) return fallback;
@@ -92,6 +104,8 @@ export function deriveCssContext(
     isPositioned: Boolean(position && position !== "static"),
     isMedia: ["image", "video"].includes(selectedElement.type),
     inspectorContext: updatedInspectorContext,
+    selectedElements: [],
+    mixedKeys: new Set(),
   };
 }
 
