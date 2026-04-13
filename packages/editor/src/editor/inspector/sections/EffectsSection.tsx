@@ -13,6 +13,7 @@ import {
   PresetButtonGrid,
   type SectionTier,
 } from "../shared/controls";
+import { InputField } from "../../../shared/forms/InputField";
 
 export interface EffectsSectionProps {
   styles: Record<string, string>;
@@ -158,21 +159,11 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         />
 
         {/* Custom Shadow */}
-        <input
+        <InputField
           type="text"
           value={styles["box-shadow"] || ""}
           onChange={(e) => onChange("box-shadow", e.target.value)}
           placeholder="0 4px 6px rgba(0,0,0,0.1)"
-          style={{
-            width: "100%",
-            padding: "8px 10px",
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: 6,
-            color: "#e4e4e7",
-            fontSize: 12,
-            outline: "none",
-          }}
         />
       </div>
 
@@ -196,7 +187,7 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         />
 
         {/* Custom Inner Shadow */}
-        <input
+        <InputField
           type="text"
           value={extractInnerShadow(styles["box-shadow"])}
           onChange={(e) => {
@@ -211,16 +202,6 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
             }
           }}
           placeholder="inset 0 2px 4px rgba(0,0,0,0.1)"
-          style={{
-            width: "100%",
-            padding: "8px 10px",
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: 6,
-            color: "#e4e4e7",
-            fontSize: 12,
-            outline: "none",
-          }}
         />
       </div>
 
