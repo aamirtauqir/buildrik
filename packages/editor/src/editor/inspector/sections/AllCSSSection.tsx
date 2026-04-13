@@ -7,7 +7,8 @@
 
 import * as React from "react";
 import type { Composer } from "../../../engine";
-import { Section, type SectionTier } from "../shared/controls";
+import { InputField } from "../../../shared/forms/InputField";
+import { Section } from "../shared/controls";
 import { INSPECTOR_TOKENS } from "../shared/controls/controlStyles";
 
 // ============================================================================
@@ -50,16 +51,6 @@ const styles = {
     color: INSPECTOR_TOKENS.textSecondary,
     fontFamily: "monospace",
   } as React.CSSProperties,
-  propertyValue: {
-    flex: 1,
-    fontSize: 12,
-    color: INSPECTOR_TOKENS.textPrimary,
-    fontFamily: "monospace",
-    background: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.06)",
-    borderRadius: 4,
-    padding: "4px 8px",
-  } as React.CSSProperties,
   removeBtn: {
     background: "transparent",
     border: "none",
@@ -76,16 +67,6 @@ const styles = {
     padding: "12px 0",
     borderTop: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
   } as React.CSSProperties,
-  addInput: {
-    flex: 1,
-    background: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: 6,
-    padding: "8px 10px",
-    color: INSPECTOR_TOKENS.textPrimary,
-    fontSize: 12,
-    fontFamily: "monospace",
-  } as React.CSSProperties,
   addBtn: {
     padding: "8px 16px",
     background: "rgba(0, 115, 230, 0.2)",
@@ -95,19 +76,6 @@ const styles = {
     fontSize: 12,
     fontWeight: 600,
     cursor: "pointer",
-  } as React.CSSProperties,
-  devBadge: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 4,
-    padding: "2px 6px",
-    background: "rgba(234, 179, 8, 0.15)",
-    border: "1px solid rgba(234, 179, 8, 0.3)",
-    borderRadius: 4,
-    color: "#eab308",
-    fontSize: 12,
-    fontWeight: 600,
-    marginLeft: 8,
   } as React.CSSProperties,
 };
 
@@ -184,11 +152,10 @@ export const AllCSSSection: React.FC<AllCSSSectionProps> = ({
         cssProperties.map((prop) => (
           <div key={prop.name} style={styles.propertyRow}>
             <span style={styles.propertyName}>{prop.name}</span>
-            <input
+            <InputField
               type="text"
               value={prop.value}
               onChange={(e) => handleUpdateProperty(prop.name, e.target.value)}
-              style={styles.propertyValue}
             />
             <button
               type="button"
@@ -204,19 +171,17 @@ export const AllCSSSection: React.FC<AllCSSSectionProps> = ({
 
       {/* Add new property */}
       <div style={styles.addForm}>
-        <input
+        <InputField
           type="text"
           placeholder="property-name"
           value={newProperty}
           onChange={(e) => setNewProperty(e.target.value)}
-          style={styles.addInput}
         />
-        <input
+        <InputField
           type="text"
           placeholder="value"
           value={newValue}
           onChange={(e) => setNewValue(e.target.value)}
-          style={styles.addInput}
           onKeyDown={(e) => e.key === "Enter" && handleAddProperty()}
         />
         <button
