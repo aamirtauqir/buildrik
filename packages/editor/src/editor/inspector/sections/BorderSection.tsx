@@ -12,6 +12,7 @@ import {
   MoreSettingsToggle,
   type SectionTier,
 } from "../shared/controls";
+import { InputField } from "../../../shared/forms/InputField";
 
 export interface BorderSectionProps {
   styles: Record<string, string>;
@@ -154,42 +155,14 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
             </div>
 
             {(["top", "right", "bottom", "left"] as const).map((side) => (
-              <div
+              <InputField
                 key={side}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  marginBottom: 8,
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 12,
-                    color: "#71717a",
-                    minWidth: 50,
-                    textTransform: "capitalize",
-                  }}
-                >
-                  {side}
-                </span>
-                <input
-                  type="text"
-                  value={styles[`border-${side}`] || ""}
-                  onChange={(e) => onChange(`border-${side}`, e.target.value)}
-                  placeholder="1px solid #ccc"
-                  style={{
-                    flex: 1,
-                    padding: "6px 8px",
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: 4,
-                    color: "#e4e4e7",
-                    fontSize: 12,
-                    outline: "none",
-                  }}
-                />
-              </div>
+                label={side.charAt(0).toUpperCase() + side.slice(1)}
+                type="text"
+                value={styles[`border-${side}`] || ""}
+                onChange={(e) => onChange(`border-${side}`, e.target.value)}
+                placeholder="1px solid #ccc"
+              />
             ))}
           </div>
 
