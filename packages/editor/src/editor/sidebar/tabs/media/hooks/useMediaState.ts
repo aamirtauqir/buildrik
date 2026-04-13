@@ -151,27 +151,41 @@ export function useMediaState(composer: Composer): MediaStateResult {
             setSelectionContext(null);
           }
         } else {
-          // STANDARD MODE: Insert new element via command layer (type-aware)
-          const typeMap: Record<string, "image" | "video" | "audio" | "svg" | "icon" | "lottie"> = {
+          // STANDARD MODE: Insert new element via command layer (type-aware).
+          // `path: "click"` tags telemetry; path: "drag" is set from the canvas drop handler.
+          const typeMap: Record<string, "image" | "video" | "audio" | "svg" | "icon" | "lottie" | "font"> = {
             img: "image", image: "image",
             vid: "video", video: "video",
             aud: "audio", audio: "audio",
             ico: "icon", icon: "icon",
             svg: "svg",
             lottie: "lottie",
+            fnt: "font", font: "font",
           };
           const mediaType = typeMap[asset.type] || "image";
-          const result = composer.mediaCommands.insertMedia(asset.src, mediaType);
+          const result = composer.mediaCommands.insertMediaAt(asset.src, mediaType, {
+            path: "click",
+          });
           if (result) {
             const insertedEl = composer.elements.getElement(result.elementId);
-            if (insertedEl) {
-              composer.selection.select(insertedEl);
+            if (insertedEl) composer.selection.select(insertedEl);
+            if (result.kind === "font-applied") {
+              showToast(`Font "${asset.name}" applied to selection ✓`, "success");
+            } else {
+              showToast(`${asset.name} added to page ✓`, "success");
             }
-            showToast(`${asset.name} added to page ✓`, "success");
           }
         }
-      } catch {
-        showToast("Could not apply media — try again", "error");
+      } catch (err) {
+        // Typed engine errors carry a rescueAction field; map to user-facing toasts.
+        const name = (err as { name?: string } | null)?.name;
+        if (name === "MediaNoActivePageError") {
+          showToast("Select a page first, then add media", "info");
+        } else if (name === "MediaQuotaError") {
+          showToast("Storage full — delete unused assets to free space", "error");
+        } else {
+          showToast("Could not apply media — try again", "error");
+        }
       }
       setDetailItem(null);
     },
