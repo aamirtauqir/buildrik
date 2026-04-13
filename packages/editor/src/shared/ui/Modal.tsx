@@ -5,6 +5,7 @@
 
 import * as React from "react";
 import { Button } from "./Button";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 
 export interface ModalProps {
   isOpen: boolean;
@@ -39,20 +40,14 @@ export const Modal: React.FC<ModalProps> = ({
   showCloseButton = true,
   initialFocusRef,
 }) => {
-  // IS2: Focus restoration — capture opener before modal opens, restore on close
-  const restoreFocusRef = React.useRef<Element | null>(null);
+  const modalRef = React.useRef<HTMLDivElement>(null);
+  useFocusTrap(modalRef, isOpen);
+
+  // Override default first-focus when initialFocusRef is provided
   React.useEffect(() => {
-    if (isOpen) {
-      restoreFocusRef.current = document.activeElement;
-    } else {
-      const target = restoreFocusRef.current;
-      if (target && typeof (target as HTMLElement).focus === "function") {
-        // Defer to let React finish unmounting before restoring focus
-        requestAnimationFrame(() => (target as HTMLElement).focus());
-      }
-      restoreFocusRef.current = null;
-    }
-  }, [isOpen]);
+    if (!isOpen || !initialFocusRef?.current) return;
+    initialFocusRef.current.focus();
+  }, [isOpen, initialFocusRef]);
 
   // Handle escape key
   React.useEffect(() => {
@@ -81,51 +76,6 @@ export const Modal: React.FC<ModalProps> = ({
   // Generate stable ID for accessibility - must be called before any early returns (Rules of Hooks)
   const titleId = React.useId();
 
-  // Basic focus trap (loop within modal)
-  React.useEffect(() => {
-    if (!isOpen) return;
-    const modalEl = document.querySelector(".aqb-modal") as HTMLElement | null;
-    if (!modalEl) return;
-
-    const focusableSelectors =
-      'a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])';
-    const focusables = Array.from(modalEl.querySelectorAll<HTMLElement>(focusableSelectors)).filter(
-      (el) => !el.hasAttribute("disabled")
-    );
-
-    if (initialFocusRef?.current) {
-      initialFocusRef.current.focus();
-    } else {
-      // Priority: first input/textarea/select, then first focusable
-      const firstInput = modalEl.querySelector<HTMLElement>(
-        'input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled])'
-      );
-      if (firstInput) {
-        firstInput.focus();
-      } else if (focusables.length > 0) {
-        focusables[0].focus();
-      }
-    }
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== "Tab" || focusables.length === 0) return;
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-
-    modalEl.addEventListener("keydown", handleKeyDown);
-    return () => {
-      modalEl.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, initialFocusRef]);
-
   if (!isOpen) return null;
 
   return (
@@ -136,6 +86,7 @@ export const Modal: React.FC<ModalProps> = ({
       role="presentation"
     >
       <div
+        ref={modalRef}
         className="aqb-modal"
         role="dialog"
         aria-modal="true"

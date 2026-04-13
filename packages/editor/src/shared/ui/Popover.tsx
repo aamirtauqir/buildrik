@@ -5,6 +5,7 @@
 
 import * as React from "react";
 import { createPortal } from "react-dom";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 
 export interface PopoverProps {
   trigger: React.ReactElement;
@@ -25,6 +26,8 @@ export const Popover: React.FC<PopoverProps> = ({
   const triggerRef = React.useRef<HTMLDivElement>(null);
   const contentRef = React.useRef<HTMLDivElement>(null);
   const [coords, setCoords] = React.useState({ top: 0, left: 0 });
+
+  useFocusTrap(contentRef, isOpen);
 
   // Calculate position on open
   React.useEffect(() => {
@@ -91,6 +94,16 @@ export const Popover: React.FC<PopoverProps> = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen, closeOnClickOutside]);
+
+  // Escape to close
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isOpen]);
 
   // Styles for the portal content
   const popoverStyles: React.CSSProperties = {
