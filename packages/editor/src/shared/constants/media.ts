@@ -101,6 +101,22 @@ export const MEDIA_EVENTS = {
   UPLOAD_COMPLETE: "media:upload:complete",
   /** Emitted on upload error */
   UPLOAD_ERROR: "media:upload:error",
+  /** Emitted after insertMediaAt creates or mutates an element. Payload: { src, type, elementId, path: 'click' | 'drag' } */
+  INSERT_SUCCEEDED: "media:insert:succeeded",
+  /** Emitted when insertMediaAt rejects. Payload: { reason: 'no-active-page' | 'invalid-type' | 'no-text-selected', src, type } */
+  INSERT_FAILED: "media:insert:failed",
+  /** Emitted when the replace-across dialog opens. Payload: { oldSrc, usageCount } */
+  REPLACE_OPENED: "media:replace:opened",
+  /** Emitted when replace-across commits (whole batch succeeded). Payload: { oldSrc, newSrc, count } */
+  REPLACE_COMMITTED: "media:replace:committed",
+  /** Emitted when replace-across committed with partial failures. Payload: { oldSrc, newSrc, succeeded, failed } */
+  REPLACE_PARTIAL: "media:replace:partial",
+  /** Emitted when replace-across rolled back entirely. Payload: { oldSrc, reason } */
+  REPLACE_ROLLED_BACK: "media:replace:rolled_back",
+  /** Emitted when storage quota is hit. Payload: { usedBytes, quotaBytes, attemptedBytes } */
+  QUOTA_EXCEEDED: "media:quota:exceeded",
+  /** Emitted when the library opens. Payload: { source: 'slim_launcher' | 'shortcut' | 'context_menu', folderId? } */
+  LIBRARY_OPENED: "media:library:opened",
 } as const;
 
 export type MediaEventName = (typeof MEDIA_EVENTS)[keyof typeof MEDIA_EVENTS];

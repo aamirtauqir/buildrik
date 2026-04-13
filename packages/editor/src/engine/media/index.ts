@@ -8,7 +8,22 @@
 
 // Core classes
 export { MediaManager } from "./MediaManager";
+export { MediaCommandLayer } from "./MediaCommandLayer";
+export type {
+  MediaInsertType,
+  InsertResult,
+  ReplaceResult,
+  ReplaceAcrossResult,
+} from "./MediaCommandLayer";
 export { MediaStorage, MediaStorageError } from "./MediaStorage";
+export {
+  MediaError,
+  MediaQuotaError,
+  MediaValidationError,
+  MediaNoActivePageError,
+  MediaReplacePartialError,
+} from "./MediaStorageTypes";
+export type { MediaRescueAction } from "./MediaStorageTypes";
 export { ImageProcessor } from "./ImageProcessor";
 export { MediaOptimizer, formatBytes, getCompressionSavings } from "./MediaOptimizer";
 export type { OptimizationOptions, OptimizationResult, FormatSupport } from "./MediaOptimizer";
