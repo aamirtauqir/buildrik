@@ -36,7 +36,7 @@ interface MediaTabProps {
     onSelect: (icon: IconConfig) => void
   ) => void;
   /** When provided, MediaTab renders as the slim 280px launcher (panel mode). */
-  onOpenLibrary?: () => void;
+  onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
 }
 
 export function MediaTab(props: MediaTabProps) {
