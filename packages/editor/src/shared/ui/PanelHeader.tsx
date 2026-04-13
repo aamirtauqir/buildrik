@@ -220,7 +220,19 @@ export const PanelHeader: React.FC<PanelHeaderProps> = ({
 
       <h2 style={titleStyles}>{title}</h2>
 
-      {children}
+      {children && (
+        <span
+          style={{
+            display: "flex",
+            alignItems: "center",
+            marginLeft: "auto",
+            marginRight: 4,
+            flexShrink: 0,
+          }}
+        >
+          {children}
+        </span>
+      )}
 
       <HeaderActions
         isPinned={isPinned}

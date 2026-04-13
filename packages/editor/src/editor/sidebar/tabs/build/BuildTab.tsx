@@ -61,7 +61,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           {(["elements", "sections"] as const).map((m) => (
             <button
               key={m}
-              className={`bld-mode-tab${tab.mode === m ? " bld-mode-tab--active" : ""}`}
+              className={`bld-mode-pill${tab.mode === m ? " bld-mode-pill--active" : ""}`}
               onClick={() => tab.setMode(m)}
               role="tab"
               aria-selected={tab.mode === m}
