@@ -2,7 +2,7 @@
  * Grid Section - Visual CSS Grid controls
  * AQUI-029: Visual CSS Grid Editor
  *
- * @module components/Panels/ProInspector/sections/GridSection
+ * @module editor/inspector/sections/GridSection
  * @license BSD-3-Clause
  */
 

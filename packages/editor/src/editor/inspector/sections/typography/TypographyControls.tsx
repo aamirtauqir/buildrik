@@ -2,7 +2,7 @@
  * TextControls - Text alignment, transform, and spacing controls
  * Part of Typography section refactoring
  *
- * @module components/Panels/ProInspector/sections/typography/TextControls
+ * @module editor/inspector/sections/typography/TypographyControls
  * @license BSD-3-Clause
  */
 

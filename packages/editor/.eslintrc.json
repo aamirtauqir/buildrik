@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "no-restricted-imports": ["error", {
+      "patterns": [{
+        "group": ["**/components/Panels/ProInspector*"],
+        "message": "Legacy inspector folder removed. Use editor/inspector/* instead."
+      }]
+    }]
+  }
+}

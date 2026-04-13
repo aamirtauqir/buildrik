@@ -2,7 +2,7 @@
  * Animation Section - CSS Animations with presets
  * AQUI-026: Basic Interactions/Animations
  *
- * @module components/Panels/ProInspector/sections/AnimationSection
+ * @module editor/inspector/sections/AnimationSection
  * @license BSD-3-Clause
  */
 

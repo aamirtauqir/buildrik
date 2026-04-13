@@ -2,7 +2,7 @@
  * FontControls - Font weight, style, and decoration controls
  * Part of Typography section refactoring
  *
- * @module components/Panels/ProInspector/sections/typography/FontControls
+ * @module editor/inspector/sections/typography/FontControls
  * @license BSD-3-Clause
  */
 

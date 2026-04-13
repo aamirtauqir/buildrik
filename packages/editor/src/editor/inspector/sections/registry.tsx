@@ -17,6 +17,22 @@
 
 import * as React from "react";
 import type { Composer } from "../../../engine";
+
+// ============================================================================
+// PICK KEYS HELPER — slices ctx.styles to only the keys a section reads,
+// preventing unrelated sections from re-rendering on every style edit.
+// ============================================================================
+
+function pickKeys<T extends Record<string, unknown>>(
+  obj: T,
+  keys: readonly string[],
+): Partial<T> {
+  const out: Partial<T> = {};
+  for (const k of keys) {
+    if (k in obj) (out as Record<string, unknown>)[k] = obj[k];
+  }
+  return out;
+}
 import type {
   IconConfig,
   MediaAsset,
@@ -164,6 +180,14 @@ export interface SectionEntry<P extends object = object> {
    * context fields are no-ops.
    */
   advancedKey?: string;
+  /**
+   * CSS property keys this section reads from ctx.styles. The adapter will
+   * receive only these keys (via pickKeys), so a single-property edit only
+   * triggers re-render of sections that actually care about that property.
+   * Sections that don't read ctx.styles (animation, interactions, link, etc.)
+   * should declare an empty array.
+   */
+  styleKeys: readonly string[];
 }
 
 /**
@@ -177,6 +201,10 @@ export interface AnySectionEntry {
   render: (ctx: SectionContext) => React.ReactElement | null;
   shouldRender?: (ctx: ShouldRenderContext) => boolean;
   advancedKey?: string;
+  /** CSS property keys this section reads — mirrors SectionEntry.styleKeys. */
+  styleKeys: readonly string[];
+  /** Section id — set by the registry loop for test / introspection helpers. */
+  id?: string;
 }
 
 /**

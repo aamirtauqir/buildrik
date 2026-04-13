@@ -2,7 +2,7 @@
  * FontPicker - Font family dropdown with Google Fonts integration
  * Part of Typography section refactoring
  *
- * @module components/Panels/ProInspector/sections/typography/FontPicker
+ * @module editor/inspector/sections/typography/FontPicker
  * @license BSD-3-Clause
  */
 

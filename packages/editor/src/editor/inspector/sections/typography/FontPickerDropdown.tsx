@@ -2,7 +2,7 @@
  * FontPickerDropdown - Dropdown components for font selection
  * Part of Typography section refactoring
  *
- * @module components/Panels/ProInspector/sections/typography/FontPickerDropdown
+ * @module editor/inspector/sections/typography/FontPickerDropdown
  * @license BSD-3-Clause
  */
 

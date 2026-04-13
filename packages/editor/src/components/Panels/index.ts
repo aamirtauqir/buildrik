@@ -7,5 +7,4 @@ export { LayersPanel, type LayersPanelProps, type SelectedElementInfo } from "./
 export { StylesPanel, type StylesPanelProps } from "./StylesPanel";
 export { TraitPanel, type TraitPanelProps, type Trait } from "./TraitPanel/index";
 export { RichTextEditor, type RichTextEditorProps } from "./RichTextEditor";
-export { ProInspector, type ProInspectorProps } from "./ProInspector";
 export { KeyboardShortcutsPanel, type KeyboardShortcutsPanelProps } from "./KeyboardShortcutsPanel";

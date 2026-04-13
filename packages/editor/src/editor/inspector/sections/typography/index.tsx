@@ -7,7 +7,7 @@
  * - FontControls: Weight, style, decoration, spacing
  * - TypographyControls: Alignment, transform, color, white-space
  *
- * @module components/Panels/ProInspector/sections/typography
+ * @module editor/inspector/sections/typography
  * @license BSD-3-Clause
  */
 
