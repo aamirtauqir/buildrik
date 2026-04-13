@@ -433,24 +433,28 @@
    These coexist with existing --aqb-* tokens for gradual migration
    ============================================ */
 :root {
-  /* Surface Hierarchy - Semantic naming (Redesign 2026) */
-  --surface-base: #0f0f12;                    /* App background (Deep Blue/Black) */
-  --surface-panel: rgba(18, 18, 22, 0.85);    /* Glassmorphic panels */
-  --surface-panel-hover: rgba(255, 255, 255, 0.05);
-  --surface-canvas: #121216;                  /* Canvas background */
-  --surface-elevated: rgba(30, 30, 35, 0.9);  /* Elevated elements */
+  /* Surface Hierarchy - Semantic naming (Redesign 2026)
+     Migrated from "spaceship" dark palette to light theme to match the
+     editor redesign (commit 4b60c41 feat(editor): apply global light theme
+     to canvas, topbar, inspector). The dark base bled through in the band
+     above the canvas area until these were updated. */
+  --surface-base: #F8FAFC;                    /* App background */
+  --surface-panel: #FFFFFF;                   /* Panels */
+  --surface-panel-hover: rgba(15, 23, 42, 0.04);
+  --surface-canvas: #EEF2F7;                  /* Canvas background */
+  --surface-elevated: #FFFFFF;                /* Elevated elements */
 
   /* Border Tokens */
-  --border-subtle: rgba(255, 255, 255, 0.08); /* Default borders */
-  --border-medium: rgba(255, 255, 255, 0.12); /* Emphasized borders */
-  --border-strong: rgba(255, 255, 255, 0.18); /* Strong contrast borders */
+  --border-subtle: rgba(15, 23, 42, 0.08);    /* Default borders */
+  --border-medium: rgba(15, 23, 42, 0.12);    /* Emphasized borders */
+  --border-strong: rgba(15, 23, 42, 0.18);    /* Strong contrast borders */
   --border-active: #3b82f6;                   /* Active/Focus border */
 
   /* Text Tokens - Semantic */
-  --text-primary: #ffffff;                    /* Headings, main labels */
-  --text-secondary: #a1a1aa;                  /* Subtitles, hints */
-  --text-tertiary: #71717a;                   /* Disabled, placeholder */
-  --text-muted: #52525b;                      /* Very subtle text */
+  --text-primary: #0F172A;                    /* Headings, main labels */
+  --text-secondary: #475569;                  /* Subtitles, hints */
+  --text-tertiary: #64748B;                   /* Disabled, placeholder */
+  --text-muted: #94A3B8;                      /* Very subtle text */
 
   /* Brand Colors */
   --brand-primary: #3b82f6;                   /* Primary actions */

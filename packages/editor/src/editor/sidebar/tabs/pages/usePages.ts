@@ -97,7 +97,11 @@ export function usePages(composer: Composer | null): UsePagesReturn {
             ).router?.getPath?.(p.id),
             isHome: p.isHome,
             isActive: p.id === active?.id,
-            status: (p.settings?.visibility as PageItem["status"]) ?? "live",
+            // Default to "draft" when visibility is unset (CAN-013).
+            // A new page can't be Live before the project is published —
+            // the top-bar Publish button correctly shows "Draft" in that
+            // state, so the per-page badge must match.
+            status: (p.settings?.visibility as PageItem["status"]) ?? "draft",
             seo: p.settings?.seo,
             head: p.settings?.head,
           }))

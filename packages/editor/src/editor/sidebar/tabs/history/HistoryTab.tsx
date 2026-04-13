@@ -12,7 +12,7 @@ import { PanelHeader } from "../../shared/PanelHeader";
 import { SearchBar } from "../../shared/SearchBar";
 import { ViewSwitcher, type ViewOption } from "../../shared/ViewSwitcher";
 import { ActivityView } from "./components/ActivityView";
-import { VersionsIcon, ActivityIcon, UndoIcon, RedoIcon, ClearIcon } from "./icons";
+import { VersionsIcon, ActivityIcon, ClearIcon } from "./icons";
 import type { HistoryView, HistoryTabProps } from "./types";
 
 // ============================================
@@ -61,9 +61,9 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   // Search state
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  // Undo/Redo state
+  // canUndo gates the Clear-History button (no point clearing an empty
+  // history). canRedo dropped — only used by removed redo button (CAN-012).
   const [canUndo, setCanUndo] = React.useState(false);
-  const [canRedo, setCanRedo] = React.useState(false);
 
   // Clear confirmation inline state
   const [showClearConfirm, setShowClearConfirm] = React.useState(false);
@@ -84,7 +84,6 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
 
     const updateUndoRedoState = () => {
       setCanUndo(composer.history.canUndo());
-      setCanRedo(composer.history.canRedo());
     };
 
     // Initial state
@@ -104,18 +103,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
     };
   }, [composer]);
 
-  // Undo/Redo handlers
-  const handleUndo = React.useCallback(() => {
-    if (composer?.history?.canUndo()) {
-      composer.history.undo();
-    }
-  }, [composer]);
-
-  const handleRedo = React.useCallback(() => {
-    if (composer?.history?.canRedo()) {
-      composer.history.redo();
-    }
-  }, [composer]);
+  // Note: undo/redo handlers removed (CAN-012). The global top-bar owns
+  // those actions; per-version Compare/Restore lives in the version list.
 
   // Clear history handler with confirmation
   const handleClearHistory = React.useCallback(() => {
@@ -138,28 +127,13 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         onClose={onClose}
       />
 
-      {/* Controls: Search + Undo/Redo + Clear + View Switcher */}
+      {/* Controls: Search + Clear + View Switcher.
+          Undo/Redo intentionally omitted — the global top-bar provides the
+          single source of truth for those actions (CAN-012). Compare/Restore
+          per-version actions live in the version list below. */}
       <div className="aqb-ht-controls">
-        {/* Undo / Redo + Clear History row */}
+        {/* Clear History row */}
         <div className="aqb-ht-undo-row">
-          <button
-            onClick={handleUndo}
-            className="aqb-ht-clear-btn"
-            disabled={!canUndo}
-            title="Undo last action"
-            aria-label="Undo"
-          >
-            <UndoIcon />
-          </button>
-          <button
-            onClick={handleRedo}
-            className="aqb-ht-clear-btn"
-            disabled={!canRedo}
-            title="Redo last undone action"
-            aria-label="Redo"
-          >
-            <RedoIcon />
-          </button>
           {showClearConfirm ? (
             <div className="aqb-ht-clear-confirm" style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ fontSize: 11, color: "var(--aqb-text-muted)", whiteSpace: "nowrap" }}>

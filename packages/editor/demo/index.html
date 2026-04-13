@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,11 +11,32 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body {
         font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background: #0d0d1a;
-        color: #e5e7eb;
+        background: #F8FAFC;
+        color: #0F172A;
         min-height: 100vh;
       }
       #root { min-height: 100vh; }
+
+      /* Light-theme overrides for the V2 "spaceship" semantic tokens.
+         themes/default.css ships these as dark by default, but the editor
+         redesign went light (commit 4b60c41 feat(editor): apply global light
+         theme to canvas, topbar, inspector). The dark base bled through in
+         the band between the top bar and the canvas. Override here at the
+         demo entry point until default.css is migrated globally. */
+      :root {
+        --surface-base: #F8FAFC;
+        --surface-panel: #FFFFFF;
+        --surface-panel-hover: rgba(15, 23, 42, 0.04);
+        --surface-canvas: #EEF2F7;
+        --surface-elevated: #FFFFFF;
+        --text-primary: #0F172A;
+        --text-secondary: #475569;
+        --text-tertiary: #64748B;
+        --text-muted: #94A3B8;
+        --border-subtle: rgba(15, 23, 42, 0.08);
+        --border-medium: rgba(15, 23, 42, 0.12);
+        --border-strong: rgba(15, 23, 42, 0.18);
+      }
     </style>
   </head>
   <body>
