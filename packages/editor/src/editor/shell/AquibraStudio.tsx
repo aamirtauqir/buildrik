@@ -442,6 +442,10 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         composer={composer}
         selectedElement={selectedElement}
         device={state.device}
+        onDeviceChange={(d) => {
+          state.setDevice(d);
+          if (composer) composer.setDevice(d);
+        }}
         zoom={state.zoom}
         onZoomChange={state.setZoom}
         isLeftPanelOpen={state.isLeftPanelOpen}
