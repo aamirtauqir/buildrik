@@ -1,13 +1,18 @@
 /**
  * ColorInput - Color picker with text input
  * Handles both hex colors and CSS keywords (inherit, transparent, currentColor)
+ * Swatch click opens TokenPickerPopover — shows design-system color tokens +
+ * a "Custom" tab for raw hex/CSS value entry.
  * @license BSD-3-Clause
  */
 
 import { X } from "lucide-react";
 import * as React from "react";
-import { ColorSwatch, ColorSwatchGroup } from "../../../../shared/ui/ColorSwatch";
+import { ColorSwatch } from "../../../../shared/ui/ColorSwatch";
 import { Popover } from "../../../../shared/ui/Popover";
+import { useColorTokens } from "../../../../features/design-system/state/useColorTokens";
+import { DEFAULT_TOKENS } from "../../../../features/design-system/constants";
+import { TokenPickerPopover } from "../TokenPickerPopover";
 import { baseStyles } from "./controlStyles";
 
 // ============================================================================
@@ -21,26 +26,6 @@ const isValidHexColor = (val: string): boolean => {
   return /^#[0-9A-Fa-f]{6}$/.test(val) || /^#[0-9A-Fa-f]{3}$/.test(val);
 };
 
-// Premium Selection Palette (Tailwind-ish + Brand)
-const PRESET_COLORS = [
-  "#000000",
-  "#FFFFFF",
-  "#3b82f6",
-  "#2563eb", // Blues
-  "#ef4444",
-  "#dc2626", // Reds
-  "#22c55e",
-  "#16a34a", // Greens
-  "#eab308",
-  "#d97706", // Yellows
-  "#8b5cf6",
-  "#7c3aed", // Purples
-  "#ec4899",
-  "#db2777", // Pinks
-  "#64748b",
-  "#94a3b8", // Greys/Slates
-];
-
 // ============================================================================
 // COLOR INPUT
 // ============================================================================
@@ -53,11 +38,15 @@ export interface ColorInputProps {
 
 export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }) => {
   const isKeyword = value && !isValidHexColor(value);
-  const nativeInputRef = React.useRef<HTMLInputElement>(null);
   const [isRowHovered, setIsRowHovered] = React.useState(false);
 
   const displayValue = isValidHexColor(value) ? value : "#000000";
   const showReset = !!value && isRowHovered;
+
+  // Pull color tokens from the design-system. DEFAULT_TOKENS is the SSOT for
+  // the initial seed — same source the Design tab uses.
+  const { tokens: colorTokens } = useColorTokens(DEFAULT_TOKENS);
+  const tokenEntries = colorTokens.map((t) => ({ id: t.id, name: t.name, value: t.value }));
 
   return (
     <div
@@ -67,109 +56,29 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
     >
       <label style={baseStyles.label}>{label}</label>
       <div style={{ display: "flex", gap: 8, flex: 1, alignItems: "center" }}>
-        {/* Instant Popover Picker */}
+        {/* Swatch opens TokenPickerPopover — token list + custom tab */}
         <Popover
           triggerOn="click"
           position="bottom"
           trigger={
-            <div style={{ position: "relative" }}>
-              <ColorSwatch
-                color={displayValue}
-                size="sm"
-                onClick={() => {}} /* Trigger handled by Popover */
-                style={{
-                  cursor: "pointer",
-                  boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
-                  opacity: isKeyword ? 0.5 : 1,
-                }}
-              />
-              {/* Native picker hidden but accessible for 'Custom' fallback */}
-              <input
-                ref={nativeInputRef}
-                type="color"
-                value={isValidHexColor(value) ? value : "#000000"}
-                onChange={(e) => onChange(e.target.value)}
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: 0,
-                  height: 0,
-                  opacity: 0,
-                  visibility: "hidden",
-                }}
-              />
-            </div>
+            <ColorSwatch
+              color={displayValue}
+              size="sm"
+              onClick={() => {}}
+              style={{
+                cursor: "pointer",
+                boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
+                opacity: isKeyword ? 0.5 : 1,
+              }}
+            />
           }
           content={
-            <div style={{ width: 232, padding: 4 }}>
-              <div
-                style={{
-                  marginBottom: 12,
-                  paddingBottom: 8,
-                  borderBottom: "1px solid var(--aqb-border)",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: "var(--aqb-text-secondary)",
-                    marginBottom: 8,
-                    paddingLeft: 4,
-                  }}
-                >
-                  QUICK COLORS
-                </div>
-                <ColorSwatchGroup
-                  colors={PRESET_COLORS}
-                  selectedColor={value}
-                  onSelect={onChange}
-                  size="sm"
-                  style={{ gap: 8, justifyContent: "flex-start" }}
-                />
-              </div>
-
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <div
-                  onClick={() => nativeInputRef.current?.click()}
-                  style={{
-                    flex: 1,
-                    height: 28,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 6,
-                    fontSize: 12,
-                    fontWeight: 500,
-                    color: "var(--aqb-text-primary)",
-                    background: "var(--aqb-surface-3, rgba(255,255,255,0.05))",
-                    borderRadius: "var(--aqb-radius-sm)",
-                    cursor: "pointer",
-                    transition: "background 0.2s",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background =
-                      "var(--aqb-surface-4, rgba(255,255,255,0.1))")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.background =
-                      "var(--aqb-surface-3, rgba(255,255,255,0.05))")
-                  }
-                >
-                  <span
-                    style={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: "50%",
-                      background:
-                        "conic-gradient(red, orange, yellow, green, blue, indigo, violet, red)",
-                    }}
-                  />
-                  Custom...
-                </div>
-              </div>
-            </div>
+            <TokenPickerPopover
+              tokens={tokenEntries}
+              currentValue={value}
+              onSelect={(_tokenId, tokenValue) => onChange(tokenValue)}
+              onCustomValue={onChange}
+            />
           }
         />
 
