@@ -193,6 +193,10 @@ export const InspectorTabContent: React.FC<InspectorTabContentProps> = (props) =
           devMode,
           tabId,
           tier,
+          // Wave 2: multi-select — optional, default to empty/false so test
+          // fixtures that don't wire cssContext.selectedElements still work.
+          mixedKeys: cssContext.mixedKeys,
+          isMultiSelect: (cssContext.selectedElements?.length ?? 0) > 1,
         };
         return <React.Fragment key={id}>{entry.render(ctx)}</React.Fragment>;
       })}
