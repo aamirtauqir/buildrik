@@ -37,6 +37,7 @@ export interface StudioPanelsProps {
     tagName?: string;
   } | null;
   device: DeviceType;
+  onDeviceChange?: (device: DeviceType) => void;
   zoom: number;
   onZoomChange: (zoom: number) => void;
   isLeftPanelOpen: boolean;
@@ -151,6 +152,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   composer,
   selectedElement,
   device,
+  onDeviceChange,
   zoom,
   onZoomChange,
   isLeftPanelOpen,
@@ -440,6 +442,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           composer={composer}
           selectedElement={selectedElement}
           currentBreakpoint={device}
+          onBreakpointChange={onDeviceChange}
           onDelete={handleDelete}
           onOpenMediaLibrary={onOpenMediaLibrary}
           onOpenIconPicker={onOpenIconPicker}

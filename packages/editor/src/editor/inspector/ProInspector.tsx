@@ -50,6 +50,8 @@ export interface ProInspectorProps {
   } | null;
   composer?: Composer | null;
   currentBreakpoint?: DeviceType;
+  /** Called when the user switches breakpoint from the inspector header */
+  onBreakpointChange?: (bp: BreakpointId) => void;
   onDelete?: (id: string) => void;
   onOpenMediaLibrary?: (
     allowedTypes: MediaAssetType[],
@@ -71,6 +73,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   selectedElement,
   composer,
   currentBreakpoint: currentBreakpointProp = "desktop",
+  onBreakpointChange,
   onDelete,
   onOpenMediaLibrary,
   onOpenIconPicker,
@@ -97,6 +100,14 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     handleBatchStyleChange,
     overriddenProperties,
   } = useStyleHandlers(selectedElement, composer, currentBreakpoint, currentPseudoState);
+
+  // Detect whether the current breakpoint has any element-specific style overrides
+  const breakpointHasOverride = React.useMemo<boolean>(() => {
+    if (!selectedElement?.id || !composer?.styles || currentBreakpoint === "desktop") return false;
+    const bpStyles = composer.styles.getBreakpointStyle(selectedElement.id, currentBreakpoint);
+    return Object.keys(bpStyles).length > 0;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedElement?.id, composer, currentBreakpoint, styles_state]);
 
   // Detect which pseudo-states have at least one overridden style
   const statesWithOverrides = React.useMemo<Set<import("../../shared/types").PseudoStateId>>(
@@ -427,7 +438,11 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         />
 
         <ElementBreadcrumb selectedElement={selectedElement} composer={composer} />
-        <BreakpointIndicator currentBreakpoint={currentBreakpoint} />
+        <BreakpointIndicator
+          currentBreakpoint={currentBreakpoint}
+          onBreakpointChange={onBreakpointChange}
+          hasOverride={breakpointHasOverride}
+        />
         {currentPseudoState !== "normal" ||
         statesWithOverrides.size > 0 ||
         stateSelectorManuallyShown ? (
