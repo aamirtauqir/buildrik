@@ -8,6 +8,7 @@
 
 import * as React from "react";
 import { SelectRow, ButtonGroup, InputWithUnit } from "../../shared/controls";
+import { MixedValueBadge } from "../../shared/MixedValueBadge";
 
 // Font weight options
 export const FONT_WEIGHTS = [
@@ -25,55 +26,92 @@ export const FONT_WEIGHTS = [
 interface FontControlsProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
+  mixedKeys?: ReadonlySet<string>;
+  isMultiSelect?: boolean;
 }
 
-export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange }) => {
+export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mixedKeys }) => {
   return (
     <>
       {/* Font Size - BUG-007 FIX: Show default 16px when not explicitly set */}
-      <InputWithUnit
-        label="Size"
-        value={styles["font-size"] || "16px"}
-        onChange={(v) => onChange("font-size", v)}
-        units={["px", "em", "rem", "%", "vw"]}
-      />
+      <div style={{ position: "relative" }}>
+        {mixedKeys?.has("font-size") && (
+          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
+            <MixedValueBadge compact />
+          </span>
+        )}
+        <InputWithUnit
+          label="Size"
+          value={styles["font-size"] || "16px"}
+          onChange={(v) => onChange("font-size", v)}
+          units={["px", "em", "rem", "%", "vw"]}
+        />
+      </div>
 
       {/* Font Weight */}
-      <SelectRow
-        label="Weight"
-        value={styles["font-weight"] || ""}
-        onChange={(v) => onChange("font-weight", v)}
-        options={FONT_WEIGHTS}
-      />
+      <div style={{ position: "relative" }}>
+        {mixedKeys?.has("font-weight") && (
+          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
+            <MixedValueBadge compact />
+          </span>
+        )}
+        <SelectRow
+          label="Weight"
+          value={styles["font-weight"] || ""}
+          onChange={(v) => onChange("font-weight", v)}
+          options={FONT_WEIGHTS}
+        />
+      </div>
 
       {/* Line Height */}
-      <InputWithUnit
-        label="Line H"
-        value={styles["line-height"] || ""}
-        onChange={(v) => onChange("line-height", v)}
-        units={["px", "em", "%", "normal"]}
-      />
+      <div style={{ position: "relative" }}>
+        {mixedKeys?.has("line-height") && (
+          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
+            <MixedValueBadge compact />
+          </span>
+        )}
+        <InputWithUnit
+          label="Line H"
+          value={styles["line-height"] || ""}
+          onChange={(v) => onChange("line-height", v)}
+          units={["px", "em", "%", "normal"]}
+        />
+      </div>
 
       {/* Letter Spacing */}
-      <InputWithUnit
-        label="Letter Sp"
-        value={styles["letter-spacing"] || ""}
-        onChange={(v) => onChange("letter-spacing", v)}
-        units={["px", "em", "normal"]}
-      />
+      <div style={{ position: "relative" }}>
+        {mixedKeys?.has("letter-spacing") && (
+          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
+            <MixedValueBadge compact />
+          </span>
+        )}
+        <InputWithUnit
+          label="Letter Sp"
+          value={styles["letter-spacing"] || ""}
+          onChange={(v) => onChange("letter-spacing", v)}
+          units={["px", "em", "normal"]}
+        />
+      </div>
 
       {/* Text Decoration */}
-      <ButtonGroup
-        label="Decoration"
-        value={styles["text-decoration"] || ""}
-        onChange={(v) => onChange("text-decoration", v)}
-        options={[
-          { value: "none", label: "None", icon: "\u2014" },
-          { value: "underline", label: "Under", icon: "U\u0332" },
-          { value: "line-through", label: "Strike", icon: "S\u0336" },
-          { value: "overline", label: "Over", icon: "O\u0305" },
-        ]}
-      />
+      <div style={{ position: "relative" }}>
+        {mixedKeys?.has("text-decoration") && (
+          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
+            <MixedValueBadge compact />
+          </span>
+        )}
+        <ButtonGroup
+          label="Decoration"
+          value={styles["text-decoration"] || ""}
+          onChange={(v) => onChange("text-decoration", v)}
+          options={[
+            { value: "none", label: "None", icon: "\u2014" },
+            { value: "underline", label: "Under", icon: "U\u0332" },
+            { value: "line-through", label: "Strike", icon: "S\u0336" },
+            { value: "overline", label: "Over", icon: "O\u0305" },
+          ]}
+        />
+      </div>
 
       {/* Font Style */}
       <ButtonGroup

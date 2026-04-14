@@ -19,6 +19,7 @@
 import * as React from "react";
 import { ColorInput, InputWithUnit, SelectRow } from "../shared/controls";
 import { INSPECTOR_TOKENS } from "../shared/controls/controlStyles";
+import type { UseAdvancedSettingsReturn } from "../hooks/useAdvancedSettings";
 
 // ============================================================================
 // TYPES
@@ -41,13 +42,163 @@ interface CatalogEntry {
   options?: { value: string; label: string }[];
   /** Units override for `unit` type */
   units?: string[];
+  /** Whether this property is advanced (behind More settings toggle) */
+  isAdvanced?: boolean;
+  /** Which group this property belongs to (e.g., "layout", "size", "spacing") */
+  groupId?: string;
 }
 
 export interface PropertySearchResultsProps {
   searchQuery: string;
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
+  advancedState?: UseAdvancedSettingsReturn;
 }
+
+// ============================================================================
+// CSS PROPERTY TO GROUP MAPPING
+// ============================================================================
+// Maps CSS property names to their group IDs (from the properties registry).
+// This allows search results to auto-expand advanced disclosure groups.
+const CSS_TO_GROUP: Record<string, string> = {
+  // Layout
+  display: "layout",
+  position: "layout",
+  visibility: "layout",
+  "box-sizing": "layout",
+  isolation: "layout",
+  contain: "layout",
+  top: "layout",
+  right: "layout",
+  bottom: "layout",
+  left: "layout",
+  "z-index": "layout",
+  overflow: "layout",
+  "overflow-x": "layout",
+  "overflow-y": "layout",
+  float: "layout",
+  clear: "layout",
+  "scroll-behavior": "layout",
+  "scroll-snap-type": "layout",
+  "scroll-snap-align": "layout",
+
+  // Size
+  width: "size",
+  height: "size",
+  "min-width": "size",
+  "max-width": "size",
+  "min-height": "size",
+  "max-height": "size",
+  "aspect-ratio": "size",
+
+  // Spacing
+  padding: "spacing",
+  "padding-top": "spacing",
+  "padding-right": "spacing",
+  "padding-bottom": "spacing",
+  "padding-left": "spacing",
+  margin: "spacing",
+  "margin-top": "spacing",
+  "margin-right": "spacing",
+  "margin-bottom": "spacing",
+  "margin-left": "spacing",
+  gap: "spacing",
+  "row-gap": "spacing",
+  "column-gap": "spacing",
+
+  // Flex
+  "flex-direction": "flex",
+  "justify-content": "flex",
+  "align-items": "flex",
+  "align-content": "flex",
+  "flex-wrap": "flex",
+  "flex-grow": "flex",
+  "flex-shrink": "flex",
+  "flex-basis": "flex",
+
+  // Grid
+  "grid-template-columns": "grid",
+  "grid-template-rows": "grid",
+  "grid-gap": "grid",
+  "grid-column": "grid",
+  "grid-row": "grid",
+  "grid-auto-flow": "grid",
+
+  // Typography
+  "font-size": "typography",
+  "font-weight": "typography",
+  "line-height": "typography",
+  "letter-spacing": "typography",
+  color: "typography",
+  "text-align": "typography",
+  "text-transform": "typography",
+  "white-space": "typography",
+  "word-break": "typography",
+  "text-decoration": "typography",
+
+  // Background
+  "background-color": "background",
+
+  // Border
+  "border-width": "border",
+  "border-style": "border",
+  "border-color": "border",
+  "border-radius": "border",
+
+  // Effects
+  opacity: "effects",
+  "box-shadow": "effects",
+  transform: "effects",
+  transition: "effects",
+  filter: "effects",
+  "backdrop-filter": "effects",
+  "mix-blend-mode": "effects",
+  cursor: "effects",
+  "user-select": "effects",
+  "pointer-events": "effects",
+  "object-fit": "effects",
+  "object-position": "effects",
+};
+
+// ============================================================================
+// TIER MAPPING (BASIC vs ADVANCED)
+// ============================================================================
+// Maps CSS property names to whether they are "advanced" (behind More settings).
+// Based on the properties registry tier values.
+const PROPERTY_TIERS: Record<string, "basic" | "advanced"> = {
+  // Layout — advanced
+  visibility: "advanced",
+  "box-sizing": "advanced",
+  isolation: "advanced",
+  contain: "advanced",
+  "overflow-x": "advanced",
+  "overflow-y": "advanced",
+  "scroll-behavior": "advanced",
+  "scroll-snap-type": "advanced",
+  "scroll-snap-align": "advanced",
+
+  // Size — advanced
+  "min-width": "advanced",
+  "max-width": "advanced",
+  "min-height": "advanced",
+  "max-height": "advanced",
+  "aspect-ratio": "advanced",
+
+  // Spacing — advanced
+  "row-gap": "advanced",
+  "column-gap": "advanced",
+
+  // Position — advanced
+  "z-index": "advanced",
+
+  // Flex — advanced (child properties)
+  "flex-grow": "advanced",
+  "flex-shrink": "advanced",
+  "flex-basis": "advanced",
+
+  // Effects — advanced
+  "pointer-events": "advanced",
+};
 
 // ============================================================================
 // CATALOG
@@ -164,85 +315,85 @@ const ALIGN_OPTS = [
 
 const CATALOG: CatalogEntry[] = [
   // Layout
-  { label: "Display", property: "display", keywords: ["display", "block", "flex", "grid"], type: "select", category: "Layout", options: DISPLAY_OPTS },
-  { label: "Position", property: "position", keywords: ["position", "absolute", "relative", "fixed"], type: "select", category: "Layout", options: POSITION_OPTS },
-  { label: "Top", property: "top", keywords: ["top", "offset"], type: "unit", category: "Layout" },
-  { label: "Right", property: "right", keywords: ["right", "offset"], type: "unit", category: "Layout" },
-  { label: "Bottom", property: "bottom", keywords: ["bottom", "offset"], type: "unit", category: "Layout" },
-  { label: "Left", property: "left", keywords: ["left", "offset"], type: "unit", category: "Layout" },
-  { label: "Z-index", property: "z-index", keywords: ["z", "zindex", "z-index", "stack"], type: "number", category: "Layout" },
-  { label: "Overflow", property: "overflow", keywords: ["overflow", "scroll", "clip"], type: "select", category: "Layout", options: OVERFLOW_OPTS },
+  { label: "Display", property: "display", keywords: ["display", "block", "flex", "grid"], type: "select", category: "Layout", options: DISPLAY_OPTS, isAdvanced: false, groupId: "layout" },
+  { label: "Position", property: "position", keywords: ["position", "absolute", "relative", "fixed"], type: "select", category: "Layout", options: POSITION_OPTS, isAdvanced: false, groupId: "layout" },
+  { label: "Top", property: "top", keywords: ["top", "offset"], type: "unit", category: "Layout", isAdvanced: false, groupId: "layout" },
+  { label: "Right", property: "right", keywords: ["right", "offset"], type: "unit", category: "Layout", isAdvanced: false, groupId: "layout" },
+  { label: "Bottom", property: "bottom", keywords: ["bottom", "offset"], type: "unit", category: "Layout", isAdvanced: false, groupId: "layout" },
+  { label: "Left", property: "left", keywords: ["left", "offset"], type: "unit", category: "Layout", isAdvanced: false, groupId: "layout" },
+  { label: "Z-index", property: "z-index", keywords: ["z", "zindex", "z-index", "stack"], type: "number", category: "Layout", isAdvanced: true, groupId: "layout" },
+  { label: "Overflow", property: "overflow", keywords: ["overflow", "scroll", "clip"], type: "select", category: "Layout", options: OVERFLOW_OPTS, isAdvanced: false, groupId: "layout" },
 
   // Size
-  { label: "Width", property: "width", keywords: ["width", "w", "size"], type: "unit", category: "Size" },
-  { label: "Height", property: "height", keywords: ["height", "h", "size"], type: "unit", category: "Size" },
-  { label: "Min width", property: "min-width", keywords: ["min", "width"], type: "unit", category: "Size" },
-  { label: "Max width", property: "max-width", keywords: ["max", "width"], type: "unit", category: "Size" },
-  { label: "Min height", property: "min-height", keywords: ["min", "height"], type: "unit", category: "Size" },
-  { label: "Max height", property: "max-height", keywords: ["max", "height"], type: "unit", category: "Size" },
+  { label: "Width", property: "width", keywords: ["width", "w", "size"], type: "unit", category: "Size", isAdvanced: false, groupId: "size" },
+  { label: "Height", property: "height", keywords: ["height", "h", "size"], type: "unit", category: "Size", isAdvanced: false, groupId: "size" },
+  { label: "Min width", property: "min-width", keywords: ["min", "width"], type: "unit", category: "Size", isAdvanced: true, groupId: "size" },
+  { label: "Max width", property: "max-width", keywords: ["max", "width"], type: "unit", category: "Size", isAdvanced: true, groupId: "size" },
+  { label: "Min height", property: "min-height", keywords: ["min", "height"], type: "unit", category: "Size", isAdvanced: true, groupId: "size" },
+  { label: "Max height", property: "max-height", keywords: ["max", "height"], type: "unit", category: "Size", isAdvanced: true, groupId: "size" },
 
   // Spacing
-  { label: "Padding", property: "padding", keywords: ["padding", "p", "space", "inside"], type: "unit", category: "Spacing" },
-  { label: "Padding top", property: "padding-top", keywords: ["padding", "top"], type: "unit", category: "Spacing" },
-  { label: "Padding right", property: "padding-right", keywords: ["padding", "right"], type: "unit", category: "Spacing" },
-  { label: "Padding bottom", property: "padding-bottom", keywords: ["padding", "bottom"], type: "unit", category: "Spacing" },
-  { label: "Padding left", property: "padding-left", keywords: ["padding", "left"], type: "unit", category: "Spacing" },
-  { label: "Margin", property: "margin", keywords: ["margin", "m", "space", "outside"], type: "unit", category: "Spacing" },
-  { label: "Margin top", property: "margin-top", keywords: ["margin", "top"], type: "unit", category: "Spacing" },
-  { label: "Margin right", property: "margin-right", keywords: ["margin", "right"], type: "unit", category: "Spacing" },
-  { label: "Margin bottom", property: "margin-bottom", keywords: ["margin", "bottom"], type: "unit", category: "Spacing" },
-  { label: "Margin left", property: "margin-left", keywords: ["margin", "left"], type: "unit", category: "Spacing" },
-  { label: "Gap", property: "gap", keywords: ["gap", "space", "between"], type: "unit", category: "Spacing" },
+  { label: "Padding", property: "padding", keywords: ["padding", "p", "space", "inside"], type: "unit", category: "Spacing", isAdvanced: false, groupId: "spacing" },
+  { label: "Padding top", property: "padding-top", keywords: ["padding", "top"], type: "unit", category: "Spacing", isAdvanced: false, groupId: "spacing" },
+  { label: "Padding right", property: "padding-right", keywords: ["padding", "right"], type: "unit", category: "Spacing", isAdvanced: false, groupId: "spacing" },
+  { label: "Padding bottom", property: "padding-bottom", keywords: ["padding", "bottom"], type: "unit", category: "Spacing", isAdvanced: false, groupId: "spacing" },
+  { label: "Padding left", property: "padding-left", keywords: ["padding", "left"], type: "unit", category: "Spacing", isAdvanced: false, groupId: "spacing" },
+  { label: "Margin", property: "margin", keywords: ["margin", "m", "space", "outside"], type: "unit", category: "Spacing", isAdvanced: false, groupId: "spacing" },
+  { label: "Margin top", property: "margin-top", keywords: ["margin", "top"], type: "unit", category: "Spacing", isAdvanced: false, groupId: "spacing" },
+  { label: "Margin right", property: "margin-right", keywords: ["margin", "right"], type: "unit", category: "Spacing", isAdvanced: false, groupId: "spacing" },
+  { label: "Margin bottom", property: "margin-bottom", keywords: ["margin", "bottom"], type: "unit", category: "Spacing", isAdvanced: false, groupId: "spacing" },
+  { label: "Margin left", property: "margin-left", keywords: ["margin", "left"], type: "unit", category: "Spacing", isAdvanced: false, groupId: "spacing" },
+  { label: "Gap", property: "gap", keywords: ["gap", "space", "between"], type: "unit", category: "Spacing", isAdvanced: false, groupId: "spacing" },
 
   // Typography
-  { label: "Font size", property: "font-size", keywords: ["font", "size", "text"], type: "unit", category: "Typography" },
-  { label: "Font weight", property: "font-weight", keywords: ["font", "weight", "bold"], type: "select", category: "Typography", options: FONT_WEIGHT_OPTS },
-  { label: "Line height", property: "line-height", keywords: ["line", "height", "leading"], type: "unit", category: "Typography" },
-  { label: "Letter spacing", property: "letter-spacing", keywords: ["letter", "spacing", "tracking", "kerning"], type: "unit", category: "Typography" },
-  { label: "Text color", property: "color", keywords: ["color", "text", "foreground"], type: "color", category: "Typography" },
-  { label: "Text align", property: "text-align", keywords: ["align", "center", "left", "right"], type: "select", category: "Typography", options: TEXT_ALIGN_OPTS },
-  { label: "Text transform", property: "text-transform", keywords: ["transform", "uppercase", "lowercase", "capitalize"], type: "select", category: "Typography", options: TEXT_TRANSFORM_OPTS },
+  { label: "Font size", property: "font-size", keywords: ["font", "size", "text"], type: "unit", category: "Typography", isAdvanced: false, groupId: "typography" },
+  { label: "Font weight", property: "font-weight", keywords: ["font", "weight", "bold"], type: "select", category: "Typography", options: FONT_WEIGHT_OPTS, isAdvanced: false, groupId: "typography" },
+  { label: "Line height", property: "line-height", keywords: ["line", "height", "leading"], type: "unit", category: "Typography", isAdvanced: false, groupId: "typography" },
+  { label: "Letter spacing", property: "letter-spacing", keywords: ["letter", "spacing", "tracking", "kerning"], type: "unit", category: "Typography", isAdvanced: false, groupId: "typography" },
+  { label: "Text color", property: "color", keywords: ["color", "text", "foreground"], type: "color", category: "Typography", isAdvanced: false, groupId: "typography" },
+  { label: "Text align", property: "text-align", keywords: ["align", "center", "left", "right"], type: "select", category: "Typography", options: TEXT_ALIGN_OPTS, isAdvanced: false, groupId: "typography" },
+  { label: "Text transform", property: "text-transform", keywords: ["transform", "uppercase", "lowercase", "capitalize"], type: "select", category: "Typography", options: TEXT_TRANSFORM_OPTS, isAdvanced: false, groupId: "typography" },
 
   // Background
-  { label: "Background color", property: "background-color", keywords: ["background", "bg", "color", "fill"], type: "color", category: "Background" },
+  { label: "Background color", property: "background-color", keywords: ["background", "bg", "color", "fill"], type: "color", category: "Background", isAdvanced: false, groupId: "background" },
 
   // Border
-  { label: "Border width", property: "border-width", keywords: ["border", "width", "stroke"], type: "unit", category: "Border" },
-  { label: "Border style", property: "border-style", keywords: ["border", "style", "solid", "dashed"], type: "select", category: "Border", options: BORDER_STYLE_OPTS },
-  { label: "Border color", property: "border-color", keywords: ["border", "color", "stroke"], type: "color", category: "Border" },
-  { label: "Border radius", property: "border-radius", keywords: ["border", "radius", "round", "corner"], type: "unit", category: "Border" },
+  { label: "Border width", property: "border-width", keywords: ["border", "width", "stroke"], type: "unit", category: "Border", isAdvanced: false, groupId: "border" },
+  { label: "Border style", property: "border-style", keywords: ["border", "style", "solid", "dashed"], type: "select", category: "Border", options: BORDER_STYLE_OPTS, isAdvanced: false, groupId: "border" },
+  { label: "Border color", property: "border-color", keywords: ["border", "color", "stroke"], type: "color", category: "Border", isAdvanced: false, groupId: "border" },
+  { label: "Border radius", property: "border-radius", keywords: ["border", "radius", "round", "corner"], type: "unit", category: "Border", isAdvanced: false, groupId: "border" },
 
-  // Layout — flex/grid item sub-properties (only meaningful when parent is flex/grid)
-  { label: "Flex grow", property: "flex-grow", keywords: ["flex", "grow"], type: "number", category: "Layout" },
-  { label: "Flex shrink", property: "flex-shrink", keywords: ["flex", "shrink"], type: "number", category: "Layout" },
-  { label: "Flex basis", property: "flex-basis", keywords: ["flex", "basis"], type: "unit", category: "Layout" },
-  { label: "Align self", property: "align-self", keywords: ["align", "self"], type: "select", category: "Layout", options: ALIGN_OPTS },
-  { label: "Justify self", property: "justify-self", keywords: ["justify", "self"], type: "select", category: "Layout", options: ALIGN_OPTS },
-  { label: "Justify content", property: "justify-content", keywords: ["justify", "content", "center", "space"], type: "select", category: "Layout", options: JUSTIFY_OPTS },
-  { label: "Align items", property: "align-items", keywords: ["align", "items", "center"], type: "select", category: "Layout", options: ALIGN_OPTS },
-  { label: "Order", property: "order", keywords: ["order", "flex"], type: "number", category: "Layout" },
+  // Flex
+  { label: "Flex grow", property: "flex-grow", keywords: ["flex", "grow"], type: "number", category: "Layout", isAdvanced: true, groupId: "flex" },
+  { label: "Flex shrink", property: "flex-shrink", keywords: ["flex", "shrink"], type: "number", category: "Layout", isAdvanced: true, groupId: "flex" },
+  { label: "Flex basis", property: "flex-basis", keywords: ["flex", "basis"], type: "unit", category: "Layout", isAdvanced: true, groupId: "flex" },
+  { label: "Align self", property: "align-self", keywords: ["align", "self"], type: "select", category: "Layout", options: ALIGN_OPTS, isAdvanced: false, groupId: "flex" },
+  { label: "Justify self", property: "justify-self", keywords: ["justify", "self"], type: "select", category: "Layout", options: ALIGN_OPTS, isAdvanced: false, groupId: "flex" },
+  { label: "Justify content", property: "justify-content", keywords: ["justify", "content", "center", "space"], type: "select", category: "Layout", options: JUSTIFY_OPTS, isAdvanced: false, groupId: "flex" },
+  { label: "Align items", property: "align-items", keywords: ["align", "items", "center"], type: "select", category: "Layout", options: ALIGN_OPTS, isAdvanced: false, groupId: "flex" },
+  { label: "Order", property: "order", keywords: ["order", "flex"], type: "number", category: "Layout", isAdvanced: false, groupId: "flex" },
 
-  // Size
-  { label: "Object fit", property: "object-fit", keywords: ["object", "fit", "cover", "contain", "image"], type: "select", category: "Size", options: OBJECT_FIT_OPTS },
-  { label: "Object position", property: "object-position", keywords: ["object", "position"], type: "unit", category: "Size" },
-  { label: "Aspect ratio", property: "aspect-ratio", keywords: ["aspect", "ratio"], type: "unit", category: "Size", units: ["auto"] },
+  // Size extras
+  { label: "Object fit", property: "object-fit", keywords: ["object", "fit", "cover", "contain", "image"], type: "select", category: "Size", options: OBJECT_FIT_OPTS, isAdvanced: false, groupId: "size" },
+  { label: "Object position", property: "object-position", keywords: ["object", "position"], type: "unit", category: "Size", isAdvanced: false, groupId: "size" },
+  { label: "Aspect ratio", property: "aspect-ratio", keywords: ["aspect", "ratio"], type: "unit", category: "Size", units: ["auto"], isAdvanced: true, groupId: "size" },
 
   // Typography extras
-  { label: "White space", property: "white-space", keywords: ["white", "space", "wrap", "nowrap"], type: "select", category: "Typography", options: WHITE_SPACE_OPTS },
-  { label: "Word break", property: "word-break", keywords: ["word", "break"], type: "unit", category: "Typography", units: ["normal"] },
-  { label: "Text decoration", property: "text-decoration", keywords: ["text", "decoration", "underline", "strike"], type: "unit", category: "Typography", units: ["none"] },
+  { label: "White space", property: "white-space", keywords: ["white", "space", "wrap", "nowrap"], type: "select", category: "Typography", options: WHITE_SPACE_OPTS, isAdvanced: false, groupId: "typography" },
+  { label: "Word break", property: "word-break", keywords: ["word", "break"], type: "unit", category: "Typography", units: ["normal"], isAdvanced: false, groupId: "typography" },
+  { label: "Text decoration", property: "text-decoration", keywords: ["text", "decoration", "underline", "strike"], type: "unit", category: "Typography", units: ["none"], isAdvanced: false, groupId: "typography" },
 
   // Effects
-  { label: "Opacity", property: "opacity", keywords: ["opacity", "alpha", "transparent"], type: "number", category: "Effects" },
-  { label: "Box shadow", property: "box-shadow", keywords: ["shadow", "box", "drop"], type: "unit", category: "Effects", units: ["px"] },
-  { label: "Transform", property: "transform", keywords: ["transform", "rotate", "scale", "translate"], type: "unit", category: "Effects", units: ["deg"] },
-  { label: "Transition", property: "transition", keywords: ["transition", "duration", "animate", "ease"], type: "unit", category: "Effects", units: ["ms", "s"] },
-  { label: "Filter", property: "filter", keywords: ["filter", "blur", "brightness", "grayscale"], type: "unit", category: "Effects", units: ["px"] },
-  { label: "Backdrop filter", property: "backdrop-filter", keywords: ["backdrop", "blur", "glass"], type: "unit", category: "Effects", units: ["px"] },
-  { label: "Mix blend mode", property: "mix-blend-mode", keywords: ["blend", "mix", "multiply", "screen"], type: "unit", category: "Effects", units: ["normal"] },
-  { label: "Cursor", property: "cursor", keywords: ["cursor", "pointer", "hand", "grab"], type: "select", category: "Effects", options: CURSOR_OPTS },
-  { label: "User select", property: "user-select", keywords: ["user", "select", "selectable"], type: "select", category: "Effects", options: USER_SELECT_OPTS },
-  { label: "Pointer events", property: "pointer-events", keywords: ["pointer", "events", "click"], type: "unit", category: "Effects", units: ["auto"] },
+  { label: "Opacity", property: "opacity", keywords: ["opacity", "alpha", "transparent"], type: "number", category: "Effects", isAdvanced: false, groupId: "effects" },
+  { label: "Box shadow", property: "box-shadow", keywords: ["shadow", "box", "drop"], type: "unit", category: "Effects", units: ["px"], isAdvanced: false, groupId: "effects" },
+  { label: "Transform", property: "transform", keywords: ["transform", "rotate", "scale", "translate"], type: "unit", category: "Effects", units: ["deg"], isAdvanced: false, groupId: "effects" },
+  { label: "Transition", property: "transition", keywords: ["transition", "duration", "animate", "ease"], type: "unit", category: "Effects", units: ["ms", "s"], isAdvanced: false, groupId: "effects" },
+  { label: "Filter", property: "filter", keywords: ["filter", "blur", "brightness", "grayscale"], type: "unit", category: "Effects", units: ["px"], isAdvanced: false, groupId: "effects" },
+  { label: "Backdrop filter", property: "backdrop-filter", keywords: ["backdrop", "blur", "glass"], type: "unit", category: "Effects", units: ["px"], isAdvanced: false, groupId: "effects" },
+  { label: "Mix blend mode", property: "mix-blend-mode", keywords: ["blend", "mix", "multiply", "screen"], type: "unit", category: "Effects", units: ["normal"], isAdvanced: false, groupId: "effects" },
+  { label: "Cursor", property: "cursor", keywords: ["cursor", "pointer", "hand", "grab"], type: "select", category: "Effects", options: CURSOR_OPTS, isAdvanced: false, groupId: "effects" },
+  { label: "User select", property: "user-select", keywords: ["user", "select", "selectable"], type: "select", category: "Effects", options: USER_SELECT_OPTS, isAdvanced: true, groupId: "effects" },
+  { label: "Pointer events", property: "pointer-events", keywords: ["pointer", "events", "click"], type: "unit", category: "Effects", units: ["auto"], isAdvanced: true, groupId: "effects" },
 ];
 
 // ============================================================================
@@ -298,11 +449,30 @@ export const PropertySearchResults: React.FC<PropertySearchResultsProps> = ({
   searchQuery,
   styles: elementStyles,
   onChange,
+  advancedState,
 }) => {
   const matched = React.useMemo(
     () => CATALOG.filter((entry) => matches(entry, searchQuery)),
     [searchQuery]
   );
+
+  // Auto-expand groups for advanced matches
+  React.useEffect(() => {
+    if (!advancedState) return;
+
+    // Find all unique group IDs that have advanced matches
+    const groupsToExpand = new Set<string>();
+    for (const entry of matched) {
+      if (entry.isAdvanced && entry.groupId) {
+        groupsToExpand.add(entry.groupId);
+      }
+    }
+
+    // Expand each group
+    for (const groupId of groupsToExpand) {
+      advancedState.expand(groupId);
+    }
+  }, [matched, advancedState]);
 
   if (matched.length === 0) {
     return (

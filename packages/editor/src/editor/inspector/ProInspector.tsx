@@ -30,8 +30,10 @@ import { PseudoStateSelector } from "./components/PseudoStateSelector";
 import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hooks";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
 import { VariantSection } from "./sections/VariantSection";
-import { buildAdvancedPropsMapFromRegistry } from "./sections/registry";
+import { buildAdvancedPropsMapFromRegistry, SECTION_REGISTRY } from "./sections/registry";
 import { deriveCssContext, getPropertyStates } from "./config/cssContext";
+import { detectMixedValues } from "./shared/detectMixedValues";
+import type { Element } from "../../engine";
 import { DevModeToggle } from "./shared/DevModeToggle";
 import { panelStyles } from "./styles";
 import { InspectorTabContent } from "./tabs/InspectorTabContent";
@@ -193,6 +195,34 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   React.useEffect(() => {
     setContextState(deriveCssContext(selectedElement, composer, devMode));
   }, [selectedElement, composer, styles_state, devMode]);
+
+  // Multi-select: resolve element instances for all selected ids
+  const selectedElements = React.useMemo<readonly Element[]>(() => {
+    if (!composer || selectedIds.length === 0) return [];
+    return selectedIds
+      .map((id) => composer.elements.getElement(id))
+      .filter((el): el is Element => !!el);
+  }, [composer, selectedIds]);
+
+  // Union of every section's styleKeys — used to compute mixed-value set once
+  const allStyleKeys = React.useMemo<readonly string[]>(() => {
+    return Array.from(
+      new Set(
+        Object.values(SECTION_REGISTRY).flatMap((entry) => entry.styleKeys as string[])
+      )
+    );
+  }, []);
+
+  const mixedKeys = React.useMemo(
+    () => detectMixedValues(selectedElements, allStyleKeys),
+    [selectedElements, allStyleKeys]
+  );
+
+  // Enrich the CSS context with multi-select data before passing to sections
+  const enrichedContext = React.useMemo(
+    () => ({ ...contextState, selectedElements, mixedKeys }),
+    [contextState, selectedElements, mixedKeys]
+  );
 
   // ── Scroll position persistence ────────────────────────────────────────────
   React.useEffect(() => {
@@ -532,6 +562,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               searchQuery={searchQuery}
               styles={styles_state}
               onChange={handleStyleChange}
+              advancedState={advancedState}
             />
           ) : (
             <>
@@ -542,7 +573,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
                 styles={styles_state}
                 onChange={handleStyleChange}
                 onBatchChange={handleBatchStyleChange}
-                cssContext={contextState}
+                cssContext={enrichedContext}
                 propertyStates={propertyStates}
                 expandedSections={expandedSections}
                 onToggleSection={toggleSection}

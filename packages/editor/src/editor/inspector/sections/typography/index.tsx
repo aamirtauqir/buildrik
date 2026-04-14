@@ -16,6 +16,7 @@ import { Section, MoreSettingsToggle, type SectionTier } from "../../shared/cont
 import { FontControls } from "./FontControls";
 import { FontPicker } from "./FontPicker";
 import { TypographyControls } from "./TypographyControls";
+import { MixedValueBadge } from "../../shared/MixedValueBadge";
 
 // ============================================================================
 // TYPES
@@ -34,6 +35,8 @@ export interface TypographySectionProps {
   advancedExpanded?: boolean;
   /** Called when the More settings toggle is clicked */
   onAdvancedToggle?: () => void;
+  mixedKeys?: ReadonlySet<string>;
+  isMultiSelect?: boolean;
 }
 
 // ============================================================================
@@ -48,6 +51,8 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
   tier = "primary",
   advancedExpanded = false,
   onAdvancedToggle,
+  mixedKeys,
+  isMultiSelect,
 }) => {
   // Handle font-family changes from FontPicker
   const handleFontChange = React.useCallback(
@@ -91,13 +96,20 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
       id="inspector-section-typography"
     >
       {/* Font Family Picker - AQUI-032 */}
-      <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} />
+      <div style={{ position: "relative" }}>
+        {mixedKeys?.has("font-family") && (
+          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
+            <MixedValueBadge compact />
+          </span>
+        )}
+        <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} />
+      </div>
 
       {/* Font Size, Weight, Line Height, Letter Spacing, Decoration, Style */}
-      <FontControls styles={styles} onChange={onChange} />
+      <FontControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} isMultiSelect={isMultiSelect} />
 
       {/* ─── Advanced: Color, Alignment, Transform, White Space, Word Break ─── */}
-      {advancedExpanded && <TypographyControls styles={styles} onChange={onChange} />}
+      {advancedExpanded && <TypographyControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} isMultiSelect={isMultiSelect} />}
 
       {/* Progressive disclosure toggle */}
       {onAdvancedToggle && (

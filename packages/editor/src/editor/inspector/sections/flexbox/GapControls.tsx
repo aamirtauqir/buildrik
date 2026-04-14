@@ -11,6 +11,7 @@
 import * as React from "react";
 import { LinkedGapInput } from "../../shared/controls";
 import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
+import { MixedValueBadge } from "../../shared/MixedValueBadge";
 
 // ============================================================================
 // TYPES
@@ -27,6 +28,7 @@ export interface GapControlsProps {
   rowStyle?: React.CSSProperties;
   /** Unused after migration — kept for call-site compatibility. */
   labelStyle?: React.CSSProperties;
+  mixedKeys?: ReadonlySet<string>;
 }
 
 // ============================================================================
@@ -38,6 +40,7 @@ export const GapControls: React.FC<GapControlsProps> = ({
   onChange,
   onBatchChange,
   disabled,
+  mixedKeys,
 }) => (
   <div
     style={{
@@ -48,6 +51,12 @@ export const GapControls: React.FC<GapControlsProps> = ({
       border: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
     }}
   >
+    {mixedKeys?.has("gap") && (
+      <div style={{ display: "flex", alignItems: "center", marginBottom: 4 }}>
+        <MixedValueBadge compact />
+        <span style={{ fontSize: 11, color: INSPECTOR_TOKENS.textMuted }}>Gap</span>
+      </div>
+    )}
     <LinkedGapInput
       styles={styles}
       onChange={onChange}

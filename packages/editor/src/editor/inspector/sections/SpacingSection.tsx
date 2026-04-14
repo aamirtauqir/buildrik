@@ -4,6 +4,7 @@
 
 import * as React from "react";
 import { Section, FourSideInput, InputWithUnit, MoreSettingsToggle, type SectionTier } from "../shared/controls";
+import { MixedValueBadge } from "../shared/MixedValueBadge";
 
 export interface SpacingSectionProps {
   styles: Record<string, string>;
@@ -20,6 +21,8 @@ export interface SpacingSectionProps {
   advancedExpanded?: boolean;
   /** Called when the More settings toggle is clicked */
   onAdvancedToggle?: () => void;
+  mixedKeys?: ReadonlySet<string>;
+  isMultiSelect?: boolean;
 }
 
 export const SpacingSection: React.FC<SpacingSectionProps> = ({
@@ -32,6 +35,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
   tier = "secondary",
   advancedExpanded = false,
   onAdvancedToggle,
+  mixedKeys,
 }) => {
   const [marginLinked, setMarginLinked] = React.useState(false);
   const [paddingLinked, setPaddingLinked] = React.useState(false);
@@ -123,6 +127,13 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
   const disabledMargin = (side: string) => propertyStates[`margin-${side}`];
   const disabledPadding = (side: string) => propertyStates[`padding-${side}`];
 
+  const marginMixed = mixedKeys
+    ? (mixedKeys.has("margin") || mixedKeys.has("margin-top") || mixedKeys.has("margin-right") || mixedKeys.has("margin-bottom") || mixedKeys.has("margin-left"))
+    : false;
+  const paddingMixed = mixedKeys
+    ? (mixedKeys.has("padding") || mixedKeys.has("padding-top") || mixedKeys.has("padding-right") || mixedKeys.has("padding-bottom") || mixedKeys.has("padding-left"))
+    : false;
+
   // Collapsed preview: "m:16 p:8" summary. Collapses the four sides into the
   // single shorthand if all sides match; otherwise shows "mixed".
   const collapseSides = (t: string, r: string, b: string, l: string): string | null => {
@@ -170,45 +181,66 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
       id="inspector-section-spacing"
     >
       {/* Margin Controls */}
-      <FourSideInput
-        label="Margin"
-        values={marginValues}
-        onChange={handleMarginChange}
-        linked={marginLinked}
-        onLinkToggle={() => setMarginLinked(!marginLinked)}
-        disabledSides={{
-          top: disabledMargin("top")?.disabled,
-          right: disabledMargin("right")?.disabled,
-          bottom: disabledMargin("bottom")?.disabled,
-          left: disabledMargin("left")?.disabled,
-        }}
-        disabledReason={disabledMargin("top")?.reason || disabledMargin("bottom")?.reason}
-      />
+      <div style={{ position: "relative" }}>
+        {marginMixed && (
+          <span style={{ position: "absolute", right: 0, top: 0, zIndex: 1 }}>
+            <MixedValueBadge compact />
+          </span>
+        )}
+        <FourSideInput
+          label="Margin"
+          values={marginValues}
+          onChange={handleMarginChange}
+          linked={marginLinked}
+          onLinkToggle={() => setMarginLinked(!marginLinked)}
+          disabledSides={{
+            top: disabledMargin("top")?.disabled,
+            right: disabledMargin("right")?.disabled,
+            bottom: disabledMargin("bottom")?.disabled,
+            left: disabledMargin("left")?.disabled,
+          }}
+          disabledReason={disabledMargin("top")?.reason || disabledMargin("bottom")?.reason}
+        />
+      </div>
 
       {/* Padding Controls */}
-      <FourSideInput
-        label="Padding"
-        values={paddingValues}
-        onChange={handlePaddingChange}
-        linked={paddingLinked}
-        onLinkToggle={() => setPaddingLinked(!paddingLinked)}
-        disabledSides={{
-          top: disabledPadding("top")?.disabled,
-          right: disabledPadding("right")?.disabled,
-          bottom: disabledPadding("bottom")?.disabled,
-          left: disabledPadding("left")?.disabled,
-        }}
-        disabledReason={disabledPadding("top")?.reason || disabledPadding("bottom")?.reason}
-      />
+      <div style={{ position: "relative" }}>
+        {paddingMixed && (
+          <span style={{ position: "absolute", right: 0, top: 0, zIndex: 1 }}>
+            <MixedValueBadge compact />
+          </span>
+        )}
+        <FourSideInput
+          label="Padding"
+          values={paddingValues}
+          onChange={handlePaddingChange}
+          linked={paddingLinked}
+          onLinkToggle={() => setPaddingLinked(!paddingLinked)}
+          disabledSides={{
+            top: disabledPadding("top")?.disabled,
+            right: disabledPadding("right")?.disabled,
+            bottom: disabledPadding("bottom")?.disabled,
+            left: disabledPadding("left")?.disabled,
+          }}
+          disabledReason={disabledPadding("top")?.reason || disabledPadding("bottom")?.reason}
+        />
+      </div>
 
       {/* ─── Advanced: row-gap, column-gap (behind More settings) ─── */}
       {advancedExpanded && (
         <>
-          <InputWithUnit
-            label="Row Gap"
-            value={styles["row-gap"] || ""}
-            onChange={(v) => onChange("row-gap", v)}
-          />
+          <div style={{ position: "relative" }}>
+            {mixedKeys?.has("gap") && (
+              <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
+                <MixedValueBadge compact />
+              </span>
+            )}
+            <InputWithUnit
+              label="Row Gap"
+              value={styles["row-gap"] || ""}
+              onChange={(v) => onChange("row-gap", v)}
+            />
+          </div>
           <InputWithUnit
             label="Col Gap"
             value={styles["column-gap"] || ""}

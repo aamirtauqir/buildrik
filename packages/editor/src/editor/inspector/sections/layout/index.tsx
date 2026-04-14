@@ -31,6 +31,8 @@ export interface LayoutSectionProps {
   advancedExpanded?: boolean;
   /** Called when the More settings toggle is clicked */
   onAdvancedToggle?: () => void;
+  mixedKeys?: ReadonlySet<string>;
+  isMultiSelect?: boolean;
 }
 
 // Use shared styles
@@ -50,6 +52,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
   tier = "primary",
   advancedExpanded = false,
   onAdvancedToggle,
+  mixedKeys,
 }) => {
   // Collapsed preview: show the display type so users can see "flex" vs "grid"
   // vs "block" at a glance without expanding. Position is also load-bearing —
@@ -89,7 +92,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
           ═══════════════════════════════════════════════════════════════════ */}
 
       {/* Display (essential) */}
-      <DisplayControls display={styles.display || ""} onChange={onChange} />
+      <DisplayControls display={styles.display || ""} onChange={onChange} mixedKeys={mixedKeys} />
 
       {/* Size Constraints (essential) */}
       <div style={sectionTitle}>Size Constraints</div>
@@ -106,7 +109,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
 
       {/* Position - essential (position type + anchor) */}
       <div style={sectionTitle}>Position</div>
-      <PositionControls styles={styles} onChange={onChange} propertyStates={propertyStates} />
+      <PositionControls styles={styles} onChange={onChange} propertyStates={propertyStates} mixedKeys={mixedKeys} />
 
       {/* ═══════════════════════════════════════════════════════════════════
           ADVANCED - Behind "More settings" toggle
@@ -116,11 +119,11 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
         <>
           {/* Overflow (advanced) */}
           <div style={sectionTitle}>Overflow</div>
-          <OverflowControls styles={styles} onChange={onChange} />
+          <OverflowControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} />
 
           {/* Visibility & Float (advanced) */}
           <div style={sectionTitle}>Visibility & Float</div>
-          <VisibilityFloatControls styles={styles} onChange={onChange} />
+          <VisibilityFloatControls styles={styles} onChange={onChange} mixedKeys={mixedKeys} />
         </>
       )}
 

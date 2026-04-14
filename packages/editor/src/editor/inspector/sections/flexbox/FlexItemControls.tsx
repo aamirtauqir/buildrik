@@ -5,6 +5,7 @@
 
 import * as React from "react";
 import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
+import { MixedValueBadge } from "../../shared/MixedValueBadge";
 
 // ============================================================================
 // TYPES
@@ -19,6 +20,7 @@ export interface FlexItemControlsProps {
   rowStyle: React.CSSProperties;
   labelStyle: React.CSSProperties;
   compactBtn: (active: boolean) => React.CSSProperties;
+  mixedKeys?: ReadonlySet<string>;
 }
 
 // ============================================================================
@@ -34,6 +36,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
   rowStyle,
   labelStyle,
   compactBtn,
+  mixedKeys,
 }) => (
   <div
     style={{
@@ -64,6 +67,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+        {mixedKeys?.has("flex-grow") && <MixedValueBadge compact />}
         <span
           style={{
             fontSize: 12,
@@ -89,6 +93,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         />
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+        {mixedKeys?.has("flex-shrink") && <MixedValueBadge compact />}
         <span
           style={{
             fontSize: 12,
@@ -114,6 +119,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         />
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+        {mixedKeys?.has("flex-basis") && <MixedValueBadge compact />}
         <span
           style={{
             fontSize: 12,

@@ -5,6 +5,7 @@
 
 import * as React from "react";
 import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
+import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { FlexAlignmentGrid } from "./controls";
 
 // ============================================================================
@@ -15,6 +16,7 @@ export interface AlignmentSectionProps {
   styles: Record<string, string>;
   onChange: (prop: string, val: string) => void;
   compactBtn: (active: boolean) => React.CSSProperties;
+  mixedKeys?: ReadonlySet<string>;
 }
 
 // ============================================================================
@@ -25,6 +27,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
   styles,
   onChange,
   compactBtn,
+  mixedKeys,
 }) => (
   <div
     style={{
@@ -62,8 +65,11 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
             fontSize: 12,
             color: INSPECTOR_TOKENS.textMuted,
             marginBottom: 4,
+            display: "flex",
+            alignItems: "center",
           }}
         >
+          {mixedKeys?.has("justify-content") && <MixedValueBadge compact />}
           Justify Content
         </div>
         <div style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
@@ -98,8 +104,11 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
             fontSize: 12,
             color: INSPECTOR_TOKENS.textMuted,
             marginBottom: 4,
+            display: "flex",
+            alignItems: "center",
           }}
         >
+          {mixedKeys?.has("align-items") && <MixedValueBadge compact />}
           Align Items
         </div>
         <div style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>

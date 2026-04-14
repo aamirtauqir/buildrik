@@ -147,7 +147,23 @@ export interface SectionContext {
    * "secondary" for indices 1-2, "tertiary" for 3+.
    */
   tier: SectionTier;
+  /**
+   * Sprint 2 / Wave 2 — section-level multi-select support.
+   * Sections render a MixedValueBadge for any style key in this set.
+   * Defaults to empty set when single-select (see `defaultMultiSelectContext`
+   * used by `defineSection` — existing test fixtures don't need to pass these).
+   */
+  mixedKeys?: ReadonlySet<string>;
+  /** True when 2+ elements are selected. Sections use this to gate badge rendering. */
+  isMultiSelect?: boolean;
 }
+
+/**
+ * Defaults applied when context is built without multi-select plumbing (e.g.,
+ * existing tests constructed SectionContext literals before Wave 2). Keeps
+ * `mixedKeys` and `isMultiSelect` backwards-compatible.
+ */
+const EMPTY_MIXED_KEYS: ReadonlySet<string> = new Set<string>();
 
 /**
  * Reduced context for `shouldRender` — excludes position/state-derived fields
@@ -242,7 +258,8 @@ export function defineSection<P extends object>(
 
 /**
  * Base props shape for style-tab sections (layout, size, spacing, typography,
- * border, effects, visibility): styles + onChange + open/tier/advanced.
+ * border, effects, visibility): styles + onChange + open/tier/advanced +
+ * Wave 2 multi-select awareness.
  */
 interface BaseStyleSectionProps {
   styles: Record<string, string>;
@@ -250,6 +267,10 @@ interface BaseStyleSectionProps {
   isOpen?: boolean;
   onToggle?: (open: boolean) => void;
   tier?: SectionTier;
+  /** Style keys with differing values across selected elements (Wave 2). */
+  mixedKeys?: ReadonlySet<string>;
+  /** True when 2+ elements selected (Wave 2). */
+  isMultiSelect?: boolean;
 }
 
 function adaptBaseStyleProps(ctx: SectionContext): BaseStyleSectionProps {
@@ -259,6 +280,8 @@ function adaptBaseStyleProps(ctx: SectionContext): BaseStyleSectionProps {
     isOpen: ctx.isOpen,
     onToggle: ctx.onToggle,
     tier: ctx.tier,
+    mixedKeys: ctx.mixedKeys ?? EMPTY_MIXED_KEYS,
+    isMultiSelect: ctx.isMultiSelect ?? false,
   };
 }
 

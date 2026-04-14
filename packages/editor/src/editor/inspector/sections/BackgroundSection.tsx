@@ -5,6 +5,7 @@
 import * as React from "react";
 import type { MediaAsset, MediaAssetType } from "../../../shared/types/media";
 import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type SectionTier } from "../shared/controls";
+import { MixedValueBadge } from "../shared/MixedValueBadge";
 
 export interface BackgroundSectionProps {
   styles: Record<string, string>;
@@ -24,6 +25,8 @@ export interface BackgroundSectionProps {
   advancedExpanded?: boolean;
   /** Called when the More settings toggle is clicked */
   onAdvancedToggle?: () => void;
+  mixedKeys?: ReadonlySet<string>;
+  isMultiSelect?: boolean;
 }
 
 export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
@@ -35,6 +38,8 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
   tier = "primary",
   advancedExpanded = false,
   onAdvancedToggle,
+  mixedKeys,
+  isMultiSelect,
 }) => {
   const [bgType, setBgType] = React.useState<"color" | "gradient" | "image">("color");
 
@@ -94,11 +99,18 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
 
       {/* Color Background */}
       {bgType === "color" && (
-        <ColorInput
-          label="Color"
-          value={styles["background-color"] || ""}
-          onChange={(v) => onChange("background-color", v)}
-        />
+        <div style={{ position: "relative" }}>
+          {mixedKeys?.has("background-color") && (
+            <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
+              <MixedValueBadge compact />
+            </span>
+          )}
+          <ColorInput
+            label="Color"
+            value={styles["background-color"] || ""}
+            onChange={(v) => onChange("background-color", v)}
+          />
+        </div>
       )}
 
       {/* Gradient Background */}
@@ -222,7 +234,12 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
       {bgType === "image" && (
         <>
           <div style={{ display: "flex", gap: 8, alignItems: "flex-end", marginBottom: 12 }}>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, position: "relative" }}>
+              {mixedKeys?.has("background-image") && (
+                <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
+                  <MixedValueBadge compact />
+                </span>
+              )}
               <InputRow
                 label="Image URL"
                 value={styles["background-image"]?.replace(/url\(['"]?|['"]?\)/g, "") || ""}
@@ -259,46 +276,67 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           {/* ─── Advanced: size/position/repeat/attachment (behind More settings) ─── */}
           {advancedExpanded && (
             <>
-              <SelectRow
-                label="Size"
-                value={styles["background-size"] || ""}
-                onChange={(v) => onChange("background-size", v)}
-                options={[
-                  { value: "auto", label: "Auto" },
-                  { value: "cover", label: "Cover" },
-                  { value: "contain", label: "Contain" },
-                  { value: "100% 100%", label: "Stretch" },
-                ]}
-              />
+              <div style={{ position: "relative" }}>
+                {mixedKeys?.has("background-size") && (
+                  <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
+                    <MixedValueBadge compact />
+                  </span>
+                )}
+                <SelectRow
+                  label="Size"
+                  value={styles["background-size"] || ""}
+                  onChange={(v) => onChange("background-size", v)}
+                  options={[
+                    { value: "auto", label: "Auto" },
+                    { value: "cover", label: "Cover" },
+                    { value: "contain", label: "Contain" },
+                    { value: "100% 100%", label: "Stretch" },
+                  ]}
+                />
+              </div>
 
-              <SelectRow
-                label="Position"
-                value={styles["background-position"] || ""}
-                onChange={(v) => onChange("background-position", v)}
-                options={[
-                  { value: "center", label: "Center" },
-                  { value: "top", label: "Top" },
-                  { value: "bottom", label: "Bottom" },
-                  { value: "left", label: "Left" },
-                  { value: "right", label: "Right" },
-                  { value: "top left", label: "Top Left" },
-                  { value: "top right", label: "Top Right" },
-                  { value: "bottom left", label: "Bottom Left" },
-                  { value: "bottom right", label: "Bottom Right" },
-                ]}
-              />
+              <div style={{ position: "relative" }}>
+                {mixedKeys?.has("background-position") && (
+                  <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
+                    <MixedValueBadge compact />
+                  </span>
+                )}
+                <SelectRow
+                  label="Position"
+                  value={styles["background-position"] || ""}
+                  onChange={(v) => onChange("background-position", v)}
+                  options={[
+                    { value: "center", label: "Center" },
+                    { value: "top", label: "Top" },
+                    { value: "bottom", label: "Bottom" },
+                    { value: "left", label: "Left" },
+                    { value: "right", label: "Right" },
+                    { value: "top left", label: "Top Left" },
+                    { value: "top right", label: "Top Right" },
+                    { value: "bottom left", label: "Bottom Left" },
+                    { value: "bottom right", label: "Bottom Right" },
+                  ]}
+                />
+              </div>
 
-              <SelectRow
-                label="Repeat"
-                value={styles["background-repeat"] || ""}
-                onChange={(v) => onChange("background-repeat", v)}
-                options={[
-                  { value: "no-repeat", label: "No Repeat" },
-                  { value: "repeat", label: "Repeat" },
-                  { value: "repeat-x", label: "Repeat X" },
-                  { value: "repeat-y", label: "Repeat Y" },
-                ]}
-              />
+              <div style={{ position: "relative" }}>
+                {mixedKeys?.has("background-repeat") && (
+                  <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
+                    <MixedValueBadge compact />
+                  </span>
+                )}
+                <SelectRow
+                  label="Repeat"
+                  value={styles["background-repeat"] || ""}
+                  onChange={(v) => onChange("background-repeat", v)}
+                  options={[
+                    { value: "no-repeat", label: "No Repeat" },
+                    { value: "repeat", label: "Repeat" },
+                    { value: "repeat-x", label: "Repeat X" },
+                    { value: "repeat-y", label: "Repeat Y" },
+                  ]}
+                />
+              </div>
 
               <SelectRow
                 label="Attachment"
