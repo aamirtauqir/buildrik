@@ -14,6 +14,7 @@ import {
   type SectionTier,
 } from "../shared/controls";
 import { InputField } from "../../../shared/forms/InputField";
+import { MixedValueBadge } from "../shared/MixedValueBadge";
 
 export interface EffectsSectionProps {
   styles: Record<string, string>;
@@ -24,6 +25,8 @@ export interface EffectsSectionProps {
   onToggle?: (open: boolean) => void;
   /** Visual weight tier — threaded from the registry-driven renderer. */
   tier?: SectionTier;
+  mixedKeys?: ReadonlySet<string>;
+  isMultiSelect?: boolean;
 }
 
 // Shadow presets
@@ -82,7 +85,7 @@ const parseFilter = (filter: string | undefined, type: string, defaultValue: str
   return match?.[1] || defaultValue;
 };
 
-export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange, isOpen, onToggle, tier = "tertiary" }) => {
+export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange, isOpen, onToggle, tier = "tertiary", mixedKeys, isMultiSelect }) => {
   // Parse opacity
   const opacity = styles.opacity ? parseFloat(styles.opacity) * 100 : 100;
 
@@ -139,18 +142,27 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
       id="inspector-section-effects"
     >
       {/* Opacity */}
-      <SliderInput
-        label="Opacity"
-        value={opacity}
-        onChange={(v) => onChange("opacity", String(v / 100))}
-        min={0}
-        max={100}
-        unit="%"
-      />
+      <div style={{ position: "relative" }}>
+        {mixedKeys?.has("opacity") && (
+          <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
+            <MixedValueBadge compact />
+          </span>
+        )}
+        <SliderInput
+          label="Opacity"
+          value={opacity}
+          onChange={(v) => onChange("opacity", String(v / 100))}
+          min={0}
+          max={100}
+          unit="%"
+        />
+      </div>
 
       {/* Box Shadow */}
       <div style={{ marginBottom: 16 }}>
-        <SectionLabel>Box Shadow</SectionLabel>
+        <SectionLabel>
+          Box Shadow{mixedKeys?.has("box-shadow") && <MixedValueBadge compact />}
+        </SectionLabel>
 
         <PresetButtonGrid
           presets={SHADOW_PRESETS}
@@ -207,7 +219,9 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
 
       {/* Transform */}
       <div style={{ marginBottom: 16 }}>
-        <SectionLabel>Transform</SectionLabel>
+        <SectionLabel>
+          Transform{mixedKeys?.has("transform") && <MixedValueBadge compact />}
+        </SectionLabel>
 
         <RangeSlider
           label="Scale"
@@ -256,7 +270,9 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
 
       {/* Transition */}
       <div style={{ marginBottom: 16 }}>
-        <SectionLabel>Transition</SectionLabel>
+        <SectionLabel>
+          Transition{mixedKeys?.has("transition") && <MixedValueBadge compact />}
+        </SectionLabel>
 
         <SelectRow
           label="Property"
@@ -326,7 +342,9 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
           borderTop: "1px solid rgba(255,255,255,0.06)",
         }}
       >
-        <SectionLabel style={{ marginBottom: 12 }}>Filters</SectionLabel>
+        <SectionLabel style={{ marginBottom: 12 }}>
+          Filters{mixedKeys?.has("filter") && <MixedValueBadge compact />}
+        </SectionLabel>
 
         <RangeSlider
           label="Blur"
