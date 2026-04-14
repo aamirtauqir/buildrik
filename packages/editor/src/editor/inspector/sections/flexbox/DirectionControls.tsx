@@ -5,6 +5,7 @@
 
 import * as React from "react";
 import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
+import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { DirectionIcon } from "./icons";
 
 const visualBtn = (active: boolean): React.CSSProperties => ({
@@ -33,6 +34,7 @@ const visualBtn = (active: boolean): React.CSSProperties => ({
 export interface DirectionControlsProps {
   currentDirection?: string;
   onChange: (prop: string, val: string) => void;
+  mixedKeys?: ReadonlySet<string>;
 }
 
 // ============================================================================
@@ -42,6 +44,7 @@ export interface DirectionControlsProps {
 export const DirectionControls: React.FC<DirectionControlsProps> = ({
   currentDirection,
   onChange,
+  mixedKeys,
 }) => (
   <>
     <div
@@ -49,8 +52,11 @@ export const DirectionControls: React.FC<DirectionControlsProps> = ({
         fontSize: 12,
         color: INSPECTOR_TOKENS.textTertiary,
         marginBottom: 6,
+        display: "flex",
+        alignItems: "center",
       }}
     >
+      {mixedKeys?.has("flex-direction") && <MixedValueBadge compact />}
       Flex Direction
     </div>
     <div

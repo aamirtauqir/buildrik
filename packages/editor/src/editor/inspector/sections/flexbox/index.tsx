@@ -5,6 +5,7 @@
 
 import * as React from "react";
 import { Section, baseStyles, type SectionTier } from "../../shared/controls";
+import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { AlignmentSection } from "./AlignmentSection";
 import { DirectionControls } from "./DirectionControls";
 import { EnableFlexPrompt } from "./EnableFlexPrompt";
@@ -29,6 +30,8 @@ export interface FlexboxSectionProps {
   onToggle?: (open: boolean) => void;
   /** Visual weight tier — threaded from the registry-driven renderer. */
   tier?: SectionTier;
+  mixedKeys?: ReadonlySet<string>;
+  isMultiSelect?: boolean;
 }
 
 // Use shared styles
@@ -47,6 +50,7 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
   isOpen,
   onToggle,
   tier = "secondary",
+  mixedKeys,
 }) => {
   const isFlexContainer = styles.display === "flex" || styles.display === "inline-flex";
 
@@ -100,13 +104,14 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
       {isFlexContainer && (
         <>
           {/* Direction Toggle */}
-          <DirectionControls currentDirection={styles["flex-direction"]} onChange={onChange} />
+          <DirectionControls currentDirection={styles["flex-direction"]} onChange={onChange} mixedKeys={mixedKeys} />
 
           {/* Alignment Grid + Justify/Align */}
-          <AlignmentSection styles={styles} onChange={onChange} compactBtn={compactBtn} />
+          <AlignmentSection styles={styles} onChange={onChange} compactBtn={compactBtn} mixedKeys={mixedKeys} />
 
           {/* Wrap Toggle */}
           <div style={rowStyle}>
+            {mixedKeys?.has("flex-wrap") && <MixedValueBadge compact />}
             <label style={labelStyle}>Wrap</label>
             <div style={{ display: "flex", gap: 2, flex: 1 }}>
               {["nowrap", "wrap", "wrap-reverse"].map((val) => (
@@ -127,10 +132,12 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
             onChange={onChange}
             onBatchChange={onBatchChange}
             disabled={disabled}
+            mixedKeys={mixedKeys}
           />
 
           {/* Align Content */}
           <div style={rowStyle}>
+            {mixedKeys?.has("align-content") && <MixedValueBadge compact />}
             <label style={labelStyle}>A-Cont</label>
             <div style={{ display: "flex", gap: 2, flex: 1 }}>
               {["start", "center", "end", "stretch", "between", "around"].map((val) => {
@@ -170,6 +177,7 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
           rowStyle={rowStyle}
           labelStyle={labelStyle}
           compactBtn={compactBtn}
+          mixedKeys={mixedKeys}
         />
       )}
     </Section>
