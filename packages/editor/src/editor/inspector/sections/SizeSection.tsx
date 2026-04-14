@@ -4,6 +4,7 @@
 
 import * as React from "react";
 import { Section, InputWithUnit, MoreSettingsToggle, type SectionTier } from "../shared/controls";
+import { MixedValueBadge } from "../shared/MixedValueBadge";
 
 export interface SizeSectionProps {
   styles: Record<string, string>;
@@ -22,6 +23,8 @@ export interface SizeSectionProps {
   advancedExpanded?: boolean;
   /** Called when the More settings toggle is clicked */
   onAdvancedToggle?: () => void;
+  mixedKeys?: ReadonlySet<string>;
+  isMultiSelect?: boolean;
 }
 
 export const SizeSection: React.FC<SizeSectionProps> = ({
@@ -33,6 +36,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
   tier = "secondary",
   advancedExpanded = false,
   onAdvancedToggle,
+  mixedKeys,
 }) => {
   const hidden = (prop: string) => propertyStates[prop]?.hidden;
   const disabled = (prop: string) => propertyStates[prop]?.disabled;
@@ -69,26 +73,40 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
     >
       {/* Width */}
       {!hidden("width") && (
-        <InputWithUnit
-          label="Width"
-          value={styles.width || ""}
-          onChange={(v) => onChange("width", v)}
-          disabled={disabled("width")}
-          disabledReason={reason("width")}
-          isOverridden={propertyStates["width"]?.isOverridden}
-        />
+        <div style={{ position: "relative" }}>
+          {mixedKeys?.has("width") && (
+            <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
+              <MixedValueBadge compact />
+            </span>
+          )}
+          <InputWithUnit
+            label="Width"
+            value={styles.width || ""}
+            onChange={(v) => onChange("width", v)}
+            disabled={disabled("width")}
+            disabledReason={reason("width")}
+            isOverridden={propertyStates["width"]?.isOverridden}
+          />
+        </div>
       )}
 
       {/* Height */}
       {!hidden("height") && (
-        <InputWithUnit
-          label="Height"
-          value={styles.height || ""}
-          onChange={(v) => onChange("height", v)}
-          disabled={disabled("height")}
-          disabledReason={reason("height")}
-          isOverridden={propertyStates["height"]?.isOverridden}
-        />
+        <div style={{ position: "relative" }}>
+          {mixedKeys?.has("height") && (
+            <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
+              <MixedValueBadge compact />
+            </span>
+          )}
+          <InputWithUnit
+            label="Height"
+            value={styles.height || ""}
+            onChange={(v) => onChange("height", v)}
+            disabled={disabled("height")}
+            disabledReason={reason("height")}
+            isOverridden={propertyStates["height"]?.isOverridden}
+          />
+        </div>
       )}
 
       {/* ─── Advanced: min/max/ratio (behind More settings) ─── */}
@@ -96,50 +114,78 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
         <>
           {/* Min Width */}
           {!hidden("min-width") && (
-            <InputWithUnit
-              label="Min W"
-              value={styles["min-width"] || ""}
-              onChange={(v) => onChange("min-width", v)}
-              disabled={disabled("min-width")}
-              disabledReason={reason("min-width")}
-              isOverridden={propertyStates["min-width"]?.isOverridden}
-            />
+            <div style={{ position: "relative" }}>
+              {mixedKeys?.has("min-width") && (
+                <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
+                  <MixedValueBadge compact />
+                </span>
+              )}
+              <InputWithUnit
+                label="Min W"
+                value={styles["min-width"] || ""}
+                onChange={(v) => onChange("min-width", v)}
+                disabled={disabled("min-width")}
+                disabledReason={reason("min-width")}
+                isOverridden={propertyStates["min-width"]?.isOverridden}
+              />
+            </div>
           )}
 
           {/* Max Width */}
           {!hidden("max-width") && (
-            <InputWithUnit
-              label="Max W"
-              value={styles["max-width"] || ""}
-              onChange={(v) => onChange("max-width", v)}
-              disabled={disabled("max-width")}
-              disabledReason={reason("max-width")}
-              isOverridden={propertyStates["max-width"]?.isOverridden}
-            />
+            <div style={{ position: "relative" }}>
+              {mixedKeys?.has("max-width") && (
+                <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
+                  <MixedValueBadge compact />
+                </span>
+              )}
+              <InputWithUnit
+                label="Max W"
+                value={styles["max-width"] || ""}
+                onChange={(v) => onChange("max-width", v)}
+                disabled={disabled("max-width")}
+                disabledReason={reason("max-width")}
+                isOverridden={propertyStates["max-width"]?.isOverridden}
+              />
+            </div>
           )}
 
           {/* Min Height */}
           {!hidden("min-height") && (
-            <InputWithUnit
-              label="Min H"
-              value={styles["min-height"] || ""}
-              onChange={(v) => onChange("min-height", v)}
-              disabled={disabled("min-height")}
-              disabledReason={reason("min-height")}
-              isOverridden={propertyStates["min-height"]?.isOverridden}
-            />
+            <div style={{ position: "relative" }}>
+              {mixedKeys?.has("min-height") && (
+                <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
+                  <MixedValueBadge compact />
+                </span>
+              )}
+              <InputWithUnit
+                label="Min H"
+                value={styles["min-height"] || ""}
+                onChange={(v) => onChange("min-height", v)}
+                disabled={disabled("min-height")}
+                disabledReason={reason("min-height")}
+                isOverridden={propertyStates["min-height"]?.isOverridden}
+              />
+            </div>
           )}
 
           {/* Max Height */}
           {!hidden("max-height") && (
-            <InputWithUnit
-              label="Max H"
-              value={styles["max-height"] || ""}
-              onChange={(v) => onChange("max-height", v)}
-              disabled={disabled("max-height")}
-              disabledReason={reason("max-height")}
-              isOverridden={propertyStates["max-height"]?.isOverridden}
-            />
+            <div style={{ position: "relative" }}>
+              {mixedKeys?.has("max-height") && (
+                <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
+                  <MixedValueBadge compact />
+                </span>
+              )}
+              <InputWithUnit
+                label="Max H"
+                value={styles["max-height"] || ""}
+                onChange={(v) => onChange("max-height", v)}
+                disabled={disabled("max-height")}
+                disabledReason={reason("max-height")}
+                isOverridden={propertyStates["max-height"]?.isOverridden}
+              />
+            </div>
           )}
         </>
       )}
