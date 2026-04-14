@@ -19,6 +19,7 @@ import {
   type SectionTier,
 } from "../shared/controls";
 import { InputField } from "../../../shared/forms/InputField";
+import { MixedValueBadge } from "../shared/MixedValueBadge";
 
 export interface GridSectionProps {
   styles: Record<string, string>;
@@ -33,6 +34,8 @@ export interface GridSectionProps {
   onToggle?: (open: boolean) => void;
   /** Visual weight tier — threaded from the registry-driven renderer. */
   tier?: SectionTier;
+  mixedKeys?: ReadonlySet<string>;
+  isMultiSelect?: boolean;
 }
 
 // Grid column templates
@@ -92,6 +95,7 @@ export const GridSection: React.FC<GridSectionProps> = ({
   isOpen,
   onToggle,
   tier = "secondary",
+  mixedKeys,
 }) => {
   // Only show if grid-related
   if (!isGridContainer && !isGridItem) {
@@ -152,21 +156,36 @@ export const GridSection: React.FC<GridSectionProps> = ({
           />
 
           {/* Grid Template Inputs */}
-          <InlineInput
-            label="Columns"
-            value={styles["grid-template-columns"] || ""}
-            onChange={(v) => onChange("grid-template-columns", v)}
-            placeholder="1fr 1fr 1fr"
-          />
+          <div style={{ position: "relative" }}>
+            {mixedKeys?.has("grid-template-columns") && (
+              <span style={{ position: "absolute", top: "50%", transform: "translateY(-50%)", left: 0, zIndex: 1 }}>
+                <MixedValueBadge compact />
+              </span>
+            )}
+            <InlineInput
+              label="Columns"
+              value={styles["grid-template-columns"] || ""}
+              onChange={(v) => onChange("grid-template-columns", v)}
+              placeholder="1fr 1fr 1fr"
+            />
+          </div>
 
-          <InlineInput
-            label="Rows"
-            value={styles["grid-template-rows"] || ""}
-            onChange={(v) => onChange("grid-template-rows", v)}
-            placeholder="auto"
-          />
+          <div style={{ position: "relative" }}>
+            {mixedKeys?.has("grid-template-rows") && (
+              <span style={{ position: "absolute", top: "50%", transform: "translateY(-50%)", left: 0, zIndex: 1 }}>
+                <MixedValueBadge compact />
+              </span>
+            )}
+            <InlineInput
+              label="Rows"
+              value={styles["grid-template-rows"] || ""}
+              onChange={(v) => onChange("grid-template-rows", v)}
+              placeholder="auto"
+            />
+          </div>
 
           {/* Grid Auto-Flow */}
+          {mixedKeys?.has("grid-auto-flow") && <MixedValueBadge compact />}
           <CompactButtonGroup
             label="Flow"
             value={styles["grid-auto-flow"] || ""}
@@ -175,6 +194,11 @@ export const GridSection: React.FC<GridSectionProps> = ({
           />
 
           {/* Gap Controls */}
+          {mixedKeys?.has("gap") && (
+            <div style={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+              <MixedValueBadge compact />
+            </div>
+          )}
           <div
             style={{
               display: "grid",
@@ -241,6 +265,12 @@ export const GridSection: React.FC<GridSectionProps> = ({
           <SubSectionTitle>Grid Item</SubSectionTitle>
 
           {/* Grid Column/Row */}
+          {(mixedKeys?.has("grid-column") || mixedKeys?.has("grid-row")) && (
+            <div style={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+              {mixedKeys?.has("grid-column") && <MixedValueBadge compact />}
+              {mixedKeys?.has("grid-row") && <MixedValueBadge compact />}
+            </div>
+          )}
           <div
             style={{
               display: "grid",
