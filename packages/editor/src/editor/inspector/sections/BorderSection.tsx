@@ -13,6 +13,7 @@ import {
   type SectionTier,
 } from "../shared/controls";
 import { InputField } from "../../../shared/forms/InputField";
+import { MixedValueBadge } from "../shared/MixedValueBadge";
 
 export interface BorderSectionProps {
   styles: Record<string, string>;
@@ -28,6 +29,8 @@ export interface BorderSectionProps {
   advancedExpanded?: boolean;
   /** Called when the More settings toggle is clicked */
   onAdvancedToggle?: () => void;
+  mixedKeys?: ReadonlySet<string>;
+  isMultiSelect?: boolean;
 }
 
 export const BorderSection: React.FC<BorderSectionProps> = ({
@@ -39,6 +42,8 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
   tier = "secondary",
   advancedExpanded = false,
   onAdvancedToggle,
+  mixedKeys,
+  isMultiSelect,
 }) => {
   const [radiusLinked, setRadiusLinked] = React.useState(true);
 
@@ -98,45 +103,73 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
   return (
     <Section title="Border" icon="Square" preview={borderPreview} isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-border">
       {/* Border Width */}
-      <InputWithUnit
-        label="Width"
-        value={styles["border-width"] || ""}
-        onChange={(v) => onChange("border-width", v)}
-        units={["px", "em", "rem"]}
-      />
+      <div style={{ position: "relative" }}>
+        {mixedKeys?.has("border-width") && (
+          <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
+            <MixedValueBadge compact />
+          </span>
+        )}
+        <InputWithUnit
+          label="Width"
+          value={styles["border-width"] || ""}
+          onChange={(v) => onChange("border-width", v)}
+          units={["px", "em", "rem"]}
+        />
+      </div>
 
       {/* Border Style */}
-      <SelectRow
-        label="Style"
-        value={styles["border-style"] || ""}
-        onChange={(v) => onChange("border-style", v)}
-        options={[
-          { value: "none", label: "None" },
-          { value: "solid", label: "Solid" },
-          { value: "dashed", label: "Dashed" },
-          { value: "dotted", label: "Dotted" },
-          { value: "double", label: "Double" },
-          { value: "groove", label: "Groove" },
-          { value: "ridge", label: "Ridge" },
-          { value: "inset", label: "Inset" },
-          { value: "outset", label: "Outset" },
-        ]}
-      />
+      <div style={{ position: "relative" }}>
+        {mixedKeys?.has("border-style") && (
+          <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
+            <MixedValueBadge compact />
+          </span>
+        )}
+        <SelectRow
+          label="Style"
+          value={styles["border-style"] || ""}
+          onChange={(v) => onChange("border-style", v)}
+          options={[
+            { value: "none", label: "None" },
+            { value: "solid", label: "Solid" },
+            { value: "dashed", label: "Dashed" },
+            { value: "dotted", label: "Dotted" },
+            { value: "double", label: "Double" },
+            { value: "groove", label: "Groove" },
+            { value: "ridge", label: "Ridge" },
+            { value: "inset", label: "Inset" },
+            { value: "outset", label: "Outset" },
+          ]}
+        />
+      </div>
 
       {/* Border Color */}
-      <ColorInput
-        label="Color"
-        value={styles["border-color"] || ""}
-        onChange={(v) => onChange("border-color", v)}
-      />
+      <div style={{ position: "relative" }}>
+        {mixedKeys?.has("border-color") && (
+          <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
+            <MixedValueBadge compact />
+          </span>
+        )}
+        <ColorInput
+          label="Color"
+          value={styles["border-color"] || ""}
+          onChange={(v) => onChange("border-color", v)}
+        />
+      </div>
 
       {/* Border Radius */}
-      <CornerRadiusInput
-        values={radiusValues}
-        onChange={handleRadiusChange}
-        linked={radiusLinked}
-        onLinkToggle={() => setRadiusLinked(!radiusLinked)}
-      />
+      <div style={{ position: "relative" }}>
+        {mixedKeys?.has("border-radius") && (
+          <span style={{ position: "absolute", top: 0, left: 56, zIndex: 1 }}>
+            <MixedValueBadge compact />
+          </span>
+        )}
+        <CornerRadiusInput
+          values={radiusValues}
+          onChange={handleRadiusChange}
+          linked={radiusLinked}
+          onLinkToggle={() => setRadiusLinked(!radiusLinked)}
+        />
+      </div>
 
       {/* ─── Advanced: Individual Borders + Outline (behind More settings) ─── */}
       {advancedExpanded && (
@@ -155,14 +188,20 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
             </div>
 
             {(["top", "right", "bottom", "left"] as const).map((side) => (
-              <InputField
-                key={side}
-                label={side.charAt(0).toUpperCase() + side.slice(1)}
-                type="text"
-                value={styles[`border-${side}`] || ""}
-                onChange={(e) => onChange(`border-${side}`, e.target.value)}
-                placeholder="1px solid #ccc"
-              />
+              <div key={side} style={{ position: "relative" }}>
+                {mixedKeys?.has(`border-${side}`) && (
+                  <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
+                    <MixedValueBadge compact />
+                  </span>
+                )}
+                <InputField
+                  label={side.charAt(0).toUpperCase() + side.slice(1)}
+                  type="text"
+                  value={styles[`border-${side}`] || ""}
+                  onChange={(e) => onChange(`border-${side}`, e.target.value)}
+                  placeholder="1px solid #ccc"
+                />
+              </div>
             ))}
           </div>
 
