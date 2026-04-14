@@ -8,43 +8,67 @@
 
 import * as React from "react";
 import { SelectRow, ButtonGroup, ColorInput } from "../../shared/controls";
+import { MixedValueBadge } from "../../shared/MixedValueBadge";
 
 interface TextControlsProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
+  mixedKeys?: ReadonlySet<string>;
+  isMultiSelect?: boolean;
 }
 
-export const TypographyControls: React.FC<TextControlsProps> = ({ styles, onChange }) => {
+export const TypographyControls: React.FC<TextControlsProps> = ({ styles, onChange, mixedKeys }) => {
   return (
     <>
       {/* Text Color */}
-      <ColorInput label="Color" value={styles.color || ""} onChange={(v) => onChange("color", v)} />
+      <div style={{ position: "relative" }}>
+        {mixedKeys?.has("color") && (
+          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
+            <MixedValueBadge compact />
+          </span>
+        )}
+        <ColorInput label="Color" value={styles.color || ""} onChange={(v) => onChange("color", v)} />
+      </div>
 
       {/* Text Align */}
-      <ButtonGroup
-        label="Align"
-        value={styles["text-align"] || ""}
-        onChange={(v) => onChange("text-align", v)}
-        options={[
-          { value: "left", label: "Left", icon: "\u2B05" },
-          { value: "center", label: "Center", icon: "\u2B0C" },
-          { value: "right", label: "Right", icon: "\u27A1" },
-          { value: "justify", label: "Justify", icon: "\u2630" },
-        ]}
-      />
+      <div style={{ position: "relative" }}>
+        {mixedKeys?.has("text-align") && (
+          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
+            <MixedValueBadge compact />
+          </span>
+        )}
+        <ButtonGroup
+          label="Align"
+          value={styles["text-align"] || ""}
+          onChange={(v) => onChange("text-align", v)}
+          options={[
+            { value: "left", label: "Left", icon: "\u2B05" },
+            { value: "center", label: "Center", icon: "\u2B0C" },
+            { value: "right", label: "Right", icon: "\u27A1" },
+            { value: "justify", label: "Justify", icon: "\u2630" },
+          ]}
+        />
+      </div>
 
       {/* Text Transform */}
-      <ButtonGroup
-        label="Transform"
-        value={styles["text-transform"] || ""}
-        onChange={(v) => onChange("text-transform", v)}
-        options={[
-          { value: "none", label: "None", icon: "Aa" },
-          { value: "uppercase", label: "Upper", icon: "AA" },
-          { value: "lowercase", label: "Lower", icon: "aa" },
-          { value: "capitalize", label: "Cap", icon: "Aa" },
-        ]}
-      />
+      <div style={{ position: "relative" }}>
+        {mixedKeys?.has("text-transform") && (
+          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
+            <MixedValueBadge compact />
+          </span>
+        )}
+        <ButtonGroup
+          label="Transform"
+          value={styles["text-transform"] || ""}
+          onChange={(v) => onChange("text-transform", v)}
+          options={[
+            { value: "none", label: "None", icon: "Aa" },
+            { value: "uppercase", label: "Upper", icon: "AA" },
+            { value: "lowercase", label: "Lower", icon: "aa" },
+            { value: "capitalize", label: "Cap", icon: "Aa" },
+          ]}
+        />
+      </div>
 
       {/* White Space */}
       <SelectRow
