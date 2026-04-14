@@ -7,6 +7,7 @@ import * as React from "react";
 import { HelpTooltip } from "../../../../shared/ui/HelpTooltip";
 import { InputRow } from "../../shared/controls";
 import { baseStyles, INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
+import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { PositionPreview } from "./previews";
 import { cardBtn, positionOffsetContainerStyle, positionOffsetBoxStyle } from "./styles";
 
@@ -21,6 +22,7 @@ export interface PositionControlsProps {
     string,
     { hidden?: boolean; disabled?: boolean; reason?: string; isOverridden?: boolean }
   >;
+  mixedKeys?: ReadonlySet<string>;
 }
 
 // ============================================================================
@@ -49,6 +51,7 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
   styles,
   onChange,
   propertyStates = {},
+  mixedKeys,
 }) => {
   const hasPosition = styles.position && styles.position !== "static";
   const disabled = (prop: string) => propertyStates[prop]?.disabled;
@@ -66,6 +69,7 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
           alignItems: "center",
         }}
       >
+        {mixedKeys?.has("position") && <MixedValueBadge compact />}
         Position
         <HelpTooltip
           content="Static: normal flow. Relative: offset from normal position. Absolute: positioned relative to nearest positioned parent. Fixed: stays in viewport. Sticky: sticks when scrolling past."
@@ -112,6 +116,7 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
           disabled={disabled}
           reason={reason}
           propertyStates={propertyStates}
+          mixedKeys={mixedKeys}
         />
       )}
     </>
@@ -132,6 +137,7 @@ interface PositionOffsetControlsProps {
     string,
     { hidden?: boolean; disabled?: boolean; reason?: string; isOverridden?: boolean }
   >;
+  mixedKeys?: ReadonlySet<string>;
 }
 
 const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
@@ -141,6 +147,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
   disabled,
   reason,
   propertyStates = {},
+  mixedKeys,
 }) => {
   const offsetInputStyle = (prop: string): React.CSSProperties => ({
     ...inputStyle,
@@ -152,7 +159,10 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
 
   return (
     <div style={positionOffsetContainerStyle}>
-      <div style={{ fontSize: 12, color: INSPECTOR_TOKENS.textMuted, marginBottom: 6 }}>
+      <div style={{ fontSize: 12, color: INSPECTOR_TOKENS.textMuted, marginBottom: 6, display: "flex", alignItems: "center" }}>
+        {(mixedKeys?.has("top") || mixedKeys?.has("right") || mixedKeys?.has("bottom") || mixedKeys?.has("left")) && (
+          <MixedValueBadge compact />
+        )}
         Position Offset
       </div>
 
@@ -218,6 +228,12 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
 
       {/* Z-Index */}
       <div style={{ marginTop: 8 }}>
+        {mixedKeys?.has("z-index") && (
+          <div style={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+            <MixedValueBadge compact />
+            <span style={{ fontSize: 11, color: INSPECTOR_TOKENS.textMuted }}>Z-Index</span>
+          </div>
+        )}
         <InputRow
           label="Z-Index"
           value={styles["z-index"] || ""}

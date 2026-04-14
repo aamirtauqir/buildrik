@@ -6,6 +6,7 @@
 import * as React from "react";
 import { HelpTooltip } from "../../../../shared/ui/HelpTooltip";
 import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
+import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { DisplayPreview } from "./previews";
 import { cardBtn, tipBoxStyle } from "./styles";
 
@@ -16,6 +17,7 @@ import { cardBtn, tipBoxStyle } from "./styles";
 export interface DisplayControlsProps {
   display: string;
   onChange: (property: string, value: string) => void;
+  mixedKeys?: ReadonlySet<string>;
 }
 
 // ============================================================================
@@ -35,7 +37,7 @@ const DISPLAY_OPTIONS = [
 // COMPONENT
 // ============================================================================
 
-export const DisplayControls: React.FC<DisplayControlsProps> = ({ display, onChange }) => {
+export const DisplayControls: React.FC<DisplayControlsProps> = ({ display, onChange, mixedKeys }) => {
   const isGrid = display === "grid" || display === "inline-grid";
   const isFlex = display === "flex" || display === "inline-flex";
 
@@ -51,6 +53,7 @@ export const DisplayControls: React.FC<DisplayControlsProps> = ({ display, onCha
           alignItems: "center",
         }}
       >
+        {mixedKeys?.has("display") && <MixedValueBadge compact />}
         Display Mode
         <HelpTooltip
           content="Controls how this element flows in the layout. Block takes full width, Flex enables flexible alignment, Grid creates 2D layouts."

@@ -5,6 +5,7 @@
 
 import * as React from "react";
 import { baseStyles, INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
+import { MixedValueBadge } from "../../shared/MixedValueBadge";
 
 // ============================================================================
 // TYPES
@@ -13,6 +14,7 @@ import { baseStyles, INSPECTOR_TOKENS } from "../../shared/controls/controlStyle
 export interface OverflowVisibilityControlsProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
+  mixedKeys?: ReadonlySet<string>;
 }
 
 // ============================================================================
@@ -43,11 +45,13 @@ const { compactBtn, row: rowStyle, label: labelStyle, input: inputStyle } = base
 export const OverflowControls: React.FC<OverflowVisibilityControlsProps> = ({
   styles,
   onChange,
+  mixedKeys,
 }) => {
   return (
     <>
       {/* Main overflow control */}
       <div style={rowStyle}>
+        {mixedKeys?.has("overflow") && <MixedValueBadge compact />}
         <div style={{ display: "flex", gap: 2, flex: 1 }}>
           {OVERFLOW_OPTIONS.map((option) => (
             <button
@@ -131,11 +135,13 @@ const OverflowXYControls: React.FC<OverflowXYControlsProps> = ({
 export const VisibilityFloatControls: React.FC<OverflowVisibilityControlsProps> = ({
   styles,
   onChange,
+  mixedKeys,
 }) => {
   return (
     <>
       {/* Visibility */}
       <div style={rowStyle}>
+        {mixedKeys?.has("visibility") && <MixedValueBadge compact />}
         <label style={labelStyle}>Visible</label>
         <div style={{ display: "flex", gap: 2, flex: 1 }}>
           {VISIBILITY_OPTIONS.map((val) => (
@@ -152,6 +158,7 @@ export const VisibilityFloatControls: React.FC<OverflowVisibilityControlsProps> 
 
       {/* Float */}
       <div style={rowStyle}>
+        {mixedKeys?.has("float") && <MixedValueBadge compact />}
         <label style={labelStyle}>Float</label>
         <div style={{ display: "flex", gap: 2, flex: 1 }}>
           {FLOAT_OPTIONS.map((val) => (
@@ -168,6 +175,7 @@ export const VisibilityFloatControls: React.FC<OverflowVisibilityControlsProps> 
 
       {/* Clear */}
       <div style={rowStyle}>
+        {mixedKeys?.has("clear") && <MixedValueBadge compact />}
         <label style={labelStyle}>Clear</label>
         <div style={{ display: "flex", gap: 2, flex: 1 }}>
           {CLEAR_OPTIONS.map((val) => (
