@@ -1,29 +1,58 @@
 /**
- * ColorInput - Color picker with text input
- * Handles both hex colors and CSS keywords (inherit, transparent, currentColor)
- * Swatch click opens TokenPickerPopover — shows design-system color tokens +
- * a "Custom" tab for raw hex/CSS value entry.
+ * ColorInput - Color picker with token binding support.
+ *
+ * Binding model:
+ *   - Unbound: value is "#3B82F6", "transparent", "inherit", etc.
+ *   - Bound:   value is "var(--aqb-color-primary)" — stored as cssVar, not hex.
+ *
+ * isKeyword: true only for CSS keywords (transparent, inherit, currentColor),
+ *   NOT for var(--aqb-*) which are valid token bindings.
+ *
+ * Token source: useColorRegistry() from TokenRegistryProvider — shared global
+ *   context, not an isolated hook instance. Changes in the Design tab are
+ *   visible here immediately.
+ *
+ * Bound state UI:
+ *   - Blue chain icon + token name replaces the raw value display
+ *   - × unlink button resolves var() to computed value via getComputedStyle
+ *
  * @license BSD-3-Clause
  */
 
-import { X } from "lucide-react";
+import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
 import { ColorSwatch } from "../../../../shared/ui/ColorSwatch";
 import { Popover } from "../../../../shared/ui/Popover";
-import { useColorTokens } from "../../../../features/design-system/state/useColorTokens";
-import { DEFAULT_TOKENS } from "../../../../features/design-system/constants";
+import { useColorRegistry } from "../../../../features/design-system/state/TokenRegistryContext";
 import { TokenPickerPopover } from "../TokenPickerPopover";
-import { baseStyles } from "./controlStyles";
+import { baseStyles, INSPECTOR_TOKENS } from "./controlStyles";
 
 // ============================================================================
 // HELPERS
 // ============================================================================
 
-/**
- * Check if value is a valid hex color that can be used in <input type="color">
- */
-const isValidHexColor = (val: string): boolean => {
-  return /^#[0-9A-Fa-f]{6}$/.test(val) || /^#[0-9A-Fa-f]{3}$/.test(val);
+const isValidHexColor = (val: string): boolean =>
+  /^#[0-9A-Fa-f]{6}$/.test(val) || /^#[0-9A-Fa-f]{3}$/.test(val);
+
+const isTokenVar = (val: string): boolean => /^var\(--aqb-/.test(val);
+
+/** CSS keywords that are not hex and not token bindings */
+const isKeywordValue = (val: string): boolean =>
+  !!val && !isValidHexColor(val) && !isTokenVar(val);
+
+/** Resolve a var(--aqb-*) binding to its computed hex via getComputedStyle */
+const resolveVar = (cssVar: string): string => {
+  const varName = cssVar.replace(/^var\(/, "").replace(/\)$/, "");
+  const resolved = getComputedStyle(document.documentElement)
+    .getPropertyValue(varName)
+    .trim();
+  return resolved || "#000000";
+};
+
+/** Extract CSS var name from var(--aqb-…) wrapper */
+const extractVarName = (v: string) => {
+  const m = v.match(/^var\((--aqb-[^)]+)\)$/);
+  return m ? m[1] : null;
 };
 
 // ============================================================================
@@ -37,16 +66,36 @@ export interface ColorInputProps {
 }
 
 export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }) => {
-  const isKeyword = value && !isValidHexColor(value);
   const [isRowHovered, setIsRowHovered] = React.useState(false);
 
-  const displayValue = isValidHexColor(value) ? value : "#000000";
-  const showReset = !!value && isRowHovered;
+  // Pull from shared registry — same instance as Design tab
+  const { tokens: colorTokens } = useColorRegistry();
+  const tokenEntries = colorTokens.map((t) => ({
+    id: t.id,
+    name: t.name,
+    value: t.value,
+    cssVar: t.cssVar,
+  }));
 
-  // Pull color tokens from the design-system. DEFAULT_TOKENS is the SSOT for
-  // the initial seed — same source the Design tab uses.
-  const { tokens: colorTokens } = useColorTokens(DEFAULT_TOKENS);
-  const tokenEntries = colorTokens.map((t) => ({ id: t.id, name: t.name, value: t.value }));
+  const isBound = isTokenVar(value);
+  const isKeyword = isKeywordValue(value);
+
+  // Resolve the bound token name for display
+  const boundToken = isBound
+    ? tokenEntries.find((t) => {
+        const varName = extractVarName(value);
+        return varName ? t.cssVar === varName : false;
+      })
+    : null;
+
+  // Swatch color: resolve var() → computed, keyword → grey, hex → direct
+  const swatchColor = isBound
+    ? resolveVar(value)
+    : isValidHexColor(value)
+      ? value
+      : "#808080";
+
+  const showReset = !!value && isRowHovered && !isBound;
 
   return (
     <div
@@ -55,20 +104,21 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
       onMouseLeave={() => setIsRowHovered(false)}
     >
       <label style={baseStyles.label}>{label}</label>
-      <div style={{ display: "flex", gap: 8, flex: 1, alignItems: "center" }}>
-        {/* Swatch opens TokenPickerPopover — token list + custom tab */}
+      <div style={{ display: "flex", gap: 8, flex: 1, alignItems: "center", minWidth: 0 }}>
+        {/* Swatch opens TokenPickerPopover */}
         <Popover
           triggerOn="click"
           position="bottom"
           trigger={
             <ColorSwatch
-              color={displayValue}
+              color={swatchColor}
               size="sm"
               onClick={() => {}}
               style={{
                 cursor: "pointer",
                 boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
                 opacity: isKeyword ? 0.5 : 1,
+                flexShrink: 0,
               }}
             />
           }
@@ -76,81 +126,138 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
             <TokenPickerPopover
               tokens={tokenEntries}
               currentValue={value}
-              onSelect={(_tokenId, tokenValue) => onChange(tokenValue)}
+              showSwatch={true}
+              tokenLabel="color"
+              onSelect={(_tokenId, cssVarRef) => onChange(cssVarRef)}
               onCustomValue={onChange}
             />
           }
         />
 
-        {/* Text Input for direct editing — wrapped so the reset × can sit
-            inside its right edge without overlapping the keyword badge. */}
-        <div style={{ position: "relative", flex: 1, display: "flex" }}>
-          <input
-            type="text"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder="#000000"
+        {isBound ? (
+          // ── Bound state: blue chain + token name + unlink × ──
+          <div
             style={{
-              ...baseStyles.input,
               flex: 1,
-              // Leave room for the reset × so it doesn't sit on top of text.
-              paddingRight: showReset ? 22 : undefined,
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              padding: "3px 6px",
+              background: INSPECTOR_TOKENS.accentAlpha10,
+              border: `1px solid ${INSPECTOR_TOKENS.accent}`,
+              borderRadius: 5,
+              minWidth: 0,
             }}
-          />
-          {showReset && (
+          >
+            <Link2
+              size={11}
+              style={{ color: INSPECTOR_TOKENS.accent, flexShrink: 0 }}
+              aria-hidden="true"
+            />
+            <span
+              style={{
+                fontSize: 11,
+                color: INSPECTOR_TOKENS.accent,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                flex: 1,
+              }}
+            >
+              {boundToken?.name ?? value}
+            </span>
+            {/* Unlink: resolve var() to computed value */}
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                onChange("");
+                onChange(resolveVar(value));
               }}
-              aria-label={`Reset ${label}`}
-              title={`Reset ${label}`}
+              aria-label={`Unlink ${label} token`}
+              title="Unlink token — resolves to current value"
               style={{
-                position: "absolute",
-                right: 4,
-                top: "50%",
-                transform: "translateY(-50%)",
-                width: 18,
-                height: 18,
                 padding: 0,
-                background: "rgba(0,0,0,0.3)",
+                background: "none",
                 border: "none",
-                borderRadius: 4,
-                color: "var(--aqb-text-tertiary)",
+                color: INSPECTOR_TOKENS.accent,
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
+                flexShrink: 0,
+                opacity: 0.7,
               }}
             >
-              <X size={11} aria-hidden="true" />
+              <Link2Off size={11} aria-hidden="true" />
             </button>
-          )}
-        </div>
-
-        {isKeyword && (
-          <span style={keywordBadgeStyles} title="CSS keyword">
-            {value}
-          </span>
+          </div>
+        ) : (
+          // ── Unbound state: text input + optional keyword badge ──
+          <div style={{ position: "relative", flex: 1, display: "flex", minWidth: 0 }}>
+            <input
+              type="text"
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder="#000000"
+              style={{
+                ...baseStyles.input,
+                flex: 1,
+                paddingRight: showReset ? 22 : undefined,
+              }}
+            />
+            {showReset && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onChange("");
+                }}
+                aria-label={`Reset ${label}`}
+                title={`Reset ${label}`}
+                style={{
+                  position: "absolute",
+                  right: 4,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  width: 18,
+                  height: 18,
+                  padding: 0,
+                  background: "rgba(0,0,0,0.3)",
+                  border: "none",
+                  borderRadius: 4,
+                  color: "var(--aqb-text-tertiary)",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                ×
+              </button>
+            )}
+            {isKeyword && (
+              <span style={keywordBadgeStyles} title="CSS keyword">
+                {value}
+              </span>
+            )}
+          </div>
         )}
       </div>
     </div>
   );
 };
 
-/** Style for CSS keyword badge */
 const keywordBadgeStyles: React.CSSProperties = {
-  fontSize: 12,
+  position: "absolute",
+  right: 0,
+  top: "50%",
+  transform: "translateY(-50%)",
+  fontSize: 10,
   color: "#6c7086",
   background: "rgba(108, 112, 134, 0.15)",
-  padding: "2px 6px",
+  padding: "2px 5px",
   borderRadius: 3,
   whiteSpace: "nowrap",
-  maxWidth: 80,
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  cursor: "help",
+  pointerEvents: "none",
 };
 
 export default ColorInput;

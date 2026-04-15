@@ -2,11 +2,21 @@
  * FontControls - Font weight, style, and decoration controls
  * Part of Typography section refactoring
  *
+ * CP5: font-size and line-height rows have a hover-reveal chain button that
+ * opens a type token picker. Selecting a type token stores
+ * var(--aqb-type-base-size) on the element — not the raw px value.
+ * The picker uses list layout (showSwatch=false).
+ *
  * @module editor/inspector/sections/typography/FontControls
  * @license BSD-3-Clause
  */
 
+import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
+import { useTypeRegistry } from "../../../../features/design-system/state/TokenRegistryContext";
+import { Popover } from "../../../../shared/ui/Popover";
+import { TokenPickerPopover } from "../../shared/TokenPickerPopover";
+import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 import { SelectRow, ButtonGroup, InputWithUnit } from "../../shared/controls";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 
@@ -23,6 +33,116 @@ export const FONT_WEIGHTS = [
   { value: "900", label: "Black (900)" },
 ];
 
+// ============================================================================
+// HELPERS
+// ============================================================================
+
+const isTokenVar = (val: string): boolean => /^var\(--aqb-/.test(val);
+
+const resolveVar = (cssVar: string): string => {
+  const varName = cssVar.replace(/^var\(/, "").replace(/\)$/, "");
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim() || "";
+};
+
+// ============================================================================
+// TYPE CHAIN BUTTON
+// ============================================================================
+
+interface TypeChainButtonProps {
+  property: string;
+  value: string;
+  onChange: (value: string) => void;
+}
+
+const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onChange }) => {
+  const { tokens: typeTokens } = useTypeRegistry();
+  const tokenEntries = typeTokens.map((t) => ({
+    id: t.id,
+    name: t.name,
+    value: t.value,
+    cssVar: t.cssVar,
+  }));
+
+  const isBound = isTokenVar(value);
+  const boundToken = isBound ? tokenEntries.find((t) => value === `var(${t.cssVar})`) : null;
+
+  if (isBound) {
+    return (
+      <button
+        type="button"
+        onClick={() => onChange(resolveVar(value))}
+        aria-label={`Unlink ${property} type token`}
+        title={`Unlink "${boundToken?.name ?? "token"}" — resolves to current value`}
+        style={{
+          padding: "2px 4px",
+          background: INSPECTOR_TOKENS.accentAlpha10,
+          border: `1px solid ${INSPECTOR_TOKENS.accent}`,
+          borderRadius: 4,
+          color: INSPECTOR_TOKENS.accent,
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          gap: 3,
+          fontSize: 9,
+          whiteSpace: "nowrap",
+          flexShrink: 0,
+        }}
+      >
+        <Link2 size={10} aria-hidden="true" />
+        {boundToken?.name && (
+          <span style={{ maxWidth: 48, overflow: "hidden", textOverflow: "ellipsis" }}>
+            {boundToken.name}
+          </span>
+        )}
+        <Link2Off size={9} aria-hidden="true" style={{ opacity: 0.7 }} />
+      </button>
+    );
+  }
+
+  return (
+    <Popover
+      triggerOn="click"
+      position="bottom"
+      trigger={
+        <button
+          type="button"
+          aria-label={`Link ${property} to type token`}
+          title="Link to type token"
+          className="aqb-chain-btn"
+          style={{
+            padding: 2,
+            background: "none",
+            border: "none",
+            color: INSPECTOR_TOKENS.textMuted,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            opacity: 0,
+            transition: "opacity 0.12s, color 0.12s",
+            flexShrink: 0,
+          }}
+        >
+          <Link2 size={12} aria-hidden="true" />
+        </button>
+      }
+      content={
+        <TokenPickerPopover
+          tokens={tokenEntries}
+          currentValue={value}
+          showSwatch={false}
+          tokenLabel="type"
+          onSelect={(_id, cssVarRef) => onChange(cssVarRef)}
+          onCustomValue={onChange}
+        />
+      }
+    />
+  );
+};
+
+// ============================================================================
+// FONT CONTROLS
+// ============================================================================
+
 interface FontControlsProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
@@ -33,19 +153,31 @@ interface FontControlsProps {
 export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mixedKeys }) => {
   return (
     <>
-      {/* Font Size - BUG-007 FIX: Show default 16px when not explicitly set */}
-      <div style={{ position: "relative" }}>
+      {/* Font Size — CP5: chain button for type token binding */}
+      <div
+        style={{ position: "relative", display: "flex", alignItems: "center" }}
+        className="aqb-row-hover-chain"
+      >
         {mixedKeys?.has("font-size") && (
           <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
             <MixedValueBadge compact />
           </span>
         )}
-        <InputWithUnit
-          label="Size"
-          value={styles["font-size"] || "16px"}
-          onChange={(v) => onChange("font-size", v)}
-          units={["px", "em", "rem", "%", "vw"]}
-        />
+        <div style={{ flex: 1 }}>
+          <InputWithUnit
+            label="Size"
+            value={styles["font-size"] || "16px"}
+            onChange={(v) => onChange("font-size", v)}
+            units={["px", "em", "rem", "%", "vw"]}
+          />
+        </div>
+        <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", zIndex: 2 }}>
+          <TypeChainButton
+            property="font-size"
+            value={styles["font-size"] || ""}
+            onChange={(v) => onChange("font-size", v)}
+          />
+        </div>
       </div>
 
       {/* Font Weight */}
@@ -63,19 +195,31 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
         />
       </div>
 
-      {/* Line Height */}
-      <div style={{ position: "relative" }}>
+      {/* Line Height — CP5: chain button for type token binding */}
+      <div
+        style={{ position: "relative", display: "flex", alignItems: "center" }}
+        className="aqb-row-hover-chain"
+      >
         {mixedKeys?.has("line-height") && (
           <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
             <MixedValueBadge compact />
           </span>
         )}
-        <InputWithUnit
-          label="Line H"
-          value={styles["line-height"] || ""}
-          onChange={(v) => onChange("line-height", v)}
-          units={["px", "em", "%", "normal"]}
-        />
+        <div style={{ flex: 1 }}>
+          <InputWithUnit
+            label="Line H"
+            value={styles["line-height"] || ""}
+            onChange={(v) => onChange("line-height", v)}
+            units={["px", "em", "%", "normal"]}
+          />
+        </div>
+        <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", zIndex: 2 }}>
+          <TypeChainButton
+            property="line-height"
+            value={styles["line-height"] || ""}
+            onChange={(v) => onChange("line-height", v)}
+          />
+        </div>
       </div>
 
       {/* Letter Spacing */}

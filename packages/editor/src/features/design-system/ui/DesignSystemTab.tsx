@@ -18,9 +18,8 @@ import { EVENTS } from "../../../shared/constants/events";
 import type { DesignTokenRecord } from "../../../shared/types/project";
 import { useToast } from "../../../shared/ui/Toast";
 import { DEFAULT_TOKENS } from "../constants";
-import { useColorTokens } from "../state/useColorTokens";
-import { useSpacingTokens } from "../state/useSpacingTokens";
-import { useTypeTokens } from "../state/useTypeTokens";
+import { useColorRegistry, useSpacingRegistry, useTypeRegistry, useRegistryConfig } from "../state/TokenRegistryContext";
+import { useTokenUsageMap } from "../state/useTokenUsageMap";
 import type { DesignToken } from "../types";
 import {
   buildExport,
@@ -94,10 +93,20 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
 
   const hasLoadedRef = React.useRef(false);
 
-  // ─ Per-tab state hooks ─
-  const colorState = useColorTokens(DEFAULT_TOKENS);
-  const typeState = useTypeTokens(DEFAULT_TOKENS);
-  const spacingState = useSpacingTokens(DEFAULT_TOKENS);
+  // ─ Token usage scan — bumps on element/style mutations, recomputes Map<tokenId, Set<elementId>> ─
+  const [usageVersion, setUsageVersion] = React.useState(0);
+  const usageMap = useTokenUsageMap(composer, usageVersion);
+  const totalUsageCount = React.useMemo(() => {
+    let n = 0;
+    for (const set of usageMap.values()) n += set.size;
+    return n;
+  }, [usageMap]);
+
+  // ─ Per-tab state hooks — from shared registry (not isolated instances) ─
+  const colorState = useColorRegistry();
+  const typeState = useTypeRegistry();
+  const spacingState = useSpacingRegistry();
+  const { persistAll } = useRegistryConfig();
 
   // Accurate per-token dirty counts (not "1 per dirty hook")
   const colorDirtyCount = Object.keys(colorState.pendingDiff).length;
@@ -132,7 +141,10 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
       const settings = composer.getProjectSettings();
       if (settings.designTokens && settings.designTokens.length > 0) {
         const merged = DEFAULT_TOKENS.map((def) => {
-          const saved = settings.designTokens?.find((t) => t.name === def.name);
+          // Look up by id first (new format), fall back to name (legacy records)
+          const saved = settings.designTokens?.find((t) =>
+            t.id ? t.id === def.id : t.name === def.name
+          );
           return saved ? { ...def, value: saved.value } : def;
         });
         colorState.resetFromSaved(merged);
@@ -173,15 +185,28 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     // Resync after undo/redo operations
     const handleUndoRedo = () => loadFromComposer();
 
+    // Bump usageVersion when elements or styles change so useTokenUsageMap rescans
+    const bumpUsage = () => setUsageVersion((v) => v + 1);
+
     composer.on(EVENTS.PROJECT_LOADED, handleProjectLoaded);
     composer.on(EVENTS.SETTINGS_CHANGE, handleSettingsChange);
     composer.on("undo:applied", handleUndoRedo);
     composer.on("redo:applied", handleUndoRedo);
+    composer.on(EVENTS.ELEMENT_CREATED, bumpUsage);
+    composer.on(EVENTS.ELEMENT_UPDATED, bumpUsage);
+    composer.on(EVENTS.ELEMENT_DELETED, bumpUsage);
+    composer.on(EVENTS.STYLE_CHANGED, bumpUsage);
+    composer.on(EVENTS.STYLE_APPLIED, bumpUsage);
     return () => {
       composer.off(EVENTS.PROJECT_LOADED, handleProjectLoaded);
       composer.off(EVENTS.SETTINGS_CHANGE, handleSettingsChange);
       composer.off("undo:applied", handleUndoRedo);
       composer.off("redo:applied", handleUndoRedo);
+      composer.off(EVENTS.ELEMENT_CREATED, bumpUsage);
+      composer.off(EVENTS.ELEMENT_UPDATED, bumpUsage);
+      composer.off(EVENTS.ELEMENT_DELETED, bumpUsage);
+      composer.off(EVENTS.STYLE_CHANGED, bumpUsage);
+      composer.off(EVENTS.STYLE_APPLIED, bumpUsage);
     };
   }, [composer, loadFromComposer, addToast]);
 
@@ -233,11 +258,21 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
       .filter((t): t is DesignToken & { category: DesignTokenRecord["category"] } =>
         (SAVEABLE_CATEGORIES as string[]).includes(t.category)
       )
-      .map((t) => ({ name: t.name, value: t.value, category: t.category }));
+      .map((t) => ({
+        id: t.id,
+        name: t.name,
+        value: t.value,
+        cssVar: t.cssVar,
+        category: t.category,
+        type: t.type,
+        group: t.group,
+      }));
 
     try {
       const current = composer.getProjectSettings();
       composer.setProjectSettings({ ...current, designTokens: tokenRecords });
+      // CP2: persist to localStorage so tokens survive page reload
+      persistAll();
       colorState.markSaved();
       typeState.markSaved();
       spacingState.markSaved();
@@ -412,6 +447,11 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         }}
       >
         Changes here apply to every page on your site
+        {totalUsageCount > 0 && (
+          <span style={{ marginLeft: 6, color: "var(--aqb-text-subtle, var(--aqb-text-muted))" }}>
+            · {totalUsageCount} token binding{totalUsageCount === 1 ? "" : "s"} in use
+          </span>
+        )}
       </div>
 
       {/* Content */}

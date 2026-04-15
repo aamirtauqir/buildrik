@@ -1,11 +1,20 @@
 /**
- * TokenPickerPopover — pick a design-system color token or enter a raw value.
+ * TokenPickerPopover — pick a design-system token or enter a raw value.
  *
- * Props:
- *   tokens       — flat list of { id, name, value } to show as swatches
- *   currentValue — current color value (hex or token value)
- *   onSelect     — called with (tokenId, value) when a token is clicked
- *   onCustomValue — called with raw hex string when user commits a custom value
+ * Layout modes:
+ *   showSwatch=true  (default) → 4-column swatch grid (color tokens)
+ *   showSwatch=false           → single-column list: name left, value badge right
+ *                                (spacing / type tokens)
+ *
+ * Empty states:
+ *   - Zero tokens in list  → "No [X] tokens yet" + "Add in Design tab" hint
+ *   - Search yields nothing → "No tokens found"  (no Design tab hint)
+ *
+ * Binding model: onSelect passes token.cssVar (e.g. var(--aqb-color-primary)),
+ * NOT the raw hex/px value.
+ *
+ * Keyboard nav: role=listbox, ArrowUp/Down (list), ArrowUp/Down/Left/Right (grid),
+ * Enter=select, Escape=close.
  *
  * @license BSD-3-Clause
  */
@@ -21,13 +30,20 @@ export interface TokenEntry {
   id: string;
   name: string;
   value: string;
+  cssVar: string;
 }
 
 export interface TokenPickerPopoverProps {
   tokens: TokenEntry[];
+  /** Currently applied value (may be var(--aqb-*) or a raw value) */
   currentValue: string;
-  onSelect: (tokenId: string, value: string) => void;
+  /** Called with (tokenId, cssVar) — e.g. ("color-primary", "var(--aqb-color-primary)") */
+  onSelect: (tokenId: string, cssVar: string) => void;
   onCustomValue: (value: string) => void;
+  /** false = list layout (spacing/type), true = 4-col swatch grid (default, color) */
+  showSwatch?: boolean;
+  /** Noun shown in empty-state prompt, e.g. "color", "spacing", "type" */
+  tokenLabel?: string;
 }
 
 // ============================================================================
@@ -35,6 +51,30 @@ export interface TokenPickerPopoverProps {
 // ============================================================================
 
 const isValidHex = (v: string) => /^#[0-9A-Fa-f]{3}(?:[0-9A-Fa-f]{3})?$/.test(v);
+
+/** Extract just the --aqb-* var name from var(--aqb-…) for comparison */
+const extractVarName = (v: string) => {
+  const m = v.match(/^var\((--aqb-[^)]+)\)$/);
+  return m ? m[1] : null;
+};
+
+// ============================================================================
+// SUB-COMPONENTS
+// ============================================================================
+
+const valueBadgeStyle: React.CSSProperties = {
+  fontSize: 10,
+  fontFamily: "var(--aqb-font-mono, 'JetBrains Mono', monospace)",
+  color: INSPECTOR_TOKENS.accent,
+  background: INSPECTOR_TOKENS.accentAlpha10,
+  padding: "1px 5px",
+  borderRadius: 4,
+  whiteSpace: "nowrap",
+  maxWidth: 80,
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  flexShrink: 0,
+};
 
 // ============================================================================
 // COMPONENT
@@ -45,16 +85,92 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
   currentValue,
   onSelect,
   onCustomValue,
+  showSwatch = true,
+  tokenLabel = "color",
 }) => {
   const [tab, setTab] = React.useState<"tokens" | "custom">("tokens");
   const [customInput, setCustomInput] = React.useState(
     isValidHex(currentValue) ? currentValue : "#000000"
   );
   const [query, setQuery] = React.useState("");
+  const [focusedIndex, setFocusedIndex] = React.useState<number>(-1);
+
+  const searchRef = React.useRef<HTMLInputElement>(null);
+  const listRef = React.useRef<HTMLDivElement>(null);
+
+  // Auto-focus search on open
+  React.useEffect(() => {
+    if (tab === "tokens") {
+      searchRef.current?.focus();
+    }
+  }, [tab]);
 
   const filtered = query.trim()
     ? tokens.filter((t) => t.name.toLowerCase().includes(query.toLowerCase()))
     : tokens;
+
+  const hasNoTokens = tokens.length === 0;
+  const hasNoResults = tokens.length > 0 && filtered.length === 0;
+
+  // Determine which token is currently selected (match by cssVar)
+  const currentVarName = extractVarName(currentValue);
+  const isSelected = (token: TokenEntry) =>
+    currentVarName != null
+      ? token.cssVar === currentVarName
+      : currentValue === token.value;
+
+  // Grid columns for keyboard nav
+  const COLS = showSwatch ? 4 : 1;
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (filtered.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown": {
+        e.preventDefault();
+        setFocusedIndex((i) => {
+          const next = i + COLS;
+          return next < filtered.length ? next : i;
+        });
+        break;
+      }
+      case "ArrowUp": {
+        e.preventDefault();
+        setFocusedIndex((i) => {
+          const next = i - COLS;
+          return next >= 0 ? next : i;
+        });
+        break;
+      }
+      case "ArrowRight": {
+        if (showSwatch) {
+          e.preventDefault();
+          setFocusedIndex((i) => (i + 1 < filtered.length ? i + 1 : i));
+        }
+        break;
+      }
+      case "ArrowLeft": {
+        if (showSwatch) {
+          e.preventDefault();
+          setFocusedIndex((i) => (i - 1 >= 0 ? i - 1 : i));
+        }
+        break;
+      }
+      case "Enter": {
+        e.preventDefault();
+        if (focusedIndex >= 0 && focusedIndex < filtered.length) {
+          const token = filtered[focusedIndex];
+          onSelect(token.id, `var(${token.cssVar})`);
+        }
+        break;
+      }
+      case "Escape": {
+        e.preventDefault();
+        // Signal parent to close — parent's Popover/Escape handler will fire
+        break;
+      }
+    }
+  };
 
   const commitCustom = () => {
     const trimmed = customInput.trim();
@@ -64,7 +180,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
   return (
     <div
       style={{
-        width: 228,
+        width: showSwatch ? 228 : 240,
         background: INSPECTOR_TOKENS.surfaceOverlay,
         border: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
         borderRadius: 8,
@@ -105,14 +221,19 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
       </div>
 
       {tab === "tokens" && (
-        <div>
+        <div onKeyDown={handleKeyDown}>
           {/* Search */}
           <div style={{ padding: "8px 8px 4px" }}>
             <input
+              ref={searchRef}
               type="text"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setFocusedIndex(-1);
+              }}
               placeholder="Search tokens…"
+              aria-label="Search tokens"
               style={{
                 width: "100%",
                 padding: "5px 8px",
@@ -127,95 +248,190 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
             />
           </div>
 
-          {/* Token grid */}
-          <div
-            style={{
-              padding: "4px 8px 8px",
-              maxHeight: 200,
-              overflowY: "auto",
-              display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
-              gap: 6,
-            }}
-          >
-            {filtered.length === 0 && (
-              <div
-                style={{
-                  gridColumn: "1 / -1",
-                  textAlign: "center",
-                  fontSize: 11,
-                  color: INSPECTOR_TOKENS.textMuted,
-                  padding: "12px 0",
-                }}
-              >
-                No tokens found
+          {/* Empty state — zero tokens */}
+          {hasNoTokens && (
+            <div
+              style={{
+                padding: "20px 12px",
+                textAlign: "center",
+              }}
+            >
+              <div style={{ fontSize: 18, marginBottom: 6, opacity: 0.4 }}>🎨</div>
+              <div style={{ fontSize: 11, color: INSPECTOR_TOKENS.textSecondary, marginBottom: 4 }}>
+                No {tokenLabel} tokens yet
               </div>
-            )}
-            {filtered.map((token) => {
-              const isSelected = currentValue === token.value;
-              return (
-                <button
-                  key={token.id}
-                  type="button"
-                  title={`${token.name}: ${token.value}`}
-                  onClick={() => onSelect(token.id, token.value)}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 3,
-                    padding: "4px 2px",
-                    background: isSelected
-                      ? INSPECTOR_TOKENS.accentAlpha10
-                      : "transparent",
-                    border: isSelected
-                      ? `1px solid ${INSPECTOR_TOKENS.accent}`
-                      : "1px solid transparent",
-                    borderRadius: 5,
-                    cursor: "pointer",
-                    transition: "background 0.12s",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isSelected)
-                      (e.currentTarget as HTMLButtonElement).style.background =
-                        INSPECTOR_TOKENS.accentAlpha08;
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isSelected)
-                      (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-                  }}
-                >
-                  {/* Swatch */}
-                  <div
+              <div style={{ fontSize: 10, color: INSPECTOR_TOKENS.textMuted }}>
+                Add tokens in the Design tab
+              </div>
+            </div>
+          )}
+
+          {/* Empty state — search no-results */}
+          {hasNoResults && (
+            <div
+              style={{
+                padding: "16px 12px",
+                textAlign: "center",
+                fontSize: 11,
+                color: INSPECTOR_TOKENS.textMuted,
+              }}
+            >
+              No tokens found
+            </div>
+          )}
+
+          {/* Token list */}
+          {!hasNoTokens && !hasNoResults && (
+            <div
+              ref={listRef}
+              role="listbox"
+              aria-label={`${tokenLabel} tokens`}
+              style={{
+                padding: showSwatch ? "4px 8px 8px" : "4px 8px 6px",
+                maxHeight: 220,
+                overflowY: "auto",
+                ...(showSwatch
+                  ? {
+                      display: "grid",
+                      gridTemplateColumns: "repeat(4, 1fr)",
+                      gap: 6,
+                    }
+                  : {
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 2,
+                    }),
+              }}
+            >
+              {filtered.map((token, idx) => {
+                const selected = isSelected(token);
+                const focused = idx === focusedIndex;
+                const cssVarRef = `var(${token.cssVar})`;
+
+                return showSwatch ? (
+                  // ── Grid item (color swatch) ──
+                  <button
+                    key={token.id}
+                    role="option"
+                    aria-selected={selected}
+                    type="button"
+                    title={`${token.name}: ${token.value}`}
+                    tabIndex={focused ? 0 : -1}
+                    onClick={() => onSelect(token.id, cssVarRef)}
                     style={{
-                      width: 28,
-                      height: 28,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: 3,
+                      padding: "4px 2px",
+                      background: selected || focused ? INSPECTOR_TOKENS.accentAlpha10 : "transparent",
+                      border: selected
+                        ? `1px solid ${INSPECTOR_TOKENS.accent}`
+                        : focused
+                          ? `1px solid ${INSPECTOR_TOKENS.accentAlpha30}`
+                          : "1px solid transparent",
                       borderRadius: 5,
-                      background: token.value,
-                      border: `1px solid rgba(255,255,255,0.12)`,
-                      flexShrink: 0,
+                      cursor: "pointer",
+                      transition: "background 0.12s",
+                      outline: "none",
                     }}
-                  />
-                  {/* Name */}
-                  <span
-                    style={{
-                      fontSize: 9,
-                      color: INSPECTOR_TOKENS.textTertiary,
-                      textAlign: "center",
-                      lineHeight: 1.2,
-                      wordBreak: "break-word",
-                      maxWidth: 44,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
+                    onMouseEnter={(e) => {
+                      if (!selected)
+                        (e.currentTarget as HTMLButtonElement).style.background =
+                          INSPECTOR_TOKENS.accentAlpha08;
                     }}
+                    onMouseLeave={(e) => {
+                      if (!selected)
+                        (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+                    }}
+                    onFocus={() => setFocusedIndex(idx)}
                   >
-                    {token.name}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                    {/* Swatch */}
+                    <div
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: 5,
+                        background: token.value,
+                        border: `1px solid rgba(255,255,255,0.12)`,
+                        flexShrink: 0,
+                      }}
+                    />
+                    {/* Name */}
+                    <span
+                      style={{
+                        fontSize: 9,
+                        color: INSPECTOR_TOKENS.textTertiary,
+                        textAlign: "center",
+                        lineHeight: 1.2,
+                        wordBreak: "break-word",
+                        maxWidth: 44,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {token.name}
+                    </span>
+                  </button>
+                ) : (
+                  // ── List item (spacing / type) ──
+                  <button
+                    key={token.id}
+                    role="option"
+                    aria-selected={selected}
+                    type="button"
+                    title={`${token.name}: ${token.value}`}
+                    tabIndex={focused ? 0 : -1}
+                    onClick={() => onSelect(token.id, cssVarRef)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 8,
+                      padding: "5px 6px",
+                      background: selected || focused ? INSPECTOR_TOKENS.accentAlpha10 : "transparent",
+                      border: selected
+                        ? `1px solid ${INSPECTOR_TOKENS.accent}`
+                        : focused
+                          ? `1px solid ${INSPECTOR_TOKENS.accentAlpha30}`
+                          : "1px solid transparent",
+                      borderRadius: 5,
+                      cursor: "pointer",
+                      transition: "background 0.12s",
+                      width: "100%",
+                      textAlign: "left",
+                      outline: "none",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!selected)
+                        (e.currentTarget as HTMLButtonElement).style.background =
+                          INSPECTOR_TOKENS.accentAlpha08;
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!selected)
+                        (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+                    }}
+                    onFocus={() => setFocusedIndex(idx)}
+                  >
+                    <span
+                      style={{
+                        fontSize: 11,
+                        color: INSPECTOR_TOKENS.textSecondary,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        flex: 1,
+                      }}
+                    >
+                      {token.name}
+                    </span>
+                    <span style={valueBadgeStyle}>{token.value}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 

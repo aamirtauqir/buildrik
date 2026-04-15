@@ -808,3 +808,15 @@ button {
     outline-offset: 3px;
   }
 }
+
+/* ============================================
+   CHAIN BUTTON HOVER REVEAL
+   Rows with .aqb-row-hover-chain reveal .aqb-chain-btn on hover.
+   Keyboard users get the button via :focus-visible on the row.
+   ============================================ */
+
+.aqb-row-hover-chain:hover .aqb-chain-btn,
+.aqb-row-hover-chain:focus-within .aqb-chain-btn {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}

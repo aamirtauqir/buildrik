@@ -1,10 +1,132 @@
 /**
  * Size Section - Width, Height, Min/Max dimensions
+ * CP3: W and H rows each have a hover-reveal chain button that opens a spacing
+ * token picker. Selecting a spacing token stores var(--aqb-space-4) on the
+ * element — not "16px". The picker uses list layout (showSwatch=false).
  */
 
+import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
+import { useSpacingRegistry } from "../../../features/design-system/state/TokenRegistryContext";
+import { Popover } from "../../../shared/ui/Popover";
+import { TokenPickerPopover } from "../shared/TokenPickerPopover";
+import { INSPECTOR_TOKENS } from "../shared/controls/controlStyles";
 import { Section, InputWithUnit, MoreSettingsToggle, type SectionTier } from "../shared/controls";
 import { MixedValueBadge } from "../shared/MixedValueBadge";
+
+// ============================================================================
+// HELPERS
+// ============================================================================
+
+const isTokenVar = (val: string): boolean => /^var\(--aqb-/.test(val);
+
+const resolveVar = (cssVar: string): string => {
+  const varName = cssVar.replace(/^var\(/, "").replace(/\)$/, "");
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim() || "";
+};
+
+// ============================================================================
+// CHAIN BUTTON
+// Chain button: hover-reveal (opacity 0→1 via CSS on parent hover).
+// Bound state: always visible in blue with unlink button.
+// ============================================================================
+
+interface ChainButtonProps {
+  property: string;
+  value: string;
+  onChange: (value: string) => void;
+}
+
+const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) => {
+  const { tokens: spacingTokens } = useSpacingRegistry();
+  const tokenEntries = spacingTokens.map((t) => ({
+    id: t.id,
+    name: t.name,
+    value: t.value,
+    cssVar: t.cssVar,
+  }));
+
+  const isBound = isTokenVar(value);
+  const boundToken = isBound
+    ? tokenEntries.find((t) => value === `var(${t.cssVar})`)
+    : null;
+
+  if (isBound) {
+    return (
+      <button
+        type="button"
+        onClick={() => onChange(resolveVar(value))}
+        aria-label={`Unlink ${property} spacing token`}
+        title={`Unlink "${boundToken?.name ?? "token"}" — resolves to current value`}
+        style={{
+          padding: "2px 4px",
+          background: INSPECTOR_TOKENS.accentAlpha10,
+          border: `1px solid ${INSPECTOR_TOKENS.accent}`,
+          borderRadius: 4,
+          color: INSPECTOR_TOKENS.accent,
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          gap: 3,
+          fontSize: 9,
+          whiteSpace: "nowrap",
+          flexShrink: 0,
+        }}
+      >
+        <Link2 size={10} aria-hidden="true" />
+        {boundToken?.name && (
+          <span style={{ maxWidth: 48, overflow: "hidden", textOverflow: "ellipsis" }}>
+            {boundToken.name}
+          </span>
+        )}
+        <Link2Off size={9} aria-hidden="true" style={{ opacity: 0.7 }} />
+      </button>
+    );
+  }
+
+  return (
+    <Popover
+      triggerOn="click"
+      position="bottom"
+      trigger={
+        <button
+          type="button"
+          aria-label={`Link ${property} to spacing token`}
+          title="Link to spacing token"
+          className="aqb-chain-btn"
+          style={{
+            padding: 2,
+            background: "none",
+            border: "none",
+            color: INSPECTOR_TOKENS.textMuted,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            opacity: 0, // revealed by parent row :hover via CSS
+            transition: "opacity 0.12s, color 0.12s",
+            flexShrink: 0,
+          }}
+        >
+          <Link2 size={12} aria-hidden="true" />
+        </button>
+      }
+      content={
+        <TokenPickerPopover
+          tokens={tokenEntries}
+          currentValue={value}
+          showSwatch={false}
+          tokenLabel="spacing"
+          onSelect={(_id, cssVarRef) => onChange(cssVarRef)}
+          onCustomValue={onChange}
+        />
+      }
+    />
+  );
+};
+
+// ============================================================================
+// SIZE SECTION
+// ============================================================================
 
 export interface SizeSectionProps {
   styles: Record<string, string>;
@@ -13,15 +135,10 @@ export interface SizeSectionProps {
     string,
     { hidden?: boolean; disabled?: boolean; reason?: string; isOverridden?: boolean }
   >;
-  /** Controlled open state for auto-expand functionality */
   isOpen?: boolean;
-  /** Called when the section header is toggled */
   onToggle?: (open: boolean) => void;
-  /** Visual weight tier — threaded from the registry-driven renderer. */
   tier?: SectionTier;
-  /** Whether advanced settings (min/max/ratio) are expanded */
   advancedExpanded?: boolean;
-  /** Called when the More settings toggle is clicked */
   onAdvancedToggle?: () => void;
   mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
@@ -42,9 +159,6 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
   const disabled = (prop: string) => propertyStates[prop]?.disabled;
   const reason = (prop: string) => propertyStates[prop]?.reason;
 
-  // Inline preview shown when the section is collapsed: "W × H" so users can
-  // scan the size without expanding. Only renders when at least one dimension
-  // is set — otherwise the default "auto × auto" is noise.
   const w = styles.width || "";
   const h = styles.height || "";
   const sizePreview =
@@ -73,39 +187,57 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
     >
       {/* Width */}
       {!hidden("width") && (
-        <div style={{ position: "relative" }}>
+        <div style={{ position: "relative", display: "flex", alignItems: "center" }}
+          className="aqb-row-hover-chain"
+        >
           {mixedKeys?.has("width") && (
             <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
               <MixedValueBadge compact />
             </span>
           )}
-          <InputWithUnit
-            label="Width"
-            value={styles.width || ""}
-            onChange={(v) => onChange("width", v)}
-            disabled={disabled("width")}
-            disabledReason={reason("width")}
-            isOverridden={propertyStates["width"]?.isOverridden}
-          />
+          <div style={{ flex: 1 }}>
+            <InputWithUnit
+              label="Width"
+              value={styles.width || ""}
+              onChange={(v) => onChange("width", v)}
+              disabled={disabled("width")}
+              disabledReason={reason("width")}
+              isOverridden={propertyStates["width"]?.isOverridden}
+            />
+          </div>
+          {!disabled("width") && (
+            <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", zIndex: 2 }}>
+              <ChainButton property="width" value={styles.width || ""} onChange={(v) => onChange("width", v)} />
+            </div>
+          )}
         </div>
       )}
 
       {/* Height */}
       {!hidden("height") && (
-        <div style={{ position: "relative" }}>
+        <div style={{ position: "relative", display: "flex", alignItems: "center" }}
+          className="aqb-row-hover-chain"
+        >
           {mixedKeys?.has("height") && (
             <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
               <MixedValueBadge compact />
             </span>
           )}
-          <InputWithUnit
-            label="Height"
-            value={styles.height || ""}
-            onChange={(v) => onChange("height", v)}
-            disabled={disabled("height")}
-            disabledReason={reason("height")}
-            isOverridden={propertyStates["height"]?.isOverridden}
-          />
+          <div style={{ flex: 1 }}>
+            <InputWithUnit
+              label="Height"
+              value={styles.height || ""}
+              onChange={(v) => onChange("height", v)}
+              disabled={disabled("height")}
+              disabledReason={reason("height")}
+              isOverridden={propertyStates["height"]?.isOverridden}
+            />
+          </div>
+          {!disabled("height") && (
+            <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", zIndex: 2 }}>
+              <ChainButton property="height" value={styles.height || ""} onChange={(v) => onChange("height", v)} />
+            </div>
+          )}
         </div>
       )}
 
@@ -238,7 +370,6 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
         </div>
       )}
 
-      {/* Progressive disclosure toggle */}
       {onAdvancedToggle && (
         <MoreSettingsToggle
           isOpen={advancedExpanded}

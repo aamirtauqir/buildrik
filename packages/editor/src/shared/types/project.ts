@@ -172,8 +172,10 @@ export interface ProjectSettings {
 
 /** Serializable design token for project settings */
 export interface DesignTokenRecord {
+  id: string;
   name: string;
   value: string;
+  cssVar: string;
   category:
     | "colors"
     | "typography"
@@ -183,6 +185,8 @@ export interface DesignTokenRecord {
     | "icons"
     | "buttons"
     | "forms";
+  type?: string;
+  group?: string;
 }
 
 /**

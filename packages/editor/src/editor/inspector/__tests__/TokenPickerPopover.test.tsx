@@ -9,9 +9,9 @@ import { describe, it, expect, vi } from "vitest";
 import { TokenPickerPopover } from "../shared/TokenPickerPopover";
 
 const TOKENS = [
-  { id: "color-primary", name: "Primary", value: "#3B82F6" },
-  { id: "color-secondary", name: "Secondary", value: "#8B5CF6" },
-  { id: "color-accent", name: "Accent", value: "#22C55E" },
+  { id: "color-primary", name: "Primary", value: "#3B82F6", cssVar: "--aqb-color-primary" },
+  { id: "color-secondary", name: "Secondary", value: "#8B5CF6", cssVar: "--aqb-color-secondary" },
+  { id: "color-accent", name: "Accent", value: "#22C55E", cssVar: "--aqb-color-accent" },
 ];
 
 describe("TokenPickerPopover", () => {
@@ -41,7 +41,8 @@ describe("TokenPickerPopover", () => {
     );
     const secondaryBtn = screen.getByTitle("Secondary: #8B5CF6");
     fireEvent.click(secondaryBtn);
-    expect(onSelect).toHaveBeenCalledWith("color-secondary", "#8B5CF6");
+    // onSelect now passes cssVar reference, not raw hex
+    expect(onSelect).toHaveBeenCalledWith("color-secondary", "var(--aqb-color-secondary)");
   });
 
   it("filters tokens by search query", async () => {

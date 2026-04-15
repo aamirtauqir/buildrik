@@ -22,6 +22,7 @@ import { ProInspector } from "../inspector/ProInspector";
 import { LayoutShell } from "../rail/LayoutShell";
 import { LeftSidebar } from "../sidebar/LeftSidebar";
 import { FullPageView } from "../sidebar/FullPageView";
+import { TokenRegistryProvider } from "../../features/design-system";
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { PageTabBar } from "./PageTabBar";
 
@@ -360,6 +361,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   );
 
   return (
+    <TokenRegistryProvider projectId={projectId}>
     <LayoutShell
       drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
       drawerPinned={panelPinned}
@@ -463,6 +465,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
         />
       </LayoutShell.FullPage>
     </LayoutShell>
+    </TokenRegistryProvider>
   );
 };
 

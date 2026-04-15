@@ -146,11 +146,15 @@ export interface InputWithUnitProps {
   helperText?: string;
 }
 
-/** Returns true for valid CSS numeric input (including empty, partial negative) */
+/** Returns true for valid CSS numeric input (including empty, partial negative, or CSS var) */
 function isValidCSSNumber(val: string): boolean {
   if (val === "" || val === "-") return true;
+  if (/^var\(--aqb-/.test(val)) return true; // token binding — always valid, pass through
   return /^-?[\d.]+$/.test(val) && !isNaN(parseFloat(val));
 }
+
+/** Returns true if the value is a token var() binding — skip all parse/validate */
+const isTokenVar = (val: string): boolean => /^var\(--aqb-/.test(val);
 
 export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   label,
@@ -164,10 +168,13 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   helperText,
 }) => {
   const [isRowHovered, setIsRowHovered] = React.useState(false);
-  // Parse value and unit
+  // Parse value and unit — token vars pass through as-is in the num field
   const parseValue = (val: string): { num: string; unit: string } => {
     if (val === "auto" || val === "none" || val === "inherit") {
       return { num: "", unit: val };
+    }
+    if (isTokenVar(val)) {
+      return { num: val, unit: "px" }; // display the var() string, unit dropdown irrelevant
     }
     const match = val.match(/^(-?[\d.]+)(.*)$/);
     if (match) {
@@ -198,6 +205,11 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
 
   const handleInputChange = (newVal: string) => {
     setInputValue(newVal);
+    // Token var() — pass through immediately, no validation
+    if (isTokenVar(newVal)) {
+      onChange(newVal);
+      return;
+    }
     const valid = isValidCSSNumber(newVal);
     setIsInvalid(!valid);
     if (valid && newVal !== "-" && newVal !== "") {
@@ -206,6 +218,10 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   };
 
   const handleInputBlur = () => {
+    // Never revert a token var() binding on blur
+    if (isTokenVar(inputValue)) {
+      return;
+    }
     if (!isValidCSSNumber(inputValue) || inputValue === "-") {
       // Revert to last known-good value from prop
       setInputValue(num);
@@ -282,7 +298,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
               // Reserve space for the reset × so it never sits on top of text.
               paddingRight: showReset ? 22 : inputStyle.paddingRight,
             }}
-            disabled={disabled || unit === "auto" || unit === "none" || unit === "inherit"}
+            disabled={disabled || (unit === "auto" || unit === "none" || unit === "inherit") && !isTokenVar(inputValue)}
             aria-invalid={isInvalid}
           />
           <ResetButton
