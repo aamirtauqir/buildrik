@@ -38,13 +38,21 @@ export async function updateSiteSettings(
     touchIcon?: string | null;
   }
 ) {
-  // If slug is being changed, record the old slug for 301 redirects
-  if (data.slug) {
+  if (data.headCode !== undefined || data.bodyCode !== undefined || data.slug) {
     const current = await prisma.site.findUnique({
       where: { id: siteId },
-      select: { slug: true },
+      select: {
+        slug: true,
+        workspace: { select: { plan: true } },
+      },
     });
-    if (current && current.slug !== data.slug) {
+
+    if (data.headCode !== undefined || data.bodyCode !== undefined) {
+      const plan = current?.workspace?.plan ?? "FREE";
+      if (plan === "FREE") throw new Error("CUSTOM_CODE_NOT_AVAILABLE");
+    }
+
+    if (data.slug && current && current.slug !== data.slug) {
       await prisma.slugHistory.create({
         data: {
           siteId,

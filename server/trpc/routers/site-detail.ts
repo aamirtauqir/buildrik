@@ -10,7 +10,6 @@ import { listDomains, connectDomain, removeDomain, setPrimaryDomain } from "@/se
 import { listShareLinks, createShareLink, revokeShareLink } from "@/server/services/share-link.service";
 import { getSiteAnalytics } from "@/server/services/analytics.service";
 import { updateSiteSettingsSchema, createRedirectSchema, connectDomainSchema, createShareLinkSchema, siteAnalyticsQuerySchema } from "@buildrik/shared/schemas/site-detail";
-import type { PlanName } from "@/lib/constants/plan-limits";
 
 export const siteDetailRouter = router({
   overview: protectedProcedure
@@ -48,7 +47,13 @@ export const siteDetailRouter = router({
           throw e;
         }
         const { id, ...data } = input;
-        return updateSiteSettings(id, data);
+        try {
+          return await updateSiteSettings(id, data);
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === "CUSTOM_CODE_NOT_AVAILABLE")
+            throw new TRPCError({ code: "FORBIDDEN", message: "Custom code requires Pro or above" });
+          throw e;
+        }
       }),
   }),
 
@@ -244,7 +249,15 @@ export const siteDetailRouter = router({
           throw e;
         }
         const { siteId, ...data } = input;
-        return createShareLink(siteId, data);
+        try {
+          return await createShareLink(siteId, data, ctx.session.user.id);
+        } catch (e: unknown) {
+          if (e instanceof Error && e.message === "NOT_WORKSPACE_MEMBER")
+            throw new TRPCError({ code: "FORBIDDEN", message: "You are not an active member of this workspace" });
+          if (e instanceof Error && e.message === "EDITORS_CANNOT_CREATE_LINKS")
+            throw new TRPCError({ code: "FORBIDDEN", message: "Editors cannot create share links for this workspace" });
+          throw e;
+        }
       }),
 
     revoke: protectedProcedure

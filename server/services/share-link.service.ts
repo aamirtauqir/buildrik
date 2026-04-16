@@ -11,12 +11,27 @@ export async function listShareLinks(siteId: string) {
 
 export async function createShareLink(
   siteId: string,
-  data: { name: string; password?: string; expiresInDays?: number }
+  data: { name: string; password?: string; expiresInDays?: number },
+  userId?: string
 ) {
   const site = await prisma.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
   if (!site) throw new Error("SITE_NOT_FOUND");
-  const ws = await prisma.workspace.findUnique({ where: { id: site.workspaceId }, select: { plan: true } });
-  const plan = (ws?.plan ?? "FREE") as PlanName;
+  let plan: PlanName;
+  if (userId) {
+    const member = await prisma.workspaceMember.findFirst({
+      where: { userId, workspaceId: site.workspaceId, status: "ACTIVE" },
+      include: { workspace: { select: { plan: true, sharingSettings: true } } },
+    });
+    if (!member) throw new Error("NOT_WORKSPACE_MEMBER");
+    const settings = member.workspace?.sharingSettings;
+    if (member.role === "EDITOR" && settings?.allowEditors === false) {
+      throw new Error("EDITORS_CANNOT_CREATE_LINKS");
+    }
+    plan = (member.workspace?.plan ?? "FREE") as PlanName;
+  } else {
+    const ws = await prisma.workspace.findUnique({ where: { id: site.workspaceId }, select: { plan: true } });
+    plan = (ws?.plan ?? "FREE") as PlanName;
+  }
   const limits = PLAN_LIMITS[plan];
   const maxDays = limits.shareLinkExpiryMaxDays as number;
   const allowPasswords = limits.shareLinkPasswords as boolean;
