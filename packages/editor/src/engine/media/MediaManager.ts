@@ -26,6 +26,7 @@ import {
   generateThumbnail,
   generateMediaId,
   blobToDataURL,
+  sniffMimeType,
 } from "./MediaHelpers";
 import { MediaStorage } from "./MediaStorage";
 import { MediaOptimizer } from "./MediaOptimizer";
@@ -94,6 +95,11 @@ export class MediaManager extends MediaEventEmitter {
    * against long sessions that open and close the library many times.
    */
   private blobUrlRefs = new Map<string, number>();
+  /**
+   * Pending revoke timers keyed by asset id. Set when refs drop to zero;
+   * cleared when refs go back up or the timer fires (5s grace period).
+   */
+  private pendingRevokes = new Map<string, ReturnType<typeof setTimeout>>();
 
   constructor() {
     super();
@@ -119,6 +125,13 @@ export class MediaManager extends MediaEventEmitter {
   async getAssetSrc(id: string): Promise<string | null> {
     const asset = this.state.assets.find((a) => a.id === id);
     if (!asset) return null;
+
+    // Cancel any pending revoke (re-acquisition within grace period)
+    const pending = this.pendingRevokes.get(id);
+    if (pending) {
+      clearTimeout(pending);
+      this.pendingRevokes.delete(id);
+    }
 
     // Already a remote URL or data URL — no blob to manage.
     if (asset.src.startsWith("http") || asset.src.startsWith("data:")) {
@@ -146,9 +159,11 @@ export class MediaManager extends MediaEventEmitter {
   /**
    * Decrement the ref count for a blob URL. Called from UI cleanup
    * (useEffect return, component unmount) to mark that the caller is
-   * done with the URL. We never revoke on zero — blob URLs are cheap
-   * to keep, and revoking mid-session would break any stale <img src>
-   * still pointing at the URL. Actual revocation happens in deleteAsset.
+   * done with the URL. When refs drop to zero, schedule a deferred revoke
+   * (5-second grace period) to handle transient hand-off scenarios where
+   * a component unmounts just before another mounts referencing the same
+   * asset. If the asset gets re-acquired within the grace period, the
+   * revoke is cancelled.
    *
    * No-op for unknown ids and for data/http URLs (which never got refs).
    */
@@ -157,9 +172,35 @@ export class MediaManager extends MediaEventEmitter {
     if (!current) return;
     if (current <= 1) {
       this.blobUrlRefs.delete(id);
+      this.scheduleRevoke(id);
     } else {
       this.blobUrlRefs.set(id, current - 1);
     }
+  }
+
+  /**
+   * Schedule revocation of a blob URL after a grace period. If the asset
+   * is re-acquired via getAssetSrc before the timeout fires, the revoke
+   * is cancelled. Prevents unbounded blob URL accumulation while avoiding
+   * race conditions with component remount cycles.
+   */
+  private scheduleRevoke(id: string): void {
+    // Cancel any pending revoke for this id
+    const existingTimer = this.pendingRevokes.get(id);
+    if (existingTimer) clearTimeout(existingTimer);
+
+    const timer = setTimeout(() => {
+      this.pendingRevokes.delete(id);
+      // Only revoke if still zero-refs (re-acquisition cancels via getAssetSrc)
+      if (!this.blobUrlRefs.has(id)) {
+        const url = this.blobUrlMap.get(id);
+        if (url) {
+          URL.revokeObjectURL(url);
+          this.blobUrlMap.delete(id);
+        }
+      }
+    }, 5000);
+    this.pendingRevokes.set(id, timer);
   }
 
   /**
@@ -253,31 +294,50 @@ export class MediaManager extends MediaEventEmitter {
 
       let finalBlob: Blob = file;
       let finalMime = file.type;
+      // Will be reassigned to sniffed type below if SVG content was detected
       let finalSize = file.size;
       let finalDimensions = await getMediaDimensions(file, src);
+
+      // Sniff actual MIME from magic bytes — file.type is set from extension
+      // and can be spoofed (e.g. .svg renamed to .png). If the content is
+      // actually SVG, route to the sanitizer regardless of declared type.
+      const sniffedMime = await sniffMimeType(file);
+      const actualType =
+        sniffedMime === "image/svg+xml" ? "image/svg+xml" : file.type;
 
       // SVG sanitization — strip <script>, event handlers, external refs, etc.
       // DOMPurify's USE_PROFILES:{svg,svgFilters} keeps drawing instructions
       // and drops anything executable. Runs before storage and before any
       // consumer renders the file.
-      if (file.type === "image/svg+xml") {
+      if (actualType === "image/svg+xml") {
         const raw = await file.text();
         const clean = DOMPurify.sanitize(raw, {
           USE_PROFILES: { svg: true, svgFilters: true },
+          FORBID_ATTR: ["xlink:href", "href"],
         });
-        if (!clean || !clean.trim().startsWith("<")) {
+        // Validate root element is <svg> — DOMPurify can return a fragment
+        // that starts with <g>, <path>, etc. which is not a valid SVG document.
+        const parsed = new DOMParser().parseFromString(clean, "image/svg+xml");
+        const parseError = parsed.querySelector("parsererror");
+        const rootEl = parsed.documentElement;
+        const isSvgRoot =
+          rootEl &&
+          rootEl.localName === "svg" &&
+          rootEl.namespaceURI === "http://www.w3.org/2000/svg";
+        if (!clean || parseError || !isSvgRoot) {
           this.emit(MEDIA_EVENTS.UPLOAD_ERROR, {
             fileName: file.name,
-            error: "SVG rejected: no drawable content after sanitization",
+            error: "SVG rejected: invalid SVG document after sanitization",
           });
           return {
             success: false,
-            error: "SVG rejected: no drawable content after sanitization",
+            error: "SVG rejected: invalid SVG document after sanitization",
             fileName: file.name,
           };
         }
         finalBlob = new Blob([clean], { type: "image/svg+xml" });
         finalSize = finalBlob.size;
+        finalMime = "image/svg+xml";
       }
 
       // Auto-optimization

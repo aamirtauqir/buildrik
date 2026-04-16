@@ -1,0 +1,76 @@
+# Editor package CI gate.
+#
+# Catches the missing-module class of bug (CAN-001/002/003/004) where a feature
+# branch lands referencing a file that was never committed. `vite build` is the
+# authoritative check: Vite's import-analysis plugin fails the build if any
+# imported module cannot be resolved, which is the exact failure mode that took
+# down the editor on feat/media-tab-fully-functional.
+#
+# Tests also run as part of this gate.
+#
+# Why not `tsc --noEmit`: the editor's tsconfig currently picks up dashboard
+# files via path aliases, so tsc surfaces pre-existing dashboard errors that
+# aren't the editor PR's problem. Once that boundary is fixed, add a typecheck
+# step here.
+#
+# Security note: this workflow uses no untrusted user input
+# (no PR titles, issue bodies, commit messages, or branch names interpolated
+# into shell commands). Only github.workflow (static) and github.ref (controlled
+# by GitHub) are referenced, both inside the concurrency key.
+
+name: editor
+
+on:
+  pull_request:
+    paths:
+      - "packages/editor/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - ".github/workflows/editor-ci.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "packages/editor/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - ".github/workflows/editor-ci.yml"
+
+concurrency:
+  group: editor-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: build + test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Authoritative gate: catches every unresolved import in the editor source
+      # tree. This is the exact check that would have caught the missing
+      # PinPopover, TemplateCard, useSectionInsert, and ../styles imports.
+      - name: Build editor
+        working-directory: packages/editor
+        run: npx vite build
+
+      - name: Run editor tests
+        working-directory: packages/editor
+        run: npx vitest run --reporter=default

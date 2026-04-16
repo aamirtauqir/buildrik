@@ -23,6 +23,93 @@ export function validateFile(file: File): { valid: boolean; error?: string } {
 }
 
 /**
+ * Validate a src URL for safety. Blocks dangerous schemes (javascript:,
+ * vbscript:, file:, about:) and characters that could break out of url(...)
+ * in CSS or attribute contexts. Allows http/https, blob:, data:image, and
+ * relative URLs (no scheme).
+ */
+export function isSafeSrc(src: unknown): boolean {
+  if (!src || typeof src !== "string") return false;
+  const trimmed = src.trim();
+  if (!trimmed) return false;
+  // Reject characters that break CSS url(...) parsing or quote attributes
+  if (/[)"']/.test(trimmed)) return false;
+  // Check scheme if present
+  const schemeMatch = trimmed.match(/^([a-z][a-z0-9+.-]*):/i);
+  if (schemeMatch) {
+    const scheme = schemeMatch[1].toLowerCase();
+    // Explicit blocklist of dangerous schemes
+    if (
+      scheme === "javascript" ||
+      scheme === "vbscript" ||
+      scheme === "file" ||
+      scheme === "about"
+    ) {
+      return false;
+    }
+    // data: URLs only allowed for images
+    if (scheme === "data") {
+      return /^data:image\/(png|jpeg|jpg|gif|webp|svg\+xml);/i.test(trimmed);
+    }
+    // http/https/blob and any other scheme: allow (rely on URL semantics)
+    return true;
+  }
+  // No scheme = relative URL or bare filename — safe
+  return true;
+}
+
+/**
+ * Sniff the actual MIME type from file content magic bytes. The browser-supplied
+ * `file.type` is set from the file extension and can be spoofed (e.g. SVG renamed
+ * to .png served as image/png). Returns the detected MIME or null if unknown.
+ *
+ * Detects: image/svg+xml, image/png, image/jpeg, image/gif, image/webp.
+ */
+export async function sniffMimeType(file: File): Promise<string | null> {
+  const head = await file.slice(0, 256).arrayBuffer();
+  const bytes = new Uint8Array(head);
+
+  // SVG: starts with "<?xml" or "<svg" (allow leading whitespace + BOM)
+  const text = new TextDecoder().decode(bytes).trimStart().toLowerCase();
+  if (text.startsWith("<?xml") || text.startsWith("<svg") || /^<!doctype svg/i.test(text)) {
+    return "image/svg+xml";
+  }
+
+  // PNG: 89 50 4E 47 0D 0A 1A 0A
+  if (
+    bytes[0] === 0x89 &&
+    bytes[1] === 0x50 &&
+    bytes[2] === 0x4e &&
+    bytes[3] === 0x47
+  ) {
+    return "image/png";
+  }
+  // JPEG: FF D8 FF
+  if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) {
+    return "image/jpeg";
+  }
+  // GIF: "GIF87a" or "GIF89a"
+  if (bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46) {
+    return "image/gif";
+  }
+  // WebP: "RIFF" .... "WEBP"
+  if (
+    bytes[0] === 0x52 &&
+    bytes[1] === 0x49 &&
+    bytes[2] === 0x46 &&
+    bytes[3] === 0x46 &&
+    bytes[8] === 0x57 &&
+    bytes[9] === 0x45 &&
+    bytes[10] === 0x42 &&
+    bytes[11] === 0x50
+  ) {
+    return "image/webp";
+  }
+
+  return null;
+}
+
+/**
  * Read a file as a data URL
  */
 export function readFileAsDataURL(file: File): Promise<string> {
