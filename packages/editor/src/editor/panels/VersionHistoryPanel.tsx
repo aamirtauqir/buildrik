@@ -1,21 +1,16 @@
 /**
- * Version History Panel
- * Shows saved versions with restore/delete actions
- * Grouped by date (Today, Yesterday, older dates)
+ * VersionHistoryPanel - Saves view with FAB, compare, restore, delete
+ * Phase 3: Uses useVersionHistory hook, FAB design, inline confirmations
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import type { Composer } from "../../engine";
-import { EVENTS } from "../../shared/constants";
-import type { NamedVersion } from "../../shared/types/versions";
-import type { ElementData } from "../../shared/types";
+import { useVersionHistory } from "../../shared/hooks/useVersionHistory";
+import { formatRelativeTime } from "../../editor/sidebar/tabs/history/helpers";
+import { SaveIcon } from "../../editor/sidebar/tabs/history/icons";
 
-export interface VersionHistoryPanelProps {
-  composer: Composer | null;
-  searchQuery?: string;
-}
+import type { Composer } from "../../engine";
 
 // ============================================
 // Date Helpers
@@ -36,73 +31,163 @@ function formatTime(timestamp: number): string {
   return new Date(timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-function relativeTime(timestamp: number): string {
-  const diff = Date.now() - timestamp;
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins} minute${mins !== 1 ? "s" : ""} ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
-  const days = Math.floor(hours / 24);
-  return `${days} day${days !== 1 ? "s" : ""} ago`;
+// ============================================
+// Empty State
+// ============================================
+
+interface EmptyStateProps {
+  icon: React.ReactNode;
+  message: string;
+  hint?: React.ReactNode;
 }
 
-function countTree(el: ElementData | undefined): number {
-  if (!el) return 0;
-  return 1 + (el.children?.reduce((s, c) => s + countTree(c), 0) ?? 0);
-}
-
-function countElements(version: NamedVersion): number {
-  const pages = version.snapshot?.pages;
-  if (!pages || !Array.isArray(pages)) return 0;
-  return pages.reduce((acc, p) => acc + countTree(p.root), 0);
-}
-
-function groupVersionsByDate(versions: NamedVersion[]): Map<string, NamedVersion[]> {
-  const groups = new Map<string, NamedVersion[]>();
-  versions.forEach((v) => {
-    const group = getDateGroup(v.createdAt);
-    if (!groups.has(group)) groups.set(group, []);
-    groups.get(group)!.push(v);
-  });
-  return groups;
+function EmptyState({ icon, message, hint }: EmptyStateProps) {
+  return (
+    <div className="aqb-ht-empty">
+      <div className="aqb-ht-empty__icon">{icon}</div>
+      <p className="aqb-ht-empty__title">{message}</p>
+      {hint && <p className="aqb-ht-empty__desc">{hint}</p>}
+    </div>
+  );
 }
 
 // ============================================
-// Component
+// Version Row Component
 // ============================================
 
-export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
+interface VersionRowProps {
+  version: { id: string; name: string; createdAt: number; isAutoCheckpoint?: boolean };
+  isRestoring: boolean;
+  isDeleteConfirm: boolean;
+  onRestore: () => void;
+  onDeleteRequest: () => void;
+  onDeleteConfirm: () => void;
+  onDeleteCancel: () => void;
+  elementCount?: number;
+}
+
+function VersionRow({
+  version,
+  isRestoring,
+  isDeleteConfirm,
+  onRestore,
+  onDeleteRequest,
+  onDeleteConfirm,
+  onDeleteCancel,
+  elementCount = 0,
+}: VersionRowProps) {
+  const relative = formatRelativeTime(version.createdAt);
+
+  return (
+    <div
+      className={`aqb-ht-version-row${isDeleteConfirm ? " aqb-ht-version-row--delete-confirm" : ""}`}
+      aria-label={`Version "${version.name}" from ${relative}`}
+    >
+      {/* Version Info */}
+      <div className="aqb-ht-version-row__info">
+        <div className="aqb-ht-version-row__avatar">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+            <circle cx="6" cy="4" r="2" />
+            <path d="M2 11a4 4 0 0 1 8 0" />
+          </svg>
+        </div>
+        <div className="aqb-ht-version-row__details">
+          <div className="aqb-ht-version-row__name">{version.name}</div>
+          <div className="aqb-ht-version-row__meta">
+            {formatTime(version.createdAt)}
+            <span className="aqb-ht-version-row__relative">{relative}</span>
+            {elementCount > 0 && (
+              <span className="aqb-ht-badge aqb-ht-badge--count">{elementCount} el</span>
+            )}
+            {version.isAutoCheckpoint && (
+              <span className="aqb-ht-badge aqb-ht-badge--auto">Auto</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="aqb-ht-version-row__actions">
+        {isDeleteConfirm ? (
+          <>
+            <button
+              onClick={onDeleteConfirm}
+              className="aqb-ht-btn aqb-ht-btn--danger"
+              aria-label="Confirm delete"
+            >
+              Delete
+            </button>
+            <button
+              onClick={onDeleteCancel}
+              className="aqb-ht-btn aqb-ht-btn--ghost"
+              aria-label="Cancel delete"
+            >
+              ×
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={onRestore}
+              className="aqb-ht-btn aqb-ht-btn--restore"
+              disabled={isRestoring}
+              aria-label={`Restore version "${version.name}"`}
+            >
+              {isRestoring ? "..." : "Restore"}
+            </button>
+            <button
+              onClick={onDeleteRequest}
+              className="aqb-ht-btn aqb-ht-btn--ghost"
+              aria-label={`Delete version "${version.name}"`}
+            >
+              ×
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ============================================
+// Main Component
+// ============================================
+
+export function VersionHistoryPanel({
   composer,
   searchQuery = "",
-}) => {
-  const [versions, setVersions] = React.useState<NamedVersion[]>([]);
+}: {
+  composer: Composer | null;
+  searchQuery?: string;
+}) {
+  const { versions, isAvailable, isLoading, createVersion, restoreVersion, deleteVersion } =
+    useVersionHistory(composer);
+
+  // Save form state
   const [showSaveForm, setShowSaveForm] = React.useState(false);
   const [newVersionName, setNewVersionName] = React.useState("");
-  const [restoring, setRestoring] = React.useState<string | null>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isSaving, setIsSaving] = React.useState(false);
+
+  // Restore confirmation state
+  const [restoreConfirmId, setRestoreConfirmId] = React.useState<string | null>(null);
+
+  // Delete confirmation state
   const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
 
-  // Load versions
-  React.useEffect(() => {
-    if (!composer?.versionHistory) return;
-    const loadVersions = () => setVersions(composer.versionHistory.getVersions());
-    loadVersions();
-    composer.on(EVENTS.VERSION_LIST_UPDATED, loadVersions);
-    return () => {
-      composer.off(EVENTS.VERSION_LIST_UPDATED, loadVersions);
-    };
-  }, [composer]);
+  // Restoring state
+  const [restoringId, setRestoringId] = React.useState<string | null>(null);
 
+  // Handle create version
   const handleCreateVersion = async () => {
-    if (!composer?.versionHistory || !newVersionName.trim()) return;
-    setIsLoading(true);
-    await composer.versionHistory.createVersion(newVersionName.trim());
+    if (!newVersionName.trim()) return;
+    setIsSaving(true);
+    await createVersion(newVersionName.trim());
     setNewVersionName("");
     setShowSaveForm(false);
-    setIsLoading(false);
+    setIsSaving(false);
   };
 
+  // Handle save form key down
   const handleSaveFormKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") handleCreateVersion();
     if (e.key === "Escape") {
@@ -111,16 +196,37 @@ export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
     }
   };
 
-  const handleRestore = async (version: NamedVersion) => {
-    if (!composer?.versionHistory) return;
-    setRestoring(version.id);
-    await composer.versionHistory.restoreVersion(version.id);
-    setRestoring(null);
+  // Handle restore click (shows inline confirmation)
+  const handleRestoreClick = (versionId: string) => {
+    setRestoreConfirmId(versionId);
   };
 
-  const handleDelete = async (versionId: string) => {
-    if (!composer?.versionHistory) return;
-    await composer.versionHistory.deleteVersion(versionId);
+  // Handle restore confirm
+  const handleRestoreConfirm = async (versionId: string) => {
+    setRestoreConfirmId(null);
+    setRestoringId(versionId);
+    await restoreVersion(versionId);
+    setRestoringId(null);
+  };
+
+  // Handle restore cancel
+  const handleRestoreCancel = () => {
+    setRestoreConfirmId(null);
+  };
+
+  // Handle delete request
+  const handleDeleteRequest = (versionId: string) => {
+    setDeleteConfirmId(versionId);
+  };
+
+  // Handle delete confirm
+  const handleDeleteConfirm = async (versionId: string) => {
+    setDeleteConfirmId(null);
+    await deleteVersion(versionId);
+  };
+
+  // Handle delete cancel
+  const handleDeleteCancel = () => {
     setDeleteConfirmId(null);
   };
 
@@ -128,19 +234,30 @@ export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
   const filteredVersions = React.useMemo(() => {
     if (!searchQuery.trim()) return versions;
     const query = searchQuery.toLowerCase();
-    return versions.filter(
-      (v) =>
-        v.name.toLowerCase().includes(query) ||
-        getDateGroup(v.createdAt).toLowerCase().includes(query) ||
-        formatTime(v.createdAt).includes(query)
-    );
+    return versions.filter((v) => v.name.toLowerCase().includes(query));
   }, [versions, searchQuery]);
 
-  if (!composer?.versionHistory?.isAvailable()) {
+  // Group versions by date
+  const groupedVersions = React.useMemo(() => {
+    const groups = new Map<string, typeof versions>();
+    for (const v of filteredVersions) {
+      const group = getDateGroup(v.createdAt);
+      if (!groups.has(group)) groups.set(group, []);
+      groups.get(group)!.push(v);
+    }
+    return groups;
+  }, [filteredVersions]);
+
+  if (!isAvailable) {
     return (
-      <div style={containerStyles}>
+      <div className="aqb-ht-version-panel">
         <EmptyState
-          icon="📋"
+          icon={
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <circle cx="16" cy="16" r="12" />
+              <path d="M16 10v6l4 2" />
+            </svg>
+          }
           message="Version history appears here as you save changes."
           hint="Use Ctrl+Z for undo. Saved versions persist across sessions."
         />
@@ -148,77 +265,114 @@ export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
     );
   }
 
-  const groupedVersions = groupVersionsByDate(filteredVersions);
-
   return (
-    <div style={containerStyles}>
-      {/* Save Version Button / Inline Form */}
-      <div style={createRowStyles}>
+    <div className="aqb-ht-version-panel">
+      {/* Save Version FAB / Inline Form */}
+      <div className="aqb-ht-version-panel__header">
         {showSaveForm ? (
-          <div style={saveFormStyles}>
+          <div className="aqb-ht-save-form">
             <input
               type="text"
               value={newVersionName}
               onChange={(e) => setNewVersionName(e.target.value)}
               onKeyDown={handleSaveFormKeyDown}
               placeholder="Version name (e.g. 'Before header redesign')"
-              style={inputStyles}
+              className="aqb-ht-save-form__input"
               autoFocus
+              maxLength={50}
             />
-            <div style={saveFormActionsStyles}>
+            <div className="aqb-ht-save-form__actions">
               <button
                 onClick={() => {
                   setShowSaveForm(false);
                   setNewVersionName("");
                 }}
-                style={cancelBtnStyles}
+                className="aqb-ht-btn aqb-ht-btn--ghost"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateVersion}
-                style={saveBtnStyles}
-                disabled={!newVersionName.trim() || isLoading}
+                className="aqb-ht-btn aqb-ht-btn--primary"
+                disabled={!newVersionName.trim() || isSaving}
               >
-                {isLoading ? "Saving..." : "Save"}
+                {isSaving ? "Saving..." : "Save"}
               </button>
             </div>
           </div>
         ) : (
-          <button onClick={() => setShowSaveForm(true)} style={createButtonStyles}>
-            <PlusIcon /> Save Version
+          <button
+            onClick={() => setShowSaveForm(true)}
+            className="aqb-ht-fab"
+            aria-label="Save version"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M7 3v8M3 7h8" />
+            </svg>
+            Save Version
           </button>
         )}
       </div>
 
       {/* Version List */}
-      <div style={listContainerStyles}>
+      <div className="aqb-ht-version-list">
         {filteredVersions.length === 0 ? (
           <EmptyState
-            icon={versions.length === 0 ? "📸" : "🔍"}
-            message={versions.length === 0 ? "No versions yet" : "No matching versions"}
+            icon={
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <rect x="8" y="6" width="16" height="20" rx="2" />
+                <path d="M12 12h8M12 16h8M12 20h4" />
+              </svg>
+            }
+            message={versions.length === 0 ? "No saved versions yet" : "No matching versions"}
             hint={
-              versions.length === 0
-                ? "Save a version when you reach a milestone."
-                : "Try a different search term."
+              versions.length === 0 ? (
+                <>
+                  Save Version creates a named milestone you can restore anytime.
+                </>
+              ) : (
+                "Try a different search term."
+              )
             }
           />
         ) : (
           Array.from(groupedVersions.entries()).map(([dateGroup, groupVersions]) => (
-            <div key={dateGroup} style={dateGroupStyles}>
-              <div style={dateGroupHeaderStyles}>{dateGroup}</div>
+            <div key={dateGroup} className="aqb-ht-version-group">
+              <div className="aqb-ht-version-group__label">{dateGroup}</div>
               {groupVersions.map((version) => (
-                <VersionRow
-                  key={version.id}
-                  version={version}
-                  isRestoring={restoring === version.id}
-                  isDeleteConfirm={deleteConfirmId === version.id}
-                  onRestore={() => handleRestore(version)}
-                  onDeleteRequest={() => setDeleteConfirmId(version.id)}
-                  onDeleteConfirm={() => handleDelete(version.id)}
-                  onDeleteCancel={() => setDeleteConfirmId(null)}
-                  composer={composer}
-                />
+                <div key={version.id}>
+                  {/* Inline restore confirmation */}
+                  {restoreConfirmId === version.id && (
+                    <div className="aqb-ht-inline-confirm aqb-ht-inline-confirm--restore">
+                      <span className="aqb-ht-inline-confirm__text">
+                        Restore to "{version.name}"?
+                      </span>
+                      <button
+                        onClick={() => handleRestoreConfirm(version.id)}
+                        className="aqb-ht-btn aqb-ht-btn--danger"
+                      >
+                        Restore
+                      </button>
+                      <button
+                        onClick={handleRestoreCancel}
+                        className="aqb-ht-btn aqb-ht-btn--ghost"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+
+                  <VersionRow
+                    version={version}
+                    isRestoring={restoringId === version.id}
+                    isDeleteConfirm={deleteConfirmId === version.id}
+                    onRestore={() => handleRestoreClick(version.id)}
+                    onDeleteRequest={() => handleDeleteRequest(version.id)}
+                    onDeleteConfirm={() => handleDeleteConfirm(version.id)}
+                    onDeleteCancel={handleDeleteCancel}
+                    elementCount={0}
+                  />
+                </div>
               ))}
             </div>
           ))
@@ -226,582 +380,4 @@ export const VersionHistoryPanel: React.FC<VersionHistoryPanelProps> = ({
       </div>
     </div>
   );
-};
-
-// ============================================
-// Version Row Component
-// ============================================
-
-interface VersionRowProps {
-  version: NamedVersion;
-  isRestoring: boolean;
-  isDeleteConfirm: boolean;
-  onRestore: () => void;
-  onDeleteRequest: () => void;
-  onDeleteConfirm: () => void;
-  onDeleteCancel: () => void;
-  composer: Composer | null;
 }
-
-const VersionRow: React.FC<VersionRowProps> = ({
-  version,
-  isRestoring,
-  isDeleteConfirm,
-  onRestore,
-  onDeleteRequest,
-  onDeleteConfirm,
-  onDeleteCancel,
-  composer,
-}) => {
-  const elementCount = countElements(version);
-  const relative = relativeTime(version.createdAt);
-
-  // Inline restore confirm state
-  const [restoreConfirm, setRestoreConfirm] = React.useState(false);
-
-  // Compare diff state
-  const [showCompare, setShowCompare] = React.useState(false);
-  const [compareResult, setCompareResult] = React.useState<{
-    available: boolean;
-    summary?: string;
-    changes?: Array<{ name: string; what: string }>;
-  } | null>(null);
-
-  const handleRestoreClick = () => {
-    setRestoreConfirm(true);
-  };
-
-  const handleRestoreConfirm = () => {
-    setRestoreConfirm(false);
-    onRestore();
-  };
-
-  const handleRestoreCancel = () => {
-    setRestoreConfirm(false);
-  };
-
-  const handleCompare = () => {
-    if (showCompare) {
-      setShowCompare(false);
-      return;
-    }
-
-    // Check if compareVersions method exists
-    const currentVersions = composer?.versionHistory?.getVersions() ?? [];
-    const currentId = currentVersions[0]?.id;
-
-    const compareMethod = (composer?.versionHistory as Record<string, unknown> | undefined)
-      ?.compareVersions;
-    if (typeof compareMethod === "function" && currentId) {
-      try {
-        const result = (
-          compareMethod as (a: string, b: string) => { changedCount: number; changes: Array<{ elementName: string; description: string }> }
-        )(currentId, version.id);
-        setCompareResult({
-          available: true,
-          summary: `Changed ${result.changedCount ?? 0} elements`,
-          changes: (result.changes ?? []).map((c) => ({
-            name: c.elementName ?? "Unknown",
-            what: c.description ?? "",
-          })),
-        });
-      } catch {
-        setCompareResult({ available: false });
-      }
-    } else {
-      setCompareResult({ available: false });
-    }
-
-    setShowCompare(true);
-  };
-
-  return (
-    <div
-      style={versionRowStyles}
-      aria-label={`Version "${version.name}" from ${relative}${elementCount > 0 ? `, ${elementCount} elements` : ""}${version.isAutoCheckpoint ? ", auto-saved" : ""}`}
-    >
-      {/* Main row content */}
-      <div style={versionRowLeftStyles}>
-        <div style={avatarStyles}>
-          <UserIcon />
-        </div>
-        <div style={versionInfoStyles}>
-          <div style={versionNameStyles}>{version.name}</div>
-          <div style={versionMetaStyles}>
-            {formatTime(version.createdAt)}
-            <span style={{ color: "var(--aqb-text-muted)", fontSize: 12 }}>{relative}</span>
-            {elementCount > 0 && (
-              <span style={changeBadgeStyles} aria-label={`${elementCount} elements`}>
-                {elementCount} el
-              </span>
-            )}
-            {version.isAutoCheckpoint && <span style={autoBadgeStyles}>Auto</span>}
-          </div>
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div style={versionActionsStyles}>
-        {restoreConfirm ? (
-          <>
-            <button
-              onClick={handleRestoreConfirm}
-              style={restoreConfirmBtnStyles}
-              disabled={isRestoring}
-              aria-label="Confirm restore"
-            >
-              {isRestoring ? "..." : "Confirm restore"}
-            </button>
-            <button
-              onClick={handleRestoreCancel}
-              style={restoreCancelBtnStyles}
-              aria-label="Cancel restore"
-            >
-              Cancel
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              onClick={handleCompare}
-              style={compareBtnStyles}
-              title="Compare with current"
-              aria-label={`Compare version "${version.name}"`}
-            >
-              {showCompare ? "Close" : "Compare"}
-            </button>
-            <button
-              onClick={handleRestoreClick}
-              style={restoreBtnStyles}
-              disabled={isRestoring}
-              aria-label={`Restore version "${version.name}"`}
-            >
-              {isRestoring ? "..." : "Restore"}
-            </button>
-            {isDeleteConfirm ? (
-              <>
-                <button
-                  onClick={onDeleteConfirm}
-                  style={deleteConfirmBtnStyles}
-                  aria-label="Confirm delete"
-                >
-                  Delete
-                </button>
-                <button
-                  onClick={onDeleteCancel}
-                  style={deleteCancelBtnStyles}
-                  aria-label="Cancel delete"
-                >
-                  ×
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={onDeleteRequest}
-                style={deleteBtnStyles}
-                title="Delete"
-                aria-label={`Delete version "${version.name}"`}
-              >
-                ×
-              </button>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* Inline Compare Diff View */}
-      {showCompare && compareResult && (
-        <div style={compareViewStyles}>
-          {compareResult.available ? (
-            <>
-              <div style={compareSummaryStyles}>{compareResult.summary}</div>
-              {compareResult.changes && compareResult.changes.length > 0 ? (
-                <div style={compareListStyles}>
-                  {compareResult.changes.map((change, idx) => (
-                    <div key={idx} style={compareItemStyles}>
-                      <span style={compareItemNameStyles}>{change.name}</span>
-                      <span style={compareItemWhatStyles}>{change.what}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div style={compareNoChangesStyles}>No differences found</div>
-              )}
-            </>
-          ) : (
-            <span style={compareUnavailableStyles}>Compare not available</span>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ============================================
-// Empty State
-// ============================================
-
-interface EmptyStateProps {
-  icon: string;
-  message: string;
-  hint?: string;
-}
-
-const EmptyState: React.FC<EmptyStateProps> = ({ icon, message, hint }) => (
-  <div style={emptyStateStyles}>
-    <span style={emptyIconStyles}>{icon}</span>
-    <p style={emptyMessageStyles}>{message}</p>
-    {hint && <p style={emptyHintStyles}>{hint}</p>}
-  </div>
-);
-
-// ============================================
-// Icons
-// ============================================
-
-const PlusIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M7 3v8M3 7h8" />
-  </svg>
-);
-
-const UserIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-    <circle cx="6" cy="4" r="2" />
-    <path d="M2 11a4 4 0 0 1 8 0" />
-  </svg>
-);
-
-// ============================================
-// Styles
-// ============================================
-
-const containerStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  height: "100%",
-  background: "var(--aqb-surface-2)",
-  color: "var(--aqb-text-primary)",
-  fontSize: 12,
-};
-
-const createRowStyles: React.CSSProperties = {
-  padding: "12px",
-  borderBottom: "1px solid var(--aqb-border)",
-};
-
-const saveFormStyles: React.CSSProperties = {
-  background: "var(--aqb-surface-3)",
-  border: "1px solid var(--aqb-border)",
-  borderRadius: "var(--aqb-radius-md, 8px)",
-  padding: "10px",
-  display: "flex",
-  flexDirection: "column",
-  gap: 8,
-};
-
-const saveFormActionsStyles: React.CSSProperties = {
-  display: "flex",
-  gap: 8,
-  justifyContent: "flex-end",
-};
-
-const createButtonStyles: React.CSSProperties = {
-  width: "100%",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: 6,
-  padding: "10px 16px",
-  background: "var(--aqb-primary)",
-  color: "#fff",
-  border: "none",
-  borderRadius: 8,
-  cursor: "pointer",
-  fontSize: 12,
-  fontWeight: 600,
-};
-
-const listContainerStyles: React.CSSProperties = {
-  flex: 1,
-  overflowY: "auto",
-  padding: 12,
-};
-
-const dateGroupStyles: React.CSSProperties = { marginBottom: 16 };
-
-const dateGroupHeaderStyles: React.CSSProperties = {
-  padding: "4px 0 8px",
-  fontSize: 11,
-  fontWeight: 600,
-  color: "var(--aqb-text-muted)",
-  textTransform: "uppercase",
-  letterSpacing: "0.5px",
-};
-
-const versionRowStyles: React.CSSProperties = {
-  display: "flex",
-  flexWrap: "wrap",
-  alignItems: "center",
-  justifyContent: "space-between",
-  padding: "10px 12px",
-  marginBottom: 6,
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid var(--aqb-border)",
-  borderRadius: 10,
-  minHeight: 56,
-  gap: 8,
-};
-
-const versionRowLeftStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 10,
-  flex: 1,
-  minWidth: 0,
-};
-
-const avatarStyles: React.CSSProperties = {
-  width: 24,
-  height: 24,
-  borderRadius: "50%",
-  background: "var(--aqb-surface-4)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "var(--aqb-text-muted)",
-  flexShrink: 0,
-};
-
-const versionInfoStyles: React.CSSProperties = { flex: 1, minWidth: 0 };
-
-const versionNameStyles: React.CSSProperties = {
-  fontSize: 13,
-  fontWeight: 600,
-  color: "var(--aqb-text-primary)",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  whiteSpace: "nowrap",
-};
-
-const versionMetaStyles: React.CSSProperties = {
-  fontSize: 12,
-  color: "var(--aqb-text-muted)",
-  display: "flex",
-  alignItems: "center",
-  gap: 6,
-};
-
-const changeBadgeStyles: React.CSSProperties = {
-  padding: "1px 6px",
-  background: "rgba(99,102,241,0.12)",
-  color: "var(--aqb-primary)",
-  borderRadius: 4,
-  fontSize: 12,
-  fontWeight: 500,
-};
-
-const autoBadgeStyles: React.CSSProperties = {
-  padding: "1px 4px",
-  background: "rgba(255,255,255,0.08)",
-  borderRadius: 4,
-  fontSize: 12,
-  textTransform: "uppercase",
-};
-
-const versionActionsStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 6,
-  flexShrink: 0,
-  flexWrap: "wrap",
-};
-
-const restoreBtnStyles: React.CSSProperties = {
-  padding: "5px 10px",
-  background: "rgba(124,125,255,0.15)",
-  color: "var(--aqb-primary)",
-  border: "1px solid rgba(124,125,255,0.3)",
-  borderRadius: 6,
-  cursor: "pointer",
-  fontSize: 12,
-  fontWeight: 500,
-};
-
-const restoreConfirmBtnStyles: React.CSSProperties = {
-  padding: "5px 10px",
-  background: "var(--aqb-error, #ef4444)",
-  color: "#fff",
-  border: "none",
-  borderRadius: 6,
-  cursor: "pointer",
-  fontSize: 12,
-  fontWeight: 600,
-};
-
-const restoreCancelBtnStyles: React.CSSProperties = {
-  padding: "5px 10px",
-  background: "transparent",
-  color: "var(--aqb-text-secondary)",
-  border: "1px solid var(--aqb-border)",
-  borderRadius: 6,
-  cursor: "pointer",
-  fontSize: 12,
-};
-
-const compareBtnStyles: React.CSSProperties = {
-  padding: "5px 8px",
-  background: "transparent",
-  color: "var(--aqb-text-muted)",
-  border: "1px solid var(--aqb-border)",
-  borderRadius: 6,
-  cursor: "pointer",
-  fontSize: 11,
-};
-
-const deleteBtnStyles: React.CSSProperties = {
-  padding: "5px 8px",
-  background: "transparent",
-  color: "var(--aqb-text-muted)",
-  border: "none",
-  borderRadius: 4,
-  cursor: "pointer",
-  fontSize: 14,
-};
-
-const deleteConfirmBtnStyles: React.CSSProperties = {
-  padding: "5px 8px",
-  background: "var(--aqb-error, #ef4444)",
-  color: "#fff",
-  border: "none",
-  borderRadius: 4,
-  cursor: "pointer",
-  fontSize: 11,
-  fontWeight: 600,
-};
-
-const deleteCancelBtnStyles: React.CSSProperties = {
-  padding: "5px 8px",
-  background: "transparent",
-  color: "var(--aqb-text-muted)",
-  border: "none",
-  borderRadius: 4,
-  cursor: "pointer",
-  fontSize: 14,
-};
-
-// Compare diff view — full-width row below the version row content
-const compareViewStyles: React.CSSProperties = {
-  width: "100%",
-  background: "var(--aqb-surface-2)",
-  border: "1px solid var(--aqb-border)",
-  borderRadius: "var(--aqb-radius-md, 8px)",
-  padding: 12,
-  marginTop: 4,
-};
-
-const compareSummaryStyles: React.CSSProperties = {
-  fontSize: 12,
-  fontWeight: 600,
-  color: "var(--aqb-text-secondary)",
-  marginBottom: 8,
-};
-
-const compareListStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 4,
-};
-
-const compareItemStyles: React.CSSProperties = {
-  display: "flex",
-  gap: 8,
-  fontSize: 12,
-  alignItems: "baseline",
-};
-
-const compareItemNameStyles: React.CSSProperties = {
-  color: "var(--aqb-text-primary)",
-  fontWeight: 500,
-  flexShrink: 0,
-};
-
-const compareItemWhatStyles: React.CSSProperties = {
-  color: "var(--aqb-text-muted)",
-};
-
-const compareNoChangesStyles: React.CSSProperties = {
-  fontSize: 12,
-  color: "var(--aqb-text-muted)",
-};
-
-const compareUnavailableStyles: React.CSSProperties = {
-  fontSize: 12,
-  color: "var(--aqb-text-muted)",
-  fontStyle: "italic",
-};
-
-const emptyStateStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  padding: 32,
-  color: "var(--aqb-text-muted)",
-  textAlign: "center",
-};
-
-const emptyIconStyles: React.CSSProperties = {
-  width: 48,
-  height: 48,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  background: "rgba(255,255,255,0.05)",
-  borderRadius: 12,
-  marginBottom: 12,
-  fontSize: 24,
-};
-
-const emptyMessageStyles: React.CSSProperties = {
-  fontSize: 13,
-  fontWeight: 500,
-  color: "var(--aqb-text-secondary)",
-};
-
-const emptyHintStyles: React.CSSProperties = { fontSize: 12, marginTop: 4 };
-
-const inputStyles: React.CSSProperties = {
-  width: "100%",
-  padding: "8px 10px",
-  background: "rgba(255,255,255,0.05)",
-  border: "1px solid var(--aqb-border)",
-  borderRadius: 6,
-  color: "var(--aqb-text-primary)",
-  fontSize: 12,
-  outline: "none",
-  boxSizing: "border-box",
-};
-
-const cancelBtnStyles: React.CSSProperties = {
-  padding: "6px 12px",
-  background: "transparent",
-  color: "var(--aqb-text-secondary)",
-  border: "1px solid var(--aqb-border)",
-  borderRadius: 6,
-  cursor: "pointer",
-  fontSize: 12,
-};
-
-const saveBtnStyles: React.CSSProperties = {
-  padding: "6px 12px",
-  background: "var(--aqb-primary)",
-  color: "#fff",
-  border: "none",
-  borderRadius: 6,
-  cursor: "pointer",
-  fontSize: 12,
-  fontWeight: 600,
-};
-
-export default VersionHistoryPanel;

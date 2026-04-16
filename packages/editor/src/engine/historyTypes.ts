@@ -9,6 +9,15 @@
 import type { ProjectData } from "../shared/types";
 import type { Patch } from "./utils/JsonPatch";
 
+// ============================================
+// Change Classification Types
+// ============================================
+
+/**
+ * Classification categories for version comparisons
+ */
+export type ChangeType = "style" | "text" | "layout" | "content" | "other";
+
 /**
  * History entry types
  */

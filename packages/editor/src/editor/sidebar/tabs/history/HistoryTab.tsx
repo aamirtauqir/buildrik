@@ -1,18 +1,20 @@
 /**
  * HistoryTab - Version history and activity log
- * Uses View Switcher pattern for Versions/Activity views
- * Features expandable diff preview in Undo History view
+ * Uses View Switcher pattern for Saves/Changes views
+ * Phase 3: Uses custom hooks, renamed tabs, helper text
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { EVENTS } from "../../../../shared/constants";
+import { useHistoryState } from "../../../../shared/hooks/useHistoryState";
+import { useVersionHistory } from "../../../../shared/hooks/useVersionHistory";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
 import { PanelHeader } from "../../shared/PanelHeader";
 import { SearchBar } from "../../shared/SearchBar";
 import { ViewSwitcher, type ViewOption } from "../../shared/ViewSwitcher";
 import { ActivityView } from "./components/ActivityView";
-import { VersionsIcon, ActivityIcon, ClearIcon } from "./icons";
+import { VersionsIcon, ActivityIcon, ClearIcon, TimeTravelIcon } from "./icons";
 import type { HistoryView, HistoryTabProps } from "./types";
 
 // ============================================
@@ -21,16 +23,25 @@ import type { HistoryView, HistoryTabProps } from "./types";
 
 const VIEW_OPTIONS: ViewOption<HistoryView>[] = [
   {
-    id: "versions",
-    label: "Versions",
+    id: "saves",
+    label: "Saves",
     icon: <VersionsIcon />,
   },
   {
-    id: "activity",
-    label: "Activity",
+    id: "changes",
+    label: "Changes",
     icon: <ActivityIcon />,
   },
 ];
+
+// ============================================
+// Helpers
+// ============================================
+
+const HELPER_TEXT: Record<HistoryView, string> = {
+  saves: "Named milestones you've saved. Compare or restore anytime.",
+  changes: "Your recent edits. Use Ctrl+Z to undo.",
+};
 
 // ============================================
 // Component
@@ -46,24 +57,23 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
 }) => {
   const storageKey = `aqb-history-view${projectId ? `-${projectId}` : ""}`;
 
+  // Use custom hooks
+  const { canUndo, clear } = useHistoryState(composer);
+
   // View state with persistence
   const [activeView, setActiveView] = React.useState<HistoryView>(() => {
-    if (typeof window === "undefined") return "versions";
+    if (typeof window === "undefined") return "saves";
     try {
       const stored = window.localStorage.getItem(storageKey);
-      if (stored === "versions" || stored === "activity") return stored;
+      if (stored === "saves" || stored === "changes") return stored;
     } catch {
       // Ignore storage errors
     }
-    return "versions";
+    return "saves";
   });
 
   // Search state
   const [searchQuery, setSearchQuery] = React.useState("");
-
-  // canUndo gates the Clear-History button (no point clearing an empty
-  // history). canRedo dropped — only used by removed redo button (CAN-012).
-  const [canUndo, setCanUndo] = React.useState(false);
 
   // Clear confirmation inline state
   const [showClearConfirm, setShowClearConfirm] = React.useState(false);
@@ -78,43 +88,11 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
     }
   }, [activeView, storageKey]);
 
-  // Update undo/redo state based on composer history
-  React.useEffect(() => {
-    if (!composer?.history) return;
-
-    const updateUndoRedoState = () => {
-      setCanUndo(composer.history.canUndo());
-    };
-
-    // Initial state
-    updateUndoRedoState();
-
-    // Listen for history changes
-    composer.on(EVENTS.HISTORY_RECORDED, updateUndoRedoState);
-    composer.on(EVENTS.HISTORY_UNDO, updateUndoRedoState);
-    composer.on(EVENTS.HISTORY_REDO, updateUndoRedoState);
-    composer.on(EVENTS.HISTORY_CLEARED, updateUndoRedoState);
-
-    return () => {
-      composer.off(EVENTS.HISTORY_RECORDED, updateUndoRedoState);
-      composer.off(EVENTS.HISTORY_UNDO, updateUndoRedoState);
-      composer.off(EVENTS.HISTORY_REDO, updateUndoRedoState);
-      composer.off(EVENTS.HISTORY_CLEARED, updateUndoRedoState);
-    };
-  }, [composer]);
-
-  // Note: undo/redo handlers removed (CAN-012). The global top-bar owns
-  // those actions; per-version Compare/Restore lives in the version list.
-
   // Clear history handler with confirmation
   const handleClearHistory = React.useCallback(() => {
-    if (composer?.history) {
-      composer.history.clear();
-      // Record initial state after clear so undo works again
-      composer.history.forceCheckpoint("Cleared history");
-      setShowClearConfirm(false);
-    }
-  }, [composer]);
+    clear();
+    setShowClearConfirm(false);
+  }, [clear]);
 
   return (
     <div className="aqb-history-container">
@@ -127,10 +105,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         onClose={onClose}
       />
 
-      {/* Controls: Search + Clear + View Switcher.
-          Undo/Redo intentionally omitted — the global top-bar provides the
-          single source of truth for those actions (CAN-012). Compare/Restore
-          per-version actions live in the version list below. */}
+      {/* Controls: Search + Clear + View Switcher */}
       <div className="aqb-ht-controls">
         {/* Clear History row */}
         <div className="aqb-ht-undo-row">
@@ -175,7 +150,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         <SearchBar
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder={activeView === "versions" ? "Search versions..." : "Search activity..."}
+          placeholder={activeView === "saves" ? "Search saves..." : "Search changes..."}
         />
 
         {/* View Switcher */}
@@ -185,15 +160,18 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           onChange={setActiveView}
           fullWidth
         />
+
+        {/* Helper text */}
+        <p className="aqb-ht-helper-text">{HELPER_TEXT[activeView]}</p>
       </div>
 
       {/* Content */}
       <div className="aqb-ht-content">
-        {activeView === "versions" && (
+        {activeView === "saves" && (
           <VersionHistoryPanel composer={composer} searchQuery={searchQuery} />
         )}
 
-        {activeView === "activity" && (
+        {activeView === "changes" && (
           <ActivityView composer={composer} searchQuery={searchQuery} />
         )}
       </div>

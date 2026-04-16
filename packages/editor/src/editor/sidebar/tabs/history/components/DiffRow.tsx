@@ -12,10 +12,10 @@ interface DiffRowProps {
 }
 
 const opColors: Record<string, string> = {
-  add: "var(--aqb-success, #10b981)",
+  add: "var(--aqb-success, #22c55e)",
   remove: "var(--aqb-error, #ef4444)",
-  replace: "var(--aqb-primary, #7c7dff)",
-  info: "var(--aqb-text-muted)",
+  replace: "var(--aqb-primary, #2d6dff)",
+  info: "var(--aqb-text-muted, #908D85)",
 };
 
 const opIcons: Record<string, string> = {

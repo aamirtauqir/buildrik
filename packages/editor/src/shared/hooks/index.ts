@@ -22,6 +22,14 @@ export { usePublish } from "./usePublish";
 // Form handler hook (composer-backed form registration + submission)
 export { useFormHandler } from "./useFormHandler";
 export type { UseFormHandlerResult } from "./useFormHandler";
+
+// History tab hooks
+export { useHistoryState } from "./useHistoryState";
+export type { UseHistoryStateReturn } from "./useHistoryState";
+export { useVersionHistory } from "./useVersionHistory";
+export type { UseVersionHistoryReturn } from "./useVersionHistory";
+export { useSemanticDiff } from "./useSemanticDiff";
+export type { CompareResult, UseSemanticDiffReturn } from "./useSemanticDiff";
 export type {
   UsePublishReturn,
   UsePublishOptions,

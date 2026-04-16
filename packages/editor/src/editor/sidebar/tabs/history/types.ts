@@ -5,7 +5,7 @@
 
 import type { Composer } from "../../../../engine";
 
-export type HistoryView = "versions" | "activity";
+export type HistoryView = "saves" | "changes";
 
 export interface HistoryTabProps {
   /** Composer instance */

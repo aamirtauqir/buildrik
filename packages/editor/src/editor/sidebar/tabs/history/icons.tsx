@@ -103,3 +103,37 @@ export function ChevronIcon({ expanded }: { expanded: boolean }) {
     </svg>
   );
 }
+
+export function SaveIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <path d="M11 13H3a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h6l3 3v8a1 1 0 0 1-1 1z" />
+      <path d="M4 13V8h6v5" />
+      <path d="M5 5h4" />
+    </svg>
+  );
+}
+
+export function TimeTravelIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <circle cx="7" cy="7" r="5" />
+      <path d="M7 4v3l2 1" />
+      <path d="M5 9.5l-1.5 1.5L5 12.5" />
+    </svg>
+  );
+}

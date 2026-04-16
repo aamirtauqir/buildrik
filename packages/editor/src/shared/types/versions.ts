@@ -132,3 +132,39 @@ export interface VersionExportPayload {
   count: number;
   filename?: string;
 }
+
+// ============================================
+// Compare Result Types
+// ============================================
+
+import type { ChangeType } from "../../engine/historyTypes";
+
+/**
+ * A single change detected between two versions
+ */
+export interface VersionChange {
+  type: ChangeType;
+  property: string;
+  before: string;
+  after: string;
+}
+
+/**
+ * Summary counts of changes by type
+ */
+export interface CompareSummary {
+  style: number;
+  text: number;
+  layout: number;
+  content: number;
+  other: number;
+}
+
+/**
+ * Result of comparing two version snapshots
+ */
+export interface CompareResult {
+  elementName: string;
+  changes: VersionChange[];
+  summary: CompareSummary;
+}
