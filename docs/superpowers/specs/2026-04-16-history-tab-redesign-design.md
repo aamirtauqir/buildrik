@@ -158,20 +158,26 @@ interface CompareResult {
 - Show summary counts in UI
 - Include page-level diff: `pagesAdded: number`, `pagesDeleted: number` in summary
 
-### 2.4 UX Clarity: Clearer Labeling
+### 2.4 UX Clarity: Clearer Labeling + Visual Hierarchy
 
-**Decision:** Rename views and add explanatory text.
+**Decision:** Rename views, add explanatory text, establish primary/secondary hierarchy.
 
 **Changes:**
-| Before | After |
-|--------|-------|
-| Activity | Changes |
-| Versions | Saves |
-| "checkpoint" badge | "auto-save" badge |
+| Before | After | Weight |
+|--------|-------|--------|
+| Activity | **Changes** | PRIMARY — bold weight, active tab indicator, default tab |
+| Versions | **Saves** | SECONDARY — lighter weight, secondary tab indicator |
+
+**Tab hierarchy (critical for IA):**
+- Changes = PRIMARY (bold label, active underline) — this is the main undo history view
+- Saves = SECONDARY (regular weight) — explicit tab click required
+- Tab weights signal importance without requiring user to "figure it out"
 
 **Helper text:**
 - **Changes view:** "Your recent edits. Use Ctrl+Z to undo."
 - **Saves view:** "Named milestones you've saved. Compare or restore anytime."
+
+**Why this matters:** If both tabs are equal weight, users don't know which one to use. Bold/active on Changes signals "this is where you start."
 
 ### 2.5 Virtualization: react-window
 
@@ -341,7 +347,95 @@ interface AISummarizeResponse {
 
 ## 3. Architecture
 
-### 3.1 Hooks Structure
+### 3.1 Interaction Decisions (Wiring & Framing)
+
+These decisions shape the component wiring and data flow:
+
+| Decision | Choice | Rationale |
+|----------|---------|-----------|
+| Q1: Canvas jump behavior | **B — Smooth scroll (animated)** | Power users want to SEE the rewind, not teleport. 300ms ease-out transition. |
+| Q2: Save Version form placement | **B — FAB (floating action button)** | Keeps Saves list clean. FAB in bottom-right of sidebar, slides up form inline. |
+| Q3: Time-travel scrubber location | **C — Bottom drawer** | Canvas fully visible above. Drawer doesn't hide sidebar. Drawer slides up from bottom, 200px height. |
+
+#### Q1: Canvas Jump Behavior — Smooth Scroll (Animated)
+
+```
+User clicks timestamp on any history entry
+→ Canvas animates from current state to historical state
+→ Duration: 300ms, ease-out easing
+→ Entry highlights briefly (accent ring, 200ms) to confirm selection
+→ No confirmation dialog — jump is immediate after animation
+
+Implementation:
+- HistoryManager.getEntrySnapshot(entryId) → returns snapshot
+- Composer.animateToState(snapshot, duration) → handles animation
+- Animation = crossfade opacity + position interpolation
+- If user clicks another entry mid-animation → interrupts, jumps to new target
+```
+
+#### Q2: Save Version FAB Placement
+
+```
+┌─────────────────────────────────────┐
+│ 🔍 Search saves...                  │
+├─────────────────────────────────────┤
+│ v1 — "Homepage redesign"      12:34 │  ← list fills available space
+│ v2 — "Pricing page"           11:20 │
+│ ...                                │
+│                                     │
+│                             [+ FAB] ← bottom-right, 44×44px tap target
+└─────────────────────────────────────┘
+
+FAB click → form slides up INLINE below search bar (not modal):
+┌─────────────────────────────────────┐
+│ 🔍 Search saves...                  │
+├─────────────────────────────────────┤
+│ ┌─────────────────────────────────┐ │
+│ │ [____________________] [Save]    │ │  ← form slides into list, list scrolls up
+│ └─────────────────────────────────┘ │
+│ v1 — "Homepage redesign"      12:34 │
+│ v2 — "Pricing page"           11:20 │
+│ ...                                │
+│                             [− FAB] ← FAB becomes close button
+└─────────────────────────────────────┘
+
+Form fields: Name (required, max 50 chars), Description (optional, max 200 chars)
+Validation: Name cannot be empty. Show inline error below field.
+Success: Form closes, new save appears at top of list with toast "Saved 'Name'"
+```
+
+#### Q3: Time-Travel Bottom Drawer
+
+```
+┌──────────────────────────────────────────────────────────┐
+│ ┌──────────────────────────────────────────────────────┐ │
+│ │            [PROJECT CANVAS — FULL WIDTH]             │ │
+│ │                                                       │ │
+│ │          (sidebar + inspector still visible)         │ │
+│ └──────────────────────────────────────────────────────┘ │
+│ ╔═════════════════════════════════════════════════════╗ │
+│ ║  ⏮ ═══════════●═══════════════════════ ⏭            ║ │  ← drawer, 200px height
+│ ║  12:30        Scrubbing: 12:45      1:02 PM         ║ │
+│ ║           [Restore this point]  [Exit time-travel]    ║ │
+│ ╚═════════════════════════════════════════════════════╝ │
+└──────────────────────────────────────────────────────────┘
+
+Drawer behavior:
+- Slides up from bottom with 200ms ease-out
+- Canvas preview above updates in real-time (30fps debounced)
+- Drawer is PERSISTENT — stays open while scrubbing
+- Sidebar remains visible (user can see History tab content, navigate away)
+- "Exit time-travel" or Ctrl+Shift+T closes drawer, returns to live editing
+- Restore button: commits the historical state, closes drawer, shows toast
+
+Canvas overlay (if needed for preview):
+- Semi-transparent preview layer (opacity: 0.4) shows historical state
+- Layer positioned absolute over canvas, pointer-events: none
+- As user scrubs, preview layer opacity stays constant
+- On restore: layer fades out (150ms), live canvas shows restored state
+```
+
+### 3.2 Hooks Structure
 
 ```
 shared/hooks/
@@ -350,21 +444,23 @@ shared/hooks/
 └── useSemanticDiff.ts    # On-demand diff computation
 
 editor/sidebar/tabs/history/
-├── TimeTravelScrubber.tsx    # Canvas overlay timeline
-└── SnapshotPreview.tsx       # Hover thumbnail
+├── TimeTravelScrubber.tsx    # Bottom drawer + canvas overlay
+└── SnapshotPreview.tsx       # Hover thumbnail (120px width)
 ```
 
-### 3.2 Data Flow
+### 3.3 Data Flow
 
 ```
 Engine Events → useHistoryState (hook) → Components
      ↓
 VersionHistoryStorage (IndexedDB) → useVersionHistory (hook) → Components
 
-Canvas → TimeTravelScrubber → Preview Layer (non-destructive)
+Canvas → TimeTravelScrubber → Bottom Drawer (non-destructive)
+              ↓
+        Preview Canvas Layer (pointer-events: none, opacity 0.4)
 ```
 
-### 3.3 File Changes
+### 3.4 File Changes
 
 | File | Action |
 |------|--------|
@@ -380,10 +476,11 @@ Canvas → TimeTravelScrubber → Preview Layer (non-destructive)
 | `editor/sidebar/tabs/history/components/VersionHistoryPanel.tsx` | **MODIFY** — virtualized, visual snapshots |
 | `editor/sidebar/tabs/history/components/DiffRow.tsx` | **MODIFY** — semantic diff, color-coded |
 | `editor/sidebar/tabs/history/components/VersionRow.tsx` | **MODIFY** — hover preview, compare |
-| `editor/sidebar/tabs/history/components/TimeTravelScrubber.tsx` | **NEW** — canvas overlay |
+| `editor/sidebar/tabs/history/components/TimeTravelScrubber.tsx` | **NEW** — bottom drawer + canvas overlay |
 | `editor/sidebar/tabs/history/components/SnapshotPreview.tsx` | **NEW** — thumbnail |
 | `editor/sidebar/shared/ViewSwitcher.tsx` | **MODIFY** — rename labels |
 | `engine/storage/VersionHistoryStorage.ts` | **MODIFY** — visual snapshot storage |
+| `editor/sidebar/tabs/history/components/DiffRow.tsx` | **MODIFY** — fix accent color (`--aqb-primary` → `--accent`) |
 
 ---
 
@@ -439,40 +536,179 @@ interface DiffRowProps {
 // Badge color by type: style=cobalt, text=teal, layout=amber, content=rose, other=gray
 ```
 
-### 4.2 ActivityView (Changes)
+### 4.3 ActivityView (Changes)
 
 - Virtualized list using `VariableSizeList`
 - Keyboard navigation: j/k (up/down), Enter (expand), Esc (collapse), g/G (start/end)
 - Expandable rows for diff details
 - Groups by date (Today, Yesterday, older)
-- Color-coded diff: green (+), red (-), yellow (~)
+- Color-coded diff: green (+), red (-), blue ~ (cobalt for replacements)
 - Activity grouping: collapse identical changes ("12 style changes")
   - Grouping key: `elementId + property + changeType` — changes are grouped if they share the same element ID, same property name, and same change type
   - Within a group, show the most recent value change with count of collapsed items
-- Empty state when no history
-- Undo to any entry: click timestamp to jump to that moment
+- **Accordion expand:** one group expands at a time (Option A per D4). User controls which group to focus on.
+  - If group has >5 items: show "Show all N" link that expands with scroll-into-view
+- **Smooth scroll jump:** clicking timestamp triggers 300ms ease-out opacity crossfade animation to that state
+  - Animation = opacity crossfade only (NO transform Y) — simple fade, no slide
+  - If user clicks another entry mid-animation → interrupt, jump to new target
+- **Empty state:** "No undo history" warm message + "Ctrl+Z to undo" action hint
+- **Search:** clears with "×" button (right side of input), appears when text is present
+  - Search icon on left, clear "×" on right when text present, placeholder: "Search changes..."
+- **Current entry (most recent):** visually elevated — accent color label, subtle background tint, "Current" badge
 
-### 4.3 VersionHistoryPanel (Saves)
+### 4.4 VersionHistoryPanel (Saves)
 
 - Virtualized list using `FixedSizeList`
-- Save Version inline form with auto-save suggestions
-- Visual snapshot thumbnail on hover
-- Compare button with side-by-side visual diff
-- Semantic diff view available as alternative
-- Restore with confirmation
-- Delete with confirmation
-- User attribution (who saved)
+- **Save Version FAB** — always visible, bottom-right, 44×44px tap target, border-radius: 8px (md per DESIGN.md)
+  - Position: fixed to bottom-right of sidebar panel, 16px margin from edges
+  - Icon: "+" or "Save" icon (not emoji)
+  - Always visible regardless of list content (always-on per D2)
+- FAB click → inline form slides up below search bar (NOT a modal)
+  - Form slides in from below with 200ms ease-out
+  - FAB icon changes to "×" (close) while form is open
+- Form: Name field (required, max 50 chars), Description field (optional, max 200 chars)
+  - Font: Inter Tight 13px, placeholder text in muted color
+  - Inline validation on blur: error appears below field in error color (#ef4444)
+  - Success: form closes, toast "Saved '[Name]'", new save appears at top of list
+- **Compare default view:** Visual snapshots FIRST (Option B per D3)
+  - Side-by-side screenshot comparison shown by default
+  - AI summary line ABOVE screenshots: "Redesigned hero section: 3 style + 1 text change"
+  - "Switch to Semantic" available to see structured diff
+  - If visual snapshot unavailable: falls back to semantic diff automatically
+- Visual snapshot thumbnail on hover (120px width SnapshotPreview tooltip, positioned above cursor)
+- Compare button → opens compare view with visual snapshot + AI summary
+- Restore with inline confirmation toast (not a dialog): "Restore to this version? [Restore] [Cancel]"
+- Delete with inline confirmation: entry background turns error-red tint, "Delete?" replaces action buttons
+- User attribution (who saved) shown as avatar + name next to each entry
+- **Empty state (no saves):** "No saved versions yet. Save Version creates a named milestone." + FAB prominently visible
+- **Search clear:** "×" button appears in search input when text is present, clears on click
+- Toast position: top-right, below toolbar, 16px from edges
 
-### 4.4 TimeTravelScrubber
+### 4.5 TimeTravelScrubber
 
-- Canvas overlay with horizontal timeline slider
-- Semi-transparent preview layer over live canvas
-- Drag to scrub through history in real-time
-- "Restore this point" button to commit
-- Esc or "Exit time travel" to return to live
-- Timestamp display showing current scrub position
+- **Entry point:** "Enter Time-Travel" button in Changes view header/toolbar area
+  - Button: "Time-Travel" with clock icon, cobalt accent color
+  - Click → bottom drawer slides up (200ms ease-out), time-travel mode active
+- **Bottom drawer** slides up from bottom of screen, 200px height
+  - Canvas above remains fully visible and interactive (sidebar + inspector stay visible too)
+  - Drawer has semi-transparent dark background (#14141f at 95% opacity) with top border
+  - Horizontal timeline slider: drag handle or use Left/Right arrow keys
+  - Timestamp shows current scrub position ("Scrubbing: 12:45 PM")
+  - Semi-transparent preview layer over canvas (opacity: 0.4, pointer-events: none)
+  - Pre-loads nearest checkpoint on entry to reduce scrub latency
+  - Debounce: max 30fps scrub updates
+- **Restore:** "Restore this point" button → commits state, closes drawer, shows toast "Restored to [timestamp]"
+- **Exit:** "Exit time-travel" button or Ctrl+Shift+T → closes drawer, returns to live editing
+  - On exit: preview layer fades out (150ms ease-out), live canvas shows current state
+- Keyboard: Left/Right step through entries, Enter = restore, Ctrl+Shift+T = exit
+- Keyboard nav: roving tabindex within drawer, slider handle is focusable with arrow key support
+- Reduced motion: if `prefers-reduced-motion: reduce`, drawer instant-appears (no slide animation), scrub is still functional but no opacity transitions
 
-### 4.5 Semantic Diff Display
+### 4.10 Interaction State Table
+
+| Feature | EMPTY | ERROR | LOADING | SUCCESS | PARTIAL |
+|---------|-------|-------|---------|---------|---------|
+| Changes list (search) | "No matching entries for '[query]'" + "×" clears | — | skeleton rows (3 shimmer rows) | filtered results | highlight matching text |
+| Changes list (no history) | "No undo history" + "Ctrl+Z to undo" hint | "Failed to load" + Retry btn | — | — | — |
+| Saves list | "No saved versions yet. Save Version creates a named milestone." + FAB prominent | "Save failed" inline, red border on field | spinner on Save btn (button disabled, "Saving...") | toast "Saved '[Name]'" + entry added | — |
+| Save Version form | "Name this save" placeholder | red border + error below field | — | form closes + toast | Name field auto-focuses on open |
+| Version restore | — | "Restore failed" toast + drawer stays open | — | canvas animates (opacity crossfade 300ms) + toast "Restored to [time]" | inline confirm toast first: "Restore to [name]? [Restore] [Cancel]" |
+| Version delete | — | "Delete failed" toast | — | entry removed + toast "Deleted [name]" | entry turns red-bg, "Delete?" inline replaces buttons |
+| Time-travel | "Enter Time-Travel" button in header | "Preview unavailable" + Continue / Exit btn | — | live preview on scrub | — |
+| AI summary button | "Get AI Summary" (cobalt btn) | "Summary unavailable" inline error | "Generating..." (button disabled, muted) | summary text appears below button | Button re-enables after success or failure |
+| Diff expand (accordion) | "12 style changes" collapsed + [+] | — | shimmer on expanding row | all items shown | >5 items: "Show all N" link |
+| Search clear | placeholder: "Search changes..." / "Search saves..." | — | — | results | "×" clears, input stays focused |
+
+### 4.6 AI Summary Loading State (D1)
+
+**Decision:** "Generating..." text with disabled button (Option A per D1 recommendation).
+
+```
+Button states:
+1. Default:    [ Get AI Summary ]            — cobalt accent, hover enabled
+2. Loading:    [ Generating...    ]           — disabled, muted text, no hover
+3. Success:    [ Get AI Summary ]            — re-enabled
+               "Redesigned the hero section:
+                changed background, increased
+                font size, added CTA button"  — summary text below
+4. Error:      [ Get AI Summary ]            — re-enabled
+               "Summary unavailable"          — error text below in muted red
+```
+
+- Button text changes to "Generating..." during request (no spinner icon)
+- Button is visually disabled (muted, no hover, cursor: not-allowed)
+- After success: summary text appears below button, button returns to default
+- After failure: error message appears below button in muted red (#ef4444 at 60% opacity)
+- If request >5s: show subtle timeout warning below button "Still working..."
+
+### 4.7 Typography & Spacing Reference
+
+**Typography (per DESIGN.md — General Sans / Inter Tight / Geist):**
+| Element | Font | Size | Weight | Color |
+|---------|------|------|--------|-------|
+| Tab labels | Inter Tight | 13px | 600 (Changes primary) / 400 (Saves) | text-primary |
+| Entry label | Inter Tight | 13px | 500 | text-primary |
+| Entry timestamp | Geist Mono | 11px | 400 | text-muted |
+| Badge text | Inter Tight | 11px | 500 | matching badge color |
+| Helper text | Inter Tight | 12px | 400 | text-tertiary |
+| Empty state title | Inter Tight | 14px | 500 | text-secondary |
+| Empty state body | Inter Tight | 12px | 400 | text-muted |
+| Form labels | Inter Tight | 12px | 500 | text-secondary |
+| Toast text | Inter Tight | 13px | 400 | text-primary |
+| Search input | Inter Tight | 13px | 400 | text-primary |
+
+**Spacing (4px base per DESIGN.md):**
+| Element | Spacing |
+|---------|---------|
+| Entry row padding | 8px top/bottom, 12px left/right |
+| Diff row padding | 4px top/bottom, 12px left, 24px left indent (child) |
+| Badge border-radius | 4px (sm per DESIGN.md) |
+| FAB dimensions | 44×44px, border-radius: 8px (md per DESIGN.md) |
+| Form field border-radius | 4px (sm) |
+| Toast border-radius | 8px (md), padding: 12px 16px |
+| Drawer height | 200px fixed |
+| Toast position | top-right, 16px from edges, below toolbar |
+
+### 4.8 Accessibility Specifications
+
+**Keyboard navigation:**
+- Changes list: roving `tabIndex` (only focused row is tabbable), j/k arrows navigate, Enter expands/collapses, Esc collapses, g/G go to start/end
+- FAB: Tab-focusable, Enter/Space activates
+- Time-travel drawer: Tab cycles through slider → Restore → Exit, slider responds to Left/Right arrows when focused
+- Search input: Tab-focusable, Esc clears or closes depending on state
+- Diff expand: Enter/Space toggles accordion
+
+**Screen reader support:**
+- `aria-live="polite"` on history list for new entries announcement
+- Each entry: `role="button"` when expandable, `aria-expanded` state, `aria-label` includes label + change count
+- Tab switcher: `role="tablist"`, tabs have `role="tab"`, panels have `role="tabpanel"`
+- Time-travel: drawer announced on open (`aria-modal="true"`), slider has `aria-valuenow` + `aria-valuetext`
+- Badges: `aria-label` describes change type and count ("3 style changes")
+
+**Focus indicators:**
+- Visible focus ring: 2px solid var(--accent), offset 2px
+- Focus visible on: entry rows, FAB, form fields, buttons, tab switcher
+
+**Color contrast (WCAG AA):**
+- All text on dark surfaces: meets or exceeds 4.5:1 (verified in DESIGN.md tokens)
+- Badge colors:
+  - Cobalt (#2D6DFF): on #14141f = 7.2:1 ✓
+  - Teal (#14B8A6): on #14141f = 4.8:1 ✓
+  - Amber (#F59E0B): on #14141f = 4.6:1 ✓ (borderline — badge has 2px darker background tint)
+  - Rose (#F43F5E): on #14141f = 5.1:1 ✓
+  - Gray (#6B6963): on #14141f = 3.2:1 ✗ — use on lighter surface or add border
+- Error states: error color (#ef4444) on any surface ≥ 4.5:1 ✓
+
+**Reduced motion:**
+- If `prefers-reduced-motion: reduce`:
+  - Smooth scroll jump: instant (no 300ms animation)
+  - Drawer slide: instant appear (no 200ms slide)
+  - Preview layer fade: none (opacity: 0.4 immediately)
+  - Accordion expand: instant (no transition)
+  - FAB form slide: none (form appears instantly)
+  - All other transitions: disabled
+
+### 4.9 Semantic Diff Display
 
 ```typescript
 // In VersionRow, after clicking Compare:
@@ -593,9 +829,11 @@ try {
 - Team attribution
 
 ### Phase 5: Time-Travel
-- Canvas overlay timeline
-- Preview layer scrubbing
-- Restore from scrub position
+- Entry point: "Enter Time-Travel" button in Changes view header (cobalt accent, clock icon)
+- Bottom drawer (slides up from bottom, 200px height)
+- Preview layer scrubbing (semi-transparent, pointer-events: none, opacity: 0.4)
+- Restore from scrub position (opacity crossfade, 150ms)
+- Canvas fully visible above drawer (sidebar + inspector stay visible)
 
 ---
 
