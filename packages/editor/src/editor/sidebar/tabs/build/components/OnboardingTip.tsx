@@ -5,7 +5,8 @@
  */
 
 import * as React from "react";
-import { BUILD_TIP } from "../catalog/catalog";
+
+const BUILD_TIP = "Start with a blank canvas or choose a template to get going quickly.";
 
 interface OnboardingTipProps {
   dismissed: boolean;

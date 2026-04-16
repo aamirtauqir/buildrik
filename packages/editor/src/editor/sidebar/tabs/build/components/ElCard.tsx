@@ -10,16 +10,16 @@ import { SvgIcon } from "./SvgIcon";
 
 interface ElCardProps {
   el: FlatElEntry;
-  isFav: boolean;
+  isFav?: boolean;
   onDragStart: DragStartFn;
   onClick: ElClickFn;
-  onToggleFav: ToggleFavFn;
+  onToggleFav?: ToggleFavFn;
   showRemove?: boolean;
 }
 
 export const ElCard: React.FC<ElCardProps> = ({
   el,
-  isFav,
+  isFav = false,
   onDragStart,
   onClick,
   onToggleFav,
@@ -82,7 +82,7 @@ export const ElCard: React.FC<ElCardProps> = ({
           className="bld-fav-remove"
           onClick={(e) => {
             e.stopPropagation();
-            onToggleFav(el.name);
+            onToggleFav?.(el.name);
           }}
           aria-label={`Remove ${el.name} from favorites`}
         >
@@ -95,7 +95,7 @@ export const ElCard: React.FC<ElCardProps> = ({
           className={`bld-el-fav${isFav ? " bld-el-fav--on" : ""}`}
           onClick={(e) => {
             e.stopPropagation();
-            onToggleFav(el.name);
+            onToggleFav?.(el.name);
           }}
           aria-label={isFav ? `Remove ${el.name} from favorites` : `Add ${el.name} to favorites`}
           aria-pressed={isFav}

@@ -76,15 +76,24 @@ export const QuickPicks: React.FC<QuickPicksProps> = ({
           </div>
         ))}
 
-        {/* "+" chip — always last */}
-        <button
-          className="bld-qp-chip bld-qp-chip--add"
-          onClick={onPlusClick}
-          title="Pin an element for quick access"
-          aria-label="Pin element"
-        >
-          <Plus size={14} />
-        </button>
+        {/* Ghost chips — teach users personalization exists */}
+        {Array.from({ length: Math.max(0, 7 - picks.length) }).map((_, i) => (
+          <div key={`ghost-${i}`} className="bld-qp-chip bld-qp-chip--ghost" aria-hidden="true">
+            <Plus size={14} />
+          </div>
+        ))}
+
+        {/* "+" chip — hidden when 7 picks (full) */}
+        {picks.length < 7 && (
+          <button
+            className="bld-qp-chip bld-qp-chip--add"
+            onClick={onPlusClick}
+            title="Pin an element for quick access"
+            aria-label="Pin element"
+          >
+            <Plus size={14} />
+          </button>
+        )}
       </div>
 
       {!ftueSeen && (

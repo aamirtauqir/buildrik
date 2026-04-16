@@ -14,6 +14,10 @@ import { CATALOG } from "./catalog/catalog";
 import { useBuildTab } from "./hooks/useBuildTab";
 import { CatAccordion } from "./components/CatAccordion";
 import { SearchResults } from "./components/SearchResults";
+import { TipsFooter } from "./components/TipsFooter";
+import { QuickPicks } from "./components/QuickPicks";
+import { AISuggestions } from "./components/AISuggestions";
+import { MyComponents } from "./components/MyComponents";
 import "./BuildTab.css";
 
 // SectionsMode pulls in ~92 KB of inline HTML (54 section templates).
@@ -38,6 +42,7 @@ export interface BuildTabProps {
   onPinToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
+  aiEnabled?: boolean;
 }
 
 export const BuildTab: React.FC<BuildTabProps> = ({
@@ -46,9 +51,32 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   isPinned,
   onPinToggle,
   onClose,
+  aiEnabled,
 }) => {
   const tab = useBuildTab(composer, onBlockClick);
   const isSearching = tab.searchQuery.trim().length > 0;
+
+  // Global "/" shortcut: focus the Build tab search bar. Only fires when focus
+  // is not already inside an input/textarea/contentEditable so it doesn't steal
+  // keystrokes from any form the user is actively typing in.
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== "/") return;
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const tag = target.tagName;
+      const inTypingContext =
+        tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
+      if (inTypingContext) return;
+      const input = document.getElementById("bld-search-input") as HTMLInputElement | null;
+      if (!input) return;
+      e.preventDefault();
+      input.focus();
+      input.select();
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
 
   return (
     <div className="bld-container">
@@ -95,12 +123,57 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           }}
         >
           <SearchBar
+            id="bld-search-input"
             value={tab.searchQuery}
             onChange={tab.setSearchQuery}
             placeholder={tab.mode === "sections" ? "Search sections..." : "Search elements..."}
             debounceMs={150}
           />
         </div>
+
+        {/* Quick Picks — always visible in Elements mode */}
+        {!isSearching && tab.mode === "elements" && (
+          <QuickPicks
+            picks={tab.picks}
+            onRemove={tab.removePick}
+            onPlusClick={() => {
+              tab.setSearchQuery("");
+              tab.setMode("elements");
+            }}
+            onDragStart={tab.handleDragStart}
+            onElClick={tab.handleElClick}
+            ftueSeen={tab.ftueSeen}
+            onDismissFtue={tab.dismissFtue}
+          />
+        )}
+
+        {/* TipsFooter — only shown in Elements mode, not during search */}
+        {!isSearching && tab.mode === "elements" && (
+          <TipsFooter
+            tipIdx={tab.tipIdx}
+            onPrev={tab.tipPrev}
+            onNext={tab.tipNext}
+            onDotClick={tab.tipSetAt}
+            dismissed={tab.tipDismissed}
+            onDismiss={tab.dismissTip}
+            collapsed={tab.tipsCollapsed}
+            onToggleCollapsed={tab.toggleTipsCollapsed}
+          />
+        )}
+
+        {/* MyComponents — only shown in Elements mode, not during search */}
+        {!isSearching && tab.mode === "elements" && (
+          <MyComponents
+            open={tab.myCompOpen}
+            onToggle={() => tab.setMyCompOpen(!tab.myCompOpen)}
+            composer={composer}
+          />
+        )}
+
+        {/* AI Suggestions — only shown in Elements mode, not during search */}
+        {!isSearching && tab.mode === "elements" && (
+          <AISuggestions enabled={aiEnabled !== false} />
+        )}
 
         {/* 3. Scrollable content area — mode-aware:
               - Sections mode ALWAYS renders SectionsMode (pass searchQuery so
@@ -125,7 +198,6 @@ export const BuildTab: React.FC<BuildTabProps> = ({
             {/* Category Browse — scrollable area */}
             <div className="bld-cats-scroll">
               <div className="bld-cats">
-                <div className="bld-sec-label">Browse</div>
                 {CATALOG.map((cat) => (
                   <CatAccordion
                     key={cat.id}

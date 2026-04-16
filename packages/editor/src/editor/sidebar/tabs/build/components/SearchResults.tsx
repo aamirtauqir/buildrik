@@ -14,6 +14,7 @@ interface SearchResultsProps {
   groups: SearchGroup[];
   onDragStart: DragStartFn;
   onElClick: ElClickFn;
+  onClearSearch: () => void;
 }
 
 export const SearchResults: React.FC<SearchResultsProps> = ({
@@ -21,6 +22,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   groups,
   onDragStart,
   onElClick,
+  onClearSearch,
 }) => {
   if (!groups.length) {
     return (
@@ -30,7 +32,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"
             stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
         </svg>
-        <p className="bld-no-results-headline">No matching block in Add</p>
+        <p className="bld-no-results-headline">Nothing matches "{query}"</p>
 
         {/* AI suggestion card */}
         <div className="bld-ai-card">
@@ -39,7 +41,9 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
           </p>
         </div>
 
-        <p className="bld-no-results-shortcut">/ opens AI outside the sidebar.</p>
+        <button className="bld-clear-search" onClick={onClearSearch}>
+          Clear search
+        </button>
       </div>
     );
   }

@@ -22,9 +22,10 @@ describe("SearchResults — no results state", () => {
         groups={[]}
         onDragStart={noop}
         onElClick={noop}
+        onClearSearch={noop}
       />
     );
-    expect(screen.getByText("No matching block in Add")).toBeInTheDocument();
+    expect(screen.getByText('Nothing matches "foobar"')).toBeInTheDocument();
     expect(screen.getByRole("status")).toBeInTheDocument();
   });
 
@@ -35,6 +36,7 @@ describe("SearchResults — no results state", () => {
         groups={[]}
         onDragStart={noop}
         onElClick={noop}
+        onClearSearch={noop}
       />
     );
     expect(
@@ -42,18 +44,32 @@ describe("SearchResults — no results state", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders the slash-shortcut hint", () => {
+  it("renders the Clear search button", () => {
     render(
       <SearchResults
         query="xyz"
         groups={[]}
         onDragStart={noop}
         onElClick={noop}
+        onClearSearch={noop}
       />
     );
-    expect(
-      screen.getByText("/ opens AI outside the sidebar.")
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Clear search" })).toBeInTheDocument();
+  });
+
+  it("calls onClearSearch when Clear search is clicked", () => {
+    const handleClear = vi.fn();
+    render(
+      <SearchResults
+        query="xyz"
+        groups={[]}
+        onDragStart={noop}
+        onElClick={noop}
+        onClearSearch={handleClear}
+      />
+    );
+    screen.getByRole("button", { name: "Clear search" }).click();
+    expect(handleClear).toHaveBeenCalledTimes(1);
   });
 
   it("renders the no-results sparkle icon", () => {
@@ -63,6 +79,7 @@ describe("SearchResults — no results state", () => {
         groups={[]}
         onDragStart={noop}
         onElClick={noop}
+        onClearSearch={noop}
       />
     );
     expect(container.querySelector(".bld-no-results-icon")).toBeTruthy();

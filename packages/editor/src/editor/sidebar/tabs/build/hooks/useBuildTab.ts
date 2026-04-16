@@ -53,6 +53,20 @@ const ls = {
       // storage may be full
     }
   },
+  getArray(key: string): string[] {
+    try {
+      return JSON.parse(localStorage.getItem(key) ?? "[]") as string[];
+    } catch {
+      return [];
+    }
+  },
+  saveArray(key: string, value: string[]): void {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      // storage may be full
+    }
+  },
 };
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -71,6 +85,8 @@ export interface UseBuildTabReturn {
   tipsCollapsed: boolean;
   myCompOpen: boolean;
   favOpen: boolean;
+  picks: string[];
+  ftueSeen: boolean;
   searchResults: SearchGroup[];
   allElements: FlatElEntry[];
   composer: Composer | null;
@@ -88,6 +104,10 @@ export interface UseBuildTabReturn {
   favsInformed: boolean;
   markFavsInformed: () => void;
   dismissTip: () => void;
+  addPick: (blockId: string) => void;
+  removePick: (blockId: string) => void;
+  togglePick: (blockId: string) => void;
+  dismissFtue: () => void;
   toggleTipsCollapsed: () => void;
   tipPrev: () => void;
   tipNext: () => void;
@@ -124,6 +144,12 @@ export function useBuildTab(
   );
   const [myCompOpen, setMyCompOpen] = React.useState(false);
   const [favOpen, setFavOpen] = React.useState(false);
+  const [picks, setPicks] = React.useState<string[]>(() =>
+    ls.getArray(STORAGE_KEYS.BUILD_PICKS)
+  );
+  const [ftueSeen, setFtueSeen] = React.useState<boolean>(() =>
+    ls.getBool(STORAGE_KEYS.BUILD_FTUE_SEEN)
+  );
   const [tipIdx, setTipIdx] = React.useState(0);
   const [mode, setModeRaw] = React.useState<BuildMode>(() => {
     const v = sessionStorage.getItem(STORAGE_KEYS.BUILD_MODE);
@@ -149,6 +175,16 @@ export function useBuildTab(
     ls.sessionSaveSet(STORAGE_KEYS.BUILD_OPEN_CATS, openCats);
   }, [openCats]);
 
+  // Persist picks
+  React.useEffect(() => {
+    ls.saveArray(STORAGE_KEYS.BUILD_PICKS, picks);
+  }, [picks]);
+
+  // Persist ftueSeen
+  React.useEffect(() => {
+    ls.saveBool(STORAGE_KEYS.BUILD_FTUE_SEEN, ftueSeen);
+  }, [ftueSeen]);
+
   const toggleFav = React.useCallback((name: string) => {
     setFavs((prev) => {
       const next = new Set(prev);
@@ -161,8 +197,12 @@ export function useBuildTab(
   const toggleCat = React.useCallback((catId: string) => {
     setOpenCats((prev) => {
       const next = new Set(prev);
-      if (next.has(catId)) next.delete(catId);
-      else next.add(catId);
+      if (next.has(catId)) {
+        next.delete(catId); // already open → close it
+      } else {
+        next.clear(); // close all others (last-in-wins)
+        next.add(catId); // open clicked
+      }
       return next;
     });
   }, []);
@@ -176,6 +216,29 @@ export function useBuildTab(
   const markFavsInformed = React.useCallback(() => {
     setFavsInformed(true);
     ls.saveBool(STORAGE_KEYS.BUILD_FAVS_INFORMED, true);
+  }, []);
+
+  const dismissFtue = React.useCallback(() => {
+    setFtueSeen(true);
+    ls.saveBool(STORAGE_KEYS.BUILD_FTUE_SEEN, true);
+  }, []);
+
+  const removePick = React.useCallback((blockId: string) => {
+    setPicks((prev) => prev.filter((id) => id !== blockId));
+  }, []);
+
+  const togglePick = React.useCallback((blockId: string) => {
+    setPicks((prev) => {
+      if (prev.includes(blockId)) return prev.filter((id) => id !== blockId);
+      return [...prev, blockId];
+    });
+  }, []);
+
+  const addPick = React.useCallback((blockId: string) => {
+    setPicks((prev) => {
+      if (prev.includes(blockId)) return prev;
+      return [...prev, blockId];
+    });
   }, []);
 
   const dismissTip = React.useCallback(() => {
@@ -283,6 +346,12 @@ export function useBuildTab(
     favsInformed,
     markFavsInformed,
     dismissTip,
+    picks,
+    ftueSeen,
+    addPick,
+    removePick,
+    togglePick,
+    dismissFtue,
     toggleTipsCollapsed,
     tipPrev,
     tipNext,

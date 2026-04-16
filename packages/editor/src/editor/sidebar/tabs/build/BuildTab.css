@@ -605,3 +605,26 @@
   color: var(--ls-text-lighter, #94A3B8);
   margin: 0;
 }
+.bld-clear-search {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ls-accent, #2D6DFF);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-decoration: none;
+}
+.bld-clear-search:hover {
+  text-decoration: underline;
+}
+
+/* Ghost chip — dashed border placeholder */
+.bld-qp-chip--ghost {
+  background: transparent;
+  border: 1.5px dashed var(--ls-border-medium, #CBD5E1);
+  color: var(--ls-text-lighter, #94A3B8);
+  cursor: default;
+  pointer-events: none;
+}
