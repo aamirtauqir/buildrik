@@ -16,7 +16,7 @@ export const siteDetailRouter = router({
     .input(z.object({ siteId: z.string() }))
     .query(async ({ ctx, input }) => {
       try {
-        await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+        await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
       } catch (e) {
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
@@ -29,7 +29,7 @@ export const siteDetailRouter = router({
       .input(z.object({ siteId: z.string() }))
       .query(async ({ ctx, input }) => {
         try {
-          await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+          await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
         } catch (e) {
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
@@ -62,7 +62,7 @@ export const siteDetailRouter = router({
       .input(z.object({ siteId: z.string() }))
       .query(async ({ ctx, input }) => {
         try {
-          await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+          await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
         } catch (e) {
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
@@ -80,12 +80,13 @@ export const siteDetailRouter = router({
           throw e;
         }
         const member = await ctx.prisma.workspaceMember.findFirst({
-          where: { userId: ctx.session.user.id },
+          where: { userId: ctx.session.user!.id! },
           include: { workspace: { select: { plan: true } } },
         });
-        const plan = (member?.workspace?.plan ?? "FREE") as PlanName;
+        const planResult = z.enum(["FREE", "PRO", "BUSINESS"] as const).safeParse(member?.workspace?.plan ?? "FREE");
+        const safePlan: PlanName = planResult.success ? planResult.data : "FREE";
         try {
-          return await createRedirect(input.siteId, { fromPath: input.fromPath, toUrl: input.toUrl, type: input.type }, plan);
+          return await createRedirect(input.siteId, { fromPath: input.fromPath, toUrl: input.toUrl, type: input.type }, safePlan);
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "REDIRECT_LIMIT")
             throw new TRPCError({ code: "FORBIDDEN", message: "Redirect limit reached." });
@@ -138,7 +139,7 @@ export const siteDetailRouter = router({
           throw e;
         }
         const member = await ctx.prisma.workspaceMember.findFirst({
-          where: { userId: ctx.session.user!.id },
+          where: { userId: ctx.session.user!.id! },
           include: { workspace: { select: { plan: true } } },
         });
         const planResult = z.enum(["FREE", "PRO", "BUSINESS"]).safeParse(member?.workspace?.plan ?? "FREE");
@@ -156,7 +157,7 @@ export const siteDetailRouter = router({
       .input(z.object({ siteId: z.string() }))
       .query(async ({ ctx, input }) => {
         try {
-          await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+          await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
         } catch (e) {
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
@@ -170,7 +171,7 @@ export const siteDetailRouter = router({
       .input(z.object({ siteId: z.string() }))
       .query(async ({ ctx, input }) => {
         try {
-          await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+          await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
         } catch (e) {
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
@@ -231,7 +232,7 @@ export const siteDetailRouter = router({
       .input(z.object({ siteId: z.string() }))
       .query(async ({ ctx, input }) => {
         try {
-          await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+          await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
         } catch (e) {
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
@@ -250,7 +251,7 @@ export const siteDetailRouter = router({
         }
         const { siteId, ...data } = input;
         try {
-          return await createShareLink(siteId, data, ctx.session.user.id);
+          return await createShareLink(siteId, data, ctx.session.user!.id!);
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "NOT_WORKSPACE_MEMBER")
             throw new TRPCError({ code: "FORBIDDEN", message: "You are not an active member of this workspace" });
@@ -282,7 +283,7 @@ export const siteDetailRouter = router({
     .input(siteAnalyticsQuerySchema)
     .query(async ({ ctx, input }) => {
       try {
-        await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+        await assertSiteAccess(ctx.prisma, ctx.session.user!.id!, input.siteId);
       } catch (e) {
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
