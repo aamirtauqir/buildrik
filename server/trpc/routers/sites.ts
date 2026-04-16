@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
+import { checkSiteRole, PermissionError } from "@/server/services/permission.service";
 import {
   listSites,
   createSite,
@@ -96,13 +97,25 @@ export const sitesRouter = router({
 
   rename: protectedProcedure
     .input(z.object({ id: z.string(), name: z.string().min(2).max(100) }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       return renameSite(input.id, input.name);
     }),
 
   duplicate: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "EDITOR");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       const workspaceId = await getWorkspaceId(ctx);
       try {
         return await duplicateSite(input.id, workspaceId, ctx.session.user.id);
@@ -118,15 +131,37 @@ export const sitesRouter = router({
 
   archive: protectedProcedure
     .input(z.object({ id: z.string() }))
-    .mutation(async ({ input }) => archiveSite(input.id)),
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "ADMIN");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      return archiveSite(input.id);
+    }),
 
   unarchive: protectedProcedure
     .input(z.object({ id: z.string() }))
-    .mutation(async ({ input }) => unarchiveSite(input.id)),
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "ADMIN");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+      return unarchiveSite(input.id);
+    }),
 
   delete: protectedProcedure
     .input(z.object({ id: z.string(), confirmName: z.string() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.id, "OWNER");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       try {
         await deleteSite(input.id, input.confirmName);
       } catch (e: unknown) {
@@ -143,6 +178,22 @@ export const sitesRouter = router({
     .input(bulkActionSchema)
     .mutation(async ({ ctx, input }) => {
       const workspaceId = await getWorkspaceId(ctx);
+
+      const minRole = input.action === "delete" ? "OWNER"
+        : ["archive", "unarchive", "publish", "unpublish"].includes(input.action) ? "ADMIN"
+        : "EDITOR";
+
+      try {
+        await Promise.all(
+          input.siteIds.map((siteId: string) =>
+            checkSiteRole(ctx.prisma, ctx.session.user.id, siteId, minRole)
+          )
+        );
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
+
       return bulkAction(workspaceId, input);
     }),
 
@@ -155,6 +206,12 @@ export const sitesRouter = router({
   transfer: protectedProcedure
     .input(transferSiteSchema)
     .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "OWNER");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       try {
         return await transferSite(
           input.siteId,
@@ -241,6 +298,12 @@ export const sitesRouter = router({
   publish: protectedProcedure
     .input(z.object({ siteId: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "ADMIN");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       const workspaceId = await getWorkspaceId(ctx);
       try {
         return await startPublish(input.siteId, workspaceId, ctx.session.user.id);
@@ -264,7 +327,18 @@ export const sitesRouter = router({
 
   cancelPublish: protectedProcedure
     .input(z.object({ jobId: z.string() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      const job = await ctx.prisma.publishBuildJob.findUnique({
+        where: { id: input.jobId },
+        select: { siteId: true },
+      });
+      if (!job) throw new TRPCError({ code: "NOT_FOUND" });
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, job.siteId, "ADMIN");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       try {
         return await cancelPublish(input.jobId);
       } catch (e: unknown) {
@@ -279,7 +353,13 @@ export const sitesRouter = router({
 
   unpublish: protectedProcedure
     .input(z.object({ siteId: z.string() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "ADMIN");
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       return unpublishSite(input.siteId);
     }),
 
@@ -331,18 +411,50 @@ export const sitesRouter = router({
 
     delete: protectedProcedure
       .input(z.object({ id: z.string() }))
-      .mutation(async ({ input }) => deleteFolder(input.id)),
+      .mutation(async ({ ctx, input }) => {
+        const folder = await ctx.prisma.folder.findUnique({
+          where: { id: input.id },
+          select: { workspaceId: true },
+        });
+        if (!folder) throw new TRPCError({ code: "NOT_FOUND" });
+        const member = await ctx.prisma.workspaceMember.findFirst({
+          where: { userId: ctx.session.user.id, workspaceId: folder.workspaceId, status: "ACTIVE" },
+          select: { role: true },
+        });
+        if (!member || (member.role !== "ADMIN" && member.role !== "OWNER"))
+          throw new TRPCError({ code: "FORBIDDEN", message: "Insufficient permissions" });
+        return deleteFolder(input.id);
+      }),
 
     rename: protectedProcedure
       .input(z.object({ id: z.string(), name: z.string().min(1).max(50) }))
-      .mutation(async ({ input }) => renameFolder(input.id, input.name)),
+      .mutation(async ({ ctx, input }) => {
+        const folder = await ctx.prisma.folder.findUnique({
+          where: { id: input.id },
+          select: { workspaceId: true },
+        });
+        if (!folder) throw new TRPCError({ code: "NOT_FOUND" });
+        const member = await ctx.prisma.workspaceMember.findFirst({
+          where: { userId: ctx.session.user.id, workspaceId: folder.workspaceId, status: "ACTIVE" },
+          select: { role: true },
+        });
+        if (!member || (member.role !== "ADMIN" && member.role !== "OWNER"))
+          throw new TRPCError({ code: "FORBIDDEN", message: "Insufficient permissions" });
+        return renameFolder(input.id, input.name);
+      }),
 
     moveSite: protectedProcedure
       .input(
         z.object({ siteId: z.string(), folderId: z.string().nullable() })
       )
-      .mutation(async ({ input }) =>
-        moveSiteToFolder(input.siteId, input.folderId)
-      ),
+      .mutation(async ({ ctx, input }) => {
+        try {
+          await checkSiteRole(ctx.prisma, ctx.session.user.id, input.siteId, "EDITOR");
+        } catch (e) {
+          if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+          throw e;
+        }
+        return moveSiteToFolder(input.siteId, input.folderId);
+      }),
   }),
 });
