@@ -109,6 +109,20 @@ Prefer `app/auth/login/page.tsx` over `app/auth/flows/credential/login/page.tsx`
 - Don't add error handling for scenarios that can't happen.
 - Don't use `any`. Don't use `as` unless truly necessary.
 
+## Design System
+
+Always read `DESIGN.md` before making any visual or UI decisions.
+All font choices, colors, spacing, aesthetic direction, and anti-slop rules are defined there.
+Do not deviate without explicit user approval.
+In QA mode, flag any code that doesn't match DESIGN.md — especially: purple/violet/indigo accents (banned), default font stacks (banned), decorative AI-slop patterns (banned list in DESIGN.md).
+
+Key constraints:
+- Editor chrome is dark-only, desktop-only.
+- Single accent color: cobalt `#2D6DFF` (legacy indigo/violet tokens in `themes/default.css` are being migrated out).
+- Typography: General Sans (display), Inter Tight or Geist (body/UI), Geist Mono (data). No Arial/Helvetica/Roboto fallbacks.
+- 4px base spacing, compact density.
+- Minimal motion. No spring physics, no scroll choreography.
+
 ## Skill routing
 
 When the user's request matches an available skill, ALWAYS invoke it using the Skill
