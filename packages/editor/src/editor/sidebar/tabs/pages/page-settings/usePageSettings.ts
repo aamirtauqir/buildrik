@@ -230,8 +230,12 @@ export function usePageSettings(
     }
     setSaveState("saving");
     try {
+      // slugManuallySet=true: any slug saved from the settings form is a
+      // user-entered slug. Downstream: rename-autosuggests-slug in PageRow
+      // must NOT overwrite this on future name edits.
       await composer.elements.updatePage(page.id, {
         slug,
+        slugManuallySet: slug !== (page.slug ?? "") ? true : undefined,
         settings: {
           visibility,
           password: visibility === "password" ? password : undefined,

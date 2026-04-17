@@ -178,10 +178,16 @@ export const PageRow = React.memo<Props>(
   }) => {
     const [renameValue, setRenameValue] = React.useState(page.name);
     const inputRef = React.useRef<HTMLInputElement>(null);
+    // A9 fix: Enter commits rename, then triggers blur, which used to fire a
+    // SECOND onRenameCommit with the same value — producing two PROJECT_CHANGED
+    // emits + two history snapshots for one rename. The committed-ref flag
+    // makes the blur handler idempotent within a single rename session.
+    const committedRef = React.useRef(false);
 
     React.useEffect(() => {
       if (isRenaming) {
         setRenameValue(page.name);
+        committedRef.current = false;
         requestAnimationFrame(() => {
           inputRef.current?.select();
           inputRef.current?.focus();
@@ -189,19 +195,26 @@ export const PageRow = React.memo<Props>(
       }
     }, [isRenaming, page.name]);
 
+    const commitOnce = (value: string) => {
+      if (committedRef.current) return;
+      committedRef.current = true;
+      onRenameCommit(value);
+    };
+
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (e.key === "Enter") {
         e.preventDefault();
-        onRenameCommit(renameValue.trim() || page.name);
+        commitOnce(renameValue.trim() || page.name);
       } else if (e.key === "Escape") {
         e.preventDefault();
+        committedRef.current = true; // prevent blur from committing after cancel
         onRenameCancel();
       }
     };
 
     const handleSettingsClick = (e: React.MouseEvent) => {
       e.stopPropagation();
-      if (isRenaming) onRenameCommit(renameValue.trim() || page.name);
+      if (isRenaming) commitOnce(renameValue.trim() || page.name);
       onSettingsClick();
     };
 
@@ -285,7 +298,7 @@ export const PageRow = React.memo<Props>(
                 value={renameValue}
                 onChange={(e) => setRenameValue(e.target.value)}
                 onKeyDown={handleKeyDown}
-                onBlur={() => onRenameCommit(renameValue.trim() || page.name)}
+                onBlur={() => commitOnce(renameValue.trim() || page.name)}
                 onClick={(e) => e.stopPropagation()}
                 aria-label="Rename page"
               />

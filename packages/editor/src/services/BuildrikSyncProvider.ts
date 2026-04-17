@@ -9,8 +9,28 @@
  */
 
 import { createBuildrikApiClient } from "@buildrik/shared";
-import type { ProjectData } from "@/shared/types/project";
+import type { PageSettings, ProjectData, SlugChange } from "@/shared/types/project";
 import type { ElementData } from "@/shared/types/element";
+
+/**
+ * Shape of a page row returned by `pages.list`. Extended in Phase 1 to
+ * include the new metadata fields. The dashboard saves via `sites.saveProject`
+ * (single payload), so round-trip correctness only requires that the load
+ * path map these fields through. Missing fields on legacy rows fall back to
+ * safe defaults in the editor via PageManager.importPage normalization.
+ */
+interface DashboardPageRow {
+  id: string;
+  name: string;
+  slug: string;
+  isHomePage: boolean;
+  blocks?: ElementData;
+  position: number;
+  settings?: PageSettings;
+  updatedAt?: string;
+  slugManuallySet?: boolean;
+  slugHistory?: SlugChange[];
+}
 
 const DASHBOARD_URL =
   import.meta.env.VITE_DASHBOARD_URL || "http://localhost:3000";
@@ -32,20 +52,35 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
   const site = await client.sites.get.query({ id: siteId });
   const pages = await client.pages.list.query({ siteId });
 
+  // Sort by position once, then map — Phase 1 round-trips the new fields
+  // (updatedAt, slugManuallySet, slugHistory, settings) so folder/slug-redirect/
+  // custom-head/etc. data survives the dashboard save boundary.
+  const sortedPages: DashboardPageRow[] = (pages as DashboardPageRow[])
+    .slice()
+    .sort((a, b) => a.position - b.position);
+
   return {
     version: "1.0",
-    pages: pages
-      .sort((a: { position: number }, b: { position: number }) => a.position - b.position)
-      .map((p: { id: string; name: string; slug: string; isHomePage: boolean; blocks?: ElementData }) => ({
-        id: p.id,
-        name: p.name,
-        slug: p.slug,
-        isHome: p.isHomePage,
-        root: p.blocks ?? DEFAULT_ROOT,
-      })),
+    pagesOrder: sortedPages.map((p) => p.id),
+    pages: sortedPages.map((p) => ({
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      isHome: p.isHomePage,
+      root: p.blocks ?? DEFAULT_ROOT,
+      settings: p.settings,
+      updatedAt: p.updatedAt,
+      slugManuallySet: p.slugManuallySet ?? false,
+      slugHistory: p.slugHistory ?? [],
+    })),
     styles: [],
     assets: [],
-    metadata: { name: site.name },
+    metadata: {
+      name: site.name,
+      // Domain lives on the dashboard site record; read-through for copy-link
+      // and SEO preview. Falls back to undefined if not configured.
+      domain: (site as { domain?: string }).domain,
+    },
   };
 }
 

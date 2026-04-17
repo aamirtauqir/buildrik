@@ -10,6 +10,5 @@ export { PageList } from "./components/PageList";
 export { PageRow } from "./components/PageRow";
 export { PageContextMenu } from "./components/PageContextMenu";
 export { AddPageButton } from "./components/AddPageButton";
-export { PageSettingsDrawer } from "./page-settings/PageSettingsDrawer";
 export { usePageSettings } from "./page-settings/usePageSettings";
 export type { UsePageSettingsReturn, SaveState } from "./page-settings/usePageSettings";

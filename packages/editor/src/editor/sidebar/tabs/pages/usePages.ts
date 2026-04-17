@@ -112,15 +112,19 @@ export function usePages(composer: Composer | null): UsePagesReturn {
       }
     };
     sync();
-    const evs = [
-      EVENTS.PROJECT_CHANGED,
-      "page:created",
-      "page:deleted",
-      "page:changed",
-      "page:updated",
-    ] as const;
-    evs.forEach((ev) => composer.on(ev as string, sync));
-    return () => evs.forEach((ev) => composer.off(ev as string, sync));
+    // Filter PROJECT_CHANGED by payload.type so element-level edits (e.g.
+    // canvas drag-resize spamming 60 events/sec) don't trigger a full page
+    // list re-sync. Only page:* mutations need to refresh the list.
+    // This was a real perf bottleneck flagged in the prior audit (B2):
+    // the four legacy string-literal events were NEVER emitted — only
+    // PROJECT_CHANGED fires — so we subscribe once and filter by type.
+    const handler = (payload?: { type?: string }) => {
+      if (!payload?.type || payload.type.startsWith("page:")) sync();
+    };
+    composer.on(EVENTS.PROJECT_CHANGED, handler);
+    return () => {
+      composer.off(EVENTS.PROJECT_CHANGED, handler);
+    };
   }, [composer, retryKey]);
 
   // ── Close context menu on outside click ──────────────────────────────────
@@ -140,13 +144,25 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     if (!composer) return;
     const name = getDefaultPageName(pages);
     const slug = name.toLowerCase().replace(/\s+/g, "-");
-    composer.elements.createPage(name, { slug });
-    setTimeout(() => {
-      const all = composer.elements.getAllPages();
-      const newest = all[all.length - 1];
-      if (newest) setRenamingPageId(newest.id);
-    }, 60);
-  }, [composer, pages.length]);
+    try {
+      // Use createPage's synchronous return value directly. The previous
+      // setTimeout(60) + getAllPages().last() pattern broke when pages are
+      // prepended instead of appended and when PROJECT_CHANGED fired twice
+      // in a tick.
+      const newest = composer.elements.createPage(name, { slug });
+      // rAF ensures the row has mounted before we focus the rename input.
+      if (newest) {
+        requestAnimationFrame(() => setRenamingPageId(newest.id));
+      }
+    } catch (err) {
+      addToast({
+        message: "Couldn't add page right now. Try again.",
+        variant: "error",
+        duration: 4000,
+      });
+      console.error("[pages] addPage failed", err);
+    }
+  }, [composer, pages.length, addToast]);
 
   const selectPage = React.useCallback(
     (pageId: string) => {
@@ -178,16 +194,29 @@ export function usePages(composer: Composer | null): UsePagesReturn {
   const duplicatePage = React.useCallback(
     (pageId: string) => {
       if (!composer) return;
-      const page = pages.find((p) => p.id === pageId);
-      if (!page) return;
-      const taken = new Set(pages.map((p) => p.slug));
-      let slug = `${page.slug}-copy`;
-      let n = 2;
-      while (taken.has(slug)) slug = `${page.slug}-copy-${n++}`;
-      composer.elements.createPage(`${page.name} Copy`, { slug });
       setContextMenu(null);
+      try {
+        // Delegate to the engine's real duplicate — deep clone, fresh IDs,
+        // smart copy-suffix naming. Previously this built an EMPTY page with
+        // a "Copy" name (feature-theater bug A1 from prior audit).
+        const copy = composer.elements.duplicatePage(pageId);
+        if (!copy) {
+          addToast({
+            message: "Couldn't duplicate — source page not found.",
+            variant: "warning",
+            duration: 3000,
+          });
+        }
+      } catch (err) {
+        addToast({
+          message: "Duplicate failed — page may have corrupt content.",
+          variant: "error",
+          duration: 4000,
+        });
+        console.error("[pages] duplicatePage failed", err);
+      }
     },
-    [composer, pages]
+    [composer, addToast]
   );
 
   const deletePage = React.useCallback(
@@ -231,22 +260,31 @@ export function usePages(composer: Composer | null): UsePagesReturn {
   const setHomepage = React.useCallback(
     (pageId: string) => {
       const page = pages.find((p) => p.id === pageId);
+      setContextMenu(null);
       if (page?.status === "external") {
         addToast({
           message: "External link pages can't be set as the homepage.",
           variant: "warning",
           duration: 4000,
         });
-        setContextMenu(null);
         return;
       }
-      composer?.elements.setHomePage?.(pageId);
-      setContextMenu(null);
-      addToast({
-        message: "Homepage updated. Your navigation menu may need updating manually.",
-        variant: "success",
-        duration: 4000,
-      });
+      if (!composer) return;
+      try {
+        composer.elements.setHomePage?.(pageId);
+        addToast({
+          message: "Homepage updated. Your navigation menu may need updating manually.",
+          variant: "success",
+          duration: 4000,
+        });
+      } catch (err) {
+        addToast({
+          message: "Couldn't update homepage. Try again.",
+          variant: "error",
+          duration: 4000,
+        });
+        console.error("[pages] setHomepage failed", err);
+      }
     },
     [composer, pages, addToast]
   );
@@ -257,21 +295,35 @@ export function usePages(composer: Composer | null): UsePagesReturn {
       setContextMenu(null);
       if (!page) return;
       const slug = page.slug || page.id;
-      const domain = (composer as { project?: { domain?: string } })?.project?.domain ?? null;
+      // A4: read real domain from ProjectData metadata. Was previously cast
+      // from a nonexistent `composer.project.domain`, always undefined.
+      const domain = composer?.getProjectMetadata?.()?.domain ?? null;
       const url = domain ? `https://${domain}/${slug}` : `https://yoursite.aquibra.io/${slug}`;
+
+      const successMsg = domain
+        ? `Link copied: ${url}`
+        : `Link copied: ${url} · Connect a custom domain in Settings →`;
+
+      // A8: navigator.clipboard is undefined in non-secure contexts (http://,
+      // some iframes). Fall back to a toast that shows the URL so the user
+      // can copy manually, instead of throwing TypeError.
+      if (!navigator.clipboard?.writeText) {
+        addToast({
+          message: `Copy manually: ${url}`,
+          variant: "info",
+          duration: 8000,
+        });
+        return;
+      }
+
       navigator.clipboard
         .writeText(url)
-        .then(() => {
-          const msg = domain
-            ? `Link copied: ${url}`
-            : `Link copied: ${url} · Connect a custom domain in Settings →`;
-          addToast({ message: msg, variant: "success", duration: 5000 });
-        })
+        .then(() => addToast({ message: successMsg, variant: "success", duration: 5000 }))
         .catch(() => {
           addToast({
-            message: "Couldn't copy link — try again.",
+            message: `Couldn't copy. Link: ${url}`,
             variant: "error",
-            duration: 3000,
+            duration: 8000,
           });
         });
     },
