@@ -95,6 +95,7 @@ export const ExportScreen: React.FC<ScreenProps> = ({ composer }) => {
     }
   }, [composer, selectedFormat]);
 
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const [waitlistEmail, setWaitlistEmail] = React.useState("");
   const [waitlistSubmitted, setWaitlistSubmitted] = React.useState(false);
 
@@ -106,7 +107,7 @@ export const ExportScreen: React.FC<ScreenProps> = ({ composer }) => {
         <p style={comingSoonDescStyles}>
           Download your site as clean HTML, React, Vue, or Next.js — ready to host anywhere you like.
         </p>
-        <p style={comingSoonTimelineStyles}>Expected: Q2 2026</p>
+        <p style={comingSoonTimelineStyles}>Coming Soon</p>
         <p style={comingSoonSocialStyles}>
           Join 2,400+ builders waiting for code export
         </p>
@@ -122,13 +123,14 @@ export const ExportScreen: React.FC<ScreenProps> = ({ composer }) => {
                 value={waitlistEmail}
                 onChange={(e) => setWaitlistEmail(e.target.value)}
                 placeholder="you@example.com"
+                aria-label="Email address for export waitlist notification"
                 style={waitlistInputStyles}
               />
               <button
                 onClick={() => {
-                  if (waitlistEmail.includes("@")) setWaitlistSubmitted(true);
+                  if (isValidEmail(waitlistEmail)) setWaitlistSubmitted(true);
                 }}
-                disabled={!waitlistEmail.includes("@")}
+                disabled={!isValidEmail(waitlistEmail)}
                 style={waitlistBtnStyles}
               >
                 Notify me
@@ -297,9 +299,9 @@ const comingSoonTimelineStyles: React.CSSProperties = {
   fontWeight: 600,
   color: "var(--aqb-primary)",
   padding: "4px 12px",
-  background: "rgba(99,102,241,0.08)",
+  background: "rgba(45,109,255,0.08)",
   borderRadius: 20,
-  border: "1px solid rgba(99,102,241,0.2)",
+  border: "1px solid rgba(45,109,255,0.2)",
 };
 
 const comingSoonSocialStyles: React.CSSProperties = {

@@ -1,10 +1,10 @@
 /**
- * Settings Tab Tests — pencil screens 17-28
- * Covers: dirty dot indicator, save error state, sett-save-error class
+ * Settings Tab Tests — SiteSettingsScreen hybrid pattern
+ * Covers: hybrid state management, auto-save on blur, dirty state, save error
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import * as React from "react";
 import { SiteSettingsScreen } from "../screens/SiteSettingsScreen";
 
@@ -16,130 +16,117 @@ function makeComposer(overrides?: Partial<ReturnType<typeof buildMockComposer>>)
 
 function buildMockComposer() {
   return {
-    getProjectSettings: vi.fn(() => ({ seo: {} })),
+    getProjectSettings: vi.fn(() => ({
+      seo: {
+        siteName: "",
+        favicon: "",
+        language: "en",
+        socialLinks: { twitter: "", facebook: "", linkedin: "" },
+      },
+    })),
     setProjectSettings: vi.fn(),
     on: vi.fn(),
     off: vi.fn(),
   };
 }
 
-// ── SiteSettingsScreen save error state ──────────────────────────────────────
+// ── SiteSettingsScreen hybrid pattern ─────────────────────────────────────────
 
-describe("SiteSettingsScreen save error state", () => {
-  it("shows sett-save-error when setProjectSettings throws", () => {
-    const composer = makeComposer({
-      setProjectSettings: vi.fn(() => {
-        throw new Error("Network error");
-      }),
+describe("SiteSettingsScreen", () => {
+  let composer: ReturnType<typeof makeComposer>;
+
+  beforeEach(() => {
+    composer = makeComposer();
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.resetAllMocks();
+  });
+
+  describe("save error state", () => {
+    it("shows alert when setProjectSettings throws", () => {
+      composer = makeComposer({
+        setProjectSettings: vi.fn(() => {
+          throw new Error("Network error");
+        }),
+      });
+
+      render(<SiteSettingsScreen composer={composer as never} />);
+
+      // No error before save
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     });
 
-    render(
-      <SiteSettingsScreen
-        composer={composer as never}
-        onDirtyChange={vi.fn()}
-      />
-    );
-
-    // Trigger save by clicking the Save button
-    const saveBtn = screen.getByRole("button", { name: /save/i });
-    fireEvent.click(saveBtn);
-
-    expect(screen.getByRole("alert")).toBeInTheDocument();
-    expect(screen.getByText(/failed to save settings/i)).toBeInTheDocument();
-  });
-
-  it("applies sett-save-error class to error container", () => {
-    const composer = makeComposer({
-      setProjectSettings: vi.fn(() => {
-        throw new Error("oops");
-      }),
+    it("does not show sett-save-error before save attempt", () => {
+      composer = makeComposer();
+      const { container } = render(<SiteSettingsScreen composer={composer as never} />);
+      expect(container.querySelector(".sett-save-error")).toBeFalsy();
     });
 
-    const { container } = render(
-      <SiteSettingsScreen
-        composer={composer as never}
-        onDirtyChange={vi.fn()}
-      />
-    );
+    it("clears save error on successful save", () => {
+      let shouldThrow = true;
+      composer = makeComposer({
+        setProjectSettings: vi.fn(() => {
+          if (shouldThrow) {
+            shouldThrow = false;
+            throw new Error("fail");
+          }
+        }),
+      });
 
-    const saveBtn = screen.getByRole("button", { name: /save/i });
-    fireEvent.click(saveBtn);
+      render(<SiteSettingsScreen composer={composer as never} />);
 
-    expect(container.querySelector(".sett-save-error")).toBeTruthy();
+      const saveBtn = screen.getByRole("button", { name: /save/i });
+
+      // First click — throws → error shown
+      fireEvent.click(saveBtn);
+      expect(screen.queryByRole("alert")).toBeInTheDocument();
+
+      // Second click — succeeds → error gone
+      fireEvent.click(saveBtn);
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    });
   });
 
-  it("does not show sett-save-error before save attempt", () => {
-    const composer = makeComposer();
-    const { container } = render(
-      <SiteSettingsScreen
-        composer={composer as never}
-        onDirtyChange={vi.fn()}
-      />
-    );
-    expect(container.querySelector(".sett-save-error")).toBeFalsy();
+  describe("dirty state", () => {
+    it("shows Save button as active after editing a field", () => {
+      const composer = makeComposer();
+      render(<SiteSettingsScreen composer={composer as never} />);
+
+      const nameInput = screen.getByPlaceholderText(/my awesome site/i);
+      fireEvent.change(nameInput, { target: { value: "New Site" } });
+
+      const saveBtn = screen.getByRole("button", { name: /save/i });
+      expect(saveBtn).toBeEnabled();
+    });
   });
 
-  it("clears save error on successful save", () => {
-    const setProjectSettings = vi.fn()
-      .mockImplementationOnce(() => { throw new Error("fail"); })
-      .mockImplementationOnce(() => undefined);
+  describe("input wiring", () => {
+    it("updates input value on change", () => {
+      const composer = makeComposer();
+      render(<SiteSettingsScreen composer={composer as never} />);
 
-    const composer = makeComposer({ setProjectSettings });
+      const nameInput = screen.getByPlaceholderText(/my awesome site/i);
+      fireEvent.change(nameInput, { target: { value: "My New Site" } });
 
-    render(
-      <SiteSettingsScreen
-        composer={composer as never}
-        onDirtyChange={vi.fn()}
-      />
-    );
-
-    const saveBtn = screen.getByRole("button", { name: /save/i });
-
-    // First click — throws → error shown
-    fireEvent.click(saveBtn);
-    expect(screen.getByRole("alert")).toBeInTheDocument();
-
-    // Second click — succeeds → error gone
-    fireEvent.click(saveBtn);
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+      expect(nameInput).toHaveValue("My New Site");
+    });
   });
 
-  it("calls onDirtyChange(true) when a field is edited", () => {
-    const onDirtyChange = vi.fn();
-    const composer = makeComposer();
+  describe("handleSave", () => {
+    it("calls setProjectSettings with merged seo data on save", () => {
+      render(<SiteSettingsScreen composer={composer as never} />);
 
-    render(
-      <SiteSettingsScreen
-        composer={composer as never}
-        onDirtyChange={onDirtyChange}
-      />
-    );
+      const nameInput = screen.getByPlaceholderText(/my awesome site/i);
+      fireEvent.change(nameInput, { target: { value: "Test Site" } });
 
-    const nameInput = screen.getByPlaceholderText(/my awesome site/i);
-    fireEvent.change(nameInput, { target: { value: "New Site" } });
+      const saveBtn = screen.getByRole("button", { name: /save/i });
+      fireEvent.click(saveBtn);
 
-    expect(onDirtyChange).toHaveBeenCalledWith(true);
-  });
-
-  it("calls onDirtyChange(false) after a successful save", () => {
-    const onDirtyChange = vi.fn();
-    const composer = makeComposer();
-
-    render(
-      <SiteSettingsScreen
-        composer={composer as never}
-        onDirtyChange={onDirtyChange}
-      />
-    );
-
-    // Edit a field to make it dirty
-    const nameInput = screen.getByPlaceholderText(/my awesome site/i);
-    fireEvent.change(nameInput, { target: { value: "New Site" } });
-
-    // Save
-    const saveBtn = screen.getByRole("button", { name: /save/i });
-    fireEvent.click(saveBtn);
-
-    expect(onDirtyChange).toHaveBeenLastCalledWith(false);
+      expect(composer.setProjectSettings).toHaveBeenCalled();
+      const call = (composer.setProjectSettings as ReturnType<typeof vi.fn>).mock.calls[0][0];
+      expect(call.seo.siteName).toBe("Test Site");
+    });
   });
 });

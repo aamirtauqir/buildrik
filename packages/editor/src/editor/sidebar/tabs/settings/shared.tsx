@@ -81,6 +81,7 @@ export const Toggle: React.FC<ToggleProps> = ({
       <button
         role="switch"
         aria-checked={checked}
+        aria-label={label}
         onClick={handleClick}
         className="aqb-st-toggle"
         style={{ background: checked ? "var(--aqb-primary)" : "var(--aqb-surface-4)" }}
@@ -195,46 +196,3 @@ const guardDiscardBtnStyle: React.CSSProperties = {
   borderRadius: 4,
   cursor: "pointer",
 };
-
-// ============================================
-// Integration Card Component
-// ============================================
-
-interface IntegrationCardProps {
-  name: string;
-  description: string;
-  connected: boolean;
-}
-
-export const IntegrationCard = React.memo<IntegrationCardProps>(
-  ({ name, description, connected }) => {
-    const [isLoading, setIsLoading] = React.useState(false);
-    const [isConnected, setIsConnected] = React.useState(connected);
-
-    const handleToggle = async () => {
-      setIsLoading(true);
-      // Simulate API call
-      await new Promise((r) => setTimeout(r, 1500));
-      setIsConnected(!isConnected);
-      setIsLoading(false);
-    };
-
-    return (
-      <div className="aqb-st-integration-card">
-        <div style={{ flex: 1 }}>
-          <div className="aqb-st-integration__name">{name}</div>
-          <div className="aqb-st-integration__desc">{description}</div>
-        </div>
-        <Button
-          onClick={handleToggle}
-          loading={isLoading}
-          disabled={isLoading}
-          variant={isConnected ? "ghost" : "primary"}
-          size="sm"
-        >
-          {isConnected ? "Disconnect" : "Connect"}
-        </Button>
-      </div>
-    );
-  }
-);

@@ -1,54 +1,39 @@
 /**
- * SEO screen — meta title (site name), description placeholder, robots toggle
- * Uses fields available in SiteSEO: siteName and twitterHandle.
- * Per-page SEO (metaTitle, metaDescription) lives in PageSEO on each page.
+ * SEO screen — Twitter Handle and Default OG Image
+ * Site name lives in Site Settings (canonical location).
+ * Per-page SEO (meta title, meta description) lives in PageSEO on each page.
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { EVENTS } from "../../../../../shared/constants/events";
 import { StickyFooter } from "../../../shared/StickyFooter";
 import { Section, Field } from "../shared";
+import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import type { ScreenProps } from "../types";
 
-export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) => {
-  const [siteName, setSiteName] = React.useState("");
-  const [twitterHandle, setTwitterHandle] = React.useState("");
-  const [defaultOgImage, setDefaultOgImage] = React.useState("");
-  const [hasChanges, setHasChanges] = React.useState(false);
-  const hasLoadedRef = React.useRef(false);
+const DEFAULT_SEO = {
+  twitterHandle: "",
+  defaultOgImage: "",
+};
 
+export const SeoScreen: React.FC<ScreenProps> = ({ composer }) => {
+  const { value: seo, isDirty, markDirty, markClean } = useSettingsScreen(
+    composer,
+    (s) => ({
+      twitterHandle: s.seo?.twitterHandle ?? "",
+      defaultOgImage: s.seo?.defaultOgImage ?? "",
+    }),
+    DEFAULT_SEO
+  );
+
+  const [twitterHandle, setTwitterHandle] = React.useState(seo.twitterHandle);
+  const [defaultOgImage, setDefaultOgImage] = React.useState(seo.defaultOgImage);
+
+  // Sync local state when composer reloads (preserves user's unsaved edits)
   React.useEffect(() => {
-    onDirtyChange?.(hasChanges);
-  }, [hasChanges, onDirtyChange]);
-
-  const loadSettings = React.useCallback(() => {
-    if (!composer) return;
-    const settings = composer.getProjectSettings();
-    const seo = settings.seo ?? {};
-    setSiteName(seo.siteName ?? "");
-    setTwitterHandle(seo.twitterHandle ?? "");
-    setDefaultOgImage(seo.defaultOgImage ?? "");
-    hasLoadedRef.current = true;
-    setHasChanges(false);
-  }, [composer]);
-
-  React.useEffect(() => {
-    if (!composer) return;
-    loadSettings();
-
-    const handleProjectLoaded = () => {
-      if (!hasLoadedRef.current) loadSettings();
-    };
-
-    composer.on(EVENTS.PROJECT_LOADED, handleProjectLoaded);
-    composer.on(EVENTS.SETTINGS_CHANGE, loadSettings);
-
-    return () => {
-      composer.off(EVENTS.PROJECT_LOADED, handleProjectLoaded);
-      composer.off(EVENTS.SETTINGS_CHANGE, loadSettings);
-    };
-  }, [composer, loadSettings]);
+    setTwitterHandle(seo.twitterHandle);
+    setDefaultOgImage(seo.defaultOgImage);
+  }, [seo.twitterHandle, seo.defaultOgImage]);
 
   const handleSave = () => {
     if (!composer) return;
@@ -57,31 +42,16 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) =>
       ...current,
       seo: {
         ...current.seo,
-        siteName,
         twitterHandle,
         defaultOgImage,
       },
     });
-    setHasChanges(false);
+    markClean();
   };
 
   return (
     <div className="aqb-st-screen">
       <Section title="Site SEO">
-        <Field label="Site Name (meta og:site_name)" htmlFor="seo-sitename">
-          <input
-            id="seo-sitename"
-            type="text"
-            value={siteName}
-            onChange={(e) => {
-              setSiteName(e.target.value);
-              setHasChanges(true);
-            }}
-            placeholder="My Awesome Site"
-            className="aqb-st-input"
-          />
-        </Field>
-
         <Field label="Twitter Handle" htmlFor="seo-twitter" hint="e.g. @buildrik">
           <input
             id="seo-twitter"
@@ -89,7 +59,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) =>
             value={twitterHandle}
             onChange={(e) => {
               setTwitterHandle(e.target.value);
-              setHasChanges(true);
+              markDirty();
             }}
             placeholder="@yourbrand"
             className="aqb-st-input"
@@ -103,7 +73,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) =>
             value={defaultOgImage}
             onChange={(e) => {
               setDefaultOgImage(e.target.value);
-              setHasChanges(true);
+              markDirty();
             }}
             placeholder="https://example.com/og-image.jpg"
             className="aqb-st-input"
@@ -114,19 +84,19 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) =>
       <div
         style={{
           padding: "10px 12px",
-          background: "rgba(99,102,241,0.06)",
+          background: "var(--aqb-surface-3)",
           borderRadius: "var(--aqb-radius-md)",
-          border: "1px solid rgba(99,102,241,0.15)",
+          border: "1px solid var(--aqb-border)",
           fontSize: 12,
           color: "var(--aqb-text-muted)",
           lineHeight: 1.5,
         }}
       >
-        Per-page SEO (meta title, description, robots) is set in each page's settings via the
+        Per-page SEO (meta title, description, robots) is set in each page&apos;s settings via the
         Pages tab.
       </div>
 
-      <StickyFooter primaryLabel="Save" onPrimary={handleSave} hasChanges={hasChanges} />
+      <StickyFooter primaryLabel="Save" onPrimary={handleSave} hasChanges={isDirty} />
     </div>
   );
 };

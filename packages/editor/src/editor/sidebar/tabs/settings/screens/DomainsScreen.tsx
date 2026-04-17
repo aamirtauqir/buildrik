@@ -8,8 +8,9 @@ import { Button } from "../../../../../shared/ui/Button";
 import { FEATURE_FLAGS } from "../constants";
 import { Section, Field } from "../shared";
 import { LockedScreen } from "./LockedScreen";
+import type { ScreenProps } from "../types";
 
-export const DomainsScreen: React.FC = () => {
+export const DomainsScreen: React.FC<ScreenProps> = () => {
   const [domain, setDomain] = React.useState("");
   const [copied, setCopied] = React.useState(false);
   const copyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -34,7 +35,6 @@ export const DomainsScreen: React.FC = () => {
 
   const handleConnect = () => {
     if (!domain.trim()) return;
-    // TODO: call domain connection API when FEATURE_FLAGS.domains = true
   };
 
   if (!FEATURE_FLAGS.domains) {
@@ -44,9 +44,6 @@ export const DomainsScreen: React.FC = () => {
         title="Custom Domains"
         message="Connect your own domain like www.yourbusiness.com to your Aquibra site. Make sure to publish your site first."
         waitlistLabel="Get notified when custom domains launch →"
-        onWaitlist={() => {
-          // TODO: integrate with waitlist/email capture when available
-        }}
       />
     );
   }

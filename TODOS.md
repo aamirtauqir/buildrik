@@ -43,3 +43,20 @@
 **Effort:** M (human: ~1 day / CC: ~30 min)
 **Priority:** P2
 **Depends on:** Run /design-consultation for structured output.
+
+---
+
+## Settings Tab Fixes (2026-04-17)
+
+### DomainsScreen: wire "Connect Domain" button
+**What:** `handleConnect` in `screens/DomainsScreen.tsx:36` is an empty function. Button is rendered but does nothing.
+**Why:** Custom domain connection requires a backend API (domain verification, SSL provisioning) that isn't wired yet.
+**Context:** `FEATURE_FLAGS.domains` gates the entire screen behind "Coming Soon" lock — not user-visible yet. When the flag is enabled, the dead button will be apparent.
+**Fix:** Wire to domain connection API once backend endpoint exists. Until then, log a "not yet implemented" message so it's not silently dead.
+**Depends on:** Backend domain connection API
+**Priority:** P2
+
+### jsdom test environment broken
+**What:** All `render()` and `renderHook()` calls fail with `ReferenceError: document is not defined`. Affects entire editor test suite.
+**Why:** jsdom environment not properly initialized in Vitest config.
+**Priority:** P2 — blocks writing new tests

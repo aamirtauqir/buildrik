@@ -6,6 +6,7 @@
 import * as React from "react";
 import type { CustomCodeConfig } from "../../../../../shared/types/project";
 import { validateHtml, type HtmlValidationResult } from "../../../../../shared/utils/validateHtml";
+import { validateCss, type CssValidationResult } from "../../../../../shared/utils/validateCss";
 import { StickyFooter } from "../../../shared/StickyFooter";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import { Section } from "../shared";
@@ -28,8 +29,9 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
   const [headCode, setHeadCode] = React.useState(savedCode.headScripts);
   const [bodyCode, setBodyCode] = React.useState(savedCode.bodyScripts);
   const [cssCode, setCssCode] = React.useState(savedCode.globalCss);
-  const [isDirty, setIsDirty] = React.useState(false);
   const [headValidation, setHeadValidation] = React.useState<HtmlValidationResult | null>(null);
+  const [cssValidation, setCssValidation] = React.useState<CssValidationResult | null>(null);
+  const [isDirty, setIsDirty] = React.useState(false);
 
   // Debounced validation for head code
   React.useEffect(() => {
@@ -43,11 +45,24 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
     return () => clearTimeout(timer);
   }, [headCode]);
 
+  // Debounced validation for CSS
+  React.useEffect(() => {
+    if (!cssCode.trim()) {
+      setCssValidation(null);
+      return;
+    }
+    const timer = setTimeout(() => {
+      setCssValidation(validateCss(cssCode));
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [cssCode]);
+
   // Sync local state when savedCode loads from composer
   React.useEffect(() => {
     setHeadCode(savedCode.headScripts);
     setBodyCode(savedCode.bodyScripts);
     setCssCode(savedCode.globalCss);
+    setIsDirty(false);
   }, [savedCode]);
 
   const handleSave = React.useCallback(() => {
@@ -120,9 +135,20 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
             setIsDirty(true);
           }}
           aria-label="Global CSS"
+          aria-describedby={cssValidation ? "css-validation-feedback" : undefined}
           placeholder={"/* Custom CSS */\n.my-class { color: red; }"}
           className="aqb-st-input" style={{ minHeight: 100, fontFamily: "monospace", fontSize: 12 }}
         />
+        {cssValidation && (
+          <div id="css-validation-feedback" role="status" aria-live="polite" style={validationContainerStyles}>
+            {cssValidation.errors.map((err, i) => (
+              <div key={`e${i}`} style={validationErrorStyles}>✗ {err}</div>
+            ))}
+            {cssValidation.valid && (
+              <div style={validationSuccessStyles}>✓ CSS brace balance looks good</div>
+            )}
+          </div>
+        )}
       </Section>
 
       <StickyFooter primaryLabel="Save" onPrimary={handleSave} hasChanges={isDirty} />

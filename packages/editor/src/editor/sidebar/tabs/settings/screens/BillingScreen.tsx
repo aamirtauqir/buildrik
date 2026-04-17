@@ -86,13 +86,13 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
           style={{
             padding: "3px 10px",
             borderRadius: "var(--aqb-radius-full, 999px)",
-            background: isFreePlan ? "var(--aqb-surface-4)" : "rgba(99,102,241,0.12)",
+            background: isFreePlan ? "var(--aqb-surface-4)" : "rgba(45,109,255,0.12)",
             color: isFreePlan ? "var(--aqb-text-secondary)" : "var(--aqb-primary)",
             fontSize: 12,
             fontWeight: 600,
             border: isFreePlan
               ? "1px solid var(--aqb-border)"
-              : "1px solid rgba(99,102,241,0.25)",
+              : "1px solid rgba(45,109,255,0.25)",
           }}
         >
           {planLabel}
@@ -104,9 +104,9 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
         <div
           style={{
             padding: "14px",
-            background: "rgba(99,102,241,0.06)",
+            background: "rgba(45,109,255,0.06)",
             borderRadius: "var(--aqb-radius-md)",
-            border: "1px solid rgba(99,102,241,0.15)",
+            border: "1px solid rgba(45,109,255,0.15)",
           }}
         >
           <div

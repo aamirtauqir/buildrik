@@ -27,9 +27,15 @@ export interface SettingsTabProps {
 }
 
 export interface ScreenProps {
-  composer: Composer | null;
+  composer?: Composer | null;
   /** Called when the screen's unsaved-changes state changes — used by shell to show nav guard */
   onDirtyChange?: (isDirty: boolean) => void;
+}
+
+export interface BillingScreenProps {
+  userPlan?: PlanTier;
+  /** Called when user clicks upgrade button */
+  onUpgrade?: () => void;
 }
 
 // ============================================

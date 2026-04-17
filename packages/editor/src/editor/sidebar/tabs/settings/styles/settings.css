@@ -102,7 +102,7 @@
 .aqb-checkbox-label input[type="checkbox"] {
   width: 14px;
   height: 14px;
-  accent-color: var(--aqb-accent-purple);
+  accent-color: var(--aqb-primary);
 }
 
 .aqb-hint {
@@ -266,7 +266,7 @@
 /* Notes / warnings */
 .aqb-st-note {
   padding: 12px;
-  background: rgba(124, 125, 255, 0.1);
+  background: rgba(45, 109, 255, 0.1);
   border-radius: 8px;
   font-size: 12px;
   color: var(--aqb-text-secondary);
@@ -369,11 +369,11 @@
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
-  background: var(--ls-danger-bg, #FEF2F2);
-  border: 1px solid var(--ls-danger-border, #FECACA);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
   border-radius: 6px;
   font-size: 12px;
-  color: var(--ls-danger, #DC2626);
+  color: var(--aqb-error, #ef4444);
   margin: 0 12px 4px;
 }
 
@@ -413,7 +413,7 @@
 
 .aqb-st-locked__btn {
   padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--aqb-primary);
   border: none;
   border-radius: 8px;
   color: #fff;

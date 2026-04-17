@@ -25,7 +25,7 @@ export interface UseSettingsScreenResult<T> {
 }
 
 export function useSettingsScreen<T>(
-  composer: Composer | null,
+  composer: Composer | null | undefined,
   selector: (settings: ProjectSettings) => T,
   defaultValue: T
 ): UseSettingsScreenResult<T> {

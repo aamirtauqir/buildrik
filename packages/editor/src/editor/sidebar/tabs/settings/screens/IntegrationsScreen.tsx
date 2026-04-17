@@ -7,6 +7,7 @@
 import * as React from "react";
 import { INTEGRATION_CATALOG } from "../constants";
 import { Section } from "../shared";
+import type { ScreenProps } from "../types";
 
 
 const categories = [...new Set(INTEGRATION_CATALOG.map((i) => i.category))];
@@ -62,7 +63,7 @@ const hintStyles: React.CSSProperties = {
   lineHeight: 1.4,
 };
 
-export const IntegrationsScreen: React.FC = () => (
+export const IntegrationsScreen: React.FC<ScreenProps> = () => (
   <div className="aqb-st-screen">
     <p style={hintStyles}>
       Connect third-party services to extend your site. Integrations require publishing your site

@@ -44,7 +44,7 @@ export const exportOptionStyles: React.CSSProperties = {
 
 /** Overlay applied to the selected option button. */
 export const activeExportOptionStyles: React.CSSProperties = {
-  background: "rgba(99,102,241,0.08)",
+  background: "rgba(45,109,255,0.08)",
   borderColor: "var(--aqb-primary, #6366f1)",
   color: "var(--aqb-primary, #6366f1)",
 };

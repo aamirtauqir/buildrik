@@ -4,61 +4,88 @@
  */
 
 import * as React from "react";
-import { EVENTS } from "../../../../../shared/constants/events";
 import { StickyFooter } from "../../../shared/StickyFooter";
 import { Section, Field } from "../shared";
-
+import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import type { ScreenProps } from "../types";
 
-export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) => {
-  const [name, setName] = React.useState("");
-  const [favicon, setFavicon] = React.useState("");
-  const [language, setLanguage] = React.useState("en");
-  const [twitter, setTwitter] = React.useState("");
-  const [facebook, setFacebook] = React.useState("");
-  const [linkedin, setLinkedin] = React.useState("");
-  const [hasChanges, setHasChanges] = React.useState(false);
+interface IdentitySettings {
+  siteName: string;
+  favicon: string;
+  language: string;
+}
+
+interface SocialSettings {
+  twitter: string;
+  facebook: string;
+  linkedin: string;
+}
+
+const DEFAULT_IDENTITY: IdentitySettings = {
+  siteName: "",
+  favicon: "",
+  language: "en",
+};
+
+const DEFAULT_SOCIAL: SocialSettings = {
+  twitter: "",
+  facebook: "",
+  linkedin: "",
+};
+
+export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
+  const identity = useSettingsScreen(
+    composer,
+    (s) => ({
+      siteName: s.seo?.siteName ?? "",
+      favicon: s.seo?.favicon ?? "",
+      language: s.seo?.language ?? "en",
+    }),
+    DEFAULT_IDENTITY
+  );
+
+  const social = useSettingsScreen(
+    composer,
+    (s) => ({
+      twitter: s.seo?.socialLinks?.twitter ?? "",
+      facebook: s.seo?.socialLinks?.facebook ?? "",
+      linkedin: s.seo?.socialLinks?.linkedin ?? "",
+    }),
+    DEFAULT_SOCIAL
+  );
+
+  const [siteName, setSiteName] = React.useState(identity.value.siteName);
+  const [favicon, setFavicon] = React.useState(identity.value.favicon);
+  const [language, setLanguage] = React.useState(identity.value.language);
+  const [twitter, setTwitter] = React.useState(social.value.twitter);
+  const [facebook, setFacebook] = React.useState(social.value.facebook);
+  const [linkedin, setLinkedin] = React.useState(social.value.linkedin);
   const [saveError, setSaveError] = React.useState<string | null>(null);
-  const hasLoadedRef = React.useRef(false);
+  const isSavingRef = React.useRef(false);
 
-  // Notify shell of dirty state for nav guard
+  // Sync local state when composer reloads (preserves user's unsaved edits)
   React.useEffect(() => {
-    onDirtyChange?.(hasChanges);
-  }, [hasChanges, onDirtyChange]);
+    setSiteName(identity.value.siteName);
+    setFavicon(identity.value.favicon);
+    setLanguage(identity.value.language);
+  }, [identity.value.siteName, identity.value.favicon, identity.value.language]);
 
-  // Load settings from project
-  const loadSettings = React.useCallback(() => {
-    if (!composer) return;
-    const settings = composer.getProjectSettings();
-    const seo = settings.seo ?? {};
-
-    setName(seo.siteName ?? "");
-    setFavicon(seo.favicon ?? "");
-    setLanguage(seo.language ?? "en");
-    setTwitter(seo.socialLinks?.twitter ?? "");
-    setFacebook(seo.socialLinks?.facebook ?? "");
-    setLinkedin(seo.socialLinks?.linkedin ?? "");
-    hasLoadedRef.current = true;
-    setHasChanges(false);
-  }, [composer]);
-
-  // Load on mount and when project loads
   React.useEffect(() => {
-    if (!composer) return;
-    loadSettings();
+    setTwitter(social.value.twitter);
+    setFacebook(social.value.facebook);
+    setLinkedin(social.value.linkedin);
+  }, [social.value.twitter, social.value.facebook, social.value.linkedin]);
 
-    const handleProjectLoaded = () => {
-      if (!hasLoadedRef.current) loadSettings();
-    };
+  const isDirty = identity.isDirty || social.isDirty;
 
-    composer.on(EVENTS.PROJECT_LOADED, handleProjectLoaded);
-    composer.on(EVENTS.SETTINGS_CHANGE, loadSettings);
-
-    return () => {
-      composer.off(EVENTS.PROJECT_LOADED, handleProjectLoaded);
-      composer.off(EVENTS.SETTINGS_CHANGE, loadSettings);
-    };
-  }, [composer, loadSettings]);
+  // Auto-save on blur: if dirty, save silently without requiring button click
+  const handleBlur = () => {
+    if (isDirty && !isSavingRef.current) {
+      isSavingRef.current = true;
+      handleSave();
+      isSavingRef.current = false;
+    }
+  };
 
   const handleSave = () => {
     if (!composer) return;
@@ -68,14 +95,15 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
         ...current,
         seo: {
           ...current.seo,
-          siteName: name,
+          siteName,
           favicon,
           language,
           socialLinks: { twitter, facebook, linkedin },
         },
       });
+      identity.markClean();
+      social.markClean();
       setSaveError(null);
-      setHasChanges(false);
     } catch {
       setSaveError("Failed to save settings. Please try again.");
     }
@@ -84,14 +112,18 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
   return (
     <div className="aqb-st-screen">
       <Section title="Site Identity">
+        {saveError && (
+          <div role="alert" className="sett-save-error">
+            <span className="sett-save-error__icon" aria-hidden="true" />
+            {saveError}
+          </div>
+        )}
         <Field label="Site Name">
           <input
             type="text"
-            value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-              setHasChanges(true);
-            }}
+            value={siteName}
+            onChange={(e) => { setSiteName(e.target.value); identity.markDirty(); }}
+            onBlur={handleBlur}
             placeholder="My Awesome Site"
             className="aqb-st-input"
           />
@@ -100,10 +132,8 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
           <input
             type="text"
             value={favicon}
-            onChange={(e) => {
-              setFavicon(e.target.value);
-              setHasChanges(true);
-            }}
+            onChange={(e) => { setFavicon(e.target.value); identity.markDirty(); }}
+            onBlur={handleBlur}
             placeholder="https://example.com/favicon.ico"
             className="aqb-st-input"
           />
@@ -111,10 +141,8 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
         <Field label="Site Language">
           <select
             value={language}
-            onChange={(e) => {
-              setLanguage(e.target.value);
-              setHasChanges(true);
-            }}
+            onChange={(e) => { setLanguage(e.target.value); identity.markDirty(); }}
+            onBlur={handleBlur}
             className="aqb-st-input"
           >
             <option value="en">English</option>
@@ -134,10 +162,8 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
             id="social-twitter"
             type="url"
             value={twitter}
-            onChange={(e) => {
-              setTwitter(e.target.value);
-              setHasChanges(true);
-            }}
+            onChange={(e) => { setTwitter(e.target.value); social.markDirty(); }}
+            onBlur={handleBlur}
             placeholder="https://twitter.com/..."
             className="aqb-st-input"
           />
@@ -147,10 +173,8 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
             id="social-facebook"
             type="url"
             value={facebook}
-            onChange={(e) => {
-              setFacebook(e.target.value);
-              setHasChanges(true);
-            }}
+            onChange={(e) => { setFacebook(e.target.value); social.markDirty(); }}
+            onBlur={handleBlur}
             placeholder="https://facebook.com/..."
             className="aqb-st-input"
           />
@@ -160,10 +184,8 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
             id="social-linkedin"
             type="url"
             value={linkedin}
-            onChange={(e) => {
-              setLinkedin(e.target.value);
-              setHasChanges(true);
-            }}
+            onChange={(e) => { setLinkedin(e.target.value); social.markDirty(); }}
+            onBlur={handleBlur}
             placeholder="https://linkedin.com/..."
             className="aqb-st-input"
           />
@@ -176,7 +198,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
             href="/privacy"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ fontSize: 13, color: "var(--aqb-primary, #6366f1)", textDecoration: "none" }}
+            style={{ fontSize: 13, color: "var(--aqb-primary)", textDecoration: "none" }}
           >
             Privacy Policy →
           </a>
@@ -184,7 +206,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
             href="/terms"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ fontSize: 13, color: "var(--aqb-primary, #6366f1)", textDecoration: "none" }}
+            style={{ fontSize: 13, color: "var(--aqb-primary)", textDecoration: "none" }}
           >
             Terms of Service →
           </a>
@@ -194,14 +216,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
         </div>
       </Section>
 
-      {saveError && (
-        <div className="sett-save-error" role="alert">
-          <span className="sett-save-error__icon" aria-hidden="true">⚠</span>
-          {saveError}
-        </div>
-      )}
-
-      <StickyFooter primaryLabel="Save" onPrimary={handleSave} hasChanges={hasChanges} />
+      <StickyFooter primaryLabel="Save" onPrimary={handleSave} hasChanges={isDirty} />
     </div>
   );
 };

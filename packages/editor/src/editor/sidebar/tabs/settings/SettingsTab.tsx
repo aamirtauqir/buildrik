@@ -234,15 +234,6 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             onClose={onClose}
           />
           <div className="aqb-st-content">{renderContent()}</div>
-          <SettingsNavGuard
-            isOpen={guardOpen}
-            onDiscard={() => {
-              setGuardOpen(false);
-              setScreenIsDirty(false);
-              goBack();
-            }}
-            onCancel={() => setGuardOpen(false)}
-          />
         </>
       ) : (
         <>
@@ -256,6 +247,15 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
           <div className="aqb-st-home">{renderHomeScreen()}</div>
         </>
       )}
+      <SettingsNavGuard
+        isOpen={guardOpen}
+        onDiscard={() => {
+          setGuardOpen(false);
+          setScreenIsDirty(false);
+          goBack();
+        }}
+        onCancel={() => setGuardOpen(false)}
+      />
     </div>
   );
 };
