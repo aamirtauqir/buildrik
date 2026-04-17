@@ -32,6 +32,8 @@ export interface ProjectData {
   version: string;
   /** Pages */
   pages: PageData[];
+  /** Ordered list of page IDs (drag-to-reorder source of truth) */
+  pagesOrder?: string[];
   /** Global styles */
   styles: StyleData[];
   /** Assets */
@@ -53,6 +55,12 @@ export interface ProjectMetadata {
   author?: string;
   /** Analytics configuration */
   analytics?: AnalyticsConfig;
+  /**
+   * Custom domain for this project (e.g., "acme.com"). Used to build real
+   * page URLs in copy-link, SEO previews, and redirects. When unset the UI
+   * falls back to the platform default (e.g., "yoursite.aquibra.io").
+   */
+  domain?: string;
 }
 
 /**
@@ -97,6 +105,27 @@ export interface PageData {
   styles?: StyleData[];
   /** Page settings */
   settings?: PageSettings;
+  /** ISO8601 timestamp of the most recent meaningful mutation (name, slug, settings, content) */
+  updatedAt?: string;
+  /**
+   * True when the current slug was entered by the user in settings; false when
+   * auto-derived from the page name. Controls whether "rename → auto-update slug"
+   * is offered. Legacy pages (undefined) are treated as false (conservative).
+   */
+  slugManuallySet?: boolean;
+  /**
+   * Append-only history of prior slugs for this page, used to generate 301
+   * redirects on export. Capped at 100 entries; oldest entries drop off.
+   */
+  slugHistory?: SlugChange[];
+}
+
+/** One slug change event for redirect generation */
+export interface SlugChange {
+  /** Prior slug (the value being redirected FROM) */
+  slug: string;
+  /** ISO8601 timestamp when the slug changed */
+  changedAt: string;
 }
 
 export interface PageSettings {
