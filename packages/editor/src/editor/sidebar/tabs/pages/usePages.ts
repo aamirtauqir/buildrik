@@ -104,6 +104,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
             status: (p.settings?.visibility as PageItem["status"]) ?? "draft",
             seo: p.settings?.seo,
             head: p.settings?.head,
+            updatedAt: p.updatedAt,
           }))
         );
         setLoadError(null); // clear error on success
@@ -150,10 +151,10 @@ export function usePages(composer: Composer | null): UsePagesReturn {
       // prepended instead of appended and when PROJECT_CHANGED fired twice
       // in a tick.
       const newest = composer.elements.createPage(name, { slug });
-      // rAF ensures the row has mounted before we focus the rename input.
-      if (newest) {
-        requestAnimationFrame(() => setRenamingPageId(newest.id));
-      }
+      // PageRow owns focus: when it mounts with isRenaming=true, its own
+      // effect selects + focuses the input. No rAF needed here — that was
+      // a timing race when the row hadn't mounted within one frame.
+      if (newest) setRenamingPageId(newest.id);
     } catch (err) {
       addToast({
         message: "Couldn't add page right now. Try again.",
@@ -166,6 +167,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
 
   const selectPage = React.useCallback(
     (pageId: string) => {
+      setContextMenu(null);
       composer?.elements.setActivePage(pageId);
     },
     [composer]
@@ -371,7 +373,9 @@ export function usePages(composer: Composer | null): UsePagesReturn {
     deletePage,
     setHomepage,
     copyPageLink,
-    isOnlyPage: pages.length <= 1,
+    // Guards against deleting the final page. Semantically the "only" page is
+    // exactly 1 — 0 pages is a different (empty-list) state handled by PageList.
+    isOnlyPage: pages.length === 1,
     canSearch: pages.length >= 5,
     loadError,
     retrySync,

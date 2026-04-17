@@ -11,6 +11,14 @@ export type PageStatus = "live" | "draft" | "hidden" | "password" | "error" | "e
 /** Settings drawer tab identifier */
 export type DrawerTab = "seo" | "social" | "advanced";
 
+/** A sidebar-only folder that groups pages. Stored in localStorage, not the engine. */
+export interface FolderItem {
+  id: string;
+  name: string;
+  pageIds: string[];
+  collapsed: boolean;
+}
+
 export interface PageItem {
   id: string;
   name: string;
@@ -24,4 +32,6 @@ export interface PageItem {
   seo?: PageSEO;
   /** Custom <head> HTML injected for this page (from settings.head) */
   head?: string;
+  /** ISO8601 timestamp from engine PageData.updatedAt — used for row "2m ago" label */
+  updatedAt?: string;
 }
