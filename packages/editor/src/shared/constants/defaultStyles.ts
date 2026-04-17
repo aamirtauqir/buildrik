@@ -10,7 +10,7 @@
 
 // Theme constants - use actual values (not CSS vars) so they display properly in Inspector
 const THEME = {
-  primary: "#8B5CF6",
+  primary: "#2D6DFF",
   textPrimary: "#1a1a1a",
   textSecondary: "#333333",
   fontFamily: "Inter, sans-serif",

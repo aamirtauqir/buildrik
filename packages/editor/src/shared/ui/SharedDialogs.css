@@ -53,7 +53,7 @@
 }
 
 .sd-btn--primary {
-  background: var(--aqb-primary, #6366f1);
+  background: var(--aqb-primary, #2D6DFF);
   color: #fff;
 }
 
@@ -101,5 +101,5 @@
 }
 
 .sd-input:focus {
-  border-color: var(--aqb-primary, #6366f1);
+  border-color: var(--aqb-primary, #2D6DFF);
 }

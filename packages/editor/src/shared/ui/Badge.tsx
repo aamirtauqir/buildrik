@@ -25,7 +25,7 @@ export const Badge: React.FC<BadgeProps> = ({
       background: "var(--aqb-surface-2)",
       color: "var(--aqb-text-muted)",
     },
-    primary: { background: "rgba(99, 102, 241, 0.12)", color: "var(--aqb-primary, #6366F1)" },
+    primary: { background: "rgba(45, 109, 255, 0.12)", color: "var(--aqb-primary, #2D6DFF)" },
     success: { background: "rgba(34, 197, 94, 0.12)", color: "var(--aqb-success, #22c55e)" },
     warning: { background: "rgba(245, 158, 11, 0.12)", color: "var(--aqb-warning, #f59e0b)" },
     error: { background: "rgba(239, 68, 68, 0.12)", color: "var(--aqb-error, #ef4444)" },

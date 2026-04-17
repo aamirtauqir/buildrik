@@ -132,7 +132,7 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
         style={{
           ...iconBtnStyles,
           color: isPinned
-            ? "var(--ls-accent, #1D4ED8)"
+            ? "var(--ls-accent, #2D6DFF)"
             : "var(--ls-text-subtle, #64748B)",
         }}
         title={isPinned ? "Unpin panel" : "Pin panel"}
