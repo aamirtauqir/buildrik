@@ -32,13 +32,13 @@ export function LayerSelectionBanner({
 
   return (
     <div
-      className="aqb-layer-sel-banner lyr-action-bar"
+      className="aqb-layer-sel-banner"
       role="status"
       aria-live="polite"
       aria-label={`${count} layers selected`}
     >
-      <span className="aqb-sel-count lyr-action-bar__count">{count} selected</span>
-      <div className="lyr-action-bar__actions">
+      <span className="aqb-sel-count">{count} selected</span>
+      <div className="aqb-layer-sel-actions">
         <button className="aqb-sel-btn" onClick={onGroup} title="Wrap in container (⌘G)">
           Group
         </button>
@@ -46,7 +46,7 @@ export function LayerSelectionBanner({
           Hide
         </button>
         <button
-          className="aqb-sel-btn aqb-sel-btn--danger lyr-action-bar__delete"
+          className="aqb-sel-btn aqb-sel-btn--danger"
           onClick={onDelete}
           title={`Delete ${count} layers`}
         >

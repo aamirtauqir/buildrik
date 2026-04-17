@@ -585,7 +585,7 @@
   gap: 8px;
   padding: 8px 12px;
   background: var(--aqb-error-bg, rgba(239, 68, 68, 0.1));
-  border-bottom: 1px solid var(--aqb-error, #ef4444);
+  border-bottom: 1px solid var(--aqb-error);
   font-size: var(--aqb-font-xs);
   color: var(--aqb-text-primary);
 }
@@ -596,7 +596,7 @@
 
 .aqb-delete-confirm-ok {
   padding: 3px 10px;
-  background: var(--aqb-error, #ef4444);
+  background: var(--aqb-error);
   border: none;
   border-radius: var(--aqb-radius-sm);
   color: #fff;
@@ -623,7 +623,7 @@
   top: 44px;
   right: 8px;
   z-index: 200;
-  background: var(--aqb-surface-2, #1e2130);
+  background: var(--aqb-surface-2);
   border: 1px solid var(--aqb-border);
   border-radius: var(--aqb-radius-md, 8px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
@@ -699,7 +699,7 @@
    CONTEXT MENU
    ───────────────────────────────────────────── */
 .aqb-layer-ctx-menu {
-  background: var(--aqb-surface-2, #1e2130);
+  background: var(--aqb-surface-2);
   border: 1px solid var(--aqb-border);
   border-radius: var(--aqb-radius-md, 8px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -724,7 +724,7 @@
 .aqb-layer-ctx-item:hover {
   background: var(--aqb-surface-hover, rgba(255,255,255,0.06));
 }
-.aqb-layer-ctx-item--danger { color: var(--aqb-error, #ef4444); }
+.aqb-layer-ctx-item--danger { color: var(--aqb-error); }
 .aqb-layer-ctx-item--danger:hover { background: rgba(239,68,68,0.1); }
 .aqb-layer-ctx-divider {
   height: 1px;
@@ -746,13 +746,13 @@
   gap: 6px;
   padding: 6px 12px;
   background: var(--aqb-info-bg, rgba(59,130,246,0.12));
-  border-bottom: 1px solid var(--aqb-info, #3b82f6);
+  border-bottom: 1px solid var(--aqb-info);
   flex-shrink: 0;
 }
 .aqb-sel-count {
   font-size: 12px;
   font-weight: 600;
-  color: var(--aqb-info, #3b82f6);
+  color: var(--aqb-info);
   flex: 1;
 }
 .aqb-sel-btn {
@@ -765,7 +765,7 @@
   cursor: pointer;
 }
 .aqb-sel-btn:hover { background: var(--aqb-surface-hover); }
-.aqb-sel-btn--danger { border-color: var(--aqb-error, #ef4444); color: var(--aqb-error, #ef4444); }
+.aqb-sel-btn--danger { border-color: var(--aqb-error); color: var(--aqb-error); }
 .aqb-sel-btn--muted { color: var(--aqb-text-tertiary); }
 /* Multi-selected row styling */
 .aqb-layer-row.is-multi-selected {
@@ -885,102 +885,94 @@
 }
 
 /* ─────────────────────────────────────────────
-   LYR-* — Pencil component-library spec classes
-   (Steps 2.2–2.5: lyr-row states, action bar, sync banner)
+   Selected row — WCAG AA compliant (design review Pass 5)
+   White text on cobalt-tint bg with cobalt left-border.
+   Do NOT use cobalt text on cobalt bg (4.0:1 fails AA).
    ───────────────────────────────────────────── */
+.aqb-layer-row.is-selected {
+  background: var(--accent-tint);
+  color: var(--aqb-text-primary);
+  border-left: 2px solid var(--accent);
+}
 
-/* lyr-* classes override aqb-layer-row where both are applied (transitional dual-class pattern).
-   lyr-row values (32px height, 13px font) match the new pencil spec and take precedence. */
-
-/* Row base */
-.lyr-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 8px;
-  height: 32px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 13px;
-  color: var(--ls-text-primary, #0F172A);
-  transition: background 100ms ease;
-  user-select: none;
-}
-.lyr-row:hover {
-  background: var(--ls-bg-subtle, #F1F5F9);
-}
-.lyr-row--selected {
-  background: var(--ls-accent-bg, #DBEAFE);
-  color: var(--ls-accent-txt, #1E40AF);
-}
-.lyr-row--hidden {
+.aqb-layer-row.is-hidden {
   opacity: 0.45;
 }
-.lyr-row--locked .lyr-row__drag-handle {
+
+.aqb-layer-row.is-locked .aqb-layer-row__drag-handle {
   display: none;
 }
 
-/* Rename state: hide name span, show input.
-   Targets the actual class names used in LayerTreeItem.tsx JSX:
-   .aqb-layer-name (the display span) and .aqb-layer-name-input (the edit input). */
-.lyr-row--rename .aqb-layer-name {
+.aqb-layer-row.is-editing .aqb-layer-name {
   display: none;
 }
-.lyr-row--rename .aqb-layer-name-input {
+
+.aqb-layer-row.is-editing .aqb-layer-name-input {
   display: block;
-  font-size: 13px;
-  border: 1px solid var(--ls-accent, #1D4ED8);
-  border-radius: 4px;
-  padding: 0 4px;
-  outline: none;
-  background: var(--ls-bg-card, #FFFFFF);
-  color: var(--ls-text-primary, #0F172A);
 }
 
-/* Multi-select action bar (Screen R4Pf4) */
-.lyr-action-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  border-top: 1px solid var(--ls-border-light, #E2E8F0);
-  background: var(--ls-bg-card, #FFFFFF);
-  font-size: 12px;
-}
-.lyr-action-bar__count {
-  color: var(--ls-text-muted, #475569);
-  font-weight: 500;
-}
-.lyr-action-bar__actions {
-  display: flex;
-  gap: 8px;
-}
-.lyr-action-bar__actions button {
-  font-size: 12px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--ls-text-secondary, #334155);
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-.lyr-action-bar__actions button:hover {
-  background: var(--ls-bg-subtle, #F1F5F9);
-}
-.lyr-action-bar__delete {
-  color: var(--ls-danger, #DC2626);
+/* ─────────────────────────────────────────────
+   Focus rings — universal 2px cobalt outline (design review Pass 2)
+   ───────────────────────────────────────────── */
+.aqb-layer-row:focus-visible,
+.aqb-layers-settings-btn:focus-visible,
+.aqb-search-input:focus-visible,
+.aqb-layer-name-input:focus-visible,
+.aqb-sel-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
-/* Selection synced banner (Screen uHSyK) */
-.lyr-sync-banner {
+/* ─────────────────────────────────────────────
+   Hover-reveal icons — smooth 100ms opacity (design review Pass 7)
+   Eye/lock icons fade in on row hover.
+   ───────────────────────────────────────────── */
+.aqb-layer-row__icon--reveal {
+  opacity: 0;
+  transition: opacity 100ms ease;
+}
+.aqb-layer-row:hover .aqb-layer-row__icon--reveal {
+  opacity: 1;
+}
+
+/* ─────────────────────────────────────────────
+   Sync banner — cobalt translucent fade-in
+   (replaces deleted lyr-sync-banner)
+   ───────────────────────────────────────────── */
+.aqb-sync-banner {
   padding: 6px 12px;
-  background: var(--ls-accent-bg, #DBEAFE);
-  color: var(--ls-accent-txt, #1E40AF);
+  background: var(--accent-tint);
+  color: var(--aqb-text-primary);
   font-size: 12px;
-  border-bottom: 1px solid var(--ls-border-light, #E2E8F0);
-  animation: lyr-fade-in 200ms ease;
+  border-bottom: 1px solid var(--aqb-border);
+  animation: aqb-sync-fade-in 200ms ease;
 }
-@keyframes lyr-fade-in {
+
+@keyframes aqb-sync-fade-in {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ─────────────────────────────────────────────
+   Multi-select action bar container (replaces deleted lyr-action-bar__actions)
+   ───────────────────────────────────────────── */
+.aqb-layer-sel-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ─────────────────────────────────────────────
+   Accessibility — honor prefers-reduced-motion (design review Pass 6)
+   ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .aqb-sync-banner {
+    animation: none;
+  }
+  .aqb-layer-row__icon--reveal {
+    transition: none;
+  }
+  .aqb-layer-row {
+    transition: none;
+  }
+}
+

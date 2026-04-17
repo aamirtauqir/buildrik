@@ -40,54 +40,68 @@
    DESIGN TOKENS (from new.left.pen variables)
    ───────────────────────────────────────────── */
 :root {
-  --ls-bg-panel: #F8FAFC;
-  --ls-bg-card: #FFFFFF;
-  --ls-bg-subtle: #F1F5F9;
-  --ls-accent: #1D4ED8;
-  --ls-accent-bg: #DBEAFE;
-  --ls-accent-txt: #1E40AF;
-  --ls-text-primary: #0F172A;
-  --ls-text-secondary: #334155;
-  --ls-text-medium: #374151;
-  --ls-text-muted: #475569;
-  --ls-text-subtle: #64748B;
-  --ls-text-lighter: #94A3B8;
-  --ls-text-ghost: #CBD5E1;
-  --ls-border-card: #D1D9E6;
-  --ls-border-light: #E2E8F0;
-  --ls-border-soft: #CBD5E1;
+  /* ────────────────────────────────────────────────
+     --ls-* tokens now ALIAS the canonical --aqb-* and --accent
+     per DESIGN.md: editor chrome is dark-only, cobalt accent only.
+     Do not redefine as literal hex values. Use var() aliasing.
+     ──────────────────────────────────────────────── */
+
+  /* Surfaces */
+  --ls-bg-panel: var(--aqb-bg-panel);
+  --ls-bg-card: var(--aqb-surface-2);
+  --ls-bg-subtle: rgba(255, 255, 255, 0.04);
+
+  /* Accent — cobalt only */
+  --ls-accent: var(--accent);
+  --ls-accent-bg: var(--accent-tint);
+  --ls-accent-txt: var(--aqb-text-primary); /* WCAG AA: white text, not cobalt (4.0:1 fails) */
+  --ls-accent-border: var(--accent);
+  --ls-accent-bg-hover: var(--accent-tint);
+
+  /* Text */
+  --ls-text-primary: var(--aqb-text-primary);
+  --ls-text-secondary: var(--aqb-text-secondary);
+  --ls-text-medium: var(--aqb-text-secondary);
+  --ls-text-muted: var(--aqb-text-tertiary);
+  --ls-text-subtle: var(--aqb-text-muted);
+  --ls-text-lighter: var(--aqb-text-muted);
+  --ls-text-ghost: var(--aqb-text-muted);
+
+  /* Borders */
+  --ls-border-card: var(--aqb-border);
+  --ls-border-light: var(--aqb-border);
+  --ls-border-soft: var(--aqb-border);
+
+  /* Status (DESIGN.md keeps these) */
   --ls-danger: #DC2626;
   --ls-danger-dark: #991B1B;
-  --ls-danger-bg: #FEF2F2;
-  --ls-danger-border: #FECACA;
-  --ls-accent-border: #BFDBFE;
-  --ls-accent-bg-hover: #BFDBFE;
+  --ls-danger-bg: rgba(220, 38, 38, 0.12);
+  --ls-danger-border: rgba(220, 38, 38, 0.4);
   --ls-dirty: #F59E0B;
 
-  /* ── Global light surface overrides ──────────────────────────────────────── */
-  /* These override the dark fallbacks used in LayoutShell.css                 */
-  --surface-base: #F0F4F8;
-  --surface-canvas: #EEF2F7;
-  --ls-topbar-bg: #FFFFFF;
-  --ls-inspector-bg: #F8FAFC;
-  --ls-inspector-border: #D1D9E6;
-  --ls-topbar-border: #E2E8F0;
-  --ls-canvas-dot: rgba(100, 116, 139, 0.1);
-
-  /* ── Status tokens ──────────────────────────────────────────────────────── */
-  --ls-success-bg: #DCFCE7;
-  --ls-success-text: #166534;
-  --ls-success-text-dark: #4ADE80;
-  --ls-warning-bg: #FEF3C7;
-  --ls-warning-text: #92400E;
-  --ls-error-bg: #FEE2E2;
-  --ls-error-text: #DC2626;
+  /* Status — dark-mode appropriate */
+  --ls-success-bg: rgba(34, 197, 94, 0.12);
+  --ls-success-text: #4ADE80;
+  --ls-success-text-dark: #22C55E;
+  --ls-warning-bg: rgba(245, 158, 11, 0.12);
+  --ls-warning-text: #FBBF24;
+  --ls-error-bg: rgba(239, 68, 68, 0.12);
+  --ls-error-text: #F87171;
   --ls-destructive: #EF4444;
   --ls-green-check: #22C55E;
-  --ls-border-dialog: #D8E0EA;
-  --ls-overlay: rgba(0, 0, 0, 0.4);
-  --ls-shadow-menu: 0 4px 12px rgba(0, 0, 0, 0.25);
-  --ls-shadow-dialog: 0 4px 24px rgba(0, 0, 0, 0.2);
+
+  /* Layout surfaces — dark chrome */
+  --ls-topbar-bg: var(--aqb-bg-panel);
+  --ls-topbar-border: var(--aqb-border);
+  --ls-inspector-bg: var(--aqb-bg-panel);
+  --ls-inspector-border: var(--aqb-border);
+  --ls-border-dialog: var(--aqb-border);
+  --ls-canvas-dot: rgba(255, 255, 255, 0.06);
+
+  /* Modal overlay — darker for dark chrome (was rgba 0.4, now 0.7 per design review) */
+  --ls-overlay: rgba(0, 0, 0, 0.7);
+  --ls-shadow-menu: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --ls-shadow-dialog: 0 4px 24px rgba(0, 0, 0, 0.5);
 }
 
 /* ─────────────────────────────────────────────

@@ -160,7 +160,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
 
       {/* Selection synced banner — Screen uHSyK */}
       {selectionSynced && (
-        <div className="lyr-sync-banner" role="status" aria-live="polite">
+        <div className="aqb-sync-banner" role="status" aria-live="polite">
           Selection synced from canvas
         </div>
       )}

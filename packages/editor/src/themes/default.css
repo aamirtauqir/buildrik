@@ -31,6 +31,13 @@
   --aqb-primary-muted: rgba(45, 109, 255, 0.08);
   --aqb-primary-subtle: rgba(45, 109, 255, 0.06);
 
+  /* Canonical aliases per DESIGN.md (use --accent everywhere going forward) */
+  --accent: var(--aqb-primary);
+  --accent-hover: var(--aqb-primary-hover);
+  --accent-pressed: var(--aqb-primary-active);
+  --accent-tint: var(--aqb-primary-light);
+  --accent-subtle: var(--aqb-primary-subtle);
+
   /* Secondary Colors - removed (DESIGN.md: single accent only) */
 
   /* Surface Hierarchy - Depth layers */
