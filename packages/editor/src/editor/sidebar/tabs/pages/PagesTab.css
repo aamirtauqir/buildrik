@@ -1166,10 +1166,10 @@
   bottom: calc(100% + 4px);
   left: 8px;
   right: 8px;
-  background: var(--ls-bg-card, #FFFFFF);
-  border: 1px solid var(--ls-border-card, #D1D9E6);
+  background: var(--aqb-surface-3, #1a1a28);
+  border: 1px solid var(--aqb-border);
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
   z-index: 10;
   overflow: hidden;
 }
@@ -1183,13 +1183,13 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--aqb-text-primary);
   font-family: inherit;
   transition: background 100ms ease;
 }
 
 .pg-add-option:hover {
-  background: var(--ls-bg-subtle, #F1F5F9);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* ── pg-empty: empty state when no pages exist ───────────────────────────── */
@@ -2071,6 +2071,9 @@
 
 /* ── Slug destructive warning ────────────────────────────────────── */
 .pg-seo__slug-warning {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
   margin-top: 6px;
   padding: 8px 10px;
   background: rgba(245, 158, 11, 0.1);
@@ -2079,6 +2082,12 @@
   font-size: var(--aqb-font-xs);
   color: var(--aqb-text-primary);
   line-height: 1.5;
+}
+
+.pg-seo__slug-warning-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: rgb(245, 158, 11);
 }
 
 /* ── Advanced tab banners ────────────────────────────────────────── */
@@ -2734,3 +2743,77 @@
     animation-duration: 0.01ms !important;
   }
 }
+
+/* ==========================================================================
+   Phase 2 Chunk 2 — Row content port (grip, thumb, slug, updated)
+   Spec: prototype.html (.pg-row-*) at designs/page-tab-premium-20260417/
+   ========================================================================== */
+
+.pages-panel .pg-row { gap: 8px; }
+
+/* Drag grip — hidden by default, shown on row hover when row is draggable */
+.pages-panel .pg-row__grip {
+  display: none;
+  width: 10px;
+  color: var(--aqb-text-muted, #908d85);
+  margin-right: -4px;
+  cursor: grab;
+  flex-shrink: 0;
+}
+.pages-panel .pg-row-wrap[draggable="true"] .pg-row:hover .pg-row__grip { display: block; }
+.pages-panel .pg-row__grip:active { cursor: grabbing; }
+
+/* Thumbnail placeholder — 32x20 gradient by page type */
+.pages-panel .pg-row__thumb {
+  position: relative;
+  width: 32px;
+  height: 20px;
+  border: 1px solid var(--aqb-border, rgba(255,255,255,0.08));
+  border-radius: 3px;
+  flex-shrink: 0;
+  overflow: hidden;
+  background-image: linear-gradient(135deg, #252531 0%, #1e1e28 55%, #17171f 100%);
+}
+.pages-panel .pg-row__thumb--t-hero    { background: linear-gradient(180deg, #1b2950, #223070 40%, #0c0c14 100%); }
+.pages-panel .pg-row__thumb--t-about   { background: linear-gradient(180deg, #222833, #13151a 60%); }
+.pages-panel .pg-row__thumb--t-blog    { background: linear-gradient(180deg, #191721, #221f2b 70%); }
+.pages-panel .pg-row__thumb--t-contact { background: linear-gradient(180deg, #0f1a2e, #0a1424); }
+.pages-panel .pg-row__thumb--t-pricing { background: linear-gradient(180deg, #1a1f14, #131509); }
+.pages-panel .pg-row__thumb--t-ext     { background: linear-gradient(135deg, #222, #111); }
+.pages-panel .pg-row__thumb-ghost {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 1px;
+}
+.pages-panel .pg-row__thumb-ghost + .pg-row__thumb-ghost {
+  top: 9px;
+  width: 70%;
+  background: rgba(255,255,255,0.15);
+}
+
+/* Inline monospace slug next to page name */
+.pages-panel .pg-row__slug {
+  margin-left: 6px;
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 10.5px;
+  color: var(--aqb-text-muted, #908d85);
+  font-weight: 400;
+}
+
+/* "Updated" time — right-aligned, tabular */
+.pages-panel .pg-row__updated {
+  flex-shrink: 0;
+  min-width: 50px;
+  text-align: right;
+  font-size: 10.5px;
+  color: var(--aqb-text-muted, #908d85);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hide the "updated" label when the hover action mini-toolbar is visible so
+   the row doesn't double-fill its right edge */
+.pages-panel .pg-row:hover .pg-row__updated { opacity: 0.5; }

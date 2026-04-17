@@ -1,9 +1,9 @@
 /**
  * PageRow — Single page item in the pages list.
  *
- * When isExpanded is true, renders an inline accordion with SEO / Social /
- * Advanced settings sections as <details> elements — replacing the old
- * full-panel drawer (B-03 fix: no more tab-within-tab navigation).
+ * Settings gear click opens a 580px slide-over drawer rendered by PagesTab.
+ * Supports multi-select (Ctrl/Cmd+click, Shift+click, Space key) and
+ * drag-to-folder (when draggable prop is set).
  *
  * @license BSD-3-Clause
  */
@@ -11,10 +11,8 @@
 import * as React from "react";
 import type { Composer } from "../../../../../engine";
 import type { PageItem } from "../types";
-import { usePageSettings } from "../page-settings/usePageSettings";
-import { SeoTab } from "../page-settings/SeoTab";
-import { SocialTab } from "../page-settings/SocialTab";
-import { AdvancedTab } from "../page-settings/AdvancedTab";
+import { relativeTime } from "../utils/relativeTime";
+import { thumbnailKey } from "../utils/thumbnailKey";
 
 interface Props {
   page: PageItem;
@@ -23,7 +21,12 @@ interface Props {
   isRenaming: boolean;
   nameError?: string | null;
   isContextMenuOpen?: boolean;
-  isExpanded: boolean;
+  /** Enables drag handle and drag-to-folder when true (pages inside folders). */
+  draggable?: boolean;
+  /** Whether this row is part of a multi-select. */
+  isSelected?: boolean;
+  /** Toggle multi-select for this page. */
+  onToggleSelect?: (e: React.MouseEvent | React.KeyboardEvent) => void;
   onSelect: () => void;
   onRenameCommit: (name: string) => void;
   onRenameCancel: () => void;
@@ -71,98 +74,6 @@ function statusTooltip(page: PageItem): string {
   }
 }
 
-// ── Inline settings panel (rendered when isExpanded = true) ────────────────
-
-interface InlineSettingsProps {
-  page: PageItem;
-  pages: PageItem[];
-  composer: Composer | null;
-  onClose: () => void;
-}
-
-const InlineSettings: React.FC<InlineSettingsProps> = ({ page, pages, composer, onClose }) => {
-  const s = usePageSettings(composer, page, pages);
-
-  // Auto-save: 500ms after any change
-  React.useEffect(() => {
-    if (!s.isDirty) return;
-    const timer = setTimeout(() => { s.save(); }, 500);
-    return () => clearTimeout(timer);
-  }, [s.isDirty, s]);
-
-  // ⌘S / Ctrl+S — immediate save
-  React.useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
-        e.preventDefault();
-        if (s.isDirty || s.saveState === "error") s.save();
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [s]);
-
-  return (
-    <div className="pg-row-settings" role="region" aria-label={`${page.name} Settings`}>
-      {/* Save row */}
-      <div className="pg-row-settings__save-row">
-        <div className="pg-row-settings__status" aria-live="polite">
-          {s.saveState === "saving" && <span>Saving...</span>}
-          {s.saveState === "clean" && !s.isDirty && <span>Saved ✓</span>}
-          {s.saveState === "error" && (
-            <button onClick={s.save} className="pg-row-settings__retry">
-              Retry
-            </button>
-          )}
-        </div>
-        <button
-          className="pg-row-settings__close"
-          onClick={onClose}
-          aria-label="Close page settings"
-          title="Close settings"
-        >
-          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        </button>
-      </div>
-
-      {/* SEO accordion */}
-      <details className="pg-row-settings__section" open>
-        <summary className="pg-row-settings__summary">
-          SEO
-          {s.seoScore < 80 && (
-            <span className="pg-row-settings__score-chip" style={{ color: s.seoScore <= 40 ? "var(--pg-error, #EF4444)" : "var(--pg-hidden, #F59E0B)" }}>
-              {s.seoScore}
-            </span>
-          )}
-        </summary>
-        <div className="pg-row-settings__body">
-          <SeoTab s={s} page={page} />
-        </div>
-      </details>
-
-      {/* Social accordion */}
-      <details className="pg-row-settings__section">
-        <summary className="pg-row-settings__summary">Social</summary>
-        <div className="pg-row-settings__body">
-          <SocialTab s={s} page={page} />
-        </div>
-      </details>
-
-      {/* Advanced accordion */}
-      <details className="pg-row-settings__section">
-        <summary className="pg-row-settings__summary">Advanced</summary>
-        <div className="pg-row-settings__body">
-          <AdvancedTab s={s} />
-        </div>
-      </details>
-
-    </div>
-  );
-};
-
 // ── PageRow ────────────────────────────────────────────────────────────────
 
 export const PageRow = React.memo<Props>(
@@ -173,8 +84,10 @@ export const PageRow = React.memo<Props>(
     isRenaming,
     nameError = null,
     isContextMenuOpen = false,
-    isExpanded,
+    draggable: isDraggable = false,
+    isSelected = false,
     onSelect,
+    onToggleSelect,
     onRenameCommit,
     onRenameCancel,
     onRenameStart,
@@ -188,6 +101,8 @@ export const PageRow = React.memo<Props>(
     // emits + two history snapshots for one rename. The committed-ref flag
     // makes the blur handler idempotent within a single rename session.
     const committedRef = React.useRef(false);
+    const updatedLabel = relativeTime(page.updatedAt);
+    const thumbClass = thumbnailKey(page);
 
     React.useEffect(() => {
       if (isRenaming) {
@@ -214,7 +129,15 @@ export const PageRow = React.memo<Props>(
         e.preventDefault();
         committedRef.current = true; // prevent blur from committing after cancel
         onRenameCancel();
+      } else if (e.key === " " && onToggleSelect) {
+        e.preventDefault();
+        onToggleSelect(e);
       }
+    };
+
+    const handleDragStart = (e: React.DragEvent) => {
+      e.dataTransfer.setData("text/plain", page.id);
+      e.dataTransfer.effectAllowed = "move";
     };
 
     const handleSettingsClick = (e: React.MouseEvent) => {
@@ -244,29 +167,57 @@ export const PageRow = React.memo<Props>(
 
     return (
       <div
-        className={[
-          "pg-row-wrap",
-          isExpanded ? "pg-row-wrap--expanded" : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
+        className="pg-row-wrap"
         role="listitem"
+        draggable={isDraggable}
+        onDragStart={isDraggable ? handleDragStart : undefined}
       >
         {/* ── Row header ───────────────────────────────────────────────── */}
         <div
-          className={["pg-row", page.isActive ? "pg-row--active" : "", isExpanded ? "pg-row--settings-open" : ""].filter(Boolean).join(" ")}
+          className={["pg-row", page.isActive ? "pg-row--active" : ""].filter(Boolean).join(" ")}
           role="button"
           tabIndex={0}
           aria-label={ariaLabel}
           aria-current={page.isActive ? "page" : undefined}
-          aria-expanded={isExpanded}
-          onClick={onSelect}
+          aria-pressed={onToggleSelect ? isSelected : undefined}
+          onClick={(e) => {
+            if (onToggleSelect && (e.ctrlKey || e.metaKey || e.shiftKey)) {
+              onToggleSelect(e);
+            } else {
+              onSelect();
+            }
+          }}
           onContextMenu={handleContextMenuClick}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !isRenaming) onSelect();
             if (e.key === "F2" && !isRenaming) onRenameStart();
+            if (e.key === " " && onToggleSelect) { e.preventDefault(); onToggleSelect(e); }
           }}
         >
+          {/* Selection indicator — shown on hover (via CSS) or when selected */}
+          {onToggleSelect && (
+            <button
+              className={`pg-row__select-dot${isSelected ? " pg-row__select-dot--on" : ""}`}
+              onClick={(e) => { e.stopPropagation(); onToggleSelect(e); }}
+              aria-label={isSelected ? "Deselect page" : "Select page"}
+              title={isSelected ? "Deselect" : "Select"}
+              tabIndex={-1}
+            >
+              {isSelected ? (
+                <svg viewBox="0 0 12 12" width="8" height="8" fill="currentColor" aria-hidden="true">
+                  <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              ) : null}
+            </button>
+          )}
+
+          {/* Drag grip — visible on hover, activates browser drag when parent draggable=true */}
+          <span className="pg-row__grip" aria-hidden="true" title="Drag to reorder">
+            <svg viewBox="0 0 10 14" width="10" height="14" fill="currentColor" aria-hidden="true">
+              <circle cx="3" cy="3" r="1" /><circle cx="3" cy="7" r="1" /><circle cx="3" cy="11" r="1" />
+              <circle cx="7" cy="3" r="1" /><circle cx="7" cy="7" r="1" /><circle cx="7" cy="11" r="1" />
+            </svg>
+          </span>
 
           {/* Page icon */}
           <div className="pg-row__icon">
@@ -293,6 +244,12 @@ export const PageRow = React.memo<Props>(
                 </>
               )}
             </svg>
+          </div>
+
+          {/* Thumbnail placeholder — gradient by page status until real snapshots ship */}
+          <div className={`pg-row__thumb pg-row__thumb--${thumbClass}`} aria-hidden="true">
+            <span className="pg-row__thumb-ghost" />
+            <span className="pg-row__thumb-ghost" />
           </div>
 
           {/* Name or inline rename input */}
@@ -324,8 +281,15 @@ export const PageRow = React.memo<Props>(
               }}
             >
               {page.name}
+              {page.slug && (
+                <span className="pg-row__slug">
+                  {page.slug.startsWith("/") ? page.slug : `/${page.slug}`}
+                </span>
+              )}
             </div>
           )}
+
+          {updatedLabel && <span className="pg-row__updated">{updatedLabel}</span>}
 
           {/* Homepage pill — cobalt "HOME" text per DESIGN.md (no emoji). */}
           {page.isHome && (
@@ -345,10 +309,9 @@ export const PageRow = React.memo<Props>(
           {/* Action buttons */}
           <div className="pg-row__actions">
             <button
-              className={`pg-row__act${isExpanded ? " pg-row__act--active" : ""}`}
-              title={isExpanded ? "Close settings" : "Page settings"}
-              aria-label={isExpanded ? `Close settings for ${page.name}` : `Open settings for ${page.name}`}
-              aria-pressed={isExpanded}
+              className="pg-row__act"
+              title="Page settings"
+              aria-label={`Open settings for ${page.name}`}
               onClick={handleSettingsClick}
             >
               <svg
@@ -390,16 +353,6 @@ export const PageRow = React.memo<Props>(
             </button>
           </div>
         </div>
-
-        {/* ── Inline accordion settings ─────────────────────────────────── */}
-        {isExpanded && (
-          <InlineSettings
-            page={page}
-            pages={pages}
-            composer={composer}
-            onClose={onSettingsClick}
-          />
-        )}
       </div>
     );
   }
