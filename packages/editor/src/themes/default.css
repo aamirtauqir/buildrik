@@ -48,6 +48,65 @@
   --aqb-bg-panel-tertiary: #24243a;
   --aqb-bg-elevated: #1e1e30;
   --aqb-bg-canvas: #ffffff;
+
+  /* ───────── Left Sidebar (--ls-*) design tokens ─────────────────────────
+   * 36 tokens consumed by 607 call sites across PanelHeader.tsx (inline
+   * style), ComponentsTab, HistoryTab, PagesTab, etc. They were NEVER
+   * defined at root, so every consumer fell through to hardcoded light-
+   * theme fallbacks (#F8FAFC panel, #DBEAFE active row, #0F172A text).
+   * That's why the editor's left sidebar rendered white/light even though
+   * the rest of the app is dark. Defining them here cascades a single
+   * dark + cobalt palette to every consumer in one pass.
+   * Aligned with DESIGN.md: cobalt accent, 5-layer dark depth, WCAG AA.
+   * ────────────────────────────────────────────────────────────────────── */
+
+  /* Surfaces */
+  --ls-bg-app: #0c0c14;                /* app root / outermost surface */
+  --ls-bg-panel: #14141f;              /* panel container */
+  --ls-bg-subtle: #17171f;             /* subtle fills (search, chips) */
+  --ls-bg-card: #1e1e28;               /* cards, elevated rows */
+  --ls-topbar-bg: #14141f;             /* editor top bar */
+  --ls-inspector-bg: #14141f;          /* right inspector panel */
+
+  /* Text */
+  --ls-text-primary: #F5F5F0;          /* primary text (14.1:1 on panel) */
+  --ls-text-secondary: #B8B5AD;        /* secondary (6.5:1) */
+  --ls-text-medium: #A8A59C;           /* medium (label-ish) */
+  --ls-text-muted: #A09D96;            /* muted text */
+  --ls-text-subtle: #908D85;           /* subtle (least emphasis) */
+  --ls-text-lighter: #B8B5AD;          /* legacy alias for secondary */
+  --ls-text-ghost: #707070;            /* disabled / very muted */
+
+  /* Borders (dark-on-dark, subtle) */
+  --ls-border-light: rgba(255, 255, 255, 0.08);
+  --ls-border-soft: rgba(255, 255, 255, 0.05);
+  --ls-border-medium: rgba(255, 255, 255, 0.12);
+  --ls-border-card: rgba(255, 255, 255, 0.08);
+  --ls-border-dialog: rgba(255, 255, 255, 0.15);
+  --ls-topbar-border: rgba(255, 255, 255, 0.08);
+  --ls-inspector-border: rgba(255, 255, 255, 0.08);
+
+  /* Accent (single cobalt per DESIGN.md) */
+  --ls-accent: #2D6DFF;
+  --ls-accent-bg: rgba(45, 109, 255, 0.12);       /* tint for active rows */
+  --ls-accent-bg-hover: rgba(45, 109, 255, 0.18);
+  --ls-accent-border: rgba(45, 109, 255, 0.35);
+  --ls-accent-txt: #F5F5F0;                       /* readable text on tint */
+
+  /* Semantic */
+  --ls-danger: #EF4444;
+  --ls-danger-bg: rgba(239, 68, 68, 0.08);
+  --ls-danger-border: rgba(239, 68, 68, 0.35);
+  --ls-error-bg: rgba(239, 68, 68, 0.08);
+  --ls-error-text: #F5A3A3;
+  --ls-warning-bg: rgba(245, 158, 11, 0.08);
+  --ls-warning-text: #F2C16B;
+  --ls-success-text: #8EE0A6;
+  --ls-dirty: #F59E0B;                            /* unsaved indicator */
+
+  /* Misc */
+  --ls-canvas-dot: rgba(255, 255, 255, 0.06);     /* canvas grid dots */
+  --ls-shadow-dialog: 0 12px 32px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.35);
   --aqb-bg-hover: rgba(255, 255, 255, 0.04);
   --aqb-bg-active: rgba(255, 255, 255, 0.06);
 
