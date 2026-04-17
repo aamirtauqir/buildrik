@@ -60,3 +60,17 @@
 **What:** All `render()` and `renderHook()` calls fail with `ReferenceError: document is not defined`. Affects entire editor test suite.
 **Why:** jsdom environment not properly initialized in Vitest config.
 **Priority:** P2 — blocks writing new tests
+
+---
+
+## Component Tab Fixes (2026-04-17)
+
+### Component swap: override preservation via path remapping
+**What:** When swapping a component instance with a different component, preserve user overrides by remapping JSON patch paths from the old master tree to the new one.
+**Why:** The current Fix #1 MVP (detach + instantiate) discards all overrides on swap. Users who have customized instance properties lose their work.
+**Pros:** Full feature parity with design intent. Makes component swapping truly usable for users who customize instances.
+**Cons:** Path remapping between arbitrary master tree structures is complex. Requires deep comparison of old vs new element hierarchies.
+**Context:** `ComponentInstance` stores overrides as JSON patches with element-index paths (e.g. `#/$5/textContent/fill`). If the new component has a different element tree, these paths break. A mapping strategy is needed — element-type matching, fuzzy matching, or explicit slot naming.
+**Effort:** L (human: ~2 weeks / CC: ~2 hours) — complex engine work
+**Priority:** P2
+**Depends on:** Component Tab Fix #1 MVP shipped
