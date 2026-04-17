@@ -28,8 +28,6 @@ export { useHistoryState } from "./useHistoryState";
 export type { UseHistoryStateReturn } from "./useHistoryState";
 export { useVersionHistory } from "./useVersionHistory";
 export type { UseVersionHistoryReturn } from "./useVersionHistory";
-export { useSemanticDiff } from "./useSemanticDiff";
-export type { CompareResult, UseSemanticDiffReturn } from "./useSemanticDiff";
 export { useAutoMilestone } from "./useAutoMilestone";
 export type { MilestoneSuggestion, UseAutoMilestoneReturn } from "./useAutoMilestone";
 export type {

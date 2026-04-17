@@ -59,6 +59,9 @@ export class HistoryManager {
   /** Labels accumulated during coalesce window */
   private coalescedLabels: string[] = [];
 
+  /** Current user ID for team attribution — set from session when available */
+  private currentUserId: string | null = null;
+
   constructor(composer: Composer) {
     this.composer = composer;
     this.config = {
@@ -162,6 +165,7 @@ export class HistoryManager {
         timestamp: Date.now(),
         snapshot: newState,
         label: finalLabel,
+        userId: this.currentUserId,
       });
       this.patchesSinceCheckpoint = 0;
     } else {
@@ -171,6 +175,7 @@ export class HistoryManager {
         patch,
         reversePatch: reversePatch(patch),
         label: finalLabel,
+        userId: this.currentUserId,
       });
     }
 
@@ -178,6 +183,14 @@ export class HistoryManager {
     this.redoStack = [];
     this.trimHistory();
     this.composer.emit(EVENTS.HISTORY_RECORDED, { label: finalLabel });
+  }
+
+  /**
+   * Set the current user ID for team attribution on undo history entries.
+   * Called by the shell when session becomes available (spec §2.10).
+   */
+  setCurrentUserId(userId: string | null): void {
+    this.currentUserId = userId;
   }
 
   // ─── Collaboration ──────────────────────────────────────────────────────────
@@ -198,6 +211,7 @@ export class HistoryManager {
       patch,
       reversePatch: reversePatchData,
       label,
+      userId: this.currentUserId,
     });
 
     this.currentStateCache = newState;

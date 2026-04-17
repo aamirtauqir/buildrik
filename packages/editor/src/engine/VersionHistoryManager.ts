@@ -686,10 +686,28 @@ export class VersionHistoryManager {
       layout: 0,
       content: 0,
       other: 0,
+      pagesAdded: 0,
+      pagesDeleted: 0,
     };
 
     for (const change of changes) {
       summary[change.type]++;
+    }
+
+    // Page-level diff (spec §2.3): match by id, fall back to name
+    const pageKey = (page: { id?: string; name?: string }): string =>
+      page.id || page.name || "";
+    const currentPageKeys = new Set(
+      currentData.pages.map(pageKey).filter((k) => k !== "")
+    );
+    const targetPageKeys = new Set(
+      targetData.pages.map(pageKey).filter((k) => k !== "")
+    );
+    for (const key of targetPageKeys) {
+      if (!currentPageKeys.has(key)) summary.pagesAdded++;
+    }
+    for (const key of currentPageKeys) {
+      if (!targetPageKeys.has(key)) summary.pagesDeleted++;
     }
 
     return {

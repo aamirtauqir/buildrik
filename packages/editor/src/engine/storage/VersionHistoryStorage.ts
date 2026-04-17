@@ -51,9 +51,10 @@ async function openDatabase(): Promise<IDBDatabase> {
 // ============================================
 
 /**
- * Save a version to IndexedDB
+ * Internal: perform the IndexedDB write for a version.
+ * Rejects with the original DOMException so callers can branch on .name.
  */
-export async function saveVersion(version: NamedVersion): Promise<void> {
+async function writeVersion(version: NamedVersion): Promise<void> {
   const db = await openDatabase();
 
   return new Promise((resolve, reject) => {
@@ -78,6 +79,29 @@ export async function saveVersion(version: NamedVersion): Promise<void> {
       reject(tx.error);
     };
   });
+}
+
+/**
+ * Save a version to IndexedDB.
+ *
+ * Spec §5.2 quota recovery: on QuotaExceededError, prune the 10 oldest
+ * versions for the project and retry once. Any other error (or a second
+ * quota failure) is rethrown so callers can surface it to the user.
+ */
+export async function saveVersion(version: NamedVersion): Promise<void> {
+  try {
+    await writeVersion(version);
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "QuotaExceededError") {
+      const projectId = version.projectId || "default";
+      const versions = await loadVersions(projectId);
+      const targetMax = Math.max(0, versions.length - 10);
+      await pruneVersions(projectId, targetMax);
+      await writeVersion(version);
+      return;
+    }
+    throw error;
+  }
 }
 
 /**

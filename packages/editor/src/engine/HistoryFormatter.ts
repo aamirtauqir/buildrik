@@ -32,6 +32,7 @@ export function buildHistoryDisplayEntries(undoStack: HistoryEntry[]): HistoryDi
       label: friendlyLabel,
       type: entry.type,
       changes: entry.type === "patch" ? formatPatchChanges(entry.patch) : [],
+      userId: entry.userId ?? null,
     };
     entries.push(displayEntry);
   }

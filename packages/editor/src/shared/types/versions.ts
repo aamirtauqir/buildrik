@@ -164,6 +164,10 @@ export interface CompareSummary {
   layout: number;
   content: number;
   other: number;
+  /** Count of pages present in target but not in current (spec §2.3) */
+  pagesAdded: number;
+  /** Count of pages present in current but not in target (spec §2.3) */
+  pagesDeleted: number;
 }
 
 /**

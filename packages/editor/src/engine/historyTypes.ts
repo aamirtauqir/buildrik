@@ -33,6 +33,8 @@ export interface BaseHistoryEntry {
   label?: string;
   /** Entry type */
   type: HistoryEntryType;
+  /** User ID of who created this entry (team attribution, spec §2.10) */
+  userId?: string | null;
 }
 
 /**
@@ -92,6 +94,8 @@ export interface HistoryDisplayEntry {
   type: "checkpoint" | "patch";
   /** Formatted changes (for patch entries) */
   changes: HistoryChange[];
+  /** User ID of who created this entry (for team attribution, spec §2.10) */
+  userId: string | null;
 }
 
 /**

@@ -23,6 +23,7 @@
     "lucide-react": "^0.562.0",
     "openai": "^6.13.0",
     "react-easy-crop": "^5.5.7",
+    "react-window": "^1.8.11",
     "zod": "^3.25.76"
   },
   "devDependencies": {
@@ -32,6 +33,7 @@
     "@types/node": "^24.10.2",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/react-window": "^2.0.0",
     "@vitejs/plugin-react": "^5.1.2",
     "agentation": "^3.0.2",
     "jsdom": "^28.1.0",
