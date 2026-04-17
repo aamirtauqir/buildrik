@@ -11,6 +11,7 @@ import { flatCatalog } from "../catalog/catalog";
 import { TIPS } from "../catalog/tips";
 import type { FlatElEntry, SearchGroup } from "../catalog/types";
 import { searchElements } from "../utils/search";
+import { getBlockDefinitions } from "../../../../../blocks";
 
 // ─── Storage helpers ─────────────────────────────────────────────────────────
 
@@ -277,6 +278,13 @@ export function useBuildTab(
 
   const handleElClick: ElClickFn = React.useCallback(
     (el) => {
+      // Dev-mode validation: warn if catalog blockId has no registry entry
+      if (process.env.NODE_ENV === "development") {
+        const def = getBlockDefinitions().find((b) => b.id === el.blockId);
+        if (!def) {
+          console.warn(`[useBuildTab] blockId "${el.blockId}" (${el.name}) has no registry entry. Catalog may be out of sync with blockRegistry.`);
+        }
+      }
       onBlockClick?.({ id: el.blockId, label: el.name, category: el.catId });
     },
     [onBlockClick]

@@ -16,7 +16,7 @@ interface OnboardingTipProps {
 export const OnboardingTip: React.FC<OnboardingTipProps> = ({ dismissed, onDismiss }) => {
   if (dismissed) return null;
   return (
-    <div className="bld-tip-banner" role="note">
+    <div className="bld-tip-banner" role="status">
       <span className="bld-tip-banner-text">{BUILD_TIP}</span>
       <button
         className="bld-tip-banner-dismiss"

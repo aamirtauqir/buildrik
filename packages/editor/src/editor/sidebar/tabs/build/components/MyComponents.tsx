@@ -15,14 +15,17 @@ interface MyComponentsProps {
   composer: Composer | null;
 }
 
-export const MyComponents: React.FC<MyComponentsProps> = ({ open, onToggle, composer }) => {
-  const hasApi =
-    composer !== null &&
-    typeof (composer?.elements as unknown as Record<string, unknown> | undefined)?.[
-      "getComponents"
-    ] === "function";
+// Composer.elements.getComponents() is not yet on the formal Composer type.
+// This duck-type check detects whether the method exists at runtime.
+// If getComponents is renamed in blockRegistry, update this check too.
+function canUseComponents(composer: Composer | null): boolean {
+  if (!composer) return false;
+  const el = composer.elements as unknown as Record<string, unknown>;
+  return typeof el.getComponents === "function";
+}
 
-  if (!hasApi) return null;
+export const MyComponents: React.FC<MyComponentsProps> = ({ open, onToggle, composer }) => {
+  if (!canUseComponents(composer)) return null;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {

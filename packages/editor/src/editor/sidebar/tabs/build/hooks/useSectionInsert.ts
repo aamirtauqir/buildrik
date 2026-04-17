@@ -37,6 +37,11 @@ export function useSectionInsert(composer: Composer | null): UseSectionInsertRes
       setIsInserting(true);
       composer.beginTransaction("insert-section-sidebar");
       try {
+        // ── Pre-transaction guard checks ─────────────────────────────────────────
+        // These early returns (lines 40-44, 45-48) are intentionally placed BEFORE
+        // beginTransaction. No history transaction is started if there's no page/root.
+        // The finally block (line 78) always calls endTransaction, which is safe
+        // because beginTransaction has not yet been called when these return.
         const page = composer.elements.getActivePage();
         if (!page) {
           addToast({ message: "No active page. Please select a page first.", variant: "error" });
@@ -47,6 +52,7 @@ export function useSectionInsert(composer: Composer | null): UseSectionInsertRes
           addToast({ message: "Page root element not found.", variant: "error" });
           return;
         }
+        // ── Transaction begins — all paths below must call endTransaction ──────────
 
         // Sections always insert at the end of the page root — they are
         // full-width layout chunks, not nested content. Selection is ignored

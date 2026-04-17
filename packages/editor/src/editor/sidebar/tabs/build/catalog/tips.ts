@@ -18,8 +18,8 @@ export const TIPS: Tip[] = [
     body: " — Hover an element and click the star to save it for quick access.",
   },
   {
-    bold: "⌘F to search",
-    body: " — Press ⌘F (Ctrl+F) to jump to search. Esc or ✕ to clear.",
+    bold: "/ to search",
+    body: " — Press / to jump to search. Esc or ✕ to clear.",
   },
   {
     bold: "My Components",

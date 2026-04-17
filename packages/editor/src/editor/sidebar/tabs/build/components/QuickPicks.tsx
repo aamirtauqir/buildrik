@@ -22,6 +22,7 @@ interface QuickPicksProps {
 }
 
 const blockIdMap = new Map(flatCatalog.map((el) => [el.blockId, el]));
+const MAX_QUICK_PICKS = 7;
 
 export const QuickPicks: React.FC<QuickPicksProps> = ({
   picks,
@@ -77,14 +78,14 @@ export const QuickPicks: React.FC<QuickPicksProps> = ({
         ))}
 
         {/* Ghost chips — teach users personalization exists */}
-        {Array.from({ length: Math.max(0, 7 - picks.length) }).map((_, i) => (
+        {Array.from({ length: Math.max(0, MAX_QUICK_PICKS - picks.length) }).map((_, i) => (
           <div key={`ghost-${i}`} className="bld-qp-chip bld-qp-chip--ghost" aria-hidden="true">
             <Plus size={14} />
           </div>
         ))}
 
         {/* "+" chip — hidden when 7 picks (full) */}
-        {picks.length < 7 && (
+        {picks.length < MAX_QUICK_PICKS && (
           <button
             className="bld-qp-chip bld-qp-chip--add"
             onClick={onPlusClick}
