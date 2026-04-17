@@ -9,7 +9,7 @@
 import type { PageItem } from "../types";
 
 const PALETTE = ["t-hero", "t-about", "t-blog", "t-contact", "t-pricing", "t-ext"] as const;
-export type ThumbClass = typeof PALETTE[number];
+type ThumbClass = typeof PALETTE[number];
 
 export function thumbnailKey(page: PageItem): ThumbClass {
   if (page.status === "external") return "t-ext";

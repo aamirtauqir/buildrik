@@ -2749,8 +2749,6 @@
    Spec: prototype.html (.pg-row-*) at designs/page-tab-premium-20260417/
    ========================================================================== */
 
-.pages-panel .pg-row { gap: 8px; }
-
 /* Drag grip — hidden by default, shown on row hover when row is draggable */
 .pages-panel .pg-row__grip {
   display: none;
