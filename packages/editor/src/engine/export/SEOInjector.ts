@@ -7,6 +7,7 @@
  */
 
 import type { PageSEO, SiteSEO, PageData } from "../../shared/types";
+import { sanitizeHeadCode } from "./sanitizeHeadCode";
 
 // ============================================================================
 // TYPES
@@ -112,12 +113,19 @@ export class SEOInjector {
       tags.push(`<meta name="robots" content="${robotsDirectives.join(", ")}">`);
     }
 
-    // Structured data (JSON-LD)
+    // Structured data (JSON-LD).
+    // Escape </script> in the payload to prevent breaking out of the script tag.
     if (pageSEO?.structuredData) {
-      tags.push(
-        `<script type="application/ld+json">${JSON.stringify(pageSEO.structuredData)}</script>`
-      );
+      const jsonLd = JSON.stringify(pageSEO.structuredData).replace(/<\/script/gi, "<\\/script");
+      tags.push(`<script type="application/ld+json">${jsonLd}</script>`);
     }
+
+    // A2: Custom head code. Was previously persisted but NEVER injected —
+    // the "runs on every page load" banner was a lie. Now sanitized via
+    // DOMPurify allowlist (inline <script>, event handlers, unknown tags
+    // all stripped) and appended last so user injections override defaults.
+    const customHead = sanitizeHeadCode(page.settings?.head);
+    if (customHead) tags.push(customHead);
 
     return tags.join("\n  ");
   }
