@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0.0] - 2026-04-17
+
+### Added
+- Layers tab theme migration: dark chrome + cobalt accent per DESIGN.md — token-layer flip across 29 consumer files via --ls-* aliasing
+- Sidebar chrome now fully dark: topbar, panels, inspector all use consistent --aqb-bg-panel surfaces
+- Pages tab visual refresh: cobalt accents, dot chips, HOME pill badge, improved hover states
+
+### Fixed
+- WCAG AA compliance: selected layer row now uses white text on cobalt-tint bg (4.0:1 contrast, was 2.8:1)
+- Indigo/violet hex values purged from shared/ui: Badge, SharedDialogs, defaultStyles, PanelHeader
+- Dead legacy CSS deleted: components/Panels/LayersPanel/styles/layers.css (651 lines, zero imports)
+
+### Changed
+- --ls-* tokens now alias --aqb-*/--accent instead of hardcoded hex (single source of truth in themes/default.css)
+- --accent canonical token added as alias for --aqb-primary cobalt
+
 ## [0.2.0.0] - 2026-04-13
 
 ### Added

@@ -74,3 +74,28 @@
 **Effort:** L (human: ~2 weeks / CC: ~2 hours) — complex engine work
 **Priority:** P2
 **Depends on:** Component Tab Fix #1 MVP shipped
+
+---
+
+## Post-Migration: Layers Tab Theme (2026-04-17)
+
+### Playwright visual regression infra
+**What:** Add Playwright-based visual regression tests covering all 7 sidebar tabs (Layers, Build, Design, Pages, Templates, History, Settings).
+**Why:** No automated visual regression infra exists. Manual QA (Task 8) is the current gate — this automates it.
+**Effort:** M (human: ~2 days / CC: ~1 hr)
+**Priority:** P2
+**Depends on:** Layers tab migration shipped
+
+### CI grep rule for banned indigo/violet hex
+**What:** Add a CI step that greps for banned indigo/violet hex values (`#1D4ED8|#1E40AF|#4F46E5|indigo|violet`) in `packages/editor/src` and fails the build.
+**Why:** Prevent indigo regression — the root cause of the light-theme leakage was 50 hardcoded indigo hex values.
+**Effort:** S (human: ~1 day / CC: ~30 min)
+**Priority:** P2
+**Depends on:** Layers tab migration shipped
+
+### Post-migration hardcoded indigo audit
+**What:** Audit `editor/rail/LayoutShell.css` (lines 59, 258) for `--surface-base`/`--surface-canvas` light fallbacks (`#F0F4F8`, `#EEF2F7`). Update to dark fallbacks.
+**Why:** LeftSidebar.css Task 4 noted these files still have light-mode fallbacks for `--surface-*` tokens.
+**Effort:** S (human: ~1 hr / CC: ~10 min)
+**Priority:** P2
+**Depends on:** Layers tab migration shipped
