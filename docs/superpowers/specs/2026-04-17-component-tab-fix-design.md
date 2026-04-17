@@ -2,7 +2,15 @@
 
 **Date:** 2026-04-17
 **Author:** Claude
-**Status:** Approved for implementation
+**Status:** Approved for implementation (revised per CEO review)
+
+**CEO Review Decisions (2026-04-17):**
+- Fix #1: Approach B (detach + instantiate MVP) — override preservation deferred to follow-up
+- Fix #3: Will include proper null-check for duplicateComponent return value
+- Fix #7: ComponentIcon will get `size` prop added
+- Fix #7: Placeholder will get `role="img"` + `aria-label` for accessibility
+- Fix #2: Toast fix also applied to `useComponentsState.handleInstantiate` (second silent fail)
+- Fix #1: TODO + TODOS.md entry added for override preservation gap
 
 ---
 
@@ -28,10 +36,15 @@ The Components Tab (`editor/sidebar/tabs/ComponentsTab.tsx`) has 7 broken or inc
 **Fix approach:** Same-category picker modal. When user clicks "Swap component":
 1. Instead of showing a toast, open a `Modal` listing all components in the same category as the current one
 2. User clicks a component to select it as the replacement
-3. On selection, call `composer.components.swapInstanceWithComponent(elementId, newComponentId)` (new engine method)
+3. On selection:
+   a. Call `detachInstance(elementId)` on the selected canvas instance
+   b. Call `instantiateComponent(newComponentId, parentId)` at the same position
+   c. Remove the old instance from the instances map
 4. Navigate back to browse view with success toast
 
-**New engine method needed:** `swapInstanceWithComponent(elementId: string, newComponentId: string)` in `ComponentManager.ts` — replaces the master tree of an instance with a different component's master tree while preserving overrides.
+**Implementation note:** This approach does NOT preserve overrides — the old instance's override patches are discarded. Override preservation requires a separate investigation into path-remapping between master trees.
+
+**New engine method needed:** `swapInstanceWithComponent(elementId: string, newComponentId: string)` in `ComponentManager.ts` — replaces the master tree of an instance using detach + instantiate approach. **Override preservation is NOT implemented** — see Approach B MVP. A follow-up investigation is needed for path-based override remapping.
 
 **Files changed:**
 - `engine/components/ComponentManager.ts` — add `swapInstanceWithComponent()`
@@ -67,6 +80,7 @@ if (!parentId) {
 
 **Files changed:**
 - `ComponentDetailScreen.tsx` — add toast on silent fail path
+- `useComponentsState.ts` — apply same fix to `handleInstantiate` (second silent fail path)
 
 ---
 
@@ -89,6 +103,8 @@ const handleDuplicate = React.useCallback(
 ```
 
 Also remove the `DuplicateInfoState` and `duplicateInfo` modal from `useComponentsState` since it's no longer needed.
+
+**Implementation note:** The `ComponentDetailScreen`'s own `handleDuplicate` also calls `duplicateComponent` but shows success toast unconditionally. Ensure implementation adds proper null-check on return value.
 
 **Files changed:**
 - `useComponentsState.ts` — simplify `handleDuplicate`, remove `duplicateInfo` state/modal
@@ -164,7 +180,11 @@ const handleHelpClickFn = React.useCallback(() => {
 For now, improve the visual placeholder:
 
 ```tsx
-<div className="aqb-component-detail-preview-placeholder">
+<div
+  className="aqb-component-detail-preview-placeholder"
+  role="img"
+  aria-label={`No preview available for ${component.name}`}
+>
   <ComponentIcon size={48} />
   <span className="preview-placeholder-text">No preview available</span>
   <span className="preview-placeholder-hint">Insert the component to see it on canvas</span>
@@ -173,7 +193,8 @@ For now, improve the visual placeholder:
 
 **Files changed:**
 - `ComponentDetailScreen.tsx` — improve placeholder design
-- CSS for `.aqb-component-detail-preview-placeholder`
+- `ComponentsTab.css` — add CSS for `.aqb-component-detail-preview-placeholder` child elements
+- `component-library/ComponentIcon.tsx` — add `size` prop to support 48px in placeholder
 
 ---
 
@@ -209,3 +230,4 @@ For now, improve the visual placeholder:
 - Build tab "My Components" section (separate tab, different code path)
 - Component thumbnails auto-generation (would need separate spec)
 - Undo/redo for component operations (marked TODO in code, needs backend)
+- Override preservation for component swap (needs separate investigation)
