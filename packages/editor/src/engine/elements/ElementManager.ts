@@ -78,8 +78,11 @@ export class ElementManager {
     return this.pageManager.getActivePage();
   }
 
-  /** Update page metadata (name/slug/settings) */
-  updatePage(id: string, data: Partial<Pick<PageData, "name" | "slug" | "settings">>): void {
+  /** Update page metadata (name/slug/settings/slugManuallySet) */
+  updatePage(
+    id: string,
+    data: Partial<Pick<PageData, "name" | "slug" | "settings" | "slugManuallySet">>
+  ): void {
     this.pageManager.updatePage(id, data);
   }
 
@@ -96,6 +99,16 @@ export class ElementManager {
   /** Delete a page */
   deletePage(id: string): boolean {
     return this.pageManager.deletePage(id);
+  }
+
+  /** Duplicate a page (deep clone with fresh IDs + smart copy-suffix naming) */
+  duplicatePage(sourceId: string): PageData | null {
+    return this.pageManager.duplicatePage(sourceId);
+  }
+
+  /** Reorder pages. `afterId === null` prepends. */
+  reorderPage(pageId: string, afterId: string | null): boolean {
+    return this.pageManager.reorderPage(pageId, afterId);
   }
 
   /** Import a page */
