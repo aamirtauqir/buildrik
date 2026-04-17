@@ -33,15 +33,20 @@ interface Props {
 }
 
 function statusLabel(page: PageItem): string {
+  // Text-only labels per DESIGN.md "no emoji as design elements" rule.
+  // Visual indication (colored dot + text color) is driven by the
+  // `.pg-row__status--<status>` class, not by emoji in the label.
   switch (page.status) {
     case "hidden":
       return "Hidden";
     case "draft":
       return "Draft";
     case "password":
-      return "🔒";
+      return "Password";
     case "external":
-      return "↗";
+      return "External";
+    case "error":
+      return "Error";
     default:
       return "Live";
   }
@@ -253,6 +258,7 @@ export const PageRow = React.memo<Props>(
           role="button"
           tabIndex={0}
           aria-label={ariaLabel}
+          aria-current={page.isActive ? "page" : undefined}
           aria-expanded={isExpanded}
           onClick={onSelect}
           onContextMenu={handleContextMenuClick}
@@ -321,10 +327,10 @@ export const PageRow = React.memo<Props>(
             </div>
           )}
 
-          {/* Homepage badge — always visible */}
+          {/* Homepage pill — cobalt "HOME" text per DESIGN.md (no emoji). */}
           {page.isHome && (
             <span className="pg-row__home-badge" aria-label="Homepage">
-              🏠
+              HOME
             </span>
           )}
 
