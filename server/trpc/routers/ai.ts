@@ -5,7 +5,9 @@ import {
   generateContent,
   generatePage,
   generateLayout,
-} from "@/server/services/ai.service";
+  summarizeChanges,
+  suggestMilestone,
+} from "../../services/ai.service";
 
 const contentInputSchema = z.object({
   prompt: z.string().min(1).max(5000),
@@ -27,6 +29,47 @@ const pageInputSchema = z.object({
 const layoutInputSchema = z.object({
   prompt: z.string().min(1).max(5000),
   sectionType: z.string().optional(),
+});
+
+const summarizeInputSchema = z.object({
+  versionName: z.string().min(1).max(200),
+  changes: z.object({
+    elementName: z.string(),
+    summary: z.object({
+      style: z.number().int().nonnegative(),
+      text: z.number().int().nonnegative(),
+      layout: z.number().int().nonnegative(),
+      content: z.number().int().nonnegative(),
+      other: z.number().int().nonnegative(),
+    }),
+    changes: z.array(
+      z.object({
+        type: z.enum(["style", "text", "layout", "content", "other"]),
+        property: z.string(),
+        before: z.string(),
+        after: z.string(),
+      })
+    ),
+  }),
+});
+
+const milestoneSuggestInputSchema = z.object({
+  recentChanges: z
+    .array(
+      z.object({
+        id: z.string(),
+        label: z.string(),
+        timestamp: z.number(),
+        type: z.enum(["checkpoint", "patch"]),
+      })
+    )
+    .max(50),
+  pageStructure: z
+    .object({
+      pageCount: z.number().int().nonnegative(),
+      elementCount: z.number().int().nonnegative(),
+    })
+    .optional(),
 });
 
 export const aiRouter = router({
@@ -98,6 +141,46 @@ export const aiRouter = router({
           code: "INTERNAL_SERVER_ERROR",
           message:
             e instanceof Error ? e.message : "Layout generation failed",
+        });
+      }
+    }),
+
+  summarize: protectedProcedure
+    .input(summarizeInputSchema)
+    .mutation(async ({ input }) => {
+      try {
+        return await summarizeChanges(input.versionName, input.changes);
+      } catch (e: unknown) {
+        const err = e as { status?: number; message?: string };
+        if (err.status === 429) {
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: "AI rate limit exceeded. Please try again later.",
+          });
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: err.message ?? "Summary generation failed",
+        });
+      }
+    }),
+
+  milestoneSuggest: protectedProcedure
+    .input(milestoneSuggestInputSchema)
+    .mutation(async ({ input }) => {
+      try {
+        return await suggestMilestone(input.recentChanges, input.pageStructure);
+      } catch (e: unknown) {
+        const err = e as { status?: number; message?: string };
+        if (err.status === 429) {
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: "AI rate limit exceeded. Please try again later.",
+          });
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: err.message ?? "Milestone suggestion failed",
         });
       }
     }),

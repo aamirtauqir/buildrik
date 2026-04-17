@@ -33,6 +33,12 @@ export interface NamedVersion {
   isAutoCheckpoint: boolean;
   /** Project ID this version belongs to */
   projectId?: string;
+  /** Base64 JPEG visual snapshot of the canvas at save time */
+  visualSnapshot?: string | null;
+  /** Cached AI-generated summary */
+  aiSummary?: string | null;
+  /** User ID of who created this version */
+  userId?: string | null;
 }
 
 /**

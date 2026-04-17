@@ -1,5 +1,6 @@
 /**
  * VersionHistoryPanel - Saves view with FAB, compare, restore, delete
+ * Phase 4: Visual snapshots, Compare view, AI Summary
  * Phase 3: Uses useVersionHistory hook, FAB design, inline confirmations
  *
  * @license BSD-3-Clause
@@ -8,8 +9,9 @@
 import * as React from "react";
 import { useVersionHistory } from "../../shared/hooks/useVersionHistory";
 import { formatRelativeTime } from "../../editor/sidebar/tabs/history/helpers";
-import { SaveIcon } from "../../editor/sidebar/tabs/history/icons";
-
+import type { CompareResult } from "../../shared/types/versions";
+import type { NamedVersion } from "../../shared/types/versions";
+import { SnapshotPreview } from "../../editor/sidebar/tabs/history/components/SnapshotPreview";
 import type { Composer } from "../../engine";
 
 // ============================================
@@ -35,18 +37,137 @@ function formatTime(timestamp: number): string {
 // Empty State
 // ============================================
 
-interface EmptyStateProps {
-  icon: React.ReactNode;
-  message: string;
-  hint?: React.ReactNode;
+function EmptyState({ icon, message, hint }: { icon: React.ReactNode; message: string; hint?: React.ReactNode }) {
+  return (
+    <div className="empty-state">
+      <div className="empty-icon">{icon}</div>
+      <p className="empty-title">{message}</p>
+      {hint && <p className="empty-hint">{hint}</p>}
+    </div>
+  );
 }
 
-function EmptyState({ icon, message, hint }: EmptyStateProps) {
+// ============================================
+// Compare View
+// ============================================
+
+interface CompareViewProps {
+  version: NamedVersion;
+  compareResult: CompareResult | null;
+  currentVisualSnapshot: string | null;
+  aiSummaryState: { loading: boolean; result: string | null; error: string | null };
+  onGetAiSummary: () => void;
+}
+
+function CompareView({
+  version,
+  compareResult,
+  currentVisualSnapshot,
+  aiSummaryState,
+  onGetAiSummary,
+}: CompareViewProps) {
+  const { summary, changes } = compareResult ?? { summary: null, changes: [] };
+
   return (
-    <div className="aqb-ht-empty">
-      <div className="aqb-ht-empty__icon">{icon}</div>
-      <p className="aqb-ht-empty__title">{message}</p>
-      {hint && <p className="aqb-ht-empty__desc">{hint}</p>}
+    <div className="compare-view">
+      {/* AI Summary text */}
+      {(version.aiSummary || aiSummaryState.result) && (
+        <div className="ai-summary">
+          {aiSummaryState.result ?? version.aiSummary}
+        </div>
+      )}
+
+      {/* Screenshots side-by-side */}
+      {(version.visualSnapshot || currentVisualSnapshot) && (
+        <div className="compare-screenshots">
+          {currentVisualSnapshot && (
+            <div className="screenshot-thumb">
+              <img src={currentVisualSnapshot} alt="Current" />
+              <span className="screenshot-label">Current</span>
+            </div>
+          )}
+          {version.visualSnapshot && (
+            <div className="screenshot-thumb">
+              <img src={version.visualSnapshot} alt={version.name} />
+              <span className="screenshot-label">{version.name}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Change summary badges */}
+      {summary && (
+        <div className="diff-summary-badges">
+          {summary.style > 0 && (
+            <span className="diff-summary-badge style">{summary.style} style</span>
+          )}
+          {summary.text > 0 && (
+            <span className="diff-summary-badge text">{summary.text} text</span>
+          )}
+          {summary.layout > 0 && (
+            <span className="diff-summary-badge layout">{summary.layout} layout</span>
+          )}
+          {summary.content > 0 && (
+            <span className="diff-summary-badge content">{summary.content} content</span>
+          )}
+          {summary.other > 0 && (
+            <span className="diff-summary-badge" style={{ background: "rgba(144,141,133,0.15)", color: "var(--aqb-text-muted)" }}>
+              {summary.other} other
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Change list */}
+      {changes.length > 0 && (
+        <div className="diff-change-list">
+          {changes.slice(0, 20).map((change, i) => (
+            <div key={i} className="diff-change">
+              <span
+                className={`diff-op ${
+                  !change.before ? "add" : !change.after ? "remove" : "replace"
+                }`}
+              >
+                {!change.before ? "+" : !change.after ? "−" : "~"}
+              </span>
+              <span className="diff-change-prop">{change.property}</span>
+              {change.before && (
+                <span className="diff-change-val before">{change.before}</span>
+              )}
+              {change.after && (
+                <span className="diff-change-val after">{change.after}</span>
+              )}
+            </div>
+          ))}
+          {changes.length > 20 && (
+            <p style={{ fontSize: 11, color: "var(--aqb-text-muted)", marginTop: 4 }}>
+              +{changes.length - 20} more changes
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* AI Summary button */}
+      <button
+        className={`ai-summary-btn${aiSummaryState.loading ? " loading" : ""}`}
+        onClick={onGetAiSummary}
+        disabled={aiSummaryState.loading}
+      >
+        {aiSummaryState.loading ? (
+          "Generating..."
+        ) : (
+          <>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 2a10 10 0 1 0 10 10H12V2z" />
+              <path d="M12 2a10 10 0 0 1 10 10" />
+            </svg>
+            Get AI Summary
+          </>
+        )}
+      </button>
+      {aiSummaryState.error && (
+        <p className="ai-summary-error">{aiSummaryState.error}</p>
+      )}
     </div>
   );
 }
@@ -56,95 +177,143 @@ function EmptyState({ icon, message, hint }: EmptyStateProps) {
 // ============================================
 
 interface VersionRowProps {
-  version: { id: string; name: string; createdAt: number; isAutoCheckpoint?: boolean };
+  version: NamedVersion;
   isRestoring: boolean;
+  isExpanded: boolean;
   isDeleteConfirm: boolean;
   onRestore: () => void;
   onDeleteRequest: () => void;
   onDeleteConfirm: () => void;
   onDeleteCancel: () => void;
+  onCompare: () => void;
+  compareResult: CompareResult | null;
+  currentVisualSnapshot: string | null;
+  aiSummaryState: { loading: boolean; result: string | null; error: string | null };
+  onGetAiSummary: () => void;
   elementCount?: number;
 }
 
 function VersionRow({
   version,
   isRestoring,
+  isExpanded,
   isDeleteConfirm,
   onRestore,
   onDeleteRequest,
   onDeleteConfirm,
   onDeleteCancel,
+  onCompare,
+  compareResult,
+  currentVisualSnapshot,
+  aiSummaryState,
+  onGetAiSummary,
   elementCount = 0,
 }: VersionRowProps) {
+  const rowRef = React.useRef<HTMLDivElement>(null);
+  const hoverTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [showPreview, setShowPreview] = React.useState(false);
+  const [previewRect, setPreviewRect] = React.useState<DOMRect | null>(null);
+
   const relative = formatRelativeTime(version.createdAt);
 
+  const handleMouseEnter = React.useCallback(() => {
+    if (!version.visualSnapshot) return;
+    hoverTimeoutRef.current = setTimeout(() => {
+      const rect = rowRef.current?.getBoundingClientRect();
+      if (rect) {
+        setPreviewRect(rect);
+        setShowPreview(true);
+      }
+    }, 300);
+  }, [version.visualSnapshot]);
+
+  const handleMouseLeave = React.useCallback(() => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setShowPreview(false);
+  }, []);
+
   return (
-    <div
-      className={`aqb-ht-version-row${isDeleteConfirm ? " aqb-ht-version-row--delete-confirm" : ""}`}
-      aria-label={`Version "${version.name}" from ${relative}`}
-    >
-      {/* Version Info */}
-      <div className="aqb-ht-version-row__info">
-        <div className="aqb-ht-version-row__avatar">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-            <circle cx="6" cy="4" r="2" />
-            <path d="M2 11a4 4 0 0 1 8 0" />
-          </svg>
-        </div>
-        <div className="aqb-ht-version-row__details">
-          <div className="aqb-ht-version-row__name">{version.name}</div>
-          <div className="aqb-ht-version-row__meta">
-            {formatTime(version.createdAt)}
-            <span className="aqb-ht-version-row__relative">{relative}</span>
-            {elementCount > 0 && (
-              <span className="aqb-ht-badge aqb-ht-badge--count">{elementCount} el</span>
-            )}
-            {version.isAutoCheckpoint && (
-              <span className="aqb-ht-badge aqb-ht-badge--auto">Auto</span>
+    <div className="version-row-wrapper">
+      <div
+        ref={rowRef}
+        className={`version-row${isDeleteConfirm ? " delete-confirm" : ""}`}
+        aria-label={`Version "${version.name}" from ${relative}`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {/* Version Info */}
+        <div className="version-row-main">
+          <div>
+            <div className="version-name">{version.name}</div>
+            <div className="version-meta">
+              <span className="version-time">{formatTime(version.createdAt)}</span>
+              <span>{relative}</span>
+              {elementCount > 0 && (
+                <span className="entry-badge" style={{ background: "rgba(45,109,255,0.12)", color: "var(--aqb-primary)" }}>
+                  {elementCount} el
+                </span>
+              )}
+              {version.isAutoCheckpoint && (
+                <span className="entry-badge auto-save">Auto</span>
+              )}
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="version-actions">
+            {isDeleteConfirm ? (
+              <>
+                <button onClick={onDeleteConfirm} className="action-btn danger" aria-label="Confirm delete">
+                  Delete
+                </button>
+                <button onClick={onDeleteCancel} className="action-btn" aria-label="Cancel">
+                  ×
+                </button>
+              </>
+            ) : (
+              <>
+                <button onClick={onCompare} className="action-btn primary" aria-label={`Compare "${version.name}"`}>
+                  Compare
+                </button>
+                <button
+                  onClick={onRestore}
+                  className="action-btn"
+                  disabled={isRestoring}
+                  aria-label={`Restore "${version.name}"`}
+                >
+                  {isRestoring ? "..." : "Restore"}
+                </button>
+                <button onClick={onDeleteRequest} className="action-btn danger" aria-label={`Delete "${version.name}"`}>
+                  ×
+                </button>
+              </>
             )}
           </div>
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="aqb-ht-version-row__actions">
-        {isDeleteConfirm ? (
-          <>
-            <button
-              onClick={onDeleteConfirm}
-              className="aqb-ht-btn aqb-ht-btn--danger"
-              aria-label="Confirm delete"
-            >
-              Delete
-            </button>
-            <button
-              onClick={onDeleteCancel}
-              className="aqb-ht-btn aqb-ht-btn--ghost"
-              aria-label="Cancel delete"
-            >
-              ×
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              onClick={onRestore}
-              className="aqb-ht-btn aqb-ht-btn--restore"
-              disabled={isRestoring}
-              aria-label={`Restore version "${version.name}"`}
-            >
-              {isRestoring ? "..." : "Restore"}
-            </button>
-            <button
-              onClick={onDeleteRequest}
-              className="aqb-ht-btn aqb-ht-btn--ghost"
-              aria-label={`Delete version "${version.name}"`}
-            >
-              ×
-            </button>
-          </>
-        )}
-      </div>
+      {/* Expanded Compare View */}
+      {isExpanded && (
+        <CompareView
+          version={version}
+          compareResult={compareResult}
+          currentVisualSnapshot={currentVisualSnapshot}
+          aiSummaryState={aiSummaryState}
+          onGetAiSummary={onGetAiSummary}
+        />
+      )}
+
+      {/* Snapshot Preview Tooltip */}
+      {showPreview && version.visualSnapshot && previewRect && (
+        <SnapshotPreview
+          snapshotUrl={version.visualSnapshot}
+          versionName={version.name}
+          anchorRect={previewRect}
+        />
+      )}
     </div>
   );
 }
@@ -160,8 +329,16 @@ export function VersionHistoryPanel({
   composer: Composer | null;
   searchQuery?: string;
 }) {
-  const { versions, isAvailable, isLoading, createVersion, restoreVersion, deleteVersion } =
-    useVersionHistory(composer);
+  const {
+    versions,
+    isAvailable,
+    isLoading,
+    createVersion,
+    restoreVersion,
+    deleteVersion,
+    compareVersions,
+    updateAiSummary,
+  } = useVersionHistory(composer);
 
   // Save form state
   const [showSaveForm, setShowSaveForm] = React.useState(false);
@@ -177,11 +354,28 @@ export function VersionHistoryPanel({
   // Restoring state
   const [restoringId, setRestoringId] = React.useState<string | null>(null);
 
+  // Expanded row state (Compare view)
+  const [expandedId, setExpandedId] = React.useState<string | null>(null);
+  const [compareResults, setCompareResults] = React.useState<Record<string, CompareResult | null>>({});
+  const [currentVisualSnapshot, setCurrentVisualSnapshot] = React.useState<string | null>(null);
+
+  // AI Summary state per version
+  const [aiSummaryStates, setAiSummaryStates] = React.useState<
+    Record<string, { loading: boolean; result: string | null; error: string | null }>
+  >({});
+
+  // Capture current canvas visual snapshot on mount
+  React.useEffect(() => {
+    if (composer?.versionHistory) {
+      setCurrentVisualSnapshot(composer.versionHistory.captureVisualSnapshot());
+    }
+  }, [composer]);
+
   // Handle create version
   const handleCreateVersion = async () => {
     if (!newVersionName.trim()) return;
     setIsSaving(true);
-    await createVersion(newVersionName.trim());
+    await createVersion(newVersionName.trim(), "");
     setNewVersionName("");
     setShowSaveForm(false);
     setIsSaving(false);
@@ -223,12 +417,79 @@ export function VersionHistoryPanel({
   const handleDeleteConfirm = async (versionId: string) => {
     setDeleteConfirmId(null);
     await deleteVersion(versionId);
+    if (expandedId === versionId) setExpandedId(null);
   };
 
   // Handle delete cancel
   const handleDeleteCancel = () => {
     setDeleteConfirmId(null);
   };
+
+  // Handle Compare click
+  const handleCompare = React.useCallback(
+    async (versionId: string) => {
+      if (expandedId === versionId) {
+        setExpandedId(null);
+        return;
+      }
+      setExpandedId(versionId);
+
+      // Load diff if not already cached
+      if (!compareResults[versionId]) {
+        const latest = versions[0];
+        if (latest && latest.id !== versionId) {
+          const result = await compareVersions(latest.id, versionId);
+          setCompareResults((prev) => ({ ...prev, [versionId]: result }));
+        }
+      }
+    },
+    [expandedId, compareResults, compareVersions, versions]
+  );
+
+  // Handle AI Summary
+  const handleGetAiSummary = React.useCallback(
+    async (versionId: string) => {
+      setAiSummaryStates((prev) => ({
+        ...prev,
+        [versionId]: { loading: true, result: null, error: null },
+      }));
+
+      try {
+        const compareData = compareResults[versionId];
+        if (!compareData) {
+          throw new Error("Compare data not loaded yet");
+        }
+        const response = await fetch("/api/trpc/ai.summarize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            versionName: versions.find((v) => v.id === versionId)?.name ?? "",
+            changes: compareData,
+          }),
+        });
+
+        if (!response.ok) throw new Error("AI summary unavailable");
+        const json = await response.json();
+        // tRPC HTTP endpoint wraps the result in { result: { data: T } }
+        const summary: string = json?.result?.data?.summary ?? json?.summary ?? "";
+        if (!summary) throw new Error("Empty summary returned");
+
+        await updateAiSummary(versionId, summary);
+
+        setAiSummaryStates((prev) => ({
+          ...prev,
+          [versionId]: { loading: false, result: summary, error: null },
+        }));
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Summary unavailable";
+        setAiSummaryStates((prev) => ({
+          ...prev,
+          [versionId]: { loading: false, result: null, error: message },
+        }));
+      }
+    },
+    [compareResults, updateAiSummary, versions]
+  );
 
   // Filter versions by search query
   const filteredVersions = React.useMemo(() => {
@@ -250,7 +511,7 @@ export function VersionHistoryPanel({
 
   if (!isAvailable) {
     return (
-      <div className="aqb-ht-version-panel">
+      <div className="saves-view">
         <EmptyState
           icon={
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -266,56 +527,61 @@ export function VersionHistoryPanel({
   }
 
   return (
-    <div className="aqb-ht-version-panel">
+    <div className="saves-view">
       {/* Save Version FAB / Inline Form */}
-      <div className="aqb-ht-version-panel__header">
+      <div className="fab-container">
         {showSaveForm ? (
-          <div className="aqb-ht-save-form">
-            <input
-              type="text"
-              value={newVersionName}
-              onChange={(e) => setNewVersionName(e.target.value)}
-              onKeyDown={handleSaveFormKeyDown}
-              placeholder="Version name (e.g. 'Before header redesign')"
-              className="aqb-ht-save-form__input"
-              autoFocus
-              maxLength={50}
-            />
-            <div className="aqb-ht-save-form__actions">
+          <div className="save-form open">
+            <div className="form-row">
+              <div className="form-field" style={{ flex: 1 }}>
+                <label className="form-label">Version name *</label>
+                <input
+                  type="text"
+                  value={newVersionName}
+                  onChange={(e) => setNewVersionName(e.target.value)}
+                  onKeyDown={handleSaveFormKeyDown}
+                  placeholder="e.g. Homepage redesign"
+                  className="form-input"
+                  autoFocus
+                  maxLength={50}
+                />
+              </div>
+            </div>
+            <div className="form-row" style={{ justifyContent: "flex-end", gap: 8 }}>
               <button
                 onClick={() => {
                   setShowSaveForm(false);
                   setNewVersionName("");
                 }}
-                className="aqb-ht-btn aqb-ht-btn--ghost"
+                className="cancel-btn"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateVersion}
-                className="aqb-ht-btn aqb-ht-btn--primary"
+                className="save-btn"
                 disabled={!newVersionName.trim() || isSaving}
               >
-                {isSaving ? "Saving..." : "Save"}
+                {isSaving ? "Saving..." : "Save Version"}
               </button>
             </div>
           </div>
         ) : (
           <button
             onClick={() => setShowSaveForm(true)}
-            className="aqb-ht-fab"
+            className="fab"
             aria-label="Save version"
           >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M7 3v8M3 7h8" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            Save Version
           </button>
         )}
       </div>
 
       {/* Version List */}
-      <div className="aqb-ht-version-list">
+      <div className="version-list">
         {filteredVersions.length === 0 ? (
           <EmptyState
             icon={
@@ -337,26 +603,23 @@ export function VersionHistoryPanel({
           />
         ) : (
           Array.from(groupedVersions.entries()).map(([dateGroup, groupVersions]) => (
-            <div key={dateGroup} className="aqb-ht-version-group">
-              <div className="aqb-ht-version-group__label">{dateGroup}</div>
+            <div key={dateGroup}>
+              <div className="date-group-header">{dateGroup}</div>
               {groupVersions.map((version) => (
                 <div key={version.id}>
                   {/* Inline restore confirmation */}
                   {restoreConfirmId === version.id && (
-                    <div className="aqb-ht-inline-confirm aqb-ht-inline-confirm--restore">
-                      <span className="aqb-ht-inline-confirm__text">
+                    <div className="restore-confirm">
+                      <span className="restore-confirm-text">
                         Restore to "{version.name}"?
                       </span>
                       <button
                         onClick={() => handleRestoreConfirm(version.id)}
-                        className="aqb-ht-btn aqb-ht-btn--danger"
+                        className="action-btn primary"
                       >
                         Restore
                       </button>
-                      <button
-                        onClick={handleRestoreCancel}
-                        className="aqb-ht-btn aqb-ht-btn--ghost"
-                      >
+                      <button onClick={handleRestoreCancel} className="action-btn">
                         Cancel
                       </button>
                     </div>
@@ -365,11 +628,19 @@ export function VersionHistoryPanel({
                   <VersionRow
                     version={version}
                     isRestoring={restoringId === version.id}
+                    isExpanded={expandedId === version.id}
                     isDeleteConfirm={deleteConfirmId === version.id}
                     onRestore={() => handleRestoreClick(version.id)}
                     onDeleteRequest={() => handleDeleteRequest(version.id)}
                     onDeleteConfirm={() => handleDeleteConfirm(version.id)}
                     onDeleteCancel={handleDeleteCancel}
+                    onCompare={() => handleCompare(version.id)}
+                    compareResult={compareResults[version.id] ?? null}
+                    currentVisualSnapshot={currentVisualSnapshot}
+                    aiSummaryState={
+                      aiSummaryStates[version.id] ?? { loading: false, result: null, error: null }
+                    }
+                    onGetAiSummary={() => handleGetAiSummary(version.id)}
                     elementCount={0}
                   />
                 </div>

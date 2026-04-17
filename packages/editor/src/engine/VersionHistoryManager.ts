@@ -56,6 +56,8 @@ export class VersionHistoryManager {
   private projectId: string = "default";
   private isLoading: boolean = false;
   private autoCheckpointHandlers: Map<string, () => void> = new Map();
+  /** Current user ID for team attribution — set from session when available */
+  private currentUserId: string | null = null;
 
   constructor(composer: Composer, config?: Partial<VersionHistoryConfig>) {
     this.composer = composer;
@@ -114,6 +116,7 @@ export class VersionHistoryManager {
    */
   async createVersion(name: string, description?: string): Promise<NamedVersion> {
     const snapshot = await this.captureSnapshotAsync();
+    const visualSnapshot = this.captureVisualSnapshot();
 
     const version: NamedVersion = {
       id: generateVersionId(),
@@ -123,6 +126,8 @@ export class VersionHistoryManager {
       createdAt: Date.now(),
       isAutoCheckpoint: false,
       projectId: this.projectId,
+      visualSnapshot: visualSnapshot ?? null,
+      userId: this.currentUserId,
     };
 
     await saveVersion(version);
@@ -136,6 +141,14 @@ export class VersionHistoryManager {
     this.composer.emit(EVENTS.VERSION_LIST_UPDATED, { versions: this.versions });
 
     return version;
+  }
+
+  /**
+   * Set the current user ID for team attribution on versions.
+   * Called by the shell when session becomes available.
+   */
+  setCurrentUserId(userId: string | null): void {
+    this.currentUserId = userId;
   }
 
   /**
@@ -153,6 +166,8 @@ export class VersionHistoryManager {
       createdAt: Date.now(),
       isAutoCheckpoint: true,
       projectId: this.projectId,
+      visualSnapshot: null, // Skip visual snapshot for auto-checkpoints to save storage
+      userId: this.currentUserId,
     };
 
     await saveVersion(version);
@@ -227,11 +242,11 @@ export class VersionHistoryManager {
   }
 
   /**
-   * Update version metadata (name, description, tags)
+   * Update version metadata (name, description, tags, aiSummary, visualSnapshot)
    */
   async updateVersion(
     versionId: string,
-    updates: Partial<Pick<NamedVersion, "name" | "description" | "tags">>
+    updates: Partial<Pick<NamedVersion, "name" | "description" | "tags" | "aiSummary" | "visualSnapshot">>
   ): Promise<boolean> {
     const version = this.versions.find((v) => v.id === versionId);
     if (!version) return false;
@@ -516,7 +531,7 @@ export class VersionHistoryManager {
   /**
    * Classify a property into ChangeType
    */
-  private static classifyProperty(property: string): ChangeType {
+  public static classifyProperty(property: string): ChangeType {
     const normalizedProp = property.replace(/^(style|styles)\./, "");
     if (VersionHistoryManager.STYLE_PROPERTIES.has(normalizedProp)) {
       return "style";
@@ -860,6 +875,20 @@ export class VersionHistoryManager {
    */
   private captureSnapshot(): ProjectData {
     return deepClone(this.composer.exportProject());
+  }
+
+  /**
+   * Capture a visual snapshot of the editor canvas as a JPEG data URL.
+   * Returns null if the canvas is not available or capture fails.
+   */
+  captureVisualSnapshot(): string | null {
+    try {
+      const canvas = document.getElementById("editor-canvas") as HTMLCanvasElement | null;
+      if (!canvas) return null;
+      return canvas.toDataURL("image/jpeg", 0.6);
+    } catch {
+      return null;
+    }
   }
 
   /**

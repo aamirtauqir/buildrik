@@ -415,6 +415,66 @@ export class HistoryManager {
     };
   }
 
+  /**
+   * Get the snapshot (ProjectData) for a specific history entry.
+   * Used by time-travel scrubber to preview historical states.
+   */
+  getEntrySnapshot(entryId: string): ProjectData | null {
+    const entries = buildHistoryDisplayEntries(this.undoStack);
+    const entry = entries.find((e) => e.id === entryId);
+    if (!entry) return null;
+
+    // Map display index back to undoStack index
+    // buildHistoryDisplayEntries skips index 0, so display index i = undoStack index i+1
+    const undoStackIndex = entry.index + 1;
+    if (undoStackIndex < 0 || undoStackIndex >= this.undoStack.length) return null;
+
+    try {
+      return this.reconstructState(undoStackIndex);
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Restore to a specific history entry by ID.
+   * Clears redo stack and replaces current state.
+   */
+  restoreEntry(entryId: string): boolean {
+    const entries = buildHistoryDisplayEntries(this.undoStack);
+    const entry = entries.find((e) => e.id === entryId);
+    if (!entry) return false;
+
+    const undoStackIndex = entry.index + 1;
+    if (undoStackIndex < 0 || undoStackIndex >= this.undoStack.length) return false;
+
+    try {
+      const snapshot = this.reconstructState(undoStackIndex);
+
+      // Clear redo stack
+      this.redoStack = [];
+
+      // Replace everything after target with a checkpoint at target position
+      this.undoStack = this.undoStack.slice(0, undoStackIndex);
+
+      // Record new checkpoint at current position
+      this.undoStack.push({
+        type: "checkpoint",
+        timestamp: Date.now(),
+        snapshot: deepClone(snapshot),
+        label: `Restored to: ${entry.label}`,
+      });
+
+      this.restoreSnapshot(snapshot);
+      this.composer.emit(EVENTS.HISTORY_RECORDED, {
+        label: `Restored to: ${entry.label}`,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   // ─── Lifecycle ──────────────────────────────────────────────────────────────
 
   clear(): void {

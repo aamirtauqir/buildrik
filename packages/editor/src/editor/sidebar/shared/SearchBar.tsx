@@ -15,6 +15,8 @@ export interface SearchBarProps {
   ariaLabel?: string;
   /** Debounce delay in ms (default: 300, 0 = instant) */
   debounceMs?: number;
+  /** Id for the input element — used by parent for keyboard shortcuts */
+  id?: string;
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
@@ -23,6 +25,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   placeholder = "Search...",
   ariaLabel = "Search",
   debounceMs = 300,
+  id,
 }) => {
   // Internal state for instant visual feedback
   const [inputValue, setInputValue] = React.useState(value);
@@ -78,6 +81,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       <SearchIcon />
       <input
         type="text"
+        id={id}
         value={inputValue}
         onChange={(e) => handleChange(e.target.value)}
         placeholder={placeholder}

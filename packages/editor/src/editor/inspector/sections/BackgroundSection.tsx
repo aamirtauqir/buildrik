@@ -79,13 +79,13 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
             style={{
               flex: 1,
               padding: "8px 12px",
-              background: bgType === type ? "rgba(0,115,230,0.2)" : "rgba(255,255,255,0.03)",
+              background: bgType === type ? "var(--aqb-primary-light)" : "rgba(255,255,255,0.03)",
               border:
                 bgType === type
-                  ? "1px solid rgba(0,115,230,0.3)"
+                  ? "1px solid var(--aqb-primary)"
                   : "1px solid rgba(255,255,255,0.06)",
               borderRadius: 6,
-              color: bgType === type ? "#0073E6" : "#71717a",
+              color: bgType === type ? "var(--aqb-primary)" : "var(--aqb-text-muted)",
               fontSize: 12,
               fontWeight: 500,
               cursor: "pointer",
@@ -131,14 +131,14 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
             <div style={{ display: "flex", gap: 4 }}>
               <button
                 onClick={() => {
-                  const color1 = "#0073E6";
-                  const color2 = "#00C853";
+                  const color1 = "var(--aqb-primary)";
+                  const color2 = "var(--aqb-success)";
                   onChange("background", `linear-gradient(90deg, ${color1}, ${color2})`);
                 }}
                 style={{
                   flex: 1,
                   padding: "20px 12px",
-                  background: "linear-gradient(90deg, #0073E6, #00C853)",
+                  background: "linear-gradient(90deg, var(--aqb-primary), var(--aqb-success))",
                   border: "1px solid rgba(255,255,255,0.1)",
                   borderRadius: 6,
                   cursor: "pointer",
@@ -150,14 +150,14 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               </button>
               <button
                 onClick={() => {
-                  const color1 = "#0073E6";
-                  const color2 = "#00C853";
+                  const color1 = "var(--aqb-primary)";
+                  const color2 = "var(--aqb-success)";
                   onChange("background", `radial-gradient(circle, ${color1}, ${color2})`);
                 }}
                 style={{
                   flex: 1,
                   padding: "20px 12px",
-                  background: "radial-gradient(circle, #0073E6, #00C853)",
+                  background: "radial-gradient(circle, var(--aqb-primary), var(--aqb-success))",
                   border: "1px solid rgba(255,255,255,0.1)",
                   borderRadius: 6,
                   cursor: "pointer",
@@ -173,25 +173,25 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           {/* Gradient Colors */}
           <ColorInput
             label="Color 1"
-            value="#0073E6"
+            value="#2d6dff"
             onChange={(v) => {
               const current = styles.background || "";
               if (current.includes("linear-gradient")) {
-                onChange("background", `linear-gradient(90deg, ${v}, #00C853)`);
+                onChange("background", `linear-gradient(90deg, ${v}, var(--aqb-success))`);
               } else {
-                onChange("background", `radial-gradient(circle, ${v}, #00C853)`);
+                onChange("background", `radial-gradient(circle, ${v}, var(--aqb-success))`);
               }
             }}
           />
           <ColorInput
             label="Color 2"
-            value="#00C853"
+            value="#22c55e"
             onChange={(v) => {
               const current = styles.background || "";
               if (current.includes("linear-gradient")) {
-                onChange("background", `linear-gradient(90deg, #0073E6, ${v})`);
+                onChange("background", `linear-gradient(90deg, var(--aqb-primary), ${v})`);
               } else {
-                onChange("background", `radial-gradient(circle, #0073E6, ${v})`);
+                onChange("background", `radial-gradient(circle, var(--aqb-primary), ${v})`);
               }
             }}
           />
@@ -221,7 +221,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               max="360"
               value="90"
               onChange={(e) => {
-                onChange("background", `linear-gradient(${e.target.value}deg, #0073E6, #00C853)`);
+                onChange("background", `linear-gradient(${e.target.value}deg, var(--aqb-primary), var(--aqb-success))`);
               }}
               style={{ flex: 1 }}
             />
@@ -256,10 +256,10 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                 }
                 style={{
                   padding: "8px 12px",
-                  background: "rgba(0, 115, 230, 0.2)",
-                  border: "1px solid rgba(0, 115, 230, 0.3)",
+                  background: "var(--aqb-primary-light)",
+                  border: "1px solid var(--aqb-primary)",
                   borderRadius: 6,
-                  color: "#0073E6",
+                  color: "var(--aqb-primary)",
                   fontSize: 12,
                   fontWeight: 600,
                   cursor: "pointer",

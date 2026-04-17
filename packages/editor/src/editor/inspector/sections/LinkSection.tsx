@@ -9,6 +9,7 @@ import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants";
 import type { PageData } from "../../../shared/types";
 import { Section, SelectRow, InputRow, type SectionTier } from "../shared/controls";
+import { isUrl, isEmail, isPhoneNumber } from "../../../shared/utils/helpers/validation";
 
 export interface LinkSectionProps {
   selectedElement: {
@@ -25,6 +26,19 @@ export interface LinkSectionProps {
 }
 
 type LinkType = "none" | "page" | "url" | "email" | "phone" | "anchor";
+
+const ErrorText: React.FC<{ message: string }> = ({ message }) => (
+  <div style={{
+    marginTop: 4,
+    fontSize: 11,
+    color: "var(--ls-danger, #DC2626)",
+    display: "flex",
+    alignItems: "center",
+    gap: 4,
+  }}>
+    <span aria-hidden>⚠</span> {message}
+  </div>
+);
 
 const LINK_TYPE_OPTIONS = [
   { value: "none", label: "No Link" },
@@ -55,6 +69,10 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
   const [phoneNumber, setPhoneNumber] = React.useState("");
   const [anchorId, setAnchorId] = React.useState("");
   const [target, setTarget] = React.useState("_self");
+  const [urlError, setUrlError] = React.useState(false);
+  const [emailError, setEmailError] = React.useState(false);
+  const [phoneError, setPhoneError] = React.useState(false);
+  const [anchorError, setAnchorError] = React.useState(false);
 
   // Only show for link/button elements
   const isLinkable = ["link", "button", "a", "cta"].includes(selectedElement.type);
@@ -174,21 +192,31 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
 
   const handleUrlChange = (url: string) => {
     setExternalUrl(url);
-    updateHref(url);
+    const valid = new RegExp("^https?://").test(url);
+    setUrlError(!valid && url.length > 0);
+    if (valid || url.length === 0) {
+      updateHref(url);
+    }
   };
 
   const handleEmailChange = (email: string) => {
     setEmailAddress(email);
+    const valid = isEmail(email);
+    setEmailError(!valid && email.length > 0);
     updateHref(email ? `mailto:${email}` : "");
   };
 
   const handlePhoneChange = (phone: string) => {
     setPhoneNumber(phone);
+    const valid = isPhoneNumber(phone);
+    setPhoneError(!valid && phone.length > 0);
     updateHref(phone ? `tel:${phone}` : "");
   };
 
   const handleAnchorChange = (anchor: string) => {
     setAnchorId(anchor);
+    const valid = anchor.length > 0 && !/\s/.test(anchor);
+    setAnchorError(!valid && anchor.length > 0);
     updateHref(anchor ? `#${anchor}` : "");
   };
 
@@ -221,39 +249,51 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
       )}
 
       {linkType === "url" && (
-        <InputRow
-          label="URL"
-          value={externalUrl}
-          onChange={handleUrlChange}
-          placeholder="https://example.com"
-        />
+        <div>
+          <InputRow
+            label="URL"
+            value={externalUrl}
+            onChange={handleUrlChange}
+            placeholder="https://example.com"
+          />
+          {urlError && <ErrorText message="URL must start with http:// or https://" />}
+        </div>
       )}
 
       {linkType === "email" && (
-        <InputRow
-          label="Email"
-          value={emailAddress}
-          onChange={handleEmailChange}
-          placeholder="hello@example.com"
-        />
+        <div>
+          <InputRow
+            label="Email"
+            value={emailAddress}
+            onChange={handleEmailChange}
+            placeholder="hello@example.com"
+          />
+          {emailError && <ErrorText message="Enter a valid email address" />}
+        </div>
       )}
 
       {linkType === "phone" && (
-        <InputRow
-          label="Phone"
-          value={phoneNumber}
-          onChange={handlePhoneChange}
-          placeholder="+1234567890"
-        />
+        <div>
+          <InputRow
+            label="Phone"
+            value={phoneNumber}
+            onChange={handlePhoneChange}
+            placeholder="+1234567890"
+          />
+          {phoneError && <ErrorText message="Enter a valid phone number" />}
+        </div>
       )}
 
       {linkType === "anchor" && (
-        <InputRow
-          label="Anchor ID"
-          value={anchorId}
-          onChange={handleAnchorChange}
-          placeholder="section-id"
-        />
+        <div>
+          <InputRow
+            label="Anchor ID"
+            value={anchorId}
+            onChange={handleAnchorChange}
+            placeholder="section-id"
+          />
+          {anchorError && <ErrorText message="Anchor ID cannot contain spaces" />}
+        </div>
       )}
 
       {linkType !== "none" && linkType !== "email" && linkType !== "phone" && (

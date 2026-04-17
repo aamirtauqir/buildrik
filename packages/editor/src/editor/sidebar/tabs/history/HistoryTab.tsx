@@ -1,51 +1,46 @@
 /**
- * HistoryTab - Version history and activity log
- * Uses View Switcher pattern for Saves/Changes views
- * Phase 3: Uses custom hooks, renamed tabs, helper text
+ * HistoryTab — Version history sidebar panel
+ *
+ * Layout matches the History Tab prototype:
+ *   PanelHeader → view-switcher (Changes / Saves) → search-bar → list-container
+ * Time-Travel scrubber drawer renders at body level when active.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import { useHistoryState } from "../../../../shared/hooks/useHistoryState";
-import { useVersionHistory } from "../../../../shared/hooks/useVersionHistory";
+import { useAutoMilestone } from "../../../../shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
 import { PanelHeader } from "../../shared/PanelHeader";
-import { SearchBar } from "../../shared/SearchBar";
-import { ViewSwitcher, type ViewOption } from "../../shared/ViewSwitcher";
 import { ActivityView } from "./components/ActivityView";
-import { VersionsIcon, ActivityIcon, ClearIcon, TimeTravelIcon } from "./icons";
+import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
+import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
 import type { HistoryView, HistoryTabProps } from "./types";
 
-// ============================================
-// View Options
-// ============================================
-
-const VIEW_OPTIONS: ViewOption<HistoryView>[] = [
-  {
-    id: "saves",
-    label: "Saves",
-    icon: <VersionsIcon />,
-  },
-  {
-    id: "changes",
-    label: "Changes",
-    icon: <ActivityIcon />,
-  },
-];
-
-// ============================================
-// Helpers
-// ============================================
-
 const HELPER_TEXT: Record<HistoryView, string> = {
-  saves: "Named milestones you've saved. Compare or restore anytime.",
-  changes: "Your recent edits. Use Ctrl+Z to undo.",
+  changes: "Your recent edits",
+  saves: "Named milestones",
 };
 
-// ============================================
-// Component
-// ============================================
+const SEARCH_PLACEHOLDER: Record<HistoryView, string> = {
+  changes: "Search changes...",
+  saves: "Search saves...",
+};
+
+const SearchIconSvg = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+);
+
+const ClearXSvg = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
 
 export const HistoryTab: React.FC<HistoryTabProps> = ({
   composer,
@@ -56,29 +51,31 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   onClose,
 }) => {
   const storageKey = `aqb-history-view${projectId ? `-${projectId}` : ""}`;
+  const { historyStack, canUndo, clear } = useHistoryState(composer);
 
-  // Use custom hooks
-  const { canUndo, clear } = useHistoryState(composer);
-
-  // View state with persistence
   const [activeView, setActiveView] = React.useState<HistoryView>(() => {
-    if (typeof window === "undefined") return "saves";
+    if (typeof window === "undefined") return "changes";
     try {
       const stored = window.localStorage.getItem(storageKey);
       if (stored === "saves" || stored === "changes") return stored;
     } catch {
       // Ignore storage errors
     }
-    return "saves";
+    return "changes";
   });
 
-  // Search state
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [showScrubber, setShowScrubber] = React.useState(false);
 
-  // Clear confirmation inline state
-  const [showClearConfirm, setShowClearConfirm] = React.useState(false);
+  const {
+    suggestion: milestoneSuggestion,
+    isLoading: milestoneLoading,
+    dismiss: dismissMilestone,
+    accept: acceptMilestone,
+    edit: editMilestone,
+    isAvailable: milestoneAvailable,
+  } = useAutoMilestone(composer);
 
-  // Persist view changes
   React.useEffect(() => {
     if (typeof window === "undefined") return;
     try {
@@ -88,15 +85,32 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
     }
   }, [activeView, storageKey]);
 
-  // Clear history handler with confirmation
-  const handleClearHistory = React.useCallback(() => {
-    clear();
-    setShowClearConfirm(false);
-  }, [clear]);
+  // Ctrl+Shift+T toggles Time-Travel scrubber
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && (e.key === "T" || e.key === "t")) {
+        e.preventDefault();
+        setShowScrubber((prev) => !prev);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const handleScrubberRestore = React.useCallback(
+    (entryId: string) => {
+      composer?.history?.restoreEntry(entryId);
+      setShowScrubber(false);
+    },
+    [composer]
+  );
+
+  const handleScrubberExit = React.useCallback(() => {
+    setShowScrubber(false);
+  }, []);
 
   return (
     <div className="aqb-history-container">
-      {/* Panel Header */}
       <PanelHeader
         title="Version History"
         isPinned={isPinned}
@@ -105,76 +119,85 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         onClose={onClose}
       />
 
-      {/* Controls: Search + Clear + View Switcher */}
-      <div className="aqb-ht-controls">
-        {/* Clear History row */}
-        <div className="aqb-ht-undo-row">
-          {showClearConfirm ? (
-            <div className="aqb-ht-clear-confirm" style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 11, color: "var(--aqb-text-muted)", whiteSpace: "nowrap" }}>
-                This cannot be undone.
-              </span>
-              <button
-                onClick={handleClearHistory}
-                className="aqb-ht-clear-btn aqb-ht-clear-btn--danger"
-                style={{ background: "var(--aqb-error, #ef4444)", color: "#fff", borderColor: "transparent" }}
-                aria-label="Confirm Clear All"
-              >
-                <ClearIcon />
-                <span style={{ fontSize: 11, marginLeft: 4 }}>Clear All</span>
-              </button>
-              <button
-                onClick={() => setShowClearConfirm(false)}
-                className="aqb-ht-clear-btn"
-                aria-label="Cancel clear"
-              >
-                <span style={{ fontSize: 11 }}>Cancel</span>
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setShowClearConfirm(true)}
-              className="aqb-ht-clear-btn"
-              disabled={!canUndo}
-              title="Clear all history"
-              aria-label="Clear History"
-              style={{ marginLeft: "auto" }}
-            >
-              <ClearIcon />
-              <span style={{ fontSize: 11, marginLeft: 4 }}>Clear history</span>
-            </button>
-          )}
-        </div>
+      {/* View switcher — prototype tabs with helper text */}
+      <div className="view-switcher" role="tablist" aria-label="History view">
+        {(["changes", "saves"] as const).map((view) => (
+          <button
+            key={view}
+            type="button"
+            role="tab"
+            aria-selected={activeView === view}
+            className={`view-tab${activeView === view ? " active" : ""}`}
+            onClick={() => setActiveView(view)}
+          >
+            {view === "changes" ? "Changes" : "Saves"}
+            <span className="tab-helper">{HELPER_TEXT[view]}</span>
+          </button>
+        ))}
+      </div>
 
-        {/* Search Bar */}
-        <SearchBar
+      {/* Search bar — prototype markup */}
+      <div className="search-bar">
+        <span className="search-icon" aria-hidden="true">
+          <SearchIconSvg />
+        </span>
+        <input
+          className="search-input"
+          type="search"
           value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder={activeView === "saves" ? "Search saves..." : "Search changes..."}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder={SEARCH_PLACEHOLDER[activeView]}
+          aria-label={SEARCH_PLACEHOLDER[activeView]}
         />
-
-        {/* View Switcher */}
-        <ViewSwitcher
-          value={activeView}
-          options={VIEW_OPTIONS}
-          onChange={setActiveView}
-          fullWidth
-        />
-
-        {/* Helper text */}
-        <p className="aqb-ht-helper-text">{HELPER_TEXT[activeView]}</p>
+        {searchQuery && (
+          <button
+            type="button"
+            className="search-clear visible"
+            onClick={() => setSearchQuery("")}
+            aria-label="Clear search"
+          >
+            <ClearXSvg />
+          </button>
+        )}
       </div>
 
-      {/* Content */}
-      <div className="aqb-ht-content">
-        {activeView === "saves" && (
-          <VersionHistoryPanel composer={composer} searchQuery={searchQuery} />
-        )}
-
+      {/* List container — switches between Changes / Saves */}
+      <div className="list-container" role="tabpanel">
         {activeView === "changes" && (
-          <ActivityView composer={composer} searchQuery={searchQuery} />
+          <ActivityView
+            composer={composer}
+            searchQuery={searchQuery}
+            onOpenTimeTravel={() => setShowScrubber(true)}
+            onClearHistory={clear}
+            canClear={canUndo}
+          />
+        )}
+
+        {activeView === "saves" && (
+          <>
+            {milestoneAvailable && milestoneSuggestion && (
+              <MilestoneSuggestionBanner
+                suggestion={milestoneSuggestion}
+                isLoading={milestoneLoading}
+                onAccept={acceptMilestone}
+                onDismiss={dismissMilestone}
+                onEdit={editMilestone}
+              />
+            )}
+            <VersionHistoryPanel composer={composer} searchQuery={searchQuery} />
+          </>
         )}
       </div>
+
+      {/* Time-Travel scrubber drawer (overlays canvas, not sidebar) */}
+      {showScrubber && (
+        <TimeTravelScrubber
+          composer={composer}
+          historyStack={historyStack}
+          onRestore={handleScrubberRestore}
+          onExit={handleScrubberExit}
+        />
+      )}
     </div>
   );
 };

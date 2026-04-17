@@ -869,7 +869,20 @@ try {
 
 ---
 
-## 10. Dependencies
+## 11. Approved Mockups
+
+| Screen/Section | Mockup Path | Direction | Notes |
+|----------------|-------------|-----------|-------|
+| History Tab (full shell) | `~/.gstack/projects/aamirtauqir-buildrik/designs/history-tab-prototype-20260417/history-tab-prototype.html` | Dark chrome, cobalt accent, Inter + JetBrains Mono fonts | Interactive prototype with tab switch, FAB, time-travel drawer |
+| Changes View | Same file | Primary tab, keyboard hints, date grouping | j/k nav, Enter expand, g/G start/end |
+| Saves View | Same file | Secondary tab, FAB for save form | Compare, restore, delete actions |
+| Time-Travel Drawer | Same file | Bottom drawer 200px, scrubber slider | Restore/exit buttons, Ctrl+Shift+T exit |
+
+Design tokens used: `--aqb-*` from `packages/editor/src/themes/default.css`
+
+---
+
+## 12. Dependencies
 
 ```json
 {

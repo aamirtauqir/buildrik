@@ -71,6 +71,8 @@ export interface LeftSidebarProps {
     files: Array<{ path: string; content: string }>;
     projectName?: string;
   }>;
+  /** Whether AI suggestions in the Add tab are enabled */
+  aiEnabled?: boolean;
 }
 
 // ============================================
@@ -147,6 +149,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onPublish,
   onUnpublish,
   onExportForDeploy,
+  aiEnabled,
 }) => {
   const navRef = React.useRef<HTMLElement>(null);
   const panelContentRef = React.useRef<HTMLDivElement>(null);
@@ -339,6 +342,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onUnpublish={onUnpublish}
                   onSettingsDirtyChange={setSettingsDirty}
                   onTemplatesSwitchTab={(tab) => safeTabChange(tab as GroupedTabId)}
+                  aiEnabled={aiEnabled}
                 />
               </React.Suspense>
             </div>

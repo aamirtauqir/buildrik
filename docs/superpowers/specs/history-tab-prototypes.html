@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>History Tab Redesign - Wireframes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent: #2D6DFF;
+      --accent-hover: #4D7FFF;
+      --surface: #14141f;
+      --surface-elevated: #1c1c2a;
+      --surface-hover: #232335;
+      --text-primary: #f4f4f5;
+      --text-secondary: #a1a1aa;
+      --text-muted: #6b6963;
+      --text-tertiary: #52525b;
+      --badge-style: #2D6DFF;
+      --badge-text: #14B8A6;
+      --badge-layout: #F59E0B;
+      --badge-content: #F43F5E;
+      --badge-other: #6B6963;
+      --success: #10B981;
+      --error: #EF4444;
+      --border: #27272a;
+      --border-subtle: #1f1f23;
+      --fab-size: 44px;
+      --spacing-1: 4px;
+      --spacing-2: 8px;
+      --spacing-3: 12px;
+      --spacing-4: 16px;
+      --spacing-5: 20px;
+      --spacing-6: 24px;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --font-ui: 'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Geist Mono', ui-monospace, monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background: #0a0a0f;
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    h2 {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    .wireframe-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 32px;
+    }
+
+    .wireframe {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+
+    .wireframe-header {
+      padding: 16px var(--spacing-4);
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .wireframe-header h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .wireframe-header p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .mock-sidebar {
+      width: 320px;
+      height: 600px;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+
+    /* Tab Switcher */
+    .tab-switcher {
+      display: flex;
+      gap: 0;
+      padding: 12px 12px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .tab {
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.15s;
+    }
+
+    .tab:hover {
+      color: var(--text-secondary);
+    }
+
+    .tab.active {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 2px 2px 0 0;
+    }
+
+    /* Helper Text */
+    .helper-text {
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      background: rgba(255,255,255,0.01);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* Search Bar */
+    .search-bar {
+      padding: 12px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 12px 8px 32px;
+      font-size: 13px;
+      font-family: var(--font-ui);
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* List */
+    .list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px;
+    }
+
+    /* History Entry */
+    .history-entry {
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 4px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .history-entry:hover {
+      background: var(--surface-hover);
+    }
+
+    .history-entry.current {
+      background: rgba(45, 109, 255, 0.1);
+      border: 1px solid rgba(45, 109, 255, 0.3);
+    }
+
+    .entry-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .entry-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      flex: 1;
+    }
+
+    .entry-timestamp {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    .entry-badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: var(--radius-sm);
+      background: rgba(45, 109, 255, 0.15);
+      color: var(--badge-style);
+    }
+
+    .badge.style { background: rgba(45, 109, 255, 0.15); color: var(--badge-style); }
+    .badge.text { background: rgba(20, 184, 166, 0.15); color: var(--badge-text); }
+    .badge.layout { background: rgba(245, 158, 11, 0.15); color: var(--badge-layout); }
+    .badge.content { background: rgba(244, 63, 94, 0.15); color: var(--badge-content); }
+    .badge.other { background: rgba(107, 105, 99, 0.15); color: var(--badge-other); }
+
+    .badge-count {
+      font-size: 10px;
+      opacity: 0.8;
+    }
+
+    .current-badge {
+      padding: 2px 6px;
+      font-size: 10px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      background: var(--accent);
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Expanded Entry */
+    .entry-expanded {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .diff-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+      font-size: 12px;
+    }
+
+    .diff-icon {
+      width: 16px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .diff-icon.add { color: var(--success); }
+    .diff-icon.remove { color: var(--error); }
+    .diff-icon.change { color: var(--accent); }
+
+    .diff-property {
+      color: var(--text-secondary);
+      flex: 1;
+    }
+
+    .diff-value {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .diff-value.before {
+      text-decoration: line-through;
+      color: var(--error);
+      opacity: 0.7;
+    }
+
+    .diff-value.after {
+      color: var(--success);
+    }
+
+    /* Empty State */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .empty-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    .empty-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .empty-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .empty-hint kbd {
+      display: inline-block;
+      padding: 2px 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text-secondary);
+    }
+
+    /* FAB */
+    .fab-container {
+      position: relative;
+      padding: 12px;
+    }
+
+    .fab {
+      position: absolute;
+      bottom: 20px;
+      right: 16px;
+      width: var(--fab-size);
+      height: var(--fab-size);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: 20px;
+      font-weight: 300;
+      box-shadow: 0 4px 12px rgba(45, 109, 255, 0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .fab:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(45, 109, 255, 0.4);
+    }
+
+    /* Save Version Form */
+    .save-form {
+      margin: 12px;
+      padding: 12px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    .form-row {
+      margin-bottom: 12px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 13px;
+      font-family: var(--font-ui);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .form-input:focus {
+      border-color: var(--accent);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: var(--font-ui);
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-hover);
+    }
+
+    /* Version Row */
+    .version-entry {
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    .version-entry:hover {
+      border-color: var(--border);
+    }
+
+    .version-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .version-info {
+      flex: 1;
+    }
+
+    .version-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .version-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .version-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .action-btn {
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 500;
+      font-family: var(--font-ui);
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .action-btn:hover {
+      background: var(--surface-hover);
+      color: var(--text-primary);
+    }
+
+    .action-btn.compare {
+      color: var(--accent);
+      border-color: rgba(45, 109, 255, 0.3);
+    }
+
+    .action-btn.compare:hover {
+      background: rgba(45, 109, 255, 0.1);
+    }
+
+    .action-btn.restore {
+      color: var(--success);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .action-btn.restore:hover {
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .action-btn.delete {
+      color: var(--error);
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .action-btn.delete:hover {
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    /* Time Travel Drawer */
+    .time-travel-drawer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      background: rgba(20, 20, 31, 0.98);
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 16px 24px;
+      z-index: 100;
+    }
+
+    .drawer-handle {
+      width: 40px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 0 auto 12px;
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .drawer-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .drawer-timestamp {
+      font-size: 13px;
+      font-family: var(--font-mono);
+      color: var(--accent);
+    }
+
+    .timeline-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .timeline-nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .timeline-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .timeline-btn:hover {
+      background: var(--surface-hover);
+      color: var(--text-primary);
+    }
+
+    .timeline-slider {
+      flex: 1;
+      height: 8px;
+      background: var(--surface-elevated);
+      border-radius: 4px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .timeline-progress {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 45%;
+      background: linear-gradient(90deg, var(--accent), rgba(45, 109, 255, 0.6));
+      border-radius: 4px;
+    }
+
+    .timeline-handle {
+      position: absolute;
+      left: 45%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      cursor: grab;
+    }
+
+    .timeline-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    .drawer-actions {
+      display: flex;
+      gap: 12px;
+      margin-left: auto;
+    }
+
+    .drawer-btn {
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: var(--font-ui);
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .drawer-btn.restore {
+      background: var(--accent);
+      color: white;
+    }
+
+    .drawer-btn.restore:hover {
+      background: var(--accent-hover);
+    }
+
+    .drawer-btn.exit {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .drawer-btn.exit:hover {
+      background: var(--surface-hover);
+      color: var(--text-primary);
+    }
+
+    /* Compare View */
+    .compare-view {
+      padding: 12px;
+    }
+
+    .compare-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .compare-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .ai-summary {
+      padding: 10px 12px;
+      background: rgba(45, 109, 255, 0.1);
+      border: 1px solid rgba(45, 109, 255, 0.2);
+      border-radius: var(--radius-sm);
+      margin-bottom: 12px;
+    }
+
+    .ai-summary-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ai-summary-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .summary-counts {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .summary-count {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    .summary-count.style { background: rgba(45, 109, 255, 0.15); color: var(--badge-style); }
+    .summary-count.text { background: rgba(20, 184, 166, 0.15); color: var(--badge-text); }
+    .summary-count.layout { background: rgba(245, 158, 11, 0.15); color: var(--badge-layout); }
+    .summary-count.content { background: rgba(244, 63, 94, 0.15); color: var(--badge-content); }
+
+    /* Tooltip Preview */
+    .snapshot-preview {
+      position: absolute;
+      width: 160px;
+      padding: 8px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      z-index: 50;
+    }
+
+    .snapshot-image {
+      width: 100%;
+      height: 100px;
+      background: linear-gradient(135deg, var(--surface) 0%, var(--surface-elevated) 100%);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    .snapshot-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    /* Keyboard Hints */
+    .keyboard-hints {
+      display: flex;
+      gap: 12px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.01);
+      border-top: 1px solid var(--border-subtle);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .kbd-hint {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    kbd {
+      display: inline-block;
+      padding: 2px 5px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text-secondary);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      padding: 12px 16px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: slideIn 0.2s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .toast-icon {
+      font-size: 16px;
+    }
+
+    .toast-icon.success { color: var(--success); }
+    .toast-icon.error { color: var(--error); }
+
+    .toast-message {
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+
+    .toast-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .toast-btn {
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      font-family: var(--font-ui);
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    .toast-btn.primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .toast-btn.secondary {
+      background: transparent;
+      color: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body { padding: 16px; }
+      .wireframe-container { grid-template-columns: 1fr; }
+      .mock-sidebar { width: 100%; height: 500px; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>History Tab 10x Redesign</h1>
+<h2>Based on CEO Plan + Design Spec — Wireframe Prototypes</h2>
+
+<div class="wireframe-container">
+
+  <!-- ============================================ -->
+  <!-- PROTOTYPE 1: Changes View (Primary Tab) -->
+  <!-- ============================================ -->
+  <div class="wireframe">
+    <div class="wireframe-header">
+      <h3>1. Changes View (Primary Tab)</h3>
+      <p>Renamed from "Activity" — bold weight, active tab indicator</p>
+    </div>
+    <div class="mock-sidebar">
+      <div class="tab-switcher">
+        <button class="tab active">Changes</button>
+        <button class="tab">Saves</button>
+      </div>
+      <div class="helper-text">Your recent edits. Use Ctrl+Z to undo.</div>
+
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" placeholder="Search changes...">
+      </div>
+
+      <div class="list-container">
+        <!-- Current Entry -->
+        <div class="history-entry current">
+          <div class="entry-header">
+            <span class="entry-label">Hero Section</span>
+            <span class="current-badge">Current</span>
+            <span class="entry-timestamp">12:45 PM</span>
+          </div>
+          <div class="entry-badges">
+            <span class="badge style">3 style <span class="badge-count">+</span></span>
+            <span class="badge text">1 text <span class="badge-count">+</span></span>
+          </div>
+          <div class="entry-expanded">
+            <div class="diff-row">
+              <span class="diff-icon change">~</span>
+              <span class="diff-property">backgroundColor</span>
+              <span class="diff-value before">#1a1a2e</span>
+              <span class="diff-value after">#14141f</span>
+            </div>
+            <div class="diff-row">
+              <span class="diff-icon add">+</span>
+              <span class="diff-property">boxShadow</span>
+              <span class="diff-value">0 4px 24px rgba(0,0,0,0.4)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Regular Entry -->
+        <div class="history-entry">
+          <div class="entry-header">
+            <span class="entry-label">Pricing Card</span>
+            <span class="entry-timestamp">12:32 PM</span>
+          </div>
+          <div class="entry-badges">
+            <span class="badge layout">2 layout</span>
+            <span class="badge style">1 style</span>
+          </div>
+        </div>
+
+        <!-- Grouped Entry -->
+        <div class="history-entry">
+          <div class="entry-header">
+            <span class="entry-label">Navigation</span>
+            <span class="entry-timestamp">11:58 AM</span>
+          </div>
+          <div class="entry-badges">
+            <span class="badge text">12 text changes</span>
+          </div>
+        </div>
+
+        <!-- Content Entry -->
+        <div class="history-entry">
+          <div class="entry-header">
+            <span class="entry-label">CTA Button</span>
+            <span class="entry-timestamp">11:45 AM</span>
+          </div>
+          <div class="entry-badges">
+            <span class="badge content">1 content</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="keyboard-hints">
+        <span class="kbd-hint"><kbd>j</kbd><kbd>k</kbd> navigate</span>
+        <span class="kbd-hint"><kbd>Enter</kbd> expand</span>
+        <span class="kbd-hint"><kbd>g</kbd><kbd>G</kbd> start/end</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- PROTOTYPE 2: Saves View (Secondary Tab) -->
+  <!-- ============================================ -->
+  <div class="wireframe">
+    <div class="wireframe-header">
+      <h3>2. Saves View (Secondary Tab)</h3>
+      <p>Named milestones with visual snapshots, FAB for save</p>
+    </div>
+    <div class="mock-sidebar">
+      <div class="tab-switcher">
+        <button class="tab">Changes</button>
+        <button class="tab active">Saves</button>
+      </div>
+      <div class="helper-text">Named milestones you've saved. Compare or restore anytime.</div>
+
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" placeholder="Search saves...">
+      </div>
+
+      <div class="list-container">
+        <!-- Version Entry with Actions -->
+        <div class="version-entry">
+          <div class="version-header">
+            <div class="version-info">
+              <div class="version-name">Homepage Redesign</div>
+              <div class="version-meta">
+                <span>Apr 16, 2:34 PM</span>
+                <span>•</span>
+                <span>Auto-save</span>
+              </div>
+            </div>
+          </div>
+          <div class="version-actions">
+            <button class="action-btn compare">Compare</button>
+            <button class="action-btn restore">Restore</button>
+            <button class="action-btn delete">Delete</button>
+          </div>
+        </div>
+
+        <!-- Version Entry - Manual Save -->
+        <div class="version-entry">
+          <div class="version-header">
+            <div class="version-info">
+              <div class="version-name">Pricing Page v1</div>
+              <div class="version-meta">
+                <span>Apr 15, 11:20 AM</span>
+                <span>•</span>
+                <span>Manual</span>
+              </div>
+            </div>
+          </div>
+          <div class="version-actions">
+            <button class="action-btn compare">Compare</button>
+            <button class="action-btn restore">Restore</button>
+            <button class="action-btn delete">Delete</button>
+          </div>
+        </div>
+
+        <!-- Empty State for Saves -->
+        <div class="empty-state">
+          <div class="empty-icon">💾</div>
+          <div class="empty-title">No saved versions yet</div>
+          <div class="empty-hint">Save Version creates a named milestone.</div>
+        </div>
+      </div>
+
+      <!-- FAB -->
+      <div class="fab-container">
+        <button class="fab">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- PROTOTYPE 3: Save Version Form -->
+  <!-- ============================================ -->
+  <div class="wireframe">
+    <div class="wireframe-header">
+      <h3>3. Save Version Form (Inline FAB)</h3>
+      <p>Slides up from bottom, FAB becomes close button</p>
+    </div>
+    <div class="mock-sidebar">
+      <div class="tab-switcher">
+        <button class="tab">Changes</button>
+        <button class="tab active">Saves</button>
+      </div>
+      <div class="helper-text">Named milestones you've saved. Compare or restore anytime.</div>
+
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" placeholder="Search saves...">
+      </div>
+
+      <div class="list-container">
+        <!-- Save Form (Inline) -->
+        <div class="save-form">
+          <div class="form-row">
+            <label class="form-label">Version Name</label>
+            <input type="text" class="form-input" placeholder="e.g., Homepage redesign">
+          </div>
+          <div class="form-row">
+            <label class="form-label">Description (optional)</label>
+            <input type="text" class="form-input" placeholder="What changed?">
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-secondary">Cancel</button>
+            <button class="btn btn-primary">Save</button>
+          </div>
+        </div>
+
+        <!-- Existing versions below -->
+        <div class="version-entry">
+          <div class="version-header">
+            <div class="version-info">
+              <div class="version-name">Homepage Redesign</div>
+              <div class="version-meta">
+                <span>Apr 16, 2:34 PM</span>
+                <span>•</span>
+                <span>Auto-save</span>
+              </div>
+            </div>
+          </div>
+          <div class="version-actions">
+            <button class="action-btn compare">Compare</button>
+            <button class="action-btn restore">Restore</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="fab-container">
+        <button class="fab">×</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- PROTOTYPE 4: Compare View with AI Summary -->
+  <!-- ============================================ -->
+  <div class="wireframe">
+    <div class="wireframe-header">
+      <h3>4. Compare View</h3>
+      <p>Semantic diff with AI summary, color-coded changes</p>
+    </div>
+    <div class="mock-sidebar">
+      <div class="tab-switcher">
+        <button class="tab">Changes</button>
+        <button class="tab active">Saves</button>
+      </div>
+
+      <div class="compare-view">
+        <div class="compare-header">
+          <span class="compare-title">Comparing: Current → Homepage Redesign</span>
+        </div>
+
+        <!-- AI Summary -->
+        <div class="ai-summary">
+          <div class="ai-summary-label">✨ AI Summary</div>
+          <div class="ai-summary-text">
+            Redesigned the hero section: increased headline font size from 32px to 48px, changed background from solid blue to gradient, and added a subtle box shadow for depth.
+          </div>
+          <div class="summary-counts">
+            <span class="summary-count style">3 style</span>
+            <span class="summary-count text">1 text</span>
+          </div>
+        </div>
+
+        <!-- Diff Details -->
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Changes by element:</div>
+
+        <div style="margin-bottom: 12px;">
+          <div style="font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 6px;">Hero Section</div>
+          <div class="diff-row">
+            <span class="diff-icon change">~</span>
+            <span class="diff-property">fontSize</span>
+            <span class="diff-value before">32px</span>
+            <span class="diff-value after">48px</span>
+          </div>
+          <div class="diff-row">
+            <span class="diff-icon change">~</span>
+            <span class="diff-property">background</span>
+            <span class="diff-value before">#1a1a2e</span>
+            <span class="diff-value after">linear-gradient...</span>
+          </div>
+          <div class="diff-row">
+            <span class="diff-icon add">+</span>
+            <span class="diff-property">boxShadow</span>
+            <span class="diff-value">0 4px 24px...</span>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <div style="font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 6px;">CTA Button</div>
+          <div class="diff-row">
+            <span class="diff-icon change">~</span>
+            <span class="diff-property">content</span>
+            <span class="diff-value before">Get Started</span>
+            <span class="diff-value after">Start Free Trial</span>
+          </div>
+        </div>
+
+        <!-- AI Summary Button -->
+        <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+          <button class="btn btn-secondary" style="width: 100%; background: rgba(45, 109, 255, 0.1); color: var(--accent); border-color: rgba(45, 109, 255, 0.3);">
+            ✨ Get AI Summary
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- PROTOTYPE 5: Time-Travel Scrubber -->
+  <!-- ============================================ -->
+  <div class="wireframe" style="grid-column: 1 / -1;">
+    <div class="wireframe-header">
+      <h3>5. Time-Travel Scrubber (Bottom Drawer)</h3>
+      <p>Canvas preview with draggable timeline, semi-transparent overlay</p>
+    </div>
+    <div style="background: var(--surface); padding: 24px; border-radius: var(--radius-md);">
+      <!-- Mock Canvas Area -->
+      <div style="background: linear-gradient(135deg, #1a1a2e 0%, #0a0a0f 100%); height: 300px; border-radius: var(--radius-md); margin-bottom: 16px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+        <div style="position: absolute; inset: 0; opacity: 0.4; background: repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(255,255,255,0.03) 20px, rgba(255,255,255,0.03) 21px);"></div>
+        <div style="text-align: center; color: var(--text-muted);">
+          <div style="font-size: 48px; margin-bottom: 8px;">🕐</div>
+          <div style="font-size: 14px;">Canvas Preview (Semi-transparent)</div>
+          <div style="font-size: 12px; margin-top: 4px;">Historical state shown at 40% opacity</div>
+        </div>
+
+        <!-- Preview indicator -->
+        <div style="position: absolute; top: 12px; left: 12px; padding: 4px 8px; background: rgba(45, 109, 255, 0.2); border: 1px solid rgba(45, 109, 255, 0.4); border-radius: var(--radius-sm); font-size: 11px; color: var(--accent);">
+          Previewing: 12:45 PM
+        </div>
+      </div>
+
+      <!-- Time-Travel Drawer -->
+      <div class="time-travel-drawer">
+        <div class="drawer-handle"></div>
+        <div class="drawer-header">
+          <span class="drawer-title">Time-Travel Mode</span>
+          <span class="drawer-timestamp">Scrubbing: 12:45 PM</span>
+        </div>
+
+        <div class="timeline-container">
+          <div class="timeline-nav">
+            <button class="timeline-btn">⏮</button>
+            <button class="timeline-btn">◀</button>
+            <button class="timeline-btn">▶</button>
+            <button class="timeline-btn">⏭</button>
+          </div>
+
+          <div style="flex: 1;">
+            <div class="timeline-slider">
+              <div class="timeline-progress"></div>
+              <div class="timeline-handle"></div>
+            </div>
+            <div class="timeline-labels">
+              <span>12:30 PM</span>
+              <span>12:45 PM</span>
+              <span>1:02 PM</span>
+            </div>
+          </div>
+
+          <div class="drawer-actions">
+            <button class="drawer-btn restore">Restore this point</button>
+            <button class="drawer-btn exit">Exit time-travel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- PROTOTYPE 6: Hover Preview Tooltip -->
+  <!-- ============================================ -->
+  <div class="wireframe">
+    <div class="wireframe-header">
+      <h3>6. Hover Preview (Snapshot)</h3>
+      <p>Visual snapshot on hover, 120px width tooltip</p>
+    </div>
+    <div class="mock-sidebar">
+      <div class="tab-switcher">
+        <button class="tab">Changes</button>
+        <button class="tab active">Saves</button>
+      </div>
+
+      <div class="list-container" style="padding: 24px; position: relative;">
+        <!-- Version Entry -->
+        <div class="version-entry" style="position: relative;">
+          <div class="version-header">
+            <div class="version-info">
+              <div class="version-name">Homepage Redesign</div>
+              <div class="version-meta">Apr 16, 2:34 PM</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Snapshot Preview Tooltip -->
+        <div class="snapshot-preview" style="top: 50px; left: 50%; transform: translateX(-50%);">
+          <div class="snapshot-image">Preview</div>
+          <div class="snapshot-label">Hero section state at 2:34 PM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- PROTOTYPE 7: Toast Notifications -->
+  <!-- ============================================ -->
+  <div class="wireframe">
+    <div class="wireframe-header">
+      <h3>7. Toast Notifications</h3>
+      <p>Top-right position, action buttons for confirmations</p>
+    </div>
+    <div style="background: var(--surface); padding: 24px; border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 16px;">
+      <!-- Success Toast -->
+      <div class="toast">
+        <span class="toast-icon success">✓</span>
+        <span class="toast-message">Saved "Homepage Redesign"</span>
+      </div>
+
+      <!-- Restore Confirmation Toast -->
+      <div class="toast">
+        <span class="toast-icon" style="color: var(--text-secondary);">↩</span>
+        <span class="toast-message">Restore to this version?</span>
+        <div class="toast-actions">
+          <button class="toast-btn primary">Restore</button>
+          <button class="toast-btn secondary">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Delete Confirmation -->
+      <div class="toast" style="border-color: rgba(239, 68, 68, 0.3);">
+        <span class="toast-icon error">⚠</span>
+        <span class="toast-message">Delete "Pricing Page v1"?</span>
+        <div class="toast-actions">
+          <button class="toast-btn primary" style="background: var(--error);">Delete</button>
+          <button class="toast-btn secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Color Palette Reference -->
+<div style="margin-top: 48px; padding: 24px; background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+  <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">Design Tokens (from CEO Plan)</h3>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
+    <div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Accent (Cobalt)</div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 32px; height: 32px; background: #2D6DFF; border-radius: 4px;"></div>
+        <code style="font-size: 12px; color: var(--text-secondary);">#2D6DFF</code>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Surface</div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 32px; height: 32px; background: #14141f; border-radius: 4px; border: 1px solid var(--border);"></div>
+        <code style="font-size: 12px; color: var(--text-secondary);">#14141f</code>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Text Primary</div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 32px; height: 32px; background: #f4f4f5; border-radius: 4px;"></div>
+        <code style="font-size: 12px; color: var(--text-secondary);">#f4f4f5</code>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Success (Add)</div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 32px; height: 32px; background: #10B981; border-radius: 4px;"></div>
+        <code style="font-size: 12px; color: var(--text-secondary);">#10B981</code>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Error (Remove)</div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 32px; height: 32px; background: #EF4444; border-radius: 4px;"></div>
+        <code style="font-size: 12px; color: var(--text-secondary);">#EF4444</code>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Badge: Style</div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 32px; height: 32px; background: #2D6DFF; border-radius: 4px;"></div>
+        <code style="font-size: 12px; color: var(--text-secondary);">cobalt</code>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Badge: Text</div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 32px; height: 32px; background: #14B8A6; border-radius: 4px;"></div>
+        <code style="font-size: 12px; color: var(--text-secondary);">teal #14B8A6</code>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Badge: Layout</div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 32px; height: 32px; background: #F59E0B; border-radius: 4px;"></div>
+        <code style="font-size: 12px; color: var(--text-secondary);">amber #F59E0B</code>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Badge: Content</div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 32px; height: 32px; background: #F43F5E; border-radius: 4px;"></div>
+        <code style="font-size: 12px; color: var(--text-secondary);">rose #F43F5E</code>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Typography</div>
+    <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+      <div>
+        <span style="font-family: 'Inter Tight', sans-serif; font-size: 13px; font-weight: 600; color: var(--text-primary);">Inter Tight 600</span>
+        <span style="font-size: 11px; color: var(--text-muted); margin-left: 8px;">UI labels</span>
+      </div>
+      <div>
+        <span style="font-family: 'Inter Tight', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-primary);">Inter Tight 500</span>
+        <span style="font-size: 11px; color: var(--text-muted); margin-left: 8px;">Entry labels</span>
+      </div>
+      <div>
+        <span style="font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-muted);">Geist Mono 400</span>
+        <span style="font-size: 11px; color: var(--text-muted); margin-left: 8px;">Timestamps</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Interactive demo: Tab switching
+  document.querySelectorAll('.tab').forEach(tabGroup => {
+    tabGroup.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const parent = tab.closest('.tab-switcher');
+        parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+  });
+
+  // Interactive demo: Expand entry
+  document.querySelectorAll('.history-entry').forEach(entry => {
+    entry.addEventListener('click', () => {
+      const expanded = entry.querySelector('.entry-expanded');
+      if (expanded) {
+        expanded.style.display = expanded.style.display === 'none' ? 'block' : 'none';
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

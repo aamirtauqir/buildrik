@@ -1,8 +1,8 @@
 /**
  * TabRouter — Panel-mode tab routing for LeftSidebar
  * Maps GroupedTabId to lazy-loaded panel tab components.
- * Only handles panel-mode tabs (Add, Media, Layers, Pages, Components).
- * Fullpage tabs (Templates, Settings, History, Design) are handled by FullPageRouter.
+ * Only handles panel-mode tabs (Add, Media, Layers, Pages, Components, History).
+ * Fullpage tabs (Templates, Settings, Design) are handled by FullPageRouter.
  *
  * Tab lifecycle note: this router mounts one panel tab at a time via a
  * `switch` and unmounts the previous tab on every nav click. An earlier
@@ -35,6 +35,7 @@ const MediaTab = React.lazy(() =>
   import("./tabs/media/MediaTab").then((m) => ({ default: m.MediaTab }))
 );
 const PublishTab = React.lazy(() => import("./tabs/publish/PublishTab"));
+const HistoryTab = React.lazy(() => import("./tabs/history/HistoryTab"));
 
 export interface TabRouterProps {
   activeTab: GroupedTabId;
@@ -57,6 +58,8 @@ export interface TabRouterProps {
   onUnpublish?: (projectId: string) => Promise<void>;
   onSettingsDirtyChange?: (dirty: boolean) => void;
   onTemplatesSwitchTab?: (tab: string) => void;
+  /** Whether AI suggestions in the Add tab are enabled */
+  aiEnabled?: boolean;
 }
 
 export const TabRouter: React.FC<TabRouterProps> = ({
@@ -72,10 +75,11 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   projectId,
   onPublish,
   onUnpublish,
+  aiEnabled,
 }) => {
   switch (activeTab) {
     case "add":
-      return <BuildTab composer={composer} onBlockClick={onBlockClick} {...commonTabProps} />;
+      return <BuildTab composer={composer} onBlockClick={onBlockClick} {...commonTabProps} aiEnabled={aiEnabled} />;
 
     case "layers":
       return (
@@ -115,6 +119,9 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           onUnpublish={onUnpublish}
         />
       );
+
+    case "history":
+      return <HistoryTab composer={composer} projectId={projectId} {...commonTabProps} />;
 
     default:
       return null;

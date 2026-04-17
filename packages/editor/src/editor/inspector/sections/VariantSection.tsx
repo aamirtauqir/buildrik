@@ -5,6 +5,7 @@
  */
 
 import * as React from "react";
+import { Package } from "lucide-react";
 import type { Composer } from "../../../engine";
 import type { ComponentDefinition } from "../../../shared/types/components";
 import { Section } from "../shared/controls";
@@ -20,6 +21,8 @@ interface VariantSectionProps {
   elementId: string | null;
   /** Controlled open state for auto-expand functionality */
   isOpen?: boolean;
+  /** Called when section header is toggled — wires into useInspectorSections */
+  onToggle?: () => void;
 }
 
 // ============================================================================
@@ -53,7 +56,7 @@ const styles = {
     padding: "6px 12px",
     borderRadius: 6,
     border: isSelected ? "1px solid var(--aqb-primary)" : "1px solid var(--aqb-border)",
-    background: isSelected ? "rgba(124, 125, 255, 0.15)" : "var(--aqb-surface-3)",
+    background: isSelected ? "var(--aqb-primary-light)" : "var(--aqb-surface-3)",
     color: isSelected ? "var(--aqb-primary)" : "var(--aqb-text-secondary)",
     fontSize: 12,
     fontWeight: isSelected ? 600 : 400,
@@ -73,7 +76,7 @@ const styles = {
     alignItems: "center",
     gap: 8,
     padding: "8px 12px",
-    background: "linear-gradient(135deg, rgba(124,125,255,0.1), rgba(167,139,250,0.1))",
+    background: "linear-gradient(135deg, rgba(45,109,255,0.08), rgba(45,109,255,0.04))",
     borderRadius: 8,
     marginBottom: 8,
   },
@@ -98,7 +101,7 @@ const styles = {
 // COMPONENT
 // ============================================================================
 
-export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elementId, isOpen }) => {
+export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elementId, isOpen, onToggle }) => {
   // State for component info
   const [componentInfo, setComponentInfo] = React.useState<{
     component: ComponentDefinition | null;
@@ -173,11 +176,11 @@ export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elemen
   };
 
   return (
-    <Section title="Variants" icon="Layers" isOpen={isOpen} id="inspector-section-variants">
+    <Section title="Variants" icon="Layers" isOpen={isOpen} onToggle={onToggle} id="inspector-section-variants">
       <div style={styles.container}>
         {/* Component name badge */}
         <div style={styles.componentName}>
-          <span style={styles.componentIcon}>📦</span>
+          <Package size={16} aria-hidden style={styles.componentIcon} />
           <span style={styles.componentLabel}>{componentInfo.component.name}</span>
         </div>
 

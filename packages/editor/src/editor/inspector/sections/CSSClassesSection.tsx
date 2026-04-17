@@ -105,11 +105,11 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
                 key={cls}
                 style={{
                   padding: "6px 10px",
-                  background: "rgba(0,115,230,0.15)",
-                  border: "1px solid rgba(0,115,230,0.3)",
+                  background: "var(--aqb-primary-light)",
+                  border: "1px solid var(--aqb-primary)",
                   borderRadius: 6,
                   fontSize: 12,
-                  color: "#0073E6",
+                  color: "var(--aqb-primary)",
                   display: "flex",
                   alignItems: "center",
                   gap: 6,

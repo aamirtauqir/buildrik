@@ -69,6 +69,10 @@ export const STORAGE_KEYS = {
   BUILD_TIPS_COLLAPSED: "aqb-build-tips-collapsed",
   /** Add tab mode: "elements" | "sections" (sessionStorage) */
   BUILD_MODE: "aqb-build-mode",
+  /** Ordered block IDs pinned as Quick Picks */
+  BUILD_PICKS: "aqb-build-picks",
+  /** FTUE tooltip for Quick Picks has been dismissed */
+  BUILD_FTUE_SEEN: "aqb-build-ftue-seen",
 
   // ─── Components Tab ───────────────────────────────────────────
   /** Favorite component IDs in the components library */

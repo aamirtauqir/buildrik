@@ -1,5 +1,5 @@
 /**
- * FullPageRouter — Routes fullpage-mode tabs (Templates, Settings, History, Design)
+ * FullPageRouter — Routes fullpage-mode tabs (Templates, Settings, Design)
  * Renders inside LayoutShell.FullPage slot when a fullpage tab is active.
  *
  * @license BSD-3-Clause
@@ -13,7 +13,6 @@ import type { GroupedTabId } from "../rail/tabsConfig";
 const TemplatesTab = React.lazy(() => import("./tabs/templates/TemplatesTab"));
 const DesignSystemTab = React.lazy(() => import("./tabs/DesignSystemTab"));
 const SettingsTab = React.lazy(() => import("./tabs/settings/SettingsTab"));
-const HistoryTab = React.lazy(() => import("./tabs/history/HistoryTab"));
 const LibraryManager = React.lazy(() =>
   import("../media/LibraryManager").then((m) => ({ default: m.LibraryManager }))
 );
@@ -71,9 +70,6 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
           onDirtyChange={onSettingsDirtyChange}
         />
       );
-
-    case "history":
-      return <HistoryTab composer={composer} {...commonTabProps} projectId={projectId} />;
 
     case "assets":
       return composer ? (

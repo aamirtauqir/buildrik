@@ -201,14 +201,14 @@ export const panelStyles = {
     // BUG-010 FIX: Changed active state to green for better visual contrast
     const colors: Record<PseudoStateId, string> = {
       normal: "var(--aqb-text-tertiary)",
-      hover: "var(--aqb-accent-purple)",
+      hover: "var(--aqb-primary)",
       focus: "var(--aqb-info)",
       active: "var(--aqb-success)",
       disabled: "var(--aqb-text-muted)",
     };
     const rawColors: Record<PseudoStateId, string> = {
       normal: "#6c7086",
-      hover: "#a855f7",
+      hover: "#2d6dff",
       focus: "#3b82f6",
       active: "#22c55e",
       disabled: "#6b7280",

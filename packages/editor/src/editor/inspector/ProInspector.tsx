@@ -598,12 +598,15 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
                 devMode={devMode}
               />
               {/* VariantSection lives outside the registry because its data
-                  model is tied to component instances, not element types. */}
-              {activeTab === "style" && (
+                  model is tied to component instances, not element types.
+                  Uses the same expandedSections key format so collapseAll/expandAll
+                  and user preferences all apply to it. */}
+              {activeTab === "style" && selectedElement && (
                 <VariantSection
                   composer={composer ?? null}
-                  elementId={selectedElement?.id ?? null}
-                  isOpen={autoExpandSection === "variants"}
+                  elementId={selectedElement.id ?? null}
+                  isOpen={expandedSections.has(`${selectedElement.type}:variants`)}
+                  onToggle={() => toggleSection(selectedElement.type, "variants")}
                 />
               )}
             </>

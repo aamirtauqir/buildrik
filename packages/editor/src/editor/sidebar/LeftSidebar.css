@@ -189,6 +189,11 @@
   outline-offset: -2px;
 }
 
+/* Suppress focus ring for mouse clicks — keyboard users still get :focus-visible */
+.ls-btn:focus:not(:focus-visible) {
+  outline: none;
+}
+
 .ls-btn:active svg {
   transform: scale(0.92);
 }

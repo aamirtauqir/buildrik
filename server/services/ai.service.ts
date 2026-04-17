@@ -285,3 +285,157 @@ ${ANTI_SLOP_INSTRUCTIONS}
 Return ONLY a single <section> element with Tailwind classes. No markdown, no code fences.`;
   }
 }
+
+// ============================================
+// History AI Functions
+// ============================================
+
+interface ChangeSummary {
+  style: number;
+  text: number;
+  layout: number;
+  content: number;
+  other: number;
+}
+
+interface VersionChange {
+  type: "style" | "text" | "layout" | "content" | "other";
+  property: string;
+  before: string;
+  after: string;
+}
+
+interface CompareResult {
+  elementName: string;
+  summary: ChangeSummary;
+  changes: VersionChange[];
+}
+
+interface SummarizeChangesInput {
+  versionName: string;
+  changes: CompareResult;
+}
+
+export interface SummarizeResult {
+  summary: string;
+}
+
+export interface MilestoneSuggestResult {
+  suggestedName: string;
+  reasoning: string;
+}
+
+export async function summarizeChanges(
+  versionName: string,
+  changes: CompareResult
+): Promise<SummarizeResult> {
+  const { summary: summaryCounts, changes: changeList } = changes;
+
+  const styleLabel = summaryCounts.style === 1 ? "style change" : "style changes";
+  const textLabel = summaryCounts.text === 1 ? "text change" : "text changes";
+  const layoutLabel = summaryCounts.layout === 1 ? "layout change" : "layout changes";
+  const contentLabel = summaryCounts.content === 1 ? "content change" : "content changes";
+
+  const parts: string[] = [];
+  if (summaryCounts.style > 0) parts.push(`${summaryCounts.style} ${styleLabel}`);
+  if (summaryCounts.text > 0) parts.push(`${summaryCounts.text} ${textLabel}`);
+  if (summaryCounts.layout > 0) parts.push(`${summaryCounts.layout} ${layoutLabel}`);
+  if (summaryCounts.content > 0) parts.push(`${summaryCounts.content} ${contentLabel}`);
+
+  const changeSummary = parts.join(", ") || "no recorded changes";
+  const changeDetail =
+    changeList.length > 0
+      ? changeList
+          .slice(0, 5)
+          .map((c) => `${c.property}: ${c.before || "(empty)"} → ${c.after || "(empty)"}`)
+          .join("; ")
+      : "";
+
+  const systemPrompt = `You are a helpful assistant that describes website editing changes in plain English.
+Given a version name and a list of changes, write 1-2 sentences describing what changed.
+Be specific but concise. Focus on what the user would care about.
+Never be vague like "some elements were modified."`;
+
+  const completion = await getOpenAI().chat.completions.create({
+    model: MODEL,
+    messages: [
+      { role: "system", content: systemPrompt },
+      {
+        role: "user",
+        content: `Version: "${versionName}"
+Changes: ${changeSummary}
+${changeDetail ? `Details: ${changeDetail}` : ""}`,
+      },
+    ],
+    max_tokens: 150,
+    temperature: 0.5,
+  });
+
+  const summary = completion.choices[0]?.message?.content?.trim() ?? "";
+
+  return { summary };
+}
+
+interface RecentChangeEntry {
+  id: string;
+  label: string;
+  timestamp: number;
+  type: "checkpoint" | "patch";
+}
+
+interface PageStructure {
+  pageCount: number;
+  elementCount: number;
+}
+
+export async function suggestMilestone(
+  recentChanges: RecentChangeEntry[],
+  pageStructure?: PageStructure
+): Promise<MilestoneSuggestResult> {
+  const changeLabels = recentChanges
+    .slice(0, 10)
+    .map((c) => c.label || "unnamed change")
+    .join(", ");
+
+  const pageInfo = pageStructure
+    ? `Current page structure: ${pageStructure.pageCount} pages, approximately ${pageStructure.elementCount} elements.`
+    : "";
+
+  const systemPrompt = `You are a helpful assistant that suggests short, meaningful names for website version saves.
+Given recent editing activity, suggest a concise name (max 50 characters) for a version save.
+Respond with ONLY a JSON object: {"suggestedName": "...", "reasoning": "..."}.
+Do not include any markdown, explanation, or extra text outside the JSON.`;
+
+  const completion = await getOpenAI().chat.completions.create({
+    model: MODEL,
+    messages: [
+      { role: "system", content: systemPrompt },
+      {
+        role: "user",
+        content: `Recent editing activity: ${changeLabels || "no recent changes"}
+${pageInfo}`,
+      },
+    ],
+    max_tokens: 100,
+    temperature: 0.6,
+  });
+
+  const raw = completion.choices[0]?.message?.content?.trim() ?? "";
+
+  // Parse JSON response safely
+  try {
+    // Strip markdown code fences if present
+    const cleaned = raw.replace(/^```json\s*/i, "").replace(/\s*```$/i, "");
+    const parsed = JSON.parse(cleaned) as { suggestedName: string; reasoning: string };
+    return {
+      suggestedName: (parsed.suggestedName ?? "Untitled").slice(0, 50),
+      reasoning: parsed.reasoning ?? "",
+    };
+  } catch {
+    // Fallback to a generic suggestion
+    return {
+      suggestedName: "Update",
+      reasoning: "Could not generate a specific suggestion.",
+    };
+  }
+}

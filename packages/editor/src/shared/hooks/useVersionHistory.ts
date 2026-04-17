@@ -7,7 +7,7 @@
 
 import * as React from "react";
 import type { Composer } from "../../engine";
-import type { NamedVersion } from "../types/versions";
+import type { NamedVersion, CompareResult } from "../types/versions";
 import { EVENTS } from "../constants/events";
 
 export interface UseVersionHistoryReturn {
@@ -25,6 +25,10 @@ export interface UseVersionHistoryReturn {
   deleteVersion: (id: string) => Promise<void>;
   /** Get a specific version by id */
   getVersion: (id: string) => NamedVersion | undefined;
+  /** Compare two versions and return diff */
+  compareVersions: (currentId: string, targetId: string) => Promise<CompareResult | null>;
+  /** Update AI summary for a version */
+  updateAiSummary: (versionId: string, summary: string) => Promise<void>;
 }
 
 export function useVersionHistory(composer: Composer | null): UseVersionHistoryReturn {
@@ -87,6 +91,22 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
     [versions]
   );
 
+  const compareVersions = React.useCallback(
+    async (currentId: string, targetId: string): Promise<CompareResult | null> => {
+      if (!composer?.versionHistory) return null;
+      return composer.versionHistory.compareVersions(currentId, targetId);
+    },
+    [composer]
+  );
+
+  const updateAiSummary = React.useCallback(
+    async (versionId: string, summary: string) => {
+      if (!composer?.versionHistory) return;
+      await composer.versionHistory.updateVersion(versionId, { aiSummary: summary });
+    },
+    [composer]
+  );
+
   return {
     versions,
     isAvailable,
@@ -95,5 +115,7 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
     restoreVersion,
     deleteVersion,
     getVersion,
+    compareVersions,
+    updateAiSummary,
   };
 }

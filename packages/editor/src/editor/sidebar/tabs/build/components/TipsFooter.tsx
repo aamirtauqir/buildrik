@@ -5,6 +5,7 @@
  */
 
 import * as React from "react";
+import { Lightbulb } from "lucide-react";
 import { TIPS } from "../catalog/tips";
 
 export interface TipsFooterProps {
@@ -49,7 +50,7 @@ export const TipsFooter: React.FC<TipsFooterProps> = ({
         }}
         style={{ cursor: "pointer" }}
       >
-        <span className="bld-tips-lbl">💡 Pro Tips</span>
+        <span className="bld-tips-lbl"><Lightbulb size={12} aria-hidden /> Pro Tips</span>
         <span style={{ fontSize: 11, color: "var(--aqb-text-muted)", fontFamily: "monospace" }}>
           {tipIdx + 1} / {TIPS.length}
         </span>
@@ -63,7 +64,7 @@ export const TipsFooter: React.FC<TipsFooterProps> = ({
   return (
     <>
       <div className="bld-tips-hd">
-        <span className="bld-tips-lbl">💡 Pro Tips</span>
+        <span className="bld-tips-lbl"><Lightbulb size={12} aria-hidden /> Pro Tips</span>
         <div className="bld-tips-nav">
           <button className="bld-tip-arr" onClick={onPrev} aria-label="Previous tip">
             ‹
