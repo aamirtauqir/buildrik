@@ -528,59 +528,7 @@ export function VersionHistoryPanel({
 
   return (
     <div className="saves-view">
-      {/* Save Version FAB / Inline Form */}
-      <div className="fab-container">
-        {showSaveForm ? (
-          <div className="save-form open">
-            <div className="form-row">
-              <div className="form-field" style={{ flex: 1 }}>
-                <label className="form-label">Version name *</label>
-                <input
-                  type="text"
-                  value={newVersionName}
-                  onChange={(e) => setNewVersionName(e.target.value)}
-                  onKeyDown={handleSaveFormKeyDown}
-                  placeholder="e.g. Homepage redesign"
-                  className="form-input"
-                  autoFocus
-                  maxLength={50}
-                />
-              </div>
-            </div>
-            <div className="form-row" style={{ justifyContent: "flex-end", gap: 8 }}>
-              <button
-                onClick={() => {
-                  setShowSaveForm(false);
-                  setNewVersionName("");
-                }}
-                className="cancel-btn"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCreateVersion}
-                className="save-btn"
-                disabled={!newVersionName.trim() || isSaving}
-              >
-                {isSaving ? "Saving..." : "Save Version"}
-              </button>
-            </div>
-          </div>
-        ) : (
-          <button
-            onClick={() => setShowSaveForm(true)}
-            className="fab"
-            aria-label="Save version"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-          </button>
-        )}
-      </div>
-
-      {/* Version List */}
+      {/* Version List — scrolls, fills available space above FAB */}
       <div className="version-list">
         {filteredVersions.length === 0 ? (
           <EmptyState
@@ -647,6 +595,66 @@ export function VersionHistoryPanel({
               ))}
             </div>
           ))
+        )}
+      </div>
+
+      {/* Save Version FAB / inline form — fixed at bottom-right of saves-view */}
+      <div className="fab-container">
+        {showSaveForm ? (
+          <div className="save-form open">
+            <div className="form-row">
+              <div className="form-field" style={{ flex: 1 }}>
+                <label className="form-label" htmlFor="aqb-save-name">
+                  Version name *
+                </label>
+                <input
+                  id="aqb-save-name"
+                  type="text"
+                  value={newVersionName}
+                  onChange={(e) => setNewVersionName(e.target.value)}
+                  onKeyDown={handleSaveFormKeyDown}
+                  placeholder="e.g. Homepage redesign"
+                  className="form-input"
+                  autoFocus
+                  maxLength={50}
+                />
+                <span className="form-hint">{newVersionName.length}/50</span>
+              </div>
+            </div>
+            <div className="form-row" style={{ justifyContent: "flex-end", gap: 8 }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowSaveForm(false);
+                  setNewVersionName("");
+                }}
+                className="cancel-btn"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleCreateVersion}
+                className="save-btn"
+                disabled={!newVersionName.trim() || isSaving}
+              >
+                {isSaving ? "Saving..." : "Save Version"}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowSaveForm(true)}
+            className="fab"
+            aria-label="Save version"
+            title="Save Version"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
         )}
       </div>
     </div>

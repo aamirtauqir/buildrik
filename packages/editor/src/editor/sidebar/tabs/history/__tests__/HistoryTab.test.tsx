@@ -110,13 +110,15 @@ describe("ActivityView error state", () => {
     expect(screen.queryByText(/failed to load/i)).not.toBeInTheDocument();
   });
 
-  it("applies hist-error class to error container", () => {
+  it("renders error state inside the activity-view container", () => {
     const { container } = render(
       <ActivityView
         composer={null}
         error="Something went wrong"
       />
     );
-    expect(container.querySelector(".hist-error")).toBeTruthy();
+    // New layout uses .activity-view → .empty-state for error display
+    expect(container.querySelector(".activity-view")).toBeTruthy();
+    expect(container.querySelector(".empty-state")).toBeTruthy();
   });
 });

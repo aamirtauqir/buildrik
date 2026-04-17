@@ -257,9 +257,9 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
             <div key={i} className="entry-row" aria-hidden="true">
               <div className="entry-row-main" style={{ padding: "8px 12px" }}>
                 <div>
-                  <div className="aqb-ht-skeleton" style={{ width: "60%", height: 14 }} />
+                  <div className="skeleton" style={{ width: "60%", height: 14 }} />
                   <div
-                    className="aqb-ht-skeleton"
+                    className="skeleton"
                     style={{ width: "40%", height: 12, marginTop: 4 }}
                   />
                 </div>
