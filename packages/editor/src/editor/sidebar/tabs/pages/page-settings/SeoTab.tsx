@@ -33,38 +33,23 @@ const rangeLabel: Record<TitleRange, string> = {
   long: " · Too long",
 };
 
-function scoreColor(score: number): string {
-  if (score <= 40) return "#EF4444";
-  if (score <= 70) return "#F59E0B";
-  return "#22C55E";
-}
-
-function scoreLabel(score: number): string {
-  if (score <= 40) return "Needs work";
-  if (score <= 70) return "Getting there";
-  return "Great";
-}
 
 export const SeoTab: React.FC<Props> = ({ s, page }) => {
-  const domain = s.domain ?? "yourdomain.com";
-  const previewSlug = s.slug || page.slug || page.id;
+  const domain = s.domain ?? "yoursite.aquibra.io";
   const range = titleRange(s.seoTitle);
 
   return (
     <div className="pg-seo">
       {/* ── 1. GOOGLE PREVIEW — TOP ────────────────────────────────────── */}
       <div className="pg-seo__section-label">How your page looks in Google Search</div>
-      <div className="pg-seo__google-preview" aria-label="Google search preview">
+      {/* Google preview — prototype .gpreview */}
+      <div className="pg-seo__gp">
         <div className="pg-seo__gp-domain">
-          {domain} › {previewSlug}
+          {s.domain ?? "yoursite.aquibra.io"} › {page.slug?.replace(/^\//, "") || page.id}
         </div>
-        <div className="pg-seo__gp-title">{s.seoTitle || "Untitled page"}</div>
-        <div className="pg-seo__gp-desc">
-          {s.seoDesc || (
-            <span className="pg-seo__gp-missing">
-              No description — add one below to improve ranking
-            </span>
-          )}
+        <div className="pg-seo__gp-title">{s.seoTitle || page.name}</div>
+        <div className={`pg-seo__gp-desc${!s.seoDesc ? " pg-seo__gp-desc--missing" : ""}`}>
+          {s.seoDesc || "No description — add one below to improve ranking"}
         </div>
       </div>
 
@@ -81,57 +66,40 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         </div>
       ) : (
         <>
+          {/* Score row + checks grid — prototype .seo-score-row + .seo-checks */}
           <div className="pg-seo__score-row">
-            <div
-              className="pg-seo__score-badge"
-              aria-live="polite"
-              aria-label={`SEO Score: ${s.seoScore} out of 100 — ${scoreLabel(s.seoScore)}`}
-            >
-              <span className="pg-seo__score-num" style={{ color: scoreColor(s.seoScore) }}>{s.seoScore}</span>
-              <span className="pg-seo__score-label">{scoreLabel(s.seoScore)}</span>
+            <div className={`pg-seo__score-num${s.seoScore >= 80 ? " pg-seo__score-num--ok" : ""}`}>
+              {s.seoScore}
             </div>
-            <Tooltip
-              content="SEO score measures how well search engines can find and understand your page. Aim for 80+ before publishing. Completing the checklist below will raise your score."
-              position="right"
-            >
-              <span
-                aria-label="What is SEO score?"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 16,
-                  height: 16,
-                  borderRadius: "50%",
-                  border: "1px solid var(--aqb-text-muted, #64748b)",
-                  color: "var(--aqb-text-muted, #64748b)",
-                  fontSize: 10,
-                  fontWeight: 700,
-                  cursor: "help",
-                  flexShrink: 0,
-                  lineHeight: 1,
-                  userSelect: "none",
-                }}
-              >
-                ?
-              </span>
-            </Tooltip>
-            <div className="pg-seo__score-checks">
-              <SeoCheck ok={s.seoChecks.indexingOn} label="Allow indexing" hint="Required" />
-              <SeoCheck ok={s.seoChecks.titleSet} label="Page title" hint="+20 pts" />
-              <SeoCheck ok={s.seoChecks.descSet} label="Meta description" hint="+30 pts" />
-              <SeoCheck ok={s.seoChecks.slugClean} label="Clean URL slug" hint="+20 pts" />
-              <SeoCheck ok={s.seoTitle.length >= 30} label="Detailed title (30+ chars)" hint="+10 pts" />
+            <div className="pg-seo__score-meta">
+              <div className="pg-seo__score-label">
+                {s.seoScore >= 80 ? "Looks good" : "Needs work"}
+              </div>
+              <div className="pg-seo__checks">
+                <div className={`pg-seo__check${s.seoChecks.titleSet ? " pg-seo__check--ok" : ""}`}>
+                  <span>Page title</span>
+                  <span className="pg-seo__check-pts">+20 pts</span>
+                </div>
+                <div className={`pg-seo__check${s.seoChecks.descSet ? " pg-seo__check--ok" : ""}`}>
+                  <span>Meta description</span>
+                  <span className="pg-seo__check-pts">+30 pts</span>
+                </div>
+                <div className={`pg-seo__check${s.seoChecks.slugClean ? " pg-seo__check--ok" : ""}`}>
+                  <span>Clean URL slug</span>
+                  <span className="pg-seo__check-pts">+10 pts</span>
+                </div>
+                <div className={`pg-seo__check${s.seoChecks.indexingOn ? " pg-seo__check--ok" : ""}`}>
+                  <span>Allow indexing</span>
+                  <span className="pg-seo__check-pts">+40 pts</span>
+                </div>
+              </div>
             </div>
           </div>
-          {s.seoScore < 80 && (
-            <div className="pg-seo__score-tip">
-              Reach 80+ before publishing —{" "}
-              {!s.seoChecks.descSet
-                ? "add a meta description (+30 pts)"
-                : !s.seoChecks.titleSet
-                  ? "improve your title (+20 pts)"
-                  : "add a clean slug (+20 pts)"}
+
+          {/* Reach 80+ banner — shown when score < 80 and indexing is on */}
+          {s.seoScore < 80 && s.allowIndex && (
+            <div className="pg-seo__banner-warn" role="note">
+              Reach 80+ before publishing{s.seoChecks.descSet ? "" : " — add a meta description (+30 pts)"}
             </div>
           )}
         </>
@@ -147,6 +115,14 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             {s.seoTitle.length}/60{rangeLabel[range]}
           </span>
         </div>
+        {s.seoTitle.length < 10 && (
+          <button type="button" className="pg-seo__ai-chip" aria-label="Suggest SEO title">
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <path d="M5 3l14 9-14 9V3z" />
+            </svg>
+            Write with AI
+          </button>
+        )}
         <input
           id="seo-title"
           className="pg-seo__input"
@@ -252,8 +228,26 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         {/* Slug destructive warning — shown when slug changes on a live page */}
         {s.slug !== page.slug && page.status === "live" && !s.slugError && (
           <div className="pg-seo__slug-warning" role="alert">
-            ⚠️ Changing this URL will break existing links, bookmarks, and search engine results for
-            this page. Consider setting up a redirect in your hosting settings after saving.
+            <svg
+              className="pg-seo__slug-warning-icon"
+              viewBox="0 0 24 24"
+              width="14"
+              height="14"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            <span>
+              Changing this URL will break existing links, bookmarks, and search engine results
+              for this page. Consider setting up a redirect in your hosting settings after saving.
+            </span>
           </div>
         )}
         {s.slugError ? (
@@ -269,11 +263,3 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
     </div>
   );
 };
-
-const SeoCheck: React.FC<{ ok: boolean; label: string; hint: string }> = ({ ok, label, hint }) => (
-  <div className={`pg-seo__check ${ok ? "pg-seo__check--ok" : "pg-seo__check--missing"}`}>
-    <span className="pg-seo__check-dot" aria-hidden="true" />
-    <span>{label}</span>
-    {!ok && <span className="pg-seo__check-hint">{hint}</span>}
-  </div>
-);
