@@ -41,13 +41,13 @@ Each row is load-bearing for the design below. All answered during brainstorm on
 | Q6 | Two `Canvas.css` files | Consolidation **out of scope** (structural). DARK_THEME_SHIM dark values in `components/Canvas/Canvas.css` **in scope** as a value-correctness fix (DESIGN.md violation). File kept, values corrected. |
 | Q7 | `design-tokens.css` fate | **Out of scope.** Structural debt — separate spec. |
 | Q8 | Namespace topology | Two namespaces. `--buildrick-*` = chrome + canvas operational (static). `--buildrick-design-*` = runtime-mutated user design tokens only. Enforces the one invariant that matters. |
-| Q9 | `data-aqb-*` rename | All 12 attributes renamed to `data-buildrick-*`. 460 references touched. Codemod + grep verification. |
+| Q9 | `data-aqb-*` rename | All **19 attributes** renamed to `data-buildrick-*`. `DATA_ATTRIBUTES` constant in `config.ts` is incomplete (lists 11) — live code uses 8 more: `data-aqb-canvas`, `data-aqb-cms-bound`, `data-aqb-context-menu`, `data-aqb-ids`, `data-aqb-interactions`, `data-aqb-name`, `data-aqb-root`, `data-aqb-section`. Codemod operation 4 greps pattern-based (`data-aqb-[a-z-]+`) so correctness doesn't depend on constant completeness — but mapping table must list all 19, not the 12 V2 claimed. |
 | Q10 | `.aqb-*` class rename | All 550+ selectors + 320+ JSX usages renamed to `.buildrick-*`. Includes engine-contract classes + user-export classes. Dead scope wrappers (`.aqb-editor`, `.aqb-layout`) deleted in the same pass. |
 | Q11 | `CSS_CLASSES` orphan constant | **Delete.** Zero consumers today — orphan is a false-SSOT trap. Rename runs inline. Real SSOT wire-up is a separate structural spec if ever wanted. |
 | Q12 | Storage key treatment | Rename prefix only, all ~68 keys (48 centralized + 20 ad-hoc + 4 known-gap hardcoded). Migration shim extends `storageMigration.ts`. Structural consolidation (duplicates, hardcoded-consumer gaps) **out of scope** — separate spec. |
 | Q13 | `aqb:trace:*` dev flags | Clean rename to `buildrick:trace:*`. No backward-compat shim. Solo workflow = zero coordination cost. |
 | Q14 | 29 undefined tokens | Case-by-case mapping-table decisions in P0. Six sub-populations (comment-only, runtime-written, truly-broken-live, fallback-masked, mixed). One decision per token, each justified inline. |
-| Q15 | `PagesTab.css` dark overrides | **Delete.** DESIGN.md violation. Value-correctness fix inseparable from rename. |
+| Q15 | `PagesTab.css` dark overrides | **Delete.** DESIGN.md violation (shadows canonical light tokens with dark values inside `.pages-panel`). Classification test: *would the deletion still be necessary in a "rename only, preserve structure" universe?* Yes — post-rename the overrides shadow `--buildrick-*` back to dark, same DESIGN.md violation with the new name. Shadow-removal is value-correctness, not file restructure. Scope defensible. |
 
 Structural-debt items (Q5, Q7, storage consolidation, SSOT wire-up, `themes/` file restructure) are all explicitly deferred. V3 scope is rename + value-correctness fixes that the codemod touches anyway.
 
@@ -68,6 +68,10 @@ Two namespaces, one invariant.
 2. `grep -rnE "^\s*--buildrick-design-" packages/editor/src/ --exclude-dir=features` → empty. (Design-namespace defs stay in `features/design-system/`.)
 3. `grep -rnE "^\s*--buildrick-(?!design-)" packages/editor/src/ --exclude-dir=themes --exclude "**/Canvas.css"` → empty. (Chrome-namespace defs stay in themes/ + Canvas.css.)
 4. `grep -rE "var\(--aqb-|var\(--ls-|var\(--accent-|@keyframes aqb-|animation(-name)?:\s*aqb-|data-aqb-|[.'\"]aqb-|aqb:trace:" packages/editor/src/ packages/editor/demo/` → empty across all matches. (Zero-surviving-`aqb` acceptance gate.)
+
+### Invariant #1 enforcement timeline
+
+Invariant #1 ("No JS writes a chrome token") is NOT enforced by the codemod alone. Today `themes/index.ts:applyTheme()` writes 11 chrome `--aqb-*` tokens at runtime via `setProperty` (verified at lines 31-41). Callers: `demo/main.tsx:21` + public re-export at `src/index.ts:75`. The invariant holds only after `applyTheme` and its entire module are deleted. **This deletion must happen BEFORE consumer rename** — see Section 5 phase P2b. Otherwise, codemod in P3 would rename `setProperty("--aqb-primary", ...)` → `setProperty("--buildrick-primary", ...)` via the new JS-string-literal operation (Section 4.1 op 1b), and the app would be actively violating invariant #1 between P3 and P5. P2b eliminates the violating code before the rename can propagate it.
 
 Rationale for Q8=B (two namespaces rather than three or one): given Q4=C, the design-system namespace's purpose is to enforce "setProperty never touches chrome." Canvas operational tokens are static CSS vars for rendered user content — they don't move at runtime. A third namespace for operational tokens would split a distinction that isn't load-bearing.
 
@@ -126,29 +130,43 @@ Per inventory Guardrail C, every "X is centralized in Y" claim is verified with 
 
 Required verifications at minimum:
 
-| Claim | Command |
-|---|---|
-| 48 storage keys from `storageKeys.ts` cover the ad-hoc duplicates | `grep -rE "'aqb-[a-z-]+'" packages/editor/src/ \| grep -v storageKeys.ts` |
-| `DATA_ATTRIBUTES` in `config.ts` covers all `data-aqb-*` usage | `grep -rE "data-aqb-[a-z-]+" packages/editor/src/` |
-| 29 undefined tokens count is correct | `comm -23 <(all-consumers.txt) <(all-definitions.txt) \| wc -l` |
-| No `--accent-*` tokens exist outside `themes/default.css` | `grep -rE "^\s*--accent-" packages/editor/src/` |
-| `CSS_CLASSES` has zero consumers (safe to delete) | `grep -rE "import.*CSS_CLASSES\|CSS_CLASSES\." packages/editor/src/` |
+| Claim | Command | Expected (at P0) |
+|---|---|---|
+| Storage keys: every `'aqb-*'` string literal outside `storageKeys.ts` is either a known duplicate or an ad-hoc inline | `grep -rE "'aqb-[a-z-]+'" packages/editor/src/ \| grep -v storageKeys.ts` | List captured verbatim; every hit must be in mapping `storage_keys` section |
+| **All `data-aqb-*` attrs enumerated in mapping** (NOT "DATA_ATTRIBUTES in config.ts is complete" — it isn't; 8 attrs live outside the constant) | `grep -rnoE "data-aqb-[a-z-]+" packages/editor/src/ packages/editor/demo/ \| sed 's/.*:data-aqb-/data-aqb-/' \| sort -u` | 19 unique attrs as of 2026-04-19; mapping `data_attributes` section must cover every one |
+| 29 undefined tokens count | `comm -23 <(all-consumers.txt) <(all-definitions.txt) \| wc -l` | 29 |
+| No `--accent-*` tokens exist outside `themes/default.css` | `grep -rE "^\s*--accent-" packages/editor/src/` | Only `themes/default.css:69-74,413` hits |
+| `CSS_CLASSES` has zero real consumers (safe to delete) | `grep -rE "import.*CSS_CLASSES\|CSS_CLASSES\." packages/editor/src/` | Empty. Re-export at `shared/constants/index.ts:36` doesn't count as a consumer (no downstream import) |
+| All `setProperty("--aqb-*"...)` JS callsites enumerated (covered by Section 4.1 op 1b) | `grep -rnE "setProperty\s*\(\s*['\"]--(?:aqb\|ls\|accent)-" packages/editor/src/` | As of 2026-04-19: only `themes/index.ts:31-41` (11 calls). File deleted in P2b before codemod runs, so these never reach op 1b. |
+| All template-literal `aqb-…${` patterns enumerated in `manual_edits` | `grep -rnE "\`[^\`]*aqb-[^\`]*\\\$\{" packages/editor/src/ packages/editor/demo/` | Every hit matches an entry in `manual_edits` whitelist |
 
 ### Dynamic token refs — explicit manual-edits whitelist
 
-Template-literal patterns are the V2 blocker Codex flagged. The codemod errors on every such pattern unless it's in the `manual_edits` whitelist:
+Template-literal patterns are the V2 blocker Codex flagged. The codemod errors on every such pattern unless it's in the `manual_edits` whitelist. This list is the P0 grep output as of 2026-04-19, NOT a priori knowledge — regenerate via grep at P0 and diff against this list; any difference means new code was added that the spec didn't anticipate, and mapping must be updated before codemod runs.
 
-1. `features/design-system/types.ts:73` — `tokenToCssVar` emits `` `--buildrick-design-${id}` ``.
-2. `features/design-system/constants.ts` — `DEFAULT_TOKENS` `cssVar` strings → `--buildrick-design-*`.
-3. `features/design-system/utils/exportUtils.ts:15` — color generator emits `` `--buildrick-design-color-${name}` ``.
-4. `features/design-system/state/__tests__/*.test.ts` — test fixtures update to `` `--buildrick-design-${id}` ``.
-5. `shared/ui/QuickSwitcher.styles.ts:17` — `aqb-quick-switcher-recent` → `buildrick-quick-switcher-recent`.
-6. `shared/utils/savedTemplates.ts:23` — `aqb-saved-templates` → `buildrick-saved-templates`.
-7. `editor/sidebar/shared/usePanelNavigation.ts:78,96` — `` `aqb-nav-${storageKey}` `` → `` `buildrick-nav-${storageKey}` ``.
-8. `editor/panels/layers/hooks/useLayersState.ts:31` — `aqb-layers-display-prefs` → `buildrick-layers-display-prefs`.
-9. `editor/panels/layers/state/layersPersistence.ts:8` — `` `aqb-layers-${pageId}-{hidden|locked|names|expanded}` `` dynamic family → `buildrick-layers-${pageId}-…`.
+**Pattern used for enumeration:** `` grep -rnE "\`[^\`]*aqb-[^\`]*\\\$\{" packages/editor/src/ packages/editor/demo/ `` — matches any backtick-delimited string literal containing `aqb-` followed by `${`, anywhere in the string (not just adjacent). V2's narrower pattern (`aqb-${`) missed 2 sites.
 
-Any other template-literal hit that the codemod encounters causes P3 to abort with a listing of every occurrence.
+| # | File:line | Current | Target (after rename) |
+|---|---|---|---|
+| 1 | `features/design-system/types.ts:73` (`tokenToCssVar`) | `` `--aqb-${id}` `` | `` `--buildrick-design-${id}` `` |
+| 2 | `features/design-system/state/__tests__/useSpacingTokens.test.ts:22` | `` `--aqb-${id}` `` | `` `--buildrick-design-${id}` `` |
+| 3 | `features/design-system/utils/exportUtils.ts:15` (color generator) | `` `--aqb-color-${name}` `` | `` `--buildrick-design-color-${name}` `` |
+| 4 | `shared/types/animations.ts:116` | `` `aqb-${config.type}` `` | `` `buildrick-${config.type}` `` |
+| 5 | `engine/elements/ElementOperations.ts:223` | `` `aqb-${config.type}` `` | `` `buildrick-${config.type}` `` |
+| 6 | `editor/inspector/sections/registry.tsx:562` | `` `aqb-${anim.type} ${anim.duration}ms ${anim.easing} ${anim.delay}ms 1 normal forwards` `` | `` `buildrick-${anim.type} ${anim.duration}ms ${anim.easing} ${anim.delay}ms 1 normal forwards` `` |
+| 7 | `editor/sidebar/shared/usePanelNavigation.ts:78,96` | `` `aqb-nav-${storageKey}` `` | `` `buildrick-nav-${storageKey}` `` |
+| 8 | `editor/panels/layers/hooks/layersPersistence.ts` (dynamic key family, ~4 callsites) | `` `aqb-layers-${pageId}-hidden` ``, `` `-locked` ``, `` `-names` ``, `` `-expanded` `` | `` `buildrick-layers-${pageId}-...` `` each |
+| 9 | `shared/utils/devLogger.ts:85,172,179,195` (4 callsites, same pattern) | `` `aqb:trace:${domain}` `` | `` `buildrick:trace:${domain}` `` |
+| 10 | `features/design-system/constants.ts` `DEFAULT_TOKENS` (~40 rows) | `cssVar: "--aqb-X"` (non-template string literals, batched as manual for review) | `cssVar: "--buildrick-design-X"` |
+
+**NOT in manual_edits (plain string literals — handled by codemod operation 6 for storage keys):**
+- `shared/ui/QuickSwitcher.styles.ts:17` — `"aqb-quick-switcher-recent"` (plain string, storage key)
+- `shared/utils/savedTemplates.ts:23` — `"aqb-saved-templates"` (plain string, storage key)
+- `editor/panels/layers/hooks/useLayersState.ts:31` — `"aqb-layers-display-prefs"` (plain string, storage key)
+
+These were in V3 draft's manual-edits list but don't need manual handling — they have no `${` interpolation. They're covered by the codemod's op 6 string-literal rename. Misclassifying them as "manual" was a spec error Codex caught.
+
+Any template-literal hit that the codemod encounters not in this whitelist causes P3 to abort with a listing of every occurrence.
 
 ---
 
@@ -170,67 +188,128 @@ Any other template-literal hit that the codemod encounters causes P3 to abort wi
 
 **Operations (applied in exact order, per file):**
 
-1. `var(--aqb-X)` / `var(--ls-X)` / `var(--accent-X)` → `var(--buildrick-Y)` per `css_vars` mapping. Fallbacks preserved.
-2. `animation: aqb-X …` / `animation-name: aqb-X` → `animation[-name]: buildrick-X` per `keyframes`.
-3. `@keyframes aqb-X` → `@keyframes buildrick-X`.
-4. `data-aqb-X` (CSS selectors, JSX props, HTML attrs, string literals) → `data-buildrick-X`.
-5. `.aqb-X` (CSS selectors) + `"aqb-X"` / `'aqb-X'` (JSX className strings, non-template string literals) → `.buildrick-X` / `"buildrick-X"`.
-6. Storage-key string literals at locations listed in `storage_keys` → `"buildrick-X"`.
-7. `aqb:trace:` literals → `buildrick:trace:`.
-8. Delete dead scope-rule blocks only: `.aqb-editor { ... }`, `.aqb-layout { ... }`, and any `.aqb-editor *` / `.aqb-editor *::selection` derivative blocks in `themes/default.css`. Pattern-unambiguous block deletion.
+1. **CSS-side CSS vars:** `var(--aqb-X)` / `var(--ls-X)` / `var(--accent-X)` → `var(--buildrick-Y)` per `css_vars` mapping. Fallbacks preserved.
+1b. **JS/TS-side CSS vars:** in `.ts`, `.tsx`, `.test.ts`, `.test.tsx` files — `"--aqb-X"` / `'--aqb-X'` / `` `--aqb-X` `` non-template string literals → `"--buildrick-Y"` per `css_vars` mapping. Covers `setProperty`/`getPropertyValue`/`getProperty` args AND object-literal `cssVar` fields (e.g., `DEFAULT_TOKENS` in `constants.ts`). Template literals remain manual (Section 3 whitelist).
+2. **Keyframe rename OR delete per mapping:**
+   - If `keyframes[X]` is a string target: `animation: aqb-X …` / `animation-name: aqb-X` → `animation[-name]: buildrick-X`. `@keyframes aqb-X` → `@keyframes buildrick-X`.
+   - If `keyframes[X] = { action: "delete" }`: the codemod deletes the matching CSS property line entirely (`animation-name: aqb-X;` line removed; `animation: aqb-X <duration> <easing> ...;` line removed since `aqb-X` is the only animation name and has no valid replacement). Multi-animation shorthand (`animation: aqb-X 200ms ease, other-anim 100ms;`) is an abort condition — manual review required; no ambiguous partial-edit attempts.
+3. (merged into op 2 above — `@keyframes` renames share the op-2 mapping logic)
+4. **Data attributes:** `data-aqb-X` (CSS selectors, JSX props, HTML attrs, string literals inside `getAttribute`/`setAttribute`/`querySelector`) → `data-buildrick-X`. Pattern-based grep across all file types — does NOT depend on `DATA_ATTRIBUTES` constant completeness.
+5. **Class names:** `.aqb-X` (CSS selectors) + `"aqb-X"` / `'aqb-X'` (JSX className strings, non-template string literals in `classList.*`/`querySelector(".aqb-X")`/etc.) → `.buildrick-X` / `"buildrick-X"`.
+6. **Storage-key string literals** at locations listed in `storage_keys` (48 centralized in `storageKeys.ts` + 20 ad-hoc inline) → `"buildrick-X"`. Includes the 3 plain-string sites Codex pointed out (QuickSwitcher.styles.ts:17, savedTemplates.ts:23, useLayersState.ts:31).
+7. **Dev flag colon-prefix:** `aqb:trace:` literals → `buildrick:trace:`.
+8. **Delete dead scope-rule blocks only:** `.aqb-editor { ... }`, `.aqb-layout { ... }`, and any `.aqb-editor *` / `.aqb-editor *::selection` derivative blocks in `themes/default.css`. Pattern-unambiguous block deletion.
 
-Codemod does NOT handle value-replacement work (DARK_THEME_SHIM dark → light canonical requires value decisions), does NOT delete old CSS var definitions, does NOT delete scaffolding files. Those are P4/P5 manual work — value decisions don't belong in a string-replacement tool, and multi-file coordinated deletes (`themes/index.ts` + `src/index.ts:75` re-export + `themeMode` field) are clearer as manual phases behind a Codex gate.
+Codemod does NOT handle value-replacement work (DARK_THEME_SHIM dark → light canonical requires value decisions), does NOT delete old CSS var definitions, does NOT delete scaffolding files. Those are P4/P5 manual work — value decisions don't belong in a string-replacement tool, and multi-file coordinated deletes (`themes/index.ts` + `src/index.ts:75` re-export + `themeMode` field) are **handled in phase P2b BEFORE the codemod runs** (Section 5), so the codemod never encounters them.
 
 **Abort conditions (fail loud, exit non-zero):**
 
-- Template literal pattern `` `--aqb-${ `` / `` `aqb-${ `` / `` `data-aqb-${ `` / `` `aqb:trace:${ `` encountered at a file:line not in `manual_edits` whitelist.
-- Any `--aqb-`, `--ls-`, `--accent-`, `aqb-` string literal, `data-aqb-`, `.aqb-`, `@keyframes aqb-`, `animation.*aqb-`, or `aqb:trace:` hit not covered by mapping.
+- Any template literal hit matching `` `[^`]*aqb-[^`]*${ `` (flexible pattern — `aqb-` followed anywhere by `${`, not required to be adjacent) at a file:line NOT in `manual_edits` whitelist.
+- Multi-animation shorthand containing an `action: delete` keyframe alongside live animations (e.g., `animation: aqb-slide-down 200ms, other-live 100ms;`) — ambiguous partial edit, abort with file:line + review instruction.
+- Any `--aqb-`, `--ls-`, `--accent-`, `aqb-` string literal, `data-aqb-`, `.aqb-`, `@keyframes aqb-`, `animation.*aqb-`, `setProperty("--aqb-...")`, or `aqb:trace:` hit not covered by mapping.
 - `--apply` invoked without `--verify` pass in the same session.
 
 **Idempotency:** running twice is a no-op on the second run.
 
 ### 4.2 Storage migration shim (Q12)
 
-Extends `packages/editor/src/shared/utils/storageMigration.ts`. Pattern matches the existing `aquibra-* → aqb-*` migration.
+Extends `packages/editor/src/shared/utils/storageMigration.ts`. **Mirrors the existing `migrateStorageKeys()` safety model exactly** — each key is a try/catch, `!localStorage.getItem(newKey)` guard prevents overwriting pre-existing target keys, completion flag uses `STORAGE_KEYS` constant (not hardcoded), precedent's own migration markers are excluded from the dynamic scan.
 
 ```ts
-function migrateAqbToBuildrick() {
-  if (localStorage.getItem('buildrick-migration-v1-complete')) return;
-  for (const [oldKey, newKey] of Object.entries(AQB_TO_BUILDRICK_STORAGE_MAP)) {
-    if (oldKey.includes('${')) continue;
-    const value = localStorage.getItem(oldKey);
-    if (value !== null) {
-      localStorage.setItem(newKey, value);
-      localStorage.removeItem(oldKey);
+// Added to storageMigration.ts alongside the existing migrateStorageKeys().
+// Called AFTER migrateStorageKeys so keys that migrated aquibra-* → aqb-* can
+// then migrate aqb-* → buildrick-*.
+export function migrateAqbKeys(): void {
+  if (localStorage.getItem(STORAGE_KEYS.AQB_MIGRATION_FLAG_V1)) return;
+
+  let migratedCount = 0;
+
+  // Static map: exact-key renames (built from mapping table's storage_keys section)
+  Object.entries(AQB_TO_BUILDRICK_STORAGE_MAP).forEach(([oldKey, newKey]) => {
+    if (oldKey.includes('${')) return; // dynamic families handled below
+    try {
+      const value = localStorage.getItem(oldKey);
+      if (value !== null && !localStorage.getItem(newKey)) {
+        localStorage.setItem(newKey, value);
+        localStorage.removeItem(oldKey);
+        migratedCount++;
+      }
+    } catch {
+      // localStorage may be full or disabled — fail silently per precedent
+    }
+  });
+
+  // Dynamic-key families: aqb-nav-*, aqb-layers-${pageId}-*, aqb-design-tokens-${projectId}-v1.
+  // Scan all localStorage keys once and rename remaining aqb-* survivors.
+  const EXCLUDED_PREFIXES = [
+    'aqb-migration-v1-complete',      // the aquibra→aqb migration marker — not ours to touch
+    'aqb-migration-v1-timestamp',
+  ];
+
+  // Snapshot keys first — mutating localStorage during iteration is undefined behavior.
+  const keys: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k) keys.push(k);
+  }
+
+  for (const key of keys) {
+    if (!key.startsWith('aqb-')) continue;
+    if (EXCLUDED_PREFIXES.includes(key)) continue;
+    const newKey = 'buildrick-' + key.slice('aqb-'.length);
+    try {
+      const value = localStorage.getItem(key);
+      if (value !== null && !localStorage.getItem(newKey)) {
+        localStorage.setItem(newKey, value);
+        localStorage.removeItem(key);
+        migratedCount++;
+      }
+    } catch {
+      // same silent-fail contract
     }
   }
-  // Dynamic-key families: aqb-nav-*, aqb-layers-${pageId}-*, aqb-design-tokens-${projectId}-v1
-  const keys = Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i));
-  for (const key of keys) {
-    if (!key?.startsWith('aqb-')) continue;
-    const newKey = 'buildrick-' + key.slice('aqb-'.length);
-    const value = localStorage.getItem(key)!;
-    localStorage.setItem(newKey, value);
-    localStorage.removeItem(key);
+
+  try {
+    localStorage.setItem(STORAGE_KEYS.AQB_MIGRATION_FLAG_V1, Date.now().toString());
+  } catch { /* storage full */ }
+
+  if (migratedCount > 0) {
+    devLog('Storage', `Migrated ${migratedCount} localStorage keys from aqb-* to buildrick-*`);
   }
-  localStorage.setItem('buildrick-migration-v1-complete', '1');
 }
 ```
 
-`AQB_TO_BUILDRICK_STORAGE_MAP` is generated from the mapping table at build time (not inlined). Invoked at `AquibraStudio.tsx:19` alongside the existing migration. Lifetime: permanent (matches the `aquibra-*` migration precedent).
+**Requirements:**
+- `AQB_TO_BUILDRICK_STORAGE_MAP` is generated from `theme-v3-mapping.json#storage_keys` at build time (not hand-inlined).
+- `STORAGE_KEYS.AQB_MIGRATION_FLAG_V1` is a new constant in `storageKeys.ts` with value `"buildrick-aqb-migration-v1-complete"` (note: the flag itself uses the NEW prefix so it's never caught by the dynamic loop).
+- Invoked at `AquibraStudio.tsx:19` AFTER the existing `migrateStorageKeys()` call (sequencing matters: old `aquibra-*` keys need to become `aqb-*` first, then `aqb-*` → `buildrick-*`).
+- Lifetime: permanent. Matches the precedent — the `aquibra-*` migration is still shipped years later; same convention here.
+
+**Safety invariants validated by this snippet:**
+1. Idempotent — early return on completion flag.
+2. Never overwrites a pre-existing `buildrick-*` key (mirrors `migrateStorageKeys:70` guard).
+3. Per-key try/catch — single failure doesn't abort the whole migration.
+4. Precedent's migration markers explicitly excluded.
+5. Completion flag uses the new prefix, so a re-run of the dynamic loop in a future migration won't mistakenly mirror it.
 
 ### 4.3 Design-tab runtime retargeting (Q4=C, lossy acceptable)
 
-Four files, manual edits (listed in `manual_edits` whitelist):
+Four files. With Section 4.1 op 1b (JS string literal rename), `constants.ts` DEFAULT_TOKENS becomes automatic rather than manual. Only the 3 template-literal sites in the table below stay in `manual_edits`.
 
-| File | Change |
-|---|---|
-| `features/design-system/constants.ts` `DEFAULT_TOKENS` | Every `cssVar: "--aqb-X"` → `cssVar: "--buildrick-design-X"` |
-| `features/design-system/types.ts:73` `tokenToCssVar` | Emits `` `--buildrick-design-${id}` `` |
-| `features/design-system/utils/exportUtils.ts:15` color generator | Emits `` `--buildrick-design-color-${name}` `` |
-| `features/design-system/state/__tests__/*.test.ts` fixtures | `` `--aqb-${id}` `` → `` `--buildrick-design-${id}` `` |
+| File | Change | Handled by |
+|---|---|---|
+| `features/design-system/constants.ts` `DEFAULT_TOKENS` (~40 rows) | Every `cssVar: "--aqb-X"` → `cssVar: "--buildrick-design-X"` | **Codemod op 1b** (automatic) |
+| `features/design-system/types.ts:73` `tokenToCssVar` | Emits `` `--buildrick-design-${id}` `` | **Manual** (template literal — whitelist #1) |
+| `features/design-system/utils/exportUtils.ts:15` color generator | Emits `` `--buildrick-design-color-${name}` `` | **Manual** (template literal — whitelist #3) |
+| `features/design-system/state/__tests__/useSpacingTokens.test.ts:22` fixture | `` `--aqb-${id}` `` → `` `--buildrick-design-${id}` `` | **Manual** (template literal — whitelist #2) |
 
-Hook internals untouched — they write whatever `cssVar` each `DesignToken` carries.
+**Direct design-token writers (hooks that call `setProperty`):**
+- `features/design-system/state/useTokenBase.ts:62` — the shared primitive that writes to `:root`. All other design-token state hooks route through this.
+- `features/design-system/state/useColorTokens.ts:50` — also writes directly (does NOT delegate to `useTokenBase` for this particular `setProperty` call).
+- `features/design-system/state/useSpacingTokens.ts:90` — also writes directly.
+- `features/design-system/state/useTypeTokens.ts` — **delegates to `useTokenBase`**, NOT a direct writer. V3 draft misclassified this. (Fix surfaced by Codex Gate 1.)
+
+Hook internals untouched by the codemod — they write whatever `cssVar` each `DesignToken` carries. The cssVar strings change (via op 1b + manual edits above); the hook code does not.
 
 **Persisted project data:** `TokenRegistryContext.tsx` load path adds a pre-hook mapping step:
 
@@ -246,35 +325,43 @@ Lossy per Q4=C: tokens not in `DEFAULT_TOKENS` become orphan JSON, dropped on ne
 
 ### 4.4 Documentation sweep
 
-33 markdown files (per inventory v2: 20 in `docs/design-documentation/` + 13 in `project-documentation/` + `code-to-prd-output/pages/`) and 1 JSON fixture (`code-to-prd-output/buildrik-analysis.json`) reference `aqb`. Codemod runs with `--docs` flag on these paths. Same replacements, no AST validation (markdown is free-form).
+33 markdown files (per inventory v2: 20 in `docs/design-documentation/` + 13 in `project-documentation/` + `code-to-prd-output/pages/`) and 1 JSON fixture (`code-to-prd-output/buildrik-analysis.json`) reference `aqb`. Codemod runs with `--docs` flag on these paths in phase P7. Same replacements, no AST validation (markdown is free-form).
+
+**Not part of the --docs sweep (covered elsewhere):**
+- `packages/editor/demo/index.html` lines 19-29 (pre-React body defaults + comments referencing `--aqb-*` token names). This file is inside the P3 codemod's target glob (`packages/editor/demo/**/*.html`), so its HTML comments + class/data-attr strings get the same string-replacement treatment as source files. Explicit mention here so the P7 docs sweep isn't mistaken as the only documentation-level pass.
 
 ---
 
 ## 5. Phase sequencing
 
-9 phases. Every phase leaves a working app. Every phase independently revertable. Solo workflow, direct-to-main commits (per memory).
+10 phases (9 + new P2b inserted after Codex Gate 1 review). Every phase leaves a working app. Every phase independently revertable. Solo workflow, direct-to-main commits (per memory).
 
 | Phase | Goal | Prereq |
 |---|---|---|
 | **P0** | Produce `theme-v3-mapping.json` (all 6 domains + `manual_edits` whitelist + `verifications` block). Commit dry-run codemod report. | — |
 | **P1 (gate)** | Codex Gate 1 review of P0 artifacts. Challenges dedup merges, undefined-token decisions, SSOT verifications, manual-edits completeness. | P0 |
-| **P2** | Author `--buildrick-*` / `--buildrick-design-*` definitions in `themes/default.css` + design-system constants alongside existing old definitions. Double-definitions = value-neutral. App runs identically. | P1 |
-| **P3** | Codemod `--verify` then `--apply`. All consumer-side renames in one run: CSS vars, keyframes, data-attrs, classes, storage keys, dev flags, scope-rule deletions, manual edits. Design-tab retargeting applied. | P2 |
-| **P4 (gate)** | Codex Gate 2 on cumulative P2+P3 diff. Delete old `--aqb-*` / `--ls-*` / `--accent-*` definitions from `themes/default.css`. Delete `PagesTab.css` dark overrides. Fix DARK_THEME_SHIM in `components/Canvas/Canvas.css` to light canonical. | P3 + Codex Gate 2 |
-| **P5** | Delete `themes/index.ts`, `src/index.ts:75` re-export, `themeMode` field, `storageKeys.THEME`, `CSS_CLASSES` constant, 2 orphan keyframe refs. | P3, P4 |
-| **P6** | Extend `storageMigration.ts` with `aqb-* → buildrick-*` migration. Wire into `AquibraStudio.tsx:19`. | P3 |
-| **P7** | Run codemod `--docs` against 33 markdown + 1 JSON. Update `DESIGN.md` with namespace contract section. Fix `CLAUDE.md` residual "dark-only" line (V1 leftover). `CHANGELOG.md` entry. | P4, P5, P6 |
-| **P8 (gate)** | Codex Gate 3 on cumulative P3–P7 diff. Delete `scripts/theme-v3-codemod.mjs` (keep audit + mapping + report JSONs). Full verification grep suite passes. | P7 + Codex Gate 3 |
+| **P2** | Author **only the mapped canonical targets** in `themes/default.css` + design-system constants alongside existing old definitions. **No lexical prefix mirroring:** if `--aqb-primary` maps to `--buildrick-accent`, P2 creates `--buildrick-accent` and does NOT also create `--buildrick-primary`. Only what the mapping says, nothing else. Double-definitions of mapped targets = value-neutral. App runs identically. | P1 |
+| **P2b (scaffolding deletion)** | Delete the `applyTheme()` runtime mutator + `themeMode` scaffolding BEFORE consumer rename so invariant #1 ("chrome never mutated at runtime") holds from here onward. Deletes: `themes/index.ts` entirely, `src/index.ts:75` `applyTheme`/`defaultTheme` re-export, `demo/main.tsx:11` import + `demo/main.tsx:21` call, `shared/types/project.ts` `themeMode` field, `storageKeys.THEME` entry. **Visible impact:** chrome renders with `themes/default.css` canonical light values instead of `applyTheme`'s dark runtime overrides — this IS the DESIGN.md 2026-04-18 light-chrome correction, not a regression. Capture before/after screenshots at `localhost:5050`. | P2 |
+| **P3** | Codemod `--verify` then `--apply`. All consumer-side renames in one run via the 8 operations in Section 4.1: CSS vars (op 1), JS string-literal CSS vars including DEFAULT_TOKENS cssVars (op 1b), keyframes rename or delete per mapping (op 2), data-attrs (op 4), class names (op 5), storage key strings (op 6), dev flags (op 7), dead scope-rule blocks `.aqb-editor`/`.aqb-layout` (op 8). Template-literal sites handled via `manual_edits` whitelist (Section 3, 10 sites). | P2b |
+| **P4 (gate)** | Codex Gate 2 on cumulative P2+P2b+P3 diff. Delete old `--aqb-*` / `--ls-*` / `--accent-*` definitions from `themes/default.css`. Delete `PagesTab.css` dark-override block (`.pages-panel` scope, DESIGN.md-violating shadows of renamed tokens). Fix DARK_THEME_SHIM in `components/Canvas/Canvas.css` to light canonical (file kept, dark hex values replaced with DESIGN.md canonical). | P3 + Codex Gate 2 |
+| **P5** | Delete `CSS_CLASSES` constant from `shared/constants/config.ts` (and any `shared/constants/index.ts:36` re-export line). (`themes/index.ts` + `themeMode` + `storageKeys.THEME` already deleted in P2b. Orphan keyframe refs already deleted by codemod op 2 `action:delete` in P3.) | P4 |
+| **P6** | Extend `storageMigration.ts` with `migrateAqbKeys()` (Section 4.2). Wire into `AquibraStudio.tsx:19` AFTER the existing `migrateStorageKeys()` call. Add `AQB_MIGRATION_FLAG_V1` entry to `storageKeys.ts`. | P3 |
+| **P7** | Run codemod `--docs` against 33 markdown + 1 JSON. Update `DESIGN.md` with namespace contract section. Fix `CLAUDE.md` residual "dark-only" line (V1 leftover). `CHANGELOG.md` entry (include note: experimental Design-tab user customizations may reset to DEFAULT_TOKENS on first post-V3 load, per Q4=C). | P4, P5, P6 |
+| **P8 (gate)** | Codex Gate 3 on cumulative P2–P7 diff. Delete `scripts/theme-v3-codemod.mjs` (keep audit + mapping + report JSONs as historical record). Full verification grep suite passes (Section 7.1). | P7 + Codex Gate 3 |
 
 ### Dependency graph
 
 ```
-P0 → P1 → P2 → P3 → P4 → P5 → P7 → P8
-                │        ↑
-                └─▶ P6 ──┘
+P0 → P1 → P2 → P2b → P3 → P4 → P5 → P7 → P8
+                      │         ↑
+                      └─▶ P6 ───┘
 ```
 
 P6 parallelizes with P4/P5 (different files, no conflict).
+
+**Why P2b is a separate phase, not bundled into P2 or P3:**
+- Bundling into P2 mixes "add definitions" (non-destructive) with "delete runtime mutator" (changes visible rendering). P2b's visible rendering change benefits from isolation so any regression is unambiguously attributable.
+- Bundling into P3 would mean the codemod's op 1b renames `setProperty("--aqb-primary", ...)` → `setProperty("--buildrick-primary", ...)` INSIDE `themes/index.ts` — which would be a live violation of invariant #1 until P5 deletes the file. Deleting the file in P2b BEFORE the codemod encounters it eliminates the violating code before the rename can propagate it.
 
 ### Per-phase hard gates (before every commit)
 
@@ -334,16 +421,24 @@ Per inventory recommended defenses ("Run Codex on the architecture BEFORE writin
 ### 7.1 Programmatic (all must pass after P8)
 
 ```bash
-# Zero aqb-anywhere ghosts
+# Zero aqb-anywhere ghosts (CSS side)
 grep -rE "var\(--aqb-|var\(--ls-|var\(--accent-|@keyframes aqb-|animation(-name)?:\s*aqb-" packages/editor/src/ packages/editor/demo/              # → empty
 grep -rE "^\s*--aqb-|^\s*--ls-|^\s*--accent-" packages/editor/src/ packages/editor/demo/                                                           # → empty
 grep -rE "data-aqb-|[.'\"]aqb-" packages/editor/src/ packages/editor/demo/ --include="*.ts" --include="*.tsx" --include="*.css" --include="*.html"  # → empty
 grep -rE "aqb:trace:" packages/editor/src/ packages/editor/demo/                                                                                    # → empty
 
+# Zero aqb-anywhere ghosts (JS string literal side — new in V3 Gate 1 revision)
+grep -rnE "setProperty\s*\(\s*['\"]--(?:aqb|ls|accent)-" packages/editor/src/ packages/editor/demo/                                                 # → empty
+grep -rnE "['\"]--(?:aqb|ls|accent)-[a-z0-9-]+['\"]" packages/editor/src/ packages/editor/demo/                                                     # → empty (covers cssVar fields etc.)
+grep -rnE "\`[^\`]*aqb-[^\`]*\\\$\{" packages/editor/src/ packages/editor/demo/                                                                     # → empty (no surviving template literals)
+
 # Namespace invariants
-grep -rnE "setProperty\s*\(\s*['\"]--buildrick-(?!design-)" packages/editor/src/                                                                    # → empty
-grep -rnE "^\s*--buildrick-design-" packages/editor/src/ --exclude-dir=features                                                                     # → empty
-grep -rnE "^\s*--buildrick-(?!design-)" packages/editor/src/ --exclude-dir=themes --exclude "**/Canvas.css"                                         # → empty
+grep -rnE "setProperty\s*\(\s*['\"]--buildrick-(?!design-)" packages/editor/src/                                                                    # → empty (no JS writes chrome)
+grep -rnE "^\s*--buildrick-design-" packages/editor/src/ --exclude-dir=features                                                                     # → empty (design defs stay in features/)
+grep -rnE "^\s*--buildrick-(?!design-)" packages/editor/src/ --exclude-dir=themes --exclude "**/Canvas.css"                                         # → empty (chrome defs stay in themes/+Canvas.css)
+
+# Data-attribute completeness (19 attrs expected post-rename; 0 --aqb-- ones)
+test $(grep -rnoE "data-buildrick-[a-z-]+" packages/editor/src/ packages/editor/demo/ | sed 's/.*:data-buildrick-/data-buildrick-/' | sort -u | wc -l) -ge 19  # >= 19
 
 # Scaffolding and orphans gone
 grep -rE "applyTheme|defaultTheme|themeMode|aqb-theme|\.aqb-editor|\.aqb-layout|CSS_CLASSES" packages/editor/src/                                   # → empty
@@ -356,8 +451,8 @@ npx vitest run                                                                  
 [ $(wc -l < packages/editor/src/themes/default.css) -lt 4000 ]                                                                                      # true
 
 # Migration shim present + invoked
-grep -c "migrateAqbToBuildrick" packages/editor/src/shared/utils/storageMigration.ts                                                                # >= 1
-grep -c "storageMigration\|migrateAqbToBuildrick" packages/editor/src/editor/shell/AquibraStudio.tsx                                                # >= 1
+grep -c "migrateAqbKeys" packages/editor/src/shared/utils/storageMigration.ts                                                                       # >= 1
+grep -c "migrateAqbKeys\|storageMigration" packages/editor/src/editor/shell/AquibraStudio.tsx                                                       # >= 1 (and AFTER migrateStorageKeys call)
 
 # Re-run of mapping-table verifications block
 node scripts/theme-v3-codemod.mjs --verify                                                                                                          # pass before P8 deletes the script
