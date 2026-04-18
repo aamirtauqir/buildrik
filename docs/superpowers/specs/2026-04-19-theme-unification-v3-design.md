@@ -157,15 +157,48 @@ Template literals where the leading static portion contains `aqb-` / `--aqb-` / 
 
 **Category B — semantic remap (requires `manual_edits` whitelist, codemod does NOT auto-handle):**
 
-Template literals where the target is in a different namespace than a direct prefix swap would produce — e.g., chrome `--aqb-*` moving to design `--buildrick-design-*`. Only these 3 sites as of 2026-04-19 P0 grep:
+Sites where the target differs from a direct prefix swap — either namespace remap (chrome → design) OR regex/prefix-reader logic that interprets token names and must be semantically rewritten. Two subtypes:
 
-| # | File:line | Current | Target | Why manual (not auto) |
+**B.1 — Template-literal namespace remap (3 sites as of 2026-04-19 P0 grep):**
+
+| # | File:line | Current | Target | Why manual |
 |---|---|---|---|---|
-| 1 | `features/design-system/types.ts:73` (`tokenToCssVar`) | `` `--aqb-${id}` `` | `` `--buildrick-design-${id}` `` | Namespace remap: chrome prefix → design prefix. Simple `--aqb-` → `--buildrick-` swap would be wrong. |
-| 2 | `features/design-system/state/__tests__/useSpacingTokens.test.ts:22` | `` `--aqb-${id}` `` | `` `--buildrick-design-${id}` `` | Same namespace remap |
-| 3 | `features/design-system/utils/exportUtils.ts:15` (color generator) | `` `--aqb-color-${name}` `` | `` `--buildrick-design-color-${name}` `` | Same namespace remap |
+| 1 | `features/design-system/types.ts:73` (`tokenToCssVar`) | `` `--aqb-${id}` `` | `` `--buildrick-design-${id}` `` | Namespace remap: chrome → design. Simple `--aqb-` → `--buildrick-` swap would be wrong (target is `--buildrick-design-`). |
+| 2 | `features/design-system/state/__tests__/useSpacingTokens.test.ts:22` | `` `--aqb-${id}` `` | `` `--buildrick-design-${id}` `` | Same |
+| 3 | `features/design-system/utils/exportUtils.ts:15` (color generator) | `` `--aqb-color-${name}` `` | `` `--buildrick-design-color-${name}` `` | Same |
 
-Codemod verifies each whitelist entry matches expected `from` pattern at the listed file:line during `--verify`; if the repo has drifted, abort.
+**B.2 — Regex / prefix-reader code (design-token interpreters, enumerated in P0):**
+
+JS/TS code that uses regex patterns to match/extract/strip `--aqb-*` prefixes from token names. A blind prefix swap would be wrong because these readers usually target the design namespace specifically (post-rename: `--buildrick-design-*`), not chrome (`--buildrick-*`). P0 grep identifies each site and records the semantic target in `manual_edits`.
+
+**Pre-P0 inventory (commit-HEAD snapshot, NOT exhaustive):**
+
+| File:line | Current pattern | Likely semantic target |
+|---|---|---|
+| `features/design-system/state/useTokenUsageMap.ts:32` | `/^var\(--aqb-/` | `/^var\(--buildrick-design-/` (matches design-token var bindings only) |
+| `features/design-system/state/useTokenUsageMap.ts:36` | `/^var\((--aqb-[^)]+)\)/` | `/^var\((--buildrick-design-[^)]+)\)/` |
+| `features/design-system/state/useTokenUsageMap.ts:73` | `cssVar.replace(/^--aqb-/, "")` | `cssVar.replace(/^--buildrick-design-/, "")` (token-id extraction) |
+| `editor/inspector/shared/controls/ColorInput.tsx:37,49` | `/^var\(--aqb-/`, `match(/^var\((--aqb-[^)]+)\)$/)` | `/^var\(--buildrick-design-/` (color-token picker UI) |
+| `editor/inspector/shared/controls/InputControls.tsx:152,157` | Similar pattern | Similar target (verify semantic in P0) |
+| `editor/inspector/sections/typography/FontControls.tsx:40` | Regex token-var check | Design-namespace target |
+| `editor/inspector/sections/SizeSection.tsx:21` | Regex token-var check | Design-namespace target |
+
+P0 mapping must list EVERY such regex/prefix-reader explicitly. Codemod does NOT auto-rewrite regex literals — each is a manual edit with a committed semantic justification.
+
+**Codemod verifies** each B.1 and B.2 whitelist entry matches expected `from` pattern at the listed file:line during `--verify`; if the repo has drifted, abort.
+
+### Mid-interpolation disambiguation (abort rule precise)
+
+For template literals containing `aqb-`:
+
+- **Static-portion match, anywhere in the literal** → auto-handled by ops 4/5/6/7 or 1b. Examples:
+  - `` `aqb-element-${id}` `` → `` `buildrick-element-${id} `` (static portion at start)
+  - `` `prefix-${x}-aqb-stuff-${y}` `` → `` `prefix-${x}-buildrick-stuff-${y}` `` (static portion after interpolation, `aqb-` NOT inside `${}`)
+  - `` `${prefix}-aqb-stuff` `` → `` `${prefix}-buildrick-stuff` `` (static portion after interpolation)
+- **Inside an interpolation** `${...aqb-...}` → **abort**. The `aqb-` is inside JS code, not a static string portion; the codemod can't safely rewrite without understanding the surrounding expression. Listed in abort output; human must handle.
+- **Spans interpolation boundary** (e.g., `` `aq${b}-stuff` ``, which happens to expand to `aqb-stuff`) → abort. Pathological pattern; should not exist but safe to flag.
+
+Criterion: the codemod tokenizes the backtick string into [static, interpolation, static, ...] segments; it ONLY rewrites inside static segments, never across boundaries, never inside interpolations.
 
 ### Gate 1 review-flagged sites (auto-handled by codemod but flagged for Codex review)
 
@@ -216,7 +249,11 @@ P3 codemod aborts if a template-literal backtick string contains `aqb-` AND ops 
 **Operations (applied in exact order, per file):**
 
 1. **CSS-side CSS vars:** `var(--aqb-X)` / `var(--ls-X)` / `var(--accent-X)` → `var(--buildrick-Y)` per `css_vars` mapping. Fallbacks preserved.
-1b. **JS/TS-side CSS vars:** in `.ts`, `.tsx`, `.test.ts`, `.test.tsx` files — `"--aqb-X"` / `'--aqb-X'` / `` `--aqb-X` `` non-template string literals → `"--buildrick-Y"` per `css_vars` mapping. Covers `setProperty`/`getPropertyValue`/`getProperty` args AND object-literal `cssVar` fields (e.g., `DEFAULT_TOKENS` in `constants.ts`). Template literals remain manual (Section 3 whitelist).
+1b. **JS/TS-side CSS vars (plain strings AND template literals):** in `.ts`, `.tsx`, `.test.ts`, `.test.tsx` files — any occurrence of `--aqb-X` / `--ls-X` / `--accent-X` inside `"..."`, `'...'`, or `` `...` `` → per `css_vars` mapping. Covers:
+   - `setProperty`/`getPropertyValue`/`getProperty` args with plain strings: `setProperty("--aqb-primary", ...)` → `setProperty("--buildrick-accent", ...)`.
+   - Object-literal `cssVar` fields (e.g., `DEFAULT_TOKENS` in `constants.ts`, ~40 rows).
+   - **Template literals containing fully-static `--aqb-X` inside `var(...)` calls** (e.g., `` `linear-gradient(90deg, ${v}, var(--aqb-success))` `` → `` `linear-gradient(90deg, ${v}, var(--buildrick-success))` ``). The codemod rewrites the static `--aqb-X` portion without touching `${...}` interpolations.
+   - Template literals with a `--aqb-${id}` namespace-remap pattern are Category B manual edits (Section 3).
 2. **Keyframe rename OR delete per mapping:**
    - If `keyframes[X]` is a string target: `animation: aqb-X …` / `animation-name: aqb-X` → `animation[-name]: buildrick-X`. `@keyframes aqb-X` → `@keyframes buildrick-X`.
    - If `keyframes[X] = { action: "delete" }`: the codemod deletes the matching CSS property line entirely (`animation-name: aqb-X;` line removed; `animation: aqb-X <duration> <easing> ...;` line removed since `aqb-X` is the only animation name and has no valid replacement). Multi-animation shorthand (`animation: aqb-X 200ms ease, other-anim 100ms;`) is an abort condition — manual review required; no ambiguous partial-edit attempts.
@@ -410,7 +447,7 @@ Three hard checkpoints:
 | Gate | Timing | Scope |
 |---|---|---|
 | Gate 1 (P1) | Before any code change | Mapping table + `verifications` + dry-run report + `manual_edits` whitelist. Challenges every dedup decision, every undefined-token resolution, every SSOT claim. |
-| Gate 2 (P4) | Before destructive old-definition deletion | Cumulative P2+P3 diff + full grep suite output. Challenges: anything still referencing old prefix, any JS `setProperty` writing to non-`--buildrick-design-*`. |
+| Gate 2 (P4) | Before destructive old-definition deletion | Cumulative P2+P2b+P3 diff + full grep suite output. Challenges: anything still referencing old prefix, any JS `setProperty` writing to non-`--buildrick-design-*`, regex/prefix-reader sites correctly retargeted to design namespace. |
 | Gate 3 (P8) | Before final artifact cleanup | Cumulative P3–P7 diff, full acceptance criteria passing, DESIGN.md namespace section. Exit gate for the whole spec. |
 
 Per inventory recommended defenses ("Run Codex on the architecture BEFORE writing it"), V3 bakes Codex into mandatory checkpoints rather than relying on after-the-fact review.
@@ -455,14 +492,16 @@ grep -rE "data-aqb-|[.'\"]aqb-" packages/editor/src/ packages/editor/demo/ --inc
 grep -rE "aqb:trace:" packages/editor/src/ packages/editor/demo/                                                                                    # → empty
 
 # Zero aqb-anywhere ghosts (JS string literal side — new in V3 Gate 1 revision)
-grep -rnE "setProperty\s*\(\s*['\"]--(?:aqb|ls|accent)-" packages/editor/src/ packages/editor/demo/                                                 # → empty
-grep -rnE "['\"]--(?:aqb|ls|accent)-[a-z0-9-]+['\"]" packages/editor/src/ packages/editor/demo/                                                     # → empty (covers cssVar fields etc.)
+grep -rnE "setProperty\s*\(\s*['\"]--(aqb|ls|accent)-" packages/editor/src/ packages/editor/demo/                                                   # → empty
+grep -rnE "['\"]--(aqb|ls|accent)-[a-z0-9-]+['\"]" packages/editor/src/ packages/editor/demo/                                                       # → empty (covers cssVar fields etc.)
 grep -rnE "\`[^\`]*aqb-[^\`]*\\\$\{" packages/editor/src/ packages/editor/demo/                                                                     # → empty (no surviving template literals)
+# Regex token-reader patterns (B.2 subtype — post-rename must match --buildrick-design-, not --aqb-)
+grep -rnE "['\"/]--aqb-|replace\\(/\\^--aqb-|match\\(/\\^var\\\\\\(--aqb-|isTokenVar.*--aqb-" packages/editor/src/                                   # → empty
 
-# Namespace invariants
-grep -rnE "setProperty\s*\(\s*['\"]--buildrick-(?!design-)" packages/editor/src/                                                                    # → empty (no JS writes chrome)
+# Namespace invariants — BSD-grep compatible (no negative lookaheads; use grep|grep -v chain)
+grep -rnE "setProperty\s*\(\s*['\"]--buildrick-" packages/editor/src/ | grep -v "buildrick-design-"                                                 # → empty (no JS writes chrome)
 grep -rnE "^\s*--buildrick-design-" packages/editor/src/ --exclude-dir=features                                                                     # → empty (design defs stay in features/)
-grep -rnE "^\s*--buildrick-(?!design-)" packages/editor/src/ --exclude-dir=themes --exclude "**/Canvas.css"                                         # → empty (chrome defs stay in themes/+Canvas.css)
+grep -rnE "^\s*--buildrick-" packages/editor/src/ --exclude-dir=themes --exclude "**/Canvas.css" | grep -v "buildrick-design-"                      # → empty (chrome defs stay in themes/+Canvas.css)
 
 # Data-attribute completeness (19 attrs expected post-rename; 0 --aqb-- ones)
 test $(grep -rnoE "data-buildrick-[a-z-]+" packages/editor/src/ packages/editor/demo/ | sed 's/.*:data-buildrick-/data-buildrick-/' | sort -u | wc -l) -ge 19  # >= 19
