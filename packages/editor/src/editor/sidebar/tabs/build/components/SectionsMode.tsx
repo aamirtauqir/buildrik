@@ -10,7 +10,7 @@
  */
 
 import * as React from "react";
-import { Chevron } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import type { Composer } from "../../../../../engine";
 import {
   SECTION_FAMILIES,
@@ -197,7 +197,7 @@ export const SectionsMode: React.FC<SectionsModeProps> = ({ composer, searchQuer
             >
               <span className="bld-cat-name">{family.label}</span>
               <span className="bld-cat-count">{cardsByFamily[family.id].length}</span>
-              <Chevron className="bld-cat-chev" />
+              <ChevronRight className="bld-cat-chev" />
             </button>
             <div className={`bld-cat-body${isOpen ? ' open' : ''}`}>
               <div className="bld-cat-body-inner">
