@@ -1146,9 +1146,9 @@
 .pg-name-error {
   padding: 6px 12px;
   font-size: 12px;
-  color: var(--ls-danger);
-  background: var(--ls-danger-bg);
-  border-top: 1px solid var(--ls-danger-border);
+  color: var(--aqb-danger, #ef4444);
+  background: var(--aqb-danger-bg, rgba(239, 68, 68, 0.12));
+  border-top: 1px solid var(--aqb-danger-border, rgba(239, 68, 68, 0.25));
   flex-shrink: 0;
 }
 
@@ -1171,8 +1171,8 @@
 
 /* Active page: blue left border indicator (Pencil screen VIyme) */
 .pg-row--active {
-  background: var(--ls-accent-bg, var(--aqb-bg-hover));
-  color: var(--ls-accent-txt);
+  background: var(--aqb-primary-bg, var(--aqb-bg-hover));
+  color: var(--aqb-primary, #2D6DFF);
   font-weight: 500;
   border-color: transparent;
 }
@@ -1184,7 +1184,7 @@
   top: 6px;
   bottom: 6px;
   width: 3px;
-  background: var(--ls-accent, var(--aqb-primary));
+  background: var(--aqb-primary);
   border-radius: 0 2px 2px 0;
 }
 
@@ -1316,7 +1316,7 @@
   margin-left: auto;
   opacity: 0;
   transition: opacity 100ms ease;
-  color: var(--ls-text-muted);
+  color: var(--aqb-text-muted, #6b7280);
 }
 
 .pg-row:hover .pg-row__gear {
@@ -1841,8 +1841,7 @@
 /* Reduced motion — new pg-* animations */
 @media (prefers-reduced-motion: reduce) {
   .pg-ctx-menu,
-  .pg-unsaved-dialog,
-  .pg-drawer__save--dirty {
+  .pg-unsaved-dialog {
     animation: none;
     transition: none;
   }
@@ -1953,31 +1952,6 @@
   margin-bottom: 12px;
 }
 
-/* ── Search empty state ──────────────────────────────────────────── */
-.pages-empty-search {
-  padding: 24px 16px;
-  text-align: center;
-}
-
-.pages-empty-search__msg {
-  font-size: var(--aqb-font-sm);
-  color: var(--aqb-text-muted);
-  margin-bottom: 8px;
-}
-
-.pages-empty-search__clear {
-  background: none;
-  border: 1px solid var(--aqb-border);
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: var(--aqb-font-xs);
-  color: var(--aqb-text-secondary);
-  cursor: pointer;
-}
-
-.pages-empty-search__clear:hover {
-  background: var(--aqb-surface-3);
-}
 
 /* ── pg-row-wrap: wrapper for row + inline settings ─────────────────────── */
 .pg-row-wrap {
