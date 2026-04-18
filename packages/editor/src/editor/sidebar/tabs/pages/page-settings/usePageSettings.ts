@@ -52,6 +52,7 @@ export interface UsePageSettingsReturn {
   customHead: string;
   setCustomHead: (v: string) => void;
   headCodeError: string | null;
+  copyPassword: () => void;
 
   domain: string | null;
 
@@ -76,6 +77,40 @@ function validateHeadCode(code: string): string | null {
     return "Unclosed HTML tag detected. Ensure all tags are properly closed.";
   }
   return null;
+}
+
+interface PersistedState {
+  seoTitle: string;
+  seoDesc: string;
+  slug: string;
+  ogTitle: string;
+  ogDesc: string;
+  ogImageUrl: string | null;
+  visibility: "live" | "hidden" | "password";
+  password: string;
+  allowIndex: boolean;
+  allowFollow: boolean;
+  customHead: string;
+}
+
+function getPersistedState(page: PageItem): PersistedState {
+  const settings = (page as { settings?: { password?: string } }).settings;
+  const seoFlags = page.seo as { noIndex?: boolean; noFollow?: boolean } | undefined;
+  const visibility: PersistedState["visibility"] =
+    page.status === "password" ? "password" : page.status === "hidden" ? "hidden" : "live";
+  return {
+    seoTitle: page.seo?.metaTitle ?? page.name,
+    seoDesc: page.seo?.metaDescription ?? "",
+    slug: page.slug ?? "",
+    ogTitle: page.seo?.ogTitle ?? "",
+    ogDesc: page.seo?.ogDescription ?? "",
+    ogImageUrl: page.seo?.ogImage ?? null,
+    visibility,
+    password: settings?.password ?? "",
+    allowIndex: !seoFlags?.noIndex,
+    allowFollow: !seoFlags?.noFollow,
+    customHead: page.head ?? "",
+  };
 }
 
 export function usePageSettings(
@@ -106,38 +141,30 @@ export function usePageSettings(
 
   const savedSnapshot = React.useRef<string>("");
 
-  React.useEffect(() => {
-    if (!page) return;
-    setSeoTitle(page.seo?.metaTitle ?? page.name);
-    setSeoDesc(page.seo?.metaDescription ?? "");
-    setSlugRaw(page.slug ?? "");
+  const applyPersistedState = React.useCallback((p: PageItem) => {
+    const state = getPersistedState(p);
+    setSeoTitle(state.seoTitle);
+    setSeoDesc(state.seoDesc);
+    setSlugRaw(state.slug);
     setSlugError(null);
-    setOgTitle(page.seo?.ogTitle ?? "");
-    setOgDesc(page.seo?.ogDescription ?? "");
-    setOgImageUrl(page.seo?.ogImage ?? null);
-    const vis =
-      page.status === "password" ? "password" : page.status === "hidden" ? "hidden" : "live";
-    setVisibility(vis as "live" | "hidden" | "password");
-    setPassword((page as { settings?: { password?: string } }).settings?.password ?? "");
-    setAllowIndex(!(page.seo as { noIndex?: boolean } | undefined)?.noIndex);
-    setAllowFollow(!(page.seo as { noFollow?: boolean } | undefined)?.noFollow);
-    setCustomHead(page.head ?? "");
+    setOgTitle(state.ogTitle);
+    setOgDesc(state.ogDesc);
+    setOgImageUrl(state.ogImageUrl);
+    setVisibility(state.visibility);
+    setPassword(state.password);
+    setShowPassword(false);
+    setAllowIndex(state.allowIndex);
+    setAllowFollow(state.allowFollow);
+    setCustomHead(state.customHead);
     setHeadCodeError(null);
     setSaveState("clean");
-    savedSnapshot.current = JSON.stringify({
-      seoTitle: page.seo?.metaTitle ?? page.name,
-      seoDesc: page.seo?.metaDescription ?? "",
-      slug: page.slug ?? "",
-      ogTitle: page.seo?.ogTitle ?? "",
-      ogDesc: page.seo?.ogDescription ?? "",
-      ogImageUrl: page.seo?.ogImage ?? null,
-      visibility: vis,
-      password: (page as { settings?: { password?: string } }).settings?.password ?? "",
-      allowIndex: !(page.seo as { noIndex?: boolean } | undefined)?.noIndex,
-      allowFollow: !(page.seo as { noFollow?: boolean } | undefined)?.noFollow,
-      customHead: page.head ?? "",
-    });
-  }, [page?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+    savedSnapshot.current = JSON.stringify(state);
+  }, []);
+
+  React.useEffect(() => {
+    if (!page) return;
+    applyPersistedState(page);
+  }, [page?.id, applyPersistedState]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // isDirty — compares all 9 fields against snapshot
   const isDirty = React.useMemo(() => {
@@ -295,40 +322,8 @@ export function usePageSettings(
 
   const discard = React.useCallback(() => {
     if (!page) return;
-    // Reset ALL fields to persisted page state
-    setSeoTitle(page.seo?.metaTitle ?? page.name);
-    setSeoDesc(page.seo?.metaDescription ?? "");
-    setSlugRaw(page.slug ?? "");
-    setSlugError(null);
-    setOgTitle(page.seo?.ogTitle ?? "");
-    setOgDesc(page.seo?.ogDescription ?? "");
-    setOgImageUrl(page.seo?.ogImage ?? null);
-    const vis =
-      page.status === "password" ? "password" : page.status === "hidden" ? "hidden" : "live";
-    setVisibility(vis as "live" | "hidden" | "password");
-    setPassword((page as { settings?: { password?: string } }).settings?.password ?? "");
-    setShowPassword(false);
-    setAllowIndex(!(page.seo as { noIndex?: boolean } | undefined)?.noIndex);
-    setAllowFollow(!(page.seo as { noFollow?: boolean } | undefined)?.noFollow);
-    setCustomHead(page.head ?? "");
-    setHeadCodeError(null);
-    setSaveState("clean");
-    const vis2 =
-      page.status === "password" ? "password" : page.status === "hidden" ? "hidden" : "live";
-    savedSnapshot.current = JSON.stringify({
-      seoTitle: page.seo?.metaTitle ?? page.name,
-      seoDesc: page.seo?.metaDescription ?? "",
-      slug: page.slug ?? "",
-      ogTitle: page.seo?.ogTitle ?? "",
-      ogDesc: page.seo?.ogDescription ?? "",
-      ogImageUrl: page.seo?.ogImage ?? null,
-      visibility: vis2 as "live" | "hidden" | "password",
-      password: (page as { settings?: { password?: string } }).settings?.password ?? "",
-      allowIndex: !(page.seo as { noIndex?: boolean } | undefined)?.noIndex,
-      allowFollow: !(page.seo as { noFollow?: boolean } | undefined)?.noFollow,
-      customHead: page.head ?? "",
-    });
-  }, [page]);
+    applyPersistedState(page);
+  }, [page, applyPersistedState]);
 
   const seoScore = React.useMemo(
     () => calculateSeoScore({ title: seoTitle, desc: seoDesc, slug, allowIndex }),
@@ -341,7 +336,17 @@ export function usePageSettings(
     descSet: seoDesc.length >= 50,
   };
 
-  const domain = (composer as { project?: { domain?: string } } | null)?.project?.domain ?? null;
+  const copyPassword = React.useCallback(() => {
+    if (!password) return;
+    navigator.clipboard?.writeText?.(password).catch(() => {
+      addToast({ message: "Could not copy password", variant: "error" });
+    });
+  }, [password, addToast]);
+
+  // A4 parity with usePages.copyPageLink: domain lives in ProjectData metadata,
+  // NOT on `composer.project.domain` (that property doesn't exist on Composer
+  // and silently resolved to undefined — the slug preview was always broken).
+  const domain = composer?.getProjectMetadata?.()?.domain ?? null;
 
   return {
     activeTab,
@@ -374,6 +379,7 @@ export function usePageSettings(
     customHead,
     setCustomHead,
     headCodeError,
+    copyPassword,
     domain,
     saveState,
     isDirty,

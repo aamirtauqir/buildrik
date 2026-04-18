@@ -3273,4 +3273,168 @@
   cursor: pointer;
   font-family: inherit;
 }
+
+/* ==========================================================================
+   Phase 2 Chunk 5b — Social + Advanced tab bodies
+   ========================================================================== */
+
+.pages-panel .pg-social { padding: 16px 18px 24px; display: flex; flex-direction: column; gap: 16px; }
+
+.pages-panel .pg-social__og-card {
+  background: var(--aqb-surface-1, #17171f);
+  border: 1px solid var(--aqb-border, rgba(255,255,255,0.08));
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 420px;
+}
+.pages-panel .pg-social__og-img {
+  width: 100%;
+  aspect-ratio: 1200 / 630;
+  background: linear-gradient(135deg, #1b2950, #2D6DFF 60%, #4B8DFF);
+  display: grid;
+  place-items: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.3px;
+  padding: 20px;
+  text-align: center;
+  position: relative;
+}
+.pages-panel .pg-social__og-img-real {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pages-panel .pg-social__og-placeholder {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 12px;
+  opacity: 0.7;
+}
+.pages-panel .pg-social__og-body { padding: 8px 12px; }
+.pages-panel .pg-social__og-domain {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--aqb-text-faint, #908d85);
+}
+.pages-panel .pg-social__og-title { font-size: 12.5px; font-weight: 500; margin-top: 2px; color: var(--aqb-text-primary, #f5f5f0); }
+.pages-panel .pg-social__og-desc { font-size: 11px; color: var(--aqb-text-secondary, #b8b5ad); margin-top: 2px; }
 .pages-panel .pg-seo__ai-chip:hover { background: rgba(45,109,255,0.12); }
+
+.pages-panel .pg-adv { padding: 16px 18px 24px; display: flex; flex-direction: column; gap: 20px; }
+
+.pages-panel .pg-adv__section { display: flex; flex-direction: column; gap: 8px; }
+.pages-panel .pg-adv__section-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--aqb-text-faint, #908d85);
+  font-weight: 500;
+}
+.pages-panel .pg-adv__hint { font-size: 11px; color: var(--aqb-text-muted, #a09d96); }
+
+.pages-panel .pg-adv__seg {
+  display: inline-flex;
+  background: var(--aqb-surface-1, #17171f);
+  border: 1px solid var(--aqb-border, rgba(255,255,255,0.08));
+  border-radius: 4px;
+  padding: 2px;
+  gap: 2px;
+  width: fit-content;
+}
+.pages-panel .pg-adv__seg-btn {
+  padding: 5px 12px;
+  font-size: 12px;
+  background: none;
+  border: 0;
+  border-radius: 3px;
+  color: var(--aqb-text-muted, #a09d96);
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 120ms, background 120ms;
+}
+.pages-panel .pg-adv__seg-btn:hover { color: var(--aqb-text-primary, #f5f5f0); }
+.pages-panel .pg-adv__seg-btn--on {
+  background: #2D6DFF;
+  color: white;
+}
+
+.pages-panel .pg-adv__password {
+  background: var(--aqb-surface-1, #17171f);
+  border: 1px solid var(--aqb-border, rgba(255,255,255,0.08));
+  border-radius: 4px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pages-panel .pg-adv__password-row { display: flex; gap: 6px; }
+.pages-panel .pg-adv__password-input {
+  flex: 1;
+  background: var(--aqb-surface-2, #1a1a22);
+  border: 1px solid var(--aqb-border, rgba(255,255,255,0.08));
+  border-radius: 4px;
+  color: var(--aqb-text-primary, #f5f5f0);
+  padding: 7px 10px;
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 12px;
+  outline: none;
+}
+.pages-panel .pg-adv__password-input:focus { border-color: #2D6DFF; box-shadow: 0 0 0 2px rgba(45,109,255,0.12); }
+.pages-panel .pg-adv__password-btn {
+  padding: 0 10px;
+  font-size: 11px;
+  color: var(--aqb-text-secondary, #b8b5ad);
+  background: var(--aqb-surface-3, #1e1e28);
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.pages-panel .pg-adv__password-btn:hover:not(:disabled) {
+  background: var(--aqb-surface-4, #252531);
+  color: var(--aqb-text-primary, #f5f5f0);
+}
+.pages-panel .pg-adv__password-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.pages-panel .pg-adv__toggle-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0;
+}
+.pages-panel .pg-adv__toggle-info { flex: 1; }
+.pages-panel .pg-adv__toggle-label { font-size: 12px; font-weight: 500; color: var(--aqb-text-primary, #f5f5f0); }
+.pages-panel .pg-adv__toggle-hint { font-size: 10.5px; color: var(--aqb-text-faint, #908d85); line-height: 1.45; margin-top: 2px; }
+
+.pages-panel .pg-adv__toggle {
+  width: 28px;
+  height: 16px;
+  background: var(--aqb-surface-4, #252531);
+  border-radius: 9999px;
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 2px;
+  cursor: pointer;
+  border: 0;
+  transition: background 150ms;
+}
+.pages-panel .pg-adv__toggle::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--aqb-text-secondary, #b8b5ad);
+  transition: left 150ms ease-in-out, background 150ms ease-in-out;
+}
+.pages-panel .pg-adv__toggle--on { background: #2D6DFF; }
+.pages-panel .pg-adv__toggle--on::after { left: 14px; background: white; }
+
+.pages-panel .pg-adv__head {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 11.5px;
+  min-height: 120px;
+}

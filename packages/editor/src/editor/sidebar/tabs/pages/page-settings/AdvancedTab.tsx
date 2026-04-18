@@ -1,11 +1,5 @@
 /**
- * AdvancedTab — Visibility, password, robots, custom code.
- *
- * Key fixes:
- * - Password protect: inline password field appears when toggle ON
- * - Section labels: Title Case (not ALL-CAPS)
- * - Robots meta: descriptive hints explaining when to use
- * - Custom head code: error display
+ * AdvancedTab — Visibility, schedule, password, indexing, head code.
  *
  * @license BSD-3-Clause
  */
@@ -17,159 +11,122 @@ interface Props {
   s: UsePageSettingsReturn;
 }
 
-export const AdvancedTab: React.FC<Props> = ({ s }) => (
-  <div className="pg-advanced">
-    {/* ── Visibility Settings ───────────────────────────────────────────── */}
-    <div className="pg-advanced__section">
-      <div className="pg-advanced__section-title">Visibility Settings</div>
-
-      <div className="pg-advanced__toggle-row">
-        <div className="pg-advanced__toggle-info">
-          <div className="pg-advanced__toggle-label">Hide from Navigation</div>
-          <div className="pg-advanced__toggle-hint">
-            Removes this page from auto-generated nav menus. Custom navigation components are not
-            affected.
-          </div>
+export const AdvancedTab: React.FC<Props> = ({ s }) => {
+  return (
+    <div className="pg-adv">
+      {/* Visibility */}
+      <div className="pg-adv__section">
+        <div className="pg-adv__section-label">Visibility</div>
+        <div className="pg-adv__seg" role="radiogroup" aria-label="Page visibility">
+          <button
+            type="button"
+            role="radio"
+            aria-checked={s.visibility === "live"}
+            className={`pg-adv__seg-btn${s.visibility === "live" ? " pg-adv__seg-btn--on" : ""}`}
+            onClick={() => s.setVisibility("live")}
+          >Live</button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={s.visibility === "hidden"}
+            className={`pg-adv__seg-btn${s.visibility === "hidden" ? " pg-adv__seg-btn--on" : ""}`}
+            onClick={() => s.setVisibility("hidden")}
+          >Hidden</button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={s.visibility === "password"}
+            className={`pg-adv__seg-btn${s.visibility === "password" ? " pg-adv__seg-btn--on" : ""}`}
+            onClick={() => s.setVisibility("password")}
+          >Password</button>
         </div>
-        <button
-          className={`pg-toggle${s.visibility === "hidden" ? " pg-toggle--on" : ""}`}
-          role="switch"
-          aria-checked={s.visibility === "hidden"}
-          onClick={() => s.setVisibility(s.visibility === "hidden" ? "live" : "hidden")}
-        />
+        <div className="pg-adv__hint">
+          {s.visibility === "live" && "Page is publicly accessible."}
+          {s.visibility === "hidden" && "Page is not linked in menus but reachable via direct URL."}
+          {s.visibility === "password" && "Visitors must enter a password to view this page."}
+        </div>
       </div>
 
-      <div className="pg-advanced__toggle-row">
-        <div className="pg-advanced__toggle-info">
-          <div className="pg-advanced__toggle-label">Password Protect</div>
-          <div className="pg-advanced__toggle-hint">
-            Visitors need a password to access this page.
-          </div>
-        </div>
-        <button
-          className={`pg-toggle${s.visibility === "password" ? " pg-toggle--on" : ""}`}
-          role="switch"
-          aria-checked={s.visibility === "password"}
-          aria-expanded={s.visibility === "password"}
-          aria-controls="pg-password-field"
-          onClick={() => s.setVisibility(s.visibility === "password" ? "live" : "password")}
-        />
-      </div>
-
+      {/* Password input — only when visibility=password */}
       {s.visibility === "password" && (
-        <div id="pg-password-field" className="pg-advanced__password-wrap">
-          <label className="pg-advanced__password-label" htmlFor="page-password">
-            Access Password <span className="pg-advanced__required">Required</span>
-          </label>
-          <div className="pg-advanced__password-row">
+        <div className="pg-adv__password">
+          <div className="pg-adv__password-row">
             <input
-              id="page-password"
+              className="pg-adv__password-input"
               type={s.showPassword ? "text" : "password"}
-              className="pg-advanced__password-input"
               value={s.password}
               onChange={(e) => s.setPassword(e.target.value)}
-              placeholder="Set access password..."
-              autoFocus
+              placeholder="Enter password"
+              aria-label="Page access password"
             />
             <button
-              className="pg-advanced__password-show"
+              className="pg-adv__password-btn"
               onClick={() => s.setShowPassword(!s.showPassword)}
+              type="button"
               aria-label={s.showPassword ? "Hide password" : "Show password"}
-            >
-              {s.showPassword ? "Hide" : "Show"}
-            </button>
-            {s.password && (
-              <button
-                className="pg-advanced__password-copy"
-                onClick={() => navigator.clipboard.writeText(s.password)}
-                aria-label="Copy password"
-              >
-                Copy
-              </button>
-            )}
+            >{s.showPassword ? "Hide" : "Show"}</button>
+            <button
+              className="pg-adv__password-btn"
+              onClick={() => s.copyPassword()}
+              type="button"
+              aria-label="Copy password"
+              disabled={!s.password}
+            >Copy</button>
           </div>
-          {!s.password.trim() && (
-            <div className="pg-advanced__error" role="alert">
-              Password is required before saving.
-            </div>
-          )}
-          {/* Info banner — always shown when password protect is ON */}
-          <div className="pg-advanced__info-banner" role="note">
-            ℹ️ Password protection requires server-side enforcement. Verify your hosting
-            configuration supports this feature before relying on it to protect sensitive content.
-          </div>
+          <div className="pg-seo__hint">Share this password with visitors who need access.</div>
         </div>
       )}
-    </div>
 
-    <div className="pg-advanced__divider" />
-
-    {/* ── Search Engine Settings ────────────────────────────────────────── */}
-    <div className="pg-advanced__section">
-      <div className="pg-advanced__section-title">Search Engine Settings</div>
-
-      <div className="pg-advanced__toggle-row">
-        <div className="pg-advanced__toggle-info">
-          <div className="pg-advanced__toggle-label">Allow Indexing</div>
-          <div className="pg-advanced__toggle-hint">
-            Let search engines index this page. Turn OFF for confirmation pages, admin pages, or
-            private content.
+      {/* Indexing */}
+      <div className="pg-adv__section">
+        <div className="pg-adv__section-label">Search Engine Indexing</div>
+        <div className="pg-adv__toggle-row">
+          <div className="pg-adv__toggle-info">
+            <div className="pg-adv__toggle-label">Allow indexing</div>
+            <div className="pg-adv__toggle-hint">Let search engines list this page in results.</div>
           </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={s.allowIndex}
+            className={`pg-adv__toggle${s.allowIndex ? " pg-adv__toggle--on" : ""}`}
+            onClick={() => s.setAllowIndex(!s.allowIndex)}
+            aria-label="Allow indexing"
+          />
         </div>
-        <button
-          className={`pg-toggle${s.allowIndex ? " pg-toggle--on" : ""}`}
-          role="switch"
-          aria-checked={s.allowIndex}
-          onClick={() => s.setAllowIndex(!s.allowIndex)}
-        />
-      </div>
-
-      <div className="pg-advanced__toggle-row">
-        <div className="pg-advanced__toggle-info">
-          <div className="pg-advanced__toggle-label">Allow Following Links</div>
-          <div className="pg-advanced__toggle-hint">
-            Search engines follow outbound links on this page.
+        <div className="pg-adv__toggle-row">
+          <div className="pg-adv__toggle-info">
+            <div className="pg-adv__toggle-label">Follow links</div>
+            <div className="pg-adv__toggle-hint">Let search engines follow outbound links on this page.</div>
           </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={s.allowFollow}
+            className={`pg-adv__toggle${s.allowFollow ? " pg-adv__toggle--on" : ""}`}
+            onClick={() => s.setAllowFollow(!s.allowFollow)}
+            aria-label="Follow links"
+          />
         </div>
-        <button
-          className={`pg-toggle${s.allowFollow ? " pg-toggle--on" : ""}`}
-          role="switch"
-          aria-checked={s.allowFollow}
-          onClick={() => s.setAllowFollow(!s.allowFollow)}
+      </div>
+
+      {/* Head code */}
+      <div className="pg-adv__section">
+        <div className="pg-adv__section-label">Custom &lt;head&gt; code</div>
+        <textarea
+          className="pg-seo__textarea pg-adv__head"
+          value={s.customHead}
+          onChange={(e) => s.setCustomHead(e.target.value)}
+          placeholder="<!-- analytics, meta tags, fonts -->"
+          rows={6}
+          spellCheck={false}
+          aria-label="Custom head code"
         />
+        {s.headCodeError && <div className="pg-seo__error">{s.headCodeError}</div>}
+        <div className="pg-seo__hint">Injected into the &lt;head&gt; of this page only. Sanitized before save.</div>
       </div>
     </div>
+  );
+};
 
-    <div className="pg-advanced__divider" />
-
-    {/* ── Custom Head Code ─────────────────────────────────────────────── */}
-    <div className="pg-advanced__section">
-      <div className="pg-advanced__section-title">Custom Head Code</div>
-      {/* Warning banner — always visible */}
-      <div className="pg-advanced__warn-banner" role="note">
-        ⚠️ Custom code runs on every page load. Incorrect HTML can break your page layout. Only add
-        code from trusted sources.
-      </div>
-      <textarea
-        className={`pg-advanced__code${s.headCodeError ? " pg-advanced__code--error" : ""}`}
-        rows={4}
-        value={s.customHead}
-        onChange={(e) => s.setCustomHead(e.target.value)}
-        placeholder="<meta>, <link>, or <script> tags…"
-        aria-label="Custom head code"
-        aria-describedby="head-code-hint"
-        spellCheck={false}
-      />
-      {s.headCodeError ? (
-        <div className="pg-advanced__error" role="alert">
-          {s.headCodeError}
-        </div>
-      ) : (
-        <div id="head-code-hint" className="pg-advanced__hint">
-          Code injected into this page&apos;s &lt;head&gt;. Example: analytics tags, fonts, custom
-          meta.
-        </div>
-      )}
-    </div>
-  </div>
-);
+AdvancedTab.displayName = "AdvancedTab";
