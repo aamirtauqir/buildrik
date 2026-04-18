@@ -1,9 +1,13 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { safeGet, safeSet, safeRemove } from "../safeStorage";
 
 describe("safeStorage", () => {
   beforeEach(() => {
     localStorage.clear();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   describe("safeGet", () => {
@@ -17,17 +21,10 @@ describe("safeStorage", () => {
     });
 
     it("returns null if localStorage.getItem throws", () => {
-      const orig = Storage.prototype.getItem;
-      Storage.prototype.getItem = vi.fn(() => {
+      vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
         throw new Error("storage disabled");
       });
       expect(safeGet("any")).toBeNull();
-      Storage.prototype.getItem = orig;
-    });
-
-    it("returns null when window undefined (SSR)", () => {
-      // jsdom has window; this is a smoke test
-      expect(typeof safeGet).toBe("function");
     });
   });
 
@@ -38,13 +35,11 @@ describe("safeStorage", () => {
     });
 
     it("returns false on QuotaExceededError without throwing", () => {
-      const orig = Storage.prototype.setItem;
-      Storage.prototype.setItem = vi.fn(() => {
+      vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
         throw new DOMException("Quota exceeded", "QuotaExceededError");
       });
       expect(() => safeSet("k", "v")).not.toThrow();
       expect(safeSet("k", "v")).toBe(false);
-      Storage.prototype.setItem = orig;
     });
   });
 
@@ -56,13 +51,11 @@ describe("safeStorage", () => {
     });
 
     it("returns false on throw without bubbling", () => {
-      const orig = Storage.prototype.removeItem;
-      Storage.prototype.removeItem = vi.fn(() => {
+      vi.spyOn(Storage.prototype, "removeItem").mockImplementation(() => {
         throw new Error("nope");
       });
       expect(() => safeRemove("k")).not.toThrow();
       expect(safeRemove("k")).toBe(false);
-      Storage.prototype.removeItem = orig;
     });
   });
 });
