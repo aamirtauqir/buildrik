@@ -2349,43 +2349,43 @@
   flex-shrink: 0;
 }
 .pages-panel .pg-row__status--live {
-  color: var(--aqb-success);
+  color: #8ee0a6;
   background: rgba(34, 197, 94, 0.08);
 }
 .pages-panel .pg-row__status--live::before {
-  background: var(--aqb-success);
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18);
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.20);
 }
 .pages-panel .pg-row__status--draft {
-  color: var(--aqb-warning);
+  color: #f2c16b;
   background: rgba(245, 158, 11, 0.08);
 }
-.pages-panel .pg-row__status--draft::before { background: var(--aqb-warning); }
+.pages-panel .pg-row__status--draft::before { background: #f59e0b; }
 .pages-panel .pg-row__status--scheduled {
-  color: var(--accent);
+  color: #a8c5ff;
   background: rgba(45, 109, 255, 0.10);
 }
 .pages-panel .pg-row__status--scheduled::before { background: var(--accent); }
 .pages-panel .pg-row__status--hidden {
-  color: var(--aqb-text-muted);
+  color: #A09D96;
   background: rgba(255, 255, 255, 0.04);
 }
-.pages-panel .pg-row__status--hidden::before { background: var(--aqb-text-muted); }
+.pages-panel .pg-row__status--hidden::before { background: #6b7280; }
 .pages-panel .pg-row__status--password {
-  color: var(--aqb-text-primary);
+  color: #d9d4c6;
   background: rgba(255, 255, 255, 0.05);
 }
-.pages-panel .pg-row__status--password::before { background: var(--aqb-text-muted); }
+.pages-panel .pg-row__status--password::before { background: #A09D96; }
 .pages-panel .pg-row__status--external {
-  color: var(--aqb-text-muted);
+  color: #bfbfbf;
   background: rgba(255, 255, 255, 0.04);
 }
-.pages-panel .pg-row__status--external::before { background: var(--aqb-text-muted); }
+.pages-panel .pg-row__status--external::before { background: #908D85; }
 .pages-panel .pg-row__status--error {
-  color: var(--aqb-error);
+  color: #f5a3a3;
   background: rgba(239, 68, 68, 0.08);
 }
-.pages-panel .pg-row__status--error::before { background: var(--aqb-error); }
+.pages-panel .pg-row__status--error::before { background: #ef4444; }
 
 /* ─── Hover mini-toolbar (duplicate/settings/more) ─────────────────────── */
 .pages-panel .pg-row__actions {
