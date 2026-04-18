@@ -6,8 +6,48 @@
 
   "version_history": [
     {"version": "1.0", "status": "SUPERSEDED", "reason": "Codex review found: undefined tokens undercounted 6x (5 vs 29), storage keys undercounted 4x (12 vs 48+), dual-persistence was actually triple, docs/demo hit classes missing, default.css role oversimplified as single CHROME_CANONICAL when compound, ux-fixes.css mislabeled passive consumer when it has global side effects, legacy Canvas.css missing dual-role notation, orphan keyframe aqb-slide-down had missed second callsite at CommandPalette.tsx:292."},
-    {"version": "2.0", "status": "CURRENT", "reason": "Corrections incorporated. Added 7th prefix category (--accent-*) discovered during v2 expansion. Added CSS_CLASSES engine contract constant discovery."}
+    {"version": "2.0", "status": "DISCUSSION_GRADE_NOT_AUTHORITATIVE", "reason": "Codex second review passed most v1 corrections but found NEW failure mode: 'declared SSOT vs actual SSOT' — promoted constants as canonical without verifying consumers actually use them. Specific gaps documented in known_gaps section. Per Codex verdict: 'Safe for discussion, not safe as authoritative base document.' Per user decision (2026-04-19): accept v2 as discussion-grade and move to V3 architecture brainstorming with explicit SSOT-verification discipline, rather than chasing inventory perfection."}
   ],
+
+  "known_gaps_from_codex_v2_review": {
+    "description": "Specific gaps Codex identified in v2 that were NOT patched before moving forward. V3 architecture must verify these specific claims against code before relying on them.",
+    "storage_keys": [
+      "aqb-guides (storageKeys.ts:41) — consumer InspectorToggle.tsx:19 hardcodes the string instead of importing",
+      "aqb-inspector-mode (storageKeys.ts:43) — hardcoded consumer in InspectorToggle.tsx",
+      "aqb-recent-commands (storageKeys.ts:45) — hardcoded in CommandPalette.tsx:65",
+      "aqb-layers-${pageId}-{hidden|locked|names|expanded} dynamic key family — layersPersistence.ts:8"
+    ],
+    "docs_undercounted": {
+      "claimed": 20,
+      "actual": 33,
+      "additional_dirs": [
+        "packages/editor/src/project-documentation/ (e.g. product-manager-output.md)",
+        "packages/editor/src/code-to-prd-output/pages/ (e.g. 09-design-system-tab.md)"
+      ]
+    },
+    "false_centralization_claims": [
+      {"claim": "data-aqb-canvas defined in config.ts DATA_ATTRIBUTES", "reality": "Inline at Canvas.tsx:412. DATA_ATTRIBUTES export does not include it. config.ts is NOT complete SSOT for data-attrs."},
+      {"claim": "CSS_CLASSES constant is the live engine contract", "reality": "Constant exists but has ZERO consumers. Engine hardcodes strings throughout (useCanvasDragDrop.ts:149, ConstraintManager.ts:138, many more). It's an orphan constant."},
+      {"claim": "components/Canvas/Canvas.css is publicly exported", "reality": "CSS file is only imported by demo/main.tsx:15. Public JS boundary is components/Canvas/index.ts + src/index.ts:30 re-exporting Canvas component. CSS is not publicly shipped."}
+    ]
+  },
+
+  "ssot_verification_guardrail_for_v3": {
+    "description": "Codex's meta-finding across three review passes. Documented as explicit rule for V3 architecture work.",
+    "rule": "Never trust a constants file, barrel export, or named SSOT without grepping consumers to verify they actually import from it. Orphan constants (defined but unused) and duplicated strings (defined twice in different places) are BOTH common in this codebase. Every SSOT claim in V3 architecture must cite a consumer-verification grep.",
+    "pass_history_documenting_pattern": [
+      "V1 spec: architecture before inventory",
+      "V2 spec: same — architecture before inventory, just wearing a cleaner suit",
+      "Inventory v1: bucket-driven normalization — rounded evidence to fit preconceived buckets",
+      "Inventory v2: declared SSOT vs actual SSOT — trusted constants files without verifying consumers"
+    ],
+    "operational_rules_for_v3_architecture": [
+      "Every constants file cited as SSOT must be verified with: grep -r 'import.*CONSTANT_NAME' to confirm consumers exist.",
+      "Every 'X is centralized in Y' claim must be verified with: grep of the string literal outside Y to confirm no inline duplicates.",
+      "Every 'file is public/private' claim must be verified by tracing actual import graph, not by file name or folder convention.",
+      "Bucket boundaries during architecture must not reject evidence that doesn't fit. If something spans 2+ buckets, mark it compound, don't pick one."
+    ]
+  },
 
   "summary": {
     "total_var_consumers": {
