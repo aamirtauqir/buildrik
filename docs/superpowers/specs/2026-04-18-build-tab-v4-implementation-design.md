@@ -1,5 +1,26 @@
 # Build Tab — V4 Implementation Design
 
+> **⚠️ SUPERSEDED — DO NOT IMPLEMENT**
+>
+> This spec was invalidated by the 2026-04-18 CEO review (`/plan-ceo-review`).
+> **Outside voice (Codex)** found 7 structural errors: the "fresh rewrite" premise
+> was wrong because most claimed "new v4 features" already exist in current code:
+>
+> - Last-in-wins accordion: already in `useBuildTab.ts:198-204`
+> - Icon grid for Sections: already in `SectionsMode.tsx:161`
+> - `useBlockInsertion` shell hook: already provides spam-guard, smart parent
+>   resolution, transactions, toast feedback — this spec would bypass it
+> - `useSectionInsert` uses a different MIME (`application/aquibra-template`) —
+>   this spec's unified `insertBlock` path would break sections
+> - `storageKeys.ts` has canonical `aqb-*` keys; this spec invents raw strings
+> - Current code uses `sessionStorage` for mode/open-cats; this spec moves to
+>   `localStorage` (changes persistence semantics)
+> - Shared `PanelHeader` + `SearchBar` have debounce/analytics/kbd behavior
+>   this spec forks, losing functionality
+>
+> **Correct approach:** targeted surgical refactor, NOT ground-up rewrite.
+> A replacement spec will be authored. See CEO review log for findings detail.
+
 **Date:** 2026-04-18
 **Branch:** `main`
 **Authority:** `docs/superpowers/specs/build-tab-prototypes-v4.html` (pixel-perfect reference)
