@@ -26,15 +26,11 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({ onAddBlank, onFrom
     return () => document.removeEventListener("mousedown", onDown);
   }, [menuOpen]);
 
+  const hasOverflow = !!onFromTemplate || !!onAddFolder;
+
   return (
     <div className="pg-add-wrap" ref={wrapRef}>
-      <button
-        className="pg-add-primary"
-        onClick={() => setMenuOpen((o) => !o)}
-        aria-label="Add new page"
-        aria-expanded={menuOpen}
-        aria-haspopup="menu"
-      >
+      <button className="pg-add-primary" onClick={onAddBlank} aria-label="Add new page">
         <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
           <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="5" y1="12" x2="19" y2="12" />
@@ -42,11 +38,24 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({ onAddBlank, onFrom
         Add Page
       </button>
 
-      {menuOpen && (
+      {hasOverflow && (
+        <button
+          className="pg-add-overflow"
+          onClick={() => setMenuOpen((o) => !o)}
+          aria-label="More add options"
+          aria-expanded={menuOpen}
+          aria-haspopup="menu"
+        >
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true">
+            <circle cx="5" cy="12" r="1.6" />
+            <circle cx="12" cy="12" r="1.6" />
+            <circle cx="19" cy="12" r="1.6" />
+          </svg>
+        </button>
+      )}
+
+      {menuOpen && hasOverflow && (
         <div className="pg-add-popover" role="menu">
-          <button className="pg-add-option" role="menuitem" onClick={() => { onAddBlank(); setMenuOpen(false); }}>
-            Blank page
-          </button>
           {onFromTemplate && (
             <button className="pg-add-option" role="menuitem" onClick={() => { onFromTemplate(); setMenuOpen(false); }}>
               From template
