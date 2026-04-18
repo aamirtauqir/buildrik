@@ -35,19 +35,14 @@ export interface TemplatesTabProps {
 export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   composer,
   onTemplateUsed,
+  onSwitchTab,
   onClose,
   newPageMode = false,
 }) => {
   const { addToast } = useToast();
   const [showSearch, setShowSearch] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(true);
   const [showCreateConfirm, setShowCreateConfirm] = React.useState(false);
   const [createResult, setCreateResult] = React.useState<"success" | "error" | null>(null);
-
-  React.useEffect(() => {
-    const t = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(t);
-  }, []);
 
   // ── Hooks ──
   const { appliedId, setAppliedId } = useTemplatePersistence();
@@ -82,7 +77,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     addAsNewPageRef.current = false;
     pendingId.current = id;
     sel.setDetailId(null);
-    hasExistingContent ? sel.setShowReplace(true) : requestApply(id);
+    hasExistingContent ? sel.setShowReplace(true) : startApply();
   }
 
   function handleAddAsNewPage(id: string) {
@@ -217,21 +212,6 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         </div>
       )}
 
-      {/* Main content — skeleton on mount */}
-      {isLoading ? (
-        <div className="tpl-skeleton-wrap">
-          <div className="tpl-skeleton-pills">
-            {[80, 110, 95, 85, 100, 90, 70, 105].map((w, i) => (
-              <div key={i} className="tpl-skeleton-pill" style={{ width: w }} />
-            ))}
-          </div>
-          <div className="tpl-skeleton-grid">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="tpl-skeleton-card" />
-            ))}
-          </div>
-        </div>
-      ) : (
       <>
 
       {/* Filter pills — two-stage */}
@@ -328,7 +308,6 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       />
 
       </>
-      )}
 
       {/* Error banner */}
       {applyError && (
@@ -375,7 +354,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       {showCreateConfirm && (
         <CreatePageConfirmModal
           templateName={tName}
-          onCancel={() => setShowCreateConfirm(false)}
+          onCancel={() => { setShowCreateConfirm(false); addAsNewPageRef.current = false; }}
           onConfirm={() => {
             setShowCreateConfirm(false);
             startApply();
@@ -386,7 +365,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       {createResult === "success" && (
         <CreatePageSuccessModal
           onClose={() => { setCreateResult(null); onTemplateUsed?.(); }}
-          onGoToPage={() => { setCreateResult(null); onTemplateUsed?.(); }}
+          onGoToPage={() => { setCreateResult(null); onSwitchTab?.("pages"); onTemplateUsed?.(); }}
         />
       )}
       {createResult === "error" && (

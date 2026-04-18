@@ -64,9 +64,7 @@ export function useTemplateSelection(showProgress: boolean): UseTemplateSelectio
       const mq = !q || t.name.toLowerCase().includes(q);
       const mc = activeFilter === "all" || t.category === activeFilter;
       const mt = !templateType || t.type === templateType;
-      // subCategory filters by sub-category tag; templates may not have a
-      // dedicated sub-category field, so we fall back to category match.
-      const ms = !subCategory || t.category === subCategory;
+      const ms = !subCategory || t.subCategory === subCategory;
       return mq && mc && mt && ms;
     });
   }, [searchQ, activeFilter, templateType, subCategory]);
@@ -95,6 +93,7 @@ export function useTemplateSelection(showProgress: boolean): UseTemplateSelectio
         if (previewId) { setPreviewId(null); return; }
         if (showUpgrade) { setShowUpgrade(false); return; }
         if (showReplace) { setShowReplace(false); return; }
+        if (detailId) { setDetailId(null); return; }
         if (selectedId) { setSelectedId(null); return; }
         return;
       }
@@ -111,7 +110,7 @@ export function useTemplateSelection(showProgress: boolean): UseTemplateSelectio
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [previewId, showUpgrade, showReplace, selectedId, filteredTemplates, showProgress]);
+  }, [previewId, showUpgrade, showReplace, detailId, selectedId, filteredTemplates, showProgress]);
 
   const clearAll = React.useCallback(() => {
     setSearchQ("");

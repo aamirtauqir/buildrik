@@ -23,6 +23,8 @@ export interface ReplaceModalProps {
 
 export const ReplaceModal: React.FC<ReplaceModalProps> = ({
   template,
+  resetGlobalStyles,
+  onResetChange,
   onCancel,
   onApply,
 }) =>
@@ -35,6 +37,15 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
             This will replace your current page content with <strong>{template.name}</strong>. This action cannot be undone.
           </p>
         </div>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--ls-text-muted, #475569)", cursor: "pointer", margin: "0 0 4px" }}>
+          <input
+            type="checkbox"
+            checked={resetGlobalStyles}
+            onChange={(e) => onResetChange(e.target.checked)}
+            style={{ width: 14, height: 14, cursor: "pointer" }}
+          />
+          Also reset global styles
+        </label>
         <div className="tpl-modal-btns">
           <button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onCancel}>
             Cancel

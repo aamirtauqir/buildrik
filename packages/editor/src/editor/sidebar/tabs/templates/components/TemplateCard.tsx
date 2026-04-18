@@ -66,7 +66,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
           <span className="tpl-card-badge">Pro</span>
         )}
       </div>
-      <div className="tpl-card-body">
+      <div className="tpl-card-info">
         <div className="tpl-card-name">{template.name}</div>
         {categoryLabel && <div className="tpl-card-category">{categoryLabel}</div>}
       </div>
