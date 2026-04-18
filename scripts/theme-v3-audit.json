@@ -1,0 +1,307 @@
+{
+  "$schema_version": "1.0",
+  "generated": "2026-04-19",
+  "generated_by": "manual audit via grep + human classification",
+  "purpose": "Complete inventory of every 'aqb' and 'ls-' hit in packages/editor/src + packages/editor/demo. V3 architecture decisions must be made on top of this inventory, NOT before it. V1 and V2 were both superseded for leaping to architecture without closing the inventory.",
+
+  "summary": {
+    "total_var_consumers": {
+      "var_aqb": 4623,
+      "var_ls": 524,
+      "combined": 5147
+    },
+    "css_var_definition_files": 6,
+    "keyframe_definitions": "~70 across 10 files",
+    "animation_references": "~40+ across 20+ files",
+    "css_classnames_prefixed_aqb": "500+ CSS definitions, 300+ JSX usages — this is namespacing convention, NOT themeable tokens",
+    "data_attributes": {
+      "attribute_names": 12,
+      "reference_count": 460,
+      "files_containing": 84
+    },
+    "storage_keys": 12,
+    "public_api_exports": 3,
+    "public_css_imports": 3
+  },
+
+  "buckets": {
+
+    "1_css_var_definitions": {
+      "description": "Every file that DEFINES --aqb-* or --ls-* CSS variables (where the colon assignment appears). Files are classified by role and scope.",
+      "files": [
+        {
+          "path": "packages/editor/src/themes/default.css",
+          "definitions_count": 312,
+          "ls_count": "included in 312 — mixed with --aqb-*",
+          "scope": ":root (global)",
+          "role": "CHROME_CANONICAL",
+          "notes": "Main canonical chrome token source. 5000 lines total. Contains both canonical light-chrome tokens AND legacy dark surface tokens (--aqb-surface-1..5) that DESIGN.md flagged for removal. Also contains 22+ @keyframes aqb-* definitions.",
+          "definition_line_ranges": ["26-66", "77-317", "334-380", "450-490", "507-510", "4116-4117"]
+        },
+        {
+          "path": "packages/editor/src/themes/ux-fixes.css",
+          "definitions_count": 0,
+          "consumer_count": 62,
+          "scope": "global selectors (*, :focus-visible, .aqb-skip-link, etc.)",
+          "role": "CHROME_CONSUMER_ONLY",
+          "notes": "V2 MISSED THIS FILE. Imported by AquibraStudio.tsx:33. Consumes --aqb-primary, --aqb-primary-light, --aqb-radius-sm, etc. from themes/default.css.",
+          "imported_by": ["packages/editor/src/editor/shell/AquibraStudio.tsx:33"]
+        },
+        {
+          "path": "packages/editor/src/editor/sidebar/tabs/design/styles/design-tokens.css",
+          "definitions_count": 27,
+          "scope": ":root (global) — CRITICALLY NOT SCOPED",
+          "role": "CHROME_DEFINITIONS_DISGUISED_AS_DESIGN",
+          "notes": "Defines global --aqb-layout-*, --aqb-btn-*, --aqb-input-*, --aqb-icon-* at :root. Named like 'design tokens' but behaves like chrome (global, static). Also defines @keyframes aqb-dot-pulse. THIS FILE MEANS default.css is NOT the only :root source of truth.",
+          "sample_tokens": ["--aqb-layout-max-width", "--aqb-btn-height-md", "--aqb-input-height", "--aqb-icon-md"]
+        },
+        {
+          "path": "packages/editor/src/editor/canvas/Canvas.css",
+          "definitions_count": 54,
+          "scope": ".aqb-canvas, .aqb-canvas-wrapper, [data-aqb-canvas]",
+          "role": "CANVAS_OPERATIONAL",
+          "notes": "Canvas-scoped tokens for rendered user content inside canvas: selection glow, box model colors, font scale, spacing. NOT user-editable. NOT chrome. Third distinct role.",
+          "sample_tokens": ["--aqb-bg", "--aqb-selection-color", "--aqb-boxmodel-content", "--aqb-spacing-md"],
+          "contains_keyframes": ["aqb-fade-in", "aqb-scale-in", "aqb-toast-in", "aqb-toast-out", "aqb-element-flash"]
+        },
+        {
+          "path": "packages/editor/src/components/Canvas/Canvas.css",
+          "definitions_count": 93,
+          "scope": ".aqb-canvas, .aqb-canvas-wrapper, [data-aqb-canvas]",
+          "role": "CANVAS_OPERATIONAL_LEGACY_DUPLICATE_LIVE",
+          "notes": "NEAR-DUPLICATE of editor/canvas/Canvas.css. V2 spec assumed legacy and dead — WRONG. Imported by demo/main.tsx:15 so it's live. Diverged content (e.g., dark --aqb-surface-1..5 redefinitions that differ from the editor/canvas version).",
+          "imported_by": ["packages/editor/demo/main.tsx:15"],
+          "contains_keyframes": ["aqb-fade-in", "aqb-scale-in", "aqb-toast-in", "aqb-toast-out", "aqb-element-flash"]
+        },
+        {
+          "path": "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.css",
+          "definitions_count": 29,
+          "scope": ".pages-panel",
+          "role": "DARK_OVERRIDE_DESIGN_MD_VIOLATION",
+          "notes": "Redefines ~29 --aqb-* tokens back to dark values inside .pages-panel. Comment explicitly says 'Override global --aqb-* light tokens with dark equivalents'. Violates DESIGN.md 2026-04-18 light-chrome canonical. Candidate for deletion ONLY if Pages panel is confirmed to be chrome (which it is — this is editor UI).",
+          "definition_line_range": "2179-2214",
+          "overridden_tokens": ["--aqb-bg-app", "--aqb-bg-panel", "--aqb-bg-subtle", "--aqb-bg-card", "--aqb-bg-elevated", "--aqb-bg-hover", "--aqb-bg-active", "--aqb-surface-1", "--aqb-surface-2", "--aqb-surface-3", "--aqb-surface-4", "--aqb-surface-5", "--aqb-text-primary", "--aqb-text-secondary", "--aqb-text-tertiary", "--aqb-text-muted", "--aqb-text-disabled", "--aqb-border", "--aqb-border-medium", "--aqb-border-strong", "--aqb-border-light", "--aqb-border-subtle", "--aqb-border-hover", "--aqb-success", "--aqb-success-light", "--aqb-warning", "--aqb-warning-light", "--aqb-error", "--aqb-error-light"]
+        }
+      ]
+    },
+
+    "2_var_consumers": {
+      "description": "Files that read --aqb-* or --ls-* tokens via var(). Any code anywhere in the editor chrome, canvas, or design-system can be a consumer. Migration must rewrite every one of these.",
+      "approach": "Summary statistics only — individual enumeration is 5000+ entries. Full list generated via: grep -rn 'var(--aqb-\\|var(--ls-' packages/editor/src --include='*.css' --include='*.ts' --include='*.tsx'",
+      "counts": {
+        "var_aqb_references": 4623,
+        "var_ls_references": 524
+      },
+      "undefined_token_consumers_critical": {
+        "description": "Tokens REFERENCED but never DEFINED anywhere in the repo. These resolve to undefined at runtime (fallbacks used, or invalid styles).",
+        "verified_via": "grep for ^\\s*--aqb-X: in default.css + ux-fixes.css + design-tokens.css — all 5 missing",
+        "undefined_tokens": [
+          {"name": "--aqb-text", "notes": "No definition found"},
+          {"name": "--aqb-surface", "notes": "No definition found"},
+          {"name": "--aqb-surface-elevated", "notes": "No definition found"},
+          {"name": "--aqb-bg-input", "notes": "No definition found"},
+          {"name": "--aqb-primary-dark", "notes": "No definition found"}
+        ],
+        "consumer_files_sample": [
+          "packages/editor/src/editor/media/IconPickerModal.tsx",
+          "packages/editor/src/editor/media/MediaLibraryPanel.tsx",
+          "packages/editor/src/shared/forms/AutocompleteField.tsx",
+          "packages/editor/src/shared/constants/canvas.ts",
+          "packages/editor/src/editor/canvas/shared/tokens.ts"
+        ]
+      }
+    },
+
+    "3_keyframes": {
+      "description": "Every @keyframes aqb-* definition + every animation: aqb-* / animation-name: aqb-* reference. These share the 'aqb' prefix but are NOT CSS variables — separate migration concern.",
+      "definition_files": [
+        {"file": "packages/editor/src/themes/default.css", "count": 22, "notes": "aqb-spin, aqb-modal-in, aqb-toast-in/out, aqb-tooltip-in, aqb-fade-out/in, aqb-popover-in, aqb-menu-in, aqb-float-in, aqb-slide-up, aqb-pulse, aqb-skeleton-pulse/wave, aqb-success-flash, aqb-error-shake, aqb-status-pulse, aqb-progress-slide, aqb-stagger-fade-in/in-x/scale-in, aqb-flash"},
+        {"file": "packages/editor/src/editor/animation/AnimationPresets.ts", "count": 24, "notes": "aqb-fadeIn/Up/Down/Left/Right, aqb-zoomIn/Out, aqb-bounceIn, aqb-slideInUp/Down, aqb-slideOutUp, aqb-flipInX/Y, aqb-rotateIn, aqb-pulse, aqb-bounce, aqb-shake, aqb-swing, aqb-wobble, aqb-flash, aqb-heartBeat, aqb-rubberBand, aqb-fadeOut/Up/Down, aqb-zoomOut"},
+        {"file": "packages/editor/src/components/Panels/LeftSidebar/LeftSidebar.css", "count": 9, "notes": "aqb-fade-in, aqb-fadeInCard, aqb-fadeInSlide, aqb-pulse, aqb-spin, aqb-skeleton-shimmer, aqb-toast-slide-up, aqb-hint-fade-in, aqb-panel-fade-in"},
+        {"file": "packages/editor/src/editor/canvas/Canvas.css", "count": 5, "notes": "aqb-fade-in, aqb-scale-in, aqb-toast-in, aqb-toast-out, aqb-element-flash"},
+        {"file": "packages/editor/src/components/Canvas/Canvas.css", "count": 5, "notes": "DUPLICATE of editor/canvas/Canvas.css keyframes"},
+        {"file": "packages/editor/src/shared/ui/Skeleton.tsx", "count": 3, "notes": "Injected via template string in <style> element: aqb-skeleton-pulse, aqb-skeleton-wave, aqb-spin"},
+        {"file": "packages/editor/src/shared/forms/ImageUploader.tsx", "count": 1, "notes": "Injected via <style> template: aqb-spin"},
+        {"file": "packages/editor/src/editor/sidebar/tabs/design/styles/design-tokens.css", "count": 1, "notes": "aqb-dot-pulse"},
+        {"file": "packages/editor/src/editor/panels/layers/styles/layers.css", "count": 1, "notes": "aqb-sync-fade-in"}
+      ],
+      "reference_files_sample": [
+        "packages/editor/src/shared/ui/Popover.tsx (aqb-popover-in)",
+        "packages/editor/src/shared/ui/Tooltip.tsx (aqb-tooltip-in)",
+        "packages/editor/src/shared/ui/ContextMenu.tsx (aqb-menu-in)",
+        "packages/editor/src/shared/ui/Modal.tsx (aqb-modal-in)",
+        "packages/editor/src/shared/ui/Spinner.tsx (aqb-spin)",
+        "packages/editor/src/shared/ui/Skeleton.tsx (aqb-spin, aqb-skeleton-pulse, aqb-skeleton-wave — 4 refs)",
+        "packages/editor/src/shared/ui/QuickSwitcher.styles.ts (aqb-slide-down — NOT IN KEYFRAMES LIST, likely broken reference)",
+        "packages/editor/src/ai/AIAssistantBar.tsx (aqb-bar-slide-up — NOT IN KEYFRAMES LIST, likely broken reference)",
+        "packages/editor/src/features/design-system/ui/DraftChip.tsx (aqb-dot-pulse)",
+        "packages/editor/src/editor/canvas/controls/KeyboardCheatSheet.tsx (2 refs)",
+        "packages/editor/src/editor/canvas/controls/CommandPalette.tsx",
+        "packages/editor/src/editor/canvas/controls/SmartSuggestions.tsx",
+        "packages/editor/src/editor/canvas/controls/BlockPickerModal.tsx",
+        "packages/editor/src/editor/collaboration/PresenceIndicators.tsx",
+        "packages/editor/src/editor/shell/StatusIndicators.tsx"
+      ],
+      "orphan_animation_references": [
+        {"ref": "aqb-slide-down", "in": "shared/ui/QuickSwitcher.styles.ts:56", "notes": "Referenced but no @keyframes found — potential runtime bug"},
+        {"ref": "aqb-bar-slide-up", "in": "ai/AIAssistantBar.tsx:190", "notes": "Referenced but no @keyframes found — potential runtime bug"}
+      ]
+    },
+
+    "4_classnames": {
+      "description": "CSS classes prefixed 'aqb-' — product namespacing convention used throughout the editor. These are NOT themeable tokens; renaming has VERY broad blast radius.",
+      "approach": "Enumerating every unique class would list 500+ CSS definitions + 300+ JSX references. This bucket is flagged as 'probably NOT in V3 scope' but documented so the decision is explicit.",
+      "sample_definitions_count": 550,
+      "sample_jsx_usages_count": 320,
+      "scope_wrappers_in_default_css": [
+        ".aqb-editor — rule block exists; audit shows no React component applies className=\"aqb-editor\" → DEAD",
+        ".aqb-layout — similar dead",
+        ".aqb-sidebar — LIVE, applied by shell component",
+        ".aqb-toast — LIVE",
+        ".aqb-canvas, .aqb-canvas-wrapper — LIVE (scope wrappers used by Canvas.css)"
+      ],
+      "user_export_implication": "Classes like .aqb-hero-section, .aqb-features, .aqb-testimonials, .aqb-slider, .aqb-countdown appear in USER-EXPORTED HTML (see blocks/Sections/*, blocks/Components/*). Changing these changes the shape of HTML Buildrik generates for customers."
+    },
+
+    "5_data_attributes": {
+      "description": "data-aqb-* HTML attributes. These are ENGINE CONTRACTS — used by the editor to identify, select, style, and manipulate elements. Also appear in user-exported HTML. Completely separate from CSS variables.",
+      "canonical_definition_file": "packages/editor/src/shared/constants/config.ts",
+      "attribute_names": [
+        "data-aqb-id",
+        "data-aqb-type",
+        "data-aqb-editable",
+        "data-aqb-selected",
+        "data-aqb-hovered",
+        "data-aqb-locked",
+        "data-aqb-hidden",
+        "data-aqb-dropzone",
+        "data-aqb-drag-source",
+        "data-aqb-component",
+        "data-aqb-binding",
+        "data-aqb-canvas"
+      ],
+      "engine_consumers": [
+        "packages/editor/src/shared/utils/html/parsing.ts (parser reads data-aqb-id, data-aqb-type)",
+        "packages/editor/src/shared/utils/html/generation.ts (generator emits data-aqb-id, data-aqb-type)",
+        "packages/editor/src/shared/hooks/useElementFlash.ts (queries [data-aqb-id])",
+        "packages/editor/src/features/design-system/state/useTokenUsageMap.ts (regex matches [data-aqb-id])",
+        "packages/editor/src/engine/styles/StyleEngine.ts (uses data-aqb-id in selectors)",
+        "packages/editor/src/engine/export/ReactExporter.ts (emits in exported HTML)"
+      ],
+      "reference_count": 460,
+      "files_containing": 84,
+      "user_export_implication": "data-aqb-* appears in HTML exported to customer sites. Changing the prefix breaks the editor's own re-import of exported content AND any external tooling that reads these attributes."
+    },
+
+    "6_storage_keys": {
+      "description": "localStorage key strings using 'aqb-' prefix. Changing these either loses user data or requires a migration pass.",
+      "canonical_definition_file": "packages/editor/src/shared/constants/storageKeys.ts",
+      "keys": [
+        {"key": "aqb-preferences", "line": 25, "purpose": "User preferences"},
+        {"key": "aqb-theme", "line": 27, "purpose": "Theme mode (scaffolding only, not wired)"},
+        {"key": "aqb-onboarding-modal", "line": 123},
+        {"key": "aqb-onboarding-tour-v2", "line": 125},
+        {"key": "aqb-onboarding-progress", "line": 127},
+        {"key": "aqb-onboarding-dismissed", "line": 129},
+        {"key": "aqb-onboarding-schema-v", "line": 131},
+        {"key": "aqb-onboarding-phase", "line": 133},
+        {"key": "aqb-onboarding-tour-step", "line": 135},
+        {"key": "aqb-onboarding-project-named", "line": 137},
+        {"key": "aqb-design-tokens-{projectId}-v1", "line": "TokenRegistryContext.tsx:61", "notes": "Dynamic storage key — design-system persisted tokens per project"}
+      ],
+      "migration_scaffold_file": "packages/editor/src/shared/utils/storageMigration.ts (maps aquibra-* → aqb-* — historical precedent for how prefix migration is done)",
+      "migration_invoker": "packages/editor/src/editor/shell/AquibraStudio.tsx:19 — calls migrateStorageKeys on load"
+    },
+
+    "7_public_api_and_demo": {
+      "description": "JavaScript exports and CSS imports that expose the editor to embedders (demo app + any external consumer).",
+      "js_exports_from_src_index": [
+        {"export": "applyTheme", "from_file": "themes/index.ts:27", "re_exported_line": "src/index.ts:75"},
+        {"export": "defaultTheme", "from_file": "themes/index.ts:13", "re_exported_line": "src/index.ts:75"}
+      ],
+      "demo_consumers": [
+        {"file": "packages/editor/demo/main.tsx:11", "pattern": "import { applyTheme } from '../src/themes/index'"},
+        {"file": "packages/editor/demo/main.tsx:14", "pattern": "import '../src/themes/default.css'"},
+        {"file": "packages/editor/demo/main.tsx:15", "pattern": "import '../src/components/Canvas/Canvas.css' (the 'legacy' Canvas.css — LIVE via demo)"},
+        {"file": "packages/editor/demo/main.tsx:21", "pattern": "applyTheme()"}
+      ],
+      "editor_shell_imports": [
+        {"file": "packages/editor/src/editor/shell/AquibraStudio.tsx:32", "pattern": "import '../../themes/default.css'"},
+        {"file": "packages/editor/src/editor/shell/AquibraStudio.tsx:33", "pattern": "import '../../themes/ux-fixes.css'"}
+      ]
+    },
+
+    "8_persisted_design_token_system": {
+      "description": "The features/design-system runtime — where user edits of canvas design tokens live. Separate from themes/* files.",
+      "key_files": [
+        "packages/editor/src/features/design-system/constants.ts (DEFAULT_TOKENS with hardcoded cssVar strings)",
+        "packages/editor/src/features/design-system/types.ts:73 (tokenToCssVar helper emits --aqb-${id})",
+        "packages/editor/src/features/design-system/utils/exportUtils.ts:15 (generateColorCssVar emits --aqb-color-${name})",
+        "packages/editor/src/features/design-system/state/TokenRegistryContext.tsx:61 (localStorage key aqb-design-tokens-{projectId}-v1)",
+        "packages/editor/src/features/design-system/state/useTokenBase.ts:62 (runtime setProperty mutation)",
+        "packages/editor/src/features/design-system/state/useColorTokens.ts:50 (runtime setProperty mutation)",
+        "packages/editor/src/features/design-system/state/useSpacingTokens.ts:90 (runtime setProperty mutation)",
+        "packages/editor/src/features/design-system/state/useTypeTokens.ts (delegates to useTokenBase)"
+      ],
+      "dual_persistence_finding_from_codex": "TokenRegistryContext.tsx:61 trusts localStorage arrays. DesignSystemTab.tsx:142 loads from Composer by id/name (ignores saved cssVar). Two load paths, one storage key — any V3 migration must address BOTH.",
+      "critical_insight": "These tokens CURRENTLY EMIT --aqb-* names that COLLIDE with chrome --aqb-* names. Example: DEFAULT_TOKENS has 'cssVar: \"--aqb-color-primary\"' but no such token is defined in themes/default.css — it's an 'undefined consumer' AND a runtime-mutated target. The system was built as a third namespace without anyone realizing."
+    }
+  },
+
+  "v3_architecture_constraints_derived_from_inventory": {
+    "description": "Observations that any V3 architecture proposal must reconcile. These are NOT decisions — they're constraints the decisions must satisfy.",
+    "constraints": [
+      "C1: CSS variable definitions exist in SIX files with FOUR different roles (chrome-canonical, chrome-consumer-only, chrome-disguised-as-design, canvas-operational, canvas-operational-legacy-duplicate, dark-override-violation). Any two-bucket architecture is insufficient.",
+      "C2: Demo app depends on a file V2 treated as 'legacy dead' (components/Canvas/Canvas.css). Deleting without demo migration breaks the public editor-embed flow.",
+      "C3: ux-fixes.css is a chrome consumer that V2 completely missed. Every spec must enumerate themes/ directory contents before proposing renames.",
+      "C4: design-tokens.css defines GLOBAL :root --aqb-* tokens (layout/btn/input/icon) — it's a second chrome source competing with default.css. V3 must decide: merge into default.css, keep as separate chrome module, or reclassify these as a new 'output-tokens' namespace (these are tokens users' sites inherit).",
+      "C5: Canvas-operational tokens in editor/canvas/Canvas.css and components/Canvas/Canvas.css overlap heavily. V3 must decide if these are one thing or two, and whether one is truly legacy (audit diff needed).",
+      "C6: 'aqb' prefix is multi-semantic (CSS vars + keyframes + classnames + data attrs + storage keys + public API + user-export HTML). Renaming 'aqb' wholesale is NOT token-scope work. V3 must scope-scope each category.",
+      "C7: data-aqb-* and user-export class names (.aqb-hero-section etc.) appear in USER-EXPORTED HTML for Buildrik customers. Changing these is a breaking change for exported sites, not an internal rename.",
+      "C8: Storage keys migration has a precedent (storageMigration.ts mapping aquibra-* → aqb-*). Any storage key rename must follow that pattern.",
+      "C9: applyTheme() has ONE real caller (demo/main.tsx:21) contrary to V2 claim of zero. Deleting requires demo handling.",
+      "C10: Five undefined-but-consumed chrome tokens need decisions: either add definitions (pick values) or rename each consumer to a defined token. This is independent of any broader rename.",
+      "C11: Two orphan @keyframes references detected (aqb-slide-down in QuickSwitcher, aqb-bar-slide-up in AIAssistantBar) — these may be pre-existing bugs, not V3 scope, but flagged.",
+      "C12: Persisted design-token system at features/design-system writes --aqb-* strings to :root at runtime, but those strings don't exist in any CSS file's definitions — it's running on undefined-variable behavior today. V3 must acknowledge this as a PRE-EXISTING bug, not introduce it."
+    ]
+  },
+
+  "questions_for_v3_brainstorm_before_architecture": {
+    "description": "Answer these before proposing any architecture. Answers inform whether a rename/namespace split is even the right tool.",
+    "questions": [
+      "Q1: Is Buildrik the final product name? All 'aqb' → new-prefix migration presumes yes. Any historical name change incoming?",
+      "Q2: Is the editor's embedded-in-dashboard use the primary customer-facing surface, or is demo/main.tsx important too? Answer shapes whether breaking demo is acceptable.",
+      "Q3: Do Buildrik's customers (who use the editor) have exported HTML files in production? If yes, data-aqb-* and .aqb-* class renames are breaking changes that need separate compatibility planning.",
+      "Q4: Is the design-token user feature (Design tab in sidebar) shipped and used, or half-built? Codex flagged this as critical; V2 didn't confirm.",
+      "Q5: Is themes/ux-fixes.css intentional or a leftover file that should be merged into default.css?",
+      "Q6: Are the two Canvas.css files (editor/canvas/ and components/Canvas/) intentional duplicates for backwards compat, or should one be deleted?",
+      "Q7: Should design-tokens.css :root definitions merge into default.css, or stay separate as an 'output tokens' module?",
+      "Q8: Should canvas-operational tokens be renamed to a distinct namespace (e.g., --buildrick-canvas-op-*) or kept under chrome since they're not user-editable?",
+      "Q9: What's the rename strategy for data-aqb-* engine attributes that appear in exported HTML? (Option A: full rename with export migration, Option B: keep aqb- for export stability, rename only internals, Option C: version the attributes.)",
+      "Q10: Are the 500+ aqb-* CSS class names part of the 'aqb identity' that needs renaming, or are they product-namespaced and out of scope? Classes appearing in user exports especially need scrutiny."
+    ]
+  },
+
+  "scope_recommendation_skeleton_for_v3": {
+    "description": "A sketch of how V3 scope could split the work. NOT a decision — options for the brainstorm.",
+    "minimal_scope": [
+      "Fix the 5 undefined-but-consumed chrome tokens (add definitions or rename consumers)",
+      "Consolidate the 6 CSS var definition files — decide authoritative source for each role",
+      "Delete the 2 orphan keyframe references (aqb-slide-down, aqb-bar-slide-up)",
+      "Delete dead CSS selectors (.aqb-editor, .aqb-layout scope wrappers — verified unused)",
+      "Fix PagesTab.css dark overrides per DESIGN.md"
+    ],
+    "extended_scope": [
+      "Above PLUS: rename --aqb-* CSS variables to --buildrick-* (chrome) + --buildrick-canvas-* (canvas)",
+      "Migrate persisted design-token runtime to target canvas namespace cleanly",
+      "Reconcile the demo/main.tsx public API (delete or repurpose applyTheme)"
+    ],
+    "maximum_scope": [
+      "Above PLUS: rename keyframes aqb-* to buildrick-*",
+      "Rename storage keys aqb-* to buildrick-* (with migration)",
+      "Rename data-aqb-* to data-buildrick-* (with exported HTML migration)",
+      "Rename .aqb-* CSS class names"
+    ],
+    "recommendation_rationale": "Maximum scope = multi-week work with breaking changes to exported user HTML. Extended scope = the 'theme unification' originally envisioned, ~1.5 weeks with careful phasing. Minimal scope = what V1 should have been — the 5-10 specific bugs in the current state."
+  }
+}
