@@ -94,7 +94,7 @@ Rationale for Q8=B (two namespaces rather than three or one): given Q4=C, the de
     "undefined_decisions": { /* Q14: each of 29 tokens resolved */ }
   },
   "keyframes":       { /* ~70 definitions + 2 orphan deletions */ },
-  "data_attributes": { /* 12 attrs */ },
+  "data_attributes": { /* 19 attrs — see Section 1 Q9; NOT just the 11 in DATA_ATTRIBUTES constant */ },
   "classnames":      { /* 550+ selectors + dead-rule deletions */ },
   "storage_keys":    { /* 48 centralized + 20 inline + 4 gaps + scaffolding deletions */ },
   "dev_flags":       { "aqb:trace:": "buildrick:trace:" },
@@ -138,35 +138,62 @@ Required verifications at minimum:
 | No `--accent-*` tokens exist outside `themes/default.css` | `grep -rE "^\s*--accent-" packages/editor/src/` | Only `themes/default.css:69-74,413` hits |
 | `CSS_CLASSES` has zero real consumers (safe to delete) | `grep -rE "import.*CSS_CLASSES\|CSS_CLASSES\." packages/editor/src/` | Empty. Re-export at `shared/constants/index.ts:36` doesn't count as a consumer (no downstream import) |
 | All `setProperty("--aqb-*"...)` JS callsites enumerated (covered by Section 4.1 op 1b) | `grep -rnE "setProperty\s*\(\s*['\"]--(?:aqb\|ls\|accent)-" packages/editor/src/` | As of 2026-04-19: only `themes/index.ts:31-41` (11 calls). File deleted in P2b before codemod runs, so these never reach op 1b. |
-| All template-literal `aqb-…${` patterns enumerated in `manual_edits` | `grep -rnE "\`[^\`]*aqb-[^\`]*\\\$\{" packages/editor/src/ packages/editor/demo/` | Every hit matches an entry in `manual_edits` whitelist |
+| All template-literal `aqb-…${` patterns classified (A/B/Gate-1-flag) | `grep -rnE "\`[^\`]*aqb-[^\`]*\\\$\{" packages/editor/src/ packages/editor/demo/` | ~158 hits as of 2026-04-19. Every hit classified in `theme-v3-mapping.json#template_literal_classification` as Category A (auto, 148+ hits), Gate-1-flag (6 hits), or Category B manual (3 hits) |
 
-### Dynamic token refs — explicit manual-edits whitelist
+### Dynamic token refs — two categories, only one is manual
 
-Template-literal patterns are the V2 blocker Codex flagged. The codemod errors on every such pattern unless it's in the `manual_edits` whitelist. This list is the P0 grep output as of 2026-04-19, NOT a priori knowledge — regenerate via grep at P0 and diff against this list; any difference means new code was added that the spec didn't anticipate, and mapping must be updated before codemod runs.
+Codex Gate 1 re-review surfaced that treating EVERY template literal as "manual" is wrong. The actual repo has ~158 backtick strings matching `` `[^`]*aqb-[^`]*${` `` — the vast majority are benign dynamic class names / data-attrs / storage keys that can be handled by the codemod with the same prefix-swap logic as plain string literals.
 
-**Pattern used for enumeration:** `` grep -rnE "\`[^\`]*aqb-[^\`]*\\\$\{" packages/editor/src/ packages/editor/demo/ `` — matches any backtick-delimited string literal containing `aqb-` followed by `${`, anywhere in the string (not just adjacent). V2's narrower pattern (`aqb-${`) missed 2 sites.
+Two categories:
 
-| # | File:line | Current | Target (after rename) |
-|---|---|---|---|
-| 1 | `features/design-system/types.ts:73` (`tokenToCssVar`) | `` `--aqb-${id}` `` | `` `--buildrick-design-${id}` `` |
-| 2 | `features/design-system/state/__tests__/useSpacingTokens.test.ts:22` | `` `--aqb-${id}` `` | `` `--buildrick-design-${id}` `` |
-| 3 | `features/design-system/utils/exportUtils.ts:15` (color generator) | `` `--aqb-color-${name}` `` | `` `--buildrick-design-color-${name}` `` |
-| 4 | `shared/types/animations.ts:116` | `` `aqb-${config.type}` `` | `` `buildrick-${config.type}` `` |
-| 5 | `engine/elements/ElementOperations.ts:223` | `` `aqb-${config.type}` `` | `` `buildrick-${config.type}` `` |
-| 6 | `editor/inspector/sections/registry.tsx:562` | `` `aqb-${anim.type} ${anim.duration}ms ${anim.easing} ${anim.delay}ms 1 normal forwards` `` | `` `buildrick-${anim.type} ${anim.duration}ms ${anim.easing} ${anim.delay}ms 1 normal forwards` `` |
-| 7 | `editor/sidebar/shared/usePanelNavigation.ts:78,96` | `` `aqb-nav-${storageKey}` `` | `` `buildrick-nav-${storageKey}` `` |
-| 8 | `editor/panels/layers/hooks/layersPersistence.ts` (dynamic key family, ~4 callsites) | `` `aqb-layers-${pageId}-hidden` ``, `` `-locked` ``, `` `-names` ``, `` `-expanded` `` | `` `buildrick-layers-${pageId}-...` `` each |
-| 9 | `shared/utils/devLogger.ts:85,172,179,195` (4 callsites, same pattern) | `` `aqb:trace:${domain}` `` | `` `buildrick:trace:${domain}` `` |
-| 10 | `features/design-system/constants.ts` `DEFAULT_TOKENS` (~40 rows) | `cssVar: "--aqb-X"` (non-template string literals, batched as manual for review) | `cssVar: "--buildrick-design-X"` |
+**Category A — simple prefix swap (auto-handled by codemod ops 4/5/6/7):**
 
-**NOT in manual_edits (plain string literals — handled by codemod operation 6 for storage keys):**
-- `shared/ui/QuickSwitcher.styles.ts:17` — `"aqb-quick-switcher-recent"` (plain string, storage key)
-- `shared/utils/savedTemplates.ts:23` — `"aqb-saved-templates"` (plain string, storage key)
-- `editor/panels/layers/hooks/useLayersState.ts:31` — `"aqb-layers-display-prefs"` (plain string, storage key)
+Template literals where the leading static portion contains `aqb-` / `--aqb-` / `data-aqb-` / `.aqb-` / `aqb:trace:` and the rename is a direct prefix replacement with no namespace remap. Examples:
+- `` `aqb-element-${id}` `` → `` `buildrick-element-${id}` ``
+- `` `data-aqb-${attr}` `` → `` `data-buildrick-${attr}` ``
+- `` `aqb-history-view-${id}` `` → `` `buildrick-history-view-${id}` ``
 
-These were in V3 draft's manual-edits list but don't need manual handling — they have no `${` interpolation. They're covered by the codemod's op 6 string-literal rename. Misclassifying them as "manual" was a spec error Codex caught.
+**Codemod behavior extension for ops 4/5/6/7:** inside backtick-delimited string literals in `.ts`/`.tsx`, find static-text runs containing the target prefix and apply the same replacement logic as plain strings. Template-literal `${...}` interpolations are preserved verbatim. This covers ~148 of the 158 sites.
 
-Any template-literal hit that the codemod encounters not in this whitelist causes P3 to abort with a listing of every occurrence.
+**Category B — semantic remap (requires `manual_edits` whitelist, codemod does NOT auto-handle):**
+
+Template literals where the target is in a different namespace than a direct prefix swap would produce — e.g., chrome `--aqb-*` moving to design `--buildrick-design-*`. Only these 3 sites as of 2026-04-19 P0 grep:
+
+| # | File:line | Current | Target | Why manual (not auto) |
+|---|---|---|---|---|
+| 1 | `features/design-system/types.ts:73` (`tokenToCssVar`) | `` `--aqb-${id}` `` | `` `--buildrick-design-${id}` `` | Namespace remap: chrome prefix → design prefix. Simple `--aqb-` → `--buildrick-` swap would be wrong. |
+| 2 | `features/design-system/state/__tests__/useSpacingTokens.test.ts:22` | `` `--aqb-${id}` `` | `` `--buildrick-design-${id}` `` | Same namespace remap |
+| 3 | `features/design-system/utils/exportUtils.ts:15` (color generator) | `` `--aqb-color-${name}` `` | `` `--buildrick-design-color-${name}` `` | Same namespace remap |
+
+Codemod verifies each whitelist entry matches expected `from` pattern at the listed file:line during `--verify`; if the repo has drifted, abort.
+
+### Gate 1 review-flagged sites (auto-handled by codemod but flagged for Codex review)
+
+These 6 sites ARE Category A (codemod handles via prefix swap) but merit explicit Gate 1 attention because of downstream assumptions:
+
+| # | File:line | Current | Target (prefix-swap target, auto) | Review concern |
+|---|---|---|---|---|
+| 4 | `shared/types/animations.ts:116` | `` `aqb-${config.type}` `` | `` `buildrick-${config.type}` `` | Verify `@keyframes buildrick-${type}` defs exist post-P2 for every `config.type` value |
+| 5 | `engine/elements/ElementOperations.ts:223` | `` `aqb-${config.type}` `` | `` `buildrick-${config.type}` `` | Same as #4 |
+| 6 | `editor/inspector/sections/registry.tsx:562` | `` `aqb-${anim.type} ${anim.duration}ms ...` `` | `` `buildrick-${anim.type} ...` `` | Same animation-name assumption + multi-interpolation complexity |
+| 7 | `editor/sidebar/shared/usePanelNavigation.ts:78,96` | `` `aqb-nav-${storageKey}` `` | `` `buildrick-nav-${storageKey}` `` | Verify migration shim's dynamic loop covers `aqb-nav-*` family |
+| 8 | `editor/panels/layers/hooks/layersPersistence.ts` (~4 callsites) | `` `aqb-layers-${pageId}-{hidden\|locked\|names\|expanded}` `` | `` `buildrick-layers-${pageId}-...` `` | Verify migration shim dynamic loop covers this family |
+| 9 | `shared/utils/devLogger.ts:85,172,179,195` (4 callsites) | `` `aqb:trace:${domain}` `` | `` `buildrick:trace:${domain}` `` | Verify no `aqb:trace:` literal elsewhere; confirm dev-flag UX consistency |
+
+Gate 1 reviewer (Codex) verifies each of these 6 behaves correctly under the codemod's auto-swap; if any are semantically broken, they're escalated to Category B manual edits before P3 runs.
+
+**NOT in either list (handled by codemod op 6 as plain string literals):**
+- `shared/ui/QuickSwitcher.styles.ts:17` — `"aqb-quick-switcher-recent"`
+- `shared/utils/savedTemplates.ts:23` — `"aqb-saved-templates"`
+- `editor/panels/layers/hooks/useLayersState.ts:31` — `"aqb-layers-display-prefs"`
+
+Plain strings. No template interpolation. Op 6 handles these.
+
+### Abort condition (updated)
+
+P3 codemod aborts if a template-literal backtick string contains `aqb-` AND ops 4/5/6/7 cannot auto-handle it AND it is not in the Category B `manual_edits` whitelist. In practice this fires only on genuinely-novel patterns (e.g., `` `${prefix}-aqb-${id}` `` where `aqb-` appears inside an interpolation, not in a static portion). ~148 benign dynamic class/attr/key template literals auto-pass.
+
+**P0 verification requirement:** after P0 runs, re-grep `` `[^`]*aqb-[^`]*${` ``. For each hit, classify as: Category A (ops handle auto) / Category B (manual remap) / Gate 1 flagged (auto but review). Commit classifications in `theme-v3-mapping.json#template_literal_classification` with per-hit `file:line + category + expected_rewrite`. Gate 1 Codex challenges any misclassification.
 
 ---
 
@@ -194,17 +221,17 @@ Any template-literal hit that the codemod encounters not in this whitelist cause
    - If `keyframes[X]` is a string target: `animation: aqb-X …` / `animation-name: aqb-X` → `animation[-name]: buildrick-X`. `@keyframes aqb-X` → `@keyframes buildrick-X`.
    - If `keyframes[X] = { action: "delete" }`: the codemod deletes the matching CSS property line entirely (`animation-name: aqb-X;` line removed; `animation: aqb-X <duration> <easing> ...;` line removed since `aqb-X` is the only animation name and has no valid replacement). Multi-animation shorthand (`animation: aqb-X 200ms ease, other-anim 100ms;`) is an abort condition — manual review required; no ambiguous partial-edit attempts.
 3. (merged into op 2 above — `@keyframes` renames share the op-2 mapping logic)
-4. **Data attributes:** `data-aqb-X` (CSS selectors, JSX props, HTML attrs, string literals inside `getAttribute`/`setAttribute`/`querySelector`) → `data-buildrick-X`. Pattern-based grep across all file types — does NOT depend on `DATA_ATTRIBUTES` constant completeness.
-5. **Class names:** `.aqb-X` (CSS selectors) + `"aqb-X"` / `'aqb-X'` (JSX className strings, non-template string literals in `classList.*`/`querySelector(".aqb-X")`/etc.) → `.buildrick-X` / `"buildrick-X"`.
-6. **Storage-key string literals** at locations listed in `storage_keys` (48 centralized in `storageKeys.ts` + 20 ad-hoc inline) → `"buildrick-X"`. Includes the 3 plain-string sites Codex pointed out (QuickSwitcher.styles.ts:17, savedTemplates.ts:23, useLayersState.ts:31).
-7. **Dev flag colon-prefix:** `aqb:trace:` literals → `buildrick:trace:`.
+4. **Data attributes:** `data-aqb-X` (CSS selectors, JSX props, HTML attrs, string literals inside `getAttribute`/`setAttribute`/`querySelector`, **and static portions of backtick template literals like** `` `data-aqb-${attr}` `` → `` `data-buildrick-${attr}` ``) → `data-buildrick-X`. Pattern-based grep across all file types — does NOT depend on `DATA_ATTRIBUTES` constant completeness.
+5. **Class names:** `.aqb-X` (CSS selectors) + `"aqb-X"` / `'aqb-X'` (JSX className strings, string literals in `classList.*`/`querySelector(".aqb-X")`/etc.) **+ static portions of backtick template literals** (e.g., `` `aqb-element-${id}` `` → `` `buildrick-element-${id}` ``) → `.buildrick-X` / `"buildrick-X"` / equivalent inside the backtick string. Template interpolations `${...}` preserved verbatim.
+6. **Storage-key string literals** at locations listed in `storage_keys` (48 centralized in `storageKeys.ts` + 20 ad-hoc inline) → `"buildrick-X"`. Includes the 3 plain-string sites Codex pointed out (QuickSwitcher.styles.ts:17, savedTemplates.ts:23, useLayersState.ts:31). **Also handles static portions of backtick template literals** (e.g., `` `aqb-history-view-${id}` ``) with same prefix-swap semantics.
+7. **Dev flag colon-prefix:** `aqb:trace:` literals (plain and static-portion of backtick template literals like `` `aqb:trace:${domain}` ``) → `buildrick:trace:`.
 8. **Delete dead scope-rule blocks only:** `.aqb-editor { ... }`, `.aqb-layout { ... }`, and any `.aqb-editor *` / `.aqb-editor *::selection` derivative blocks in `themes/default.css`. Pattern-unambiguous block deletion.
 
 Codemod does NOT handle value-replacement work (DARK_THEME_SHIM dark → light canonical requires value decisions), does NOT delete old CSS var definitions, does NOT delete scaffolding files. Those are P4/P5 manual work — value decisions don't belong in a string-replacement tool, and multi-file coordinated deletes (`themes/index.ts` + `src/index.ts:75` re-export + `themeMode` field) are **handled in phase P2b BEFORE the codemod runs** (Section 5), so the codemod never encounters them.
 
 **Abort conditions (fail loud, exit non-zero):**
 
-- Any template literal hit matching `` `[^`]*aqb-[^`]*${ `` (flexible pattern — `aqb-` followed anywhere by `${`, not required to be adjacent) at a file:line NOT in `manual_edits` whitelist.
+- Any template literal hit matching `` `[^`]*aqb-[^`]*${ `` where ops 4/5/6/7 cannot auto-handle it (no static `aqb-` prefix portion OR the static portion starts mid-interpolation) AND it is NOT in the Category B `manual_edits` whitelist.
 - Multi-animation shorthand containing an `action: delete` keyframe alongside live animations (e.g., `animation: aqb-slide-down 200ms, other-live 100ms;`) — ambiguous partial edit, abort with file:line + review instruction.
 - Any `--aqb-`, `--ls-`, `--accent-`, `aqb-` string literal, `data-aqb-`, `.aqb-`, `@keyframes aqb-`, `animation.*aqb-`, `setProperty("--aqb-...")`, or `aqb:trace:` hit not covered by mapping.
 - `--apply` invoked without `--verify` pass in the same session.
@@ -342,7 +369,7 @@ Lossy per Q4=C: tokens not in `DEFAULT_TOKENS` become orphan JSON, dropped on ne
 | **P1 (gate)** | Codex Gate 1 review of P0 artifacts. Challenges dedup merges, undefined-token decisions, SSOT verifications, manual-edits completeness. | P0 |
 | **P2** | Author **only the mapped canonical targets** in `themes/default.css` + design-system constants alongside existing old definitions. **No lexical prefix mirroring:** if `--aqb-primary` maps to `--buildrick-accent`, P2 creates `--buildrick-accent` and does NOT also create `--buildrick-primary`. Only what the mapping says, nothing else. Double-definitions of mapped targets = value-neutral. App runs identically. | P1 |
 | **P2b (scaffolding deletion)** | Delete the `applyTheme()` runtime mutator + `themeMode` scaffolding BEFORE consumer rename so invariant #1 ("chrome never mutated at runtime") holds from here onward. Deletes: `themes/index.ts` entirely, `src/index.ts:75` `applyTheme`/`defaultTheme` re-export, `demo/main.tsx:11` import + `demo/main.tsx:21` call, `shared/types/project.ts` `themeMode` field, `storageKeys.THEME` entry. **Visible impact:** chrome renders with `themes/default.css` canonical light values instead of `applyTheme`'s dark runtime overrides — this IS the DESIGN.md 2026-04-18 light-chrome correction, not a regression. Capture before/after screenshots at `localhost:5050`. | P2 |
-| **P3** | Codemod `--verify` then `--apply`. All consumer-side renames in one run via the 8 operations in Section 4.1: CSS vars (op 1), JS string-literal CSS vars including DEFAULT_TOKENS cssVars (op 1b), keyframes rename or delete per mapping (op 2), data-attrs (op 4), class names (op 5), storage key strings (op 6), dev flags (op 7), dead scope-rule blocks `.aqb-editor`/`.aqb-layout` (op 8). Template-literal sites handled via `manual_edits` whitelist (Section 3, 10 sites). | P2b |
+| **P3** | Codemod `--verify` then `--apply`. All consumer-side renames in one run via the 8 operations in Section 4.1: CSS vars (op 1), JS string-literal CSS vars including DEFAULT_TOKENS cssVars (op 1b), keyframes rename or delete per mapping (op 2), data-attrs (op 4), class names (op 5), storage key strings (op 6), dev flags (op 7), dead scope-rule blocks `.aqb-editor`/`.aqb-layout` (op 8). ~148 template literals with static `aqb-`/`--aqb-`/`data-aqb-`/`aqb:trace:` prefix handled by ops 4/5/6/7 auto-swap. 3 Category B sites (design-namespace remap) applied from `manual_edits` whitelist. 6 Gate-1-flagged auto-swap sites verified. | P2b |
 | **P4 (gate)** | Codex Gate 2 on cumulative P2+P2b+P3 diff. Delete old `--aqb-*` / `--ls-*` / `--accent-*` definitions from `themes/default.css`. Delete `PagesTab.css` dark-override block (`.pages-panel` scope, DESIGN.md-violating shadows of renamed tokens). Fix DARK_THEME_SHIM in `components/Canvas/Canvas.css` to light canonical (file kept, dark hex values replaced with DESIGN.md canonical). | P3 + Codex Gate 2 |
 | **P5** | Delete `CSS_CLASSES` constant from `shared/constants/config.ts` (and any `shared/constants/index.ts:36` re-export line). (`themes/index.ts` + `themeMode` + `storageKeys.THEME` already deleted in P2b. Orphan keyframe refs already deleted by codemod op 2 `action:delete` in P3.) | P4 |
 | **P6** | Extend `storageMigration.ts` with `migrateAqbKeys()` (Section 4.2). Wire into `AquibraStudio.tsx:19` AFTER the existing `migrateStorageKeys()` call. Add `AQB_MIGRATION_FLAG_V1` entry to `storageKeys.ts`. | P3 |
@@ -403,7 +430,7 @@ Per inventory recommended defenses ("Run Codex on the architecture BEFORE writin
 | # | Risk | Likelihood | Impact | Detection | Mitigation |
 |---|---|---|---|---|---|
 | R1 | Mapping dedups two tokens that serve different visual roles | Medium | High | Codex Gate 1. Value comparison in mapping `reason` field. | If values differ beyond perceptual threshold, split into two canonical names. Don't force-merge. |
-| R2 | Codemod misses a template-literal pattern, leaves `--aqb-${id}` in source | Low | High | Codemod AST detection + fail-loud on any `${` inside aqb-prefixed strings. 9 manual edits explicitly whitelisted. | Whitelist is positive allowlist — codemod errors on any template literal NOT whitelisted. |
+| R2 | Codemod misses a template-literal pattern, leaves `aqb-` in source | Low | High | Ops 4/5/6/7 handle template literals with static `aqb-*` prefix automatically (Category A). 3 Category B sites (design-namespace remap) explicitly whitelisted. 6 Gate-1-flagged auto-swap sites reviewed by Codex. Abort fires on any hit matching none of those three buckets. | Final grep at P8 (`` `[^`]*aqb-[^`]*${` ``) must return empty. Whitelist is positive allowlist for Category B; automatic coverage for Category A provable by re-running the classification grep after P3. |
 | R3 | User's local state wiped on first post-rename boot | High if unmitigated | Medium | First-boot user sees empty recents, favorites, etc. | Migration shim (P6) runs before any component reads storage. |
 | R4 | `--buildrick-design-*` invariant violated — JS writes chrome tokens | Medium | High | Grep gate at P4 + P8: `setProperty("--buildrick-(?!design-)` must be empty. | Non-empty → either rename JS source to emit `--buildrick-design-X`, or remove the JS write if chrome-intended. |
 | R5 | `--accent-*` fold misses semantic difference between `--accent-hover` and `--buildrick-accent-hover` | Low | Medium | Codex Gate 1 challenges `--accent-*` rows specifically. | 7 tokens, trivial to line-review at `themes/default.css:69-74 + 413`. |
