@@ -2538,26 +2538,26 @@
   background: var(--aqb-bg-subtle);
   border: 1px solid var(--aqb-border);
 }
-/* Page-type thumbs — flat neutral surfaces, no gradients (DESIGN.md) */
-.pages-panel .pg-row__thumb--t-hero    { background: var(--aqb-bg-subtle); }
-.pages-panel .pg-row__thumb--t-about   { background: var(--aqb-bg-subtle); }
-.pages-panel .pg-row__thumb--t-blog    { background: var(--aqb-bg-subtle); }
-.pages-panel .pg-row__thumb--t-contact { background: var(--aqb-bg-subtle); }
-.pages-panel .pg-row__thumb--t-pricing { background: var(--aqb-bg-subtle); }
-.pages-panel .pg-row__thumb--t-ext     { background: var(--aqb-bg-subtle); }
+/* Page-type thumbs — prototype gradient palette */
+.pages-panel .pg-row__thumb--t-hero    { background: linear-gradient(180deg, #1b2950, #223070 40%, #0c0c14 100%); }
+.pages-panel .pg-row__thumb--t-about   { background: linear-gradient(180deg, #222833, #13151a 60%); }
+.pages-panel .pg-row__thumb--t-blog    { background: linear-gradient(180deg, #191721, #221f2b 70%); }
+.pages-panel .pg-row__thumb--t-contact { background: linear-gradient(180deg, #0f1a2e, #0a1424); }
+.pages-panel .pg-row__thumb--t-pricing { background: linear-gradient(180deg, #1a1f14, #131509); }
+.pages-panel .pg-row__thumb--t-ext     { background: linear-gradient(135deg, #222, #111); }
 .pages-panel .pg-row__thumb-ghost {
   position: absolute;
   top: 4px;
   left: 4px;
   right: 4px;
   height: 2px;
-  background: var(--aqb-border-medium);
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 1px;
 }
 .pages-panel .pg-row__thumb-ghost + .pg-row__thumb-ghost {
   top: 9px;
   width: 70%;
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* Inline monospace slug next to page name */
