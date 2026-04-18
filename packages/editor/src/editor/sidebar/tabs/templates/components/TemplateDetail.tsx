@@ -11,6 +11,7 @@ interface TemplateDetailProps {
   template: TemplateItem;
   onApplyToCurrent: (id: string) => void;
   onAddAsNewPage: (id: string) => void;
+  onPreview: (id: string) => void;
   onCancel: () => void;
   previewState?: "loading" | "error" | "ready";
   onPreviewRetry?: () => void;
@@ -20,6 +21,7 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
   template,
   onApplyToCurrent,
   onAddAsNewPage,
+  onPreview,
   onCancel,
   previewState = "ready",
   onPreviewRetry,
@@ -91,6 +93,12 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
             </button>
           </>
         )}
+        <button
+          className="tpl-detail-btn tpl-detail-btn--ghost"
+          onClick={() => onPreview(template.id)}
+        >
+          Preview
+        </button>
         <button
           className="tpl-detail-btn tpl-detail-btn--ghost"
           onClick={onCancel}

@@ -4,5 +4,5 @@
  */
 export { TemplatesTab } from "./TemplatesTab";
 export type { TemplatesTabProps } from "./TemplatesTab";
-export type { TemplateItem, RecentTemplate, TopLevelGroup, SiteCategory } from "./templatesData";
+export type { TemplateItem, RecentTemplate, SiteCategory } from "./templatesData";
 export { addRecentTemplate, getRecentTemplates, getTemplateById } from "./templatesData";

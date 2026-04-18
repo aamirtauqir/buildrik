@@ -33,8 +33,6 @@ export interface TemplateItem {
   subCategory?: string;
 }
 
-export type TopLevelGroup = "sections" | "pages" | "mySaves";
-
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================

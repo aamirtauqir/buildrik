@@ -11,6 +11,7 @@ import { useToast } from "../../../../shared/ui/Toast";
 import { type TemplateItem, SITE_CATEGORY_PILLS, SITE_TEMPLATES, TEMPLATE_TYPE_PILLS, SUB_CATEGORY_TAGS, type SiteCategory, type TemplateType } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
 import { ReplaceModal, ProModal, CreatePageConfirmModal, CreatePageSuccessModal, CreatePageErrorModal } from "./TemplatesTabModals";
+import { TemplatePreviewModal } from "./TemplatePreviewModal";
 import { useTemplatePersistence } from "./hooks/useTemplatePersistence";
 import { useTemplateApply } from "./hooks/useTemplateApply";
 import { useTemplateSelection } from "./hooks/useTemplateSelection";
@@ -54,7 +55,6 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     resetStyles, setResetStyles,
     hasExistingContent,
     pendingId,
-    requestApply,
     startApply,
     handleRetry,
   } = useTemplateApply(composer);
@@ -126,7 +126,6 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     setAppliedId(null);
     requestAnimationFrame(() => {
       setAppliedId(id);
-      sel.setSelectedId(null);
       setResetStyles(false);
       addToast({ message: `"${t.name}" applied successfully`, variant: "success" });
       recordTemplateApplied(t);
@@ -293,6 +292,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
                 template={detailTemplate}
                 onApplyToCurrent={handleApplyToCurrent}
                 onAddAsNewPage={handleAddAsNewPage}
+                onPreview={(id) => sel.setPreviewId(id)}
                 onCancel={() => sel.setDetailId(null)}
               />
             )}
@@ -377,6 +377,18 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       {showProgress && (
         <ApplyProgressOverlay templateName={tName} onComplete={handleProgressComplete} />
       )}
+      {sel.previewId && (() => {
+        const previewTemplate = SITE_TEMPLATES.find((t) => t.id === sel.previewId);
+        if (!previewTemplate) return null;
+        return (
+          <TemplatePreviewModal
+            template={previewTemplate}
+            onBack={() => sel.setPreviewId(null)}
+            onUseTemplate={(t) => { sel.setPreviewId(null); handleApplyToCurrent(t.id); }}
+            hasExistingContent={hasExistingContent}
+          />
+        );
+      })()}
     </div>
   );
 };

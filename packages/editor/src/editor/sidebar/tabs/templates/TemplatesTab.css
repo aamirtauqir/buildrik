@@ -480,28 +480,7 @@
   padding: 0;
 }
 
-/* ── Apply progress overlay ── */
-.tpl-apply-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(248, 250, 252, 0.85);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 20;
-}
-.tpl-apply-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
-  width: 420px;
-  border: 1px solid var(--ls-border-light, #E2E8F0);
-  border-radius: 8px;
-  background: var(--ls-bg-card, #FFFFFF);
-}
+/* ── Apply spinner (used in TemplateDetail preview area) ── */
 .tpl-apply-spinner {
   width: 32px;
   height: 32px;
@@ -512,35 +491,6 @@
 }
 @keyframes tpl-spin {
   to { transform: rotate(360deg); }
-}
-.tpl-apply-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--ls-text-primary);
-  margin: 0;
-}
-.tpl-apply-bar {
-  width: 240px;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--ls-bg-subtle, #F1F5F9);
-  overflow: hidden;
-}
-.tpl-apply-bar-fill {
-  height: 100%;
-  border-radius: 2px;
-  background: var(--ls-accent, #1D4ED8);
-  animation: tpl-progress 2s ease-in-out infinite;
-}
-@keyframes tpl-progress {
-  0% { width: 0%; }
-  50% { width: 70%; }
-  100% { width: 100%; }
-}
-.tpl-apply-sub {
-  font-size: 13px;
-  color: var(--ls-text-muted, #475569);
-  margin: 0;
 }
 
 /* ── Modal overlay (ReplaceModal + ProModal) ── */
@@ -680,41 +630,6 @@
   color: var(--ls-text-primary);
 }
 
-/* ── Loading skeleton (l5Zoz) ── */
-.tpl-skeleton-wrap {
-  flex: 1;
-  overflow: hidden;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.tpl-skeleton-pills {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.tpl-skeleton-pill {
-  height: 28px;
-  border-radius: 20px;
-  background: var(--ls-bg-subtle, #F1F5F9);
-  animation: tpl-pulse 1.4s ease-in-out infinite;
-}
-.tpl-skeleton-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-.tpl-skeleton-card {
-  height: 140px;
-  border-radius: 8px;
-  background: var(--ls-bg-subtle, #F1F5F9);
-  animation: tpl-pulse 1.4s ease-in-out infinite;
-}
-@keyframes tpl-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
 
 /* ── New page context header ── */
 .tpl-newpage-header {

@@ -1,5 +1,5 @@
 /**
- * useTemplateSelection — selected/preview state, modal flags, and filtered list.
+ * useTemplateSelection — preview/detail state, modal flags, and filtered list.
  * @license BSD-3-Clause
  */
 
@@ -14,8 +14,6 @@ import {
 const PAGE_SIZE = 12;
 
 export interface UseTemplateSelectionReturn {
-  selectedId: string | null;
-  setSelectedId: React.Dispatch<React.SetStateAction<string | null>>;
   previewId: string | null;
   setPreviewId: React.Dispatch<React.SetStateAction<string | null>>;
   /** Currently expanded card → drives the inline TemplateDetail panel. */
@@ -47,7 +45,6 @@ export interface UseTemplateSelectionReturn {
 }
 
 export function useTemplateSelection(showProgress: boolean): UseTemplateSelectionReturn {
-  const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [previewId, setPreviewId] = React.useState<string | null>(null);
   const [detailId, setDetailId] = React.useState<string | null>(null);
   const [showReplace, setShowReplace] = React.useState(false);
@@ -94,7 +91,6 @@ export function useTemplateSelection(showProgress: boolean): UseTemplateSelectio
         if (showUpgrade) { setShowUpgrade(false); return; }
         if (showReplace) { setShowReplace(false); return; }
         if (detailId) { setDetailId(null); return; }
-        if (selectedId) { setSelectedId(null); return; }
         return;
       }
       if (inInput) return;
@@ -110,7 +106,7 @@ export function useTemplateSelection(showProgress: boolean): UseTemplateSelectio
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [previewId, showUpgrade, showReplace, detailId, selectedId, filteredTemplates, showProgress]);
+  }, [previewId, showUpgrade, showReplace, detailId, filteredTemplates, showProgress]);
 
   const clearAll = React.useCallback(() => {
     setSearchQ("");
@@ -122,8 +118,6 @@ export function useTemplateSelection(showProgress: boolean): UseTemplateSelectio
   }, []);
 
   return {
-    selectedId,
-    setSelectedId,
     previewId,
     setPreviewId,
     detailId,

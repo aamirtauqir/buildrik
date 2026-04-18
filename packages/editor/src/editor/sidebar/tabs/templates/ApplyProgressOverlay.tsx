@@ -41,10 +41,7 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
     <div className="tmpl-progress" role="status" aria-label="Applying template">
       <div className="tmpl-progress__inner">
         <h3 className="tmpl-progress__title">Applying {templateName}...</h3>
-        <div className="tmpl-progress__bar">
-          <div className="tmpl-progress__fill tmpl-progress__fill--indeterminate" />
-        </div>
-        <span className="tmpl-progress__spinner" style={{ display: "block", margin: "8px auto 0" }} />
+        <span className="tmpl-progress__spinner" style={{ width: 24, height: 24, borderWidth: 2 }} />
         {onCancel && (
           <button className="tmpl-progress__cancel" onClick={onCancel}>
             Cancel

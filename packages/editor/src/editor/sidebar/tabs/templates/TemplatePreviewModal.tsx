@@ -103,28 +103,22 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
 }) => {
   const [viewport, setViewport] = React.useState<ViewportMode>("desktop");
   const [isClosing, setIsClosing] = React.useState(false);
-  const iframeRef = React.useRef<HTMLIFrameElement>(null);
   const modalRef = React.useRef<HTMLDivElement>(null);
 
   const currentViewport = VIEWPORT_CONFIGS.find((v) => v.id === viewport) ?? VIEWPORT_CONFIGS[0];
   const sectionCount = getSectionCount(template.html);
 
-  // Render HTML preview in iframe
-  React.useEffect(() => {
-    if (!iframeRef.current) return;
-    const doc = iframeRef.current.contentDocument;
-    if (!doc) return;
-    doc.open();
-    doc.write(`<!DOCTYPE html><html><head>
-      <meta charset="utf-8"><meta name="viewport" content="width=${currentViewport.frameWidth * 5}">
+  const srcDoc = React.useMemo(() => {
+    const w = currentViewport.frameWidth * 5;
+    return `<!DOCTYPE html><html><head>
+      <meta charset="utf-8"><meta name="viewport" content="width=${w}">
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { width: 100%; height: 100%; background: #080810; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; overflow: hidden; }
-        .tmpl-scale-root { transform: scale(0.2); transform-origin: top left; width: ${currentViewport.frameWidth * 5}px; }
+        .tmpl-scale-root { transform: scale(0.2); transform-origin: top left; width: ${w}px; }
       </style>
-    </head><body><div class="tmpl-scale-root">${template.html}</div></body></html>`);
-    doc.close();
+    </head><body><div class="tmpl-scale-root">${template.html}</div></body></html>`;
   }, [template.html, currentViewport.frameWidth]);
 
   const handleClose = React.useCallback(() => {
@@ -210,10 +204,10 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
         <div className="tmpl-preview__canvas">
           <div className="tmpl-preview__frame" style={{ width: currentViewport.frameWidth }}>
             <iframe
-              ref={iframeRef}
               className="tmpl-preview__iframe"
               title={`Preview: ${template.name}`}
               sandbox="allow-same-origin"
+              srcDoc={srcDoc}
             />
           </div>
         </div>
