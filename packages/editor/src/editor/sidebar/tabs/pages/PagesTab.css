@@ -2173,7 +2173,44 @@
  * ══════════════════════════════════════════════════════════════════════════ */
 
 .pages-panel {
-  /* Explicit dark tokens — don't inherit from whatever the sidebar root is */
+  /* ── Dark surface layer (editor chrome is dark-only per DESIGN.md) ── */
+  /* Override global --aqb-* light tokens with dark equivalents.
+     All downstream .pages-panel .pg-* rules consume these scoped values. */
+  --aqb-bg-app:    #0c0c14;
+  --aqb-bg-panel:  #14141f;
+  --aqb-bg-subtle: #1e1e28;
+  --aqb-bg-card:   #17171f;
+  --aqb-bg-elevated: #1e1e28;
+  --aqb-bg-hover:  rgba(255, 255, 255, 0.04);
+  --aqb-bg-active: rgba(255, 255, 255, 0.06);
+
+  --aqb-surface-1: #0f0f14;
+  --aqb-surface-2: #14141f;
+  --aqb-surface-3: #1e1e28;
+  --aqb-surface-4: #252531;
+  --aqb-surface-5: #2e2e38;
+
+  --aqb-text-primary:   #F5F5F0;
+  --aqb-text-secondary: #B8B5AD;
+  --aqb-text-tertiary:  #A09D96;
+  --aqb-text-muted:     #908D85;
+  --aqb-text-disabled:  #6b7280;
+
+  --aqb-border:        rgba(255, 255, 255, 0.08);
+  --aqb-border-medium: rgba(255, 255, 255, 0.12);
+  --aqb-border-strong: rgba(255, 255, 255, 0.15);
+  --aqb-border-light:  rgba(255, 255, 255, 0.05);
+  --aqb-border-subtle: rgba(255, 255, 255, 0.05);
+  --aqb-border-hover:  rgba(255, 255, 255, 0.15);
+
+  /* Semantic — bright variants for dark backgrounds */
+  --aqb-success:       #22c55e;
+  --aqb-success-light: rgba(34, 197, 94, 0.10);
+  --aqb-warning:       #f59e0b;
+  --aqb-warning-light: rgba(245, 158, 11, 0.10);
+  --aqb-error:         #ef4444;
+  --aqb-error-light:   rgba(239, 68, 68, 0.10);
+
   background: var(--aqb-bg-panel);
   color: var(--aqb-text-primary);
 }
