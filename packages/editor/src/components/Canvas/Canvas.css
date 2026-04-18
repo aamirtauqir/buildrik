@@ -5,35 +5,16 @@
  */
 
 /* ============================================
-   CSS Variables (can be overridden by Global Design Settings)
+   CANVAS-SCOPED TOKENS (do NOT redefine canonical)
+   ────────────────────────────────────────────
+   Same treatment as editor/canvas/Canvas.css — this file
+   was a legacy duplicate. Scoped to .aqb-canvas context so
+   it can no longer shadow the canonical light palette.
    ============================================ */
-:root {
-  /* ============================================
-     AQUIBRA BRAND COLORS - Single Source of Truth
-     Updated: Professional Blue Palette (Phase 4)
-     ============================================ */
-
-  /* Primary Blue (Professional Color) */
-  --aqb-primary: #2563EB;
-  --aqb-primary-light: #3B82F6;
-  --aqb-primary-dark: #1D4ED8;
-  --aqb-primary-subtle: #DBEAFE;
-
-  /* Legacy compatibility */
-  --aqb-secondary: #1D4ED8;
-  --aqb-accent: #10B981;
-
-  /* Canvas Content Colors (Light Theme) */
-  --aqb-bg: #ffffff;
-  --aqb-text: #18181B;
-  --aqb-text-muted: #71717A;
-  --aqb-border: #E4E4E7;
-
-  /* Canvas Wrapper */
-  --aqb-canvas-wrapper: #F8FAFC;
-  --aqb-canvas-content: #FFFFFF;
-  --aqb-font-family: Inter, system-ui, sans-serif;
-  --aqb-heading-font: Inter, system-ui, sans-serif;
+.aqb-canvas, .aqb-canvas-wrapper, [data-aqb-canvas] {
+  --aqb-canvas-wrapper-bg: var(--aqb-bg-panel);
+  --aqb-canvas-content-bg: var(--aqb-bg-canvas);
+  --aqb-heading-font: var(--aqb-font-family);
   --aqb-font-size: 16px;
   --aqb-heading-size: 32px;
   --aqb-line-height: 1.6;
@@ -970,12 +951,12 @@
 
 .aqb-drop-breadcrumb {
   animation: breadcrumbFadeIn 150ms ease-out forwards;
-  font-family: var(--aqb-font-family, Inter, system-ui, sans-serif);
+  font-family: var(--aqb-font-family);
 }
 
 /* Depth badge for nesting level indicator */
 .aqb-depth-badge {
-  font-family: var(--aqb-font-family, Inter, system-ui, sans-serif);
+  font-family: var(--aqb-font-family);
 }
 
 /* ============================================

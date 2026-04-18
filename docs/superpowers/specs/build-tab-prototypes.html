@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build Tab — Wireframe Prototypes (v3)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent: #2D6DFF;
+      --accent-bg: #DBEAFE;
+      --surface: #14141f;
+      --surface-elevated: #1c1c2a;
+      --surface-hover: #232335;
+      --surface-subtle: #1a1a26;
+      --surface-card: #ffffff;
+      --text-primary: #f4f4f5;
+      --text-secondary: #a1a1aa;
+      --text-muted: #6b6963;
+      --text-tertiary: #52525b;
+      --text-dark: #374151;
+      --text-dark-secondary: #64748b;
+      --text-dark-muted: #94a3b8;
+      --border: #27272a;
+      --border-subtle: #1f1f23;
+      --border-light: #e2e8f0;
+      --border-card: #d1d9e6;
+      --warning: #F59E0B;
+      --rail-w: 60px;
+      --spacing-2: 8px;
+      --spacing-3: 12px;
+      --spacing-4: 16px;
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      --radius-pill: 999px;
+      --font-ui: 'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Geist Mono', ui-monospace, monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--font-ui); background: #0a0a0f; color: var(--text-primary); min-height: 100vh; padding: 32px; }
+    h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+    h2 { font-size: 13px; font-weight: 400; color: var(--text-muted); margin-bottom: 28px; }
+    h2 span { background: var(--warning); color: #000; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: var(--radius-pill); margin-left: 8px; }
+
+    .sec-label { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+
+    .wireframe-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 32px; }
+    .wireframe { background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); overflow: hidden; }
+    .wireframe-header { padding: 14px var(--spacing-4); border-bottom: 1px solid var(--border-subtle); background: rgba(255,255,255,0.02); display: flex; align-items: center; justify-content: space-between; }
+    .wireframe-header h3 { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+    .wireframe-header p { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: var(--radius-pill); background: var(--accent); color: #fff; }
+
+    .panel-shell { display: flex; height: 620px; }
+
+    /* Rail */
+    .rail { width: var(--rail-w); background: var(--surface); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; align-items: center; padding: 8px 0; gap: 2px; flex-shrink: 0; }
+    .rail-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); cursor: pointer; color: var(--text-tertiary); position: relative; transition: background 0.12s, color 0.12s; }
+    .rail-icon:hover { background: var(--surface-hover); color: var(--text-secondary); }
+    .rail-icon.active { background: var(--surface-elevated); color: var(--accent); }
+    .rail-icon.active::before { content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 2px; background: var(--accent); border-radius: 0 2px 2px 0; }
+    .rail-divider { width: 28px; height: 1px; background: var(--border); margin: 4px 0; }
+    .rail-spacer { flex: 1; }
+    .rail-icon svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Panel */
+    .panel { flex: 1; display: flex; flex-direction: column; background: var(--surface-elevated); overflow: hidden; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 0 var(--spacing-4); height: 44px; border-bottom: 1px solid var(--border-subtle); flex-shrink: 0; }
+    .panel-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .panel-actions { display: flex; align-items: center; gap: 4px; }
+    .icon-btn { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; border-radius: var(--radius-sm); cursor: pointer; color: var(--text-tertiary); transition: background 0.12s, color 0.12s; }
+    .icon-btn:hover { background: var(--surface-hover); color: var(--text-secondary); }
+    .icon-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Panel body */
+    .panel-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* Mode switch */
+    .mode-switch { display: flex; gap: 4px; padding: 10px var(--spacing-4) 6px; flex-shrink: 0; }
+    .mode-pill { flex: 1; height: 30px; border: none; border-radius: var(--radius-pill); background: transparent; font-size: 13px; font-weight: 400; color: var(--text-tertiary); cursor: pointer; transition: all 0.12s; font-family: inherit; }
+    .mode-pill.active { background: var(--surface-card); border: 1px solid var(--border-card); font-weight: 500; color: var(--text-dark); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+    /* Search bar */
+    .search-wrap { padding: 0 var(--spacing-4) 8px; flex-shrink: 0; }
+    .search-bar { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 10px; background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); transition: border-color 0.12s; }
+    .search-bar:focus-within { border-color: var(--accent); }
+    .search-bar svg { width: 15px; height: 15px; stroke: var(--text-tertiary); fill: none; stroke-width: 1.8; flex-shrink: 0; }
+    .search-bar input { flex: 1; background: transparent; border: none; outline: none; font-size: 13px; color: var(--text-primary); font-family: inherit; }
+    .search-bar input::placeholder { color: var(--text-tertiary); }
+    .kbd-hint { font-size: 10px; font-family: var(--font-mono); color: var(--text-tertiary); background: var(--surface-hover); padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border); }
+
+    /* Scrollable area */
+    .panel-scroll { flex: 1; overflow-y: auto; padding: 0 var(--spacing-4) var(--spacing-4); scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+    .panel-scroll::-webkit-scrollbar { width: 4px; }
+    .panel-scroll::-webkit-scrollbar-track { background: transparent; }
+    .panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* My Components */
+    .mycomp-hd { display: flex; align-items: center; gap: 6px; padding: 8px 0 4px; cursor: pointer; flex-shrink: 0; }
+    .mycomp-hd:hover { background: var(--surface-hover); border-radius: var(--radius-sm); }
+    .mycomp-chev { width: 14px; height: 14px; stroke: var(--text-tertiary); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.15s; flex-shrink: 0; }
+    .mycomp-chev.open { transform: rotate(90deg); }
+    .mycomp-label { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+    .mycomp-body { overflow: hidden; max-height: 0; transition: max-height 0.2s; }
+    .mycomp-body.open { max-height: 200px; }
+    .mycomp-body-inner { padding: 0 0 8px; }
+    .mycomp-empty { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+    /* Divider */
+    .divider { height: 1px; background: var(--border-subtle); margin: 6px 0; flex-shrink: 0; }
+
+    /* Category accordion */
+    .cat-item { border-bottom: 1px solid var(--border-subtle); }
+    .cat-item:last-child { border-bottom: none; }
+    .cat-row { display: flex; align-items: center; gap: 8px; height: 40px; cursor: pointer; background: transparent; transition: background 0.1s; user-select: none; }
+    .cat-row:hover { background: var(--surface-hover); }
+    .cat-name { font-size: 13px; font-weight: 500; color: var(--text-secondary); flex: 1; transition: color 0.1s; }
+    .cat-row.open .cat-name { color: var(--text-primary); }
+    .cat-chev { width: 12px; height: 12px; stroke: var(--text-tertiary); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.15s; flex-shrink: 0; }
+    .cat-row.open .cat-chev { transform: rotate(90deg); }
+    .cat-body { overflow: hidden; max-height: 0; transition: max-height 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+    .cat-body.open { max-height: 600px; }
+    .cat-body-inner { padding: 4px 0 8px; }
+
+    /* Element grid */
+    .el-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .el-card { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; border-radius: var(--radius-sm); background: var(--surface-subtle); cursor: grab; transition: all 0.12s; }
+    .el-card:hover { background: var(--accent-bg); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .el-card:active { cursor: grabbing; transform: scale(0.95); }
+    .el-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .el-icon { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; }
+    .el-icon svg { width: 20px; height: 20px; stroke: var(--text-muted); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.12s; }
+    .el-card:hover .el-icon svg { stroke: var(--accent); }
+    .el-name { font-size: 11px; color: var(--text-muted); font-weight: 400; text-align: center; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; transition: color 0.12s; }
+    .el-card:hover .el-name { color: var(--accent); }
+
+    /* Section chips */
+    .sec-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .sec-chip { height: 28px; padding: 0 12px; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--surface-card); font-size: 12px; font-weight: 500; color: var(--text-dark-secondary); cursor: pointer; white-space: nowrap; font-family: inherit; transition: all 0.12s; }
+    .sec-chip:hover { border-color: var(--accent); color: var(--accent); }
+    .sec-chip.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+    /* Section cards */
+    .sec-card { height: 80px; padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--surface-card); cursor: grab; display: flex; flex-direction: column; gap: 4px; transition: border-color 0.12s, box-shadow 0.12s; margin-bottom: 8px; }
+    .sec-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .sec-card-name { font-size: 13px; font-weight: 600; color: var(--text-dark); }
+    .sec-card-sub { font-size: 11px; color: var(--text-dark-muted); line-height: 1.4; }
+
+    /* Search results */
+    .search-group { margin-bottom: 12px; }
+    .search-group-hdr { display: flex; align-items: center; justify-content: space-between; padding: 4px 0 6px; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); }
+    .search-count { font-family: var(--font-mono); font-size: 10px; padding: 1px 5px; border-radius: 3px; background: var(--surface-subtle); color: var(--text-tertiary); }
+
+    /* No results */
+    .no-results { display: flex; flex-direction: column; align-items: center; padding: 28px 14px; gap: 8px; text-align: center; }
+    .no-results svg { width: 32px; height: 32px; stroke: var(--text-tertiary); fill: none; stroke-width: 1.4; margin-bottom: 4px; }
+    .no-results h4 { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .no-results p { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+    /* ─────────────────────────────────────────────────────────
+       Bottom strip: Tips + Footer hint — OUTSIDE scroll, always visible
+       ───────────────────────────────────────────────────────── */
+    .panel-bottom {
+      border-top: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    /* Tips — inside bottom strip */
+    .tips-hd { display: flex; align-items: center; gap: 6px; padding: 8px var(--spacing-4) 4px; cursor: pointer; flex-shrink: 0; }
+    .tips-hd:hover { background: var(--surface-hover); }
+    .tips-hd svg { width: 12px; height: 12px; stroke: var(--warning); fill: none; stroke-width: 2; flex-shrink: 0; }
+    .tips-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); flex: 1; }
+    .tips-meta { font-size: 10px; font-family: var(--font-mono); color: var(--text-tertiary); }
+    .tips-nav-btn { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; cursor: pointer; color: var(--text-tertiary); font-size: 13px; border-radius: 3px; transition: background 0.1s; flex-shrink: 0; }
+    .tips-nav-btn:hover { background: var(--surface-hover); color: var(--text-secondary); }
+    .tip-card { margin: 0 var(--spacing-4) 4px; padding: 8px 10px; background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 12px; color: var(--text-secondary); line-height: 1.5; flex-shrink: 0; }
+    .tip-card strong { color: var(--text-primary); }
+    .tip-dots { display: flex; justify-content: center; gap: 5px; padding: 0 var(--spacing-4) 8px; flex-shrink: 0; }
+    .tip-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text-tertiary); border: none; cursor: pointer; transition: background 0.12s; padding: 0; }
+    .tip-dot.on { background: var(--accent); }
+
+    /* Footer hint — inside bottom strip */
+    .panel-footer-hint { display: flex; align-items: center; gap: 6px; padding: 8px var(--spacing-4); font-size: 11px; color: var(--text-tertiary); flex-shrink: 0; }
+    .panel-footer-hint svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
+
+    /* Change callout */
+    .change-callout { display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.15); border-radius: var(--radius-md); margin: 0 0 6px; flex-shrink: 0; }
+    .change-callout svg { width: 14px; height: 14px; stroke: var(--warning); fill: none; stroke-width: 2; flex-shrink: 0; margin-top: 1px; }
+    .change-callout-text { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+    .change-callout-text strong { color: var(--text-primary); }
+
+    /* Section hint */
+    .sec-hint { display: flex; flex-direction: column; gap: 2px; padding: 6px 0 4px; }
+    .sec-hint-primary { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+    .sec-hint-muted { font-size: 10px; color: var(--text-tertiary); }
+  </style>
+</head>
+<body>
+
+<h1>Build Tab — Wireframe Prototypes (v3)</h1>
+<h2>Quick Picks removed · AI removed · Tips in bottom strip · Footer in bottom strip <span>v3</span></h2>
+
+<div class="wireframe-grid">
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SCREEN 1: Elements Mode — Default -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="wireframe">
+    <div class="wireframe-header">
+      <div>
+        <h3>1. Elements Mode — Default</h3>
+        <p>Tips + Footer in bottom strip · My Components + Categories scroll</p>
+      </div>
+      <span class="badge">Default</span>
+    </div>
+    <div class="panel-shell">
+      <div class="rail">
+        <div class="rail-icon active"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="rail-divider"></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="rail-spacer"></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Add</span>
+          <div class="panel-actions">
+            <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M12 2L12 22M12 2L8 6M12 2L16 6"/></svg></button>
+            <button class="icon-btn"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <!-- Mode switch + Search -->
+          <div class="mode-switch">
+            <button class="mode-pill active">Elements</button>
+            <button class="mode-pill">Sections</button>
+          </div>
+          <div class="search-wrap">
+            <div class="search-bar">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" placeholder="Search elements..." />
+              <span class="kbd-hint">/</span>
+            </div>
+          </div>
+
+          <!-- Scrollable: My Components + Categories -->
+          <div class="panel-scroll">
+            <div class="change-callout">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <div class="change-callout-text"><strong>Quick Picks removed.</strong> Elements pinned via right-click from category grids.</div>
+            </div>
+
+            <div class="mycomp-hd">
+              <svg class="mycomp-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+              <span class="mycomp-label">My Components</span>
+            </div>
+
+            <div class="divider"></div>
+            <div class="sec-label">CATEGORIES</div>
+
+            <div class="cat-item">
+              <div class="cat-row"><span class="cat-name">Layout</span><svg class="cat-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </div>
+
+            <div class="cat-item">
+              <div class="cat-row open">
+                <span class="cat-name">Text &amp; Buttons</span>
+                <svg class="cat-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <div class="cat-body open">
+                <div class="cat-body-inner">
+                  <div class="el-grid">
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg></div><span class="el-name">Heading</span></div>
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg></div><span class="el-name">Paragraph</span></div>
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="2"/></svg></div><span class="el-name">Button</span></div>
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/></svg></div><span class="el-name">Link</span></div>
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg></div><span class="el-name">Divider</span></div>
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><span class="el-name">Badge</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cat-item">
+              <div class="cat-row"><span class="cat-name">Media</span><svg class="cat-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </div>
+
+            <div class="cat-item">
+              <div class="cat-row"><span class="cat-name">Forms</span><svg class="cat-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </div>
+          </div>
+
+          <!-- Bottom strip: Tips + Footer — always visible -->
+          <div class="panel-bottom">
+            <div class="tips-hd">
+              <svg viewBox="0 0 24 24"><path d="M9 21h6M12 3a6 6 0 0 1 6 6c0 2.22-1.2 4.16-3 5.2V17a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1v-2.8C7.2 13.16 6 11.22 6 9a6 6 0 0 1 6-6z"/></svg>
+              <span class="tips-label">Pro Tips</span>
+              <span class="tips-meta">1 / 5</span>
+              <button class="tips-nav-btn">‹</button>
+              <button class="tips-nav-btn">›</button>
+              <button class="tips-nav-btn">˄</button>
+              <button class="tips-nav-btn">✕</button>
+            </div>
+            <div class="tip-card"><strong>Drag to canvas</strong> — Drag an element card onto the canvas to place it.</div>
+            <div class="tip-dots">
+              <button class="tip-dot on"></button>
+              <button class="tip-dot"></button>
+              <button class="tip-dot"></button>
+              <button class="tip-dot"></button>
+              <button class="tip-dot"></button>
+            </div>
+            <div class="panel-footer-hint">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Drag elements onto canvas or click to insert
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SCREEN 2: Category Accordion — Layout Open -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="wireframe">
+    <div class="wireframe-header">
+      <div>
+        <h3>2. Category Accordion — Layout Open</h3>
+        <p>Last-in-wins: opening Layout closes Text &amp; Buttons</p>
+      </div>
+      <span class="badge">State</span>
+    </div>
+    <div class="panel-shell">
+      <div class="rail">
+        <div class="rail-icon active"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="rail-divider"></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="rail-spacer"></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Add</span>
+          <div class="panel-actions">
+            <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M12 2L12 22M12 2L8 6M12 2L16 6"/></svg></button>
+            <button class="icon-btn"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="mode-switch">
+            <button class="mode-pill active">Elements</button>
+            <button class="mode-pill">Sections</button>
+          </div>
+          <div class="search-wrap">
+            <div class="search-bar">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" placeholder="Search elements..." />
+              <span class="kbd-hint">/</span>
+            </div>
+          </div>
+          <div class="panel-scroll">
+            <div class="mycomp-hd">
+              <svg class="mycomp-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+              <span class="mycomp-label">My Components</span>
+            </div>
+            <div class="divider"></div>
+            <div class="sec-label">CATEGORIES</div>
+
+            <!-- Layout OPEN -->
+            <div class="cat-item">
+              <div class="cat-row open">
+                <span class="cat-name">Layout</span>
+                <svg class="cat-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <div class="cat-body open">
+                <div class="cat-body-inner">
+                  <div class="el-grid">
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><span class="el-name">Container</span></div>
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="8" rx="1"/></svg></div><span class="el-name">Section</span></div>
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="6" height="18" rx="1"/></svg></div><span class="el-name">Grid</span></div>
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="1"/></svg></div><span class="el-name">Row</span></div>
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="18" rx="1"/></svg></div><span class="el-name">Column</span></div>
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><span class="el-name">Stack</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cat-item">
+              <div class="cat-row"><span class="cat-name">Text &amp; Buttons</span><svg class="cat-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </div>
+            <div class="cat-item">
+              <div class="cat-row"><span class="cat-name">Media</span><svg class="cat-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </div>
+            <div class="cat-item">
+              <div class="cat-row"><span class="cat-name">Forms</span><svg class="cat-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </div>
+          </div>
+          <div class="panel-bottom">
+            <div class="tips-hd">
+              <svg viewBox="0 0 24 24"><path d="M9 21h6M12 3a6 6 0 0 1 6 6c0 2.22-1.2 4.16-3 5.2V17a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1v-2.8C7.2 13.16 6 11.22 6 9a6 6 0 0 1 6-6z"/></svg>
+              <span class="tips-label">Pro Tips</span>
+              <span class="tips-meta">1 / 5</span>
+              <button class="tips-nav-btn">‹</button>
+              <button class="tips-nav-btn">›</button>
+              <button class="tips-nav-btn">˄</button>
+              <button class="tips-nav-btn">✕</button>
+            </div>
+            <div class="tip-card"><strong>Drag to canvas</strong> — Drag an element card onto the canvas to place it.</div>
+            <div class="tip-dots">
+              <button class="tip-dot on"></button>
+              <button class="tip-dot"></button>
+              <button class="tip-dot"></button>
+              <button class="tip-dot"></button>
+              <button class="tip-dot"></button>
+            </div>
+            <div class="panel-footer-hint">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Drag elements onto canvas or click to insert
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SCREEN 3: Search — Results Found -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="wireframe">
+    <div class="wireframe-header">
+      <div>
+        <h3>3. Search — Results Found</h3>
+        <p>Categorized results with hit counts · No AI card</p>
+      </div>
+      <span class="badge">Search</span>
+    </div>
+    <div class="panel-shell">
+      <div class="rail">
+        <div class="rail-icon active"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="rail-divider"></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="rail-spacer"></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Add</span>
+          <div class="panel-actions">
+            <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M12 2L12 22M12 2L8 6M12 2L16 6"/></svg></button>
+            <button class="icon-btn"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="mode-switch">
+            <button class="mode-pill active">Elements</button>
+            <button class="mode-pill">Sections</button>
+          </div>
+          <div class="search-wrap">
+            <div class="search-bar" style="border-color: var(--accent);">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" placeholder="Search elements..." value="button" style="color: var(--text-primary);" />
+              <span class="kbd-hint">Esc ✕</span>
+            </div>
+          </div>
+          <div class="panel-scroll">
+            <div class="search-group">
+              <div class="search-group-hdr">Text &amp; Buttons <span class="search-count">4</span></div>
+              <div class="el-grid">
+                <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="2"/></svg></div><span class="el-name">Button</span></div>
+                <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><line x1="8" y1="16" x2="16" y2="16"/></svg></div><span class="el-name">Button Group</span></div>
+                <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg></div><span class="el-name">Icon Button</span></div>
+                <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><span class="el-name">Button + Badge</span></div>
+              </div>
+            </div>
+            <div class="search-group">
+              <div class="search-group-hdr">Forms <span class="search-count">2</span></div>
+              <div class="el-grid">
+                <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="8" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/></svg></div><span class="el-name">Form</span></div>
+                <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/></svg></div><span class="el-name">Search Input</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="panel-bottom">
+            <div class="tips-hd">
+              <svg viewBox="0 0 24 24"><path d="M9 21h6M12 3a6 6 0 0 1 6 6c0 2.22-1.2 4.16-3 5.2V17a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1v-2.8C7.2 13.16 6 11.22 6 9a6 6 0 0 1 6-6z"/></svg>
+              <span class="tips-label">Pro Tips</span>
+              <span class="tips-meta">1 / 5</span>
+              <button class="tips-nav-btn">‹</button>
+              <button class="tips-nav-btn">›</button>
+              <button class="tips-nav-btn">˄</button>
+              <button class="tips-nav-btn">✕</button>
+            </div>
+            <div class="tip-card"><strong>Drag to canvas</strong> — Drag an element card onto the canvas to place it.</div>
+            <div class="tip-dots">
+              <button class="tip-dot on"></button>
+              <button class="tip-dot"></button>
+              <button class="tip-dot"></button>
+              <button class="tip-dot"></button>
+              <button class="tip-dot"></button>
+            </div>
+            <div class="panel-footer-hint">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Drag elements onto canvas or click to insert
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SCREEN 4: Search — No Results -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="wireframe">
+    <div class="wireframe-header">
+      <div>
+        <h3>4. Search — No Results</h3>
+        <p>Empty state — no AI card in v3</p>
+      </div>
+      <span class="badge">Edge Case</span>
+    </div>
+    <div class="panel-shell">
+      <div class="rail">
+        <div class="rail-icon active"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="rail-divider"></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="rail-spacer"></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Add</span>
+          <div class="panel-actions">
+            <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M12 2L12 22M12 2L8 6M12 2L16 6"/></svg></button>
+            <button class="icon-btn"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="mode-switch">
+            <button class="mode-pill active">Elements</button>
+            <button class="mode-pill">Sections</button>
+          </div>
+          <div class="search-wrap">
+            <div class="search-bar" style="border-color: var(--accent);">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" placeholder="Search elements..." value="xyzzyx" />
+              <span class="kbd-hint">Esc ✕</span>
+            </div>
+          </div>
+          <div class="panel-scroll">
+            <div class="no-results">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <h4>No elements found</h4>
+              <p>Try a different keyword or browse categories below.</p>
+              <button style="font-size:12px;font-weight:500;color:var(--accent);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;margin-top:4px;">Clear search</button>
+            </div>
+          </div>
+          <div class="panel-bottom">
+            <div class="tips-hd">
+              <svg viewBox="0 0 24 24"><path d="M9 21h6M12 3a6 6 0 0 1 6 6c0 2.22-1.2 4.16-3 5.2V17a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1v-2.8C7.2 13.16 6 11.22 6 9a6 6 0 0 1 6-6z"/></svg>
+              <span class="tips-label">Pro Tips</span>
+              <span class="tips-meta">1 / 5</span>
+              <button class="tips-nav-btn">‹</button>
+              <button class="tips-nav-btn">›</button>
+              <button class="tips-nav-btn">˄</button>
+              <button class="tips-nav-btn">✕</button>
+            </div>
+            <div class="tip-card"><strong>Drag to canvas</strong> — Drag an element card onto the canvas to place it.</div>
+            <div class="tip-dots">
+              <button class="tip-dot on"></button>
+              <button class="tip-dot"></button>
+              <button class="tip-dot"></button>
+              <button class="tip-dot"></button>
+              <button class="tip-dot"></button>
+            </div>
+            <div class="panel-footer-hint">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Drag elements onto canvas or click to insert
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SCREEN 5: Sections Mode -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="wireframe">
+    <div class="wireframe-header">
+      <div>
+        <h3>5. Sections Mode</h3>
+        <p>Family chips + Section cards · Tips + Footer in bottom strip</p>
+      </div>
+      <span class="badge">Sections</span>
+    </div>
+    <div class="panel-shell">
+      <div class="rail">
+        <div class="rail-icon active"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="rail-divider"></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="rail-spacer"></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Add</span>
+          <div class="panel-actions">
+            <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M12 2L12 22M12 2L8 6M12 2L16 6"/></svg></button>
+            <button class="icon-btn"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="mode-switch">
+            <button class="mode-pill">Elements</button>
+            <button class="mode-pill active">Sections</button>
+          </div>
+          <div class="search-wrap">
+            <div class="search-bar">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" placeholder="Search sections..." />
+              <span class="kbd-hint">/</span>
+            </div>
+          </div>
+          <div class="panel-scroll">
+            <div class="sec-hint">
+              <div class="sec-hint-primary">Ready-to-use page sections</div>
+              <div class="sec-hint-muted">Click or drag to insert onto canvas</div>
+            </div>
+            <div class="sec-chips">
+              <button class="sec-chip active">All</button>
+              <button class="sec-chip">Hero</button>
+              <button class="sec-chip">Pricing</button>
+              <button class="sec-chip">Features</button>
+              <button class="sec-chip">FAQ</button>
+              <button class="sec-chip">CTA</button>
+              <button class="sec-chip">Team</button>
+              <button class="sec-chip">Testimonials</button>
+              <button class="sec-chip">Stats</button>
+            </div>
+            <div class="sec-card"><div class="sec-card-name">Hero Centered</div><div class="sec-card-sub">Large heading, subtext, two CTA buttons</div></div>
+            <div class="sec-card"><div class="sec-card-name">Hero Split</div><div class="sec-card-sub">Heading left, image right, gradient bg</div></div>
+            <div class="sec-card"><div class="sec-card-name">Hero Minimal</div><div class="sec-card-sub">Bold headline, short sub, single CTA</div></div>
+            <div class="sec-card"><div class="sec-card-name">CTA Banner</div><div class="sec-card-sub">Full-width gradient, heading + button</div></div>
+            <div class="sec-card"><div class="sec-card-name">Pricing 3-Col</div><div class="sec-card-sub">3 pricing tiers with feature lists</div></div>
+            <div class="sec-card"><div class="sec-card-name">Features Grid</div><div class="sec-card-sub">3-column icon + title + description</div></div>
+          </div>
+          <div class="panel-bottom">
+            <div class="tips-hd">
+              <svg viewBox="0 0 24 24"><path d="M9 21h6M12 3a6 6 0 0 1 6 6c0 2.22-1.2 4.16-3 5.2V17a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1v-2.8C7.2 13.16 6 11.22 6 9a6 6 0 0 1 6-6z"/></svg>
+              <span class="tips-label">Pro Tips</span>
+              <span class="tips-meta">1 / 5</span>
+              <button class="tips-nav-btn">‹</button>
+              <button class="tips-nav-btn">›</button>
+              <button class="tips-nav-btn">˄</button>
+              <button class="tips-nav-btn">✕</button>
+            </div>
+            <div class="tip-card"><strong>Drag to canvas</strong> — Drag an element card onto the canvas to place it.</div>
+            <div class="tip-dots">
+              <button class="tip-dot on"></button>
+              <button class="tip-dot"></button>
+              <button class="tip-dot"></button>
+              <button class="tip-dot"></button>
+              <button class="tip-dot"></button>
+            </div>
+            <div class="panel-footer-hint">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Drag elements onto canvas or click to insert
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- SCREEN 6: Tips Collapsed + My Components Open -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="wireframe">
+    <div class="wireframe-header">
+      <div>
+        <h3>6. Tips Collapsed + My Components Open</h3>
+        <p>Tips header collapsed · My Components accordion expanded</p>
+      </div>
+      <span class="badge">State</span>
+    </div>
+    <div class="panel-shell">
+      <div class="rail">
+        <div class="rail-icon active"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="rail-divider"></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="rail-spacer"></div>
+        <div class="rail-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Add</span>
+          <div class="panel-actions">
+            <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M12 2L12 22M12 2L8 6M12 2L16 6"/></svg></button>
+            <button class="icon-btn"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="mode-switch">
+            <button class="mode-pill active">Elements</button>
+            <button class="mode-pill">Sections</button>
+          </div>
+          <div class="search-wrap">
+            <div class="search-bar">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" placeholder="Search elements..." />
+              <span class="kbd-hint">/</span>
+            </div>
+          </div>
+          <div class="panel-scroll">
+            <!-- My Components OPEN -->
+            <div class="mycomp-hd" style="background: var(--surface-hover);">
+              <svg class="mycomp-chev open" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+              <span class="mycomp-label">My Components</span>
+            </div>
+            <div class="mycomp-body open">
+              <div class="mycomp-body-inner">
+                <p class="mycomp-empty">No saved components yet.<br/>Select an element → right-click → Save as Component.</p>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+            <div class="sec-label">CATEGORIES</div>
+
+            <div class="cat-item">
+              <div class="cat-row open">
+                <span class="cat-name">Layout</span>
+                <svg class="cat-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <div class="cat-body open">
+                <div class="cat-body-inner">
+                  <div class="el-grid">
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><span class="el-name">Container</span></div>
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="8" rx="1"/></svg></div><span class="el-name">Section</span></div>
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="6" height="18" rx="1"/></svg></div><span class="el-name">Grid</span></div>
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="1"/></svg></div><span class="el-name">Row</span></div>
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="18" rx="1"/></svg></div><span class="el-name">Column</span></div>
+                    <div class="el-card" tabindex="0"><div class="el-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><span class="el-name">Stack</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cat-item">
+              <div class="cat-row"><span class="cat-name">Text &amp; Buttons</span><svg class="cat-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </div>
+            <div class="cat-item">
+              <div class="cat-row"><span class="cat-name">Media</span><svg class="cat-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+            </div>
+          </div>
+          <div class="panel-bottom">
+            <!-- Tips COLLAPSED -->
+            <div class="tips-hd">
+              <svg viewBox="0 0 24 24"><path d="M9 21h6M12 3a6 6 0 0 1 6 6c0 2.22-1.2 4.16-3 5.2V17a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1v-2.8C7.2 13.16 6 11.22 6 9a6 6 0 0 1 6-6z"/></svg>
+              <span class="tips-label">Pro Tips</span>
+              <span class="tips-meta">1 / 5</span>
+              <button class="tips-nav-btn">˅</button>
+            </div>
+            <div class="panel-footer-hint">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Drag elements onto canvas or click to insert
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

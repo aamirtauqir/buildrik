@@ -17,7 +17,7 @@
   cursor: pointer;
   border-radius: 6px;
   font-size: 13px;
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
   transition: background 100ms ease;
 }
 
@@ -62,7 +62,7 @@
 .comp-empty__title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
   margin: 0;
 }
 

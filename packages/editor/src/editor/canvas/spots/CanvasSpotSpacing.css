@@ -39,11 +39,11 @@
 }
 
 .aqb-spacing-indicator--margin .aqb-spacing-indicator-label {
-  background-color: #00d4aa;
+  background-color: var(--aqb-success);
 }
 
 .aqb-spacing-indicator--padding .aqb-spacing-indicator-label {
-  background-color: #7c3aed;
+  background-color: var(--accent);
 }
 
 .aqb-spacing-indicator--top .aqb-spacing-indicator-label {

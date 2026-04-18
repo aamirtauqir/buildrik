@@ -143,7 +143,7 @@ const inputStyles: React.CSSProperties = {
   flex: 1,
   background: "transparent",
   border: "none",
-  color: "var(--ls-text-primary, #0F172A)",
+  color: "var(--ls-text-primary)",
   fontSize: 12,
   outline: "none",
   lineHeight: "18px",

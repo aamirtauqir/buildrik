@@ -35,7 +35,7 @@ export const MapEmbed: React.FC<MapEmbedProps> = ({
         height,
         borderRadius: 12,
         overflow: "hidden",
-        background: "var(--aqb-bg-panel, #1a1a2e)",
+        background: "var(--aqb-bg-panel)",
       }}
     >
       <iframe

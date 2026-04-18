@@ -300,15 +300,16 @@
   --aqb-btn-radius: 8px;
   --aqb-cta-radius: 9999px;
 
-  /* Forms */
+  /* Forms — sizing only. Colors resolved from canonical root.
+     Removed: --aqb-input-border: #27272a (near-black zinc shadowed canonical).
+     Removed: --aqb-input-focus: #3b82f6 (wrong blue shadowed cobalt).
+     --aqb-placeholder-color rerouted to canonical muted text. */
   --aqb-input-height: 40px;
   --aqb-input-radius: 8px;
-  --aqb-input-border: #27272a;
-  --aqb-input-focus: #3b82f6;
   --aqb-input-padding-x: 12px;
   --aqb-label-font-size: 13px;
   --aqb-label-weight: 500;
-  --aqb-placeholder-color: #71717a;
+  --aqb-placeholder-color: var(--aqb-text-muted);
 
   /* Icons */
   --aqb-icon-style: outline;

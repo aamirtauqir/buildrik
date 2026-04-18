@@ -104,9 +104,9 @@ export function useTemplateSelection(showProgress: boolean): UseTemplateSelectio
       if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
         if (showReplace || showUpgrade || showProgress) return;
         e.preventDefault();
-        const idx = selectedId ? filteredTemplates.findIndex((t) => t.id === selectedId) : -1;
+        const idx = detailId ? filteredTemplates.findIndex((t) => t.id === detailId) : -1;
         const next = e.key === "ArrowRight" ? filteredTemplates[idx + 1] : filteredTemplates[idx - 1];
-        if (next) setSelectedId(next.id);
+        if (next) setDetailId(next.id);
       }
     };
     window.addEventListener("keydown", onKey);

@@ -84,8 +84,8 @@
 .bld-ftue {
   margin-top: 6px;
   padding: 5px 10px;
-  background: #1E293B;
-  color: #F8FAFC;
+  background: var(--aqb-text-primary);
+  color: var(--aqb-text-on-accent);
   font-size: 11px;
   border-radius: 4px;
   text-align: center;
@@ -205,7 +205,7 @@
   transition: color 100ms;
 }
 .bld-cat-row.open .bld-cat-name {
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
 }
 .bld-cat-spacer {
   flex: 1;
@@ -224,6 +224,12 @@
 }
 .bld-cat-row.open .bld-cat-chev {
   transform: rotate(90deg);
+}
+.bld-cat-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ls-text-lighter, #94A3B8);
+  margin-right: 4px;
 }
 .bld-cat-body {
   overflow: hidden;
@@ -406,7 +412,7 @@
   background: var(--ls-bg-card, #FFFFFF);
   border: 1px solid var(--ls-border-card, #D1D9E6);
   font-weight: 500;
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
 }
 
 /* ── Section family chips ── */
@@ -441,6 +447,77 @@
   font-weight: 600;
 }
 
+/* ── Section type icon grid ── */
+.bld-sec-type-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.bld-sec-type-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-radius: 4px;
+  background: var(--ls-bg-subtle, #F1F5F9);
+  cursor: pointer;
+  transition: all 0.12s;
+  user-select: none;
+}
+.bld-sec-type-card:hover {
+  background: var(--ls-accent-bg, #DBEAFE);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+.bld-sec-type-card:focus-visible {
+  outline: 2px solid var(--ls-accent, #1D4ED8);
+  outline-offset: 2px;
+}
+.bld-sec-type-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+.bld-sec-type-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--ls-text-muted, #475569);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  transition: stroke 0.12s;
+}
+.bld-sec-type-card:hover .bld-sec-type-icon svg {
+  stroke: var(--ls-accent, #1D4ED8);
+}
+.bld-sec-type-name {
+  font-size: 10px;
+  color: var(--ls-text-muted, #475569);
+  font-weight: 400;
+  text-align: center;
+  line-height: 1.2;
+  transition: color 0.12s;
+}
+.bld-sec-type-card:hover .bld-sec-type-name {
+  color: var(--ls-accent, #1D4ED8);
+}
+.bld-sec-type-card--active {
+  background: var(--ls-accent-bg, #DBEAFE);
+  box-shadow: 0 0 0 1px var(--ls-accent, #1D4ED8);
+}
+.bld-sec-type-card--active .bld-sec-type-name {
+  color: var(--ls-accent, #1D4ED8);
+  font-weight: 600;
+}
+.bld-sec-type-card--active .bld-sec-type-icon svg {
+  stroke: var(--ls-accent, #1D4ED8);
+}
+
 /* ── Section preview cards ── */
 .bld-sec-cards {
   display: flex;
@@ -471,7 +548,7 @@
 .bld-sec-card-name {
   font-size: 13px;
   font-weight: 600;
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
 }
 .bld-sec-card-sub {
   font-size: 11px;
@@ -489,7 +566,7 @@
 .bld-sec-hint-primary {
   font-size: 11px;
   font-weight: 600;
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
 }
 .bld-sec-hint-muted {
   font-size: 10px;
@@ -583,7 +660,7 @@
 .bld-no-results-headline {
   font-size: 13px;
   font-weight: 600;
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
   margin: 0;
 }
 .bld-ai-card {

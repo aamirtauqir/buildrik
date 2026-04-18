@@ -8,674 +8,510 @@
 /* ============================================
    CSS Variables - Premium Design System
    ============================================ */
+/* ============================================
+   CANONICAL TOKEN SET — LIGHT
+   ────────────────────────────────────────────
+   Source of truth derived from Topbar palette.
+   See DESIGN.md § "Color" for rationale.
+   RULES:
+     1. Every token is defined exactly once.
+     2. Legacy names are preserved as aliases so 1000+ call sites
+        keep rendering without a grep-and-replace megapass.
+     3. NO BLACK. Primary text caps at slate-700 (#334155).
+     4. One accent: cobalt #2D6DFF.
+     5. One type family: Inter Tight + Geist Mono, no fallbacks.
+   ============================================ */
 :root {
-  /* Navbar Variables */
-  --bar: #0b1220;
-  --bar2: #0a1322;
-  --barStroke: #1a2a3d;
-  --pillStroke: #1b2b3f;
-  --pillStroke2: #20334b;
-  --txt: #eaf2ff;
-  --muted: #b7c5dc;
-  --blue: #4b8dff;
-  --blue2: #2d6dff;
-  --green: #38d07a;
-  --green2: #19b45c;
-  --navShadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+  /* ─────── PRIMARY SURFACES (light depth ladder) ─────── */
+  --aqb-bg-app:       #F1F5F9;   /* outermost — slate-100 */
+  --aqb-bg-panel:     #F8FAFC;   /* topbar + sidebar — slate-50 */
+  --aqb-bg-subtle:    #F1F5F9;   /* search bg, hover fills */
+  --aqb-bg-card:      #FFFFFF;   /* cards, inputs, rows */
+  --aqb-bg-elevated:  #FFFFFF;   /* modals, popovers */
+  --aqb-bg-canvas:    #FFFFFF;   /* user canvas (unchanged) */
+  --aqb-bg-hover:     rgba(15, 23, 42, 0.04);
+  --aqb-bg-active:    rgba(15, 23, 42, 0.06);
 
-  /* Primary Colors - Cobalt (DESIGN.md approved) */
-  --aqb-primary: #2d6dff;
-  --aqb-primary-hover: #4B8DFF;
-  --aqb-primary-active: #1E58D9;
-  --aqb-primary-light: rgba(45, 109, 255, 0.12);
-  --aqb-primary-muted: rgba(45, 109, 255, 0.08);
-  --aqb-primary-subtle: rgba(45, 109, 255, 0.06);
+  /* Legacy surface ladder — flipped from dark values to light equivalents.
+     ~300 call sites across editor use these names. Re-routing at the token
+     layer avoids a grep-rename of every consumer. */
+  --aqb-surface-1: var(--aqb-bg-card);
+  --aqb-surface-2: var(--aqb-bg-panel);
+  --aqb-surface-3: var(--aqb-bg-subtle);
+  --aqb-surface-4: #E2E8F0;
+  --aqb-surface-5: #CBD5E1;
 
-  /* Canonical aliases per DESIGN.md (use --accent everywhere going forward) */
-  --accent: var(--aqb-primary);
-  --accent-hover: var(--aqb-primary-hover);
-  --accent-pressed: var(--aqb-primary-active);
-  --accent-tint: var(--aqb-primary-light);
-  --accent-subtle: var(--aqb-primary-subtle);
+  /* Legacy bg tokens — aliased to current canonical */
+  --aqb-bg-dark:              var(--aqb-bg-panel);
+  --aqb-bg-darker:            var(--aqb-bg-subtle);
+  --aqb-bg-panel-secondary:   var(--aqb-bg-subtle);
+  --aqb-bg-panel-tertiary:    var(--aqb-bg-subtle);
 
-  /* Secondary Colors - removed (DESIGN.md: single accent only) */
+  /* ─────── BORDERS ─────── */
+  --aqb-border:         #E2E8F0;   /* default hairline */
+  --aqb-border-medium:  #CBD5E1;   /* inputs + buttons — matches topbar */
+  --aqb-border-strong:  #94A3B8;   /* hover — matches topbar hover */
+  --aqb-border-light:   var(--aqb-border);
+  --aqb-border-subtle:  var(--aqb-border);
+  --aqb-border-hover:   var(--aqb-border-strong);
+  --aqb-border-focus:   #2D6DFF;
 
-  /* Surface Hierarchy - Depth layers */
-  --aqb-surface-1: #0f0f14;
-  --aqb-surface-2: #16161d;
-  --aqb-surface-3: #1e1e26;
-  --aqb-surface-4: #26262f;
-  --aqb-surface-5: #2e2e38;
+  /* ─────── TEXT — NO BLACK ─────── */
+  --aqb-text-primary:   #334155;   /* slate-700 — AAA on panel */
+  --aqb-text-secondary: #64748B;   /* slate-500 — AAA */
+  --aqb-text-tertiary:  #94A3B8;   /* slate-400 */
+  --aqb-text-muted:     #94A3B8;   /* alias */
+  --aqb-text-disabled:  #CBD5E1;   /* slate-300 */
+  --aqb-text-inverse:   #FFFFFF;   /* text on accent surfaces */
+  --aqb-text-on-accent: #FFFFFF;
 
-  /* Background Colors - Refined Dark */
-  --aqb-bg-dark: #0c0c14;
-  --aqb-bg-darker: #08080e;
-  --aqb-bg-panel: #14141f;
-  --aqb-bg-panel-secondary: #1c1c2a;
-  --aqb-bg-panel-tertiary: #24243a;
-  --aqb-bg-elevated: #1e1e30;
-  --aqb-bg-canvas: #ffffff;
+  /* ─────── ACCENT — single cobalt ─────── */
+  --accent:         #2D6DFF;
+  --accent-hover:   #4B8DFF;
+  --accent-pressed: #1E58D9;
+  --accent-tint:    rgba(45, 109, 255, 0.10);
+  --accent-subtle:  rgba(45, 109, 255, 0.05);
+  --accent-on:      #FFFFFF;
 
-  /* ───────── Left Sidebar (--ls-*) design tokens ─────────────────────────
-   * 36 tokens consumed by 607 call sites across PanelHeader.tsx (inline
-   * style), ComponentsTab, HistoryTab, PagesTab, etc. They were NEVER
-   * defined at root, so every consumer fell through to hardcoded light-
-   * theme fallbacks (#F8FAFC panel, #DBEAFE active row, #0F172A text).
-   * That's why the editor's left sidebar rendered white/light even though
-   * the rest of the app is dark. Defining them here cascades a single
-   * dark + cobalt palette to every consumer in one pass.
-   * Aligned with DESIGN.md: cobalt accent, 5-layer dark depth, WCAG AA.
-   * ────────────────────────────────────────────────────────────────────── */
+  /* Legacy accent names — aliased to cobalt */
+  --aqb-primary:        var(--accent);
+  --aqb-primary-hover:  var(--accent-hover);
+  --aqb-primary-active: var(--accent-pressed);
+  --aqb-primary-light:  var(--accent-tint);
+  --aqb-primary-muted:  var(--accent-subtle);
+  --aqb-primary-subtle: var(--accent-subtle);
+  --aqb-accent:         var(--accent);
+  --aqb-accent-hover:   var(--accent-hover);
+  --aqb-accent-light:   var(--accent-tint);
+  --aqb-accent-blue:        var(--accent);
+  --aqb-accent-blue-hover:  var(--accent-hover);
+  --aqb-accent-blue-alpha:  var(--accent-tint);
+  --aqb-accent-blue-light:  var(--accent-tint);
+  --aqb-accent-blue-bg:     var(--accent-subtle);
 
-  /* Surfaces */
-  --ls-bg-app: #0c0c14;                /* app root / outermost surface */
-  --ls-bg-panel: #14141f;              /* panel container */
-  --ls-bg-subtle: #17171f;             /* subtle fills (search, chips) */
-  --ls-bg-card: #1e1e28;               /* cards, elevated rows */
-  --ls-topbar-bg: #14141f;             /* editor top bar */
-  --ls-inspector-bg: #14141f;          /* right inspector panel */
+  /* Legacy purple / AI tokens — re-routed to cobalt per DESIGN.md single-accent rule.
+     These names remain so 60+ consumers keep rendering, but the VALUE is now cobalt.
+     Cleanup PR will grep-rename these to --accent-* families. */
+  --aqb-accent-purple:        var(--accent);
+  --aqb-accent-purple-hover:  var(--accent-hover);
+  --aqb-accent-purple-alpha:  var(--accent-tint);
+  --aqb-accent-purple-light:  var(--accent-tint);
+  --aqb-accent-purple-muted:  var(--accent-subtle);
+  --aqb-accent-purple-bg:     var(--accent-subtle);
+  --aqb-accent-purple-3:   rgba(45, 109, 255, 0.03);
+  --aqb-accent-purple-5:   rgba(45, 109, 255, 0.05);
+  --aqb-accent-purple-7:   rgba(45, 109, 255, 0.07);
+  --aqb-accent-purple-8:   rgba(45, 109, 255, 0.08);
+  --aqb-accent-purple-10:  rgba(45, 109, 255, 0.10);
+  --aqb-accent-purple-12:  rgba(45, 109, 255, 0.12);
+  --aqb-accent-purple-15:  rgba(45, 109, 255, 0.15);
+  --aqb-accent-purple-20:  rgba(45, 109, 255, 0.20);
+  --aqb-accent-purple-22:  rgba(45, 109, 255, 0.22);
+  --aqb-accent-purple-25:  rgba(45, 109, 255, 0.25);
+  --aqb-accent-purple-30:  rgba(45, 109, 255, 0.30);
+  --aqb-accent-purple-35:  rgba(45, 109, 255, 0.35);
+  --aqb-accent-purple-40:  rgba(45, 109, 255, 0.40);
+  --aqb-accent-purple-45:  rgba(45, 109, 255, 0.45);
+  --aqb-accent-purple-50:  rgba(45, 109, 255, 0.50);
+  --aqb-accent-purple-55:  rgba(45, 109, 255, 0.55);
+  --aqb-accent-purple-60:  rgba(45, 109, 255, 0.60);
+  --aqb-accent-purple-05:  rgba(45, 109, 255, 0.05);
+  --aqb-accent-purple-08:  rgba(45, 109, 255, 0.08);
+  --aqb-ai:        var(--accent);
+  --aqb-ai-hover:  var(--accent-hover);
+  --aqb-ai-active: var(--accent-pressed);
+  --aqb-ai-light:  var(--accent-tint);
+  --aqb-ai-muted:  var(--accent-subtle);
 
-  /* Text */
-  --ls-text-primary: #F5F5F0;          /* primary text (14.1:1 on panel) */
-  --ls-text-secondary: #B8B5AD;        /* secondary (6.5:1) */
-  --ls-text-medium: #A8A59C;           /* medium (label-ish) */
-  --ls-text-muted: #A09D96;            /* muted text */
-  --ls-text-subtle: #908D85;           /* subtle (least emphasis) */
-  --ls-text-lighter: #B8B5AD;          /* legacy alias for secondary */
-  --ls-text-ghost: #707070;            /* disabled / very muted */
+  /* ─────── SEMANTIC (light-mode tuned) ─────── */
+  --aqb-success:       #16A34A;
+  --aqb-success-light: rgba(22, 163, 74, 0.10);
+  --aqb-warning:       #D97706;
+  --aqb-warning-light: rgba(217, 119, 6, 0.10);
+  --aqb-error:         #DC2626;
+  --aqb-error-light:   rgba(220, 38, 38, 0.10);
+  --aqb-info:          var(--accent);
+  --aqb-info-light:    var(--accent-tint);
 
-  /* Borders (dark-on-dark, subtle) */
-  --ls-border-light: rgba(255, 255, 255, 0.08);
-  --ls-border-soft: rgba(255, 255, 255, 0.05);
-  --ls-border-medium: rgba(255, 255, 255, 0.12);
-  --ls-border-card: rgba(255, 255, 255, 0.08);
-  --ls-border-dialog: rgba(255, 255, 255, 0.15);
-  --ls-topbar-border: rgba(255, 255, 255, 0.08);
-  --ls-inspector-border: rgba(255, 255, 255, 0.08);
+  /* ─────── TYPOGRAPHY ─────── */
+  /* DESIGN.md mandate: no system-ui / -apple-system / BlinkMacSystemFont / Segoe UI
+     / Roboto / Helvetica / Arial in any fallback. Only the CSS generic is allowed. */
+  --aqb-font-family: "Inter Tight", sans-serif;
+  --aqb-font-mono:   "Geist Mono", monospace;
 
-  /* Accent (single cobalt per DESIGN.md) */
-  --ls-accent: #2D6DFF;
-  --ls-accent-bg: rgba(45, 109, 255, 0.12);       /* tint for active rows */
-  --ls-accent-bg-hover: rgba(45, 109, 255, 0.18);
-  --ls-accent-border: rgba(45, 109, 255, 0.35);
-  --ls-accent-txt: #F5F5F0;                       /* readable text on tint */
+  --aqb-text-xs:   11px;
+  --aqb-text-sm:   12px;
+  --aqb-text-base: 13px;
+  --aqb-text-md:   14px;
+  --aqb-text-lg:   16px;
+  --aqb-text-xl:   20px;
+  --aqb-text-2xl:  24px;
+  --aqb-text-3xl:  32px;
+  --aqb-text-4xl:  48px;
 
-  /* Semantic */
-  --ls-danger: #EF4444;
-  --ls-danger-bg: rgba(239, 68, 68, 0.08);
-  --ls-danger-border: rgba(239, 68, 68, 0.35);
-  --ls-error-bg: rgba(239, 68, 68, 0.08);
-  --ls-error-text: #F5A3A3;
-  --ls-warning-bg: rgba(245, 158, 11, 0.08);
-  --ls-warning-text: #F2C16B;
-  --ls-success-text: #8EE0A6;
-  --ls-dirty: #F59E0B;                            /* unsaved indicator */
+  /* Legacy scale aliases — all zombies that resolved to 12-14px. Preserved for
+     consumers but collapsed to real values. */
+  --aqb-text-micro:     var(--aqb-text-xs);
+  --aqb-text-3xs:       var(--aqb-text-xs);
+  --aqb-text-2xs:       var(--aqb-text-xs);
+  --aqb-text-2xs-plus:  var(--aqb-text-sm);
+  --aqb-text-sm-plus:   var(--aqb-text-sm);
+  --aqb-text-md-plus:   var(--aqb-text-md);
+  --aqb-text-2xl-plus:  var(--aqb-text-2xl);
+  --aqb-text-5xl:       var(--aqb-text-4xl);
+  --aqb-text-display:   64px;
 
-  /* Misc */
-  --ls-canvas-dot: rgba(255, 255, 255, 0.06);     /* canvas grid dots */
-  --ls-shadow-dialog: 0 12px 32px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.35);
-  --aqb-bg-hover: rgba(255, 255, 255, 0.04);
-  --aqb-bg-active: rgba(255, 255, 255, 0.06);
+  --aqb-font-normal:   400;
+  --aqb-font-medium:   500;
+  --aqb-font-semibold: 600;
+  --aqb-font-bold:     700;
 
-  /* Text Colors - WCAG AA Compliant (dark theme, surface ref #0f0f14) */
-  --aqb-text-primary: #F5F5F0;
-  /* 14.1:1 — headings, important text */
-  --aqb-text-secondary: #B8B5AD;
-  /* 6.5:1  — body text */
-  --aqb-text-tertiary: #A09D96;
-  /* 5.2:1  — supporting text */
-  --aqb-text-muted: #908D85;
-  /* 4.6:1  — captions, metadata ✅ AA */
-  --aqb-text-disabled: #6B6963;
-  /* 3.2:1  — disabled UI (component only) */
-  --aqb-text-inverse: #1A1A1A;
-  /* text on light backgrounds */
+  --aqb-leading-none:    1;
+  --aqb-leading-tight:   1.25;
+  --aqb-leading-snug:    1.375;
+  --aqb-leading-normal:  1.5;
+  --aqb-leading-relaxed: 1.625;
+  --aqb-line-tight:      1.25;
+  --aqb-line-normal:     1.5;
 
-  /* Border Colors - Subtle & Refined */
-  --aqb-border: rgba(255, 255, 255, 0.08);
-  --aqb-border-light: rgba(255, 255, 255, 0.12);
-  --aqb-border-subtle: rgba(255, 255, 255, 0.06);
-  --aqb-border-focus: rgba(59, 130, 246, 0.5);
-  --aqb-border-hover: rgba(255, 255, 255, 0.15);
+  --aqb-tracking-tight:  -0.02em;
+  --aqb-tracking-normal: 0;
+  --aqb-tracking-wide:   0.02em;
+  --aqb-tracking-wider:  0.05em;
+  --aqb-tracking-widest: 0.1em;
 
-  /* Shadow Colors */
-  --aqb-shadow-color: rgba(0, 0, 0, 0.2);
-
-  /* Status Colors - Refined */
-  --aqb-success: #22c55e;
-  --aqb-success-light: rgba(34, 197, 94, 0.12);
-  --aqb-warning: #f59e0b;
-  --aqb-warning-light: rgba(245, 158, 11, 0.12);
-  --aqb-error: #ef4444;
-  --aqb-error-light: rgba(239, 68, 68, 0.12);
-  --aqb-info: #3b82f6;
-  --aqb-info-light: rgba(59, 130, 246, 0.12);
-
-  /* Shadows - Layered Depth */
-  --aqb-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --aqb-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
-  --aqb-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.25);
-  --aqb-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.35), 0 4px 8px rgba(0, 0, 0, 0.3);
-  --aqb-shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.35);
-  --aqb-shadow-2xl: 0 24px 56px rgba(0, 0, 0, 0.45), 0 12px 24px rgba(0, 0, 0, 0.4);
-  --aqb-shadow-inner: inset 0 1px 2px rgba(0, 0, 0, 0.25);
-  --aqb-shadow-glow: 0 0 20px rgba(59, 130, 246, 0.25);
-
-  /* Border Radius - Consistent Scale */
-  --aqb-radius-xs: 3px;
-  --aqb-radius-sm: 5px;
-  --aqb-radius-md: 8px;
-  --aqb-radius-lg: 12px;
-  --aqb-radius-xl: 16px;
-  --aqb-radius-2xl: 24px;
-  --aqb-radius-full: 9999px;
-
-  /* Spacing Scale - 4px base */
-  --aqb-space-0: 0;
-  --aqb-space-1: 4px;
-  --aqb-space-2: 8px;
-  --aqb-space-3: 12px;
-  --aqb-space-4: 16px;
-  --aqb-space-5: 20px;
-  --aqb-space-6: 24px;
-  --aqb-space-8: 32px;
+  /* ─────── SPACING (4px base — unchanged) ─────── */
+  --aqb-space-0:  0;
+  --aqb-space-1:  4px;
+  --aqb-space-2:  8px;
+  --aqb-space-3:  12px;
+  --aqb-space-4:  16px;
+  --aqb-space-5:  20px;
+  --aqb-space-6:  24px;
+  --aqb-space-8:  32px;
   --aqb-space-10: 40px;
   --aqb-space-12: 48px;
   --aqb-space-16: 64px;
 
-  /* Typography - Professional Scale */
-  --aqb-font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --aqb-font-mono: "JetBrains Mono", "Fira Code", "SF Mono", Monaco, monospace;
+  /* ─────── RADIUS ─────── */
+  --aqb-radius-xs:   3px;
+  --aqb-radius-sm:   4px;
+  --aqb-radius-md:   8px;
+  --aqb-radius-lg:   12px;
+  --aqb-radius-xl:   16px;
+  --aqb-radius-2xl:  24px;
+  --aqb-radius-full: 9999px;
 
-  /* Font Sizes - Extended Scale (12px minimum for readability) */
-  --aqb-text-micro: 12px;
-  --aqb-text-3xs: 12px;
-  --aqb-text-2xs: 12px;
-  --aqb-text-2xs-plus: 12px;
-  --aqb-text-xs: 12px;
-  --aqb-text-sm: 12px;
-  --aqb-text-sm-plus: 12px;
-  --aqb-text-base: 13px;
-  --aqb-text-md: 14px;
-  --aqb-text-md-plus: 15px;
-  --aqb-text-lg: 16px;
-  --aqb-text-xl: 18px;
-  --aqb-text-2xl: 20px;
-  --aqb-text-2xl-plus: 22px;
-  --aqb-text-3xl: 24px;
-  --aqb-text-4xl: 32px;
-  --aqb-text-5xl: 48px;
-  --aqb-text-display: 64px;
+  /* ─────── ELEVATION (light-mode, modals only) ─────── */
+  --aqb-shadow-color:  rgba(15, 23, 42, 0.08);
+  --aqb-shadow-xs:   0 1px 2px rgba(15, 23, 42, 0.04);
+  --aqb-shadow-sm:   0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --aqb-shadow-md:   0 4px 12px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.04);
+  --aqb-shadow-lg:   0 8px 24px rgba(15, 23, 42, 0.08), 0 4px 8px rgba(15, 23, 42, 0.05);
+  --aqb-shadow-xl:   0 16px 40px rgba(15, 23, 42, 0.10), 0 8px 16px rgba(15, 23, 42, 0.06);
+  --aqb-shadow-2xl:  0 24px 56px rgba(15, 23, 42, 0.12), 0 12px 24px rgba(15, 23, 42, 0.08);
+  --aqb-shadow-inner: inset 0 1px 2px rgba(15, 23, 42, 0.04);
+  --aqb-shadow-modal:    var(--aqb-shadow-lg);
+  --aqb-shadow-dropdown: var(--aqb-shadow-md);
 
-  /* Font Weights */
-  --aqb-font-normal: 400;
-  --aqb-font-medium: 500;
-  --aqb-font-semibold: 600;
-  --aqb-font-bold: 700;
+  /* Glow (kept as accent ring, not color flash) */
+  --aqb-shadow-glow:   0 0 0 3px var(--accent-tint);
+  --aqb-glow-primary:  0 0 0 3px var(--accent-tint);
+  --aqb-glow-cta:      0 0 0 3px var(--accent-tint);
+  --aqb-glow-selection:0 0 0 3px var(--accent-tint);
+  --aqb-glow-publish:  0 0 0 3px var(--accent-tint);
 
-  /* Line Heights */
-  --aqb-leading-none: 1;
-  --aqb-leading-tight: 1.25;
-  --aqb-leading-snug: 1.375;
-  --aqb-leading-normal: 1.5;
-  --aqb-leading-relaxed: 1.625;
-
-  /* Letter Spacing */
-  --aqb-tracking-tight: -0.02em;
-  --aqb-tracking-normal: 0;
-  --aqb-tracking-wide: 0.02em;
-  --aqb-tracking-wider: 0.05em;
-  --aqb-tracking-widest: 0.1em;
-
-  /* Transitions - Smooth & Professional */
-  --aqb-ease-default: cubic-bezier(0.4, 0, 0.2, 1);
-  --aqb-ease-in: cubic-bezier(0.4, 0, 1, 1);
-  --aqb-ease-out: cubic-bezier(0, 0, 0.2, 1);
-  --aqb-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --aqb-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-
-  --aqb-duration-instant: 50ms;
-  --aqb-duration-fast: 100ms;
-  --aqb-duration-normal: 150ms;
-  --aqb-duration-moderate: 200ms;
-  --aqb-duration-slow: 300ms;
-  --aqb-duration-slower: 400ms;
-
-  --aqb-transition-fast: 100ms var(--aqb-ease-default);
-  --aqb-transition-normal: 150ms var(--aqb-ease-default);
-  --aqb-transition-slow: 300ms var(--aqb-ease-default);
-  --aqb-transition-colors: 150ms var(--aqb-ease-default);
-  --aqb-transition-transform: 200ms var(--aqb-ease-out);
-  --aqb-transition-all: 200ms var(--aqb-ease-default);
-
-  /* Z-Index Scale */
-  --aqb-z-base: 0;
-  --aqb-z-dropdown: 100;
-  --aqb-z-sticky: 200;
-  --aqb-z-overlay: 300;
-  --aqb-z-modal: 400;
-  --aqb-z-popover: 500;
-  --aqb-z-tooltip: 600;
-  --aqb-z-toast: 700;
-  --aqb-z-max: 9999;
-
-  /* Glass Morphism - Refined */
-  --aqb-glass-bg: rgba(20, 20, 31, 0.85);
-  --aqb-glass-border: rgba(255, 255, 255, 0.08);
-  --aqb-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  --aqb-glass-blur: blur(16px);
-
-  /* Accent Colors - UI Highlights */
-  --aqb-accent: #a78bfa;
-  --aqb-accent-hover: #8b5cf6;
-  --aqb-accent-light: rgba(167, 139, 250, 0.12);
-
-  /* Feature-specific Accents */
-  --aqb-accent-blue: #60a5fa;
-  --aqb-accent-blue-hover: #3b82f6;
-  --aqb-accent-blue-alpha: rgba(59, 130, 246, 0.12);
-  --aqb-accent-blue-light: rgba(59, 130, 246, 0.12);
-  --aqb-accent-blue-bg: rgba(37, 99, 235, 0.08);
-  --aqb-accent-purple: #a78bfa;
-  --aqb-accent-purple-hover: #7c3aed;
-  --aqb-accent-purple-alpha: rgba(139, 92, 246, 0.12);
-  --aqb-accent-purple-light: rgba(168, 85, 247, 0.12);
-  --aqb-accent-purple-muted: rgba(139, 92, 246, 0.05);
-  --aqb-accent-purple-05: rgba(139, 92, 246, 0.05);
-  --aqb-accent-purple-08: rgba(139, 92, 246, 0.08);
-  --aqb-accent-purple-30: rgba(139, 92, 246, 0.3);
-  --aqb-accent-purple-35: rgba(139, 92, 246, 0.35);
-  --aqb-accent-purple-40: rgba(139, 92, 246, 0.4);
-  --aqb-accent-purple-45: rgba(139, 92, 246, 0.45);
-  --aqb-accent-purple-50: rgba(139, 92, 246, 0.5);
-  --aqb-accent-purple-60: rgba(139, 92, 246, 0.6);
-  --aqb-accent-purple-bg: rgba(139, 92, 246, 0.05);
-  /* Build-tab purple (#7C6DFA) alpha scale */
-  --aqb-accent-purple-3: rgba(124, 109, 250, 0.03);
-  --aqb-accent-purple-5: rgba(124, 109, 250, 0.05);
-  --aqb-accent-purple-7: rgba(124, 109, 250, 0.07);
-  --aqb-accent-purple-8: rgba(124, 109, 250, 0.08);
-  --aqb-accent-purple-10: rgba(124, 109, 250, 0.10);
-  --aqb-accent-purple-12: rgba(124, 109, 250, 0.12);
-  --aqb-accent-purple-15: rgba(124, 109, 250, 0.15);
-  --aqb-accent-purple-20: rgba(124, 109, 250, 0.20);
-  --aqb-accent-purple-22: rgba(124, 109, 250, 0.22);
-  --aqb-accent-purple-25: rgba(124, 109, 250, 0.25);
-  --aqb-accent-purple-55: rgba(124, 109, 250, 0.55);
-  --aqb-accent-cyan: #22d3ee;
-  --aqb-accent-cyan-light: rgba(34, 211, 238, 0.12);
-  --aqb-accent-amber: #fbbf24;
-  --aqb-accent-amber-light: rgba(251, 191, 36, 0.12);
-  --aqb-accent-emerald: #34d399;
-  --aqb-accent-emerald-light: rgba(16, 185, 129, 0.12);
-  --aqb-accent-rose: #f43f5e;
-  --aqb-accent-rose-light: rgba(244, 63, 94, 0.12);
-
-  /* Media Tab Type Colors */
-  --media-img: #6366f1;
-  --media-img-l: rgba(99, 102, 241, 0.12);
-  --media-img-b: rgba(99, 102, 241, 0.22);
-  --media-vid: #f97316;
-  --media-vid-l: rgba(249, 115, 22, 0.10);
-  --media-vid-b: rgba(249, 115, 22, 0.22);
-  --media-doc: #ef4444;
-  --media-doc-l: rgba(239, 68, 68, 0.10);
-  --media-doc-b: rgba(239, 68, 68, 0.22);
-  --media-fnt: #10b981;
-  --media-fnt-l: rgba(16, 185, 129, 0.10);
-  --media-fnt-b: rgba(16, 185, 129, 0.20);
-
-  /* Rail v16 Design Tokens */
-  --rail-bg: var(--aqb-bg-darker, #08080e);
-  /* PRD §8: rail bg — darkest surface */
-  --rail-active: #818CF8;
-  --rail-active-bg: rgba(99, 102, 241, 0.09);
-  --rail-active-bg-hover: rgba(99, 102, 241, 0.13);
-  --rail-active-bar: #6366F1;
-  --rail-text-default: #3d4a5c;
-  --rail-text-hover: #7c88a0;
-  --rail-focus: #00d4aa;
-  --rail-tooltip-bg: #161620;
-  --rail-badge-warn: #f59e0b;
-  --rail-badge-info: #6366f1;
-  --rail-badge-ok: #00d4aa;
-
-  /* Templates v2 Design Tokens */
-  --tmpl-card-h: 88px;
-  --tmpl-grid-gap: 7px;
-  --tmpl-radius: 9px;
-  --tmpl-overlay-bg: rgba(0, 0, 0, 0.8);
-  --tmpl-blur: blur(3px);
-  --tmpl-modal-w: 232px;
-  --tmpl-modal-radius: 12px;
-  --tmpl-progress-h: 3px;
-  --tmpl-step-h: 16px;
-  --tmpl-tooltip-w: 162px;
-  --tmpl-onboard-delay: 800ms;
-  --tmpl-skeleton-threshold: 150ms;
-
-  /* Feature Row Gradient & Border Variants */
-  --aqb-blue-light: rgba(59, 130, 246, 0.2);
-  --aqb-blue-dark: rgba(37, 99, 235, 0.2);
-  --aqb-blue-border: rgba(59, 130, 246, 0.3);
-  --aqb-emerald-light: rgba(16, 185, 129, 0.2);
-  --aqb-emerald-dark: rgba(5, 150, 105, 0.2);
-  --aqb-emerald-border: rgba(16, 185, 129, 0.3);
-  --aqb-amber-light: rgba(245, 158, 11, 0.2);
-  --aqb-amber-dark: rgba(217, 119, 6, 0.2);
-  --aqb-amber-border: rgba(245, 158, 11, 0.3);
-  --aqb-purple-light: rgba(139, 92, 246, 0.2);
-  --aqb-purple-dark: rgba(124, 58, 237, 0.2);
-  --aqb-purple-border: rgba(139, 92, 246, 0.3);
-
-  /* Gradients - Enhanced (UX Audit 2026) */
-  --aqb-gradient-hero: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-  --aqb-gradient-glass: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
-  --aqb-gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #6366f1 100%);
-  --aqb-gradient-cta: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-  --aqb-gradient-success: linear-gradient(135deg, #10b981 0%, #22c55e 100%);
-  --aqb-gradient-publish: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
-
-  /* Enhanced Glow Effects (Webflow-inspired) */
-  --aqb-glow-primary: 0 0 20px rgba(99, 102, 241, 0.4);
-  --aqb-glow-cta: 0 4px 14px rgba(59, 130, 246, 0.4);
-  --aqb-glow-selection: 0 0 0 3px rgba(99, 102, 241, 0.2);
-  --aqb-glow-publish: 0 4px 20px rgba(99, 102, 241, 0.35);
-
-  /* Enhanced Glassmorphism (UX Audit 2026) */
-  --aqb-glass-heavy-bg: rgba(15, 15, 25, 0.75);
-  --aqb-glass-heavy-blur: blur(24px);
-  --aqb-glass-light-bg: rgba(255, 255, 255, 0.05);
-
-  /* Hover Transform Utilities */
-  --aqb-hover-lift: translateY(-2px);
-  --aqb-hover-scale: scale(1.02);
-
-  /* Build Theme - Deep Navy */
-  --aqb-build-surface: #0f172a;
-  --aqb-build-card: rgba(15, 23, 42, 0.6);
-  --aqb-build-card-hover: rgba(15, 23, 42, 0.8);
-  --aqb-build-border: rgba(255, 255, 255, 0.06);
-  --aqb-build-border-hover: rgba(255, 255, 255, 0.1);
-
-  /* AI Features - Purple reserved for AI-only features */
-  --aqb-ai: #8b5cf6;
-  --aqb-ai-hover: #7c3aed;
-  --aqb-ai-active: #6d28d9;
-  --aqb-ai-light: rgba(139, 92, 246, 0.12);
-  --aqb-ai-muted: rgba(139, 92, 246, 0.08);
-
-  /* Input Specific */
-  --aqb-input-bg: rgba(0, 0, 0, 0.25);
-  --aqb-input-bg-hover: rgba(0, 0, 0, 0.3);
-  --aqb-input-bg-focus: rgba(0, 0, 0, 0.35);
-  --aqb-input-border: rgba(255, 255, 255, 0.1);
-  --aqb-input-border-hover: rgba(255, 255, 255, 0.15);
-  --aqb-input-border-focus: rgba(59, 130, 246, 0.5);
-  --aqb-input-ring: 0 0 0 3px rgba(59, 130, 246, 0.15);
-  --aqb-input-ring-error: 0 0 0 3px rgba(239, 68, 68, 0.15);
-
-  /* Panel Control Tokens - Shared across Inspector, Sidebar, and all panels */
-  --aqb-control-accent: var(--ls-accent);
-  --aqb-control-accent-alpha-08: color-mix(in srgb, var(--ls-accent) 8%, transparent);
-  --aqb-control-accent-alpha-10: color-mix(in srgb, var(--ls-accent) 10%, transparent);
-  --aqb-control-accent-alpha-20: color-mix(in srgb, var(--ls-accent) 20%, transparent);
-  --aqb-control-accent-alpha-30: color-mix(in srgb, var(--ls-accent) 30%, transparent);
-  --aqb-control-surface-input: var(--ls-bg-card);
-  --aqb-control-surface-subtle: var(--ls-bg-subtle);
-  --aqb-control-surface-overlay: var(--ls-bg-subtle);
-  --aqb-control-text-primary: var(--ls-text-primary);
-  --aqb-control-text-secondary: var(--ls-text-secondary);
-  --aqb-control-text-tertiary: var(--ls-text-muted);
-  --aqb-control-text-muted: var(--ls-text-subtle);
-
-  /* Panel Layout Tokens - Shared section/label/input sizing */
-  --aqb-panel-section-padding: 12px 16px;
-  --aqb-panel-section-gap: 8px;
-  --aqb-panel-input-height: 30px;
-  --aqb-panel-label-size: 12px;
-  --aqb-panel-label-weight: 500;
-
-  /* Toggle button states */
-  --toggle-bg-default: transparent;
-  --toggle-bg-active: var(--aqb-surface-4);
-  --toggle-border-active: var(--aqb-primary);
-
-  /* Status colors */
-  --status-saving: var(--aqb-warning);
-  --status-saved: var(--aqb-success);
-  --status-error: var(--aqb-error);
-  --status-synced: var(--aqb-success);
-  --status-offline: var(--aqb-text-muted);
-
-  /* Micro-animations */
-  --transition-toggle: 150ms ease;
-  --transition-glow: 200ms ease;
-
-  /* Layout Dimensions - IA Redesign 2026 */
-  --aqb-header-height: 52px;
-  /* TopBar height - touch-friendly */
-  --aqb-footer-height: 40px;
-  /* Canvas footer toolbar */
-  --aqb-sidebar-width: 56px;
-  /* Icon rail - touch-optimized (44px icons + padding) */
-  --aqb-sidebar-panel-width: 280px;
-  /* Left panel - industry standard (Webflow/Framer) */
-  --aqb-right-panel-width: 280px;
-  /* Right inspector - PRD §11: 280px default */
-  --aqb-layout-gap: var(--aqb-space-3);
-  --aqb-touch-min: 44px;
-  /* Minimum touch target size */
-  --aqb-touch-gap: 8px;
-  /* Gap between touch targets */
-
-  /* Glass Effect Tokens - Sidebar glassmorphism */
-  --aqb-sidebar-glass-bg: rgba(10, 10, 10, 0.6);
-  --aqb-sidebar-glass-blur: blur(12px);
-  --aqb-sidebar-glass-border: rgba(255, 255, 255, 0.08);
-  --aqb-sidebar-glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-
-  /* Brand Colors */
-  --aqb-brand-accent: rgba(170, 210, 255, 0.95);
-
-  /* ── RF-3 Additions ─────────────────────────────────────────────────────── */
-
-  /* Motion — duration aliases for enter/exit + named easing aliases */
-  --aqb-duration-enter: 200ms;
-  --aqb-duration-exit: 150ms;
-  --aqb-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  /* ─────── MOTION ─────── */
+  --aqb-ease-default:    cubic-bezier(0.4, 0, 0.2, 1);
+  --aqb-ease-in:         cubic-bezier(0.4, 0, 1, 1);
+  --aqb-ease-out:        cubic-bezier(0, 0, 0.2, 1);
+  --aqb-ease-in-out:     cubic-bezier(0.4, 0, 0.2, 1);
+  --aqb-ease-standard:   cubic-bezier(0.4, 0, 0.2, 1);
   --aqb-ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
   --aqb-ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
-  --aqb-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --aqb-ease-bounce:     cubic-bezier(0.34, 1.56, 0.64, 1);
+  --aqb-ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* Z-index — editor layer scale (complements existing generic scale) */
-  --aqb-z-canvas: 0;
-  --aqb-z-overlay: 10;
-  --aqb-z-panel: 20;
-  --aqb-z-rail: 30;
-  --aqb-z-topbar: 40;
+  --aqb-duration-instant:  50ms;
+  --aqb-duration-fast:     100ms;
+  --aqb-duration-normal:   150ms;
+  --aqb-duration-moderate: 200ms;
+  --aqb-duration-slow:     300ms;
+  --aqb-duration-slower:   400ms;
+  --aqb-duration-enter:    200ms;
+  --aqb-duration-exit:     150ms;
 
-  /* Focus ring */
-  --aqb-focus-ring: 0 0 0 2px #6366f1;
+  --aqb-transition-fast:      100ms var(--aqb-ease-default);
+  --aqb-transition-normal:    150ms var(--aqb-ease-default);
+  --aqb-transition-slow:      300ms var(--aqb-ease-default);
+  --aqb-transition-colors:    150ms var(--aqb-ease-default);
+  --aqb-transition-transform: 200ms var(--aqb-ease-out);
+  --aqb-transition-all:       200ms var(--aqb-ease-default);
+
+  /* ─────── Z-INDEX ─────── */
+  --aqb-z-base:     0;
+  --aqb-z-canvas:   0;
+  --aqb-z-overlay:  10;
+  --aqb-z-panel:    20;
+  --aqb-z-rail:     30;
+  --aqb-z-topbar:   40;
+  --aqb-z-dropdown: 100;
+  --aqb-z-sticky:   200;
+  --aqb-z-modal:    400;
+  --aqb-z-popover:  500;
+  --aqb-z-tooltip:  600;
+  --aqb-z-toast:    700;
+  --aqb-z-max:      9999;
+
+  /* ─────── INPUTS ─────── */
+  --aqb-input-bg:           var(--aqb-bg-card);
+  --aqb-input-bg-hover:     var(--aqb-bg-subtle);
+  --aqb-input-bg-focus:     var(--aqb-bg-card);
+  --aqb-input-border:       var(--aqb-border-medium);
+  --aqb-input-border-hover: var(--aqb-border-strong);
+  --aqb-input-border-focus: var(--accent);
+  --aqb-input-ring:       0 0 0 3px var(--accent-tint);
+  --aqb-input-ring-error: 0 0 0 3px var(--aqb-error-light);
+
+  /* ─────── FOCUS ─────── */
+  --aqb-focus-ring:        0 0 0 2px var(--accent);
   --aqb-focus-ring-offset: 2px;
 
-  /* Line-height aliases (matches PRD §6.2 naming; --aqb-leading-* variants already exist) */
-  --aqb-line-tight: 1.25;
-  --aqb-line-normal: 1.5;
-}
+  /* ─────── GLASS (neutralized — no real glass on light chrome) ─────── */
+  --aqb-glass-bg:          var(--aqb-bg-card);
+  --aqb-glass-border:      var(--aqb-border);
+  --aqb-glass-shadow:      var(--aqb-shadow-md);
+  --aqb-glass-blur:        none;
+  --aqb-glass-heavy-bg:    var(--aqb-bg-card);
+  --aqb-glass-heavy-blur:  none;
+  --aqb-glass-light-bg:    var(--aqb-bg-subtle);
 
-/* ============================================
-   V2 SEMANTIC DESIGN SYSTEM
-   "Spaceship" Palette - New tokens for Layout Shell Redesign
-   These coexist with existing --aqb-* tokens for gradual migration
-   ============================================ */
-:root {
-  /* Surface Hierarchy - Semantic naming (Redesign 2026)
-     Migrated from "spaceship" dark palette to light theme to match the
-     editor redesign (commit 4b60c41 feat(editor): apply global light theme
-     to canvas, topbar, inspector). The dark base bled through in the band
-     above the canvas area until these were updated. */
-  --surface-base: #F8FAFC;
-  /* App background */
-  --surface-panel: #FFFFFF;
-  /* Panels */
-  --surface-panel-hover: rgba(15, 23, 42, 0.04);
-  --surface-canvas: #EEF2F7;
-  /* Canvas background */
-  --surface-elevated: #FFFFFF;
-  /* Elevated elements */
+  /* ─────── CONTROL TOKENS (inspector + panel shared) ─────── */
+  --aqb-control-accent:          var(--accent);
+  --aqb-control-accent-alpha-08: var(--accent-subtle);
+  --aqb-control-accent-alpha-10: var(--accent-tint);
+  --aqb-control-accent-alpha-20: rgba(45, 109, 255, 0.20);
+  --aqb-control-accent-alpha-30: rgba(45, 109, 255, 0.30);
+  --aqb-control-surface-input:   var(--aqb-bg-card);
+  --aqb-control-surface-subtle:  var(--aqb-bg-subtle);
+  --aqb-control-surface-overlay: var(--aqb-bg-subtle);
+  --aqb-control-text-primary:    var(--aqb-text-primary);
+  --aqb-control-text-secondary:  var(--aqb-text-secondary);
+  --aqb-control-text-tertiary:   var(--aqb-text-muted);
+  --aqb-control-text-muted:      var(--aqb-text-muted);
 
-  /* Border Tokens */
-  --border-subtle: rgba(15, 23, 42, 0.08);
-  /* Default borders */
-  --border-medium: rgba(15, 23, 42, 0.12);
-  /* Emphasized borders */
-  --border-strong: rgba(15, 23, 42, 0.18);
-  /* Strong contrast borders */
-  --border-active: #3b82f6;
-  /* Active/Focus border */
+  --aqb-panel-section-padding: 12px 16px;
+  --aqb-panel-section-gap:     8px;
+  --aqb-panel-input-height:    30px;
+  --aqb-panel-label-size:      12px;
+  --aqb-panel-label-weight:    500;
 
-  /* Text Tokens - Semantic */
-  --text-primary: #0F172A;
-  /* Headings, main labels */
-  --text-secondary: #475569;
-  /* Subtitles, hints */
-  --text-tertiary: #64748B;
-  /* Disabled, placeholder */
-  --text-muted: #94A3B8;
-  /* Very subtle text */
+  /* ─────── LAYOUT DIMENSIONS ─────── */
+  --aqb-header-height:       56px;
+  --aqb-footer-height:       40px;
+  --aqb-sidebar-width:       60px;
+  --aqb-sidebar-panel-width: 240px;
+  --aqb-right-panel-width:   320px;
+  --aqb-layout-gap:          var(--aqb-space-3);
+  --aqb-touch-min:           44px;
+  --aqb-touch-gap:           8px;
 
-  /* Brand Colors */
-  --brand-primary: #3b82f6;
-  /* Primary actions */
-  --brand-primary-hover: #2563eb;
-  /* Primary hover state */
-  --brand-primary-light: rgba(59, 130, 246, 0.12);
-  --selection-blue: #2563eb;
-  /* Selection outlines */
-  --accent-glow: 0 0 15px rgba(59, 130, 246, 0.5);
+  /* ─────── STATUS ─────── */
+  --status-saving:  var(--aqb-warning);
+  --status-saved:   var(--aqb-success);
+  --status-error:   var(--aqb-error);
+  --status-synced:  var(--aqb-success);
+  --status-offline: var(--aqb-text-muted);
 
-  /* Glass Effects - Premium feel */
-  --glass-blur: blur(20px);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  --glass-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+  --toggle-bg-default:   transparent;
+  --toggle-bg-active:    var(--aqb-bg-subtle);
+  --toggle-border-active:var(--accent);
 
-  /* Layout Shell Dimensions — PRD §7–11 */
-  --layout-rail-width: 56px;
-  /* Left icon rail — PRD §8 */
-  --layout-drawer-width: 280px;
-  /* Sliding drawer panel — PRD §9.3 */
-  --layout-inspector-width: 280px;
-  /* Right inspector panel — PRD §11 */
-  --layout-topbar-height: 52px;
-  /* Top bar height — PRD §7 */
-  --layout-gap: 8px;
-  /* Tighter gap */
+  --transition-toggle: 150ms ease;
+  --transition-glow:   200ms ease;
 
-  /* Interaction Feedback */
-  --feedback-hover: rgba(255, 255, 255, 0.05);
-  --feedback-active: rgba(255, 255, 255, 0.08);
-  --feedback-focus: rgba(59, 130, 246, 0.25);
+  /* ─────── LEFT SIDEBAR (--ls-*) — aliases to canonical ─────── */
+  --ls-bg-app:        var(--aqb-bg-app);
+  --ls-bg-panel:      var(--aqb-bg-panel);
+  --ls-bg-subtle:     var(--aqb-bg-subtle);
+  --ls-bg-card:       var(--aqb-bg-card);
+  --ls-topbar-bg:     var(--aqb-bg-panel);
+  --ls-inspector-bg:  var(--aqb-bg-panel);
 
-  /* Animation Tokens */
-  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-  --duration-fast: 150ms;
-  --duration-normal: 200ms;
-  --duration-slow: 300ms;
+  --ls-text-primary:   var(--aqb-text-primary);
+  --ls-text-secondary: var(--aqb-text-secondary);
+  --ls-text-medium:    var(--aqb-text-secondary);
+  --ls-text-muted:     var(--aqb-text-muted);
+  --ls-text-subtle:    var(--aqb-text-muted);
+  --ls-text-lighter:   var(--aqb-text-secondary);
+  --ls-text-ghost:     var(--aqb-text-disabled);
 
-  /* Z-Index Layering */
-  --z-canvas: 0;
-  --z-overlay: 100;
-  --z-panel: 500;
-  --z-modal: 9999;
-}
+  --ls-border-light:     var(--aqb-border);
+  --ls-border-soft:      var(--aqb-border);
+  --ls-border-medium:    var(--aqb-border-medium);
+  --ls-border-card:      var(--aqb-border);
+  --ls-border-dialog:    var(--aqb-border-medium);
+  --ls-topbar-border:    var(--aqb-border-medium);
+  --ls-inspector-border: var(--aqb-border);
 
-/* Glass Panel Utility Class */
-.glass-panel {
-  background: var(--surface-panel);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--border-subtle);
-  box-shadow: var(--glass-shadow);
-}
+  --ls-accent:         var(--accent);
+  --ls-accent-bg:      var(--accent-tint);
+  --ls-accent-bg-hover:var(--accent-tint);
+  --ls-accent-border:  var(--accent);
+  --ls-accent-txt:     var(--aqb-text-primary);
 
-/* Glass Panel Elevated Variant */
-.glass-panel-elevated {
-  background: var(--surface-elevated);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--border-medium);
-  box-shadow: var(--glass-shadow-lg);
-}
+  --ls-danger:        var(--aqb-error);
+  --ls-danger-bg:     var(--aqb-error-light);
+  --ls-danger-border: var(--aqb-error);
+  --ls-error-bg:      var(--aqb-error-light);
+  --ls-error-text:    var(--aqb-error);
+  --ls-warning-bg:    var(--aqb-warning-light);
+  --ls-warning-text:  var(--aqb-warning);
+  --ls-success-text:  var(--aqb-success);
+  --ls-success-bg:    var(--aqb-success-light);
+  --ls-dirty:         var(--aqb-warning);
+  --ls-destructive:   var(--aqb-error);
+  --ls-green-check:   var(--aqb-success);
+  --ls-success-text-dark: var(--aqb-success);
 
-/* ============================================
-   Light Theme Override
-   Toggle via document.documentElement.classList.toggle('light-theme')
-   ============================================ */
-:root.light-theme {
-  /* Navbar Variables - Light Mode */
-  --bar: #f8fafc;
-  --bar2: #f1f5f9;
-  --barStroke: #e2e8f0;
-  --pillStroke: #cbd5e1;
-  --pillStroke2: #94a3b8;
-  --txt: #1e293b;
-  --muted: #475569;
-  --blue: #3b82f6;
-  --blue2: #2563eb;
-  --green: #22c55e;
-  --green2: #16a34a;
-  --navShadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --ls-canvas-dot:    rgba(15, 23, 42, 0.06);
+  --ls-overlay:       rgba(15, 23, 42, 0.40);
+  --ls-shadow-menu:   var(--aqb-shadow-dropdown);
+  --ls-shadow-dialog: var(--aqb-shadow-modal);
 
-  /* Surface Hierarchy - Light Depth */
-  --aqb-surface-1: #ffffff;
-  --aqb-surface-2: #f8fafc;
-  --aqb-surface-3: #f1f5f9;
-  --aqb-surface-4: #e2e8f0;
-  --aqb-surface-5: #cbd5e1;
+  /* ─────── RAIL (--rail-*) — aliases to canonical ─────── */
+  --rail-bg:              var(--aqb-bg-panel);
+  --rail-active:          var(--accent);
+  --rail-active-bg:       var(--accent-tint);
+  --rail-active-bg-hover: var(--accent-tint);
+  --rail-active-bar:      var(--accent);
+  --rail-text-default:    var(--aqb-text-secondary);
+  --rail-text-hover:      var(--aqb-text-primary);
+  --rail-focus:           var(--accent);
+  --rail-tooltip-bg:      var(--aqb-text-primary);
+  --rail-badge-warn:      var(--aqb-warning);
+  --rail-badge-info:      var(--accent);
+  --rail-badge-ok:        var(--aqb-success);
 
-  /* Background Colors - Light Mode */
-  --aqb-bg-dark: #f8fafc;
-  --aqb-bg-darker: #f1f5f9;
-  --aqb-bg-panel: #ffffff;
-  --aqb-bg-panel-secondary: #f8fafc;
-  --aqb-bg-panel-tertiary: #f1f5f9;
-  --aqb-bg-elevated: #ffffff;
-  --aqb-bg-canvas: #ffffff;
-  --aqb-bg-hover: rgba(0, 0, 0, 0.04);
-  --aqb-bg-active: rgba(0, 0, 0, 0.06);
+  /* ─────── V2 SEMANTIC (--surface-* / --text-* / --brand-*) — aliases ─────── */
+  --surface-base:         var(--aqb-bg-app);
+  --surface-panel:        var(--aqb-bg-panel);
+  --surface-panel-hover:  var(--aqb-bg-hover);
+  --surface-canvas:       var(--aqb-bg-canvas);
+  --surface-elevated:     var(--aqb-bg-elevated);
+  --border-subtle:        var(--aqb-border);
+  --border-strong:        var(--aqb-border-strong);
+  --border-active:        var(--accent);
+  --text-primary:         var(--aqb-text-primary);
+  --text-secondary:       var(--aqb-text-secondary);
+  --text-tertiary:        var(--aqb-text-muted);
+  --text-muted:           var(--aqb-text-muted);
+  --brand-primary:        var(--accent);
+  --brand-primary-hover:  var(--accent-hover);
+  --brand-primary-light:  var(--accent-tint);
+  --selection-blue:       var(--accent);
+  --accent-glow:          0 0 0 3px var(--accent-tint);
+  --glass-blur:           none;
+  --glass-shadow:         var(--aqb-shadow-md);
+  --glass-shadow-lg:      var(--aqb-shadow-lg);
+  --layout-rail-width:      60px;
+  --layout-drawer-width:    240px;
+  --layout-inspector-width: 320px;
+  --layout-topbar-height:   56px;
+  --layout-gap:             8px;
+  --feedback-hover:   var(--aqb-bg-hover);
+  --feedback-active:  var(--aqb-bg-active);
+  --feedback-focus:   var(--accent-tint);
+  --ease-bounce:      var(--aqb-ease-bounce);
+  --ease-smooth:      var(--aqb-ease-default);
+  --duration-fast:    var(--aqb-duration-normal);
+  --duration-normal:  var(--aqb-duration-moderate);
+  --duration-slow:    var(--aqb-duration-slow);
+  --z-canvas:         var(--aqb-z-canvas);
+  --z-overlay:        var(--aqb-z-overlay);
+  --z-panel:          var(--aqb-z-panel);
+  --z-modal:          var(--aqb-z-modal);
 
-  /* Text Colors - Light Mode */
-  --aqb-text-primary: #1e293b;
-  --aqb-text-secondary: #475569;
-  --aqb-text-tertiary: #64748b;
-  --aqb-text-muted: #94a3b8;
-  --aqb-text-disabled: #cbd5e1;
+  /* ─────── LEGACY NAVBAR (--bar / --blue / --txt) — aliases ─────── */
+  --bar:        var(--aqb-bg-panel);
+  --bar2:       var(--aqb-bg-subtle);
+  --barStroke:  var(--aqb-border-medium);
+  --pillStroke: var(--aqb-border-medium);
+  --pillStroke2:var(--aqb-border-strong);
+  --txt:        var(--aqb-text-primary);
+  --muted:      var(--aqb-text-secondary);
+  --blue:       var(--accent-hover);
+  --blue2:      var(--accent);
+  --green:      var(--aqb-success);
+  --green2:     var(--aqb-success);
+  --navShadow:  var(--aqb-shadow-md);
 
-  /* Border Colors - Light Mode */
-  --aqb-border: rgba(0, 0, 0, 0.08);
-  --aqb-border-light: rgba(0, 0, 0, 0.12);
-  --aqb-border-hover: rgba(0, 0, 0, 0.15);
+  /* ─────── BRAND / MISC ─────── */
+  --aqb-brand-accent: var(--accent);
+  --aqb-build-surface:       var(--aqb-bg-panel);
+  --aqb-build-card:          var(--aqb-bg-card);
+  --aqb-build-card-hover:    var(--aqb-bg-hover);
+  --aqb-build-border:        var(--aqb-border);
+  --aqb-build-border-hover:  var(--aqb-border-strong);
 
-  /* Shadows - Light Mode */
-  --aqb-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --aqb-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --aqb-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
-  --aqb-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
-  --aqb-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+  /* Gradients — neutralized to solid accent (DESIGN.md bans gradients) */
+  --aqb-gradient-hero:    var(--accent);
+  --aqb-gradient-glass:   var(--aqb-bg-card);
+  --aqb-gradient-primary: var(--accent);
+  --aqb-gradient-cta:     var(--accent);
+  --aqb-gradient-success: var(--aqb-success);
+  --aqb-gradient-publish: var(--accent);
 
-  /* Glass Morphism - Light Mode */
-  --aqb-glass-bg: rgba(255, 255, 255, 0.85);
-  --aqb-glass-border: rgba(0, 0, 0, 0.08);
-  --aqb-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  /* Feature-row color variants — all re-routed to accent or semantic */
+  --aqb-blue-light:     var(--accent-tint);
+  --aqb-blue-dark:      rgba(45, 109, 255, 0.20);
+  --aqb-blue-border:    rgba(45, 109, 255, 0.30);
+  --aqb-emerald-light:  rgba(22, 163, 74, 0.10);
+  --aqb-emerald-dark:   rgba(22, 163, 74, 0.20);
+  --aqb-emerald-border: rgba(22, 163, 74, 0.30);
+  --aqb-amber-light:    rgba(217, 119, 6, 0.10);
+  --aqb-amber-dark:     rgba(217, 119, 6, 0.20);
+  --aqb-amber-border:   rgba(217, 119, 6, 0.30);
+  --aqb-purple-light:   var(--accent-tint);
+  --aqb-purple-dark:    rgba(45, 109, 255, 0.20);
+  --aqb-purple-border:  rgba(45, 109, 255, 0.30);
 
-  /* Input Specific - Light Mode */
-  --aqb-input-bg: rgba(0, 0, 0, 0.03);
-  --aqb-input-bg-hover: rgba(0, 0, 0, 0.05);
-  --aqb-input-bg-focus: rgba(0, 0, 0, 0.06);
-  --aqb-input-border: rgba(0, 0, 0, 0.1);
-  --aqb-input-border-hover: rgba(0, 0, 0, 0.15);
+  --aqb-hover-lift:  translateY(-2px);
+  --aqb-hover-scale: scale(1.02);
+
+  /* Other accent families — all re-routed to canonical */
+  --aqb-accent-cyan:       var(--accent);
+  --aqb-accent-cyan-light: var(--accent-tint);
+  --aqb-accent-amber:      var(--aqb-warning);
+  --aqb-accent-amber-light:var(--aqb-warning-light);
+  --aqb-accent-emerald:    var(--aqb-success);
+  --aqb-accent-emerald-light: var(--aqb-success-light);
+  --aqb-accent-rose:       var(--aqb-error);
+  --aqb-accent-rose-light: var(--aqb-error-light);
+
+  /* Templates v2 — keep layout tokens, they are sizing not color */
+  --tmpl-card-h:             88px;
+  --tmpl-grid-gap:           7px;
+  --tmpl-radius:             9px;
+  --tmpl-overlay-bg:         rgba(15, 23, 42, 0.40);
+  --tmpl-blur:               none;
+  --tmpl-modal-w:            232px;
+  --tmpl-modal-radius:       12px;
+  --tmpl-progress-h:         3px;
+  --tmpl-step-h:             16px;
+  --tmpl-tooltip-w:          162px;
+  --tmpl-onboard-delay:      800ms;
+  --tmpl-skeleton-threshold: 150ms;
+
+  /* Sidebar glass — neutralized */
+  --aqb-sidebar-glass-bg:     var(--aqb-bg-panel);
+  --aqb-sidebar-glass-blur:   none;
+  --aqb-sidebar-glass-border: var(--aqb-border);
+  --aqb-sidebar-glass-shadow: var(--aqb-shadow-md);
+
+  /* Media category tokens — DELETED (0 consumers confirmed).
+     --media-img / --media-vid / --media-doc / --media-fnt removed per DESIGN.md
+     single-accent rule. */
 }
 
 /* ============================================
@@ -1545,20 +1381,20 @@
 }
 
 /* ============================================
-   Topbar — New Design 2026
-   Light theme: #F8FAFC bg, 56px, tb-* classes
-   Spec: Component/Topbar/Main — left icon-btns (r=8) | breadcrumb | collab+actions
+   Topbar — canonical light chrome (DESIGN.md)
+   All values via tokens. No raw hex. Height 56px.
    ============================================ */
 
 /* Outer shell */
 .tbWrap {
   width: 100%;
-  height: 56px;
-  min-height: 56px;
-  background: #F8FAFC;
-  border-bottom: 1px solid #CBD5E1;
+  height: var(--aqb-header-height);
+  min-height: var(--aqb-header-height);
+  background: var(--aqb-bg-panel);
+  border-bottom: 1px solid var(--aqb-border-medium);
   flex-shrink: 0;
   box-sizing: border-box;
+  font-family: var(--aqb-font-family);
 }
 
 /* Inner flex row */
@@ -1572,7 +1408,7 @@
 }
 
 /* Sections */
-.tbLeft {
+.tbLeft, .tbRight {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1587,39 +1423,32 @@
   min-width: 0;
 }
 
-.tbRight {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 0 0 auto;
-}
-
-/* ── Icon button — 32×32, cornerRadius 8 (back, undo, redo) ── */
+/* ── Icon button — 32×32, cornerRadius 8 ── */
 .tbIconBtn {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
-  background: #FFFFFF;
-  border: 1px solid #CBD5E1;
+  border-radius: var(--aqb-radius-md);
+  background: var(--aqb-bg-card);
+  border: 1px solid var(--aqb-border-medium);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #334155;
+  color: var(--aqb-text-primary);
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 0.12s ease, border-color 0.12s ease;
+  transition: background 120ms ease, border-color 120ms ease;
   text-decoration: none;
   padding: 0;
   font-family: inherit;
 }
 
 .tbIconBtn:hover:not(:disabled) {
-  background: #F1F5F9;
-  border-color: #94A3B8;
+  background: var(--aqb-bg-subtle);
+  border-color: var(--aqb-border-strong);
 }
 
 .tbIconBtn:active:not(:disabled) {
-  background: #E2E8F0;
+  background: var(--aqb-surface-4);
 }
 
 .tbIconBtn:disabled {
@@ -1631,11 +1460,11 @@
 .tbDivider {
   width: 1px;
   height: 20px;
-  background: #CBD5E1;
+  background: var(--aqb-border-medium);
   flex-shrink: 0;
 }
 
-/* ── Breadcrumb (center, default state) ── */
+/* ── Breadcrumb ── */
 .tbBreadcrumb {
   display: flex;
   align-items: center;
@@ -1645,42 +1474,42 @@
 .tbBreadcrumb-project {
   font-size: 13px;
   font-weight: 400;
-  color: #64748B;
+  color: var(--aqb-text-secondary);
   white-space: nowrap;
 }
 
 .tbBreadcrumb-sep {
   font-size: 13px;
-  color: #CBD5E1;
+  color: var(--aqb-text-muted);
 }
 
 .tbBreadcrumb-page {
   font-size: 13px;
   font-weight: 500;
-  color: #334155;
+  color: var(--aqb-text-primary);
   white-space: nowrap;
 }
 
-/* ── Issues badge (center, State 2) ── */
+/* ── Issues badge ── */
 .tbIssuesBadge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 5px 10px;
-  background: #3F1D1D;
-  border: 1px solid #B91C1C;
-  border-radius: 999px;
-  color: #FCA5A5;
+  background: var(--aqb-error-light);
+  border: 1px solid var(--aqb-error);
+  border-radius: var(--aqb-radius-full);
+  color: var(--aqb-error);
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
   font-family: inherit;
-  transition: background 0.12s ease;
+  transition: background 120ms ease;
 }
 
 .tbIssuesBadge:hover {
-  background: #4D1F1F;
+  background: rgba(220, 38, 38, 0.14);
 }
 
 /* ── Invite ghost button ── */
@@ -1688,23 +1517,23 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 8px;
+  padding: 6px 10px;
   background: transparent;
-  border: 1px solid #CBD5E1;
-  border-radius: 8px;
-  color: #CBD5E1;
+  border: 1px solid var(--aqb-border-medium);
+  border-radius: var(--aqb-radius-md);
+  color: var(--aqb-text-secondary);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
   font-family: inherit;
-  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
 }
 
 .tbInviteBtn:hover {
-  background: #F8FAFC;
-  border-color: #94A3B8;
-  color: #64748B;
+  background: var(--aqb-bg-subtle);
+  border-color: var(--aqb-border-strong);
+  color: var(--aqb-text-primary);
 }
 
 /* ── Command palette button (⌘K) ── */
@@ -1713,24 +1542,26 @@
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
-  background: #FFFFFF;
-  border: 1px solid #CBD5E1;
-  border-radius: 8px;
+  background: var(--aqb-bg-card);
+  border: 1px solid var(--aqb-border-medium);
+  border-radius: var(--aqb-radius-md);
   cursor: pointer;
   white-space: nowrap;
   font-family: inherit;
-  transition: background 0.12s ease, border-color 0.12s ease;
+  color: var(--aqb-text-primary);
+  transition: background 120ms ease, border-color 120ms ease;
 }
 
 .tbCmdBtn:hover {
-  background: #F1F5F9;
-  border-color: #94A3B8;
+  background: var(--aqb-bg-subtle);
+  border-color: var(--aqb-border-strong);
 }
 
 .tbCmdText {
-  font-size: 12px;
-  font-weight: 600;
-  color: #CBD5E1;
+  font-family: var(--aqb-font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--aqb-text-secondary);
 }
 
 /* ── Preview button ── */
@@ -1739,21 +1570,21 @@
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
-  background: #FFFFFF;
-  border: 1px solid #CBD5E1;
-  border-radius: 8px;
-  color: #334155;
+  background: var(--aqb-bg-card);
+  border: 1px solid var(--aqb-border-medium);
+  border-radius: var(--aqb-radius-md);
+  color: var(--aqb-text-primary);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
   font-family: inherit;
-  transition: background 0.12s ease, border-color 0.12s ease;
+  transition: background 120ms ease, border-color 120ms ease;
 }
 
 .tbPreviewBtn:hover:not(:disabled) {
-  background: #F1F5F9;
-  border-color: #94A3B8;
+  background: var(--aqb-bg-subtle);
+  border-color: var(--aqb-border-strong);
 }
 
 .tbPreviewBtn:disabled {
@@ -1761,53 +1592,53 @@
   cursor: not-allowed;
 }
 
-/* ── Help button — 32×32, muted "?" ── */
+/* ── Help button ── */
 .tbHelpBtn {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
-  background: #FFFFFF;
-  border: 1px solid #CBD5E1;
+  border-radius: var(--aqb-radius-md);
+  background: var(--aqb-bg-card);
+  border: 1px solid var(--aqb-border-medium);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #CBD5E1;
+  color: var(--aqb-text-secondary);
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
   font-family: inherit;
   padding: 0;
 }
 
 .tbHelpBtn:hover {
-  background: #F1F5F9;
-  border-color: #94A3B8;
-  color: #94A3B8;
+  background: var(--aqb-bg-subtle);
+  border-color: var(--aqb-border-strong);
+  color: var(--aqb-text-primary);
 }
 
-/* ── Account button — 32×32, dark avatar style (#1F2937) ── */
+/* ── Account button — cobalt, replaces legacy #1F2937 per NO BLACK rule ── */
 .tbAccountBtn {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
-  background: #1F2937;
+  border-radius: var(--aqb-radius-md);
+  background: var(--accent);
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #E5E7EB;
+  color: var(--aqb-text-on-accent);
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 0.12s ease;
+  transition: background 120ms ease;
   text-decoration: none;
   padding: 0;
   font-family: inherit;
 }
 
 .tbAccountBtn:hover {
-  background: #374151;
+  background: var(--accent-hover);
 }
 
 /* ── Compact state (States 3-6: in-review, approved, published, offline) ──
@@ -1862,15 +1693,15 @@
   top: calc(100% + 6px);
   right: 0;
   white-space: nowrap;
-  background: #FFFFFF;
-  border: 1px solid #CBD5E1;
-  border-radius: 8px;
+  background: var(--aqb-bg-card);
+  border: 1px solid var(--aqb-error);
+  border-radius: var(--aqb-radius-md);
   padding: 4px 10px;
   font-size: 11px;
   font-weight: 500;
-  color: #FCA5A5;
+  color: var(--aqb-error);
   pointer-events: none;
-  z-index: 100;
+  z-index: var(--aqb-z-tooltip);
 }
 
 /* ── Topbar spinner keyframe (for loading states) ── */
@@ -1898,7 +1729,7 @@
   /* PRD §7: fixed 52px topbar height */
   min-height: 52px;
   padding: 0;
-  background: var(--aqb-bg-dark, #0c0c14);
+  background: var(--aqb-bg-dark);
   border-bottom: 1px solid var(--aqb-border, rgba(255, 255, 255, 0.08));
   flex-shrink: 0;
   box-sizing: border-box;
@@ -2142,7 +1973,7 @@
 
 /* Export Button with Gradient Glow */
 .pillExport {
-  background: linear-gradient(135deg, var(--aqb-primary, #6366f1), var(--aqb-secondary, #8b5cf6));
+  background: linear-gradient(135deg, var(--aqb-primary), var(--aqb-secondary));
   border-color: rgba(139, 92, 246, 0.4);
   color: #fff;
   box-shadow: none;
@@ -2191,13 +2022,13 @@
 }
 
 .pillPublish:hover {
-  background: var(--aqb-primary-hover, #1D4ED8);
+  background: var(--aqb-primary-hover);
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
 }
 
 .pillPublish:active {
-  background: var(--aqb-primary-active, #1E40AF);
+  background: var(--aqb-primary-active);
   transform: translateY(1px);
   box-shadow: 0 2px 10px rgba(37, 99, 235, 0.3);
 }
@@ -4240,7 +4071,7 @@ input[type="color"]::-webkit-color-swatch {
 
 /* IS7: Global focus ring — WCAG 2.1 AA (bare :focus-visible for all elements) */
 :focus-visible {
-  outline: 2px solid var(--aqb-primary, #6366f1);
+  outline: 2px solid var(--aqb-primary);
   outline-offset: var(--aqb-focus-ring-offset, 2px);
 }
 
@@ -5128,7 +4959,7 @@ textarea:disabled {
    ============================================ */
 .aqb-btn:focus-visible,
 .aqb-icon-btn:focus-visible {
-  outline: 2px solid var(--aqb-accent-purple, #7C6DFA) !important;
+  outline: 2px solid var(--aqb-accent-purple) !important;
   outline-offset: 2px !important;
   box-shadow: 0 0 0 4px rgba(124, 109, 250, 0.2) !important;
 }

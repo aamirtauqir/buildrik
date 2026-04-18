@@ -92,10 +92,10 @@ export const PricingTable: React.FC<PricingTableProps> = ({
             padding: 32,
             background: plan.highlighted
               ? "var(--aqb-primary-light, rgba(0,212,170,0.1))"
-              : "var(--aqb-bg-panel, #1a1a2e)",
+              : "var(--aqb-bg-panel)",
             border: plan.highlighted
-              ? "2px solid var(--aqb-primary, #00d4aa)"
-              : "1px solid var(--aqb-border, #334155)",
+              ? "2px solid var(--aqb-primary)"
+              : "1px solid var(--aqb-border)",
             borderRadius: 16,
             textAlign: "center",
             transform: plan.highlighted ? "scale(1.05)" : "none",
@@ -109,7 +109,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                 left: "50%",
                 transform: "translateX(-50%)",
                 padding: "4px 16px",
-                background: "var(--aqb-primary, #00d4aa)",
+                background: "var(--aqb-primary)",
                 color: "#fff",
                 fontSize: 12,
                 fontWeight: 600,
@@ -125,7 +125,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               fontSize: 24,
               fontWeight: 600,
               marginBottom: 8,
-              color: "var(--aqb-text-primary, #f8fafc)",
+              color: "var(--aqb-text-primary)",
             }}
           >
             {plan.name}
@@ -135,7 +135,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
             <p
               style={{
                 fontSize: 14,
-                color: "var(--aqb-text-muted, #94a3b8)",
+                color: "var(--aqb-text-muted)",
                 marginBottom: 24,
               }}
             >
@@ -148,7 +148,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               style={{
                 fontSize: 48,
                 fontWeight: 700,
-                color: "var(--aqb-text-primary, #f8fafc)",
+                color: "var(--aqb-text-primary)",
               }}
             >
               {plan.price}
@@ -157,7 +157,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               <span
                 style={{
                   fontSize: 16,
-                  color: "var(--aqb-text-muted, #94a3b8)",
+                  color: "var(--aqb-text-muted)",
                 }}
               >
                 {plan.period}
@@ -182,11 +182,11 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                   gap: 8,
                   padding: "8px 0",
                   fontSize: 14,
-                  color: "var(--aqb-text-secondary, #cbd5e1)",
-                  borderBottom: "1px solid var(--aqb-border, #334155)",
+                  color: "var(--aqb-text-secondary)",
+                  borderBottom: "1px solid var(--aqb-border)",
                 }}
               >
-                <span style={{ color: "var(--aqb-success, #22c55e)" }}>✓</span>
+                <span style={{ color: "var(--aqb-success)" }}>✓</span>
                 {feature}
               </li>
             ))}
@@ -197,9 +197,9 @@ export const PricingTable: React.FC<PricingTableProps> = ({
             style={{
               display: "block",
               padding: "12px 24px",
-              background: plan.highlighted ? "var(--aqb-primary, #00d4aa)" : "transparent",
-              border: plan.highlighted ? "none" : "2px solid var(--aqb-primary, #00d4aa)",
-              color: plan.highlighted ? "#fff" : "var(--aqb-primary, #00d4aa)",
+              background: plan.highlighted ? "var(--aqb-primary)" : "transparent",
+              border: plan.highlighted ? "none" : "2px solid var(--aqb-primary)",
+              color: plan.highlighted ? "#fff" : "var(--aqb-primary)",
               fontSize: 14,
               fontWeight: 600,
               borderRadius: 8,

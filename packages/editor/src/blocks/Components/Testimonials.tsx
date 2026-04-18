@@ -69,7 +69,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
             style={{
               fontSize: 24,
               fontStyle: "italic",
-              color: "var(--aqb-text-primary, #f8fafc)",
+              color: "var(--aqb-text-primary)",
               marginBottom: 24,
               lineHeight: 1.6,
             }}
@@ -101,7 +101,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
               <div
                 style={{
                   fontWeight: 600,
-                  color: "var(--aqb-text-primary, #f8fafc)",
+                  color: "var(--aqb-text-primary)",
                 }}
               >
                 {testimonials[activeIndex].author}
@@ -109,7 +109,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
               <div
                 style={{
                   fontSize: 14,
-                  color: "var(--aqb-text-muted, #94a3b8)",
+                  color: "var(--aqb-text-muted)",
                 }}
               >
                 {testimonials[activeIndex].role}
@@ -137,8 +137,8 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
                   border: "none",
                   background:
                     i === activeIndex
-                      ? "var(--aqb-primary, #00d4aa)"
-                      : "var(--aqb-border, #334155)",
+                      ? "var(--aqb-primary)"
+                      : "var(--aqb-border)",
                   cursor: "pointer",
                 }}
               />
@@ -165,8 +165,8 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
           className="aqb-testimonial-card"
           style={{
             padding: 24,
-            background: "var(--aqb-bg-panel, #1a1a2e)",
-            border: "1px solid var(--aqb-border, #334155)",
+            background: "var(--aqb-bg-panel)",
+            border: "1px solid var(--aqb-border)",
             borderRadius: 12,
           }}
         >
@@ -183,7 +183,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
           <blockquote
             style={{
               fontSize: 16,
-              color: "var(--aqb-text-secondary, #cbd5e1)",
+              color: "var(--aqb-text-secondary)",
               marginBottom: 20,
               lineHeight: 1.6,
               fontStyle: "italic",
@@ -210,7 +210,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
                   width: 40,
                   height: 40,
                   borderRadius: "50%",
-                  background: "var(--aqb-primary, #00d4aa)",
+                  background: "var(--aqb-primary)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -225,7 +225,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
               <div
                 style={{
                   fontWeight: 600,
-                  color: "var(--aqb-text-primary, #f8fafc)",
+                  color: "var(--aqb-text-primary)",
                   fontSize: 14,
                 }}
               >
@@ -234,7 +234,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
               <div
                 style={{
                   fontSize: 12,
-                  color: "var(--aqb-text-muted, #94a3b8)",
+                  color: "var(--aqb-text-muted)",
                 }}
               >
                 {testimonial.role}

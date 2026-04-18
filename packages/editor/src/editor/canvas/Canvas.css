@@ -5,173 +5,85 @@
  */
 
 /* ============================================
-   CSS Variables (can be overridden by Global Design Settings)
+   CANVAS-SCOPED TOKENS (do NOT redefine canonical --aqb-*)
+   ────────────────────────────────────────────
+   Previously a :root block that shadowed the canonical palette
+   (white text, dark surfaces, purple badges, gradient handles) —
+   deleted per DESIGN.md light unification. Canvas-specific tokens
+   below live under .aqb-canvas scope only, so they cannot leak
+   into the editor chrome.
+   Tokens that collide with canonical names (--aqb-primary, --aqb-accent,
+   --aqb-text-*, --aqb-surface-*, --aqb-shadow-*, --aqb-border) are REMOVED —
+   consumers inherit canonical from themes/default.css :root.
    ============================================ */
-:root {
-  /* ============================================
-     AQUIBRA BRAND COLORS - Single Source of Truth
-     Updated: Professional Blue Palette (Phase 4)
-     ============================================ */
-
-  /* Primary Blue (Professional Color) */
-  --aqb-primary: #2563EB;
-  --aqb-primary-light: #3B82F6;
-  --aqb-primary-dark: #1D4ED8;
-  --aqb-primary-subtle: #DBEAFE;
-
-  /* Legacy compatibility */
-  --aqb-secondary: #1D4ED8;
-  --aqb-accent: #10B981;
-
-  /* Canvas Content Colors (Light Theme) */
-  --aqb-bg: #ffffff;
-  --aqb-text: #18181B;
-  --aqb-text-muted: #71717A;
-  --aqb-border: #E4E4E7;
-
-  /* Canvas Wrapper */
-  --aqb-canvas-wrapper: #F8FAFC;
-  --aqb-canvas-content: #FFFFFF;
-  --aqb-font-family: Inter, system-ui, sans-serif;
-  --aqb-heading-font: Inter, system-ui, sans-serif;
+.aqb-canvas, .aqb-canvas-wrapper, [data-aqb-canvas] {
+  /* Canvas-only surfaces (not in canonical) */
+  --aqb-bg: var(--aqb-bg-canvas);
+  --aqb-canvas-wrapper-bg: var(--aqb-bg-panel);
+  --aqb-canvas-content-bg: var(--aqb-bg-canvas);
+  --aqb-heading-font: var(--aqb-font-family);
   --aqb-font-size: 16px;
   --aqb-heading-size: 32px;
   --aqb-line-height: 1.6;
   --aqb-spacing-sm: 8px;
   --aqb-spacing-md: 16px;
   --aqb-spacing-lg: 24px;
-  --aqb-radius-sm: 4px;
-  --aqb-radius-md: 8px;
-  --aqb-radius-lg: 16px;
 
-  /* ============================================
-     UI Typography Scale (UX-Compliant - WCAG 2.1)
-     Single Source of Truth for all UI components
-     ============================================ */
-  --aqb-font-xs: 12px;      /* Badges, hints (minimum readable) */
-  --aqb-font-sm: 13px;      /* Labels, counts, secondary text */
-  --aqb-font-md: 14px;      /* Body text, inputs, tab labels */
-  --aqb-font-lg: 15px;      /* Section headers */
-  --aqb-font-xl: 16px;      /* Titles, headings */
-
-  /* Font Weights */
+  /* Canvas-only font scale */
+  --aqb-font-xs: 12px;
+  --aqb-font-sm: 13px;
+  --aqb-font-md: 14px;
+  --aqb-font-lg: 15px;
+  --aqb-font-xl: 16px;
   --aqb-weight-normal: 400;
   --aqb-weight-medium: 500;
   --aqb-weight-semibold: 600;
   --aqb-weight-bold: 700;
 
-  /* UI Text Colors (Dark Theme) */
-  --aqb-text-primary: #f8fafc;
-  --aqb-text-secondary: #a1a1aa;
-  --aqb-text-tertiary: #71717a;
+  /* Selection (canvas handles) — uses canonical accent */
+  --aqb-selection-color:       var(--accent);
+  --aqb-selection-alpha-40:    rgba(45, 109, 255, 0.40);
+  --aqb-selection-alpha-20:    rgba(45, 109, 255, 0.20);
+  --aqb-selection-glow:        0 0 0 1px var(--accent-tint), 0 0 12px rgba(45, 109, 255, 0.12);
+  --aqb-selection-glow-sm:     0 2px 8px var(--accent-tint);
+  --aqb-selection-glow-strong: 0 0 0 2px rgba(45, 109, 255, 0.40), 0 0 16px var(--accent-tint);
+  --aqb-selection-outline:     2px solid var(--accent);
+  --aqb-handle-gradient:       var(--accent);
 
-  /* UI Surface Colors (Dark Theme) */
-  --aqb-surface-1: #0d0d1a;     /* Deep background */
-  --aqb-surface-2: #1a1a2e;     /* Panel background */
-  --aqb-surface-3: #252542;     /* Cards, inputs */
-  --aqb-surface-4: #2d2d52;     /* Hover states */
+  /* DevTools box model (Alt+Shift hover) */
+  --aqb-boxmodel-content: rgba(111, 168, 220, 0.50);
+  --aqb-boxmodel-padding: rgba(147, 196, 125, 0.45);
+  --aqb-boxmodel-margin:  rgba(246, 178, 107, 0.50);
 
-  /* Border Colors */
-  --aqb-border-subtle: rgba(255, 255, 255, 0.06);
-  --aqb-border-default: rgba(255, 255, 255, 0.1);
-  --aqb-border-strong: rgba(255, 255, 255, 0.15);
+  /* Badges (unused colors removed, all non-accent become neutral) */
+  --aqb-badge-tag:     var(--aqb-success);
+  --aqb-badge-id:      var(--accent);
+  --aqb-badge-class:   var(--aqb-warning);
+  --aqb-badge-data:    var(--accent);
+  --aqb-badge-default: var(--aqb-text-muted);
 
-  /* Accent Colors (Professional Blue) */
-  --aqb-accent-blue: #2563EB;
-  --aqb-accent-blue-alpha: rgba(37, 99, 235, 0.15);
-  --aqb-accent-blue-hover: rgba(37, 99, 235, 0.3);
-  --aqb-accent-blue-light: #3B82F6;
-  --aqb-accent-blue-dark: #1D4ED8;
-  /* Legacy purple aliases (for gradual migration) */
-  --aqb-accent-purple: var(--aqb-accent-blue);
-  --aqb-accent-purple-alpha: var(--aqb-accent-blue-alpha);
-  --aqb-accent-purple-hover: var(--aqb-accent-blue-hover);
-  --aqb-accent-purple-light: var(--aqb-accent-blue-light);
-  --aqb-accent-purple-dark: var(--aqb-accent-blue-dark);
+  /* Toolbar (canvas floating UI) */
+  --aqb-toolbar-bg:           var(--aqb-bg-card);
+  --aqb-toolbar-bg-hover:     var(--aqb-bg-subtle);
+  --aqb-toolbar-border:       var(--aqb-border-medium);
+  --aqb-toolbar-text:         var(--aqb-text-secondary);
+  --aqb-toolbar-text-hover:   var(--aqb-text-primary);
+  --aqb-toolbar-text-muted:   var(--aqb-text-muted);
+  --aqb-toolbar-text-active:  var(--aqb-text-primary);
 
-  /* Selection Colors (Clean, Professional) - IA Redesign 2026 Part 5.4 */
-  --aqb-selection-color: #3B82F6;
-  --aqb-selection-alpha-40: rgba(59, 130, 246, 0.4);
-  --aqb-selection-alpha-20: rgba(59, 130, 246, 0.2);
-  --aqb-selection-glow: 0 0 0 1px rgba(59, 130, 246, 0.2), 0 0 20px rgba(59, 130, 246, 0.15);
-  --aqb-selection-glow-sm: 0 2px 8px rgba(59, 130, 246, 0.25);
-  --aqb-selection-glow-strong: 0 0 0 2px rgba(59, 130, 246, 0.4), 0 0 20px rgba(59, 130, 246, 0.2);
-  --aqb-selection-outline: 2px solid #3B82F6;
-  --aqb-handle-gradient: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+  /* Smart guides */
+  --aqb-guide-color:     var(--accent);
+  --aqb-guide-color-alt: var(--accent-hover);
 
-  /* DevTools Box Model Colors (for Alt+Shift hover inspection) */
-  --aqb-boxmodel-content: rgba(111, 168, 220, 0.66);  /* Blue - content area */
-  --aqb-boxmodel-padding: rgba(147, 196, 125, 0.55);  /* Green - padding */
-  --aqb-boxmodel-margin: rgba(246, 178, 107, 0.66);   /* Orange - margin */
+  /* Drop feedback */
+  --aqb-drop-valid-border:    var(--accent);
+  --aqb-drop-valid-bg:        var(--accent-tint);
+  --aqb-drop-invalid-border:  var(--aqb-error);
+  --aqb-drop-invalid-bg:      var(--aqb-error-light);
 
-  /* Shadows */
-  --aqb-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --aqb-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
-  --aqb-shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.15);
-  --aqb-shadow-accent: 0 4px 14px rgba(37, 99, 235, 0.3);
-  --aqb-shadow-purple: var(--aqb-shadow-accent); /* Legacy alias */
-  --aqb-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(37, 99, 235, 0.1);
-
-  /* Transitions */
-  --aqb-transition-fast: 150ms ease;
-  --aqb-transition-normal: 200ms ease;
-  --aqb-transition-slow: 300ms ease;
-
-  /* ============================================
-     Status/Badge Colors
-     For inspector badges, annotations, etc.
-     ============================================ */
-  --aqb-badge-tag: #10B981;       /* Emerald - HTML tag badges */
-  --aqb-badge-id: #7c3aed;        /* Purple - ID attribute badges */
-  --aqb-badge-class: #f59e0b;     /* Amber - class badges */
-  --aqb-badge-data: #3b82f6;      /* Blue - data attribute badges */
-  --aqb-badge-default: #94a3b8;   /* Gray - default/custom badges */
-
-  /* ============================================
-     Feedback Colors
-     Success, error, warning, info states
-     ============================================ */
-  --aqb-success: #a6e3a1;         /* Green - success states */
-  --aqb-success-bg: rgba(166, 227, 161, 0.15);
-  --aqb-error: #f38ba8;           /* Red/Pink - error states */
-  --aqb-error-bg: rgba(243, 139, 168, 0.15);
-  --aqb-warning: #f9e2af;         /* Yellow - warning states */
-  --aqb-warning-bg: rgba(249, 226, 175, 0.15);
-  --aqb-info: #89b4fa;            /* Light blue - info states */
-  --aqb-info-bg: rgba(137, 180, 250, 0.15);
-
-  /* ============================================
-     Toolbar Colors (Dark Theme Panels)
-     Specific colors for toolbars and floating UI
-     ============================================ */
-  --aqb-toolbar-bg: #252536;
-  --aqb-toolbar-bg-hover: #3a3a4d;
-  --aqb-toolbar-border: #3a3a4d;
-  --aqb-toolbar-text: #a0a0b0;
-  --aqb-toolbar-text-hover: #e0e0e8;
-  --aqb-toolbar-text-muted: #6c7086;
-  --aqb-toolbar-text-active: #cdd6f4;
-
-  /* ============================================
-     Smart Guides
-     ============================================ */
-  --aqb-guide-color: #FF00FF;     /* Magenta - smart alignment guides */
-  --aqb-guide-color-alt: #89b4fa; /* Light blue - custom guides */
-
-  /* ============================================
-     Drop Feedback Colors - Unified Blue Palette
-     ============================================ */
-  --aqb-drop-valid-border: var(--aqb-primary);
-  --aqb-drop-valid-bg: rgba(99, 102, 241, 0.08);
-  --aqb-drop-invalid-border: #ef4444;
-  --aqb-drop-invalid-bg: rgba(239, 68, 68, 0.1);
-  --aqb-primary-muted: rgba(99, 102, 241, 0.08);
-
-  /* ============================================
-     Spacing Indicator Colors
-     ============================================ */
-  --aqb-spacing-margin: #10B981;  /* Emerald - margin indicators */
-  --aqb-spacing-padding: #7c3aed; /* Purple - padding indicators */
+  /* Spacing indicators */
+  --aqb-spacing-margin:  var(--aqb-success);
+  --aqb-spacing-padding: var(--accent);
 }
 
 /* ============================================
@@ -437,7 +349,7 @@
    ============================================ */
 /* Drop target - simple outline only, overlay handles detailed feedback */
 [data-aqb-id][data-drop-target="true"] {
-  outline: 2px solid var(--aqb-drop-valid-border, #3b82f6);
+  outline: 2px solid var(--aqb-drop-valid-border);
   outline-offset: 2px;
   transition: outline-color 150ms ease;
 }
@@ -968,12 +880,12 @@
 
 .aqb-drop-breadcrumb {
   animation: breadcrumbFadeIn 150ms ease-out forwards;
-  font-family: var(--aqb-font-family, Inter, system-ui, sans-serif);
+  font-family: var(--aqb-font-family);
 }
 
 /* Depth badge for nesting level indicator */
 .aqb-depth-badge {
-  font-family: var(--aqb-font-family, Inter, system-ui, sans-serif);
+  font-family: var(--aqb-font-family);
 }
 
 /* ============================================
@@ -1164,7 +1076,7 @@
   font-family: monospace;
   font-weight: 600;
   background: rgba(30, 30, 46, 0.85);
-  color: var(--aqb-badge-tag, #10B981);
+  color: var(--aqb-badge-tag);
   padding: 1px 4px;
   border-radius: 2px;
   pointer-events: none;
@@ -1177,16 +1089,16 @@
 
 /* Type-specific badge colors */
 .aqb-canvas[data-badges="true"] [data-aqb-type="container"]::after {
-  color: var(--aqb-badge-id, #7c3aed);
+  color: var(--aqb-badge-id);
 }
 
 .aqb-canvas[data-badges="true"] [data-aqb-type="text"]::after,
 .aqb-canvas[data-badges="true"] [data-aqb-type="heading"]::after {
-  color: var(--aqb-badge-class, #f59e0b);
+  color: var(--aqb-badge-class);
 }
 
 .aqb-canvas[data-badges="true"] [data-aqb-type="button"]::after {
-  color: var(--aqb-badge-data, #3b82f6);
+  color: var(--aqb-badge-data);
 }
 
 .aqb-canvas[data-badges="true"] [data-aqb-type="image"]::after {

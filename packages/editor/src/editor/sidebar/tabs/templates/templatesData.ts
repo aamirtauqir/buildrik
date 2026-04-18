@@ -29,6 +29,8 @@ export interface TemplateItem {
   gradient?: string;
   /** Number of pages in this template */
   pageCount?: number;
+  /** Sub-category tag for filtering (hero | features | pricing | testimonials | cta | footer | contact) */
+  subCategory?: string;
 }
 
 export type TopLevelGroup = "sections" | "pages" | "mySaves";
@@ -113,6 +115,7 @@ export const SITE_TEMPLATES: TemplateItem[] = [
     category: "landing",
     gradient: "linear-gradient(145deg, #0a081e, #180f3a)",
     pageCount: 4,
+    subCategory: "features", // SaaS landing: has feature sections
   },
   {
     id: "site-portfolio",
@@ -124,6 +127,7 @@ export const SITE_TEMPLATES: TemplateItem[] = [
     category: "portfolio",
     gradient: "linear-gradient(145deg, #0e1220, #061624)",
     pageCount: 3,
+    subCategory: "hero", // Portfolio: hero-focused layout
   },
   {
     id: "site-agency",
@@ -135,6 +139,7 @@ export const SITE_TEMPLATES: TemplateItem[] = [
     category: "landing",
     gradient: "linear-gradient(145deg, #0d1a12, #061a0a)",
     pageCount: 5,
+    subCategory: "cta", // Agency: CTA-focused hero with strong call-to-action
   },
   {
     id: "site-ecommerce",
@@ -146,6 +151,7 @@ export const SITE_TEMPLATES: TemplateItem[] = [
     category: "ecommerce",
     gradient: "linear-gradient(145deg, #1a0a00, #2d1200)",
     pageCount: 6,
+    subCategory: "pricing", // E-Commerce: product/pricing grid prominent
   },
   {
     id: "site-blog",

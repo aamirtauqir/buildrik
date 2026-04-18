@@ -8,9 +8,9 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--ls-bg-card, #FFFFFF);
-  color: var(--ls-text-primary, #0F172A);
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  background: var(--aqb-bg-card);
+  color: var(--aqb-text-primary);
+  font-family: var(--aqb-font-family);
   position: relative;
   overflow: hidden;
 }
@@ -32,7 +32,7 @@
 }
 .tpl-header-btn:hover {
   background: var(--ls-bg-subtle, #F1F5F9);
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
 }
 
 /* ── Search ── */
@@ -65,7 +65,7 @@
   border: none;
   outline: none;
   font-size: 13px;
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
   font-family: inherit;
 }
 .tpl-search-input::placeholder {
@@ -86,7 +86,7 @@
   transition: color 0.12s, background 0.12s;
 }
 .tpl-search-clear:hover {
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
   background: var(--ls-border-light, #E2E8F0);
 }
 
@@ -248,7 +248,7 @@
 .tpl-card-name {
   font-size: 13px;
   font-weight: 600;
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -291,7 +291,7 @@
 .tpl-detail-title {
   font-size: 18px;
   font-weight: 600;
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
   margin: 0;
 }
 .tpl-detail-desc {
@@ -513,7 +513,7 @@
 .tpl-apply-title {
   font-size: 15px;
   font-weight: 600;
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
   margin: 0;
 }
 .tpl-apply-bar {
@@ -563,7 +563,7 @@
 .tpl-modal-title {
   font-size: 16px;
   font-weight: 600;
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
   margin: 0 0 16px;
 }
 .tpl-modal-warning {
@@ -640,7 +640,7 @@
 .tpl-header-title {
   font-size: 18px;
   font-weight: 600;
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
   margin: 0;
 }
 .tpl-header-actions {
@@ -669,12 +669,12 @@
   padding: 0;
 }
 .tpl-breadcrumb-back:hover {
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
 }
 .tpl-breadcrumb-cat {
   font-size: 11px;
   font-weight: 600;
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
 }
 
 /* ── Loading skeleton (l5Zoz) ── */

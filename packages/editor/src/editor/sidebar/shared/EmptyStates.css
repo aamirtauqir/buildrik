@@ -27,7 +27,7 @@
 .empty-title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
   margin: 0 0 6px;
 }
 

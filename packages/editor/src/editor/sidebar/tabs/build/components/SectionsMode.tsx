@@ -10,6 +10,7 @@
  */
 
 import * as React from "react";
+import { Chevron } from "lucide-react";
 import type { Composer } from "../../../../../engine";
 import {
   SECTION_FAMILIES,
@@ -31,6 +32,18 @@ interface SectionsModeProps {
  *  came from when the browse layout is collapsed to a flat list). */
 const FAMILY_LABEL_BY_ID = new Map(SECTION_FAMILIES.map((f) => [f.id, f.label]));
 
+const SECTION_TYPE_ICONS: Record<string, React.ReactNode> = {
+  hero: <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="2"/><line x1="3" y1="20" x2="21" y2="20"/></svg>,
+  about: <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>,
+  features: <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>,
+  testimonials: <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
+  pricing: <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
+  faq: <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+  cta: <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
+  contact: <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>,
+  footers: <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>,
+};
+
 /** Case-insensitive filter over card name + sub + family label. */
 function filterSectionCards(query: string): SectionCard[] {
   const q = query.trim().toLowerCase();
@@ -46,17 +59,10 @@ function filterSectionCards(query: string): SectionCard[] {
 }
 
 export const SectionsMode: React.FC<SectionsModeProps> = ({ composer, searchQuery = "" }) => {
-  // Ref per family so jump anchors can scrollIntoView the matching header.
-  const familyRefs = React.useRef<Record<string, HTMLElement | null>>({});
+  // Active section type for icon grid + accordion layout.
+  const [activeSectionType, setActiveSectionType] = React.useState<string>("hero");
 
   const { handleSectionClick, isInserting } = useSectionInsert(composer);
-
-  const handleJumpTo = React.useCallback((familyId: string) => {
-    const el = familyRefs.current[familyId];
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }, []);
 
   // Cards pre-grouped at module load (SECTION_CARDS_BY_FAMILY). No per-mount
   // work, no useMemo churn.
@@ -152,51 +158,62 @@ export const SectionsMode: React.FC<SectionsModeProps> = ({ composer, searchQuer
     );
   }
 
-  // Browse mode: all 9 families stacked with sticky jump anchors.
+  // Browse mode: icon grid + accordion for section families.
   return (
     <div className="bld-sections-mode">
-      {/* Sticky jump-to anchors — not a real tablist since nothing is filtered. */}
-      <div className="bld-sections-jump" role="tablist" aria-label="Jump to section family">
+      {/* SECTION TYPES label */}
+      <div className="bld-sec-label">SECTION TYPES</div>
+
+      {/* Icon grid */}
+      <div className="bld-sec-type-grid">
         {SECTION_FAMILIES.map((family) => (
           <button
             key={family.id}
-            type="button"
-            className="bld-sec-chip"
-            onClick={() => handleJumpTo(family.id)}
-            aria-label={`Jump to ${family.label} sections`}
+            className={`bld-sec-type-card${activeSectionType === family.id ? ' bld-sec-type-card--active' : ''}`}
+            onClick={() => setActiveSectionType(family.id)}
+            aria-pressed={activeSectionType === family.id}
           >
-            {family.label}
+            <div className="bld-sec-type-icon">
+              {SECTION_TYPE_ICONS[family.id]}
+            </div>
+            <span className="bld-sec-type-name">{family.label}</span>
           </button>
         ))}
       </div>
 
-      {/* Scrollable body — all 9 families stacked, each with its own header. */}
-      <div className="bld-sections-scroll">
-        {SECTION_FAMILIES.map((family) => (
+      {/* Accordion sections - only active one open */}
+      {SECTION_FAMILIES.map((family) => {
+        const isOpen = activeSectionType === family.id;
+        return (
           <section
             key={family.id}
-            ref={(el) => {
-              familyRefs.current[family.id] = el;
-            }}
             className="bld-sections-family"
             aria-labelledby={`sections-family-${family.id}-header`}
           >
-            <h3
-              id={`sections-family-${family.id}-header`}
-              className="bld-sections-family-header"
+            <button
+              className={`bld-cat-row${isOpen ? ' open' : ''}`}
+              onClick={() => setActiveSectionType(isOpen ? '' : family.id)}
+              aria-expanded={isOpen}
             >
-              {family.label}
-            </h3>
-            <div className="bld-sec-cards">
-              {cardsByFamily[family.id].map((card) => renderCard(card, /* showFamilyTag */ false))}
+              <span className="bld-cat-name">{family.label}</span>
+              <span className="bld-cat-count">{cardsByFamily[family.id].length}</span>
+              <Chevron className="bld-cat-chev" />
+            </button>
+            <div className={`bld-cat-body${isOpen ? ' open' : ''}`}>
+              <div className="bld-cat-body-inner">
+                <div className="bld-sec-cards">
+                  {cardsByFamily[family.id].map((card) => renderCard(card, false))}
+                </div>
+              </div>
             </div>
           </section>
-        ))}
+        );
+      })}
 
-        <div className="bld-sec-hint">
-          <span className="bld-sec-hint-primary">Sections insert into the current page.</span>
-          <span className="bld-sec-hint-muted">Use New Page › Templates for full-page starts.</span>
-        </div>
+      {/* Bottom hint */}
+      <div className="bld-sec-hint">
+        <span className="bld-sec-hint-primary">Sections insert into the current page.</span>
+        <span className="bld-sec-hint-muted">Use New Page › Templates for full-page starts.</span>
       </div>
     </div>
   );

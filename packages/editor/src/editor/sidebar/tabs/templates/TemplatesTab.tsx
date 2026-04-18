@@ -59,6 +59,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     resetStyles, setResetStyles,
     hasExistingContent,
     pendingId,
+    requestApply,
     startApply,
     handleRetry,
   } = useTemplateApply(composer);
@@ -81,7 +82,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     addAsNewPageRef.current = false;
     pendingId.current = id;
     sel.setDetailId(null);
-    hasExistingContent ? sel.setShowReplace(true) : startApply();
+    hasExistingContent ? sel.setShowReplace(true) : requestApply(id);
   }
 
   function handleAddAsNewPage(id: string) {

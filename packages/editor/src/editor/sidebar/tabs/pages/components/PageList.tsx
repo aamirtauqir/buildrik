@@ -99,13 +99,13 @@ export const PageList: React.FC<Props> = ({
     : pages;
 
   const stats = React.useMemo(() => {
-    let drafts = 0;
-    let hidden = 0;
+    let drafts = 0, scheduled = 0, hidden = 0;
     for (const p of pages) {
-      if (p.status === "draft") drafts++;
-      else if (p.status === "hidden") hidden++;
+      if (p.status === "draft")          drafts++;
+      else if (p.status === "scheduled") scheduled++;
+      else if (p.status === "hidden")    hidden++;
     }
-    return { total: pages.length, drafts, hidden };
+    return { total: pages.length, drafts, scheduled, hidden };
   }, [pages]);
 
   if (pages.length === 0) {
@@ -299,6 +299,9 @@ export const PageList: React.FC<Props> = ({
           <span><b>{stats.total}</b> page{stats.total !== 1 ? "s" : ""}</span>
           {stats.drafts > 0 && (
             <><span>·</span><span>{stats.drafts} draft{stats.drafts !== 1 ? "s" : ""}</span></>
+          )}
+          {stats.scheduled > 0 && (
+            <><span>·</span><span>{stats.scheduled} scheduled</span></>
           )}
           {stats.hidden > 0 && (
             <><span>·</span><span>{stats.hidden} hidden</span></>

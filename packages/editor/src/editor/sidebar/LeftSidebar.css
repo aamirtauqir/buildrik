@@ -27,82 +27,15 @@
 }
 
 /* ─────────────────────────────────────────────
-   MEDIA TAB ACCENT TOKENS
+   TOKENS MOVED TO CANONICAL ROOT
+   ─────────────────────────────────────────────
+   All --ls-* aliases now live in themes/default.css :root.
+   The previous local :root here defined dark-mode values
+   (rgba(255,255,255,*) fills, #4ADE80 greens, rgba(0,0,0,0.7)
+   overlay) that shadowed the canonical light palette.
+   Media category tokens (--media-img/vid/ico/fnt) deleted —
+   DESIGN.md single-accent rule, zero consumers confirmed.
    ───────────────────────────────────────────── */
-:root {
-  --media-img: #3b82f6;
-  --media-vid: #f97316;
-  --media-ico: #f59e0b;
-  --media-fnt: #10b981;
-}
-
-/* ─────────────────────────────────────────────
-   DESIGN TOKENS (from new.left.pen variables)
-   ───────────────────────────────────────────── */
-:root {
-  /* ────────────────────────────────────────────────
-     --ls-* tokens now ALIAS the canonical --aqb-* and --accent
-     per DESIGN.md: editor chrome is dark-only, cobalt accent only.
-     Do not redefine as literal hex values. Use var() aliasing.
-     ──────────────────────────────────────────────── */
-
-  /* Surfaces */
-  --ls-bg-panel: var(--aqb-bg-panel);
-  --ls-bg-card: var(--aqb-surface-2);
-  --ls-bg-subtle: rgba(255, 255, 255, 0.04);
-
-  /* Accent — cobalt only */
-  --ls-accent: var(--accent);
-  --ls-accent-bg: var(--accent-tint);
-  --ls-accent-txt: var(--aqb-text-primary); /* WCAG AA: white text, not cobalt (4.0:1 fails) */
-  --ls-accent-border: var(--accent);
-  --ls-accent-bg-hover: var(--accent-tint);
-
-  /* Text */
-  --ls-text-primary: var(--aqb-text-primary);
-  --ls-text-secondary: var(--aqb-text-secondary);
-  --ls-text-medium: var(--aqb-text-secondary);
-  --ls-text-muted: var(--aqb-text-tertiary);
-  --ls-text-subtle: var(--aqb-text-muted);
-  --ls-text-lighter: var(--aqb-text-muted);
-  --ls-text-ghost: var(--aqb-text-muted);
-
-  /* Borders */
-  --ls-border-card: var(--aqb-border);
-  --ls-border-light: var(--aqb-border);
-  --ls-border-soft: var(--aqb-border);
-
-  /* Status (DESIGN.md keeps these) */
-  --ls-danger: #DC2626;
-  --ls-danger-dark: #991B1B;
-  --ls-danger-bg: rgba(220, 38, 38, 0.12);
-  --ls-danger-border: rgba(220, 38, 38, 0.4);
-  --ls-dirty: #F59E0B;
-
-  /* Status — dark-mode appropriate */
-  --ls-success-bg: rgba(34, 197, 94, 0.12);
-  --ls-success-text: #4ADE80;
-  --ls-success-text-dark: #22C55E;
-  --ls-warning-bg: rgba(245, 158, 11, 0.12);
-  --ls-warning-text: #FBBF24;
-  --ls-error-bg: rgba(239, 68, 68, 0.12);
-  --ls-error-text: #F87171;
-  --ls-destructive: #EF4444;
-  --ls-green-check: #22C55E;
-
-  /* Layout surfaces — dark chrome */
-  --ls-topbar-bg: var(--aqb-bg-panel);
-  --ls-topbar-border: var(--aqb-border);
-  --ls-inspector-bg: var(--aqb-bg-panel);
-  --ls-inspector-border: var(--aqb-border);
-  --ls-border-dialog: var(--aqb-border);
-  --ls-canvas-dot: rgba(255, 255, 255, 0.06);
-
-  /* Modal overlay — darker for dark chrome (was rgba 0.4, now 0.7 per design review) */
-  --ls-overlay: rgba(0, 0, 0, 0.7);
-  --ls-shadow-menu: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --ls-shadow-dialog: 0 4px 24px rgba(0, 0, 0, 0.5);
-}
 
 /* ─────────────────────────────────────────────
    ROOT — horizontal flex: rail + panel
@@ -298,7 +231,7 @@
 }
 
 .ls-panel-title {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--aqb-font-family);
   font-size: 14px;
   font-weight: 600;
   color: var(--ls-text-primary);

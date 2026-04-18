@@ -3,39 +3,33 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Aquibra Studio — new-editor-l2</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <title>Buildrik Editor</title>
+    <!--
+      Canonical type stack per DESIGN.md:
+      Inter Tight (UI) + Geist Mono (data). No system fallback names.
+      Loaded from Bunny Fonts (privacy-respecting, no Google tracking).
+    -->
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link
+      href="https://fonts.bunny.net/css?family=inter-tight:400,500,600,700|geist-mono:400,500&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      /*
+        Pre-React body defaults — matches canonical --aqb-* tokens from
+        themes/default.css. Literal values here because this paints before
+        default.css loads. Values MUST match the canonical token set.
+        See DESIGN.md § Color.
+      */
       * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body, #root { min-height: 100vh; }
       body {
-        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background: #F8FAFC;
-        color: #0F172A;
-        min-height: 100vh;
-      }
-      #root { min-height: 100vh; }
-
-      /* Light-theme overrides for the V2 "spaceship" semantic tokens.
-         themes/default.css ships these as dark by default, but the editor
-         redesign went light (commit 4b60c41 feat(editor): apply global light
-         theme to canvas, topbar, inspector). The dark base bled through in
-         the band between the top bar and the canvas. Override here at the
-         demo entry point until default.css is migrated globally. */
-      :root {
-        --surface-base: #F8FAFC;
-        --surface-panel: #FFFFFF;
-        --surface-panel-hover: rgba(15, 23, 42, 0.04);
-        --surface-canvas: #EEF2F7;
-        --surface-elevated: #FFFFFF;
-        --text-primary: #0F172A;
-        --text-secondary: #475569;
-        --text-tertiary: #64748B;
-        --text-muted: #94A3B8;
-        --border-subtle: rgba(15, 23, 42, 0.08);
-        --border-medium: rgba(15, 23, 42, 0.12);
-        --border-strong: rgba(15, 23, 42, 0.18);
+        font-family: 'Inter Tight', sans-serif;
+        background: #F1F5F9;      /* --aqb-bg-app */
+        color: #334155;           /* --aqb-text-primary */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
       }
     </style>
   </head>

@@ -75,7 +75,7 @@ export const Features: React.FC<FeaturesProps> = ({
               style={{
                 fontSize: 36,
                 fontWeight: 700,
-                color: "var(--aqb-text-primary, #f8fafc)",
+                color: "var(--aqb-text-primary)",
                 marginBottom: 16,
               }}
             >
@@ -86,7 +86,7 @@ export const Features: React.FC<FeaturesProps> = ({
             <p
               style={{
                 fontSize: 18,
-                color: "var(--aqb-text-secondary, #cbd5e1)",
+                color: "var(--aqb-text-secondary)",
                 lineHeight: 1.6,
               }}
             >
@@ -111,8 +111,8 @@ export const Features: React.FC<FeaturesProps> = ({
             className="aqb-feature-card"
             style={{
               padding: variant === "cards" ? 32 : 24,
-              background: variant === "cards" ? "var(--aqb-bg-panel, #1a1a2e)" : "transparent",
-              border: variant === "cards" ? "1px solid var(--aqb-border, #334155)" : "none",
+              background: variant === "cards" ? "var(--aqb-bg-panel)" : "transparent",
+              border: variant === "cards" ? "1px solid var(--aqb-border)" : "none",
               borderRadius: variant === "cards" ? 16 : 0,
               textAlign: variant === "icons" ? "center" : "left",
               transition: "transform 0.2s ease, box-shadow 0.2s ease",
@@ -132,7 +132,7 @@ export const Features: React.FC<FeaturesProps> = ({
               style={{
                 fontSize: 20,
                 fontWeight: 600,
-                color: "var(--aqb-text-primary, #f8fafc)",
+                color: "var(--aqb-text-primary)",
                 marginBottom: 12,
                 display: variant === "list" ? "inline" : "block",
               }}
@@ -142,7 +142,7 @@ export const Features: React.FC<FeaturesProps> = ({
             <p
               style={{
                 fontSize: 15,
-                color: "var(--aqb-text-secondary, #cbd5e1)",
+                color: "var(--aqb-text-secondary)",
                 lineHeight: 1.6,
               }}
             >

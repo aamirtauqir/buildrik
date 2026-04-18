@@ -19,7 +19,7 @@
   position: relative;
   width: min(1100px, 92vw);
   height: min(780px, 88vh);
-  background: var(--aqb-bg-dark, #0c0c14);
+  background: var(--aqb-bg-dark);
   display: flex;
   flex-direction: column;
   border-radius: var(--aqb-radius-lg, 12px);
@@ -48,7 +48,7 @@
   align-items: center;
   height: 42px;
   padding: 0 12px;
-  background: var(--aqb-bg-panel, #14141f);
+  background: var(--aqb-bg-panel);
   border-bottom: 1px solid var(--aqb-border);
   flex-shrink: 0;
   gap: 8px;
@@ -138,13 +138,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #060610;
+  background: var(--aqb-bg-app);
   padding: 12px;
   overflow: hidden;
 }
 
 .tmpl-preview__frame {
-  background: linear-gradient(145deg, #0a081e, #12093a);
+  background: var(--aqb-bg-card);
+  border: 1px solid var(--aqb-border);
   border-radius: 5px;
   overflow: hidden;
   height: 100%;
@@ -162,7 +163,7 @@
 /* ── Bottom bar ── */
 .tmpl-preview__bottom {
   padding: 8px 12px;
-  background: var(--aqb-bg-panel, #14141f);
+  background: var(--aqb-bg-panel);
   border-top: 1px solid var(--aqb-border);
   display: flex;
   gap: 6px;
@@ -194,7 +195,7 @@
   padding: 7px 12px;
   border-radius: var(--aqb-radius-sm, 6px);
   border: none;
-  background: var(--aqb-primary, #6366F1);
+  background: var(--aqb-primary);
   color: #fff;
   font-size: 10.5px;
   font-weight: 600;

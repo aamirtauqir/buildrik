@@ -47,9 +47,9 @@
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: var(--surface-base, #0f1115);
-  color: var(--text-primary, #ffffff);
-  font-family: var(--aqb-font-family, "Inter", sans-serif);
+  background: var(--aqb-bg-app);
+  color: var(--aqb-text-primary);
+  font-family: var(--aqb-font-family);
 }
 
 /* Drawer open state - expand drawer column */

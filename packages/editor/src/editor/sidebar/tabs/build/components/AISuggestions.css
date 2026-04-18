@@ -41,7 +41,7 @@
 }
 
 .ai-sug-dismiss:hover {
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
 }
 
 .ai-sug-cards {
@@ -78,7 +78,7 @@
 .ai-sug-card-title {
   font-size: 12px;
   font-weight: 600;
-  color: var(--ls-text-primary, #0F172A);
+  color: var(--ls-text-primary);
   line-height: 1.3;
 }
 

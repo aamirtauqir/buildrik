@@ -13,7 +13,7 @@
 }
 
 .sd-dialog {
-  background: var(--aqb-surface-3, #1e1e2e);
+  background: var(--aqb-surface-3);
   border-radius: 12px;
   border: 1px solid var(--aqb-border, rgba(255, 255, 255, 0.08));
   padding: 20px 24px;
@@ -53,7 +53,7 @@
 }
 
 .sd-btn--primary {
-  background: var(--aqb-primary, #2D6DFF);
+  background: var(--aqb-primary);
   color: #fff;
 }
 
@@ -66,11 +66,11 @@
 }
 
 .sd-btn--secondary:hover {
-  background: var(--aqb-surface-4, #2e2e38);
+  background: var(--aqb-surface-4);
 }
 
 .sd-btn--danger {
-  background: var(--aqb-error, #ef4444);
+  background: var(--aqb-error);
   color: #fff;
 }
 
@@ -92,7 +92,7 @@
   padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid var(--aqb-border, rgba(255, 255, 255, 0.08));
-  background: var(--aqb-surface-2, #1a1a24);
+  background: var(--aqb-surface-2);
   color: var(--aqb-text-primary, #F5F5F0);
   font-size: 13px;
   font-family: inherit;
@@ -101,5 +101,5 @@
 }
 
 .sd-input:focus {
-  border-color: var(--aqb-primary, #2D6DFF);
+  border-color: var(--aqb-primary);
 }

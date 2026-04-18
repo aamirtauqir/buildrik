@@ -283,7 +283,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
                         ? "#EF4444"
                         : nameValidation.warning
                         ? "#F59E0B"
-                        : "var(--aqb-accent, #3b82f6)",
+                        : "var(--aqb-accent)",
                     }}
                     onClick={(e) => e.stopPropagation()}
                   />
@@ -295,7 +295,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
                       top: "100%",
                       left: 0,
                       zIndex: 100,
-                      background: "var(--aqb-surface, #1a1a2e)",
+                      background: "var(--aqb-surface)",
                       border: "1px solid var(--aqb-border)",
                       borderRadius: 4,
                       padding: "4px 8px",
@@ -422,8 +422,8 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
 
 const containerStyles: React.CSSProperties = {
   position: "relative",
-  borderBottom: "1px solid var(--aqb-border, #e2e8f0)",
-  background: "var(--aqb-surface, #f8fafc)",
+  borderBottom: "1px solid var(--aqb-border)",
+  background: "var(--aqb-surface)",
 };
 
 // Outer row: tablist (scrollable) + add button (fixed, outside tablist)
@@ -451,7 +451,7 @@ const tabStyles: React.CSSProperties = {
   border: "none",
   borderRadius: "6px 6px 0 0",
   fontSize: 13,
-  color: "var(--aqb-text-secondary, #64748b)",
+  color: "var(--aqb-text-secondary)",
   cursor: "pointer",
   transition: "all 0.15s ease",
   whiteSpace: "nowrap",
@@ -459,7 +459,7 @@ const tabStyles: React.CSSProperties = {
 
 const activeTabStyles: React.CSSProperties = {
   background: "var(--aqb-surface-2, #fff)",
-  color: "var(--aqb-text-primary, #1e293b)",
+  color: "var(--aqb-text-primary)",
   fontWeight: 500,
   boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
 };
@@ -480,14 +480,14 @@ const dirtyDotStyles: React.CSSProperties = {
   width: 6,
   height: 6,
   borderRadius: "50%",
-  background: "var(--aqb-primary, #3b82f6)",
+  background: "var(--aqb-primary)",
   flexShrink: 0,
 };
 
 const inputStyles: React.CSSProperties = {
   width: 100,
   padding: "2px 4px",
-  border: "1px solid var(--aqb-accent, #3b82f6)",
+  border: "1px solid var(--aqb-accent)",
   borderRadius: 3,
   fontSize: 13,
   outline: "none",
@@ -501,10 +501,10 @@ const addButtonStyles: React.CSSProperties = {
   height: 24,
   marginLeft: 4,
   background: "transparent",
-  border: "1px dashed var(--aqb-border, #cbd5e1)",
+  border: "1px dashed var(--aqb-border)",
   borderRadius: 4,
   fontSize: 16,
-  color: "var(--aqb-text-muted, #94a3b8)",
+  color: "var(--aqb-text-muted)",
   cursor: "pointer",
   transition: "all 0.15s ease",
 };
@@ -513,7 +513,7 @@ const menuStyles: React.CSSProperties = {
   position: "fixed",
   zIndex: 10000,
   background: "var(--aqb-surface, #fff)",
-  border: "1px solid var(--aqb-border, #e2e8f0)",
+  border: "1px solid var(--aqb-border)",
   borderRadius: 8,
   boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
   padding: 4,
@@ -530,7 +530,7 @@ const menuItemStyles: React.CSSProperties = {
   border: "none",
   borderRadius: 4,
   fontSize: 13,
-  color: "var(--aqb-text-primary, #1e293b)",
+  color: "var(--aqb-text-primary)",
   cursor: "pointer",
   textAlign: "left",
 };
