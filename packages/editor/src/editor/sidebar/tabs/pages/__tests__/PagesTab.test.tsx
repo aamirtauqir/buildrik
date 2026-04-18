@@ -73,50 +73,49 @@ describe("AddPageButton", () => {
     expect(screen.getByRole("button", { name: /add new page/i })).toBeTruthy();
   });
 
-  it("shows popover with Blank page option on click", () => {
-    render(<AddPageButton onAddBlank={vi.fn()} />);
-    fireEvent.click(screen.getByRole("button", { name: /add new page/i }));
-    expect(screen.getByText("Blank page")).toBeTruthy();
-  });
-
-  it("shows From template option when onFromTemplate provided", () => {
-    render(<AddPageButton onAddBlank={vi.fn()} onFromTemplate={vi.fn()} />);
-    fireEvent.click(screen.getByRole("button", { name: /add new page/i }));
-    expect(screen.getByText("From template")).toBeTruthy();
-  });
-
-  it("does not show From template when onFromTemplate not provided", () => {
-    render(<AddPageButton onAddBlank={vi.fn()} />);
-    fireEvent.click(screen.getByRole("button", { name: /add new page/i }));
-    expect(screen.queryByText("From template")).toBeNull();
-  });
-
-  it("calls onAddBlank and closes popover on Blank page click", () => {
+  it("calls onAddBlank directly when primary button is clicked", () => {
     const onAddBlank = vi.fn();
     render(<AddPageButton onAddBlank={onAddBlank} />);
     fireEvent.click(screen.getByRole("button", { name: /add new page/i }));
-    fireEvent.click(screen.getByText("Blank page"));
+    expect(onAddBlank).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows From template in overflow menu when onFromTemplate provided", () => {
+    render(<AddPageButton onAddBlank={vi.fn()} onFromTemplate={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: /more add options/i }));
+    expect(screen.getByText("From template")).toBeTruthy();
+  });
+
+  it("does not show overflow button when no extra options provided", () => {
+    render(<AddPageButton onAddBlank={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: /more add options/i })).toBeNull();
+  });
+
+  it("calls onAddBlank when primary button clicked", () => {
+    const onAddBlank = vi.fn();
+    render(<AddPageButton onAddBlank={onAddBlank} />);
+    fireEvent.click(screen.getByRole("button", { name: /add new page/i }));
     expect(onAddBlank).toHaveBeenCalledTimes(1);
     // Popover should close
     expect(screen.queryByText("Blank page")).toBeNull();
   });
 
-  it("calls onFromTemplate and closes popover on From template click", () => {
+  it("calls onFromTemplate and closes overflow menu on From template click", () => {
     const onFromTemplate = vi.fn();
     render(<AddPageButton onAddBlank={vi.fn()} onFromTemplate={onFromTemplate} />);
-    fireEvent.click(screen.getByRole("button", { name: /add new page/i }));
+    fireEvent.click(screen.getByRole("button", { name: /more add options/i }));
     fireEvent.click(screen.getByText("From template"));
     expect(onFromTemplate).toHaveBeenCalledTimes(1);
     expect(screen.queryByText("From template")).toBeNull();
   });
 
-  it("toggles popover closed on second button click", () => {
+  it("toggles overflow menu closed on second overflow button click", () => {
     render(<AddPageButton onAddBlank={vi.fn()} onFromTemplate={vi.fn()} />);
-    const btn = screen.getByRole("button", { name: /add new page/i });
+    const btn = screen.getByRole("button", { name: /more add options/i });
     fireEvent.click(btn);
-    expect(screen.getByText("Blank page")).toBeTruthy();
+    expect(screen.getByText("From template")).toBeTruthy();
     fireEvent.click(btn);
-    expect(screen.queryByText("Blank page")).toBeNull();
+    expect(screen.queryByText("From template")).toBeNull();
   });
 });
 
