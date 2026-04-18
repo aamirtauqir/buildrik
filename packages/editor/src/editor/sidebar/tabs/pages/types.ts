@@ -6,7 +6,7 @@
 import type { PageSEO } from "../../../../shared/types";
 
 /** Visibility/publication state of a page — stored in page.settings.visibility */
-export type PageStatus = "live" | "draft" | "hidden" | "password" | "error" | "external";
+export type PageStatus = "live" | "draft" | "hidden" | "password" | "scheduled" | "error" | "external";
 
 /** Settings drawer tab identifier */
 export type DrawerTab = "seo" | "social" | "advanced";

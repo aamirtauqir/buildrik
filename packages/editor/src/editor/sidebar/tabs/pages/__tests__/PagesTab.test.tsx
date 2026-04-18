@@ -183,6 +183,13 @@ describe("PageRow active indicator", () => {
     fireEvent.click(screen.getByLabelText(/open settings for home/i));
     expect(onSettingsClick).toHaveBeenCalledTimes(1);
   });
+
+  it("renders Scheduled chip when page.status is scheduled", () => {
+    const page = makePage({ status: "scheduled" });
+    const { container } = render(<PageRow page={page} {...baseProps} />);
+    const badge = container.querySelector(".pg-row__status--scheduled");
+    expect(badge).toBeTruthy();
+  });
 });
 
 // ─── Name conflict error (Screen GoEJk) ──────────────────────────────────────

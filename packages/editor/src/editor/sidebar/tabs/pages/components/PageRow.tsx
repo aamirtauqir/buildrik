@@ -44,6 +44,8 @@ function statusLabel(page: PageItem): string {
       return "Hidden";
     case "draft":
       return "Draft";
+    case "scheduled":
+      return "Scheduled";
     case "password":
       return "Password";
     case "external":
@@ -65,6 +67,8 @@ function statusTooltip(page: PageItem): string {
       return "This page is hidden from navigation menus";
     case "password":
       return "This page requires a password to access";
+    case "scheduled":
+      return "This page is scheduled to publish automatically";
     case "error":
       return "This page has a configuration error";
     case "external":
