@@ -79,7 +79,7 @@ const titleStyles: React.CSSProperties = {
   fontSize: 14,
   fontWeight: 600,
   lineHeight: "20px",
-  color: "var(--ls-text-primary, #0F172A)",
+  color: "var(--ls-text-primary)",
   letterSpacing: "-0.01em",
 };
 

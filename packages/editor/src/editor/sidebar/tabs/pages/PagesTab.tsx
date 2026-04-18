@@ -2,11 +2,12 @@
  * PagesTab — Shell component.
  *
  * Wires usePages hook to sub-components. Zero business logic here.
- * Business logic: ./pages/usePages.ts
- * Settings logic: ./pages/page-settings/usePageSettings.ts
+ * Business logic: ./usePages.ts
+ * Settings logic: ./page-settings/usePageSettings.ts
  *
- * B-03 fix: page settings no longer replace the list with a full-panel
- * drawer. Instead, each PageRow expands inline with accordion sections.
+ * Page settings live in a 580px slide-over drawer (PageSettingsDrawer)
+ * rendered here, opened via settingsPageId and wrapped in a local error
+ * boundary so a bad page doesn't crash the whole tab.
  *
  * @license BSD-3-Clause
  */
@@ -15,9 +16,14 @@ import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { ConfirmDialog } from "../../../../shared/ui/Modal";
 import { PanelHeader } from "../../shared/PanelHeader";
+import { PageCommandPalette } from "./components/PageCommandPalette";
 import { PageContextMenu } from "./components/PageContextMenu";
 import { PageList } from "./components/PageList";
+import { PageSettingsDrawer } from "./page-settings/PageSettingsDrawer";
+import { SettingsErrorBoundary } from "./page-settings/SettingsErrorBoundary";
 import { usePages } from "./usePages";
+import { useFolders } from "./useFolders";
+import { useBulkSelect } from "./useBulkSelect";
 import "./PagesTab.css";
 
 export interface PagesTabProps {
@@ -40,12 +46,34 @@ export const PagesTab: React.FC<PagesTabProps> = ({
 }) => {
   const p = usePages(composer);
 
+  // Folders — sidebar-only, localStorage-persisted
+  const composerId = (composer as { id?: string } | null)?.id ?? null;
+  const livePageIds = React.useMemo(
+    () => new Set(p.pages.map((pg) => pg.id)),
+    [p.pages]
+  );
+  const f = useFolders(composerId, livePageIds);
+  const bulk = useBulkSelect();
+
+  // Prune stale folder references when pages are deleted
+  React.useEffect(() => {
+    f.pruneDeletedPages(livePageIds);
+  }, [livePageIds, f.pruneDeletedPages]);
+
   // Delete confirmation state — UI concern lives here, not in usePages
   const [deleteTargetId, setDeleteTargetId] = React.useState<string | null>(null);
   const deleteTarget = p.pages.find((pg) => pg.id === deleteTargetId);
 
   // Name conflict error state (Screen GoEJk)
   const [nameError, setNameError] = React.useState<string | null>(null);
+
+  // ⌘K command palette
+  const [paletteOpen, setPaletteOpen] = React.useState(false);
+
+  // Settings drawer — resolve the active page from the id stored in usePages
+  const settingsPage = p.settingsPageId
+    ? p.pages.find((pg) => pg.id === p.settingsPageId) ?? null
+    : null;
 
   const handleRenameCommit = React.useCallback(
     (pageId: string, name: string) => {
@@ -76,6 +104,60 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     setDeleteTargetId(pageId); // show confirm dialog
   };
 
+  // ⌘K / Ctrl+K shortcut — open command palette; Escape — clear bulk selection
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setPaletteOpen((open) => !open);
+      }
+      if (e.key === "Escape" && bulk.hasSelection) {
+        bulk.clearSelection();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [bulk.hasSelection, bulk.clearSelection]);
+
+  // Ordered page ids for shift-range selection
+  const orderedPageIds = React.useMemo(() => p.pages.map((pg) => pg.id), [p.pages]);
+
+  const handleToggleSelect = React.useCallback(
+    (pageId: string, e: React.MouseEvent | React.KeyboardEvent) => {
+      const shift = "shiftKey" in e ? e.shiftKey : false;
+      bulk.toggleSelect(pageId, { shift, orderedIds: orderedPageIds });
+    },
+    [bulk.toggleSelect, orderedPageIds]
+  );
+
+  // Bulk actions
+  const handleBulkDuplicate = React.useCallback(() => {
+    bulk.selectedIds.forEach((id) => p.duplicatePage(id));
+    bulk.clearSelection();
+  }, [bulk.selectedIds, p.duplicatePage, bulk.clearSelection]);
+
+  const handleBulkDelete = React.useCallback(() => {
+    const deletable = [...bulk.selectedIds].filter((id) => {
+      const pg = p.pages.find((x) => x.id === id);
+      return pg && !pg.isHome && p.pages.length > bulk.selectedIds.size;
+    });
+    deletable.forEach((id) => p.deletePage(id));
+    bulk.clearSelection();
+  }, [bulk.selectedIds, p.pages, p.deletePage, bulk.clearSelection]);
+
+  const handleBulkMoveToFolder = React.useCallback(
+    (folderId: string) => {
+      bulk.selectedIds.forEach((id) => f.movePageToFolder(id, folderId));
+      bulk.clearSelection();
+    },
+    [bulk.selectedIds, f.movePageToFolder, bulk.clearSelection]
+  );
+
+  const handleBulkRemoveFromFolders = React.useCallback(() => {
+    bulk.selectedIds.forEach((id) => f.removePageFromFolder(id));
+    bulk.clearSelection();
+  }, [bulk.selectedIds, f.removePageFromFolder, bulk.clearSelection]);
+
   return (
     <div className="pages-panel">
       <PanelHeader
@@ -84,14 +166,22 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         onPinToggle={onPinToggle}
         onHelpClick={onHelpClick}
         onClose={onClose}
-      />
+      >
+        <button
+          className="pg-panel-kbd-btn"
+          onClick={() => setPaletteOpen(true)}
+          aria-label="Open command palette"
+        >
+          <span className="pg-panel-kbd">⌘K</span>
+        </button>
+      </PanelHeader>
 
       {/* Error state — takes priority over everything */}
       {p.loadError ? (
-        <div className="pages-error" role="alert" aria-live="assertive">
-          <div className="pages-error__msg">{p.loadError}</div>
-          <div className="pages-error__sub">Check your connection and try again.</div>
-          <button className="pages-error__btn" onClick={p.retrySync}>
+        <div className="pg-error" role="alert" aria-live="assertive">
+          <div className="pg-error__msg">{p.loadError}</div>
+          <div className="pg-error__sub">Your connection dropped. Work is safe — nothing was lost.</div>
+          <button className="pg-error__retry" onClick={p.retrySync}>
             Try again
           </button>
         </div>
@@ -103,16 +193,30 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             nameError={nameError}
             canSearch={p.canSearch}
             openContextMenuPageId={p.contextMenu?.pageId ?? null}
-            requestExpandPageId={p.settingsPageId}
             composer={composer}
+            folders={f.folders}
+            pageToFolder={f.pageToFolder}
+            selectedIds={bulk.selectedIds}
             onAddPage={p.addPage}
+            onAddFolder={() => f.createFolder("New Folder")}
             onSelectPage={p.selectPage}
+            onToggleSelect={handleToggleSelect}
+            onBulkDuplicate={handleBulkDuplicate}
+            onBulkMoveToFolder={handleBulkMoveToFolder}
+            onBulkRemoveFromFolders={handleBulkRemoveFromFolders}
+            onBulkDelete={handleBulkDelete}
+            onClearSelection={bulk.clearSelection}
             onContextMenu={p.openContextMenu}
             onSettingsClick={p.openSettings}
             onRenameStart={p.startRename}
             onRenameCommit={handleRenameCommit}
             onRenameCancel={() => { setNameError(null); p.cancelRename(); }}
             onRequestTemplates={onRequestTemplates}
+            onFolderToggle={f.toggleCollapse}
+            onFolderRename={f.renameFolder}
+            onFolderDelete={f.deleteFolder}
+            onMovePageToFolder={f.movePageToFolder}
+            onRemovePageFromFolder={f.removePageFromFolder}
           />
         </>
       )}
@@ -147,6 +251,27 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         confirmText="Delete Page"
         variant="danger"
       />
+
+      {/* ⌘K command palette */}
+      {paletteOpen && (
+        <PageCommandPalette
+          pages={p.pages}
+          onSelect={p.selectPage}
+          onClose={() => setPaletteOpen(false)}
+        />
+      )}
+
+      {/* Page settings drawer — opened by gear / context-menu via openSettings */}
+      {settingsPage && (
+        <SettingsErrorBoundary onClose={p.closeSettings}>
+          <PageSettingsDrawer
+            page={settingsPage}
+            allPages={p.pages}
+            composer={composer}
+            onClose={p.closeSettings}
+          />
+        </SettingsErrorBoundary>
+      )}
     </div>
   );
 };

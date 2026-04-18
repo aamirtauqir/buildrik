@@ -7,8 +7,11 @@
 
 import * as React from "react";
 import type { Composer } from "../../../../../engine";
-import type { PageItem } from "../types";
+import type { FolderItem, PageItem } from "../types";
+import { shouldFocusSearch } from "../utils/keyboardShortcuts";
 import { AddPageButton } from "./AddPageButton";
+import { BulkToolbar } from "./BulkToolbar";
+import { PageFolder } from "./PageFolder";
 import { PageRow } from "./PageRow";
 
 interface Props {
@@ -17,20 +20,33 @@ interface Props {
   nameError: string | null;
   canSearch: boolean;
   openContextMenuPageId?: string | null;
-  /**
-   * When set (e.g. from context menu "Page Settings"), PageList syncs its
-   * expandedPageId to this value so the settings open on the correct row.
-   */
-  requestExpandPageId?: string | null;
   composer: Composer | null;
+  // Folder support
+  folders: FolderItem[];
+  pageToFolder: Map<string, string>;
+  // Bulk select
+  selectedIds: Set<string>;
   onAddPage: () => void;
+  onAddFolder: () => void;
   onSelectPage: (id: string) => void;
+  onToggleSelect: (id: string, e: React.MouseEvent | React.KeyboardEvent) => void;
+  onBulkDuplicate: () => void;
+  onBulkMoveToFolder: (folderId: string) => void;
+  onBulkRemoveFromFolders: () => void;
+  onBulkDelete: () => void;
+  onClearSelection: () => void;
   onContextMenu: (id: string, x: number, y: number) => void;
   onSettingsClick: (id: string) => void;
   onRenameStart: (id: string) => void;
   onRenameCommit: (id: string, name: string) => void;
   onRenameCancel: () => void;
   onRequestTemplates?: () => void;
+  // Folder handlers
+  onFolderToggle: (folderId: string) => void;
+  onFolderRename: (folderId: string, name: string) => void;
+  onFolderDelete: (folderId: string) => void;
+  onMovePageToFolder: (pageId: string, folderId: string) => void;
+  onRemovePageFromFolder: (pageId: string) => void;
 }
 
 export const PageList: React.FC<Props> = ({
@@ -39,51 +55,77 @@ export const PageList: React.FC<Props> = ({
   nameError,
   canSearch,
   openContextMenuPageId = null,
-  requestExpandPageId = null,
   composer,
+  folders,
+  pageToFolder,
+  selectedIds,
   onAddPage,
+  onAddFolder,
   onSelectPage,
+  onToggleSelect,
+  onBulkDuplicate,
+  onBulkMoveToFolder,
+  onBulkRemoveFromFolders,
+  onBulkDelete,
+  onClearSelection,
   onContextMenu,
   onSettingsClick,
   onRenameStart,
   onRenameCommit,
   onRenameCancel,
   onRequestTemplates,
+  onFolderToggle,
+  onFolderRename,
+  onFolderDelete,
+  onMovePageToFolder,
+  onRemovePageFromFolder,
 }) => {
   const [search, setSearch] = React.useState("");
-  const [expandedPageId, setExpandedPageId] = React.useState<string | null>(null);
   const searchRef = React.useRef<HTMLInputElement>(null);
 
-  // Sync expansion when context menu "Page Settings" triggers openSettings externally
   React.useEffect(() => {
-    if (requestExpandPageId) setExpandedPageId(requestExpandPageId);
-  }, [requestExpandPageId]);
+    const handler = (e: KeyboardEvent) => {
+      if (shouldFocusSearch(e)) {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   const visible = search
     ? pages.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
     : pages;
 
-  const handleToggleSettings = React.useCallback(
-    (pageId: string) => {
-      setExpandedPageId((prev) => (prev === pageId ? null : pageId));
-      // Also call original onSettingsClick so context menu closes etc.
-      onSettingsClick(pageId);
-    },
-    [onSettingsClick]
-  );
+  const stats = React.useMemo(() => {
+    let drafts = 0;
+    let hidden = 0;
+    for (const p of pages) {
+      if (p.status === "draft") drafts++;
+      else if (p.status === "hidden") hidden++;
+    }
+    return { total: pages.length, drafts, hidden };
+  }, [pages]);
 
-  // Empty state — no pages exist yet
   if (pages.length === 0) {
     return (
-      <div className="pg-list">
+      <div className="pg-list pg-list--empty">
         <div className="pg-empty">
-          <svg className="pg-empty__icon" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="8" y="6" width="32" height="36" rx="3" fill="var(--ls-border-soft, #E2E8F0)" />
-            <rect x="14" y="14" width="20" height="2" rx="1" fill="var(--ls-text-muted, #94A3B8)" />
-            <rect x="14" y="20" width="14" height="2" rx="1" fill="var(--ls-text-muted, #94A3B8)" />
-          </svg>
-          <p className="pg-empty__label">No pages yet</p>
-          <button className="pg-empty__cta" onClick={onAddPage}>Create your first page</button>
+          <div className="pg-empty__illus" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+          </div>
+          <h4 className="pg-empty__title">No pages yet</h4>
+          <p className="pg-empty__sub">Pages are the screens visitors see. Start with a blank canvas or pick a template.</p>
+          <div className="pg-empty__actions">
+            <button className="pg-empty__cta pg-empty__cta--primary" onClick={onAddPage}>Create blank page</button>
+            {onRequestTemplates && (
+              <button className="pg-empty__cta pg-empty__cta--ghost" onClick={onRequestTemplates}>From template</button>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -117,7 +159,7 @@ export const PageList: React.FC<Props> = ({
             }}
             aria-label="Search pages"
           />
-          {search && (
+          {search ? (
             <button
               className="pg-list__search-clear"
               onClick={() => setSearch("")}
@@ -125,11 +167,18 @@ export const PageList: React.FC<Props> = ({
             >
               ✕
             </button>
+          ) : (
+            <span className="pg-list__search-kbd" aria-hidden="true">/</span>
           )}
         </div>
       )}
 
-      {/* Page rows */}
+      {/* Group label — shown when pages exist and search is inactive */}
+      {pages.length > 0 && !search && (
+        <div className="pg-list__group">Site</div>
+      )}
+
+      {/* Page rows + folders */}
       <div className="pg-list__rows aqb-scrollbar" role="list" aria-label="Pages">
         {visible.length === 0 && search ? (
           <div className="pages-empty-search">
@@ -139,39 +188,92 @@ export const PageList: React.FC<Props> = ({
             </button>
           </div>
         ) : (
-          visible.map((page) => (
-            <PageRow
-              key={page.id}
-              page={page}
-              pages={pages}
-              composer={composer}
-              isRenaming={renamingPageId === page.id}
-              nameError={renamingPageId === page.id ? nameError : null}
-              isContextMenuOpen={openContextMenuPageId === page.id}
-              isExpanded={expandedPageId === page.id}
-              onSelect={() => onSelectPage(page.id)}
-              onRenameStart={() => onRenameStart(page.id)}
-              onRenameCommit={(name) => onRenameCommit(page.id, name)}
-              onRenameCancel={onRenameCancel}
-              onContextMenu={(x, y) => onContextMenu(page.id, x, y)}
-              onSettingsClick={() => handleToggleSettings(page.id)}
-            />
-          ))
+          <>
+            {/* Folders (hidden when searching — search shows all matches flat) */}
+            {!search && folders.map((folder) => {
+              const folderPages = folder.pageIds
+                .map((id) => pages.find((p) => p.id === id))
+                .filter((p): p is PageItem => !!p);
+              return (
+                <PageFolder
+                  key={folder.id}
+                  folder={folder}
+                  pages={folderPages}
+                  allPages={pages}
+                  composer={composer}
+                  renamingPageId={renamingPageId}
+                  nameError={nameError}
+                  openContextMenuPageId={openContextMenuPageId}
+                  onToggle={() => onFolderToggle(folder.id)}
+                  onFolderRename={(name) => onFolderRename(folder.id, name)}
+                  onFolderDelete={() => onFolderDelete(folder.id)}
+                  onSelectPage={onSelectPage}
+                  onContextMenu={onContextMenu}
+                  onSettingsClick={onSettingsClick}
+                  onRenameStart={onRenameStart}
+                  onRenameCommit={onRenameCommit}
+                  onRenameCancel={onRenameCancel}
+                  onDrop={(pageId) => onMovePageToFolder(pageId, folder.id)}
+                  onPageRemove={onRemovePageFromFolder}
+                />
+              );
+            })}
+
+            {/* Ungrouped pages */}
+            {visible
+              .filter((p) => !pageToFolder.has(p.id))
+              .map((page) => (
+                <PageRow
+                  key={page.id}
+                  page={page}
+                  pages={pages}
+                  composer={composer}
+                  isRenaming={renamingPageId === page.id}
+                  nameError={renamingPageId === page.id ? nameError : null}
+                  isContextMenuOpen={openContextMenuPageId === page.id}
+                  draggable={folders.length > 0}
+                  isSelected={selectedIds.has(page.id)}
+                  onSelect={() => onSelectPage(page.id)}
+                  onToggleSelect={(e) => onToggleSelect(page.id, e)}
+                  onRenameStart={() => onRenameStart(page.id)}
+                  onRenameCommit={(name) => onRenameCommit(page.id, name)}
+                  onRenameCancel={onRenameCancel}
+                  onContextMenu={(x, y) => onContextMenu(page.id, x, y)}
+                  onSettingsClick={() => onSettingsClick(page.id)}
+                />
+              ))}
+          </>
         )}
       </div>
 
-      {/* Footer count */}
+      {/* Bulk action toolbar — shown when 2+ pages selected */}
+      {selectedIds.size >= 2 && (
+        <BulkToolbar
+          selectedCount={selectedIds.size}
+          folders={folders}
+          onDuplicate={onBulkDuplicate}
+          onMoveToFolder={onBulkMoveToFolder}
+          onRemoveFromFolders={onBulkRemoveFromFolders}
+          onDelete={onBulkDelete}
+          onClear={onClearSelection}
+        />
+      )}
+
+      {/* Footer stats */}
       <div className="pg-list__footer">
-        <span>{pages.length} page{pages.length !== 1 ? "s" : ""}</span>
-        {onRequestTemplates && (
-          <button className="pg-list__from-template" onClick={onRequestTemplates}>
-            From Template →
-          </button>
-        )}
+        <div className="pg-list__stats">
+          <span><b>{stats.total}</b> page{stats.total !== 1 ? "s" : ""}</span>
+          {stats.drafts > 0 && (
+            <><span>·</span><span>{stats.drafts} draft{stats.drafts !== 1 ? "s" : ""}</span></>
+          )}
+          {stats.hidden > 0 && (
+            <><span>·</span><span>{stats.hidden} hidden</span></>
+          )}
+        </div>
       </div>
 
       {/* Add Page CTA — sticky bottom */}
-      <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} />
+      <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
     </div>
   );
 };
