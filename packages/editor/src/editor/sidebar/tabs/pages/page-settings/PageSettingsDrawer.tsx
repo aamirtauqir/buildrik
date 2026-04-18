@@ -93,8 +93,15 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
             </svg>
           </button>
 
-          <div className="pg-drawer-slide__title" title={page.name}>
-            {page.name}
+          <div className="pg-drawer-slide__title-block">
+            <div className="pg-drawer-slide__title" title={page.name}>
+              {page.name}
+            </div>
+            {s.domain && page.slug && (
+              <div className="pg-drawer-slide__slug">
+                {s.domain}/{page.slug.replace(/^\//, "")}
+              </div>
+            )}
           </div>
 
           {/* Save button */}

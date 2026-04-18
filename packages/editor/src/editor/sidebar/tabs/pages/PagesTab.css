@@ -2634,13 +2634,26 @@
 }
 .pages-panel .pg-drawer-slide__back svg { width: 14px; height: 14px; }
 
-.pages-panel .pg-drawer-slide__title {
+.pages-panel .pg-drawer-slide__title-block {
   flex: 1;
   min-width: 0;
+}
+
+.pages-panel .pg-drawer-slide__title {
   font-size: 13px;
   font-weight: 600;
   color: var(--aqb-text-primary);
   letter-spacing: -0.1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pages-panel .pg-drawer-slide__slug {
+  font-family: "Geist Mono", monospace;
+  font-size: 10.5px;
+  color: var(--aqb-text-muted);
+  margin-top: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
