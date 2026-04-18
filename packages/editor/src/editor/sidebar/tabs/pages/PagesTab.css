@@ -3049,4 +3049,132 @@
   cursor: pointer;
   font-family: inherit;
 }
+
+/* ==========================================================================
+   Phase 2 Chunk 4b — Bulk toolbar + drag visuals + select-all
+   ========================================================================== */
+
+.pages-panel .pg-bulk {
+  position: absolute;
+  bottom: 72px;
+  left: 12px;
+  right: 12px;
+  background: var(--aqb-surface-3, #1e1e28);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.35);
+  z-index: 15;
+}
+.pages-panel .pg-bulk__count { font-size: 11px; font-weight: 500; color: var(--aqb-text-primary, #f5f5f0); }
+.pages-panel .pg-bulk__count b { color: #2D6DFF; font-family: "Geist Mono", ui-monospace, monospace; }
+.pages-panel .pg-bulk__spacer { flex: 1; }
+.pages-panel .pg-bulk__btn {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--aqb-text-primary, #f5f5f0);
+  background: var(--aqb-surface-4, #252531);
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+.pages-panel .pg-bulk__btn:hover:not(:disabled) { background: var(--aqb-surface-5, #2e2e38); }
+.pages-panel .pg-bulk__btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pages-panel .pg-bulk__btn--danger { color: #f5a3a3; }
+.pages-panel .pg-bulk__btn--danger:hover:not(:disabled) { background: rgba(239,68,68,0.15); }
+.pages-panel .pg-bulk__clear {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  color: var(--aqb-text-muted, #a09d96);
+  background: none;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.pages-panel .pg-bulk__clear:hover { color: var(--aqb-text-primary, #f5f5f0); background: rgba(255,255,255,0.06); }
+
+.pages-panel .pg-bulk__folder-wrap { position: relative; }
+.pages-panel .pg-bulk__folder-menu {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  min-width: 160px;
+  background: var(--aqb-surface-3, #1e1e28);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+  padding: 4px;
+  z-index: 20;
+}
+.pages-panel .pg-bulk__folder-item {
+  display: block;
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 11px;
+  text-align: left;
+  color: var(--aqb-text-primary, #f5f5f0);
+  background: none;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.pages-panel .pg-bulk__folder-item:hover { background: rgba(45,109,255,0.12); }
+.pages-panel .pg-bulk__folder-empty { padding: 6px 10px; font-size: 11px; color: var(--aqb-text-faint, #908d85); }
+.pages-panel .pg-bulk__folder-sep { height: 1px; background: var(--aqb-border, rgba(255,255,255,0.08)); margin: 4px 0; }
+
+/* ─── Chunk 4b — select-all row, drop indicator, thumbnail shimmer ───────── */
+.pages-panel .pg-selectall {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: var(--aqb-text-secondary, #b8b5ad);
+  font-size: 11.5px;
+  background: var(--aqb-surface-1, #17171f);
+  cursor: pointer;
+  user-select: none;
+}
+.pages-panel .pg-selectall:hover { background: var(--aqb-surface-2, #1a1a22); }
+.pages-panel .pg-selectall__checkbox {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.15);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: #ffffff;
+}
+.pages-panel .pg-selectall__checkbox--on {
+  background: #2D6DFF;
+  border-color: #2D6DFF;
+}
+
+/* Drop indicator — shown during drag-to-reorder (render logic handled by future reorder feature) */
+.pages-panel .pg-drop-indicator {
+  height: 2px;
+  background: #2D6DFF;
+  border-radius: 1px;
+  margin: 2px 8px;
+  box-shadow: 0 0 0 2px rgba(45,109,255,0.12);
+}
+
+/* Thumbnail "generating" shimmer */
+.pages-panel .pg-row__thumb--generating {
+  background: linear-gradient(90deg, var(--aqb-surface-3, #1e1e28) 0%, var(--aqb-surface-4, #252531) 50%, var(--aqb-surface-3, #1e1e28) 100%);
+  background-size: 200% 100%;
+  animation: pg-thumb-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes pg-thumb-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 .pages-panel .pg-error__retry:hover { background: var(--aqb-surface-4, #252531); }

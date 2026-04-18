@@ -178,6 +178,40 @@ export const PageList: React.FC<Props> = ({
         <div className="pg-list__group">Site</div>
       )}
 
+      {/* Select-all row — visible only in bulk mode (prototype .pg-selectall) */}
+      {selectedIds.size > 0 && (
+        <div
+          className="pg-selectall"
+          role="button"
+          tabIndex={0}
+          aria-label={`Select all ${pages.length} pages`}
+          onClick={() => {
+            if (selectedIds.size === pages.length) {
+              onClearSelection();
+            } else {
+              pages.forEach((p) => {
+                if (!selectedIds.has(p.id)) onToggleSelect(p.id, {} as React.MouseEvent);
+              });
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") e.currentTarget.click();
+          }}
+        >
+          <span
+            className={`pg-selectall__checkbox${selectedIds.size === pages.length ? " pg-selectall__checkbox--on" : ""}`}
+            aria-hidden="true"
+          >
+            {selectedIds.size === pages.length ? (
+              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                <polyline points="4 12 10 18 20 6" />
+              </svg>
+            ) : null}
+          </span>
+          <span>Select all ({pages.length} page{pages.length !== 1 ? "s" : ""})</span>
+        </div>
+      )}
+
       {/* Page rows + folders */}
       <div className="pg-list__rows aqb-scrollbar" role="list" aria-label="Pages">
         {visible.length === 0 && search ? (
