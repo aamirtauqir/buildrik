@@ -1,9 +1,57 @@
 # Theme Unification V2 — Namespace Separation + Runtime Reconciliation
 
+> **⚠️ SUPERSEDED — DO NOT IMPLEMENT**
+>
+> Invalidated by Codex review 2026-04-19 (same day as spec was written). Codex caught
+> premise problems that internal review missed — same pattern that killed V1. Seven
+> structural findings:
+>
+> 1. **Not 2 namespaces — at least 3 (possibly 4).** V2's "chrome vs canvas" model is
+>    too clean. Reality has: chrome tokens (`themes/default.css`), canvas
+>    **operational** tokens (`editor/canvas/Canvas.css` + duplicate `components/Canvas/Canvas.css`),
+>    persisted Design-tab tokens (`constants.ts` + `design-tokens.css`). V2 collapses
+>    canvas operational and persisted design tokens into one bucket — they're different systems.
+> 2. **P2/P3 codemod is internally contradictory.** Spec says "delete bare `--aqb-*`
+>    definitions outside `themes/default.css` as scope violations" — but 4+ files contain
+>    load-bearing, intentional `--aqb-*` definitions. Executing P2 as written breaks the
+>    app before P3 can delete anything.
+> 3. **Dual persistence missed.** `TokenRegistryContext.tsx:61` trusts localStorage
+>    arrays; `DesignSystemTab.tsx:142` loads from Composer by id/name ignoring saved cssVar.
+>    V2 migration addresses only the Composer side.
+> 4. **Keyframes count undercounted.** V2 says 6 keyframes in `default.css`. Actual
+>    `aqb-*` animations/keyframes live across 7+ additional files: `AnimationPresets.ts`,
+>    both `Canvas.css` files, `LeftSidebar.css`, `layers.css`, `Skeleton.tsx`, `ImageUploader.tsx`.
+> 5. **`themes/index.ts` has live consumers.** V2 claimed zero internal callsites.
+>    Actual: `src/index.ts:75` re-exports + `demo/main.tsx:11` imports. Deletion breaks
+>    demo + public API.
+> 6. **`aqb` prefix is multi-semantic, not just tokens.** CSS variables + `data-aqb-*`
+>    DOM attributes (engine contracts in `StyleEngine.ts`, `ReactExporter.ts`) + class
+>    names (`.aqb-sidebar`, `.aqb-toast` still live) + storage keys (`aqb-design-tokens-*`)
+>    + demo/public API. V2 treats `aqb` as a single rename target — it's not.
+> 7. **Undefined-token consumer list is incomplete.** `var(--aqb-text)`, `var(--aqb-surface)`,
+>    `var(--aqb-bg-input)`, `var(--aqb-primary-dark)` live in `IconPickerModal`, `MediaLibraryPanel`,
+>    `AutocompleteField`, `canvas/shared/tokens.ts`, `shared/constants/canvas.ts`, and more.
+>
+> **Meta pattern (now confirmed twice):** Author leaps to clean architecture before the
+> inventory is closed. Codex review caught this premise problem on V1 AND V2. The reliable
+> pattern: **do inventory first, architecture second**.
+>
+> **Real problem (now refined):** Not "one namespace" or "chrome vs canvas". It's that
+> the `aqb` prefix has accumulated at least 6 unrelated uses (CSS vars + DOM attrs +
+> classnames + storage keys + keyframes + demo API), each needing independent treatment.
+> Token debt is a subset, and even that subset has 3+ domains (chrome / canvas operational /
+> persisted design) with different lifecycles.
+>
+> **V3 scope (to be authored):** Start with a complete inventory — classify every `aqb`
+> hit into one of: chrome token / canvas operational token / persisted design token /
+> data-attribute contract / class name / storage key / keyframe / demo API. No architecture
+> decisions until the inventory is committed and reviewed. Then design migration topology
+> around the actual 6+ bucket reality, not a forced 2-bucket model.
+
 **Date:** 2026-04-19
 **Branch:** `main`
-**Status:** DRAFT — awaiting Codex review + user approval
-**Supersedes:** `2026-04-18-theme-unification-design.md` (V1, invalidated by Codex)
+**Status:** SUPERSEDED — see banner above
+**Supersedes:** `2026-04-18-theme-unification-design.md` (V1, also invalidated by Codex)
 
 ---
 
