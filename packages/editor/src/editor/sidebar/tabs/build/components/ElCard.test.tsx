@@ -26,32 +26,15 @@ describe("ElCard — disabled state", () => {
   it("disabled card does not call onClick when clicked", async () => {
     const onClick = vi.fn();
     const onDragStart = vi.fn();
-    const onToggleFav = vi.fn();
 
-    render(
-      <ElCard
-        el={disabledEl}
-        isFav={false}
-        onDragStart={onDragStart}
-        onClick={onClick}
-        onToggleFav={onToggleFav}
-      />
-    );
+    render(<ElCard el={disabledEl} onDragStart={onDragStart} onClick={onClick} />);
 
     await userEvent.click(screen.getByRole("button", { name: /Custom Code/i }));
     expect(onClick).not.toHaveBeenCalled();
   });
 
   it("disabled card shows Coming Soon in title", () => {
-    render(
-      <ElCard
-        el={disabledEl}
-        isFav={false}
-        onDragStart={vi.fn()}
-        onClick={vi.fn()}
-        onToggleFav={vi.fn()}
-      />
-    );
+    render(<ElCard el={disabledEl} onDragStart={vi.fn()} onClick={vi.fn()} />);
 
     const card = screen.getByRole("button", { name: /Custom Code/i });
     expect(card.title).toContain("Coming Soon");
@@ -60,17 +43,8 @@ describe("ElCard — disabled state", () => {
   it("enabled card calls onClick when clicked", async () => {
     const onClick = vi.fn();
 
-    render(
-      <ElCard
-        el={baseEl}
-        isFav={false}
-        onDragStart={vi.fn()}
-        onClick={onClick}
-        onToggleFav={vi.fn()}
-      />
-    );
+    render(<ElCard el={baseEl} onDragStart={vi.fn()} onClick={onClick} />);
 
-    // Use description text to distinguish card from the fav star button
     await userEvent.click(screen.getByRole("button", { name: /Clickable action button/i }));
     expect(onClick).toHaveBeenCalledWith(baseEl);
   });

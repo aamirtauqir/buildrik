@@ -29,7 +29,7 @@ describe("SearchResults — no results state", () => {
     expect(screen.getByRole("status")).toBeInTheDocument();
   });
 
-  it("renders the AI suggestion card body", () => {
+  it("does NOT render the AI suggestion card (v4 removed)", () => {
     render(
       <SearchResults
         query="xyz"
@@ -39,9 +39,7 @@ describe("SearchResults — no results state", () => {
         onClearSearch={noop}
       />
     );
-    expect(
-      screen.getByText(/Try describing what you need/)
-    ).toBeInTheDocument();
+    expect(screen.queryByText(/Try describing what you need/)).not.toBeInTheDocument();
   });
 
   it("renders the Clear search button", () => {

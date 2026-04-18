@@ -34,13 +34,6 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
         </svg>
         <p className="bld-no-results-headline">Nothing matches "{query}"</p>
 
-        {/* AI suggestion card */}
-        <div className="bld-ai-card">
-          <p className="bld-ai-card-body">
-            Try describing what you need — AI can suggest or create a custom block for you.
-          </p>
-        </div>
-
         <button className="bld-clear-search" onClick={onClearSearch}>
           Clear search
         </button>

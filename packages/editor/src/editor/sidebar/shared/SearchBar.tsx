@@ -17,6 +17,8 @@ export interface SearchBarProps {
   debounceMs?: number;
   /** Id for the input element — used by parent for keyboard shortcuts */
   id?: string;
+  /** Optional keyboard hint shown on the right of the input (e.g. "/"). Rendered only when input is empty. */
+  kbdHint?: string;
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
@@ -26,6 +28,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   ariaLabel = "Search",
   debounceMs = 300,
   id,
+  kbdHint,
 }) => {
   // Internal state for instant visual feedback
   const [inputValue, setInputValue] = React.useState(value);
@@ -88,11 +91,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         style={inputStyles}
         aria-label={ariaLabel}
       />
-      {inputValue && (
+      {inputValue ? (
         <button onClick={handleClear} style={clearButtonStyles} aria-label="Clear search">
           <ClearIcon />
         </button>
-      )}
+      ) : kbdHint ? (
+        <span className="bld-kbd-hint" aria-hidden="true">{kbdHint}</span>
+      ) : null}
     </div>
   );
 };

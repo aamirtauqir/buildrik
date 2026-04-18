@@ -165,6 +165,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
             onChange={tab.setSearchQuery}
             placeholder={tab.mode === "sections" ? "Search sections..." : "Search elements..."}
             debounceMs={150}
+            kbdHint="/"
           />
         </div>
 

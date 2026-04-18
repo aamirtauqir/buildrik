@@ -495,20 +495,6 @@
   color: var(--ls-text-primary);
   margin: 0;
 }
-.bld-ai-card {
-  width: 100%;
-  background: var(--ls-bg-card, #FFFFFF);
-  border: 1px solid var(--ls-border-light, #E2E8F0);
-  border-radius: 8px;
-  padding: 12px;
-  text-align: left;
-}
-.bld-ai-card-body {
-  font-size: 12px;
-  color: var(--ls-text-muted, #475569);
-  margin: 0;
-  line-height: 1.5;
-}
 .bld-no-results-shortcut {
   font-size: 10px;
   color: var(--ls-text-lighter, #94A3B8);
@@ -534,7 +520,18 @@
   flex-shrink: 0;
   border-top: 1px solid var(--aqb-border-subtle, #2e2e3e);
   padding: 12px 16px;
-  background: var(--aqb-surface-1, #14141c);
+}
+
+/* ─── v4: Kbd hint (search bar `/`) ─── */
+.bld-kbd-hint {
+  font-family: var(--aqb-font-mono, 'Geist Mono', monospace);
+  font-size: 11px;
+  color: var(--aqb-text-muted, #686878);
+  padding: 2px 6px;
+  border: 1px solid var(--aqb-border-subtle, #2e2e3e);
+  border-radius: 4px;
+  pointer-events: none;
+  flex-shrink: 0;
 }
 
 .bld-footer-hint {
