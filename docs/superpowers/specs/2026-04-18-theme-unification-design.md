@@ -1,8 +1,36 @@
 # Theme Unification — Migration Design
 
+> **⚠️ SUPERSEDED — DO NOT IMPLEMENT**
+>
+> Invalidated by CEO review 2026-04-18 via Codex outside voice. The premise
+> that "`--ls-*` is already aliased to `--aqb-*` values, so migration is
+> value-neutral" is WRONG in ways this spec missed:
+>
+> 1. **`themes/index.ts` mutates `--aqb-*` at runtime** via `applyTheme()` —
+>    CSS values are NOT source of truth (verified at `themes/index.ts:31-41`).
+> 2. **`--aqb-*` itself has multi-scope semantics** — `PagesTab.css` and
+>    `SharedDialogs.css` override `--aqb-*` back to dark; `canvas/shared/tokens.ts`
+>    labels `aqb` tokens "dark theme panels". Eliminating `--ls-*` doesn't unify.
+> 3. **Canonical tokens consumers reference don't exist globally** —
+>    `--aqb-text`, `--aqb-surface`, `--aqb-surface-elevated`, `--aqb-bg-input`,
+>    `--aqb-primary-dark` are not in `themes/default.css`. Consumers fall back
+>    to hex values or undefined behavior.
+> 4. **Runtime token mutation via design-system hooks** (`useTokenBase.ts:62`,
+>    `useColorTokens.ts:49`) means any before/after screenshot comparison can
+>    be invalidated by persisted user edits.
+> 5. **Theme preference system is unfinished** — `themeMode` type + `aqb-theme`
+>    storage key exist but no real light/dark application path.
+>
+> **Real problem:** Not `--ls-*` vs `--aqb-*`. It's broken `--aqb-*` semantics
+> and unfinished theme application path. Migrating `--ls-*` treats one symptom.
+>
+> **Replacement spec:** to be authored. Correct scope = audit `--aqb-*` semantics
+> across scopes → decide canonical intent → add missing definitions → reconcile
+> runtime mutation → THEN `--ls-*` migration is trivial.
+
 **Date:** 2026-04-18
 **Branch:** `main`
-**Status:** Spec — awaiting user review
+**Status:** SUPERSEDED — see banner above
 **Driver:** End the recurring CSS churn. 20+ symptom-level fixes in 60 days traced to architectural debt.
 
 ---
