@@ -295,7 +295,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
                       top: "100%",
                       left: 0,
                       zIndex: 100,
-                      background: "var(--buildrick-surface)",
+                      background: "var(--buildrick-bg-card)",
                       border: "1px solid var(--buildrick-border)",
                       borderRadius: 4,
                       padding: "4px 8px",
@@ -423,7 +423,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
 const containerStyles: React.CSSProperties = {
   position: "relative",
   borderBottom: "1px solid var(--buildrick-border)",
-  background: "var(--buildrick-surface)",
+  background: "var(--buildrick-bg-card)",
 };
 
 // Outer row: tablist (scrollable) + add button (fixed, outside tablist)
