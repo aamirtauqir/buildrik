@@ -268,14 +268,14 @@ const FormView: React.FC<FormViewProps> = ({
               borderColor:
                 stylePreset === preset.value
                   ? "var(--buildrick-accent, #6366f1)"
-                  : "var(--barStroke, #1a2a3d)",
+                  : "var(--buildrick-bg-panel)",
               background:
                 stylePreset === preset.value
                   ? "rgba(99, 102, 241, 0.1)"
                   : "rgba(255, 255, 255, 0.03)",
             }}
           >
-            <div style={{ fontWeight: 600, fontSize: 14, color: "var(--txt, #eaf2ff)" }}>
+            <div style={{ fontWeight: 600, fontSize: 14, color: "var(--buildrick-text-primary)" }}>
               {preset.label}
             </div>
             <div style={{ fontSize: 12, color: "var(--muted, #b7c5dc)", marginTop: 4 }}>
@@ -338,7 +338,7 @@ const LoadingView: React.FC<LoadingViewProps> = ({ steps, progress, onCancel }) 
             style={{
               color:
                 step.status === "generating"
-                  ? "var(--txt, #eaf2ff)"
+                  ? "var(--buildrick-text-primary)"
                   : step.status === "done"
                     ? "var(--green, #38d07a)"
                     : "var(--muted, #b7c5dc)",
@@ -418,7 +418,7 @@ const overlayStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  background: "var(--bar, #0b1220)",
+  background: "var(--buildrick-bg-panel)",
 };
 
 const cardStyles: React.CSSProperties = {
@@ -434,7 +434,7 @@ const cardStyles: React.CSSProperties = {
 const headlineStyles: React.CSSProperties = {
   fontSize: 36,
   fontWeight: 800,
-  color: "var(--txt, #eaf2ff)",
+  color: "var(--buildrick-text-primary)",
   margin: "0 0 12px",
   letterSpacing: "-0.02em",
 };
@@ -456,7 +456,7 @@ const labelStyles: React.CSSProperties = {
   display: "block",
   fontSize: 13,
   fontWeight: 600,
-  color: "var(--txt, #eaf2ff)",
+  color: "var(--buildrick-text-primary)",
   marginBottom: 8,
 };
 
@@ -464,9 +464,9 @@ const selectStyles: React.CSSProperties = {
   width: "100%",
   padding: "12px 14px",
   background: "rgba(255, 255, 255, 0.05)",
-  border: "1px solid var(--barStroke, #1a2a3d)",
+  border: "1px solid var(--buildrick-bg-panel)",
   borderRadius: 8,
-  color: "var(--txt, #eaf2ff)",
+  color: "var(--buildrick-text-primary)",
   fontSize: 14,
   outline: "none",
   cursor: "pointer",
@@ -477,9 +477,9 @@ const inputStyles: React.CSSProperties = {
   width: "100%",
   padding: "12px 14px",
   background: "rgba(255, 255, 255, 0.05)",
-  border: "1px solid var(--barStroke, #1a2a3d)",
+  border: "1px solid var(--buildrick-bg-panel)",
   borderRadius: 8,
-  color: "var(--txt, #eaf2ff)",
+  color: "var(--buildrick-text-primary)",
   fontSize: 14,
   outline: "none",
   boxSizing: "border-box",
@@ -493,7 +493,7 @@ const styleGridStyles: React.CSSProperties = {
 
 const styleCardStyles: React.CSSProperties = {
   padding: "16px 12px",
-  border: "1px solid var(--barStroke, #1a2a3d)",
+  border: "1px solid var(--buildrick-bg-panel)",
   borderRadius: 10,
   cursor: "pointer",
   textAlign: "center",
@@ -534,8 +534,8 @@ const templateBtnStyles: React.CSSProperties = {
   justifyContent: "center",
   padding: "14px 24px",
   background: "rgba(255, 255, 255, 0.08)",
-  color: "var(--txt, #eaf2ff)",
-  border: "1px solid var(--barStroke, #1a2a3d)",
+  color: "var(--buildrick-text-primary)",
+  border: "1px solid var(--buildrick-bg-panel)",
   borderRadius: 10,
   fontSize: 15,
   fontWeight: 600,
@@ -576,7 +576,7 @@ const checklistItemStyles: React.CSSProperties = {
 
 const cancelBtnStyles: React.CSSProperties = {
   background: "none",
-  border: "1px solid var(--barStroke, #1a2a3d)",
+  border: "1px solid var(--buildrick-bg-panel)",
   color: "var(--muted, #b7c5dc)",
   padding: "10px 24px",
   borderRadius: 8,

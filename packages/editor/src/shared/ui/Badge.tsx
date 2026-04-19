@@ -29,7 +29,7 @@ export const Badge: React.FC<BadgeProps> = ({
     success: { background: "rgba(34, 197, 94, 0.12)", color: "var(--buildrick-success, #22c55e)" },
     warning: { background: "rgba(245, 158, 11, 0.12)", color: "var(--buildrick-warning, #f59e0b)" },
     error: { background: "rgba(239, 68, 68, 0.12)", color: "var(--buildrick-error, #ef4444)" },
-    info: { background: "rgba(75, 141, 255, 0.12)", color: "var(--blue, #4b8dff)" },
+    info: { background: "rgba(75, 141, 255, 0.12)", color: "var(--buildrick-accent)" },
   };
 
   const sizeStyles: Record<string, React.CSSProperties> = {
