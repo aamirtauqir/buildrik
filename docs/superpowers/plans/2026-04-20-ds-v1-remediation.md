@@ -929,10 +929,12 @@ Two sub-phases. 5a is 4 unambiguous repo-wide find-replace patterns (no human re
 
 ### Task 5a.1: Apply 4 unambiguous non-namespaced aliases
 
+> **STATUS: COMPLETE (pre-drained).** Verified 2026-04-20: all 4 aliases already had 0 exact occurrences in HEAD (prior Phase 3.x work drained them). The Step 1 grep pattern `var\(\s*${tok}\b` produced false positives because `--text-primary` is a substring of `--buildrick-text-primary`. Exact-match grep `var\(--text-primary\)` (with closing paren, no buildrick) confirms 0 remaining. Safety gates confirmed: vite build ✓, ds-grep-gates.sh (9/9) ✓, hex=1464 ✓, baselines ✓. No commit needed.
+
 **Files:**
 - Modify: any chrome file containing `var(--text-primary)`, `var(--text-muted)`, `var(--border-medium)`, `var(--font-mono)`
 
-- [ ] **Step 1: Count occurrences pre-change**
+- [x] **Step 1: Count occurrences pre-change**
 
 ```bash
 cd /Users/shahg/Desktop/pencil/buildrik
@@ -944,7 +946,7 @@ done
 
 Record the counts.
 
-- [ ] **Step 2: Apply each replacement across all files**
+- [x] **Step 2: Apply each replacement across all files**
 
 Use the `grep -rl` pattern to find files then `sed -i` (macOS uses `-i ''` empty backup):
 
@@ -968,7 +970,7 @@ grep -rlE 'var\(\s*--font-mono\b' packages/editor/src --include="*.tsx" --includ
   xargs sed -i '' 's/var(--font-mono)/var(--buildrick-font-family-mono)/g'
 ```
 
-- [ ] **Step 3: Verify counts zeroed**
+- [x] **Step 3: Verify counts zeroed**
 
 ```bash
 cd /Users/shahg/Desktop/pencil/buildrik
@@ -982,7 +984,7 @@ Expected: all four at `0`.
 
 ### Task 5a.2: Safety gate + commit 5a
 
-- [ ] **Step 1: Run full safety gate**
+- [x] **Step 1: Run full safety gate**
 
 ```bash
 cd /Users/shahg/Desktop/pencil/buildrik/packages/editor
@@ -994,7 +996,7 @@ node scripts/verify-design-baselines.mjs
 
 Expected: all pass. Hex count equal to baseline (Phase 5a touches vars not hex).
 
-- [ ] **Step 2: Dev-server smoke**
+- [x] **Step 2: Dev-server smoke**
 
 ```bash
 npm run dev
@@ -1002,7 +1004,7 @@ npm run dev
 
 Visual diff against baseline screenshots. Text and border colors should be unchanged because the new `--buildrick-*` tokens have the same values as the old `--text-*` aliases did before Phase 3 (and after Phase 3 any value change was already captured).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit** *(skipped — no changes needed, already drained)*
 
 ```bash
 cd /Users/shahg/Desktop/pencil/buildrik
