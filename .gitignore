@@ -12,3 +12,10 @@ next-env.d.ts
 docs/designs/
 latest-screenshots/
 dist/
+
+# Session / tooling scratch
+.context/
+.superpowers/
+.claude/
+packages/*.zip
+packages/editor.zip
