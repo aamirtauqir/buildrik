@@ -67,7 +67,7 @@ export function useCanvasInlineEdit({
       if (!composer) return;
 
       const target = e.target as HTMLElement;
-      const editableEl = target.closest("[data-aqb-id]") as HTMLElement | null;
+      const editableEl = target.closest("[data-buildrick-id]") as HTMLElement | null;
       if (!editableEl) return;
 
       const id = getElementId(editableEl);
@@ -77,7 +77,7 @@ export function useCanvasInlineEdit({
       if (!INLINE_EDITABLE_TAGS.includes(tagName)) return;
 
       // Check if element has nested aqb elements - can't edit containers
-      const hasNestedElements = editableEl.querySelector("[data-aqb-id]");
+      const hasNestedElements = editableEl.querySelector("[data-buildrick-id]");
       if (hasNestedElements) {
         // Element contains children - don't enable editing on the parent
         // User should double-click directly on the text element
@@ -107,7 +107,7 @@ export function useCanvasInlineEdit({
     if (!editing.id || !composer) return;
 
     const el = canvasRef.current?.querySelector(
-      `[data-aqb-id="${editing.id}"]`
+      `[data-buildrick-id="${editing.id}"]`
     ) as HTMLElement | null;
     if (!el) return;
 
@@ -160,7 +160,7 @@ export function useCanvasInlineEdit({
     const handleBlur = (evt: FocusEvent) => {
       // Don't finish editing if focus is moving to the inline toolbar
       const relatedTarget = evt.relatedTarget as HTMLElement | null;
-      if (relatedTarget?.closest(".aqb-inline-toolbar")) {
+      if (relatedTarget?.closest(".buildrick-inline-toolbar")) {
         // Re-focus the contentEditable element after toolbar interaction
         setTimeout(() => el.focus(), 0);
         return;
@@ -184,7 +184,7 @@ export function useCanvasInlineEdit({
       if (!target) return;
 
       // Don't finish editing if clicking on the inline toolbar
-      if (target.closest(".aqb-inline-toolbar")) {
+      if (target.closest(".buildrick-inline-toolbar")) {
         return;
       }
 

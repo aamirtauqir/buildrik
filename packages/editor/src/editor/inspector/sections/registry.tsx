@@ -509,7 +509,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
       };
       const handleAnimationPreview = () => {
         const domEl = document.querySelector(
-          `[data-aqb-id="${ctx.selectedElement.id}"]`
+          `[data-buildrick-id="${ctx.selectedElement.id}"]`
         ) as HTMLElement | null;
         if (!domEl) return;
         const animation = domEl.style.animation;
@@ -552,14 +552,14 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
       };
       const handleInteractionPreview = (interaction: Interaction) => {
         const domEl = document.querySelector(
-          `[data-aqb-id="${ctx.selectedElement.id}"]`
+          `[data-buildrick-id="${ctx.selectedElement.id}"]`
         ) as HTMLElement | null;
         if (!domEl) return;
         const anim = interaction.animation;
         if (anim) {
           domEl.style.animation = "";
           void domEl.offsetHeight;
-          domEl.style.animation = `aqb-${anim.type} ${anim.duration}ms ${anim.easing} ${anim.delay}ms 1 normal forwards`;
+          domEl.style.animation = `buildrick-${anim.type} ${anim.duration}ms ${anim.easing} ${anim.delay}ms 1 normal forwards`;
         }
       };
       return {

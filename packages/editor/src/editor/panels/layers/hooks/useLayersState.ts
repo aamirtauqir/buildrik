@@ -28,7 +28,7 @@ import { useLayerSearch, type UseLayerSearchReturn } from "./useLayerSearch";
 import { useLayerSelection, type UseLayerSelectionReturn } from "./useLayerSelection";
 import { useLayerTree, type UseLayerTreeReturn } from "./useLayerTree";
 
-const DISPLAY_PREFS_KEY = "aqb-layers-display-prefs";
+const DISPLAY_PREFS_KEY = "buildrick-layers-display-prefs";
 
 const defaultPrefs: LayerDisplayPrefs = {
   showHtmlBadges: false,

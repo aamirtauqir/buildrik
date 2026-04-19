@@ -204,7 +204,7 @@ export const AccessibilityChecker: React.FC<AccessibilityCheckerProps> = ({
     return (
       <div style={{ padding: 20, textAlign: "center" }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>♿</div>
-        <div style={{ marginBottom: 16, color: "var(--aqb-text-muted)" }}>
+        <div style={{ marginBottom: 16, color: "var(--buildrick-text-muted)" }}>
           Check your design for accessibility issues including missing alt text, color contrast, and
           heading structure.
         </div>
@@ -222,21 +222,21 @@ export const AccessibilityChecker: React.FC<AccessibilityCheckerProps> = ({
           gap: 16,
           marginBottom: 16,
           padding: 12,
-          background: "var(--aqb-bg-panel-secondary)",
+          background: "var(--buildrick-bg-panel-secondary)",
           borderRadius: 8,
         }}
       >
         <div style={{ textAlign: "center", flex: 1 }}>
           <div style={{ fontSize: 24, fontWeight: 700, color: "#ef4444" }}>{errorCount}</div>
-          <div style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>Errors</div>
+          <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>Errors</div>
         </div>
         <div style={{ textAlign: "center", flex: 1 }}>
           <div style={{ fontSize: 24, fontWeight: 700, color: "#eab308" }}>{warningCount}</div>
-          <div style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>Warnings</div>
+          <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>Warnings</div>
         </div>
         <div style={{ textAlign: "center", flex: 1 }}>
           <div style={{ fontSize: 24, fontWeight: 700, color: "#3b82f6" }}>{infoCount}</div>
-          <div style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>Info</div>
+          <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>Info</div>
         </div>
       </div>
 
@@ -289,7 +289,7 @@ export const AccessibilityChecker: React.FC<AccessibilityCheckerProps> = ({
                   style={{
                     marginTop: 4,
                     fontSize: 13,
-                    color: "var(--aqb-text)",
+                    color: "var(--buildrick-text)",
                   }}
                 >
                   {issue.message}

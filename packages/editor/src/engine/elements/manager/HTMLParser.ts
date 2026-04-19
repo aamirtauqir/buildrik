@@ -72,7 +72,7 @@ export class HTMLParser {
             id: generateId("root"),
             type: "container",
             tagName: "div",
-            classes: ["aqb-page-root"],
+            classes: ["buildrick-page-root"],
             children: [],
           },
         };
@@ -169,7 +169,7 @@ export class HTMLParser {
     let styles: Record<string, string> | undefined;
     Array.from(el.attributes).forEach((attr) => {
       const name = attr.name;
-      if (name === "class" || name === "data-aqb-id" || name === "data-aqb-type") {
+      if (name === "class" || name === "data-buildrick-id" || name === "data-buildrick-type") {
         return;
       }
       if (name === "style") {
@@ -235,7 +235,7 @@ export class HTMLParser {
    * Map a DOM element to an internal ElementType
    */
   private mapDomToElementType(el: HTMLElement): ElementData["type"] {
-    const dataType = el.getAttribute("data-aqb-type");
+    const dataType = el.getAttribute("data-buildrick-type");
     const tag = el.tagName.toLowerCase();
     return getElementTypeFromTag(tag, dataType) as ElementData["type"];
   }

@@ -102,7 +102,7 @@ export function useCanvasKeyboard({
       // Shift+F10: Open context menu (standard accessibility shortcut)
       if (e.key === "F10" && e.shiftKey && selectedId) {
         e.preventDefault();
-        const element = document.querySelector(`[data-aqb-id="${selectedId}"]`);
+        const element = document.querySelector(`[data-buildrick-id="${selectedId}"]`);
         if (element && onOpenContextMenu) {
           const rect = element.getBoundingClientRect();
           onOpenContextMenu(selectedId, {

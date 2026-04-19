@@ -57,8 +57,8 @@
   width: 60px;
   min-width: 60px;
   height: 100%;
-  background: var(--ls-bg-panel);
-  border-right: 1px solid var(--ls-border-card);
+  background: var(--buildrick-bg-panel);
+  border-right: 1px solid var(--buildrick-border);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -73,7 +73,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: var(--ls-accent);
+  color: var(--buildrick-accent);
 }
 
 /* ─────────────────────────────────────────────
@@ -82,7 +82,7 @@
 .ls-divider {
   width: 100%;
   height: 1px;
-  background: var(--ls-border-light);
+  background: var(--buildrick-border-light);
   flex-shrink: 0;
 }
 
@@ -119,7 +119,7 @@
   border: none;
   background: transparent;
   cursor: pointer;
-  color: var(--ls-text-subtle);
+  color: var(--buildrick-text-muted);
   font-family: inherit;
   padding: 0;
   text-decoration: none;
@@ -127,12 +127,12 @@
 }
 
 .ls-btn:hover {
-  background: var(--ls-bg-subtle);
-  color: var(--ls-text-medium);
+  background: var(--buildrick-bg-subtle);
+  color: var(--buildrick-text-secondary);
 }
 
 .ls-btn:focus-visible {
-  outline: 2px solid var(--ls-accent);
+  outline: 2px solid var(--buildrick-accent);
   outline-offset: -2px;
 }
 
@@ -157,13 +157,13 @@
    ACTIVE BUTTON — blue bg + left accent bar
    ───────────────────────────────────────────── */
 .ls-btn--active {
-  background: var(--ls-accent-bg);
-  color: var(--ls-accent);
+  background: var(--buildrick-accent-tint);
+  color: var(--buildrick-accent);
 }
 
 .ls-btn--active:hover {
-  background: var(--ls-accent-bg);
-  color: var(--ls-accent);
+  background: var(--buildrick-accent-tint);
+  color: var(--buildrick-accent);
 }
 
 /* Left accent bar — 3px, full height */
@@ -173,7 +173,7 @@
   top: 0;
   width: 3px;
   height: 100%;
-  background: var(--ls-accent);
+  background: var(--buildrick-accent);
 }
 
 /* ─────────────────────────────────────────────
@@ -186,7 +186,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--ls-dirty, #F59E0B);
+  background: var(--buildrick-warning, #F59E0B);
   pointer-events: none;
 }
 
@@ -204,8 +204,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--ls-bg-panel);
-  border-right: 1px solid var(--ls-border-card);
+  background: var(--buildrick-bg-panel);
+  border-right: 1px solid var(--buildrick-border);
   overflow: hidden;
   transition: width 0.2s ease, opacity 0.15s ease;
 }
@@ -225,16 +225,16 @@
   height: 44px;
   min-height: 44px;
   padding: 0 12px;
-  border-bottom: 1px solid var(--ls-border-light);
+  border-bottom: 1px solid var(--buildrick-border-light);
   flex-shrink: 0;
   gap: 8px;
 }
 
 .ls-panel-title {
-  font-family: var(--aqb-font-family);
+  font-family: var(--buildrick-font-family);
   font-size: 14px;
   font-weight: 600;
-  color: var(--ls-text-primary);
+  color: var(--buildrick-text-primary);
   white-space: nowrap;
 }
 
@@ -251,19 +251,19 @@
   border: none;
   background: transparent;
   cursor: pointer;
-  color: var(--ls-text-subtle);
+  color: var(--buildrick-text-muted);
   padding: 0;
   border-radius: 4px;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 .ls-panel-icon-btn:hover {
-  background: var(--ls-bg-subtle);
-  color: var(--ls-text-medium);
+  background: var(--buildrick-bg-subtle);
+  color: var(--buildrick-text-secondary);
 }
 
 .ls-panel-icon-btn:focus-visible {
-  outline: 2px solid var(--ls-accent);
+  outline: 2px solid var(--buildrick-accent);
   outline-offset: -2px;
 }
 
@@ -283,7 +283,7 @@
   padding: 16px;
   overflow-y: auto;
   overflow-x: hidden;
-  background: var(--ls-bg-panel);
+  background: var(--buildrick-bg-panel);
 }
 
 .ls-panel-content--no-padding {
@@ -302,12 +302,12 @@
 }
 
 .ls-panel-content::-webkit-scrollbar-thumb {
-  background: var(--ls-border-soft);
+  background: var(--buildrick-border);
   border-radius: 2px;
 }
 
 .ls-panel-content::-webkit-scrollbar-thumb:hover {
-  background: var(--ls-text-lighter);
+  background: var(--buildrick-text-secondary);
 }
 
 /* ─────────────────────────────────────────────

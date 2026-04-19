@@ -102,7 +102,7 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
               onClick={() => handlePresetSelect(preset)}
               style={{
                 ...presetItemStyles,
-                background: zoom === preset ? "var(--aqb-primary)" : "transparent",
+                background: zoom === preset ? "var(--buildrick-accent)" : "transparent",
               }}
             >
               {preset}%
@@ -172,9 +172,9 @@ const containerStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 4,
   padding: "6px 10px",
-  background: "var(--aqb-surface-2)",
-  border: "1px solid var(--aqb-border)",
-  borderRadius: "var(--aqb-radius-lg)",
+  background: "var(--buildrick-surface-2)",
+  border: "1px solid var(--buildrick-border)",
+  borderRadius: "var(--buildrick-design-radius-lg)",
   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
   zIndex: 100,
 };
@@ -189,7 +189,7 @@ const sliderStyles: React.CSSProperties = {
   width: "100%",
   height: 4,
   appearance: "none",
-  background: "var(--aqb-surface-4)",
+  background: "var(--buildrick-surface-4)",
   borderRadius: 2,
   outline: "none",
   cursor: "pointer",
@@ -198,7 +198,7 @@ const sliderStyles: React.CSSProperties = {
 const dividerStyles: React.CSSProperties = {
   width: 1,
   height: 16,
-  background: "var(--aqb-border)",
+  background: "var(--buildrick-border)",
   margin: "0 4px",
 };
 
@@ -207,8 +207,8 @@ const percentButtonStyles: React.CSSProperties = {
   padding: "4px 8px",
   background: "transparent",
   border: "none",
-  borderRadius: "var(--aqb-radius-sm)",
-  color: "var(--aqb-text-secondary)",
+  borderRadius: "var(--buildrick-design-radius-sm)",
+  color: "var(--buildrick-text-secondary)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
@@ -223,17 +223,17 @@ const presetsDropdownStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   padding: 4,
-  background: "var(--aqb-surface-2)",
-  border: "1px solid var(--aqb-border)",
-  borderRadius: "var(--aqb-radius-md)",
+  background: "var(--buildrick-surface-2)",
+  border: "1px solid var(--buildrick-border)",
+  borderRadius: "var(--buildrick-design-radius-md)",
   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
 };
 
 const presetItemStyles: React.CSSProperties = {
   padding: "6px 12px",
   border: "none",
-  borderRadius: "var(--aqb-radius-sm)",
-  color: "var(--aqb-text-primary)",
+  borderRadius: "var(--buildrick-design-radius-sm)",
+  color: "var(--buildrick-text-primary)",
   fontSize: 12,
   cursor: "pointer",
   textAlign: "right",

@@ -132,7 +132,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
         .finally(() => {
           if (loadedFromStorage) return;
           try {
-            const savedRaw = localStorage.getItem("aqb-project");
+            const savedRaw = localStorage.getItem("buildrick-project");
             if (savedRaw) {
               const saved = JSON.parse(savedRaw);
               if (saved.project) {

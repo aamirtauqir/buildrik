@@ -32,7 +32,7 @@ export class AutoLayoutManager {
     if (typeof document === "undefined") return null;
     const element = this.composer.elements.getElement(elementId);
     if (!element) return null;
-    const domElement = document.querySelector(`[data-aqb-id="${elementId}"]`) as HTMLElement | null;
+    const domElement = document.querySelector(`[data-buildrick-id="${elementId}"]`) as HTMLElement | null;
     if (!domElement) return null;
 
     const computedStyle = window.getComputedStyle(domElement);

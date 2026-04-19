@@ -61,20 +61,20 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ items, x, y, onClose }
   return (
     <div
       ref={menuRef}
-      className="aqb-context-menu"
-      data-aqb-context-menu="true"
+      className="buildrick-context-menu"
+      data-buildrick-context-menu="true"
       style={{
         position: "fixed",
         left: adjustedPosition.x,
         top: adjustedPosition.y,
-        background: "var(--aqb-bg-panel)",
+        background: "var(--buildrick-bg-panel)",
         borderRadius: 8,
         boxShadow: "0 8px 30px rgba(0,0,0,0.4)",
-        border: "1px solid var(--aqb-border)",
+        border: "1px solid var(--buildrick-border)",
         minWidth: 180,
         padding: "4px 0",
         zIndex: 2000,
-        animation: "aqb-menu-in 0.15s ease",
+        animation: "buildrick-menu-in 0.15s ease",
       }}
     >
       {items.map((item, index) => {
@@ -84,7 +84,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ items, x, y, onClose }
               key={index}
               style={{
                 height: 1,
-                background: "var(--aqb-border)",
+                background: "var(--buildrick-border)",
                 margin: "4px 0",
               }}
             />
@@ -110,7 +110,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ items, x, y, onClose }
               gap: 10,
               background: "transparent",
               border: "none",
-              color: item.danger ? "var(--aqb-error)" : "var(--aqb-text-primary)",
+              color: item.danger ? "var(--buildrick-error)" : "var(--buildrick-text-primary)",
               cursor: item.disabled ? "not-allowed" : "pointer",
               fontSize: 13,
               textAlign: "left",
@@ -119,7 +119,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ items, x, y, onClose }
             }}
             onMouseEnter={(e) => {
               if (!item.disabled) {
-                e.currentTarget.style.background = "var(--aqb-bg-panel-secondary)";
+                e.currentTarget.style.background = "var(--buildrick-bg-panel-secondary)";
               }
             }}
             onMouseLeave={(e) => {
@@ -131,7 +131,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ items, x, y, onClose }
             </span>
             <span style={{ flex: 1 }}>{item.label}</span>
             {item.shortcut && (
-              <span style={{ color: "var(--aqb-text-muted)", fontSize: 12 }}>{item.shortcut}</span>
+              <span style={{ color: "var(--buildrick-text-muted)", fontSize: 12 }}>{item.shortcut}</span>
             )}
             {item.children && <span>▶</span>}
           </button>

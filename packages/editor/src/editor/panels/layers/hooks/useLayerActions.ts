@@ -113,7 +113,7 @@ export function useLayerActions(
     const pending = pendingVisibilityRef.current;
     if (!pending) return;
     pendingVisibilityRef.current = null;
-    const el = document.querySelector(`[data-aqb-id="${pending.id}"]`) as HTMLElement | null;
+    const el = document.querySelector(`[data-buildrick-id="${pending.id}"]`) as HTMLElement | null;
     if (el) el.setAttribute("data-hidden", String(pending.hidden));
   }, [hiddenIds]);
 
@@ -134,7 +134,7 @@ export function useLayerActions(
     const pending = pendingLockRef.current;
     if (!pending) return;
     pendingLockRef.current = null;
-    const el = document.querySelector(`[data-aqb-id="${pending.id}"]`) as HTMLElement | null;
+    const el = document.querySelector(`[data-buildrick-id="${pending.id}"]`) as HTMLElement | null;
     if (el) el.setAttribute("data-locked", String(pending.locked));
     composer?.elements.getElement(pending.id)?.setLocked(pending.locked);
   }, [lockedIds, composer]);
@@ -224,7 +224,7 @@ export function useLayerActions(
       const next = new Set(prev);
       ids.forEach((id) => {
         next.add(id);
-        const el = document.querySelector(`[data-aqb-id="${id}"]`) as HTMLElement | null;
+        const el = document.querySelector(`[data-buildrick-id="${id}"]`) as HTMLElement | null;
         if (el) el.setAttribute("data-hidden", "true");
       });
       return next;

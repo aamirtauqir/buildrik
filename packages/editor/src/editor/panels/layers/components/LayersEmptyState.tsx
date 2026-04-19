@@ -24,12 +24,12 @@ const LayersIcon: React.FC = () => (
 );
 
 export const LayersEmptyState: React.FC = () => (
-  <div className="aqb-layers-empty-state-custom">
-    <div className="aqb-les-icon-wrap">
+  <div className="buildrick-layers-empty-state-custom">
+    <div className="buildrick-les-icon-wrap">
       <LayersIcon />
     </div>
-    <p className="aqb-les-heading">No layers yet</p>
-    <p className="aqb-les-sub">Add elements to your canvas to see them here.</p>
+    <p className="buildrick-les-heading">No layers yet</p>
+    <p className="buildrick-les-sub">Add elements to your canvas to see them here.</p>
   </div>
 );
 

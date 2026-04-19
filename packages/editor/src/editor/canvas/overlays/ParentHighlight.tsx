@@ -49,7 +49,7 @@ export const ParentHighlight: React.FC<ParentHighlightProps> = ({
       const canvas = canvasRef.current;
       if (!canvas) return;
 
-      const parentEl = canvas.querySelector(`[data-aqb-id="${parentId}"]`) as HTMLElement;
+      const parentEl = canvas.querySelector(`[data-buildrick-id="${parentId}"]`) as HTMLElement;
       if (!parentEl) {
         setParentRect(null);
         return;
@@ -72,7 +72,7 @@ export const ParentHighlight: React.FC<ParentHighlightProps> = ({
 
     // Observe for changes
     const observer = new ResizeObserver(updateRect);
-    const parentEl = canvasRef.current.querySelector(`[data-aqb-id="${parentId}"]`);
+    const parentEl = canvasRef.current.querySelector(`[data-buildrick-id="${parentId}"]`);
     if (parentEl) observer.observe(parentEl);
 
     window.addEventListener("scroll", updateRect, { capture: true, passive: true });
@@ -89,7 +89,7 @@ export const ParentHighlight: React.FC<ParentHighlightProps> = ({
 
   return (
     <ParentHighlightBox
-      className="aqb-parent-highlight"
+      className="buildrick-parent-highlight"
       style={{
         left: parentRect.left - 2,
         top: parentRect.top - 2,

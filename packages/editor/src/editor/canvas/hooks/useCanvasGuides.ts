@@ -9,7 +9,7 @@ import * as React from "react";
 import type { CanvasGuide } from "../../../shared/types/canvas";
 import { devLogger } from "../../../shared/utils/devLogger";
 
-const STORAGE_KEY = "aqb-guides";
+const STORAGE_KEY = "buildrick-guides";
 
 export interface UseCanvasGuidesOptions {
   /** Enable/disable guides */

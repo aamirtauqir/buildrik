@@ -58,7 +58,7 @@ export const QuickActionsToolbar: React.FC<QuickActionsToolbarProps> = ({
       const canvas = canvasRef.current;
       if (!canvas) return;
 
-      const el = canvas.querySelector(`[data-aqb-id="${elementId}"]`) as HTMLElement;
+      const el = canvas.querySelector(`[data-buildrick-id="${elementId}"]`) as HTMLElement;
       if (!el) return;
 
       const canvasRect = canvas.getBoundingClientRect();
@@ -76,7 +76,7 @@ export const QuickActionsToolbar: React.FC<QuickActionsToolbarProps> = ({
     updatePosition();
 
     const observer = new ResizeObserver(updatePosition);
-    const el = canvasRef.current.querySelector(`[data-aqb-id="${elementId}"]`);
+    const el = canvasRef.current.querySelector(`[data-buildrick-id="${elementId}"]`);
     if (el) observer.observe(el);
 
     window.addEventListener("scroll", updatePosition, { capture: true, passive: true });
@@ -353,7 +353,7 @@ export const QuickActionsToolbar: React.FC<QuickActionsToolbarProps> = ({
 
   return (
     <div
-      className="aqb-quick-actions"
+      className="buildrick-quick-actions"
       style={{
         position: "absolute",
         left: toolbarLeft,

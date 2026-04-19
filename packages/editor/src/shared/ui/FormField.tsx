@@ -62,9 +62,9 @@ export const FormField: React.FC<FormFieldProps> = ({
   const message = error || warning || success;
 
   const messageColors = {
-    error: "var(--aqb-error, #ef4444)",
-    warning: "var(--aqb-warning, #f59e0b)",
-    success: "var(--aqb-success, #10b981)",
+    error: "var(--buildrick-error, #ef4444)",
+    warning: "var(--buildrick-warning, #f59e0b)",
+    success: "var(--buildrick-success, #10b981)",
   };
 
   const messageIcons = {
@@ -115,9 +115,9 @@ export const FormField: React.FC<FormFieldProps> = ({
 
   return (
     <div
-      className={`aqb-form-field aqb-form-field-${size} aqb-form-field-${layout} ${
-        error ? "aqb-form-field-error" : ""
-      } ${disabled ? "aqb-form-field-disabled" : ""} ${className}`}
+      className={`buildrick-form-field buildrick-form-field-${size} buildrick-form-field-${layout} ${
+        error ? "buildrick-form-field-error" : ""
+      } ${disabled ? "buildrick-form-field-disabled" : ""} ${className}`}
       style={{
         display: "flex",
         flexDirection: isHorizontal ? "row" : "column",
@@ -140,7 +140,7 @@ export const FormField: React.FC<FormFieldProps> = ({
             style={{
               fontSize: sizes.labelSize,
               fontWeight: 600,
-              color: "var(--aqb-text-secondary, #94a3b8)",
+              color: "var(--buildrick-text-secondary, #94a3b8)",
               letterSpacing: "0.3px",
             }}
           >
@@ -149,7 +149,7 @@ export const FormField: React.FC<FormFieldProps> = ({
           {required && (
             <span
               style={{
-                color: "var(--aqb-error, #ef4444)",
+                color: "var(--buildrick-error, #ef4444)",
                 fontWeight: 600,
                 fontSize: sizes.labelSize,
               }}
@@ -162,7 +162,7 @@ export const FormField: React.FC<FormFieldProps> = ({
             <span
               style={{
                 fontSize: 12,
-                color: "var(--aqb-text-muted, #64748b)",
+                color: "var(--buildrick-text-muted, #64748b)",
                 background: "rgba(255, 255, 255, 0.05)",
                 padding: "2px 6px",
                 borderRadius: 4,
@@ -182,7 +182,7 @@ export const FormField: React.FC<FormFieldProps> = ({
             style={{
               margin: 0,
               fontSize: sizes.descSize,
-              color: "var(--aqb-text-muted, #64748b)",
+              color: "var(--buildrick-text-muted, #64748b)",
               lineHeight: 1.4,
             }}
           >
@@ -192,11 +192,11 @@ export const FormField: React.FC<FormFieldProps> = ({
 
         {/* Input element with error styling context */}
         <div
-          className={`aqb-form-field-input ${error ? "has-error" : ""}`}
+          className={`buildrick-form-field-input ${error ? "has-error" : ""}`}
           style={
             error
               ? ({
-                  "--input-border-color": "var(--aqb-error)",
+                  "--input-border-color": "var(--buildrick-error)",
                   "--input-focus-shadow": "0 0 0 2px rgba(239, 68, 68, 0.2)",
                 } as React.CSSProperties)
               : undefined
@@ -208,7 +208,7 @@ export const FormField: React.FC<FormFieldProps> = ({
         {/* Message below input */}
         {hasMessage && messageType && (
           <div
-            className={`aqb-form-field-message aqb-form-field-${messageType}`}
+            className={`buildrick-form-field-message buildrick-form-field-${messageType}`}
             role={messageType === "error" ? "alert" : "status"}
             style={{
               display: "flex",
@@ -262,7 +262,7 @@ export const FormGroup: React.FC<FormGroupProps> = ({
 
   return (
     <fieldset
-      className={`aqb-form-group aqb-form-group-${layout} ${className}`}
+      className={`buildrick-form-group buildrick-form-group-${layout} ${className}`}
       style={{
         margin: 0,
         padding: 0,
@@ -276,7 +276,7 @@ export const FormGroup: React.FC<FormGroupProps> = ({
               style={{
                 fontSize: 14,
                 fontWeight: 700,
-                color: "var(--aqb-text-primary, #f8fafc)",
+                color: "var(--buildrick-text-primary, #f8fafc)",
                 marginBottom: description ? 4 : 0,
               }}
             >
@@ -288,7 +288,7 @@ export const FormGroup: React.FC<FormGroupProps> = ({
               style={{
                 margin: 0,
                 fontSize: 12,
-                color: "var(--aqb-text-muted, #64748b)",
+                color: "var(--buildrick-text-muted, #64748b)",
               }}
             >
               {description}
@@ -330,14 +330,14 @@ export const FormActions: React.FC<FormActionsProps> = ({
 
   return (
     <div
-      className={`aqb-form-actions ${className}`}
+      className={`buildrick-form-actions ${className}`}
       style={{
         display: "flex",
         alignItems: "center",
         gap,
         marginTop: 20,
         paddingTop: bordered ? 20 : 0,
-        borderTop: bordered ? "1px solid var(--aqb-border, #334155)" : "none",
+        borderTop: bordered ? "1px solid var(--buildrick-border, #334155)" : "none",
         ...alignStyles[align],
       }}
     >

@@ -54,7 +54,7 @@ const heroLandingFixture: ElementData = {
       type: "paragraph",
       tagName: "p",
       content: "The builder for solo designers who bill by the page.",
-      styles: { "font-size": "18px", color: "var(--aqb-text-secondary)" },
+      styles: { "font-size": "18px", color: "var(--buildrick-text-secondary)" },
     },
     {
       id: "hero-cta-row",

@@ -231,72 +231,72 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   const showAlphaWarning = hsb.a < 0.8;
 
   return (
-    <div className="aqb-design-picker">
+    <div className="buildrick-design-picker">
       {/* SB Canvas */}
-      <div className="aqb-design-picker__sb-wrap">
+      <div className="buildrick-design-picker__sb-wrap">
         <canvas
           ref={sbCanvasRef}
           width={228}
           height={128}
-          className="aqb-design-picker__sb-canvas"
+          className="buildrick-design-picker__sb-canvas"
           onPointerDown={handleSbDown}
           onPointerMove={handleSbMove}
           onPointerUp={handleSbUp}
         />
-        <div className="aqb-design-picker__crosshair" style={{ left: sbX, top: sbY }} aria-hidden />
+        <div className="buildrick-design-picker__crosshair" style={{ left: sbX, top: sbY }} aria-hidden />
       </div>
 
       {/* Hue slider */}
-      <div className="aqb-design-picker__slider-wrap">
+      <div className="buildrick-design-picker__slider-wrap">
         <canvas
           ref={hueCanvasRef}
           width={228}
           height={12}
-          className="aqb-design-picker__slider-canvas"
+          className="buildrick-design-picker__slider-canvas"
           onPointerDown={handleHueDown}
           onPointerMove={handleHueMove}
           onPointerUp={handleHueUp}
         />
-        <div className="aqb-design-picker__knob" style={{ left: hueX }} aria-hidden />
+        <div className="buildrick-design-picker__knob" style={{ left: hueX }} aria-hidden />
       </div>
 
       {/* Alpha slider */}
-      <div className="aqb-design-picker__slider-wrap">
+      <div className="buildrick-design-picker__slider-wrap">
         <canvas
           ref={alphaCanvasRef}
           width={228}
           height={12}
-          className="aqb-design-picker__slider-canvas"
+          className="buildrick-design-picker__slider-canvas"
           onPointerDown={handleAlphaDown}
           onPointerMove={handleAlphaMove}
           onPointerUp={handleAlphaUp}
         />
-        <div className="aqb-design-picker__knob" style={{ left: alphaX }} aria-hidden />
-        <span className="aqb-design-picker__alpha-label">{Math.round(hsb.a * 100)}%</span>
+        <div className="buildrick-design-picker__knob" style={{ left: alphaX }} aria-hidden />
+        <span className="buildrick-design-picker__alpha-label">{Math.round(hsb.a * 100)}%</span>
       </div>
 
       {/* Hex input row */}
-      <div className="aqb-design-picker__hex-row">
+      <div className="buildrick-design-picker__hex-row">
         <div
-          className="aqb-design-picker__swatch-preview"
+          className="buildrick-design-picker__swatch-preview"
           style={{ background: currentHex.slice(0, 7) }}
         />
         <div
-          className={`aqb-design-picker__hex-input-wrap${hexError ? " aqb-design-picker__hex-input-wrap--error" : ""}`}
+          className={`buildrick-design-picker__hex-input-wrap${hexError ? " buildrick-design-picker__hex-input-wrap--error" : ""}`}
         >
-          <span className="aqb-design-picker__hash">#</span>
+          <span className="buildrick-design-picker__hash">#</span>
           <input
             type="text"
             value={hexInput.replace("#", "")}
             onChange={handleHexInput}
-            className="aqb-design-picker__hex-input"
+            className="buildrick-design-picker__hex-input"
             maxLength={8}
             spellCheck={false}
             aria-label="Hex color value"
           />
         </div>
         <span
-          className="aqb-design-picker__contrast-badge"
+          className="buildrick-design-picker__contrast-badge"
           title={`Contrast ratio: ${contrastRatio.toFixed(1)}:1`}
         >
           {contrastRatio.toFixed(1)}:1
@@ -304,22 +304,22 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
       </div>
 
       {hexError && (
-        <div className="aqb-design-picker__hex-error">Enter a valid hex like #3B82F6</div>
+        <div className="buildrick-design-picker__hex-error">Enter a valid hex like #3B82F6</div>
       )}
 
       {showAlphaWarning && (
-        <div className="aqb-design-picker__alpha-warning">
+        <div className="buildrick-design-picker__alpha-warning">
           Background has transparency — contrast may not be accurate
         </div>
       )}
 
       {/* Action buttons */}
-      <div className="aqb-design-picker__actions">
-        <button className="aqb-design-picker__cancel-btn" onClick={onCancel} type="button">
+      <div className="buildrick-design-picker__actions">
+        <button className="buildrick-design-picker__cancel-btn" onClick={onCancel} type="button">
           Cancel
         </button>
         <button
-          className="aqb-design-picker__save-btn"
+          className="buildrick-design-picker__save-btn"
           onClick={() => onSave(currentHex)}
           type="button"
           disabled={hexError}

@@ -59,7 +59,7 @@ export const CanvasSpotSpacing: React.FC<CanvasSpotSpacingProps> = ({
   if (indicators.length === 0) return null;
 
   return (
-    <div className="aqb-canvas-spot-spacing">
+    <div className="buildrick-canvas-spot-spacing">
       {indicators.map((indicator, index) => {
         const isEditing = editing === `${indicator.type}-${indicator.side}`;
         const color = indicator.type === "margin" ? "#00d4aa" : "#7c3aed";
@@ -67,7 +67,7 @@ export const CanvasSpotSpacing: React.FC<CanvasSpotSpacingProps> = ({
         return (
           <div
             key={`${indicator.type}-${indicator.side}-${index}`}
-            className={`aqb-spacing-indicator aqb-spacing-indicator--${indicator.type} aqb-spacing-indicator--${indicator.side}`}
+            className={`buildrick-spacing-indicator buildrick-spacing-indicator--${indicator.type} buildrick-spacing-indicator--${indicator.side}`}
             style={{
               position: "absolute",
               left: `${indicator.position.x}px`,
@@ -79,7 +79,7 @@ export const CanvasSpotSpacing: React.FC<CanvasSpotSpacingProps> = ({
             onClick={() => handleIndicatorClick(indicator)}
           >
             {indicator.position.width > 20 && indicator.position.height > 20 && (
-              <div className="aqb-spacing-indicator-label" style={{ backgroundColor: color }}>
+              <div className="buildrick-spacing-indicator-label" style={{ backgroundColor: color }}>
                 {isEditing ? (
                   <input
                     type="number"
@@ -88,7 +88,7 @@ export const CanvasSpotSpacing: React.FC<CanvasSpotSpacingProps> = ({
                     onBlur={() => handleValueCommit(indicator)}
                     onKeyDown={(e) => handleKeyDown(e, indicator)}
                     autoFocus
-                    className="aqb-spacing-indicator-input"
+                    className="buildrick-spacing-indicator-input"
                   />
                 ) : (
                   <span>{indicator.value}px</span>

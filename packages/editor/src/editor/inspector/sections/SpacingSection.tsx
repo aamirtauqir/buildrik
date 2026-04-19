@@ -158,8 +158,8 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
       <span
         style={{
           fontSize: 11,
-          color: "var(--aqb-text-tertiary)",
-          fontFamily: "var(--aqb-font-mono)",
+          color: "var(--buildrick-text-tertiary)",
+          fontFamily: "var(--buildrick-design-font-mono)",
           whiteSpace: "nowrap",
         }}
       >

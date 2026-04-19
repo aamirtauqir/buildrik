@@ -189,7 +189,7 @@ const headerStyles: React.CSSProperties = {
   justifyContent: "space-between",
   alignItems: "center",
   padding: "8px 12px",
-  background: "var(--aqb-surface-3)",
+  background: "var(--buildrick-surface-3)",
   borderRadius: "6px",
 };
 
@@ -202,24 +202,24 @@ const fieldStyles: React.CSSProperties = {
 const labelStyles: React.CSSProperties = {
   fontSize: "11px",
   fontWeight: 500,
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
   textTransform: "uppercase",
   letterSpacing: "0.5px",
 };
 
 const valueStyles: React.CSSProperties = {
   fontSize: "12px",
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
   fontFamily: "monospace",
 };
 
 const inputStyles: React.CSSProperties = {
   padding: "8px 12px",
-  border: "1px solid var(--aqb-border)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: "6px",
   fontSize: "13px",
-  background: "var(--aqb-surface)",
-  color: "var(--aqb-text-primary)",
+  background: "var(--buildrick-surface)",
+  color: "var(--buildrick-text-primary)",
 };
 
 const selectStyles: React.CSSProperties = {
@@ -229,7 +229,7 @@ const selectStyles: React.CSSProperties = {
 
 const buttonStyles: React.CSSProperties = {
   padding: "10px 16px",
-  background: "var(--aqb-accent)",
+  background: "var(--buildrick-accent)",
   color: "#fff",
   border: "none",
   borderRadius: "6px",
@@ -240,7 +240,7 @@ const buttonStyles: React.CSSProperties = {
 
 const hintStyles: React.CSSProperties = {
   fontSize: "11px",
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
   margin: 0,
 };
 

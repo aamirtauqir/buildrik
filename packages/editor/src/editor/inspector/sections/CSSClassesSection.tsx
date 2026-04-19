@@ -95,7 +95,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
     <Section title="CSS Classes" icon="Tag" defaultOpen isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-css-classes">
       {/* Applied Classes */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 12, color: "var(--aqb-text-tertiary)", marginBottom: 8 }}>
+        <div style={{ fontSize: 12, color: "var(--buildrick-text-tertiary)", marginBottom: 8 }}>
           Applied Classes
         </div>
         <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 6 }}>
@@ -105,11 +105,11 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
                 key={cls}
                 style={{
                   padding: "6px 10px",
-                  background: "var(--aqb-primary-light)",
-                  border: "1px solid var(--aqb-primary)",
+                  background: "var(--buildrick-accent-subtle)",
+                  border: "1px solid var(--buildrick-accent)",
                   borderRadius: 6,
                   fontSize: 12,
-                  color: "var(--aqb-primary)",
+                  color: "var(--buildrick-accent)",
                   display: "flex",
                   alignItems: "center",
                   gap: 6,
@@ -123,7 +123,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
                   style={{
                     background: "none",
                     border: "none",
-                    color: "var(--aqb-error)",
+                    color: "var(--buildrick-error)",
                     cursor: "pointer",
                     padding: 0,
                     fontSize: 14,
@@ -135,7 +135,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
               </span>
             ))
           ) : (
-            <span style={{ fontSize: 12, color: "var(--aqb-text-tertiary)", fontStyle: "italic" }}>
+            <span style={{ fontSize: 12, color: "var(--buildrick-text-tertiary)", fontStyle: "italic" }}>
               No classes applied — type a name below and click Add
             </span>
           )}
@@ -172,7 +172,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
             aria-label="Add class"
             style={{
               padding: "10px 16px",
-              background: "var(--aqb-primary)",
+              background: "var(--buildrick-accent)",
               border: "none",
               borderRadius: 6,
               color: "#fff",
@@ -196,8 +196,8 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
               left: 0,
               right: 60,
               marginTop: 4,
-              background: "var(--aqb-surface-3)",
-              border: "1px solid var(--aqb-border)",
+              background: "var(--buildrick-surface-3)",
+              border: "1px solid var(--buildrick-border)",
               borderRadius: 6,
               overflow: "hidden",
               zIndex: 10,
@@ -215,8 +215,8 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
                   padding: "8px 12px",
                   background: "transparent",
                   border: "none",
-                  borderBottom: "1px solid var(--aqb-border-subtle)",
-                  color: "var(--aqb-text-primary)",
+                  borderBottom: "1px solid var(--buildrick-border-subtle)",
+                  color: "var(--buildrick-text-primary)",
                   fontSize: 12,
                   textAlign: "left" as const,
                   cursor: "pointer",

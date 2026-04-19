@@ -141,7 +141,7 @@ const overlayStyles: React.CSSProperties = {
 };
 
 const modalStyles: React.CSSProperties = {
-  background: "var(--aqb-surface, #fff)",
+  background: "var(--buildrick-surface, #fff)",
   borderRadius: "12px",
   padding: "24px",
   maxWidth: "500px",
@@ -160,13 +160,13 @@ const titleStyles: React.CSSProperties = {
   margin: 0,
   fontSize: "18px",
   fontWeight: 600,
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
 };
 
 const descriptionStyles: React.CSSProperties = {
   margin: "0 0 20px 0",
   fontSize: "14px",
-  color: "var(--aqb-text-secondary, #666)",
+  color: "var(--buildrick-text-secondary, #666)",
   lineHeight: 1.5,
 };
 
@@ -180,7 +180,7 @@ const versionsContainerStyles: React.CSSProperties = {
 const versionCardStyles: React.CSSProperties = {
   flex: 1,
   padding: "16px",
-  background: "var(--aqb-surface-2, #f5f5f5)",
+  background: "var(--buildrick-surface-2, #f5f5f5)",
   borderRadius: "8px",
   display: "flex",
   flexDirection: "column",
@@ -196,23 +196,23 @@ const versionHeaderStyles: React.CSSProperties = {
 const versionLabelStyles: React.CSSProperties = {
   fontSize: "14px",
   fontWeight: 600,
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
 };
 
 const versionMetaStyles: React.CSSProperties = {
   fontSize: "12px",
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
 };
 
 const timeAgoStyles: React.CSSProperties = {
-  color: "var(--aqb-accent)",
+  color: "var(--buildrick-accent)",
   fontWeight: 500,
 };
 
 const vsStyles: React.CSSProperties = {
   fontSize: "12px",
   fontWeight: 600,
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
 };
 
 const buttonStyles: React.CSSProperties = {
@@ -226,13 +226,13 @@ const buttonStyles: React.CSSProperties = {
 };
 
 const primaryButtonStyles: React.CSSProperties = {
-  background: "var(--aqb-accent)",
+  background: "var(--buildrick-accent)",
   color: "#fff",
 };
 
 const secondaryButtonStyles: React.CSSProperties = {
-  background: "var(--aqb-surface-3)",
-  color: "var(--aqb-text-primary)",
+  background: "var(--buildrick-surface-3)",
+  color: "var(--buildrick-text-primary)",
 };
 
 const footerStyles: React.CSSProperties = {
@@ -244,7 +244,7 @@ const cancelButtonStyles: React.CSSProperties = {
   padding: "8px 16px",
   border: "none",
   background: "transparent",
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
   fontSize: "13px",
   cursor: "pointer",
 };

@@ -14,7 +14,7 @@ const overrideDotStyle: React.CSSProperties = {
   width: 6,
   height: 6,
   borderRadius: "50%",
-  backgroundColor: "var(--aqb-primary, #3b82f6)",
+  backgroundColor: "var(--buildrick-accent, #3b82f6)",
   marginLeft: 4,
   display: "inline-block",
   verticalAlign: "middle",
@@ -23,8 +23,8 @@ const overrideDotStyle: React.CSSProperties = {
 /**
  * ResetButton — hover-revealed × that clears the current value.
  * Rendered inside a row that has `position: relative`. Visibility driven by
- * the row's hover state via a parent-scoped CSS class (`aqb-row`) whose hover
- * selector toggles `opacity` on `.aqb-reset`. Falls back to always-visible for
+ * the row's hover state via a parent-scoped CSS class (`buildrick-row`) whose hover
+ * selector toggles `opacity` on `.buildrick-reset`. Falls back to always-visible for
  * keyboard-only users via `:focus-visible`.
  */
 const resetButtonStyle: React.CSSProperties = {
@@ -38,7 +38,7 @@ const resetButtonStyle: React.CSSProperties = {
   background: "rgba(0,0,0,0.3)",
   border: "none",
   borderRadius: 4,
-  color: "var(--aqb-text-tertiary)",
+  color: "var(--buildrick-text-tertiary)",
   cursor: "pointer",
   display: "flex",
   alignItems: "center",
@@ -61,7 +61,7 @@ const ResetButton: React.FC<{
     }}
     aria-label={label}
     title={label}
-    className="aqb-reset"
+    className="buildrick-reset"
     style={{
       ...resetButtonStyle,
       opacity: visible ? 1 : 0,
@@ -149,12 +149,12 @@ export interface InputWithUnitProps {
 /** Returns true for valid CSS numeric input (including empty, partial negative, or CSS var) */
 function isValidCSSNumber(val: string): boolean {
   if (val === "" || val === "-") return true;
-  if (/^var\(--aqb-/.test(val)) return true; // token binding — always valid, pass through
+  if (/^var\(--buildrick-design-/.test(val)) return true; // token binding — always valid, pass through
   return /^-?[\d.]+$/.test(val) && !isNaN(parseFloat(val));
 }
 
 /** Returns true if the value is a token var() binding — skip all parse/validate */
-const isTokenVar = (val: string): boolean => /^var\(--aqb-/.test(val);
+const isTokenVar = (val: string): boolean => /^var\(--buildrick-design-/.test(val);
 
 export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   label,
@@ -252,7 +252,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   const inputStyle: React.CSSProperties = {
     ...baseStyles.inputWithUnit,
     ...(isInvalid
-      ? { borderColor: "var(--aqb-error, #ef4444)", outline: "1px solid var(--aqb-error, #ef4444)" }
+      ? { borderColor: "var(--buildrick-error, #ef4444)", outline: "1px solid var(--buildrick-error, #ef4444)" }
       : {}),
   };
 

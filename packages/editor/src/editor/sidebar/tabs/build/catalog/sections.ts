@@ -46,7 +46,7 @@ const INNER = "max-width:1200px;margin:0 auto;";
 // ─── HERO ───────────────────────────────────────────────────────────────────
 
 const heroSplit = `
-<section data-aqb-section="hero-split" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="hero-split" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;">
     <div>
       <h1 style="font-size:48px;font-weight:700;color:${TEXT_PRIMARY};line-height:1.1;margin:0 0 20px;">Build faster. Ship smarter.</h1>
@@ -61,7 +61,7 @@ const heroSplit = `
 </section>`;
 
 const heroCentered = `
-<section data-aqb-section="hero-centered" style="padding:${PAD};background:${BG_WHITE};text-align:center;">
+<section data-buildrick-section="hero-centered" style="padding:${PAD};background:${BG_WHITE};text-align:center;">
   <div style="${INNER}max-width:720px;">
     <h1 style="font-size:56px;font-weight:700;color:${TEXT_PRIMARY};line-height:1.1;margin:0 0 20px;">The headline that wins hearts</h1>
     <p style="font-size:20px;color:${TEXT_MUTED};line-height:1.6;margin:0 0 32px;">One sentence that expands on the headline and makes the value undeniable to your target user.</p>
@@ -73,7 +73,7 @@ const heroCentered = `
 </section>`;
 
 const heroMedia = `
-<section data-aqb-section="hero-media" style="padding:120px 24px;background:${BG_DARK};position:relative;text-align:center;min-height:500px;display:flex;align-items:center;justify-content:center;">
+<section data-buildrick-section="hero-media" style="padding:120px 24px;background:${BG_DARK};position:relative;text-align:center;min-height:500px;display:flex;align-items:center;justify-content:center;">
   <div style="position:relative;z-index:1;${INNER}max-width:800px;">
     <h1 style="font-size:56px;font-weight:700;color:#fff;line-height:1.1;margin:0 0 20px;">Visual impact that stops scroll</h1>
     <p style="font-size:20px;color:rgba(255,255,255,0.85);line-height:1.6;margin:0 0 32px;">Full-bleed media hero with overlay copy — ideal for brand, product launch, or editorial.</p>
@@ -82,7 +82,7 @@ const heroMedia = `
 </section>`;
 
 const heroMinimal = `
-<section data-aqb-section="hero-minimal" style="padding:140px 24px 100px;background:${BG_WHITE};">
+<section data-buildrick-section="hero-minimal" style="padding:140px 24px 100px;background:${BG_WHITE};">
   <div style="${INNER}max-width:760px;">
     <p style="font-size:14px;font-weight:600;color:${ACCENT};letter-spacing:0.08em;text-transform:uppercase;margin:0 0 16px;">Introducing v2</p>
     <h1 style="font-size:64px;font-weight:700;color:${TEXT_PRIMARY};line-height:1.05;letter-spacing:-0.02em;margin:0 0 24px;">Typography is the product.</h1>
@@ -91,7 +91,7 @@ const heroMinimal = `
 </section>`;
 
 const heroGradient = `
-<section data-aqb-section="hero-gradient" style="padding:140px 24px;background:linear-gradient(135deg,${ACCENT} 0%,#7c3aed 100%);text-align:center;">
+<section data-buildrick-section="hero-gradient" style="padding:140px 24px;background:linear-gradient(135deg,${ACCENT} 0%,#7c3aed 100%);text-align:center;">
   <div style="${INNER}max-width:760px;">
     <h1 style="font-size:60px;font-weight:700;color:#fff;line-height:1.1;margin:0 0 20px;letter-spacing:-0.01em;">Build something people love</h1>
     <p style="font-size:20px;color:rgba(255,255,255,0.9);line-height:1.6;margin:0 0 32px;">A full-bleed gradient hero that commands attention without a single image.</p>
@@ -103,7 +103,7 @@ const heroGradient = `
 </section>`;
 
 const heroVideoBg = `
-<section data-aqb-section="hero-video-bg" style="padding:0;background:${BG_DARK};position:relative;min-height:560px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+<section data-buildrick-section="hero-video-bg" style="padding:0;background:${BG_DARK};position:relative;min-height:560px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
   <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,23,42,0.3) 0%,rgba(15,23,42,0.85) 100%);display:flex;align-items:center;justify-content:center;">
     <div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;">▶</div>
   </div>
@@ -118,7 +118,7 @@ const heroVideoBg = `
 // ─── ABOUT ──────────────────────────────────────────────────────────────────
 
 const aboutIntro = `
-<section data-aqb-section="about-intro" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="about-intro" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}max-width:720px;">
     <p style="font-size:14px;font-weight:600;color:${ACCENT};letter-spacing:0.08em;text-transform:uppercase;margin:0 0 16px;">About us</p>
     <h2 style="font-size:40px;font-weight:700;color:${TEXT_PRIMARY};line-height:1.15;margin:0 0 24px;">We started with a simple question</h2>
@@ -136,7 +136,7 @@ const aboutIntro = `
 </section>`;
 
 const aboutMission = `
-<section data-aqb-section="about-mission" style="padding:${PAD};background:${BG_LIGHT};text-align:center;">
+<section data-buildrick-section="about-mission" style="padding:${PAD};background:${BG_LIGHT};text-align:center;">
   <div style="${INNER}max-width:680px;">
     <p style="font-size:14px;font-weight:600;color:${ACCENT};letter-spacing:0.08em;text-transform:uppercase;margin:0 0 24px;">Our mission</p>
     <h2 style="font-size:48px;font-weight:600;color:${TEXT_PRIMARY};line-height:1.2;letter-spacing:-0.01em;margin:0 0 24px;">To make building on the web feel effortless for everyone who has something to say.</h2>
@@ -145,7 +145,7 @@ const aboutMission = `
 </section>`;
 
 const aboutTeamGrid = `
-<section data-aqb-section="about-team-grid" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="about-team-grid" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}">
     <div style="text-align:center;margin-bottom:48px;">
       <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 12px;">Our team</h2>
@@ -163,7 +163,7 @@ const aboutTeamGrid = `
 </section>`;
 
 const aboutTeamBios = `
-<section data-aqb-section="about-team-bios" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="about-team-bios" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}">
     <div style="text-align:center;margin-bottom:56px;">
       <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 12px;">Meet the founders</h2>
@@ -178,7 +178,7 @@ const aboutTeamBios = `
 </section>`;
 
 const aboutTimeline = `
-<section data-aqb-section="about-timeline" style="padding:${PAD};background:${BG_LIGHT};">
+<section data-buildrick-section="about-timeline" style="padding:${PAD};background:${BG_LIGHT};">
   <div style="${INNER}max-width:760px;">
     <div style="text-align:center;margin-bottom:48px;">
       <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 12px;">Our story</h2>
@@ -194,7 +194,7 @@ const aboutTimeline = `
 </section>`;
 
 const aboutValues = `
-<section data-aqb-section="about-values" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="about-values" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}">
     <div style="text-align:center;margin-bottom:48px;">
       <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 12px;">Our values</h2>
@@ -214,7 +214,7 @@ const aboutValues = `
 // ─── FEATURES ───────────────────────────────────────────────────────────────
 
 const featuresGrid = `
-<section data-aqb-section="features-3col" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="features-3col" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}">
     <div style="text-align:center;margin-bottom:48px;">
       <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 12px;">Everything you need</h2>
@@ -241,7 +241,7 @@ const featuresGrid = `
 </section>`;
 
 const featuresIconList = `
-<section data-aqb-section="features-icon-list" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="features-icon-list" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}max-width:720px;">
     <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 32px;">Why teams choose us</h2>
     <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:20px;">
@@ -253,7 +253,7 @@ const featuresIconList = `
 </section>`;
 
 const featuresComparison = `
-<section data-aqb-section="features-comparison" style="padding:${PAD};background:${BG_LIGHT};">
+<section data-buildrick-section="features-comparison" style="padding:${PAD};background:${BG_LIGHT};">
   <div style="${INNER}">
     <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};text-align:center;margin:0 0 40px;">Compare plans</h2>
     <table style="width:100%;border-collapse:collapse;background:${BG_WHITE};border-radius:12px;overflow:hidden;">
@@ -268,7 +268,7 @@ const featuresComparison = `
 </section>`;
 
 const featuresAlternating = `
-<section data-aqb-section="features-alternating" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="features-alternating" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}display:flex;flex-direction:column;gap:80px;">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;">
       <div><h2 style="font-size:32px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 16px;">Feature one</h2><p style="color:${TEXT_MUTED};line-height:1.7;margin:0;">Describe the first key capability. Focus on the benefit to the user, not the implementation detail.</p></div>
@@ -282,7 +282,7 @@ const featuresAlternating = `
 </section>`;
 
 const featuresBento = `
-<section data-aqb-section="features-bento" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="features-bento" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}">
     <div style="text-align:center;margin-bottom:48px;">
       <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 12px;">Everything, in one place</h2>
@@ -299,7 +299,7 @@ const featuresBento = `
 </section>`;
 
 const featuresAccordion = `
-<section data-aqb-section="features-accordion" style="padding:${PAD};background:${BG_LIGHT};">
+<section data-buildrick-section="features-accordion" style="padding:${PAD};background:${BG_LIGHT};">
   <div style="${INNER}max-width:760px;">
     <div style="text-align:center;margin-bottom:40px;">
       <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 12px;">Dig in</h2>
@@ -317,7 +317,7 @@ const featuresAccordion = `
 // ─── TESTIMONIALS ───────────────────────────────────────────────────────────
 
 const socialTestimonialSingle = `
-<section data-aqb-section="social-testimonial-single" style="padding:${PAD};background:${BG_LIGHT};text-align:center;">
+<section data-buildrick-section="social-testimonial-single" style="padding:${PAD};background:${BG_LIGHT};text-align:center;">
   <div style="${INNER}max-width:720px;">
     <p style="font-size:28px;font-weight:500;color:${TEXT_PRIMARY};line-height:1.4;margin:0 0 32px;font-style:italic;">"This is the testimonial quote that captures the customer's transformation in their own words."</p>
     <div style="display:flex;gap:16px;align-items:center;justify-content:center;">
@@ -328,7 +328,7 @@ const socialTestimonialSingle = `
 </section>`;
 
 const socialTestimonialGrid = `
-<section data-aqb-section="social-testimonial-grid" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="social-testimonial-grid" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}">
     <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};text-align:center;margin:0 0 48px;">Loved by teams everywhere</h2>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
@@ -340,7 +340,7 @@ const socialTestimonialGrid = `
 </section>`;
 
 const socialLogoStrip = `
-<section data-aqb-section="social-logo-strip" style="padding:60px 24px;background:${BG_LIGHT};">
+<section data-buildrick-section="social-logo-strip" style="padding:60px 24px;background:${BG_LIGHT};">
   <div style="${INNER}text-align:center;">
     <p style="color:${TEXT_MUTED};font-size:14px;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 24px;">Trusted by teams at</p>
     <div style="display:flex;gap:48px;justify-content:center;align-items:center;flex-wrap:wrap;opacity:0.6;">
@@ -354,7 +354,7 @@ const socialLogoStrip = `
 </section>`;
 
 const socialStats = `
-<section data-aqb-section="social-stats" style="padding:${PAD};background:${BG_DARK};color:#fff;">
+<section data-buildrick-section="social-stats" style="padding:${PAD};background:${BG_DARK};color:#fff;">
   <div style="${INNER}display:grid;grid-template-columns:repeat(4,1fr);gap:32px;text-align:center;">
     <div><div style="font-size:48px;font-weight:700;color:#fff;">10k+</div><div style="color:rgba(255,255,255,0.7);font-size:14px;margin-top:8px;">Active users</div></div>
     <div><div style="font-size:48px;font-weight:700;color:#fff;">99.9%</div><div style="color:rgba(255,255,255,0.7);font-size:14px;margin-top:8px;">Uptime</div></div>
@@ -364,7 +364,7 @@ const socialStats = `
 </section>`;
 
 const testimonialsVideo = `
-<section data-aqb-section="testimonials-video" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="testimonials-video" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;">
     <div>
       <p style="font-size:14px;font-weight:600;color:${ACCENT};letter-spacing:0.08em;text-transform:uppercase;margin:0 0 16px;">Customer story</p>
@@ -381,7 +381,7 @@ const testimonialsVideo = `
 </section>`;
 
 const testimonialsCarousel = `
-<section data-aqb-section="testimonials-carousel" style="padding:${PAD};background:${BG_LIGHT};">
+<section data-buildrick-section="testimonials-carousel" style="padding:${PAD};background:${BG_LIGHT};">
   <div style="${INNER}">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:40px;">
       <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};margin:0;">What customers say</h2>
@@ -403,7 +403,7 @@ const testimonialsCarousel = `
 // ─── PRICING ────────────────────────────────────────────────────────────────
 
 const pricingSingle = `
-<section data-aqb-section="pricing-single" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="pricing-single" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}max-width:480px;text-align:center;">
     <h2 style="font-size:32px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 16px;">One simple plan</h2>
     <p style="color:${TEXT_MUTED};margin:0 0 32px;">Everything you need, nothing you don't.</p>
@@ -421,7 +421,7 @@ const pricingSingle = `
 </section>`;
 
 const pricing2col = `
-<section data-aqb-section="pricing-2col" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="pricing-2col" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}">
     <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};text-align:center;margin:0 0 48px;">Choose your plan</h2>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:760px;margin:0 auto;">
@@ -440,7 +440,7 @@ const pricing2col = `
 </section>`;
 
 const pricing3col = `
-<section data-aqb-section="pricing-3col" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="pricing-3col" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}">
     <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};text-align:center;margin:0 0 48px;">Pricing that scales</h2>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
@@ -452,7 +452,7 @@ const pricing3col = `
 </section>`;
 
 const pricingToggle = `
-<section data-aqb-section="pricing-toggle" style="padding:${PAD};background:${BG_WHITE};text-align:center;">
+<section data-buildrick-section="pricing-toggle" style="padding:${PAD};background:${BG_WHITE};text-align:center;">
   <div style="${INNER}">
     <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 16px;">Save 20% with annual</h2>
     <div style="display:inline-flex;background:${BG_LIGHT};padding:4px;border-radius:999px;margin-bottom:40px;"><button style="padding:8px 20px;background:#fff;border:0;border-radius:999px;color:${TEXT_PRIMARY};font-weight:600;cursor:pointer;">Monthly</button><button style="padding:8px 20px;background:transparent;border:0;border-radius:999px;color:${TEXT_MUTED};font-weight:600;cursor:pointer;">Annual</button></div>
@@ -464,7 +464,7 @@ const pricingToggle = `
 </section>`;
 
 const pricingComparison = `
-<section data-aqb-section="pricing-comparison" style="padding:${PAD};background:${BG_LIGHT};">
+<section data-buildrick-section="pricing-comparison" style="padding:${PAD};background:${BG_LIGHT};">
   <div style="${INNER}">
     <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};text-align:center;margin:0 0 40px;">Compare every feature</h2>
     <div style="background:${BG_WHITE};border:1px solid ${BORDER};border-radius:16px;overflow:hidden;">
@@ -484,7 +484,7 @@ const pricingComparison = `
 </section>`;
 
 const pricingEnterprise = `
-<section data-aqb-section="pricing-enterprise" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="pricing-enterprise" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}max-width:820px;">
     <div style="padding:56px;background:${BG_DARK};border-radius:20px;color:#fff;display:grid;grid-template-columns:2fr 1fr;gap:40px;align-items:center;">
       <div>
@@ -508,7 +508,7 @@ const pricingEnterprise = `
 // ─── FAQ ────────────────────────────────────────────────────────────────────
 
 const faqAccordion = `
-<section data-aqb-section="faq-accordion" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="faq-accordion" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}max-width:720px;">
     <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};text-align:center;margin:0 0 40px;">Frequently asked questions</h2>
     <div style="display:flex;flex-direction:column;gap:12px;">
@@ -520,7 +520,7 @@ const faqAccordion = `
 </section>`;
 
 const faq2col = `
-<section data-aqb-section="faq-2col" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="faq-2col" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}">
     <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};text-align:center;margin:0 0 40px;">Common questions</h2>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;">
@@ -533,7 +533,7 @@ const faq2col = `
 </section>`;
 
 const faqWithCta = `
-<section data-aqb-section="faq-with-cta" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="faq-with-cta" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}max-width:720px;">
     <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};text-align:center;margin:0 0 32px;">Questions?</h2>
     <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:40px;">
@@ -545,7 +545,7 @@ const faqWithCta = `
 </section>`;
 
 const faqCategories = `
-<section data-aqb-section="faq-categories" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="faq-categories" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}max-width:800px;">
     <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};text-align:center;margin:0 0 40px;">Help center</h2>
     <div style="margin-bottom:32px;"><h3 style="color:${ACCENT};font-size:14px;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 16px;">Getting started</h3><details style="padding:16px;background:${BG_LIGHT};border-radius:8px;margin-bottom:8px;"><summary style="font-weight:600;color:${TEXT_PRIMARY};cursor:pointer;">How do I create my first page?</summary></details><details style="padding:16px;background:${BG_LIGHT};border-radius:8px;"><summary style="font-weight:600;color:${TEXT_PRIMARY};cursor:pointer;">What's included in my plan?</summary></details></div>
@@ -554,7 +554,7 @@ const faqCategories = `
 </section>`;
 
 const faqNumbered = `
-<section data-aqb-section="faq-numbered" style="padding:${PAD};background:${BG_LIGHT};">
+<section data-buildrick-section="faq-numbered" style="padding:${PAD};background:${BG_LIGHT};">
   <div style="${INNER}max-width:720px;">
     <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};text-align:center;margin:0 0 40px;">Top questions</h2>
     <ol style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:24px;counter-reset:faq;">
@@ -567,7 +567,7 @@ const faqNumbered = `
 </section>`;
 
 const faqSidenav = `
-<section data-aqb-section="faq-sidenav" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="faq-sidenav" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}">
     <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};text-align:center;margin:0 0 40px;">Help center</h2>
     <div style="display:grid;grid-template-columns:220px 1fr;gap:48px;">
@@ -592,7 +592,7 @@ const faqSidenav = `
 // ─── CTA ────────────────────────────────────────────────────────────────────
 
 const ctaCentered = `
-<section data-aqb-section="cta-centered" style="padding:${PAD};background:${BG_LIGHT};text-align:center;">
+<section data-buildrick-section="cta-centered" style="padding:${PAD};background:${BG_LIGHT};text-align:center;">
   <div style="${INNER}max-width:680px;">
     <h2 style="font-size:40px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 16px;">Ready to get started?</h2>
     <p style="font-size:18px;color:${TEXT_MUTED};margin:0 0 32px;">Join thousands of teams shipping faster.</p>
@@ -601,7 +601,7 @@ const ctaCentered = `
 </section>`;
 
 const ctaSplit = `
-<section data-aqb-section="cta-split" style="padding:${PAD};background:${BG_DARK};">
+<section data-buildrick-section="cta-split" style="padding:${PAD};background:${BG_DARK};">
   <div style="${INNER}display:grid;grid-template-columns:2fr 1fr;gap:32px;align-items:center;">
     <div><h2 style="font-size:36px;font-weight:700;color:#fff;margin:0 0 12px;">Ship your first page in 5 minutes</h2><p style="color:rgba(255,255,255,0.8);font-size:18px;margin:0;">No credit card. No commitment. Just building.</p></div>
     <div style="text-align:right;"><a href="#" style="display:inline-block;padding:16px 32px;background:#fff;color:${TEXT_PRIMARY};font-weight:600;border-radius:8px;text-decoration:none;">Get started →</a></div>
@@ -609,7 +609,7 @@ const ctaSplit = `
 </section>`;
 
 const ctaBanner = `
-<section data-aqb-section="cta-banner" style="padding:20px 24px;background:${ACCENT};color:#fff;">
+<section data-buildrick-section="cta-banner" style="padding:20px 24px;background:${ACCENT};color:#fff;">
   <div style="${INNER}display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
     <p style="margin:0;font-weight:500;">🚀 New: v2 is live with 10x faster build times</p>
     <a href="#" style="color:#fff;text-decoration:underline;font-weight:600;">Read the changelog →</a>
@@ -617,7 +617,7 @@ const ctaBanner = `
 </section>`;
 
 const ctaEmail = `
-<section data-aqb-section="cta-email" style="padding:${PAD};background:${BG_WHITE};text-align:center;">
+<section data-buildrick-section="cta-email" style="padding:${PAD};background:${BG_WHITE};text-align:center;">
   <div style="${INNER}max-width:560px;">
     <h2 style="font-size:32px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 12px;">Get the newsletter</h2>
     <p style="color:${TEXT_MUTED};margin:0 0 24px;">One email a week. No spam. Unsubscribe anytime.</p>
@@ -626,7 +626,7 @@ const ctaEmail = `
 </section>`;
 
 const ctaDual = `
-<section data-aqb-section="cta-dual" style="padding:${PAD};background:${BG_LIGHT};text-align:center;">
+<section data-buildrick-section="cta-dual" style="padding:${PAD};background:${BG_LIGHT};text-align:center;">
   <div style="${INNER}max-width:720px;">
     <h2 style="font-size:40px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 16px;">Two paths to get started</h2>
     <p style="font-size:18px;color:${TEXT_MUTED};margin:0 0 40px;">Try it yourself, or let us show you around.</p>
@@ -644,7 +644,7 @@ const ctaDual = `
 </section>`;
 
 const ctaGradient = `
-<section data-aqb-section="cta-gradient" style="padding:120px 24px;background:linear-gradient(135deg,${ACCENT} 0%,#7c3aed 100%);text-align:center;">
+<section data-buildrick-section="cta-gradient" style="padding:120px 24px;background:linear-gradient(135deg,${ACCENT} 0%,#7c3aed 100%);text-align:center;">
   <div style="${INNER}max-width:720px;">
     <h2 style="font-size:48px;font-weight:700;color:#fff;line-height:1.15;margin:0 0 16px;">Start building today</h2>
     <p style="font-size:20px;color:rgba(255,255,255,0.9);line-height:1.5;margin:0 0 32px;">Your next website is five minutes away.</p>
@@ -655,7 +655,7 @@ const ctaGradient = `
 // ─── CONTACT ────────────────────────────────────────────────────────────────
 
 const contactForm = `
-<section data-aqb-section="contact-form" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="contact-form" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}max-width:560px;">
     <div style="text-align:center;margin-bottom:40px;">
       <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 12px;">Get in touch</h2>
@@ -671,7 +671,7 @@ const contactForm = `
 </section>`;
 
 const contactFormMap = `
-<section data-aqb-section="contact-form-map" style="padding:${PAD};background:${BG_LIGHT};">
+<section data-buildrick-section="contact-form-map" style="padding:${PAD};background:${BG_LIGHT};">
   <div style="${INNER}">
     <div style="text-align:center;margin-bottom:40px;">
       <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 12px;">Say hello</h2>
@@ -690,7 +690,7 @@ const contactFormMap = `
 </section>`;
 
 const contactInfoCards = `
-<section data-aqb-section="contact-info-cards" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="contact-info-cards" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}">
     <div style="text-align:center;margin-bottom:48px;">
       <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 12px;">Contact us</h2>
@@ -705,7 +705,7 @@ const contactInfoCards = `
 </section>`;
 
 const contactHero = `
-<section data-aqb-section="contact-hero" style="padding:140px 24px;background:${BG_WHITE};text-align:center;">
+<section data-buildrick-section="contact-hero" style="padding:140px 24px;background:${BG_WHITE};text-align:center;">
   <div style="${INNER}max-width:720px;">
     <p style="font-size:14px;font-weight:600;color:${ACCENT};letter-spacing:0.08em;text-transform:uppercase;margin:0 0 16px;">Contact</p>
     <h1 style="font-size:56px;font-weight:700;color:${TEXT_PRIMARY};line-height:1.1;margin:0 0 20px;">Let's talk</h1>
@@ -715,7 +715,7 @@ const contactHero = `
 </section>`;
 
 const contactLocations = `
-<section data-aqb-section="contact-locations" style="padding:${PAD};background:${BG_LIGHT};">
+<section data-buildrick-section="contact-locations" style="padding:${PAD};background:${BG_LIGHT};">
   <div style="${INNER}">
     <div style="text-align:center;margin-bottom:48px;">
       <h2 style="font-size:36px;font-weight:700;color:${TEXT_PRIMARY};margin:0 0 12px;">Our offices</h2>
@@ -730,7 +730,7 @@ const contactLocations = `
 </section>`;
 
 const contactSupport = `
-<section data-aqb-section="contact-support" style="padding:${PAD};background:${BG_WHITE};">
+<section data-buildrick-section="contact-support" style="padding:${PAD};background:${BG_WHITE};">
   <div style="${INNER}max-width:560px;">
     <div style="padding:48px;background:${BG_LIGHT};border:1px solid ${BORDER};border-radius:16px;text-align:center;">
       <div style="width:64px;height:64px;background:${ACCENT};border-radius:16px;margin:0 auto 20px;"></div>
@@ -747,7 +747,7 @@ const contactSupport = `
 // ─── FOOTERS ────────────────────────────────────────────────────────────────
 
 const footerSimple = `
-<footer data-aqb-section="footer-simple" style="padding:40px 24px;background:${BG_LIGHT};border-top:1px solid ${BORDER};">
+<footer data-buildrick-section="footer-simple" style="padding:40px 24px;background:${BG_LIGHT};border-top:1px solid ${BORDER};">
   <div style="${INNER}display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
     <div style="color:${TEXT_MUTED};font-size:14px;">© 2026 Your Company. All rights reserved.</div>
     <div style="display:flex;gap:24px;"><a href="#" style="color:${TEXT_MUTED};text-decoration:none;font-size:14px;">Privacy</a><a href="#" style="color:${TEXT_MUTED};text-decoration:none;font-size:14px;">Terms</a><a href="#" style="color:${TEXT_MUTED};text-decoration:none;font-size:14px;">Contact</a></div>
@@ -755,7 +755,7 @@ const footerSimple = `
 </footer>`;
 
 const footerMultiCol = `
-<footer data-aqb-section="footer-multi-col" style="padding:60px 24px 40px;background:${BG_DARK};color:#fff;">
+<footer data-buildrick-section="footer-multi-col" style="padding:60px 24px 40px;background:${BG_DARK};color:#fff;">
   <div style="${INNER}display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:40px;">
     <div><div style="font-size:20px;font-weight:700;margin-bottom:12px;">Company</div><p style="color:rgba(255,255,255,0.7);font-size:14px;line-height:1.6;margin:0;">One-line company tagline that captures the mission.</p></div>
     <div><div style="font-size:13px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(255,255,255,0.5);margin-bottom:16px;">Product</div><div style="display:flex;flex-direction:column;gap:8px;"><a href="#" style="color:rgba(255,255,255,0.8);text-decoration:none;font-size:14px;">Features</a><a href="#" style="color:rgba(255,255,255,0.8);text-decoration:none;font-size:14px;">Pricing</a><a href="#" style="color:rgba(255,255,255,0.8);text-decoration:none;font-size:14px;">Changelog</a></div></div>
@@ -766,7 +766,7 @@ const footerMultiCol = `
 </footer>`;
 
 const footerMinimal = `
-<footer data-aqb-section="footer-minimal" style="padding:32px 24px;background:${BG_WHITE};border-top:1px solid ${BORDER};text-align:center;">
+<footer data-buildrick-section="footer-minimal" style="padding:32px 24px;background:${BG_WHITE};border-top:1px solid ${BORDER};text-align:center;">
   <div style="${INNER}">
     <div style="color:${TEXT_MUTED};font-size:14px;margin-bottom:12px;">© 2026 Your Company</div>
     <div style="display:flex;gap:16px;justify-content:center;"><a href="#" style="color:${TEXT_MUTED};text-decoration:none;">𝕏</a><a href="#" style="color:${TEXT_MUTED};text-decoration:none;">in</a><a href="#" style="color:${TEXT_MUTED};text-decoration:none;">GitHub</a></div>
@@ -774,7 +774,7 @@ const footerMinimal = `
 </footer>`;
 
 const footerNewsletter = `
-<footer data-aqb-section="footer-newsletter" style="background:${BG_LIGHT};">
+<footer data-buildrick-section="footer-newsletter" style="background:${BG_LIGHT};">
   <div style="padding:40px 24px;text-align:center;border-bottom:1px solid ${BORDER};"><div style="${INNER}max-width:520px;"><h3 style="color:${TEXT_PRIMARY};margin:0 0 8px;">Stay in the loop</h3><p style="color:${TEXT_MUTED};margin:0 0 16px;">Monthly product updates.</p><form style="display:flex;gap:8px;"><input type="email" placeholder="Email address" style="flex:1;padding:12px;border:1px solid ${BORDER};border-radius:8px;"/><button type="submit" style="padding:12px 20px;background:${ACCENT};color:#fff;border:0;border-radius:8px;font-weight:600;cursor:pointer;">Subscribe</button></form></div></div>
   <div style="padding:32px 24px;${INNER}display:grid;grid-template-columns:repeat(3,1fr);gap:32px;">
     <div><strong style="color:${TEXT_PRIMARY};display:block;margin-bottom:12px;">Product</strong><div style="display:flex;flex-direction:column;gap:6px;"><a href="#" style="color:${TEXT_MUTED};text-decoration:none;font-size:14px;">Features</a><a href="#" style="color:${TEXT_MUTED};text-decoration:none;font-size:14px;">Pricing</a></div></div>
@@ -785,7 +785,7 @@ const footerNewsletter = `
 </footer>`;
 
 const footerSocial = `
-<footer data-aqb-section="footer-social" style="padding:40px 24px;background:${BG_LIGHT};border-top:1px solid ${BORDER};">
+<footer data-buildrick-section="footer-social" style="padding:40px 24px;background:${BG_LIGHT};border-top:1px solid ${BORDER};">
   <div style="${INNER}display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
     <div style="color:${TEXT_MUTED};font-size:14px;">© 2026 Your Company. All rights reserved.</div>
     <div style="display:flex;gap:12px;">
@@ -798,7 +798,7 @@ const footerSocial = `
 </footer>`;
 
 const footerLogoLinks = `
-<footer data-aqb-section="footer-logo-links" style="padding:48px 24px 32px;background:${BG_WHITE};border-top:1px solid ${BORDER};">
+<footer data-buildrick-section="footer-logo-links" style="padding:48px 24px 32px;background:${BG_WHITE};border-top:1px solid ${BORDER};">
   <div style="${INNER}display:grid;grid-template-columns:2fr 1fr;gap:48px;margin-bottom:32px;">
     <div>
       <div style="font-size:22px;font-weight:700;color:${TEXT_PRIMARY};margin-bottom:12px;">Company</div>

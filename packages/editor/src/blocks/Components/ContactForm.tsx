@@ -132,12 +132,12 @@ export const ContactForm: React.FC<ContactFormProps> = ({
 
   if (isSuccess) {
     return (
-      <div className="aqb-contact-form" style={{ padding: 40, textAlign: "center" }}>
+      <div className="buildrick-contact-form" style={{ padding: 40, textAlign: "center" }}>
         <div style={{ fontSize: 64, marginBottom: 24 }}>✅</div>
         <h3
           style={{
             fontSize: 24,
-            color: "var(--aqb-text-primary)",
+            color: "var(--buildrick-text-primary)",
             marginBottom: 12,
           }}
         >
@@ -145,7 +145,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         </h3>
         <p
           style={{
-            color: "var(--aqb-text-secondary)",
+            color: "var(--buildrick-text-secondary)",
             marginBottom: 24,
           }}
         >
@@ -155,7 +155,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
           onClick={() => setIsSuccess(false)}
           style={{
             padding: "12px 24px",
-            background: "var(--aqb-primary)",
+            background: "var(--buildrick-accent)",
             border: "none",
             borderRadius: 8,
             color: "#fff",
@@ -170,13 +170,13 @@ export const ContactForm: React.FC<ContactFormProps> = ({
   }
 
   return (
-    <div className="aqb-contact-form" style={{ padding: 40, maxWidth: 600, margin: "0 auto" }}>
+    <div className="buildrick-contact-form" style={{ padding: 40, maxWidth: 600, margin: "0 auto" }}>
       {title && (
         <h2
           style={{
             fontSize: 32,
             fontWeight: 700,
-            color: "var(--aqb-text-primary)",
+            color: "var(--buildrick-text-primary)",
             marginBottom: 12,
             textAlign: "center",
           }}
@@ -187,7 +187,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
       {subtitle && (
         <p
           style={{
-            color: "var(--aqb-text-secondary)",
+            color: "var(--buildrick-text-secondary)",
             marginBottom: 32,
             textAlign: "center",
           }}
@@ -212,11 +212,11 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                     marginBottom: 6,
                     fontSize: 14,
                     fontWeight: 500,
-                    color: "var(--aqb-text-primary)",
+                    color: "var(--buildrick-text-primary)",
                   }}
                 >
                   {field.label}
-                  {field.required && <span style={{ color: "var(--aqb-error)" }}> *</span>}
+                  {field.required && <span style={{ color: "var(--buildrick-error)" }}> *</span>}
                 </label>
               )}
 
@@ -229,12 +229,12 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                   style={{
                     width: "100%",
                     padding: "12px 16px",
-                    background: "var(--aqb-bg-dark)",
+                    background: "var(--buildrick-bg-dark)",
                     border: `1px solid ${
-                      errors[field.id] ? "var(--aqb-error)" : "var(--aqb-border)"
+                      errors[field.id] ? "var(--buildrick-error)" : "var(--buildrick-border)"
                     }`,
                     borderRadius: 8,
-                    color: "var(--aqb-text-primary)",
+                    color: "var(--buildrick-text-primary)",
                     fontSize: 14,
                     resize: "vertical",
                   }}
@@ -246,12 +246,12 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                   style={{
                     width: "100%",
                     padding: "12px 16px",
-                    background: "var(--aqb-bg-dark)",
+                    background: "var(--buildrick-bg-dark)",
                     border: `1px solid ${
-                      errors[field.id] ? "var(--aqb-error)" : "var(--aqb-border)"
+                      errors[field.id] ? "var(--buildrick-error)" : "var(--buildrick-border)"
                     }`,
                     borderRadius: 8,
-                    color: "var(--aqb-text-primary)",
+                    color: "var(--buildrick-text-primary)",
                     fontSize: 14,
                   }}
                 >
@@ -280,7 +280,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                   <span
                     style={{
                       fontSize: 14,
-                      color: "var(--aqb-text-secondary)",
+                      color: "var(--buildrick-text-secondary)",
                     }}
                   >
                     {field.label}
@@ -295,12 +295,12 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                   style={{
                     width: "100%",
                     padding: "12px 16px",
-                    background: "var(--aqb-bg-dark)",
+                    background: "var(--buildrick-bg-dark)",
                     border: `1px solid ${
-                      errors[field.id] ? "var(--aqb-error)" : "var(--aqb-border)"
+                      errors[field.id] ? "var(--buildrick-error)" : "var(--buildrick-border)"
                     }`,
                     borderRadius: 8,
-                    color: "var(--aqb-text-primary)",
+                    color: "var(--buildrick-text-primary)",
                     fontSize: 14,
                   }}
                 />
@@ -310,7 +310,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                 <span
                   style={{
                     fontSize: 12,
-                    color: "var(--aqb-error)",
+                    color: "var(--buildrick-error)",
                     marginTop: 4,
                     display: "block",
                   }}
@@ -329,7 +329,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
             width: "100%",
             marginTop: 24,
             padding: "14px 24px",
-            background: "var(--aqb-primary)",
+            background: "var(--buildrick-accent)",
             border: "none",
             borderRadius: 8,
             color: "#fff",
@@ -353,11 +353,11 @@ export const contactFormBlockConfig = {
   elementType: "form" as const,
   icon: "📧",
   content:
-    '<form class="aqb-contact-form" data-aqb-type="form">' +
-    '<div class="aqb-contact-field"><label>Name</label><input type="text" placeholder="Your name"/></div>' +
-    '<div class="aqb-contact-field"><label>Email</label><input type="email" placeholder="you@example.com"/></div>' +
-    '<div class="aqb-contact-field"><label>Message</label><textarea placeholder="How can we help?"></textarea></div>' +
-    '<button type="submit" class="aqb-contact-submit">Send Message</button>' +
+    '<form class="buildrick-contact-form" data-buildrick-type="form">' +
+    '<div class="buildrick-contact-field"><label>Name</label><input type="text" placeholder="Your name"/></div>' +
+    '<div class="buildrick-contact-field"><label>Email</label><input type="email" placeholder="you@example.com"/></div>' +
+    '<div class="buildrick-contact-field"><label>Message</label><textarea placeholder="How can we help?"></textarea></div>' +
+    '<button type="submit" class="buildrick-contact-submit">Send Message</button>' +
     "</form>",
 };
 

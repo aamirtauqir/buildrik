@@ -70,7 +70,7 @@ export interface TokenListProps {
 
 /** Canonical CSS variable name from token id. Use everywhere — never derive from token.name. */
 export function tokenToCssVar(id: string): string {
-  return `--aqb-${id}`;
+  return `--buildrick-design-${id}`;
 }
 
 export const CATEGORY_CHIPS = [

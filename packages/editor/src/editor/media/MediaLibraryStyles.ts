@@ -41,7 +41,7 @@ export const mediaLibraryStyles = {
   emptyState: {
     textAlign: "center" as const,
     padding: 60,
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
   },
   uploadArea: {
     padding: 20,
@@ -49,7 +49,7 @@ export const mediaLibraryStyles = {
   footer: {
     marginTop: 16,
     paddingTop: 16,
-    borderTop: "1px solid var(--aqb-border)",
+    borderTop: "1px solid var(--buildrick-border)",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
@@ -61,20 +61,20 @@ export const assetCardStyles = {
     position: "relative" as const,
     borderRadius: 8,
     overflow: "hidden",
-    border: "1px solid var(--aqb-border)",
+    border: "1px solid var(--buildrick-border)",
     cursor: "pointer",
     transition: "all 0.15s ease",
-    background: "var(--aqb-bg-panel)",
+    background: "var(--buildrick-bg-panel)",
   },
   cardSelected: {
-    border: "2px solid var(--aqb-primary)",
+    border: "2px solid var(--buildrick-accent)",
     boxShadow: "0 0 0 2px rgba(99, 102, 241, 0.2)",
   },
   thumbnail: {
     width: "100%",
     height: 100,
     objectFit: "cover" as const,
-    background: "var(--aqb-bg-panel-secondary)",
+    background: "var(--buildrick-bg-panel-secondary)",
   },
   info: {
     padding: 8,
@@ -88,7 +88,7 @@ export const assetCardStyles = {
   },
   meta: {
     fontSize: 12,
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
     marginTop: 2,
   },
   deleteBtn: {

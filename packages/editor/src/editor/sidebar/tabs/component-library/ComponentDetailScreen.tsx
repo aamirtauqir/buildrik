@@ -150,7 +150,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   };
 
   return (
-    <div className="aqb-component-detail">
+    <div className="buildrick-component-detail">
       {/* Header with breadcrumb */}
       <DrillInHeader
         title={component.name}
@@ -160,49 +160,49 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
       />
 
       {/* Scrollable content */}
-      <div className="aqb-component-detail-content">
+      <div className="buildrick-component-detail-content">
         {/* Large Preview */}
-        <div className="aqb-component-detail-preview">
+        <div className="buildrick-component-detail-preview">
           {component.thumbnail ? (
             <img
               src={component.thumbnail}
               alt={component.name}
-              className="aqb-component-detail-preview-img"
+              className="buildrick-component-detail-preview-img"
             />
           ) : (
-            <div className="aqb-component-detail-preview-placeholder">
+            <div className="buildrick-component-detail-preview-placeholder">
               <span>No Preview</span>
             </div>
           )}
         </div>
 
         {/* Info Section */}
-        <div className="aqb-component-detail-info">
-          <div className="aqb-component-detail-info-row">
-            <span className="aqb-component-detail-info-label">Type:</span>
-            <span className="aqb-component-detail-info-value">{displayType}</span>
+        <div className="buildrick-component-detail-info">
+          <div className="buildrick-component-detail-info-row">
+            <span className="buildrick-component-detail-info-label">Type:</span>
+            <span className="buildrick-component-detail-info-value">{displayType}</span>
           </div>
-          <div className="aqb-component-detail-info-row">
-            <span className="aqb-component-detail-info-label">Tags:</span>
-            <span className="aqb-component-detail-info-value">{displayTags}</span>
+          <div className="buildrick-component-detail-info-row">
+            <span className="buildrick-component-detail-info-label">Tags:</span>
+            <span className="buildrick-component-detail-info-value">{displayTags}</span>
           </div>
           {component.description && (
-            <div className="aqb-component-detail-info-row">
-              <span className="aqb-component-detail-info-label">Description:</span>
-              <span className="aqb-component-detail-info-value">{component.description}</span>
+            <div className="buildrick-component-detail-info-row">
+              <span className="buildrick-component-detail-info-label">Description:</span>
+              <span className="buildrick-component-detail-info-value">{component.description}</span>
             </div>
           )}
         </div>
 
         {/* Primary Action */}
-        <button className="aqb-component-detail-insert-btn" onClick={handleInsert}>
+        <button className="buildrick-component-detail-insert-btn" onClick={handleInsert}>
           Insert Component
         </button>
 
         {/* Secondary Actions */}
-        <div className="aqb-component-detail-actions">
+        <div className="buildrick-component-detail-actions">
           <button
-            className="aqb-component-detail-action-btn"
+            className="buildrick-component-detail-action-btn"
             onClick={handleDuplicate}
             title="Duplicate component"
           >
@@ -210,7 +210,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
             <span>Duplicate</span>
           </button>
           <button
-            className="aqb-component-detail-action-btn danger"
+            className="buildrick-component-detail-action-btn danger"
             onClick={handleDelete}
             title="Delete component"
           >
@@ -221,10 +221,10 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 
         {/* Instance Actions (shown when instance is selected on canvas) */}
         {isInstanceSelected && (
-          <div className="aqb-component-detail-instance-actions">
-            <h4 className="aqb-component-detail-section-title">Instance Actions</h4>
+          <div className="buildrick-component-detail-instance-actions">
+            <h4 className="buildrick-component-detail-section-title">Instance Actions</h4>
             <button
-              className="aqb-component-detail-instance-btn"
+              className="buildrick-component-detail-instance-btn"
               onClick={handleDetach}
               title="Detach this instance from the component"
             >
@@ -232,7 +232,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
               <span>Detach instance</span>
             </button>
             <button
-              className="aqb-component-detail-instance-btn"
+              className="buildrick-component-detail-instance-btn"
               onClick={handleSwap}
               title="Swap with another component"
             >
@@ -244,8 +244,8 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 
         {/* Variants Section */}
         {component.variantProperties && component.variantProperties.length > 0 && (
-          <div className="aqb-component-detail-variants">
-            <h4 className="aqb-component-detail-section-title">Variants</h4>
+          <div className="buildrick-component-detail-variants">
+            <h4 className="buildrick-component-detail-section-title">Variants</h4>
             {component.variantProperties.map((prop) => (
               <VariantPicker
                 key={prop.name}
@@ -288,13 +288,13 @@ interface VariantPickerProps {
 
 const VariantPicker: React.FC<VariantPickerProps> = ({ property, selectedValue, onChange }) => {
   return (
-    <div className="aqb-variant-picker">
-      <span className="aqb-variant-picker-label">{property.name}:</span>
-      <div className="aqb-variant-picker-pills">
+    <div className="buildrick-variant-picker">
+      <span className="buildrick-variant-picker-label">{property.name}:</span>
+      <div className="buildrick-variant-picker-pills">
         {property.values.map((value) => (
           <button
             key={value}
-            className={`aqb-variant-pill ${selectedValue === value ? "active" : ""}`}
+            className={`buildrick-variant-pill ${selectedValue === value ? "active" : ""}`}
             onClick={() => onChange(value)}
           >
             {value}

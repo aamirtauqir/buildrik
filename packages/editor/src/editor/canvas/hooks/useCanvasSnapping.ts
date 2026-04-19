@@ -55,7 +55,7 @@ export function useCanvasSnapping(composer: Composer | null) {
         .filter((child) => child.getId() !== id)
         .map((child) => {
           const childId = child.getId();
-          const el = document.querySelector(`[data-aqb-id="${childId}"]`);
+          const el = document.querySelector(`[data-buildrick-id="${childId}"]`);
           if (el) {
             const rect = el.getBoundingClientRect();
             // Convert to canvas coordinates if needed, but assuming draggingRect is already in client/screen space OR relative space.
@@ -69,8 +69,8 @@ export function useCanvasSnapping(composer: Composer | null) {
 
             // Alternative: The input draggingRect passed from useCanvasDragDrop is relative to CANVAS (e.clientX - rect.left).
             // So we need to convert sibling BoundingClientRect to relative to CANVAS.
-            // We can find canvas using closest('.aqb-canvas') from the sibling element.
-            const canvas = el.closest(".aqb-canvas");
+            // We can find canvas using closest('.buildrick-canvas') from the sibling element.
+            const canvas = el.closest(".buildrick-canvas");
             if (canvas) {
               const canvasRect = canvas.getBoundingClientRect();
               return {

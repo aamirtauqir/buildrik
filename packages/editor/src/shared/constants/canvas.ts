@@ -17,13 +17,13 @@ import type React from "react";
  */
 export const BRAND_PURPLE = {
   // Core shades - now reference CSS variables (Blue palette)
-  DEFAULT: "var(--aqb-primary)", // #2563EB - Main brand blue
-  light: "var(--aqb-primary-light)", // #3B82F6 - Hover states
-  dark: "var(--aqb-primary-dark)", // #1D4ED8 - Active/pressed states
-  subtle: "var(--aqb-primary-subtle)", // #DBEAFE - Very light tint
+  DEFAULT: "var(--buildrick-accent)", // #2563EB - Main brand blue
+  light: "var(--buildrick-accent-subtle)", // #3B82F6 - Hover states
+  dark: "var(--buildrick-accent-pressed)", // #1D4ED8 - Active/pressed states
+  subtle: "var(--buildrick-accent-tint)", // #DBEAFE - Very light tint
 
   // Alpha variations for glows and overlays (using blue)
-  alpha10: "var(--aqb-accent-blue-alpha)", // rgba(37, 99, 235, 0.15)
+  alpha10: "var(--buildrick-accent-tint)", // rgba(37, 99, 235, 0.15)
   alpha15: "rgba(37, 99, 235, 0.15)",
   alpha20: "rgba(37, 99, 235, 0.2)",
   alpha30: "rgba(37, 99, 235, 0.3)",
@@ -37,20 +37,20 @@ export const BRAND_PURPLE = {
  */
 export const SELECTION_COLORS = {
   // Selection outline and handles - reference CSS vars
-  outline: "var(--aqb-selection-color)",
-  outlineHover: "var(--aqb-primary-light)",
-  handle: "var(--aqb-selection-color)",
-  handleHover: "var(--aqb-primary-light)",
-  handleGradient: "var(--aqb-handle-gradient)",
+  outline: "var(--buildrick-selection-color)",
+  outlineHover: "var(--buildrick-accent-subtle)",
+  handle: "var(--buildrick-selection-color)",
+  handleHover: "var(--buildrick-accent-subtle)",
+  handleGradient: "var(--buildrick-handle-gradient)",
 
   // Glow effects - reference CSS vars
-  glow: "var(--aqb-selection-glow)",
-  glowStrong: "var(--aqb-selection-glow-strong)",
+  glow: "var(--buildrick-selection-glow)",
+  glowStrong: "var(--buildrick-selection-glow-strong)",
   glowSubtle: "0 0 0 2px rgba(37, 99, 235, 0.3)",
 
   // Multi-select
   multiSelectOutline: "rgba(37, 99, 235, 0.4)",
-  multiSelectFill: "var(--aqb-accent-blue-alpha)",
+  multiSelectFill: "var(--buildrick-accent-tint)",
 } as const;
 
 /**
@@ -91,18 +91,18 @@ export const CANVAS_COLORS = {
   // Background
   bgPanel: "#1e1e2e",
   bgPanelSecondary: "#181825",
-  bgInput: "var(--aqb-bg-input, #181825)",
+  bgInput: "var(--buildrick-bg-input, #181825)",
   bgHover: BRAND_PURPLE.alpha15,
 
   // Text
   textPrimary: "#cdd6f4",
-  textSecondary: "var(--aqb-text-secondary, #a6adc8)",
+  textSecondary: "var(--buildrick-text-secondary, #a6adc8)",
   textMuted: "#6c7086",
 
   // Borders
   border: "rgba(255,255,255,0.1)",
   borderLight: "rgba(255,255,255,0.06)",
-  borderInput: "var(--aqb-border, #313244)",
+  borderInput: "var(--buildrick-border, #313244)",
 
   // Accent - NOW USING PURPLE!
   primary: BRAND_PURPLE.DEFAULT,
@@ -117,11 +117,11 @@ export const CANVAS_COLORS = {
 
   // Indicators
   margin: "#10B981", // Emerald green
-  padding: "var(--aqb-primary-dark)", // Blue for padding indicator
+  padding: "var(--buildrick-accent-pressed)", // Blue for padding indicator
 
   // Badges
   badgeTag: "#10B981",
-  badgeId: "var(--aqb-primary)", // Blue badge for IDs
+  badgeId: "var(--buildrick-accent)", // Blue badge for IDs
   badgeClass: "#F59E0B",
   badgeData: "#3B82F6",
   badgeCustom: "#94A3B8",

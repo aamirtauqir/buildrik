@@ -162,7 +162,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
                   border: "none",
                   cursor: "pointer",
                   padding: 2,
-                  color: "var(--aqb-text-muted)",
+                  color: "var(--buildrick-text-muted)",
                   display: "inline-flex",
                   lineHeight: 0,
                 }}

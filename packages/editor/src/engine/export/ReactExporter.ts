@@ -26,8 +26,8 @@ interface ReactExportResult {
 // CONSTANTS
 // ============================================================================
 
-/** data-aqb-* attributes are editor internals and must be stripped */
-const EDITOR_ATTR_PREFIX = "data-aqb-";
+/** data-buildrick-* attributes are editor internals and must be stripped */
+const EDITOR_ATTR_PREFIX = "data-buildrick-";
 
 /** HTML attributes that map to different JSX names */
 const JSX_ATTR_MAP: Record<string, string> = {

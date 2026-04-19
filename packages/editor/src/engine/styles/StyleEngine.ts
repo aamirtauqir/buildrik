@@ -195,7 +195,7 @@ export class StyleEngine {
       return;
     }
 
-    const selector = `[data-aqb-id="${elementId}"]`;
+    const selector = `[data-buildrick-id="${elementId}"]`;
     const mediaQuery = getBreakpointQuery(breakpoint);
 
     // For desktop (base styles), use regular setRule without media query
@@ -218,7 +218,7 @@ export class StyleEngine {
    */
   getBreakpointStyles(elementId: string): BreakpointStyles {
     const result: BreakpointStyles = {};
-    const selector = `[data-aqb-id="${elementId}"]`;
+    const selector = `[data-buildrick-id="${elementId}"]`;
 
     for (const breakpoint of BREAKPOINT_ORDER) {
       const mediaQuery = getBreakpointQuery(breakpoint);
@@ -243,7 +243,7 @@ export class StyleEngine {
       return {};
     }
 
-    const selector = `[data-aqb-id="${elementId}"]`;
+    const selector = `[data-buildrick-id="${elementId}"]`;
     const mediaQuery = getBreakpointQuery(breakpoint);
     const style = this.findRule(selector, mediaQuery ?? undefined);
 
@@ -265,7 +265,7 @@ export class StyleEngine {
       return;
     }
 
-    const selector = `[data-aqb-id="${elementId}"]`;
+    const selector = `[data-buildrick-id="${elementId}"]`;
     const mediaQuery = getBreakpointQuery(breakpoint);
     const style = this.findRule(selector, mediaQuery ?? undefined);
 
@@ -287,7 +287,7 @@ export class StyleEngine {
       return;
     }
 
-    const selector = `[data-aqb-id="${elementId}"]`;
+    const selector = `[data-buildrick-id="${elementId}"]`;
     const mediaQuery = getBreakpointQuery(breakpoint);
     this.removeRule(selector, mediaQuery ?? undefined);
 
@@ -571,7 +571,7 @@ export class StyleEngine {
 
     propsToInherit.forEach((prop) => {
       if (fromStyles.properties[prop]) {
-        this.setProperty(`[data-aqb-id="${to.getId()}"]`, prop, fromStyles.properties[prop]);
+        this.setProperty(`[data-buildrick-id="${to.getId()}"]`, prop, fromStyles.properties[prop]);
       }
     });
 
@@ -620,7 +620,7 @@ export class StyleEngine {
    * Get styles for an element ID
    */
   getStyles(elementId: string): StyleData | undefined {
-    return this.findRule(`[data-aqb-id="${elementId}"]`);
+    return this.findRule(`[data-buildrick-id="${elementId}"]`);
   }
 
   /**

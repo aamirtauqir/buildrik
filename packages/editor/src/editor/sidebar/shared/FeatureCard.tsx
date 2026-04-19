@@ -91,7 +91,7 @@ export const FeatureCardGrid: React.FC<FeatureCardGridProps> = ({ children, colu
             fontSize: 10,
             fontWeight: 600,
             letterSpacing: "0.08em",
-            color: "var(--aqb-text-muted, #6B7280)",
+            color: "var(--buildrick-text-muted, #6B7280)",
             textTransform: "uppercase",
           }}
         >
@@ -126,7 +126,7 @@ const ChevronRightIcon: React.FC = () => (
     strokeWidth="1.5"
     strokeLinecap="round"
     strokeLinejoin="round"
-    style={{ color: "var(--aqb-text-muted)" }}
+    style={{ color: "var(--buildrick-text-muted)" }}
   >
     <path d="M6 4l4 4-4 4" />
   </svg>
@@ -143,8 +143,8 @@ const cardStyles: React.CSSProperties = {
   width: "100%",
   height: 72,
   padding: "12px 16px",
-  background: "var(--aqb-bg-hover)",
-  border: "1px solid var(--aqb-border)",
+  background: "var(--buildrick-bg-hover)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 12,
   cursor: "pointer",
   transition: "background 0.15s ease, border-color 0.15s ease, transform 0.1s ease",
@@ -152,8 +152,8 @@ const cardStyles: React.CSSProperties = {
 };
 
 const cardActiveStyles: React.CSSProperties = {
-  background: "var(--aqb-primary-light)",
-  borderColor: "var(--aqb-primary)",
+  background: "var(--buildrick-accent-subtle)",
+  borderColor: "var(--buildrick-accent)",
 };
 
 const cardDisabledStyles: React.CSSProperties = {
@@ -167,9 +167,9 @@ const iconContainerStyles: React.CSSProperties = {
   justifyContent: "center",
   width: 40,
   height: 40,
-  background: "var(--aqb-bg-active)",
+  background: "var(--buildrick-bg-active)",
   borderRadius: 10,
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
   flexShrink: 0,
 };
 
@@ -186,7 +186,7 @@ const titleStyles: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 600,
   lineHeight: "18px",
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
   whiteSpace: "nowrap",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -196,7 +196,7 @@ const subtitleStyles: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 400,
   lineHeight: "16px",
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   whiteSpace: "nowrap",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -216,16 +216,16 @@ const badgeStyles: React.CSSProperties = {
   minWidth: 20,
   height: 20,
   padding: "0 6px",
-  background: "var(--aqb-surface-4)",
+  background: "var(--buildrick-surface-4)",
   borderRadius: 10,
   fontSize: 12,
   fontWeight: 600,
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
 };
 
 const planBadgeStyles: React.CSSProperties = {
-  background: "var(--aqb-primary-light, rgba(124, 125, 255, 0.15))",
-  color: "var(--aqb-primary)",
+  background: "var(--buildrick-accent-subtle, rgba(124, 125, 255, 0.15))",
+  color: "var(--buildrick-accent)",
   fontSize: 12,
   textTransform: "uppercase",
   letterSpacing: "0.3px",

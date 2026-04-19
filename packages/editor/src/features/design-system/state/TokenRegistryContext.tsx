@@ -6,7 +6,7 @@
  *   A color keystroke re-renders only ColorInput consumers, never SizeSection.
  *
  * CP2 (localStorage persistence):
- *   - On mount: reads aqb-design-tokens-{projectId}-v1, falls back to DEFAULT_TOKENS
+ *   - On mount: reads buildrick-design-tokens-{projectId}-v1, falls back to DEFAULT_TOKENS
  *   - On apply: call persistAll() after composer.setProjectSettings
  *   - Private browsing (SecurityError) or corrupt JSON → falls through to DEFAULT_TOKENS, no crash
  *
@@ -58,7 +58,7 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
   projectId,
   children,
 }) => {
-  const storageKey = `aqb-design-tokens-${projectId ?? "default"}-v1`;
+  const storageKey = `buildrick-design-tokens-${projectId ?? "default"}-v1`;
 
   // CP2: Load from localStorage on first render. If corrupt or missing, fall back to DEFAULT_TOKENS.
   const initialTokens = React.useMemo((): DesignToken[] => {

@@ -153,7 +153,7 @@ export function useCursorIntelligence({
         target.isContentEditable;
 
       // Check if over selectable element
-      const aqbElement = target.closest("[data-aqb-id]");
+      const aqbElement = target.closest("[data-buildrick-id]");
 
       if (isTextElement && aqbElement) {
         setContext("text");

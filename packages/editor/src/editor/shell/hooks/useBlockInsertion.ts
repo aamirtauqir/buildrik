@@ -87,7 +87,7 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
           // Post-insert highlight flash — parity with drag-drop success animation.
           setTimeout(() => {
             const domEl = document.querySelector(
-              `[data-aqb-id="${insertedId}"]`
+              `[data-buildrick-id="${insertedId}"]`
             ) as HTMLElement | null;
             if (domEl) void animateDropSuccess(domEl);
           }, 0);

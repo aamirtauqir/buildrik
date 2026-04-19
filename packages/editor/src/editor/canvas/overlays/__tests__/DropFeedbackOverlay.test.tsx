@@ -13,7 +13,7 @@ vi.mock("../../utils/elementInfo", () => ({
 
 /**
  * Build a canvasRef whose .current has a querySelector that returns a fake
- * element for `[data-aqb-id="el-1"]` with stable getBoundingClientRect values,
+ * element for `[data-buildrick-id="el-1"]` with stable getBoundingClientRect values,
  * so the overlay can measure a non-null rect.
  */
 function makeCanvasRef(elementId: string): React.RefObject<HTMLDivElement | null> {
@@ -23,14 +23,14 @@ function makeCanvasRef(elementId: string): React.RefObject<HTMLDivElement | null
   const fakeElement = {
     getBoundingClientRect: () => fakeElementRect,
     tagName: "DIV",
-    getAttribute: (attr: string) => (attr === "data-aqb-id" ? elementId : null),
+    getAttribute: (attr: string) => (attr === "data-buildrick-id" ? elementId : null),
     closest: () => null,
   } as unknown as HTMLElement;
 
   const fakeCanvas = {
     getBoundingClientRect: () => fakeCanvasRect,
     querySelector: (selector: string) => {
-      if (selector === `[data-aqb-id="${elementId}"]`) return fakeElement;
+      if (selector === `[data-buildrick-id="${elementId}"]`) return fakeElement;
       return null;
     },
   } as unknown as HTMLDivElement;

@@ -57,7 +57,7 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({
   return (
     <div
       role="alert"
-      className={`aqb-error-message ${className}`}
+      className={`buildrick-error-message ${className}`}
       style={{
         ...containerStyles,
         background: colors.bg,
@@ -143,26 +143,26 @@ const VARIANT_COLORS = {
   error: {
     bg: "rgba(239, 68, 68, 0.08)",
     border: "rgba(239, 68, 68, 0.2)",
-    icon: "var(--aqb-error)",
-    title: "var(--aqb-text-primary)",
-    text: "var(--aqb-text-secondary)",
-    action: "var(--aqb-accent-blue)",
+    icon: "var(--buildrick-error)",
+    title: "var(--buildrick-text-primary)",
+    text: "var(--buildrick-text-secondary)",
+    action: "var(--buildrick-accent)",
   },
   warning: {
     bg: "rgba(245, 158, 11, 0.08)",
     border: "rgba(245, 158, 11, 0.2)",
-    icon: "var(--aqb-warning)",
-    title: "var(--aqb-text-primary)",
-    text: "var(--aqb-text-secondary)",
-    action: "var(--aqb-accent-blue)",
+    icon: "var(--buildrick-warning)",
+    title: "var(--buildrick-text-primary)",
+    text: "var(--buildrick-text-secondary)",
+    action: "var(--buildrick-accent)",
   },
   info: {
     bg: "rgba(59, 130, 246, 0.08)",
     border: "rgba(59, 130, 246, 0.2)",
-    icon: "var(--aqb-info)",
-    title: "var(--aqb-text-primary)",
-    text: "var(--aqb-text-secondary)",
-    action: "var(--aqb-accent-blue)",
+    icon: "var(--buildrick-info)",
+    title: "var(--buildrick-text-primary)",
+    text: "var(--buildrick-text-secondary)",
+    action: "var(--buildrick-accent)",
   },
 };
 
@@ -193,7 +193,7 @@ const containerStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "flex-start",
   gap: 10,
-  borderRadius: "var(--aqb-radius-md)",
+  borderRadius: "var(--buildrick-design-radius-md)",
   border: "1px solid",
 };
 
@@ -208,7 +208,7 @@ const iconContainerStyles: React.CSSProperties = {
 const dismissButtonStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
-  color: "var(--aqb-text-tertiary)",
+  color: "var(--buildrick-text-tertiary)",
   cursor: "pointer",
   padding: 4,
   borderRadius: 4,

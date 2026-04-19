@@ -75,7 +75,7 @@ function spyOnInnerHtml(el: HTMLElement): () => number {
 }
 
 describe("canvas HTML injection stability", () => {
-  const html = "<section data-aqb-id='s1'><div data-aqb-id='d1'>hi</div></section>";
+  const html = "<section data-buildrick-id='s1'><div data-buildrick-id='d1'>hi</div></section>";
 
   it("memoized prop: unrelated state change does NOT rewrite innerHTML", () => {
     const { getByTestId, rerender } = render(
@@ -96,8 +96,8 @@ describe("canvas HTML injection stability", () => {
   });
 
   it("memoized prop: html content change DOES rewrite innerHTML", () => {
-    const html1 = "<div data-aqb-id='a'>one</div>";
-    const html2 = "<div data-aqb-id='a'>one</div><div data-aqb-id='b'>two</div>";
+    const html1 = "<div data-buildrick-id='a'>one</div>";
+    const html2 = "<div data-buildrick-id='a'>one</div><div data-buildrick-id='b'>two</div>";
 
     const { getByTestId, rerender } = render(
       <MemoizedDiv html={html1} dragActive={false} />
@@ -137,14 +137,14 @@ describe("canvas HTML injection stability", () => {
     // The real-world consequence of the bug: the child DOM node the user
     // was dragging over got detached mid-drag, so the subsequent native
     // drop event fired on an orphaned node and React never saw it.
-    const childHtml = "<div data-aqb-id='child'>hello</div>";
+    const childHtml = "<div data-buildrick-id='child'>hello</div>";
 
     const { getByTestId, rerender } = render(
       <MemoizedDiv html={childHtml} dragActive={false} />
     );
 
     const container = getByTestId("target");
-    const childBefore = container.querySelector('[data-aqb-id="child"]')!;
+    const childBefore = container.querySelector('[data-buildrick-id="child"]')!;
     expect(childBefore).toBeTruthy();
 
     for (let i = 0; i < 5; i++) {
@@ -153,7 +153,7 @@ describe("canvas HTML injection stability", () => {
       });
     }
 
-    const childAfter = container.querySelector('[data-aqb-id="child"]');
+    const childAfter = container.querySelector('[data-buildrick-id="child"]');
     expect(childAfter).toBe(childBefore);
     expect(childBefore.isConnected).toBe(true);
   });

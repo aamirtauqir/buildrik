@@ -3,7 +3,7 @@ import { useCanvasContent } from "../useCanvasContent";
 
 describe("useCanvasContent — DOMParser memoization", () => {
   it("does not re-compute displayContent when only selectedId changes", () => {
-    const content = "<div data-aqb-id='root'><p data-aqb-id='el-1'>text</p></div>";
+    const content = "<div data-buildrick-id='root'><p data-buildrick-id='el-1'>text</p></div>";
     let parseCount = 0;
 
     // Spy on DOMParser to count calls

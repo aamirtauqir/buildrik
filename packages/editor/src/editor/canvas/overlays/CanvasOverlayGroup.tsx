@@ -185,7 +185,7 @@ export function CanvasOverlayGroup({
 
   return (
     <div
-      className="aqb-canvas-overlay-group"
+      className="buildrick-canvas-overlay-group"
       style={{
         position: "absolute",
         inset: 0,
@@ -215,7 +215,7 @@ export function CanvasOverlayGroup({
       )}
 
       {/* Marquee selection tool */}
-      {marquee && <div className="aqb-canvas-marquee" style={getMarqueeStyles(marquee)} />}
+      {marquee && <div className="buildrick-canvas-marquee" style={getMarqueeStyles(marquee)} />}
 
       {/* Rulers and persistent guides */}
       {showRulers && canvasRef.current && (
@@ -246,7 +246,7 @@ export function CanvasOverlayGroup({
 
       {/* Selection overlays */}
       {selectedId && (
-        <div className="aqb-canvas-spots-overlay" style={spotsOverlayStyles}>
+        <div className="buildrick-canvas-spots-overlay" style={spotsOverlayStyles}>
           {showSpacing && spacingIndicators.length > 0 && (
             <CanvasSpotSpacing
               composer={composer}

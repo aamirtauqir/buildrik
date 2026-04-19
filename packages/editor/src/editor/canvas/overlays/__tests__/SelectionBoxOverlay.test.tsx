@@ -63,7 +63,7 @@ describe("SelectionBoxOverlay — rotation handle accessibility", () => {
     } as unknown as typeof MutationObserver;
 
     // Provide a fake canvas element and a fake selected element so updateRect sets the rect
-    // The component queries: '.aqb-canvas' and '[data-aqb-id="el-1"]'
+    // The component queries: '.buildrick-canvas' and '[data-buildrick-id="el-1"]'
     const fakeElementRect = {
       left: 50,
       top: 50,
@@ -89,8 +89,8 @@ describe("SelectionBoxOverlay — rotation handle accessibility", () => {
     } as unknown as Element;
 
     querySelectorSpy = vi.spyOn(document, "querySelector").mockImplementation((selector) => {
-      if (selector === ".aqb-canvas") return fakeCanvas;
-      if (selector === '[data-aqb-id="el-1"]') return fakeElement;
+      if (selector === ".buildrick-canvas") return fakeCanvas;
+      if (selector === '[data-buildrick-id="el-1"]') return fakeElement;
       return null;
     });
   });

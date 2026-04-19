@@ -436,7 +436,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                       <span>px</span>
                     </label>
                   </div>
-                  <div style={{ fontSize: 11, color: "var(--ls-text-ghost)", marginTop: 8 }}>
+                  <div style={{ fontSize: 11, color: "var(--buildrick-text-disabled)", marginTop: 8 }}>
                     Leave empty to keep original crop dimensions
                   </div>
                 </>

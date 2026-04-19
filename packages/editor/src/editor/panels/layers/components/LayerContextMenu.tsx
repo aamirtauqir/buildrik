@@ -62,61 +62,61 @@ export function LayerContextMenu({
   return (
     <div
       ref={menuRef}
-      className="aqb-layer-ctx-menu"
+      className="buildrick-layer-ctx-menu"
       style={{ position: "fixed", left: x, top: y, zIndex: 9999 }}
       role="menu"
       aria-label={`Actions for ${nodeName}`}
     >
-      <button className="aqb-layer-ctx-item" role="menuitem" onClick={() => act("rename")}>
+      <button className="buildrick-layer-ctx-item" role="menuitem" onClick={() => act("rename")}>
         <span>Rename</span>
-        <span className="aqb-ctx-hint">F2</span>
+        <span className="buildrick-ctx-hint">F2</span>
       </button>
-      <button className="aqb-layer-ctx-item" role="menuitem" onClick={() => act("duplicate")}>
+      <button className="buildrick-layer-ctx-item" role="menuitem" onClick={() => act("duplicate")}>
         <span>Duplicate</span>
-        <span className="aqb-ctx-hint">⌘D</span>
+        <span className="buildrick-ctx-hint">⌘D</span>
       </button>
-      <div className="aqb-layer-ctx-divider" />
+      <div className="buildrick-layer-ctx-divider" />
       <button
-        className="aqb-layer-ctx-item"
+        className="buildrick-layer-ctx-item"
         role="menuitem"
         onClick={() => act(isHidden ? "show" : "hide")}
       >
         {isHidden ? "Show" : "Hide"}
       </button>
       <button
-        className="aqb-layer-ctx-item"
+        className="buildrick-layer-ctx-item"
         role="menuitem"
         onClick={() => act(isLocked ? "unlock" : "lock")}
       >
         {isLocked ? "Unlock" : "Lock"}
       </button>
-      <div className="aqb-layer-ctx-divider" />
+      <div className="buildrick-layer-ctx-divider" />
       {selectedCount > 1 && (
-        <button className="aqb-layer-ctx-item" role="menuitem" onClick={() => act("group")}>
+        <button className="buildrick-layer-ctx-item" role="menuitem" onClick={() => act("group")}>
           <span>Group {selectedCount} layers</span>
-          <span className="aqb-ctx-hint">⌘G</span>
+          <span className="buildrick-ctx-hint">⌘G</span>
         </button>
       )}
       {childCount > 0 && (
         <button
-          className="aqb-layer-ctx-item"
+          className="buildrick-layer-ctx-item"
           role="menuitem"
           onClick={() => act("selectChildren")}
         >
           Select children
         </button>
       )}
-      <button className="aqb-layer-ctx-item" role="menuitem" onClick={() => act("moveToTop")}>
+      <button className="buildrick-layer-ctx-item" role="menuitem" onClick={() => act("moveToTop")}>
         <span>Move to top</span>
-        <span className="aqb-ctx-hint">⌘⇧]</span>
+        <span className="buildrick-ctx-hint">⌘⇧]</span>
       </button>
-      <button className="aqb-layer-ctx-item" role="menuitem" onClick={() => act("moveToBottom")}>
+      <button className="buildrick-layer-ctx-item" role="menuitem" onClick={() => act("moveToBottom")}>
         <span>Move to bottom</span>
-        <span className="aqb-ctx-hint">⌘⇧[</span>
+        <span className="buildrick-ctx-hint">⌘⇧[</span>
       </button>
-      <div className="aqb-layer-ctx-divider" />
+      <div className="buildrick-layer-ctx-divider" />
       <button
-        className="aqb-layer-ctx-item aqb-layer-ctx-item--danger"
+        className="buildrick-layer-ctx-item buildrick-layer-ctx-item--danger"
         role="menuitem"
         onClick={() => act("delete")}
       >
@@ -124,7 +124,7 @@ export function LayerContextMenu({
           Delete
           {childCount > 0 ? ` (+ ${childCount} child${childCount === 1 ? "" : "ren"})` : ""}
         </span>
-        <span className="aqb-ctx-hint">⌫</span>
+        <span className="buildrick-ctx-hint">⌫</span>
       </button>
     </div>
   );

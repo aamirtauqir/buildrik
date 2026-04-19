@@ -19,12 +19,12 @@
   position: relative;
   width: min(1100px, 92vw);
   height: min(780px, 88vh);
-  background: var(--aqb-bg-dark);
+  background: var(--buildrick-bg-dark);
   display: flex;
   flex-direction: column;
-  border-radius: var(--aqb-radius-lg, 12px);
+  border-radius: var(--buildrick-design-radius-lg, 12px);
   overflow: hidden;
-  border: 1px solid var(--aqb-border);
+  border: 1px solid var(--buildrick-border);
   animation: tmpl-preview-in 0.15s ease;
 }
 
@@ -48,8 +48,8 @@
   align-items: center;
   height: 42px;
   padding: 0 12px;
-  background: var(--aqb-bg-panel);
-  border-bottom: 1px solid var(--aqb-border);
+  background: var(--buildrick-bg-panel);
+  border-bottom: 1px solid var(--buildrick-border);
   flex-shrink: 0;
   gap: 8px;
 }
@@ -115,21 +115,21 @@
 .tmpl-preview__close {
   width: 24px;
   height: 24px;
-  border-radius: var(--aqb-radius-sm, 5px);
+  border-radius: var(--buildrick-design-radius-sm, 5px);
   border: none;
-  background: var(--aqb-bg-hover);
-  color: var(--aqb-text-muted);
+  background: var(--buildrick-bg-hover);
+  color: var(--buildrick-text-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: background var(--aqb-duration-fast, 100ms);
+  transition: background var(--buildrick-duration-fast, 100ms);
 }
 
 .tmpl-preview__close:hover {
-  background: var(--aqb-bg-active);
-  color: var(--aqb-text-secondary);
+  background: var(--buildrick-bg-active);
+  color: var(--buildrick-text-secondary);
 }
 
 /* ── Preview canvas ── */
@@ -138,14 +138,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--aqb-bg-app);
+  background: var(--buildrick-bg-app);
   padding: 12px;
   overflow: hidden;
 }
 
 .tmpl-preview__frame {
-  background: var(--aqb-bg-card);
-  border: 1px solid var(--aqb-border);
+  background: var(--buildrick-bg-card);
+  border: 1px solid var(--buildrick-border);
   border-radius: 5px;
   overflow: hidden;
   height: 100%;
@@ -163,8 +163,8 @@
 /* ── Bottom bar ── */
 .tmpl-preview__bottom {
   padding: 8px 12px;
-  background: var(--aqb-bg-panel);
-  border-top: 1px solid var(--aqb-border);
+  background: var(--buildrick-bg-panel);
+  border-top: 1px solid var(--buildrick-border);
   display: flex;
   gap: 6px;
   flex-shrink: 0;
@@ -173,35 +173,35 @@
 .tmpl-preview__back {
   flex: 0 0 auto;
   padding: 7px 12px;
-  border-radius: var(--aqb-radius-sm, 6px);
-  border: 1px solid var(--aqb-border);
-  background: var(--aqb-bg-hover);
-  color: var(--aqb-text-muted);
+  border-radius: var(--buildrick-design-radius-sm, 6px);
+  border: 1px solid var(--buildrick-border);
+  background: var(--buildrick-bg-hover);
+  color: var(--buildrick-text-muted);
   font-size: 10.5px;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
-  transition: background var(--aqb-duration-fast, 100ms), color var(--aqb-duration-fast, 100ms);
+  transition: background var(--buildrick-duration-fast, 100ms), color var(--buildrick-duration-fast, 100ms);
 }
 
 .tmpl-preview__back:hover {
-  background: var(--aqb-bg-active);
-  color: var(--aqb-text-secondary);
+  background: var(--buildrick-bg-active);
+  color: var(--buildrick-text-secondary);
 }
 
 /* "Use this template" CTA — primary style */
 .tmpl-preview__use {
   flex: 1;
   padding: 7px 12px;
-  border-radius: var(--aqb-radius-sm, 6px);
+  border-radius: var(--buildrick-design-radius-sm, 6px);
   border: none;
-  background: var(--aqb-primary);
+  background: var(--buildrick-accent);
   color: #fff;
   font-size: 10.5px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
-  transition: opacity var(--aqb-duration-fast, 100ms);
+  transition: opacity var(--buildrick-duration-fast, 100ms);
 }
 
 .tmpl-preview__use:hover {

@@ -10,7 +10,7 @@
  *   - Zero tokens in list  → "No [X] tokens yet" + "Add in Design tab" hint
  *   - Search yields nothing → "No tokens found"  (no Design tab hint)
  *
- * Binding model: onSelect passes token.cssVar (e.g. var(--aqb-color-primary)),
+ * Binding model: onSelect passes token.cssVar (e.g. var(--buildrick-design-color-primary)),
  * NOT the raw hex/px value.
  *
  * Keyboard nav: role=listbox, ArrowUp/Down (list), ArrowUp/Down/Left/Right (grid),
@@ -37,7 +37,7 @@ export interface TokenPickerPopoverProps {
   tokens: TokenEntry[];
   /** Currently applied value (may be var(--aqb-*) or a raw value) */
   currentValue: string;
-  /** Called with (tokenId, cssVar) — e.g. ("color-primary", "var(--aqb-color-primary)") */
+  /** Called with (tokenId, cssVar) — e.g. ("color-primary", "var(--buildrick-design-color-primary)") */
   onSelect: (tokenId: string, cssVar: string) => void;
   onCustomValue: (value: string) => void;
   /** false = list layout (spacing/type), true = 4-col swatch grid (default, color) */
@@ -52,9 +52,9 @@ export interface TokenPickerPopoverProps {
 
 const isValidHex = (v: string) => /^#[0-9A-Fa-f]{3}(?:[0-9A-Fa-f]{3})?$/.test(v);
 
-/** Extract just the --aqb-* var name from var(--aqb-…) for comparison */
+/** Extract just the --buildrick-design-* var name from var(--buildrick-design-…) for comparison */
 const extractVarName = (v: string) => {
-  const m = v.match(/^var\((--aqb-[^)]+)\)$/);
+  const m = v.match(/^var\((--buildrick-design-[^)]+)\)$/);
   return m ? m[1] : null;
 };
 
@@ -64,7 +64,7 @@ const extractVarName = (v: string) => {
 
 const valueBadgeStyle: React.CSSProperties = {
   fontSize: 10,
-  fontFamily: "var(--aqb-font-mono, 'JetBrains Mono', monospace)",
+  fontFamily: "var(--buildrick-design-font-mono, 'JetBrains Mono', monospace)",
   color: INSPECTOR_TOKENS.accent,
   background: INSPECTOR_TOKENS.accentAlpha10,
   padding: "1px 5px",

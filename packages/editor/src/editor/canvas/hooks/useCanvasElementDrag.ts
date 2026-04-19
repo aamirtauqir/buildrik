@@ -156,10 +156,10 @@ export function useCanvasElementDrag({
       if (e.button !== 0) return;
 
       const target = e.target as HTMLElement;
-      const draggableEl = target.closest("[data-aqb-id]") as HTMLElement | null;
+      const draggableEl = target.closest("[data-buildrick-id]") as HTMLElement | null;
       if (!draggableEl) return;
 
-      const elementId = draggableEl.getAttribute("data-aqb-id");
+      const elementId = draggableEl.getAttribute("data-buildrick-id");
       const rootId = rootIdRef.current;
 
       // Don't make root draggable
@@ -176,7 +176,7 @@ export function useCanvasElementDrag({
     // Reset cursor on mouseup
     const handleMouseUp = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const draggableEl = target.closest("[data-aqb-id]") as HTMLElement | null;
+      const draggableEl = target.closest("[data-buildrick-id]") as HTMLElement | null;
       if (draggableEl && !isDraggingRef.current) {
         draggableEl.style.cursor = "grab";
       }
@@ -185,10 +185,10 @@ export function useCanvasElementDrag({
     // Handle dragstart using event delegation
     const handleDragStart = (e: DragEvent) => {
       const target = e.target as HTMLElement;
-      const draggableEl = target.closest("[data-aqb-id]") as HTMLElement | null;
+      const draggableEl = target.closest("[data-buildrick-id]") as HTMLElement | null;
       if (!draggableEl || !composer) return;
 
-      let elementId = draggableEl.getAttribute("data-aqb-id");
+      let elementId = draggableEl.getAttribute("data-buildrick-id");
       if (!elementId) return;
 
       const rootId = rootIdRef.current;
@@ -270,7 +270,7 @@ export function useCanvasElementDrag({
       // Create enhanced drag ghost with element type label
       const rect = draggableEl.getBoundingClientRect();
       const dragGhost = document.createElement("div");
-      dragGhost.className = "aqb-drag-ghost";
+      dragGhost.className = "buildrick-drag-ghost";
       dragGhost.style.cssText = `
         position: absolute;
         top: -9999px;
@@ -329,11 +329,11 @@ export function useCanvasElementDrag({
 
       // Visual feedback during drag
       draggableEl.style.opacity = "0.4";
-      draggableEl.classList.add("aqb-dragging");
+      draggableEl.classList.add("buildrick-dragging");
 
       // Clone mode visual feedback
       if (isCloneModeRef.current) {
-        draggableEl.classList.add("aqb-clone-mode");
+        draggableEl.classList.add("buildrick-clone-mode");
         // Set copy effect for cursor feedback
         e.dataTransfer!.effectAllowed = "copy";
       }
@@ -367,22 +367,22 @@ export function useCanvasElementDrag({
       isDraggingRef.current = false;
 
       const target = e.target as HTMLElement;
-      const draggableEl = target.closest("[data-aqb-id]") as HTMLElement | null;
+      const draggableEl = target.closest("[data-buildrick-id]") as HTMLElement | null;
 
       // Clean up the element that was being dragged
       if (draggableEl) {
         draggableEl.style.opacity = "1";
         draggableEl.style.cursor = "grab";
-        draggableEl.classList.remove("aqb-dragging");
-        draggableEl.classList.remove("aqb-clone-mode");
+        draggableEl.classList.remove("buildrick-dragging");
+        draggableEl.classList.remove("buildrick-clone-mode");
       }
 
       // Also clean up via ref in case DOM was recreated during drag
       if (draggingElementRef.current && draggingElementRef.current !== draggableEl) {
         draggingElementRef.current.style.opacity = "1";
         draggingElementRef.current.style.cursor = "grab";
-        draggingElementRef.current.classList.remove("aqb-dragging");
-        draggingElementRef.current.classList.remove("aqb-clone-mode");
+        draggingElementRef.current.classList.remove("buildrick-dragging");
+        draggingElementRef.current.classList.remove("buildrick-clone-mode");
       }
 
       // Reset modifier state
@@ -410,10 +410,10 @@ export function useCanvasElementDrag({
       lastDragCalcRef.current = now;
 
       const target = e.target as HTMLElement;
-      const draggableEl = target.closest("[data-aqb-id]") as HTMLElement | null;
+      const draggableEl = target.closest("[data-buildrick-id]") as HTMLElement | null;
       if (!draggableEl) return;
 
-      const elementId = draggableEl.getAttribute("data-aqb-id");
+      const elementId = draggableEl.getAttribute("data-buildrick-id");
       if (!elementId) return;
 
       const canvas = canvasRef.current;

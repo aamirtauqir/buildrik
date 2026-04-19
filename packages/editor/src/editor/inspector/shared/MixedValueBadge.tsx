@@ -2,7 +2,7 @@ import * as React from "react";
 
 /**
  * Small "Mixed" badge shown next to field labels when multi-select has
- * differing values for that property. Uses --ls-dirty (amber) from the
+ * differing values for that property. Uses --buildrick-warning (amber) from the
  * global token system to match the design spec.
  */
 export const MixedValueBadge: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
@@ -14,7 +14,7 @@ export const MixedValueBadge: React.FC<{ compact?: boolean }> = ({ compact = fal
           width: 6,
           height: 6,
           borderRadius: "50%",
-          background: "var(--ls-dirty)",
+          background: "var(--buildrick-warning)",
           marginRight: 4,
         }}
         title="Mixed — values differ across selected elements"
@@ -30,8 +30,8 @@ export const MixedValueBadge: React.FC<{ compact?: boolean }> = ({ compact = fal
         gap: 4,
         fontSize: 10,
         fontWeight: 500,
-        color: "var(--ls-warning-text, #92400E)",
-        background: "var(--ls-warning-bg, #FEF3C7)",
+        color: "var(--buildrick-warning, #92400E)",
+        background: "var(--buildrick-warning-bg, #FEF3C7)",
         border: "1px solid #FDE68A",
         padding: "1px 6px",
         borderRadius: 3,
@@ -44,8 +44,8 @@ export const MixedValueBadge: React.FC<{ compact?: boolean }> = ({ compact = fal
           width: 4,
           height: 4,
           borderRadius: "50%",
-          background: "var(--ls-dirty)",
-          boxShadow: "0 0 4px var(--ls-dirty)",
+          background: "var(--buildrick-warning)",
+          boxShadow: "0 0 4px var(--buildrick-warning)",
         }}
       />
       Mixed

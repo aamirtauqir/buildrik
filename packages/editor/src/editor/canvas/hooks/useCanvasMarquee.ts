@@ -55,9 +55,9 @@ export function useCanvasMarquee({
     (e: React.MouseEvent) => {
       // Only start marquee if clicking on empty canvas (not on an element or toolbar)
       const target = e.target as HTMLElement;
-      const clickedElement = target.closest("[data-aqb-id]") as HTMLElement | null;
+      const clickedElement = target.closest("[data-buildrick-id]") as HTMLElement | null;
       const clickedToolbar = target.closest(
-        ".aqb-quick-actions, .aqb-unified-toolbar, .aqb-selection-label, .aqb-canvas-breadcrumb, .aqb-alignment-toolbar, .aqb-context-menu"
+        ".buildrick-quick-actions, .buildrick-unified-toolbar, .buildrick-selection-label, .buildrick-canvas-breadcrumb, .buildrick-alignment-toolbar, .buildrick-context-menu"
       ) as HTMLElement | null;
 
       // If clicking on an element or toolbar, don't start marquee
@@ -146,7 +146,7 @@ export function useCanvasMarquee({
           if (id === page.root?.id) return; // Skip root
 
           const domEl = canvasRef.current?.querySelector(
-            `[data-aqb-id="${id}"]`
+            `[data-buildrick-id="${id}"]`
           ) as HTMLElement | null;
 
           if (domEl) {

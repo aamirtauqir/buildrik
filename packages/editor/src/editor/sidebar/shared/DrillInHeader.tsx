@@ -89,7 +89,7 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
         <button
           ref={backBtnRef}
           onClick={handleBackClick}
-          className="aqb-back-btn"
+          className="buildrick-back-btn"
           style={backButtonStyles}
           title={`Back to ${parentName}`}
           aria-label={`Back to ${parentName}`}
@@ -148,9 +148,9 @@ const backButtonStyles: React.CSSProperties = {
   margin: "-4px",
   background: "transparent",
   border: "none",
-  borderRadius: "var(--aqb-radius-md)",
-  color: "var(--aqb-text-secondary)",
-  fontSize: "var(--aqb-text-base)",
+  borderRadius: "var(--buildrick-design-radius-md)",
+  color: "var(--buildrick-text-secondary)",
+  fontSize: "var(--buildrick-text-base)",
   fontWeight: 500,
   cursor: "pointer",
   transition: "background 0.15s ease, color 0.15s ease",
@@ -164,18 +164,18 @@ const breadcrumbStyles: React.CSSProperties = {
 };
 
 const breadcrumbItemStyles: React.CSSProperties = {
-  fontSize: "var(--aqb-text-sm)",
+  fontSize: "var(--buildrick-text-sm)",
   fontWeight: 400,
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
 };
 
 const breadcrumbSeparatorStyles: React.CSSProperties = {
-  fontSize: "var(--aqb-text-sm)",
-  color: "var(--aqb-text-disabled)",
+  fontSize: "var(--buildrick-text-sm)",
+  color: "var(--buildrick-text-disabled)",
 };
 
 const breadcrumbCurrentStyles: React.CSSProperties = {
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   fontWeight: 500,
 };
 

@@ -45,11 +45,11 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
   } = state;
 
   return (
-    <div className="aqb-sidebar-container">
+    <div className="buildrick-sidebar-container">
       {/* Quick Access Pills */}
-      <div className="aqb-quick-pills">
+      <div className="buildrick-quick-pills">
         <button
-          className={`aqb-pill ${showRecentsOverlay ? "active" : ""}`}
+          className={`buildrick-pill ${showRecentsOverlay ? "active" : ""}`}
           onClick={() => {
             setShowRecentsOverlay(!showRecentsOverlay);
             setShowFavoritesOverlay(false);
@@ -57,11 +57,11 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
         >
           <History size={14} />
           Recents
-          {recentIds.length > 0 && <span className="aqb-pill-badge">{recentIds.length}</span>}
+          {recentIds.length > 0 && <span className="buildrick-pill-badge">{recentIds.length}</span>}
         </button>
 
         <button
-          className={`aqb-pill ${showFavoritesOverlay ? "active" : ""}`}
+          className={`buildrick-pill ${showFavoritesOverlay ? "active" : ""}`}
           onClick={() => {
             setShowFavoritesOverlay(!showFavoritesOverlay);
             setShowRecentsOverlay(false);
@@ -69,29 +69,29 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
         >
           <Star size={14} />
           Favorites
-          {favorites.length > 0 && <span className="aqb-pill-badge">{favorites.length}</span>}
+          {favorites.length > 0 && <span className="buildrick-pill-badge">{favorites.length}</span>}
         </button>
 
         {showTip && (
-          <button className="aqb-pill aqb-pill-tip" onClick={dismissTip}>
+          <button className="buildrick-pill buildrick-pill-tip" onClick={dismissTip}>
             <Lightbulb size={14} />
             Drag onto canvas
-            <X size={12} className="aqb-pill-dismiss" />
+            <X size={12} className="buildrick-pill-dismiss" />
           </button>
         )}
       </div>
 
       {/* Recents overlay */}
       {showRecentsOverlay && (
-        <div className="aqb-quick-overlay">
-          <div className="aqb-overlay-header">
+        <div className="buildrick-quick-overlay">
+          <div className="buildrick-overlay-header">
             <span>Recent Elements</span>
             <button onClick={() => setShowRecentsOverlay(false)}>
               <X size={14} />
             </button>
           </div>
           {recentBlocks.length > 0 ? (
-            <div className="aqb-overlay-grid">
+            <div className="buildrick-overlay-grid">
               {recentBlocks.map((block) => (
                 <ElementCard
                   key={block.id}
@@ -104,7 +104,7 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
               ))}
             </div>
           ) : (
-            <div className="aqb-overlay-empty">
+            <div className="buildrick-overlay-empty">
               <History size={24} strokeWidth={1.5} />
               <span>No recent elements</span>
             </div>
@@ -114,15 +114,15 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
 
       {/* Favorites overlay */}
       {showFavoritesOverlay && (
-        <div className="aqb-quick-overlay">
-          <div className="aqb-overlay-header">
+        <div className="buildrick-quick-overlay">
+          <div className="buildrick-overlay-header">
             <span>Favorite Elements</span>
             <button onClick={() => setShowFavoritesOverlay(false)}>
               <X size={14} />
             </button>
           </div>
           {favoriteBlocks.length > 0 ? (
-            <div className="aqb-overlay-grid">
+            <div className="buildrick-overlay-grid">
               {favoriteBlocks.map((block) => (
                 <ElementCard
                   key={block.id}
@@ -135,10 +135,10 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
               ))}
             </div>
           ) : (
-            <div className="aqb-overlay-empty">
+            <div className="buildrick-overlay-empty">
               <Star size={24} strokeWidth={1.5} />
               <span>No favorites yet</span>
-              <span className="aqb-overlay-hint">Click the star on any element</span>
+              <span className="buildrick-overlay-hint">Click the star on any element</span>
             </div>
           )}
         </div>
@@ -146,28 +146,28 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
 
       {/* Main content — category accordions */}
       {!showRecentsOverlay && !showFavoritesOverlay && (
-        <div className="aqb-sidebar-content aqb-scrollbar" aria-live="polite">
+        <div className="buildrick-sidebar-content buildrick-scrollbar" aria-live="polite">
           {sortedCategories.map((cat) => {
             const isOpen = expandedCategory === cat;
             const CategoryIcon = CATEGORY_ICONS[cat];
             return (
-              <div key={cat} className="aqb-accordion">
+              <div key={cat} className="buildrick-accordion">
                 <button
-                  className={`aqb-accordion-header ${isOpen ? "open" : ""}`}
+                  className={`buildrick-accordion-header ${isOpen ? "open" : ""}`}
                   onClick={() => toggleCategory(cat)}
                   aria-expanded={isOpen}
                 >
-                  <span className="aqb-accordion-label">
+                  <span className="buildrick-accordion-label">
                     {CategoryIcon && (
-                      <CategoryIcon size={18} strokeWidth={2} className="aqb-accordion-icon" />
+                      <CategoryIcon size={18} strokeWidth={2} className="buildrick-accordion-icon" />
                     )}
                     {cat}
-                    <span className="aqb-accordion-count">{filtered[cat].length}</span>
+                    <span className="buildrick-accordion-count">{filtered[cat].length}</span>
                   </span>
                   <ChevronIcon expanded={isOpen} />
                 </button>
                 <AnimatedAccordionContent isOpen={isOpen}>
-                  <div className="aqb-element-grid">
+                  <div className="buildrick-element-grid">
                     {filtered[cat].map((block) => (
                       <ElementCard
                         key={block.id}
@@ -186,7 +186,7 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
           })}
 
           {sortedCategories.length === 0 && (
-            <div className="aqb-empty-state">
+            <div className="buildrick-empty-state">
               <p>No elements found</p>
             </div>
           )}

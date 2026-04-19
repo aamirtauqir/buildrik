@@ -214,13 +214,13 @@ export function calculateFreshDropTarget(
   findDropTargetElement: (x: number, y: number) => HTMLElement | null
 ): FreshDropTargetResult {
   let freshDropTarget = findDropTargetElement(clientX, clientY);
-  let freshTargetId = freshDropTarget?.getAttribute("data-aqb-id") || null;
+  let freshTargetId = freshDropTarget?.getAttribute("data-buildrick-id") || null;
 
   // Validate target exists in composer (DOM may have been recreated)
   if (freshTargetId && !composer.elements.getElement(freshTargetId)) {
     let currentEl = freshDropTarget?.parentElement;
-    while (currentEl && !currentEl.hasAttribute("data-aqb-canvas")) {
-      const parentId = currentEl.getAttribute("data-aqb-id");
+    while (currentEl && !currentEl.hasAttribute("data-buildrick-canvas")) {
+      const parentId = currentEl.getAttribute("data-buildrick-id");
       if (parentId && composer.elements.getElement(parentId)) {
         freshTargetId = parentId;
         freshDropTarget = currentEl;
@@ -247,7 +247,7 @@ export function calculateFreshDropTarget(
   let freshDropPosition: DropPosition = "inside";
   if (freshTargetId && canvasRef.current) {
     const targetDomEl = canvasRef.current.querySelector(
-      `[data-aqb-id="${freshTargetId}"]`
+      `[data-buildrick-id="${freshTargetId}"]`
     ) as HTMLElement | null;
 
     if (targetDomEl) {

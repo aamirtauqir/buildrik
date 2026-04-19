@@ -167,11 +167,11 @@ const ShortcutBadge: React.FC<{ shortcut: string }> = ({ shortcut }) => {
     <span
       style={{
         fontSize: 11,
-        color: "var(--aqb-text-muted)",
-        background: "var(--aqb-surface-4)",
-        borderRadius: "var(--aqb-radius-sm)",
+        color: "var(--buildrick-text-muted)",
+        background: "var(--buildrick-surface-4)",
+        borderRadius: "var(--buildrick-design-radius-sm)",
         padding: "2px 6px",
-        fontFamily: "var(--aqb-font-mono, monospace)",
+        fontFamily: "var(--buildrick-design-font-mono, monospace)",
         whiteSpace: "nowrap",
         flexShrink: 0,
       }}
@@ -268,7 +268,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           position: "fixed",
           inset: 0,
           background: "rgba(0,0,0,0.6)",
-          zIndex: "calc(var(--aqb-z-modal) - 1)",
+          zIndex: "calc(var(--buildrick-z-modal) - 1)",
         }}
       />
 
@@ -284,11 +284,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           transform: "translateX(-50%)",
           width: 560,
           maxWidth: "90vw",
-          background: "var(--aqb-surface-3)",
-          border: "1px solid var(--aqb-border-light)",
-          borderRadius: "var(--aqb-radius-xl)",
-          boxShadow: "var(--aqb-shadow-2xl)",
-          zIndex: "var(--aqb-z-modal)",
+          background: "var(--buildrick-surface-3)",
+          border: "1px solid var(--buildrick-border-light)",
+          borderRadius: "var(--buildrick-design-radius-xl)",
+          boxShadow: "var(--buildrick-shadow-2xl)",
+          zIndex: "var(--buildrick-z-modal)",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
@@ -302,7 +302,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             height: 52,
             padding: "0 16px",
             gap: 10,
-            borderBottom: "1px solid var(--aqb-border)",
+            borderBottom: "1px solid var(--buildrick-border)",
           }}
         >
           {/* Search icon */}
@@ -311,7 +311,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             height={18}
             viewBox="0 0 24 24"
             fill="none"
-            stroke="var(--aqb-text-muted)"
+            stroke="var(--buildrick-text-muted)"
             strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -336,7 +336,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
               border: "none",
               outline: "none",
               fontSize: 16,
-              color: "var(--aqb-text-primary)",
+              color: "var(--buildrick-text-primary)",
               fontFamily: "inherit",
             }}
           />
@@ -349,7 +349,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             maxHeight: 360,
             overflowY: "auto",
             scrollbarWidth: "thin",
-            scrollbarColor: "var(--aqb-surface-5) transparent",
+            scrollbarColor: "var(--buildrick-surface-5) transparent",
           }}
         >
           {filteredCommands.length === 0 ? (
@@ -357,7 +357,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
               style={{
                 padding: "24px 16px",
                 textAlign: "center",
-                color: "var(--aqb-text-muted)",
+                color: "var(--buildrick-text-muted)",
                 fontSize: 13,
               }}
             >
@@ -377,8 +377,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                       fontSize: 11,
                       textTransform: "uppercase",
                       letterSpacing: "0.5px",
-                      color: "var(--aqb-text-muted)",
-                      background: "var(--aqb-surface-2)",
+                      color: "var(--buildrick-text-muted)",
+                      background: "var(--buildrick-surface-2)",
                     }}
                   >
                     {group}
@@ -404,7 +404,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                           padding: "0 16px",
                           gap: 10,
                           background: isSelected
-                            ? "var(--aqb-primary-subtle)"
+                            ? "var(--buildrick-accent-tint)"
                             : "transparent",
                           border: "none",
                           cursor: "pointer",
@@ -422,7 +422,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                color: "var(--aqb-text-muted)",
+                                color: "var(--buildrick-text-muted)",
                                 flexShrink: 0,
                                 fontSize: 14,
                               }}
@@ -433,7 +433,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                           <span
                             style={{
                               fontSize: 14,
-                              color: "var(--aqb-text-primary)",
+                              color: "var(--buildrick-text-primary)",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
                               whiteSpace: "nowrap",
@@ -460,9 +460,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            borderTop: "1px solid var(--aqb-border)",
+            borderTop: "1px solid var(--buildrick-border)",
             fontSize: 11,
-            color: "var(--aqb-text-muted)",
+            color: "var(--buildrick-text-muted)",
             gap: 16,
           }}
         >

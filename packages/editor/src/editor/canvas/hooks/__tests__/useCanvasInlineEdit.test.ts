@@ -25,10 +25,10 @@ describe("useCanvasInlineEdit — non-left-click guard (EC-06)", () => {
   let canvasRef: React.RefObject<HTMLDivElement | null>;
 
   beforeEach(() => {
-    // Build a minimal canvas DOM: a wrapper div containing a <p data-aqb-id="el-1">
+    // Build a minimal canvas DOM: a wrapper div containing a <p data-buildrick-id="el-1">
     canvasDiv = document.createElement("div");
     editableEl = document.createElement("p");
-    editableEl.setAttribute("data-aqb-id", "el-1");
+    editableEl.setAttribute("data-buildrick-id", "el-1");
     editableEl.textContent = "Hello world";
     canvasDiv.appendChild(editableEl);
     document.body.appendChild(canvasDiv);

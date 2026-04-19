@@ -51,11 +51,11 @@ export class CMSExportResolver {
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
-    const elements = doc.querySelectorAll("[data-aqb-id]");
+    const elements = doc.querySelectorAll("[data-buildrick-id]");
     const promises: Promise<void>[] = [];
 
     elements.forEach((el) => {
-      const elementId = el.getAttribute("data-aqb-id");
+      const elementId = el.getAttribute("data-buildrick-id");
       if (!elementId) return;
 
       const bindings = this.composer.cmsBindings.getBindings(elementId);
@@ -72,8 +72,8 @@ export class CMSExportResolver {
 
     // Clean up builder-specific attributes for production
     elements.forEach((el) => {
-      el.removeAttribute("data-aqb-id");
-      el.removeAttribute("data-aqb-selected");
+      el.removeAttribute("data-buildrick-id");
+      el.removeAttribute("data-buildrick-selected");
       el.removeAttribute("data-cms-bound");
     });
 
@@ -88,10 +88,10 @@ export class CMSExportResolver {
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
-    const elements = doc.querySelectorAll("[data-aqb-id]");
+    const elements = doc.querySelectorAll("[data-buildrick-id]");
 
     elements.forEach((el) => {
-      const elementId = el.getAttribute("data-aqb-id");
+      const elementId = el.getAttribute("data-buildrick-id");
       if (!elementId) return;
 
       const bindings = this.composer.cmsBindings.getBindings(elementId);
@@ -108,9 +108,9 @@ export class CMSExportResolver {
     });
 
     // Clean up builder-specific attributes for production
-    doc.querySelectorAll("[data-aqb-id]").forEach((el) => {
-      el.removeAttribute("data-aqb-id");
-      el.removeAttribute("data-aqb-selected");
+    doc.querySelectorAll("[data-buildrick-id]").forEach((el) => {
+      el.removeAttribute("data-buildrick-id");
+      el.removeAttribute("data-buildrick-selected");
       el.removeAttribute("data-cms-bound");
       el.removeAttribute("data-cms-repeater-template");
     });

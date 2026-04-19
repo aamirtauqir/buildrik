@@ -29,7 +29,7 @@ const s: Record<string, React.CSSProperties> = {
     gap: 8,
     height: 36,
     padding: "0 16px",
-    background: "var(--aqb-primary-light)",
+    background: "var(--buildrick-accent-subtle)",
     borderBottom: "1px solid rgba(99, 102, 241, 0.3)",
     flexShrink: 0,
     zIndex: 10,
@@ -37,13 +37,13 @@ const s: Record<string, React.CSSProperties> = {
   },
   label: {
     fontSize: 12,
-    color: "var(--aqb-text-secondary)",
+    color: "var(--buildrick-text-secondary)",
     whiteSpace: "nowrap" as const,
   },
   counter: {
     fontSize: 12,
     fontWeight: 500,
-    color: "var(--aqb-text-primary, #e4e4e7)",
+    color: "var(--buildrick-text-primary, #e4e4e7)",
     minWidth: 32,
     textAlign: "center" as const,
   },
@@ -55,8 +55,8 @@ const s: Record<string, React.CSSProperties> = {
     justifyContent: "center",
     background: "transparent",
     border: "1px solid rgba(99, 102, 241, 0.3)",
-    borderRadius: "var(--aqb-radius-sm)",
-    color: "var(--aqb-text-secondary)",
+    borderRadius: "var(--buildrick-design-radius-sm)",
+    color: "var(--buildrick-text-secondary)",
     cursor: "pointer",
     transition: "background 0.15s, border-color 0.15s",
     flexShrink: 0,
@@ -64,12 +64,12 @@ const s: Record<string, React.CSSProperties> = {
   exitLink: {
     marginLeft: "auto",
     fontSize: 12,
-    color: "var(--aqb-primary)",
+    color: "var(--buildrick-accent)",
     cursor: "pointer",
     background: "transparent",
     border: "none",
     padding: "2px 4px",
-    borderRadius: "var(--aqb-radius-sm)",
+    borderRadius: "var(--buildrick-design-radius-sm)",
     transition: "opacity 0.15s",
     whiteSpace: "nowrap" as const,
   },
@@ -155,7 +155,7 @@ export const CMSPreviewBar: React.FC<CMSPreviewBarProps> = ({ composer }) => {
           (e.currentTarget as HTMLElement).style.background =
             "rgba(99, 102, 241, 0.15)";
           (e.currentTarget as HTMLElement).style.borderColor =
-            "var(--aqb-primary)";
+            "var(--buildrick-accent)";
         }}
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLElement).style.background = "transparent";
@@ -176,7 +176,7 @@ export const CMSPreviewBar: React.FC<CMSPreviewBarProps> = ({ composer }) => {
           (e.currentTarget as HTMLElement).style.background =
             "rgba(99, 102, 241, 0.15)";
           (e.currentTarget as HTMLElement).style.borderColor =
-            "var(--aqb-primary)";
+            "var(--buildrick-accent)";
         }}
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLElement).style.background = "transparent";

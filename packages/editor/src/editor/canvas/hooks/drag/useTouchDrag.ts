@@ -93,11 +93,11 @@ export function useTouchDrag({
     if (touchElementIdRef.current && canvasRef.current) {
       try {
         const draggedEl = canvasRef.current.querySelector(
-          `[data-aqb-id="${touchElementIdRef.current}"]`
+          `[data-buildrick-id="${touchElementIdRef.current}"]`
         ) as HTMLElement | null;
         if (draggedEl) {
           draggedEl.style.opacity = "1";
-          draggedEl.classList.remove("aqb-dragging");
+          draggedEl.classList.remove("buildrick-dragging");
         }
 
         // Unified cleanup for all drop indicators
@@ -131,10 +131,10 @@ export function useTouchDrag({
 
       const touch = e.touches[0];
       const target = touch.target as HTMLElement;
-      const draggableEl = target.closest("[data-aqb-id]") as HTMLElement | null;
+      const draggableEl = target.closest("[data-buildrick-id]") as HTMLElement | null;
       if (!draggableEl) return;
 
-      const elementId = draggableEl.getAttribute("data-aqb-id");
+      const elementId = draggableEl.getAttribute("data-buildrick-id");
       const rootId = rootIdRef.current;
 
       // Don't allow dragging root element
@@ -160,7 +160,7 @@ export function useTouchDrag({
 
             // Visual feedback
             capturedDraggableEl.style.opacity = "0.4";
-            capturedDraggableEl.classList.add("aqb-dragging");
+            capturedDraggableEl.classList.add("buildrick-dragging");
           }
         },
         LONG_PRESS_DELAY
@@ -198,8 +198,8 @@ export function useTouchDrag({
 
           // Find drop target under touch
           const elemUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
-          const dropTargetEl = elemUnderTouch?.closest("[data-aqb-id]") as HTMLElement | null;
-          const targetId = dropTargetEl?.getAttribute("data-aqb-id") || null;
+          const dropTargetEl = elemUnderTouch?.closest("[data-buildrick-id]") as HTMLElement | null;
+          const targetId = dropTargetEl?.getAttribute("data-buildrick-id") || null;
 
           // Don't set self as drop target
           if (targetId && targetId !== elementId) {
@@ -217,7 +217,7 @@ export function useTouchDrag({
           // Calculate snap lines
           if (showGuides && composer?.canvasIndicators && canvas && elementId) {
             const draggableEl = canvas.querySelector(
-              `[data-aqb-id="${elementId}"]`
+              `[data-buildrick-id="${elementId}"]`
             ) as HTMLElement | null;
             if (draggableEl) {
               const canvasRect = canvas.getBoundingClientRect();
@@ -334,14 +334,14 @@ export function useTouchDrag({
   const showInvalidDropFeedback = React.useCallback(
     (targetId: string) => {
       const targetDomEl = canvasRef.current?.querySelector(
-        `[data-aqb-id="${targetId}"]`
+        `[data-buildrick-id="${targetId}"]`
       ) as HTMLElement | null;
       if (targetDomEl) {
         targetDomEl.setAttribute("data-drop-invalid", "true");
-        targetDomEl.classList.add("aqb-invalid-drop-shake");
+        targetDomEl.classList.add("buildrick-invalid-drop-shake");
         setTimeout(() => {
           targetDomEl.removeAttribute("data-drop-invalid");
-          targetDomEl.classList.remove("aqb-invalid-drop-shake");
+          targetDomEl.classList.remove("buildrick-invalid-drop-shake");
         }, 500);
       }
     },

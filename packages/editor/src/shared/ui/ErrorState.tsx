@@ -43,19 +43,19 @@ const severityConfig: Record<
 > = {
   error: {
     icon: "✕",
-    color: "var(--aqb-error, #ef4444)",
+    color: "var(--buildrick-error, #ef4444)",
     bgColor: "rgba(239, 68, 68, 0.1)",
     borderColor: "rgba(239, 68, 68, 0.3)",
   },
   warning: {
     icon: "⚠",
-    color: "var(--aqb-warning, #f59e0b)",
+    color: "var(--buildrick-warning, #f59e0b)",
     bgColor: "rgba(245, 158, 11, 0.1)",
     borderColor: "rgba(245, 158, 11, 0.3)",
   },
   info: {
     icon: "ℹ",
-    color: "var(--aqb-info, #3b82f6)",
+    color: "var(--buildrick-info, #3b82f6)",
     bgColor: "rgba(59, 130, 246, 0.1)",
     borderColor: "rgba(59, 130, 246, 0.3)",
   },
@@ -114,7 +114,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   if (inline) {
     return (
       <div
-        className={`aqb-error-state aqb-error-state-inline aqb-error-${severity} ${className}`}
+        className={`buildrick-error-state buildrick-error-state-inline buildrick-error-${severity} ${className}`}
         role="alert"
         aria-live="polite"
         style={{
@@ -124,7 +124,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           padding: "10px 14px",
           background: config.bgColor,
           border: `1px solid ${config.borderColor}`,
-          borderRadius: "var(--aqb-radius-md, 8px)",
+          borderRadius: "var(--buildrick-design-radius-md, 8px)",
         }}
       >
         <span
@@ -149,7 +149,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           style={{
             flex: 1,
             fontSize: 13,
-            color: "var(--aqb-text-primary, #f8fafc)",
+            color: "var(--buildrick-text-primary, #f8fafc)",
           }}
         >
           {message}
@@ -177,7 +177,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
 
   return (
     <div
-      className={`aqb-error-state aqb-error-state-${size} aqb-error-${severity} ${className}`}
+      className={`buildrick-error-state buildrick-error-state-${size} buildrick-error-${severity} ${className}`}
       role="alert"
       aria-live="polite"
       style={{
@@ -188,7 +188,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
         padding: sizes.padding,
         background: "rgba(255, 255, 255, 0.02)",
         border: "1px solid rgba(255, 255, 255, 0.06)",
-        borderRadius: "var(--aqb-radius-lg, 12px)",
+        borderRadius: "var(--buildrick-design-radius-lg, 12px)",
       }}
     >
       {/* Icon */}
@@ -224,7 +224,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           marginBottom: sizes.gap / 2,
           fontSize: sizes.titleSize,
           fontWeight: 600,
-          color: "var(--aqb-text-primary, #f8fafc)",
+          color: "var(--buildrick-text-primary, #f8fafc)",
         }}
       >
         {title || defaultTitles[severity]}
@@ -236,7 +236,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           margin: 0,
           marginBottom: sizes.gap,
           fontSize: sizes.messageSize,
-          color: "var(--aqb-text-muted, #64748b)",
+          color: "var(--buildrick-text-muted, #64748b)",
           maxWidth: 320,
           lineHeight: 1.5,
         }}
@@ -251,7 +251,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           style={{
             background: "transparent",
             border: "none",
-            color: "var(--aqb-text-secondary, #94a3b8)",
+            color: "var(--buildrick-text-secondary, #94a3b8)",
             fontSize: 12,
             cursor: "pointer",
             display: "flex",
@@ -281,11 +281,11 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
             marginBottom: sizes.gap,
             padding: 12,
             background: "rgba(0, 0, 0, 0.3)",
-            borderRadius: "var(--aqb-radius-md, 8px)",
-            border: "1px solid var(--aqb-border, #334155)",
+            borderRadius: "var(--buildrick-design-radius-md, 8px)",
+            border: "1px solid var(--buildrick-border, #334155)",
             fontSize: 12,
-            fontFamily: "var(--aqb-font-mono, monospace)",
-            color: "var(--aqb-text-secondary, #94a3b8)",
+            fontFamily: "var(--buildrick-design-font-mono, monospace)",
+            color: "var(--buildrick-text-secondary, #94a3b8)",
             textAlign: "left",
             maxWidth: "100%",
             maxHeight: 200,
@@ -354,7 +354,7 @@ export interface FieldErrorProps {
 export const FieldError: React.FC<FieldErrorProps> = ({ message, className = "" }) => {
   return (
     <span
-      className={`aqb-field-error ${className}`}
+      className={`buildrick-field-error ${className}`}
       role="alert"
       style={{
         display: "flex",
@@ -362,7 +362,7 @@ export const FieldError: React.FC<FieldErrorProps> = ({ message, className = "" 
         gap: 4,
         marginTop: 4,
         fontSize: 12,
-        color: "var(--aqb-error, #ef4444)",
+        color: "var(--buildrick-error, #ef4444)",
       }}
     >
       <svg width={12} height={12} viewBox="0 0 24 24" fill="currentColor">

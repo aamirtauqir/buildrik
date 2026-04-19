@@ -14,10 +14,10 @@ export const toolbarStyles: React.CSSProperties = {
   alignItems: "center",
   height: 28,
   padding: "0 4px",
-  background: "var(--aqb-surface-4)",
-  border: "1px solid var(--aqb-border-light, rgba(255,255,255,0.12))",
-  borderRadius: "var(--aqb-radius-md)",
-  boxShadow: "var(--aqb-shadow-md)",
+  background: "var(--buildrick-surface-4)",
+  border: "1px solid var(--buildrick-border-light, rgba(255,255,255,0.12))",
+  borderRadius: "var(--buildrick-design-radius-md)",
+  boxShadow: "var(--buildrick-design-shadow-md)",
   backdropFilter: "blur(8px)",
   gap: 2,
 };
@@ -138,46 +138,46 @@ export const menuDividerStyles: React.CSSProperties = {
 
 // Inject global hover/focus styles via CSS using design tokens
 const styleSheet = `
-.aqb-unified-toolbar button:hover {
+.buildrick-unified-toolbar button:hover {
   background: ${colors.surface.border} !important;
   color: ${colors.text.primary} !important;
 }
-.aqb-unified-toolbar button:active {
+.buildrick-unified-toolbar button:active {
   transform: scale(0.95);
 }
-.aqb-unified-toolbar button:focus-visible {
+.buildrick-unified-toolbar button:focus-visible {
   outline: 2px solid ${colors.primary.default} !important;
   outline-offset: 1px;
   background: ${colors.primary.alpha10} !important;
 }
-.aqb-unified-toolbar button[aria-label="Delete element"] {
+.buildrick-unified-toolbar button[aria-label="Delete element"] {
   color: ${colors.text.muted};
 }
-.aqb-unified-toolbar button[aria-label="Delete element"]:hover {
+.buildrick-unified-toolbar button[aria-label="Delete element"]:hover {
   background: ${colors.status.errorBg} !important;
   color: ${colors.status.error} !important;
 }
-.aqb-unified-toolbar button[aria-label="Delete element"]:focus-visible {
+.buildrick-unified-toolbar button[aria-label="Delete element"]:focus-visible {
   outline-color: ${colors.status.error} !important;
 }
 /* Dropdown menu keyboard navigation */
-.aqb-unified-toolbar [role="menu"] button:focus-visible {
+.buildrick-unified-toolbar [role="menu"] button:focus-visible {
   background: ${colors.surface.border} !important;
   outline: none;
 }
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-  .aqb-unified-toolbar button:active {
+  .buildrick-unified-toolbar button:active {
     transform: none;
   }
 }
 `;
 
 if (typeof document !== "undefined") {
-  const existingStyle = document.getElementById("aqb-unified-toolbar-styles");
+  const existingStyle = document.getElementById("buildrick-unified-toolbar-styles");
   if (!existingStyle) {
     const style = document.createElement("style");
-    style.id = "aqb-unified-toolbar-styles";
+    style.id = "buildrick-unified-toolbar-styles";
     style.textContent = styleSheet;
     document.head.appendChild(style);
   }

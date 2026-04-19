@@ -84,7 +84,7 @@ export function useCanvasDOM(options: UseCanvasDOMOptions): UseCanvasDOMResult {
       }
 
       // Query and cache
-      const element = canvasRef.current.querySelector<HTMLElement>(`[data-aqb-id="${id}"]`);
+      const element = canvasRef.current.querySelector<HTMLElement>(`[data-buildrick-id="${id}"]`);
       elementCache.current.set(id, element);
 
       return element;
@@ -110,9 +110,9 @@ export function useCanvasDOM(options: UseCanvasDOMOptions): UseCanvasDOMResult {
       return {
         element,
         id,
-        type: element.getAttribute("data-aqb-type"),
+        type: element.getAttribute("data-buildrick-type"),
         rect,
-        isRoot: element.hasAttribute("data-aqb-root"),
+        isRoot: element.hasAttribute("data-buildrick-root"),
       };
     },
     [getElement]
@@ -128,7 +128,7 @@ export function useCanvasDOM(options: UseCanvasDOMOptions): UseCanvasDOMResult {
       if (!elementAtPoint) return null;
 
       // Find closest aquibra element
-      const aqbElement = elementAtPoint.closest<HTMLElement>("[data-aqb-id]");
+      const aqbElement = elementAtPoint.closest<HTMLElement>("[data-buildrick-id]");
 
       // Verify it's within our canvas
       if (aqbElement && canvasRef.current?.contains(aqbElement)) {
@@ -156,8 +156,8 @@ export function useCanvasDOM(options: UseCanvasDOMOptions): UseCanvasDOMResult {
     if (!canvasRef.current) return null;
 
     return (
-      canvasRef.current.querySelector<HTMLElement>(".aqb-canvas") ??
-      canvasRef.current.querySelector<HTMLElement>("[data-aqb-root]") ??
+      canvasRef.current.querySelector<HTMLElement>(".buildrick-canvas") ??
+      canvasRef.current.querySelector<HTMLElement>("[data-buildrick-root]") ??
       canvasRef.current
     );
   }, [canvasRef]);
@@ -177,14 +177,14 @@ export function useCanvasDOM(options: UseCanvasDOMOptions): UseCanvasDOMResult {
     if (!parent) return null;
 
     // Find closest aquibra parent
-    return parent.closest<HTMLElement>("[data-aqb-id]");
+    return parent.closest<HTMLElement>("[data-buildrick-id]");
   }, []);
 
   /**
    * Get direct children that are aquibra elements
    */
   const getChildElements = useCallback((element: HTMLElement): HTMLElement[] => {
-    return Array.from(element.querySelectorAll<HTMLElement>(":scope > [data-aqb-id]"));
+    return Array.from(element.querySelectorAll<HTMLElement>(":scope > [data-buildrick-id]"));
   }, []);
 
   /**

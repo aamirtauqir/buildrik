@@ -100,14 +100,14 @@ export function useLayerSelection(
 
   const handleLayerMouseEnter = React.useCallback((id: string) => {
     setHoveredLayerId(id);
-    const el = document.querySelector(`[data-aqb-id="${id}"]`) as HTMLElement | null;
-    if (el) el.classList.add("aqb-layer-hover-highlight");
+    const el = document.querySelector(`[data-buildrick-id="${id}"]`) as HTMLElement | null;
+    if (el) el.classList.add("buildrick-layer-hover-highlight");
   }, []);
 
   const handleLayerMouseLeave = React.useCallback(() => {
     if (hoveredLayerId) {
-      const el = document.querySelector(`[data-aqb-id="${hoveredLayerId}"]`) as HTMLElement | null;
-      if (el) el.classList.remove("aqb-layer-hover-highlight");
+      const el = document.querySelector(`[data-buildrick-id="${hoveredLayerId}"]`) as HTMLElement | null;
+      if (el) el.classList.remove("buildrick-layer-hover-highlight");
     }
     setHoveredLayerId(null);
   }, [hoveredLayerId]);

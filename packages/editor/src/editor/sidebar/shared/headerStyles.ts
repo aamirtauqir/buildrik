@@ -22,10 +22,10 @@ export const actionsContainerStyles: React.CSSProperties = {
  */
 export const titleStyles: React.CSSProperties = {
   margin: 0,
-  fontSize: "var(--aqb-text-md)",
+  fontSize: "var(--buildrick-text-md)",
   fontWeight: 600,
   lineHeight: "20px",
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
   letterSpacing: "-0.01em",
 };
 
@@ -39,8 +39,8 @@ export const headerContainerStyles: React.CSSProperties = {
   height: 48,
   minHeight: 48,
   padding: "0 10px 0 12px",
-  borderBottom: "1px solid var(--aqb-border)",
-  background: "var(--aqb-surface-2)",
+  borderBottom: "1px solid var(--buildrick-border)",
+  background: "var(--buildrick-surface-2)",
 };
 
 /**
@@ -52,6 +52,6 @@ export const drillInHeaderContainerStyles: React.CSSProperties = {
   justifyContent: "space-between",
   minHeight: 48,
   padding: "8px 10px 8px 12px",
-  borderBottom: "1px solid var(--aqb-border)",
-  background: "var(--aqb-surface-2)",
+  borderBottom: "1px solid var(--buildrick-border)",
+  background: "var(--buildrick-surface-2)",
 };

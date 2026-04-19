@@ -26,15 +26,15 @@ export function InfoBanner({ children, dismissible, onDismiss, className }: Info
         alignItems: "flex-start",
         gap: 8,
         padding: "10px 12px",
-        background: "var(--aqb-info-light, rgba(59, 130, 246, 0.12))",
-        borderLeft: "3px solid var(--aqb-info, #3b82f6)",
+        background: "var(--buildrick-info-light, rgba(59, 130, 246, 0.12))",
+        borderLeft: "3px solid var(--buildrick-info, #3b82f6)",
         borderRadius: "0 6px 6px 0",
       }}
     >
       <Info
         size={16}
         aria-hidden="true"
-        style={{ flexShrink: 0, marginTop: 1, color: "var(--aqb-info, #3b82f6)" }}
+        style={{ flexShrink: 0, marginTop: 1, color: "var(--buildrick-info, #3b82f6)" }}
       />
       <span
         style={{
@@ -42,7 +42,7 @@ export function InfoBanner({ children, dismissible, onDismiss, className }: Info
           fontSize: 13,
           fontWeight: 400,
           lineHeight: 1.5,
-          color: "var(--aqb-text-secondary)",
+          color: "var(--buildrick-text-secondary)",
         }}
       >
         {children}
@@ -60,7 +60,7 @@ export function InfoBanner({ children, dismissible, onDismiss, className }: Info
             padding: 0,
             background: "transparent",
             border: "none",
-            color: "var(--aqb-text-muted)",
+            color: "var(--buildrick-text-muted)",
             cursor: "pointer",
             flexShrink: 0,
           }}
@@ -94,14 +94,14 @@ export function Tip({ children, className }: TipProps) {
       <Lightbulb
         size={14}
         aria-hidden="true"
-        style={{ flexShrink: 0, marginTop: 1, color: "var(--aqb-text-disabled, #6b6963)" }}
+        style={{ flexShrink: 0, marginTop: 1, color: "var(--buildrick-text-disabled, #6b6963)" }}
       />
       <span
         style={{
           fontSize: 12,
           fontWeight: 400,
           lineHeight: 1.5,
-          color: "var(--aqb-text-muted)",
+          color: "var(--buildrick-text-muted)",
         }}
       >
         {children}
@@ -129,15 +129,15 @@ export function WarningBanner({ children, dismissible, onDismiss, className }: W
         alignItems: "flex-start",
         gap: 8,
         padding: "10px 12px",
-        background: "var(--aqb-warning-light, rgba(245, 158, 11, 0.12))",
-        borderLeft: "3px solid var(--aqb-warning, #f59e0b)",
+        background: "var(--buildrick-warning-light, rgba(245, 158, 11, 0.12))",
+        borderLeft: "3px solid var(--buildrick-warning, #f59e0b)",
         borderRadius: "0 6px 6px 0",
       }}
     >
       <AlertTriangle
         size={16}
         aria-hidden="true"
-        style={{ flexShrink: 0, marginTop: 1, color: "var(--aqb-warning, #f59e0b)" }}
+        style={{ flexShrink: 0, marginTop: 1, color: "var(--buildrick-warning, #f59e0b)" }}
       />
       <span
         style={{
@@ -145,7 +145,7 @@ export function WarningBanner({ children, dismissible, onDismiss, className }: W
           fontSize: 13,
           fontWeight: 400,
           lineHeight: 1.5,
-          color: "var(--aqb-text-secondary)",
+          color: "var(--buildrick-text-secondary)",
         }}
       >
         {children}
@@ -163,7 +163,7 @@ export function WarningBanner({ children, dismissible, onDismiss, className }: W
             padding: 0,
             background: "transparent",
             border: "none",
-            color: "var(--aqb-text-muted)",
+            color: "var(--buildrick-text-muted)",
             cursor: "pointer",
             flexShrink: 0,
           }}

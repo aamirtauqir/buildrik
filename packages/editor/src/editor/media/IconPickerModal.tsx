@@ -36,7 +36,7 @@ export interface IconPickerModalProps {
 // Constants
 // ============================================
 
-const RECENT_ICONS_KEY = "aqb-recent-icons";
+const RECENT_ICONS_KEY = "buildrick-recent-icons";
 const MAX_RECENT_ICONS = 12;
 
 // ============================================
@@ -57,7 +57,7 @@ const styles = {
   },
   iconCount: {
     fontSize: 12,
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
   },
   toolbar: {
     display: "flex",
@@ -72,27 +72,27 @@ const styles = {
     gap: 4,
     flexWrap: "wrap" as const,
     paddingBottom: 12,
-    borderBottom: "1px solid var(--aqb-border)",
+    borderBottom: "1px solid var(--buildrick-border)",
   },
   categoryBtn: {
     padding: "4px 10px",
     fontSize: 12,
-    border: "1px solid var(--aqb-border)",
+    border: "1px solid var(--buildrick-border)",
     borderRadius: 16,
     background: "transparent",
-    color: "var(--aqb-text-secondary)",
+    color: "var(--buildrick-text-secondary)",
     cursor: "pointer",
     transition: "all 0.15s ease",
   },
   categoryBtnActive: {
-    background: "var(--aqb-primary)",
-    borderColor: "var(--aqb-primary)",
+    background: "var(--buildrick-accent)",
+    borderColor: "var(--buildrick-accent)",
     color: "#fff",
   },
   sectionTitle: {
     fontSize: 12,
     fontWeight: 600,
-    color: "var(--aqb-text-secondary)",
+    color: "var(--buildrick-text-secondary)",
     textTransform: "uppercase" as const,
     letterSpacing: "0.5px",
     marginBottom: 8,
@@ -111,19 +111,19 @@ const styles = {
     justifyContent: "center",
     width: 48,
     height: 48,
-    border: "1px solid var(--aqb-border)",
+    border: "1px solid var(--buildrick-border)",
     borderRadius: 8,
-    background: "var(--aqb-bg-panel)",
+    background: "var(--buildrick-bg-panel)",
     cursor: "pointer",
     transition: "all 0.15s ease",
-    color: "var(--aqb-text)",
+    color: "var(--buildrick-text)",
   },
   iconBtnHover: {
     background: "rgba(99, 102, 241, 0.1)",
     borderColor: "rgba(99, 102, 241, 0.3)",
   },
   iconBtnSelected: {
-    border: "2px solid var(--aqb-primary)",
+    border: "2px solid var(--buildrick-accent)",
     background: "rgba(99, 102, 241, 0.15)",
   },
   preview: {
@@ -131,7 +131,7 @@ const styles = {
     alignItems: "center",
     gap: 16,
     padding: 16,
-    background: "var(--aqb-bg-panel-secondary)",
+    background: "var(--buildrick-bg-panel-secondary)",
     borderRadius: 8,
   },
   previewIcon: {
@@ -140,9 +140,9 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "var(--aqb-bg-panel)",
+    background: "var(--buildrick-bg-panel)",
     borderRadius: 8,
-    border: "1px solid var(--aqb-border)",
+    border: "1px solid var(--buildrick-border)",
   },
   previewInfo: {
     flex: 1,
@@ -154,7 +154,7 @@ const styles = {
   },
   previewTags: {
     fontSize: 12,
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
   },
   controls: {
     display: "flex",
@@ -168,16 +168,16 @@ const styles = {
   },
   controlLabel: {
     fontSize: 12,
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
     textTransform: "uppercase" as const,
   },
   sizeInput: {
     width: 60,
     padding: "6px 8px",
     borderRadius: 6,
-    border: "1px solid var(--aqb-border)",
-    background: "var(--aqb-bg-panel)",
-    color: "var(--aqb-text)",
+    border: "1px solid var(--buildrick-border)",
+    background: "var(--buildrick-bg-panel)",
+    color: "var(--buildrick-text)",
     fontSize: 12,
     textAlign: "center" as const,
   },
@@ -185,7 +185,7 @@ const styles = {
     width: 40,
     height: 32,
     borderRadius: 6,
-    border: "1px solid var(--aqb-border)",
+    border: "1px solid var(--buildrick-border)",
     cursor: "pointer",
     padding: 2,
   },
@@ -193,9 +193,9 @@ const styles = {
     width: 60,
     padding: "6px 8px",
     borderRadius: 6,
-    border: "1px solid var(--aqb-border)",
-    background: "var(--aqb-bg-panel)",
-    color: "var(--aqb-text)",
+    border: "1px solid var(--buildrick-border)",
+    background: "var(--buildrick-bg-panel)",
+    color: "var(--buildrick-text)",
     fontSize: 12,
   },
   footer: {
@@ -203,12 +203,12 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center",
     paddingTop: 16,
-    borderTop: "1px solid var(--aqb-border)",
+    borderTop: "1px solid var(--buildrick-border)",
   },
   noResults: {
     padding: 40,
     textAlign: "center" as const,
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
   },
 };
 
@@ -477,7 +477,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
 
         {/* Footer */}
         <div style={styles.footer}>
-          <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>
+          <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
             Powered by Lucide Icons
           </span>
           <div style={{ display: "flex", gap: 8 }}>

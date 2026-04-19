@@ -17,20 +17,20 @@ const cardStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 10,
   padding: "10px 12px",
-  background: "var(--aqb-surface-3)",
-  borderRadius: "var(--aqb-radius-md)",
+  background: "var(--buildrick-surface-3)",
+  borderRadius: "var(--buildrick-design-radius-md)",
   marginBottom: 6,
 };
 
 const nameStyles: React.CSSProperties = {
-  fontSize: "var(--aqb-font-sm)",
+  fontSize: "var(--buildrick-font-sm)",
   fontWeight: 500,
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
 };
 
 const descStyles: React.CSSProperties = {
-  fontSize: "var(--aqb-font-xs)",
-  color: "var(--aqb-text-muted)",
+  fontSize: "var(--buildrick-font-xs)",
+  color: "var(--buildrick-text-muted)",
   marginTop: 2,
 };
 
@@ -39,32 +39,32 @@ const badgeStyles: React.CSSProperties = {
   fontWeight: 600,
   padding: "2px 6px",
   borderRadius: 4,
-  background: "var(--aqb-surface-4)",
-  color: "var(--aqb-text-muted)",
+  background: "var(--buildrick-surface-4)",
+  color: "var(--buildrick-text-muted)",
   whiteSpace: "nowrap",
 };
 
 const learnBtnStyles: React.CSSProperties = {
-  fontSize: "var(--aqb-font-xs)",
+  fontSize: "var(--buildrick-font-xs)",
   fontWeight: 500,
   padding: "4px 10px",
-  borderRadius: "var(--aqb-radius-sm)",
-  border: "1px solid var(--aqb-border)",
+  borderRadius: "var(--buildrick-design-radius-sm)",
+  border: "1px solid var(--buildrick-border)",
   background: "transparent",
-  color: "var(--aqb-primary)",
+  color: "var(--buildrick-accent)",
   cursor: "pointer",
   whiteSpace: "nowrap",
 };
 
 const hintStyles: React.CSSProperties = {
-  fontSize: "var(--aqb-font-xs)",
-  color: "var(--aqb-text-muted)",
+  fontSize: "var(--buildrick-font-xs)",
+  color: "var(--buildrick-text-muted)",
   padding: "8px 12px 0",
   lineHeight: 1.4,
 };
 
 export const IntegrationsScreen: React.FC<ScreenProps> = () => (
-  <div className="aqb-st-screen">
+  <div className="buildrick-st-screen">
     <p style={hintStyles}>
       Connect third-party services to extend your site. Integrations require publishing your site
       first.

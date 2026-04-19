@@ -131,10 +131,10 @@ const triggerStyles: React.CSSProperties = {
   gap: 8,
   height: 28,
   padding: "0 10px",
-  background: "var(--aqb-surface-3)",
-  border: "1px solid var(--aqb-border)",
-  borderRadius: "var(--aqb-radius-md)",
-  color: "var(--aqb-text-primary)",
+  background: "var(--buildrick-surface-3)",
+  border: "1px solid var(--buildrick-border)",
+  borderRadius: "var(--buildrick-design-radius-md)",
+  color: "var(--buildrick-text-primary)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
@@ -143,8 +143,8 @@ const triggerStyles: React.CSSProperties = {
 };
 
 const triggerOpenStyles: React.CSSProperties = {
-  background: "var(--aqb-surface-4)",
-  borderColor: "var(--aqb-border-hover)",
+  background: "var(--buildrick-surface-4)",
+  borderColor: "var(--buildrick-border-hover)",
 };
 
 const labelStyles: React.CSSProperties = {
@@ -154,18 +154,18 @@ const labelStyles: React.CSSProperties = {
 };
 
 const labelPrefixStyles: React.CSSProperties = {
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   fontWeight: 400,
 };
 
 const labelValueStyles: React.CSSProperties = {
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
 };
 
 const iconWrapStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
 };
 
 const dropdownStyles: React.CSSProperties = {
@@ -175,11 +175,11 @@ const dropdownStyles: React.CSSProperties = {
   right: 0,
   minWidth: 140,
   padding: 4,
-  background: "var(--aqb-surface-3)",
-  border: "1px solid var(--aqb-border)",
-  borderRadius: "var(--aqb-radius-md)",
-  boxShadow: "var(--aqb-shadow-lg)",
-  zIndex: "var(--aqb-z-dropdown)",
+  background: "var(--buildrick-surface-3)",
+  border: "1px solid var(--buildrick-border)",
+  borderRadius: "var(--buildrick-design-radius-md)",
+  boxShadow: "var(--buildrick-design-shadow-lg)",
+  zIndex: "var(--buildrick-z-dropdown)",
 };
 
 const optionStyles: React.CSSProperties = {
@@ -190,8 +190,8 @@ const optionStyles: React.CSSProperties = {
   padding: "8px 10px",
   background: "transparent",
   border: "none",
-  borderRadius: "var(--aqb-radius-sm)",
-  color: "var(--aqb-text-primary)",
+  borderRadius: "var(--buildrick-design-radius-sm)",
+  color: "var(--buildrick-text-primary)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
@@ -200,14 +200,14 @@ const optionStyles: React.CSSProperties = {
 };
 
 const optionSelectedStyles: React.CSSProperties = {
-  background: "var(--aqb-primary-subtle)",
-  color: "var(--aqb-primary)",
+  background: "var(--buildrick-accent-tint)",
+  color: "var(--buildrick-accent)",
 };
 
 const optionIconStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
 };
 
 export default ViewSwitcher;

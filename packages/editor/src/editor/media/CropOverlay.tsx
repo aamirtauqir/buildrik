@@ -72,15 +72,15 @@ const styles: Record<string, React.CSSProperties> = {
   presetBtn: {
     padding: "4px 10px",
     fontSize: 12,
-    background: "var(--aqb-bg-panel-secondary)",
-    border: "1px solid var(--aqb-border)",
+    background: "var(--buildrick-bg-panel-secondary)",
+    border: "1px solid var(--buildrick-border)",
     borderRadius: 4,
-    color: "var(--aqb-text)",
+    color: "var(--buildrick-text)",
     cursor: "pointer",
   },
   presetBtnActive: {
-    background: "var(--aqb-primary)",
-    borderColor: "var(--aqb-primary)",
+    background: "var(--buildrick-accent)",
+    borderColor: "var(--buildrick-accent)",
     color: "#fff",
   },
 };

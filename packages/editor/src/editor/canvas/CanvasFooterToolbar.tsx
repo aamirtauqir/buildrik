@@ -123,17 +123,17 @@ const OverlayButton: React.FC<OverlayButtonProps> = ({
         height: "28px",
         fontSize: "11px",
         fontWeight: 500,
-        color: active ? "var(--aqb-text-primary)" : "var(--aqb-text-secondary)",
-        background: active ? "var(--aqb-surface-3)" : "transparent",
-        border: active ? "1px solid var(--aqb-border-active)" : "1px solid transparent",
-        borderRadius: "var(--aqb-radius-sm)",
+        color: active ? "var(--buildrick-text-primary)" : "var(--buildrick-text-secondary)",
+        background: active ? "var(--buildrick-surface-3)" : "transparent",
+        border: active ? "1px solid var(--buildrick-accent)" : "1px solid transparent",
+        borderRadius: "var(--buildrick-design-radius-sm)",
         cursor: "pointer",
         transition: "all 0.15s ease",
       }}
     >
       <span style={{ display: "flex", opacity: active ? 1 : 0.7 }}>{icon}</span>
       <span>{label}</span>
-      {active && <span style={{ marginLeft: "2px", color: "var(--aqb-accent-primary)" }}>✓</span>}
+      {active && <span style={{ marginLeft: "2px", color: "var(--buildrick-accent)" }}>✓</span>}
     </button>
   </Tooltip>
 );
@@ -261,11 +261,11 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                 }}
                 style={{
                   ...presetItemStyles,
-                  background: Math.round(zoom) === preset ? "var(--aqb-surface-3)" : "transparent",
+                  background: Math.round(zoom) === preset ? "var(--buildrick-surface-3)" : "transparent",
                   color:
                     Math.round(zoom) === preset
-                      ? "var(--aqb-text-primary)"
-                      : "var(--aqb-text-secondary)",
+                      ? "var(--buildrick-text-primary)"
+                      : "var(--buildrick-text-secondary)",
                 }}
               >
                 {preset}%
@@ -321,9 +321,9 @@ const containerStyles: React.CSSProperties = {
   gap: "12px",
   padding: "8px 16px",        /* PRD §10.7: 8px padding */
   height: "40px",
-  background: "var(--aqb-surface-3)",           /* PRD §10.7: surface-3 bg */
-  border: "1px solid var(--aqb-border)",        /* PRD §10.7: all-sides border */
-  borderRadius: "var(--aqb-radius-lg)",         /* PRD §10.7: lg corner radius */
+  background: "var(--buildrick-surface-3)",           /* PRD §10.7: surface-3 bg */
+  border: "1px solid var(--buildrick-border)",        /* PRD §10.7: all-sides border */
+  borderRadius: "var(--buildrick-design-radius-lg)",         /* PRD §10.7: lg corner radius */
   boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
   whiteSpace: "nowrap" as const,
 };
@@ -337,7 +337,7 @@ const overlaysGroupStyles: React.CSSProperties = {
 const dividerStyles: React.CSSProperties = {
   width: "1px",
   height: "20px",
-  background: "var(--aqb-border)",
+  background: "var(--buildrick-border)",
   margin: "0 4px",
 };
 
@@ -345,8 +345,8 @@ const zoomGroupStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: "2px",
-  background: "var(--aqb-surface-2)",
-  borderRadius: "var(--aqb-radius-sm)",
+  background: "var(--buildrick-surface-2)",
+  borderRadius: "var(--buildrick-design-radius-sm)",
   padding: "2px",
 };
 
@@ -358,10 +358,10 @@ const zoomBtnStyles: React.CSSProperties = {
   height: "24px",
   fontSize: "14px",
   fontWeight: 500,
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   background: "transparent",
   border: "none",
-  borderRadius: "var(--aqb-radius-sm)",
+  borderRadius: "var(--buildrick-design-radius-sm)",
   cursor: "pointer",
   transition: "all 0.15s ease",
 };
@@ -374,7 +374,7 @@ const zoomPctStyles: React.CSSProperties = {
   height: "24px",
   fontSize: "11px",
   fontWeight: 600,
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
   background: "transparent",
   border: "none",
   cursor: "pointer",
@@ -388,9 +388,9 @@ const presetsDropdownStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   padding: "4px",
-  background: "var(--aqb-surface-2)",
-  border: "1px solid var(--aqb-border)",
-  borderRadius: "var(--aqb-radius-md)",
+  background: "var(--buildrick-surface-2)",
+  border: "1px solid var(--buildrick-border)",
+  borderRadius: "var(--buildrick-design-radius-md)",
   boxShadow: "0 4px 16px rgba(0, 0, 0, 0.35)",
   zIndex: 500,
   minWidth: "100px",
@@ -399,8 +399,8 @@ const presetsDropdownStyles: React.CSSProperties = {
 const presetItemStyles: React.CSSProperties = {
   padding: "5px 12px",
   border: "none",
-  borderRadius: "var(--aqb-radius-sm)",
-  color: "var(--aqb-text-secondary)",
+  borderRadius: "var(--buildrick-design-radius-sm)",
+  color: "var(--buildrick-text-secondary)",
   fontSize: "12px",
   fontWeight: 500,
   cursor: "pointer",
@@ -411,7 +411,7 @@ const presetItemStyles: React.CSSProperties = {
 
 const presetDividerStyles: React.CSSProperties = {
   height: "1px",
-  background: "var(--aqb-border)",
+  background: "var(--buildrick-border)",
   margin: "4px 0",
 };
 

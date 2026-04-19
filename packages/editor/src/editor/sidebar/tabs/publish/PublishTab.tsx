@@ -54,14 +54,14 @@ const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
       alignItems: "center",
       gap: 6,
       padding: "4px 10px",
-      borderRadius: "var(--aqb-radius-full, 999px)",
-      fontSize: "var(--aqb-text-xs, 12px)",
+      borderRadius: "var(--buildrick-design-radius-full, 999px)",
+      fontSize: "var(--buildrick-text-xs, 12px)",
       fontWeight: 600,
       letterSpacing: "0.02em",
       background: isPublished
-        ? "var(--aqb-success-light, rgba(34, 197, 94, 0.12))"
+        ? "var(--buildrick-success-light, rgba(34, 197, 94, 0.12))"
         : "rgba(245, 158, 11, 0.15)",
-      color: isPublished ? "var(--aqb-success, #22c55e)" : "#F59E0B",
+      color: isPublished ? "var(--buildrick-success, #22c55e)" : "#F59E0B",
     }}
   >
     <span
@@ -70,7 +70,7 @@ const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
         height: 6,
         borderRadius: "50%",
         background: isPublished
-          ? "var(--aqb-success, #22c55e)"
+          ? "var(--buildrick-success, #22c55e)"
           : "#F59E0B",
       }}
     />
@@ -92,7 +92,7 @@ const ChecklistItem: React.FC<{
       padding: "6px 8px",
       borderRadius: 6,
       background: ok ? "rgba(34,197,94,0.06)" : "rgba(255,255,255,0.02)",
-      border: `1px solid ${ok ? "rgba(34,197,94,0.15)" : "var(--aqb-border-light, var(--aqb-border))"}`,
+      border: `1px solid ${ok ? "rgba(34,197,94,0.15)" : "var(--buildrick-border-light, var(--buildrick-border))"}`,
       fontSize: 13,
     }}
     aria-label={`${label}: ${ok ? "complete" : "incomplete"}`}
@@ -102,12 +102,12 @@ const ChecklistItem: React.FC<{
       style={{
         width: 16,
         height: 16,
-        borderRadius: "var(--aqb-radius-sm, 4px)",
+        borderRadius: "var(--buildrick-design-radius-sm, 4px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: ok ? "var(--aqb-success, #22c55e)" : "transparent",
-        border: ok ? "none" : "1px solid var(--aqb-border-light, var(--aqb-border))",
+        background: ok ? "var(--buildrick-success, #22c55e)" : "transparent",
+        border: ok ? "none" : "1px solid var(--buildrick-border-light, var(--buildrick-border))",
         flexShrink: 0,
         transition: "background 0.15s",
       }}
@@ -122,7 +122,7 @@ const ChecklistItem: React.FC<{
     <span
       style={{
         flex: 1,
-        color: ok ? "var(--aqb-text-muted)" : "var(--aqb-text-secondary)",
+        color: ok ? "var(--buildrick-text-muted)" : "var(--buildrick-text-secondary)",
         textDecoration: ok ? "line-through" : "none",
         fontSize: 13,
       }}
@@ -133,7 +133,7 @@ const ChecklistItem: React.FC<{
       <span style={{ fontSize: 12, color: "#ef4444", fontWeight: 500 }}>Required</span>
     )}
     {hint && !ok && (
-      <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>{hint}</span>
+      <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>{hint}</span>
     )}
   </div>
 );
@@ -315,7 +315,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         onClose={onClose}
       />
 
-      <div className="aqb-scrollbar" style={contentStyles}>
+      <div className="buildrick-scrollbar" style={contentStyles}>
         {/* Status Section */}
         <section style={sectionStyles}>
           <div style={sectionHeaderStyles}>
@@ -356,14 +356,14 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </div>
           {projectId && (
             <p style={{ ...metaTextStyles, marginTop: 4 }}>
-              Publishing to <strong style={{ color: "var(--aqb-text-primary)" }}>buildrik.app/{projectId}</strong>
+              Publishing to <strong style={{ color: "var(--buildrick-text-primary)" }}>buildrik.app/{projectId}</strong>
             </p>
           )}
         </section>
 
         {/* Trust signal */}
         <div style={trustBadgeStyles}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" style={{ flexShrink: 0, color: "var(--aqb-success, #22c55e)" }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" style={{ flexShrink: 0, color: "var(--buildrick-success, #22c55e)" }}>
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
           <span>Your site data is encrypted and stored securely.</span>
@@ -376,9 +376,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
               padding: "12px",
               background: "rgba(245, 158, 11, 0.08)",
               border: "1px solid rgba(245, 158, 11, 0.2)",
-              borderRadius: "var(--aqb-radius-md, 8px)",
+              borderRadius: "var(--buildrick-design-radius-md, 8px)",
               fontSize: 12,
-              color: "var(--aqb-text-secondary)",
+              color: "var(--buildrick-text-secondary)",
               lineHeight: 1.5,
             }}>
               Publishing not configured. Contact your administrator to link this project.
@@ -491,7 +491,7 @@ const RocketIcon: React.FC = () => (
     height="20"
     viewBox="0 0 24 24"
     fill="none"
-    stroke="var(--aqb-primary, #6366f1)"
+    stroke="var(--buildrick-accent, #6366f1)"
     strokeWidth="1.5"
     style={{ flexShrink: 0, marginTop: 2 }}
     aria-hidden="true"
@@ -511,7 +511,7 @@ const containerStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   height: "100%",
-  background: "var(--aqb-surface-1)",
+  background: "var(--buildrick-surface-1)",
 };
 
 const contentStyles: React.CSSProperties = {
@@ -528,9 +528,9 @@ const sectionStyles: React.CSSProperties = {
   flexDirection: "column",
   gap: 8,
   padding: 12,
-  background: "var(--aqb-surface-2)",
-  borderRadius: "var(--aqb-radius-md, 8px)",
-  border: "1px solid var(--aqb-border)",
+  background: "var(--buildrick-surface-2)",
+  borderRadius: "var(--buildrick-design-radius-md, 8px)",
+  border: "1px solid var(--buildrick-border)",
 };
 
 const sectionHeaderStyles: React.CSSProperties = {
@@ -541,21 +541,21 @@ const sectionHeaderStyles: React.CSSProperties = {
 
 const sectionTitleStyles: React.CSSProperties = {
   margin: 0,
-  fontSize: "var(--aqb-text-sm, 13px)",
+  fontSize: "var(--buildrick-text-sm, 13px)",
   fontWeight: 600,
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
 };
 
 const metaTextStyles: React.CSSProperties = {
   margin: 0,
-  fontSize: "var(--aqb-text-xs, 12px)",
-  color: "var(--aqb-text-muted)",
+  fontSize: "var(--buildrick-text-xs, 12px)",
+  color: "var(--buildrick-text-muted)",
 };
 
 const labelStyles: React.CSSProperties = {
-  fontSize: "var(--aqb-text-xs, 12px)",
+  fontSize: "var(--buildrick-text-xs, 12px)",
   fontWeight: 500,
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   marginBottom: 4,
 };
 
@@ -569,15 +569,15 @@ const urlRowStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 6,
   padding: "6px 8px",
-  background: "var(--aqb-surface-3)",
-  borderRadius: "var(--aqb-radius-sm, 4px)",
-  border: "1px solid var(--aqb-border)",
+  background: "var(--buildrick-surface-3)",
+  borderRadius: "var(--buildrick-design-radius-sm, 4px)",
+  border: "1px solid var(--buildrick-border)",
 };
 
 const urlLinkStyles: React.CSSProperties = {
   flex: 1,
-  fontSize: "var(--aqb-text-xs, 12px)",
-  color: "var(--aqb-primary)",
+  fontSize: "var(--buildrick-text-xs, 12px)",
+  color: "var(--buildrick-accent)",
   textDecoration: "none",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -593,8 +593,8 @@ const copyButtonStyles: React.CSSProperties = {
   padding: 0,
   background: "transparent",
   border: "none",
-  borderRadius: "var(--aqb-radius-sm, 4px)",
-  color: "var(--aqb-text-secondary)",
+  borderRadius: "var(--buildrick-design-radius-sm, 4px)",
+  color: "var(--buildrick-text-secondary)",
   cursor: "pointer",
   flexShrink: 0,
 };
@@ -608,7 +608,7 @@ const actionRowStyles: React.CSSProperties = {
 const disabledReasonStyles: React.CSSProperties = {
   margin: 0,
   fontSize: 11,
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
   lineHeight: 1.4,
 };
 
@@ -616,23 +616,23 @@ const infoSectionStyles: React.CSSProperties = {
   display: "flex",
   gap: 12,
   padding: 12,
-  background: "var(--aqb-primary-subtle, rgba(99, 102, 241, 0.06))",
-  borderRadius: "var(--aqb-radius-md, 8px)",
-  border: "1px solid var(--aqb-primary-light, rgba(99, 102, 241, 0.12))",
+  background: "var(--buildrick-accent-tint, rgba(99, 102, 241, 0.06))",
+  borderRadius: "var(--buildrick-design-radius-md, 8px)",
+  border: "1px solid var(--buildrick-accent-subtle, rgba(99, 102, 241, 0.12))",
 };
 
 const infoTitleStyles: React.CSSProperties = {
   margin: 0,
-  fontSize: "var(--aqb-text-sm, 13px)",
+  fontSize: "var(--buildrick-text-sm, 13px)",
   fontWeight: 600,
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
 };
 
 const infoDescStyles: React.CSSProperties = {
   margin: "4px 0 0",
-  fontSize: "var(--aqb-text-xs, 12px)",
+  fontSize: "var(--buildrick-text-xs, 12px)",
   lineHeight: 1.5,
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
 };
 
 const errorStyles: React.CSSProperties = {
@@ -641,11 +641,11 @@ const errorStyles: React.CSSProperties = {
   justifyContent: "space-between",
   gap: 8,
   padding: "8px 12px",
-  background: "var(--aqb-error-light, rgba(239, 68, 68, 0.1))",
-  borderRadius: "var(--aqb-radius-md, 8px)",
-  border: "1px solid var(--aqb-error-light, rgba(239, 68, 68, 0.2))",
-  color: "var(--aqb-error, #ef4444)",
-  fontSize: "var(--aqb-text-xs, 12px)",
+  background: "var(--buildrick-error-light, rgba(239, 68, 68, 0.1))",
+  borderRadius: "var(--buildrick-design-radius-md, 8px)",
+  border: "1px solid var(--buildrick-error-light, rgba(239, 68, 68, 0.2))",
+  color: "var(--buildrick-error, #ef4444)",
+  fontSize: "var(--buildrick-text-xs, 12px)",
 };
 
 const errorDismissStyles: React.CSSProperties = {
@@ -668,24 +668,24 @@ const trustBadgeStyles: React.CSSProperties = {
   gap: 6,
   padding: "7px 10px",
   background: "rgba(34, 197, 94, 0.06)",
-  borderRadius: "var(--aqb-radius-md, 8px)",
+  borderRadius: "var(--buildrick-design-radius-md, 8px)",
   border: "1px solid rgba(34, 197, 94, 0.15)",
   fontSize: 12,
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
   lineHeight: 1.4,
 };
 
 const privacyFooterStyles: React.CSSProperties = {
   padding: "10px 16px",
-  borderTop: "1px solid var(--aqb-border)",
+  borderTop: "1px solid var(--buildrick-border)",
   fontSize: 12,
   lineHeight: 1.5,
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
   textAlign: "center",
 };
 
 const privacyLinkStyles: React.CSSProperties = {
-  color: "var(--aqb-primary, #3b82f6)",
+  color: "var(--buildrick-accent, #3b82f6)",
   textDecoration: "none",
 };
 

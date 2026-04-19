@@ -46,7 +46,7 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
 }) => (
   <div
     className={[
-      "aqb-component-row comp-row",
+      "buildrick-component-row comp-row",
       isSelected && "selected comp-row--selected",
     ].filter(Boolean).join(" ")}
     draggable
@@ -54,16 +54,16 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
     onClick={() => onViewDetail(component)}
     onDoubleClick={() => onInstantiate(component.id)}
   >
-    <div className="aqb-component-thumb">
+    <div className="buildrick-component-thumb">
       <ComponentIcon />
     </div>
-    <span className="aqb-component-name" style={{ flex: 1 }}>
+    <span className="buildrick-component-name" style={{ flex: 1 }}>
       {component.name}
     </span>
 
     {instanceCount > 0 && (
       <span
-        className="aqb-instance-badge comp-count-badge"
+        className="buildrick-instance-badge comp-count-badge"
         title={`${instanceCount} instance${instanceCount !== 1 ? "s" : ""} on canvas`}
       >
         {instanceCount}x
@@ -71,7 +71,7 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
     )}
 
     <button
-      className="aqb-component-add-btn"
+      className="buildrick-component-add-btn"
       onClick={(e) => {
         e.stopPropagation();
         onInstantiate(component.id);
@@ -81,9 +81,9 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
       Add
     </button>
 
-    <div className="aqb-component-menu-wrapper">
+    <div className="buildrick-component-menu-wrapper">
       <button
-        className="aqb-component-menu-btn"
+        className="buildrick-component-menu-btn"
         onClick={(e) => {
           e.stopPropagation();
           onSetOpenMenuId(openMenuId === component.id ? null : component.id);
@@ -95,7 +95,7 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
       </button>
 
       {openMenuId === component.id && (
-        <div className="aqb-component-dropdown" onClick={(e) => e.stopPropagation()}>
+        <div className="buildrick-component-dropdown" onClick={(e) => e.stopPropagation()}>
           <button onClick={() => onInstantiate(component.id)}>
             <Plus size={14} /> Insert
           </button>
@@ -114,7 +114,7 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
             <Star size={14} fill={isFavorite(component.id) ? "currentColor" : "none"} />
             {isFavorite(component.id) ? "Unfavorite" : "Favorite"}
           </button>
-          <button className="aqb-menu-danger" onClick={() => onDelete(component.id)}>
+          <button className="buildrick-menu-danger" onClick={() => onDelete(component.id)}>
             <Trash2 size={14} /> Delete
           </button>
         </div>

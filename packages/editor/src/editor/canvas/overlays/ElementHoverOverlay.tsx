@@ -49,23 +49,23 @@ export interface ElementHoverOverlayProps {
 // Colors using CSS variables - single source of truth is Canvas.css
 const COLORS = {
   // Minimal mode - uses CSS vars for consistency
-  outline: "var(--aqb-primary)",
-  outlineDashed: "var(--aqb-selection-alpha-40)",
-  label: "var(--aqb-surface-2)",
-  labelText: "var(--aqb-text-primary)",
+  outline: "var(--buildrick-accent)",
+  outlineDashed: "var(--buildrick-selection-alpha-40)",
+  label: "var(--buildrick-surface-2)",
+  labelText: "var(--buildrick-text-primary)",
 
   // Box model (DevTools-style) - CSS vars for theme compatibility
-  content: "var(--aqb-boxmodel-content)",
-  padding: "var(--aqb-boxmodel-padding)",
-  margin: "var(--aqb-boxmodel-margin)",
+  content: "var(--buildrick-boxmodel-content)",
+  padding: "var(--buildrick-boxmodel-padding)",
+  margin: "var(--buildrick-boxmodel-margin)",
 
   // Hierarchy
   hierarchyBg: "rgba(30, 30, 46, 0.95)",
-  hierarchyText: "var(--aqb-text-secondary)",
-  hierarchyCurrent: "var(--aqb-primary-light)",
+  hierarchyText: "var(--buildrick-text-secondary)",
+  hierarchyCurrent: "var(--buildrick-accent-subtle)",
 
   // Clone mode badge background
-  cloneMode: "var(--aqb-success, #22c55e)",
+  cloneMode: "var(--buildrick-success, #22c55e)",
 };
 
 // =============================================================================
@@ -115,7 +115,7 @@ const ElementHoverOverlayComponent: React.FC<ElementHoverOverlayProps> = ({
     }
 
     const element = canvasRef.current.querySelector(
-      `[data-aqb-id="${hoveredElementId}"]`
+      `[data-buildrick-id="${hoveredElementId}"]`
     ) as HTMLElement;
 
     if (!element) {
@@ -146,7 +146,7 @@ const ElementHoverOverlayComponent: React.FC<ElementHoverOverlayProps> = ({
 
   return (
     <div
-      className="aqb-hover-overlay"
+      className="buildrick-hover-overlay"
       style={{
         position: "absolute",
         top: 0,
@@ -428,7 +428,7 @@ const CloneBadge: React.FC<{ rect: DOMRect }> = ({ rect }) => (
       width: 18,
       height: 18,
       background: COLORS.cloneMode,
-      color: "var(--aqb-text-on-color, #ffffff)",
+      color: "var(--buildrick-text-on-color, #ffffff)",
       borderRadius: "50%",
       fontSize: 12,
       fontWeight: 700,

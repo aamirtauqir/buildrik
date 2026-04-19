@@ -261,7 +261,7 @@
   padding: 1px 5px;
   font-size: 9px;
   color: var(--rail-text-hover, #7c88a0);
-  font-family: var(--aqb-font-mono, 'JetBrains Mono', monospace);
+  font-family: var(--buildrick-design-font-mono, 'JetBrains Mono', monospace);
 }
 
 /* ============================================
@@ -478,7 +478,7 @@
   padding: 1px 5px;
   font-size: 9px;
   color: var(--rail-text-default, #3d4a5c);
-  font-family: var(--aqb-font-mono, 'JetBrains Mono', monospace);
+  font-family: var(--buildrick-design-font-mono, 'JetBrains Mono', monospace);
 }
 
 /* ============================================

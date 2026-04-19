@@ -61,12 +61,12 @@ export class ElementStyles {
     const attrs = { ...this.getData().attributes };
 
     // Always include element ID for interaction runtime
-    attrs["data-aqb-id"] = this.getElementId();
+    attrs["data-buildrick-id"] = this.getElementId();
 
     // Include interaction data if present
     const interactions = this.getInteractionsFn();
     if (interactions.length > 0) {
-      attrs["data-aqb-interactions"] = JSON.stringify(interactions);
+      attrs["data-buildrick-interactions"] = JSON.stringify(interactions);
     }
 
     return attrs;

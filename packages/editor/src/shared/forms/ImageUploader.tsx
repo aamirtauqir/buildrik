@@ -168,9 +168,9 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   const size = previewSizes[previewSize];
 
   return (
-    <div className="aqb-field aqb-image-uploader">
+    <div className="buildrick-field buildrick-image-uploader">
       {label && (
-        <label htmlFor={fieldId} className="aqb-field-label">
+        <label htmlFor={fieldId} className="buildrick-field-label">
           {label}
         </label>
       )}
@@ -190,13 +190,13 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
           padding: preview ? 12 : 24,
           border: `2px dashed ${
             isDragging
-              ? "var(--aqb-primary)"
+              ? "var(--buildrick-accent)"
               : displayError
-                ? "var(--aqb-error, #ef4444)"
-                : "var(--aqb-border)"
+                ? "var(--buildrick-error, #ef4444)"
+                : "var(--buildrick-border)"
           }`,
           borderRadius: 8,
-          background: isDragging ? "rgba(0, 212, 170, 0.05)" : "var(--aqb-bg-dark)",
+          background: isDragging ? "rgba(0, 212, 170, 0.05)" : "var(--buildrick-bg-dark)",
           cursor: disabled ? "not-allowed" : "pointer",
           opacity: disabled ? 0.5 : 1,
           transition: "all 0.15s ease",
@@ -221,13 +221,13 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                 width: 24,
                 height: 24,
                 margin: "0 auto 8px",
-                border: "2px solid var(--aqb-border)",
-                borderTopColor: "var(--aqb-primary)",
+                border: "2px solid var(--buildrick-border)",
+                borderTopColor: "var(--buildrick-accent)",
                 borderRadius: "50%",
-                animation: "aqb-spin 0.8s linear infinite",
+                animation: "buildrick-spin 0.8s linear infinite",
               }}
             />
-            <span style={{ color: "var(--aqb-text-muted)", fontSize: 13 }}>Processing...</span>
+            <span style={{ color: "var(--buildrick-text-muted)", fontSize: 13 }}>Processing...</span>
           </div>
         ) : preview ? (
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -257,7 +257,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
               {showFileName && fileName && (
                 <div
                   style={{
-                    color: "var(--aqb-text-primary)",
+                    color: "var(--buildrick-text-primary)",
                     fontSize: 13,
                     fontWeight: 500,
                     overflow: "hidden",
@@ -272,7 +272,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
               {fileSize !== null && (
                 <div
                   style={{
-                    color: "var(--aqb-text-muted)",
+                    color: "var(--buildrick-text-muted)",
                     fontSize: 12,
                     marginBottom: 8,
                   }}
@@ -288,18 +288,18 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                   padding: "4px 10px",
                   fontSize: 12,
                   fontWeight: 500,
-                  color: "var(--aqb-text-primary)",
-                  background: "var(--aqb-bg-panel)",
-                  border: "1px solid var(--aqb-border)",
+                  color: "var(--buildrick-text-primary)",
+                  background: "var(--buildrick-bg-panel)",
+                  border: "1px solid var(--buildrick-border)",
                   borderRadius: 4,
                   cursor: "pointer",
                   transition: "background 0.15s ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "var(--aqb-border)";
+                  e.currentTarget.style.background = "var(--buildrick-border)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "var(--aqb-bg-panel)";
+                  e.currentTarget.style.background = "var(--buildrick-bg-panel)";
                 }}
               >
                 Remove
@@ -314,7 +314,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                 height: 48,
                 margin: "0 auto 12px",
                 borderRadius: 8,
-                background: "var(--aqb-bg-panel)",
+                background: "var(--buildrick-bg-panel)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -325,7 +325,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                 height="24"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="var(--aqb-text-muted)"
+                stroke="var(--buildrick-text-muted)"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -337,7 +337,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
             </div>
             <div
               style={{
-                color: "var(--aqb-text-primary)",
+                color: "var(--buildrick-text-primary)",
                 fontSize: 14,
                 fontWeight: 500,
                 marginBottom: 4,
@@ -347,7 +347,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
             </div>
             <div
               style={{
-                color: "var(--aqb-text-muted)",
+                color: "var(--buildrick-text-muted)",
                 fontSize: 12,
               }}
             >
@@ -364,7 +364,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
             display: "block",
             marginTop: 6,
             fontSize: 12,
-            color: "var(--aqb-error, #ef4444)",
+            color: "var(--buildrick-error, #ef4444)",
           }}
         >
           {displayError}
@@ -372,7 +372,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       )}
 
       <style>{`
-        @keyframes aqb-spin {
+        @keyframes buildrick-spin {
           to { transform: rotate(360deg); }
         }
       `}</style>

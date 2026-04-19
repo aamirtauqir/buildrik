@@ -52,7 +52,7 @@ export const Grid: React.FC<GridProps> = ({
 
   return (
     <div
-      className={`aqb-grid ${className || ""}`}
+      className={`buildrick-grid ${className || ""}`}
       style={{
         display: "grid",
         gridTemplateColumns,
@@ -86,7 +86,7 @@ export const GridItem: React.FC<GridItemProps> = ({
   style,
 }) => (
   <div
-    className={`aqb-grid-item ${className || ""}`}
+    className={`buildrick-grid-item ${className || ""}`}
     style={{
       gridColumn: colSpan
         ? `span ${colSpan}`

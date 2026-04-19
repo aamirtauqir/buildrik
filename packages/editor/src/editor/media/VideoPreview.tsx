@@ -181,9 +181,9 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
           alignItems: "center",
           justifyContent: "center",
           padding: 40,
-          background: "var(--aqb-bg-panel-secondary)",
+          background: "var(--buildrick-bg-panel-secondary)",
           borderRadius: 8,
-          color: "var(--aqb-text-muted)",
+          color: "var(--buildrick-text-muted)",
         }}
       >
         <span style={{ fontSize: 32, marginBottom: 12 }}>⚠️</span>
@@ -259,7 +259,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             style={{
               height: "100%",
               width: `${progressPercent}%`,
-              background: "var(--aqb-primary)",
+              background: "var(--buildrick-accent)",
               borderRadius: 2,
               transition: "width 0.1s linear",
             }}

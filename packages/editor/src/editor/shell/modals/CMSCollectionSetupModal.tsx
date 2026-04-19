@@ -60,27 +60,27 @@ const s: Record<string, React.CSSProperties> = {
     gap: 8,
     padding: "0 0 16px",
     marginBottom: 16,
-    borderBottom: "1px solid var(--aqb-border)",
+    borderBottom: "1px solid var(--buildrick-border)",
   },
   step: {
     display: "flex",
     alignItems: "center",
     gap: 6,
     fontSize: 12,
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
   },
   stepActive: {
-    color: "var(--aqb-primary)",
+    color: "var(--buildrick-accent)",
     fontWeight: 600,
   },
   stepDone: {
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
   },
   stepDot: {
     width: 20,
     height: 20,
     borderRadius: "50%",
-    background: "var(--aqb-border)",
+    background: "var(--buildrick-border)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -89,32 +89,32 @@ const s: Record<string, React.CSSProperties> = {
     flexShrink: 0,
   },
   stepDotActive: {
-    background: "var(--aqb-primary)",
+    background: "var(--buildrick-accent)",
     color: "#fff",
   },
   stepDotDone: {
-    background: "var(--aqb-primary)",
+    background: "var(--buildrick-accent)",
     color: "#fff",
   },
   stepDivider: {
     flex: 1,
     height: 1,
-    background: "var(--aqb-border)",
+    background: "var(--buildrick-border)",
   },
   label: {
     display: "block",
     fontSize: 12,
     fontWeight: 500,
-    color: "var(--aqb-text-secondary)",
+    color: "var(--buildrick-text-secondary)",
     marginBottom: 6,
   },
   input: {
     width: "100%",
     padding: "8px 12px",
-    background: "var(--aqb-bg-panel-secondary)",
-    border: "1px solid var(--aqb-border)",
-    borderRadius: "var(--aqb-radius-md)",
-    color: "var(--aqb-text-primary, #e4e4e7)",
+    background: "var(--buildrick-bg-panel-secondary)",
+    border: "1px solid var(--buildrick-border)",
+    borderRadius: "var(--buildrick-design-radius-md)",
+    color: "var(--buildrick-text-primary, #e4e4e7)",
     fontSize: 13,
     outline: "none",
     boxSizing: "border-box" as const,
@@ -123,10 +123,10 @@ const s: Record<string, React.CSSProperties> = {
   select: {
     width: "100%",
     padding: "8px 12px",
-    background: "var(--aqb-bg-panel-secondary)",
-    border: "1px solid var(--aqb-border)",
-    borderRadius: "var(--aqb-radius-md)",
-    color: "var(--aqb-text-primary, #e4e4e7)",
+    background: "var(--buildrick-bg-panel-secondary)",
+    border: "1px solid var(--buildrick-border)",
+    borderRadius: "var(--buildrick-design-radius-md)",
+    color: "var(--buildrick-text-primary, #e4e4e7)",
     fontSize: 13,
     outline: "none",
     cursor: "pointer",
@@ -135,10 +135,10 @@ const s: Record<string, React.CSSProperties> = {
   textarea: {
     width: "100%",
     padding: "8px 12px",
-    background: "var(--aqb-bg-panel-secondary)",
-    border: "1px solid var(--aqb-border)",
-    borderRadius: "var(--aqb-radius-md)",
-    color: "var(--aqb-text-primary, #e4e4e7)",
+    background: "var(--buildrick-bg-panel-secondary)",
+    border: "1px solid var(--buildrick-border)",
+    borderRadius: "var(--buildrick-design-radius-md)",
+    color: "var(--buildrick-text-primary, #e4e4e7)",
     fontSize: 13,
     outline: "none",
     resize: "vertical" as const,
@@ -151,25 +151,25 @@ const s: Record<string, React.CSSProperties> = {
     alignItems: "center",
     gap: 8,
     padding: "6px 0",
-    borderBottom: "1px solid var(--aqb-border-subtle)",
+    borderBottom: "1px solid var(--buildrick-border-subtle)",
   },
   fieldNameInput: {
     flex: 1,
     padding: "6px 10px",
-    background: "var(--aqb-bg-panel-secondary)",
-    border: "1px solid var(--aqb-border)",
-    borderRadius: "var(--aqb-radius-sm)",
-    color: "var(--aqb-text-primary, #e4e4e7)",
+    background: "var(--buildrick-bg-panel-secondary)",
+    border: "1px solid var(--buildrick-border)",
+    borderRadius: "var(--buildrick-design-radius-sm)",
+    color: "var(--buildrick-text-primary, #e4e4e7)",
     fontSize: 12,
     outline: "none",
   },
   fieldTypeSelect: {
     width: 110,
     padding: "6px 8px",
-    background: "var(--aqb-bg-panel-secondary)",
-    border: "1px solid var(--aqb-border)",
-    borderRadius: "var(--aqb-radius-sm)",
-    color: "var(--aqb-text-primary, #e4e4e7)",
+    background: "var(--buildrick-bg-panel-secondary)",
+    border: "1px solid var(--buildrick-border)",
+    borderRadius: "var(--buildrick-design-radius-sm)",
+    color: "var(--buildrick-text-primary, #e4e4e7)",
     fontSize: 12,
     outline: "none",
     cursor: "pointer",
@@ -182,8 +182,8 @@ const s: Record<string, React.CSSProperties> = {
     justifyContent: "center",
     background: "transparent",
     border: "none",
-    borderRadius: "var(--aqb-radius-sm)",
-    color: "var(--aqb-text-muted)",
+    borderRadius: "var(--buildrick-design-radius-sm)",
+    color: "var(--buildrick-text-muted)",
     cursor: "pointer",
     flexShrink: 0,
     transition: "color 0.15s, background 0.15s",
@@ -195,7 +195,7 @@ const s: Record<string, React.CSSProperties> = {
     padding: "12px 14px",
     background: "rgba(34, 197, 94, 0.1)",
     border: "1px solid rgba(34, 197, 94, 0.25)",
-    borderRadius: "var(--aqb-radius-md)",
+    borderRadius: "var(--buildrick-design-radius-md)",
     color: "#86efac",
     fontSize: 13,
     marginTop: 12,
@@ -205,7 +205,7 @@ const s: Record<string, React.CSSProperties> = {
     justifyContent: "flex-end",
     gap: 8,
     paddingTop: 16,
-    borderTop: "1px solid var(--aqb-border)",
+    borderTop: "1px solid var(--buildrick-border)",
     marginTop: 8,
   },
 };
@@ -380,7 +380,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           {/* Collection name */}
           <div>
             <label style={s.label}>
-              Collection name <span style={{ color: "var(--aqb-danger, #f38ba8)" }}>*</span>
+              Collection name <span style={{ color: "var(--buildrick-design-color-error, #f38ba8)" }}>*</span>
             </label>
             <input
               style={s.input}
@@ -391,11 +391,11 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
               autoFocus
               onFocus={(e) => {
                 (e.currentTarget as HTMLInputElement).style.borderColor =
-                  "var(--aqb-primary)";
+                  "var(--buildrick-accent)";
               }}
               onBlur={(e) => {
                 (e.currentTarget as HTMLInputElement).style.borderColor =
-                  "var(--aqb-border)";
+                  "var(--buildrick-border)";
               }}
             />
           </div>
@@ -426,11 +426,11 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
               onChange={(e) => setDescription(e.target.value)}
               onFocus={(e) => {
                 (e.currentTarget as HTMLTextAreaElement).style.borderColor =
-                  "var(--aqb-primary)";
+                  "var(--buildrick-accent)";
               }}
               onBlur={(e) => {
                 (e.currentTarget as HTMLTextAreaElement).style.borderColor =
-                  "var(--aqb-border)";
+                  "var(--buildrick-border)";
               }}
             />
           </div>
@@ -447,8 +447,8 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
               marginBottom: 10,
             }}
           >
-            <span style={{ fontSize: 12, color: "var(--aqb-text-secondary)" }}>
-              Fields for <strong style={{ color: "var(--aqb-text-primary, #e4e4e7)" }}>{name}</strong>
+            <span style={{ fontSize: 12, color: "var(--buildrick-text-secondary)" }}>
+              Fields for <strong style={{ color: "var(--buildrick-text-primary, #e4e4e7)" }}>{name}</strong>
             </span>
             <Button
               variant="ghost"
@@ -466,14 +466,14 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
               display: "flex",
               gap: 8,
               paddingBottom: 6,
-              borderBottom: "1px solid var(--aqb-border)",
+              borderBottom: "1px solid var(--buildrick-border)",
               marginBottom: 2,
             }}
           >
-            <span style={{ flex: 1, fontSize: 11, color: "var(--aqb-text-muted)", fontWeight: 500 }}>
+            <span style={{ flex: 1, fontSize: 11, color: "var(--buildrick-text-muted)", fontWeight: 500 }}>
               FIELD NAME
             </span>
-            <span style={{ width: 110, fontSize: 11, color: "var(--aqb-text-muted)", fontWeight: 500 }}>
+            <span style={{ width: 110, fontSize: 11, color: "var(--buildrick-text-muted)", fontWeight: 500 }}>
               TYPE
             </span>
             <span style={{ width: 24 }} />
@@ -507,12 +507,12 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                   onClick={() => removeField(field.id)}
                   title="Remove field"
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.color = "var(--aqb-danger, #f38ba8)";
+                    (e.currentTarget as HTMLElement).style.color = "var(--buildrick-design-color-error, #f38ba8)";
                     (e.currentTarget as HTMLElement).style.background =
                       "rgba(243,139,168,0.1)";
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.color = "var(--aqb-text-muted)";
+                    (e.currentTarget as HTMLElement).style.color = "var(--buildrick-text-muted)";
                     (e.currentTarget as HTMLElement).style.background = "transparent";
                   }}
                 >
@@ -529,8 +529,8 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                 padding: "8px 12px",
                 background: "rgba(243,139,168,0.1)",
                 border: "1px solid rgba(243,139,168,0.25)",
-                borderRadius: "var(--aqb-radius-md)",
-                color: "var(--aqb-danger, #f38ba8)",
+                borderRadius: "var(--buildrick-design-radius-md)",
+                color: "var(--buildrick-design-color-error, #f38ba8)",
                 fontSize: 12,
               }}
             >

@@ -181,13 +181,13 @@ export function cleanupDropIndicators(container: HTMLElement | null): void {
     });
 
     // Remove breathing animation class
-    container.querySelectorAll(".aqb-drop-zone-breathing").forEach((el) => {
-      el.classList.remove("aqb-drop-zone-breathing");
+    container.querySelectorAll(".buildrick-drop-zone-breathing").forEach((el) => {
+      el.classList.remove("buildrick-drop-zone-breathing");
     });
 
     // Remove shake animation class
-    container.querySelectorAll(".aqb-invalid-drop-shake").forEach((el) => {
-      el.classList.remove("aqb-invalid-drop-shake");
+    container.querySelectorAll(".buildrick-invalid-drop-shake").forEach((el) => {
+      el.classList.remove("buildrick-invalid-drop-shake");
     });
   } catch {
     // Container may have been unmounted

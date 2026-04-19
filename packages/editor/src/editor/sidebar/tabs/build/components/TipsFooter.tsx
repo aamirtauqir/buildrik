@@ -51,7 +51,7 @@ export const TipsFooter: React.FC<TipsFooterProps> = ({
         style={{ cursor: "pointer" }}
       >
         <span className="bld-tips-lbl"><Lightbulb size={12} aria-hidden /> Pro Tips</span>
-        <span style={{ fontSize: 11, color: "var(--aqb-text-muted)", fontFamily: "monospace" }}>
+        <span style={{ fontSize: 11, color: "var(--buildrick-text-muted)", fontFamily: "monospace" }}>
           {tipIdx + 1} / {TIPS.length}
         </span>
         <div className="bld-tips-nav">

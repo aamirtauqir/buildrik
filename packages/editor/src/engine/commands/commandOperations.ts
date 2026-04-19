@@ -22,7 +22,7 @@ export function nudgeSelected(composer: Composer, deltaX: number, deltaY: number
   if (!selected) return;
 
   const elementId = selected.getId();
-  const domElement = document.querySelector(`[data-aqb-id="${elementId}"]`) as HTMLElement;
+  const domElement = document.querySelector(`[data-buildrick-id="${elementId}"]`) as HTMLElement;
   if (!domElement) return;
 
   composer.beginTransaction("nudge");

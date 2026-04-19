@@ -71,7 +71,7 @@ export class PageManager {
         id: generateId("root"),
         type: "container",
         tagName: "div",
-        classes: ["aqb-page-root"],
+        classes: ["buildrick-page-root"],
         children: [],
       },
       updatedAt: now,

@@ -267,7 +267,7 @@ const FormView: React.FC<FormViewProps> = ({
               ...styleCardStyles,
               borderColor:
                 stylePreset === preset.value
-                  ? "var(--aqb-primary, #6366f1)"
+                  ? "var(--buildrick-accent, #6366f1)"
                   : "var(--barStroke, #1a2a3d)",
               background:
                 stylePreset === preset.value
@@ -328,7 +328,7 @@ const LoadingView: React.FC<LoadingViewProps> = ({ steps, progress, onCancel }) 
               <span style={{ color: "var(--green, #38d07a)" }}>&#10003;</span>
             )}
             {step.status === "generating" && (
-              <span style={{ color: "var(--aqb-primary, #6366f1)" }}>&#9673;</span>
+              <span style={{ color: "var(--buildrick-accent, #6366f1)" }}>&#9673;</span>
             )}
             {step.status === "pending" && (
               <span style={{ color: "var(--muted, #b7c5dc)", opacity: 0.4 }}>&#9675;</span>
@@ -506,7 +506,7 @@ const generateBtnStyles: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   padding: "14px 32px",
-  background: "var(--aqb-primary, #6366f1)",
+  background: "var(--buildrick-accent, #6366f1)",
   color: "#fff",
   border: "none",
   borderRadius: 10,
@@ -553,7 +553,7 @@ const progressBarTrackStyles: React.CSSProperties = {
 
 const progressBarFillStyles: React.CSSProperties = {
   height: "100%",
-  background: "var(--aqb-primary, #6366f1)",
+  background: "var(--buildrick-accent, #6366f1)",
   borderRadius: 3,
   transition: "width 0.4s ease",
 };

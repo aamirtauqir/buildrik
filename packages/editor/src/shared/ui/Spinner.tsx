@@ -15,19 +15,19 @@ const sizeMap = { sm: 16, md: 24, lg: 40 };
 
 export const Spinner: React.FC<SpinnerProps> = ({
   size = "md",
-  color = "var(--aqb-primary)",
+  color = "var(--buildrick-accent)",
   thickness = 2,
 }) => {
   const pixelSize = typeof size === "number" ? size : sizeMap[size];
 
   return (
     <svg
-      className="aqb-spinner"
+      className="buildrick-spinner"
       width={pixelSize}
       height={pixelSize}
       viewBox="0 0 24 24"
       fill="none"
-      style={{ animation: "aqb-spin 1s linear infinite" }}
+      style={{ animation: "buildrick-spin 1s linear infinite" }}
     >
       <circle
         cx="12"

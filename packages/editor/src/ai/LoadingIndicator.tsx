@@ -16,7 +16,7 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
   return (
     <div style={{ textAlign: "center", padding: 40 }}>
       <Spinner size="lg" />
-      <p style={{ marginTop: 16, color: "var(--aqb-text-muted)" }}>{message}</p>
+      <p style={{ marginTop: 16, color: "var(--buildrick-text-muted)" }}>{message}</p>
     </div>
   );
 };

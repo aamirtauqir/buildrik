@@ -13,23 +13,23 @@ import type { PseudoStateId } from "../../../shared/types";
 
 export const INSPECTOR_SPACING = {
   // Section container
-  sectionPadding: "var(--aqb-space-4)", // 16px
-  sectionGap: "var(--aqb-space-3)", // 12px between sections
+  sectionPadding: "var(--buildrick-design-space-4)", // 16px
+  sectionGap: "var(--buildrick-design-space-3)", // 12px between sections
 
   // Section header
-  headerPaddingY: "var(--aqb-space-2)", // 8px
-  headerPaddingX: "var(--aqb-space-4)", // 16px
+  headerPaddingY: "var(--buildrick-design-space-2)", // 8px
+  headerPaddingX: "var(--buildrick-design-space-4)", // 16px
 
   // Content area
-  contentPadding: "var(--aqb-space-4)", // 16px
-  contentGap: "var(--aqb-space-3)", // 12px between control groups
+  contentPadding: "var(--buildrick-design-space-4)", // 16px
+  contentGap: "var(--buildrick-design-space-3)", // 12px between control groups
 
   // Control groups (label + input)
-  controlGap: "var(--aqb-space-2)", // 8px between label and input
-  inputGap: "var(--aqb-space-2)", // 8px between inputs in a row
+  controlGap: "var(--buildrick-design-space-2)", // 8px between label and input
+  inputGap: "var(--buildrick-design-space-2)", // 8px between inputs in a row
 
   // Labels
-  labelMarginBottom: "var(--aqb-space-1)", // 4px
+  labelMarginBottom: "var(--buildrick-design-space-1)", // 4px
 } as const;
 
 // ============================================================================
@@ -45,7 +45,7 @@ export const INSPECTOR_TYPOGRAPHY = {
   label: {
     fontSize: "11px",
     fontWeight: 500,
-    color: "var(--aqb-text-secondary)",
+    color: "var(--buildrick-text-secondary)",
   },
   input: {
     fontSize: "13px",
@@ -53,7 +53,7 @@ export const INSPECTOR_TYPOGRAPHY = {
   },
   hint: {
     fontSize: "10px",
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
   },
 } as const;
 
@@ -65,8 +65,8 @@ export const panelStyles = {
   panel: {
     height: "100%",
     overflowY: "auto" as const,
-    background: "var(--aqb-surface-2)",
-    fontFamily: "var(--aqb-font-family)",
+    background: "var(--buildrick-surface-2)",
+    fontFamily: "var(--buildrick-font-family)",
   },
   noSelection: {
     height: "100%",
@@ -76,12 +76,12 @@ export const panelStyles = {
     justifyContent: "center" as const,
     textAlign: "center" as const,
     padding: 40,
-    color: "var(--aqb-text-tertiary)",
+    color: "var(--buildrick-text-tertiary)",
   },
   header: {
     padding: "10px 14px",
-    background: "var(--aqb-surface-2)",
-    borderBottom: "1px solid var(--aqb-border)",
+    background: "var(--buildrick-surface-2)",
+    borderBottom: "1px solid var(--buildrick-border)",
     position: "sticky" as const,
     top: 0,
     zIndex: 10,
@@ -98,7 +98,7 @@ export const panelStyles = {
     width: 28,
     height: 28,
     borderRadius: 6,
-    background: "var(--aqb-surface-3)",
+    background: "var(--buildrick-surface-3)",
     display: "flex" as const,
     alignItems: "center" as const,
     justifyContent: "center" as const,
@@ -108,32 +108,19 @@ export const panelStyles = {
   elementName: {
     fontSize: 13,
     fontWeight: 700,
-    color: "var(--aqb-text-primary)",
+    color: "var(--buildrick-text-primary)",
     marginBottom: 2,
-  },
-  elementId: {
-    fontSize: "var(--aqb-text-sm)",
-    color: "var(--aqb-text-tertiary)",
-    fontFamily: "var(--aqb-font-mono)",
-  },
-  tagBadge: {
-    marginLeft: 6,
-    padding: "2px 6px",
-    background: "var(--aqb-primary-light)",
-    borderRadius: 4,
-    fontSize: 12,
-    color: "var(--aqb-primary)",
   },
   tabs: {
     display: "flex" as const,
     padding: "8px 12px",
-    background: "var(--aqb-surface-2)",
-    borderBottom: "1px solid var(--aqb-border)",
+    background: "var(--buildrick-surface-2)",
+    borderBottom: "1px solid var(--buildrick-border)",
   },
   tabGroup: {
     display: "flex" as const,
     flex: 1,
-    background: "var(--aqb-surface-3)",
+    background: "var(--buildrick-surface-3)",
     borderRadius: 20,
     padding: 3,
     gap: 2,
@@ -141,41 +128,21 @@ export const panelStyles = {
   tab: (active: boolean) => ({
     flex: 1,
     padding: "6px 12px",
-    background: active ? "var(--aqb-primary)" : "transparent",
+    background: active ? "var(--buildrick-accent)" : "transparent",
     border: "none",
     borderRadius: 18,
-    color: active ? "#fff" : "var(--aqb-text-tertiary)",
-    fontSize: "var(--aqb-text-sm)",
+    color: active ? "#fff" : "var(--buildrick-text-tertiary)",
+    fontSize: "var(--buildrick-text-sm)",
     fontWeight: 600,
     cursor: "pointer" as const,
-    transition: "var(--aqb-transition-fast)",
+    transition: "var(--buildrick-transition-fast)",
     display: "flex" as const,
     alignItems: "center" as const,
     justifyContent: "center" as const,
     gap: 6,
   }),
   content: {
-    padding: "var(--aqb-space-2) 0",
-  },
-  deleteBtn: {
-    position: "absolute" as const,
-    top: 8,
-    right: 8,
-    width: 32,
-    height: 32,
-    // IS8: Expand hit area to 44×44 via padding without changing visual size
-    minWidth: 44,
-    minHeight: 44,
-    borderRadius: 6,
-    background: "var(--aqb-error-light)",
-    border: "1px solid var(--aqb-error-border, rgba(239,68,68,0.3))",
-    color: "var(--aqb-error)",
-    cursor: "pointer" as const,
-    display: "flex" as const,
-    alignItems: "center" as const,
-    justifyContent: "center" as const,
-    fontSize: 14,
-    transition: "var(--aqb-transition-fast)",
+    padding: "var(--buildrick-design-space-2) 0",
   },
   breakpointIndicator: {
     display: "flex" as const,
@@ -184,15 +151,15 @@ export const panelStyles = {
     padding: "6px 12px",
     marginTop: 12,
     borderRadius: 6,
-    fontSize: "var(--aqb-text-sm)",
+    fontSize: "var(--buildrick-text-sm)",
     fontWeight: 600,
-    transition: "var(--aqb-transition-fast)",
+    transition: "var(--buildrick-transition-fast)",
   },
   stateSelector: {
     display: "flex" as const,
     alignItems: "center" as const,
     gap: 4,
-    padding: "var(--aqb-space-2) var(--aqb-space-3)",
+    padding: "var(--buildrick-design-space-2) var(--buildrick-design-space-3)",
     marginTop: 8,
     background: "rgba(0,0,0,0.2)",
     borderRadius: 6,
@@ -200,11 +167,11 @@ export const panelStyles = {
   stateBtn: (active: boolean, state: PseudoStateId) => {
     // BUG-010 FIX: Changed active state to green for better visual contrast
     const colors: Record<PseudoStateId, string> = {
-      normal: "var(--aqb-text-tertiary)",
-      hover: "var(--aqb-primary)",
-      focus: "var(--aqb-info)",
-      active: "var(--aqb-success)",
-      disabled: "var(--aqb-text-muted)",
+      normal: "var(--buildrick-text-tertiary)",
+      hover: "var(--buildrick-accent)",
+      focus: "var(--buildrick-info)",
+      active: "var(--buildrick-success)",
+      disabled: "var(--buildrick-text-muted)",
     };
     const rawColors: Record<PseudoStateId, string> = {
       normal: "#6c7086",
@@ -219,18 +186,13 @@ export const panelStyles = {
       background: active ? `${rawColors[state]}20` : "transparent",
       border: active ? `1px solid ${rawColors[state]}50` : "1px solid transparent",
       borderRadius: 6,
-      color: active ? colors[state] : "var(--aqb-text-tertiary)",
-      fontSize: "var(--aqb-text-xs)",
+      color: active ? colors[state] : "var(--buildrick-text-tertiary)",
+      fontSize: "var(--buildrick-text-xs)",
       fontWeight: 600,
       cursor: "pointer" as const,
-      transition: "var(--aqb-transition-fast)",
+      transition: "var(--buildrick-transition-fast)",
       textAlign: "center" as const,
     };
   },
 };
 
-// ============================================================================
-// ELEMENT ICONS
-// ============================================================================
-
-// ELEMENT_ICONS removed - replaced by components/ui/Icons

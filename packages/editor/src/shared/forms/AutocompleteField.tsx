@@ -104,7 +104,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
   };
 
   return (
-    <div className={`aqb-autocomplete ${className || ""}`} style={{ position: "relative" }}>
+    <div className={`buildrick-autocomplete ${className || ""}`} style={{ position: "relative" }}>
       {label && (
         <label
           style={{
@@ -112,7 +112,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
             fontSize: 12,
             fontWeight: 500,
             marginBottom: 6,
-            color: "var(--aqb-text-secondary)",
+            color: "var(--buildrick-text-secondary)",
           }}
         >
           {label}
@@ -134,10 +134,10 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
             width: "100%",
             padding: "8px 12px",
             paddingRight: loading ? 36 : 12,
-            background: "var(--aqb-bg-input)",
-            border: `1px solid ${error ? "var(--aqb-danger)" : "var(--aqb-border)"}`,
+            background: "var(--buildrick-bg-input)",
+            border: `1px solid ${error ? "var(--buildrick-design-color-error)" : "var(--buildrick-border)"}`,
             borderRadius: 6,
-            color: "var(--aqb-text-primary)",
+            color: "var(--buildrick-text-primary)",
             fontSize: 13,
             outline: "none",
           }}
@@ -152,10 +152,10 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
               transform: "translateY(-50%)",
               width: 16,
               height: 16,
-              border: "2px solid var(--aqb-border)",
-              borderTopColor: "var(--aqb-primary)",
+              border: "2px solid var(--buildrick-border)",
+              borderTopColor: "var(--buildrick-accent)",
               borderRadius: "50%",
-              animation: "aqb-spin 0.6s linear infinite",
+              animation: "buildrick-spin 0.6s linear infinite",
             }}
           />
         )}
@@ -171,8 +171,8 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
             left: 0,
             right: 0,
             marginTop: 4,
-            background: "var(--aqb-bg-panel)",
-            border: "1px solid var(--aqb-border)",
+            background: "var(--buildrick-bg-panel)",
+            border: "1px solid var(--buildrick-border)",
             borderRadius: 8,
             boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
             maxHeight: 240,
@@ -190,14 +190,14 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
                 alignItems: "center",
                 gap: 10,
                 cursor: "pointer",
-                background: index === highlightedIndex ? "var(--aqb-bg-hover)" : "transparent",
+                background: index === highlightedIndex ? "var(--buildrick-bg-hover)" : "transparent",
               }}
             >
               {option.icon && <span style={{ fontSize: 16 }}>{option.icon}</span>}
               <div>
                 <div style={{ fontSize: 13, fontWeight: 500 }}>{option.label}</div>
                 {option.description && (
-                  <div style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>
+                  <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
                     {option.description}
                   </div>
                 )}
@@ -208,7 +208,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
       )}
 
       {error && (
-        <div style={{ fontSize: 12, color: "var(--aqb-danger)", marginTop: 4 }}>{error}</div>
+        <div style={{ fontSize: 12, color: "var(--buildrick-design-color-error)", marginTop: 4 }}>{error}</div>
       )}
     </div>
   );

@@ -27,7 +27,7 @@ export const GeneratedResult: React.FC<GeneratedResultProps> = ({
           fontSize: 12,
           fontWeight: 600,
           textTransform: "uppercase",
-          color: "var(--aqb-text-muted)",
+          color: "var(--buildrick-text-muted)",
           marginBottom: 8,
         }}
       >
@@ -49,7 +49,7 @@ export const GeneratedResult: React.FC<GeneratedResultProps> = ({
         <div
           style={{
             padding: 16,
-            background: "var(--aqb-bg-dark)",
+            background: "var(--buildrick-bg-dark)",
             borderRadius: 8,
             fontSize: 14,
             lineHeight: 1.6,

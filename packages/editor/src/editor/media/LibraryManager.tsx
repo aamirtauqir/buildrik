@@ -381,7 +381,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
               onClick={() => { setSmartFolder("in-use"); state.setCurrentFolderId(null); }}
             />
             <TreeNode
-              icon={<MinusCircle size={14} style={{ color: "var(--ls-text-ghost)" }} />}
+              icon={<MinusCircle size={14} style={{ color: "var(--buildrick-text-disabled)" }} />}
               label="Unused"
               count={unusedCount}
               active={smartFolder === "unused"}
@@ -406,7 +406,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             {renderFolderTree(null, 0)}
 
             {state.folders.length === 0 && (
-              <div style={{ padding: "12px 8px", fontSize: 11, color: "var(--ls-text-ghost)" }}>
+              <div style={{ padding: "12px 8px", fontSize: 11, color: "var(--buildrick-text-disabled)" }}>
                 No folders yet
               </div>
             )}
@@ -584,7 +584,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                   : item.type === "ico"
                     ? <img src={item.src} alt={item.name} style={{ width: 36, height: 36, objectFit: "contain" }} />
                     : item.type === "fnt"
-                      ? <span style={{ fontSize: viewMode === "list" ? 18 : 32, fontWeight: 700, color: "var(--ls-text-primary)" }}>Aa</span>
+                      ? <span style={{ fontSize: viewMode === "list" ? 18 : 32, fontWeight: 700, color: "var(--buildrick-text-primary)" }}>Aa</span>
                       : <img src={item.src} alt={item.name} loading="lazy" />;
 
                 // Drag data for canvas drop
@@ -730,7 +730,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                 ) : selectedItem.type === "ico" ? (
                   <img src={selectedItem.src} alt={selectedItem.name} style={{ width: 64, height: 64 }} />
                 ) : selectedItem.type === "fnt" ? (
-                  <span style={{ fontSize: 48, fontWeight: 700, color: "var(--ls-text-primary)" }}>Aa Bb</span>
+                  <span style={{ fontSize: 48, fontWeight: 700, color: "var(--buildrick-text-primary)" }}>Aa Bb</span>
                 ) : null}
               </div>
               <div className="mgr-det-tabs">
@@ -790,11 +790,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                           )}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 12, fontWeight: 500, color: "var(--ls-text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          <div style={{ fontSize: 12, fontWeight: 500, color: "var(--buildrick-text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                             {v.name}
-                            {i === 0 && <span style={{ marginLeft: 6, fontSize: 9, background: "var(--ls-accent-bg)", color: "var(--ls-accent-txt)", padding: "1px 5px", borderRadius: 6, fontWeight: 700 }}>CURRENT</span>}
+                            {i === 0 && <span style={{ marginLeft: 6, fontSize: 9, background: "var(--buildrick-accent-tint)", color: "var(--buildrick-text-primary)", padding: "1px 5px", borderRadius: 6, fontWeight: 700 }}>CURRENT</span>}
                           </div>
-                          <div style={{ fontSize: 10, color: "var(--ls-text-ghost)" }}>
+                          <div style={{ fontSize: 10, color: "var(--buildrick-text-disabled)" }}>
                             {fmtBytes(v.size)} · {new Date(v.createdAt).toLocaleString()}
                           </div>
                         </div>
@@ -824,11 +824,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                       Used in <span className="mgr-used-count">{usageCount} places</span>
                     </div>
                     {usageCount === 0 ? (
-                      <div style={{ fontSize: 12, color: "var(--ls-text-ghost)", padding: 8 }}>
+                      <div style={{ fontSize: 12, color: "var(--buildrick-text-disabled)", padding: 8 }}>
                         Not used on any page yet
                       </div>
                     ) : (
-                      <div style={{ fontSize: 12, color: "var(--ls-text-ghost)", padding: 8 }}>
+                      <div style={{ fontSize: 12, color: "var(--buildrick-text-disabled)", padding: 8 }}>
                         {usageCount} element{usageCount !== 1 ? "s" : ""} reference this asset
                       </div>
                     )}
@@ -875,7 +875,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
             </>
           ) : (
             <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 32 }}>
-              <div style={{ textAlign: "center", color: "var(--ls-text-ghost)" }}>
+              <div style={{ textAlign: "center", color: "var(--buildrick-text-disabled)" }}>
                 <FolderOpen size={32} style={{ marginBottom: 12, opacity: 0.4 }} />
                 <div style={{ fontSize: 13 }}>Select an asset to view details</div>
               </div>
@@ -886,7 +886,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
 
       {/* ═══ STATUS BAR ═══ */}
       <div className="mgr-status">
-        <span><strong style={{ color: "var(--ls-text-medium)" }}>{state.counts.all}</strong> assets</span>
+        <span><strong style={{ color: "var(--buildrick-text-secondary)" }}>{state.counts.all}</strong> assets</span>
         <span className="mgr-status-dot" />
         <span>{fmtBytes(state.storage.used)} / {fmtBytes(state.storage.total)}</span>
         <div className="mgr-status-right">
@@ -986,7 +986,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
               </button>
             </div>
             <div className="stock-modal-content">
-              <p style={{ fontSize: 12, color: "var(--ls-text-ghost)", marginBottom: 12 }}>
+              <p style={{ fontSize: 12, color: "var(--buildrick-text-disabled)", marginBottom: 12 }}>
                 Pick a replacement asset. All canvas usages will be swapped atomically (one undo reverses everything).
               </p>
               <div className="med-grid" data-cols="3">
@@ -1018,7 +1018,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                           <img src={i.thumb || i.src} alt={i.name} loading="lazy" />
                         ) : null}
                       </div>
-                      <div style={{ padding: "4px 6px", fontSize: 11, color: "var(--ls-text-medium)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <div style={{ padding: "4px 6px", fontSize: 11, color: "var(--buildrick-text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {i.name}
                       </div>
                     </div>

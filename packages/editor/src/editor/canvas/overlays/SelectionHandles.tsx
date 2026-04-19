@@ -47,7 +47,7 @@ const ARIA_LABELS: Record<HandlePosition, string> = {
 const handleBaseStyle: React.CSSProperties = {
   position: "absolute",
   background: "#FFFFFF",
-  border: "2px solid var(--aqb-primary)",
+  border: "2px solid var(--buildrick-accent)",
   borderRadius: "2px",
   zIndex: Z_INDEX.selectionHandle,
   boxShadow: SHADOWS.glowMd,

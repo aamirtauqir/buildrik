@@ -22,14 +22,14 @@ export const TextareaField: React.FC<TextareaFieldProps> = ({
   ...props
 }) => {
   return (
-    <div className={`aqb-textarea-field ${className}`} style={{ width: "100%", ...style }}>
+    <div className={`buildrick-textarea-field ${className}`} style={{ width: "100%", ...style }}>
       {label && (
         <label
           style={{
             display: "block",
             marginBottom: 6,
             fontSize: 12,
-            color: "var(--aqb-text-secondary)",
+            color: "var(--buildrick-text-secondary)",
           }}
         >
           {label}
@@ -41,10 +41,10 @@ export const TextareaField: React.FC<TextareaFieldProps> = ({
           width: "100%",
           minHeight: 80,
           padding: "8px 12px",
-          background: "var(--aqb-bg-dark)",
-          border: `1px solid ${error ? "var(--aqb-error)" : "var(--aqb-border)"}`,
+          background: "var(--buildrick-bg-dark)",
+          border: `1px solid ${error ? "var(--buildrick-error)" : "var(--buildrick-border)"}`,
           borderRadius: 6,
-          color: "var(--aqb-text-primary)",
+          color: "var(--buildrick-text-primary)",
           fontSize: 13,
           fontFamily: "inherit",
           outline: "none",
@@ -58,7 +58,7 @@ export const TextareaField: React.FC<TextareaFieldProps> = ({
             display: "block",
             marginTop: 4,
             fontSize: 12,
-            color: error ? "var(--aqb-error)" : "var(--aqb-text-muted)",
+            color: error ? "var(--buildrick-error)" : "var(--buildrick-text-muted)",
           }}
         >
           {error || hint}

@@ -67,7 +67,7 @@ export function devLog(context: string, message: string, data?: unknown): void {
 // =============================================================================
 // Domain-Specific Canvas Tracing
 // Usage: devLogger.hover('start', { elementId }); devLogger.drag('move', pos);
-// Enable per-domain filtering: localStorage.setItem('aqb:trace:hover', 'true')
+// Enable per-domain filtering: localStorage.setItem('buildrick:trace:hover', 'true')
 // =============================================================================
 
 type TraceLevel = "info" | "debug" | "trace";
@@ -76,13 +76,13 @@ type TraceLevel = "info" | "debug" | "trace";
 function isTraceEnabled(domain: string): boolean {
   if (!isDev) return false;
   // Global enable all
-  if (typeof localStorage !== "undefined" && localStorage.getItem("aqb:trace:all") === "true") {
+  if (typeof localStorage !== "undefined" && localStorage.getItem("buildrick:trace:all") === "true") {
     return true;
   }
   // Per-domain enable
   if (
     typeof localStorage !== "undefined" &&
-    localStorage.getItem(`aqb:trace:${domain}`) === "true"
+    localStorage.getItem(`buildrick:trace:${domain}`) === "true"
   ) {
     return true;
   }
@@ -138,8 +138,8 @@ function createDomainTrace(domain: string) {
 
 /**
  * Domain-specific development logger for Canvas operations.
- * Enable per-domain: localStorage.setItem('aqb:trace:hover', 'true')
- * Enable all: localStorage.setItem('aqb:trace:all', 'true')
+ * Enable per-domain: localStorage.setItem('buildrick:trace:hover', 'true')
+ * Enable all: localStorage.setItem('buildrick:trace:all', 'true')
  *
  * @example
  * devLogger.hover('start', { elementId, position });
@@ -169,30 +169,30 @@ export const devLogger = {
   /** Enable tracing for a domain */
   enable(domain: string): void {
     if (typeof localStorage !== "undefined") {
-      localStorage.setItem(`aqb:trace:${domain}`, "true");
+      localStorage.setItem(`buildrick:trace:${domain}`, "true");
     }
   },
 
   /** Disable tracing for a domain */
   disable(domain: string): void {
     if (typeof localStorage !== "undefined") {
-      localStorage.removeItem(`aqb:trace:${domain}`);
+      localStorage.removeItem(`buildrick:trace:${domain}`);
     }
   },
 
   /** Enable all tracing */
   enableAll(): void {
     if (typeof localStorage !== "undefined") {
-      localStorage.setItem("aqb:trace:all", "true");
+      localStorage.setItem("buildrick:trace:all", "true");
     }
   },
 
   /** Disable all tracing */
   disableAll(): void {
     if (typeof localStorage !== "undefined") {
-      localStorage.removeItem("aqb:trace:all");
+      localStorage.removeItem("buildrick:trace:all");
       Object.keys(DOMAIN_COLORS).forEach((domain) => {
-        localStorage.removeItem(`aqb:trace:${domain}`);
+        localStorage.removeItem(`buildrick:trace:${domain}`);
       });
     }
   },

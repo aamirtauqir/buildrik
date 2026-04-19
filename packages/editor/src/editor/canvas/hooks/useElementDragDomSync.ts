@@ -61,9 +61,9 @@ export function useElementDragDomSync({
       let newDropTarget: string | null = null;
 
       for (const elem of elementsAtPoint) {
-        const aqbEl = elem.closest("[data-aqb-id]") as HTMLElement | null;
+        const aqbEl = elem.closest("[data-buildrick-id]") as HTMLElement | null;
         if (aqbEl) {
-          const targetId = aqbEl.getAttribute("data-aqb-id");
+          const targetId = aqbEl.getAttribute("data-buildrick-id");
           if (targetId && targetId !== draggingElementId && targetId !== rootIdRef.current) {
             const sourceEl = composer.elements.getElement(draggingElementId);
             const targetEl = composer.elements.getElement(targetId);
@@ -82,7 +82,7 @@ export function useElementDragDomSync({
       if (newDropTarget !== currentDropTargetRef.current) {
         if (lastDropTargetRef.current) {
           const prevEl = canvas.querySelector(
-            `[data-aqb-id="${lastDropTargetRef.current}"]`
+            `[data-buildrick-id="${lastDropTargetRef.current}"]`
           ) as HTMLElement | null;
           if (prevEl) {
             prevEl.removeAttribute("data-drop-target");
@@ -92,7 +92,7 @@ export function useElementDragDomSync({
 
         if (newDropTarget) {
           const newEl = canvas.querySelector(
-            `[data-aqb-id="${newDropTarget}"]`
+            `[data-buildrick-id="${newDropTarget}"]`
           ) as HTMLElement | null;
           if (newEl) {
             newEl.setAttribute("data-drop-target", "true");
@@ -112,7 +112,7 @@ export function useElementDragDomSync({
     const canvas = canvasRef.current;
     if (lastDropTargetRef.current && canvas) {
       const el = canvas.querySelector(
-        `[data-aqb-id="${lastDropTargetRef.current}"]`
+        `[data-buildrick-id="${lastDropTargetRef.current}"]`
       ) as HTMLElement | null;
       if (el) {
         el.removeAttribute("data-drop-target");
@@ -140,10 +140,10 @@ export function useElementDragDomSync({
 
     const applyDraggable = () => {
       const rootId = rootIdRef.current;
-      const elements = canvas.querySelectorAll("[data-aqb-id]");
+      const elements = canvas.querySelectorAll("[data-buildrick-id]");
       elements.forEach((el) => {
         const htmlEl = el as HTMLElement;
-        const id = htmlEl.getAttribute("data-aqb-id");
+        const id = htmlEl.getAttribute("data-buildrick-id");
         if (id && id !== rootId) {
           htmlEl.draggable = true;
           htmlEl.style.cursor = "grab";
@@ -165,7 +165,7 @@ export function useElementDragDomSync({
           for (const node of mutation.addedNodes) {
             if (node.nodeType === Node.ELEMENT_NODE) {
               const el = node as Element;
-              if (el.hasAttribute?.("data-aqb-id") || el.querySelector?.("[data-aqb-id]")) {
+              if (el.hasAttribute?.("data-buildrick-id") || el.querySelector?.("[data-buildrick-id]")) {
                 applyDraggable();
                 return;
               }

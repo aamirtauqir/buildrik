@@ -50,7 +50,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   onHelpClick,
   onClose,
 }) => {
-  const storageKey = `aqb-history-view${projectId ? `-${projectId}` : ""}`;
+  const storageKey = `buildrick-history-view${projectId ? `-${projectId}` : ""}`;
   const { historyStack, canUndo, clear } = useHistoryState(composer);
 
   const [activeView, setActiveView] = React.useState<HistoryView>(() => {
@@ -110,7 +110,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   }, []);
 
   return (
-    <div className="aqb-history-container">
+    <div className="buildrick-history-container">
       <PanelHeader
         title="Version History"
         isPinned={isPinned}

@@ -20,7 +20,7 @@ export interface UseSelectionRectOptions {
   elementIds: string[];
   /** Whether multiple elements are selected */
   isMultiSelect: boolean;
-  /** Canvas selector (default: ".aqb-canvas") */
+  /** Canvas selector (default: ".buildrick-canvas") */
   canvasSelector?: string;
 }
 
@@ -31,7 +31,7 @@ export interface UseSelectionRectOptions {
 export function useSelectionRect({
   elementIds,
   isMultiSelect,
-  canvasSelector = ".aqb-canvas",
+  canvasSelector = ".buildrick-canvas",
 }: UseSelectionRectOptions): SelectionRect | null {
   const [rect, setRect] = React.useState<SelectionRect | null>(null);
 
@@ -57,7 +57,7 @@ export function useSelectionRect({
         let maxY = -Infinity;
 
         elementIds.forEach((id) => {
-          const element = document.querySelector(`[data-aqb-id="${id}"]`) as HTMLElement;
+          const element = document.querySelector(`[data-buildrick-id="${id}"]`) as HTMLElement;
           if (element) {
             const elRect = element.getBoundingClientRect();
             minX = Math.min(minX, elRect.left - canvasRect.left + scrollLeft);
@@ -77,7 +77,7 @@ export function useSelectionRect({
         }
       } else {
         // Single element selection
-        const element = document.querySelector(`[data-aqb-id="${elementIds[0]}"]`) as HTMLElement;
+        const element = document.querySelector(`[data-buildrick-id="${elementIds[0]}"]`) as HTMLElement;
 
         if (element) {
           const elementRect = element.getBoundingClientRect();
@@ -106,7 +106,7 @@ export function useSelectionRect({
 
     // Observe all selected elements for size changes
     elementIds.forEach((id) => {
-      const element = document.querySelector(`[data-aqb-id="${id}"]`);
+      const element = document.querySelector(`[data-buildrick-id="${id}"]`);
       if (element) {
         resizeObserver.observe(element);
       }
@@ -125,7 +125,7 @@ export function useSelectionRect({
 
     // Observe selected elements for style changes
     elementIds.forEach((id) => {
-      const element = document.querySelector(`[data-aqb-id="${id}"]`);
+      const element = document.querySelector(`[data-buildrick-id="${id}"]`);
       if (element) {
         mutationObserver.observe(element, {
           attributes: true,

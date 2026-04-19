@@ -84,7 +84,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
   // ];
 
   return (
-    <div className="aqb-animation-editor" style={{ padding: 12 }}>
+    <div className="buildrick-animation-editor" style={{ padding: 12 }}>
       {/* Animation Type */}
       <Tabs
         tabs={[
@@ -113,11 +113,11 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
                 padding: "12px 8px",
                 background:
                   animation.type === anim.value
-                    ? "var(--aqb-primary)"
-                    : "var(--aqb-bg-panel-secondary)",
+                    ? "var(--buildrick-accent)"
+                    : "var(--buildrick-bg-panel-secondary)",
                 border: "none",
                 borderRadius: 8,
-                color: animation.type === anim.value ? "#fff" : "var(--aqb-text-secondary)",
+                color: animation.type === anim.value ? "#fff" : "var(--buildrick-text-secondary)",
                 fontSize: 12,
                 cursor: "pointer",
                 transition: "all 0.15s ease",
@@ -136,7 +136,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
             fontSize: 12,
             fontWeight: 600,
             textTransform: "uppercase",
-            color: "var(--aqb-text-muted)",
+            color: "var(--buildrick-text-muted)",
             marginBottom: 12,
           }}
         >
@@ -188,7 +188,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
             fontSize: 12,
             fontWeight: 600,
             textTransform: "uppercase",
-            color: "var(--aqb-text-muted)",
+            color: "var(--buildrick-text-muted)",
             marginBottom: 12,
           }}
         >
@@ -205,11 +205,11 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
                 padding: "10px 8px",
                 background:
                   animation.trigger === trigger
-                    ? "var(--aqb-primary)"
-                    : "var(--aqb-bg-panel-secondary)",
+                    ? "var(--buildrick-accent)"
+                    : "var(--buildrick-bg-panel-secondary)",
                 border: "none",
                 borderRadius: 6,
-                color: animation.trigger === trigger ? "#fff" : "var(--aqb-text-secondary)",
+                color: animation.trigger === trigger ? "#fff" : "var(--buildrick-text-secondary)",
                 fontSize: 12,
                 cursor: "pointer",
                 textTransform: "capitalize",
@@ -246,11 +246,11 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
         <div
           style={{
             padding: 12,
-            background: "var(--aqb-bg-dark)",
+            background: "var(--buildrick-bg-dark)",
             borderRadius: 8,
-            fontFamily: "var(--aqb-font-mono)",
+            fontFamily: "var(--buildrick-design-font-mono)",
             fontSize: 12,
-            color: "var(--aqb-text-muted)",
+            color: "var(--buildrick-text-muted)",
           }}
         >
           animation: {animation.type} {animation.duration}ms {animation.easing} {animation.delay}ms{" "}

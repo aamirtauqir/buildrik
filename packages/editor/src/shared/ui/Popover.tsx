@@ -118,14 +118,14 @@ export const Popover: React.FC<PopoverProps> = ({
           : position === "left"
             ? "translateY(-50%) translateX(-100%)"
             : "translateY(-50%)",
-    background: "var(--aqb-bg-panel)",
+    background: "var(--buildrick-bg-panel)",
     borderRadius: 8,
     boxShadow: "0 8px 30px rgba(0,0,0,0.4)",
-    border: "1px solid var(--aqb-border)",
+    border: "1px solid var(--buildrick-border)",
     padding: 12,
     zIndex: 9999, // High Z-Index to stay on top
     minWidth: 200,
-    animation: "aqb-popover-in 0.15s ease",
+    animation: "buildrick-popover-in 0.15s ease",
   };
 
   return (
@@ -150,7 +150,7 @@ export const Popover: React.FC<PopoverProps> = ({
         createPortal(
           <div
             ref={contentRef}
-            className="aqb-popover"
+            className="buildrick-popover"
             style={popoverStyles}
             onMouseEnter={triggerOn === "hover" ? () => setIsOpen(true) : undefined}
             onMouseLeave={triggerOn === "hover" ? () => setIsOpen(false) : undefined}

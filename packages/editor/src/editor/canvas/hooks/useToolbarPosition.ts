@@ -46,7 +46,7 @@ const DEFAULT_OPTIONS: Required<UseToolbarPositionOptions> = {
  * - Viewport edge clamping
  * - Auto-flip when element is too close to edge
  *
- * @param elementId - The data-aqb-id of the target element
+ * @param elementId - The data-buildrick-id of the target element
  * @param canvasRef - Reference to the canvas container
  * @param options - Position customization options
  * @returns Calculated position or null if element not found

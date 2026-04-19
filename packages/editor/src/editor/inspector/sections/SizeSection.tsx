@@ -1,7 +1,7 @@
 /**
  * Size Section - Width, Height, Min/Max dimensions
  * CP3: W and H rows each have a hover-reveal chain button that opens a spacing
- * token picker. Selecting a spacing token stores var(--aqb-space-4) on the
+ * token picker. Selecting a spacing token stores var(--buildrick-design-space-4) on the
  * element — not "16px". The picker uses list layout (showSwatch=false).
  */
 
@@ -18,7 +18,7 @@ import { MixedValueBadge } from "../shared/MixedValueBadge";
 // HELPERS
 // ============================================================================
 
-const isTokenVar = (val: string): boolean => /^var\(--aqb-/.test(val);
+const isTokenVar = (val: string): boolean => /^var\(--buildrick-design-/.test(val);
 
 const resolveVar = (cssVar: string): string => {
   const varName = cssVar.replace(/^var\(/, "").replace(/\)$/, "");
@@ -93,7 +93,7 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
           type="button"
           aria-label={`Link ${property} to spacing token`}
           title="Link to spacing token"
-          className="aqb-chain-btn"
+          className="buildrick-chain-btn"
           style={{
             padding: 2,
             background: "none",
@@ -166,8 +166,8 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
       <span
         style={{
           fontSize: 11,
-          color: "var(--aqb-text-tertiary)",
-          fontFamily: "var(--aqb-font-mono)",
+          color: "var(--buildrick-text-tertiary)",
+          fontFamily: "var(--buildrick-design-font-mono)",
           whiteSpace: "nowrap",
         }}
       >
@@ -188,7 +188,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
       {/* Width */}
       {!hidden("width") && (
         <div style={{ position: "relative", display: "flex", alignItems: "center" }}
-          className="aqb-row-hover-chain"
+          className="buildrick-row-hover-chain"
         >
           {mixedKeys?.has("width") && (
             <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
@@ -216,7 +216,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
       {/* Height */}
       {!hidden("height") && (
         <div style={{ position: "relative", display: "flex", alignItems: "center" }}
-          className="aqb-row-hover-chain"
+          className="buildrick-row-hover-chain"
         >
           {mixedKeys?.has("height") && (
             <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
@@ -328,16 +328,16 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "var(--aqb-space-2)",
-            marginBottom: "var(--aqb-space-3)",
+            gap: "var(--buildrick-design-space-2)",
+            marginBottom: "var(--buildrick-design-space-3)",
             opacity: disabled("object-fit") ? 0.5 : 1,
           }}
           title={reason("object-fit")}
         >
           <label
             style={{
-              fontSize: "var(--aqb-text-sm)",
-              color: "var(--aqb-text-tertiary)",
+              fontSize: "var(--buildrick-text-sm)",
+              color: "var(--buildrick-text-tertiary)",
               fontWeight: 500,
               minWidth: 70,
             }}
@@ -349,12 +349,12 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
             onChange={(e) => onChange("object-fit", e.target.value)}
             style={{
               flex: 1,
-              padding: "var(--aqb-space-2) 10px",
+              padding: "var(--buildrick-design-space-2) 10px",
               background: "rgba(255,255,255,0.05)",
-              border: "1px solid var(--aqb-border)",
-              borderRadius: "var(--aqb-radius-sm)",
-              color: "var(--aqb-text-primary)",
-              fontSize: "var(--aqb-text-base)",
+              border: "1px solid var(--buildrick-border)",
+              borderRadius: "var(--buildrick-design-radius-sm)",
+              color: "var(--buildrick-text-primary)",
+              fontSize: "var(--buildrick-text-base)",
               outline: "none",
               cursor: "pointer",
             }}

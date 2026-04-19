@@ -91,7 +91,7 @@ export class RecoveryManager {
         id: generateId("root"),
         type: "container" as const,
         tagName: "div" as const,
-        classes: ["aqb-page-root"],
+        classes: ["buildrick-page-root"],
         children: [],
         attributes: {},
         styles: {},

@@ -60,7 +60,7 @@ export const Features: React.FC<FeaturesProps> = ({
   variant = "cards",
 }) => {
   return (
-    <section className="aqb-features" style={{ padding: "60px 40px" }}>
+    <section className="buildrick-features" style={{ padding: "60px 40px" }}>
       {(title || subtitle) && (
         <div
           style={{
@@ -75,7 +75,7 @@ export const Features: React.FC<FeaturesProps> = ({
               style={{
                 fontSize: 36,
                 fontWeight: 700,
-                color: "var(--aqb-text-primary)",
+                color: "var(--buildrick-text-primary)",
                 marginBottom: 16,
               }}
             >
@@ -86,7 +86,7 @@ export const Features: React.FC<FeaturesProps> = ({
             <p
               style={{
                 fontSize: 18,
-                color: "var(--aqb-text-secondary)",
+                color: "var(--buildrick-text-secondary)",
                 lineHeight: 1.6,
               }}
             >
@@ -108,11 +108,11 @@ export const Features: React.FC<FeaturesProps> = ({
         {features.map((feature, index) => (
           <div
             key={index}
-            className="aqb-feature-card"
+            className="buildrick-feature-card"
             style={{
               padding: variant === "cards" ? 32 : 24,
-              background: variant === "cards" ? "var(--aqb-bg-panel)" : "transparent",
-              border: variant === "cards" ? "1px solid var(--aqb-border)" : "none",
+              background: variant === "cards" ? "var(--buildrick-bg-panel)" : "transparent",
+              border: variant === "cards" ? "1px solid var(--buildrick-border)" : "none",
               borderRadius: variant === "cards" ? 16 : 0,
               textAlign: variant === "icons" ? "center" : "left",
               transition: "transform 0.2s ease, box-shadow 0.2s ease",
@@ -132,7 +132,7 @@ export const Features: React.FC<FeaturesProps> = ({
               style={{
                 fontSize: 20,
                 fontWeight: 600,
-                color: "var(--aqb-text-primary)",
+                color: "var(--buildrick-text-primary)",
                 marginBottom: 12,
                 display: variant === "list" ? "inline" : "block",
               }}
@@ -142,7 +142,7 @@ export const Features: React.FC<FeaturesProps> = ({
             <p
               style={{
                 fontSize: 15,
-                color: "var(--aqb-text-secondary)",
+                color: "var(--buildrick-text-secondary)",
                 lineHeight: 1.6,
               }}
             >
@@ -162,10 +162,10 @@ export const featuresBlockConfig = {
   elementType: "features" as const,
   icon: "✨",
   content:
-    '<section class="aqb-features" data-aqb-type="features">' +
-    '<div class="aqb-feature-item"><h3>Fast Editing</h3><p>Drag, drop, and style in seconds.</p></div>' +
-    '<div class="aqb-feature-item"><h3>Responsive</h3><p>Looks great on every device.</p></div>' +
-    '<div class="aqb-feature-item"><h3>AI Assist</h3><p>Generate sections with one prompt.</p></div>' +
+    '<section class="buildrick-features" data-buildrick-type="features">' +
+    '<div class="buildrick-feature-item"><h3>Fast Editing</h3><p>Drag, drop, and style in seconds.</p></div>' +
+    '<div class="buildrick-feature-item"><h3>Responsive</h3><p>Looks great on every device.</p></div>' +
+    '<div class="buildrick-feature-item"><h3>AI Assist</h3><p>Generate sections with one prompt.</p></div>' +
     "</section>",
 };
 

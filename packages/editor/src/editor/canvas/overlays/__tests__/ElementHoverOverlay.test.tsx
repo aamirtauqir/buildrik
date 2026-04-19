@@ -41,7 +41,7 @@ vi.mock("../SpacingLabels", () => ({
 
 /**
  * Build a fake canvas ref whose .current has a querySelector that returns a
- * fake element for `[data-aqb-id="el-1"]`, with stable getBoundingClientRect
+ * fake element for `[data-buildrick-id="el-1"]`, with stable getBoundingClientRect
  * values so the overlay computes a non-null rect.
  */
 function makeCanvasRef(elementId: string): React.RefObject<HTMLDivElement | null> {
@@ -58,7 +58,7 @@ function makeCanvasRef(elementId: string): React.RefObject<HTMLDivElement | null
   const fakeCanvas = {
     getBoundingClientRect: () => fakeCanvasRect,
     querySelector: (selector: string) => {
-      if (selector === `[data-aqb-id="${elementId}"]`) {
+      if (selector === `[data-buildrick-id="${elementId}"]`) {
         return fakeElement;
       }
       return null;

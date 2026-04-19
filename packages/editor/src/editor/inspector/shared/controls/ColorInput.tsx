@@ -3,7 +3,7 @@
  *
  * Binding model:
  *   - Unbound: value is "#3B82F6", "transparent", "inherit", etc.
- *   - Bound:   value is "var(--aqb-color-primary)" — stored as cssVar, not hex.
+ *   - Bound:   value is "var(--buildrick-design-color-primary)" — stored as cssVar, not hex.
  *
  * isKeyword: true only for CSS keywords (transparent, inherit, currentColor),
  *   NOT for var(--aqb-*) which are valid token bindings.
@@ -34,13 +34,13 @@ import { baseStyles, INSPECTOR_TOKENS } from "./controlStyles";
 const isValidHexColor = (val: string): boolean =>
   /^#[0-9A-Fa-f]{6}$/.test(val) || /^#[0-9A-Fa-f]{3}$/.test(val);
 
-const isTokenVar = (val: string): boolean => /^var\(--aqb-/.test(val);
+const isTokenVar = (val: string): boolean => /^var\(--buildrick-design-/.test(val);
 
 /** CSS keywords that are not hex and not token bindings */
 const isKeywordValue = (val: string): boolean =>
   !!val && !isValidHexColor(val) && !isTokenVar(val);
 
-/** Resolve a var(--aqb-*) binding to its computed hex via getComputedStyle */
+/** Resolve a var(--buildrick-design-*) binding to its computed hex via getComputedStyle */
 const resolveVar = (cssVar: string): string => {
   const varName = cssVar.replace(/^var\(/, "").replace(/\)$/, "");
   const resolved = getComputedStyle(document.documentElement)
@@ -49,9 +49,9 @@ const resolveVar = (cssVar: string): string => {
   return resolved || "#000000";
 };
 
-/** Extract CSS var name from var(--aqb-…) wrapper */
+/** Extract CSS var name from var(--buildrick-design-…) wrapper */
 const extractVarName = (v: string) => {
-  const m = v.match(/^var\((--aqb-[^)]+)\)$/);
+  const m = v.match(/^var\((--buildrick-design-[^)]+)\)$/);
   return m ? m[1] : null;
 };
 
@@ -224,7 +224,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
                   background: "rgba(0,0,0,0.3)",
                   border: "none",
                   borderRadius: 4,
-                  color: "var(--aqb-text-tertiary)",
+                  color: "var(--buildrick-text-tertiary)",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",

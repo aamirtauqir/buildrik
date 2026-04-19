@@ -37,7 +37,7 @@ export const FONT_WEIGHTS = [
 // HELPERS
 // ============================================================================
 
-const isTokenVar = (val: string): boolean => /^var\(--aqb-/.test(val);
+const isTokenVar = (val: string): boolean => /^var\(--buildrick-design-/.test(val);
 
 const resolveVar = (cssVar: string): string => {
   const varName = cssVar.replace(/^var\(/, "").replace(/\)$/, "");
@@ -108,7 +108,7 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
           type="button"
           aria-label={`Link ${property} to type token`}
           title="Link to type token"
-          className="aqb-chain-btn"
+          className="buildrick-chain-btn"
           style={{
             padding: 2,
             background: "none",
@@ -156,7 +156,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
       {/* Font Size — CP5: chain button for type token binding */}
       <div
         style={{ position: "relative", display: "flex", alignItems: "center" }}
-        className="aqb-row-hover-chain"
+        className="buildrick-row-hover-chain"
       >
         {mixedKeys?.has("font-size") && (
           <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
@@ -198,7 +198,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
       {/* Line Height — CP5: chain button for type token binding */}
       <div
         style={{ position: "relative", display: "flex", alignItems: "center" }}
-        className="aqb-row-hover-chain"
+        className="buildrick-row-hover-chain"
       >
         {mixedKeys?.has("line-height") && (
           <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>

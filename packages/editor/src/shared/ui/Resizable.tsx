@@ -89,7 +89,7 @@ export const Resizable: React.FC<ResizableProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`aqb-resizable ${className || ""}`}
+      className={`buildrick-resizable ${className || ""}`}
       style={{
         position: "relative",
         width: direction !== "vertical" ? size.width : "100%",
@@ -120,7 +120,7 @@ export const Resizable: React.FC<ResizableProps> = ({
               transform: "translateY(-50%)",
               width: 2,
               height: 40,
-              background: isResizing ? "var(--aqb-primary)" : "var(--aqb-border)",
+              background: isResizing ? "var(--buildrick-accent)" : "var(--buildrick-border)",
               borderRadius: 1,
               transition: "background 0.15s",
             }}
@@ -149,7 +149,7 @@ export const Resizable: React.FC<ResizableProps> = ({
               transform: "translateX(-50%)",
               width: 40,
               height: 2,
-              background: isResizing ? "var(--aqb-primary)" : "var(--aqb-border)",
+              background: isResizing ? "var(--buildrick-accent)" : "var(--buildrick-border)",
               borderRadius: 1,
               transition: "background 0.15s",
             }}
@@ -177,8 +177,8 @@ export const Resizable: React.FC<ResizableProps> = ({
               bottom: 3,
               width: 6,
               height: 6,
-              borderRight: `2px solid ${isResizing ? "var(--aqb-primary)" : "var(--aqb-border)"}`,
-              borderBottom: `2px solid ${isResizing ? "var(--aqb-primary)" : "var(--aqb-border)"}`,
+              borderRight: `2px solid ${isResizing ? "var(--buildrick-accent)" : "var(--buildrick-border)"}`,
+              borderBottom: `2px solid ${isResizing ? "var(--buildrick-accent)" : "var(--buildrick-border)"}`,
               transition: "border-color 0.15s",
             }}
           />

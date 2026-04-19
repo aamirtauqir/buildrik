@@ -308,7 +308,7 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
         aria-label="Time travel"
       >
         {historyStack.length === 0 ? (
-          <p style={{ color: "var(--aqb-text-muted)", fontSize: 13 }}>
+          <p style={{ color: "var(--buildrick-text-muted)", fontSize: 13 }}>
             No history entries to scrub through.
           </p>
         ) : (

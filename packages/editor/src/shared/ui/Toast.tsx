@@ -204,29 +204,29 @@ const Toast: React.FC<ToastProps> = ({
   };
 
   const variantStyles: Record<ToastVariant, { bg: string; border: string; icon: string }> = {
-    info: { bg: "var(--aqb-info)", border: "var(--aqb-info)", icon: "ℹ" },
+    info: { bg: "var(--buildrick-info)", border: "var(--buildrick-info)", icon: "ℹ" },
     success: {
-      bg: "var(--aqb-success)",
-      border: "var(--aqb-success)",
+      bg: "var(--buildrick-success)",
+      border: "var(--buildrick-success)",
       icon: "✓",
     },
     warning: {
-      bg: "var(--aqb-warning)",
-      border: "var(--aqb-warning)",
+      bg: "var(--buildrick-warning)",
+      border: "var(--buildrick-warning)",
       icon: "⚠",
     },
-    error: { bg: "var(--aqb-error)", border: "var(--aqb-error)", icon: "✕" },
+    error: { bg: "var(--buildrick-error)", border: "var(--buildrick-error)", icon: "✕" },
   };
 
   const style = variantStyles[variant];
 
   return (
     <div
-      className={`aqb-toast aqb-toast-${variant}`}
+      className={`buildrick-toast buildrick-toast-${variant}`}
       role="alert"
       aria-live={variant === "error" ? "assertive" : "polite"}
       style={{
-        background: "var(--aqb-bg-panel)",
+        background: "var(--buildrick-bg-panel)",
         borderRadius: 8,
         boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
         padding: "12px 16px",
@@ -236,7 +236,7 @@ const Toast: React.FC<ToastProps> = ({
         alignItems: "flex-start",
         gap: 12,
         borderLeft: `4px solid ${style.border}`,
-        animation: isExiting ? "aqb-toast-out 0.2s ease forwards" : "aqb-toast-in 0.2s ease",
+        animation: isExiting ? "buildrick-toast-out 0.2s ease forwards" : "buildrick-toast-in 0.2s ease",
       }}
     >
       <span
@@ -258,13 +258,13 @@ const Toast: React.FC<ToastProps> = ({
       </span>
       <div style={{ flex: 1 }}>
         {title && <div style={{ fontWeight: 600, marginBottom: 4 }}>{title}</div>}
-        <div style={{ color: "var(--aqb-text-secondary)", fontSize: 13 }}>{message}</div>
+        <div style={{ color: "var(--buildrick-text-secondary)", fontSize: 13 }}>{message}</div>
       </div>
       {action && (
         <button
           onClick={handleAction}
           style={{
-            background: "var(--aqb-primary)",
+            background: "var(--buildrick-accent)",
             border: "none",
             borderRadius: 4,
             color: "#fff",
@@ -287,7 +287,7 @@ const Toast: React.FC<ToastProps> = ({
         style={{
           background: "transparent",
           border: "none",
-          color: "var(--aqb-text-muted)",
+          color: "var(--buildrick-text-muted)",
           cursor: "pointer",
           padding: 4,
           flexShrink: 0,

@@ -149,10 +149,10 @@ export function parseHTMLToElementData(html: string): ElementData[] {
  * Convert parsed node to ElementData
  */
 function parsedNodeToElementData(node: ParsedNode): ElementData {
-  const type = getElementTypeFromTag(node.tag || "div", node.attrs?.["data-aqb-type"]);
+  const type = getElementTypeFromTag(node.tag || "div", node.attrs?.["data-buildrick-type"]);
 
   const data: ElementData = {
-    id: node.attrs?.["data-aqb-id"] || generateId("el"),
+    id: node.attrs?.["data-buildrick-id"] || generateId("el"),
     type: type as ElementData["type"],
     tagName: node.tag,
   };
@@ -168,7 +168,7 @@ function parsedNodeToElementData(node: ParsedNode): ElementData {
   }
 
   // Extract other attributes
-  const skipAttrs = new Set(["class", "style", "data-aqb-id", "data-aqb-type"]);
+  const skipAttrs = new Set(["class", "style", "data-buildrick-id", "data-buildrick-type"]);
   const attrs: Record<string, string> = {};
   for (const [key, value] of Object.entries(node.attrs || {})) {
     if (!skipAttrs.has(key)) {

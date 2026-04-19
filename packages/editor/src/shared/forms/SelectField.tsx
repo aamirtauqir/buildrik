@@ -47,16 +47,16 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   const hintId = hint && !error ? `${selectId}-hint` : undefined;
 
   const sizeClasses = {
-    sm: "aqb-input-sm",
+    sm: "buildrick-input-sm",
     md: "",
-    lg: "aqb-input-lg",
+    lg: "buildrick-input-lg",
   };
 
   const selectClasses = [
-    "aqb-input",
-    "aqb-select",
+    "buildrick-input",
+    "buildrick-select",
     sizeClasses[size],
-    error ? "aqb-input-error" : "",
+    error ? "buildrick-input-error" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -79,9 +79,9 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   }, [options]);
 
   return (
-    <div className="aqb-field" style={{ width: fullWidth ? "100%" : "auto" }}>
+    <div className="buildrick-field" style={{ width: fullWidth ? "100%" : "auto" }}>
       {label && (
-        <label htmlFor={selectId} className="aqb-field-label">
+        <label htmlFor={selectId} className="buildrick-field-label">
           {label}
         </label>
       )}
@@ -94,7 +94,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
         aria-invalid={error ? "true" : undefined}
         aria-describedby={errorId || hintId}
         style={{
-          color: value ? undefined : "var(--aqb-text-muted)",
+          color: value ? undefined : "var(--buildrick-text-muted)",
         }}
       >
         {placeholder && <option value="">{placeholder}</option>}
@@ -114,12 +114,12 @@ export const SelectField: React.FC<SelectFieldProps> = ({
         ))}
       </select>
       {error && (
-        <span id={errorId} className="aqb-field-error" role="alert">
+        <span id={errorId} className="buildrick-field-error" role="alert">
           {error}
         </span>
       )}
       {hint && !error && (
-        <span id={hintId} className="aqb-field-hint">
+        <span id={hintId} className="buildrick-field-hint">
           {hint}
         </span>
       )}

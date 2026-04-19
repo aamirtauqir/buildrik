@@ -49,12 +49,12 @@ export class RepeaterRenderer {
     const parser = new DOMParser();
     const doc = parser.parseFromString(rootHtml, "text/html");
 
-    // Find all elements with data-aqb-id that have collection bindings
-    const elements = doc.querySelectorAll("[data-aqb-id]");
+    // Find all elements with data-buildrick-id that have collection bindings
+    const elements = doc.querySelectorAll("[data-buildrick-id]");
     const expansionPromises: Promise<void>[] = [];
 
     elements.forEach((el) => {
-      const elementId = el.getAttribute("data-aqb-id");
+      const elementId = el.getAttribute("data-buildrick-id");
       if (!elementId) return;
 
       const binding = this.composer.cmsBindings.getCollectionBinding(elementId);
@@ -96,7 +96,7 @@ export class RepeaterRenderer {
 
     // Create a fragment to hold all cloned elements
     const fragment = doc.createDocumentFragment();
-    const originalId = templateEl.getAttribute("data-aqb-id");
+    const originalId = templateEl.getAttribute("data-buildrick-id");
 
     items.forEach((item, index) => {
       const context: RepeaterContext = {
@@ -145,7 +145,7 @@ export class RepeaterRenderer {
 
     // Generate unique ID for this clone
     const cloneId = `${originalId}-${index}`;
-    el.setAttribute("data-aqb-id", cloneId);
+    el.setAttribute("data-buildrick-id", cloneId);
 
     // Process text content in all child elements
     const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);

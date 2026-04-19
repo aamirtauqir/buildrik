@@ -218,7 +218,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
   };
 
   return (
-    <div className="aqb-st-container">
+    <div className="buildrick-st-container">
       {canGoBack ? (
         <>
           <DrillInHeader
@@ -233,7 +233,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             onHelpClick={onHelpClick}
             onClose={onClose}
           />
-          <div className="aqb-st-content">{renderContent()}</div>
+          <div className="buildrick-st-content">{renderContent()}</div>
         </>
       ) : (
         <>
@@ -244,7 +244,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             onHelpClick={onHelpClick}
             onClose={onClose}
           />
-          <div className="aqb-st-home">{renderHomeScreen()}</div>
+          <div className="buildrick-st-home">{renderHomeScreen()}</div>
         </>
       )}
       <SettingsNavGuard

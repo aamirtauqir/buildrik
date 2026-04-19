@@ -12,10 +12,10 @@ interface DiffRowProps {
 }
 
 const opColors: Record<string, string> = {
-  add: "var(--aqb-success, #22c55e)",
-  remove: "var(--aqb-error, #ef4444)",
-  replace: "var(--aqb-primary, #2d6dff)",
-  info: "var(--aqb-text-muted, #908D85)",
+  add: "var(--buildrick-success, #22c55e)",
+  remove: "var(--buildrick-error, #ef4444)",
+  replace: "var(--buildrick-accent, #2d6dff)",
+  info: "var(--buildrick-text-muted, #908D85)",
 };
 
 const opIcons: Record<string, string> = {
@@ -27,15 +27,15 @@ const opIcons: Record<string, string> = {
 
 export const DiffRow = React.memo<DiffRowProps>(({ change }) => {
   return (
-    <div className="aqb-ht-diff__row">
+    <div className="buildrick-ht-diff__row">
       <span
-        className="aqb-ht-diff__op"
+        className="buildrick-ht-diff__op"
         style={{ color: opColors[change.operation] }}
       >
         {opIcons[change.operation]}
       </span>
-      <span className="aqb-ht-diff__property">{change.property}</span>
-      <span className="aqb-ht-diff__desc">{change.description}</span>
+      <span className="buildrick-ht-diff__property">{change.property}</span>
+      <span className="buildrick-ht-diff__desc">{change.description}</span>
     </div>
   );
 });

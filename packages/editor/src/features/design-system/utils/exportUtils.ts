@@ -12,7 +12,7 @@ export function generateColorTokenId(name: string): string {
 }
 
 export function generateColorCssVar(name: string): string {
-  return `--aqb-color-${name.toLowerCase().replace(/\s+/g, "-")}`;
+  return `--buildrick-design-color-${name.toLowerCase().replace(/\s+/g, "-")}`;
 }
 
 export function buildExport(

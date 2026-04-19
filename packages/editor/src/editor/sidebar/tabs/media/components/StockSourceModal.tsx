@@ -143,7 +143,7 @@ export function StockSourceModal({
                   onClick={() => onSetColor(c.id)}
                   title={c.label}
                   className={`stock-color-dot${color === c.id ? " active" : ""}`}
-                  style={{ background: c.hex || "var(--ls-bg-subtle)" }}
+                  style={{ background: c.hex || "var(--buildrick-bg-subtle)" }}
                 >
                   {c.id === "all" && "\u00d7"}
                 </button>
@@ -228,7 +228,7 @@ export function StockSourceModal({
                       style={{ padding: 8 }}
                     >
                       <img src={ico.svgDataUrl} alt={ico.name} style={{ width: 24, height: 24 }} />
-                      <span style={{ fontSize: 10, color: "var(--ls-text-ghost)", marginTop: 4 }}>{ico.name}</span>
+                      <span style={{ fontSize: 10, color: "var(--buildrick-text-disabled)", marginTop: 4 }}>{ico.name}</span>
                     </div>
                   ))}
                 </div>

@@ -49,23 +49,23 @@ interface QualityConfig {
 const QUALITY_CONFIG: Record<DisplayQuality, QualityConfig> = {
   good: {
     filledBars: 3,
-    barColor: "var(--aqb-success)",
-    bgColor: "var(--aqb-success-light)",
+    barColor: "var(--buildrick-success)",
+    bgColor: "var(--buildrick-success-light)",
   },
   fair: {
     filledBars: 2,
-    barColor: "var(--aqb-warning)",
-    bgColor: "var(--aqb-warning-light)",
+    barColor: "var(--buildrick-warning)",
+    bgColor: "var(--buildrick-warning-light)",
   },
   poor: {
     filledBars: 1,
-    barColor: "var(--aqb-error)",
-    bgColor: "var(--aqb-error-light)",
+    barColor: "var(--buildrick-error)",
+    bgColor: "var(--buildrick-error-light)",
   },
   disconnected: {
     filledBars: 0,
-    barColor: "var(--aqb-text-disabled, var(--aqb-text-muted))",
-    bgColor: "var(--aqb-surface-3)",
+    barColor: "var(--buildrick-text-disabled, var(--buildrick-text-muted))",
+    bgColor: "var(--buildrick-surface-3)",
   },
 };
 
@@ -134,7 +134,7 @@ const SignalBars: React.FC<SignalBarsProps> = ({ filledBars, activeColor }) => {
           borderRadius: 1,
           backgroundColor: isFilled
             ? activeColor
-            : "var(--aqb-border, rgba(255,255,255,0.15))",
+            : "var(--buildrick-border, rgba(255,255,255,0.15))",
           flexShrink: 0,
         };
         return <div key={idx} style={barStyle} />;
@@ -166,12 +166,12 @@ const Tooltip: React.FC<TooltipProps> = ({ label, children }) => {
     left: "50%",
     transform: "translateX(-50%)",
     whiteSpace: "nowrap",
-    backgroundColor: "var(--aqb-surface-4)",
-    color: "var(--aqb-text-primary)",
+    backgroundColor: "var(--buildrick-surface-4)",
+    color: "var(--buildrick-text-primary)",
     fontSize: 12,
     padding: "4px 8px",
-    borderRadius: "var(--aqb-radius-sm)",
-    boxShadow: "var(--aqb-shadow-md)",
+    borderRadius: "var(--buildrick-design-radius-sm)",
+    boxShadow: "var(--buildrick-design-shadow-md)",
     pointerEvents: "none",
     zIndex: 9999,
     opacity: visible ? 1 : 0,
@@ -221,7 +221,7 @@ export const ConnectionQualityIndicator: React.FC<ConnectionQualityIndicatorProp
     gap: 5,
     height: 24,
     padding: "0 8px",
-    borderRadius: "var(--aqb-radius-xl, 999px)",
+    borderRadius: "var(--buildrick-design-radius-xl, 999px)",
     backgroundColor: config.bgColor,
     cursor: "default",
     flexShrink: 0,
@@ -230,7 +230,7 @@ export const ConnectionQualityIndicator: React.FC<ConnectionQualityIndicatorProp
   const offlineTextStyle: React.CSSProperties = {
     fontSize: 11,
     fontWeight: 500,
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
     lineHeight: 1,
   };
 

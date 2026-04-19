@@ -15,8 +15,8 @@ export const HIT_EXPANSION = 4;
 export function buildElementStack(x: number, y: number): string[] {
   const elements = document.elementsFromPoint(x, y);
   return elements
-    .filter((el) => el.hasAttribute("data-aqb-id"))
-    .map((el) => el.getAttribute("data-aqb-id")!)
+    .filter((el) => el.hasAttribute("data-buildrick-id"))
+    .map((el) => el.getAttribute("data-buildrick-id")!)
     .filter(Boolean);
 }
 
@@ -30,11 +30,11 @@ export function findElementWithHitExpansion(
   y: number
 ): HTMLElement | null {
   // First try direct hit
-  const directHit = target.closest("[data-aqb-id]") as HTMLElement | null;
+  const directHit = target.closest("[data-buildrick-id]") as HTMLElement | null;
   if (directHit) return directHit;
 
   // Try expanded hitbox for nearby small elements
-  const candidates = document.querySelectorAll("[data-aqb-id]");
+  const candidates = document.querySelectorAll("[data-buildrick-id]");
   let closest: HTMLElement | null = null;
   let closestScore = Infinity;
 

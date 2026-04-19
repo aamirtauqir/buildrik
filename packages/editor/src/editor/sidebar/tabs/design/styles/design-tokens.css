@@ -1,27 +1,27 @@
 /* ─────────────────────────────────────────────
    DESIGN TOKENS (for DesignSystemTab)
    ───────────────────────────────────────────── */
-.aqb-token-grid {
+.buildrick-token-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 4px;
 }
 
-.aqb-color-swatch {
+.buildrick-color-swatch {
   width: 100%;
   aspect-ratio: 1;
   border-radius: 6px;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: var(--aqb-transition-fast);
+  transition: var(--buildrick-transition-fast);
 }
 
-.aqb-color-swatch.active {
-  border-color: var(--aqb-text-primary, #f1f5f9);
-  box-shadow: 0 0 0 2px var(--aqb-primary);
+.buildrick-color-swatch.active {
+  border-color: var(--buildrick-text-primary, #f1f5f9);
+  box-shadow: 0 0 0 2px var(--buildrick-accent);
 }
 
-.aqb-token-row {
+.buildrick-token-row {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -31,39 +31,39 @@
   margin-bottom: 4px;
 }
 
-.aqb-token-name {
-  font-size: var(--aqb-text-xs);
-  color: var(--aqb-text-muted);
+.buildrick-token-name {
+  font-size: var(--buildrick-text-xs);
+  color: var(--buildrick-text-muted);
   font-family: 'Fira Code', monospace;
   flex: 1;
 }
 
-.aqb-token-value {
-  font-size: var(--aqb-text-xs);
-  color: var(--aqb-text-secondary);
+.buildrick-token-value {
+  font-size: var(--buildrick-text-xs);
+  color: var(--buildrick-text-secondary);
   font-family: 'Fira Code', monospace;
   background: rgba(0, 0, 0, 0.2);
   padding: 2px 6px;
   border-radius: 4px;
 }
 
-.aqb-copy-btn {
+.buildrick-copy-btn {
   padding: 4px 8px;
   background: transparent;
   border: none;
-  color: var(--aqb-text-muted);
-  font-size: var(--aqb-text-xs);
+  color: var(--buildrick-text-muted);
+  font-size: var(--buildrick-text-xs);
   cursor: pointer;
   border-radius: 4px;
-  transition: var(--aqb-transition-fast);
+  transition: var(--buildrick-transition-fast);
 }
 
-.aqb-copy-btn:hover {
-  background: var(--aqb-surface-3);
-  color: var(--aqb-text-primary);
+.buildrick-copy-btn:hover {
+  background: var(--buildrick-surface-3);
+  color: var(--buildrick-text-primary);
 }
 
-.aqb-radius-preview {
+.buildrick-radius-preview {
   width: 40px;
   height: 40px;
   background: rgba(0, 115, 230, 0.2);
@@ -72,56 +72,56 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--aqb-text-2xs);
-  color: var(--aqb-text-muted);
+  font-size: var(--buildrick-text-2xs);
+  color: var(--buildrick-text-muted);
 }
 
-.aqb-usage-hint {
+.buildrick-usage-hint {
   padding: 12px;
   background: rgba(0, 115, 230, 0.1);
   border-radius: 8px;
   margin-top: 16px;
 }
 
-.aqb-usage-hint-title {
-  font-size: var(--aqb-text-xs);
-  color: var(--aqb-primary);
+.buildrick-usage-hint-title {
+  font-size: var(--buildrick-text-xs);
+  color: var(--buildrick-accent);
   margin-bottom: 4px;
 }
 
-.aqb-usage-hint-text {
-  font-size: var(--aqb-text-2xs-plus);
-  color: var(--aqb-text-muted);
+.buildrick-usage-hint-text {
+  font-size: var(--buildrick-text-2xs-plus);
+  color: var(--buildrick-text-muted);
   line-height: 1.5;
 }
 
 /* ─── v10 Color Picker ────────────────────────────────────────────────── */
 
-.aqb-design-picker {
+.buildrick-design-picker {
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 10px;
-  background: var(--aqb-surface-3);
+  background: var(--buildrick-surface-3);
   border-radius: 8px;
-  border: 1px solid var(--aqb-border);
+  border: 1px solid var(--buildrick-border);
 }
 
-.aqb-design-picker__sb-wrap {
+.buildrick-design-picker__sb-wrap {
   position: relative;
   border-radius: 6px;
   overflow: hidden;
   cursor: crosshair;
 }
 
-.aqb-design-picker__sb-canvas {
+.buildrick-design-picker__sb-canvas {
   display: block;
   width: 100%;
   height: 128px;
   border-radius: 6px;
 }
 
-.aqb-design-picker__crosshair {
+.buildrick-design-picker__crosshair {
   position: absolute;
   width: 12px;
   height: 12px;
@@ -132,11 +132,11 @@
   pointer-events: none;
 }
 
-.aqb-design-picker__slider-wrap {
+.buildrick-design-picker__slider-wrap {
   position: relative;
 }
 
-.aqb-design-picker__slider-canvas {
+.buildrick-design-picker__slider-canvas {
   display: block;
   width: 100%;
   height: 12px;
@@ -144,7 +144,7 @@
   cursor: ew-resize;
 }
 
-.aqb-design-picker__knob {
+.buildrick-design-picker__knob {
   position: absolute;
   top: 50%;
   width: 16px;
@@ -157,24 +157,24 @@
   pointer-events: none;
 }
 
-.aqb-design-picker__alpha-label {
+.buildrick-design-picker__alpha-label {
   position: absolute;
   right: 0;
   top: 50%;
   transform: translateY(-50%) translateX(calc(100% + 6px));
   font-size: 12px;
-  color: var(--aqb-text-muted);
+  color: var(--buildrick-text-muted);
   white-space: nowrap;
   pointer-events: none;
 }
 
-.aqb-design-picker__hex-row {
+.buildrick-design-picker__hex-row {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.aqb-design-picker__swatch-preview {
+.buildrick-design-picker__swatch-preview {
   width: 28px;
   height: 28px;
   border-radius: 5px;
@@ -182,55 +182,55 @@
   flex-shrink: 0;
 }
 
-.aqb-design-picker__hex-input-wrap {
+.buildrick-design-picker__hex-input-wrap {
   flex: 1;
   display: flex;
   align-items: center;
   gap: 2px;
   padding: 0 8px;
   background: rgba(255,255,255,0.05);
-  border: 1px solid var(--aqb-border);
+  border: 1px solid var(--buildrick-border);
   border-radius: 5px;
   height: 28px;
 }
 
-.aqb-design-picker__hex-input-wrap--error {
+.buildrick-design-picker__hex-input-wrap--error {
   border-color: #ef4444;
 }
 
-.aqb-design-picker__hash {
+.buildrick-design-picker__hash {
   font-size: 12px;
-  color: var(--aqb-text-muted);
+  color: var(--buildrick-text-muted);
   font-family: monospace;
   user-select: none;
 }
 
-.aqb-design-picker__hex-input {
+.buildrick-design-picker__hex-input {
   flex: 1;
   background: transparent;
   border: none;
   outline: none;
-  color: var(--aqb-text-primary);
+  color: var(--buildrick-text-primary);
   font-size: 12px;
   font-family: monospace;
   letter-spacing: 0.5px;
   width: 0; /* flex child */
 }
 
-.aqb-design-picker__contrast-badge {
+.buildrick-design-picker__contrast-badge {
   font-size: 12px;
-  color: var(--aqb-text-muted);
+  color: var(--buildrick-text-muted);
   white-space: nowrap;
   font-family: monospace;
 }
 
-.aqb-design-picker__hex-error {
+.buildrick-design-picker__hex-error {
   font-size: 12px;
   color: #ef4444;
   padding-top: 2px;
 }
 
-.aqb-design-picker__alpha-warning {
+.buildrick-design-picker__alpha-warning {
   font-size: 12px;
   color: #f59e0b;
   background: rgba(245,158,11,0.08);
@@ -239,26 +239,26 @@
   padding: 5px 8px;
 }
 
-.aqb-design-picker__actions {
+.buildrick-design-picker__actions {
   display: flex;
   gap: 6px;
   justify-content: flex-end;
   padding-top: 2px;
 }
 
-.aqb-design-picker__cancel-btn {
+.buildrick-design-picker__cancel-btn {
   padding: 5px 12px;
   background: transparent;
-  border: 1px solid var(--aqb-border);
+  border: 1px solid var(--buildrick-border);
   border-radius: 5px;
-  color: var(--aqb-text-muted);
+  color: var(--buildrick-text-muted);
   font-size: 12px;
   cursor: pointer;
 }
 
-.aqb-design-picker__save-btn {
+.buildrick-design-picker__save-btn {
   padding: 5px 12px;
-  background: var(--aqb-primary);
+  background: var(--buildrick-accent);
   border: none;
   border-radius: 5px;
   color: #fff;
@@ -267,13 +267,13 @@
   cursor: pointer;
 }
 
-.aqb-design-picker__save-btn:disabled {
+.buildrick-design-picker__save-btn:disabled {
   opacity: 0.4;
   cursor: default;
 }
 
 /* Dot pulse animation for draft chip */
-@keyframes aqb-dot-pulse {
+@keyframes buildrick-dot-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
 }
@@ -281,40 +281,40 @@
 /* ─── Design Token CSS Var Declarations ─────────────────────────────── */
 :root {
   /* Layout */
-  --aqb-layout-max-width: 1280px;
-  --aqb-layout-padding-x: 24px;
-  --aqb-layout-columns: 12;
-  --aqb-layout-gutter: 24px;
-  --aqb-section-padding-y: 80px;
-  --aqb-content-max-width: 720px;
-  --aqb-base-unit: 4px;
-  --aqb-breakpoint-mobile: 768px;
+  --buildrick-design-layout-max-width: 1280px;
+  --buildrick-design-layout-padding-x: 24px;
+  --buildrick-design-layout-columns: 12;
+  --buildrick-design-layout-gutter: 24px;
+  --buildrick-design-section-padding-y: 80px;
+  --buildrick-design-content-max-width: 720px;
+  --buildrick-design-base-unit: 4px;
+  --buildrick-design-breakpoint-mobile: 768px;
 
   /* Buttons */
-  --aqb-btn-height-sm: 32px;
-  --aqb-btn-height-md: 40px;
-  --aqb-btn-height-lg: 48px;
-  --aqb-btn-padding-x: 16px;
-  --aqb-btn-font-weight: 600;
-  --aqb-btn-font-size: 14px;
-  --aqb-btn-radius: 8px;
-  --aqb-cta-radius: 9999px;
+  --buildrick-design-btn-height-sm: 32px;
+  --buildrick-design-btn-height-md: 40px;
+  --buildrick-design-btn-height-lg: 48px;
+  --buildrick-design-btn-padding-x: 16px;
+  --buildrick-design-btn-font-weight: 600;
+  --buildrick-design-btn-font-size: 14px;
+  --buildrick-design-btn-radius: 8px;
+  --buildrick-design-cta-radius: 9999px;
 
   /* Forms — sizing only. Colors resolved from canonical root.
      Removed: --aqb-input-border: #27272a (near-black zinc shadowed canonical).
      Removed: --aqb-input-focus: #3b82f6 (wrong blue shadowed cobalt).
      --aqb-placeholder-color rerouted to canonical muted text. */
-  --aqb-input-height: 40px;
-  --aqb-input-radius: 8px;
-  --aqb-input-padding-x: 12px;
-  --aqb-label-font-size: 13px;
-  --aqb-label-weight: 500;
-  --aqb-placeholder-color: var(--aqb-text-muted);
+  --buildrick-design-input-height: 40px;
+  --buildrick-design-input-radius: 8px;
+  --buildrick-design-input-padding-x: 12px;
+  --buildrick-design-label-font-size: 13px;
+  --buildrick-design-label-weight: 500;
+  --buildrick-design-placeholder-color: var(--buildrick-text-muted);
 
   /* Icons */
-  --aqb-icon-style: outline;
-  --aqb-icon-stroke: 1.5;
-  --aqb-icon-sm: 16px;
-  --aqb-icon-md: 20px;
-  --aqb-icon-lg: 24px;
+  --buildrick-design-icon-style: outline;
+  --buildrick-design-icon-stroke: 1.5;
+  --buildrick-design-icon-sm: 16px;
+  --buildrick-design-icon-md: 20px;
+  --buildrick-design-icon-lg: 24px;
 }

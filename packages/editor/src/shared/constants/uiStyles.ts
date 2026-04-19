@@ -23,28 +23,28 @@ import type { CSSProperties } from "react";
  */
 export const TEXT_STYLES = {
   xs: {
-    fontSize: "var(--aqb-font-xs)",
-    fontWeight: "var(--aqb-weight-medium)",
+    fontSize: "var(--buildrick-font-xs)",
+    fontWeight: "var(--buildrick-weight-medium)",
     lineHeight: 1.4,
   } as CSSProperties,
   sm: {
-    fontSize: "var(--aqb-font-sm)",
-    fontWeight: "var(--aqb-weight-medium)",
+    fontSize: "var(--buildrick-font-sm)",
+    fontWeight: "var(--buildrick-weight-medium)",
     lineHeight: 1.4,
   } as CSSProperties,
   md: {
-    fontSize: "var(--aqb-font-md)",
-    fontWeight: "var(--aqb-weight-normal)",
+    fontSize: "var(--buildrick-font-md)",
+    fontWeight: "var(--buildrick-weight-normal)",
     lineHeight: 1.5,
   } as CSSProperties,
   lg: {
-    fontSize: "var(--aqb-font-lg)",
-    fontWeight: "var(--aqb-weight-medium)",
+    fontSize: "var(--buildrick-font-lg)",
+    fontWeight: "var(--buildrick-weight-medium)",
     lineHeight: 1.4,
   } as CSSProperties,
   xl: {
-    fontSize: "var(--aqb-font-xl)",
-    fontWeight: "var(--aqb-weight-semibold)",
+    fontSize: "var(--buildrick-font-xl)",
+    fontWeight: "var(--buildrick-weight-semibold)",
     lineHeight: 1.3,
   } as CSSProperties,
 };
@@ -53,22 +53,22 @@ export const TEXT_STYLES = {
  * Color tokens referencing CSS variables
  */
 export const COLOR = {
-  primary: "var(--aqb-text-primary)",
-  secondary: "var(--aqb-text-secondary)",
-  tertiary: "var(--aqb-text-tertiary)",
-  muted: "var(--aqb-text-muted)",
-  accent: "var(--aqb-accent-purple)",
-  accentLight: "var(--aqb-accent-purple-light)",
+  primary: "var(--buildrick-text-primary)",
+  secondary: "var(--buildrick-text-secondary)",
+  tertiary: "var(--buildrick-text-tertiary)",
+  muted: "var(--buildrick-text-muted)",
+  accent: "var(--buildrick-accent)",
+  accentLight: "var(--buildrick-accent-tint)",
 };
 
 /**
  * Surface/background colors for different elevation levels
  */
 export const SURFACE = {
-  level1: "var(--aqb-surface-1)",
-  level2: "var(--aqb-surface-2)",
-  level3: "var(--aqb-surface-3)",
-  level4: "var(--aqb-surface-4)",
+  level1: "var(--buildrick-surface-1)",
+  level2: "var(--buildrick-surface-2)",
+  level3: "var(--buildrick-surface-3)",
+  level4: "var(--buildrick-surface-4)",
 };
 
 /**
@@ -93,22 +93,22 @@ export const CARD_STYLES = {
     alignItems: "center",
     gap: 6,
     padding: "14px 8px",
-    background: "var(--aqb-surface-3)",
+    background: "var(--buildrick-surface-3)",
     border: "1px solid transparent",
-    borderRadius: "var(--aqb-radius-md)",
+    borderRadius: "var(--buildrick-design-radius-md)",
     cursor: "pointer",
-    transition: "var(--aqb-transition-fast)",
+    transition: "var(--buildrick-transition-fast)",
     minHeight: 64,
   } as CSSProperties,
   hover: {
-    background: "var(--aqb-surface-4)",
-    borderColor: "var(--aqb-accent-purple-hover)",
-    boxShadow: "var(--aqb-shadow-md)",
+    background: "var(--buildrick-surface-4)",
+    borderColor: "var(--buildrick-accent-hover)",
+    boxShadow: "var(--buildrick-design-shadow-md)",
     transform: "translateY(-2px)",
   } as CSSProperties,
   selected: {
-    border: "2px solid var(--aqb-accent-purple)",
-    boxShadow: "0 0 0 4px var(--aqb-accent-purple-alpha)",
+    border: "2px solid var(--buildrick-accent)",
+    boxShadow: "0 0 0 4px var(--buildrick-accent-tint)",
   } as CSSProperties,
 };
 
@@ -120,8 +120,8 @@ export const TAB_STYLES = {
     display: "flex",
     gap: 4,
     padding: "8px 8px 0",
-    background: "var(--aqb-surface-2)",
-    borderBottom: "1px solid var(--aqb-border-subtle)",
+    background: "var(--buildrick-surface-2)",
+    borderBottom: "1px solid var(--buildrick-border-subtle)",
   } as CSSProperties,
   button: {
     flex: 1,
@@ -135,15 +135,15 @@ export const TAB_STYLES = {
     borderBottom: "2px solid transparent",
     borderRadius: "6px 6px 0 0",
     cursor: "pointer",
-    fontSize: "var(--aqb-font-md)",
+    fontSize: "var(--buildrick-font-md)",
     fontWeight: 500,
-    color: "var(--aqb-text-tertiary)",
-    transition: "var(--aqb-transition-fast)",
+    color: "var(--buildrick-text-tertiary)",
+    transition: "var(--buildrick-transition-fast)",
   } as CSSProperties,
   active: {
-    color: "var(--aqb-text-primary)",
-    borderBottomColor: "var(--aqb-accent-purple)",
-    background: "var(--aqb-surface-3)",
+    color: "var(--buildrick-text-primary)",
+    borderBottomColor: "var(--buildrick-accent)",
+    background: "var(--buildrick-surface-3)",
   } as CSSProperties,
 };
 
@@ -157,19 +157,19 @@ export const ACCORDION_STYLES = {
     alignItems: "center",
     justifyContent: "space-between",
     padding: "12px 14px",
-    background: "var(--aqb-surface-3)",
+    background: "var(--buildrick-surface-3)",
     border: "none",
     borderLeft: "2px solid transparent",
-    borderRadius: "var(--aqb-radius-md)",
+    borderRadius: "var(--buildrick-design-radius-md)",
     cursor: "pointer",
-    fontSize: "var(--aqb-font-lg)",
+    fontSize: "var(--buildrick-font-lg)",
     fontWeight: 500,
-    color: "var(--aqb-text-primary)",
-    transition: "var(--aqb-transition-fast)",
+    color: "var(--buildrick-text-primary)",
+    transition: "var(--buildrick-transition-fast)",
   } as CSSProperties,
   headerOpen: {
-    background: "var(--aqb-surface-4)",
-    borderLeftColor: "var(--aqb-accent-purple)",
+    background: "var(--buildrick-surface-4)",
+    borderLeftColor: "var(--buildrick-accent)",
   } as CSSProperties,
   content: {
     padding: "8px 4px",
@@ -184,20 +184,20 @@ export const ACCORDION_STYLES = {
  */
 export const BADGE_STYLES = {
   base: {
-    fontSize: "var(--aqb-font-xs)",
+    fontSize: "var(--buildrick-font-xs)",
     fontWeight: 500,
     padding: "2px 8px",
     borderRadius: 10,
-    background: "var(--aqb-accent-purple-alpha)",
-    color: "var(--aqb-accent-purple)",
+    background: "var(--buildrick-accent-tint)",
+    color: "var(--buildrick-accent)",
   } as CSSProperties,
   count: {
-    fontSize: "var(--aqb-font-xs)",
+    fontSize: "var(--buildrick-font-xs)",
     fontWeight: 500,
     padding: "2px 6px",
     borderRadius: 10,
     background: "rgba(255, 255, 255, 0.1)",
-    color: "var(--aqb-text-secondary)",
+    color: "var(--buildrick-text-secondary)",
   } as CSSProperties,
 };
 
@@ -206,16 +206,16 @@ export const BADGE_STYLES = {
  */
 export const LABEL_STYLES = {
   base: {
-    fontSize: "var(--aqb-font-sm)",
+    fontSize: "var(--buildrick-font-sm)",
     fontWeight: 500,
-    color: "var(--aqb-text-secondary)",
+    color: "var(--buildrick-text-secondary)",
     textTransform: "uppercase" as const,
     letterSpacing: "0.5px",
   } as CSSProperties,
   section: {
-    fontSize: "var(--aqb-font-xs)",
+    fontSize: "var(--buildrick-font-xs)",
     fontWeight: 600,
-    color: "var(--aqb-text-tertiary)",
+    color: "var(--buildrick-text-tertiary)",
     textTransform: "uppercase" as const,
     letterSpacing: "0.5px",
     marginBottom: 8,
@@ -227,18 +227,18 @@ export const LABEL_STYLES = {
  */
 export const INPUT_STYLES = {
   base: {
-    fontSize: "var(--aqb-font-md)",
+    fontSize: "var(--buildrick-font-md)",
     padding: "8px 10px",
     background: "rgba(255, 255, 255, 0.05)",
-    border: "1px solid var(--aqb-border-default)",
-    borderRadius: "var(--aqb-radius-sm)",
-    color: "var(--aqb-text-primary)",
-    transition: "var(--aqb-transition-fast)",
+    border: "1px solid var(--buildrick-border-default)",
+    borderRadius: "var(--buildrick-design-radius-sm)",
+    color: "var(--buildrick-text-primary)",
+    transition: "var(--buildrick-transition-fast)",
   } as CSSProperties,
   focus: {
-    borderColor: "var(--aqb-accent-purple)",
+    borderColor: "var(--buildrick-accent)",
     outline: "none",
-    boxShadow: "0 0 0 2px var(--aqb-accent-purple-alpha)",
+    boxShadow: "0 0 0 2px var(--buildrick-accent-tint)",
   } as CSSProperties,
 };
 

@@ -22,7 +22,7 @@ describe("Popover — focus trap integration", () => {
       fireEvent.click(getByText("open"));
     });
 
-    expect(document.querySelector(".aqb-popover")).toBeTruthy();
+    expect(document.querySelector(".buildrick-popover")).toBeTruthy();
     expect(container).toBeTruthy();
   });
 
@@ -39,13 +39,13 @@ describe("Popover — focus trap integration", () => {
     await act(async () => {
       fireEvent.click(document.querySelector("button")!);
     });
-    expect(document.querySelector(".aqb-popover")).toBeTruthy();
+    expect(document.querySelector(".buildrick-popover")).toBeTruthy();
 
     // Press Escape
     await act(async () => {
       fireEvent.keyDown(document, { key: "Escape" });
     });
-    expect(document.querySelector(".aqb-popover")).toBeNull();
+    expect(document.querySelector(".buildrick-popover")).toBeNull();
   });
 
   it("traps focus inside popover content when open", async () => {
@@ -67,7 +67,7 @@ describe("Popover — focus trap integration", () => {
     });
 
     // After opening, focus should move to first focusable inside popover
-    const firstInside = document.querySelector(".aqb-popover button") as HTMLElement;
+    const firstInside = document.querySelector(".buildrick-popover button") as HTMLElement;
     expect(firstInside).toBeTruthy();
     expect(document.activeElement).toBe(firstInside);
   });

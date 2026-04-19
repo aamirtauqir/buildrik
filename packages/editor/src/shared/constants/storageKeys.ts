@@ -14,83 +14,83 @@ export const STORAGE_KEYS = {
   /** Prefix for all project-specific scoped keys */
   PROJECT_PREFIX: "aqb",
   /** Current active project data */
-  CURRENT_PROJECT: "aqb-project",
+  CURRENT_PROJECT: "buildrick-project",
   /** Draft / autosave data (unsaved changes) */
-  AUTOSAVE: "aqb-autosave",
+  AUTOSAVE: "buildrick-autosave",
   /** Last opened file path / ID */
-  LAST_FILE: "aqb-last-file",
+  LAST_FILE: "buildrick-last-file",
 
   // ─── User Preferences ─────────────────────────────────────────
   /** User general preferences (theme, language, etc.) */
-  PREFERENCES: "aqb-preferences",
+  PREFERENCES: "buildrick-preferences",
   /** License key */
-  LICENSE_KEY: "aqb-license",
+  LICENSE_KEY: "buildrick-license",
   /** Recent projects list */
-  RECENT_PROJECTS: "aqb-recent-projects",
+  RECENT_PROJECTS: "buildrick-recent-projects",
 
   // ─── Panel / Layout State ─────────────────────────────────────
   /** Panel layout configuration (open/closed, widths) */
-  PANEL_LAYOUT: "aqb-panels",
+  PANEL_LAYOUT: "buildrick-panels",
   /** Panel state (active tabs, pin state) */
-  PANEL_STATE: "aqb-panel-state",
+  PANEL_STATE: "buildrick-panel-state",
 
   // ─── Canvas Controls ──────────────────────────────────────────
   /** Saved canvas guides (horizontal/vertical guide positions) */
-  GUIDES: "aqb-guides",
+  GUIDES: "buildrick-guides",
   /** Inspector mode enabled/disabled */
-  INSPECTOR_MODE: "aqb-inspector-mode",
+  INSPECTOR_MODE: "buildrick-inspector-mode",
   /** Recent commands from command palette */
-  RECENT_COMMANDS: "aqb-recent-commands",
+  RECENT_COMMANDS: "buildrick-recent-commands",
 
   // ─── Elements Tab ─────────────────────────────────────────────
   /** Recently used element types */
-  ELEMENTS_RECENT: "aqb-elements-recent",
+  ELEMENTS_RECENT: "buildrick-elements-recent",
   /** Favorite element types */
-  ELEMENTS_FAVORITES: "aqb-elements-favorites",
+  ELEMENTS_FAVORITES: "buildrick-elements-favorites",
   /** Whether the "getting started" tip in elements panel is dismissed */
-  ELEMENTS_TIP_DISMISSED: "aqb-elements-tip-dismissed",
+  ELEMENTS_TIP_DISMISSED: "buildrick-elements-tip-dismissed",
   /** Which element category is expanded in the panel */
-  ELEMENTS_EXPANDED_CATEGORY: "aqb-elements-expanded-category",
+  ELEMENTS_EXPANDED_CATEGORY: "buildrick-elements-expanded-category",
 
   // ─── Build Tab ────────────────────────────────────────────────
   /** Favorite element names in the Build tab */
-  BUILD_FAVORITES: "aqb-build-favorites",
+  BUILD_FAVORITES: "buildrick-build-favorites",
   /** Recently used element IDs in the Build tab (max 8) */
-  BUILD_RECENT: "aqb-build-recent",
+  BUILD_RECENT: "buildrick-build-recent",
   /** Open category IDs in Build tab accordion (sessionStorage) */
-  BUILD_OPEN_CATS: "aqb-build-open-cats",
+  BUILD_OPEN_CATS: "buildrick-build-open-cats",
   /** Whether the onboarding tip in Build tab has been dismissed */
-  BUILD_TIP_DISMISSED: "aqb-build-tip-dismissed",
+  BUILD_TIP_DISMISSED: "buildrick-build-tip-dismissed",
   /** Whether the user has been informed that favorites are browser-local only */
-  BUILD_FAVS_INFORMED: "aqb-build-favs-informed",
+  BUILD_FAVS_INFORMED: "buildrick-build-favs-informed",
   /** Whether the Pro Tips footer is collapsed */
-  BUILD_TIPS_COLLAPSED: "aqb-build-tips-collapsed",
+  BUILD_TIPS_COLLAPSED: "buildrick-build-tips-collapsed",
   /** Add tab mode: "elements" | "sections" (sessionStorage) */
-  BUILD_MODE: "aqb-build-mode",
+  BUILD_MODE: "buildrick-build-mode",
   /** @deprecated — Quick Picks removed in v4. Cleaned on TransitionCallout dismiss. */
-  BUILD_PICKS: "aqb-build-picks",
+  BUILD_PICKS: "buildrick-build-picks",
   /** @deprecated — Quick Picks FTUE removed in v4. Cleaned on TransitionCallout dismiss. */
-  BUILD_FTUE_SEEN: "aqb-build-ftue-seen",
+  BUILD_FTUE_SEEN: "buildrick-build-ftue-seen",
   /** One-time flag: user has seen the "Quick Picks removed" v4 transition callout */
-  BUILD_V4_TRANSITION_SEEN: "aqb-build-v4-transition-seen",
+  BUILD_V4_TRANSITION_SEEN: "buildrick-build-v4-transition-seen",
 
   // ─── Components Tab ───────────────────────────────────────────
   /** Favorite component IDs in the components library */
-  COMPONENT_FAVORITES: "aqb-component-favorites",
+  COMPONENT_FAVORITES: "buildrick-component-favorites",
 
   // ─── Templates Tab ────────────────────────────────────────────
   /** Recently used template IDs */
-  RECENT_TEMPLATES: "aqb-recent-templates",
+  RECENT_TEMPLATES: "buildrick-recent-templates",
   /** User-saved section templates */
-  MY_TEMPLATES: "aqb-my-templates",
+  MY_TEMPLATES: "buildrick-my-templates",
   /** Last applied site-template ID (sessionStorage — survives tab close) */
-  APPLIED_TEMPLATE_ID: "aqb-applied-template-id",
+  APPLIED_TEMPLATE_ID: "buildrick-applied-template-id",
 
   // ─── Media / Assets ───────────────────────────────────────────
   /** Asset library data */
-  ASSETS: "aqb-assets",
+  ASSETS: "buildrick-assets",
   /** Copied style (for paste-style functionality) */
-  COPIED_STYLE: "aqb-copied-style",
+  COPIED_STYLE: "buildrick-copied-style",
   /** Media library sort field (name | date | size | type) */
   MEDIA_SORT: "med_sort",
   /** Media library sort direction (asc | desc) */
@@ -108,41 +108,41 @@ export const STORAGE_KEYS = {
 
   // ─── History & AI ─────────────────────────────────────────────
   /** Undo history (if persisted to storage) */
-  HISTORY: "aqb-history",
+  HISTORY: "buildrick-history",
   /** AI assistant conversation context */
-  AI_CONTEXT: "aqb-ai-context",
+  AI_CONTEXT: "buildrick-ai-context",
 
   // ─── Clipboard ────────────────────────────────────────────────
   /** Clipboard data (copied elements) */
-  CLIPBOARD: "aqb-clipboard",
+  CLIPBOARD: "buildrick-clipboard",
 
   // ─── Onboarding ───────────────────────────────────────────────
   /** Center modal — shown once on first visit */
-  ONBOARDING_MODAL: "aqb-onboarding-modal",
+  ONBOARDING_MODAL: "buildrick-onboarding-modal",
   /** Spotlight tour — v2 key forces reset for users with old tour state */
-  ONBOARDING_TOUR: "aqb-onboarding-tour-v2",
+  ONBOARDING_TOUR: "buildrick-onboarding-tour-v2",
   /** Get-started checklist step progress (JSON array of OnboardingStep) */
-  ONBOARDING_PROGRESS: "aqb-onboarding-progress",
+  ONBOARDING_PROGRESS: "buildrick-onboarding-progress",
   /** Whether the checklist widget has been dismissed */
-  ONBOARDING_DISMISSED: "aqb-onboarding-dismissed",
+  ONBOARDING_DISMISSED: "buildrick-onboarding-dismissed",
   /** Schema version — bump when DEFAULT_STEPS changes to clear stale data */
-  ONBOARDING_SCHEMA_VERSION: "aqb-onboarding-schema-v",
+  ONBOARDING_SCHEMA_VERSION: "buildrick-onboarding-schema-v",
   /** Current onboarding phase — "modal" | "tour" | "checklist" | "done" */
-  ONBOARDING_PHASE: "aqb-onboarding-phase",
+  ONBOARDING_PHASE: "buildrick-onboarding-phase",
   /** Current tour step index (0-based) — persisted so refresh resumes same step */
-  ONBOARDING_TOUR_STEP: "aqb-onboarding-tour-step",
+  ONBOARDING_TOUR_STEP: "buildrick-onboarding-tour-step",
   /** Whether user has named their project during onboarding */
-  ONBOARDING_PROJECT_NAMED: "aqb-onboarding-project-named",
+  ONBOARDING_PROJECT_NAMED: "buildrick-onboarding-project-named",
 
   // ─── Integrations ─────────────────────────────────────────────
   /** Vercel deployment token (encrypted) */
-  VERCEL_TOKEN: "aqb-vercel-token",
+  VERCEL_TOKEN: "buildrick-vercel-token",
 
   // ─── Debug (dev-only) ─────────────────────────────────────────
   /** Canvas debug logs */
-  DEBUG_LOGS: "aqb-canvas-logs",
+  DEBUG_LOGS: "buildrick-canvas-logs",
   /** Debug mode settings */
-  DEBUG_SETTINGS: "aqb-debug-settings",
+  DEBUG_SETTINGS: "buildrick-debug-settings",
 
   // ─── Migration ────────────────────────────────────────────────
   /** Flag set when the v1 storage key migration has completed */

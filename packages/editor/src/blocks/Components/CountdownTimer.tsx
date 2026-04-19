@@ -77,7 +77,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         flexDirection: "column",
         alignItems: "center",
         padding: "24px 32px",
-        background: "var(--aqb-bg-panel)",
+        background: "var(--buildrick-bg-panel)",
         borderRadius: 16,
         minWidth: 100,
       }}
@@ -86,7 +86,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         style={{
           fontSize: 48,
           fontWeight: 700,
-          color: "var(--aqb-primary)",
+          color: "var(--buildrick-accent)",
           lineHeight: 1,
         }}
       >
@@ -95,7 +95,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
       <span
         style={{
           fontSize: 14,
-          color: "var(--aqb-text-muted)",
+          color: "var(--buildrick-text-muted)",
           marginTop: 8,
           textTransform: "uppercase",
           letterSpacing: 1,
@@ -107,13 +107,13 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   );
 
   return (
-    <div className="aqb-countdown" style={{ padding: 60, textAlign: "center" }}>
+    <div className="buildrick-countdown" style={{ padding: 60, textAlign: "center" }}>
       {title && (
         <h2
           style={{
             fontSize: 36,
             fontWeight: 700,
-            color: "var(--aqb-text-primary)",
+            color: "var(--buildrick-text-primary)",
             marginBottom: 12,
           }}
         >
@@ -124,7 +124,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         <p
           style={{
             fontSize: 18,
-            color: "var(--aqb-text-secondary)",
+            color: "var(--buildrick-text-secondary)",
             marginBottom: 40,
           }}
         >
@@ -137,7 +137,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           style={{
             fontSize: 32,
             fontWeight: 600,
-            color: "var(--aqb-success)",
+            color: "var(--buildrick-success)",
           }}
         >
           🎉 Time's Up!
@@ -168,16 +168,16 @@ export const countdownBlockConfig = {
   elementType: "countdown" as const,
   icon: "⏰",
   content:
-    '<div class="aqb-countdown" data-aqb-type="countdown">' +
-    '<div class="aqb-countdown-header">' +
+    '<div class="buildrick-countdown" data-buildrick-type="countdown">' +
+    '<div class="buildrick-countdown-header">' +
     "<h3>Launch in</h3>" +
     "<p>We are preparing something amazing.</p>" +
     "</div>" +
-    '<div class="aqb-countdown-grid">' +
-    '<div class="aqb-countdown-unit"><span class="aqb-countdown-value">12</span><span class="aqb-countdown-label">Days</span></div>' +
-    '<div class="aqb-countdown-unit"><span class="aqb-countdown-value">08</span><span class="aqb-countdown-label">Hours</span></div>' +
-    '<div class="aqb-countdown-unit"><span class="aqb-countdown-value">45</span><span class="aqb-countdown-label">Minutes</span></div>' +
-    '<div class="aqb-countdown-unit"><span class="aqb-countdown-value">20</span><span class="aqb-countdown-label">Seconds</span></div>' +
+    '<div class="buildrick-countdown-grid">' +
+    '<div class="buildrick-countdown-unit"><span class="buildrick-countdown-value">12</span><span class="buildrick-countdown-label">Days</span></div>' +
+    '<div class="buildrick-countdown-unit"><span class="buildrick-countdown-value">08</span><span class="buildrick-countdown-label">Hours</span></div>' +
+    '<div class="buildrick-countdown-unit"><span class="buildrick-countdown-value">45</span><span class="buildrick-countdown-label">Minutes</span></div>' +
+    '<div class="buildrick-countdown-unit"><span class="buildrick-countdown-value">20</span><span class="buildrick-countdown-label">Seconds</span></div>' +
     "</div>" +
     "</div>",
 };

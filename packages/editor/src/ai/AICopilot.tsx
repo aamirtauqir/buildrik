@@ -326,7 +326,7 @@ export const AICopilot: React.FC<AICopilotProps> = ({
         {/* Header */}
         <div style={styles.header}>
           <div style={styles.headerTitle}>
-            <Sparkles size={20} style={{ color: "var(--aqb-accent)" }} />
+            <Sparkles size={20} style={{ color: "var(--buildrick-accent)" }} />
             <span>AI Copilot</span>
           </div>
           <div style={styles.headerRight}>
@@ -344,7 +344,7 @@ export const AICopilot: React.FC<AICopilotProps> = ({
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                 <path
                   d="M16 2L19 11L28 14L19 17L16 26L13 17L4 14L13 11L16 2Z"
-                  fill="var(--aqb-text-muted)"
+                  fill="var(--buildrick-text-muted)"
                 />
               </svg>
             </div>
@@ -481,8 +481,8 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: "space-between",
     padding: "16px 20px",
-    borderBottom: "1px solid var(--aqb-border)",
-    background: "var(--aqb-bg-panel)",
+    borderBottom: "1px solid var(--buildrick-border)",
+    background: "var(--buildrick-bg-panel)",
   },
   headerTitle: {
     display: "flex",
@@ -490,7 +490,7 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 8,
     fontSize: 16,
     fontWeight: 600,
-    color: "var(--aqb-text-primary)",
+    color: "var(--buildrick-text-primary)",
   },
   headerRight: {
     display: "flex",
@@ -502,7 +502,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 12,
     fontWeight: 500,
     borderRadius: 10,
-    background: "var(--aqb-accent)",
+    background: "var(--buildrick-accent)",
     color: "white",
   },
   closeBtn: {
@@ -513,9 +513,9 @@ const styles: Record<string, React.CSSProperties> = {
     height: 28,
     background: "transparent",
     border: "none",
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
     cursor: "pointer",
-    borderRadius: "var(--aqb-radius-sm)",
+    borderRadius: "var(--buildrick-design-radius-sm)",
   },
   unavailableContainer: {
     flex: 1,
@@ -535,12 +535,12 @@ const styles: Record<string, React.CSSProperties> = {
     margin: 0,
     fontSize: 15,
     fontWeight: 500,
-    color: "var(--aqb-text-secondary)",
+    color: "var(--buildrick-text-secondary)",
   },
   unavailableDesc: {
     margin: 0,
     fontSize: 13,
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
     lineHeight: 1.5,
   },
   settingsBtn: {
@@ -548,10 +548,10 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "8px 16px",
     fontSize: 13,
     fontWeight: 500,
-    color: "var(--aqb-text-primary)",
+    color: "var(--buildrick-text-primary)",
     background: "transparent",
-    border: "1px solid var(--aqb-border)",
-    borderRadius: "var(--aqb-radius-md)",
+    border: "1px solid var(--buildrick-border)",
+    borderRadius: "var(--buildrick-design-radius-md)",
     cursor: "pointer",
   },
   messagesContainer: {
@@ -581,15 +581,15 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "var(--aqb-bg-panel-secondary)",
-    color: "var(--aqb-text-secondary)",
+    background: "var(--buildrick-bg-panel-secondary)",
+    color: "var(--buildrick-text-secondary)",
     flexShrink: 0,
   },
   messageContent: {
     padding: "12px 16px",
     borderRadius: 12,
-    background: "var(--aqb-bg-panel-secondary)",
-    color: "var(--aqb-text-primary)",
+    background: "var(--buildrick-bg-panel-secondary)",
+    color: "var(--buildrick-text-primary)",
     fontSize: 14,
     lineHeight: 1.5,
   },
@@ -603,14 +603,14 @@ const styles: Record<string, React.CSSProperties> = {
   },
   previewLabel: {
     fontSize: 12,
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
     marginBottom: 8,
   },
   htmlPreview: {
     padding: 12,
-    background: "var(--aqb-bg-canvas)",
+    background: "var(--buildrick-bg-canvas)",
     borderRadius: 8,
-    border: "1px solid var(--aqb-border)",
+    border: "1px solid var(--buildrick-border)",
     maxHeight: 200,
     overflow: "auto",
     fontSize: 13,
@@ -628,12 +628,12 @@ const styles: Record<string, React.CSSProperties> = {
   },
   quickActions: {
     padding: "12px 20px",
-    borderTop: "1px solid var(--aqb-border)",
-    background: "var(--aqb-bg-panel)",
+    borderTop: "1px solid var(--buildrick-border)",
+    background: "var(--buildrick-bg-panel)",
   },
   quickActionsLabel: {
     fontSize: 12,
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
     marginBottom: 8,
   },
   quickActionsGrid: {
@@ -646,10 +646,10 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     gap: 6,
     padding: "6px 12px",
-    background: "var(--aqb-bg-panel-secondary)",
-    border: "1px solid var(--aqb-border)",
+    background: "var(--buildrick-bg-panel-secondary)",
+    border: "1px solid var(--buildrick-border)",
     borderRadius: 16,
-    color: "var(--aqb-text-secondary)",
+    color: "var(--buildrick-text-secondary)",
     fontSize: 12,
     cursor: "pointer",
     transition: "all 0.2s",
@@ -658,16 +658,16 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     gap: 12,
     padding: "16px 20px",
-    borderTop: "1px solid var(--aqb-border)",
-    background: "var(--aqb-bg-panel)",
+    borderTop: "1px solid var(--buildrick-border)",
+    background: "var(--buildrick-bg-panel)",
   },
   input: {
     flex: 1,
     padding: "12px 16px",
-    background: "var(--aqb-bg-panel-secondary)",
-    border: "1px solid var(--aqb-border)",
+    background: "var(--buildrick-bg-panel-secondary)",
+    border: "1px solid var(--buildrick-border)",
     borderRadius: 12,
-    color: "var(--aqb-text-primary)",
+    color: "var(--buildrick-text-primary)",
     fontSize: 14,
     resize: "none",
     outline: "none",

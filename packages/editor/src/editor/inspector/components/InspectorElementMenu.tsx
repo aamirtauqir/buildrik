@@ -60,7 +60,7 @@ const styles = {
     background: "transparent",
     border: "1px solid transparent",
     borderRadius: 6,
-    color: "var(--aqb-text-tertiary)",
+    color: "var(--buildrick-text-tertiary)",
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
@@ -69,16 +69,16 @@ const styles = {
   },
   triggerHover: {
     background: "rgba(255,255,255,0.06)",
-    color: "var(--aqb-text-primary)",
-    borderColor: "var(--aqb-border)",
+    color: "var(--buildrick-text-primary)",
+    borderColor: "var(--buildrick-border)",
   },
   menu: {
     position: "absolute" as const,
     top: 40,
     right: 8,
     minWidth: 180,
-    background: "var(--aqb-surface-3)",
-    border: "1px solid var(--aqb-border)",
+    background: "var(--buildrick-surface-3)",
+    border: "1px solid var(--buildrick-border)",
     borderRadius: 8,
     boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
     padding: 4,
@@ -96,10 +96,10 @@ const styles = {
     border: "none",
     borderRadius: 4,
     color: disabled
-      ? "var(--aqb-text-muted)"
+      ? "var(--buildrick-text-muted)"
       : danger
-        ? "var(--aqb-error, #ef4444)"
-        : "var(--aqb-text-primary)",
+        ? "var(--buildrick-error, #ef4444)"
+        : "var(--buildrick-text-primary)",
     fontSize: 12,
     fontWeight: 500,
     cursor: disabled ? "not-allowed" : "pointer",
@@ -110,7 +110,7 @@ const styles = {
   }),
   divider: {
     height: 1,
-    background: "var(--aqb-border-subtle)",
+    background: "var(--buildrick-border-subtle)",
     margin: "4px 0",
   },
 };

@@ -55,8 +55,8 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
     >
       <div
         style={{
-          background: "var(--aqb-surface-3)",
-          border: "1px solid var(--aqb-border)",
+          background: "var(--buildrick-surface-3)",
+          border: "1px solid var(--buildrick-border)",
           borderRadius: 12,
           padding: 20,
           width: 280,
@@ -67,7 +67,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
           style={{
             fontSize: 14,
             fontWeight: 600,
-            color: "var(--aqb-text-primary)",
+            color: "var(--buildrick-text-primary)",
             marginBottom: 16,
           }}
         >
@@ -77,7 +77,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
         <label
           style={{
             fontSize: 12,
-            color: "var(--aqb-text-muted)",
+            color: "var(--buildrick-text-muted)",
             display: "block",
             marginBottom: 4,
           }}
@@ -93,9 +93,9 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
             width: "100%",
             padding: "8px 10px",
             background: "rgba(255,255,255,0.05)",
-            border: `1px solid ${nameError ? "#ef4444" : "var(--aqb-border)"}`,
+            border: `1px solid ${nameError ? "#ef4444" : "var(--buildrick-border)"}`,
             borderRadius: 6,
-            color: "var(--aqb-text-primary)",
+            color: "var(--buildrick-text-primary)",
             fontSize: 12,
             boxSizing: "border-box",
             marginBottom: 4,
@@ -108,7 +108,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
         <label
           style={{
             fontSize: 12,
-            color: "var(--aqb-text-muted)",
+            color: "var(--buildrick-text-muted)",
             display: "block",
             marginBottom: 4,
             marginTop: 8,
@@ -123,7 +123,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
               height: 32,
               borderRadius: 6,
               background: /^#[0-9A-Fa-f]{6}$/.test(hex) ? hex : "#333",
-              border: "1px solid var(--aqb-border)",
+              border: "1px solid var(--buildrick-border)",
               flexShrink: 0,
             }}
           />
@@ -136,9 +136,9 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
               flex: 1,
               padding: "8px 10px",
               background: "rgba(255,255,255,0.05)",
-              border: `1px solid ${hexError ? "#ef4444" : "var(--aqb-border)"}`,
+              border: `1px solid ${hexError ? "#ef4444" : "var(--buildrick-border)"}`,
               borderRadius: 6,
-              color: "var(--aqb-text-primary)",
+              color: "var(--buildrick-text-primary)",
               fontSize: 12,
               fontFamily: "monospace",
             }}
@@ -154,9 +154,9 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
             style={{
               padding: "7px 14px",
               background: "transparent",
-              border: "1px solid var(--aqb-border)",
+              border: "1px solid var(--buildrick-border)",
               borderRadius: 6,
-              color: "var(--aqb-text-secondary)",
+              color: "var(--buildrick-text-secondary)",
               fontSize: 12,
               cursor: "pointer",
             }}
@@ -167,7 +167,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
             onClick={handleAdd}
             style={{
               padding: "7px 14px",
-              background: "var(--aqb-primary)",
+              background: "var(--buildrick-accent)",
               border: "none",
               borderRadius: 6,
               color: "#fff",

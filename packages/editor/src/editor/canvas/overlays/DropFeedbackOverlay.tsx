@@ -49,15 +49,15 @@ export interface DropFeedbackOverlayProps {
 /** Professional color palette - using CSS variables from Canvas.css */
 const COLORS = {
   valid: {
-    border: "var(--aqb-drop-valid-border)", // Green for valid drops
-    bg: "var(--aqb-drop-valid-bg)",
+    border: "var(--buildrick-drop-valid-border)", // Green for valid drops
+    bg: "var(--buildrick-drop-valid-bg)",
     text: "#1e293b",
     badgeBg: "#1e1e2e",
-    badgeText: "var(--aqb-primary-light)",
+    badgeText: "var(--buildrick-accent-subtle)",
   },
   invalid: {
-    border: "var(--aqb-drop-invalid-border)", // Red for invalid drops
-    bg: "var(--aqb-drop-invalid-bg)",
+    border: "var(--buildrick-drop-invalid-border)", // Red for invalid drops
+    bg: "var(--buildrick-drop-invalid-bg)",
     text: "#ffffff",
   },
 };
@@ -94,7 +94,7 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
     }
 
     const targetEl = canvasRef.current.querySelector(
-      `[data-aqb-id="${dropTargetId}"]`
+      `[data-buildrick-id="${dropTargetId}"]`
     ) as HTMLElement | null;
 
     if (!targetEl) {
@@ -132,7 +132,7 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
 
   // Get target element name for destination label (only when visual is needed)
   const targetElement = showVisual
-    ? (canvasRef.current?.querySelector(`[data-aqb-id="${dropTargetId}"]`) as HTMLElement | null)
+    ? (canvasRef.current?.querySelector(`[data-buildrick-id="${dropTargetId}"]`) as HTMLElement | null)
     : null;
   const targetName = getElementName(targetElement);
 
@@ -142,14 +142,14 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
           assertive priority because drop feedback is time-sensitive: once the user
           releases the mouse the moment to announce has passed. aria-atomic ensures
           the full message is read even if it changes rapidly. */}
-      <div aria-live="assertive" aria-atomic="true" className="aqb-sr-only">
+      <div aria-live="assertive" aria-atomic="true" className="buildrick-sr-only">
         {liveText}
       </div>
 
       {/* Visual overlay — only rendered when rects are measured */}
       {showVisual && relativeRect && (
         <div
-          className="aqb-drop-feedback-overlay"
+          className="buildrick-drop-feedback-overlay"
           style={{
             position: "absolute",
             top: 0,
@@ -163,7 +163,7 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
           {/* Target highlight overlay - 2px solid border */}
           {/* BUG-009 FIX: Added z-index and pointerEvents to prevent visual overlap with text */}
           <div
-            className={`aqb-drop-feedback-target ${isValidDrop ? "valid" : "invalid"}`}
+            className={`buildrick-drop-feedback-target ${isValidDrop ? "valid" : "invalid"}`}
             style={{
               position: "absolute",
               left: relativeRect.left,
@@ -174,7 +174,7 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
                 ? `2px dashed ${COLORS.valid.border}`
                 : `2px solid ${COLORS.invalid.border}`,
               backgroundColor: isValidDrop ? COLORS.valid.bg : COLORS.invalid.bg,
-              borderRadius: "var(--aqb-radius-sm)",
+              borderRadius: "var(--buildrick-design-radius-sm)",
               transition: "border-color 150ms ease, background-color 150ms ease",
               boxSizing: "border-box",
               zIndex: 1,
@@ -234,7 +234,7 @@ const DropPositionLine: React.FC<DropPositionLineProps> = ({ position, targetRec
 
   return (
     <div
-      className="aqb-drop-position-line"
+      className="buildrick-drop-position-line"
       style={{
         position: "absolute",
         left: targetRect.left - 4,
@@ -260,15 +260,15 @@ const DropSlotPreview: React.FC<DropSlotPreviewProps> = ({ slotRect }) => {
 
   return (
     <div
-      className="aqb-drop-slot-preview"
+      className="buildrick-drop-slot-preview"
       style={{
         position: "absolute",
         left: slotRect.x,
         top: slotRect.y,
         width: slotRect.width,
         height: slotRect.height,
-        backgroundColor: "var(--aqb-drop-valid-bg)",
-        border: "2px dashed var(--aqb-drop-valid-border)",
+        backgroundColor: "var(--buildrick-drop-valid-bg)",
+        border: "2px dashed var(--buildrick-drop-valid-border)",
         borderRadius: 4,
         animation: `${animationName} 150ms ease-out forwards`,
         transformOrigin: slotRect.isHorizontal ? "left center" : "center top",
@@ -288,7 +288,7 @@ interface DropFeedbackBadgeProps {
 const DropFeedbackBadge: React.FC<DropFeedbackBadgeProps> = ({ targetRect, message }) => {
   return (
     <div
-      className="aqb-drop-feedback-badge invalid"
+      className="buildrick-drop-feedback-badge invalid"
       style={{
         position: "absolute",
         left: targetRect.left + targetRect.width + 8,
@@ -331,7 +331,7 @@ const DestinationLabel: React.FC<DestinationLabelProps> = ({
 
   return (
     <div
-      className="aqb-drop-destination-label"
+      className="buildrick-drop-destination-label"
       style={{
         position: "absolute",
         left: targetRect.left + targetRect.width + 8,
@@ -364,7 +364,7 @@ const DropBreadcrumb: React.FC<DropBreadcrumbProps> = ({ path, targetRect }) => 
 
   return (
     <div
-      className="aqb-drop-breadcrumb"
+      className="buildrick-drop-breadcrumb"
       style={{
         position: "absolute",
         left: targetRect.left,
@@ -372,11 +372,11 @@ const DropBreadcrumb: React.FC<DropBreadcrumbProps> = ({ path, targetRect }) => 
         display: "flex",
         alignItems: "center",
         gap: 2,
-        backgroundColor: "var(--aqb-toolbar-bg, #252536)",
+        backgroundColor: "var(--buildrick-toolbar-bg, #252536)",
         padding: "4px 8px",
         borderRadius: 4,
         fontSize: 12,
-        color: "var(--aqb-text-secondary, #a0a0b0)",
+        color: "var(--buildrick-text-secondary, #a0a0b0)",
         boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
         animation: "breadcrumbFadeIn 150ms ease-out forwards",
         zIndex: Z_LAYERS.dropBreadcrumb,
@@ -390,15 +390,15 @@ const DropBreadcrumb: React.FC<DropBreadcrumbProps> = ({ path, targetRect }) => 
           <span
             style={{
               color: item.isCurrent
-                ? "var(--aqb-text-primary, #f8fafc)"
-                : "var(--aqb-text-secondary, #a0a0b0)",
+                ? "var(--buildrick-text-primary, #f8fafc)"
+                : "var(--buildrick-text-secondary, #a0a0b0)",
               fontWeight: item.isCurrent ? 600 : 400,
             }}
           >
             {item.label}
           </span>
           {idx < path.length - 1 && (
-            <span style={{ color: "var(--aqb-text-tertiary, #71717a)", margin: "0 2px" }}>›</span>
+            <span style={{ color: "var(--buildrick-text-tertiary, #71717a)", margin: "0 2px" }}>›</span>
           )}
         </React.Fragment>
       ))}
@@ -417,13 +417,13 @@ const DepthBadge: React.FC<DepthBadgeProps> = ({ depth, targetRect }) => {
 
   return (
     <div
-      className="aqb-depth-badge"
+      className="buildrick-depth-badge"
       style={{
         position: "absolute",
         left: targetRect.left + targetRect.width - 40,
         top: targetRect.top + targetRect.height + 4,
-        backgroundColor: "var(--aqb-toolbar-bg, #252536)",
-        color: "var(--aqb-text-secondary, #a0a0b0)",
+        backgroundColor: "var(--buildrick-toolbar-bg, #252536)",
+        color: "var(--buildrick-text-secondary, #a0a0b0)",
         padding: "2px 8px",
         borderRadius: 10,
         fontSize: 12,

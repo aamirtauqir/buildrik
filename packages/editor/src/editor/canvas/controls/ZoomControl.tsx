@@ -43,13 +43,13 @@ export const ZoomControl: React.FC<ZoomControlProps> = ({
 
   return (
     <div
-      className={`aqb-zoom-control ${className || ""}`}
+      className={`buildrick-zoom-control ${className || ""}`}
       style={{
         display: "flex",
         alignItems: "center",
         gap: SIZES.padding.xs,
         padding: SIZES.padding.xs,
-        background: "var(--aqb-bg-panel-secondary)",
+        background: "var(--buildrick-bg-panel-secondary)",
         borderRadius: SIZES.borderRadius.lg,
       }}
     >

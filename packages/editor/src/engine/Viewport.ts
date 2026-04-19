@@ -49,7 +49,7 @@ export class Viewport {
     if (!this.container) return;
 
     this.frame = document.createElement("iframe");
-    this.frame.className = "aqb-viewport-frame";
+    this.frame.className = "buildrick-viewport-frame";
     this.frame.style.cssText = `
       border: none;
       background: #fff;

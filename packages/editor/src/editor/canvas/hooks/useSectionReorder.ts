@@ -90,7 +90,7 @@ export function useSectionReorder({
 
     children.forEach((child, index) => {
       const id = child.getId();
-      const domEl = canvasRef.current?.querySelector(`[data-aqb-id="${id}"]`) as HTMLElement | null;
+      const domEl = canvasRef.current?.querySelector(`[data-buildrick-id="${id}"]`) as HTMLElement | null;
       if (!domEl) return;
 
       const elRect = domEl.getBoundingClientRect();

@@ -274,7 +274,7 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
 
   return (
     <div className={shellClass} style={shellStyle}>
-      <a href="#layout-canvas" className="aqb-skip-link">
+      <a href="#layout-canvas" className="buildrick-skip-link">
         Skip to Canvas
       </a>
 

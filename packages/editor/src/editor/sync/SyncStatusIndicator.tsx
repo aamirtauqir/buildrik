@@ -184,9 +184,9 @@ const buttonStyles: React.CSSProperties = {
   alignItems: "center",
   gap: "8px",
   padding: "6px 12px",
-  border: "1px solid var(--aqb-border)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: "6px",
-  background: "var(--aqb-surface)",
+  background: "var(--buildrick-surface)",
   cursor: "pointer",
   transition: "all 150ms ease",
 };
@@ -214,12 +214,12 @@ const textContainerStyles: React.CSSProperties = {
 const labelStyles: React.CSSProperties = {
   fontSize: "12px",
   fontWeight: 500,
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
 };
 
 const lastSyncStyles: React.CSSProperties = {
   fontSize: "10px",
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
 };
 
 const badgeStyles: React.CSSProperties = {

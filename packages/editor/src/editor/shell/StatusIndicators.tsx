@@ -86,12 +86,12 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
             alignItems: "center",
             gap: 6,
             padding: "4px 8px",
-            borderRadius: "var(--aqb-radius-md, 8px)",
+            borderRadius: "var(--buildrick-design-radius-md, 8px)",
             fontSize: 12,
             fontWeight: 600,
-            color: "var(--aqb-text-muted)",
-            background: "var(--aqb-surface-3)",
-            transition: `opacity var(--aqb-duration-normal, 200ms) ease`,
+            color: "var(--buildrick-text-muted)",
+            background: "var(--buildrick-surface-3)",
+            transition: `opacity var(--buildrick-duration-normal, 200ms) ease`,
           }}
         >
           <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 14, height: 14 }}>
@@ -118,8 +118,8 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
             borderRadius: 8,
             fontSize: 12,
             fontWeight: 600,
-            color: "var(--aqb-text-muted)",
-            transition: `opacity var(--aqb-duration-normal, 200ms) ease`,
+            color: "var(--buildrick-text-muted)",
+            transition: `opacity var(--buildrick-duration-normal, 200ms) ease`,
           }}
         >
           <span
@@ -128,7 +128,7 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
               width: 8,
               height: 8,
               borderRadius: "50%",
-              background: "var(--aqb-warning)",
+              background: "var(--buildrick-warning)",
               flexShrink: 0,
             }}
           />
@@ -153,8 +153,8 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
             borderRadius: 8,
             fontSize: 12,
             fontWeight: 600,
-            color: "var(--aqb-text-secondary)",
-            transition: `opacity var(--aqb-duration-normal, 200ms) ease`,
+            color: "var(--buildrick-text-secondary)",
+            transition: `opacity var(--buildrick-duration-normal, 200ms) ease`,
           }}
         >
           <span
@@ -164,7 +164,7 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
               justifyContent: "center",
               width: 14,
               height: 14,
-              animation: "aqb-spin 1s linear infinite",
+              animation: "buildrick-spin 1s linear infinite",
             }}
           >
             <SvgSync />
@@ -190,9 +190,9 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
             borderRadius: 8,
             fontSize: 12,
             fontWeight: 600,
-            color: "var(--aqb-error)",
-            background: "var(--aqb-error-light)",
-            transition: `opacity var(--aqb-duration-normal, 200ms) ease`,
+            color: "var(--buildrick-error)",
+            background: "var(--buildrick-error-light)",
+            transition: `opacity var(--buildrick-duration-normal, 200ms) ease`,
             cursor: "default",
           }}
         >
@@ -208,7 +208,7 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
             style={{
               textDecoration: "underline",
               cursor: "pointer",
-              color: "var(--aqb-error)",
+              color: "var(--buildrick-error)",
             }}
             aria-label="Retry save"
           >
@@ -234,8 +234,8 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
             borderRadius: 8,
             fontSize: 12,
             fontWeight: 600,
-            color: "var(--aqb-text-muted)",
-            transition: `opacity var(--aqb-duration-normal, 200ms) ease`,
+            color: "var(--buildrick-text-muted)",
+            transition: `opacity var(--buildrick-duration-normal, 200ms) ease`,
             opacity: savedVisible ? 1 : 0,
           }}
         >
@@ -265,17 +265,17 @@ const SYNC_DOT_CONFIG: Record<
   { color: string; label: string; pulse: boolean }
 > = {
   connected: {
-    color: "var(--aqb-success)",
+    color: "var(--buildrick-success)",
     label: "Synced",
     pulse: false,
   },
   syncing: {
-    color: "var(--aqb-warning)",
+    color: "var(--buildrick-warning)",
     label: "Syncing",
     pulse: true,
   },
   offline: {
-    color: "var(--aqb-text-disabled)",
+    color: "var(--buildrick-text-disabled)",
     label: "Disconnected",
     pulse: false,
   },
@@ -297,8 +297,8 @@ const SyncDot: React.FC<SyncDotProps> = ({ status }) => {
           borderRadius: "50%",
           background: config.color,
           flexShrink: 0,
-          animation: config.pulse ? "aqb-pulse 1s ease-in-out infinite" : "none",
-          transition: `background var(--aqb-duration-normal, 200ms) ease`,
+          animation: config.pulse ? "buildrick-pulse 1s ease-in-out infinite" : "none",
+          transition: `background var(--buildrick-duration-normal, 200ms) ease`,
         }}
       />
     </Tooltip>
@@ -319,19 +319,19 @@ const SyncIndicator: React.FC<SyncIndicatorProps> = ({ status }) => {
     { color: string; bg: string; label: string; animate: boolean }
   > = {
     connected: {
-      color: "var(--status-synced, var(--aqb-success))",
-      bg: "var(--aqb-success-light)",
+      color: "var(--status-synced, var(--buildrick-success))",
+      bg: "var(--buildrick-success-light)",
       label: "Connected",
       animate: false,
     },
     syncing: {
-      color: "var(--aqb-text-secondary)",
+      color: "var(--buildrick-text-secondary)",
       bg: "transparent",
       label: "Syncing",
       animate: true,
     },
     offline: {
-      color: "var(--aqb-text-muted)",
+      color: "var(--buildrick-text-muted)",
       bg: "transparent",
       label: "Offline",
       animate: false,
@@ -353,7 +353,7 @@ const SyncIndicator: React.FC<SyncIndicatorProps> = ({ status }) => {
           borderRadius: 6,
           color: config.color,
           background: config.bg,
-          transition: `all var(--aqb-duration-normal, 200ms) ease`,
+          transition: `all var(--buildrick-duration-normal, 200ms) ease`,
         }}
       >
         <span
@@ -363,7 +363,7 @@ const SyncIndicator: React.FC<SyncIndicatorProps> = ({ status }) => {
             justifyContent: "center",
             width: 14,
             height: 14,
-            animation: config.animate ? "aqb-spin 1.5s linear infinite" : "none",
+            animation: config.animate ? "buildrick-spin 1.5s linear infinite" : "none",
           }}
         >
           <SvgSync />
@@ -389,8 +389,8 @@ const IssuesBadge: React.FC<IssuesBadgeProps> = ({ issues, onClick }) => {
   const warningCount = issues.filter((i) => i.type === "warning").length;
 
   const hasErrors = errorCount > 0;
-  const color = hasErrors ? "var(--aqb-error)" : "var(--aqb-warning)";
-  const bg = hasErrors ? "var(--aqb-error-light)" : "var(--aqb-warning-light)";
+  const color = hasErrors ? "var(--buildrick-error)" : "var(--buildrick-warning)";
+  const bg = hasErrors ? "var(--buildrick-error-light)" : "var(--buildrick-warning-light)";
 
   const tooltip = `${errorCount} error${errorCount !== 1 ? "s" : ""}, ${warningCount} warning${warningCount !== 1 ? "s" : ""}`;
 
@@ -410,7 +410,7 @@ const IssuesBadge: React.FC<IssuesBadgeProps> = ({ issues, onClick }) => {
           background: bg,
           border: "none",
           cursor: "pointer",
-          transition: `all var(--aqb-duration-normal, 200ms) ease`,
+          transition: `all var(--buildrick-duration-normal, 200ms) ease`,
         }}
         onClick={onClick}
         aria-label={`${issues.length} issues found`}

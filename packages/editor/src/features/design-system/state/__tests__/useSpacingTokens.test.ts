@@ -19,7 +19,7 @@ function makeTokens(): DesignToken[] {
     name: id,
     value: "0px",
     category: "spacing" as const,
-    cssVar: `--aqb-${id}`,
+    cssVar: `--buildrick-design-${id}`,
     type: "length" as const,
   }));
 }

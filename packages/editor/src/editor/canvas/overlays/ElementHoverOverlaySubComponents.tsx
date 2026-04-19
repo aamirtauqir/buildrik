@@ -211,7 +211,7 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
       {info.isFlexContainer && (
         <span
           style={{
-            background: "var(--aqb-primary)",
+            background: "var(--buildrick-accent)",
             padding: "0 4px",
             borderRadius: 2,
             fontSize: 12,

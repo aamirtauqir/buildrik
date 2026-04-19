@@ -14,7 +14,7 @@ import type { QuickSwitcherSection } from "./QuickSwitcher.types";
 // Constants
 // ============================================
 
-export const STORAGE_KEY = "aqb-quick-switcher-recent";
+export const STORAGE_KEY = "buildrick-quick-switcher-recent";
 export const MAX_RECENT = 8;
 
 export const SECTIONS: QuickSwitcherSection[] = [
@@ -45,29 +45,28 @@ export const containerStyles: React.CSSProperties = {
   width: 600,
   maxWidth: "90vw",
   maxHeight: "70vh",
-  background: "var(--aqb-bg-panel, #1c1e24)",
-  border: "1px solid var(--aqb-border, rgba(255, 255, 255, 0.08))",
-  borderRadius: "var(--aqb-radius-lg, 12px)",
+  background: "var(--buildrick-bg-panel, #1c1e24)",
+  border: "1px solid var(--buildrick-border, rgba(255, 255, 255, 0.08))",
+  borderRadius: "var(--buildrick-design-radius-lg, 12px)",
   boxShadow: "0 16px 64px rgba(0, 0, 0, 0.5)",
   zIndex: 2000,
   display: "flex",
   flexDirection: "column",
   overflow: "hidden",
-  animation: "aqb-slide-down 0.15s ease-out",
 };
 
 export const inputContainerStyles: React.CSSProperties = {
   padding: 16,
-  borderBottom: "1px solid var(--aqb-border, rgba(255, 255, 255, 0.08))",
+  borderBottom: "1px solid var(--buildrick-border, rgba(255, 255, 255, 0.08))",
 };
 
 export const inputStyles: React.CSSProperties = {
   width: "100%",
   padding: "12px 16px",
-  background: "var(--aqb-surface-1, rgba(255, 255, 255, 0.03))",
-  border: "1px solid var(--aqb-border, rgba(255, 255, 255, 0.08))",
-  borderRadius: "var(--aqb-radius-md, 8px)",
-  color: "var(--aqb-text-primary, #ffffff)",
+  background: "var(--buildrick-surface-1, rgba(255, 255, 255, 0.03))",
+  border: "1px solid var(--buildrick-border, rgba(255, 255, 255, 0.08))",
+  borderRadius: "var(--buildrick-design-radius-md, 8px)",
+  color: "var(--buildrick-text-primary, #ffffff)",
   fontSize: 15,
   outline: "none",
 };
@@ -85,7 +84,7 @@ export const sectionHeaderStyles: React.CSSProperties = {
   padding: "10px 8px 6px",
   fontSize: 12,
   fontWeight: 600,
-  color: "var(--aqb-text-muted, #6b7280)",
+  color: "var(--buildrick-text-muted, #6b7280)",
   textTransform: "uppercase",
   letterSpacing: "0.5px",
 };
@@ -99,7 +98,7 @@ export const itemStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
   borderRadius: 6,
-  color: "var(--aqb-text-primary, #ffffff)",
+  color: "var(--buildrick-text-primary, #ffffff)",
   fontSize: 13,
   cursor: "pointer",
   textAlign: "left",
@@ -107,7 +106,7 @@ export const itemStyles: React.CSSProperties = {
 };
 
 export const itemSelectedStyles: React.CSSProperties = {
-  background: "var(--aqb-bg-hover, rgba(255, 255, 255, 0.05))",
+  background: "var(--buildrick-bg-hover, rgba(255, 255, 255, 0.05))",
 };
 
 export const itemLeftStyles: React.CSSProperties = {
@@ -137,7 +136,7 @@ export const labelStyles: React.CSSProperties = {
 
 export const subtitleStyles: React.CSSProperties = {
   fontSize: 12,
-  color: "var(--aqb-text-muted, #6b7280)",
+  color: "var(--buildrick-text-muted, #6b7280)",
   whiteSpace: "nowrap",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -146,7 +145,7 @@ export const subtitleStyles: React.CSSProperties = {
 
 export const shortcutStyles: React.CSSProperties = {
   fontSize: 12,
-  color: "var(--aqb-text-muted, #6b7280)",
+  color: "var(--buildrick-text-muted, #6b7280)",
   fontFamily: "system-ui, -apple-system, sans-serif",
   background: "rgba(255, 255, 255, 0.06)",
   padding: "3px 8px",
@@ -156,17 +155,17 @@ export const shortcutStyles: React.CSSProperties = {
 
 export const footerStyles: React.CSSProperties = {
   padding: "10px 16px",
-  borderTop: "1px solid var(--aqb-border, rgba(255, 255, 255, 0.08))",
+  borderTop: "1px solid var(--buildrick-border, rgba(255, 255, 255, 0.08))",
   display: "flex",
   justifyContent: "space-between",
   fontSize: 12,
-  color: "var(--aqb-text-muted, #6b7280)",
+  color: "var(--buildrick-text-muted, #6b7280)",
 };
 
 export const emptyStyles: React.CSSProperties = {
   padding: 32,
   textAlign: "center",
-  color: "var(--aqb-text-muted, #6b7280)",
+  color: "var(--buildrick-text-muted, #6b7280)",
   fontSize: 13,
 };
 

@@ -342,7 +342,7 @@ export class TemplateManager extends EventEmitter {
       return this.getPlaceholderThumbnail();
     }
 
-    const canvasElement = document.querySelector("[data-aqb-canvas]") as HTMLElement | null;
+    const canvasElement = document.querySelector("[data-buildrick-canvas]") as HTMLElement | null;
     if (!canvasElement) {
       return this.getPlaceholderThumbnail();
     }

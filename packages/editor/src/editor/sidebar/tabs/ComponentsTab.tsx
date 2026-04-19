@@ -86,7 +86,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
   const headerAddBtn = (
     <button
-      className="aqb-comp-header-add-btn"
+      className="buildrick-comp-header-add-btn"
       onClick={() => setShowCreateModal(true)}
       title="Create a new component"
       aria-label="Create component"
@@ -111,10 +111,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             {headerAddBtn}
           </PanelHeader>
         )}
-        <div className="aqb-empty-state">
+        <div className="buildrick-empty-state">
           <ComponentIcon />
-          <p className="aqb-empty-state-title">Components not available</p>
-          <p className="aqb-empty-state-desc">
+          <p className="buildrick-empty-state-title">Components not available</p>
+          <p className="buildrick-empty-state-desc">
             Components require storage access.
             <br />
             Try opening in a regular browser window.
@@ -165,11 +165,11 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   if (state.components.length === 0) {
     if (compactMode) {
       return (
-        <div className="aqb-compact-empty">
-          <span className="aqb-compact-empty-text">No components saved yet</span>
+        <div className="buildrick-compact-empty">
+          <span className="buildrick-compact-empty-text">No components saved yet</span>
           {onCreateNew && (
             <button
-              className="aqb-compact-new-btn"
+              className="buildrick-compact-new-btn"
               onClick={onCreateNew}
               title="Right-click any element to save as component"
             >
@@ -201,10 +201,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             </div>
           </>
         )}
-        <div className="aqb-sidebar-container">
+        <div className="buildrick-sidebar-container">
           {state.canCreateComponent && (
-            <div className="aqb-context-banner">
-              <div className="aqb-context-banner-text">
+            <div className="buildrick-context-banner">
+              <div className="buildrick-context-banner-text">
                 <Layers size={14} />
                 <span>
                   Selected: {state.canvasSelection.length} layer
@@ -212,7 +212,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                 </span>
               </div>
               <button
-                className="aqb-create-component-btn"
+                className="buildrick-create-component-btn"
                 onClick={onCreateNew}
                 title="Create a reusable component from selection"
               >
@@ -220,13 +220,13 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               </button>
             </div>
           )}
-          <div className="aqb-empty-state aqb-comp-empty-state comp-empty">
+          <div className="buildrick-empty-state buildrick-comp-empty-state comp-empty">
             <span className="comp-empty__icon" aria-hidden="true">◇</span>
-            <p className="aqb-empty-state-title aqb-comp-empty-title comp-empty__title">No components yet</p>
-            <p className="aqb-empty-state-desc aqb-comp-empty-desc comp-empty__body">
+            <p className="buildrick-empty-state-title buildrick-comp-empty-title comp-empty__title">No components yet</p>
+            <p className="buildrick-empty-state-desc buildrick-comp-empty-desc comp-empty__body">
               Select elements on the canvas and save them as reusable components.
             </p>
-            <a href="#" className="aqb-comp-learn-more-btn" onClick={(e) => e.preventDefault()}>
+            <a href="#" className="buildrick-comp-learn-more-btn" onClick={(e) => e.preventDefault()}>
               Learn more
             </a>
           </div>
@@ -267,7 +267,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         </>
       )}
 
-      <div className="aqb-sidebar-container aqb-scrollbar" style={{ flex: 1, overflow: "auto" }}>
+      <div className="buildrick-sidebar-container buildrick-scrollbar" style={{ flex: 1, overflow: "auto" }}>
         {!state.isLoaded && (
           <div style={{ padding: "12px" }}>
             {Array.from({ length: 4 }).map((_, i) => (
@@ -276,18 +276,18 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           </div>
         )}
 
-        <div className="aqb-context-banner-hint">
-          <span className="aqb-context-hint-title">Create components from canvas:</span>
-          <span className="aqb-context-hint-text">
+        <div className="buildrick-context-banner-hint">
+          <span className="buildrick-context-hint-title">Create components from canvas:</span>
+          <span className="buildrick-context-hint-text">
             Select layers → Right-click → Create component
           </span>
         </div>
 
-        <div className="aqb-component-chips">
+        <div className="buildrick-component-chips">
           {FILTER_CHIPS.map((chip) => (
             <button
               key={chip.id}
-              className={`aqb-chip ${state.activeFilter === chip.id ? "active" : ""}`}
+              className={`buildrick-chip ${state.activeFilter === chip.id ? "active" : ""}`}
               onClick={() => state.setActiveFilter(chip.id)}
             >
               {chip.label}
@@ -295,10 +295,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           ))}
         </div>
 
-        <div className="aqb-sidebar-content aqb-scrollbar" aria-live="polite">
-          <span className="aqb-sr-only">{state.filteredComponents.length} components found</span>
+        <div className="buildrick-sidebar-content buildrick-scrollbar" aria-live="polite">
+          <span className="buildrick-sr-only">{state.filteredComponents.length} components found</span>
           {state.filteredComponents.length === 0 ? (
-            <div className="aqb-empty-state-inline">
+            <div className="buildrick-empty-state-inline">
               <span>No components match filters</span>
               <button onClick={() => state.setActiveFilter("all" as ComponentFilter)}>
                 Clear filters
@@ -306,23 +306,23 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             </div>
           ) : (
             Object.entries(state.groupedComponents).map(([category, items]) => (
-              <div key={category} className="aqb-accordion">
+              <div key={category} className="buildrick-accordion">
                 <button
-                  className={`aqb-accordion-header ${!state.collapsedGroups.has(category) ? "open" : ""}`}
+                  className={`buildrick-accordion-header ${!state.collapsedGroups.has(category) ? "open" : ""}`}
                   onClick={() => state.toggleGroup(category)}
                 >
-                  <span className="aqb-accordion-label">
+                  <span className="buildrick-accordion-label">
                     {category}
-                    <span className="aqb-accordion-count">{items.length}</span>
+                    <span className="buildrick-accordion-count">{items.length}</span>
                   </span>
                   <ChevronDown
                     size={14}
-                    className={`aqb-accordion-chevron ${!state.collapsedGroups.has(category) ? "open" : "closed"}`}
+                    className={`buildrick-accordion-chevron ${!state.collapsedGroups.has(category) ? "open" : "closed"}`}
                   />
                 </button>
 
                 {!state.collapsedGroups.has(category) && (
-                  <div className="aqb-component-list">
+                  <div className="buildrick-component-list">
                     {items.map((component) => (
                       <ComponentRow
                         key={component.id}
@@ -423,16 +423,16 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                   fontSize: 13,
                   cursor: "pointer",
                   textAlign: "left" as const,
-                  background: isCurrent ? "var(--aqb-primary-alpha-15, rgba(59,130,246,0.15))" : "var(--aqb-surface-3)",
+                  background: isCurrent ? "var(--buildrick-primary-alpha-15, rgba(59,130,246,0.15))" : "var(--buildrick-surface-3)",
                   border: isCurrent
-                    ? "1px solid var(--aqb-primary)"
-                    : "1px solid var(--aqb-border)",
-                  color: "var(--aqb-text-primary)",
+                    ? "1px solid var(--buildrick-accent)"
+                    : "1px solid var(--buildrick-border)",
+                  color: "var(--buildrick-text-primary)",
                 }}
               >
                 {v.name}
                 {isCurrent && (
-                  <span style={{ marginLeft: 8, fontSize: 12, color: "var(--aqb-primary)" }}>
+                  <span style={{ marginLeft: 8, fontSize: 12, color: "var(--buildrick-accent)" }}>
                     (current)
                   </span>
                 )}
@@ -448,7 +448,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         title="Duplicate Component"
         size="sm"
       >
-        <div style={{ color: "var(--aqb-text-secondary)", fontSize: 13, lineHeight: 1.5 }}>
+        <div style={{ color: "var(--buildrick-text-secondary)", fontSize: 13, lineHeight: 1.5 }}>
           <p style={{ margin: "0 0 12px" }}>
             To duplicate &quot;{state.duplicateInfo?.name}&quot;:
           </p>
@@ -460,7 +460,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               {state.duplicateInfo?.copyName}&quot;
             </li>
           </ol>
-          <p style={{ margin: "12px 0 0", fontSize: 12, color: "var(--aqb-text-muted)" }}>
+          <p style={{ margin: "12px 0 0", fontSize: 12, color: "var(--buildrick-text-muted)" }}>
             This ensures a proper deep copy with new element IDs.
           </p>
         </div>

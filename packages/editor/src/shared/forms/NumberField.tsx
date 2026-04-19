@@ -90,19 +90,19 @@ export const NumberField: React.FC<NumberFieldProps> = ({
   };
 
   return (
-    <div className="aqb-field aqb-number-field">
+    <div className="buildrick-field buildrick-number-field">
       {label && (
-        <label htmlFor={fieldId} className="aqb-field-label">
+        <label htmlFor={fieldId} className="buildrick-field-label">
           {label}
         </label>
       )}
-      <div className="aqb-number-row">
-        <div className={`aqb-number-stepper ${error ? "has-error" : ""}`}>
+      <div className="buildrick-number-row">
+        <div className={`buildrick-number-stepper ${error ? "has-error" : ""}`}>
           <button
             type="button"
             onClick={() => decrement()}
             disabled={disabled || !canDecrement}
-            className="aqb-number-btn aqb-number-btn-dec"
+            className="buildrick-number-btn buildrick-number-btn-dec"
             aria-label="Decrease value"
             tabIndex={-1}
           >
@@ -124,7 +124,7 @@ export const NumberField: React.FC<NumberFieldProps> = ({
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             disabled={disabled}
-            className="aqb-number-input"
+            className="buildrick-number-input"
             aria-invalid={error ? "true" : undefined}
             inputMode="decimal"
           />
@@ -132,7 +132,7 @@ export const NumberField: React.FC<NumberFieldProps> = ({
             type="button"
             onClick={increment}
             disabled={disabled || !canIncrement}
-            className="aqb-number-btn aqb-number-btn-inc"
+            className="buildrick-number-btn buildrick-number-btn-inc"
             aria-label="Increase value"
             tabIndex={-1}
           >
@@ -153,7 +153,7 @@ export const NumberField: React.FC<NumberFieldProps> = ({
             value={unit}
             onChange={(e) => onUnitChange?.(e.target.value)}
             disabled={disabled}
-            className="aqb-input aqb-input-sm aqb-number-unit"
+            className="buildrick-input buildrick-input-sm buildrick-number-unit"
             aria-label="Unit"
           >
             {units.map((u) => (
@@ -165,11 +165,11 @@ export const NumberField: React.FC<NumberFieldProps> = ({
         )}
       </div>
       {error && (
-        <span className="aqb-field-error" role="alert">
+        <span className="buildrick-field-error" role="alert">
           {error}
         </span>
       )}
-      {hint && !error && <span className="aqb-field-hint">{hint}</span>}
+      {hint && !error && <span className="buildrick-field-hint">{hint}</span>}
     </div>
   );
 };

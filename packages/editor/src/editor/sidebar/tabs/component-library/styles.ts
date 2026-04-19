@@ -10,7 +10,7 @@ export const containerStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   height: "100%",
-  background: "var(--aqb-surface-2)",
+  background: "var(--buildrick-surface-2)",
 };
 
 export const searchContainerStyles: React.CSSProperties = {
@@ -21,9 +21,9 @@ export const dialogInputStyles: React.CSSProperties = {
   padding: "8px 12px",
   borderRadius: 8,
   fontSize: 13,
-  background: "var(--aqb-surface-3)",
-  border: "1px solid var(--aqb-border)",
-  color: "var(--aqb-text-primary)",
+  background: "var(--buildrick-surface-3)",
+  border: "1px solid var(--buildrick-border)",
+  color: "var(--buildrick-text-primary)",
   outline: "none",
   width: "100%",
 };
@@ -33,9 +33,9 @@ export const dialogCancelBtnStyles: React.CSSProperties = {
   borderRadius: 6,
   fontSize: 13,
   cursor: "pointer",
-  background: "var(--aqb-surface-3)",
-  border: "1px solid var(--aqb-border)",
-  color: "var(--aqb-text-secondary)",
+  background: "var(--buildrick-surface-3)",
+  border: "1px solid var(--buildrick-border)",
+  color: "var(--buildrick-text-secondary)",
 };
 
 export const dialogPrimaryBtnStyles: React.CSSProperties = {
@@ -43,7 +43,7 @@ export const dialogPrimaryBtnStyles: React.CSSProperties = {
   borderRadius: 6,
   fontSize: 13,
   cursor: "pointer",
-  background: "var(--aqb-primary)",
-  border: "1px solid var(--aqb-primary)",
+  background: "var(--buildrick-accent)",
+  border: "1px solid var(--buildrick-accent)",
   color: "#fff",
 };

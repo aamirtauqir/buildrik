@@ -9,7 +9,7 @@ import * as React from "react";
 import type { GroupedTabId } from "../rail/tabsConfig";
 import { trackSidebar } from "../../shared/utils/sidebarAnalytics";
 
-const SIDEBAR_STORAGE_KEY = "aqb-sidebar-state";
+const SIDEBAR_STORAGE_KEY = "buildrick-sidebar-state";
 
 interface SidebarStateOptions {
   controlledPrimaryTab?: GroupedTabId;

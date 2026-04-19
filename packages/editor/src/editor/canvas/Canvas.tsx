@@ -355,7 +355,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     const handleContextMenu = React.useCallback(
       (e: React.MouseEvent) => {
         const target = e.target as HTMLElement;
-        const editableEl = target.closest("[data-aqb-id]") as HTMLElement | null;
+        const editableEl = target.closest("[data-buildrick-id]") as HTMLElement | null;
         if (!editableEl || !composer) {
           closeContextMenu();
           return;
@@ -370,8 +370,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         // Detect all elements at this position for "Select from stack" feature
         const elementsAtPoint = document.elementsFromPoint(e.clientX, e.clientY);
         const elementStack = elementsAtPoint
-          .filter((elem) => elem.hasAttribute("data-aqb-id"))
-          .map((elem) => elem.getAttribute("data-aqb-id")!)
+          .filter((elem) => elem.hasAttribute("data-buildrick-id"))
+          .map((elem) => elem.getAttribute("data-buildrick-id")!)
           .filter(Boolean);
 
         setContextMenu({ x: e.clientX, y: e.clientY, elementId: id, elementStack });
@@ -408,8 +408,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
           {/* Canvas Content */}
           <div
             ref={canvasRef}
-            className={`aqb-canvas${showComponentView ? " aqb-canvas--component-view" : ""}`}
-            data-aqb-canvas="true"
+            className={`buildrick-canvas${showComponentView ? " buildrick-canvas--component-view" : ""}`}
+            data-buildrick-canvas="true"
             data-show-outlines={showOutlines ? "true" : undefined}
             data-xray-mode={showXRay ? "true" : undefined}
             data-badges={showBadges ? "true" : undefined}
@@ -531,7 +531,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         <KeyboardCheatSheet isOpen={isCheatSheetOpen} onClose={closeCheatSheet} />
 
         {/* Aria-live region for selection announcements (WCAG 4.1.3 — always in DOM) */}
-        <div aria-live="polite" aria-atomic="true" className="aqb-sr-only">
+        <div aria-live="polite" aria-atomic="true" className="buildrick-sr-only">
           {liveAnnouncement}
         </div>
       </div>

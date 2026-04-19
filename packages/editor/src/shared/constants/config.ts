@@ -15,27 +15,27 @@
  */
 export const DATA_ATTRIBUTES = {
   /** Element unique identifier */
-  ELEMENT_ID: "data-aqb-id",
+  ELEMENT_ID: "data-buildrick-id",
   /** Element type (div, span, img, etc.) */
-  ELEMENT_TYPE: "data-aqb-type",
+  ELEMENT_TYPE: "data-buildrick-type",
   /** Element is editable */
-  EDITABLE: "data-aqb-editable",
+  EDITABLE: "data-buildrick-editable",
   /** Element is selected */
-  SELECTED: "data-aqb-selected",
+  SELECTED: "data-buildrick-selected",
   /** Element is hovered */
-  HOVERED: "data-aqb-hovered",
+  HOVERED: "data-buildrick-hovered",
   /** Element is locked */
-  LOCKED: "data-aqb-locked",
+  LOCKED: "data-buildrick-locked",
   /** Element is hidden */
-  HIDDEN: "data-aqb-hidden",
+  HIDDEN: "data-buildrick-hidden",
   /** Drop zone indicator */
-  DROP_ZONE: "data-aqb-dropzone",
+  DROP_ZONE: "data-buildrick-dropzone",
   /** Drag source marker */
-  DRAG_SOURCE: "data-aqb-drag-source",
+  DRAG_SOURCE: "data-buildrick-drag-source",
   /** Component type for custom elements */
-  COMPONENT: "data-aqb-component",
+  COMPONENT: "data-buildrick-component",
   /** Binding reference */
-  BINDING: "data-aqb-binding",
+  BINDING: "data-buildrick-binding",
 } as const;
 
 export type DataAttribute = (typeof DATA_ATTRIBUTES)[keyof typeof DATA_ATTRIBUTES];
@@ -226,17 +226,17 @@ export const API = {
  */
 export const CSS_CLASSES = {
   PREFIX: "aqb-",
-  CANVAS: "aqb-canvas",
-  ELEMENT: "aqb-element",
-  SELECTED: "aqb-selected",
-  HOVERED: "aqb-hovered",
-  DRAGGING: "aqb-dragging",
-  RESIZING: "aqb-resizing",
-  DROP_TARGET: "aqb-drop-target",
-  HIDDEN: "aqb-hidden",
-  LOCKED: "aqb-locked",
-  EDITABLE: "aqb-editable",
-  EDITING: "aqb-editing",
+  CANVAS: "buildrick-canvas",
+  ELEMENT: "buildrick-element",
+  SELECTED: "buildrick-selected",
+  HOVERED: "buildrick-hovered",
+  DRAGGING: "buildrick-dragging",
+  RESIZING: "buildrick-resizing",
+  DROP_TARGET: "buildrick-drop-target",
+  HIDDEN: "buildrick-hidden",
+  LOCKED: "buildrick-locked",
+  EDITABLE: "buildrick-editable",
+  EDITING: "buildrick-editing",
 } as const;
 
 // ============================================

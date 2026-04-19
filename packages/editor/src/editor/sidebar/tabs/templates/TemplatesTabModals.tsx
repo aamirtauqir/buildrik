@@ -37,7 +37,7 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
             This will replace your current page content with <strong>{template.name}</strong>. This action cannot be undone.
           </p>
         </div>
-        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--ls-text-muted, #475569)", cursor: "pointer", margin: "0 0 4px" }}>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--buildrick-text-muted, #475569)", cursor: "pointer", margin: "0 0 4px" }}>
           <input
             type="checkbox"
             checked={resetGlobalStyles}
@@ -74,7 +74,7 @@ export const ProModal: React.FC<ProModalProps> = ({ templateName, onCancel, onUp
     <div className="tpl-modal-overlay" onClick={onCancel}>
       <div className="tpl-modal" onClick={(e) => e.stopPropagation()}>
         <h3 className="tpl-modal-title">Pro Template</h3>
-        <p style={{ fontSize: 13, color: "var(--ls-text-subtle, #64748B)", lineHeight: 1.5, margin: "0 0 16px" }}>
+        <p style={{ fontSize: 13, color: "var(--buildrick-text-muted, #64748B)", lineHeight: 1.5, margin: "0 0 16px" }}>
           <strong>{templateName}</strong> is available on the Pro plan. Upgrade to unlock 40+ premium templates.
         </p>
         <div className="tpl-modal-btns">
@@ -110,7 +110,7 @@ export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
       <div className="tpl-modal tpl-modal--create" onClick={(e) => e.stopPropagation()}>
         <h3 className="tpl-modal-title">Create page?</h3>
         <div className="tpl-modal-row">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ls-text-subtle, #64748B)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--buildrick-text-muted, #64748B)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" />
             <path d="M3 9h18M9 21V9" />
           </svg>
@@ -142,7 +142,7 @@ export const CreatePageSuccessModal: React.FC<CreatePageSuccessModalProps> = ({
     <div className="tpl-modal-overlay" onClick={onClose}>
       <div className="tpl-modal tpl-modal--create" onClick={(e) => e.stopPropagation()}>
         <div className="tpl-modal-icon tpl-modal-icon--success">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--ls-success-text, #166534)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--buildrick-success, #166534)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
             <path d="M9 12l2 2 4-4" />
           </svg>
@@ -175,14 +175,14 @@ export const CreatePageErrorModal: React.FC<CreatePageErrorModalProps> = ({
     <div className="tpl-modal-overlay" onClick={onCancel}>
       <div className="tpl-modal tpl-modal--create" onClick={(e) => e.stopPropagation()}>
         <div className="tpl-modal-icon">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--ls-error-text, #DC2626)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--buildrick-error, #DC2626)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
             <path d="M12 8v4M12 16h.01" />
           </svg>
         </div>
         <h3 className="tpl-modal-title tpl-modal-title--lg">Couldn&apos;t create page</h3>
-        <div className="tpl-modal-warning" style={{ background: "var(--ls-error-bg, #FEE2E2)", borderColor: "transparent" }}>
-          <p className="tpl-modal-warning-text" style={{ color: "var(--ls-text-muted, #475569)" }}>
+        <div className="tpl-modal-warning" style={{ background: "var(--buildrick-error-bg, #FEE2E2)", borderColor: "transparent" }}>
+          <p className="tpl-modal-warning-text" style={{ color: "var(--buildrick-text-muted, #475569)" }}>
             Something went wrong creating your page. Your existing pages were not affected.
           </p>
         </div>

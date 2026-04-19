@@ -35,14 +35,14 @@ export const DeviceSelector: React.FC<DeviceSelectorProps> = ({
 }) => {
   return (
     <div
-      className={`aqb-device-selector ${className || ""}`}
+      className={`buildrick-device-selector ${className || ""}`}
       data-control="device"
       style={{
         display: "flex",
         alignItems: "center",
         gap: SIZES.padding.xs,
         padding: SIZES.padding.xs,
-        background: "var(--aqb-bg-panel-secondary)",
+        background: "var(--buildrick-bg-panel-secondary)",
         borderRadius: SIZES.borderRadius.lg,
       }}
     >

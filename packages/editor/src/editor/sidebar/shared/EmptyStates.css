@@ -16,24 +16,24 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: var(--ls-bg-subtle, #F1F5F9);
+  background: var(--buildrick-bg-subtle, #F1F5F9);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
-  color: var(--ls-text-lighter, #94A3B8);
+  color: var(--buildrick-text-secondary, #94A3B8);
 }
 
 .empty-title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--ls-text-primary);
+  color: var(--buildrick-text-primary);
   margin: 0 0 6px;
 }
 
 .empty-message {
   font-size: 12px;
-  color: var(--ls-text-muted, #475569);
+  color: var(--buildrick-text-muted, #475569);
   margin: 0 0 16px;
   line-height: 1.5;
   max-width: 240px;
@@ -43,7 +43,7 @@
   padding: 8px 16px;
   border-radius: 6px;
   border: none;
-  background: var(--ls-accent, #1D4ED8);
+  background: var(--buildrick-accent, #1D4ED8);
   color: #fff;
   font-size: 12px;
   font-weight: 500;

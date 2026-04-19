@@ -32,28 +32,28 @@ export function LayerSelectionBanner({
 
   return (
     <div
-      className="aqb-layer-sel-banner"
+      className="buildrick-layer-sel-banner"
       role="status"
       aria-live="polite"
       aria-label={`${count} layers selected`}
     >
-      <span className="aqb-sel-count">{count} selected</span>
-      <div className="aqb-layer-sel-actions">
-        <button className="aqb-sel-btn" onClick={onGroup} title="Wrap in container (⌘G)">
+      <span className="buildrick-sel-count">{count} selected</span>
+      <div className="buildrick-layer-sel-actions">
+        <button className="buildrick-sel-btn" onClick={onGroup} title="Wrap in container (⌘G)">
           Group
         </button>
-        <button className="aqb-sel-btn" onClick={onHide} title="Hide all selected">
+        <button className="buildrick-sel-btn" onClick={onHide} title="Hide all selected">
           Hide
         </button>
         <button
-          className="aqb-sel-btn aqb-sel-btn--danger"
+          className="buildrick-sel-btn buildrick-sel-btn--danger"
           onClick={onDelete}
           title={`Delete ${count} layers`}
         >
           Delete
         </button>
         <button
-          className="aqb-sel-btn aqb-sel-btn--muted"
+          className="buildrick-sel-btn buildrick-sel-btn--muted"
           onClick={onExit}
           title="Exit selection (Esc)"
         >

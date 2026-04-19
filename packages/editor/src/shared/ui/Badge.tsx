@@ -22,13 +22,13 @@ export const Badge: React.FC<BadgeProps> = ({
 
   const variantStyles: Record<string, React.CSSProperties> = {
     default: {
-      background: "var(--aqb-surface-2)",
-      color: "var(--aqb-text-muted)",
+      background: "var(--buildrick-surface-2)",
+      color: "var(--buildrick-text-muted)",
     },
-    primary: { background: "rgba(45, 109, 255, 0.12)", color: "var(--aqb-primary, #2D6DFF)" },
-    success: { background: "rgba(34, 197, 94, 0.12)", color: "var(--aqb-success, #22c55e)" },
-    warning: { background: "rgba(245, 158, 11, 0.12)", color: "var(--aqb-warning, #f59e0b)" },
-    error: { background: "rgba(239, 68, 68, 0.12)", color: "var(--aqb-error, #ef4444)" },
+    primary: { background: "rgba(45, 109, 255, 0.12)", color: "var(--buildrick-accent, #2D6DFF)" },
+    success: { background: "rgba(34, 197, 94, 0.12)", color: "var(--buildrick-success, #22c55e)" },
+    warning: { background: "rgba(245, 158, 11, 0.12)", color: "var(--buildrick-warning, #f59e0b)" },
+    error: { background: "rgba(239, 68, 68, 0.12)", color: "var(--buildrick-error, #ef4444)" },
     info: { background: "rgba(75, 141, 255, 0.12)", color: "var(--blue, #4b8dff)" },
   };
 
@@ -41,7 +41,7 @@ export const Badge: React.FC<BadgeProps> = ({
   if (dot) {
     return (
       <span
-        className={`aqb-badge-dot aqb-badge-${variant}`}
+        className={`buildrick-badge-dot buildrick-badge-${variant}`}
         style={{
           width: size === "sm" ? 6 : 8,
           height: size === "sm" ? 6 : 8,
@@ -55,7 +55,7 @@ export const Badge: React.FC<BadgeProps> = ({
 
   return (
     <span
-      className={`aqb-badge aqb-badge-${variant}`}
+      className={`buildrick-badge buildrick-badge-${variant}`}
       style={{
         display: "inline-flex",
         alignItems: "center",

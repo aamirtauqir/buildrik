@@ -39,16 +39,16 @@ export const SliderField: React.FC<SliderFieldProps> = ({
   const percentage = ((value - min) / (max - min)) * 100;
 
   return (
-    <div className="aqb-slider-field" style={{ opacity: disabled ? 0.5 : 1 }}>
+    <div className="buildrick-slider-field" style={{ opacity: disabled ? 0.5 : 1 }}>
       {(label || showValue) && (
-        <div className="aqb-slider-header">
+        <div className="buildrick-slider-header">
           {label && (
-            <label htmlFor={sliderId} className="aqb-field-label">
+            <label htmlFor={sliderId} className="buildrick-field-label">
               {label}
             </label>
           )}
           {showValue && (
-            <span className="aqb-slider-value">
+            <span className="buildrick-slider-value">
               {value}
               {unit}
             </span>
@@ -64,22 +64,22 @@ export const SliderField: React.FC<SliderFieldProps> = ({
         max={max}
         step={step}
         disabled={disabled}
-        className="aqb-slider"
+        className="buildrick-slider"
         aria-valuemin={min}
         aria-valuemax={max}
         aria-valuenow={value}
         aria-valuetext={`${value}${unit}`}
         style={{
-          background: `linear-gradient(to right, var(--aqb-primary) 0%, var(--aqb-primary) ${percentage}%, var(--aqb-bg-panel-secondary) ${percentage}%, var(--aqb-bg-panel-secondary) 100%)`,
+          background: `linear-gradient(to right, var(--buildrick-accent) 0%, var(--buildrick-accent) ${percentage}%, var(--buildrick-bg-panel-secondary) ${percentage}%, var(--buildrick-bg-panel-secondary) 100%)`,
         }}
       />
       {marks && marks.length > 0 && (
-        <div className="aqb-slider-marks">
+        <div className="buildrick-slider-marks">
           {marks.map((mark) => (
             <button
               key={mark.value}
               type="button"
-              className="aqb-slider-mark"
+              className="buildrick-slider-mark"
               onClick={() => !disabled && onChange?.(mark.value)}
               disabled={disabled}
             >

@@ -77,7 +77,7 @@ export const PseudoStateSelector: React.FC<PseudoStateSelectorProps> = ({
       <span
         style={{
           fontSize: 12,
-          color: "var(--aqb-text-tertiary)",
+          color: "var(--buildrick-text-tertiary)",
           marginRight: 4,
           flexShrink: 0,
         }}
@@ -104,11 +104,11 @@ export const PseudoStateSelector: React.FC<PseudoStateSelectorProps> = ({
               background: isActive ? `${meta.rawColor}20` : "transparent",
               border: isActive ? `1px solid ${meta.rawColor}50` : "1px solid transparent",
               borderRadius: 6,
-              color: isActive ? meta.rawColor : "var(--aqb-text-tertiary)",
-              fontSize: "var(--aqb-text-xs)",
+              color: isActive ? meta.rawColor : "var(--buildrick-text-tertiary)",
+              fontSize: "var(--buildrick-text-xs)",
               fontWeight: 600,
               cursor: "pointer",
-              transition: "var(--aqb-transition-fast)",
+              transition: "var(--buildrick-transition-fast)",
               textAlign: "center" as const,
             }}
           >

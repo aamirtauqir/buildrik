@@ -63,7 +63,7 @@ export const DragHandle: React.FC<DragHandleProps> = ({ rect, elementId, size = 
       setIsDragging(true);
 
       // Find the actual element and trigger native drag
-      const element = document.querySelector(`[data-aqb-id="${elementId}"]`) as HTMLElement;
+      const element = document.querySelector(`[data-buildrick-id="${elementId}"]`) as HTMLElement;
       if (element) {
         // Create and dispatch a dragstart event
         const dragEvent = new DragEvent("dragstart", {
@@ -108,7 +108,7 @@ export const DragHandle: React.FC<DragHandleProps> = ({ rect, elementId, size = 
 
   return (
     <div
-      className="aqb-drag-handle"
+      className="buildrick-drag-handle"
       role="button"
       aria-label="Drag to move element"
       aria-pressed={isDragging}

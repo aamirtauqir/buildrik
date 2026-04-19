@@ -1,7 +1,7 @@
 /* ─────────────────────────────────────────────
    SETTINGS PANEL STYLES (scrollable with accordions)
    ───────────────────────────────────────────── */
-.aqb-settings-container {
+.buildrick-settings-container {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -9,24 +9,24 @@
   overflow-y: auto;
 }
 
-.aqb-settings-title {
-  font-size: var(--aqb-font-lg);
+.buildrick-settings-title {
+  font-size: var(--buildrick-font-lg);
   font-weight: 600;
   margin: 0 0 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--aqb-border);
+  border-bottom: 1px solid var(--buildrick-border);
 }
 
-.aqb-settings-tabs {
+.buildrick-settings-tabs {
   display: flex;
   gap: 4px;
   margin-bottom: 12px;
   padding: 4px;
-  background: var(--aqb-surface-3);
-  border-radius: var(--aqb-radius-md);
+  background: var(--buildrick-surface-3);
+  border-radius: var(--buildrick-design-radius-md);
 }
 
-.aqb-settings-tab {
+.buildrick-settings-tab {
   flex: 1;
   display: flex;
   align-items: center;
@@ -35,111 +35,111 @@
   padding: 8px 12px;
   background: transparent;
   border: none;
-  border-radius: var(--aqb-radius-sm);
-  font-size: var(--aqb-font-xs);
+  border-radius: var(--buildrick-design-radius-sm);
+  font-size: var(--buildrick-font-xs);
   font-weight: 500;
-  color: var(--aqb-text-secondary);
+  color: var(--buildrick-text-secondary);
   cursor: pointer;
-  transition: var(--aqb-transition-fast);
+  transition: var(--buildrick-transition-fast);
 }
 
-.aqb-settings-tab:hover {
-  color: var(--aqb-text-primary);
+.buildrick-settings-tab:hover {
+  color: var(--buildrick-text-primary);
 }
 
-.aqb-settings-tab.active {
-  background: var(--aqb-surface-1);
-  color: var(--aqb-text-primary);
+.buildrick-settings-tab.active {
+  background: var(--buildrick-surface-1);
+  color: var(--buildrick-text-primary);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.aqb-settings-sections {
+.buildrick-settings-sections {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.aqb-settings-card {
-  background: var(--aqb-surface-3);
-  border-radius: var(--aqb-radius-md);
+.buildrick-settings-card {
+  background: var(--buildrick-surface-3);
+  border-radius: var(--buildrick-design-radius-md);
   padding: 12px;
 }
 
-.aqb-settings-card-header {
+.buildrick-settings-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
 }
 
-.aqb-settings-card-title {
-  font-size: var(--aqb-font-sm);
+.buildrick-settings-card-title {
+  font-size: var(--buildrick-font-sm);
   font-weight: 600;
-  color: var(--aqb-text-primary);
+  color: var(--buildrick-text-primary);
 }
 
-.aqb-form-group {
+.buildrick-form-group {
   margin-bottom: 12px;
 }
 
-.aqb-form-label {
+.buildrick-form-label {
   display: block;
   margin-bottom: 6px;
-  color: var(--aqb-text-secondary);
-  font-size: var(--aqb-font-xs);
+  color: var(--buildrick-text-secondary);
+  font-size: var(--buildrick-font-xs);
   font-weight: 500;
 }
 
-.aqb-checkbox-label {
+.buildrick-checkbox-label {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: var(--aqb-font-xs);
-  color: var(--aqb-text-secondary);
+  font-size: var(--buildrick-font-xs);
+  color: var(--buildrick-text-secondary);
   cursor: pointer;
 }
 
-.aqb-checkbox-label input[type="checkbox"] {
+.buildrick-checkbox-label input[type="checkbox"] {
   width: 14px;
   height: 14px;
-  accent-color: var(--aqb-primary);
+  accent-color: var(--buildrick-accent);
 }
 
-.aqb-hint {
-  font-size: var(--aqb-font-xs);
-  color: var(--aqb-text-muted);
+.buildrick-hint {
+  font-size: var(--buildrick-font-xs);
+  color: var(--buildrick-text-muted);
   margin-top: 4px;
 }
 
-.aqb-input-error,
-.aqb-input-error:hover,
-.aqb-input-error:focus {
-  border-color: var(--aqb-error);
+.buildrick-input-error,
+.buildrick-input-error:hover,
+.buildrick-input-error:focus {
+  border-color: var(--buildrick-error);
 }
 
-.aqb-error-text {
-  font-size: var(--aqb-font-xs);
-  color: var(--aqb-error);
+.buildrick-error-text {
+  font-size: var(--buildrick-font-xs);
+  color: var(--buildrick-error);
   margin-top: 4px;
 }
 
 /* ─────────────────────────────────────────────
    SETTINGS TAB — converted from styles.ts (RF-4)
    ───────────────────────────────────────────── */
-.aqb-st-container {
+.buildrick-st-container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--aqb-surface-2);
+  background: var(--buildrick-surface-2);
 }
 
-.aqb-st-home,
-.aqb-st-content {
+.buildrick-st-home,
+.buildrick-st-content {
   flex: 1;
   overflow: auto;
 }
 
-.aqb-st-screen {
+.buildrick-st-screen {
   padding: 12px;
   display: flex;
   flex-direction: column;
@@ -147,55 +147,55 @@
 }
 
 /* Section */
-.aqb-st-section {
+.buildrick-st-section {
   background: rgba(255, 255, 255, 0.04);
   border-radius: 8px;
   padding: 12px;
 }
 
-.aqb-st-section__title {
+.buildrick-st-section__title {
   margin: 0 0 12px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--aqb-text-muted);
+  color: var(--buildrick-text-muted);
   text-transform: uppercase;
 }
 
 /* Field */
-.aqb-st-field {
+.buildrick-st-field {
   display: flex;
   flex-direction: column;
   gap: 6px;
   margin-bottom: 12px;
 }
 
-.aqb-st-label {
+.buildrick-st-label {
   font-size: 12px;
   font-weight: 500;
-  color: var(--aqb-text-primary);
+  color: var(--buildrick-text-primary);
 }
 
-.aqb-st-hint {
+.buildrick-st-hint {
   display: block;
   font-size: 12px;
   font-weight: 400;
-  color: var(--aqb-text-muted);
+  color: var(--buildrick-text-muted);
 }
 
-.aqb-st-input {
+.buildrick-st-input {
   width: 100%;
   padding: 8px 10px;
-  background: var(--aqb-surface-2);
-  border: 1px solid var(--aqb-border);
+  background: var(--buildrick-surface-2);
+  border: 1px solid var(--buildrick-border);
   border-radius: 6px;
-  color: var(--aqb-text-primary);
+  color: var(--buildrick-text-primary);
   font-size: 12px;
   outline: none;
   box-sizing: border-box;
 }
 
 /* Toggle */
-.aqb-st-toggle-row {
+.buildrick-st-toggle-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -204,17 +204,17 @@
   font-size: 12px;
 }
 
-.aqb-st-toggle {
+.buildrick-st-toggle {
   position: relative;
   width: 32px;
   height: 18px;
-  border: 1px solid var(--aqb-border);
+  border: 1px solid var(--buildrick-border);
   border-radius: 9px;
   cursor: pointer;
   transition: background 0.15s;
 }
 
-.aqb-st-toggle__knob {
+.buildrick-st-toggle__knob {
   position: absolute;
   top: 2px;
   left: 2px;
@@ -226,141 +226,141 @@
 }
 
 /* Status / URL */
-.aqb-st-status-row {
+.buildrick-st-status-row {
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
   font-size: 12px;
 }
 
-.aqb-st-badge--success {
+.buildrick-st-badge--success {
   padding: 2px 8px;
-  background: var(--aqb-success);
+  background: var(--buildrick-success);
   color: #fff;
   border-radius: 4px;
   font-size: 12px;
   font-weight: 600;
 }
 
-.aqb-st-muted {
-  color: var(--aqb-text-muted);
+.buildrick-st-muted {
+  color: var(--buildrick-text-muted);
 }
 
-.aqb-st-url-row {
+.buildrick-st-url-row {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-.aqb-st-copy-btn {
+.buildrick-st-copy-btn {
   padding: 8px 12px;
-  background: var(--aqb-surface-4);
+  background: var(--buildrick-surface-4);
   border: none;
   border-radius: 6px;
-  color: var(--aqb-text-primary);
+  color: var(--buildrick-text-primary);
   font-size: 12px;
   cursor: pointer;
   transition: color 0.15s;
 }
 
 /* Notes / warnings */
-.aqb-st-note {
+.buildrick-st-note {
   padding: 12px;
   background: rgba(45, 109, 255, 0.1);
   border-radius: 8px;
   font-size: 12px;
-  color: var(--aqb-text-secondary);
+  color: var(--buildrick-text-secondary);
   margin-top: 8px;
 }
 
-.aqb-st-warning {
+.buildrick-st-warning {
   padding: 12px;
   background: rgba(245, 158, 11, 0.15);
   border-radius: 8px;
   font-size: 12px;
-  color: var(--aqb-warning);
+  color: var(--buildrick-warning);
 }
 
-.aqb-st-error-hint {
+.buildrick-st-error-hint {
   display: block;
   font-size: 12px;
-  color: var(--aqb-error, #ef4444);
+  color: var(--buildrick-error, #ef4444);
   margin-top: 4px;
 }
 
-.aqb-st-success-note {
+.buildrick-st-success-note {
   padding: 8px;
   background: rgba(34, 197, 94, 0.1);
   border-radius: 6px;
   font-size: 12px;
-  color: var(--aqb-success, #22c55e);
+  color: var(--buildrick-success, #22c55e);
   margin-top: 8px;
 }
 
 /* DNS help */
-.aqb-st-dns-help {
+.buildrick-st-dns-help {
   margin-top: 12px;
   padding: 12px;
-  background: var(--aqb-surface-3);
+  background: var(--buildrick-surface-3);
   border-radius: 6px;
   font-size: 12px;
 }
 
-.aqb-st-code {
+.buildrick-st-code {
   display: block;
   margin-top: 8px;
   padding: 6px 10px;
-  background: var(--aqb-surface-2);
+  background: var(--buildrick-surface-2);
   border-radius: 4px;
   font-family: monospace;
   font-size: 12px;
 }
 
 /* Export options */
-.aqb-st-export-options {
+.buildrick-st-export-options {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
 }
 
-.aqb-st-export-option {
+.buildrick-st-export-option {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 16px 8px;
   background: rgba(255, 255, 255, 0.04);
-  border: 2px solid var(--aqb-border);
+  border: 2px solid var(--buildrick-border);
   border-radius: 8px;
   font-size: 20px;
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.aqb-st-export-option--active {
-  border-color: var(--aqb-primary);
+.buildrick-st-export-option--active {
+  border-color: var(--buildrick-accent);
   background: rgba(59, 130, 246, 0.1);
 }
 
 /* Integrations */
-.aqb-st-integration-card {
+.buildrick-st-integration-card {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: var(--aqb-surface-3);
+  background: var(--buildrick-surface-3);
   border-radius: 6px;
   margin-bottom: 8px;
 }
 
-.aqb-st-integration__name {
+.buildrick-st-integration__name {
   font-size: 12px;
   font-weight: 500;
-  color: var(--aqb-text-primary);
+  color: var(--buildrick-text-primary);
 }
 
-.aqb-st-integration__desc {
+.buildrick-st-integration__desc {
   font-size: 12px;
-  color: var(--aqb-text-muted);
+  color: var(--buildrick-text-muted);
 }
 
 /* ── sett-save-error: inline error banner after failed save (Screen 17-28) ── */
@@ -373,7 +373,7 @@
   border: 1px solid rgba(239, 68, 68, 0.2);
   border-radius: 6px;
   font-size: 12px;
-  color: var(--aqb-error, #ef4444);
+  color: var(--buildrick-error, #ef4444);
   margin: 0 12px 4px;
 }
 
@@ -383,7 +383,7 @@
 }
 
 /* Locked screen */
-.aqb-st-locked {
+.buildrick-st-locked {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -393,27 +393,27 @@
   height: 100%;
 }
 
-.aqb-st-locked__icon {
+.buildrick-st-locked__icon {
   font-size: 48px;
   margin-bottom: 16px;
 }
 
-.aqb-st-locked__title {
+.buildrick-st-locked__title {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: var(--aqb-text-primary);
+  color: var(--buildrick-text-primary);
 }
 
-.aqb-st-locked__desc {
+.buildrick-st-locked__desc {
   margin: 8px 0 24px;
   font-size: 13px;
-  color: var(--aqb-text-muted);
+  color: var(--buildrick-text-muted);
 }
 
-.aqb-st-locked__btn {
+.buildrick-st-locked__btn {
   padding: 12px 24px;
-  background: var(--aqb-primary);
+  background: var(--buildrick-accent);
   border: none;
   border-radius: 8px;
   color: #fff;

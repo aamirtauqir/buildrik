@@ -19,20 +19,20 @@ export const PanelSkeleton: React.FC = () => (
 
 /** Error fallback shown when a tab panel crashes */
 export const SidebarErrorFallback: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
-  <div style={{ padding: 24, textAlign: "center", color: "var(--aqb-text-secondary)" }}>
+  <div style={{ padding: 24, textAlign: "center", color: "var(--buildrick-text-secondary)" }}>
     <div style={{ fontSize: 32, marginBottom: 12 }}>!</div>
     <div style={{ fontWeight: 600, marginBottom: 8, fontSize: 13 }}>Something went wrong</div>
-    <div style={{ fontSize: 12, marginBottom: 16, color: "var(--aqb-text-muted)" }}>
+    <div style={{ fontSize: 12, marginBottom: 16, color: "var(--buildrick-text-muted)" }}>
       This panel encountered an error. Your work is safe.
     </div>
     <button
       onClick={onRetry}
       style={{
         padding: "6px 16px",
-        background: "var(--aqb-surface-3)",
-        border: "1px solid var(--aqb-bg-active)",
+        background: "var(--buildrick-surface-3)",
+        border: "1px solid var(--buildrick-bg-active)",
         borderRadius: 6,
-        color: "var(--aqb-text-primary)",
+        color: "var(--buildrick-text-primary)",
         fontSize: 12,
         fontWeight: 500,
         cursor: "pointer",

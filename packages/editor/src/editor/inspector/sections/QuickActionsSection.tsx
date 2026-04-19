@@ -137,12 +137,12 @@ const styles = {
     justifyContent: "center",
     gap: 3,
     padding: "6px 4px",
-    background: active ? "var(--aqb-primary-light, rgba(59,130,246,0.15))" : "rgba(255,255,255,0.04)",
+    background: active ? "var(--buildrick-accent-subtle, rgba(59,130,246,0.15))" : "rgba(255,255,255,0.04)",
     border: active
-      ? "1px solid var(--aqb-primary, rgba(59,130,246,0.6))"
+      ? "1px solid var(--buildrick-accent, rgba(59,130,246,0.6))"
       : "1px solid rgba(255,255,255,0.08)",
     borderRadius: 6,
-    color: active ? "var(--aqb-primary, #3b82f6)" : "var(--aqb-text-tertiary)",
+    color: active ? "var(--buildrick-accent, #3b82f6)" : "var(--buildrick-text-tertiary)",
     fontSize: 10,
     fontWeight: 600,
     cursor: "pointer",

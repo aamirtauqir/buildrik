@@ -20,7 +20,7 @@ export interface SavedTemplate {
 // Constants
 // ============================================
 
-const STORAGE_KEY = "aqb-saved-templates";
+const STORAGE_KEY = "buildrick-saved-templates";
 
 // ============================================
 // Functions

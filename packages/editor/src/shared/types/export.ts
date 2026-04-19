@@ -65,7 +65,7 @@ export const DEFAULT_EXPORT_CONFIG: ExportConfig = {
   pageTitle: "Aquibra Export",
   metaDescription: "",
   includeResetCSS: true,
-  cssPrefix: "aqb-",
+  cssPrefix: "buildrick-",
   includeComments: false,
 };
 

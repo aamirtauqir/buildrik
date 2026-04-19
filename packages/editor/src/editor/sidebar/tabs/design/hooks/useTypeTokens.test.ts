@@ -8,7 +8,7 @@ const MOCK_TYPE_TOKEN: DesignToken = {
   name: "Font Size 4XL",
   value: "48px",
   category: "typography",
-  cssVar: "--aqb-font-size-4xl",
+  cssVar: "--buildrick-design-font-size-4xl",
   type: "font-size",
 };
 

@@ -2,7 +2,7 @@
  * Canvas Spot Badge Styles
  */
 
-.aqb-canvas-spot-badge {
+.buildrick-canvas-spot-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -17,16 +17,16 @@
   transition: all 0.2s ease;
 }
 
-.aqb-canvas-spot-badge:hover {
+.buildrick-canvas-spot-badge:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-.aqb-canvas-spot-badge-content {
+.buildrick-canvas-spot-badge-content {
   white-space: nowrap;
 }
 
-.aqb-canvas-spot-badge-close {
+.buildrick-canvas-spot-badge-close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -44,7 +44,7 @@
   transition: all 0.2s ease;
 }
 
-.aqb-canvas-spot-badge-close:hover {
+.buildrick-canvas-spot-badge-close:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: scale(1.1);
 }

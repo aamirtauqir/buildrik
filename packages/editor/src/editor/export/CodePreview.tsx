@@ -256,7 +256,7 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
           activeTab={activeTab}
           onChange={(tab) => setActiveTab(tab as CodeTab)}
         />
-        <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>
+        <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
           {activeTab === "html"
             ? `${html.split("\n").length} lines`
             : `${css.split("\n").length} lines`}

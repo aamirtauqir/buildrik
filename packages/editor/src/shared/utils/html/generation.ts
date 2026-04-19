@@ -56,10 +56,10 @@ export function buildAttributeString(
   // Aquibra data attributes (for editor mode)
   if (includeDataAttributes) {
     if (data.id) {
-      parts.push(`data-aqb-id="${escapeAttr(data.id)}"`);
+      parts.push(`data-buildrick-id="${escapeAttr(data.id)}"`);
     }
     if (data.type) {
-      parts.push(`data-aqb-type="${escapeAttr(data.type)}"`);
+      parts.push(`data-buildrick-type="${escapeAttr(data.type)}"`);
     }
   }
 

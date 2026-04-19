@@ -37,21 +37,21 @@ export function LayerDisplaySettings({ prefs, onChange, onClose }: LayerDisplayS
   return (
     <div
       ref={ref}
-      className="aqb-layer-display-settings"
+      className="buildrick-layer-display-settings"
       role="dialog"
       aria-label="Layer display settings"
     >
-      <div className="aqb-lds-header">
-        <span className="aqb-lds-title">Display Settings</span>
-        <button className="aqb-lds-close" onClick={onClose} aria-label="Close display settings">
+      <div className="buildrick-lds-header">
+        <span className="buildrick-lds-title">Display Settings</span>
+        <button className="buildrick-lds-close" onClick={onClose} aria-label="Close display settings">
           ×
         </button>
       </div>
 
-      <label className="aqb-lds-row">
-        <span className="aqb-lds-label">
+      <label className="buildrick-lds-row">
+        <span className="buildrick-lds-label">
           Show HTML tags
-          <span className="aqb-lds-hint">div, section, h1…</span>
+          <span className="buildrick-lds-hint">div, section, h1…</span>
         </span>
         <input
           type="checkbox"
@@ -61,10 +61,10 @@ export function LayerDisplaySettings({ prefs, onChange, onClose }: LayerDisplayS
         />
       </label>
 
-      <label className="aqb-lds-row">
-        <span className="aqb-lds-label">
+      <label className="buildrick-lds-row">
+        <span className="buildrick-lds-label">
           Show element IDs
-          <span className="aqb-lds-hint">#abc123 format</span>
+          <span className="buildrick-lds-hint">#abc123 format</span>
         </span>
         <input
           type="checkbox"
@@ -74,8 +74,8 @@ export function LayerDisplaySettings({ prefs, onChange, onClose }: LayerDisplayS
         />
       </label>
 
-      <label className="aqb-lds-row">
-        <span className="aqb-lds-label">Compact rows</span>
+      <label className="buildrick-lds-row">
+        <span className="buildrick-lds-label">Compact rows</span>
         <input
           type="checkbox"
           checked={prefs.treeDensity === "compact"}

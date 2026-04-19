@@ -118,7 +118,7 @@ describe("useStyleHandlers — pseudo-state style write (Task 4)", () => {
     });
 
     expect(composer.styles.setRule).toHaveBeenCalledWith(
-      '[data-aqb-id="el-1"]',
+      '[data-buildrick-id="el-1"]',
       { color: "green" },
       { pseudo: ":hover" },
     );
@@ -141,7 +141,7 @@ describe("useStyleHandlers — pseudo-state style write (Task 4)", () => {
     });
 
     expect(composer.styles.getRule).toHaveBeenCalledWith(
-      '[data-aqb-id="el-1"]',
+      '[data-buildrick-id="el-1"]',
       undefined,
     );
   });

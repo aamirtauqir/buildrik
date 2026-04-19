@@ -50,25 +50,25 @@ export const Card: React.FC<CardProps> = ({
 
   const variantStyles: Record<string, React.CSSProperties> = {
     default: {
-      background: "var(--aqb-bg-panel)",
-      border: "1px solid var(--aqb-border)",
+      background: "var(--buildrick-bg-panel)",
+      border: "1px solid var(--buildrick-border)",
     },
     elevated: {
-      background: "var(--aqb-bg-panel)",
+      background: "var(--buildrick-bg-panel)",
       boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
     },
     outlined: {
       background: "transparent",
-      border: "1px solid var(--aqb-border)",
+      border: "1px solid var(--buildrick-border)",
     },
     filled: {
-      background: "var(--aqb-bg-panel-secondary)",
+      background: "var(--buildrick-bg-panel-secondary)",
     },
   };
 
   return (
     <div
-      className={`aqb-card aqb-card--${variant} ${className || ""}`}
+      className={`buildrick-card buildrick-card--${variant} ${className || ""}`}
       onClick={clickable ? onClick : undefined}
       style={{
         ...variantStyles[variant],
@@ -92,7 +92,7 @@ export const Card: React.FC<CardProps> = ({
 
 export const CardHeader: React.FC<CardHeaderProps> = ({ children, action, className }) => (
   <div
-    className={`aqb-card-header ${className || ""}`}
+    className={`buildrick-card-header ${className || ""}`}
     style={{
       display: "flex",
       alignItems: "center",
@@ -106,7 +106,7 @@ export const CardHeader: React.FC<CardHeaderProps> = ({ children, action, classN
 );
 
 export const CardBody: React.FC<CardBodyProps> = ({ children, className }) => (
-  <div className={`aqb-card-body ${className || ""}`}>{children}</div>
+  <div className={`buildrick-card-body ${className || ""}`}>{children}</div>
 );
 
 export const CardFooter: React.FC<CardFooterProps> = ({ children, align = "right", className }) => {
@@ -119,14 +119,14 @@ export const CardFooter: React.FC<CardFooterProps> = ({ children, align = "right
 
   return (
     <div
-      className={`aqb-card-footer ${className || ""}`}
+      className={`buildrick-card-footer ${className || ""}`}
       style={{
         display: "flex",
         alignItems: "center",
         justifyContent: alignMap[align],
         marginTop: 16,
         paddingTop: 12,
-        borderTop: "1px solid var(--aqb-border)",
+        borderTop: "1px solid var(--buildrick-border)",
         gap: 8,
       }}
     >

@@ -32,7 +32,7 @@ export function useCanvasInlineCommands({
   const handleInlineCommand = React.useCallback(
     (command: string, value?: string) => {
       const editingEl = canvasRef.current?.querySelector(
-        `[data-aqb-id="${editingId}"]`
+        `[data-buildrick-id="${editingId}"]`
       ) as HTMLElement | null;
       if (!editingEl) return;
 

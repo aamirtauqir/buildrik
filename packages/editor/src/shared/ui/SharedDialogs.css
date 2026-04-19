@@ -13,9 +13,9 @@
 }
 
 .sd-dialog {
-  background: var(--aqb-surface-3);
+  background: var(--buildrick-surface-3);
   border-radius: 12px;
-  border: 1px solid var(--aqb-border, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--buildrick-border, rgba(255, 255, 255, 0.08));
   padding: 20px 24px;
   max-width: 420px;
   width: 100%;
@@ -25,13 +25,13 @@
 .sd-title {
   font-size: 16px;
   font-weight: 600;
-  color: var(--aqb-text-primary, #F5F5F0);
+  color: var(--buildrick-text-primary, #F5F5F0);
   margin: 0;
 }
 
 .sd-body {
   font-size: 13px;
-  color: var(--aqb-text-secondary, #B8B5AD);
+  color: var(--buildrick-text-secondary, #B8B5AD);
   margin: 8px 0 16px;
   line-height: 1.5;
 }
@@ -53,24 +53,24 @@
 }
 
 .sd-btn--primary {
-  background: var(--aqb-primary);
+  background: var(--buildrick-accent);
   color: #fff;
 }
 
 .sd-btn--primary:hover { opacity: 0.9; }
 
 .sd-btn--secondary {
-  border: 1px solid var(--aqb-border, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--buildrick-border, rgba(255, 255, 255, 0.08));
   background: transparent;
-  color: var(--aqb-text-secondary, #B8B5AD);
+  color: var(--buildrick-text-secondary, #B8B5AD);
 }
 
 .sd-btn--secondary:hover {
-  background: var(--aqb-surface-4);
+  background: var(--buildrick-surface-4);
 }
 
 .sd-btn--danger {
-  background: var(--aqb-error);
+  background: var(--buildrick-error);
   color: #fff;
 }
 
@@ -83,7 +83,7 @@
   display: block;
   font-size: 12px;
   font-weight: 500;
-  color: var(--aqb-text-secondary, #B8B5AD);
+  color: var(--buildrick-text-secondary, #B8B5AD);
   margin-bottom: 4px;
 }
 
@@ -91,9 +91,9 @@
   width: 100%;
   padding: 8px 12px;
   border-radius: 6px;
-  border: 1px solid var(--aqb-border, rgba(255, 255, 255, 0.08));
-  background: var(--aqb-surface-2);
-  color: var(--aqb-text-primary, #F5F5F0);
+  border: 1px solid var(--buildrick-border, rgba(255, 255, 255, 0.08));
+  background: var(--buildrick-surface-2);
+  color: var(--buildrick-text-primary, #F5F5F0);
   font-size: 13px;
   font-family: inherit;
   outline: none;
@@ -101,5 +101,5 @@
 }
 
 .sd-input:focus {
-  border-color: var(--aqb-primary);
+  border-color: var(--buildrick-accent);
 }

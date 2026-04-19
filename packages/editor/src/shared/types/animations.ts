@@ -112,8 +112,8 @@ export interface EasingPreset {
 export function generateAnimationCSS(config: AnimationConfig): string {
   const iterations = config.iterations === -1 ? "infinite" : config.iterations.toString();
   const fill = config.fillMode || "forwards";
-  // Add aqb- prefix to match keyframe names
-  const animName = `aqb-${config.type}`;
+  // Add buildrick- prefix to match keyframe names
+  const animName = `buildrick-${config.type}`;
 
   return `${animName} ${config.duration}ms ${config.easing} ${config.delay}ms ${iterations} ${config.direction} ${fill}`;
 }

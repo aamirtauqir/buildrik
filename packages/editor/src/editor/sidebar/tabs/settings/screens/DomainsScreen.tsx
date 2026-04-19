@@ -49,13 +49,13 @@ export const DomainsScreen: React.FC<ScreenProps> = () => {
   }
 
   return (
-    <div className="aqb-st-screen">
+    <div className="buildrick-st-screen">
       <Section title="Default Domain">
-        <div className="aqb-st-url-row">
-          <span className="aqb-st-muted">project.builder.aquibra.com</span>
+        <div className="buildrick-st-url-row">
+          <span className="buildrick-st-muted">project.builder.aquibra.com</span>
           <button
-            className="aqb-st-copy-btn"
-            style={copied ? { color: "var(--aqb-success)" } : undefined}
+            className="buildrick-st-copy-btn"
+            style={copied ? { color: "var(--buildrick-success)" } : undefined}
             onClick={handleCopy}
             aria-label={copied ? "Copied to clipboard" : "Copy default domain to clipboard"}
           >
@@ -74,22 +74,22 @@ export const DomainsScreen: React.FC<ScreenProps> = () => {
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
             placeholder="www.example.com"
-            className="aqb-st-input"
+            className="buildrick-st-input"
           />
         </Field>
         <Button onClick={handleConnect} disabled={!domain.trim()} variant="primary" fullWidth>
           Connect Domain
         </Button>
-        <div className="aqb-st-dns-help">
+        <div className="buildrick-st-dns-help">
           <p>Point your domain to:</p>
-          <code className="aqb-st-code">CNAME: builder.aquibra.com</code>
+          <code className="buildrick-st-code">CNAME: builder.aquibra.com</code>
         </div>
       </Section>
 
       <Section title="SSL Certificate">
-        <div className="aqb-st-status-row">
+        <div className="buildrick-st-status-row">
           <span>Status</span>
-          <span className="aqb-st-badge--success">✓ Active</span>
+          <span className="buildrick-st-badge--success">✓ Active</span>
         </div>
       </Section>
     </div>

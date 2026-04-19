@@ -58,25 +58,25 @@ export const ColorField: React.FC<ColorFieldProps> = ({
     "repeating-conic-gradient(rgba(128,128,128,0.2) 0% 25%, transparent 0% 50%) 50% / 8px 8px";
 
   return (
-    <div className="aqb-field aqb-color-field">
+    <div className="buildrick-field buildrick-color-field">
       {label && (
-        <label htmlFor={fieldId} className="aqb-field-label">
+        <label htmlFor={fieldId} className="buildrick-field-label">
           {label}
         </label>
       )}
-      <div className="aqb-color-input-row">
-        <div className="aqb-color-swatch-wrapper">
+      <div className="buildrick-color-input-row">
+        <div className="buildrick-color-swatch-wrapper">
           <input
             type="color"
             id={fieldId}
             value={isTransparent ? "#ffffff" : localValue}
             onChange={(e) => handleColorChange(e.target.value)}
             disabled={disabled}
-            className="aqb-color-native"
+            className="buildrick-color-native"
             aria-label={label || "Color picker"}
           />
           <div
-            className="aqb-color-swatch"
+            className="buildrick-color-swatch"
             style={{
               background: isTransparent ? checkerPattern : localValue,
             }}
@@ -89,13 +89,13 @@ export const ColorField: React.FC<ColorFieldProps> = ({
             onChange={(e) => handleColorChange(e.target.value)}
             disabled={disabled}
             placeholder="#000000"
-            className="aqb-input"
+            className="buildrick-input"
             aria-label="Color value"
           />
         )}
       </div>
       {presets.length > 0 && (
-        <div className="aqb-color-presets">
+        <div className="buildrick-color-presets">
           {presets.map((color) => {
             const isSelected = localValue === color;
             const isTransparentPreset = color === "transparent";
@@ -106,7 +106,7 @@ export const ColorField: React.FC<ColorFieldProps> = ({
                 onClick={() => handleColorChange(color)}
                 disabled={disabled}
                 title={color}
-                className={`aqb-color-preset ${isSelected ? "is-selected" : ""}`}
+                className={`buildrick-color-preset ${isSelected ? "is-selected" : ""}`}
                 style={{
                   background: isTransparentPreset ? checkerPattern : color,
                 }}

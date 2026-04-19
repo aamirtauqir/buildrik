@@ -25,27 +25,27 @@ export function LayerBreadcrumb({
   if (ancestors.length === 0) return null;
 
   return (
-    <div className="aqb-layer-breadcrumb" role="navigation" aria-label="Layer ancestry">
+    <div className="buildrick-layer-breadcrumb" role="navigation" aria-label="Layer ancestry">
       {ancestors.map((node, i) => (
         <React.Fragment key={node.id}>
           <button
-            className="aqb-bc-crumb"
+            className="buildrick-bc-crumb"
             onClick={() => onSelect(node.id, {})}
             title={`Select ${getDisplayName(node.id, node.type, customNames)}`}
           >
             {getDisplayName(node.id, node.type, customNames)}
           </button>
           {i < ancestors.length - 1 && (
-            <span className="aqb-bc-sep" aria-hidden>
+            <span className="buildrick-bc-sep" aria-hidden>
               /
             </span>
           )}
         </React.Fragment>
       ))}
-      <span className="aqb-bc-sep" aria-hidden>
+      <span className="buildrick-bc-sep" aria-hidden>
         /
       </span>
-      <span className="aqb-bc-current">
+      <span className="buildrick-bc-current">
         {getDisplayName(selectedId, selectedNode?.type ?? "element", customNames)}
       </span>
     </div>

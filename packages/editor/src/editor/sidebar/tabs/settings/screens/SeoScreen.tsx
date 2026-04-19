@@ -50,7 +50,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer }) => {
   };
 
   return (
-    <div className="aqb-st-screen">
+    <div className="buildrick-st-screen">
       <Section title="Site SEO">
         <Field label="Twitter Handle" htmlFor="seo-twitter" hint="e.g. @buildrik">
           <input
@@ -62,7 +62,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer }) => {
               markDirty();
             }}
             placeholder="@yourbrand"
-            className="aqb-st-input"
+            className="buildrick-st-input"
           />
         </Field>
 
@@ -76,7 +76,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer }) => {
               markDirty();
             }}
             placeholder="https://example.com/og-image.jpg"
-            className="aqb-st-input"
+            className="buildrick-st-input"
           />
         </Field>
       </Section>
@@ -84,11 +84,11 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer }) => {
       <div
         style={{
           padding: "10px 12px",
-          background: "var(--aqb-surface-3)",
-          borderRadius: "var(--aqb-radius-md)",
-          border: "1px solid var(--aqb-border)",
+          background: "var(--buildrick-surface-3)",
+          borderRadius: "var(--buildrick-design-radius-md)",
+          border: "1px solid var(--buildrick-border)",
           fontSize: 12,
-          color: "var(--aqb-text-muted)",
+          color: "var(--buildrick-text-muted)",
           lineHeight: 1.5,
         }}
       >

@@ -17,27 +17,27 @@
   cursor: pointer;
   border-radius: 6px;
   font-size: 13px;
-  color: var(--ls-text-primary);
+  color: var(--buildrick-text-primary);
   transition: background 100ms ease;
 }
 
 .comp-row:hover {
-  background: var(--ls-bg-subtle, #F1F5F9);
+  background: var(--buildrick-bg-subtle, #F1F5F9);
 }
 
 .comp-row--selected {
-  background: var(--ls-accent-bg, #DBEAFE);
-  color: var(--ls-accent-txt, #1E40AF);
+  background: var(--buildrick-accent-tint, #DBEAFE);
+  color: var(--buildrick-text-primary, #1E40AF);
 }
 
 /* ── comp-count-badge: usage count "6x" pill ────────────────────────────── */
 .comp-count-badge {
   margin-left: auto;
   padding: 2px 6px;
-  background: var(--ls-bg-subtle, #F1F5F9);
+  background: var(--buildrick-bg-subtle, #F1F5F9);
   border-radius: 999px;
   font-size: 11px;
-  color: var(--ls-text-muted, #64748B);
+  color: var(--buildrick-text-muted, #64748B);
   font-weight: 500;
   flex-shrink: 0;
 }
@@ -55,20 +55,20 @@
 
 .comp-empty__icon {
   font-size: 32px;
-  color: var(--ls-text-ghost, #CBD5E1);
+  color: var(--buildrick-text-disabled, #CBD5E1);
   line-height: 1;
 }
 
 .comp-empty__title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--ls-text-primary);
+  color: var(--buildrick-text-primary);
   margin: 0;
 }
 
 .comp-empty__body {
   font-size: 12px;
-  color: var(--ls-text-muted, #64748B);
+  color: var(--buildrick-text-muted, #64748B);
   margin: 0;
   max-width: 200px;
   line-height: 1.5;

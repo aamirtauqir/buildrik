@@ -43,9 +43,9 @@ export const ButtonGroupField: React.FC<ButtonGroupFieldProps> = ({
   const groupId = id || generatedId;
 
   const sizeClasses = {
-    sm: "aqb-btn-group-sm",
+    sm: "buildrick-btn-group-sm",
     md: "",
-    lg: "aqb-btn-group-lg",
+    lg: "buildrick-btn-group-lg",
   };
 
   const isSelected = (optValue: string) => {
@@ -70,9 +70,9 @@ export const ButtonGroupField: React.FC<ButtonGroupFieldProps> = ({
   };
 
   return (
-    <div className={`aqb-field aqb-button-group-field ${className || ""}`}>
+    <div className={`buildrick-field buildrick-button-group-field ${className || ""}`}>
       {label && (
-        <label htmlFor={groupId} className="aqb-field-label">
+        <label htmlFor={groupId} className="buildrick-field-label">
           {label}
         </label>
       )}
@@ -81,7 +81,7 @@ export const ButtonGroupField: React.FC<ButtonGroupFieldProps> = ({
         id={groupId}
         role="group"
         aria-label={label}
-        className={`aqb-btn-group ${sizeClasses[size]} ${fullWidth ? "aqb-btn-group-full" : ""}`}
+        className={`buildrick-btn-group ${sizeClasses[size]} ${fullWidth ? "buildrick-btn-group-full" : ""}`}
       >
         {options.map((option) => {
           const selected = isSelected(option.value);
@@ -91,12 +91,12 @@ export const ButtonGroupField: React.FC<ButtonGroupFieldProps> = ({
               type="button"
               onClick={() => handleClick(option.value)}
               disabled={disabled || option.disabled}
-              className={`aqb-btn-group-item ${selected ? "is-selected" : ""}`}
+              className={`buildrick-btn-group-item ${selected ? "is-selected" : ""}`}
               aria-pressed={selected}
               aria-disabled={disabled || option.disabled}
             >
-              {option.icon && <span className="aqb-btn-group-icon">{option.icon}</span>}
-              {option.label && <span className="aqb-btn-group-label">{option.label}</span>}
+              {option.icon && <span className="buildrick-btn-group-icon">{option.icon}</span>}
+              {option.label && <span className="buildrick-btn-group-label">{option.label}</span>}
             </button>
           );
         })}

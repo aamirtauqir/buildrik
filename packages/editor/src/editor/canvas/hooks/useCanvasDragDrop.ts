@@ -138,21 +138,21 @@ export function useCanvasDragDrop({
   const SNAP_THROTTLE_MS = 50;
 
   // Track the currently highlighted drop-affordance element so we can remove
-  // the `.aqb-drop-target--active` class when the target changes or drag ends.
+  // the `.buildrick-drop-target--active` class when the target changes or drag ends.
   const dropAffordanceElRef = React.useRef<HTMLElement | null>(null);
   const applyDropAffordance = React.useCallback((el: HTMLElement | null) => {
     if (dropAffordanceElRef.current === el) return;
     if (dropAffordanceElRef.current) {
-      dropAffordanceElRef.current.classList.remove("aqb-drop-target--active");
+      dropAffordanceElRef.current.classList.remove("buildrick-drop-target--active");
     }
     if (el) {
-      el.classList.add("aqb-drop-target--active");
+      el.classList.add("buildrick-drop-target--active");
     }
     dropAffordanceElRef.current = el;
   }, []);
   const clearDropAffordance = React.useCallback(() => {
     if (dropAffordanceElRef.current) {
-      dropAffordanceElRef.current.classList.remove("aqb-drop-target--active");
+      dropAffordanceElRef.current.classList.remove("buildrick-drop-target--active");
       dropAffordanceElRef.current = null;
     }
   }, []);
@@ -202,7 +202,7 @@ export function useCanvasDragDrop({
         setDropTargetId(targetId);
 
         const targetEl = canvasRef.current?.querySelector(
-          `[data-aqb-id="${targetId}"]`
+          `[data-buildrick-id="${targetId}"]`
         ) as HTMLElement | null;
 
         if (targetEl) {
@@ -317,7 +317,7 @@ export function useCanvasDragDrop({
       const localY = e.clientY - rect.top;
 
       const draggedDomEl = canvasRef.current.querySelector(
-        `[data-aqb-id="${draggingElementId}"]`
+        `[data-buildrick-id="${draggingElementId}"]`
       ) as HTMLElement | null;
 
       const lines: import("./useCanvasSnapping").SnapLine[] = [];
@@ -405,7 +405,7 @@ export function useCanvasDragDrop({
     (e: React.DragEvent) => {
       e.preventDefault();
       const relatedTarget = e.relatedTarget as HTMLElement | null;
-      const stillInCanvas = relatedTarget?.closest(".aqb-canvas");
+      const stillInCanvas = relatedTarget?.closest(".buildrick-canvas");
       if (!stillInCanvas) {
         resetSession();
         onSnapLinesChangeRef.current([]);

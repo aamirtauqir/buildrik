@@ -366,14 +366,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   return (
     <div
-      className={`aqb-studio ${className}`}
+      className={`buildrick-studio ${className}`}
       style={{
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        background: "var(--ls-bg-app, #F8FAFC)",
-        color: "var(--aqb-text-primary)",
-        fontFamily: "var(--aqb-font-family)",
+        background: "var(--buildrick-bg-app, #F8FAFC)",
+        color: "var(--buildrick-text-primary)",
+        fontFamily: "var(--buildrick-font-family)",
         position: "relative",
         ...style,
       }}

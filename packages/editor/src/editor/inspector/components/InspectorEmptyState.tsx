@@ -19,7 +19,7 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
   const [appliedName, setAppliedName] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    const stored = localStorage.getItem("aqb-last-applied-template");
+    const stored = localStorage.getItem("buildrick-last-applied-template");
     if (stored) {
       try {
         const data = JSON.parse(stored) as { name: string; ts: number };
@@ -27,10 +27,10 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
         if (Date.now() - data.ts < 30 * 60 * 1000) {
           setAppliedName(data.name);
         } else {
-          localStorage.removeItem("aqb-last-applied-template");
+          localStorage.removeItem("buildrick-last-applied-template");
         }
       } catch {
-        localStorage.removeItem("aqb-last-applied-template");
+        localStorage.removeItem("buildrick-last-applied-template");
       }
     }
   }, []);
@@ -135,7 +135,7 @@ const containerStyle: React.CSSProperties = {
   height: "100%",
   padding: "24px",
   textAlign: "center",
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   marginTop: "40px",
 };
 
@@ -155,14 +155,14 @@ const titleStyle: React.CSSProperties = {
   margin: "0 0 8px 0",
   fontSize: "14px",
   fontWeight: 600,
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
 };
 
 const descriptionStyle: React.CSSProperties = {
   margin: 0,
   fontSize: "13px",
   lineHeight: 1.5,
-  color: "var(--aqb-text-tertiary)",
+  color: "var(--buildrick-text-tertiary)",
   maxWidth: "220px",
 };
 
@@ -181,7 +181,7 @@ const primaryButtonStyle: React.CSSProperties = {
   justifyContent: "center",
   gap: "6px",
   padding: "8px 16px",
-  background: "var(--aqb-primary, #3b82f6)",
+  background: "var(--buildrick-accent, #3b82f6)",
   color: "#ffffff",
   border: "none",
   borderRadius: "6px",
@@ -194,7 +194,7 @@ const primaryButtonStyle: React.CSSProperties = {
 const secondaryButtonStyle: React.CSSProperties = {
   padding: "6px 12px",
   background: "transparent",
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   border: "none",
   borderRadius: "4px",
   fontSize: "12px",
@@ -211,7 +211,7 @@ const tipStyle: React.CSSProperties = {
   background: "rgba(137, 180, 250, 0.08)",
   borderRadius: 6,
   fontSize: "11px",
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
 };
 
 const kbdStyle: React.CSSProperties = {

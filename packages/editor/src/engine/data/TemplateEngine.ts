@@ -69,9 +69,9 @@ export class TemplateEngine {
   private exportPlainElement(element: Element): string {
     const html = element.toHTML();
 
-    // Remove data-aqb-* attributes if skipTags is true
+    // Remove data-buildrick-* attributes if skipTags is true
     if (this.options.skipTags) {
-      return html.replace(/\s*data-aqb-[^=]*="[^"]*"/g, "");
+      return html.replace(/\s*data-buildrick-[^=]*="[^"]*"/g, "");
     }
 
     return html;

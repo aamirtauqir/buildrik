@@ -13,7 +13,7 @@ export const ComponentIcon: React.FC = () => (
     fill="none"
     stroke="currentColor"
     strokeWidth="1.5"
-    className="aqb-empty-state-icon"
+    className="buildrick-empty-state-icon"
   >
     <rect x="3" y="3" width="7" height="7" rx="1" />
     <rect x="14" y="3" width="7" height="7" rx="1" />

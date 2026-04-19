@@ -92,14 +92,14 @@ export const GradientPicker: React.FC<GradientPickerProps> = ({
   };
 
   return (
-    <div className="aqb-gradient-picker" style={{ opacity: disabled ? 0.5 : 1 }}>
+    <div className="buildrick-gradient-picker" style={{ opacity: disabled ? 0.5 : 1 }}>
       {label && (
         <label
           style={{
             display: "block",
             marginBottom: 6,
             fontSize: 12,
-            color: "var(--aqb-text-secondary)",
+            color: "var(--buildrick-text-secondary)",
           }}
         >
           {label}
@@ -113,7 +113,7 @@ export const GradientPicker: React.FC<GradientPickerProps> = ({
           borderRadius: 8,
           background: buildGradient(),
           marginBottom: 12,
-          border: "1px solid var(--aqb-border)",
+          border: "1px solid var(--buildrick-border)",
         }}
       />
 
@@ -129,10 +129,10 @@ export const GradientPicker: React.FC<GradientPickerProps> = ({
           style={{
             flex: 1,
             padding: "6px 10px",
-            background: "var(--aqb-bg-dark)",
-            border: "1px solid var(--aqb-border)",
+            background: "var(--buildrick-bg-dark)",
+            border: "1px solid var(--buildrick-border)",
             borderRadius: 6,
-            color: "var(--aqb-text-primary)",
+            color: "var(--buildrick-text-primary)",
             fontSize: 12,
           }}
         >
@@ -154,10 +154,10 @@ export const GradientPicker: React.FC<GradientPickerProps> = ({
             style={{
               width: 70,
               padding: "6px 10px",
-              background: "var(--aqb-bg-dark)",
-              border: "1px solid var(--aqb-border)",
+              background: "var(--buildrick-bg-dark)",
+              border: "1px solid var(--buildrick-border)",
               borderRadius: 6,
-              color: "var(--aqb-text-primary)",
+              color: "var(--buildrick-text-primary)",
               fontSize: 12,
               textAlign: "center",
             }}
@@ -175,16 +175,16 @@ export const GradientPicker: React.FC<GradientPickerProps> = ({
             marginBottom: 8,
           }}
         >
-          <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>Color Stops</span>
+          <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>Color Stops</span>
           <button
             onClick={addStop}
             disabled={disabled}
             style={{
               padding: "4px 8px",
-              background: "var(--aqb-bg-panel-secondary)",
+              background: "var(--buildrick-bg-panel-secondary)",
               border: "none",
               borderRadius: 4,
-              color: "var(--aqb-text-secondary)",
+              color: "var(--buildrick-text-secondary)",
               fontSize: 12,
               cursor: "pointer",
             }}
@@ -211,7 +211,7 @@ export const GradientPicker: React.FC<GradientPickerProps> = ({
               style={{
                 width: 32,
                 height: 32,
-                border: "1px solid var(--aqb-border)",
+                border: "1px solid var(--buildrick-border)",
                 borderRadius: 4,
                 cursor: "pointer",
               }}
@@ -230,14 +230,14 @@ export const GradientPicker: React.FC<GradientPickerProps> = ({
               style={{
                 flex: 1,
                 padding: "6px 8px",
-                background: "var(--aqb-bg-dark)",
-                border: "1px solid var(--aqb-border)",
+                background: "var(--buildrick-bg-dark)",
+                border: "1px solid var(--buildrick-border)",
                 borderRadius: 4,
-                color: "var(--aqb-text-primary)",
+                color: "var(--buildrick-text-primary)",
                 fontSize: 12,
               }}
             />
-            <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>%</span>
+            <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>%</span>
             {stops.length > 2 && (
               <button
                 onClick={() => removeStop(i)}
@@ -245,7 +245,7 @@ export const GradientPicker: React.FC<GradientPickerProps> = ({
                 style={{
                   background: "transparent",
                   border: "none",
-                  color: "var(--aqb-text-muted)",
+                  color: "var(--buildrick-text-muted)",
                   cursor: "pointer",
                   padding: 4,
                 }}

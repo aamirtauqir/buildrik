@@ -84,8 +84,8 @@ const STYLE_USER_CHIP: React.CSSProperties = {
   width: 16,
   height: 16,
   borderRadius: "50%",
-  background: "var(--aqb-primary-subtle)",
-  color: "var(--aqb-primary)",
+  background: "var(--buildrick-accent-tint)",
+  color: "var(--buildrick-accent)",
   fontSize: 10,
   fontWeight: 600,
   lineHeight: 1,
@@ -93,13 +93,13 @@ const STYLE_USER_CHIP: React.CSSProperties = {
 
 const STYLE_RELATIVE_TIME: React.CSSProperties = {
   fontSize: 11,
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
 };
 
 const STYLE_DIFF_COUNT: React.CSSProperties = {
   marginLeft: 6,
   fontSize: 11,
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
   fontVariantNumeric: "tabular-nums",
 };
 

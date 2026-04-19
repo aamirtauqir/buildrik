@@ -32,7 +32,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           <label
             htmlFor="create-component-name"
-            style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}
+            style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}
           >
             Name
           </label>

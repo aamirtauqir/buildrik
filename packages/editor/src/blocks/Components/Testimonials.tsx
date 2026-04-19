@@ -55,7 +55,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
 
   if (variant === "carousel") {
     return (
-      <div className="aqb-testimonials-carousel" style={{ padding: 40, textAlign: "center" }}>
+      <div className="buildrick-testimonials-carousel" style={{ padding: 40, textAlign: "center" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           <div style={{ fontSize: 24, marginBottom: 24 }}>
             {[...Array(testimonials[activeIndex].rating || 5)].map((_, i) => (
@@ -69,7 +69,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
             style={{
               fontSize: 24,
               fontStyle: "italic",
-              color: "var(--aqb-text-primary)",
+              color: "var(--buildrick-text-primary)",
               marginBottom: 24,
               lineHeight: 1.6,
             }}
@@ -101,7 +101,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
               <div
                 style={{
                   fontWeight: 600,
-                  color: "var(--aqb-text-primary)",
+                  color: "var(--buildrick-text-primary)",
                 }}
               >
                 {testimonials[activeIndex].author}
@@ -109,7 +109,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
               <div
                 style={{
                   fontSize: 14,
-                  color: "var(--aqb-text-muted)",
+                  color: "var(--buildrick-text-muted)",
                 }}
               >
                 {testimonials[activeIndex].role}
@@ -137,8 +137,8 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
                   border: "none",
                   background:
                     i === activeIndex
-                      ? "var(--aqb-primary)"
-                      : "var(--aqb-border)",
+                      ? "var(--buildrick-accent)"
+                      : "var(--buildrick-border)",
                   cursor: "pointer",
                 }}
               />
@@ -151,7 +151,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
 
   return (
     <div
-      className="aqb-testimonials"
+      className="buildrick-testimonials"
       style={{
         display: "grid",
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
@@ -162,11 +162,11 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
       {testimonials.map((testimonial, index) => (
         <div
           key={index}
-          className="aqb-testimonial-card"
+          className="buildrick-testimonial-card"
           style={{
             padding: 24,
-            background: "var(--aqb-bg-panel)",
-            border: "1px solid var(--aqb-border)",
+            background: "var(--buildrick-bg-panel)",
+            border: "1px solid var(--buildrick-border)",
             borderRadius: 12,
           }}
         >
@@ -183,7 +183,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
           <blockquote
             style={{
               fontSize: 16,
-              color: "var(--aqb-text-secondary)",
+              color: "var(--buildrick-text-secondary)",
               marginBottom: 20,
               lineHeight: 1.6,
               fontStyle: "italic",
@@ -210,7 +210,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
                   width: 40,
                   height: 40,
                   borderRadius: "50%",
-                  background: "var(--aqb-primary)",
+                  background: "var(--buildrick-accent)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -225,7 +225,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
               <div
                 style={{
                   fontWeight: 600,
-                  color: "var(--aqb-text-primary)",
+                  color: "var(--buildrick-text-primary)",
                   fontSize: 14,
                 }}
               >
@@ -234,7 +234,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
               <div
                 style={{
                   fontSize: 12,
-                  color: "var(--aqb-text-muted)",
+                  color: "var(--buildrick-text-muted)",
                 }}
               >
                 {testimonial.role}
@@ -255,11 +255,11 @@ export const testimonialsBlockConfig = {
   elementType: "testimonials" as const,
   icon: "💬",
   content:
-    '<div class="aqb-testimonials" data-aqb-type="testimonials">' +
-    '<div class="aqb-testimonial-item">' +
-    '<p class="aqb-testimonial-quote">"Great product experience."</p>' +
-    '<div class="aqb-testimonial-meta"><strong>Alex Doe</strong><span>Founder, Nova</span></div>' +
-    '<div class="aqb-testimonial-rating">★★★★★</div>' +
+    '<div class="buildrick-testimonials" data-buildrick-type="testimonials">' +
+    '<div class="buildrick-testimonial-item">' +
+    '<p class="buildrick-testimonial-quote">"Great product experience."</p>' +
+    '<div class="buildrick-testimonial-meta"><strong>Alex Doe</strong><span>Founder, Nova</span></div>' +
+    '<div class="buildrick-testimonial-rating">★★★★★</div>' +
     "</div>" +
     "</div>",
 };

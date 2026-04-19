@@ -34,7 +34,7 @@ export const ElementCard: React.FC<ElementCardProps> = ({
 
   return (
     <div
-      className={`aqb-element-card${fullWidth ? " aqb-element-card--full" : ""}`}
+      className={`buildrick-element-card${fullWidth ? " buildrick-element-card--full" : ""}`}
       draggable
       role="button"
       tabIndex={0}
@@ -49,19 +49,19 @@ export const ElementCard: React.FC<ElementCardProps> = ({
       title={`Drag or click to add ${block.label}`}
     >
       <button
-        className={`aqb-element-card-star${isFavorite ? " favorited" : ""}`}
+        className={`buildrick-element-card-star${isFavorite ? " favorited" : ""}`}
         onClick={(e) => onToggleFavorite(block.id, e)}
         title={isFavorite ? "Remove from favorites" : "Add to favorites"}
       >
         <Star size={12} fill={isFavorite ? "currentColor" : "none"} />
       </button>
-      <div className="aqb-element-card-header">
-        <div className="aqb-element-card-icon">
+      <div className="buildrick-element-card-header">
+        <div className="buildrick-element-card-icon">
           <Icon size={18} strokeWidth={1.5} />
         </div>
-        <span className="aqb-element-card-label">{block.label}</span>
+        <span className="buildrick-element-card-label">{block.label}</span>
       </div>
-      {description && <span className="aqb-element-card-desc">{description}</span>}
+      {description && <span className="buildrick-element-card-desc">{description}</span>}
     </div>
   );
 };
@@ -107,7 +107,7 @@ export const ChevronIcon: React.FC<{ expanded: boolean }> = ({ expanded }) => (
   <ChevronDown
     size={14}
     strokeWidth={2}
-    className={`aqb-accordion-chevron ${expanded ? "open" : "closed"}`}
+    className={`buildrick-accordion-chevron ${expanded ? "open" : "closed"}`}
   />
 );
 
@@ -136,7 +136,7 @@ export function handleDragStart(
   if (isCard) {
     const target = e.currentTarget as HTMLElement;
     const ghost = target.cloneNode(true) as HTMLElement;
-    ghost.classList.add("aqb-drag-ghost");
+    ghost.classList.add("buildrick-drag-ghost");
     ghost.style.cssText = "position:absolute;top:-1000px;";
     ghost.style.width = `${target.offsetWidth}px`;
     document.body.appendChild(ghost);

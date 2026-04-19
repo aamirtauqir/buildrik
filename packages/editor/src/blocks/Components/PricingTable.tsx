@@ -73,7 +73,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
 }) => {
   return (
     <div
-      className="aqb-pricing-table"
+      className="buildrick-pricing-table"
       style={{
         display: "grid",
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
@@ -86,16 +86,16 @@ export const PricingTable: React.FC<PricingTableProps> = ({
       {plans.map((plan, index) => (
         <div
           key={index}
-          className={`aqb-pricing-card ${plan.highlighted ? "highlighted" : ""}`}
+          className={`buildrick-pricing-card ${plan.highlighted ? "highlighted" : ""}`}
           style={{
             position: "relative",
             padding: 32,
             background: plan.highlighted
-              ? "var(--aqb-primary-light, rgba(0,212,170,0.1))"
-              : "var(--aqb-bg-panel)",
+              ? "var(--buildrick-accent-subtle, rgba(0,212,170,0.1))"
+              : "var(--buildrick-bg-panel)",
             border: plan.highlighted
-              ? "2px solid var(--aqb-primary)"
-              : "1px solid var(--aqb-border)",
+              ? "2px solid var(--buildrick-accent)"
+              : "1px solid var(--buildrick-border)",
             borderRadius: 16,
             textAlign: "center",
             transform: plan.highlighted ? "scale(1.05)" : "none",
@@ -109,7 +109,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                 left: "50%",
                 transform: "translateX(-50%)",
                 padding: "4px 16px",
-                background: "var(--aqb-primary)",
+                background: "var(--buildrick-accent)",
                 color: "#fff",
                 fontSize: 12,
                 fontWeight: 600,
@@ -125,7 +125,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               fontSize: 24,
               fontWeight: 600,
               marginBottom: 8,
-              color: "var(--aqb-text-primary)",
+              color: "var(--buildrick-text-primary)",
             }}
           >
             {plan.name}
@@ -135,7 +135,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
             <p
               style={{
                 fontSize: 14,
-                color: "var(--aqb-text-muted)",
+                color: "var(--buildrick-text-muted)",
                 marginBottom: 24,
               }}
             >
@@ -148,7 +148,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               style={{
                 fontSize: 48,
                 fontWeight: 700,
-                color: "var(--aqb-text-primary)",
+                color: "var(--buildrick-text-primary)",
               }}
             >
               {plan.price}
@@ -157,7 +157,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               <span
                 style={{
                   fontSize: 16,
-                  color: "var(--aqb-text-muted)",
+                  color: "var(--buildrick-text-muted)",
                 }}
               >
                 {plan.period}
@@ -182,11 +182,11 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                   gap: 8,
                   padding: "8px 0",
                   fontSize: 14,
-                  color: "var(--aqb-text-secondary)",
-                  borderBottom: "1px solid var(--aqb-border)",
+                  color: "var(--buildrick-text-secondary)",
+                  borderBottom: "1px solid var(--buildrick-border)",
                 }}
               >
-                <span style={{ color: "var(--aqb-success)" }}>✓</span>
+                <span style={{ color: "var(--buildrick-success)" }}>✓</span>
                 {feature}
               </li>
             ))}
@@ -197,9 +197,9 @@ export const PricingTable: React.FC<PricingTableProps> = ({
             style={{
               display: "block",
               padding: "12px 24px",
-              background: plan.highlighted ? "var(--aqb-primary)" : "transparent",
-              border: plan.highlighted ? "none" : "2px solid var(--aqb-primary)",
-              color: plan.highlighted ? "#fff" : "var(--aqb-primary)",
+              background: plan.highlighted ? "var(--buildrick-accent)" : "transparent",
+              border: plan.highlighted ? "none" : "2px solid var(--buildrick-accent)",
+              color: plan.highlighted ? "#fff" : "var(--buildrick-accent)",
               fontSize: 14,
               fontWeight: 600,
               borderRadius: 8,
@@ -222,18 +222,18 @@ export const pricingBlockConfig = {
   elementType: "pricing" as const,
   icon: "💰",
   content:
-    '<div class="aqb-pricing-table" data-aqb-type="pricing">' +
-    '<div class="aqb-pricing-card">' +
+    '<div class="buildrick-pricing-table" data-buildrick-type="pricing">' +
+    '<div class="buildrick-pricing-card">' +
     "<h3>Starter</h3>" +
-    '<p class="aqb-pricing-price">$19/mo</p>' +
+    '<p class="buildrick-pricing-price">$19/mo</p>' +
     "<ul><li>Basic features</li><li>Email support</li></ul>" +
-    '<a href="#" class="aqb-pricing-button">Choose Plan</a>' +
+    '<a href="#" class="buildrick-pricing-button">Choose Plan</a>' +
     "</div>" +
-    '<div class="aqb-pricing-card aqb-featured">' +
+    '<div class="buildrick-pricing-card buildrick-featured">' +
     "<h3>Pro</h3>" +
-    '<p class="aqb-pricing-price">$49/mo</p>' +
+    '<p class="buildrick-pricing-price">$49/mo</p>' +
     "<ul><li>Everything in Starter</li><li>Advanced analytics</li><li>Priority support</li></ul>" +
-    '<a href="#" class="aqb-pricing-button">Get Pro</a>' +
+    '<a href="#" class="buildrick-pricing-button">Get Pro</a>' +
     "</div>" +
     "</div>",
 };

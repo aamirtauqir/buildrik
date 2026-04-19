@@ -36,11 +36,11 @@ export const CanvasSpotBadge: React.FC<CanvasSpotBadgeProps> = ({
 
     // Find DOM element
     const updatePosition = () => {
-      const domElement = document.querySelector(`[data-aqb-id="${elementId}"]`) as HTMLElement;
+      const domElement = document.querySelector(`[data-buildrick-id="${elementId}"]`) as HTMLElement;
       if (domElement) {
         elementRef.current = domElement;
         const rect = domElement.getBoundingClientRect();
-        const canvasRect = domElement.closest(".aqb-canvas")?.getBoundingClientRect();
+        const canvasRect = domElement.closest(".buildrick-canvas")?.getBoundingClientRect();
 
         if (canvasRect && badgeRef.current) {
           const badgeWidth = badgeRef.current.offsetWidth || 60;
@@ -108,7 +108,7 @@ export const CanvasSpotBadge: React.FC<CanvasSpotBadgeProps> = ({
   return (
     <div
       ref={badgeRef}
-      className={`aqb-canvas-spot-badge aqb-canvas-spot-badge--${badge.type}`}
+      className={`buildrick-canvas-spot-badge buildrick-canvas-spot-badge--${badge.type}`}
       style={{
         position: "absolute",
         left: `${position.x}px`,
@@ -117,10 +117,10 @@ export const CanvasSpotBadge: React.FC<CanvasSpotBadgeProps> = ({
         zIndex: 1001,
       }}
     >
-      <span className="aqb-canvas-spot-badge-content">{badge.content}</span>
+      <span className="buildrick-canvas-spot-badge-content">{badge.content}</span>
       {onRemove && (
         <button
-          className="aqb-canvas-spot-badge-close"
+          className="buildrick-canvas-spot-badge-close"
           onClick={(e) => {
             e.stopPropagation();
             onRemove(elementId);

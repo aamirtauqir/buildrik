@@ -83,8 +83,8 @@ const containerStyles: React.CSSProperties = {
   flexDirection: "column",
   gap: 8,
   padding: "12px",
-  background: "var(--aqb-surface-2)",
-  borderTop: "1px solid var(--aqb-border)",
+  background: "var(--buildrick-surface-2)",
+  borderTop: "1px solid var(--buildrick-border)",
   marginTop: "auto",
 };
 
@@ -93,14 +93,14 @@ const indicatorStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 6,
   fontSize: 12,
-  color: "var(--aqb-warning)",
+  color: "var(--buildrick-warning)",
 };
 
 const dotStyles: React.CSSProperties = {
   width: 6,
   height: 6,
   borderRadius: "50%",
-  background: "var(--aqb-warning)",
+  background: "var(--buildrick-warning)",
 };
 
 const buttonsStyles: React.CSSProperties = {
@@ -112,7 +112,7 @@ const primaryBtnStyles: React.CSSProperties = {
   flex: 1,
   padding: "8px 16px",
   height: 32,
-  background: "var(--aqb-primary)",
+  background: "var(--buildrick-accent)",
   border: "none",
   borderRadius: 8,
   color: "#fff",
@@ -127,9 +127,9 @@ const secondaryBtnStyles: React.CSSProperties = {
   padding: "8px 16px",
   height: 32,
   background: "transparent",
-  border: "1px solid var(--aqb-border)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 8,
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",

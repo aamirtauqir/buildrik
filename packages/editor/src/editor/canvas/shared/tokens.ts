@@ -10,7 +10,7 @@
  *
  * Usage:
  *   // Component style
- *   background: tokens.colors.primary  // Returns 'var(--aqb-primary)'
+ *   background: tokens.colors.primary  // Returns 'var(--buildrick-accent)'
  *
  * @license BSD-3-Clause
  */
@@ -21,88 +21,88 @@
  */
 export const colors = {
   // Primary brand colors
-  primary: "var(--aqb-primary)",
-  primaryLight: "var(--aqb-primary-light)",
-  primaryDark: "var(--aqb-primary-dark)",
-  primarySubtle: "var(--aqb-primary-subtle)",
+  primary: "var(--buildrick-accent)",
+  primaryLight: "var(--buildrick-accent-subtle)",
+  primaryDark: "var(--buildrick-accent-pressed)",
+  primarySubtle: "var(--buildrick-accent-tint)",
 
   // Legacy (aliased to primary)
-  secondary: "var(--aqb-secondary)",
-  accent: "var(--aqb-accent)",
+  secondary: "var(--buildrick-text-muted)",
+  accent: "var(--buildrick-accent)",
 
   // Selection
-  selection: "var(--aqb-selection-color)",
+  selection: "var(--buildrick-selection-color)",
 
   // Accent blue (same as primary in current theme)
-  accentBlue: "var(--aqb-accent-blue)",
-  accentBlueAlpha: "var(--aqb-accent-blue-alpha)",
-  accentBlueHover: "var(--aqb-accent-blue-hover)",
+  accentBlue: "var(--buildrick-accent)",
+  accentBlueAlpha: "var(--buildrick-accent-tint)",
+  accentBlueHover: "var(--buildrick-accent-hover)",
 
   // Canvas content colors (light theme)
-  background: "var(--aqb-bg)",
-  text: "var(--aqb-text)",
-  textMuted: "var(--aqb-text-muted)",
-  border: "var(--aqb-border)",
+  background: "var(--buildrick-bg)",
+  text: "var(--buildrick-text)",
+  textMuted: "var(--buildrick-text-muted)",
+  border: "var(--buildrick-border)",
 
   // Canvas wrapper
-  canvasWrapper: "var(--aqb-canvas-wrapper)",
-  canvasContent: "var(--aqb-canvas-content)",
+  canvasWrapper: "var(--buildrick-canvas-wrapper)",
+  canvasContent: "var(--buildrick-canvas-content)",
 
   // UI Text colors (dark theme panels)
-  textPrimary: "var(--aqb-text-primary)",
-  textSecondary: "var(--aqb-text-secondary)",
-  textTertiary: "var(--aqb-text-tertiary)",
+  textPrimary: "var(--buildrick-text-primary)",
+  textSecondary: "var(--buildrick-text-secondary)",
+  textTertiary: "var(--buildrick-text-tertiary)",
 
   // UI Surfaces (dark theme panels)
-  surface1: "var(--aqb-surface-1)",
-  surface2: "var(--aqb-surface-2)",
-  surface3: "var(--aqb-surface-3)",
-  surface4: "var(--aqb-surface-4)",
+  surface1: "var(--buildrick-surface-1)",
+  surface2: "var(--buildrick-surface-2)",
+  surface3: "var(--buildrick-surface-3)",
+  surface4: "var(--buildrick-surface-4)",
 
   // Borders
-  borderSubtle: "var(--aqb-border-subtle)",
-  borderDefault: "var(--aqb-border-default)",
-  borderStrong: "var(--aqb-border-strong)",
+  borderSubtle: "var(--buildrick-border-subtle)",
+  borderDefault: "var(--buildrick-border-default)",
+  borderStrong: "var(--buildrick-border-strong)",
 
   // Drop feedback
-  dropValidBorder: "var(--aqb-drop-valid-border)",
-  dropValidBg: "var(--aqb-drop-valid-bg)",
-  dropInvalidBorder: "var(--aqb-drop-invalid-border)",
-  dropInvalidBg: "var(--aqb-drop-invalid-bg)",
+  dropValidBorder: "var(--buildrick-drop-valid-border)",
+  dropValidBg: "var(--buildrick-drop-valid-bg)",
+  dropInvalidBorder: "var(--buildrick-drop-invalid-border)",
+  dropInvalidBg: "var(--buildrick-drop-invalid-bg)",
 
   // Badge colors
-  badgeTag: "var(--aqb-badge-tag)",
-  badgeId: "var(--aqb-badge-id)",
-  badgeClass: "var(--aqb-badge-class)",
-  badgeData: "var(--aqb-badge-data)",
-  badgeDefault: "var(--aqb-badge-default)",
+  badgeTag: "var(--buildrick-badge-tag)",
+  badgeId: "var(--buildrick-badge-id)",
+  badgeClass: "var(--buildrick-badge-class)",
+  badgeData: "var(--buildrick-badge-data)",
+  badgeDefault: "var(--buildrick-badge-default)",
 
   // Feedback colors
-  success: "var(--aqb-success)",
-  successBg: "var(--aqb-success-bg)",
-  error: "var(--aqb-error)",
-  errorBg: "var(--aqb-error-bg)",
-  warning: "var(--aqb-warning)",
-  warningBg: "var(--aqb-warning-bg)",
-  info: "var(--aqb-info)",
-  infoBg: "var(--aqb-info-bg)",
+  success: "var(--buildrick-success)",
+  successBg: "var(--buildrick-success-bg)",
+  error: "var(--buildrick-error)",
+  errorBg: "var(--buildrick-error-bg)",
+  warning: "var(--buildrick-warning)",
+  warningBg: "var(--buildrick-warning-bg)",
+  info: "var(--buildrick-info)",
+  infoBg: "var(--buildrick-info-bg)",
 
   // Toolbar colors
-  toolbarBg: "var(--aqb-toolbar-bg)",
-  toolbarBgHover: "var(--aqb-toolbar-bg-hover)",
-  toolbarBorder: "var(--aqb-toolbar-border)",
-  toolbarText: "var(--aqb-toolbar-text)",
-  toolbarTextHover: "var(--aqb-toolbar-text-hover)",
-  toolbarTextMuted: "var(--aqb-toolbar-text-muted)",
-  toolbarTextActive: "var(--aqb-toolbar-text-active)",
+  toolbarBg: "var(--buildrick-toolbar-bg)",
+  toolbarBgHover: "var(--buildrick-toolbar-bg-hover)",
+  toolbarBorder: "var(--buildrick-toolbar-border)",
+  toolbarText: "var(--buildrick-toolbar-text)",
+  toolbarTextHover: "var(--buildrick-toolbar-text-hover)",
+  toolbarTextMuted: "var(--buildrick-toolbar-text-muted)",
+  toolbarTextActive: "var(--buildrick-toolbar-text-active)",
 
   // Guide colors
-  guideColor: "var(--aqb-guide-color)",
-  guideColorAlt: "var(--aqb-guide-color-alt)",
+  guideColor: "var(--buildrick-guide-color)",
+  guideColorAlt: "var(--buildrick-guide-color-alt)",
 
   // Spacing indicator colors
-  spacingMargin: "var(--aqb-spacing-margin)",
-  spacingPadding: "var(--aqb-spacing-padding)",
+  spacingMargin: "var(--buildrick-spacing-margin)",
+  spacingPadding: "var(--buildrick-spacing-padding)",
 } as const;
 
 /**
@@ -111,16 +111,16 @@ export const colors = {
  */
 export const typography = {
   // Font families
-  fontFamily: "var(--aqb-font-family)",
-  headingFont: "var(--aqb-heading-font)",
-  monoFont: "var(--aqb-font-mono)",
+  fontFamily: "var(--buildrick-font-family)",
+  headingFont: "var(--buildrick-heading-font)",
+  monoFont: "var(--buildrick-design-font-mono)",
 
   // Font sizes (UX-compliant scale)
-  fontXs: "var(--aqb-text-xs)", // 10px - hints, very small
-  fontSm: "var(--aqb-text-sm)", // 11px - labels
-  fontMd: "var(--aqb-text-base)", // 13px - body, inputs
-  fontLg: "var(--aqb-text-md)", // 14px - section headers
-  fontXl: "var(--aqb-text-lg)", // 16px - titles, headings
+  fontXs: "var(--buildrick-text-xs)", // 10px - hints, very small
+  fontSm: "var(--buildrick-text-sm)", // 11px - labels
+  fontMd: "var(--buildrick-text-base)", // 13px - body, inputs
+  fontLg: "var(--buildrick-text-md)", // 14px - section headers
+  fontXl: "var(--buildrick-text-lg)", // 16px - titles, headings
 
   // Font weights
   weightNormal: 400,
@@ -129,24 +129,24 @@ export const typography = {
   weightBold: 700,
 
   // Line height
-  lineHeight: "var(--aqb-leading-normal)",
+  lineHeight: "var(--buildrick-leading-normal)",
 
   // Semantic presets for consistent usage
   label: {
     fontSize: "11px",
     fontWeight: 500,
-    color: "var(--aqb-text-secondary)",
+    color: "var(--buildrick-text-secondary)",
   },
   value: {
     fontSize: "13px",
     fontWeight: 400,
-    color: "var(--aqb-text-primary)",
+    color: "var(--buildrick-text-primary)",
   },
   sectionTitle: {
     fontSize: "12px",
     fontWeight: 600,
     letterSpacing: "0.02em",
-    color: "var(--aqb-text-primary)",
+    color: "var(--buildrick-text-primary)",
   },
 } as const;
 
@@ -155,11 +155,11 @@ export const typography = {
  * Aligned with UX plan: 8px/12px as primary values
  */
 export const spacing = {
-  xs: "var(--aqb-space-1)", // 4px
-  sm: "var(--aqb-space-2)", // 8px - small gaps
-  md: "var(--aqb-space-3)", // 12px - medium gaps
-  lg: "var(--aqb-space-4)", // 16px
-  xl: "var(--aqb-space-6)", // 24px
+  xs: "var(--buildrick-design-space-1)", // 4px
+  sm: "var(--buildrick-design-space-2)", // 8px - small gaps
+  md: "var(--buildrick-design-space-3)", // 12px - medium gaps
+  lg: "var(--buildrick-design-space-4)", // 16px
+  xl: "var(--buildrick-design-space-6)", // 24px
 } as const;
 
 /**
@@ -167,44 +167,44 @@ export const spacing = {
  * Standard: 6px for most UI elements (consistent visual language)
  */
 export const radius = {
-  xs: "var(--aqb-radius-xs)", // 3px - subtle
-  sm: "var(--aqb-radius-sm)", // 5px - inputs, badges
+  xs: "var(--buildrick-radius-xs)", // 3px - subtle
+  sm: "var(--buildrick-design-radius-sm)", // 5px - inputs, badges
   default: "6px", // 6px - standard UI elements
-  md: "var(--aqb-radius-md)", // 8px - cards, panels
-  lg: "var(--aqb-radius-lg)", // 12px - modals
-  xl: "var(--aqb-radius-xl)", // 16px - large panels
-  full: "var(--aqb-radius-full)", // 9999px - pills, circles
+  md: "var(--buildrick-design-radius-md)", // 8px - cards, panels
+  lg: "var(--buildrick-design-radius-lg)", // 12px - modals
+  xl: "var(--buildrick-design-radius-xl)", // 16px - large panels
+  full: "var(--buildrick-design-radius-full)", // 9999px - pills, circles
 } as const;
 
 /**
  * Shadow tokens
  */
 export const shadows = {
-  sm: "var(--aqb-shadow-sm)",
-  md: "var(--aqb-shadow-md)",
-  lg: "var(--aqb-shadow-lg)",
-  accent: "var(--aqb-shadow-accent)",
-  hover: "var(--aqb-shadow-hover)",
+  sm: "var(--buildrick-design-shadow-sm)",
+  md: "var(--buildrick-design-shadow-md)",
+  lg: "var(--buildrick-design-shadow-lg)",
+  accent: "var(--buildrick-shadow-accent)",
+  hover: "var(--buildrick-shadow-hover)",
 } as const;
 
 /**
  * Selection-specific tokens
  */
 export const selection = {
-  color: "var(--aqb-selection-color)",
-  glow: "var(--aqb-selection-glow)",
-  glowStrong: "var(--aqb-selection-glow-strong)",
-  outline: "var(--aqb-selection-outline)",
-  handleGradient: "var(--aqb-handle-gradient)",
+  color: "var(--buildrick-selection-color)",
+  glow: "var(--buildrick-selection-glow)",
+  glowStrong: "var(--buildrick-selection-glow-strong)",
+  outline: "var(--buildrick-selection-outline)",
+  handleGradient: "var(--buildrick-handle-gradient)",
 } as const;
 
 /**
  * Transition tokens
  */
 export const transitions = {
-  fast: "var(--aqb-transition-fast)", // 150ms ease
-  normal: "var(--aqb-transition-normal)", // 200ms ease
-  slow: "var(--aqb-transition-slow)", // 300ms ease
+  fast: "var(--buildrick-transition-fast)", // 150ms ease
+  normal: "var(--buildrick-transition-normal)", // 200ms ease
+  slow: "var(--buildrick-transition-slow)", // 300ms ease
 } as const;
 
 /**

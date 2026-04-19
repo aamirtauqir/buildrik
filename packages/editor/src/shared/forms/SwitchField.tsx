@@ -41,7 +41,7 @@ export const SwitchField: React.FC<SwitchFieldProps> = ({
   return (
     <label
       htmlFor={switchId}
-      className={`aqb-switch ${disabled ? "is-disabled" : ""}`}
+      className={`buildrick-switch ${disabled ? "is-disabled" : ""}`}
       style={{
         opacity: disabled ? 0.5 : 1,
         cursor: disabled ? "not-allowed" : "pointer",
@@ -54,7 +54,7 @@ export const SwitchField: React.FC<SwitchFieldProps> = ({
         checked={checked}
         onChange={(e) => !disabled && onChange?.(e.target.checked)}
         disabled={disabled}
-        className="aqb-switch-input"
+        className="buildrick-switch-input"
         role="switch"
         aria-checked={checked}
         style={{
@@ -65,16 +65,16 @@ export const SwitchField: React.FC<SwitchFieldProps> = ({
         }}
       />
       <div
-        className="aqb-switch-track"
+        className="buildrick-switch-track"
         style={{
           width: s.width,
           height: s.height,
-          background: checked ? "var(--aqb-primary)" : "var(--aqb-bg-panel-secondary)",
-          borderColor: checked ? "var(--aqb-primary)" : "var(--aqb-border)",
+          background: checked ? "var(--buildrick-accent)" : "var(--buildrick-bg-panel-secondary)",
+          borderColor: checked ? "var(--buildrick-accent)" : "var(--buildrick-border)",
         }}
       >
         <div
-          className="aqb-switch-thumb"
+          className="buildrick-switch-thumb"
           style={{
             width: s.thumb,
             height: s.thumb,
@@ -86,10 +86,10 @@ export const SwitchField: React.FC<SwitchFieldProps> = ({
       </div>
       {label && (
         <span
-          className="aqb-switch-label"
+          className="buildrick-switch-label"
           style={{
-            fontSize: size === "sm" ? "var(--aqb-text-sm)" : "var(--aqb-text-base)",
-            color: disabled ? "var(--aqb-text-muted)" : "var(--aqb-text-primary)",
+            fontSize: size === "sm" ? "var(--buildrick-text-sm)" : "var(--buildrick-text-base)",
+            color: disabled ? "var(--buildrick-text-muted)" : "var(--buildrick-text-primary)",
           }}
         >
           {label}

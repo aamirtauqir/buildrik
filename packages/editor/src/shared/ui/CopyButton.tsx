@@ -41,30 +41,30 @@ const styles = {
   } as React.CSSProperties,
   ghost: {
     background: "transparent",
-    color: "var(--aqb-text-secondary)",
+    color: "var(--buildrick-text-secondary)",
   } as React.CSSProperties,
   ghostHover: {
     background: "rgba(255, 255, 255, 0.08)",
-    color: "var(--aqb-text-primary)",
+    color: "var(--buildrick-text-primary)",
   } as React.CSSProperties,
   outline: {
     background: "transparent",
     border: "1px solid rgba(255, 255, 255, 0.15)",
-    color: "var(--aqb-text-secondary)",
+    color: "var(--buildrick-text-secondary)",
   } as React.CSSProperties,
   outlineHover: {
     borderColor: "rgba(255, 255, 255, 0.25)",
-    color: "var(--aqb-text-primary)",
+    color: "var(--buildrick-text-primary)",
   } as React.CSSProperties,
   solid: {
     background: "rgba(255, 255, 255, 0.1)",
-    color: "var(--aqb-text-primary)",
+    color: "var(--buildrick-text-primary)",
   } as React.CSSProperties,
   solidHover: {
     background: "rgba(255, 255, 255, 0.15)",
   } as React.CSSProperties,
   copied: {
-    color: "var(--aqb-success, #22c55e)",
+    color: "var(--buildrick-success, #22c55e)",
   } as React.CSSProperties,
 };
 
@@ -113,7 +113,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       onClick={handleCopy}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className={`aqb-copy-btn ${className}`}
+      className={`buildrick-copy-btn ${className}`}
       style={getStyle()}
       aria-label={copied ? "Copied" : `Copy ${label}`}
     >

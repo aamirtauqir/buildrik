@@ -117,16 +117,16 @@ const iconContainerStyles: React.CSSProperties = {
 
 const descriptionStyles: React.CSSProperties = {
   margin: 0,
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   textAlign: "center",
   lineHeight: 1.5,
 };
 
 const checkboxContainerStyles: React.CSSProperties = {
-  background: "var(--aqb-bg-elevated)",
+  background: "var(--buildrick-bg-elevated)",
   borderRadius: "8px",
   padding: "12px",
-  border: "1px solid var(--aqb-border)",
+  border: "1px solid var(--buildrick-border)",
 };
 
 const checkboxLabelStyles: React.CSSProperties = {
@@ -158,7 +158,7 @@ const checkboxTitleStyles: React.CSSProperties = {
 
 const checkboxDescStyles: React.CSSProperties = {
   fontSize: "13px",
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
 };
 
 const featuresListStyles: React.CSSProperties = {
@@ -173,7 +173,7 @@ const featureItemStyles: React.CSSProperties = {
   alignItems: "center",
   gap: "8px",
   fontSize: "13px",
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
 };
 
 const footerStyles: React.CSSProperties = {
@@ -182,7 +182,7 @@ const footerStyles: React.CSSProperties = {
   gap: "8px",
   marginTop: "16px",
   paddingTop: "16px",
-  borderTop: "1px solid var(--aqb-border)",
+  borderTop: "1px solid var(--buildrick-border)",
 };
 
 export default CollectionSetupModal;

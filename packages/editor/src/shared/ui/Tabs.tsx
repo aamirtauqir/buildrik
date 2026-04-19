@@ -60,15 +60,15 @@ export const Tabs: React.FC<TabsProps> = ({
   };
 
   return (
-    <div className="aqb-tabs">
+    <div className="buildrick-tabs">
       <div
-        className={`aqb-tabs-list aqb-tabs-${variant}`}
+        className={`buildrick-tabs-list buildrick-tabs-${variant}`}
         role="tablist"
         style={{
           display: "flex",
           gap: variant === "pills" ? 4 : 0,
-          borderBottom: variant === "underline" ? "1px solid var(--aqb-border)" : "none",
-          background: variant === "default" ? "var(--aqb-bg-panel-secondary)" : "transparent",
+          borderBottom: variant === "underline" ? "1px solid var(--buildrick-border)" : "none",
+          background: variant === "default" ? "var(--buildrick-bg-panel-secondary)" : "transparent",
           borderRadius: variant === "default" ? 8 : 0,
           padding: variant === "default" ? 4 : 0,
         }}
@@ -106,7 +106,7 @@ export const Tabs: React.FC<TabsProps> = ({
         })}
       </div>
       {activeContent && (
-        <div className="aqb-tabs-content" style={{ marginTop: 16 }}>
+        <div className="buildrick-tabs-content" style={{ marginTop: 16 }}>
           {activeContent}
         </div>
       )}
@@ -118,22 +118,22 @@ function getVariantStyles(variant: TabsProps["variant"], isActive: boolean): Rea
   switch (variant) {
     case "pills":
       return {
-        background: isActive ? "var(--aqb-primary)" : "transparent",
-        color: isActive ? "#fff" : "var(--aqb-text-secondary)",
+        background: isActive ? "var(--buildrick-accent)" : "transparent",
+        color: isActive ? "#fff" : "var(--buildrick-text-secondary)",
         borderRadius: 6,
       };
     case "underline":
       return {
         background: "transparent",
-        color: isActive ? "var(--aqb-primary)" : "var(--aqb-text-secondary)",
-        borderBottom: isActive ? "2px solid var(--aqb-primary)" : "2px solid transparent",
+        color: isActive ? "var(--buildrick-accent)" : "var(--buildrick-text-secondary)",
+        borderBottom: isActive ? "2px solid var(--buildrick-accent)" : "2px solid transparent",
         borderRadius: 0,
         marginBottom: -1,
       };
     default:
       return {
-        background: isActive ? "var(--aqb-bg-panel)" : "transparent",
-        color: isActive ? "var(--aqb-text-primary)" : "var(--aqb-text-secondary)",
+        background: isActive ? "var(--buildrick-bg-panel)" : "transparent",
+        color: isActive ? "var(--buildrick-text-primary)" : "var(--buildrick-text-secondary)",
         borderRadius: 6,
       };
   }

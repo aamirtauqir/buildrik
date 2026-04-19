@@ -75,7 +75,7 @@ export function usePanelNavigation({
   const [currentScreen, setCurrentScreen] = React.useState<string>(() => {
     if (typeof window === "undefined") return initialScreen;
     try {
-      const stored = localStorage.getItem(`aqb-nav-${storageKey}`);
+      const stored = localStorage.getItem(`buildrick-nav-${storageKey}`);
       if (stored) {
         const parsed = JSON.parse(stored);
         // Validate that the stored screen exists
@@ -93,7 +93,7 @@ export function usePanelNavigation({
   React.useEffect(() => {
     if (typeof window === "undefined") return;
     try {
-      localStorage.setItem(`aqb-nav-${storageKey}`, JSON.stringify({ currentScreen }));
+      localStorage.setItem(`buildrick-nav-${storageKey}`, JSON.stringify({ currentScreen }));
     } catch {
       // Ignore storage errors
     }

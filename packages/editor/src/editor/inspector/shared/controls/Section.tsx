@@ -136,7 +136,7 @@ export const Section: React.FC<SectionProps> = ({
             style={{
               transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
               transition: "transform 0.2s",
-              color: "var(--aqb-text-tertiary)",
+              color: "var(--buildrick-text-tertiary)",
             }}
           />
         </span>

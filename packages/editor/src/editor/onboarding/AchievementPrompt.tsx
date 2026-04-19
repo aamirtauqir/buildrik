@@ -39,7 +39,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
 
   // Screen reader announcement on mount
   React.useEffect(() => {
-    const el = document.getElementById("aqb-achievement-live");
+    const el = document.getElementById("buildrick-achievement-live");
     if (!el) return;
     el.textContent = isLastStep
       ? "Congratulations! You have completed all getting started steps."
@@ -50,7 +50,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
     <>
       {/* Accessible live region — invisible, read by screen readers on mount */}
       <div
-        id="aqb-achievement-live"
+        id="buildrick-achievement-live"
         role="status"
         aria-live="polite"
         aria-atomic="true"
@@ -90,8 +90,8 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
           zIndex: 10001,
           width: 380,
           maxWidth: "calc(100vw - 48px)",
-          background: "var(--aqb-bg-panel, #1c1e24)",
-          border: "1px solid var(--aqb-border, rgba(255,255,255,0.1))",
+          background: "var(--buildrick-bg-panel, #1c1e24)",
+          border: "1px solid var(--buildrick-border, rgba(255,255,255,0.1))",
           borderRadius: 16,
           boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
           overflow: "hidden",
@@ -103,8 +103,8 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
           style={{
             height: 3,
             background: isLastStep
-              ? "var(--aqb-success, #10b981)"
-              : "var(--aqb-primary, #3b82f6)",
+              ? "var(--buildrick-success, #10b981)"
+              : "var(--buildrick-accent, #3b82f6)",
             width: `${progress}%`,
             transition: "width 50ms linear",
           }}
@@ -142,7 +142,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                   fontWeight: 600,
                   textTransform: "uppercase",
                   letterSpacing: 0.8,
-                  color: "var(--aqb-success, #10b981)",
+                  color: "var(--buildrick-success, #10b981)",
                 }}
               >
                 {isLastStep ? "All done!" : "Step complete"}
@@ -153,7 +153,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                   margin: 0,
                   fontSize: 16,
                   fontWeight: 700,
-                  color: "var(--aqb-text-primary, #fff)",
+                  color: "var(--buildrick-text-primary, #fff)",
                 }}
               >
                 {isLastStep ? "You're all set!" : completedStep.label}
@@ -163,7 +163,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                   style={{
                     margin: "6px 0 0",
                     fontSize: 13,
-                    color: "var(--aqb-text-secondary, rgba(255,255,255,0.6))",
+                    color: "var(--buildrick-text-secondary, rgba(255,255,255,0.6))",
                     lineHeight: 1.5,
                   }}
                 >
@@ -190,7 +190,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                 aria-hidden="true"
                 style={{
                   fontSize: 16,
-                  color: "var(--aqb-text-tertiary, rgba(255,255,255,0.4))",
+                  color: "var(--buildrick-text-tertiary, rgba(255,255,255,0.4))",
                   flexShrink: 0,
                   marginTop: 2,
                 }}
@@ -202,7 +202,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                   style={{
                     margin: "0 0 2px",
                     fontSize: 11,
-                    color: "var(--aqb-text-tertiary, rgba(255,255,255,0.4))",
+                    color: "var(--buildrick-text-tertiary, rgba(255,255,255,0.4))",
                     fontWeight: 600,
                     textTransform: "uppercase",
                     letterSpacing: 0.8,
@@ -214,7 +214,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                   style={{
                     margin: 0,
                     fontSize: 13,
-                    color: "var(--aqb-text-secondary, rgba(255,255,255,0.7))",
+                    color: "var(--buildrick-text-secondary, rgba(255,255,255,0.7))",
                     fontWeight: 500,
                   }}
                 >
@@ -224,7 +224,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                   style={{
                     margin: "2px 0 0",
                     fontSize: 12,
-                    color: "var(--aqb-text-tertiary, rgba(255,255,255,0.4))",
+                    color: "var(--buildrick-text-tertiary, rgba(255,255,255,0.4))",
                     lineHeight: 1.4,
                   }}
                 >
@@ -243,8 +243,8 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
               width: "100%",
               padding: "11px 20px",
               background: isLastStep
-                ? "var(--aqb-success, #10b981)"
-                : "var(--aqb-primary, #3b82f6)",
+                ? "var(--buildrick-success, #10b981)"
+                : "var(--buildrick-accent, #3b82f6)",
               border: "none",
               borderRadius: 10,
               color: "#fff",

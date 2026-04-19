@@ -138,7 +138,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   const scrollToSelection = React.useCallback(() => {
     if (!state.treeContainerRef.current) return;
     const layerRow = state.treeContainerRef.current.querySelector(
-      `.aqb-layer-row[aria-selected="true"]`
+      `.buildrick-layer-row[aria-selected="true"]`
     ) as HTMLElement | null;
     if (layerRow) layerRow.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [state.treeContainerRef]);
@@ -297,14 +297,14 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   const filteredLayers = state.filterTree(state.layers);
 
   return (
-    <div className="aqb-layers-panel aqb-layers-minimal">
+    <div className="buildrick-layers-panel buildrick-layers-minimal">
       {/* Search Bar + Settings */}
-      <div className="aqb-layers-search-row">
+      <div className="buildrick-layers-search-row">
         {/* Header row: expand/collapse + count */}
-        <div className="aqb-layers-header-row">
-          <div className="aqb-layers-header-actions">
+        <div className="buildrick-layers-header-row">
+          <div className="buildrick-layers-header-actions">
             <button
-              className="aqb-layers-settings-btn"
+              className="buildrick-layers-settings-btn"
               title="Expand all layers (Alt+→)"
               aria-label="Expand all layers"
               onClick={() => state.treeHook.expandAll()}
@@ -315,7 +315,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
               </svg>
             </button>
             <button
-              className="aqb-layers-settings-btn"
+              className="buildrick-layers-settings-btn"
               title="Collapse all layers (Alt+←)"
               aria-label="Collapse all layers"
               onClick={() => state.treeHook.collapseAll()}
@@ -326,7 +326,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
               </svg>
             </button>
             <span
-              className="aqb-layers-count"
+              className="buildrick-layers-count"
               aria-live="polite"
               aria-label={`${state.treeHook.totalCount} layers`}
             >
@@ -336,8 +336,8 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         </div>
 
         {/* Search input */}
-        <div className="aqb-search-container">
-          <span className="aqb-search-icon" aria-hidden>
+        <div className="buildrick-search-container">
+          <span className="buildrick-search-icon" aria-hidden>
             <IconSearch size="sm" />
           </span>
           <input
@@ -346,12 +346,12 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             value={state.search}
             onChange={(e) => state.setSearch(e.target.value)}
             aria-label="Search layers"
-            aria-controls="aqb-layers-tree"
-            className="aqb-search-input"
+            aria-controls="buildrick-layers-tree"
+            className="buildrick-search-input"
           />
           {state.search && (
             <button
-              className="aqb-search-clear"
+              className="buildrick-search-clear"
               onClick={() => state.setSearch("")}
               aria-label="Clear search"
             >
@@ -363,7 +363,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         {/* Gear icon — now wired to display settings */}
         <div style={{ position: "relative" }}>
           <button
-            className="aqb-layers-settings-btn"
+            className="buildrick-layers-settings-btn"
             title="Display settings"
             aria-label="Layer display settings"
             aria-expanded={state.displaySettingsOpen}
@@ -391,7 +391,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
       )}
 
       {/* Screen reader announcement for search results (WCAG 4.1.3) */}
-      <div aria-live="polite" aria-atomic="true" className="aqb-sr-only" style={SR_ONLY_STYLE}>
+      <div aria-live="polite" aria-atomic="true" className="buildrick-sr-only" style={SR_ONLY_STYLE}>
         {state.search && filteredLayers.length > 0
           ? `${filteredLayers.length} layer${filteredLayers.length === 1 ? "" : "s"} found`
           : state.search && filteredLayers.length === 0
@@ -416,28 +416,28 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
       />
 
       {pendingBannerDelete && state.selectionHook.selectedIds.size > 1 && (
-        <div className="aqb-delete-confirm" role="alert">
+        <div className="buildrick-delete-confirm" role="alert">
           <span>Delete {state.selectionHook.selectedIds.size} layers?</span>
-          <button className="aqb-delete-confirm-ok" onClick={confirmBannerDelete}>Delete</button>
-          <button className="aqb-delete-confirm-cancel" onClick={() => setPendingBannerDelete(false)}>Cancel</button>
+          <button className="buildrick-delete-confirm-ok" onClick={confirmBannerDelete}>Delete</button>
+          <button className="buildrick-delete-confirm-cancel" onClick={() => setPendingBannerDelete(false)}>Cancel</button>
         </div>
       )}
 
       {/* Clean Tree View - Maximum space for content */}
       <div
         ref={state.treeContainerRef}
-        id="aqb-layers-tree"
-        className={`aqb-layers-tree aqb-layers-tree-minimal${state.displayPrefs.treeDensity === "compact" ? " aqb-layers-compact" : ""}`}
+        id="buildrick-layers-tree"
+        className={`buildrick-layers-tree buildrick-layers-tree-minimal${state.displayPrefs.treeDensity === "compact" ? " buildrick-layers-compact" : ""}`}
         role="tree"
         aria-label="Page structure"
       >
         {state.layers.length === 0 && <LayersEmptyState />}
 
         {state.searchHook.isSearching && filteredLayers.length === 0 && (
-          <div className="aqb-layers-empty-search" role="status">
-            <span className="aqb-les-icon">🔍</span>
-            <p className="aqb-les-title">No layers match &quot;{state.search}&quot;</p>
-            <button className="aqb-les-clear" onClick={() => state.setSearch("")}>
+          <div className="buildrick-layers-empty-search" role="status">
+            <span className="buildrick-les-icon">🔍</span>
+            <p className="buildrick-les-title">No layers match &quot;{state.search}&quot;</p>
+            <button className="buildrick-les-clear" onClick={() => state.setSearch("")}>
               Clear search
             </button>
           </div>

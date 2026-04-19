@@ -62,7 +62,7 @@ export interface CommandPaletteProps {
 // CONSTANTS
 // =============================================================================
 
-const STORAGE_KEY = "aqb-recent-commands";
+const STORAGE_KEY = "buildrick-recent-commands";
 const MAX_RECENT = 5;
 
 // =============================================================================
@@ -289,7 +289,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
-          animation: "aqb-slide-down 0.15s ease-out",
         }}
         role="dialog"
         aria-label="Command Palette"

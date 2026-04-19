@@ -41,7 +41,7 @@ const DEFAULT_OPTIONS: UseElementRectOptions = {
  * Hook to efficiently track an element's bounding rect
  * Uses ResizeObserver and RAF batching to minimize layout thrashing
  *
- * @param elementId - The data-aqb-id of the element to track
+ * @param elementId - The data-buildrick-id of the element to track
  * @param canvasRef - Reference to the canvas container
  * @param options - Configuration options
  * @returns The element's rect relative to canvas, or null if not found
@@ -67,7 +67,7 @@ export function useElementRect(
     }
 
     const element = canvasRef.current.querySelector(
-      `[data-aqb-id="${elementId}"]`
+      `[data-buildrick-id="${elementId}"]`
     ) as HTMLElement | null;
 
     if (!element) {
@@ -126,7 +126,7 @@ export function useElementRect(
     updateRect();
 
     const canvas = canvasRef.current;
-    const element = canvas.querySelector(`[data-aqb-id="${elementId}"]`) as HTMLElement | null;
+    const element = canvas.querySelector(`[data-buildrick-id="${elementId}"]`) as HTMLElement | null;
 
     // Set up ResizeObserver for efficient size change detection
     resizeObserverRef.current = new ResizeObserver(() => {
@@ -177,7 +177,7 @@ export function useElementRect(
  * Hook to track multiple element rects efficiently
  * Shares a single ResizeObserver for all elements
  *
- * @param elementIds - Array of data-aqb-ids to track
+ * @param elementIds - Array of data-buildrick-ids to track
  * @param canvasRef - Reference to the canvas container
  * @returns Map of elementId -> rect
  */
@@ -203,7 +203,7 @@ export function useMultipleElementRects(
     const newRects = new Map<string, ElementRect>();
 
     for (const id of elementIds) {
-      const element = canvas.querySelector(`[data-aqb-id="${id}"]`) as HTMLElement | null;
+      const element = canvas.querySelector(`[data-buildrick-id="${id}"]`) as HTMLElement | null;
 
       if (element) {
         const elementRect = element.getBoundingClientRect();
@@ -250,7 +250,7 @@ export function useMultipleElementRects(
 
     // Observe all elements
     for (const id of elementIds) {
-      const element = canvas.querySelector(`[data-aqb-id="${id}"]`);
+      const element = canvas.querySelector(`[data-buildrick-id="${id}"]`);
       if (element) {
         resizeObserverRef.current.observe(element);
       }

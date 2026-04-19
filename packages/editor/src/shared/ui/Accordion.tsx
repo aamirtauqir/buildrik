@@ -42,11 +42,11 @@ export const Accordion: React.FC<AccordionProps> = ({
   };
 
   return (
-    <div className="aqb-accordion">
+    <div className="buildrick-accordion">
       {items.map((item) => {
         const isOpen = openIds.includes(item.id);
         return (
-          <div key={item.id} className="aqb-accordion-item" style={{ marginBottom: 4 }}>
+          <div key={item.id} className="buildrick-accordion-item" style={{ marginBottom: 4 }}>
             <button
               onClick={() => !item.disabled && toggle(item.id)}
               disabled={item.disabled}
@@ -57,10 +57,10 @@ export const Accordion: React.FC<AccordionProps> = ({
                 alignItems: "center",
                 justifyContent: "space-between",
                 gap: 8,
-                background: "var(--aqb-bg-panel-secondary)",
+                background: "var(--buildrick-bg-panel-secondary)",
                 border: "none",
                 borderRadius: isOpen ? "8px 8px 0 0" : 8,
-                color: "var(--aqb-text-primary)",
+                color: "var(--buildrick-text-primary)",
                 cursor: item.disabled ? "not-allowed" : "pointer",
                 fontWeight: 500,
                 fontSize: 13,
@@ -86,7 +86,7 @@ export const Accordion: React.FC<AccordionProps> = ({
                 maxHeight: isOpen ? 1000 : 0,
                 overflow: "hidden",
                 transition: "max-height 0.3s ease",
-                background: "var(--aqb-bg-panel)",
+                background: "var(--buildrick-bg-panel)",
                 borderRadius: "0 0 8px 8px",
               }}
             >

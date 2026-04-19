@@ -65,7 +65,7 @@ export const StackField: React.FC<StackFieldProps> = ({
   };
 
   return (
-    <div className={`aqb-stack-field ${className || ""}`}>
+    <div className={`buildrick-stack-field ${className || ""}`}>
       {label && (
         <div
           style={{
@@ -79,7 +79,7 @@ export const StackField: React.FC<StackFieldProps> = ({
             style={{
               fontSize: 12,
               fontWeight: 500,
-              color: "var(--aqb-text-secondary)",
+              color: "var(--buildrick-text-secondary)",
             }}
           >
             {label}
@@ -88,10 +88,10 @@ export const StackField: React.FC<StackFieldProps> = ({
             onClick={toggleLink}
             style={{
               padding: "4px 8px",
-              background: isLinked ? "var(--aqb-primary)" : "var(--aqb-bg-panel-secondary)",
+              background: isLinked ? "var(--buildrick-accent)" : "var(--buildrick-bg-panel-secondary)",
               border: "none",
               borderRadius: 4,
-              color: isLinked ? "#fff" : "var(--aqb-text-muted)",
+              color: isLinked ? "#fff" : "var(--buildrick-text-muted)",
               fontSize: 12,
               cursor: "pointer",
             }}
@@ -192,14 +192,14 @@ export const StackField: React.FC<StackFieldProps> = ({
             transform: "translate(-50%, -50%)",
             width: 40,
             height: 40,
-            background: "var(--aqb-bg-panel-secondary)",
-            border: "2px dashed var(--aqb-border)",
+            background: "var(--buildrick-bg-panel-secondary)",
+            border: "2px dashed var(--buildrick-border)",
             borderRadius: 4,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             fontSize: 12,
-            color: "var(--aqb-text-muted)",
+            color: "var(--buildrick-text-muted)",
           }}
         >
           ⬜

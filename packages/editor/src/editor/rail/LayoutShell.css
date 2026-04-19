@@ -23,16 +23,16 @@
    These can be overridden by default.css tokens
    ============================================ */
 :root {
-  --layout-rail-width: var(--aqb-sidebar-width, 60px);
-  --layout-drawer-width: var(--aqb-sidebar-panel-width, 280px);
+  --layout-rail-width: var(--buildrick-sidebar-width, 60px);
+  --layout-drawer-width: var(--buildrick-sidebar-panel-width, 280px);
   /* Inspector: widened from 280 → 320 so labels + inputs + units breathe.
      At 280px with 16px padding × 2 and a 64px label column, inputs had <170px —
      multi-button groups and unit pickers were crushed. */
-  --layout-inspector-width: var(--aqb-right-panel-width, 320px);
-  --layout-topbar-height: var(--aqb-header-height, 52px);
-  --layout-footer-height: var(--aqb-footer-height, 40px);
-  --layout-gap: var(--aqb-space-3, 12px);
-  --layout-touch-min: var(--aqb-touch-min, 44px);
+  --layout-inspector-width: var(--buildrick-right-panel-width, 320px);
+  --layout-topbar-height: var(--buildrick-header-height, 52px);
+  --layout-footer-height: var(--buildrick-footer-height, 40px);
+  --layout-gap: var(--buildrick-design-space-3, 12px);
+  --layout-touch-min: var(--buildrick-touch-min, 44px);
 }
 
 /* ============================================
@@ -56,9 +56,9 @@
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: var(--aqb-bg-app);
-  color: var(--aqb-text-primary);
-  font-family: var(--aqb-font-family);
+  background: var(--buildrick-bg-app);
+  color: var(--buildrick-text-primary);
+  font-family: var(--buildrick-font-family);
 }
 
 /* No topbar slot provided — collapse the empty topbar row */
@@ -125,7 +125,7 @@
   z-index: 200;
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.45);
   border-right: none;
-  border-radius: 0 var(--aqb-radius-lg, 12px) var(--aqb-radius-lg, 12px) 0;
+  border-radius: 0 var(--buildrick-design-radius-lg, 12px) var(--buildrick-design-radius-lg, 12px) 0;
 }
 
 /* When no topbar slot, overlay starts from top */
@@ -142,8 +142,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 0;                                   /* navWrap handles own padding */
-  background: var(--ls-topbar-bg);
-  border-bottom: 1px solid var(--ls-topbar-border);
+  background: var(--buildrick-bg-panel);
+  border-bottom: 1px solid var(--buildrick-border-medium);
   z-index: 100;
 }
 
@@ -156,8 +156,8 @@
   flex-direction: column;
   align-items: center;
   padding: var(--layout-gap, 12px) 0;
-  background: var(--aqb-bg-darker);    /* PRD §8: rail bg — darkest surface */
-  border-right: 1px solid var(--aqb-border, rgba(255, 255, 255, 0.08));
+  background: var(--buildrick-bg-darker);    /* PRD §8: rail bg — darkest surface */
+  border-right: 1px solid var(--buildrick-border, rgba(255, 255, 255, 0.08));
   z-index: 90;
   overflow-y: auto;
   overflow-x: clip;
@@ -228,8 +228,8 @@
   grid-area: drawer;
   display: flex;
   flex-direction: column;
-  background: var(--aqb-bg-panel);     /* PRD §9.3: sidebar panel bg */
-  border-right: 1px solid var(--aqb-border, rgba(255, 255, 255, 0.08));
+  background: var(--buildrick-bg-panel);     /* PRD §9.3: sidebar panel bg */
+  border-right: 1px solid var(--buildrick-border, rgba(255, 255, 255, 0.08));
   overflow: hidden;
   z-index: 80;
 
@@ -266,7 +266,7 @@
   inset: 0;
   background-image: radial-gradient(
     circle at 1px 1px,
-    var(--ls-canvas-dot, rgba(100, 116, 139, 0.1)) 1px,
+    var(--buildrick-canvas-dot, rgba(100, 116, 139, 0.1)) 1px,
     transparent 0
   );
   background-size: 24px 24px;
@@ -281,8 +281,8 @@
   grid-area: inspector;
   display: flex;
   flex-direction: column;
-  background: var(--ls-inspector-bg);
-  border-left: 1px solid var(--ls-inspector-border);
+  background: var(--buildrick-bg-panel);
+  border-left: 1px solid var(--buildrick-border);
   overflow: hidden;
   z-index: 80;
 
@@ -318,7 +318,7 @@
   grid-area: fullpage;
   display: flex;
   flex-direction: column;
-  background: var(--ls-bg-card);
+  background: var(--buildrick-bg-card);
   overflow: hidden;
   min-width: 0;
 }
@@ -368,7 +368,7 @@
     right: var(--layout-gap, 12px);
     bottom: var(--layout-gap, 12px);
     width: var(--layout-inspector-width, 280px);
-    border-radius: var(--aqb-radius-xl, 16px);
+    border-radius: var(--buildrick-design-radius-xl, 16px);
     box-shadow: var(--glass-shadow-lg, 0 8px 32px rgba(0, 0, 0, 0.37));
     z-index: 200;
   }

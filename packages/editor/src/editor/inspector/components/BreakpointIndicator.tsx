@@ -90,10 +90,10 @@ export const BreakpointIndicator: React.FC<BreakpointIndicatorProps> = ({
           border: `1px solid ${color.border}`,
           borderRadius: 6,
           color: color.text,
-          fontSize: "var(--aqb-text-xs, 11px)",
+          fontSize: "var(--buildrick-text-xs, 11px)",
           fontWeight: 600,
           cursor: onBreakpointChange ? "pointer" : "default",
-          transition: "var(--aqb-transition-fast, opacity 0.15s)",
+          transition: "var(--buildrick-transition-fast, opacity 0.15s)",
           position: "relative",
         }}
       >
@@ -136,8 +136,8 @@ export const BreakpointIndicator: React.FC<BreakpointIndicatorProps> = ({
             top: "calc(100% + 4px)",
             left: 0,
             zIndex: 200,
-            background: "var(--aqb-surface-elevated, #1a1d27)",
-            border: "1px solid var(--aqb-border, rgba(255,255,255,0.08))",
+            background: "var(--buildrick-surface-elevated, #1a1d27)",
+            border: "1px solid var(--buildrick-border, rgba(255,255,255,0.08))",
             borderRadius: 8,
             padding: 4,
             minWidth: 150,
@@ -165,12 +165,12 @@ export const BreakpointIndicator: React.FC<BreakpointIndicatorProps> = ({
                   background: isActive ? c.bg : "transparent",
                   border: isActive ? `1px solid ${c.border}` : "1px solid transparent",
                   borderRadius: 6,
-                  color: isActive ? c.text : "var(--aqb-text-secondary, rgba(255,255,255,0.6))",
-                  fontSize: "var(--aqb-text-xs, 11px)",
+                  color: isActive ? c.text : "var(--buildrick-text-secondary, rgba(255,255,255,0.6))",
+                  fontSize: "var(--buildrick-text-xs, 11px)",
                   fontWeight: isActive ? 600 : 400,
                   cursor: "pointer",
                   textAlign: "left",
-                  transition: "var(--aqb-transition-fast, opacity 0.15s)",
+                  transition: "var(--buildrick-transition-fast, opacity 0.15s)",
                 }}
               >
                 {BP_ICONS[bp]}

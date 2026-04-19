@@ -18,13 +18,13 @@ import { SelectionHandles } from "./SelectionHandles";
 
 // CSS variable references for colors - single source of truth is Canvas.css
 const SELECTION_VARS = {
-  primary: "var(--aqb-selection-color)",
-  primaryLight: "var(--aqb-primary-light)",
-  glow: "var(--aqb-selection-glow)",
-  alpha40: "var(--aqb-selection-alpha-40)",
-  alpha10: "var(--aqb-accent-blue-alpha)",
-  gradient: "var(--aqb-handle-gradient)",
-  glowSm: "var(--aqb-selection-glow-sm)",
+  primary: "var(--buildrick-selection-color)",
+  primaryLight: "var(--buildrick-accent-subtle)",
+  glow: "var(--buildrick-selection-glow)",
+  alpha40: "var(--buildrick-selection-alpha-40)",
+  alpha10: "var(--buildrick-accent-tint)",
+  gradient: "var(--buildrick-handle-gradient)",
+  glowSm: "var(--buildrick-selection-glow-sm)",
 };
 
 interface SelectionBoxOverlayProps {
@@ -150,7 +150,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
     let rafId: number | null = null;
 
     const updateRect = () => {
-      const canvas = document.querySelector(".aqb-canvas") as HTMLElement;
+      const canvas = document.querySelector(".buildrick-canvas") as HTMLElement;
       if (!canvas) return;
 
       const canvasRect = canvas.getBoundingClientRect();
@@ -170,7 +170,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
         const newElementRects = new Map<string, SelectionRect>();
 
         effectiveIds.forEach((id) => {
-          const element = document.querySelector(`[data-aqb-id="${id}"]`) as HTMLElement;
+          const element = document.querySelector(`[data-buildrick-id="${id}"]`) as HTMLElement;
           if (element) {
             const elRect = element.getBoundingClientRect();
             // Add scroll offset to convert viewport coords to canvas coords
@@ -204,7 +204,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
         // Clear element rects for single selection
         setElementRects(new Map());
         // Single element selection
-        const element = document.querySelector(`[data-aqb-id="${effectiveIds[0]}"]`) as HTMLElement;
+        const element = document.querySelector(`[data-buildrick-id="${effectiveIds[0]}"]`) as HTMLElement;
 
         if (element) {
           const elementRect = element.getBoundingClientRect();
@@ -236,14 +236,14 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
     });
 
     // Observe the canvas for overall layout changes
-    const canvas = document.querySelector(".aqb-canvas") as HTMLElement;
+    const canvas = document.querySelector(".buildrick-canvas") as HTMLElement;
     if (canvas) {
       resizeObserver.observe(canvas);
     }
 
     // Observe all selected elements for size changes
     effectiveIds.forEach((id) => {
-      const element = document.querySelector(`[data-aqb-id="${id}"]`);
+      const element = document.querySelector(`[data-buildrick-id="${id}"]`);
       if (element) {
         resizeObserver.observe(element);
       }
@@ -263,7 +263,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
 
     // Observe selected elements for style changes
     effectiveIds.forEach((id) => {
-      const element = document.querySelector(`[data-aqb-id="${id}"]`);
+      const element = document.querySelector(`[data-buildrick-id="${id}"]`);
       if (element) {
         mutationObserver.observe(element, {
           attributes: true,
@@ -328,7 +328,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
 
   return (
     <div
-      className="aqb-selection-box"
+      className="buildrick-selection-box"
       style={{
         position: "absolute",
         left: 0,
@@ -433,7 +433,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
             top: top - 20,
             width: 16,
             height: 16,
-            background: "var(--aqb-warning, #f59e0b)",
+            background: "var(--buildrick-warning, #f59e0b)",
             borderRadius: "50%",
             display: "flex",
             alignItems: "center",

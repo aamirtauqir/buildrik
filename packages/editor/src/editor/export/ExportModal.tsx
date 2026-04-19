@@ -18,19 +18,19 @@ import { PreviewFrame } from "./PreviewFrame";
 
 // Scoped CSS override — makes this modal narrower with the token-based design spec
 const EXPORT_MODAL_STYLE = `
-  .aqb-export-modal-scope .aqb-modal {
+  .buildrick-export-modal-scope .buildrick-modal {
     width: 480px !important;
     max-width: 90vw !important;
-    border-radius: var(--aqb-radius-xl) !important;
-    box-shadow: var(--aqb-shadow-2xl) !important;
-    border: 1px solid var(--aqb-border) !important;
-    background: var(--aqb-bg-panel) !important;
+    border-radius: var(--buildrick-design-radius-xl) !important;
+    box-shadow: var(--buildrick-shadow-2xl) !important;
+    border: 1px solid var(--buildrick-border) !important;
+    background: var(--buildrick-bg-panel) !important;
   }
-  .aqb-export-modal-scope .aqb-modal-header {
+  .buildrick-export-modal-scope .buildrick-modal-header {
     min-height: 52px;
     padding: 0 20px;
   }
-  .aqb-export-modal-scope .aqb-modal-body {
+  .buildrick-export-modal-scope .buildrick-modal-body {
     padding: 20px;
   }
 `;
@@ -141,7 +141,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
     <>
       {/* Scoped style override for export modal sizing/tokens */}
       <style>{EXPORT_MODAL_STYLE}</style>
-      <div className="aqb-export-modal-scope">
+      <div className="buildrick-export-modal-scope">
         <Modal isOpen={isOpen} onClose={onClose} title="Export" size="lg">
           {/* Format grid — always visible at top */}
           <div style={{ marginBottom: 20 }}>
@@ -194,7 +194,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
             <div
               style={{
                 fontSize: 12,
-                color: "var(--aqb-text-muted)",
+                color: "var(--buildrick-text-muted)",
                 marginTop: 16,
                 marginBottom: 4,
               }}
@@ -212,10 +212,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
               width: "100%",
               height: 44,
               marginTop: 16,
-              background: "var(--aqb-primary)",
+              background: "var(--buildrick-accent)",
               color: "#fff",
               border: "none",
-              borderRadius: "var(--aqb-radius-md)",
+              borderRadius: "var(--buildrick-design-radius-md)",
               fontSize: 14,
               fontWeight: 600,
               cursor: !result?.html || loading || zipLoading ? "not-allowed" : "pointer",
@@ -283,7 +283,7 @@ const LoadingState: React.FC = () => (
     }}
   >
     <Spinner size="lg" />
-    <span style={{ color: "var(--aqb-text-muted)" }}>Generating export...</span>
+    <span style={{ color: "var(--buildrick-text-muted)" }}>Generating export...</span>
   </div>
 );
 
@@ -318,10 +318,10 @@ const PreviewTab: React.FC<{
           style={{
             padding: "6px 12px",
             background:
-              previewDevice === device ? "var(--aqb-primary)" : "var(--aqb-bg-panel-secondary)",
+              previewDevice === device ? "var(--buildrick-accent)" : "var(--buildrick-bg-panel-secondary)",
             border: "none",
             borderRadius: 6,
-            color: previewDevice === device ? "#fff" : "var(--aqb-text)",
+            color: previewDevice === device ? "#fff" : "var(--buildrick-text)",
             cursor: "pointer",
             fontSize: 12,
           }}

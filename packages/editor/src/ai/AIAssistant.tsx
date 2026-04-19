@@ -131,7 +131,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
         <div
           style={{
             padding: "8px 0 0",
-            color: "var(--aqb-text-muted)",
+            color: "var(--buildrick-text-muted)",
             fontSize: 12,
           }}
         >
@@ -190,10 +190,10 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
             style={{
               padding: "10px 14px",
               marginBottom: 12,
-              background: "var(--aqb-surface-2)",
-              border: "1px solid var(--aqb-border)",
+              background: "var(--buildrick-surface-2)",
+              border: "1px solid var(--buildrick-border)",
               borderRadius: 8,
-              color: "var(--aqb-text-muted)",
+              color: "var(--buildrick-text-muted)",
               fontSize: 13,
             }}
           >
@@ -269,13 +269,13 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
           style={{
             marginTop: 24,
             paddingTop: 16,
-            borderTop: "1px solid var(--aqb-border)",
+            borderTop: "1px solid var(--buildrick-border)",
           }}
         >
           <div
             style={{
               fontSize: 12,
-              color: "var(--aqb-text-muted)",
+              color: "var(--buildrick-text-muted)",
               marginBottom: 8,
             }}
           >
@@ -288,10 +288,10 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
                 onClick={() => setPrompt(qp)}
                 style={{
                   padding: "6px 12px",
-                  background: "var(--aqb-bg-panel-secondary)",
+                  background: "var(--buildrick-bg-panel-secondary)",
                   border: "none",
                   borderRadius: 16,
-                  color: "var(--aqb-text-secondary)",
+                  color: "var(--buildrick-text-secondary)",
                   fontSize: 12,
                   cursor: "pointer",
                 }}

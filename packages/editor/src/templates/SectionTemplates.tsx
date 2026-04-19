@@ -177,7 +177,7 @@ export const SectionTemplates: React.FC<SectionTemplatesProps> = ({ onInsert, fi
           gap: 6,
           flexWrap: "wrap",
           paddingBottom: 12,
-          borderBottom: "1px solid var(--aqb-border)",
+          borderBottom: "1px solid var(--buildrick-border)",
         }}
       >
         {sectionTypes.map((st) => (
@@ -187,12 +187,12 @@ export const SectionTemplates: React.FC<SectionTemplatesProps> = ({ onInsert, fi
             style={{
               padding: "6px 12px",
               background:
-                activeType === st.type ? "var(--aqb-primary)" : "var(--aqb-bg-panel-secondary)",
+                activeType === st.type ? "var(--buildrick-accent)" : "var(--buildrick-bg-panel-secondary)",
               border: "none",
               borderRadius: 6,
               cursor: "pointer",
               fontSize: 12,
-              color: activeType === st.type ? "#fff" : "var(--aqb-text)",
+              color: activeType === st.type ? "#fff" : "var(--buildrick-text)",
               display: "flex",
               alignItems: "center",
               gap: 4,
@@ -218,14 +218,14 @@ export const SectionTemplates: React.FC<SectionTemplatesProps> = ({ onInsert, fi
             onClick={() => onInsert(section)}
             style={{
               padding: 16,
-              background: "var(--aqb-bg-panel-secondary)",
+              background: "var(--buildrick-bg-panel-secondary)",
               borderRadius: 10,
               cursor: "pointer",
               transition: "all 0.2s",
               border: "1px solid transparent",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "var(--aqb-primary)";
+              e.currentTarget.style.borderColor = "var(--buildrick-accent)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = "transparent";
@@ -235,7 +235,7 @@ export const SectionTemplates: React.FC<SectionTemplatesProps> = ({ onInsert, fi
               <span style={{ fontSize: 24 }}>{section.icon}</span>
               <div>
                 <div style={{ fontWeight: 500, fontSize: 13 }}>{section.name}</div>
-                <div style={{ fontSize: 11, color: "var(--aqb-text-muted)" }}>
+                <div style={{ fontSize: 11, color: "var(--buildrick-text-muted)" }}>
                   {section.description}
                 </div>
               </div>
@@ -254,7 +254,7 @@ export const SectionTemplates: React.FC<SectionTemplatesProps> = ({ onInsert, fi
           style={{
             padding: 40,
             textAlign: "center",
-            color: "var(--aqb-text-muted)",
+            color: "var(--buildrick-text-muted)",
           }}
         >
           No sections found for this category

@@ -74,12 +74,12 @@ const KeyBadge: React.FC<{ children: string }> = ({ children }) => {
         display: "inline-flex",
         alignItems: "center",
         padding: "2px 6px",
-        background: "var(--aqb-surface-3)",
-        border: "1px solid var(--aqb-border)",
-        borderRadius: "var(--aqb-radius-sm)",
+        background: "var(--buildrick-surface-3)",
+        border: "1px solid var(--buildrick-border)",
+        borderRadius: "var(--buildrick-design-radius-sm)",
         fontSize: 11,
-        fontFamily: "var(--aqb-font-mono, monospace)",
-        color: "var(--aqb-text-primary)",
+        fontFamily: "var(--buildrick-design-font-mono, monospace)",
+        color: "var(--buildrick-text-primary)",
         whiteSpace: "nowrap",
         flexShrink: 0,
       }}
@@ -122,10 +122,10 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
                 fontSize: 12,
                 textTransform: "uppercase",
                 letterSpacing: "0.5px",
-                color: "var(--aqb-text-muted)",
+                color: "var(--buildrick-text-muted)",
                 marginBottom: 8,
                 paddingBottom: 6,
-                borderBottom: "1px solid var(--aqb-border)",
+                borderBottom: "1px solid var(--buildrick-border)",
                 fontWeight: 600,
               }}
             >
@@ -148,7 +148,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
                   <span
                     style={{
                       fontSize: 13,
-                      color: "var(--aqb-text-secondary)",
+                      color: "var(--buildrick-text-secondary)",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
@@ -169,10 +169,10 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
         style={{
           marginTop: 16,
           padding: "8px 12px",
-          background: "var(--aqb-bg-panel-secondary)",
-          borderRadius: "var(--aqb-radius-sm)",
+          background: "var(--buildrick-bg-panel-secondary)",
+          borderRadius: "var(--buildrick-design-radius-sm)",
           fontSize: 12,
-          color: "var(--aqb-text-muted)",
+          color: "var(--buildrick-text-muted)",
           textAlign: "center",
         }}
       >

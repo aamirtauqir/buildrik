@@ -51,34 +51,34 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
       height: config.size,
       padding: config.padding,
       border: "none",
-      borderRadius: rounded ? "var(--aqb-radius-full)" : "var(--aqb-radius-md)",
+      borderRadius: rounded ? "var(--buildrick-design-radius-full)" : "var(--buildrick-design-radius-md)",
       cursor: disabled ? "not-allowed" : "pointer",
-      transition: "all var(--aqb-transition-fast)",
+      transition: "all var(--buildrick-transition-fast)",
       opacity: disabled ? 0.4 : 1,
       flexShrink: 0,
     };
 
     const variantStyles: Record<string, React.CSSProperties> = {
       ghost: {
-        background: active ? "var(--aqb-primary-light)" : "transparent",
-        color: active ? "var(--aqb-primary)" : "var(--aqb-text-secondary)",
+        background: active ? "var(--buildrick-accent-subtle)" : "transparent",
+        color: active ? "var(--buildrick-accent)" : "var(--buildrick-text-secondary)",
       },
       subtle: {
-        background: active ? "var(--aqb-primary-light)" : "var(--aqb-surface-3)",
-        color: active ? "var(--aqb-primary)" : "var(--aqb-text-secondary)",
+        background: active ? "var(--buildrick-accent-subtle)" : "var(--buildrick-surface-3)",
+        color: active ? "var(--buildrick-accent)" : "var(--buildrick-text-secondary)",
       },
       solid: {
         background: active
-          ? "var(--aqb-primary)"
-          : "linear-gradient(135deg, var(--aqb-surface-3), var(--aqb-surface-4))",
-        color: active ? "#fff" : "var(--aqb-text-primary)",
+          ? "var(--buildrick-accent)"
+          : "linear-gradient(135deg, var(--buildrick-surface-3), var(--buildrick-surface-4))",
+        color: active ? "#fff" : "var(--buildrick-text-primary)",
       },
     };
 
     const hoverStyles = {
-      ghost: { background: "var(--aqb-bg-hover)", color: "var(--aqb-text-primary)" },
-      subtle: { background: "var(--aqb-surface-4)", color: "var(--aqb-text-primary)" },
-      solid: { background: "var(--aqb-primary)", color: "#fff" },
+      ghost: { background: "var(--buildrick-bg-hover)", color: "var(--buildrick-text-primary)" },
+      subtle: { background: "var(--buildrick-surface-4)", color: "var(--buildrick-text-primary)" },
+      solid: { background: "var(--buildrick-accent)", color: "#fff" },
     };
 
     const [isHovered, setIsHovered] = React.useState(false);
@@ -93,7 +93,7 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
     const button = (
       <button
         ref={ref}
-        className={`aqb-icon-btn aqb-icon-btn-${variant} aqb-icon-btn-${size} ${active ? "active" : ""} ${className}`}
+        className={`buildrick-icon-btn buildrick-icon-btn-${variant} buildrick-icon-btn-${size} ${active ? "active" : ""} ${className}`}
         style={computedStyles}
         disabled={disabled}
         aria-pressed={active}

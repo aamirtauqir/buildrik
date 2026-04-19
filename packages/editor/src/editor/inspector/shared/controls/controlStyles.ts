@@ -19,20 +19,20 @@ import type * as React from "react";
  * These map to CSS variables defined in themes/default.css
  */
 export const INSPECTOR_TOKENS = {
-  accent: "var(--aqb-control-accent)",
-  accentAlpha08: "var(--aqb-control-accent-alpha-08)",
-  accentAlpha10: "var(--aqb-control-accent-alpha-10)",
-  accentAlpha20: "var(--aqb-control-accent-alpha-20)",
-  accentAlpha30: "var(--aqb-control-accent-alpha-30)",
-  surfaceInput: "var(--aqb-control-surface-input)",
-  surfaceSubtle: "var(--aqb-control-surface-subtle)",
-  surfaceOverlay: "var(--aqb-control-surface-overlay)",
-  borderInput: "var(--aqb-input-border)",
-  borderSubtle: "var(--aqb-border-subtle)",
-  textPrimary: "var(--aqb-control-text-primary)",
-  textSecondary: "var(--aqb-control-text-secondary)",
-  textTertiary: "var(--aqb-control-text-tertiary)",
-  textMuted: "var(--aqb-control-text-muted)",
+  accent: "var(--buildrick-control-accent)",
+  accentAlpha08: "var(--buildrick-control-accent-alpha-08)",
+  accentAlpha10: "var(--buildrick-control-accent-alpha-10)",
+  accentAlpha20: "var(--buildrick-control-accent-alpha-20)",
+  accentAlpha30: "var(--buildrick-control-accent-alpha-30)",
+  surfaceInput: "var(--buildrick-control-surface-input)",
+  surfaceSubtle: "var(--buildrick-control-surface-subtle)",
+  surfaceOverlay: "var(--buildrick-control-surface-overlay)",
+  borderInput: "var(--buildrick-design-input-border)",
+  borderSubtle: "var(--buildrick-border-subtle)",
+  textPrimary: "var(--buildrick-control-text-primary)",
+  textSecondary: "var(--buildrick-control-text-secondary)",
+  textTertiary: "var(--buildrick-control-text-tertiary)",
+  textMuted: "var(--buildrick-control-text-muted)",
 } as const;
 
 // ============================================================================

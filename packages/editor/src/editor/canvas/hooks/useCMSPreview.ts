@@ -38,12 +38,12 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
         const parser = new DOMParser();
         const doc = parser.parseFromString(content, "text/html");
 
-        // Find all elements with data-aqb-id
-        const elements = doc.querySelectorAll("[data-aqb-id]");
+        // Find all elements with data-buildrick-id
+        const elements = doc.querySelectorAll("[data-buildrick-id]");
         const resolvePromises: Promise<void>[] = [];
 
         elements.forEach((el) => {
-          const elementId = el.getAttribute("data-aqb-id");
+          const elementId = el.getAttribute("data-buildrick-id");
           if (!elementId) return;
 
           // Get bindings for this element

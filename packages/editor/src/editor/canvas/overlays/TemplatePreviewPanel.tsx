@@ -97,7 +97,7 @@ export const TemplatePreviewPanel: React.FC<TemplatePreviewPanelProps> = ({
   };
 
   return (
-    <div className={`aqb-template-preview-panel ${visible ? "visible" : ""}`} style={panelStyles}>
+    <div className={`buildrick-template-preview-panel ${visible ? "visible" : ""}`} style={panelStyles}>
       {!template ? (
         /* Empty State */
         <div style={emptyStateStyles}>
@@ -286,7 +286,7 @@ const panelStyles: React.CSSProperties = {
   justifyContent: "center",
   background: "linear-gradient(180deg, #e2e8f0 0%, #d1d8e0 100%)",
   zIndex: 50,
-  // Animation handled by CSS class .aqb-template-preview-panel + .visible
+  // Animation handled by CSS class .buildrick-template-preview-panel + .visible
 };
 
 const emptyStateStyles: React.CSSProperties = {

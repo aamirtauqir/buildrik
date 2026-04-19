@@ -32,10 +32,10 @@ export const LockedScreen: React.FC<LockedScreenProps> = ({
 }) => {
   if (variant === "coming-soon") {
     return (
-      <div className="aqb-st-locked">
+      <div className="buildrick-st-locked">
         <div style={{ fontSize: 32, marginBottom: 12 }}>🔜</div>
-        <h3 className="aqb-st-locked__title">{title ?? "Coming Soon"}</h3>
-        {message && <p className="aqb-st-locked__desc">{message}</p>}
+        <h3 className="buildrick-st-locked__title">{title ?? "Coming Soon"}</h3>
+        {message && <p className="buildrick-st-locked__desc">{message}</p>}
         {waitlistLabel && (
           <button onClick={onWaitlist} style={waitlistBtnStyles}>
             {waitlistLabel}
@@ -54,14 +54,14 @@ export const LockedScreen: React.FC<LockedScreenProps> = ({
   };
 
   return (
-    <div className="aqb-st-locked">
-      <div className="aqb-st-locked__icon">
+    <div className="buildrick-st-locked">
+      <div className="buildrick-st-locked__icon">
         <PremiumBadge size="lg" />
       </div>
-      <h3 className="aqb-st-locked__title">Available in {variant === "pro" ? "Pro" : "Enterprise"}</h3>
-      <p className="aqb-st-locked__desc">{message ?? "Upgrade your plan to unlock this feature."}</p>
+      <h3 className="buildrick-st-locked__title">Available in {variant === "pro" ? "Pro" : "Enterprise"}</h3>
+      <p className="buildrick-st-locked__desc">{message ?? "Upgrade your plan to unlock this feature."}</p>
       <button
-        className="aqb-st-locked__btn"
+        className="buildrick-st-locked__btn"
         onClick={handleUpgrade}
         aria-label={`Upgrade to ${variant === "pro" ? "Pro" : "Enterprise"} plan`}
       >
@@ -74,8 +74,8 @@ export const LockedScreen: React.FC<LockedScreenProps> = ({
 const waitlistBtnStyles: React.CSSProperties = {
   marginTop: 16,
   padding: "8px 16px",
-  fontSize: "var(--aqb-font-sm, 13px)",
-  background: "var(--aqb-primary, #2563eb)",
+  fontSize: "var(--buildrick-font-sm, 13px)",
+  background: "var(--buildrick-accent, #2563eb)",
   color: "#fff",
   border: "none",
   borderRadius: 6,

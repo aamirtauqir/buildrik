@@ -29,13 +29,13 @@ export class BoundsCalculator {
     if (typeof document === "undefined") return null;
 
     const domElement = document.querySelector(
-      `[data-aqb-id="${element.getId()}"]`
+      `[data-buildrick-id="${element.getId()}"]`
     ) as HTMLElement | null;
 
     if (!domElement) return null;
 
     const canvasContainer = document.querySelector(
-      "[data-aqb-canvas], .aqb-canvas"
+      "[data-buildrick-canvas], .buildrick-canvas"
     ) as HTMLElement | null;
 
     const elementRect = domElement.getBoundingClientRect();

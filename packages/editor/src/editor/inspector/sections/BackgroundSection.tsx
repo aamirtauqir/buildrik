@@ -79,13 +79,13 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
             style={{
               flex: 1,
               padding: "8px 12px",
-              background: bgType === type ? "var(--aqb-primary-light)" : "rgba(255,255,255,0.03)",
+              background: bgType === type ? "var(--buildrick-accent-subtle)" : "rgba(255,255,255,0.03)",
               border:
                 bgType === type
-                  ? "1px solid var(--aqb-primary)"
+                  ? "1px solid var(--buildrick-accent)"
                   : "1px solid rgba(255,255,255,0.06)",
               borderRadius: 6,
-              color: bgType === type ? "var(--aqb-primary)" : "var(--aqb-text-muted)",
+              color: bgType === type ? "var(--buildrick-accent)" : "var(--buildrick-text-muted)",
               fontSize: 12,
               fontWeight: 500,
               cursor: "pointer",
@@ -131,14 +131,14 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
             <div style={{ display: "flex", gap: 4 }}>
               <button
                 onClick={() => {
-                  const color1 = "var(--aqb-primary)";
-                  const color2 = "var(--aqb-success)";
+                  const color1 = "var(--buildrick-accent)";
+                  const color2 = "var(--buildrick-success)";
                   onChange("background", `linear-gradient(90deg, ${color1}, ${color2})`);
                 }}
                 style={{
                   flex: 1,
                   padding: "20px 12px",
-                  background: "linear-gradient(90deg, var(--aqb-primary), var(--aqb-success))",
+                  background: "linear-gradient(90deg, var(--buildrick-accent), var(--buildrick-success))",
                   border: "1px solid rgba(255,255,255,0.1)",
                   borderRadius: 6,
                   cursor: "pointer",
@@ -150,14 +150,14 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               </button>
               <button
                 onClick={() => {
-                  const color1 = "var(--aqb-primary)";
-                  const color2 = "var(--aqb-success)";
+                  const color1 = "var(--buildrick-accent)";
+                  const color2 = "var(--buildrick-success)";
                   onChange("background", `radial-gradient(circle, ${color1}, ${color2})`);
                 }}
                 style={{
                   flex: 1,
                   padding: "20px 12px",
-                  background: "radial-gradient(circle, var(--aqb-primary), var(--aqb-success))",
+                  background: "radial-gradient(circle, var(--buildrick-accent), var(--buildrick-success))",
                   border: "1px solid rgba(255,255,255,0.1)",
                   borderRadius: 6,
                   cursor: "pointer",
@@ -177,9 +177,9 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
             onChange={(v) => {
               const current = styles.background || "";
               if (current.includes("linear-gradient")) {
-                onChange("background", `linear-gradient(90deg, ${v}, var(--aqb-success))`);
+                onChange("background", `linear-gradient(90deg, ${v}, var(--buildrick-success))`);
               } else {
-                onChange("background", `radial-gradient(circle, ${v}, var(--aqb-success))`);
+                onChange("background", `radial-gradient(circle, ${v}, var(--buildrick-success))`);
               }
             }}
           />
@@ -189,9 +189,9 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
             onChange={(v) => {
               const current = styles.background || "";
               if (current.includes("linear-gradient")) {
-                onChange("background", `linear-gradient(90deg, var(--aqb-primary), ${v})`);
+                onChange("background", `linear-gradient(90deg, var(--buildrick-accent), ${v})`);
               } else {
-                onChange("background", `radial-gradient(circle, var(--aqb-primary), ${v})`);
+                onChange("background", `radial-gradient(circle, var(--buildrick-accent), ${v})`);
               }
             }}
           />
@@ -221,7 +221,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               max="360"
               value="90"
               onChange={(e) => {
-                onChange("background", `linear-gradient(${e.target.value}deg, var(--aqb-primary), var(--aqb-success))`);
+                onChange("background", `linear-gradient(${e.target.value}deg, var(--buildrick-accent), var(--buildrick-success))`);
               }}
               style={{ flex: 1 }}
             />
@@ -256,10 +256,10 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                 }
                 style={{
                   padding: "8px 12px",
-                  background: "var(--aqb-primary-light)",
-                  border: "1px solid var(--aqb-primary)",
+                  background: "var(--buildrick-accent-subtle)",
+                  border: "1px solid var(--buildrick-accent)",
                   borderRadius: 6,
-                  color: "var(--aqb-primary)",
+                  color: "var(--buildrick-accent)",
                   fontSize: 12,
                   fontWeight: 600,
                   cursor: "pointer",

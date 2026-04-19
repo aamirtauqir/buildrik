@@ -17,14 +17,14 @@ import type { AnyHandle, HandlePosition, Bounds } from "./types";
  * Get DOM element by element ID
  */
 export function getDOMElement(elementId: string): HTMLElement | null {
-  return document.querySelector(`[data-aqb-id="${elementId}"]`) as HTMLElement | null;
+  return document.querySelector(`[data-buildrick-id="${elementId}"]`) as HTMLElement | null;
 }
 
 /**
  * Get canvas container element
  */
 export function getCanvasContainer(): HTMLElement | null {
-  return document.querySelector("[data-aqb-canvas], .aqb-canvas") as HTMLElement | null;
+  return document.querySelector("[data-buildrick-canvas], .buildrick-canvas") as HTMLElement | null;
 }
 
 /**

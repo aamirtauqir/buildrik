@@ -76,7 +76,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
   };
 
   return (
-    <div className="aqb-st-screen">
+    <div className="buildrick-st-screen">
       <Section title="Google Analytics">
         <p id="ga-privacy-note" style={privacyNoteStyles}>
           Track visitor behavior on your published site. When enabled, Google&apos;s analytics
@@ -96,12 +96,12 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
               setHasChanges(true);
             }}
             placeholder="G-XXXXXXXXXX"
-            className="aqb-st-input" style={{ borderColor: gaError ? "var(--aqb-error)" : undefined }}
+            className="buildrick-st-input" style={{ borderColor: gaError ? "var(--buildrick-error)" : undefined }}
             aria-describedby={gaError ? "ga-error" : undefined}
             aria-invalid={!!gaError}
           />
           {gaError && (
-            <span id="ga-error" role="alert" className="aqb-st-error-hint">
+            <span id="ga-error" role="alert" className="buildrick-st-error-hint">
               This doesn&apos;t look right. Your Google Analytics ID should start with G- followed
               by 10 characters, like G-ABCD123456.
             </span>
@@ -116,7 +116,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
           }}
         />
         {gaEnabled && gaId && isValidGA && (
-          <div className="aqb-st-success-note">
+          <div className="buildrick-st-success-note">
             ✓ Tracking will be added to your published site automatically
           </div>
         )}
@@ -141,12 +141,12 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
               setHasChanges(true);
             }}
             placeholder="1234567890123456"
-            className="aqb-st-input" style={{ borderColor: pixelError ? "var(--aqb-error)" : undefined }}
+            className="buildrick-st-input" style={{ borderColor: pixelError ? "var(--buildrick-error)" : undefined }}
             aria-describedby={pixelError ? "pixel-error" : undefined}
             aria-invalid={!!pixelError}
           />
           {pixelError && (
-            <span id="pixel-error" role="alert" className="aqb-st-error-hint">
+            <span id="pixel-error" role="alert" className="buildrick-st-error-hint">
               Pixel IDs are 15 or 16 digits. Check your Meta Events Manager for the correct ID.
             </span>
           )}
@@ -160,7 +160,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
           }}
         />
         {metaPixelEnabled && metaPixelId && isValidPixel && (
-          <div className="aqb-st-success-note">
+          <div className="buildrick-st-success-note">
             ✓ Tracking will be added to your published site automatically
           </div>
         )}
@@ -175,7 +175,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
             setHasChanges(true);
           }}
         />
-        <div className="aqb-st-note">
+        <div className="buildrick-st-note">
           Displays a banner asking visitors to accept cookies before tracking begins. Required in
           the EU (GDPR) and recommended everywhere else.
         </div>
@@ -195,13 +195,13 @@ const privacyNoteStyles: React.CSSProperties = {
   margin: "0 0 12px",
   fontSize: 13,
   lineHeight: 1.5,
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
 };
 
 const hintTextStyles: React.CSSProperties = {
   display: "block",
   fontSize: 12,
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
   marginTop: 4,
   lineHeight: 1.4,
 };

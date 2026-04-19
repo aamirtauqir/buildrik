@@ -157,13 +157,13 @@ export const BlockPickerModal: React.FC<BlockPickerModalProps> = ({
 
   return createPortal(
     <div
-      className="aqb-block-picker-overlay"
+      className="buildrick-block-picker-overlay"
       style={overlayStyles}
       onClick={onClose}
       role="presentation"
     >
       <div
-        className="aqb-block-picker-modal"
+        className="buildrick-block-picker-modal"
         role="dialog"
         aria-modal="true"
         aria-label={positionLabels[insertionContext.position]}
@@ -234,19 +234,19 @@ const overlayStyles: React.CSSProperties = {
 };
 
 const modalStyles: React.CSSProperties = {
-  background: "var(--aqb-bg-panel, #1e1e2e)",
+  background: "var(--buildrick-bg-panel, #1e1e2e)",
   borderRadius: 12,
   boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
   width: 380,
   maxHeight: "80vh",
   display: "flex",
   flexDirection: "column",
-  animation: "aqb-modal-in 0.2s ease",
+  animation: "buildrick-modal-in 0.2s ease",
 };
 
 const headerStyles: React.CSSProperties = {
   padding: "14px 16px",
-  borderBottom: "1px solid var(--aqb-border, rgba(255,255,255,0.08))",
+  borderBottom: "1px solid var(--buildrick-border, rgba(255,255,255,0.08))",
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
@@ -255,13 +255,13 @@ const headerStyles: React.CSSProperties = {
 const titleStyles: React.CSSProperties = {
   fontWeight: 600,
   fontSize: 14,
-  color: "var(--aqb-text-primary, #cdd6f4)",
+  color: "var(--buildrick-text-primary, #cdd6f4)",
 };
 
 const closeButtonStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
-  color: "var(--aqb-text-secondary, #a6adc8)",
+  color: "var(--buildrick-text-secondary, #a6adc8)",
   cursor: "pointer",
   padding: 4,
   borderRadius: 6,
@@ -274,7 +274,7 @@ const searchContainerStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   padding: "8px 16px",
-  borderBottom: "1px solid var(--aqb-border, rgba(255,255,255,0.08))",
+  borderBottom: "1px solid var(--buildrick-border, rgba(255,255,255,0.08))",
 };
 
 const searchInputStyles: React.CSSProperties = {
@@ -282,7 +282,7 @@ const searchInputStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
   outline: "none",
-  color: "var(--aqb-text-primary, #cdd6f4)",
+  color: "var(--buildrick-text-primary, #cdd6f4)",
   fontSize: 13,
 };
 

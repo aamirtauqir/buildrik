@@ -140,7 +140,7 @@ export const PageCommandPalette: React.FC<Props> = ({ pages, onSelect, onClose }
         {/* Results list */}
         <div
           ref={listRef}
-          className="pg-palette__list aqb-scrollbar"
+          className="pg-palette__list buildrick-scrollbar"
           role="listbox"
           aria-label="Pages"
         >

@@ -281,7 +281,7 @@ export const SmartSuggestions: React.FC<SmartSuggestionsProps> = ({
 
   return (
     <div
-      className="aqb-smart-suggestions"
+      className="buildrick-smart-suggestions"
       style={{
         position: "absolute",
         left: Math.max(8, left),
@@ -296,7 +296,7 @@ export const SmartSuggestions: React.FC<SmartSuggestionsProps> = ({
         boxShadow: "0 4px 16px rgba(0, 0, 0, 0.25)",
         zIndex: Z_LAYERS.contextMenu,
         pointerEvents: "auto",
-        animation: "aqb-fade-in 0.15s ease-out",
+        animation: "buildrick-fade-in 0.15s ease-out",
       }}
     >
       {suggestions.map((suggestion) => (

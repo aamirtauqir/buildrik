@@ -16,8 +16,8 @@ interface SectionProps {
 }
 
 export const Section: React.FC<SectionProps> = ({ title, children }) => (
-  <div className="aqb-st-section">
-    <h4 className="aqb-st-section__title">{title}</h4>
+  <div className="buildrick-st-section">
+    <h4 className="buildrick-st-section__title">{title}</h4>
     {children}
   </div>
 );
@@ -34,10 +34,10 @@ interface FieldProps {
 }
 
 export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, children }) => (
-  <div className="aqb-st-field">
-    <label className="aqb-st-label" htmlFor={htmlFor}>
+  <div className="buildrick-st-field">
+    <label className="buildrick-st-label" htmlFor={htmlFor}>
       {label}
-      {hint && <span className="aqb-st-hint">{hint}</span>}
+      {hint && <span className="buildrick-st-hint">{hint}</span>}
     </label>
     {children}
   </div>
@@ -76,18 +76,18 @@ export const Toggle: React.FC<ToggleProps> = ({
   };
 
   return (
-    <label className="aqb-st-toggle-row">
+    <label className="buildrick-st-toggle-row">
       <span>{label}</span>
       <button
         role="switch"
         aria-checked={checked}
         aria-label={label}
         onClick={handleClick}
-        className="aqb-st-toggle"
-        style={{ background: checked ? "var(--aqb-primary)" : "var(--aqb-surface-4)" }}
+        className="buildrick-st-toggle"
+        style={{ background: checked ? "var(--buildrick-accent)" : "var(--buildrick-surface-4)" }}
       >
         <span
-          className="aqb-st-toggle__knob"
+          className="buildrick-st-toggle__knob"
           style={{ transform: checked ? "translateX(14px)" : "translateX(0)" }}
         />
       </button>
@@ -153,7 +153,7 @@ const guardOverlayStyle: React.CSSProperties = {
 };
 
 const guardModalStyle: React.CSSProperties = {
-  background: "var(--aqb-surface, #fff)",
+  background: "var(--buildrick-surface, #fff)",
   borderRadius: 8,
   padding: "24px",
   width: 320,
@@ -161,14 +161,14 @@ const guardModalStyle: React.CSSProperties = {
 };
 
 const guardTitleStyle: React.CSSProperties = {
-  fontSize: "var(--aqb-font-lg, 15px)",
+  fontSize: "var(--buildrick-font-lg, 15px)",
   fontWeight: 600,
   margin: "0 0 8px",
 };
 
 const guardBodyStyle: React.CSSProperties = {
-  fontSize: "var(--aqb-font-sm, 13px)",
-  color: "var(--aqb-text-muted, #666)",
+  fontSize: "var(--buildrick-font-sm, 13px)",
+  color: "var(--buildrick-text-muted, #666)",
   margin: "0 0 20px",
 };
 
@@ -182,7 +182,7 @@ const guardKeepBtnStyle: React.CSSProperties = {
   fontSize: 13,
   padding: "6px 12px",
   background: "transparent",
-  border: "1px solid var(--aqb-border)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 4,
   cursor: "pointer",
 };

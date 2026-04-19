@@ -109,7 +109,7 @@ const contentStyle: React.CSSProperties = {
 const messageStyle: React.CSSProperties = {
   margin: 0,
   fontSize: 14,
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   lineHeight: 1.5,
 };
 
@@ -121,7 +121,7 @@ const featuresListStyle: React.CSSProperties = {
   padding: "12px 16px",
   background: "rgba(255, 255, 255, 0.03)",
   borderRadius: 8,
-  border: "1px solid var(--aqb-border, rgba(255,255,255,0.08))",
+  border: "1px solid var(--buildrick-border, rgba(255,255,255,0.08))",
 };
 
 const featureRowStyle: React.CSSProperties = {
@@ -129,11 +129,11 @@ const featureRowStyle: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   fontSize: 13,
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
 };
 
 const checkStyle: React.CSSProperties = {
-  color: "var(--aqb-success, #22c55e)",
+  color: "var(--buildrick-success, #22c55e)",
   fontWeight: 700,
   fontSize: 14,
 };
@@ -149,8 +149,8 @@ const cancelStyle: React.CSSProperties = {
   flex: 1,
   padding: "10px 16px",
   background: "transparent",
-  color: "var(--aqb-text-secondary)",
-  border: "1px solid var(--aqb-border, rgba(255,255,255,0.08))",
+  color: "var(--buildrick-text-secondary)",
+  border: "1px solid var(--buildrick-border, rgba(255,255,255,0.08))",
   borderRadius: 6,
   fontSize: 13,
   cursor: "pointer",
@@ -159,7 +159,7 @@ const cancelStyle: React.CSSProperties = {
 const upgradeStyle: React.CSSProperties = {
   flex: 1,
   padding: "10px 16px",
-  background: "var(--aqb-primary)",
+  background: "var(--buildrick-accent)",
   color: "#fff",
   border: "none",
   borderRadius: 6,

@@ -108,7 +108,7 @@ export function flashOnDrop(element: HTMLElement, color: string = "#a6e3a1"): Pr
     }
 
     // Add CSS class for animation
-    element.classList.add("aqb-element-flash");
+    element.classList.add("buildrick-element-flash");
 
     // Also apply inline style for custom color
     const originalBoxShadow = element.style.boxShadow;
@@ -122,7 +122,7 @@ export function flashOnDrop(element: HTMLElement, color: string = "#a6e3a1"): Pr
     element.style.boxShadow = `0 0 0 8px transparent`;
 
     const cleanup = () => {
-      element.classList.remove("aqb-element-flash");
+      element.classList.remove("buildrick-element-flash");
       element.style.boxShadow = originalBoxShadow;
       element.style.transition = "";
       resolve();
@@ -147,10 +147,10 @@ export function settleElement(element: HTMLElement): Promise<void> {
     }
 
     // Add CSS class for animation
-    element.classList.add("aqb-element-settle");
+    element.classList.add("buildrick-element-settle");
 
     const cleanup = () => {
-      element.classList.remove("aqb-element-settle");
+      element.classList.remove("buildrick-element-settle");
       resolve();
     };
 

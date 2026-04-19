@@ -90,7 +90,7 @@ export const Slider: React.FC<SliderProps> = ({
 
   return (
     <div
-      className="aqb-slider"
+      className="buildrick-slider"
       style={{
         position: "relative",
         height,
@@ -109,7 +109,7 @@ export const Slider: React.FC<SliderProps> = ({
         {slides.map((slide) => (
           <div
             key={slide.id}
-            className="aqb-slide"
+            className="buildrick-slide"
             style={{
               minWidth: "100%",
               height: "100%",
@@ -170,7 +170,7 @@ export const Slider: React.FC<SliderProps> = ({
                   style={{
                     display: "inline-block",
                     padding: "14px 32px",
-                    background: "var(--aqb-primary, #00d4aa)",
+                    background: "var(--buildrick-accent, #00d4aa)",
                     color: "#fff",
                     fontSize: 16,
                     fontWeight: 600,
@@ -254,7 +254,7 @@ export const Slider: React.FC<SliderProps> = ({
                 borderRadius: 5,
                 border: "none",
                 background:
-                  index === activeIndex ? "var(--aqb-primary, #00d4aa)" : "rgba(255,255,255,0.5)",
+                  index === activeIndex ? "var(--buildrick-accent, #00d4aa)" : "rgba(255,255,255,0.5)",
                 cursor: "pointer",
                 transition: "all 0.3s ease",
               }}
@@ -273,9 +273,9 @@ export const sliderBlockConfig = {
   icon: "🎠",
   elementType: "slider" as const,
   content:
-    '<div class="aqb-slider" data-aqb-type="slider">' +
-    '<div class="aqb-slide"><h3>Slide One</h3><p>Add your slide copy here.</p></div>' +
-    '<div class="aqb-slide"><h3>Slide Two</h3><p>Share another highlight.</p></div>' +
+    '<div class="buildrick-slider" data-buildrick-type="slider">' +
+    '<div class="buildrick-slide"><h3>Slide One</h3><p>Add your slide copy here.</p></div>' +
+    '<div class="buildrick-slide"><h3>Slide Two</h3><p>Share another highlight.</p></div>' +
     "</div>",
 };
 

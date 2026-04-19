@@ -13,7 +13,7 @@ export const imageEditorStyles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "var(--aqb-bg-panel-secondary)",
+    background: "var(--buildrick-bg-panel-secondary)",
     borderRadius: 8,
     padding: 16,
     minHeight: 300,
@@ -31,7 +31,7 @@ export const imageEditorStyles = {
     gap: 8,
     justifyContent: "center",
     padding: "12px 0",
-    borderBottom: "1px solid var(--aqb-border)",
+    borderBottom: "1px solid var(--buildrick-border)",
   },
   toolBtn: {
     display: "flex",
@@ -43,11 +43,11 @@ export const imageEditorStyles = {
     background: "transparent",
     borderRadius: 8,
     cursor: "pointer",
-    color: "var(--aqb-text)",
+    color: "var(--buildrick-text)",
     transition: "all 0.15s ease",
   },
   toolBtnActive: {
-    background: "var(--aqb-primary)",
+    background: "var(--buildrick-accent)",
     color: "#fff",
   },
   controls: {
@@ -57,7 +57,7 @@ export const imageEditorStyles = {
     display: "flex",
     justifyContent: "space-between",
     paddingTop: 16,
-    borderTop: "1px solid var(--aqb-border)",
+    borderTop: "1px solid var(--buildrick-border)",
   },
 };
 
@@ -71,13 +71,13 @@ export const sliderStyles = {
   label: {
     width: 80,
     fontSize: 12,
-    color: "var(--aqb-text-secondary)",
+    color: "var(--buildrick-text-secondary)",
   },
   input: {
     flex: 1,
     height: 4,
     WebkitAppearance: "none" as const,
-    background: "var(--aqb-border)",
+    background: "var(--buildrick-border)",
     borderRadius: 2,
     cursor: "pointer",
   },
@@ -85,6 +85,6 @@ export const sliderStyles = {
     width: 40,
     fontSize: 12,
     textAlign: "right" as const,
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
   },
 };

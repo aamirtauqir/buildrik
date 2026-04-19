@@ -76,7 +76,7 @@ export const SelectFontField: React.FC<SelectFontFieldProps> = ({
   // const selectedFont = fonts.find((f) => f.family === value);
 
   return (
-    <div className={`aqb-select-font-field ${className || ""}`} style={{ position: "relative" }}>
+    <div className={`buildrick-select-font-field ${className || ""}`} style={{ position: "relative" }}>
       {label && (
         <label
           style={{
@@ -84,7 +84,7 @@ export const SelectFontField: React.FC<SelectFontFieldProps> = ({
             fontSize: 12,
             fontWeight: 500,
             marginBottom: 6,
-            color: "var(--aqb-text-secondary)",
+            color: "var(--buildrick-text-secondary)",
           }}
         >
           {label}
@@ -98,10 +98,10 @@ export const SelectFontField: React.FC<SelectFontFieldProps> = ({
         style={{
           width: "100%",
           padding: "8px 12px",
-          background: "var(--aqb-bg-input)",
-          border: "1px solid var(--aqb-border)",
+          background: "var(--buildrick-bg-input)",
+          border: "1px solid var(--buildrick-border)",
           borderRadius: 6,
-          color: "var(--aqb-text-primary)",
+          color: "var(--buildrick-text-primary)",
           fontSize: 13,
           textAlign: "left",
           cursor: disabled ? "not-allowed" : "pointer",
@@ -125,8 +125,8 @@ export const SelectFontField: React.FC<SelectFontFieldProps> = ({
             left: 0,
             right: 0,
             marginTop: 4,
-            background: "var(--aqb-bg-panel)",
-            border: "1px solid var(--aqb-border)",
+            background: "var(--buildrick-bg-panel)",
+            border: "1px solid var(--buildrick-border)",
             borderRadius: 8,
             boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
             zIndex: 100,
@@ -134,7 +134,7 @@ export const SelectFontField: React.FC<SelectFontFieldProps> = ({
           }}
         >
           {/* Search */}
-          <div style={{ padding: 8, borderBottom: "1px solid var(--aqb-border)" }}>
+          <div style={{ padding: 8, borderBottom: "1px solid var(--buildrick-border)" }}>
             <input
               type="text"
               value={searchQuery}
@@ -143,10 +143,10 @@ export const SelectFontField: React.FC<SelectFontFieldProps> = ({
               style={{
                 width: "100%",
                 padding: "6px 10px",
-                background: "var(--aqb-bg-input)",
-                border: "1px solid var(--aqb-border)",
+                background: "var(--buildrick-bg-input)",
+                border: "1px solid var(--buildrick-border)",
                 borderRadius: 4,
-                color: "var(--aqb-text-primary)",
+                color: "var(--buildrick-text-primary)",
                 fontSize: 12,
                 outline: "none",
               }}
@@ -159,7 +159,7 @@ export const SelectFontField: React.FC<SelectFontFieldProps> = ({
               display: "flex",
               gap: 4,
               padding: 8,
-              borderBottom: "1px solid var(--aqb-border)",
+              borderBottom: "1px solid var(--buildrick-border)",
               flexWrap: "wrap",
             }}
           >
@@ -168,11 +168,11 @@ export const SelectFontField: React.FC<SelectFontFieldProps> = ({
               style={{
                 padding: "4px 8px",
                 background: !activeCategory
-                  ? "var(--aqb-primary)"
-                  : "var(--aqb-bg-panel-secondary)",
+                  ? "var(--buildrick-accent)"
+                  : "var(--buildrick-bg-panel-secondary)",
                 border: "none",
                 borderRadius: 4,
-                color: !activeCategory ? "#fff" : "var(--aqb-text-muted)",
+                color: !activeCategory ? "#fff" : "var(--buildrick-text-muted)",
                 fontSize: 12,
                 cursor: "pointer",
               }}
@@ -186,10 +186,10 @@ export const SelectFontField: React.FC<SelectFontFieldProps> = ({
                 style={{
                   padding: "4px 8px",
                   background:
-                    activeCategory === cat ? "var(--aqb-primary)" : "var(--aqb-bg-panel-secondary)",
+                    activeCategory === cat ? "var(--buildrick-accent)" : "var(--buildrick-bg-panel-secondary)",
                   border: "none",
                   borderRadius: 4,
-                  color: activeCategory === cat ? "#fff" : "var(--aqb-text-muted)",
+                  color: activeCategory === cat ? "#fff" : "var(--buildrick-text-muted)",
                   fontSize: 12,
                   cursor: "pointer",
                   textTransform: "capitalize",
@@ -215,7 +215,7 @@ export const SelectFontField: React.FC<SelectFontFieldProps> = ({
                   alignItems: "center",
                   justifyContent: "space-between",
                   cursor: "pointer",
-                  background: value === font.family ? "var(--aqb-bg-hover)" : "transparent",
+                  background: value === font.family ? "var(--buildrick-bg-hover)" : "transparent",
                 }}
               >
                 <span
@@ -226,7 +226,7 @@ export const SelectFontField: React.FC<SelectFontFieldProps> = ({
                 >
                   {font.family}
                 </span>
-                <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>
+                <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
                   {categoryIcons[font.category]}
                 </span>
               </div>

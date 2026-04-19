@@ -79,10 +79,10 @@ export function useCanvasHover({
       }
 
       const target = e.target as HTMLElement;
-      const hoveredEl = target.closest("[data-aqb-id]") as HTMLElement | null;
+      const hoveredEl = target.closest("[data-buildrick-id]") as HTMLElement | null;
 
       if (hoveredEl) {
-        const id = hoveredEl.getAttribute("data-aqb-id");
+        const id = hoveredEl.getAttribute("data-buildrick-id");
         // Don't show hover on already selected element
         if (id && id !== selectedId) {
           devLogger.hover("enter", { elementId: id });

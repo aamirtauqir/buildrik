@@ -314,8 +314,8 @@ export class GSAPEngine {
     let element = document.getElementById(target);
     if (element) return element;
 
-    // Try as data-aqb-id (primary for Aquibra)
-    element = document.querySelector(`[data-aqb-id="${target}"]`);
+    // Try as data-buildrick-id (primary for Aquibra)
+    element = document.querySelector(`[data-buildrick-id="${target}"]`);
     if (element) return element;
 
     // Try as data-element-id (legacy)

@@ -129,10 +129,10 @@ export function getElementBoundsWithSpacing(
  */
 export function getAllElementBounds(excludeId: string): TransformRect[] {
   const bounds: TransformRect[] = [];
-  const elements = document.querySelectorAll("[data-aqb-id]");
+  const elements = document.querySelectorAll("[data-buildrick-id]");
 
   elements.forEach((el) => {
-    const id = el.getAttribute("data-aqb-id");
+    const id = el.getAttribute("data-buildrick-id");
     if (id && id !== excludeId) {
       const elBounds = getElementBounds(el as HTMLElement);
       if (elBounds) bounds.push(elBounds);

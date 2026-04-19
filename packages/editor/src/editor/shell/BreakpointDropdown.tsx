@@ -257,7 +257,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
               <span
                 style={{
                   fontSize: 12,
-                  color: "var(--aqb-text-muted)",
+                  color: "var(--buildrick-text-muted)",
                   flexShrink: 0,
                 }}
               >

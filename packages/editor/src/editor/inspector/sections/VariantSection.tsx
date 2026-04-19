@@ -43,7 +43,7 @@ const styles = {
   propertyLabel: {
     fontSize: 12,
     fontWeight: 500,
-    color: "var(--aqb-text-secondary)",
+    color: "var(--buildrick-text-secondary)",
     textTransform: "uppercase" as const,
     letterSpacing: "0.5px",
   },
@@ -55,9 +55,9 @@ const styles = {
   chip: (isSelected: boolean): React.CSSProperties => ({
     padding: "6px 12px",
     borderRadius: 6,
-    border: isSelected ? "1px solid var(--aqb-primary)" : "1px solid var(--aqb-border)",
-    background: isSelected ? "var(--aqb-primary-light)" : "var(--aqb-surface-3)",
-    color: isSelected ? "var(--aqb-primary)" : "var(--aqb-text-secondary)",
+    border: isSelected ? "1px solid var(--buildrick-accent)" : "1px solid var(--buildrick-border)",
+    background: isSelected ? "var(--buildrick-accent-subtle)" : "var(--buildrick-surface-3)",
+    color: isSelected ? "var(--buildrick-accent)" : "var(--buildrick-text-secondary)",
     fontSize: 12,
     fontWeight: isSelected ? 600 : 400,
     cursor: "pointer",
@@ -65,10 +65,10 @@ const styles = {
   }),
   noVariants: {
     padding: 12,
-    background: "var(--aqb-surface-2)",
+    background: "var(--buildrick-surface-2)",
     borderRadius: 8,
     fontSize: 12,
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
     textAlign: "center" as const,
   },
   componentName: {
@@ -86,13 +86,13 @@ const styles = {
   componentLabel: {
     fontSize: 12,
     fontWeight: 600,
-    color: "var(--aqb-text-primary)",
+    color: "var(--buildrick-text-primary)",
   },
   hint: {
     fontSize: 12,
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
     padding: "8px 0 0",
-    borderTop: "1px solid var(--aqb-border)",
+    borderTop: "1px solid var(--buildrick-border)",
     marginTop: 8,
   },
 };

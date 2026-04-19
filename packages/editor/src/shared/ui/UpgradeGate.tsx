@@ -108,14 +108,14 @@ const blurredContentStyle: React.CSSProperties = {
 const messageStyle: React.CSSProperties = {
   margin: 0,
   fontSize: 13,
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   textAlign: "center",
   maxWidth: 200,
 };
 
 const upgradeButtonStyle: React.CSSProperties = {
   padding: "8px 20px",
-  background: "var(--aqb-primary)",
+  background: "var(--buildrick-accent)",
   color: "#fff",
   border: "none",
   borderRadius: 6,

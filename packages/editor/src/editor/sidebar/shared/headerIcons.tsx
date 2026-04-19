@@ -17,7 +17,7 @@ export const PinIcon: React.FC<{ isPinned: boolean }> = ({ isPinned }) => (
     strokeWidth="1.5"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={isPinned ? "aqb-pin-icon--pinned" : "aqb-pin-icon"}
+    className={isPinned ? "buildrick-pin-icon--pinned" : "buildrick-pin-icon"}
   >
     <path d="M3 6l3-3 4 4-1 3 4 4-1 1-4-4-3 1-4-4 2-2z" />
     <path d="M5 11l-2 2" />
@@ -104,7 +104,7 @@ export const CheckIcon: React.FC = () => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    style={{ marginLeft: "auto", color: "var(--aqb-primary)" }}
+    style={{ marginLeft: "auto", color: "var(--buildrick-accent)" }}
   >
     <path d="M3 7l3 3 5-5" />
   </svg>

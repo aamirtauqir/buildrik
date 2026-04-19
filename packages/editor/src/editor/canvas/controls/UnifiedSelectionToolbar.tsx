@@ -100,7 +100,7 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
       const canvas = canvasRef.current;
       if (!canvas) return;
 
-      const el = canvas.querySelector(`[data-aqb-id="${elementId}"]`) as HTMLElement;
+      const el = canvas.querySelector(`[data-buildrick-id="${elementId}"]`) as HTMLElement;
       if (!el) return;
 
       const canvasRect = canvas.getBoundingClientRect();
@@ -121,7 +121,7 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
     updatePosition();
 
     const observer = new ResizeObserver(updatePosition);
-    const el = canvasRef.current.querySelector(`[data-aqb-id="${elementId}"]`);
+    const el = canvasRef.current.querySelector(`[data-buildrick-id="${elementId}"]`);
     if (el) observer.observe(el);
 
     window.addEventListener("scroll", updatePosition, { capture: true, passive: true });
@@ -261,7 +261,7 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
   return (
     <div
       ref={toolbarRef}
-      className="aqb-unified-toolbar"
+      className="buildrick-unified-toolbar"
       onMouseDown={stopPropagation}
       onClick={stopPropagation}
       style={{

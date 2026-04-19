@@ -119,7 +119,7 @@ export const SliderInput: React.FC<SliderInputProps> = ({
 
   const labelStyles: React.CSSProperties = {
     fontSize: 12,
-    color: "var(--aqb-text-tertiary)",
+    color: "var(--buildrick-text-tertiary)",
     fontWeight: 500,
     textTransform: "uppercase",
     letterSpacing: "0.05em",
@@ -129,13 +129,13 @@ export const SliderInput: React.FC<SliderInputProps> = ({
     display: "flex",
     alignItems: "center",
     gap: 8,
-    background: "var(--aqb-input-bg)",
-    borderRadius: "var(--aqb-radius-sm)",
+    background: "var(--buildrick-input-bg)",
+    borderRadius: "var(--buildrick-design-radius-sm)",
     padding: "4px 8px",
-    border: "1px solid var(--aqb-input-border)",
+    border: "1px solid var(--buildrick-design-input-border)",
     cursor: disabled ? "not-allowed" : isDragging ? "ew-resize" : "default",
     opacity: disabled ? 0.5 : 1,
-    transition: "all var(--aqb-transition-fast)",
+    transition: "all var(--buildrick-transition-fast)",
   };
 
   const valueDisplayStyles: React.CSSProperties = {
@@ -143,7 +143,7 @@ export const SliderInput: React.FC<SliderInputProps> = ({
     textAlign: "right",
     fontSize: 12,
     fontWeight: 500,
-    color: "var(--aqb-text-primary)",
+    color: "var(--buildrick-text-primary)",
     cursor: disabled ? "not-allowed" : "ew-resize",
     userSelect: "none",
   };
@@ -152,7 +152,7 @@ export const SliderInput: React.FC<SliderInputProps> = ({
     width: 50,
     background: "transparent",
     border: "none",
-    color: "var(--aqb-text-primary)",
+    color: "var(--buildrick-text-primary)",
     fontSize: 12,
     fontWeight: 500,
     textAlign: "right",
@@ -162,7 +162,7 @@ export const SliderInput: React.FC<SliderInputProps> = ({
   const sliderTrackStyles: React.CSSProperties = {
     flex: 1,
     height: 4,
-    background: "var(--aqb-surface-4)",
+    background: "var(--buildrick-surface-4)",
     borderRadius: 2,
     position: "relative",
     overflow: "hidden",
@@ -174,19 +174,19 @@ export const SliderInput: React.FC<SliderInputProps> = ({
     top: 0,
     height: "100%",
     width: `${percentage}%`,
-    background: "var(--aqb-primary)",
+    background: "var(--buildrick-accent)",
     borderRadius: 2,
-    transition: isDragging ? "none" : "width var(--aqb-transition-fast)",
+    transition: isDragging ? "none" : "width var(--buildrick-transition-fast)",
   };
 
   const unitStyles: React.CSSProperties = {
     fontSize: 12,
-    color: "var(--aqb-text-muted)",
+    color: "var(--buildrick-text-muted)",
     marginLeft: 2,
   };
 
   return (
-    <div className={`aqb-slider-input ${className}`} style={containerStyles}>
+    <div className={`buildrick-slider-input ${className}`} style={containerStyles}>
       {label && <span style={labelStyles}>{label}</span>}
       <div style={inputWrapperStyles} onMouseDown={handleMouseDown}>
         <div style={sliderTrackStyles}>

@@ -35,7 +35,7 @@ export function OnboardingEmptyState({
       aria-label="Upload area — drag files here or click to browse"
     >
       <div className="med-empty-icon" aria-hidden="true">
-        <Upload size={48} color="var(--aqb-text-muted)" />
+        <Upload size={48} color="var(--buildrick-text-muted)" />
       </div>
       <h3 className="med-empty-title">{msg.title}</h3>
       <p className="med-empty-sub">{msg.sub}</p>

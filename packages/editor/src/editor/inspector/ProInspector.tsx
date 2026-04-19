@@ -116,7 +116,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       const pseudoStates = ["hover", "focus", "active", "disabled"] as const;
       const withOverrides = new Set<import("../../shared/types").PseudoStateId>();
       pseudoStates.forEach((state) => {
-        const rule = composer.styles.getRule(`[data-aqb-id="${selectedElement.id}"]:${state}`);
+        const rule = composer.styles.getRule(`[data-buildrick-id="${selectedElement.id}"]:${state}`);
         if (rule && Object.keys(rule.properties ?? {}).length > 0) {
           withOverrides.add(state);
         }
@@ -332,7 +332,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           border: "none",
           padding: "5px 14px",
           fontSize: 11,
-          color: "var(--aqb-text-muted)",
+          color: "var(--buildrick-text-muted)",
           cursor: "pointer",
           textAlign: "left",
           width: "100%",
@@ -376,9 +376,9 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
                 border: "none",
                 cursor: "pointer",
                 padding: 0,
-                fontFamily: "var(--aqb-font-mono)",
+                fontFamily: "var(--buildrick-design-font-mono)",
                 fontSize: 11,
-                color: idCopied ? "var(--aqb-success)" : "var(--aqb-text-tertiary)",
+                color: idCopied ? "var(--buildrick-success)" : "var(--buildrick-text-tertiary)",
                 transition: "color 0.2s",
                 display: "flex",
                 alignItems: "center",
@@ -398,7 +398,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
                 <span
                   aria-live="polite"
                   style={{
-                    color: "var(--aqb-success)",
+                    color: "var(--buildrick-success)",
                     fontWeight: 600,
                   }}
                 >
@@ -461,9 +461,9 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               marginTop: 6,
               padding: "4px 10px",
               background: "transparent",
-              border: "1px dashed var(--aqb-border)",
+              border: "1px dashed var(--buildrick-border)",
               borderRadius: 6,
-              color: "var(--aqb-text-tertiary)",
+              color: "var(--buildrick-text-tertiary)",
               fontSize: 11,
               fontWeight: 500,
               cursor: "pointer",
@@ -471,12 +471,12 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               transition: "color 0.15s, border-color 0.15s",
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.color = "var(--aqb-text-primary)";
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--aqb-text-tertiary)";
+              (e.currentTarget as HTMLElement).style.color = "var(--buildrick-text-primary)";
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--buildrick-text-tertiary)";
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.color = "var(--aqb-text-tertiary)";
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--aqb-border)";
+              (e.currentTarget as HTMLElement).style.color = "var(--buildrick-text-tertiary)";
+              (e.currentTarget as HTMLElement).style.borderColor = "var(--buildrick-border)";
             }}
           >
             + state override
@@ -489,8 +489,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "var(--aqb-space-2)",
-          padding: "6px var(--aqb-space-3)",
+          gap: "var(--buildrick-design-space-2)",
+          padding: "6px var(--buildrick-design-space-3)",
         }}
       >
         <div style={{ flex: 1 }}>

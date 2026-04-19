@@ -105,7 +105,7 @@ const TOGGLE_PILL_CONTAINER: React.CSSProperties = {
   gap: 2,
   padding: 2,
   background: "rgba(255,255,255,0.04)",
-  border: "1px solid var(--aqb-border)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 999,
   marginBottom: 8,
 };
@@ -114,7 +114,7 @@ const TOGGLE_PILL_BTN: React.CSSProperties = {
   padding: "4px 10px",
   fontSize: 11,
   fontWeight: 500,
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
   background: "transparent",
   border: "none",
   borderRadius: 999,
@@ -124,7 +124,7 @@ const TOGGLE_PILL_BTN: React.CSSProperties = {
 
 const TOGGLE_PILL_ACTIVE: React.CSSProperties = {
   ...TOGGLE_PILL_BTN,
-  background: "var(--aqb-primary)",
+  background: "var(--buildrick-accent)",
   color: "#fff",
 };
 
@@ -226,7 +226,7 @@ function CompareView({
             <span className="diff-summary-badge content">{summary.content} content</span>
           )}
           {summary.other > 0 && (
-            <span className="diff-summary-badge" style={{ background: "rgba(144,141,133,0.15)", color: "var(--aqb-text-muted)" }}>
+            <span className="diff-summary-badge" style={{ background: "rgba(144,141,133,0.15)", color: "var(--buildrick-text-muted)" }}>
               {summary.other} other
             </span>
           )}
@@ -235,7 +235,7 @@ function CompareView({
 
       {/* Page-level add/remove counts (Wave 1 CompareSummary fields) */}
       {summary && (summary.pagesAdded > 0 || summary.pagesDeleted > 0) && (
-        <p style={{ fontSize: 11, color: "var(--aqb-text-muted)", margin: "4px 0 0" }}>
+        <p style={{ fontSize: 11, color: "var(--buildrick-text-muted)", margin: "4px 0 0" }}>
           {summary.pagesAdded > 0 && `${summary.pagesAdded} page${summary.pagesAdded === 1 ? "" : "s"} added`}
           {summary.pagesAdded > 0 && summary.pagesDeleted > 0 && ", "}
           {summary.pagesDeleted > 0 && `${summary.pagesDeleted} page${summary.pagesDeleted === 1 ? "" : "s"} removed`}
@@ -264,7 +264,7 @@ function CompareView({
             </div>
           ))}
           {changes.length > 20 && (
-            <p style={{ fontSize: 11, color: "var(--aqb-text-muted)", marginTop: 4 }}>
+            <p style={{ fontSize: 11, color: "var(--buildrick-text-muted)", marginTop: 4 }}>
               +{changes.length - 20} more changes
             </p>
           )}
@@ -367,7 +367,7 @@ function VersionRow({
               <span className="version-time">{formatTime(version.createdAt)}</span>
               <span>{relative}</span>
               {elementCount > 0 && (
-                <span className="entry-badge" style={{ background: "rgba(45,109,255,0.12)", color: "var(--aqb-primary)" }}>
+                <span className="entry-badge" style={{ background: "rgba(45,109,255,0.12)", color: "var(--buildrick-accent)" }}>
                   {elementCount} el
                 </span>
               )}
@@ -446,9 +446,9 @@ const TOAST_BASE_STYLE: React.CSSProperties = {
   borderRadius: 8,
   fontSize: 12,
   lineHeight: 1.4,
-  color: "var(--aqb-text-primary)",
-  background: "var(--aqb-surface-3, #1a1a24)",
-  border: "1px solid var(--aqb-border)",
+  color: "var(--buildrick-text-primary)",
+  background: "var(--buildrick-surface-3, #1a1a24)",
+  border: "1px solid var(--buildrick-border)",
   boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
   pointerEvents: "auto",
   animation: "fadeIn 150ms ease-out",
@@ -906,11 +906,11 @@ export function VersionHistoryPanel({
           <div className="save-form open">
             <div className="form-row">
               <div className="form-field" style={{ flex: 1 }}>
-                <label className="form-label" htmlFor="aqb-save-name">
+                <label className="form-label" htmlFor="buildrick-save-name">
                   Version name *
                 </label>
                 <input
-                  id="aqb-save-name"
+                  id="buildrick-save-name"
                   type="text"
                   value={newVersionName}
                   onChange={(e) => setNewVersionName(e.target.value)}

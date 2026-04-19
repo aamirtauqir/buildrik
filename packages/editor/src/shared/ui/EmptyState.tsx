@@ -77,8 +77,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     justifyContent: "center",
     textAlign: "center",
     padding: sizes.padding,
-    borderRadius: "var(--aqb-radius-lg, 12px)",
-    transition: "all var(--aqb-transition-normal, 250ms ease)",
+    borderRadius: "var(--buildrick-design-radius-lg, 12px)",
+    transition: "all var(--buildrick-transition-normal, 250ms ease)",
   };
 
   const variantStyles: Record<string, React.CSSProperties> = {
@@ -88,7 +88,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     },
     dashed: {
       background: "transparent",
-      border: "1px dashed var(--aqb-border, #334155)",
+      border: "1px dashed var(--buildrick-border, #334155)",
     },
     minimal: {
       background: "transparent",
@@ -98,14 +98,14 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
   return (
     <div
-      className={`aqb-empty-state aqb-empty-state-${size} aqb-empty-state-${variant} ${className}`}
+      className={`buildrick-empty-state buildrick-empty-state-${size} buildrick-empty-state-${variant} ${className}`}
       style={{ ...baseStyles, ...variantStyles[variant] }}
       role="status"
       aria-label={title}
     >
       {icon && (
         <div
-          className="aqb-empty-state-icon"
+          className="buildrick-empty-state-icon"
           style={{
             fontSize: sizes.iconSize,
             marginBottom: sizes.gap,
@@ -119,11 +119,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       )}
 
       <h3
-        className="aqb-empty-state-title"
+        className="buildrick-empty-state-title"
         style={{
           fontSize: sizes.titleSize,
           fontWeight: 600,
-          color: "var(--aqb-text-primary, #f8fafc)",
+          color: "var(--buildrick-text-primary, #f8fafc)",
           marginBottom: description ? sizes.gap / 2 : 0,
           margin: 0,
         }}
@@ -133,10 +133,10 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
       {description && (
         <p
-          className="aqb-empty-state-desc"
+          className="buildrick-empty-state-desc"
           style={{
             fontSize: sizes.descSize,
-            color: "var(--aqb-text-muted, #64748b)",
+            color: "var(--buildrick-text-muted, #64748b)",
             maxWidth: 300,
             lineHeight: 1.5,
             margin: 0,
@@ -149,7 +149,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
       {(action || secondaryAction) && (
         <div
-          className="aqb-empty-state-actions"
+          className="buildrick-empty-state-actions"
           style={{
             display: "flex",
             alignItems: "center",
@@ -173,7 +173,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
               style={{
                 background: "transparent",
                 border: "none",
-                color: "var(--aqb-text-secondary, #94a3b8)",
+                color: "var(--buildrick-text-secondary, #94a3b8)",
                 fontSize: size === "sm" ? 12 : 13,
                 cursor: "pointer",
                 textDecoration: "underline",

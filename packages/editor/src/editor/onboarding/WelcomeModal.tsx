@@ -40,12 +40,12 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
     >
       <div
         style={{
-          background: "var(--aqb-surface-elevated, #1a1b1e)",
+          background: "var(--buildrick-surface-elevated, #1a1b1e)",
           borderRadius: 16,
           padding: 40,
           maxWidth: 640,
           width: "90%",
-          color: "var(--aqb-text, #fff)",
+          color: "var(--buildrick-text, #fff)",
         }}
       >
         <h1
@@ -54,7 +54,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
         >
           Welcome to Buildrik
         </h1>
-        <p style={{ color: "var(--aqb-text-muted, #9ca3af)", marginBottom: 32, marginTop: 8 }}>
+        <p style={{ color: "var(--buildrick-text-muted, #9ca3af)", marginBottom: 32, marginTop: 8 }}>
           Start with a template — or build from scratch.
         </p>
 
@@ -71,8 +71,8 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
               key={t.id}
               onClick={() => onSelectTemplate(t.id)}
               style={{
-                background: "var(--aqb-surface-2, #2a2b2e)",
-                border: "1px solid var(--aqb-border, rgba(255,255,255,0.1))",
+                background: "var(--buildrick-surface-2, #2a2b2e)",
+                border: "1px solid var(--buildrick-border, rgba(255,255,255,0.1))",
                 borderRadius: 10,
                 padding: "16px 12px",
                 cursor: "pointer",
@@ -83,13 +83,13 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
               <div
                 style={{
                   height: 80,
-                  background: "var(--aqb-surface-3, #3a3b3e)",
+                  background: "var(--buildrick-surface-3, #3a3b3e)",
                   borderRadius: 6,
                   marginBottom: 10,
                 }}
               />
               <div style={{ fontSize: 13, fontWeight: 600 }}>{t.name}</div>
-              <div style={{ fontSize: 11, color: "var(--aqb-text-muted, #9ca3af)" }}>
+              <div style={{ fontSize: 11, color: "var(--buildrick-text-muted, #9ca3af)" }}>
                 {t.tag}
               </div>
             </button>
@@ -102,7 +102,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
             width: "100%",
             padding: "12px 24px",
             borderRadius: 8,
-            background: "var(--aqb-accent, #3b82f6)",
+            background: "var(--buildrick-accent, #3b82f6)",
             color: "#fff",
             border: "none",
             cursor: "pointer",

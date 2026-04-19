@@ -32,7 +32,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 }) => {
   return (
     <section
-      className="aqb-hero-section"
+      className="buildrick-hero-section"
       style={{
         position: "relative",
         display: "flex",
@@ -86,7 +86,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             style={{
               display: "inline-block",
               padding: "14px 32px",
-              background: "var(--aqb-primary, #00d4aa)",
+              background: "var(--buildrick-accent, #00d4aa)",
               color: "#fff",
               fontSize: 16,
               fontWeight: 600,
@@ -110,11 +110,11 @@ export const heroBlockConfig = {
   elementType: "hero" as const,
   icon: "🦸",
   content:
-    '<section class="aqb-hero-section" data-aqb-type="hero">' +
-    '<div class="aqb-hero-content">' +
+    '<section class="buildrick-hero-section" data-buildrick-type="hero">' +
+    '<div class="buildrick-hero-content">' +
     "<h1>Welcome to Aquibra</h1>" +
     "<p>Build beautiful websites in minutes with our visual composer.</p>" +
-    '<a href="#" class="aqb-hero-button">Get Started</a>' +
+    '<a href="#" class="buildrick-hero-button">Get Started</a>' +
     "</div>" +
     "</section>",
   attributes: {

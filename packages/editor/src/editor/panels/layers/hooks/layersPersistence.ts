@@ -5,14 +5,14 @@
  * to localStorage. States are stored per-page using the page ID.
  *
  * Storage format:
- * - `aqb-layers-{pageId}-hidden`: string[] (array of hidden element IDs)
- * - `aqb-layers-{pageId}-locked`: string[] (array of locked element IDs)
- * - `aqb-layers-{pageId}-names`: Record<string, string> (custom names map)
+ * - `buildrick-layers-{pageId}-hidden`: string[] (array of hidden element IDs)
+ * - `buildrick-layers-{pageId}-locked`: string[] (array of locked element IDs)
+ * - `buildrick-layers-{pageId}-names`: Record<string, string> (custom names map)
  *
  * @license BSD-3-Clause
  */
 
-const STORAGE_PREFIX = "aqb-layers";
+const STORAGE_PREFIX = "buildrick-layers";
 
 /** Get storage key for a specific page and data type */
 export function getStorageKey(
@@ -82,11 +82,11 @@ export function saveMapToStorage(pageId: string, data: Map<string, string>): voi
 /** Apply stored hidden/locked states to canvas DOM elements */
 export function applyStoredStatesToDOM(hiddenIds: Set<string>, lockedIds: Set<string>): void {
   hiddenIds.forEach((id) => {
-    const el = document.querySelector(`[data-aqb-id="${id}"]`) as HTMLElement;
+    const el = document.querySelector(`[data-buildrick-id="${id}"]`) as HTMLElement;
     if (el) el.setAttribute("data-hidden", "true");
   });
   lockedIds.forEach((id) => {
-    const el = document.querySelector(`[data-aqb-id="${id}"]`) as HTMLElement;
+    const el = document.querySelector(`[data-buildrick-id="${id}"]`) as HTMLElement;
     if (el) el.setAttribute("data-locked", "true");
   });
 }

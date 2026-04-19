@@ -69,7 +69,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({
         alignItems: "center",
         gap: 12,
         padding: 12,
-        background: "var(--aqb-bg-panel-secondary)",
+        background: "var(--buildrick-bg-panel-secondary)",
         borderRadius: 8,
         transition: "background 0.2s",
       }}
@@ -80,7 +80,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({
           width: 60,
           height: 45,
           borderRadius: 6,
-          background: "var(--aqb-bg-dark)",
+          background: "var(--buildrick-bg-dark)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -118,7 +118,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({
             <div
               style={{
                 fontSize: 12,
-                color: "var(--aqb-text-muted)",
+                color: "var(--buildrick-text-muted)",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
@@ -225,7 +225,7 @@ export const MyTemplates: React.FC<MyTemplatesProps> = ({
         style={{
           padding: 40,
           textAlign: "center",
-          color: "var(--aqb-text-muted)",
+          color: "var(--buildrick-text-muted)",
         }}
       >
         <div style={{ fontSize: 48, marginBottom: 16 }}>📁</div>
@@ -249,7 +249,7 @@ export const MyTemplates: React.FC<MyTemplatesProps> = ({
       {/* Count */}
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <Badge variant="default">{templates.length}</Badge>
-        <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>
+        <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
           saved template{templates.length !== 1 ? "s" : ""}
         </span>
       </div>

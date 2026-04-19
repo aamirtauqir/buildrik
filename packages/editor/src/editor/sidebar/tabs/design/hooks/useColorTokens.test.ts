@@ -8,7 +8,7 @@ const MOCK_TOKEN: DesignToken = {
   name: "Primary",
   value: "#3B82F6",
   category: "colors",
-  cssVar: "--aqb-color-primary",
+  cssVar: "--buildrick-design-color-primary",
   type: "color",
   group: "brand",
 };
@@ -23,7 +23,7 @@ describe("useColorTokens — addToken", () => {
       name: "CTA",
       value: "#FF6B00",
       category: "colors",
-      cssVar: "--aqb-color-cta",
+      cssVar: "--buildrick-design-color-cta",
       type: "color",
       group: "brand",
     };
@@ -39,7 +39,7 @@ describe("useColorTokens — addToken", () => {
       name: "New",
       value: "#AABBCC",
       category: "colors",
-      cssVar: "--aqb-color-new",
+      cssVar: "--buildrick-design-color-new",
       type: "color",
       group: "brand",
     };

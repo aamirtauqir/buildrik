@@ -8,7 +8,7 @@ const MOCK_SPACING: DesignToken = {
   name: "Space 4",
   value: "16px",
   category: "spacing",
-  cssVar: "--aqb-space-4",
+  cssVar: "--buildrick-design-space-4",
   type: "length",
 };
 

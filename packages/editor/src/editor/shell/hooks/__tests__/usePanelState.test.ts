@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { usePanelState } from "../usePanelState";
 
-const STORAGE_KEY = "aqb-panel-state";
+const STORAGE_KEY = "buildrick-panel-state";
 
 describe("usePanelState", () => {
   beforeEach(() => {

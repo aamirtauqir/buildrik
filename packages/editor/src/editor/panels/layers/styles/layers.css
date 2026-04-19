@@ -11,16 +11,16 @@
 /* ─────────────────────────────────────────────
    LAYER CSS VARIABLES
    ───────────────────────────────────────────── */
-.aqb-layers-panel {
+.buildrick-layers-panel {
   /* Layer Colors - Using theme variables */
-  --layer-accent: var(--aqb-info);
+  --layer-accent: var(--buildrick-info);
   --layer-accent-alpha: rgba(59, 130, 246, 0.15);
   --layer-accent-soft: rgba(59, 130, 246, 0.2);
-  --layer-success: var(--aqb-success);
+  --layer-success: var(--buildrick-success);
   --layer-success-alpha: rgba(34, 197, 94, 0.15);
-  --layer-warning: var(--aqb-accent-amber);
+  --layer-warning: var(--buildrick-accent-amber);
   --layer-warning-alpha: rgba(251, 191, 36, 0.15);
-  --layer-muted: var(--aqb-text-tertiary);
+  --layer-muted: var(--buildrick-text-tertiary);
   --layer-muted-alpha: rgba(100, 116, 139, 0.15);
 
   /* Row Sizing */
@@ -34,39 +34,39 @@
 }
 
 /* Minimal Tree Variant - Maximum content space */
-.aqb-layers-minimal {
+.buildrick-layers-minimal {
   padding: 0;
 }
 
 /* ─────────────────────────────────────────────
    MINIMAL SEARCH ROW (Search + Settings only)
    ───────────────────────────────────────────── */
-.aqb-layers-search-row {
+.buildrick-layers-search-row {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 8px;
   padding: 8px 12px;
-  border-bottom: 1px solid var(--aqb-border);
+  border-bottom: 1px solid var(--buildrick-border);
   flex-shrink: 0;
 }
 
 /* Header row (toolbar buttons + count) sits above the search input so the
    search input gets the full panel width and doesn't get squeezed when the
    sidebar is narrow. */
-.aqb-layers-search-row .aqb-layers-header-row {
+.buildrick-layers-search-row .buildrick-layers-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 4px;
 }
 
-.aqb-layers-search-row .aqb-search-container {
+.buildrick-layers-search-row .buildrick-search-container {
   width: 100%;
   min-width: 0;
 }
 
-.aqb-layers-search-row .aqb-search-input {
+.buildrick-layers-search-row .buildrick-search-input {
   width: 100%;
   min-width: 0;
 }
@@ -74,60 +74,60 @@
 /* ─────────────────────────────────────────────
    MINIMAL TREE VIEW (Full height, scrollable)
    ───────────────────────────────────────────── */
-.aqb-layers-tree-minimal {
+.buildrick-layers-tree-minimal {
   flex: 1;
   overflow-y: auto;
   padding: 0;
-  background: var(--aqb-bg-panel);
+  background: var(--buildrick-bg-panel);
 }
 
 /* ─────────────────────────────────────────────
    LAYER PANEL HEADER
    ───────────────────────────────────────────── */
-.aqb-layers-header {
+.buildrick-layers-header {
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 12px;
-  background: var(--aqb-surface-3);
-  border-radius: var(--aqb-radius-md);
+  background: var(--buildrick-surface-3);
+  border-radius: var(--buildrick-design-radius-md);
   margin-bottom: 8px;
 }
 
-.aqb-layers-header-top {
+.buildrick-layers-header-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.aqb-layers-header-title {
+.buildrick-layers-header-title {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: var(--aqb-font-sm);
+  font-size: var(--buildrick-font-sm);
   font-weight: 600;
-  color: var(--aqb-text-primary);
+  color: var(--buildrick-text-primary);
 }
 
-.aqb-layers-header-icon {
-  color: var(--aqb-text-tertiary);
+.buildrick-layers-header-icon {
+  color: var(--buildrick-text-tertiary);
 }
 
-.aqb-layers-header-count {
-  font-size: var(--aqb-font-xs);
+.buildrick-layers-header-count {
+  font-size: var(--buildrick-font-xs);
   font-weight: 500;
   padding: 2px 8px;
-  background: var(--aqb-accent-purple-alpha);
-  color: var(--aqb-accent-purple);
+  background: var(--buildrick-accent-tint);
+  color: var(--buildrick-accent);
   border-radius: 10px;
 }
 
-.aqb-layers-header-actions {
+.buildrick-layers-header-actions {
   display: flex;
   gap: 4px;
 }
 
-.aqb-layers-settings-btn {
+.buildrick-layers-settings-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -135,21 +135,21 @@
   height: 28px;
   background: transparent;
   border: none;
-  border-radius: var(--aqb-radius-sm);
-  color: var(--aqb-text-tertiary);
+  border-radius: var(--buildrick-design-radius-sm);
+  color: var(--buildrick-text-tertiary);
   cursor: pointer;
-  transition: var(--aqb-transition-fast);
+  transition: var(--buildrick-transition-fast);
 }
 
-.aqb-layers-settings-btn:hover {
-  background: var(--aqb-surface-4);
-  color: var(--aqb-text-primary);
+.buildrick-layers-settings-btn:hover {
+  background: var(--buildrick-surface-4);
+  color: var(--buildrick-text-primary);
 }
 
 /* ─────────────────────────────────────────────
    LAYER ROW (Updated with CSS vars)
    ───────────────────────────────────────────── */
-.aqb-layer-row {
+.buildrick-layer-row {
   position: relative;
   display: flex;
   align-items: center;
@@ -158,51 +158,51 @@
   padding: 0 8px;
   border-radius: 0;
   cursor: pointer;
-  transition: var(--aqb-transition-fast);
+  transition: var(--buildrick-transition-fast);
   font-size: 12px;
   font-weight: 400;
-  color: var(--aqb-text-secondary);
+  color: var(--buildrick-text-secondary);
   background: transparent;
 }
 
-.aqb-layer-row:hover {
-  background: var(--aqb-bg-hover);
+.buildrick-layer-row:hover {
+  background: var(--buildrick-bg-hover);
 }
 
-.aqb-layer-row.is-selected {
-  background: var(--aqb-primary-subtle);
+.buildrick-layer-row.is-selected {
+  background: var(--buildrick-accent-tint);
   font-weight: 500;
-  color: var(--aqb-text-primary);
+  color: var(--buildrick-text-primary);
 }
 
 /* Selected left bar indicator */
-.aqb-layer-row.is-selected::before {
+.buildrick-layer-row.is-selected::before {
   content: "";
   position: absolute;
   left: 0;
   top: 0;
   bottom: 0;
   width: 2px;
-  background: var(--aqb-primary);
+  background: var(--buildrick-accent);
   border-radius: 0 1px 1px 0;
 }
 
-.aqb-layer-row.is-dragging {
+.buildrick-layer-row.is-dragging {
   opacity: 0.5;
 }
 
 /* WCAG 2.1 AA: Focus visible for keyboard navigation in layer tree */
-.aqb-layer-row:focus-visible {
-  outline: 2px solid var(--aqb-primary);
+.buildrick-layer-row:focus-visible {
+  outline: 2px solid var(--buildrick-accent);
   outline-offset: -2px;
-  border-radius: var(--aqb-radius-sm);
+  border-radius: var(--buildrick-design-radius-sm);
   z-index: 1;
 }
 
 /* ─────────────────────────────────────────────
    LAYER TOGGLE (Expand/Collapse)
    ───────────────────────────────────────────── */
-.aqb-layer-toggle {
+.buildrick-layer-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -210,35 +210,35 @@
   height: 16px;
   background: transparent;
   border: none;
-  border-radius: var(--aqb-radius-xs);
-  color: var(--aqb-text-muted);
+  border-radius: var(--buildrick-radius-xs);
+  color: var(--buildrick-text-muted);
   cursor: pointer;
-  transition: var(--aqb-transition-fast);
+  transition: var(--buildrick-transition-fast);
   flex-shrink: 0;
 }
 
-.aqb-layer-toggle:hover {
-  color: var(--aqb-text-primary);
+.buildrick-layer-toggle:hover {
+  color: var(--buildrick-text-primary);
 }
 
-.aqb-layer-toggle svg {
+.buildrick-layer-toggle svg {
   width: 10px;
   height: 10px;
   transition: transform 0.15s ease;
 }
 
-.aqb-layer-toggle.collapsed svg {
+.buildrick-layer-toggle.collapsed svg {
   transform: rotate(-90deg);
 }
 
 /* Placeholder for leaf nodes (no children) */
-.aqb-layer-toggle-placeholder {
+.buildrick-layer-toggle-placeholder {
   width: 16px;
   height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--aqb-text-muted);
+  color: var(--buildrick-text-muted);
   font-size: 8px;
   flex-shrink: 0;
 }
@@ -246,18 +246,18 @@
 /* ─────────────────────────────────────────────
    LAYER ICON (Type-based) — 14×14, 6px right of chevron
    ───────────────────────────────────────────── */
-.aqb-layer-icon {
+.buildrick-layer-icon {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 14px;
   height: 14px;
   flex-shrink: 0;
-  color: var(--aqb-text-muted);
+  color: var(--buildrick-text-muted);
   margin-left: 6px;
 }
 
-.aqb-layer-icon svg {
+.buildrick-layer-icon svg {
   width: 14px;
   height: 14px;
 }
@@ -265,63 +265,63 @@
 /* ─────────────────────────────────────────────
    LAYER NAME & TYPE TAG
    ───────────────────────────────────────────── */
-.aqb-layer-name {
+.buildrick-layer-name {
   flex: 1;
   min-width: 0;
   font-size: 12px;
   font-weight: 400;
-  color: var(--aqb-text-secondary);
+  color: var(--buildrick-text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.aqb-layer-row.is-selected .aqb-layer-name {
+.buildrick-layer-row.is-selected .buildrick-layer-name {
   font-weight: 500;
-  color: var(--aqb-text-primary);
+  color: var(--buildrick-text-primary);
 }
 
-.aqb-layer-type {
-  font-size: var(--aqb-text-xs);
+.buildrick-layer-type {
+  font-size: var(--buildrick-text-xs);
   font-weight: 500;
-  color: var(--aqb-text-muted);
+  color: var(--buildrick-text-muted);
   padding: 1px 6px;
-  background: var(--aqb-surface-4);
-  border-radius: var(--aqb-radius-xs);
+  background: var(--buildrick-surface-4);
+  border-radius: var(--buildrick-radius-xs);
   flex-shrink: 0;
 }
 
-.aqb-layer-id {
-  font-size: var(--aqb-text-2xs-plus);
-  color: var(--aqb-text-muted);
-  font-family: var(--aqb-font-mono);
+.buildrick-layer-id {
+  font-size: var(--buildrick-text-2xs-plus);
+  color: var(--buildrick-text-muted);
+  font-family: var(--buildrick-design-font-mono);
   opacity: 0.6;
 }
 
 /* ─────────────────────────────────────────────
    COMPONENT BADGE
    ───────────────────────────────────────────── */
-.aqb-component-badge {
+.buildrick-component-badge {
   display: flex;
   align-items: center;
   gap: 3px;
   padding: 1px 6px;
-  background: var(--aqb-accent-purple-alpha);
-  color: var(--aqb-accent-purple);
-  border-radius: var(--aqb-radius-xs);
-  font-size: var(--aqb-text-2xs-plus);
+  background: var(--buildrick-accent-tint);
+  color: var(--buildrick-accent);
+  border-radius: var(--buildrick-radius-xs);
+  font-size: var(--buildrick-text-2xs-plus);
   font-weight: 600;
   flex-shrink: 0;
 }
 
-.aqb-component-badge-icon {
-  font-size: var(--aqb-text-xs);
+.buildrick-component-badge-icon {
+  font-size: var(--buildrick-text-xs);
 }
 
 /* ─────────────────────────────────────────────
    LAYER ACTIONS (Eye/Lock — visible on row hover only)
    ───────────────────────────────────────────── */
-.aqb-layer-actions {
+.buildrick-layer-actions {
   display: flex;
   gap: 2px;
   margin-left: auto;
@@ -329,11 +329,11 @@
   transition: opacity 0.15s ease;
 }
 
-.aqb-layer-row:hover .aqb-layer-actions {
+.buildrick-layer-row:hover .buildrick-layer-actions {
   opacity: 1;
 }
 
-.aqb-layer-action-btn {
+.buildrick-layer-action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -341,67 +341,67 @@
   height: 22px;
   border: none;
   background: transparent;
-  border-radius: var(--aqb-radius-xs);
+  border-radius: var(--buildrick-radius-xs);
   cursor: pointer;
-  color: var(--aqb-text-muted);
-  transition: var(--aqb-transition-fast);
+  color: var(--buildrick-text-muted);
+  transition: var(--buildrick-transition-fast);
 }
 
-.aqb-layer-action-btn svg {
+.buildrick-layer-action-btn svg {
   width: 14px;
   height: 14px;
 }
 
-.aqb-layer-action-btn:hover {
-  color: var(--aqb-text-primary);
+.buildrick-layer-action-btn:hover {
+  color: var(--buildrick-text-primary);
 }
 
 /* ─────────────────────────────────────────────
    HIDDEN STATE - Show eye button always when hidden
    ───────────────────────────────────────────── */
-.aqb-layer-row.is-hidden {
+.buildrick-layer-row.is-hidden {
   opacity: 0.5;
 }
 
-.aqb-layer-row.is-hidden .aqb-layer-name {
-  color: var(--aqb-text-muted);
+.buildrick-layer-row.is-hidden .buildrick-layer-name {
+  color: var(--buildrick-text-muted);
 }
 
-.aqb-layer-row.is-hidden .aqb-layer-actions {
+.buildrick-layer-row.is-hidden .buildrick-layer-actions {
   opacity: 1;
 }
 
-.aqb-layer-row.is-hidden .aqb-layer-action-btn:first-child {
+.buildrick-layer-row.is-hidden .buildrick-layer-action-btn:first-child {
   color: var(--layer-warning);
 }
 
-.aqb-layer-row.is-hidden .aqb-layer-action-btn:first-child:hover {
+.buildrick-layer-row.is-hidden .buildrick-layer-action-btn:first-child:hover {
   background: var(--layer-warning-alpha);
 }
 
 /* ─────────────────────────────────────────────
    LOCKED STATE - Show lock button always when locked
    ───────────────────────────────────────────── */
-.aqb-layer-row.is-locked {
+.buildrick-layer-row.is-locked {
   cursor: not-allowed;
 }
 
-.aqb-layer-row.is-locked .aqb-layer-actions {
+.buildrick-layer-row.is-locked .buildrick-layer-actions {
   opacity: 1;
 }
 
-.aqb-layer-row.is-locked .aqb-layer-action-btn:last-child {
+.buildrick-layer-row.is-locked .buildrick-layer-action-btn:last-child {
   color: var(--layer-muted);
 }
 
-.aqb-layer-row.is-locked .aqb-layer-action-btn:last-child:hover {
+.buildrick-layer-row.is-locked .buildrick-layer-action-btn:last-child:hover {
   background: var(--layer-muted-alpha);
 }
 
 /* ─────────────────────────────────────────────
-   DROP INDICATORS — PRD §9.6: 2px line, aqb-primary color
+   DROP INDICATORS — PRD §9.6: 2px line, buildrick-primary color
    ───────────────────────────────────────────── */
-.aqb-drop-indicator {
+.buildrick-drop-indicator {
   position: absolute;
   left: 0;
   right: 0;
@@ -409,66 +409,66 @@
   z-index: 10;
 }
 
-.aqb-drop-before {
+.buildrick-drop-before {
   top: 0;
   height: 2px;
-  background: var(--aqb-primary);
+  background: var(--buildrick-accent);
   border-radius: 1px;
 }
 
-.aqb-drop-after {
+.buildrick-drop-after {
   bottom: 0;
   height: 2px;
-  background: var(--aqb-primary);
+  background: var(--buildrick-accent);
   border-radius: 1px;
 }
 
-.aqb-drop-inside {
+.buildrick-drop-inside {
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  border: 2px solid var(--aqb-primary);
-  background: var(--aqb-primary-subtle);
-  border-radius: var(--aqb-radius-sm);
+  border: 2px solid var(--buildrick-accent);
+  background: var(--buildrick-accent-tint);
+  border-radius: var(--buildrick-design-radius-sm);
 }
 
 /* ─────────────────────────────────────────────
    BIDIRECTIONAL HOVER HIGHLIGHT
    ───────────────────────────────────────────── */
-.aqb-layer-row.is-canvas-hovered,
-.aqb-layer-row.is-layer-hovered {
-  background: var(--aqb-bg-hover) !important;
+.buildrick-layer-row.is-canvas-hovered,
+.buildrick-layer-row.is-layer-hovered {
+  background: var(--buildrick-bg-hover) !important;
   outline: 1px solid rgba(99, 102, 241, 0.3);
   outline-offset: -1px;
 }
 
-.aqb-layer-row.is-canvas-hovered::before {
+.buildrick-layer-row.is-canvas-hovered::before {
   content: "";
   position: absolute;
   left: 0;
   top: 0;
   bottom: 0;
   width: 2px;
-  background: var(--aqb-primary);
+  background: var(--buildrick-accent);
   border-radius: 0 1px 1px 0;
 }
 
 /* ─────────────────────────────────────────────
    LAYER NAME INPUT (Editing)
    ───────────────────────────────────────────── */
-.aqb-layer-name-input {
+.buildrick-layer-name-input {
   width: 100%;
   padding: 2px 6px;
   border: 1px solid var(--layer-accent);
-  border-radius: var(--aqb-radius-xs);
+  border-radius: var(--buildrick-radius-xs);
   background: var(--layer-accent-alpha);
   color: inherit;
-  font-size: var(--aqb-font-xs);
+  font-size: var(--buildrick-font-xs);
   outline: none;
 }
 
-.aqb-layer-name-input:focus {
+.buildrick-layer-name-input:focus {
   border-color: var(--layer-success);
   box-shadow: 0 0 0 2px var(--layer-success-alpha);
 }
@@ -476,7 +476,7 @@
 /* ─────────────────────────────────────────────
    TREE DEPTH LINES
    ───────────────────────────────────────────── */
-.aqb-layer-tree-lines {
+.buildrick-layer-tree-lines {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -484,7 +484,7 @@
   pointer-events: none;
 }
 
-.aqb-tree-line {
+.buildrick-tree-line {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -495,48 +495,48 @@
 /* ─────────────────────────────────────────────
    MULTI-SELECT TOOLBAR
    ───────────────────────────────────────────── */
-.aqb-multiselect-toolbar {
+.buildrick-multiselect-toolbar {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: var(--aqb-surface-4);
-  border-radius: var(--aqb-radius-md);
+  background: var(--buildrick-surface-4);
+  border-radius: var(--buildrick-design-radius-md);
   margin-bottom: 8px;
 }
 
-.aqb-multiselect-count {
-  font-size: var(--aqb-font-xs);
+.buildrick-multiselect-count {
+  font-size: var(--buildrick-font-xs);
   font-weight: 500;
-  color: var(--aqb-text-secondary);
+  color: var(--buildrick-text-secondary);
 }
 
-.aqb-multiselect-actions {
+.buildrick-multiselect-actions {
   display: flex;
   gap: 4px;
   margin-left: auto;
 }
 
-.aqb-multiselect-btn {
+.buildrick-multiselect-btn {
   display: flex;
   align-items: center;
   gap: 4px;
   padding: 4px 8px;
-  background: var(--aqb-surface-3);
+  background: var(--buildrick-surface-3);
   border: none;
-  border-radius: var(--aqb-radius-sm);
-  font-size: var(--aqb-font-xs);
-  color: var(--aqb-text-primary);
+  border-radius: var(--buildrick-design-radius-sm);
+  font-size: var(--buildrick-font-xs);
+  color: var(--buildrick-text-primary);
   cursor: pointer;
-  transition: var(--aqb-transition-fast);
+  transition: var(--buildrick-transition-fast);
 }
 
-.aqb-multiselect-btn:hover {
-  background: var(--aqb-accent-purple-alpha);
-  color: var(--aqb-accent-purple);
+.buildrick-multiselect-btn:hover {
+  background: var(--buildrick-accent-tint);
+  color: var(--buildrick-accent);
 }
 
-.aqb-multiselect-close {
+.buildrick-multiselect-close {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -544,115 +544,115 @@
   height: 20px;
   background: transparent;
   border: none;
-  border-radius: var(--aqb-radius-xs);
-  color: var(--aqb-text-muted);
+  border-radius: var(--buildrick-radius-xs);
+  color: var(--buildrick-text-muted);
   cursor: pointer;
-  transition: var(--aqb-transition-fast);
+  transition: var(--buildrick-transition-fast);
 }
 
-.aqb-multiselect-close:hover {
-  background: var(--aqb-surface-3);
-  color: var(--aqb-text-primary);
+.buildrick-multiselect-close:hover {
+  background: var(--buildrick-surface-3);
+  color: var(--buildrick-text-primary);
 }
 
 /* Add Page Button */
-.aqb-add-page-btn {
+.buildrick-add-page-btn {
   display: flex;
   align-items: center;
   gap: 4px;
   padding: 6px 10px;
   background: transparent;
-  border: 1px dashed var(--aqb-border);
-  border-radius: var(--aqb-radius-md);
-  font-size: var(--aqb-font-xs);
-  color: var(--aqb-text-muted);
+  border: 1px dashed var(--buildrick-border);
+  border-radius: var(--buildrick-design-radius-md);
+  font-size: var(--buildrick-font-xs);
+  color: var(--buildrick-text-muted);
   cursor: pointer;
-  transition: var(--aqb-transition-fast);
+  transition: var(--buildrick-transition-fast);
 }
 
-.aqb-add-page-btn:hover {
-  background: var(--aqb-surface-3);
-  border-color: var(--aqb-accent-purple);
-  color: var(--aqb-accent-purple);
+.buildrick-add-page-btn:hover {
+  background: var(--buildrick-surface-3);
+  border-color: var(--buildrick-accent);
+  color: var(--buildrick-accent);
 }
 
 /* ─────────────────────────────────────────────
    DELETE CONFIRMATION STRIP
    ───────────────────────────────────────────── */
-.aqb-delete-confirm {
+.buildrick-delete-confirm {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: var(--aqb-error-bg, rgba(239, 68, 68, 0.1));
-  border-bottom: 1px solid var(--aqb-error);
-  font-size: var(--aqb-font-xs);
-  color: var(--aqb-text-primary);
+  background: var(--buildrick-error-bg, rgba(239, 68, 68, 0.1));
+  border-bottom: 1px solid var(--buildrick-error);
+  font-size: var(--buildrick-font-xs);
+  color: var(--buildrick-text-primary);
 }
 
-.aqb-delete-confirm span {
+.buildrick-delete-confirm span {
   flex: 1;
 }
 
-.aqb-delete-confirm-ok {
+.buildrick-delete-confirm-ok {
   padding: 3px 10px;
-  background: var(--aqb-error);
+  background: var(--buildrick-error);
   border: none;
-  border-radius: var(--aqb-radius-sm);
+  border-radius: var(--buildrick-design-radius-sm);
   color: #fff;
-  font-size: var(--aqb-font-xs);
+  font-size: var(--buildrick-font-xs);
   font-weight: 500;
   cursor: pointer;
 }
 
-.aqb-delete-confirm-cancel {
+.buildrick-delete-confirm-cancel {
   padding: 3px 10px;
   background: transparent;
-  border: 1px solid var(--aqb-border);
-  border-radius: var(--aqb-radius-sm);
-  color: var(--aqb-text-secondary);
-  font-size: var(--aqb-font-xs);
+  border: 1px solid var(--buildrick-border);
+  border-radius: var(--buildrick-design-radius-sm);
+  color: var(--buildrick-text-secondary);
+  font-size: var(--buildrick-font-xs);
   cursor: pointer;
 }
 
 /* ─────────────────────────────────────────────
    DISPLAY SETTINGS POPOVER
    ───────────────────────────────────────────── */
-.aqb-layer-display-settings {
+.buildrick-layer-display-settings {
   position: absolute;
   top: 44px;
   right: 8px;
   z-index: 200;
-  background: var(--aqb-surface-2);
-  border: 1px solid var(--aqb-border);
-  border-radius: var(--aqb-radius-md, 8px);
+  background: var(--buildrick-surface-2);
+  border: 1px solid var(--buildrick-border);
+  border-radius: var(--buildrick-design-radius-md, 8px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   min-width: 220px;
   padding: 4px 0 8px;
 }
-.aqb-lds-header {
+.buildrick-lds-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 8px 12px;
-  border-bottom: 1px solid var(--aqb-border);
+  border-bottom: 1px solid var(--buildrick-border);
   margin-bottom: 4px;
 }
-.aqb-lds-title {
+.buildrick-lds-title {
   font-size: 12px;
   font-weight: 600;
-  color: var(--aqb-text-primary);
+  color: var(--buildrick-text-primary);
 }
-.aqb-lds-close {
+.buildrick-lds-close {
   background: none;
   border: none;
-  color: var(--aqb-text-tertiary);
+  color: var(--buildrick-text-tertiary);
   cursor: pointer;
   font-size: 16px;
   line-height: 1;
   padding: 0 4px;
 }
-.aqb-lds-row {
+.buildrick-lds-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -660,54 +660,54 @@
   cursor: pointer;
   gap: 8px;
 }
-.aqb-lds-row:hover {
-  background: var(--aqb-surface-hover, rgba(255,255,255,0.04));
+.buildrick-lds-row:hover {
+  background: var(--buildrick-surface-hover, rgba(255,255,255,0.04));
 }
-.aqb-lds-label {
+.buildrick-lds-label {
   display: flex;
   flex-direction: column;
   gap: 1px;
   font-size: 12px;
-  color: var(--aqb-text-primary);
+  color: var(--buildrick-text-primary);
 }
-.aqb-lds-hint {
+.buildrick-lds-hint {
   font-size: 12px;
-  color: var(--aqb-text-tertiary);
+  color: var(--buildrick-text-tertiary);
 }
 
 /* ─────────────────────────────────────────────
    HEADER ROW (count + expand/collapse buttons)
    ───────────────────────────────────────────── */
-.aqb-layers-header-row {
+.buildrick-layers-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 4px 12px 0;
 }
-.aqb-layers-header-actions {
+.buildrick-layers-header-actions {
   display: flex;
   align-items: center;
   gap: 4px;
 }
-.aqb-layers-count {
+.buildrick-layers-count {
   font-size: 12px;
-  color: var(--aqb-text-tertiary);
+  color: var(--buildrick-text-tertiary);
   margin-left: 4px;
 }
 
 /* ─────────────────────────────────────────────
    CONTEXT MENU
    ───────────────────────────────────────────── */
-.aqb-layer-ctx-menu {
-  background: var(--aqb-surface-2);
-  border: 1px solid var(--aqb-border);
-  border-radius: var(--aqb-radius-md, 8px);
+.buildrick-layer-ctx-menu {
+  background: var(--buildrick-surface-2);
+  border: 1px solid var(--buildrick-border);
+  border-radius: var(--buildrick-design-radius-md, 8px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   min-width: 190px;
   padding: 4px 0;
   user-select: none;
 }
-.aqb-layer-ctx-item {
+.buildrick-layer-ctx-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -715,24 +715,24 @@
   padding: 6px 12px;
   background: none;
   border: none;
-  color: var(--aqb-text-primary);
+  color: var(--buildrick-text-primary);
   font-size: 12px;
   cursor: pointer;
   text-align: left;
   gap: 16px;
 }
-.aqb-layer-ctx-item:hover {
-  background: var(--aqb-surface-hover, rgba(255,255,255,0.06));
+.buildrick-layer-ctx-item:hover {
+  background: var(--buildrick-surface-hover, rgba(255,255,255,0.06));
 }
-.aqb-layer-ctx-item--danger { color: var(--aqb-error); }
-.aqb-layer-ctx-item--danger:hover { background: rgba(239,68,68,0.1); }
-.aqb-layer-ctx-divider {
+.buildrick-layer-ctx-item--danger { color: var(--buildrick-error); }
+.buildrick-layer-ctx-item--danger:hover { background: rgba(239,68,68,0.1); }
+.buildrick-layer-ctx-divider {
   height: 1px;
-  background: var(--aqb-border);
+  background: var(--buildrick-border);
   margin: 4px 0;
 }
-.aqb-ctx-hint {
-  color: var(--aqb-text-tertiary);
+.buildrick-ctx-hint {
+  color: var(--buildrick-text-tertiary);
   font-size: 12px;
   flex-shrink: 0;
 }
@@ -740,35 +740,35 @@
 /* ─────────────────────────────────────────────
    MULTI-SELECT BANNER
    ───────────────────────────────────────────── */
-.aqb-layer-sel-banner {
+.buildrick-layer-sel-banner {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: var(--aqb-info-bg, rgba(59,130,246,0.12));
-  border-bottom: 1px solid var(--aqb-info);
+  background: var(--buildrick-info-bg, rgba(59,130,246,0.12));
+  border-bottom: 1px solid var(--buildrick-info);
   flex-shrink: 0;
 }
-.aqb-sel-count {
+.buildrick-sel-count {
   font-size: 12px;
   font-weight: 600;
-  color: var(--aqb-info);
+  color: var(--buildrick-info);
   flex: 1;
 }
-.aqb-sel-btn {
+.buildrick-sel-btn {
   padding: 2px 8px;
   border-radius: 4px;
-  border: 1px solid var(--aqb-border);
-  background: var(--aqb-surface-2);
-  color: var(--aqb-text-primary);
+  border: 1px solid var(--buildrick-border);
+  background: var(--buildrick-surface-2);
+  color: var(--buildrick-text-primary);
   font-size: 12px;
   cursor: pointer;
 }
-.aqb-sel-btn:hover { background: var(--aqb-surface-hover); }
-.aqb-sel-btn--danger { border-color: var(--aqb-error); color: var(--aqb-error); }
-.aqb-sel-btn--muted { color: var(--aqb-text-tertiary); }
+.buildrick-sel-btn:hover { background: var(--buildrick-surface-hover); }
+.buildrick-sel-btn--danger { border-color: var(--buildrick-error); color: var(--buildrick-error); }
+.buildrick-sel-btn--muted { color: var(--buildrick-text-tertiary); }
 /* Multi-selected row styling */
-.aqb-layer-row.is-multi-selected {
+.buildrick-layer-row.is-multi-selected {
   background: rgba(59, 130, 246, 0.12) !important;
   outline: 1px solid rgba(59, 130, 246, 0.3);
 }
@@ -776,33 +776,33 @@
 /* ─────────────────────────────────────────────
    BREADCRUMB
    ───────────────────────────────────────────── */
-.aqb-layer-breadcrumb {
+.buildrick-layer-breadcrumb {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 2px;
   padding: 4px 12px;
-  border-bottom: 1px solid var(--aqb-border);
-  background: var(--aqb-surface-1);
+  border-bottom: 1px solid var(--buildrick-border);
+  background: var(--buildrick-surface-1);
   flex-shrink: 0;
 }
-.aqb-bc-crumb {
+.buildrick-bc-crumb {
   background: none;
   border: none;
-  color: var(--aqb-text-tertiary);
+  color: var(--buildrick-text-tertiary);
   font-size: 12px;
   cursor: pointer;
   padding: 1px 2px;
   border-radius: 2px;
 }
-.aqb-bc-crumb:hover { color: var(--aqb-text-primary); background: var(--aqb-surface-hover); }
-.aqb-bc-sep { color: var(--aqb-text-tertiary); font-size: 12px; }
-.aqb-bc-current { font-size: 12px; font-weight: 600; color: var(--aqb-text-primary); }
+.buildrick-bc-crumb:hover { color: var(--buildrick-text-primary); background: var(--buildrick-surface-hover); }
+.buildrick-bc-sep { color: var(--buildrick-text-tertiary); font-size: 12px; }
+.buildrick-bc-current { font-size: 12px; font-weight: 600; color: var(--buildrick-text-primary); }
 
 /* ─────────────────────────────────────────────
    LAYERS EMPTY STATE (no elements on canvas)
    ───────────────────────────────────────────── */
-.aqb-layers-empty-state-custom {
+.buildrick-layers-empty-state-custom {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -811,30 +811,30 @@
   gap: 6px;
 }
 
-.aqb-les-icon-wrap {
-  color: var(--aqb-text-muted);
+.buildrick-les-icon-wrap {
+  color: var(--buildrick-text-muted);
   font-size: 32px;
   margin-bottom: 4px;
   line-height: 1;
 }
 
-.aqb-les-heading {
+.buildrick-les-heading {
   font-size: 13px;
   font-weight: 500;
-  color: var(--aqb-text-secondary);
+  color: var(--buildrick-text-secondary);
   margin: 0;
 }
 
-.aqb-les-sub {
+.buildrick-les-sub {
   font-size: 12px;
-  color: var(--aqb-text-muted);
+  color: var(--buildrick-text-muted);
   margin: 0;
 }
 
 /* ─────────────────────────────────────────────
    SEARCH EMPTY STATE
    ───────────────────────────────────────────── */
-.aqb-layers-empty-search {
+.buildrick-layers-empty-search {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -842,14 +842,14 @@
   gap: 8px;
   text-align: center;
 }
-.aqb-les-icon { font-size: 24px; }
-.aqb-les-title { font-size: 12px; color: var(--aqb-text-secondary); margin: 0; }
-.aqb-les-clear {
+.buildrick-les-icon { font-size: 24px; }
+.buildrick-les-title { font-size: 12px; color: var(--buildrick-text-secondary); margin: 0; }
+.buildrick-les-clear {
   padding: 4px 12px;
   border-radius: 4px;
-  background: var(--aqb-surface-2);
-  border: 1px solid var(--aqb-border);
-  color: var(--aqb-text-primary);
+  background: var(--buildrick-surface-2);
+  border: 1px solid var(--buildrick-border);
+  color: var(--buildrick-text-primary);
   font-size: 12px;
   cursor: pointer;
 }
@@ -857,7 +857,7 @@
 /* ─────────────────────────────────────────────
    COMPACT DENSITY MODE
    ───────────────────────────────────────────── */
-.aqb-layers-compact .aqb-layer-row {
+.buildrick-layers-compact .buildrick-layer-row {
   --layer-row-height: 24px;
   font-size: 12px;
 }
@@ -865,7 +865,7 @@
 /* ─────────────────────────────────────────────
    BREAKPOINT VISIBILITY CHIPS
    ───────────────────────────────────────────── */
-.aqb-layer-bp-chip {
+.buildrick-layer-bp-chip {
   font-size: 12px;
   font-weight: 700;
   padding: 1px 4px;
@@ -873,12 +873,12 @@
   letter-spacing: 0.03em;
   flex-shrink: 0;
 }
-.aqb-bp-mobile {
+.buildrick-bp-mobile {
   background: rgba(241, 196, 15, 0.2);
   color: #f1c40f;
   border: 1px solid rgba(241, 196, 15, 0.3);
 }
-.aqb-bp-tablet {
+.buildrick-bp-tablet {
   background: rgba(52, 152, 219, 0.2);
   color: #3498db;
   border: 1px solid rgba(52, 152, 219, 0.3);
@@ -889,36 +889,36 @@
    White text on cobalt-tint bg with cobalt left-border.
    Do NOT use cobalt text on cobalt bg (4.0:1 fails AA).
    ───────────────────────────────────────────── */
-.aqb-layer-row.is-selected {
-  background: var(--accent-tint);
-  color: var(--aqb-text-primary);
+.buildrick-layer-row.is-selected {
+  background: var(--buildrick-accent-tint);
+  color: var(--buildrick-text-primary);
   border-left: 2px solid var(--accent);
 }
 
-.aqb-layer-row.is-hidden {
+.buildrick-layer-row.is-hidden {
   opacity: 0.45;
 }
 
-.aqb-layer-row.is-locked .aqb-layer-row__drag-handle {
+.buildrick-layer-row.is-locked .buildrick-layer-row__drag-handle {
   display: none;
 }
 
-.aqb-layer-row.is-editing .aqb-layer-name {
+.buildrick-layer-row.is-editing .buildrick-layer-name {
   display: none;
 }
 
-.aqb-layer-row.is-editing .aqb-layer-name-input {
+.buildrick-layer-row.is-editing .buildrick-layer-name-input {
   display: block;
 }
 
 /* ─────────────────────────────────────────────
    Focus rings — universal 2px cobalt outline (design review Pass 2)
    ───────────────────────────────────────────── */
-.aqb-layer-row:focus-visible,
-.aqb-layers-settings-btn:focus-visible,
-.aqb-search-input:focus-visible,
-.aqb-layer-name-input:focus-visible,
-.aqb-sel-btn:focus-visible {
+.buildrick-layer-row:focus-visible,
+.buildrick-layers-settings-btn:focus-visible,
+.buildrick-search-input:focus-visible,
+.buildrick-layer-name-input:focus-visible,
+.buildrick-sel-btn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -927,11 +927,11 @@
    Hover-reveal icons — smooth 100ms opacity (design review Pass 7)
    Eye/lock icons fade in on row hover.
    ───────────────────────────────────────────── */
-.aqb-layer-row__icon--reveal {
+.buildrick-layer-row__icon--reveal {
   opacity: 0;
   transition: opacity 100ms ease;
 }
-.aqb-layer-row:hover .aqb-layer-row__icon--reveal {
+.buildrick-layer-row:hover .buildrick-layer-row__icon--reveal {
   opacity: 1;
 }
 
@@ -939,16 +939,16 @@
    Sync banner — cobalt translucent fade-in
    (replaces deleted lyr-sync-banner)
    ───────────────────────────────────────────── */
-.aqb-sync-banner {
+.buildrick-sync-banner {
   padding: 6px 12px;
-  background: var(--accent-tint);
-  color: var(--aqb-text-primary);
+  background: var(--buildrick-accent-tint);
+  color: var(--buildrick-text-primary);
   font-size: 12px;
-  border-bottom: 1px solid var(--aqb-border);
-  animation: aqb-sync-fade-in 200ms ease;
+  border-bottom: 1px solid var(--buildrick-border);
+  animation: buildrick-sync-fade-in 200ms ease;
 }
 
-@keyframes aqb-sync-fade-in {
+@keyframes buildrick-sync-fade-in {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
@@ -956,7 +956,7 @@
 /* ─────────────────────────────────────────────
    Multi-select action bar container (replaces deleted lyr-action-bar__actions)
    ───────────────────────────────────────────── */
-.aqb-layer-sel-actions {
+.buildrick-layer-sel-actions {
   display: flex;
   gap: 8px;
 }
@@ -965,13 +965,13 @@
    Accessibility — honor prefers-reduced-motion (design review Pass 6)
    ───────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .aqb-sync-banner {
+  .buildrick-sync-banner {
     animation: none;
   }
-  .aqb-layer-row__icon--reveal {
+  .buildrick-layer-row__icon--reveal {
     transition: none;
   }
-  .aqb-layer-row {
+  .buildrick-layer-row {
     transition: none;
   }
 }

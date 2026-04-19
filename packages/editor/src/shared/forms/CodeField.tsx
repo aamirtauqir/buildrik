@@ -49,7 +49,7 @@ export const CodeField: React.FC<CodeFieldProps> = ({
   };
 
   return (
-    <div className="aqb-code-field">
+    <div className="buildrick-code-field">
       {label && (
         <div
           style={{
@@ -59,12 +59,12 @@ export const CodeField: React.FC<CodeFieldProps> = ({
             marginBottom: 6,
           }}
         >
-          <label style={{ fontSize: 12, color: "var(--aqb-text-secondary)" }}>{label}</label>
+          <label style={{ fontSize: 12, color: "var(--buildrick-text-secondary)" }}>{label}</label>
           <span
             style={{
               fontSize: 12,
-              color: "var(--aqb-text-muted)",
-              background: "var(--aqb-bg-panel-secondary)",
+              color: "var(--buildrick-text-muted)",
+              background: "var(--buildrick-bg-panel-secondary)",
               padding: "2px 6px",
               borderRadius: 4,
               textTransform: "uppercase",
@@ -77,8 +77,8 @@ export const CodeField: React.FC<CodeFieldProps> = ({
       <div
         style={{
           display: "flex",
-          background: "var(--aqb-bg-dark)",
-          border: "1px solid var(--aqb-border)",
+          background: "var(--buildrick-bg-dark)",
+          border: "1px solid var(--buildrick-border)",
           borderRadius: 6,
           overflow: "hidden",
           minHeight,
@@ -89,8 +89,8 @@ export const CodeField: React.FC<CodeFieldProps> = ({
           <div
             style={{
               padding: "8px 0",
-              background: "var(--aqb-bg-panel-secondary)",
-              borderRight: "1px solid var(--aqb-border)",
+              background: "var(--buildrick-bg-panel-secondary)",
+              borderRight: "1px solid var(--buildrick-border)",
               userSelect: "none",
               minWidth: 40,
               textAlign: "right",
@@ -102,9 +102,9 @@ export const CodeField: React.FC<CodeFieldProps> = ({
                 style={{
                   padding: "0 8px",
                   fontSize: 12,
-                  fontFamily: "var(--aqb-font-mono)",
+                  fontFamily: "var(--buildrick-design-font-mono)",
                   lineHeight: "20px",
-                  color: "var(--aqb-text-muted)",
+                  color: "var(--buildrick-text-muted)",
                 }}
               >
                 {i + 1}
@@ -125,9 +125,9 @@ export const CodeField: React.FC<CodeFieldProps> = ({
             padding: 8,
             background: "transparent",
             border: "none",
-            color: "var(--aqb-text-primary)",
+            color: "var(--buildrick-text-primary)",
             fontSize: 12,
-            fontFamily: "var(--aqb-font-mono)",
+            fontFamily: "var(--buildrick-design-font-mono)",
             lineHeight: "20px",
             resize: "none",
             outline: "none",

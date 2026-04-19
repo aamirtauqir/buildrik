@@ -37,7 +37,7 @@ export interface TemplateItem {
 // HELPER FUNCTIONS
 // ============================================================================
 
-const RECENT_STORAGE_KEY = "aqb-recent-templates";
+const RECENT_STORAGE_KEY = "buildrick-recent-templates";
 const MAX_RECENT = 3;
 
 /** Get recent templates from localStorage */

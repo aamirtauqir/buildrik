@@ -17,7 +17,7 @@
 .ie-modal {
   width: min(1100px, 95vw);
   height: min(720px, 90vh);
-  background: var(--ls-bg-panel, #F8FAFC);
+  background: var(--buildrick-bg-panel, #F8FAFC);
   border-radius: 12px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   display: flex;
@@ -32,15 +32,15 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  border-bottom: 1px solid var(--ls-border-light, #E2E8F0);
-  background: var(--ls-bg-card, #fff);
+  border-bottom: 1px solid var(--buildrick-border-light, #E2E8F0);
+  background: var(--buildrick-bg-card, #fff);
 }
 
 .ie-title {
   margin: 0;
   font-size: 15px;
   font-weight: 700;
-  color: var(--ls-text-primary);
+  color: var(--buildrick-text-primary);
 }
 
 .ie-header-actions {
@@ -53,21 +53,21 @@
   height: 32px;
   padding: 0 12px;
   border-radius: 6px;
-  border: 1px solid var(--ls-border-soft, #D1D9E6);
-  background: var(--ls-bg-card, #fff);
-  color: var(--ls-text-medium, #475569);
+  border: 1px solid var(--buildrick-border, #D1D9E6);
+  background: var(--buildrick-bg-card, #fff);
+  color: var(--buildrick-text-secondary, #475569);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
 }
-.ie-btn-ghost:hover { background: var(--ls-bg-subtle, #F1F5F9); }
+.ie-btn-ghost:hover { background: var(--buildrick-bg-subtle, #F1F5F9); }
 
 .ie-btn-primary {
   height: 32px;
   padding: 0 14px;
   border-radius: 6px;
-  border: 1px solid var(--ls-accent, #1D4ED8);
-  background: var(--ls-accent, #1D4ED8);
+  border: 1px solid var(--buildrick-accent, #1D4ED8);
+  background: var(--buildrick-accent, #1D4ED8);
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -83,15 +83,15 @@
   width: 32px;
   height: 32px;
   border-radius: 6px;
-  border: 1px solid var(--ls-border-soft);
-  background: var(--ls-bg-card);
-  color: var(--ls-text-ghost);
+  border: 1px solid var(--buildrick-border);
+  background: var(--buildrick-bg-card);
+  color: var(--buildrick-text-disabled);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 }
-.ie-close:hover { background: var(--ls-bg-subtle); color: var(--ls-text-primary); }
+.ie-close:hover { background: var(--buildrick-bg-subtle); color: var(--buildrick-text-primary); }
 
 /* ─── Body ────────────────────────────────────── */
 
@@ -151,8 +151,8 @@
 /* ─── Sidebar (right) ─────────────────────────── */
 
 .ie-sidebar {
-  background: var(--ls-bg-panel);
-  border-left: 1px solid var(--ls-border-light);
+  background: var(--buildrick-bg-panel);
+  border-left: 1px solid var(--buildrick-border-light);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -160,7 +160,7 @@
 
 .ie-tabs {
   display: flex;
-  border-bottom: 1px solid var(--ls-border-light);
+  border-bottom: 1px solid var(--buildrick-border-light);
   padding: 0;
 }
 
@@ -169,7 +169,7 @@
   padding: 10px 8px;
   font-size: 12px;
   font-weight: 500;
-  color: var(--ls-text-ghost, #CBD5E1);
+  color: var(--buildrick-text-disabled, #CBD5E1);
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
@@ -180,10 +180,10 @@
   gap: 5px;
   transition: all 0.12s;
 }
-.ie-tab:hover { color: var(--ls-text-secondary); }
+.ie-tab:hover { color: var(--buildrick-text-secondary); }
 .ie-tab.active {
-  color: var(--ls-accent, #1D4ED8);
-  border-bottom-color: var(--ls-accent, #1D4ED8);
+  color: var(--buildrick-accent, #1D4ED8);
+  border-bottom-color: var(--buildrick-accent, #1D4ED8);
   font-weight: 600;
 }
 
@@ -198,7 +198,7 @@
 .ie-section-label {
   font-size: 11px;
   font-weight: 700;
-  color: var(--ls-text-ghost);
+  color: var(--buildrick-text-disabled);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 8px;
@@ -217,7 +217,7 @@
   flex: 1;
   height: 4px;
   appearance: none;
-  background: var(--ls-border-light, #E2E8F0);
+  background: var(--buildrick-border-light, #E2E8F0);
   border-radius: 2px;
   outline: none;
 }
@@ -226,7 +226,7 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: var(--ls-accent, #1D4ED8);
+  background: var(--buildrick-accent, #1D4ED8);
   cursor: pointer;
   border: 2px solid #fff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.15);
@@ -237,7 +237,7 @@
   text-align: right;
   font-size: 11px;
   font-weight: 600;
-  color: var(--ls-text-medium);
+  color: var(--buildrick-text-secondary);
   font-variant-numeric: tabular-nums;
 }
 
@@ -254,18 +254,18 @@
   height: 28px;
   padding: 0 10px;
   border-radius: 6px;
-  border: 1px solid var(--ls-border-soft);
-  background: var(--ls-bg-card);
-  color: var(--ls-text-medium);
+  border: 1px solid var(--buildrick-border);
+  background: var(--buildrick-bg-card);
+  color: var(--buildrick-text-secondary);
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
 }
-.ie-preset:hover { background: var(--ls-bg-subtle); }
+.ie-preset:hover { background: var(--buildrick-bg-subtle); }
 .ie-preset.active {
-  background: var(--ls-accent-bg, #DBEAFE);
-  color: var(--ls-accent-txt, #1E40AF);
-  border-color: var(--ls-accent, #1D4ED8);
+  background: var(--buildrick-accent-tint, #DBEAFE);
+  color: var(--buildrick-text-primary, #1E40AF);
+  border-color: var(--buildrick-accent, #1D4ED8);
 }
 
 /* ─── Transform buttons ──────────────────────── */
@@ -279,20 +279,20 @@
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  border: 1px solid var(--ls-border-soft);
-  background: var(--ls-bg-card);
-  color: var(--ls-text-medium);
+  border: 1px solid var(--buildrick-border);
+  background: var(--buildrick-bg-card);
+  color: var(--buildrick-text-secondary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.12s;
 }
-.ie-tool-btn:hover { background: var(--ls-bg-subtle); }
+.ie-tool-btn:hover { background: var(--buildrick-bg-subtle); }
 .ie-tool-btn.active {
-  background: var(--ls-accent-bg);
-  color: var(--ls-accent-txt);
-  border-color: var(--ls-accent);
+  background: var(--buildrick-accent-tint);
+  color: var(--buildrick-text-primary);
+  border-color: var(--buildrick-accent);
 }
 
 /* ─── Resize ──────────────────────────────────── */
@@ -308,25 +308,25 @@
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: var(--ls-text-ghost);
+  color: var(--buildrick-text-disabled);
 }
 .ie-resize-field input {
   width: 80px;
   height: 32px;
-  border: 1px solid var(--ls-border-soft);
+  border: 1px solid var(--buildrick-border);
   border-radius: 4px;
-  background: var(--ls-bg-card);
-  color: var(--ls-text-primary);
+  background: var(--buildrick-bg-card);
+  color: var(--buildrick-text-primary);
   font-size: 13px;
   padding: 0 8px;
   text-align: center;
   outline: none;
 }
 .ie-resize-field input:focus {
-  border-color: var(--ls-accent);
+  border-color: var(--buildrick-accent);
 }
 
 .ie-resize-x {
   font-size: 14px;
-  color: var(--ls-text-ghost);
+  color: var(--buildrick-text-disabled);
 }

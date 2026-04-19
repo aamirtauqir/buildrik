@@ -31,7 +31,7 @@ const ScoreCircle: React.FC<{ score: number; label: string }> = ({ score, label 
   return (
     <div style={{ textAlign: "center" }}>
       <svg width="48" height="48" style={{ transform: "rotate(-90deg)" }}>
-        <circle cx="24" cy="24" r="18" fill="none" stroke="var(--aqb-border)" strokeWidth="4" />
+        <circle cx="24" cy="24" r="18" fill="none" stroke="var(--buildrick-border)" strokeWidth="4" />
         <circle
           cx="24"
           cy="24"
@@ -57,7 +57,7 @@ const ScoreCircle: React.FC<{ score: number; label: string }> = ({ score, label 
         style={{
           marginTop: 12,
           fontSize: 12,
-          color: "var(--aqb-text-muted)",
+          color: "var(--buildrick-text-muted)",
           textTransform: "uppercase",
         }}
       >
@@ -106,7 +106,7 @@ const SuggestionItem: React.FC<{
         style={{
           marginTop: 4,
           fontSize: 12,
-          color: "var(--aqb-text-muted)",
+          color: "var(--buildrick-text-muted)",
         }}
       >
         {suggestion.description}
@@ -142,7 +142,7 @@ export const LayoutSuggestions: React.FC<LayoutSuggestionsProps> = ({
     return (
       <div style={{ padding: 20, textAlign: "center" }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>🔍</div>
-        <div style={{ marginBottom: 16, color: "var(--aqb-text-muted)" }}>
+        <div style={{ marginBottom: 16, color: "var(--buildrick-text-muted)" }}>
           Analyze your layout to get AI-powered suggestions for improving spacing, alignment,
           contrast, and accessibility.
         </div>
@@ -165,7 +165,7 @@ export const LayoutSuggestions: React.FC<LayoutSuggestionsProps> = ({
           gap: 16,
           marginBottom: 24,
           padding: 16,
-          background: "var(--aqb-bg-panel-secondary)",
+          background: "var(--buildrick-bg-panel-secondary)",
           borderRadius: 8,
         }}
       >
@@ -186,7 +186,7 @@ export const LayoutSuggestions: React.FC<LayoutSuggestionsProps> = ({
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 24, fontWeight: 700 }}>{score}</span>
-          <span style={{ color: "var(--aqb-text-muted)" }}>/ 100</span>
+          <span style={{ color: "var(--buildrick-text-muted)" }}>/ 100</span>
           <span style={{ fontSize: 18 }}>{score >= 80 ? "✨" : score >= 60 ? "👍" : "⚠️"}</span>
         </div>
         <Button size="sm" variant="secondary" onClick={onAnalyze}>
@@ -214,7 +214,7 @@ export const LayoutSuggestions: React.FC<LayoutSuggestionsProps> = ({
               fontSize: 12,
               fontWeight: 600,
               textTransform: "uppercase",
-              color: "var(--aqb-text-muted)",
+              color: "var(--buildrick-text-muted)",
               marginBottom: 12,
             }}
           >

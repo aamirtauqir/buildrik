@@ -2,7 +2,7 @@
  * Canvas Spot Spacing Styles
  */
 
-.aqb-canvas-spot-spacing {
+.buildrick-canvas-spot-spacing {
   position: absolute;
   top: 0;
   left: 0;
@@ -12,7 +12,7 @@
   z-index: 1000;
 }
 
-.aqb-spacing-indicator {
+.buildrick-spacing-indicator {
   position: absolute;
   border: 2px dashed;
   background: rgba(0, 0, 0, 0.05);
@@ -21,12 +21,12 @@
   transition: all 0.2s ease;
 }
 
-.aqb-spacing-indicator:hover {
+.buildrick-spacing-indicator:hover {
   background: rgba(0, 0, 0, 0.1);
   border-style: solid;
 }
 
-.aqb-spacing-indicator-label {
+.buildrick-spacing-indicator-label {
   position: absolute;
   padding: 2px 6px;
   border-radius: 4px;
@@ -38,39 +38,39 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.aqb-spacing-indicator--margin .aqb-spacing-indicator-label {
-  background-color: var(--aqb-success);
+.buildrick-spacing-indicator--margin .buildrick-spacing-indicator-label {
+  background-color: var(--buildrick-success);
 }
 
-.aqb-spacing-indicator--padding .aqb-spacing-indicator-label {
+.buildrick-spacing-indicator--padding .buildrick-spacing-indicator-label {
   background-color: var(--accent);
 }
 
-.aqb-spacing-indicator--top .aqb-spacing-indicator-label {
+.buildrick-spacing-indicator--top .buildrick-spacing-indicator-label {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
-.aqb-spacing-indicator--right .aqb-spacing-indicator-label {
+.buildrick-spacing-indicator--right .buildrick-spacing-indicator-label {
   top: 50%;
   right: 4px;
   transform: translateY(-50%);
 }
 
-.aqb-spacing-indicator--bottom .aqb-spacing-indicator-label {
+.buildrick-spacing-indicator--bottom .buildrick-spacing-indicator-label {
   bottom: 4px;
   left: 50%;
   transform: translateX(-50%);
 }
 
-.aqb-spacing-indicator--left .aqb-spacing-indicator-label {
+.buildrick-spacing-indicator--left .buildrick-spacing-indicator-label {
   top: 50%;
   left: 4px;
   transform: translateY(-50%);
 }
 
-.aqb-spacing-indicator-input {
+.buildrick-spacing-indicator-input {
   width: 50px;
   padding: 2px 4px;
   border: none;

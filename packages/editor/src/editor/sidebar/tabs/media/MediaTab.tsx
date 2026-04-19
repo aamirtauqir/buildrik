@@ -134,7 +134,7 @@ function MediaTabWithComposer({
       {/* 0. Selection Mode Header (Snap-back context) */}
       {state.selectionContext && (
         <div className="med-selection-bar" style={{
-          background: 'var(--ls-accent, #1D4ED8)',
+          background: 'var(--buildrick-accent, #1D4ED8)',
           color: 'white',
           padding: '8px 16px',
           display: 'flex',
@@ -178,9 +178,9 @@ function MediaTabWithComposer({
             <Plus size={14} />
             Add from Stock
           </button>
-          <div style={{ width: 1, height: 24, background: 'var(--ls-border-light)' }} />
+          <div style={{ width: 1, height: 24, background: 'var(--buildrick-border-light)' }} />
           <button onClick={onClose} style={{
-            background: 'none', border: 'none', color: 'var(--ls-text-subtle)',
+            background: 'none', border: 'none', color: 'var(--buildrick-text-muted)',
             cursor: 'pointer', padding: 4, display: 'flex'
           }}>
             <Upload size={18} style={{ transform: 'rotate(180deg)' }} />

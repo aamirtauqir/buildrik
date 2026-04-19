@@ -138,7 +138,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
       <div style={containerStyles} onKeyDown={handleKeyPress}>
         <div>
           <label style={labelStyles}>
-            Name <span style={{ color: "var(--aqb-accent)" }}>*</span>
+            Name <span style={{ color: "var(--buildrick-accent)" }}>*</span>
           </label>
           <input
             type="text"
@@ -209,11 +209,11 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                     style={{
                       ...variantChipStyles,
                       background: selectedVariantProps.includes(preset.name)
-                        ? "var(--aqb-primary)"
-                        : "var(--aqb-surface-3)",
+                        ? "var(--buildrick-accent)"
+                        : "var(--buildrick-surface-3)",
                       color: selectedVariantProps.includes(preset.name)
                         ? "#fff"
-                        : "var(--aqb-text-secondary)",
+                        : "var(--buildrick-text-secondary)",
                     }}
                   >
                     {preset.name}
@@ -244,17 +244,17 @@ const labelStyles: React.CSSProperties = {
   display: "block",
   fontSize: 12,
   fontWeight: 600,
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
   marginBottom: 6,
 };
 
 const inputStyles: React.CSSProperties = {
   width: "100%",
   padding: "8px 12px",
-  background: "var(--aqb-surface-3)",
-  border: "1px solid var(--aqb-border)",
+  background: "var(--buildrick-surface-3)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 6,
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
   fontSize: 13,
 };
 
@@ -266,7 +266,7 @@ const textareaStyles: React.CSSProperties = {
 
 const hintStyles: React.CSSProperties = {
   fontSize: 12,
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
   marginTop: 4,
   display: "block",
 };
@@ -275,7 +275,7 @@ const hintStyles: React.CSSProperties = {
 const variantSectionStyles: React.CSSProperties = {
   marginTop: 8,
   paddingTop: 16,
-  borderTop: "1px solid var(--aqb-border)",
+  borderTop: "1px solid var(--buildrick-border)",
 };
 
 const checkboxLabelStyles: React.CSSProperties = {
@@ -283,7 +283,7 @@ const checkboxLabelStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   fontSize: 13,
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   cursor: "pointer",
 };
 
@@ -296,7 +296,7 @@ const checkboxStyles: React.CSSProperties = {
 const variantPropsContainerStyles: React.CSSProperties = {
   marginTop: 12,
   padding: 12,
-  background: "var(--aqb-surface-2)",
+  background: "var(--buildrick-surface-2)",
   borderRadius: 8,
 };
 
@@ -312,7 +312,7 @@ const variantChipStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 4,
   padding: "6px 12px",
-  border: "1px solid var(--aqb-border)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 16,
   fontSize: 12,
   fontWeight: 500,

@@ -81,7 +81,7 @@ export const LayerContextMenu: React.FC<LayerContextMenuProps> = ({
         <span>{isLocked ? "Unlock" : "Lock"}</span>
       </button>
       <div style={dividerStyles} />
-      <button style={{ ...itemStyles, color: "var(--aqb-error, #ef4444)" }} role="menuitem" onClick={() => handleAction(onDelete)}>
+      <button style={{ ...itemStyles, color: "var(--buildrick-error, #ef4444)" }} role="menuitem" onClick={() => handleAction(onDelete)}>
         <Trash2 size={14} />
         <span>Delete</span>
       </button>
@@ -112,7 +112,7 @@ export const DragTooltip: React.FC<DragTooltipProps> = ({
       ...tooltipStyles,
       left: position.x + 12,
       top: position.y + 12,
-      background: variant === "error" ? "var(--aqb-error, #ef4444)" : "var(--aqb-surface-4, #2e2e38)",
+      background: variant === "error" ? "var(--buildrick-error, #ef4444)" : "var(--buildrick-surface-4, #2e2e38)",
     }}
     role="tooltip"
   >
@@ -127,8 +127,8 @@ export const DragTooltip: React.FC<DragTooltipProps> = ({
 const menuStyles: React.CSSProperties = {
   position: "fixed",
   zIndex: 10000,
-  background: "var(--aqb-surface-3, #1e1e2e)",
-  border: "1px solid var(--aqb-border, rgba(255, 255, 255, 0.08))",
+  background: "var(--buildrick-surface-3, #1e1e2e)",
+  border: "1px solid var(--buildrick-border, rgba(255, 255, 255, 0.08))",
   borderRadius: 8,
   padding: "4px 0",
   minWidth: 160,
@@ -143,7 +143,7 @@ const itemStyles: React.CSSProperties = {
   padding: "8px 12px",
   border: "none",
   background: "transparent",
-  color: "var(--aqb-text-primary, #F5F5F0)",
+  color: "var(--buildrick-text-primary, #F5F5F0)",
   fontSize: 13,
   cursor: "pointer",
   fontFamily: "inherit",
@@ -152,7 +152,7 @@ const itemStyles: React.CSSProperties = {
 
 const dividerStyles: React.CSSProperties = {
   height: 1,
-  background: "var(--aqb-border, rgba(255, 255, 255, 0.08))",
+  background: "var(--buildrick-border, rgba(255, 255, 255, 0.08))",
   margin: "4px 0",
 };
 

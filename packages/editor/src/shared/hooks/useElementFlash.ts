@@ -9,7 +9,7 @@ import { useEffect, useCallback } from "react";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants/events";
 
-const FLASH_CLASS = "aqb-element-flash";
+const FLASH_CLASS = "buildrick-element-flash";
 const FLASH_DURATION = 500; // ms - matches CSS animation
 
 /**
@@ -21,7 +21,7 @@ export function useElementFlash(composer: Composer | null): void {
   const flashElement = useCallback((elementId: string) => {
     // Use requestAnimationFrame to ensure DOM is ready
     requestAnimationFrame(() => {
-      const el = document.querySelector(`[data-aqb-id="${elementId}"]`);
+      const el = document.querySelector(`[data-buildrick-id="${elementId}"]`);
       if (el) {
         // Remove class first in case it's already flashing
         el.classList.remove(FLASH_CLASS);

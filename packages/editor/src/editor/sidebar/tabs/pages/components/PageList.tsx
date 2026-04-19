@@ -213,7 +213,7 @@ export const PageList: React.FC<Props> = ({
       )}
 
       {/* Page rows + folders */}
-      <div className="pg-list__rows aqb-scrollbar" role="list" aria-label="Pages">
+      <div className="pg-list__rows buildrick-scrollbar" role="list" aria-label="Pages">
         {visible.length === 0 && search ? (
           <div className="pages-empty-search">
             <div className="pages-empty-search__msg">No pages match &ldquo;{search}&rdquo;</div>

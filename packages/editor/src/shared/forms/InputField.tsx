@@ -36,30 +36,30 @@ export const InputField: React.FC<InputFieldProps> = ({
   const hintId = hint && !error ? `${inputId}-hint` : undefined;
 
   const sizeClasses = {
-    sm: "aqb-input-sm",
+    sm: "buildrick-input-sm",
     md: "",
-    lg: "aqb-input-lg",
+    lg: "buildrick-input-lg",
   };
 
   const inputClasses = [
-    "aqb-input",
+    "buildrick-input",
     sizeClasses[size],
-    error ? "aqb-input-error" : "",
-    leftIcon ? "aqb-input-with-left-icon" : "",
-    rightIcon ? "aqb-input-with-right-icon" : "",
+    error ? "buildrick-input-error" : "",
+    leftIcon ? "buildrick-input-with-left-icon" : "",
+    rightIcon ? "buildrick-input-with-right-icon" : "",
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
-    <div className={`aqb-field ${className}`} style={{ width: fullWidth ? "100%" : "auto" }}>
+    <div className={`buildrick-field ${className}`} style={{ width: fullWidth ? "100%" : "auto" }}>
       {label && (
-        <label htmlFor={inputId} className="aqb-field-label">
+        <label htmlFor={inputId} className="buildrick-field-label">
           {label}
         </label>
       )}
-      <div className="aqb-input-wrapper">
-        {leftIcon && <span className="aqb-input-icon aqb-input-icon-left">{leftIcon}</span>}
+      <div className="buildrick-input-wrapper">
+        {leftIcon && <span className="buildrick-input-icon buildrick-input-icon-left">{leftIcon}</span>}
         <input
           {...props}
           id={inputId}
@@ -72,15 +72,15 @@ export const InputField: React.FC<InputFieldProps> = ({
             paddingRight: rightIcon ? 38 : undefined,
           }}
         />
-        {rightIcon && <span className="aqb-input-icon aqb-input-icon-right">{rightIcon}</span>}
+        {rightIcon && <span className="buildrick-input-icon buildrick-input-icon-right">{rightIcon}</span>}
       </div>
       {error && (
-        <span id={errorId} className="aqb-field-error" role="alert">
+        <span id={errorId} className="buildrick-field-error" role="alert">
           {error}
         </span>
       )}
       {hint && !error && (
-        <span id={hintId} className="aqb-field-hint">
+        <span id={hintId} className="buildrick-field-hint">
           {hint}
         </span>
       )}

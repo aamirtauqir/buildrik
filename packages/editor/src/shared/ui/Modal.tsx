@@ -80,14 +80,14 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className="aqb-modal-overlay"
+      className="buildrick-modal-overlay"
       style={overlayStyles}
       onClick={closeOnOverlay ? onClose : undefined}
       role="presentation"
     >
       <div
         ref={modalRef}
-        className="aqb-modal"
+        className="buildrick-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? titleId : undefined}
@@ -99,7 +99,7 @@ export const Modal: React.FC<ModalProps> = ({
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="aqb-modal-header" style={headerStyles}>
+          <div className="buildrick-modal-header" style={headerStyles}>
             <div id={titleId} style={{ fontWeight: 600, fontSize: 16 }}>
               {title}
             </div>
@@ -122,13 +122,13 @@ export const Modal: React.FC<ModalProps> = ({
         )}
 
         {/* Body */}
-        <div className="aqb-modal-body" style={bodyStyles}>
+        <div className="buildrick-modal-body" style={bodyStyles}>
           {children}
         </div>
 
         {/* Footer */}
         {footer && (
-          <div className="aqb-modal-footer" style={footerStyles}>
+          <div className="buildrick-modal-footer" style={footerStyles}>
             {footer}
           </div>
         )}
@@ -149,18 +149,18 @@ const overlayStyles: React.CSSProperties = {
 };
 
 const modalStyles: React.CSSProperties = {
-  background: "var(--aqb-bg-panel)",
+  background: "var(--buildrick-bg-panel)",
   borderRadius: 12,
   boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
   maxHeight: "90vh",
   display: "flex",
   flexDirection: "column",
-  animation: "aqb-modal-in 0.2s ease",
+  animation: "buildrick-modal-in 0.2s ease",
 };
 
 const headerStyles: React.CSSProperties = {
   padding: "16px 20px",
-  borderBottom: "1px solid var(--aqb-border)",
+  borderBottom: "1px solid var(--buildrick-border)",
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
@@ -169,7 +169,7 @@ const headerStyles: React.CSSProperties = {
 const closeButtonStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   cursor: "pointer",
   padding: 12, // Increased from 4px to meet WCAG 2.5.5 touch target (44x44px)
   borderRadius: 6,
@@ -188,7 +188,7 @@ const bodyStyles: React.CSSProperties = {
 
 const footerStyles: React.CSSProperties = {
   padding: "16px 20px",
-  borderTop: "1px solid var(--aqb-border)",
+  borderTop: "1px solid var(--buildrick-border)",
   display: "flex",
   justifyContent: "flex-end",
   gap: 8,
@@ -220,7 +220,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm" initialFocusRef={confirmRef}>
-      <p style={{ margin: 0, color: "var(--aqb-text-secondary)" }}>{message}</p>
+      <p style={{ margin: 0, color: "var(--buildrick-text-secondary)" }}>{message}</p>
       <div
         style={{
           display: "flex",

@@ -92,7 +92,7 @@ const DeviceSelector: React.FC<{
       style={{
         display: "flex",
         gap: 4,
-        background: "var(--aqb-bg-dark)",
+        background: "var(--buildrick-bg-dark)",
         borderRadius: 8,
         padding: 4,
       }}
@@ -104,7 +104,7 @@ const DeviceSelector: React.FC<{
           title={d.label}
           style={{
             padding: "8px 12px",
-            background: device === d.type ? "var(--aqb-primary)" : "transparent",
+            background: device === d.type ? "var(--buildrick-accent)" : "transparent",
             border: "none",
             borderRadius: 6,
             cursor: "pointer",
@@ -145,14 +145,14 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
             justifyContent: "space-between",
             alignItems: "center",
             padding: "12px 16px",
-            borderBottom: "1px solid var(--aqb-border)",
+            borderBottom: "1px solid var(--buildrick-border)",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{ fontSize: 24 }}>{template.thumbnail || "📄"}</span>
             <div>
               <div style={{ fontWeight: 600, fontSize: 16 }}>{template.name}</div>
-              <div style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>
+              <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
                 {template.description}
               </div>
             </div>
@@ -195,20 +195,20 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
         <div
           style={{
             padding: 16,
-            borderTop: "1px solid var(--aqb-border)",
+            borderTop: "1px solid var(--buildrick-border)",
             display: "flex",
             gap: 24,
           }}
         >
           <div>
-            <div style={{ fontSize: 11, color: "var(--aqb-text-muted)", marginBottom: 4 }}>
+            <div style={{ fontSize: 11, color: "var(--buildrick-text-muted)", marginBottom: 4 }}>
               Category
             </div>
             <div style={{ fontWeight: 500 }}>{template.category}</div>
           </div>
           {template.tags && template.tags.length > 0 && (
             <div>
-              <div style={{ fontSize: 11, color: "var(--aqb-text-muted)", marginBottom: 4 }}>
+              <div style={{ fontSize: 11, color: "var(--buildrick-text-muted)", marginBottom: 4 }}>
                 Tags
               </div>
               <div style={{ display: "flex", gap: 4 }}>

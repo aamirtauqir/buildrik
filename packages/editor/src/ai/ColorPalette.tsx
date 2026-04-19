@@ -179,10 +179,10 @@ export const ColorPalette: React.FC<ColorPaletteProps> = ({ onApplyColor }) => {
             style={{
               flex: 1,
               padding: "8px 12px",
-              background: "var(--aqb-bg-dark)",
-              border: "1px solid var(--aqb-border)",
+              background: "var(--buildrick-bg-dark)",
+              border: "1px solid var(--buildrick-border)",
               borderRadius: 4,
-              color: "var(--aqb-text)",
+              color: "var(--buildrick-text)",
               fontFamily: "monospace",
             }}
           />
@@ -208,10 +208,10 @@ export const ColorPalette: React.FC<ColorPaletteProps> = ({ onApplyColor }) => {
               onClick={() => setHarmony(h)}
               style={{
                 padding: "6px 12px",
-                background: harmony === h ? "var(--aqb-primary)" : "var(--aqb-bg-dark)",
-                border: "1px solid var(--aqb-border)",
+                background: harmony === h ? "var(--buildrick-accent)" : "var(--buildrick-bg-dark)",
+                border: "1px solid var(--buildrick-border)",
                 borderRadius: 4,
-                color: harmony === h ? "#fff" : "var(--aqb-text)",
+                color: harmony === h ? "#fff" : "var(--buildrick-text)",
                 fontSize: 12,
                 cursor: "pointer",
                 textTransform: "capitalize",
@@ -248,10 +248,10 @@ export const ColorPalette: React.FC<ColorPaletteProps> = ({ onApplyColor }) => {
                 background: swatch.hex,
                 borderRadius: 8,
                 marginBottom: 4,
-                border: "2px solid var(--aqb-border)",
+                border: "2px solid var(--buildrick-border)",
               }}
             />
-            <div style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>{swatch.name}</div>
+            <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>{swatch.name}</div>
             <div style={{ fontSize: 12, fontFamily: "monospace" }}>{swatch.hex}</div>
           </div>
         ))}

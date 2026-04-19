@@ -135,7 +135,7 @@ export function applyBoundaryConstraints(
 export function getBoundaryConstraints(
   domElement: HTMLElement,
   elementBounds: Bounds,
-  canvasSelector = "[data-aqb-canvas], .aqb-canvas"
+  canvasSelector = "[data-buildrick-canvas], .buildrick-canvas"
 ): BoundaryConstraints {
   devLog("ConstraintManager", "Starting boundary detection for element:", domElement);
 
@@ -153,11 +153,11 @@ export function getBoundaryConstraints(
   devLog("ConstraintManager", "Parent element:", parent);
   devLog(
     "ConstraintManager",
-    `Parent has aqb-canvas class? ${parent?.classList.contains("aqb-canvas")}`
+    `Parent has buildrick-canvas class? ${parent?.classList.contains("buildrick-canvas")}`
   );
   devLog(
     "ConstraintManager",
-    `Parent has data-aqb-canvas? ${parent?.hasAttribute("data-aqb-canvas")}`
+    `Parent has data-buildrick-canvas? ${parent?.hasAttribute("data-buildrick-canvas")}`
   );
 
   let parentBounds: Bounds | null = null;
@@ -167,8 +167,8 @@ export function getBoundaryConstraints(
 
   if (
     parent &&
-    !parent.classList.contains("aqb-canvas") &&
-    !parent.hasAttribute("data-aqb-canvas")
+    !parent.classList.contains("buildrick-canvas") &&
+    !parent.hasAttribute("data-buildrick-canvas")
   ) {
     devLog("ConstraintManager", "✅ Valid parent detected! Setting up parent bounds...");
 
@@ -184,7 +184,7 @@ export function getBoundaryConstraints(
       height: parentRect.height,
     };
 
-    parentElementId = parent.getAttribute("data-aqb-id");
+    parentElementId = parent.getAttribute("data-buildrick-id");
     parentElement = parent;
 
     offsetInParent = {

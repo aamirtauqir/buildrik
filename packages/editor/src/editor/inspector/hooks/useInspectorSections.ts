@@ -5,7 +5,7 @@
  * act on the currently selected element's profile only, so customizing one
  * element type never touches collapse state for another.
  *
- * Migration from the pre-Phase-6 flat key (`aqb-inspector-sections`) runs
+ * Migration from the pre-Phase-6 flat key (`buildrick-inspector-sections`) runs
  * once per session at module load time: the old Set is cloned across every
  * known element type so users don't lose their prior preferences.
  *
@@ -26,9 +26,9 @@ import { ALL_REGISTRY_SECTION_IDS, type SectionId } from "../sections/registry";
 const MAX_DEFAULT_EXPANDED = 2;
 
 /** Legacy localStorage key (pre-Phase-6 flat section set). */
-const LEGACY_PREFS_KEY = "aqb-inspector-sections";
+const LEGACY_PREFS_KEY = "buildrick-inspector-sections";
 /** Current localStorage key — entries are `${elementType}:${sectionId}`. */
-const PREFS_KEY = "aqb-inspector-sections-v2";
+const PREFS_KEY = "buildrick-inspector-sections-v2";
 
 /** Total section count across all inspector tabs — used for collapse/expand progress. */
 export const TOTAL_SECTIONS = ALL_REGISTRY_SECTION_IDS.length;

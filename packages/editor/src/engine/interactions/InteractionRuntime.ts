@@ -21,7 +21,7 @@ export class InteractionRuntime {
 
   /**
    * Start the interaction runtime
-   * Scans document for [data-aqb-id] elements and attaches listeners
+   * Scans document for [data-buildrick-id] elements and attaches listeners
    */
   start(root?: HTMLElement | Document): void {
     if (this.isRunning) return;
@@ -31,7 +31,7 @@ export class InteractionRuntime {
     this.initIntersectionObserver();
 
     const base = root || document;
-    const elements = base.querySelectorAll("[data-aqb-id]");
+    const elements = base.querySelectorAll("[data-buildrick-id]");
 
     elements.forEach((el) => {
       if (el instanceof HTMLElement) {
@@ -60,7 +60,7 @@ export class InteractionRuntime {
           const interactions = this.observedElements.get(element);
           if (!interactions) return;
 
-          const id = element.getAttribute("data-aqb-id");
+          const id = element.getAttribute("data-buildrick-id");
           if (!id) return;
 
           interactions.forEach((interaction) => {
@@ -128,15 +128,15 @@ export class InteractionRuntime {
    * Attach interaction listeners to a specific element
    */
   attachToElement(element: HTMLElement): void {
-    const id = element.getAttribute("data-aqb-id");
+    const id = element.getAttribute("data-buildrick-id");
     if (!id) return;
 
     // We store interaction data in the Composer, but for vanilla exports or sandboxed preview,
     // we might need to look at a data attribute or global registry.
     // For now, let's assume active elements have their interactions available.
-    // NOTE: In a real production build, interactions would be serialized into [data-aqb-interactions].
+    // NOTE: In a real production build, interactions would be serialized into [data-buildrick-interactions].
 
-    const interactionsStr = element.getAttribute("data-aqb-interactions");
+    const interactionsStr = element.getAttribute("data-buildrick-interactions");
     if (!interactionsStr) return;
 
     try {
@@ -316,14 +316,14 @@ export class InteractionRuntime {
   private resolveTarget(sourceId: string, targetType?: string): string | null {
     if (!targetType || targetType === "self") return sourceId;
 
-    const sourceElement = document.querySelector(`[data-aqb-id="${sourceId}"]`);
+    const sourceElement = document.querySelector(`[data-buildrick-id="${sourceId}"]`);
     if (!sourceElement) return sourceId;
 
-    // Handle "parent" - resolve to parent element with data-aqb-id
+    // Handle "parent" - resolve to parent element with data-buildrick-id
     if (targetType === "parent") {
-      const parent = sourceElement.parentElement?.closest("[data-aqb-id]");
+      const parent = sourceElement.parentElement?.closest("[data-buildrick-id]");
       if (parent) {
-        return parent.getAttribute("data-aqb-id");
+        return parent.getAttribute("data-buildrick-id");
       }
       return sourceId; // Fallback to self if no parent found
     }
@@ -340,7 +340,7 @@ export class InteractionRuntime {
       }
 
       if (targetElement) {
-        const targetId = targetElement.getAttribute("data-aqb-id");
+        const targetId = targetElement.getAttribute("data-buildrick-id");
         if (targetId) return targetId;
       }
     } catch (e) {

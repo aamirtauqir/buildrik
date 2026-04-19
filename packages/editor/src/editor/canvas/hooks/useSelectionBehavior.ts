@@ -226,9 +226,9 @@ export function useSelectionBehavior({
       // Ignore clicks on toolbar/control elements
       if (
         target.closest(
-          ".aqb-quick-actions, .aqb-unified-toolbar, .aqb-selection-label, " +
-            ".aqb-canvas-breadcrumb, .aqb-alignment-toolbar, .aqb-floating-helper, " +
-            ".aqb-inspector-toggle, .aqb-command-palette"
+          ".buildrick-quick-actions, .buildrick-unified-toolbar, .buildrick-selection-label, " +
+            ".buildrick-canvas-breadcrumb, .buildrick-alignment-toolbar, .buildrick-floating-helper, " +
+            ".buildrick-inspector-toggle, .buildrick-command-palette"
         )
       ) {
         return;

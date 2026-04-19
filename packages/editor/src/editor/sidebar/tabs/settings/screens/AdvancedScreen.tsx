@@ -81,8 +81,8 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
   }, [composer, headCode, bodyCode, cssCode, markClean]);
 
   return (
-    <div className="aqb-st-screen">
-      <div className="aqb-st-warning">⚠️ Custom code runs on all pages. Test thoroughly.</div>
+    <div className="buildrick-st-screen">
+      <div className="buildrick-st-warning">⚠️ Custom code runs on all pages. Test thoroughly.</div>
 
       <Section title="Head Scripts">
         <textarea
@@ -95,7 +95,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
           aria-label="Head Scripts"
           aria-describedby={headValidation ? "head-validation-feedback" : undefined}
           placeholder={"<script>...</script>\n<link>...</link>"}
-          className="aqb-st-input" style={{ minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
+          className="buildrick-st-input" style={{ minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
         />
         {headValidation && (
           <div id="head-validation-feedback" role="status" aria-live="polite" style={validationContainerStyles}>
@@ -122,7 +122,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
           }}
           aria-label="Body Scripts"
           placeholder={"<script>...</script>"}
-          className="aqb-st-input" style={{ minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
+          className="buildrick-st-input" style={{ minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
         />
       </Section>
 
@@ -137,7 +137,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
           aria-label="Global CSS"
           aria-describedby={cssValidation ? "css-validation-feedback" : undefined}
           placeholder={"/* Custom CSS */\n.my-class { color: red; }"}
-          className="aqb-st-input" style={{ minHeight: 100, fontFamily: "monospace", fontSize: 12 }}
+          className="buildrick-st-input" style={{ minHeight: 100, fontFamily: "monospace", fontSize: 12 }}
         />
         {cssValidation && (
           <div id="css-validation-feedback" role="status" aria-live="polite" style={validationContainerStyles}>

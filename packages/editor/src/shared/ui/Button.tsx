@@ -38,7 +38,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       justifyContent: "center",
       gap: 6,
       border: "none",
-      borderRadius: "var(--aqb-radius-md, 8px)",
+      borderRadius: "var(--buildrick-design-radius-md, 8px)",
       cursor: disabled || loading ? "not-allowed" : "pointer",
       fontFamily: "inherit",
       fontWeight: 500,
@@ -59,7 +59,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const variantStyles: Record<string, React.CSSProperties> = {
       // Tier 1 — Primary CTA (Publish, Save)
       primary: {
-        background: "var(--aqb-primary)",
+        background: "var(--buildrick-accent)",
         color: "#fff",
         fontWeight: 600,
         border: "none",
@@ -68,22 +68,22 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       // Tier 2 — Secondary (Preview, Export, Cancel)
       secondary: {
         background: "transparent",
-        color: "var(--aqb-text-secondary)",
-        border: "1px solid var(--aqb-border)",
+        color: "var(--buildrick-text-secondary)",
+        border: "1px solid var(--buildrick-border)",
       },
       // Tier 3 — Ghost (inline actions, toolbar)
       ghost: {
         background: "transparent",
-        color: "var(--aqb-text-muted)",
+        color: "var(--buildrick-text-muted)",
         border: "none",
       },
       danger: {
-        background: "var(--aqb-error)",
+        background: "var(--buildrick-error)",
         color: "#fff",
         border: "none",
       },
       success: {
-        background: "var(--aqb-success)",
+        background: "var(--buildrick-success)",
         color: "#fff",
         border: "none",
       },
@@ -92,7 +92,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         ref={ref}
-        className={`aqb-btn aqb-btn-${variant} aqb-btn-${size} ${className}`}
+        className={`buildrick-btn buildrick-btn-${variant} buildrick-btn-${size} ${className}`}
         style={{
           ...baseStyles,
           ...sizeStyles[size],

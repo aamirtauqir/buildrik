@@ -16,7 +16,7 @@ import { CanvasButton, SIZES } from "../shared";
 // CONSTANTS
 // =============================================================================
 
-const STORAGE_KEY = "aqb-inspector-mode";
+const STORAGE_KEY = "buildrick-inspector-mode";
 
 // =============================================================================
 // TYPES
@@ -121,7 +121,7 @@ export const InspectorToggle: React.FC<InspectorToggleProps> = ({
 
   return (
     <div
-      className={`aqb-inspector-toggle ${className || ""}`}
+      className={`buildrick-inspector-toggle ${className || ""}`}
       style={{
         display: "flex",
         alignItems: "center",

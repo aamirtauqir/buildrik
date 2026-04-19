@@ -67,11 +67,11 @@ export function useCanvasSelectionBox({
 
       // Check if clicking on an element (not empty canvas)
       const target = e.target as HTMLElement;
-      const clickedElement = target.closest("[data-aqb-id]") as HTMLElement | null;
+      const clickedElement = target.closest("[data-buildrick-id]") as HTMLElement | null;
 
       // Only start selection box if clicking on empty canvas or root
       const rootId = composer.elements.getActivePage()?.root?.id;
-      const clickedId = clickedElement?.getAttribute("data-aqb-id");
+      const clickedId = clickedElement?.getAttribute("data-buildrick-id");
 
       if (clickedElement && clickedId !== rootId) {
         // Clicked on an element, don't start selection box
@@ -213,12 +213,12 @@ function findElementsInRect(
   const selectedIds: string[] = [];
   const rootId = composer.elements.getActivePage()?.root?.id;
 
-  // Query all elements with data-aqb-id
-  const elements = canvas.querySelectorAll("[data-aqb-id]");
+  // Query all elements with data-buildrick-id
+  const elements = canvas.querySelectorAll("[data-buildrick-id]");
 
   elements.forEach((el) => {
     const htmlEl = el as HTMLElement;
-    const elementId = htmlEl.getAttribute("data-aqb-id");
+    const elementId = htmlEl.getAttribute("data-buildrick-id");
 
     // Skip root element
     if (!elementId || elementId === rootId) return;

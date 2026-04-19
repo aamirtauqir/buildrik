@@ -12,10 +12,10 @@ import * as React from "react";
 
 function EmptyState() {
   return (
-    <div className="aqb-empty-state aqb-comp-empty-state comp-empty">
+    <div className="buildrick-empty-state buildrick-comp-empty-state comp-empty">
       <span className="comp-empty__icon" aria-hidden="true">◇</span>
-      <p className="aqb-empty-state-title aqb-comp-empty-title comp-empty__title">No components yet</p>
-      <p className="aqb-empty-state-desc aqb-comp-empty-desc comp-empty__body">
+      <p className="buildrick-empty-state-title buildrick-comp-empty-title comp-empty__title">No components yet</p>
+      <p className="buildrick-empty-state-desc buildrick-comp-empty-desc comp-empty__body">
         Select elements on the canvas and save them as reusable components.
       </p>
     </div>

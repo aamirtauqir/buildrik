@@ -182,7 +182,7 @@ export function handleElementDrop(
     if (!dropTargetEl) {
       if (!page) return true;
       const rootId = page.root.id;
-      dropTargetEl = document.querySelector(`[data-aqb-id="${rootId}"]`) as HTMLElement | null;
+      dropTargetEl = document.querySelector(`[data-buildrick-id="${rootId}"]`) as HTMLElement | null;
       if (!dropTargetEl) return true;
     }
 
@@ -323,7 +323,7 @@ export function handleTemplateDrop(e: React.DragEvent, ctx: DropContext): boolea
           composer.selection.select(createdElements[0]);
 
           const domEl = canvasRef.current?.querySelector(
-            `[data-aqb-id="${createdElements[0].getId()}"]`
+            `[data-buildrick-id="${createdElements[0].getId()}"]`
           ) as HTMLElement | null;
           if (domEl) {
             animateDropSuccess(domEl);
@@ -376,8 +376,8 @@ export function handleBlockDrop(e: React.DragEvent, ctx: DropContext): boolean {
 
       if (!targetEl) {
         // Fallback: find target from DOM
-        const domTarget = (e.target as HTMLElement).closest("[data-aqb-id]") as HTMLElement | null;
-        const fallbackId = domTarget?.getAttribute("data-aqb-id");
+        const domTarget = (e.target as HTMLElement).closest("[data-buildrick-id]") as HTMLElement | null;
+        const fallbackId = domTarget?.getAttribute("data-buildrick-id");
         if (fallbackId) {
           targetEl = composer.elements.getElement(fallbackId) || null;
         }
@@ -454,8 +454,8 @@ export function handleBlockDrop(e: React.DragEvent, ctx: DropContext): boolean {
       let targetEl = (freshTargetId && composer.elements.getElement(freshTargetId)) || null;
 
       if (!targetEl) {
-        const domTarget = (e.target as HTMLElement).closest("[data-aqb-id]") as HTMLElement | null;
-        const fallbackId = domTarget?.getAttribute("data-aqb-id");
+        const domTarget = (e.target as HTMLElement).closest("[data-buildrick-id]") as HTMLElement | null;
+        const fallbackId = domTarget?.getAttribute("data-buildrick-id");
         if (fallbackId) {
           targetEl = composer.elements.getElement(fallbackId) || null;
         }
@@ -502,7 +502,7 @@ export function handleBlockDrop(e: React.DragEvent, ctx: DropContext): boolean {
 
             // Drop success animation
             const domEl = canvasRef.current?.querySelector(
-              `[data-aqb-id="${newElementId}"]`
+              `[data-buildrick-id="${newElementId}"]`
             ) as HTMLElement | null;
             if (domEl) {
               animateDropSuccess(domEl);

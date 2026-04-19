@@ -30,8 +30,8 @@ export const TabGuardModal: React.FC<{
     >
       <div
         style={{
-          background: "var(--aqb-surface-3)",
-          border: "1px solid var(--aqb-border)",
+          background: "var(--buildrick-surface-3)",
+          border: "1px solid var(--buildrick-border)",
           borderRadius: 12,
           padding: 20,
           width: 260,
@@ -42,7 +42,7 @@ export const TabGuardModal: React.FC<{
           style={{
             fontSize: 14,
             fontWeight: 600,
-            color: "var(--aqb-text-primary)",
+            color: "var(--buildrick-text-primary)",
             marginBottom: 8,
           }}
         >
@@ -51,12 +51,12 @@ export const TabGuardModal: React.FC<{
         <div
           style={{
             fontSize: 12,
-            color: "var(--aqb-text-muted)",
+            color: "var(--buildrick-text-muted)",
             marginBottom: 16,
             lineHeight: 1.6,
           }}
         >
-          Your <strong style={{ color: "var(--aqb-text-primary)" }}>{tabList}</strong> tab
+          Your <strong style={{ color: "var(--buildrick-text-primary)" }}>{tabList}</strong> tab
           {changedTabs.length > 1 ? "s have" : " has"} unsaved changes. Switching tabs will discard{" "}
           {changedTabs.length > 1 ? "all of them" : "them"}.
         </div>
@@ -67,9 +67,9 @@ export const TabGuardModal: React.FC<{
             style={{
               padding: "7px 14px",
               background: "transparent",
-              border: "1px solid var(--aqb-border)",
+              border: "1px solid var(--buildrick-border)",
               borderRadius: 6,
-              color: "var(--aqb-text-secondary)",
+              color: "var(--buildrick-text-secondary)",
               fontSize: 12,
               cursor: "pointer",
             }}

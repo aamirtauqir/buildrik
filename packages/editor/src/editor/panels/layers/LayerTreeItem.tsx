@@ -106,7 +106,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
   } as React.CSSProperties;
 
   const rowClassNames = [
-    "aqb-layer-row",
+    "buildrick-layer-row",
     hasChildren ? "has-children" : "",
     isSelected ? "is-selected" : "",
     isDragging ? "is-dragging" : "",
@@ -150,7 +150,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
   };
 
   return (
-    <div className="aqb-layer-node">
+    <div className="buildrick-layer-node">
       <div
         className={rowClassNames}
         role="treeitem"
@@ -181,15 +181,15 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
         }}
         onKeyDown={handleKeyDown}
       >
-        {dropPosition === "before" && <div className="aqb-drop-indicator aqb-drop-before" />}
-        {dropPosition === "after" && <div className="aqb-drop-indicator aqb-drop-after" />}
-        {dropPosition === "inside" && <div className="aqb-drop-indicator aqb-drop-inside" />}
+        {dropPosition === "before" && <div className="buildrick-drop-indicator buildrick-drop-before" />}
+        {dropPosition === "after" && <div className="buildrick-drop-indicator buildrick-drop-after" />}
+        {dropPosition === "inside" && <div className="buildrick-drop-indicator buildrick-drop-inside" />}
 
         {/* Expand/Collapse Toggle */}
         {hasChildren ? (
           <button
             type="button"
-            className={`aqb-layer-toggle ${isExpanded ? "" : "collapsed"}`}
+            className={`buildrick-layer-toggle ${isExpanded ? "" : "collapsed"}`}
             aria-label={isExpanded ? "Collapse children" : "Expand children"}
             onClick={(e) => {
               e.stopPropagation();
@@ -201,19 +201,19 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
             </svg>
           </button>
         ) : (
-          <span className="aqb-layer-toggle-placeholder" aria-hidden>
+          <span className="buildrick-layer-toggle-placeholder" aria-hidden>
             •
           </span>
         )}
-        <div className="aqb-layer-icon" aria-hidden>
+        <div className="buildrick-layer-icon" aria-hidden>
           <IconComponent size="sm" />
         </div>
-        <div className="aqb-layer-meta">
+        <div className="buildrick-layer-meta">
           {isEditing ? (
             <input
               ref={editInputRef}
               type="text"
-              className="aqb-layer-name-input"
+              className="buildrick-layer-name-input"
               value={editingName}
               onChange={(e) => onEditingNameChange(e.target.value)}
               onBlur={onSaveEditedName}
@@ -226,28 +226,28 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
             />
           ) : (
             <>
-              <span className="aqb-layer-name">{displayName}</span>
+              <span className="buildrick-layer-name">{displayName}</span>
               {/* Type Tag - conditional on displayPrefs */}
               {displayPrefs.showHtmlBadges && (
-                <span className="aqb-layer-type" aria-hidden>
+                <span className="buildrick-layer-type" aria-hidden>
                   {layer.tagName}
                 </span>
               )}
               {displayPrefs.showElementIds && (
-                <span className="aqb-layer-type aqb-layer-id" aria-hidden>
+                <span className="buildrick-layer-type buildrick-layer-id" aria-hidden>
                   #{layer.id.slice(0, 8)}
                 </span>
               )}
               {/* Component Badge */}
               {layer.isComponent && (
-                <span className="aqb-component-badge" title="Component instance">
+                <span className="buildrick-component-badge" title="Component instance">
                   ⚡
                 </span>
               )}
               {/* Breakpoint override chips */}
               {layer.breakpointOverrides?.mobile?.hidden && (
                 <span
-                  className="aqb-layer-bp-chip aqb-bp-mobile"
+                  className="buildrick-layer-bp-chip buildrick-bp-mobile"
                   title="Hidden on mobile"
                   role="img"
                   aria-label="Hidden on mobile"
@@ -257,7 +257,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
               )}
               {layer.breakpointOverrides?.tablet?.hidden && (
                 <span
-                  className="aqb-layer-bp-chip aqb-bp-tablet"
+                  className="buildrick-layer-bp-chip buildrick-bp-tablet"
                   title="Hidden on tablet"
                   role="img"
                   aria-label="Hidden on tablet"
@@ -269,10 +269,10 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
           )}
         </div>
 
-        <div className="aqb-layer-actions">
+        <div className="buildrick-layer-actions">
           <button
             type="button"
-            className={`aqb-layer-action-btn ${isHidden ? "is-active" : ""}`}
+            className={`buildrick-layer-action-btn ${isHidden ? "is-active" : ""}`}
             title={isHidden ? "Show element" : "Hide element"}
             onClick={(e) => onToggleVisibility(layer.id, e)}
             aria-label={isHidden ? "Show element" : "Hide element"}
@@ -281,7 +281,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
           </button>
           <button
             type="button"
-            className={`aqb-layer-action-btn ${isLocked ? "is-active" : ""}`}
+            className={`buildrick-layer-action-btn ${isLocked ? "is-active" : ""}`}
             title={isLocked ? "Unlock element" : "Lock element"}
             onClick={(e) => onToggleLock(layer.id, e)}
             aria-label={isLocked ? "Unlock element" : "Lock element"}
@@ -291,7 +291,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
         </div>
       </div>
       {isExpanded && layer.children.length > 0 && (
-        <div className="aqb-layer-children" role="group">
+        <div className="buildrick-layer-children" role="group">
           {layer.children.map((child) => (
             <LayerTreeItem
               key={child.id}

@@ -27,7 +27,7 @@ export const FILTER_CHIPS: FilterChip[] = [
   { id: "favorites", label: "Favorites" },
 ];
 
-export const FAVORITES_STORAGE_KEY = "aqb-component-favorites";
+export const FAVORITES_STORAGE_KEY = "buildrick-component-favorites";
 
 // ============================================
 // Utilities

@@ -15,7 +15,7 @@ import { migrateLegacyPanelState } from "./panelStateMigration";
 // ============================================
 
 /** LocalStorage key for panel state persistence */
-const PANEL_STATE_KEY = "aqb-panel-state";
+const PANEL_STATE_KEY = "buildrick-panel-state";
 
 // ============================================
 // Types

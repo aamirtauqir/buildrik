@@ -107,8 +107,8 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
               onClick={() => setActiveTab(tab)}
               style={{
                 ...tabButtonStyles,
-                borderBottomColor: activeTab === tab ? "var(--aqb-primary)" : "transparent",
-                color: activeTab === tab ? "var(--aqb-text-primary)" : "var(--aqb-text-muted)",
+                borderBottomColor: activeTab === tab ? "var(--buildrick-accent)" : "transparent",
+                color: activeTab === tab ? "var(--buildrick-text-primary)" : "var(--buildrick-text-muted)",
               }}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -152,7 +152,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                   min={1}
                   max={100}
                 />
-                <span style={{ fontSize: 12, color: "var(--aqb-text-muted)" }}>
+                <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
                   Width/Height in pixels
                 </span>
               </div>
@@ -206,7 +206,7 @@ const containerStyles: React.CSSProperties = {
 const tabBarStyles: React.CSSProperties = {
   display: "flex",
   gap: 20,
-  borderBottom: "1px solid var(--aqb-border-subtle)",
+  borderBottom: "1px solid var(--buildrick-border-subtle)",
   marginBottom: 20,
 };
 
@@ -234,16 +234,16 @@ const formGroupStyles: React.CSSProperties = {
 const labelStyles: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   marginBottom: 4,
 };
 
 const inputStyles: React.CSSProperties = {
   padding: "8px 12px",
-  background: "var(--aqb-surface-3)",
-  border: "1px solid var(--aqb-border)",
+  background: "var(--buildrick-surface-3)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 6,
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
   fontSize: 13,
 };
 
@@ -262,7 +262,7 @@ const checkboxStyles: React.CSSProperties = {
 
 const hintStyles: React.CSSProperties = {
   fontSize: 12,
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
   marginTop: 4,
 };
 

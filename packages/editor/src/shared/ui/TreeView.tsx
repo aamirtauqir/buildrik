@@ -58,14 +58,14 @@ function TreeItem<T>({
     gap: 4,
     padding: "4px 8px",
     paddingLeft: depth * indent + 8,
-    borderRadius: "var(--aqb-radius-sm)",
+    borderRadius: "var(--buildrick-design-radius-sm)",
     cursor: "pointer",
     background: isSelected
-      ? "var(--aqb-primary-light)"
+      ? "var(--buildrick-accent-subtle)"
       : isHovered
-        ? "var(--aqb-bg-hover)"
+        ? "var(--buildrick-bg-hover)"
         : "transparent",
-    transition: "background var(--aqb-transition-fast)",
+    transition: "background var(--buildrick-transition-fast)",
     userSelect: "none",
   };
 
@@ -75,8 +75,8 @@ function TreeItem<T>({
     justifyContent: "center",
     width: 16,
     height: 16,
-    color: "var(--aqb-text-muted)",
-    transition: "transform var(--aqb-transition-fast)",
+    color: "var(--buildrick-text-muted)",
+    transition: "transform var(--buildrick-transition-fast)",
     transform: isExpanded ? "rotate(90deg)" : "rotate(0deg)",
     visibility: hasChildren ? "visible" : "hidden",
   };
@@ -87,7 +87,7 @@ function TreeItem<T>({
     alignItems: "center",
     gap: 6,
     fontSize: 12,
-    color: isSelected ? "var(--aqb-primary)" : "var(--aqb-text-primary)",
+    color: isSelected ? "var(--buildrick-accent)" : "var(--buildrick-text-primary)",
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
@@ -120,7 +120,7 @@ function TreeItem<T>({
         </span>
         {renderIcon && (
           <span
-            style={{ display: "flex", alignItems: "center", color: "var(--aqb-text-tertiary)" }}
+            style={{ display: "flex", alignItems: "center", color: "var(--buildrick-text-tertiary)" }}
           >
             {renderIcon(node.data, node)}
           </span>
@@ -167,7 +167,7 @@ export function TreeView<T>({
   };
 
   return (
-    <div className={`aqb-tree-view ${className}`} style={containerStyles} role="tree">
+    <div className={`buildrick-tree-view ${className}`} style={containerStyles} role="tree">
       {items.map((node) => (
         <TreeItem
           key={node.id}

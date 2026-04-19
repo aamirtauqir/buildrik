@@ -19,13 +19,13 @@
    These can be overridden by default.css tokens
    ============================================ */
 :root {
-  --layout-rail-width: var(--aqb-sidebar-width, 56px);
-  --layout-drawer-width: var(--aqb-sidebar-panel-width, 280px);
-  --layout-inspector-width: var(--aqb-right-panel-width, 300px);
-  --layout-topbar-height: var(--aqb-header-height, 52px);
-  --layout-footer-height: var(--aqb-footer-height, 40px);
-  --layout-gap: var(--aqb-space-3, 12px);
-  --layout-touch-min: var(--aqb-touch-min, 44px);
+  --layout-rail-width: var(--buildrick-sidebar-width, 56px);
+  --layout-drawer-width: var(--buildrick-sidebar-panel-width, 280px);
+  --layout-inspector-width: var(--buildrick-right-panel-width, 300px);
+  --layout-topbar-height: var(--buildrick-header-height, 52px);
+  --layout-footer-height: var(--buildrick-footer-height, 40px);
+  --layout-gap: var(--buildrick-design-space-3, 12px);
+  --layout-touch-min: var(--buildrick-touch-min, 44px);
 }
 
 /* ============================================
@@ -47,9 +47,9 @@
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: var(--aqb-bg-app);
-  color: var(--aqb-text-primary);
-  font-family: var(--aqb-font-family);
+  background: var(--buildrick-bg-app);
+  color: var(--buildrick-text-primary);
+  font-family: var(--buildrick-font-family);
 }
 
 /* Drawer open state - expand drawer column */
@@ -225,7 +225,7 @@
     right: var(--layout-gap, 12px);
     bottom: var(--layout-gap, 12px);
     width: var(--layout-inspector-width, 300px);
-    border-radius: var(--aqb-radius-xl, 16px);
+    border-radius: var(--buildrick-design-radius-xl, 16px);
     box-shadow: var(--glass-shadow-lg, 0 8px 32px rgba(0, 0, 0, 0.37));
     z-index: 200;
   }

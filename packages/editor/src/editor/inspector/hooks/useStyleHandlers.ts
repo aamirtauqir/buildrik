@@ -106,7 +106,7 @@ export function useStyleHandlers(
       const el = composer?.elements.getElement(selectedElement.id);
       if (!el) return;
 
-      const selector = `[data-aqb-id="${selectedElement.id}"]`;
+      const selector = `[data-buildrick-id="${selectedElement.id}"]`;
 
       // 1. Immediate local state update — live preview without waiting for debounce
       setStyles((prev) => {

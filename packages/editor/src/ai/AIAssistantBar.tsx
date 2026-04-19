@@ -187,7 +187,6 @@ const barStyles: React.CSSProperties = {
   padding: "8px 16px",
   gap: 12,
   pointerEvents: "auto",
-  animation: "aqb-bar-slide-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
 };
 
 const iconStyles: React.CSSProperties = {

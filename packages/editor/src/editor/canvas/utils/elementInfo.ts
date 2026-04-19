@@ -121,11 +121,11 @@ export const TYPE_ICON_MAP: Record<string, string> = {
  */
 export function getFriendlyName(element: HTMLElement): string {
   // Check for custom name attribute first
-  const customName = element.getAttribute("data-aqb-name");
+  const customName = element.getAttribute("data-buildrick-name");
   if (customName) return customName;
 
   // Check for type attribute
-  const type = element.getAttribute("data-aqb-type");
+  const type = element.getAttribute("data-buildrick-type");
   if (type) {
     return TYPE_NAME_MAP[type.toLowerCase()] || type;
   }
@@ -152,7 +152,7 @@ export function getElementNameFromType(type: string, tagName?: string): string {
  * Get parent element name
  */
 export function getParentName(element: HTMLElement): string | null {
-  const parent = element.parentElement?.closest("[data-aqb-id]") as HTMLElement | null;
+  const parent = element.parentElement?.closest("[data-buildrick-id]") as HTMLElement | null;
   if (!parent) return null;
   return getFriendlyName(parent);
 }
@@ -249,12 +249,12 @@ export function getElementInfo(element: HTMLElement): ElementInfo {
 
   // Check for CMS binding (data attribute)
   const hasCMSBinding =
-    element.hasAttribute("data-aqb-cms-bound") ||
-    Boolean(element.querySelector("[data-aqb-cms-bound]"));
+    element.hasAttribute("data-buildrick-cms-bound") ||
+    Boolean(element.querySelector("[data-buildrick-cms-bound]"));
 
   return {
     tagName,
-    id: element.getAttribute("data-aqb-id") || "",
+    id: element.getAttribute("data-buildrick-id") || "",
     classes: Array.from(element.classList),
     dimensions: {
       width: Math.round(rect.width),

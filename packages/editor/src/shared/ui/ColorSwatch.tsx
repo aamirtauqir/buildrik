@@ -46,10 +46,10 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
     position: "relative",
     width: dimension,
     height: dimension,
-    borderRadius: size === "xs" ? 3 : "var(--aqb-radius-sm)",
+    borderRadius: size === "xs" ? 3 : "var(--buildrick-design-radius-sm)",
     cursor: disabled ? "not-allowed" : onClick ? "pointer" : "default",
     opacity: disabled ? 0.4 : 1,
-    transition: "all var(--aqb-transition-fast)",
+    transition: "all var(--buildrick-transition-fast)",
     transform: isHovered && onClick ? "scale(1.1)" : "scale(1)",
     ...style,
   };
@@ -80,17 +80,17 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
     inset: 0,
     borderRadius: "inherit",
     border: selected
-      ? "2px solid var(--aqb-primary)"
+      ? "2px solid var(--buildrick-accent)"
       : isWhite || isTransparent
-        ? "1px solid var(--aqb-border)"
+        ? "1px solid var(--buildrick-border)"
         : "1px solid transparent",
-    boxShadow: selected ? "0 0 0 2px var(--aqb-primary-light)" : "none",
+    boxShadow: selected ? "0 0 0 2px var(--buildrick-accent-subtle)" : "none",
     pointerEvents: "none",
   };
 
   const swatch = (
     <div
-      className={`aqb-color-swatch ${selected ? "selected" : ""} ${className}`}
+      className={`buildrick-color-swatch ${selected ? "selected" : ""} ${className}`}
       style={containerStyles}
       onClick={disabled ? undefined : onClick}
       onMouseEnter={() => setIsHovered(true)}
@@ -127,7 +127,7 @@ export const ColorSwatchGroup: React.FC<{
 }> = ({ colors, selectedColor, size = "sm", onSelect, className = "", style }) => {
   return (
     <div
-      className={`aqb-color-swatch-group ${className}`}
+      className={`buildrick-color-swatch-group ${className}`}
       style={{
         display: "flex",
         flexWrap: "wrap",

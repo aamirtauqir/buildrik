@@ -79,14 +79,14 @@ export const Tooltip: React.FC<TooltipProps> = ({
         <div
           role="tooltip"
           id={tooltipId}
-          className="aqb-tooltip"
+          className="buildrick-tooltip"
           style={{
             position: "fixed",
             left: coords.x,
             top: coords.y,
             transform: getTransform(position),
-            background: "var(--aqb-bg-panel-secondary)",
-            color: "var(--aqb-text-primary)",
+            background: "var(--buildrick-bg-panel-secondary)",
+            color: "var(--buildrick-text-primary)",
             padding: "6px 10px",
             borderRadius: 6,
             fontSize: 12,
@@ -94,7 +94,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
             zIndex: 3000,
             pointerEvents: "none",
             whiteSpace: "nowrap",
-            animation: "aqb-tooltip-in 0.15s ease",
+            animation: "buildrick-tooltip-in 0.15s ease",
           }}
         >
           {content}

@@ -37,43 +37,43 @@ export interface MultiSelectToolbarProps {
 const toolbarStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
-  gap: "var(--aqb-space-4)",
-  padding: "var(--aqb-space-4)",
+  gap: "var(--buildrick-design-space-4)",
+  padding: "var(--buildrick-design-space-4)",
 };
 
 const sectionStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
-  gap: "var(--aqb-space-2)",
+  gap: "var(--buildrick-design-space-2)",
 };
 
 const sectionLabelStyles: React.CSSProperties = {
-  fontSize: "var(--aqb-text-xs)",
+  fontSize: "var(--buildrick-text-xs)",
   fontWeight: 600,
-  color: "var(--aqb-text-tertiary)",
+  color: "var(--buildrick-text-tertiary)",
   textTransform: "uppercase" as const,
   letterSpacing: "0.05em",
 };
 
 const buttonGroupStyles: React.CSSProperties = {
   display: "flex",
-  gap: "var(--aqb-space-1)",
-  background: "var(--aqb-surface-3)",
-  padding: "var(--aqb-space-1)",
-  borderRadius: "var(--aqb-radius-md)",
+  gap: "var(--buildrick-design-space-1)",
+  background: "var(--buildrick-surface-3)",
+  padding: "var(--buildrick-design-space-1)",
+  borderRadius: "var(--buildrick-design-radius-md)",
 };
 
 const countBadgeStyles: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
-  background: "var(--aqb-primary-light)",
-  color: "var(--aqb-primary)",
-  fontSize: "var(--aqb-text-sm)",
+  background: "var(--buildrick-accent-subtle)",
+  color: "var(--buildrick-accent)",
+  fontSize: "var(--buildrick-text-sm)",
   fontWeight: 600,
-  padding: "var(--aqb-space-2) var(--aqb-space-3)",
-  borderRadius: "var(--aqb-radius-md)",
-  marginBottom: "var(--aqb-space-2)",
+  padding: "var(--buildrick-design-space-2) var(--buildrick-design-space-3)",
+  borderRadius: "var(--buildrick-design-radius-md)",
+  marginBottom: "var(--buildrick-design-space-2)",
 };
 
 // ============================================================================

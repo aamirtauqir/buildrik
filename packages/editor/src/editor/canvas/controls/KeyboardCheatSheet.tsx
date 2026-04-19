@@ -195,7 +195,7 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
         justifyContent: "center",
         background: "rgba(0, 0, 0, 0.6)",
         backdropFilter: "blur(4px)",
-        animation: "aqb-fade-in 0.15s ease",
+        animation: "buildrick-fade-in 0.15s ease",
       }}
     >
       <div
@@ -212,7 +212,7 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
-          animation: "aqb-scale-in 0.2s ease",
+          animation: "buildrick-scale-in 0.2s ease",
           outline: "none",
         }}
       >

@@ -29,20 +29,20 @@ import type { Composer } from "../../../engine/Composer";
 // ============================================================================
 
 /** Test if a CSS value is a token var() binding */
-const isTokenVarValue = (val: string): boolean => /^var\(--aqb-/.test(val);
+const isTokenVarValue = (val: string): boolean => /^var\(--buildrick-design-/.test(val);
 
-/** Extract --aqb-* var name from var(--aqb-…). Returns null if not a token var. */
+/** Extract --buildrick-design-* var name from var(--buildrick-design-…). Returns null if not a token var. */
 const extractCssVar = (val: string): string | null => {
-  const m = val.match(/^var\((--aqb-[^)]+)\)/);
+  const m = val.match(/^var\((--buildrick-design-[^)]+)\)/);
   return m ? m[1] : null;
 };
 
 /**
- * Extract element ID from an [data-aqb-id="..."] selector.
- * Handles pseudo selectors: [data-aqb-id="foo"]:hover → "foo"
+ * Extract element ID from an [data-buildrick-id="..."] selector.
+ * Handles pseudo selectors: [data-buildrick-id="foo"]:hover → "foo"
  */
 const extractElementIdFromSelector = (selector: string): string | null => {
-  const m = selector.match(/\[data-aqb-id="([^"]+)"\]/);
+  const m = selector.match(/\[data-buildrick-id="([^"]+)"\]/);
   return m ? m[1] : null;
 };
 
@@ -68,9 +68,9 @@ export function useTokenUsageMap(
 
     // Helper: record a token→element binding
     const record = (cssVar: string, elementId: string) => {
-      // cssVar is "--aqb-color-primary". Map key is token id derived from cssVar:
-      // "--aqb-color-primary" → "color-primary", "--aqb-space-4" → "space-4"
-      const tokenId = cssVar.replace(/^--aqb-/, "");
+      // cssVar is "--buildrick-design-color-primary". Map key is token id derived from cssVar:
+      // "--buildrick-design-color-primary" → "color-primary", "--buildrick-design-space-4" → "space-4"
+      const tokenId = cssVar.replace(/^--buildrick-design-/, "");
       if (!map.has(tokenId)) map.set(tokenId, new Set());
       map.get(tokenId)!.add(elementId);
     };

@@ -49,7 +49,7 @@ export const CanvasSpot: React.FC<CanvasSpotProps> = ({
 
   return (
     <div
-      className={`aqb-canvas-spot ${className || ""}`}
+      className={`buildrick-canvas-spot ${className || ""}`}
       style={{
         position: "absolute",
         zIndex,
@@ -67,7 +67,7 @@ export const CanvasSpot: React.FC<CanvasSpotProps> = ({
  */
 export const PointerBadge: React.FC<PointerBadgeProps> = ({
   label,
-  color = "var(--aqb-primary)",
+  color = "var(--buildrick-accent)",
   position,
   visible = true,
 }) => {
@@ -75,7 +75,7 @@ export const PointerBadge: React.FC<PointerBadgeProps> = ({
 
   return (
     <div
-      className="aqb-pointer-badge"
+      className="buildrick-pointer-badge"
       style={{
         position: "absolute",
         top: position.y - 24,

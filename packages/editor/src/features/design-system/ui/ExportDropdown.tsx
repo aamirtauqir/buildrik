@@ -38,9 +38,9 @@ export const ExportDropdown: React.FC<{
         style={{
           padding: "4px 10px",
           background: "rgba(255,255,255,0.05)",
-          border: "1px solid var(--aqb-border)",
+          border: "1px solid var(--buildrick-border)",
           borderRadius: 6,
-          color: "var(--aqb-text-secondary)",
+          color: "var(--buildrick-text-secondary)",
           fontSize: 12,
           cursor: "pointer",
           display: "flex",
@@ -67,8 +67,8 @@ export const ExportDropdown: React.FC<{
             position: "absolute",
             top: "calc(100% + 4px)",
             right: 0,
-            background: "var(--aqb-surface-3)",
-            border: "1px solid var(--aqb-border)",
+            background: "var(--buildrick-surface-3)",
+            border: "1px solid var(--buildrick-border)",
             borderRadius: 8,
             overflow: "hidden",
             zIndex: 100,
@@ -80,7 +80,7 @@ export const ExportDropdown: React.FC<{
             <div
               style={{
                 padding: "10px 14px",
-                borderBottom: "1px solid var(--aqb-border)",
+                borderBottom: "1px solid var(--buildrick-border)",
                 background: "rgba(245,158,11,0.06)",
               }}
             >
@@ -94,7 +94,7 @@ export const ExportDropdown: React.FC<{
                 }}
                 style={{
                   fontSize: 12,
-                  color: "var(--aqb-primary)",
+                  color: "var(--buildrick-accent)",
                   background: "none",
                   border: "none",
                   cursor: "pointer",
@@ -124,8 +124,8 @@ export const ExportDropdown: React.FC<{
                 textAlign: "left",
               }}
             >
-              <div style={{ fontSize: 12, color: "var(--aqb-text-primary)" }}>{label}</div>
-              <div style={{ fontSize: 12, color: "var(--aqb-text-muted)", marginTop: 1 }}>
+              <div style={{ fontSize: 12, color: "var(--buildrick-text-primary)" }}>{label}</div>
+              <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginTop: 1 }}>
                 {desc}
               </div>
             </button>

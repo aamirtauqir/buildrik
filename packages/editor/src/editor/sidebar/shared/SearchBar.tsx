@@ -137,10 +137,10 @@ const containerStyles: React.CSSProperties = {
   margin: 0,
   padding: "0 8px",
   height: 36,
-  background: "var(--ls-bg-card, #FFFFFF)",
-  border: "1px solid var(--ls-border-card, #D1D9E6)",
+  background: "var(--buildrick-bg-card, #FFFFFF)",
+  border: "1px solid var(--buildrick-border, #D1D9E6)",
   borderRadius: 4,
-  color: "var(--ls-text-lighter, #94A3B8)",
+  color: "var(--buildrick-text-secondary, #94A3B8)",
   transition: "border-color 0.15s ease, box-shadow 0.15s ease",
 };
 
@@ -148,7 +148,7 @@ const inputStyles: React.CSSProperties = {
   flex: 1,
   background: "transparent",
   border: "none",
-  color: "var(--ls-text-primary)",
+  color: "var(--buildrick-text-primary)",
   fontSize: 12,
   outline: "none",
   lineHeight: "18px",
@@ -163,7 +163,7 @@ const clearButtonStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
   cursor: "pointer",
-  color: "var(--ls-text-subtle, #64748B)",
+  color: "var(--buildrick-text-muted, #64748B)",
   borderRadius: 4,
 };
 

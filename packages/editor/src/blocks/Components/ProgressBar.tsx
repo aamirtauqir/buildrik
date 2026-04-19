@@ -74,7 +74,7 @@ export const progressBlockConfig = {
   elementType: "progress" as const,
   icon: "📊",
   content:
-    '<div class="pb-card" data-aqb-type="progress">' +
+    '<div class="pb-card" data-buildrick-type="progress">' +
     '<h1 class="pb-title">Your Progress</h1>' +
     '<div class="pb-progress">' +
     '<div class="pb-circle">93%</div>' +

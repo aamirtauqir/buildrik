@@ -62,7 +62,7 @@ export const ExportScreen: React.FC<ScreenProps> = ({ composer }) => {
           includeViewport: true,
           includeCSS: true,
           includeComments: false,
-          cssPrefix: "aqb-",
+          cssPrefix: "buildrick-",
         });
 
         blob = await engine.generateZip({
@@ -215,24 +215,24 @@ const optionLabelStyles: React.CSSProperties = {
   marginTop: 8,
   fontSize: 12,
   fontWeight: 600,
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
 };
 
 const optionHintStyles: React.CSSProperties = {
   marginTop: 2,
   fontSize: 12,
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
   textAlign: "center",
 };
 
 const downloadBtnStyles: React.CSSProperties = {
   width: "100%",
   padding: "10px 16px",
-  background: "var(--aqb-primary)",
+  background: "var(--buildrick-accent)",
   border: "none",
-  borderRadius: "var(--aqb-radius-md)",
+  borderRadius: "var(--buildrick-design-radius-md)",
   color: "#fff",
-  fontSize: "var(--aqb-font-sm)",
+  fontSize: "var(--buildrick-font-sm)",
   fontWeight: 600,
   cursor: "pointer",
   marginBottom: 8,
@@ -275,21 +275,21 @@ const comingSoonStyles: React.CSSProperties = {
   justifyContent: "center",
   padding: 32,
   textAlign: "center",
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
 };
 
 const comingSoonTitleStyles: React.CSSProperties = {
   margin: 0,
   fontSize: 16,
   fontWeight: 700,
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
 };
 
 const comingSoonDescStyles: React.CSSProperties = {
   margin: "8px 0 0",
   fontSize: 13,
   lineHeight: 1.5,
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   maxWidth: 280,
 };
 
@@ -297,7 +297,7 @@ const comingSoonTimelineStyles: React.CSSProperties = {
   margin: "12px 0 0",
   fontSize: 13,
   fontWeight: 600,
-  color: "var(--aqb-primary)",
+  color: "var(--buildrick-accent)",
   padding: "4px 12px",
   background: "rgba(45,109,255,0.08)",
   borderRadius: 20,
@@ -307,7 +307,7 @@ const comingSoonTimelineStyles: React.CSSProperties = {
 const comingSoonSocialStyles: React.CSSProperties = {
   margin: "12px 0 0",
   fontSize: 12,
-  color: "var(--aqb-text-muted)",
+  color: "var(--buildrick-text-muted)",
 };
 
 const waitlistFormStyles: React.CSSProperties = {
@@ -320,7 +320,7 @@ const waitlistLabelStyles: React.CSSProperties = {
   display: "block",
   fontSize: 12,
   fontWeight: 500,
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   marginBottom: 6,
 };
 
@@ -328,16 +328,16 @@ const waitlistInputStyles: React.CSSProperties = {
   flex: 1,
   padding: "8px 10px",
   background: "rgba(255,255,255,0.05)",
-  border: "1px solid var(--aqb-border)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 6,
-  color: "var(--aqb-text-primary)",
+  color: "var(--buildrick-text-primary)",
   fontSize: 12,
   outline: "none",
 };
 
 const waitlistBtnStyles: React.CSSProperties = {
   padding: "8px 14px",
-  background: "var(--aqb-primary)",
+  background: "var(--buildrick-accent)",
   color: "#fff",
   border: "none",
   borderRadius: 6,

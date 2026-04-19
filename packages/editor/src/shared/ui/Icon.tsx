@@ -54,13 +54,13 @@ const SIZE_MAP: Record<IconSize, number> = {
 
 const COLOR_MAP: Record<IconColor, string> = {
   inherit: "currentColor",
-  primary: "var(--aqb-primary)",
-  secondary: "var(--aqb-text-secondary)",
-  muted: "var(--aqb-text-muted)",
-  error: "var(--aqb-error)",
-  success: "var(--aqb-success)",
-  warning: "var(--aqb-warning)",
-  ai: "var(--aqb-ai)",
+  primary: "var(--buildrick-accent)",
+  secondary: "var(--buildrick-text-secondary)",
+  muted: "var(--buildrick-text-muted)",
+  error: "var(--buildrick-error)",
+  success: "var(--buildrick-success)",
+  warning: "var(--buildrick-warning)",
+  ai: "var(--buildrick-accent)",
 };
 
 /**
@@ -104,7 +104,7 @@ export const Icon: React.FC<IconProps> = ({
       size={pixelSize}
       strokeWidth={strokeWidth}
       color={colorValue}
-      className={`aqb-icon ${className || ""}`}
+      className={`buildrick-icon ${className || ""}`}
       style={style}
       aria-label={ariaLabel}
       aria-hidden={ariaHidden}

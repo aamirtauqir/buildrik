@@ -209,7 +209,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
           <div style={{ ...styles.uploadArea, textAlign: "center", padding: "40px 24px" }}>
             <div style={{ fontSize: 40, marginBottom: 16 }}>🔗</div>
             <div style={{ fontWeight: 600, marginBottom: 8 }}>Import from URL — coming soon</div>
-            <div style={{ fontSize: 13, color: "var(--aqb-text-muted)", lineHeight: 1.5 }}>
+            <div style={{ fontSize: 13, color: "var(--buildrick-text-muted)", lineHeight: 1.5 }}>
               Paste an image or video URL to import it directly.
               <br />
               This feature is launching soon.
@@ -240,7 +240,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
                   }
                   return (
                     <div
-                      style={{ textAlign: "center", padding: 40, color: "var(--aqb-text-muted)" }}
+                      style={{ textAlign: "center", padding: 40, color: "var(--buildrick-text-muted)" }}
                     >
                       Select an image to optimize
                     </div>
@@ -248,7 +248,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
                 })()}
               </>
             ) : (
-              <div style={{ textAlign: "center", padding: 40, color: "var(--aqb-text-muted)" }}>
+              <div style={{ textAlign: "center", padding: 40, color: "var(--buildrick-text-muted)" }}>
                 <div style={{ fontSize: 48, marginBottom: 12 }}>🖼️</div>
                 <div>Select an image from the Library to optimize</div>
               </div>
@@ -260,7 +260,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
       {/* Footer with selection info */}
       {multiple && selectedIds.size > 0 && (
         <div style={styles.footer}>
-          <span style={{ color: "var(--aqb-text-secondary)", fontSize: 13 }}>
+          <span style={{ color: "var(--buildrick-text-secondary)", fontSize: 13 }}>
             {selectedIds.size} selected
           </span>
           <Button onClick={handleConfirmSelection}>Use Selected</Button>
@@ -297,7 +297,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
             >
               <div
                 style={{
-                  background: "var(--aqb-surface)",
+                  background: "var(--buildrick-surface)",
                   borderRadius: 8,
                   padding: 24,
                   width: 320,
@@ -309,7 +309,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
                   style={{
                     margin: "0 0 20px",
                     fontSize: 13,
-                    color: "var(--aqb-text-secondary)",
+                    color: "var(--buildrick-text-secondary)",
                   }}
                 >
                   &quot;{asset?.name ?? "This file"}&quot; will be permanently deleted. This cannot

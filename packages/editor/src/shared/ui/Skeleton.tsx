@@ -40,9 +40,9 @@ export interface SkeletonProps {
 
 const radiusMap = {
   none: 0,
-  sm: "var(--aqb-radius-sm, 4px)",
-  md: "var(--aqb-radius-md, 8px)",
-  lg: "var(--aqb-radius-lg, 12px)",
+  sm: "var(--buildrick-design-radius-sm, 4px)",
+  md: "var(--buildrick-design-radius-md, 8px)",
+  lg: "var(--buildrick-design-radius-lg, 12px)",
   full: "9999px",
 };
 
@@ -59,19 +59,19 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 
   const animationStyles: Record<string, React.CSSProperties> = {
     pulse: {
-      animation: "aqb-skeleton-pulse 1.5s ease-in-out infinite",
+      animation: "buildrick-skeleton-pulse 1.5s ease-in-out infinite",
     },
     wave: {
       backgroundImage: "linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent)",
       backgroundSize: "200% 100%",
-      animation: "aqb-skeleton-wave 1.5s ease-in-out infinite",
+      animation: "buildrick-skeleton-wave 1.5s ease-in-out infinite",
     },
     none: {},
   };
 
   return (
     <div
-      className={`aqb-skeleton aqb-skeleton-${effectiveAnimation} ${className}`}
+      className={`buildrick-skeleton buildrick-skeleton-${effectiveAnimation} ${className}`}
       role="status"
       aria-label="Loading..."
       style={{
@@ -108,7 +108,7 @@ export const SkeletonText: React.FC<SkeletonTextProps> = ({
   animation = "pulse",
 }) => {
   return (
-    <div className="aqb-skeleton-text" style={{ display: "flex", flexDirection: "column", gap }}>
+    <div className="buildrick-skeleton-text" style={{ display: "flex", flexDirection: "column", gap }}>
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton
           key={i}
@@ -156,11 +156,11 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({
 }) => {
   return (
     <div
-      className="aqb-skeleton-card"
+      className="buildrick-skeleton-card"
       style={{
-        background: "var(--aqb-bg-panel-secondary, #2d2d44)",
-        borderRadius: "var(--aqb-radius-lg, 12px)",
-        border: "1px solid var(--aqb-border, #334155)",
+        background: "var(--buildrick-bg-panel-secondary, #2d2d44)",
+        borderRadius: "var(--buildrick-design-radius-lg, 12px)",
+        border: "1px solid var(--buildrick-border, #334155)",
         overflow: "hidden",
       }}
     >
@@ -208,14 +208,14 @@ export const SkeletonListItem: React.FC<SkeletonListItemProps> = ({
 }) => {
   return (
     <div
-      className="aqb-skeleton-list-item"
+      className="buildrick-skeleton-list-item"
       style={{
         display: "flex",
         alignItems: "center",
         gap: 12,
         padding: "12px 16px",
         background: "rgba(255, 255, 255, 0.02)",
-        borderRadius: "var(--aqb-radius-md, 8px)",
+        borderRadius: "var(--buildrick-design-radius-md, 8px)",
         border: "1px solid rgba(255, 255, 255, 0.04)",
       }}
     >
@@ -248,14 +248,14 @@ export const SkeletonTable: React.FC<SkeletonTableProps> = ({
 }) => {
   return (
     <div
-      className="aqb-skeleton-table"
+      className="buildrick-skeleton-table"
       style={{
         display: "flex",
         flexDirection: "column",
         gap: 2,
-        background: "var(--aqb-bg-panel-secondary, #2d2d44)",
-        borderRadius: "var(--aqb-radius-lg, 12px)",
-        border: "1px solid var(--aqb-border, #334155)",
+        background: "var(--buildrick-bg-panel-secondary, #2d2d44)",
+        borderRadius: "var(--buildrick-design-radius-lg, 12px)",
+        border: "1px solid var(--buildrick-border, #334155)",
         overflow: "hidden",
         padding: 4,
       }}
@@ -268,7 +268,7 @@ export const SkeletonTable: React.FC<SkeletonTableProps> = ({
             gap: 12,
             padding: "12px 16px",
             background: "rgba(255, 255, 255, 0.03)",
-            borderRadius: "var(--aqb-radius-md, 8px)",
+            borderRadius: "var(--buildrick-design-radius-md, 8px)",
           }}
         >
           {Array.from({ length: columns }).map((_, i) => (
@@ -284,7 +284,7 @@ export const SkeletonTable: React.FC<SkeletonTableProps> = ({
             gridTemplateColumns: `repeat(${columns}, 1fr)`,
             gap: 12,
             padding: "12px 16px",
-            borderRadius: "var(--aqb-radius-md, 8px)",
+            borderRadius: "var(--buildrick-design-radius-md, 8px)",
           }}
         >
           {Array.from({ length: columns }).map((_, colIndex) => (
@@ -329,7 +329,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
     <div style={{ position: "relative" }}>
       {children}
       <div
-        className="aqb-loading-overlay"
+        className="buildrick-loading-overlay"
         style={{
           position: "absolute",
           inset: 0,
@@ -351,13 +351,13 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
           height={spinnerSize}
           viewBox="0 0 24 24"
           fill="none"
-          style={prefersReduced ? {} : { animation: "aqb-spin 1s linear infinite" }}
+          style={prefersReduced ? {} : { animation: "buildrick-spin 1s linear infinite" }}
         >
           <circle
             cx="12"
             cy="12"
             r="10"
-            stroke="var(--aqb-primary, #00d4aa)"
+            stroke="var(--buildrick-accent, #00d4aa)"
             strokeWidth="2"
             strokeLinecap="round"
             strokeDasharray="60 30"
@@ -367,7 +367,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
           <span
             style={{
               fontSize: 13,
-              color: "var(--aqb-text-secondary, #94a3b8)",
+              color: "var(--buildrick-text-secondary, #94a3b8)",
             }}
           >
             {message}
@@ -381,7 +381,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
 // Studio Skeleton - mimic the main editor layout (V3 Blueprint)
 export const StudioSkeleton: React.FC = () => {
   const prefersReduced = useReducedMotion();
-  const spinStyle = prefersReduced ? {} : { animation: "aqb-spin 1s linear infinite" };
+  const spinStyle = prefersReduced ? {} : { animation: "buildrick-spin 1s linear infinite" };
 
   return (
     <div
@@ -536,7 +536,7 @@ export const StudioSkeleton: React.FC = () => {
                 height: 48,
                 borderRadius: "50%",
                 border: "3px solid rgba(255,255,255,0.1)",
-                borderTopColor: "var(--aqb-primary, #00d4aa)",
+                borderTopColor: "var(--buildrick-accent, #00d4aa)",
                 ...spinStyle,
               }}
             />
@@ -602,20 +602,20 @@ export const StudioSkeleton: React.FC = () => {
       </div>
 
       <style>{`
-        @keyframes aqb-skeleton-pulse {
+        @keyframes buildrick-skeleton-pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.4; }
         }
-        @keyframes aqb-skeleton-wave {
+        @keyframes buildrick-skeleton-wave {
           0% { background-position: -200% 0; }
           100% { background-position: 200% 0; }
         }
-        @keyframes aqb-spin {
+        @keyframes buildrick-spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
         @media (prefers-reduced-motion: reduce) {
-          .aqb-skeleton, .aqb-skeleton-pulse, .aqb-skeleton-wave {
+          .buildrick-skeleton, .buildrick-skeleton-pulse, .buildrick-skeleton-wave {
             animation: none !important;
             transition: none !important;
           }

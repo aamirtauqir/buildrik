@@ -110,7 +110,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
   };
 
   return (
-    <div className="aqb-st-screen">
+    <div className="buildrick-st-screen">
       <Section title="Site Identity">
         {saveError && (
           <div role="alert" className="sett-save-error">
@@ -125,7 +125,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             onChange={(e) => { setSiteName(e.target.value); identity.markDirty(); }}
             onBlur={handleBlur}
             placeholder="My Awesome Site"
-            className="aqb-st-input"
+            className="buildrick-st-input"
           />
         </Field>
         <Field label="Favicon URL">
@@ -135,7 +135,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             onChange={(e) => { setFavicon(e.target.value); identity.markDirty(); }}
             onBlur={handleBlur}
             placeholder="https://example.com/favicon.ico"
-            className="aqb-st-input"
+            className="buildrick-st-input"
           />
         </Field>
         <Field label="Site Language">
@@ -143,7 +143,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             value={language}
             onChange={(e) => { setLanguage(e.target.value); identity.markDirty(); }}
             onBlur={handleBlur}
-            className="aqb-st-input"
+            className="buildrick-st-input"
           >
             <option value="en">English</option>
             <option value="es">Spanish</option>
@@ -165,7 +165,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             onChange={(e) => { setTwitter(e.target.value); social.markDirty(); }}
             onBlur={handleBlur}
             placeholder="https://twitter.com/..."
-            className="aqb-st-input"
+            className="buildrick-st-input"
           />
         </Field>
         <Field label="Facebook" htmlFor="social-facebook">
@@ -176,7 +176,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             onChange={(e) => { setFacebook(e.target.value); social.markDirty(); }}
             onBlur={handleBlur}
             placeholder="https://facebook.com/..."
-            className="aqb-st-input"
+            className="buildrick-st-input"
           />
         </Field>
         <Field label="LinkedIn" htmlFor="social-linkedin">
@@ -187,7 +187,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             onChange={(e) => { setLinkedin(e.target.value); social.markDirty(); }}
             onBlur={handleBlur}
             placeholder="https://linkedin.com/..."
-            className="aqb-st-input"
+            className="buildrick-st-input"
           />
         </Field>
       </Section>
@@ -198,7 +198,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             href="/privacy"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ fontSize: 13, color: "var(--aqb-primary)", textDecoration: "none" }}
+            style={{ fontSize: 13, color: "var(--buildrick-accent)", textDecoration: "none" }}
           >
             Privacy Policy →
           </a>
@@ -206,11 +206,11 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             href="/terms"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ fontSize: 13, color: "var(--aqb-primary)", textDecoration: "none" }}
+            style={{ fontSize: 13, color: "var(--buildrick-accent)", textDecoration: "none" }}
           >
             Terms of Service →
           </a>
-          <span style={{ fontSize: 12, color: "var(--aqb-text-muted)", marginTop: 4 }}>
+          <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginTop: 4 }}>
             Your data is stored securely. We do not sell or share your site data.
           </span>
         </div>

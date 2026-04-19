@@ -105,9 +105,9 @@ const chipStyles: React.CSSProperties = {
   padding: "6px 12px",
   height: 28,
   background: "transparent",
-  border: "1px solid var(--aqb-border)",
+  border: "1px solid var(--buildrick-border)",
   borderRadius: 8,
-  color: "var(--aqb-text-secondary)",
+  color: "var(--buildrick-text-secondary)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
@@ -117,8 +117,8 @@ const chipStyles: React.CSSProperties = {
 };
 
 const chipActiveStyles: React.CSSProperties = {
-  background: "var(--aqb-primary)",
-  borderColor: "var(--aqb-primary)",
+  background: "var(--buildrick-accent)",
+  borderColor: "var(--buildrick-accent)",
   color: "#fff",
 };
 
