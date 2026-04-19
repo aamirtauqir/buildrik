@@ -5,17 +5,14 @@
  * Imports:
  *   design-system/index.css — canonical DS (color, typography, spacing, radius,
  *     shadow, motion, z-index, layout, design, a11y)
- *   compat.css — deprecated alias layers during Phase 3 (deleted in Phase 4)
- *   components.css — .buildrick-* class rules + responsive @media (temporary
- *     transitional home; Phase 3 migrates into per-component files)
+ *   components.css — legacy .buildrick-* class rules + responsive @media
+ *     (transitional home; gradually migrated into per-component files)
  *
- * This file is the PUBLIC import path. It does NOT change during migration.
- * Only internals (above imports) shift as consumer migration progresses.
+ * Phase 4 complete: compat.css deleted, no alias layer remaining.
  *
  * See: docs/superpowers/specs/2026-04-19-buildrik-design-system-v1-design.md
  * @license BSD-3-Clause
  */
 
 @import "./design-system/index.css";
-@import "./compat.css";
 @import "./components.css";
