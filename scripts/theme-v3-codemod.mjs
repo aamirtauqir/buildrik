@@ -38,11 +38,32 @@ export function walkFiles(roots, exts) {
   return out;
 }
 
-export function applyOp1(content, mapping) {
-  const csssVars = {
+// Build combined CSS var lookup: chrome + design + undefined_decisions resolved to targets.
+// For undefined_decisions: 'rename-to-existing' uses target field; 'define-new' synthesizes
+// --buildrick-{suffix} where suffix strips the --aqb-/--ls-/--accent- prefix.
+function buildCssVarLookup(mapping) {
+  const lookup = {
     ...mapping.css_vars.chrome_and_canvas_operational,
     ...mapping.css_vars.design_runtime,
   };
+  for (const [from, val] of Object.entries(mapping.css_vars.undefined_decisions || {})) {
+    if (!val || typeof val !== 'object') continue;
+    if (val.action === 'rename-to-existing' && val.target) {
+      lookup[from] = val.target;
+    } else if (val.action === 'define-new') {
+      const suffix = from.replace(/^--(?:aqb|ls|accent)-/, '');
+      lookup[from] = `--buildrick-${suffix}`;
+    } else if (val.action === 'delete-consumer') {
+      // No-op: the consumer reference is usually a comment/placeholder. Leave unchanged.
+      // The final grep-verification suite will flag any surviving --aqb-* references.
+      lookup[from] = from;
+    }
+  }
+  return lookup;
+}
+
+export function applyOp1(content, mapping) {
+  const csssVars = buildCssVarLookup(mapping);
   return content.replace(/var\((--(?:aqb|ls|accent)-[a-z0-9-]+)(\s*,\s*[^)]+)?\)/g, (match, varName, fallback) => {
     const target = csssVars[varName];
     if (!target) throw new Error(`op1: unmapped CSS var ${varName}`);
@@ -51,16 +72,13 @@ export function applyOp1(content, mapping) {
 }
 
 export function applyOp1b(content, mapping) {
-  const cssVars = {
-    ...mapping.css_vars.chrome_and_canvas_operational,
-    ...mapping.css_vars.design_runtime,
-  };
+  const cssVars = buildCssVarLookup(mapping);
   // Match --aqb-X / --ls-X / --accent-X NOT immediately followed by ${ (those are Category B manual).
   return content.replace(
     /(--(?:aqb|ls|accent)-[a-z0-9-]+)(?!\$\{)/g,
     (match, varName) => {
       const target = cssVars[varName];
-      if (!target) return match; // leave for abort detection in verify step (not implemented here)
+      if (!target) return match; // leave for abort detection in verify step
       return target;
     }
   );
@@ -103,11 +121,23 @@ export function applyOp5(content, mapping) {
     }
   }
   // Pattern rename — stop at word-boundary (don't eat trailing hyphens before template expressions)
-  out = out.replace(/\.?aqb-[a-z0-9]+(?:-[a-z0-9]+)*/g, (match) => {
+  // Negative lookbehind (?<!-) rejects matches inside --aqb-X / data-aqb-X (those are CSS vars / data-attrs handled by other ops)
+  out = out.replace(/(?<!-)\.?aqb-[a-z0-9]+(?:-[a-z0-9]+)*/g, (match) => {
     const hasDot = match.startsWith('.');
     const name = hasDot ? match.slice(1) : match;
     const target = mapping.classnames[name];
-    if (!target) throw new Error(`op5: unmapped class ${name}`);
+    if (!target) {
+      // Skip if handled by another op (keyframes / storage keys)
+      if (mapping.keyframes && mapping.keyframes[name] !== undefined) return match;
+      if (mapping.storage_keys && mapping.storage_keys[name] !== undefined) return match;
+      // Skip if handled by dev_flags (colon-prefix match)
+      if (mapping.dev_flags) {
+        for (const prefix of Object.keys(mapping.dev_flags)) {
+          if (name.startsWith(prefix.replace(/:$/, ''))) return match;
+        }
+      }
+      throw new Error(`op5: unmapped class ${name}`);
+    }
     if (typeof target === 'object') return match; // already handled by delete-rule
     return (hasDot ? '.' : '') + target;
   });
@@ -172,15 +202,25 @@ export function runVerify() {
     }
   }
 
-  // 2. Scan for aqb- INSIDE ${...} interpolations (Category B manual abort case)
+  // 2. Scan for aqb- INSIDE ${...} interpolations where it's JS code (not nested string literal).
+  // Per spec: "aqb- inside JS code can't be safely rewritten without understanding surrounding expression".
+  // But aqb- inside a string literal nested in the interpolation IS handleable by ops 1b/4/5/6/7.
+  // Strip string literals from interpolation body before checking.
   const files = walkFiles(DEFAULT_ROOTS, ['.ts', '.tsx']);
   const unhandled = [];
   for (const f of files) {
     const content = readFileSync(f, 'utf8');
     const lines = content.split('\n');
     lines.forEach((line, i) => {
-      if (/\$\{[^}]*aqb-/.test(line)) {
-        unhandled.push(`${relative('.', f)}:${i + 1} — aqb- INSIDE interpolation`);
+      // Find all ${...} interpolation bodies on this line
+      const matches = [...line.matchAll(/\$\{([^}]*)\}/g)];
+      for (const m of matches) {
+        const innerCode = m[1];
+        // Strip nested string literals (double-quote, single-quote, backtick)
+        const stripped = innerCode.replace(/"[^"]*"|'[^']*'|`[^`]*`/g, '');
+        if (/aqb-/.test(stripped)) {
+          unhandled.push(`${relative('.', f)}:${i + 1} — aqb- in JS code inside interpolation (not a string literal)`);
+        }
       }
     });
   }
