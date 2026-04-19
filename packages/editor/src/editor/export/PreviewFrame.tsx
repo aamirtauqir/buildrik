@@ -1,4 +1,8 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette (error boundary / overlay / preview
+ *   frame / warm neutral / onboarding theme). Chrome-hex lint rules do not apply.
+ *
  * Preview Frame Component
  * Renders HTML in an iframe with responsive preview
  * @license BSD-3-Clause

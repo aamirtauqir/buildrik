@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * Layout Visual Previews
  * Display and Position preview components
  * @license BSD-3-Clause

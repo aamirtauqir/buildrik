@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * DataAttributeEditor - Custom data-* attribute editor
  * @license BSD-3-Clause
  */

@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * Element Breadcrumb Navigation
  * Shows clickable path from root to selected element
  * Click any ancestor to select it

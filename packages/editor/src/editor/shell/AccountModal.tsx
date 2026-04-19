@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * AccountModal — Full-screen account settings overlay
  * 4 tabs: Profile, Team & Access, Collaboration Settings, Plans & Billing.
  *

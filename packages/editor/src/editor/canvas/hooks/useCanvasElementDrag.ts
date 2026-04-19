@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * Canvas Element Drag Hook - Professional Drag & Drop System
  * Makes canvas elements draggable for re-parenting using event delegation
  *

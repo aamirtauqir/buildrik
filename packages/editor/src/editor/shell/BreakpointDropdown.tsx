@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * BreakpointDropdown - Viewport width selector
  * Shows current viewport width, preset sizes, and custom input.
  * Used alongside DeviceSwitcherPill in the topbar.

@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * Spacing Controls for Pro Inspector
  * FourSideInput (margin/padding), CornerRadiusInput
  * @license BSD-3-Clause

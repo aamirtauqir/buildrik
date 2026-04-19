@@ -1,3 +1,7 @@
+/* @lint-hex-policy: data-fixture
+   Test fixtures verify the color preview swatch behavior; hex values here
+   are INPUT data to the component under test, not chrome styling. */
+
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { BackgroundSection } from "../sections/BackgroundSection";

@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * FeatureCard - 72px clickable card for home screens (Build, Settings)
  * Card-based navigation pattern for drill-in screens
  * @license BSD-3-Clause

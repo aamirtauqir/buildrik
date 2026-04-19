@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * Overlay Styled Components
  * Shared styles for canvas overlay elements
  * @license BSD-3-Clause

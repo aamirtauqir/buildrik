@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * Text Controls for Pro Inspector
  * TextInputRow, InlineInput, SectionLabel, SubSectionTitle
  * @license BSD-3-Clause

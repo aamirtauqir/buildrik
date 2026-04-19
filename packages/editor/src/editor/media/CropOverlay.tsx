@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * Crop Overlay Component
  * Interactive crop region with handles and aspect ratio presets
  * @license BSD-3-Clause

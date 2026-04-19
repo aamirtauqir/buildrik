@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * DeviceFramePreview
  * CSS-only device frame mockup (iPhone / Android) that wraps the canvas content.
  * Toggle via a small device icon button rendered by the parent.

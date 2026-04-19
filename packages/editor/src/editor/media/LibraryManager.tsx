@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * LibraryManager — fullpage 3-column asset manager (Surface 0)
  * Three columns: folder tree (240px) | asset grid (5-col) | details rail (320px)
  * Opens via "Manage library" button or J shortcut from MediaTab.

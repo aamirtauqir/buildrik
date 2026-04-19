@@ -1,4 +1,8 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette (error boundary / overlay / preview
+ *   frame / warm neutral / onboarding theme). Chrome-hex lint rules do not apply.
+ *
  * TemplatePreviewPanel - Split-view preview panel for templates
  * Renders in canvas area when a template is selected from TemplatesTab
  * Shows empty state or selected template preview with "Use Template" CTA

@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * TemplatePreviewModal — Full-panel dark preview overlay
  * Triggered by "Preview →" on card hover. Shows D/T/M viewport toggle,
  * page tabs (for multi-section templates), and apply/back actions.

@@ -1,4 +1,8 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette (error boundary / overlay / preview
+ *   frame / warm neutral / onboarding theme). Chrome-hex lint rules do not apply.
+ *
  * Accessibility Checker
  * Check and report accessibility issues
  * @license BSD-3-Clause

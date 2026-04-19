@@ -1,7 +1,14 @@
 /**
- * Sections Mode catalog — 9 families × 6 cards = 54 total
+ * Sections Mode catalog — 9 families × 6 cards = 54 total.
  * Each card has production-ready HTML content that inserts into the page root
  * via composer.elements.insertHTMLToElement (see useSectionInsert).
+ *
+ * @lint-hex-policy: user-content
+ *   Section HTML strings are USER SITE CONTENT (inserted into user's page
+ *   when they pick a section). The inline style constants (BG_WHITE, ACCENT,
+ *   etc.) are sample palette defaults — they get overridden by the user's
+ *   Design tab tokens at publish time. Editor chrome rules do not apply.
+ *
  * @license BSD-3-Clause
  */
 

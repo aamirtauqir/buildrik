@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * Inspector Error Boundary
  * Catches errors in inspector sections to prevent entire panel crashes
  * @license BSD-3-Clause

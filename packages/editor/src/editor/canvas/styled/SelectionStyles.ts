@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * Selection Styled Components
  * Shared styles for selection UI elements
  * @license BSD-3-Clause

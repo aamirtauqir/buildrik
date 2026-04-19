@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * styleActions — style clipboard consolidation test
  *
  * Verifies that both the context menu copy-styles action and the keyboard

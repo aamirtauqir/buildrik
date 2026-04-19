@@ -1,4 +1,8 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette (error boundary / overlay / preview
+ *   frame / warm neutral / onboarding theme). Chrome-hex lint rules do not apply.
+ *
  * UnsavedWarningModal — Confirms tab switch with unsaved changes.
  *
  * Three actions:

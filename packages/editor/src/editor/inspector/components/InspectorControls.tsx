@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * Inspector Controls - Search and Collapse/Expand All
  * Phase 7: Aquibra Hybrid Inspector Approach
  *

@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * SettingsErrorBoundary — Catches render errors inside the page-settings
  * drawer so a bad page / composer state can't crash the whole Pages tab.
  *

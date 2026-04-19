@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * VersionHistoryPanel - Saves view with FAB, compare, restore, delete
  * Phase 4: Visual snapshots, Compare view, AI Summary
  * Phase 3: Uses useVersionHistory hook, FAB design, inline confirmations

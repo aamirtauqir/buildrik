@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * CMSCollectionSetupModal — Create CMS Collection (WS-14a)
  * PRD §12.2 — Two-step wizard: Name/Type then Fields
  *

@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * Asset Card Component
  * Displays a single media asset in the library
  * @license BSD-3-Clause

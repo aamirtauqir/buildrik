@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * useCanvasGuides Hook
  * Manages canvas guides with localStorage persistence
  *

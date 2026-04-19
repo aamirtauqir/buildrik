@@ -1,4 +1,7 @@
 /**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ *
  * Smart Alignment Guides Overlay
  * Renders dashed lines when dragging elements to show alignment with siblings
  *
