@@ -42,40 +42,19 @@
   --buildrick-weight-semibold: 600;
   --buildrick-weight-bold: 700;
 
-  /* UI Text Colors (light canonical per DESIGN.md 2026-04-18) */
-  --buildrick-text-primary: #334155;
-  --buildrick-text-secondary: #64748B;
-  --buildrick-text-tertiary: #94A3B8;
+  /* Text / surface / border / accent tokens inherited from
+     themes/design-system/*.css canonical DS V1 — scoped redefs removed
+     to avoid shadowing the canonical palette. */
 
-  /* UI Surface Colors (light canonical per DESIGN.md 2026-04-18) */
-  --buildrick-surface-1: #F8FAFC;     /* Deep background */
-  --buildrick-surface-2: #FFFFFF;     /* Panel background */
-  --buildrick-surface-3: #F1F5F9;     /* Cards, inputs */
-  --buildrick-surface-4: #E2E8F0;     /* Hover states */
-
-  /* Border Colors */
-  --buildrick-border-subtle: rgba(255, 255, 255, 0.06);
-  --buildrick-border-default: rgba(255, 255, 255, 0.1);
-  --buildrick-border-strong: rgba(255, 255, 255, 0.15);
-
-  /* Accent Colors (Professional Blue) */
-  --buildrick-accent: #2563EB;
-  --buildrick-accent-tint: rgba(37, 99, 235, 0.15);
-  --buildrick-accent-hover: rgba(37, 99, 235, 0.3);
-  --buildrick-accent-tint: #3B82F6;
-  --buildrick-accent-pressed: #1D4ED8;
-  /* Legacy purple aliases (for gradual migration) */
-  --buildrick-accent-purple-dark: var(--buildrick-accent-pressed);
-
-  /* Selection Colors (Clean, Professional) - IA Redesign 2026 Part 5.4 */
-  --buildrick-selection-color: #3B82F6;
-  --buildrick-selection-alpha-40: rgba(59, 130, 246, 0.4);
-  --buildrick-selection-alpha-20: rgba(59, 130, 246, 0.2);
-  --buildrick-selection-glow: 0 0 0 1px rgba(59, 130, 246, 0.2), 0 0 20px rgba(59, 130, 246, 0.15);
-  --buildrick-selection-glow-sm: 0 2px 8px rgba(59, 130, 246, 0.25);
-  --buildrick-selection-glow-strong: 0 0 0 2px rgba(59, 130, 246, 0.4), 0 0 20px rgba(59, 130, 246, 0.2);
-  --buildrick-selection-outline: 2px solid #3B82F6;
-  --buildrick-handle-gradient: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+  /* Selection Colors (canvas-specific, derived from accent) */
+  --buildrick-selection-color: var(--buildrick-accent);
+  --buildrick-selection-alpha-40: rgba(45, 109, 255, 0.4);
+  --buildrick-selection-alpha-20: rgba(45, 109, 255, 0.2);
+  --buildrick-selection-glow: 0 0 0 1px rgba(45, 109, 255, 0.2), 0 0 20px rgba(45, 109, 255, 0.15);
+  --buildrick-selection-glow-sm: 0 2px 8px rgba(45, 109, 255, 0.25);
+  --buildrick-selection-glow-strong: 0 0 0 2px rgba(45, 109, 255, 0.4), 0 0 20px rgba(45, 109, 255, 0.2);
+  --buildrick-selection-outline: 2px solid var(--buildrick-accent);
+  --buildrick-handle-gradient: linear-gradient(135deg, var(--buildrick-accent) 0%, var(--buildrick-accent-subtle) 100%);
 
   /* DevTools Box Model Colors (for Alt+Shift hover inspection) */
   --buildrick-boxmodel-content: rgba(111, 168, 220, 0.66);  /* Blue - content area */
