@@ -416,18 +416,6 @@
         "action": "rename-to-existing",
         "target": "--buildrick-accent"
       },
-      "--aqb-color-primary": {
-        "action": "rename-to-existing",
-        "target": "--buildrick-design-color-primary"
-      },
-      "--aqb-color-secondary": {
-        "action": "rename-to-existing",
-        "target": "--buildrick-design-color-secondary"
-      },
-      "--aqb-color-success": {
-        "action": "rename-to-existing",
-        "target": "--buildrick-design-color-success"
-      },
       "--aqb-canvas-content": {
         "action": "define-new",
         "value": "transparent",
