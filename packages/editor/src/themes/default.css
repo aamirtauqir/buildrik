@@ -264,6 +264,7 @@
   --buildrick-text-md: 14px;
   --buildrick-text-md-plus: var(--buildrick-text-md);
   --buildrick-text-micro: var(--buildrick-text-xs);
+  --buildrick-text: var(--buildrick-text-primary);  /* V3 resolve: --aqb-text was undefined — alias to text-primary */
   --buildrick-text-muted: #94A3B8;
   --buildrick-text-on-accent: #FFFFFF;
   --buildrick-text-on-color: #FFFFFF;  /* define-new */
