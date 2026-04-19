@@ -21,7 +21,7 @@
   align-items: center;
   width: var(--layout-rail-width, 60px);
   height: 100%;
-  background: var(--rail-bg, #0c0c12);
+  background: var(--buildrick-bg-panel);
   border-right: 1px solid rgba(255, 255, 255, 0.07);
   position: relative;
   z-index: 20;
@@ -48,13 +48,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 22px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 0 22px rgba(45, 109, 255, 0.5);
   cursor: pointer;
   transition: box-shadow 0.2s;
 }
 
 .left-rail__logo-mark:hover {
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.65);
+  box-shadow: 0 0 30px rgba(45, 109, 255, 0.65);
 }
 
 .left-rail__logo-mark::after {
@@ -115,25 +115,25 @@
   transition:
     background 0.15s ease,
     color 0.15s ease;
-  color: var(--rail-text-default, #3d4a5c);
+  color: var(--buildrick-text-muted);
   font-family: inherit;
 }
 
 /* Hover state — subtle, NO scale */
 .left-rail__item:hover {
   background: rgba(255, 255, 255, 0.04);
-  color: var(--rail-text-hover, #7c88a0);
+  color: var(--buildrick-text-secondary);
 }
 
 /* Active/Selected state — indigo */
 .left-rail__item--active {
-  background: var(--rail-active-bg, rgba(99, 102, 241, 0.09));
-  color: var(--rail-active, #818CF8);
+  background: var(--buildrick-accent-subtle));
+  color: var(--buildrick-accent);
 }
 
 .left-rail__item--active:hover {
-  background: var(--rail-active-bg-hover, rgba(99, 102, 241, 0.13));
-  color: var(--rail-active, #818CF8);
+  background: var(--buildrick-accent-tint));
+  color: var(--buildrick-accent);
 }
 
 /* Active left indicator bar — extends outside via overflow:visible */
@@ -145,13 +145,13 @@
   transform: translateY(-50%);
   width: 2px;
   height: 16px;
-  background: var(--rail-active-bar, #6366F1);
+  background: var(--buildrick-accent);
   border-radius: 0 2px 2px 0;
 }
 
 /* Focus state — teal */
 .left-rail__item:focus-visible {
-  outline: 2px solid var(--rail-focus, #00d4aa);
+  outline: 2px solid var(--buildrick-border-focus);
   outline-offset: 2px;
 }
 
@@ -193,7 +193,7 @@
 }
 
 .left-rail__item--active .left-rail__label {
-  color: var(--rail-active, #818CF8);
+  color: var(--buildrick-accent);
 }
 
 /* ============================================
@@ -205,7 +205,7 @@
   left: calc(100% + 12px);
   top: 50%;
   transform: translateY(-50%);
-  background: var(--rail-tooltip-bg, #161620);
+  background: var(--buildrick-text-primary);
   border: 1px solid rgba(255, 255, 255, 0.10);
   padding: 5px 10px;
   border-radius: 7px;
@@ -245,7 +245,7 @@
   top: 50%;
   transform: translateY(-50%);
   border: 5px solid transparent;
-  border-right-color: var(--rail-tooltip-bg, #161620);
+  border-right-color: var(--buildrick-text-primary);
 }
 
 .left-rail__tooltip-name {
@@ -260,7 +260,7 @@
   border-radius: 4px;
   padding: 1px 5px;
   font-size: 9px;
-  color: var(--rail-text-hover, #7c88a0);
+  color: var(--buildrick-text-secondary);
   font-family: var(--buildrick-design-font-mono, 'JetBrains Mono', monospace);
 }
 
@@ -274,21 +274,21 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  border: 1.5px solid var(--rail-bg, #0c0c12);
+  border: 1.5px solid var(--buildrick-bg-panel);
   z-index: 5;
   pointer-events: none;
 }
 
 .left-rail__badge--warn {
-  background: var(--rail-badge-warn, #f59e0b);
+  background: var(--buildrick-warning);
 }
 
 .left-rail__badge--info {
-  background: var(--rail-badge-info, #6366f1);
+  background: var(--buildrick-accent);
 }
 
 .left-rail__badge--ok {
-  background: var(--rail-badge-ok, #00d4aa);
+  background: var(--buildrick-success);
 }
 
 /* ============================================
@@ -317,7 +317,7 @@
 
 .left-rail__progress-fill {
   fill: none;
-  stroke: var(--rail-badge-warn, #f59e0b);
+  stroke: var(--buildrick-warning);
   stroke-width: 2;
   stroke-linecap: round;
   stroke-dasharray: 0 25.13;
@@ -352,7 +352,7 @@
   border: none;
   border-radius: 7px;
   cursor: pointer;
-  color: var(--rail-text-default, #3d4a5c);
+  color: var(--buildrick-text-muted);
   background: transparent;
   transition:
     color 0.15s ease,
@@ -362,21 +362,21 @@
 
 .left-rail__footer-btn:hover {
   background: rgba(255, 255, 255, 0.04);
-  color: var(--rail-text-hover, #7c88a0);
+  color: var(--buildrick-text-secondary);
 }
 
 .left-rail__footer-btn--active {
-  color: var(--rail-focus, #00d4aa);
+  color: var(--buildrick-border-focus);
   background: rgba(0, 212, 170, 0.08);
 }
 
 .left-rail__footer-btn--active:hover {
-  color: var(--rail-focus, #00d4aa);
+  color: var(--buildrick-border-focus);
   background: rgba(0, 212, 170, 0.12);
 }
 
 .left-rail__footer-btn:focus-visible {
-  outline: 2px solid var(--rail-focus, #00d4aa);
+  outline: 2px solid var(--buildrick-border-focus);
   outline-offset: 2px;
 }
 
@@ -410,7 +410,7 @@
   position: absolute;
   left: calc(100% + 8px);
   bottom: 0;
-  background: var(--rail-tooltip-bg, #161620);
+  background: var(--buildrick-text-primary);
   border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 10px;
   padding: 4px;
@@ -430,7 +430,7 @@
   border: none;
   border-radius: 7px;
   background: transparent;
-  color: var(--rail-text-hover, #7c88a0);
+  color: var(--buildrick-text-secondary);
   cursor: pointer;
   transition:
     background 0.12s ease,
@@ -445,12 +445,12 @@
 }
 
 .left-rail__overflow-item--active {
-  color: var(--rail-active, #818CF8);
+  color: var(--buildrick-accent);
 }
 
 .left-rail__overflow-item--active:hover {
-  color: var(--rail-active, #818CF8);
-  background: var(--rail-active-bg, rgba(99, 102, 241, 0.09));
+  color: var(--buildrick-accent);
+  background: var(--buildrick-accent-subtle));
 }
 
 .left-rail__overflow-icon,
@@ -477,7 +477,7 @@
   border-radius: 4px;
   padding: 1px 5px;
   font-size: 9px;
-  color: var(--rail-text-default, #3d4a5c);
+  color: var(--buildrick-text-muted);
   font-family: var(--buildrick-design-font-mono, 'JetBrains Mono', monospace);
 }
 
