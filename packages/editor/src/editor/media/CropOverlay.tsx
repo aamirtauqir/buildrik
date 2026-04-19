@@ -78,7 +78,7 @@ const styles: Record<string, React.CSSProperties> = {
     background: "var(--buildrick-bg-panel-secondary)",
     border: "1px solid var(--buildrick-border)",
     borderRadius: 4,
-    color: "var(--buildrick-text)",
+    color: "var(--buildrick-text-primary)",
     cursor: "pointer",
   },
   presetBtnActive: {

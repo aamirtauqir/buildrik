@@ -297,7 +297,7 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
             >
               <div
                 style={{
-                  background: "var(--buildrick-surface)",
+                  background: "var(--buildrick-bg-card)",
                   borderRadius: 8,
                   padding: 24,
                   width: 320,

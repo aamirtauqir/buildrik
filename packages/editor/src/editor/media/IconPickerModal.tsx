@@ -116,7 +116,7 @@ const styles = {
     background: "var(--buildrick-bg-panel)",
     cursor: "pointer",
     transition: "all 0.15s ease",
-    color: "var(--buildrick-text)",
+    color: "var(--buildrick-text-primary)",
   },
   iconBtnHover: {
     background: "rgba(99, 102, 241, 0.1)",
@@ -177,7 +177,7 @@ const styles = {
     borderRadius: 6,
     border: "1px solid var(--buildrick-border)",
     background: "var(--buildrick-bg-panel)",
-    color: "var(--buildrick-text)",
+    color: "var(--buildrick-text-primary)",
     fontSize: 12,
     textAlign: "center" as const,
   },
@@ -195,7 +195,7 @@ const styles = {
     borderRadius: 6,
     border: "1px solid var(--buildrick-border)",
     background: "var(--buildrick-bg-panel)",
-    color: "var(--buildrick-text)",
+    color: "var(--buildrick-text-primary)",
     fontSize: 12,
   },
   footer: {

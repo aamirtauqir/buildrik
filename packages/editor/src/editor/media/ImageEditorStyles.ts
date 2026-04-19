@@ -43,7 +43,7 @@ export const imageEditorStyles = {
     background: "transparent",
     borderRadius: 8,
     cursor: "pointer",
-    color: "var(--buildrick-text)",
+    color: "var(--buildrick-text-primary)",
     transition: "all 0.15s ease",
   },
   toolBtnActive: {

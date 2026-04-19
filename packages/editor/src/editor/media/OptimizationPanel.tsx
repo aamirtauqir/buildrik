@@ -60,7 +60,7 @@ const styles: Record<string, React.CSSProperties> = {
     background: "var(--buildrick-bg-panel-secondary)",
     border: "1px solid var(--buildrick-border)",
     borderRadius: 6,
-    color: "var(--buildrick-text)",
+    color: "var(--buildrick-text-primary)",
     cursor: "pointer",
     transition: "all 0.15s ease",
   },
@@ -88,7 +88,7 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: "right" as const,
     fontSize: 13,
     fontFamily: "monospace",
-    color: "var(--buildrick-text)",
+    color: "var(--buildrick-text-primary)",
   },
   statsRow: {
     display: "flex",
@@ -110,7 +110,7 @@ const styles: Record<string, React.CSSProperties> = {
   statValue: {
     fontSize: 14,
     fontWeight: 600,
-    color: "var(--buildrick-text)",
+    color: "var(--buildrick-text-primary)",
   },
   savings: {
     color: "#a6e3a1",
