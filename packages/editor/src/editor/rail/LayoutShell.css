@@ -255,7 +255,7 @@
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  background: var(--surface-canvas);
+  background: var(--buildrick-canvas-wrapper);
   min-width: 0; /* Prevent grid blowout */
 }
 
@@ -388,7 +388,7 @@
 .layout-shell__drawer:focus-visible,
 .layout-shell__canvas:focus-visible,
 .layout-shell__inspector:focus-visible {
-  outline: 2px solid var(--brand-primary);
+  outline: 2px solid var(--buildrick-accent);
   outline-offset: -2px;
 }
 

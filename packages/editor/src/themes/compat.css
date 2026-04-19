@@ -11,14 +11,6 @@
  */
 
 :root {
-  /* --surface-* / --brand-* V2 semantic (Phase 3.4) */
-  --surface-primary: var(--buildrick-bg-panel);
-  --surface-secondary: var(--buildrick-bg-card);
-  --surface-hover: var(--buildrick-bg-hover);
-  --surface-elevated: var(--buildrick-bg-elevated);
-  --brand-primary: var(--buildrick-accent);
-  --brand-primary-hover: var(--buildrick-accent-hover);
-
   /* --bar / --blue / --txt legacy navbar (Phase 3.5) */
   --bar: var(--buildrick-bg-panel);
   --blue: var(--buildrick-accent);

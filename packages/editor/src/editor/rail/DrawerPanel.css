@@ -19,7 +19,7 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background: var(--surface-panel, rgba(28, 30, 36, 0.7));
+  background: var(--buildrick-bg-card));
   backdrop-filter: var(--glass-blur, blur(12px));
   -webkit-backdrop-filter: var(--glass-blur, blur(12px));
   overflow: hidden;
@@ -30,7 +30,7 @@
 /* Pinned state indicator */
 .drawer-panel--pinned {
   /* Visual indicator for pinned state */
-  border-left: 2px solid var(--brand-primary, #3b82f6);
+  border-left: 2px solid var(--buildrick-accent);
 }
 
 /* ============================================

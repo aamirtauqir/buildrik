@@ -123,7 +123,7 @@ const styles = {
   container: {
     flex: 1,
     overflow: "hidden",
-    background: "var(--surface-base, #0f1115)",
+    background: "var(--buildrick-bg-panel)",
   } as React.CSSProperties,
 
   canvasPattern: {

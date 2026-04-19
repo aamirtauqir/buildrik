@@ -4321,7 +4321,7 @@ textarea:focus-visible,
 }
 
 .buildrick-btn-floating {
-  background: var(--brand-primary);
+  background: var(--buildrick-accent);
   color: white;
   width: 48px;
   height: 48px;
@@ -4337,13 +4337,13 @@ textarea:focus-visible,
 
 .buildrick-btn-floating:hover {
   transform: scale(1.1);
-  background: var(--brand-primary-hover);
+  background: var(--buildrick-accent-hover);
 }
 
 .buildrick-btn-floating[data-active="true"] {
-  background: var(--surface-panel);
-  border: 1px solid var(--brand-primary);
-  color: var(--brand-primary);
+  background: var(--buildrick-bg-card);
+  border: 1px solid var(--buildrick-accent);
+  color: var(--buildrick-accent);
 }
 
 /* ============================================
