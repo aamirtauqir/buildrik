@@ -5,33 +5,62 @@
 **Spec:** `docs/superpowers/specs/2026-04-19-theme-unification-v3-design.md`
 **Plan:** `docs/superpowers/plans/2026-04-19-theme-unification-v3.md`
 **Auditor posture:** Strict — no inflation, no optimism, evidence-backed claims only.
+**Revision:** v2.0 (2026-04-19, post-Codex verification). See §0 Codex Addendum for corrections.
+
+---
+
+## 0. Codex Verification Addendum (2026-04-19)
+
+This audit was independently reviewed by Codex (OpenAI Codex CLI v0.121.0) against commit `ea45ba4`. Codex verdict: **audit is too strict on keyframes, too generous on namespace**. Net completion revised **~55% → ~60–65%**.
+
+### Corrections applied (in-line in sections below)
+
+| Original claim | Codex finding | Corrected status |
+|---|---|---|
+| 273 duplicate def lines in `default.css` | Actual grep count is **275** | Fixed §1, §3 R23, §8, §11, §12 |
+| R10: 10 orphan `@keyframes` consumers | **FALSE POSITIVE.** All 10 names ARE defined, just not in `.css` `@keyframes` blocks. Defs live in: `LeftSidebar.css`, `Canvas.css`, `shared/animation/AnimationPresets.ts`, `shared/ui/Skeleton.tsx` (injecting `<style>` via template literal). Original grep only scanned `.css` files. | R10 upgraded to Fully Implemented. Removed from Phase 1 roadmap. |
+| R24 / §7: 2 files violate namespace invariant (`Canvas.css`, `design-tokens.css`) | **3 files violate.** `themes/default.css:116+` also defines `--buildrick-design-*`. | Fixed §3 R24, §7, §8, §11, §12 |
+| R21: 242 hardcoded hex in `.tsx` inline styles | Inflated. Count includes ALL hex literals in `.tsx` (SVG fills, placeholder data, comments). Stricter inline-style regex (`style={{.*"#...`) yields lower number. | Flagged as "inflated estimate" in §3 R21, §5, §8. Real count needs re-measurement. |
+
+### What survived Codex review unchanged
+
+- R1–R9, R11–R12, R14–R20 remain Fully Implemented.
+- R23 duplicate-def problem is real (275 lines).
+- R3 bare `--accent` + 66 consumers is real.
+- R22 SSOT is weak due to duplicates.
+- Overall structural verdict: rename succeeded, unification did not.
+
+### Revised completion
+
+- **Overall completion: ~60–65%.** (R10 flips to 100%; R21 estimate unreliable; R2/R24 dropped from 35% → 25% as boundary is broken in 3 files, not 2.)
+- Critical Phase 1 fixes reduced from 4 items to 3 (R10 no longer blocks).
 
 ---
 
 ## 1. Executive Summary
 
-- **Overall completion: ~55%.** Confidence: High.
+- **Overall completion: ~60–65%** (revised from initial ~55% per §0 Codex corrections). Confidence: High.
 - **Status:** V3 is NOT complete. The rename succeeded. The unification did not.
 - **Blunt summary:** Consumer-side rename and scaffolding removal are done (codemod ran, `applyTheme` gone, docs updated, migration shim wired). But three load-bearing problems remain that prevent calling this "unified":
-  1. **273 duplicate CSS var def lines in `default.css`** across 282 unique keys. `default.css` is not a clean single-source-of-truth; it's a stack of overlapping blocks where "last wins" is the only contract.
-  2. **~242 hardcoded hex color literals in `.tsx` inline styles.** Chrome tokens bypassed across shared UI, inspector controls, AI panels, templates, shell.
-  3. **Namespace boundary violated:** `--buildrick-design-*` defs present in `components/Canvas/Canvas.css` AND `editor/sidebar/tabs/design/styles/design-tokens.css` (both outside `features/design-system/`). Spec §2 invariant #2 fails.
+  1. **275 duplicate CSS var def lines in `default.css`** (post-Codex count) across 282 unique keys. `default.css` is not a clean single-source-of-truth; it's a stack of overlapping blocks where "last wins" is the only contract.
+  2. **Hardcoded hex color literals in `.tsx` inline styles** (initial grep: 242, but inflated — includes SVG fills, data, comments; real inline-style count lower, needs re-measurement). Chrome tokens bypassed across shared UI, inspector controls, AI panels, templates, shell.
+  3. **Namespace boundary violated in 3 files:** `--buildrick-design-*` defs present in `themes/default.css:116+` (missed by original audit), `components/Canvas/Canvas.css`, AND `editor/sidebar/tabs/design/styles/design-tokens.css` (all outside `features/design-system/`). Spec §2 invariant #2 fails.
 
 ### Biggest remaining gaps (ranked by visual impact)
 
 1. **LeftRail.css fallback values are dark** (`#0c0c12`, `#161620`) — upstream `--rail-bg` now resolves correctly after commit `ea45ba4`, but 10+ dark hardcoded fallbacks remain as DESIGN.md risk.
-2. **10+ orphan `@keyframes` references** (`buildrick-fade-in`, `buildrick-pulse`, `buildrick-skeleton-shimmer`, `buildrick-element-flash`, `buildrick-error-shake`, `buildrick-fade`, `buildrick-flash`, `buildrick-hint-fade-in`, `buildrick-panel-fade-in`, `buildrick-progress-slide`) — animation uses referenced without matching keyframe definitions. Silently broken animations.
-3. **273 duplicate def lines in default.css** → impossible to audit as SSOT.
-4. **242 hardcoded hex in inline styles** → chrome tokens bypassed.
+2. ~~**10+ orphan `@keyframes` references**~~ **REMOVED — FALSE POSITIVE per §0 Codex verification.** All 10 names are defined in non-`.css` sources (`LeftSidebar.css`, `Canvas.css`, `AnimationPresets.ts`, `Skeleton.tsx` via `<style>` template injection).
+3. **275 duplicate def lines in default.css** → impossible to audit as SSOT.
+4. **Hardcoded hex in inline styles** (count inflated, real number lower) → chrome tokens bypassed.
 5. **Bare `--accent: #2D6DFF`** + 66 `var(--accent)` consumers — the one remaining legacy prefix in CSS.
 6. **Docs comments** reference old `--aqb-*` / `--ls-*` / `data-aqb-*` names (superficial: no runtime impact, but violates spec §7.1 "zero aqb-anywhere" acceptance gate).
 
 ### Highest-priority next steps
 
-1. Deduplicate `default.css` (273 duplicate lines → 0).
-2. Define the 10 orphan keyframes OR delete the consumer references.
-3. Move `--buildrick-design-*` defs out of `Canvas.css` + `design-tokens.css` into `features/design-system/` (boundary correction).
-4. Replace 242 hardcoded hex inline styles with token references (biggest effort, medium risk).
+1. Deduplicate `default.css` (275 duplicate lines → 0).
+2. ~~Define the 10 orphan keyframes OR delete the consumer references.~~ **Dropped — see §0 Codex addendum.**
+3. Move `--buildrick-design-*` defs out of `themes/default.css`, `Canvas.css`, and `design-tokens.css` into `features/design-system/` (boundary correction — 3 files, not 2).
+4. Replace hardcoded hex inline styles with token references (re-measure scope first; 242 is inflated).
 5. Delete bare `--accent: #2D6DFF` + rename 66 `var(--accent)` consumers to `var(--buildrick-accent)`.
 
 ---
@@ -72,7 +101,7 @@
 | ID | Status | % | Evidence |
 |---|---|---|---|
 | R1 | Fully Implemented | 100 | `grep var\(--aqb-` = 0 functional hits; remaining are doc comments |
-| R2 | Present but Not Wired Correctly | 35 | `--buildrick-design-*` defined in `components/Canvas/Canvas.css:27-29, 88-89` + `editor/sidebar/tabs/design/styles/design-tokens.css:284+` |
+| R2 | Present but Not Wired Correctly | 25 | (Codex-corrected) `--buildrick-design-*` defined in 3 files outside features/: `themes/default.css:116+`, `components/Canvas/Canvas.css:27-29, 88-89`, `editor/sidebar/tabs/design/styles/design-tokens.css:284+` |
 | R3 | Partially Implemented | 50 | `--accent-*` gone BUT bare `--accent: #2D6DFF` remains at `default.css:349` + 66 `var(--accent)` consumers |
 | R4 | Fully Implemented | 100 | `grep setProperty.*--buildrick-(?!design-)` = 0 hits |
 | R5 | Fully Implemented | 100 | `themes/index.ts` deleted; no applyTheme refs |
@@ -80,7 +109,7 @@
 | R7 | Fully Implemented | 100 | `CSS_CLASSES` zero hits |
 | R8 | Fully Implemented | 100 | Zero `.aqb-*` / `"aqb-*"` functional hits |
 | R9 | Fully Implemented | 100 | Zero `data-aqb-*` functional hits (1 comment in `generation.ts:22`) |
-| R10 | Implemented but Weak / Fragile | 75 | 41 `@keyframes buildrick-*` defined, 18 animation-name uses; 10 orphan uses lack a def |
+| R10 | Fully Implemented | 100 | (Codex-corrected, was 75) Original grep only scanned `.css` `@keyframes` blocks. All 10 "orphan" names ARE defined: `LeftSidebar.css`, `Canvas.css`, `shared/animation/AnimationPresets.ts`, `shared/ui/Skeleton.tsx` (via `<style>` template injection). No broken animations. |
 | R11 | Fully Implemented | 100 | Zero `aqb:trace:` hits |
 | R12 | Fully Implemented | 100 | `migrateAqbKeys` defined + imported + called (3 correct hits) |
 | R13 | Partially Implemented | 50 | 26 entries in `undefined_decisions`; `--buildrick-text` was undefined post-mapping (fixed at `7c09e9a`). Other 25 not spot-verified. |
@@ -91,13 +120,13 @@
 | R18 | Fully Implemented | 100 | `CLAUDE.md:120` shows corrected line referring to V3 flip |
 | R19 | Fully Implemented | 100 | CHANGELOG has V3 entry |
 | R20 | Fully Implemented | 100 | `scripts/theme-v3-codemod.mjs` + `.test.mjs` deleted |
-| R21 | Incorrectly Implemented | 25 | `grep 'background:\s*"#' / 'color:\s*"#'` in `.tsx` inline styles: 242 hits |
-| R22 | Implemented but Weak / Fragile | 75 | `applyTheme` gone = no JS mutation; BUT 273 duplicate def lines + mixed fallback hardcodes means CSS is SSOT structurally but not cleanly |
-| R23 | Partially Implemented | 50 | 273 duplicate def lines across 282 unique keys; `--buildrick-accent` has 7 defs, `--buildrick-border-light` has 3 |
-| R24 | Present but Not Wired Correctly | 35 | `--buildrick-design-*` defined at `components/Canvas/Canvas.css:27+` and `design-tokens.css:284+` — both outside `features/design-system/` |
+| R21 | Incorrectly Implemented | 25 | (Codex: count inflated) Original grep returned 242 hits, but includes SVG fills, comments, data literals. Stricter inline-style regex yields a lower real number; re-measurement needed before batching fixes. |
+| R22 | Implemented but Weak / Fragile | 75 | `applyTheme` gone = no JS mutation; BUT 275 duplicate def lines + mixed fallback hardcodes means CSS is SSOT structurally but not cleanly |
+| R23 | Partially Implemented | 50 | (Codex-corrected) 275 duplicate def lines across 282 unique keys; `--buildrick-accent` has 7 defs, `--buildrick-border-light` has 3 |
+| R24 | Present but Not Wired Correctly | 25 | (Codex-corrected, was 35) `--buildrick-design-*` defined in 3 files outside features/: `themes/default.css:116+`, `components/Canvas/Canvas.css:27+`, `design-tokens.css:284+` |
 
-**Raw score:** (100×13 + 75×2 + 50×3 + 35×2 + 25×1) / 24 = **71.5%**.
-**Conservative adjusted score:** ~55–60% truly implemented (R21/R23/R24/R10 materially break the spec's goals).
+**Raw score:** (100×14 + 75×2 + 50×3 + 25×3 + 25×1) / 24 = **75.0%** (with R10 corrected to 100%).
+**Conservative adjusted score:** ~60–65% truly implemented (R21/R23/R24 materially break the spec's goals; R10 false-positive removed from gap list).
 
 ---
 
@@ -105,15 +134,15 @@
 
 | Category | Planned | Found | % | Risk |
 |---|---|---|---|---|
-| Color tokens (chrome) | ~253 unique | ~282 unique, 273 duplicate lines | 70 | Medium (SSOT noise) |
-| Color tokens (design) | 68 | 68 in `constants.ts`, +leaks in Canvas.css + design-tokens.css | 50 | Medium (boundary) |
+| Color tokens (chrome) | ~253 unique | ~282 unique, 275 duplicate lines | 70 | Medium (SSOT noise) |
+| Color tokens (design) | 68 | 68 in `constants.ts`, +leaks in `themes/default.css`, `Canvas.css`, `design-tokens.css` (3 files, Codex-corrected) | 40 | High (boundary) |
 | Spacing tokens | Implied | Mixed: `--buildrick-space-*` (design) + `--buildrick-spacing-*` (chrome) | 60 | Low (naming split) |
 | Radius tokens | Implied | `--buildrick-design-radius-*` in Canvas.css + design-tokens.css | 50 | Low (boundary leak) |
 | Typography tokens | Implied | `--buildrick-design-font-*` in constants.ts; chrome `--buildrick-font-*` in default.css | 85 | Low |
 | Border tokens | Implied | `--buildrick-border-*` in default.css (3 dup for border-light) | 85 | Low |
 | Shadow tokens | Implied | Chrome + `--buildrick-design-shadow-*` leak in Canvas.css | 60 | Low |
 | Semantic tokens (`--rail-*`, `--surface-*`, `--buildrick-control-*`) | Resolve through `--buildrick-*` | Present in default.css:624-650 | 85 | Medium (dark hardcoded fallbacks in LeftRail.css) |
-| Shell/editor tokens | Static | Mostly correct per R4/R22 | 75 | Medium (273 duplicates) |
+| Shell/editor tokens | Static | Mostly correct per R4/R22 | 75 | Medium (275 duplicates) |
 | Canvas/user-facing tokens | Dynamic, design-namespace | Leaks into Canvas.css/design-tokens.css | 50 | High |
 
 ---
@@ -128,11 +157,11 @@
 - Storage keys (plain + dynamic families) with shim
 
 **Partially adopted:**
-- Animation refs: 18 consumers, 10 lack matching keyframe defs
+- ~~Animation refs: 18 consumers, 10 lack matching keyframe defs~~ *(Codex-corrected: all defs exist in non-`.css` sources — see §0. R10 is Fully Implemented.)*
 - `--accent`: bare still present with 66 consumers
 
 **NOT adopted:**
-- 242 hardcoded hex values in `.tsx` inline styles across:
+- Hardcoded hex values in `.tsx` inline styles (initial count 242, but inflated — includes SVG fills, data literals, comments; re-measure before batching) across:
   - `shared/ui/*` (primitives)
   - `editor/inspector/shared/*` (control colors)
   - `ai/*` (AI panels)
@@ -140,10 +169,10 @@
   - `editor/shell/*` (shell state colors)
 
 **"Looks done but isn't":**
-1. Animation names renamed but 10 animations silently fail (no keyframe def).
-2. `--buildrick-design-*` defs "in place" but 2 files violate namespace contract.
-3. `default.css` "has tokens" but 273 duplicate def lines.
-4. Shell tokens defined but `.tsx` bypasses with 242 hardcoded hex.
+1. ~~Animation names renamed but 10 animations silently fail (no keyframe def).~~ *(Codex-corrected: FALSE POSITIVE.)*
+2. `--buildrick-design-*` defs "in place" but **3 files** violate namespace contract (Codex-corrected).
+3. `default.css` "has tokens" but 275 duplicate def lines.
+4. Shell tokens defined but `.tsx` bypasses with hardcoded hex (real count TBD).
 
 ---
 
@@ -153,7 +182,7 @@
 |---|---|
 | All `--aqb-*` CSS vars → `--buildrick-*` | Done |
 | All `--ls-*` / `--accent-*` folded | Done (minus bare `--accent`) |
-| All `@keyframes aqb-*` → `buildrick-*` | Renamed, but 10 consumer uses have no matching def |
+| All `@keyframes aqb-*` → `buildrick-*` | Renamed. ~~10 orphan consumer uses~~ FALSE POSITIVE per §0 Codex verification — all defs exist in non-`.css` sources. |
 | All `.aqb-*` classes → `.buildrick-*` | Done |
 | All `data-aqb-*` → `data-buildrick-*` | Done |
 | Storage keys with shim | Done |
@@ -165,15 +194,15 @@
 
 **Still legacy:**
 - Bare `--accent: #2D6DFF` (1 def, 66 consumers)
-- 242 hardcoded hex values in `.tsx` inline styles
+- Hardcoded hex values in `.tsx` inline styles (count TBD, initial 242 inflated)
 - Dark hardcoded fallbacks in `LeftRail.css`
-- Design-namespace leaks in `components/Canvas/Canvas.css` + `design-tokens.css`
+- Design-namespace leaks in 3 files: `themes/default.css`, `components/Canvas/Canvas.css`, `design-tokens.css` (Codex-corrected)
 
 **Appearing complete but not:**
-- 10 orphan animation consumers (defs missing).
-- 273 duplicate def lines in default.css.
+- ~~10 orphan animation consumers~~ *(Codex-corrected: FALSE POSITIVE.)*
+- 275 duplicate def lines in default.css.
 
-**Migration completion:** ~65% (consumer rename + scaffolding done; structural cleanup + adoption gaps remain).
+**Migration completion:** ~70% (revised from ~65% after R10 false-positive removed; consumer rename + scaffolding done; structural cleanup + adoption gaps remain).
 
 ---
 
@@ -183,14 +212,16 @@
 - `--buildrick-design-*` defs only in `features/design-system/`.
 - CI grep: `grep -rnE "^\s*--buildrick-design-" packages/editor/src/ --exclude-dir=features` → empty.
 
-**Actual:**
+**Actual (Codex-corrected — 3 files violate, not 2):**
+- `packages/editor/src/themes/default.css:116+` defines `--buildrick-design-*` tokens (missed by original audit).
 - `packages/editor/src/components/Canvas/Canvas.css:27-29, 88-89` defines `--buildrick-design-radius-*`, `--buildrick-design-shadow-*`.
 - `packages/editor/src/editor/sidebar/tabs/design/styles/design-tokens.css:284-300+` defines `--buildrick-design-layout-*`, `--buildrick-design-btn-*`, etc.
-- Invariant #2 violated in 2 files.
+- Invariant #2 violated in **3 files**.
 
 **Impact:** Design tokens defined statically compete with runtime-set DEFAULT_TOKENS. Design-tab edits may be silently shadowed.
 
 **Required correction:**
+- Move `--buildrick-design-*` defs from `themes/default.css:116+` into `features/design-system/` (or verify if this is intentional static baseline that DEFAULT_TOKENS overrides).
 - Move `--buildrick-design-radius-*` and `--buildrick-design-shadow-*` from Canvas.css into `features/design-system/` (DEFAULT_TOKENS or new `design-defaults.css`).
 - Move `--buildrick-design-*` defs from `design-tokens.css` to features/ OR reclassify as chrome-layout tokens (`--buildrick-layout-*`, not `-design-`).
 
@@ -201,12 +232,13 @@
 | Severity | File:line | Issue | Fix |
 |---|---|---|---|
 | HIGH | `packages/editor/src/components/Layout/LeftRail.css:24,208,248,277,291,413` | 6 sites use `var(--rail-*, #0c0c12/#161620/#00d4aa)` dark fallbacks | Remove fallbacks OR change to light values |
-| HIGH | `.tsx` files (242 occurrences) | Inline `background: "#..."` / `color: "#..."` literal hex | Replace with `var(--buildrick-X)` per usage audit |
-| HIGH | `packages/editor/src/themes/default.css` (273 duplicate def lines) | Same `--buildrick-X` key defined multiple times | Consolidate duplicates |
+| HIGH | `.tsx` files (initial 242 count, INFLATED) | Inline `background: "#..."` / `color: "#..."` literal hex — count includes SVG fills, data, comments. Re-measure with strict inline-style regex before batching. | Replace with `var(--buildrick-X)` per usage audit |
+| HIGH | `packages/editor/src/themes/default.css` (275 duplicate def lines) | Same `--buildrick-X` key defined multiple times | Consolidate duplicates |
 | HIGH | `packages/editor/src/themes/default.css:349` | `--accent: #2D6DFF;` bare def; 66 `var(--accent)` consumers | Delete def + rename consumers to `--buildrick-accent` |
+| HIGH | `packages/editor/src/themes/default.css:116+` | **(Codex-added)** `--buildrick-design-*` defs leak out of features/ | Move to features/design-system/ or verify intentional baseline |
 | HIGH | `packages/editor/src/components/Canvas/Canvas.css:27-29,88-89` | `--buildrick-design-radius-*/shadow-*` in chrome-scoped file | Move to features/design-system/ |
 | HIGH | `packages/editor/src/editor/sidebar/tabs/design/styles/design-tokens.css:284+` | `--buildrick-design-layout-*`, `-btn-*`, etc. at :root | Move or reclassify as chrome-layout |
-| MEDIUM | 10 orphan animation consumers | Used but no `@keyframes buildrick-*` defined | Add defs OR delete uses |
+| ~~MEDIUM~~ | ~~10 orphan animation consumers~~ | ~~Used but no `@keyframes buildrick-*` defined~~ | ~~Add defs OR delete uses~~ **REMOVED — FALSE POSITIVE per §0.** |
 | LOW | `design-tokens.css:306`, `ComponentsTab.css:5`, `html/generation.ts:22`, `Canvas.css:16`, `TokenPickerPopover.tsx:38` | Comments referencing old prefix | Update comments |
 
 ---
@@ -215,11 +247,11 @@
 
 | Decision | Status | Impact | Resolution | Owner |
 |---|---|---|---|---|
-| Hardcoded hex inline style policy | Not addressed | 242 raw hex values | Define policy + batched migration | design-system |
-| Design-namespace boundary CI enforcement | Named but not wired | Silent violations in 2 files | Pre-commit hook or lint rule | engineering |
-| 10 orphan keyframes fate | Unresolved | Silent animation failures | Per-name: add def or delete use | design-system |
+| Hardcoded hex inline style policy | Not addressed | Count inflated (initial 242, real lower) | Re-measure with strict regex, then policy + batched migration | design-system |
+| Design-namespace boundary CI enforcement | Named but not wired | Silent violations in **3 files** (Codex-corrected) | Pre-commit hook or lint rule | engineering |
+| ~~10 orphan keyframes fate~~ | ~~Unresolved~~ | ~~Silent animation failures~~ | ~~Per-name: add def or delete use~~ **RESOLVED — FALSE POSITIVE per §0.** | — |
 | `--accent` bare def | Kept as leftover | 66 consumers depend on it | Rename consumers OR accept exception | engineering |
-| `default.css` dedup | Unresolved | 273 duplicate lines | Write + run dedup pass | engineering |
+| `default.css` dedup | Unresolved | 275 duplicate lines | Write + run dedup pass | engineering |
 | `--buildrick-layout-*` vs `--buildrick-design-layout-*` | Ambiguous | Depends on semantic classification | Decide: chrome or design? | design-system |
 
 ---
@@ -227,12 +259,12 @@
 ## 10. Problems and Risks
 
 ### Missing implementation
-- 10 orphan keyframe consumers. Impact: broken animations. Fix: define or delete.
-- Design-namespace defs not in features/. Impact: invariant #2 fails. Fix: move defs.
+- ~~10 orphan keyframe consumers.~~ *(Codex-corrected: FALSE POSITIVE. Removed.)*
+- Design-namespace defs not in features/. Impact: invariant #2 fails **in 3 files**. Fix: move defs.
 
 ### Incorrect implementation
-- 273 duplicate def lines in default.css. Impact: SSOT claim false. Fix: dedup script.
-- `--buildrick-design-radius-*` + `-shadow-*` in Canvas.css. Impact: chrome CSS file defines design namespace. Fix: move.
+- 275 duplicate def lines in default.css. Impact: SSOT claim false. Fix: dedup script.
+- `--buildrick-design-radius-*` + `-shadow-*` in Canvas.css + `--buildrick-design-*` in `themes/default.css:116+`. Impact: chrome CSS files define design namespace. Fix: move.
 
 ### Weak implementation
 - Semantic tokens rely on dark hardcoded fallbacks in LeftRail.css. Impact: regression-prone.
@@ -241,14 +273,14 @@
 ### Legacy leakage
 - Bare `--accent: #2D6DFF` + 66 consumers.
 - 5+ doc/JSDoc comments reference `--aqb-*` / `--ls-*` / `data-aqb-*`.
-- 242 hardcoded hex in `.tsx` inline styles.
+- Hardcoded hex in `.tsx` inline styles (count TBD after re-measurement).
 
 ### Boundary confusion
-- Two files break invariant #2.
+- **Three files** break invariant #2 (Codex-corrected).
 - No CI gate enforcing the invariant.
 
 ### Maintainability risk
-- 273 duplicate def lines.
+- 275 duplicate def lines.
 - Naming split.
 - Partial tokenization in `.tsx`.
 
@@ -261,25 +293,25 @@
 
 | Claim | Reality |
 |---|---|
-| "CSS is the 100% source of truth" (user) / "Invariant #1 holds" (spec §2) | JS mutation eliminated, BUT 273 duplicate def lines means CSS itself has multiple competing sources; last-wins is not SSOT. |
-| "Chrome tokens in themes/default.css + Canvas.css; design tokens in features/" (§2) | `--buildrick-design-*` defs present in `Canvas.css` + `design-tokens.css`. Two files violate. |
+| "CSS is the 100% source of truth" (user) / "Invariant #1 holds" (spec §2) | JS mutation eliminated, BUT 275 duplicate def lines means CSS itself has multiple competing sources; last-wins is not SSOT. |
+| "Chrome tokens in themes/default.css + Canvas.css; design tokens in features/" (§2) | `--buildrick-design-*` defs present in `themes/default.css`, `Canvas.css`, AND `design-tokens.css`. **Three files violate** (Codex-corrected). |
 | "Zero surviving aqb-* patterns" (§7.1) | Bare `--accent` remains. `--accent-*` is in prohibited pattern by spec's own grep. |
-| "All orphan keyframe refs deleted" (implied §1 Q10) | 10 animation consumers have no matching `@keyframes buildrick-*` def. |
-| "Consumers use tokens" (implicit) | 242 hardcoded hex literals in `.tsx` inline styles. |
-| "No duplicated/double CSS" (user request) | 273 duplicate def lines in default.css. |
+| ~~"All orphan keyframe refs deleted" (implied §1 Q10)~~ | ~~10 animation consumers have no matching `@keyframes buildrick-*` def.~~ *(Codex-corrected: FALSE POSITIVE. All 10 defined in non-`.css` sources.)* |
+| "Consumers use tokens" (implicit) | Hardcoded hex literals in `.tsx` inline styles (count TBD; initial 242 inflated). |
+| "No duplicated/double CSS" (user request) | 275 duplicate def lines in default.css. |
 
 ---
 
 ## 12. Completion Roadmap
 
 ### Phase 1: Critical fixes (must happen before "done")
-1. Fix 10 orphan animation keyframes — define them or delete consumer refs. Start with highest-usage (`buildrick-fade-in`, `buildrick-pulse`, `buildrick-skeleton-shimmer`). Fix type: quick fix.
-2. Dedup `default.css` — automated script: for each `--buildrick-X` key, keep last ROOT-scoped def, delete prior exact-value duplicates. Fix type: medium refactor.
-3. Move `--buildrick-design-*` defs to features/design-system/ from `Canvas.css` and `design-tokens.css`. Fix type: structural cleanup.
+1. ~~Fix 10 orphan animation keyframes~~ *(Codex-corrected: REMOVED — FALSE POSITIVE.)*
+2. Dedup `default.css` — automated script: for each `--buildrick-X` key, keep last ROOT-scoped def, delete prior exact-value duplicates. Target: 275 duplicate lines → 0. Fix type: medium refactor.
+3. Move `--buildrick-design-*` defs to features/design-system/ from **3 files**: `themes/default.css:116+`, `Canvas.css`, and `design-tokens.css`. Fix type: structural cleanup.
 4. Delete bare `--accent: #2D6DFF` def + rename 66 consumers to `var(--buildrick-accent)`. Fix type: medium refactor.
 
 ### Phase 2: Legacy cleanup
-1. Replace 242 hardcoded hex in `.tsx` inline styles with `var(--buildrick-X)`. Batch by subdirectory. Fix type: medium refactor per batch (~5–10 batches).
+1. **Re-measure** hardcoded hex in `.tsx` inline styles with strict regex (strip SVG fills, comments, data). Then replace with `var(--buildrick-X)`. Batch by subdirectory. Fix type: medium refactor per batch.
 2. Update 5+ JSDoc/CSS comments referencing old prefix names. Fix type: quick fix.
 3. Remove dark hardcoded fallbacks in `LeftRail.css`. Fix type: quick fix.
 
@@ -300,18 +332,20 @@
 
 **Is it partially migrated?** Yes — heavily partial. Consumer-side rename ~100%. Adoption, boundaries, deduplication: NOT.
 
-**% truly achieved:** ~55%. Confidence: High.
+**% truly achieved:** ~60–65% (revised from initial ~55% per §0 Codex verification). Confidence: High.
+
+**Codex verdict:** Audit was too strict on keyframes (FALSE POSITIVE — all defined outside `.css` files), too generous on namespace boundary (3 files violate, not 2).
 
 **What must happen before "complete":**
 
-1. Delete or define the 10 orphan keyframes.
-2. Dedup `default.css` (273 duplicate lines).
-3. Move `--buildrick-design-*` defs out of `Canvas.css` + `design-tokens.css` into `features/design-system/`.
-4. Replace 242 hardcoded hex in `.tsx` with token references.
+1. ~~Delete or define the 10 orphan keyframes.~~ *(REMOVED per §0.)*
+2. Dedup `default.css` (275 duplicate lines).
+3. Move `--buildrick-design-*` defs out of `themes/default.css`, `Canvas.css`, and `design-tokens.css` into `features/design-system/` (3 files).
+4. Re-measure hardcoded hex in `.tsx` inline styles, then replace with token references.
 5. Delete bare `--accent: #2D6DFF` + rename 66 consumers.
 6. Wire CI gate enforcing namespace boundary.
 
-Items 1–3 must land for the theme to be unified. Items 4–6 are the difference between "functional" and "truly clean."
+Items 2–3 must land for the theme to be unified. Items 4–6 are the difference between "functional" and "truly clean."
 
 **Bottom line:** The rename succeeded. The unification did not.
 
@@ -325,3 +359,8 @@ Items 1–3 must land for the theme to be unified. Items 4–6 are the differenc
 - Inventory (retained): `scripts/theme-v3-audit.json`
 - Dry-run report (retained): `scripts/theme-v3-codemod-report.txt`
 - Commits: 31 under `theme-v3` prefix, HEAD at `ea45ba4`
+
+## Revision History
+
+- **v1.0** (2026-04-19): Initial audit at commit `ea45ba4`. Completion ~55%. Committed as `ff0c236`.
+- **v2.0** (2026-04-19): Codex verification pass (Codex CLI v0.121.0). §0 addendum added. Key corrections: 273→275 duplicates, R10 keyframes flipped to Fully Implemented (FALSE POSITIVE), namespace violations 2→3 files, R21 hex count flagged as inflated. Completion revised ~55% → ~60–65%.
