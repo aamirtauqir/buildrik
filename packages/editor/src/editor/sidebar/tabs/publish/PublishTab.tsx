@@ -511,7 +511,7 @@ const containerStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   height: "100%",
-  background: "var(--buildrick-surface-1)",
+  background: "var(--buildrick-bg-panel)",
 };
 
 const contentStyles: React.CSSProperties = {

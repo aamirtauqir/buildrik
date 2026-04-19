@@ -23,13 +23,13 @@ const cardStyles: React.CSSProperties = {
 };
 
 const nameStyles: React.CSSProperties = {
-  fontSize: "var(--buildrick-font-sm)",
+  fontSize: "var(--buildrick-text-sm-plus)",
   fontWeight: 500,
   color: "var(--buildrick-text-primary)",
 };
 
 const descStyles: React.CSSProperties = {
-  fontSize: "var(--buildrick-font-xs)",
+  fontSize: "var(--buildrick-text-sm)",
   color: "var(--buildrick-text-muted)",
   marginTop: 2,
 };
@@ -45,7 +45,7 @@ const badgeStyles: React.CSSProperties = {
 };
 
 const learnBtnStyles: React.CSSProperties = {
-  fontSize: "var(--buildrick-font-xs)",
+  fontSize: "var(--buildrick-text-sm)",
   fontWeight: 500,
   padding: "4px 10px",
   borderRadius: "var(--buildrick-radius-sm)",
@@ -57,7 +57,7 @@ const learnBtnStyles: React.CSSProperties = {
 };
 
 const hintStyles: React.CSSProperties = {
-  fontSize: "var(--buildrick-font-xs)",
+  fontSize: "var(--buildrick-text-sm)",
   color: "var(--buildrick-text-muted)",
   padding: "8px 12px 0",
   lineHeight: 1.4,

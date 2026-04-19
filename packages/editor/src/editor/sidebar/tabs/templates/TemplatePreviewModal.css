@@ -138,7 +138,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--buildrick-bg-app);
+  background: var(--buildrick-bg-subtle);
   padding: 12px;
   overflow: hidden;
 }

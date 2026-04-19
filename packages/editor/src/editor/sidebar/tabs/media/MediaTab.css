@@ -251,7 +251,7 @@
   aspect-ratio: 16/9;
   border-radius: 10px;
   border: 1px solid var(--buildrick-border-light);
-  background: var(--buildrick-bg-canvas);
+  background: var(--buildrick-canvas-content);
   overflow: hidden;
   cursor: pointer;
   transition: all 0.2s ease;

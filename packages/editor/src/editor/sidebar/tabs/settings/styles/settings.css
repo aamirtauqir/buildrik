@@ -36,7 +36,7 @@
   background: transparent;
   border: none;
   border-radius: var(--buildrick-radius-sm);
-  font-size: var(--buildrick-font-xs);
+  font-size: var(--buildrick-text-sm);
   font-weight: 500;
   color: var(--buildrick-text-secondary);
   cursor: pointer;
@@ -48,7 +48,7 @@
 }
 
 .buildrick-settings-tab.active {
-  background: var(--buildrick-surface-1);
+  background: var(--buildrick-bg-panel);
   color: var(--buildrick-text-primary);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -73,7 +73,7 @@
 }
 
 .buildrick-settings-card-title {
-  font-size: var(--buildrick-font-sm);
+  font-size: var(--buildrick-text-sm-plus);
   font-weight: 600;
   color: var(--buildrick-text-primary);
 }
@@ -86,7 +86,7 @@
   display: block;
   margin-bottom: 6px;
   color: var(--buildrick-text-secondary);
-  font-size: var(--buildrick-font-xs);
+  font-size: var(--buildrick-text-sm);
   font-weight: 500;
 }
 
@@ -94,7 +94,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: var(--buildrick-font-xs);
+  font-size: var(--buildrick-text-sm);
   color: var(--buildrick-text-secondary);
   cursor: pointer;
 }
@@ -106,7 +106,7 @@
 }
 
 .buildrick-hint {
-  font-size: var(--buildrick-font-xs);
+  font-size: var(--buildrick-text-sm);
   color: var(--buildrick-text-muted);
   margin-top: 4px;
 }
@@ -118,7 +118,7 @@
 }
 
 .buildrick-error-text {
-  font-size: var(--buildrick-font-xs);
+  font-size: var(--buildrick-text-sm);
   color: var(--buildrick-error);
   margin-top: 4px;
 }
