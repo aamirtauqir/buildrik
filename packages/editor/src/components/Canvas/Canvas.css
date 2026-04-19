@@ -24,9 +24,7 @@
   --buildrick-spacing-sm: 8px;
   --buildrick-spacing-md: 16px;
   --buildrick-spacing-lg: 24px;
-  --buildrick-design-radius-sm: 4px;
-  --buildrick-design-radius-md: 8px;
-  --buildrick-design-radius-lg: 16px;
+  /* radius defs removed — canonical in themes/design-system/design.css (DS V1 Phase 3.10) */
 
   /* ============================================
      UI Typography Scale (UX-Compliant - WCAG 2.1)
@@ -84,10 +82,7 @@
   --buildrick-boxmodel-padding: rgba(147, 196, 125, 0.55);  /* Green - padding */
   --buildrick-boxmodel-margin: rgba(246, 178, 107, 0.66);   /* Orange - margin */
 
-  /* Shadows */
-  --buildrick-design-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --buildrick-design-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
-  --buildrick-design-shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.15);
+  /* Shadows — canonical defs in themes/design-system/shadow.css */
   --buildrick-shadow-accent: 0 4px 14px rgba(37, 99, 235, 0.3);
   --buildrick-shadow-purple: var(--buildrick-shadow-accent); /* Legacy alias */
   --buildrick-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(37, 99, 235, 0.1);

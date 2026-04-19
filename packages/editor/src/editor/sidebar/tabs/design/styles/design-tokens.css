@@ -279,42 +279,5 @@
 }
 
 /* ─── Design Token CSS Var Declarations ─────────────────────────────── */
-:root {
-  /* Layout */
-  --buildrick-design-layout-max-width: 1280px;
-  --buildrick-design-layout-padding-x: 24px;
-  --buildrick-design-layout-columns: 12;
-  --buildrick-design-layout-gutter: 24px;
-  --buildrick-design-section-padding-y: 80px;
-  --buildrick-design-content-max-width: 720px;
-  --buildrick-design-base-unit: 4px;
-  --buildrick-design-breakpoint-mobile: 768px;
-
-  /* Buttons */
-  --buildrick-design-btn-height-sm: 32px;
-  --buildrick-design-btn-height-md: 40px;
-  --buildrick-design-btn-height-lg: 48px;
-  --buildrick-design-btn-padding-x: 16px;
-  --buildrick-design-btn-font-weight: 600;
-  --buildrick-design-btn-font-size: 14px;
-  --buildrick-design-btn-radius: 8px;
-  --buildrick-design-cta-radius: 9999px;
-
-  /* Forms — sizing only. Colors resolved from canonical root.
-     Removed: --aqb-input-border: #27272a (near-black zinc shadowed canonical).
-     Removed: --aqb-input-focus: #3b82f6 (wrong blue shadowed cobalt).
-     --aqb-placeholder-color rerouted to canonical muted text. */
-  --buildrick-design-input-height: 40px;
-  --buildrick-design-input-radius: 8px;
-  --buildrick-design-input-padding-x: 12px;
-  --buildrick-design-label-font-size: 13px;
-  --buildrick-design-label-weight: 500;
-  --buildrick-design-placeholder-color: var(--buildrick-text-muted);
-
-  /* Icons */
-  --buildrick-design-icon-style: outline;
-  --buildrick-design-icon-stroke: 1.5;
-  --buildrick-design-icon-sm: 16px;
-  --buildrick-design-icon-md: 20px;
-  --buildrick-design-icon-lg: 24px;
-}
+/* All --buildrick-design-* defs moved to themes/design-system/design.css
+   (DS V1 Phase 3.10). Consumers here read from the canonical location. */
