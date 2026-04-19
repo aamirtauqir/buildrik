@@ -1,5 +1,16 @@
 /**
  * themes/design-system/index.css
- * Buildrik DS V1 — see spec §5
+ * Buildrik DS V1 — public DS entry point.
  * @license BSD-3-Clause
  */
+
+@import "./color.css";
+@import "./typography.css";
+@import "./spacing.css";
+@import "./radius.css";
+@import "./shadow.css";
+@import "./motion.css";
+@import "./z-index.css";
+@import "./layout.css";
+@import "./design.css";
+@import "./a11y.css";
