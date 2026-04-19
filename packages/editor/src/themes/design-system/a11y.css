@@ -1,5 +1,39 @@
 /**
  * themes/design-system/a11y.css
- * Buildrik DS V1 — see spec §5
+ * Buildrik DS V1 — consolidated a11y media-query overrides.
+ * Only file allowed to contain @media (prefers-*) blocks (spec §10 Gate 7).
  * @license BSD-3-Clause
  */
+
+@media (prefers-contrast: high) {
+  :root {
+    --buildrick-border: #64748B;
+    --buildrick-border-light: #94A3B8;
+  }
+  .buildrick-btn {
+    border: 2px solid currentColor;
+  }
+  .buildrick-input,
+  .buildrick-select,
+  .buildrick-textarea {
+    border-width: 2px;
+  }
+  :focus-visible {
+    outline: 3px solid CanvasText;
+    outline-offset: 2px;
+  }
+  [data-buildrick-id][data-selected="true"] {
+    outline: 3px solid Highlight;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
