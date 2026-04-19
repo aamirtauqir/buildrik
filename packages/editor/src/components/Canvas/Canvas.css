@@ -12,6 +12,9 @@
    it can no longer shadow the canonical light palette.
    ============================================ */
 .aqb-canvas, .aqb-canvas-wrapper, [data-aqb-canvas] {
+  /* V3 undefined_decisions define-new — op 1c renames to --buildrick-* in P3 */
+  --aqb-canvas-content: transparent;
+  --aqb-canvas-wrapper: transparent;
   --aqb-canvas-wrapper-bg: var(--aqb-bg-panel);
   --aqb-canvas-content-bg: var(--aqb-bg-canvas);
   --aqb-heading-font: var(--aqb-font-family);
