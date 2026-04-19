@@ -77,7 +77,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         flexDirection: "column",
         alignItems: "center",
         padding: "24px 32px",
-        background: "var(--buildrick-bg-panel)",
+        background: "var(--buildrick-design-color-background)",
         borderRadius: 16,
         minWidth: 100,
       }}
@@ -86,7 +86,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         style={{
           fontSize: 48,
           fontWeight: 700,
-          color: "var(--buildrick-accent)",
+          color: "var(--buildrick-design-color-primary)",
           lineHeight: 1,
         }}
       >
@@ -95,7 +95,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
       <span
         style={{
           fontSize: 14,
-          color: "var(--buildrick-text-muted)",
+          color: "var(--buildrick-design-color-muted)",
           marginTop: 8,
           textTransform: "uppercase",
           letterSpacing: 1,
@@ -113,7 +113,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           style={{
             fontSize: 36,
             fontWeight: 700,
-            color: "var(--buildrick-text-primary)",
+            color: "var(--buildrick-design-color-text)",
             marginBottom: 12,
           }}
         >
@@ -124,7 +124,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         <p
           style={{
             fontSize: 18,
-            color: "var(--buildrick-text-secondary)",
+            color: "var(--buildrick-design-color-muted)",
             marginBottom: 40,
           }}
         >
@@ -137,7 +137,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           style={{
             fontSize: 32,
             fontWeight: 600,
-            color: "var(--buildrick-success)",
+            color: "var(--buildrick-design-color-success)",
           }}
         >
           🎉 Time's Up!

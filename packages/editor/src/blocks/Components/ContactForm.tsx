@@ -137,7 +137,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         <h3
           style={{
             fontSize: 24,
-            color: "var(--buildrick-text-primary)",
+            color: "var(--buildrick-design-color-text)",
             marginBottom: 12,
           }}
         >
@@ -145,7 +145,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         </h3>
         <p
           style={{
-            color: "var(--buildrick-text-secondary)",
+            color: "var(--buildrick-design-color-muted)",
             marginBottom: 24,
           }}
         >
@@ -155,7 +155,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
           onClick={() => setIsSuccess(false)}
           style={{
             padding: "12px 24px",
-            background: "var(--buildrick-accent)",
+            background: "var(--buildrick-design-color-primary)",
             border: "none",
             borderRadius: 8,
             color: "#fff",
@@ -176,7 +176,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
           style={{
             fontSize: 32,
             fontWeight: 700,
-            color: "var(--buildrick-text-primary)",
+            color: "var(--buildrick-design-color-text)",
             marginBottom: 12,
             textAlign: "center",
           }}
@@ -187,7 +187,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
       {subtitle && (
         <p
           style={{
-            color: "var(--buildrick-text-secondary)",
+            color: "var(--buildrick-design-color-muted)",
             marginBottom: 32,
             textAlign: "center",
           }}
@@ -212,11 +212,11 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                     marginBottom: 6,
                     fontSize: 14,
                     fontWeight: 500,
-                    color: "var(--buildrick-text-primary)",
+                    color: "var(--buildrick-design-color-text)",
                   }}
                 >
                   {field.label}
-                  {field.required && <span style={{ color: "var(--buildrick-error)" }}> *</span>}
+                  {field.required && <span style={{ color: "var(--buildrick-design-color-error)" }}> *</span>}
                 </label>
               )}
 
@@ -229,12 +229,12 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                   style={{
                     width: "100%",
                     padding: "12px 16px",
-                    background: "var(--buildrick-bg-dark)",
+                    background: "var(--buildrick-design-color-background)",
                     border: `1px solid ${
-                      errors[field.id] ? "var(--buildrick-error)" : "var(--buildrick-border)"
+                      errors[field.id] ? "var(--buildrick-design-color-error)" : "var(--buildrick-design-color-border)"
                     }`,
                     borderRadius: 8,
-                    color: "var(--buildrick-text-primary)",
+                    color: "var(--buildrick-design-color-text)",
                     fontSize: 14,
                     resize: "vertical",
                   }}
@@ -246,12 +246,12 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                   style={{
                     width: "100%",
                     padding: "12px 16px",
-                    background: "var(--buildrick-bg-dark)",
+                    background: "var(--buildrick-design-color-background)",
                     border: `1px solid ${
-                      errors[field.id] ? "var(--buildrick-error)" : "var(--buildrick-border)"
+                      errors[field.id] ? "var(--buildrick-design-color-error)" : "var(--buildrick-design-color-border)"
                     }`,
                     borderRadius: 8,
-                    color: "var(--buildrick-text-primary)",
+                    color: "var(--buildrick-design-color-text)",
                     fontSize: 14,
                   }}
                 >
@@ -280,7 +280,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                   <span
                     style={{
                       fontSize: 14,
-                      color: "var(--buildrick-text-secondary)",
+                      color: "var(--buildrick-design-color-muted)",
                     }}
                   >
                     {field.label}
@@ -295,12 +295,12 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                   style={{
                     width: "100%",
                     padding: "12px 16px",
-                    background: "var(--buildrick-bg-dark)",
+                    background: "var(--buildrick-design-color-background)",
                     border: `1px solid ${
-                      errors[field.id] ? "var(--buildrick-error)" : "var(--buildrick-border)"
+                      errors[field.id] ? "var(--buildrick-design-color-error)" : "var(--buildrick-design-color-border)"
                     }`,
                     borderRadius: 8,
-                    color: "var(--buildrick-text-primary)",
+                    color: "var(--buildrick-design-color-text)",
                     fontSize: 14,
                   }}
                 />
@@ -310,7 +310,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
                 <span
                   style={{
                     fontSize: 12,
-                    color: "var(--buildrick-error)",
+                    color: "var(--buildrick-design-color-error)",
                     marginTop: 4,
                     display: "block",
                   }}
@@ -329,7 +329,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
             width: "100%",
             marginTop: 24,
             padding: "14px 24px",
-            background: "var(--buildrick-accent)",
+            background: "var(--buildrick-design-color-primary)",
             border: "none",
             borderRadius: 8,
             color: "#fff",

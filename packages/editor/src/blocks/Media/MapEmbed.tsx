@@ -35,7 +35,7 @@ export const MapEmbed: React.FC<MapEmbedProps> = ({
         height,
         borderRadius: 12,
         overflow: "hidden",
-        background: "var(--buildrick-bg-panel)",
+        background: "var(--buildrick-design-color-background)",
       }}
     >
       <iframe

@@ -69,7 +69,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
             style={{
               fontSize: 24,
               fontStyle: "italic",
-              color: "var(--buildrick-text-primary)",
+              color: "var(--buildrick-design-color-text)",
               marginBottom: 24,
               lineHeight: 1.6,
             }}
@@ -101,7 +101,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
               <div
                 style={{
                   fontWeight: 600,
-                  color: "var(--buildrick-text-primary)",
+                  color: "var(--buildrick-design-color-text)",
                 }}
               >
                 {testimonials[activeIndex].author}
@@ -109,7 +109,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
               <div
                 style={{
                   fontSize: 14,
-                  color: "var(--buildrick-text-muted)",
+                  color: "var(--buildrick-design-color-muted)",
                 }}
               >
                 {testimonials[activeIndex].role}
@@ -137,8 +137,8 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
                   border: "none",
                   background:
                     i === activeIndex
-                      ? "var(--buildrick-accent)"
-                      : "var(--buildrick-border)",
+                      ? "var(--buildrick-design-color-primary)"
+                      : "var(--buildrick-design-color-border)",
                   cursor: "pointer",
                 }}
               />
@@ -165,8 +165,8 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
           className="buildrick-testimonial-card"
           style={{
             padding: 24,
-            background: "var(--buildrick-bg-panel)",
-            border: "1px solid var(--buildrick-border)",
+            background: "var(--buildrick-design-color-background)",
+            border: "1px solid var(--buildrick-design-color-border)",
             borderRadius: 12,
           }}
         >
@@ -183,7 +183,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
           <blockquote
             style={{
               fontSize: 16,
-              color: "var(--buildrick-text-secondary)",
+              color: "var(--buildrick-design-color-muted)",
               marginBottom: 20,
               lineHeight: 1.6,
               fontStyle: "italic",
@@ -210,7 +210,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
                   width: 40,
                   height: 40,
                   borderRadius: "50%",
-                  background: "var(--buildrick-accent)",
+                  background: "var(--buildrick-design-color-primary)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -225,7 +225,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
               <div
                 style={{
                   fontWeight: 600,
-                  color: "var(--buildrick-text-primary)",
+                  color: "var(--buildrick-design-color-text)",
                   fontSize: 14,
                 }}
               >
@@ -234,7 +234,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
               <div
                 style={{
                   fontSize: 12,
-                  color: "var(--buildrick-text-muted)",
+                  color: "var(--buildrick-design-color-muted)",
                 }}
               >
                 {testimonial.role}

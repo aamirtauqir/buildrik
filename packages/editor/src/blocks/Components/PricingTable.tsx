@@ -92,10 +92,10 @@ export const PricingTable: React.FC<PricingTableProps> = ({
             padding: 32,
             background: plan.highlighted
               ? "var(--buildrick-accent-subtle, rgba(0,212,170,0.1))"
-              : "var(--buildrick-bg-panel)",
+              : "var(--buildrick-design-color-background)",
             border: plan.highlighted
-              ? "2px solid var(--buildrick-accent)"
-              : "1px solid var(--buildrick-border)",
+              ? "2px solid var(--buildrick-design-color-primary)"
+              : "1px solid var(--buildrick-design-color-border)",
             borderRadius: 16,
             textAlign: "center",
             transform: plan.highlighted ? "scale(1.05)" : "none",
@@ -109,7 +109,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                 left: "50%",
                 transform: "translateX(-50%)",
                 padding: "4px 16px",
-                background: "var(--buildrick-accent)",
+                background: "var(--buildrick-design-color-primary)",
                 color: "#fff",
                 fontSize: 12,
                 fontWeight: 600,
@@ -125,7 +125,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               fontSize: 24,
               fontWeight: 600,
               marginBottom: 8,
-              color: "var(--buildrick-text-primary)",
+              color: "var(--buildrick-design-color-text)",
             }}
           >
             {plan.name}
@@ -135,7 +135,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
             <p
               style={{
                 fontSize: 14,
-                color: "var(--buildrick-text-muted)",
+                color: "var(--buildrick-design-color-muted)",
                 marginBottom: 24,
               }}
             >
@@ -148,7 +148,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               style={{
                 fontSize: 48,
                 fontWeight: 700,
-                color: "var(--buildrick-text-primary)",
+                color: "var(--buildrick-design-color-text)",
               }}
             >
               {plan.price}
@@ -157,7 +157,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
               <span
                 style={{
                   fontSize: 16,
-                  color: "var(--buildrick-text-muted)",
+                  color: "var(--buildrick-design-color-muted)",
                 }}
               >
                 {plan.period}
@@ -182,11 +182,11 @@ export const PricingTable: React.FC<PricingTableProps> = ({
                   gap: 8,
                   padding: "8px 0",
                   fontSize: 14,
-                  color: "var(--buildrick-text-secondary)",
-                  borderBottom: "1px solid var(--buildrick-border)",
+                  color: "var(--buildrick-design-color-muted)",
+                  borderBottom: "1px solid var(--buildrick-design-color-border)",
                 }}
               >
-                <span style={{ color: "var(--buildrick-success)" }}>✓</span>
+                <span style={{ color: "var(--buildrick-design-color-success)" }}>✓</span>
                 {feature}
               </li>
             ))}
@@ -197,9 +197,9 @@ export const PricingTable: React.FC<PricingTableProps> = ({
             style={{
               display: "block",
               padding: "12px 24px",
-              background: plan.highlighted ? "var(--buildrick-accent)" : "transparent",
-              border: plan.highlighted ? "none" : "2px solid var(--buildrick-accent)",
-              color: plan.highlighted ? "#fff" : "var(--buildrick-accent)",
+              background: plan.highlighted ? "var(--buildrick-design-color-primary)" : "transparent",
+              border: plan.highlighted ? "none" : "2px solid var(--buildrick-design-color-primary)",
+              color: plan.highlighted ? "#fff" : "var(--buildrick-design-color-primary)",
               fontSize: 14,
               fontWeight: 600,
               borderRadius: 8,

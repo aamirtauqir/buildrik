@@ -75,7 +75,7 @@ export const Features: React.FC<FeaturesProps> = ({
               style={{
                 fontSize: 36,
                 fontWeight: 700,
-                color: "var(--buildrick-text-primary)",
+                color: "var(--buildrick-design-color-text)",
                 marginBottom: 16,
               }}
             >
@@ -86,7 +86,7 @@ export const Features: React.FC<FeaturesProps> = ({
             <p
               style={{
                 fontSize: 18,
-                color: "var(--buildrick-text-secondary)",
+                color: "var(--buildrick-design-color-muted)",
                 lineHeight: 1.6,
               }}
             >
@@ -111,8 +111,8 @@ export const Features: React.FC<FeaturesProps> = ({
             className="buildrick-feature-card"
             style={{
               padding: variant === "cards" ? 32 : 24,
-              background: variant === "cards" ? "var(--buildrick-bg-panel)" : "transparent",
-              border: variant === "cards" ? "1px solid var(--buildrick-border)" : "none",
+              background: variant === "cards" ? "var(--buildrick-design-color-background)" : "transparent",
+              border: variant === "cards" ? "1px solid var(--buildrick-design-color-border)" : "none",
               borderRadius: variant === "cards" ? 16 : 0,
               textAlign: variant === "icons" ? "center" : "left",
               transition: "transform 0.2s ease, box-shadow 0.2s ease",
@@ -132,7 +132,7 @@ export const Features: React.FC<FeaturesProps> = ({
               style={{
                 fontSize: 20,
                 fontWeight: 600,
-                color: "var(--buildrick-text-primary)",
+                color: "var(--buildrick-design-color-text)",
                 marginBottom: 12,
                 display: variant === "list" ? "inline" : "block",
               }}
@@ -142,7 +142,7 @@ export const Features: React.FC<FeaturesProps> = ({
             <p
               style={{
                 fontSize: 15,
-                color: "var(--buildrick-text-secondary)",
+                color: "var(--buildrick-design-color-muted)",
                 lineHeight: 1.6,
               }}
             >
