@@ -129,3 +129,21 @@ test('op 5: action:delete-rule removes entire rule block', () => {
   assert.ok(!result.includes('.aqb-editor'));
   assert.ok(result.includes('.other'));
 });
+
+import { applyOp6 } from './theme-v3-codemod.mjs';
+
+test('op 6: "aqb-X" plain storage key renames', () => {
+  const m = { storage_keys: { 'aqb-panel-state': 'buildrick-panel-state' } };
+  assert.strictEqual(applyOp6('localStorage.getItem("aqb-panel-state")', m), 'localStorage.getItem("buildrick-panel-state")');
+});
+
+test('op 6: template literal static portion (aqb-nav-*)', () => {
+  const m = { storage_keys: { 'aqb-nav-*': { _dynamic: true, template: 'aqb-nav-${storageKey}', target: 'buildrick-nav-${storageKey}' } } };
+  assert.strictEqual(applyOp6('const k = `aqb-nav-${sk}`;', m), 'const k = `buildrick-nav-${sk}`;');
+});
+
+test('op 6: preserve marker skipped', () => {
+  const m = { storage_keys: { 'aqb-migration-v1-complete': { action: 'preserve' } } };
+  const input = 'localStorage.getItem("aqb-migration-v1-complete")';
+  assert.strictEqual(applyOp6(input, m), input);
+});

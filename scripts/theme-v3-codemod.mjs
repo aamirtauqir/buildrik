@@ -114,6 +114,26 @@ export function applyOp5(content, mapping) {
   return out;
 }
 
+export function applyOp6(content, mapping) {
+  let out = content;
+  for (const [key, val] of Object.entries(mapping.storage_keys)) {
+    if (val && typeof val === 'object') {
+      if (val.action === 'preserve' || val.action === 'delete') continue;
+      if (val._dynamic) {
+        const oldPrefix = key.replace(/-\*$/, '-');
+        const newPrefix = val.target.replace(/\$\{.*$/, '');
+        const re = new RegExp(`(["'\`])${oldPrefix}([^"'\`]*?)\\$\\{`, 'g');
+        out = out.replace(re, `$1${newPrefix}$2\${`);
+      }
+      continue;
+    }
+    // Plain rename
+    const re = new RegExp(`(["'\`])${key}\\1`, 'g');
+    out = out.replace(re, `$1${val}$1`);
+  }
+  return out;
+}
+
 const mode = process.argv[2] || 'dry-run';
 
 if (mode === 'dry-run') runDryRun();
