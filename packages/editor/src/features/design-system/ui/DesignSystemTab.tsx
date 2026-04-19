@@ -21,6 +21,7 @@ import { DEFAULT_TOKENS } from "../constants";
 import { useColorRegistry, useSpacingRegistry, useTypeRegistry, useRegistryConfig } from "../state/TokenRegistryContext";
 import { useTokenUsageMap } from "../state/useTokenUsageMap";
 import type { DesignToken } from "../types";
+import { CURRENT_SCHEMA_VERSION, migrateDesignTokens } from "../migrations";
 import {
   buildExport,
   downloadFile,
@@ -139,10 +140,23 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     if (!composer) return;
     try {
       const settings = composer.getProjectSettings();
+      const storedVersion = settings.designTokensSchemaVersion ?? 1;
+
+      if (storedVersion > CURRENT_SCHEMA_VERSION) {
+        console.warn(
+          `project was saved with designTokensSchemaVersion=${storedVersion} ` +
+          `(editor supports up to ${CURRENT_SCHEMA_VERSION}); loading tokens as-is`
+        );
+      }
+
       if (settings.designTokens && settings.designTokens.length > 0) {
+        let incoming = settings.designTokens;
+        if (storedVersion < CURRENT_SCHEMA_VERSION) {
+          incoming = migrateDesignTokens(incoming, storedVersion, CURRENT_SCHEMA_VERSION);
+        }
         const merged = DEFAULT_TOKENS.map((def) => {
           // Look up by id first (new format), fall back to name (legacy records)
-          const saved = settings.designTokens?.find((t) =>
+          const saved = incoming.find((t) =>
             t.id ? t.id === def.id : t.name === def.name
           );
           return saved ? { ...def, value: saved.value } : def;
@@ -270,7 +284,11 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
 
     try {
       const current = composer.getProjectSettings();
-      composer.setProjectSettings({ ...current, designTokens: tokenRecords });
+      composer.setProjectSettings({
+        ...current,
+        designTokens: tokenRecords,
+        designTokensSchemaVersion: CURRENT_SCHEMA_VERSION,
+      });
       // CP2: persist to localStorage so tokens survive page reload
       persistAll();
       colorState.markSaved();
