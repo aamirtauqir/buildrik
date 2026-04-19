@@ -10,7 +10,6 @@ import * as React from "react";
 import { useSpacingRegistry } from "../../../features/design-system/state/TokenRegistryContext";
 import { Popover } from "../../../shared/ui/Popover";
 import { TokenPickerPopover } from "../shared/TokenPickerPopover";
-import { INSPECTOR_TOKENS } from "../shared/controls/controlStyles";
 import { Section, InputWithUnit, MoreSettingsToggle, type SectionTier } from "../shared/controls";
 import { MixedValueBadge } from "../shared/MixedValueBadge";
 
@@ -60,10 +59,10 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
         title={`Unlink "${boundToken?.name ?? "token"}" — resolves to current value`}
         style={{
           padding: "2px 4px",
-          background: INSPECTOR_TOKENS.accentAlpha10,
-          border: `1px solid ${INSPECTOR_TOKENS.accent}`,
+          background: "var(--buildrick-accent-subtle)",
+          border: `1px solid ${"var(--buildrick-accent)"}`,
           borderRadius: 4,
-          color: INSPECTOR_TOKENS.accent,
+          color: "var(--buildrick-accent)",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
@@ -98,7 +97,7 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
             padding: 2,
             background: "none",
             border: "none",
-            color: INSPECTOR_TOKENS.textMuted,
+            color: "var(--buildrick-text-muted)",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",

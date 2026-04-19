@@ -4,7 +4,6 @@
  */
 
 import * as React from "react";
-import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { FlexAlignmentGrid } from "./controls";
 
@@ -42,7 +41,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
       <div
         style={{
           fontSize: 12,
-          color: INSPECTOR_TOKENS.textTertiary,
+          color: "var(--buildrick-text-tertiary)",
           marginBottom: 6,
         }}
       >
@@ -63,7 +62,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
         <div
           style={{
             fontSize: 12,
-            color: INSPECTOR_TOKENS.textMuted,
+            color: "var(--buildrick-text-muted)",
             marginBottom: 4,
             display: "flex",
             alignItems: "center",
@@ -102,7 +101,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
         <div
           style={{
             fontSize: 12,
-            color: INSPECTOR_TOKENS.textMuted,
+            color: "var(--buildrick-text-muted)",
             marginBottom: 4,
             display: "flex",
             alignItems: "center",

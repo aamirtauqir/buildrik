@@ -8,7 +8,6 @@ import * as React from "react";
 import type { Composer } from "../../../../engine";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../../../shared/types/media";
 import { Section, type SectionTier } from "../../shared/controls";
-import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 import { getPropertiesForType } from "./config";
 import { DataAttributeEditor } from "./DataAttributeEditor";
 import {
@@ -29,21 +28,21 @@ const styles = {
   dataAttributesSection: {
     marginTop: 16,
     paddingTop: 16,
-    borderTop: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
+    borderTop: `1px solid ${"var(--buildrick-border)"}`,
   } as React.CSSProperties,
   sectionTitle: {
     fontSize: 12,
-    color: INSPECTOR_TOKENS.textTertiary,
+    color: "var(--buildrick-text-tertiary)",
     fontWeight: 500,
     marginBottom: 12,
   } as React.CSSProperties,
   iconPickerButton: {
     width: "100%",
     padding: "12px 16px",
-    background: INSPECTOR_TOKENS.accentAlpha20,
-    border: `1px solid ${INSPECTOR_TOKENS.accentAlpha30}`,
+    background: "rgba(45, 109, 255, 0.20)",
+    border: `1px solid ${"rgba(45, 109, 255, 0.30)"}`,
     borderRadius: 8,
-    color: INSPECTOR_TOKENS.accent,
+    color: "var(--buildrick-accent)",
     fontSize: 13,
     fontWeight: 600,
     cursor: "pointer",
@@ -54,7 +53,7 @@ const styles = {
   } as React.CSSProperties,
   iconHint: {
     fontSize: 12,
-    color: INSPECTOR_TOKENS.textMuted,
+    color: "var(--buildrick-text-muted)",
     marginTop: 6,
     textAlign: "center" as const,
   } as React.CSSProperties,

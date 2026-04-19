@@ -11,37 +11,15 @@
 import type * as React from "react";
 
 // ============================================================================
-// INSPECTOR TOKENS (CSS Variables)
-// ============================================================================
-
-/**
- * Token references for panel control values
- * These map to CSS variables defined in themes/default.css
- */
-export const INSPECTOR_TOKENS = {
-  accent: "var(--buildrick-control-accent)",
-  accentAlpha08: "var(--buildrick-control-accent-alpha-08)",
-  accentAlpha10: "var(--buildrick-control-accent-alpha-10)",
-  accentAlpha20: "var(--buildrick-control-accent-alpha-20)",
-  accentAlpha30: "var(--buildrick-control-accent-alpha-30)",
-  surfaceInput: "var(--buildrick-control-surface-input)",
-  surfaceSubtle: "var(--buildrick-control-surface-subtle)",
-  surfaceOverlay: "var(--buildrick-control-surface-overlay)",
-  borderInput: "var(--buildrick-design-input-border)",
-  borderSubtle: "var(--buildrick-border-subtle)",
-  textPrimary: "var(--buildrick-control-text-primary)",
-  textSecondary: "var(--buildrick-control-text-secondary)",
-  textTertiary: "var(--buildrick-control-text-tertiary)",
-  textMuted: "var(--buildrick-control-text-muted)",
-} as const;
-
-// ============================================================================
 // BASE STYLES
 // ============================================================================
+// Values reference canonical --buildrick-* DS tokens directly.
+// INSPECTOR_TOKENS constant was deprecated and removed in DS V1 Phase 3.7.
+// Consumers use var() strings inline; no indirection layer.
 
 export const baseStyles = {
   section: {
-    borderBottom: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
+    borderBottom: `1px solid ${"var(--buildrick-border)"}`,
   },
   // Calmer header: bigger hit area, no hard inner divider when open, no loud
   // left accent bar. The section's own borderBottom provides the only divider.
@@ -50,7 +28,7 @@ export const baseStyles = {
     padding: "10px 14px",
     background: "transparent",
     border: "none",
-    color: isOpen ? INSPECTOR_TOKENS.textPrimary : INSPECTOR_TOKENS.textSecondary,
+    color: isOpen ? "var(--buildrick-text-primary)" : "var(--buildrick-text-secondary)",
     fontSize: 12,
     fontWeight: 600,
     letterSpacing: "0.01em",
@@ -71,7 +49,7 @@ export const baseStyles = {
   },
   label: {
     fontSize: 12,
-    color: INSPECTOR_TOKENS.textTertiary,
+    color: "var(--buildrick-text-tertiary)",
     fontWeight: 500,
     minWidth: 60,
     flexShrink: 0,
@@ -79,25 +57,25 @@ export const baseStyles = {
   input: {
     flex: 1,
     padding: "5px 8px",
-    background: INSPECTOR_TOKENS.surfaceInput,
-    border: `1px solid ${INSPECTOR_TOKENS.borderInput}`,
+    background: "var(--buildrick-bg-input)",
+    border: `1px solid ${"var(--buildrick-border-medium)"}`,
     borderRadius: 6,
-    color: INSPECTOR_TOKENS.textPrimary,
+    color: "var(--buildrick-text-primary)",
     fontSize: 12,
     outline: "none",
     transition: "border-color 0.2s, box-shadow 0.2s",
   },
   inputFocus: {
-    borderColor: INSPECTOR_TOKENS.accent,
-    boxShadow: `0 0 0 2px ${INSPECTOR_TOKENS.accentAlpha30}`,
+    borderColor: "var(--buildrick-accent)",
+    boxShadow: `0 0 0 2px ${"rgba(45, 109, 255, 0.30)"}`,
   },
   select: {
     flex: 1,
     padding: "5px 8px",
-    background: INSPECTOR_TOKENS.surfaceInput,
-    border: `1px solid ${INSPECTOR_TOKENS.borderInput}`,
+    background: "var(--buildrick-bg-input)",
+    border: `1px solid ${"var(--buildrick-border-medium)"}`,
     borderRadius: 6,
-    color: INSPECTOR_TOKENS.textPrimary,
+    color: "var(--buildrick-text-primary)",
     fontSize: 12,
     outline: "none",
     cursor: "pointer",
@@ -110,17 +88,17 @@ export const baseStyles = {
   buttonGroup: {
     display: "flex" as const,
     gap: 2,
-    background: INSPECTOR_TOKENS.surfaceSubtle,
+    background: "var(--buildrick-bg-subtle)",
     borderRadius: 6,
     padding: 2,
   },
   buttonGroupItem: (active: boolean): React.CSSProperties => ({
     flex: 1,
     padding: "6px 10px",
-    background: active ? INSPECTOR_TOKENS.accentAlpha20 : "transparent",
-    border: active ? `1px solid ${INSPECTOR_TOKENS.accentAlpha30}` : "1px solid transparent",
+    background: active ? "rgba(45, 109, 255, 0.20)" : "transparent",
+    border: active ? `1px solid ${"rgba(45, 109, 255, 0.30)"}` : "1px solid transparent",
     borderRadius: 4,
-    color: active ? INSPECTOR_TOKENS.accent : INSPECTOR_TOKENS.textTertiary,
+    color: active ? "var(--buildrick-accent)" : "var(--buildrick-text-tertiary)",
     fontSize: 12,
     fontWeight: 500,
     cursor: "pointer",
@@ -133,17 +111,17 @@ export const baseStyles = {
   compactBtn: (active: boolean): React.CSSProperties => ({
     flex: 1,
     padding: "5px 4px",
-    background: active ? INSPECTOR_TOKENS.accentAlpha20 : INSPECTOR_TOKENS.surfaceSubtle,
-    border: active ? `1px solid ${INSPECTOR_TOKENS.accentAlpha30}` : "1px solid transparent",
+    background: active ? "rgba(45, 109, 255, 0.20)" : "var(--buildrick-bg-subtle)",
+    border: active ? `1px solid ${"rgba(45, 109, 255, 0.30)"}` : "1px solid transparent",
     borderRadius: 4,
-    color: active ? INSPECTOR_TOKENS.accent : INSPECTOR_TOKENS.textTertiary,
+    color: active ? "var(--buildrick-accent)" : "var(--buildrick-text-tertiary)",
     fontSize: 12,
     fontWeight: 500,
     cursor: "pointer",
   }),
   sectionTitle: {
     fontSize: 11,
-    color: INSPECTOR_TOKENS.textSecondary,
+    color: "var(--buildrick-text-secondary)",
     fontWeight: 600,
     marginBottom: 10,
     marginTop: 16,
@@ -152,7 +130,7 @@ export const baseStyles = {
     width: 32,
     height: 32,
     padding: 0,
-    border: `2px solid ${INSPECTOR_TOKENS.borderInput}`,
+    border: `2px solid ${"var(--buildrick-border-medium)"}`,
     borderRadius: 6,
     cursor: "pointer",
     overflow: "hidden" as const,
@@ -160,11 +138,11 @@ export const baseStyles = {
   unitSelect: {
     width: 50,
     padding: "4px 4px",
-    background: INSPECTOR_TOKENS.surfaceInput,
-    border: `1px solid ${INSPECTOR_TOKENS.borderInput}`,
+    background: "var(--buildrick-bg-input)",
+    border: `1px solid ${"var(--buildrick-border-medium)"}`,
     borderLeft: "none",
     borderRadius: "0 4px 4px 0",
-    color: INSPECTOR_TOKENS.textTertiary,
+    color: "var(--buildrick-text-tertiary)",
     fontSize: 12,
     outline: "none",
     cursor: "pointer",
@@ -172,17 +150,17 @@ export const baseStyles = {
   inputWithUnit: {
     flex: 1,
     padding: "4px 8px",
-    background: INSPECTOR_TOKENS.surfaceInput,
-    border: `1px solid ${INSPECTOR_TOKENS.borderInput}`,
+    background: "var(--buildrick-bg-input)",
+    border: `1px solid ${"var(--buildrick-border-medium)"}`,
     borderRadius: "4px 0 0 4px",
-    color: INSPECTOR_TOKENS.textPrimary,
+    color: "var(--buildrick-text-primary)",
     fontSize: 12,
     outline: "none",
   },
   slider: {
     flex: 1,
     height: 4,
-    background: INSPECTOR_TOKENS.borderInput,
+    background: "var(--buildrick-border-medium)",
     borderRadius: 2,
     appearance: "none" as const,
     cursor: "pointer",

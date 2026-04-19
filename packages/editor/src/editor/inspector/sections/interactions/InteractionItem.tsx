@@ -5,7 +5,6 @@
  */
 
 import * as React from "react";
-import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 import { InteractionEditor } from "./InteractionEditor";
 import { type Interaction, getTriggerInfo } from "./types";
 
@@ -30,7 +29,7 @@ export interface InteractionItemProps {
 
 const styles = {
   container: (enabled: boolean): React.CSSProperties => ({
-    background: INSPECTOR_TOKENS.surfaceSubtle,
+    background: "var(--buildrick-bg-subtle)",
     borderRadius: 8,
     overflow: "hidden",
     opacity: enabled ? 1 : 0.5,
@@ -41,7 +40,7 @@ const styles = {
     gap: 8,
     padding: "10px 12px",
     cursor: "pointer",
-    background: isEditing ? INSPECTOR_TOKENS.surfaceInput : "transparent",
+    background: isEditing ? "var(--buildrick-bg-input)" : "transparent",
   }),
   icon: {
     fontSize: 14,
@@ -49,15 +48,15 @@ const styles = {
   label: {
     flex: 1,
     fontSize: 13,
-    color: INSPECTOR_TOKENS.textPrimary,
+    color: "var(--buildrick-text-primary)",
   },
   type: {
     fontSize: 12,
-    color: INSPECTOR_TOKENS.textMuted,
+    color: "var(--buildrick-text-muted)",
   },
   arrow: (isEditing: boolean): React.CSSProperties => ({
     transform: isEditing ? "rotate(90deg)" : "none",
-    color: INSPECTOR_TOKENS.textMuted,
+    color: "var(--buildrick-text-muted)",
     fontSize: 12,
   }),
 };

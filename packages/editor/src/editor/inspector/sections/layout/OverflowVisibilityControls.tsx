@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { baseStyles, INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
+import { baseStyles } from "../../shared/controls/controlStyles";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 
 // ============================================================================
@@ -98,7 +98,7 @@ const OverflowXYControls: React.FC<OverflowXYControlsProps> = ({
     }}
   >
     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-      <span style={{ fontSize: 12, color: INSPECTOR_TOKENS.textMuted, width: 14 }}>X</span>
+      <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)", width: 14 }}>X</span>
       <select
         value={styles["overflow-x"] || ""}
         onChange={(e) => onChange("overflow-x", e.target.value)}
@@ -112,7 +112,7 @@ const OverflowXYControls: React.FC<OverflowXYControlsProps> = ({
       </select>
     </div>
     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-      <span style={{ fontSize: 12, color: INSPECTOR_TOKENS.textMuted, width: 14 }}>Y</span>
+      <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)", width: 14 }}>Y</span>
       <select
         value={styles["overflow-y"] || ""}
         onChange={(e) => onChange("overflow-y", e.target.value)}

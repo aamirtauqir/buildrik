@@ -14,7 +14,6 @@ import {
   type GoogleFont,
   type FontCategory,
 } from "../../../../services/GoogleFontsService";
-import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 import { FontSearchInput, CategoryTabs, FontList } from "./FontPickerDropdown";
 
 // ============================================================================
@@ -99,7 +98,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
       <label
         style={{
           fontSize: 12,
-          color: INSPECTOR_TOKENS.textTertiary,
+          color: "var(--buildrick-text-tertiary)",
           fontWeight: 500,
           display: "block",
           marginBottom: 6,
@@ -117,10 +116,10 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
         style={{
           width: "100%",
           padding: "10px 12px",
-          background: INSPECTOR_TOKENS.surfaceInput,
-          border: `1px solid ${INSPECTOR_TOKENS.borderInput}`,
+          background: "var(--buildrick-bg-input)",
+          border: `1px solid ${"var(--buildrick-border-medium)"}`,
           borderRadius: 6,
-          color: INSPECTOR_TOKENS.textPrimary,
+          color: "var(--buildrick-text-primary)",
           fontSize: 12,
           textAlign: "left",
           cursor: "pointer",
@@ -131,7 +130,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
         }}
       >
         <span>{currentFontName}</span>
-        <span style={{ fontSize: 12, color: INSPECTOR_TOKENS.textTertiary }}>
+        <span style={{ fontSize: 12, color: "var(--buildrick-text-tertiary)" }}>
           {showFontPicker ? "\u25B2" : "\u25BC"}
         </span>
       </button>
@@ -147,8 +146,8 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
             left: 0,
             right: 0,
             marginTop: 4,
-            background: INSPECTOR_TOKENS.surfaceOverlay,
-            border: `1px solid ${INSPECTOR_TOKENS.borderInput}`,
+            background: "var(--buildrick-bg-panel)",
+            border: `1px solid ${"var(--buildrick-border-medium)"}`,
             borderRadius: 8,
             zIndex: 100,
             maxHeight: 300,
@@ -163,8 +162,8 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
             style={{
               padding: "6px 8px",
               fontSize: 12,
-              color: INSPECTOR_TOKENS.textTertiary,
-              borderBottom: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
+              color: "var(--buildrick-text-tertiary)",
+              borderBottom: `1px solid ${"var(--buildrick-border)"}`,
             }}
           >
             Showing {googleFonts.length} of {totalFonts} Google fonts

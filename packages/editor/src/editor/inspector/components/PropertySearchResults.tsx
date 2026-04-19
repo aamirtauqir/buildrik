@@ -18,7 +18,6 @@
 
 import * as React from "react";
 import { ColorInput, InputWithUnit, SelectRow } from "../shared/controls";
-import { INSPECTOR_TOKENS } from "../shared/controls/controlStyles";
 import type { UseAdvancedSettingsReturn } from "../hooks/useAdvancedSettings";
 
 // ============================================================================
@@ -420,13 +419,13 @@ const styles = {
     padding: "24px 14px",
     textAlign: "center" as const,
     fontSize: 12,
-    color: INSPECTOR_TOKENS.textMuted,
+    color: "var(--buildrick-text-muted)",
   },
   categoryLabel: {
     fontSize: 10,
     fontWeight: 700,
     textTransform: "uppercase" as const,
-    color: INSPECTOR_TOKENS.textMuted,
+    color: "var(--buildrick-text-muted)",
     letterSpacing: "0.05em",
     marginTop: 14,
     marginBottom: 6,
@@ -436,7 +435,7 @@ const styles = {
   },
   resultCount: {
     fontSize: 11,
-    color: INSPECTOR_TOKENS.textMuted,
+    color: "var(--buildrick-text-muted)",
     marginBottom: 8,
   },
 };

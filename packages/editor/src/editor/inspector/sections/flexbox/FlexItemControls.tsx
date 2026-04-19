@@ -4,7 +4,6 @@
  */
 
 import * as React from "react";
-import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 
 // ============================================================================
@@ -42,13 +41,13 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
     style={{
       marginTop: 10,
       paddingTop: 10,
-      borderTop: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
+      borderTop: `1px solid ${"var(--buildrick-border)"}`,
     }}
   >
     <div
       style={{
         fontSize: 12,
-        color: INSPECTOR_TOKENS.textMuted,
+        color: "var(--buildrick-text-muted)",
         fontWeight: 600,
         marginBottom: 8,
         textTransform: "uppercase",
@@ -71,7 +70,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         <span
           style={{
             fontSize: 12,
-            color: INSPECTOR_TOKENS.textMuted,
+            color: "var(--buildrick-text-muted)",
             width: 30,
           }}
         >
@@ -97,7 +96,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         <span
           style={{
             fontSize: 12,
-            color: INSPECTOR_TOKENS.textMuted,
+            color: "var(--buildrick-text-muted)",
             width: 30,
           }}
         >
@@ -123,7 +122,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         <span
           style={{
             fontSize: 12,
-            color: INSPECTOR_TOKENS.textMuted,
+            color: "var(--buildrick-text-muted)",
             width: 30,
           }}
         >

@@ -25,7 +25,7 @@ import { ColorSwatch } from "../../../../shared/ui/ColorSwatch";
 import { Popover } from "../../../../shared/ui/Popover";
 import { useColorRegistry } from "../../../../features/design-system/state/TokenRegistryContext";
 import { TokenPickerPopover } from "../TokenPickerPopover";
-import { baseStyles, INSPECTOR_TOKENS } from "./controlStyles";
+import { baseStyles } from "./controlStyles";
 
 // ============================================================================
 // HELPERS
@@ -143,21 +143,21 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
               alignItems: "center",
               gap: 5,
               padding: "3px 6px",
-              background: INSPECTOR_TOKENS.accentAlpha10,
-              border: `1px solid ${INSPECTOR_TOKENS.accent}`,
+              background: "var(--buildrick-accent-subtle)",
+              border: `1px solid ${"var(--buildrick-accent)"}`,
               borderRadius: 5,
               minWidth: 0,
             }}
           >
             <Link2
               size={11}
-              style={{ color: INSPECTOR_TOKENS.accent, flexShrink: 0 }}
+              style={{ color: "var(--buildrick-accent)", flexShrink: 0 }}
               aria-hidden="true"
             />
             <span
               style={{
                 fontSize: 11,
-                color: INSPECTOR_TOKENS.accent,
+                color: "var(--buildrick-accent)",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
@@ -179,7 +179,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
                 padding: 0,
                 background: "none",
                 border: "none",
-                color: INSPECTOR_TOKENS.accent,
+                color: "var(--buildrick-accent)",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",

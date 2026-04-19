@@ -8,7 +8,6 @@ import * as React from "react";
 import { DEFAULT_ANIMATION } from "../../../../shared/types/animations";
 import { Button } from "../../../../shared/ui";
 import { Section } from "../../shared/controls";
-import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 import { AddInteractionPanel } from "./AddInteractionPanel";
 import { InteractionItem } from "./InteractionItem";
 import { type Interaction, type InteractionTrigger, type InteractionsSectionProps } from "./types";
@@ -34,7 +33,7 @@ const styles = {
   emptyState: {
     textAlign: "center" as const,
     padding: "16px 12px",
-    color: INSPECTOR_TOKENS.textMuted,
+    color: "var(--buildrick-text-muted)",
     fontSize: 12,
   },
 };

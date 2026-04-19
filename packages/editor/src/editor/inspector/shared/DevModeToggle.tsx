@@ -7,7 +7,6 @@
  */
 
 import * as React from "react";
-import { INSPECTOR_TOKENS } from "./controls/controlStyles";
 
 // ============================================================================
 // TYPES
@@ -33,7 +32,7 @@ const toggleStyles = {
   label: {
     fontSize: 12,
     fontWeight: 500,
-    color: INSPECTOR_TOKENS.textTertiary,
+    color: "var(--buildrick-text-tertiary)",
     textTransform: "uppercase" as const,
     letterSpacing: "0.5px",
   } as React.CSSProperties,

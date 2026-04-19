@@ -1,11 +1,10 @@
 /**
  * Layout Section Styles
- * Visual card buttons and layout-specific styling using INSPECTOR_TOKENS
+ * Visual card buttons and layout-specific styling with canonical --buildrick-* tokens
  * @license BSD-3-Clause
  */
 
 import type * as React from "react";
-import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 
 // ============================================================================
 // CARD BUTTON STYLE (unique to Layout - visual option cards)
@@ -14,12 +13,12 @@ import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 export const cardBtn = (active: boolean): React.CSSProperties => ({
   flex: 1,
   padding: "8px 6px",
-  background: active ? INSPECTOR_TOKENS.accentAlpha20 : INSPECTOR_TOKENS.surfaceSubtle,
+  background: active ? "rgba(45, 109, 255, 0.20)" : "var(--buildrick-bg-subtle)",
   border: active
-    ? `1px solid ${INSPECTOR_TOKENS.accentAlpha30}`
-    : `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
+    ? `1px solid ${"rgba(45, 109, 255, 0.30)"}`
+    : `1px solid ${"var(--buildrick-border)"}`,
   borderRadius: 6,
-  color: active ? INSPECTOR_TOKENS.accent : INSPECTOR_TOKENS.textTertiary,
+  color: active ? "var(--buildrick-accent)" : "var(--buildrick-text-tertiary)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
@@ -38,12 +37,12 @@ export const cardBtn = (active: boolean): React.CSSProperties => ({
 export const constraintBtnStyle = (active: boolean): React.CSSProperties => ({
   flex: 1,
   padding: "8px 4px",
-  background: active ? INSPECTOR_TOKENS.accentAlpha20 : INSPECTOR_TOKENS.surfaceSubtle,
+  background: active ? "rgba(45, 109, 255, 0.20)" : "var(--buildrick-bg-subtle)",
   border: active
-    ? `1px solid ${INSPECTOR_TOKENS.accentAlpha30}`
-    : `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
+    ? `1px solid ${"rgba(45, 109, 255, 0.30)"}`
+    : `1px solid ${"var(--buildrick-border)"}`,
   borderRadius: 6,
-  color: active ? INSPECTOR_TOKENS.accent : INSPECTOR_TOKENS.textTertiary,
+  color: active ? "var(--buildrick-accent)" : "var(--buildrick-text-tertiary)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
@@ -61,10 +60,10 @@ export const constraintBtnStyle = (active: boolean): React.CSSProperties => ({
 export const fixedInputStyle: React.CSSProperties = {
   flex: 1,
   padding: "5px 6px",
-  background: INSPECTOR_TOKENS.surfaceInput,
-  border: `1px solid ${INSPECTOR_TOKENS.borderInput}`,
+  background: "var(--buildrick-bg-input)",
+  border: `1px solid ${"var(--buildrick-border-medium)"}`,
   borderRadius: 4,
-  color: INSPECTOR_TOKENS.textPrimary,
+  color: "var(--buildrick-text-primary)",
   fontSize: 12,
   outline: "none",
 };
@@ -74,11 +73,11 @@ export const fixedInputStyle: React.CSSProperties = {
 // ============================================================================
 
 export const positionOffsetContainerStyle: React.CSSProperties = {
-  background: INSPECTOR_TOKENS.surfaceSubtle,
+  background: "var(--buildrick-bg-subtle)",
   borderRadius: 6,
   padding: 8,
   marginBottom: 10,
-  border: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
+  border: `1px solid ${"var(--buildrick-border)"}`,
 };
 
 // ============================================================================
@@ -88,8 +87,8 @@ export const positionOffsetContainerStyle: React.CSSProperties = {
 export const positionOffsetBoxStyle: React.CSSProperties = {
   width: 32,
   height: 24,
-  background: INSPECTOR_TOKENS.accentAlpha20,
-  border: `1px solid ${INSPECTOR_TOKENS.accentAlpha30}`,
+  background: "rgba(45, 109, 255, 0.20)",
+  border: `1px solid ${"rgba(45, 109, 255, 0.30)"}`,
   borderRadius: 4,
 };
 
@@ -99,9 +98,9 @@ export const positionOffsetBoxStyle: React.CSSProperties = {
 
 export const tipBoxStyle: React.CSSProperties = {
   padding: "6px 8px",
-  background: INSPECTOR_TOKENS.accentAlpha08,
+  background: "rgba(45, 109, 255, 0.08)",
   borderRadius: 4,
   marginBottom: 10,
   fontSize: 12,
-  color: INSPECTOR_TOKENS.accent,
+  color: "var(--buildrick-accent)",
 };

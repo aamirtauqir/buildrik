@@ -4,19 +4,18 @@
  */
 
 import * as React from "react";
-import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { DirectionIcon } from "./icons";
 
 const visualBtn = (active: boolean): React.CSSProperties => ({
   flex: 1,
   padding: "10px 6px",
-  background: active ? INSPECTOR_TOKENS.accentAlpha20 : INSPECTOR_TOKENS.surfaceSubtle,
+  background: active ? "rgba(45, 109, 255, 0.20)" : "var(--buildrick-bg-subtle)",
   border: active
-    ? `1px solid ${INSPECTOR_TOKENS.accentAlpha30}`
-    : `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
+    ? `1px solid ${"rgba(45, 109, 255, 0.30)"}`
+    : `1px solid ${"var(--buildrick-border)"}`,
   borderRadius: 6,
-  color: active ? INSPECTOR_TOKENS.accent : INSPECTOR_TOKENS.textMuted,
+  color: active ? "var(--buildrick-accent)" : "var(--buildrick-text-muted)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
@@ -50,7 +49,7 @@ export const DirectionControls: React.FC<DirectionControlsProps> = ({
     <div
       style={{
         fontSize: 12,
-        color: INSPECTOR_TOKENS.textTertiary,
+        color: "var(--buildrick-text-tertiary)",
         marginBottom: 6,
         display: "flex",
         alignItems: "center",

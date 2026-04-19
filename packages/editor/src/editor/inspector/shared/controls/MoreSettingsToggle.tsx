@@ -6,7 +6,6 @@
  */
 
 import * as React from "react";
-import { INSPECTOR_TOKENS } from "./controlStyles";
 
 // ============================================================================
 // TYPES
@@ -43,7 +42,7 @@ const toggleStyles = {
     borderRadius: 6,
     cursor: "pointer",
     transition: "all 0.15s ease",
-    color: isOpen ? INSPECTOR_TOKENS.accent : INSPECTOR_TOKENS.textSecondary,
+    color: isOpen ? "var(--buildrick-accent)" : "var(--buildrick-text-secondary)",
     fontSize: 12,
     fontWeight: 500,
   }),
@@ -57,7 +56,7 @@ const toggleStyles = {
     padding: "2px 6px",
     borderRadius: 4,
     fontSize: 12,
-    color: INSPECTOR_TOKENS.textTertiary,
+    color: "var(--buildrick-text-tertiary)",
   } as React.CSSProperties,
   chevron: (isOpen: boolean): React.CSSProperties => ({
     fontSize: 12,

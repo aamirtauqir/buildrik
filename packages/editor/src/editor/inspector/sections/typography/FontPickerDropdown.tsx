@@ -8,7 +8,6 @@
 
 import * as React from "react";
 import type { GoogleFont, FontCategory } from "../../../../services/GoogleFontsService";
-import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 import type { SystemFont } from "./FontPicker";
 
 // Category labels for display
@@ -31,7 +30,7 @@ interface FontSearchInputProps {
 }
 
 export const FontSearchInput: React.FC<FontSearchInputProps> = ({ value, onChange }) => (
-  <div style={{ padding: 8, borderBottom: `1px solid ${INSPECTOR_TOKENS.borderSubtle}` }}>
+  <div style={{ padding: 8, borderBottom: `1px solid ${"var(--buildrick-border)"}` }}>
     <input
       type="text"
       value={value}
@@ -40,10 +39,10 @@ export const FontSearchInput: React.FC<FontSearchInputProps> = ({ value, onChang
       style={{
         width: "100%",
         padding: "8px 10px",
-        background: INSPECTOR_TOKENS.surfaceInput,
-        border: `1px solid ${INSPECTOR_TOKENS.borderInput}`,
+        background: "var(--buildrick-bg-input)",
+        border: `1px solid ${"var(--buildrick-border-medium)"}`,
         borderRadius: 6,
-        color: INSPECTOR_TOKENS.textPrimary,
+        color: "var(--buildrick-text-primary)",
         fontSize: 12,
         outline: "none",
       }}
@@ -67,7 +66,7 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({ selected, onSelect }
       display: "flex",
       gap: 2,
       padding: "6px 8px",
-      borderBottom: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
+      borderBottom: `1px solid ${"var(--buildrick-border)"}`,
       overflowX: "auto",
     }}
   >
@@ -77,10 +76,10 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({ selected, onSelect }
         onClick={() => onSelect(cat)}
         style={{
           padding: "4px 8px",
-          background: selected === cat ? INSPECTOR_TOKENS.accentAlpha20 : "transparent",
+          background: selected === cat ? "rgba(45, 109, 255, 0.20)" : "transparent",
           border: "none",
           borderRadius: 4,
-          color: selected === cat ? INSPECTOR_TOKENS.accent : INSPECTOR_TOKENS.textTertiary,
+          color: selected === cat ? "var(--buildrick-accent)" : "var(--buildrick-text-tertiary)",
           fontSize: 12,
           cursor: "pointer",
           whiteSpace: "nowrap",
@@ -120,7 +119,7 @@ export const FontList: React.FC<FontListProps> = ({
         <div
           style={{
             fontSize: 12,
-            color: INSPECTOR_TOKENS.textMuted,
+            color: "var(--buildrick-text-muted)",
             textTransform: "uppercase",
             letterSpacing: "0.5px",
             padding: "4px 0",
@@ -140,10 +139,10 @@ export const FontList: React.FC<FontListProps> = ({
                 width: "100%",
                 padding: "8px",
                 background:
-                  currentValue === font.value ? INSPECTOR_TOKENS.accentAlpha20 : "transparent",
+                  currentValue === font.value ? "rgba(45, 109, 255, 0.20)" : "transparent",
                 border: "none",
                 borderRadius: 4,
-                color: INSPECTOR_TOKENS.textPrimary,
+                color: "var(--buildrick-text-primary)",
                 fontSize: 12,
                 textAlign: "left",
                 cursor: "pointer",
@@ -161,7 +160,7 @@ export const FontList: React.FC<FontListProps> = ({
       <div
         style={{
           fontSize: 12,
-          color: INSPECTOR_TOKENS.textMuted,
+          color: "var(--buildrick-text-muted)",
           textTransform: "uppercase",
           letterSpacing: "0.5px",
           padding: "4px 0",
@@ -179,11 +178,11 @@ export const FontList: React.FC<FontListProps> = ({
             width: "100%",
             padding: "8px",
             background: currentValue?.includes(font.family)
-              ? INSPECTOR_TOKENS.accentAlpha20
+              ? "rgba(45, 109, 255, 0.20)"
               : "transparent",
             border: "none",
             borderRadius: 4,
-            color: INSPECTOR_TOKENS.textPrimary,
+            color: "var(--buildrick-text-primary)",
             fontSize: 12,
             textAlign: "left",
             cursor: "pointer",
@@ -194,7 +193,7 @@ export const FontList: React.FC<FontListProps> = ({
         >
           <span>{font.family}</span>
           <span
-            style={{ fontSize: 12, color: INSPECTOR_TOKENS.textMuted, textTransform: "uppercase" }}
+            style={{ fontSize: 12, color: "var(--buildrick-text-muted)", textTransform: "uppercase" }}
           >
             {font.category}
           </span>

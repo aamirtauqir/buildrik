@@ -10,7 +10,6 @@
 
 import * as React from "react";
 import { LinkedGapInput } from "../../shared/controls";
-import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 
 // ============================================================================
@@ -46,15 +45,15 @@ export const GapControls: React.FC<GapControlsProps> = ({
     style={{
       marginTop: 8,
       padding: 10,
-      background: INSPECTOR_TOKENS.surfaceSubtle,
+      background: "var(--buildrick-bg-subtle)",
       borderRadius: 6,
-      border: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
+      border: `1px solid ${"var(--buildrick-border)"}`,
     }}
   >
     {mixedKeys?.has("gap") && (
       <div style={{ display: "flex", alignItems: "center", marginBottom: 4 }}>
         <MixedValueBadge compact />
-        <span style={{ fontSize: 11, color: INSPECTOR_TOKENS.textMuted }}>Gap</span>
+        <span style={{ fontSize: 11, color: "var(--buildrick-text-muted)" }}>Gap</span>
       </div>
     )}
     <LinkedGapInput

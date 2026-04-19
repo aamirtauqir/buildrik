@@ -16,7 +16,6 @@ import * as React from "react";
 import { useTypeRegistry } from "../../../../features/design-system/state/TokenRegistryContext";
 import { Popover } from "../../../../shared/ui/Popover";
 import { TokenPickerPopover } from "../../shared/TokenPickerPopover";
-import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 import { SelectRow, ButtonGroup, InputWithUnit } from "../../shared/controls";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 
@@ -75,10 +74,10 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
         title={`Unlink "${boundToken?.name ?? "token"}" — resolves to current value`}
         style={{
           padding: "2px 4px",
-          background: INSPECTOR_TOKENS.accentAlpha10,
-          border: `1px solid ${INSPECTOR_TOKENS.accent}`,
+          background: "var(--buildrick-accent-subtle)",
+          border: `1px solid ${"var(--buildrick-accent)"}`,
           borderRadius: 4,
-          color: INSPECTOR_TOKENS.accent,
+          color: "var(--buildrick-accent)",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
@@ -113,7 +112,7 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
             padding: 2,
             background: "none",
             border: "none",
-            color: INSPECTOR_TOKENS.textMuted,
+            color: "var(--buildrick-text-muted)",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",

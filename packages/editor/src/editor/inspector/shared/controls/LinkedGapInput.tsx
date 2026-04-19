@@ -15,7 +15,7 @@
 
 import { Link, Link2Off } from "lucide-react";
 import * as React from "react";
-import { INSPECTOR_TOKENS, baseStyles } from "./controlStyles";
+import { baseStyles } from "./controlStyles";
 
 // ============================================================================
 // TYPES
@@ -78,10 +78,10 @@ const styles = {
     width: 22,
     height: 22,
     padding: 0,
-    background: linked ? INSPECTOR_TOKENS.accentAlpha20 : "transparent",
-    border: `1px solid ${linked ? INSPECTOR_TOKENS.accentAlpha30 : INSPECTOR_TOKENS.borderInput}`,
+    background: linked ? "rgba(45, 109, 255, 0.20)" : "transparent",
+    border: `1px solid ${linked ? "rgba(45, 109, 255, 0.30)" : "var(--buildrick-border-medium)"}`,
     borderRadius: 4,
-    color: linked ? INSPECTOR_TOKENS.accent : INSPECTOR_TOKENS.textTertiary,
+    color: linked ? "var(--buildrick-accent)" : "var(--buildrick-text-tertiary)",
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
@@ -106,7 +106,7 @@ const styles = {
   },
   splitLabel: {
     fontSize: 11,
-    color: INSPECTOR_TOKENS.textMuted,
+    color: "var(--buildrick-text-muted)",
     width: 22,
     flexShrink: 0,
   },

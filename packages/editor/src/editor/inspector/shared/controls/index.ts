@@ -4,8 +4,8 @@
  * @license BSD-3-Clause
  */
 
-// Styles and tokens
-export { baseStyles, INSPECTOR_TOKENS } from "./controlStyles";
+// Styles
+export { baseStyles } from "./controlStyles";
 
 // Unified ControlRow system
 export { ControlRow, CompactRow, StackedRow, SubTitle } from "./ControlRow";

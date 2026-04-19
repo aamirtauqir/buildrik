@@ -4,7 +4,6 @@
  */
 
 import * as React from "react";
-import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 
 // ============================================================================
 // TYPES
@@ -22,7 +21,7 @@ export const EnableFlexPrompt: React.FC<EnableFlexPromptProps> = ({ onChange }) 
   <div
     style={{
       padding: 10,
-      background: INSPECTOR_TOKENS.accentAlpha10,
+      background: "var(--buildrick-accent-subtle)",
       borderRadius: 6,
       marginBottom: 10,
       textAlign: "center",
@@ -31,7 +30,7 @@ export const EnableFlexPrompt: React.FC<EnableFlexPromptProps> = ({ onChange }) 
     <div
       style={{
         fontSize: 12,
-        color: INSPECTOR_TOKENS.textMuted,
+        color: "var(--buildrick-text-muted)",
         marginBottom: 6,
       }}
     >
@@ -41,7 +40,7 @@ export const EnableFlexPrompt: React.FC<EnableFlexPromptProps> = ({ onChange }) 
       onClick={() => onChange("display", "flex")}
       style={{
         padding: "6px 14px",
-        background: INSPECTOR_TOKENS.accent,
+        background: "var(--buildrick-accent)",
         border: "none",
         borderRadius: 4,
         color: "#fff",

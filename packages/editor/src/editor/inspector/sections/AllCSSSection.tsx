@@ -9,7 +9,6 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { InputField } from "../../../shared/forms/InputField";
 import { Section, type SectionTier } from "../shared/controls";
-import { INSPECTOR_TOKENS } from "../shared/controls/controlStyles";
 
 // ============================================================================
 // TYPES
@@ -48,13 +47,13 @@ const styles = {
   propertyName: {
     flex: "0 0 100px",
     fontSize: 12,
-    color: INSPECTOR_TOKENS.textSecondary,
+    color: "var(--buildrick-text-secondary)",
     fontFamily: "monospace",
   } as React.CSSProperties,
   removeBtn: {
     background: "transparent",
     border: "none",
-    color: INSPECTOR_TOKENS.textTertiary,
+    color: "var(--buildrick-text-tertiary)",
     cursor: "pointer",
     padding: 4,
     fontSize: 12,
@@ -65,7 +64,7 @@ const styles = {
     gap: 8,
     marginTop: 12,
     padding: "12px 0",
-    borderTop: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
+    borderTop: `1px solid ${"var(--buildrick-border)"}`,
   } as React.CSSProperties,
   addBtn: {
     padding: "8px 16px",
@@ -145,7 +144,7 @@ export const AllCSSSection: React.FC<AllCSSSectionProps> = ({
     <Section title="All CSS" icon="Code" defaultOpen={false} isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-all-css">
       {/* Existing properties */}
       {cssProperties.length === 0 ? (
-        <div style={{ color: INSPECTOR_TOKENS.textTertiary, fontSize: 12, padding: "8px 0" }}>
+        <div style={{ color: "var(--buildrick-text-tertiary)", fontSize: 12, padding: "8px 0" }}>
           No inline styles applied
         </div>
       ) : (

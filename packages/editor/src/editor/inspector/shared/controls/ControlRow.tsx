@@ -19,7 +19,6 @@
  */
 
 import * as React from "react";
-import { INSPECTOR_TOKENS } from "./controlStyles";
 
 // ============================================================================
 // TYPES
@@ -77,7 +76,7 @@ const getLabelStyle = (
   variant: ControlRowProps["variant"]
 ): React.CSSProperties => ({
   fontSize: variant === "compact" ? 10 : 11,
-  color: INSPECTOR_TOKENS.textTertiary,
+  color: "var(--buildrick-text-tertiary)",
   fontWeight: 500,
   minWidth: variant === "stacked" ? undefined : LABEL_WIDTHS[labelWidth],
   flexShrink: 0,
@@ -151,7 +150,7 @@ export const SubTitle: React.FC<SubTitleProps> = ({ children, marginTop = 12 }) 
   <div
     style={{
       fontSize: 12,
-      color: INSPECTOR_TOKENS.textMuted,
+      color: "var(--buildrick-text-muted)",
       fontWeight: 600,
       marginBottom: 8,
       marginTop,

@@ -7,7 +7,6 @@
 import * as React from "react";
 import { SelectField } from "../../../../shared/forms";
 import { Button } from "../../../../shared/ui";
-import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 import { type Interaction, ANIMATION_PRESETS, EASING_OPTIONS } from "./types";
 
 // ============================================================================
@@ -30,7 +29,7 @@ export interface InteractionEditorProps {
 const styles = {
   container: {
     padding: 12,
-    borderTop: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
+    borderTop: `1px solid ${"var(--buildrick-border)"}`,
     display: "flex",
     flexDirection: "column" as const,
     gap: 12,
@@ -45,16 +44,16 @@ const styles = {
   label: {
     display: "block",
     fontSize: 12,
-    color: INSPECTOR_TOKENS.textMuted,
+    color: "var(--buildrick-text-muted)",
     marginBottom: 4,
   },
   input: {
     width: "100%",
     padding: "8px 10px",
-    background: INSPECTOR_TOKENS.surfaceInput,
-    border: `1px solid ${INSPECTOR_TOKENS.borderInput}`,
+    background: "var(--buildrick-bg-input)",
+    border: `1px solid ${"var(--buildrick-border-medium)"}`,
     borderRadius: 6,
-    color: INSPECTOR_TOKENS.textPrimary,
+    color: "var(--buildrick-text-primary)",
     fontSize: 13,
   } as React.CSSProperties,
   buttonRow: {

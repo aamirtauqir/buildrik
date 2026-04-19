@@ -20,7 +20,6 @@
  */
 
 import * as React from "react";
-import { INSPECTOR_TOKENS } from "./controls/controlStyles";
 
 // ============================================================================
 // TYPES
@@ -65,8 +64,8 @@ const extractVarName = (v: string) => {
 const valueBadgeStyle: React.CSSProperties = {
   fontSize: 10,
   fontFamily: "var(--buildrick-design-font-mono, 'JetBrains Mono', monospace)",
-  color: INSPECTOR_TOKENS.accent,
-  background: INSPECTOR_TOKENS.accentAlpha10,
+  color: "var(--buildrick-accent)",
+  background: "var(--buildrick-accent-subtle)",
   padding: "1px 5px",
   borderRadius: 4,
   whiteSpace: "nowrap",
@@ -181,8 +180,8 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
     <div
       style={{
         width: showSwatch ? 228 : 240,
-        background: INSPECTOR_TOKENS.surfaceOverlay,
-        border: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
+        background: "var(--buildrick-bg-panel)",
+        border: `1px solid ${"var(--buildrick-border)"}`,
         borderRadius: 8,
         boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
         overflow: "hidden",
@@ -192,7 +191,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
       <div
         style={{
           display: "flex",
-          borderBottom: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
+          borderBottom: `1px solid ${"var(--buildrick-border)"}`,
         }}
       >
         {(["tokens", "custom"] as const).map((t) => (
@@ -203,10 +202,10 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
             style={{
               flex: 1,
               padding: "7px 0",
-              background: tab === t ? INSPECTOR_TOKENS.accentAlpha10 : "transparent",
+              background: tab === t ? "var(--buildrick-accent-subtle)" : "transparent",
               border: "none",
-              borderBottom: tab === t ? `2px solid ${INSPECTOR_TOKENS.accent}` : "2px solid transparent",
-              color: tab === t ? INSPECTOR_TOKENS.accent : INSPECTOR_TOKENS.textTertiary,
+              borderBottom: tab === t ? `2px solid ${"var(--buildrick-accent)"}` : "2px solid transparent",
+              color: tab === t ? "var(--buildrick-accent)" : "var(--buildrick-text-tertiary)",
               fontSize: 11,
               fontWeight: 600,
               cursor: "pointer",
@@ -237,10 +236,10 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
               style={{
                 width: "100%",
                 padding: "5px 8px",
-                background: INSPECTOR_TOKENS.surfaceInput,
-                border: `1px solid ${INSPECTOR_TOKENS.borderInput}`,
+                background: "var(--buildrick-bg-input)",
+                border: `1px solid ${"var(--buildrick-border-medium)"}`,
                 borderRadius: 5,
-                color: INSPECTOR_TOKENS.textPrimary,
+                color: "var(--buildrick-text-primary)",
                 fontSize: 11,
                 outline: "none",
                 boxSizing: "border-box",
@@ -257,10 +256,10 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
               }}
             >
               <div style={{ fontSize: 18, marginBottom: 6, opacity: 0.4 }}>🎨</div>
-              <div style={{ fontSize: 11, color: INSPECTOR_TOKENS.textSecondary, marginBottom: 4 }}>
+              <div style={{ fontSize: 11, color: "var(--buildrick-text-secondary)", marginBottom: 4 }}>
                 No {tokenLabel} tokens yet
               </div>
-              <div style={{ fontSize: 10, color: INSPECTOR_TOKENS.textMuted }}>
+              <div style={{ fontSize: 10, color: "var(--buildrick-text-muted)" }}>
                 Add tokens in the Design tab
               </div>
             </div>
@@ -273,7 +272,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                 padding: "16px 12px",
                 textAlign: "center",
                 fontSize: 11,
-                color: INSPECTOR_TOKENS.textMuted,
+                color: "var(--buildrick-text-muted)",
               }}
             >
               No tokens found
@@ -324,11 +323,11 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                       alignItems: "center",
                       gap: 3,
                       padding: "4px 2px",
-                      background: selected || focused ? INSPECTOR_TOKENS.accentAlpha10 : "transparent",
+                      background: selected || focused ? "var(--buildrick-accent-subtle)" : "transparent",
                       border: selected
-                        ? `1px solid ${INSPECTOR_TOKENS.accent}`
+                        ? `1px solid ${"var(--buildrick-accent)"}`
                         : focused
-                          ? `1px solid ${INSPECTOR_TOKENS.accentAlpha30}`
+                          ? `1px solid ${"rgba(45, 109, 255, 0.30)"}`
                           : "1px solid transparent",
                       borderRadius: 5,
                       cursor: "pointer",
@@ -338,7 +337,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                     onMouseEnter={(e) => {
                       if (!selected)
                         (e.currentTarget as HTMLButtonElement).style.background =
-                          INSPECTOR_TOKENS.accentAlpha08;
+                          "rgba(45, 109, 255, 0.08)";
                     }}
                     onMouseLeave={(e) => {
                       if (!selected)
@@ -361,7 +360,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                     <span
                       style={{
                         fontSize: 9,
-                        color: INSPECTOR_TOKENS.textTertiary,
+                        color: "var(--buildrick-text-tertiary)",
                         textAlign: "center",
                         lineHeight: 1.2,
                         wordBreak: "break-word",
@@ -390,11 +389,11 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                       justifyContent: "space-between",
                       gap: 8,
                       padding: "5px 6px",
-                      background: selected || focused ? INSPECTOR_TOKENS.accentAlpha10 : "transparent",
+                      background: selected || focused ? "var(--buildrick-accent-subtle)" : "transparent",
                       border: selected
-                        ? `1px solid ${INSPECTOR_TOKENS.accent}`
+                        ? `1px solid ${"var(--buildrick-accent)"}`
                         : focused
-                          ? `1px solid ${INSPECTOR_TOKENS.accentAlpha30}`
+                          ? `1px solid ${"rgba(45, 109, 255, 0.30)"}`
                           : "1px solid transparent",
                       borderRadius: 5,
                       cursor: "pointer",
@@ -406,7 +405,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                     onMouseEnter={(e) => {
                       if (!selected)
                         (e.currentTarget as HTMLButtonElement).style.background =
-                          INSPECTOR_TOKENS.accentAlpha08;
+                          "rgba(45, 109, 255, 0.08)";
                     }}
                     onMouseLeave={(e) => {
                       if (!selected)
@@ -417,7 +416,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                     <span
                       style={{
                         fontSize: 11,
-                        color: INSPECTOR_TOKENS.textSecondary,
+                        color: "var(--buildrick-text-secondary)",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
@@ -437,7 +436,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
 
       {tab === "custom" && (
         <div style={{ padding: 10 }}>
-          <div style={{ fontSize: 11, color: INSPECTOR_TOKENS.textTertiary, marginBottom: 6 }}>
+          <div style={{ fontSize: 11, color: "var(--buildrick-text-tertiary)", marginBottom: 6 }}>
             Enter any CSS color value
           </div>
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
@@ -448,7 +447,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                 height: 28,
                 borderRadius: 5,
                 background: customInput,
-                border: `1px solid ${INSPECTOR_TOKENS.borderInput}`,
+                border: `1px solid ${"var(--buildrick-border-medium)"}`,
                 flexShrink: 0,
               }}
             />
@@ -465,10 +464,10 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
               style={{
                 flex: 1,
                 padding: "5px 8px",
-                background: INSPECTOR_TOKENS.surfaceInput,
-                border: `1px solid ${INSPECTOR_TOKENS.borderInput}`,
+                background: "var(--buildrick-bg-input)",
+                border: `1px solid ${"var(--buildrick-border-medium)"}`,
                 borderRadius: 5,
-                color: INSPECTOR_TOKENS.textPrimary,
+                color: "var(--buildrick-text-primary)",
                 fontSize: 12,
                 outline: "none",
               }}
@@ -478,7 +477,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
             style={{
               marginTop: 8,
               fontSize: 10,
-              color: INSPECTOR_TOKENS.textMuted,
+              color: "var(--buildrick-text-muted)",
             }}
           >
             Accepts hex, rgb(), hsl(), or any CSS keyword

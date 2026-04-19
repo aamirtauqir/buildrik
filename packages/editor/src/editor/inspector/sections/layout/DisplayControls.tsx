@@ -5,7 +5,6 @@
 
 import * as React from "react";
 import { HelpTooltip } from "../../../../shared/ui/HelpTooltip";
-import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 import { MixedValueBadge } from "../../shared/MixedValueBadge";
 import { DisplayPreview } from "./previews";
 import { cardBtn, tipBoxStyle } from "./styles";
@@ -47,7 +46,7 @@ export const DisplayControls: React.FC<DisplayControlsProps> = ({ display, onCha
       <div
         style={{
           fontSize: 12,
-          color: INSPECTOR_TOKENS.textTertiary,
+          color: "var(--buildrick-text-tertiary)",
           marginBottom: 8,
           display: "flex",
           alignItems: "center",

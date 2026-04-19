@@ -5,7 +5,6 @@
  */
 
 import * as React from "react";
-import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 import { type InteractionTrigger, TRIGGER_GROUPS } from "./types";
 
 // ============================================================================
@@ -34,7 +33,7 @@ const GROUP_LABELS: Record<string, string> = {
 
 const styles = {
   container: {
-    background: INSPECTOR_TOKENS.surfaceInput,
+    background: "var(--buildrick-bg-input)",
     borderRadius: 8,
     padding: 12,
   },
@@ -47,12 +46,12 @@ const styles = {
   title: {
     fontSize: 12,
     fontWeight: 600,
-    color: INSPECTOR_TOKENS.textPrimary,
+    color: "var(--buildrick-text-primary)",
   },
   closeButton: {
     background: "none",
     border: "none",
-    color: INSPECTOR_TOKENS.textMuted,
+    color: "var(--buildrick-text-muted)",
     cursor: "pointer",
     fontSize: 16,
   } as React.CSSProperties,
@@ -63,7 +62,7 @@ const styles = {
     fontSize: 12,
     fontWeight: 600,
     textTransform: "uppercase" as const,
-    color: INSPECTOR_TOKENS.textMuted,
+    color: "var(--buildrick-text-muted)",
     marginBottom: 6,
   },
   triggerGrid: {
@@ -76,10 +75,10 @@ const styles = {
     alignItems: "center",
     gap: 6,
     padding: "8px 10px",
-    background: INSPECTOR_TOKENS.surfaceSubtle,
+    background: "var(--buildrick-bg-subtle)",
     border: "none",
     borderRadius: 6,
-    color: INSPECTOR_TOKENS.textSecondary,
+    color: "var(--buildrick-text-secondary)",
     fontSize: 12,
     cursor: "pointer",
     transition: "all 0.15s ease",

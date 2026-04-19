@@ -11,20 +11,6 @@
  */
 
 :root {
-  /* --buildrick-control-* inspector aliases (Phase 3.7) */
-  --buildrick-control-accent: var(--buildrick-accent);
-  --buildrick-control-accent-alpha-08: rgba(45, 109, 255, 0.08);
-  --buildrick-control-accent-alpha-10: rgba(45, 109, 255, 0.10);
-  --buildrick-control-accent-alpha-20: rgba(45, 109, 255, 0.20);
-  --buildrick-control-accent-alpha-30: rgba(45, 109, 255, 0.30);
-  --buildrick-control-surface-input: var(--buildrick-bg-input);
-  --buildrick-control-surface-overlay: var(--buildrick-bg-panel);
-  --buildrick-control-surface-subtle: var(--buildrick-bg-subtle);
-  --buildrick-control-text-primary: var(--buildrick-text-primary);
-  --buildrick-control-text-secondary: var(--buildrick-text-secondary);
-  --buildrick-control-text-muted: var(--buildrick-text-muted);
-  --buildrick-control-text-tertiary: var(--buildrick-text-tertiary);
-
   /* --buildrick-build-* Build tab (Phase 3.8) */
   --buildrick-build-surface: var(--buildrick-bg-panel);
   --buildrick-build-card: var(--buildrick-bg-card);

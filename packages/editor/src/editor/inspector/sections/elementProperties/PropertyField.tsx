@@ -7,7 +7,6 @@
 import * as React from "react";
 import type { MediaAsset, MediaAssetType } from "../../../../shared/types/media";
 import { InputRow, SelectRow } from "../../shared/controls";
-import { INSPECTOR_TOKENS } from "../../shared/controls/controlStyles";
 import type { PropertyConfig } from "./config";
 
 const styles = {
@@ -19,7 +18,7 @@ const styles = {
   } as React.CSSProperties,
   checkboxLabel: {
     fontSize: 12,
-    color: INSPECTOR_TOKENS.textTertiary,
+    color: "var(--buildrick-text-tertiary)",
     fontWeight: 500,
     minWidth: 70,
   } as React.CSSProperties,
@@ -31,7 +30,7 @@ const styles = {
   } as React.CSSProperties,
   checkboxText: {
     fontSize: 12,
-    color: INSPECTOR_TOKENS.textPrimary,
+    color: "var(--buildrick-text-primary)",
   } as React.CSSProperties,
   srcRow: {
     display: "flex",
@@ -41,10 +40,10 @@ const styles = {
   } as React.CSSProperties,
   browseButton: {
     padding: "8px 12px",
-    background: INSPECTOR_TOKENS.accentAlpha20,
-    border: `1px solid ${INSPECTOR_TOKENS.accentAlpha30}`,
+    background: "rgba(45, 109, 255, 0.20)",
+    border: `1px solid ${"rgba(45, 109, 255, 0.30)"}`,
     borderRadius: 6,
-    color: INSPECTOR_TOKENS.accent,
+    color: "var(--buildrick-accent)",
     fontSize: 12,
     fontWeight: 600,
     cursor: "pointer",

@@ -18,7 +18,6 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import { useBatchStyleHandler } from "../hooks/useBatchStyleHandler";
 import { ColorInput, InputWithUnit } from "../shared/controls";
-import { INSPECTOR_TOKENS } from "../shared/controls/controlStyles";
 
 // ============================================================================
 // TYPES
@@ -39,19 +38,19 @@ const styles = {
     flexDirection: "column" as const,
     gap: 4,
     padding: "12px 14px",
-    borderTop: `1px solid ${INSPECTOR_TOKENS.borderSubtle}`,
+    borderTop: `1px solid ${"var(--buildrick-border)"}`,
   },
   label: {
     fontSize: 11,
     fontWeight: 600,
-    color: INSPECTOR_TOKENS.textTertiary,
+    color: "var(--buildrick-text-tertiary)",
     textTransform: "uppercase" as const,
     letterSpacing: "0.04em",
     marginBottom: 6,
   },
   hint: {
     fontSize: 11,
-    color: INSPECTOR_TOKENS.textMuted,
+    color: "var(--buildrick-text-muted)",
     marginTop: 8,
     lineHeight: 1.4,
   },
