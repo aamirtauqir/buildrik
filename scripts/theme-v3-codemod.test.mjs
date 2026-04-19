@@ -82,3 +82,25 @@ test('op 2: multi-animation shorthand with orphan aborts', () => {
   const input = '.foo { animation: aqb-slide-down 200ms, other-live 100ms; }';
   assert.throws(() => applyOp2(input, m), /multi-animation/i);
 });
+
+import { applyOp4 } from './theme-v3-codemod.mjs';
+
+test('op 4: data-aqb-X renames (CSS selector)', () => {
+  const m = { data_attributes: { 'data-aqb-id': 'data-buildrick-id' } };
+  assert.strictEqual(applyOp4('[data-aqb-id="foo"] { color: red; }', m), '[data-buildrick-id="foo"] { color: red; }');
+});
+
+test('op 4: data-aqb-X renames (JSX prop)', () => {
+  const m = { data_attributes: { 'data-aqb-canvas': 'data-buildrick-canvas' } };
+  assert.strictEqual(applyOp4('<div data-aqb-canvas="true" />', m), '<div data-buildrick-canvas="true" />');
+});
+
+test('op 4: data-aqb-X in template literal static portion renames', () => {
+  const m = { data_attributes: { 'data-aqb-id': 'data-buildrick-id' } };
+  assert.strictEqual(applyOp4('const sel = `[data-aqb-id="${id}"]`;', m), 'const sel = `[data-buildrick-id="${id}"]`;');
+});
+
+test('op 4: unmapped data-aqb-X aborts', () => {
+  const m = { data_attributes: {} };
+  assert.throws(() => applyOp4('<div data-aqb-wtf />', m), /unmapped/i);
+});

@@ -85,6 +85,14 @@ export function applyOp2(content, mapping) {
   return out;
 }
 
+export function applyOp4(content, mapping) {
+  return content.replace(/data-aqb-[a-z-]+/g, (match) => {
+    const target = mapping.data_attributes[match];
+    if (!target) throw new Error(`op4: unmapped data attr ${match}`);
+    return target;
+  });
+}
+
 const mode = process.argv[2] || 'dry-run';
 
 if (mode === 'dry-run') runDryRun();
