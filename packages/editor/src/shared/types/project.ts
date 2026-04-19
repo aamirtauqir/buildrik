@@ -191,6 +191,12 @@ export interface ProjectSettings {
   seo?: SiteSEO;
   /** Publishing configuration */
   publishing?: PublishingConfig;
+  /**
+   * Schema version for designTokens array. See DS V1 spec §9.
+   * Absent = treated as 1 (pre-DS-V1 projects).
+   * Bumped when token names rename/split/remove.
+   */
+  designTokensSchemaVersion?: number;
   /** Design tokens (CSS custom properties) */
   designTokens?: DesignTokenRecord[];
   /** Custom code injection (head scripts, body scripts, global CSS) */
