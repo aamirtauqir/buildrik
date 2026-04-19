@@ -6,6 +6,7 @@ import * as React from "react";
 import type { MediaAsset, MediaAssetType } from "../../../shared/types/media";
 import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type SectionTier } from "../shared/controls";
 import { MixedValueBadge } from "../shared/MixedValueBadge";
+import { extractGradientUI, composeGradient, deriveBgType } from "@/shared/utils/parsers/gradientHelpers";
 
 export interface BackgroundSectionProps {
   styles: Record<string, string>;
@@ -41,7 +42,15 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
   mixedKeys,
   isMultiSelect,
 }) => {
-  const [bgType, setBgType] = React.useState<"color" | "gradient" | "image">("color");
+  const [bgType, setBgType] = React.useState<"color" | "gradient" | "image">(() => deriveBgType(styles));
+
+  // Sync bgType when styles change
+  React.useEffect(() => {
+    setBgType(deriveBgType(styles));
+  }, [styles.background, styles["background-image"]]);
+
+  // Parse current gradient for the 2-stop UI
+  const gradientUI = bgType === "gradient" ? extractGradientUI(styles.background || styles["background-image"]) : null;
 
   // Compute color preview from styles
   const bgColor = styles["background-color"] || styles["backgroundColor"] || styles["background"];

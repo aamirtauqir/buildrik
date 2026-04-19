@@ -88,7 +88,7 @@ const s: Record<string, React.CSSProperties> = {
     color: "var(--buildrick-text-muted)",
     textTransform: "uppercase" as const,
     letterSpacing: "0.07em",
-    background: "var(--buildrick-bg-panel-secondary)",
+    background: "var(--buildrick-bg-elevated)",
   },
   listItem: {
     display: "flex",
@@ -230,7 +230,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
           if (!isActive) {
             (e.currentTarget as HTMLElement).style.color = "var(--buildrick-text-secondary)";
             (e.currentTarget as HTMLElement).style.background =
-              "var(--buildrick-bg-panel-secondary)";
+              "var(--buildrick-bg-elevated)";
           }
         }}
         onMouseLeave={(e) => {
@@ -288,7 +288,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
                     onClick={() => handleSelectCollection(col)}
                     onMouseEnter={(e) => {
                       (e.currentTarget as HTMLElement).style.background =
-                        "var(--buildrick-bg-panel-secondary)";
+                        "var(--buildrick-bg-elevated)";
                     }}
                     onMouseLeave={(e) => {
                       (e.currentTarget as HTMLElement).style.background = "transparent";
@@ -338,7 +338,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
                     }
                     onMouseEnter={(e) => {
                       (e.currentTarget as HTMLElement).style.background =
-                        "var(--buildrick-bg-panel-secondary)";
+                        "var(--buildrick-bg-elevated)";
                     }}
                     onMouseLeave={(e) => {
                       (e.currentTarget as HTMLElement).style.background = "transparent";

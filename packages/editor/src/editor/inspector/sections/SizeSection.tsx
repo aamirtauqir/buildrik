@@ -353,7 +353,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
               border: "1px solid var(--buildrick-border)",
               borderRadius: "var(--buildrick-radius-sm)",
               color: "var(--buildrick-text-primary)",
-              fontSize: "var(--buildrick-text-base)",
+              fontSize: "var(--buildrick-text-sm-plus)",
               outline: "none",
               cursor: "pointer",
             }}

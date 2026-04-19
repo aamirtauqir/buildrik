@@ -15,6 +15,17 @@ import {
 } from "../shared/controls";
 import { InputField } from "../../../shared/forms/InputField";
 import { MixedValueBadge } from "../shared/MixedValueBadge";
+import {
+  parseTransform,
+  serializeTransform,
+  updateTransformFunction,
+  isOpaqueTransform,
+} from "@/shared/utils/parsers/transformParser";
+import {
+  parseFilter,
+  serializeFilter,
+  updateFilterFunction,
+} from "@/shared/utils/parsers/filterParser";
 
 export interface EffectsSectionProps {
   styles: Record<string, string>;
@@ -51,17 +62,6 @@ const INNER_SHADOW_PRESETS = [
   { label: "All", value: "inset 0 0 10px rgba(0,0,0,0.15)" },
 ];
 
-// Parse transform values
-const parseTransform = (
-  transform: string | undefined,
-  type: string,
-  defaultValue: string
-): string => {
-  if (!transform) return defaultValue;
-  const match = transform.match(new RegExp(`${type}\\(([^)]+)\\)`));
-  return match?.[1] || defaultValue;
-};
-
 // Extract inner shadow (inset) from combined box-shadow value
 const extractInnerShadow = (boxShadow: string | undefined): string => {
   if (!boxShadow || boxShadow === "none") return "";
@@ -78,33 +78,36 @@ const extractOuterShadow = (boxShadow: string | undefined): string => {
   return outerShadows.map((s) => s.trim()).join(", ");
 };
 
-// Parse filter values
-const parseFilter = (filter: string | undefined, type: string, defaultValue: string): string => {
-  if (!filter) return defaultValue;
-  const match = filter.match(new RegExp(`${type}\\(([^)]+)\\)`));
-  return match?.[1] || defaultValue;
-};
-
 export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange, isOpen, onToggle, tier = "tertiary", mixedKeys, isMultiSelect }) => {
   // Parse opacity
   const opacity = styles.opacity ? parseFloat(styles.opacity) * 100 : 100;
 
-  // Parse transform values
-  const scaleValue = parseFloat(parseTransform(styles.transform, "scale", "1")) * 100;
-  const rotateValue = parseFloat(
-    parseTransform(styles.transform, "rotate", "0deg").replace("deg", "")
-  );
-  const skewValue = parseFloat(parseTransform(styles.transform, "skew", "0deg").replace("deg", ""));
-  const translateX = parseTransform(styles.transform, "translateX", "");
-  const translateY = parseTransform(styles.transform, "translateY", "");
+  // Parse transform values using shared parser
+  const transformFns = parseTransform(styles.transform || "");
+  const opaqueTransform = isOpaqueTransform(styles.transform || "");
+  const scaleFn = transformFns.find((f) => f.name === "scale");
+  const rotateFn = transformFns.find((f) => f.name === "rotate");
+  const skewFn = transformFns.find((f) => f.name === "skew");
+  const translateXFn = transformFns.find((f) => f.name === "translateX");
+  const translateYFn = transformFns.find((f) => f.name === "translateY");
 
-  // Parse filter values
-  const blurValue = parseFloat(parseFilter(styles.filter, "blur", "0px").replace("px", ""));
-  const brightnessValue = parseFloat(
-    parseFilter(styles.filter, "brightness", "100%").replace("%", "")
-  );
-  const contrastValue = parseFloat(parseFilter(styles.filter, "contrast", "100%").replace("%", ""));
-  const grayscaleValue = parseFloat(parseFilter(styles.filter, "grayscale", "0%").replace("%", ""));
+  const scaleValue = scaleFn ? parseFloat(String(scaleFn.args[0])) * 100 : 100;
+  const rotateValue = rotateFn ? parseFloat(String(rotateFn.args[0]).replace("deg", "")) : 0;
+  const skewValue = skewFn ? parseFloat(String(skewFn.args[0]).replace("deg", "")) : 0;
+  const translateX = translateXFn ? String(translateXFn.args[0]) : "";
+  const translateY = translateYFn ? String(translateYFn.args[0]) : "";
+
+  // Parse filter values using shared parser
+  const filterFns = parseFilter(styles.filter || "");
+  const blurFn = filterFns.find((f) => f.name === "blur");
+  const brightnessFn = filterFns.find((f) => f.name === "brightness");
+  const contrastFn = filterFns.find((f) => f.name === "contrast");
+  const grayscaleFn = filterFns.find((f) => f.name === "grayscale");
+
+  const blurValue = blurFn ? parseFloat(String(blurFn.args[0]).replace("px", "")) : 0;
+  const brightnessValue = brightnessFn ? parseFloat(String(brightnessFn.args[0]).replace("%", "")) : 100;
+  const contrastValue = contrastFn ? parseFloat(String(contrastFn.args[0]).replace("%", "")) : 100;
+  const grayscaleValue = grayscaleFn ? parseFloat(String(grayscaleFn.args[0]).replace("%", "")) : 0;
 
   // Build the collapsed preview — prioritize the most visually impactful effect.
   // Shows shadow count OR "blur 4px" OR opacity % OR "scaled/rotated" — whichever
@@ -226,45 +229,70 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         <RangeSlider
           label="Scale"
           value={scaleValue}
-          onChange={(v) => onChange("transform", `scale(${v / 100})`)}
+          onChange={(v) => {
+            const fns = parseTransform(styles.transform || "");
+            const updated = updateTransformFunction(fns, "scale", [v / 100]);
+            onChange("transform", serializeTransform(updated));
+          }}
           min={0}
           max={200}
           unit="x"
           labelWidth={50}
+          disabled={opaqueTransform}
         />
 
         <RangeSlider
           label="Rotate"
           value={rotateValue}
-          onChange={(v) => onChange("transform", `rotate(${v}deg)`)}
+          onChange={(v) => {
+            const fns = parseTransform(styles.transform || "");
+            const updated = updateTransformFunction(fns, "rotate", [`${v}deg`]);
+            onChange("transform", serializeTransform(updated));
+          }}
           min={-180}
           max={180}
           unit="°"
           labelWidth={50}
+          disabled={opaqueTransform}
         />
 
         <TextInputRow
           label="Move X"
           value={translateX}
-          onChange={(v) => onChange("transform", `translateX(${v})`)}
+          onChange={(v) => {
+            const fns = parseTransform(styles.transform || "");
+            const updated = updateTransformFunction(fns, "translateX", [v]);
+            onChange("transform", serializeTransform(updated));
+          }}
           placeholder="0px"
+          disabled={opaqueTransform}
         />
 
         <TextInputRow
           label="Move Y"
           value={translateY}
-          onChange={(v) => onChange("transform", `translateY(${v})`)}
+          onChange={(v) => {
+            const fns = parseTransform(styles.transform || "");
+            const updated = updateTransformFunction(fns, "translateY", [v]);
+            onChange("transform", serializeTransform(updated));
+          }}
           placeholder="0px"
+          disabled={opaqueTransform}
         />
 
         <RangeSlider
           label="Skew"
           value={skewValue}
-          onChange={(v) => onChange("transform", `skew(${v}deg)`)}
+          onChange={(v) => {
+            const fns = parseTransform(styles.transform || "");
+            const updated = updateTransformFunction(fns, "skew", [`${v}deg`]);
+            onChange("transform", serializeTransform(updated));
+          }}
           min={-45}
           max={45}
           unit="°"
           labelWidth={50}
+          disabled={opaqueTransform}
         />
       </div>
 
@@ -349,7 +377,11 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         <RangeSlider
           label="Blur"
           value={blurValue}
-          onChange={(v) => onChange("filter", `blur(${v}px)`)}
+          onChange={(v) => {
+            const fns = parseFilter(styles.filter || "");
+            const updated = updateFilterFunction(fns, "blur", [`${v}px`]);
+            onChange("filter", serializeFilter(updated));
+          }}
           min={0}
           max={20}
           unit="px"
@@ -358,7 +390,11 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         <RangeSlider
           label="Brightness"
           value={brightnessValue}
-          onChange={(v) => onChange("filter", `brightness(${v}%)`)}
+          onChange={(v) => {
+            const fns = parseFilter(styles.filter || "");
+            const updated = updateFilterFunction(fns, "brightness", [`${v}%`]);
+            onChange("filter", serializeFilter(updated));
+          }}
           min={0}
           max={200}
           unit="%"
@@ -367,7 +403,11 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         <RangeSlider
           label="Contrast"
           value={contrastValue}
-          onChange={(v) => onChange("filter", `contrast(${v}%)`)}
+          onChange={(v) => {
+            const fns = parseFilter(styles.filter || "");
+            const updated = updateFilterFunction(fns, "contrast", [`${v}%`]);
+            onChange("filter", serializeFilter(updated));
+          }}
           min={0}
           max={200}
           unit="%"
@@ -376,7 +416,11 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         <RangeSlider
           label="Grayscale"
           value={grayscaleValue}
-          onChange={(v) => onChange("filter", `grayscale(${v}%)`)}
+          onChange={(v) => {
+            const fns = parseFilter(styles.filter || "");
+            const updated = updateFilterFunction(fns, "grayscale", [`${v}%`]);
+            onChange("filter", serializeFilter(updated));
+          }}
           min={0}
           max={100}
           unit="%"

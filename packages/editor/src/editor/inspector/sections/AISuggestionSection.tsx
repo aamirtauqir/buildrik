@@ -227,7 +227,7 @@ const iconStyles: React.CSSProperties = {
 
 const titleStyles: React.CSSProperties = {
   flex: 1,
-  fontSize: "var(--buildrick-font-sm)",
+  fontSize: "var(--buildrick-text-sm-plus)",
   fontWeight: 600,
   color: "var(--buildrick-text-primary)",
 };
@@ -263,7 +263,7 @@ const suggestionStyles: React.CSSProperties = {
 
 const messageStyles: React.CSSProperties = {
   margin: 0,
-  fontSize: "var(--buildrick-font-sm)",
+  fontSize: "var(--buildrick-text-sm-plus)",
   color: "var(--buildrick-text-secondary)",
   lineHeight: 1.4,
 };
