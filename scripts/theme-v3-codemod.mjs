@@ -64,11 +64,22 @@ function buildCssVarLookup(mapping) {
 
 export function applyOp1(content, mapping) {
   const csssVars = buildCssVarLookup(mapping);
-  return content.replace(/var\((--(?:aqb|ls|accent)-[a-z0-9-]+)(\s*,\s*[^)]+)?\)/g, (match, varName, fallback) => {
+  const once = (s) => s.replace(/var\((--(?:aqb|ls|accent)-[a-z0-9-]+)(\s*,\s*[^)]+)?\)/g, (match, varName, fallback) => {
     const target = csssVars[varName];
     if (!target) throw new Error(`op1: unmapped CSS var ${varName}`);
     return `var(${target}${fallback || ''})`;
   });
+  // Iterate to handle nested var() calls like var(--aqb-a, var(--aqb-b)).
+  // The fallback-group regex greedily consumes the first ), so nested inner vars need a second pass.
+  let prev;
+  let out = content;
+  let passes = 0;
+  do {
+    prev = out;
+    out = once(out);
+    passes++;
+  } while (out !== prev && passes < 5);
+  return out;
 }
 
 export function applyOp1b(content, mapping) {
@@ -80,6 +91,23 @@ export function applyOp1b(content, mapping) {
       const target = cssVars[varName];
       if (!target) return match; // leave for abort detection in verify step
       return target;
+    }
+  );
+}
+
+// Op 1c: CSS variable DEFINITIONS (--aqb-X: value;) → (--buildrick-Y: value;) per mapping.
+// Op 1 handles var() USES; Op 1b handles JS-side refs; this op handles DEFINITIONS.
+// Without this, defs like `--aqb-bg: #fff;` in Canvas.css / design-tokens.css would survive P3 and
+// break consumers that op 1 renamed to var(--buildrick-bg).
+// Runs on CSS files. Safe on default.css too (produces duplicates with P2's new defs; same values → harmless).
+export function applyOp1c(content, mapping) {
+  const lookup = buildCssVarLookup(mapping);
+  return content.replace(
+    /^(\s*)(--(?:aqb|ls|accent)-[a-z0-9-]+)(\s*:)/gm,
+    (match, indent, name, colon) => {
+      const target = lookup[name];
+      if (!target) return match;
+      return `${indent}${target}${colon}`;
     }
   );
 }
@@ -259,6 +287,7 @@ export function runApply() {
     try {
       if (f.endsWith('.css')) {
         content = applyOp1(content, mapping);
+        content = applyOp1c(content, mapping);
         content = applyOp2(content, mapping);
         content = applyOp4(content, mapping);
         content = applyOp5(content, mapping);
@@ -293,6 +322,7 @@ export function runDocsSweep() {
     // Liberal mode — catch errors and continue (markdown has partial matches)
     try { content = applyOp1(content, mapping); } catch {}
     try { content = applyOp1b(content, mapping); } catch {}
+    try { content = applyOp1c(content, mapping); } catch {}
     try { content = applyOp2(content, mapping); } catch {}
     try { content = applyOp4(content, mapping); } catch {}
     try { content = applyOp5(content, mapping); } catch {}
@@ -316,6 +346,7 @@ export function runDryRun() {
     try {
       if (f.endsWith('.css')) {
         content = applyOp1(content, mapping);
+        content = applyOp1c(content, mapping);
         content = applyOp2(content, mapping);
         content = applyOp4(content, mapping);
         content = applyOp5(content, mapping);

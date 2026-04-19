@@ -3,8 +3,8 @@
  * Part of Typography section refactoring
  *
  * CP5: font-size and line-height rows have a hover-reveal chain button that
- * opens a type token picker. Selecting a type token stores
- * var(--aqb-type-base-size) on the element — not the raw px value.
+ * opens a type token picker. Selecting a type token stores the type-size var
+ * binding on the element, not the raw px value.
  * The picker uses list layout (showSwatch=false).
  *
  * @module editor/inspector/sections/typography/FontControls
