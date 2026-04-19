@@ -321,7 +321,7 @@ const PreviewTab: React.FC<{
               previewDevice === device ? "var(--buildrick-accent)" : "var(--buildrick-bg-panel-secondary)",
             border: "none",
             borderRadius: 6,
-            color: previewDevice === device ? "#fff" : "var(--buildrick-text)",
+            color: previewDevice === device ? "#fff" : "var(--buildrick-text-primary)",
             cursor: "pointer",
             fontSize: 12,
           }}

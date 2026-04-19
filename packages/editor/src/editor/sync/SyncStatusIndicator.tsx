@@ -186,7 +186,7 @@ const buttonStyles: React.CSSProperties = {
   padding: "6px 12px",
   border: "1px solid var(--buildrick-border)",
   borderRadius: "6px",
-  background: "var(--buildrick-surface)",
+  background: "var(--buildrick-bg-card)",
   cursor: "pointer",
   transition: "all 150ms ease",
 };

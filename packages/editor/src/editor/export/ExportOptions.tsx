@@ -246,7 +246,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
             background: "var(--buildrick-bg-dark)",
             border: "1px solid var(--buildrick-border)",
             borderRadius: 6,
-            color: "var(--buildrick-text)",
+            color: "var(--buildrick-text-primary)",
           }}
         />
       </div>
@@ -268,7 +268,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
                     : "var(--buildrick-bg-panel-secondary)",
                 border: "none",
                 borderRadius: 6,
-                color: config.cssStyle === style ? "#fff" : "var(--buildrick-text)",
+                color: config.cssStyle === style ? "#fff" : "var(--buildrick-text-primary)",
                 cursor: "pointer",
                 fontSize: 12,
                 textTransform: "capitalize",
@@ -324,7 +324,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
                       : "var(--buildrick-bg-panel-secondary)",
                   border: "none",
                   borderRadius: 6,
-                  color: cmsSettings.mode === mode ? "#fff" : "var(--buildrick-text)",
+                  color: cmsSettings.mode === mode ? "#fff" : "var(--buildrick-text-primary)",
                   cursor: "pointer",
                   fontSize: 12,
                 }}
@@ -358,7 +358,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
                         cmsSettings.syntax === syntax ? "#a6e3a1" : "var(--buildrick-bg-panel-secondary)",
                       border: "none",
                       borderRadius: 4,
-                      color: cmsSettings.syntax === syntax ? "#1e1e2e" : "var(--buildrick-text)",
+                      color: cmsSettings.syntax === syntax ? "#1e1e2e" : "var(--buildrick-text-primary)",
                       cursor: "pointer",
                       fontSize: 12,
                       textTransform: "capitalize",
