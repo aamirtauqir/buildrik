@@ -1,5 +1,16 @@
 /**
  * themes/design-system/radius.css
- * Buildrik DS V1 — see spec §5
+ * Buildrik DS V1 — chrome radius tokens
+ * NEW: --buildrick-radius-sm..full. Replaces 149 chrome consumers of --buildrick-design-radius-*.
  * @license BSD-3-Clause
  */
+
+:root {
+  --buildrick-radius-sm: 4px;
+  --buildrick-radius-md: 8px;
+  --buildrick-radius-lg: 12px;
+  --buildrick-radius-xl: 16px;
+  --buildrick-radius-full: 9999px;
+  --buildrick-rounded: 6px;
+  --buildrick-rounded-sm: 4px;
+}
