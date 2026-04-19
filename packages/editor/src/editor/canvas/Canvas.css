@@ -41,14 +41,14 @@
   --buildrick-weight-bold: 700;
 
   /* Selection (canvas handles) — uses canonical accent */
-  --buildrick-selection-color:       var(--accent);
+  --buildrick-selection-color:       var(--buildrick-accent);
   --buildrick-selection-alpha-40:    rgba(45, 109, 255, 0.40);
   --buildrick-selection-alpha-20:    rgba(45, 109, 255, 0.20);
   --buildrick-selection-glow:        0 0 0 1px var(--buildrick-accent-tint), 0 0 12px rgba(45, 109, 255, 0.12);
   --buildrick-selection-glow-sm:     0 2px 8px var(--buildrick-accent-tint);
   --buildrick-selection-glow-strong: 0 0 0 2px rgba(45, 109, 255, 0.40), 0 0 16px var(--buildrick-accent-tint);
-  --buildrick-selection-outline:     2px solid var(--accent);
-  --buildrick-handle-gradient:       var(--accent);
+  --buildrick-selection-outline:     2px solid var(--buildrick-accent);
+  --buildrick-handle-gradient:       var(--buildrick-accent);
 
   /* DevTools box model (Alt+Shift hover) */
   --buildrick-boxmodel-content: rgba(111, 168, 220, 0.50);
@@ -57,9 +57,9 @@
 
   /* Badges (unused colors removed, all non-accent become neutral) */
   --buildrick-badge-tag:     var(--buildrick-success);
-  --buildrick-badge-id:      var(--accent);
+  --buildrick-badge-id:      var(--buildrick-accent);
   --buildrick-badge-class:   var(--buildrick-warning);
-  --buildrick-badge-data:    var(--accent);
+  --buildrick-badge-data:    var(--buildrick-accent);
   --buildrick-badge-default: var(--buildrick-text-muted);
 
   /* Toolbar (canvas floating UI) */
@@ -72,18 +72,18 @@
   --buildrick-toolbar-text-active:  var(--buildrick-text-primary);
 
   /* Smart guides */
-  --buildrick-guide-color:     var(--accent);
+  --buildrick-guide-color:     var(--buildrick-accent);
   --buildrick-guide-color-alt: var(--buildrick-accent-hover);
 
   /* Drop feedback */
-  --buildrick-drop-valid-border:    var(--accent);
+  --buildrick-drop-valid-border:    var(--buildrick-accent);
   --buildrick-drop-valid-bg:        var(--buildrick-accent-tint);
   --buildrick-drop-invalid-border:  var(--buildrick-error);
   --buildrick-drop-invalid-bg:      var(--buildrick-error-light);
 
   /* Spacing indicators */
   --buildrick-spacing-margin:  var(--buildrick-success);
-  --buildrick-spacing-padding: var(--accent);
+  --buildrick-spacing-padding: var(--buildrick-accent);
 }
 
 /* ============================================

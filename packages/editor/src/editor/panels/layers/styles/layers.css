@@ -892,7 +892,7 @@
 .buildrick-layer-row.is-selected {
   background: var(--buildrick-accent-tint);
   color: var(--buildrick-text-primary);
-  border-left: 2px solid var(--accent);
+  border-left: 2px solid var(--buildrick-accent);
 }
 
 .buildrick-layer-row.is-hidden {
@@ -919,7 +919,7 @@
 .buildrick-search-input:focus-visible,
 .buildrick-layer-name-input:focus-visible,
 .buildrick-sel-btn:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--buildrick-accent);
   outline-offset: 2px;
 }
 

@@ -1028,7 +1028,7 @@
   width: 32px;
   height: 32px;
   border-radius: var(--buildrick-design-radius-md);
-  background: var(--accent);
+  background: var(--buildrick-accent);
   border: none;
   display: flex;
   align-items: center;

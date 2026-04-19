@@ -11,9 +11,6 @@
  */
 
 :root {
-  /* --accent (Phase 3.3) */
-  --accent: var(--buildrick-accent);
-
   /* --surface-* / --brand-* V2 semantic (Phase 3.4) */
   --surface-primary: var(--buildrick-bg-panel);
   --surface-secondary: var(--buildrick-bg-card);
