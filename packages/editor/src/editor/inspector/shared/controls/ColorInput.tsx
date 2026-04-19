@@ -6,7 +6,7 @@
  *   - Bound:   value is "var(--buildrick-design-color-primary)" — stored as cssVar, not hex.
  *
  * isKeyword: true only for CSS keywords (transparent, inherit, currentColor),
- *   NOT for var(--aqb-*) which are valid token bindings.
+ *   NOT for var(--buildrick-design-*) which are valid token bindings.
  *
  * Token source: useColorRegistry() from TokenRegistryProvider — shared global
  *   context, not an isolated hook instance. Changes in the Design tab are

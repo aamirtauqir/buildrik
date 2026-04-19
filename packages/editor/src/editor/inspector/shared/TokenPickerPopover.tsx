@@ -34,7 +34,7 @@ export interface TokenEntry {
 
 export interface TokenPickerPopoverProps {
   tokens: TokenEntry[];
-  /** Currently applied value (may be var(--aqb-*) or a raw value) */
+  /** Currently applied value (may be var(--buildrick-design-*) or a raw value) */
   currentValue: string;
   /** Called with (tokenId, cssVar) — e.g. ("color-primary", "var(--buildrick-design-color-primary)") */
   onSelect: (tokenId: string, cssVar: string) => void;

@@ -5,15 +5,15 @@
  */
 
 /* ============================================
-   CANVAS-SCOPED TOKENS (do NOT redefine canonical --aqb-*)
+   CANVAS-SCOPED TOKENS (do NOT redefine canonical --buildrick-design-*)
    ────────────────────────────────────────────
    Previously a :root block that shadowed the canonical palette
    (white text, dark surfaces, purple badges, gradient handles) —
    deleted per DESIGN.md light unification. Canvas-specific tokens
    below live under .buildrick-canvas scope only, so they cannot leak
    into the editor chrome.
-   Tokens that collide with canonical names (--aqb-primary, --aqb-accent,
-   --aqb-text-*, --aqb-surface-*, --aqb-shadow-*, --aqb-border) are REMOVED —
+   Tokens that collide with canonical names (--buildrick-design-primary, --buildrick-design-accent,
+   --buildrick-design-text-*, --buildrick-design-surface-*, --buildrick-design-shadow-*, --buildrick-design-border) are REMOVED —
    consumers inherit canonical from themes/default.css :root.
    ============================================ */
 .buildrick-canvas, .buildrick-canvas-wrapper, [data-buildrick-canvas] {

@@ -19,7 +19,7 @@ import { isSelfClosing } from "./tagCategories";
  * Options for HTML generation
  */
 export interface HTMLGenerationOptions {
-  /** Include data-aqb-* attributes (for editor mode) */
+  /** Include data-buildrick-* attributes (for editor mode) */
   includeDataAttributes?: boolean;
   /** Pretty print with indentation */
   prettyPrint?: boolean;
