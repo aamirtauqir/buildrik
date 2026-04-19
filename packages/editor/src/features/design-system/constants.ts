@@ -32,7 +32,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
   {
     id: "color-secondary",
     name: "Secondary",
-    value: "#8B5CF6",
+    value: "#64748B",
     category: "colors",
     cssVar: "--buildrick-design-color-secondary",
     type: "color",
@@ -52,7 +52,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
   {
     id: "color-background",
     name: "Background",
-    value: "#0A0A0A",
+    value: "#F8FAFC",
     category: "colors",
     cssVar: "--buildrick-design-color-background",
     type: "color",
@@ -62,7 +62,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
   {
     id: "color-text",
     name: "Text",
-    value: "#FFFFFF",
+    value: "#334155",
     category: "colors",
     cssVar: "--buildrick-design-color-text",
     type: "color",
@@ -113,7 +113,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
   {
     id: "font-heading",
     name: "Heading Font",
-    value: "Inter",
+    value: "Inter Tight",
     category: "typography",
     cssVar: "--buildrick-design-font-heading",
     type: "font-family",
@@ -121,7 +121,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
   {
     id: "font-body",
     name: "Body Font",
-    value: "Inter",
+    value: "Inter Tight",
     category: "typography",
     cssVar: "--buildrick-design-font-body",
     type: "font-family",
@@ -129,7 +129,7 @@ export const DEFAULT_TOKENS: DesignToken[] = [
   {
     id: "font-mono",
     name: "Mono Font",
-    value: "JetBrains Mono",
+    value: "Geist Mono",
     category: "typography",
     cssVar: "--buildrick-design-font-mono",
     type: "font-family",

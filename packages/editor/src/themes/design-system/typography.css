@@ -6,9 +6,9 @@
 
 :root {
   /* FONT FAMILIES */
-  --buildrick-font-family: "Inter Tight", "Inter", sans-serif;
-  --buildrick-font-family-display: "General Sans", "Inter Tight", sans-serif;
-  --buildrick-font-family-mono: "Geist Mono", "JetBrains Mono", monospace;
+  --buildrick-font-family: "Inter Tight", sans-serif;
+  --buildrick-font-family-display: "General Sans", sans-serif;
+  --buildrick-font-family-mono: "Geist Mono", monospace;
 
   /* FONT SIZE SCALE */
   --buildrick-text-xs: 11px;

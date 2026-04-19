@@ -11,19 +11,19 @@
 :root {
   /* COLORS (9 — user-editable) */
   --buildrick-design-color-primary: #3B82F6;
-  --buildrick-design-color-secondary: #8B5CF6;
+  --buildrick-design-color-secondary: #64748B;
   --buildrick-design-color-accent: #22C55E;
-  --buildrick-design-color-background: #0A0A0A;
-  --buildrick-design-color-text: #FFFFFF;
+  --buildrick-design-color-background: #F8FAFC;
+  --buildrick-design-color-text: #334155;
   --buildrick-design-color-muted: #71717A;
   --buildrick-design-color-border: #27272A;
   --buildrick-design-color-success: #22C55E;
   --buildrick-design-color-error: #EF4444;
 
   /* TYPOGRAPHY (11 — user-editable) */
-  --buildrick-design-font-heading: "Inter";
-  --buildrick-design-font-body: "Inter";
-  --buildrick-design-font-mono: "JetBrains Mono";
+  --buildrick-design-font-heading: "Inter Tight";
+  --buildrick-design-font-body: "Inter Tight";
+  --buildrick-design-font-mono: "Geist Mono";
   --buildrick-design-font-size-xs: 12px;
   --buildrick-design-font-size-sm: 14px;
   --buildrick-design-font-size-base: 16px;

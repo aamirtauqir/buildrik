@@ -14,14 +14,14 @@
   --buildrick-bg-subtle: #F1F5F9;
 
   /* TEXT */
-  --buildrick-text-primary: #0F172A;
-  --buildrick-text-secondary: #334155;
-  --buildrick-text-muted: #64748B;
+  --buildrick-text-primary: #334155;
+  --buildrick-text-secondary: #64748B;
+  --buildrick-text-muted: #94A3B8;
   --buildrick-text-tertiary: #94A3B8;
   --buildrick-text-on-accent: #FFFFFF;
 
   /* BORDERS */
-  --buildrick-border: #64748B;
+  --buildrick-border: #E2E8F0;
   --buildrick-border-light: #94A3B8;
   --buildrick-border-medium: #CBD5E1;
   --buildrick-border-strong: #94A3B8;
@@ -30,10 +30,10 @@
 
   /* ACCENT (cobalt — single accent per DESIGN.md) */
   --buildrick-accent: #2D6DFF;
-  --buildrick-accent-hover: #2557CC;
-  --buildrick-accent-pressed: #1E4499;
-  --buildrick-accent-subtle: rgba(45, 109, 255, 0.08);
-  --buildrick-accent-tint: rgba(45, 109, 255, 0.12);
+  --buildrick-accent-hover: #4B8DFF;
+  --buildrick-accent-pressed: #1E58D9;
+  --buildrick-accent-subtle: rgba(45, 109, 255, 0.05);
+  --buildrick-accent-tint: rgba(45, 109, 255, 0.10);
 
   /* SEMANTIC STATUS */
   --buildrick-error: #DC2626;
