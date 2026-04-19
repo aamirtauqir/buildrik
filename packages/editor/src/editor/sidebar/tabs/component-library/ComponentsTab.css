@@ -1,8 +1,7 @@
 /**
  * ComponentsTab — light-theme CSS (comp-* namespace)
  *
- * Dual-class pattern: comp-* classes are added alongside existing aqb-* classes.
- * All colors use var(--ls-TOKEN, #fallback) — no raw hex.
+ * All colors use var(--buildrick-*) canonical DS tokens. No raw hex.
  *
  * Pencil screens: gIKXw (list), E2jan (detail), 65J2Q (empty state)
  */

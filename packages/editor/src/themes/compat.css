@@ -14,23 +14,6 @@
   /* --accent (Phase 3.3) */
   --accent: var(--buildrick-accent);
 
-  /* --ls-* LeftSidebar (Phase 3.1) */
-  --ls-bg-panel: var(--buildrick-bg-panel);
-  --ls-bg-card: var(--buildrick-bg-card);
-  --ls-bg-subtle: var(--buildrick-bg-subtle);
-  --ls-bg-hover: var(--buildrick-bg-hover);
-  --ls-text-primary: var(--buildrick-text-primary);
-  --ls-text-secondary: var(--buildrick-text-secondary);
-  --ls-text-muted: var(--buildrick-text-muted);
-  --ls-border: var(--buildrick-border);
-  --ls-border-light: var(--buildrick-border-light);
-  --ls-accent: var(--buildrick-accent);
-  --ls-accent-subtle: var(--buildrick-accent-subtle);
-  --ls-error: var(--buildrick-error);
-  --ls-success: var(--buildrick-success);
-  --ls-warning: var(--buildrick-warning);
-  --ls-shadow-dropdown: var(--buildrick-shadow-dropdown);
-
   /* --rail-* LeftRail (Phase 3.2) */
   --rail-bg: var(--buildrick-bg-panel);
   --rail-active: var(--buildrick-accent);
