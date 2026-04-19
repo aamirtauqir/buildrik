@@ -11,7 +11,8 @@
     "check:no-legacy-settings-path": "grep -r 'components/Panels/LeftSidebar/tabs/settings' src/ --include='*.ts' --include='*.tsx' && echo 'FAIL: legacy settings path found' && exit 1 || echo 'PASS: no legacy settings path'",
     "lint:ds": "bash scripts/ds-grep-gates.sh",
     "verify:ds": "node scripts/verify-design-baselines.mjs && bash scripts/ds-grep-gates.sh",
-    "lint:ds-hex": "node scripts/find-inline-hex-v2.mjs"
+    "lint:ds-hex": "node scripts/find-inline-hex-v2.mjs",
+    "lint": "eslint . --ext .ts,.tsx"
   },
   "dependencies": {
     "@buildrik/shared": "workspace:*",
@@ -44,6 +45,11 @@
     "react-dom": "^19.0.0",
     "typescript": "^5.3.0",
     "vite": "^7.2.7",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "eslint": "^9.0.0",
+    "@eslint/js": "^9.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "globals": "^15.0.0"
   }
 }

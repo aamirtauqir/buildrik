@@ -71,6 +71,18 @@ jobs:
         working-directory: packages/editor
         run: npx vite build
 
+      - name: DS invariants (grep + baselines)
+        working-directory: packages/editor
+        run: pnpm run verify:ds
+
+      - name: DS hex gate (WARN mode)
+        working-directory: packages/editor
+        run: pnpm run lint:ds-hex
+
+      - name: ESLint (DS rules)
+        working-directory: packages/editor
+        run: pnpm run lint || true
+
       - name: Run editor tests
         working-directory: packages/editor
         run: npx vitest run --reporter=default

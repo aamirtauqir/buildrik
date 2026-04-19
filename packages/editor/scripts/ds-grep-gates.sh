@@ -43,7 +43,7 @@ fi
 pass "Gate 3: chrome consumers of --buildrick-design-* eliminated"
 
 # Gate 4: No deprecated alias consumers (compat.css deleted; aliases must be gone)
-LEAK=$(grep -rE 'var\(--(ls-|rail-|surface-[a-z]|brand-|primary-[0-9]|buildrick-(control|build|ai)-|accent\)|accent,|bar\)|bar,|blue\)|blue,|txt\)|txt,)' packages/editor/src 2>/dev/null | grep -v components.css | grep -v __tests__ || true)
+LEAK=$(grep -rE 'var\(--(ls-|rail-|surface-[a-z]|brand-|primary-[0-9]|buildrick-(control|build|ai)-|accent\)|accent,|bar\)|bar,|blue\)|blue,|txt\)|txt,)' packages/editor/src 2>/dev/null | grep -v __tests__ || true)
 if [ -n "$LEAK" ]; then
   echo "$LEAK"
   fail "Gate 4: deprecated alias consumer"
@@ -67,6 +67,18 @@ for f in packages/editor/src/themes/design-system/*.css; do
   fi
 done
 pass "Gate 6: no duplicate keys in any DS file"
+
+
+# Gate 7: @media (prefers-*) must only appear in a11y.css
+# WARN mode: 14 legacy CSS files have leaked @media (prefers-*) blocks (tracked, out
+# of scope for this remediation pass). Gate warns and lists files but does not fail CI.
+# Flip to fail mode once the backlog is cleared.
+LEAKED_MEDIA=$(grep -rlE '@media\s*\(\s*prefers-' packages/editor/src --include="*.css" 2>/dev/null | grep -v 'design-system/a11y.css' || true)
+if [ -n "$LEAKED_MEDIA" ]; then
+  echo "  WARN Gate 7: @media (prefers-*) outside a11y.css (backlog — not blocking):"
+  echo "$LEAKED_MEDIA" | sed 's/^/    /'
+fi
+pass "Gate 7: @media (prefers-*) audit complete (WARN mode — flip to fail after backlog cleared)"
 
 # Gate 8: No bare deprecated defs (--accent, --buildrick-text, --buildrick-surface)
 LEAK=$(grep -rE '^\s*(--accent|--buildrick-text|--buildrick-surface)\s*:' packages/editor/src --include='*.css' 2>/dev/null || true)
@@ -96,4 +108,4 @@ fi
 pass "Gate 10: hex count at or below baseline"
 
 echo ""
-echo "=== All 9 DS gates passed ==="
+echo "=== All 10 DS gates passed ==="
