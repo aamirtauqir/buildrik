@@ -54,9 +54,9 @@ Collaboration enables multiple users to edit the same project simultaneously. Pr
 ### State 1: Presence Avatars (Header)
 
 - **Avatars:** 28px circles, user's profile photo or initials on colored bg. Max 3 visible.
-- **Overflow:** "+2" badge in `--aqb-chrome-surface`, `--aqb-text-secondary` if > 3 collaborators.
+- **Overflow:** "+2" badge in `--aqb-chrome-surface`, `--buildrick-text-secondary` if > 3 collaborators.
 - **Hover avatar:** Tooltip with full name + role (Owner/Editor/Viewer).
-- **Online ring:** 2px `--aqb-success` border on active users. Gray border for idle (> 5 min).
+- **Online ring:** 2px `--buildrick-success` border on active users. Gray border for idle (> 5 min).
 - **Color assignment:** Each user gets a unique color from a preset palette (teal, purple, orange, pink, lime, cyan). Persists per session.
 
 ### State 2: Remote Cursors
@@ -79,7 +79,7 @@ Collaboration enables multiple users to edit the same project simultaneously. Pr
 - **Visual:** Lock badge on element: "[Name] is editing" in user's color, small banner above the element.
 - **Behavior:** Other users can select the element (read) but cannot edit it (inputs disabled).
 - **Release:** Auto-releases after 15 seconds of inactivity, or user clicks "Done editing" button.
-- **Done button:** Appears in Inspector header when user has an active lock. `--aqb-primary` text.
+- **Done button:** Appears in Inspector header when user has an active lock. `--buildrick-accent` text.
 
 ### State 5: Style Conflict (OT Auto-Resolve)
 

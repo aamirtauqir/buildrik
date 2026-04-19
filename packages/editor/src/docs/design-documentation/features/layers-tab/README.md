@@ -57,24 +57,24 @@ The Layers Tab provides a hierarchical tree view of every element on the current
 
 ### State 1: Default Tree View
 
-- **Breadcrumb:** Top bar showing path to selected element. Each segment clickable to select parent. `--aqb-body-sm`, `--aqb-text-secondary`, separator " > ".
-- **Tree nodes:** 32px row height, 16px indent per level. Type icon (12px, `--aqb-text-tertiary`) + name (`--aqb-body-sm`, `--aqb-text-primary`).
+- **Breadcrumb:** Top bar showing path to selected element. Each segment clickable to select parent. `--aqb-body-sm`, `--buildrick-text-secondary`, separator " > ".
+- **Tree nodes:** 32px row height, 16px indent per level. Type icon (12px, `--buildrick-text-tertiary`) + name (`--aqb-body-sm`, `--buildrick-text-primary`).
 - **Expand/collapse:** Chevron icon, 12px, rotates 90deg on expand. `--aqb-duration-short` transition.
-- **Visibility icon (eye):** Right-aligned, `--aqb-text-tertiary`. Crossed-out when hidden. Click toggles `display: none`.
-- **Lock icon:** Right-aligned next to eye. `--aqb-text-tertiary`. Locked = `--aqb-warning`. Prevents selection and editing on canvas.
+- **Visibility icon (eye):** Right-aligned, `--buildrick-text-tertiary`. Crossed-out when hidden. Click toggles `display: none`.
+- **Lock icon:** Right-aligned next to eye. `--buildrick-text-tertiary`. Locked = `--buildrick-warning`. Prevents selection and editing on canvas.
 
 ### State 2: Element Selected
 
-- **Selected row:** `--aqb-primary-subtle` bg, `--aqb-primary` left border (2px).
+- **Selected row:** `--buildrick-accent-tint` bg, `--buildrick-accent` left border (2px).
 - **Canvas sync:** Corresponding element on canvas shows selection bounding box.
 - **Inspector sync:** Inspector populates with selected element properties.
 - **Breadcrumb updates** to show path to selected element.
 
 ### State 3: Search/Filter Active
 
-- **Filter input focused:** `--aqb-primary` border. Typing filters tree to matching nodes + their ancestor chain.
-- **Matched nodes:** Name text has matched characters highlighted in `--aqb-primary`.
-- **Non-matching ancestors:** Shown but dimmed (`--aqb-text-tertiary`).
+- **Filter input focused:** `--buildrick-accent` border. Typing filters tree to matching nodes + their ancestor chain.
+- **Matched nodes:** Name text has matched characters highlighted in `--buildrick-accent`.
+- **Non-matching ancestors:** Shown but dimmed (`--buildrick-text-tertiary`).
 - **No results:** "No layers matching '[query]'" centered.
 
 ### State 4: Drag Reorder
@@ -82,13 +82,13 @@ The Layers Tab provides a hierarchical tree view of every element on the current
 - **Drag handle:** Visible on hover (6-dot grip icon, left of type icon).
 - **Dragging row:** 50% opacity, elevated with `--aqb-elevation-2`.
 - **Drop indicators:**
-  - Between siblings: 2px `--aqb-primary` horizontal line at insertion point
-  - Into container: Target container row gets 2px `--aqb-primary` border (reparent)
+  - Between siblings: 2px `--buildrick-accent` horizontal line at insertion point
+  - Into container: Target container row gets 2px `--buildrick-accent` border (reparent)
 - **Invalid drop:** No indicator shown (e.g., dropping parent into own child).
 
 ### State 5: Empty Page
 
-- **Visual:** Single root "Page" node with no children. Below: "Add elements from the Build tab" in `--aqb-text-tertiary`.
+- **Visual:** Single root "Page" node with no children. Below: "Add elements from the Build tab" in `--buildrick-text-tertiary`.
 
 ---
 

@@ -62,10 +62,10 @@ The Templates Tab lets users browse, preview, and apply full page templates. It 
 
 ### State 1: Default Browse
 
-- **Category pills:** Horizontally scrollable row. Active: `--aqb-primary` bg, white text. Inactive: `--aqb-chrome-surface`, `--aqb-text-secondary`. Categories: All, Landing, Blog, Portfolio, E-commerce, SaaS, Custom.
-- **Save button:** Full-width, `--aqb-primary-subtle` bg, `--aqb-primary` text, `--aqb-radius-md`, 40px height. Star icon left-aligned.
-- **Template cards:** Full-width thumbnails (240x160px), `--aqb-radius-md`, `--aqb-chrome-border` border. Below: name in `--aqb-heading-sm`, metadata in `--aqb-caption` `--aqb-text-tertiary`.
-- **Hover:** Card lifts with `--aqb-elevation-1`, border becomes `--aqb-primary`.
+- **Category pills:** Horizontally scrollable row. Active: `--buildrick-accent` bg, white text. Inactive: `--aqb-chrome-surface`, `--buildrick-text-secondary`. Categories: All, Landing, Blog, Portfolio, E-commerce, SaaS, Custom.
+- **Save button:** Full-width, `--buildrick-accent-tint` bg, `--buildrick-accent` text, `--buildrick-design-radius-md`, 40px height. Star icon left-aligned.
+- **Template cards:** Full-width thumbnails (240x160px), `--buildrick-design-radius-md`, `--aqb-chrome-border` border. Below: name in `--aqb-heading-sm`, metadata in `--aqb-caption` `--buildrick-text-tertiary`.
+- **Hover:** Card lifts with `--aqb-elevation-1`, border becomes `--buildrick-accent`.
 
 ### State 2: Template Detail / Comparison
 
@@ -91,7 +91,7 @@ The Templates Tab lets users browse, preview, and apply full page templates. It 
 
 ### State 5: Empty State (No Templates Match Filter)
 
-- **Visual:** Centered illustration, "No templates in this category" in `--aqb-text-tertiary`
+- **Visual:** Centered illustration, "No templates in this category" in `--buildrick-text-tertiary`
 - **Action:** "Browse All Templates" ghost button
 
 ---
@@ -100,7 +100,7 @@ The Templates Tab lets users browse, preview, and apply full page templates. It 
 
 | Action | Behavior | Animation |
 |--------|----------|-----------|
-| Click template card | Opens detail view | Slide-in from right, 200ms `--aqb-ease-out` |
+| Click template card | Opens detail view | Slide-in from right, 200ms `--buildrick-ease-out` |
 | Click "Apply Template" | Confirmation modal → replaces page content | Instant swap, canvas re-render < 100ms |
 | Click "Compare" | Split view: current vs template | Slide divider in, 200ms |
 | Ctrl+Z after apply | Full revert to previous page state | Instant (single transaction) |

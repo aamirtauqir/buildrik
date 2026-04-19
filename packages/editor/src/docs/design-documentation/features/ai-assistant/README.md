@@ -73,19 +73,19 @@ The AI Assistant provides a chat interface plus quick-action prompts for content
 
 ### State 1: Default (Empty Chat)
 
-- **Quick prompts:** 4 pill buttons in 2x2 grid. `--aqb-chrome-surface` bg, `--aqb-chrome-border`, `--aqb-radius-full`.
-- **Welcome message:** AI avatar + greeting. `--aqb-body`, `--aqb-text-secondary`.
-- **Input:** Full-width, 40px height, `--aqb-chrome-surface` bg, send button `--aqb-primary`.
+- **Quick prompts:** 4 pill buttons in 2x2 grid. `--aqb-chrome-surface` bg, `--aqb-chrome-border`, `--buildrick-design-radius-full`.
+- **Welcome message:** AI avatar + greeting. `--aqb-body`, `--buildrick-text-secondary`.
+- **Input:** Full-width, 40px height, `--aqb-chrome-surface` bg, send button `--buildrick-accent`.
 
 ### State 2: Content Generation Response
 
-- **User message:** Right-aligned bubble, `--aqb-primary-subtle` bg.
+- **User message:** Right-aligned bubble, `--buildrick-accent-tint` bg.
 - **AI response:** Left-aligned bubble, `--aqb-chrome-surface` bg, `--aqb-chrome-border` border.
 - **Confidence tags:**
-  - High (green): `--aqb-success` badge — AI is confident this is correct/good
-  - Medium (yellow): `--aqb-warning` badge — reasonable but user should review
-  - Suggestion (blue): `--aqb-info` badge — creative option, may not fit
-- **Apply button:** Each suggestion has [Apply to Selection], `--aqb-primary` text, ghost style. Applies content to the currently selected canvas element.
+  - High (green): `--buildrick-success` badge — AI is confident this is correct/good
+  - Medium (yellow): `--buildrick-warning` badge — reasonable but user should review
+  - Suggestion (blue): `--buildrick-info` badge — creative option, may not fit
+- **Apply button:** Each suggestion has [Apply to Selection], `--buildrick-accent` text, ghost style. Applies content to the currently selected canvas element.
 
 ### State 3: Layout Suggestion
 
@@ -108,7 +108,7 @@ The AI Assistant provides a chat interface plus quick-action prompts for content
 
 ### State 6: Rate Limited
 
-- **Counter:** "0/30 requests remaining" in `--aqb-error` text.
+- **Counter:** "0/30 requests remaining" in `--buildrick-error` text.
 - **Input:** Disabled with "Rate limit reached. Resets in [time]." placeholder.
 - **Timer:** Countdown to next available request.
 

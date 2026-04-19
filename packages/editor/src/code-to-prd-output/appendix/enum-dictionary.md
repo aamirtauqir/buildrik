@@ -384,18 +384,18 @@ All prefixed with `aqb-`:
 | Key | Purpose |
 |-----|---------|
 | `aqb-project-*` | Project data |
-| `aqb-preferences` | User preferences |
-| `aqb-panel-state` | Sidebar expand/collapse |
+| `buildrick-preferences` | User preferences |
+| `buildrick-panel-state` | Sidebar expand/collapse |
 | `aqb-canvas-state` | Canvas zoom/grid/rulers |
 | `aqb-active-tab` | Current sidebar tab |
 | `aqb-media-*` | Media library state |
 | `aqb-ai-*` | AI conversation state |
 | `aqb-onboarding-*` | Onboarding progress |
 | `aqb-history-*` | History preferences |
-| `aqb-clipboard` | Copy/paste data |
+| `buildrick-clipboard` | Copy/paste data |
 | `aqb-favorites` | Element catalog favorites |
 | `aqb-templates-saved` | User-saved templates |
-| `aqb-recent-templates` | Recently used templates |
+| `buildrick-recent-templates` | Recently used templates |
 
 ---
 

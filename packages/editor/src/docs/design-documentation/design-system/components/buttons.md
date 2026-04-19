@@ -14,10 +14,10 @@ status: approved
 ## Variants
 
 ### Primary
-- **Background:** `--aqb-primary` (#2563EB)
+- **Background:** `--buildrick-accent` (#2563EB)
 - **Text:** White (#FFFFFF)
-- **Hover:** `--aqb-primary-hover` (#3B82F6)
-- **Active:** `--aqb-primary-active` (#1D4ED8)
+- **Hover:** `--buildrick-accent-hover` (#3B82F6)
+- **Active:** `--buildrick-accent-pressed` (#1D4ED8)
 - **Focus:** 2px `--aqb-primary-glow` outline
 - **Disabled:** 40% opacity, no pointer events
 - **Usage:** Main CTAs (Export, Publish, Apply Template)
@@ -25,28 +25,28 @@ status: approved
 ### Secondary
 - **Background:** Transparent
 - **Border:** 1px solid `--aqb-chrome-border-strong`
-- **Text:** `--aqb-text-primary`
+- **Text:** `--buildrick-text-primary`
 - **Hover:** `--aqb-chrome-surface-hover` bg
 - **Usage:** Cancel, secondary actions, filter chips
 
 ### Ghost
 - **Background:** Transparent, no border
-- **Text:** `--aqb-text-secondary`
-- **Hover:** `--aqb-chrome-surface-hover` bg, text becomes `--aqb-text-primary`
+- **Text:** `--buildrick-text-secondary`
+- **Hover:** `--aqb-chrome-surface-hover` bg, text becomes `--buildrick-text-primary`
 - **Usage:** Toolbar actions, toggles, "More settings"
 
 ### Danger
 - **Background:** Transparent
-- **Border:** 1px solid `--aqb-error`
-- **Text:** `--aqb-error`
+- **Border:** 1px solid `--buildrick-error`
+- **Text:** `--buildrick-error`
 - **Hover:** `--aqb-error-subtle` bg
 - **Usage:** Delete, Clear History, destructive actions
 
 ### Icon-Only
 - **Background:** Transparent
-- **Icon:** `--aqb-text-secondary` (16px Lucide icon)
+- **Icon:** `--buildrick-text-secondary` (16px Lucide icon)
 - **Hover:** `--aqb-chrome-surface-hover` bg circle
-- **Active:** `--aqb-primary` icon color
+- **Active:** `--buildrick-accent` icon color
 - **Usage:** Undo/Redo, zoom +/-, toolbar icons
 
 ## Sizes
@@ -58,9 +58,9 @@ status: approved
 | Large | 40px | 16px | `--aqb-body` (13px) | 18px |
 
 ## Specs
-- **Border radius:** `--aqb-radius-md` (6px)
-- **Icon-to-label gap:** `--aqb-space-1` (4px)
-- **Transition:** `--aqb-duration-micro` (100ms) `--aqb-ease-out`
+- **Border radius:** `--buildrick-design-radius-md` (6px)
+- **Icon-to-label gap:** `--buildrick-design-space-1` (4px)
+- **Transition:** `--aqb-duration-micro` (100ms) `--buildrick-ease-out`
 - **Min width:** 64px (text buttons), 28/32/40px (icon-only matches height)
 
 ## Do's and Don'ts

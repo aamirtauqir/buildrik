@@ -81,13 +81,13 @@ The Inspector is the right-side panel (280px) where users edit the visual proper
 └──────────────────────────────┘
 ```
 
-- **Visual:** Centered vertically. Icon `--aqb-text-tertiary`, heading `--aqb-heading-sm` `--aqb-text-secondary`, body `--aqb-body-sm` `--aqb-text-tertiary`.
+- **Visual:** Centered vertically. Icon `--buildrick-text-tertiary`, heading `--aqb-heading-sm` `--buildrick-text-secondary`, body `--aqb-body-sm` `--buildrick-text-tertiary`.
 - **No tabs visible** — the 3-tab navigation is hidden when nothing is selected.
 
 ### State 2: Single Element Selected
 
 - **Element header:** Name + breadcrumb (see Layout Architecture above)
-- **Tabs visible:** Layout, Appearance, Effects. Active tab: `--aqb-primary` text + 2px bottom border.
+- **Tabs visible:** Layout, Appearance, Effects. Active tab: `--buildrick-accent` text + 2px bottom border.
 - **Sections:** Auto-expanded based on element type:
   - Text element: Size + Spacing + Typography expanded
   - Container: Display + Size + Spacing + Flexbox/Grid expanded
@@ -98,13 +98,13 @@ The Inspector is the right-side panel (280px) where users edit the visual proper
 
 - **Header:** "3 elements selected" (no breadcrumb)
 - **Sections:** Only properties common to ALL selected elements shown
-- **Mixed values:** When selected elements have different values for a property, show "Mixed" placeholder in `--aqb-text-tertiary` italic
+- **Mixed values:** When selected elements have different values for a property, show "Mixed" placeholder in `--buildrick-text-tertiary` italic
 - **Editing:** Changing a "Mixed" value applies to ALL selected elements
 
 ### State 4: Pseudo-State Editing
 
 - **Pseudo-state bar:** 4 pill buttons below sections: Normal (default), :hover, :focus, :active, :disabled
-- **Active pseudo-state:** `--aqb-primary` background + white text
+- **Active pseudo-state:** `--buildrick-accent` background + white text
 - **Visual indicator on canvas:** When editing :hover, canvas shows a subtle "HOVER" badge on the selected element
 
 ### State 5: Dev Mode
@@ -126,11 +126,11 @@ The Inspector is the right-side panel (280px) where users edit the visual proper
 └──────────┴──────┘
 ```
 
-- **Input:** 60px width, `--aqb-chrome-surface` bg, `--aqb-chrome-border` border, `--aqb-radius-md`
+- **Input:** 60px width, `--aqb-chrome-surface` bg, `--aqb-chrome-border` border, `--buildrick-design-radius-md`
 - **Unit dropdown:** 40px width, attached right. Options: px, %, em, rem, vw, vh, auto
 - **Interaction:** Click to focus + type. Up/down arrows increment by 1 (Shift+arrow: 10). Scroll to adjust.
 - **Hover:** Border becomes `--aqb-chrome-border-strong`
-- **Focus:** Border becomes `--aqb-primary`, glow ring `--aqb-primary-glow`
+- **Focus:** Border becomes `--buildrick-accent`, glow ring `--aqb-primary-glow`
 
 ### Color Picker
 
@@ -140,10 +140,10 @@ The Inspector is the right-side panel (280px) where users edit the visual proper
 └──────────────────┘
 ```
 
-- **Swatch:** 16x16px color preview square, `--aqb-radius-sm`
+- **Swatch:** 16x16px color preview square, `--buildrick-design-radius-sm`
 - **Hex input:** Editable text field
 - **Picker button:** Opens full color picker popover
-- **Token integration:** When a design token matches the current color, show token name below hex: "Primary" in `--aqb-caption` `--aqb-text-tertiary`
+- **Token integration:** When a design token matches the current color, show token name below hex: "Primary" in `--aqb-caption` `--buildrick-text-tertiary`
 
 ### 4-Value Box Control (Spacing)
 
@@ -157,7 +157,7 @@ The Inspector is the right-side panel (280px) where users edit the visual proper
 
 - **Layout:** Visual representation of the CSS box model
 - **Inputs:** 4 number inputs positioned on top/right/bottom/left of a centered rectangle
-- **Center label:** "MARGIN" (outer) or "PADDING" (inner) in `--aqb-caption` `--aqb-text-tertiary`
+- **Center label:** "MARGIN" (outer) or "PADDING" (inner) in `--aqb-caption` `--buildrick-text-tertiary`
 - **Link all:** Clicking a link icon chains all 4 values (editing one changes all)
 - **Colors:** Margin area `--aqb-warning-subtle` tint, Padding area `--aqb-info-subtle` tint
 
@@ -170,7 +170,7 @@ The Inspector is the right-side panel (280px) where users edit the visual proper
 ```
 
 - **Each button:** 32x32px, `--aqb-chrome-surface` bg, 1px `--aqb-chrome-border`
-- **Active:** `--aqb-primary-subtle` bg, `--aqb-primary` icon color
+- **Active:** `--buildrick-accent-tint` bg, `--buildrick-accent` icon color
 - **Hover:** `--aqb-chrome-surface-hover` bg
 
 ### Section Header (Collapsible)
@@ -184,10 +184,10 @@ The Inspector is the right-side panel (280px) where users edit the visual proper
 
 - **Expanded (▼):** Section content visible below
 - **Collapsed (▸):** Section content hidden; only header visible
-- **Text:** `--aqb-heading-sm`, `--aqb-text-primary`
+- **Text:** `--aqb-heading-sm`, `--buildrick-text-primary`
 - **Help icon (?):** Tooltip with brief explanation of the section
 - **Click anywhere on header:** Toggles expand/collapse
-- **Animation:** `--aqb-duration-short` (200ms) height transition, `--aqb-ease-out`
+- **Animation:** `--aqb-duration-short` (200ms) height transition, `--buildrick-ease-out`
 
 ---
 

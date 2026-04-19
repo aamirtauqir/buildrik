@@ -45,33 +45,33 @@ Buildrik uses a **dark chrome / light canvas** visual language. The editor shell
 
 | Token | Hex | Usage |
 |-------|-----|-------|
-| `--aqb-primary` | `#2563EB` | Primary buttons, active tab indicator, selection bounding box |
-| `--aqb-primary-hover` | `#3B82F6` | Hover state for primary elements |
-| `--aqb-primary-active` | `#1D4ED8` | Active/pressed state |
-| `--aqb-primary-subtle` | `rgba(37, 99, 235, 0.08)` | Subtle backgrounds (selected sidebar items, hover rows) |
+| `--buildrick-accent` | `#2563EB` | Primary buttons, active tab indicator, selection bounding box |
+| `--buildrick-accent-hover` | `#3B82F6` | Hover state for primary elements |
+| `--buildrick-accent-pressed` | `#1D4ED8` | Active/pressed state |
+| `--buildrick-accent-tint` | `rgba(37, 99, 235, 0.08)` | Subtle backgrounds (selected sidebar items, hover rows) |
 | `--aqb-primary-glow` | `rgba(37, 99, 235, 0.25)` | Selection glow on canvas, focus rings |
 
 ### Semantic Colors
 
 | Token | Hex | Usage |
 |-------|-----|-------|
-| `--aqb-success` | `#22C55E` | Published status, SEO good score, save confirmed |
+| `--buildrick-success` | `#22C55E` | Published status, SEO good score, save confirmed |
 | `--aqb-success-subtle` | `rgba(34, 197, 94, 0.1)` | Success backgrounds |
-| `--aqb-warning` | `#F59E0B` | SEO needs-work score, unsaved changes, AI medium confidence |
+| `--buildrick-warning` | `#F59E0B` | SEO needs-work score, unsaved changes, AI medium confidence |
 | `--aqb-warning-subtle` | `rgba(245, 158, 11, 0.1)` | Warning backgrounds |
-| `--aqb-error` | `#EF4444` | Delete confirmations, SEO poor score, save failed, AI high violations |
+| `--buildrick-error` | `#EF4444` | Delete confirmations, SEO poor score, save failed, AI high violations |
 | `--aqb-error-subtle` | `rgba(239, 68, 68, 0.1)` | Error backgrounds |
-| `--aqb-info` | `#3B82F6` | Informational toasts, AI suggestion confidence |
+| `--buildrick-info` | `#3B82F6` | Informational toasts, AI suggestion confidence |
 | `--aqb-info-subtle` | `rgba(59, 130, 246, 0.1)` | Info backgrounds |
 
 ### Text Colors
 
 | Token | Hex | Usage |
 |-------|-----|-------|
-| `--aqb-text-primary` | `#F1F3F9` | Primary text on dark chrome |
-| `--aqb-text-secondary` | `#9CA3B4` | Secondary/muted text, labels, timestamps |
-| `--aqb-text-tertiary` | `#6B7280` | Placeholder text, disabled labels |
-| `--aqb-text-inverse` | `#0F1117` | Text on light/white surfaces (canvas overlays, tooltips) |
+| `--buildrick-text-primary` | `#F1F3F9` | Primary text on dark chrome |
+| `--buildrick-text-secondary` | `#9CA3B4` | Secondary/muted text, labels, timestamps |
+| `--buildrick-text-tertiary` | `#6B7280` | Placeholder text, disabled labels |
+| `--buildrick-text-inverse` | `#0F1117` | Text on light/white surfaces (canvas overlays, tooltips) |
 
 ### Collaboration Colors (Assigned to Collaborators)
 
@@ -92,12 +92,12 @@ Buildrik uses a **dark chrome / light canvas** visual language. The editor shell
 
 | Combination | Ratio | Passes |
 |-------------|-------|--------|
-| `--aqb-text-primary` on `--aqb-chrome-bg` | 14.8:1 | AAA |
-| `--aqb-text-secondary` on `--aqb-chrome-bg` | 7.2:1 | AAA |
-| `--aqb-text-tertiary` on `--aqb-chrome-bg` | 4.6:1 | AA |
-| `--aqb-primary` on `--aqb-chrome-bg` | 5.1:1 | AA |
-| `--aqb-text-inverse` on white | 17.4:1 | AAA |
-| `--aqb-error` on `--aqb-chrome-bg` | 5.3:1 | AA |
+| `--buildrick-text-primary` on `--aqb-chrome-bg` | 14.8:1 | AAA |
+| `--buildrick-text-secondary` on `--aqb-chrome-bg` | 7.2:1 | AAA |
+| `--buildrick-text-tertiary` on `--aqb-chrome-bg` | 4.6:1 | AA |
+| `--buildrick-accent` on `--aqb-chrome-bg` | 5.1:1 | AA |
+| `--buildrick-text-inverse` on white | 17.4:1 | AAA |
+| `--buildrick-error` on `--aqb-chrome-bg` | 5.3:1 | AA |
 
 ---
 
@@ -106,8 +106,8 @@ Buildrik uses a **dark chrome / light canvas** visual language. The editor shell
 ### Font Stack
 
 ```css
---aqb-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
---aqb-font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+--buildrick-design-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+--buildrick-design-font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
 ```
 
 **Why Inter:** Designed for computer screens. Excellent legibility at small sizes (11-13px) which is critical for a dense editor UI. Variable font support for fine weight tuning. Free and open source.
@@ -141,25 +141,25 @@ text-rendering: optimizeLegibility;
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--aqb-space-0` | 0px | Zero spacing |
-| `--aqb-space-1` | 4px | Micro: between icon and label, within tight groups |
-| `--aqb-space-2` | 8px | Small: internal button padding, between list items |
-| `--aqb-space-3` | 12px | Medium: between form fields, section padding |
-| `--aqb-space-4` | 16px | Default: panel padding, between sections |
-| `--aqb-space-5` | 20px | Large: between major groups |
-| `--aqb-space-6` | 24px | XL: between sidebar sections |
-| `--aqb-space-8` | 32px | 2XL: modal padding, major section breaks |
-| `--aqb-space-10` | 40px | 3XL: page-level padding |
-| `--aqb-space-12` | 48px | 4XL: hero-level spacing |
+| `--buildrick-space-0` | 0px | Zero spacing |
+| `--buildrick-design-space-1` | 4px | Micro: between icon and label, within tight groups |
+| `--buildrick-design-space-2` | 8px | Small: internal button padding, between list items |
+| `--buildrick-design-space-3` | 12px | Medium: between form fields, section padding |
+| `--buildrick-design-space-4` | 16px | Default: panel padding, between sections |
+| `--buildrick-design-space-5` | 20px | Large: between major groups |
+| `--buildrick-design-space-6` | 24px | XL: between sidebar sections |
+| `--buildrick-design-space-8` | 32px | 2XL: modal padding, major section breaks |
+| `--buildrick-design-space-10` | 40px | 3XL: page-level padding |
+| `--buildrick-design-space-12` | 48px | 4XL: hero-level spacing |
 
 ### Layout Dimensions
 
 | Token | Value | Usage |
 |-------|-------|-------|
 | `--aqb-rail-width` | 56px | Left icon rail |
-| `--aqb-sidebar-width` | 280px | Left sidebar panel |
+| `--buildrick-sidebar-width` | 280px | Left sidebar panel |
 | `--aqb-inspector-width` | 280px | Right property inspector |
-| `--aqb-header-height` | 52px | Top bar |
+| `--buildrick-header-height` | 52px | Top bar |
 | `--aqb-page-tab-height` | 36px | Page tab bar below header |
 | `--aqb-footer-toolbar-height` | 40px | Canvas footer (zoom, grid, ruler) |
 
@@ -167,11 +167,11 @@ text-rendering: optimizeLegibility;
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--aqb-radius-sm` | 4px | Small elements: badges, tags, chips |
-| `--aqb-radius-md` | 6px | Buttons, inputs, cards, dropdowns |
-| `--aqb-radius-lg` | 8px | Panels, modal corners, large cards |
-| `--aqb-radius-xl` | 12px | Modal/dialog containers |
-| `--aqb-radius-full` | 9999px | Circular: avatars, pills, toggles |
+| `--buildrick-design-radius-sm` | 4px | Small elements: badges, tags, chips |
+| `--buildrick-design-radius-md` | 6px | Buttons, inputs, cards, dropdowns |
+| `--buildrick-design-radius-lg` | 8px | Panels, modal corners, large cards |
+| `--buildrick-design-radius-xl` | 12px | Modal/dialog containers |
+| `--buildrick-design-radius-full` | 9999px | Circular: avatars, pills, toggles |
 
 ---
 
@@ -195,16 +195,16 @@ text-rendering: optimizeLegibility;
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--aqb-ease-out` | `cubic-bezier(0.0, 0, 0.2, 1)` | Entrances, expansions, things coming into view |
-| `--aqb-ease-in-out` | `cubic-bezier(0.4, 0, 0.2, 1)` | State transitions, tab switches, drill-in |
-| `--aqb-ease-spring` | `cubic-bezier(0.34, 1.56, 0.64, 1)` | Playful: achievement toasts, selection bounce |
-| `--aqb-ease-in` | `cubic-bezier(0.4, 0, 1, 1)` | Exits, things leaving view |
+| `--buildrick-ease-out` | `cubic-bezier(0.0, 0, 0.2, 1)` | Entrances, expansions, things coming into view |
+| `--buildrick-ease-in-out` | `cubic-bezier(0.4, 0, 0.2, 1)` | State transitions, tab switches, drill-in |
+| `--buildrick-ease-spring` | `cubic-bezier(0.34, 1.56, 0.64, 1)` | Playful: achievement toasts, selection bounce |
+| `--buildrick-ease-in` | `cubic-bezier(0.4, 0, 1, 1)` | Exits, things leaving view |
 
 ### Duration Scale
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--aqb-duration-instant` | 0ms | Canvas operations (selection, style apply) — NO animation in editing loop |
+| `--buildrick-duration-instant` | 0ms | Canvas operations (selection, style apply) — NO animation in editing loop |
 | `--aqb-duration-micro` | 100ms | Hover states, button press feedback, toggle switches |
 | `--aqb-duration-short` | 200ms | Dropdown open, tooltip appear, tab content switch |
 | `--aqb-duration-medium` | 300ms | Sidebar panel slide, drill-in animation, modal appear |
@@ -222,7 +222,7 @@ text-rendering: optimizeLegibility;
 ```
 
 ### Critical Rule
-**The core editing loop (Canvas ↔ Inspector ↔ Layers) uses `--aqb-duration-instant` (0ms).** No transitions between selection and property population. No fade-in for Inspector sections. No slide for Layers highlighting. These must be immediate. Animation is reserved for UI chrome transitions (tab switches, modal opens, drill-ins), never for the editing loop.
+**The core editing loop (Canvas ↔ Inspector ↔ Layers) uses `--buildrick-duration-instant` (0ms).** No transitions between selection and property population. No fade-in for Inspector sections. No slide for Layers highlighting. These must be immediate. Animation is reserved for UI chrome transitions (tab switches, modal opens, drill-ins), never for the editing loop.
 
 ---
 
@@ -232,7 +232,7 @@ text-rendering: optimizeLegibility;
 - **Library:** Lucide React (consistent line-weight icons)
 - **Default size:** 16px (sidebar), 20px (rail icons), 14px (inline with text)
 - **Stroke width:** 1.5px (matches Inter's visual weight at body size)
-- **Color:** Inherits from parent text color; active icons use `--aqb-primary`
+- **Color:** Inherits from parent text color; active icons use `--buildrick-accent`
 
 ### Icon Usage Rules
 1. Every icon must have an accessible label (ARIA label or visible text)
@@ -246,12 +246,12 @@ text-rendering: optimizeLegibility;
 
 | Element | Specification |
 |---------|---------------|
-| Selection box | 1px solid `--aqb-primary`, with `--aqb-primary-glow` outer glow (2px) |
-| Resize handles | 8px × 8px white squares with 1px `--aqb-primary` border |
-| Hover highlight | 1px dashed `--aqb-primary` at 50% opacity |
-| Drop zone indicator | 2px solid `--aqb-primary` at insertion point |
+| Selection box | 1px solid `--buildrick-accent`, with `--aqb-primary-glow` outer glow (2px) |
+| Resize handles | 8px × 8px white squares with 1px `--buildrick-accent` border |
+| Hover highlight | 1px dashed `--buildrick-accent` at 50% opacity |
+| Drop zone indicator | 2px solid `--buildrick-accent` at insertion point |
 | Smart guides | 1px solid `#FF6B6B` (red, high visibility on any canvas color) |
-| Spacing labels | `--aqb-caption` size, `--aqb-primary` background pill |
+| Spacing labels | `--aqb-caption` size, `--buildrick-accent` background pill |
 | Remote cursor | 12px arrow in collaborator's assigned color + name label |
 | Selection label | `--aqb-caption` size badge above selection box, `--aqb-chrome-surface` background |
 

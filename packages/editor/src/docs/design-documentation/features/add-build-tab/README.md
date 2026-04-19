@@ -67,22 +67,22 @@ The Add/Build Tab is the primary entry point for placing new elements onto the c
 
 - **Search bar:** 100% width, `--aqb-chrome-surface` bg, `--aqb-chrome-border` border, 36px height, placeholder "Search elements..."
 - **Tab bar:** 3 pill buttons — Sections (default active), Elements, Favorites
-- **Active tab:** `--aqb-primary` bg, white text. Inactive: `--aqb-chrome-surface` bg, `--aqb-text-secondary`
+- **Active tab:** `--buildrick-accent` bg, white text. Inactive: `--aqb-chrome-surface` bg, `--buildrick-text-secondary`
 - **Category ordering:** Hero > CTA > Pricing > Features > Testimonials > Footer > Navigation > Forms > Basic Elements
-- **Thumbnails:** 120x80px, `--aqb-radius-md` corners, `--aqb-chrome-border` border, hover: `--aqb-primary` 2px border + `--aqb-elevation-1` shadow
-- **Labels:** `--aqb-caption`, `--aqb-text-secondary`, centered below thumbnail
+- **Thumbnails:** 120x80px, `--buildrick-design-radius-md` corners, `--aqb-chrome-border` border, hover: `--buildrick-accent` 2px border + `--aqb-elevation-1` shadow
+- **Labels:** `--aqb-caption`, `--buildrick-text-secondary`, centered below thumbnail
 
 ### State 2: Search Active
 
-- **Search input focused:** `--aqb-primary` border, `--aqb-primary-glow` ring
-- **Results:** Flat list replacing category grid. Fuzzy matching highlights matched characters in `--aqb-primary`
-- **No results:** "No elements matching '[query]'" in `--aqb-text-tertiary`, centered
+- **Search input focused:** `--buildrick-accent` border, `--aqb-primary-glow` ring
+- **Results:** Flat list replacing category grid. Fuzzy matching highlights matched characters in `--buildrick-accent`
+- **No results:** "No elements matching '[query]'" in `--buildrick-text-tertiary`, centered
 
 ### State 3: Favorites Tab
 
 - **Populated:** Grid of starred elements, same thumbnail format
-- **Empty:** "Star elements to add them here" + illustration, `--aqb-text-tertiary`
-- **Sync badge:** Small "Synced" indicator if team favorites enabled, `--aqb-success` text
+- **Empty:** "Star elements to add them here" + illustration, `--buildrick-text-tertiary`
+- **Sync badge:** Small "Synced" indicator if team favorites enabled, `--buildrick-success` text
 
 ### State 4: Drag in Progress
 
@@ -96,9 +96,9 @@ The Add/Build Tab is the primary entry point for placing new elements onto the c
 
 | Action | Behavior | Animation |
 |--------|----------|-----------|
-| Click thumbnail | Insert element at canvas cursor position (or end of page) | Element fades in, 150ms `--aqb-ease-out` |
+| Click thumbnail | Insert element at canvas cursor position (or end of page) | Element fades in, 150ms `--buildrick-ease-out` |
 | Drag thumbnail | Ghost preview follows cursor to canvas drop zone | Immediate on mousedown + 3px threshold |
-| Hover thumbnail | 2px `--aqb-primary` border, elevation lift | 150ms transition |
+| Hover thumbnail | 2px `--buildrick-accent` border, elevation lift | 150ms transition |
 | Star/unstar | Toggle favorite; syncs to team via SyncManager | Heart icon fills/empties, 200ms |
 | Search typing | Fuzzy filter with 100ms debounce | Results animate in with 150ms fade |
 | Category collapse | Toggle section visibility | 200ms height transition |

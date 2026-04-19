@@ -15,9 +15,9 @@ status: approved
 
 ### Dialog (Centered Modal)
 - **Backdrop:** Black at 60% opacity, `backdrop-filter: blur(4px)`
-- **Container:** `--aqb-chrome-surface` bg, `--aqb-elevation-3` shadow, `--aqb-radius-xl` corners
+- **Container:** `--aqb-chrome-surface` bg, `--aqb-elevation-3` shadow, `--buildrick-design-radius-xl` corners
 - **Width:** 480px (small), 640px (medium), 800px (large), 1200px (Export Modal)
-- **Padding:** `--aqb-space-8` (32px)
+- **Padding:** `--buildrick-design-space-8` (32px)
 - **Entry:** Fade in backdrop (200ms) + scale dialog from 95% to 100% (300ms, ease-out)
 - **Exit:** Escape key or click backdrop → fade out (200ms)
 - **Focus:** Trapped inside. First focusable element receives focus. Tab cycles.
@@ -32,7 +32,7 @@ status: approved
 - **Used by:** Settings sub-screens, Template comparison drawer
 
 ### Popover
-- **Container:** `--aqb-chrome-surface` bg, `--aqb-elevation-2` shadow, `--aqb-radius-md`
+- **Container:** `--aqb-chrome-surface` bg, `--aqb-elevation-2` shadow, `--buildrick-design-radius-md`
 - **Width:** 240-320px
 - **Position:** Below or beside trigger element, auto-flips if near viewport edge
 - **Entry:** Fade + scale from 95% (150ms, ease-out)
@@ -41,7 +41,7 @@ status: approved
 
 ### Toast
 - **Position:** Bottom-right, 24px from edges, stacks vertically (max 3 visible)
-- **Container:** `--aqb-chrome-surface` bg, `--aqb-elevation-2` shadow, `--aqb-radius-md`, 360px width
+- **Container:** `--aqb-chrome-surface` bg, `--aqb-elevation-2` shadow, `--buildrick-design-radius-md`, 360px width
 - **Left border:** 3px solid semantic color (success=green, error=red, warning=amber, info=blue)
 - **Content:** Icon + message + optional action link + dismiss ×
 - **Auto-dismiss:** 5 seconds (errors persist until dismissed)
@@ -52,7 +52,7 @@ status: approved
 ### Confirmation Modal
 - **Variant of Dialog** at 480px width
 - **Structure:** Icon + title + description + action buttons
-- **For delete:** `--aqb-error` icon, "Delete [Item Name]?" title, description of impact, [Cancel] + [Delete] (danger) buttons
+- **For delete:** `--buildrick-error` icon, "Delete [Item Name]?" title, description of impact, [Cancel] + [Delete] (danger) buttons
 - **For template apply:** Side-by-side visual comparison (see Templates Tab feature)
 
 ### Side-by-Side Comparison

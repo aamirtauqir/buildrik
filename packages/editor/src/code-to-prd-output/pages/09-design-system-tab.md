@@ -94,7 +94,7 @@ The Design System tab manages global design tokens — reusable values for color
 ### Export Options
 | Format | Output | Use Case |
 |--------|--------|----------|
-| CSS Variables | `:root { --aqb-primary: #2563EB; ... }` | Direct CSS integration |
+| CSS Variables | `:root { --buildrick-accent: #2563EB; ... }` | Direct CSS integration |
 | JSON | `{ "primary": "#2563EB", ... }` | JavaScript/framework integration |
 | **Tailwind Config** | `theme: { colors: { primary: "#2563EB" } }` | **Developer handoff** — bridge from design team to engineering team |
 
@@ -138,15 +138,15 @@ The Design System tab manages global design tokens — reusable values for color
 ### Colors (9)
 | Token | Default Value | CSS Variable |
 |-------|--------------|-------------|
-| Primary | #2563EB | `--aqb-primary` |
-| Secondary | #64748B | `--aqb-secondary` |
-| Accent | #8B5CF6 | `--aqb-accent` |
+| Primary | #2563EB | `--buildrick-accent` |
+| Secondary | #64748B | `--buildrick-text-muted` |
+| Accent | #8B5CF6 | `--buildrick-accent` |
 | Background | #FFFFFF | `--aqb-background` |
-| Text | #0F172A | `--aqb-text` |
+| Text | #0F172A | `--buildrick-text` |
 | Muted | #94A3B8 | `--aqb-muted` |
-| Border | #E2E8F0 | `--aqb-border` |
-| Success | #22C55E | `--aqb-success` |
-| Error | #EF4444 | `--aqb-error` |
+| Border | #E2E8F0 | `--buildrick-border` |
+| Success | #22C55E | `--buildrick-success` |
+| Error | #EF4444 | `--buildrick-error` |
 
 ### Typography (4)
 | Token | Default Value |

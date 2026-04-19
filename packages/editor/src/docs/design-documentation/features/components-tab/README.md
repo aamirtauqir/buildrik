@@ -61,10 +61,10 @@ The Components Tab enables users to create reusable UI components with variants 
 
 ### State 1: Component List
 
-- **Component cards:** 64px height, `--aqb-chrome-surface` bg, `--aqb-radius-md`. Thumbnail (40x40px) left, name + metadata right.
-- **Name:** `--aqb-body`, `--aqb-text-primary`.
-- **Metadata:** `--aqb-caption`, `--aqb-text-tertiary`. Shows variant count and usage count.
-- **Filter tabs:** All (default), In Use (instances exist), Unused (zero instances). Active: `--aqb-primary` text + underline.
+- **Component cards:** 64px height, `--aqb-chrome-surface` bg, `--buildrick-design-radius-md`. Thumbnail (40x40px) left, name + metadata right.
+- **Name:** `--aqb-body`, `--buildrick-text-primary`.
+- **Metadata:** `--aqb-caption`, `--buildrick-text-tertiary`. Shows variant count and usage count.
+- **Filter tabs:** All (default), In Use (instances exist), Unused (zero instances). Active: `--buildrick-accent` text + underline.
 - **Hover:** `--aqb-chrome-surface-hover` bg, drag handle appears.
 
 ### State 2: Create Component — From Selection
@@ -91,7 +91,7 @@ The Components Tab enables users to create reusable UI components with variants 
 
 - **Isolated canvas:** Main component renders in a focused view (no page context)
 - **Variant switcher:** Tab bar at top of canvas showing all variants. Click to switch.
-- **Properties panel:** Shows which properties differ from base variant (highlighted in `--aqb-primary`)
+- **Properties panel:** Shows which properties differ from base variant (highlighted in `--buildrick-accent`)
 - **Exit:** "Back to Page" button returns to normal canvas
 
 ### State 6: Empty State
@@ -107,7 +107,7 @@ The Components Tab enables users to create reusable UI components with variants 
 | Drag component to canvas | Creates new instance at drop point | Ghost preview, standard drag flow |
 | Click component card | Opens detail drill-in | Slide-in from right, 200ms |
 | Right-click instance on canvas | Context menu includes "Switch Variant" submenu | Instant popup |
-| Edit main component | All instances update automatically | Instances flash briefly (200ms `--aqb-primary` outline) |
+| Edit main component | All instances update automatically | Instances flash briefly (200ms `--buildrick-accent` outline) |
 | Override instance property | Instance diverges from main for that property | Override indicator dot on property |
 | Reset override | Instance property reverts to main value | Instant |
 | Detach instance | Converts to regular elements (breaks link) | Confirmation modal |

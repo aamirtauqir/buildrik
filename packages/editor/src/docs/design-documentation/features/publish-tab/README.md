@@ -65,42 +65,42 @@ The Publish Tab handles the transition from editor to live website. First-time u
 
 ### State 1: First Time — No Hosting Connected
 
-- **Illustration:** Centered graphic (rocket/cloud icon), 120x120px, `--aqb-text-tertiary`.
-- **Heading:** "Connect Hosting to Go Live" in `--aqb-heading-md`, `--aqb-text-primary`.
-- **Description:** "Publish your site to Buildrik hosting or connect your own domain." in `--aqb-body`, `--aqb-text-tertiary`.
+- **Illustration:** Centered graphic (rocket/cloud icon), 120x120px, `--buildrick-text-tertiary`.
+- **Heading:** "Connect Hosting to Go Live" in `--aqb-heading-md`, `--buildrick-text-primary`.
+- **Description:** "Publish your site to Buildrik hosting or connect your own domain." in `--aqb-body`, `--buildrick-text-tertiary`.
 - **CTA:** [Connect Hosting] primary button, full-width.
 - **Setup flow:** Guided steps — choose subdomain → verify → connected.
 
 ### State 2: Draft (Never Published)
 
-- **Status badge:** `--aqb-warning` bg, "Draft" text, pill shape.
+- **Status badge:** `--buildrick-warning` bg, "Draft" text, pill shape.
 - **URL preview:** Shows what the URL will be (dimmed).
-- **Publish button:** [Publish Site] primary, full-width, `--aqb-primary` bg.
+- **Publish button:** [Publish Site] primary, full-width, `--buildrick-accent` bg.
 - **No "Unpublish"** button visible (nothing is live yet).
 
 ### State 3: Published (Live)
 
-- **Status badge:** `--aqb-success` bg, "Published" text, green dot pulsing subtly.
-- **Live URL:** Clickable link (opens in new tab) + copy button. `--aqb-primary` text.
-- **Attribution:** "Published by [Name]" + timestamp in `--aqb-caption`, `--aqb-text-tertiary`.
+- **Status badge:** `--buildrick-success` bg, "Published" text, green dot pulsing subtly.
+- **Live URL:** Clickable link (opens in new tab) + copy button. `--buildrick-accent` text.
+- **Attribution:** "Published by [Name]" + timestamp in `--aqb-caption`, `--buildrick-text-tertiary`.
 - **Buttons:** [Publish Changes] primary (if changes exist) + [Unpublish Site] ghost/destructive.
 - **Change summary:** Bullet list of changes since last publish.
 
 ### State 4: Publishing in Progress
 
 - **Button:** Disabled, shows spinner + "Publishing..."
-- **Progress:** Indeterminate progress bar below button, `--aqb-primary`.
+- **Progress:** Indeterminate progress bar below button, `--buildrick-accent`.
 - **Auto-save note:** "Auto-saving before publish..." shown briefly.
 
 ### State 5: Viewer Role (Read-Only)
 
 - **Status visible:** Same status badge and URL.
 - **Buttons hidden:** No Publish or Unpublish buttons.
-- **Note:** "Only Owners and Editors can publish." in `--aqb-caption`, `--aqb-text-tertiary`.
+- **Note:** "Only Owners and Editors can publish." in `--aqb-caption`, `--buildrick-text-tertiary`.
 
 ### State 6: Publish Failed
 
-- **Error banner:** `--aqb-error-subtle` bg, `--aqb-error` border. Error message + [Retry] button.
+- **Error banner:** `--aqb-error-subtle` bg, `--buildrick-error` border. Error message + [Retry] button.
 - **Common errors:** Build failure, domain not verified, quota exceeded.
 
 ---

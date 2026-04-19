@@ -69,22 +69,22 @@ The Settings Tab provides project-level configuration through 7 card-based drill
 
 ### State 1: Settings Overview (Card Grid)
 
-- **Cards:** Full-width, 64px height, `--aqb-chrome-surface` bg, `--aqb-radius-md`, 12px padding.
-- **Icon:** 20px, `--aqb-text-tertiary`, left-aligned.
-- **Title:** `--aqb-body`, `--aqb-text-primary`. Subtitle: `--aqb-caption`, `--aqb-text-tertiary`.
-- **Chevron:** Right-aligned, `--aqb-text-tertiary`.
+- **Cards:** Full-width, 64px height, `--aqb-chrome-surface` bg, `--buildrick-design-radius-md`, 12px padding.
+- **Icon:** 20px, `--buildrick-text-tertiary`, left-aligned.
+- **Title:** `--aqb-body`, `--buildrick-text-primary`. Subtitle: `--aqb-caption`, `--buildrick-text-tertiary`.
+- **Chevron:** Right-aligned, `--buildrick-text-tertiary`.
 - **Hover:** `--aqb-chrome-surface-hover` bg.
 
 ### State 2: Site Info (Drill-In)
 
 - **Fields:** Site Name (text input), Tagline (text input), Favicon (image upload, 32x32 preview), Language (dropdown), Time Zone (dropdown).
-- **Auto-save:** 1.5s debounce. Save indicator: "Saved" in `--aqb-success` text, top-right.
+- **Auto-save:** 1.5s debounce. Save indicator: "Saved" in `--buildrick-success` text, top-right.
 
 ### State 3: Domains (Drill-In)
 
 - **Default domain:** `project-name.buildrik.app` shown as read-only with copy button.
 - **Custom domain:** Input field + [Connect] button. DNS verification steps shown inline.
-- **Status badges:** Connected (`--aqb-success`), Pending (`--aqb-warning`), Failed (`--aqb-error`).
+- **Status badges:** Connected (`--buildrick-success`), Pending (`--buildrick-warning`), Failed (`--buildrick-error`).
 
 ### State 4: Analytics (Drill-In)
 

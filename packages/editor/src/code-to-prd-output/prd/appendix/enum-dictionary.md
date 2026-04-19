@@ -55,9 +55,9 @@ All enums, status codes, and type mappings extracted from the codebase.
 
 | Key | Value |
 |-----|-------|
-| `sm` | var(--aqb-radius-sm, 4px) |
-| `md` | var(--aqb-radius-md, 8px) |
-| `lg` | var(--aqb-radius-lg, 12px) |
+| `sm` | var(--buildrick-design-radius-sm, 4px) |
+| `md` | var(--buildrick-design-radius-md, 8px) |
+| `lg` | var(--buildrick-design-radius-lg, 12px) |
 | `full` | 9999px |
 
 ## MIME_TYPES

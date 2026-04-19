@@ -64,23 +64,23 @@ The History Tab provides two views: Versions (the undo/redo stack with hover-to-
 ### State 1: Versions View (Default)
 
 - **Timeline:** Vertical line, 1px, `--aqb-chrome-border`, left-aligned at 12px.
-- **Version nodes:** 8px circles on the timeline. Default: `--aqb-chrome-border` fill. Active (current): `--aqb-primary` fill, 12px.
-- **Entries:** 48px min-height. Action description in `--aqb-body-sm`, `--aqb-text-primary`. Category + element type in `--aqb-caption`, `--aqb-text-tertiary`. Timestamp right-aligned, `--aqb-caption`.
+- **Version nodes:** 8px circles on the timeline. Default: `--aqb-chrome-border` fill. Active (current): `--buildrick-accent` fill, 12px.
+- **Entries:** 48px min-height. Action description in `--aqb-body-sm`, `--buildrick-text-primary`. Category + element type in `--aqb-caption`, `--buildrick-text-tertiary`. Timestamp right-aligned, `--aqb-caption`.
 - **Future entries (after undo):** Dimmed, 50% opacity. These are redo-able states.
-- **Checkpoint badge:** Star icon + "Checkpoint" in `--aqb-warning` text on every 10th entry.
+- **Checkpoint badge:** Star icon + "Checkpoint" in `--buildrick-warning` text on every 10th entry.
 
 ### State 2: Hover-to-Preview
 
 - **Trigger:** Mouse hovers over a version entry for 300ms.
 - **Canvas:** Shows a ghost preview of the page at that version state. Semi-transparent overlay (50% opacity) over current canvas content.
-- **Badge on canvas:** "Preview: [action description]" pill at top of canvas, `--aqb-warning` bg.
+- **Badge on canvas:** "Preview: [action description]" pill at top of canvas, `--buildrick-warning` bg.
 - **Leave hover:** Preview fades out in 150ms, current state restores.
 
 ### State 3: Jumped-to-Version
 
 - **Trigger:** Click a version entry.
 - **Canvas:** Fully renders the page at that version state (not a preview — this is now the active state).
-- **Timeline:** Clicked node becomes solid `--aqb-primary`. All entries above it are "future" (dimmed).
+- **Timeline:** Clicked node becomes solid `--buildrick-accent`. All entries above it are "future" (dimmed).
 - **Redo available:** User can click entries above to move forward again.
 - **New edits:** If user makes changes while jumped-back, future entries are discarded (standard undo tree behavior).
 
@@ -100,7 +100,7 @@ The History Tab provides two views: Versions (the undo/redo stack with hover-to-
 
 ### State 6: Empty History
 
-- **Visual:** "No changes yet. Start editing to build history." Centered, `--aqb-text-tertiary`.
+- **Visual:** "No changes yet. Start editing to build history." Centered, `--buildrick-text-tertiary`.
 
 ---
 

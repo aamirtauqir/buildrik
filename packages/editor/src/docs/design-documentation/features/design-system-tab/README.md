@@ -65,9 +65,9 @@ The Design System Tab is where users define and manage their project's visual la
 
 ### State 1: Colors Tab (Default)
 
-- **Palette grid:** 3-column layout. Each swatch: 72x56px, `--aqb-radius-md`, displays the color fill.
-- **Token name:** `--aqb-caption`, `--aqb-text-secondary`, centered below swatch.
-- **Hex value:** `--aqb-caption`, `--aqb-text-tertiary`, below name.
+- **Palette grid:** 3-column layout. Each swatch: 72x56px, `--buildrick-design-radius-md`, displays the color fill.
+- **Token name:** `--aqb-caption`, `--buildrick-text-secondary`, centered below swatch.
+- **Hex value:** `--aqb-caption`, `--buildrick-text-tertiary`, below name.
 - **Click swatch:** Opens color picker popover with hex, RGB, HSL inputs + design token name editor.
 - **Add color:** "+" button at end of group, `--aqb-chrome-border` dashed border.
 - **Groups:** Brand Colors, Neutral Colors, Semantic Colors. Each collapsible.

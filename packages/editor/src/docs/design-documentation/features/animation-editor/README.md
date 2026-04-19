@@ -68,9 +68,9 @@ The Animation Editor lets users add motion to elements using GSAP presets withou
 
 ### State 2: Preset Selection
 
-- **Preset cards:** 56x48px each, `--aqb-chrome-surface` bg, `--aqb-radius-md`. Icon or mini-animation preview inside.
-- **Hover:** Card border becomes `--aqb-primary`, shows a micro-animation preview (200ms loop).
-- **Selected:** `--aqb-primary` bg, white icon. Other controls become enabled.
+- **Preset cards:** 56x48px each, `--aqb-chrome-surface` bg, `--buildrick-design-radius-md`. Icon or mini-animation preview inside.
+- **Hover:** Card border becomes `--buildrick-accent`, shows a micro-animation preview (200ms loop).
+- **Selected:** `--buildrick-accent` bg, white icon. Other controls become enabled.
 - **Presets available:**
 
 | Preset | GSAP Properties | Default Duration |

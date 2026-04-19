@@ -604,7 +604,7 @@ Retention: last 10 published versions.
 | Requirement | Specification |
 |-------------|--------------|
 | Color contrast | All text ≥ 4.5:1; large text ≥ 3:1 |
-| Focus indicators | 2px solid `--aqb-primary`, 2px offset (not browser default) |
+| Focus indicators | 2px solid `--buildrick-accent`, 2px offset (not browser default) |
 | Keyboard navigation | All interactive elements reachable via Tab; no keyboard traps |
 | ARIA labels | All icon-only buttons have `aria-label`; all panels have `role` + `aria-label` |
 | Screen reader announcements | Selection changes: "Selected: [Name], [Type]". Undo: "Undo: [Action]". |

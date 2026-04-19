@@ -60,9 +60,9 @@ The Media Tab is the central asset library for all project media. It has two pri
 
 ### State 1: My Library (Default)
 
-- **Tab bar:** My Library active (`--aqb-primary` text + underline), Discovery inactive.
-- **Type filters:** Pill buttons, horizontally scrollable. Active: `--aqb-primary` bg.
-- **Asset grid:** 3-column masonry layout. Thumbnails: `--aqb-radius-sm`, aspect-ratio preserved.
+- **Tab bar:** My Library active (`--buildrick-accent` text + underline), Discovery inactive.
+- **Type filters:** Pill buttons, horizontally scrollable. Active: `--buildrick-accent` bg.
+- **Asset grid:** 3-column masonry layout. Thumbnails: `--buildrick-design-radius-sm`, aspect-ratio preserved.
 - **Hover:** Dark overlay (40% black) with action icons: Edit, Delete, Copy URL. `--aqb-elevation-1`.
 - **Upload zone:** 64px height, dashed `--aqb-chrome-border` border, `--aqb-chrome-surface` bg. "+" icon centered.
 
@@ -75,7 +75,7 @@ The Media Tab is the central asset library for all project media. It has two pri
 
 ### State 3: Upload in Progress
 
-- **Drop zone active:** Dashed border becomes solid `--aqb-primary`, bg becomes `--aqb-primary-subtle`.
+- **Drop zone active:** Dashed border becomes solid `--buildrick-accent`, bg becomes `--buildrick-accent-tint`.
 - **Progress:** Each uploading file shows as a card with progress bar. File name + size + percentage.
 - **Validation errors:** Red border, error message below. Limits: Images 10MB, Videos 50MB, Fonts 5MB.
 - **Complete:** Card transforms into standard thumbnail with green checkmark flash (300ms).

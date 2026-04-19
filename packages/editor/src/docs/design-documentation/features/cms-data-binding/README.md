@@ -89,7 +89,7 @@ The CMS feature allows users to define data collections (e.g., Blog Posts, Produ
 
 - **Setup:** User wraps a container in a repeater and selects a collection.
 - **Canvas rendering:** Shows 3 preview clones by default (configurable 1-10).
-- **Visual:** Repeater container has a dashed `--aqb-info` border with "Repeater: [Collection]" label.
+- **Visual:** Repeater container has a dashed `--buildrick-info` border with "Repeater: [Collection]" label.
 - **Edit mode:** Editing the first clone edits the template; other clones show the result.
 - **Sort/filter:** Repeater settings popover — sort by field, filter conditions, limit count.
 

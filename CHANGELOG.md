@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## Theme Unification V3 — 2026-04-19
+
+### Changed
+- Renamed all `--aqb-*` CSS variables to `--buildrick-*` (chrome) and `--buildrick-design-*` (user design tokens).
+- Renamed all `aqb-*` class names, `data-aqb-*` attributes, `aqb-*` localStorage keys, `aqb:trace:*` dev flags to `buildrick-*` equivalents.
+- Renamed all `@keyframes aqb-*` to `@keyframes buildrick-*`.
+- Enforced "chrome never mutated at runtime" invariant via two-namespace split.
+- Deleted runtime `applyTheme()` function (chrome now renders from `themes/default.css` canonical light values per DESIGN.md 2026-04-18).
+- Added `migrateAqbKeys()` storage migration — preserves existing user state across rename.
+
+### Fixed
+- `PagesTab.css` dark-override block removed (was shadowing canonical tokens, DESIGN.md violation).
+- `components/Canvas/Canvas.css` DARK_THEME_SHIM values corrected to light canonical.
+- 29 previously-undefined-but-consumed tokens resolved (defined, renamed, or deleted).
+- 2 orphan `@keyframes` animation-name references deleted (`aqb-slide-down`, `aqb-bar-slide-up`).
+- Orphan `CSS_CLASSES` constant deleted.
+
+### Known limitations
+- Experimental Design-tab user customizations may reset to `DEFAULT_TOKENS` on first post-V3 load (Q4=C lossy retargeting, acceptable).
+- Structural debt (file consolidations in `themes/`, storage key duplication cleanup, engine class-name SSOT wire-up) explicitly deferred to separate specs.
+
 ## [0.3.0.0] - 2026-04-17
 
 ### Added

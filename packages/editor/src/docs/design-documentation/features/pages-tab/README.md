@@ -61,9 +61,9 @@ The Pages Tab lists all pages in the project with inline SEO health indicators. 
 
 ### State 1: Page List
 
-- **Page cards:** 56px height, `--aqb-chrome-surface` bg, `--aqb-radius-md`, 8px padding. Active page: `--aqb-primary-subtle` bg, `--aqb-primary` left border (2px).
-- **Page name:** `--aqb-body`, `--aqb-text-primary`. Homepage badge: 🏠 icon, `--aqb-primary`.
-- **Slug:** `--aqb-caption`, `--aqb-text-tertiary`, below name.
+- **Page cards:** 56px height, `--aqb-chrome-surface` bg, `--buildrick-design-radius-md`, 8px padding. Active page: `--buildrick-accent-tint` bg, `--buildrick-accent` left border (2px).
+- **Page name:** `--aqb-body`, `--buildrick-text-primary`. Homepage badge: 🏠 icon, `--buildrick-accent`.
+- **Slug:** `--aqb-caption`, `--buildrick-text-tertiary`, below name.
 - **SEO dot:** 8px circle, right-aligned. Green (#22C55E) >= 80, Yellow (#EAB308) 50-79, Red (#EF4444) < 50.
 - **SEO score number:** `--aqb-caption`, same color as dot, right of dot.
 

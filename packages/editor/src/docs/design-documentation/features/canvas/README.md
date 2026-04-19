@@ -113,16 +113,16 @@ Canvas scales via CSS `transform: scale()` for zoom. Elements are NOT re-rendere
 ```
 
 **Typography:**
-- Icon: 48px, `--aqb-text-tertiary`
-- Heading: `--aqb-heading-md`, `--aqb-text-secondary`
-- Description: `--aqb-body`, `--aqb-text-tertiary`
-- Buttons: Ghost variant, `--aqb-primary`
+- Icon: 48px, `--buildrick-text-tertiary`
+- Heading: `--aqb-heading-md`, `--buildrick-text-secondary`
+- Description: `--aqb-body`, `--buildrick-text-tertiary`
+- Buttons: Ghost variant, `--buildrick-accent`
 
 ### State 2: Active Editing (Elements Present, None Selected)
 
 **Visual:** User's website renders inside the page viewport. Hover highlights appear when mouse moves over elements.
 
-- **Hover highlight:** 1px dashed `--aqb-primary` at 50% opacity, appears instantly on mousemove
+- **Hover highlight:** 1px dashed `--buildrick-accent` at 50% opacity, appears instantly on mousemove
 - **No selection indicators** — clean view of the design
 - **Breadcrumb hidden** when no element is selected
 
@@ -132,34 +132,34 @@ Canvas scales via CSS `transform: scale()` for zoom. Elements are NOT re-rendere
 
 | Overlay Element | Spec |
 |-----------------|------|
-| **Bounding box** | 1px solid `--aqb-primary`, with 2px `--aqb-primary-glow` outer glow |
-| **Resize handles** | 8 handles (4 corners, 4 edges). 8x8px white squares, 1px `--aqb-primary` border, `--aqb-elevation-1` shadow |
-| **Selection label** | Positioned 4px above top-left of bounding box. `--aqb-caption` text, `--aqb-chrome-surface` bg, `--aqb-radius-sm` corners, 4px 8px padding. Shows element type + name (e.g., "Heading · Hero Title") |
-| **Quick Actions toolbar** | Positioned 8px above selection label. Row of icon buttons: Copy, Paste, Duplicate, Delete, Lock. `--aqb-chrome-surface` bg, `--aqb-elevation-2` shadow, `--aqb-radius-md` corners |
-| **Breadcrumb** | Top of canvas area. Shows DOM path: "Page > Section > Container > Heading". Each segment clickable to select parent. `--aqb-body-sm`, `--aqb-text-secondary`, `--aqb-primary` for hovered segment |
+| **Bounding box** | 1px solid `--buildrick-accent`, with 2px `--aqb-primary-glow` outer glow |
+| **Resize handles** | 8 handles (4 corners, 4 edges). 8x8px white squares, 1px `--buildrick-accent` border, `--aqb-elevation-1` shadow |
+| **Selection label** | Positioned 4px above top-left of bounding box. `--aqb-caption` text, `--aqb-chrome-surface` bg, `--buildrick-design-radius-sm` corners, 4px 8px padding. Shows element type + name (e.g., "Heading · Hero Title") |
+| **Quick Actions toolbar** | Positioned 8px above selection label. Row of icon buttons: Copy, Paste, Duplicate, Delete, Lock. `--aqb-chrome-surface` bg, `--aqb-elevation-2` shadow, `--buildrick-design-radius-md` corners |
+| **Breadcrumb** | Top of canvas area. Shows DOM path: "Page > Section > Container > Heading". Each segment clickable to select parent. `--aqb-body-sm`, `--buildrick-text-secondary`, `--buildrick-accent` for hovered segment |
 
 ### State 4: Multi-Element Selected
 
 **Visual:** Each selected element gets a bounding box (no handles individually). A combined bounding box wraps all selections.
 
-- **Multi-select badge:** "3 selected" pill at top-right of combined bounding box. `--aqb-primary` bg, white text, `--aqb-caption` size.
+- **Multi-select badge:** "3 selected" pill at top-right of combined bounding box. `--buildrick-accent` bg, white text, `--aqb-caption` size.
 - **Unified toolbar:** Alignment and distribution controls replace the single-element quick actions. 9 alignment buttons (left, center, right, top, middle, bottom, distribute H, distribute V, equal spacing).
 
 ### State 5: Drag-in-Progress (From Sidebar)
 
 **Visual:**
 - Ghost preview of the element follows cursor at 50% opacity
-- Valid drop zones highlight with 2px solid `--aqb-primary` border
-- Insertion line (2px `--aqb-primary` horizontal bar) shows exact drop position
+- Valid drop zones highlight with 2px solid `--buildrick-accent` border
+- Insertion line (2px `--buildrick-accent` horizontal bar) shows exact drop position
 - Invalid drop targets show no highlight
 
 ### State 6: Resize-in-Progress
 
 **Visual:**
-- Active handle fills with `--aqb-primary`
-- Dimension labels appear near the element: "320 × 200" in `--aqb-caption` size, `--aqb-primary` background pill
+- Active handle fills with `--buildrick-accent`
+- Dimension labels appear near the element: "320 × 200" in `--aqb-caption` size, `--buildrick-accent` background pill
 - Smart guides fire when edges align with siblings/parents (1px solid `#FF6B6B`)
-- Spacing labels show distance to nearest neighbors ("16px" in `--aqb-primary` background pills)
+- Spacing labels show distance to nearest neighbors ("16px" in `--buildrick-accent` background pills)
 
 ### State 7: Inline Text Editing
 
@@ -218,7 +218,7 @@ Canvas scales via CSS `transform: scale()` for zoom. Elements are NOT re-rendere
 | Phase | Visual Feedback | Performance |
 |-------|----------------|-------------|
 | Drag start (from sidebar) | Ghost preview at 50% opacity follows cursor | Immediate on mousedown + 3px movement threshold |
-| Drag over canvas | Drop zones highlight with `--aqb-primary` border; insertion line shows position | 60fps cursor tracking |
+| Drag over canvas | Drop zones highlight with `--buildrick-accent` border; insertion line shows position | 60fps cursor tracking |
 | Drag over invalid target | No highlight; cursor shows "not-allowed" | Immediate |
 | Drop | Element created at insertion point; auto-selected | Instant creation, canvas re-render < 16ms |
 | Auto-scroll | Canvas scrolls when cursor is within 40px of edge | Smooth scroll, 8px/frame |
@@ -270,7 +270,7 @@ Canvas scales via CSS `transform: scale()` for zoom. Elements are NOT re-rendere
 └─────────────────────────────┘
 ```
 
-**Visual spec:** `--aqb-chrome-surface` background, `--aqb-elevation-2` shadow, `--aqb-radius-md` corners, 8px vertical padding, 240px width. Items: `--aqb-body` text, `--aqb-text-secondary` for shortcuts. Hover: `--aqb-chrome-surface-hover` background. Dividers: 1px `--aqb-chrome-border`.
+**Visual spec:** `--aqb-chrome-surface` background, `--aqb-elevation-2` shadow, `--buildrick-design-radius-md` corners, 8px vertical padding, 240px width. Items: `--aqb-body` text, `--buildrick-text-secondary` for shortcuts. Hover: `--aqb-chrome-surface-hover` background. Dividers: 1px `--aqb-chrome-border`.
 
 ### Keyboard Shortcuts
 
@@ -309,7 +309,7 @@ Canvas scales via CSS `transform: scale()` for zoom. Elements are NOT re-rendere
 └─────────────────────────────────────┘
 ```
 
-**Visual:** Centered overlay, 480px wide, `--aqb-chrome-surface` bg, `--aqb-elevation-3` shadow, `--aqb-radius-xl` corners. Search input at top with auto-focus. Results use `--aqb-body` text, fuzzy-matched characters highlighted in `--aqb-primary`.
+**Visual:** Centered overlay, 480px wide, `--aqb-chrome-surface` bg, `--aqb-elevation-3` shadow, `--buildrick-design-radius-xl` corners. Search input at top with auto-focus. Results use `--aqb-body` text, fuzzy-matched characters highlighted in `--buildrick-accent`.
 
 ---
 
@@ -321,16 +321,16 @@ Canvas scales via CSS `transform: scale()` for zoom. Elements are NOT re-rendere
 └────────────────────────────────────────────────────────┘
 ```
 
-**Position:** Fixed to bottom-right of canvas area, 40px height, `--aqb-chrome-surface` bg with 80% opacity + backdrop blur, `--aqb-radius-lg` top corners.
+**Position:** Fixed to bottom-right of canvas area, 40px height, `--aqb-chrome-surface` bg with 80% opacity + backdrop blur, `--buildrick-design-radius-lg` top corners.
 
 | Control | Behavior | Visual |
 |---------|----------|--------|
 | Zoom dropdown | Click: shows preset list (25%, 50%, 75%, 100%, 150%, 200%). Also accepts direct number input. | `--aqb-body` text |
-| Zoom +/- | Increment/decrement by 10% | Icon buttons, `--aqb-text-secondary` |
+| Zoom +/- | Increment/decrement by 10% | Icon buttons, `--buildrick-text-secondary` |
 | Fit | Auto-calculate zoom to show entire page | Icon button |
-| Grid toggle | Show/hide pixel grid overlay | Toggle, active = `--aqb-primary` |
-| Rulers toggle | Show/hide top + left rulers | Toggle, active = `--aqb-primary` |
-| X-ray toggle | Show/hide dev overlay (boundaries, z-index, classes) | Toggle, active = `--aqb-warning` |
+| Grid toggle | Show/hide pixel grid overlay | Toggle, active = `--buildrick-accent` |
+| Rulers toggle | Show/hide top + left rulers | Toggle, active = `--buildrick-accent` |
+| X-ray toggle | Show/hide dev overlay (boundaries, z-index, classes) | Toggle, active = `--buildrick-warning` |
 
 ---
 

@@ -68,13 +68,13 @@ The Export Modal generates production-ready code from the visual design in multi
 
 ### State 1: Format Selection
 
-- **Format radio buttons:** Left column, 4 options. Active: `--aqb-primary` radio fill + label.
+- **Format radio buttons:** Left column, 4 options. Active: `--buildrick-accent` radio fill + label.
 - **File tree updates** when format changes (e.g., React shows `.tsx`, Vue shows `.vue`).
 - **Code preview updates** to show format-appropriate syntax.
 
 ### State 2: Code Quality Score
 
-- **Overall score:** Large number (82/100), progress bar `--aqb-success`/`--aqb-warning`/`--aqb-error` based on value.
+- **Overall score:** Large number (82/100), progress bar `--buildrick-success`/`--buildrick-warning`/`--buildrick-error` based on value.
 - **5 factors with individual scores:**
 
 | Factor | Weight | Measures |
@@ -92,7 +92,7 @@ The Export Modal generates production-ready code from the visual design in multi
 
 - **Tree view:** Standard folder/file tree, `--aqb-body-sm`, `--aqb-code` font for filenames.
 - **Click file:** Code preview pane shows that file's contents.
-- **Active file:** `--aqb-primary-subtle` bg highlight.
+- **Active file:** `--buildrick-accent-tint` bg highlight.
 - **Structure:** Mirrors component hierarchy from canvas (one component = one file).
 
 ### State 4: Live Preview

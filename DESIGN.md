@@ -239,3 +239,12 @@ Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / 
 | 2026-04-18 | Font stack fix — drop all system fallbacks | Current `--aqb-font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif` violates DESIGN.md explicit "no Roboto/system-ui/Helvetica" rule. Replaced with `"Inter Tight", sans-serif` only. |
 | 2026-04-18 | Delete legacy navbar tokens `--bar`, `--blue`, `--txt`, etc. | Dead tokens from first-gen editor. 11 tokens, used in a handful of legacy places. Replace with `--aqb-*` canonical. |
 | 2026-04-18 | Add Design + Publish to rail | Previously keyboard-only, inconsistent with every other config surface. Goes in Config zone. |
+
+## Token Namespace Contract (V3, 2026-04-19)
+
+Two namespaces, one invariant.
+
+- `--buildrick-*` — chrome tokens (sidebar, topbar, panels, inspector, buttons) and canvas operational tokens (selection glow, box-model, spacing on rendered user content). Static. Never mutated by JavaScript at runtime. Defined in `themes/default.css` + `components/Canvas/Canvas.css` + `editor/canvas/Canvas.css`.
+- `--buildrick-design-*` — user-editable design tokens from the Design tab. Runtime-mutated ONLY by `useTokenBase` / `useColorTokens` / `useSpacingTokens` / `useTypeTokens`. Defined in `features/design-system/constants.ts` DEFAULT_TOKENS.
+
+CI-enforceable invariants: see `docs/superpowers/specs/2026-04-19-theme-unification-v3-design.md` Section 2.

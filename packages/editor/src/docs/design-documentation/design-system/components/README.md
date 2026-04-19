@@ -27,7 +27,7 @@ All components use the Buildrik design token system (dark chrome, 4px spacing, I
 Every interactive component supports: Default, Hover, Active/Pressed, Focus, Disabled, Loading.
 
 ### Dark Theme
-All components render on `--aqb-chrome-bg` (#0F1117) or `--aqb-chrome-surface` (#161922). Text uses `--aqb-text-primary` (#F1F3F9) by default.
+All components render on `--aqb-chrome-bg` (#0F1117) or `--aqb-chrome-surface` (#161922). Text uses `--buildrick-text-primary` (#F1F3F9) by default.
 
 ### Accessibility
 Every component has keyboard support, ARIA attributes, and meets WCAG AA contrast ratios.

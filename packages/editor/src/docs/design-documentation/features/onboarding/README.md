@@ -68,11 +68,11 @@ Team Flow:
 └──────────────────────────────────────┘
 ```
 
-- **Visual:** Centered modal, 480px wide, `--aqb-chrome-surface` bg, `--aqb-elevation-3`, `--aqb-radius-xl`.
-- **Heading:** `--aqb-heading-lg`, `--aqb-text-primary`.
-- **Subtitle:** `--aqb-body`, `--aqb-text-secondary`.
+- **Visual:** Centered modal, 480px wide, `--aqb-chrome-surface` bg, `--aqb-elevation-3`, `--buildrick-design-radius-xl`.
+- **Heading:** `--aqb-heading-lg`, `--buildrick-text-primary`.
+- **Subtitle:** `--aqb-body`, `--buildrick-text-secondary`.
 - **Goal selector:** Radio buttons, answer personalizes template suggestions.
-- **CTA:** Primary button, `--aqb-primary` bg.
+- **CTA:** Primary button, `--buildrick-accent` bg.
 
 ### State 2: Project Summary Modal (Team)
 
@@ -93,7 +93,7 @@ Team Flow:
 | 4 | Top bar | "Project Controls — Preview, publish, collaborate, and more." |
 
 - **Navigation:** [Back] [Next] buttons + dot indicators (○○●○).
-- **Skip:** "Skip tour" link, `--aqb-text-tertiary`.
+- **Skip:** "Skip tour" link, `--buildrick-text-tertiary`.
 
 ### State 4: Spotlight Tour (Team — 3 Steps)
 
