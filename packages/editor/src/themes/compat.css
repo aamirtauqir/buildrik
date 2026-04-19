@@ -1,0 +1,92 @@
+/**
+ * themes/compat.css
+ * Buildrik DS V1 — deprecated alias layer (transitional)
+ *
+ * Phase 3 consumer migration drains each family; corresponding block deletes when
+ * zero-consumer check passes. Entire file deleted in Phase 4.
+ *
+ * DO NOT use these aliases in new code.
+ *
+ * @license BSD-3-Clause
+ */
+
+:root {
+  /* --accent (Phase 3.3) */
+  --accent: var(--buildrick-accent);
+
+  /* --ls-* LeftSidebar (Phase 3.1) */
+  --ls-bg-panel: var(--buildrick-bg-panel);
+  --ls-bg-card: var(--buildrick-bg-card);
+  --ls-bg-subtle: var(--buildrick-bg-subtle);
+  --ls-bg-hover: var(--buildrick-bg-hover);
+  --ls-text-primary: var(--buildrick-text-primary);
+  --ls-text-secondary: var(--buildrick-text-secondary);
+  --ls-text-muted: var(--buildrick-text-muted);
+  --ls-border: var(--buildrick-border);
+  --ls-border-light: var(--buildrick-border-light);
+  --ls-accent: var(--buildrick-accent);
+  --ls-accent-subtle: var(--buildrick-accent-subtle);
+  --ls-error: var(--buildrick-error);
+  --ls-success: var(--buildrick-success);
+  --ls-warning: var(--buildrick-warning);
+  --ls-shadow-dropdown: var(--buildrick-shadow-dropdown);
+
+  /* --rail-* LeftRail (Phase 3.2) */
+  --rail-bg: var(--buildrick-bg-panel);
+  --rail-active: var(--buildrick-accent);
+  --rail-active-bg: var(--buildrick-accent-subtle);
+  --rail-active-bg-hover: var(--buildrick-accent-tint);
+  --rail-active-bar: var(--buildrick-accent);
+  --rail-text-default: var(--buildrick-text-muted);
+  --rail-text-hover: var(--buildrick-text-secondary);
+  --rail-focus: var(--buildrick-border-focus);
+  --rail-tooltip-bg: var(--buildrick-text-primary);
+  --rail-badge-warn: var(--buildrick-warning);
+  --rail-badge-info: var(--buildrick-accent);
+  --rail-badge-ok: var(--buildrick-success);
+
+  /* --surface-* / --brand-* V2 semantic (Phase 3.4) */
+  --surface-primary: var(--buildrick-bg-panel);
+  --surface-secondary: var(--buildrick-bg-card);
+  --surface-hover: var(--buildrick-bg-hover);
+  --surface-elevated: var(--buildrick-bg-elevated);
+  --brand-primary: var(--buildrick-accent);
+  --brand-primary-hover: var(--buildrick-accent-hover);
+
+  /* --bar / --blue / --txt legacy navbar (Phase 3.5) */
+  --bar: var(--buildrick-bg-panel);
+  --blue: var(--buildrick-accent);
+  --txt: var(--buildrick-text-primary);
+
+  /* --primary-* old color variants (Phase 3.6) */
+  --primary-500: var(--buildrick-accent);
+  --primary-600: var(--buildrick-accent-hover);
+  --primary-700: var(--buildrick-accent-pressed);
+
+  /* --buildrick-control-* inspector aliases (Phase 3.7) */
+  --buildrick-control-accent: var(--buildrick-accent);
+  --buildrick-control-accent-alpha-08: rgba(45, 109, 255, 0.08);
+  --buildrick-control-accent-alpha-10: rgba(45, 109, 255, 0.10);
+  --buildrick-control-accent-alpha-20: rgba(45, 109, 255, 0.20);
+  --buildrick-control-accent-alpha-30: rgba(45, 109, 255, 0.30);
+  --buildrick-control-surface-input: var(--buildrick-bg-input);
+  --buildrick-control-surface-overlay: var(--buildrick-bg-panel);
+  --buildrick-control-surface-subtle: var(--buildrick-bg-subtle);
+  --buildrick-control-text-primary: var(--buildrick-text-primary);
+  --buildrick-control-text-secondary: var(--buildrick-text-secondary);
+  --buildrick-control-text-muted: var(--buildrick-text-muted);
+  --buildrick-control-text-tertiary: var(--buildrick-text-tertiary);
+
+  /* --buildrick-build-* Build tab (Phase 3.8) */
+  --buildrick-build-surface: var(--buildrick-bg-panel);
+  --buildrick-build-card: var(--buildrick-bg-card);
+  --buildrick-build-card-hover: var(--buildrick-bg-hover);
+  --buildrick-build-border: var(--buildrick-border);
+  --buildrick-build-border-hover: var(--buildrick-border-strong);
+
+  /* --buildrick-ai-* AI panel (Phase 3.9) */
+  --buildrick-ai-active: var(--buildrick-accent-pressed);
+  --buildrick-ai-hover: var(--buildrick-accent-hover);
+  --buildrick-ai-light: var(--buildrick-accent-tint);
+  --buildrick-ai-muted: var(--buildrick-accent-subtle);
+}
