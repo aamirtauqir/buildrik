@@ -67,10 +67,6 @@
   --buildrick-accent-tint: #3B82F6;
   --buildrick-accent-pressed: #1D4ED8;
   /* Legacy purple aliases (for gradual migration) */
-  --buildrick-accent: var(--buildrick-accent);
-  --buildrick-accent-tint: var(--buildrick-accent-tint);
-  --buildrick-accent-hover: var(--buildrick-accent-hover);
-  --buildrick-accent-tint: var(--buildrick-accent-tint);
   --buildrick-accent-purple-dark: var(--buildrick-accent-pressed);
 
   /* Selection Colors (Clean, Professional) - IA Redesign 2026 Part 5.4 */

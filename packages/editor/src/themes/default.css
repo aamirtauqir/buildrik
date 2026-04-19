@@ -36,10 +36,8 @@
   --buildrick-accent-emerald: var(--buildrick-success);
   --buildrick-accent-emerald-light: var(--buildrick-success-light);
   --buildrick-accent-glow: 0 0 0 3px var(--buildrick-accent-tint);
-  --buildrick-accent-hover: var(--buildrick-accent-hover);
   --buildrick-accent-light: var(--buildrick-accent-tint);
   --buildrick-accent-on: #FFFFFF;
-  --buildrick-accent-pressed: var(--buildrick-accent-pressed);
   --buildrick-accent-purple-05: rgba(45, 109, 255, 0.05);
   --buildrick-accent-purple-08: rgba(45, 109, 255, 0.08);
   --buildrick-accent-purple-10: rgba(45, 109, 255, 0.10);
@@ -63,8 +61,6 @@
   --buildrick-accent-purple-muted: var(--buildrick-accent-subtle);
   --buildrick-accent-rose: var(--buildrick-error);
   --buildrick-accent-rose-light: var(--buildrick-error-light);
-  --buildrick-accent-subtle: var(--buildrick-accent-subtle);
-  --buildrick-accent-tint: var(--buildrick-accent-tint);
   --buildrick-ai-active: var(--buildrick-accent-pressed);
   --buildrick-ai-hover: var(--buildrick-accent-hover);
   --buildrick-ai-light: var(--buildrick-accent-tint);
@@ -359,27 +355,16 @@
 
   /* Legacy accent names — aliased to cobalt */
   --buildrick-accent:        var(--accent);
-  --buildrick-accent-hover:  var(--buildrick-accent-hover);
-  --buildrick-accent-pressed: var(--buildrick-accent-pressed);
   --buildrick-accent-subtle:  var(--buildrick-accent-tint);
-  --buildrick-accent-subtle:  var(--buildrick-accent-subtle);
   --buildrick-accent-tint: var(--buildrick-accent-subtle);
   --buildrick-accent:         var(--accent);
-  --buildrick-accent-hover:   var(--buildrick-accent-hover);
   --buildrick-accent-light:   var(--buildrick-accent-tint);
   --buildrick-accent:        var(--accent);
-  --buildrick-accent-hover:  var(--buildrick-accent-hover);
-  --buildrick-accent-tint:  var(--buildrick-accent-tint);
-  --buildrick-accent-tint:  var(--buildrick-accent-tint);
-  --buildrick-accent-subtle:     var(--buildrick-accent-subtle);
 
   /* Legacy purple / AI tokens — re-routed to cobalt per DESIGN.md single-accent rule.
      These names remain so 60+ consumers keep rendering, but the VALUE is now cobalt.
      Cleanup PR will grep-rename these to --accent-* families. */
   --buildrick-accent:        var(--accent);
-  --buildrick-accent-hover:  var(--buildrick-accent-hover);
-  --buildrick-accent-tint:  var(--buildrick-accent-tint);
-  --buildrick-accent-tint:  var(--buildrick-accent-tint);
   --buildrick-accent-purple-muted:  var(--buildrick-accent-subtle);
   --buildrick-accent-purple-bg:     var(--buildrick-accent-subtle);
   --buildrick-accent-purple-3:   rgba(45, 109, 255, 0.03);
@@ -615,45 +600,18 @@
   --transition-glow:   200ms ease;
 
   /* ─────── LEFT SIDEBAR (--ls-*) — aliases to canonical ─────── */
-  --buildrick-bg-app:        var(--buildrick-bg-app);
-  --buildrick-bg-panel:      var(--buildrick-bg-panel);
-  --buildrick-bg-subtle:     var(--buildrick-bg-subtle);
-  --buildrick-bg-card:       var(--buildrick-bg-card);
-  --buildrick-bg-panel:     var(--buildrick-bg-panel);
-  --buildrick-bg-panel:  var(--buildrick-bg-panel);
 
-  --buildrick-text-primary:   var(--buildrick-text-primary);
-  --buildrick-text-secondary: var(--buildrick-text-secondary);
-  --buildrick-text-secondary:    var(--buildrick-text-secondary);
-  --buildrick-text-muted:     var(--buildrick-text-muted);
-  --buildrick-text-muted:    var(--buildrick-text-muted);
-  --buildrick-text-secondary:   var(--buildrick-text-secondary);
-  --buildrick-text-disabled:     var(--buildrick-text-disabled);
 
   --buildrick-border-light:     var(--buildrick-border);
-  --buildrick-border:      var(--buildrick-border);
-  --buildrick-border-medium:    var(--buildrick-border-medium);
-  --buildrick-border:      var(--buildrick-border);
-  --buildrick-border-medium:    var(--buildrick-border-medium);
-  --buildrick-border-medium:    var(--buildrick-border-medium);
-  --buildrick-border: var(--buildrick-border);
 
   --buildrick-accent:         var(--accent);
-  --buildrick-accent-tint:      var(--buildrick-accent-tint);
   --buildrick-accent-bg-hover:var(--buildrick-accent-tint);
   --buildrick-accent-border:  var(--accent);
-  --buildrick-text-primary:     var(--buildrick-text-primary);
 
-  --buildrick-error:        var(--buildrick-error);
   --buildrick-danger-bg:     var(--buildrick-error-light);
-  --buildrick-error: var(--buildrick-error);
   --buildrick-error-bg:      var(--buildrick-error-light);
-  --buildrick-error:    var(--buildrick-error);
   --buildrick-warning-bg:    var(--buildrick-warning-light);
-  --buildrick-warning:  var(--buildrick-warning);
-  --buildrick-success:  var(--buildrick-success);
   --buildrick-success-bg:    var(--buildrick-success-light);
-  --buildrick-warning:         var(--buildrick-warning);
   --buildrick-destructive:   var(--buildrick-error);
   --buildrick-green-check:   var(--buildrick-success);
   --buildrick-success-text-dark: var(--buildrick-success);
@@ -661,7 +619,6 @@
   --buildrick-canvas-dot:    rgba(15, 23, 42, 0.06);
   --buildrick-overlay:       rgba(15, 23, 42, 0.40);
   --buildrick-shadow-menu:   var(--buildrick-shadow-dropdown);
-  --buildrick-shadow-modal: var(--buildrick-shadow-modal);
 
   /* ─────── RAIL (--rail-*) — aliases to canonical ─────── */
   --rail-bg:              var(--buildrick-bg-panel);
