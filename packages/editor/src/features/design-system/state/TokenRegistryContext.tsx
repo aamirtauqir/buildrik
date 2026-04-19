@@ -16,6 +16,7 @@
 import * as React from "react";
 import type { DesignToken } from "../types";
 import { DEFAULT_TOKENS } from "../constants";
+import { migrateDesignTokens, CURRENT_SCHEMA_VERSION } from "../migrations";
 import { useColorTokens } from "./useColorTokens";
 import type { ColorTokensState, ColorTokensActions } from "./useColorTokens";
 import { useSpacingTokens } from "./useSpacingTokens";
@@ -60,27 +61,54 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
 }) => {
   const storageKey = `buildrick-design-tokens-${projectId ?? "default"}-v1`;
 
-  // CP2: Load from localStorage on first render. If corrupt or missing, fall back to DEFAULT_TOKENS.
+  // Load from localStorage on first render. Supports BOTH legacy array format
+  // and new versioned format ({schemaVersion, tokens}). Applies migrations
+  // when stored version < CURRENT_SCHEMA_VERSION. Falls through to DEFAULT_TOKENS
+  // on any error (private browsing, corrupt JSON, unknown shape).
   const initialTokens = React.useMemo((): DesignToken[] => {
     try {
       const raw = localStorage.getItem(storageKey);
-      if (raw) {
-        const parsed: unknown = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed as DesignToken[];
-        }
+      if (!raw) return DEFAULT_TOKENS;
+
+      const parsed: unknown = JSON.parse(raw);
+      let tokens: DesignToken[];
+      let storedVersion: number;
+
+      if (Array.isArray(parsed)) {
+        // Legacy format — pre-versioned. Treat as V1.
+        tokens = parsed as DesignToken[];
+        storedVersion = 1;
+      } else if (
+        parsed &&
+        typeof parsed === "object" &&
+        "schemaVersion" in parsed &&
+        "tokens" in parsed &&
+        Array.isArray((parsed as { tokens: unknown }).tokens)
+      ) {
+        tokens = (parsed as { tokens: DesignToken[] }).tokens;
+        storedVersion = (parsed as { schemaVersion: number }).schemaVersion;
+      } else {
+        return DEFAULT_TOKENS;
       }
+
+      if (storedVersion < CURRENT_SCHEMA_VERSION) {
+        tokens = migrateDesignTokens(tokens, storedVersion, CURRENT_SCHEMA_VERSION);
+      }
+
+      return tokens.length > 0 ? tokens : DEFAULT_TOKENS;
     } catch {
       // SecurityError (private browsing) or JSON.parse failure → use defaults
+      return DEFAULT_TOKENS;
     }
-    return DEFAULT_TOKENS;
   }, [storageKey]);
 
   const colorState = useColorTokens(initialTokens);
   const spacingState = useSpacingTokens(initialTokens);
   const typeState = useTypeTokens(initialTokens);
 
-  // CP2: Save all tokens to localStorage. Call this after apply.
+  // Save all tokens to localStorage in versioned format. Call this after apply.
+  // Versioned format is {schemaVersion, tokens} — the loader accepts both
+  // this and the legacy array-only format for backward compat.
   const persistAll = React.useCallback(() => {
     const all: DesignToken[] = [
       ...colorState.tokens,
@@ -88,7 +116,11 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
       ...typeState.tokens,
     ];
     try {
-      localStorage.setItem(storageKey, JSON.stringify(all));
+      const versioned = {
+        schemaVersion: CURRENT_SCHEMA_VERSION,
+        tokens: all,
+      };
+      localStorage.setItem(storageKey, JSON.stringify(versioned));
     } catch {
       // SecurityError in private browsing → no crash, just skip persistence
     }
