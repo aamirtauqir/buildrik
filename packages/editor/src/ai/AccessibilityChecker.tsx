@@ -293,7 +293,7 @@ export const AccessibilityChecker: React.FC<AccessibilityCheckerProps> = ({
                   style={{
                     marginTop: 4,
                     fontSize: 13,
-                    color: "var(--buildrick-text)",
+                    color: "var(--buildrick-text-primary)",
                   }}
                 >
                   {issue.message}

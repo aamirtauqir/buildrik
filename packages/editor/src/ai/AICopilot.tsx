@@ -608,7 +608,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   htmlPreview: {
     padding: 12,
-    background: "var(--buildrick-bg-canvas)",
+    background: "var(--buildrick-canvas-content)",
     borderRadius: 8,
     border: "1px solid var(--buildrick-border)",
     maxHeight: 200,
