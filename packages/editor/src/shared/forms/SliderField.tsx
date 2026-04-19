@@ -70,7 +70,7 @@ export const SliderField: React.FC<SliderFieldProps> = ({
         aria-valuenow={value}
         aria-valuetext={`${value}${unit}`}
         style={{
-          background: `linear-gradient(to right, var(--buildrick-accent) 0%, var(--buildrick-accent) ${percentage}%, var(--buildrick-bg-panel-secondary) ${percentage}%, var(--buildrick-bg-panel-secondary) 100%)`,
+          background: `linear-gradient(to right, var(--buildrick-accent) 0%, var(--buildrick-accent) ${percentage}%, var(--buildrick-bg-input) ${percentage}%, var(--buildrick-bg-input) 100%)`,
         }}
       />
       {marks && marks.length > 0 && (

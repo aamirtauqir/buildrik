@@ -169,7 +169,7 @@ export const SelectFontField: React.FC<SelectFontFieldProps> = ({
                 padding: "4px 8px",
                 background: !activeCategory
                   ? "var(--buildrick-accent)"
-                  : "var(--buildrick-bg-panel-secondary)",
+                  : "var(--buildrick-bg-input)",
                 border: "none",
                 borderRadius: 4,
                 color: !activeCategory ? "#fff" : "var(--buildrick-text-muted)",
@@ -186,7 +186,7 @@ export const SelectFontField: React.FC<SelectFontFieldProps> = ({
                 style={{
                   padding: "4px 8px",
                   background:
-                    activeCategory === cat ? "var(--buildrick-accent)" : "var(--buildrick-bg-panel-secondary)",
+                    activeCategory === cat ? "var(--buildrick-accent)" : "var(--buildrick-bg-input)",
                   border: "none",
                   borderRadius: 4,
                   color: activeCategory === cat ? "#fff" : "var(--buildrick-text-muted)",

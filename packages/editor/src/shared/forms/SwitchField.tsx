@@ -69,7 +69,7 @@ export const SwitchField: React.FC<SwitchFieldProps> = ({
         style={{
           width: s.width,
           height: s.height,
-          background: checked ? "var(--buildrick-accent)" : "var(--buildrick-bg-panel-secondary)",
+          background: checked ? "var(--buildrick-accent)" : "var(--buildrick-bg-input)",
           borderColor: checked ? "var(--buildrick-accent)" : "var(--buildrick-border)",
         }}
       >
@@ -88,7 +88,7 @@ export const SwitchField: React.FC<SwitchFieldProps> = ({
         <span
           className="buildrick-switch-label"
           style={{
-            fontSize: size === "sm" ? "var(--buildrick-text-sm)" : "var(--buildrick-text-base)",
+            fontSize: size === "sm" ? "var(--buildrick-text-sm)" : "var(--buildrick-text-sm-plus)",
             color: disabled ? "var(--buildrick-text-muted)" : "var(--buildrick-text-primary)",
           }}
         >

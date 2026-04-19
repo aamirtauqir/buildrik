@@ -218,7 +218,7 @@ const inputStyles: React.CSSProperties = {
   border: "1px solid var(--buildrick-border)",
   borderRadius: "6px",
   fontSize: "13px",
-  background: "var(--buildrick-surface)",
+  background: "var(--buildrick-bg-card)",
   color: "var(--buildrick-text-primary)",
 };
 

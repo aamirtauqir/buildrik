@@ -64,7 +64,7 @@ export const CodeField: React.FC<CodeFieldProps> = ({
             style={{
               fontSize: 12,
               color: "var(--buildrick-text-muted)",
-              background: "var(--buildrick-bg-panel-secondary)",
+              background: "var(--buildrick-bg-input)",
               padding: "2px 6px",
               borderRadius: 4,
               textTransform: "uppercase",
@@ -89,7 +89,7 @@ export const CodeField: React.FC<CodeFieldProps> = ({
           <div
             style={{
               padding: "8px 0",
-              background: "var(--buildrick-bg-panel-secondary)",
+              background: "var(--buildrick-bg-input)",
               borderRight: "1px solid var(--buildrick-border)",
               userSelect: "none",
               minWidth: 40,
