@@ -52,3 +52,33 @@ test('op 1b: template literal with --aqb-${id} (namespace remap) NOT auto-rewrit
   const input = "const v = `--aqb-${id}`;";
   assert.strictEqual(applyOp1b(input, mapping), input);
 });
+
+import { applyOp2 } from './theme-v3-codemod.mjs';
+
+test('op 2: @keyframes aqb-X renames', () => {
+  const m = { keyframes: { 'aqb-spin': 'buildrick-spin' } };
+  assert.strictEqual(applyOp2('@keyframes aqb-spin { from {} to {} }', m), '@keyframes buildrick-spin { from {} to {} }');
+});
+
+test('op 2: animation-name: aqb-X renames', () => {
+  const m = { keyframes: { 'aqb-spin': 'buildrick-spin' } };
+  assert.strictEqual(applyOp2('.foo { animation-name: aqb-spin; }', m), '.foo { animation-name: buildrick-spin; }');
+});
+
+test('op 2: animation: aqb-X <rest> renames', () => {
+  const m = { keyframes: { 'aqb-spin': 'buildrick-spin' } };
+  assert.strictEqual(applyOp2('.foo { animation: aqb-spin 200ms ease; }', m), '.foo { animation: buildrick-spin 200ms ease; }');
+});
+
+test('op 2: action:delete removes animation-name property line', () => {
+  const m = { keyframes: { 'aqb-slide-down': { action: 'delete' } } };
+  const input = '.foo {\n  color: red;\n  animation-name: aqb-slide-down;\n  padding: 4px;\n}';
+  const expected = '.foo {\n  color: red;\n  padding: 4px;\n}';
+  assert.strictEqual(applyOp2(input, m), expected);
+});
+
+test('op 2: multi-animation shorthand with orphan aborts', () => {
+  const m = { keyframes: { 'aqb-slide-down': { action: 'delete' } } };
+  const input = '.foo { animation: aqb-slide-down 200ms, other-live 100ms; }';
+  assert.throws(() => applyOp2(input, m), /multi-animation/i);
+});

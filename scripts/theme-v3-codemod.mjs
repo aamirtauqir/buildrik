@@ -66,6 +66,25 @@ export function applyOp1b(content, mapping) {
   );
 }
 
+export function applyOp2(content, mapping) {
+  let out = content;
+  for (const [oldName, target] of Object.entries(mapping.keyframes)) {
+    if (typeof target === 'string') {
+      out = out.replace(new RegExp(`@keyframes\\s+${oldName}\\b`, 'g'), `@keyframes ${target}`);
+      out = out.replace(new RegExp(`animation-name:\\s*${oldName}\\b`, 'g'), `animation-name: ${target}`);
+      out = out.replace(new RegExp(`(animation:\\s*)${oldName}\\b`, 'g'), `$1${target}`);
+    } else if (target && target.action === 'delete') {
+      const multi = new RegExp(`animation:\\s*${oldName}[^;]*,|,\\s*${oldName}\\b`);
+      if (multi.test(out)) {
+        throw new Error(`op2: multi-animation shorthand contains orphan ${oldName} — manual review required`);
+      }
+      out = out.replace(new RegExp(`^\\s*animation-name:\\s*${oldName}\\s*;\\s*\\n`, 'gm'), '');
+      out = out.replace(new RegExp(`^\\s*animation:\\s*${oldName}[^,;]*;\\s*\\n`, 'gm'), '');
+    }
+  }
+  return out;
+}
+
 const mode = process.argv[2] || 'dry-run';
 
 if (mode === 'dry-run') runDryRun();
