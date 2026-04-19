@@ -18,7 +18,7 @@
   --layer-accent-soft: rgba(59, 130, 246, 0.2);
   --layer-success: var(--buildrick-success);
   --layer-success-alpha: rgba(34, 197, 94, 0.15);
-  --layer-warning: var(--buildrick-accent-amber);
+  --layer-warning: var(--buildrick-warning);
   --layer-warning-alpha: rgba(251, 191, 36, 0.15);
   --layer-muted: var(--buildrick-text-tertiary);
   --layer-muted-alpha: rgba(100, 116, 139, 0.15);
@@ -104,7 +104,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: var(--buildrick-font-sm);
+  font-size: var(--buildrick-text-sm-plus);
   font-weight: 600;
   color: var(--buildrick-text-primary);
 }
@@ -114,7 +114,7 @@
 }
 
 .buildrick-layers-header-count {
-  font-size: var(--buildrick-font-xs);
+  font-size: var(--buildrick-text-sm);
   font-weight: 500;
   padding: 2px 8px;
   background: var(--buildrick-accent-tint);
@@ -210,7 +210,7 @@
   height: 16px;
   background: transparent;
   border: none;
-  border-radius: var(--buildrick-radius-xs);
+  border-radius: var(--buildrick-radius-sm);
   color: var(--buildrick-text-muted);
   cursor: pointer;
   transition: var(--buildrick-transition-fast);
@@ -287,7 +287,7 @@
   color: var(--buildrick-text-muted);
   padding: 1px 6px;
   background: var(--buildrick-surface-4);
-  border-radius: var(--buildrick-radius-xs);
+  border-radius: var(--buildrick-radius-sm);
   flex-shrink: 0;
 }
 
@@ -308,7 +308,7 @@
   padding: 1px 6px;
   background: var(--buildrick-accent-tint);
   color: var(--buildrick-accent);
-  border-radius: var(--buildrick-radius-xs);
+  border-radius: var(--buildrick-radius-sm);
   font-size: var(--buildrick-text-2xs-plus);
   font-weight: 600;
   flex-shrink: 0;
@@ -341,7 +341,7 @@
   height: 22px;
   border: none;
   background: transparent;
-  border-radius: var(--buildrick-radius-xs);
+  border-radius: var(--buildrick-radius-sm);
   cursor: pointer;
   color: var(--buildrick-text-muted);
   transition: var(--buildrick-transition-fast);
@@ -461,10 +461,10 @@
   width: 100%;
   padding: 2px 6px;
   border: 1px solid var(--layer-accent);
-  border-radius: var(--buildrick-radius-xs);
+  border-radius: var(--buildrick-radius-sm);
   background: var(--layer-accent-alpha);
   color: inherit;
-  font-size: var(--buildrick-font-xs);
+  font-size: var(--buildrick-text-sm);
   outline: none;
 }
 
@@ -506,7 +506,7 @@
 }
 
 .buildrick-multiselect-count {
-  font-size: var(--buildrick-font-xs);
+  font-size: var(--buildrick-text-sm);
   font-weight: 500;
   color: var(--buildrick-text-secondary);
 }
@@ -525,7 +525,7 @@
   background: var(--buildrick-surface-3);
   border: none;
   border-radius: var(--buildrick-radius-sm);
-  font-size: var(--buildrick-font-xs);
+  font-size: var(--buildrick-text-sm);
   color: var(--buildrick-text-primary);
   cursor: pointer;
   transition: var(--buildrick-transition-fast);
@@ -544,7 +544,7 @@
   height: 20px;
   background: transparent;
   border: none;
-  border-radius: var(--buildrick-radius-xs);
+  border-radius: var(--buildrick-radius-sm);
   color: var(--buildrick-text-muted);
   cursor: pointer;
   transition: var(--buildrick-transition-fast);
@@ -564,7 +564,7 @@
   background: transparent;
   border: 1px dashed var(--buildrick-border);
   border-radius: var(--buildrick-radius-md);
-  font-size: var(--buildrick-font-xs);
+  font-size: var(--buildrick-text-sm);
   color: var(--buildrick-text-muted);
   cursor: pointer;
   transition: var(--buildrick-transition-fast);
@@ -586,7 +586,7 @@
   padding: 8px 12px;
   background: var(--buildrick-error-bg, rgba(239, 68, 68, 0.1));
   border-bottom: 1px solid var(--buildrick-error);
-  font-size: var(--buildrick-font-xs);
+  font-size: var(--buildrick-text-sm);
   color: var(--buildrick-text-primary);
 }
 
@@ -600,7 +600,7 @@
   border: none;
   border-radius: var(--buildrick-radius-sm);
   color: #fff;
-  font-size: var(--buildrick-font-xs);
+  font-size: var(--buildrick-text-sm);
   font-weight: 500;
   cursor: pointer;
 }
@@ -611,7 +611,7 @@
   border: 1px solid var(--buildrick-border);
   border-radius: var(--buildrick-radius-sm);
   color: var(--buildrick-text-secondary);
-  font-size: var(--buildrick-font-xs);
+  font-size: var(--buildrick-text-sm);
   cursor: pointer;
 }
 
@@ -764,7 +764,7 @@
   font-size: 12px;
   cursor: pointer;
 }
-.buildrick-sel-btn:hover { background: var(--buildrick-surface-hover); }
+.buildrick-sel-btn:hover { background: var(--buildrick-bg-hover); }
 .buildrick-sel-btn--danger { border-color: var(--buildrick-error); color: var(--buildrick-error); }
 .buildrick-sel-btn--muted { color: var(--buildrick-text-tertiary); }
 /* Multi-selected row styling */
@@ -783,7 +783,7 @@
   gap: 2px;
   padding: 4px 12px;
   border-bottom: 1px solid var(--buildrick-border);
-  background: var(--buildrick-surface-1);
+  background: var(--buildrick-bg-panel);
   flex-shrink: 0;
 }
 .buildrick-bc-crumb {
@@ -795,7 +795,7 @@
   padding: 1px 2px;
   border-radius: 2px;
 }
-.buildrick-bc-crumb:hover { color: var(--buildrick-text-primary); background: var(--buildrick-surface-hover); }
+.buildrick-bc-crumb:hover { color: var(--buildrick-text-primary); background: var(--buildrick-bg-hover); }
 .buildrick-bc-sep { color: var(--buildrick-text-tertiary); font-size: 12px; }
 .buildrick-bc-current { font-size: 12px; font-weight: 600; color: var(--buildrick-text-primary); }
 
