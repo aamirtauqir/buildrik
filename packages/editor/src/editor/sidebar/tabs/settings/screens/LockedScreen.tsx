@@ -76,7 +76,7 @@ const waitlistBtnStyles: React.CSSProperties = {
   padding: "8px 16px",
   fontSize: "var(--buildrick-font-sm, 13px)",
   background: "var(--buildrick-accent, #2563eb)",
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
   border: "none",
   borderRadius: 6,
   cursor: "pointer",

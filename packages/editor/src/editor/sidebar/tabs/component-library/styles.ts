@@ -45,5 +45,5 @@ export const dialogPrimaryBtnStyles: React.CSSProperties = {
   cursor: "pointer",
   background: "var(--buildrick-accent)",
   border: "1px solid var(--buildrick-accent)",
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
 };

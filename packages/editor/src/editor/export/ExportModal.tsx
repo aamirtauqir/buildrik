@@ -213,7 +213,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
               height: 44,
               marginTop: 16,
               background: "var(--buildrick-accent)",
-              color: "#fff",
+              color: "var(--buildrick-text-on-accent)",
               border: "none",
               borderRadius: "var(--buildrick-radius-md)",
               fontSize: 14,
@@ -296,7 +296,7 @@ const ErrorState: React.FC<{ error: string }> = ({ error }) => (
       justifyContent: "center",
       height: 300,
       gap: 16,
-      color: "#ef4444",
+      color: "var(--buildrick-error)",
     }}
   >
     <span style={{ fontSize: 32 }}>Error</span>

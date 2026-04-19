@@ -256,7 +256,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               background: "linear-gradient(135deg, #8b5cf6, #3b82f6)",
               border: "none",
               borderRadius: 6,
-              color: "#fff",
+              color: "var(--buildrick-text-on-accent)",
               fontSize: 12,
               fontWeight: 600,
               cursor: "pointer",

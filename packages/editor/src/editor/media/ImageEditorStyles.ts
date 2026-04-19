@@ -48,7 +48,7 @@ export const imageEditorStyles = {
   },
   toolBtnActive: {
     background: "var(--buildrick-accent)",
-    color: "#fff",
+    color: "var(--buildrick-text-on-accent)",
   },
   controls: {
     padding: 16,

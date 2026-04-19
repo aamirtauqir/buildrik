@@ -35,30 +35,30 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
 }) => {
   const getStatusInfo = () => {
     if (!managerState.isOnline) {
-      return { icon: <OfflineIcon />, label: "Offline", color: "#94a3b8" };
+      return { icon: <OfflineIcon />, label: "Offline", color: "var(--buildrick-text-tertiary)" };
     }
 
     if (managerState.activeConflict) {
-      return { icon: <ConflictIcon />, label: "Conflict", color: "#f59e0b" };
+      return { icon: <ConflictIcon />, label: "Conflict", color: "var(--buildrick-warning)" };
     }
 
     if (status.isSyncing) {
-      return { icon: <SyncingIcon />, label: "Syncing...", color: "#3b82f6" };
+      return { icon: <SyncingIcon />, label: "Syncing...", color: "var(--buildrick-accent)" };
     }
 
     if (status.error) {
-      return { icon: <ErrorIcon />, label: "Sync Error", color: "#ef4444" };
+      return { icon: <ErrorIcon />, label: "Sync Error", color: "var(--buildrick-error)" };
     }
 
     if (status.hasLocalChanges) {
-      return { icon: <UnsyncedIcon />, label: "Unsaved changes", color: "#f59e0b" };
+      return { icon: <UnsyncedIcon />, label: "Unsaved changes", color: "var(--buildrick-warning)" };
     }
 
     if (status.lastSyncedAt) {
-      return { icon: <SyncedIcon />, label: "Synced", color: "#10b981" };
+      return { icon: <SyncedIcon />, label: "Synced", color: "var(--buildrick-success)" };
     }
 
-    return { icon: <CloudIcon />, label: "Not synced", color: "#94a3b8" };
+    return { icon: <CloudIcon />, label: "Not synced", color: "var(--buildrick-text-tertiary)" };
   };
 
   const { icon, label, color } = getStatusInfo();
@@ -229,8 +229,8 @@ const badgeStyles: React.CSSProperties = {
   minWidth: "16px",
   height: "16px",
   padding: "0 4px",
-  background: "#f59e0b",
-  color: "#fff",
+  background: "var(--buildrick-warning)",
+  color: "var(--buildrick-text-on-accent)",
   fontSize: "10px",
   fontWeight: 600,
   borderRadius: "8px",

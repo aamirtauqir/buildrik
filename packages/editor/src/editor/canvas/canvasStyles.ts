@@ -13,7 +13,7 @@ import type { DeviceType } from "../../shared/types";
 
 export const wrapperStyles: React.CSSProperties = {
   flex: 1,
-  background: "#f1f5f9",
+  background: "var(--buildrick-bg-subtle)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -34,7 +34,7 @@ export function getCanvasStyles(
     height: size.height,
     maxWidth: device === "desktop" ? "100%" : size.width,
     maxHeight: device === "desktop" ? "100%" : size.height,
-    background: "#fff",
+    background: "var(--buildrick-bg-card)",
     borderRadius: 12,
     boxShadow: isDragOver
       ? "0 0 0 3px #89b4fa, 0 8px 32px rgba(0,0,0,0.4)"

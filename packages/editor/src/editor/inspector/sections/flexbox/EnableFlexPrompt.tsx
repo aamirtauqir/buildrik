@@ -43,7 +43,7 @@ export const EnableFlexPrompt: React.FC<EnableFlexPromptProps> = ({ onChange }) 
         background: "var(--buildrick-accent)",
         border: "none",
         borderRadius: 4,
-        color: "#fff",
+        color: "var(--buildrick-text-on-accent)",
         fontSize: 12,
         fontWeight: 600,
         cursor: "pointer",

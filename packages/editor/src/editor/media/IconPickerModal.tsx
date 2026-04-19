@@ -87,7 +87,7 @@ const styles = {
   categoryBtnActive: {
     background: "var(--buildrick-accent)",
     borderColor: "var(--buildrick-accent)",
-    color: "#fff",
+    color: "var(--buildrick-text-on-accent)",
   },
   sectionTitle: {
     fontSize: 12,

@@ -175,7 +175,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
               background: "var(--buildrick-accent)",
               border: "none",
               borderRadius: 6,
-              color: "#fff",
+              color: "var(--buildrick-text-on-accent)",
               fontSize: 12,
               fontWeight: 600,
               cursor: "pointer",

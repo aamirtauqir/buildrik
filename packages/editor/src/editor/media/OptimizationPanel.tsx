@@ -64,7 +64,7 @@ const styles: Record<string, React.CSSProperties> = {
   formatBtnActive: {
     background: "var(--buildrick-accent)",
     borderColor: "var(--buildrick-accent)",
-    color: "#fff",
+    color: "var(--buildrick-text-on-accent)",
   },
   sliderContainer: {
     display: "flex",

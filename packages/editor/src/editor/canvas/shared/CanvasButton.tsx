@@ -100,7 +100,7 @@ export const CanvasButton: React.FC<CanvasButtonProps> = ({
     ...variantStyle.base,
     ...(active && {
       background: CANVAS_COLORS.primary,
-      color: "#fff",
+      color: "var(--buildrick-text-on-accent)",
     }),
     ...(isHovered && !disabled && variantStyle.hover),
     ...(disabled && {

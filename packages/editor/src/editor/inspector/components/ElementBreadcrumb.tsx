@@ -99,7 +99,7 @@ const styles = {
   },
   emptyState: {
     padding: "8px 12px",
-    color: "#6c7086",
+    color: "var(--buildrick-text-muted)",
     fontSize: 12,
     fontStyle: "italic" as const,
   },

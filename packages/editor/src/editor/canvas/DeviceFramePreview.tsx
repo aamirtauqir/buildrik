@@ -82,7 +82,7 @@ const shellStyle = (spec: FrameSpec): React.CSSProperties => ({
   position: "relative",
   width: spec.outerWidth,
   height: spec.outerHeight,
-  background: "#1a1a1a",
+  background: "var(--buildrick-text-primary)",
   borderRadius: spec.outerRadius,
   boxShadow:
     "0 12px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06) inset",
@@ -99,7 +99,7 @@ const screenStyle = (spec: FrameSpec): React.CSSProperties => ({
   height: spec.screenHeight,
   borderRadius: spec.screenRadius,
   overflow: "auto",
-  background: "#fff",
+  background: "var(--buildrick-bg-card)",
   position: "relative",
 });
 
@@ -110,7 +110,7 @@ const notchStyle: React.CSSProperties = {
   transform: "translateX(-50%)",
   width: 150,
   height: 28,
-  background: "#1a1a1a",
+  background: "var(--buildrick-text-primary)",
   borderRadius: "0 0 18px 18px",
   zIndex: 2,
   display: "flex",

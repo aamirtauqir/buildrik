@@ -71,7 +71,7 @@ const styles = {
     background: "rgba(0, 115, 230, 0.2)",
     border: "1px solid rgba(0, 115, 230, 0.3)",
     borderRadius: 6,
-    color: "#0073E6",
+    color: "var(--buildrick-accent)",
     fontSize: 12,
     fontWeight: 600,
     cursor: "pointer",

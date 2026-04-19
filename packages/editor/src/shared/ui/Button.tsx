@@ -60,7 +60,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       // Tier 1 — Primary CTA (Publish, Save)
       primary: {
         background: "var(--buildrick-accent)",
-        color: "#fff",
+        color: "var(--buildrick-text-on-accent)",
         fontWeight: 600,
         border: "none",
         boxShadow: "0 2px 8px rgba(99, 102, 241, 0.25)",
@@ -79,12 +79,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       },
       danger: {
         background: "var(--buildrick-error)",
-        color: "#fff",
+        color: "var(--buildrick-text-on-accent)",
         border: "none",
       },
       success: {
         background: "var(--buildrick-success)",
-        color: "#fff",
+        color: "var(--buildrick-text-on-accent)",
         border: "none",
       },
     };

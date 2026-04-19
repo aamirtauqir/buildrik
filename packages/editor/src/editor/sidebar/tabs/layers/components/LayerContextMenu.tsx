@@ -161,7 +161,7 @@ const tooltipStyles: React.CSSProperties = {
   zIndex: 10001,
   padding: "6px 10px",
   borderRadius: 6,
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
   fontSize: 12,
   fontWeight: 500,
   whiteSpace: "nowrap" as const,

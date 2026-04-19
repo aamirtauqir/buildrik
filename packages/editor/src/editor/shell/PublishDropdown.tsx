@@ -267,7 +267,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
             top: buttonRef.current.getBoundingClientRect().bottom + 6,
             right: window.innerWidth - buttonRef.current.getBoundingClientRect().right - 26,
             width: 240,
-            background: "#FFFFFF",
+            background: "var(--buildrick-bg-card)",
             border: "1px solid #E2E8F0",
             borderRadius: 10,
             boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
@@ -314,13 +314,13 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
                     <span>{opt.label}</span>
                   </div>
                   {opt.sublabel && (
-                    <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 2 }}>
+                    <div style={{ fontSize: 11, color: "var(--buildrick-text-tertiary)", marginTop: 2 }}>
                       {opt.sublabel}
                     </div>
                   )}
                 </div>
                 {opt.external && (
-                  <span style={{ color: "#94A3B8", flexShrink: 0, marginTop: 1 }}>
+                  <span style={{ color: "var(--buildrick-text-tertiary)", flexShrink: 0, marginTop: 1 }}>
                     <IconExternal />
                   </span>
                 )}

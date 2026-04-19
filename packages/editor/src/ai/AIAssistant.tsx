@@ -226,7 +226,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
               background: "rgba(239, 68, 68, 0.1)",
               border: "1px solid rgba(239, 68, 68, 0.3)",
               borderRadius: 8,
-              color: "#ef4444",
+              color: "var(--buildrick-error)",
               fontSize: 13,
             }}
           >

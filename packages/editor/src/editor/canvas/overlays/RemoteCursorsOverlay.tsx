@@ -58,7 +58,7 @@ const labelStyle: React.CSSProperties = {
   borderRadius: 4,
   fontSize: 12,
   fontWeight: 500,
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
   whiteSpace: "nowrap",
   maxWidth: 120,
   overflow: "hidden",

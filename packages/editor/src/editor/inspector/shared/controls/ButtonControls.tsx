@@ -84,7 +84,7 @@ export const CompactButtonGroup: React.FC<CompactButtonGroupProps> = ({
         <span
           style={{
             fontSize: 12,
-            color: "#71717a",
+            color: "var(--buildrick-text-tertiary)",
             fontWeight: 500,
             minWidth: labelWidth,
           }}

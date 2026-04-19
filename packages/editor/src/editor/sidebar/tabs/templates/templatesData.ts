@@ -1,6 +1,13 @@
 /**
- * Templates Data - Types, interfaces, and template definitions
- * Extracted from TemplatesTab.tsx for maintainability
+ * Templates Data - Types, interfaces, and template definitions.
+ * Extracted from TemplatesTab.tsx for maintainability.
+ *
+ * @lint-hex-policy: user-content
+ *   Template HTML strings are USER SITE CONTENT (deployed to user's website
+ *   when they pick a template). Hex colors here are intentional sample
+ *   palettes — they get replaced by user's Design tab tokens at publish time
+ *   via the site-output generator. Editor chrome rules do not apply.
+ *
  * @license BSD-3-Clause
  */
 

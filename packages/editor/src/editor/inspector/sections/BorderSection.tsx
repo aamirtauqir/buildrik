@@ -179,7 +179,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
             <div
               style={{
                 fontSize: 12,
-                color: "#71717a",
+                color: "var(--buildrick-text-tertiary)",
                 fontWeight: 500,
                 marginBottom: 12,
               }}
@@ -216,7 +216,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
             <div
               style={{
                 fontSize: 12,
-                color: "#71717a",
+                color: "var(--buildrick-text-tertiary)",
                 fontWeight: 500,
                 marginBottom: 12,
               }}

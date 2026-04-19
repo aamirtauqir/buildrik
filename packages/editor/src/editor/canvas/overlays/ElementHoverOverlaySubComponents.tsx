@@ -227,7 +227,7 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
       )}
     </div>
     <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
-      {info.parentName && <span style={{ color: "#6c7086" }}>in {info.parentName}</span>}
+      {info.parentName && <span style={{ color: "var(--buildrick-text-muted)" }}>in {info.parentName}</span>}
       <span style={{ color: "#a5f3fc", fontFamily: "monospace" }}>
         {info.dimensions.width} × {info.dimensions.height}
       </span>

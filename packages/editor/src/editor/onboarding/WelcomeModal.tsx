@@ -103,7 +103,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
             padding: "12px 24px",
             borderRadius: 8,
             background: "var(--buildrick-accent, #3b82f6)",
-            color: "#fff",
+            color: "var(--buildrick-text-on-accent)",
             border: "none",
             cursor: "pointer",
             fontSize: 14,

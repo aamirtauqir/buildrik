@@ -83,7 +83,7 @@ export const TabGuardModal: React.FC<{
               background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
               border: "none",
               borderRadius: 6,
-              color: "#fff",
+              color: "var(--buildrick-text-on-accent)",
               fontSize: 12,
               fontWeight: 600,
               cursor: "pointer",
@@ -95,10 +95,10 @@ export const TabGuardModal: React.FC<{
             onClick={onDiscard}
             style={{
               padding: "7px 14px",
-              background: "#ef4444",
+              background: "var(--buildrick-error)",
               border: "none",
               borderRadius: 6,
-              color: "#fff",
+              color: "var(--buildrick-text-on-accent)",
               fontSize: 12,
               fontWeight: 600,
               cursor: "pointer",

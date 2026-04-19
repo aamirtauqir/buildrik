@@ -306,12 +306,12 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
                     }}
                   >
                     {nameValidation.error && (
-                      <span style={{ color: "#EF4444", display: "block" }}>
+                      <span style={{ color: "var(--buildrick-error)", display: "block" }}>
                         {nameValidation.error}
                       </span>
                     )}
                     {nameValidation.warning && (
-                      <span style={{ color: "#F59E0B", display: "block" }}>
+                      <span style={{ color: "var(--buildrick-warning)", display: "block" }}>
                         {nameValidation.warning}
                       </span>
                     )}
@@ -391,7 +391,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
             </button>
             {pages.length > 1 && (
               <button
-                style={{ ...menuItemStyles, color: "#ef4444" }}
+                style={{ ...menuItemStyles, color: "var(--buildrick-error)" }}
                 role="menuitem"
                 onClick={() => handleDeleteRequest(contextMenu.pageId)}
               >

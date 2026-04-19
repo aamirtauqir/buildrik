@@ -111,7 +111,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: 480,
-          background: "#FFFFFF",
+          background: "var(--buildrick-bg-card)",
           border: "1px solid #E2E8F0",
           borderRadius: 14,
           boxShadow: "0 24px 64px rgba(0,0,0,0.15)",
@@ -133,10 +133,10 @@ export const InviteModal: React.FC<InviteModalProps> = ({
           }}
         >
           <div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A" }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "var(--buildrick-text-primary)" }}>
               Invite to Buildrik
             </div>
-            <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>
+            <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginTop: 2 }}>
               Collaborate on your project in real time
             </div>
           </div>
@@ -152,7 +152,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               background: "transparent",
               border: "none",
               borderRadius: 6,
-              color: "#94A3B8",
+              color: "var(--buildrick-text-tertiary)",
               cursor: "pointer",
               transition: "background 0.1s ease",
             }}
@@ -168,7 +168,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
 
           {/* Share link */}
           <div style={{ marginBottom: 20 }}>
-            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#475569", marginBottom: 6 }}>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--buildrick-text-secondary)", marginBottom: 6 }}>
               Sharing link
             </label>
             <div
@@ -177,19 +177,19 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                 alignItems: "center",
                 gap: 8,
                 padding: "8px 10px",
-                background: "#F8FAFC",
+                background: "var(--buildrick-bg-panel)",
                 border: "1px solid #E2E8F0",
                 borderRadius: 8,
               }}
             >
-              <span style={{ color: "#94A3B8", flexShrink: 0 }}>
+              <span style={{ color: "var(--buildrick-text-tertiary)", flexShrink: 0 }}>
                 <IconLink />
               </span>
               <span
                 style={{
                   flex: 1,
                   fontSize: 12,
-                  color: "#64748B",
+                  color: "var(--buildrick-text-muted)",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
@@ -201,7 +201,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                 onClick={handleCopy}
                 style={{
                   padding: "3px 10px",
-                  background: "#FFFFFF",
+                  background: "var(--buildrick-bg-card)",
                   border: "1px solid #E2E8F0",
                   borderRadius: 6,
                   fontSize: 12,
@@ -220,7 +220,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
 
           {/* Email + Role */}
           <div style={{ marginBottom: 20 }}>
-            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#475569", marginBottom: 6 }}>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--buildrick-text-secondary)", marginBottom: 6 }}>
               Invite by email
             </label>
             <div style={{ display: "flex", gap: 8 }}>
@@ -236,11 +236,11 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                   flex: 1,
                   height: 36,
                   padding: "0 12px",
-                  background: "#FFFFFF",
+                  background: "var(--buildrick-bg-card)",
                   border: "1px solid #E2E8F0",
                   borderRadius: 8,
                   fontSize: 13,
-                  color: "#0F172A",
+                  color: "var(--buildrick-text-primary)",
                   outline: "none",
                   fontFamily: "inherit",
                   transition: "border-color 0.1s ease",
@@ -255,11 +255,11 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                 style={{
                   height: 36,
                   padding: "0 10px",
-                  background: "#FFFFFF",
+                  background: "var(--buildrick-bg-card)",
                   border: "1px solid #E2E8F0",
                   borderRadius: 8,
                   fontSize: 13,
-                  color: "#334155",
+                  color: "var(--buildrick-text-secondary)",
                   cursor: "pointer",
                   outline: "none",
                   fontFamily: "inherit",
@@ -274,8 +274,8 @@ export const InviteModal: React.FC<InviteModalProps> = ({
 
           {/* Message (optional) */}
           <div style={{ marginBottom: 20 }}>
-            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#475569", marginBottom: 6 }}>
-              Message <span style={{ fontWeight: 400, color: "#94A3B8" }}>(optional)</span>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--buildrick-text-secondary)", marginBottom: 6 }}>
+              Message <span style={{ fontWeight: 400, color: "var(--buildrick-text-tertiary)" }}>(optional)</span>
             </label>
             <textarea
               placeholder="Add a personal message…"
@@ -286,11 +286,11 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               style={{
                 width: "100%",
                 padding: "8px 12px",
-                background: "#FFFFFF",
+                background: "var(--buildrick-bg-card)",
                 border: "1px solid #E2E8F0",
                 borderRadius: 8,
                 fontSize: 13,
-                color: "#0F172A",
+                color: "var(--buildrick-text-primary)",
                 outline: "none",
                 resize: "none",
                 fontFamily: "inherit",
@@ -305,7 +305,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
           {/* Existing members */}
           {MOCK_MEMBERS.length > 0 && (
             <div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#475569", marginBottom: 8 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--buildrick-text-secondary)", marginBottom: 8 }}>
                 Team members ({MOCK_MEMBERS.length})
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -337,13 +337,13 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                           flexShrink: 0,
                         }}
                       >
-                        <span style={{ fontSize: 11, fontWeight: 700, color: "#FFFFFF" }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "var(--buildrick-text-on-accent)" }}>
                           {m.initials}
                         </span>
                       </div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 13, fontWeight: 500, color: "#0F172A" }}>{m.name}</div>
-                        <div style={{ fontSize: 11, color: "#94A3B8" }}>{m.email}</div>
+                        <div style={{ fontSize: 13, fontWeight: 500, color: "var(--buildrick-text-primary)" }}>{m.name}</div>
+                        <div style={{ fontSize: 11, color: "var(--buildrick-text-tertiary)" }}>{m.email}</div>
                       </div>
                       <span
                         style={{
@@ -379,12 +379,12 @@ export const InviteModal: React.FC<InviteModalProps> = ({
             onClick={onClose}
             style={{
               padding: "7px 16px",
-              background: "#FFFFFF",
+              background: "var(--buildrick-bg-card)",
               border: "1px solid #E2E8F0",
               borderRadius: 8,
               fontSize: 13,
               fontWeight: 500,
-              color: "#475569",
+              color: "var(--buildrick-text-secondary)",
               cursor: "pointer",
               fontFamily: "inherit",
               transition: "background 0.1s ease",
@@ -404,7 +404,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               borderRadius: 8,
               fontSize: 13,
               fontWeight: 600,
-              color: "#FFFFFF",
+              color: "var(--buildrick-text-on-accent)",
               cursor: email.trim() ? "pointer" : "default",
               fontFamily: "inherit",
               transition: "background 0.1s ease",

@@ -59,7 +59,7 @@ const styles: Record<string, React.CSSProperties> = {
     position: "absolute",
     width: 12,
     height: 12,
-    background: "#fff",
+    background: "var(--buildrick-bg-card)",
     border: "2px solid #89b4fa",
     borderRadius: 2,
   },
@@ -81,7 +81,7 @@ const styles: Record<string, React.CSSProperties> = {
   presetBtnActive: {
     background: "var(--buildrick-accent)",
     borderColor: "var(--buildrick-accent)",
-    color: "#fff",
+    color: "var(--buildrick-text-on-accent)",
   },
 };
 
@@ -293,7 +293,7 @@ export const CropOverlay: React.FC<CropOverlayProps> = ({
               bottom: 4,
               right: 4,
               background: "rgba(0,0,0,0.7)",
-              color: "#fff",
+              color: "var(--buildrick-text-on-accent)",
               padding: "2px 6px",
               borderRadius: 3,
               fontSize: 12,

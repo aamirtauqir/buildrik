@@ -230,7 +230,7 @@ const selectStyles: React.CSSProperties = {
 const buttonStyles: React.CSSProperties = {
   padding: "10px 16px",
   background: "var(--buildrick-accent)",
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
   border: "none",
   borderRadius: "6px",
   fontSize: "13px",

@@ -125,7 +125,7 @@ const TOGGLE_PILL_BTN: React.CSSProperties = {
 const TOGGLE_PILL_ACTIVE: React.CSSProperties = {
   ...TOGGLE_PILL_BTN,
   background: "var(--buildrick-accent)",
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
 };
 
 const TOGGLE_PILL_DISABLED: React.CSSProperties = {

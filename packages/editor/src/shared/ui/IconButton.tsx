@@ -78,7 +78,7 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
     const hoverStyles = {
       ghost: { background: "var(--buildrick-bg-hover)", color: "var(--buildrick-text-primary)" },
       subtle: { background: "var(--buildrick-surface-4)", color: "var(--buildrick-text-primary)" },
-      solid: { background: "var(--buildrick-accent)", color: "#fff" },
+      solid: { background: "var(--buildrick-accent)", color: "var(--buildrick-text-on-accent)" },
     };
 
     const [isHovered, setIsHovered] = React.useState(false);

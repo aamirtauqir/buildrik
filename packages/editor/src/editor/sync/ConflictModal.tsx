@@ -227,7 +227,7 @@ const buttonStyles: React.CSSProperties = {
 
 const primaryButtonStyles: React.CSSProperties = {
   background: "var(--buildrick-accent)",
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
 };
 
 const secondaryButtonStyles: React.CSSProperties = {

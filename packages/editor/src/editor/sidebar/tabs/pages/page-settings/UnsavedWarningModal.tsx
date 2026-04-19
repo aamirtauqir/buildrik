@@ -133,7 +133,7 @@ const saveBtn: React.CSSProperties = {
   borderRadius: 7,
   border: "none",
   background: "#2D6DFF",
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
   fontSize: 12,
   fontWeight: 600,
   cursor: "pointer",

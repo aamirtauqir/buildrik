@@ -163,11 +163,11 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
               borderRadius: 8,
               fontFamily: "var(--buildrick-font-family-mono)",
               fontSize: 12,
-              color: "#71717a",
+              color: "var(--buildrick-text-tertiary)",
               wordBreak: "break-all",
             }}
           >
-            <div style={{ color: "#0073E6", marginBottom: 4 }}>Generated CSS:</div>
+            <div style={{ color: "var(--buildrick-accent)", marginBottom: 4 }}>Generated CSS:</div>
             <code>animation: {generateAnimationCSS(localAnimation)};</code>
           </div>
         </>
@@ -182,7 +182,7 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
             border: "1px solid rgba(245, 158, 11, 0.2)",
             borderRadius: 8,
             fontSize: 12,
-            color: "#f59e0b",
+            color: "var(--buildrick-warning)",
             lineHeight: 1.5,
           }}
         >

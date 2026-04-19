@@ -38,8 +38,8 @@ const AVATAR_PALETTE = [
 
 /** Mock users shown in demo/disconnected mode */
 const MOCK_USERS: CollaborationUser[] = [
-  { id: "1", name: "You", color: "#6366f1", lastActive: Date.now() },
-  { id: "2", name: "Ana", color: "#8b5cf6", lastActive: Date.now() },
+  { id: "1", name: "You", color: "var(--buildrick-accent)", lastActive: Date.now() },
+  { id: "2", name: "Ana", color: "var(--buildrick-accent)", lastActive: Date.now() },
 ];
 
 // ============================================================================
@@ -145,7 +145,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ user, isSelf, role, stackIndex 
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: color,
-    color: "#fff",
+    color: "var(--buildrick-text-on-accent)",
     fontSize: 11,
     fontWeight: 600,
     border: "2px solid var(--buildrick-bg-dark)",

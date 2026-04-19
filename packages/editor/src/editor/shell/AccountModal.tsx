@@ -70,10 +70,10 @@ const Toggle: React.FC<{ on: boolean }> = ({ on }) => (
 const TabProfile: React.FC = () => (
   <>
     <div>
-      <div style={{ fontSize: 24, fontWeight: 700, color: "#111827", fontFamily: "Inter, sans-serif" }}>
+      <div style={{ fontSize: 24, fontWeight: 700, color: "var(--buildrick-text-primary)", fontFamily: "Inter, sans-serif" }}>
         Profile
       </div>
-      <div style={{ fontSize: 13, fontWeight: 500, color: "#64748B", marginTop: 4 }}>
+      <div style={{ fontSize: 13, fontWeight: 500, color: "var(--buildrick-text-muted)", marginTop: 4 }}>
         Manage your personal account settings
       </div>
     </div>
@@ -85,23 +85,23 @@ const TabProfile: React.FC = () => (
           width: 64,
           height: 64,
           borderRadius: 999,
-          background: "#8B5CF6",
+          background: "var(--buildrick-accent)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           flexShrink: 0,
         }}
       >
-        <span style={{ fontSize: 20, fontWeight: 700, color: "#FFFFFF", fontFamily: "Inter, sans-serif" }}>
+        <span style={{ fontSize: 20, fontWeight: 700, color: "var(--buildrick-text-on-accent)", fontFamily: "Inter, sans-serif" }}>
           AS
         </span>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "#111827" }}>Aamir Siddiqui</div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--buildrick-text-primary)" }}>Aamir Siddiqui</div>
         <button
           style={{
             fontSize: 12,
-            color: "#2563EB",
+            color: "var(--buildrick-accent-hover)",
             cursor: "pointer",
             background: "none",
             border: "none",
@@ -117,7 +117,7 @@ const TabProfile: React.FC = () => (
     {/* Email field */}
     <div>
       <label
-        style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#475569", marginBottom: 6 }}
+        style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--buildrick-text-secondary)", marginBottom: 6 }}
       >
         Email
       </label>
@@ -131,8 +131,8 @@ const TabProfile: React.FC = () => (
           borderRadius: 8,
           padding: "0 12px",
           fontSize: 13,
-          color: "#111827",
-          background: "#F8FAFC",
+          color: "var(--buildrick-text-primary)",
+          background: "var(--buildrick-bg-panel)",
           width: "100%",
           boxSizing: "border-box",
           outline: "none",
@@ -143,12 +143,12 @@ const TabProfile: React.FC = () => (
 
     {/* Notification preferences */}
     <div>
-      <div style={{ fontSize: 14, fontWeight: 600, color: "#0F172A", marginBottom: 8 }}>
+      <div style={{ fontSize: 14, fontWeight: 600, color: "var(--buildrick-text-primary)", marginBottom: 8 }}>
         Notification preferences
       </div>
       <div
         style={{
-          background: "#FFFFFF",
+          background: "var(--buildrick-bg-card)",
           border: "1px solid #D1D5DB",
           borderRadius: 8,
           padding: 12,
@@ -158,11 +158,11 @@ const TabProfile: React.FC = () => (
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: 13, fontWeight: 500, color: "#64748B" }}>Email notifications</span>
+          <span style={{ fontSize: 13, fontWeight: 500, color: "var(--buildrick-text-muted)" }}>Email notifications</span>
           <Toggle on={true} />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: 13, fontWeight: 500, color: "#64748B" }}>Push notifications</span>
+          <span style={{ fontSize: 13, fontWeight: 500, color: "var(--buildrick-text-muted)" }}>Push notifications</span>
           <Toggle on={false} />
         </div>
       </div>
@@ -171,10 +171,10 @@ const TabProfile: React.FC = () => (
     {/* Save button */}
     <button
       style={{
-        background: "#2563EB",
+        background: "var(--buildrick-accent-hover)",
         height: 38,
         borderRadius: 8,
-        color: "#FFFFFF",
+        color: "var(--buildrick-text-on-accent)",
         fontSize: 13,
         fontWeight: 700,
         padding: "0 16px",
@@ -193,7 +193,7 @@ const TabProfile: React.FC = () => (
 
 const TabTeam: React.FC = () => (
   <>
-    <div style={{ fontSize: 24, fontWeight: 700, color: "#111827" }}>Team & Access</div>
+    <div style={{ fontSize: 24, fontWeight: 700, color: "var(--buildrick-text-primary)" }}>Team & Access</div>
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       {MOCK_MEMBERS.map((m) => {
         const roleStyle = ROLE_COLORS[m.role];
@@ -201,7 +201,7 @@ const TabTeam: React.FC = () => (
           <div
             key={m.email}
             style={{
-              background: "#FFFFFF",
+              background: "var(--buildrick-bg-card)",
               border: "1px solid #E2E8F0",
               borderRadius: 8,
               padding: "10px 12px",
@@ -222,11 +222,11 @@ const TabTeam: React.FC = () => (
                 flexShrink: 0,
               }}
             >
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#FFFFFF" }}>{m.initials}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--buildrick-text-on-accent)" }}>{m.initials}</span>
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 500, color: "#111827" }}>{m.name}</div>
-              <div style={{ fontSize: 11, color: "#94A3B8" }}>{m.email}</div>
+              <div style={{ fontSize: 13, fontWeight: 500, color: "var(--buildrick-text-primary)" }}>{m.name}</div>
+              <div style={{ fontSize: 11, color: "var(--buildrick-text-tertiary)" }}>{m.email}</div>
             </div>
             <span
               style={{
@@ -251,11 +251,11 @@ const TabTeam: React.FC = () => (
 
 const TabCollaboration: React.FC = () => (
   <>
-    <div style={{ fontSize: 24, fontWeight: 700, color: "#111827" }}>Collaboration Settings</div>
+    <div style={{ fontSize: 24, fontWeight: 700, color: "var(--buildrick-text-primary)" }}>Collaboration Settings</div>
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       <div
         style={{
-          background: "#FFFFFF",
+          background: "var(--buildrick-bg-card)",
           border: "1px solid #E2E8F0",
           borderRadius: 8,
           height: 48,
@@ -265,12 +265,12 @@ const TabCollaboration: React.FC = () => (
           alignItems: "center",
         }}
       >
-        <span style={{ fontSize: 13, fontWeight: 500, color: "#374151" }}>Allow comments</span>
+        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--buildrick-text-secondary)" }}>Allow comments</span>
         <Toggle on={true} />
       </div>
       <div
         style={{
-          background: "#FFFFFF",
+          background: "var(--buildrick-bg-card)",
           border: "1px solid #E2E8F0",
           borderRadius: 8,
           height: 48,
@@ -281,7 +281,7 @@ const TabCollaboration: React.FC = () => (
           opacity: 0.5,
         }}
       >
-        <span style={{ fontSize: 13, fontWeight: 500, color: "#374151" }}>Guest access</span>
+        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--buildrick-text-secondary)" }}>Guest access</span>
         <Toggle on={false} />
       </div>
     </div>
@@ -292,12 +292,12 @@ const TabCollaboration: React.FC = () => (
 
 const TabBilling: React.FC = () => (
   <>
-    <div style={{ fontSize: 24, fontWeight: 700, color: "#111827" }}>Plans & Billing</div>
+    <div style={{ fontSize: 24, fontWeight: 700, color: "var(--buildrick-text-primary)" }}>Plans & Billing</div>
 
     {/* Plan card */}
     <div
       style={{
-        background: "#FFFFFF",
+        background: "var(--buildrick-bg-card)",
         border: "1px solid #CBD5E1",
         borderRadius: 10,
         padding: 16,
@@ -306,10 +306,10 @@ const TabBilling: React.FC = () => (
         gap: 10,
       }}
     >
-      <div style={{ fontSize: 16, fontWeight: 700, color: "#111827" }}>Pro Plan</div>
-      <div style={{ fontSize: 13, color: "#64748B" }}>Everything you need for professional sites</div>
+      <div style={{ fontSize: 16, fontWeight: 700, color: "var(--buildrick-text-primary)" }}>Pro Plan</div>
+      <div style={{ fontSize: 13, color: "var(--buildrick-text-muted)" }}>Everything you need for professional sites</div>
       <div>
-        <div style={{ fontSize: 12, color: "#64748B", marginBottom: 6 }}>Sites: 2 of 5</div>
+        <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginBottom: 6 }}>Sites: 2 of 5</div>
         <div
           style={{
             background: "#E2E8F0",
@@ -320,7 +320,7 @@ const TabBilling: React.FC = () => (
         >
           <div
             style={{
-              background: "#2563EB",
+              background: "var(--buildrick-accent-hover)",
               width: "40%",
               height: "100%",
               borderRadius: 999,
@@ -332,10 +332,10 @@ const TabBilling: React.FC = () => (
 
     {/* Payment Method */}
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      <div style={{ fontSize: 13, fontWeight: 600, color: "#374151" }}>Payment Method</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--buildrick-text-secondary)" }}>Payment Method</div>
       <div
         style={{
-          background: "#F8FAFC",
+          background: "var(--buildrick-bg-panel)",
           borderRadius: 8,
           padding: "10px 12px",
           display: "flex",
@@ -343,16 +343,16 @@ const TabBilling: React.FC = () => (
           alignItems: "center",
         }}
       >
-        <span style={{ fontSize: 13, fontWeight: 500, color: "#111827" }}>
+        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--buildrick-text-primary)" }}>
           •••• •••• •••• 4242{"  "}Visa
         </span>
-        <span style={{ fontSize: 11, color: "#94A3B8" }}>Exp 12/27</span>
+        <span style={{ fontSize: 11, color: "var(--buildrick-text-tertiary)" }}>Exp 12/27</span>
       </div>
     </div>
 
     {/* Billing History */}
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      <div style={{ fontSize: 13, fontWeight: 600, color: "#374151" }}>Billing History</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--buildrick-text-secondary)" }}>Billing History</div>
       {[
         { amount: "$12.00", detail: "Mar 3, 2026 · Pro Plan" },
         { amount: "$12.00", detail: "Feb 3, 2026 · Pro Plan" },
@@ -367,8 +367,8 @@ const TabBilling: React.FC = () => (
             borderBottom: "1px solid #F1F5F9",
           }}
         >
-          <span style={{ fontSize: 13, fontWeight: 500, color: "#111827" }}>{inv.amount}</span>
-          <span style={{ fontSize: 11, color: "#64748B" }}>{inv.detail}</span>
+          <span style={{ fontSize: 13, fontWeight: 500, color: "var(--buildrick-text-primary)" }}>{inv.amount}</span>
+          <span style={{ fontSize: 11, color: "var(--buildrick-text-muted)" }}>{inv.detail}</span>
         </div>
       ))}
     </div>
@@ -404,7 +404,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
         position: "fixed",
         inset: 0,
         zIndex: 20001,
-        background: "#F8FAFC",
+        background: "var(--buildrick-bg-panel)",
         display: "flex",
         flexDirection: "column",
       }}
@@ -414,7 +414,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
         style={{
           height: 64,
           flexShrink: 0,
-          background: "#FFFFFF",
+          background: "var(--buildrick-bg-card)",
           borderBottom: "1px solid #D1D5DB",
           padding: "0 16px",
           display: "flex",
@@ -427,8 +427,8 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
           style={{
             fontSize: 13,
             fontWeight: 500,
-            color: "#111827",
-            background: "#FFFFFF",
+            color: "var(--buildrick-text-primary)",
+            background: "var(--buildrick-bg-card)",
             border: "1px solid #CBD5E1",
             borderRadius: 8,
             padding: "8px 10px",
@@ -438,7 +438,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
         >
           ← Back to Editor
         </button>
-        <div style={{ fontSize: 16, fontWeight: 600, color: "#0F172A", fontFamily: "Inter, sans-serif" }}>
+        <div style={{ fontSize: 16, fontWeight: 600, color: "var(--buildrick-text-primary)", fontFamily: "Inter, sans-serif" }}>
           Account Settings
         </div>
       </div>
@@ -451,7 +451,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
           style={{
             width: 280,
             flexShrink: 0,
-            background: "#FFFFFF",
+            background: "var(--buildrick-bg-card)",
             borderRight: "1px solid #D1D5DB",
             padding: "20px 16px",
             display: "flex",
@@ -494,7 +494,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
             flex: 1,
             overflowY: "auto",
             padding: "24px 28px",
-            background: "#F8FAFC",
+            background: "var(--buildrick-bg-panel)",
             display: "flex",
             flexDirection: "column",
             gap: 20,

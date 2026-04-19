@@ -34,7 +34,7 @@ export const TextInputRow: React.FC<TextInputRowProps> = ({
         marginBottom: 8,
       }}
     >
-      <span style={{ fontSize: 12, color: "#71717a", minWidth: labelWidth }}>{label}</span>
+      <span style={{ fontSize: 12, color: "var(--buildrick-text-tertiary)", minWidth: labelWidth }}>{label}</span>
       <input
         type="text"
         value={value}
@@ -86,7 +86,7 @@ export const InlineInput: React.FC<InlineInputProps> = ({
       <label
         style={{
           fontSize: 12,
-          color: "#71717a",
+          color: "var(--buildrick-text-tertiary)",
           fontWeight: 500,
           minWidth: labelWidth,
         }}
@@ -127,7 +127,7 @@ export const SectionLabel: React.FC<SectionLabelProps> = ({ children, style }) =
     <label
       style={{
         fontSize: 12,
-        color: "#71717a",
+        color: "var(--buildrick-text-tertiary)",
         fontWeight: 500,
         display: "block",
         marginBottom: 8,
@@ -151,7 +151,7 @@ export const SubSectionTitle: React.FC<SubSectionTitleProps> = ({ children }) =>
   <div
     style={{
       fontSize: 12,
-      color: "#52525b",
+      color: "var(--buildrick-text-secondary)",
       fontWeight: 600,
       marginBottom: 8,
       marginTop: 12,

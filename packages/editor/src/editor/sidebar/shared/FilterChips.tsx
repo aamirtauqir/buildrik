@@ -119,7 +119,7 @@ const chipStyles: React.CSSProperties = {
 const chipActiveStyles: React.CSSProperties = {
   background: "var(--buildrick-accent)",
   borderColor: "var(--buildrick-accent)",
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
 };
 
 const iconStyles: React.CSSProperties = {

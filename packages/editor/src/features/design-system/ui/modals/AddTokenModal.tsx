@@ -102,7 +102,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
           }}
         />
         {nameError && (
-          <div style={{ fontSize: 12, color: "#ef4444", marginBottom: 8 }}>{nameError}</div>
+          <div style={{ fontSize: 12, color: "var(--buildrick-error)", marginBottom: 8 }}>{nameError}</div>
         )}
 
         <label
@@ -145,7 +145,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
           />
         </div>
         {hexError && (
-          <div style={{ fontSize: 12, color: "#ef4444", marginBottom: 8 }}>{hexError}</div>
+          <div style={{ fontSize: 12, color: "var(--buildrick-error)", marginBottom: 8 }}>{hexError}</div>
         )}
 
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
@@ -170,7 +170,7 @@ export const AddTokenModal: React.FC<AddTokenModalProps> = ({ existingIds, onAdd
               background: "var(--buildrick-accent)",
               border: "none",
               borderRadius: 6,
-              color: "#fff",
+              color: "var(--buildrick-text-on-accent)",
               fontSize: 12,
               fontWeight: 600,
               cursor: "pointer",

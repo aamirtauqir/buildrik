@@ -49,7 +49,7 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose} title="Set Up Products Collection" size="sm">
       <div style={containerStyles}>
         <div style={iconContainerStyles}>
-          <ShoppingBag size={48} style={{ color: "#3b82f6" }} />
+          <ShoppingBag size={48} style={{ color: "var(--buildrick-accent)" }} />
         </div>
 
         <p style={descriptionStyles}>
@@ -77,15 +77,15 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
 
         <div style={featuresListStyles}>
           <div style={featureItemStyles}>
-            <Check size={16} style={{ color: "#10b981" }} />
+            <Check size={16} style={{ color: "var(--buildrick-success)" }} />
             <span>8 product fields (name, price, image, etc.)</span>
           </div>
           <div style={featureItemStyles}>
-            <Check size={16} style={{ color: "#10b981" }} />
+            <Check size={16} style={{ color: "var(--buildrick-success)" }} />
             <span>Validation rules included</span>
           </div>
           <div style={featureItemStyles}>
-            <Check size={16} style={{ color: "#10b981" }} />
+            <Check size={16} style={{ color: "var(--buildrick-success)" }} />
             <span>Ready for CMS data binding</span>
           </div>
         </div>

@@ -181,7 +181,7 @@ const SpacingRow: React.FC<SpacingRowProps> = ({
       {size === 0 && (
         <span
           title="Zero spacing will collapse layout gaps"
-          style={{ color: "#f59e0b", fontSize: 12, flexShrink: 0 }}
+          style={{ color: "var(--buildrick-warning)", fontSize: 12, flexShrink: 0 }}
         >
           ⚠
         </span>
@@ -197,7 +197,7 @@ const SpacingRow: React.FC<SpacingRowProps> = ({
             border: "none",
             padding: 4,
             cursor: "pointer",
-            color: "#f59e0b",
+            color: "var(--buildrick-warning)",
             fontSize: 13,
             flexShrink: 0,
           }}
@@ -216,7 +216,7 @@ const SpacingRow: React.FC<SpacingRowProps> = ({
             border: "none",
             padding: 4,
             cursor: "pointer",
-            color: "#3b82f6",
+            color: "var(--buildrick-accent)",
             fontSize: 13,
             flexShrink: 0,
           }}

@@ -1,6 +1,12 @@
 /**
  * Code Preview Component
- * Display HTML/CSS with syntax highlighting
+ * Display HTML/CSS with syntax highlighting.
+ *
+ * @lint-hex-policy: syntax-theme
+ *   Hex colors in this file are One Dark / Catppuccin-style syntax theme
+ *   palettes for code highlighting. They're intentionally non-token — they
+ *   represent semantic code-token colors, not editor chrome.
+ *
  * @license BSD-3-Clause
  */
 
@@ -72,7 +78,7 @@ function highlightHTML(code: string): React.ReactNode[] {
     } else if (match[5]) {
       // Comments
       parts.push(
-        <span key={key++} style={{ color: "#5c6370", fontStyle: "italic" }}>
+        <span key={key++} style={{ color: "var(--buildrick-text-muted)", fontStyle: "italic" }}>
           {match[0]}
         </span>
       );
@@ -129,7 +135,7 @@ function highlightCSS(code: string): React.ReactNode[] {
     } else if (match[4]) {
       // Comments
       parts.push(
-        <span key={key++} style={{ color: "#5c6370", fontStyle: "italic" }}>
+        <span key={key++} style={{ color: "var(--buildrick-text-muted)", fontStyle: "italic" }}>
           {match[0]}
         </span>
       );
@@ -161,7 +167,7 @@ const LineNumbers: React.FC<{ count: number }> = ({ count }) => (
     style={{
       textAlign: "right",
       paddingRight: 16,
-      color: "#5c6370",
+      color: "var(--buildrick-text-muted)",
       fontSize: 12,
       fontFamily: "monospace",
       userSelect: "none",

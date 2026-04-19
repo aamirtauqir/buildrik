@@ -320,7 +320,7 @@ const hintStyles: React.CSSProperties = {
   background: "rgba(0, 115, 230, 0.1)",
   borderRadius: 6,
   fontSize: 12,
-  color: "#6c7086",
+  color: "var(--buildrick-text-muted)",
   lineHeight: 1.4,
 };
 

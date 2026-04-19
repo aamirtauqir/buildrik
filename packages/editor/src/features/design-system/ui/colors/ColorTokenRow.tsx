@@ -14,27 +14,27 @@ import { ColorPicker } from "./ColorPicker";
 const WCAG_BADGE_STYLES: Record<WcagLevel, React.CSSProperties> = {
   aaa: {
     background: "rgba(34,197,94,0.15)",
-    color: "#22c55e",
+    color: "var(--buildrick-success)",
     border: "1px solid rgba(34,197,94,0.3)",
   },
   aa: {
     background: "rgba(59,130,246,0.15)",
-    color: "#3b82f6",
+    color: "var(--buildrick-accent)",
     border: "1px solid rgba(59,130,246,0.3)",
   },
   "aa-large": {
     background: "rgba(245,158,11,0.12)",
-    color: "#f59e0b",
+    color: "var(--buildrick-warning)",
     border: "1px solid rgba(245,158,11,0.3)",
   },
   fail: {
     background: "rgba(239,68,68,0.12)",
-    color: "#ef4444",
+    color: "var(--buildrick-error)",
     border: "1px solid rgba(239,68,68,0.3)",
   },
   na: {
     background: "rgba(113,113,122,0.15)",
-    color: "#71717a",
+    color: "var(--buildrick-text-tertiary)",
     border: "1px solid rgba(113,113,122,0.3)",
   },
 };
@@ -234,7 +234,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
                   width: 6,
                   height: 6,
                   borderRadius: "50%",
-                  background: "#f59e0b",
+                  background: "var(--buildrick-warning)",
                   flexShrink: 0,
                 }}
                 title="Unsaved change"
@@ -287,7 +287,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
                 {wcagLevel === "fail" ? (
                   <>
                     <div
-                      style={{ fontSize: 12, fontWeight: 600, color: "#ef4444", marginBottom: 4 }}
+                      style={{ fontSize: 12, fontWeight: 600, color: "var(--buildrick-error)", marginBottom: 4 }}
                     >
                       Low contrast
                     </div>
@@ -328,7 +328,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
               border: "none",
               padding: 4,
               cursor: "pointer",
-              color: "#f59e0b",
+              color: "var(--buildrick-warning)",
               borderRadius: 4,
               display: "flex",
               alignItems: "center",

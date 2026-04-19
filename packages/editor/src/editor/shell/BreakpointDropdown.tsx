@@ -100,10 +100,10 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
           gap: 4,
           height: 30,
           padding: "0 10px",
-          background: "#FFFFFF",
+          background: "var(--buildrick-bg-card)",
           border: "1px solid #D1D9E6",
           borderRadius: 8,
-          color: "#334155",
+          color: "var(--buildrick-text-secondary)",
           fontSize: 12,
           fontWeight: 500,
           cursor: "pointer",
@@ -118,12 +118,12 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
           e.currentTarget.style.borderColor = "#D1D9E6";
         }}
       >
-        <span style={{ color: "#334155", fontSize: 12, fontWeight: 500 }}>
+        <span style={{ color: "var(--buildrick-text-secondary)", fontSize: 12, fontWeight: 500 }}>
           {currentWidth}px
         </span>
         <span
           style={{
-            color: "#94A3B8",
+            color: "var(--buildrick-text-tertiary)",
             fontSize: 10,
             lineHeight: 1,
             marginLeft: 2,
@@ -144,7 +144,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
             top: buttonRef.current.getBoundingClientRect().bottom + 6,
             left: buttonRef.current.getBoundingClientRect().left,
             width: 200,
-            background: "#FFFFFF",
+            background: "var(--buildrick-bg-card)",
             border: "1px solid #D1D9E6",
             borderRadius: 8,
             boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
@@ -189,14 +189,14 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
                   }}
                 >
                   <span style={{ flex: 1 }}>{preset.label}</span>
-                  <span style={{ fontSize: 12, color: "#94A3B8" }}>
+                  <span style={{ fontSize: 12, color: "var(--buildrick-text-tertiary)" }}>
                     {preset.width}px
                   </span>
                   {isActive && (
                     <span
                       style={{
                         marginLeft: 8,
-                        color: "#2563EB",
+                        color: "var(--buildrick-accent-hover)",
                         fontSize: 11,
                         flexShrink: 0,
                       }}
@@ -217,7 +217,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
             <div
               style={{
                 fontSize: 11,
-                color: "#94A3B8",
+                color: "var(--buildrick-text-tertiary)",
                 marginBottom: 6,
                 fontWeight: 500,
                 textTransform: "uppercase",
@@ -241,10 +241,10 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
                   flex: 1,
                   height: 28,
                   padding: "0 8px",
-                  background: "#F8FAFC",
+                  background: "var(--buildrick-bg-panel)",
                   border: "1px solid #D1D9E6",
                   borderRadius: 6,
-                  color: "#334155",
+                  color: "var(--buildrick-text-secondary)",
                   fontSize: 12,
                   outline: "none",
                   MozAppearance: "textfield" as React.CSSProperties["MozAppearance"],

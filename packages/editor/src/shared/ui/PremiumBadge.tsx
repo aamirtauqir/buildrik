@@ -51,7 +51,7 @@ const baseStyle: React.CSSProperties = {
   alignItems: "center",
   fontWeight: 600,
   background: "linear-gradient(135deg, var(--buildrick-accent), #a78bfa)",
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
   borderRadius: 100,
   whiteSpace: "nowrap",
 };

@@ -83,7 +83,7 @@ const styles = {
   label: baseStyles.label,
   range: {
     fontSize: 12,
-    color: "#52525b",
+    color: "var(--buildrick-text-secondary)",
   },
   toggle: (isVisible: boolean): React.CSSProperties => ({
     width: 44,
@@ -111,7 +111,7 @@ const styles = {
   }),
   hint: {
     fontSize: 12,
-    color: "#52525b",
+    color: "var(--buildrick-text-secondary)",
     padding: "8px 0 0",
     borderTop: "1px solid rgba(255,255,255,0.06)",
     marginTop: 8,
@@ -124,7 +124,7 @@ const styles = {
     background: "rgba(239,68,68,0.15)",
     borderRadius: 4,
     fontSize: 12,
-    color: "#ef4444",
+    color: "var(--buildrick-error)",
     marginTop: 8,
   },
 };

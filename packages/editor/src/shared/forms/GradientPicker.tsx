@@ -27,7 +27,7 @@ export const GradientPicker: React.FC<GradientPickerProps> = ({
   const [angle, setAngle] = React.useState(90);
   const [stops, setStops] = React.useState<GradientStop[]>([
     { color: "#00d4aa", position: 0 },
-    { color: "#7c3aed", position: 100 },
+    { color: "var(--buildrick-accent)", position: 100 },
   ]);
 
   // Parse initial value
@@ -81,7 +81,7 @@ export const GradientPicker: React.FC<GradientPickerProps> = ({
 
   const addStop = () => {
     const newPosition = 50;
-    setStops([...stops, { color: "#ffffff", position: newPosition }]);
+    setStops([...stops, { color: "var(--buildrick-text-on-accent)", position: newPosition }]);
     setTimeout(updateGradient, 0);
   };
 

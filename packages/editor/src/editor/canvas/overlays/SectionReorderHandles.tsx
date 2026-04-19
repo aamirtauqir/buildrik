@@ -94,7 +94,7 @@ function getDropLineStyle(top: number): React.CSSProperties {
     right: 0,
     top: top - 1.5,
     height: 3,
-    background: "#2563EB",
+    background: "var(--buildrick-accent-hover)",
     borderRadius: 1.5,
     pointerEvents: "none",
     boxShadow: "0 0 8px rgba(37, 99, 235, 0.5)",

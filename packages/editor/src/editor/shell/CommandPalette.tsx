@@ -144,7 +144,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
           transform: "translateX(-50%)",
           width: 480,
           maxHeight: 400,
-          background: "#FFFFFF",
+          background: "var(--buildrick-bg-card)",
           border: "1px solid #E2E8F0",
           borderRadius: 12,
           boxShadow: "0 20px 60px rgba(0,0,0,0.18)",
@@ -177,7 +177,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
               border: "none",
               outline: "none",
               fontSize: 14,
-              color: "#0F172A",
+              color: "var(--buildrick-text-primary)",
               background: "transparent",
               fontFamily: "inherit",
             }}
@@ -185,11 +185,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
           <kbd
             style={{
               padding: "2px 6px",
-              background: "#F1F5F9",
+              background: "var(--buildrick-bg-subtle)",
               border: "1px solid #E2E8F0",
               borderRadius: 4,
               fontSize: 11,
-              color: "#64748B",
+              color: "var(--buildrick-text-muted)",
               fontFamily: "inherit",
             }}
           >
@@ -204,7 +204,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
           aria-label="Command results"
         >
           {filtered.length === 0 && (
-            <div style={{ padding: "32px 16px", textAlign: "center", color: "#94A3B8", fontSize: 13 }}>
+            <div style={{ padding: "32px 16px", textAlign: "center", color: "var(--buildrick-text-tertiary)", fontSize: 13 }}>
               No results for "{query}"
             </div>
           )}
@@ -215,7 +215,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
                   padding: "8px 16px 4px",
                   fontSize: 10,
                   fontWeight: 600,
-                  color: "#94A3B8",
+                  color: "var(--buildrick-text-tertiary)",
                   letterSpacing: "0.06em",
                   textTransform: "uppercase",
                 }}
@@ -295,15 +295,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
             { key: "↵", label: "run" },
             { key: "Esc", label: "close" },
           ].map(({ key, label }) => (
-            <span key={key} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#94A3B8" }}>
+            <span key={key} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "var(--buildrick-text-tertiary)" }}>
               <kbd
                 style={{
                   padding: "1px 5px",
-                  background: "#F8FAFC",
+                  background: "var(--buildrick-bg-panel)",
                   border: "1px solid #E2E8F0",
                   borderRadius: 3,
                   fontSize: 10,
-                  color: "#64748B",
+                  color: "var(--buildrick-text-muted)",
                   fontFamily: "inherit",
                 }}
               >

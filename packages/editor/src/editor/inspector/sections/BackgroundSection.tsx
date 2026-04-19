@@ -120,7 +120,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
             <label
               style={{
                 fontSize: 12,
-                color: "#71717a",
+                color: "var(--buildrick-text-tertiary)",
                 fontWeight: 500,
                 display: "block",
                 marginBottom: 8,
@@ -143,7 +143,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                   borderRadius: 6,
                   cursor: "pointer",
                   fontSize: 12,
-                  color: "#fff",
+                  color: "var(--buildrick-text-on-accent)",
                 }}
               >
                 Linear
@@ -162,7 +162,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                   borderRadius: 6,
                   cursor: "pointer",
                   fontSize: 12,
-                  color: "#fff",
+                  color: "var(--buildrick-text-on-accent)",
                 }}
               >
                 Radial
@@ -208,7 +208,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
             <label
               style={{
                 fontSize: 12,
-                color: "#71717a",
+                color: "var(--buildrick-text-tertiary)",
                 fontWeight: 500,
                 minWidth: 70,
               }}
@@ -225,7 +225,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               }}
               style={{ flex: 1 }}
             />
-            <span style={{ fontSize: 12, color: "#71717a", minWidth: 40 }}>90°</span>
+            <span style={{ fontSize: 12, color: "var(--buildrick-text-tertiary)", minWidth: 40 }}>90°</span>
           </div>
         </>
       )}

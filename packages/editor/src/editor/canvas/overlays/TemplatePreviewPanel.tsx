@@ -295,13 +295,13 @@ const emptyStateStyles: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   gap: 16,
-  color: "#64748b",
+  color: "var(--buildrick-text-muted)",
 };
 
 const emptyTextStyles: React.CSSProperties = {
   fontSize: 14,
   fontWeight: 500,
-  color: "#64748b",
+  color: "var(--buildrick-text-muted)",
   margin: 0,
 };
 
@@ -321,7 +321,7 @@ const iframeWrapperStyles: React.CSSProperties = {
   maxWidth: 900,
   height: "100%",
   maxHeight: 500,
-  background: "#fff",
+  background: "var(--buildrick-bg-card)",
   borderRadius: 12,
   boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08)",
   overflow: "hidden",
@@ -344,7 +344,7 @@ const premiumOverlayStyles: React.CSSProperties = {
   gap: 8,
   background: "rgba(0, 0, 0, 0.7)",
   backdropFilter: "blur(4px)",
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
   fontSize: 14,
   fontWeight: 600,
 };
@@ -353,7 +353,7 @@ const infoCardStyles: React.CSSProperties = {
   width: "100%",
   maxWidth: 900,
   padding: 20,
-  background: "#fff",
+  background: "var(--buildrick-bg-card)",
   borderTop: "1px solid rgba(0, 0, 0, 0.06)",
   borderRadius: "0 0 12px 12px",
   margin: "-20px auto 40px",
@@ -380,8 +380,8 @@ const badgeFreeStyles: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
   textTransform: "uppercase",
-  background: "#10b981",
-  color: "#fff",
+  background: "var(--buildrick-success)",
+  color: "var(--buildrick-text-on-accent)",
   borderRadius: 4,
 };
 
@@ -393,14 +393,14 @@ const badgeProStyles: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
   textTransform: "uppercase",
-  background: "#f59e0b",
-  color: "#fff",
+  background: "var(--buildrick-warning)",
+  color: "var(--buildrick-text-on-accent)",
   borderRadius: 4,
 };
 
 const templateMetaStyles: React.CSSProperties = {
   fontSize: 13,
-  color: "#64748b",
+  color: "var(--buildrick-text-muted)",
   marginBottom: 16,
 };
 
@@ -411,8 +411,8 @@ const actionsStyles: React.CSSProperties = {
 
 const primaryButtonStyles: React.CSSProperties = {
   padding: "10px 20px",
-  background: "#6366f1",
-  color: "#fff",
+  background: "var(--buildrick-accent)",
+  color: "var(--buildrick-text-on-accent)",
   border: "none",
   borderRadius: 8,
   fontSize: 13,
@@ -429,7 +429,7 @@ const ghostButtonStyles: React.CSSProperties = {
   height: 40,
   padding: 0,
   background: "transparent",
-  color: "#64748b",
+  color: "var(--buildrick-text-muted)",
   border: "1px solid rgba(0, 0, 0, 0.12)",
   borderRadius: 8,
   cursor: "pointer",
@@ -442,7 +442,7 @@ const upgradeButtonStyles: React.CSSProperties = {
   gap: 8,
   padding: "12px 24px",
   background: "linear-gradient(135deg, #f59e0b 0%, #f97316 100%)",
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
   border: "none",
   borderRadius: 8,
   fontSize: 14,
@@ -463,7 +463,7 @@ const closeButtonStyles: React.CSSProperties = {
   background: "rgba(255, 255, 255, 0.9)",
   border: "none",
   borderRadius: "50%",
-  color: "#64748b",
+  color: "var(--buildrick-text-muted)",
   cursor: "pointer",
   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
   transition: "all 150ms ease",

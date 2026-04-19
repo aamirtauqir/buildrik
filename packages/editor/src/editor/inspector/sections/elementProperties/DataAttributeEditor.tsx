@@ -32,17 +32,17 @@ const styles = {
   } as React.CSSProperties,
   addButton: {
     padding: "8px 16px",
-    background: "#0073E6",
+    background: "var(--buildrick-accent)",
     border: "none",
     borderRadius: 6,
-    color: "#fff",
+    color: "var(--buildrick-text-on-accent)",
     fontSize: 12,
     fontWeight: 600,
     cursor: "pointer",
   } as React.CSSProperties,
   hint: {
     fontSize: 12,
-    color: "#52525b",
+    color: "var(--buildrick-text-secondary)",
   } as React.CSSProperties,
 };
 

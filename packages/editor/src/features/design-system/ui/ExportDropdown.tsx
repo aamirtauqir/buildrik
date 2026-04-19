@@ -84,7 +84,7 @@ export const ExportDropdown: React.FC<{
                 background: "rgba(245,158,11,0.06)",
               }}
             >
-              <div style={{ fontSize: 12, color: "#f59e0b", marginBottom: 6, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 12, color: "var(--buildrick-warning)", marginBottom: 6, lineHeight: 1.5 }}>
                 ⚠ Exporting unsaved changes — not yet live on your site.
               </div>
               <button

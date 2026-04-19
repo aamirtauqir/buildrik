@@ -247,7 +247,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                 : "var(--buildrick-accent, #3b82f6)",
               border: "none",
               borderRadius: 10,
-              color: "#fff",
+              color: "var(--buildrick-text-on-accent)",
               fontSize: 14,
               fontWeight: 600,
               cursor: "pointer",

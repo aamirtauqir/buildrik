@@ -390,7 +390,7 @@ export const StudioSkeleton: React.FC = () => {
         flexDirection: "column",
         height: "100vh",
         width: "100vw",
-        background: "#0A0A0A",
+        background: "var(--buildrick-text-primary)",
         overflow: "hidden",
       }}
     >
@@ -403,7 +403,7 @@ export const StudioSkeleton: React.FC = () => {
           padding: "0 16px",
           gap: 12,
           borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-          background: "#0A0A0A",
+          background: "var(--buildrick-text-primary)",
           zIndex: 10,
         }}
       >
@@ -428,7 +428,7 @@ export const StudioSkeleton: React.FC = () => {
             alignItems: "center",
             paddingTop: 16,
             gap: 20,
-            background: "#0A0A0A",
+            background: "var(--buildrick-text-primary)",
             zIndex: 5,
           }}
         >
@@ -511,7 +511,7 @@ export const StudioSkeleton: React.FC = () => {
             style={{
               width: "70%",
               height: "70%",
-              background: "#FFFFFF",
+              background: "var(--buildrick-bg-card)",
               borderRadius: 4,
               opacity: 0.1,
               boxShadow: "0 20px 50px rgba(0,0,0,0.5)",

@@ -166,7 +166,7 @@ const errorListStyles: React.CSSProperties = {
 
 const errorItemStyles: React.CSSProperties = {
   fontSize: "13px",
-  color: "#ef4444",
+  color: "var(--buildrick-error)",
   padding: "8px 12px",
   background: "rgba(239, 68, 68, 0.1)",
   borderRadius: "6px",
@@ -175,7 +175,7 @@ const errorItemStyles: React.CSSProperties = {
 
 const buttonStyles: React.CSSProperties = {
   background: "var(--buildrick-accent, #3b82f6)",
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
   border: "none",
   padding: "12px 24px",
   borderRadius: "8px",

@@ -374,7 +374,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
               onClick={() => { setSmartFolder("recent"); state.setCurrentFolderId(null); }}
             />
             <TreeNode
-              icon={<CheckCircle size={14} style={{ color: "#10B981" }} />}
+              icon={<CheckCircle size={14} style={{ color: "var(--buildrick-success)" }} />}
               label="In use"
               count={inUseCount}
               active={smartFolder === "in-use"}
@@ -480,7 +480,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                             state.toggleSelMode();
                           }}
                         >
-                          <div className="mgr-folder-dot" style={{ background: "#F59E0B" }} />
+                          <div className="mgr-folder-dot" style={{ background: "var(--buildrick-warning)" }} />
                           {folder.name}
                         </button>
                       ))}

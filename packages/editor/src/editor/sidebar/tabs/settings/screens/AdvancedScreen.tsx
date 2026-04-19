@@ -163,16 +163,16 @@ const validationContainerStyles: React.CSSProperties = {
 };
 
 const validationErrorStyles: React.CSSProperties = {
-  color: "#EF4444",
+  color: "var(--buildrick-error)",
   padding: "2px 0",
 };
 
 const validationWarningStyles: React.CSSProperties = {
-  color: "#F59E0B",
+  color: "var(--buildrick-warning)",
   padding: "2px 0",
 };
 
 const validationSuccessStyles: React.CSSProperties = {
-  color: "#22C55E",
+  color: "var(--buildrick-success)",
   padding: "2px 0",
 };

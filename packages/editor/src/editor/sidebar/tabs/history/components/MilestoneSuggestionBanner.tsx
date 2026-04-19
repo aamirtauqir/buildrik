@@ -146,7 +146,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
           <button
             onClick={handleEditSave}
             className="milestone-btn milestone-btn--primary"
-            style={{ background: "var(--buildrick-accent)", color: "#fff" }}
+            style={{ background: "var(--buildrick-accent)", color: "var(--buildrick-text-on-accent)" }}
           >
             Save
           </button>

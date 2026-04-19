@@ -305,7 +305,7 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange }) => {
           Aa Bb Cc 123
         </div>
         {fontLoadFailed && (
-          <div style={{ fontSize: 12, color: "#f59e0b", marginTop: 2 }}>
+          <div style={{ fontSize: 12, color: "var(--buildrick-warning)", marginTop: 2 }}>
             Font unavailable — may fall back to system font
           </div>
         )}

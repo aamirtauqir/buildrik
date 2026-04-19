@@ -507,7 +507,7 @@ const generateBtnStyles: React.CSSProperties = {
   justifyContent: "center",
   padding: "14px 32px",
   background: "var(--buildrick-accent, #6366f1)",
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
   border: "none",
   borderRadius: 10,
   fontSize: 15,

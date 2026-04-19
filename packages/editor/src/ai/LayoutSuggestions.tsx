@@ -205,7 +205,7 @@ export const LayoutSuggestions: React.FC<LayoutSuggestionsProps> = ({
           }}
         >
           <div style={{ fontSize: 32, marginBottom: 8 }}>🎉</div>
-          <div style={{ color: "#22c55e", fontWeight: 500 }}>Perfect! No issues found.</div>
+          <div style={{ color: "var(--buildrick-success)", fontWeight: 500 }}>Perfect! No issues found.</div>
         </div>
       ) : (
         <div>

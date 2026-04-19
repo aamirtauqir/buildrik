@@ -148,7 +148,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
               background: "var(--buildrick-accent)",
               border: "none",
               borderRadius: "var(--buildrick-radius-md)",
-              color: "#fff",
+              color: "var(--buildrick-text-on-accent)",
               fontSize: 13,
               fontWeight: 600,
               cursor: "pointer",

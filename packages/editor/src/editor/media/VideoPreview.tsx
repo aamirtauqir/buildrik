@@ -211,7 +211,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
         style={{
           width: "100%",
           display: "block",
-          background: "#000",
+          background: "var(--buildrick-text-primary)",
           maxHeight: 400,
         }}
       />
@@ -228,7 +228,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             background: "rgba(0,0,0,0.5)",
           }}
         >
-          <span style={{ color: "#fff", fontSize: 14 }}>Loading...</span>
+          <span style={{ color: "var(--buildrick-text-on-accent)", fontSize: 14 }}>Loading...</span>
         </div>
       )}
 
@@ -280,7 +280,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             style={{
               background: "transparent",
               border: "none",
-              color: "#fff",
+              color: "var(--buildrick-text-on-accent)",
               cursor: "pointer",
               fontSize: 16,
               padding: 4,
@@ -296,7 +296,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             style={{
               background: "rgba(255,255,255,0.2)",
               border: "none",
-              color: "#fff",
+              color: "var(--buildrick-text-on-accent)",
               cursor: "pointer",
               fontSize: 18,
               padding: "8px 12px",
@@ -312,7 +312,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             style={{
               background: "transparent",
               border: "none",
-              color: "#fff",
+              color: "var(--buildrick-text-on-accent)",
               cursor: "pointer",
               fontSize: 16,
               padding: 4,
@@ -323,7 +323,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
           </button>
 
           {/* Time display */}
-          <span style={{ color: "#fff", fontSize: 12, fontFamily: "monospace" }}>
+          <span style={{ color: "var(--buildrick-text-on-accent)", fontSize: 12, fontFamily: "monospace" }}>
             {formatTime(state.currentTime)} / {formatTime(state.duration)}
           </span>
 
@@ -337,7 +337,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
               style={{
                 background: "transparent",
                 border: "none",
-                color: "#fff",
+                color: "var(--buildrick-text-on-accent)",
                 cursor: "pointer",
                 fontSize: 16,
                 padding: 4,
@@ -368,7 +368,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             padding: "4px 12px",
             background: "rgba(0,0,0,0.6)",
             borderRadius: 4,
-            color: "#fff",
+            color: "var(--buildrick-text-on-accent)",
             fontSize: 13,
             fontWeight: 500,
           }}

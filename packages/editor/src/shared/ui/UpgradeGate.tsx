@@ -116,7 +116,7 @@ const messageStyle: React.CSSProperties = {
 const upgradeButtonStyle: React.CSSProperties = {
   padding: "8px 20px",
   background: "var(--buildrick-accent)",
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
   border: "none",
   borderRadius: 6,
   fontSize: 12,

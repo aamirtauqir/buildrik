@@ -227,7 +227,7 @@ export const AccessibilityChecker: React.FC<AccessibilityCheckerProps> = ({
         }}
       >
         <div style={{ textAlign: "center", flex: 1 }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#ef4444" }}>{errorCount}</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: "var(--buildrick-error)" }}>{errorCount}</div>
           <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>Errors</div>
         </div>
         <div style={{ textAlign: "center", flex: 1 }}>
@@ -235,7 +235,7 @@ export const AccessibilityChecker: React.FC<AccessibilityCheckerProps> = ({
           <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>Warnings</div>
         </div>
         <div style={{ textAlign: "center", flex: 1 }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#3b82f6" }}>{infoCount}</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: "var(--buildrick-accent)" }}>{infoCount}</div>
           <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>Info</div>
         </div>
       </div>
@@ -260,7 +260,7 @@ export const AccessibilityChecker: React.FC<AccessibilityCheckerProps> = ({
           }}
         >
           <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
-          <div style={{ color: "#22c55e", fontWeight: 500 }}>No accessibility issues found!</div>
+          <div style={{ color: "var(--buildrick-success)", fontWeight: 500 }}>No accessibility issues found!</div>
         </div>
       ) : (
         <div>

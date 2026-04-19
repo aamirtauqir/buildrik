@@ -130,7 +130,7 @@ const ChecklistItem: React.FC<{
       {label}
     </span>
     {required && !ok && (
-      <span style={{ fontSize: 12, color: "#ef4444", fontWeight: 500 }}>Required</span>
+      <span style={{ fontSize: 12, color: "var(--buildrick-error)", fontWeight: 500 }}>Required</span>
     )}
     {hint && !ok && (
       <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>{hint}</span>

@@ -90,11 +90,11 @@ const s: Record<string, React.CSSProperties> = {
   },
   stepDotActive: {
     background: "var(--buildrick-accent)",
-    color: "#fff",
+    color: "var(--buildrick-text-on-accent)",
   },
   stepDotDone: {
     background: "var(--buildrick-accent)",
-    color: "#fff",
+    color: "var(--buildrick-text-on-accent)",
   },
   stepDivider: {
     flex: 1,

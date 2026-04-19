@@ -133,7 +133,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
             height: 20,
             borderRadius: "50%",
             background: config.color,
-            color: "#fff",
+            color: "var(--buildrick-text-on-accent)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

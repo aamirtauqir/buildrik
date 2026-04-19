@@ -11,7 +11,7 @@ import * as React from "react";
 // ============================================================================
 
 export const DisplayPreview: React.FC<{ type: string }> = ({ type }) => {
-  const box = { background: "#0073E6", borderRadius: 1 };
+  const box = { background: "var(--buildrick-accent)", borderRadius: 1 };
   const gray = { background: "#52525b", borderRadius: 1 };
 
   switch (type) {
@@ -102,7 +102,7 @@ export const PositionPreview: React.FC<{ type: string }> = ({ type }) => {
   const boxStyle: React.CSSProperties = {
     width: 8,
     height: 6,
-    background: "#0073E6",
+    background: "var(--buildrick-accent)",
     borderRadius: 1,
     position: "absolute",
   };
@@ -141,7 +141,7 @@ export const PositionPreview: React.FC<{ type: string }> = ({ type }) => {
     case "fixed":
       return (
         <div style={containerStyle}>
-          <div style={{ ...boxStyle, bottom: 2, right: 2, background: "#22c55e" }} />
+          <div style={{ ...boxStyle, bottom: 2, right: 2, background: "var(--buildrick-success)" }} />
         </div>
       );
     case "sticky":
@@ -153,7 +153,7 @@ export const PositionPreview: React.FC<{ type: string }> = ({ type }) => {
               top: 0,
               left: "50%",
               transform: "translateX(-50%)",
-              background: "#f59e0b",
+              background: "var(--buildrick-warning)",
             }}
           />
         </div>

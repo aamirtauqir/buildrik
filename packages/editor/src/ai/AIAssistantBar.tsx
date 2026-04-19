@@ -198,7 +198,7 @@ const inputStyles: React.CSSProperties = {
   flex: 1,
   background: "transparent",
   border: "none",
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
   fontSize: 15,
   outline: "none",
   padding: "10px 0",
@@ -225,7 +225,7 @@ const modeBtnStyles: React.CSSProperties = {
 
 const activeModeBtnStyles: React.CSSProperties = {
   background: "rgba(255, 255, 255, 0.1)",
-  color: "#fff",
+  color: "var(--buildrick-text-on-accent)",
 };
 
 const shortcutStyles: React.CSSProperties = {
