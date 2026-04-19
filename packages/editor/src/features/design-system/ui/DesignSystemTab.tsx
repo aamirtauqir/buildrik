@@ -424,7 +424,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                     width: 5,
                     height: 5,
                     borderRadius: "50%",
-                    background: "var(--buildrick-accent-amber)",
+                    background: "var(--buildrick-warning)",
                     flexShrink: 0,
                   }}
                   aria-label="unsaved changes"

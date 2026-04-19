@@ -248,7 +248,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
               border: "none",
               padding: 0,
               cursor: "pointer",
-              color: copied ? "var(--buildrick-design-color-success)" : "var(--buildrick-text-muted)",
+              color: copied ? "var(--buildrick-success)" : "var(--buildrick-text-muted)",
               fontSize: 12,
               fontFamily: "monospace",
               letterSpacing: "0.3px",

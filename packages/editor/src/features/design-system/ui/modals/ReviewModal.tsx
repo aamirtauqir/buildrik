@@ -185,7 +185,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                     style={{
                       fontSize: 12,
                       fontFamily: "monospace",
-                      color: "var(--buildrick-design-color-success)",
+                      color: "var(--buildrick-success)",
                     }}
                   >
                     {t.value}
@@ -222,7 +222,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                     style={{
                       fontSize: 12,
                       fontFamily: "monospace",
-                      color: "var(--buildrick-design-color-success)",
+                      color: "var(--buildrick-success)",
                     }}
                   >
                     {t.value}

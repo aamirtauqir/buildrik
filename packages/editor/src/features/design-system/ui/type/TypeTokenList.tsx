@@ -202,7 +202,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
       {isExtreme && (
         <span
           title="Extreme font size may break layout"
-          style={{ color: "var(--buildrick-accent-amber)", fontSize: 12, flexShrink: 0 }}
+          style={{ color: "var(--buildrick-warning)", fontSize: 12, flexShrink: 0 }}
         >
           ⚠
         </span>
@@ -218,7 +218,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
             border: "none",
             padding: 4,
             cursor: "pointer",
-            color: "var(--buildrick-accent-amber)",
+            color: "var(--buildrick-warning)",
             fontSize: 13,
             flexShrink: 0,
           }}

@@ -266,7 +266,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
       {isIssuesEmpty && (
         <div style={{ padding: "24px 0", textAlign: "center" }}>
           <div style={{ fontSize: 20, marginBottom: 6 }}>✓</div>
-          <div style={{ fontSize: 12, color: "var(--buildrick-design-color-success)", fontWeight: 600 }}>
+          <div style={{ fontSize: 12, color: "var(--buildrick-success)", fontWeight: 600 }}>
             All colors pass WCAG
           </div>
           <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginTop: 4 }}>
