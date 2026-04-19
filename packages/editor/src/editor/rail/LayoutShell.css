@@ -56,7 +56,7 @@
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: var(--buildrick-bg-app);
+  background: var(--buildrick-bg-subtle);
   color: var(--buildrick-text-primary);
   font-family: var(--buildrick-font-family);
 }
@@ -156,7 +156,7 @@
   flex-direction: column;
   align-items: center;
   padding: var(--layout-gap, 12px) 0;
-  background: var(--buildrick-bg-darker);    /* PRD §8: rail bg — darkest surface */
+  background: var(--buildrick-bg-panel);    /* PRD §8: rail bg — darkest surface */
   border-right: 1px solid var(--buildrick-border, rgba(255, 255, 255, 0.08));
   z-index: 90;
   overflow-y: auto;
