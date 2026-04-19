@@ -38,6 +38,34 @@ export function walkFiles(roots, exts) {
   return out;
 }
 
+export function applyOp1(content, mapping) {
+  const csssVars = {
+    ...mapping.css_vars.chrome_and_canvas_operational,
+    ...mapping.css_vars.design_runtime,
+  };
+  return content.replace(/var\((--(?:aqb|ls|accent)-[a-z0-9-]+)(\s*,\s*[^)]+)?\)/g, (match, varName, fallback) => {
+    const target = csssVars[varName];
+    if (!target) throw new Error(`op1: unmapped CSS var ${varName}`);
+    return `var(${target}${fallback || ''})`;
+  });
+}
+
+export function applyOp1b(content, mapping) {
+  const cssVars = {
+    ...mapping.css_vars.chrome_and_canvas_operational,
+    ...mapping.css_vars.design_runtime,
+  };
+  // Match --aqb-X / --ls-X / --accent-X NOT immediately followed by ${ (those are Category B manual).
+  return content.replace(
+    /(--(?:aqb|ls|accent)-[a-z0-9-]+)(?!\$\{)/g,
+    (match, varName) => {
+      const target = cssVars[varName];
+      if (!target) return match; // leave for abort detection in verify step (not implemented here)
+      return target;
+    }
+  );
+}
+
 const mode = process.argv[2] || 'dry-run';
 
 if (mode === 'dry-run') runDryRun();
