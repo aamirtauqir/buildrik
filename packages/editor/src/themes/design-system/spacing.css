@@ -1,5 +1,20 @@
 /**
  * themes/design-system/spacing.css
- * Buildrik DS V1 — see spec §5
+ * Buildrik DS V1 — chrome spacing tokens
+ * NEW: --buildrick-space-1..12. Replaces chrome consumption of --buildrick-design-space-*.
  * @license BSD-3-Clause
  */
+
+:root {
+  --buildrick-space-1: 4px;
+  --buildrick-space-2: 8px;
+  --buildrick-space-3: 12px;
+  --buildrick-space-4: 16px;
+  --buildrick-space-5: 20px;
+  --buildrick-space-6: 24px;
+  --buildrick-space-8: 32px;
+  --buildrick-space-10: 40px;
+  --buildrick-space-12: 48px;
+  --buildrick-touch-min: 44px;
+  --buildrick-touch-gap: 8px;
+}
