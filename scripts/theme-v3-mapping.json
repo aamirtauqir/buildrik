@@ -1,0 +1,40 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated": "2026-04-19",
+    "spec": "docs/superpowers/specs/2026-04-19-theme-unification-v3-design.md"
+  },
+  "css_vars": {
+    "chrome_and_canvas_operational": {},
+    "design_runtime": {},
+    "delete": [],
+    "undefined_decisions": {}
+  },
+  "keyframes": {},
+  "data_attributes": {},
+  "classnames": {},
+  "storage_keys": {},
+  "dev_flags": {
+    "aqb:trace:": "buildrick:trace:"
+  },
+  "deletions": {
+    "css_classes_constant": "shared/constants/config.ts CSS_CLASSES export",
+    "dead_scope_rules": ["themes/default.css .aqb-editor", "themes/default.css .aqb-layout"],
+    "pages_panel_overrides": "PagesTab.css:2179-2214 .pages-panel dark overrides (DESIGN.md violation)",
+    "canvas_dark_shim": "components/Canvas/Canvas.css DARK_THEME_SHIM values (file kept, values corrected)",
+    "theme_scaffolding_p2b": [
+      "themes/index.ts (entire file)",
+      "src/index.ts:75 applyTheme/defaultTheme re-export",
+      "demo/main.tsx:11 import",
+      "demo/main.tsx:21 applyTheme() call",
+      "shared/types/project.ts themeMode field",
+      "storageKeys.ts THEME entry"
+    ]
+  },
+  "manual_edits": {
+    "category_b_1_namespace_remap": [],
+    "category_b_2_regex_readers": [],
+    "gate_1_flagged_auto_swap": []
+  },
+  "verifications": []
+}
