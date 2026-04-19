@@ -2,6 +2,52 @@
 
 All notable changes to this project will be documented in this file.
 
+## Buildrik DS V1 — 2026-04-19
+
+Supersedes Theme Unification V3 (which shipped ~65% complete). DS V1 delivers
+the remaining structural cleanup + enforcement + versioning infrastructure.
+
+### Added
+- `packages/editor/src/themes/design-system/` directory with 11 focused token files (color, typography, spacing, radius, shadow, motion, z-index, layout, design, a11y, index). ~329 canonical tokens total.
+- `--buildrick-space-1..12` chrome spacing tokens (were previously consumed from `--buildrick-design-space-*`).
+- `--buildrick-radius-sm..full` chrome radius tokens (were previously consumed from `--buildrick-design-radius-*`).
+- `--buildrick-font-family-mono` chrome mono font token.
+- `getToken(name: TokenName): string` helper in `shared/utils/tokens.ts` for JS-level token reads.
+- `TokenName` type union in `shared/utils/token-names.ts` — compile-time safety for getToken calls.
+- `designTokensSchemaVersion?: number` field on `ProjectSettings` interface.
+- Token migration framework at `features/design-system/migrations/` — handles schema version transitions for user-saved tokens. Empty MIGRATIONS table (V1 baseline).
+- `generateCompatibilityShim(version)` in `exportUtils.ts` — prepends deprecated-alias lines to exported CSS during 2-version retention window.
+- `scripts/ds-grep-gates.sh` — 8 CI invariants enforced via grep.
+- `scripts/verify-design-baselines.mjs` — verifies `design.css` parity with `constants.ts` DEFAULT_TOKENS.
+- `npm run verify:ds` — runs parity check + all 8 grep gates.
+- ESLint rules (`.eslintrc.buildrik-ds.js`): bans INSPECTOR_TOKENS import, bans direct `getPropertyValue` on `--buildrick-*`.
+- `components.css` — transitional home for legacy `.buildrick-*` class rules and responsive `@media` blocks extracted from old `default.css`.
+
+### Changed
+- `themes/default.css` is now a thin aggregator (21 lines, was 5151). Imports only `design-system/index.css` + `components.css`.
+- Namespace invariant: `--buildrick-design-*` = SITE tokens (user-facing, published in deployed sites). `--buildrick-*` = SHELL tokens (editor chrome, static).
+- 265 chrome consumer sites migrated off `--buildrick-design-*` → `--buildrick-*` equivalents.
+- `TokenRegistryContext` loader supports both legacy array format and new versioned format `{schemaVersion, tokens}`.
+- `TokenRegistryContext` persistAll writes versioned format going forward.
+- `buildExport()` in exportUtils accepts optional `schemaVersion` param; CSS output prepends compatibility shim.
+- INSPECTOR_TOKENS constant pattern deleted (was 14 keys mapping to `--buildrick-control-*` aliases). 211 usage sites across 32 files converted to direct `var(--buildrick-*)` or rgba strings via codemod.
+
+### Removed
+- 10 alias layer families: `--accent`, `--ls-*`, `--rail-*`, `--surface-*`, `--brand-*`, `--bar/--blue/--txt`, `--primary-*`, `--buildrick-control-*`, `--buildrick-build-*`, `--buildrick-ai-*`.
+- 275 duplicate CSS var def lines from old `default.css` (V3 residue).
+- 29 dark-value fallback sites (`#0c0c12`, `#161620`, `#818CF8`, `#6366F1`, `#00d4aa`, `rgba(99, 102, 241, *)`) from `LeftRail.css`. 2 indigo box-shadows replaced with cobalt.
+- `themes/compat.css` (transitional file, all 10 alias families drained during Phase 3).
+- 32 duplicate `--buildrick-design-*` defs from `components/Canvas/Canvas.css` (6) and `editor/sidebar/tabs/design/styles/design-tokens.css` (26).
+
+### Migration
+- V3 projects load identically in DS V1 (names preserved per Decision 1 Option A — no user project migration needed).
+- localStorage format backward compat: loader accepts both legacy array and new `{schemaVersion, tokens}` shape.
+- Future token renames follow 2-version alias retention policy (see DESIGN.md Token Public Contract).
+
+### Infrastructure
+- Codex (OpenAI Codex CLI v0.121.0) gated each phase boundary — Codex reviews from Phase 0 through Phase 5, plus mid-session reviews on audit findings and 6 architecture decisions.
+- Self-review + Codex verification caught: Decision 1 fundamental reframing (site-vs-shell not mutable-vs-static), token versioning gap (no schema version infrastructure), big-switch execution risk (aggregator pattern adopted instead), --accent premature-delete risk (alias-then-drain pattern adopted).
+
 ## Theme Unification V3 — 2026-04-19
 
 ### Changed

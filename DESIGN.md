@@ -216,10 +216,13 @@ Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / 
 
 ## Implementation Notes
 
-- Tokens live in `packages/editor/src/themes/default.css`. Token rewrite from dark → light is one PR, runs before any component changes.
-- Every consumer uses `var(--aqb-*)` or `var(--accent)`. No hex literals anywhere except the root token definitions.
-- `packages/editor/src/features/design-system/` exports tokens as TypeScript constants for inline-styled code. Values match `default.css` exactly.
-- Marketing site has its own theme file but uses the same `--accent` token. Keep naming consistent across editor + marketing.
+- Tokens live in `packages/editor/src/themes/design-system/` (DS V1, 2026-04-19). Canonical split across 11 files: `color.css`, `typography.css`, `spacing.css`, `radius.css`, `shadow.css`, `motion.css`, `z-index.css`, `layout.css`, `design.css`, `a11y.css`, `index.css`.
+- `themes/default.css` is the stable public import path — a thin aggregator of `design-system/index.css` + `components.css` (legacy class rules).
+- Every consumer uses `var(--buildrick-*)` (chrome) or `var(--buildrick-design-*)` (user site tokens) directly in Emotion `styled()` or `.css` files. No INSPECTOR_TOKENS indirection.
+- For JS-level reads (canvas drawing, color math), use the `getToken(name)` helper from `shared/utils/tokens.ts`.
+- Inline `style={{}}` allowed only for runtime-computed values (drag positions, transforms). Colors inside dynamic inline still use `var(--buildrick-*)` strings.
+- `packages/editor/src/features/design-system/constants.ts` is the JS source-of-truth for the 68 user-editable `--buildrick-design-*` tokens. Values match `themes/design-system/design.css` baseline (verified by `scripts/verify-design-baselines.mjs`).
+- Marketing site uses the same token system. Keep naming consistent.
 
 ## Decisions Log
 
@@ -239,12 +242,43 @@ Rail is 60px, `--aqb-bg-panel` (`#F8FAFC`), three zones (Creation / Structure / 
 | 2026-04-18 | Font stack fix — drop all system fallbacks | Current `--aqb-font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif` violates DESIGN.md explicit "no Roboto/system-ui/Helvetica" rule. Replaced with `"Inter Tight", sans-serif` only. |
 | 2026-04-18 | Delete legacy navbar tokens `--bar`, `--blue`, `--txt`, etc. | Dead tokens from first-gen editor. 11 tokens, used in a handful of legacy places. Replace with `--aqb-*` canonical. |
 | 2026-04-18 | Add Design + Publish to rail | Previously keyboard-only, inconsistent with every other config surface. Goes in Config zone. |
+| 2026-04-19 | **Buildrik DS V1** — supersedes V3 theme unification | V3 shipped ~65% complete. DS V1 locks 7 architecture decisions: strict site/shell namespace, no alias layers, `--accent` alias-then-drain, a11y.css owns all media queries, intent+path hex lint, INSPECTOR_TOKENS codemod (single-commit convergence), full token versioning framework. Aggregator execution (no big-switch). See `docs/superpowers/specs/2026-04-19-buildrik-design-system-v1-design.md`. |
 
-## Token Namespace Contract (V3, 2026-04-19)
+## Token Namespace Contract (DS V1, 2026-04-19)
 
-Two namespaces, one invariant.
+Two namespaces. One invariant each.
 
-- `--buildrick-*` — chrome tokens (sidebar, topbar, panels, inspector, buttons) and canvas operational tokens (selection glow, box-model, spacing on rendered user content). Static. Never mutated by JavaScript at runtime. Defined in `themes/default.css` + `components/Canvas/Canvas.css` + `editor/canvas/Canvas.css`.
-- `--buildrick-design-*` — user-editable design tokens from the Design tab. Runtime-mutated ONLY by `useTokenBase` / `useColorTokens` / `useSpacingTokens` / `useTypeTokens`. Defined in `features/design-system/constants.ts` DEFAULT_TOKENS.
+- `--buildrick-*` — **editor SHELL tokens**. Chrome UI only (sidebar, topbar, panels, inspector, buttons, rail). Static — never mutated at runtime. Defined only in `themes/design-system/*.css` (excluding `design.css`).
+- `--buildrick-design-*` — **user SITE tokens**. User-editable via Design tab. Runtime-mutated via `useTokenBase` / `useColorTokens` / `useSpacingTokens` / `useTypeTokens` hooks. Defined in two locations only: `features/design-system/constants.ts` (JS source-of-truth) and `themes/design-system/design.css` (pre-render baseline — must match constants.ts, verified by script).
 
-CI-enforceable invariants: see `docs/superpowers/specs/2026-04-19-theme-unification-v3-design.md` Section 2.
+### Public contract (token names appear in user-deployed sites)
+
+All `--buildrick-design-*` token names are part of Buildrik's public contract. They appear in:
+- User project JSON (`settings.designTokens[].cssVar`)
+- User's published site CSS output (via `exportUtils.ts`)
+- localStorage key `buildrick-design-tokens-${projectId}-v1`
+- Exported `design-tokens.css` / `design-tokens.json` / `design-tokens.tailwind.js`
+
+**Renaming these names is a BREAKING change.** Requires:
+1. Bump `CURRENT_SCHEMA_VERSION` in `features/design-system/migrations/index.ts`
+2. Add migration function to `MIGRATIONS[newVersion]`
+3. Add alias entry to `ALIAS_RETENTION` in `exportUtils.ts` (2-version retention window)
+4. CHANGELOG entry with before/after name mapping
+
+Editor SHELL tokens (`--buildrick-*` without `design-` prefix) are INTERNAL — may rename freely without migration.
+
+### CI-enforceable invariants
+
+Run `npm run verify:ds` in `packages/editor/` to check all 8 gates:
+1. No self-referential CSS var defs
+2. `--buildrick-design-*` defs only in `design.css`
+3. No `--buildrick-design-*` consumers in editor chrome (sensor reads in `features/design-system/ui` excepted)
+4. No deprecated alias consumers (`--ls-*`, `--rail-*`, `--accent`, etc.)
+5. No `--aqb-*` / `data-aqb-*` survives
+6. No duplicate keys within any DS file
+7. No `@media (prefers-*)` outside `a11y.css` (best-effort, some transitional duplicates in `components.css`)
+8. No bare deprecated defs (`--accent`, `--buildrick-text`, `--buildrick-surface`)
+
+Plus baseline parity: `scripts/verify-design-baselines.mjs` confirms `design.css` values match `constants.ts` DEFAULT_TOKENS byte-for-byte (normalized).
+
+See: `docs/superpowers/specs/2026-04-19-buildrik-design-system-v1-design.md`
