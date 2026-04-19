@@ -1,5 +1,73 @@
 /**
  * themes/design-system/color.css
- * Buildrik DS V1 — see spec §5
+ * Buildrik DS V1 — chrome color tokens
  * @license BSD-3-Clause
  */
+
+:root {
+  /* BACKGROUNDS */
+  --buildrick-bg-panel: #F8FAFC;
+  --buildrick-bg-card: #FFFFFF;
+  --buildrick-bg-input: #FFFFFF;
+  --buildrick-bg-elevated: #FFFFFF;
+  --buildrick-bg-hover: rgba(15, 23, 42, 0.04);
+  --buildrick-bg-subtle: #F1F5F9;
+
+  /* TEXT */
+  --buildrick-text-primary: #0F172A;
+  --buildrick-text-secondary: #334155;
+  --buildrick-text-muted: #64748B;
+  --buildrick-text-tertiary: #94A3B8;
+  --buildrick-text-on-accent: #FFFFFF;
+
+  /* BORDERS */
+  --buildrick-border: #64748B;
+  --buildrick-border-light: #94A3B8;
+  --buildrick-border-medium: #CBD5E1;
+  --buildrick-border-strong: #94A3B8;
+  --buildrick-border-hover: #94A3B8;
+  --buildrick-border-focus: #2D6DFF;
+
+  /* ACCENT (cobalt — single accent per DESIGN.md) */
+  --buildrick-accent: #2D6DFF;
+  --buildrick-accent-hover: #2557CC;
+  --buildrick-accent-pressed: #1E4499;
+  --buildrick-accent-subtle: rgba(45, 109, 255, 0.08);
+  --buildrick-accent-tint: rgba(45, 109, 255, 0.12);
+
+  /* SEMANTIC STATUS */
+  --buildrick-error: #DC2626;
+  --buildrick-error-light: rgba(220, 38, 38, 0.10);
+  --buildrick-error-border: rgba(220, 38, 38, 0.30);
+  --buildrick-error-bg: rgba(220, 38, 38, 0.05);
+  --buildrick-success: #16A34A;
+  --buildrick-success-light: rgba(22, 163, 74, 0.10);
+  --buildrick-success-border: rgba(22, 163, 74, 0.30);
+  --buildrick-warning: #D97706;
+  --buildrick-warning-light: rgba(217, 119, 6, 0.10);
+  --buildrick-warning-border: rgba(217, 119, 6, 0.30);
+  --buildrick-warning-bg: rgba(217, 119, 6, 0.05);
+  --buildrick-info: #2D6DFF;
+  --buildrick-info-light: rgba(45, 109, 255, 0.08);
+
+  /* AMBER / EMERALD FAMILIES */
+  --buildrick-amber-light: rgba(217, 119, 6, 0.10);
+  --buildrick-amber-dark: rgba(217, 119, 6, 0.20);
+  --buildrick-amber-border: rgba(217, 119, 6, 0.30);
+  --buildrick-emerald-light: rgba(22, 163, 74, 0.10);
+  --buildrick-emerald-dark: rgba(22, 163, 74, 0.20);
+  --buildrick-emerald-border: rgba(22, 163, 74, 0.30);
+
+  /* OVERLAYS */
+  --buildrick-overlay: rgba(15, 23, 42, 0.40);
+
+  /* CANVAS CHROME */
+  --buildrick-canvas-content: #FFFFFF;
+  --buildrick-canvas-wrapper: #F8FAFC;
+  --buildrick-canvas-dot: rgba(15, 23, 42, 0.08);
+
+  /* MISC */
+  --buildrick-destructive: #DC2626;
+  --buildrick-input-ring: rgba(45, 109, 255, 0.08);
+  --buildrick-input-ring-error: rgba(220, 38, 38, 0.10);
+}
