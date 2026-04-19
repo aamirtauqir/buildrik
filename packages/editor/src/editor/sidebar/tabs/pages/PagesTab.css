@@ -2173,44 +2173,6 @@
  * ══════════════════════════════════════════════════════════════════════════ */
 
 .pages-panel {
-  /* ── Dark surface layer (editor chrome is dark-only per DESIGN.md) ── */
-  /* Override global --aqb-* light tokens with dark equivalents.
-     All downstream .pages-panel .pg-* rules consume these scoped values. */
-  --buildrick-bg-app:    #0c0c14;
-  --buildrick-bg-panel:  #14141f;
-  --buildrick-bg-subtle: #1e1e28;
-  --buildrick-bg-card:   #17171f;
-  --buildrick-bg-elevated: #1e1e28;
-  --buildrick-bg-hover:  rgba(255, 255, 255, 0.04);
-  --buildrick-bg-active: rgba(255, 255, 255, 0.06);
-
-  --buildrick-surface-1: #17171f;
-  --buildrick-surface-2: #1a1a22;
-  --buildrick-surface-3: #1e1e28;
-  --buildrick-surface-4: #252531;
-  --buildrick-surface-5: #2e2e38;
-
-  --buildrick-text-primary:   #F5F5F0;
-  --buildrick-text-secondary: #B8B5AD;
-  --buildrick-text-tertiary:  #A09D96;
-  --buildrick-text-muted:     #908D85;
-  --buildrick-text-disabled:  #6b7280;
-
-  --buildrick-border:        rgba(255, 255, 255, 0.08);
-  --buildrick-border-medium: rgba(255, 255, 255, 0.12);
-  --buildrick-border-strong: rgba(255, 255, 255, 0.15);
-  --buildrick-border-light:  rgba(255, 255, 255, 0.05);
-  --buildrick-border-subtle: rgba(255, 255, 255, 0.05);
-  --buildrick-border-hover:  rgba(255, 255, 255, 0.15);
-
-  /* Semantic — bright variants for dark backgrounds */
-  --buildrick-success:       #22c55e;
-  --buildrick-success-light: rgba(34, 197, 94, 0.10);
-  --buildrick-warning:       #f59e0b;
-  --buildrick-warning-light: rgba(245, 158, 11, 0.10);
-  --buildrick-error:         #ef4444;
-  --buildrick-error-light:   rgba(239, 68, 68, 0.10);
-
   background: var(--buildrick-bg-panel);
   color: var(--buildrick-text-primary);
 }

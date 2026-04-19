@@ -44,16 +44,16 @@
   --buildrick-weight-semibold: 600;
   --buildrick-weight-bold: 700;
 
-  /* UI Text Colors (Dark Theme) */
-  --buildrick-text-primary: #f8fafc;
-  --buildrick-text-secondary: #a1a1aa;
-  --buildrick-text-tertiary: #71717a;
+  /* UI Text Colors (light canonical per DESIGN.md 2026-04-18) */
+  --buildrick-text-primary: #334155;
+  --buildrick-text-secondary: #64748B;
+  --buildrick-text-tertiary: #94A3B8;
 
-  /* UI Surface Colors (Dark Theme) */
-  --buildrick-surface-1: #0d0d1a;     /* Deep background */
-  --buildrick-surface-2: #1a1a2e;     /* Panel background */
-  --buildrick-surface-3: #252542;     /* Cards, inputs */
-  --buildrick-surface-4: #2d2d52;     /* Hover states */
+  /* UI Surface Colors (light canonical per DESIGN.md 2026-04-18) */
+  --buildrick-surface-1: #F8FAFC;     /* Deep background */
+  --buildrick-surface-2: #FFFFFF;     /* Panel background */
+  --buildrick-surface-3: #F1F5F9;     /* Cards, inputs */
+  --buildrick-surface-4: #E2E8F0;     /* Hover states */
 
   /* Border Colors */
   --buildrick-border-subtle: rgba(255, 255, 255, 0.06);
