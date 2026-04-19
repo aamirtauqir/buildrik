@@ -193,7 +193,7 @@ const containerStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "flex-start",
   gap: 10,
-  borderRadius: "var(--buildrick-design-radius-md)",
+  borderRadius: "var(--buildrick-radius-md)",
   border: "1px solid",
 };
 

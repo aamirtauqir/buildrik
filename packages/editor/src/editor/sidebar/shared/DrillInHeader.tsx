@@ -148,7 +148,7 @@ const backButtonStyles: React.CSSProperties = {
   margin: "-4px",
   background: "transparent",
   border: "none",
-  borderRadius: "var(--buildrick-design-radius-md)",
+  borderRadius: "var(--buildrick-radius-md)",
   color: "var(--buildrick-text-secondary)",
   fontSize: "var(--buildrick-text-base)",
   fontWeight: 500,

@@ -261,7 +261,7 @@
   padding: 1px 5px;
   font-size: 9px;
   color: var(--buildrick-text-secondary);
-  font-family: var(--buildrick-design-font-mono, 'JetBrains Mono', monospace);
+  font-family: var(--buildrick-font-family-mono);
 }
 
 /* ============================================
@@ -478,7 +478,7 @@
   padding: 1px 5px;
   font-size: 9px;
   color: var(--buildrick-text-muted);
-  font-family: var(--buildrick-design-font-mono, 'JetBrains Mono', monospace);
+  font-family: var(--buildrick-font-family-mono);
 }
 
 /* ============================================

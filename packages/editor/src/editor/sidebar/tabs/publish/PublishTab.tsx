@@ -54,7 +54,7 @@ const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
       alignItems: "center",
       gap: 6,
       padding: "4px 10px",
-      borderRadius: "var(--buildrick-design-radius-full, 999px)",
+      borderRadius: "var(--buildrick-radius-full)",
       fontSize: "var(--buildrick-text-xs, 12px)",
       fontWeight: 600,
       letterSpacing: "0.02em",
@@ -102,7 +102,7 @@ const ChecklistItem: React.FC<{
       style={{
         width: 16,
         height: 16,
-        borderRadius: "var(--buildrick-design-radius-sm, 4px)",
+        borderRadius: "var(--buildrick-radius-sm)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -376,7 +376,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
               padding: "12px",
               background: "rgba(245, 158, 11, 0.08)",
               border: "1px solid rgba(245, 158, 11, 0.2)",
-              borderRadius: "var(--buildrick-design-radius-md, 8px)",
+              borderRadius: "var(--buildrick-radius-md)",
               fontSize: 12,
               color: "var(--buildrick-text-secondary)",
               lineHeight: 1.5,
@@ -529,7 +529,7 @@ const sectionStyles: React.CSSProperties = {
   gap: 8,
   padding: 12,
   background: "var(--buildrick-surface-2)",
-  borderRadius: "var(--buildrick-design-radius-md, 8px)",
+  borderRadius: "var(--buildrick-radius-md)",
   border: "1px solid var(--buildrick-border)",
 };
 
@@ -570,7 +570,7 @@ const urlRowStyles: React.CSSProperties = {
   gap: 6,
   padding: "6px 8px",
   background: "var(--buildrick-surface-3)",
-  borderRadius: "var(--buildrick-design-radius-sm, 4px)",
+  borderRadius: "var(--buildrick-radius-sm)",
   border: "1px solid var(--buildrick-border)",
 };
 
@@ -593,7 +593,7 @@ const copyButtonStyles: React.CSSProperties = {
   padding: 0,
   background: "transparent",
   border: "none",
-  borderRadius: "var(--buildrick-design-radius-sm, 4px)",
+  borderRadius: "var(--buildrick-radius-sm)",
   color: "var(--buildrick-text-secondary)",
   cursor: "pointer",
   flexShrink: 0,
@@ -617,7 +617,7 @@ const infoSectionStyles: React.CSSProperties = {
   gap: 12,
   padding: 12,
   background: "var(--buildrick-accent-tint, rgba(99, 102, 241, 0.06))",
-  borderRadius: "var(--buildrick-design-radius-md, 8px)",
+  borderRadius: "var(--buildrick-radius-md)",
   border: "1px solid var(--buildrick-accent-subtle, rgba(99, 102, 241, 0.12))",
 };
 
@@ -642,7 +642,7 @@ const errorStyles: React.CSSProperties = {
   gap: 8,
   padding: "8px 12px",
   background: "var(--buildrick-error-light, rgba(239, 68, 68, 0.1))",
-  borderRadius: "var(--buildrick-design-radius-md, 8px)",
+  borderRadius: "var(--buildrick-radius-md)",
   border: "1px solid var(--buildrick-error-light, rgba(239, 68, 68, 0.2))",
   color: "var(--buildrick-error, #ef4444)",
   fontSize: "var(--buildrick-text-xs, 12px)",
@@ -668,7 +668,7 @@ const trustBadgeStyles: React.CSSProperties = {
   gap: 6,
   padding: "7px 10px",
   background: "rgba(34, 197, 94, 0.06)",
-  borderRadius: "var(--buildrick-design-radius-md, 8px)",
+  borderRadius: "var(--buildrick-radius-md)",
   border: "1px solid rgba(34, 197, 94, 0.15)",
   fontSize: 12,
   color: "var(--buildrick-text-muted)",

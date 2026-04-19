@@ -133,7 +133,7 @@ const triggerStyles: React.CSSProperties = {
   padding: "0 10px",
   background: "var(--buildrick-surface-3)",
   border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--buildrick-design-radius-md)",
+  borderRadius: "var(--buildrick-radius-md)",
   color: "var(--buildrick-text-primary)",
   fontSize: 12,
   fontWeight: 500,
@@ -177,8 +177,8 @@ const dropdownStyles: React.CSSProperties = {
   padding: 4,
   background: "var(--buildrick-surface-3)",
   border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--buildrick-design-radius-md)",
-  boxShadow: "var(--buildrick-design-shadow-lg)",
+  borderRadius: "var(--buildrick-radius-md)",
+  boxShadow: "var(--buildrick-shadow-lg)",
   zIndex: "var(--buildrick-z-dropdown)",
 };
 
@@ -190,7 +190,7 @@ const optionStyles: React.CSSProperties = {
   padding: "8px 10px",
   background: "transparent",
   border: "none",
-  borderRadius: "var(--buildrick-design-radius-sm)",
+  borderRadius: "var(--buildrick-radius-sm)",
   color: "var(--buildrick-text-primary)",
   fontSize: 12,
   fontWeight: 500,

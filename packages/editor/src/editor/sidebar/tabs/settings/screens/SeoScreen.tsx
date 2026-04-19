@@ -85,7 +85,7 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer }) => {
         style={{
           padding: "10px 12px",
           background: "var(--buildrick-surface-3)",
-          borderRadius: "var(--buildrick-design-radius-md)",
+          borderRadius: "var(--buildrick-radius-md)",
           border: "1px solid var(--buildrick-border)",
           fontSize: 12,
           color: "var(--buildrick-text-muted)",

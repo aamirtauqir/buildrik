@@ -40,9 +40,9 @@ export interface SkeletonProps {
 
 const radiusMap = {
   none: 0,
-  sm: "var(--buildrick-design-radius-sm, 4px)",
-  md: "var(--buildrick-design-radius-md, 8px)",
-  lg: "var(--buildrick-design-radius-lg, 12px)",
+  sm: "var(--buildrick-radius-sm)",
+  md: "var(--buildrick-radius-md)",
+  lg: "var(--buildrick-radius-lg)",
   full: "9999px",
 };
 
@@ -159,7 +159,7 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({
       className="buildrick-skeleton-card"
       style={{
         background: "var(--buildrick-bg-panel-secondary, #2d2d44)",
-        borderRadius: "var(--buildrick-design-radius-lg, 12px)",
+        borderRadius: "var(--buildrick-radius-lg)",
         border: "1px solid var(--buildrick-border, #334155)",
         overflow: "hidden",
       }}
@@ -215,7 +215,7 @@ export const SkeletonListItem: React.FC<SkeletonListItemProps> = ({
         gap: 12,
         padding: "12px 16px",
         background: "rgba(255, 255, 255, 0.02)",
-        borderRadius: "var(--buildrick-design-radius-md, 8px)",
+        borderRadius: "var(--buildrick-radius-md)",
         border: "1px solid rgba(255, 255, 255, 0.04)",
       }}
     >
@@ -254,7 +254,7 @@ export const SkeletonTable: React.FC<SkeletonTableProps> = ({
         flexDirection: "column",
         gap: 2,
         background: "var(--buildrick-bg-panel-secondary, #2d2d44)",
-        borderRadius: "var(--buildrick-design-radius-lg, 12px)",
+        borderRadius: "var(--buildrick-radius-lg)",
         border: "1px solid var(--buildrick-border, #334155)",
         overflow: "hidden",
         padding: 4,
@@ -268,7 +268,7 @@ export const SkeletonTable: React.FC<SkeletonTableProps> = ({
             gap: 12,
             padding: "12px 16px",
             background: "rgba(255, 255, 255, 0.03)",
-            borderRadius: "var(--buildrick-design-radius-md, 8px)",
+            borderRadius: "var(--buildrick-radius-md)",
           }}
         >
           {Array.from({ length: columns }).map((_, i) => (
@@ -284,7 +284,7 @@ export const SkeletonTable: React.FC<SkeletonTableProps> = ({
             gridTemplateColumns: `repeat(${columns}, 1fr)`,
             gap: 12,
             padding: "12px 16px",
-            borderRadius: "var(--buildrick-design-radius-md, 8px)",
+            borderRadius: "var(--buildrick-radius-md)",
           }}
         >
           {Array.from({ length: columns }).map((_, colIndex) => (

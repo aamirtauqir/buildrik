@@ -77,7 +77,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     justifyContent: "center",
     textAlign: "center",
     padding: sizes.padding,
-    borderRadius: "var(--buildrick-design-radius-lg, 12px)",
+    borderRadius: "var(--buildrick-radius-lg)",
     transition: "all var(--buildrick-transition-normal, 250ms ease)",
   };
 

@@ -113,7 +113,7 @@ export const typography = {
   // Font families
   fontFamily: "var(--buildrick-font-family)",
   headingFont: "var(--buildrick-heading-font)",
-  monoFont: "var(--buildrick-design-font-mono)",
+  monoFont: "var(--buildrick-font-family-mono)",
 
   // Font sizes (UX-compliant scale)
   fontXs: "var(--buildrick-text-xs)", // 10px - hints, very small
@@ -155,11 +155,11 @@ export const typography = {
  * Aligned with UX plan: 8px/12px as primary values
  */
 export const spacing = {
-  xs: "var(--buildrick-design-space-1)", // 4px
-  sm: "var(--buildrick-design-space-2)", // 8px - small gaps
-  md: "var(--buildrick-design-space-3)", // 12px - medium gaps
-  lg: "var(--buildrick-design-space-4)", // 16px
-  xl: "var(--buildrick-design-space-6)", // 24px
+  xs: "var(--buildrick-space-1)", // 4px
+  sm: "var(--buildrick-space-2)", // 8px - small gaps
+  md: "var(--buildrick-space-3)", // 12px - medium gaps
+  lg: "var(--buildrick-space-4)", // 16px
+  xl: "var(--buildrick-space-6)", // 24px
 } as const;
 
 /**
@@ -168,21 +168,21 @@ export const spacing = {
  */
 export const radius = {
   xs: "var(--buildrick-radius-xs)", // 3px - subtle
-  sm: "var(--buildrick-design-radius-sm)", // 5px - inputs, badges
+  sm: "var(--buildrick-radius-sm)", // 5px - inputs, badges
   default: "6px", // 6px - standard UI elements
-  md: "var(--buildrick-design-radius-md)", // 8px - cards, panels
-  lg: "var(--buildrick-design-radius-lg)", // 12px - modals
-  xl: "var(--buildrick-design-radius-xl)", // 16px - large panels
-  full: "var(--buildrick-design-radius-full)", // 9999px - pills, circles
+  md: "var(--buildrick-radius-md)", // 8px - cards, panels
+  lg: "var(--buildrick-radius-lg)", // 12px - modals
+  xl: "var(--buildrick-radius-xl)", // 16px - large panels
+  full: "var(--buildrick-radius-full)", // 9999px - pills, circles
 } as const;
 
 /**
  * Shadow tokens
  */
 export const shadows = {
-  sm: "var(--buildrick-design-shadow-sm)",
-  md: "var(--buildrick-design-shadow-md)",
-  lg: "var(--buildrick-design-shadow-lg)",
+  sm: "var(--buildrick-shadow-sm)",
+  md: "var(--buildrick-shadow-md)",
+  lg: "var(--buildrick-shadow-lg)",
   accent: "var(--buildrick-shadow-accent)",
   hover: "var(--buildrick-shadow-hover)",
 } as const;

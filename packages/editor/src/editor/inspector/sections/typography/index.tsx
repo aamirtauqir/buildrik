@@ -73,7 +73,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
         style={{
           fontSize: 11,
           color: "var(--buildrick-text-tertiary)",
-          fontFamily: "var(--buildrick-design-font-mono)",
+          fontFamily: "var(--buildrick-font-family-mono)",
           whiteSpace: "nowrap",
           maxWidth: 140,
           overflow: "hidden",

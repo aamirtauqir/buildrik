@@ -68,7 +68,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
         style={{
           fontSize: 11,
           color: "var(--buildrick-text-tertiary)",
-          fontFamily: "var(--buildrick-design-font-mono)",
+          fontFamily: "var(--buildrick-font-family-mono)",
           whiteSpace: "nowrap",
         }}
       >

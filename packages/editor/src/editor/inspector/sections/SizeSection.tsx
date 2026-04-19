@@ -1,7 +1,7 @@
 /**
  * Size Section - Width, Height, Min/Max dimensions
  * CP3: W and H rows each have a hover-reveal chain button that opens a spacing
- * token picker. Selecting a spacing token stores var(--buildrick-design-space-4) on the
+ * token picker. Selecting a spacing token stores var(--buildrick-space-4) on the
  * element — not "16px". The picker uses list layout (showSwatch=false).
  */
 
@@ -166,7 +166,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
         style={{
           fontSize: 11,
           color: "var(--buildrick-text-tertiary)",
-          fontFamily: "var(--buildrick-design-font-mono)",
+          fontFamily: "var(--buildrick-font-family-mono)",
           whiteSpace: "nowrap",
         }}
       >
@@ -327,8 +327,8 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "var(--buildrick-design-space-2)",
-            marginBottom: "var(--buildrick-design-space-3)",
+            gap: "var(--buildrick-space-2)",
+            marginBottom: "var(--buildrick-space-3)",
             opacity: disabled("object-fit") ? 0.5 : 1,
           }}
           title={reason("object-fit")}
@@ -348,10 +348,10 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
             onChange={(e) => onChange("object-fit", e.target.value)}
             style={{
               flex: 1,
-              padding: "var(--buildrick-design-space-2) 10px",
+              padding: "var(--buildrick-space-2) 10px",
               background: "rgba(255,255,255,0.05)",
               border: "1px solid var(--buildrick-border)",
-              borderRadius: "var(--buildrick-design-radius-sm)",
+              borderRadius: "var(--buildrick-radius-sm)",
               color: "var(--buildrick-text-primary)",
               fontSize: "var(--buildrick-text-base)",
               outline: "none",

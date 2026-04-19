@@ -248,7 +248,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
             padding: 12,
             background: "var(--buildrick-bg-dark)",
             borderRadius: 8,
-            fontFamily: "var(--buildrick-design-font-mono)",
+            fontFamily: "var(--buildrick-font-family-mono)",
             fontSize: 12,
             color: "var(--buildrick-text-muted)",
           }}

@@ -118,7 +118,7 @@ export const GridSection: React.FC<GridSectionProps> = ({
       style={{
         fontSize: 11,
         color: "var(--buildrick-text-tertiary)",
-        fontFamily: "var(--buildrick-design-font-mono)",
+        fontFamily: "var(--buildrick-font-family-mono)",
         whiteSpace: "nowrap",
       }}
     >
@@ -145,7 +145,7 @@ export const GridSection: React.FC<GridSectionProps> = ({
 
           {/* Quick Templates */}
           <SectionLabel
-            style={{ fontSize: "var(--buildrick-text-2xs)", marginBottom: "var(--buildrick-design-space-1)" }}
+            style={{ fontSize: "var(--buildrick-text-2xs)", marginBottom: "var(--buildrick-space-1)" }}
           >
             Column Templates
           </SectionLabel>
@@ -203,8 +203,8 @@ export const GridSection: React.FC<GridSectionProps> = ({
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr 1fr",
-              gap: "var(--buildrick-design-space-1)",
-              marginBottom: "var(--buildrick-design-space-2)",
+              gap: "var(--buildrick-space-1)",
+              marginBottom: "var(--buildrick-space-2)",
             }}
           >
             <InputField
@@ -232,7 +232,7 @@ export const GridSection: React.FC<GridSectionProps> = ({
 
           {/* Visual Alignment Grid */}
           <SectionLabel
-            style={{ fontSize: "var(--buildrick-text-2xs)", marginBottom: "var(--buildrick-design-space-1)" }}
+            style={{ fontSize: "var(--buildrick-text-2xs)", marginBottom: "var(--buildrick-space-1)" }}
           >
             Item Alignment
           </SectionLabel>
@@ -275,8 +275,8 @@ export const GridSection: React.FC<GridSectionProps> = ({
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              gap: "var(--buildrick-design-space-1)",
-              marginBottom: "var(--buildrick-design-space-2)",
+              gap: "var(--buildrick-space-1)",
+              marginBottom: "var(--buildrick-space-2)",
             }}
           >
             <InputField

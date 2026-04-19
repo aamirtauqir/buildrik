@@ -515,7 +515,7 @@ const styles: Record<string, React.CSSProperties> = {
     border: "none",
     color: "var(--buildrick-text-muted)",
     cursor: "pointer",
-    borderRadius: "var(--buildrick-design-radius-sm)",
+    borderRadius: "var(--buildrick-radius-sm)",
   },
   unavailableContainer: {
     flex: 1,
@@ -551,7 +551,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: "var(--buildrick-text-primary)",
     background: "transparent",
     border: "1px solid var(--buildrick-border)",
-    borderRadius: "var(--buildrick-design-radius-md)",
+    borderRadius: "var(--buildrick-radius-md)",
     cursor: "pointer",
   },
   messagesContainer: {

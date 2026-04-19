@@ -71,7 +71,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
         padding: "8px 12px",
         background: "var(--buildrick-accent-tint, rgba(45,109,255,0.08))",
         border: "1px solid rgba(45,109,255,0.2)",
-        borderRadius: "var(--buildrick-design-radius-md)",
+        borderRadius: "var(--buildrick-radius-md)",
         margin: "0 12px 8px",
       }}
     >

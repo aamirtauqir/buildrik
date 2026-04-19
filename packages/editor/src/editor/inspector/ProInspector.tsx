@@ -376,7 +376,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
                 border: "none",
                 cursor: "pointer",
                 padding: 0,
-                fontFamily: "var(--buildrick-design-font-mono)",
+                fontFamily: "var(--buildrick-font-family-mono)",
                 fontSize: 11,
                 color: idCopied ? "var(--buildrick-success)" : "var(--buildrick-text-tertiary)",
                 transition: "color 0.2s",
@@ -489,8 +489,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "var(--buildrick-design-space-2)",
-          padding: "6px var(--buildrick-design-space-3)",
+          gap: "var(--buildrick-space-2)",
+          padding: "6px var(--buildrick-space-3)",
         }}
       >
         <div style={{ flex: 1 }}>

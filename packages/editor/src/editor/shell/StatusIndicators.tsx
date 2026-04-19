@@ -86,7 +86,7 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
             alignItems: "center",
             gap: 6,
             padding: "4px 8px",
-            borderRadius: "var(--buildrick-design-radius-md, 8px)",
+            borderRadius: "var(--buildrick-radius-md)",
             fontSize: 12,
             fontWeight: 600,
             color: "var(--buildrick-text-muted)",

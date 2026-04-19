@@ -135,7 +135,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
             padding: "8px 12px",
             paddingRight: loading ? 36 : 12,
             background: "var(--buildrick-bg-input)",
-            border: `1px solid ${error ? "var(--buildrick-design-color-error)" : "var(--buildrick-border)"}`,
+            border: `1px solid ${error ? "var(--buildrick-error)" : "var(--buildrick-border)"}`,
             borderRadius: 6,
             color: "var(--buildrick-text-primary)",
             fontSize: 13,
@@ -208,7 +208,7 @@ export const AutocompleteField: React.FC<AutocompleteFieldProps> = ({
       )}
 
       {error && (
-        <div style={{ fontSize: 12, color: "var(--buildrick-design-color-error)", marginTop: 4 }}>{error}</div>
+        <div style={{ fontSize: 12, color: "var(--buildrick-error)", marginTop: 4 }}>{error}</div>
       )}
     </div>
   );

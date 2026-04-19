@@ -174,7 +174,7 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
                 ? `2px dashed ${COLORS.valid.border}`
                 : `2px solid ${COLORS.invalid.border}`,
               backgroundColor: isValidDrop ? COLORS.valid.bg : COLORS.invalid.bg,
-              borderRadius: "var(--buildrick-design-radius-sm)",
+              borderRadius: "var(--buildrick-radius-sm)",
               transition: "border-color 150ms ease, background-color 150ms ease",
               boxSizing: "border-box",
               zIndex: 1,

@@ -46,7 +46,7 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
     position: "relative",
     width: dimension,
     height: dimension,
-    borderRadius: size === "xs" ? 3 : "var(--buildrick-design-radius-sm)",
+    borderRadius: size === "xs" ? 3 : "var(--buildrick-radius-sm)",
     cursor: disabled ? "not-allowed" : onClick ? "pointer" : "default",
     opacity: disabled ? 0.4 : 1,
     transition: "all var(--buildrick-transition-fast)",

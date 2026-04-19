@@ -126,7 +126,7 @@ const OverlayButton: React.FC<OverlayButtonProps> = ({
         color: active ? "var(--buildrick-text-primary)" : "var(--buildrick-text-secondary)",
         background: active ? "var(--buildrick-surface-3)" : "transparent",
         border: active ? "1px solid var(--buildrick-accent)" : "1px solid transparent",
-        borderRadius: "var(--buildrick-design-radius-sm)",
+        borderRadius: "var(--buildrick-radius-sm)",
         cursor: "pointer",
         transition: "all 0.15s ease",
       }}
@@ -323,7 +323,7 @@ const containerStyles: React.CSSProperties = {
   height: "40px",
   background: "var(--buildrick-surface-3)",           /* PRD §10.7: surface-3 bg */
   border: "1px solid var(--buildrick-border)",        /* PRD §10.7: all-sides border */
-  borderRadius: "var(--buildrick-design-radius-lg)",         /* PRD §10.7: lg corner radius */
+  borderRadius: "var(--buildrick-radius-lg)",         /* PRD §10.7: lg corner radius */
   boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
   whiteSpace: "nowrap" as const,
 };
@@ -346,7 +346,7 @@ const zoomGroupStyles: React.CSSProperties = {
   alignItems: "center",
   gap: "2px",
   background: "var(--buildrick-surface-2)",
-  borderRadius: "var(--buildrick-design-radius-sm)",
+  borderRadius: "var(--buildrick-radius-sm)",
   padding: "2px",
 };
 
@@ -361,7 +361,7 @@ const zoomBtnStyles: React.CSSProperties = {
   color: "var(--buildrick-text-secondary)",
   background: "transparent",
   border: "none",
-  borderRadius: "var(--buildrick-design-radius-sm)",
+  borderRadius: "var(--buildrick-radius-sm)",
   cursor: "pointer",
   transition: "all 0.15s ease",
 };
@@ -390,7 +390,7 @@ const presetsDropdownStyles: React.CSSProperties = {
   padding: "4px",
   background: "var(--buildrick-surface-2)",
   border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--buildrick-design-radius-md)",
+  borderRadius: "var(--buildrick-radius-md)",
   boxShadow: "0 4px 16px rgba(0, 0, 0, 0.35)",
   zIndex: 500,
   minWidth: "100px",
@@ -399,7 +399,7 @@ const presetsDropdownStyles: React.CSSProperties = {
 const presetItemStyles: React.CSSProperties = {
   padding: "5px 12px",
   border: "none",
-  borderRadius: "var(--buildrick-design-radius-sm)",
+  borderRadius: "var(--buildrick-radius-sm)",
   color: "var(--buildrick-text-secondary)",
   fontSize: "12px",
   fontWeight: 500,

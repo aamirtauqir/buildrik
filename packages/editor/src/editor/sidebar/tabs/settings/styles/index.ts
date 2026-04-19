@@ -35,7 +35,7 @@ export const exportOptionStyles: React.CSSProperties = {
   padding: "12px 8px",
   background: "var(--buildrick-surface-2, #f8fafc)",
   border: "1px solid var(--buildrick-border, #e2e8f0)",
-  borderRadius: "var(--buildrick-design-radius-md, 8px)",
+  borderRadius: "var(--buildrick-radius-md)",
   color: "var(--buildrick-text-primary, #0f172a)",
   cursor: "pointer",
   fontSize: 18,

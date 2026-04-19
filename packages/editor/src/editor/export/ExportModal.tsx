@@ -21,7 +21,7 @@ const EXPORT_MODAL_STYLE = `
   .buildrick-export-modal-scope .buildrick-modal {
     width: 480px !important;
     max-width: 90vw !important;
-    border-radius: var(--buildrick-design-radius-xl) !important;
+    border-radius: var(--buildrick-radius-xl) !important;
     box-shadow: var(--buildrick-shadow-2xl) !important;
     border: 1px solid var(--buildrick-border) !important;
     background: var(--buildrick-bg-panel) !important;
@@ -215,7 +215,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
               background: "var(--buildrick-accent)",
               color: "#fff",
               border: "none",
-              borderRadius: "var(--buildrick-design-radius-md)",
+              borderRadius: "var(--buildrick-radius-md)",
               fontSize: 14,
               fontWeight: 600,
               cursor: !result?.html || loading || zipLoading ? "not-allowed" : "pointer",

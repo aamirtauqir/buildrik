@@ -205,16 +205,16 @@ export const AISuggestionSection: React.FC<AISuggestionSectionProps> = ({
 // ============================================
 
 const containerStyles: React.CSSProperties = {
-  marginTop: "var(--buildrick-design-space-4)",
+  marginTop: "var(--buildrick-space-4)",
   borderTop: "1px solid var(--buildrick-border)",
 };
 
 const headerStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  gap: "var(--buildrick-design-space-2)",
+  gap: "var(--buildrick-space-2)",
   width: "100%",
-  padding: "var(--buildrick-design-space-3)",
+  padding: "var(--buildrick-space-3)",
   background: "linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(59,130,246,0.08) 100%)",
   border: "none",
   cursor: "pointer",
@@ -238,7 +238,7 @@ const badgeStyles: React.CSSProperties = {
   fontWeight: 600,
   color: "var(--buildrick-accent)",
   background: "rgba(139,92,246,0.15)",
-  borderRadius: "var(--buildrick-design-radius-sm)",
+  borderRadius: "var(--buildrick-radius-sm)",
 };
 
 const chevronStyles: React.CSSProperties = {
@@ -247,18 +247,18 @@ const chevronStyles: React.CSSProperties = {
 };
 
 const listStyles: React.CSSProperties = {
-  padding: "var(--buildrick-design-space-2)",
+  padding: "var(--buildrick-space-2)",
 };
 
 const suggestionStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
-  gap: "var(--buildrick-design-space-2)",
-  padding: "var(--buildrick-design-space-3)",
+  gap: "var(--buildrick-space-2)",
+  padding: "var(--buildrick-space-3)",
   background: "var(--buildrick-surface-2)",
-  borderRadius: "var(--buildrick-design-radius-md)",
+  borderRadius: "var(--buildrick-radius-md)",
   borderLeft: "3px solid var(--buildrick-accent)",
-  marginBottom: "var(--buildrick-design-space-2)",
+  marginBottom: "var(--buildrick-space-2)",
 };
 
 const messageStyles: React.CSSProperties = {
@@ -271,7 +271,7 @@ const messageStyles: React.CSSProperties = {
 const actionsStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  gap: "var(--buildrick-design-space-2)",
+  gap: "var(--buildrick-space-2)",
 };
 
 const applyBtnStyles: React.CSSProperties = {
@@ -281,7 +281,7 @@ const applyBtnStyles: React.CSSProperties = {
   color: "white",
   background: "var(--buildrick-accent)",
   border: "none",
-  borderRadius: "var(--buildrick-design-radius-sm)",
+  borderRadius: "var(--buildrick-radius-sm)",
   cursor: "pointer",
   transition: "background 0.15s ease",
 };
@@ -292,7 +292,7 @@ const dismissBtnStyles: React.CSSProperties = {
   color: "var(--buildrick-text-muted)",
   background: "transparent",
   border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--buildrick-design-radius-sm)",
+  borderRadius: "var(--buildrick-radius-sm)",
   cursor: "pointer",
 };
 

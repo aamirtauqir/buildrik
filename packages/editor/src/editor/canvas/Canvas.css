@@ -182,7 +182,7 @@
   background: var(--buildrick-accent);
   color: #fff;
   border: none;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   padding: var(--buildrick-spacing-sm) var(--buildrick-spacing-md);
   font-family: var(--buildrick-font-family);
   cursor: pointer;
@@ -209,7 +209,7 @@
   color: var(--buildrick-text);
   background: #fff;
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   padding: var(--buildrick-spacing-sm);
   font-family: var(--buildrick-font-family);
 }
@@ -606,7 +606,7 @@
 .buildrick-empty-hint kbd {
   display: inline-block;
   padding: 2px 6px;
-  font-family: var(--buildrick-design-font-mono, monospace);
+  font-family: var(--buildrick-font-family-mono);
   font-size: var(--buildrick-text-sm, 12px);
   background: #f1f5f9;
   border: 1px solid #e2e8f0;
@@ -683,7 +683,7 @@
   background: var(--buildrick-accent);
   color: #fff;
   border: none;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;

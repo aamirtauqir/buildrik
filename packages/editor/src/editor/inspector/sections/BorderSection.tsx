@@ -78,7 +78,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
       style={{
         fontSize: 12,
         color: "var(--buildrick-text-tertiary)",
-        fontFamily: "var(--buildrick-design-font-mono)",
+        fontFamily: "var(--buildrick-font-family-mono)",
         whiteSpace: "nowrap" as const,
       }}
     >

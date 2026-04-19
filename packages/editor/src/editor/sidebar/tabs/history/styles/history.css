@@ -85,7 +85,7 @@
   width: 100%;
   background: var(--buildrick-surface-3);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   padding: 6px 28px 6px 32px;
   font-size: 13px;
   color: var(--buildrick-text-primary);
@@ -179,7 +179,7 @@
   background: var(--buildrick-accent-subtle);
   color: var(--buildrick-accent);
   border: 1px solid rgba(45, 109, 255, 0.2);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   font-size: 12px;
   font-weight: 500;
   font-family: inherit;
@@ -250,7 +250,7 @@
 /* ── Entry row ──────────────────────────────────────────────────────────────── */
 .entry-row {
   padding: 8px 12px;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   margin: 2px 8px;
   cursor: pointer;
   transition: background 150ms ease-out;
@@ -301,7 +301,7 @@
 }
 
 .entry-time {
-  font-family: var(--buildrick-design-font-mono, "JetBrains Mono", "Fira Code", "SF Mono", Monaco, monospace);
+  font-family: var(--buildrick-font-family-mono);
   font-size: 11px;
   color: var(--buildrick-text-muted);
 }
@@ -311,7 +311,7 @@
   display: inline-flex;
   align-items: center;
   padding: 2px 6px;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   font-size: 10px;
   font-weight: 500;
 }
@@ -356,7 +356,7 @@
   margin-top: 8px;
   padding: 8px;
   background: var(--buildrick-surface-1);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
 }
 
 .diff-item {
@@ -464,7 +464,7 @@
   position: relative;
   padding: 10px 12px;
   margin: 2px 8px;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   cursor: pointer;
   border: 1px solid transparent;
   transition: background 150ms ease-out, border-color 150ms ease-out;
@@ -529,7 +529,7 @@
 }
 
 .version-time {
-  font-family: var(--buildrick-design-font-mono, "JetBrains Mono", "Fira Code", "SF Mono", Monaco, monospace);
+  font-family: var(--buildrick-font-family-mono);
   font-size: 11px;
   color: var(--buildrick-text-muted);
 }
@@ -553,7 +553,7 @@
     var(--buildrick-surface-3) 24px
   );
   padding-left: 24px;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   transition: opacity 150ms ease-out;
 }
 
@@ -569,7 +569,7 @@
 .action-btn {
   padding: 4px 8px;
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   background: var(--buildrick-surface-4);
   color: var(--buildrick-text-secondary);
   font-size: 11px;
@@ -617,7 +617,7 @@
   width: 44px;
   height: 44px;
   border: none;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   background: var(--buildrick-accent);
   color: #fff;
   display: flex;
@@ -650,7 +650,7 @@
   padding: 12px;
   background: var(--buildrick-surface-2);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   display: none;
   flex-direction: column;
   gap: 8px;
@@ -694,7 +694,7 @@
 .form-input {
   background: var(--buildrick-surface-3);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   padding: 7px 10px;
   font-size: 13px;
   color: var(--buildrick-text-primary);
@@ -731,7 +731,7 @@
   background: var(--buildrick-accent);
   color: #fff;
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   font-size: 13px;
   font-weight: 500;
   font-family: inherit;
@@ -754,7 +754,7 @@
   background: var(--buildrick-surface-4);
   color: var(--buildrick-text-secondary);
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   font-size: 13px;
   font-family: inherit;
   cursor: pointer;
@@ -771,7 +771,7 @@
   padding: 12px;
   margin: 8px 8px 0;
   background: var(--buildrick-surface-1);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
 }
 
 .compare-screenshots {
@@ -784,7 +784,7 @@
 .screenshot-thumb {
   aspect-ratio: 16 / 10;
   background: var(--buildrick-surface-3);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -807,7 +807,7 @@
 .ai-summary {
   padding: 10px 12px;
   background: var(--buildrick-accent-tint);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   font-size: 12px;
   color: var(--buildrick-text-primary);
   margin-bottom: 10px;
@@ -823,7 +823,7 @@
 
 .diff-summary-badge {
   padding: 3px 8px;
-  border-radius: var(--buildrick-design-radius-full);
+  border-radius: var(--buildrick-radius-full);
   font-size: 11px;
   font-weight: 500;
 }
@@ -881,7 +881,7 @@
 
 .diff-change-val {
   font-size: 11px;
-  font-family: var(--buildrick-design-font-mono, "JetBrains Mono", "Fira Code", "SF Mono", Monaco, monospace);
+  font-family: var(--buildrick-font-family-mono);
   color: var(--buildrick-text-muted);
   max-width: 80px;
   overflow: hidden;
@@ -907,7 +907,7 @@
   background: var(--buildrick-accent-subtle);
   color: var(--buildrick-accent);
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   font-size: 12px;
   font-weight: 500;
   font-family: inherit;
@@ -936,7 +936,7 @@
   margin-top: 8px;
   padding: 10px;
   background: var(--buildrick-surface-2);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   font-size: 12px;
   color: var(--buildrick-text-primary);
   line-height: 1.5;
@@ -960,7 +960,7 @@
 
 .snapshot-preview img {
   width: 100%;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
@@ -983,7 +983,7 @@
   margin: 4px 8px;
   background: var(--buildrick-error-light);
   border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   animation: fadeIn 150ms ease-out;
 }
 
@@ -1079,7 +1079,7 @@
 .tt-time-display {
   display: flex;
   justify-content: space-between;
-  font-family: var(--buildrick-design-font-mono, "JetBrains Mono", "Fira Code", "SF Mono", Monaco, monospace);
+  font-family: var(--buildrick-font-family-mono);
   font-size: 11px;
   color: var(--buildrick-text-muted);
   margin-top: 8px;
@@ -1101,7 +1101,7 @@
   background: var(--buildrick-accent);
   color: #fff;
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   font-size: 13px;
   font-weight: 500;
   font-family: inherit;
@@ -1123,7 +1123,7 @@
   background: var(--buildrick-surface-4);
   color: var(--buildrick-text-secondary);
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   font-size: 13px;
   font-family: inherit;
   cursor: pointer;
@@ -1173,7 +1173,7 @@
   padding: 12px 16px;
   background: var(--buildrick-surface-3);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   font-size: 13px;
   color: var(--buildrick-text-primary);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -1225,7 +1225,7 @@
 .buildrick-history-container kbd {
   display: inline-block;
   padding: 2px 5px;
-  font-family: var(--buildrick-design-font-mono, "JetBrains Mono", "Fira Code", "SF Mono", Monaco, monospace);
+  font-family: var(--buildrick-font-family-mono);
   font-size: 10px;
   background: var(--buildrick-surface-3);
   border: 1px solid var(--buildrick-border);
@@ -1268,7 +1268,7 @@
 }
 
 .empty-hint kbd {
-  font-family: var(--buildrick-design-font-mono, "JetBrains Mono", "Fira Code", "SF Mono", Monaco, monospace);
+  font-family: var(--buildrick-font-family-mono);
   padding: 2px 6px;
   background: var(--buildrick-surface-3);
   border: 1px solid var(--buildrick-border);
@@ -1306,7 +1306,7 @@
 .milestone-btn {
   padding: 5px 10px;
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   background: var(--buildrick-surface-4);
   color: var(--buildrick-text-secondary);
   font-size: 12px;

@@ -102,7 +102,7 @@ export const CodeField: React.FC<CodeFieldProps> = ({
                 style={{
                   padding: "0 8px",
                   fontSize: 12,
-                  fontFamily: "var(--buildrick-design-font-mono)",
+                  fontFamily: "var(--buildrick-font-family-mono)",
                   lineHeight: "20px",
                   color: "var(--buildrick-text-muted)",
                 }}
@@ -127,7 +127,7 @@ export const CodeField: React.FC<CodeFieldProps> = ({
             border: "none",
             color: "var(--buildrick-text-primary)",
             fontSize: 12,
-            fontFamily: "var(--buildrick-design-font-mono)",
+            fontFamily: "var(--buildrick-font-family-mono)",
             lineHeight: "20px",
             resize: "none",
             outline: "none",

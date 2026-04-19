@@ -63,7 +63,7 @@ const extractVarName = (v: string) => {
 
 const valueBadgeStyle: React.CSSProperties = {
   fontSize: 10,
-  fontFamily: "var(--buildrick-design-font-mono, 'JetBrains Mono', monospace)",
+  fontFamily: "var(--buildrick-font-family-mono)",
   color: "var(--buildrick-accent)",
   background: "var(--buildrick-accent-subtle)",
   padding: "1px 5px",

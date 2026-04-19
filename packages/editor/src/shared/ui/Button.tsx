@@ -38,7 +38,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       justifyContent: "center",
       gap: 6,
       border: "none",
-      borderRadius: "var(--buildrick-design-radius-md, 8px)",
+      borderRadius: "var(--buildrick-radius-md)",
       cursor: disabled || loading ? "not-allowed" : "pointer",
       fontFamily: "inherit",
       fontWeight: 500,

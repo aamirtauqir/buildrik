@@ -22,7 +22,7 @@
   background: var(--buildrick-bg-dark);
   display: flex;
   flex-direction: column;
-  border-radius: var(--buildrick-design-radius-lg, 12px);
+  border-radius: var(--buildrick-radius-lg);
   overflow: hidden;
   border: 1px solid var(--buildrick-border);
   animation: tmpl-preview-in 0.15s ease;
@@ -115,7 +115,7 @@
 .tmpl-preview__close {
   width: 24px;
   height: 24px;
-  border-radius: var(--buildrick-design-radius-sm, 5px);
+  border-radius: var(--buildrick-radius-sm);
   border: none;
   background: var(--buildrick-bg-hover);
   color: var(--buildrick-text-muted);
@@ -173,7 +173,7 @@
 .tmpl-preview__back {
   flex: 0 0 auto;
   padding: 7px 12px;
-  border-radius: var(--buildrick-design-radius-sm, 6px);
+  border-radius: var(--buildrick-radius-sm);
   border: 1px solid var(--buildrick-border);
   background: var(--buildrick-bg-hover);
   color: var(--buildrick-text-muted);
@@ -193,7 +193,7 @@
 .tmpl-preview__use {
   flex: 1;
   padding: 7px 12px;
-  border-radius: var(--buildrick-design-radius-sm, 6px);
+  border-radius: var(--buildrick-radius-sm);
   border: none;
   background: var(--buildrick-accent);
   color: #fff;

@@ -31,7 +31,7 @@
   --layout-inspector-width: var(--buildrick-right-panel-width, 320px);
   --layout-topbar-height: var(--buildrick-header-height, 52px);
   --layout-footer-height: var(--buildrick-footer-height, 40px);
-  --layout-gap: var(--buildrick-design-space-3, 12px);
+  --layout-gap: var(--buildrick-space-3);
   --layout-touch-min: var(--buildrick-touch-min, 44px);
 }
 
@@ -125,7 +125,7 @@
   z-index: 200;
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.45);
   border-right: none;
-  border-radius: 0 var(--buildrick-design-radius-lg, 12px) var(--buildrick-design-radius-lg, 12px) 0;
+  border-radius: 0 var(--buildrick-radius-lg) var(--buildrick-radius-lg) 0;
 }
 
 /* When no topbar slot, overlay starts from top */
@@ -368,7 +368,7 @@
     right: var(--layout-gap, 12px);
     bottom: var(--layout-gap, 12px);
     width: var(--layout-inspector-width, 280px);
-    border-radius: var(--buildrick-design-radius-xl, 16px);
+    border-radius: var(--buildrick-radius-xl);
     box-shadow: var(--glass-shadow-lg, 0 8px 32px rgba(0, 0, 0, 0.37));
     z-index: 200;
   }

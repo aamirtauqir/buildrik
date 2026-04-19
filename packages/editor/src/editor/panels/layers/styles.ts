@@ -28,7 +28,7 @@ export function getDropFeedbackStyle(type: "error" | "info"): CSSProperties {
     padding: "8px 12px",
     margin: "0 8px 8px",
     fontSize: "var(--buildrick-text-xs,12px)",
-    borderRadius: "var(--buildrick-design-radius-sm,4px)",
+    borderRadius: "var(--buildrick-radius-sm)",
     display: "flex",
     alignItems: "center",
     gap: "6px",

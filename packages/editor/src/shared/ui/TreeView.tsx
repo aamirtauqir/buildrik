@@ -58,7 +58,7 @@ function TreeItem<T>({
     gap: 4,
     padding: "4px 8px",
     paddingLeft: depth * indent + 8,
-    borderRadius: "var(--buildrick-design-radius-sm)",
+    borderRadius: "var(--buildrick-radius-sm)",
     cursor: "pointer",
     background: isSelected
       ? "var(--buildrick-accent-subtle)"

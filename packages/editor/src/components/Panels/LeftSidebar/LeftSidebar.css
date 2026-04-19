@@ -57,7 +57,7 @@
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
-  border-radius: var(--buildrick-design-radius-md) var(--buildrick-design-radius-md) 0 0;
+  border-radius: var(--buildrick-radius-md) 0 0;
   color: var(--buildrick-text-secondary);
   font-size: var(--buildrick-font-sm);
   font-weight: 500;
@@ -97,7 +97,7 @@
   padding: 0;
   background: transparent;
   border: none;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-secondary);
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
@@ -157,7 +157,7 @@
    ACCORDION STYLES
    ───────────────────────────────────────────── */
 .buildrick-accordion {
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   margin-bottom: 8px;
 }
 
@@ -171,7 +171,7 @@
   background: var(--buildrick-surface-3);
   border: 1px solid var(--buildrick-bg-hover);
   border-left: 2px solid transparent;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-primary);
   font-size: var(--buildrick-text-sm-plus);
   font-weight: 600;
@@ -272,7 +272,7 @@
   padding: 14px 8px;
   background: var(--buildrick-surface-3);
   border: 1px solid transparent;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   cursor: pointer;
   transition: var(--buildrick-transition-fast);
   min-height: 64px;
@@ -281,14 +281,14 @@
 .buildrick-card:hover {
   background: var(--buildrick-surface-4);
   border-color: var(--buildrick-accent-hover);
-  box-shadow: var(--buildrick-design-shadow-md);
+  box-shadow: var(--buildrick-shadow-md);
   transform: translateY(-2px);
 }
 
 .buildrick-card.selected {
   background: var(--buildrick-surface-4);
   border: 2px solid var(--buildrick-accent);
-  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2), var(--buildrick-design-shadow-md);
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2), var(--buildrick-shadow-md);
 }
 
 .buildrick-card.dragging {
@@ -753,8 +753,8 @@
   width: 100%;
   padding: 10px 12px 10px 36px;
   background: var(--buildrick-input-bg);
-  border: 1px solid var(--buildrick-design-input-border);
-  border-radius: var(--buildrick-design-radius-md);
+  border: 1px solid var(--buildrick-border-medium);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-primary);
   font-size: var(--buildrick-font-sm);
   outline: none;
@@ -910,7 +910,7 @@
   position: relative;
   aspect-ratio: 1;
   background: var(--buildrick-surface-3);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -921,7 +921,7 @@
 
 .buildrick-asset-card:hover {
   background: var(--buildrick-surface-4);
-  box-shadow: var(--buildrick-design-shadow-md);
+  box-shadow: var(--buildrick-shadow-md);
   transform: translateY(-2px);
 }
 
@@ -986,7 +986,7 @@
   padding: 24px;
   background: var(--buildrick-surface-2);
   border: 2px dashed var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-tertiary);
   font-size: var(--buildrick-font-sm);
   cursor: pointer;
@@ -1045,7 +1045,7 @@
   border: none;
   cursor: pointer;
   padding: 4px 8px;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   transition: var(--buildrick-transition-fast);
 }
 
@@ -1063,7 +1063,7 @@
   padding: 8px 12px;
   background: var(--buildrick-surface-3);
   border: 1px solid transparent;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-secondary);
   font-size: var(--buildrick-font-sm);
   cursor: pointer;
@@ -1116,7 +1116,7 @@
   padding: 8px 16px;
   background: var(--buildrick-surface-3);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-primary);
   font-size: var(--buildrick-font-sm);
   font-weight: 500;
@@ -1163,13 +1163,13 @@
   padding: 6px 10px;
   background: var(--buildrick-surface-4);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   color: var(--buildrick-text-primary);
   font-size: var(--buildrick-font-xs);
   white-space: nowrap;
   z-index: 1000;
   pointer-events: none;
-  box-shadow: var(--buildrick-design-shadow-md);
+  box-shadow: var(--buildrick-shadow-md);
 }
 
 /* ─────────────────────────────────────────────
@@ -1201,7 +1201,7 @@
   );
   background-size: 200% 100%;
   animation: buildrick-skeleton-shimmer 1.5s ease-in-out infinite;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
 }
 
 @keyframes buildrick-skeleton-shimmer {
@@ -1219,7 +1219,7 @@
   background: linear-gradient(90deg, var(--buildrick-surface-3) 25%, var(--buildrick-surface-4) 50%, var(--buildrick-surface-3) 75%);
   background-size: 200% 100%;
   animation: buildrick-skeleton-shimmer 1.5s ease-in-out infinite;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
 }
 
 .buildrick-skeleton-row {
@@ -1227,7 +1227,7 @@
   background: linear-gradient(90deg, var(--buildrick-surface-3) 25%, var(--buildrick-surface-4) 50%, var(--buildrick-surface-3) 75%);
   background-size: 200% 100%;
   animation: buildrick-skeleton-shimmer 1.5s ease-in-out infinite;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
 }
 
 .buildrick-skeleton-text {
@@ -1245,7 +1245,7 @@
   background: linear-gradient(90deg, var(--buildrick-surface-3) 25%, var(--buildrick-surface-4) 50%, var(--buildrick-surface-3) 75%);
   background-size: 200% 100%;
   animation: buildrick-skeleton-shimmer 1.5s ease-in-out infinite;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
 }
 
 /* ─────────────────────────────────────────────
@@ -1375,7 +1375,7 @@
   gap: 10px;
   padding: 8px;
   background: var(--buildrick-surface-3);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   cursor: grab;
   transition: var(--buildrick-transition-fast);
   align-items: center;
@@ -1395,7 +1395,7 @@
   width: 40px;
   height: 40px;
   background: var(--buildrick-surface-4);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1472,7 +1472,7 @@
   gap: 4px;
   padding: 4px;
   background: var(--buildrick-surface-3);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
 }
 
 .buildrick-toggle-btn {
@@ -1480,7 +1480,7 @@
   padding: 8px 12px;
   background: transparent;
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   font-size: var(--buildrick-text-sm-plus);
   font-weight: 500;
   color: var(--buildrick-text-secondary);
@@ -1535,8 +1535,8 @@
   width: 100%;
   padding: 8px 12px;
   background: var(--buildrick-input-bg);
-  border: 1px solid var(--buildrick-design-input-border);
-  border-radius: var(--buildrick-design-radius-md);
+  border: 1px solid var(--buildrick-border-medium);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-primary);
   font-size: var(--buildrick-text-sm-plus);
   outline: none;
@@ -1556,8 +1556,8 @@
   width: 100%;
   padding: 12px;
   background: var(--buildrick-input-bg);
-  border: 1px solid var(--buildrick-design-input-border);
-  border-radius: var(--buildrick-design-radius-md);
+  border: 1px solid var(--buildrick-border-medium);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-primary);
   font-size: var(--buildrick-text-sm-plus);
   font-family: inherit;
@@ -1575,8 +1575,8 @@
   width: 100%;
   padding: 8px 12px;
   background: var(--buildrick-input-bg);
-  border: 1px solid var(--buildrick-design-input-border);
-  border-radius: var(--buildrick-design-radius-md);
+  border: 1px solid var(--buildrick-border-medium);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-primary);
   font-size: var(--buildrick-text-sm-plus);
   outline: none;
@@ -1592,7 +1592,7 @@
   padding: 10px 12px;
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   font-size: var(--buildrick-text-sm-plus);
   color: #ef4444;
 }
@@ -1612,7 +1612,7 @@
   padding: 2px 6px;
   background: var(--buildrick-success, #10b981);
   color: #fff;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
 }
 
 .buildrick-error-badge {
@@ -1633,7 +1633,7 @@
   gap: 8px;
   padding: 12px;
   background: var(--buildrick-surface-2);
-  border-radius: var(--buildrick-design-radius-lg);
+  border-radius: var(--buildrick-radius-lg);
 }
 
 .buildrick-provider-header {
@@ -1656,7 +1656,7 @@
   background: var(--buildrick-accent);
   color: #fff;
   border: none;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   font-size: var(--buildrick-text-sm-plus);
   font-weight: 500;
   cursor: pointer;
@@ -1681,7 +1681,7 @@
   background: var(--buildrick-surface-3);
   color: var(--buildrick-text-primary);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   font-size: var(--buildrick-text-sm-plus);
   cursor: pointer;
   display: flex;
@@ -1715,7 +1715,7 @@
 .buildrick-deployment-card {
   padding: 12px;
   background: var(--buildrick-surface-3);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -1757,7 +1757,7 @@
   gap: 8px;
   padding: 12px;
   background: var(--buildrick-surface-3);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
 }
 
 .buildrick-token-buttons {
@@ -1771,7 +1771,7 @@
   background: var(--buildrick-accent);
   color: #fff;
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   font-size: var(--buildrick-text-sm-plus);
   font-weight: 500;
   cursor: pointer;
@@ -1782,7 +1782,7 @@
   background: transparent;
   color: var(--buildrick-text-muted);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   font-size: var(--buildrick-text-sm-plus);
   cursor: pointer;
 }
@@ -1860,7 +1860,7 @@
 .buildrick-coming-soon {
   padding: 12px;
   background: var(--buildrick-surface-2);
-  border-radius: var(--buildrick-design-radius-lg);
+  border-radius: var(--buildrick-radius-lg);
   opacity: 0.6;
 }
 
@@ -1889,7 +1889,7 @@
   justify-content: space-between;
   padding: 10px 12px;
   background: var(--buildrick-surface-3);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   gap: 8px;
 }
 
@@ -1902,7 +1902,7 @@
   padding: 4px 10px;
   background: var(--buildrick-surface-4);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   color: var(--buildrick-text-secondary);
   font-size: var(--buildrick-text-sm);
   font-weight: 500;
@@ -2346,7 +2346,7 @@
   display: flex;
   margin: 8px 10px;
   background: var(--buildrick-bg-hover);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   padding: 3px;
   gap: 2px;
 }
@@ -2356,7 +2356,7 @@
   padding: 8px 12px;
   background: transparent;
   border: none;
-  border-radius: calc(var(--buildrick-design-radius-md) - 2px);
+  border-radius: calc(var(--buildrick-radius-md);
   font-size: var(--buildrick-font-sm);
   font-weight: 500;
   color: var(--buildrick-text-secondary);
@@ -2399,7 +2399,7 @@
   gap: 4px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--buildrick-bg-hover);
-  border-radius: var(--buildrick-design-radius-lg);
+  border-radius: var(--buildrick-radius-lg);
   padding: 6px;
 }
 
@@ -2409,7 +2409,7 @@
   padding: 10px 12px;
   background: transparent;
   border: none;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   cursor: pointer;
   width: 100%;
   text-align: left;
@@ -2426,7 +2426,7 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   background: var(--buildrick-bg-active);
   color: var(--buildrick-text-secondary);
   flex-shrink: 0;
@@ -2542,7 +2542,7 @@
   margin: 0 2px;
   background: var(--buildrick-surface-4);
   border-radius: 4px;
-  font-family: var(--buildrick-design-font-mono);
+  font-family: var(--buildrick-font-family-mono);
   font-size: var(--buildrick-text-xs);
   font-weight: 500;
   color: var(--buildrick-text-primary);
@@ -2597,12 +2597,12 @@
   color: var(--buildrick-text-muted);
   padding: 4px 8px;
   background: var(--buildrick-surface-2);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
 }
 
 /* Group Container (SECTIONS/PAGES/MY SAVES) */
 .buildrick-group {
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   overflow: hidden;
   background: var(--buildrick-surface-1);
 }
@@ -2654,7 +2654,7 @@
   gap: 10px;
   padding: 8px 10px;
   background: var(--buildrick-surface-3);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   cursor: pointer;
   border: 1px solid transparent;
   transition: background 100ms, border-color 100ms;
@@ -2673,7 +2673,7 @@
   align-items: center;
   justify-content: center;
   background: var(--buildrick-surface-4);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   flex-shrink: 0;
 }
 
@@ -2988,7 +2988,7 @@
   padding: 8px 10px;
   background: linear-gradient(135deg, var(--buildrick-surface-3), var(--buildrick-surface-4));
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   cursor: pointer;
   transition: background 100ms, border-color 100ms;
 }
@@ -3007,7 +3007,7 @@
   justify-content: center;
   background: var(--buildrick-accent);
   color: #fff;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   flex-shrink: 0;
 }
 
@@ -3031,7 +3031,7 @@
 
 .buildrick-dialog {
   background: var(--buildrick-surface-1);
-  border-radius: var(--buildrick-design-radius-lg);
+  border-radius: var(--buildrick-radius-lg);
   padding: 24px;
   width: 320px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -3065,7 +3065,7 @@
   background: var(--buildrick-accent);
   color: #fff;
   border: none;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   font-size: var(--buildrick-text-base);
   font-weight: 500;
   cursor: pointer;
@@ -3082,7 +3082,7 @@
   background: var(--buildrick-surface-3);
   color: var(--buildrick-text-primary);
   border: none;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   font-size: var(--buildrick-text-base);
   font-weight: 500;
   cursor: pointer;
@@ -3170,7 +3170,7 @@
   justify-content: center;
   background: transparent;
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   cursor: pointer;
   color: var(--buildrick-text-muted);
   font-size: var(--buildrick-text-xl);
@@ -3312,7 +3312,7 @@
   padding: 8px 10px;
   background: var(--buildrick-surface-3);
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   cursor: pointer;
   color: var(--buildrick-text-secondary);
   font-size: var(--buildrick-text-sm);
@@ -3350,7 +3350,7 @@
   justify-content: center;
   background: var(--buildrick-surface-4);
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   cursor: pointer;
   color: var(--buildrick-text-muted);
   font-size: var(--buildrick-text-md);
@@ -3406,7 +3406,7 @@
   content: '';
   position: absolute;
   inset: 4px;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   background: transparent;
   transition: all 0.2s ease;
 }
@@ -3475,7 +3475,7 @@
 .buildrick-icon-rail-btn:focus-visible {
   outline: 2px solid var(--buildrick-accent);
   outline-offset: 2px;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
 }
 
 .buildrick-icon-rail-btn:focus-visible::after {
@@ -3500,7 +3500,7 @@
 }
 .hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: var(--buildrick-design-shadow-md);
+  box-shadow: var(--buildrick-shadow-md);
 }
 
 /* Hover Glow - adds glow effect */
@@ -3552,7 +3552,7 @@
   justify-content: space-between;
   padding: 12px;
   background: var(--buildrick-surface-3);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
 }
 
 .buildrick-compact-empty-text {
@@ -3565,7 +3565,7 @@
   background: var(--buildrick-accent-tint);
   color: var(--buildrick-accent);
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   font-size: var(--buildrick-font-xs);
   font-weight: 500;
   cursor: pointer;
@@ -3785,7 +3785,7 @@
   padding: 6px 12px;
   background: var(--buildrick-surface-3);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-primary);
   font-size: var(--buildrick-text-sm-plus);
   font-weight: 500;
@@ -3847,7 +3847,7 @@
   padding: 8px;
   background: transparent;
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   color: var(--buildrick-text-primary);
   font-size: var(--buildrick-text-sm-plus);
   text-align: left;
@@ -4767,7 +4767,7 @@
   padding: 10px 12px;
   background: rgba(74, 222, 128, 0.07);
   border: 1px solid rgba(74, 222, 128, 0.2);
-  border-radius: var(--buildrick-design-radius-md, 8px);
+  border-radius: var(--buildrick-radius-md);
   margin-bottom: 6px;
 }
 
@@ -5034,7 +5034,7 @@
   padding: 10px 12px;
   background: rgba(248, 113, 113, 0.06);
   border: 1px solid rgba(248, 113, 113, 0.2);
-  border-radius: var(--buildrick-design-radius-md, 8px);
+  border-radius: var(--buildrick-radius-md);
   margin-bottom: 6px;
 }
 
@@ -5550,7 +5550,7 @@
   padding: 0;
   background: transparent;
   border: none;
-  border-radius: var(--buildrick-design-radius-md, 6px);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-secondary, #a1a1aa);
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
@@ -5616,7 +5616,7 @@
   padding: 6px 8px;
   background: transparent;
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   color: var(--buildrick-text-secondary);
   font-size: var(--buildrick-font-sm);
   cursor: pointer;
@@ -5648,7 +5648,7 @@
   padding: 0;
   background: transparent;
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   color: var(--buildrick-text-tertiary);
   cursor: pointer;
   transition: var(--buildrick-transition-fast);
@@ -5673,7 +5673,7 @@
   width: 100%;
   aspect-ratio: 236 / 140;
   background: var(--buildrick-surface-3);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   border: 1px solid var(--buildrick-border);
   overflow: hidden;
   display: flex;
@@ -5699,7 +5699,7 @@
   gap: 8px;
   padding: 12px;
   background: var(--buildrick-surface-3);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
 }
 
 .buildrick-component-detail-info-row {
@@ -5725,7 +5725,7 @@
   padding: 12px 16px;
   background: linear-gradient(135deg, #8B5CF6, #7C3AED);
   border: none;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   color: white;
   font-size: var(--buildrick-font-md);
   font-weight: 600;
@@ -5757,7 +5757,7 @@
   padding: 10px 12px;
   background: var(--buildrick-surface-3);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-secondary);
   font-size: var(--buildrick-font-sm);
   cursor: pointer;
@@ -5786,7 +5786,7 @@
   padding: 12px;
   background: rgba(124, 125, 255, 0.08);
   border: 1px solid rgba(124, 125, 255, 0.2);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
 }
 
 .buildrick-component-detail-section-title {
@@ -5803,7 +5803,7 @@
   padding: 10px 12px;
   background: transparent;
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-secondary);
   font-size: var(--buildrick-font-sm);
   cursor: pointer;
@@ -5822,7 +5822,7 @@
   gap: 12px;
   padding: 12px;
   background: var(--buildrick-surface-3);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
 }
 
 .buildrick-variant-picker {
@@ -5846,7 +5846,7 @@
   padding: 6px 12px;
   background: var(--buildrick-surface-2);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   color: var(--buildrick-text-secondary);
   font-size: var(--buildrick-font-xs);
   font-weight: 500;
@@ -5888,7 +5888,7 @@
   padding: 6px 12px;
   font-size: var(--buildrick-font-xs);
   font-weight: 500;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   cursor: pointer;
   transition: var(--buildrick-transition-fast);
 }
@@ -5967,7 +5967,7 @@
   padding: 6px 10px;
   background: var(--buildrick-surface-3);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   color: var(--buildrick-text-primary);
   font-size: var(--buildrick-font-xs);
 }
@@ -5983,7 +5983,7 @@
 
 .buildrick-new-folder-input button {
   padding: 6px 10px;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   font-size: var(--buildrick-font-xs);
   font-weight: 500;
   cursor: pointer;
@@ -6013,7 +6013,7 @@
   padding: 8px 12px;
   background: transparent;
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   color: var(--buildrick-text-secondary);
   font-size: var(--buildrick-font-xs);
   cursor: pointer;
@@ -6112,7 +6112,7 @@
   flex-direction: column;
   background: var(--buildrick-surface-3);
   border: 1px solid transparent;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   cursor: pointer;
   transition: var(--buildrick-transition-fast);
   overflow: hidden;
@@ -6122,7 +6122,7 @@
   background: var(--buildrick-surface-4);
   border-color: var(--buildrick-accent-hover);
   transform: translateY(-2px);
-  box-shadow: var(--buildrick-design-shadow-md);
+  box-shadow: var(--buildrick-shadow-md);
 }
 
 .buildrick-asset-tile.selected {
@@ -6212,7 +6212,7 @@
   max-width: 90vw;
   background: var(--buildrick-surface-2);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-lg);
+  border-radius: var(--buildrick-radius-lg);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
 }
 
@@ -6241,7 +6241,7 @@
   padding: 40px 20px;
   background: var(--buildrick-surface-3);
   border: 2px dashed var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-muted);
   transition: var(--buildrick-transition-fast);
 }
@@ -6273,7 +6273,7 @@
   padding: 10px 16px;
   font-size: var(--buildrick-font-sm);
   font-weight: 500;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   cursor: pointer;
   transition: var(--buildrick-transition-fast);
 }
@@ -6305,7 +6305,7 @@
   padding: 10px 12px;
   background: var(--buildrick-surface-3);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   color: var(--buildrick-text-primary);
   font-size: var(--buildrick-font-sm);
 }
@@ -6323,7 +6323,7 @@
   padding: 10px 16px;
   background: var(--buildrick-accent);
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   color: white;
   font-size: var(--buildrick-font-sm);
   font-weight: 500;
@@ -6372,7 +6372,7 @@
   gap: 12px;
   padding: 16px;
   background: var(--buildrick-surface-3);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   margin-top: 12px;
 }
 
@@ -6412,7 +6412,7 @@
   padding: 10px 16px;
   background: linear-gradient(135deg, var(--buildrick-accent), var(--buildrick-accent));
   border: none;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   color: white;
   font-size: var(--buildrick-font-sm);
   font-weight: 500;
@@ -6472,7 +6472,7 @@
   align-items: center;
   padding: 2px;
   background: var(--buildrick-surface-3);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   gap: 2px;
 }
 
@@ -6943,7 +6943,7 @@
   margin: 8px 0;
   padding: 10px 12px;
   background: var(--buildrick-surface-3);
-  border-radius: var(--buildrick-design-radius-lg);
+  border-radius: var(--buildrick-radius-lg);
   border: 1px solid var(--buildrick-border-subtle);
 }
 
@@ -6981,7 +6981,7 @@
   padding: 10px 8px;
   background: var(--buildrick-surface-2);
   border: 1px solid var(--buildrick-border-default);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-primary);
   font-size: var(--buildrick-font-xs);
   cursor: pointer;

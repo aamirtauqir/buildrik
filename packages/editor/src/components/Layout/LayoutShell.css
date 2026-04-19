@@ -24,7 +24,7 @@
   --layout-inspector-width: var(--buildrick-right-panel-width, 300px);
   --layout-topbar-height: var(--buildrick-header-height, 52px);
   --layout-footer-height: var(--buildrick-footer-height, 40px);
-  --layout-gap: var(--buildrick-design-space-3, 12px);
+  --layout-gap: var(--buildrick-space-3);
   --layout-touch-min: var(--buildrick-touch-min, 44px);
 }
 
@@ -225,7 +225,7 @@
     right: var(--layout-gap, 12px);
     bottom: var(--layout-gap, 12px);
     width: var(--layout-inspector-width, 300px);
-    border-radius: var(--buildrick-design-radius-xl, 16px);
+    border-radius: var(--buildrick-radius-xl);
     box-shadow: var(--glass-shadow-lg, 0 8px 32px rgba(0, 0, 0, 0.37));
     z-index: 200;
   }

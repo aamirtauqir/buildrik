@@ -113,7 +113,7 @@ const s: Record<string, React.CSSProperties> = {
     padding: "8px 12px",
     background: "var(--buildrick-bg-panel-secondary)",
     border: "1px solid var(--buildrick-border)",
-    borderRadius: "var(--buildrick-design-radius-md)",
+    borderRadius: "var(--buildrick-radius-md)",
     color: "var(--buildrick-text-primary, #e4e4e7)",
     fontSize: 13,
     outline: "none",
@@ -125,7 +125,7 @@ const s: Record<string, React.CSSProperties> = {
     padding: "8px 12px",
     background: "var(--buildrick-bg-panel-secondary)",
     border: "1px solid var(--buildrick-border)",
-    borderRadius: "var(--buildrick-design-radius-md)",
+    borderRadius: "var(--buildrick-radius-md)",
     color: "var(--buildrick-text-primary, #e4e4e7)",
     fontSize: 13,
     outline: "none",
@@ -137,7 +137,7 @@ const s: Record<string, React.CSSProperties> = {
     padding: "8px 12px",
     background: "var(--buildrick-bg-panel-secondary)",
     border: "1px solid var(--buildrick-border)",
-    borderRadius: "var(--buildrick-design-radius-md)",
+    borderRadius: "var(--buildrick-radius-md)",
     color: "var(--buildrick-text-primary, #e4e4e7)",
     fontSize: 13,
     outline: "none",
@@ -158,7 +158,7 @@ const s: Record<string, React.CSSProperties> = {
     padding: "6px 10px",
     background: "var(--buildrick-bg-panel-secondary)",
     border: "1px solid var(--buildrick-border)",
-    borderRadius: "var(--buildrick-design-radius-sm)",
+    borderRadius: "var(--buildrick-radius-sm)",
     color: "var(--buildrick-text-primary, #e4e4e7)",
     fontSize: 12,
     outline: "none",
@@ -168,7 +168,7 @@ const s: Record<string, React.CSSProperties> = {
     padding: "6px 8px",
     background: "var(--buildrick-bg-panel-secondary)",
     border: "1px solid var(--buildrick-border)",
-    borderRadius: "var(--buildrick-design-radius-sm)",
+    borderRadius: "var(--buildrick-radius-sm)",
     color: "var(--buildrick-text-primary, #e4e4e7)",
     fontSize: 12,
     outline: "none",
@@ -182,7 +182,7 @@ const s: Record<string, React.CSSProperties> = {
     justifyContent: "center",
     background: "transparent",
     border: "none",
-    borderRadius: "var(--buildrick-design-radius-sm)",
+    borderRadius: "var(--buildrick-radius-sm)",
     color: "var(--buildrick-text-muted)",
     cursor: "pointer",
     flexShrink: 0,
@@ -195,7 +195,7 @@ const s: Record<string, React.CSSProperties> = {
     padding: "12px 14px",
     background: "rgba(34, 197, 94, 0.1)",
     border: "1px solid rgba(34, 197, 94, 0.25)",
-    borderRadius: "var(--buildrick-design-radius-md)",
+    borderRadius: "var(--buildrick-radius-md)",
     color: "#86efac",
     fontSize: 13,
     marginTop: 12,
@@ -380,7 +380,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           {/* Collection name */}
           <div>
             <label style={s.label}>
-              Collection name <span style={{ color: "var(--buildrick-design-color-error, #f38ba8)" }}>*</span>
+              Collection name <span style={{ color: "var(--buildrick-error)" }}>*</span>
             </label>
             <input
               style={s.input}
@@ -507,7 +507,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                   onClick={() => removeField(field.id)}
                   title="Remove field"
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.color = "var(--buildrick-design-color-error, #f38ba8)";
+                    (e.currentTarget as HTMLElement).style.color = "var(--buildrick-error)";
                     (e.currentTarget as HTMLElement).style.background =
                       "rgba(243,139,168,0.1)";
                   }}
@@ -529,8 +529,8 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                 padding: "8px 12px",
                 background: "rgba(243,139,168,0.1)",
                 border: "1px solid rgba(243,139,168,0.25)",
-                borderRadius: "var(--buildrick-design-radius-md)",
-                color: "var(--buildrick-design-color-error, #f38ba8)",
+                borderRadius: "var(--buildrick-radius-md)",
+                color: "var(--buildrick-error)",
                 fontSize: 12,
               }}
             >

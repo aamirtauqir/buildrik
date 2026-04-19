@@ -18,7 +18,7 @@ const cardStyles: React.CSSProperties = {
   gap: 10,
   padding: "10px 12px",
   background: "var(--buildrick-surface-3)",
-  borderRadius: "var(--buildrick-design-radius-md)",
+  borderRadius: "var(--buildrick-radius-md)",
   marginBottom: 6,
 };
 
@@ -48,7 +48,7 @@ const learnBtnStyles: React.CSSProperties = {
   fontSize: "var(--buildrick-font-xs)",
   fontWeight: 500,
   padding: "4px 10px",
-  borderRadius: "var(--buildrick-design-radius-sm)",
+  borderRadius: "var(--buildrick-radius-sm)",
   border: "1px solid var(--buildrick-border)",
   background: "transparent",
   color: "var(--buildrick-accent)",

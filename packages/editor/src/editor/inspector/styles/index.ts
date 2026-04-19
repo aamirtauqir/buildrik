@@ -13,23 +13,23 @@ import type { PseudoStateId } from "../../../shared/types";
 
 export const INSPECTOR_SPACING = {
   // Section container
-  sectionPadding: "var(--buildrick-design-space-4)", // 16px
-  sectionGap: "var(--buildrick-design-space-3)", // 12px between sections
+  sectionPadding: "var(--buildrick-space-4)", // 16px
+  sectionGap: "var(--buildrick-space-3)", // 12px between sections
 
   // Section header
-  headerPaddingY: "var(--buildrick-design-space-2)", // 8px
-  headerPaddingX: "var(--buildrick-design-space-4)", // 16px
+  headerPaddingY: "var(--buildrick-space-2)", // 8px
+  headerPaddingX: "var(--buildrick-space-4)", // 16px
 
   // Content area
-  contentPadding: "var(--buildrick-design-space-4)", // 16px
-  contentGap: "var(--buildrick-design-space-3)", // 12px between control groups
+  contentPadding: "var(--buildrick-space-4)", // 16px
+  contentGap: "var(--buildrick-space-3)", // 12px between control groups
 
   // Control groups (label + input)
-  controlGap: "var(--buildrick-design-space-2)", // 8px between label and input
-  inputGap: "var(--buildrick-design-space-2)", // 8px between inputs in a row
+  controlGap: "var(--buildrick-space-2)", // 8px between label and input
+  inputGap: "var(--buildrick-space-2)", // 8px between inputs in a row
 
   // Labels
-  labelMarginBottom: "var(--buildrick-design-space-1)", // 4px
+  labelMarginBottom: "var(--buildrick-space-1)", // 4px
 } as const;
 
 // ============================================================================
@@ -142,7 +142,7 @@ export const panelStyles = {
     gap: 6,
   }),
   content: {
-    padding: "var(--buildrick-design-space-2) 0",
+    padding: "var(--buildrick-space-2) 0",
   },
   breakpointIndicator: {
     display: "flex" as const,
@@ -159,7 +159,7 @@ export const panelStyles = {
     display: "flex" as const,
     alignItems: "center" as const,
     gap: 4,
-    padding: "var(--buildrick-design-space-2) var(--buildrick-design-space-3)",
+    padding: "var(--buildrick-space-2)",
     marginTop: 8,
     background: "rgba(0,0,0,0.2)",
     borderRadius: 6,

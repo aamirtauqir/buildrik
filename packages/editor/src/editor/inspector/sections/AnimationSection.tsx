@@ -86,7 +86,7 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
         style={{
           fontSize: 12,
           color: "var(--buildrick-text-tertiary)",
-          fontFamily: "var(--buildrick-design-font-mono)",
+          fontFamily: "var(--buildrick-font-family-mono)",
         }}
       >
         {localAnimation.type}
@@ -161,7 +161,7 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
               padding: 12,
               background: "rgba(0, 0, 0, 0.2)",
               borderRadius: 8,
-              fontFamily: "var(--buildrick-design-font-mono, 'Fira Code', monospace)",
+              fontFamily: "var(--buildrick-font-family-mono)",
               fontSize: 12,
               color: "#71717a",
               wordBreak: "break-all",

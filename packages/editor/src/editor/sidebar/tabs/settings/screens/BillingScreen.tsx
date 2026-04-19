@@ -63,7 +63,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
           justifyContent: "space-between",
           padding: "12px 14px",
           background: "var(--buildrick-surface-3)",
-          borderRadius: "var(--buildrick-design-radius-md)",
+          borderRadius: "var(--buildrick-radius-md)",
           border: "1px solid var(--buildrick-border)",
         }}
       >
@@ -85,7 +85,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
         <span
           style={{
             padding: "3px 10px",
-            borderRadius: "var(--buildrick-design-radius-full, 999px)",
+            borderRadius: "var(--buildrick-radius-full)",
             background: isFreePlan ? "var(--buildrick-surface-4)" : "rgba(45,109,255,0.12)",
             color: isFreePlan ? "var(--buildrick-text-secondary)" : "var(--buildrick-accent)",
             fontSize: 12,
@@ -105,7 +105,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
           style={{
             padding: "14px",
             background: "rgba(45,109,255,0.06)",
-            borderRadius: "var(--buildrick-design-radius-md)",
+            borderRadius: "var(--buildrick-radius-md)",
             border: "1px solid rgba(45,109,255,0.15)",
           }}
         >
@@ -147,7 +147,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
               padding: "9px 16px",
               background: "var(--buildrick-accent)",
               border: "none",
-              borderRadius: "var(--buildrick-design-radius-md)",
+              borderRadius: "var(--buildrick-radius-md)",
               color: "#fff",
               fontSize: 13,
               fontWeight: 600,
@@ -167,7 +167,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
           style={{
             padding: "12px 14px",
             background: "rgba(34,197,94,0.06)",
-            borderRadius: "var(--buildrick-design-radius-md)",
+            borderRadius: "var(--buildrick-radius-md)",
             border: "1px solid rgba(34,197,94,0.15)",
             fontSize: 13,
             color: "var(--buildrick-text-secondary)",

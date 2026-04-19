@@ -51,7 +51,7 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
       height: config.size,
       padding: config.padding,
       border: "none",
-      borderRadius: rounded ? "var(--buildrick-design-radius-full)" : "var(--buildrick-design-radius-md)",
+      borderRadius: rounded ? "var(--buildrick-radius-full)" : "var(--buildrick-radius-md)",
       cursor: disabled ? "not-allowed" : "pointer",
       transition: "all var(--buildrick-transition-fast)",
       opacity: disabled ? 0.4 : 1,

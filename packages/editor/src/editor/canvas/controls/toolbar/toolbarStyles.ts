@@ -16,8 +16,8 @@ export const toolbarStyles: React.CSSProperties = {
   padding: "0 4px",
   background: "var(--buildrick-surface-4)",
   border: "1px solid var(--buildrick-border-light, rgba(255,255,255,0.12))",
-  borderRadius: "var(--buildrick-design-radius-md)",
-  boxShadow: "var(--buildrick-design-shadow-md)",
+  borderRadius: "var(--buildrick-radius-md)",
+  boxShadow: "var(--buildrick-shadow-md)",
   backdropFilter: "blur(8px)",
   gap: 2,
 };

@@ -99,8 +99,8 @@ const Tooltip: React.FC<TooltipProps> = ({ label, children }) => {
     color: "var(--buildrick-text-primary)",
     fontSize: 12,
     padding: "4px 8px",
-    borderRadius: "var(--buildrick-design-radius-sm)",
-    boxShadow: "var(--buildrick-design-shadow-md)",
+    borderRadius: "var(--buildrick-radius-sm)",
+    boxShadow: "var(--buildrick-shadow-md)",
     pointerEvents: "none",
     zIndex: 9999,
     opacity: visible ? 1 : 0,
@@ -233,7 +233,7 @@ const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = ({ status }) => 
     color: "var(--buildrick-text-muted)",
     padding: "4px 8px",
     backgroundColor: "var(--buildrick-surface-3)",
-    borderRadius: "var(--buildrick-design-radius-xl, 999px)",
+    borderRadius: "var(--buildrick-radius-xl)",
   };
 
   const spinnerStyle: React.CSSProperties = {

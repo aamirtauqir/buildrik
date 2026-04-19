@@ -260,7 +260,7 @@ const panelStyles: React.CSSProperties = {
   overflow: "hidden",
   display: "flex",
   flexDirection: "column",
-  fontFamily: "var(--buildrick-design-font-body, system-ui, -apple-system, sans-serif)",
+  fontFamily: "var(--buildrick-font-family)",
 };
 
 const pillStyles: React.CSSProperties = {
@@ -277,7 +277,7 @@ const pillStyles: React.CSSProperties = {
   boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
   zIndex: 1200,
   cursor: "pointer",
-  fontFamily: "var(--buildrick-design-font-body, system-ui, -apple-system, sans-serif)",
+  fontFamily: "var(--buildrick-font-family)",
   userSelect: "none",
 };
 

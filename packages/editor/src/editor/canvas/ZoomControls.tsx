@@ -174,7 +174,7 @@ const containerStyles: React.CSSProperties = {
   padding: "6px 10px",
   background: "var(--buildrick-surface-2)",
   border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--buildrick-design-radius-lg)",
+  borderRadius: "var(--buildrick-radius-lg)",
   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
   zIndex: 100,
 };
@@ -207,7 +207,7 @@ const percentButtonStyles: React.CSSProperties = {
   padding: "4px 8px",
   background: "transparent",
   border: "none",
-  borderRadius: "var(--buildrick-design-radius-sm)",
+  borderRadius: "var(--buildrick-radius-sm)",
   color: "var(--buildrick-text-secondary)",
   fontSize: 12,
   fontWeight: 500,
@@ -225,14 +225,14 @@ const presetsDropdownStyles: React.CSSProperties = {
   padding: 4,
   background: "var(--buildrick-surface-2)",
   border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--buildrick-design-radius-md)",
+  borderRadius: "var(--buildrick-radius-md)",
   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
 };
 
 const presetItemStyles: React.CSSProperties = {
   padding: "6px 12px",
   border: "none",
-  borderRadius: "var(--buildrick-design-radius-sm)",
+  borderRadius: "var(--buildrick-radius-sm)",
   color: "var(--buildrick-text-primary)",
   fontSize: 12,
   cursor: "pointer",

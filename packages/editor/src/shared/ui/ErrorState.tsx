@@ -124,7 +124,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           padding: "10px 14px",
           background: config.bgColor,
           border: `1px solid ${config.borderColor}`,
-          borderRadius: "var(--buildrick-design-radius-md, 8px)",
+          borderRadius: "var(--buildrick-radius-md)",
         }}
       >
         <span
@@ -188,7 +188,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
         padding: sizes.padding,
         background: "rgba(255, 255, 255, 0.02)",
         border: "1px solid rgba(255, 255, 255, 0.06)",
-        borderRadius: "var(--buildrick-design-radius-lg, 12px)",
+        borderRadius: "var(--buildrick-radius-lg)",
       }}
     >
       {/* Icon */}
@@ -281,10 +281,10 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
             marginBottom: sizes.gap,
             padding: 12,
             background: "rgba(0, 0, 0, 0.3)",
-            borderRadius: "var(--buildrick-design-radius-md, 8px)",
+            borderRadius: "var(--buildrick-radius-md)",
             border: "1px solid var(--buildrick-border, #334155)",
             fontSize: 12,
-            fontFamily: "var(--buildrick-design-font-mono, monospace)",
+            fontFamily: "var(--buildrick-font-family-mono)",
             color: "var(--buildrick-text-secondary, #94a3b8)",
             textAlign: "left",
             maxWidth: "100%",

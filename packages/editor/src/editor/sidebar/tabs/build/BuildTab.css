@@ -524,7 +524,7 @@
 
 /* ─── v4: Kbd hint (search bar `/`) ─── */
 .bld-kbd-hint {
-  font-family: var(--buildrick-design-font-mono, 'Geist Mono', monospace);
+  font-family: var(--buildrick-font-family-mono);
   font-size: 11px;
   color: var(--buildrick-text-muted, #686878);
   padding: 2px 6px;

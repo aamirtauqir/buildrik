@@ -66,7 +66,7 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
               border: isSelected
                 ? "2px solid var(--buildrick-accent)"
                 : "1px solid var(--buildrick-border)",
-              borderRadius: "var(--buildrick-design-radius-md)",
+              borderRadius: "var(--buildrick-radius-md)",
               padding: 16,
               cursor: "pointer",
               textAlign: "left",
@@ -81,7 +81,7 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
                 width: 32,
                 height: 32,
                 background: "var(--buildrick-surface-5)",
-                borderRadius: "var(--buildrick-design-radius-sm)",
+                borderRadius: "var(--buildrick-radius-sm)",
                 flexShrink: 0,
               }}
             />
@@ -115,7 +115,7 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
           style={{
             background: "var(--buildrick-surface-3)",
             border: "1px solid var(--buildrick-border)",
-            borderRadius: "var(--buildrick-design-radius-md)",
+            borderRadius: "var(--buildrick-radius-md)",
             padding: 16,
             textAlign: "left",
             display: "flex",
@@ -132,7 +132,7 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
               width: 32,
               height: 32,
               background: "var(--buildrick-surface-5)",
-              borderRadius: "var(--buildrick-design-radius-sm)",
+              borderRadius: "var(--buildrick-radius-sm)",
               flexShrink: 0,
             }}
           />

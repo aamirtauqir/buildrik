@@ -48,7 +48,7 @@
 
 .pages-header__count {
   font-size: 12px;
-  font-family: var(--buildrick-design-font-mono, monospace);
+  font-family: var(--buildrick-font-family-mono);
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--buildrick-border);
   border-radius: 10px;
@@ -147,7 +147,7 @@
 .pages-add-item__badge {
   font-size: 10px;
   font-weight: 700;
-  font-family: var(--buildrick-design-font-mono, monospace);
+  font-family: var(--buildrick-font-family-mono);
   background: rgba(245, 158, 11, 0.12);
   border: 1px solid rgba(245, 158, 11, 0.28);
   color: var(--pg-hidden);
@@ -421,7 +421,7 @@
 /* Badges */
 .pages-row__home {
   font-size: 10px;
-  font-family: var(--buildrick-design-font-mono, monospace);
+  font-family: var(--buildrick-font-family-mono);
   font-weight: 600;
   background: rgba(34, 197, 94, 0.1);
   border: 1px solid rgba(34, 197, 94, 0.2);
@@ -486,7 +486,7 @@
 
 .pages-footer__info {
   font-size: 12px;
-  font-family: var(--buildrick-design-font-mono, monospace);
+  font-family: var(--buildrick-font-family-mono);
   color: var(--buildrick-text-muted);
 }
 
@@ -697,7 +697,7 @@
 
 .pages-drawer__cc {
   font-size: 12px;
-  font-family: var(--buildrick-design-font-mono, monospace);
+  font-family: var(--buildrick-font-family-mono);
   color: var(--buildrick-text-muted);
 }
 
@@ -911,7 +911,7 @@
 
 .pages-ctx__kbd {
   font-size: 12px;
-  font-family: var(--buildrick-design-font-mono, monospace);
+  font-family: var(--buildrick-font-family-mono);
   color: var(--buildrick-text-muted);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--buildrick-border);
@@ -1146,9 +1146,9 @@
 .pg-name-error {
   padding: 6px 12px;
   font-size: 12px;
-  color: var(--buildrick-design-color-error, #ef4444);
+  color: var(--buildrick-error);
   background: var(--buildrick-danger-bg, rgba(239, 68, 68, 0.12));
-  border-top: 1px solid var(--buildrick-design-color-error, rgba(239, 68, 68, 0.25));
+  border-top: 1px solid var(--buildrick-error));
   flex-shrink: 0;
 }
 
@@ -1245,7 +1245,7 @@
 
 .pg-row__status {
   font-size: 10px;
-  font-family: var(--buildrick-design-font-mono, monospace);
+  font-family: var(--buildrick-font-family-mono);
   font-weight: 600;
   border-radius: 3px;
   padding: 1px 5px;
@@ -1367,7 +1367,7 @@
 
 .pg-ctx-item kbd {
   font-size: 12px;
-  font-family: var(--buildrick-design-font-mono, monospace);
+  font-family: var(--buildrick-font-family-mono);
   color: var(--buildrick-text-muted);
   background: rgba(255,255,255,0.05);
   border: 1px solid var(--buildrick-border);
@@ -1740,7 +1740,7 @@
   font-size: 12px;
   color: var(--buildrick-text-primary);
   outline: none;
-  font-family: var(--buildrick-design-font-mono, monospace);
+  font-family: var(--buildrick-font-family-mono);
   box-sizing: border-box;
   resize: vertical;
   min-height: 80px;
@@ -2129,7 +2129,7 @@
   margin-left: auto;
   font-size: 10px;
   font-weight: 700;
-  font-family: var(--buildrick-design-font-mono, monospace);
+  font-family: var(--buildrick-font-family-mono);
   background: rgba(255,255,255,0.06);
   border: 1px solid var(--buildrick-border);
   border-radius: 3px;
@@ -2192,7 +2192,7 @@
   letter-spacing: -0.1px;
 }
 .pages-panel .pages-header__count {
-  font-family: "Geist Mono", var(--buildrick-design-font-mono, monospace);
+  font-family: "Geist Mono", var(--buildrick-font-family-mono);
   font-variant-numeric: tabular-nums;
   font-size: 10.5px;
   background: rgba(255, 255, 255, 0.05);

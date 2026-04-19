@@ -21,27 +21,27 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   elementLabel,
 }) => (
   <Modal isOpen={isOpen} onClose={onClose} title="Delete Element" size="sm">
-    <div style={{ padding: "var(--buildrick-design-space-4)" }}>
+    <div style={{ padding: "var(--buildrick-space-4)" }}>
       <p
         role="alert"
         style={{
-          margin: "0 0 var(--buildrick-design-space-4)",
+          margin: "0 0 var(--buildrick-space-4)",
           color: "var(--buildrick-text-secondary)",
           fontSize: "var(--buildrick-text-md)",
           lineHeight: 1.5,
         }}
       >
         Delete <strong>{elementLabel}</strong>? You can undo this with{" "}
-        <kbd style={{ fontFamily: "var(--buildrick-design-font-mono)", fontSize: "0.9em" }}>Ctrl+Z</kbd>.
+        <kbd style={{ fontFamily: "var(--buildrick-font-family-mono)", fontSize: "0.9em" }}>Ctrl+Z</kbd>.
       </p>
-      <div style={{ display: "flex", gap: "var(--buildrick-design-space-3)", justifyContent: "flex-end" }}>
+      <div style={{ display: "flex", gap: "var(--buildrick-space-3)", justifyContent: "flex-end" }}>
         <button
           onClick={onClose}
           style={{
             padding: "8px 16px",
             background: "var(--buildrick-surface-4)",
             border: "1px solid var(--buildrick-border)",
-            borderRadius: "var(--buildrick-design-radius-md)",
+            borderRadius: "var(--buildrick-radius-md)",
             color: "var(--buildrick-text-primary)",
             cursor: "pointer",
             fontWeight: 500,
@@ -55,7 +55,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
             padding: "8px 16px",
             background: "var(--buildrick-error)",
             border: "none",
-            borderRadius: "var(--buildrick-design-radius-md)",
+            borderRadius: "var(--buildrick-radius-md)",
             color: "white",
             cursor: "pointer",
             fontWeight: 600,

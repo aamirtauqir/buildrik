@@ -80,7 +80,7 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
       style={{
         fontSize: 11,
         color: "var(--buildrick-text-tertiary)",
-        fontFamily: "var(--buildrick-design-font-mono)",
+        fontFamily: "var(--buildrick-font-family-mono)",
         whiteSpace: "nowrap",
       }}
     >
