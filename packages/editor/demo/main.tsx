@@ -8,18 +8,12 @@ import { createRoot } from "react-dom/client";
 import { Agentation } from "agentation";
 import { AquibraStudio } from "../src/components/Editor/AquibraStudio";
 import type { Composer } from "../src/engine/Composer";
-import { applyTheme } from "../src/themes/index";
-
 // Global styles
 import "../src/themes/default.css";
 import "../src/components/Canvas/Canvas.css";
 
 const App: React.FC = () => {
   const composerRef = React.useRef<Composer | null>(null);
-
-  React.useEffect(() => {
-    applyTheme();
-  }, []);
 
   return (
     <div

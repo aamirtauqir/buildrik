@@ -23,8 +23,6 @@ export const STORAGE_KEYS = {
   // ─── User Preferences ─────────────────────────────────────────
   /** User general preferences (theme, language, etc.) */
   PREFERENCES: "aqb-preferences",
-  /** Theme preference (light / dark / system) */
-  THEME: "aqb-theme",
   /** License key */
   LICENSE_KEY: "aqb-license",
   /** Recent projects list */
@@ -149,6 +147,8 @@ export const STORAGE_KEYS = {
   // ─── Migration ────────────────────────────────────────────────
   /** Flag set when the v1 storage key migration has completed */
   MIGRATION_FLAG_V1: "aqb-migration-v1-complete",
+  /** V3 theme rename migration completion marker */
+  AQB_MIGRATION_FLAG_V1: "buildrick-aqb-migration-v1-complete",
 } as const;
 
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];

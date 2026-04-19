@@ -193,8 +193,6 @@ export interface ProjectSettings {
   publishing?: PublishingConfig;
   /** Design tokens (CSS custom properties) */
   designTokens?: DesignTokenRecord[];
-  /** Theme mode preference */
-  themeMode?: "light" | "dark" | "system";
   /** Custom code injection (head scripts, body scripts, global CSS) */
   customCode?: CustomCodeConfig;
 }

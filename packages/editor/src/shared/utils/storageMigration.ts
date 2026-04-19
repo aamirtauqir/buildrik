@@ -16,7 +16,6 @@ const MIGRATION_MAP: Record<string, string> = {
   "aquibra-project": STORAGE_KEYS.CURRENT_PROJECT,
   "aquibra-preferences": STORAGE_KEYS.PREFERENCES,
   "aquibra-recent-projects": STORAGE_KEYS.RECENT_PROJECTS,
-  "aquibra-theme": STORAGE_KEYS.THEME,
   "aquibra-panels": STORAGE_KEYS.PANEL_LAYOUT,
   "aquibra-panel-state": STORAGE_KEYS.PANEL_STATE,
   "aquibra-last-file": STORAGE_KEYS.LAST_FILE,
