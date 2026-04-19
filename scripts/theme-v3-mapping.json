@@ -1670,6 +1670,18 @@
         "line": 85,
         "pattern": "`aqb:trace:${domain}` (4 callsites: 85, 172, 179, 195)",
         "concern": "verify no aqb:trace: literal elsewhere"
+      },
+      {
+        "file": "packages/editor/src/features/design-system/state/useTokenUsageMap.ts",
+        "line": 45,
+        "pattern": "/\\[data-aqb-id=\"([^\"]+)\"\\]/",
+        "concern": "regex literal containing data-aqb-id — op 4 handles via content-pattern match; verify at Codex Gate 1 that swap produces valid regex"
+      },
+      {
+        "file": "packages/editor/src/engine/data/TemplateEngine.ts",
+        "line": 74,
+        "pattern": "/\\s*data-aqb-[^=]*=\"[^\"]*\"/g",
+        "concern": "regex literal with wildcard data-aqb-[^=]* — op 4 does literal replacement; verify Codex Gate 1 that post-rename regex still matches all 19 data-buildrick-* attrs"
       }
     ]
   },
