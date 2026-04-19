@@ -23,9 +23,9 @@
    ============================================ */
 :root {
 
-  /* === V3 theme unification: new canonical tokens (alongside old --aqb-*/--ls-*/--accent-*) ===
-   * Values copied from mapped sources. Consumers rename to these in P3 via codemod.
-   * Old definitions deleted in P4. Double-definitions through P3 are value-neutral. */
+  /* === V3 theme unification: new canonical tokens (alongside legacy aqb/ls/accent prefixes) ===
+     Values copied from mapped sources. Consumers rename to these in P3 via codemod.
+     Old definitions deleted in P4. Double-definitions through P3 are value-neutral. */
   --buildrick-accent: var(--accent);
   --buildrick-accent-amber: var(--buildrick-warning);
   --buildrick-accent-amber-light: var(--buildrick-warning-light);
