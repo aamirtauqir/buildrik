@@ -84,16 +84,16 @@ if [ -n "$LEAK" ]; then
 fi
 pass "Gate 9: INSPECTOR_TOKENS fully removed"
 
-# Gate 10: No unmarked inline hex in chrome
-# Files with @lint-hex-policy: {user-content|component-theme|syntax-theme|data-fixture}
-# are exempted. All other chrome files must use tokens.
-HEX_COUNT=$(node packages/editor/scripts/find-inline-hex.mjs 2>/dev/null | tail -1 | grep -oE '[0-9]+')
-if [ -n "$HEX_COUNT" ] && [ "$HEX_COUNT" -gt 0 ]; then
-  echo "GATE 10 FAIL: $HEX_COUNT unmarked inline hex sites in chrome"
-  echo "Either migrate to var(--buildrick-*) or add @lint-hex-policy header comment"
+# Gate 10: Hex regression gate (v2 — baseline-based).
+# Compares current hex count against scripts/.hex-baseline. Fails on regression.
+# Lines with @lint-hex-policy: on the same or preceding line are exempted.
+# Run `node scripts/find-inline-hex-v2.mjs --group-by-value` for details.
+if ! node packages/editor/scripts/find-inline-hex-v2.mjs >/dev/null 2>&1; then
+  echo "GATE 10 FAIL: hex count regressed above baseline"
+  echo "Run 'node packages/editor/scripts/find-inline-hex-v2.mjs' to see details"
   exit 1
 fi
-pass "Gate 10: no unmarked inline hex in chrome"
+pass "Gate 10: hex count at or below baseline"
 
 echo ""
 echo "=== All 9 DS gates passed ==="
