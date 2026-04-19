@@ -147,3 +147,15 @@ test('op 6: preserve marker skipped', () => {
   const input = 'localStorage.getItem("aqb-migration-v1-complete")';
   assert.strictEqual(applyOp6(input, m), input);
 });
+
+import { applyOp7 } from './theme-v3-codemod.mjs';
+
+test('op 7: aqb:trace: prefix renames in plain strings', () => {
+  const m = { dev_flags: { 'aqb:trace:': 'buildrick:trace:' } };
+  assert.strictEqual(applyOp7('localStorage.getItem("aqb:trace:hover")', m), 'localStorage.getItem("buildrick:trace:hover")');
+});
+
+test('op 7: aqb:trace: in template literal static renames', () => {
+  const m = { dev_flags: { 'aqb:trace:': 'buildrick:trace:' } };
+  assert.strictEqual(applyOp7('const k = `aqb:trace:${domain}`;', m), 'const k = `buildrick:trace:${domain}`;');
+});

@@ -134,6 +134,14 @@ export function applyOp6(content, mapping) {
   return out;
 }
 
+export function applyOp7(content, mapping) {
+  let out = content;
+  for (const [oldPrefix, newPrefix] of Object.entries(mapping.dev_flags)) {
+    out = out.split(oldPrefix).join(newPrefix);
+  }
+  return out;
+}
+
 const mode = process.argv[2] || 'dry-run';
 
 if (mode === 'dry-run') runDryRun();
