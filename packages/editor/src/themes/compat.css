@@ -11,16 +11,4 @@
  */
 
 :root {
-  /* --buildrick-build-* Build tab (Phase 3.8) */
-  --buildrick-build-surface: var(--buildrick-bg-panel);
-  --buildrick-build-card: var(--buildrick-bg-card);
-  --buildrick-build-card-hover: var(--buildrick-bg-hover);
-  --buildrick-build-border: var(--buildrick-border);
-  --buildrick-build-border-hover: var(--buildrick-border-strong);
-
-  /* --buildrick-ai-* AI panel (Phase 3.9) */
-  --buildrick-ai-active: var(--buildrick-accent-pressed);
-  --buildrick-ai-hover: var(--buildrick-accent-hover);
-  --buildrick-ai-light: var(--buildrick-accent-tint);
-  --buildrick-ai-muted: var(--buildrick-accent-subtle);
 }

@@ -535,7 +535,7 @@
   gap: 3px;
   padding: 10px 8px;
   min-height: 72px;
-  background: var(--buildrick-build-card);
+  background: var(--buildrick-bg-card);
   border: 1px solid var(--buildrick-border-subtle);
   border-radius: 10px;
   cursor: grab;
@@ -545,7 +545,7 @@
 }
 
 .buildrick-element-card:hover {
-  background: var(--buildrick-build-card-hover);
+  background: var(--buildrick-bg-hover);
   border-color: var(--buildrick-border);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px var(--buildrick-shadow-color);
