@@ -496,7 +496,28 @@
     "aqb-bar-slide-up": {
       "action": "delete",
       "reason": "orphan — no @keyframes defined; 1 consumer callsite at AIAssistantBar.tsx:190"
-    }
+    },
+    "aqb-bounceIn": "buildrick-bounceIn",
+    "aqb-fadeIn": "buildrick-fadeIn",
+    "aqb-fadeInCard": "buildrick-fadeInCard",
+    "aqb-fadeInDown": "buildrick-fadeInDown",
+    "aqb-fadeInLeft": "buildrick-fadeInLeft",
+    "aqb-fadeInRight": "buildrick-fadeInRight",
+    "aqb-fadeInSlide": "buildrick-fadeInSlide",
+    "aqb-fadeInUp": "buildrick-fadeInUp",
+    "aqb-fadeOut": "buildrick-fadeOut",
+    "aqb-fadeOutDown": "buildrick-fadeOutDown",
+    "aqb-fadeOutUp": "buildrick-fadeOutUp",
+    "aqb-flipInX": "buildrick-flipInX",
+    "aqb-flipInY": "buildrick-flipInY",
+    "aqb-heartBeat": "buildrick-heartBeat",
+    "aqb-rotateIn": "buildrick-rotateIn",
+    "aqb-rubberBand": "buildrick-rubberBand",
+    "aqb-slideInDown": "buildrick-slideInDown",
+    "aqb-slideInUp": "buildrick-slideInUp",
+    "aqb-slideOutUp": "buildrick-slideOutUp",
+    "aqb-zoomIn": "buildrick-zoomIn",
+    "aqb-zoomOut": "buildrick-zoomOut"
   },
   "data_attributes": {
     "data-aqb-binding": "data-buildrick-binding",
