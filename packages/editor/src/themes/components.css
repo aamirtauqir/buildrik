@@ -99,12 +99,12 @@
 }
 
 .buildrick-viewport {
-  background: var(--buildrick-bg-canvas);
+  background: var(--buildrick-canvas-content);
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.1),
     0 4px 6px rgba(0, 0, 0, 0.1),
     0 20px 40px rgba(0, 0, 0, 0.3);
-  border-radius: var(--buildrick-design-radius-lg);
+  border-radius: var(--buildrick-radius-lg);
   overflow: hidden;
   transition: width var(--buildrick-transition-normal),
     height var(--buildrick-transition-normal);
@@ -137,21 +137,21 @@
    ============================================ */
 .buildrick-panel {
   background: var(--buildrick-bg-panel);
-  border-radius: var(--buildrick-design-radius-lg);
+  border-radius: var(--buildrick-radius-lg);
   overflow: hidden;
   border: 1px solid var(--buildrick-border);
-  box-shadow: var(--buildrick-design-shadow-sm);
+  box-shadow: var(--buildrick-shadow-sm);
 }
 
 .buildrick-panel-header {
   height: 44px;
-  padding: 0 var(--buildrick-design-space-4);
+  padding: 0 var(--buildrick-space-4);
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: linear-gradient(180deg, var(--buildrick-bg-panel-secondary), var(--buildrick-bg-panel));
   border-bottom: 1px solid var(--buildrick-border);
-  font-weight: var(--buildrick-font-semibold);
+  font-weight: var(--buildrick-font-weight-semibold);
   font-size: var(--buildrick-text-sm);
   text-transform: uppercase;
   letter-spacing: var(--buildrick-tracking-wider);
@@ -161,7 +161,7 @@
 .buildrick-panel-header-title {
   display: flex;
   align-items: center;
-  gap: var(--buildrick-design-space-2);
+  gap: var(--buildrick-space-2);
 }
 
 .buildrick-panel-header-icon {
@@ -172,16 +172,16 @@
 .buildrick-panel-header-actions {
   display: flex;
   align-items: center;
-  gap: var(--buildrick-design-space-1);
+  gap: var(--buildrick-space-1);
 }
 
 .buildrick-panel-content {
-  padding: var(--buildrick-design-space-4);
+  padding: var(--buildrick-space-4);
   overflow-y: auto;
 }
 
 .buildrick-panel-footer {
-  padding: var(--buildrick-design-space-3) var(--buildrick-design-space-4);
+  padding: var(--buildrick-space-3) var(--buildrick-space-4);
   background: var(--buildrick-bg-panel-secondary);
   border-top: 1px solid var(--buildrick-border);
 }
@@ -193,11 +193,11 @@
 
 .buildrick-panel-compact .buildrick-panel-header {
   height: 36px;
-  padding: 0 var(--buildrick-design-space-3);
+  padding: 0 var(--buildrick-space-3);
 }
 
 .buildrick-panel-compact .buildrick-panel-content {
-  padding: var(--buildrick-design-space-3);
+  padding: var(--buildrick-space-3);
 }
 
 /* ============================================
@@ -255,17 +255,17 @@
 
 .buildrick-left-search {
   position: relative;
-  padding: 0 var(--buildrick-design-space-3) var(--buildrick-design-space-3);
+  padding: 0 var(--buildrick-space-3) var(--buildrick-space-3);
 }
 
 .buildrick-left-search-input {
   width: 100%;
   padding: 10px 40px 10px 14px;
-  background: var(--buildrick-input-bg);
-  border: 1px solid var(--buildrick-design-input-border);
-  border-radius: var(--buildrick-design-radius-md);
+  background: var(--buildrick-bg-input);
+  border: 1px solid var(--buildrick-border-medium);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-primary);
-  font-size: var(--buildrick-text-base);
+  font-size: var(--buildrick-text-sm-plus);
   font-family: var(--buildrick-font-family);
   outline: none;
   transition: border-color var(--buildrick-transition-fast),
@@ -278,14 +278,14 @@
 }
 
 .buildrick-left-search-input:hover:not(:focus) {
-  border-color: var(--buildrick-input-border-hover);
-  background: var(--buildrick-input-bg-hover);
+  border-color: var(--buildrick-border-hover);
+  background: var(--buildrick-bg-subtle);
 }
 
 .buildrick-left-search-input:focus {
-  border-color: var(--buildrick-input-border-focus);
+  border-color: var(--buildrick-border-focus);
   box-shadow: var(--buildrick-input-ring);
-  background: var(--buildrick-input-bg-focus);
+  background: var(--buildrick-bg-input);
 }
 
 .buildrick-left-search-icon {
@@ -832,7 +832,7 @@
 .tbIconBtn {
   width: 32px;
   height: 32px;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   background: var(--buildrick-bg-card);
   border: 1px solid var(--buildrick-border-medium);
   display: flex;
@@ -903,7 +903,7 @@
   padding: 5px 10px;
   background: var(--buildrick-error-light);
   border: 1px solid var(--buildrick-error);
-  border-radius: var(--buildrick-design-radius-full);
+  border-radius: var(--buildrick-radius-full);
   color: var(--buildrick-error);
   font-size: 11px;
   font-weight: 700;
@@ -925,7 +925,7 @@
   padding: 6px 10px;
   background: transparent;
   border: 1px solid var(--buildrick-border-medium);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-secondary);
   font-size: 12px;
   font-weight: 600;
@@ -949,7 +949,7 @@
   padding: 6px 10px;
   background: var(--buildrick-bg-card);
   border: 1px solid var(--buildrick-border-medium);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   cursor: pointer;
   white-space: nowrap;
   font-family: inherit;
@@ -963,7 +963,7 @@
 }
 
 .tbCmdText {
-  font-family: var(--buildrick-design-font-mono);
+  font-family: var(--buildrick-font-family-mono);
   font-size: 11px;
   font-weight: 500;
   color: var(--buildrick-text-secondary);
@@ -977,7 +977,7 @@
   padding: 6px 10px;
   background: var(--buildrick-bg-card);
   border: 1px solid var(--buildrick-border-medium);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   color: var(--buildrick-text-primary);
   font-size: 12px;
   font-weight: 600;
@@ -1001,7 +1001,7 @@
 .tbHelpBtn {
   width: 32px;
   height: 32px;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   background: var(--buildrick-bg-card);
   border: 1px solid var(--buildrick-border-medium);
   display: flex;
@@ -1027,7 +1027,7 @@
 .tbAccountBtn {
   width: 32px;
   height: 32px;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   background: var(--buildrick-accent);
   border: none;
   display: flex;
@@ -1100,7 +1100,7 @@
   white-space: nowrap;
   background: var(--buildrick-bg-card);
   border: 1px solid var(--buildrick-error);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   padding: 4px 10px;
   font-size: 11px;
   font-weight: 500;
@@ -1365,7 +1365,7 @@
 }
 
 .pillGreen {
-  background: linear-gradient(180deg, var(--green), var(--green2));
+  background: linear-gradient(180deg, var(--buildrick-success), var(--buildrick-success));
   border-color: rgba(170, 255, 210, 0.35);
   color: #fff;
   box-shadow: none;
@@ -1373,7 +1373,7 @@
 
 .pillGreen:hover {
   transform: translateY(-1px);
-  background: linear-gradient(180deg, var(--green), var(--green2));
+  background: linear-gradient(180deg, var(--buildrick-success), var(--buildrick-success));
 }
 
 /* Export Button with Gradient Glow */
@@ -1522,14 +1522,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--buildrick-design-space-2);
+  gap: var(--buildrick-space-2);
   padding: 9px 16px;
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-base);
-  font-weight: var(--buildrick-font-medium);
-  line-height: var(--buildrick-leading-tight);
+  font-size: var(--buildrick-text-sm-plus);
+  font-weight: var(--buildrick-font-weight-medium);
+  line-height: var(--buildrick-line-tight);
   border: 1px solid transparent;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   cursor: pointer;
   white-space: nowrap;
   user-select: none;
@@ -1554,14 +1554,14 @@
   background: var(--buildrick-accent);
   color: white;
   border-color: var(--buildrick-accent);
-  box-shadow: var(--buildrick-design-shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  box-shadow: var(--buildrick-shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .buildrick-btn-primary:hover:not(:disabled) {
   background: var(--buildrick-accent-hover);
   border-color: var(--buildrick-accent-hover);
   transform: translateY(-1px);
-  box-shadow: var(--buildrick-design-shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  box-shadow: var(--buildrick-shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .buildrick-btn-primary:active:not(:disabled) {
@@ -1579,7 +1579,7 @@
 }
 
 .buildrick-btn-secondary:hover:not(:disabled) {
-  background: var(--buildrick-bg-panel-tertiary);
+  background: var(--buildrick-bg-hover);
   border-color: var(--buildrick-border-hover);
   transform: translateY(-1px);
 }
@@ -1625,14 +1625,14 @@
   background: var(--buildrick-error);
   color: white;
   border-color: var(--buildrick-error);
-  box-shadow: var(--buildrick-design-shadow-sm);
+  box-shadow: var(--buildrick-shadow-sm);
 }
 
 .buildrick-btn-danger:hover:not(:disabled) {
   background: #dc2626;
   border-color: #dc2626;
   transform: translateY(-1px);
-  box-shadow: var(--buildrick-design-shadow-md);
+  box-shadow: var(--buildrick-shadow-md);
 }
 
 .buildrick-btn-danger:active:not(:disabled) {
@@ -1645,7 +1645,7 @@
   background: var(--buildrick-success);
   color: white;
   border-color: var(--buildrick-success);
-  box-shadow: var(--buildrick-design-shadow-sm);
+  box-shadow: var(--buildrick-shadow-sm);
 }
 
 .buildrick-btn-success:hover:not(:disabled) {
@@ -1658,28 +1658,28 @@
 .buildrick-btn-xs {
   padding: 4px 8px;
   font-size: var(--buildrick-text-xs);
-  gap: var(--buildrick-design-space-1);
-  border-radius: var(--buildrick-design-radius-sm);
+  gap: var(--buildrick-space-1);
+  border-radius: var(--buildrick-radius-sm);
 }
 
 .buildrick-btn-sm {
   padding: 6px 12px;
   font-size: var(--buildrick-text-sm);
-  gap: var(--buildrick-design-space-1);
+  gap: var(--buildrick-space-1);
 }
 
 .buildrick-btn-lg {
   padding: 12px 24px;
   font-size: var(--buildrick-text-lg);
-  gap: var(--buildrick-design-space-3);
-  border-radius: var(--buildrick-design-radius-lg);
+  gap: var(--buildrick-space-3);
+  border-radius: var(--buildrick-radius-lg);
 }
 
 .buildrick-btn-xl {
   padding: 16px 32px;
   font-size: var(--buildrick-text-xl);
-  gap: var(--buildrick-design-space-3);
-  border-radius: var(--buildrick-design-radius-lg);
+  gap: var(--buildrick-space-3);
+  border-radius: var(--buildrick-radius-lg);
 }
 
 /* Icon Button */
@@ -1729,13 +1729,13 @@
   width: 100%;
   padding: 10px 12px;
   font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-base);
-  font-weight: var(--buildrick-font-normal);
-  line-height: var(--buildrick-leading-normal);
+  font-size: var(--buildrick-text-sm-plus);
+  font-weight: var(--buildrick-font-weight-normal);
+  line-height: var(--buildrick-line-normal);
   color: var(--buildrick-text-primary);
-  background: var(--buildrick-input-bg);
-  border: 1px solid var(--buildrick-design-input-border);
-  border-radius: var(--buildrick-design-radius-md);
+  background: var(--buildrick-bg-input);
+  border: 1px solid var(--buildrick-border-medium);
+  border-radius: var(--buildrick-radius-md);
   outline: none;
   transition: border-color var(--buildrick-transition-fast),
     background var(--buildrick-transition-fast),
@@ -1743,13 +1743,13 @@
 }
 
 .buildrick-input:hover:not(:disabled):not(:focus) {
-  border-color: var(--buildrick-input-border-hover);
-  background: var(--buildrick-input-bg-hover);
+  border-color: var(--buildrick-border-hover);
+  background: var(--buildrick-bg-subtle);
 }
 
 .buildrick-input:focus {
-  border-color: var(--buildrick-input-border-focus);
-  background: var(--buildrick-input-bg-focus);
+  border-color: var(--buildrick-border-focus);
+  background: var(--buildrick-bg-input);
   box-shadow: var(--buildrick-input-ring);
 }
 
@@ -1780,13 +1780,13 @@
 .buildrick-input-sm {
   padding: 7px 10px;
   font-size: var(--buildrick-text-sm);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
 }
 
 .buildrick-input-lg {
   padding: 12px 16px;
   font-size: var(--buildrick-text-md);
-  border-radius: var(--buildrick-design-radius-lg);
+  border-radius: var(--buildrick-radius-lg);
 }
 
 /* Select */
@@ -1801,11 +1801,11 @@
 }
 
 .buildrick-select:hover:not(:disabled) {
-  border-color: var(--buildrick-input-border-hover);
+  border-color: var(--buildrick-border-hover);
 }
 
 .buildrick-select:focus {
-  border-color: var(--buildrick-input-border-focus);
+  border-color: var(--buildrick-border-focus);
   box-shadow: var(--buildrick-input-ring);
 }
 
@@ -1826,43 +1826,43 @@
 }
 
 .buildrick-input-group .buildrick-input:first-child {
-  border-radius: var(--buildrick-design-radius-md) 0 0 var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md) 0 0 var(--buildrick-radius-md);
 }
 
 .buildrick-input-group .buildrick-input:last-child {
-  border-radius: 0 var(--buildrick-design-radius-md) var(--buildrick-design-radius-md) 0;
+  border-radius: 0 var(--buildrick-radius-md) var(--buildrick-radius-md) 0;
 }
 
 .buildrick-input-addon {
   display: flex;
   align-items: center;
   padding: 0 12px;
-  background: var(--buildrick-bg-panel-secondary);
-  border: 1px solid var(--buildrick-design-input-border);
+  background: var(--buildrick-bg-input);
+  border: 1px solid var(--buildrick-border-medium);
   color: var(--buildrick-text-secondary);
   font-size: var(--buildrick-text-sm);
 }
 
 .buildrick-input-addon:first-child {
   border-right: none;
-  border-radius: var(--buildrick-design-radius-md) 0 0 var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md) 0 0 var(--buildrick-radius-md);
 }
 
 .buildrick-input-addon:last-child {
   border-left: none;
-  border-radius: 0 var(--buildrick-design-radius-md) var(--buildrick-design-radius-md) 0;
+  border-radius: 0 var(--buildrick-radius-md) var(--buildrick-radius-md) 0;
 }
 
 /* Form Field Wrapper */
 .buildrick-field {
   display: flex;
   flex-direction: column;
-  gap: var(--buildrick-design-space-1);
+  gap: var(--buildrick-space-1);
 }
 
 .buildrick-field-label {
   font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-medium);
+  font-weight: var(--buildrick-font-weight-medium);
   color: var(--buildrick-text-secondary);
   letter-spacing: var(--buildrick-tracking-wide);
 }
@@ -1912,7 +1912,7 @@
 .buildrick-radio {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-design-space-2);
+  gap: var(--buildrick-space-2);
   cursor: pointer;
   user-select: none;
 }
@@ -1922,15 +1922,15 @@
   appearance: none;
   width: 18px;
   height: 18px;
-  border: 1px solid var(--buildrick-design-input-border);
-  background: var(--buildrick-input-bg);
+  border: 1px solid var(--buildrick-border-medium);
+  background: var(--buildrick-bg-input);
   cursor: pointer;
   transition: all var(--buildrick-transition-fast);
   flex-shrink: 0;
 }
 
 .buildrick-checkbox input {
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
 }
 
 .buildrick-radio input {
@@ -1939,8 +1939,8 @@
 
 .buildrick-checkbox input:hover,
 .buildrick-radio input:hover {
-  border-color: var(--buildrick-input-border-hover);
-  background: var(--buildrick-input-bg-hover);
+  border-color: var(--buildrick-border-hover);
+  background: var(--buildrick-bg-subtle);
 }
 
 .buildrick-checkbox input:checked,
@@ -1969,7 +1969,7 @@
 
 .buildrick-checkbox-label,
 .buildrick-radio-label {
-  font-size: var(--buildrick-text-base);
+  font-size: var(--buildrick-text-sm-plus);
   color: var(--buildrick-text-primary);
 }
 
@@ -1977,7 +1977,7 @@
 .buildrick-switch {
   display: inline-flex;
   align-items: center;
-  gap: var(--buildrick-design-space-2);
+  gap: var(--buildrick-space-2);
   cursor: pointer;
 }
 
@@ -1987,7 +1987,7 @@
   height: 22px;
   background: var(--buildrick-bg-panel-secondary);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-full);
+  border-radius: var(--buildrick-radius-full);
   transition: all var(--buildrick-transition-fast);
 }
 
@@ -1999,7 +1999,7 @@
   height: 16px;
   background: white;
   border-radius: 50%;
-  box-shadow: var(--buildrick-design-shadow-sm);
+  box-shadow: var(--buildrick-shadow-sm);
   transition: transform var(--buildrick-transition-fast);
 }
 
@@ -2017,7 +2017,7 @@
 }
 
 .buildrick-switch-label {
-  font-weight: var(--buildrick-font-normal);
+  font-weight: var(--buildrick-font-weight-normal);
   user-select: none;
 }
 
@@ -2025,12 +2025,12 @@
 .buildrick-color-field {
   display: flex;
   flex-direction: column;
-  gap: var(--buildrick-design-space-2);
+  gap: var(--buildrick-space-2);
 }
 
 .buildrick-color-input-row {
   display: flex;
-  gap: var(--buildrick-design-space-2);
+  gap: var(--buildrick-space-2);
   align-items: center;
 }
 
@@ -2054,7 +2054,7 @@
 .buildrick-color-swatch {
   width: 100%;
   height: 100%;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   border: 1px solid var(--buildrick-border);
   box-shadow: var(--buildrick-shadow-inner);
   pointer-events: none;
@@ -2073,13 +2073,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: var(--buildrick-design-space-1);
+  margin-top: var(--buildrick-space-1);
 }
 
 .buildrick-color-preset {
   width: 22px;
   height: 22px;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   border: 2px solid transparent;
   cursor: pointer;
   transition: all var(--buildrick-transition-fast);
@@ -2104,7 +2104,7 @@
 .buildrick-slider-field {
   display: flex;
   flex-direction: column;
-  gap: var(--buildrick-design-space-2);
+  gap: var(--buildrick-space-2);
 }
 
 .buildrick-slider-header {
@@ -2115,9 +2115,9 @@
 
 .buildrick-slider-value {
   font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-medium);
+  font-weight: var(--buildrick-font-weight-medium);
   color: var(--buildrick-text-primary);
-  font-family: var(--buildrick-design-font-mono);
+  font-family: var(--buildrick-font-family-mono);
 }
 
 .buildrick-slider {
@@ -2125,7 +2125,7 @@
   width: 100%;
   height: 6px;
   background: var(--buildrick-bg-panel-secondary);
-  border-radius: var(--buildrick-design-radius-full);
+  border-radius: var(--buildrick-radius-full);
   outline: none;
   cursor: pointer;
 }
@@ -2137,7 +2137,7 @@
   border-radius: 50%;
   background: var(--buildrick-accent);
   border: 3px solid white;
-  box-shadow: var(--buildrick-design-shadow-md);
+  box-shadow: var(--buildrick-shadow-md);
   cursor: pointer;
   transition: transform var(--buildrick-transition-fast);
 }
@@ -2152,18 +2152,18 @@
   border-radius: 50%;
   background: var(--buildrick-accent);
   border: 3px solid white;
-  box-shadow: var(--buildrick-design-shadow-md);
+  box-shadow: var(--buildrick-shadow-md);
   cursor: pointer;
 }
 
 .buildrick-slider:focus-visible::-webkit-slider-thumb {
-  box-shadow: var(--buildrick-design-shadow-md), 0 0 0 3px var(--buildrick-accent-subtle);
+  box-shadow: var(--buildrick-shadow-md), 0 0 0 3px var(--buildrick-accent-subtle);
 }
 
 .buildrick-slider-marks {
   display: flex;
   justify-content: space-between;
-  margin-top: var(--buildrick-design-space-1);
+  margin-top: var(--buildrick-space-1);
 }
 
 .buildrick-slider-mark {
@@ -2180,21 +2180,21 @@
 /* Number Field */
 .buildrick-number-row {
   display: flex;
-  gap: var(--buildrick-design-space-2);
+  gap: var(--buildrick-space-2);
 }
 
 .buildrick-number-stepper {
   display: flex;
   flex: 1;
-  background: var(--buildrick-input-bg);
-  border: 1px solid var(--buildrick-design-input-border);
-  border-radius: var(--buildrick-design-radius-md);
+  background: var(--buildrick-bg-input);
+  border: 1px solid var(--buildrick-border-medium);
+  border-radius: var(--buildrick-radius-md);
   overflow: hidden;
   transition: border-color var(--buildrick-transition-fast), box-shadow var(--buildrick-transition-fast);
 }
 
 .buildrick-number-stepper:focus-within {
-  border-color: var(--buildrick-input-border-focus);
+  border-color: var(--buildrick-border-focus);
   box-shadow: var(--buildrick-input-ring);
 }
 
@@ -2248,8 +2248,8 @@
   background: transparent;
   border: none;
   color: var(--buildrick-text-primary);
-  font-size: var(--buildrick-text-base);
-  font-family: var(--buildrick-design-font-mono);
+  font-size: var(--buildrick-text-sm-plus);
+  font-family: var(--buildrick-font-family-mono);
   text-align: center;
   outline: none;
 }
@@ -2268,7 +2268,7 @@
 /* Button Group */
 .buildrick-btn-group {
   display: inline-flex;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   overflow: hidden;
   border: 1px solid var(--buildrick-border);
 }
@@ -2283,14 +2283,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--buildrick-design-space-1);
+  gap: var(--buildrick-space-1);
   padding: 8px 14px;
   background: var(--buildrick-bg-panel-secondary);
   border: none;
   border-left: 1px solid var(--buildrick-border);
   color: var(--buildrick-text-secondary);
   font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-medium);
+  font-weight: var(--buildrick-font-weight-medium);
   cursor: pointer;
   transition: all var(--buildrick-transition-fast);
 }
@@ -2343,7 +2343,7 @@
 
 .buildrick-btn-group-lg .buildrick-btn-group-item {
   padding: 10px 18px;
-  font-size: var(--buildrick-text-base);
+  font-size: var(--buildrick-text-sm-plus);
 }
 
 /* ============================================
@@ -2365,7 +2365,7 @@
   padding: 12px 6px;
   background: var(--buildrick-bg-panel-secondary);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   cursor: grab;
   transition: all var(--buildrick-transition-fast);
 }
@@ -2397,7 +2397,7 @@
 .buildrick-layers-panel {
   background: var(--buildrick-bg-panel);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   overflow: hidden;
 }
 
@@ -2448,7 +2448,7 @@
 }
 
 .buildrick-layer-droppable {
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
 }
 
 .buildrick-layer-row {
@@ -2514,13 +2514,13 @@
 }
 
 .buildrick-layer-toggle:hover {
-  border-color: var(--layer-accent);
+  border-color: var(--buildrick-info);
   color: var(--buildrick-text-primary);
 }
 
 .buildrick-layer-toggle.is-open {
   color: var(--buildrick-text-primary);
-  border-color: var(--layer-accent);
+  border-color: var(--buildrick-info);
   transform: rotate(90deg);
 }
 
@@ -2554,7 +2554,7 @@
 
 .buildrick-layer-id {
   margin-left: auto;
-  font-family: var(--buildrick-design-font-mono);
+  font-family: var(--buildrick-font-family-mono);
   font-size: 12px;
   color: var(--buildrick-text-muted);
   padding: 4px 8px;
@@ -2574,7 +2574,7 @@
   color: var(--buildrick-text-muted);
   background: rgba(255, 255, 255, 0.02);
   border: 1px dashed var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
 }
 
 .buildrick-layer-empty-icon {
@@ -2603,12 +2603,12 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   cursor: pointer;
 }
 
 .buildrick-layer:hover {
-  background: var(--buildrick-bg-panel-secondary);
+  background: var(--buildrick-bg-hover);
 }
 
 /* ============================================
@@ -2870,7 +2870,7 @@
 .buildrick-glass:hover {
   background: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
-  box-shadow: var(--buildrick-design-shadow-xl);
+  box-shadow: var(--buildrick-shadow-xl);
 }
 
 /* Modern Button Glass Variant */
@@ -2887,7 +2887,7 @@
 .buildrick-btn-glass:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
-  box-shadow: var(--buildrick-design-shadow-xl);
+  box-shadow: var(--buildrick-shadow-xl);
 }
 
 /* Modern Card Glass Variant */
@@ -3185,7 +3185,7 @@ input[type="color"]::-webkit-color-swatch {
   padding: 1px 5px;
   border-radius: 3px;
   font-size: 12px;
-  font-family: var(--buildrick-design-font-mono);
+  font-family: var(--buildrick-font-family-mono);
 }
 
 /* ============================================
@@ -3196,13 +3196,13 @@ input[type="color"]::-webkit-color-swatch {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--buildrick-design-space-12) var(--buildrick-design-space-6);
+  padding: var(--buildrick-space-12) var(--buildrick-space-6);
   text-align: center;
   color: var(--buildrick-text-muted);
   background: linear-gradient(180deg, var(--buildrick-bg-hover), transparent);
   border: 1px dashed var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-lg);
-  margin: var(--buildrick-design-space-4);
+  border-radius: var(--buildrick-radius-lg);
+  margin: var(--buildrick-space-4);
 }
 
 .buildrick-empty-state-icon {
@@ -3211,10 +3211,10 @@ input[type="color"]::-webkit-color-swatch {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: var(--buildrick-design-space-4);
+  margin-bottom: var(--buildrick-space-4);
   background: var(--buildrick-bg-panel-secondary);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-xl);
+  border-radius: var(--buildrick-radius-xl);
   color: var(--buildrick-text-muted);
 }
 
@@ -3226,33 +3226,33 @@ input[type="color"]::-webkit-color-swatch {
 
 .buildrick-empty-state-title {
   font-size: var(--buildrick-text-md);
-  font-weight: var(--buildrick-font-semibold);
+  font-weight: var(--buildrick-font-weight-semibold);
   color: var(--buildrick-text-primary);
-  margin-bottom: var(--buildrick-design-space-2);
+  margin-bottom: var(--buildrick-space-2);
   letter-spacing: var(--buildrick-tracking-tight);
 }
 
 .buildrick-empty-state-desc {
-  font-size: var(--buildrick-text-base);
+  font-size: var(--buildrick-text-sm-plus);
   color: var(--buildrick-text-tertiary);
   max-width: 280px;
   line-height: var(--buildrick-leading-relaxed);
-  margin-bottom: var(--buildrick-design-space-4);
+  margin-bottom: var(--buildrick-space-4);
 }
 
 .buildrick-empty-state-action {
-  margin-top: var(--buildrick-design-space-4);
+  margin-top: var(--buildrick-space-4);
 }
 
 /* Compact Empty State */
 .buildrick-empty-state-compact {
-  padding: var(--buildrick-design-space-6) var(--buildrick-design-space-4);
+  padding: var(--buildrick-space-6) var(--buildrick-space-4);
 }
 
 .buildrick-empty-state-compact .buildrick-empty-state-icon {
   width: 40px;
   height: 40px;
-  margin-bottom: var(--buildrick-design-space-3);
+  margin-bottom: var(--buildrick-space-3);
 }
 
 .buildrick-empty-state-compact .buildrick-empty-state-icon svg {
@@ -3261,7 +3261,7 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .buildrick-empty-state-compact .buildrick-empty-state-title {
-  font-size: var(--buildrick-text-base);
+  font-size: var(--buildrick-text-sm-plus);
 }
 
 .buildrick-empty-state-compact .buildrick-empty-state-desc {
@@ -3366,7 +3366,7 @@ input[type="color"]::-webkit-color-swatch {
   border: 1px solid var(--buildrick-border);
   border-radius: 8px;
   padding: 4px;
-  box-shadow: var(--buildrick-design-shadow-md);
+  box-shadow: var(--buildrick-shadow-md);
   z-index: 1000;
   animation: buildrick-fade-in 0.15s ease;
 }
@@ -3426,7 +3426,7 @@ input[type="color"]::-webkit-color-swatch {
   color: var(--buildrick-text-primary);
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   outline: none;
   transition: all var(--buildrick-transition-fast);
 }
@@ -3466,7 +3466,7 @@ input[type="color"]::-webkit-color-swatch {
   text-decoration: none;
   font-weight: 600;
   z-index: 9999;
-  border-radius: 0 0 var(--buildrick-design-radius-md) 0;
+  border-radius: 0 0 var(--buildrick-radius-md) 0;
   transition: top 0.2s ease;
 }
 
@@ -3737,7 +3737,7 @@ textarea:focus-visible,
 
 .buildrick-card-hoverable:hover {
   transform: translateY(-2px);
-  box-shadow: var(--buildrick-design-shadow-lg);
+  box-shadow: var(--buildrick-shadow-lg);
 }
 
 /* Clickable icons */
@@ -3747,7 +3747,7 @@ textarea:focus-visible,
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   border: 1px solid transparent;
   background: transparent;
   color: var(--buildrick-text-secondary);
@@ -3830,7 +3830,7 @@ textarea:focus-visible,
 /* Collapsible sections */
 .buildrick-collapsible {
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   overflow: hidden;
 }
 
@@ -3895,7 +3895,7 @@ textarea:focus-visible,
   min-height: 400px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
   border: 2px dashed rgba(255, 255, 255, 0.1);
-  border-radius: var(--buildrick-design-radius-lg);
+  border-radius: var(--buildrick-radius-lg);
   margin: 40px;
   padding: 60px 40px;
   text-align: center;
@@ -3941,13 +3941,13 @@ textarea:focus-visible,
   gap: 4px;
   background: var(--buildrick-bg-panel);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
   padding: 4px 8px;
   font-size: 12px;
   color: var(--buildrick-text-secondary);
   z-index: 100;
   white-space: nowrap;
-  box-shadow: var(--buildrick-design-shadow-md);
+  box-shadow: var(--buildrick-shadow-md);
 }
 
 .buildrick-breadcrumb-item {
@@ -4088,7 +4088,7 @@ textarea:focus-visible,
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid var(--buildrick-border);
   border-radius: 4px;
-  font-family: var(--buildrick-design-font-mono);
+  font-family: var(--buildrick-font-family-mono);
   font-size: 12px;
   color: var(--buildrick-text-secondary);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
@@ -4107,14 +4107,14 @@ textarea:focus-visible,
   width: 100%;
   height: 6px;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: var(--buildrick-design-radius-full);
+  border-radius: var(--buildrick-radius-full);
   overflow: hidden;
 }
 
 .buildrick-progress-bar {
   height: 100%;
   background: linear-gradient(90deg, var(--buildrick-accent), var(--buildrick-accent-hover));
-  border-radius: var(--buildrick-design-radius-full);
+  border-radius: var(--buildrick-radius-full);
   transition: width var(--buildrick-transition-normal);
 }
 
@@ -4309,7 +4309,7 @@ textarea:focus-visible,
   position: absolute;
   bottom: 24px;
   right: 24px;
-  z-index: var(--z-overlay);
+  z-index: var(--buildrick-z-overlay);
   display: none;
   /* Hidden by default only shown in compact */
 }

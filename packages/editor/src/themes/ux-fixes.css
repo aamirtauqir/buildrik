@@ -13,7 +13,7 @@
 *:focus-visible {
   outline: 2px solid var(--buildrick-accent);
   outline-offset: 2px;
-  border-radius: var(--buildrick-design-radius-sm);
+  border-radius: var(--buildrick-radius-sm);
 }
 
 /* Remove default focus outline when using mouse */
@@ -39,10 +39,10 @@ a:focus-visible,
   background: var(--buildrick-accent);
   color: white;
   padding: 8px 16px;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   z-index: var(--buildrick-z-max);
   text-decoration: none;
-  font-weight: var(--buildrick-font-semibold);
+  font-weight: var(--buildrick-font-weight-semibold);
 }
 
 .buildrick-skip-link:focus {
@@ -56,8 +56,8 @@ a:focus-visible,
 
 /* Enhanced input hover states */
 .buildrick-input:hover:not(:disabled):not(:focus) {
-  border-color: var(--buildrick-input-border-hover);
-  background: var(--buildrick-input-bg-hover);
+  border-color: var(--buildrick-border-hover);
+  background: var(--buildrick-bg-subtle);
   transform: translateY(-1px);
   transition: all 0.15s ease;
 }
@@ -86,7 +86,7 @@ a:focus-visible,
 .buildrick-select:focus,
 .buildrick-textarea:focus {
   border-color: var(--buildrick-accent);
-  background: var(--buildrick-input-bg-focus);
+  background: var(--buildrick-bg-input);
   box-shadow:
     var(--buildrick-input-ring),
     0 4px 12px rgba(59, 130, 246, 0.15);
@@ -133,8 +133,8 @@ a:focus-visible,
 
 /* Better select hover state */
 .buildrick-select:hover:not(:disabled):not(:focus) {
-  border-color: var(--buildrick-input-border-hover);
-  background-color: var(--buildrick-input-bg-hover);
+  border-color: var(--buildrick-border-hover);
+  background-color: var(--buildrick-bg-subtle);
   cursor: pointer;
   transform: translateY(-1px);
   transition: all 0.15s ease;
@@ -449,14 +449,14 @@ button:disabled::after,
 
 .buildrick-empty-state {
   text-align: center;
-  padding: var(--buildrick-design-space-8) var(--buildrick-design-space-4);
+  padding: var(--buildrick-space-8) var(--buildrick-space-4);
   color: var(--buildrick-text-muted);
   animation: fadeIn 0.4s ease;
 }
 
 .buildrick-empty-state-icon {
   font-size: 48px;
-  margin-bottom: var(--buildrick-design-space-4);
+  margin-bottom: var(--buildrick-space-4);
   opacity: 0.4;
   filter: grayscale(0.3);
   animation: float 3s ease-in-out infinite;
@@ -464,13 +464,13 @@ button:disabled::after,
 
 .buildrick-empty-state-title {
   font-size: var(--buildrick-text-lg);
-  font-weight: var(--buildrick-font-semibold);
+  font-weight: var(--buildrick-font-weight-semibold);
   color: var(--buildrick-text-secondary);
-  margin-bottom: var(--buildrick-design-space-2);
+  margin-bottom: var(--buildrick-space-2);
 }
 
 .buildrick-empty-state-desc {
-  font-size: var(--buildrick-text-base);
+  font-size: var(--buildrick-text-sm-plus);
   color: var(--buildrick-text-muted);
   line-height: var(--buildrick-leading-relaxed);
 }
@@ -497,16 +497,16 @@ button:disabled::after,
 
 /* Compact empty state */
 .buildrick-empty-state-compact {
-  padding: var(--buildrick-design-space-6) var(--buildrick-design-space-3);
+  padding: var(--buildrick-space-6) var(--buildrick-space-3);
 }
 
 .buildrick-empty-state-compact .buildrick-empty-state-icon {
   font-size: 32px;
-  margin-bottom: var(--buildrick-design-space-2);
+  margin-bottom: var(--buildrick-space-2);
 }
 
 .buildrick-empty-state-compact .buildrick-empty-state-title {
-  font-size: var(--buildrick-text-base);
+  font-size: var(--buildrick-text-sm-plus);
 }
 
 .buildrick-empty-state-compact .buildrick-empty-state-desc {
@@ -582,9 +582,9 @@ button:disabled::after,
   background: rgba(0, 0, 0, 0.9);
   color: white;
   font-size: var(--buildrick-text-xs);
-  font-weight: var(--buildrick-font-medium);
+  font-weight: var(--buildrick-font-weight-medium);
   white-space: nowrap;
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
   pointer-events: none;
   opacity: 0;
   transition: all 0.2s ease;
@@ -624,8 +624,8 @@ button:disabled::after,
   padding: 16px 20px;
   background: var(--buildrick-bg-panel);
   border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-design-radius-lg);
-  box-shadow: var(--buildrick-design-shadow-xl);
+  border-radius: var(--buildrick-radius-lg);
+  box-shadow: var(--buildrick-shadow-xl);
   z-index: var(--buildrick-z-toast);
   animation: slideIn 0.3s ease, fadeIn 0.3s ease;
 }
@@ -745,12 +745,12 @@ button {
 .buildrick-btn,
 .buildrick-panel,
 .buildrick-card {
-  border-radius: var(--buildrick-design-radius-md);
+  border-radius: var(--buildrick-radius-md);
 }
 
 /* Ensure consistent spacing */
 .buildrick-field + .buildrick-field {
-  margin-top: var(--buildrick-design-space-4);
+  margin-top: var(--buildrick-space-4);
 }
 
 /* ============================================
