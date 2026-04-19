@@ -104,3 +104,28 @@ test('op 4: unmapped data-aqb-X aborts', () => {
   const m = { data_attributes: {} };
   assert.throws(() => applyOp4('<div data-aqb-wtf />', m), /unmapped/i);
 });
+
+import { applyOp5 } from './theme-v3-codemod.mjs';
+
+test('op 5: .aqb-X CSS selector renames', () => {
+  const m = { classnames: { 'aqb-canvas': 'buildrick-canvas' } };
+  assert.strictEqual(applyOp5('.aqb-canvas { color: red; }', m), '.buildrick-canvas { color: red; }');
+});
+
+test('op 5: "aqb-X" JSX className renames', () => {
+  const m = { classnames: { 'aqb-selected': 'buildrick-selected' } };
+  assert.strictEqual(applyOp5('className="aqb-selected"', m), 'className="buildrick-selected"');
+});
+
+test('op 5: template literal static portion renames', () => {
+  const m = { classnames: { 'aqb-element': 'buildrick-element' } };
+  assert.strictEqual(applyOp5('const c = `aqb-element-${id}`;', m), 'const c = `buildrick-element-${id}`;');
+});
+
+test('op 5: action:delete-rule removes entire rule block', () => {
+  const m = { classnames: { 'aqb-editor': { action: 'delete-rule' } } };
+  const input = '.aqb-editor {\n  color: red;\n  padding: 4px;\n}\n.other { font: x; }';
+  const result = applyOp5(input, m);
+  assert.ok(!result.includes('.aqb-editor'));
+  assert.ok(result.includes('.other'));
+});

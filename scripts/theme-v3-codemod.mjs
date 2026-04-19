@@ -93,6 +93,27 @@ export function applyOp4(content, mapping) {
   });
 }
 
+export function applyOp5(content, mapping) {
+  let out = content;
+  // Rule-block deletions first (before pattern rename)
+  for (const [name, val] of Object.entries(mapping.classnames)) {
+    if (val && typeof val === 'object' && val.action === 'delete-rule') {
+      const ruleRe = new RegExp(`\\.${name}[^{]*\\{[^}]*\\}\\s*`, 'g');
+      out = out.replace(ruleRe, '');
+    }
+  }
+  // Pattern rename — stop at word-boundary (don't eat trailing hyphens before template expressions)
+  out = out.replace(/\.?aqb-[a-z0-9]+(?:-[a-z0-9]+)*/g, (match) => {
+    const hasDot = match.startsWith('.');
+    const name = hasDot ? match.slice(1) : match;
+    const target = mapping.classnames[name];
+    if (!target) throw new Error(`op5: unmapped class ${name}`);
+    if (typeof target === 'object') return match; // already handled by delete-rule
+    return (hasDot ? '.' : '') + target;
+  });
+  return out;
+}
+
 const mode = process.argv[2] || 'dry-run';
 
 if (mode === 'dry-run') runDryRun();
