@@ -218,28 +218,6 @@ export const API = {
 } as const;
 
 // ============================================
-// CSS Class Names
-// ============================================
-
-/**
- * CSS class name prefixes and common classes
- */
-export const CSS_CLASSES = {
-  PREFIX: "aqb-",
-  CANVAS: "buildrick-canvas",
-  ELEMENT: "buildrick-element",
-  SELECTED: "buildrick-selected",
-  HOVERED: "buildrick-hovered",
-  DRAGGING: "buildrick-dragging",
-  RESIZING: "buildrick-resizing",
-  DROP_TARGET: "buildrick-drop-target",
-  HIDDEN: "buildrick-hidden",
-  LOCKED: "buildrick-locked",
-  EDITABLE: "buildrick-editable",
-  EDITING: "buildrick-editing",
-} as const;
-
-// ============================================
 // Feature Flags
 // ============================================
 

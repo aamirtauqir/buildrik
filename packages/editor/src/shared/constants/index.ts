@@ -33,7 +33,6 @@ export {
   THRESHOLDS,
   DEFAULTS,
   API,
-  CSS_CLASSES,
   FEATURES,
   type DataAttribute,
   type MimeType,
