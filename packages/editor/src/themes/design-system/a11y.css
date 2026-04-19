@@ -5,6 +5,10 @@
  * @license BSD-3-Clause
  */
 
+:root {
+  --buildrick-focus-ring-offset: 2px;
+}
+
 @media (prefers-contrast: high) {
   :root {
     --buildrick-border: #64748B;

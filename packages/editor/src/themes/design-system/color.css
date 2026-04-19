@@ -70,4 +70,36 @@
   --buildrick-destructive: #DC2626;
   --buildrick-input-ring: rgba(45, 109, 255, 0.08);
   --buildrick-input-ring-error: rgba(220, 38, 38, 0.10);
+
+  /* ─── DS V1 REMEDIATION (2026-04-20) — NEW TOKENS ─── */
+
+  /* Pressed / active fills (distinct from accent-tint which is branded selection) */
+  --buildrick-bg-pressed: rgba(15, 23, 42, 0.06);
+
+  /* Text */
+  --buildrick-text-disabled: #CBD5E1;
+
+  /* Canvas box-model overlay */
+  --buildrick-boxmodel-content: rgba(111, 168, 220, 0.50);
+  --buildrick-boxmodel-padding: rgba(147, 196, 125, 0.45);
+  --buildrick-boxmodel-margin: rgba(246, 178, 107, 0.50);
+
+  /* Layer tree tints */
+  --buildrick-layer-accent-muted: rgba(45, 109, 255, 0.15);
+  --buildrick-layer-muted-alpha: rgba(100, 116, 139, 0.15);
+  --buildrick-layer-muted-light: rgba(100, 116, 139, 0.08);
+
+  /* Border */
+  --buildrick-border-subtle: rgba(148, 163, 184, 0.24);
+  --buildrick-border-default: #CBD5E1;
+
+  /* Semantic tints */
+  --buildrick-danger-bg: rgba(220, 38, 38, 0.05);
+  --buildrick-success-bg: rgba(22, 163, 74, 0.10);
+  --buildrick-status-synced: #16A34A;
+  --buildrick-primary-alpha-15: rgba(45, 109, 255, 0.15);
+
+  /* Pill borders (retained for legacy component migration window) */
+  --buildrick-pill-stroke: rgba(148, 163, 184, 0.35);
+  --buildrick-pill-stroke-strong: rgba(148, 163, 184, 0.50);
 }

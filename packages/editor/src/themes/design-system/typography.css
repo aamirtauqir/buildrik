@@ -37,4 +37,11 @@
   /* LINE HEIGHT */
   --buildrick-line-tight: 1.2;
   --buildrick-line-normal: 1.5;
+
+  /* ─── DS V1 REMEDIATION (2026-04-20) — NEW TOKENS ─── */
+  --buildrick-text-2xs: 10px;
+  --buildrick-text-2xs-plus: 10.5px;
+  --buildrick-text-md-plus: 15px;
+  --buildrick-text-display: 48px;
+  --buildrick-line-relaxed: 1.6;
 }
