@@ -18,10 +18,10 @@ import { SelectionHandles } from "./SelectionHandles";
 
 // CSS variable references for colors - single source of truth is Canvas.css
 const SELECTION_VARS = {
-  primary: "var(--buildrick-selection-color)",
+  primary: "var(--buildrick-accent)",
   primaryLight: "var(--buildrick-accent-subtle)",
-  glow: "var(--buildrick-selection-glow)",
-  alpha40: "var(--buildrick-selection-alpha-40)",
+  glow: "var(--buildrick-glow-selection)",
+  alpha40: "var(--buildrick-accent-tint)",
   alpha10: "var(--buildrick-accent-tint)",
   gradient: "var(--buildrick-handle-gradient)",
   glowSm: "var(--buildrick-selection-glow-sm)",

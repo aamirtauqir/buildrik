@@ -49,15 +49,15 @@ export interface DropFeedbackOverlayProps {
 /** Professional color palette - using CSS variables from Canvas.css */
 const COLORS = {
   valid: {
-    border: "var(--buildrick-drop-valid-border)", // Green for valid drops
-    bg: "var(--buildrick-drop-valid-bg)",
+    border: "var(--buildrick-accent)", // Green for valid drops
+    bg: "var(--buildrick-accent-tint)",
     text: "#1e293b",
     badgeBg: "#1e1e2e",
     badgeText: "var(--buildrick-accent-subtle)",
   },
   invalid: {
-    border: "var(--buildrick-drop-invalid-border)", // Red for invalid drops
-    bg: "var(--buildrick-drop-invalid-bg)",
+    border: "var(--buildrick-error)", // Red for invalid drops
+    bg: "var(--buildrick-error-light)",
     text: "#ffffff",
   },
 };
@@ -267,8 +267,8 @@ const DropSlotPreview: React.FC<DropSlotPreviewProps> = ({ slotRect }) => {
         top: slotRect.y,
         width: slotRect.width,
         height: slotRect.height,
-        backgroundColor: "var(--buildrick-drop-valid-bg)",
-        border: "2px dashed var(--buildrick-drop-valid-border)",
+        backgroundColor: "var(--buildrick-accent-tint)",
+        border: "2px dashed var(--buildrick-accent)",
         borderRadius: 4,
         animation: `${animationName} 150ms ease-out forwards`,
         transformOrigin: slotRect.isHorizontal ? "left center" : "center top",

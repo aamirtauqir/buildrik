@@ -50,7 +50,7 @@ export interface ElementHoverOverlayProps {
 const COLORS = {
   // Minimal mode - uses CSS vars for consistency
   outline: "var(--buildrick-accent)",
-  outlineDashed: "var(--buildrick-selection-alpha-40)",
+  outlineDashed: "var(--buildrick-accent-tint)",
   label: "var(--buildrick-surface-2)",
   labelText: "var(--buildrick-text-primary)",
 

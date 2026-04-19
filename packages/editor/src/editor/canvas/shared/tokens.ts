@@ -40,7 +40,7 @@ export const colors = {
 
   // Canvas content colors (light theme)
   background: "var(--buildrick-bg)",
-  text: "var(--buildrick-text)",
+  text: "var(--buildrick-text-primary)",
   textMuted: "var(--buildrick-text-muted)",
   border: "var(--buildrick-border)",
 
@@ -54,7 +54,7 @@ export const colors = {
   textTertiary: "var(--buildrick-text-tertiary)",
 
   // UI Surfaces (dark theme panels)
-  surface1: "var(--buildrick-surface-1)",
+  surface1: "var(--buildrick-bg-panel)",
   surface2: "var(--buildrick-surface-2)",
   surface3: "var(--buildrick-surface-3)",
   surface4: "var(--buildrick-surface-4)",
@@ -85,7 +85,7 @@ export const colors = {
   warning: "var(--buildrick-warning)",
   warningBg: "var(--buildrick-warning-bg)",
   info: "var(--buildrick-info)",
-  infoBg: "var(--buildrick-info-bg)",
+  infoBg: "var(--buildrick-info-light)",
 
   // Toolbar colors
   toolbarBg: "var(--buildrick-toolbar-bg)",
@@ -118,7 +118,7 @@ export const typography = {
   // Font sizes (UX-compliant scale)
   fontXs: "var(--buildrick-text-xs)", // 10px - hints, very small
   fontSm: "var(--buildrick-text-sm)", // 11px - labels
-  fontMd: "var(--buildrick-text-base)", // 13px - body, inputs
+  fontMd: "var(--buildrick-text-sm-plus)", // 13px - body, inputs
   fontLg: "var(--buildrick-text-md)", // 14px - section headers
   fontXl: "var(--buildrick-text-lg)", // 16px - titles, headings
 
@@ -129,7 +129,7 @@ export const typography = {
   weightBold: 700,
 
   // Line height
-  lineHeight: "var(--buildrick-leading-normal)",
+  lineHeight: "var(--buildrick-line-normal)",
 
   // Semantic presets for consistent usage
   label: {
@@ -167,7 +167,7 @@ export const spacing = {
  * Standard: 6px for most UI elements (consistent visual language)
  */
 export const radius = {
-  xs: "var(--buildrick-radius-xs)", // 3px - subtle
+  xs: "var(--buildrick-radius-sm)", // 3px - subtle
   sm: "var(--buildrick-radius-sm)", // 5px - inputs, badges
   default: "6px", // 6px - standard UI elements
   md: "var(--buildrick-radius-md)", // 8px - cards, panels
