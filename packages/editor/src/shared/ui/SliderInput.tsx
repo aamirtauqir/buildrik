@@ -129,7 +129,7 @@ export const SliderInput: React.FC<SliderInputProps> = ({
     display: "flex",
     alignItems: "center",
     gap: 8,
-    background: "var(--buildrick-input-bg)",
+    background: "var(--buildrick-bg-input)",
     borderRadius: "var(--buildrick-radius-sm)",
     padding: "4px 8px",
     border: "1px solid var(--buildrick-border-medium)",

@@ -85,7 +85,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
             left: coords.x,
             top: coords.y,
             transform: getTransform(position),
-            background: "var(--buildrick-bg-panel-secondary)",
+            background: "var(--buildrick-bg-elevated)",
             color: "var(--buildrick-text-primary)",
             padding: "6px 10px",
             borderRadius: 6,

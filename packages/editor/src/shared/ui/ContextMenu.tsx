@@ -119,7 +119,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ items, x, y, onClose }
             }}
             onMouseEnter={(e) => {
               if (!item.disabled) {
-                e.currentTarget.style.background = "var(--buildrick-bg-panel-secondary)";
+                e.currentTarget.style.background = "var(--buildrick-bg-elevated)";
               }
             }}
             onMouseLeave={(e) => {
