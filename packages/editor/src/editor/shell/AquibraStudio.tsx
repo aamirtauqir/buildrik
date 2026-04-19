@@ -16,7 +16,7 @@ import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types"
 import { StudioSkeleton } from "../../shared/ui/Skeleton";
 import { ToastProvider, useToast } from "../../shared/ui/Toast";
 import { UpgradeModal } from "../../shared/ui/UpgradeModal";
-import { migrateStorageKeys } from "../../shared/utils/storageMigration";
+import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { PageWizard } from "../wizard/PageWizard";
@@ -34,6 +34,7 @@ import "../../themes/ux-fixes.css";
 
 // Run localStorage migration on app startup (module load)
 migrateStorageKeys();
+migrateAqbKeys();
 
 export interface AquibraStudioProps {
   licenseKey?: string;
