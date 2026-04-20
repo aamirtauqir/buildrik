@@ -15,7 +15,7 @@
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { ConfirmDialog } from "../../../../shared/ui/Modal";
-import { PanelHeader } from "../../shared/PanelHeader";
+import { PanelShell } from "@shared/ui/panel";
 import { PageCommandPalette } from "./components/PageCommandPalette";
 import { PageContextMenu } from "./components/PageContextMenu";
 import { PageList } from "./components/PageList";
@@ -159,8 +159,13 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   }, [bulk.selectedIds, f.removePageFromFolder, bulk.clearSelection]);
 
   return (
-    <div className="pages-panel">
-      <PanelHeader
+    // `pages-panel` is retained as a scoping class — PagesTab.css uses it to
+    // namespace ~2400 lines of `.pages-panel .pg-*` rules. Dropping it would
+    // leave those rules orphaned.
+    // No width prop — Pages host (LeftSidebar drawer, width from tabsConfig.ts)
+    // controls the 200px sizing. PanelShell fills the host via width:100%.
+    <PanelShell className="pages-panel">
+      <PanelShell.Header
         title="Pages"
         isPinned={isPinned}
         onPinToggle={onPinToggle}
@@ -174,19 +179,21 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         >
           <span className="pg-panel-kbd">⌘K</span>
         </button>
-      </PanelHeader>
+      </PanelShell.Header>
 
       {/* Error state — takes priority over everything */}
       {p.loadError ? (
-        <div className="pg-error" role="alert" aria-live="assertive">
-          <div className="pg-error__msg">{p.loadError}</div>
-          <div className="pg-error__sub">Your connection dropped. Work is safe — nothing was lost.</div>
-          <button className="pg-error__retry" onClick={p.retrySync}>
-            Try again
-          </button>
-        </div>
+        <PanelShell.Content>
+          <div className="pg-error" role="alert" aria-live="assertive">
+            <div className="pg-error__msg">{p.loadError}</div>
+            <div className="pg-error__sub">Your connection dropped. Work is safe — nothing was lost.</div>
+            <button className="pg-error__retry" onClick={p.retrySync}>
+              Try again
+            </button>
+          </div>
+        </PanelShell.Content>
       ) : (
-        <>
+        <PanelShell.Content noScroll>
           <PageList
             pages={p.pages}
             renamingPageId={p.renamingPageId}
@@ -218,7 +225,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onMovePageToFolder={f.movePageToFolder}
             onRemovePageFromFolder={f.removePageFromFolder}
           />
-        </>
+        </PanelShell.Content>
       )}
 
       {/* Context menu (portal) */}
@@ -272,7 +279,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           />
         </SettingsErrorBoundary>
       )}
-    </div>
+    </PanelShell>
   );
 };
 

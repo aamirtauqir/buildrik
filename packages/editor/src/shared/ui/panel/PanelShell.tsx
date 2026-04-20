@@ -58,7 +58,22 @@ const WIDTH_PX: Record<PanelWidth, number | string> = {
 };
 
 export interface PanelShellProps {
+  /**
+   * Optional width constraint. When OMITTED (default), PanelShell fills its
+   * host (100% width, no min-width). This is the right choice when the host
+   * already controls width via tabsConfig/grid/flex — which is true for all
+   * existing editor tabs.
+   *
+   * Specify a value only when PanelShell is the OUTERMOST width-setting
+   * element (e.g., a new standalone panel not inside a sized host).
+   */
   width?: PanelWidth;
+  /**
+   * When true AND `width` is "narrow" or "wide", render a 1px border-right
+   * separating this panel from adjacent content. Fullpage and host-sized
+   * panels should NOT set this (they don't live next to other panels).
+   */
+  bordered?: boolean;
   className?: string;
   style?: React.CSSProperties;
   children: React.ReactNode;
@@ -73,31 +88,47 @@ interface PanelShellComponent extends React.FC<PanelShellProps> {
   Footer: typeof Footer;
 }
 
-const rootStyles: React.CSSProperties = {
+const rootStylesBase: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   height: "100%",
   background: "var(--buildrick-bg-panel)",
-  borderRight: "1px solid var(--buildrick-border)",
   overflow: "hidden",
 };
 
 const PanelShellFn: React.FC<PanelShellProps> = ({
-  width = "narrow",
+  width,
+  bordered = false,
   className,
   style,
   children,
   "data-testid": testid,
 }) => {
-  const resolvedWidth = WIDTH_PX[width];
+  const widthStyles: React.CSSProperties = (() => {
+    if (width === undefined) {
+      // Host controls width — fill available space, no min-width constraint.
+      return { width: "100%" };
+    }
+    const resolvedWidth = WIDTH_PX[width];
+    if (typeof resolvedWidth === "number") {
+      return { width: resolvedWidth, minWidth: resolvedWidth };
+    }
+    return { width: resolvedWidth };
+  })();
+
+  const borderStyles: React.CSSProperties =
+    bordered && (width === "narrow" || width === "wide")
+      ? { borderRight: "1px solid var(--buildrick-border)" }
+      : {};
+
   return (
     <div
       className={className}
       data-testid={testid}
       style={{
-        ...rootStyles,
-        width: typeof resolvedWidth === "number" ? resolvedWidth : resolvedWidth,
-        minWidth: typeof resolvedWidth === "number" ? resolvedWidth : undefined,
+        ...rootStylesBase,
+        ...widthStyles,
+        ...borderStyles,
         ...style,
       }}
     >

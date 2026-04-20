@@ -19,7 +19,7 @@ import * as React from "react";
 const DesignSystemScreen = React.lazy(() => import("../DesignSystemTab"));
 import { DrillInHeader } from "../../shared/DrillInHeader";
 import { FeatureCard, FeatureCardGrid } from "../../shared/FeatureCard";
-import { PanelHeader } from "../../shared/PanelHeader";
+import { PanelShell } from "@shared/ui/panel";
 import { usePanelNavigation } from "../../shared/usePanelNavigation";
 import {
   type SettingsTabProps,
@@ -218,7 +218,9 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
   };
 
   return (
-    <div className="buildrick-st-container">
+    // No width prop — Settings is a fullpage tab, its host controls sizing.
+    // PanelShell fills the host via width:100%.
+    <PanelShell>
       {canGoBack ? (
         <>
           <DrillInHeader
@@ -233,18 +235,18 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             onHelpClick={onHelpClick}
             onClose={onClose}
           />
-          <div className="buildrick-st-content">{renderContent()}</div>
+          <PanelShell.Content>{renderContent()}</PanelShell.Content>
         </>
       ) : (
         <>
-          <PanelHeader
+          <PanelShell.Header
             title="Settings"
             isPinned={isPinned}
             onPinToggle={onPinToggle}
             onHelpClick={onHelpClick}
             onClose={onClose}
           />
-          <div className="buildrick-st-home">{renderHomeScreen()}</div>
+          <PanelShell.Content>{renderHomeScreen()}</PanelShell.Content>
         </>
       )}
       <SettingsNavGuard
@@ -256,7 +258,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
         }}
         onCancel={() => setGuardOpen(false)}
       />
-    </div>
+    </PanelShell>
   );
 };
 

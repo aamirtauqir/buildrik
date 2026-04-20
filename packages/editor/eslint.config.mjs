@@ -179,11 +179,24 @@ export default [
       ],
     },
   },
-  // Survivor #6 — ban legacy components/** imports from editor/** code.
+  // Survivor #6 — ban legacy src/components/ imports from editor/** code.
   // CLAUDE.md already forbids this socially; this makes it a build gate.
-  // Zero existing violations verified 2026-04-20, so ships as error (not warn).
-  // Covers relative, absolute-src, and the tsconfig path aliases
-  // @/components/* and @components/* (see packages/editor/tsconfig.json paths).
+  //
+  // SCOPE: any import that could RESOLVE to src/components/ from an editor/**
+  // file. Covers:
+  //   - tsconfig aliases: @components/*, @/components/*
+  //   - absolute-src form: src/components/*
+  //   - relative paths with ANY number of `../` prefixes targeting `components/`
+  //     (from any editor/ file depth, 1+ ups reaches src/components/)
+  //
+  // Does NOT match local sibling directories (e.g. `./components/PageList`
+  // inside pages/ is a legitimate local sub-folder) because `./components/**`
+  // is NOT in the deny list.
+  //
+  // Tradeoff: relative `../components/**` CAN false-positive on nested files
+  // that intend their tab-root's components/ folder. If a real false positive
+  // arises, add a per-file override in a targeted eslint-disable-next-line.
+  // Zero current violations verified 2026-04-20.
   {
     files: ["src/editor/**/*.{ts,tsx}"],
     rules: {
@@ -193,14 +206,24 @@ export default [
           patterns: [
             {
               group: [
-                "**/components/**",
-                "../components/**",
-                "../../components/**",
-                "../../../components/**",
-                "@components/**",
                 "@components",
+                "@components/**",
                 "@/components/**",
                 "src/components/**",
+                // Any relative path with `../` that reaches `components/`.
+                // Enumerated 1..6 ups to cover the full editor/ tree depth.
+                "../components",
+                "../components/**",
+                "../../components",
+                "../../components/**",
+                "../../../components",
+                "../../../components/**",
+                "../../../../components",
+                "../../../../components/**",
+                "../../../../../components",
+                "../../../../../components/**",
+                "../../../../../../components",
+                "../../../../../../components/**",
               ],
               message:
                 "src/components/ is legacy (CLAUDE.md: 371 files, do not add). Move the source to src/editor/ or src/shared/ui/, or import a shared primitive instead.",

@@ -126,18 +126,10 @@
 /* ─────────────────────────────────────────────
    SETTINGS TAB — converted from styles.ts (RF-4)
    ───────────────────────────────────────────── */
-.buildrick-st-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background: var(--buildrick-surface-2);
-}
-
-.buildrick-st-home,
-.buildrick-st-content {
-  flex: 1;
-  overflow: auto;
-}
+/* Container + home/content classes removed 2026-04-20 (Week 3 migration).
+ * SettingsTab.tsx now composes PanelShell + PanelShell.Content directly.
+ * Sub-screen styles below remain and will be migrated as DS primitives
+ * (Card, Section, Field, Toggle, Badge, Input) land in a later phase. */
 
 .buildrick-st-screen {
   padding: 12px;
