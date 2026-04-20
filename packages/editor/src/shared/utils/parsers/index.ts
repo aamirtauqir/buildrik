@@ -201,4 +201,34 @@ export { parseBoxShadow, serializeBoxShadow, type BoxShadow } from "./shadowPars
 // TRANSFORM PARSING
 // =============================================================================
 
-export { parseTransform, serializeTransform, type TransformFunction } from "./transformParser";
+export {
+  parseTransform,
+  serializeTransform,
+  updateTransformFunction,
+  removeTransformFunction,
+  isOpaqueTransform,
+  type TransformFunction,
+} from "./transformParser";
+
+// =============================================================================
+// FILTER PARSING
+// =============================================================================
+
+export {
+  parseFilter,
+  serializeFilter,
+  updateFilterFunction,
+  removeFilterFunction,
+  type FilterFunction,
+} from "./filterParser";
+
+// =============================================================================
+// GRADIENT HELPERS
+// =============================================================================
+
+export {
+  extractGradientUI,
+  composeGradient,
+  deriveBgType,
+  type GradientUI,
+} from "./gradientHelpers";

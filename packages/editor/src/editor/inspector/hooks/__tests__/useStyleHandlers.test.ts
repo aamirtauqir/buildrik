@@ -14,7 +14,7 @@ function makeMockElement(id = "el-1") {
 function makeMockComposer(element = makeMockElement()) {
   return {
     elements: {
-      getElement: vi.fn(() => element),
+      getElement: vi.fn((_id: string) => element),
     },
     styles: {
       getBreakpointStyle: vi.fn(() => ({})),
@@ -141,7 +141,7 @@ describe("useStyleHandlers — pseudo-state style write (Task 4)", () => {
     });
 
     expect(composer.styles.getRule).toHaveBeenCalledWith(
-      '[data-buildrick-id="el-1"]',
+      '[data-buildrick-id="el-1"]:hover',
       undefined,
     );
   });

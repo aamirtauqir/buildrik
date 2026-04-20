@@ -4,8 +4,8 @@
 
 import * as React from "react";
 import type { MediaAsset, MediaAssetType } from "../../../shared/types/media";
-import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type SectionTier } from "../shared/controls";
-import { MixedValueBadge } from "../shared/MixedValueBadge";
+import { extractGradientUI, composeGradient, deriveBgType } from "../../../shared/utils/parsers/gradientHelpers";
+import { Section, ColorInput, SelectRow, InputRow, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
 
 export interface BackgroundSectionProps {
   styles: Record<string, string>;
@@ -41,7 +41,13 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
   mixedKeys,
   isMultiSelect,
 }) => {
-  const [bgType, setBgType] = React.useState<"color" | "gradient" | "image">("color");
+  const [bgType, setBgType] = React.useState<"color" | "gradient" | "image">(() => deriveBgType(styles));
+
+  React.useEffect(() => {
+    setBgType(deriveBgType(styles));
+  }, [styles.background, styles["background-image"]]);
+
+  const gradientUI = bgType === "gradient" ? extractGradientUI(styles.background || styles["background-image"] || "") : null;
 
   // Compute color preview from styles
   const bgColor = styles["background-color"] || styles["backgroundColor"] || styles["background"];
@@ -100,11 +106,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
       {/* Color Background */}
       {bgType === "color" && (
         <div style={{ position: "relative" }}>
-          {mixedKeys?.has("background-color") && (
-            <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
-              <MixedValueBadge compact />
-            </span>
-          )}
+          <MixedValueIndicator prop="background-color" mixedKeys={mixedKeys} />
           <ColorInput
             label="Color"
             value={styles["background-color"] || ""}
@@ -173,60 +175,70 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           {/* Gradient Colors */}
           <ColorInput
             label="Color 1"
-            value="#2d6dff"
+            value={gradientUI?.color1 || "#2d6dff"}
             onChange={(v) => {
-              const current = styles.background || "";
-              if (current.includes("linear-gradient")) {
-                onChange("background", `linear-gradient(90deg, ${v}, var(--buildrick-success))`);
-              } else {
-                onChange("background", `radial-gradient(circle, ${v}, var(--buildrick-success))`);
-              }
+              const result = composeGradient({
+                type: (gradientUI?.gradientType || "linear") as "linear" | "radial",
+                angle: gradientUI?.angle ?? 90,
+                color1: v,
+                color2: gradientUI?.color2 || "var(--buildrick-success)",
+              });
+              onChange("background", result);
             }}
           />
           <ColorInput
             label="Color 2"
-            value="#22c55e"
+            value={gradientUI?.color2 || "#22c55e"}
             onChange={(v) => {
-              const current = styles.background || "";
-              if (current.includes("linear-gradient")) {
-                onChange("background", `linear-gradient(90deg, var(--buildrick-accent), ${v})`);
-              } else {
-                onChange("background", `radial-gradient(circle, var(--buildrick-accent), ${v})`);
-              }
+              const result = composeGradient({
+                type: (gradientUI?.gradientType || "linear") as "linear" | "radial",
+                angle: gradientUI?.angle ?? 90,
+                color1: gradientUI?.color1 || "var(--buildrick-accent)",
+                color2: v,
+              });
+              onChange("background", result);
             }}
           />
 
           {/* Gradient Angle (for linear) */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 12,
-            }}
-          >
-            <label
+          {(gradientUI?.gradientType !== "radial") && (
+            <div
               style={{
-                fontSize: 12,
-                color: "var(--buildrick-text-tertiary)",
-                fontWeight: 500,
-                minWidth: 70,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginBottom: 12,
               }}
             >
-              Angle
-            </label>
-            <input
-              type="range"
-              min="0"
-              max="360"
-              value="90"
-              onChange={(e) => {
-                onChange("background", `linear-gradient(${e.target.value}deg, var(--buildrick-accent), var(--buildrick-success))`);
-              }}
-              style={{ flex: 1 }}
-            />
-            <span style={{ fontSize: 12, color: "var(--buildrick-text-tertiary)", minWidth: 40 }}>90°</span>
-          </div>
+              <label
+                style={{
+                  fontSize: 12,
+                  color: "var(--buildrick-text-tertiary)",
+                  fontWeight: 500,
+                  minWidth: 70,
+                }}
+              >
+                Angle
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="360"
+                value={gradientUI?.angle ?? 90}
+                onChange={(e) => {
+                  const result = composeGradient({
+                    type: "linear",
+                    angle: Number(e.target.value),
+                    color1: gradientUI?.color1 || "var(--buildrick-accent)",
+                    color2: gradientUI?.color2 || "var(--buildrick-success)",
+                  });
+                  onChange("background", result);
+                }}
+                style={{ flex: 1 }}
+              />
+              <span style={{ fontSize: 12, color: "var(--buildrick-text-tertiary)", minWidth: 40 }}>{gradientUI?.angle ?? 90}°</span>
+            </div>
+          )}
         </>
       )}
 
@@ -235,11 +247,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
         <>
           <div style={{ display: "flex", gap: 8, alignItems: "flex-end", marginBottom: 12 }}>
             <div style={{ flex: 1, position: "relative" }}>
-              {mixedKeys?.has("background-image") && (
-                <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
-                  <MixedValueBadge compact />
-                </span>
-              )}
+              <MixedValueIndicator prop="background-image" mixedKeys={mixedKeys} />
               <InputRow
                 label="Image URL"
                 value={styles["background-image"]?.replace(/url\(['"]?|['"]?\)/g, "") || ""}
@@ -277,11 +285,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           {advancedExpanded && (
             <>
               <div style={{ position: "relative" }}>
-                {mixedKeys?.has("background-size") && (
-                  <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
-                    <MixedValueBadge compact />
-                  </span>
-                )}
+                <MixedValueIndicator prop="background-size" mixedKeys={mixedKeys} />
                 <SelectRow
                   label="Size"
                   value={styles["background-size"] || ""}
@@ -296,11 +300,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               </div>
 
               <div style={{ position: "relative" }}>
-                {mixedKeys?.has("background-position") && (
-                  <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
-                    <MixedValueBadge compact />
-                  </span>
-                )}
+                <MixedValueIndicator prop="background-position" mixedKeys={mixedKeys} />
                 <SelectRow
                   label="Position"
                   value={styles["background-position"] || ""}
@@ -320,11 +320,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               </div>
 
               <div style={{ position: "relative" }}>
-                {mixedKeys?.has("background-repeat") && (
-                  <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
-                    <MixedValueBadge compact />
-                  </span>
-                )}
+                <MixedValueIndicator prop="background-repeat" mixedKeys={mixedKeys} />
                 <SelectRow
                   label="Repeat"
                   value={styles["background-repeat"] || ""}

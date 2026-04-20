@@ -12,6 +12,7 @@ import {
   TextInputRow,
   PresetButtonGrid,
   type SectionTier,
+  MixedValueIndicator,
 } from "../shared/controls";
 import { InputField } from "../../../shared/forms/InputField";
 import { MixedValueBadge } from "../shared/MixedValueBadge";
@@ -143,11 +144,7 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
     >
       {/* Opacity */}
       <div style={{ position: "relative" }}>
-        {mixedKeys?.has("opacity") && (
-          <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
-            <MixedValueBadge compact />
-          </span>
-        )}
+        <MixedValueIndicator prop="opacity" mixedKeys={mixedKeys} />
         <SliderInput
           label="Opacity"
           value={opacity}

@@ -82,12 +82,11 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   // Convert DeviceType to BreakpointId
   const currentBreakpoint: BreakpointId = isValidBreakpoint(currentBreakpointProp)
     ? currentBreakpointProp
-    : "mobile";
+    : "desktop";
 
   const {
     activeTab,
     currentPseudoState,
-    autoExpandSection,
     devMode,
     setActiveTab,
     setCurrentPseudoState,

@@ -95,7 +95,16 @@ export function useStyleHandlers(
       setStyles(baseStyles);
       setOverriddenProperties(new Set());
     }
-  }, [selectedElement, composer, currentBreakpoint]);
+
+    // Layer pseudo-state styles on top of base
+    if (currentPseudoState !== "normal" && composer?.styles) {
+      const pseudoSelector = `[data-buildrick-id="${selectedElement.id}"]:${currentPseudoState}`;
+      const pseudoRule = composer.styles.getRule(pseudoSelector, undefined);
+      if (pseudoRule) {
+        setStyles((prev) => ({ ...prev, ...pseudoRule.properties }));
+      }
+    }
+  }, [selectedElement, composer, currentBreakpoint, currentPseudoState]);
 
   // Style change handler - breakpoint and pseudo-state aware
   // Immediate visual update + 300ms debounced history entry to prevent keystroke spam
@@ -138,7 +147,8 @@ export function useStyleHandlers(
           if (currentPseudoState !== "normal" && composer?.styles) {
             // Handle pseudo-state styling
             if (value === "" || value == null) {
-              const existingRule = composer.styles.getRule(selector, undefined);
+              const pseudoSelector = `${selector}:${currentPseudoState}`;
+              const existingRule = composer.styles.getRule(pseudoSelector, undefined);
               if (existingRule) {
                 const props = { ...existingRule.properties };
                 delete props[property];
@@ -200,6 +210,33 @@ export function useStyleHandlers(
 
       composer?.beginTransaction?.("style-batch");
       try {
+        // Pseudo-state batch changes
+        if (currentPseudoState !== "normal" && composer?.styles) {
+          const selector = `[data-buildrick-id="${selectedElement.id}"]`;
+          const pseudoSelector = `${selector}:${currentPseudoState}`;
+          const existingRule = composer.styles.getRule(pseudoSelector, undefined);
+          const existing = existingRule ? { ...existingRule.properties } : {};
+
+          Object.entries(changes).forEach(([prop, val]) => {
+            if (val === "" || val == null) {
+              delete existing[prop];
+            } else {
+              existing[prop] = val;
+            }
+          });
+
+          composer.styles.setRule(selector, existing, { pseudo: `:${currentPseudoState}` });
+          setStyles((prev) => {
+            const merged = { ...prev };
+            Object.entries(changes).forEach(([prop, val]) => {
+              if (val === "" || val == null) delete merged[prop];
+              else merged[prop] = val;
+            });
+            return merged;
+          });
+          return;
+        }
+
         const next: Record<string, string> = {};
         const toSet: Record<string, string> = {};
 
@@ -241,7 +278,7 @@ export function useStyleHandlers(
         composer?.endTransaction?.();
       }
     },
-    [selectedElement, composer, currentBreakpoint]
+    [selectedElement, composer, currentBreakpoint, currentPseudoState]
   );
 
   return {

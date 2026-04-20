@@ -40,6 +40,7 @@ import type {
 } from "../../../shared/types/media";
 import type { CssContext, PropertyState } from "../config/cssContext";
 import { getAdvancedPropsForGroup } from "../config/propertiesRegistry";
+import { getProfileFor } from "../config/elementProfiles";
 import type { SectionTier } from "../shared/controls";
 
 // ============================================================================
@@ -308,7 +309,6 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
     styleKeys: ["display", "position", "top", "right", "bottom", "left", "z-index", "overflow", "float", "clear", "visibility"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
-      onBatchChange: ctx.onBatchChange,
       propertyStates: ctx.propertyStates,
       advancedExpanded: ctx.advancedExpanded,
       onAdvancedToggle: ctx.onAdvancedToggle,
@@ -319,12 +319,17 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
     Component: SizeSection,
     advancedKey: "size",
     styleKeys: ["width", "height", "min-width", "min-height", "max-width", "max-height", "aspect-ratio"],
-    adaptProps: (ctx) => ({
-      ...adaptBaseStyleProps(ctx),
-      propertyStates: ctx.propertyStates,
-      advancedExpanded: ctx.advancedExpanded,
-      onAdvancedToggle: ctx.onAdvancedToggle,
-    }),
+    adaptProps: (ctx) => {
+      const profile = getProfileFor(ctx.selectedElement.type);
+      const hasLayout = profile?.style?.order?.includes("layout") ?? false;
+      return {
+        ...adaptBaseStyleProps(ctx),
+        propertyStates: ctx.propertyStates,
+        advancedExpanded: ctx.advancedExpanded,
+        onAdvancedToggle: ctx.onAdvancedToggle,
+        showDimensions: !hasLayout,
+      };
+    },
   }),
 
   spacing: defineSection({
@@ -400,7 +405,6 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
     styleKeys: ["border", "border-width", "border-style", "border-color", "border-radius"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
-      onBatchChange: ctx.onBatchChange,
       advancedExpanded: ctx.advancedExpanded,
       onAdvancedToggle: ctx.onAdvancedToggle,
     }),
@@ -488,7 +492,11 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
       const getAnimation = () => {
         if (!ctx.composer) return null;
         const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
-        return el?.getAnimation?.() ?? null;
+        if (!el?.getAnimation) {
+          if (import.meta.env.DEV) console.warn(`[Inspector] getAnimation not implemented on element ${ctx.selectedElement.id}`);
+          return null;
+        }
+        return el.getAnimation() ?? null;
       };
       const handleAnimationChange = (
         animation: import("../../../shared/types/animations").AnimationConfig | null
@@ -499,8 +507,10 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
         ctx.composer.beginTransaction?.("animation-change");
         try {
           if (animation) {
+            if (!el.setAnimation && import.meta.env.DEV) console.warn(`[Inspector] setAnimation not implemented on element ${ctx.selectedElement.id}`);
             el.setAnimation?.(animation);
           } else {
+            if (!el.clearAnimation && import.meta.env.DEV) console.warn(`[Inspector] clearAnimation not implemented on element ${ctx.selectedElement.id}`);
             el.clearAnimation?.();
           }
         } finally {
@@ -537,7 +547,11 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
         if (!ctx.composer || !ctx.selectedElement) return [];
         const el = ctx.composer.elements.getElement(ctx.selectedElement.id);
         if (!el) return [];
-        return (el.getInteractions?.() as Interaction[]) ?? [];
+        if (!el.getInteractions) {
+          if (import.meta.env.DEV) console.warn(`[Inspector] getInteractions not implemented on element ${ctx.selectedElement.id}`);
+          return [];
+        }
+        return (el.getInteractions() as Interaction[]) ?? [];
       };
       const handleInteractionsChange = (interactions: Interaction[]) => {
         if (!ctx.composer) return;
@@ -545,6 +559,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
         if (!el) return;
         ctx.composer.beginTransaction?.("interactions-change");
         try {
+          if (!el.setInteractions && import.meta.env.DEV) console.warn(`[Inspector] setInteractions not implemented on element ${ctx.selectedElement.id}`);
           el.setInteractions?.(interactions);
         } finally {
           ctx.composer.endTransaction?.();
@@ -566,6 +581,9 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
         interactions: getInteractions(),
         onInteractionsChange: handleInteractionsChange,
         onPreview: handleInteractionPreview,
+        onOpenTimeline: () => {
+          if (import.meta.env.DEV) console.warn("[Inspector] onOpenTimeline: animation section navigation not yet implemented");
+        },
         isOpen: ctx.isOpen,
         onToggle: ctx.onToggle,
         tier: ctx.tier,
