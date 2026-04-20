@@ -58,16 +58,6 @@
   background: var(--buildrick-bg-panel);
 }
 
-.buildrick-layers-header {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  background: var(--buildrick-surface-3);
-  border-radius: var(--buildrick-radius-md);
-  margin-bottom: 8px;
-}
-
 .buildrick-layers-header-actions {
   display: flex;
   gap: 4px;
