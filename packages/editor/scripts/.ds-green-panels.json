@@ -4,6 +4,7 @@
   "version": 1,
   "files": [
     "packages/editor/src/editor/sidebar/tabs/settings/SettingsTab.tsx",
+    "packages/editor/src/editor/sidebar/tabs/settings/icons.tsx",
     "packages/editor/src/editor/sidebar/tabs/settings/shared.tsx",
     "packages/editor/src/editor/sidebar/tabs/settings/screens/SiteSettingsScreen.tsx",
     "packages/editor/src/editor/sidebar/tabs/settings/screens/DomainsScreen.tsx",
