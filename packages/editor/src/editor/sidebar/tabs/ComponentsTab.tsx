@@ -14,7 +14,7 @@ import { ConfirmDialog, Modal } from "../../../shared/ui/Modal";
 import { SkeletonListItem } from "../../../shared/ui/Skeleton";
 import { useToast } from "../../../shared/ui/Toast";
 import { PanelErrorState } from "../shared/PanelErrorState";
-import { PanelHeader } from "../shared/PanelHeader";
+import { PanelShell } from "@shared/ui/panel";
 import { SearchBar } from "../shared/SearchBar";
 import { ComponentDetailScreen } from "./component-library/ComponentDetailScreen";
 import { ComponentIcon } from "./component-library/ComponentIcon";
@@ -99,9 +99,9 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
   if (!composer?.components?.isAvailable()) {
     return (
-      <div style={containerStyles}>
+      <PanelShell>
         {state.isStandaloneMode && (
-          <PanelHeader
+          <PanelShell.Header
             title="Components"
             isPinned={isPinned}
             onPinToggle={onPinToggle}
@@ -109,7 +109,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onClose={onClose}
           >
             {headerAddBtn}
-          </PanelHeader>
+          </PanelShell.Header>
         )}
         <div className="buildrick-empty-state">
           <ComponentIcon />
@@ -120,15 +120,15 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             Try opening in a regular browser window.
           </p>
         </div>
-      </div>
+      </PanelShell>
     );
   }
 
   if (state.error) {
     return (
-      <div style={containerStyles}>
+      <PanelShell>
         {state.isStandaloneMode && (
-          <PanelHeader
+          <PanelShell.Header
             title="Components"
             isPinned={isPinned}
             onPinToggle={onPinToggle}
@@ -136,10 +136,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onClose={onClose}
           >
             {headerAddBtn}
-          </PanelHeader>
+          </PanelShell.Header>
         )}
         <PanelErrorState message={state.error} onRetry={() => state.setError(null)} />
-      </div>
+      </PanelShell>
     );
   }
 
@@ -180,10 +180,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
       );
     }
     return (
-      <div style={containerStyles}>
+      <PanelShell>
         {state.isStandaloneMode && (
           <>
-            <PanelHeader
+            <PanelShell.Header
               title="Components"
               isPinned={isPinned}
               onPinToggle={onPinToggle}
@@ -191,7 +191,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               onClose={onClose}
             >
               {headerAddBtn}
-            </PanelHeader>
+            </PanelShell.Header>
             <div style={searchContainerStyles}>
               <SearchBar
                 value={state.internalSearchQuery}
@@ -238,17 +238,17 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onSubmit={handleCreateComponent}
           />
         )}
-      </div>
+      </PanelShell>
     );
   }
 
   // ── Main list view ────────────────────────────────────────────────────────────
 
   return (
-    <div style={containerStyles}>
+    <PanelShell>
       {state.isStandaloneMode && (
         <>
-          <PanelHeader
+          <PanelShell.Header
             title="Components"
             isPinned={isPinned}
             onPinToggle={onPinToggle}
@@ -256,7 +256,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onClose={onClose}
           >
             {headerAddBtn}
-          </PanelHeader>
+          </PanelShell.Header>
           <div style={searchContainerStyles}>
             <SearchBar
               value={state.internalSearchQuery}
@@ -419,7 +419,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                 onClick={() => state.confirmVariant(v.id)}
                 style={{
                   padding: "10px 14px",
-                  borderRadius: 8,
+                  borderRadius: "var(--buildrick-radius-sm)",
                   fontSize: 13,
                   cursor: "pointer",
                   textAlign: "left" as const,
@@ -465,7 +465,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           </p>
         </div>
       </Modal>
-    </div>
+    </PanelShell>
   );
 };
 

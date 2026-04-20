@@ -26,7 +26,7 @@ import { EVENTS } from "../../../../shared/constants/events";
 import { Skeleton } from "../../../../shared/ui/Skeleton";
 import { LayersPanel } from "../../../panels/layers/index";
 import type { SelectedElementInfo } from "../../../panels/layers/types";
-import { PanelHeader } from "../../shared/PanelHeader";
+import { PanelShell } from "@shared/ui/panel";
 
 export interface LayersTabProps {
   composer: Composer | null;
@@ -108,8 +108,8 @@ export const LayersTab: React.FC<LayersTabProps> = ({
 
   if (!composer) {
     return (
-      <div style={containerStyles}>
-        <PanelHeader
+      <PanelShell>
+        <PanelShell.Header
           title="Layers"
           isPinned={isPinned}
           onPinToggle={onPinToggle}
@@ -126,11 +126,11 @@ export const LayersTab: React.FC<LayersTabProps> = ({
             <Skeleton width={14} height={14} radius="sm" />
             <Skeleton width="50%" height={12} radius="sm" />
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, paddingLeft: 44 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, paddingLeft: 42 }}>
             <Skeleton width={14} height={14} radius="sm" />
             <Skeleton width="40%" height={12} radius="sm" />
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, paddingLeft: 44 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, paddingLeft: 42 }}>
             <Skeleton width={14} height={14} radius="sm" />
             <Skeleton width="55%" height={12} radius="sm" />
           </div>
@@ -143,14 +143,13 @@ export const LayersTab: React.FC<LayersTabProps> = ({
             <Skeleton width="50%" height={12} radius="sm" />
           </div>
         </div>
-      </div>
+      </PanelShell>
     );
   }
 
   return (
-    <div style={containerStyles}>
-      {/* Panel Header */}
-      <PanelHeader
+    <PanelShell>
+      <PanelShell.Header
         title="Layers"
         isPinned={isPinned}
         onPinToggle={onPinToggle}
@@ -166,7 +165,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
       )}
 
       {/* Tree Content - LayersPanel has its own integrated search */}
-      <div style={contentStyles}>
+      <PanelShell.Content noScroll>
         <LayersPanel
           composer={composer}
           selectedElement={selectedElement}
@@ -174,8 +173,8 @@ export const LayersTab: React.FC<LayersTabProps> = ({
           canvasHoveredId={canvasHoveredId}
           onAddBlockClick={onAddBlockClick}
         />
-      </div>
-    </div>
+      </PanelShell.Content>
+    </PanelShell>
   );
 };
 

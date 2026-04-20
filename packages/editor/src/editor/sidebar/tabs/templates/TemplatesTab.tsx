@@ -8,6 +8,7 @@ import * as React from "react";
 import { Search, X } from "lucide-react";
 import type { Composer } from "../../../../engine";
 import { useToast } from "../../../../shared/ui/Toast";
+import { PanelShell } from "@shared/ui/panel";
 import { type TemplateItem, SITE_CATEGORY_PILLS, SITE_TEMPLATES, TEMPLATE_TYPE_PILLS, SUB_CATEGORY_TAGS, type SiteCategory, type TemplateType } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
 import { ReplaceModal, ProModal, CreatePageConfirmModal, CreatePageSuccessModal, CreatePageErrorModal } from "./TemplatesTabModals";
@@ -140,8 +141,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     : "Template";
 
   return (
-    <div className="tpl-shell">
-      {/* Header — 48px, title 18px/600 */}
+    <PanelShell className="tpl-shell">
+      {/* Header — tpl-header class controls height via tpl-header-title sizing. */}
       <div className="tpl-header">
         {detailTemplate ? (
           /* Breadcrumb (Screen cV3OT) */
@@ -389,7 +390,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           />
         );
       })()}
-    </div>
+    </PanelShell>
   );
 };
 

@@ -57,7 +57,8 @@ const WIDTH_PX: Record<PanelWidth, number | string> = {
   fullpage: "100%",
 };
 
-export interface PanelShellProps {
+export interface PanelShellProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Optional width constraint. When OMITTED (default), PanelShell fills its
    * host (100% width, no min-width). This is the right choice when the host
@@ -74,11 +75,7 @@ export interface PanelShellProps {
    * panels should NOT set this (they don't live next to other panels).
    */
   bordered?: boolean;
-  className?: string;
-  style?: React.CSSProperties;
   children: React.ReactNode;
-  /** data-* or aria-* attributes for testing/a11y. */
-  "data-testid"?: string;
 }
 
 interface PanelShellComponent extends React.FC<PanelShellProps> {
@@ -102,7 +99,7 @@ const PanelShellFn: React.FC<PanelShellProps> = ({
   className,
   style,
   children,
-  "data-testid": testid,
+  ...rest
 }) => {
   const widthStyles: React.CSSProperties = (() => {
     if (width === undefined) {
@@ -124,13 +121,13 @@ const PanelShellFn: React.FC<PanelShellProps> = ({
   return (
     <div
       className={className}
-      data-testid={testid}
       style={{
         ...rootStylesBase,
         ...widthStyles,
         ...borderStyles,
         ...style,
       }}
+      {...rest}
     >
       {children}
     </div>

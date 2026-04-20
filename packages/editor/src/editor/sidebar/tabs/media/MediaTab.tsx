@@ -8,7 +8,8 @@
 import * as React from "react";
 import { Upload, Plus } from "lucide-react";
 import type { Composer } from "../../../../engine/Composer";
-import { PanelHeader } from "../../shared/PanelHeader";
+import { PanelShell } from "@shared/ui/panel";
+import { ROW_LG } from "@shared/constants/layout";
 import { SearchBar } from "../../shared/SearchBar";
 import { AssetDetailOverlay } from "./components/AssetDetailOverlay";
 import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
@@ -42,10 +43,12 @@ interface MediaTabProps {
 export function MediaTab(props: MediaTabProps) {
   if (!props.composer) {
     return (
-      <div className="med-tab">
-        <PanelHeader title="Media" {...props} />
-        <div className="med-no-project">Open a project to manage media.</div>
-      </div>
+      <PanelShell className="med-tab">
+        <PanelShell.Header title="Media" {...props} />
+        <PanelShell.Content>
+          <div className="med-no-project">Open a project to manage media.</div>
+        </PanelShell.Content>
+      </PanelShell>
     );
   }
   return <MediaTabWithComposer {...props} composer={props.composer} />;
@@ -124,7 +127,7 @@ function MediaTabWithComposer({
   }, [onOpenIconPicker, composer, showToast]);
 
   return (
-    <div
+    <PanelShell
       className="med-tab"
       onDragEnter={state.handlePanelDragEnter}
       onDragLeave={state.handlePanelDragLeave}
@@ -144,7 +147,7 @@ function MediaTabWithComposer({
           fontWeight: 500
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'rgba(255,255,255,0.6)', animation: 'pulse 2s infinite' }} />
+            <div style={{ width: 8, height: 8, borderRadius: 'var(--buildrick-radius-full)', background: 'rgba(255,255,255,0.6)', animation: 'pulse 2s infinite' }} />
             Selecting image for: <span style={{ opacity: 0.9 }}>{state.selectionContext.label || 'Canvas Element'}</span>
           </div>
           <button 
@@ -165,7 +168,7 @@ function MediaTabWithComposer({
       )}
 
       {/* 1. Header bar — type pills + stock button + close */}
-      <div className="med-tabs-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 48 }}>
+      <div className="med-tabs-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: ROW_LG }}>
         <TypePills
           activeType={state.activeType}
           counts={state.counts}
@@ -309,6 +312,6 @@ function MediaTabWithComposer({
         onInsert={state.insertToCanvas}
         onOpenIconPicker={handleOpenIconPicker}
       />
-    </div>
+    </PanelShell>
   );
 }

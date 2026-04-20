@@ -8,7 +8,7 @@
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import type { BlockData } from "../../../../shared/types";
-import { PanelHeader } from "../../shared/PanelHeader";
+import { PanelShell } from "@shared/ui/panel";
 import { SearchBar } from "../../shared/SearchBar";
 import { CATALOG } from "./catalog/catalog";
 import { useBuildTab } from "./hooks/useBuildTab";
@@ -117,8 +117,8 @@ export const BuildTab: React.FC<BuildTabProps> = ({
   }, []);
 
   return (
-    <div className="bld-container">
-      <PanelHeader title="Add" isPinned={isPinned} onPinToggle={onPinToggle} onClose={onClose} />
+    <PanelShell className="bld-container">
+      <PanelShell.Header title="Add" isPinned={isPinned} onPinToggle={onPinToggle} onClose={onClose} />
 
       <div className="bld-content">
         {/* Mode Switch */}
@@ -246,7 +246,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </PanelShell>
   );
 };
 

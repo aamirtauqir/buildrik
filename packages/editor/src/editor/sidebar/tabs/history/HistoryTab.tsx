@@ -12,7 +12,7 @@ import * as React from "react";
 import { useHistoryState } from "../../../../shared/hooks/useHistoryState";
 import { useAutoMilestone } from "../../../../shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
-import { PanelHeader } from "../../shared/PanelHeader";
+import { PanelShell } from "@shared/ui/panel";
 import { ActivityView } from "./components/ActivityView";
 import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
@@ -110,8 +110,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   }, []);
 
   return (
-    <div className="buildrick-history-container">
-      <PanelHeader
+    <PanelShell className="buildrick-history-container">
+      <PanelShell.Header
         title="Version History"
         isPinned={isPinned}
         onPinToggle={onPinToggle}
@@ -198,7 +198,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           onExit={handleScrubberExit}
         />
       )}
-    </div>
+    </PanelShell>
   );
 };
 
