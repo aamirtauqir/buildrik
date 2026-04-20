@@ -282,3 +282,74 @@ Run `npm run verify:ds` in `packages/editor/` to check all 8 gates:
 Plus baseline parity: `scripts/verify-design-baselines.mjs` confirms `design.css` values match `constants.ts` DEFAULT_TOKENS byte-for-byte (normalized).
 
 See: `docs/superpowers/specs/2026-04-19-buildrik-design-system-v1-design.md`
+
+## Chrome Axioms (editor-chrome DS rollout, 2026-04-20)
+
+These axioms codify the editor-chrome design constraints. They extend (not contradict) the existing §Color, §Typography, §Spacing, §Layout, and §Sidebar Panel System sections. Where this section and earlier sections appear to conflict, earlier sections win — these axioms only add new lint-enforced constraints.
+
+### Scope
+
+Chrome paths enforced:
+- `packages/editor/src/editor/**`
+- `packages/editor/src/shared/ui/**`
+- `packages/editor/src/shared/forms/**`
+
+LOCAL_SHADOW — exempt because they render or edit user-site content, not chrome:
+- `editor/sidebar/tabs/design/**` (user-site token editor, legitimately mutates `--buildrick-design-*`)
+- `editor/inspector/sections/BackgroundSection.tsx` (user-site gradient editor)
+- `editor/media/VideoPreview.tsx`, `editor/export/PreviewFrame.tsx`, `editor/wizard/sectionData.ts` (user-content preview renderers)
+- `shared/forms/GradientPicker.tsx` (user-site gradient editor)
+- `shared/utils/parsers/**` (user-content parsers)
+- `**/__tests__/**`, `**/*.test.*`, `**/*.stories.*`
+
+NOT exempt (in scope, enforced): `features/design-system/ui/**` — this is the Design tab's own chrome (headers, footers, modals, dropdowns), enforced like the rest of the sidebar.
+
+### Chrome vs form atoms
+
+Two tiers within chrome. Axioms apply differently to each.
+
+- **Panel chrome** — panel shells, headers, toolbars, content backgrounds, sidebar rows, inspector sections, rail zones, canvas overlays, topbar containers. Zero-decoration rules apply strictly.
+- **Form atoms** — `Button`, `Input`, `Select`, `Toggle`, `Tooltip`, `Toast`, `Modal`, `IconButton`, `Kbd`, `Badge`. These are atomic primitives inside panels. They may use the full `--buildrick-radius-*` scale (sm 4 / md 8 / lg 12 / xl 16) and `--buildrick-shadow-*` tokens. They are NOT panel chrome.
+
+### Axiom A1 — Zero Decoration on Panel Chrome
+
+Panel chrome must be visually restrained. Canvas (user content) owns decoration; panel chrome is the instrument chassis.
+
+1. **No gradients** in panel chrome (`linear-gradient`, `radial-gradient`, `conic-gradient`).
+2. **Box-shadow in chrome must come from a `--buildrick-shadow-*` token** — not from raw `rgba(...)` or hex values inline. Allowed tokens: `shadow-xs/sm/md/lg/xl`, `shadow-dropdown`, `shadow-modal`, `shadow-hover`, `shadow-inner`, and the `glow-*` family for focus rings. Use `shadow-dropdown` or `shadow-modal` for floating panels; never invent a raw shadow.
+3. **`border-radius` ≤ 4px on panel chrome containers.** Panels, headers, toolbars, footers, sidebar rows, inspector sections, rail zones all cap at `--buildrick-radius-sm` (4px). Form atoms are exempt (see tier above).
+4. **No decorative hover effects on panel chrome** — no glow, no scale, no rotate, no tint animations on panel containers. Hover on rows uses a background-color change to a hover-surface token. Form-atom hover states (button color shift, input focus ring) are unchanged.
+
+**Rationale.** Adobe Spectrum, VS Code, Figma UI3, and every professional DAW/CAD/game-engine converge on this: decorative panel chrome competes with user content for attention and trains users to mistake chrome for editable objects.
+
+### Axiom A2 — Hue Is Never Load-Bearing in Chrome
+
+Restates and sharpens the existing §Color rules.
+
+1. **Cobalt `#2D6DFF` is used ONLY where §Color §Accent Usage Rules already allow** — primary CTA, selection outlines and selected-row tint, active rail/tab indicator, focus rings, account avatar. Nowhere else in chrome.
+2. **Semantic colors (`--success`, `--warning`, `--error`, `--info`) are used ONLY in functional status indicators** — Toast, SyncStatusIndicator, save-state badges, validation messages. Never as decoration elsewhere in chrome.
+3. **No decorative tint** in panel headers, sidebar section backgrounds, toolbar fills. Chrome uses the neutral surface tokens (`--aqb-bg-*` / `--buildrick-bg-panel*`) only.
+4. **Chrome must survive any user canvas color.** A user building a hot-pink brand site and a user building a forest-green one must see the same chrome affordances.
+
+**Rationale.** The microscope/DAW invariant: hue on chrome biases the user's perception of hue in their own content. Chrome separates via luminance + typography + iconography.
+
+### Axiom A3 — No Motion Beyond Function
+
+1. **No scroll choreography, no parallax, no spring physics.**
+2. **Allowed:** 100-150ms ease-out transitions on background-color, opacity, transform (drag only). Nothing else.
+3. **No entrance/exit animations** on panels, modals, menus beyond a simple opacity fade ≤150ms.
+
+### Enforcement
+
+Enforcement has two layers. Both run in WARN mode at introduction, tied to `.chrome-axioms-baseline`. Counts can only go down.
+
+1. **`no-restricted-syntax` rules inside `eslint.config.mjs`** — scoped via `files: ["src/editor/**/*.{ts,tsx}", ...]` overrides. Catches most Emotion tagged-template-literal and JSX object-literal cases. ESLint is advisory only (CI step allows non-blocking `|| true`); real enforcement lives in the grep gates.
+2. **Grep gates 11-14 in `scripts/ds-grep-gates.sh`**, backed by `scripts/.chrome-axioms-baseline`:
+   - Gate 11 — no gradients in panel chrome
+   - Gate 12 — no raw box-shadow literals in panel chrome (must use `--buildrick-shadow-*` tokens)
+   - Gate 13 — `border-radius` ≤ 4px on panel chrome (form atoms exempt)
+   - Gate 14 — magic layout literals (44/48/56/60/28/32/36/40/240/300/320) — migrate to `src/shared/constants/layout.ts` when it lands (Week 1, Survivor #3)
+
+Gates compare current count against the frozen baseline and fail on regression. Lower the baseline as migrations ship.
+
+See: `docs/ideation/2026-04-20-editor-chrome-ds-ideation.md` (rollout plan) and `docs/reviews/2026-04-20-editor-chrome-consumer-inventory.md` (Week 0 inventory).

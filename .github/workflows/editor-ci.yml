@@ -79,7 +79,13 @@ jobs:
         working-directory: packages/editor
         run: pnpm run lint:ds-hex
 
-      - name: ESLint (DS rules)
+      # ESLint runs advisory-only by design. DS V1 rules (no-inline-hex,
+      # no-inspector-tokens, no-get-property-value-ds) and Chrome Axiom
+      # rules (A1.1-A1.3) surface as IDE warnings; real enforcement lives
+      # in the grep gates (verify:ds, lint:ds-hex) which ARE blocking.
+      # See DESIGN.md Chrome Axioms - Enforcement. Do not remove || true
+      # without also flipping WARN to FAIL on chrome-axiom baselines.
+      - name: ESLint (DS rules, advisory)
         working-directory: packages/editor
         run: pnpm run lint || true
 
