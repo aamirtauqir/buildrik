@@ -83,7 +83,7 @@ const STYLE_USER_CHIP: React.CSSProperties = {
   justifyContent: "center",
   width: 16,
   height: 16,
-  borderRadius: "50%",
+  borderRadius: "var(--buildrick-radius-full)",
   background: "var(--buildrick-accent-tint)",
   color: "var(--buildrick-accent)",
   fontSize: 10,

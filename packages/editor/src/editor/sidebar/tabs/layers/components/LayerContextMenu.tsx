@@ -127,12 +127,12 @@ export const DragTooltip: React.FC<DragTooltipProps> = ({
 const menuStyles: React.CSSProperties = {
   position: "fixed",
   zIndex: 10000,
-  background: "var(--buildrick-surface-3, #1e1e2e)",
-  border: "1px solid var(--buildrick-border, rgba(255, 255, 255, 0.08))",
-  borderRadius: 8,
+  background: "var(--buildrick-bg-elevated)",
+  border: "1px solid var(--buildrick-border)",
+  borderRadius: "var(--buildrick-radius-sm)",
   padding: "4px 0",
   minWidth: 160,
-  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
+  boxShadow: "var(--buildrick-shadow-dropdown)",
 };
 
 const itemStyles: React.CSSProperties = {
@@ -160,11 +160,11 @@ const tooltipStyles: React.CSSProperties = {
   position: "fixed",
   zIndex: 10001,
   padding: "6px 10px",
-  borderRadius: 6,
+  borderRadius: "var(--buildrick-radius-sm)",
   color: "var(--buildrick-text-on-accent)",
   fontSize: 12,
   fontWeight: 500,
   whiteSpace: "nowrap" as const,
   pointerEvents: "none" as const,
-  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+  boxShadow: "var(--buildrick-shadow-md)",
 };

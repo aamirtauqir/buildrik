@@ -1,6 +1,6 @@
 /**
  * TipsFooter — PRO TIP carousel rendered at the bottom of the Build Tab
- * Supports collapsed state (28px header) vs expanded (full carousel).
+ * Supports collapsed state (compact header = ROW_SM) vs expanded (full carousel).
  * @license BSD-3-Clause
  */
 

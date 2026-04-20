@@ -27,7 +27,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   if (!groups.length) {
     return (
       <div className="bld-no-results" role="status" aria-live="polite">
-        {/* Sparkle icon — 28px, #94A3B8 */}
+        {/* Sparkle icon — small square, slate-400 tint */}
         <svg className="bld-no-results-icon" width="28" height="28" viewBox="0 0 24 24" fill="none">
           <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"
             stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
