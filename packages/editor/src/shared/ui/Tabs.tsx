@@ -69,7 +69,7 @@ export const Tabs: React.FC<TabsProps> = ({
           gap: variant === "pills" ? 4 : 0,
           borderBottom: variant === "underline" ? "1px solid var(--buildrick-border)" : "none",
           background: variant === "default" ? "var(--buildrick-bg-panel-secondary)" : "transparent",
-          borderRadius: variant === "default" ? 8 : 0,
+          borderRadius: variant === "default" ? "var(--buildrick-radius-sm)" : 0,
           padding: variant === "default" ? 4 : 0,
         }}
       >
@@ -119,8 +119,8 @@ function getVariantStyles(variant: TabsProps["variant"], isActive: boolean): Rea
     case "pills":
       return {
         background: isActive ? "var(--buildrick-accent)" : "transparent",
-        color: isActive ? "#fff" : "var(--buildrick-text-secondary)",
-        borderRadius: 6,
+        color: isActive ? "var(--buildrick-text-on-accent)" : "var(--buildrick-text-secondary)",
+        borderRadius: "var(--buildrick-radius-sm)",
       };
     case "underline":
       return {
@@ -134,7 +134,7 @@ function getVariantStyles(variant: TabsProps["variant"], isActive: boolean): Rea
       return {
         background: isActive ? "var(--buildrick-bg-panel)" : "transparent",
         color: isActive ? "var(--buildrick-text-primary)" : "var(--buildrick-text-secondary)",
-        borderRadius: 6,
+        borderRadius: "var(--buildrick-radius-sm)",
       };
   }
 }

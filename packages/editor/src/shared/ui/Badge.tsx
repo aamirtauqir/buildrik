@@ -45,7 +45,7 @@ export const Badge: React.FC<BadgeProps> = ({
         style={{
           width: size === "sm" ? 6 : 8,
           height: size === "sm" ? 6 : 8,
-          borderRadius: "50%",
+          borderRadius: "var(--buildrick-radius-full)",
           display: "inline-block",
           ...variantStyles[variant],
         }}

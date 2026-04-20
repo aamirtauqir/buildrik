@@ -4,12 +4,24 @@
   "version": 1,
   "files": [
     "packages/editor/src/editor/sidebar/tabs/settings/SettingsTab.tsx",
-    "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.tsx"
+    "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.tsx",
+    "packages/editor/src/shared/ui/Card.tsx",
+    "packages/editor/src/shared/ui/Badge.tsx",
+    "packages/editor/src/shared/ui/FormField.tsx",
+    "packages/editor/src/shared/ui/Accordion.tsx",
+    "packages/editor/src/shared/ui/Tabs.tsx",
+    "packages/editor/src/shared/ui/Spinner.tsx",
+    "packages/editor/src/shared/ui/InfoBanner.tsx",
+    "packages/editor/src/shared/ui/ErrorMessage.tsx",
+    "packages/editor/src/shared/ui/HelpTooltip.tsx",
+    "packages/editor/src/shared/ui/CopyButton.tsx",
+    "packages/editor/src/shared/ui/Icons.tsx",
+    "packages/editor/src/shared/ui/Icon.tsx"
   ],
   "notes": [
-    "SettingsTab.tsx + PagesTab.tsx added 2026-04-20 (Week 3 container migration). Both tab shells compose PanelShell directly with no inline chrome styling.",
+    "Week 3 Part 3 (tonight): added 12 shared/ui primitives after a quick tokenization pass (50% → radius-full, raw shadows → shadow tokens). All files verified ZERO chrome-gate violations.",
+    "Week 3 Part 1 (commit 32c1737) + Part 2 (commit e515272): SettingsTab + PagesTab container migrations.",
     "Sub-screens (9 Settings screens) and sub-components (PageList / PageRow / etc.) are NOT yet in this list — their CSS files still have some violations counted against the overall baseline.",
-    "Order of addition follows the rollout in docs/ideation/2026-04-20-editor-chrome-ds-ideation.md: Week 3 PanelShell migrations add sidebar tabs one at a time; Week 5-6 inspector schema adds one section at a time.",
     "Do NOT remove files from this list once added. If a migration regresses, fix the code — removing from the allowlist hides the regression."
   ]
 }

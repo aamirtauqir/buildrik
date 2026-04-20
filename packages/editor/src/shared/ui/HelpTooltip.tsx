@@ -95,7 +95,7 @@ const buttonStyles: React.CSSProperties = {
   marginLeft: 4,
   background: "transparent",
   border: "none",
-  borderRadius: "50%",
+  borderRadius: "var(--buildrick-radius-full)",
   color: "var(--buildrick-text-tertiary)",
   cursor: "help",
   transition: "color 0.15s, background 0.15s",

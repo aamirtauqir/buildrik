@@ -55,7 +55,7 @@ export const Card: React.FC<CardProps> = ({
     },
     elevated: {
       background: "var(--buildrick-bg-panel)",
-      boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+      boxShadow: "var(--buildrick-shadow-lg)",
     },
     outlined: {
       background: "transparent",
@@ -79,7 +79,7 @@ export const Card: React.FC<CardProps> = ({
         ...(hoverable && {
           ":hover": {
             transform: "translateY(-2px)",
-            boxShadow: "0 8px 30px rgba(0, 0, 0, 0.2)",
+            boxShadow: "var(--buildrick-shadow-xl)",
           },
         }),
         ...style,

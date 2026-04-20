@@ -26,7 +26,7 @@ const styles = {
     alignItems: "center",
     gap: 6,
     border: "none",
-    borderRadius: 6,
+    borderRadius: "var(--buildrick-radius-sm)",
     cursor: "pointer",
     fontWeight: 500,
     transition: "all 0.2s ease",
