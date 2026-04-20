@@ -1,10 +1,14 @@
 {
-  "description": "Green-panel allowlist for DS gate ratchet (Survivor #6). Files listed here run DS rules in FAIL mode instead of WARN. The list can only grow — adding a file is a one-way door. Used by ds-grep-gates.sh and (eventually) the ESLint overlay to ratchet WARN → FAIL file-by-file as panels migrate through PanelShell (Week 3+).",
-  "mechanism": "On each gate run, a file in `files` is counted separately. If its current violation count exceeds zero, that gate FAILS for the file regardless of overall baseline. This is stricter than the baseline check because it accepts zero violations, not baseline-parity.",
+  "description": "Green-panel allowlist for DS gate ratchet (Survivor #6). Files listed here run DS rules in strict-zero mode (must have ZERO chrome-gate violations, not just baseline-parity). Additions are one-way doors.",
+  "mechanism": "On each gate run, a file in `files` is counted separately. Any violation (gradient / raw shadow / radius>4 / magic layout literal) fails CI for that file, regardless of overall baseline.",
   "version": 1,
-  "files": [],
+  "files": [
+    "packages/editor/src/editor/sidebar/tabs/settings/SettingsTab.tsx",
+    "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.tsx"
+  ],
   "notes": [
-    "Migrated files are expected to have ZERO chrome-gate violations (gradients, raw shadows, radius > 4 on panel chrome, magic layout literals). Adding a file with existing violations will fail CI immediately.",
+    "SettingsTab.tsx + PagesTab.tsx added 2026-04-20 (Week 3 container migration). Both tab shells compose PanelShell directly with no inline chrome styling.",
+    "Sub-screens (9 Settings screens) and sub-components (PageList / PageRow / etc.) are NOT yet in this list — their CSS files still have some violations counted against the overall baseline.",
     "Order of addition follows the rollout in docs/ideation/2026-04-20-editor-chrome-ds-ideation.md: Week 3 PanelShell migrations add sidebar tabs one at a time; Week 5-6 inspector schema adds one section at a time.",
     "Do NOT remove files from this list once added. If a migration regresses, fix the code — removing from the allowlist hides the regression."
   ]
