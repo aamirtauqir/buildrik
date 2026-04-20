@@ -6,7 +6,7 @@
 import * as React from "react";
 import { Button } from "../../../../../shared/ui/Button";
 import { FEATURE_FLAGS } from "../constants";
-import { Section, Field } from "../shared";
+import { Section, Field, Screen, Input, CopyBtn, Code, DnsHelp, Muted, StatusRow, UrlRow, SuccessBadge } from "../shared";
 import { LockedScreen } from "./LockedScreen";
 import type { ScreenProps } from "../types";
 
@@ -49,50 +49,48 @@ export const DomainsScreen: React.FC<ScreenProps> = () => {
   }
 
   return (
-    <div className="buildrick-st-screen">
+    <Screen>
       <Section title="Default Domain">
-        <div className="buildrick-st-url-row">
-          <span className="buildrick-st-muted">project.builder.aquibra.com</span>
-          <button
-            className="buildrick-st-copy-btn"
+        <UrlRow>
+          <Muted>project.builder.aquibra.com</Muted>
+          <CopyBtn
             style={copied ? { color: "var(--buildrick-success)" } : undefined}
             onClick={handleCopy}
             aria-label={copied ? "Copied to clipboard" : "Copy default domain to clipboard"}
           >
             {copied ? "✓ Copied" : "Copy"}
-          </button>
+          </CopyBtn>
           <span aria-live="assertive" aria-atomic="true" style={srOnlyStyles}>
             {copied ? "Copied to clipboard" : ""}
           </span>
-        </div>
+        </UrlRow>
       </Section>
 
       <Section title="Custom Domain">
         <Field label="Enter your domain">
-          <input
+          <Input
             type="text"
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
             placeholder="www.example.com"
-            className="buildrick-st-input"
           />
         </Field>
         <Button onClick={handleConnect} disabled={!domain.trim()} variant="primary" fullWidth>
           Connect Domain
         </Button>
-        <div className="buildrick-st-dns-help">
+        <DnsHelp>
           <p>Point your domain to:</p>
-          <code className="buildrick-st-code">CNAME: builder.aquibra.com</code>
-        </div>
+          <Code>CNAME: builder.aquibra.com</Code>
+        </DnsHelp>
       </Section>
 
       <Section title="SSL Certificate">
-        <div className="buildrick-st-status-row">
+        <StatusRow>
           <span>Status</span>
-          <span className="buildrick-st-badge--success">✓ Active</span>
-        </div>
+          <SuccessBadge>✓ Active</SuccessBadge>
+        </StatusRow>
       </Section>
-    </div>
+    </Screen>
   );
 };
 

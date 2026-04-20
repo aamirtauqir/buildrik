@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { INTEGRATION_CATALOG } from "../constants";
-import { Section } from "../shared";
+import { Screen, Section } from "../shared";
 import type { ScreenProps } from "../types";
 
 
@@ -64,7 +64,7 @@ const hintStyles: React.CSSProperties = {
 };
 
 export const IntegrationsScreen: React.FC<ScreenProps> = () => (
-  <div className="buildrick-st-screen">
+  <Screen>
     <p style={hintStyles}>
       Connect third-party services to extend your site. Integrations require publishing your site
       first.
@@ -89,5 +89,5 @@ export const IntegrationsScreen: React.FC<ScreenProps> = () => (
         ))}
       </Section>
     ))}
-  </div>
+  </Screen>
 );

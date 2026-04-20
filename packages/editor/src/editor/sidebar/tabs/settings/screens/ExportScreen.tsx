@@ -255,7 +255,7 @@ const successMsgStyles: React.CSSProperties = {
   color: "var(--buildrick-success)",
   background: "rgba(34,197,94,0.08)",
   border: "1px solid rgba(34,197,94,0.2)",
-  borderRadius: 6,
+  borderRadius: "var(--buildrick-radius-sm)",
 };
 
 const errorMsgStyles: React.CSSProperties = {
@@ -265,7 +265,7 @@ const errorMsgStyles: React.CSSProperties = {
   color: "var(--buildrick-error)",
   background: "rgba(239,68,68,0.08)",
   border: "1px solid rgba(239,68,68,0.2)",
-  borderRadius: 6,
+  borderRadius: "var(--buildrick-radius-sm)",
 };
 
 const comingSoonStyles: React.CSSProperties = {
@@ -273,7 +273,7 @@ const comingSoonStyles: React.CSSProperties = {
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  padding: 32,
+  padding: 24,
   textAlign: "center",
   color: "var(--buildrick-text-muted)",
 };
@@ -300,7 +300,7 @@ const comingSoonTimelineStyles: React.CSSProperties = {
   color: "var(--buildrick-accent)",
   padding: "4px 12px",
   background: "rgba(45,109,255,0.08)",
-  borderRadius: 20,
+  borderRadius: "var(--buildrick-radius-sm)",
   border: "1px solid rgba(45,109,255,0.2)",
 };
 
@@ -329,7 +329,7 @@ const waitlistInputStyles: React.CSSProperties = {
   padding: "8px 10px",
   background: "rgba(255,255,255,0.05)",
   border: "1px solid var(--buildrick-border)",
-  borderRadius: 6,
+  borderRadius: "var(--buildrick-radius-sm)",
   color: "var(--buildrick-text-primary)",
   fontSize: 12,
   outline: "none",
@@ -340,7 +340,7 @@ const waitlistBtnStyles: React.CSSProperties = {
   background: "var(--buildrick-accent)",
   color: "var(--buildrick-text-on-accent)",
   border: "none",
-  borderRadius: 6,
+  borderRadius: "var(--buildrick-radius-sm)",
   fontSize: 12,
   fontWeight: 600,
   cursor: "pointer",
@@ -352,7 +352,7 @@ const waitlistSuccessStyles: React.CSSProperties = {
   padding: "8px 14px",
   background: "rgba(34,197,94,0.08)",
   border: "1px solid rgba(34,197,94,0.2)",
-  borderRadius: 6,
+  borderRadius: "var(--buildrick-radius-sm)",
   fontSize: 12,
   color: "var(--buildrick-success)",
   fontWeight: 500,

@@ -5,6 +5,13 @@
 
 import * as React from "react";
 import { PremiumBadge } from "../../../../../shared/ui/PremiumBadge";
+import {
+  LockedContainer,
+  LockedIcon,
+  LockedTitle,
+  LockedDesc,
+  LockedBtn,
+} from "../shared";
 
 export type LockedVariant = "pro" | "enterprise" | "coming-soon";
 
@@ -32,16 +39,14 @@ export const LockedScreen: React.FC<LockedScreenProps> = ({
 }) => {
   if (variant === "coming-soon") {
     return (
-      <div className="buildrick-st-locked">
+      <LockedContainer>
         <div style={{ fontSize: 32, marginBottom: 12 }}>🔜</div>
-        <h3 className="buildrick-st-locked__title">{title ?? "Coming Soon"}</h3>
-        {message && <p className="buildrick-st-locked__desc">{message}</p>}
+        <LockedTitle>{title ?? "Coming Soon"}</LockedTitle>
+        {message && <LockedDesc>{message}</LockedDesc>}
         {waitlistLabel && (
-          <button onClick={onWaitlist} style={waitlistBtnStyles}>
-            {waitlistLabel}
-          </button>
+          <LockedBtn onClick={onWaitlist}>{waitlistLabel}</LockedBtn>
         )}
-      </div>
+      </LockedContainer>
     );
   }
 
@@ -54,30 +59,18 @@ export const LockedScreen: React.FC<LockedScreenProps> = ({
   };
 
   return (
-    <div className="buildrick-st-locked">
-      <div className="buildrick-st-locked__icon">
+    <LockedContainer>
+      <LockedIcon>
         <PremiumBadge size="lg" />
-      </div>
-      <h3 className="buildrick-st-locked__title">Available in {variant === "pro" ? "Pro" : "Enterprise"}</h3>
-      <p className="buildrick-st-locked__desc">{message ?? "Upgrade your plan to unlock this feature."}</p>
-      <button
-        className="buildrick-st-locked__btn"
+      </LockedIcon>
+      <LockedTitle>Available in {variant === "pro" ? "Pro" : "Enterprise"}</LockedTitle>
+      <LockedDesc>{message ?? "Upgrade your plan to unlock this feature."}</LockedDesc>
+      <LockedBtn
         onClick={handleUpgrade}
         aria-label={`Upgrade to ${variant === "pro" ? "Pro" : "Enterprise"} plan`}
       >
         Upgrade Now
-      </button>
-    </div>
+      </LockedBtn>
+    </LockedContainer>
   );
-};
-
-const waitlistBtnStyles: React.CSSProperties = {
-  marginTop: 16,
-  padding: "8px 16px",
-  fontSize: "var(--buildrick-font-sm, 13px)",
-  background: "var(--buildrick-accent, #2563eb)",
-  color: "var(--buildrick-text-on-accent)",
-  border: "none",
-  borderRadius: 6,
-  cursor: "pointer",
 };

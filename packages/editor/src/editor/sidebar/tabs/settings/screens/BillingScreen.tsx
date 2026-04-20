@@ -6,6 +6,7 @@
 
 import * as React from "react";
 import type { PlanTier } from "../types";
+import { Screen } from "../shared";
 
 interface BillingScreenProps {
   /** Current user plan — controls whether upgrade prompt is shown */
@@ -54,7 +55,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
   };
 
   return (
-    <div className="buildrick-st-screen">
+    <Screen>
       {/* Current plan badge */}
       <div
         style={{
@@ -195,6 +196,6 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
           Manage subscription →
         </a>
       </div>
-    </div>
+    </Screen>
   );
 };

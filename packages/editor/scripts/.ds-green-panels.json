@@ -4,6 +4,16 @@
   "version": 1,
   "files": [
     "packages/editor/src/editor/sidebar/tabs/settings/SettingsTab.tsx",
+    "packages/editor/src/editor/sidebar/tabs/settings/shared.tsx",
+    "packages/editor/src/editor/sidebar/tabs/settings/screens/SiteSettingsScreen.tsx",
+    "packages/editor/src/editor/sidebar/tabs/settings/screens/DomainsScreen.tsx",
+    "packages/editor/src/editor/sidebar/tabs/settings/screens/AnalyticsScreen.tsx",
+    "packages/editor/src/editor/sidebar/tabs/settings/screens/ExportScreen.tsx",
+    "packages/editor/src/editor/sidebar/tabs/settings/screens/IntegrationsScreen.tsx",
+    "packages/editor/src/editor/sidebar/tabs/settings/screens/AdvancedScreen.tsx",
+    "packages/editor/src/editor/sidebar/tabs/settings/screens/SeoScreen.tsx",
+    "packages/editor/src/editor/sidebar/tabs/settings/screens/BillingScreen.tsx",
+    "packages/editor/src/editor/sidebar/tabs/settings/screens/LockedScreen.tsx",
     "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.tsx",
     "packages/editor/src/editor/sidebar/tabs/build/BuildTab.tsx",
     "packages/editor/src/editor/sidebar/tabs/templates/TemplatesTab.tsx",
@@ -25,9 +35,9 @@
     "packages/editor/src/shared/ui/Icon.tsx"
   ],
   "notes": [
-    "Week 4 (tonight): all 8 sidebar-tab shells migrated to PanelShell + strict-zero. Sub-screens/sub-components still use their original CSS class files (deferred).",
+    "Week 5 (tonight): Settings tab fully axiom-clean. All 9 screens + shared.tsx + SettingsTab.tsx strict-zero. Settings is the first tab with both shell AND sub-content migrated end-to-end.",
+    "Week 4: all 8 sidebar-tab shells migrated to PanelShell + strict-zero.",
     "Week 3 Part 3: 12 shared/ui primitives brought to strict zero + added.",
-    "Week 3 Part 1/2: SettingsTab + PagesTab container migrations + shared.tsx inline refactor.",
     "Do NOT remove files from this list once added. If a migration regresses, fix the code — removing from the allowlist hides the regression."
   ]
 }

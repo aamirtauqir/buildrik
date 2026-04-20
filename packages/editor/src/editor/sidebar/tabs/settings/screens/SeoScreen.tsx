@@ -7,7 +7,7 @@
 
 import * as React from "react";
 import { StickyFooter } from "../../../shared/StickyFooter";
-import { Section, Field } from "../shared";
+import { Field, Input, Screen, Section } from "../shared";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import type { ScreenProps } from "../types";
 
@@ -50,10 +50,10 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer }) => {
   };
 
   return (
-    <div className="buildrick-st-screen">
+    <Screen>
       <Section title="Site SEO">
         <Field label="Twitter Handle" htmlFor="seo-twitter" hint="e.g. @buildrik">
-          <input
+          <Input
             id="seo-twitter"
             type="text"
             value={twitterHandle}
@@ -62,12 +62,11 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer }) => {
               markDirty();
             }}
             placeholder="@yourbrand"
-            className="buildrick-st-input"
           />
         </Field>
 
         <Field label="Default OG Image URL" htmlFor="seo-og" hint="Used when pages have no custom image">
-          <input
+          <Input
             id="seo-og"
             type="url"
             value={defaultOgImage}
@@ -76,7 +75,6 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer }) => {
               markDirty();
             }}
             placeholder="https://example.com/og-image.jpg"
-            className="buildrick-st-input"
           />
         </Field>
       </Section>
@@ -97,6 +95,6 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer }) => {
       </div>
 
       <StickyFooter primaryLabel="Save" onPrimary={handleSave} hasChanges={isDirty} />
-    </div>
+    </Screen>
   );
 };

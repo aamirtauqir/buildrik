@@ -5,7 +5,7 @@
 
 import * as React from "react";
 import { StickyFooter } from "../../../shared/StickyFooter";
-import { Section, Field, Toggle } from "../shared";
+import { ErrorHint, Field, Input, Note, Screen, Section, SuccessNote, Toggle } from "../shared";
 import { EVENTS } from "../../../../../shared/constants/events";
 import type { ScreenProps } from "../types";
 
@@ -76,7 +76,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
   };
 
   return (
-    <div className="buildrick-st-screen">
+    <Screen>
       <Section title="Google Analytics">
         <p id="ga-privacy-note" style={privacyNoteStyles}>
           Track visitor behavior on your published site. When enabled, Google&apos;s analytics
@@ -87,7 +87,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
           label="Google Analytics ID"
           hint="Find this in Google Analytics → Admin → Data Streams → your stream → Measurement ID"
         >
-          <input
+          <Input
             id="ga-measurement-id"
             type="text"
             value={gaId}
@@ -95,16 +95,15 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
               setGaId(e.target.value.toUpperCase());
               setHasChanges(true);
             }}
-            placeholder="G-XXXXXXXXXX"
-            className="buildrick-st-input" style={{ borderColor: gaError ? "var(--buildrick-error)" : undefined }}
+            placeholder="G-XXXXXXXXXX" style={{ borderColor: gaError ? "var(--buildrick-error)" : undefined }}
             aria-describedby={gaError ? "ga-error" : undefined}
             aria-invalid={!!gaError}
           />
           {gaError && (
-            <span id="ga-error" role="alert" className="buildrick-st-error-hint">
+            <ErrorHint id="ga-error" role="alert" >
               This doesn&apos;t look right. Your Google Analytics ID should start with G- followed
               by 10 characters, like G-ABCD123456.
-            </span>
+            </ErrorHint>
           )}
         </Field>
         <Toggle
@@ -116,9 +115,9 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
           }}
         />
         {gaEnabled && gaId && isValidGA && (
-          <div className="buildrick-st-success-note">
+          <SuccessNote>
             ✓ Tracking will be added to your published site automatically
-          </div>
+          </SuccessNote>
         )}
       </Section>
 
@@ -132,7 +131,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
           label="Meta (Facebook) Pixel ID"
           hint="15–16 digit number from your Meta Events Manager"
         >
-          <input
+          <Input
             id="meta-pixel-id"
             type="text"
             value={metaPixelId}
@@ -140,15 +139,14 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
               setMetaPixelId(e.target.value.replace(/\D/g, ""));
               setHasChanges(true);
             }}
-            placeholder="1234567890123456"
-            className="buildrick-st-input" style={{ borderColor: pixelError ? "var(--buildrick-error)" : undefined }}
+            placeholder="1234567890123456" style={{ borderColor: pixelError ? "var(--buildrick-error)" : undefined }}
             aria-describedby={pixelError ? "pixel-error" : undefined}
             aria-invalid={!!pixelError}
           />
           {pixelError && (
-            <span id="pixel-error" role="alert" className="buildrick-st-error-hint">
+            <ErrorHint id="pixel-error" role="alert" >
               Pixel IDs are 15 or 16 digits. Check your Meta Events Manager for the correct ID.
-            </span>
+            </ErrorHint>
           )}
         </Field>
         <Toggle
@@ -160,9 +158,9 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
           }}
         />
         {metaPixelEnabled && metaPixelId && isValidPixel && (
-          <div className="buildrick-st-success-note">
+          <SuccessNote>
             ✓ Tracking will be added to your published site automatically
-          </div>
+          </SuccessNote>
         )}
       </Section>
 
@@ -175,10 +173,10 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
             setHasChanges(true);
           }}
         />
-        <div className="buildrick-st-note">
+        <Note>
           Displays a banner asking visitors to accept cookies before tracking begins. Required in
           the EU (GDPR) and recommended everywhere else.
-        </div>
+        </Note>
       </Section>
 
       <StickyFooter
@@ -187,7 +185,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
         hasChanges={hasChanges}
         disabled={!canSave}
       />
-    </div>
+    </Screen>
   );
 };
 

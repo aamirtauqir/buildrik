@@ -5,7 +5,7 @@
 
 import * as React from "react";
 import { StickyFooter } from "../../../shared/StickyFooter";
-import { Section, Field } from "../shared";
+import { Field, Input, Screen, Section } from "../shared";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import type { ScreenProps } from "../types";
 
@@ -110,7 +110,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
   };
 
   return (
-    <div className="buildrick-st-screen">
+    <Screen>
       <Section title="Site Identity">
         {saveError && (
           <div role="alert" className="sett-save-error">
@@ -119,23 +119,21 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
           </div>
         )}
         <Field label="Site Name">
-          <input
+          <Input
             type="text"
             value={siteName}
             onChange={(e) => { setSiteName(e.target.value); identity.markDirty(); }}
             onBlur={handleBlur}
             placeholder="My Awesome Site"
-            className="buildrick-st-input"
           />
         </Field>
         <Field label="Favicon URL">
-          <input
+          <Input
             type="text"
             value={favicon}
             onChange={(e) => { setFavicon(e.target.value); identity.markDirty(); }}
             onBlur={handleBlur}
             placeholder="https://example.com/favicon.ico"
-            className="buildrick-st-input"
           />
         </Field>
         <Field label="Site Language">
@@ -143,7 +141,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             value={language}
             onChange={(e) => { setLanguage(e.target.value); identity.markDirty(); }}
             onBlur={handleBlur}
-            className="buildrick-st-input"
           >
             <option value="en">English</option>
             <option value="es">Spanish</option>
@@ -158,36 +155,33 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
 
       <Section title="Social Links">
         <Field label="Twitter" htmlFor="social-twitter">
-          <input
+          <Input
             id="social-twitter"
             type="url"
             value={twitter}
             onChange={(e) => { setTwitter(e.target.value); social.markDirty(); }}
             onBlur={handleBlur}
             placeholder="https://twitter.com/..."
-            className="buildrick-st-input"
           />
         </Field>
         <Field label="Facebook" htmlFor="social-facebook">
-          <input
+          <Input
             id="social-facebook"
             type="url"
             value={facebook}
             onChange={(e) => { setFacebook(e.target.value); social.markDirty(); }}
             onBlur={handleBlur}
             placeholder="https://facebook.com/..."
-            className="buildrick-st-input"
           />
         </Field>
         <Field label="LinkedIn" htmlFor="social-linkedin">
-          <input
+          <Input
             id="social-linkedin"
             type="url"
             value={linkedin}
             onChange={(e) => { setLinkedin(e.target.value); social.markDirty(); }}
             onBlur={handleBlur}
             placeholder="https://linkedin.com/..."
-            className="buildrick-st-input"
           />
         </Field>
       </Section>
@@ -217,6 +211,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
       </Section>
 
       <StickyFooter primaryLabel="Save" onPrimary={handleSave} hasChanges={isDirty} />
-    </div>
+    </Screen>
   );
 };

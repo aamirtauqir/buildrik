@@ -9,7 +9,7 @@ import { validateHtml, type HtmlValidationResult } from "../../../../../shared/u
 import { validateCss, type CssValidationResult } from "../../../../../shared/utils/validateCss";
 import { StickyFooter } from "../../../shared/StickyFooter";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
-import { Section } from "../shared";
+import { Input, Screen, Section, Warning } from "../shared";
 
 import type { ScreenProps } from "../types";
 
@@ -81,8 +81,8 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
   }, [composer, headCode, bodyCode, cssCode, markClean]);
 
   return (
-    <div className="buildrick-st-screen">
-      <div className="buildrick-st-warning">⚠️ Custom code runs on all pages. Test thoroughly.</div>
+    <Screen>
+      <Warning>⚠️ Custom code runs on all pages. Test thoroughly.</Warning>
 
       <Section title="Head Scripts">
         <textarea
@@ -94,8 +94,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
           }}
           aria-label="Head Scripts"
           aria-describedby={headValidation ? "head-validation-feedback" : undefined}
-          placeholder={"<script>...</script>\n<link>...</link>"}
-          className="buildrick-st-input" style={{ minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
+          placeholder={"<script>...</script>\n<link>...</link>"} style={{ minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
         />
         {headValidation && (
           <div id="head-validation-feedback" role="status" aria-live="polite" style={validationContainerStyles}>
@@ -121,8 +120,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
             setIsDirty(true);
           }}
           aria-label="Body Scripts"
-          placeholder={"<script>...</script>"}
-          className="buildrick-st-input" style={{ minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
+          placeholder={"<script>...</script>"} style={{ minHeight: 120, fontFamily: "monospace", fontSize: 12 }}
         />
       </Section>
 
@@ -136,8 +134,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
           }}
           aria-label="Global CSS"
           aria-describedby={cssValidation ? "css-validation-feedback" : undefined}
-          placeholder={"/* Custom CSS */\n.my-class { color: red; }"}
-          className="buildrick-st-input" style={{ minHeight: 100, fontFamily: "monospace", fontSize: 12 }}
+          placeholder={"/* Custom CSS */\n.my-class { color: red; }"} style={{ minHeight: 100, fontFamily: "monospace", fontSize: 12 }}
         />
         {cssValidation && (
           <div id="css-validation-feedback" role="status" aria-live="polite" style={validationContainerStyles}>
@@ -152,7 +149,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
       </Section>
 
       <StickyFooter primaryLabel="Save" onPrimary={handleSave} hasChanges={isDirty} />
-    </div>
+    </Screen>
   );
 };
 

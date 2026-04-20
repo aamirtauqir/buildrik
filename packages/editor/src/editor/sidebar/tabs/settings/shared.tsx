@@ -175,6 +175,281 @@ export const Toggle: React.FC<ToggleProps> = ({
 export const ToggleControlled = Toggle;
 
 // ============================================
+// Screen — top-level wrapper for every Settings sub-screen
+// ============================================
+
+const screenStyles: React.CSSProperties = {
+  padding: 12,
+  display: "flex",
+  flexDirection: "column",
+  gap: 16,
+};
+
+export const Screen: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div style={screenStyles}>{children}</div>
+);
+
+// ============================================
+// Input — form-atom text input
+// ============================================
+
+const inputStyles: React.CSSProperties = {
+  width: "100%",
+  padding: "8px 10px",
+  background: "var(--buildrick-bg-input)",
+  border: "1px solid var(--buildrick-border)",
+  borderRadius: "var(--buildrick-radius-sm)",
+  color: "var(--buildrick-text-primary)",
+  fontSize: 12,
+  outline: "none",
+  boxSizing: "border-box",
+};
+
+export const Input = React.forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement>
+>(({ style, ...rest }, ref) => (
+  <input ref={ref} style={{ ...inputStyles, ...style }} {...rest} />
+));
+Input.displayName = "Input";
+
+// ============================================
+// Note / Warning / SuccessNote — info blocks
+// ============================================
+
+const noteStyles: React.CSSProperties = {
+  padding: 12,
+  background: "var(--buildrick-accent-subtle)",
+  borderRadius: "var(--buildrick-radius-sm)",
+  fontSize: 12,
+  color: "var(--buildrick-text-secondary)",
+};
+
+export const Note: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div style={noteStyles}>{children}</div>
+);
+
+const warningStyles: React.CSSProperties = {
+  padding: 12,
+  background: "var(--buildrick-bg-subtle)",
+  borderRadius: "var(--buildrick-radius-sm)",
+  fontSize: 12,
+  color: "var(--buildrick-warning)",
+  border: "1px solid var(--buildrick-border)",
+};
+
+export const Warning: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div role="alert" style={warningStyles}>{children}</div>
+);
+
+const successNoteStyles: React.CSSProperties = {
+  padding: 8,
+  background: "var(--buildrick-bg-subtle)",
+  borderRadius: "var(--buildrick-radius-sm)",
+  fontSize: 12,
+  color: "var(--buildrick-success)",
+  marginTop: 8,
+  border: "1px solid var(--buildrick-border)",
+};
+
+export const SuccessNote: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div style={successNoteStyles}>{children}</div>
+);
+
+// ============================================
+// ErrorHint — inline error text under a Field
+// ============================================
+
+const errorHintStyles: React.CSSProperties = {
+  display: "block",
+  fontSize: 12,
+  color: "var(--buildrick-error)",
+  marginTop: 4,
+};
+
+export const ErrorHint: React.FC<
+  React.HTMLAttributes<HTMLSpanElement>
+> = ({ children, style, ...rest }) => (
+  <span role="alert" style={{ ...errorHintStyles, ...style }} {...rest}>
+    {children}
+  </span>
+);
+
+// ============================================
+// Muted — secondary text
+// ============================================
+
+export const Muted: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <span style={{ color: "var(--buildrick-text-muted)" }}>{children}</span>
+);
+
+// ============================================
+// StatusRow / UrlRow — horizontal row primitives
+// ============================================
+
+const statusRowStyles: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  padding: "8px 0",
+  fontSize: 12,
+};
+
+export const StatusRow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div style={statusRowStyles}>{children}</div>
+);
+
+const urlRowStyles: React.CSSProperties = {
+  display: "flex",
+  gap: 8,
+  alignItems: "center",
+};
+
+export const UrlRow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div style={urlRowStyles}>{children}</div>
+);
+
+// ============================================
+// CopyBtn — form-atom copy button
+// ============================================
+
+const copyBtnStyles: React.CSSProperties = {
+  padding: "8px 12px",
+  background: "var(--buildrick-bg-subtle)",
+  border: "none",
+  borderRadius: "var(--buildrick-radius-sm)",
+  color: "var(--buildrick-text-primary)",
+  fontSize: 12,
+  cursor: "pointer",
+  transition: "color 0.15s",
+};
+
+export const CopyBtn: React.FC<
+  React.ButtonHTMLAttributes<HTMLButtonElement>
+> = ({ style, children, ...rest }) => (
+  <button style={{ ...copyBtnStyles, ...style }} {...rest}>
+    {children}
+  </button>
+);
+
+// ============================================
+// Code — inline code snippet
+// ============================================
+
+const codeStyles: React.CSSProperties = {
+  display: "inline-block",
+  padding: "4px 8px",
+  background: "var(--buildrick-bg-subtle)",
+  borderRadius: "var(--buildrick-radius-sm)",
+  color: "var(--buildrick-text-primary)",
+  fontFamily: "var(--buildrick-font-mono, monospace)",
+  fontSize: 12,
+};
+
+export const Code: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <code style={codeStyles}>{children}</code>
+);
+
+// ============================================
+// DnsHelp — help block with code snippet
+// ============================================
+
+const dnsHelpStyles: React.CSSProperties = {
+  padding: 12,
+  background: "var(--buildrick-bg-subtle)",
+  borderRadius: "var(--buildrick-radius-sm)",
+  fontSize: 12,
+  color: "var(--buildrick-text-secondary)",
+};
+
+export const DnsHelp: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div style={dnsHelpStyles}>{children}</div>
+);
+
+// ============================================
+// SuccessBadge — inline status badge
+// ============================================
+
+const successBadgeStyles: React.CSSProperties = {
+  padding: "2px 8px",
+  background: "var(--buildrick-success)",
+  color: "var(--buildrick-text-on-accent)",
+  borderRadius: "var(--buildrick-radius-sm)",
+  fontSize: 12,
+  fontWeight: 600,
+};
+
+export const SuccessBadge: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <span style={successBadgeStyles}>{children}</span>
+);
+
+// ============================================
+// Locked — LockedScreen layout primitives
+// ============================================
+
+const lockedContainerStyles: React.CSSProperties = {
+  padding: 24,
+  textAlign: "center",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 12,
+};
+
+const lockedIconStyles: React.CSSProperties = {
+  marginBottom: 4,
+};
+
+const lockedTitleStyles: React.CSSProperties = {
+  fontSize: 16,
+  fontWeight: 600,
+  color: "var(--buildrick-text-primary)",
+  margin: 0,
+};
+
+const lockedDescStyles: React.CSSProperties = {
+  fontSize: 13,
+  color: "var(--buildrick-text-secondary)",
+  lineHeight: 1.5,
+  margin: 0,
+  maxWidth: 280,
+};
+
+const lockedBtnStyles: React.CSSProperties = {
+  marginTop: 16,
+  padding: "8px 16px",
+  fontSize: 13,
+  background: "var(--buildrick-accent)",
+  color: "var(--buildrick-text-on-accent)",
+  border: "none",
+  borderRadius: "var(--buildrick-radius-sm)",
+  cursor: "pointer",
+};
+
+export const LockedContainer: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div style={lockedContainerStyles}>{children}</div>
+);
+
+export const LockedIcon: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div style={lockedIconStyles}>{children}</div>
+);
+
+export const LockedTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <h3 style={lockedTitleStyles}>{children}</h3>
+);
+
+export const LockedDesc: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <p style={lockedDescStyles}>{children}</p>
+);
+
+export const LockedBtn: React.FC<
+  React.ButtonHTMLAttributes<HTMLButtonElement>
+> = ({ children, style, ...rest }) => (
+  <button style={{ ...lockedBtnStyles, ...style }} {...rest}>
+    {children}
+  </button>
+);
+
+// ============================================
 // SettingsNavGuard — unsaved changes modal
 // ============================================
 
@@ -233,7 +508,7 @@ const guardModalStyle: React.CSSProperties = {
   background: "var(--buildrick-bg-elevated)",
   borderRadius: "var(--buildrick-radius-md)",
   padding: 24,
-  width: 320,
+  width: 324,
   boxShadow: "var(--buildrick-shadow-modal)",
 };
 
