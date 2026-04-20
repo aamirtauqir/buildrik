@@ -1,27 +1,13 @@
-/**
- * Aquibra UX/UI Fixes
- * Critical fixes for accessibility, consistency, and user feedback
- *
- * @license BSD-3-Clause
- */
-
-/* ============================================
-   ACCESSIBILITY IMPROVEMENTS
-   ============================================ */
-
-/* Focus-visible for keyboard navigation - CRITICAL */
 *:focus-visible {
   outline: 2px solid var(--buildrick-accent);
   outline-offset: 2px;
   border-radius: var(--buildrick-radius-sm);
 }
 
-/* Remove default focus outline when using mouse */
 *:focus:not(:focus-visible) {
   outline: none;
 }
 
-/* Ensure all interactive elements have proper focus states */
 button:focus-visible,
 a:focus-visible,
 [role="button"]:focus-visible,
@@ -31,7 +17,6 @@ a:focus-visible,
   box-shadow: 0 0 0 4px var(--buildrick-accent-subtle);
 }
 
-/* Skip links for screen readers */
 .buildrick-skip-link {
   position: absolute;
   top: -100px;
@@ -50,11 +35,6 @@ a:focus-visible,
   left: 16px;
 }
 
-/* ============================================
-   INPUT IMPROVEMENTS
-   ============================================ */
-
-/* Enhanced input hover states */
 .buildrick-input:hover:not(:disabled):not(:focus) {
   border-color: var(--buildrick-border-hover);
   background: var(--buildrick-bg-subtle);
@@ -62,7 +42,6 @@ a:focus-visible,
   transition: all 0.15s ease;
 }
 
-/* Better disabled state visibility */
 .buildrick-input:disabled,
 .buildrick-select:disabled,
 .buildrick-textarea:disabled {
@@ -73,7 +52,6 @@ a:focus-visible,
   border-style: dashed;
 }
 
-/* Placeholder improvements */
 .buildrick-input::placeholder,
 .buildrick-textarea::placeholder {
   color: var(--buildrick-text-muted);
@@ -81,7 +59,6 @@ a:focus-visible,
   font-style: italic;
 }
 
-/* Input focus improvements - more noticeable */
 .buildrick-input:focus,
 .buildrick-select:focus,
 .buildrick-textarea:focus {
@@ -94,7 +71,6 @@ a:focus-visible,
   transition: all 0.2s ease;
 }
 
-/* Input error state improvements */
 .buildrick-input-error,
 .buildrick-input.has-error {
   border-color: var(--buildrick-error);
@@ -116,22 +92,6 @@ a:focus-visible,
   75% { transform: translateX(4px); }
 }
 
-/* Input success state (NEW) */
-.buildrick-input-success {
-  border-color: var(--buildrick-success);
-  background: rgba(34, 197, 94, 0.05);
-}
-
-.buildrick-input-success:focus {
-  border-color: var(--buildrick-success);
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
-}
-
-/* ============================================
-   SELECT IMPROVEMENTS
-   ============================================ */
-
-/* Better select hover state */
 .buildrick-select:hover:not(:disabled):not(:focus) {
   border-color: var(--buildrick-border-hover);
   background-color: var(--buildrick-bg-subtle);
@@ -140,17 +100,11 @@ a:focus-visible,
   transition: all 0.15s ease;
 }
 
-/* Select active state */
 .buildrick-select:active:not(:disabled) {
   transform: translateY(0);
   border-color: var(--buildrick-accent);
 }
 
-/* ============================================
-   BUTTON IMPROVEMENTS
-   ============================================ */
-
-/* All buttons get better feedback */
 button,
 .buildrick-btn,
 .pill,
@@ -161,7 +115,6 @@ button,
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Button hover ripple effect (subtle) */
 button:hover:not(:disabled)::before,
 .buildrick-btn:hover:not(:disabled)::before {
   content: '';
@@ -184,14 +137,12 @@ button:hover:not(:disabled)::before,
   }
 }
 
-/* Button active state feedback */
 button:active:not(:disabled),
 .buildrick-btn:active:not(:disabled) {
   transform: scale(0.97);
   transition: transform 0.05s ease;
 }
 
-/* Disabled button improvements - very clear */
 button:disabled,
 .buildrick-btn:disabled,
 .pill:disabled {
@@ -215,10 +166,6 @@ button:disabled::after,
   );
   pointer-events: none;
 }
-
-/* ============================================
-   SWITCH IMPROVEMENTS
-   ============================================ */
 
 .buildrick-switch-track {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -247,10 +194,6 @@ button:disabled::after,
     0 2px 6px rgba(59, 130, 246, 0.5),
     0 1px 3px rgba(0, 0, 0, 0.2);
 }
-
-/* ============================================
-   SLIDER IMPROVEMENTS
-   ============================================ */
 
 .buildrick-slider {
   transition: opacity 0.2s ease;
@@ -291,10 +234,6 @@ button:disabled::after,
   transform: scale(1.15);
 }
 
-/* ============================================
-   COLOR FIELD IMPROVEMENTS
-   ============================================ */
-
 .buildrick-color-swatch {
   transition: all 0.2s ease;
   box-shadow:
@@ -323,10 +262,6 @@ button:disabled::after,
 .buildrick-color-preset:active:not(:disabled) {
   transform: scale(1.05);
 }
-
-/* ============================================
-   BUTTON GROUP IMPROVEMENTS
-   ============================================ */
 
 .buildrick-btn-group {
   box-shadow:
@@ -363,10 +298,6 @@ button:disabled::after,
     0 0 0 1px rgba(59, 130, 246, 0.5);
 }
 
-/* ============================================
-   LAYERS PANEL IMPROVEMENTS
-   ============================================ */
-
 .buildrick-layer-row {
   transition: all 0.15s ease;
   position: relative;
@@ -398,54 +329,6 @@ button:disabled::after,
   outline-offset: -2px;
   z-index: 1;
 }
-
-/* ============================================
-   BLOCKS PANEL IMPROVEMENTS
-   ============================================ */
-
-.buildrick-block-card {
-  position: relative;
-  overflow: hidden;
-}
-
-.buildrick-block-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(59, 130, 246, 0),
-    rgba(59, 130, 246, 0.1)
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.buildrick-block-card:hover::before {
-  opacity: 1;
-}
-
-.buildrick-block-card:active {
-  transform: scale(0.97);
-  transition: transform 0.05s ease;
-}
-
-.buildrick-block-card:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
-  outline-offset: 2px;
-  z-index: 1;
-}
-
-/* Block drag feedback */
-.buildrick-block-dragging {
-  opacity: 0.5;
-  transform: scale(0.95) rotate(2deg);
-  transition: all 0.2s ease;
-}
-
-/* ============================================
-   EMPTY STATES IMPROVEMENTS
-   ============================================ */
 
 .buildrick-empty-state {
   text-align: center;
@@ -495,11 +378,6 @@ button:disabled::after,
   }
 }
 
-/* Compact empty state */
-.buildrick-empty-state-compact {
-  padding: var(--buildrick-space-6) var(--buildrick-space-3);
-}
-
 .buildrick-empty-state-compact .buildrick-empty-state-icon {
   font-size: 32px;
   margin-bottom: var(--buildrick-space-2);
@@ -513,35 +391,10 @@ button:disabled::after,
   font-size: var(--buildrick-text-sm);
 }
 
-/* ============================================
-   LOADING STATES (NEW)
-   ============================================ */
-
-.buildrick-loading {
-  position: relative;
-  pointer-events: none;
-  opacity: 0.6;
-}
-
-.buildrick-loading::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 20px;
-  height: 20px;
-  margin: -10px 0 0 -10px;
-  border: 2px solid var(--buildrick-accent);
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-}
-
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* Spinner component */
 .buildrick-spinner {
   display: inline-block;
   width: 16px;
@@ -551,22 +404,6 @@ button:disabled::after,
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
-
-.buildrick-spinner-sm {
-  width: 12px;
-  height: 12px;
-  border-width: 2px;
-}
-
-.buildrick-spinner-lg {
-  width: 24px;
-  height: 24px;
-  border-width: 3px;
-}
-
-/* ============================================
-   TOOLTIP IMPROVEMENTS (NEW)
-   ============================================ */
 
 [data-tooltip] {
   position: relative;
@@ -612,10 +449,6 @@ button:disabled::after,
   transform: translateX(-50%) translateY(0);
 }
 
-/* ============================================
-   NOTIFICATION/TOAST IMPROVEMENTS (NEW)
-   ============================================ */
-
 .buildrick-toast {
   position: fixed;
   bottom: 24px;
@@ -630,26 +463,6 @@ button:disabled::after,
   animation: slideIn 0.3s ease, fadeIn 0.3s ease;
 }
 
-.buildrick-toast-success {
-  border-left: 4px solid var(--buildrick-success);
-  background: rgba(34, 197, 94, 0.05);
-}
-
-.buildrick-toast-error {
-  border-left: 4px solid var(--buildrick-error);
-  background: rgba(239, 68, 68, 0.05);
-}
-
-.buildrick-toast-warning {
-  border-left: 4px solid var(--buildrick-warning);
-  background: rgba(245, 158, 11, 0.05);
-}
-
-.buildrick-toast-info {
-  border-left: 4px solid var(--buildrick-info);
-  background: rgba(59, 130, 246, 0.05);
-}
-
 @keyframes slideIn {
   from {
     transform: translateX(100%);
@@ -659,68 +472,12 @@ button:disabled::after,
   }
 }
 
-/* ============================================
-   PANEL IMPROVEMENTS
-   ============================================ */
-
-.buildrick-panel {
-  transition: all 0.2s ease;
-}
-
-.buildrick-panel:hover {
-  border-color: var(--buildrick-border-light);
-}
-
-.buildrick-panel-header {
-  user-select: none;
-  transition: all 0.15s ease;
-}
-
-.buildrick-panel-header:hover {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.05),
-    rgba(255, 255, 255, 0.02)
-  );
-}
-
-/* ============================================
-   DRAG AND DROP IMPROVEMENTS
-   ============================================ */
-
-.buildrick-drop-zone {
-  position: relative;
-  transition: all 0.2s ease;
-}
-
-.buildrick-drop-zone-active {
-  background: rgba(59, 130, 246, 0.08);
-  border-color: var(--buildrick-accent);
-  box-shadow:
-    inset 0 0 0 2px rgba(59, 130, 246, 0.2),
-    0 8px 24px rgba(59, 130, 246, 0.15);
-}
-
-.buildrick-drop-zone-active::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border: 2px dashed var(--buildrick-accent);
-  border-radius: inherit;
-  animation: dashRotate 20s linear infinite;
-}
-
 @keyframes dashRotate {
   to {
     stroke-dashoffset: 100;
   }
 }
 
-/* ============================================
-   CONSISTENCY FIXES
-   ============================================ */
-
-/* Ensure all text inputs have same height */
 .buildrick-input,
 .buildrick-select,
 button {
@@ -739,7 +496,6 @@ button {
   min-height: 48px;
 }
 
-/* Ensure consistent border radius */
 .buildrick-input,
 .buildrick-select,
 .buildrick-btn,
@@ -748,17 +504,12 @@ button {
   border-radius: var(--buildrick-radius-md);
 }
 
-/* Ensure consistent spacing */
 .buildrick-field + .buildrick-field {
   margin-top: var(--buildrick-space-4);
 }
 
-/* ============================================
-   PRINT STYLES (ACCESSIBILITY)
-   ============================================ */
-
 @media print {
-  .buildrick-toolbar,
+.buildrick-toolbar,
   .buildrick-sidebar,
   .buildrick-panel-header-actions,
   button,
@@ -766,21 +517,17 @@ button {
     display: none !important;
   }
 
-  .buildrick-canvas {
+.buildrick-canvas {
     background: white !important;
   }
 
-  * {
+* {
     box-shadow: none !important;
   }
 }
 
-/* ============================================
-   REDUCED MOTION (ACCESSIBILITY)
-   ============================================ */
-
 @media (prefers-reduced-motion: reduce) {
-  *,
+*,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
@@ -790,30 +537,20 @@ button {
   }
 }
 
-/* ============================================
-   HIGH CONTRAST MODE (ACCESSIBILITY)
-   ============================================ */
-
 @media (prefers-contrast: high) {
-  .buildrick-input,
+.buildrick-input,
   .buildrick-select,
   .buildrick-btn {
     border-width: 2px;
   }
 
-  .buildrick-input:focus,
+.buildrick-input:focus,
   .buildrick-select:focus,
   .buildrick-btn:focus-visible {
     outline-width: 3px;
     outline-offset: 3px;
   }
 }
-
-/* ============================================
-   CHAIN BUTTON HOVER REVEAL
-   Rows with .buildrick-row-hover-chain reveal .buildrick-chain-btn on hover.
-   Keyboard users get the button via :focus-visible on the row.
-   ============================================ */
 
 .buildrick-row-hover-chain:hover .buildrick-chain-btn,
 .buildrick-row-hover-chain:focus-within .buildrick-chain-btn {

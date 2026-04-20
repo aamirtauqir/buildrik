@@ -1,14 +1,6 @@
-/* ===========================================
-   LEFT SIDEBAR — Light Theme Redesign
-   Merged rail + panel. Source: new.left.pen
-   Prefix: ls-*
-   =========================================== */
-
-/* ─────────────────────────────────────────────
-   EXTRACTED CSS MODULES (imported)
-   ───────────────────────────────────────────── */
 @import "../panels/layers/styles/layers.css";
-@import "./tabs/history/styles/history.css";
+
+@import "../panels/layers/styles/layers.css"; {@import "./tabs/history/styles/history.css";
 @import "./tabs/settings/styles/settings.css";
 @import "./tabs/design/styles/design-tokens.css";
 @import "./tabs/media/MediaTab.css";
@@ -339,4 +331,5 @@
   .ls-btn:active svg {
     transform: none;
   }
+}
 }

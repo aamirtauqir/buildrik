@@ -1,17 +1,3 @@
-/* =============================================================================
-   History Tab styles — pixel-aligned with the prototype at
-   designs/history-tab-prototype-20260417/history-tab-prototype.html
-   Class names mirror the prototype 1:1. All values come from --buildrick-design-* tokens
-   defined in packages/editor/src/themes/default.css.
-   ============================================================================= */
-
-/* ── Root container ─────────────────────────────────────────────────────────── */
-/*
- * The shared sidebar wraps each tab in .ls-panel-animate (display: block)
- * which breaks the flex height chain that .virtual-list and .version-list
- * need to scroll. Promote the wrapper to a flex column so the History
- * container can claim the panel's full height.
- */
 .ls-panel-animate:has(> .buildrick-history-container) {
   display: flex;
   flex-direction: column;
@@ -31,7 +17,6 @@
   line-height: 1.4;
 }
 
-/* ── View switcher (Changes / Saves tabs) ───────────────────────────────────── */
 .view-switcher {
   display: flex;
   border-bottom: 1px solid var(--buildrick-border);
@@ -73,7 +58,6 @@
   margin-top: 1px;
 }
 
-/* ── Search bar ─────────────────────────────────────────────────────────────── */
 .buildrick-history-container .search-bar {
   position: relative;
   padding: 8px 12px;
@@ -136,7 +120,6 @@
   background: var(--buildrick-bg-hover);
 }
 
-/* ── List container ─────────────────────────────────────────────────────────── */
 .list-container {
   flex: 1;
   overflow: hidden;
@@ -145,7 +128,6 @@
   flex-direction: column;
 }
 
-/* ── Activity view (Changes) ───────────────────────────────────────────────── */
 .activity-view {
   height: 100%;
   display: flex;
@@ -170,7 +152,6 @@
   letter-spacing: 0.05em;
 }
 
-/* Time-Travel button — accent tinted */
 .tt-btn {
   display: inline-flex;
   align-items: center;
@@ -202,7 +183,6 @@
   height: 14px;
 }
 
-/* ── Virtual list (entries scroll area) ─────────────────────────────────────── */
 .virtual-list {
   flex: 1;
   overflow-y: auto;
@@ -226,7 +206,6 @@
   background: var(--buildrick-surface-5);
 }
 
-/* Date group (sticky header) */
 .date-group-header {
   padding: 10px 12px 4px;
   font-size: 11px;
@@ -247,7 +226,6 @@
   margin-top: 0;
 }
 
-/* ── Entry row ──────────────────────────────────────────────────────────────── */
 .entry-row {
   padding: 8px 12px;
   border-radius: var(--buildrick-radius-sm);
@@ -306,7 +284,6 @@
   color: var(--buildrick-text-muted);
 }
 
-/* ── Badges ─────────────────────────────────────────────────────────────────── */
 .entry-badge {
   display: inline-flex;
   align-items: center;
@@ -336,7 +313,6 @@
   color: var(--buildrick-text-muted);
 }
 
-/* ── Expand chevron ─────────────────────────────────────────────────────────── */
 .expand-icon {
   width: 16px;
   height: 16px;
@@ -349,7 +325,6 @@
   transform: rotate(90deg);
 }
 
-/* ── Diff preview (expanded entry) ──────────────────────────────────────────── */
 .diff-preview {
   display: grid;
   gap: 2px;
@@ -399,7 +374,6 @@
   white-space: nowrap;
 }
 
-/* Change-type colored badges */
 .diff-badge {
   padding: 1px 5px;
   border-radius: 3px;
@@ -433,7 +407,6 @@
   color: var(--buildrick-text-muted);
 }
 
-/* ── Saves view ─────────────────────────────────────────────────────────────── */
 .saves-view {
   height: 100%;
   display: flex;
@@ -459,7 +432,6 @@
   border-radius: 3px;
 }
 
-/* ── Version row ────────────────────────────────────────────────────────────── */
 .version-row {
   position: relative;
   padding: 10px 12px;
@@ -503,21 +475,8 @@
   max-width: 100%;
 }
 
-/* Make sure the row's left column hard-clips long labels (info column = 1fr in
- * version-row-main grid) so the FAB + actions can't be pushed off-canvas by a
- * very long auto-checkpoint label like "Auto: project:loaded". */
 .version-row-main > div:first-child {
   min-width: 0;
-}
-
-.version-desc {
-  font-size: 12px;
-  color: var(--buildrick-text-muted);
-  margin-top: 2px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 200px;
 }
 
 .version-meta {
@@ -534,11 +493,6 @@
   color: var(--buildrick-text-muted);
 }
 
-/*
- * Actions overlay the row's right edge — never participate in row width
- * (so a long version name can fully use the available 1fr column without
- * being squeezed by hidden buttons).
- */
 .version-actions {
   position: absolute;
   top: 8px;
@@ -565,7 +519,6 @@
   pointer-events: auto;
 }
 
-/* ── Action buttons (Compare/Restore/Delete) ────────────────────────────────── */
 .action-btn {
   padding: 4px 8px;
   border: none;
@@ -606,7 +559,6 @@
   background: var(--buildrick-error-light);
 }
 
-/* ── FAB (floating action button) ───────────────────────────────────────────── */
 .fab-container {
   position: relative;
   padding: 12px;
@@ -644,7 +596,6 @@
   height: 20px;
 }
 
-/* ── Save form (slides up over FAB) ─────────────────────────────────────────── */
 .save-form {
   margin: 0 8px 8px;
   padding: 12px;
@@ -715,11 +666,6 @@
   border-color: var(--buildrick-error);
 }
 
-.form-error {
-  font-size: 11px;
-  color: var(--buildrick-error);
-}
-
 .form-hint {
   font-size: 11px;
   color: var(--buildrick-text-muted);
@@ -766,7 +712,6 @@
   color: var(--buildrick-text-primary);
 }
 
-/* ── Compare view (side-by-side diff) ───────────────────────────────────────── */
 .compare-view {
   padding: 12px;
   margin: 8px 8px 0;
@@ -866,13 +811,6 @@
   border-bottom: none;
 }
 
-.diff-change-op {
-  font-size: 12px;
-  font-weight: 700;
-  width: 14px;
-  flex-shrink: 0;
-}
-
 .diff-change-prop {
   font-size: 12px;
   color: var(--buildrick-text-secondary);
@@ -899,7 +837,6 @@
   color: var(--buildrick-success);
 }
 
-/* AI Summary button */
 .ai-summary-btn {
   width: 100%;
   margin-top: 12px;
@@ -932,16 +869,6 @@
   opacity: 0.7;
 }
 
-.ai-summary-result {
-  margin-top: 8px;
-  padding: 10px;
-  background: var(--buildrick-surface-2);
-  border-radius: var(--buildrick-radius-sm);
-  font-size: 12px;
-  color: var(--buildrick-text-primary);
-  line-height: 1.5;
-}
-
 .ai-summary-error {
   font-size: 11px;
   color: var(--buildrick-error);
@@ -949,7 +876,6 @@
   opacity: 0.8;
 }
 
-/* ── Snapshot preview tooltip (hover) ───────────────────────────────────────── */
 .snapshot-preview {
   position: fixed;
   z-index: 100;
@@ -973,7 +899,6 @@
   }
 }
 
-/* ── Restore / delete inline confirmations ─────────────────────────────────── */
 .restore-confirm,
 .delete-confirm {
   display: flex;
@@ -994,7 +919,6 @@
   flex: 1;
 }
 
-/* ── Time-Travel drawer + canvas overlay ───────────────────────────────────── */
 .tt-overlay {
   position: fixed;
   inset: 0;
@@ -1135,38 +1059,8 @@
   color: var(--buildrick-text-primary);
 }
 
-.tt-canvas-preview {
-  position: fixed;
-  top: 48px;
-  left: var(--buildrick-tt-drawer-left, 344px);
-  right: var(--buildrick-tt-drawer-right, 320px);
-  height: calc(100vh - 48px - 200px);
-  pointer-events: none;
-  z-index: 199;
-  opacity: 0;
-  transition: opacity 150ms ease-out;
-  background: #f5f5f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  color: #aaa;
-}
-
 .tt-canvas-preview.active {
   opacity: 0.4;
-}
-
-/* ── Toast container ───────────────────────────────────────────────────────── */
-.toast-container {
-  position: fixed;
-  top: 64px;
-  right: 16px;
-  z-index: 500;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  pointer-events: none;
 }
 
 .toast {
@@ -1203,7 +1097,6 @@
   }
 }
 
-/* ── Keyboard hints footer ─────────────────────────────────────────────────── */
 .keyboard-hints {
   display: flex;
   gap: 12px;
@@ -1234,7 +1127,6 @@
   line-height: 1;
 }
 
-/* ── Empty state ───────────────────────────────────────────────────────────── */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -1276,7 +1168,6 @@
   color: var(--buildrick-text-secondary);
 }
 
-/* ── Skeleton loading shimmer ──────────────────────────────────────────────── */
 .skeleton {
   background: linear-gradient(
     90deg,
@@ -1298,7 +1189,6 @@
   }
 }
 
-/* ── Milestone suggestion banner buttons (paired with MilestoneSuggestionBanner) */
 .milestone-banner {
   font-family: inherit;
 }
@@ -1345,13 +1235,11 @@
   color: var(--buildrick-text-primary);
 }
 
-/* ── Focus visible — accent outline (matches prototype) ────────────────────── */
 .buildrick-history-container :focus-visible {
   outline: 2px solid var(--buildrick-accent);
   outline-offset: 2px;
 }
 
-/* ── Utility ───────────────────────────────────────────────────────────────── */
 .buildrick-history-container .hidden {
   display: none !important;
 }

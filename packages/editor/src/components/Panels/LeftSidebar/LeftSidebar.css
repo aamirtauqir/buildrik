@@ -1,19 +1,6 @@
-/* ===========================================
-   LEFT SIDEBAR - Unified Design System
-   Aquibra Visual Page Builder
-
-   CSS Modularization (UX Audit 2026 - Task 9):
-   Tab-specific styles are being extracted to
-   separate files for maintainability.
-
-   Imports below load extracted modules:
-   =========================================== */
-
-/* ─────────────────────────────────────────────
-   EXTRACTED CSS MODULES (imported)
-   ───────────────────────────────────────────── */
 @import "../LayersPanel/styles/layers.css";
-@import "./tabs/history/styles/history.css";
+
+@import "../LayersPanel/styles/layers.css"; {@import "./tabs/history/styles/history.css";
 @import "./tabs/settings/styles/settings.css";
 @import "./tabs/design/styles/design-tokens.css";
 @import "./tabs/media/styles/media.css";
@@ -7033,4 +7020,5 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
 }

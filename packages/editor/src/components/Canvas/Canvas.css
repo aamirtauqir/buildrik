@@ -1,16 +1,3 @@
-/**
- * Canvas Styles
- * Main editing canvas styles
- * @license BSD-3-Clause
- */
-
-/* ============================================
-   CANVAS-SCOPED TOKENS (do NOT redefine canonical)
-   ────────────────────────────────────────────
-   Same treatment as editor/canvas/Canvas.css — this file
-   was a legacy duplicate. Scoped to .buildrick-canvas context so
-   it can no longer shadow the canonical light palette.
-   ============================================ */
 .buildrick-canvas, .buildrick-canvas-wrapper, [data-buildrick-canvas] {
   /* V3 undefined_decisions define-new — op 1c renames to --buildrick-* in P3 */
   --buildrick-canvas-content: transparent;
@@ -127,9 +114,6 @@
   --buildrick-spacing-padding: #7c3aed; /* Purple - padding indicators */
 }
 
-/* ============================================
-   Canvas Content Area - Normal Document Flow
-   ============================================ */
 .buildrick-canvas {
   /* Override theme centering - web pages flow top-to-bottom */
   display: block !important;
@@ -137,15 +121,11 @@
   justify-content: initial !important;
 }
 
-/* Page root should also have normal flow */
 .buildrick-page-root {
   display: block;
   min-height: 100%;
 }
 
-/* ============================================
-   Base Element Styles
-   ============================================ */
 [data-buildrick-id] * {
   color: inherit;
 }
@@ -158,16 +138,11 @@
   color: var(--buildrick-text);
 }
 
-/* ============================================
-   Always-Visible Element Outlines
-   Shows element boundaries at all times for easier editing
-   ============================================ */
 .buildrick-canvas[data-show-outlines="true"] [data-buildrick-id] {
   outline: 1px dashed rgba(59, 130, 246, 0.35);
   outline-offset: -1px;
 }
 
-/* Stronger outline for layout containers */
 .buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].container,
 .buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].section,
 .buildrick-canvas[data-show-outlines="true"] [data-buildrick-id].row,
@@ -175,14 +150,10 @@
   outline: 1px dashed var(--buildrick-accent-purple-45);
 }
 
-/* Hide outline on selected elements (they have selection box already) */
 .buildrick-canvas[data-show-outlines="true"] [data-buildrick-id][data-selected="true"] {
   outline: none;
 }
 
-/* ============================================
-   Typography
-   ============================================ */
 [data-buildrick-id] h1,
 [data-buildrick-id] h2,
 [data-buildrick-id] h3,
@@ -197,12 +168,15 @@
 [data-buildrick-id] h1 {
   font-size: calc(var(--buildrick-heading-size) * 1.5);
 }
+
 [data-buildrick-id] h2 {
   font-size: var(--buildrick-heading-size);
 }
+
 [data-buildrick-id] h3 {
   font-size: calc(var(--buildrick-heading-size) * 0.75);
 }
+
 [data-buildrick-id] h4 {
   font-size: calc(var(--buildrick-heading-size) * 0.625);
 }
@@ -216,9 +190,6 @@
   color: var(--buildrick-accent);
 }
 
-/* ============================================
-   Button Styles
-   ============================================ */
 [data-buildrick-id] button {
   background: var(--buildrick-accent);
   color: #fff;
@@ -233,17 +204,11 @@
   background: var(--buildrick-text-muted);
 }
 
-/* ============================================
-   Media Elements
-   ============================================ */
 [data-buildrick-id] img {
   max-width: 100%;
   height: auto;
 }
 
-/* ============================================
-   Form Elements
-   ============================================ */
 [data-buildrick-id] input,
 [data-buildrick-id] textarea,
 [data-buildrick-id] select {
@@ -255,9 +220,6 @@
   font-family: var(--buildrick-font-family);
 }
 
-/* ============================================
-   Container Elements
-   ============================================ */
 [data-buildrick-type="container"]:empty,
 [data-buildrick-type="columns"]:empty {
   min-height: 60px;
@@ -285,9 +247,6 @@
   padding: 8px 16px;
 }
 
-/* ============================================
-   Columns Layout
-   ============================================ */
 .row,
 [data-buildrick-type="columns"] {
   display: flex;
@@ -318,16 +277,10 @@
   font-size: var(--buildrick-text-sm-plus);
 }
 
-/* ============================================
-   Text Elements
-   ============================================ */
 [data-buildrick-type="text"] {
   min-height: 1em;
 }
 
-/* ============================================
-   Image Placeholders
-   ============================================ */
 [data-buildrick-type="image"]:not([src]),
 [data-buildrick-type="image"][src=""] {
   min-height: 100px;
@@ -338,27 +291,19 @@
   border-radius: 8px;
 }
 
-/* ============================================
-   Selection & Interaction States
-   ============================================ */
-
-/* Make all canvas elements draggable */
 [data-buildrick-id]:not([data-buildrick-root="true"]) {
   cursor: move;
 }
 
-/* Hover outline handled by React ElementHoverOverlay - only set cursor here */
 [data-buildrick-id]:hover {
   cursor: move;
 }
 
-/* Dragging state */
 [data-buildrick-id].dragging {
   opacity: 0.5;
   cursor: grabbing !important;
 }
 
-/* Selected state */
 [data-buildrick-id][data-selected="true"] {
   outline: 2px solid var(--buildrick-selection-color);
   outline-offset: 2px;
@@ -366,93 +311,34 @@
   z-index: 100;
 }
 
-/* Locked state - prevents accidental selection/modification */
 [data-buildrick-id][data-locked="true"] {
   outline: 2px dotted #f38ba8;
   cursor: not-allowed !important;
   user-select: none;
 }
 
-/* Locked element selected - show lock status */
 [data-buildrick-id][data-locked="true"][data-selected="true"] {
   outline: 2px dotted #f38ba8;
   outline-offset: 2px;
 }
 
-/* Hidden state - reduced visibility, no interactions */
 [data-buildrick-id][data-hidden="true"] {
   opacity: 0.25;
   pointer-events: none;
 }
 
-/* ============================================
-   Drop Target Indicator
-   ============================================ */
-/* Drop target - simple outline only, overlay handles detailed feedback */
 [data-buildrick-id][data-drop-target="true"] {
   outline: 2px solid var(--buildrick-drop-valid-border, #3b82f6);
   outline-offset: 2px;
   transition: outline-color 150ms ease;
 }
 
-/* Drop zone at top/bottom of elements - Professional 2px solid */
-.buildrick-drop-indicator-top {
-  position: absolute;
-  top: 0;
-  left: -4px;
-  right: -4px;
-  height: 2px;
-  background-color: var(--buildrick-drop-valid-border);
-  border-radius: 1px;
-  animation: dropLineFadeIn 150ms ease-out forwards;
-  z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
-}
-
-.buildrick-drop-indicator-bottom {
-  position: absolute;
-  bottom: 0;
-  left: -4px;
-  right: -4px;
-  height: 2px;
-  background-color: var(--buildrick-drop-valid-border);
-  border-radius: 1px;
-  animation: dropLineFadeIn 150ms ease-out forwards;
-  z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
-}
-
-/* Drop zone indicators at left/right of elements (for horizontal flex/grid layouts) */
-.buildrick-drop-indicator-left {
-  position: absolute;
-  top: -4px;
-  bottom: -4px;
-  left: 0;
-  width: 2px;
-  background-color: var(--buildrick-drop-valid-border);
-  border-radius: 1px;
-  animation: dropLineFadeIn 150ms ease-out forwards;
-  z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
-}
-
-.buildrick-drop-indicator-right {
-  position: absolute;
-  top: -4px;
-  bottom: -4px;
-  right: 0;
-  width: 2px;
-  background-color: var(--buildrick-drop-valid-border);
-  border-radius: 1px;
-  animation: dropLineFadeIn 150ms ease-out forwards;
-  z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
-}
-
-/* Style for elements currently being dragged */
 .buildrick-dragging {
   opacity: 0.4 !important;
   cursor: grabbing !important;
   user-select: none;
 }
 
-/* Clone mode indicator (Alt+Drag) - shows element is being duplicated */
 .buildrick-clone-mode {
   cursor: copy !important;
   outline: 2px dashed var(--buildrick-selection-color) !important;
@@ -478,43 +364,27 @@
   pointer-events: none;
 }
 
-/* Valid drop target indicator
-   NOTE: Visual feedback (outline, background) now handled by React DropFeedbackOverlay
-   CSS rules kept minimal to avoid conflicts with overlay positioning */
 [data-buildrick-id][data-drop-target="true"],
 [data-buildrick-id][data-drop-valid="true"] {
   /* Let React DropFeedbackOverlay handle visual styling */
   transition: outline 0.15s ease;
 }
 
-/* Drop target label REMOVED - React DropFeedbackOverlay handles visual feedback
-   This CSS ::before rule was creating a duplicate green "Drop here" label that
-   conflicted with the React-based feedback system. The DropFeedbackOverlay
-   component provides better control over when and how drop feedback appears. */
-
-/* Invalid drop target - simple red outline, overlay handles badge */
 [data-buildrick-id][data-drop-invalid="true"] {
   outline: 2px solid var(--buildrick-drop-invalid-border, #dc2626);
   outline-offset: 2px;
   cursor: not-allowed !important;
 }
 
-/* BUG-GAP: Invalid cursor during drag (higher specificity than .buildrick-dragging)
-   When an element is marked as invalid drop target during drag, cursor must be not-allowed */
 .buildrick-canvas[data-drag-active="true"] [data-buildrick-id][data-drop-invalid="true"],
 .buildrick-canvas[data-drag-active="true"] [data-buildrick-id][data-drop-invalid="true"] * {
   cursor: not-allowed !important;
 }
 
-/* Canvas-wide cursor when dragging over invalid area */
 .buildrick-canvas[data-invalid-drop="true"] {
   cursor: not-allowed !important;
 }
 
-/* ============================================
-   Multi-Select Rectangle (Marquee Selection)
-   Phase 4: Simplified - no infinite animations
-   ============================================ */
 .buildrick-selection-box {
   position: absolute;
   pointer-events: none;
@@ -526,7 +396,6 @@
   /* NOTE: Removed infinite selectionBoxPulse animation per Phase 4 cleanup */
 }
 
-/* Selection box corner markers */
 .buildrick-selection-box::before,
 .buildrick-selection-box::after {
   content: "";
@@ -547,39 +416,6 @@
   right: -3px;
 }
 
-/* Selection count badge */
-.buildrick-selection-count {
-  position: absolute;
-  bottom: -24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--buildrick-handle-gradient);
-  color: #ffffff;
-  padding: 2px 10px;
-  border-radius: 10px;
-  font-size: var(--buildrick-text-sm);
-  font-weight: 600;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px var(--buildrick-accent-purple-40);
-}
-
-/* ============================================
-   Empty Canvas State
-   ============================================ */
-.buildrick-empty-canvas {
-  min-height: 480px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  background: #f8fafc;
-  border: 3px dashed #e2e8f0;
-  border-radius: 16px;
-  margin: 20px;
-  transition: all 0.3s ease;
-  animation: emptyCanvasPulse 3s ease-in-out infinite;
-}
-
 @keyframes emptyCanvasPulse {
   0%, 100% {
     border-color: #e2e8f0;
@@ -591,96 +427,10 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .buildrick-empty-canvas {
-    animation: none;
-  }
-}
-
-.buildrick-empty-canvas:hover {
-  border-color: #94a3b8;
-  background: #f1f5f9;
-  animation-play-state: paused;
-}
-
-.buildrick-empty-canvas-container {
-  max-width: 400px;
-  text-align: center;
-  animation: buildrick-fade-in 0.5s ease-out;
-}
-
-.buildrick-empty-icon {
-  font-size: var(--buildrick-text-display);
-  margin-bottom: 24px;
-  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));
-}
-
-.buildrick-empty-title {
-  font-size: var(--buildrick-text-3xl);
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 12px;
-}
-
-.buildrick-empty-text {
-  font-size: var(--buildrick-text-md-plus);
-  color: #64748b;
-  line-height: 1.6;
-  margin-bottom: 24px;
-}
-
-.buildrick-empty-hint {
-  display: inline-block;
-  padding: 8px 16px;
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 99px;
-  font-size: var(--buildrick-text-base);
-  color: #475569;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-}
-
-.buildrick-empty-hint strong {
-  color: #3b82f6;
-}
-
-.buildrick-empty-hint kbd {
-  display: inline-block;
-  padding: 2px 6px;
-  font-family: var(--buildrick-font-family-mono);
-  font-size: var(--buildrick-text-sm, 12px);
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  border-radius: var(--buildrick-radius-xs, 4px);
-  box-shadow: 0 1px 0 #d1d5db;
-  color: #374151;
-}
-
-.buildrick-empty-shortcuts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 16px;
-  justify-content: center;
-}
-
-.buildrick-shortcut {
-  font-size: var(--buildrick-text-sm-plus);
-  color: #94a3b8;
-  padding: 4px 12px;
-  background: #f1f5f9;
-  border-radius: 4px;
-}
-
-/* Minimal root for empty canvas (React overlay handles CTA) */
 .buildrick-empty-canvas-root {
   min-height: 480px;
 }
 
-/* ============================================
-   Canvas Empty State CTA Overlay (React)
-   Interactive buttons over the empty canvas
-   ============================================ */
 .buildrick-canvas-empty-cta {
   position: absolute;
   inset: 0;
@@ -776,9 +526,6 @@
   to { opacity: 0; transform: translateX(20px); }
 }
 
-/* ============================================
-   Component View Mode
-   ============================================ */
 .buildrick-canvas--component-view [data-buildrick-type] {
   position: relative;
   outline: 1px dashed var(--buildrick-accent-purple-60);
@@ -807,19 +554,6 @@
   outline-color: var(--buildrick-accent-purple-35);
 }
 
-/* ============================================
-   Selection Animations (Single-run only)
-   ============================================ */
-/* NOTE: Removed infinite buildrick-selection-pulse animation for better performance
-   and cleaner visual design per UX plan "Hybrid 2: Minimal + Smart Escalation" */
-
-/* Selection animations removed - instant selection prevents jerk/race conditions */
-
-/* ============================================
-   Drop Feedback Overlay Styles
-   ============================================ */
-
-/* CSS Variables for drop feedback colors */
 .buildrick-canvas {
   --buildrick-drop-valid-border: var(--buildrick-selection-color);
   --buildrick-drop-valid-bg: var(--buildrick-accent-purple-08);
@@ -827,7 +561,6 @@
   --buildrick-drop-invalid-bg: rgba(220, 38, 38, 0.04);
 }
 
-/* Professional single-run animations (no infinite loops) */
 @keyframes dropLineFadeIn {
   from { opacity: 0; transform: scaleX(0.8); }
   to { opacity: 1; transform: scaleX(1); }
@@ -848,32 +581,23 @@
   to { opacity: 1; transform: scaleX(1); }
 }
 
-/* Invalid drop feedback badge - corner positioned, fade in */
 .buildrick-drop-feedback-badge.invalid {
   animation: badgeFadeIn 150ms ease-out forwards;
 }
 
-/* Drop feedback target overlay - valid state */
 .buildrick-drop-feedback-target.valid {
   border-color: var(--buildrick-drop-valid-border) !important;
   background: var(--buildrick-drop-valid-bg) !important;
 }
 
-/* Drop feedback target overlay - invalid state */
 .buildrick-drop-feedback-target.invalid {
   border-color: var(--buildrick-drop-invalid-border) !important;
   background: var(--buildrick-drop-invalid-bg) !important;
 }
 
-/* Position line animation - single run fade in */
 .buildrick-drop-position-line {
   animation: dropLineFadeIn 150ms ease-out forwards;
 }
-
-/* ============================================
-   Visual Drag Handles (Phase 2)
-   6-dot grip icon on element hover
-   ============================================ */
 
 .buildrick-drag-handle {
   animation: dragHandleFadeIn 0.15s ease-out;
@@ -890,12 +614,6 @@
   }
 }
 
-/* ============================================
-   Layer Panel Hover Highlight (Phase 8)
-   Bidirectional hover-to-highlight
-   ============================================ */
-
-/* Highlight element when hovering its layer in the panel */
 .buildrick-layer-hover-highlight {
   outline: 1px solid var(--buildrick-selection-color) !important;
   outline-offset: 1px;
@@ -903,19 +621,9 @@
   /* NOTE: Removed infinite layerHoverPulse animation - static highlight is cleaner */
 }
 
-/* ============================================
-   Drop Slot Preview Styles (Professional)
-   ============================================ */
-
-/* Drop slot preview - simple dashed outline */
 .buildrick-drop-slot-preview {
   animation: slotFadeIn 150ms ease-out forwards;
 }
-
-/* ============================================
-   Drop Zone Breadcrumb Trail
-   Shows element hierarchy during drag operations
-   ============================================ */
 
 @keyframes breadcrumbFadeIn {
   from { opacity: 0; transform: translateY(4px); }
@@ -927,24 +635,16 @@
   font-family: var(--buildrick-font-family);
 }
 
-/* Depth badge for nesting level indicator */
 .buildrick-depth-badge {
   font-family: var(--buildrick-font-family);
 }
 
-/* ============================================
-   Valid Drop Container Glow Effect
-   Subtle glow animation for valid drop targets
-   ============================================ */
-
-/* Valid drop target - subtle blue glow effect */
 [data-buildrick-id][data-drop-target="true"][data-drop-valid="true"] {
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3),
               0 0 12px rgba(59, 130, 246, 0.1);
   transition: box-shadow 150ms ease, outline 150ms ease;
 }
 
-/* Container expansion hint - "+" indicator for containers with children */
 [data-buildrick-id][data-drop-target="true"][data-drop-valid="true"][data-has-children="true"]::after {
   content: '+';
   position: absolute;
@@ -966,9 +666,8 @@
   pointer-events: none;
 }
 
-/* Accessibility: Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
-  .buildrick-drop-feedback-badge,
+.buildrick-drop-feedback-badge,
   .buildrick-drop-feedback-target,
   .buildrick-drop-position-line,
   .buildrick-drop-slot-preview,
@@ -979,11 +678,6 @@
     opacity: 1 !important;
   }
 }
-
-/* ============================================
-   Phase 4: Micro-interactions
-   Flash + settle animations on drop
-   ============================================ */
 
 @keyframes flashOnDrop {
   0% {
@@ -1020,16 +714,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .buildrick-element-flash,
+.buildrick-element-flash,
   .buildrick-element-settle {
     animation: none !important;
   }
 }
-
-/* ============================================
-   Phase 9: X-Ray / Outline Mode
-   Shows all element boundaries with labels
-   ============================================ */
 
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-id] {
   outline: 1px dashed var(--buildrick-accent-purple-50) !important;
@@ -1055,7 +744,6 @@
   white-space: nowrap;
 }
 
-/* Different colors for different element types */
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="container"]::before {
   background: rgba(180, 190, 254, 0.9);
   color: #1e1e2e;
@@ -1088,12 +776,10 @@
   color: #1e1e2e;
 }
 
-/* Hide X-Ray labels on selected elements (they have their own badge) */
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-id][data-selected="true"]::before {
   display: none;
 }
 
-/* Nested elements get slightly different outline colors for depth perception */
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-id] [data-buildrick-id] {
   outline-color: rgba(180, 190, 254, 0.4) !important;
 }
@@ -1102,10 +788,6 @@
   outline-color: rgba(203, 166, 247, 0.4) !important;
 }
 
-/* ============================================
-   Inline Text Editing Mode
-   Visual feedback when double-clicking to edit text
-   ============================================ */
 [data-buildrick-id][contenteditable="true"] {
   outline: 2px solid var(--buildrick-accent, #667eea) !important;
   outline-offset: 2px;
@@ -1116,7 +798,6 @@
   border-radius: 2px;
 }
 
-/* Placeholder for empty editable elements */
 [data-buildrick-id][contenteditable="true"]:empty::before {
   content: 'Type here...';
   color: var(--buildrick-text-muted, #6b7280);
@@ -1124,12 +805,10 @@
   pointer-events: none;
 }
 
-/* Ensure text selection is visible */
 [data-buildrick-id][contenteditable="true"]::selection {
   background: rgba(102, 126, 234, 0.3);
 }
 
-/* Flash animation for newly dropped elements */
 @keyframes buildrick-element-flash {
   0% {
     background-color: rgba(102, 126, 234, 0.3);
@@ -1145,54 +824,17 @@
   animation: buildrick-element-flash 0.5s ease-out forwards;
 }
 
-/* ============================================
-   Accessibility: Focus Visible States (WCAG 2.1 AA)
-   ============================================ */
-
-/* Global focus-visible outline for keyboard navigation */
 :focus-visible {
   outline: 2px solid var(--buildrick-accent, #667eea);
   outline-offset: 2px;
 }
 
-/* Canvas element focus (keyboard navigation) */
 [data-buildrick-id]:focus-visible {
   outline: 3px solid var(--buildrick-accent, #667eea);
   outline-offset: 2px;
   box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
 }
 
-/* Toolbar button focus */
-.buildrick-toolbar-button:focus-visible,
-.buildrick-icon-button:focus-visible {
-  outline: 2px solid var(--buildrick-accent, #667eea);
-  outline-offset: 2px;
-  background: rgba(102, 126, 234, 0.1);
-}
-
-/* Panel tab focus */
-.buildrick-tab:focus-visible,
-.buildrick-sidebar-tab:focus-visible {
-  outline: 2px solid var(--buildrick-accent, #667eea);
-  outline-offset: -2px;
-  background: rgba(102, 126, 234, 0.1);
-}
-
-/* Layer tree item focus */
-.buildrick-layer-item:focus-visible {
-  outline: 2px solid var(--buildrick-accent, #667eea);
-  outline-offset: -1px;
-  background: rgba(102, 126, 234, 0.1);
-}
-
-/* Block card focus */
-.buildrick-block-card:focus-visible {
-  outline: 2px solid var(--buildrick-accent, #667eea);
-  outline-offset: 2px;
-  transform: scale(1.02);
-}
-
-/* Input field focus */
 .buildrick-input:focus-visible,
 .buildrick-select:focus-visible,
 .buildrick-textarea:focus-visible {
@@ -1201,7 +843,6 @@
   border-color: var(--buildrick-accent, #667eea);
 }
 
-/* Skip link for screen readers */
 .buildrick-skip-link {
   position: absolute;
   top: -100px;
@@ -1218,30 +859,23 @@
   top: 0;
 }
 
-/* High contrast mode support */
 @media (prefers-contrast: high) {
-  :focus-visible {
+:focus-visible {
     outline: 3px solid CanvasText;
     outline-offset: 2px;
   }
 
-  [data-buildrick-id][data-selected="true"] {
+[data-buildrick-id][data-selected="true"] {
     outline: 3px solid Highlight;
   }
 }
 
-/* ============================================
-   Accessibility: Reduced Motion Preferences
-   Phase 4: Comprehensive motion reduction
-   ============================================ */
 @media (prefers-reduced-motion: reduce) {
-  /* Disable all focus animations */
-  :focus-visible {
+:focus-visible {
     transition: none;
   }
 
-  /* Disable selection and interaction animations */
-  .buildrick-selection-box,
+.buildrick-selection-box,
   .buildrick-selection-box--appearing,
   .buildrick-drag-handle,
   .buildrick-drop-indicator-top,
@@ -1253,21 +887,14 @@
     transition: none !important;
   }
 
-  /* Disable canvas state transitions */
-  [data-buildrick-id],
+[data-buildrick-id],
   [data-buildrick-id]:hover,
   [data-buildrick-id][data-selected="true"],
   [data-buildrick-id][data-drop-target="true"] {
     transition: none !important;
   }
 
-  /* Disable transform effects */
-  .buildrick-block-card:focus-visible {
-    transform: none !important;
-  }
-
-  /* Ensure all overlays appear instantly */
-  .buildrick-hover-overlay,
+.buildrick-hover-overlay,
   .buildrick-drop-feedback-badge,
   .buildrick-drop-feedback-target {
     animation: none !important;
