@@ -45,6 +45,13 @@ const CHROME_EXEMPT = [
   "src/editor/wizard/sectionData.ts",
   "src/shared/forms/GradientPicker.tsx",
   "src/shared/utils/parsers/**",
+  // Token Binding primitives (Survivor #5). Box.tsx's `boxShadow:
+  // resolveShadow(shadow)` resolves a typed token prop through the
+  // resolver — syntactically it looks like a raw shadow to grep/ESLint,
+  // but semantically it only emits var(--buildrick-*). Exempted per-file
+  // so PanelShell.tsx and future primitive additions stay enforced.
+  "src/shared/ui/ds/Box.tsx",
+  "src/shared/ui/ds/tokens.ts",
 ];
 
 // Form atoms — may use the full radius/shadow scale. Exempt ONLY from the

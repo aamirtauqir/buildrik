@@ -123,7 +123,12 @@ pass "Gate 10: hex count at or below baseline"
 # gradients), user-content preview renderers, gradient parsers, tests, stories.
 # features/design-system/ui/** is IN scope (Design tab chrome).
 CHROME_PATHS="packages/editor/src/editor packages/editor/src/shared/ui packages/editor/src/shared/forms"
-CHROME_EXCLUDE='__tests__|\.test\.|\.stories\.|sidebar/tabs/design/|inspector/sections/BackgroundSection\.tsx|shared/utils/parsers/|editor/export/PreviewFrame\.tsx|editor/media/VideoPreview\.tsx|editor/wizard/sectionData\.ts|shared/forms/GradientPicker\.tsx'
+CHROME_EXCLUDE='__tests__|\.test\.|\.stories\.|sidebar/tabs/design/|inspector/sections/BackgroundSection\.tsx|shared/utils/parsers/|editor/export/PreviewFrame\.tsx|editor/media/VideoPreview\.tsx|editor/wizard/sectionData\.ts|shared/forms/GradientPicker\.tsx|shared/ui/ds/Box\.tsx|shared/ui/ds/tokens\.ts'
+# Box.tsx + tokens.ts are the Token Binding primitives (Survivor #5). They
+# assemble the tokenized output via resolveShadow/resolveRadius resolvers —
+# grep cannot distinguish `boxShadow: resolveShadow(...)` (legitimate resolver
+# plumbing) from a raw shadow (violation). Exempted narrowly, per-file.
+# PanelShell.tsx is NOT exempted — it must stay free of raw shadow/radius.
 
 # Form atoms — exempt from radius-above-4 (Gate 13) only. Gradient + raw shadow
 # (Gates 11, 12) still apply.
