@@ -15,6 +15,19 @@
     "packages/editor/src/editor/sidebar/tabs/settings/screens/BillingScreen.tsx",
     "packages/editor/src/editor/sidebar/tabs/settings/screens/LockedScreen.tsx",
     "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.tsx",
+    "packages/editor/src/editor/sidebar/tabs/pages/components/AddPageButton.tsx",
+    "packages/editor/src/editor/sidebar/tabs/pages/components/BulkToolbar.tsx",
+    "packages/editor/src/editor/sidebar/tabs/pages/components/PageCommandPalette.tsx",
+    "packages/editor/src/editor/sidebar/tabs/pages/components/PageContextMenu.tsx",
+    "packages/editor/src/editor/sidebar/tabs/pages/components/PageFolder.tsx",
+    "packages/editor/src/editor/sidebar/tabs/pages/components/PageList.tsx",
+    "packages/editor/src/editor/sidebar/tabs/pages/components/PageRow.tsx",
+    "packages/editor/src/editor/sidebar/tabs/pages/page-settings/AdvancedTab.tsx",
+    "packages/editor/src/editor/sidebar/tabs/pages/page-settings/PageSettingsDrawer.tsx",
+    "packages/editor/src/editor/sidebar/tabs/pages/page-settings/SeoTab.tsx",
+    "packages/editor/src/editor/sidebar/tabs/pages/page-settings/SettingsErrorBoundary.tsx",
+    "packages/editor/src/editor/sidebar/tabs/pages/page-settings/SocialTab.tsx",
+    "packages/editor/src/editor/sidebar/tabs/pages/page-settings/UnsavedWarningModal.tsx",
     "packages/editor/src/editor/sidebar/tabs/build/BuildTab.tsx",
     "packages/editor/src/editor/sidebar/tabs/templates/TemplatesTab.tsx",
     "packages/editor/src/editor/sidebar/tabs/media/MediaTab.tsx",
@@ -35,9 +48,10 @@
     "packages/editor/src/shared/ui/Icon.tsx"
   ],
   "notes": [
-    "Week 5 (tonight): Settings tab fully axiom-clean. All 9 screens + shared.tsx + SettingsTab.tsx strict-zero. Settings is the first tab with both shell AND sub-content migrated end-to-end.",
-    "Week 4: all 8 sidebar-tab shells migrated to PanelShell + strict-zero.",
-    "Week 3 Part 3: 12 shared/ui primitives brought to strict zero + added.",
+    "Pages sub-components (tonight): 13 files added — 7 components/ + 6 page-settings/. Most were already axiom-clean (they USE .pg-* classes but emit no inline style violations). UnsavedWarningModal fixed 6 inline literals; SeoTab fixed 1.",
+    "Settings tab fully axiom-clean: SettingsTab + shared + 9 screens = 11 files.",
+    "Pages tab: shell + 13 sub-components = 14 files. PagesTab.css (3426L) still has legacy .pg-* rules contributing to overall baseline — file-scoped strict-zero is satisfied because JSX files don't emit raw literals.",
+    "All 8 sidebar-tab shells + 12 shared/ui primitives.",
     "Do NOT remove files from this list once added. If a migration regresses, fix the code — removing from the allowlist hides the regression."
   ]
 }

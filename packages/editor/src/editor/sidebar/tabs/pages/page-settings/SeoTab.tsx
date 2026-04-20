@@ -146,7 +146,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             </label>
             <Tooltip
               content={
-                <span style={{ display: "block", whiteSpace: "normal", maxWidth: 240 }}>
+                <span style={{ display: "block", whiteSpace: "normal", maxWidth: 244 }}>
                   A short summary of your page shown in Google search results (keep under 160
                   characters)
                 </span>

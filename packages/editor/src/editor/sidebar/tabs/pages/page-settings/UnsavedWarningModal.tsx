@@ -4,6 +4,8 @@
  *   frame / warm neutral / onboarding theme). Chrome-hex lint rules do not apply.
  *
  * UnsavedWarningModal — Confirms tab switch with unsaved changes.
+ * Form atoms (action buttons) use ROW_MD from layout constants + radius-sm
+ * token per Chrome Axiom A1.3 (form atoms exempt for radius scale).
  *
  * Three actions:
  * - "Save & Switch": persists current tab state, then confirms navigation
@@ -15,6 +17,7 @@
 
 import * as React from "react";
 import { Modal } from "@shared/ui/Modal";
+import { ROW_MD } from "@shared/constants/layout";
 
 interface Props {
   isOpen: boolean;
@@ -104,9 +107,9 @@ export const UnsavedWarningModal: React.FC<Props> = ({
 };
 
 const discardBtn: React.CSSProperties = {
-  height: 32,
+  height: ROW_MD,
   padding: "0 12px",
-  borderRadius: 7,
+  borderRadius: "var(--buildrick-radius-sm)",
   border: "1px solid rgba(239,68,68,0.25)",
   background: "rgba(239,68,68,0.1)",
   color: "#f5a3a3",
@@ -118,9 +121,9 @@ const discardBtn: React.CSSProperties = {
 };
 
 const cancelBtn: React.CSSProperties = {
-  height: 32,
+  height: ROW_MD,
   padding: "0 12px",
-  borderRadius: 7,
+  borderRadius: "var(--buildrick-radius-sm)",
   border: "1px solid rgba(255,255,255,0.1)",
   background: "rgba(255,255,255,0.06)",
   color: "#A09D96",
@@ -132,9 +135,9 @@ const cancelBtn: React.CSSProperties = {
 };
 
 const saveBtn: React.CSSProperties = {
-  height: 32,
+  height: ROW_MD,
   padding: "0 12px",
-  borderRadius: 7,
+  borderRadius: "var(--buildrick-radius-sm)",
   border: "none",
   background: "#2D6DFF",
   color: "var(--buildrick-text-on-accent)",
