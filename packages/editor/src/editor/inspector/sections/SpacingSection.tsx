@@ -3,8 +3,9 @@
  */
 
 import * as React from "react";
-import { Section, FourSideInput, InputWithUnit, MoreSettingsToggle, type SectionTier } from "../shared/controls";
+import { Section, FourSideInput, InputWithUnit, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
 import { MixedValueBadge } from "../shared/MixedValueBadge";
+import { parseCssShorthand } from "../shared/utils/parseCssShorthand";
 
 export interface SpacingSectionProps {
   styles: Record<string, string>;
@@ -40,58 +41,20 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
   const [marginLinked, setMarginLinked] = React.useState(false);
   const [paddingLinked, setPaddingLinked] = React.useState(false);
 
-  // Parse shorthand to individual values
-  const parseShorthand = (
-    value: string
-  ): { top: string; right: string; bottom: string; left: string } => {
-    if (!value) return { top: "", right: "", bottom: "", left: "" };
-    const parts = value.split(" ").filter(Boolean);
-    if (parts.length === 1) {
-      return {
-        top: parts[0],
-        right: parts[0],
-        bottom: parts[0],
-        left: parts[0],
-      };
-    } else if (parts.length === 2) {
-      return {
-        top: parts[0],
-        right: parts[1],
-        bottom: parts[0],
-        left: parts[1],
-      };
-    } else if (parts.length === 3) {
-      return {
-        top: parts[0],
-        right: parts[1],
-        bottom: parts[2],
-        left: parts[1],
-      };
-    } else if (parts.length === 4) {
-      return {
-        top: parts[0],
-        right: parts[1],
-        bottom: parts[2],
-        left: parts[3],
-      };
-    }
-    return { top: "", right: "", bottom: "", left: "" };
-  };
-
   // Get margin values
   const marginValues = {
-    top: styles["margin-top"] || parseShorthand(styles.margin || "").top,
-    right: styles["margin-right"] || parseShorthand(styles.margin || "").right,
-    bottom: styles["margin-bottom"] || parseShorthand(styles.margin || "").bottom,
-    left: styles["margin-left"] || parseShorthand(styles.margin || "").left,
+    top: styles["margin-top"] || parseCssShorthand(styles.margin || "").top,
+    right: styles["margin-right"] || parseCssShorthand(styles.margin || "").right,
+    bottom: styles["margin-bottom"] || parseCssShorthand(styles.margin || "").bottom,
+    left: styles["margin-left"] || parseCssShorthand(styles.margin || "").left,
   };
 
   // Get padding values
   const paddingValues = {
-    top: styles["padding-top"] || parseShorthand(styles.padding || "").top,
-    right: styles["padding-right"] || parseShorthand(styles.padding || "").right,
-    bottom: styles["padding-bottom"] || parseShorthand(styles.padding || "").bottom,
-    left: styles["padding-left"] || parseShorthand(styles.padding || "").left,
+    top: styles["padding-top"] || parseCssShorthand(styles.padding || "").top,
+    right: styles["padding-right"] || parseCssShorthand(styles.padding || "").right,
+    bottom: styles["padding-bottom"] || parseCssShorthand(styles.padding || "").bottom,
+    left: styles["padding-left"] || parseCssShorthand(styles.padding || "").left,
   };
 
   // Handle margin change
@@ -230,11 +193,7 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
       {advancedExpanded && (
         <>
           <div style={{ position: "relative" }}>
-            {mixedKeys?.has("gap") && (
-              <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
-                <MixedValueBadge compact />
-              </span>
-            )}
+            <MixedValueIndicator prop="gap" mixedKeys={mixedKeys} />
             <InputWithUnit
               label="Row Gap"
               value={styles["row-gap"] || ""}

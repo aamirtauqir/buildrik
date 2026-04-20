@@ -17,6 +17,7 @@ import {
   TemplateButtonGrid,
   SectionLabel,
   type SectionTier,
+  MixedValueIndicator,
 } from "../shared/controls";
 import { InputField } from "../../../shared/forms/InputField";
 import { MixedValueBadge } from "../shared/MixedValueBadge";
@@ -157,11 +158,7 @@ export const GridSection: React.FC<GridSectionProps> = ({
 
           {/* Grid Template Inputs */}
           <div style={{ position: "relative" }}>
-            {mixedKeys?.has("grid-template-columns") && (
-              <span style={{ position: "absolute", top: "50%", transform: "translateY(-50%)", left: 0, zIndex: 1 }}>
-                <MixedValueBadge compact />
-              </span>
-            )}
+            <MixedValueIndicator prop="grid-template-columns" mixedKeys={mixedKeys} offsetLeft={0} />
             <InlineInput
               label="Columns"
               value={styles["grid-template-columns"] || ""}
@@ -171,11 +168,7 @@ export const GridSection: React.FC<GridSectionProps> = ({
           </div>
 
           <div style={{ position: "relative" }}>
-            {mixedKeys?.has("grid-template-rows") && (
-              <span style={{ position: "absolute", top: "50%", transform: "translateY(-50%)", left: 0, zIndex: 1 }}>
-                <MixedValueBadge compact />
-              </span>
-            )}
+            <MixedValueIndicator prop="grid-template-rows" mixedKeys={mixedKeys} offsetLeft={0} />
             <InlineInput
               label="Rows"
               value={styles["grid-template-rows"] || ""}

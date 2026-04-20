@@ -59,3 +59,6 @@ export type { TemplateButtonGridProps, PresetButtonGridProps } from "./PresetGri
 // Progressive disclosure toggle
 export { MoreSettingsToggle } from "./MoreSettingsToggle";
 export type { MoreSettingsToggleProps } from "./MoreSettingsToggle";
+
+// Mixed-value indicator
+export { MixedValueIndicator } from "./MixedValueIndicator";

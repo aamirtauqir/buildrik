@@ -7,8 +7,7 @@
  */
 
 import * as React from "react";
-import { SelectRow, ButtonGroup, ColorInput } from "../../shared/controls";
-import { MixedValueBadge } from "../../shared/MixedValueBadge";
+import { SelectRow, ButtonGroup, ColorInput, MixedValueIndicator } from "../../shared/controls";
 
 interface TextControlsProps {
   styles: Record<string, string>;
@@ -22,21 +21,13 @@ export const TypographyControls: React.FC<TextControlsProps> = ({ styles, onChan
     <>
       {/* Text Color */}
       <div style={{ position: "relative" }}>
-        {mixedKeys?.has("color") && (
-          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
-            <MixedValueBadge compact />
-          </span>
-        )}
+        <MixedValueIndicator prop="color" mixedKeys={mixedKeys} />
         <ColorInput label="Color" value={styles.color || ""} onChange={(v) => onChange("color", v)} />
       </div>
 
       {/* Text Align */}
       <div style={{ position: "relative" }}>
-        {mixedKeys?.has("text-align") && (
-          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
-            <MixedValueBadge compact />
-          </span>
-        )}
+        <MixedValueIndicator prop="text-align" mixedKeys={mixedKeys} />
         <ButtonGroup
           label="Align"
           value={styles["text-align"] || ""}
@@ -52,11 +43,7 @@ export const TypographyControls: React.FC<TextControlsProps> = ({ styles, onChan
 
       {/* Text Transform */}
       <div style={{ position: "relative" }}>
-        {mixedKeys?.has("text-transform") && (
-          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
-            <MixedValueBadge compact />
-          </span>
-        )}
+        <MixedValueIndicator prop="text-transform" mixedKeys={mixedKeys} />
         <ButtonGroup
           label="Transform"
           value={styles["text-transform"] || ""}

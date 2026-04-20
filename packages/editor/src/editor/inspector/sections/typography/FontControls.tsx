@@ -16,8 +16,7 @@ import * as React from "react";
 import { useTypeRegistry } from "../../../../features/design-system/state/TokenRegistryContext";
 import { Popover } from "../../../../shared/ui/Popover";
 import { TokenPickerPopover } from "../../shared/TokenPickerPopover";
-import { SelectRow, ButtonGroup, InputWithUnit } from "../../shared/controls";
-import { MixedValueBadge } from "../../shared/MixedValueBadge";
+import { SelectRow, ButtonGroup, InputWithUnit, MixedValueIndicator } from "../../shared/controls";
 
 // Font weight options
 export const FONT_WEIGHTS = [
@@ -157,11 +156,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
         style={{ position: "relative", display: "flex", alignItems: "center" }}
         className="buildrick-row-hover-chain"
       >
-        {mixedKeys?.has("font-size") && (
-          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
-            <MixedValueBadge compact />
-          </span>
-        )}
+        <MixedValueIndicator prop="font-size" mixedKeys={mixedKeys} />
         <div style={{ flex: 1 }}>
           <InputWithUnit
             label="Size"
@@ -181,11 +176,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
 
       {/* Font Weight */}
       <div style={{ position: "relative" }}>
-        {mixedKeys?.has("font-weight") && (
-          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
-            <MixedValueBadge compact />
-          </span>
-        )}
+        <MixedValueIndicator prop="font-weight" mixedKeys={mixedKeys} />
         <SelectRow
           label="Weight"
           value={styles["font-weight"] || ""}
@@ -199,11 +190,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
         style={{ position: "relative", display: "flex", alignItems: "center" }}
         className="buildrick-row-hover-chain"
       >
-        {mixedKeys?.has("line-height") && (
-          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
-            <MixedValueBadge compact />
-          </span>
-        )}
+        <MixedValueIndicator prop="line-height" mixedKeys={mixedKeys} />
         <div style={{ flex: 1 }}>
           <InputWithUnit
             label="Line H"
@@ -223,11 +210,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
 
       {/* Letter Spacing */}
       <div style={{ position: "relative" }}>
-        {mixedKeys?.has("letter-spacing") && (
-          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
-            <MixedValueBadge compact />
-          </span>
-        )}
+        <MixedValueIndicator prop="letter-spacing" mixedKeys={mixedKeys} />
         <InputWithUnit
           label="Letter Sp"
           value={styles["letter-spacing"] || ""}
@@ -238,11 +221,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
 
       {/* Text Decoration */}
       <div style={{ position: "relative" }}>
-        {mixedKeys?.has("text-decoration") && (
-          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
-            <MixedValueBadge compact />
-          </span>
-        )}
+        <MixedValueIndicator prop="text-decoration" mixedKeys={mixedKeys} />
         <ButtonGroup
           label="Decoration"
           value={styles["text-decoration"] || ""}

@@ -13,12 +13,12 @@ import {
   type SectionTier,
 } from "../shared/controls";
 import { InputField } from "../../../shared/forms/InputField";
-import { MixedValueBadge } from "../shared/MixedValueBadge";
+import { MixedValueIndicator } from "../shared/controls";
+import { parseCssShorthand } from "../shared/utils/parseCssShorthand";
 
 export interface BorderSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
-  onBatchChange: (changes: Record<string, string>) => void;
   /** Controlled open state for auto-expand functionality */
   isOpen?: boolean;
   /** Called when the section header is toggled */
@@ -36,7 +36,6 @@ export interface BorderSectionProps {
 export const BorderSection: React.FC<BorderSectionProps> = ({
   styles,
   onChange,
-  // onBatchChange - reserved for batch border operations
   isOpen,
   onToggle,
   tier = "secondary",
@@ -48,28 +47,17 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
   const [radiusLinked, setRadiusLinked] = React.useState(true);
 
   // Parse border radius values
-  const parseRadius = (): {
-    tl: string;
-    tr: string;
-    br: string;
-    bl: string;
-  } => {
-    const br = styles["border-radius"] || "";
-    const parts = br.split(" ").filter(Boolean);
-    if (parts.length === 1) {
-      return { tl: parts[0], tr: parts[0], br: parts[0], bl: parts[0] };
-    } else if (parts.length === 4) {
-      return { tl: parts[0], tr: parts[1], br: parts[2], bl: parts[3] };
-    }
+  const getRadiusValues = () => {
+    const { top: tl, right: tr, bottom: br, left: bl } = parseCssShorthand(styles["border-radius"] || "");
     return {
-      tl: styles["border-top-left-radius"] || "",
-      tr: styles["border-top-right-radius"] || "",
-      br: styles["border-bottom-right-radius"] || "",
-      bl: styles["border-bottom-left-radius"] || "",
+      tl: tl || styles["border-top-left-radius"] || "",
+      tr: tr || styles["border-top-right-radius"] || "",
+      br: br || styles["border-bottom-right-radius"] || "",
+      bl: bl || styles["border-bottom-left-radius"] || "",
     };
   };
 
-  const radiusValues = parseRadius();
+  const radiusValues = getRadiusValues();
 
   // Compute border preview
   const borderStyle = styles["border-style"] || (styles["border"] ? "set" : undefined);
@@ -104,11 +92,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
     <Section title="Border" icon="Square" preview={borderPreview} isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-border">
       {/* Border Width */}
       <div style={{ position: "relative" }}>
-        {mixedKeys?.has("border-width") && (
-          <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
-            <MixedValueBadge compact />
-          </span>
-        )}
+        <MixedValueIndicator prop="border-width" mixedKeys={mixedKeys} />
         <InputWithUnit
           label="Width"
           value={styles["border-width"] || ""}
@@ -119,11 +103,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
 
       {/* Border Style */}
       <div style={{ position: "relative" }}>
-        {mixedKeys?.has("border-style") && (
-          <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
-            <MixedValueBadge compact />
-          </span>
-        )}
+        <MixedValueIndicator prop="border-style" mixedKeys={mixedKeys} />
         <SelectRow
           label="Style"
           value={styles["border-style"] || ""}
@@ -144,11 +124,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
 
       {/* Border Color */}
       <div style={{ position: "relative" }}>
-        {mixedKeys?.has("border-color") && (
-          <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
-            <MixedValueBadge compact />
-          </span>
-        )}
+        <MixedValueIndicator prop="border-color" mixedKeys={mixedKeys} />
         <ColorInput
           label="Color"
           value={styles["border-color"] || ""}
@@ -158,11 +134,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
 
       {/* Border Radius */}
       <div style={{ position: "relative" }}>
-        {mixedKeys?.has("border-radius") && (
-          <span style={{ position: "absolute", top: 0, left: 56, zIndex: 1 }}>
-            <MixedValueBadge compact />
-          </span>
-        )}
+        <MixedValueIndicator prop="border-radius" mixedKeys={mixedKeys} offsetLeft={56} />
         <CornerRadiusInput
           values={radiusValues}
           onChange={handleRadiusChange}
@@ -189,11 +161,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
 
             {(["top", "right", "bottom", "left"] as const).map((side) => (
               <div key={side} style={{ position: "relative" }}>
-                {mixedKeys?.has(`border-${side}`) && (
-                  <span style={{ position: "absolute", top: "50%", left: 56, transform: "translateY(-50%)", zIndex: 1 }}>
-                    <MixedValueBadge compact />
-                  </span>
-                )}
+                <MixedValueIndicator prop={`border-${side}`} mixedKeys={mixedKeys} />
                 <InputField
                   label={side.charAt(0).toUpperCase() + side.slice(1)}
                   type="text"

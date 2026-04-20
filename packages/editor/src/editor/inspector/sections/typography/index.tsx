@@ -12,11 +12,10 @@
  */
 
 import * as React from "react";
-import { Section, MoreSettingsToggle, type SectionTier } from "../../shared/controls";
+import { Section, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../../shared/controls";
 import { FontControls } from "./FontControls";
 import { FontPicker } from "./FontPicker";
 import { TypographyControls } from "./TypographyControls";
-import { MixedValueBadge } from "../../shared/MixedValueBadge";
 
 // ============================================================================
 // TYPES
@@ -97,11 +96,7 @@ export const TypographySection: React.FC<TypographySectionProps> = ({
     >
       {/* Font Family Picker - AQUI-032 */}
       <div style={{ position: "relative" }}>
-        {mixedKeys?.has("font-family") && (
-          <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
-            <MixedValueBadge compact />
-          </span>
-        )}
+        <MixedValueIndicator prop="font-family" mixedKeys={mixedKeys} />
         <FontPicker value={styles["font-family"] || ""} onChange={handleFontChange} />
       </div>
 

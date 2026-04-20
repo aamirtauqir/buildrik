@@ -10,8 +10,7 @@ import * as React from "react";
 import { useSpacingRegistry } from "../../../features/design-system/state/TokenRegistryContext";
 import { Popover } from "../../../shared/ui/Popover";
 import { TokenPickerPopover } from "../shared/TokenPickerPopover";
-import { Section, InputWithUnit, MoreSettingsToggle, type SectionTier } from "../shared/controls";
-import { MixedValueBadge } from "../shared/MixedValueBadge";
+import { Section, InputWithUnit, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
 
 // ============================================================================
 // HELPERS
@@ -141,6 +140,8 @@ export interface SizeSectionProps {
   onAdvancedToggle?: () => void;
   mixedKeys?: ReadonlySet<string>;
   isMultiSelect?: boolean;
+  /** Hide width/height rows (LayoutSection handles them via ConstraintControl) */
+  showDimensions?: boolean;
 }
 
 export const SizeSection: React.FC<SizeSectionProps> = ({
@@ -153,6 +154,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
   advancedExpanded = false,
   onAdvancedToggle,
   mixedKeys,
+  showDimensions = true,
 }) => {
   const hidden = (prop: string) => propertyStates[prop]?.hidden;
   const disabled = (prop: string) => propertyStates[prop]?.disabled;
@@ -185,15 +187,11 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
       id="inspector-section-size"
     >
       {/* Width */}
-      {!hidden("width") && (
+      {showDimensions && !hidden("width") && (
         <div style={{ position: "relative", display: "flex", alignItems: "center" }}
           className="buildrick-row-hover-chain"
         >
-          {mixedKeys?.has("width") && (
-            <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
-              <MixedValueBadge compact />
-            </span>
-          )}
+          <MixedValueIndicator prop="width" mixedKeys={mixedKeys} />
           <div style={{ flex: 1 }}>
             <InputWithUnit
               label="Width"
@@ -213,15 +211,11 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
       )}
 
       {/* Height */}
-      {!hidden("height") && (
+      {showDimensions && !hidden("height") && (
         <div style={{ position: "relative", display: "flex", alignItems: "center" }}
           className="buildrick-row-hover-chain"
         >
-          {mixedKeys?.has("height") && (
-            <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
-              <MixedValueBadge compact />
-            </span>
-          )}
+          <MixedValueIndicator prop="height" mixedKeys={mixedKeys} />
           <div style={{ flex: 1 }}>
             <InputWithUnit
               label="Height"
@@ -246,11 +240,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
           {/* Min Width */}
           {!hidden("min-width") && (
             <div style={{ position: "relative" }}>
-              {mixedKeys?.has("min-width") && (
-                <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
-                  <MixedValueBadge compact />
-                </span>
-              )}
+              <MixedValueIndicator prop="min-width" mixedKeys={mixedKeys} />
               <InputWithUnit
                 label="Min W"
                 value={styles["min-width"] || ""}
@@ -265,11 +255,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
           {/* Max Width */}
           {!hidden("max-width") && (
             <div style={{ position: "relative" }}>
-              {mixedKeys?.has("max-width") && (
-                <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
-                  <MixedValueBadge compact />
-                </span>
-              )}
+              <MixedValueIndicator prop="max-width" mixedKeys={mixedKeys} />
               <InputWithUnit
                 label="Max W"
                 value={styles["max-width"] || ""}
@@ -284,11 +270,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
           {/* Min Height */}
           {!hidden("min-height") && (
             <div style={{ position: "relative" }}>
-              {mixedKeys?.has("min-height") && (
-                <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
-                  <MixedValueBadge compact />
-                </span>
-              )}
+              <MixedValueIndicator prop="min-height" mixedKeys={mixedKeys} />
               <InputWithUnit
                 label="Min H"
                 value={styles["min-height"] || ""}
@@ -303,11 +285,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
           {/* Max Height */}
           {!hidden("max-height") && (
             <div style={{ position: "relative" }}>
-              {mixedKeys?.has("max-height") && (
-                <span style={{ position: "absolute", left: 56, top: "50%", transform: "translateY(-50%)", zIndex: 1, lineHeight: 0 }}>
-                  <MixedValueBadge compact />
-                </span>
-              )}
+              <MixedValueIndicator prop="max-height" mixedKeys={mixedKeys} />
               <InputWithUnit
                 label="Max H"
                 value={styles["max-height"] || ""}

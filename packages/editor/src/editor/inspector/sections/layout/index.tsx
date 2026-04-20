@@ -18,7 +18,6 @@ import { PositionControls } from "./PositionControls";
 export interface LayoutSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
-  onBatchChange: (changes: Record<string, string>) => void;
   propertyStates?: Record<string, { hidden?: boolean; disabled?: boolean; reason?: string }>;
   /** Controlled open state for auto-expand functionality */
   isOpen?: boolean;
@@ -45,7 +44,6 @@ const { sectionTitle } = baseStyles;
 export const LayoutSection: React.FC<LayoutSectionProps> = ({
   styles,
   onChange,
-  // onBatchChange - reserved for future batch operations
   propertyStates = {},
   isOpen,
   onToggle,
