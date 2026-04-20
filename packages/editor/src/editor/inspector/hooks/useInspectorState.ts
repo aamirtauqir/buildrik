@@ -1,6 +1,6 @@
 /**
  * useInspectorState Hook
- * Manages inspector panel UI state: tabs, pseudo-states, and section expansion
+ * Manages inspector panel UI state: tabs and pseudo-states
  *
  * @license BSD-3-Clause
  */
@@ -20,14 +20,6 @@ import { getDefaultTab } from "../config";
  */
 export type TabName = "style" | "element" | "effects";
 
-export type AutoExpandSection =
-  | "typography"
-  | "layout"
-  | "size"
-  | "elementProperties"
-  | "variants" // GAP-FIX: Auto-expand variant section for component instances
-  | null;
-
 export interface SelectedElement {
   id: string;
   type: string;
@@ -39,8 +31,6 @@ export interface InspectorState {
   activeTab: TabName;
   /** Current pseudo-state for styling (hover, focus, etc.) */
   currentPseudoState: PseudoStateId;
-  /** Section to auto-expand based on element type */
-  autoExpandSection: AutoExpandSection;
   /** Whether developer mode is enabled (shows All CSS, raw CSS editor) */
   devMode: boolean;
   /** Set active tab */
@@ -63,41 +53,28 @@ function getRecommendedTab(elementType: string, _tagName?: string): TabName {
   return getDefaultTab(elementType) ?? "style";
 }
 
-/**
- * Get the recommended section to auto-expand for an element type (internal helper)
- * Section auto-expand is handled by elementProfiles.ts defaultOpenGroups
- * ELEMENT_TO_SECTION_MAP was deleted (ARCH-02 fix) — see design doc backlog BL-01
- */
-function getAutoExpandSection(_elementType: string, _tagName?: string): AutoExpandSection {
-  return null;
-}
-
 // ============================================================================
 // HOOK
 // ============================================================================
 
 /**
  * Hook to manage inspector panel UI state
- * Handles tab navigation, pseudo-state selection, and smart section auto-expand
+ * Handles tab navigation and pseudo-state selection
  */
 export function useInspectorState(selectedElement: SelectedElement | null): InspectorState {
   const [activeTab, setActiveTab] = useState<TabName>("style");
   const [currentPseudoState, setCurrentPseudoState] = useState<PseudoStateId>("normal");
-  const [autoExpandSection, setAutoExpandSection] = useState<AutoExpandSection>(null);
   const [devMode, setDevMode] = useState<boolean>(false);
 
   // Extract element ID for dependency tracking
   const elementId = selectedElement?.id;
 
-  // Smart Tab & Section Auto-Expand: Update when element selection changes
+  // Smart Tab Auto-Expand: Update when element selection changes
   useEffect(() => {
     if (!selectedElement) return;
 
     const recommendedTab = getRecommendedTab(selectedElement.type, selectedElement.tagName);
     setActiveTab(recommendedTab);
-
-    const sectionToExpand = getAutoExpandSection(selectedElement.type, selectedElement.tagName);
-    setAutoExpandSection(sectionToExpand);
   }, [elementId, selectedElement]);
 
   const handleSetActiveTab = useCallback((tab: TabName) => {
@@ -115,7 +92,6 @@ export function useInspectorState(selectedElement: SelectedElement | null): Insp
   return {
     activeTab,
     currentPseudoState,
-    autoExpandSection,
     devMode,
     setActiveTab: handleSetActiveTab,
     setCurrentPseudoState: handleSetPseudoState,

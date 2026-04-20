@@ -6,7 +6,6 @@
 export { useInspectorState } from "./useInspectorState";
 export type {
   TabName,
-  AutoExpandSection,
   SelectedElement,
   InspectorState,
 } from "./useInspectorState";
