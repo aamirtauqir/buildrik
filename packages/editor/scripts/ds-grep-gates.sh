@@ -143,6 +143,7 @@ count_chrome() {
 # Use absolute SCRIPT_DIR computed at the top so this works whether the script
 # was invoked from repo root or from packages/editor.
 BASELINE_FILE="$SCRIPT_DIR/.chrome-axioms-baseline"
+GREEN_PANELS_FILE="$SCRIPT_DIR/.ds-green-panels.json"
 if [ ! -f "$BASELINE_FILE" ]; then
   echo "  ERROR: missing chrome-axioms baseline at $BASELINE_FILE"
   echo "         Run: bash $(dirname "$0")/freeze-chrome-baseline.sh"
@@ -197,5 +198,80 @@ LAYOUT_TSX=$(count_chrome '(height|width|minHeight|maxWidth|minWidth|maxHeight|p
 LITERAL_COUNT=$((LAYOUT_CSS + LAYOUT_TSX))
 check_gate 14 "$LITERAL_COUNT" "$BASE_14" "layout literals → src/shared/constants/layout.ts" || exit 1
 
+# ------------------------------------------------------------
+# Green-panel allowlist check (Survivor #6).
+# Any file listed in .ds-green-panels.json must have ZERO chrome-gate
+# violations, not just baseline-parity. Adding a file is a one-way door.
+# ------------------------------------------------------------
+if [ -f "$GREEN_PANELS_FILE" ]; then
+  # Disable set -e locally — `jq -er` exits non-zero on empty arrays AND on
+  # malformed JSON, and we need to distinguish those cases explicitly.
+  # Restore set -e at end of the block.
+  set +e
+  # Extract file list. Fail LOUDLY on malformed JSON or missing tool —
+  # silent failure would let violations slip past the ratchet.
+  if command -v jq >/dev/null 2>&1; then
+    GREEN_FILES=$(jq -r '.files[]?' "$GREEN_PANELS_FILE" 2>/dev/null)
+    JQ_PARSE_CHECK=$(jq 'type' "$GREEN_PANELS_FILE" 2>/dev/null)
+    if [ -z "$JQ_PARSE_CHECK" ]; then
+      echo "  ERROR: malformed $GREEN_PANELS_FILE (jq parse failed)"
+      exit 1
+    fi
+  elif command -v python3 >/dev/null 2>&1; then
+    GREEN_FILES=$(python3 -c "
+import json, sys
+with open('$GREEN_PANELS_FILE') as f:
+    data = json.load(f)
+for p in data.get('files', []):
+    print(p)
+") || { echo "  ERROR: malformed $GREEN_PANELS_FILE (python parse failed)"; exit 1; }
+  else
+    echo "  ERROR: neither jq nor python3 available; cannot parse $GREEN_PANELS_FILE"
+    exit 1
+  fi
+
+  GREEN_FAIL=0
+  if [ -n "$GREEN_FILES" ]; then
+    while IFS= read -r green_file; do
+      [ -z "$green_file" ] && continue
+      # Fail loudly if a listed file doesn't exist — typo or stale entry.
+      if [ ! -f "$green_file" ]; then
+        echo "  FAIL green-panel: $green_file listed but not found on disk"
+        GREEN_FAIL=1
+        continue
+      fi
+      # Scoped grep against the four chrome patterns, matching the full
+      # coverage of gates 11-14 including bare-number TSX patterns.
+      # Note: `grep -c` always prints a count (0 for no match) and exits 1 on
+      # no match. We capture the count directly — do NOT add `|| echo 0`,
+      # since grep's no-match would append a second "0" and break arithmetic.
+      file_gradients=$(grep -cE '(linear-gradient|radial-gradient|conic-gradient)' "$green_file" 2>/dev/null); file_gradients=${file_gradients:-0}
+      file_shadow_all=$(grep -cE '(box-shadow|boxShadow)[[:space:]]*:' "$green_file" 2>/dev/null); file_shadow_all=${file_shadow_all:-0}
+      # Token-bound shadow check allows both ' and " quote styles.
+      file_shadow_tok=$(grep -cE "(box-shadow|boxShadow)[[:space:]]*:[[:space:]]*[\"']?var\(--buildrick-(shadow|glow)" "$green_file" 2>/dev/null); file_shadow_tok=${file_shadow_tok:-0}
+      file_shadow_raw=$((file_shadow_all - file_shadow_tok))
+      file_radius=$(grep -cE "(border-radius|borderRadius)[[:space:]]*:[[:space:]]*[\"']?([5-9]|1[0-9]|2[0-9]|3[0-9]|50%|999)" "$green_file" 2>/dev/null); file_radius=${file_radius:-0}
+      # Layout literal: CSS (Npx) + TSX bare-number (camelCase property).
+      file_layout_css=$(grep -cE '\b(28|32|36|40|44|48|56|60|240|300|320)px\b' "$green_file" 2>/dev/null); file_layout_css=${file_layout_css:-0}
+      file_layout_tsx=$(grep -cE '(height|width|minHeight|maxWidth|minWidth|maxHeight|padding|paddingLeft|paddingRight|paddingTop|paddingBottom|margin|marginLeft|marginRight|marginTop|marginBottom|top|bottom|left|right|gap|rowGap|columnGap)[[:space:]]*:[[:space:]]*(28|32|36|40|44|48|56|60|240|300|320)[^0-9pxPX]' "$green_file" 2>/dev/null); file_layout_tsx=${file_layout_tsx:-0}
+      file_layout=$((file_layout_css + file_layout_tsx))
+      total=$((file_gradients + file_shadow_raw + file_radius + file_layout))
+      if [ "$total" -gt 0 ]; then
+        echo "  FAIL green-panel: $green_file has $total chrome-gate violations (gradients=$file_gradients, raw-shadow=$file_shadow_raw, radius>4=$file_radius, layout-literals=$file_layout); must be 0 when allowlisted"
+        GREEN_FAIL=1
+      fi
+    done <<< "$GREEN_FILES"
+  fi
+
+  if [ "$GREEN_FAIL" -eq 1 ]; then
+    exit 1
+  fi
+
+  GREEN_COUNT=$(printf '%s\n' "$GREEN_FILES" | grep -c . 2>/dev/null)
+  [ -z "$GREEN_COUNT" ] && GREEN_COUNT=0
+  echo "  PASS green-panel allowlist: $GREEN_COUNT file(s) listed, all at zero chrome-gate violations"
+  set -e
+fi
+
 echo ""
-echo "=== DS V1 gates: 10 passed + 4 chrome-axiom gates at baseline ==="
+echo "=== DS V1 gates: 10 passed + 4 chrome-axiom gates at baseline + green-panel check ==="

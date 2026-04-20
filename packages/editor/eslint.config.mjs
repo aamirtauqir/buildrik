@@ -84,38 +84,40 @@ export default [
       "no-undef": "off",
     },
   },
-  // Chrome Axiom A1 — gradient ban (applies to chrome files, all except LOCAL_SHADOW).
-  // Separate config block so this doesn't collide with the base rule set.
+  // Chrome Axioms A1 + Survivor #3 — ALL chrome-file no-restricted-syntax
+  // selectors MUST live in this single block. ESLint flat-config overrides
+  // same rule key across matching blocks (last wins), so splitting across
+  // blocks would cause selector stomping. This is the bug Codex flagged in
+  // the Week 0 first draft (C2). Do NOT add a second `no-restricted-syntax`
+  // block for chrome files elsewhere in this config — extend this list.
   {
     files: CHROME_FILES,
     ignores: CHROME_EXEMPT,
     rules: {
       "no-restricted-syntax": [
         "warn",
-        // String literal containing a gradient function.
+        // Chrome Axiom A1.1 — gradient in string literal.
         {
           selector:
             "Literal[value=/linear-gradient|radial-gradient|conic-gradient/]",
           message:
             "Chrome Axiom A1.1: no gradients in chrome. See DESIGN.md §Chrome Axioms.",
         },
-        // Emotion tagged-template literal piece containing a gradient function.
+        // Chrome Axiom A1.1 — gradient in Emotion tagged-template literal.
         {
           selector:
             "TemplateElement[value.raw=/linear-gradient|radial-gradient|conic-gradient/]",
           message:
             "Chrome Axiom A1.1: no gradients in chrome (Emotion). See DESIGN.md §Chrome Axioms.",
         },
-        // Chrome Axiom A1.2 — box-shadow in Emotion templates must reference a token,
-        // not raw rgba/hex/literal shadow.
+        // Chrome Axiom A1.2 — box-shadow in Emotion templates must reference a token.
         {
           selector:
             "TemplateElement[value.raw=/box-shadow:\\s*(?!var\\(--buildrick-)/]",
           message:
             "Chrome Axiom A1.2: box-shadow must use a --buildrick-shadow-* token. See DESIGN.md §Chrome Axioms.",
         },
-        // Chrome Axiom A1.2 — JSX inline-style boxShadow property with a raw string value.
-        // Catches style={{ boxShadow: "0 2px 8px rgba(...)" }} patterns.
+        // Chrome Axiom A1.2 — JSX inline-style boxShadow with raw string value.
         {
           selector:
             "Property[key.name='boxShadow'][value.type='Literal'][value.value=/rgb|rgba|#[0-9a-fA-F]|^[0-9]/]",
@@ -123,12 +125,33 @@ export default [
             "Chrome Axiom A1.2: boxShadow inline style must reference a --buildrick-shadow-* token via var(). See DESIGN.md §Chrome Axioms.",
         },
         // Chrome Axiom A1.1 — JSX inline-style backgroundImage with a gradient.
-        // Catches style={{ backgroundImage: "linear-gradient(...)" }} patterns.
         {
           selector:
             "Property[key.name='backgroundImage'][value.type='Literal'][value.value=/gradient/]",
           message:
             "Chrome Axiom A1.1: backgroundImage inline style must not use a gradient. See DESIGN.md §Chrome Axioms.",
+        },
+        // Survivor #3 — banned magic layout literal in a React.CSSProperties
+        // or Emotion object Property. Import from src/shared/constants/layout.ts.
+        // 177 existing TSX violations (Gate 14 baseline); WARN until Week 3
+        // PanelShell migration lowers the count.
+        // Selector uses `value.raw` (string) not `value.value` (number) — regex
+        // in ESLint selectors operates on strings.
+        // Numeric form: `height: 44` — Literal.raw is "44".
+        {
+          selector:
+            "Property[key.type='Identifier'][key.name=/^(height|width|minHeight|maxWidth|minWidth|maxHeight|padding|paddingLeft|paddingRight|paddingTop|paddingBottom|margin|marginLeft|marginRight|marginTop|marginBottom|top|bottom|left|right|gap|rowGap|columnGap)$/][value.type='Literal'][value.raw=/^(28|32|36|40|44|48|56|60|240|300|320)$/]",
+          message:
+            "Survivor #3: magic layout literal banned. Import from src/shared/constants/layout.ts (RAIL_W / SIDEBAR_W / INSPECTOR_W / TOPBAR_H / HEADER_H / TOOLBAR_H / FOOTER_H / ROW_SM / ROW_MD / ROW_LG).",
+        },
+        // String-px form: `height: "44px"` — Literal.raw is `"44px"` (with quotes).
+        // Common in TSX files where CSS-property strings are used. Gate 14 counts
+        // these; parity between ESLint and gate requires both selectors.
+        {
+          selector:
+            "Property[key.type='Identifier'][key.name=/^(height|width|minHeight|maxWidth|minWidth|maxHeight|padding|paddingLeft|paddingRight|paddingTop|paddingBottom|margin|marginLeft|marginRight|marginTop|marginBottom|top|bottom|left|right|gap|rowGap|columnGap)$/][value.type='Literal'][value.raw=/^[\"'](28|32|36|40|44|48|56|60|240|300|320)px[\"']$/]",
+          message:
+            "Survivor #3: magic layout literal (string form) banned. Import from src/shared/constants/layout.ts and interpolate, e.g. height: `${HEADER_H}px`.",
         },
       ],
     },
@@ -145,6 +168,37 @@ export default [
           property: "borderRadius",
           message:
             "Chrome Axiom A1.3: panel chrome border-radius must be ≤ 4 (--buildrick-radius-sm). Form atoms exempt. See DESIGN.md §Chrome Axioms.",
+        },
+      ],
+    },
+  },
+  // Survivor #6 — ban legacy components/** imports from editor/** code.
+  // CLAUDE.md already forbids this socially; this makes it a build gate.
+  // Zero existing violations verified 2026-04-20, so ships as error (not warn).
+  // Covers relative, absolute-src, and the tsconfig path aliases
+  // @/components/* and @components/* (see packages/editor/tsconfig.json paths).
+  {
+    files: ["src/editor/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "**/components/**",
+                "../components/**",
+                "../../components/**",
+                "../../../components/**",
+                "@components/**",
+                "@components",
+                "@/components/**",
+                "src/components/**",
+              ],
+              message:
+                "src/components/ is legacy (CLAUDE.md: 371 files, do not add). Move the source to src/editor/ or src/shared/ui/, or import a shared primitive instead.",
+            },
+          ],
         },
       ],
     },
