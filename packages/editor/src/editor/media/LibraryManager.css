@@ -1,11 +1,3 @@
-/**
- * Library Manager — fullpage 3-column asset manager
- * Matches wireframe Surface 0 at DESIGN.md token fidelity.
- * @license BSD-3-Clause
- */
-
-/* ─── Shell ──────────────────────────────────────────── */
-
 .mgr {
   width: 100%;
   height: 100%;
@@ -16,8 +8,6 @@
   font-size: 13px;
   color: var(--buildrick-text-primary);
 }
-
-/* ─── Top bar ────────────────────────────────────────── */
 
 .mgr-top {
   background: var(--buildrick-bg-card, #fff);
@@ -38,7 +28,9 @@
   color: var(--buildrick-text-primary);
   white-space: nowrap;
 }
+
 .mgr-title svg { width: 16px; height: 16px; color: var(--buildrick-accent, #1D4ED8); }
+
 .mgr-title .mgr-tag {
   background: var(--buildrick-accent-tint, #DBEAFE);
   color: var(--buildrick-text-primary, #1E40AF);
@@ -66,9 +58,13 @@
   white-space: nowrap;
   flex-shrink: 0;
 }
+
 .mgr-breadcrumb .mgr-crumb { cursor: pointer; }
+
 .mgr-breadcrumb .mgr-crumb:hover { color: var(--buildrick-accent); }
+
 .mgr-breadcrumb .mgr-crumb-current { color: var(--buildrick-text-primary); font-weight: 600; }
+
 .mgr-breadcrumb .mgr-sep { color: var(--buildrick-text-disabled, #CBD5E1); }
 
 .mgr-search {
@@ -86,7 +82,9 @@
   color: var(--buildrick-text-disabled);
   font-size: 13px;
 }
+
 .mgr-search svg { width: 14px; height: 14px; flex-shrink: 0; }
+
 .mgr-search input {
   border: none;
   background: transparent;
@@ -95,7 +93,9 @@
   font-size: 13px;
   color: var(--buildrick-text-primary);
 }
+
 .mgr-search input::placeholder { color: var(--buildrick-text-disabled); }
+
 .mgr-search .mgr-kbd {
   font-size: 10px;
   color: var(--buildrick-text-disabled);
@@ -124,7 +124,9 @@
   align-items: center;
   gap: 6px;
 }
+
 .mgr-btn:hover { background: var(--buildrick-bg-subtle); }
+
 .mgr-btn svg { width: 14px; height: 14px; }
 
 .mgr-btn-primary {
@@ -141,7 +143,9 @@
   align-items: center;
   gap: 6px;
 }
+
 .mgr-btn-primary:hover { filter: brightness(0.92); }
+
 .mgr-btn-primary svg { width: 14px; height: 14px; }
 
 .mgr-close {
@@ -156,9 +160,8 @@
   justify-content: center;
   cursor: pointer;
 }
-.mgr-close:hover { background: var(--buildrick-bg-subtle); color: var(--buildrick-text-primary); }
 
-/* ─── Body (3-column) ────────────────────────────────── */
+.mgr-close:hover { background: var(--buildrick-bg-subtle); color: var(--buildrick-text-primary); }
 
 .mgr-body {
   display: grid;
@@ -167,13 +170,11 @@
   overflow: hidden;
 }
 
-/* Responsive: collapse details rail */
 @media (max-width: 1320px) {
-  .mgr-body { grid-template-columns: 200px 1fr; }
-  .mgr-details { display: none; }
-}
+.mgr-body { grid-template-columns: 200px 1fr; }
 
-/* ─── Left: Folder tree ──────────────────────────────── */
+.mgr-details { display: none; }
+}
 
 .mgr-left {
   background: var(--buildrick-bg-panel);
@@ -208,7 +209,9 @@
   justify-content: center;
   cursor: pointer;
 }
+
 .mgr-tree-add:hover { background: var(--buildrick-bg-subtle); color: var(--buildrick-accent); }
+
 .mgr-tree-add svg { width: 12px; height: 12px; }
 
 .mgr-tree {
@@ -242,7 +245,9 @@
   color: var(--buildrick-text-secondary);
   cursor: pointer;
 }
+
 .mgr-node:hover { background: var(--buildrick-bg-subtle); }
+
 .mgr-node.active {
   background: var(--buildrick-accent-tint, #DBEAFE);
   color: var(--buildrick-text-primary, #1E40AF);
@@ -254,12 +259,14 @@
   color: var(--buildrick-text-disabled);
   flex-shrink: 0;
 }
+
 .mgr-node .mgr-chev.hidden { visibility: hidden; }
 
 .mgr-node .mgr-node-ico {
   width: 14px; height: 14px;
   flex-shrink: 0;
 }
+
 .mgr-node.active .mgr-node-ico { color: var(--buildrick-accent); }
 
 .mgr-node .mgr-node-dot {
@@ -286,12 +293,12 @@
   color: var(--buildrick-text-disabled);
   font-variant-numeric: tabular-nums;
 }
+
 .mgr-node.active .mgr-node-count { color: var(--buildrick-accent); }
 
 .mgr-node.depth-1 { padding-left: 20px; }
-.mgr-node.depth-2 { padding-left: 36px; }
 
-/* ─── Middle: Asset grid ─────────────────────────────── */
+.mgr-node.depth-2 { padding-left: 36px; }
 
 .mgr-main {
   background: var(--buildrick-bg-card, #fff);
@@ -329,6 +336,7 @@
   cursor: pointer;
   border: none;
 }
+
 .mgr-pill.active {
   background: var(--buildrick-accent-tint, #DBEAFE);
   color: var(--buildrick-text-primary, #1E40AF);
@@ -348,6 +356,7 @@
   background: var(--buildrick-bg-card);
   cursor: pointer;
 }
+
 .mgr-sort svg { width: 12px; height: 12px; color: var(--buildrick-text-disabled); }
 
 .mgr-view-toggle {
@@ -357,6 +366,7 @@
   padding: 2px;
   gap: 2px;
 }
+
 .mgr-view-toggle button {
   width: 28px; height: 24px;
   border-radius: 3px;
@@ -368,11 +378,13 @@
   justify-content: center;
   cursor: pointer;
 }
+
 .mgr-view-toggle button.active {
   background: var(--buildrick-bg-card);
   color: var(--buildrick-accent);
   box-shadow: 0 1px 2px rgba(15,23,42,0.08);
 }
+
 .mgr-view-toggle button svg { width: 12px; height: 12px; }
 
 .mgr-grid {
@@ -384,11 +396,11 @@
   gap: 14px;
   align-content: start;
 }
+
 @media (max-width: 1320px) {
-  .mgr-grid { grid-template-columns: repeat(4, 1fr); }
+.mgr-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
-/* Asset card */
 .mgr-asset {
   background: var(--buildrick-bg-card);
   border: 1px solid var(--buildrick-border, #D1D9E6);
@@ -398,7 +410,9 @@
   cursor: pointer;
   transition: box-shadow 0.12s;
 }
+
 .mgr-asset:hover { box-shadow: 0 2px 8px rgba(15,23,42,0.06); }
+
 .mgr-asset.selected {
   outline: 2px solid var(--buildrick-accent);
   outline-offset: -1px;
@@ -413,13 +427,13 @@
   align-items: center;
   justify-content: center;
 }
+
 .mgr-asset-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* Source badge */
 .mgr-badge {
   position: absolute;
   top: 6px; left: 6px;
@@ -434,10 +448,11 @@
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }
+
 .mgr-badge.uploaded { background: var(--buildrick-bg-subtle); color: var(--buildrick-text-secondary); }
+
 .mgr-badge.stock { background: var(--buildrick-accent-tint); color: var(--buildrick-text-primary); }
 
-/* Usage chip */
 .mgr-usage {
   position: absolute;
   top: 6px; right: 6px;
@@ -456,6 +471,7 @@
 .mgr-asset-meta {
   padding: 6px 8px 8px;
 }
+
 .mgr-asset-name {
   font-size: 11px;
   color: var(--buildrick-text-secondary);
@@ -464,13 +480,13 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .mgr-asset-sub {
   font-size: 10px;
   color: var(--buildrick-text-disabled);
   margin-top: 2px;
 }
 
-/* Selection check */
 .mgr-sel-check {
   position: absolute;
   right: 6px; bottom: 6px;
@@ -482,9 +498,8 @@
   align-items: center;
   justify-content: center;
 }
-.mgr-sel-check svg { width: 12px; height: 12px; }
 
-/* ─── Sort dropdown ───────────────────────────────────── */
+.mgr-sel-check svg { width: 12px; height: 12px; }
 
 .mgr-sort-wrap {
   position: relative;
@@ -527,7 +542,9 @@
   text-align: left;
   white-space: nowrap;
 }
+
 .mgr-sort-item:hover { background: var(--buildrick-bg-subtle); }
+
 .mgr-sort-item.active { color: var(--buildrick-accent); font-weight: 600; }
 
 .mgr-sort-sep {
@@ -535,8 +552,6 @@
   background: var(--buildrick-border-light);
   margin: 4px 0;
 }
-
-/* ─── Tree chevron button ─────────────────────────────── */
 
 .mgr-chev-btn {
   width: 14px;
@@ -552,12 +567,11 @@
   padding: 0;
   flex-shrink: 0;
 }
+
 .mgr-chev-btn:hover {
   background: rgba(15, 23, 42, 0.06);
   color: var(--buildrick-text-primary);
 }
-
-/* ─── Folder delete button (hover only) ───────────────── */
 
 .mgr-node-del {
   background: none;
@@ -568,14 +582,14 @@
   display: none;
   align-items: center;
 }
+
 .mgr-node:hover .mgr-node-del {
   display: inline-flex;
 }
+
 .mgr-node-del:hover {
   color: var(--buildrick-error, #DC2626);
 }
-
-/* ─── Bulk action bar ────────────────────────────────── */
 
 .mgr-bulk-bar {
   display: flex;
@@ -599,26 +613,11 @@
   margin-right: 8px;
 }
 
-/* ─── List view ──────────────────────────────────────── */
-
 .mgr-list {
   flex: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-}
-
-.mgr-list-header {
-  display: grid;
-  grid-template-columns: 40px 1fr 60px 100px 80px;
-  gap: 12px;
-  padding: 8px 20px;
-  border-bottom: 1px solid var(--buildrick-border-light);
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--buildrick-text-disabled);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .mgr-list-row {
@@ -633,7 +632,9 @@
   color: var(--buildrick-text-secondary);
   transition: background 0.1s;
 }
+
 .mgr-list-row:hover { background: var(--buildrick-bg-subtle); }
+
 .mgr-list-row.selected {
   background: var(--buildrick-accent-tint, #DBEAFE);
   outline: none;
@@ -650,6 +651,7 @@
   justify-content: center;
   flex-shrink: 0;
 }
+
 .mgr-list-thumb img {
   width: 100%;
   height: 100%;
@@ -684,7 +686,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Grid footer */
 .mgr-grid-foot {
   border-top: 1px solid var(--buildrick-border-light);
   padding: 10px 20px;
@@ -694,8 +695,6 @@
   color: var(--buildrick-text-disabled);
   flex-shrink: 0;
 }
-
-/* ─── Right: Details rail ────────────────────────────── */
 
 .mgr-details {
   background: var(--buildrick-bg-panel);
@@ -710,6 +709,7 @@
   border-bottom: 1px solid var(--buildrick-border-light);
   background: var(--buildrick-bg-card);
 }
+
 .mgr-det-filename {
   font-size: 14px;
   font-weight: 600;
@@ -719,6 +719,7 @@
   align-items: center;
   gap: 6px;
 }
+
 .mgr-det-sub {
   font-size: 11px;
   color: var(--buildrick-text-disabled);
@@ -733,6 +734,7 @@
   justify-content: center;
   overflow: hidden;
 }
+
 .mgr-det-preview img {
   max-width: 100%;
   max-height: 100%;
@@ -745,6 +747,7 @@
   border-bottom: 1px solid var(--buildrick-border-light);
   background: var(--buildrick-bg-card);
 }
+
 .mgr-det-tab {
   padding: 10px 12px;
   font-size: 12px;
@@ -756,6 +759,7 @@
   position: relative;
   top: 1px;
 }
+
 .mgr-det-tab.active {
   color: var(--buildrick-accent);
   border-bottom: 2px solid var(--buildrick-accent);
@@ -775,7 +779,9 @@
   font-size: 12px;
   margin-bottom: 16px;
 }
+
 .mgr-kv-key { color: var(--buildrick-text-disabled); }
+
 .mgr-kv-val { color: var(--buildrick-text-secondary); font-weight: 500; }
 
 .mgr-used-head {
@@ -789,6 +795,7 @@
   justify-content: space-between;
   align-items: center;
 }
+
 .mgr-used-count {
   background: var(--buildrick-accent-tint);
   color: var(--buildrick-text-primary);
@@ -797,24 +804,13 @@
   font-size: 10px;
 }
 
-.mgr-used-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  color: var(--buildrick-text-secondary);
-}
-.mgr-used-row:hover { background: var(--buildrick-bg-subtle); }
-
 .mgr-det-actions {
   display: flex;
   gap: 6px;
   margin-top: 14px;
   flex-wrap: wrap;
 }
+
 .mgr-det-actions .mgr-btn {
   flex: 1;
   min-width: 0;
@@ -823,13 +819,13 @@
   padding: 0 8px;
   justify-content: center;
 }
+
 .mgr-det-actions .mgr-btn.danger {
   color: var(--buildrick-error, #DC2626);
   border-color: #FECACA;
 }
-.mgr-det-actions .mgr-btn.danger:hover { background: #FEE2E2; }
 
-/* ─── Status bar ─────────────────────────────────────── */
+.mgr-det-actions .mgr-btn.danger:hover { background: #FEE2E2; }
 
 .mgr-status {
   background: var(--buildrick-bg-card);
@@ -862,6 +858,7 @@
   background: var(--buildrick-border-light);
   overflow: hidden;
 }
+
 .mgr-quota-fill {
   height: 100%;
   background: var(--buildrick-accent);
@@ -879,9 +876,8 @@
   font-size: 10px;
   font-weight: 600;
 }
-.mgr-sync-pill svg { width: 10px; height: 10px; }
 
-/* ─── Version history list ────────────────────────────── */
+.mgr-sync-pill svg { width: 10px; height: 10px; }
 
 .mgr-version-list {
   display: flex;
@@ -898,7 +894,9 @@
   cursor: pointer;
   transition: background 0.1s;
 }
+
 .mgr-version-row:hover { background: var(--buildrick-bg-subtle); }
+
 .mgr-version-row.active {
   background: var(--buildrick-accent-tint);
 }
@@ -915,13 +913,12 @@
   flex-shrink: 0;
   border: 1px solid var(--buildrick-border-light);
 }
+
 .mgr-version-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-
-/* ─── Empty state ────────────────────────────────────── */
 
 .mgr-empty {
   flex: 1;
@@ -951,6 +948,7 @@
   color: var(--buildrick-text-disabled);
   margin-bottom: 4px;
 }
+
 .mgr-empty-ring svg { width: 32px; height: 32px; }
 
 .mgr-empty-hero h4 {

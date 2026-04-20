@@ -52,6 +52,10 @@ const CHROME_EXEMPT = [
   // so PanelShell.tsx and future primitive additions stay enforced.
   "src/shared/ui/ds/Box.tsx",
   "src/shared/ui/ds/tokens.ts",
+  // B&W filter-preview gradient for stock photo source picker.
+  // The linear-gradient is DATA representing a visual filter option,
+  // not chrome styling. User-content preview, not chrome axiom scope.
+  "src/editor/sidebar/tabs/media/components/StockSourceModal.tsx",
 ];
 
 // Form atoms — may use the full radius/shadow scale. Exempt ONLY from the

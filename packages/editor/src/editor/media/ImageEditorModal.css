@@ -1,8 +1,3 @@
-/**
- * Image Editor Modal — react-easy-crop + CSS filters
- * @license BSD-3-Clause
- */
-
 .ie-backdrop {
   position: fixed;
   inset: 0;
@@ -24,8 +19,6 @@
   flex-direction: column;
   overflow: hidden;
 }
-
-/* ─── Header ──────────────────────────────────── */
 
 .ie-header {
   display: flex;
@@ -60,6 +53,7 @@
   font-weight: 500;
   cursor: pointer;
 }
+
 .ie-btn-ghost:hover { background: var(--buildrick-bg-subtle, #F1F5F9); }
 
 .ie-btn-primary {
@@ -76,7 +70,9 @@
   align-items: center;
   gap: 6px;
 }
+
 .ie-btn-primary:hover { filter: brightness(0.92); }
+
 .ie-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .ie-close {
@@ -91,9 +87,8 @@
   justify-content: center;
   cursor: pointer;
 }
-.ie-close:hover { background: var(--buildrick-bg-subtle); color: var(--buildrick-text-primary); }
 
-/* ─── Body ────────────────────────────────────── */
+.ie-close:hover { background: var(--buildrick-bg-subtle); color: var(--buildrick-text-primary); }
 
 .ie-body {
   flex: 1;
@@ -101,8 +96,6 @@
   grid-template-columns: 1fr 280px;
   min-height: 0;
 }
-
-/* ─── Canvas (left) ───────────────────────────── */
 
 .ie-canvas {
   position: relative;
@@ -132,6 +125,7 @@
   padding: 20px;
   pointer-events: none;
 }
+
 .ie-canvas-error svg {
   color: #F59E0B;
   opacity: 0.9;
@@ -142,13 +136,10 @@
   inset: 0;
 }
 
-/* Override react-easy-crop container */
 .ie-cropper-wrap .reactEasyCrop_Container {
   position: absolute;
   inset: 0;
 }
-
-/* ─── Sidebar (right) ─────────────────────────── */
 
 .ie-sidebar {
   background: var(--buildrick-bg-panel);
@@ -180,7 +171,9 @@
   gap: 5px;
   transition: all 0.12s;
 }
+
 .ie-tab:hover { color: var(--buildrick-text-secondary); }
+
 .ie-tab.active {
   color: var(--buildrick-accent, #1D4ED8);
   border-bottom-color: var(--buildrick-accent, #1D4ED8);
@@ -193,8 +186,6 @@
   padding: 16px;
 }
 
-/* ─── Controls shared ─────────────────────────── */
-
 .ie-section-label {
   font-size: 11px;
   font-weight: 700;
@@ -204,6 +195,7 @@
   margin-bottom: 8px;
   margin-top: 16px;
 }
+
 .ie-section-label:first-child { margin-top: 0; }
 
 .ie-slider-row {
@@ -221,6 +213,7 @@
   border-radius: 2px;
   outline: none;
 }
+
 .ie-slider::-webkit-slider-thumb {
   appearance: none;
   width: 14px;
@@ -241,8 +234,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ─── Crop presets ────────────────────────────── */
-
 .ie-presets {
   display: flex;
   flex-wrap: wrap;
@@ -261,14 +252,14 @@
   font-weight: 600;
   cursor: pointer;
 }
+
 .ie-preset:hover { background: var(--buildrick-bg-subtle); }
+
 .ie-preset.active {
   background: var(--buildrick-accent-tint, #DBEAFE);
   color: var(--buildrick-text-primary, #1E40AF);
   border-color: var(--buildrick-accent, #1D4ED8);
 }
-
-/* ─── Transform buttons ──────────────────────── */
 
 .ie-transform-btns {
   display: flex;
@@ -288,14 +279,14 @@
   cursor: pointer;
   transition: all 0.12s;
 }
+
 .ie-tool-btn:hover { background: var(--buildrick-bg-subtle); }
+
 .ie-tool-btn.active {
   background: var(--buildrick-accent-tint);
   color: var(--buildrick-text-primary);
   border-color: var(--buildrick-accent);
 }
-
-/* ─── Resize ──────────────────────────────────── */
 
 .ie-resize-inputs {
   display: flex;
@@ -310,6 +301,7 @@
   font-size: 12px;
   color: var(--buildrick-text-disabled);
 }
+
 .ie-resize-field input {
   width: 80px;
   height: 32px;
@@ -322,6 +314,7 @@
   text-align: center;
   outline: none;
 }
+
 .ie-resize-field input:focus {
   border-color: var(--buildrick-accent);
 }

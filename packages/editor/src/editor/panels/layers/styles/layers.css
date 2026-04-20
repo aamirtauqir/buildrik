@@ -1,16 +1,3 @@
-/* ===========================================
-   LAYERS PANEL - Extracted CSS Module
-
-   Purpose: Styles for the Layer tree view,
-   DOM hierarchy, and layer management UI.
-
-   Extracted from LeftSidebar.css as part of
-   CSS modularization (Task 9 - UX Audit 2026)
-   =========================================== */
-
-/* ─────────────────────────────────────────────
-   LAYER CSS VARIABLES
-   ───────────────────────────────────────────── */
 .buildrick-layers-panel {
   /* Layer Colors - Using theme variables */
   --layer-accent: var(--buildrick-info);
@@ -33,14 +20,10 @@
   height: 100%;
 }
 
-/* Minimal Tree Variant - Maximum content space */
 .buildrick-layers-minimal {
   padding: 0;
 }
 
-/* ─────────────────────────────────────────────
-   MINIMAL SEARCH ROW (Search + Settings only)
-   ───────────────────────────────────────────── */
 .buildrick-layers-search-row {
   display: flex;
   flex-direction: column;
@@ -51,9 +34,6 @@
   flex-shrink: 0;
 }
 
-/* Header row (toolbar buttons + count) sits above the search input so the
-   search input gets the full panel width and doesn't get squeezed when the
-   sidebar is narrow. */
 .buildrick-layers-search-row .buildrick-layers-header-row {
   display: flex;
   align-items: center;
@@ -71,9 +51,6 @@
   min-width: 0;
 }
 
-/* ─────────────────────────────────────────────
-   MINIMAL TREE VIEW (Full height, scrollable)
-   ───────────────────────────────────────────── */
 .buildrick-layers-tree-minimal {
   flex: 1;
   overflow-y: auto;
@@ -81,9 +58,6 @@
   background: var(--buildrick-bg-panel);
 }
 
-/* ─────────────────────────────────────────────
-   LAYER PANEL HEADER
-   ───────────────────────────────────────────── */
 .buildrick-layers-header {
   display: flex;
   flex-direction: column;
@@ -92,34 +66,6 @@
   background: var(--buildrick-surface-3);
   border-radius: var(--buildrick-radius-md);
   margin-bottom: 8px;
-}
-
-.buildrick-layers-header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.buildrick-layers-header-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: var(--buildrick-text-sm-plus);
-  font-weight: 600;
-  color: var(--buildrick-text-primary);
-}
-
-.buildrick-layers-header-icon {
-  color: var(--buildrick-text-tertiary);
-}
-
-.buildrick-layers-header-count {
-  font-size: var(--buildrick-text-sm);
-  font-weight: 500;
-  padding: 2px 8px;
-  background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent);
-  border-radius: 10px;
 }
 
 .buildrick-layers-header-actions {
@@ -146,9 +92,6 @@
   color: var(--buildrick-text-primary);
 }
 
-/* ─────────────────────────────────────────────
-   LAYER ROW (Updated with CSS vars)
-   ───────────────────────────────────────────── */
 .buildrick-layer-row {
   position: relative;
   display: flex;
@@ -175,7 +118,6 @@
   color: var(--buildrick-text-primary);
 }
 
-/* Selected left bar indicator */
 .buildrick-layer-row.is-selected::before {
   content: "";
   position: absolute;
@@ -191,7 +133,6 @@
   opacity: 0.5;
 }
 
-/* WCAG 2.1 AA: Focus visible for keyboard navigation in layer tree */
 .buildrick-layer-row:focus-visible {
   outline: 2px solid var(--buildrick-accent);
   outline-offset: -2px;
@@ -199,9 +140,6 @@
   z-index: 1;
 }
 
-/* ─────────────────────────────────────────────
-   LAYER TOGGLE (Expand/Collapse)
-   ───────────────────────────────────────────── */
 .buildrick-layer-toggle {
   display: flex;
   align-items: center;
@@ -231,7 +169,6 @@
   transform: rotate(-90deg);
 }
 
-/* Placeholder for leaf nodes (no children) */
 .buildrick-layer-toggle-placeholder {
   width: 16px;
   height: 16px;
@@ -243,9 +180,6 @@
   flex-shrink: 0;
 }
 
-/* ─────────────────────────────────────────────
-   LAYER ICON (Type-based) — 14×14, 6px right of chevron
-   ───────────────────────────────────────────── */
 .buildrick-layer-icon {
   display: flex;
   align-items: center;
@@ -262,9 +196,6 @@
   height: 14px;
 }
 
-/* ─────────────────────────────────────────────
-   LAYER NAME & TYPE TAG
-   ───────────────────────────────────────────── */
 .buildrick-layer-name {
   flex: 1;
   min-width: 0;
@@ -298,9 +229,6 @@
   opacity: 0.6;
 }
 
-/* ─────────────────────────────────────────────
-   COMPONENT BADGE
-   ───────────────────────────────────────────── */
 .buildrick-component-badge {
   display: flex;
   align-items: center;
@@ -314,13 +242,6 @@
   flex-shrink: 0;
 }
 
-.buildrick-component-badge-icon {
-  font-size: var(--buildrick-text-xs);
-}
-
-/* ─────────────────────────────────────────────
-   LAYER ACTIONS (Eye/Lock — visible on row hover only)
-   ───────────────────────────────────────────── */
 .buildrick-layer-actions {
   display: flex;
   gap: 2px;
@@ -356,9 +277,6 @@
   color: var(--buildrick-text-primary);
 }
 
-/* ─────────────────────────────────────────────
-   HIDDEN STATE - Show eye button always when hidden
-   ───────────────────────────────────────────── */
 .buildrick-layer-row.is-hidden {
   opacity: 0.5;
 }
@@ -379,9 +297,6 @@
   background: var(--layer-warning-alpha);
 }
 
-/* ─────────────────────────────────────────────
-   LOCKED STATE - Show lock button always when locked
-   ───────────────────────────────────────────── */
 .buildrick-layer-row.is-locked {
   cursor: not-allowed;
 }
@@ -398,9 +313,6 @@
   background: var(--layer-muted-alpha);
 }
 
-/* ─────────────────────────────────────────────
-   DROP INDICATORS — PRD §9.6: 2px line, buildrick-primary color
-   ───────────────────────────────────────────── */
 .buildrick-drop-indicator {
   position: absolute;
   left: 0;
@@ -433,9 +345,6 @@
   border-radius: var(--buildrick-radius-sm);
 }
 
-/* ─────────────────────────────────────────────
-   BIDIRECTIONAL HOVER HIGHLIGHT
-   ───────────────────────────────────────────── */
 .buildrick-layer-row.is-canvas-hovered,
 .buildrick-layer-row.is-layer-hovered {
   background: var(--buildrick-bg-hover) !important;
@@ -454,9 +363,6 @@
   border-radius: 0 1px 1px 0;
 }
 
-/* ─────────────────────────────────────────────
-   LAYER NAME INPUT (Editing)
-   ───────────────────────────────────────────── */
 .buildrick-layer-name-input {
   width: 100%;
   padding: 2px 6px;
@@ -473,9 +379,6 @@
   box-shadow: 0 0 0 2px var(--layer-success-alpha);
 }
 
-/* ─────────────────────────────────────────────
-   TREE DEPTH LINES
-   ───────────────────────────────────────────── */
 .buildrick-layer-tree-lines {
   position: absolute;
   top: 0;
@@ -492,93 +395,6 @@
   background: var(--layer-accent-soft);
 }
 
-/* ─────────────────────────────────────────────
-   MULTI-SELECT TOOLBAR
-   ───────────────────────────────────────────── */
-.buildrick-multiselect-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: var(--buildrick-surface-4);
-  border-radius: var(--buildrick-radius-md);
-  margin-bottom: 8px;
-}
-
-.buildrick-multiselect-count {
-  font-size: var(--buildrick-text-sm);
-  font-weight: 500;
-  color: var(--buildrick-text-secondary);
-}
-
-.buildrick-multiselect-actions {
-  display: flex;
-  gap: 4px;
-  margin-left: auto;
-}
-
-.buildrick-multiselect-btn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  background: var(--buildrick-surface-3);
-  border: none;
-  border-radius: var(--buildrick-radius-sm);
-  font-size: var(--buildrick-text-sm);
-  color: var(--buildrick-text-primary);
-  cursor: pointer;
-  transition: var(--buildrick-transition-fast);
-}
-
-.buildrick-multiselect-btn:hover {
-  background: var(--buildrick-accent-tint);
-  color: var(--buildrick-accent);
-}
-
-.buildrick-multiselect-close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  background: transparent;
-  border: none;
-  border-radius: var(--buildrick-radius-sm);
-  color: var(--buildrick-text-muted);
-  cursor: pointer;
-  transition: var(--buildrick-transition-fast);
-}
-
-.buildrick-multiselect-close:hover {
-  background: var(--buildrick-surface-3);
-  color: var(--buildrick-text-primary);
-}
-
-/* Add Page Button */
-.buildrick-add-page-btn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 10px;
-  background: transparent;
-  border: 1px dashed var(--buildrick-border);
-  border-radius: var(--buildrick-radius-md);
-  font-size: var(--buildrick-text-sm);
-  color: var(--buildrick-text-muted);
-  cursor: pointer;
-  transition: var(--buildrick-transition-fast);
-}
-
-.buildrick-add-page-btn:hover {
-  background: var(--buildrick-surface-3);
-  border-color: var(--buildrick-accent);
-  color: var(--buildrick-accent);
-}
-
-/* ─────────────────────────────────────────────
-   DELETE CONFIRMATION STRIP
-   ───────────────────────────────────────────── */
 .buildrick-delete-confirm {
   display: flex;
   align-items: center;
@@ -615,9 +431,6 @@
   cursor: pointer;
 }
 
-/* ─────────────────────────────────────────────
-   DISPLAY SETTINGS POPOVER
-   ───────────────────────────────────────────── */
 .buildrick-layer-display-settings {
   position: absolute;
   top: 44px;
@@ -630,6 +443,7 @@
   min-width: 220px;
   padding: 4px 0 8px;
 }
+
 .buildrick-lds-header {
   display: flex;
   align-items: center;
@@ -638,11 +452,13 @@
   border-bottom: 1px solid var(--buildrick-border);
   margin-bottom: 4px;
 }
+
 .buildrick-lds-title {
   font-size: 12px;
   font-weight: 600;
   color: var(--buildrick-text-primary);
 }
+
 .buildrick-lds-close {
   background: none;
   border: none;
@@ -652,6 +468,7 @@
   line-height: 1;
   padding: 0 4px;
 }
+
 .buildrick-lds-row {
   display: flex;
   align-items: center;
@@ -660,9 +477,11 @@
   cursor: pointer;
   gap: 8px;
 }
+
 .buildrick-lds-row:hover {
   background: var(--buildrick-surface-hover, rgba(255,255,255,0.04));
 }
+
 .buildrick-lds-label {
   display: flex;
   flex-direction: column;
@@ -670,34 +489,31 @@
   font-size: 12px;
   color: var(--buildrick-text-primary);
 }
+
 .buildrick-lds-hint {
   font-size: 12px;
   color: var(--buildrick-text-tertiary);
 }
 
-/* ─────────────────────────────────────────────
-   HEADER ROW (count + expand/collapse buttons)
-   ───────────────────────────────────────────── */
 .buildrick-layers-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 4px 12px 0;
 }
+
 .buildrick-layers-header-actions {
   display: flex;
   align-items: center;
   gap: 4px;
 }
+
 .buildrick-layers-count {
   font-size: 12px;
   color: var(--buildrick-text-tertiary);
   margin-left: 4px;
 }
 
-/* ─────────────────────────────────────────────
-   CONTEXT MENU
-   ───────────────────────────────────────────── */
 .buildrick-layer-ctx-menu {
   background: var(--buildrick-surface-2);
   border: 1px solid var(--buildrick-border);
@@ -707,6 +523,7 @@
   padding: 4px 0;
   user-select: none;
 }
+
 .buildrick-layer-ctx-item {
   display: flex;
   align-items: center;
@@ -721,25 +538,27 @@
   text-align: left;
   gap: 16px;
 }
+
 .buildrick-layer-ctx-item:hover {
   background: var(--buildrick-surface-hover, rgba(255,255,255,0.06));
 }
+
 .buildrick-layer-ctx-item--danger { color: var(--buildrick-error); }
+
 .buildrick-layer-ctx-item--danger:hover { background: rgba(239,68,68,0.1); }
+
 .buildrick-layer-ctx-divider {
   height: 1px;
   background: var(--buildrick-border);
   margin: 4px 0;
 }
+
 .buildrick-ctx-hint {
   color: var(--buildrick-text-tertiary);
   font-size: 12px;
   flex-shrink: 0;
 }
 
-/* ─────────────────────────────────────────────
-   MULTI-SELECT BANNER
-   ───────────────────────────────────────────── */
 .buildrick-layer-sel-banner {
   display: flex;
   align-items: center;
@@ -749,12 +568,14 @@
   border-bottom: 1px solid var(--buildrick-info);
   flex-shrink: 0;
 }
+
 .buildrick-sel-count {
   font-size: 12px;
   font-weight: 600;
   color: var(--buildrick-info);
   flex: 1;
 }
+
 .buildrick-sel-btn {
   padding: 2px 8px;
   border-radius: 4px;
@@ -764,18 +585,18 @@
   font-size: 12px;
   cursor: pointer;
 }
+
 .buildrick-sel-btn:hover { background: var(--buildrick-bg-hover); }
+
 .buildrick-sel-btn--danger { border-color: var(--buildrick-error); color: var(--buildrick-error); }
+
 .buildrick-sel-btn--muted { color: var(--buildrick-text-tertiary); }
-/* Multi-selected row styling */
+
 .buildrick-layer-row.is-multi-selected {
   background: rgba(59, 130, 246, 0.12) !important;
   outline: 1px solid rgba(59, 130, 246, 0.3);
 }
 
-/* ─────────────────────────────────────────────
-   BREADCRUMB
-   ───────────────────────────────────────────── */
 .buildrick-layer-breadcrumb {
   display: flex;
   align-items: center;
@@ -786,6 +607,7 @@
   background: var(--buildrick-bg-panel);
   flex-shrink: 0;
 }
+
 .buildrick-bc-crumb {
   background: none;
   border: none;
@@ -795,13 +617,13 @@
   padding: 1px 2px;
   border-radius: 2px;
 }
+
 .buildrick-bc-crumb:hover { color: var(--buildrick-text-primary); background: var(--buildrick-bg-hover); }
+
 .buildrick-bc-sep { color: var(--buildrick-text-tertiary); font-size: 12px; }
+
 .buildrick-bc-current { font-size: 12px; font-weight: 600; color: var(--buildrick-text-primary); }
 
-/* ─────────────────────────────────────────────
-   LAYERS EMPTY STATE (no elements on canvas)
-   ───────────────────────────────────────────── */
 .buildrick-layers-empty-state-custom {
   display: flex;
   flex-direction: column;
@@ -831,9 +653,6 @@
   margin: 0;
 }
 
-/* ─────────────────────────────────────────────
-   SEARCH EMPTY STATE
-   ───────────────────────────────────────────── */
 .buildrick-layers-empty-search {
   display: flex;
   flex-direction: column;
@@ -842,8 +661,11 @@
   gap: 8px;
   text-align: center;
 }
+
 .buildrick-les-icon { font-size: 24px; }
+
 .buildrick-les-title { font-size: 12px; color: var(--buildrick-text-secondary); margin: 0; }
+
 .buildrick-les-clear {
   padding: 4px 12px;
   border-radius: 4px;
@@ -854,17 +676,11 @@
   cursor: pointer;
 }
 
-/* ─────────────────────────────────────────────
-   COMPACT DENSITY MODE
-   ───────────────────────────────────────────── */
 .buildrick-layers-compact .buildrick-layer-row {
   --layer-row-height: 24px;
   font-size: 12px;
 }
 
-/* ─────────────────────────────────────────────
-   BREAKPOINT VISIBILITY CHIPS
-   ───────────────────────────────────────────── */
 .buildrick-layer-bp-chip {
   font-size: 12px;
   font-weight: 700;
@@ -873,22 +689,19 @@
   letter-spacing: 0.03em;
   flex-shrink: 0;
 }
+
 .buildrick-bp-mobile {
   background: rgba(241, 196, 15, 0.2);
   color: #f1c40f;
   border: 1px solid rgba(241, 196, 15, 0.3);
 }
+
 .buildrick-bp-tablet {
   background: rgba(52, 152, 219, 0.2);
   color: #3498db;
   border: 1px solid rgba(52, 152, 219, 0.3);
 }
 
-/* ─────────────────────────────────────────────
-   Selected row — WCAG AA compliant (design review Pass 5)
-   White text on cobalt-tint bg with cobalt left-border.
-   Do NOT use cobalt text on cobalt bg (4.0:1 fails AA).
-   ───────────────────────────────────────────── */
 .buildrick-layer-row.is-selected {
   background: var(--buildrick-accent-tint);
   color: var(--buildrick-text-primary);
@@ -911,9 +724,6 @@
   display: block;
 }
 
-/* ─────────────────────────────────────────────
-   Focus rings — universal 2px cobalt outline (design review Pass 2)
-   ───────────────────────────────────────────── */
 .buildrick-layer-row:focus-visible,
 .buildrick-layers-settings-btn:focus-visible,
 .buildrick-search-input:focus-visible,
@@ -923,22 +733,10 @@
   outline-offset: 2px;
 }
 
-/* ─────────────────────────────────────────────
-   Hover-reveal icons — smooth 100ms opacity (design review Pass 7)
-   Eye/lock icons fade in on row hover.
-   ───────────────────────────────────────────── */
-.buildrick-layer-row__icon--reveal {
-  opacity: 0;
-  transition: opacity 100ms ease;
-}
 .buildrick-layer-row:hover .buildrick-layer-row__icon--reveal {
   opacity: 1;
 }
 
-/* ─────────────────────────────────────────────
-   Sync banner — cobalt translucent fade-in
-   (replaces deleted lyr-sync-banner)
-   ───────────────────────────────────────────── */
 .buildrick-sync-banner {
   padding: 6px 12px;
   background: var(--buildrick-accent-tint);
@@ -953,26 +751,17 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─────────────────────────────────────────────
-   Multi-select action bar container (replaces deleted lyr-action-bar__actions)
-   ───────────────────────────────────────────── */
 .buildrick-layer-sel-actions {
   display: flex;
   gap: 8px;
 }
 
-/* ─────────────────────────────────────────────
-   Accessibility — honor prefers-reduced-motion (design review Pass 6)
-   ───────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .buildrick-sync-banner {
+.buildrick-sync-banner {
     animation: none;
   }
-  .buildrick-layer-row__icon--reveal {
-    transition: none;
-  }
-  .buildrick-layer-row {
+
+.buildrick-layer-row {
     transition: none;
   }
 }
-
