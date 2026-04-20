@@ -185,7 +185,7 @@ check_gate 11 "$GRADIENT_COUNT" "$BASE_11" "A1.1 — no chrome gradients" || exi
 # where the next non-whitespace token is var(--buildrick-shadow or var(--buildrick-glow.
 # Match all box-shadow / boxShadow occurrences first, then subtract token-bound ones.
 SHADOW_ALL=$(count_chrome '(box-shadow|boxShadow)[[:space:]]*:')
-SHADOW_TOKENIZED=$(count_chrome '(box-shadow|boxShadow)[[:space:]]*:[[:space:]]*"?var\(--buildrick-(shadow|glow)')
+SHADOW_TOKENIZED=$(count_chrome "(box-shadow|boxShadow)[[:space:]]*:[[:space:]]*[\"']?var\(--buildrick-(shadow|glow)")
 SHADOW_COUNT=$((SHADOW_ALL - SHADOW_TOKENIZED))
 check_gate 12 "$SHADOW_COUNT" "$BASE_12" "A1.2 — box-shadow via --buildrick-shadow-* token" || exit 1
 
