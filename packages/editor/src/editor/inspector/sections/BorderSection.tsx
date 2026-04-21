@@ -19,6 +19,13 @@ import { parseCssShorthand } from "../shared/utils/parseCssShorthand";
 export interface BorderSectionProps {
   styles: Record<string, string>;
   onChange: (property: string, value: string) => void;
+  /**
+   * Multi-property writes. Unused by the hand-written section (it routes
+   * everything through `onChange`), but kept on the prop contract so the
+   * schema-driven replacement — which uses it for corners4 linked-mode
+   * shorthand writes — can be swapped in with no registry changes.
+   */
+  onBatchChange?: (changes: Record<string, string>) => void;
   /** Controlled open state for auto-expand functionality */
   isOpen?: boolean;
   /** Called when the section header is toggled */

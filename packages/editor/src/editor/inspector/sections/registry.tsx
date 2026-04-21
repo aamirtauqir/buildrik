@@ -53,6 +53,8 @@ import { AllCSSSection } from "./AllCSSSection";
 import { AnimationSection } from "./AnimationSection";
 import { BackgroundSection } from "./BackgroundSection";
 import { BorderSection } from "./BorderSection";
+import { SchemaBorderSection } from "./border/SchemaBorderSection";
+import { USE_SCHEMA_BORDER } from "../renderer/featureFlags";
 import { CSSClassesSection } from "./CSSClassesSection";
 import { EffectsSection } from "./EffectsSection";
 import { ElementPropertiesSection } from "./elementProperties";
@@ -400,11 +402,16 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
   }),
 
   border: defineSection({
-    Component: BorderSection,
+    // Feature-flagged: localStorage.setItem("buildrick:schema-border", "1")
+    // + reload to render the schema-driven version. Default path remains
+    // the hand-written BorderSection until the schema reaches full parity
+    // including mixed-value badges and persisted advanced-toggle state.
+    Component: USE_SCHEMA_BORDER ? SchemaBorderSection : BorderSection,
     advancedKey: "border",
     styleKeys: ["border", "border-width", "border-style", "border-color", "border-radius"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
+      onBatchChange: ctx.onBatchChange,
       advancedExpanded: ctx.advancedExpanded,
       onAdvancedToggle: ctx.onAdvancedToggle,
     }),
