@@ -4,6 +4,7 @@
  */
 
 export { InspectorRenderer } from "./InspectorRenderer";
+export { borderEssentialsSchema } from "./schemas/border";
 export type { InspectorRendererProps } from "./InspectorRenderer";
 export { defaultControlRegistry } from "./controlRegistry";
 export type {
