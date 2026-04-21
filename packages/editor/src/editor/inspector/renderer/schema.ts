@@ -136,8 +136,26 @@ export interface GroupHeadingField {
   divider?: boolean;
 }
 
-/** Union of all supported field types. Discriminated on `type`. */
-export type Field =
+/**
+ * Structural wrapper: renders a disclosure toggle ("More settings") and
+ * conditionally renders a nested list of fields below it. Scope is flat —
+ * an advanced-group cannot contain another advanced-group.
+ *
+ * Handled directly by InspectorRenderer (not dispatched through the control
+ * registry) because the "group" pattern is structural, not input-shaped.
+ */
+export interface AdvancedGroupField {
+  type: "advanced-group";
+  /** Label shown on the disclosure toggle when collapsed. */
+  label: string;
+  /** Nested fields — must NOT contain another advanced-group. */
+  fields: readonly AtomicField[];
+  /** Initial expanded state. Default false. */
+  defaultExpanded?: boolean;
+}
+
+/** Field types that can be rendered directly by an atomic control. */
+export type AtomicField =
   | LengthField
   | NumberField
   | SelectField
@@ -147,6 +165,9 @@ export type Field =
   | Spacing4Field
   | Corners4Field
   | GroupHeadingField;
+
+/** Union of all supported field types. Discriminated on `type`. */
+export type Field = AtomicField | AdvancedGroupField;
 
 // ============================================================================
 // SECTION SCHEMA
@@ -191,9 +212,12 @@ export interface ControlProps<F extends Field = Field> {
 }
 
 /**
- * Registry shape. One React component per discriminator. Renderer looks up
- * field.type here to resolve the control.
+ * Registry shape. One React component per atomic discriminator. The renderer
+ * looks up `field.type` here for atomic fields; advanced-group is handled
+ * directly by the renderer and intentionally not listed here.
  */
 export type ControlRegistry = {
-  [K in Field["type"]]: React.FC<ControlProps<Extract<Field, { type: K }>>>;
+  [K in AtomicField["type"]]: React.FC<
+    ControlProps<Extract<AtomicField, { type: K }>>
+  >;
 };

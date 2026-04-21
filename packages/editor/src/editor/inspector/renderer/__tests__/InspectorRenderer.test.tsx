@@ -288,6 +288,68 @@ describe("InspectorRenderer", () => {
     });
   });
 
+  it("advanced-group hides its nested fields until the disclosure is toggled", () => {
+    const onChange = vi.fn();
+    const schema: SectionSchema = {
+      id: "x",
+      label: "X",
+      fields: [
+        {
+          type: "advanced-group",
+          label: "More settings",
+          fields: [
+            { type: "length", prop: "outline-width", label: "Outline Width" },
+          ],
+        },
+      ],
+    };
+    render(
+      <InspectorRenderer
+        schema={schema}
+        styles={{ "outline-width": "2px" }}
+        onChange={onChange}
+        onBatchChange={vi.fn()}
+      />,
+    );
+    // Collapsed by default.
+    expect(screen.queryByLabelText("Outline Width")).toBeNull();
+    expect(screen.getByRole("button", { name: /More settings/i }))
+      .toHaveAttribute("aria-expanded", "false");
+
+    // Expand.
+    fireEvent.click(screen.getByRole("button", { name: /More settings/i }));
+    const input = screen.getByLabelText("Outline Width") as HTMLInputElement;
+    expect(input.value).toBe("2px");
+
+    // Edits route through with the nested field's prop.
+    fireEvent.change(input, { target: { value: "4px" } });
+    expect(onChange).toHaveBeenCalledWith("outline-width", "4px");
+  });
+
+  it("advanced-group respects defaultExpanded=true", () => {
+    const schema: SectionSchema = {
+      id: "x",
+      label: "X",
+      fields: [
+        {
+          type: "advanced-group",
+          label: "Advanced",
+          defaultExpanded: true,
+          fields: [{ type: "text", prop: "foo", label: "Foo" }],
+        },
+      ],
+    };
+    render(
+      <InspectorRenderer
+        schema={schema}
+        styles={{}}
+        onChange={vi.fn()}
+        onBatchChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByLabelText("Foo")).toBeInTheDocument();
+  });
+
   it("group-heading renders its label with no input", () => {
     render(
       <InspectorRenderer

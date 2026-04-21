@@ -15,7 +15,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import * as React from "react";
 import { InspectorRenderer } from "../../InspectorRenderer";
-import { borderEssentialsSchema } from "../border";
+import { borderEssentialsSchema, borderSchema } from "../border";
 
 describe("borderEssentialsSchema", () => {
   const styles = {
@@ -101,6 +101,44 @@ describe("borderEssentialsSchema", () => {
       target: { value: "#ff0000" },
     });
     expect(onChange).toHaveBeenCalledWith("border-color", "#ff0000");
+  });
+
+  it("full borderSchema exposes the advanced disclosure with 4 individual-border inputs + outline controls", () => {
+    render(
+      <InspectorRenderer
+        schema={borderSchema}
+        styles={styles}
+        onChange={vi.fn()}
+        onBatchChange={vi.fn()}
+      />,
+    );
+    // Essentials still visible.
+    expect(screen.getByLabelText("Width")).toBeInTheDocument();
+    // Advanced block collapsed by default.
+    expect(screen.queryByLabelText("Top")).toBeNull();
+    expect(screen.queryByLabelText("Offset")).toBeNull();
+
+    // Expand.
+    fireEvent.click(
+      screen.getByRole("button", { name: /Individual borders & outline/i }),
+    );
+
+    // Individual borders (4 text inputs).
+    expect(screen.getByLabelText("Top")).toBeInTheDocument();
+    expect(screen.getByLabelText("Right")).toBeInTheDocument();
+    expect(screen.getByLabelText("Bottom")).toBeInTheDocument();
+    expect(screen.getByLabelText("Left")).toBeInTheDocument();
+
+    // Outline block — Width+Style+Color+Offset. "Width" label now appears
+    // twice (Border Width + Outline Width) so re-query with getAllByLabelText.
+    expect(screen.getAllByLabelText("Width")).toHaveLength(2);
+    expect(screen.getAllByLabelText("Style")).toHaveLength(2);
+    expect(screen.getAllByLabelText("Color")).toHaveLength(2);
+    expect(screen.getByLabelText("Offset")).toBeInTheDocument();
+
+    // Group-heading labels visible.
+    expect(screen.getByText("Individual Borders")).toBeInTheDocument();
+    expect(screen.getByText("Outline")).toBeInTheDocument();
   });
 
   it("editing any corner in linked mode writes border-radius shorthand", () => {
