@@ -4,6 +4,8 @@
  */
 
 export { InspectorRenderer } from "./InspectorRenderer";
+export { SchemaDrivenSection } from "./SchemaDrivenSection";
+export type { SchemaDrivenSectionProps } from "./SchemaDrivenSection";
 export { borderEssentialsSchema, borderSchema } from "./schemas/border";
 export { spacingEssentialsSchema } from "./schemas/spacing";
 export type { InspectorRendererProps } from "./InspectorRenderer";

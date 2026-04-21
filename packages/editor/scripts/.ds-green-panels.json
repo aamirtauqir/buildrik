@@ -45,6 +45,7 @@
     "packages/editor/src/editor/inspector/sections/layout/index.tsx",
     "packages/editor/src/editor/inspector/sections/registry.tsx",
     "packages/editor/src/editor/inspector/renderer/InspectorRenderer.tsx",
+    "packages/editor/src/editor/inspector/renderer/SchemaDrivenSection.tsx",
     "packages/editor/src/editor/inspector/renderer/controlRegistry.tsx",
     "packages/editor/src/editor/inspector/renderer/index.ts",
     "packages/editor/src/editor/inspector/renderer/schema.ts",
