@@ -42,23 +42,35 @@ export interface InspectorRendererProps {
   registry?: Partial<ControlRegistry>;
 }
 
-function isCompound(field: Field): boolean {
-  return field.type === "spacing4";
+/** Field types that read/write via the prop axis. */
+function hasProp(
+  field: Field,
+): field is Exclude<Field, { type: "spacing4" | "corners4" | "group-heading" }> {
+  return (
+    field.type !== "spacing4" &&
+    field.type !== "corners4" &&
+    field.type !== "group-heading"
+  );
+}
+
+/** Field types that should not receive an onChange (structural / display-only). */
+function isDisplayOnly(field: Field): boolean {
+  return field.type === "group-heading";
 }
 
 function getValue(
   field: Field,
   styles: Readonly<Record<string, string>>,
 ): string {
-  if (isCompound(field)) return "";
-  return styles[(field as { prop: string }).prop] ?? "";
+  if (!hasProp(field)) return "";
+  return styles[field.prop] ?? "";
 }
 
 function keyFor(field: Field, index: number): string {
-  if (isCompound(field)) {
-    return `${field.type}-${(field as { group: string }).group}-${index}`;
-  }
-  return `${field.type}-${(field as { prop: string }).prop}-${index}`;
+  if (field.type === "spacing4") return `spacing4-${field.group}-${index}`;
+  if (field.type === "corners4") return `corners4-${index}`;
+  if (field.type === "group-heading") return `heading-${index}-${field.label}`;
+  return `${field.type}-${field.prop}-${index}`;
 }
 
 export const InspectorRenderer: React.FC<InspectorRendererProps> = ({
@@ -84,7 +96,15 @@ export const InspectorRenderer: React.FC<InspectorRendererProps> = ({
       }}
     >
       {schema.fields.map((field, index) => {
-        if (field.conditional && !field.conditional(styles)) return null;
+        // group-heading + other display-only fields never evaluate conditional.
+        if (
+          !isDisplayOnly(field) &&
+          "conditional" in field &&
+          field.conditional &&
+          !field.conditional(styles)
+        ) {
+          return null;
+        }
 
         const Control = resolved[field.type] as React.FC<
           ControlProps<typeof field>
@@ -101,8 +121,8 @@ export const InspectorRenderer: React.FC<InspectorRendererProps> = ({
 
         const value = getValue(field, styles);
         const handleChange = (next: string) => {
-          if (isCompound(field)) return;
-          onChange((field as { prop: string }).prop, next);
+          if (!hasProp(field)) return;
+          onChange(field.prop, next);
         };
 
         return (

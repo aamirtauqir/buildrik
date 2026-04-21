@@ -15,10 +15,13 @@ import type {
   ColorField,
   ControlProps,
   ControlRegistry,
+  Corners4Field,
+  GroupHeadingField,
   LengthField,
   NumberField,
   SelectField,
   Spacing4Field,
+  TextField,
   ToggleField,
 } from "./schema";
 
@@ -272,6 +275,131 @@ const Spacing4Control: React.FC<ControlProps<Spacing4Field>> = ({
 };
 
 // ============================================================================
+// TEXT — free-form shorthand input.
+// ============================================================================
+
+const TextControl: React.FC<ControlProps<TextField>> = ({
+  field,
+  value,
+  onChange,
+}) => (
+  <div style={rowStyle}>
+    <label style={labelStyle} htmlFor={`field-${field.prop}`}>
+      {field.label}
+    </label>
+    <input
+      id={`field-${field.prop}`}
+      type="text"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={field.placeholder}
+      style={inputStyle}
+    />
+  </div>
+);
+
+// ============================================================================
+// CORNERS4 — four-corner border radius. Linked mode writes the shorthand
+// `border-radius`; unlinked writes the four long-form corner properties.
+// ============================================================================
+
+const CORNERS = [
+  { id: "tl", prop: "border-top-left-radius", label: "TL" },
+  { id: "tr", prop: "border-top-right-radius", label: "TR" },
+  { id: "br", prop: "border-bottom-right-radius", label: "BR" },
+  { id: "bl", prop: "border-bottom-left-radius", label: "BL" },
+] as const;
+
+const Corners4Control: React.FC<ControlProps<Corners4Field>> = ({
+  field,
+  styles,
+  onBatchChange,
+}) => {
+  const [linked, setLinked] = React.useState(true);
+
+  const cornerValues = Object.fromEntries(
+    CORNERS.map((c) => [c.id, styles[c.prop] ?? ""]),
+  ) as Record<(typeof CORNERS)[number]["id"], string>;
+
+  const handleCorner = (cornerId: string, next: string) => {
+    if (linked) {
+      onBatchChange({ "border-radius": next });
+      return;
+    }
+    const corner = CORNERS.find((c) => c.id === cornerId);
+    if (!corner) return;
+    onBatchChange({ [corner.prop]: next });
+  };
+
+  return (
+    <div>
+      <div style={rowStyle}>
+        <span style={labelStyle}>{field.label}</span>
+        {field.linkable !== false && (
+          <button
+            type="button"
+            onClick={() => setLinked((v) => !v)}
+            aria-pressed={linked}
+            aria-label={linked ? "Unlink corners" : "Link corners"}
+            style={{
+              height: 24,
+              padding: "0 8px",
+              fontSize: 11,
+              color: linked
+                ? "var(--buildrick-accent)"
+                : "var(--buildrick-text-muted)",
+              background: "transparent",
+              border: "1px solid var(--buildrick-border)",
+              borderRadius: 4,
+              cursor: "pointer",
+            }}
+          >
+            {linked ? "Linked" : "Link"}
+          </button>
+        )}
+      </div>
+      {CORNERS.map((c) => (
+        <div key={c.id} style={rowStyle}>
+          <label style={labelStyle} htmlFor={`field-${c.prop}`}>
+            {c.label}
+          </label>
+          <input
+            id={`field-${c.prop}`}
+            type="text"
+            value={cornerValues[c.id]}
+            onChange={(e) => handleCorner(c.id, e.target.value)}
+            style={inputStyle}
+          />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// ============================================================================
+// GROUP HEADING — structural label; writes nothing.
+// ============================================================================
+
+const GroupHeadingControl: React.FC<ControlProps<GroupHeadingField>> = ({
+  field,
+}) => (
+  <div
+    style={{
+      fontSize: 12,
+      color: "var(--buildrick-text-tertiary)",
+      fontWeight: 500,
+      marginTop: field.divider ? 12 : 8,
+      paddingTop: field.divider ? 12 : 0,
+      borderTop: field.divider
+        ? "1px solid var(--buildrick-border-light)"
+        : undefined,
+    }}
+  >
+    {field.label}
+  </div>
+);
+
+// ============================================================================
 // REGISTRY — single export. Callers may pass a merged registry to override
 // or extend individual controls without forking the renderer.
 // ============================================================================
@@ -282,5 +410,8 @@ export const defaultControlRegistry: ControlRegistry = {
   select: SelectControl,
   toggle: ToggleControl,
   color: ColorControl,
+  text: TextControl,
   spacing4: Spacing4Control,
+  corners4: Corners4Control,
+  "group-heading": GroupHeadingControl,
 };

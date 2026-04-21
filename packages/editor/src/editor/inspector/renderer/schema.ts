@@ -86,6 +86,16 @@ export interface ColorField extends FieldBase {
 }
 
 /**
+ * Free-form single-line text input. Used for shorthand values (e.g. the
+ * individual `border-top` / `border-right` strings in BorderSection) where
+ * a structured control doesn't fit.
+ */
+export interface TextField extends FieldBase {
+  type: "text";
+  placeholder?: string;
+}
+
+/**
  * Compound field: four-sided spacing (margin or padding). Writes to the four
  * side properties ({group}-top|right|bottom|left) via onBatchChange.
  * `prop` on the base is ignored — kept optional to satisfy the shape while
@@ -99,6 +109,33 @@ export interface Spacing4Field extends Omit<FieldBase, "prop"> {
   linkable?: boolean;
 }
 
+/**
+ * Compound field: four-corner border radius. Writes the four long-form
+ * properties: border-{top-left,top-right,bottom-right,bottom-left}-radius.
+ * When linked, writes the `border-radius` shorthand instead.
+ *
+ * Separate from Spacing4Field because the prop-name shape is different
+ * (prefix/suffix ordering) — collapsing them would push axis logic into
+ * the control, which is exactly what the schema is trying to avoid.
+ */
+export interface Corners4Field extends Omit<FieldBase, "prop"> {
+  type: "corners4";
+  /** When true, show a link button to write the shorthand instead. Default true. */
+  linkable?: boolean;
+}
+
+/**
+ * Non-editing structural field: a small heading row with a divider, used to
+ * group a run of fields under a label ("Individual Borders", "Outline", ...).
+ * Reads and writes nothing.
+ */
+export interface GroupHeadingField {
+  type: "group-heading";
+  label: string;
+  /** When true, render a top divider line above the heading. Default false. */
+  divider?: boolean;
+}
+
 /** Union of all supported field types. Discriminated on `type`. */
 export type Field =
   | LengthField
@@ -106,7 +143,10 @@ export type Field =
   | SelectField
   | ToggleField
   | ColorField
-  | Spacing4Field;
+  | TextField
+  | Spacing4Field
+  | Corners4Field
+  | GroupHeadingField;
 
 // ============================================================================
 // SECTION SCHEMA

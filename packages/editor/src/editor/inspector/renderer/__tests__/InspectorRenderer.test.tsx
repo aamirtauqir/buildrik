@@ -222,6 +222,89 @@ describe("InspectorRenderer", () => {
     expect(screen.getByLabelText("Flex Basis")).toBeInTheDocument();
   });
 
+  it("text field routes plain strings through onChange", () => {
+    const onChange = vi.fn();
+    const schema: SectionSchema = {
+      id: "border",
+      label: "Border",
+      fields: [
+        {
+          type: "text",
+          prop: "border-top",
+          label: "Top",
+          placeholder: "1px solid #ccc",
+        },
+      ],
+    };
+    render(
+      <InspectorRenderer
+        schema={schema}
+        styles={{ "border-top": "1px solid red" }}
+        onChange={onChange}
+        onBatchChange={vi.fn()}
+      />,
+    );
+    const input = screen.getByLabelText("Top") as HTMLInputElement;
+    expect(input.value).toBe("1px solid red");
+    expect(input.placeholder).toBe("1px solid #ccc");
+    fireEvent.change(input, { target: { value: "2px dashed blue" } });
+    expect(onChange).toHaveBeenCalledWith("border-top", "2px dashed blue");
+  });
+
+  it("corners4 writes shorthand when linked, long-form when unlinked", () => {
+    const onBatchChange = vi.fn();
+    const schema: SectionSchema = {
+      id: "border",
+      label: "Border",
+      fields: [{ type: "corners4", label: "Radius", linkable: true }],
+    };
+    render(
+      <InspectorRenderer
+        schema={schema}
+        styles={{
+          "border-top-left-radius": "4px",
+          "border-top-right-radius": "4px",
+          "border-bottom-right-radius": "4px",
+          "border-bottom-left-radius": "4px",
+        }}
+        onChange={vi.fn()}
+        onBatchChange={onBatchChange}
+      />,
+    );
+
+    // Default: linked. Changing TL writes the shorthand via onBatchChange.
+    fireEvent.change(screen.getByLabelText("TL"), {
+      target: { value: "8px" },
+    });
+    expect(onBatchChange).toHaveBeenLastCalledWith({ "border-radius": "8px" });
+
+    // Unlink, then TL edits only the TL long-form prop.
+    fireEvent.click(screen.getByRole("button", { name: /Unlink corners/i }));
+    fireEvent.change(screen.getByLabelText("TL"), {
+      target: { value: "12px" },
+    });
+    expect(onBatchChange).toHaveBeenLastCalledWith({
+      "border-top-left-radius": "12px",
+    });
+  });
+
+  it("group-heading renders its label with no input", () => {
+    render(
+      <InspectorRenderer
+        schema={{
+          id: "x",
+          label: "X",
+          fields: [{ type: "group-heading", label: "Individual Borders" }],
+        }}
+        styles={{}}
+        onChange={vi.fn()}
+        onBatchChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("Individual Borders")).toBeInTheDocument();
+    expect(screen.queryAllByRole("textbox")).toHaveLength(0);
+  });
+
   it("registry override replaces the default control for one field type", () => {
     const onChange = vi.fn();
     const CustomLength: React.FC<

@@ -10,8 +10,10 @@ export type {
   ColorField,
   ControlProps,
   ControlRegistry,
+  Corners4Field,
   Field,
   FieldBase,
+  GroupHeadingField,
   LengthField,
   NumberField,
   SectionDensity,
@@ -19,5 +21,6 @@ export type {
   SelectField,
   SelectOption,
   Spacing4Field,
+  TextField,
   ToggleField,
 } from "./schema";
