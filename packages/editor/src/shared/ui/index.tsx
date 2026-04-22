@@ -13,6 +13,7 @@ export * from "./Modal";
 export * from "./Tooltip";
 export * from "./Popover";
 export * from "./Tabs";
+export * from "./TextInput";
 export * from "./Accordion";
 export * from "./Card";
 export * from "./Grid";

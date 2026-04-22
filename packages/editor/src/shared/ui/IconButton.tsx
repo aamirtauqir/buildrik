@@ -1,10 +1,20 @@
 /**
- * IconButton Component
- * Compact button for toolbar actions with tooltip
+ * IconButton — compact button for toolbar actions + inspector controls.
+ *
+ * Phase 2 primitive port (augment, props API preserved).
+ * Previous impl used inline style objects, raw hex fallbacks, a background
+ * gradient (gate violation), and useState-based hover. This version:
+ * Emotion styled.button, --bd-* tokens, CSS :hover, flat background.
+ *
+ * Props preserved for existing consumers: icon, tooltip, ariaLabel, size,
+ * variant, active, rounded, disabled, className, plus standard button attrs
+ * via rest.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import styled from "@emotion/styled";
 import { Tooltip } from "./Tooltip";
 
 export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -18,6 +28,63 @@ export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEl
   rounded?: boolean;
 }
 
+type Size = NonNullable<IconButtonProps["size"]>;
+type Variant = NonNullable<IconButtonProps["variant"]>;
+
+const sizePx: Record<Size, number> = { sm: 24, md: 32, lg: 44 };
+const iconPx: Record<Size, number> = { sm: 14, md: 16, lg: 20 };
+
+const Btn = styled.button<{ s: Size; v: Variant; a: boolean; r: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: ${(p) => sizePx[p.s]}px;
+  height: ${(p) => sizePx[p.s]}px;
+  border: none;
+  border-radius: ${(p) => (p.r ? "var(--buildrick-radius-full)" : "var(--buildrick-radius-md)")};
+  cursor: pointer;
+  transition: var(--buildrick-transition-colors);
+  flex-shrink: 0;
+  padding: 0;
+  background: ${(p) => {
+    if (p.a) return "var(--bd-accent-subtle)";
+    if (p.v === "subtle") return "var(--bd-bg-subtle)";
+    if (p.v === "solid") return "var(--bd-accent)";
+    return "transparent";
+  }};
+  color: ${(p) => {
+    if (p.a) return "var(--bd-accent)";
+    if (p.v === "solid") return "var(--bd-fg-on-accent)";
+    return "var(--bd-fg-secondary)";
+  }};
+
+  &:hover:not(:disabled) {
+    background: ${(p) => {
+      if (p.a) return "var(--bd-accent-subtle)";
+      if (p.v === "solid") return "var(--bd-accent-hover)";
+      return "var(--bd-bg-hover)";
+    }};
+    color: ${(p) => {
+      if (p.a) return "var(--bd-accent)";
+      if (p.v === "solid") return "var(--bd-fg-on-accent)";
+      return "var(--bd-fg-primary)";
+    }};
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+`;
+
+const IconSpan = styled.span<{ s: Size }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: ${(p) => iconPx[p.s]}px;
+  height: ${(p) => iconPx[p.s]}px;
+`;
+
 export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
   (
     {
@@ -29,91 +96,26 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
       active = false,
       rounded = false,
       disabled,
-      className = "",
-      style,
+      className,
       ...props
     },
     ref
   ) => {
-    const sizeMap = {
-      sm: { size: 24, iconSize: 14, padding: 5 },
-      md: { size: 32, iconSize: 16, padding: 8 },
-      lg: { size: 44, iconSize: 20, padding: 12 }, // 44px for WCAG touch target compliance
-    };
-
-    const config = sizeMap[size];
-
-    const baseStyles: React.CSSProperties = {
-      display: "inline-flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: config.size,
-      height: config.size,
-      padding: config.padding,
-      border: "none",
-      borderRadius: rounded ? "var(--buildrick-radius-full)" : "var(--buildrick-radius-md)",
-      cursor: disabled ? "not-allowed" : "pointer",
-      transition: "all var(--buildrick-transition-fast)",
-      opacity: disabled ? 0.4 : 1,
-      flexShrink: 0,
-    };
-
-    const variantStyles: Record<string, React.CSSProperties> = {
-      ghost: {
-        background: active ? "var(--buildrick-accent-subtle)" : "transparent",
-        color: active ? "var(--buildrick-accent)" : "var(--buildrick-text-secondary)",
-      },
-      subtle: {
-        background: active ? "var(--buildrick-accent-subtle)" : "var(--buildrick-surface-3)",
-        color: active ? "var(--buildrick-accent)" : "var(--buildrick-text-secondary)",
-      },
-      solid: {
-        background: active
-          ? "var(--buildrick-accent)"
-          : "linear-gradient(135deg, var(--buildrick-surface-3), var(--buildrick-surface-4))",
-        color: active ? "#fff" : "var(--buildrick-text-primary)",
-      },
-    };
-
-    const hoverStyles = {
-      ghost: { background: "var(--buildrick-bg-hover)", color: "var(--buildrick-text-primary)" },
-      subtle: { background: "var(--buildrick-surface-4)", color: "var(--buildrick-text-primary)" },
-      solid: { background: "var(--buildrick-accent)", color: "var(--buildrick-text-on-accent)" },
-    };
-
-    const [isHovered, setIsHovered] = React.useState(false);
-
-    const computedStyles: React.CSSProperties = {
-      ...baseStyles,
-      ...variantStyles[variant],
-      ...(isHovered && !disabled && !active ? hoverStyles[variant] : {}),
-      ...style,
-    };
-
     const button = (
-      <button
+      <Btn
         ref={ref}
-        className={`buildrick-icon-btn buildrick-icon-btn-${variant} buildrick-icon-btn-${size} ${active ? "active" : ""} ${className}`}
-        style={computedStyles}
+        s={size}
+        v={variant}
+        a={active}
+        r={rounded}
         disabled={disabled}
         aria-pressed={active}
         aria-label={ariaLabel || tooltip}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        className={className}
         {...props}
       >
-        <span
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: config.iconSize,
-            height: config.iconSize,
-          }}
-        >
-          {icon}
-        </span>
-      </button>
+        <IconSpan s={size}>{icon}</IconSpan>
+      </Btn>
     );
 
     if (tooltip) {
@@ -123,7 +125,6 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
         </Tooltip>
       );
     }
-
     return button;
   }
 );

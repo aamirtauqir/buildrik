@@ -172,6 +172,7 @@
     "packages/editor/src/shared/ui/Grid.tsx",
     "packages/editor/src/shared/ui/HelpTooltip.tsx",
     "packages/editor/src/shared/ui/Icon.tsx",
+    "packages/editor/src/shared/ui/IconButton.tsx",
     "packages/editor/src/shared/ui/Icons.tsx",
     "packages/editor/src/shared/ui/InfoBanner.tsx",
     "packages/editor/src/shared/ui/Kbd.tsx",
@@ -180,6 +181,7 @@
     "packages/editor/src/shared/ui/SharedDialogs.tsx",
     "packages/editor/src/shared/ui/Spinner.tsx",
     "packages/editor/src/shared/ui/Tabs.tsx",
+    "packages/editor/src/shared/ui/TextInput.tsx",
     "packages/editor/src/shared/ui/TreeView.tsx",
     "packages/editor/src/shared/ui/panel/PanelShell.tsx"
   ],
