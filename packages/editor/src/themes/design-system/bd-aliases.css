@@ -1,0 +1,114 @@
+/**
+ * themes/design-system/bd-aliases.css
+ * Buildrik DS — --bd-* alias layer for user-provided design-system drop.
+ *
+ * Maps drop's --bd-* shorthand onto canonical --buildrick-* tokens.
+ * Every alias is: one --bd-* name on the left, one canonical token reference
+ * on the right. NO standalone values. All values live in canonical files.
+ *
+ * Rule enforced by gate: grep `^\s*--bd-[a-z0-9-]+:` across packages/editor/src
+ * must match ONLY this file. Consumers use `var(--bd-*)` in their own styles.
+ *
+ * Source drop: /Users/shahg/Desktop/design-system/project/colors_and_type.css
+ * Canonical verified against: themes/design-system/{color,typography,radius,shadow,spacing,motion,layout}.css
+ *
+ * @license BSD-3-Clause
+ */
+
+:root {
+  /* ─── SURFACES ───────────────────────────────────────────────────────── */
+  --bd-bg-panel: var(--buildrick-bg-panel);
+  --bd-bg-card: var(--buildrick-bg-card);
+  --bd-bg-input: var(--buildrick-bg-input);
+  --bd-bg-elevated: var(--buildrick-bg-elevated);
+  --bd-bg-subtle: var(--buildrick-bg-subtle);
+  --bd-bg-hover: var(--buildrick-bg-hover);
+  --bd-bg-pressed: var(--buildrick-bg-pressed);
+  --bd-canvas-wrapper: var(--buildrick-canvas-wrapper);
+  --bd-canvas-content: var(--buildrick-canvas-content);
+  --bd-canvas-dot: var(--buildrick-canvas-dot);
+
+  /* ─── TEXT ───────────────────────────────────────────────────────────── */
+  --bd-fg-primary: var(--buildrick-text-primary);
+  --bd-fg-secondary: var(--buildrick-text-secondary);
+  --bd-fg-muted: var(--buildrick-text-muted);
+  --bd-fg-disabled: var(--buildrick-text-disabled);
+  --bd-fg-on-accent: var(--buildrick-text-on-accent);
+  --bd-fg-heading: var(--buildrick-text-heading);
+
+  /* ─── BORDERS ────────────────────────────────────────────────────────── */
+  --bd-border: var(--buildrick-border);
+  --bd-border-medium: var(--buildrick-border-medium);
+  --bd-border-strong: var(--buildrick-border-strong);
+  --bd-border-subtle: var(--buildrick-border-subtle);
+  --bd-border-focus: var(--buildrick-border-focus);
+
+  /* ─── ACCENT (cobalt #2D6DFF single-accent system) ───────────────────── */
+  --bd-accent: var(--buildrick-accent);
+  --bd-accent-hover: var(--buildrick-accent-hover);
+  --bd-accent-pressed: var(--buildrick-accent-pressed);
+  --bd-accent-subtle: var(--buildrick-accent-subtle);
+  --bd-accent-tint: var(--buildrick-accent-tint);
+  --bd-accent-alpha-15: var(--buildrick-primary-alpha-15);
+
+  /* ─── SEMANTIC STATUS ────────────────────────────────────────────────── */
+  --bd-error: var(--buildrick-error);
+  --bd-error-bg: var(--buildrick-error-bg);
+  --bd-error-tint: var(--buildrick-error-light);
+  --bd-error-border: var(--buildrick-error-border);
+  --bd-success: var(--buildrick-success);
+  --bd-success-bg: var(--buildrick-success-bg);
+  --bd-success-border: var(--buildrick-success-border);
+  --bd-warning: var(--buildrick-warning);
+  --bd-warning-bg: var(--buildrick-warning-bg);
+  --bd-warning-tint: var(--buildrick-warning-light);
+  --bd-warning-border: var(--buildrick-warning-border);
+  --bd-info: var(--buildrick-info);
+
+  /* ─── CANVAS BOX-MODEL OVERLAYS ──────────────────────────────────────── */
+  --bd-box-content: var(--buildrick-boxmodel-content);
+  --bd-box-padding: var(--buildrick-boxmodel-padding);
+  --bd-box-margin: var(--buildrick-boxmodel-margin);
+
+  /* ─── OVERLAY ────────────────────────────────────────────────────────── */
+  --bd-overlay: var(--buildrick-overlay);
+
+  /* ─── TYPOGRAPHY — FONT FAMILIES ─────────────────────────────────────── */
+  --bd-font-family: var(--buildrick-font-family);
+  --bd-font: var(--buildrick-font-family);
+  --bd-font-display: var(--buildrick-font-family-display);
+  --bd-font-mono: var(--buildrick-font-family-mono);
+  --bd-mono: var(--buildrick-font-family-mono);
+
+  /* ─── TYPOGRAPHY — SCALE ─────────────────────────────────────────────── */
+  --bd-text-2xs: var(--buildrick-text-2xs);
+  --bd-text-xs: var(--buildrick-text-xs);
+  --bd-text-sm: var(--buildrick-text-sm);
+  --bd-text-sm-plus: var(--buildrick-text-sm-plus);
+  --bd-text-md: var(--buildrick-text-md);
+  --bd-text-md-plus: var(--buildrick-text-md-plus);
+  --bd-text-lg: var(--buildrick-text-lg);
+  --bd-text-xl: var(--buildrick-text-xl);
+  --bd-text-2xl: var(--buildrick-text-2xl);
+  --bd-text-3xl: var(--buildrick-text-3xl);
+  --bd-text-4xl: var(--buildrick-text-4xl);
+  --bd-text-display: var(--buildrick-text-display);
+
+  /* ─── TYPOGRAPHY — WEIGHTS ───────────────────────────────────────────── */
+  --bd-weight-regular: var(--buildrick-font-weight-normal);
+  --bd-weight-medium: var(--buildrick-font-weight-medium);
+  --bd-weight-semibold: var(--buildrick-font-weight-semibold);
+  --bd-weight-bold: var(--buildrick-font-weight-bold);
+
+  /* ─── TYPOGRAPHY — TRACKING ──────────────────────────────────────────── */
+  --bd-track-tight: var(--buildrick-tracking-tight);
+  --bd-track-normal: var(--buildrick-tracking-normal);
+  --bd-track-wide: var(--buildrick-tracking-wide);
+  --bd-track-wider: var(--buildrick-tracking-wider);
+  --bd-track-widest: var(--buildrick-tracking-widest);
+
+  /* ─── TYPOGRAPHY — LEADING ───────────────────────────────────────────── */
+  --bd-leading-tight: var(--buildrick-line-tight);
+  --bd-leading-normal: var(--buildrick-line-normal);
+  --bd-leading-relaxed: var(--buildrick-line-relaxed);
+}
