@@ -9,7 +9,7 @@
  * Rule enforced by gate: grep `^\s*--bd-[a-z0-9-]+:` across packages/editor/src
  * must match ONLY this file. Consumers use `var(--bd-*)` in their own styles.
  *
- * Source drop: /Users/shahg/Desktop/design-system/project/colors_and_type.css
+ * Source drop: external design-system snapshot (colors_and_type.css).
  * Canonical verified against: themes/design-system/{color,typography,radius,shadow,spacing,motion,layout}.css
  *
  * @license BSD-3-Clause
@@ -43,7 +43,7 @@
   --bd-border-subtle: var(--buildrick-border-subtle);
   --bd-border-focus: var(--buildrick-border-focus);
 
-  /* ─── ACCENT (cobalt #2D6DFF single-accent system) ───────────────────── */
+  /* ─── ACCENT (cobalt single-accent system — value lives in color.css) ── */
   --bd-accent: var(--buildrick-accent);
   --bd-accent-hover: var(--buildrick-accent-hover);
   --bd-accent-pressed: var(--buildrick-accent-pressed);
