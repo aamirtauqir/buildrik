@@ -68,24 +68,40 @@ describe("Badge", () => {
     expect(tt).toBe("none");
   });
 
-  it("info variant matches primary (DESIGN.md: info === accent family)", () => {
+  it("info variant uses accent-family tokens on fg, bg, and border (identical to primary)", () => {
     // Guards against re-cross-wiring info to --bd-info while leaving bg/border
     // on --bd-accent-*. Per DESIGN.md contract, info and primary must be
-    // visually identical (both cobalt). If info is ever given a separate
-    // color family, this test will correctly start failing — update the
-    // contract intentionally at that point.
+    // visually identical (both cobalt). Test compares all 4 style axes:
+    // color, background-color, border-color, text-transform. If any differ,
+    // the variant maps are mixing token families — fail loud.
     const { container: infoC, unmount: iu } = render(<Badge variant="info">x</Badge>);
     const infoSpan = infoC.querySelector("span") as HTMLElement;
-    const infoStyle = getComputedStyle(infoSpan);
-    const infoTT = infoStyle.textTransform;
+    const infoCls = infoSpan.className;
     iu();
     const { container: primaryC, unmount: pu } = render(<Badge variant="primary">x</Badge>);
     const primarySpan = primaryC.querySelector("span") as HTMLElement;
-    const primaryStyle = getComputedStyle(primarySpan);
-    const primaryTT = primaryStyle.textTransform;
+    const primaryCls = primarySpan.className;
     pu();
-    expect(infoTT).toBe(primaryTT);
-    expect(infoTT).toBe("uppercase");
+    // Emotion generates one class per distinct styled-component CSS output.
+    // Identical CSS output → identical classname. If info and primary diverge
+    // on any of color / background / border, the classnames will differ.
+    expect(infoCls).toBe(primaryCls);
+  });
+
+  it("status variants each produce distinct styling (success, warning, error are NOT interchangeable)", () => {
+    // Orthogonal guard to the info-vs-primary test. Ensures non-accent status
+    // variants each resolve to their own color family (success/warning/error
+    // never collapse into one flat mapping).
+    const { container: successC, unmount: su } = render(<Badge variant="success">x</Badge>);
+    const successCls = (successC.querySelector("span") as HTMLElement).className;
+    su();
+    const { container: warningC, unmount: wu } = render(<Badge variant="warning">x</Badge>);
+    const warningCls = (warningC.querySelector("span") as HTMLElement).className;
+    wu();
+    const { container: errorC, unmount: eu } = render(<Badge variant="error">x</Badge>);
+    const errorCls = (errorC.querySelector("span") as HTMLElement).className;
+    eu();
+    expect(new Set([successCls, warningCls, errorCls]).size).toBe(3);
   });
 
   it("non-accent status variants have distinct visual treatment from each other", () => {
