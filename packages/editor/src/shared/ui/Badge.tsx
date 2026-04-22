@@ -24,9 +24,9 @@ export interface BadgeProps {
 type Variant = NonNullable<BadgeProps["variant"]>;
 type Size = NonNullable<BadgeProps["size"]>;
 
-// info === accent family per canonical (--buildrick-info equals --buildrick-accent
-// at #2D6DFF, per color.css). Wire info consistently to accent-family tokens to
-// avoid mixing info fg with accent bg/border.
+// info === accent family per DESIGN.md. Canonical --buildrick-info shares the
+// same cobalt value as --buildrick-accent (see color.css), so Badge wires info
+// consistently to accent-family tokens rather than mixing fg/bg sources.
 const variantFg: Record<Variant, string> = {
   default: "var(--bd-fg-muted)",
   primary: "var(--bd-accent)",

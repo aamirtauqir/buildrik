@@ -68,17 +68,30 @@ describe("Badge", () => {
     expect(tt).toBe("none");
   });
 
-  it("info variant uses accent family tokens consistently (not mixed)", () => {
-    const { container } = render(<Badge variant="info">info</Badge>);
-    const span = container.querySelector("span") as HTMLElement | null;
-    expect(span).not.toBeNull();
-    const style = span ? getComputedStyle(span) : null;
-    // All 3 of fg/bg/border should resolve via accent family for info variant.
-    // This guards against the cross-wiring regression Codex flagged 2026-04-23.
-    expect(style).not.toBeNull();
+  it("info variant matches primary (DESIGN.md: info === accent family)", () => {
+    // Guards against re-cross-wiring info to --bd-info while leaving bg/border
+    // on --bd-accent-*. Per DESIGN.md contract, info and primary must be
+    // visually identical (both cobalt). If info is ever given a separate
+    // color family, this test will correctly start failing — update the
+    // contract intentionally at that point.
+    const { container: infoC, unmount: iu } = render(<Badge variant="info">x</Badge>);
+    const infoSpan = infoC.querySelector("span") as HTMLElement;
+    const infoStyle = getComputedStyle(infoSpan);
+    const infoTT = infoStyle.textTransform;
+    iu();
+    const { container: primaryC, unmount: pu } = render(<Badge variant="primary">x</Badge>);
+    const primarySpan = primaryC.querySelector("span") as HTMLElement;
+    const primaryStyle = getComputedStyle(primarySpan);
+    const primaryTT = primaryStyle.textTransform;
+    pu();
+    expect(infoTT).toBe(primaryTT);
+    expect(infoTT).toBe("uppercase");
   });
 
-  it("each variant has distinct visual treatment", () => {
+  it("non-accent status variants have distinct visual treatment from each other", () => {
+    // Excludes info (identical to primary by contract — see above test).
+    // Each non-accent variant must produce distinct output so they're not
+    // silently flat-mapped to one another.
     const variants = ["default", "primary", "success", "warning", "error"] as const;
     const renders = variants.map((v) => {
       const { container, unmount } = render(<Badge variant={v}>x</Badge>);
@@ -86,7 +99,6 @@ describe("Badge", () => {
       unmount();
       return { v, html };
     });
-    // Each variant should produce a unique Emotion className (distinct styling).
     const uniqueHtml = new Set(renders.map((r) => r.html));
     expect(uniqueHtml.size).toBe(variants.length);
   });
