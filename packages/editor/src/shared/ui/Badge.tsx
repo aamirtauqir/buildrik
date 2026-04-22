@@ -1,74 +1,106 @@
 /**
- * Aquibra Badge Component
+ * Badge — pill-shaped label for status/counter/tag.
+ *
+ * Phase 2 primitive port — uses --bd-* tokens (alias layer → canonical).
+ * Props API preserved for existing consumers (~20 callers):
+ * variant = default | primary | success | warning | error | info
+ * size    = sm | md | lg
+ * dot     = small circle variant
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import styled from "@emotion/styled";
 
 export interface BadgeProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   variant?: "default" | "primary" | "success" | "warning" | "error" | "info";
   size?: "sm" | "md" | "lg";
   dot?: boolean;
+  className?: string;
 }
+
+type Variant = NonNullable<BadgeProps["variant"]>;
+type Size = NonNullable<BadgeProps["size"]>;
+
+const variantFg: Record<Variant, string> = {
+  default: "var(--bd-fg-muted)",
+  primary: "var(--bd-accent)",
+  success: "var(--bd-success)",
+  warning: "var(--bd-warning)",
+  error: "var(--bd-error)",
+  info: "var(--bd-info)",
+};
+
+const variantBg: Record<Variant, string> = {
+  default: "var(--bd-bg-subtle)",
+  primary: "var(--bd-accent-tint)",
+  success: "var(--bd-success-bg)",
+  warning: "var(--bd-warning-bg)",
+  error: "var(--bd-error-bg)",
+  info: "var(--bd-accent-tint)",
+};
+
+const variantBorder: Record<Variant, string> = {
+  default: "var(--bd-border)",
+  primary: "var(--bd-accent-subtle)",
+  success: "var(--bd-success-border)",
+  warning: "var(--bd-warning-border)",
+  error: "var(--bd-error-border)",
+  info: "var(--bd-accent-subtle)",
+};
+
+const sizePad: Record<Size, string> = {
+  sm: "1px 6px",
+  md: "2px 8px",
+  lg: "3px 10px",
+};
+
+const sizeFont: Record<Size, string> = {
+  sm: "var(--bd-text-2xs)",
+  md: "var(--bd-text-xs)",
+  lg: "var(--bd-text-sm)",
+};
+
+const Pill = styled.span<{ v: Variant; s: Size }>`
+  display: inline-flex;
+  align-items: center;
+  gap: var(--buildrick-space-2);
+  padding: ${(p) => sizePad[p.s]};
+  font-family: var(--bd-font);
+  font-size: ${(p) => sizeFont[p.s]};
+  font-weight: var(--bd-weight-semibold);
+  letter-spacing: var(--bd-track-wide);
+  border-radius: var(--buildrick-radius-full);
+  border: 1px solid ${(p) => variantBorder[p.v]};
+  background: ${(p) => variantBg[p.v]};
+  color: ${(p) => variantFg[p.v]};
+  line-height: 1.2;
+`;
+
+const Dot = styled.span<{ v: Variant; s: Size }>`
+  display: inline-block;
+  width: ${(p) => (p.s === "sm" ? "5px" : p.s === "lg" ? "8px" : "6px")};
+  height: ${(p) => (p.s === "sm" ? "5px" : p.s === "lg" ? "8px" : "6px")};
+  border-radius: var(--buildrick-radius-full);
+  background: ${(p) => variantFg[p.v]};
+`;
 
 export const Badge: React.FC<BadgeProps> = ({
   children,
   variant = "default",
   size = "md",
   dot = false,
+  className,
 }) => {
-  const isStatus = variant !== "default";
-
-  const variantStyles: Record<string, React.CSSProperties> = {
-    default: {
-      background: "var(--buildrick-surface-2)",
-      color: "var(--buildrick-text-muted)",
-    },
-    primary: { background: "rgba(45, 109, 255, 0.12)", color: "var(--buildrick-accent, #2D6DFF)" },
-    success: { background: "rgba(34, 197, 94, 0.12)", color: "var(--buildrick-success, #22c55e)" },
-    warning: { background: "rgba(245, 158, 11, 0.12)", color: "var(--buildrick-warning, #f59e0b)" },
-    error: { background: "rgba(239, 68, 68, 0.12)", color: "var(--buildrick-error, #ef4444)" },
-    info: { background: "rgba(75, 141, 255, 0.12)", color: "var(--buildrick-accent)" },
-  };
-
-  const sizeStyles: Record<string, React.CSSProperties> = {
-    sm: { padding: "0 6px", height: 18, fontSize: 11, lineHeight: "18px" },
-    md: { padding: "0 8px", height: 22, fontSize: 11, lineHeight: "22px" },
-    lg: { padding: "0 10px", height: 26, fontSize: 12, lineHeight: "26px" },
-  };
-
   if (dot) {
-    return (
-      <span
-        className={`buildrick-badge-dot buildrick-badge-${variant}`}
-        style={{
-          width: size === "sm" ? 6 : 8,
-          height: size === "sm" ? 6 : 8,
-          borderRadius: "var(--buildrick-radius-full)",
-          display: "inline-block",
-          ...variantStyles[variant],
-        }}
-      />
-    );
+    return <Dot v={variant} s={size} className={className} aria-hidden />;
   }
-
   return (
-    <span
-      className={`buildrick-badge buildrick-badge-${variant}`}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        borderRadius: 4,
-        fontWeight: isStatus ? 600 : 500,
-        textTransform: isStatus ? "uppercase" : undefined,
-        letterSpacing: isStatus ? "0.5px" : undefined,
-        ...sizeStyles[size],
-        ...variantStyles[variant],
-      }}
-    >
+    <Pill v={variant} s={size} className={className}>
       {children}
-    </span>
+    </Pill>
   );
 };
 

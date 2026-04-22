@@ -174,6 +174,7 @@
     "packages/editor/src/shared/ui/Icon.tsx",
     "packages/editor/src/shared/ui/Icons.tsx",
     "packages/editor/src/shared/ui/InfoBanner.tsx",
+    "packages/editor/src/shared/ui/Kbd.tsx",
     "packages/editor/src/shared/ui/Layout/index.tsx",
     "packages/editor/src/shared/ui/QuickSwitcher.tsx",
     "packages/editor/src/shared/ui/SharedDialogs.tsx",

@@ -24,6 +24,7 @@ export * from "./Resizable";
 export * from "./Skeleton";
 export * from "./Spinner";
 export * from "./Badge";
+export * from "./Kbd";
 export * from "./IconButton";
 export * from "./ToggleButton";
 export * from "./EmptyState";
