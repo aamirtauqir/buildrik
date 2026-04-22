@@ -24,13 +24,16 @@ export interface BadgeProps {
 type Variant = NonNullable<BadgeProps["variant"]>;
 type Size = NonNullable<BadgeProps["size"]>;
 
+// info === accent family per canonical (--buildrick-info equals --buildrick-accent
+// at #2D6DFF, per color.css). Wire info consistently to accent-family tokens to
+// avoid mixing info fg with accent bg/border.
 const variantFg: Record<Variant, string> = {
   default: "var(--bd-fg-muted)",
   primary: "var(--bd-accent)",
   success: "var(--bd-success)",
   warning: "var(--bd-warning)",
   error: "var(--bd-error)",
-  info: "var(--bd-info)",
+  info: "var(--bd-accent)",
 };
 
 const variantBg: Record<Variant, string> = {
@@ -72,6 +75,7 @@ const Pill = styled.span<{ v: Variant; s: Size }>`
   font-size: ${(p) => sizeFont[p.s]};
   font-weight: var(--bd-weight-semibold);
   letter-spacing: var(--bd-track-wide);
+  text-transform: ${(p) => (p.v === "default" ? "none" : "uppercase")};
   border-radius: var(--buildrick-radius-full);
   border: 1px solid ${(p) => variantBorder[p.v]};
   background: ${(p) => variantBg[p.v]};
