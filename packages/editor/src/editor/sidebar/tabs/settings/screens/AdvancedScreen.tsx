@@ -7,9 +7,8 @@ import * as React from "react";
 import type { CustomCodeConfig } from "../../../../../shared/types/project";
 import { validateHtml, type HtmlValidationResult } from "../../../../../shared/utils/validateHtml";
 import { validateCss, type CssValidationResult } from "../../../../../shared/utils/validateCss";
-import { StickyFooter } from "../../../shared/StickyFooter";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
-import { Input, Screen, Section, Warning } from "../shared";
+import { Input, Screen, Section } from "../shared";
 
 import type { ScreenProps } from "../types";
 
@@ -82,7 +81,15 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
 
   return (
     <Screen>
-      <Warning>⚠️ Custom code runs on all pages. Test thoroughly.</Warning>
+      <div style={{
+        padding: "10px 12px",
+        background: "rgba(217, 119, 6, 0.08)",
+        border: "1px solid rgba(217, 119, 6, 0.3)",
+        borderRadius: 6,
+        font: "500 11.5px var(--bd-font)",
+        color: "var(--bd-warning)",
+        lineHeight: 1.5,
+      }}>⚠️ Custom code runs on all pages. Test thoroughly.</div>
 
       <Section title="Head Scripts">
         <textarea
@@ -148,7 +155,6 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
         )}
       </Section>
 
-      <StickyFooter primaryLabel="Save" onPrimary={handleSave} hasChanges={isDirty} />
     </Screen>
   );
 };
@@ -160,16 +166,16 @@ const validationContainerStyles: React.CSSProperties = {
 };
 
 const validationErrorStyles: React.CSSProperties = {
-  color: "var(--buildrick-error)",
+  color: "var(--bd-error)",
   padding: "2px 0",
 };
 
 const validationWarningStyles: React.CSSProperties = {
-  color: "var(--buildrick-warning)",
+  color: "var(--bd-warning)",
   padding: "2px 0",
 };
 
 const validationSuccessStyles: React.CSSProperties = {
-  color: "var(--buildrick-success)",
+  color: "var(--bd-success)",
   padding: "2px 0",
 };

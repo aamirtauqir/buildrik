@@ -215,24 +215,24 @@ const optionLabelStyles: React.CSSProperties = {
   marginTop: 8,
   fontSize: 12,
   fontWeight: 600,
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bd-fg-primary)",
 };
 
 const optionHintStyles: React.CSSProperties = {
   marginTop: 2,
   fontSize: 12,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bd-fg-muted)",
   textAlign: "center",
 };
 
 const downloadBtnStyles: React.CSSProperties = {
   width: "100%",
   padding: "10px 16px",
-  background: "var(--buildrick-accent)",
+  background: "var(--bd-accent)",
   border: "none",
-  borderRadius: "var(--buildrick-radius-md)",
-  color: "var(--buildrick-text-on-accent)",
-  fontSize: "var(--buildrick-text-sm-plus)",
+  borderRadius: 6,
+  color: "var(--bd-fg-on-accent)",
+  fontSize: 13,
   fontWeight: 600,
   cursor: "pointer",
   marginBottom: 8,
@@ -252,20 +252,20 @@ const successMsgStyles: React.CSSProperties = {
   padding: "6px 12px",
   marginBottom: 8,
   fontSize: 12,
-  color: "var(--buildrick-success)",
+  color: "var(--bd-success)",
   background: "rgba(34,197,94,0.08)",
   border: "1px solid rgba(34,197,94,0.2)",
-  borderRadius: "var(--buildrick-radius-sm)",
+  borderRadius: 4,
 };
 
 const errorMsgStyles: React.CSSProperties = {
   padding: "6px 12px",
   marginBottom: 8,
   fontSize: 12,
-  color: "var(--buildrick-error)",
+  color: "var(--bd-error)",
   background: "rgba(239,68,68,0.08)",
   border: "1px solid rgba(239,68,68,0.2)",
-  borderRadius: "var(--buildrick-radius-sm)",
+  borderRadius: 4,
 };
 
 const comingSoonStyles: React.CSSProperties = {
@@ -275,21 +275,21 @@ const comingSoonStyles: React.CSSProperties = {
   justifyContent: "center",
   padding: 24,
   textAlign: "center",
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bd-fg-muted)",
 };
 
 const comingSoonTitleStyles: React.CSSProperties = {
   margin: 0,
   fontSize: 16,
   fontWeight: 700,
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bd-fg-primary)",
 };
 
 const comingSoonDescStyles: React.CSSProperties = {
   margin: "8px 0 0",
   fontSize: 13,
   lineHeight: 1.5,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bd-fg-secondary)",
   maxWidth: 280,
 };
 
@@ -297,17 +297,17 @@ const comingSoonTimelineStyles: React.CSSProperties = {
   margin: "12px 0 0",
   fontSize: 13,
   fontWeight: 600,
-  color: "var(--buildrick-accent)",
+  color: "var(--bd-accent)",
   padding: "4px 12px",
   background: "rgba(45,109,255,0.08)",
-  borderRadius: "var(--buildrick-radius-sm)",
+  borderRadius: 4,
   border: "1px solid rgba(45,109,255,0.2)",
 };
 
 const comingSoonSocialStyles: React.CSSProperties = {
   margin: "12px 0 0",
   fontSize: 12,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bd-fg-muted)",
 };
 
 const waitlistFormStyles: React.CSSProperties = {
@@ -320,7 +320,7 @@ const waitlistLabelStyles: React.CSSProperties = {
   display: "block",
   fontSize: 12,
   fontWeight: 500,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bd-fg-secondary)",
   marginBottom: 6,
 };
 
@@ -328,19 +328,19 @@ const waitlistInputStyles: React.CSSProperties = {
   flex: 1,
   padding: "8px 10px",
   background: "rgba(255,255,255,0.05)",
-  border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--buildrick-radius-sm)",
-  color: "var(--buildrick-text-primary)",
+  border: "1px solid var(--bd-border)",
+  borderRadius: 4,
+  color: "var(--bd-fg-primary)",
   fontSize: 12,
   outline: "none",
 };
 
 const waitlistBtnStyles: React.CSSProperties = {
   padding: "8px 14px",
-  background: "var(--buildrick-accent)",
-  color: "var(--buildrick-text-on-accent)",
+  background: "var(--bd-accent)",
+  color: "var(--bd-fg-on-accent)",
   border: "none",
-  borderRadius: "var(--buildrick-radius-sm)",
+  borderRadius: 4,
   fontSize: 12,
   fontWeight: 600,
   cursor: "pointer",
@@ -352,8 +352,8 @@ const waitlistSuccessStyles: React.CSSProperties = {
   padding: "8px 14px",
   background: "rgba(34,197,94,0.08)",
   border: "1px solid rgba(34,197,94,0.2)",
-  borderRadius: "var(--buildrick-radius-sm)",
+  borderRadius: 4,
   fontSize: 12,
-  color: "var(--buildrick-success)",
+  color: "var(--bd-success)",
   fontWeight: 500,
 };

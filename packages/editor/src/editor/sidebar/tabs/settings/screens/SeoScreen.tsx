@@ -6,7 +6,6 @@
  */
 
 import * as React from "react";
-import { StickyFooter } from "../../../shared/StickyFooter";
 import { Field, Input, Screen, Section } from "../shared";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import type { ScreenProps } from "../types";
@@ -17,7 +16,7 @@ const DEFAULT_SEO = {
 };
 
 export const SeoScreen: React.FC<ScreenProps> = ({ composer }) => {
-  const { value: seo, isDirty, markDirty, markClean } = useSettingsScreen(
+  const { value: seo, markDirty, markClean } = useSettingsScreen(
     composer,
     (s) => ({
       twitterHandle: s.seo?.twitterHandle ?? "",
@@ -82,19 +81,17 @@ export const SeoScreen: React.FC<ScreenProps> = ({ composer }) => {
       <div
         style={{
           padding: "10px 12px",
-          background: "var(--buildrick-surface-3)",
-          borderRadius: "var(--buildrick-radius-md)",
-          border: "1px solid var(--buildrick-border)",
+          background: "var(--bd-bg-subtle)",
+          border: "1px solid var(--bd-border)",
+          borderRadius: 6,
           fontSize: 12,
-          color: "var(--buildrick-text-muted)",
+          color: "var(--bd-fg-muted)",
           lineHeight: 1.5,
         }}
       >
         Per-page SEO (meta title, description, robots) is set in each page&apos;s settings via the
         Pages tab.
       </div>
-
-      <StickyFooter primaryLabel="Save" onPrimary={handleSave} hasChanges={isDirty} />
     </Screen>
   );
 };

@@ -17,20 +17,20 @@ const cardStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 10,
   padding: "10px 12px",
-  background: "var(--buildrick-surface-3)",
-  borderRadius: "var(--buildrick-radius-md)",
+  background: "var(--bd-bg-subtle)",
+  borderRadius: 6,
   marginBottom: 6,
 };
 
 const nameStyles: React.CSSProperties = {
-  fontSize: "var(--buildrick-text-sm-plus)",
+  fontSize: 13,
   fontWeight: 500,
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bd-fg-primary)",
 };
 
 const descStyles: React.CSSProperties = {
-  fontSize: "var(--buildrick-text-sm)",
-  color: "var(--buildrick-text-muted)",
+  fontSize: 12,
+  color: "var(--bd-fg-muted)",
   marginTop: 2,
 };
 
@@ -39,26 +39,26 @@ const badgeStyles: React.CSSProperties = {
   fontWeight: 600,
   padding: "2px 6px",
   borderRadius: 4,
-  background: "var(--buildrick-surface-4)",
-  color: "var(--buildrick-text-muted)",
+  background: "var(--bd-bg-hover)",
+  color: "var(--bd-fg-muted)",
   whiteSpace: "nowrap",
 };
 
 const learnBtnStyles: React.CSSProperties = {
-  fontSize: "var(--buildrick-text-sm)",
+  fontSize: 12,
   fontWeight: 500,
   padding: "4px 10px",
-  borderRadius: "var(--buildrick-radius-sm)",
-  border: "1px solid var(--buildrick-border)",
+  borderRadius: 4,
+  border: "1px solid var(--bd-border)",
   background: "transparent",
-  color: "var(--buildrick-accent)",
+  color: "var(--bd-accent)",
   cursor: "pointer",
   whiteSpace: "nowrap",
 };
 
 const hintStyles: React.CSSProperties = {
-  fontSize: "var(--buildrick-text-sm)",
-  color: "var(--buildrick-text-muted)",
+  fontSize: 12,
+  color: "var(--bd-fg-muted)",
   padding: "8px 12px 0",
   lineHeight: 1.4,
 };

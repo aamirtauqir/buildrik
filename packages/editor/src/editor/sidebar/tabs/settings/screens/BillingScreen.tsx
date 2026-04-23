@@ -63,9 +63,9 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
           alignItems: "center",
           justifyContent: "space-between",
           padding: "12px 14px",
-          background: "var(--buildrick-surface-3)",
-          borderRadius: "var(--buildrick-radius-md)",
-          border: "1px solid var(--buildrick-border)",
+          background: "var(--bd-bg-subtle)",
+          borderRadius: 6,
+          border: "1px solid var(--bd-border)",
         }}
       >
         <div>
@@ -73,26 +73,26 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
             style={{
               fontSize: 12,
               fontWeight: 500,
-              color: "var(--buildrick-text-muted)",
+              color: "var(--bd-fg-muted)",
               marginBottom: 2,
             }}
           >
             Current plan
           </div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: "var(--buildrick-text-primary)" }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "var(--bd-fg-primary)" }}>
             {planLabel}
           </div>
         </div>
         <span
           style={{
             padding: "3px 10px",
-            borderRadius: "var(--buildrick-radius-full)",
-            background: isFreePlan ? "var(--buildrick-surface-4)" : "rgba(45,109,255,0.12)",
-            color: isFreePlan ? "var(--buildrick-text-secondary)" : "var(--buildrick-accent)",
+            borderRadius: 9999,
+            background: isFreePlan ? "var(--bd-bg-hover)" : "rgba(45,109,255,0.12)",
+            color: isFreePlan ? "var(--bd-fg-secondary)" : "var(--bd-accent)",
             fontSize: 12,
             fontWeight: 600,
             border: isFreePlan
-              ? "1px solid var(--buildrick-border)"
+              ? "1px solid var(--bd-border)"
               : "1px solid rgba(45,109,255,0.25)",
           }}
         >
@@ -106,7 +106,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
           style={{
             padding: "14px",
             background: "rgba(45,109,255,0.06)",
-            borderRadius: "var(--buildrick-radius-md)",
+            borderRadius: 6,
             border: "1px solid rgba(45,109,255,0.15)",
           }}
         >
@@ -114,7 +114,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
             style={{
               fontSize: 13,
               fontWeight: 600,
-              color: "var(--buildrick-text-primary)",
+              color: "var(--bd-fg-primary)",
               marginBottom: 10,
             }}
           >
@@ -130,10 +130,10 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
                   alignItems: "center",
                   gap: 8,
                   fontSize: 13,
-                  color: "var(--buildrick-text-secondary)",
+                  color: "var(--bd-fg-secondary)",
                 }}
               >
-                <span style={{ color: "var(--buildrick-text-muted)" }}>
+                <span style={{ color: "var(--bd-fg-muted)" }}>
                   <LockIcon />
                 </span>
                 {feature}
@@ -146,10 +146,10 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
             style={{
               width: "100%",
               padding: "9px 16px",
-              background: "var(--buildrick-accent)",
+              background: "var(--bd-accent)",
               border: "none",
-              borderRadius: "var(--buildrick-radius-md)",
-              color: "var(--buildrick-text-on-accent)",
+              borderRadius: 6,
+              color: "var(--bd-fg-on-accent)",
               fontSize: 13,
               fontWeight: 600,
               cursor: "pointer",
@@ -168,10 +168,10 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
           style={{
             padding: "12px 14px",
             background: "rgba(34,197,94,0.06)",
-            borderRadius: "var(--buildrick-radius-md)",
+            borderRadius: 6,
             border: "1px solid rgba(34,197,94,0.15)",
             fontSize: 13,
-            color: "var(--buildrick-text-secondary)",
+            color: "var(--bd-fg-secondary)",
           }}
         >
           You have access to all {planLabel} features.
@@ -181,7 +181,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
       <div
         style={{
           fontSize: 12,
-          color: "var(--buildrick-text-muted)",
+          color: "var(--bd-fg-muted)",
           lineHeight: 1.5,
           paddingTop: 4,
         }}
@@ -191,7 +191,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
           href="/dashboard/settings/subscription"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: "var(--buildrick-accent)", textDecoration: "none" }}
+          style={{ color: "var(--bd-accent)", textDecoration: "none" }}
         >
           Manage subscription →
         </a>

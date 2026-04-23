@@ -6,7 +6,7 @@
 import * as React from "react";
 import { Button } from "../../../../../shared/ui/Button";
 import { FEATURE_FLAGS } from "../constants";
-import { Section, Field, Screen, Input, CopyBtn, Code, DnsHelp, Muted, StatusRow, UrlRow, SuccessBadge } from "../shared";
+import { Section, Field, Screen, Input } from "../shared";
 import { LockedScreen } from "./LockedScreen";
 import type { ScreenProps } from "../types";
 
@@ -51,19 +51,43 @@ export const DomainsScreen: React.FC<ScreenProps> = () => {
   return (
     <Screen>
       <Section title="Default Domain">
-        <UrlRow>
-          <Muted>project.builder.aquibra.com</Muted>
-          <CopyBtn
-            style={copied ? { color: "var(--buildrick-success)" } : undefined}
+        {/* URL row */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "8px 10px",
+          background: "var(--bd-bg-subtle)",
+          borderRadius: 4,
+          font: "500 11px var(--bd-mono)",
+        }}>
+          <span style={{
+            flex: 1,
+            font: "500 11px var(--bd-mono)",
+            color: "var(--bd-fg-muted)",
+          }}>
+            project.builder.aquibra.com
+          </span>
+          <button
+            type="button"
             onClick={handleCopy}
             aria-label={copied ? "Copied to clipboard" : "Copy default domain to clipboard"}
+            style={{
+              padding: "4px 8px",
+              font: "600 10px var(--bd-font)",
+              color: copied ? "var(--bd-success)" : "var(--bd-accent)",
+              background: "var(--bd-bg-subtle)",
+              border: "1px solid var(--bd-border)",
+              borderRadius: 4,
+              cursor: "pointer",
+            }}
           >
             {copied ? "✓ Copied" : "Copy"}
-          </CopyBtn>
+          </button>
           <span aria-live="assertive" aria-atomic="true" style={srOnlyStyles}>
             {copied ? "Copied to clipboard" : ""}
           </span>
-        </UrlRow>
+        </div>
       </Section>
 
       <Section title="Custom Domain">
@@ -78,17 +102,51 @@ export const DomainsScreen: React.FC<ScreenProps> = () => {
         <Button onClick={handleConnect} disabled={!domain.trim()} variant="primary" fullWidth>
           Connect Domain
         </Button>
-        <DnsHelp>
-          <p>Point your domain to:</p>
-          <Code>CNAME: builder.aquibra.com</Code>
-        </DnsHelp>
+        {/* DNS help block */}
+        <div style={{
+          padding: "10px 12px",
+          background: "var(--bd-bg-subtle)",
+          border: "1px solid var(--bd-border)",
+          borderRadius: 6,
+          font: "500 11.5px var(--bd-font)",
+          color: "var(--bd-fg-primary)",
+          lineHeight: 1.5,
+        }}>
+          <p style={{ margin: "0 0 6px" }}>Point your domain to:</p>
+          <code style={{
+            font: "500 11px var(--bd-mono)",
+            background: "var(--bd-bg-subtle)",
+            padding: "1px 5px",
+            borderRadius: 3,
+            color: "var(--bd-fg-primary)",
+          }}>CNAME: builder.aquibra.com</code>
+        </div>
       </Section>
 
       <Section title="SSL Certificate">
-        <StatusRow>
-          <span>Status</span>
-          <SuccessBadge>✓ Active</SuccessBadge>
-        </StatusRow>
+        {/* Status row */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "8px 0",
+          borderTop: "1px solid var(--bd-border)",
+        }}>
+          <span style={{
+            font: "500 11px var(--bd-font)",
+            color: "var(--bd-fg-muted)",
+          }}>Status</span>
+          {/* Success badge */}
+          <div style={{
+            padding: "10px 12px",
+            background: "rgba(22, 163, 74, 0.08)",
+            border: "1px solid rgba(22, 163, 74, 0.3)",
+            borderRadius: 6,
+            font: "500 11.5px var(--bd-font)",
+            color: "var(--bd-success)",
+            lineHeight: 1.5,
+          }}>✓ Active</div>
+        </div>
       </Section>
     </Screen>
   );

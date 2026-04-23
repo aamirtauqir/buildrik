@@ -20,13 +20,13 @@ interface Props {
 
 const subHeaderStyle: React.CSSProperties = {
   padding: "20px 20px 8px",
-  fontFamily: "var(--buildrick-font-family)",
+  fontFamily: "var(--bd-font)",
   fontSize: 11,
   fontWeight: 600,
   letterSpacing: "0.08em",
   textTransform: "uppercase",
-  color: "var(--buildrick-text-muted)",
-  borderTop: "1px solid var(--buildrick-border)",
+  color: "var(--bd-fg-muted)",
+  borderTop: "1px solid var(--bd-border)",
   marginTop: 16,
 };
 

@@ -4,7 +4,6 @@
  */
 
 import * as React from "react";
-import { StickyFooter } from "../../../shared/StickyFooter";
 import { Field, Input, Screen, Section } from "../shared";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import type { ScreenProps } from "../types";
@@ -61,7 +60,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
   const [facebook, setFacebook] = React.useState(social.value.facebook);
   const [linkedin, setLinkedin] = React.useState(social.value.linkedin);
   const [saveError, setSaveError] = React.useState<string | null>(null);
-  const isSavingRef = React.useRef(false);
 
   // Sync local state when composer reloads (preserves user's unsaved edits)
   React.useEffect(() => {
@@ -75,17 +73,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
     setFacebook(social.value.facebook);
     setLinkedin(social.value.linkedin);
   }, [social.value.twitter, social.value.facebook, social.value.linkedin]);
-
-  const isDirty = identity.isDirty || social.isDirty;
-
-  // Auto-save on blur: if dirty, save silently without requiring button click
-  const handleBlur = () => {
-    if (isDirty && !isSavingRef.current) {
-      isSavingRef.current = true;
-      handleSave();
-      isSavingRef.current = false;
-    }
-  };
 
   const handleSave = () => {
     if (!composer) return;
@@ -113,8 +100,11 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
     <Screen>
       <Section title="Site Identity">
         {saveError && (
-          <div role="alert" className="sett-save-error">
-            <span className="sett-save-error__icon" aria-hidden="true" />
+          <div role="alert" style={{
+            marginTop: 4,
+            font: "500 10.5px var(--bd-font)",
+            color: "var(--bd-error)",
+          }}>
             {saveError}
           </div>
         )}
@@ -123,7 +113,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             type="text"
             value={siteName}
             onChange={(e) => { setSiteName(e.target.value); identity.markDirty(); }}
-            onBlur={handleBlur}
             placeholder="My Awesome Site"
           />
         </Field>
@@ -132,7 +121,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             type="text"
             value={favicon}
             onChange={(e) => { setFavicon(e.target.value); identity.markDirty(); }}
-            onBlur={handleBlur}
             placeholder="https://example.com/favicon.ico"
           />
         </Field>
@@ -140,7 +128,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
           <select
             value={language}
             onChange={(e) => { setLanguage(e.target.value); identity.markDirty(); }}
-            onBlur={handleBlur}
           >
             <option value="en">English</option>
             <option value="es">Spanish</option>
@@ -160,7 +147,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             type="url"
             value={twitter}
             onChange={(e) => { setTwitter(e.target.value); social.markDirty(); }}
-            onBlur={handleBlur}
             placeholder="https://twitter.com/..."
           />
         </Field>
@@ -170,7 +156,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             type="url"
             value={facebook}
             onChange={(e) => { setFacebook(e.target.value); social.markDirty(); }}
-            onBlur={handleBlur}
             placeholder="https://facebook.com/..."
           />
         </Field>
@@ -180,7 +165,6 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             type="url"
             value={linkedin}
             onChange={(e) => { setLinkedin(e.target.value); social.markDirty(); }}
-            onBlur={handleBlur}
             placeholder="https://linkedin.com/..."
           />
         </Field>
@@ -192,7 +176,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             href="/privacy"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ fontSize: 13, color: "var(--buildrick-accent)", textDecoration: "none" }}
+            style={{ fontSize: 13, color: "var(--bd-accent)", textDecoration: "none" }}
           >
             Privacy Policy →
           </a>
@@ -200,17 +184,15 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             href="/terms"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ fontSize: 13, color: "var(--buildrick-accent)", textDecoration: "none" }}
+            style={{ fontSize: 13, color: "var(--bd-accent)", textDecoration: "none" }}
           >
             Terms of Service →
           </a>
-          <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginTop: 4 }}>
+          <span style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginTop: 4 }}>
             Your data is stored securely. We do not sell or share your site data.
           </span>
         </div>
       </Section>
-
-      <StickyFooter primaryLabel="Save" onPrimary={handleSave} hasChanges={isDirty} />
     </Screen>
   );
 };

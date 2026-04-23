@@ -4,8 +4,7 @@
  */
 
 import * as React from "react";
-import { StickyFooter } from "../../../shared/StickyFooter";
-import { ErrorHint, Field, Input, Note, Screen, Section, SuccessNote, Toggle } from "../shared";
+import { Field, Input, Screen, Section, SwitchRow } from "../shared";
 import { EVENTS } from "../../../../../shared/constants/events";
 import type { ScreenProps } from "../types";
 
@@ -78,7 +77,7 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
   return (
     <Screen>
       <Section title="Google Analytics">
-        <p id="ga-privacy-note" style={privacyNoteStyles}>
+        <p style={privacyNoteStyles}>
           Track visitor behavior on your published site. When enabled, Google&apos;s analytics
           script is added to every page — visitors&apos; page views, clicks, and sessions are sent
           to your Google Analytics account.
@@ -95,34 +94,35 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
               setGaId(e.target.value.toUpperCase());
               setHasChanges(true);
             }}
-            placeholder="G-XXXXXXXXXX" style={{ borderColor: gaError ? "var(--buildrick-error)" : undefined }}
+            placeholder="G-XXXXXXXXXX"
+            style={{ borderColor: gaError ? "var(--bd-error)" : undefined }}
             aria-describedby={gaError ? "ga-error" : undefined}
             aria-invalid={!!gaError}
           />
           {gaError && (
-            <ErrorHint id="ga-error" role="alert" >
+            <div id="ga-error" role="alert" style={errorHintStyles}>
               This doesn&apos;t look right. Your Google Analytics ID should start with G- followed
               by 10 characters, like G-ABCD123456.
-            </ErrorHint>
+            </div>
           )}
         </Field>
-        <Toggle
-          label="Enable Google Analytics"
+        <SwitchRow
+          title="Enable Google Analytics"
           checked={gaEnabled}
-          onChange={(v) => {
-            setGaEnabled(v);
+          onChange={(next) => {
+            setGaEnabled(next);
             setHasChanges(true);
           }}
         />
         {gaEnabled && gaId && isValidGA && (
-          <SuccessNote>
+          <div style={successNoteStyles}>
             ✓ Tracking will be added to your published site automatically
-          </SuccessNote>
+          </div>
         )}
       </Section>
 
       <Section title="Meta Pixel">
-        <p id="meta-privacy-note" style={privacyNoteStyles}>
+        <p style={privacyNoteStyles}>
           Measure ad performance and build retargeting audiences. When enabled, Meta&apos;s
           tracking pixel is loaded on every page — visitor interactions are reported to your
           Meta Events Manager.
@@ -139,52 +139,46 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
               setMetaPixelId(e.target.value.replace(/\D/g, ""));
               setHasChanges(true);
             }}
-            placeholder="1234567890123456" style={{ borderColor: pixelError ? "var(--buildrick-error)" : undefined }}
+            placeholder="1234567890123456"
+            style={{ borderColor: pixelError ? "var(--bd-error)" : undefined }}
             aria-describedby={pixelError ? "pixel-error" : undefined}
             aria-invalid={!!pixelError}
           />
           {pixelError && (
-            <ErrorHint id="pixel-error" role="alert" >
+            <div id="pixel-error" role="alert" style={errorHintStyles}>
               Pixel IDs are 15 or 16 digits. Check your Meta Events Manager for the correct ID.
-            </ErrorHint>
+            </div>
           )}
         </Field>
-        <Toggle
-          label="Enable Meta Pixel"
+        <SwitchRow
+          title="Enable Meta Pixel"
           checked={metaPixelEnabled}
-          onChange={(v) => {
-            setMetaPixelEnabled(v);
+          onChange={(next) => {
+            setMetaPixelEnabled(next);
             setHasChanges(true);
           }}
         />
         {metaPixelEnabled && metaPixelId && isValidPixel && (
-          <SuccessNote>
+          <div style={successNoteStyles}>
             ✓ Tracking will be added to your published site automatically
-          </SuccessNote>
+          </div>
         )}
       </Section>
 
       <Section title="Cookie Consent">
-        <Toggle
-          label="Show Cookie Banner"
+        <SwitchRow
+          title="Show Cookie Banner"
           checked={cookieBanner}
-          onChange={(v) => {
-            setCookieBanner(v);
+          onChange={(next) => {
+            setCookieBanner(next);
             setHasChanges(true);
           }}
         />
-        <Note>
+        <div style={infoNoteStyles}>
           Displays a banner asking visitors to accept cookies before tracking begins. Required in
           the EU (GDPR) and recommended everywhere else.
-        </Note>
+        </div>
       </Section>
-
-      <StickyFooter
-        primaryLabel="Save"
-        onPrimary={handleSave}
-        hasChanges={hasChanges}
-        disabled={!canSave}
-      />
     </Screen>
   );
 };
@@ -193,13 +187,31 @@ const privacyNoteStyles: React.CSSProperties = {
   margin: "0 0 12px",
   fontSize: 13,
   lineHeight: 1.5,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bd-fg-secondary)",
 };
 
-const hintTextStyles: React.CSSProperties = {
-  display: "block",
-  fontSize: 12,
-  color: "var(--buildrick-text-muted)",
+const errorHintStyles: React.CSSProperties = {
   marginTop: 4,
-  lineHeight: 1.4,
+  font: "500 10.5px var(--bd-font)",
+  color: "var(--bd-error)",
+};
+
+const successNoteStyles: React.CSSProperties = {
+  padding: "10px 12px",
+  background: "rgba(22, 163, 74, 0.08)",
+  border: "1px solid rgba(22, 163, 74, 0.3)",
+  borderRadius: 6,
+  font: "500 11.5px var(--bd-font)",
+  color: "var(--bd-success)",
+  lineHeight: 1.5,
+};
+
+const infoNoteStyles: React.CSSProperties = {
+  padding: "10px 12px",
+  background: "var(--bd-bg-subtle)",
+  border: "1px solid var(--bd-border)",
+  borderRadius: 6,
+  font: "500 11.5px var(--bd-font)",
+  color: "var(--bd-fg-primary)",
+  lineHeight: 1.5,
 };
