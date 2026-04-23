@@ -141,7 +141,8 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     section: "bottom",
     pattern: "card-drill-in",
     shortcut: "S",
-    mode: "fullpage",
+    mode: "panel",
+    panelWidth: 700,
     zone: "config",
   },
   {

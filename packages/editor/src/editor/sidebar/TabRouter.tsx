@@ -36,6 +36,7 @@ const MediaTab = React.lazy(() =>
 );
 const PublishTab = React.lazy(() => import("./tabs/publish/PublishTab"));
 const HistoryTab = React.lazy(() => import("./tabs/history/HistoryTab"));
+const SettingsTab = React.lazy(() => import("./tabs/settings/SettingsTab"));
 
 export interface TabRouterProps {
   activeTab: GroupedTabId;
@@ -75,6 +76,8 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   projectId,
   onPublish,
   onUnpublish,
+  onSettingsDirtyChange,
+  onReplayTour,
   aiEnabled,
 }) => {
   switch (activeTab) {
@@ -122,6 +125,17 @@ export const TabRouter: React.FC<TabRouterProps> = ({
 
     case "history":
       return <HistoryTab composer={composer} projectId={projectId} {...commonTabProps} />;
+
+    case "settings":
+      return (
+        <SettingsTab
+          composer={composer}
+          projectId={projectId}
+          onReplayTour={onReplayTour}
+          onDirtyChange={onSettingsDirtyChange}
+          {...commonTabProps}
+        />
+      );
 
     default:
       return null;

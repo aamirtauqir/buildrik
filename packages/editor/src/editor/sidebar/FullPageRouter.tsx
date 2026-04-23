@@ -60,17 +60,6 @@ export const FullPageRouter: React.FC<FullPageRouterProps> = ({
     case "design":
       return <DesignSystemTab composer={composer} {...commonTabProps} />;
 
-    case "settings":
-      return (
-        <SettingsTab
-          composer={composer}
-          onReplayTour={onReplayTour}
-          {...commonTabProps}
-          projectId={projectId}
-          onDirtyChange={onSettingsDirtyChange}
-        />
-      );
-
     case "assets":
       return composer ? (
         <LibraryManager
