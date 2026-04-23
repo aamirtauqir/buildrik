@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  body { background: #F8FAFC; }
+  .wrap { display: grid; grid-template-columns: 120px 1fr; gap: 20px; align-items: flex-start; }
+  .title { font: 600 11px var(--bd-font); color: var(--bd-fg-secondary); letter-spacing: 0.04em; text-transform: uppercase; }
+  .mid { background: #fff; border: 1px solid var(--bd-border); border-radius: 10px; padding: 12px; }
+  .row { display: flex; align-items: center; gap: 10px; font: 500 12px var(--bd-font); color: var(--bd-fg-primary); }
+  .row + .row { margin-top: 8px; }
+  .sp { width: 14px; height: 14px; border: 2px solid var(--bd-accent); border-right-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .skeleton { height: 12px; border-radius: 6px; background: linear-gradient(90deg, #F1F5F9, #E2E8F0, #F1F5F9); background-size: 200% 100%; animation: sk 1.4s infinite; }
+  @keyframes sk { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }
+  .sk-row { display: flex; flex-direction: column; gap: 8px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .pulse { position: relative; }
+  .pulse::after {
+    content: ""; position: absolute; inset: -4px; border-radius: 50%;
+    border: 2px solid #2D6DFF; opacity: 0; animation: pulse 1.4s infinite;
+  }
+  @keyframes pulse {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    100% { transform: scale(1.8); opacity: 0; }
+  }
+</style>
+</head><body><div class="card">
+  <div class="wrap">
+    <div class="title">Loading</div>
+    <div class="mid">
+      <div class="row"><div class="sp"></div>Saving…</div>
+      <div class="row" style="margin-top:12px"><div class="dot pulse" style="background:#2D6DFF"></div>Connected</div>
+      <div class="row" style="margin-top:12px"><div class="dot" style="background:#D97706"></div>Slow connection</div>
+      <div class="row" style="margin-top:12px"><div class="dot" style="background:#DC2626"></div>Offline</div>
+    </div>
+    <div class="title">Skeleton</div>
+    <div class="mid">
+      <div class="sk-row">
+        <div class="skeleton" style="width:60%"></div>
+        <div class="skeleton" style="width:90%"></div>
+        <div class="skeleton" style="width:72%"></div>
+      </div>
+    </div>
+  </div>
+</div></body></html>

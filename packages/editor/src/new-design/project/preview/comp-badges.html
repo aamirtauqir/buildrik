@@ -1,0 +1,35 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  .wrap { display: flex; flex-direction: column; gap: 16px; }
+  .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 9px; font: 600 11px var(--bd-font); border-radius: 9999px;
+    border: 1px solid; letter-spacing: 0.02em;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .published { background: rgba(22,163,74,0.10); border-color: rgba(22,163,74,0.30); color: #16A34A; }
+  .draft     { background: rgba(148,163,184,0.15); border-color: rgba(148,163,184,0.35); color: #64748B; }
+  .issues    { background: rgba(220,38,38,0.10); border-color: #DC2626; color: #DC2626; }
+  .unsaved   { background: rgba(217,119,6,0.10); border-color: rgba(217,119,6,0.30); color: #D97706; }
+  .syncing   { background: rgba(45,109,255,0.08); border-color: rgba(45,109,255,0.30); color: #2D6DFF; }
+  .new       { background: rgba(45,109,255,0.10); border-color: rgba(45,109,255,0.30); color: #2D6DFF; }
+  .premium   { background: #0F172A; border-color: #0F172A; color: #FFFFFF; }
+  .tab-badge { font: 500 10px var(--bd-font); padding: 1px 6px; border-radius: 10px; background: rgba(45,109,255,0.10); color: #2D6DFF; }
+</style>
+</head><body><div class="card">
+  <div class="wrap">
+    <div class="row">
+      <span class="badge published"><span class="dot" style="background:#16A34A"></span>Published</span>
+      <span class="badge draft"><span class="dot" style="background:#94A3B8"></span>Draft</span>
+      <span class="badge unsaved">Unsaved</span>
+      <span class="badge syncing">Syncing…</span>
+    </div>
+    <div class="row">
+      <span class="badge issues">3 issues</span>
+      <span class="badge new">NEW</span>
+      <span class="badge premium">PRO</span>
+      <span class="tab-badge">12</span>
+    </div>
+  </div>
+</div></body></html>

@@ -1,0 +1,544 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>AI · tab prototype</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+  /* Scope chip */
+  .scope {
+    margin: 10px 10px 0; padding: 6px 8px;
+    background: var(--bd-bg-subtle); border-radius: 6px;
+    display: flex; align-items: center; gap: 6px;
+    font: 500 10.5px var(--bd-font); color: var(--bd-fg-secondary);
+  }
+  .scope .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--bd-accent); flex-shrink: 0; }
+  .scope .target { color: var(--bd-fg-heading); font-weight: 600; font-family: var(--bd-mono); font-size: 10px; }
+  .scope .ch { margin-left: auto; color: var(--bd-fg-muted); cursor: pointer; padding: 2px; border-radius: 3px; }
+  .scope .ch:hover { background: #fff; color: var(--bd-fg-primary); }
+
+  /* Quick actions */
+  .qa {
+    padding: 0 10px; margin-top: 10px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+  }
+  .qa .a {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 8px; background: #fff;
+    border: 1px solid var(--bd-border); border-radius: 6px;
+    cursor: pointer; font: 500 11px var(--bd-font); color: var(--bd-fg-primary);
+    transition: 100ms;
+  }
+  .qa .a:hover { border-color: var(--bd-accent); color: var(--bd-accent); background: var(--bd-accent-tint); }
+  .qa .a svg { color: var(--bd-fg-muted); flex-shrink: 0; }
+  .qa .a:hover svg { color: var(--bd-accent); }
+
+  /* Thread */
+  .thread { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+  .msg { display: flex; flex-direction: column; gap: 4px; max-width: 100%; }
+  .msg .role { font: 600 9.5px var(--bd-font); letter-spacing: 0.08em; text-transform: uppercase; color: var(--bd-fg-muted); }
+  .msg .role.u { color: var(--bd-accent); }
+  .msg .body {
+    font: 500 11.5px var(--bd-font); color: var(--bd-fg-primary);
+    line-height: 1.5;
+    padding: 8px 10px; border-radius: 8px;
+    background: var(--bd-bg-subtle);
+  }
+  .msg.u .body { background: var(--bd-accent-tint); color: var(--bd-fg-heading); }
+  .msg.a .body { background: #fff; border: 1px solid var(--bd-border); }
+  .msg .body p { margin: 0 0 6px; }
+  .msg .body p:last-child { margin-bottom: 0; }
+  .msg .body code { font: 500 10.5px var(--bd-mono); background: rgba(15,23,42,0.06); padding: 1px 4px; border-radius: 3px; color: var(--bd-fg-heading); }
+  .msg .cit { font: 500 9.5px var(--bd-mono); color: var(--bd-fg-muted); }
+  .msg .cit span { color: var(--bd-accent); }
+
+  /* Diff card */
+  .diff {
+    background: #fff; border: 1px solid var(--bd-border); border-radius: 8px; overflow: hidden;
+    font: 500 11px var(--bd-font);
+  }
+  .diff .dh {
+    padding: 6px 8px; background: var(--bd-bg-subtle);
+    border-bottom: 1px solid var(--bd-border);
+    display: flex; align-items: center; gap: 6px;
+    font: 500 10px var(--bd-mono); color: var(--bd-fg-secondary);
+  }
+  .diff .dh .tgt { color: var(--bd-fg-heading); font-weight: 600; }
+  .diff .dh .badge { margin-left: auto; font-size: 9.5px; padding: 1px 5px; border-radius: 3px; background: var(--bd-warning); color: #fff; }
+  .diff .db { padding: 0; }
+  .diff .row {
+    display: grid; grid-template-columns: 16px 1fr; gap: 6px; align-items: start;
+    padding: 4px 8px; font: 500 10.5px var(--bd-mono); line-height: 1.4;
+  }
+  .diff .row.ad { background: rgba(22,163,74,0.06); color: #166534; }
+  .diff .row.rm { background: rgba(220,38,38,0.04); color: #991B1B; }
+  .diff .row .g { color: var(--bd-fg-muted); text-align: center; }
+  .diff .row.ad .g { color: var(--bd-success); }
+  .diff .row.rm .g { color: var(--bd-error); }
+  .diff .dfoot {
+    display: flex; gap: 4px; padding: 6px 8px; border-top: 1px solid var(--bd-border);
+    background: var(--bd-bg-subtle);
+  }
+  .diff .dfoot .btn {
+    flex: 1; padding: 5px 8px; border-radius: 5px;
+    font: 600 10.5px var(--bd-font); text-align: center; cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .diff .dfoot .btn.acc { background: var(--bd-success); color: #fff; }
+  .diff .dfoot .btn.acc:hover { background: #15803D; }
+  .diff .dfoot .btn.rej { background: #fff; color: var(--bd-fg-primary); border-color: var(--bd-border); }
+  .diff .dfoot .btn.rej:hover { border-color: var(--bd-error); color: var(--bd-error); }
+
+  /* Streaming cursor */
+  .streaming::after {
+    content: '▍'; color: var(--bd-accent); animation: blink 0.8s step-end infinite;
+    margin-left: 1px;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* Composer */
+  .comp {
+    border-top: 1px solid var(--bd-border);
+    padding: 8px;
+    background: #fff;
+  }
+  .comp-inner {
+    border: 1px solid var(--bd-border); border-radius: 8px;
+    background: var(--bd-bg-subtle);
+    display: flex; flex-direction: column;
+    transition: 120ms;
+  }
+  .comp-inner:focus-within {
+    border-color: var(--bd-accent); background: #fff;
+    box-shadow: 0 0 0 3px var(--bd-accent-tint);
+  }
+  .comp textarea {
+    border: none; outline: none; background: transparent;
+    padding: 8px 10px 2px; resize: none;
+    font: 500 11.5px var(--bd-font); color: var(--bd-fg-primary);
+    min-height: 38px; max-height: 110px;
+  }
+  .comp textarea::placeholder { color: var(--bd-fg-muted); }
+  .comp .bar {
+    display: flex; align-items: center; gap: 4px;
+    padding: 4px 6px 5px;
+  }
+  .comp .bar .tool {
+    width: 22px; height: 22px; border-radius: 4px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--bd-fg-muted); cursor: pointer;
+  }
+  .comp .bar .tool:hover { background: rgba(15,23,42,0.06); color: var(--bd-fg-primary); }
+  .comp .bar .model {
+    font: 500 10px var(--bd-mono); color: var(--bd-fg-secondary);
+    padding: 2px 6px; border-radius: 4px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 3px;
+  }
+  .comp .bar .model:hover { background: rgba(15,23,42,0.06); }
+  .comp .bar .send {
+    margin-left: auto; width: 26px; height: 22px; border-radius: 5px;
+    background: var(--bd-accent); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .comp .bar .send:hover { background: var(--bd-accent-hover); }
+  .comp .bar .send.off { background: var(--bd-border-medium); pointer-events: none; }
+
+  /* Wireframe primitives */
+  .wire .scope { background: transparent; border: 1px dashed var(--bd-border-medium); }
+  .wire .qa .a { background: transparent; border-style: dashed; font-family: var(--bd-mono); color: var(--bd-fg-muted); font-size: 10px; }
+  .wire .msg.u .body, .wire .msg.a .body { background: transparent; border: 1px dashed var(--bd-border-medium); }
+  .wire .msg .body { font-family: var(--bd-mono); color: var(--bd-fg-muted); font-size: 10px; }
+  .wire .diff { background: transparent; border-style: dashed; }
+  .wire .comp-inner { background: transparent; border-style: dashed; }
+
+  /* Section headers in canvas */
+  .section-pill {
+    font: 500 9px var(--bd-mono); letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--bd-fg-muted); padding: 4px 2px 2px;
+  }
+
+  /* Canvas (hi-fi showing selected block) */
+  .canvas-wrap { margin-top: 24px; padding: 16px 20px 20px; background: #fff; border: 1px solid var(--bd-border); border-radius: 12px; }
+  .canvas-wrap h3 { margin: 0 0 10px; font: 600 12px var(--bd-font); color: var(--bd-fg-heading); display: flex; justify-content: space-between; align-items: center; }
+  .canvas-wrap h3 .pill { font: 500 9.5px var(--bd-mono); color: var(--bd-fg-muted); background: var(--bd-bg-subtle); padding: 1px 5px; border-radius: 3px; }
+  .cv-block {
+    padding: 28px 24px; border-radius: 8px;
+    background: linear-gradient(135deg, #0F172A, #1E293B);
+    color: #fff; text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    position: relative;
+    transition: 280ms;
+  }
+  .cv-block.glow { background: linear-gradient(135deg, #0F172A, #2D6DFF); box-shadow: 0 20px 60px -20px rgba(45,109,255,0.5); }
+  .cv-block .eye {
+    position: absolute; top: 8px; right: 10px;
+    font: 500 9px var(--bd-mono); color: rgba(255,255,255,0.5);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .cv-block h2 { margin: 0; font: 700 26px var(--bd-font); letter-spacing: -0.02em; max-width: 480px; }
+  .cv-block p { margin: 0; font: 500 12px var(--bd-font); color: #CBD5E1; max-width: 420px; line-height: 1.5; }
+  .cv-block .ctas { display: flex; gap: 8px; margin-top: 4px; }
+  .cv-block .ctas .cta { padding: 8px 14px; border-radius: 6px; font: 600 11px var(--bd-font); }
+  .cv-block .ctas .cta.pri { background: #fff; color: #0F172A; }
+  .cv-block .ctas .cta.sec { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.25); }
+</style></head><body>
+<div class="page">
+  <div class="head"><div class="ttl"><h1>AI · tab prototype</h1><div class="sub">05 of 06 · scoped prompt · diff preview · accept / reject</div></div>
+    <div class="nav"><a href="index.html">← all</a><a href="tab-add.html">Add</a><a href="tab-layers.html">Layers</a><a href="tab-pages.html">Pages</a><a href="tab-templates.html">Templates</a><a href="tab-ai.html" class="on">AI</a><a href="tab-settings.html">Settings</a></div>
+  </div>
+
+  <div class="split">
+    <!-- Wireframe -->
+    <div>
+      <div class="col-h"><h2>Wireframe</h2><span class="tag">scope · actions · thread · composer</span></div>
+      <div class="shell wire">
+        <nav class="rail">
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="18" height="18" rx="3"/><path class="s" d="M12 8v8 M8 12h8"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="4" width="14" height="4" rx="1"/><rect class="s" x="7" y="10" width="14" height="4" rx="1"/><rect class="s" x="3" y="16" width="14" height="4" rx="1"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M8 3h6l4 4v10a2 2 0 01-2 2H8a2 2 0 01-2-2V5z"/></svg></button>
+          <div class="divr"></div>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="8" height="8" rx="1"/><rect class="s" x="13" y="3" width="8" height="8" rx="1"/><rect class="s" x="3" y="13" width="8" height="8" rx="1"/><rect class="s" x="13" y="13" width="8" height="8" rx="1"/></svg></button>
+          <button class="on"><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg></button>
+          <div style="flex:1"></div>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><circle class="s" cx="12" cy="12" r="3"/></svg></button>
+        </nav>
+        <section class="panel">
+          <div class="panel-h"><div class="ttl"><h2>AI</h2><div class="panel-sub">scope · thread · diff</div></div></div>
+
+          <div class="scope"><span class="dot"></span>Scoped to <span class="target">Hero</span></div>
+
+          <div style="padding:0 10px"><div class="section-pill">Quick actions</div></div>
+          <div class="qa">
+            <div class="a">Rewrite copy</div>
+            <div class="a">Punch up CTA</div>
+            <div class="a">Try variant</div>
+            <div class="a">Improve a11y</div>
+          </div>
+
+          <div class="thread" style="margin-top:8px">
+            <div class="msg u"><div class="role u">You</div><div class="body">Make the hero more confident.</div></div>
+            <div class="msg a"><div class="role">Assistant</div>
+              <div class="body"><p>Tightened the headline and subcopy. Diff below.</p></div>
+            </div>
+            <div class="diff">
+              <div class="dh"><span>EDIT</span><span class="tgt">Hero.headline</span><span class="badge">2</span></div>
+              <div class="db">
+                <div class="row rm"><span class="g">−</span><span>Build sites quickly</span></div>
+                <div class="row ad"><span class="g">+</span><span>Ship sites at thought-speed</span></div>
+              </div>
+              <div class="dfoot"><div class="btn rej">Reject</div><div class="btn acc">Accept</div></div>
+            </div>
+          </div>
+
+          <div class="comp">
+            <div class="comp-inner">
+              <textarea placeholder="Ask about Hero…" disabled></textarea>
+              <div class="bar">
+                <span class="tool">📎</span>
+                <span class="tool">@</span>
+                <span class="model">sonnet</span>
+                <span class="send">↑</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Hi-fi -->
+    <div>
+      <div class="col-h"><h2>Prototype</h2><span class="tag">click a quick action · watch it stream · Accept to see the canvas update</span></div>
+      <div class="shell">
+        <nav class="rail">
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="18" height="18" rx="3"/><path class="s" d="M12 8v8 M8 12h8"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="4" width="14" height="4" rx="1"/><rect class="s" x="7" y="10" width="14" height="4" rx="1"/><rect class="s" x="3" y="16" width="14" height="4" rx="1"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M8 3h6l4 4v10a2 2 0 01-2 2H8a2 2 0 01-2-2V5z M14 3v4h4"/></svg></button>
+          <div class="divr"></div>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="8" height="8" rx="1.5"/><rect class="s" x="13" y="3" width="8" height="8" rx="1.5"/><rect class="s" x="3" y="13" width="8" height="8" rx="1.5"/><rect class="s" x="13" y="13" width="8" height="8" rx="1.5"/></svg></button>
+          <button class="on" title="AI"><svg width="17" height="17" viewBox="0 0 24 24"><path class="f" d="M12 3l2.1 5.4 5.4 2.1-5.4 2.1L12 18l-2.1-5.4L4.5 10.5l5.4-2.1z"/><path class="s" d="M12 3l2.1 5.4 5.4 2.1-5.4 2.1L12 18l-2.1-5.4L4.5 10.5l5.4-2.1z"/></svg></button>
+          <div style="flex:1"></div>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><circle class="s" cx="12" cy="12" r="3"/></svg></button>
+        </nav>
+        <section class="panel">
+          <div class="panel-h">
+            <div class="ttl"><h2>AI assistant</h2><div class="panel-sub" id="modelLabel">claude · sonnet</div></div>
+            <div class="acts">
+              <button class="icon-btn" title="New chat" id="newchat"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M12 5v14 M5 12h14"/></svg></button>
+              <button class="icon-btn" title="History"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9 9 0 00-6.5 2.8L3 8 M3 3v5h5 M12 7v5l3 2"/></svg></button>
+            </div>
+          </div>
+
+          <div class="scope">
+            <span class="dot"></span>Scoped to <span class="target" id="scope">Hero · Home</span>
+            <span class="ch" id="changeScope" title="Change scope"><svg class="base" width="10" height="10" viewBox="0 0 24 24"><path d="M7 10l5-5 5 5 M7 14l5 5 5-5"/></svg></span>
+          </div>
+
+          <div style="padding:0 10px"><div class="section-pill">Suggested actions</div></div>
+          <div class="qa" id="qa">
+            <div class="a" data-p="confident">
+              <svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M4 12l4 4L20 6"/></svg>
+              More confident
+            </div>
+            <div class="a" data-p="shorter">
+              <svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M4 6h16 M4 12h10 M4 18h6"/></svg>
+              Shorter copy
+            </div>
+            <div class="a" data-p="cta">
+              <svg class="base" width="12" height="12" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="2"/><path d="M8 12h8 M14 9l3 3-3 3"/></svg>
+              Punch up CTA
+            </div>
+            <div class="a" data-p="variant">
+              <svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M4 7h16 M4 12h10 M4 17h14"/></svg>
+              Try variant
+            </div>
+          </div>
+
+          <div class="thread" id="thread">
+            <div class="msg a"><div class="role">Assistant</div>
+              <div class="body"><p>Hey — I can rewrite copy, add variants, or make small layout tweaks. I'll always show a diff before changing anything.</p></div>
+            </div>
+          </div>
+
+          <div class="comp">
+            <div class="comp-inner">
+              <textarea id="input" placeholder="Ask about Hero · Home…"></textarea>
+              <div class="bar">
+                <span class="tool" title="Attach"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M21 12l-8.5 8.5a5 5 0 01-7-7L14 5a3.5 3.5 0 014.9 4.9l-8.5 8.5a2 2 0 01-2.8-2.8L15 8"/></svg></span>
+                <span class="tool" title="Mention"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 006 0v-1a10 10 0 10-4 8"/></svg></span>
+                <span class="model" id="modelPick">
+                  <svg class="base" width="10" height="10" viewBox="0 0 24 24"><path d="M12 3l2.1 5.4 5.4 2.1-5.4 2.1L12 18l-2.1-5.4L4.5 10.5l5.4-2.1z"/></svg>
+                  sonnet
+                </span>
+                <span class="send off" id="send">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14 M13 6l6 6-6 6"/></svg>
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="canvas-wrap">
+    <h3>
+      <span style="display:inline-flex; align-items:center; gap:8px">Canvas <span class="pill" id="canvasPill">Hero · Home</span></span>
+      <span class="pill" id="versionLabel">v1 · original</span>
+    </h3>
+    <div class="cv-block" id="canvas">
+      <span class="eye">selected</span>
+      <h2 id="cvH">Build sites at the speed of thought.</h2>
+      <p id="cvP">Drop in blocks, theme with tokens, publish in one click.</p>
+      <div class="ctas"><span class="cta pri" id="cvCta">Get started</span><span class="cta sec">Learn more</span></div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><span class="k">Scoped by default</span><h4>Inherits current selection</h4><p>Whatever's selected on the canvas becomes the AI's target. Change it via the chip or by reselecting.</p></div>
+    <div class="note"><span class="k">Non-destructive</span><h4>Always shows a diff</h4><p>Edits land as a reviewable diff inside the thread. Accept to apply; reject to discard. Multi-field edits group as one card.</p></div>
+    <div class="note"><span class="k">Streaming</span><h4>Feel-fast response</h4><p>Answers stream token by token. Quick actions feel instant — the diff assembles as it arrives.</p></div>
+  </div>
+
+  <div class="flow">
+    <div class="step"><span class="n">1</span><div class="t">Select</div><div class="d">Pick a block on the canvas. The scope chip updates.</div></div>
+    <div class="step"><span class="n">2</span><div class="t">Ask</div><div class="d">Type a prompt or tap a quick action. Streams live.</div></div>
+    <div class="step"><span class="n">3</span><div class="t">Review</div><div class="d">Diff card shows before/after. Preview highlights changes.</div></div>
+    <div class="step"><span class="n">4</span><div class="t">Apply</div><div class="d">Accept to commit (undo snapshot kept). Reject to discard.</div></div>
+  </div>
+
+  <div class="foot"><span>Try: click a quick action → watch stream → Accept</span><span class="mono">tab-ai · v1</span></div>
+</div>
+
+<div class="toast" id="toast">Done</div>
+
+<script>
+const thread = document.getElementById('thread');
+const input = document.getElementById('input');
+const send = document.getElementById('send');
+const toast = document.getElementById('toast');
+
+// Canvas refs
+const cvH = document.getElementById('cvH');
+const cvP = document.getElementById('cvP');
+const cvCta = document.getElementById('cvCta');
+const canvas = document.getElementById('canvas');
+const vlabel = document.getElementById('versionLabel');
+
+const original = {
+  h: 'Build sites at the speed of thought.',
+  p: 'Drop in blocks, theme with tokens, publish in one click.',
+  cta: 'Get started'
+};
+
+const prompts = {
+  confident: {
+    user: 'Make the hero more confident.',
+    reply: 'I tightened the headline and subcopy. Here\'s the diff:',
+    edit: {
+      label: 'Hero',
+      rows: [
+        { f: 'headline', from: original.h, to: 'Ship production sites at thought-speed.' },
+        { f: 'subcopy', from: original.p, to: 'Drag, theme, publish — in one afternoon.' },
+      ],
+      apply: { h: 'Ship production sites at thought-speed.', p: 'Drag, theme, publish — in one afternoon.', cta: original.cta },
+      version: 'v2 · confident'
+    }
+  },
+  shorter: {
+    user: 'Make the copy shorter.',
+    reply: 'Trimmed to the essentials.',
+    edit: {
+      label: 'Hero',
+      rows: [
+        { f: 'headline', from: original.h, to: 'Sites, at thought-speed.' },
+        { f: 'subcopy', from: original.p, to: 'Drag. Theme. Publish.' },
+      ],
+      apply: { h: 'Sites, at thought-speed.', p: 'Drag. Theme. Publish.', cta: original.cta },
+      version: 'v2 · concise'
+    }
+  },
+  cta: {
+    user: 'Punch up the CTA.',
+    reply: 'Stronger verb, urgency on the primary action.',
+    edit: {
+      label: 'Hero.cta',
+      rows: [
+        { f: 'primary', from: 'Get started', to: 'Start building — free' },
+      ],
+      apply: { h: original.h, p: original.p, cta: 'Start building — free' },
+      version: 'v2 · punchy-cta'
+    }
+  },
+  variant: {
+    user: 'Try a bolder visual variant.',
+    reply: 'Swapping to the gradient treatment. Copy kept.',
+    edit: {
+      label: 'Hero.style',
+      rows: [
+        { f: 'background', from: 'slate-900', to: 'gradient · slate → blue' },
+      ],
+      apply: { h: original.h, p: original.p, cta: original.cta, glow: true },
+      version: 'v2 · gradient'
+    }
+  }
+};
+
+function notify(m){ toast.textContent=m; toast.classList.add('on'); clearTimeout(toast._t); toast._t=setTimeout(()=>toast.classList.remove('on'),1400); }
+
+function addUserMsg(text) {
+  const el = document.createElement('div');
+  el.className = 'msg u';
+  el.innerHTML = `<div class="role u">You</div><div class="body">${text}</div>`;
+  thread.appendChild(el);
+  thread.scrollTop = thread.scrollHeight;
+}
+
+async function streamText(el, text, speed = 14) {
+  el.textContent = '';
+  el.classList.add('streaming');
+  for (let i = 0; i < text.length; i++) {
+    el.textContent += text[i];
+    if (i % 3 === 0) thread.scrollTop = thread.scrollHeight;
+    await new Promise(r => setTimeout(r, speed));
+  }
+  el.classList.remove('streaming');
+}
+
+async function runPrompt(key) {
+  const p = prompts[key];
+  addUserMsg(p.user);
+
+  // assistant bubble
+  const msg = document.createElement('div');
+  msg.className = 'msg a';
+  msg.innerHTML = `<div class="role">Assistant</div><div class="body"><p></p></div>`;
+  thread.appendChild(msg);
+  const para = msg.querySelector('p');
+  thread.scrollTop = thread.scrollHeight;
+
+  await streamText(para, p.reply);
+
+  // diff card
+  const diff = document.createElement('div');
+  diff.className = 'diff';
+  const rowsHtml = p.edit.rows.map(r => `
+    <div class="row rm"><span class="g">−</span><span>${r.from}</span></div>
+    <div class="row ad"><span class="g">+</span><span>${r.to}</span></div>
+  `).join('');
+  diff.innerHTML = `
+    <div class="dh"><span>EDIT</span><span class="tgt">${p.edit.label}</span><span class="badge">${p.edit.rows.length}</span></div>
+    <div class="db">${rowsHtml}</div>
+    <div class="dfoot"><div class="btn rej">Reject</div><div class="btn acc">Accept</div></div>
+  `;
+  thread.appendChild(diff);
+  thread.scrollTop = thread.scrollHeight;
+
+  diff.querySelector('.acc').addEventListener('click', () => {
+    cvH.textContent = p.edit.apply.h;
+    cvP.textContent = p.edit.apply.p;
+    cvCta.textContent = p.edit.apply.cta;
+    canvas.classList.toggle('glow', !!p.edit.apply.glow);
+    vlabel.textContent = p.edit.version;
+    diff.querySelector('.dfoot').innerHTML = `<div class="btn rej" style="cursor:default; pointer-events:none; color:var(--bd-success); border-color:var(--bd-success); background:rgba(22,163,74,0.08)">✓ Applied</div>`;
+    notify(`Applied · ${p.edit.label}`);
+  });
+  diff.querySelector('.rej').addEventListener('click', () => {
+    diff.querySelector('.dfoot').innerHTML = `<div class="btn rej" style="cursor:default; pointer-events:none; color:var(--bd-fg-muted)">✗ Rejected</div>`;
+    notify('Rejected');
+  });
+}
+
+document.getElementById('qa').addEventListener('click', e => {
+  const a = e.target.closest('.a'); if (!a) return;
+  runPrompt(a.dataset.p);
+});
+
+input.addEventListener('input', () => {
+  send.classList.toggle('off', !input.value.trim());
+});
+
+function submit() {
+  const t = input.value.trim(); if (!t) return;
+  input.value = ''; send.classList.add('off');
+  addUserMsg(t);
+  // echo back a minimal stream
+  (async () => {
+    const msg = document.createElement('div');
+    msg.className = 'msg a';
+    msg.innerHTML = `<div class="role">Assistant</div><div class="body"><p></p></div>`;
+    thread.appendChild(msg);
+    const para = msg.querySelector('p');
+    thread.scrollTop = thread.scrollHeight;
+    await streamText(para, `Got it. I'd scope this to ${document.getElementById('scope').textContent} and draft options. Try a quick action above for a full demo.`);
+  })();
+}
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); }
+});
+send.addEventListener('click', submit);
+
+document.getElementById('newchat').addEventListener('click', () => {
+  thread.innerHTML = `<div class="msg a"><div class="role">Assistant</div><div class="body"><p>Fresh chat. Scope is <b>${document.getElementById('scope').textContent}</b>.</p></div></div>`;
+  cvH.textContent = original.h; cvP.textContent = original.p; cvCta.textContent = original.cta;
+  canvas.classList.remove('glow');
+  vlabel.textContent = 'v1 · original';
+  notify('New chat');
+});
+
+document.getElementById('changeScope').addEventListener('click', () => {
+  const opts = ['Hero · Home', 'Pricing · Plans', 'Footer', 'Navbar'];
+  const cur = document.getElementById('scope').textContent;
+  const next = opts[(opts.indexOf(cur) + 1) % opts.length];
+  document.getElementById('scope').textContent = next;
+  document.getElementById('canvasPill').textContent = next;
+  input.placeholder = `Ask about ${next}…`;
+  notify(`Scope → ${next}`);
+});
+
+document.getElementById('modelPick').addEventListener('click', () => {
+  const opts = ['sonnet', 'opus', 'haiku'];
+  const label = document.getElementById('modelLabel');
+  const pick = document.getElementById('modelPick');
+  const cur = pick.textContent.trim();
+  const next = opts[(opts.indexOf(cur) + 1) % opts.length];
+  pick.innerHTML = `<svg class="base" width="10" height="10" viewBox="0 0 24 24"><path d="M12 3l2.1 5.4 5.4 2.1-5.4 2.1L12 18l-2.1-5.4L4.5 10.5l5.4-2.1z"/></svg> ${next}`;
+  label.textContent = `claude · ${next}`;
+});
+</script>
+</body></html>

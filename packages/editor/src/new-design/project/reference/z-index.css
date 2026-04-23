@@ -1,0 +1,21 @@
+/**
+ * themes/design-system/z-index.css
+ * Buildrik DS V1 — chrome z-index layering
+ * @license BSD-3-Clause
+ */
+
+:root {
+  --buildrick-z-base: 0;
+  --buildrick-z-canvas: 1;
+  --buildrick-z-sticky: 10;
+  --buildrick-z-rail: 20;
+  --buildrick-z-panel: 30;
+  --buildrick-z-topbar: 40;
+  --buildrick-z-dropdown: 100;
+  --buildrick-z-popover: 200;
+  --buildrick-z-modal: 300;
+  --buildrick-z-overlay: 400;
+  --buildrick-z-toast: 500;
+  --buildrick-z-tooltip: 600;
+  --buildrick-z-max: 9999;
+}

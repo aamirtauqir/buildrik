@@ -1,0 +1,197 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Design · tab prototype</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+  .section { padding: 10px 12px; border-bottom: 1px solid var(--bd-border); }
+  .section h3 {
+    margin: 0 0 8px; font: 600 10.5px var(--bd-mono);
+    color: var(--bd-fg-muted); text-transform: uppercase; letter-spacing: 0.08em;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .section h3 .mini { font: 500 10px var(--bd-mono); color: var(--bd-fg-secondary); text-transform: none; letter-spacing: 0; }
+
+  .swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+  .sw {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    position: relative; cursor: pointer;
+    border: 1px solid var(--bd-border);
+  }
+  .sw.active { outline: 2px solid var(--bd-accent); outline-offset: 2px; }
+  .sw::after {
+    content: attr(data-tok); position: absolute; bottom: -14px; left: 0; right: 0;
+    font: 500 8.5px var(--bd-mono); color: var(--bd-fg-muted); text-align: center;
+  }
+
+  .kv { display: grid; grid-template-columns: 90px 1fr; gap: 6px 8px; align-items: center; font: 500 11px var(--bd-font); }
+  .kv .k { color: var(--bd-fg-muted); font-family: var(--bd-mono); font-size: 10.5px; }
+  .input {
+    height: 26px; padding: 0 8px; border-radius: 5px;
+    border: 1px solid var(--bd-border); background: #fff;
+    font: 500 11px var(--bd-mono); color: var(--bd-fg-primary); width: 100%;
+  }
+  .chip {
+    display: inline-flex; gap: 3px; align-items: center;
+    padding: 3px 7px; border-radius: 5px;
+    background: var(--bd-bg-subtle); font: 500 10.5px var(--bd-mono);
+    color: var(--bd-fg-primary);
+  }
+
+  .font-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px; background: var(--bd-bg-subtle); border-radius: 6px;
+    cursor: pointer;
+  }
+  .font-row .fname { font: 500 12px var(--bd-font); color: var(--bd-fg-primary); }
+  .font-row .meta { font: 500 10px var(--bd-mono); color: var(--bd-fg-muted); }
+
+  .scale { display: flex; justify-content: space-between; align-items: flex-end; }
+  .scale .step {
+    display: flex; flex-direction: column; gap: 2px; align-items: center;
+    flex: 1;
+  }
+  .scale .bar {
+    width: 100%; background: var(--bd-accent-tint); border-radius: 2px 2px 0 0;
+  }
+  .scale .lbl { font: 500 9px var(--bd-mono); color: var(--bd-fg-muted); }
+
+  .pbody { overflow: auto; flex: 1; }
+</style>
+</head><body>
+<div class="page">
+  <div class="head">
+    <div class="ttl">
+      <h1>Design · tab prototype</h1>
+      <div class="sub">site-wide design tokens · colour · type · spacing · radius</div>
+    </div>
+    <div class="nav">
+      <a href="index.html">All tabs</a>
+      <a href="tab-add.html">Add</a>
+      <a class="on">Design</a>
+      <a href="tab-settings.html">Settings</a>
+    </div>
+  </div>
+
+  <div class="split">
+    <!-- Wire -->
+    <div>
+      <div class="col-h"><h2>Wireframe</h2><span class="tag">scrollable sections · tokens grouped</span></div>
+      <div class="shell wire">
+        <nav class="rail">
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="18" height="18" rx="3"/><path class="s" d="M12 8v8 M8 12h8"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="4" width="14" height="4" rx="1"/><rect class="s" x="7" y="10" width="14" height="4" rx="1"/><rect class="s" x="3" y="16" width="14" height="4" rx="1"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M8 3h6l4 4v10a2 2 0 01-2 2H8a2 2 0 01-2-2V5z M14 3v4h4"/></svg></button>
+          <div class="divr"></div>
+          <button class="on"><svg width="17" height="17" viewBox="0 0 24 24"><circle class="s" cx="12" cy="12" r="9"/><path class="s" d="M12 3v18 M3 12h18"/></svg></button>
+          <div style="flex:1"></div>
+        </nav>
+        <section class="panel">
+          <div class="panel-h"><div class="ttl"><h2>Design</h2><div class="panel-sub">site tokens</div></div></div>
+          <div class="pbody">
+            <div class="section"><h3>Colour</h3><div class="swatches">
+              <div class="sw" style="background:#2D6DFF"></div>
+              <div class="sw" style="background:#0F172A"></div>
+              <div class="sw" style="background:#64748B"></div>
+              <div class="sw" style="background:#E2E8F0"></div>
+              <div class="sw" style="background:#F8FAFC"></div>
+              <div class="sw" style="background:#DC2626"></div>
+            </div></div>
+            <div class="section"><h3>Type</h3>
+              <div class="font-row"><span class="fname">Inter Tight</span><span class="meta">ui · 400–700</span></div>
+            </div>
+            <div class="section"><h3>Radius</h3>
+              <div class="kv"><span class="k">sm / md / lg</span><span>4 · 8 · 12</span></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Prototype -->
+    <div>
+      <div class="col-h"><h2>Prototype</h2><span class="tag">hi-fi · edit tokens · live preview</span></div>
+      <div class="shell">
+        <nav class="rail">
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="18" height="18" rx="3"/><path class="s" d="M12 8v8 M8 12h8"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="4" width="14" height="4" rx="1"/><rect class="s" x="7" y="10" width="14" height="4" rx="1"/><rect class="s" x="3" y="16" width="14" height="4" rx="1"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M8 3h6l4 4v10a2 2 0 01-2 2H8a2 2 0 01-2-2V5z M14 3v4h4"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="8" height="8" rx="1.5"/><rect class="s" x="13" y="3" width="8" height="8" rx="1.5"/><rect class="s" x="3" y="13" width="8" height="8" rx="1.5"/><rect class="s" x="13" y="13" width="8" height="8" rx="1.5"/></svg></button>
+          <div class="divr"></div>
+          <button class="on" title="Design"><svg width="17" height="17" viewBox="0 0 24 24"><circle class="f" cx="12" cy="12" r="9"/><circle class="s" cx="12" cy="12" r="9"/><path class="s" d="M12 3v18 M3 12h18"/></svg></button>
+          <div style="flex:1"></div>
+        </nav>
+        <section class="panel">
+          <div class="panel-h"><div class="ttl"><h2>Design</h2><div class="panel-sub">site-wide tokens · affect every page</div></div></div>
+
+          <div class="pbody">
+            <!-- Colour -->
+            <div class="section">
+              <h3>Brand colour <span class="mini">#2D6DFF</span></h3>
+              <div class="swatches" style="padding-bottom: 18px">
+                <div class="sw active" style="background:#2D6DFF" data-tok="accent"></div>
+                <div class="sw" style="background:#0F172A" data-tok="heading"></div>
+                <div class="sw" style="background:#334155" data-tok="text"></div>
+                <div class="sw" style="background:#64748B" data-tok="muted"></div>
+                <div class="sw" style="background:#E2E8F0" data-tok="border"></div>
+                <div class="sw" style="background:#F8FAFC; border-color:var(--bd-border-medium)" data-tok="panel"></div>
+              </div>
+            </div>
+
+            <!-- Type -->
+            <div class="section">
+              <h3>Typography</h3>
+              <div style="display:flex; flex-direction:column; gap:4px">
+                <div class="font-row"><span><span class="fname">Inter Tight</span> <span class="meta">ui + headings</span></span><span class="meta">400 · 500 · 600 · 700</span></div>
+                <div class="font-row"><span><span class="fname" style="font-family:var(--bd-mono)">Geist Mono</span> <span class="meta">numeric · code</span></span><span class="meta">400 · 500 · 600</span></div>
+              </div>
+            </div>
+
+            <!-- Scale -->
+            <div class="section">
+              <h3>Type scale <span class="mini">11 · 12 · 13 · 14 · 16 · 18 · 20 · 24</span></h3>
+              <div class="scale" style="height:60px">
+                <div class="step"><div class="bar" style="height:11px"></div><span class="lbl">11</span></div>
+                <div class="step"><div class="bar" style="height:12px"></div><span class="lbl">12</span></div>
+                <div class="step"><div class="bar" style="height:13px"></div><span class="lbl">13</span></div>
+                <div class="step"><div class="bar" style="height:14px"></div><span class="lbl">14</span></div>
+                <div class="step"><div class="bar" style="height:16px"></div><span class="lbl">16</span></div>
+                <div class="step"><div class="bar" style="height:18px"></div><span class="lbl">18</span></div>
+                <div class="step"><div class="bar" style="height:20px"></div><span class="lbl">20</span></div>
+                <div class="step"><div class="bar" style="height:24px"></div><span class="lbl">24</span></div>
+                <div class="step"><div class="bar" style="height:32px"></div><span class="lbl">32</span></div>
+                <div class="step"><div class="bar" style="height:48px"></div><span class="lbl">48</span></div>
+              </div>
+            </div>
+
+            <!-- Radius -->
+            <div class="section">
+              <h3>Radius</h3>
+              <div class="kv">
+                <span class="k">sm</span><input class="input" value="4"/>
+                <span class="k">md</span><input class="input" value="8"/>
+                <span class="k">lg</span><input class="input" value="12"/>
+                <span class="k">full</span><input class="input" value="9999"/>
+              </div>
+            </div>
+
+            <!-- Spacing -->
+            <div class="section">
+              <h3>Spacing <span class="mini">4-pt grid</span></h3>
+              <div style="display:flex; gap:4px; flex-wrap:wrap">
+                <span class="chip">4</span>
+                <span class="chip">8</span>
+                <span class="chip">12</span>
+                <span class="chip">16</span>
+                <span class="chip">20</span>
+                <span class="chip">24</span>
+                <span class="chip">32</span>
+                <span class="chip">40</span>
+                <span class="chip">48</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>

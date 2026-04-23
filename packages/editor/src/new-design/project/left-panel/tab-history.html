@@ -1,0 +1,179 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>History · tab prototype</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+  .tl-body { overflow: auto; flex: 1; padding: 4px 0 10px; }
+  .day-h {
+    padding: 10px 12px 4px;
+    font: 600 9.5px var(--bd-mono); color: var(--bd-fg-muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    position: sticky; top: 0; background: linear-gradient(#fff 80%, transparent);
+  }
+  .ver {
+    position: relative;
+    padding: 8px 12px 8px 30px;
+    display: flex; flex-direction: column; gap: 2px;
+    cursor: pointer;
+    margin: 0 6px;
+    border-radius: 5px;
+  }
+  .ver:hover { background: var(--bd-bg-subtle); }
+  .ver.on {
+    background: var(--bd-accent-tint);
+    box-shadow: 0 0 0 1px var(--bd-accent) inset;
+  }
+  .ver::before {
+    content: ""; position: absolute; left: 16px; top: 14px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--bd-fg-muted);
+  }
+  .ver.on::before { background: var(--bd-accent); box-shadow: 0 0 0 3px rgba(45,109,255,0.20); }
+  .ver::after {
+    content: ""; position: absolute; left: 19px; top: 22px; bottom: -10px;
+    width: 1px; background: var(--bd-border);
+  }
+  .ver:last-of-type::after { display: none; }
+  .ver .t { font: 500 11.5px var(--bd-font); color: var(--bd-fg-primary); display: flex; align-items: center; gap: 5px; }
+  .ver .m { font: 500 10px var(--bd-mono); color: var(--bd-fg-muted); display: flex; gap: 6px; align-items: center; }
+  .tag {
+    font: 500 9px var(--bd-mono); padding: 1px 5px; border-radius: 3px;
+    background: var(--bd-bg-subtle); color: var(--bd-fg-muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .tag.pub  { background: rgba(22,163,74,0.15); color: var(--bd-success); }
+  .tag.auto { background: var(--bd-bg-subtle); color: var(--bd-fg-muted); }
+
+  .filter-bar {
+    display: flex; gap: 4px; padding: 8px 10px;
+    border-bottom: 1px solid var(--bd-border);
+  }
+  .fpill {
+    font: 500 10px var(--bd-font); color: var(--bd-fg-secondary);
+    padding: 3px 8px; border-radius: 9999px; background: var(--bd-bg-subtle); cursor: pointer;
+  }
+  .fpill.on { background: var(--bd-accent-tint); color: var(--bd-accent); font-weight: 600; }
+
+  .actions-bar {
+    padding: 8px 10px; border-top: 1px solid var(--bd-border);
+    background: var(--bd-bg-panel);
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 6px;
+  }
+  .btn-xs {
+    height: 24px; padding: 0 8px; border-radius: 5px;
+    font: 500 10.5px var(--bd-font); border: 1px solid var(--bd-border);
+    background: #fff; color: var(--bd-fg-primary); cursor: pointer;
+  }
+  .btn-xs.p { background: var(--bd-accent); color: #fff; border-color: var(--bd-accent); }
+</style>
+</head><body>
+<div class="page">
+  <div class="head">
+    <div class="ttl">
+      <h1>History · tab prototype</h1>
+      <div class="sub">version timeline · auto-save + published checkpoints · revert</div>
+    </div>
+    <div class="nav">
+      <a href="index.html">All tabs</a>
+      <a href="tab-pages.html">Pages</a>
+      <a href="tab-publish.html">Publish</a>
+      <a class="on">History</a>
+    </div>
+  </div>
+
+  <div class="split">
+    <!-- Wire -->
+    <div>
+      <div class="col-h"><h2>Wireframe</h2><span class="tag">timeline · filter pills · dot connector</span></div>
+      <div class="shell wire">
+        <nav class="rail">
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="18" height="18" rx="3"/><path class="s" d="M12 8v8 M8 12h8"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M8 3h6l4 4v10a2 2 0 01-2 2H8a2 2 0 01-2-2V5z M14 3v4h4"/></svg></button>
+          <div class="divr"></div>
+          <button class="on"><svg width="17" height="17" viewBox="0 0 24 24"><circle class="s" cx="12" cy="12" r="9"/><path class="s" d="M12 8v4l3 2"/></svg></button>
+          <div style="flex:1"></div>
+        </nav>
+        <section class="panel">
+          <div class="panel-h"><div class="ttl"><h2>History</h2><div class="panel-sub">versions</div></div></div>
+          <div class="filter-bar"><span class="fpill on">All</span><span class="fpill">Published</span><span class="fpill">Manual</span></div>
+          <div class="tl-body">
+            <div class="day-h">Today</div>
+            <div class="ver on"><span class="t">Hero copy</span><span class="m">2:14 PM · <span class="tag pub">Pub</span></span></div>
+            <div class="ver"><span class="t">Layout tweak</span><span class="m">11:48 AM</span></div>
+            <div class="ver"><span class="t">Auto-save</span><span class="m">10:22 AM · <span class="tag auto">Auto</span></span></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Prototype -->
+    <div>
+      <div class="col-h"><h2>Prototype</h2><span class="tag">filter · revert · compare</span></div>
+      <div class="shell">
+        <nav class="rail">
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="18" height="18" rx="3"/><path class="s" d="M12 8v8 M8 12h8"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="4" width="14" height="4" rx="1"/><rect class="s" x="7" y="10" width="14" height="4" rx="1"/><rect class="s" x="3" y="16" width="14" height="4" rx="1"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M8 3h6l4 4v10a2 2 0 01-2 2H8a2 2 0 01-2-2V5z M14 3v4h4"/></svg></button>
+          <div class="divr"></div>
+          <button class="on" title="History"><svg width="17" height="17" viewBox="0 0 24 24"><circle class="f" cx="12" cy="12" r="9"/><circle class="s" cx="12" cy="12" r="9"/><path class="s" d="M12 8v4l3 2"/></svg></button>
+          <div style="flex:1"></div>
+        </nav>
+        <section class="panel">
+          <div class="panel-h"><div class="ttl"><h2>History</h2><div class="panel-sub">14 versions · 3 published</div></div>
+            <div class="acts">
+              <button class="icon-btn" title="Branch"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M6 8v8 M18 8a4 4 0 01-4 4h-4"/></svg></button>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <span class="fpill on">All</span>
+            <span class="fpill">Published</span>
+            <span class="fpill">Manual</span>
+            <span class="fpill">Auto</span>
+          </div>
+          <div class="tl-body">
+            <div class="day-h">Today · Apr 22</div>
+            <div class="ver on">
+              <span class="t">Hero copy update</span>
+              <span class="m">2:14 PM · you · <span class="tag pub">Published</span></span>
+            </div>
+            <div class="ver">
+              <span class="t">Layout: columns-3 → 2</span>
+              <span class="m">11:48 AM · you</span>
+            </div>
+            <div class="ver">
+              <span class="t">Auto-save</span>
+              <span class="m">10:22 AM · <span class="tag auto">Auto</span></span>
+            </div>
+
+            <div class="day-h">Yesterday</div>
+            <div class="ver">
+              <span class="t">CTA colour + radius</span>
+              <span class="m">6:02 PM · you</span>
+            </div>
+            <div class="ver">
+              <span class="t">First published draft</span>
+              <span class="m">4:31 PM · <span class="tag pub">Published</span></span>
+            </div>
+            <div class="ver">
+              <span class="t">Added /about page</span>
+              <span class="m">2:17 PM · you</span>
+            </div>
+
+            <div class="day-h">Apr 20</div>
+            <div class="ver">
+              <span class="t">Initial import</span>
+              <span class="m">9:04 AM · template</span>
+            </div>
+          </div>
+          <div class="actions-bar">
+            <span style="font: 500 10px var(--bd-mono); color: var(--bd-fg-muted)">v14 selected</span>
+            <div style="display:flex; gap:4px">
+              <button class="btn-xs">Compare</button>
+              <button class="btn-xs p">Revert</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>

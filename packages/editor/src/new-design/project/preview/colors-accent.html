@@ -1,0 +1,42 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  .swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .sw { display: flex; flex-direction: column; gap: 6px; }
+  .chip {
+    height: 72px; border-radius: 10px;
+    display: flex; align-items: flex-end; padding: 10px 12px;
+    color: #fff; font: 600 12px var(--bd-font);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 1px 2px rgba(15,23,42,0.08);
+  }
+  .meta { display: flex; justify-content: space-between; align-items: baseline; }
+  .meta .name { font: 600 12px var(--bd-font); color: var(--bd-fg-heading); }
+  .meta .hex  { font: 500 11px var(--bd-mono); color: var(--bd-fg-muted); }
+</style>
+</head><body><div class="card">
+  <div class="swatches">
+    <div class="sw">
+      <div class="chip" style="background:#2D6DFF">Accent</div>
+      <div class="meta"><span class="name">Cobalt</span><span class="hex">#2D6DFF</span></div>
+    </div>
+    <div class="sw">
+      <div class="chip" style="background:#4B8DFF">Hover</div>
+      <div class="meta"><span class="name">Cobalt hover</span><span class="hex">#4B8DFF</span></div>
+    </div>
+    <div class="sw">
+      <div class="chip" style="background:#1E58D9">Pressed</div>
+      <div class="meta"><span class="name">Cobalt pressed</span><span class="hex">#1E58D9</span></div>
+    </div>
+    <div class="sw">
+      <div class="chip" style="background:rgba(45,109,255,0.10); color:#2D6DFF; box-shadow:inset 0 0 0 1px rgba(45,109,255,0.25)">Tint 10%</div>
+      <div class="meta"><span class="name">Accent tint</span><span class="hex">2D6DFF / .10</span></div>
+    </div>
+    <div class="sw">
+      <div class="chip" style="background:rgba(45,109,255,0.05); color:#2D6DFF; box-shadow:inset 0 0 0 1px rgba(45,109,255,0.20)">Subtle 5%</div>
+      <div class="meta"><span class="name">Accent subtle</span><span class="hex">2D6DFF / .05</span></div>
+    </div>
+    <div class="sw">
+      <div class="chip" style="background:rgba(45,109,255,0.15); color:#2D6DFF; box-shadow:inset 0 0 0 1px rgba(45,109,255,0.30)">Alpha 15%</div>
+      <div class="meta"><span class="name">Accent α15</span><span class="hex">2D6DFF / .15</span></div>
+    </div>
+  </div>
+</div></body></html>

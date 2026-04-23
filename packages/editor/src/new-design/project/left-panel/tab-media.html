@@ -1,0 +1,147 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Media · tab prototype</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+  .mgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 8px 12px; }
+  .asset {
+    aspect-ratio: 1;
+    border: 1px solid var(--bd-border); border-radius: 6px;
+    overflow: hidden; position: relative; cursor: grab;
+    background: var(--bd-bg-subtle);
+    transition: 120ms;
+  }
+  .asset:hover { border-color: var(--bd-accent); box-shadow: 0 0 0 3px rgba(45,109,255,0.10); }
+  .asset:active { cursor: grabbing; }
+  .asset .thumb { width: 100%; height: 100%; display: block; object-fit: cover; }
+  .asset .type {
+    position: absolute; bottom: 3px; left: 3px;
+    font: 500 8.5px var(--bd-mono); color: #fff;
+    background: rgba(15,23,42,0.6); padding: 1px 4px; border-radius: 2px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .asset .badge-new {
+    position: absolute; top: 3px; right: 3px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--bd-accent);
+  }
+  .fake {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font: 500 10px var(--bd-mono); color: var(--bd-fg-muted);
+  }
+  .drop-zone {
+    margin: 10px 12px 6px;
+    padding: 12px; border: 1px dashed var(--bd-border-medium); border-radius: 8px;
+    background: var(--bd-bg-subtle);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font: 500 11px var(--bd-font); color: var(--bd-fg-secondary); cursor: pointer;
+  }
+  .drop-zone:hover { border-color: var(--bd-accent); color: var(--bd-accent); background: rgba(45,109,255,0.04); }
+  .fsuite { display: flex; gap: 4px; padding: 8px 12px; border-bottom: 1px solid var(--bd-border); overflow-x: auto; }
+  .fpill {
+    font: 500 10px var(--bd-font); color: var(--bd-fg-secondary);
+    padding: 3px 8px; border-radius: 9999px; background: var(--bd-bg-subtle); cursor: pointer; white-space: nowrap;
+  }
+  .fpill.on { background: var(--bd-accent-tint); color: var(--bd-accent); font-weight: 600; }
+  .qstat {
+    padding: 8px 12px; display: flex; justify-content: space-between;
+    font: 500 10px var(--bd-mono); color: var(--bd-fg-muted);
+    border-top: 1px solid var(--bd-border);
+    background: var(--bd-bg-panel);
+  }
+  .pbody { overflow: auto; flex: 1; }
+</style>
+</head><body>
+<div class="page">
+  <div class="head">
+    <div class="ttl">
+      <h1>Media · tab prototype</h1>
+      <div class="sub">asset library · images, video, svg, docs · drop to upload</div>
+    </div>
+    <div class="nav">
+      <a href="index.html">All tabs</a>
+      <a href="tab-add.html">Add</a>
+      <a class="on">Media</a>
+      <a href="tab-pages.html">Pages</a>
+    </div>
+  </div>
+
+  <div class="split">
+    <!-- Wire -->
+    <div>
+      <div class="col-h"><h2>Wireframe</h2><span class="tag">3-col grid · filter pills · drop zone</span></div>
+      <div class="shell wire">
+        <nav class="rail">
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="18" height="18" rx="3"/><path class="s" d="M12 8v8 M8 12h8"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="4" width="14" height="4" rx="1"/><rect class="s" x="7" y="10" width="14" height="4" rx="1"/><rect class="s" x="3" y="16" width="14" height="4" rx="1"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M8 3h6l4 4v10a2 2 0 01-2 2H8a2 2 0 01-2-2V5z M14 3v4h4"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="8" height="8" rx="1.5"/><rect class="s" x="13" y="3" width="8" height="8" rx="1.5"/><rect class="s" x="3" y="13" width="8" height="8" rx="1.5"/><rect class="s" x="13" y="13" width="8" height="8" rx="1.5"/></svg></button>
+          <button class="on"><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="4" width="18" height="14" rx="2"/><path class="s" d="M3 15l5-5 4 4 3-3 6 6"/></svg></button>
+          <div style="flex:1"></div>
+        </nav>
+        <section class="panel">
+          <div class="panel-h"><div class="ttl"><h2>Media</h2><div class="panel-sub">count · storage</div></div><div class="acts"><button class="icon-btn">↑</button></div></div>
+          <div class="fsuite"><span class="fpill on">All</span><span class="fpill">Images</span><span class="fpill">Video</span><span class="fpill">SVG</span></div>
+          <div class="drop-zone">Drop files</div>
+          <div class="pbody">
+            <div class="mgrid">
+              <div class="asset"><div class="fake">IMG</div></div>
+              <div class="asset"><div class="fake">IMG</div></div>
+              <div class="asset"><div class="fake">IMG</div></div>
+              <div class="asset"><div class="fake">MP4</div></div>
+              <div class="asset"><div class="fake">SVG</div></div>
+              <div class="asset"><div class="fake">PDF</div></div>
+            </div>
+          </div>
+          <div class="qstat"><span>48 files</span><span>12.4 MB / 2 GB</span></div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Prototype -->
+    <div>
+      <div class="col-h"><h2>Prototype</h2><span class="tag">upload · filter · drag to canvas</span></div>
+      <div class="shell">
+        <nav class="rail">
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="18" height="18" rx="3"/><path class="s" d="M12 8v8 M8 12h8"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="4" width="14" height="4" rx="1"/><rect class="s" x="7" y="10" width="14" height="4" rx="1"/><rect class="s" x="3" y="16" width="14" height="4" rx="1"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M8 3h6l4 4v10a2 2 0 01-2 2H8a2 2 0 01-2-2V5z M14 3v4h4"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="8" height="8" rx="1.5"/><rect class="s" x="13" y="3" width="8" height="8" rx="1.5"/><rect class="s" x="3" y="13" width="8" height="8" rx="1.5"/><rect class="s" x="13" y="13" width="8" height="8" rx="1.5"/></svg></button>
+          <button class="on" title="Media"><svg width="17" height="17" viewBox="0 0 24 24"><rect class="f" x="3" y="4" width="18" height="14" rx="2"/><rect class="s" x="3" y="4" width="18" height="14" rx="2"/><path class="s" d="M3 15l5-5 4 4 3-3 6 6"/><circle fill="currentColor" cx="9" cy="9" r="1.2"/></svg></button>
+          <div style="flex:1"></div>
+        </nav>
+        <section class="panel">
+          <div class="panel-h"><div class="ttl"><h2>Media</h2><div class="panel-sub">48 files · 12.4 MB</div></div>
+            <div class="acts">
+              <button class="icon-btn" title="Upload"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M12 16V4 M6 10l6-6 6 6 M4 20h16"/></svg></button>
+            </div>
+          </div>
+          <div class="fsuite">
+            <span class="fpill on">All</span>
+            <span class="fpill">Images 34</span>
+            <span class="fpill">Video 4</span>
+            <span class="fpill">SVG 8</span>
+            <span class="fpill">Docs 2</span>
+          </div>
+          <div class="drop-zone">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 16V4 M6 10l6-6 6 6"/></svg>
+            Drop files or click to upload
+          </div>
+          <div class="pbody">
+            <div class="mgrid">
+              <div class="asset"><div class="fake" style="background:linear-gradient(135deg,#93C5FD,#3B82F6); color:#fff">hero.jpg</div><span class="type">jpg</span></div>
+              <div class="asset"><div class="fake" style="background:linear-gradient(135deg,#FDE68A,#F59E0B); color:#fff">about.jpg</div><span class="type">jpg</span><span class="badge-new"></span></div>
+              <div class="asset"><div class="fake" style="background:linear-gradient(135deg,#BBF7D0,#16A34A); color:#fff">team.jpg</div><span class="type">jpg</span></div>
+              <div class="asset"><div class="fake" style="background:#0F172A; color:#fff">▶ promo</div><span class="type">mp4</span></div>
+              <div class="asset"><div class="fake" style="background:#fff; color:var(--bd-accent); border:1px solid var(--bd-border)">logo</div><span class="type">svg</span></div>
+              <div class="asset"><div class="fake" style="background:linear-gradient(135deg,#FCA5A5,#DC2626); color:#fff">cover.png</div><span class="type">png</span></div>
+              <div class="asset"><div class="fake" style="background:var(--bd-bg-subtle); color:var(--bd-fg-muted)">brief.pdf</div><span class="type">pdf</span></div>
+              <div class="asset"><div class="fake" style="background:linear-gradient(135deg,#C7D2FE,#6366F1); color:#fff">banner</div><span class="type">jpg</span></div>
+              <div class="asset"><div class="fake" style="background:#fff; color:var(--bd-accent); border:1px solid var(--bd-border)">icon</div><span class="type">svg</span></div>
+            </div>
+          </div>
+          <div class="qstat"><span>48 files</span><span>12.4 MB / 2 GB</span></div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>

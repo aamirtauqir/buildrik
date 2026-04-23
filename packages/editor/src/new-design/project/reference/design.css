@@ -1,0 +1,95 @@
+/**
+ * themes/design-system/design.css
+ * Buildrik DS V1 — user-editable SITE tokens (pre-render baselines)
+ *
+ * Values MUST match DEFAULT_TOKENS in features/design-system/constants.ts.
+ * Runtime setProperty (Design tab) overrides these after hydration.
+ *
+ * @license BSD-3-Clause
+ */
+
+:root {
+  /* COLORS (9 — user-editable) */
+  --buildrick-design-color-primary: #3B82F6;
+  --buildrick-design-color-secondary: #64748B;
+  --buildrick-design-color-accent: #22C55E;
+  --buildrick-design-color-background: #F8FAFC;
+  --buildrick-design-color-text: #334155;
+  --buildrick-design-color-muted: #71717A;
+  --buildrick-design-color-border: #27272A;
+  --buildrick-design-color-success: #22C55E;
+  --buildrick-design-color-error: #EF4444;
+
+  /* TYPOGRAPHY (11 — user-editable) */
+  --buildrick-design-font-heading: "Inter Tight";
+  --buildrick-design-font-body: "Inter Tight";
+  --buildrick-design-font-mono: "Geist Mono";
+  --buildrick-design-font-size-xs: 12px;
+  --buildrick-design-font-size-sm: 14px;
+  --buildrick-design-font-size-base: 16px;
+  --buildrick-design-font-size-lg: 18px;
+  --buildrick-design-font-size-xl: 20px;
+  --buildrick-design-font-size-2xl: 24px;
+  --buildrick-design-font-size-3xl: 30px;
+  --buildrick-design-font-size-4xl: 36px;
+
+  /* SPACING (9 — user-editable) */
+  --buildrick-design-space-1: 4px;
+  --buildrick-design-space-2: 8px;
+  --buildrick-design-space-3: 12px;
+  --buildrick-design-space-4: 16px;
+  --buildrick-design-space-5: 20px;
+  --buildrick-design-space-6: 24px;
+  --buildrick-design-space-8: 32px;
+  --buildrick-design-space-10: 40px;
+  --buildrick-design-space-12: 48px;
+
+  /* EFFECTS (10 — static DS defaults) */
+  --buildrick-design-radius-none: 0;
+  --buildrick-design-radius-sm: 4px;
+  --buildrick-design-radius-md: 8px;
+  --buildrick-design-radius-lg: 12px;
+  --buildrick-design-radius-xl: 16px;
+  --buildrick-design-radius-full: 9999px;
+  --buildrick-design-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --buildrick-design-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --buildrick-design-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+  --buildrick-design-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.25);
+
+  /* LAYOUT (8 — static DS defaults) */
+  --buildrick-design-layout-max-width: 1280px;
+  --buildrick-design-layout-padding-x: 24px;
+  --buildrick-design-layout-columns: 12;
+  --buildrick-design-layout-gutter: 24px;
+  --buildrick-design-section-padding-y: 80px;
+  --buildrick-design-content-max-width: 720px;
+  --buildrick-design-base-unit: 4px;
+  --buildrick-design-breakpoint-mobile: 768px;
+
+  /* ICONS (5 — static DS defaults) */
+  --buildrick-design-icon-style: outline;
+  --buildrick-design-icon-stroke: 1.5;
+  --buildrick-design-icon-sm: 16px;
+  --buildrick-design-icon-md: 20px;
+  --buildrick-design-icon-lg: 24px;
+
+  /* BUTTONS (8 — static DS defaults) */
+  --buildrick-design-btn-height-sm: 32px;
+  --buildrick-design-btn-height-md: 40px;
+  --buildrick-design-btn-height-lg: 48px;
+  --buildrick-design-btn-padding-x: 16px;
+  --buildrick-design-btn-font-weight: 600;
+  --buildrick-design-btn-font-size: 14px;
+  --buildrick-design-btn-radius: 8px;
+  --buildrick-design-cta-radius: 9999px;
+
+  /* FORMS (8 — static DS defaults) */
+  --buildrick-design-input-height: 40px;
+  --buildrick-design-input-radius: 8px;
+  --buildrick-design-input-border: #27272A;
+  --buildrick-design-input-focus: #3B82F6;
+  --buildrick-design-input-padding-x: 12px;
+  --buildrick-design-label-font-size: 13px;
+  --buildrick-design-label-weight: 500;
+  --buildrick-design-placeholder-color: #71717A;
+}

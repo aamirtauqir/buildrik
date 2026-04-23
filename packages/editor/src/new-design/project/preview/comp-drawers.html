@@ -1,0 +1,428 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  .card { padding: 24px 28px; background: var(--bd-bg-panel); gap: 32px; }
+  .row-h { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px dashed var(--bd-border); }
+  .row-h h3 { margin: 0; font: 600 12px var(--bd-font); color: var(--bd-fg-heading); letter-spacing: -0.01em; }
+  .row-h .tag { font: 500 9px var(--bd-mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--bd-fg-muted); }
+
+  /* Stage — fake editor behind a drawer */
+  .stage {
+    position: relative; border-radius: 12px; overflow: hidden;
+    background: linear-gradient(135deg, #F1F5F9, #E2E8F0);
+    border: 1px solid var(--bd-border);
+    height: 420px;
+  }
+  .stage.right { display: flex; justify-content: flex-end; }
+  .stage.left { display: flex; justify-content: flex-start; }
+  .stage.bottom { display: flex; align-items: flex-end; }
+  .stage::before {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(15,23,42,0.28);
+  }
+
+  /* Fake editor backdrop */
+  .bg-shell {
+    position: absolute; inset: 0;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 8px;
+    opacity: 0.65;
+  }
+  .bg-rail { background: #fff; border-radius: 6px; border: 1px solid var(--bd-border); display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; }
+  .bg-rail .dot { width: 18px; height: 18px; border-radius: 4px; background: var(--bd-bg-subtle); }
+  .bg-rail .dot.on { background: var(--bd-accent-tint); }
+  .bg-canvas { background: #fff; border-radius: 6px; border: 1px solid var(--bd-border); padding: 20px; overflow: hidden; }
+  .bg-canvas .ln { height: 10px; background: var(--bd-bg-subtle); border-radius: 3px; margin-bottom: 8px; }
+  .bg-canvas .ln.short { width: 40%; }
+  .bg-canvas .ln.long { width: 80%; }
+  .bg-canvas .block {
+    height: 60px; background: var(--bd-bg-subtle); border-radius: 6px; margin-top: 12px;
+  }
+
+  /* Drawer */
+  .drawer {
+    position: relative; z-index: 1;
+    background: #fff;
+    box-shadow: -12px 0 40px -10px rgba(15,23,42,0.3);
+    display: flex; flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    border-left: 1px solid var(--bd-border);
+  }
+  .drawer.sm { width: 340px; }
+  .drawer.md { width: 420px; }
+  .drawer.lg { width: 520px; }
+  .drawer.left-side { border-left: none; border-right: 1px solid var(--bd-border); box-shadow: 12px 0 40px -10px rgba(15,23,42,0.3); }
+  .drawer.bottom-side { width: 100%; height: 340px; border-left: none; border-top: 1px solid var(--bd-border); box-shadow: 0 -12px 40px -10px rgba(15,23,42,0.3); border-radius: 14px 14px 0 0; }
+
+  .dr-h {
+    padding: 12px 14px 11px;
+    border-bottom: 1px solid var(--bd-border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .dr-h .meta { flex: 1; min-width: 0; }
+  .dr-h h4 { margin: 0; font: 600 13px var(--bd-font); color: var(--bd-fg-heading); letter-spacing: -0.01em; }
+  .dr-h .sub { font: 500 10px var(--bd-mono); color: var(--bd-fg-muted); letter-spacing: -0.01em; }
+  .dr-h .acts { display: flex; gap: 3px; }
+  .icon-btn {
+    width: 24px; height: 24px; border-radius: 5px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--bd-fg-muted); cursor: pointer; border: none; background: transparent;
+  }
+  .icon-btn:hover { background: var(--bd-bg-subtle); color: var(--bd-fg-primary); }
+
+  /* Sub-nav inside drawer */
+  .dr-tabs {
+    display: flex; gap: 1px;
+    padding: 0 10px; border-bottom: 1px solid var(--bd-border);
+    background: var(--bd-bg-subtle);
+  }
+  .dr-tabs .t {
+    padding: 8px 10px; font: 500 11px var(--bd-font); color: var(--bd-fg-secondary);
+    cursor: pointer; border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .dr-tabs .t.on { color: var(--bd-accent); border-bottom-color: var(--bd-accent); font-weight: 600; }
+  .dr-tabs .t:hover:not(.on) { color: var(--bd-fg-primary); }
+
+  .dr-body { flex: 1; overflow-y: auto; padding: 12px 14px; font: 500 11.5px var(--bd-font); color: var(--bd-fg-primary); }
+  .dr-sec { margin-bottom: 16px; }
+  .dr-sec:last-child { margin-bottom: 0; }
+  .dr-sec h5 { margin: 0 0 8px; font: 600 10px var(--bd-font); letter-spacing: 0.08em; text-transform: uppercase; color: var(--bd-fg-muted); }
+
+  .field { margin-bottom: 10px; }
+  .field label { display: flex; justify-content: space-between; align-items: baseline; font: 500 10px var(--bd-mono); color: var(--bd-fg-secondary); margin-bottom: 4px; letter-spacing: -0.01em; }
+  .field label .cc { color: var(--bd-fg-muted); font-size: 9.5px; }
+  .inp, .ta {
+    width: 100%; padding: 7px 9px;
+    border: 1px solid var(--bd-border); border-radius: 5px;
+    font: 500 11.5px var(--bd-font); color: var(--bd-fg-primary);
+    outline: none; background: #fff;
+  }
+  .ta { min-height: 60px; resize: vertical; font-family: var(--bd-font); }
+  .inp:focus, .ta:focus { border-color: var(--bd-accent); box-shadow: 0 0 0 3px var(--bd-accent-tint); }
+
+  .dr-f {
+    padding: 10px 12px;
+    border-top: 1px solid var(--bd-border);
+    background: var(--bd-bg-subtle);
+    display: flex; gap: 6px; justify-content: flex-end;
+  }
+  .btn {
+    padding: 6px 12px; border-radius: 5px; cursor: pointer;
+    font: 600 11px var(--bd-font); border: 1px solid transparent;
+  }
+  .btn.pri { background: var(--bd-accent); color: #fff; }
+  .btn.sec { background: #fff; color: var(--bd-fg-primary); border-color: var(--bd-border); }
+  .btn.gho { background: transparent; color: var(--bd-fg-secondary); }
+  .btn.gho:hover { background: #fff; color: var(--bd-fg-primary); }
+
+  /* SERP preview */
+  .serp { padding: 10px 12px; background: var(--bd-bg-subtle); border-radius: 6px; }
+  .serp .u { font: 500 10px var(--bd-font); color: #16A34A; margin-bottom: 2px; }
+  .serp .t { font: 500 14px var(--bd-font); color: #1A0DAB; line-height: 1.2; margin-bottom: 2px; }
+  .serp .d { font: 500 10.5px var(--bd-font); color: #4D5156; line-height: 1.4; }
+
+  /* Asset detail */
+  .asset-preview {
+    height: 160px; border-radius: 6px;
+    background: repeating-conic-gradient(#F8FAFC 0% 25%, #fff 0% 50%) 50% / 12px 12px,
+                linear-gradient(135deg, #2D6DFF, #8B5CF6);
+    background-blend-mode: normal;
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .asset-preview::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, #2D6DFF, #8B5CF6);
+  }
+  .asset-preview .pl {
+    position: relative; z-index: 1; color: rgba(255,255,255,0.85);
+    font: 600 12px var(--bd-mono);
+  }
+  .meta-kv {
+    display: grid; grid-template-columns: 80px 1fr; gap: 4px 10px;
+    font: 500 10.5px var(--bd-font);
+  }
+  .meta-kv .k { color: var(--bd-fg-muted); font-family: var(--bd-mono); font-size: 10px; }
+  .meta-kv .v { color: var(--bd-fg-primary); }
+
+  /* Version history */
+  .vh-item {
+    display: flex; gap: 10px; padding: 9px 10px;
+    border-radius: 6px; cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .vh-item:hover { background: var(--bd-bg-subtle); }
+  .vh-item.on { background: var(--bd-accent-tint); border-color: rgba(45,109,255,0.2); }
+  .vh-item .av { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #2D6DFF, #8B5CF6); color: #fff; font: 700 10px var(--bd-font); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .vh-item .body { flex: 1; min-width: 0; }
+  .vh-item .body .t { font: 500 11px var(--bd-font); color: var(--bd-fg-primary); margin-bottom: 2px; }
+  .vh-item .body .d { font: 500 9.5px var(--bd-mono); color: var(--bd-fg-muted); }
+  .vh-item .body .d .dot { margin: 0 4px; color: var(--bd-border-medium); }
+  .vh-item .cur { font: 500 9px var(--bd-mono); color: var(--bd-success); padding: 1px 5px; background: rgba(22,163,74,0.1); border-radius: 3px; align-self: center; letter-spacing: 0.05em; }
+
+  /* Bottom drawer — CMS row editor */
+  .bottom-inner { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; padding: 14px; }
+
+  /* Icons */
+  .base { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+  .f { fill: currentColor; opacity: 0.12; }
+
+  .handle {
+    position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+    width: 36px; height: 3px; background: var(--bd-border-medium); border-radius: 2px;
+  }
+
+  .spec {
+    margin-top: 10px; padding: 8px 10px;
+    background: var(--bd-bg-subtle); border-radius: 6px;
+    font: 500 10px var(--bd-mono); color: var(--bd-fg-secondary);
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px 10px;
+  }
+  .spec .s { display: flex; justify-content: space-between; }
+  .spec .s .v { color: var(--bd-fg-heading); font-weight: 600; }
+</style></head><body>
+<div class="card">
+
+  <div>
+    <div class="label">Drawers</div>
+    <h2 style="margin:4px 0 0; font: 600 16px var(--bd-font); color: var(--bd-fg-heading); letter-spacing: -0.01em;">Slide-out panels</h2>
+    <p class="mono" style="margin: 6px 0 0; color: var(--bd-fg-muted);">right · left · bottom · non-modal · canvas stays scrollable</p>
+  </div>
+
+  <!-- Right drawer: Page SEO -->
+  <div>
+    <div class="row-h"><h3>Right drawer — Page SEO</h3><span class="tag">420px · tabbed · sticky footer</span></div>
+    <div class="stage right">
+      <div class="bg-shell">
+        <div class="bg-rail">
+          <div class="dot"></div>
+          <div class="dot on"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <div class="bg-canvas">
+          <div class="ln long"></div><div class="ln short"></div><div class="block"></div><div class="block"></div>
+        </div>
+      </div>
+      <div class="drawer md">
+        <div class="dr-h">
+          <div class="meta">
+            <h4>Pricing · SEO</h4>
+            <div class="sub">/pricing · last edited 4m ago</div>
+          </div>
+          <div class="acts">
+            <button class="icon-btn" title="Open in new tab"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M14 3h7v7 M21 3l-10 10 M10 5H5a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5"/></svg></button>
+            <button class="icon-btn" title="Close"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M6 6l12 12 M18 6L6 18"/></svg></button>
+          </div>
+        </div>
+        <div class="dr-tabs">
+          <div class="t on">SEO</div>
+          <div class="t">Open Graph</div>
+          <div class="t">Schema</div>
+          <div class="t">Advanced</div>
+        </div>
+        <div class="dr-body">
+          <div class="dr-sec">
+            <h5>Search result</h5>
+            <div class="field">
+              <label>Title <span class="cc">47 / 60</span></label>
+              <input class="inp" value="Pricing · Acme — Simple plans for every team"/>
+            </div>
+            <div class="field">
+              <label>Description <span class="cc">128 / 160</span></label>
+              <textarea class="ta">From solo makers to enterprises. Start free — upgrade only when you need more seats, domains, or collaborators.</textarea>
+            </div>
+            <div class="serp">
+              <div class="u">acme.com › pricing</div>
+              <div class="t">Pricing · Acme — Simple plans for every team</div>
+              <div class="d">From solo makers to enterprises. Start free — upgrade only when you need more seats, domains, or collaborators.</div>
+            </div>
+          </div>
+          <div class="dr-sec">
+            <h5>Canonical URL</h5>
+            <input class="inp" value="https://acme.com/pricing" style="font-family: var(--bd-mono); font-size: 10.5px;"/>
+          </div>
+        </div>
+        <div class="dr-f">
+          <button class="btn gho">Reset</button>
+          <button class="btn sec">Preview</button>
+          <button class="btn pri">Save</button>
+        </div>
+      </div>
+    </div>
+    <div class="spec">
+      <div class="s"><span>width</span><span class="v">420px</span></div>
+      <div class="s"><span>side</span><span class="v">right</span></div>
+      <div class="s"><span>scrim</span><span class="v">0.28</span></div>
+      <div class="s"><span>dismiss</span><span class="v">Esc · X · outside</span></div>
+    </div>
+  </div>
+
+  <!-- Right drawer: Asset detail -->
+  <div>
+    <div class="row-h"><h3>Right drawer — Asset detail</h3><span class="tag">340px · preview · metadata</span></div>
+    <div class="stage right">
+      <div class="bg-shell">
+        <div class="bg-rail"><div class="dot"></div><div class="dot"></div><div class="dot on"></div><div class="dot"></div></div>
+        <div class="bg-canvas"><div class="ln long"></div><div class="ln short"></div><div class="block"></div><div class="block"></div></div>
+      </div>
+      <div class="drawer sm">
+        <div class="dr-h">
+          <div class="meta">
+            <h4>hero-bg.jpg</h4>
+            <div class="sub">asset · uploaded 6 days ago</div>
+          </div>
+          <div class="acts">
+            <button class="icon-btn"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M12 3v12 M7 10l5 5 5-5 M5 21h14"/></svg></button>
+            <button class="icon-btn"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M6 6l12 12 M18 6L6 18"/></svg></button>
+          </div>
+        </div>
+        <div class="dr-body">
+          <div class="asset-preview"><span class="pl">1920 × 1080</span></div>
+          <div class="dr-sec" style="margin-top: 14px;">
+            <h5>Details</h5>
+            <div class="meta-kv">
+              <span class="k">Type</span><span class="v">JPEG · image/jpeg</span>
+              <span class="k">Size</span><span class="v">284 KB</span>
+              <span class="k">Dimensions</span><span class="v">1920 × 1080</span>
+              <span class="k">Uploaded</span><span class="v">Apr 15 · by Nadia</span>
+              <span class="k">Used by</span><span class="v">3 pages</span>
+            </div>
+          </div>
+          <div class="dr-sec">
+            <h5>Alt text</h5>
+            <textarea class="ta">Gradient blue hero background with subtle grain texture.</textarea>
+          </div>
+        </div>
+        <div class="dr-f">
+          <button class="btn gho" style="color: var(--bd-error);">Delete</button>
+          <button class="btn pri">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right drawer: Version history -->
+  <div>
+    <div class="row-h"><h3>Right drawer — Version history</h3><span class="tag">520px · list · restore</span></div>
+    <div class="stage right">
+      <div class="bg-shell">
+        <div class="bg-rail"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot on"></div></div>
+        <div class="bg-canvas"><div class="ln long"></div><div class="ln short"></div><div class="block"></div></div>
+      </div>
+      <div class="drawer lg">
+        <div class="dr-h">
+          <div class="meta">
+            <h4>Version history</h4>
+            <div class="sub">14 snapshots · auto every 5min</div>
+          </div>
+          <div class="acts">
+            <button class="icon-btn"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M6 6l12 12 M18 6L6 18"/></svg></button>
+          </div>
+        </div>
+        <div class="dr-body">
+          <div class="dr-sec">
+            <h5>Today</h5>
+            <div class="vh-item on">
+              <div class="av">Y</div>
+              <div class="body">
+                <div class="t">Current draft</div>
+                <div class="d">You<span class="dot">·</span>4m ago<span class="dot">·</span>7 edits</div>
+              </div>
+              <span class="cur">NOW</span>
+            </div>
+            <div class="vh-item">
+              <div class="av" style="background: linear-gradient(135deg, #EC4899, #F59E0B);">N</div>
+              <div class="body">
+                <div class="t">Updated Hero copy</div>
+                <div class="d">Nadia<span class="dot">·</span>32m ago<span class="dot">·</span>3 edits</div>
+              </div>
+            </div>
+            <div class="vh-item">
+              <div class="av">Y</div>
+              <div class="body">
+                <div class="t">Added Pricing section</div>
+                <div class="d">You<span class="dot">·</span>2h ago<span class="dot">·</span>12 edits</div>
+              </div>
+            </div>
+          </div>
+          <div class="dr-sec">
+            <h5>Yesterday</h5>
+            <div class="vh-item">
+              <div class="av" style="background: linear-gradient(135deg, #10B981, #2D6DFF);">P</div>
+              <div class="body">
+                <div class="t">Published to acme.com</div>
+                <div class="d">Priya<span class="dot">·</span>Apr 20 · 18:42<span class="dot">·</span>Milestone</div>
+              </div>
+            </div>
+            <div class="vh-item">
+              <div class="av">Y</div>
+              <div class="body">
+                <div class="t">Rebrand · new primary color</div>
+                <div class="d">You<span class="dot">·</span>Apr 20 · 16:10<span class="dot">·</span>24 edits</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dr-f">
+          <button class="btn gho">Compare</button>
+          <button class="btn sec">Restore as draft</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom drawer — CMS row editor -->
+  <div>
+    <div class="row-h"><h3>Bottom drawer — CMS row editor</h3><span class="tag">340px tall · sheet style · handle</span></div>
+    <div class="stage bottom">
+      <div class="bg-shell">
+        <div class="bg-rail"><div class="dot"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+        <div class="bg-canvas"><div class="ln long"></div><div class="ln short"></div><div class="block"></div><div class="block"></div></div>
+      </div>
+      <div class="drawer bottom-side">
+        <div class="handle"></div>
+        <div class="dr-h" style="padding-top: 16px;">
+          <div class="meta">
+            <h4>Edit · Posts / "Shipping reliability at scale"</h4>
+            <div class="sub">collection · published · slug: shipping-reliability-at-scale</div>
+          </div>
+          <div class="acts">
+            <button class="icon-btn"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M9 3v12 M9 15l-4-4 M9 15l4-4 M5 21h14"/></svg></button>
+            <button class="icon-btn"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M6 6l12 12 M18 6L6 18"/></svg></button>
+          </div>
+        </div>
+        <div class="bottom-inner">
+          <div>
+            <div class="field"><label>Title</label><input class="inp" value="Shipping reliability at scale"/></div>
+            <div class="field"><label>Slug</label><input class="inp" style="font-family: var(--bd-mono); font-size: 10.5px;" value="shipping-reliability-at-scale"/></div>
+          </div>
+          <div>
+            <div class="field"><label>Excerpt <span class="cc">88 / 200</span></label><textarea class="ta">How we took our deploy pipeline from 12min to 40s without breaking anything.</textarea></div>
+          </div>
+          <div>
+            <div class="field"><label>Published</label><input class="inp" value="Apr 19, 2026 · 09:24"/></div>
+            <div class="field"><label>Author</label><input class="inp" value="Priya Sharma"/></div>
+          </div>
+        </div>
+        <div class="dr-f">
+          <button class="btn gho">Unpublish</button>
+          <button class="btn sec">Save draft</button>
+          <button class="btn pri">Publish changes</button>
+        </div>
+      </div>
+    </div>
+    <div class="spec">
+      <div class="s"><span>height</span><span class="v">340px</span></div>
+      <div class="s"><span>side</span><span class="v">bottom</span></div>
+      <div class="s"><span>radius</span><span class="v">14 14 0 0</span></div>
+      <div class="s"><span>drag</span><span class="v">handle · resize</span></div>
+    </div>
+  </div>
+
+</div>
+</body></html>

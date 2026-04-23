@@ -1,0 +1,53 @@
+/* Shared styles for preview cards shown in the Design System tab.
+   Each card is rendered inside a small iframe; keep styles local. */
+@import url("https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap");
+
+:root {
+  --bd-bg-panel: #F8FAFC;
+  --bd-bg-card: #FFFFFF;
+  --bd-bg-subtle: #F1F5F9;
+  --bd-fg-primary: #334155;
+  --bd-fg-secondary: #64748B;
+  --bd-fg-muted: #94A3B8;
+  --bd-fg-heading: #0F172A;
+  --bd-border: #E2E8F0;
+  --bd-border-medium: #CBD5E1;
+  --bd-accent: #2D6DFF;
+  --bd-accent-hover: #4B8DFF;
+  --bd-accent-pressed: #1E58D9;
+  --bd-accent-tint: rgba(45, 109, 255, 0.10);
+  --bd-error: #DC2626;
+  --bd-success: #16A34A;
+  --bd-warning: #D97706;
+  --bd-font: "Inter Tight", system-ui, sans-serif;
+  --bd-mono: "Geist Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bd-bg-panel);
+  color: var(--bd-fg-primary);
+  font-family: var(--bd-font);
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.card {
+  padding: 20px 24px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bd-fg-muted);
+}
+.mono { font-family: var(--bd-mono); font-size: 11px; }
+.row  { display: flex; align-items: center; gap: 12px; }
+.col  { display: flex; flex-direction: column; gap: 6px; }

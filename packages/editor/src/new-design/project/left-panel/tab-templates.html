@@ -1,0 +1,247 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Templates · tab prototype</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+  .tfilter { display: flex; gap: 4px; padding: 8px 0 6px; overflow-x: auto; }
+  .tfilter .tf { font: 500 10px var(--bd-font); color: var(--bd-fg-secondary); background: var(--bd-bg-subtle); padding: 3px 8px; border-radius: 9999px; cursor: pointer; white-space: nowrap; flex-shrink: 0; user-select: none; }
+  .tfilter .tf.on { background: var(--bd-accent-tint); color: var(--bd-accent); font-weight: 600; }
+  .tgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .tpl { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--bd-border); border-radius: 6px; overflow: hidden; cursor: pointer; transition: 120ms; }
+  .tpl:hover { border-color: var(--bd-accent); box-shadow: 0 0 0 3px rgba(45,109,255,0.08); }
+  .tpl.sel { border-color: var(--bd-accent); box-shadow: 0 0 0 3px var(--bd-accent-tint); }
+  .tpl .thumb { aspect-ratio: 4/3; background: var(--bd-bg-subtle); border-bottom: 1px solid var(--bd-border); position: relative; overflow: hidden; }
+  .tpl .thumb::before { content:''; position:absolute; inset:0; background: linear-gradient(transparent 0 32%, rgba(15,23,42,0.12) 32% 38%, transparent 38%), linear-gradient(transparent 0 48%, rgba(15,23,42,0.06) 48% 52%, transparent 52%), linear-gradient(transparent 0 70%, rgba(45,109,255,0.14) 70% 78%, transparent 78%); }
+  .tpl .thumb.b { background: linear-gradient(135deg, #0F172A, #2D6DFF); }
+  .tpl .thumb.b::before { background: linear-gradient(transparent 0 30%, rgba(255,255,255,0.18) 30% 38%, transparent 38%), linear-gradient(transparent 0 48%, rgba(255,255,255,0.1) 48% 52%, transparent 52%), linear-gradient(transparent 0 70%, rgba(255,255,255,0.22) 70% 78%, transparent 78%); }
+  .tpl .thumb.c { background: linear-gradient(135deg, #FEF3C7, #D97706); }
+  .tpl .thumb.c::before { background: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.5) 0 8%, transparent 8%), linear-gradient(transparent 0 70%, rgba(15,23,42,0.1) 70% 75%, transparent 75%); }
+  .tpl .thumb.d { background: linear-gradient(135deg, #16A34A, #059669); }
+  .tpl .meta { padding: 6px 8px 8px; }
+  .tpl .meta .n { font: 600 11px var(--bd-font); color: var(--bd-fg-heading); }
+  .tpl .meta .s { font: 500 9.5px var(--bd-mono); color: var(--bd-fg-muted); margin-top: 1px; }
+  .wire .tpl .thumb { background: repeating-linear-gradient(45deg, transparent 0 6px, rgba(15,23,42,0.05) 6px 7px); }
+  .wire .tpl .thumb::before { display: none; }
+  .wire .tpl .meta .n { font-family: var(--bd-mono); font-size: 10px; color: var(--bd-fg-muted); }
+  .wire .psearch { background: transparent; border: 1px dashed var(--bd-border-medium); }
+
+  /* Preview */
+  .canvas-wrap { margin-top: 24px; padding: 20px 24px 24px; background: #fff; border: 1px solid var(--bd-border); border-radius: 12px; }
+  .canvas-wrap h3 { margin: 0 0 12px; font: 600 13px var(--bd-font); color: var(--bd-fg-heading); display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+  .canvas-wrap h3 .pill { font: 500 9.5px var(--bd-mono); color: var(--bd-fg-muted); background: var(--bd-bg-subtle); padding: 1px 5px; border-radius: 3px; }
+  .canvas-wrap h3 .right { display: flex; align-items: center; gap: 8px; }
+  .btn { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 6px; cursor: pointer; font: 600 11px var(--bd-font); border: 1px solid transparent; }
+  .btn.sec { background: var(--bd-bg-subtle); color: var(--bd-fg-primary); border-color: var(--bd-border); }
+  .btn.pri { background: var(--bd-accent); color: #fff; }
+  .previewframe { min-height: 260px; background: linear-gradient(180deg, #fff, var(--bd-bg-subtle)); border: 1px solid var(--bd-border); border-radius: 8px; padding: 40px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
+  .previewframe h2 { margin: 0; font: 700 28px var(--bd-font); color: var(--bd-fg-heading); letter-spacing: -0.02em; max-width: 480px; }
+  .previewframe p { margin: 0; font: 500 13px var(--bd-font); color: var(--bd-fg-secondary); max-width: 440px; line-height: 1.5; }
+  .previewframe .cta { display: inline-flex; gap: 8px; }
+  .previewframe.dark { background: linear-gradient(180deg, #0F172A, #1E293B); }
+  .previewframe.dark h2 { color: #fff; }
+  .previewframe.dark p { color: #CBD5E1; }
+  .previewframe.warm { background: linear-gradient(180deg, #FEF3C7, #FCD34D); }
+  .previewframe.green { background: linear-gradient(180deg, #DCFCE7, #BBF7D0); }
+</style></head><body>
+<div class="page">
+  <div class="head"><div class="ttl"><h1>Templates · tab prototype</h1><div class="sub">04 of 06 · community + mine · filter + apply</div></div>
+    <div class="nav"><a href="index.html">← all</a><a href="tab-add.html">Add</a><a href="tab-layers.html">Layers</a><a href="tab-pages.html">Pages</a><a href="tab-templates.html" class="on">Templates</a><a href="tab-ai.html">AI</a><a href="tab-settings.html">Settings</a></div>
+  </div>
+
+  <div class="split">
+    <!-- Wireframe -->
+    <div>
+      <div class="col-h"><h2>Wireframe</h2><span class="tag">filter pills · 2-col grid</span></div>
+      <div class="shell wire">
+        <nav class="rail">
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="18" height="18" rx="3"/><path class="s" d="M12 8v8 M8 12h8"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="4" width="14" height="4" rx="1"/><rect class="s" x="7" y="10" width="14" height="4" rx="1"/><rect class="s" x="3" y="16" width="14" height="4" rx="1"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M8 3h6l4 4v10a2 2 0 01-2 2H8a2 2 0 01-2-2V5z"/></svg></button>
+          <div class="divr"></div>
+          <button class="on"><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="8" height="8" rx="1"/><rect class="s" x="13" y="3" width="8" height="8" rx="1"/><rect class="s" x="3" y="13" width="8" height="8" rx="1"/><rect class="s" x="13" y="13" width="8" height="8" rx="1"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg></button>
+          <div style="flex:1"></div>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><circle class="s" cx="12" cy="12" r="3"/></svg></button>
+        </nav>
+        <section class="panel">
+          <div class="panel-h"><div class="ttl"><h2>Templates</h2><div class="panel-sub">category count</div></div></div>
+          <label class="psearch"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input placeholder="search templates" disabled/></label>
+          <div style="padding:0 10px"><div class="tfilter"><span class="tf on">All</span><span class="tf">Landing</span><span class="tf">SaaS</span><span class="tf">Docs</span><span class="tf">Mine</span></div></div>
+          <div class="pbody scroll">
+            <div class="cat-h"><span>Community</span><span class="n">4</span></div>
+            <div class="tgrid">
+              <div class="tpl"><div class="thumb"></div><div class="meta"><div class="n">Template A</div><div class="s">tag</div></div></div>
+              <div class="tpl"><div class="thumb"></div><div class="meta"><div class="n">Template B</div><div class="s">tag</div></div></div>
+              <div class="tpl"><div class="thumb"></div><div class="meta"><div class="n">Template C</div><div class="s">tag</div></div></div>
+              <div class="tpl"><div class="thumb"></div><div class="meta"><div class="n">Template D</div><div class="s">tag</div></div></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Hi-fi -->
+    <div>
+      <div class="col-h"><h2>Prototype</h2><span class="tag">click → preview below · Apply</span></div>
+      <div class="shell">
+        <nav class="rail">
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="18" height="18" rx="3"/><path class="s" d="M12 8v8 M8 12h8"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="4" width="14" height="4" rx="1"/><rect class="s" x="7" y="10" width="14" height="4" rx="1"/><rect class="s" x="3" y="16" width="14" height="4" rx="1"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M8 3h6l4 4v10a2 2 0 01-2 2H8a2 2 0 01-2-2V5z M14 3v4h4"/></svg></button>
+          <div class="divr"></div>
+          <button class="on" title="Templates"><svg width="17" height="17" viewBox="0 0 24 24"><rect class="f" x="3" y="3" width="8" height="8" rx="1.5"/><rect class="s" x="3" y="3" width="8" height="8" rx="1.5"/><rect class="s" x="13" y="3" width="8" height="8" rx="1.5"/><rect class="s" x="3" y="13" width="8" height="8" rx="1.5"/><rect class="f" x="13" y="13" width="8" height="8" rx="1.5"/><rect class="s" x="13" y="13" width="8" height="8" rx="1.5"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M12 3l2.1 5.4 5.4 2.1-5.4 2.1L12 18l-2.1-5.4L4.5 10.5l5.4-2.1z"/></svg></button>
+          <div style="flex:1"></div>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><circle class="s" cx="12" cy="12" r="3"/></svg></button>
+        </nav>
+        <section class="panel">
+          <div class="panel-h">
+            <div class="ttl"><h2>Templates</h2><div class="panel-sub" id="tcount">12 starters</div></div>
+            <div class="acts"><button class="icon-btn" title="Import"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M12 3v12 M7 10l5 5 5-5 M4 20h16"/></svg></button></div>
+          </div>
+          <label class="psearch">
+            <svg class="base" width="12" height="12" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input id="tq" placeholder="Search templates"/>
+          </label>
+          <div style="padding:0 10px">
+            <div class="tfilter" id="filters">
+              <span class="tf on" data-f="all">All</span>
+              <span class="tf" data-f="Landing">Landing</span>
+              <span class="tf" data-f="SaaS">SaaS</span>
+              <span class="tf" data-f="Docs">Docs</span>
+              <span class="tf" data-f="Portfolio">Portfolio</span>
+              <span class="tf" data-f="mine">Mine</span>
+            </div>
+          </div>
+          <div class="pbody scroll" id="tlist"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="canvas-wrap">
+    <h3>
+      <span style="display:inline-flex; align-items:center; gap:8px">Preview <span class="pill" id="selLabel">pick a template</span></span>
+      <span class="right"><span class="btn sec" id="clearBtn">Clear</span><span class="btn pri" id="applyBtn">Apply to current page</span></span>
+    </h3>
+    <div class="previewframe" id="preview">
+      <h2 id="pHead">Build sites at the speed of thought.</h2>
+      <p id="pDesc">Drop in blocks, theme with tokens, publish in one click. Pick a template at left to load it here.</p>
+      <div class="cta"><span class="btn pri">Get started</span><span class="btn sec">Learn more</span></div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><span class="k">Starting point</span><h4>Full-page scaffolds</h4><p>Templates drop a complete, themed layout you can edit. Faster than stacking blocks one by one.</p></div>
+    <div class="note"><span class="k">Filters</span><h4>Category pills</h4><p>Pills filter in-place. Combines with search. "Mine" shows saved-as-template pages.</p></div>
+    <div class="note"><span class="k">Non-destructive</span><h4>Preview before applying</h4><p>Click a card to preview below. Apply only when ready — it replaces current page content.</p></div>
+  </div>
+
+  <div class="flow">
+    <div class="step"><span class="n">1</span><div class="t">Browse</div><div class="d">Pills for category, search for fuzzy match. Thumbs hint at style + density.</div></div>
+    <div class="step"><span class="n">2</span><div class="t">Select</div><div class="d">Click loads it into the preview pane. Description + tags appear.</div></div>
+    <div class="step"><span class="n">3</span><div class="t">Apply</div><div class="d">Replaces current page. An undo snapshot is kept for 10 minutes.</div></div>
+    <div class="step"><span class="n">4</span><div class="t">Save yours</div><div class="d">Any page can be saved as a template into "Mine" via the meta menu.</div></div>
+  </div>
+
+  <div class="foot"><span>Try: filter by pill, click a template, Apply</span><span class="mono">tab-templates · v1</span></div>
+</div>
+
+<div class="toast" id="toast">Done</div>
+
+<script>
+const tpls = [
+  { g:'Community', id:'t1', name:'Linear · SaaS', sub:'Dark · 6 sections', cat:'SaaS', style:'', headline:'Build delightful products.', desc:'Issue tracking for fast-moving teams.', bg:'dark' },
+  { g:'Community', id:'t2', name:'Midnight', sub:'Gradient · bold', cat:'Landing', style:'b', headline:'Ship beautiful sites in hours.', desc:'Typography-forward landing with bold gradient.', bg:'dark' },
+  { g:'Community', id:'t3', name:'Warm studio', sub:'Portfolio · 4', cat:'Portfolio', style:'c', headline:'I make things.', desc:'Friendly studio portfolio, editorial layout.', bg:'warm' },
+  { g:'Community', id:'t4', name:'Docs', sub:'Sidebar · mono', cat:'Docs', style:'', headline:'Documentation, done.', desc:'Tri-column docs with sidebar + TOC.', bg:'' },
+  { g:'Community', id:'t5', name:'Stripe-style', sub:'Payments · glow', cat:'SaaS', style:'b', headline:'Payments that work.', desc:'Premium SaaS template with animated hero.', bg:'dark' },
+  { g:'Community', id:'t6', name:'Garden', sub:'Portfolio · green', cat:'Portfolio', style:'d', headline:'Grow your ideas.', desc:'Organic portfolio with hand-drawn accents.', bg:'green' },
+  { g:'Community', id:'t7', name:'Launchpad', sub:'Landing · split', cat:'Landing', style:'', headline:'Launch in a week.', desc:'Split-screen landing with checklist.', bg:'' },
+  { g:'Community', id:'t8', name:'API Docs', sub:'Docs · code', cat:'Docs', style:'', headline:'API reference.', desc:'Docs with inline code samples + curl.', bg:'' },
+  { g:'Mine', id:'t9', name:'Acme · v2', sub:'Edited 2d ago', cat:'Landing', mine:true, style:'b', headline:'Acme · v2 draft', desc:'Your saved template · 6 sections.', bg:'dark' },
+  { g:'Mine', id:'t10', name:'Launch note', sub:'Edited 1w ago', cat:'Landing', mine:true, style:'', headline:'We shipped.', desc:'Launch announcement template.', bg:'' },
+  { g:'Mine', id:'t11', name:'Demo call', sub:'Edited 2w ago', cat:'SaaS', mine:true, style:'c', headline:'Book a demo.', desc:'Short landing with calendar embed.', bg:'warm' },
+  { g:'Mine', id:'t12', name:'Changelog', sub:'Edited 1mo ago', cat:'Docs', mine:true, style:'', headline:'What\'s new.', desc:'Versioned changelog template.', bg:'' },
+];
+let selTpl = null, filter = 'all';
+
+const tlist = document.getElementById('tlist');
+const tq = document.getElementById('tq');
+const tcount = document.getElementById('tcount');
+const filters = document.getElementById('filters');
+const pHead = document.getElementById('pHead');
+const pDesc = document.getElementById('pDesc');
+const preview = document.getElementById('preview');
+const selLabel = document.getElementById('selLabel');
+const toast = document.getElementById('toast');
+
+function render() {
+  const v = tq.value.trim().toLowerCase();
+  tlist.innerHTML = '';
+  const byG = {};
+  let shown = 0;
+  tpls.forEach(t => {
+    if (v && !t.name.toLowerCase().includes(v) && !t.cat.toLowerCase().includes(v)) return;
+    if (filter !== 'all') {
+      if (filter === 'mine' && !t.mine) return;
+      if (filter !== 'mine' && t.cat !== filter) return;
+    }
+    (byG[t.g] ||= []).push(t);
+    shown++;
+  });
+  tcount.textContent = `${shown} of ${tpls.length}`;
+  for (const g of ['Community','Mine']) {
+    if (!byG[g]) continue;
+    const h = document.createElement('div'); h.className='cat-h';
+    h.innerHTML = `<span>${g}</span><span class="n">${byG[g].length}</span>`;
+    tlist.appendChild(h);
+    const grid = document.createElement('div'); grid.className = 'tgrid';
+    for (const t of byG[g]) {
+      const card = document.createElement('div');
+      card.className = 'tpl' + (selTpl && selTpl.id === t.id ? ' sel' : '');
+      card.dataset.id = t.id;
+      card.innerHTML = `<div class="thumb ${t.style}"></div><div class="meta"><div class="n">${t.name}</div><div class="s">${t.sub}</div></div>`;
+      grid.appendChild(card);
+    }
+    tlist.appendChild(grid);
+  }
+}
+
+tlist.addEventListener('click', e => {
+  const card = e.target.closest('.tpl'); if (!card) return;
+  const t = tpls.find(x => x.id === card.dataset.id);
+  selTpl = t;
+  pHead.textContent = t.headline;
+  pDesc.textContent = t.desc + ' · ' + t.cat + (t.mine ? ' · yours' : '');
+  preview.className = 'previewframe ' + (t.bg || '');
+  selLabel.textContent = t.name;
+  render();
+});
+
+filters.addEventListener('click', e => {
+  const f = e.target.closest('.tf'); if (!f) return;
+  filters.querySelectorAll('.tf').forEach(x => x.classList.remove('on'));
+  f.classList.add('on');
+  filter = f.dataset.f;
+  render();
+});
+
+tq.addEventListener('input', render);
+
+document.getElementById('applyBtn').addEventListener('click', () => {
+  if (!selTpl) { notify('Pick a template first'); return; }
+  notify(`Applied · ${selTpl.name}`);
+});
+document.getElementById('clearBtn').addEventListener('click', () => {
+  selTpl = null;
+  pHead.textContent = 'Build sites at the speed of thought.';
+  pDesc.textContent = 'Drop in blocks, theme with tokens, publish in one click.';
+  preview.className = 'previewframe';
+  selLabel.textContent = 'pick a template';
+  render();
+});
+
+function notify(m){ toast.textContent=m; toast.classList.add('on'); clearTimeout(toast._t); toast._t=setTimeout(()=>toast.classList.remove('on'),1300); }
+
+render();
+</script>
+</body></html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  .stack { display: flex; flex-direction: column; gap: 10px; }
+  .row2 { display: grid; grid-template-columns: 130px 1fr; align-items: baseline; gap: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--bd-border); }
+  .row2:last-child { border-bottom: none; padding-bottom: 0; }
+  .lab { font: 500 10.5px var(--bd-mono); color: var(--bd-fg-muted); letter-spacing: 0.04em; text-transform: uppercase; }
+  .body  { font: 400 14px/1.5 var(--bd-font); color: var(--bd-fg-primary); }
+  .ui    { font: 400 13px/1.5 var(--bd-font); color: var(--bd-fg-primary); }
+  .small { font: 500 12px/1.5 var(--bd-font); color: var(--bd-fg-secondary); }
+  .xs    { font: 500 11px/1.4 var(--bd-font); color: var(--bd-fg-muted); letter-spacing: 0.02em; }
+  .micro { font: 600 10px/1.4 var(--bd-font); color: var(--bd-fg-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+</style>
+</head><body><div class="card">
+  <div class="stack">
+    <div class="row2"><div class="lab">Body / 14 / 400</div><div class="body">Select an element to edit its properties</div></div>
+    <div class="row2"><div class="lab">UI / 13 / 400</div><div class="ui">Add a new page from the sidebar</div></div>
+    <div class="row2"><div class="lab">Label / 12 / 500</div><div class="small">Margin top</div></div>
+    <div class="row2"><div class="lab">Caption / 11 / 500</div><div class="xs">Supports px, %, em, rem</div></div>
+    <div class="row2"><div class="lab">Overline / 10 / 600</div><div class="micro">Appearance</div></div>
+  </div>
+</div></body></html>

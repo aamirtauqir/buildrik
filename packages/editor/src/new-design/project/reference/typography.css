@@ -1,0 +1,47 @@
+/**
+ * themes/design-system/typography.css
+ * Buildrik DS V1 — chrome typography tokens
+ * @license BSD-3-Clause
+ */
+
+:root {
+  /* FONT FAMILIES */
+  --buildrick-font-family: "Inter Tight", sans-serif;
+  --buildrick-font-family-display: "General Sans", sans-serif;
+  --buildrick-font-family-mono: "Geist Mono", monospace;
+
+  /* FONT SIZE SCALE */
+  --buildrick-text-xs: 11px;
+  --buildrick-text-sm: 12px;
+  --buildrick-text-sm-plus: 13px;
+  --buildrick-text-md: 14px;
+  --buildrick-text-lg: 16px;
+  --buildrick-text-xl: 18px;
+  --buildrick-text-2xl: 20px;
+  --buildrick-text-3xl: 24px;
+  --buildrick-text-4xl: 32px;
+
+  /* FONT WEIGHTS */
+  --buildrick-font-weight-normal: 400;
+  --buildrick-font-weight-medium: 500;
+  --buildrick-font-weight-semibold: 600;
+  --buildrick-font-weight-bold: 700;
+
+  /* LETTER SPACING */
+  --buildrick-tracking-tight: -0.02em;
+  --buildrick-tracking-normal: 0;
+  --buildrick-tracking-wide: 0.02em;
+  --buildrick-tracking-wider: 0.04em;
+  --buildrick-tracking-widest: 0.08em;
+
+  /* LINE HEIGHT */
+  --buildrick-line-tight: 1.2;
+  --buildrick-line-normal: 1.5;
+
+  /* ─── DS V1 REMEDIATION (2026-04-20) — NEW TOKENS ─── */
+  --buildrick-text-2xs: 10px;
+  --buildrick-text-2xs-plus: 10.5px;
+  --buildrick-text-md-plus: 15px;
+  --buildrick-text-display: 48px;
+  --buildrick-line-relaxed: 1.6;
+}

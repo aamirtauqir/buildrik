@@ -1,0 +1,1147 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  body { background: #F1F5F9; }
+  .card { padding: 16px; gap: 14px; }
+
+  .lead { display: flex; justify-content: space-between; align-items: baseline; padding: 0 2px; }
+  .lead h1 { margin: 0; font: 600 14px var(--bd-font); color: var(--bd-fg-heading); letter-spacing: -0.01em; }
+  .lead .meta { font: 500 10.5px var(--bd-mono); color: var(--bd-fg-muted); }
+
+  .stage { display: grid; grid-template-columns: repeat(2, 280px); gap: 18px; justify-content: center; align-items: start; }
+
+  /* ─── Panel shell ──────────────────────────────────────────────────── */
+  .insp {
+    background: #fff;
+    border: 1px solid var(--bd-border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px -12px rgba(15,23,42,0.18), 0 1px 2px rgba(15,23,42,0.04);
+    font: 500 11px var(--bd-font);
+    color: var(--bd-fg-primary);
+  }
+
+  /* Selection strip */
+  .ssel {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 8px 6px 10px;
+    background: #fff;
+    border-bottom: 1px solid var(--bd-border);
+  }
+  .ssel .crumb {
+    flex: 1; min-width: 0;
+    display: flex; align-items: center; gap: 4px;
+    font: 500 10.5px var(--bd-mono); color: var(--bd-fg-muted);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ssel .crumb .cur { color: var(--bd-fg-heading); font-weight: 600; }
+  .ssel .crumb .sep { opacity: 0.5; }
+  .ssel .icon-btn {
+    width: 22px; height: 22px; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; border: none; border-radius: 4px;
+    color: var(--bd-fg-muted); cursor: pointer;
+  }
+  .ssel .icon-btn:hover { background: var(--bd-bg-subtle); color: var(--bd-fg-primary); }
+
+  /* Element header (Figma-style title + tag) */
+  .ehdr {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px;
+    background: linear-gradient(180deg, #fff 0%, #F8FAFC 100%);
+    border-bottom: 1px solid var(--bd-border);
+  }
+  .ehdr .eic {
+    width: 26px; height: 26px; border-radius: 6px;
+    background: var(--bd-accent-tint);
+    color: var(--bd-accent);
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .ehdr .ename {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .ehdr .ename .n { font: 600 12.5px var(--bd-font); color: var(--bd-fg-heading); letter-spacing: -0.01em; }
+  .ehdr .ename .t { font: 500 9.5px var(--bd-mono); color: var(--bd-fg-muted); letter-spacing: -0.01em; }
+  .ehdr .eact { display: inline-flex; gap: 2px; }
+
+  /* Tabs */
+  .tabs {
+    display: flex; padding: 0 8px;
+    border-bottom: 1px solid var(--bd-border);
+    background: #fff;
+  }
+  .tab {
+    flex: 1; padding: 8px 6px;
+    font: 500 11px var(--bd-font); color: var(--bd-fg-secondary);
+    background: transparent; border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer; letter-spacing: -0.005em;
+    position: relative;
+  }
+  .tab:hover { color: var(--bd-fg-primary); }
+  .tab.on { color: var(--bd-fg-heading); font-weight: 600; border-bottom-color: var(--bd-accent); }
+  .tab .dot {
+    display: inline-block; width: 4px; height: 4px; border-radius: 50%;
+    background: var(--bd-accent); margin-left: 4px; vertical-align: middle;
+  }
+
+  /* Breakpoint & state strip */
+  .bpstrip {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 10px;
+    background: #FAFBFC;
+    border-bottom: 1px solid var(--bd-border);
+    font: 500 10px var(--bd-font); color: var(--bd-fg-muted);
+  }
+  .bpstrip .pill {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 1px 6px; border-radius: 3px;
+    font: 600 10px var(--bd-font);
+    background: var(--bd-accent-tint); color: var(--bd-accent);
+  }
+  .bpstrip .sz { flex: 1; text-align: right; font-family: var(--bd-mono); font-size: 9.5px; }
+
+  /* Sections */
+  .sec { border-bottom: 1px solid var(--bd-border); }
+  .sec:last-child { border-bottom: none; }
+  .sec-h {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 10px 7px 12px;
+    cursor: pointer; user-select: none;
+    position: relative;
+  }
+  .sec-h::before {
+    content: ''; position: absolute; left: 0; top: 10px; bottom: 10px;
+    width: 2px; border-radius: 0 2px 2px 0;
+    background: var(--bd-border); transition: background 120ms;
+  }
+  .sec-h.open::before { background: var(--bd-accent); }
+  .sec-h .chev {
+    display: inline-flex; color: var(--bd-fg-muted);
+    transition: transform 120ms;
+  }
+  .sec-h.closed .chev { transform: rotate(-90deg); }
+  .sec-h .name {
+    flex: 1; font: 600 11px var(--bd-font); color: var(--bd-fg-heading);
+    letter-spacing: -0.005em;
+  }
+  .sec-h .ind {
+    font: 500 9.5px var(--bd-mono); color: var(--bd-fg-secondary);
+    background: var(--bd-bg-subtle); padding: 1px 5px; border-radius: 3px;
+    letter-spacing: -0.01em;
+  }
+  .sec-h .ind.link { color: var(--bd-accent); background: var(--bd-accent-tint); }
+  .sec-h .add {
+    width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center;
+    color: var(--bd-fg-muted); border-radius: 3px;
+  }
+  .sec-h .add:hover { color: var(--bd-accent); background: var(--bd-accent-tint); }
+
+  .sec-body { padding: 2px 10px 10px; display: flex; flex-direction: column; gap: 6px; }
+  .sec-h.closed + .sec-body { display: none; }
+
+  /* ─── Figma-style icon-labelled row ─────────────────────────────── */
+  /* 2-up: [icon] [input]  [icon] [input] */
+  .pair { display: grid; grid-template-columns: 1fr 14px 1fr; align-items: center; gap: 0; }
+  .pair .link {
+    width: 14px; height: 22px; display: inline-flex; align-items: center; justify-content: center;
+    color: var(--bd-fg-muted); cursor: pointer; border-radius: 3px;
+  }
+  .pair .link:hover { color: var(--bd-accent); background: var(--bd-accent-tint); }
+  .pair .link.on { color: var(--bd-accent); }
+
+  .fld {
+    display: flex; align-items: center;
+    height: 24px;
+    background: var(--bd-bg-subtle);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    overflow: hidden;
+    transition: 120ms;
+  }
+  .fld:hover { background: #fff; border-color: var(--bd-border); }
+  .fld:focus-within { background: #fff; border-color: var(--bd-accent); box-shadow: 0 0 0 2px rgba(45,109,255,0.12); }
+  .fld .lb {
+    width: 22px; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--bd-fg-muted);
+    font: 600 10px var(--bd-font);
+  }
+  .fld input {
+    flex: 1; min-width: 0;
+    padding: 0 4px 0 0;
+    background: transparent; border: none; outline: none;
+    font: 500 11px var(--bd-font); color: var(--bd-fg-primary);
+    font-variant-numeric: tabular-nums;
+  }
+  .fld input.auto { color: var(--bd-fg-muted); font-style: italic; }
+  .fld .u {
+    font: 500 9.5px var(--bd-mono); color: var(--bd-fg-muted);
+    padding: 0 6px 0 0; text-transform: lowercase; letter-spacing: -0.02em;
+  }
+  .fld.mixed { background: rgba(217,119,6,0.06); }
+  .fld.mixed input { color: var(--bd-warning); }
+
+  /* Dropdown trigger (inline) */
+  .ddn {
+    display: flex; align-items: center; gap: 4px;
+    height: 24px; padding: 0 6px 0 8px;
+    background: var(--bd-bg-subtle); border: 1px solid transparent; border-radius: 4px;
+    font: 500 11px var(--bd-font); color: var(--bd-fg-primary);
+    cursor: pointer; transition: 120ms;
+  }
+  .ddn:hover { background: #fff; border-color: var(--bd-border); }
+  .ddn .v { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ddn .c { color: var(--bd-fg-muted); display: inline-flex; }
+
+  /* Row: single wide field with leading icon */
+  .row1 {
+    display: grid; grid-template-columns: 22px 1fr; align-items: center; gap: 4px;
+  }
+  .row1 > .lbl {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 24px; color: var(--bd-fg-muted);
+  }
+
+  /* ─── Labelled row (text + control) ───────────────────────── */
+  .row-lbl {
+    display: grid; grid-template-columns: 56px 1fr;
+    align-items: center; gap: 6px;
+  }
+  .row-lbl .rl {
+    font: 500 10.5px var(--bd-font); color: var(--bd-fg-secondary);
+    letter-spacing: -0.005em;
+  }
+  /* Inline icon inside a dropdown trigger */
+  .ddn .dic {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 14px; color: var(--bd-fg-secondary); flex-shrink: 0;
+  }
+  /* Inline text label inside segmented buttons */
+  .iseg button .il {
+    font: 500 10px var(--bd-font); color: inherit;
+    margin-left: 4px; letter-spacing: -0.01em;
+  }
+  /* Align pad metadata (key: value) */
+  .pad-meta { display: flex; flex-direction: column; gap: 3px; }
+  .pad-kv {
+    display: flex; align-items: center; gap: 6px;
+    font: 500 10px var(--bd-font);
+  }
+  .pad-kv .pk {
+    font: 500 9px var(--bd-font); letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--bd-fg-muted); min-width: 38px;
+  }
+  .pad-kv .pv { color: var(--bd-fg-heading); font-weight: 600; }
+
+  /* ─── Webflow-style nested padding/margin box ───────────────────── */
+  .box {
+    position: relative;
+    padding: 16px 10px 8px;
+    display: flex; flex-direction: column;
+    gap: 0;
+  }
+  .box-lbl {
+    position: absolute; top: 6px; left: 10px;
+    font: 600 8.5px var(--bd-font); letter-spacing: 0.08em;
+    color: var(--bd-fg-muted); text-transform: uppercase;
+    background: #fff; padding: 0 4px;
+  }
+  .mbox, .pbox {
+    position: relative;
+    border: 1px dashed #CBD5E1;
+    border-radius: 4px;
+    padding: 18px 34px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mbox { background: rgba(217,119,6,0.04); border-color: rgba(217,119,6,0.35); }
+  .pbox { background: rgba(45,109,255,0.04); border-color: rgba(45,109,255,0.35); margin: 2px; }
+  .mbox > .tag, .pbox > .tag {
+    position: absolute; top: -1px; left: 6px;
+    transform: translateY(-50%);
+    font: 600 8px var(--bd-font); letter-spacing: 0.08em;
+    background: #fff; padding: 0 4px;
+    color: var(--bd-warning);
+  }
+  .pbox > .tag { color: var(--bd-accent); }
+
+  /* axis inputs positioned inside the boxes */
+  .ax {
+    position: absolute;
+    font: 500 10.5px var(--bd-font); color: var(--bd-fg-primary);
+    font-variant-numeric: tabular-nums;
+    background: transparent; border: 1px solid transparent;
+    padding: 1px 4px; border-radius: 3px;
+    min-width: 26px; text-align: center;
+    cursor: text;
+    transition: 120ms;
+  }
+  .ax:hover { background: #fff; border-color: var(--bd-border); }
+  .ax.sel { background: #fff; border-color: var(--bd-accent); box-shadow: 0 0 0 2px rgba(45,109,255,0.12); }
+  .mbox .ax { color: var(--bd-warning); }
+  .pbox .ax { color: var(--bd-accent); }
+  .ax.muted { color: var(--bd-fg-muted); }
+
+  /* position of each axis input within its box */
+  .ax.t { top: -9px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); }
+  .ax.b { bottom: -9px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); }
+  .ax.l { left: 4px; top: 50%; transform: translateY(-50%); }
+  .ax.r { right: 4px; top: 50%; transform: translateY(-50%); }
+
+  /* Content rectangle at the center */
+  .center-rect {
+    background: #fff;
+    border: 1px solid var(--bd-border-medium);
+    border-radius: 3px;
+    padding: 5px 14px;
+    font: 600 9px var(--bd-font); color: var(--bd-fg-secondary);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  /* ─── 9-dot align pad ───────────────────────────────────────────── */
+  .pad {
+    width: 60px; height: 60px; flex-shrink: 0;
+    background: var(--bd-bg-subtle);
+    border: 1px solid var(--bd-border);
+    border-radius: 5px;
+    display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+    padding: 6px;
+    gap: 4px;
+    position: relative;
+  }
+  .pad .d {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--bd-border-medium);
+    align-self: center; justify-self: center;
+    cursor: pointer;
+  }
+  .pad .d:hover { background: var(--bd-fg-secondary); }
+  .pad .d.on {
+    background: var(--bd-accent);
+    box-shadow: 0 0 0 3px var(--bd-accent-tint);
+  }
+  .pad-aux {
+    flex: 1; display: flex; flex-direction: column; gap: 4px;
+  }
+
+  /* ─── Segmented (icon-only, compact) ───────────────────────────── */
+  .iseg {
+    display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+    background: var(--bd-bg-subtle);
+    border-radius: 4px; padding: 2px;
+    height: 24px;
+  }
+  .iseg button {
+    background: transparent; border: none;
+    border-radius: 3px; cursor: pointer;
+    color: var(--bd-fg-muted);
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0;
+  }
+  .iseg button:hover { color: var(--bd-fg-primary); }
+  .iseg button.on {
+    background: #fff; color: var(--bd-fg-heading);
+    box-shadow: 0 1px 2px rgba(15,23,42,0.08);
+  }
+
+  /* ─── Color swatch row (Figma Fill row) ───────────────────────── */
+  .fill {
+    display: flex; align-items: center; gap: 6px;
+    height: 24px; padding: 0 4px 0 2px;
+    background: var(--bd-bg-subtle); border: 1px solid transparent;
+    border-radius: 4px;
+  }
+  .fill:hover { background: #fff; border-color: var(--bd-border); }
+  .fill .sw {
+    width: 18px; height: 18px; border-radius: 3px;
+    box-shadow: inset 0 0 0 1px rgba(15,23,42,0.10);
+    flex-shrink: 0;
+    background-image:
+      linear-gradient(45deg, rgba(0,0,0,0.08) 25%, transparent 25%),
+      linear-gradient(-45deg, rgba(0,0,0,0.08) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.08) 75%),
+      linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.08) 75%);
+    background-size: 6px 6px;
+    background-position: 0 0, 0 3px, 3px -3px, -3px 0;
+  }
+  .fill .hx {
+    flex: 1; font: 500 11px var(--bd-font); color: var(--bd-fg-primary);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  }
+  .fill .pct {
+    font: 500 10px var(--bd-mono); color: var(--bd-fg-muted);
+    min-width: 30px; text-align: right;
+  }
+  .fill .eye {
+    width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center;
+    color: var(--bd-fg-muted); cursor: pointer; border-radius: 3px;
+  }
+  .fill .eye:hover { color: var(--bd-fg-primary); background: rgba(15,23,42,0.05); }
+
+  /* ─── Switch (tiny) ─────────────────────────────────────────── */
+  .swx {
+    position: relative;
+    width: 22px; height: 12px;
+    background: var(--bd-accent); border-radius: 9999px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .swx.off { background: var(--bd-border-medium); }
+  .swx .th {
+    position: absolute; top: 2px; left: 12px;
+    width: 8px; height: 8px; background: #fff; border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.2);
+    transition: 120ms;
+  }
+  .swx.off .th { left: 2px; }
+
+  .sw-row { display: flex; align-items: center; justify-content: space-between; padding: 1px 0; }
+  .sw-row .t { font: 500 11px var(--bd-font); color: var(--bd-fg-primary); }
+
+  /* ─── Chips (classes) ─────────────────────────────────────── */
+  .chips { display: flex; flex-wrap: wrap; gap: 3px; }
+  .chip {
+    font: 500 10px var(--bd-mono); color: var(--bd-fg-primary);
+    background: #fff; border: 1px solid var(--bd-border);
+    padding: 1px 4px 1px 6px; border-radius: 3px;
+    display: inline-flex; align-items: center; gap: 3px;
+    letter-spacing: -0.01em;
+  }
+  .chip.pri { color: var(--bd-accent); background: var(--bd-accent-tint); border-color: rgba(45,109,255,0.25); }
+  .chip .x { color: var(--bd-fg-muted); cursor: pointer; font-size: 11px; line-height: 1; }
+  .chip-add {
+    font: 500 10px var(--bd-font); color: var(--bd-fg-muted);
+    background: transparent; border: 1px dashed var(--bd-border);
+    padding: 1px 5px; border-radius: 3px; cursor: pointer;
+  }
+  .chip-add:hover { color: var(--bd-accent); border-color: var(--bd-accent); }
+
+  /* ─── Advanced disclosure text button ─────────────────────── */
+  .adv {
+    display: inline-flex; align-items: center; gap: 4px;
+    font: 500 10px var(--bd-font); color: var(--bd-fg-secondary);
+    background: transparent; border: none; cursor: pointer;
+    padding: 3px 0;
+    letter-spacing: -0.005em;
+  }
+  .adv:hover { color: var(--bd-accent); }
+
+  /* ─── Effect row with type chip ────────────────────────── */
+  .effrow {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 6px;
+    background: var(--bd-bg-subtle); border-radius: 4px;
+    font: 500 10.5px var(--bd-font); color: var(--bd-fg-primary);
+  }
+  .effrow .tp {
+    font: 600 9px var(--bd-font); letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--bd-fg-secondary); background: #fff;
+    padding: 1px 5px; border-radius: 3px;
+  }
+  .effrow .val { flex: 1; font-family: var(--bd-mono); font-size: 10px; color: var(--bd-fg-secondary); }
+  .effrow .eye { color: var(--bd-fg-muted); cursor: pointer; }
+
+  /* Sprite svg */
+  .base { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .ico { width: 13px; height: 13px; display: inline-flex; align-items: center; justify-content: center; }
+  .f { fill: currentColor; opacity: 0.14; }
+  .f3 { fill: currentColor; opacity: 0.38; }
+  .s { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* States pill */
+  .states { display: inline-flex; gap: 3px; }
+  .stp {
+    font: 600 9px var(--bd-font); letter-spacing: 0.04em;
+    color: var(--bd-fg-muted); background: var(--bd-bg-subtle);
+    padding: 2px 5px; border-radius: 3px; cursor: pointer;
+  }
+  .stp.on { color: var(--bd-accent); background: var(--bd-accent-tint); }
+
+  /* Caption + note */
+  .foot { display: flex; justify-content: space-between; padding: 0 2px; font: 500 10.5px var(--bd-font); color: var(--bd-fg-muted); }
+  .foot .mono { font-family: var(--bd-mono); font-size: 10px; }
+
+  /* Annotation bubble */
+  .anno {
+    position: absolute; left: calc(100% + 10px); top: 0;
+    font: 500 10px var(--bd-font); color: var(--bd-fg-muted);
+    max-width: 160px; line-height: 1.4;
+    display: flex; align-items: flex-start; gap: 4px;
+    pointer-events: none;
+  }
+  .anno .leader {
+    flex-shrink: 0; width: 18px; height: 1px; background: var(--bd-border-medium);
+    margin-top: 8px;
+  }
+
+  /* Tweaks panel */
+  .tweaks {
+    position: fixed; right: 14px; top: 14px;
+    width: 220px;
+    background: #fff; border: 1px solid var(--bd-border);
+    border-radius: 8px;
+    box-shadow: 0 12px 28px -10px rgba(15,23,42,0.25), 0 1px 2px rgba(15,23,42,0.06);
+    font: 500 11px var(--bd-font);
+    color: var(--bd-fg-primary);
+    z-index: 50;
+    display: none;
+    overflow: hidden;
+  }
+  .tweaks.on { display: block; }
+  .tweaks h3 {
+    margin: 0; padding: 9px 12px;
+    font: 600 11px var(--bd-font); color: var(--bd-fg-heading); letter-spacing: -0.005em;
+    background: var(--bd-bg-panel);
+    border-bottom: 1px solid var(--bd-border);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tweaks h3 .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--bd-accent); }
+  .tweaks-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 10px; }
+  .tweak-row { display: flex; flex-direction: column; gap: 4px; }
+  .tweak-row .name { font: 600 9.5px var(--bd-font); color: var(--bd-fg-muted); letter-spacing: 0.06em; text-transform: uppercase; }
+  .tseg {
+    display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+    background: var(--bd-bg-subtle); border-radius: 4px; padding: 2px; height: 24px;
+  }
+  .tseg button {
+    font: 500 10px var(--bd-font); color: var(--bd-fg-secondary);
+    background: transparent; border: none; border-radius: 3px; cursor: pointer;
+    letter-spacing: -0.01em;
+  }
+  .tseg button.on { background: #fff; color: var(--bd-fg-heading); font-weight: 600; box-shadow: 0 1px 2px rgba(15,23,42,0.08); }
+
+  /* ─── Mode variations ─── */
+  /* Hybrid mode = default styles */
+  /* Figma mode: lighter tabs, no section gradient headers, tighter */
+  body.figma .ehdr { background: #fff; }
+  body.figma .sec-h::before { display: none; }
+  body.figma .bpstrip { background: #fff; }
+
+  /* Webflow mode: flatter, sidebar feel */
+  body.webflow .insp { border-radius: 6px; box-shadow: 0 2px 8px rgba(15,23,42,0.06); }
+  body.webflow .sec-h { padding-left: 14px; }
+  body.webflow .sec-h::before { left: 6px; }
+
+  /* Density variations */
+  body.dense .sec-h { padding-top: 5px; padding-bottom: 5px; }
+  body.dense .sec-body { padding-top: 2px; padding-bottom: 7px; gap: 4px; }
+  body.dense .fld, body.dense .ddn, body.dense .iseg, body.dense .swx + * { height: 22px; }
+  body.dense .ehdr { padding-top: 8px; padding-bottom: 8px; }
+
+  body.comfy .sec-h { padding-top: 10px; padding-bottom: 10px; }
+  body.comfy .sec-body { padding-top: 4px; padding-bottom: 12px; gap: 8px; }
+  body.comfy .fld, body.comfy .ddn { height: 26px; }
+</style>
+</head><body><div class="card">
+
+  <div class="lead">
+    <h1>Right inspector · Figma · Webflow visual language</h1>
+    <span class="meta">260px · icon-first · nested box · align-pad</span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div class="stage">
+
+    <!-- ══════════════════ PANEL A · STYLE / LAYOUT ══════════════════ -->
+    <div class="insp" id="panelA">
+
+      <!-- Selection breadcrumb -->
+      <div class="ssel">
+        <div class="crumb">
+          <span>body</span><span class="sep">/</span>
+          <span>main</span><span class="sep">/</span>
+          <span>section.hero</span><span class="sep">/</span>
+          <span class="cur">div.container</span>
+        </div>
+        <button class="icon-btn" title="Hover pick">
+          <svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M4 4l7 16 2-7 7-2z"/></svg>
+        </button>
+        <button class="icon-btn" title="Navigate up">
+          <svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg>
+        </button>
+      </div>
+
+      <!-- Element header -->
+      <div class="ehdr">
+        <div class="eic">
+          <svg width="15" height="15" viewBox="0 0 24 24">
+            <rect class="f" x="3" y="4" width="18" height="16" rx="2"/>
+            <rect class="s" x="3" y="4" width="18" height="16" rx="2"/>
+            <path class="s" d="M3 9h18"/>
+            <path class="s" d="M8 14h8 M8 17h5" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="ename">
+          <div class="n">Container</div>
+          <div class="t">div.container · 1200 × auto</div>
+        </div>
+        <div class="eact">
+          <button class="icon-btn"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button>
+          <button class="icon-btn"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/></svg></button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab on">Style</button>
+        <button class="tab">Element<span class="dot"></span></button>
+        <button class="tab">Effects</button>
+      </div>
+
+      <!-- BP strip -->
+      <div class="bpstrip">
+        <span class="pill">
+          <svg class="base" width="10" height="10" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="1"/><path d="M8 21h8"/></svg>
+          Desktop
+        </span>
+        <span class="states">
+          <span class="stp on">Base</span>
+          <span class="stp">Hover</span>
+          <span class="stp">Focus</span>
+        </span>
+        <span class="sz">1200+</span>
+      </div>
+
+      <!-- ─────── DISPLAY / LAYOUT ─────── -->
+      <div class="sec">
+        <div class="sec-h open">
+          <span class="chev"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+          <span class="name">Layout</span>
+          <span class="ind">flex</span>
+        </div>
+        <div class="sec-body">
+          <!-- Display row: labelled dropdown (icon + text) -->
+          <div class="row-lbl">
+            <span class="rl">Display</span>
+            <div class="ddn">
+              <span class="dic"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><rect x="3" y="6" width="4" height="12"/><rect x="10" y="6" width="4" height="12"/><rect x="17" y="6" width="4" height="12"/></svg></span>
+              <span class="v">Flex</span>
+              <span class="c"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+            </div>
+          </div>
+
+          <!-- Direction segmented with text -->
+          <div class="row-lbl">
+            <span class="rl">Direction</span>
+            <div class="iseg" style="grid-auto-columns: repeat(4, 1fr)">
+              <button class="on" title="Row"><svg class="base" width="10" height="10" viewBox="0 0 24 24"><path d="M5 12h14 M14 7l5 5-5 5"/></svg><span class="il">Row</span></button>
+              <button title="Column"><svg class="base" width="10" height="10" viewBox="0 0 24 24"><path d="M12 5v14 M7 14l5 5 5-5"/></svg><span class="il">Col</span></button>
+              <button title="Row reverse"><svg class="base" width="10" height="10" viewBox="0 0 24 24"><path d="M19 12H5 M10 7l-5 5 5 5"/></svg></button>
+              <button title="Wrap"><svg class="base" width="10" height="10" viewBox="0 0 24 24"><path d="M3 6h12a4 4 0 014 4 4 4 0 01-4 4H8 M11 11l-3 3 3 3"/></svg></button>
+            </div>
+          </div>
+
+          <!-- Align pad + annotated state -->
+          <div class="row-lbl" style="align-items:flex-start">
+            <span class="rl" style="padding-top:4px">Align</span>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <div class="pad" title="Align items · justify-content">
+                <div class="d"></div><div class="d"></div><div class="d"></div>
+                <div class="d"></div><div class="d on"></div><div class="d"></div>
+                <div class="d"></div><div class="d"></div><div class="d"></div>
+              </div>
+              <div class="pad-meta">
+                <div class="pad-kv"><span class="pk">justify</span><span class="pv">center</span></div>
+                <div class="pad-kv"><span class="pk">items</span><span class="pv">center</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gap row (labelled) -->
+          <div class="row-lbl">
+            <span class="rl">Gap</span>
+            <div class="fld">
+              <span class="lb"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M7 4v16 M17 4v16 M3 12h4 M17 12h4"/></svg></span>
+              <input value="16"/><span class="u">px</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────── SIZE ─────── -->
+      <div class="sec">
+        <div class="sec-h open">
+          <span class="chev"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+          <span class="name">Size</span>
+        </div>
+        <div class="sec-body">
+          <div class="row-lbl">
+            <span class="rl">Size</span>
+            <div class="pair">
+              <div class="fld">
+                <span class="lb">W</span>
+                <input value="1200"/><span class="u">px</span>
+              </div>
+              <span class="link on" title="Link aspect ratio">
+                <svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M10 14a3 3 0 004 0l3-3a3 3 0 10-4-4l-1 1 M14 10a3 3 0 00-4 0l-3 3a3 3 0 104 4l1-1"/></svg>
+              </span>
+              <div class="fld">
+                <span class="lb">H</span>
+                <input value="auto" class="auto"/>
+              </div>
+            </div>
+          </div>
+          <div class="row-lbl">
+            <span class="rl">Min · Max</span>
+            <div class="pair">
+              <div class="fld">
+                <span class="lb" title="Min W"><svg class="base" width="10" height="10" viewBox="0 0 24 24"><path d="M4 6v12 M4 12h16 M20 6v12 M15 8l5 4-5 4"/></svg></span>
+                <input value="320"/><span class="u">px</span>
+              </div>
+              <span class="link" title="Constraints"></span>
+              <div class="fld">
+                <span class="lb" title="Max W"><svg class="base" width="10" height="10" viewBox="0 0 24 24"><path d="M4 6v12 M4 12h16 M20 6v12 M15 8l-5 4 5 4"/></svg></span>
+                <input value="1440"/><span class="u">px</span>
+              </div>
+            </div>
+          </div>
+          <div class="row-lbl">
+            <span class="rl">Overflow</span>
+            <div class="ddn"><span class="v">Visible</span><span class="c"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────── SPACING (Webflow nested box) ─────── -->
+      <div class="sec">
+        <div class="sec-h open">
+          <span class="chev"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+          <span class="name">Spacing</span>
+          <span class="ind link">padding</span>
+        </div>
+        <div class="sec-body">
+          <div class="box" style="padding:18px 4px 14px">
+            <div class="mbox">
+              <span class="tag">Margin</span>
+              <span class="ax t">0</span>
+              <span class="ax r muted">auto</span>
+              <span class="ax b">32</span>
+              <span class="ax l muted">auto</span>
+              <div class="pbox">
+                <span class="tag">Padding</span>
+                <span class="ax t sel">64</span>
+                <span class="ax r">32</span>
+                <span class="ax b">72</span>
+                <span class="ax l">32</span>
+                <div class="center-rect">Content</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────── FILL ─────── -->
+      <div class="sec">
+        <div class="sec-h open">
+          <span class="chev"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+          <span class="name">Fill</span>
+          <span class="add"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M12 5v14 M5 12h14"/></svg></span>
+        </div>
+        <div class="sec-body">
+          <div class="fill">
+            <div class="sw" style="background: #FFFFFF;"></div>
+            <span class="hx">FFFFFF</span>
+            <span class="pct">100%</span>
+            <span class="eye"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></svg></span>
+          </div>
+          <div class="fill">
+            <div class="sw" style="background: linear-gradient(135deg,#2D6DFF,#4B8DFF);"></div>
+            <span class="hx" style="font-variant:small-caps">Linear gradient</span>
+            <span class="pct">18%</span>
+            <span class="eye"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></svg></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────── STROKE ─────── -->
+      <div class="sec">
+        <div class="sec-h closed">
+          <span class="chev"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+          <span class="name">Stroke</span>
+          <span class="add"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M12 5v14 M5 12h14"/></svg></span>
+        </div>
+      </div>
+
+      <!-- ─────── CORNER RADIUS ─────── -->
+      <div class="sec">
+        <div class="sec-h open">
+          <span class="chev"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+          <span class="name">Corner radius</span>
+          <span class="ind">12 · link</span>
+        </div>
+        <div class="sec-body">
+          <div class="row-lbl">
+            <span class="rl">Radius</span>
+            <div class="pair">
+              <div class="fld">
+                <span class="lb"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M4 20V10a6 6 0 016-6h10"/></svg></span>
+                <input value="12"/><span class="u">px</span>
+              </div>
+              <span class="link on" title="Link corners">
+                <svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M10 14a3 3 0 004 0l3-3a3 3 0 10-4-4l-1 1 M14 10a3 3 0 00-4 0l-3 3a3 3 0 104 4l1-1"/></svg>
+              </span>
+              <div class="fld">
+                <span class="lb"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M20 20V10a6 6 0 00-6-6H4"/></svg></span>
+                <input value="12"/><span class="u">px</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /panelA -->
+
+
+    <!-- ══════════════════ PANEL B · TYPOGRAPHY / EFFECTS ══════════════════ -->
+    <div class="insp" id="panelB">
+
+      <div class="ssel">
+        <div class="crumb">
+          <span>section</span><span class="sep">/</span>
+          <span>div</span><span class="sep">/</span>
+          <span class="cur">h1.display</span>
+        </div>
+        <button class="icon-btn"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M4 4l7 16 2-7 7-2z"/></svg></button>
+        <button class="icon-btn"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+      </div>
+
+      <div class="ehdr">
+        <div class="eic" style="background:rgba(217,119,6,0.12); color:var(--bd-warning);">
+          <svg width="15" height="15" viewBox="0 0 24 24">
+            <path class="s" d="M5 6V4h14v2 M12 4v16 M8 20h8"/>
+          </svg>
+        </div>
+        <div class="ename">
+          <div class="n">Heading 1</div>
+          <div class="t">h1.display · Inter Tight 72/80</div>
+        </div>
+        <div class="eact">
+          <button class="icon-btn"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/></svg></button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab on">Style</button>
+        <button class="tab">Element</button>
+        <button class="tab">Effects<span class="dot"></span></button>
+      </div>
+
+      <div class="bpstrip">
+        <span class="pill">
+          <svg class="base" width="10" height="10" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="1"/><path d="M8 21h8"/></svg>
+          Desktop
+        </span>
+        <span class="states">
+          <span class="stp on">Base</span>
+          <span class="stp">Hover</span>
+        </span>
+        <span class="sz">1200+</span>
+      </div>
+
+      <!-- ─────── TYPOGRAPHY ─────── -->
+      <div class="sec">
+        <div class="sec-h open">
+          <span class="chev"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+          <span class="name">Typography</span>
+          <span class="ind">Inter Tight</span>
+        </div>
+        <div class="sec-body">
+          <div class="row-lbl">
+            <span class="rl">Family</span>
+            <div class="ddn">
+              <span class="dic"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M5 6V4h14v2 M12 4v16 M8 20h8"/></svg></span>
+              <span class="v">Inter Tight</span>
+              <span class="c"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+            </div>
+          </div>
+          <div class="row-lbl">
+            <span class="rl">Weight</span>
+            <div class="ddn"><span class="v">Semibold · 600</span><span class="c"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></div>
+          </div>
+          <div class="row-lbl">
+            <span class="rl">Size · LH</span>
+            <div class="pair">
+              <div class="fld">
+                <span class="lb" title="Font size"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M4 19l6-14 6 14 M6.5 14h7" stroke-width="1.3"/></svg></span>
+                <input value="72"/><span class="u">px</span>
+              </div>
+              <span class="link" title="Link line-height"></span>
+              <div class="fld">
+                <span class="lb" title="Line height"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M6 5h12 M6 19h12 M12 5v14 M9 8l3-3 3 3 M9 16l3 3 3-3"/></svg></span>
+                <input value="80"/><span class="u">px</span>
+              </div>
+            </div>
+          </div>
+          <div class="row-lbl">
+            <span class="rl">Track · ¶</span>
+            <div class="pair">
+              <div class="fld">
+                <span class="lb" title="Letter spacing"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M7 4v16 M17 4v16 M10 14l2-6 2 6 M10.5 12h3"/></svg></span>
+                <input value="-1.2"/><span class="u">%</span>
+              </div>
+              <span class="link"></span>
+              <div class="fld">
+                <span class="lb" title="Paragraph spacing"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M4 6h16 M4 10h10 M4 18h16 M4 14h10"/></svg></span>
+                <input value="0"/><span class="u">px</span>
+              </div>
+            </div>
+          </div>
+          <div class="row-lbl">
+            <span class="rl">Align</span>
+            <div class="iseg" style="grid-auto-columns: repeat(4, 1fr)">
+              <button class="on" title="Left"><svg class="base ico" viewBox="0 0 24 24"><path d="M4 6h16 M4 10h10 M4 14h16 M4 18h10"/></svg></button>
+              <button title="Center"><svg class="base ico" viewBox="0 0 24 24"><path d="M4 6h16 M7 10h10 M4 14h16 M7 18h10"/></svg></button>
+              <button title="Right"><svg class="base ico" viewBox="0 0 24 24"><path d="M4 6h16 M10 10h10 M4 14h16 M10 18h10"/></svg></button>
+              <button title="Justify"><svg class="base ico" viewBox="0 0 24 24"><path d="M4 6h16 M4 10h16 M4 14h16 M4 18h16"/></svg></button>
+            </div>
+          </div>
+          <div class="row-lbl">
+            <span class="rl">Case</span>
+            <div class="iseg" style="grid-auto-columns: repeat(3, 1fr)">
+              <button class="on" title="As typed"><span style="font: 600 11px var(--bd-font); color:inherit">Aa</span></button>
+              <button title="All caps"><span style="font: 600 10px var(--bd-font); letter-spacing:0.08em; color:inherit">AG</span></button>
+              <button title="Lowercase"><span style="font: 600 10px var(--bd-font); color:inherit">ag</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────── FILL (color) ─────── -->
+      <div class="sec">
+        <div class="sec-h open">
+          <span class="chev"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+          <span class="name">Color</span>
+        </div>
+        <div class="sec-body">
+          <div class="fill">
+            <div class="sw" style="background: #0F172A;"></div>
+            <span class="hx">0F172A</span>
+            <span class="pct">100%</span>
+            <span class="eye"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></svg></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────── EFFECTS (shadow, blur list) ─────── -->
+      <div class="sec">
+        <div class="sec-h open">
+          <span class="chev"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+          <span class="name">Effects</span>
+          <span class="add"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M12 5v14 M5 12h14"/></svg></span>
+        </div>
+        <div class="sec-body">
+          <div class="effrow">
+            <span class="tp">Drop</span>
+            <span class="val">0 · 8 · 24 · 0F172A · 18%</span>
+            <span class="eye"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></svg></span>
+          </div>
+          <div class="effrow">
+            <span class="tp">Layer</span>
+            <span class="val">Background blur · 12px</span>
+            <span class="eye" style="color:var(--bd-border-medium)"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 002.8 2.8"/><path d="M9.9 5.1A9.5 9.5 0 0121 12a9.5 9.5 0 01-2.1 3"/></svg></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────── ANIMATION ─────── -->
+      <div class="sec">
+        <div class="sec-h open">
+          <span class="chev"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+          <span class="name">Animation</span>
+          <span class="ind link">fade-rise</span>
+        </div>
+        <div class="sec-body">
+          <div class="row-lbl">
+            <span class="rl">Trigger</span>
+            <div class="ddn"><span class="v">On scroll into view</span><span class="c"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></div>
+          </div>
+          <div class="row-lbl">
+            <span class="rl">Dur · Delay</span>
+            <div class="pair">
+              <div class="fld">
+                <span class="lb" title="Duration"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></span>
+                <input value="480"/><span class="u">ms</span>
+              </div>
+              <span class="link"></span>
+              <div class="fld">
+                <span class="lb" title="Delay"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M5 12h14 M14 6l6 6-6 6"/></svg></span>
+                <input value="120"/><span class="u">ms</span>
+              </div>
+            </div>
+          </div>
+          <div class="row-lbl">
+            <span class="rl">Easing</span>
+            <div class="ddn"><span class="v">Ease-out · cubic</span><span class="c"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─────── VISIBILITY ─────── -->
+      <div class="sec">
+        <div class="sec-h open">
+          <span class="chev"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+          <span class="name">Visibility</span>
+          <span class="ind">2 of 3</span>
+        </div>
+        <div class="sec-body">
+          <div class="sw-row"><span class="t">Desktop · 1200+</span><span class="swx"><span class="th"></span></span></div>
+          <div class="sw-row"><span class="t">Tablet · 768+</span><span class="swx"><span class="th"></span></span></div>
+          <div class="sw-row"><span class="t">Mobile · 0+</span><span class="swx off"><span class="th"></span></span></div>
+        </div>
+      </div>
+
+      <!-- ─────── CLASSES ─────── -->
+      <div class="sec">
+        <div class="sec-h open">
+          <span class="chev"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+          <span class="name">Classes</span>
+          <span class="ind">2</span>
+        </div>
+        <div class="sec-body">
+          <div class="chips">
+            <span class="chip pri">.display<span class="x">×</span></span>
+            <span class="chip">.heading-xl<span class="x">×</span></span>
+            <span class="chip-add">+ class</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /panelB -->
+
+  </div><!-- /stage -->
+
+  <div class="foot">
+    <span>Two panels side-by-side for review · normally one visible · breakpoint + state cascade at top</span>
+    <span class="mono">inspector v3 · figma + webflow</span>
+  </div>
+
+</div>
+
+<!-- ══════════════════ TWEAKS PANEL ══════════════════ -->
+<div class="tweaks" id="tweaks">
+  <h3><span class="dot"></span>Tweaks</h3>
+  <div class="tweaks-body">
+    <div class="tweak-row">
+      <span class="name">Mode</span>
+      <div class="tseg" data-tweak="mode">
+        <button data-v="hybrid" class="on">Hybrid</button>
+        <button data-v="figma">Figma</button>
+        <button data-v="webflow">Webflow</button>
+      </div>
+    </div>
+    <div class="tweak-row">
+      <span class="name">Density</span>
+      <div class="tseg" data-tweak="density">
+        <button data-v="dense">Dense</button>
+        <button data-v="default" class="on">Default</button>
+        <button data-v="comfy">Comfy</button>
+      </div>
+    </div>
+    <div class="tweak-row">
+      <span class="name">Show annotations</span>
+      <div class="tseg" data-tweak="anno">
+        <button data-v="off" class="on">Off</button>
+        <button data-v="on">On</button>
+      </div>
+    </div>
+    <div class="tweak-row">
+      <span class="name">Breakpoint state</span>
+      <div class="tseg" data-tweak="bp">
+        <button data-v="desktop" class="on">Desktop</button>
+        <button data-v="tablet">Tablet</button>
+        <button data-v="mobile">Mobile</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "mode": "figma",
+    "density": "default",
+    "anno": "on",
+    "bp": "desktop"
+  }/*EDITMODE-END*/;
+
+  const state = Object.assign({}, TWEAK_DEFAULTS);
+
+  function applyMode(v) {
+    document.body.classList.remove('figma', 'webflow');
+    if (v === 'figma' || v === 'webflow') document.body.classList.add(v);
+  }
+  function applyDensity(v) {
+    document.body.classList.remove('dense', 'comfy');
+    if (v === 'dense' || v === 'comfy') document.body.classList.add(v);
+  }
+  function applyBp(v) {
+    const labels = { desktop: ['Desktop', '1200+'], tablet: ['Tablet', '768 – 1199'], mobile: ['Mobile', '0 – 767'] };
+    const [name, sz] = labels[v] || labels.desktop;
+    document.querySelectorAll('.bpstrip .pill').forEach(p => {
+      // preserve the icon, update the trailing text
+      const nodes = [...p.childNodes];
+      const lastText = nodes.reverse().find(n => n.nodeType === 3);
+      if (lastText) lastText.textContent = ' ' + name;
+      else p.appendChild(document.createTextNode(' ' + name));
+    });
+    document.querySelectorAll('.bpstrip .sz').forEach(e => e.textContent = sz);
+  }
+  function apply(k, v) {
+    state[k] = v;
+    if (k === 'mode') applyMode(v);
+    if (k === 'density') applyDensity(v);
+    if (k === 'bp') applyBp(v);
+  }
+
+  // Wire tseg buttons
+  document.querySelectorAll('.tseg').forEach(seg => {
+    const key = seg.dataset.tweak;
+    seg.addEventListener('click', e => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      seg.querySelectorAll('button').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      apply(key, btn.dataset.v);
+      // persist via parent host
+      window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [key]: btn.dataset.v } }, '*');
+    });
+    // set initial state from defaults
+    seg.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('on', b.dataset.v === state[key]);
+    });
+  });
+
+  // Apply initial
+  applyMode(state.mode);
+  applyDensity(state.density);
+  applyBp(state.bp);
+
+  // Tweaks host protocol
+  window.addEventListener('message', (ev) => {
+    const d = ev.data || {};
+    if (d.type === '__activate_edit_mode') document.getElementById('tweaks').classList.add('on');
+    if (d.type === '__deactivate_edit_mode') document.getElementById('tweaks').classList.remove('on');
+  });
+  window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+
+  // Section collapse (for feel)
+  document.querySelectorAll('.sec-h').forEach(h => {
+    h.addEventListener('click', () => {
+      h.classList.toggle('closed');
+      h.classList.toggle('open');
+    });
+  });
+
+  // Pad dot selection
+  document.querySelectorAll('.pad').forEach(pad => {
+    pad.addEventListener('click', (e) => {
+      const d = e.target.closest('.d');
+      if (!d) return;
+      pad.querySelectorAll('.d').forEach(x => x.classList.remove('on'));
+      d.classList.add('on');
+    });
+  });
+})();
+</script>
+</body></html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Pages · tab prototype</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+  .pg { display: flex; align-items: center; gap: 7px; padding: 6px 8px; border-radius: 5px; cursor: pointer; user-select: none; position: relative; }
+  .pg:hover { background: var(--bd-bg-subtle); }
+  .pg.sel { background: var(--bd-accent-tint); }
+  .pg.sel .nm { color: var(--bd-accent); }
+  .pg .pic { color: var(--bd-fg-muted); flex-shrink: 0; display: inline-flex; }
+  .pg .txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .pg .nm { font: 500 11.5px var(--bd-font); color: var(--bd-fg-heading); display: flex; align-items: center; gap: 5px; }
+  .pg .slug { font: 500 10px var(--bd-mono); color: var(--bd-fg-muted); }
+  .pg .badge { font: 600 8.5px var(--bd-font); letter-spacing: 0.08em; color: var(--bd-accent); background: var(--bd-accent-tint); padding: 1px 4px; border-radius: 3px; }
+  .pg .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .pg .dot.on { background: var(--bd-success); }
+  .pg .dot.off { background: var(--bd-fg-muted); }
+
+  .wire .pg .nm { font-family: var(--bd-mono); font-size: 10px; color: var(--bd-fg-muted); }
+  .wire .psearch { background: transparent; border: 1px dashed var(--bd-border-medium); }
+
+  /* context menu */
+  .cmenu { position: fixed; z-index: 60; background: #fff; border: 1px solid var(--bd-border); border-radius: 7px; box-shadow: 0 12px 28px -8px rgba(15,23,42,0.28), 0 1px 2px rgba(15,23,42,0.06); padding: 4px; min-width: 180px; display: none; font: 500 11.5px var(--bd-font); color: var(--bd-fg-primary); }
+  .cmenu.on { display: block; }
+  .cmenu button { width: 100%; display: flex; align-items: center; gap: 8px; padding: 6px 8px; border: none; background: transparent; cursor: pointer; border-radius: 4px; font: inherit; color: inherit; text-align: left; }
+  .cmenu button:hover { background: var(--bd-bg-subtle); }
+  .cmenu button.danger { color: var(--bd-error); }
+  .cmenu button.danger:hover { background: rgba(220,38,38,0.08); }
+  .cmenu .sep { height: 1px; background: var(--bd-border); margin: 4px 2px; }
+  .cmenu .kbd { margin-left: auto; font: 500 9.5px var(--bd-mono); color: var(--bd-fg-muted); }
+
+  /* New-page dialog */
+  .modal-bg { position: fixed; inset: 0; background: rgba(15,23,42,0.35); z-index: 80; display: none; align-items: center; justify-content: center; }
+  .modal-bg.on { display: flex; }
+  .modal { width: 420px; background: #fff; border-radius: 12px; padding: 20px 22px 18px; box-shadow: 0 24px 48px -12px rgba(15,23,42,0.4); display: flex; flex-direction: column; gap: 14px; }
+  .modal h3 { margin: 0; font: 600 15px var(--bd-font); color: var(--bd-fg-heading); }
+  .modal label { display: flex; flex-direction: column; gap: 4px; font: 600 9.5px var(--bd-font); letter-spacing: 0.08em; text-transform: uppercase; color: var(--bd-fg-muted); }
+  .modal input, .modal select { padding: 8px 10px; border: 1px solid var(--bd-border); border-radius: 6px; font: 500 12px var(--bd-font); color: var(--bd-fg-primary); outline: none; }
+  .modal input:focus, .modal select:focus { border-color: var(--bd-accent); box-shadow: 0 0 0 3px var(--bd-accent-tint); }
+  .modal .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 7px 14px; border-radius: 6px; cursor: pointer; font: 600 11px var(--bd-font); border: 1px solid transparent; }
+  .btn.sec { background: #fff; color: var(--bd-fg-primary); border-color: var(--bd-border); }
+  .btn.pri { background: var(--bd-accent); color: #fff; }
+
+  .canvas-wrap { margin-top: 24px; padding: 20px 24px 24px; background: #fff; border: 1px solid var(--bd-border); border-radius: 12px; }
+  .canvas-wrap h3 { margin: 0 0 12px; font: 600 13px var(--bd-font); color: var(--bd-fg-heading); display: flex; align-items: center; gap: 8px; }
+  .canvas-wrap h3 .pill { font: 500 9.5px var(--bd-mono); color: var(--bd-fg-muted); background: var(--bd-bg-subtle); padding: 1px 5px; border-radius: 3px; }
+  .addr { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--bd-bg-subtle); border-radius: 6px 6px 0 0; border: 1px solid var(--bd-border); border-bottom: none; }
+  .addr .url { flex: 1; font: 500 11px var(--bd-mono); color: var(--bd-fg-primary); }
+  .addr .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--bd-success); }
+  .viewport { min-height: 200px; padding: 30px; background: #fff; border: 1px solid var(--bd-border); border-radius: 0 0 6px 6px; text-align: center; color: var(--bd-fg-secondary); font: 500 12.5px var(--bd-font); }
+  .viewport h2 { margin: 0 0 8px; font: 600 22px var(--bd-font); color: var(--bd-fg-heading); letter-spacing: -0.01em; }
+</style></head><body>
+<div class="page">
+  <div class="head"><div class="ttl"><h1>Pages · tab prototype</h1><div class="sub">03 of 06 · static, collection, utility</div></div>
+    <div class="nav"><a href="index.html">← all</a><a href="tab-add.html">Add</a><a href="tab-layers.html">Layers</a><a href="tab-pages.html" class="on">Pages</a><a href="tab-templates.html">Templates</a><a href="tab-ai.html">AI</a><a href="tab-settings.html">Settings</a></div>
+  </div>
+
+  <div class="split">
+    <!-- Wireframe -->
+    <div>
+      <div class="col-h"><h2>Wireframe</h2><span class="tag">groups · slugs · status dot</span></div>
+      <div class="shell wire">
+        <nav class="rail">
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="18" height="18" rx="3"/><path class="s" d="M12 8v8 M8 12h8"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="4" width="14" height="4" rx="1"/><rect class="s" x="7" y="10" width="14" height="4" rx="1"/><rect class="s" x="3" y="16" width="14" height="4" rx="1"/></svg></button>
+          <button class="on"><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M8 3h6l4 4v10a2 2 0 01-2 2H8a2 2 0 01-2-2V5z M14 3v4h4"/></svg></button>
+          <div class="divr"></div>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="8" height="8" rx="1"/><rect class="s" x="13" y="3" width="8" height="8" rx="1"/><rect class="s" x="3" y="13" width="8" height="8" rx="1"/><rect class="s" x="13" y="13" width="8" height="8" rx="1"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg></button>
+          <div style="flex:1"></div>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><circle class="s" cx="12" cy="12" r="3"/></svg></button>
+        </nav>
+        <section class="panel">
+          <div class="panel-h"><div class="ttl"><h2>Pages</h2><div class="panel-sub">count · published</div></div><div class="acts"><button class="icon-btn">+</button></div></div>
+          <label class="psearch"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input placeholder="find" disabled/></label>
+          <div class="pbody scroll">
+            <div class="cat-h"><span>Static</span><span class="n">4</span></div>
+            <div class="pg sel"><span class="pic">▢</span><div class="txt"><div class="nm">Home <span class="badge">HOME</span></div><div class="slug">/</div></div><span class="dot on"></span></div>
+            <div class="pg"><span class="pic">▢</span><div class="txt"><div class="nm">Pricing</div><div class="slug">/pricing</div></div><span class="dot on"></span></div>
+            <div class="pg"><span class="pic">▢</span><div class="txt"><div class="nm">Features</div><div class="slug">/features</div></div><span class="dot on"></span></div>
+            <div class="pg"><span class="pic">▢</span><div class="txt"><div class="nm">About · draft</div><div class="slug">/about</div></div><span class="dot off"></span></div>
+            <div class="cat-h"><span>Collections</span><span class="n">2</span></div>
+            <div class="pg"><span class="pic">▤</span><div class="txt"><div class="nm">Blog · 18 posts</div><div class="slug">/blog/[slug]</div></div><span class="dot on"></span></div>
+            <div class="pg"><span class="pic">▤</span><div class="txt"><div class="nm">Customers · 6</div><div class="slug">/customers/[slug]</div></div><span class="dot on"></span></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Hi-fi -->
+    <div>
+      <div class="col-h"><h2>Prototype</h2><span class="tag">click to navigate · right-click for menu</span></div>
+      <div class="shell">
+        <nav class="rail">
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="18" height="18" rx="3"/><path class="s" d="M12 8v8 M8 12h8"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="4" width="14" height="4" rx="1"/><rect class="s" x="7" y="10" width="14" height="4" rx="1"/><rect class="s" x="3" y="16" width="14" height="4" rx="1"/></svg></button>
+          <button class="on" title="Pages"><svg width="17" height="17" viewBox="0 0 24 24"><path class="f" d="M8 3h6l4 4v10a2 2 0 01-2 2H8a2 2 0 01-2-2V5z"/><path class="s" d="M8 3h6l4 4v10a2 2 0 01-2 2H8a2 2 0 01-2-2V5z M14 3v4h4"/></svg></button>
+          <div class="divr"></div>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="8" height="8" rx="1.5"/><rect class="s" x="13" y="3" width="8" height="8" rx="1.5"/><rect class="s" x="3" y="13" width="8" height="8" rx="1.5"/><rect class="s" x="13" y="13" width="8" height="8" rx="1.5"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M12 3l2.1 5.4 5.4 2.1-5.4 2.1L12 18l-2.1-5.4L4.5 10.5l5.4-2.1z"/></svg></button>
+          <div style="flex:1"></div>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><circle class="s" cx="12" cy="12" r="3"/></svg></button>
+        </nav>
+        <section class="panel">
+          <div class="panel-h">
+            <div class="ttl"><h2>Pages</h2><div class="panel-sub" id="pcount">7 pages · 6 published</div></div>
+            <div class="acts">
+              <button class="icon-btn" title="New folder"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></button>
+              <button class="icon-btn" id="newBtn" title="New page"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M12 5v14 M5 12h14"/></svg></button>
+            </div>
+          </div>
+          <label class="psearch">
+            <svg class="base" width="12" height="12" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input id="pq" placeholder="Find a page"/>
+          </label>
+          <div class="pbody scroll" id="plist"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview / current page -->
+  <div class="canvas-wrap">
+    <h3>Current page <span class="pill">live navigation</span></h3>
+    <div class="addr">
+      <span class="dot"></span>
+      <span class="url" id="url">https://acme.com/</span>
+      <span style="font:500 9.5px var(--bd-mono); color:var(--bd-fg-muted)" id="status">published</span>
+    </div>
+    <div class="viewport" id="viewport"><h2 id="vtitle">Home</h2><div id="vdesc">Landing · welcome back to Acme</div></div>
+  </div>
+
+  <div class="notes">
+    <div class="note"><span class="k">Groups</span><h4>Static · collections · utility</h4><p>Static pages are one-of. Collections use <code>[slug]</code> templates. Utility includes 404, sitemap.</p></div>
+    <div class="note"><span class="k">Publish state</span><h4>Dot = live</h4><p>Green = published. Grey = draft. Right-click a draft → Publish to push live.</p></div>
+    <div class="note"><span class="k">Context menu</span><h4>Right-click actions</h4><p>Rename, duplicate, set as home, open in new tab, delete. Keyboard shortcuts shown inline.</p></div>
+  </div>
+
+  <div class="flow">
+    <div class="step"><span class="n">1</span><div class="t">Open Pages</div><div class="d">Press <b>P</b>. Pages list scoped to current site.</div></div>
+    <div class="step"><span class="n">2</span><div class="t">Click page</div><div class="d">Canvas loads that page. URL bar updates.</div></div>
+    <div class="step"><span class="n">3</span><div class="t">Right-click</div><div class="d">Rename, duplicate, publish, delete. No hover overflow menu — just context.</div></div>
+    <div class="step"><span class="n">4</span><div class="t">New page</div><div class="d">+ button opens modal. Name + slug + template, then jumps to it.</div></div>
+  </div>
+
+  <div class="foot"><span>Try: click pages · right-click any row · + to create new</span><span class="mono">tab-pages · v1</span></div>
+</div>
+
+<!-- Context menu -->
+<div class="cmenu" id="cmenu">
+  <button data-act="open"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M14 4h6v6 M10 14l10-10 M5 8v11h11v-5"/></svg>Open <span class="kbd">↵</span></button>
+  <button data-act="rename"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M12 20h9 M16.5 3.5a2 2 0 112.8 2.8L7 19 3 20l1-4z"/></svg>Rename <span class="kbd">F2</span></button>
+  <button data-act="dup"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><rect x="7" y="7" width="13" height="13" rx="1.5"/><path d="M4 14V5a1 1 0 011-1h9"/></svg>Duplicate <span class="kbd">⌘D</span></button>
+  <button data-act="home"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9 M5 10v10h14V10"/></svg>Set as home</button>
+  <div class="sep"></div>
+  <button data-act="publish"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></svg>Publish / unpublish</button>
+  <div class="sep"></div>
+  <button class="danger" data-act="del"><svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M5 7h14 M8 7V5a1 1 0 011-1h6a1 1 0 011 1v2 M7 7l1 13h8l1-13"/></svg>Delete <span class="kbd">⌫</span></button>
+</div>
+
+<!-- New page modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>New page</h3>
+    <label>Name<input id="mName" placeholder="About"/></label>
+    <label>Slug<input id="mSlug" placeholder="/about"/></label>
+    <label>Template<select><option>Blank</option><option>Landing</option><option>Marketing section</option><option>Docs article</option></select></label>
+    <div class="actions"><span class="btn sec" id="mCancel">Cancel</span><span class="btn pri" id="mCreate">Create</span></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Done</div>
+
+<script>
+const pages = [
+  { g:'Static', id:'home', name:'Home', slug:'/', home:true, pub:true, title:'Home', desc:'Landing · welcome back to Acme' },
+  { g:'Static', id:'pricing', name:'Pricing', slug:'/pricing', pub:true, title:'Pricing', desc:'Simple, transparent pricing' },
+  { g:'Static', id:'features', name:'Features', slug:'/features', pub:true, title:'Features', desc:'All the reasons to switch' },
+  { g:'Static', id:'about', name:'About', slug:'/about', pub:false, title:'About', desc:'Our story · draft' },
+  { g:'Collections', id:'blog', name:'Blog · 18 posts', slug:'/blog/[slug]', pub:true, col:true, title:'Blog', desc:'Collection template · /blog/[slug]' },
+  { g:'Collections', id:'customers', name:'Customers · 6', slug:'/customers/[slug]', pub:true, col:true, title:'Customers', desc:'Collection template · /customers/[slug]' },
+  { g:'Utility', id:'404', name:'404 · Not found', slug:'/404', pub:true, util:true, title:'404', desc:'Not found page' },
+];
+let selId = 'home';
+
+const plist = document.getElementById('plist');
+const url = document.getElementById('url');
+const status = document.getElementById('status');
+const vtitle = document.getElementById('vtitle');
+const vdesc = document.getElementById('vdesc');
+const pcount = document.getElementById('pcount');
+const pq = document.getElementById('pq');
+const cmenu = document.getElementById('cmenu');
+const modalBg = document.getElementById('modalBg');
+const toast = document.getElementById('toast');
+let ctxPageId = null;
+
+function iconFor(p) {
+  if (p.home) return '<svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9 M5 10v10h14V10"/></svg>';
+  if (p.col) return '<svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>';
+  if (p.util) return '<svg class="base" width="13" height="13" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12h8 M12 8v8"/></svg>';
+  return '<svg class="base" width="13" height="13" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z M14 2v6h6"/></svg>';
+}
+
+function render() {
+  const v = pq.value.trim().toLowerCase();
+  plist.innerHTML = '';
+  const byG = {};
+  pages.forEach(p => { if (!v || p.name.toLowerCase().includes(v)) (byG[p.g] ||= []).push(p); });
+  let total=0, pub=0;
+  pages.forEach(p => { total++; if (p.pub) pub++; });
+  pcount.textContent = `${total} pages · ${pub} published`;
+  for (const g of ['Static','Collections','Utility']) {
+    if (!byG[g]) continue;
+    const h = document.createElement('div'); h.className='cat-h';
+    h.innerHTML = `<span>${g}</span><span class="n">${byG[g].length}</span>`;
+    plist.appendChild(h);
+    for (const p of byG[g]) {
+      const row = document.createElement('div');
+      row.className = 'pg' + (p.id === selId ? ' sel' : '');
+      row.dataset.id = p.id;
+      row.innerHTML = `
+        <span class="pic">${iconFor(p)}</span>
+        <div class="txt">
+          <div class="nm">${p.name}${p.home?' <span class="badge">HOME</span>':''}${!p.pub?' <span class="badge" style="color:var(--bd-fg-muted); background:var(--bd-bg-subtle)">DRAFT</span>':''}</div>
+          <div class="slug">${p.slug}</div>
+        </div>
+        <span class="dot ${p.pub?'on':'off'}"></span>`;
+      plist.appendChild(row);
+    }
+  }
+}
+
+function select(id) {
+  selId = id;
+  const p = pages.find(x => x.id === id);
+  if (!p) return;
+  url.textContent = 'https://acme.com' + (p.slug === '/' ? '' : p.slug).replace('[slug]','example');
+  status.textContent = p.pub ? 'published' : 'draft — not live';
+  vtitle.textContent = p.title;
+  vdesc.textContent = p.desc;
+  render();
+}
+
+plist.addEventListener('click', e => {
+  const row = e.target.closest('.pg');
+  if (row) select(row.dataset.id);
+});
+plist.addEventListener('contextmenu', e => {
+  const row = e.target.closest('.pg');
+  if (!row) return;
+  e.preventDefault();
+  ctxPageId = row.dataset.id;
+  cmenu.classList.add('on');
+  cmenu.style.left = Math.min(e.clientX, window.innerWidth - 200) + 'px';
+  cmenu.style.top = Math.min(e.clientY, window.innerHeight - 280) + 'px';
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('#cmenu')) cmenu.classList.remove('on');
+});
+cmenu.addEventListener('click', e => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  const act = btn.dataset.act;
+  const p = pages.find(x => x.id === ctxPageId);
+  if (!p) return;
+  if (act === 'open') select(p.id);
+  if (act === 'rename') { const n = prompt('Rename page', p.name); if (n) { p.name = n; } }
+  if (act === 'dup') {
+    const np = {...p, id: p.id + '-copy', name: p.name + ' copy', slug: p.slug + '-copy', home:false };
+    pages.push(np); notify('Duplicated');
+  }
+  if (act === 'home') { pages.forEach(x => x.home = false); p.home = true; notify('Set as home'); }
+  if (act === 'publish') { p.pub = !p.pub; notify(p.pub ? 'Published' : 'Unpublished'); }
+  if (act === 'del') { if (confirm('Delete ' + p.name + '?')) { const i = pages.indexOf(p); pages.splice(i,1); if (selId === p.id) selId = pages[0]?.id; notify('Deleted'); } }
+  cmenu.classList.remove('on');
+  select(selId);
+});
+
+document.getElementById('newBtn').addEventListener('click', () => modalBg.classList.add('on'));
+document.getElementById('mCancel').addEventListener('click', () => modalBg.classList.remove('on'));
+document.getElementById('mCreate').addEventListener('click', () => {
+  const name = document.getElementById('mName').value.trim() || 'Untitled';
+  const slug = document.getElementById('mSlug').value.trim() || '/' + name.toLowerCase().replace(/\s+/g,'-');
+  const id = 'p-' + Date.now();
+  pages.push({ g:'Static', id, name, slug, pub:false, title:name, desc:'New page · draft' });
+  selId = id;
+  modalBg.classList.remove('on');
+  document.getElementById('mName').value = '';
+  document.getElementById('mSlug').value = '';
+  notify('Page created');
+  select(id);
+});
+
+pq.addEventListener('input', render);
+
+function notify(msg) { toast.textContent = msg; toast.classList.add('on'); clearTimeout(toast._t); toast._t = setTimeout(()=>toast.classList.remove('on'), 1300); }
+
+select('home');
+</script>
+</body></html>

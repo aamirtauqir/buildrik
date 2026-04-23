@@ -1,0 +1,45 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  body { background: #F8FAFC; }
+  .menu {
+    width: 240px; background: #fff; border: 1px solid var(--bd-border);
+    border-radius: 10px; padding: 6px; box-shadow: 0 8px 24px rgba(15,23,42,0.08), 0 4px 8px rgba(15,23,42,0.05);
+  }
+  .mi {
+    display: flex; align-items: center; gap: 10px; padding: 7px 10px;
+    font: 500 12.5px var(--bd-font); color: var(--bd-fg-primary); border-radius: 6px; cursor: pointer;
+  }
+  .mi:hover { background: rgba(15,23,42,0.04); }
+  .mi .kbd { margin-left: auto; font: 500 10.5px var(--bd-mono); color: var(--bd-fg-muted); }
+  .mi.danger { color: var(--bd-error); }
+  .mi svg { color: var(--bd-fg-muted); }
+  .sep { height: 1px; background: var(--bd-border); margin: 4px 0; }
+  .head { padding: 6px 10px 4px; font: 600 10px var(--bd-font); letter-spacing: 0.08em; color: var(--bd-fg-muted); text-transform: uppercase; }
+  .row { display: flex; gap: 20px; align-items: flex-start; }
+  .toast {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: #0F172A; color: #fff; padding: 10px 14px; border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(15,23,42,0.25);
+    font: 500 12.5px var(--bd-font);
+  }
+  .toast .dot { width: 8px; height: 8px; border-radius: 50%; background: #16A34A; }
+</style>
+</head><body><div class="card">
+  <div class="row">
+    <div class="menu">
+      <div class="head">Page</div>
+      <div class="mi">Rename<span class="kbd">F2</span></div>
+      <div class="mi">Duplicate<span class="kbd">⌘D</span></div>
+      <div class="mi">Set as home</div>
+      <div class="sep"></div>
+      <div class="mi">SEO settings…</div>
+      <div class="mi">Advanced…</div>
+      <div class="sep"></div>
+      <div class="mi danger">Delete</div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:10px; padding-top:4px">
+      <div class="toast"><span class="dot"></span>Changes saved</div>
+      <div class="toast" style="background:#DC2626"><span class="dot" style="background:#fff"></span>Couldn't publish — 2 issues</div>
+    </div>
+  </div>
+</div></body></html>

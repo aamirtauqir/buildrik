@@ -1,0 +1,185 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Publish · tab prototype</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+  .section { padding: 12px; border-bottom: 1px solid var(--bd-border); display: flex; flex-direction: column; gap: 10px; }
+  .section h3 {
+    margin: 0; font: 600 10.5px var(--bd-mono); color: var(--bd-fg-muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .domain-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px; background: var(--bd-bg-subtle); border-radius: 6px;
+    font: 500 11.5px var(--bd-mono); color: var(--bd-fg-primary);
+  }
+  .domain-row .verified { color: var(--bd-success); font-size: 10px; font-family: var(--bd-font); }
+  .domain-row svg { color: var(--bd-fg-muted); }
+  .grow { flex: 1; }
+
+  .check-row {
+    display: flex; align-items: flex-start; gap: 8px;
+    font: 500 11.5px var(--bd-font); color: var(--bd-fg-primary);
+  }
+  .check-row .c {
+    width: 14px; height: 14px; flex-shrink: 0;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+  }
+  .check-row.ok  .c { background: rgba(22,163,74,0.15); color: var(--bd-success); }
+  .check-row.warn .c { background: rgba(217,119,6,0.15); color: var(--bd-warning); }
+  .check-row.err  .c { background: rgba(220,38,38,0.15); color: var(--bd-error); }
+  .check-row .sub { font: 400 10.5px var(--bd-font); color: var(--bd-fg-muted); }
+
+  .pub-btn {
+    height: 40px; border-radius: 9999px;
+    background: var(--bd-accent); color: #fff; border: 0; cursor: pointer;
+    font: 600 13px var(--bd-font);
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    width: 100%;
+  }
+  .pub-btn:hover { background: var(--bd-accent-hover); }
+  .pub-btn.busy  { background: var(--bd-accent-pressed); pointer-events: none; }
+  .pub-btn .sp {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff;
+    animation: spin 600ms linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .last-pub {
+    font: 500 11px var(--bd-font); color: var(--bd-fg-secondary);
+    text-align: center;
+  }
+
+  .preview-link {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 10px; background: var(--bd-bg-subtle); border-radius: 5px;
+    font: 500 11px var(--bd-mono); color: var(--bd-fg-primary);
+  }
+
+  .pbody { overflow: auto; flex: 1; }
+  kbd { font: 500 9.5px var(--bd-mono); background: #fff; color: var(--bd-fg-primary); padding: 1px 5px; border: 1px solid var(--bd-border); border-radius: 3px; }
+</style>
+</head><body>
+<div class="page">
+  <div class="head">
+    <div class="ttl">
+      <h1>Publish · tab prototype</h1>
+      <div class="sub">domain · preflight checks · deploy · history</div>
+    </div>
+    <div class="nav">
+      <a href="index.html">All tabs</a>
+      <a href="tab-pages.html">Pages</a>
+      <a class="on">Publish</a>
+      <a href="tab-settings.html">Settings</a>
+      <a href="tab-history.html">History</a>
+    </div>
+  </div>
+
+  <div class="split">
+    <!-- Wire -->
+    <div>
+      <div class="col-h"><h2>Wireframe</h2><span class="tag">domain · checklist · pill CTA</span></div>
+      <div class="shell wire">
+        <nav class="rail">
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="18" height="18" rx="3"/><path class="s" d="M12 8v8 M8 12h8"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M8 3h6l4 4v10a2 2 0 01-2 2H8a2 2 0 01-2-2V5z M14 3v4h4"/></svg></button>
+          <div class="divr"></div>
+          <button class="on"><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M12 2l-7 18 7-3 7 3z"/></svg></button>
+          <div style="flex:1"></div>
+        </nav>
+        <section class="panel">
+          <div class="panel-h"><div class="ttl"><h2>Publish</h2><div class="panel-sub">last · 2d ago</div></div></div>
+          <div class="pbody">
+            <div class="section">
+              <h3>Domain</h3>
+              <div class="domain-row">buildrik.app/shahg</div>
+            </div>
+            <div class="section">
+              <h3>Preflight</h3>
+              <div class="check-row ok"><span class="c">✓</span>18 pages compiled</div>
+              <div class="check-row ok"><span class="c">✓</span>Assets optimised</div>
+              <div class="check-row warn"><span class="c">!</span>2 SEO warnings</div>
+            </div>
+            <div class="section">
+              <button class="pub-btn">Publish</button>
+              <div class="last-pub">Last: Apr 20</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Prototype -->
+    <div>
+      <div class="col-h"><h2>Prototype</h2><span class="tag">preflight · deploy · preview url</span></div>
+      <div class="shell">
+        <nav class="rail">
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="3" width="18" height="18" rx="3"/><path class="s" d="M12 8v8 M8 12h8"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><rect class="s" x="3" y="4" width="14" height="4" rx="1"/><rect class="s" x="7" y="10" width="14" height="4" rx="1"/><rect class="s" x="3" y="16" width="14" height="4" rx="1"/></svg></button>
+          <button><svg width="17" height="17" viewBox="0 0 24 24"><path class="s" d="M8 3h6l4 4v10a2 2 0 01-2 2H8a2 2 0 01-2-2V5z M14 3v4h4"/></svg></button>
+          <div class="divr"></div>
+          <button class="on" title="Publish"><svg width="17" height="17" viewBox="0 0 24 24"><path class="f" d="M12 2l-7 18 7-3 7 3z"/><path class="s" d="M12 2l-7 18 7-3 7 3z"/></svg></button>
+          <div style="flex:1"></div>
+        </nav>
+        <section class="panel">
+          <div class="panel-h">
+            <div class="ttl"><h2>Publish</h2><div class="panel-sub">8 unsaved changes · ready</div></div>
+            <div class="acts">
+              <button class="icon-btn" title="History"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></button>
+            </div>
+          </div>
+          <div class="pbody">
+            <!-- Domain -->
+            <div class="section">
+              <h3>Domain <span style="color:var(--bd-accent); font-weight:500; text-transform:none; letter-spacing:0; font-family:var(--bd-font); font-size:10.5px">Edit</span></h3>
+              <div class="domain-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18 M12 3c2.5 3 2.5 15 0 18 M12 3c-2.5 3-2.5 15 0 18"/></svg>
+                <span class="grow">shahg.buildrik.app</span>
+                <span class="verified">●&nbsp;Verified</span>
+              </div>
+              <div class="domain-row" style="background:transparent; border:1px dashed var(--bd-border-medium)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 5v14 M5 12h14"/></svg>
+                <span class="grow" style="color:var(--bd-fg-muted)">Add custom domain</span>
+              </div>
+            </div>
+
+            <!-- Preflight -->
+            <div class="section">
+              <h3>Preflight checks <span style="font-family:var(--bd-font); font-size:10px; color:var(--bd-success); font-weight:500; text-transform:none; letter-spacing:0">3 / 4 passed</span></h3>
+              <div class="check-row ok"><span class="c"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg></span>
+                <div class="col" style="gap:2px"><span>18 pages compiled</span><span class="sub">0 errors · 12.4 MB bundle</span></div>
+              </div>
+              <div class="check-row ok"><span class="c"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg></span>
+                <div class="col" style="gap:2px"><span>Images optimised</span><span class="sub">AVIF + WebP · lazy-loaded</span></div>
+              </div>
+              <div class="check-row ok"><span class="c"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg></span>
+                <div class="col" style="gap:2px"><span>No broken links</span><span class="sub">44 links checked</span></div>
+              </div>
+              <div class="check-row warn"><span class="c">!</span>
+                <div class="col" style="gap:2px"><span>2 SEO warnings</span><span class="sub">Missing meta description on /about, /team</span></div>
+              </div>
+            </div>
+
+            <!-- Deploy -->
+            <div class="section">
+              <button class="pub-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2L4.5 20.29l7.5-3 7.5 3L12 2z"/></svg>
+                Publish to buildrik.app/shahg
+              </button>
+              <div class="last-pub">Last published Apr 20, 4:31 PM · <a href="#" style="color:var(--bd-accent)">view live ↗</a></div>
+              <div class="preview-link">
+                <span>preview-8f3a.buildrik.app</span>
+                <span style="color:var(--bd-accent)">copy</span>
+              </div>
+              <div style="font: 500 10px var(--bd-mono); color: var(--bd-fg-muted); text-align:center">⌘ · ⇧ · P to publish · <kbd>⌘P</kbd> preview</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>

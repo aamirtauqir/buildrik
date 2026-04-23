@@ -1,0 +1,221 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  .card { padding: 24px 28px; background: var(--bd-bg-panel); gap: 24px; }
+  .sec-h { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 6px; border-bottom: 1px dashed var(--bd-border); margin-bottom: 10px; }
+  .sec-h h3 { margin: 0; font: 600 12px var(--bd-font); color: var(--bd-fg-heading); letter-spacing: -0.01em; }
+  .sec-h .tag { font: 500 9px var(--bd-mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--bd-fg-muted); }
+
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 7px 10px; text-align: left; font: 500 11px var(--bd-mono); vertical-align: middle; }
+  th { font-weight: 600; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bd-fg-muted); border-bottom: 1px solid var(--bd-border); }
+  td { border-bottom: 1px solid var(--bd-border); color: var(--bd-fg-primary); }
+  td.token { color: var(--bd-accent); font-weight: 600; }
+  td.val { color: var(--bd-fg-secondary); }
+  td.desc { font-family: var(--bd-font); color: var(--bd-fg-secondary); }
+
+  .swatch { width: 22px; height: 22px; border-radius: 5px; border: 1px solid rgba(15,23,42,0.08); display: inline-block; vertical-align: middle; }
+  .spb { display: inline-block; background: var(--bd-accent); vertical-align: middle; }
+  .fontP { font: 600 13px var(--bd-font); color: var(--bd-fg-heading); }
+  .fontM { font: 600 11px var(--bd-mono); color: var(--bd-fg-heading); }
+  .shadowSwatch { width: 40px; height: 28px; background: #fff; border-radius: 5px; display: inline-block; border: 1px solid var(--bd-border); }
+  .radiusSwatch { width: 28px; height: 28px; background: var(--bd-accent-tint); display: inline-block; border: 1px solid var(--bd-accent); }
+
+  code.inline { font: 500 10.5px var(--bd-mono); background: var(--bd-bg-subtle); padding: 1px 5px; border-radius: 3px; color: var(--bd-fg-heading); }
+</style></head><body>
+<div class="card">
+  <div>
+    <div class="label">Design Tokens Reference</div>
+    <h2 style="margin:4px 0 0; font: 600 16px var(--bd-font); color: var(--bd-fg-heading); letter-spacing: -0.01em;">Complete token catalogue</h2>
+    <p class="mono" style="margin: 6px 0 0; color: var(--bd-fg-muted);">Single source of truth · all CSS variables in <code class="inline">colors_and_type.css</code></p>
+  </div>
+
+  <!-- COLORS -->
+  <div>
+    <div class="sec-h"><h3>Colors — Brand &amp; Accent</h3><span class="tag">6 tokens</span></div>
+    <table>
+      <thead><tr><th style="width:40px">·</th><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><span class="swatch" style="background:#2D6DFF"></span></td><td class="token">--bd-accent</td><td class="val">#2D6DFF</td><td class="desc">Primary CTAs, active states, links, focus rings</td></tr>
+        <tr><td><span class="swatch" style="background:#1E5AE0"></span></td><td class="token">--bd-accent-hover</td><td class="val">#1E5AE0</td><td class="desc">Button hover, pressed states</td></tr>
+        <tr><td><span class="swatch" style="background:#E8F0FF"></span></td><td class="token">--bd-accent-tint</td><td class="val">#E8F0FF</td><td class="desc">Selection tint, subtle highlights, chip bg</td></tr>
+        <tr><td><span class="swatch" style="background:#8B5CF6"></span></td><td class="token">--bd-accent-purple</td><td class="val">#8B5CF6</td><td class="desc">Secondary gradient stop, Pro badges</td></tr>
+        <tr><td><span class="swatch" style="background:#EC4899"></span></td><td class="token">--bd-accent-pink</td><td class="val">#EC4899</td><td class="desc">Tertiary accent, user avatars</td></tr>
+        <tr><td><span class="swatch" style="background:linear-gradient(135deg,#2D6DFF,#8B5CF6)"></span></td><td class="token">--bd-gradient-brand</td><td class="val">linear-gradient(135deg, #2D6DFF, #8B5CF6)</td><td class="desc">Logo mark, hero elements</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <div class="sec-h"><h3>Colors — Neutrals</h3><span class="tag">10 tokens</span></div>
+    <table>
+      <thead><tr><th style="width:40px">·</th><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><span class="swatch" style="background:#FFFFFF"></span></td><td class="token">--bd-bg-canvas</td><td class="val">#FFFFFF</td><td class="desc">Canvas, cards, inputs</td></tr>
+        <tr><td><span class="swatch" style="background:#FAFBFC"></span></td><td class="token">--bd-bg-panel</td><td class="val">#FAFBFC</td><td class="desc">Panel backgrounds, grouped lists</td></tr>
+        <tr><td><span class="swatch" style="background:#F1F5F9"></span></td><td class="token">--bd-bg-subtle</td><td class="val">#F1F5F9</td><td class="desc">Hover states, chip bg, code bg</td></tr>
+        <tr><td><span class="swatch" style="background:#E2E8F0"></span></td><td class="token">--bd-border</td><td class="val">#E2E8F0</td><td class="desc">Default borders, dividers</td></tr>
+        <tr><td><span class="swatch" style="background:#CBD5E1"></span></td><td class="token">--bd-border-medium</td><td class="val">#CBD5E1</td><td class="desc">Stronger borders, avatar fallback</td></tr>
+        <tr><td><span class="swatch" style="background:#64748B"></span></td><td class="token">--bd-fg-muted</td><td class="val">#64748B</td><td class="desc">Muted text, captions, icons secondary</td></tr>
+        <tr><td><span class="swatch" style="background:#475569"></span></td><td class="token">--bd-fg-secondary</td><td class="val">#475569</td><td class="desc">Body text, labels</td></tr>
+        <tr><td><span class="swatch" style="background:#1E293B"></span></td><td class="token">--bd-fg-primary</td><td class="val">#1E293B</td><td class="desc">Primary body, input text</td></tr>
+        <tr><td><span class="swatch" style="background:#0F172A"></span></td><td class="token">--bd-fg-heading</td><td class="val">#0F172A</td><td class="desc">Headings, bold emphasis</td></tr>
+        <tr><td><span class="swatch" style="background:#020617"></span></td><td class="token">--bd-fg-inverse-bg</td><td class="val">#020617</td><td class="desc">Dark panels, tooltips, dark chrome</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <div class="sec-h"><h3>Colors — Semantic</h3><span class="tag">8 tokens</span></div>
+    <table>
+      <thead><tr><th style="width:40px">·</th><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><span class="swatch" style="background:#16A34A"></span></td><td class="token">--bd-success</td><td class="val">#16A34A</td><td class="desc">Success state, published, positive delta</td></tr>
+        <tr><td><span class="swatch" style="background:rgba(22,163,74,0.1)"></span></td><td class="token">--bd-success-tint</td><td class="val">rgba(22,163,74,0.1)</td><td class="desc">Success banner bg, check tint</td></tr>
+        <tr><td><span class="swatch" style="background:#D97706"></span></td><td class="token">--bd-warning</td><td class="val">#D97706</td><td class="desc">Warning state, attention needed</td></tr>
+        <tr><td><span class="swatch" style="background:rgba(217,119,6,0.1)"></span></td><td class="token">--bd-warning-tint</td><td class="val">rgba(217,119,6,0.1)</td><td class="desc">Warning banner bg</td></tr>
+        <tr><td><span class="swatch" style="background:#DC2626"></span></td><td class="token">--bd-error</td><td class="val">#DC2626</td><td class="desc">Error state, destructive action</td></tr>
+        <tr><td><span class="swatch" style="background:rgba(220,38,38,0.1)"></span></td><td class="token">--bd-error-tint</td><td class="val">rgba(220,38,38,0.1)</td><td class="desc">Error banner bg, delete modal</td></tr>
+        <tr><td><span class="swatch" style="background:#06B6D4"></span></td><td class="token">--bd-info</td><td class="val">#06B6D4</td><td class="desc">Informational accents, tips</td></tr>
+        <tr><td><span class="swatch" style="background:rgba(6,182,212,0.1)"></span></td><td class="token">--bd-info-tint</td><td class="val">rgba(6,182,212,0.1)</td><td class="desc">Info banner bg</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TYPE -->
+  <div>
+    <div class="sec-h"><h3>Typography — Families</h3><span class="tag">3 families</span></div>
+    <table>
+      <thead><tr><th>Token</th><th>Stack</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td class="token">--bd-font</td><td><span class="fontP" style="font-family: Geist, -apple-system, system-ui">Geist, -apple-system, system-ui, sans-serif</span></td><td class="desc">UI chrome, body, buttons — default</td></tr>
+        <tr><td class="token">--bd-font-display</td><td><span class="fontP" style="font-family: 'Geist', system-ui; letter-spacing: -0.02em;">Geist (tight tracking)</span></td><td class="desc">Headings, hero titles</td></tr>
+        <tr><td class="token">--bd-mono</td><td><span class="fontM" style="font-family: 'Geist Mono', ui-monospace, monospace">Geist Mono, ui-monospace, monospace</span></td><td class="desc">Code, tokens, numeric, timestamps</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <div class="sec-h"><h3>Typography — Scale</h3><span class="tag">9 sizes</span></div>
+    <table>
+      <thead><tr><th>Token</th><th>Size</th><th>Line</th><th>Weight</th><th>Sample</th></tr></thead>
+      <tbody>
+        <tr><td class="token">--text-display-2xl</td><td class="val">48px</td><td class="val">1.1</td><td class="val">700</td><td style="font: 700 22px/1.1 var(--bd-font); letter-spacing: -0.025em;">Display 2XL</td></tr>
+        <tr><td class="token">--text-display-xl</td><td class="val">36px</td><td class="val">1.15</td><td class="val">700</td><td style="font: 700 20px/1.15 var(--bd-font); letter-spacing: -0.02em;">Display XL</td></tr>
+        <tr><td class="token">--text-h1</td><td class="val">24px</td><td class="val">1.25</td><td class="val">700</td><td style="font: 700 17px/1.25 var(--bd-font); letter-spacing: -0.015em;">Heading 1</td></tr>
+        <tr><td class="token">--text-h2</td><td class="val">18px</td><td class="val">1.3</td><td class="val">600</td><td style="font: 600 15px/1.3 var(--bd-font); letter-spacing: -0.01em;">Heading 2</td></tr>
+        <tr><td class="token">--text-h3</td><td class="val">15px</td><td class="val">1.4</td><td class="val">600</td><td style="font: 600 13px/1.4 var(--bd-font);">Heading 3</td></tr>
+        <tr><td class="token">--text-body</td><td class="val">13px</td><td class="val">1.5</td><td class="val">500</td><td style="font: 500 13px/1.5 var(--bd-font);">Body default</td></tr>
+        <tr><td class="token">--text-body-sm</td><td class="val">12px</td><td class="val">1.45</td><td class="val">500</td><td style="font: 500 12px/1.45 var(--bd-font);">Body small — inspector rows</td></tr>
+        <tr><td class="token">--text-caption</td><td class="val">11px</td><td class="val">1.4</td><td class="val">500</td><td style="font: 500 11px/1.4 var(--bd-font); color: var(--bd-fg-muted);">Caption — meta, hints</td></tr>
+        <tr><td class="token">--text-overline</td><td class="val">9.5px</td><td class="val">1.2</td><td class="val">600</td><td style="font: 600 9.5px/1.2 var(--bd-font); letter-spacing: 0.08em; text-transform: uppercase; color: var(--bd-fg-muted);">Section Label</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SPACING -->
+  <div>
+    <div class="sec-h"><h3>Spacing scale</h3><span class="tag">4px base · 10 steps</span></div>
+    <table>
+      <thead><tr><th>Token</th><th>Value</th><th style="width: 120px">Visual</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td class="token">--sp-0</td><td class="val">2px</td><td><span class="spb" style="width: 2px; height: 14px;"></span></td><td class="desc">Hairline, divider gaps</td></tr>
+        <tr><td class="token">--sp-1</td><td class="val">4px</td><td><span class="spb" style="width: 4px; height: 14px;"></span></td><td class="desc">Icon-to-label, tight chip padding</td></tr>
+        <tr><td class="token">--sp-2</td><td class="val">6px</td><td><span class="spb" style="width: 6px; height: 14px;"></span></td><td class="desc">Inline gaps, button gap</td></tr>
+        <tr><td class="token">--sp-3</td><td class="val">8px</td><td><span class="spb" style="width: 8px; height: 14px;"></span></td><td class="desc">Card padding compact, row gap</td></tr>
+        <tr><td class="token">--sp-4</td><td class="val">12px</td><td><span class="spb" style="width: 12px; height: 14px;"></span></td><td class="desc">Default padding, list row height delta</td></tr>
+        <tr><td class="token">--sp-5</td><td class="val">16px</td><td><span class="spb" style="width: 16px; height: 14px;"></span></td><td class="desc">Card padding, section gaps</td></tr>
+        <tr><td class="token">--sp-6</td><td class="val">24px</td><td><span class="spb" style="width: 24px; height: 14px;"></span></td><td class="desc">Panel padding, block separation</td></tr>
+        <tr><td class="token">--sp-7</td><td class="val">32px</td><td><span class="spb" style="width: 32px; height: 14px;"></span></td><td class="desc">Large panel, modal inner</td></tr>
+        <tr><td class="token">--sp-8</td><td class="val">48px</td><td><span class="spb" style="width: 48px; height: 14px;"></span></td><td class="desc">Hero gap, major section</td></tr>
+        <tr><td class="token">--sp-9</td><td class="val">64px</td><td><span class="spb" style="width: 64px; height: 14px;"></span></td><td class="desc">Page-level top/bottom</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- RADIUS -->
+  <div>
+    <div class="sec-h"><h3>Border radius</h3><span class="tag">6 tokens</span></div>
+    <table>
+      <thead><tr><th style="width:50px">·</th><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><span class="radiusSwatch" style="border-radius:2px"></span></td><td class="token">--r-xs</td><td class="val">2px</td><td class="desc">Tags, progress bars, dividers</td></tr>
+        <tr><td><span class="radiusSwatch" style="border-radius:4px"></span></td><td class="token">--r-sm</td><td class="val">4px</td><td class="desc">Chips, small buttons, inline pills</td></tr>
+        <tr><td><span class="radiusSwatch" style="border-radius:6px"></span></td><td class="token">--r-md</td><td class="val">6px</td><td class="desc">Buttons, inputs, tooltips</td></tr>
+        <tr><td><span class="radiusSwatch" style="border-radius:8px"></span></td><td class="token">--r-lg</td><td class="val">8px</td><td class="desc">Cards, panels, toasts</td></tr>
+        <tr><td><span class="radiusSwatch" style="border-radius:12px"></span></td><td class="token">--r-xl</td><td class="val">12px</td><td class="desc">Modals, drawers, large cards</td></tr>
+        <tr><td><span class="radiusSwatch" style="border-radius:999px"></span></td><td class="token">--r-full</td><td class="val">9999px</td><td class="desc">Avatars, status pills, icon buttons</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SHADOWS -->
+  <div>
+    <div class="sec-h"><h3>Shadows</h3><span class="tag">6 elevations</span></div>
+    <table>
+      <thead><tr><th style="width:70px">·</th><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><span class="shadowSwatch" style="box-shadow: 0 1px 2px rgba(15,23,42,0.04)"></span></td><td class="token">--sh-xs</td><td class="val">0 1px 2px rgba(15,23,42,0.04)</td><td class="desc">Chips, inline pills, flat buttons on hover</td></tr>
+        <tr><td><span class="shadowSwatch" style="box-shadow: 0 2px 4px rgba(15,23,42,0.06)"></span></td><td class="token">--sh-sm</td><td class="val">0 2px 4px rgba(15,23,42,0.06)</td><td class="desc">Default cards at rest</td></tr>
+        <tr><td><span class="shadowSwatch" style="box-shadow: 0 4px 8px -2px rgba(15,23,42,0.08)"></span></td><td class="token">--sh-md</td><td class="val">0 4px 8px -2px rgba(15,23,42,0.08)</td><td class="desc">Card hover, dropdowns, popovers</td></tr>
+        <tr><td><span class="shadowSwatch" style="box-shadow: 0 10px 24px -8px rgba(15,23,42,0.14)"></span></td><td class="token">--sh-lg</td><td class="val">0 10px 24px -8px rgba(15,23,42,0.14)</td><td class="desc">Tooltips, menus, toasts</td></tr>
+        <tr><td><span class="shadowSwatch" style="box-shadow: 0 20px 40px -12px rgba(15,23,42,0.18)"></span></td><td class="token">--sh-xl</td><td class="val">0 20px 40px -12px rgba(15,23,42,0.18)</td><td class="desc">Modals, drawers, command palette</td></tr>
+        <tr><td><span class="shadowSwatch" style="box-shadow: 0 30px 80px -20px rgba(15,23,42,0.30)"></span></td><td class="token">--sh-2xl</td><td class="val">0 30px 80px -20px rgba(15,23,42,0.30)</td><td class="desc">Full-page overlays, max elevation</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- MOTION -->
+  <div>
+    <div class="sec-h"><h3>Motion</h3><span class="tag">5 durations · 3 curves</span></div>
+    <table>
+      <thead><tr><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td class="token">--dur-instant</td><td class="val">80ms</td><td class="desc">Hover color, chip highlight</td></tr>
+        <tr><td class="token">--dur-fast</td><td class="val">140ms</td><td class="desc">Button press, toggle, card lift</td></tr>
+        <tr><td class="token">--dur-base</td><td class="val">200ms</td><td class="desc">Default transitions, drawer resize</td></tr>
+        <tr><td class="token">--dur-slow</td><td class="val">300ms</td><td class="desc">Modal enter, drawer slide</td></tr>
+        <tr><td class="token">--dur-xslow</td><td class="val">500ms</td><td class="desc">Page transitions, hero animations</td></tr>
+        <tr><td class="token">--ease-out</td><td class="val">cubic-bezier(0.4, 0, 0.2, 1)</td><td class="desc">Enter · default</td></tr>
+        <tr><td class="token">--ease-in</td><td class="val">cubic-bezier(0.4, 0, 1, 1)</td><td class="desc">Exit</td></tr>
+        <tr><td class="token">--ease-spring</td><td class="val">cubic-bezier(0.34, 1.56, 0.64, 1)</td><td class="desc">Toast enter, playful feedback</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Z-INDEX -->
+  <div>
+    <div class="sec-h"><h3>Z-index layers</h3><span class="tag">7 layers</span></div>
+    <table>
+      <thead><tr><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td class="token">--z-base</td><td class="val">0</td><td class="desc">Default layer</td></tr>
+        <tr><td class="token">--z-sticky</td><td class="val">10</td><td class="desc">Sticky headers, section markers</td></tr>
+        <tr><td class="token">--z-dropdown</td><td class="val">100</td><td class="desc">Dropdowns, select menus</td></tr>
+        <tr><td class="token">--z-popover</td><td class="val">200</td><td class="desc">Popovers, tooltips</td></tr>
+        <tr><td class="token">--z-drawer</td><td class="val">300</td><td class="desc">Drawers, side panels</td></tr>
+        <tr><td class="token">--z-modal</td><td class="val">400</td><td class="desc">Modal dialogs</td></tr>
+        <tr><td class="token">--z-toast</td><td class="val">500</td><td class="desc">Toasts — always on top</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- COMPONENT TOKENS -->
+  <div>
+    <div class="sec-h"><h3>Component tokens</h3><span class="tag">derived · per-component</span></div>
+    <table>
+      <thead><tr><th>Component</th><th>Token</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td class="fontP" style="font-family: var(--bd-font);">Button</td><td class="token">--btn-h-sm / md / lg</td><td class="val">24px / 32px / 40px</td></tr>
+        <tr><td class="fontP" style="font-family: var(--bd-font);">Input</td><td class="token">--input-h</td><td class="val">32px</td></tr>
+        <tr><td class="fontP" style="font-family: var(--bd-font);">Row</td><td class="token">--row-h</td><td class="val">28px (inspector) · 32px (list)</td></tr>
+        <tr><td class="fontP" style="font-family: var(--bd-font);">Left rail</td><td class="token">--rail-w</td><td class="val">48px</td></tr>
+        <tr><td class="fontP" style="font-family: var(--bd-font);">Left panel</td><td class="token">--panel-w</td><td class="val">260px</td></tr>
+        <tr><td class="fontP" style="font-family: var(--bd-font);">Inspector</td><td class="token">--inspector-w</td><td class="val">280px</td></tr>
+        <tr><td class="fontP" style="font-family: var(--bd-font);">Top bar</td><td class="token">--topbar-h</td><td class="val">44px</td></tr>
+        <tr><td class="fontP" style="font-family: var(--bd-font);">Focus ring</td><td class="token">--focus-ring</td><td class="val">0 0 0 3px rgba(45,109,255,0.25)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</body></html>

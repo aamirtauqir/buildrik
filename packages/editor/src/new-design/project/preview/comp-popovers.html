@@ -1,0 +1,466 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  .card { padding: 24px 28px; background: var(--bd-bg-panel); gap: 28px; }
+  .row-h { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px dashed var(--bd-border); }
+  .row-h h3 { margin: 0; font: 600 12px var(--bd-font); color: var(--bd-fg-heading); letter-spacing: -0.01em; }
+  .row-h .tag { font: 500 9px var(--bd-mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--bd-fg-muted); }
+
+  .stage {
+    position: relative; border-radius: 10px;
+    background: var(--bd-bg-subtle); border: 1px solid var(--bd-border);
+    padding: 32px;
+    min-height: 180px;
+    display: flex; flex-wrap: wrap; gap: 24px;
+    align-items: flex-start;
+  }
+
+  /* Anchor + popover pairs */
+  .anchor-block {
+    display: flex; flex-direction: column; align-items: center; gap: 28px;
+    position: relative;
+  }
+  .anchor {
+    padding: 6px 12px; border-radius: 6px; cursor: default;
+    font: 600 11px var(--bd-font); color: var(--bd-fg-primary);
+    background: #fff; border: 1px solid var(--bd-border);
+    display: inline-flex; align-items: center; gap: 5px;
+    position: relative;
+  }
+  .anchor.icon-only { width: 28px; height: 28px; padding: 0; justify-content: center; color: var(--bd-fg-secondary); }
+  .anchor.active { background: var(--bd-accent-tint); border-color: rgba(45,109,255,0.2); color: var(--bd-accent); }
+
+  /* POPOVER base */
+  .pop {
+    position: relative; z-index: 2;
+    background: #fff; border-radius: 8px;
+    border: 1px solid var(--bd-border);
+    box-shadow: 0 12px 30px -8px rgba(15,23,42,0.18), 0 2px 6px rgba(15,23,42,0.06);
+    overflow: hidden;
+  }
+  .pop::before {
+    content: ''; position: absolute;
+    width: 10px; height: 10px;
+    background: #fff;
+    border-left: 1px solid var(--bd-border);
+    border-top: 1px solid var(--bd-border);
+    top: -6px; left: 50%; transform: translateX(-50%) rotate(45deg);
+  }
+
+  /* Tooltip (dark) */
+  .tooltip {
+    background: #0F172A; color: #fff;
+    padding: 5px 9px; border-radius: 5px;
+    font: 500 11px var(--bd-font); line-height: 1.3;
+    box-shadow: 0 4px 12px rgba(15,23,42,0.3);
+    position: relative;
+    white-space: nowrap;
+    max-width: 220px;
+  }
+  .tooltip::before {
+    content: ''; position: absolute;
+    bottom: -4px; left: 50%; transform: translateX(-50%) rotate(45deg);
+    width: 6px; height: 6px; background: #0F172A;
+  }
+  .tooltip .kbd {
+    font: 500 9.5px var(--bd-mono);
+    background: rgba(255,255,255,0.12);
+    padding: 0 4px; border-radius: 3px;
+    margin-left: 5px; letter-spacing: 0.02em;
+  }
+  .tooltip.multiline { white-space: normal; max-width: 220px; padding: 8px 10px; }
+  .tooltip.multiline .t { font-weight: 600; color: #fff; margin-bottom: 2px; font-size: 11px; }
+  .tooltip.multiline .d { font-weight: 500; color: #CBD5E1; font-size: 10.5px; line-height: 1.45; }
+
+  /* Dropdown menu */
+  .menu { min-width: 200px; padding: 4px; }
+  .menu-group { padding: 4px 0; }
+  .menu-group + .menu-group { border-top: 1px solid var(--bd-border); }
+  .menu-label { font: 500 9.5px var(--bd-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--bd-fg-muted); padding: 4px 8px 3px; }
+  .menu-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 8px; border-radius: 4px;
+    font: 500 11.5px var(--bd-font); color: var(--bd-fg-primary);
+    cursor: default;
+  }
+  .menu-item:hover { background: var(--bd-bg-subtle); }
+  .menu-item.on { background: var(--bd-accent-tint); color: var(--bd-accent); font-weight: 600; }
+  .menu-item.danger { color: var(--bd-error); }
+  .menu-item.danger:hover { background: rgba(220,38,38,0.08); }
+  .menu-item .ic { width: 14px; color: var(--bd-fg-muted); flex-shrink: 0; display: inline-flex; }
+  .menu-item.on .ic { color: var(--bd-accent); }
+  .menu-item.danger .ic { color: var(--bd-error); }
+  .menu-item .label { flex: 1; }
+  .menu-item .kbd {
+    font: 500 9.5px var(--bd-mono); color: var(--bd-fg-muted);
+    padding: 0 4px; border: 1px solid var(--bd-border); border-radius: 3px;
+    background: #fff;
+  }
+  .menu-item .chevron { color: var(--bd-fg-muted); }
+
+  /* Select popover */
+  .select {
+    min-width: 220px; padding: 4px;
+  }
+  .select-search {
+    padding: 6px 8px 7px; margin-bottom: 2px;
+    border-bottom: 1px solid var(--bd-border);
+    display: flex; align-items: center; gap: 6px;
+    color: var(--bd-fg-muted);
+  }
+  .select-search input { border: none; outline: none; background: transparent; font: 500 11.5px var(--bd-font); flex: 1; color: var(--bd-fg-primary); }
+  .select-search input::placeholder { color: var(--bd-fg-muted); }
+  .select-item {
+    padding: 5px 8px; border-radius: 4px;
+    display: flex; align-items: center; gap: 8px;
+    font: 500 11.5px var(--bd-font);
+    cursor: default;
+  }
+  .select-item:hover { background: var(--bd-bg-subtle); }
+  .select-item.selected { color: var(--bd-accent); font-weight: 600; }
+  .select-item .swatch { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+  .select-item .check { margin-left: auto; color: var(--bd-accent); }
+  .select-item:not(.selected) .check { visibility: hidden; }
+
+  /* Date picker */
+  .dp { width: 260px; padding: 8px 10px 10px; }
+  .dp-head { display: flex; align-items: center; justify-content: space-between; padding: 2px 2px 8px; }
+  .dp-head .m { font: 600 12px var(--bd-font); color: var(--bd-fg-heading); }
+  .dp-head .arr { color: var(--bd-fg-muted); width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; }
+  .dp-head .arr:hover { background: var(--bd-bg-subtle); color: var(--bd-fg-primary); }
+  .dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
+  .dp-dow { font: 500 9.5px var(--bd-mono); color: var(--bd-fg-muted); text-align: center; padding: 3px 0 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .dp-d {
+    text-align: center; padding: 5px 0; font: 500 11px var(--bd-font);
+    color: var(--bd-fg-primary); cursor: pointer; border-radius: 4px;
+  }
+  .dp-d.out { color: var(--bd-fg-muted); opacity: 0.4; }
+  .dp-d:hover:not(.out) { background: var(--bd-bg-subtle); }
+  .dp-d.today { font-weight: 700; color: var(--bd-accent); }
+  .dp-d.in-range { background: var(--bd-accent-tint); border-radius: 0; }
+  .dp-d.start { background: var(--bd-accent); color: #fff; border-radius: 4px 0 0 4px; }
+  .dp-d.end { background: var(--bd-accent); color: #fff; border-radius: 0 4px 4px 0; }
+  .dp-foot { display: flex; gap: 4px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--bd-border); }
+  .dp-chip { padding: 3px 8px; border-radius: 4px; font: 500 10.5px var(--bd-font); color: var(--bd-fg-secondary); cursor: pointer; background: var(--bd-bg-subtle); }
+  .dp-chip:hover { color: var(--bd-accent); }
+
+  /* Context menu */
+  .ctx { min-width: 200px; padding: 4px; position: absolute; top: 40px; left: 30px; z-index: 3; }
+  .ctx-trigger {
+    background: repeating-linear-gradient(45deg, #E2E8F0 0 8px, #F1F5F9 8px 16px);
+    height: 140px; border-radius: 6px;
+    border: 1px dashed var(--bd-border-medium);
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    font: 500 10.5px var(--bd-mono); color: var(--bd-fg-muted);
+  }
+  .ctx-trigger .pin {
+    position: absolute; top: 40px; left: 30px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--bd-accent); box-shadow: 0 0 0 4px var(--bd-accent-tint);
+  }
+
+  /* Color picker */
+  .cp { width: 240px; padding: 10px; }
+  .cp .sat {
+    height: 120px; border-radius: 5px; position: relative;
+    background:
+      linear-gradient(to bottom, rgba(0,0,0,0), #000),
+      linear-gradient(to right, #fff, #2D6DFF);
+    margin-bottom: 8px;
+  }
+  .cp .sat .dot {
+    position: absolute; top: 20%; left: 70%;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #3D7FFF; border: 2px solid #fff;
+    box-shadow: 0 0 0 1px rgba(15,23,42,0.3);
+    transform: translate(-50%, -50%);
+  }
+  .cp .hue {
+    height: 8px; border-radius: 4px;
+    background: linear-gradient(to right, red, orange, yellow, green, cyan, blue, violet, red);
+    position: relative; margin-bottom: 8px;
+  }
+  .cp .hue .thumb {
+    position: absolute; left: 52%; top: 50%;
+    width: 10px; height: 14px; background: #fff;
+    border: 1px solid rgba(15,23,42,0.3); border-radius: 2px;
+    transform: translate(-50%, -50%);
+  }
+  .cp .input {
+    display: flex; gap: 5px; align-items: center;
+    font: 500 10.5px var(--bd-mono);
+  }
+  .cp .input .sw { width: 20px; height: 20px; border-radius: 4px; background: #2D6DFF; border: 1px solid var(--bd-border); flex-shrink: 0; }
+  .cp .input .hex { flex: 1; padding: 3px 6px; border: 1px solid var(--bd-border); border-radius: 4px; background: var(--bd-bg-subtle); color: var(--bd-fg-heading); }
+
+  /* Icons */
+  .base { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+  /* Position variants diagram */
+  .pos-diagram {
+    position: relative; height: 200px; width: 260px;
+    border: 1px dashed var(--bd-border-medium); border-radius: 8px;
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    margin: auto;
+  }
+  .pos-diagram .center {
+    padding: 5px 10px; background: var(--bd-accent); color: #fff;
+    border-radius: 4px; font: 600 10px var(--bd-mono);
+  }
+  .pos-diagram .mini {
+    position: absolute;
+    font: 500 9px var(--bd-mono);
+    background: #0F172A; color: #fff;
+    padding: 2px 5px; border-radius: 3px;
+  }
+  .pos-diagram .mini.top { top: 8px; left: 50%; transform: translateX(-50%); }
+  .pos-diagram .mini.bot { bottom: 8px; left: 50%; transform: translateX(-50%); }
+  .pos-diagram .mini.left { left: 8px; top: 50%; transform: translateY(-50%); }
+  .pos-diagram .mini.right { right: 8px; top: 50%; transform: translateY(-50%); }
+</style></head><body>
+<div class="card">
+  <div>
+    <div class="label">Popovers &amp; Tooltips</div>
+    <h2 style="margin:4px 0 0; font: 600 16px var(--bd-font); color: var(--bd-fg-heading); letter-spacing: -0.01em;">Floating surfaces</h2>
+    <p class="mono" style="margin: 6px 0 0; color: var(--bd-fg-muted);">anchored to a trigger · shadow-md · dismiss on outside-click or Esc · arrow optional</p>
+  </div>
+
+  <!-- TOOLTIPS -->
+  <div>
+    <div class="row-h"><h3>Tooltips</h3><span class="tag">dark · 200ms delay · nowrap unless multiline</span></div>
+    <div class="stage">
+      <div class="anchor-block">
+        <div class="tooltip">Duplicate<span class="kbd">⌘D</span></div>
+        <button class="anchor icon-only"><svg class="base" width="14" height="14" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M3 16V5a2 2 0 012-2h11"/></svg></button>
+      </div>
+      <div class="anchor-block">
+        <div class="tooltip">Preview on canvas</div>
+        <button class="anchor icon-only"><svg class="base" width="14" height="14" viewBox="0 0 24 24"><path d="M2 12s4-8 10-8 10 8 10 8-4 8-10 8-10-8-10-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+      </div>
+      <div class="anchor-block">
+        <div class="tooltip multiline">
+          <div class="t">Auto-save enabled</div>
+          <div class="d">Every 5 min, versioned in history. Click to see last snapshot.</div>
+        </div>
+        <button class="anchor icon-only active"><svg class="base" width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg></button>
+      </div>
+      <div class="anchor-block">
+        <div class="tooltip">Drag to resize</div>
+        <button class="anchor">
+          <svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M4 12h16 M8 8l-4 4 4 4 M16 8l4 4-4 4"/></svg>
+          Canvas
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DROPDOWN MENU -->
+  <div>
+    <div class="row-h"><h3>Dropdown menu</h3><span class="tag">action list · grouped · keyboard · submenus</span></div>
+    <div class="stage">
+      <div class="anchor-block">
+        <button class="anchor active">
+          <svg class="base" width="11" height="11" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none"/></svg>
+        </button>
+        <div class="pop menu">
+          <div class="menu-group">
+            <div class="menu-item">
+              <span class="ic"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M3 16V5a2 2 0 012-2h11"/></svg></span>
+              <span class="label">Duplicate</span>
+              <span class="kbd">⌘D</span>
+            </div>
+            <div class="menu-item on">
+              <span class="ic"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M4 12l4 4L20 6"/></svg></span>
+              <span class="label">Lock position</span>
+            </div>
+            <div class="menu-item">
+              <span class="ic"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M12 2v6 M12 16v6 M2 12h6 M16 12h6"/></svg></span>
+              <span class="label">Wrap in container</span>
+              <span class="chevron"><svg class="base" width="10" height="10" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+            </div>
+          </div>
+          <div class="menu-group">
+            <div class="menu-label">Align to</div>
+            <div class="menu-item">
+              <span class="ic"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M3 6h18 M3 12h12 M3 18h6"/></svg></span>
+              <span class="label">Parent · Left</span>
+            </div>
+            <div class="menu-item">
+              <span class="ic"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M3 6h18 M6 12h12 M9 18h6"/></svg></span>
+              <span class="label">Parent · Center</span>
+            </div>
+          </div>
+          <div class="menu-group">
+            <div class="menu-item danger">
+              <span class="ic"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M3 6h18 M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2 M6 6l1 14a2 2 0 002 2h6a2 2 0 002-2l1-14"/></svg></span>
+              <span class="label">Delete element</span>
+              <span class="kbd" style="background: rgba(220,38,38,0.08); border-color: rgba(220,38,38,0.2);">⌫</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Select -->
+      <div class="anchor-block">
+        <button class="anchor active" style="min-width: 160px; justify-content: space-between;">
+          <span style="display:inline-flex; align-items:center; gap: 6px;">
+            <span style="width:12px; height:12px; border-radius: 3px; background: #2D6DFF;"></span>
+            Accent / Primary
+          </span>
+          <svg class="base" width="10" height="10" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="pop select">
+          <div class="select-search">
+            <svg class="base" width="11" height="11" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input placeholder="Search colors…"/>
+          </div>
+          <div class="select-item selected">
+            <span class="swatch" style="background: #2D6DFF"></span>
+            Accent / Primary
+            <span class="check"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M4 12l4 4L20 6"/></svg></span>
+          </div>
+          <div class="select-item">
+            <span class="swatch" style="background: #8B5CF6"></span>
+            Accent / Violet
+            <span class="check"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M4 12l4 4L20 6"/></svg></span>
+          </div>
+          <div class="select-item">
+            <span class="swatch" style="background: #16A34A"></span>
+            Success
+            <span class="check"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M4 12l4 4L20 6"/></svg></span>
+          </div>
+          <div class="select-item">
+            <span class="swatch" style="background: #D97706"></span>
+            Warning
+            <span class="check"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M4 12l4 4L20 6"/></svg></span>
+          </div>
+          <div class="select-item">
+            <span class="swatch" style="background: #DC2626"></span>
+            Error
+            <span class="check"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M4 12l4 4L20 6"/></svg></span>
+          </div>
+          <div class="select-item">
+            <span class="swatch" style="background: #475569"></span>
+            Neutral / Slate
+            <span class="check"><svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M4 12l4 4L20 6"/></svg></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATE + COLOR PICKER -->
+  <div>
+    <div class="row-h"><h3>Date range · Color picker</h3><span class="tag">specialized popovers</span></div>
+    <div class="stage">
+      <div class="anchor-block">
+        <button class="anchor active">
+          <svg class="base" width="11" height="11" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18 M8 3v4 M16 3v4"/></svg>
+          Apr 14 → Apr 21
+        </button>
+        <div class="pop dp">
+          <div class="dp-head">
+            <span class="arr"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></span>
+            <span class="m">April 2026</span>
+            <span class="arr"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+          </div>
+          <div class="dp-grid">
+            <div class="dp-dow">S</div><div class="dp-dow">M</div><div class="dp-dow">T</div><div class="dp-dow">W</div><div class="dp-dow">T</div><div class="dp-dow">F</div><div class="dp-dow">S</div>
+            <div class="dp-d out">30</div><div class="dp-d out">31</div>
+            <div class="dp-d">1</div><div class="dp-d">2</div><div class="dp-d">3</div><div class="dp-d">4</div><div class="dp-d">5</div>
+            <div class="dp-d">6</div><div class="dp-d">7</div><div class="dp-d">8</div><div class="dp-d">9</div><div class="dp-d">10</div><div class="dp-d">11</div><div class="dp-d">12</div>
+            <div class="dp-d">13</div><div class="dp-d start">14</div><div class="dp-d in-range">15</div><div class="dp-d in-range">16</div><div class="dp-d in-range">17</div><div class="dp-d in-range">18</div><div class="dp-d in-range">19</div>
+            <div class="dp-d in-range">20</div><div class="dp-d end">21</div><div class="dp-d today">22</div><div class="dp-d">23</div><div class="dp-d">24</div><div class="dp-d">25</div><div class="dp-d">26</div>
+            <div class="dp-d">27</div><div class="dp-d">28</div><div class="dp-d">29</div><div class="dp-d">30</div>
+            <div class="dp-d out">1</div><div class="dp-d out">2</div><div class="dp-d out">3</div>
+          </div>
+          <div class="dp-foot">
+            <span class="dp-chip">Today</span>
+            <span class="dp-chip">7d</span>
+            <span class="dp-chip">30d</span>
+            <span class="dp-chip">Quarter</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="anchor-block">
+        <button class="anchor active">
+          <span style="width:12px; height:12px; border-radius: 3px; background: #2D6DFF;"></span>
+          <span style="font-family: var(--bd-mono); font-size: 10.5px;">#2D6DFF</span>
+        </button>
+        <div class="pop cp">
+          <div class="sat"><div class="dot"></div></div>
+          <div class="hue"><div class="thumb"></div></div>
+          <div class="input">
+            <div class="sw"></div>
+            <span class="hex">#2D6DFF</span>
+            <span style="color: var(--bd-fg-muted); font-family: var(--bd-mono); font-size: 10px;">100%</span>
+          </div>
+          <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--bd-border); display: flex; gap: 4px;">
+            <div style="width:16px; height:16px; border-radius: 3px; background: #2D6DFF; border: 2px solid var(--bd-accent); box-shadow: 0 0 0 1px var(--bd-accent);"></div>
+            <div style="width:16px; height:16px; border-radius: 3px; background: #8B5CF6; border: 1px solid var(--bd-border);"></div>
+            <div style="width:16px; height:16px; border-radius: 3px; background: #EC4899; border: 1px solid var(--bd-border);"></div>
+            <div style="width:16px; height:16px; border-radius: 3px; background: #F59E0B; border: 1px solid var(--bd-border);"></div>
+            <div style="width:16px; height:16px; border-radius: 3px; background: #16A34A; border: 1px solid var(--bd-border);"></div>
+            <div style="width:16px; height:16px; border-radius: 3px; background: #0F172A; border: 1px solid var(--bd-border);"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTEXT MENU -->
+  <div>
+    <div class="row-h"><h3>Context menu · Position</h3><span class="tag">right-click · follows cursor · flips on viewport edge</span></div>
+    <div class="stage" style="align-items: stretch;">
+      <div style="flex: 1; min-width: 280px; position: relative;">
+        <div class="ctx-trigger">
+          <span>Right-clicked here ↗</span>
+          <div class="pin"></div>
+        </div>
+        <div class="pop ctx" style="position: absolute;">
+          <div class="menu-item">
+            <span class="ic"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M3 16V5a2 2 0 012-2h11"/></svg></span>
+            <span class="label">Copy</span>
+            <span class="kbd">⌘C</span>
+          </div>
+          <div class="menu-item">
+            <span class="ic"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2 M9 2h6v4H9z"/></svg></span>
+            <span class="label">Paste</span>
+            <span class="kbd">⌘V</span>
+          </div>
+          <div class="menu-item">
+            <span class="ic"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M8 6h13 M8 12h13 M8 18h13 M3 6h.01 M3 12h.01 M3 18h.01"/></svg></span>
+            <span class="label">Duplicate</span>
+            <span class="kbd">⌘D</span>
+          </div>
+          <div class="menu-group">
+            <div class="menu-item">
+              <span class="ic"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M12 20l9-9-4-4-9 9z M8 5L5 8l4 4 3-3z"/></svg></span>
+              <span class="label">Rename</span>
+              <span class="kbd">F2</span>
+            </div>
+            <div class="menu-item danger">
+              <span class="ic"><svg class="base" width="12" height="12" viewBox="0 0 24 24"><path d="M3 6h18 M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2 M6 6l1 14a2 2 0 002 2h6a2 2 0 002-2l1-14"/></svg></span>
+              <span class="label">Delete</span>
+              <span class="kbd" style="background: rgba(220,38,38,0.08); border-color: rgba(220,38,38,0.2);">⌫</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pos-diagram">
+        <span class="mini top">top</span>
+        <span class="mini right">right</span>
+        <span class="mini bot">bottom</span>
+        <span class="mini left">left</span>
+        <div class="center">ANCHOR</div>
+      </div>
+    </div>
+    <p style="font: 500 10.5px var(--bd-mono); color: var(--bd-fg-muted); margin: 6px 0 0;">offset: 8 · arrow: 6 · auto-flip when within 16px of viewport edge</p>
+  </div>
+
+</div>
+</body></html>

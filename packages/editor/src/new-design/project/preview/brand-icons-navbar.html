@@ -1,0 +1,269 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  body { background: #FFFFFF; }
+  .layout { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: flex-start; }
+  .section-h {
+    font: 600 10px var(--bd-font); letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--bd-fg-muted); margin: 0 0 10px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-h .line { flex: 1; height: 1px; background: var(--bd-border); }
+
+  /* Rail */
+  .rail {
+    width: 52px; padding: 6px;
+    background: #FFFFFF; border: 1px solid var(--bd-border); border-radius: 12px;
+    display: flex; flex-direction: column; gap: 2px;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.04);
+  }
+  .rail-btn {
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent; border: none; border-radius: 8px;
+    color: var(--bd-fg-secondary); cursor: pointer; position: relative;
+    transition: 120ms;
+  }
+  .rail-btn:hover { background: var(--bd-bg-subtle); color: var(--bd-fg-primary); }
+  .rail-btn.on { background: rgba(45,109,255,0.10); color: var(--bd-accent); }
+  .rail-btn.on::before {
+    content: ""; position: absolute; left: -7px; top: 10px; bottom: 10px; width: 2.5px;
+    background: var(--bd-accent); border-radius: 2px;
+  }
+
+  /* Topbar tools */
+  .tool-row { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+  .tool {
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; border: 1px solid var(--bd-border); border-radius: 6px;
+    color: var(--bd-fg-secondary); cursor: pointer; transition: 120ms;
+  }
+  .tool:hover { border-color: var(--bd-accent); color: var(--bd-accent); background: rgba(45,109,255,0.04); }
+  .tool.off { color: var(--bd-fg-muted); border-color: var(--bd-border); }
+  .group {
+    display: inline-flex; gap: 0; background: var(--bd-bg-subtle); border-radius: 6px; padding: 2px;
+  }
+  .group .tool { background: transparent; border: none; border-radius: 4px; width: 28px; height: 28px; }
+  .group .tool.on { background: #fff; color: var(--bd-fg-heading); box-shadow: 0 1px 2px rgba(15,23,42,0.08); }
+
+  /* Layer row */
+  .layers { display: flex; flex-direction: column; gap: 2px; max-width: 260px; }
+  .lr {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 8px; border-radius: 5px;
+    font: 500 12px var(--bd-font); color: var(--bd-fg-primary);
+  }
+  .lr.sel { background: rgba(45,109,255,0.10); color: var(--bd-accent); font-weight: 600; }
+  .lr .nm { flex: 1; }
+  .lr .eye { color: var(--bd-fg-muted); display: inline-flex; }
+  .lr.sel .eye { color: var(--bd-accent); }
+  .lr .eye.off { opacity: 0.45; }
+
+  /* SVG defaults */
+  svg { display: block; }
+  .ic-stroke { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+  .ic-fill   { fill: currentColor; opacity: 0.14; }
+
+  .foot {
+    grid-column: 1 / -1;
+    display: flex; justify-content: space-between;
+    font: 500 11px var(--bd-font); color: var(--bd-fg-muted);
+    border-top: 1px solid var(--bd-border); padding-top: 10px; margin-top: 4px;
+  }
+</style>
+</head><body><div class="card">
+  <div class="layout">
+
+    <!-- LEFT RAIL -->
+    <div>
+      <div class="section-h">Rail<span class="line"></span></div>
+      <div class="rail">
+        <!-- Add / plus-square (active) -->
+        <button class="rail-btn on" title="Add">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <rect class="ic-fill" x="3" y="3" width="18" height="18" rx="3"/>
+            <rect class="ic-stroke" x="3" y="3" width="18" height="18" rx="3"/>
+            <path class="ic-stroke" d="M12 8v8 M8 12h8"/>
+          </svg>
+        </button>
+        <!-- Layers / stacked rects -->
+        <button class="rail-btn" title="Layers">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <rect class="ic-fill" x="3" y="4" width="14" height="4" rx="1"/>
+            <rect class="ic-stroke" x="3" y="4" width="14" height="4" rx="1"/>
+            <rect class="ic-stroke" x="7" y="10" width="14" height="4" rx="1"/>
+            <rect class="ic-stroke" x="3" y="16" width="14" height="4" rx="1"/>
+          </svg>
+        </button>
+        <!-- Pages / file stack -->
+        <button class="rail-btn" title="Pages">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path class="ic-fill" d="M8 3h6l4 4v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+            <path class="ic-stroke" d="M8 3h6l4 4v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+            <path class="ic-stroke" d="M14 3v4h4"/>
+          </svg>
+        </button>
+        <!-- Templates / grid -->
+        <button class="rail-btn" title="Templates">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <rect class="ic-fill" x="3" y="3" width="8" height="8" rx="1.5"/>
+            <rect class="ic-stroke" x="3" y="3" width="8" height="8" rx="1.5"/>
+            <rect class="ic-stroke" x="13" y="3" width="8" height="8" rx="1.5"/>
+            <rect class="ic-stroke" x="3" y="13" width="8" height="8" rx="1.5"/>
+            <rect class="ic-fill" x="13" y="13" width="8" height="8" rx="1.5"/>
+            <rect class="ic-stroke" x="13" y="13" width="8" height="8" rx="1.5"/>
+          </svg>
+        </button>
+        <!-- AI / sparkle -->
+        <button class="rail-btn" title="AI">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path class="ic-fill" d="M12 3l2.1 5.4 5.4 2.1-5.4 2.1L12 18l-2.1-5.4L4.5 10.5l5.4-2.1z"/>
+            <path class="ic-stroke" d="M12 3l2.1 5.4 5.4 2.1-5.4 2.1L12 18l-2.1-5.4L4.5 10.5l5.4-2.1z"/>
+            <path class="ic-stroke" d="M18.5 17l1 2.5 2.5 1-2.5 1-1 2.5" transform="translate(-1 -3) scale(0.6)"/>
+          </svg>
+        </button>
+        <!-- Settings / gear -->
+        <button class="rail-btn" title="Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <circle class="ic-fill" cx="12" cy="12" r="3"/>
+            <circle class="ic-stroke" cx="12" cy="12" r="3"/>
+            <path class="ic-stroke" d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- TOPBAR + LAYERS -->
+    <div style="display:flex; flex-direction:column; gap:20px;">
+
+      <div>
+        <div class="section-h">Topbar · history<span class="line"></span></div>
+        <div class="tool-row">
+          <button class="tool" title="Undo">
+            <svg width="14" height="14" viewBox="0 0 24 24">
+              <path class="ic-stroke" d="M9 14L4 9l5-5"/>
+              <path class="ic-stroke" d="M4 9h10a6 6 0 0 1 6 6v0a6 6 0 0 1-6 6H8"/>
+            </svg>
+          </button>
+          <button class="tool" title="Redo">
+            <svg width="14" height="14" viewBox="0 0 24 24">
+              <path class="ic-stroke" d="M15 14l5-5-5-5"/>
+              <path class="ic-stroke" d="M20 9H10a6 6 0 0 0-6 6v0a6 6 0 0 0 6 6h6"/>
+            </svg>
+          </button>
+          <button class="tool" title="History">
+            <svg width="14" height="14" viewBox="0 0 24 24">
+              <circle class="ic-stroke" cx="12" cy="12" r="9"/>
+              <path class="ic-stroke" d="M12 7v5l3 2"/>
+              <path class="ic-stroke" d="M3 8h4v4"/>
+            </svg>
+          </button>
+          <button class="tool" title="Save">
+            <svg width="14" height="14" viewBox="0 0 24 24">
+              <path class="ic-fill" d="M5 3h11l3 3v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+              <path class="ic-stroke" d="M5 3h11l3 3v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+              <path class="ic-stroke" d="M8 3v5h7V3 M8 15h8"/>
+            </svg>
+          </button>
+        </div>
+
+        <div style="height:14px"></div>
+
+        <div class="section-h">Breakpoints<span class="line"></span></div>
+        <div class="group">
+          <button class="tool on" title="Desktop">
+            <svg width="14" height="14" viewBox="0 0 24 24">
+              <rect class="ic-stroke" x="2" y="4" width="20" height="12" rx="2"/>
+              <path class="ic-stroke" d="M8 20h8 M12 16v4"/>
+            </svg>
+          </button>
+          <button class="tool" title="Tablet">
+            <svg width="14" height="14" viewBox="0 0 24 24">
+              <rect class="ic-stroke" x="5" y="3" width="14" height="18" rx="2"/>
+              <path class="ic-stroke" d="M12 18h.01"/>
+            </svg>
+          </button>
+          <button class="tool" title="Mobile">
+            <svg width="14" height="14" viewBox="0 0 24 24">
+              <rect class="ic-stroke" x="7" y="2" width="10" height="20" rx="2"/>
+              <path class="ic-stroke" d="M12 18h.01"/>
+            </svg>
+          </button>
+        </div>
+
+        <div style="height:14px"></div>
+
+        <div class="section-h">Preview · publish<span class="line"></span></div>
+        <div class="tool-row">
+          <button class="tool" title="Preview">
+            <svg width="14" height="14" viewBox="0 0 24 24">
+              <path class="ic-stroke" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle class="ic-fill" cx="12" cy="12" r="3"/>
+              <circle class="ic-stroke" cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+          <button class="tool" title="Open in new tab">
+            <svg width="14" height="14" viewBox="0 0 24 24">
+              <path class="ic-stroke" d="M15 3h6v6 M10 14L21 3 M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/>
+            </svg>
+          </button>
+          <button class="tool" title="Share link">
+            <svg width="14" height="14" viewBox="0 0 24 24">
+              <circle class="ic-fill" cx="6" cy="12" r="3"/>
+              <circle class="ic-stroke" cx="6" cy="12" r="3"/>
+              <circle class="ic-stroke" cx="18" cy="6" r="3"/>
+              <circle class="ic-stroke" cx="18" cy="18" r="3"/>
+              <path class="ic-stroke" d="M8.6 10.6l6.8-3.2 M8.6 13.4l6.8 3.2"/>
+            </svg>
+          </button>
+          <button class="tool" title="Download">
+            <svg width="14" height="14" viewBox="0 0 24 24">
+              <path class="ic-stroke" d="M12 3v12 M7 10l5 5 5-5 M4 19h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-h">Layers · visibility<span class="line"></span></div>
+        <div class="layers">
+          <div class="lr">
+            <svg width="14" height="14" viewBox="0 0 24 24" style="color: var(--bd-fg-muted)">
+              <rect class="ic-stroke" x="3" y="3" width="18" height="18" rx="2"/>
+            </svg>
+            <span class="nm">Body</span>
+            <span class="eye">
+              <svg width="13" height="13" viewBox="0 0 24 24"><path class="ic-stroke" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle class="ic-stroke" cx="12" cy="12" r="3"/></svg>
+            </span>
+          </div>
+          <div class="lr sel">
+            <svg width="14" height="14" viewBox="0 0 24 24">
+              <rect class="ic-fill" x="3" y="4" width="18" height="16" rx="2"/>
+              <rect class="ic-stroke" x="3" y="4" width="18" height="16" rx="2"/>
+            </svg>
+            <span class="nm">Hero · section</span>
+            <span class="eye">
+              <svg width="13" height="13" viewBox="0 0 24 24"><path class="ic-stroke" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle class="ic-stroke" cx="12" cy="12" r="3"/></svg>
+            </span>
+          </div>
+          <div class="lr">
+            <svg width="14" height="14" viewBox="0 0 24 24" style="color: var(--bd-fg-muted)">
+              <rect class="ic-stroke" x="3" y="5" width="18" height="14" rx="2"/>
+              <path class="ic-stroke" d="M7 10h10 M7 13h8"/>
+            </svg>
+            <span class="nm">Footer</span>
+            <span class="eye off">
+              <svg width="13" height="13" viewBox="0 0 24 24"><path class="ic-stroke" d="M1 1l22 22 M6.7 6.7A10 10 0 0 0 1 12s4 8 11 8a10 10 0 0 0 5.3-1.7 M10 6a10 10 0 0 1 2-.2c7 0 11 8 11 8a18 18 0 0 1-2.6 3.6"/></svg>
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="foot">
+      <span>Chrome icons · duotone · 1.75 stroke · 14–18px</span>
+      <span class="mono">chrome icons v2</span>
+    </div>
+  </div>
+</div></body></html>

@@ -1,0 +1,27 @@
+/**
+ * themes/design-system/layout.css
+ * Buildrik DS V1 — chrome layout dimensions
+ * Distinct from --buildrick-design-layout-* (user site layout, in design.css).
+ * @license BSD-3-Clause
+ */
+
+:root {
+  /* EDITOR SHELL DIMENSIONS */
+  --buildrick-sidebar-width: 56px;
+  --buildrick-sidebar-panel-width: 320px;
+  --buildrick-right-panel-width: 280px;
+  --buildrick-header-height: 48px;
+  --buildrick-footer-height: 32px;
+  --buildrick-layout-gap: 0px;
+
+  /* PANEL INTERNALS */
+  --buildrick-panel-input-height: 32px;
+  --buildrick-panel-label-size: 12px;
+  --buildrick-panel-label-weight: 500;
+  --buildrick-panel-section-gap: 16px;
+  --buildrick-panel-section-padding: 12px;
+
+  /* HISTORY TAB DRAWER (renamed from --buildrick-tt-drawer-*) */
+  --buildrick-layout-drawer-left: 344px;
+  --buildrick-layout-drawer-right: 320px;
+}

@@ -1,0 +1,547 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  .card { padding: 24px 28px; background: var(--bd-bg-panel); gap: 28px; }
+  .row-h { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px dashed var(--bd-border); }
+  .row-h h3 { margin: 0; font: 600 12px var(--bd-font); color: var(--bd-fg-heading); letter-spacing: -0.01em; }
+  .row-h .tag { font: 500 9px var(--bd-mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--bd-fg-muted); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+  /* Empty state container — simulates a panel */
+  .frame {
+    background: #fff; border-radius: 10px; border: 1px solid var(--bd-border);
+    overflow: hidden;
+  }
+  .frame .head {
+    padding: 10px 14px; border-bottom: 1px solid var(--bd-border);
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bd-bg-panel);
+  }
+  .frame .head .t { font: 600 11.5px var(--bd-font); color: var(--bd-fg-heading); flex: 1; }
+  .frame .head .dots { display: inline-flex; gap: 3px; }
+  .frame .head .dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--bd-border-medium); }
+  .frame .body {
+    padding: 32px 24px; min-height: 260px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    position: relative;
+  }
+  .frame.compact .body { padding: 24px 16px; min-height: 180px; }
+  .frame.tall .body { min-height: 320px; padding: 40px 28px; }
+
+  .art {
+    margin-bottom: 14px; position: relative;
+  }
+
+  /* Spot illustration — abstract, non-emoji */
+  .spot {
+    width: 80px; height: 80px; border-radius: 20px;
+    background: var(--bd-bg-subtle);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--bd-fg-muted);
+    position: relative;
+    overflow: hidden;
+  }
+  .spot.accent { background: var(--bd-accent-tint); color: var(--bd-accent); }
+  .spot.success { background: rgba(22,163,74,0.1); color: var(--bd-success); }
+  .spot.warning { background: rgba(217,119,6,0.1); color: var(--bd-warning); }
+  .spot.error { background: rgba(220,38,38,0.1); color: var(--bd-error); }
+
+  .spot.layered::before, .spot.layered::after {
+    content: ''; position: absolute;
+    border-radius: 14px;
+  }
+  .spot.layered::before {
+    width: 52px; height: 52px;
+    background: rgba(45,109,255,0.08);
+    top: 10px; left: 14px;
+    transform: rotate(-8deg);
+  }
+  .spot.layered::after {
+    width: 52px; height: 52px;
+    background: rgba(45,109,255,0.06);
+    top: 18px; left: 22px;
+    transform: rotate(6deg);
+  }
+  .spot.layered svg { position: relative; z-index: 1; }
+
+  /* Larger hero illustration */
+  .hero-art {
+    width: 120px; height: 120px; position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-art .ring {
+    position: absolute; border-radius: 50%;
+    border: 1.5px solid var(--bd-border);
+  }
+  .hero-art .ring.r1 { inset: 0; }
+  .hero-art .ring.r2 { inset: 12px; border-color: rgba(45,109,255,0.15); }
+  .hero-art .ring.r3 { inset: 24px; border-color: rgba(45,109,255,0.25); border-style: dashed; }
+  .hero-art .core {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: linear-gradient(135deg, #2D6DFF, #8B5CF6);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; position: relative; z-index: 1;
+    box-shadow: 0 8px 24px -8px rgba(45,109,255,0.4);
+  }
+  .hero-art .dot {
+    position: absolute; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--bd-accent);
+  }
+  .hero-art .dot.d1 { top: 4px; left: 50%; transform: translateX(-50%); }
+  .hero-art .dot.d2 { top: 50%; right: 4px; transform: translateY(-50%); background: #8B5CF6; }
+  .hero-art .dot.d3 { bottom: 4px; left: 50%; transform: translateX(-50%); background: #EC4899; }
+  .hero-art .dot.d4 { top: 50%; left: 4px; transform: translateY(-50%); background: #F59E0B; }
+
+  .title {
+    font: 600 14px var(--bd-font); color: var(--bd-fg-heading);
+    letter-spacing: -0.015em; margin: 0 0 4px;
+  }
+  .desc {
+    font: 500 11.5px var(--bd-font); color: var(--bd-fg-secondary);
+    max-width: 280px; line-height: 1.5; margin: 0 0 14px;
+  }
+  .actions { display: inline-flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .btn {
+    padding: 7px 12px; border-radius: 6px; cursor: pointer;
+    font: 600 11.5px var(--bd-font); border: 1px solid transparent;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .btn.pri { background: var(--bd-accent); color: #fff; }
+  .btn.sec { background: #fff; color: var(--bd-fg-primary); border-color: var(--bd-border); }
+  .btn.gho { background: transparent; color: var(--bd-fg-secondary); }
+  .btn.gho:hover { background: var(--bd-bg-subtle); }
+  .btn.dng { background: var(--bd-error); color: #fff; }
+
+  .steps {
+    margin-top: 10px;
+    display: flex; flex-direction: column; gap: 6px;
+    font: 500 11px var(--bd-font); color: var(--bd-fg-secondary);
+    text-align: left;
+  }
+  .steps .step { display: flex; align-items: flex-start; gap: 7px; }
+  .steps .num {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--bd-bg-subtle); color: var(--bd-fg-secondary);
+    font: 700 9.5px var(--bd-mono);
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .steps .step.done .num { background: var(--bd-success); color: #fff; }
+  .steps .step.done { color: var(--bd-fg-muted); text-decoration: line-through; }
+  .steps .step.current .num { background: var(--bd-accent); color: #fff; box-shadow: 0 0 0 3px var(--bd-accent-tint); }
+  .steps .step.current { color: var(--bd-fg-heading); font-weight: 600; }
+
+  .search-hint {
+    margin-top: 8px; padding: 6px 10px;
+    background: var(--bd-bg-subtle); border-radius: 5px;
+    font: 500 10.5px var(--bd-mono); color: var(--bd-fg-muted);
+  }
+  .search-hint .q { color: var(--bd-fg-heading); font-weight: 600; }
+
+  /* Error */
+  .err-code {
+    font: 500 10px var(--bd-mono); color: var(--bd-fg-muted);
+    background: var(--bd-bg-subtle); padding: 2px 7px; border-radius: 4px;
+    margin-top: 10px;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+
+  /* Filter pills (for "no results" context) */
+  .active-filters {
+    display: inline-flex; gap: 4px; flex-wrap: wrap; justify-content: center;
+    margin-top: 8px;
+  }
+  .active-filters .pill {
+    font: 500 10px var(--bd-font); color: var(--bd-fg-secondary);
+    padding: 2px 7px; border-radius: 4px; background: var(--bd-bg-subtle);
+    display: inline-flex; align-items: center; gap: 3px;
+  }
+  .active-filters .pill .x { cursor: pointer; color: var(--bd-fg-muted); }
+
+  /* First run — dashed dropzone */
+  .dropzone {
+    width: 200px; padding: 18px; border-radius: 8px;
+    border: 1.5px dashed var(--bd-border-medium);
+    background: rgba(45,109,255,0.03);
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    color: var(--bd-fg-muted); font: 500 11px var(--bd-font);
+  }
+  .dropzone svg { color: var(--bd-accent); }
+  .dropzone .pri {
+    font: 600 12px var(--bd-font); color: var(--bd-fg-heading);
+  }
+
+  /* Collab presence */
+  .presence {
+    display: inline-flex; align-items: center; gap: -4px;
+    margin-bottom: 10px;
+  }
+  .presence .av {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid #fff;
+    font: 700 9.5px var(--bd-font); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-left: -6px;
+  }
+  .presence .av:first-child { margin-left: 0; }
+  .presence .label {
+    font: 500 10.5px var(--bd-mono); color: var(--bd-fg-muted);
+    margin-left: 8px;
+  }
+
+  /* Loading variant (skeleton preview) */
+  .skeleton { width: 100%; max-width: 260px; }
+  .skeleton .ln {
+    height: 8px; background: var(--bd-bg-subtle);
+    border-radius: 2px; margin-bottom: 6px;
+    animation: pulse 1.6s infinite;
+  }
+  .skeleton .ln.t { height: 14px; width: 70%; }
+  .skeleton .ln.s { width: 90%; }
+  .skeleton .ln.m { width: 50%; }
+  @keyframes pulse { 50% { background: var(--bd-border); } }
+
+  /* Filter chips section */
+  .chips { display: inline-flex; gap: 4px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
+  .chip {
+    padding: 3px 8px; border-radius: 4px; cursor: pointer;
+    font: 500 10.5px var(--bd-font); color: var(--bd-fg-secondary);
+    background: var(--bd-bg-subtle);
+  }
+  .chip:hover { background: #fff; color: var(--bd-accent); border-color: var(--bd-border); }
+
+  /* Icons */
+  .base { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Variant matrix */
+  .matrix-head {
+    padding: 6px 10px; background: var(--bd-bg-subtle); border-radius: 5px;
+    font: 500 9.5px var(--bd-mono); color: var(--bd-fg-muted); text-align: center;
+    margin-bottom: 4px; letter-spacing: -0.01em;
+  }
+</style></head><body>
+<div class="card">
+  <div>
+    <div class="label">Empty States</div>
+    <h2 style="margin:4px 0 0; font: 600 16px var(--bd-font); color: var(--bd-fg-heading); letter-spacing: -0.01em;">Zero · no-results · error · first-run · loading</h2>
+    <p class="mono" style="margin: 6px 0 0; color: var(--bd-fg-muted);">abstract spot illustration · concise copy · 1 primary + 1 secondary action</p>
+  </div>
+
+  <!-- FIRST RUN / ZERO STATE -->
+  <div>
+    <div class="row-h"><h3>First-run · onboarding</h3><span class="tag">guide user to action · steps · drop zone</span></div>
+    <div class="grid-2">
+
+      <div class="frame tall">
+        <div class="head">
+          <span class="t">Pages</span>
+          <span class="dots"><span></span><span></span><span></span></span>
+        </div>
+        <div class="body">
+          <div class="art">
+            <div class="hero-art">
+              <div class="ring r1"></div>
+              <div class="ring r2"></div>
+              <div class="ring r3"></div>
+              <div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div><div class="dot d4"></div>
+              <div class="core">
+                <svg class="base" width="20" height="20" viewBox="0 0 24 24"><path d="M8 3h6l4 4v10a2 2 0 01-2 2H8a2 2 0 01-2-2V5z"/></svg>
+              </div>
+            </div>
+          </div>
+          <h4 class="title">Start with your first page</h4>
+          <p class="desc">Pages are the building blocks of your site. Each one gets its own URL and can reuse sections.</p>
+          <div class="actions">
+            <button class="btn pri">
+              <svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M12 5v14 M5 12h14"/></svg>
+              Create page
+            </button>
+            <button class="btn sec">Use a template</button>
+          </div>
+          <div class="steps">
+            <div class="step current"><span class="num">1</span>Add a page (home, about, pricing…)</div>
+            <div class="step"><span class="num">2</span>Drop in sections from the library</div>
+            <div class="step"><span class="num">3</span>Publish · get a live URL</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="frame tall">
+        <div class="head">
+          <span class="t">Assets</span>
+          <span class="dots"><span></span><span></span><span></span></span>
+        </div>
+        <div class="body">
+          <div class="art">
+            <div class="dropzone">
+              <svg class="base" width="28" height="28" viewBox="0 0 24 24"><path d="M12 15V3 M7 8l5-5 5 5 M5 21h14"/></svg>
+              <span class="pri">Drop files here</span>
+              <span>PNG, JPG, SVG, MP4 · up to 50MB</span>
+            </div>
+          </div>
+          <h4 class="title" style="margin-top: 14px;">Your media library is empty</h4>
+          <p class="desc">Upload assets from your computer, import from URL, or pick from the stock library.</p>
+          <div class="actions">
+            <button class="btn pri">
+              <svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M12 15V3 M7 8l5-5 5 5 M5 21h14"/></svg>
+              Upload files
+            </button>
+            <button class="btn sec">
+              <svg class="base" width="11" height="11" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
+              Browse stock
+            </button>
+            <button class="btn gho">From URL</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NO RESULTS -->
+  <div>
+    <div class="row-h"><h3>No results · search &amp; filter</h3><span class="tag">show what was searched · offer filter clears</span></div>
+    <div class="grid-3">
+
+      <div class="frame">
+        <div class="head">
+          <span class="t">Search</span>
+        </div>
+        <div class="body">
+          <div class="art">
+            <div class="spot">
+              <svg class="base" width="32" height="32" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3 M8 11h6"/></svg>
+            </div>
+          </div>
+          <h4 class="title">No templates found</h4>
+          <p class="desc">We couldn't find a template matching your search.</p>
+          <div class="search-hint">Searched for <span class="q">"crypto dashboard"</span></div>
+          <div class="actions" style="margin-top: 12px;">
+            <button class="btn sec">Clear search</button>
+            <button class="btn gho">Request template</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="frame">
+        <div class="head">
+          <span class="t">Assets</span>
+        </div>
+        <div class="body">
+          <div class="art">
+            <div class="spot accent layered">
+              <svg class="base" width="28" height="28" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 16l5-5 4 4 3-3 6 6"/></svg>
+            </div>
+          </div>
+          <h4 class="title">Nothing matches these filters</h4>
+          <p class="desc">Try removing one of the filters below, or reset everything.</p>
+          <div class="active-filters">
+            <span class="pill">Images <span class="x"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 6l12 12 M18 6L6 18"/></svg></span></span>
+            <span class="pill">Used on pages <span class="x"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 6l12 12 M18 6L6 18"/></svg></span></span>
+            <span class="pill">Last 7d <span class="x"><svg class="base" width="9" height="9" viewBox="0 0 24 24"><path d="M6 6l12 12 M18 6L6 18"/></svg></span></span>
+          </div>
+          <div class="actions" style="margin-top: 12px;">
+            <button class="btn sec">Clear all filters</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="frame">
+        <div class="head">
+          <span class="t">Comments</span>
+        </div>
+        <div class="body">
+          <div class="art">
+            <div class="spot success">
+              <svg class="base" width="30" height="30" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+            </div>
+          </div>
+          <h4 class="title">All caught up</h4>
+          <p class="desc">No unresolved comments on this page. Nice work!</p>
+          <div class="actions">
+            <button class="btn gho">Show resolved (12)</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ERROR STATES -->
+  <div>
+    <div class="row-h"><h3>Errors · server · permission · offline</h3><span class="tag">say what broke · give a way out · show codes for support</span></div>
+    <div class="grid-3">
+
+      <div class="frame">
+        <div class="head">
+          <span class="t">Canvas</span>
+        </div>
+        <div class="body">
+          <div class="art">
+            <div class="spot error">
+              <svg class="base" width="32" height="32" viewBox="0 0 24 24"><path d="M12 3L2 19h20z"/><path d="M12 10v4 M12 18h.01"/></svg>
+            </div>
+          </div>
+          <h4 class="title">We couldn't load this page</h4>
+          <p class="desc">Something went wrong rendering the canvas. Try again or reload.</p>
+          <div class="actions">
+            <button class="btn pri">
+              <svg class="base" width="11" height="11" viewBox="0 0 24 24"><path d="M3 12a9 9 0 019-9 M21 12a9 9 0 01-9 9 M21 3v5h-5 M3 21v-5h5"/></svg>
+              Retry
+            </button>
+            <button class="btn sec">Reload</button>
+          </div>
+          <div class="err-code">
+            <svg class="base" width="9" height="9" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6 M12 17h.01"/></svg>
+            ERR_CANVAS_5812
+          </div>
+        </div>
+      </div>
+
+      <div class="frame">
+        <div class="head">
+          <span class="t">Locked</span>
+        </div>
+        <div class="body">
+          <div class="art">
+            <div class="spot warning">
+              <svg class="base" width="30" height="30" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+            </div>
+          </div>
+          <h4 class="title">You don't have access</h4>
+          <p class="desc">This page belongs to a private workspace. Ask an admin to invite you.</p>
+          <div class="actions">
+            <button class="btn sec">Request access</button>
+            <button class="btn gho">Go back</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="frame">
+        <div class="head">
+          <span class="t">Offline</span>
+        </div>
+        <div class="body">
+          <div class="art">
+            <div class="spot">
+              <svg class="base" width="30" height="30" viewBox="0 0 24 24"><path d="M2 2l20 20 M8.5 16.4a5 5 0 017 0 M5 12.5a10 10 0 016-3.3 M2 8.8A15 15 0 017 5.5 M22 8.8a15 15 0 00-5-3.3 M12 20h.01"/></svg>
+            </div>
+          </div>
+          <h4 class="title">You're offline</h4>
+          <p class="desc">Changes are saved locally. They'll sync when you're back online.</p>
+          <div class="actions">
+            <button class="btn sec">Try again</button>
+          </div>
+          <div class="err-code" style="background: rgba(217,119,6,0.1); color: var(--bd-warning);">
+            <svg class="base" width="9" height="9" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v2 M12 20v2 M4.9 4.9l1.4 1.4 M17.7 17.7l1.4 1.4 M2 12h2 M20 12h2 M4.9 19.1l1.4-1.4 M17.7 6.3l1.4-1.4"/></svg>
+            Auto-sync when online
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INLINE / COMPACT EMPTY STATES -->
+  <div>
+    <div class="row-h"><h3>Compact · inline empties</h3><span class="tag">for small panels — condensed copy, single action</span></div>
+    <div class="grid-3">
+
+      <div class="frame compact">
+        <div class="head"><span class="t">Recent activity</span></div>
+        <div class="body">
+          <div class="spot" style="width: 48px; height: 48px; border-radius: 12px; margin-bottom: 8px;">
+            <svg class="base" width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          </div>
+          <h4 class="title" style="font-size: 12.5px;">No activity yet</h4>
+          <p class="desc" style="font-size: 10.5px; max-width: 200px;">Edits by you and your team will appear here.</p>
+        </div>
+      </div>
+
+      <div class="frame compact">
+        <div class="head"><span class="t">Team</span></div>
+        <div class="body">
+          <div class="presence">
+            <div class="av" style="background: linear-gradient(135deg, #2D6DFF, #8B5CF6)">N</div>
+          </div>
+          <h4 class="title" style="font-size: 12.5px;">It's just you here</h4>
+          <p class="desc" style="font-size: 10.5px; max-width: 200px;">Invite teammates to edit together in real time.</p>
+          <button class="btn pri" style="padding: 5px 10px; font-size: 10.5px;">
+            <svg class="base" width="10" height="10" viewBox="0 0 24 24"><path d="M16 3.1a4 4 0 110 7.8 M22 22a8 8 0 00-14.8 0 M12 15a6 6 0 100-12 6 6 0 000 12z"/></svg>
+            Invite
+          </button>
+        </div>
+      </div>
+
+      <div class="frame compact">
+        <div class="head"><span class="t">Comments</span></div>
+        <div class="body">
+          <div class="spot" style="width: 48px; height: 48px; border-radius: 12px; margin-bottom: 8px;">
+            <svg class="base" width="20" height="20" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          </div>
+          <h4 class="title" style="font-size: 12.5px;">No comments</h4>
+          <p class="desc" style="font-size: 10.5px; max-width: 200px;">Select an element and press <span style="font-family: var(--bd-mono); background: var(--bd-bg-subtle); padding: 1px 5px; border-radius: 3px;">C</span> to add a comment.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LOADING STATE -->
+  <div>
+    <div class="row-h"><h3>Loading · skeleton placeholder</h3><span class="tag">show structure before content arrives</span></div>
+    <div class="grid-2">
+
+      <div class="frame">
+        <div class="head">
+          <span class="t">Loading templates</span>
+          <span style="font: 500 10px var(--bd-mono); color: var(--bd-fg-muted);">Connecting to library…</span>
+        </div>
+        <div class="body">
+          <div class="skeleton">
+            <div class="ln t"></div>
+            <div class="ln s"></div>
+            <div class="ln m"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 12px;">
+              <div style="aspect-ratio: 4/3; background: var(--bd-bg-subtle); border-radius: 5px; animation: pulse 1.6s infinite;"></div>
+              <div style="aspect-ratio: 4/3; background: var(--bd-bg-subtle); border-radius: 5px; animation: pulse 1.6s infinite; animation-delay: 0.15s;"></div>
+              <div style="aspect-ratio: 4/3; background: var(--bd-bg-subtle); border-radius: 5px; animation: pulse 1.6s infinite; animation-delay: 0.3s;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="frame">
+        <div class="head">
+          <span class="t">Slow connection</span>
+        </div>
+        <div class="body">
+          <div class="art">
+            <div class="hero-art" style="width: 80px; height: 80px;">
+              <div class="ring r1" style="border-style: dashed; animation: spin 3s linear infinite;"></div>
+              <div class="ring r2" style="inset: 8px;"></div>
+              <div class="core" style="width: 32px; height: 32px;">
+                <svg class="base" width="14" height="14" viewBox="0 0 24 24"><path d="M3 12a9 9 0 019-9"/></svg>
+              </div>
+            </div>
+          </div>
+          <h4 class="title">Still loading…</h4>
+          <p class="desc">This is taking longer than usual. Check your connection or retry.</p>
+          <div class="actions">
+            <button class="btn sec">Retry</button>
+            <button class="btn gho">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+
+</div>
+</body></html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .box { padding: 14px; border: 1px solid var(--bd-border); border-radius: 10px; background: var(--bd-bg-card); }
+  .title { font: 600 10px var(--bd-font); color: var(--bd-fg-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+  .mono-line { font: 400 12px/1.7 var(--bd-mono); color: var(--bd-fg-primary); }
+  .mono-line .k { color: #94A3B8; }
+  .mono-line .v { color: #0F172A; font-weight: 500; }
+  .mono-line .u { color: #2D6DFF; }
+  .kbd { display: inline-block; padding: 2px 6px; font: 500 11px var(--bd-mono); color: var(--bd-fg-primary); background: var(--bd-bg-subtle); border: 1px solid var(--bd-border); border-radius: 4px; box-shadow: 0 1px 0 var(--bd-border-medium); }
+</style>
+</head><body><div class="card">
+  <div class="grid">
+    <div class="box">
+      <div class="title">Numeric values</div>
+      <div class="mono-line"><span class="k">width</span>: <span class="v">320</span><span class="u">px</span></div>
+      <div class="mono-line"><span class="k">padding</span>: <span class="v">12</span><span class="u">px</span> <span class="v">16</span><span class="u">px</span></div>
+      <div class="mono-line"><span class="k">opacity</span>: <span class="v">0.86</span></div>
+      <div class="mono-line"><span class="k">border-radius</span>: <span class="v">8</span><span class="u">px</span></div>
+    </div>
+    <div class="box">
+      <div class="title">Shortcuts · keys</div>
+      <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:4px">
+        <span class="kbd">⌘</span><span class="kbd">K</span>
+        <span style="color:var(--bd-fg-muted); padding:0 4px">·</span>
+        <span class="kbd">⌘</span><span class="kbd">Z</span>
+        <span style="color:var(--bd-fg-muted); padding:0 4px">·</span>
+        <span class="kbd">⇧</span><span class="kbd">⌘</span><span class="kbd">P</span>
+      </div>
+      <div class="mono-line" style="margin-top:10px; color:var(--bd-fg-secondary)">// Geist Mono 400/500</div>
+    </div>
+  </div>
+</div></body></html>

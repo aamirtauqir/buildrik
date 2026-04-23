@@ -1,0 +1,109 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_card.css">
+<style>
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tile {
+    background: #fff; border: 1px solid var(--bd-border); border-radius: 10px;
+    padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .tile h4 { margin: 0; font: 600 12.5px var(--bd-font); color: var(--bd-fg-heading); }
+  .tile p  { margin: 0; font: 400 11.5px var(--bd-font); color: var(--bd-fg-secondary); line-height: 1.55; }
+  .tile code { font: 500 11px var(--bd-mono); background: var(--bd-bg-subtle); padding: 1px 5px; border-radius: 3px; color: var(--bd-fg-primary); }
+
+  .focus-demo .btn {
+    height: 32px; padding: 0 12px; border-radius: 8px;
+    background: var(--bd-accent); color: #fff;
+    font: 500 12px var(--bd-font); border: 0; cursor: pointer;
+    outline: 0; box-shadow: 0 0 0 3px rgba(45,109,255,0.35);
+  }
+  .focus-demo .input {
+    height: 32px; padding: 0 10px; border-radius: 6px;
+    border: 1px solid var(--bd-accent);
+    background: #fff; color: var(--bd-fg-primary);
+    font: 400 12px var(--bd-font); width: 160px;
+    outline: 0; box-shadow: 0 0 0 3px rgba(45,109,255,0.25);
+  }
+  .focus-demo .link {
+    color: var(--bd-accent); text-decoration: underline; text-underline-offset: 2px;
+    outline: 2px solid var(--bd-accent); outline-offset: 3px; border-radius: 2px;
+    font: 500 12px var(--bd-font);
+  }
+
+  .contrast {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;
+    font: 500 11px var(--bd-mono);
+  }
+  .swatch {
+    padding: 8px; border-radius: 6px;
+    display: flex; justify-content: space-between; align-items: center;
+    border: 1px solid var(--bd-border);
+  }
+  .swatch .ratio { font-weight: 600; color: var(--bd-success); }
+  .swatch.warn .ratio { color: var(--bd-warning); }
+
+  .hit {
+    position: relative;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--bd-accent-tint);
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .hit .inner {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--bd-accent); display: inline-flex; align-items: center; justify-content: center;
+    color: #fff;
+  }
+  .hit-label { font: 500 10px var(--bd-mono); color: var(--bd-fg-muted); margin-top: 6px; display: block; text-align: center; }
+
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .lbl { font-size: 10px; color: var(--bd-fg-muted); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; }
+</style>
+</head><body><div class="card">
+  <div class="lbl">Accessibility · WCAG 2.2 AA baseline</div>
+
+  <div class="grid">
+    <div class="tile focus-demo">
+      <h4>Focus rings</h4>
+      <p>3px cobalt at 8–12% alpha. Never opacity-only. <code>:focus-visible</code> everywhere.</p>
+      <div class="row" style="gap:12px; flex-wrap:wrap">
+        <button class="btn">Publish</button>
+        <input class="input" value="Focused" readonly />
+        <a href="#" class="link">Link</a>
+      </div>
+    </div>
+
+    <div class="tile">
+      <h4>Touch targets</h4>
+      <p>Minimum <code>44×44px</code> tap area. Visual hit can be smaller if padded hitbox meets target.</p>
+      <div class="row" style="gap:20px">
+        <div><div class="hit"><span class="inner"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14 M5 12h14"/></svg></span></div><span class="hit-label">44 · ok</span></div>
+        <div><div class="hit" style="width:32px;height:32px;background:rgba(220,38,38,0.12)"><span class="inner" style="width:24px;height:24px;background:var(--bd-error)"></span></div><span class="hit-label" style="color:var(--bd-error)">32 · fail</span></div>
+      </div>
+    </div>
+
+    <div class="tile">
+      <h4>Contrast ratios</h4>
+      <p>Body text on card/panel meets <code>4.5:1</code>. UI text &amp; icons meet <code>3:1</code>.</p>
+      <div class="contrast">
+        <div class="swatch">#334155/#fff <span class="ratio">10.3</span></div>
+        <div class="swatch">#64748B/#fff <span class="ratio">5.7</span></div>
+        <div class="swatch warn">#94A3B8/#fff <span class="ratio">3.4</span></div>
+        <div class="swatch" style="background:var(--bd-accent); color:#fff; border-color:transparent">#fff/#2D6DFF <span class="ratio" style="color:#fff">4.9</span></div>
+        <div class="swatch" style="background:#F1F5F9">#334155/#F1F5F9 <span class="ratio">9.4</span></div>
+        <div class="swatch warn">muted on subtle <span class="ratio">3.1</span></div>
+      </div>
+    </div>
+
+    <div class="tile">
+      <h4>Reduced motion &amp; SR</h4>
+      <p><code>prefers-reduced-motion</code> collapses durations to 0.01ms. Every icon-only control ships an <code>aria-label</code>.</p>
+      <pre style="margin:0; font: 500 11px var(--bd-mono); color:var(--bd-fg-primary); background:var(--bd-bg-subtle); padding:8px; border-radius:6px; line-height:1.5">@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}</pre>
+      <span class="sr">Screen-reader-only text example: "Open layers panel"</span>
+    </div>
+  </div>
+</div></body></html>
