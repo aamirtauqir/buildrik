@@ -30,28 +30,31 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   search,
   displaySettingsOpen,
   onDisplaySettingsToggle,
+  onSearchChange,
 }) => {
   const state = useLayersState({ composer, canvasHoveredId });
 
   // Sync controlled search prop -> internal useLayerSearch state
+  const { search: stateSearch, setSearch } = state;
   React.useEffect(() => {
-    if (typeof search === "string" && search !== state.search) {
-      state.setSearch(search);
+    if (typeof search === "string" && search !== stateSearch) {
+      setSearch(search);
     }
-  }, [search, state]);
+  }, [search, stateSearch, setSearch]);
 
   // Expand/collapse-all from LayersTab
+  const { expandAll, collapseAll } = state.treeHook;
   React.useEffect(() => {
     if (!composer) return;
-    const onExpand = () => state.treeHook.expandAll();
-    const onCollapse = () => state.treeHook.collapseAll();
+    const onExpand = () => expandAll();
+    const onCollapse = () => collapseAll();
     composer.on("layers:expand-all", onExpand);
     composer.on("layers:collapse-all", onCollapse);
     return () => {
       composer.off("layers:expand-all", onExpand);
       composer.off("layers:collapse-all", onCollapse);
     };
-  }, [composer, state.treeHook]);
+  }, [composer, expandAll, collapseAll]);
 
   // Emit stats to LayersTab
   const totalCount = state.treeHook.totalCount;
@@ -393,7 +396,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           <div className="buildrick-layers-empty-search" role="status">
             <span className="buildrick-les-icon">🔍</span>
             <p className="buildrick-les-title">No layers match &quot;{state.search}&quot;</p>
-            <button className="buildrick-les-clear" onClick={() => state.setSearch("")}>
+            <button className="buildrick-les-clear" onClick={() => onSearchChange ? onSearchChange("") : setSearch("")}>
               Clear search
             </button>
           </div>

@@ -21,8 +21,11 @@ export interface LayersTabProps {
   onAddBlockClick?: () => void;
   /** Retained for call-site compat. Unused in the new-design Layers tab. */
   isPinned?: boolean;
+  /** Retained for call-site compat. Unused in the new-design Layers tab. */
   onPinToggle?: () => void;
+  /** Retained for call-site compat. Unused in the new-design Layers tab. */
   onHelpClick?: () => void;
+  /** Retained for call-site compat. Unused in the new-design Layers tab. */
   onClose?: () => void;
 }
 
@@ -136,6 +139,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
             search={search}
             displaySettingsOpen={displaySettingsOpen}
             onDisplaySettingsToggle={() => setDisplaySettingsOpen((v) => !v)}
+            onSearchChange={setSearch}
           />
         ) : (
           <div className="bdc-layers-empty">

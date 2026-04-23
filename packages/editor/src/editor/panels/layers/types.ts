@@ -26,6 +26,10 @@ export interface LayersPanelProps {
   displaySettingsOpen?: boolean;
   /** Lifted display-settings popover toggle callback. */
   onDisplaySettingsToggle?: () => void;
+  /** Lifted search setter. When provided, internal clear-search controls
+   *  route through this instead of calling state.setSearch directly, so
+   *  LayersTab's controlled search input stays in sync. */
+  onSearchChange?: (value: string) => void;
 }
 
 /** Layer tree item data */
