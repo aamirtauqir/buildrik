@@ -55,10 +55,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
   dragState,
   hiddenIds,
   lockedIds,
-  selectedIds,
   customNames,
-  canvasHoveredId,
-  hoveredLayerId,
   editingId,
   editingName,
   editInputRef,
@@ -104,7 +101,6 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
     "bdc-lr",
     isSelected ? "bdc-sel" : "",
     isHidden ? "bdc-hidden" : "",
-    isLocked ? "bdc-locked" : "",
     isEditing ? "bdc-editing" : "",
     isDragging ? "is-dragging" : "",
     hasChildren ? "" : "bdc-leaf",
@@ -177,6 +173,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
         className="bdc-lr-chev"
         aria-label={hasChildren ? (isExpanded ? "Collapse children" : "Expand children") : undefined}
         aria-hidden={!hasChildren}
+        tabIndex={hasChildren ? undefined : -1}
         onClick={(e) => {
           e.stopPropagation();
           if (hasChildren) onToggleExpand(layer.id);

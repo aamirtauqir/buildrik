@@ -150,8 +150,7 @@
 }
 
 .bdc-lr:hover .bdc-lr-eye,
-.bdc-lr.bdc-sel .bdc-lr-eye,
-.bdc-lr-eye.bdc-off { opacity: 1; }
+.bdc-lr.bdc-sel .bdc-lr-eye { opacity: 1; }
 
 .bdc-lr-eye.bdc-off { opacity: 0.6; }
 .bdc-lr-eye:hover { color: var(--bd-fg-primary); }

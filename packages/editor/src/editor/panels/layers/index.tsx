@@ -139,7 +139,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   const scrollToSelection = React.useCallback(() => {
     if (!state.treeContainerRef.current) return;
     const layerRow = state.treeContainerRef.current.querySelector(
-      `.buildrick-layer-row[aria-selected="true"]`
+      `.bdc-lr[aria-selected="true"]`
     ) as HTMLElement | null;
     if (layerRow) layerRow.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [state.treeContainerRef]);
