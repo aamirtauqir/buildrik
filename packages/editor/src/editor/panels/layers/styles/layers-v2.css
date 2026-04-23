@@ -96,8 +96,7 @@
 
 /* Inline tag/id/class/component/bp badges (display-settings controlled) */
 .bdc-lr-tag,
-.bdc-lr-id,
-.bdc-lr-cls {
+.bdc-lr-id {
   font: 500 9.5px var(--bd-mono);
   color: var(--bd-fg-muted);
   padding: 0 3px;
@@ -108,7 +107,7 @@
 }
 
 .bdc-lr-cmp {
-  font-size: 10px;
+  font: 500 10px var(--bd-font);
   color: var(--bd-accent);
   flex-shrink: 0;
 }
@@ -209,6 +208,24 @@
 /* ==========================================================================
    Selection banner (multi-select action bar)
    ========================================================================== */
+
+/* Shared icon button primitive used by the selection banner + panel-h acts.
+   Promoted to chrome.css in a later cross-tab cleanup. */
+.bdc-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  color: var(--bd-fg-secondary);
+  cursor: pointer;
+  padding: 0;
+}
+.bdc-icon-btn:hover {
+  background: var(--bd-bg-subtle);
+  color: var(--bd-fg-primary);
+}
 
 .bdc-layers-banner {
   display: flex;
