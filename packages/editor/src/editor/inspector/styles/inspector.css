@@ -1,0 +1,781 @@
+/*
+ * Inspector panel styles — tokens: --bd-* only.
+ * Ported from /design-system/project/preview/comp-inspector.v1.html
+ * Namespace: .bdi-* (buildrik-design inspector)
+ */
+
+/* ── Panel shell ──────────────────────────────────────── */
+.bdi-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bd-bg-card, #fff);
+  font-family: var(--bd-font);
+  color: var(--bd-fg-primary);
+  overflow: hidden;
+}
+.bdi-panel-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* ── Header — element id strip ────────────────────────── */
+.bdi-h {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--bd-bg-panel);
+  border-bottom: 1px solid var(--bd-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.bdi-h .bdi-el {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font: 600 12px var(--bd-font);
+  color: var(--bd-fg-heading);
+}
+.bdi-h .bdi-el-ic {
+  color: var(--bd-accent);
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.bdi-h .bdi-el-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bdi-h .bdi-tag {
+  font: 500 10px var(--bd-mono);
+  color: var(--bd-fg-muted);
+  background: #fff;
+  border: 1px solid var(--bd-border);
+  padding: 1px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.bdi-h .bdi-mini {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--bd-fg-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+}
+.bdi-h .bdi-mini:hover {
+  background: rgba(15, 23, 42, 0.05);
+  color: var(--bd-fg-primary);
+}
+
+/* ── Back link ────────────────────────────────────────── */
+.bdi-back {
+  background: none;
+  border: none;
+  padding: 5px 14px;
+  font: 500 11px var(--bd-font);
+  color: var(--bd-fg-muted);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.5;
+  transition: opacity 120ms;
+}
+.bdi-back:hover {
+  opacity: 1;
+}
+
+/* ── Tabs ─────────────────────────────────────────────── */
+.bdi-tabs {
+  display: flex;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--bd-border);
+  background: #fff;
+  gap: 2px;
+}
+.bdi-tab {
+  flex: 1;
+  padding: 8px 4px;
+  font: 500 11px var(--bd-font);
+  color: var(--bd-fg-secondary);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  letter-spacing: -0.005em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: color 120ms, border-color 120ms;
+}
+.bdi-tab:hover {
+  color: var(--bd-fg-primary);
+}
+.bdi-tab.on {
+  color: var(--bd-fg-heading);
+  font-weight: 600;
+  border-bottom-color: var(--bd-accent);
+}
+.bdi-tab .bdi-tc {
+  font: 500 9.5px var(--bd-mono);
+  color: var(--bd-fg-muted);
+  background: var(--bd-bg-subtle);
+  padding: 0 4px;
+  border-radius: 3px;
+}
+.bdi-tab.on .bdi-tc {
+  background: var(--bd-accent-tint);
+  color: var(--bd-accent);
+}
+
+/* ── Breakpoint ribbon ─────────────────────────────────── */
+.bdi-bpr {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #fff;
+  border-bottom: 1px solid var(--bd-border);
+  font: 500 10.5px var(--bd-font);
+  color: var(--bd-fg-secondary);
+}
+.bdi-bpr .bdi-bpr-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font: 600 10px var(--bd-font);
+  color: var(--bd-accent);
+  background: var(--bd-accent-tint);
+}
+.bdi-bpr .bdi-bpr-spacer {
+  flex: 1;
+}
+.bdi-states {
+  display: inline-flex;
+  gap: 4px;
+}
+.bdi-state-pill {
+  font: 600 9px var(--bd-font);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bd-fg-muted);
+  background: var(--bd-bg-subtle);
+  padding: 2px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  border: none;
+  transition: color 120ms, background 120ms;
+}
+.bdi-state-pill:hover {
+  color: var(--bd-fg-primary);
+}
+.bdi-state-pill.on {
+  color: var(--bd-accent);
+  background: var(--bd-accent-tint);
+}
+.bdi-state-pill.has-override::after {
+  content: "•";
+  margin-left: 3px;
+  color: var(--bd-accent);
+}
+
+/* ── Body ─────────────────────────────────────────────── */
+.bdi-body {
+  padding: 0;
+}
+
+/* ── Section ──────────────────────────────────────────── */
+.bdi-sec {
+  border-bottom: 1px solid var(--bd-border);
+}
+.bdi-sec:last-child {
+  border-bottom: none;
+}
+.bdi-sec-h {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 12px;
+  font: 600 10px var(--bd-font);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bd-fg-secondary);
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  border: none;
+  text-align: left;
+}
+.bdi-sec-h:hover {
+  color: var(--bd-fg-primary);
+}
+.bdi-sec-h .bdi-chev {
+  color: var(--bd-fg-muted);
+  display: inline-flex;
+  transition: transform 120ms;
+  flex-shrink: 0;
+}
+.bdi-sec-h .bdi-sec-name {
+  flex: 1;
+}
+.bdi-sec-h .bdi-ind {
+  font: 500 9.5px var(--bd-mono);
+  color: var(--bd-accent);
+  background: var(--bd-accent-tint);
+  padding: 1px 5px;
+  border-radius: 3px;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+.bdi-sec-h .bdi-ind.mixed {
+  color: var(--bd-warning);
+  background: rgba(217, 119, 6, 0.12);
+}
+.bdi-sec-h .bdi-ind.neutral {
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--bd-fg-secondary);
+}
+.bdi-sec-h .bdi-plus {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bd-fg-muted);
+  border-radius: 3px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.bdi-sec-h .bdi-plus:hover {
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--bd-fg-primary);
+}
+.bdi-sec.closed .bdi-chev {
+  transform: rotate(-90deg);
+}
+.bdi-sec-body {
+  padding: 6px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bdi-sec.closed .bdi-sec-body {
+  display: none;
+}
+
+/* ── Sub-label inside section body ──────────────────── */
+.bdi-sub-label {
+  font: 600 9px var(--bd-font);
+  letter-spacing: 0.08em;
+  color: var(--bd-fg-muted);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* ── Row (label + control) ──────────────────────────── */
+.bdi-row-ctrl {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  align-items: center;
+  gap: 6px;
+}
+.bdi-row-ctrl.wide {
+  grid-template-columns: 64px 1fr;
+}
+.bdi-row-ctrl .bdi-lb {
+  font: 500 11px var(--bd-font);
+  color: var(--bd-fg-secondary);
+  letter-spacing: -0.005em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.bdi-row-ctrl.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.bdi-row-ctrl .bdi-row-content {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* ── Numeric input ──────────────────────────────────── */
+.bdi-num {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  width: 100%;
+  background: var(--bd-bg-subtle);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  overflow: hidden;
+  transition: background 120ms, border-color 120ms;
+  position: relative;
+}
+.bdi-num:hover {
+  background: #fff;
+  border-color: var(--bd-border);
+}
+.bdi-num input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0 4px 0 8px;
+  font: 500 11.5px var(--bd-font);
+  color: var(--bd-fg-primary);
+  font-variant-numeric: tabular-nums;
+}
+.bdi-num input.muted {
+  color: var(--bd-fg-muted);
+}
+.bdi-num .bdi-u {
+  font: 500 10px var(--bd-font);
+  color: var(--bd-fg-muted);
+  padding: 0 6px 0 2px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  text-transform: lowercase;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+.bdi-num .bdi-u.select {
+  padding-right: 4px;
+}
+.bdi-num:focus-within {
+  background: #fff;
+  border-color: var(--bd-accent);
+  box-shadow: 0 0 0 2px rgba(45, 109, 255, 0.12);
+}
+.bdi-num.mixed {
+  background: rgba(217, 119, 6, 0.06);
+  border-color: rgba(217, 119, 6, 0.35);
+}
+.bdi-num.mixed input::placeholder {
+  color: var(--bd-warning);
+}
+.bdi-num.invalid {
+  border-color: var(--bd-error, #dc2626);
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12);
+}
+
+/* Axis variant (padding/margin quad) */
+.bdi-num.axis {
+  padding-left: 14px;
+}
+.bdi-num.axis::before {
+  content: attr(data-axis);
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  font: 600 9px var(--bd-font);
+  letter-spacing: 0.08em;
+  color: var(--bd-fg-muted);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.bdi-quad {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+/* Reset × on hover */
+.bdi-num .bdi-reset {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  background: rgba(15, 23, 42, 0.06);
+  border: none;
+  border-radius: 3px;
+  color: var(--bd-fg-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 120ms;
+}
+.bdi-num:hover .bdi-reset.visible {
+  opacity: 1;
+}
+.bdi-num .bdi-reset:hover {
+  color: var(--bd-fg-primary);
+  background: rgba(15, 23, 42, 0.1);
+}
+
+/* ── Segmented control ──────────────────────────────── */
+.bdi-seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  background: var(--bd-bg-subtle);
+  border-radius: 4px;
+  padding: 2px;
+  height: 24px;
+  width: 100%;
+}
+.bdi-seg button {
+  padding: 0;
+  font: 500 11px var(--bd-font);
+  color: var(--bd-fg-secondary);
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+}
+.bdi-seg button:hover {
+  color: var(--bd-fg-primary);
+}
+.bdi-seg button.on {
+  background: #fff;
+  color: var(--bd-fg-heading);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+/* ── Color field ────────────────────────────────────── */
+.bdi-color {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  width: 100%;
+  background: var(--bd-bg-subtle);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 2px 6px 2px 2px;
+  cursor: pointer;
+}
+.bdi-color:hover {
+  background: #fff;
+  border-color: var(--bd-border);
+}
+.bdi-color .bdi-sw {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.1);
+  flex-shrink: 0;
+  background-image: linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(-45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e2e8f0 75%),
+    linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+}
+.bdi-color .bdi-sw-fill {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+}
+.bdi-color .bdi-hx {
+  flex: 1;
+  min-width: 0;
+  font: 500 11px var(--bd-font);
+  color: var(--bd-fg-primary);
+  font-variant-numeric: tabular-nums;
+  background: transparent;
+  border: none;
+  outline: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bdi-color .bdi-pct {
+  font: 500 10.5px var(--bd-font);
+  color: var(--bd-fg-muted);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.bdi-color.bound {
+  background: var(--bd-accent-tint);
+  border-color: var(--bd-accent);
+}
+.bdi-color.bound .bdi-hx {
+  color: var(--bd-accent);
+}
+
+/* ── Switch row ─────────────────────────────────────── */
+.bdi-sw-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font: 500 11.5px var(--bd-font);
+  color: var(--bd-fg-primary);
+}
+.bdi-sw-ctrl {
+  position: relative;
+  width: 28px;
+  height: 16px;
+  background: var(--bd-accent);
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 120ms;
+}
+.bdi-sw-ctrl.off {
+  background: #cbd5e1;
+}
+.bdi-sw-ctrl .bdi-thumb {
+  position: absolute;
+  top: 2px;
+  left: 14px;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);
+  transition: left 120ms;
+}
+.bdi-sw-ctrl.off .bdi-thumb {
+  left: 2px;
+}
+
+/* ── Advanced disclosure ──────────────────────────────── */
+.bdi-adv {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: 500 10.5px var(--bd-font);
+  color: var(--bd-fg-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0 0;
+  letter-spacing: -0.005em;
+}
+.bdi-adv:hover {
+  color: var(--bd-accent);
+}
+.bdi-adv .bdi-adv-c {
+  color: var(--bd-fg-muted);
+  display: inline-flex;
+}
+
+/* ── Empty state ──────────────────────────────────────── */
+.bdi-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 18px 12px;
+  text-align: center;
+  border: 1px dashed var(--bd-border);
+  border-radius: 6px;
+}
+.bdi-empty .bdi-empty-ttl {
+  font: 500 11.5px var(--bd-font);
+  color: var(--bd-fg-primary);
+}
+.bdi-empty .bdi-empty-sub {
+  font: 400 10.5px var(--bd-font);
+  color: var(--bd-fg-muted);
+}
+.bdi-empty .bdi-empty-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: 500 11px var(--bd-font);
+  color: var(--bd-accent);
+  background: var(--bd-accent-tint);
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-top: 2px;
+  cursor: pointer;
+  border: none;
+}
+
+/* ── Chips (classes, tokens) ──────────────────────────── */
+.bdi-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.bdi-chip {
+  font: 500 10.5px var(--bd-mono);
+  color: var(--bd-fg-primary);
+  background: var(--bd-bg-subtle);
+  border: 1px solid var(--bd-border);
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.bdi-chip.primary {
+  color: var(--bd-accent);
+  background: var(--bd-accent-tint);
+  border-color: rgba(45, 109, 255, 0.25);
+}
+.bdi-chip .bdi-chip-x {
+  color: var(--bd-fg-muted);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 11px;
+  line-height: 1;
+}
+.bdi-chip .bdi-chip-x:hover {
+  color: var(--bd-fg-primary);
+}
+.bdi-chip-add {
+  font: 500 10.5px var(--bd-font);
+  color: var(--bd-fg-muted);
+  background: transparent;
+  border: 1px dashed var(--bd-border);
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.bdi-chip-add:hover {
+  color: var(--bd-accent);
+  border-color: var(--bd-accent);
+}
+
+/* ── Text input ───────────────────────────────────────── */
+.bdi-text {
+  width: 100%;
+  padding: 0 8px;
+  height: 24px;
+  background: var(--bd-bg-subtle);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font: 500 11.5px var(--bd-font);
+  color: var(--bd-fg-primary);
+  outline: none;
+  transition: background 120ms, border-color 120ms;
+}
+.bdi-text:hover {
+  background: #fff;
+  border-color: var(--bd-border);
+}
+.bdi-text:focus {
+  background: #fff;
+  border-color: var(--bd-accent);
+  box-shadow: 0 0 0 2px rgba(45, 109, 255, 0.12);
+}
+.bdi-text.mono {
+  font-family: var(--bd-mono);
+  font-size: 11px;
+}
+textarea.bdi-text {
+  height: auto;
+  min-height: 60px;
+  padding: 6px 8px;
+  resize: vertical;
+  font-family: var(--bd-font);
+}
+
+/* ── Quick actions row ────────────────────────────────── */
+.bdi-quick {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+.bdi-qa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 7px 0;
+  background: var(--bd-bg-subtle);
+  border: 1px solid transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  color: var(--bd-fg-secondary);
+  font: 500 9.5px var(--bd-font);
+}
+.bdi-qa:hover {
+  background: #fff;
+  border-color: var(--bd-border);
+  color: var(--bd-fg-primary);
+}
+.bdi-qa.on {
+  background: var(--bd-accent-tint);
+  color: var(--bd-accent);
+  border-color: rgba(45, 109, 255, 0.25);
+}
+
+/* Utility — inline icon sized 13×13 matching mock */
+.bdi-ico {
+  width: 13px;
+  height: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Override dot (for mixed/overridden) ──────────────── */
+.bdi-override-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bd-accent);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ── Scrollbar ────────────────────────────────────────── */
+.bdi-panel-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.bdi-panel-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.bdi-panel-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 3px;
+}
+.bdi-panel-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* ── A11y: visually hidden (status live region) ──────── */
+.bdi-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}

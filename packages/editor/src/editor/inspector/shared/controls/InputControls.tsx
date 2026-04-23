@@ -1,6 +1,7 @@
 /**
- * Input Controls for Pro Inspector
- * InputRow, InputWithUnit, SelectRow
+ * Input Controls — InputRow, InputWithUnit, SelectRow.
+ * Ported to .bdi-num / .bdi-text / .bdi-row-ctrl per comp-inspector.v1 design.
+ *
  * @license BSD-3-Clause
  */
 
@@ -8,72 +9,32 @@ import { X } from "lucide-react";
 import * as React from "react";
 import { IconInfo } from "../../../../shared/ui/Icons";
 import { Tooltip } from "../../../../shared/ui/Tooltip";
-import { baseStyles } from "./controlStyles";
 
-const overrideDotStyle: React.CSSProperties = {
-  width: 6,
-  height: 6,
-  borderRadius: "50%",
-  backgroundColor: "var(--buildrick-accent, #3b82f6)",
-  marginLeft: 4,
-  display: "inline-block",
-  verticalAlign: "middle",
-};
+// ============================================================================
+// HELPERS
+// ============================================================================
 
-/**
- * ResetButton — hover-revealed × that clears the current value.
- * Rendered inside a row that has `position: relative`. Visibility driven by
- * the row's hover state via a parent-scoped CSS class (`buildrick-row`) whose hover
- * selector toggles `opacity` on `.buildrick-reset`. Falls back to always-visible for
- * keyboard-only users via `:focus-visible`.
- */
-const resetButtonStyle: React.CSSProperties = {
-  position: "absolute",
-  right: 4,
-  top: "50%",
-  transform: "translateY(-50%)",
-  width: 18,
-  height: 18,
-  padding: 0,
-  background: "rgba(0,0,0,0.3)",
-  border: "none",
-  borderRadius: 4,
-  color: "var(--buildrick-text-tertiary)",
-  cursor: "pointer",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  opacity: 0,
-  transition: "opacity 0.12s, color 0.12s",
-  pointerEvents: "none",
-};
+const OverrideDot: React.FC = () => (
+  <span className="bdi-override-dot" aria-hidden="true" />
+);
 
-const ResetButton: React.FC<{
-  onReset: () => void;
-  label?: string;
-  visible: boolean;
-}> = ({ onReset, label = "Reset to default", visible }) => (
-  <button
-    type="button"
-    onClick={(e) => {
-      e.stopPropagation();
-      onReset();
-    }}
-    aria-label={label}
-    title={label}
-    className="buildrick-reset"
-    style={{
-      ...resetButtonStyle,
-      opacity: visible ? 1 : 0,
-      pointerEvents: visible ? "auto" : "none",
-    }}
-  >
-    <X size={11} aria-hidden="true" />
-  </button>
+const HelperIcon: React.FC<{ text: string }> = ({ text }) => (
+  <Tooltip content={text} position="top">
+    <span
+      style={{
+        marginLeft: 4,
+        display: "inline-flex",
+        opacity: 0.5,
+        cursor: "help",
+      }}
+    >
+      <IconInfo size="xs" />
+    </span>
+  </Tooltip>
 );
 
 // ============================================================================
-// INPUT ROW
+// INPUT ROW (text / textarea — full-width .bdi-text)
 // ============================================================================
 
 export interface InputRowProps {
@@ -96,42 +57,36 @@ export const InputRow: React.FC<InputRowProps> = ({
   textarea = false,
   isOverridden,
   helperText,
-}) => {
-  return (
-    <div style={baseStyles.row}>
-      <label style={baseStyles.label}>
-        {label}
-        {isOverridden && <span style={overrideDotStyle} />}
-        {helperText && (
-          <Tooltip content={helperText} position="top">
-            <span style={{ marginLeft: 4, display: "inline-flex", opacity: 0.5, cursor: "help" }}>
-              <IconInfo size="xs" />
-            </span>
-          </Tooltip>
-        )}
-      </label>
+}) => (
+  <div className="bdi-row-ctrl">
+    <label className="bdi-lb">
+      {label}
+      {isOverridden && <OverrideDot />}
+      {helperText && <HelperIcon text={helperText} />}
+    </label>
+    <div className="bdi-row-content">
       {textarea ? (
         <textarea
+          className="bdi-text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          style={{ ...baseStyles.input, minHeight: 80, resize: "vertical" }}
         />
       ) : (
         <input
+          className="bdi-text"
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          style={baseStyles.input}
         />
       )}
     </div>
-  );
-};
+  </div>
+);
 
 // ============================================================================
-// INPUT WITH UNIT
+// INPUT WITH UNIT (.bdi-num with inline unit selector)
 // ============================================================================
 
 export interface InputWithUnitProps {
@@ -146,14 +101,12 @@ export interface InputWithUnitProps {
   helperText?: string;
 }
 
-/** Returns true for valid CSS numeric input (including empty, partial negative, or CSS var) */
 function isValidCSSNumber(val: string): boolean {
   if (val === "" || val === "-") return true;
-  if (/^var\(--buildrick-design-/.test(val)) return true; // token binding — always valid, pass through
+  if (/^var\(--buildrick-design-/.test(val)) return true;
   return /^-?[\d.]+$/.test(val) && !isNaN(parseFloat(val));
 }
 
-/** Returns true if the value is a token var() binding — skip all parse/validate */
 const isTokenVar = (val: string): boolean => /^var\(--buildrick-design-/.test(val);
 
 export const InputWithUnit: React.FC<InputWithUnitProps> = ({
@@ -168,13 +121,13 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   helperText,
 }) => {
   const [isRowHovered, setIsRowHovered] = React.useState(false);
-  // Parse value and unit — token vars pass through as-is in the num field
+
   const parseValue = (val: string): { num: string; unit: string } => {
     if (val === "auto" || val === "none" || val === "inherit") {
       return { num: "", unit: val };
     }
     if (isTokenVar(val)) {
-      return { num: val, unit: "px" }; // display the var() string, unit dropdown irrelevant
+      return { num: val, unit: "px" };
     }
     const match = val.match(/^(-?[\d.]+)(.*)$/);
     if (match) {
@@ -185,11 +138,9 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
 
   const { num, unit } = parseValue(value);
 
-  // Local input state — buffers keystrokes, validates on blur
   const [inputValue, setInputValue] = React.useState(num);
   const [isInvalid, setIsInvalid] = React.useState(false);
 
-  // Sync from external prop (element deselection, undo, etc.)
   React.useEffect(() => {
     setInputValue(num);
     setIsInvalid(false);
@@ -205,7 +156,6 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
 
   const handleInputChange = (newVal: string) => {
     setInputValue(newVal);
-    // Token var() — pass through immediately, no validation
     if (isTokenVar(newVal)) {
       onChange(newVal);
       return;
@@ -218,12 +168,8 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   };
 
   const handleInputBlur = () => {
-    // Never revert a token var() binding on blur
-    if (isTokenVar(inputValue)) {
-      return;
-    }
+    if (isTokenVar(inputValue)) return;
     if (!isValidCSSNumber(inputValue) || inputValue === "-") {
-      // Revert to last known-good value from prop
       setInputValue(num);
       setIsInvalid(false);
     } else if (inputValue !== "" && inputValue !== "-") {
@@ -249,87 +195,76 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
     }
   };
 
-  const inputStyle: React.CSSProperties = {
-    ...baseStyles.inputWithUnit,
-    ...(isInvalid
-      ? { borderColor: "var(--buildrick-error, #ef4444)", outline: "1px solid var(--buildrick-error, #ef4444)" }
-      : {}),
-  };
-
   const hasValue = !disabled && value !== "" && value !== undefined;
-  const showReset = hasValue && isRowHovered;
+  const showReset = hasValue && isRowHovered && !isTokenVar(inputValue);
+
+  const isKeywordUnit = unit === "auto" || unit === "none" || unit === "inherit";
 
   return (
-    <div
-      style={{ ...baseStyles.row, position: "relative" }}
-      onMouseEnter={() => setIsRowHovered(true)}
-      onMouseLeave={() => setIsRowHovered(false)}
-    >
-      <label style={baseStyles.label} title={disabledReason}>
+    <div className={`bdi-row-ctrl${disabled ? " disabled" : ""}`} title={disabledReason}>
+      <label className="bdi-lb">
         {label}
-        {isOverridden && <span style={overrideDotStyle} />}
-        {helperText && (
-          <Tooltip content={helperText} position="top">
-            <span style={{ marginLeft: 4, display: "inline-flex", opacity: 0.5, cursor: "help" }}>
-              <IconInfo size="xs" />
-            </span>
-          </Tooltip>
-        )}
+        {isOverridden && <OverrideDot />}
+        {helperText && <HelperIcon text={helperText} />}
       </label>
-      <div
-        style={{
-          display: "flex",
-          flex: 1,
-          opacity: disabled ? 0.5 : 1,
-          pointerEvents: disabled ? "none" : "auto",
-        }}
-        title={isInvalid ? "Invalid number — press Escape to revert" : disabledReason}
-      >
-        <div style={{ position: "relative", flex: 1, display: "flex" }}>
+      <div className="bdi-row-content">
+        <div
+          className={`bdi-num${isInvalid ? " invalid" : ""}`}
+          onMouseEnter={() => setIsRowHovered(true)}
+          onMouseLeave={() => setIsRowHovered(false)}
+          title={isInvalid ? "Invalid number — press Escape to revert" : disabledReason}
+        >
           <input
             type="text"
-            value={inputValue}
+            value={isKeywordUnit && !isTokenVar(inputValue) ? unit : inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             onBlur={handleInputBlur}
             onKeyDown={handleInputKeyDown}
             placeholder={placeholder}
-            style={{
-              ...inputStyle,
-              // Reserve space for the reset × so it never sits on top of text.
-              paddingRight: showReset ? 22 : inputStyle.paddingRight,
-            }}
-            disabled={disabled || (unit === "auto" || unit === "none" || unit === "inherit") && !isTokenVar(inputValue)}
+            className={isKeywordUnit ? "muted" : ""}
+            disabled={disabled || (isKeywordUnit && !isTokenVar(inputValue))}
             aria-invalid={isInvalid}
+            style={{ paddingRight: showReset ? 22 : undefined }}
           />
-          <ResetButton
-            onReset={() => {
-              setInputValue("");
-              setIsInvalid(false);
-              onChange("");
-            }}
-            label={`Reset ${label}`}
-            visible={showReset}
-          />
+          {showReset && (
+            <button
+              type="button"
+              className="bdi-reset visible"
+              onClick={(e) => {
+                e.stopPropagation();
+                setInputValue("");
+                setIsInvalid(false);
+                onChange("");
+              }}
+              aria-label={`Reset ${label}`}
+              title={`Reset ${label}`}
+            >
+              <X size={10} aria-hidden="true" />
+            </button>
+          )}
+          {!isKeywordUnit && (
+            <select
+              className="bdi-u select"
+              value={unit}
+              onChange={(e) => handleUnitChange(e.target.value)}
+              disabled={disabled}
+              aria-label={`${label} unit`}
+            >
+              {units.map((u) => (
+                <option key={u} value={u}>
+                  {u}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
-        <select
-          value={unit}
-          onChange={(e) => handleUnitChange(e.target.value)}
-          style={baseStyles.unitSelect}
-          disabled={disabled}
-        >
-          {units.map((u) => (
-            <option key={u} value={u}>
-              {u}
-            </option>
-          ))}
-        </select>
       </div>
     </div>
   );
 };
 
 // ============================================================================
-// SELECT ROW
+// SELECT ROW (styled select using .bdi-num frame)
 // ============================================================================
 
 export interface SelectRowProps {
@@ -339,7 +274,6 @@ export interface SelectRowProps {
   options: { value: string; label: string }[];
   isOverridden?: boolean;
   helperText?: string;
-  /** Label for the empty/unset option. Defaults to "Default". */
   placeholder?: string;
 }
 
@@ -351,28 +285,44 @@ export const SelectRow: React.FC<SelectRowProps> = ({
   isOverridden,
   helperText,
   placeholder = "Default",
-}) => {
-  return (
-    <div style={baseStyles.row}>
-      <label style={baseStyles.label}>
-        {label}
-        {isOverridden && <span style={overrideDotStyle} />}
-        {helperText && (
-          <Tooltip content={helperText} position="top">
-            <span style={{ marginLeft: 4, display: "inline-flex", opacity: 0.5, cursor: "help" }}>
-              <IconInfo size="xs" />
-            </span>
-          </Tooltip>
-        )}
-      </label>
-      <select value={value} onChange={(e) => onChange(e.target.value)} style={baseStyles.select}>
-        <option value="">{placeholder}</option>
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+}) => (
+  <div className="bdi-row-ctrl">
+    <label className="bdi-lb">
+      {label}
+      {isOverridden && <OverrideDot />}
+      {helperText && <HelperIcon text={helperText} />}
+    </label>
+    <div className="bdi-row-content">
+      <div className="bdi-num" style={{ paddingRight: 0 }}>
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          style={{
+            flex: 1,
+            minWidth: 0,
+            height: "100%",
+            border: "none",
+            outline: "none",
+            background: "transparent",
+            padding: "0 24px 0 8px",
+            font: "500 11.5px var(--bd-font)",
+            color: "var(--bd-fg-primary)",
+            appearance: "none",
+            backgroundImage:
+              `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "right 8px center",
+            cursor: "pointer",
+          }}
+        >
+          <option value="">{placeholder}</option>
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </div>
     </div>
-  );
-};
+  </div>
+);

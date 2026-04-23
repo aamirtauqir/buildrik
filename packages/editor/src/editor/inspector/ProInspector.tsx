@@ -1,23 +1,21 @@
 /**
  * Aquibra Pro Inspector Panel
- * Professional page builder inspector with visual controls
- * Elementor-style UI with comprehensive CSS property support
+ * Redesign: ported to .bdi-* namespace per /design-system/preview/comp-inspector.v1.html
+ * Tokens: --bd-* only
  *
- * Section expansion logic is in hooks/useInspectorSections.ts
  * @license BSD-3-Clause
  */
 
-import { ArrowLeft } from "lucide-react";
-import { BindingPopover } from "./components/BindingPopover";
+import { ArrowLeft, ChevronDown, Lock, Monitor, Tablet, Smartphone } from "lucide-react";
 import * as React from "react";
+import { BindingPopover } from "./components/BindingPopover";
 import type { Composer } from "../../engine";
-import { isValidBreakpoint } from "../../shared/constants/breakpoints";
-import type { DeviceType } from "../../shared/types";
+import { BREAKPOINTS, BREAKPOINT_ORDER, isValidBreakpoint } from "../../shared/constants/breakpoints";
+import type { DeviceType, PseudoStateId } from "../../shared/types";
 import type { BreakpointId } from "../../shared/types/breakpoints";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
 import { getElementIcon } from "../../shared/ui/Icons";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
-import { BreakpointIndicator } from "./components/BreakpointIndicator";
 import { DeleteConfirmModal } from "./components/DeleteConfirmModal";
 import { ElementBreadcrumb } from "./components/ElementBreadcrumb";
 import { InspectorControls } from "./components/InspectorControls";
@@ -26,7 +24,6 @@ import { InspectorEmptyState } from "./components/InspectorEmptyState";
 import { InspectorErrorBoundary } from "./components/InspectorErrorBoundary";
 import { MultiSelectToolbar } from "./components/MultiSelectToolbar";
 import { PropertySearchResults } from "./components/PropertySearchResults";
-import { PseudoStateSelector } from "./components/PseudoStateSelector";
 import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hooks";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
 import { VariantSection } from "./sections/VariantSection";
@@ -35,8 +32,8 @@ import { deriveCssContext, getPropertyStates } from "./config/cssContext";
 import { detectMixedValues } from "./shared/detectMixedValues";
 import type { Element } from "../../engine";
 import { DevModeToggle } from "./shared/DevModeToggle";
-import { panelStyles } from "./styles";
 import { InspectorTabContent } from "./tabs/InspectorTabContent";
+import "./styles/inspector.css";
 
 // ============================================================================
 // TYPES
@@ -50,7 +47,6 @@ export interface ProInspectorProps {
   } | null;
   composer?: Composer | null;
   currentBreakpoint?: DeviceType;
-  /** Called when the user switches breakpoint from the inspector header */
   onBreakpointChange?: (bp: BreakpointId) => void;
   onDelete?: (id: string) => void;
   onOpenMediaLibrary?: (
@@ -61,9 +57,166 @@ export interface ProInspectorProps {
     currentIcon: IconConfig | undefined,
     onSelect: (icon: IconConfig) => void
   ) => void;
-  /** Opens the CMS collection setup modal (for BindingPopover create link) */
   onOpenCreateCollection?: () => void;
 }
+
+// ============================================================================
+// INLINE BPR — breakpoint chooser (left) + pseudo-state pills (right)
+// ============================================================================
+
+const BP_ICONS: Record<BreakpointId, React.ReactNode> = {
+  desktop: <Monitor size={11} aria-hidden="true" />,
+  tablet: <Tablet size={11} aria-hidden="true" />,
+  mobile: <Smartphone size={11} aria-hidden="true" />,
+};
+
+const PSEUDO_LABELS: Record<PseudoStateId, string> = {
+  normal: "Base",
+  hover: ":hover",
+  focus: ":focus",
+  active: ":active",
+  disabled: ":disabled",
+};
+
+const BreakpointPill: React.FC<{
+  current: BreakpointId;
+  onChange?: (bp: BreakpointId) => void;
+  hasOverride?: boolean;
+}> = ({ current, onChange, hasOverride }) => {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
+  const meta = BREAKPOINTS[current];
+
+  React.useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown);
+    return () => document.removeEventListener("pointerdown", onDown);
+  }, [open]);
+
+  return (
+    <div ref={ref} style={{ position: "relative", display: "inline-block" }}>
+      <button
+        type="button"
+        className="bdi-bpr-pill"
+        onClick={() => onChange && setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={`Breakpoint: ${meta.name}`}
+        style={{
+          border: "none",
+          cursor: onChange ? "pointer" : "default",
+        }}
+      >
+        {BP_ICONS[current]}
+        <span>
+          {meta.name}
+          {meta.maxWidth !== undefined ? ` · ≤${meta.maxWidth}` : " · 1200+"}
+        </span>
+        {hasOverride && (
+          <span
+            aria-hidden="true"
+            style={{
+              width: 5,
+              height: 5,
+              borderRadius: "50%",
+              background: "var(--bd-accent)",
+            }}
+          />
+        )}
+        {onChange && <ChevronDown size={10} aria-hidden="true" style={{ opacity: 0.7 }} />}
+      </button>
+      {open && onChange && (
+        <div
+          role="listbox"
+          style={{
+            position: "absolute",
+            top: "calc(100% + 4px)",
+            left: 0,
+            zIndex: 200,
+            background: "#fff",
+            border: "1px solid var(--bd-border)",
+            borderRadius: 6,
+            padding: 4,
+            minWidth: 160,
+            boxShadow: "0 8px 24px rgba(15, 23, 42, 0.12)",
+          }}
+        >
+          {BREAKPOINT_ORDER.map((bp) => {
+            const bpMeta = BREAKPOINTS[bp];
+            const active = bp === current;
+            return (
+              <button
+                key={bp}
+                type="button"
+                role="option"
+                aria-selected={active}
+                onClick={() => {
+                  setOpen(false);
+                  if (bp !== current) onChange(bp);
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  width: "100%",
+                  padding: "5px 8px",
+                  background: active ? "var(--bd-accent-tint)" : "transparent",
+                  border: "none",
+                  borderRadius: 4,
+                  color: active ? "var(--bd-accent)" : "var(--bd-fg-primary)",
+                  fontSize: 11,
+                  fontWeight: active ? 600 : 500,
+                  cursor: "pointer",
+                  textAlign: "left",
+                  fontFamily: "var(--bd-font)",
+                }}
+              >
+                {BP_ICONS[bp]}
+                <span style={{ flex: 1 }}>{bpMeta.name}</span>
+                {bpMeta.maxWidth !== undefined && (
+                  <span
+                    style={{
+                      fontSize: 10,
+                      color: "var(--bd-fg-muted)",
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
+                    ≤{bpMeta.maxWidth}px
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const StatePills: React.FC<{
+  current: PseudoStateId;
+  onChange: (s: PseudoStateId) => void;
+  withOverrides: Set<PseudoStateId>;
+  visibleStates: readonly PseudoStateId[];
+}> = ({ current, onChange, withOverrides, visibleStates }) => (
+  <div className="bdi-states" role="group" aria-label="Element state selector">
+    {visibleStates.map((s) => (
+      <button
+        key={s}
+        type="button"
+        className={`bdi-state-pill${current === s ? " on" : ""}${withOverrides.has(s) ? " has-override" : ""}`}
+        onClick={() => onChange(s)}
+        aria-pressed={current === s}
+        title={s === "normal" ? "Base styles" : `Styles for :${s}`}
+      >
+        {PSEUDO_LABELS[s]}
+      </button>
+    ))}
+  </div>
+);
 
 // ============================================================================
 // MAIN COMPONENT
@@ -79,7 +232,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   onOpenIconPicker,
   onOpenCreateCollection,
 }) => {
-  // Convert DeviceType to BreakpointId
   const currentBreakpoint: BreakpointId = isValidBreakpoint(currentBreakpointProp)
     ? currentBreakpointProp
     : "desktop";
@@ -100,20 +252,20 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     overriddenProperties,
   } = useStyleHandlers(selectedElement, composer, currentBreakpoint, currentPseudoState);
 
-  // Detect whether the current breakpoint has any element-specific style overrides
+  // Breakpoint override indicator
   const breakpointHasOverride = React.useMemo<boolean>(() => {
     if (!selectedElement?.id || !composer?.styles || currentBreakpoint === "desktop") return false;
     const bpStyles = composer.styles.getBreakpointStyle(selectedElement.id, currentBreakpoint);
     return Object.keys(bpStyles).length > 0;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedElement?.id, composer, currentBreakpoint, styles_state]);
 
-  // Detect which pseudo-states have at least one overridden style
-  const statesWithOverrides = React.useMemo<Set<import("../../shared/types").PseudoStateId>>(
+  // Pseudo-states with overrides
+  const statesWithOverrides = React.useMemo<Set<PseudoStateId>>(
     () => {
       if (!selectedElement?.id || !composer?.styles) return new Set();
       const pseudoStates = ["hover", "focus", "active", "disabled"] as const;
-      const withOverrides = new Set<import("../../shared/types").PseudoStateId>();
+      const withOverrides = new Set<PseudoStateId>();
       pseudoStates.forEach((state) => {
         const rule = composer.styles.getRule(`[data-buildrick-id="${selectedElement.id}"]:${state}`);
         if (rule && Object.keys(rule.properties ?? {}).length > 0) {
@@ -126,7 +278,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     [selectedElement?.id, composer, styles_state]
   );
 
-  // Section expand/collapse — extracted to useInspectorSections
   const { expandedSections, collapseAll, expandAll, toggleSection } = useInspectorSections({
     selectedElement,
     composer,
@@ -134,10 +285,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
 
   const [searchQuery, setSearchQuery] = React.useState("");
 
-  // Advanced-disclosure state lifted to ProInspector so the registry-driven
-  // InspectorTabContent can share a single UseAdvancedSettingsReturn across
-  // every section. The prop map is derived from the registry — any section
-  // that declares an `advancedKey` is automatically part of the union.
   const advancedPropsMap = React.useMemo(() => buildAdvancedPropsMapFromRegistry(), []);
   const advancedState = useAdvancedSettings({
     advancedPropsMap,
@@ -147,25 +294,19 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   });
   const contentRef = React.useRef<HTMLDivElement>(null);
 
-  // Scroll position persistence (Gap 2 fix - UX Strategy)
   const scrollPositionsRef = React.useRef<Map<string, number>>(new Map());
   const previousElementIdRef = React.useRef<string | null>(null);
 
-  // P0 Fix: Delete confirmation modal
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
   const [idCopied, setIdCopied] = React.useState(false);
 
-  // Pseudo-state selector visibility — hide unless the user is actively editing
-  // a non-normal state or has an existing override on this element. Users can
-  // still opt in via the "+ state override" affordance. Reset per selection.
+  // Show pseudo-state pills only when non-normal / overrides exist / user opts in
   const [stateSelectorManuallyShown, setStateSelectorManuallyShown] = React.useState(false);
   React.useEffect(() => {
     setStateSelectorManuallyShown(false);
   }, [selectedElement?.id]);
 
-  // Global "/" shortcut: focus the inspector search. Only fires when focus is
-  // not already inside an input/textarea/contentEditable so it doesn't steal
-  // keystrokes from any form the user is actively typing in.
+  // Global "/" shortcut focuses search
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key !== "/") return;
@@ -185,16 +326,13 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     return () => document.removeEventListener("keydown", handler);
   }, []);
 
-  // Multi-select detection via same hook as Canvas (proven to work)
   const { selectedIds, isMultiSelect } = useComposerSelection({ composer: composer ?? null });
 
-  // CSS context for rule-based UI
   const [contextState, setContextState] = React.useState(() =>
     deriveCssContext(selectedElement, composer, devMode)
   );
   const propertyStates = getPropertyStates(contextState);
 
-  // Phase 5: Inject override indicators
   if (overriddenProperties) {
     overriddenProperties.forEach((prop) => {
       if (!propertyStates[prop]) propertyStates[prop] = {};
@@ -206,7 +344,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     setContextState(deriveCssContext(selectedElement, composer, devMode));
   }, [selectedElement, composer, styles_state, devMode]);
 
-  // Multi-select: resolve element instances for all selected ids
   const selectedElements = React.useMemo<readonly Element[]>(() => {
     if (!composer || selectedIds.length === 0) return [];
     return selectedIds
@@ -214,7 +351,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       .filter((el): el is Element => !!el);
   }, [composer, selectedIds]);
 
-  // Union of every section's styleKeys — used to compute mixed-value set once
   const allStyleKeys = React.useMemo<readonly string[]>(() => {
     return Array.from(
       new Set(
@@ -228,13 +364,12 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     [selectedElements, allStyleKeys]
   );
 
-  // Enrich the CSS context with multi-select data before passing to sections
   const enrichedContext = React.useMemo(
     () => ({ ...contextState, selectedElements, mixedKeys }),
     [contextState, selectedElements, mixedKeys]
   );
 
-  // ── Scroll position persistence ────────────────────────────────────────────
+  // Scroll persistence per element
   React.useEffect(() => {
     const container = contentRef.current;
     const prevId = previousElementIdRef.current;
@@ -270,7 +405,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     return () => container.removeEventListener("scroll", handleScroll);
   }, [selectedElement?.id]);
 
-  // Element info lookup
   const ElementIcon = selectedElement
     ? getElementIcon(selectedElement.type)
     : getElementIcon("default");
@@ -278,145 +412,90 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     ? selectedElement.type.charAt(0).toUpperCase() + selectedElement.type.slice(1)
     : "Element";
 
-  // ============================================================================
-  // RENDER: Multi-Select State
-  // ============================================================================
+  // Multi-select short-circuit
   const hasMultipleSelected = selectedIds.length > 1 || isMultiSelect;
-
   if (hasMultipleSelected) {
     return (
-      <div style={panelStyles.panel}>
+      <div className="bdi-panel">
         <MultiSelectToolbar selectedIds={selectedIds} composer={composer ?? null} />
       </div>
     );
   }
 
-  // ============================================================================
-  // RENDER: No Selection
-  // ============================================================================
   if (!selectedElement) {
-    return (
-      <InspectorEmptyState composer={composer} />
-    );
+    return <InspectorEmptyState composer={composer} />;
   }
 
-  // ============================================================================
-  // RENDER: Inspector
-  // ============================================================================
+  const showStatePills =
+    currentPseudoState !== "normal" ||
+    statesWithOverrides.size > 0 ||
+    stateSelectorManuallyShown;
+
+  const visibleStates: readonly PseudoStateId[] = showStatePills
+    ? (["normal", "hover", "focus", "active", "disabled"] as const)
+    : (["normal"] as const);
+
   return (
-    <div style={panelStyles.panel}>
-      {/* IS6: Visually-hidden live region — announces element selection to screen readers */}
-      <div
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0,0,0,0)",
-          whiteSpace: "nowrap",
-        }}
-      >
+    <div className="bdi-panel">
+      {/* Live region for selection announcement */}
+      <div role="status" aria-live="polite" aria-atomic="true" className="bdi-sr-only">
         {elementLabel} selected
       </div>
-      {/* Page settings link — visible when element is selected */}
+
+      {/* Back link — switches focus to page settings */}
       <button
         type="button"
+        className="bdi-back"
         onClick={() => composer?.selection?.clear()}
         aria-label="Switch to page settings"
-        style={{
-          background: "none",
-          border: "none",
-          padding: "5px 14px",
-          fontSize: 11,
-          color: "var(--buildrick-text-muted)",
-          cursor: "pointer",
-          textAlign: "left",
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          gap: 4,
-          opacity: 0.5,
-          transition: "opacity 0.2s",
-        }}
-        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
-        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = "0.5"; }}
       >
         <ArrowLeft size={10} aria-hidden="true" />
         Page settings
       </button>
-      {/* Header */}
-      <div style={{ ...panelStyles.header, position: "relative" as const }}>
-        <div style={panelStyles.elementInfo}>
-          <div style={panelStyles.elementIcon}>
-            <ElementIcon size="lg" />
-          </div>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={panelStyles.elementName}>{elementLabel}</div>
-            {/* Compact meta row — tag and ID live inline as a single mono-font
-                line. Click copies the id. Keeps header tight on narrow panels. */}
-            <button
-              type="button"
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(`#${selectedElement.id}`);
-                  setIdCopied(true);
-                  setTimeout(() => setIdCopied(false), 1500);
-                } catch {
-                  // clipboard API not available — silently skip
-                }
-              }}
-              aria-label="Copy element ID"
-              title={idCopied ? "Copied!" : "Click to copy element ID"}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: 0,
-                fontFamily: "var(--buildrick-font-family-mono)",
-                fontSize: 11,
-                color: idCopied ? "var(--buildrick-success)" : "var(--buildrick-text-tertiary)",
-                transition: "color 0.2s",
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-                maxWidth: "100%",
-                overflow: "hidden",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {selectedElement.tagName && (
-                <span style={{ opacity: 0.7 }}>
-                  &lt;{selectedElement.tagName.toLowerCase()}&gt;
-                </span>
-              )}
-              <span>#{selectedElement.id.slice(-6)}</span>
-              {idCopied && (
-                <span
-                  aria-live="polite"
-                  style={{
-                    color: "var(--buildrick-success)",
-                    fontWeight: 600,
-                  }}
-                >
-                  · Copied
-                </span>
-              )}
-            </button>
-          </div>
+
+      {/* Header — element identity strip */}
+      <div className="bdi-h">
+        <div className="bdi-el">
+          <span className="bdi-el-ic">
+            <ElementIcon size="sm" />
+          </span>
+          <span className="bdi-el-name">{elementLabel}</span>
+          <button
+            type="button"
+            className="bdi-tag"
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(`#${selectedElement.id}`);
+                setIdCopied(true);
+                setTimeout(() => setIdCopied(false), 1500);
+              } catch {
+                /* clipboard API unavailable */
+              }
+            }}
+            aria-label="Copy element ID"
+            title={idCopied ? "Copied!" : "Click to copy element ID"}
+            style={{ cursor: "pointer" }}
+          >
+            {selectedElement.tagName
+              ? `${selectedElement.tagName.toLowerCase()} · #${selectedElement.id.slice(-6)}`
+              : `#${selectedElement.id.slice(-6)}`}
+            {idCopied && " ✓"}
+          </button>
         </div>
 
-        {/* Binding popover — link element to CMS field (WS-14b) */}
+        {/* Binding popover — link element to CMS field */}
         <BindingPopover
           elementId={selectedElement?.id ?? null}
           composer={composer ?? null}
           onOpenCreateCollection={onOpenCreateCollection}
         />
 
-        {/* Element actions overflow menu — Duplicate / Copy styles / Paste styles / Delete.
-            Replaces the standalone delete button. */}
+        {/* Lock placeholder (future) */}
+        <button className="bdi-mini" title="Lock element" aria-label="Lock element" type="button">
+          <Lock size={12} aria-hidden="true" />
+        </button>
+
+        {/* Overflow menu */}
         {onDelete && (
           <InspectorElementMenu
             composer={composer}
@@ -425,7 +504,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           />
         )}
 
-        {/* Delete confirmation modal — still driven by the overflow menu above. */}
         <DeleteConfirmModal
           isOpen={showDeleteConfirm}
           onClose={() => setShowDeleteConfirm(false)}
@@ -435,78 +513,16 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           }}
           elementLabel={elementLabel}
         />
-
-        <ElementBreadcrumb selectedElement={selectedElement} composer={composer} />
-        <BreakpointIndicator
-          currentBreakpoint={currentBreakpoint}
-          onBreakpointChange={onBreakpointChange}
-          hasOverride={breakpointHasOverride}
-        />
-        {currentPseudoState !== "normal" ||
-        statesWithOverrides.size > 0 ||
-        stateSelectorManuallyShown ? (
-          <PseudoStateSelector
-            currentPseudoState={currentPseudoState}
-            onChange={setCurrentPseudoState}
-            statesWithOverrides={statesWithOverrides}
-          />
-        ) : (
-          <button
-            type="button"
-            onClick={() => setStateSelectorManuallyShown(true)}
-            aria-label="Show state override selector"
-            title="Add hover / focus / active styles"
-            style={{
-              marginTop: 6,
-              padding: "4px 10px",
-              background: "transparent",
-              border: "1px dashed var(--buildrick-border)",
-              borderRadius: 6,
-              color: "var(--buildrick-text-tertiary)",
-              fontSize: 11,
-              fontWeight: 500,
-              cursor: "pointer",
-              width: "fit-content",
-              transition: "color 0.15s, border-color 0.15s",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.color = "var(--buildrick-text-primary)";
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--buildrick-text-tertiary)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.color = "var(--buildrick-text-tertiary)";
-              (e.currentTarget as HTMLElement).style.borderColor = "var(--buildrick-border)";
-            }}
-          >
-            + state override
-          </button>
-        )}
       </div>
 
-      {/* Inspector Controls - Search, Collapse/Expand, Dev Mode */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--buildrick-space-2)",
-          padding: "6px var(--buildrick-space-3)",
-        }}
-      >
-        <div style={{ flex: 1 }}>
-          <InspectorControls
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onCollapseAll={collapseAll}
-            onExpandAll={expandAll}
-          />
-        </div>
-        <DevModeToggle enabled={devMode} onToggle={setDevMode} />
-      </div>
+      {/* Breadcrumb (kept; visual fit checked in Phase 4) */}
+      <ElementBreadcrumb selectedElement={selectedElement} composer={composer} />
 
-      {/* Tabs — Style / Element / Effects (pill segment control).
-          Axis changed in Phase 6 from CSS-category to concept. */}
+      {/* Tabs */}
       <div
-        style={panelStyles.tabs}
+        className="bdi-tabs"
+        role="tablist"
+        aria-label="Inspector sections"
         onKeyDown={(e) => {
           const tabIds = ["style", "element", "effects"] as const;
           const tabButtons = (e.currentTarget as HTMLDivElement).querySelectorAll('[role="tab"]');
@@ -525,92 +541,140 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           }
         }}
       >
-        <div
-          role="tablist"
-          aria-label="Inspector sections"
-          style={panelStyles.tabGroup}
-        >
-          {(["style", "element", "effects"] as const).map((tab) => {
-            const tabLabels = {
-              style: "Style",
-              element: "Element",
-              effects: "Effects",
-            };
-            const tabAriaLabels = {
-              style: "Style tab — Layout, Size, Spacing, Typography, Background, Border",
-              element: "Element tab — Link, CSS classes, element properties",
-              effects: "Effects tab — Shadows, Transforms, Animation, Interactions",
-            };
-            return (
-              <button
-                key={tab}
-                role="tab"
-                id={`inspector-tab-${tab}`}
-                aria-selected={activeTab === tab}
-                aria-controls={`inspector-tabpanel-${tab}`}
-                tabIndex={activeTab === tab ? 0 : -1}
-                style={panelStyles.tab(activeTab === tab)}
-                onClick={() => setActiveTab(tab)}
-                aria-label={tabAriaLabels[tab]}
-              >
-                {tabLabels[tab]}
-              </button>
-            );
-          })}
-        </div>
+        {(["style", "element", "effects"] as const).map((tab) => {
+          const tabLabels = { style: "Style", element: "Element", effects: "Effects" };
+          const tabAriaLabels = {
+            style: "Style tab — Layout, Size, Spacing, Typography, Background, Border",
+            element: "Element tab — Link, CSS classes, element properties",
+            effects: "Effects tab — Shadows, Transforms, Animation, Interactions",
+          };
+          return (
+            <button
+              key={tab}
+              role="tab"
+              id={`inspector-tab-${tab}`}
+              aria-selected={activeTab === tab}
+              aria-controls={`inspector-tabpanel-${tab}`}
+              tabIndex={activeTab === tab ? 0 : -1}
+              className={`bdi-tab${activeTab === tab ? " on" : ""}`}
+              onClick={() => setActiveTab(tab)}
+              aria-label={tabAriaLabels[tab]}
+              type="button"
+            >
+              {tabLabels[tab]}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Content — single InspectorTabContent renderer replaces the three
-          old per-tab components. The search overlay still pre-empts the
-          tab content when a query is active. */}
+      {/* Breakpoint + state ribbon */}
+      <div className="bdi-bpr">
+        <span>Editing</span>
+        <BreakpointPill
+          current={currentBreakpoint}
+          onChange={onBreakpointChange}
+          hasOverride={breakpointHasOverride}
+        />
+        <span className="bdi-bpr-spacer" />
+        {showStatePills ? (
+          <StatePills
+            current={currentPseudoState}
+            onChange={setCurrentPseudoState}
+            withOverrides={statesWithOverrides}
+            visibleStates={visibleStates}
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setStateSelectorManuallyShown(true)}
+            aria-label="Show state override selector"
+            title="Add hover / focus / active styles"
+            style={{
+              padding: "2px 6px",
+              background: "transparent",
+              border: "1px dashed var(--bd-border)",
+              borderRadius: 3,
+              color: "var(--bd-fg-muted)",
+              fontSize: 10,
+              fontWeight: 500,
+              cursor: "pointer",
+              fontFamily: "var(--bd-font)",
+            }}
+          >
+            + state
+          </button>
+        )}
+      </div>
+
+      {/* Inspector controls — search + collapse/expand + dev mode */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "6px 10px",
+          borderBottom: "1px solid var(--bd-border)",
+          background: "#fff",
+        }}
+      >
+        <div style={{ flex: 1 }}>
+          <InspectorControls
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            onCollapseAll={collapseAll}
+            onExpandAll={expandAll}
+          />
+        </div>
+        <DevModeToggle enabled={devMode} onToggle={setDevMode} />
+      </div>
+
+      {/* Scrollable body */}
       <div
         ref={contentRef}
+        className="bdi-panel-scroll"
         role="tabpanel"
         id={`inspector-tabpanel-${activeTab}`}
         aria-labelledby={`inspector-tab-${activeTab}`}
-        style={panelStyles.content}
       >
-        <InspectorErrorBoundary>
-          {searchQuery.trim() ? (
-            <PropertySearchResults
-              searchQuery={searchQuery}
-              styles={styles_state}
-              onChange={handleStyleChange}
-              advancedState={advancedState}
-            />
-          ) : (
-            <>
-              <InspectorTabContent
-                tabId={activeTab}
-                composer={composer}
-                selectedElement={selectedElement}
+        <div className="bdi-body">
+          <InspectorErrorBoundary>
+            {searchQuery.trim() ? (
+              <PropertySearchResults
+                searchQuery={searchQuery}
                 styles={styles_state}
                 onChange={handleStyleChange}
-                onBatchChange={handleBatchStyleChange}
-                cssContext={enrichedContext}
-                propertyStates={propertyStates}
-                expandedSections={expandedSections}
-                onToggleSection={toggleSection}
                 advancedState={advancedState}
-                onOpenMediaLibrary={onOpenMediaLibrary}
-                onOpenIconPicker={onOpenIconPicker}
-                devMode={devMode}
               />
-              {/* VariantSection lives outside the registry because its data
-                  model is tied to component instances, not element types.
-                  Uses the same expandedSections key format so collapseAll/expandAll
-                  and user preferences all apply to it. */}
-              {activeTab === "style" && selectedElement && (
-                <VariantSection
-                  composer={composer ?? null}
-                  elementId={selectedElement.id ?? null}
-                  isOpen={expandedSections.has(`${selectedElement.type}:variants`)}
-                  onToggle={() => toggleSection(selectedElement.type, "variants")}
+            ) : (
+              <>
+                <InspectorTabContent
+                  tabId={activeTab}
+                  composer={composer}
+                  selectedElement={selectedElement}
+                  styles={styles_state}
+                  onChange={handleStyleChange}
+                  onBatchChange={handleBatchStyleChange}
+                  cssContext={enrichedContext}
+                  propertyStates={propertyStates}
+                  expandedSections={expandedSections}
+                  onToggleSection={toggleSection}
+                  advancedState={advancedState}
+                  onOpenMediaLibrary={onOpenMediaLibrary}
+                  onOpenIconPicker={onOpenIconPicker}
+                  devMode={devMode}
                 />
-              )}
-            </>
-          )}
-        </InspectorErrorBoundary>
+                {activeTab === "style" && selectedElement && (
+                  <VariantSection
+                    composer={composer ?? null}
+                    elementId={selectedElement.id ?? null}
+                    isOpen={expandedSections.has(`${selectedElement.type}:variants`)}
+                    onToggle={() => toggleSection(selectedElement.type, "variants")}
+                  />
+                )}
+              </>
+            )}
+          </InspectorErrorBoundary>
+        </div>
       </div>
     </div>
   );
