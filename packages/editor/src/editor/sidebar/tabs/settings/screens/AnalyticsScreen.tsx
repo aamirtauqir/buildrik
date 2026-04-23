@@ -11,7 +11,7 @@ import type { ScreenProps } from "../types";
 // GA4 measurement ID: exactly G- followed by 10 alphanumeric characters (EC-05)
 const GA_ID_REGEX = /^G-[A-Z0-9]{10}$/i;
 
-export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
+export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) => {
   const [gaId, setGaId] = React.useState("");
   const [gaEnabled, setGaEnabled] = React.useState(false);
   const [metaPixelId, setMetaPixelId] = React.useState("");
@@ -45,6 +45,10 @@ export const AnalyticsScreen: React.FC<ScreenProps> = ({ composer }) => {
       composer.off(EVENTS.SETTINGS_CHANGE, loadSettings);
     };
   }, [composer, loadSettings]);
+
+  React.useEffect(() => {
+    onDirtyChange?.(hasChanges);
+  }, [hasChanges, onDirtyChange]);
 
   const gaError = gaId && !GA_ID_REGEX.test(gaId);
   const pixelError = metaPixelId && !/^\d{15,16}$/.test(metaPixelId);

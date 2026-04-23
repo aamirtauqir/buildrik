@@ -18,7 +18,7 @@ const DEFAULT_CUSTOM_CODE: CustomCodeConfig = {
   globalCss: "",
 };
 
-export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
+export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) => {
   const { value: savedCode, markClean } = useSettingsScreen(
     composer,
     (s) => s.customCode ?? DEFAULT_CUSTOM_CODE,
@@ -64,6 +64,10 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
     setIsDirty(false);
   }, [savedCode]);
 
+  React.useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
+
   const handleSave = React.useCallback(() => {
     if (!composer) return;
     const current = composer.getProjectSettings();
@@ -81,15 +85,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
 
   return (
     <Screen>
-      <div style={{
-        padding: "10px 12px",
-        background: "rgba(217, 119, 6, 0.08)",
-        border: "1px solid rgba(217, 119, 6, 0.3)",
-        borderRadius: 6,
-        font: "500 11.5px var(--bd-font)",
-        color: "var(--bd-warning)",
-        lineHeight: 1.5,
-      }}>⚠️ Custom code runs on all pages. Test thoroughly.</div>
+      <div style={warningBannerStyles}>⚠️ Custom code runs on all pages. Test thoroughly.</div>
 
       <Section title="Head Scripts">
         <textarea
@@ -157,6 +153,16 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer }) => {
 
     </Screen>
   );
+};
+
+const warningBannerStyles: React.CSSProperties = {
+  padding: "10px 12px",
+  background: "rgba(217, 119, 6, 0.08)",
+  border: "1px solid rgba(217, 119, 6, 0.3)",
+  borderRadius: 6,
+  font: "500 11.5px var(--bd-font)",
+  color: "var(--bd-warning)",
+  lineHeight: 1.5,
 };
 
 const validationContainerStyles: React.CSSProperties = {
