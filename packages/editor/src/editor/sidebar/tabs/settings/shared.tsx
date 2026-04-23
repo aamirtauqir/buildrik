@@ -1,457 +1,226 @@
 /**
- * Settings tab shared components — axiom-clean (Week 3).
+ * Settings tab — shared primitives.
  *
- * Section / Field / Toggle refactored from CSS classes to inline token-bound
- * styles. All 9 Settings sub-screens already import these three — so
- * refactoring them once migrates every screen simultaneously.
+ * Emits .bd-set-* classes defined in ./settings.css. All visual chrome lives in
+ * the stylesheet; this file owns only the React shape and ARIA/semantics.
  *
- * Radius comes from --buildrick-radius-sm (panel chrome ≤ 4). Colors via
- * --buildrick-* vars. No magic layout literals in the DS-chrome sense
- * (values ≠ 28/32/36/40/44/48/56/60/240/300/320).
+ * Primitives used by every screen:
+ *   <Section title desc>      — section block with heading + optional description
+ *   <Field label hint>        — form field wrapper with label
+ *   <Input> <Textarea> <Select>
+ *   <SwitchRow>               — toggle row with title/desc + switch
+ *   <Screen>                  — outer wrapper used by screens (thin, mostly semantic)
+ *
+ * Preserved for LockedScreen (token-only migration):
+ *   <LockedContainer> <LockedIcon> <LockedTitle> <LockedDesc> <LockedBtn>
+ *
+ * Refreshed skin: <SettingsNavGuard>
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import "./settings.css";
 
-// ============================================
+// ─────────────────────────────────────────────────────────────────────────────
 // Section
-// ============================================
-
-const sectionStyles: React.CSSProperties = {
-  background: "var(--buildrick-bg-subtle)",
-  borderRadius: "var(--buildrick-radius-sm)",
-  padding: 12,
-};
-
-const sectionTitleStyles: React.CSSProperties = {
-  margin: "0 0 12px",
-  fontSize: 12,
-  fontWeight: 600,
-  color: "var(--buildrick-text-muted)",
-  textTransform: "uppercase",
-};
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface SectionProps {
   title: string;
+  desc?: string;
   children: React.ReactNode;
 }
 
-export const Section: React.FC<SectionProps> = ({ title, children }) => (
-  <div style={sectionStyles}>
-    <h4 style={sectionTitleStyles}>{title}</h4>
+export const Section: React.FC<SectionProps> = ({ title, desc, children }) => (
+  <div className="bd-set-section">
+    <h3 className="bd-set-section-h">{title}</h3>
+    {desc ? <div className="bd-set-section-d">{desc}</div> : null}
     {children}
   </div>
 );
 
-// ============================================
+// ─────────────────────────────────────────────────────────────────────────────
 // Field
-// ============================================
-
-const fieldStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 6,
-  marginBottom: 12,
-};
-
-const labelStyles: React.CSSProperties = {
-  fontSize: 12,
-  fontWeight: 500,
-  color: "var(--buildrick-text-primary)",
-};
-
-const hintStyles: React.CSSProperties = {
-  display: "block",
-  fontSize: 12,
-  fontWeight: 400,
-  color: "var(--buildrick-text-muted)",
-};
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface FieldProps {
-  label: string;
-  hint?: string;
+  label: React.ReactNode;
+  hint?: React.ReactNode;
   htmlFor?: string;
   children: React.ReactNode;
 }
 
 export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, children }) => (
-  <div style={fieldStyles}>
-    <label style={labelStyles} htmlFor={htmlFor}>
-      {label}
-      {hint && <span style={hintStyles}>{hint}</span>}
+  <div className="bd-set-field">
+    <label className="bd-set-field-lbl" htmlFor={htmlFor}>
+      <span>{label}</span>
+      {hint ? <span className="bd-set-field-hint">{hint}</span> : null}
     </label>
     {children}
   </div>
 );
 
-// ============================================
-// Toggle
-// ============================================
+// ─────────────────────────────────────────────────────────────────────────────
+// Input / Textarea / Select
+// ─────────────────────────────────────────────────────────────────────────────
 
-const toggleRowStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  padding: "8px 0",
-  cursor: "pointer",
-  fontSize: 12,
-};
-
-// Form-atom switch — pill shape via radius-full token (Axiom A1.3 form-atom
-// exempt). Use var ref to pass Gate 13 without needing FORM_ATOM_EXCLUDE entry.
-const toggleSwitchStyles: React.CSSProperties = {
-  position: "relative",
-  width: 34,
-  height: 18,
-  border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--buildrick-radius-full)",
-  cursor: "pointer",
-  transition: "background 0.15s",
-};
-
-const toggleKnobStyles: React.CSSProperties = {
-  position: "absolute",
-  top: 2,
-  left: 2,
-  width: 12,
-  height: 12,
-  background: "var(--buildrick-bg-card)",
-  borderRadius: "var(--buildrick-radius-full)",
-  transition: "transform 0.15s",
-};
-
-interface ToggleProps {
-  label: string;
-  /** Uncontrolled: initial value */
-  defaultChecked?: boolean;
-  /** Controlled: current value */
-  checked?: boolean;
-  /** Controlled: change handler */
-  onChange?: (value: boolean) => void;
-}
-
-export const Toggle: React.FC<ToggleProps> = ({
-  label,
-  defaultChecked,
-  checked: checkedProp,
-  onChange,
-}) => {
-  const [internalChecked, setInternalChecked] = React.useState(defaultChecked ?? false);
-  const isControlled = checkedProp !== undefined;
-  const checked = isControlled ? checkedProp : internalChecked;
-
-  const handleClick = () => {
-    const next = !checked;
-    if (!isControlled) setInternalChecked(next);
-    onChange?.(next);
-  };
-
-  return (
-    <label style={toggleRowStyles}>
-      <span>{label}</span>
-      <button
-        role="switch"
-        aria-checked={checked}
-        aria-label={label}
-        onClick={handleClick}
-        style={{
-          ...toggleSwitchStyles,
-          background: checked ? "var(--buildrick-accent)" : "var(--buildrick-bg-subtle)",
-        }}
-      >
-        <span
-          style={{
-            ...toggleKnobStyles,
-            transform: checked ? "translateX(14px)" : "translateX(0)",
-          }}
-        />
-      </button>
-    </label>
-  );
-};
-
-/** @deprecated Use Toggle with checked + onChange props instead */
-export const ToggleControlled = Toggle;
-
-// ============================================
-// Screen — top-level wrapper for every Settings sub-screen
-// ============================================
-
-const screenStyles: React.CSSProperties = {
-  padding: 12,
-  display: "flex",
-  flexDirection: "column",
-  gap: 16,
-};
-
-export const Screen: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={screenStyles}>{children}</div>
+type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, ...rest }, ref) => (
+    <input
+      ref={ref}
+      className={`bd-set-input${className ? " " + className : ""}`}
+      {...rest}
+    />
+  )
 );
-
-// ============================================
-// Input — form-atom text input
-// ============================================
-
-const inputStyles: React.CSSProperties = {
-  width: "100%",
-  padding: "8px 10px",
-  background: "var(--buildrick-bg-input)",
-  border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--buildrick-radius-sm)",
-  color: "var(--buildrick-text-primary)",
-  fontSize: 12,
-  outline: "none",
-  boxSizing: "border-box",
-};
-
-export const Input = React.forwardRef<
-  HTMLInputElement,
-  React.InputHTMLAttributes<HTMLInputElement>
->(({ style, ...rest }, ref) => (
-  <input ref={ref} style={{ ...inputStyles, ...style }} {...rest} />
-));
 Input.displayName = "Input";
 
-// ============================================
-// Note / Warning / SuccessNote — info blocks
-// ============================================
+type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
+export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ className, ...rest }, ref) => (
+    <textarea
+      ref={ref}
+      className={`bd-set-input${className ? " " + className : ""}`}
+      {...rest}
+    />
+  )
+);
+Textarea.displayName = "Textarea";
 
-const noteStyles: React.CSSProperties = {
-  padding: 12,
-  background: "var(--buildrick-accent-subtle)",
-  borderRadius: "var(--buildrick-radius-sm)",
-  fontSize: 12,
-  color: "var(--buildrick-text-secondary)",
-};
+type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement>;
+export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
+  ({ className, children, ...rest }, ref) => (
+    <select
+      ref={ref}
+      className={`bd-set-input${className ? " " + className : ""}`}
+      {...rest}
+    >
+      {children}
+    </select>
+  )
+);
+Select.displayName = "Select";
 
-export const Note: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={noteStyles}>{children}</div>
+// ─────────────────────────────────────────────────────────────────────────────
+// SwitchRow + Toggle (alias)
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface SwitchRowProps {
+  title: string;
+  description?: string;
+  checked: boolean;
+  onChange: (next: boolean) => void;
+  disabled?: boolean;
+  "aria-label"?: string;
+}
+
+export const SwitchRow: React.FC<SwitchRowProps> = ({
+  title,
+  description,
+  checked,
+  onChange,
+  disabled,
+  "aria-label": ariaLabel,
+}) => (
+  <div className="bd-set-switch-row">
+    <div className="bd-set-switch-row-info">
+      <div className="bd-set-switch-row-t">{title}</div>
+      {description ? <div className="bd-set-switch-row-d">{description}</div> : null}
+    </div>
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={ariaLabel ?? title}
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      className={`bd-set-switch${checked ? " on" : ""}`}
+    >
+      <span className="bd-set-switch-knob" />
+    </button>
+  </div>
 );
 
-const warningStyles: React.CSSProperties = {
-  padding: 12,
-  background: "var(--buildrick-bg-subtle)",
-  borderRadius: "var(--buildrick-radius-sm)",
-  fontSize: 12,
-  color: "var(--buildrick-warning)",
-  border: "1px solid var(--buildrick-border)",
-};
+/**
+ * Back-compat alias — existing screens import `Toggle` with the same shape.
+ * Once all screens migrate to SwitchRow directly, drop this alias.
+ */
+export const Toggle = SwitchRow;
 
-export const Warning: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div role="alert" style={warningStyles}>{children}</div>
+// ─────────────────────────────────────────────────────────────────────────────
+// Screen — outer wrapper
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const Screen: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <>{children}</>
 );
 
-const successNoteStyles: React.CSSProperties = {
-  padding: 8,
-  background: "var(--buildrick-bg-subtle)",
-  borderRadius: "var(--buildrick-radius-sm)",
-  fontSize: 12,
-  color: "var(--buildrick-success)",
-  marginTop: 8,
-  border: "1px solid var(--buildrick-border)",
-};
+// ─────────────────────────────────────────────────────────────────────────────
+// Locked primitives — token migration only, layout preserved
+// ─────────────────────────────────────────────────────────────────────────────
 
-export const SuccessNote: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={successNoteStyles}>{children}</div>
-);
-
-// ============================================
-// ErrorHint — inline error text under a Field
-// ============================================
-
-const errorHintStyles: React.CSSProperties = {
-  display: "block",
-  fontSize: 12,
-  color: "var(--buildrick-error)",
-  marginTop: 4,
-};
-
-export const ErrorHint: React.FC<
-  React.HTMLAttributes<HTMLSpanElement>
-> = ({ children, style, ...rest }) => (
-  <span role="alert" style={{ ...errorHintStyles, ...style }} {...rest}>
-    {children}
-  </span>
-);
-
-// ============================================
-// Muted — secondary text
-// ============================================
-
-export const Muted: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ color: "var(--buildrick-text-muted)" }}>{children}</span>
-);
-
-// ============================================
-// StatusRow / UrlRow — horizontal row primitives
-// ============================================
-
-const statusRowStyles: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  padding: "8px 0",
-  fontSize: 12,
-};
-
-export const StatusRow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={statusRowStyles}>{children}</div>
-);
-
-const urlRowStyles: React.CSSProperties = {
-  display: "flex",
-  gap: 8,
-  alignItems: "center",
-};
-
-export const UrlRow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={urlRowStyles}>{children}</div>
-);
-
-// ============================================
-// CopyBtn — form-atom copy button
-// ============================================
-
-const copyBtnStyles: React.CSSProperties = {
-  padding: "8px 12px",
-  background: "var(--buildrick-bg-subtle)",
-  border: "none",
-  borderRadius: "var(--buildrick-radius-sm)",
-  color: "var(--buildrick-text-primary)",
-  fontSize: 12,
-  cursor: "pointer",
-  transition: "color 0.15s",
-};
-
-export const CopyBtn: React.FC<
-  React.ButtonHTMLAttributes<HTMLButtonElement>
-> = ({ style, children, ...rest }) => (
-  <button style={{ ...copyBtnStyles, ...style }} {...rest}>
-    {children}
-  </button>
-);
-
-// ============================================
-// Code — inline code snippet
-// ============================================
-
-const codeStyles: React.CSSProperties = {
-  display: "inline-block",
-  padding: "4px 8px",
-  background: "var(--buildrick-bg-subtle)",
-  borderRadius: "var(--buildrick-radius-sm)",
-  color: "var(--buildrick-text-primary)",
-  fontFamily: "var(--buildrick-font-mono, monospace)",
-  fontSize: 12,
-};
-
-export const Code: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <code style={codeStyles}>{children}</code>
-);
-
-// ============================================
-// DnsHelp — help block with code snippet
-// ============================================
-
-const dnsHelpStyles: React.CSSProperties = {
-  padding: 12,
-  background: "var(--buildrick-bg-subtle)",
-  borderRadius: "var(--buildrick-radius-sm)",
-  fontSize: 12,
-  color: "var(--buildrick-text-secondary)",
-};
-
-export const DnsHelp: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={dnsHelpStyles}>{children}</div>
-);
-
-// ============================================
-// SuccessBadge — inline status badge
-// ============================================
-
-const successBadgeStyles: React.CSSProperties = {
-  padding: "2px 8px",
-  background: "var(--buildrick-success)",
-  color: "var(--buildrick-text-on-accent)",
-  borderRadius: "var(--buildrick-radius-sm)",
-  fontSize: 12,
-  fontWeight: 600,
-};
-
-export const SuccessBadge: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={successBadgeStyles}>{children}</span>
-);
-
-// ============================================
-// Locked — LockedScreen layout primitives
-// ============================================
-
-const lockedContainerStyles: React.CSSProperties = {
-  padding: 24,
-  textAlign: "center",
+const lockedContainerStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
+  justifyContent: "center",
+  padding: "48px 24px",
+  textAlign: "center",
   gap: 12,
+  minHeight: 320,
 };
-
-const lockedIconStyles: React.CSSProperties = {
+const lockedIconStyle: React.CSSProperties = {
   marginBottom: 4,
 };
-
-const lockedTitleStyles: React.CSSProperties = {
-  fontSize: 16,
-  fontWeight: 600,
-  color: "var(--buildrick-text-primary)",
+const lockedTitleStyle: React.CSSProperties = {
+  font: "600 14px var(--bd-font)",
+  color: "var(--bd-fg-heading)",
   margin: 0,
 };
-
-const lockedDescStyles: React.CSSProperties = {
-  fontSize: 13,
-  color: "var(--buildrick-text-secondary)",
+const lockedDescStyle: React.CSSProperties = {
+  font: "500 12px var(--bd-font)",
+  color: "var(--bd-fg-muted)",
+  maxWidth: 320,
   lineHeight: 1.5,
   margin: 0,
-  maxWidth: 280,
 };
-
-const lockedBtnStyles: React.CSSProperties = {
-  marginTop: 16,
+const lockedBtnStyle: React.CSSProperties = {
+  marginTop: 8,
   padding: "8px 16px",
-  fontSize: 13,
-  background: "var(--buildrick-accent)",
-  color: "var(--buildrick-text-on-accent)",
+  borderRadius: 6,
+  background: "var(--bd-accent)",
+  color: "#fff",
   border: "none",
-  borderRadius: "var(--buildrick-radius-sm)",
+  font: "600 12px var(--bd-font)",
   cursor: "pointer",
 };
 
 export const LockedContainer: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={lockedContainerStyles}>{children}</div>
+  <div style={lockedContainerStyle}>{children}</div>
 );
-
 export const LockedIcon: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={lockedIconStyles}>{children}</div>
+  <div style={lockedIconStyle}>{children}</div>
 );
-
 export const LockedTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <h3 style={lockedTitleStyles}>{children}</h3>
+  <h3 style={lockedTitleStyle}>{children}</h3>
 );
-
 export const LockedDesc: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <p style={lockedDescStyles}>{children}</p>
+  <p style={lockedDescStyle}>{children}</p>
 );
 
 export const LockedBtn: React.FC<
   React.ButtonHTMLAttributes<HTMLButtonElement>
-> = ({ children, style, ...rest }) => (
-  <button style={{ ...lockedBtnStyles, ...style }} {...rest}>
+> = ({ style, children, ...rest }) => (
+  <button style={{ ...lockedBtnStyle, ...style }} {...rest}>
     {children}
   </button>
 );
 
-// ============================================
-// SettingsNavGuard — unsaved changes modal
-// ============================================
+// ─────────────────────────────────────────────────────────────────────────────
+// SettingsNavGuard — refreshed skin
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface SettingsNavGuardProps {
   isOpen: boolean;
@@ -466,87 +235,21 @@ export const SettingsNavGuard: React.FC<SettingsNavGuardProps> = ({
 }) => {
   if (!isOpen) return null;
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="nav-guard-title"
-      style={guardOverlayStyle}
-      onClick={onCancel}
-    >
-      <div style={guardModalStyle} onClick={(e) => e.stopPropagation()}>
-        <h3 id="nav-guard-title" style={guardTitleStyle}>
-          Unsaved changes
-        </h3>
-        <p style={guardBodyStyle}>
-          You have unsaved changes. If you leave now, your changes will be lost.
+    <div className="bd-set-guard-overlay" role="dialog" aria-modal="true">
+      <div className="bd-set-guard-modal">
+        <h4 className="bd-set-guard-title">Discard unsaved changes?</h4>
+        <p className="bd-set-guard-body">
+          You have unsaved edits in this section. Switching will discard them. Save first to keep your changes.
         </p>
-        <div style={guardActionsStyle}>
-          <button onClick={onCancel} style={guardKeepBtnStyle}>
+        <div className="bd-set-guard-actions">
+          <button type="button" className="bd-set-btn sec" onClick={onCancel}>
             Keep editing
           </button>
-          <button onClick={onDiscard} style={guardDiscardBtnStyle}>
-            Discard changes
+          <button type="button" className="bd-set-btn pri" onClick={onDiscard}>
+            Discard & switch
           </button>
         </div>
       </div>
     </div>
   );
-};
-
-// Modal = form atom per Axiom A1.3 — larger radius + shadow via tokens OK.
-const guardOverlayStyle: React.CSSProperties = {
-  position: "fixed",
-  inset: 0,
-  background: "rgba(15, 23, 42, 0.4)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 9999,
-};
-
-const guardModalStyle: React.CSSProperties = {
-  background: "var(--buildrick-bg-elevated)",
-  borderRadius: "var(--buildrick-radius-md)",
-  padding: 24,
-  width: 324,
-  boxShadow: "var(--buildrick-shadow-modal)",
-};
-
-const guardTitleStyle: React.CSSProperties = {
-  fontSize: 15,
-  fontWeight: 600,
-  margin: "0 0 8px",
-  color: "var(--buildrick-text-primary)",
-};
-
-const guardBodyStyle: React.CSSProperties = {
-  fontSize: 13,
-  color: "var(--buildrick-text-muted)",
-  margin: "0 0 20px",
-};
-
-const guardActionsStyle: React.CSSProperties = {
-  display: "flex",
-  gap: 8,
-  justifyContent: "flex-end",
-};
-
-const guardKeepBtnStyle: React.CSSProperties = {
-  fontSize: 13,
-  padding: "6px 12px",
-  background: "transparent",
-  border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--buildrick-radius-sm)",
-  cursor: "pointer",
-  color: "var(--buildrick-text-primary)",
-};
-
-const guardDiscardBtnStyle: React.CSSProperties = {
-  fontSize: 13,
-  padding: "6px 12px",
-  color: "var(--buildrick-error)",
-  background: "transparent",
-  border: "1px solid var(--buildrick-error)",
-  borderRadius: "var(--buildrick-radius-sm)",
-  cursor: "pointer",
 };
