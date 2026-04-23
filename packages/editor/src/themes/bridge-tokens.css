@@ -96,10 +96,10 @@
   --bd-leading-normal: 1.5;
   --bd-leading-relaxed: 1.6;
 
-  /* Shell layout */
+  /* Shell layout — matches _shared.css left-panel prototype spec */
   --bd-shell-header-h: 48px;
-  --bd-shell-rail-w: 56px;
-  --bd-shell-panel-w: 320px;
+  --bd-shell-rail-w: 48px;
+  --bd-shell-panel-w: 280px;
   --bd-shell-insp-w: 280px;
   --bd-shell-foot-h: 32px;
 }

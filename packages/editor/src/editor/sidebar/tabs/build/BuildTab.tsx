@@ -1,8 +1,14 @@
 /**
- * BuildTab — Add tab shell (v4)
+ * BuildTab — Add tab shell.
  *
- * Layout: PanelHeader / ModeSwitch / SearchBar / panel-scroll / panel-bottom
+ * Layout: PanelHeader / SearchBar / panel-scroll / panel-bottom
  * where panel-bottom is pinned (flex-shrink: 0) and hidden during search.
+ *
+ * Sections mode (pre-built sections catalog + lazy chunk) was removed on
+ * 2026-04-23 — the UI switch had been stripped earlier and ~1300 lines
+ * across catalog/sections.ts, components/SectionsMode.tsx, and the
+ * accompanying hook were unreachable dead code. Only the elements grid
+ * remains.
  */
 
 import * as React from "react";
@@ -10,70 +16,15 @@ import type { Composer } from "../../../../engine";
 import type { BlockData } from "../../../../shared/types";
 import { PanelShell } from "@shared/ui/panel";
 import { SearchBar } from "../../shared/SearchBar";
-import { CATALOG } from "./catalog/catalog";
+import { CATALOG, flatCatalog } from "./catalog/catalog";
 import { useBuildTab } from "./hooks/useBuildTab";
 import { useCallout } from "./hooks/useCallout";
+import { TipsFooter } from "./components/TipsFooter";
 import { CatAccordion } from "./components/CatAccordion";
 import { SearchResults } from "./components/SearchResults";
-import { TipsFooter } from "./components/TipsFooter";
 import { MyComponents } from "./components/MyComponents";
 import { TransitionCallout } from "./components/TransitionCallout";
 import "./BuildTab.css";
-
-// SectionsMode pulls in ~92 KB of inline HTML. Lazy-load it.
-const SectionsMode = React.lazy(() =>
-  import("./components/SectionsMode").then((m) => ({ default: m.SectionsMode }))
-);
-
-const SectionsFallback: React.FC = () => (
-  <div className="bld-sections-mode" aria-busy="true">
-    <div className="bld-sections-scroll">
-      <div className="bld-sections-family-header">Loading sections...</div>
-    </div>
-  </div>
-);
-
-/**
- * Error boundary for the lazy SectionsMode chunk — if the chunk fails
- * to load (network error, dev server restart), show a retry affordance
- * instead of an infinite spinner.
- */
-class SectionsErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { error: Error | null }
-> {
-  state = { error: null as Error | null };
-  static getDerivedStateFromError(error: Error) {
-    return { error };
-  }
-  componentDidCatch(error: Error) {
-    console.error("[buildtab] SectionsMode failed to load", error);
-  }
-  handleRetry = () => {
-    this.setState({ error: null });
-  };
-  render() {
-    if (this.state.error) {
-      return (
-        <div className="bld-sections-mode" role="alert">
-          <div className="bld-sections-scroll">
-            <div className="bld-sections-family-header">
-              Failed to load Sections.{" "}
-              <button
-                type="button"
-                className="bld-retry-btn"
-                onClick={this.handleRetry}
-              >
-                Reload
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
 
 export interface BuildTabProps {
   composer: Composer | null;
@@ -85,13 +36,7 @@ export interface BuildTabProps {
   aiEnabled?: boolean;
 }
 
-export const BuildTab: React.FC<BuildTabProps> = ({
-  composer,
-  onBlockClick,
-  isPinned,
-  onPinToggle,
-  onClose,
-}) => {
+export const BuildTab: React.FC<BuildTabProps> = ({ composer, onBlockClick }) => {
   const tab = useBuildTab(composer, onBlockClick);
   const callout = useCallout();
   const isSearching = tab.searchQuery.trim().length > 0;
@@ -116,40 +61,13 @@ export const BuildTab: React.FC<BuildTabProps> = ({
     return () => document.removeEventListener("keydown", handler);
   }, []);
 
+  const blocksSubtitle = `${flatCatalog.length} blocks · ${CATALOG.length} categories`;
+
   return (
     <PanelShell className="bld-container">
-      <PanelShell.Header title="Add" isPinned={isPinned} onPinToggle={onPinToggle} onClose={onClose} />
+      <PanelShell.Header title="Add" subtitle={blocksSubtitle} />
 
       <div className="bld-content">
-        {/* Mode Switch */}
-        <div className="bld-mode-switch" role="tablist" aria-label="Add tab mode">
-          {(["elements", "sections"] as const).map((m) => (
-            <button
-              key={m}
-              className={`bld-mode-pill${tab.mode === m ? " bld-mode-pill--active" : ""}`}
-              onClick={() => tab.setMode(m)}
-              role="tab"
-              aria-selected={tab.mode === m}
-              tabIndex={tab.mode === m ? 0 : -1}
-              onKeyDown={(e) => {
-                if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-                  e.preventDefault();
-                  tab.setMode(m === "elements" ? "sections" : "elements");
-                } else if (e.key === "Home") {
-                  e.preventDefault();
-                  tab.setMode("elements");
-                } else if (e.key === "End") {
-                  e.preventDefault();
-                  tab.setMode("sections");
-                }
-              }}
-            >
-              {m === "elements" ? "Elements" : "Sections"}
-            </button>
-          ))}
-        </div>
-
-        {/* Search */}
         <div
           className="bld-search-wrap"
           onKeyDown={(e) => {
@@ -163,20 +81,13 @@ export const BuildTab: React.FC<BuildTabProps> = ({
             id="bld-search-input"
             value={tab.searchQuery}
             onChange={tab.setSearchQuery}
-            placeholder={tab.mode === "sections" ? "Search sections..." : "Search elements..."}
+            placeholder="Search blocks"
             debounceMs={150}
-            kbdHint="/"
+            kbdHint="⌘K"
           />
         </div>
 
-        {/* Scroll region */}
-        {tab.mode === "sections" ? (
-          <SectionsErrorBoundary>
-            <React.Suspense fallback={<SectionsFallback />}>
-              <SectionsMode composer={composer} searchQuery={tab.searchQuery} />
-            </React.Suspense>
-          </SectionsErrorBoundary>
-        ) : isSearching ? (
+        {isSearching ? (
           <div className="bld-scroll">
             <SearchResults
               query={tab.searchQuery}
@@ -196,9 +107,6 @@ export const BuildTab: React.FC<BuildTabProps> = ({
               composer={composer}
             />
 
-            <div className="bld-divider" />
-            <div className="bld-sec-label">Categories</div>
-
             <div className="bld-cats">
               {CATALOG.map((cat) => (
                 <CatAccordion
@@ -214,8 +122,7 @@ export const BuildTab: React.FC<BuildTabProps> = ({
           </div>
         )}
 
-        {/* Pinned bottom strip — hidden during search, hidden in Sections mode */}
-        {!isSearching && tab.mode === "elements" && (
+        {!isSearching && (
           <div className="bld-panel-bottom">
             <TipsFooter
               tipIdx={tab.tipIdx}
@@ -227,22 +134,6 @@ export const BuildTab: React.FC<BuildTabProps> = ({
               collapsed={tab.tipsCollapsed}
               onToggleCollapsed={tab.toggleTipsCollapsed}
             />
-            <div className="bld-footer-hint" role="note">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={1.75}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              <span>Drag elements onto canvas or click to insert</span>
-            </div>
           </div>
         )}
       </div>

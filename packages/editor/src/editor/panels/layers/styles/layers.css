@@ -82,41 +82,44 @@
   color: var(--buildrick-text-primary);
 }
 
-.buildrick-layer-row {
+/* Scoped with parent class to win cascade against components.css +
+   ux-fixes.css which both redefine .buildrick-layer-row globally. */
+.buildrick-layers-panel .buildrick-layer-row {
   position: relative;
   display: flex;
   align-items: center;
   gap: 6px;
   height: var(--layer-row-height);
-  padding: 0 8px;
-  border-radius: 0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: none;
   cursor: pointer;
   transition: var(--buildrick-transition-fast);
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--buildrick-text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--buildrick-text-primary);
   background: transparent;
 }
 
-.buildrick-layer-row:hover {
-  background: var(--buildrick-bg-hover);
+.buildrick-layers-panel .buildrick-layer-row:hover {
+  background: var(--buildrick-bg-subtle);
 }
 
-.buildrick-layer-row.is-selected {
+.buildrick-layers-panel .buildrick-layer-row.is-selected {
   background: var(--buildrick-accent-tint);
-  font-weight: 500;
-  color: var(--buildrick-text-primary);
+  border-color: transparent;
+  font-weight: 600;
+  color: var(--buildrick-accent);
 }
 
-.buildrick-layer-row.is-selected::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--buildrick-accent);
-  border-radius: 0 1px 1px 0;
+.buildrick-layers-panel .buildrick-layer-row.is-selected .buildrick-layer-icon {
+  color: var(--buildrick-accent);
+}
+
+/* Kill the ux-fixes.css ::before 3px accent bar — new-design has no
+   left indicator strip on selected rows; tinted background is enough. */
+.buildrick-layers-panel .buildrick-layer-row::before {
+  display: none;
 }
 
 .buildrick-layer-row.is-dragging {

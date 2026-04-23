@@ -164,11 +164,11 @@
 
 .pg-row {
   height: 32px;
-  padding: 0 12px;
+  padding: 0 10px;
   display: flex;
   align-items: center;
   border: 1px solid transparent;
-  border-radius: 0;
+  border-radius: 5px;
   cursor: pointer;
   flex-shrink: 0;
   position: relative;
@@ -176,24 +176,13 @@
   gap: 0;
 }
 
-.pg-row:hover { background: var(--buildrick-bg-hover); }
+.pg-row:hover { background: var(--buildrick-bg-subtle); }
 
 .pg-row--active {
   background: var(--buildrick-accent-tint, var(--buildrick-bg-hover));
   color: var(--buildrick-accent, #2D6DFF);
   font-weight: 500;
   border-color: transparent;
-}
-
-.pg-row--active::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 6px;
-  bottom: 6px;
-  width: 3px;
-  background: var(--buildrick-accent);
-  border-radius: 0 2px 2px 0;
 }
 
 .pg-row__icon {
@@ -210,18 +199,18 @@
 }
 
 .pg-row--active .pg-row__icon {
-  background: var(--buildrick-accent-subtle, rgba(99,102,241,0.15));
+  background: var(--buildrick-accent-tint, rgba(45, 109, 255, 0.10));
   color: var(--buildrick-accent);
 }
 
 .pg-row__name {
   flex: 1;
-  font-size: 13px;
-  font-weight: 400;
+  font-size: 11.5px;
+  font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--buildrick-text-secondary);
+  color: var(--buildrick-text-primary);
   min-width: 0;
 }
 
@@ -233,8 +222,8 @@
 .pg-row__rename {
   flex: 1;
   font-size: 11.5px;
-  background: rgba(99,102,241,0.08);
-  border: 1px solid rgba(99,102,241,0.4);
+  background: var(--buildrick-accent-subtle, rgba(45, 109, 255, 0.05));
+  border: 1px solid var(--buildrick-accent);
   border-radius: 4px;
   padding: 2px 7px;
   color: var(--buildrick-text-primary);
@@ -836,15 +825,7 @@
 .pages-panel .pg-row__grip:active { cursor: grabbing; }
 
 .pages-panel .pg-row__thumb {
-  position: relative;
-  width: 32px;
-  height: 20px;
-  border: 1px solid var(--buildrick-border, rgba(255,255,255,0.08));
-  border-radius: 3px;
-  flex-shrink: 0;
-  overflow: hidden;
-  background: var(--buildrick-bg-subtle);
-  border: 1px solid var(--buildrick-border);
+  display: none;
 }
 
 .pages-panel .pg-row__thumb--t-hero { background: linear-gradient(180deg, #1b2950, #223070 40%, #0c0c14 100%); }

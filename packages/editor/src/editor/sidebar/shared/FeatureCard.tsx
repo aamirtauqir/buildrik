@@ -144,13 +144,13 @@ const cardStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 12,
   width: "100%",
-  height: 72,
-  padding: "12px 16px",
-  background: "var(--buildrick-bg-hover)",
+  height: 60,
+  padding: "10px 14px",
+  background: "var(--buildrick-bg-card)",
   border: "1px solid var(--buildrick-border)",
-  borderRadius: 12,
+  borderRadius: 8,
   cursor: "pointer",
-  transition: "background 0.15s ease, border-color 0.15s ease, transform 0.1s ease",
+  transition: "background 0.15s ease, border-color 0.15s ease",
   textAlign: "left",
 };
 
@@ -168,11 +168,11 @@ const iconContainerStyles: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  width: 40,
-  height: 40,
-  background: "var(--buildrick-bg-active)",
-  borderRadius: 10,
-  color: "var(--buildrick-text-primary)",
+  width: 32,
+  height: 32,
+  background: "var(--buildrick-bg-subtle)",
+  borderRadius: 8,
+  color: "var(--buildrick-text-secondary)",
   flexShrink: 0,
 };
 
@@ -227,11 +227,12 @@ const badgeStyles: React.CSSProperties = {
 };
 
 const planBadgeStyles: React.CSSProperties = {
-  background: "var(--buildrick-accent-subtle, rgba(124, 125, 255, 0.15))",
+  background: "var(--buildrick-accent-tint, rgba(45, 109, 255, 0.10))",
   color: "var(--buildrick-accent)",
-  fontSize: 12,
+  fontSize: 10,
+  fontWeight: 700,
   textTransform: "uppercase",
-  letterSpacing: "0.3px",
+  letterSpacing: "0.08em",
 };
 
 const comingSoonBadgeStyles: React.CSSProperties = {

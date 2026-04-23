@@ -13,30 +13,7 @@ describe("useBuildTab", () => {
     sessionStorage.clear();
   });
 
-  describe("setMode clears search (v4 regression guard)", () => {
-    it("clears pending search query when mode changes to sections", () => {
-      const { result } = renderHook(() => useBuildTab(null));
-      act(() => result.current.setSearchQuery("heading"));
-      expect(result.current.searchQuery).toBe("heading");
-      act(() => result.current.setMode("sections"));
-      expect(result.current.searchQuery).toBe("");
-    });
-
-    it("clears pending search query when mode changes to elements", () => {
-      const { result } = renderHook(() => useBuildTab(null));
-      act(() => result.current.setMode("sections"));
-      act(() => result.current.setSearchQuery("hero"));
-      act(() => result.current.setMode("elements"));
-      expect(result.current.searchQuery).toBe("");
-    });
-
-    it("preserves the new mode even when query was active", () => {
-      const { result } = renderHook(() => useBuildTab(null));
-      act(() => result.current.setSearchQuery("card"));
-      act(() => result.current.setMode("sections"));
-      expect(result.current.mode).toBe("sections");
-    });
-  });
+  // Sections-mode tests removed 2026-04-23 — Sections mode deleted in P1 pass.
 
   describe("tip nav wrap at boundaries", () => {
     it("tipNext cycles forward and wraps back to 0", () => {

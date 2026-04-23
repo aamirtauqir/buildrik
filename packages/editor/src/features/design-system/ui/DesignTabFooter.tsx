@@ -19,6 +19,7 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
   onReview,
 }) => (
   <div
+    data-screen-savebar="true"
     style={{
       display: "flex",
       alignItems: "center",

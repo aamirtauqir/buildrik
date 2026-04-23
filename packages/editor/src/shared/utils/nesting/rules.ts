@@ -181,6 +181,11 @@ export const ELEMENT_RULES: Record<ElementType, ElementRule> = {
       ElementCategory.FLOW,
     ],
     allowChildren: true,
+    // Form controls + nested layout are explicitly forbidden inside headings
+    // per HTML5 phrasing-content rules. Without "input"/"textarea"/"select"
+    // here, canNestElement would accept them via the INLINE category overlap,
+    // which then causes silent insert failures when the engine rejects the
+    // HTML5-invalid nesting downstream.
     forbiddenChildren: [
       "section",
       "header",
@@ -191,6 +196,15 @@ export const ELEMENT_RULES: Record<ElementType, ElementRule> = {
       "list",
       "heading",
       "paragraph",
+      "input",
+      "textarea",
+      "select",
+      "button",
+      "checkbox",
+      "radio",
+      "switch",
+      "slider",
+      "upload",
     ],
     implicitRole: "heading",
     description: "Heading element (h1-h6)",
@@ -198,6 +212,8 @@ export const ELEMENT_RULES: Record<ElementType, ElementRule> = {
   paragraph: {
     categories: [ElementCategory.TEXT, ElementCategory.BLOCK, ElementCategory.FLOW],
     allowChildren: true,
+    // Same reasoning as heading: form controls would pass canNestElement
+    // via INLINE category overlap, causing silent insert failures.
     forbiddenChildren: [
       "section",
       "header",
@@ -211,6 +227,15 @@ export const ELEMENT_RULES: Record<ElementType, ElementRule> = {
       "container",
       "flex",
       "grid",
+      "input",
+      "textarea",
+      "select",
+      "button",
+      "checkbox",
+      "radio",
+      "switch",
+      "slider",
+      "upload",
     ],
     description: "Paragraph text element",
   },

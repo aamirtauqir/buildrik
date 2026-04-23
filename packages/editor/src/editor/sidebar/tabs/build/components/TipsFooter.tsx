@@ -1,11 +1,16 @@
 /**
- * TipsFooter — PRO TIP carousel rendered at the bottom of the Build Tab
- * Supports collapsed state (compact header = ROW_SM) vs expanded (full carousel).
+ * TipsFooter — PRO TIPS carousel at bottom of Add panel.
+ *
+ * Rewritten against the `--bd-*` bridge tokens from
+ * src/themes/bridge-tokens.css. All colors, spacing, type come from tokens
+ * (no raw hex, no class dependency). Collapsed = 1-line header; expanded =
+ * header + tip card + dot pagination.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { Lightbulb } from "lucide-react";
+import { Lightbulb, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
 import { TIPS } from "../catalog/tips";
 
 export interface TipsFooterProps {
@@ -19,6 +24,116 @@ export interface TipsFooterProps {
   onToggleCollapsed?: () => void;
 }
 
+// ── Styles (token-bound) ─────────────────────────────────────────────────────
+
+const wrap: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 6,
+  fontFamily: "var(--bd-font)",
+};
+
+const header: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 6,
+  minHeight: 20,
+};
+
+const label: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 5,
+  fontFamily: "var(--bd-font)",
+  fontSize: "var(--bd-text-2xs)",
+  fontWeight: 600,
+  letterSpacing: "var(--bd-track-widest)",
+  textTransform: "uppercase",
+  color: "var(--bd-fg-muted)",
+  flexShrink: 0,
+};
+
+const counter: React.CSSProperties = {
+  fontFamily: "var(--bd-mono)",
+  fontSize: "var(--bd-text-xs)",
+  fontWeight: 500,
+  color: "var(--bd-fg-muted)",
+  marginLeft: 8,
+  fontVariantNumeric: "tabular-nums",
+};
+
+const nav: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 2,
+  marginLeft: "auto",
+};
+
+const arr: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 20,
+  height: 20,
+  minHeight: 20,
+  padding: 0,
+  border: "none",
+  borderRadius: 4,
+  background: "transparent",
+  color: "var(--bd-fg-muted)",
+  cursor: "pointer",
+  lineHeight: 1,
+  transition: "background 120ms, color 120ms",
+};
+
+const card: React.CSSProperties = {
+  fontFamily: "var(--bd-font)",
+  fontSize: "var(--bd-text-sm-plus)",
+  fontWeight: 500,
+  lineHeight: "var(--bd-leading-normal)",
+  color: "var(--bd-fg-secondary)",
+  textAlign: "center",
+};
+
+const cardBold: React.CSSProperties = {
+  color: "var(--bd-fg-primary)",
+  fontWeight: 600,
+  marginRight: 4,
+};
+
+const dots: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 4,
+  paddingTop: 2,
+};
+
+const dot = (active: boolean): React.CSSProperties => ({
+  width: 5,
+  height: 5,
+  minHeight: 5,
+  padding: 0,
+  border: "none",
+  borderRadius: "50%",
+  background: active ? "var(--bd-accent)" : "var(--bd-border-medium)",
+  cursor: "pointer",
+  transform: active ? "scale(1.1)" : "none",
+  transition: "background 120ms, transform 120ms",
+});
+
+// Simple hover-bg via inline handlers since we're avoiding new CSS classes.
+const hoverIn = (e: React.MouseEvent<HTMLElement>) => {
+  e.currentTarget.style.background = "var(--bd-bg-subtle)";
+  e.currentTarget.style.color = "var(--bd-fg-primary)";
+};
+const hoverOut = (e: React.MouseEvent<HTMLElement>) => {
+  e.currentTarget.style.background = "transparent";
+  e.currentTarget.style.color = "var(--bd-fg-muted)";
+};
+
+// ── Component ────────────────────────────────────────────────────────────────
+
 export const TipsFooter: React.FC<TipsFooterProps> = ({
   tipIdx,
   onPrev,
@@ -30,13 +145,12 @@ export const TipsFooter: React.FC<TipsFooterProps> = ({
   onToggleCollapsed,
 }) => {
   if (dismissed) return null;
-
   const tip = TIPS[tipIdx];
 
   if (collapsed) {
     return (
       <div
-        className="bld-tips-hd"
+        style={{ ...header, cursor: "pointer" }}
         onClick={onToggleCollapsed}
         role="button"
         tabIndex={0}
@@ -48,65 +162,83 @@ export const TipsFooter: React.FC<TipsFooterProps> = ({
             onToggleCollapsed?.();
           }
         }}
-        style={{ cursor: "pointer" }}
       >
-        <span className="bld-tips-lbl"><Lightbulb size={12} aria-hidden /> Pro Tips</span>
-        <span style={{ fontSize: 11, color: "var(--buildrick-text-muted)", fontFamily: "monospace" }}>
+        <span style={label}>
+          <Lightbulb size={12} aria-hidden color="var(--bd-accent)" />
+          Pro tips
+        </span>
+        <span style={counter}>
           {tipIdx + 1} / {TIPS.length}
         </span>
-        <div className="bld-tips-nav">
-          <span className="bld-tip-arr" aria-hidden="true">˅</span>
-        </div>
+        <span style={{ ...arr, marginLeft: "auto" }} aria-hidden="true">
+          <ChevronUp size={12} />
+        </span>
       </div>
     );
   }
 
   return (
-    <>
-      <div className="bld-tips-hd">
-        <span className="bld-tips-lbl"><Lightbulb size={12} aria-hidden /> Pro Tips</span>
-        <div className="bld-tips-nav">
-          <button className="bld-tip-arr" onClick={onPrev} aria-label="Previous tip">
-            ‹
+    <div style={wrap}>
+      <div style={header}>
+        <span style={label}>
+          <Lightbulb size={12} aria-hidden color="var(--bd-accent)" />
+          Pro tips
+        </span>
+        <span style={counter}>
+          {tipIdx + 1} / {TIPS.length}
+        </span>
+        <div style={nav}>
+          <button
+            type="button"
+            style={arr}
+            onClick={onPrev}
+            onMouseEnter={hoverIn}
+            onMouseLeave={hoverOut}
+            aria-label="Previous tip"
+          >
+            <ChevronLeft size={12} />
           </button>
-          <button className="bld-tip-arr" onClick={onNext} aria-label="Next tip">
-            ›
+          <button
+            type="button"
+            style={arr}
+            onClick={onNext}
+            onMouseEnter={hoverIn}
+            onMouseLeave={hoverOut}
+            aria-label="Next tip"
+          >
+            <ChevronRight size={12} />
           </button>
           {onToggleCollapsed && (
             <button
-              className="bld-tip-arr"
+              type="button"
+              style={arr}
               onClick={onToggleCollapsed}
+              onMouseEnter={hoverIn}
+              onMouseLeave={hoverOut}
               aria-label="Collapse tips"
               aria-expanded={true}
             >
-              ˄
-            </button>
-          )}
-          {onDismiss && (
-            <button
-              className="bld-tip-arr bld-tip-dismiss"
-              onClick={onDismiss}
-              aria-label="Dismiss tips"
-            >
-              ✕
+              <ChevronDown size={12} />
             </button>
           )}
         </div>
       </div>
-      <div className="bld-tip-card">
-        <strong>{tip.bold}</strong>
+      <div style={card}>
+        <strong style={cardBold}>{tip.bold}</strong>
         {tip.body}
       </div>
-      <div className="bld-tip-dots">
+      <div style={dots}>
         {TIPS.map((_, i) => (
           <button
             key={i}
-            className={`bld-tip-dot${i === tipIdx ? " on" : ""}`}
+            type="button"
+            style={dot(i === tipIdx)}
             onClick={() => onDotClick(i)}
             aria-label={`Tip ${i + 1}`}
+            aria-current={i === tipIdx ? "true" : undefined}
           />
         ))}
       </div>
-    </>
+    </div>
   );
 };

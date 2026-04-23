@@ -10,7 +10,7 @@
 import * as React from "react";
 import { getBlockDefinitions, insertBlock } from "../../../blocks/blockRegistry";
 import type { Composer } from "../../../engine";
-import type { BlockData } from "../../../shared/types";
+import type { BlockData, ElementType } from "../../../shared/types";
 import { useToast } from "../../../shared/ui/Toast";
 import { animateDropSuccess } from "../../../shared/utils/dragDrop/animations";
 import { canNestElement, getSuggestedParents } from "../../../shared/utils/nesting";
@@ -54,7 +54,13 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
           return;
         }
 
-        // Smart placement: insert into selected container if valid, otherwise into root
+        // Smart placement: walk up from the selected element looking for the
+        // nearest ancestor that can accept this block. Insert into selected if
+        // it is itself a valid container; otherwise insert as sibling at the
+        // ancestor's child list, after whichever descendant is on the
+        // selected element's path. If no ancestor accepts the block, fall
+        // back to the page root. This prevents silent-fail cascades where
+        // one-level lookups give up after a single rejection.
         const selectedIds = composer.selection.getSelectedIds();
         let parentId = root.getId();
         let insertIndex: number | undefined = root.getChildCount();
@@ -62,21 +68,40 @@ export function useBlockInsertion(composer: Composer | null): UseBlockInsertionR
         if (selectedIds.length === 1) {
           const selectedEl = composer.elements.getElement(selectedIds[0]);
           if (selectedEl) {
-            const selectedType = selectedEl.getType();
-            const canContain = canNestElement(def.elementType, selectedType);
-            if (canContain) {
-              parentId = selectedEl.getId();
-              insertIndex = selectedEl.getChildCount?.() ?? 0;
-            } else {
-              const parentEl = selectedEl.getParent();
-              if (parentEl) {
-                const siblingIndex = parentEl
-                  .getChildren()
-                  .findIndex((c) => c.getId() === selectedEl.getId());
-                parentId = parentEl.getId();
-                insertIndex = siblingIndex >= 0 ? siblingIndex + 1 : undefined;
+            let candidate: ReturnType<typeof composer.elements.getElement> = selectedEl;
+            let childOnPath = selectedEl;
+            let isSelected = true;
+
+            while (candidate) {
+              const canContain = canNestElement(
+                def.elementType,
+                candidate.getType() as ElementType
+              );
+              if (canContain) {
+                if (isSelected) {
+                  // Selected itself accepts the block: insert inside at end.
+                  parentId = candidate.getId();
+                  insertIndex = candidate.getChildCount?.() ?? 0;
+                } else {
+                  // Inserting as sibling of whichever descendant of candidate
+                  // sits on the selection path.
+                  const siblingIdx = candidate
+                    .getChildren()
+                    .findIndex((c) => c.getId() === childOnPath.getId());
+                  parentId = candidate.getId();
+                  insertIndex = siblingIdx >= 0 ? siblingIdx + 1 : candidate.getChildCount?.();
+                }
+                break;
               }
+              // Walk up. getParent() returns Element | null; normalize to
+              // undefined so the loop guard (while candidate) exits cleanly.
+              childOnPath = candidate;
+              candidate = candidate.getParent() ?? undefined;
+              isSelected = false;
             }
+            // candidate === null means nothing up to (and including) root
+            // accepts this block. The initial root-fallback parentId/insertIndex
+            // values are already set above, so the insert still tries.
           }
         }
 

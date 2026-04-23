@@ -15,3 +15,44 @@
 .buildrick-input-error:focus {
   border-color: var(--buildrick-error);
 }
+
+/* ─────────────────────────────────────────────
+   Settings pane scoped overrides.
+   `.bd-settings-pane` wraps the right-hand content pane in SettingsTab. These
+   rules token-bind native controls and hide per-screen save UI so the parent
+   sticky save bar is the single save affordance.
+   ───────────────────────────────────────────── */
+
+.bd-settings-pane select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--buildrick-bg-card) url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 10px center;
+  background-size: 10px;
+  border: 1px solid var(--buildrick-border);
+  border-radius: 6px;
+  padding: 7px 28px 7px 10px;
+  font-family: var(--buildrick-font-family);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--buildrick-text-primary);
+  outline: none;
+  transition: border-color 120ms, box-shadow 120ms;
+  cursor: pointer;
+}
+
+.bd-settings-pane select:hover {
+  border-color: var(--buildrick-border-medium);
+}
+
+.bd-settings-pane select:focus {
+  border-color: var(--buildrick-accent);
+  box-shadow: 0 0 0 3px var(--buildrick-accent-tint);
+}
+
+/* Hide per-screen Save buttons + save bars when rendered inside the Settings
+   hub — the parent sticky save bar owns the save action. */
+.bd-settings-pane [data-screen-savebar],
+.bd-settings-pane button[data-screen-save] {
+  display: none !important;
+}
+

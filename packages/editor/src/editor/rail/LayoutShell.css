@@ -23,8 +23,8 @@
    These can be overridden by default.css tokens
    ============================================ */
 :root {
-  --layout-rail-width: 56px;
-  --layout-drawer-width: 320px;
+  --layout-rail-width: 48px;
+  --layout-drawer-width: 280px;
   --layout-inspector-width: 280px;
   --layout-topbar-height: 48px;
   --layout-footer-height: 32px;

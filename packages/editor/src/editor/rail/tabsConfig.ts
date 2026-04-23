@@ -95,7 +95,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     pattern: "standalone",
     shortcut: "Z",
     mode: "panel",
-    panelWidth: 200,
+    panelWidth: 280,
     zone: "structure",
   },
   {
@@ -107,7 +107,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     pattern: "standalone",
     shortcut: "P",
     mode: "panel",
-    panelWidth: 200,
+    panelWidth: 280,
     zone: "structure",
   },
   {
@@ -119,7 +119,7 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     pattern: "standalone",
     shortcut: "⇧A",
     mode: "panel",
-    panelWidth: 200,
+    panelWidth: 280,
     zone: "structure",
   },
   // ── CONFIG: site configuration ─────────────────────────────────────────────

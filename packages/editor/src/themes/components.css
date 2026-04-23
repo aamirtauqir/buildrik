@@ -22,7 +22,7 @@
 .buildrick-left-tab.is-active {
   background: var(--buildrick-accent-subtle);
   color: var(--buildrick-accent);
-  border-color: rgba(59, 130, 246, 0.3);
+  border-color: rgba(45, 109, 255, 0.3);
 }
 
 .buildrick-page-card.is-active {
@@ -32,7 +32,7 @@
 
 .pCard.isActive {
   border-color: var(--buildrick-info);
-  background: rgba(59, 130, 246, 0.08);
+  background: rgba(45, 109, 255, 0.08);
 }
 
 .tbWrap {
@@ -1085,8 +1085,8 @@
 }
 
 .buildrick-layer-row.is-selected {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: rgba(59, 130, 246, 0.25);
+  background: rgba(45, 109, 255, 0.1);
+  border-color: rgba(45, 109, 255, 0.25);
   color: var(--buildrick-text-primary);
 }
 
@@ -1710,7 +1710,7 @@ textarea:focus-visible,
 }
 
 [data-buildrick-id]:hover:not([data-selected="true"]) {
-  outline: 1px dashed rgba(59, 130, 246, 0.6) !important;
+  outline: 1px dashed rgba(45, 109, 255, 0.6) !important;
   outline-offset: 0px;
 }
 

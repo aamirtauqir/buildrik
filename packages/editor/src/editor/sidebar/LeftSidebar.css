@@ -45,8 +45,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 56px;
-  min-width: 56px;
+  width: 48px;
+  min-width: 48px;
   height: 100%;
   background: var(--buildrick-bg-card);
   border-right: 1px solid var(--buildrick-border);
@@ -108,10 +108,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
+  /* Defeat ux-fixes.css global `button { min-height: 40px }` which would
+     otherwise force rail buttons taller than the 36px spec. */
+  min-height: 36px;
   border: none;
-  border-radius: 8px;
+  border-radius: 7px;
   background: transparent;
   cursor: pointer;
   color: var(--buildrick-text-secondary);
@@ -162,12 +165,13 @@
   color: var(--buildrick-accent);
 }
 
-/* Left accent bar — 2px inset (not full height) */
+/* Left accent bar — 2px inset (not full height). Offsets match
+   _shared.css prototype spec (left -6, top/bottom 8). */
 .ls-btn-bar {
   position: absolute;
-  left: -8px;
-  top: 10px;
-  bottom: 10px;
+  left: -6px;
+  top: 8px;
+  bottom: 8px;
   width: 2px;
   height: auto;
   border-radius: 0 2px 2px 0;
@@ -326,6 +330,15 @@
    ───────────────────────────────────────────── */
 .ls-panel-animate {
   animation: ls-fade-in 0.15s ease;
+  /* Propagate the flex height chain so descendant flex:1 containers
+     (.bld-content > .bld-scroll) receive a real height. Without this,
+     .bld-container's `height: 100%` resolved against an auto-sized
+     parent and .bld-scroll never became the scroll container, which
+     broke sticky bottom strips like .bld-panel-bottom. */
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes ls-fade-in {

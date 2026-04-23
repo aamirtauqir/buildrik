@@ -66,7 +66,7 @@ a:focus-visible,
   background: var(--buildrick-bg-input);
   box-shadow:
     var(--buildrick-input-ring),
-    0 4px 12px rgba(59, 130, 246, 0.15);
+    0 4px 12px rgba(45, 109, 255, 0.15);
   transform: translateY(0);
   transition: all 0.2s ease;
 }
@@ -191,7 +191,7 @@ button:disabled::after,
 
 .buildrick-switch-input:checked + .buildrick-switch-track .buildrick-switch-thumb {
   box-shadow:
-    0 2px 6px rgba(59, 130, 246, 0.5),
+    0 2px 6px rgba(45, 109, 255, 0.5),
     0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
@@ -207,22 +207,22 @@ button:disabled::after,
 .buildrick-slider::-webkit-slider-thumb {
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.25),
-    0 0 0 4px rgba(59, 130, 246, 0);
+    0 0 0 4px rgba(45, 109, 255, 0);
   transition: all 0.2s ease;
 }
 
 .buildrick-slider:hover::-webkit-slider-thumb {
   transform: scale(1.15);
   box-shadow:
-    0 3px 8px rgba(59, 130, 246, 0.4),
-    0 0 0 6px rgba(59, 130, 246, 0.15);
+    0 3px 8px rgba(45, 109, 255, 0.4),
+    0 0 0 6px rgba(45, 109, 255, 0.15);
 }
 
 .buildrick-slider:active::-webkit-slider-thumb {
   transform: scale(1.3);
   box-shadow:
-    0 4px 12px rgba(59, 130, 246, 0.5),
-    0 0 0 8px rgba(59, 130, 246, 0.2);
+    0 4px 12px rgba(45, 109, 255, 0.5),
+    0 0 0 8px rgba(45, 109, 255, 0.2);
 }
 
 .buildrick-slider::-moz-range-thumb {
@@ -294,8 +294,8 @@ button:disabled::after,
 
 .buildrick-btn-group-item.is-selected {
   box-shadow:
-    inset 0 1px 2px rgba(59, 130, 246, 0.3),
-    0 0 0 1px rgba(59, 130, 246, 0.5);
+    inset 0 1px 2px rgba(45, 109, 255, 0.3),
+    0 0 0 1px rgba(45, 109, 255, 0.5);
 }
 
 .buildrick-layer-row {
@@ -321,7 +321,7 @@ button:disabled::after,
 
 .buildrick-layer-row.is-selected::before {
   opacity: 1;
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 8px rgba(45, 109, 255, 0.5);
 }
 
 .buildrick-layer-row:focus-visible {

@@ -41,7 +41,7 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({
   className,
 }) => {
   return (
-    <div className={className} style={containerStyles}>
+    <div className={className} data-screen-savebar="true" style={containerStyles}>
       <div aria-live="polite" aria-atomic="true" style={indicatorStyles}>
         {hasChanges && (
           <>

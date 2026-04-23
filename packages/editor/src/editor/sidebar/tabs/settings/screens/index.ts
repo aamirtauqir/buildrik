@@ -15,3 +15,5 @@ export { AdvancedScreen } from "./AdvancedScreen";
 export { LockedScreen } from "./LockedScreen";
 export { BillingScreen } from "./BillingScreen";
 export { SeoScreen } from "./SeoScreen";
+export { IntegrationsHub } from "./IntegrationsHub";
+export { PublishingHub } from "./PublishingHub";

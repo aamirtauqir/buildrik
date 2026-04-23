@@ -64,16 +64,18 @@
 
 .bld-cat-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 10px 2px 6px;
+  padding: 7px 10px;
+  margin: 2px 0;
+  border-radius: 5px;
   cursor: pointer;
   background: transparent;
-  transition: color 0.12s ease;
+  transition: background 0.12s ease, color 0.12s ease;
   user-select: none;
   font-family: var(--buildrick-font-family, "Inter Tight", system-ui, sans-serif);
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -81,7 +83,22 @@
 }
 
 .bld-cat-row:hover {
+  background: var(--buildrick-bg-subtle);
   color: var(--buildrick-text-primary, #334155);
+}
+
+/* Open = active. Mirrors the canonical active-state pattern used across
+   rail (.ls-btn--active), pages (.pg-row--active), layers (.is-selected),
+   and the Settings split sub-nav: accent-tint background + accent color.
+   Same three-property treatment, no deviation. */
+.bld-cat-row.open,
+.bld-cat-row.open:hover {
+  background: var(--buildrick-accent-tint);
+  color: var(--buildrick-accent);
+}
+
+.bld-cat-row.open .bld-cat-count {
+  color: var(--buildrick-accent);
 }
 
 .bld-cat-row:focus-visible {
@@ -92,11 +109,6 @@
 
 .bld-cat-name {
   font: inherit;
-  color: inherit;
-}
-
-.bld-cat-row.open .bld-cat-name,
-.bld-cat-row:hover .bld-cat-name {
   color: inherit;
 }
 
@@ -699,9 +711,9 @@
 
 .bld-panel-bottom {
   flex-shrink: 0;
-  border-top: 1px solid var(--buildrick-border, #E2E8F0);
+  border-top: 1px solid var(--bd-border);
   padding: 10px 12px;
-  background: var(--buildrick-bg-panel, #F8FAFC);
+  background: var(--bd-bg-panel);
 }
 
 .bld-kbd-hint {

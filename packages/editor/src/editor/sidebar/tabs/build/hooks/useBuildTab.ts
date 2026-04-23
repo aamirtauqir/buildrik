@@ -61,7 +61,6 @@ const ls = {
 export type DragStartFn = (e: React.DragEvent, el: FlatElEntry) => void;
 export type ElClickFn = (el: FlatElEntry) => void;
 export type ToggleFavFn = (name: string) => void;
-export type BuildMode = "elements" | "sections";
 
 export interface UseBuildTabReturn {
   // State
@@ -76,9 +75,7 @@ export interface UseBuildTabReturn {
   allElements: FlatElEntry[];
   composer: Composer | null;
   tipIdx: number;
-  mode: BuildMode;
   // Handlers
-  setMode: (m: BuildMode) => void;
   setSearchQuery: (q: string) => void;
   toggleFav: ToggleFavFn;
   toggleCat: (catId: string) => void;
@@ -110,11 +107,12 @@ export function useBuildTab(
   );
   const [openCats, setOpenCats] = React.useState<Set<string>>(() => {
     const stored = ls.sessionGetSet(STORAGE_KEYS.BUILD_OPEN_CATS);
-    // First-session default: open every category so the Add panel shows
-    // the full block grid on load (matches new-design spec). Users can
-    // collapse; their choices persist via sessionStorage.
-    if (stored.size === 0) {
-      return new Set(CATALOG.map((c) => c.id));
+    // Exclusive-accordion invariant: at most one category open at a time.
+    // Legacy sessions may have persisted multiple open categories from an
+    // earlier version; collapse to just "basic" to restore the invariant.
+    // First-session default is also "basic" only.
+    if (stored.size !== 1) {
+      return new Set(["basic"]);
     }
     return stored;
   });
@@ -133,20 +131,6 @@ export function useBuildTab(
   const [myCompOpen, setMyCompOpen] = React.useState(false);
   const [favOpen, setFavOpen] = React.useState(false);
   const [tipIdx, setTipIdx] = React.useState(0);
-  const [mode, setModeRaw] = React.useState<BuildMode>(() => {
-    const v = sessionStorage.getItem(STORAGE_KEYS.BUILD_MODE);
-    return v === "sections" ? "sections" : "elements";
-  });
-
-  const setMode = React.useCallback((m: BuildMode) => {
-    setModeRaw(m);
-    setSearchQueryRaw(""); // v4: mode change clears any pending search
-    try {
-      sessionStorage.setItem(STORAGE_KEYS.BUILD_MODE, m);
-    } catch {
-      // storage may be full
-    }
-  }, []);
 
   // Persist favs
   React.useEffect(() => {
@@ -169,14 +153,11 @@ export function useBuildTab(
 
   const toggleCat = React.useCallback((catId: string) => {
     setOpenCats((prev) => {
-      const next = new Set(prev);
-      if (next.has(catId)) {
-        next.delete(catId); // already open → close it
-      } else {
-        next.clear(); // close all others (last-in-wins)
-        next.add(catId); // open clicked
-      }
-      return next;
+      // Exclusive accordion: clicking the already-open category is a no-op
+      // (can't collapse the active one via its own chevron). Clicking a
+      // closed category opens it and closes whichever was previously open.
+      if (prev.has(catId)) return prev;
+      return new Set([catId]);
     });
   }, []);
 
@@ -291,8 +272,6 @@ export function useBuildTab(
     searchResults,
     allElements: flatCatalog,
     composer,
-    mode,
-    setMode,
     setSearchQuery,
     toggleFav,
     toggleCat,

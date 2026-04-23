@@ -14,10 +14,6 @@ export const TIPS: Tip[] = [
     body: " — Drag an element card onto the canvas to place it.",
   },
   {
-    bold: "⭐ My Favorites",
-    body: " — Hover an element and click the star to save it for quick access.",
-  },
-  {
     bold: "/ to search",
     body: " — Press / to jump to search. Esc or ✕ to clear.",
   },

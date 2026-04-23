@@ -65,7 +65,7 @@ export const STORAGE_KEYS = {
   BUILD_FAVS_INFORMED: "buildrick-build-favs-informed",
   /** Whether the Pro Tips footer is collapsed */
   BUILD_TIPS_COLLAPSED: "buildrick-build-tips-collapsed",
-  /** Add tab mode: "elements" | "sections" (sessionStorage) */
+  /** @deprecated — Sections mode removed 2026-04-23. Cleaned on next read of BUILD_OPEN_CATS. */
   BUILD_MODE: "buildrick-build-mode",
   /** @deprecated — Quick Picks removed in v4. Cleaned on TransitionCallout dismiss. */
   BUILD_PICKS: "buildrick-build-picks",
