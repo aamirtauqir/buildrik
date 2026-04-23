@@ -148,12 +148,12 @@ const iconCircleStyle: React.CSSProperties = {
   width: 48,
   height: 48,
   borderRadius: "50%",
-  background: "rgba(255, 255, 255, 0.03)",
+  background: "var(--bd-bg-subtle)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   marginBottom: 16,
-  border: "1px solid rgba(255, 255, 255, 0.05)",
+  border: "1px solid var(--bd-bg-subtle)",
 };
 
 const titleStyle: React.CSSProperties = {
@@ -222,11 +222,11 @@ const tipStyle: React.CSSProperties = {
 const kbdStyle: React.CSSProperties = {
   display: "inline-block",
   padding: "2px 6px",
-  background: "rgba(255, 255, 255, 0.08)",
+  background: "var(--bd-border)",
   borderRadius: 4,
   fontSize: "10px",
   fontFamily: "monospace",
-  border: "1px solid rgba(255, 255, 255, 0.12)",
+  border: "1px solid var(--bd-border-medium)",
 };
 
 // Phase 7: Post-apply banner styles

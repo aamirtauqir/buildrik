@@ -1,19 +1,11 @@
 /**
- * @lint-hex-policy: component-theme
- *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
- *
- * Inspector Controls - Search and Collapse/Expand All
- * Phase 7: Aquibra Hybrid Inspector Approach
+ * Inspector Controls — search + expand/collapse all. Ported to --bd-* tokens.
  *
  * @license BSD-3-Clause
  */
 
 import { ChevronsDownUp, ChevronsUpDown, Search, X } from "lucide-react";
 import * as React from "react";
-
-// ============================================================================
-// TYPES
-// ============================================================================
 
 interface InspectorControlsProps {
   searchQuery: string;
@@ -22,86 +14,82 @@ interface InspectorControlsProps {
   onExpandAll: () => void;
 }
 
-// ============================================================================
-// STYLES
-// ============================================================================
-
 const styles = {
   container: {
     display: "flex",
     alignItems: "center",
-    gap: 6,
-    padding: "6px 14px",
-    background: "transparent",
-    borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
-  },
+    gap: 4,
+  } as React.CSSProperties,
   searchContainer: {
     flex: 1,
-    position: "relative" as const,
-  },
-  searchInput: {
-    width: "100%",
-    padding: "6px 28px 6px 28px",
-    background: "rgba(255, 255, 255, 0.04)",
-    border: "1px solid rgba(255, 255, 255, 0.08)",
-    borderRadius: 6,
-    color: "#e4e4e7",
-    fontSize: 12,
-    outline: "none",
-    transition: "all 0.15s",
-  },
-  searchInputFocused: {
-    background: "rgba(255, 255, 255, 0.07)",
-    borderColor: "rgba(0, 115, 230, 0.5)",
-  },
-  searchIcon: {
-    position: "absolute" as const,
-    left: 8,
-    top: "50%",
-    transform: "translateY(-50%)",
-    color: "var(--buildrick-text-muted)",
-    pointerEvents: "none" as const,
+    position: "relative",
     display: "flex",
     alignItems: "center",
-  },
-  clearButton: {
-    position: "absolute" as const,
-    right: 4,
+  } as React.CSSProperties,
+  searchIcon: {
+    position: "absolute",
+    left: 7,
     top: "50%",
     transform: "translateY(-50%)",
-    padding: 4,
-    background: "transparent",
-    border: "none",
-    color: "var(--buildrick-text-muted)",
-    cursor: "pointer",
+    color: "var(--bd-fg-muted)",
+    pointerEvents: "none",
+    display: "flex",
+    alignItems: "center",
+  } as React.CSSProperties,
+  searchInput: {
+    width: "100%",
+    height: 24,
+    padding: "0 24px 0 24px",
+    background: "var(--bd-bg-subtle)",
+    border: "1px solid transparent",
     borderRadius: 4,
+    color: "var(--bd-fg-primary)",
+    font: "500 11.5px var(--bd-font)",
+    outline: "none",
+    transition: "background 120ms, border-color 120ms, box-shadow 120ms",
+  } as React.CSSProperties,
+  searchInputFocused: {
+    background: "#fff",
+    borderColor: "var(--bd-accent)",
+    boxShadow: "0 0 0 2px rgba(45, 109, 255, 0.12)",
+  } as React.CSSProperties,
+  clearButton: {
+    position: "absolute",
+    right: 3,
+    top: "50%",
+    transform: "translateY(-50%)",
+    width: 18,
+    height: 18,
+    padding: 0,
+    background: "rgba(15, 23, 42, 0.06)",
+    border: "none",
+    color: "var(--bd-fg-muted)",
+    cursor: "pointer",
+    borderRadius: 3,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-  },
+  } as React.CSSProperties,
   iconButton: {
-    width: 26,
-    height: 26,
+    width: 22,
+    height: 22,
     padding: 0,
     background: "transparent",
     border: "none",
-    color: "var(--buildrick-text-muted)",
+    color: "var(--bd-fg-muted)",
     cursor: "pointer",
-    transition: "color 0.15s, background 0.15s",
+    transition: "color 120ms, background 120ms",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 4,
-  },
+    borderRadius: 3,
+    flexShrink: 0,
+  } as React.CSSProperties,
   iconButtonHover: {
-    background: "rgba(255, 255, 255, 0.06)",
-    color: "#cdd6f4",
-  },
+    background: "rgba(15, 23, 42, 0.06)",
+    color: "var(--bd-fg-primary)",
+  } as React.CSSProperties,
 };
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 export const InspectorControls: React.FC<InspectorControlsProps> = ({
   searchQuery,
@@ -114,22 +102,19 @@ export const InspectorControls: React.FC<InspectorControlsProps> = ({
 
   return (
     <div style={styles.container}>
-      {/* Search */}
       <div style={styles.searchContainer}>
         <span style={styles.searchIcon}>
-          <Search size={13} aria-hidden="true" />
+          <Search size={11} aria-hidden="true" />
         </span>
         <input
           id="inspector-search-input"
           type="text"
-          placeholder="Search…  (press /)"
+          placeholder="Search · /"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           onKeyDown={(e) => {
-            // Escape clears the query and unfocuses. Clearing via onSearchChange
-            // also collapses the PropertySearchResults view back to normal tabs.
             if (e.key === "Escape") {
               e.preventDefault();
               onSearchChange("");
@@ -144,18 +129,19 @@ export const InspectorControls: React.FC<InspectorControlsProps> = ({
         />
         {searchQuery && (
           <button
+            type="button"
             onClick={() => onSearchChange("")}
             style={styles.clearButton}
             title="Clear search"
             aria-label="Clear search"
           >
-            <X size={12} aria-hidden="true" />
+            <X size={10} aria-hidden="true" />
           </button>
         )}
       </div>
 
-      {/* Collapse All */}
       <button
+        type="button"
         onClick={onCollapseAll}
         onMouseEnter={() => setHoveredButton("collapse")}
         onMouseLeave={() => setHoveredButton(null)}
@@ -166,11 +152,11 @@ export const InspectorControls: React.FC<InspectorControlsProps> = ({
         title="Collapse all sections"
         aria-label="Collapse all sections"
       >
-        <ChevronsDownUp size={14} aria-hidden="true" />
+        <ChevronsDownUp size={12} aria-hidden="true" />
       </button>
 
-      {/* Expand All */}
       <button
+        type="button"
         onClick={onExpandAll}
         onMouseEnter={() => setHoveredButton("expand")}
         onMouseLeave={() => setHoveredButton(null)}
@@ -181,7 +167,7 @@ export const InspectorControls: React.FC<InspectorControlsProps> = ({
         title="Expand all sections"
         aria-label="Expand all sections"
       >
-        <ChevronsUpDown size={14} aria-hidden="true" />
+        <ChevronsUpDown size={12} aria-hidden="true" />
       </button>
     </div>
   );

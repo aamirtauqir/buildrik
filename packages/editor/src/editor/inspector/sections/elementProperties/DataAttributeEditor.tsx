@@ -26,10 +26,10 @@ const styles = {
   input: {
     flex: 1,
     padding: "8px 10px",
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
+    background: "var(--bd-bg-subtle)",
+    border: "1px solid var(--bd-border-medium)",
     borderRadius: 6,
-    color: "#e4e4e7",
+    color: "var(--bd-fg-primary)",
     fontSize: 12,
     outline: "none",
   } as React.CSSProperties,

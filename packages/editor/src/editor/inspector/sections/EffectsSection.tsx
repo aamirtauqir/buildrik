@@ -336,7 +336,7 @@ export const EffectsSection: React.FC<EffectsSectionProps> = ({ styles, onChange
         style={{
           marginTop: 16,
           paddingTop: 16,
-          borderTop: "1px solid rgba(255,255,255,0.06)",
+          borderTop: "1px solid var(--bd-border)",
         }}
       >
         <SectionLabel style={{ marginBottom: 12 }}>

@@ -111,17 +111,17 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
           justifyContent: "space-between",
           marginBottom: 16,
           padding: "10px 12px",
-          background: enabled ? "rgba(0, 115, 230, 0.1)" : "rgba(255, 255, 255, 0.03)",
+          background: enabled ? "var(--bd-accent-tint)" : "var(--bd-bg-subtle)",
           borderRadius: 8,
           border: enabled
-            ? "1px solid rgba(0, 115, 230, 0.2)"
-            : "1px solid rgba(255, 255, 255, 0.06)",
+            ? "1px solid var(--bd-accent-tint)"
+            : "1px solid var(--bd-border)",
         }}
       >
         <span
           style={{
             fontSize: 12,
-            color: enabled ? "#0073E6" : "#71717a",
+            color: enabled ? "var(--bd-accent)" : "var(--bd-fg-muted)",
             fontWeight: 500,
           }}
         >
@@ -131,10 +131,10 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
           onClick={handleToggle}
           style={{
             padding: "6px 12px",
-            background: enabled ? "rgba(0, 115, 230, 0.2)" : "rgba(255, 255, 255, 0.1)",
+            background: enabled ? "var(--bd-accent-tint)" : "var(--bd-border-medium)",
             border: "none",
             borderRadius: 6,
-            color: enabled ? "#0073E6" : "#a1a1aa",
+            color: enabled ? "var(--bd-accent)" : "#a1a1aa",
             fontSize: 12,
             fontWeight: 600,
             cursor: "pointer",

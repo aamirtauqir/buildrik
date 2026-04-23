@@ -352,7 +352,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                         height: 28,
                         borderRadius: 5,
                         background: token.value,
-                        border: `1px solid rgba(255,255,255,0.12)`,
+                        border: `1px solid var(--bd-border-medium)`,
                         flexShrink: 0,
                       }}
                     />

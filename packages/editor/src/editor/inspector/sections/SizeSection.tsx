@@ -327,7 +327,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
             style={{
               flex: 1,
               padding: "var(--buildrick-space-2) 10px",
-              background: "rgba(255,255,255,0.05)",
+              background: "var(--bd-bg-subtle)",
               border: "1px solid var(--buildrick-border)",
               borderRadius: "var(--buildrick-radius-sm)",
               color: "var(--buildrick-text-primary)",

@@ -68,7 +68,7 @@ const styles = {
     transition: "background 0.15s, color 0.15s, border-color 0.15s",
   },
   triggerHover: {
-    background: "rgba(255,255,255,0.06)",
+    background: "var(--bd-border)",
     color: "var(--buildrick-text-primary)",
     borderColor: "var(--buildrick-border)",
   },
@@ -261,7 +261,7 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
                     hoveredItem === item.id && !item.disabled
                       ? item.danger
                         ? "rgba(239,68,68,0.12)"
-                        : "rgba(255,255,255,0.06)"
+                        : "var(--bd-border)"
                       : "transparent",
                 }}
               >

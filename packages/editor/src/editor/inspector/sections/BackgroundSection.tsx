@@ -59,7 +59,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
         height: 14,
         borderRadius: 3,
         background: bgColor,
-        border: "1px solid rgba(255,255,255,0.15)",
+        border: "1px solid var(--bd-border-medium)",
         flexShrink: 0,
       }}
       title={bgColor}
@@ -85,11 +85,11 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
             style={{
               flex: 1,
               padding: "8px 12px",
-              background: bgType === type ? "var(--buildrick-accent-subtle)" : "rgba(255,255,255,0.03)",
+              background: bgType === type ? "var(--buildrick-accent-subtle)" : "var(--bd-bg-subtle)",
               border:
                 bgType === type
                   ? "1px solid var(--buildrick-accent)"
-                  : "1px solid rgba(255,255,255,0.06)",
+                  : "1px solid var(--bd-border)",
               borderRadius: 6,
               color: bgType === type ? "var(--buildrick-accent)" : "var(--buildrick-text-muted)",
               fontSize: 12,
@@ -141,7 +141,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                   flex: 1,
                   padding: "20px 12px",
                   background: "linear-gradient(90deg, var(--buildrick-accent), var(--buildrick-success))",
-                  border: "1px solid rgba(255,255,255,0.1)",
+                  border: "1px solid var(--bd-border-medium)",
                   borderRadius: 6,
                   cursor: "pointer",
                   fontSize: 12,
@@ -160,7 +160,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                   flex: 1,
                   padding: "20px 12px",
                   background: "radial-gradient(circle, var(--buildrick-accent), var(--buildrick-success))",
-                  border: "1px solid rgba(255,255,255,0.1)",
+                  border: "1px solid var(--bd-border-medium)",
                   borderRadius: 6,
                   cursor: "pointer",
                   fontSize: 12,
