@@ -29,12 +29,15 @@ import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
 import { useStudioModals } from "./hooks/useStudioModals";
 import { useStudioState } from "./hooks/useStudioState";
+import { StudioFooter } from "./StudioFooter";
 import { StudioHeader } from "./StudioHeader";
 import { StudioModals } from "./StudioModals";
 import { StudioPanels } from "./StudioPanels";
 
 import "../../themes/default.css";
+import "../../themes/bridge-tokens.css";
 import "../../themes/ux-fixes.css";
+import "./chrome.css";
 
 // Run localStorage migration on app startup (module load)
 migrateStorageKeys();
@@ -536,6 +539,23 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         showProjectSettings={modals.showProjectSettings}
         onCloseProjectSettings={modals.closeProjectSettings}
       />
+
+      <footer
+        className="layout-shell__footer"
+        role="contentinfo"
+        aria-label="Editor status"
+      >
+        <StudioFooter
+          composer={composer}
+          device={state.device}
+          zoom={state.zoom}
+          onZoomChange={(z) => {
+            state.setZoom(z);
+            if (composer) composer.setZoom(z);
+          }}
+          selectedElement={selectedElement}
+        />
+      </footer>
 
       <UpgradeModal />
 

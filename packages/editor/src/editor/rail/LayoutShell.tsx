@@ -168,6 +168,19 @@ const FullPage: React.FC<SlotProps> = ({ children, className = "", style }) => (
 );
 FullPage.displayName = "LayoutShell.FullPage";
 
+/** Footer slot — 32px status bar at bottom */
+const Footer: React.FC<SlotProps> = ({ children, className = "", style }) => (
+  <footer
+    className={`layout-shell__footer ${className}`}
+    style={style}
+    role="contentinfo"
+    aria-label="Editor status"
+  >
+    {children}
+  </footer>
+);
+Footer.displayName = "LayoutShell.Footer";
+
 // ============================================
 // Main Component
 // ============================================
@@ -180,6 +193,7 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
   Canvas: typeof Canvas;
   Inspector: typeof Inspector;
   FullPage: typeof FullPage;
+  Footer: typeof Footer;
 } = ({
   children,
   drawerOpen,
@@ -199,6 +213,7 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
       canvas: React.ReactNode | null;
       inspector: React.ReactNode | null;
       fullPage: React.ReactNode | null;
+      footer: React.ReactNode | null;
       other: React.ReactNode[];
     } = {
       topBar: null,
@@ -208,6 +223,7 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
       canvas: null,
       inspector: null,
       fullPage: null,
+      footer: null,
       other: [],
     };
 
@@ -245,6 +261,9 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
           break;
         case "LayoutShell.FullPage":
           result.fullPage = child;
+          break;
+        case "LayoutShell.Footer":
+          result.footer = child;
           break;
         default:
           result.other.push(child);
@@ -290,6 +309,8 @@ export const LayoutShell: React.FC<LayoutShellProps> & {
       {/* Fullpage mode: FullPage slot spans columns 2-4 */}
       {slots.fullPage}
 
+      {slots.footer}
+
       {slots.other}
     </div>
   );
@@ -302,5 +323,6 @@ LayoutShell.Sidebar = Sidebar;
 LayoutShell.Canvas = Canvas;
 LayoutShell.Inspector = Inspector;
 LayoutShell.FullPage = FullPage;
+LayoutShell.Footer = Footer;
 
 export default LayoutShell;

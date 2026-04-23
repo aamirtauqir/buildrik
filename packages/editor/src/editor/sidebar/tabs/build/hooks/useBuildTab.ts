@@ -7,7 +7,7 @@ import * as React from "react";
 import type { Composer } from "../../../../../engine";
 import type { BlockData } from "../../../../../shared/types";
 import { STORAGE_KEYS } from "../../../../../shared/constants/storageKeys";
-import { flatCatalog } from "../catalog/catalog";
+import { CATALOG, flatCatalog } from "../catalog/catalog";
 import { TIPS } from "../catalog/tips";
 import type { FlatElEntry, SearchGroup } from "../catalog/types";
 import { searchElements } from "../utils/search";
@@ -108,9 +108,16 @@ export function useBuildTab(
   const [favs, setFavs] = React.useState<Set<string>>(() =>
     ls.getSet(STORAGE_KEYS.BUILD_FAVORITES)
   );
-  const [openCats, setOpenCats] = React.useState<Set<string>>(() =>
-    ls.sessionGetSet(STORAGE_KEYS.BUILD_OPEN_CATS)
-  );
+  const [openCats, setOpenCats] = React.useState<Set<string>>(() => {
+    const stored = ls.sessionGetSet(STORAGE_KEYS.BUILD_OPEN_CATS);
+    // First-session default: open every category so the Add panel shows
+    // the full block grid on load (matches new-design spec). Users can
+    // collapse; their choices persist via sessionStorage.
+    if (stored.size === 0) {
+      return new Set(CATALOG.map((c) => c.id));
+    }
+    return stored;
+  });
   const [searchQuery, setSearchQueryRaw] = React.useState("");
   // Track which categories were open before a search started
   const preClearCatsRef = React.useRef<Set<string> | null>(null);

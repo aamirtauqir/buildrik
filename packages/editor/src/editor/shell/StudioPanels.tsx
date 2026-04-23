@@ -17,7 +17,7 @@ import type { BlockData, DeviceType } from "../../shared/types";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
 import { useToast } from "../../shared/ui/Toast";
 import { Canvas, type CanvasRef } from "../canvas/Canvas";
-import { CanvasFooterToolbar, type CanvasOverlayState } from "../canvas/CanvasFooterToolbar";
+import type { CanvasOverlayState } from "../canvas/CanvasFooterToolbar";
 import { ProInspector } from "../inspector/ProInspector";
 import { LayoutShell } from "../rail/LayoutShell";
 import { LeftSidebar } from "../sidebar/LeftSidebar";
@@ -304,19 +304,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
     [composer, addToast]
   );
 
-  const handleZoomChange = React.useCallback(
-    (z: number) => {
-      onZoomChange(z);
-      if (composer) composer.setZoom(z);
-    },
-    [composer, onZoomChange]
-  );
-
-  const handleFitToScreen = React.useCallback(() => {
-    onZoomChange(100);
-    if (composer) composer.setZoom(100);
-  }, [composer, onZoomChange]);
-
   const handleRailTabChange = React.useCallback(
     (tab: GroupedTabId) => {
       if (onLeftPanelTabChange) {
@@ -427,19 +414,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             </div>
           )}
         </div>
-        <CanvasFooterToolbar
-          overlays={{
-            guides: showGuides,
-            spacing: showSpacingIndicators,
-            grid: showGrid,
-            badges: showBadges,
-            xray: showXRay,
-          }}
-          zoom={zoom}
-          onOverlayChange={onOverlayChange ?? (() => {})}
-          onZoomChange={handleZoomChange}
-          onFitToScreen={handleFitToScreen}
-        />
       </LayoutShell.Canvas>
 
       {/* Right Inspector — element properties */}

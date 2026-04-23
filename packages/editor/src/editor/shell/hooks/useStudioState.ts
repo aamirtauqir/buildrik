@@ -185,7 +185,7 @@ export function useStudioState(): UseStudioStateReturn {
   const [rightPanelTab, _setRightPanelTab] = React.useState(
     savedState?.rightPanelTab || "inspector"
   );
-  const [isLeftPanelOpen, setIsLeftPanelOpen] = React.useState(savedState?.isLeftPanelOpen ?? false);
+  const [isLeftPanelOpen, setIsLeftPanelOpen] = React.useState(savedState?.isLeftPanelOpen ?? true);
 
   // Overlay states
   const [showComponentView, setShowComponentView] = React.useState(false);

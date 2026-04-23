@@ -23,14 +23,11 @@
    These can be overridden by default.css tokens
    ============================================ */
 :root {
-  --layout-rail-width: var(--buildrick-sidebar-width, 60px);
-  --layout-drawer-width: var(--buildrick-sidebar-panel-width, 280px);
-  /* Inspector: widened from 280 → 320 so labels + inputs + units breathe.
-     At 280px with 16px padding × 2 and a 64px label column, inputs had <170px —
-     multi-button groups and unit pickers were crushed. */
-  --layout-inspector-width: var(--buildrick-right-panel-width, 320px);
-  --layout-topbar-height: var(--buildrick-header-height, 52px);
-  --layout-footer-height: var(--buildrick-footer-height, 40px);
+  --layout-rail-width: 56px;
+  --layout-drawer-width: 320px;
+  --layout-inspector-width: 280px;
+  --layout-topbar-height: 48px;
+  --layout-footer-height: 32px;
   --layout-gap: var(--buildrick-space-3);
   --layout-touch-min: var(--buildrick-touch-min, 44px);
 }
@@ -42,29 +39,32 @@
   position: relative; /* Containing block for overlay (unpinned) drawer */
   display: grid;
   grid-template-columns:
-    var(--layout-rail-width, 60px)
+    var(--layout-rail-width, 56px)
     0px
     1fr
     0px;
   grid-template-rows:
-    var(--layout-topbar-height, 52px)
-    1fr;
+    var(--layout-topbar-height, 48px)
+    1fr
+    var(--layout-footer-height, 32px);
   grid-template-areas:
     "topbar topbar topbar topbar"
-    "rail drawer canvas inspector";
-  /* 100% fills the parent flex child (StudioPanels); 100vh would overflow the header */
+    "rail drawer canvas inspector"
+    "footer footer footer footer";
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: var(--buildrick-bg-subtle);
+  background: var(--buildrick-bg-panel);
   color: var(--buildrick-text-primary);
   font-family: var(--buildrick-font-family);
 }
 
 /* No topbar slot provided — collapse the empty topbar row */
 .layout-shell--no-topbar {
-  grid-template-rows: 1fr;
-  grid-template-areas: "rail drawer canvas inspector";
+  grid-template-rows: 1fr var(--layout-footer-height, 32px);
+  grid-template-areas:
+    "rail drawer canvas inspector"
+    "footer footer footer footer";
 }
 
 /* Drawer open state - expand drawer column */
@@ -141,9 +141,24 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0;                                   /* navWrap handles own padding */
-  background: var(--buildrick-bg-panel);
-  border-bottom: 1px solid var(--buildrick-border-medium);
+  padding: 0;
+  background: var(--buildrick-bg-card);
+  border-bottom: 1px solid var(--buildrick-border);
+  z-index: 100;
+}
+
+/* Footer slot — 32px status bar at bottom */
+.layout-shell__footer {
+  grid-area: footer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  gap: 16px;
+  background: var(--buildrick-bg-card);
+  border-top: 1px solid var(--buildrick-border);
+  font: 500 11px "Geist Mono", "SF Mono", Menlo, monospace;
+  color: var(--buildrick-text-muted);
   z-index: 100;
 }
 
@@ -155,9 +170,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--layout-gap, 12px) 0;
-  background: var(--buildrick-bg-panel);    /* PRD §8: rail bg — darkest surface */
-  border-right: 1px solid var(--buildrick-border, rgba(255, 255, 255, 0.08));
+  padding: 6px 0;
+  gap: 2px;
+  background: var(--buildrick-bg-card);
+  border-right: 1px solid var(--buildrick-border);
   z-index: 90;
   overflow-y: auto;
   overflow-x: clip;
@@ -180,7 +196,8 @@
   z-index: 90;
 }
 
-/* When using merged sidebar, rail+drawer collapse into auto sidebar column */
+/* When using merged sidebar, rail+drawer collapse into auto sidebar column.
+   Must include the footer row so the bottom status bar has a home. */
 .layout-shell--has-sidebar {
   grid-template-columns:
     auto
@@ -189,7 +206,17 @@
     0px;
   grid-template-areas:
     "topbar topbar topbar topbar"
-    "rail rail canvas inspector";
+    "rail rail canvas inspector"
+    "footer footer footer footer";
+}
+
+.layout-shell--has-sidebar.layout-shell--no-topbar {
+  grid-template-rows:
+    1fr
+    var(--layout-footer-height, 32px);
+  grid-template-areas:
+    "rail rail canvas inspector"
+    "footer footer footer footer";
 }
 
 .layout-shell--has-sidebar.layout-shell--inspector-open {
@@ -228,17 +255,16 @@
   grid-area: drawer;
   display: flex;
   flex-direction: column;
-  background: var(--buildrick-bg-panel);     /* PRD §9.3: sidebar panel bg */
-  border-right: 1px solid var(--buildrick-border, rgba(255, 255, 255, 0.08));
+  background: var(--buildrick-bg-card);
+  border-right: 1px solid var(--buildrick-border);
   overflow: hidden;
   z-index: 80;
 
-  /* Slide animation */
   transform: translateX(-100%);
   opacity: 0;
   transition:
-    transform var(--duration-slow, 300ms) var(--ease-bounce, cubic-bezier(0.34, 1.56, 0.64, 1)),
-    opacity var(--duration-fast, 150ms) var(--ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+    transform 120ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 120ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .layout-shell__drawer--open {
@@ -259,17 +285,17 @@
   min-width: 0; /* Prevent grid blowout */
 }
 
-/* Canvas background pattern — dark dots on light background */
+/* Canvas dot grid — cool slate dots per new-design spec */
 .layout-shell__canvas::before {
   content: "";
   position: absolute;
   inset: 0;
   background-image: radial-gradient(
-    circle at 1px 1px,
-    var(--buildrick-canvas-dot, rgba(100, 116, 139, 0.1)) 1px,
-    transparent 0
+    circle,
+    rgba(15, 23, 42, 0.08) 1px,
+    transparent 1px
   );
-  background-size: 24px 24px;
+  background-size: 20px 20px;
   pointer-events: none;
   z-index: 0;
 }
@@ -281,17 +307,16 @@
   grid-area: inspector;
   display: flex;
   flex-direction: column;
-  background: var(--buildrick-bg-panel);
+  background: var(--buildrick-bg-card);
   border-left: 1px solid var(--buildrick-border);
   overflow: hidden;
   z-index: 80;
 
-  /* Slide animation from right */
   transform: translateX(100%);
   opacity: 0;
   transition:
-    transform var(--duration-slow, 300ms) var(--ease-bounce, cubic-bezier(0.34, 1.56, 0.64, 1)),
-    opacity var(--duration-fast, 150ms) var(--ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+    transform 120ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 120ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .layout-shell__inspector--open {

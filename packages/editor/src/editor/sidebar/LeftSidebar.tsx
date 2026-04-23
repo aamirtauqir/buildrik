@@ -28,7 +28,6 @@ import {
   Diamond,
   Settings,
   Timer,
-  Info,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -45,7 +44,6 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Diamond,
   Settings,
   Timer,
-  Info,
 };
 
 // ============================================
@@ -300,16 +298,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         ))}
 
         <div className="ls-spacer" />
-
-        <a
-          className="ls-btn ls-btn--help"
-          href="https://docs.buildrik.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Help and documentation"
-        >
-          <Info size={20} />
-        </a>
       </nav>
 
       {/* Panel */}

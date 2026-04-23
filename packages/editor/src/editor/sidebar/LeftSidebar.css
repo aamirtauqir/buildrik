@@ -39,42 +39,46 @@
 }
 
 /* ─────────────────────────────────────────────
-   RAIL — 60px vertical icon navigation
+   RAIL — 48px vertical icon navigation (DS drop spec)
    ───────────────────────────────────────────── */
 .ls-rail {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 60px;
-  min-width: 60px;
+  width: 56px;
+  min-width: 56px;
   height: 100%;
-  background: var(--buildrick-bg-panel);
+  background: var(--buildrick-bg-card);
   border-right: 1px solid var(--buildrick-border);
   overflow: hidden;
   flex-shrink: 0;
+  padding: 6px 0;
+  gap: 2px;
 }
 
 /* ─────────────────────────────────────────────
-   LOGO — 52px centered icon
+   LOGO — 40px centered icon
    ───────────────────────────────────────────── */
 .ls-logo {
-  width: 100%;
-  height: 52px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   color: var(--buildrick-accent);
+  margin-bottom: 2px;
 }
 
 /* ─────────────────────────────────────────────
-   DIVIDER — 1px horizontal line
+   DIVIDER — 24px hairline between zones
    ───────────────────────────────────────────── */
 .ls-divider {
-  width: 100%;
+  width: 24px;
   height: 1px;
-  background: var(--buildrick-border-light);
+  background: var(--buildrick-border);
   flex-shrink: 0;
+  margin: 4px 0;
 }
 
 /* ─────────────────────────────────────────────
@@ -84,8 +88,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 8px 0;
+  gap: 2px;
   width: 100%;
 }
 
@@ -98,28 +101,30 @@
 }
 
 /* ─────────────────────────────────────────────
-   RAIL BUTTON — 40px icon button
+   RAIL BUTTON — 36×36 centered pill (DS drop spec)
    ───────────────────────────────────────────── */
 .ls-btn {
   position: relative;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  width: 40px;
   height: 40px;
   border: none;
+  border-radius: 8px;
   background: transparent;
   cursor: pointer;
-  color: var(--buildrick-text-muted);
+  color: var(--buildrick-text-secondary);
   font-family: inherit;
   padding: 0;
   text-decoration: none;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.12s ease, color 0.12s ease;
+  flex-shrink: 0;
 }
 
 .ls-btn:hover {
-  background: var(--buildrick-bg-subtle);
-  color: var(--buildrick-text-secondary);
+  background: var(--buildrick-bg-hover);
+  color: var(--buildrick-text-primary);
 }
 
 .ls-btn:focus-visible {
@@ -133,19 +138,19 @@
 }
 
 .ls-btn:active svg {
-  transform: scale(0.92);
+  transform: scale(0.94);
 }
 
 /* Icon sizing */
 .ls-btn > svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
   stroke-width: 1.6;
 }
 
 /* ─────────────────────────────────────────────
-   ACTIVE BUTTON — blue bg + left accent bar
+   ACTIVE BUTTON — accent tint + inset left bar
    ───────────────────────────────────────────── */
 .ls-btn--active {
   background: var(--buildrick-accent-tint);
@@ -157,13 +162,15 @@
   color: var(--buildrick-accent);
 }
 
-/* Left accent bar — 3px, full height */
+/* Left accent bar — 2px inset (not full height) */
 .ls-btn-bar {
   position: absolute;
-  left: 0;
-  top: 0;
-  width: 3px;
-  height: 100%;
+  left: -8px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  height: auto;
+  border-radius: 0 2px 2px 0;
   background: var(--buildrick-accent);
 }
 
@@ -195,7 +202,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--buildrick-bg-panel);
+  background: var(--buildrick-bg-card);
   border-right: 1px solid var(--buildrick-border);
   overflow: hidden;
   transition: width 0.2s ease, opacity 0.15s ease;
@@ -208,25 +215,37 @@
 }
 
 /* ─────────────────────────────────────────────
-   PANEL HEADER — 44px with title, pin, close
+   PANEL HEADER — title + optional subtitle + actions
    ───────────────────────────────────────────── */
 .ls-panel-header {
   display: flex;
   align-items: center;
-  height: 44px;
-  min-height: 44px;
-  padding: 0 12px;
-  border-bottom: 1px solid var(--buildrick-border-light);
+  padding: 11px 12px 10px;
+  border-bottom: 1px solid var(--buildrick-border);
   flex-shrink: 0;
   gap: 8px;
 }
 
 .ls-panel-title {
-  font-family: var(--buildrick-font-family);
-  font-size: 14px;
+  font-family: var(--buildrick-font-family, "Inter Tight", system-ui, sans-serif);
+  font-size: 13px;
   font-weight: 600;
-  color: var(--buildrick-text-primary);
+  color: #0F172A;
+  letter-spacing: -0.01em;
   white-space: nowrap;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Optional subtitle under title (e.g. "30 blocks · 4 categories") */
+.ls-panel-subtitle {
+  font-family: var(--buildrick-font-mono, "Geist Mono", ui-monospace, monospace);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--buildrick-text-muted);
+  letter-spacing: -0.01em;
+  margin-top: 1px;
+  line-height: 1.2;
 }
 
 .ls-panel-header-spacer {
@@ -234,7 +253,7 @@
 }
 
 .ls-panel-icon-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 24px;
@@ -244,13 +263,14 @@
   cursor: pointer;
   color: var(--buildrick-text-muted);
   padding: 0;
-  border-radius: 4px;
-  transition: background 0.15s ease, color 0.15s ease;
+  border-radius: 5px;
+  transition: background 0.12s ease, color 0.12s ease;
+  flex-shrink: 0;
 }
 
 .ls-panel-icon-btn:hover {
   background: var(--buildrick-bg-subtle);
-  color: var(--buildrick-text-secondary);
+  color: var(--buildrick-text-primary);
 }
 
 .ls-panel-icon-btn:focus-visible {
@@ -274,7 +294,7 @@
   padding: 16px;
   overflow-y: auto;
   overflow-x: hidden;
-  background: var(--buildrick-bg-panel);
+  background: var(--buildrick-bg-card);
 }
 
 .ls-panel-content--no-padding {
