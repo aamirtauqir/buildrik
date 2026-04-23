@@ -17,7 +17,6 @@ import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/
 import { getElementIcon } from "../../shared/ui/Icons";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { DeleteConfirmModal } from "./components/DeleteConfirmModal";
-import { ElementBreadcrumb } from "./components/ElementBreadcrumb";
 import { InspectorControls } from "./components/InspectorControls";
 import { InspectorElementMenu } from "./components/InspectorElementMenu";
 import { InspectorEmptyState } from "./components/InspectorEmptyState";
@@ -503,9 +502,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           elementLabel={elementLabel}
         />
       </div>
-
-      {/* Breadcrumb (kept; visual fit checked in Phase 4) */}
-      <ElementBreadcrumb selectedElement={selectedElement} composer={composer} />
 
       {/* Tabs */}
       <div

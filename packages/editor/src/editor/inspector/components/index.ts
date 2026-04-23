@@ -11,7 +11,5 @@
 
 export { DeleteConfirmModal } from "./DeleteConfirmModal";
 export type { DeleteConfirmModalProps } from "./DeleteConfirmModal";
-export { ElementBreadcrumb } from "./ElementBreadcrumb";
-export type { ElementBreadcrumbProps } from "./ElementBreadcrumb";
 export { BindingPopover } from "./BindingPopover";
 export type { BindingPopoverProps } from "./BindingPopover";
