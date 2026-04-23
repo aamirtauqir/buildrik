@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import { ArrowLeft, ChevronDown, Lock, Monitor, Tablet, Smartphone } from "lucide-react";
+import { ChevronDown, Lock, Monitor, Tablet, Smartphone } from "lucide-react";
 import * as React from "react";
 import { BindingPopover } from "./components/BindingPopover";
 import type { Composer } from "../../engine";
@@ -441,17 +441,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       <div role="status" aria-live="polite" aria-atomic="true" className="bdi-sr-only">
         {elementLabel} selected
       </div>
-
-      {/* Back link — switches focus to page settings */}
-      <button
-        type="button"
-        className="bdi-back"
-        onClick={() => composer?.selection?.clear()}
-        aria-label="Switch to page settings"
-      >
-        <ArrowLeft size={10} aria-hidden="true" />
-        Page settings
-      </button>
 
       {/* Header — element identity strip */}
       <div className="bdi-h">

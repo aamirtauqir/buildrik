@@ -80,26 +80,6 @@
   color: var(--bd-fg-primary);
 }
 
-/* ── Back link ────────────────────────────────────────── */
-.bdi-back {
-  background: none;
-  border: none;
-  padding: 5px 14px;
-  font: 500 11px var(--bd-font);
-  color: var(--bd-fg-muted);
-  cursor: pointer;
-  text-align: left;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  opacity: 0.5;
-  transition: opacity 120ms;
-}
-.bdi-back:hover {
-  opacity: 1;
-}
-
 /* ── Tabs ─────────────────────────────────────────────── */
 .bdi-tabs {
   display: flex;
