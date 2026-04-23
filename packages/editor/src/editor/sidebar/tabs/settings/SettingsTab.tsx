@@ -105,8 +105,8 @@ export const SettingsTab: React.FC<
   }
 > = ({
   composer,
-  isPinned,
-  onPinToggle,
+  isPinned: _isPinned,
+  onPinToggle: _onPinToggle,
   onHelpClick,
   onClose,
   userPlan = "starter",
@@ -228,14 +228,41 @@ export const SettingsTab: React.FC<
 
   return (
     <PanelShell>
-      <PanelShell.Header
-        title={current.title}
-        subtitle={current.subtitle}
-        isPinned={isPinned}
-        onPinToggle={onPinToggle}
-        onHelpClick={onHelpClick}
-        onClose={onClose}
-      />
+      <div className="bd-set-panel-h">
+        <div className="bd-set-panel-h-ttl">
+          <h2>{current.title}</h2>
+          {current.subtitle ? <span className="bd-set-panel-sub">{current.subtitle}</span> : null}
+        </div>
+        <div className="bd-set-panel-acts">
+          {onHelpClick ? (
+            <button
+              type="button"
+              className="bd-set-icon-btn"
+              onClick={onHelpClick}
+              aria-label="Help"
+              title="Help"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 17v-.5 M12 8a2 2 0 012 2c0 2-2 2-2 3.5" />
+              </svg>
+            </button>
+          ) : null}
+          {onClose ? (
+            <button
+              type="button"
+              className="bd-set-icon-btn"
+              onClick={onClose}
+              aria-label="Close"
+              title="Close"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M4 4l16 16M20 4L4 20" />
+              </svg>
+            </button>
+          ) : null}
+        </div>
+      </div>
       <PanelShell.Content noScroll>
         <div className="bd-set-root">
           <nav className="bd-set-snav" aria-label="Settings sections">
