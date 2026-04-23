@@ -359,7 +359,7 @@ Target ≥90% match. Any of the following blocks merge:
 | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|
 | Global rules in `components.css` / `ux-fixes.css` leak into `.bdc-lr` via element selectors | Medium | Medium | Grep for bare role selectors, scope with `.bdc-layers` parent if needed. No `!important`. |
-| Expand-all / collapse-all event timing breaks on first render | Low | Low | Event listener registered in existing `useLayersState` mount effect; same pattern as `layers:scroll-to-selection`. |
+| Expand-all / collapse-all event timing breaks on first render | Low | Low | Event listener registered in a new `useEffect` inside `LayersPanel` (`index.tsx`) — mirrors the existing `layers:scroll-to-selection` listener in the same file. Hooks under `hooks/` stay untouched. |
 | Parent sidebar grid breaks when `PanelShell` disappears | Low | Medium | `LayersTab` returns a full-height `<section class="bdc-panel">`. Parent grid cell is unchanged. |
 | Lucide-based element icons drift in size / stroke | Medium | Low | Global `.bdc-lr-ic svg` rule enforces `width/height: 13; stroke-width: 1.5`. |
 | Hex-gate CI fails on new CSS | Low | High | `layers-v2.css` uses `var(--bd-*)` only; audited manually before commit 1. |
