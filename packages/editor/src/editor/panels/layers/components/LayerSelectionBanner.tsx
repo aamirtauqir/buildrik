@@ -13,53 +13,41 @@ interface LayerSelectionBannerProps {
   onExit: () => void;
 }
 
-export function LayerSelectionBanner({
+export const LayerSelectionBanner: React.FC<LayerSelectionBannerProps> = ({
   count,
   onGroup,
   onHide,
   onDelete,
   onExit,
-}: LayerSelectionBannerProps) {
-  React.useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onExit();
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [onExit]);
-
+}) => {
   if (count < 2) return null;
-
   return (
-    <div
-      className="buildrick-layer-sel-banner"
-      role="status"
-      aria-live="polite"
-      aria-label={`${count} layers selected`}
-    >
-      <span className="buildrick-sel-count">{count} selected</span>
-      <div className="buildrick-layer-sel-actions">
-        <button className="buildrick-sel-btn" onClick={onGroup} title="Wrap in container (⌘G)">
-          Group
-        </button>
-        <button className="buildrick-sel-btn" onClick={onHide} title="Hide all selected">
-          Hide
-        </button>
-        <button
-          className="buildrick-sel-btn buildrick-sel-btn--danger"
-          onClick={onDelete}
-          title={`Delete ${count} layers`}
-        >
-          Delete
-        </button>
-        <button
-          className="buildrick-sel-btn buildrick-sel-btn--muted"
-          onClick={onExit}
-          title="Exit selection (Esc)"
-        >
-          Done
-        </button>
-      </div>
+    <div className="bdc-layers-banner" role="toolbar" aria-label="Selection actions">
+      <span className="bdc-layers-banner-count">{count} selected</span>
+      <button className="bdc-icon-btn" title="Group" aria-label="Group" onClick={onGroup}>
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="3" width="8" height="8" rx="1.5" />
+          <rect x="13" y="3" width="8" height="8" rx="1.5" />
+          <rect x="3" y="13" width="8" height="8" rx="1.5" />
+          <rect x="13" y="13" width="8" height="8" rx="1.5" />
+        </svg>
+      </button>
+      <button className="bdc-icon-btn" title="Hide" aria-label="Hide" onClick={onHide}>
+        <svg viewBox="0 0 24 24">
+          <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" />
+          <circle cx="12" cy="12" r="2.5" />
+        </svg>
+      </button>
+      <button className="bdc-icon-btn" title="Delete" aria-label="Delete" onClick={onDelete}>
+        <svg viewBox="0 0 24 24">
+          <path d="M4 7h16 M6 7v13a2 2 0 002 2h8a2 2 0 002-2V7 M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" />
+        </svg>
+      </button>
+      <button className="bdc-icon-btn" title="Done" aria-label="Done" onClick={onExit}>
+        <svg viewBox="0 0 24 24">
+          <path d="M6 6l12 12 M18 6L6 18" />
+        </svg>
+      </button>
     </div>
   );
-}
+};

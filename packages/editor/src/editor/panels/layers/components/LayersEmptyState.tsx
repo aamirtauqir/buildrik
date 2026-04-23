@@ -5,32 +5,27 @@
 
 import * as React from "react";
 
-const LayersIcon: React.FC = () => (
-  <svg
-    width="32"
-    height="32"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <polygon points="12 2 2 7 12 12 22 7 12 2" />
-    <polyline points="2 17 12 22 22 17" />
-    <polyline points="2 12 12 17 22 12" />
-  </svg>
-);
+interface LayersEmptyStateProps {
+  onAddBlockClick?: () => void;
+}
 
-export const LayersEmptyState: React.FC = () => (
-  <div className="buildrick-layers-empty-state-custom">
-    <div className="buildrick-les-icon-wrap">
-      <LayersIcon />
+export const LayersEmptyState: React.FC<LayersEmptyStateProps> = ({ onAddBlockClick }) => {
+  return (
+    <div className="bdc-layers-empty">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <rect x="3" y="4" width="14" height="4" rx="1" />
+        <rect x="7" y="10" width="14" height="4" rx="1" />
+        <rect x="3" y="16" width="14" height="4" rx="1" />
+      </svg>
+      <h3>No layers yet</h3>
+      <p>Drop in a block to get started.</p>
+      {onAddBlockClick && (
+        <button className="bdc-btn bdc-primary" onClick={onAddBlockClick}>
+          Browse blocks
+        </button>
+      )}
     </div>
-    <p className="buildrick-les-heading">No layers yet</p>
-    <p className="buildrick-les-sub">Add elements to your canvas to see them here.</p>
-  </div>
-);
+  );
+};
 
 export default LayersEmptyState;

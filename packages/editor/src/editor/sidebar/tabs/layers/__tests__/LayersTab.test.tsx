@@ -194,7 +194,7 @@ describe("LayerSelectionBanner", () => {
         onExit={vi.fn()}
       />
     );
-    screen.getByText("Group").click();
+    screen.getByRole("button", { name: "Group" }).click();
     expect(onGroup).toHaveBeenCalledTimes(1);
   });
 
@@ -209,7 +209,7 @@ describe("LayerSelectionBanner", () => {
         onExit={vi.fn()}
       />
     );
-    screen.getByText("Delete").click();
+    screen.getByRole("button", { name: "Delete" }).click();
     expect(onDelete).toHaveBeenCalledTimes(1);
   });
 
@@ -224,7 +224,7 @@ describe("LayerSelectionBanner", () => {
         onExit={onExit}
       />
     );
-    screen.getByText("Done").click();
+    screen.getByRole("button", { name: "Done" }).click();
     expect(onExit).toHaveBeenCalledTimes(1);
   });
 });

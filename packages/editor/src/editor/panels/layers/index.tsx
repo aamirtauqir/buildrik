@@ -17,7 +17,7 @@ import { LayerSelectionBanner } from "./components/LayerSelectionBanner";
 import { useLayerContextActions } from "./hooks/useLayerContextActions";
 import { useLayersState } from "./hooks/useLayersState";
 import { LayerTreeItem } from "./LayerTreeItem";
-import { layersPanelStyles, SR_ONLY_STYLE, getDropFeedbackStyle } from "./styles";
+import { SR_ONLY_STYLE, getDropFeedbackStyle } from "./styles";
 import type { LayersPanelProps } from "./types";
 
 export type { LayersPanelProps, SelectedElementInfo } from "./types";
@@ -498,7 +498,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         />
       )}
 
-      <style>{layersPanelStyles}</style>
     </div>
   );
 };

@@ -37,47 +37,50 @@ export function LayerDisplaySettings({ prefs, onChange, onClose }: LayerDisplayS
   return (
     <div
       ref={ref}
-      className="buildrick-layer-display-settings"
+      className="bdc-popover bdc-layers-settings"
       role="dialog"
       aria-label="Layer display settings"
     >
-      <div className="buildrick-lds-header">
-        <span className="buildrick-lds-title">Display Settings</span>
-        <button className="buildrick-lds-close" onClick={onClose} aria-label="Close display settings">
+      <div className="bdc-popover-h">
+        <span>Display Settings</span>
+        <button className="bdc-icon-btn" onClick={onClose} aria-label="Close display settings">
           ×
         </button>
       </div>
 
-      <label className="buildrick-lds-row">
-        <span className="buildrick-lds-label">
+      <label className="bdc-toggle-row">
+        <span>
           Show HTML tags
-          <span className="buildrick-lds-hint">div, section, h1…</span>
+          <span> div, section, h1…</span>
         </span>
         <input
           type="checkbox"
+          className="bdc-switch"
           checked={prefs.showHtmlBadges}
           onChange={(e) => onChange({ showHtmlBadges: e.target.checked })}
           aria-label="Show HTML tags"
         />
       </label>
 
-      <label className="buildrick-lds-row">
-        <span className="buildrick-lds-label">
+      <label className="bdc-toggle-row">
+        <span>
           Show element IDs
-          <span className="buildrick-lds-hint">#abc123 format</span>
+          <span> #abc123 format</span>
         </span>
         <input
           type="checkbox"
+          className="bdc-switch"
           checked={prefs.showElementIds}
           onChange={(e) => onChange({ showElementIds: e.target.checked })}
           aria-label="Show element IDs"
         />
       </label>
 
-      <label className="buildrick-lds-row">
-        <span className="buildrick-lds-label">Compact rows</span>
+      <label className="bdc-toggle-row">
+        <span>Compact rows</span>
         <input
           type="checkbox"
+          className="bdc-switch"
           checked={prefs.treeDensity === "compact"}
           onChange={(e) => onChange({ treeDensity: e.target.checked ? "compact" : "comfortable" })}
           aria-label="Compact row density"
