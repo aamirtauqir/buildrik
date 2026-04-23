@@ -144,8 +144,8 @@ export const SwitchRow: React.FC<SwitchRowProps> = ({
 );
 
 /**
- * Back-compat alias — existing screens import `Toggle` with the same shape.
- * Once all screens migrate to SwitchRow directly, drop this alias.
+ * @deprecated Back-compat alias for SwitchRow. Import SwitchRow directly in new code.
+ * Remove this alias once all consumer screens migrate (target: Task 4).
  */
 export const Toggle = SwitchRow;
 
@@ -212,8 +212,8 @@ export const LockedDesc: React.FC<{ children: React.ReactNode }> = ({ children }
 
 export const LockedBtn: React.FC<
   React.ButtonHTMLAttributes<HTMLButtonElement>
-> = ({ style, children, ...rest }) => (
-  <button style={{ ...lockedBtnStyle, ...style }} {...rest}>
+> = ({ style, type = "button", children, ...rest }) => (
+  <button type={type} style={{ ...lockedBtnStyle, ...style }} {...rest}>
     {children}
   </button>
 );
@@ -235,9 +235,16 @@ export const SettingsNavGuard: React.FC<SettingsNavGuardProps> = ({
 }) => {
   if (!isOpen) return null;
   return (
-    <div className="bd-set-guard-overlay" role="dialog" aria-modal="true">
+    <div
+      className="bd-set-guard-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="bd-set-guard-title"
+    >
       <div className="bd-set-guard-modal">
-        <h4 className="bd-set-guard-title">Discard unsaved changes?</h4>
+        <h4 id="bd-set-guard-title" className="bd-set-guard-title">
+          Discard unsaved changes?
+        </h4>
         <p className="bd-set-guard-body">
           You have unsaved edits in this section. Switching will discard them. Save first to keep your changes.
         </p>
