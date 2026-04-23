@@ -15,6 +15,7 @@ import { PanelShell } from "@shared/ui/panel";
 import { usePanelNavigation } from "../../shared/usePanelNavigation";
 import {
   type SettingsTabProps,
+  type PlanTier,
   SCREEN_PLAN_REQUIREMENTS,
   SiteSettingsIcon,
   IntegrationsIcon,
@@ -58,7 +59,7 @@ const SETTINGS_SCREENS = NAV.map(({ id, title }) => ({ id, title }));
 // ─── Branding placeholder (V1 — replaces DesignSystemTab delegate) ───────────
 
 interface BrandingPlaceholderProps {
-  onOpenPalette: () => void;
+  onOpenPalette?: () => void;
 }
 const BrandingPlaceholder: React.FC<BrandingPlaceholderProps> = ({ onOpenPalette }) => (
   <div className="bd-set-section">
@@ -71,17 +72,37 @@ const BrandingPlaceholder: React.FC<BrandingPlaceholderProps> = ({ onOpenPalette
       <div className="bd-set-branding-placeholder-d">
         Palette owns the design system for this project. Changes there apply to every page.
       </div>
-      <button type="button" className="bd-set-btn pri" onClick={onOpenPalette}>
+      <button
+        type="button"
+        className="bd-set-btn pri"
+        onClick={onOpenPalette}
+        disabled={!onOpenPalette}
+      >
         Open Palette →
       </button>
     </div>
   </div>
 );
 
+// ─── Module-scope helpers ─────────────────────────────────────────────────────
+
+function isScreenLocked(screenId: string, userPlan: PlanTier): boolean {
+  const required = SCREEN_PLAN_REQUIREMENTS[screenId];
+  if (!required) return false;
+  return required === "pro" ? userPlan === "starter" : userPlan !== "enterprise";
+}
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export const SettingsTab: React.FC<
-  SettingsTabProps & { onOpenDesignTab?: () => void }
+  SettingsTabProps & {
+    /**
+     * Optional: switch to the Palette (`design`) tab. When absent, the Branding
+     * section's "Open Palette →" button renders disabled. TODO: thread from
+     * FullPageRouter once a tab-switch handle exists there.
+     */
+    onOpenDesignTab?: () => void;
+  }
 > = ({
   composer,
   isPinned,
@@ -118,16 +139,8 @@ export const SettingsTab: React.FC<
 
   const handleScreenDirty = React.useCallback((dirty: boolean) => {
     setScreenIsDirty(dirty);
-    setDirtyCount((c) => (dirty ? c + 1 : 0));
+    setDirtyCount(dirty ? 1 : 0);
   }, []);
-
-  const isScreenLocked = (screenId: string) => {
-    const required = SCREEN_PLAN_REQUIREMENTS[screenId];
-    if (!required) return false;
-    if (required === "pro") return userPlan === "starter";
-    if (required === "enterprise") return userPlan !== "enterprise";
-    return false;
-  };
 
   const handleNav = React.useCallback(
     (nextId: NavId) => {
@@ -150,21 +163,27 @@ export const SettingsTab: React.FC<
 
   const handleSave = React.useCallback(() => {
     if (!composer) return;
-    composer.saveProject?.().catch((err) => {
-      console.error("[settings] save failed", err);
-    });
-    setScreenIsDirty(false);
-    setDirtyCount(0);
+    const maybePromise = composer.saveProject?.();
+    if (!maybePromise) {
+      setScreenIsDirty(false);
+      setDirtyCount(0);
+      return;
+    }
+    maybePromise
+      .then(() => {
+        setScreenIsDirty(false);
+        setDirtyCount(0);
+      })
+      .catch((err) => {
+        console.error("[settings] save failed", err);
+        // Leave dirty state so savebar stays visible
+      });
   }, [composer]);
-
-  const handleOpenPalette = React.useCallback(() => {
-    onOpenDesignTab?.();
-  }, [onOpenDesignTab]);
 
   const current = NAV.find((n) => n.id === currentScreen) ?? NAV[0];
 
   const renderContent = (): React.ReactNode => {
-    if (isScreenLocked(currentScreen)) {
+    if (isScreenLocked(currentScreen, userPlan)) {
       const requiredPlan = SCREEN_PLAN_REQUIREMENTS[currentScreen];
       return <LockedScreen variant={requiredPlan} />;
     }
@@ -172,7 +191,7 @@ export const SettingsTab: React.FC<
       case "general":
         return <SiteSettingsScreen composer={composer} onDirtyChange={handleScreenDirty} />;
       case "branding":
-        return <BrandingPlaceholder onOpenPalette={handleOpenPalette} />;
+        return <BrandingPlaceholder onOpenPalette={onOpenDesignTab} />;
       case "seo":
         return <SeoScreen composer={composer} onDirtyChange={handleScreenDirty} />;
       case "integrations":
@@ -188,7 +207,7 @@ export const SettingsTab: React.FC<
 
   const renderRow = (n: NavDef) => {
     const active = currentScreen === n.id;
-    const locked = isScreenLocked(n.id);
+    const locked = isScreenLocked(n.id, userPlan);
     const Icon = n.icon;
     return (
       <button
@@ -227,8 +246,7 @@ export const SettingsTab: React.FC<
                 <button
                   type="button"
                   onClick={onReplayTour}
-                  className="bd-set-snav-row"
-                  style={{ marginTop: 8 }}
+                  className="bd-set-snav-row bd-set-snav-row-sep"
                 >
                   <span className="bd-set-snav-icon">
                     <TourIcon />
@@ -249,7 +267,7 @@ export const SettingsTab: React.FC<
               aria-hidden={!screenIsDirty}
             >
               <span className="bd-set-savebar-note">
-                <span>{dirtyCount || 1} unsaved</span>
+                <span>{dirtyCount} unsaved</span>
               </span>
               <div className="bd-set-savebar-actions">
                 <button type="button" className="bd-set-btn sec" onClick={handleDiscard}>
