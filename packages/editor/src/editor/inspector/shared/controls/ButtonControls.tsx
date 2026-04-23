@@ -1,47 +1,65 @@
 /**
- * Button Controls for Pro Inspector
- * ButtonGroup, CompactButtonGroup
+ * Button Group controls — ported to .bdi-seg per comp-inspector.v1.
+ * ButtonGroup = full-row segmented control. CompactButtonGroup = dense variant.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { baseStyles } from "./controlStyles";
 
 // ============================================================================
-// BUTTON GROUP
+// BUTTON GROUP (segmented, sits in a .bdi-row-ctrl row when labeled)
 // ============================================================================
 
 export interface ButtonGroupProps {
   label?: string;
   value: string;
   onChange: (value: string) => void;
-  options: { value: string; label: string; icon?: string }[];
+  options: { value: string; label: string; icon?: React.ReactNode | string }[];
 }
 
 export const ButtonGroup: React.FC<ButtonGroupProps> = ({ label, value, onChange, options }) => {
+  const segment = (
+    <div
+      className="bdi-seg"
+      style={{
+        gridAutoColumns: `repeat(${options.length}, 1fr)`,
+      }}
+    >
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          className={value === opt.value ? "on" : ""}
+          onClick={() => onChange(opt.value)}
+          title={opt.label}
+          aria-label={opt.label}
+          aria-pressed={value === opt.value}
+        >
+          {opt.icon ? (
+            <span className="bdi-ico" aria-hidden="true">
+              {typeof opt.icon === "string" ? opt.icon : opt.icon}
+            </span>
+          ) : (
+            opt.label
+          )}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (!label) return segment;
+
   return (
-    <div style={baseStyles.row}>
-      {label && <label style={baseStyles.label}>{label}</label>}
-      <div style={{ ...baseStyles.buttonGroup, flex: label ? 1 : undefined }}>
-        {options.map((opt) => (
-          <button
-            key={opt.value}
-            style={baseStyles.buttonGroupItem(value === opt.value)}
-            onClick={() => onChange(opt.value)}
-            title={opt.label}
-            aria-label={opt.label}
-            aria-pressed={value === opt.value}
-          >
-            {opt.icon || opt.label}
-          </button>
-        ))}
-      </div>
+    <div className="bdi-row-ctrl">
+      <label className="bdi-lb">{label}</label>
+      <div className="bdi-row-content">{segment}</div>
     </div>
   );
 };
 
 // ============================================================================
-// COMPACT BUTTON GROUP (small toggle buttons in a row)
+// COMPACT BUTTON GROUP (short inline variant)
 // ============================================================================
 
 export interface CompactButtonGroupProps {
@@ -57,55 +75,37 @@ export const CompactButtonGroup: React.FC<CompactButtonGroupProps> = ({
   value,
   options,
   onChange,
-  labelWidth = 50,
 }) => {
-  const compactBtnStyle = (active: boolean): React.CSSProperties => ({
-    flex: 1,
-    padding: "6px 4px",
-    background: active ? "rgba(0,115,230,0.2)" : "rgba(255,255,255,0.03)",
-    border: active ? "1px solid rgba(0,115,230,0.3)" : "1px solid transparent",
-    borderRadius: 4,
-    color: active ? "#0073E6" : "#71717a",
-    fontSize: 12,
-    fontWeight: 500,
-    cursor: "pointer",
-  });
-
-  return (
+  const segment = (
     <div
+      className="bdi-seg"
       style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 6,
-        marginBottom: 8,
+        gridAutoColumns: `repeat(${options.length}, 1fr)`,
+        height: 22,
       }}
     >
-      {label && (
-        <span
-          style={{
-            fontSize: 12,
-            color: "var(--buildrick-text-tertiary)",
-            fontWeight: 500,
-            minWidth: labelWidth,
-          }}
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          className={value === opt.value ? "on" : ""}
+          onClick={() => onChange(opt.value)}
+          title={opt.label}
+          aria-label={opt.label}
+          aria-pressed={value === opt.value}
         >
-          {label}
-        </span>
-      )}
-      <div style={{ display: "flex", gap: 2, flex: 1 }}>
-        {options.map((opt) => (
-          <button
-            key={opt.value}
-            style={compactBtnStyle(value === opt.value)}
-            onClick={() => onChange(opt.value)}
-            title={opt.label}
-            aria-label={opt.label}
-            aria-pressed={value === opt.value}
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (!label) return segment;
+
+  return (
+    <div className="bdi-row-ctrl">
+      <label className="bdi-lb">{label}</label>
+      <div className="bdi-row-content">{segment}</div>
     </div>
   );
 };

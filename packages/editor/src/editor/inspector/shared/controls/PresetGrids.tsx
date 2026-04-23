@@ -1,13 +1,14 @@
 /**
- * Preset Grid Controls for Pro Inspector
- * TemplateButtonGrid, PresetButtonGrid
+ * Preset Grid Controls — TemplateButtonGrid + PresetButtonGrid.
+ * Ported to .bdi-qa pattern per comp-inspector.v1 quick actions row.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 
 // ============================================================================
-// TEMPLATE BUTTON GRID (for quick presets like grid templates)
+// TEMPLATE BUTTON GRID (dense preset row, e.g., grid templates)
 // ============================================================================
 
 export interface TemplateButtonGridProps {
@@ -22,38 +23,28 @@ export const TemplateButtonGrid: React.FC<TemplateButtonGridProps> = ({
   currentValue,
   onChange,
   columns = 4,
-}) => {
-  const templateBtnStyle = (active: boolean): React.CSSProperties => ({
-    padding: "5px 4px",
-    background: active ? "rgba(0,115,230,0.2)" : "rgba(255,255,255,0.03)",
-    border: active ? "1px solid rgba(0,115,230,0.3)" : "1px solid rgba(255,255,255,0.06)",
-    borderRadius: 4,
-    color: active ? "#0073E6" : "#71717a",
-    fontSize: 8,
-    cursor: "pointer",
-  });
-
-  return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: `repeat(${columns}, 1fr)`,
-        gap: 3,
-        marginBottom: 10,
-      }}
-    >
-      {templates.map((tpl) => (
-        <button
-          key={tpl.label}
-          onClick={() => onChange(tpl.value)}
-          style={templateBtnStyle(currentValue === tpl.value)}
-        >
-          {tpl.label}
-        </button>
-      ))}
-    </div>
-  );
-};
+}) => (
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: `repeat(${columns}, 1fr)`,
+      gap: 3,
+    }}
+  >
+    {templates.map((tpl) => (
+      <button
+        key={tpl.label}
+        type="button"
+        onClick={() => onChange(tpl.value)}
+        className={`bdi-qa${currentValue === tpl.value ? " on" : ""}`}
+        style={{ padding: "5px 0", fontSize: 9 }}
+        aria-pressed={currentValue === tpl.value}
+      >
+        {tpl.label}
+      </button>
+    ))}
+  </div>
+);
 
 // ============================================================================
 // PRESET BUTTON GRID
@@ -71,34 +62,24 @@ export const PresetButtonGrid: React.FC<PresetButtonGridProps> = ({
   currentValue,
   onChange,
   columns = 4,
-}) => {
-  return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: `repeat(${columns}, 1fr)`,
-        gap: 4,
-        marginBottom: 12,
-      }}
-    >
-      {presets.map((preset) => (
-        <button
-          key={preset.label}
-          onClick={() => onChange(preset.value)}
-          style={{
-            padding: "8px 4px",
-            background:
-              currentValue === preset.value ? "rgba(0,115,230,0.2)" : "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.06)",
-            borderRadius: 4,
-            color: currentValue === preset.value ? "#0073E6" : "#71717a",
-            fontSize: 12,
-            cursor: "pointer",
-          }}
-        >
-          {preset.label}
-        </button>
-      ))}
-    </div>
-  );
-};
+}) => (
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: `repeat(${columns}, 1fr)`,
+      gap: 4,
+    }}
+  >
+    {presets.map((preset) => (
+      <button
+        key={preset.label}
+        type="button"
+        onClick={() => onChange(preset.value)}
+        className={`bdi-qa${currentValue === preset.value ? " on" : ""}`}
+        aria-pressed={currentValue === preset.value}
+      >
+        {preset.label}
+      </button>
+    ))}
+  </div>
+);

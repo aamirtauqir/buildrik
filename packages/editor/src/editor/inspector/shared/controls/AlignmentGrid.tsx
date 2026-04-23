@@ -1,13 +1,10 @@
 /**
- * AlignmentGrid - 3x3 visual alignment picker
+ * AlignmentGrid — 3x3 visual justify/align picker. Ported to --bd-* tokens.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-
-// ============================================================================
-// ALIGNMENT GRID
-// ============================================================================
 
 export interface AlignmentGridProps {
   justifyItems: string;
@@ -38,10 +35,9 @@ export const AlignmentGrid: React.FC<AlignmentGridProps> = ({
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
         gap: 2,
-        padding: 8,
-        background: "rgba(0,0,0,0.2)",
-        borderRadius: 6,
-        marginBottom: 8,
+        padding: 4,
+        background: "var(--bd-bg-subtle)",
+        borderRadius: 4,
       }}
     >
       {positions.map((pos, i) => {
@@ -49,28 +45,32 @@ export const AlignmentGrid: React.FC<AlignmentGridProps> = ({
         return (
           <button
             key={i}
+            type="button"
             onClick={() => {
               onChange("justify-items", pos.ji);
               onChange("align-items", pos.ai);
             }}
             style={{
-              width: 24,
-              height: 24,
-              background: isActive ? "#0073E6" : "rgba(255,255,255,0.1)",
+              width: 22,
+              height: 22,
+              background: isActive ? "var(--bd-accent)" : "#fff",
               border: "none",
               borderRadius: 3,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              transition: "background 120ms",
             }}
             title={`justify: ${pos.ji}, align: ${pos.ai}`}
+            aria-label={`justify: ${pos.ji}, align: ${pos.ai}`}
+            aria-pressed={isActive}
           >
             <div
               style={{
                 width: 6,
                 height: 6,
-                background: isActive ? "#fff" : "#71717a",
+                background: isActive ? "#fff" : "var(--bd-fg-muted)",
                 borderRadius: 1,
               }}
             />

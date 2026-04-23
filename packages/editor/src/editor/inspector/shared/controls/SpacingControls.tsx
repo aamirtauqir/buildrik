@@ -1,17 +1,15 @@
 /**
- * @lint-hex-policy: component-theme
- *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ * Spacing Controls — FourSideInput (margin/padding quad) + CornerRadiusInput.
+ * Ported to .bdi-quad + .bdi-num.axis per comp-inspector.v1.
  *
- * Spacing Controls for Pro Inspector
- * FourSideInput (margin/padding), CornerRadiusInput
  * @license BSD-3-Clause
  */
 
+import { Link, Unlink } from "lucide-react";
 import * as React from "react";
-import { baseStyles } from "./controlStyles";
 
 // ============================================================================
-// FOUR-SIDE INPUT (for margin/padding)
+// FOUR-SIDE INPUT (margin / padding quad)
 // ============================================================================
 
 export interface FourSideInputProps {
@@ -24,6 +22,60 @@ export interface FourSideInputProps {
   disabledReason?: string;
 }
 
+const SIDE_AXIS: Record<"top" | "right" | "bottom" | "left", string> = {
+  top: "T",
+  right: "R",
+  bottom: "B",
+  left: "L",
+};
+
+const AxisInput: React.FC<{
+  side: "top" | "right" | "bottom" | "left";
+  value: string;
+  onChange: (v: string) => void;
+  disabled?: boolean;
+}> = ({ side, value, onChange, disabled }) => {
+  const [local, setLocal] = React.useState(value);
+  React.useEffect(() => setLocal(value), [value]);
+
+  const parseValue = (val: string): { num: string; unit: string } => {
+    if (val === "auto" || val === "inherit" || val === "") return { num: val, unit: "" };
+    const m = val.match(/^(-?[\d.]+)(.*)$/);
+    return m ? { num: m[1], unit: m[2] || "px" } : { num: val, unit: "" };
+  };
+
+  const { num, unit } = parseValue(local);
+  const commit = (raw: string) => {
+    if (raw === "" || raw === "auto") {
+      onChange(raw);
+      return;
+    }
+    if (/^-?[\d.]+$/.test(raw)) onChange(`${raw}px`);
+  };
+
+  return (
+    <div
+      className="bdi-num axis"
+      data-axis={SIDE_AXIS[side]}
+      style={disabled ? { opacity: 0.5, pointerEvents: "none" } : undefined}
+    >
+      <input
+        type="text"
+        value={num}
+        onChange={(e) => {
+          setLocal(e.target.value);
+          commit(e.target.value);
+        }}
+        placeholder="0"
+        disabled={disabled}
+        aria-label={`${side} ${SIDE_AXIS[side]}`}
+        className={num === "auto" ? "muted" : ""}
+      />
+      {unit && num !== "auto" && <span className="bdi-u">{unit}</span>}
+    </div>
+  );
+};
+
 export const FourSideInput: React.FC<FourSideInputProps> = ({
   label,
   values,
@@ -32,115 +84,67 @@ export const FourSideInput: React.FC<FourSideInputProps> = ({
   linked = false,
   disabledSides,
   disabledReason,
-}) => {
-  const boxStyle: React.CSSProperties = {
-    display: "grid",
-    gridTemplateColumns: "1fr 44px 1fr",
-    gridTemplateRows: "auto auto auto",
-    gap: 3,
-    alignItems: "center",
-    justifyItems: "center",
-  };
-
-  const sideInputStyle: React.CSSProperties = {
-    width: 46,
-    padding: "3px 4px",
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: 4,
-    color: "#e4e4e7",
-    fontSize: 11,
-    textAlign: "center",
-    outline: "none",
-  };
-
-  const centerBoxStyle: React.CSSProperties = {
-    width: 30,
-    height: 30,
-    background: "rgba(0,115,230,0.1)",
-    border: "1px dashed rgba(0,115,230,0.3)",
-    borderRadius: 4,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-    fontSize: 12,
-    color: linked ? "#0073E6" : "#71717a",
-  };
-
-  return (
-    <div style={{ marginBottom: 10 }}>
-      <div style={{ ...baseStyles.label, marginBottom: 5 }} title={disabledReason}>
+}) => (
+  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 4,
+      }}
+    >
+      <span className="bdi-sub-label" style={{ marginTop: 0 }} title={disabledReason}>
         {label}
-      </div>
-      <div style={boxStyle}>
-        {/* Top */}
-        <div />
-        <input
-          type="text"
-          value={values.top}
-          onChange={(e) => onChange("top", e.target.value)}
-          placeholder="0"
+      </span>
+      {onLinkToggle && (
+        <button
+          type="button"
+          onClick={onLinkToggle}
+          title={linked ? "Unlink sides" : "Link all sides"}
+          aria-label={linked ? "Unlink sides" : "Link all sides"}
+          className="bdi-mini"
           style={{
-            ...sideInputStyle,
-            opacity: disabledSides?.top ? 0.5 : 1,
-            cursor: disabledSides?.top ? "not-allowed" : "text",
+            width: 18,
+            height: 18,
+            color: linked ? "var(--bd-accent)" : "var(--bd-fg-muted)",
           }}
-          disabled={disabledSides?.top}
-        />
-        <div />
-
-        {/* Left - Center - Right */}
-        <input
-          type="text"
-          value={values.left}
-          onChange={(e) => onChange("left", e.target.value)}
-          placeholder="0"
-          style={{
-            ...sideInputStyle,
-            opacity: disabledSides?.left ? 0.5 : 1,
-            cursor: disabledSides?.left ? "not-allowed" : "text",
-          }}
-          disabled={disabledSides?.left}
-        />
-        <div style={centerBoxStyle} onClick={onLinkToggle} title="Link all sides">
-          {linked ? "🔗" : "⛓️‍💥"}
-        </div>
-        <input
-          type="text"
-          value={values.right}
-          onChange={(e) => onChange("right", e.target.value)}
-          placeholder="0"
-          style={{
-            ...sideInputStyle,
-            opacity: disabledSides?.right ? 0.5 : 1,
-            cursor: disabledSides?.right ? "not-allowed" : "text",
-          }}
-          disabled={disabledSides?.right}
-        />
-
-        {/* Bottom */}
-        <div />
-        <input
-          type="text"
-          value={values.bottom}
-          onChange={(e) => onChange("bottom", e.target.value)}
-          placeholder="0"
-          style={{
-            ...sideInputStyle,
-            opacity: disabledSides?.bottom ? 0.5 : 1,
-            cursor: disabledSides?.bottom ? "not-allowed" : "text",
-          }}
-          disabled={disabledSides?.bottom}
-        />
-        <div />
-      </div>
+        >
+          {linked ? <Link size={11} aria-hidden="true" /> : <Unlink size={11} aria-hidden="true" />}
+        </button>
+      )}
     </div>
-  );
-};
+    <div className="bdi-quad">
+      <AxisInput
+        side="top"
+        value={values.top}
+        onChange={(v) => onChange("top", v)}
+        disabled={disabledSides?.top}
+      />
+      <AxisInput
+        side="right"
+        value={values.right}
+        onChange={(v) => onChange("right", v)}
+        disabled={disabledSides?.right}
+      />
+      <AxisInput
+        side="bottom"
+        value={values.bottom}
+        onChange={(v) => onChange("bottom", v)}
+        disabled={disabledSides?.bottom}
+      />
+      <AxisInput
+        side="left"
+        value={values.left}
+        onChange={(v) => onChange("left", v)}
+        disabled={disabledSides?.left}
+      />
+    </div>
+  </div>
+);
 
 // ============================================================================
-// CORNER RADIUS INPUT
+// CORNER RADIUS INPUT (2x2 corners + link)
 // ============================================================================
 
 export interface CornerRadiusInputProps {
@@ -150,78 +154,85 @@ export interface CornerRadiusInputProps {
   onLinkToggle?: () => void;
 }
 
+const CORNER_AXIS: Record<"tl" | "tr" | "br" | "bl", string> = {
+  tl: "TL",
+  tr: "TR",
+  br: "BR",
+  bl: "BL",
+};
+
+const CornerAxisInput: React.FC<{
+  corner: "tl" | "tr" | "br" | "bl";
+  value: string;
+  onChange: (v: string) => void;
+}> = ({ corner, value, onChange }) => {
+  const [local, setLocal] = React.useState(value);
+  React.useEffect(() => setLocal(value), [value]);
+
+  const parseValue = (val: string): { num: string; unit: string } => {
+    const m = val.match(/^(-?[\d.]+)(.*)$/);
+    return m ? { num: m[1], unit: m[2] || "px" } : { num: val, unit: "" };
+  };
+  const { num, unit } = parseValue(local);
+
+  return (
+    <div className="bdi-num axis" data-axis={CORNER_AXIS[corner]}>
+      <input
+        type="text"
+        value={num}
+        onChange={(e) => {
+          setLocal(e.target.value);
+          if (/^-?[\d.]+$/.test(e.target.value)) onChange(`${e.target.value}px`);
+          else if (e.target.value === "") onChange("");
+        }}
+        placeholder="0"
+        aria-label={`${corner} corner`}
+      />
+      {unit && <span className="bdi-u">{unit}</span>}
+    </div>
+  );
+};
+
 export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
   values,
   onChange,
   linked = false,
   onLinkToggle,
-}) => {
-  const cornerStyle: React.CSSProperties = {
-    width: 40,
-    padding: "6px 4px",
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: 4,
-    color: "#e4e4e7",
-    fontSize: 12,
-    textAlign: "center",
-    outline: "none",
-  };
-
-  return (
-    <div style={{ marginBottom: 12 }}>
-      <div style={{ ...baseStyles.label, marginBottom: 8 }}>Border Radius</div>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "40px 40px", gap: 4 }}>
-          <input
-            type="text"
-            value={values.tl}
-            onChange={(e) => onChange("tl", e.target.value)}
-            placeholder="0"
-            style={{ ...cornerStyle, borderRadius: "8px 0 0 0" }}
-            title="Top Left"
-          />
-          <input
-            type="text"
-            value={values.tr}
-            onChange={(e) => onChange("tr", e.target.value)}
-            placeholder="0"
-            style={{ ...cornerStyle, borderRadius: "0 8px 0 0" }}
-            title="Top Right"
-          />
-          <input
-            type="text"
-            value={values.bl}
-            onChange={(e) => onChange("bl", e.target.value)}
-            placeholder="0"
-            style={{ ...cornerStyle, borderRadius: "0 0 0 8px" }}
-            title="Bottom Left"
-          />
-          <input
-            type="text"
-            value={values.br}
-            onChange={(e) => onChange("br", e.target.value)}
-            placeholder="0"
-            style={{ ...cornerStyle, borderRadius: "0 0 8px 0" }}
-            title="Bottom Right"
-          />
-        </div>
+}) => (
+  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 4,
+      }}
+    >
+      <span className="bdi-sub-label" style={{ marginTop: 0 }}>
+        Radius
+      </span>
+      {onLinkToggle && (
         <button
+          type="button"
           onClick={onLinkToggle}
+          title={linked ? "Unlink corners" : "Link all corners"}
+          aria-label={linked ? "Unlink corners" : "Link all corners"}
+          className="bdi-mini"
           style={{
-            padding: "8px 12px",
-            background: linked ? "rgba(0,115,230,0.2)" : "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: 6,
-            color: linked ? "#0073E6" : "#71717a",
-            cursor: "pointer",
-            fontSize: 12,
+            width: 18,
+            height: 18,
+            color: linked ? "var(--bd-accent)" : "var(--bd-fg-muted)",
           }}
-          title="Link all corners"
         >
-          {linked ? "🔗" : "⛓️‍💥"}
+          {linked ? <Link size={11} aria-hidden="true" /> : <Unlink size={11} aria-hidden="true" />}
         </button>
-      </div>
+      )}
     </div>
-  );
-};
+    <div className="bdi-quad">
+      <CornerAxisInput corner="tl" value={values.tl} onChange={(v) => onChange("tl", v)} />
+      <CornerAxisInput corner="tr" value={values.tr} onChange={(v) => onChange("tr", v)} />
+      <CornerAxisInput corner="bl" value={values.bl} onChange={(v) => onChange("bl", v)} />
+      <CornerAxisInput corner="br" value={values.br} onChange={(v) => onChange("br", v)} />
+    </div>
+  </div>
+);

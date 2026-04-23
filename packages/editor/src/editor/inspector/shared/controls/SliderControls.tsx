@@ -1,11 +1,11 @@
 /**
- * Slider Controls for Pro Inspector
- * SliderInput, RangeSlider
+ * Slider Controls — SliderInput, RangeSlider. Ported to .bdi-row-ctrl with
+ * numeric value display on the right.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import { baseStyles } from "./controlStyles";
 
 // ============================================================================
 // SLIDER INPUT
@@ -21,6 +21,15 @@ export interface SliderInputProps {
   unit?: string;
 }
 
+const sliderStyle: React.CSSProperties = {
+  flex: 1,
+  height: 4,
+  background: "var(--bd-border-medium, #CBD5E1)",
+  borderRadius: 2,
+  appearance: "none",
+  cursor: "pointer",
+};
+
 export const SliderInput: React.FC<SliderInputProps> = ({
   label,
   value,
@@ -29,10 +38,10 @@ export const SliderInput: React.FC<SliderInputProps> = ({
   max = 100,
   step = 1,
   unit = "",
-}) => {
-  return (
-    <div style={baseStyles.row}>
-      <label style={baseStyles.label}>{label}</label>
+}) => (
+  <div className="bdi-row-ctrl">
+    <label className="bdi-lb">{label}</label>
+    <div className="bdi-row-content">
       <input
         type="range"
         value={value}
@@ -40,25 +49,26 @@ export const SliderInput: React.FC<SliderInputProps> = ({
         min={min}
         max={max}
         step={step}
-        style={baseStyles.slider}
+        style={sliderStyle}
       />
       <span
         style={{
-          fontSize: 12,
-          color: "var(--buildrick-text-tertiary)",
-          minWidth: 40,
-          textAlign: "right" as const,
+          font: "500 11px var(--bd-font)",
+          color: "var(--bd-fg-muted)",
+          minWidth: 32,
+          textAlign: "right",
+          fontVariantNumeric: "tabular-nums",
         }}
       >
         {value}
         {unit}
       </span>
     </div>
-  );
-};
+  </div>
+);
 
 // ============================================================================
-// RANGE SLIDER (inline slider with label and value display)
+// RANGE SLIDER
 // ============================================================================
 
 export interface RangeSliderProps {
@@ -81,19 +91,10 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
   max = 100,
   step = 1,
   unit = "",
-  labelWidth = 70,
-  valueWidth = 35,
-}) => {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        marginBottom: 8,
-      }}
-    >
-      <span style={{ fontSize: 12, color: "var(--buildrick-text-tertiary)", minWidth: labelWidth }}>{label}</span>
+}) => (
+  <div className="bdi-row-ctrl">
+    <label className="bdi-lb">{label}</label>
+    <div className="bdi-row-content">
       <input
         type="range"
         min={min}
@@ -101,12 +102,20 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        style={{ flex: 1 }}
+        style={sliderStyle}
       />
-      <span style={{ fontSize: 12, color: "var(--buildrick-text-tertiary)", minWidth: valueWidth }}>
+      <span
+        style={{
+          font: "500 11px var(--bd-font)",
+          color: "var(--bd-fg-muted)",
+          minWidth: 32,
+          textAlign: "right",
+          fontVariantNumeric: "tabular-nums",
+        }}
+      >
         {value}
         {unit}
       </span>
     </div>
-  );
-};
+  </div>
+);
