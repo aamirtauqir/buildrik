@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { Field, Input, Screen, Section } from "../shared";
+import { Field, Input, Screen, Section, Select } from "../shared";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import type { ScreenProps } from "../types";
 
@@ -32,7 +32,7 @@ const DEFAULT_SOCIAL: SocialSettings = {
   linkedin: "",
 };
 
-export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
+export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange }) => {
   const identity = useSettingsScreen(
     composer,
     (s) => ({
@@ -59,7 +59,13 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
   const [twitter, setTwitter] = React.useState(social.value.twitter);
   const [facebook, setFacebook] = React.useState(social.value.facebook);
   const [linkedin, setLinkedin] = React.useState(social.value.linkedin);
-  const [saveError, setSaveError] = React.useState<string | null>(null);
+
+  const isDirty = identity.isDirty || social.isDirty;
+
+  // Notify central savebar when dirty state changes
+  React.useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
 
   // Sync local state when composer reloads (preserves user's unsaved edits)
   React.useEffect(() => {
@@ -74,40 +80,27 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
     setLinkedin(social.value.linkedin);
   }, [social.value.twitter, social.value.facebook, social.value.linkedin]);
 
-  const handleSave = () => {
-    if (!composer) return;
-    try {
-      const current = composer.getProjectSettings();
-      composer.setProjectSettings({
-        ...current,
-        seo: {
-          ...current.seo,
-          siteName,
-          favicon,
-          language,
-          socialLinks: { twitter, facebook, linkedin },
-        },
-      });
-      identity.markClean();
-      social.markClean();
-      setSaveError(null);
-    } catch {
-      setSaveError("Failed to save settings. Please try again.");
-    }
-  };
+  // Sync local edits to composer's in-memory settings so central savebar's
+  // saveProject() picks them up. Only writes when dirty — avoids reentrant
+  // loops when composer emits SETTINGS_CHANGE back via setProjectSettings.
+  React.useEffect(() => {
+    if (!composer || !isDirty) return;
+    const current = composer.getProjectSettings();
+    composer.setProjectSettings({
+      ...current,
+      seo: {
+        ...current.seo,
+        siteName,
+        favicon,
+        language,
+        socialLinks: { twitter, facebook, linkedin },
+      },
+    });
+  }, [composer, siteName, favicon, language, twitter, facebook, linkedin, isDirty]);
 
   return (
     <Screen>
       <Section title="Site Identity">
-        {saveError && (
-          <div role="alert" style={{
-            marginTop: 4,
-            font: "500 10.5px var(--bd-font)",
-            color: "var(--bd-error)",
-          }}>
-            {saveError}
-          </div>
-        )}
         <Field label="Site Name">
           <Input
             type="text"
@@ -125,7 +118,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
           />
         </Field>
         <Field label="Site Language">
-          <select
+          <Select
             value={language}
             onChange={(e) => { setLanguage(e.target.value); identity.markDirty(); }}
           >
@@ -136,7 +129,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             <option value="pt">Portuguese</option>
             <option value="zh">Chinese</option>
             <option value="ja">Japanese</option>
-          </select>
+          </Select>
         </Field>
       </Section>
 
@@ -176,7 +169,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             href="/privacy"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ fontSize: 13, color: "var(--bd-accent)", textDecoration: "none" }}
+            style={{ font: "500 11.5px var(--bd-font)", color: "var(--bd-accent)", textDecoration: "none" }}
           >
             Privacy Policy →
           </a>
@@ -184,7 +177,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer }) => {
             href="/terms"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ fontSize: 13, color: "var(--bd-accent)", textDecoration: "none" }}
+            style={{ font: "500 11.5px var(--bd-font)", color: "var(--bd-accent)", textDecoration: "none" }}
           >
             Terms of Service →
           </a>
