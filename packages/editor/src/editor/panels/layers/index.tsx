@@ -7,7 +7,6 @@ import * as React from "react";
 import "./styles/layers-v2.css";
 import type { Element } from "../../../engine/elements/Element";
 import type { ElementType } from "../../../shared/types";
-import { IconSearch, IconSettings } from "../../../shared/ui/Icons";
 import { LayersEmptyState } from "./components/LayersEmptyState";
 import { canNestElement, canHaveChildren } from "../../../shared/utils/nesting";
 import { LayerBreadcrumb } from "./components/LayerBreadcrumb";
@@ -28,8 +27,39 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   onLayerHover,
   canvasHoveredId,
   onAddBlockClick,
+  search,
+  displaySettingsOpen,
+  onDisplaySettingsToggle,
 }) => {
   const state = useLayersState({ composer, canvasHoveredId });
+
+  // Sync controlled search prop -> internal useLayerSearch state
+  React.useEffect(() => {
+    if (typeof search === "string" && search !== state.search) {
+      state.setSearch(search);
+    }
+  }, [search, state]);
+
+  // Expand/collapse-all from LayersTab
+  React.useEffect(() => {
+    if (!composer) return;
+    const onExpand = () => state.treeHook.expandAll();
+    const onCollapse = () => state.treeHook.collapseAll();
+    composer.on("layers:expand-all", onExpand);
+    composer.on("layers:collapse-all", onCollapse);
+    return () => {
+      composer.off("layers:expand-all", onExpand);
+      composer.off("layers:collapse-all", onCollapse);
+    };
+  }, [composer, state.treeHook]);
+
+  // Emit stats to LayersTab
+  const totalCount = state.treeHook.totalCount;
+  const selectedCount = state.selectionHook.selectedIds.size;
+  React.useEffect(() => {
+    if (!composer) return;
+    composer.emit("layers:stats-change", { total: totalCount, selected: selectedCount });
+  }, [composer, totalCount, selectedCount]);
 
   // Auto-expand ancestors of matching layers during search
   const { getAncestorIdsForMatches, isSearching } = state.searchHook;
@@ -299,88 +329,13 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
 
   return (
     <div className="buildrick-layers-panel buildrick-layers-minimal">
-      {/* Search Bar + Settings */}
-      <div className="buildrick-layers-search-row">
-        {/* Header row: expand/collapse + count */}
-        <div className="buildrick-layers-header-row">
-          <div className="buildrick-layers-header-actions">
-            <button
-              className="buildrick-layers-settings-btn"
-              title="Expand all layers (Alt+→)"
-              aria-label="Expand all layers"
-              onClick={() => state.treeHook.expandAll()}
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-                <rect x="1.5" y="1.5" width="11" height="11" rx="1.5" />
-                <path d="M7 4.5v5M4.5 7h5" />
-              </svg>
-            </button>
-            <button
-              className="buildrick-layers-settings-btn"
-              title="Collapse all layers (Alt+←)"
-              aria-label="Collapse all layers"
-              onClick={() => state.treeHook.collapseAll()}
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-                <rect x="1.5" y="1.5" width="11" height="11" rx="1.5" />
-                <path d="M4.5 7h5" />
-              </svg>
-            </button>
-            <span
-              className="buildrick-layers-count"
-              aria-live="polite"
-              aria-label={`${state.treeHook.totalCount} layers`}
-            >
-              {state.treeHook.totalCount > 0 ? `· ${state.treeHook.totalCount}` : ""}
-            </span>
-          </div>
-        </div>
-
-        {/* Search input */}
-        <div className="buildrick-search-container">
-          <span className="buildrick-search-icon" aria-hidden>
-            <IconSearch size="sm" />
-          </span>
-          <input
-            type="text"
-            placeholder="Search layers..."
-            value={state.search}
-            onChange={(e) => state.setSearch(e.target.value)}
-            aria-label="Search layers"
-            aria-controls="buildrick-layers-tree"
-            className="buildrick-search-input"
-          />
-          {state.search && (
-            <button
-              className="buildrick-search-clear"
-              onClick={() => state.setSearch("")}
-              aria-label="Clear search"
-            >
-              ×
-            </button>
-          )}
-        </div>
-
-        {/* Gear icon — now wired to display settings */}
-        <div style={{ position: "relative" }}>
-          <button
-            className="buildrick-layers-settings-btn"
-            title="Display settings"
-            aria-label="Layer display settings"
-            aria-expanded={state.displaySettingsOpen}
-            onClick={() => state.setDisplaySettingsOpen((prev: boolean) => !prev)}
-          >
-            <IconSettings size="sm" />
-          </button>
-          {state.displaySettingsOpen && (
-            <LayerDisplaySettings
-              prefs={state.displayPrefs}
-              onChange={state.updateDisplayPrefs}
-              onClose={() => state.setDisplaySettingsOpen(false)}
-            />
-          )}
-        </div>
-      </div>
+      {displaySettingsOpen && (
+        <LayerDisplaySettings
+          prefs={state.displayPrefs}
+          onChange={state.updateDisplayPrefs}
+          onClose={() => onDisplaySettingsToggle?.()}
+        />
+      )}
 
       {state.selectionHook.selectedIds.size === 1 && (
         <LayerBreadcrumb

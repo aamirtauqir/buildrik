@@ -20,6 +20,12 @@ export interface LayersPanelProps {
   canvasHoveredId?: string | null;
   /** Callback to add a block (when tree is empty) */
   onAddBlockClick?: () => void;
+  /** Controlled search value lifted to LayersTab (prototype panel-h shape). */
+  search?: string;
+  /** Lifted display-settings popover open state. */
+  displaySettingsOpen?: boolean;
+  /** Lifted display-settings popover toggle callback. */
+  onDisplaySettingsToggle?: () => void;
 }
 
 /** Layer tree item data */
