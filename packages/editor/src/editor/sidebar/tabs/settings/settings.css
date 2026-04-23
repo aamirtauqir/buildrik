@@ -57,6 +57,10 @@
   color: var(--bd-accent);
   font-weight: 600;
 }
+.bd-set-snav-row:focus-visible {
+  outline: 2px solid var(--bd-accent);
+  outline-offset: 2px;
+}
 .bd-set-snav-icon {
   display: inline-flex;
   align-items: center;
@@ -163,7 +167,7 @@
   font: 500 11.5px var(--bd-font);
   color: var(--bd-fg-primary);
   outline: none;
-  transition: border-color 100ms, box-shadow 100ms;
+  transition: border-color 120ms, box-shadow 120ms;
 }
 textarea.bd-set-input {
   resize: vertical;
@@ -274,7 +278,11 @@ textarea.bd-set-input {
   color: #fff;
 }
 .bd-set-btn.pri:hover {
-  background: var(--bd-accent-hover, #1D5FEB);
+  background: var(--bd-accent-hover);
+}
+.bd-set-btn:focus-visible {
+  outline: 2px solid var(--bd-accent);
+  outline-offset: 2px;
 }
 
 /* ── Branding placeholder (V1 — replaces DesignSystemTab delegate) ── */
@@ -303,7 +311,7 @@ textarea.bd-set-input {
 .bd-set-guard-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.45);
+  background: var(--bd-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
