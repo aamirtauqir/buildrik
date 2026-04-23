@@ -20,6 +20,15 @@ export const LayerSelectionBanner: React.FC<LayerSelectionBannerProps> = ({
   onDelete,
   onExit,
 }) => {
+  React.useEffect(() => {
+    if (count < 2) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onExit();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [count, onExit]);
+
   if (count < 2) return null;
   return (
     <div className="bdc-layers-banner" role="toolbar" aria-label="Selection actions">
