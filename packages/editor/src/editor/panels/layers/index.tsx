@@ -4,6 +4,7 @@
  */
 
 import * as React from "react";
+import "./styles/layers-v2.css";
 import type { Element } from "../../../engine/elements/Element";
 import type { ElementType } from "../../../shared/types";
 import { IconSearch, IconSettings } from "../../../shared/ui/Icons";

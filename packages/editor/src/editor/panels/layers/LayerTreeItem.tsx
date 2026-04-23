@@ -94,30 +94,21 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
   const displayName =
     customNames.get(layer.id) ||
     (ELEMENT_TYPE_LABELS[layer.type] ?? layer.type.charAt(0).toUpperCase() + layer.type.slice(1));
-  const isCanvasHovered = canvasHoveredId === layer.id;
-  const isLayerHovered = hoveredLayerId === layer.id;
   const canDrag = !!(composer && layer.depth > 0 && !isLocked);
 
-  // Minimal Tree: Simple depth-based indentation via CSS padding
-  const rowStyle = {
-    "--layer-depth": layer.depth,
-    paddingLeft: `${8 + layer.depth * 16}px`,
-    opacity: isDragging ? 0.5 : isHidden ? 0.5 : 1,
-  } as React.CSSProperties;
+  const rowStyle: React.CSSProperties = {
+    paddingLeft: `${6 + layer.depth * 14}px`,
+  };
 
   const rowClassNames = [
-    "buildrick-layer-row",
-    hasChildren ? "has-children" : "",
-    isSelected ? "is-selected" : "",
+    "bdc-lr",
+    isSelected ? "bdc-sel" : "",
+    isHidden ? "bdc-hidden" : "",
+    isLocked ? "bdc-locked" : "",
+    isEditing ? "bdc-editing" : "",
     isDragging ? "is-dragging" : "",
-    isDropTarget ? "is-drop-target" : "",
-    dropPosition ? `drop-${dropPosition}` : "",
-    isHidden ? "is-hidden" : "",
-    isLocked ? "is-locked" : "",
-    isEditing ? "is-editing" : "",
-    isCanvasHovered ? "is-canvas-hovered" : "",
-    isLayerHovered ? "is-layer-hovered" : "",
-    selectedIds.has(layer.id) && layer.id !== selectedElementId ? "is-multi-selected" : "",
+    hasChildren ? "" : "bdc-leaf",
+    hasChildren && !isExpanded ? "bdc-closed" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -150,218 +141,138 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
   };
 
   return (
-    <div className="buildrick-layer-node">
-      <div
-        className={rowClassNames}
-        role="treeitem"
-        tabIndex={0}
-        draggable={canDrag}
-        aria-selected={isSelected}
-        aria-expanded={hasChildren ? isExpanded : undefined}
-        aria-label={`${displayName}, ${layer.type} element${isHidden ? ", hidden" : ""}${isLocked ? ", locked" : ""}`}
-        aria-level={layer.depth + 1}
-        title={`${displayName}${isHidden ? " (Hidden)" : ""}${isLocked ? " (Locked)" : ""}`}
-        style={rowStyle}
-        onMouseEnter={() => onMouseEnter(layer.id)}
-        onMouseLeave={onMouseLeave}
-        onDragStart={canDrag ? (e) => onDragStart(e, layer.id, layer.type) : undefined}
-        onDragEnd={onDragEnd}
-        onDragOver={(e) => onDragOver(e, layer.id, layer.type)}
-        onDragLeave={onDragLeave}
-        onDrop={(e) => onDrop(e, layer.id)}
+    <div
+      className={rowClassNames}
+      role="treeitem"
+      tabIndex={0}
+      draggable={canDrag}
+      aria-selected={isSelected}
+      aria-expanded={hasChildren ? isExpanded : undefined}
+      aria-label={`${displayName}, ${layer.type} element${isHidden ? ", hidden" : ""}${isLocked ? ", locked" : ""}`}
+      aria-level={layer.depth + 1}
+      title={`${displayName}${isHidden ? " (Hidden)" : ""}${isLocked ? " (Locked)" : ""}`}
+      style={rowStyle}
+      data-drop={dropPosition ?? undefined}
+      onMouseEnter={() => onMouseEnter(layer.id)}
+      onMouseLeave={onMouseLeave}
+      onDragStart={canDrag ? (e) => onDragStart(e, layer.id, layer.type) : undefined}
+      onDragEnd={onDragEnd}
+      onDragOver={(e) => onDragOver(e, layer.id, layer.type)}
+      onDragLeave={onDragLeave}
+      onDrop={(e) => onDrop(e, layer.id)}
+      onClick={(e) => {
+        onSelect(layer.id, { shift: e.shiftKey, meta: e.metaKey || e.ctrlKey });
+      }}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        onContextMenu(e, layer.id);
+      }}
+      onDoubleClick={(e) => {
+        if (!isLocked) onStartEditing(layer.id, displayName, e);
+      }}
+      onKeyDown={handleKeyDown}
+    >
+      <button
+        type="button"
+        className="bdc-lr-chev"
+        aria-label={hasChildren ? (isExpanded ? "Collapse children" : "Expand children") : undefined}
+        aria-hidden={!hasChildren}
         onClick={(e) => {
-          onSelect(layer.id, { shift: e.shiftKey, meta: e.metaKey || e.ctrlKey });
+          e.stopPropagation();
+          if (hasChildren) onToggleExpand(layer.id);
         }}
-        onContextMenu={(e) => {
-          e.preventDefault();
-          onContextMenu(e, layer.id);
-        }}
-        onDoubleClick={(e) => {
-          if (!isLocked) onStartEditing(layer.id, displayName, e);
-        }}
-        onKeyDown={handleKeyDown}
       >
-        {dropPosition === "before" && <div className="buildrick-drop-indicator buildrick-drop-before" />}
-        {dropPosition === "after" && <div className="buildrick-drop-indicator buildrick-drop-after" />}
-        {dropPosition === "inside" && <div className="buildrick-drop-indicator buildrick-drop-inside" />}
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
 
-        {/* Expand/Collapse Toggle */}
-        {hasChildren ? (
-          <button
-            type="button"
-            className={`buildrick-layer-toggle ${isExpanded ? "" : "collapsed"}`}
-            aria-label={isExpanded ? "Collapse children" : "Expand children"}
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleExpand(layer.id);
-            }}
-          >
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
-              <path d="M3 2l4 3-4 3V2z" />
-            </svg>
-          </button>
-        ) : (
-          <span className="buildrick-layer-toggle-placeholder" aria-hidden>
-            •
-          </span>
-        )}
-        <div className="buildrick-layer-icon" aria-hidden>
-          <IconComponent size="sm" />
-        </div>
-        <div className="buildrick-layer-meta">
-          {isEditing ? (
-            <input
-              ref={editInputRef}
-              type="text"
-              className="buildrick-layer-name-input"
-              value={editingName}
-              onChange={(e) => onEditingNameChange(e.target.value)}
-              onBlur={onSaveEditedName}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") onSaveEditedName();
-                else if (e.key === "Escape") onCancelEditing();
-                e.stopPropagation();
-              }}
-              onClick={(e) => e.stopPropagation()}
-            />
+      <span className="bdc-lr-ic" aria-hidden>
+        <IconComponent size="sm" />
+      </span>
+
+      {isEditing ? (
+        <input
+          ref={editInputRef}
+          type="text"
+          className="bdc-lr-edit"
+          value={editingName}
+          onChange={(e) => onEditingNameChange(e.target.value)}
+          onBlur={onSaveEditedName}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") onSaveEditedName();
+            else if (e.key === "Escape") onCancelEditing();
+            e.stopPropagation();
+          }}
+          onClick={(e) => e.stopPropagation()}
+        />
+      ) : (
+        <>
+          <span className="bdc-lr-nm">{displayName}</span>
+          {displayPrefs.showHtmlBadges && (
+            <span className="bdc-lr-tag" aria-hidden>{layer.tagName}</span>
+          )}
+          {displayPrefs.showElementIds && (
+            <span className="bdc-lr-id" aria-hidden>#{layer.id.slice(0, 8)}</span>
+          )}
+          {layer.isComponent && (
+            <span className="bdc-lr-cmp" title="Component instance" aria-label="Component instance">⚡</span>
+          )}
+          {layer.breakpointOverrides?.mobile?.hidden && (
+            <span className="bdc-lr-bp" title="Hidden on mobile" role="img" aria-label="Hidden on mobile">M</span>
+          )}
+          {layer.breakpointOverrides?.tablet?.hidden && (
+            <span className="bdc-lr-bp" title="Hidden on tablet" role="img" aria-label="Hidden on tablet">T</span>
+          )}
+        </>
+      )}
+
+      <button
+        type="button"
+        className={`bdc-lr-lock${isLocked ? " bdc-on" : ""}`}
+        title={isLocked ? "Unlock element" : "Lock element"}
+        aria-label={isLocked ? "Unlock element" : "Lock element"}
+        onClick={(e) => onToggleLock(layer.id, e)}
+      >
+        <svg viewBox="0 0 24 24">
+          {isLocked ? (
+            <>
+              <rect x="5" y="11" width="14" height="10" rx="2" />
+              <path d="M8 11V7a4 4 0 018 0v4" />
+            </>
           ) : (
             <>
-              <span className="buildrick-layer-name">{displayName}</span>
-              {/* Type Tag - conditional on displayPrefs */}
-              {displayPrefs.showHtmlBadges && (
-                <span className="buildrick-layer-type" aria-hidden>
-                  {layer.tagName}
-                </span>
-              )}
-              {displayPrefs.showElementIds && (
-                <span className="buildrick-layer-type buildrick-layer-id" aria-hidden>
-                  #{layer.id.slice(0, 8)}
-                </span>
-              )}
-              {/* Component Badge */}
-              {layer.isComponent && (
-                <span className="buildrick-component-badge" title="Component instance">
-                  ⚡
-                </span>
-              )}
-              {/* Breakpoint override chips */}
-              {layer.breakpointOverrides?.mobile?.hidden && (
-                <span
-                  className="buildrick-layer-bp-chip buildrick-bp-mobile"
-                  title="Hidden on mobile"
-                  role="img"
-                  aria-label="Hidden on mobile"
-                >
-                  M
-                </span>
-              )}
-              {layer.breakpointOverrides?.tablet?.hidden && (
-                <span
-                  className="buildrick-layer-bp-chip buildrick-bp-tablet"
-                  title="Hidden on tablet"
-                  role="img"
-                  aria-label="Hidden on tablet"
-                >
-                  T
-                </span>
-              )}
+              <rect x="5" y="11" width="14" height="10" rx="2" />
+              <path d="M8 11V7a4 4 0 018 0" />
             </>
           )}
-        </div>
+        </svg>
+      </button>
 
-        <div className="buildrick-layer-actions">
-          <button
-            type="button"
-            className={`buildrick-layer-action-btn ${isHidden ? "is-active" : ""}`}
-            title={isHidden ? "Show element" : "Hide element"}
-            onClick={(e) => onToggleVisibility(layer.id, e)}
-            aria-label={isHidden ? "Show element" : "Hide element"}
-          >
-            {isHidden ? <EyeOffIcon /> : <EyeIcon />}
-          </button>
-          <button
-            type="button"
-            className={`buildrick-layer-action-btn ${isLocked ? "is-active" : ""}`}
-            title={isLocked ? "Unlock element" : "Lock element"}
-            onClick={(e) => onToggleLock(layer.id, e)}
-            aria-label={isLocked ? "Unlock element" : "Lock element"}
-          >
-            {isLocked ? <LockIcon /> : <UnlockIcon />}
-          </button>
-        </div>
-      </div>
-      {isExpanded && layer.children.length > 0 && (
-        <div className="buildrick-layer-children" role="group">
-          {layer.children.map((child) => (
-            <LayerTreeItem
-              key={child.id}
-              layer={child}
-              composer={composer}
-              selectedElementId={selectedElementId}
-              expandedIds={expandedIds}
-              dragState={dragState}
-              hiddenIds={hiddenIds}
-              lockedIds={lockedIds}
-              selectedIds={selectedIds}
-              customNames={customNames}
-              canvasHoveredId={canvasHoveredId}
-              hoveredLayerId={hoveredLayerId}
-              editingId={editingId}
-              editingName={editingName}
-              editInputRef={editInputRef}
-              onToggleExpand={onToggleExpand}
-              onToggleVisibility={onToggleVisibility}
-              onToggleLock={onToggleLock}
-              onStartEditing={onStartEditing}
-              onSaveEditedName={onSaveEditedName}
-              onCancelEditing={onCancelEditing}
-              onEditingNameChange={onEditingNameChange}
-              onMouseEnter={onMouseEnter}
-              onMouseLeave={onMouseLeave}
-              onDragStart={onDragStart}
-              onDragEnd={onDragEnd}
-              onDragOver={onDragOver}
-              onDragLeave={onDragLeave}
-              onDrop={onDrop}
-              onSelect={onSelect}
-              onContextMenu={onContextMenu}
-              getVisibleLayerIds={getVisibleLayerIds}
-              displayPrefs={displayPrefs}
-            />
-          ))}
-        </div>
-      )}
+      <button
+        type="button"
+        className={`bdc-lr-eye${isHidden ? " bdc-off" : ""}`}
+        title={isHidden ? "Show element" : "Hide element"}
+        aria-label={isHidden ? "Show element" : "Hide element"}
+        onClick={(e) => onToggleVisibility(layer.id, e)}
+      >
+        <svg viewBox="0 0 24 24">
+          {isHidden ? (
+            <>
+              <path d="M3 3l18 18" />
+              <path d="M10.6 10.6a2 2 0 002.8 2.8" />
+              <path d="M9.9 5.1A9.5 9.5 0 0121 12a9.5 9.5 0 01-2.1 3" />
+            </>
+          ) : (
+            <>
+              <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" />
+              <circle cx="12" cy="12" r="2.5" />
+            </>
+          )}
+        </svg>
+      </button>
     </div>
   );
 };
-
-// Icon components
-const EyeIcon: React.FC = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-    <circle cx="12" cy="12" r="3" />
-  </svg>
-);
-
-const EyeOffIcon: React.FC = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-    <line x1="1" y1="1" x2="23" y2="23" />
-  </svg>
-);
-
-const LockIcon: React.FC = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-  </svg>
-);
-
-const UnlockIcon: React.FC = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-    <path d="M7 11V7a5 5 0 0 1 9.9-1" />
-  </svg>
-);
 
 export default LayerTreeItem;
