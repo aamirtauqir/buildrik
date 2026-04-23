@@ -66,7 +66,7 @@ describe("usePanelState", () => {
     expect(result.current.isFullPageMode).toBe(true);
 
     act(() => result.current.setLeftPanelTab("settings"));
-    expect(result.current.isFullPageMode).toBe(true);
+    expect(result.current.isFullPageMode).toBe(false);
 
     act(() => result.current.setLeftPanelTab("layers"));
     expect(result.current.isFullPageMode).toBe(false);
@@ -78,10 +78,10 @@ describe("usePanelState", () => {
     expect(result.current.drawerWidth).toBe(280);
 
     act(() => result.current.setLeftPanelTab("layers"));
-    expect(result.current.drawerWidth).toBe(200);
+    expect(result.current.drawerWidth).toBe(280);
 
     act(() => result.current.setLeftPanelTab("pages"));
-    expect(result.current.drawerWidth).toBe(200);
+    expect(result.current.drawerWidth).toBe(280);
   });
 
   it("openLeftPanelToTab sets tab and opens panel", () => {

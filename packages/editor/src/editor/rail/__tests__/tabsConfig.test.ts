@@ -17,12 +17,12 @@ describe("tabsConfig helpers", () => {
       expect(getTabMode("templates")).toBe("fullpage");
     });
 
-    it("returns 'fullpage' for Settings tab", () => {
-      expect(getTabMode("settings")).toBe("fullpage");
+    it("returns 'panel' for Settings tab", () => {
+      expect(getTabMode("settings")).toBe("panel");
     });
 
-    it("returns 'fullpage' for History tab", () => {
-      expect(getTabMode("history")).toBe("fullpage");
+    it("returns 'panel' for History tab", () => {
+      expect(getTabMode("history")).toBe("panel");
     });
 
     it("returns 'panel' for unknown tab ID (fallback)", () => {
@@ -35,16 +35,16 @@ describe("tabsConfig helpers", () => {
       expect(getTabWidth("add")).toBe(280);
     });
 
-    it("returns 200 for Layers tab (narrow)", () => {
-      expect(getTabWidth("layers")).toBe(200);
+    it("returns 280 for Layers tab", () => {
+      expect(getTabWidth("layers")).toBe(280);
     });
 
-    it("returns 200 for Pages tab (narrow)", () => {
-      expect(getTabWidth("pages")).toBe(200);
+    it("returns 280 for Pages tab", () => {
+      expect(getTabWidth("pages")).toBe(280);
     });
 
-    it("returns 200 for Components tab (narrow)", () => {
-      expect(getTabWidth("components")).toBe(200);
+    it("returns 280 for Components tab", () => {
+      expect(getTabWidth("components")).toBe(280);
     });
 
     it("returns 280 for unknown tab (default)", () => {
