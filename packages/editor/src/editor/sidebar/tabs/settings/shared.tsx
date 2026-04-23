@@ -104,7 +104,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 Select.displayName = "Select";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SwitchRow + Toggle (alias)
+// SwitchRow
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface SwitchRowProps {
@@ -142,12 +142,6 @@ export const SwitchRow: React.FC<SwitchRowProps> = ({
     </button>
   </div>
 );
-
-/**
- * @deprecated Back-compat alias for SwitchRow. Import SwitchRow directly in new code.
- * Remove this alias once all consumer screens migrate (target: Task 4).
- */
-export const Toggle = SwitchRow;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Screen — outer wrapper
