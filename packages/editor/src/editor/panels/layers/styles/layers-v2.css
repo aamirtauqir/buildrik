@@ -1,0 +1,521 @@
+/**
+ * layers-v2.css — Layers tab styles (prototype port 2026-04-24).
+ *
+ * Scope: everything rendered by LayersTab + LayersPanel + LayerTreeItem +
+ * all sub-components under editor/panels/layers/components/.
+ *
+ * Tokens: --bd-* only (bridged in editor/shell/chrome.css).
+ * Namespace: .bdc-lr* for tree rows, .bdc-layers-* for panel-scoped bits,
+ *            .bdc-menu*, .bdc-popover for generic floating surfaces that
+ *            may later be promoted to chrome.css.
+ */
+
+/* ==========================================================================
+   Tree row (.bdc-lr)
+   ========================================================================== */
+
+.bdc-lr {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font: 500 11px var(--bd-font);
+  color: var(--bd-fg-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.bdc-lr:hover { background: var(--bd-bg-subtle); }
+
+.bdc-lr.bdc-sel {
+  background: var(--bd-accent-tint);
+  color: var(--bd-accent);
+  font-weight: 600;
+}
+
+.bdc-lr.bdc-hidden .bdc-lr-nm {
+  color: var(--bd-fg-muted);
+  font-style: italic;
+}
+
+.bdc-lr-chev {
+  width: 12px;
+  height: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bd-fg-muted);
+  transition: transform 120ms;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.bdc-lr.bdc-closed .bdc-lr-chev { transform: rotate(-90deg); }
+.bdc-lr.bdc-leaf .bdc-lr-chev { visibility: hidden; }
+
+.bdc-lr-ic {
+  color: var(--bd-fg-secondary);
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.bdc-lr.bdc-sel .bdc-lr-ic { color: var(--bd-accent); }
+
+.bdc-lr-ic svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bdc-lr-nm {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bdc-lr-edit {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--bd-accent);
+  outline: none;
+  font: 500 11px var(--bd-font);
+  color: var(--bd-fg-primary);
+  padding: 0;
+}
+
+/* Inline tag/id/class/component/bp badges (display-settings controlled) */
+.bdc-lr-tag,
+.bdc-lr-id,
+.bdc-lr-cls {
+  font: 500 9.5px var(--bd-mono);
+  color: var(--bd-fg-muted);
+  padding: 0 3px;
+  border-radius: 3px;
+  background: var(--bd-bg-subtle);
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+}
+
+.bdc-lr-cmp {
+  font-size: 10px;
+  color: var(--bd-accent);
+  flex-shrink: 0;
+}
+
+.bdc-lr-bp {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 600 8.5px var(--bd-mono);
+  color: var(--bd-fg-muted);
+  border: 1px solid var(--bd-border);
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* Eye + lock (hover-reveal, warning color on lock) */
+.bdc-lr-eye,
+.bdc-lr-lock {
+  color: var(--bd-fg-muted);
+  display: inline-flex;
+  padding: 2px;
+  opacity: 0;
+  transition: opacity 120ms;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.bdc-lr-eye svg,
+.bdc-lr-lock svg {
+  width: 11px;
+  height: 11px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bdc-lr:hover .bdc-lr-eye,
+.bdc-lr.bdc-sel .bdc-lr-eye,
+.bdc-lr-eye.bdc-off { opacity: 1; }
+
+.bdc-lr-eye.bdc-off { opacity: 0.6; }
+.bdc-lr-eye:hover { color: var(--bd-fg-primary); }
+
+.bdc-lr:hover .bdc-lr-lock,
+.bdc-lr-lock.bdc-on { opacity: 1; }
+.bdc-lr-lock.bdc-on { color: var(--bd-warning); }
+
+/* Drag indicators */
+.bdc-lr[data-drop="before"]::before,
+.bdc-lr[data-drop="after"]::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  height: 2px;
+  background: var(--bd-accent);
+  border-radius: 2px;
+  pointer-events: none;
+}
+.bdc-lr[data-drop="before"]::before { top: -1px; }
+.bdc-lr[data-drop="after"]::after { bottom: -1px; }
+.bdc-lr[data-drop="inside"] {
+  box-shadow: inset 0 0 0 1.5px var(--bd-accent);
+  background: var(--bd-accent-tint);
+}
+.bdc-lr.is-dragging { opacity: 0.5; }
+
+/* Focus ring */
+.bdc-lr:focus-visible {
+  outline: 2px solid var(--bd-accent);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   Tree container + compact density
+   ========================================================================== */
+
+.bdc-layers-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 10px 10px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.bdc-layers-tree.bdc-layers-tree-compact .bdc-lr {
+  padding: 2px 6px;
+}
+
+/* ==========================================================================
+   Selection banner (multi-select action bar)
+   ========================================================================== */
+
+.bdc-layers-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--bd-bg-subtle);
+  border-bottom: 1px solid var(--bd-border);
+}
+
+.bdc-layers-banner-count {
+  font: 500 10px var(--bd-mono);
+  color: var(--bd-fg-secondary);
+  flex: 1;
+}
+
+.bdc-layers-banner .bdc-icon-btn {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  color: var(--bd-fg-secondary);
+  cursor: pointer;
+}
+.bdc-layers-banner .bdc-icon-btn:hover {
+  background: #fff;
+  color: var(--bd-fg-primary);
+}
+.bdc-layers-banner .bdc-icon-btn svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ==========================================================================
+   Breadcrumb (single-select ancestor chain)
+   ========================================================================== */
+
+.bdc-layers-crumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--bd-border);
+  font: 500 9.5px var(--bd-mono);
+}
+
+.bdc-layers-crumb button {
+  background: transparent;
+  border: none;
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: var(--bd-fg-muted);
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.bdc-layers-crumb button:hover {
+  color: var(--bd-fg-primary);
+  background: var(--bd-bg-subtle);
+}
+.bdc-layers-crumb button.bdc-on {
+  color: var(--bd-accent);
+  font-weight: 600;
+}
+
+.bdc-layers-crumb-sep {
+  color: var(--bd-fg-muted);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Context menu
+   ========================================================================== */
+
+.bdc-menu {
+  position: fixed;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid var(--bd-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.18);
+  padding: 4px;
+  min-width: 180px;
+  font: 500 11px var(--bd-font);
+}
+
+.bdc-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 5px;
+  background: transparent;
+  border: none;
+  color: var(--bd-fg-primary);
+  font: inherit;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+.bdc-menu-item:hover { background: var(--bd-bg-subtle); }
+.bdc-menu-item:disabled { color: var(--bd-fg-muted); cursor: not-allowed; }
+
+.bdc-menu-ic {
+  width: 13px;
+  height: 13px;
+  color: var(--bd-fg-muted);
+  flex-shrink: 0;
+}
+.bdc-menu-ic svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bdc-menu-lbl { flex: 1; }
+
+.bdc-menu-kbd {
+  font: 500 9.5px var(--bd-mono);
+  color: var(--bd-fg-muted);
+  background: var(--bd-bg-subtle);
+  padding: 1px 4px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.bdc-menu-sep {
+  height: 1px;
+  background: var(--bd-border);
+  margin: 4px 0;
+}
+
+.bdc-menu-item.bdc-menu-danger:hover {
+  color: var(--bd-error);
+}
+
+/* ==========================================================================
+   Display settings popover
+   ========================================================================== */
+
+.bdc-popover {
+  position: absolute;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid var(--bd-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.18);
+  padding: 10px 12px;
+  min-width: 220px;
+}
+
+.bdc-layers-settings .bdc-popover-h {
+  font: 600 10px var(--bd-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bd-fg-muted);
+  padding-bottom: 6px;
+}
+
+.bdc-layers-settings .bdc-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 0;
+  font: 500 11px var(--bd-font);
+  color: var(--bd-fg-primary);
+  cursor: pointer;
+}
+
+.bdc-switch {
+  appearance: none;
+  position: relative;
+  width: 18px;
+  height: 10px;
+  background: var(--bd-border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.bdc-switch::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 120ms;
+}
+.bdc-switch:checked { background: var(--bd-accent); }
+.bdc-switch:checked::after { transform: translateX(8px); }
+
+/* ==========================================================================
+   Empty state
+   ========================================================================== */
+
+.bdc-layers-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+  gap: 8px;
+  color: var(--bd-fg-muted);
+}
+.bdc-layers-empty h3 {
+  margin: 0;
+  font: 600 13px var(--bd-font);
+  color: var(--bd-fg-heading);
+}
+.bdc-layers-empty p {
+  margin: 0;
+  font: 500 11.5px var(--bd-font);
+  color: var(--bd-fg-secondary);
+}
+
+/* ==========================================================================
+   Drop feedback alert
+   ========================================================================== */
+
+.bdc-layers-drop-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  margin: 6px 10px 0;
+  background: rgba(220, 38, 38, 0.08);
+  border-left: 2px solid var(--bd-error);
+  border-radius: 4px;
+  font: 500 11px var(--bd-font);
+  color: var(--bd-error);
+}
+
+/* ==========================================================================
+   Inline delete-confirm
+   ========================================================================== */
+
+.bdc-layers-confirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  margin: 6px 10px 0;
+  background: rgba(217, 119, 6, 0.08);
+  border-left: 2px solid var(--bd-warning);
+  border-radius: 4px;
+  font: 500 11px var(--bd-font);
+  color: var(--bd-fg-primary);
+}
+.bdc-layers-confirm span { flex: 1; }
+
+.bdc-layers-confirm .bdc-btn {
+  padding: 4px 10px;
+  font: 500 10.5px var(--bd-font);
+  border-radius: 5px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.bdc-layers-confirm .bdc-btn-danger {
+  background: var(--bd-error);
+  color: #fff;
+  border-color: var(--bd-error);
+}
+.bdc-layers-confirm .bdc-btn-danger:hover {
+  filter: brightness(1.05);
+}
+
+.bdc-layers-confirm .bdc-btn-ghost {
+  background: transparent;
+  color: var(--bd-fg-secondary);
+  border-color: transparent;
+}
+.bdc-layers-confirm .bdc-btn-ghost:hover {
+  background: var(--bd-bg-subtle);
+  color: var(--bd-fg-primary);
+}
+
+/* ==========================================================================
+   Screen-reader only
+   ========================================================================== */
+
+.bdc-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
