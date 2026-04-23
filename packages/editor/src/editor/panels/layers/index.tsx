@@ -16,7 +16,6 @@ import { LayerSelectionBanner } from "./components/LayerSelectionBanner";
 import { useLayerContextActions } from "./hooks/useLayerContextActions";
 import { useLayersState } from "./hooks/useLayersState";
 import { LayerTreeItem } from "./LayerTreeItem";
-import { SR_ONLY_STYLE, getDropFeedbackStyle } from "./styles";
 import type { LayersPanelProps } from "./types";
 
 export type { LayersPanelProps, SelectedElementInfo } from "./types";
@@ -331,7 +330,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
   const filteredLayers = state.filterTree(state.layers);
 
   return (
-    <div className="buildrick-layers-panel buildrick-layers-minimal">
+    <div className="bdc-layers-panel">
       {displaySettingsOpen && (
         <LayerDisplaySettings
           prefs={state.displayPrefs}
@@ -350,7 +349,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
       )}
 
       {/* Screen reader announcement for search results (WCAG 4.1.3) */}
-      <div aria-live="polite" aria-atomic="true" className="buildrick-sr-only" style={SR_ONLY_STYLE}>
+      <div aria-live="polite" aria-atomic="true" className="bdc-sr-only">
         {state.search && filteredLayers.length > 0
           ? `${filteredLayers.length} layer${filteredLayers.length === 1 ? "" : "s"} found`
           : state.search && filteredLayers.length === 0
@@ -360,7 +359,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
 
       {/* Drop feedback message (UX improvement - Phase 3) */}
       {dropFeedback && (
-        <div role="alert" aria-live="assertive" style={getDropFeedbackStyle(dropFeedback.type)}>
+        <div className="bdc-layers-drop-alert" role="alert" aria-live="assertive">
           <span aria-hidden>{dropFeedback.type === "error" ? "⚠️" : "ℹ️"}</span>
           {dropFeedback.message}
         </div>
@@ -375,10 +374,10 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
       />
 
       {pendingBannerDelete && state.selectionHook.selectedIds.size > 1 && (
-        <div className="buildrick-delete-confirm" role="alert">
+        <div className="bdc-layers-confirm" role="alert">
           <span>Delete {state.selectionHook.selectedIds.size} layers?</span>
-          <button className="buildrick-delete-confirm-ok" onClick={confirmBannerDelete}>Delete</button>
-          <button className="buildrick-delete-confirm-cancel" onClick={() => setPendingBannerDelete(false)}>Cancel</button>
+          <button className="bdc-btn bdc-btn-danger" onClick={confirmBannerDelete}>Delete</button>
+          <button className="bdc-btn bdc-btn-ghost" onClick={() => setPendingBannerDelete(false)}>Cancel</button>
         </div>
       )}
 
@@ -386,17 +385,17 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
       <div
         ref={state.treeContainerRef}
         id="buildrick-layers-tree"
-        className={`buildrick-layers-tree buildrick-layers-tree-minimal${state.displayPrefs.treeDensity === "compact" ? " buildrick-layers-compact" : ""}`}
+        className={`bdc-layers-tree${state.displayPrefs.treeDensity === "compact" ? " bdc-layers-tree-compact" : ""}`}
         role="tree"
         aria-label="Page structure"
       >
         {state.layers.length === 0 && <LayersEmptyState />}
 
         {state.searchHook.isSearching && filteredLayers.length === 0 && (
-          <div className="buildrick-layers-empty-search" role="status">
-            <span className="buildrick-les-icon">🔍</span>
-            <p className="buildrick-les-title">No layers match &quot;{state.search}&quot;</p>
-            <button className="buildrick-les-clear" onClick={() => onSearchChange ? onSearchChange("") : setSearch("")}>
+          <div className="bdc-layers-empty-search" role="status">
+            <span className="bdc-les-icon">🔍</span>
+            <p className="bdc-les-title">No layers match &quot;{state.search}&quot;</p>
+            <button className="bdc-les-clear" onClick={() => onSearchChange ? onSearchChange("") : setSearch("")}>
               Clear search
             </button>
           </div>
