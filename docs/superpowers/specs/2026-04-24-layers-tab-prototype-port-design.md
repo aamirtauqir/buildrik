@@ -83,6 +83,23 @@ All values reference `--bd-*` only. No hex literals except `#fff` where the prot
 | Body font | `var(--bd-font)` — Inter Tight |
 | Mono font | `var(--bd-mono)` — Geist Mono |
 
+### Icon aesthetic (monochrome stroke)
+
+Prototype `_shared.css` declares internal `.f` (14% fill) and `.s` (1.5px stroke) classes applied to specific paths inside each SVG. This spec **does not** adopt that internal-class convention. Instead, every icon inside `.bdc-lr-ic` is rendered as **monochrome stroke-only** via a single outer rule:
+
+```css
+.bdc-lr-ic svg {
+  width: 13px; height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+```
+
+Rationale: `getElementIcon()` already returns many Lucide-style stroke-only SVGs; adopting the prototype's dual-class convention would require rewriting the entire icon registry. The visual delta is minor (subtle fill tint → stroke silhouette) and acceptable for this port. Any future fill-tint work belongs in a separate icon-system spec.
+
 ## 6. Panel header and state lift
 
 ### DOM (in `LayersTab.tsx`)
@@ -135,7 +152,23 @@ All values reference `--bd-*` only. No hex literals except `#fff` where the prot
 
 The listener pattern is additive to `LayersPanel` (`index.tsx`) — it mirrors the existing `layers:scroll-to-selection` registration inside the same file. `useLayersState` and every other hook under `hooks/` stay untouched.
 
-Stats (`totalCount`, `selectedCount`) are emitted from `LayersPanel` via a new `layers:stats-change` event on mount and when `treeHook.totalCount` / `selectionHook.selectedIds.size` change. `LayersTab` subscribes and renders the sub text. Again, additive to `index.tsx` only.
+Stats (`totalCount`, `selectedCount`) are emitted from `LayersPanel` via a new `layers:stats-change` event. Exact effect signature inside `LayersPanel`:
+
+```ts
+const totalCount = state.treeHook.totalCount;
+const selectedCount = state.selectionHook.selectedIds.size;
+
+React.useEffect(() => {
+  if (!composer) return;
+  composer.emit("layers:stats-change", { total: totalCount, selected: selectedCount });
+}, [composer, totalCount, selectedCount]);
+```
+
+Dep array is exactly `[composer, totalCount, selectedCount]`. No double-emit: React skips the effect when both numbers are unchanged. No debounce: both values change at most once per user action (click, keypress, drag drop).
+
+`LayersTab` subscribes via `composer.on("layers:stats-change", handler)` inside its own mount effect, with matching `off` in cleanup. Initial paint before first emit uses `{ total: 0, selected: 0 }`.
+
+Additive to `index.tsx` + `LayersTab.tsx` only.
 
 ## 7. Tree row anatomy (`LayerTreeItem.tsx`)
 
@@ -257,7 +290,7 @@ Floating, positioned at `(x, y)`.
 - Container: `.bdc-menu`, `#fff`, 1px `var(--bd-border)`, 8px radius, shadow `0 8px 24px -6px rgba(15,23,42,0.18)`, 4px inner padding.
 - Items: `.bdc-menu-item`, 6/10 padding, 11px Inter Tight, icon 13px muted, kbd pill 9.5px Geist Mono in `var(--bd-bg-subtle)`.
 - Separator: `.bdc-menu-sep`, 1px `var(--bd-border)`.
-- Destructive: `.bdc-menu-item.bdc-danger:hover` → `var(--bd-error)` foreground.
+- Destructive: `.bdc-menu-item.bdc-menu-danger:hover` → `var(--bd-error)` foreground. (The menu-scoped danger class is **separate** from `.bdc-btn-danger` used on buttons — see §8 "Inline delete-confirm" — to avoid a single `.bdc-danger` selector matching both surfaces with different rules.)
 
 All 11 action dispatches through `useLayerContextActions` unchanged.
 
@@ -289,7 +322,7 @@ Inline alert, 3-second auto-clear logic unchanged.
 ### Inline delete-confirm
 
 - Container: `.bdc-layers-confirm`, `rgba(217,119,6,0.08)` background, 2px left border `var(--bd-warning)`, 6/12 padding, 11px Inter Tight.
-- Buttons: `.bdc-btn.bdc-danger` and `.bdc-btn.bdc-ghost`. Both are **new modifiers defined inside `layers-v2.css`** (scoped under `.bdc-layers-confirm`) — not promoted to `chrome.css` in this spec. `.bdc-danger` uses `var(--bd-error)` background / `#fff` foreground at 4/10 padding, 10.5px. `.bdc-ghost` uses transparent background / `var(--bd-fg-secondary)` foreground with `:hover` → `var(--bd-bg-subtle)`.
+- Buttons: `.bdc-btn.bdc-btn-danger` and `.bdc-btn.bdc-btn-ghost`. Both are **new modifiers defined inside `layers-v2.css`** (scoped under `.bdc-layers-confirm`) — not promoted to `chrome.css` in this spec. `.bdc-btn-danger` uses `var(--bd-error)` background / `#fff` foreground at 4/10 padding, 10.5px. `.bdc-btn-ghost` uses transparent background / `var(--bd-fg-secondary)` foreground with `:hover` → `var(--bd-bg-subtle)`. Selector names are `.bdc-btn-danger` / `.bdc-btn-ghost` (button-scoped) — **not** `.bdc-danger` / `.bdc-ghost` — to avoid collision with `.bdc-menu-danger` used for destructive context-menu items.
 
 ## 9. Logic preservation contract
 
@@ -325,15 +358,42 @@ All must hold after the port:
 - `PanelShell.Header` pin / help / close buttons and the `isPinned`, `onPinToggle`, `onHelpClick`, `onClose` prop handling inside `LayersTab`. The props remain in the type signature to avoid breaking parent callers; their values are ignored. Parent removal is out of scope.
 - `selectionSynced` transient banner and its `syncTimerRef` timer in `LayersTab`.
 
+### Test impact audit (commit-by-commit update plan)
+
+Two test files exist in the Layers subtree:
+
+| File | Lines | Impact |
+|---|---|---|
+| `editor/panels/layers/data/layerUtils.test.ts` | 97 | **None.** Pure data-function tests (tree walks, node lookups). No classname, no rendering. Passes unchanged. |
+| `editor/sidebar/tabs/layers/__tests__/LayersTab.test.tsx` | 230 | **Breaks in commits 3 + 4.** See breakdown below. |
+
+Breakdown of `LayersTab.test.tsx`:
+
+| Lines | What it asserts | Port impact | Fix |
+|---|---|---|---|
+| 69–78 | Renders "Layers" text when composer is null | No impact — new `<h2>Layers</h2>` renders the same text | — |
+| 82–155 | "Selection synced from canvas" banner — 3 tests (initial state, shows on event, hides after 2.5s) | **DELETE.** Banner is removed per §9 "Explicitly removed behavior" | Delete the full `describe("LayersTab selection synced banner", …)` block in **commit 4** (same commit that removes the banner and timer) |
+| 159–229 | `LayerSelectionBanner` — 5 tests asserting visible text labels ("3 selected", "Group", "Delete", "Done") | **UPDATE.** §8.1 restyles banner to icon-only buttons. Text labels become `aria-label` / `title` attrs on `.bdc-icon-btn` | Switch assertions in **commit 3** from `screen.getByText("Group")` → `screen.getByRole("button", { name: "Group" })` (same for Hide, Delete, Done). Count pill text "3 selected" stays as a visible text node per §8.1, so that assertion remains `getByText`. |
+| 13–31 | `PanelHeader` mock (both `@shared/ui/PanelHeader` and `@/editor/sidebar/shared/PanelHeader`) | **Becomes dead code in commit 4** — `LayersTab` no longer imports `PanelShell.Header` | Delete both `vi.mock(...)` calls in commit 4 |
+| 41–43 | `useComposerSelection` mock | No impact — still used | — |
+
+Rule for each affected commit: tests updated in the **same commit** as the source change so the branch is green at every point. Running `npx vitest run src/editor/panels/layers src/editor/sidebar/tabs/layers` at the end of each commit must pass.
+
 ## 10. Rollout
+
+### Pre-flight (required before commit 1)
+
+The working tree currently has unrelated staged deletes (`packages/editor/src/code-to-prd-output/`, `packages/editor/src/docs/design-documentation/`, many `.md` files). These must not be bundled into Layers commits.
+
+Run `git status --short` and confirm the tree is either clean or that the unrelated deletes are committed / stashed on a separate commit before starting commit 1. If the user wants those deletes kept, land them as a single `chore: remove stale generated artifacts` commit first.
 
 ### Commit plan
 
-1. **feat(layers): add layers-v2.css and bdc-layers tokens.** New CSS file only. App behavior unchanged.
-2. **feat(layers): port LayerTreeItem to bdc-lr classes.** Swap classnames, drop `isHovered` state, drop inline styles. Tree rows switch to new visuals; panel header still legacy.
-3. **feat(layers): port sub-components to bdc-layers-\*.** Classname swap in `LayerBreadcrumb`, `LayerContextMenu`, `LayerDisplaySettings`, `LayerSelectionBanner`, `LayersEmptyState`. Delete their internal `<style>` blocks.
-4. **feat(layers): lift header into LayersTab, drop PanelShell wrapper.** Prototype `panel-h` + `psearch` shape. Drop selection-synced banner. Wire stats event. Drop internal search bar in `LayersPanel`.
-5. **chore(layers): delete legacy layers.css and styles.ts.** Remove all `--buildrick-*` references in the Layers subtree.
+1. **feat(layers): add layers-v2.css and bdc-layers tokens.** New CSS file only. App behavior unchanged. Tests: unchanged.
+2. **feat(layers): port LayerTreeItem to bdc-lr classes.** Swap classnames, drop `isHovered` state, drop inline styles. Tree rows switch to new visuals; panel header still legacy. Tests: `layerUtils.test.ts` unchanged; `LayersTab.test.tsx` unaffected.
+3. **feat(layers): port sub-components to bdc-layers-\*.** Classname swap in `LayerBreadcrumb`, `LayerContextMenu`, `LayerDisplaySettings`, `LayerSelectionBanner`, `LayersEmptyState`. Delete their internal `<style>` blocks. **Tests:** update 5 `LayerSelectionBanner` assertions from `getByText` → `getByRole({ name })` per audit in §9.
+4. **feat(layers): lift header into LayersTab, drop PanelShell wrapper.** Prototype `panel-h` + `psearch` shape. Drop selection-synced banner. Wire stats event. Drop internal search bar in `LayersPanel`. **Tests:** delete the 3-test `describe("LayersTab selection synced banner", …)` block; delete both dead `PanelHeader` mocks.
+5. **chore(layers): delete legacy layers.css and styles.ts.** Remove all `--buildrick-*` references in the Layers subtree. Tests: unchanged.
 
 Each commit leaves the application in a working state; each is independently revertable.
 
@@ -363,6 +423,9 @@ Target ≥90% match. Any of the following blocks merge:
 | Parent sidebar grid breaks when `PanelShell` disappears | Low | Medium | `LayersTab` returns a full-height `<section class="bdc-panel">`. Parent grid cell is unchanged. |
 | Lucide-based element icons drift in size / stroke | Medium | Low | Global `.bdc-lr-ic svg` rule enforces `width/height: 13; stroke-width: 1.5`. |
 | Hex-gate CI fails on new CSS | Low | High | `layers-v2.css` uses `var(--bd-*)` only; audited manually before commit 1. |
+| Stale legacy CSS rules in `themes/{components,ux-fixes}.css` accidentally still match Layers DOM (global bleed) | Low | Medium | JSX stops emitting any `.buildrick-layer*` / `.buildrick-layers-*` classname after commit 4; global rules become dead selectors. Verified by manual search for surviving `buildrick-layer` classnames inside the Layers subtree after commit 5. |
+| Commit 3/4 test updates land out of sync with source change and CI turns red mid-sequence | Medium | Medium | §9 "Test impact audit" pins which assertions change in which commit; run `npx vitest run src/editor/panels/layers src/editor/sidebar/tabs/layers` at the end of each commit before pushing. |
+| Unrelated staged deletes in working tree get bundled into a Layers commit | Medium | High (reviewer confusion, hard revert) | §10 "Pre-flight" step: confirm clean tree or commit the unrelated deletes separately before commit 1. |
 
 ## 12. Out of scope
 
@@ -371,6 +434,19 @@ Target ≥90% match. Any of the following blocks merge:
 - Dark mode. Editor chrome is canonical light per DESIGN.md (2026-04-18 flip).
 - Keyboard shortcut overlay, drag ghost thumbnails, layer preview thumbnails. New features, not in the prototype.
 - Removal of pin / help / close in other tabs' `PanelShell.Header`.
+- **Legacy global CSS deletion.** `themes/components.css` (lines ~1038–1100+, 19 rules on `.buildrick-layers-panel` / `-count` / `-tree` / `-layer-node` / `-row` / `-toggle` / `-bullet`) and `themes/ux-fixes.css` (lines 301–327, 5 rules on `.buildrick-layer-row` + `::before` pseudo-element) become **dead selectors** after this port — JSX no longer emits any `.buildrick-layer*` classname, so the rules never match. Removing them physically is deferred to a separate cross-tab "legacy CSS purge" spec that can address Add / Templates / Components / History / AI / Media classes in one pass. See TODOS.md item: "Post-port: legacy `.buildrick-layer*` rule removal."
+- **Rename collision error surfacing.** When `actionsHook.renameLayer` throws on name collision or locked parent, current code doesn't show a user-visible error. This spec preserves that pre-existing behavior. Belongs in a separate editing-UX spec.
+- **Icon path-class convention (`.f` / `.s`).** Adopting the prototype's internal fill/stroke class convention requires rewriting `getElementIcon()`. Deferred to a separate icon-system spec. This port uses monochrome stroke-only (see §5 "Icon aesthetic").
+
+## 12.1 Downstream unblocks
+
+Shipping this spec unblocks three existing P2 items in `TODOS.md` (all currently marked `Depends on: Layers tab migration shipped`):
+
+1. **Playwright visual regression infra** for all 7 sidebar tabs. This port provides the first Layers-tab baseline.
+2. **CI grep rule for banned indigo/violet hex values** (`#1D4ED8`, `#1E40AF`, `#4F46E5`, `indigo`, `violet`). Layers no longer references these after the port.
+3. **Post-migration hardcoded indigo audit** in `editor/rail/LayoutShell.css` (lines 59, 258).
+
+None of these are *in* scope of this spec, but they become runnable the moment commit 5 lands.
 
 ## 13. References
 
