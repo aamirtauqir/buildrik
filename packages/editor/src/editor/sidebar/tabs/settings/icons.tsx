@@ -6,16 +6,9 @@
 import * as React from "react";
 
 export const SiteSettingsIcon: React.FC = () => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-  >
-    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-    <polyline points="9 22 9 12 15 12 15 22" />
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <circle cx="12" cy="12" r="3" />
+    <path d="M12 3v3 M12 18v3 M3 12h3 M18 12h3 M5.6 5.6l2 2 M16.4 16.4l2 2 M5.6 18.4l2-2 M16.4 7.6l2-2" />
   </svg>
 );
 
@@ -65,19 +58,11 @@ export const ExportIcon: React.FC = () => (
 );
 
 export const IntegrationsIcon: React.FC = () => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-  >
-    <rect x="2" y="7" width="6" height="6" rx="1" />
-    <rect x="16" y="7" width="6" height="6" rx="1" />
-    <rect x="9" y="2" width="6" height="6" rx="1" />
-    <rect x="9" y="16" width="6" height="6" rx="1" />
-    <path d="M12 8v2M12 14v2M8 10h2M14 10h2" />
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <rect x="3" y="3" width="7" height="7" rx="1" />
+    <rect x="14" y="3" width="7" height="7" rx="1" />
+    <rect x="3" y="14" width="7" height="7" rx="1" />
+    <path d="M14 17.5h7 M17.5 14v7" />
   </svg>
 );
 
@@ -124,48 +109,28 @@ export const HistoryIcon: React.FC = () => (
 );
 
 export const SeoIcon: React.FC = () => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-  >
-    <circle cx="11" cy="11" r="8" />
-    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-    <line x1="8" y1="11" x2="14" y2="11" />
-    <line x1="11" y1="8" x2="11" y2="14" />
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <circle cx="11" cy="11" r="7" />
+    <path d="M21 21l-4.3-4.3" />
   </svg>
 );
 
 export const BillingIcon: React.FC = () => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-  >
-    <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-    <line x1="1" y1="10" x2="23" y2="10" />
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <rect x="3" y="6" width="18" height="13" rx="2" />
+    <path d="M3 10h18 M7 15h3" />
   </svg>
 );
 
 export const DesignSystemIcon: React.FC = () => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-  >
-    <circle cx="13.5" cy="6.5" r="2.5" />
-    <circle cx="6.5" cy="13.5" r="2.5" />
-    <circle cx="17.5" cy="17.5" r="2.5" />
-    <path d="M13.5 9v2a2 2 0 0 1-2 2H9" />
-    <path d="M15.5 8.5l2 2" />
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <circle cx="12" cy="12" r="9" />
+    <path d="M8 12a4 4 0 018 0 M8 12v4 M16 12v4" />
+  </svg>
+);
+
+export const PublishingIcon: React.FC = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <path d="M12 3L2 9l10 6 10-6z M2 15l10 6 10-6" />
   </svg>
 );
