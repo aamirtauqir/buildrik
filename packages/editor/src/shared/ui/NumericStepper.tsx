@@ -159,7 +159,7 @@ export const NumericStepper: React.FC<NumericStepperProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
     if (raw === "" || raw === "-") {
-      onChange(0);
+      onChange(clamp(0));
       return;
     }
     const parsed = Number(raw);
