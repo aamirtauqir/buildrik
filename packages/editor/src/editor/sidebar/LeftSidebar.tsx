@@ -104,20 +104,21 @@ function RailZone({
       {tabs.map((tab) => {
         const Icon = ICON_MAP[tab.iconName];
         if (!Icon) return null;
-        const isActive = tab.id === activeTab && drawerOpen;
+        const isSelectedTab = tab.id === activeTab;
+        const isVisibleActive = isSelectedTab && drawerOpen;
         const isDirty = dirtyTabIds?.has(tab.id) ?? false;
 
         return (
           <button
             key={tab.id}
-            className={`ls-btn${isActive ? " ls-btn--active" : ""}`}
+            className={`ls-btn${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
             onClick={() => onBtnClick(tab.id)}
             role="tab"
-            aria-selected={isActive}
+            aria-selected={isVisibleActive}
             aria-label={tab.ariaLabel}
             data-tab={tab.id}
           >
-            {isActive && <div className="ls-btn-bar" />}
+            {isVisibleActive && <div className="ls-btn-bar" />}
             {isDirty && <div className="ls-btn__dirty-dot" aria-hidden="true" />}
             <Icon size={20} />
           </button>
@@ -190,16 +191,18 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
     }
   }, [activeTab, onTabChange]);
 
-  // Rail button click: toggle drawer if same tab, else switch tab
+  // Rail button click: open drawer if closed, switch tab if different.
+  // Clicking an already-active tab is a no-op — closing uses the explicit X.
   const handleBtnClick = React.useCallback(
     (tabId: GroupedTabId) => {
-      if (tabId === activeTab) {
-        onDrawerToggle();
-      } else {
+      if (tabId !== activeTab) {
         safeTabChange(tabId);
+        if (!drawerOpen) onDrawerToggle();
+      } else if (!drawerOpen) {
+        onDrawerToggle();
       }
     },
-    [activeTab, onDrawerToggle, safeTabChange]
+    [activeTab, drawerOpen, onDrawerToggle, safeTabChange]
   );
 
   // Keyboard nav within rail
@@ -307,6 +310,20 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         role="tabpanel"
         aria-hidden={!drawerOpen}
       >
+        {drawerOpen && (
+          <button
+            type="button"
+            className="ls-panel-close"
+            onClick={onDrawerToggle}
+            aria-label="Close panel"
+            title="Close panel"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
+        )}
         <div ref={panelContentRef} className="ls-panel-content ls-panel-content--no-padding" tabIndex={-1}>
           <InspectorErrorBoundary
             key={errorKey}

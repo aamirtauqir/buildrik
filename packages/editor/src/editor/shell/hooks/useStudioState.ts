@@ -185,7 +185,10 @@ export function useStudioState(): UseStudioStateReturn {
   const [rightPanelTab, _setRightPanelTab] = React.useState(
     savedState?.rightPanelTab || "inspector"
   );
-  const [isLeftPanelOpen, setIsLeftPanelOpen] = React.useState(savedState?.isLeftPanelOpen ?? true);
+  // Always open on session start. Closed state is per-session only — persisting
+  // `false` stranded users with an invisible panel after the rail-click toggle
+  // bug closed it. Reopening is a deliberate act during this session.
+  const [isLeftPanelOpen, setIsLeftPanelOpen] = React.useState(true);
 
   // Overlay states
   const [showComponentView, setShowComponentView] = React.useState(false);
@@ -214,15 +217,15 @@ export function useStudioState(): UseStudioStateReturn {
   const [canUndo, setCanUndo] = React.useState(false);
   const [canRedo, setCanRedo] = React.useState(false);
 
-  // Persist panel state to localStorage when it changes
+  // Persist panel state to localStorage when it changes.
+  // `isLeftPanelOpen` intentionally excluded — see initializer above.
   React.useEffect(() => {
     savePanelState({
       leftPanelTab,
       leftPanelSubTabs,
       rightPanelTab,
-      isLeftPanelOpen,
     });
-  }, [leftPanelTab, leftPanelSubTabs, rightPanelTab, isLeftPanelOpen]);
+  }, [leftPanelTab, leftPanelSubTabs, rightPanelTab]);
 
   // Wrapped setters that update state and trigger persistence
   const setLeftPanelTab = React.useCallback((tab: string) => {
