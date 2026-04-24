@@ -86,10 +86,10 @@ Priority by (a) user-facing traffic, (b) visual-fidelity gap, (c) blocker-remova
 - **History** — low traffic, small scope; bundle with any larger batch.
 - **Components** — depends on component-library subdirectory conformance pass, may pair with Templates.
 
-### Blocker decisions before Week 2 starts
+### Blocker decisions — status
 
-1. **tab-ai disposition** — port as standalone, reconcile into BuildTab, or delete prototype. See v3 plan Open Question 2.
-2. **`assets` ID rename** — rename `assets` → `media` in `tabsConfig.ts`, or keep divergent? Low stakes.
+1. ~~tab-ai disposition~~ **LOCKED 2026-04-25:** reconcile visuals into BuildTab's AI view. No standalone 11th tab. Row in matrix stays `routed-differently`. Week 2 work: port tab-ai.html visuals (conversation thread, suggestion cards, prompt input) into BuildTab's existing `aiEnabled` path.
+2. **`assets` ID rename** — still open. Rename `assets` → `media` in `tabsConfig.ts` or keep divergent? Low stakes — defer.
 3. **Primitive conformance must land first** — per P0c audit, 4 of 5 primitives need `--bd-*` sweep + missing alias families (`--bd-radius-*`, `--bd-space-*`, `--bd-shadow-*`). Tab token-sweep work is blocked until primitives are ready OR tab-level sweeps tolerate mixed token namespacing during transition.
 
 ---

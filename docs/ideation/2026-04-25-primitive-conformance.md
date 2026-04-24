@@ -193,9 +193,9 @@ Total Week 1 estimate: **~12 CC+gstack hours / ~4-5 working days solo human**.
 
 Tests per primitive: 1 interaction test + 1 CSS source scan (assert only `var(--bd-*)` references, no hex).
 
-## Blockers to flag to user
+## Blockers — RESOLVED 2026-04-25
 
-- **M4 spec conflict**: prototype uses `backdrop-filter: blur(2px)` but DESIGN.md says no blur in chrome. Decision needed.
-- **T2 size policy**: is current live `TextInput` the inspector variant (tiny) and prototype is the form variant (bigger)? If yes, split into two primitives or add `variant="inspector" | "form"` prop.
-- **B4 danger variant**: prototype subtle (white+red-border), live destructive (solid red). Pick one.
-- **BD2 premium variant**: is PRO tier concept live in product copy? If yes, add variant; if no, defer.
+- ~~M4 spec conflict~~ **LOCKED:** solid dimmer only, no backdrop-filter:blur. DESIGN.md wins. Modal overlay = `var(--bd-overlay)`. If prototype has blur, prototype is wrong.
+- ~~T2 size policy~~ **LOCKED:** split into two primitives. `TextInput` keeps current inspector sizes (20/24/28, `--bd-bg-subtle` bg). New `FormInput.tsx` takes prototype's form sizes (~28/34/40, `--bd-bg-card` bg).
+- ~~B4 danger variant~~ **LOCKED:** subtle style — `background: #fff; border: 1px solid rgba(220,38,38,0.30); color: var(--bd-error);`. Matches prototype.
+- **BD2 premium variant**: still open. Defer decision until PRO tier UI copy is confirmed live.
