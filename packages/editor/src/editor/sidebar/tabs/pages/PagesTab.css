@@ -23,18 +23,7 @@
   position: relative; /* for absolute-positioned bulk toolbar */
 }
 
-/* ─── HEADER ──────────────────────────────────────────────────────────── */
-.bd-pg-header {
-  padding: 12px 12px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.bd-pg-header-title {
-  font: 600 13px var(--bd-font);
-  color: var(--bd-fg-heading);
-  letter-spacing: -0.01em;
-}
+/* PanelShell.Header owns header chrome; no .bd-pg-header rules needed. */
 
 /* ─── SEARCH ──────────────────────────────────────────────────────────── */
 .bd-pg-search {
