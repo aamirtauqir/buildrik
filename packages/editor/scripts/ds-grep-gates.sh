@@ -285,9 +285,20 @@ fi
 # (literal or var()) is a cascade-override risk. Enforces the SSOT rule that
 # was broken by themes/bridge-tokens.css (deleted 2026-04-24) and the
 # src/new-design/project/ reference snapshot (deleted 2026-04-24).
-LEAK=$(grep -rnE '^\s*--bd-[a-z0-9-]+\s*:' packages/editor/src --include='*.css' 2>/dev/null \
-  | grep -v 'themes/design-system/bd-aliases.css' \
+#
+# Scope covers both:
+#   (a) CSS files — `--bd-foo: value;` rules
+#   (b) TSX/TS files — JSX style props like `style={{"--bd-foo": value}}`
+# Exclusion is anchored to the exact canonical path to prevent a future
+# `/legacy/.../bd-aliases.css` from silently bypassing the gate.
+CANONICAL='packages/editor/src/themes/design-system/bd-aliases.css'
+LEAK_CSS=$(grep -rnE '^\s*--bd-[a-z0-9-]+\s*:' packages/editor/src --include='*.css' 2>/dev/null \
+  | grep -vE "(^|/)${CANONICAL}:" \
   || true)
+LEAK_TSX=$(grep -rnE '"--bd-[a-z0-9-]+"\s*:' packages/editor/src --include='*.tsx' --include='*.ts' 2>/dev/null \
+  | grep -v '__tests__' \
+  || true)
+LEAK=$(printf '%s\n%s' "$LEAK_CSS" "$LEAK_TSX" | sed '/^$/d')
 if [ -n "$LEAK" ]; then
   echo "$LEAK"
   fail "Gate 15: --bd-* def outside bd-aliases.css"

@@ -1,8 +1,8 @@
 /**
  * TipsFooter — PRO TIPS carousel at bottom of Add panel.
  *
- * Rewritten against the `--bd-*` bridge tokens from
- * src/themes/bridge-tokens.css. All colors, spacing, type come from tokens
+ * Rewritten against the `--bd-*` alias tokens from
+ * src/themes/design-system/bd-aliases.css. All colors, spacing, type come from tokens
  * (no raw hex, no class dependency). Collapsed = 1-line header; expanded =
  * header + tip card + dot pagination.
  *
