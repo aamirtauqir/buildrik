@@ -10,6 +10,11 @@
  *   - Exits 1 if count exceeds .hex-baseline (WARN mode)
  *   - Run with `--fail` to exit 1 if count > 0 (FAIL mode, Phase 8)
  *
+ * Flags (v2, 2026-04-25 Week 3 additions):
+ *   --editor-only       scope to editor/** excluding editor/inspector/**
+ *                       uses .hex-baseline-editor file
+ *   --exclude-fallback  skip hex in var(--X, #HEX) fallback position
+ *
  * @license BSD-3-Clause
  */
 
@@ -20,21 +25,34 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const EDITOR_ROOT = path.resolve(__dirname, "..");
 const REPO_ROOT = path.resolve(EDITOR_ROOT, "../..");
-const BASELINE_FILE = path.join(__dirname, ".hex-baseline");
 
-const CHROME_ROOTS = [
+const argv = process.argv.slice(2);
+const EDITOR_ONLY = argv.includes("--editor-only");
+const EXCLUDE_FALLBACK = argv.includes("--exclude-fallback");
+
+const BASELINE_FILE = EDITOR_ONLY
+  ? path.join(__dirname, ".hex-baseline-editor")
+  : path.join(__dirname, ".hex-baseline");
+
+const FULL_CHROME_ROOTS = [
   "src/editor",
   "src/shared/ui",
   "src/shared/forms",
   "src/ai",
   "src/features/design-system/ui",
 ];
-const EXTRA_FILES = [
-  "src/themes/components.css",
-  "src/themes/ux-fixes.css",
-];
+const EDITOR_ONLY_ROOTS = ["src/editor"];
+const EDITOR_EXCLUDE_DIRS = ["inspector"]; // mid-flight port; re-include later
+
+const CHROME_ROOTS = EDITOR_ONLY ? EDITOR_ONLY_ROOTS : FULL_CHROME_ROOTS;
+const EXTRA_FILES = EDITOR_ONLY
+  ? []
+  : ["src/themes/components.css", "src/themes/ux-fixes.css"];
 
 const HEX_RE = /#[0-9A-Fa-f]{3,8}\b/g;
+// Match hex inside var(--name, #HEX) fallback position.
+// Captures the hex so we can compare per match.
+const FALLBACK_HEX_RE = /var\(\s*--[a-z0-9-]+\s*,\s*(#[0-9A-Fa-f]{3,8})\b/gi;
 const POLICY_RE = /@lint-hex-policy:/;
 
 function walk(dir, out = []) {
@@ -43,6 +61,7 @@ function walk(dir, out = []) {
     const full = path.join(dir, e.name);
     if (e.isDirectory()) {
       if (e.name === "__tests__" || e.name === "node_modules") continue;
+      if (EDITOR_ONLY && EDITOR_EXCLUDE_DIRS.includes(e.name)) continue;
       walk(full, out);
     } else if (/\.(css|ts|tsx)$/.test(e.name) && !/\.test\.(ts|tsx)$/.test(e.name)) {
       out.push(full);
@@ -74,8 +93,20 @@ function scanFile(file) {
     if (POLICY_RE.test(prev)) continue;
     const matches = line.match(HEX_RE);
     if (!matches) continue;
+    // When --exclude-fallback is active, skip hex values that appear
+    // only as var(--X, #HEX) fallback. Those aren't drift; they're
+    // defensive defaults that never render once canonical resolves.
+    const fallbackHexes = new Set();
+    if (EXCLUDE_FALLBACK) {
+      const re = new RegExp(FALLBACK_HEX_RE.source, FALLBACK_HEX_RE.flags);
+      let m;
+      while ((m = re.exec(line)) !== null) {
+        fallbackHexes.add(m[1].toUpperCase());
+      }
+    }
     for (const hex of matches) {
       if (!/[:=]/.test(line)) continue;
+      if (EXCLUDE_FALLBACK && fallbackHexes.has(hex.toUpperCase())) continue;
       sites.push({ file, line: i + 1, hex: hex.toUpperCase(), snippet: line.trim() });
     }
   }

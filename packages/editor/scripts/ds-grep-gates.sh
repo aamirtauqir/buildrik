@@ -305,5 +305,21 @@ if [ -n "$LEAK" ]; then
 fi
 pass "Gate 15: --bd-* defs only in bd-aliases.css"
 
+# Gate 16: Editor-scoped hex ERROR gate (added 2026-04-25).
+# Narrower scope than Gate 10 (which covers full chrome in WARN mode):
+#   - Only scans packages/editor/src/editor/** (excludes shared/ui, shared/forms,
+#     ai, features/design-system/ui).
+#   - Excludes editor/inspector/** (mid-flight port, joins gate later).
+#   - Excludes var(--X, #HEX) fallback-position hex (defensive defaults, not drift).
+# Baseline in scripts/.hex-baseline-editor. Regressions FAIL CI.
+# New hex in editor/** non-inspector code paths cannot ship without tokenization
+# or explicit @lint-hex-policy: marker.
+if ! node packages/editor/scripts/find-inline-hex-v2.mjs --editor-only --exclude-fallback >/dev/null 2>&1; then
+  echo "GATE 16 FAIL: editor/** (excluding inspector/) hex count regressed above baseline"
+  echo "Run 'node packages/editor/scripts/find-inline-hex-v2.mjs --editor-only --exclude-fallback --group-by-value' to see details"
+  exit 1
+fi
+pass "Gate 16: editor-scoped hex at or below baseline (ERROR mode)"
+
 echo ""
-echo "=== DS V1 gates: 11 passed + 4 chrome-axiom gates at baseline + green-panel check ==="
+echo "=== DS V1 gates: 12 passed + 4 chrome-axiom gates at baseline + green-panel check ==="
