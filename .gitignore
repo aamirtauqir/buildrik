@@ -25,3 +25,7 @@ packages/editor.zip
 # Excluded from git so it can't drift into the runtime tree, and from DS gates
 # via --exclude-dir=project (see packages/editor/scripts/ds-grep-gates.sh).
 packages/editor/src/project/
+
+# Per-developer dev-only artifacts (not source, not committed)
+packages/editor/src/editor-live.jpeg
+packages/editor/src/project/
