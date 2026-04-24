@@ -203,21 +203,27 @@ export const LinkSection: React.FC<LinkSectionProps> = ({
     setEmailAddress(email);
     const valid = isEmail(email);
     setEmailError(!valid && email.length > 0);
-    updateHref(email ? `mailto:${email}` : "");
+    if (valid || email.length === 0) {
+      updateHref(email ? `mailto:${email}` : "");
+    }
   };
 
   const handlePhoneChange = (phone: string) => {
     setPhoneNumber(phone);
     const valid = isPhoneNumber(phone);
     setPhoneError(!valid && phone.length > 0);
-    updateHref(phone ? `tel:${phone}` : "");
+    if (valid || phone.length === 0) {
+      updateHref(phone ? `tel:${phone}` : "");
+    }
   };
 
   const handleAnchorChange = (anchor: string) => {
     setAnchorId(anchor);
     const valid = anchor.length > 0 && !/\s/.test(anchor);
     setAnchorError(!valid && anchor.length > 0);
-    updateHref(anchor ? `#${anchor}` : "");
+    if (valid || anchor.length === 0) {
+      updateHref(anchor ? `#${anchor}` : "");
+    }
   };
 
   if (!isLinkable) return null;
