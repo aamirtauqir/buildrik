@@ -51,7 +51,7 @@ export const MyComponents: React.FC<MyComponentsProps> = ({ open, onToggle, comp
       </div>
       <div className={`bld-mycomp-body${open ? " open" : ""}`}>
         <div className="bld-empty-comp">
-          <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)", lineHeight: 1.5 }}>
+          <span style={{ fontSize: 12, color: "var(--bd-fg-muted)", lineHeight: 1.5 }}>
             No saved components yet. Select an element → right-click → Save as Component.
           </span>
         </div>

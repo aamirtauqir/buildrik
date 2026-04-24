@@ -109,7 +109,7 @@ export const UnsavedWarningModal: React.FC<Props> = ({
 const discardBtn: React.CSSProperties = {
   height: ROW_MD,
   padding: "0 12px",
-  borderRadius: "var(--buildrick-radius-sm)",
+  borderRadius: "var(--bd-radius-sm)",
   border: "1px solid rgba(239,68,68,0.25)",
   background: "rgba(239,68,68,0.1)",
   color: "#f5a3a3",
@@ -123,7 +123,7 @@ const discardBtn: React.CSSProperties = {
 const cancelBtn: React.CSSProperties = {
   height: ROW_MD,
   padding: "0 12px",
-  borderRadius: "var(--buildrick-radius-sm)",
+  borderRadius: "var(--bd-radius-sm)",
   border: "1px solid rgba(255,255,255,0.1)",
   background: "rgba(255,255,255,0.06)",
   color: "#A09D96",
@@ -137,10 +137,10 @@ const cancelBtn: React.CSSProperties = {
 const saveBtn: React.CSSProperties = {
   height: ROW_MD,
   padding: "0 12px",
-  borderRadius: "var(--buildrick-radius-sm)",
+  borderRadius: "var(--bd-radius-sm)",
   border: "none",
   background: "#2D6DFF",
-  color: "var(--buildrick-text-on-accent)",
+  color: "var(--bd-fg-on-accent)",
   fontSize: 12,
   fontWeight: 600,
   cursor: "pointer",

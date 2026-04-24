@@ -419,20 +419,20 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                 onClick={() => state.confirmVariant(v.id)}
                 style={{
                   padding: "10px 14px",
-                  borderRadius: "var(--buildrick-radius-sm)",
+                  borderRadius: "var(--bd-radius-sm)",
                   fontSize: 13,
                   cursor: "pointer",
                   textAlign: "left" as const,
-                  background: isCurrent ? "var(--buildrick-primary-alpha-15, rgba(59,130,246,0.15))" : "var(--buildrick-surface-3)",
+                  background: isCurrent ? "var(--bd-accent-alpha-15, rgba(59,130,246,0.15))" : "var(--bd-bg-subtle)",
                   border: isCurrent
-                    ? "1px solid var(--buildrick-accent)"
-                    : "1px solid var(--buildrick-border)",
-                  color: "var(--buildrick-text-primary)",
+                    ? "1px solid var(--bd-accent)"
+                    : "1px solid var(--bd-border)",
+                  color: "var(--bd-fg-primary)",
                 }}
               >
                 {v.name}
                 {isCurrent && (
-                  <span style={{ marginLeft: 8, fontSize: 12, color: "var(--buildrick-accent)" }}>
+                  <span style={{ marginLeft: 8, fontSize: 12, color: "var(--bd-accent)" }}>
                     (current)
                   </span>
                 )}
@@ -448,7 +448,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         title="Duplicate Component"
         size="sm"
       >
-        <div style={{ color: "var(--buildrick-text-secondary)", fontSize: 13, lineHeight: 1.5 }}>
+        <div style={{ color: "var(--bd-fg-secondary)", fontSize: 13, lineHeight: 1.5 }}>
           <p style={{ margin: "0 0 12px" }}>
             To duplicate &quot;{state.duplicateInfo?.name}&quot;:
           </p>
@@ -460,7 +460,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               {state.duplicateInfo?.copyName}&quot;
             </li>
           </ol>
-          <p style={{ margin: "12px 0 0", fontSize: 12, color: "var(--buildrick-text-muted)" }}>
+          <p style={{ margin: "12px 0 0", fontSize: 12, color: "var(--bd-fg-muted)" }}>
             This ensures a proper deep copy with new element IDs.
           </p>
         </div>

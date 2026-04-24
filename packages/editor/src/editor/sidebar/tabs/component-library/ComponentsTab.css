@@ -1,7 +1,7 @@
 /**
  * ComponentsTab — light-theme CSS (comp-* namespace)
  *
- * All colors use var(--buildrick-*) canonical DS tokens. No raw hex.
+ * All colors use var(--bd-*) alias tokens. No raw hex.
  *
  * Pencil screens: gIKXw (list), E2jan (detail), 65J2Q (empty state)
  */
@@ -16,27 +16,27 @@
   cursor: pointer;
   border-radius: 6px;
   font-size: 13px;
-  color: var(--buildrick-text-primary);
+  color: var(--bd-fg-primary);
   transition: background 100ms ease;
 }
 
 .comp-row:hover {
-  background: var(--buildrick-bg-subtle, #F1F5F9);
+  background: var(--bd-bg-subtle, #F1F5F9);
 }
 
 .comp-row--selected {
-  background: var(--buildrick-accent-tint, #DBEAFE);
-  color: var(--buildrick-text-primary, #1E40AF);
+  background: var(--bd-accent-tint, #DBEAFE);
+  color: var(--bd-fg-primary, #1E40AF);
 }
 
 /* ── comp-count-badge: usage count "6x" pill ────────────────────────────── */
 .comp-count-badge {
   margin-left: auto;
   padding: 2px 6px;
-  background: var(--buildrick-bg-subtle, #F1F5F9);
+  background: var(--bd-bg-subtle, #F1F5F9);
   border-radius: 999px;
   font-size: 11px;
-  color: var(--buildrick-text-muted, #64748B);
+  color: var(--bd-fg-muted, #64748B);
   font-weight: 500;
   flex-shrink: 0;
 }
@@ -54,20 +54,20 @@
 
 .comp-empty__icon {
   font-size: 32px;
-  color: var(--buildrick-text-disabled, #CBD5E1);
+  color: var(--bd-fg-disabled, #CBD5E1);
   line-height: 1;
 }
 
 .comp-empty__title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--buildrick-text-primary);
+  color: var(--bd-fg-primary);
   margin: 0;
 }
 
 .comp-empty__body {
   font-size: 12px;
-  color: var(--buildrick-text-muted, #64748B);
+  color: var(--bd-fg-muted, #64748B);
   margin: 0;
   max-width: 200px;
   line-height: 1.5;

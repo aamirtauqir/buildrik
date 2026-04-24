@@ -33,8 +33,8 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
         style={{
           background:
             previewState === "ready"
-              ? (template.gradient ?? "var(--buildrick-bg-subtle, #F1F5F9)")
-              : "var(--buildrick-bg-subtle, #F1F5F9)",
+              ? (template.gradient ?? "var(--bd-bg-subtle, #F1F5F9)")
+              : "var(--bd-bg-subtle, #F1F5F9)",
         }}
       >
         {previewState === "loading" && (
@@ -44,11 +44,11 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
         )}
         {previewState === "error" && (
           <div className="tpl-detail-preview-state">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--buildrick-text-secondary, #94A3B8)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--bd-fg-secondary, #94A3B8)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" />
               <path d="M12 8v4M12 16h.01" />
             </svg>
-            <p style={{ fontSize: 11, color: "var(--buildrick-text-muted, #475569)", margin: "6px 0 0", textAlign: "center" }}>
+            <p style={{ fontSize: 11, color: "var(--bd-fg-muted, #475569)", margin: "6px 0 0", textAlign: "center" }}>
               Preview unavailable
             </p>
             {onPreviewRetry && (

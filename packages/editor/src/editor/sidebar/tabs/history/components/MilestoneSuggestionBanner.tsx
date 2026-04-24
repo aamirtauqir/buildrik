@@ -69,14 +69,14 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
         alignItems: "center",
         gap: 8,
         padding: "8px 12px",
-        background: "var(--buildrick-accent-tint, rgba(45,109,255,0.08))",
+        background: "var(--bd-accent-tint, rgba(45,109,255,0.08))",
         border: "1px solid rgba(45,109,255,0.2)",
-        borderRadius: "var(--buildrick-radius-md)",
+        borderRadius: "var(--bd-radius-md)",
         margin: "0 12px 8px",
       }}
     >
       {/* Icon */}
-      <div style={{ flexShrink: 0, color: "var(--buildrick-accent)" }}>
+      <div style={{ flexShrink: 0, color: "var(--bd-accent)" }}>
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
           <circle cx="8" cy="8" r="6" />
           <path d="M8 5v3l2 1" />
@@ -85,7 +85,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
 
       {/* Content */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 11, color: "var(--buildrick-text-muted)", marginBottom: 2 }}>
+        <div style={{ fontSize: 11, color: "var(--bd-fg-muted)", marginBottom: 2 }}>
           {triggerLabel}
         </div>
         {isEditing ? (
@@ -99,12 +99,12 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
             maxLength={50}
             style={{
               width: "100%",
-              background: "var(--buildrick-surface-3)",
-              border: "1px solid var(--buildrick-accent)",
+              background: "var(--bd-bg-subtle)",
+              border: "1px solid var(--bd-accent)",
               borderRadius: 4,
               padding: "2px 6px",
               fontSize: 13,
-              color: "var(--buildrick-text-primary)",
+              color: "var(--bd-fg-primary)",
               outline: "none",
               fontFamily: "inherit",
             }}
@@ -114,7 +114,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
             style={{
               fontSize: 13,
               fontWeight: 500,
-              color: "var(--buildrick-text-primary)",
+              color: "var(--bd-fg-primary)",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -128,7 +128,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
           <div
             style={{
               fontSize: 11,
-              color: "var(--buildrick-text-muted)",
+              color: "var(--bd-fg-muted)",
               marginTop: 2,
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -146,7 +146,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
           <button
             onClick={handleEditSave}
             className="milestone-btn milestone-btn--primary"
-            style={{ background: "var(--buildrick-accent)", color: "var(--buildrick-text-on-accent)" }}
+            style={{ background: "var(--bd-accent)", color: "var(--bd-fg-on-accent)" }}
           >
             Save
           </button>

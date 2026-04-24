@@ -2,15 +2,15 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--buildrick-bg-panel);
+  background: var(--bd-bg-panel);
   position: relative;
   overflow: hidden;
 }
 
 .med-tabs-wrap {
   padding: 0 20px;
-  border-bottom: 1px solid var(--buildrick-border-light);
-  background: var(--buildrick-bg-card);
+  border-bottom: 1px solid var(--bd-border-light);
+  background: var(--bd-bg-card);
 }
 
 @keyframes med-slide-down {
@@ -22,9 +22,9 @@
   height: 28px;
   padding: 0 12px;
   border-radius: 6px;
-  border: 1px solid var(--buildrick-border);
-  background: var(--buildrick-bg-card);
-  color: var(--buildrick-text-secondary);
+  border: 1px solid var(--bd-border);
+  background: var(--bd-bg-card);
+  color: var(--bd-fg-secondary);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -33,8 +33,8 @@
 }
 
 .med-bulk-btn.danger {
-  color: var(--buildrick-error);
-  border-color: var(--buildrick-error);
+  color: var(--bd-error);
+  border-color: var(--bd-error);
 }
 
 .med-grid {
@@ -59,8 +59,8 @@
   position: relative;
   aspect-ratio: 1;
   border-radius: 10px;
-  border: 1px solid var(--buildrick-border-light);
-  background: var(--buildrick-bg-card);
+  border: 1px solid var(--bd-border-light);
+  background: var(--bd-bg-card);
   overflow: hidden;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
@@ -68,14 +68,14 @@
 }
 
 .med-img-card:hover {
-  border-color: var(--buildrick-accent);
+  border-color: var(--bd-accent);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .med-img-card.selected {
-  border: 2px solid var(--buildrick-accent);
-  background: var(--buildrick-accent-tint);
+  border: 2px solid var(--bd-accent);
+  background: var(--bd-accent-tint);
 }
 
 .med-img-card-bg {
@@ -106,7 +106,7 @@
   opacity: 0;
   transition: opacity 0.2s ease;
   backdrop-filter: blur(8px);
-  border-top: 1px solid var(--buildrick-border-light);
+  border-top: 1px solid var(--bd-border-light);
 }
 
 .med-img-card:hover .med-img-hover-bar {
@@ -116,7 +116,7 @@
 .med-img-hover-bar button {
   background: none;
   border: none;
-  color: var(--buildrick-text-secondary);
+  color: var(--bd-fg-secondary);
   padding: 6px;
   cursor: pointer;
   display: flex;
@@ -124,7 +124,7 @@
 }
 
 .med-img-hover-bar button:hover {
-  color: var(--buildrick-accent);
+  color: var(--bd-accent);
   transform: scale(1.2);
 }
 
@@ -132,8 +132,8 @@
   position: relative;
   aspect-ratio: 16/9;
   border-radius: 10px;
-  border: 1px solid var(--buildrick-border-light);
-  background: var(--buildrick-canvas-content);
+  border: 1px solid var(--bd-border-light);
+  background: var(--bd-canvas-content);
   overflow: hidden;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -184,22 +184,22 @@
   align-items: center;
   padding: 12px;
   border-radius: 10px;
-  border: 1px solid var(--buildrick-border-light);
-  background: var(--buildrick-bg-card);
+  border: 1px solid var(--bd-border-light);
+  background: var(--bd-bg-card);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .med-ico-card:hover {
-  background: var(--buildrick-bg-subtle);
-  border-color: var(--buildrick-accent);
+  background: var(--bd-bg-subtle);
+  border-color: var(--bd-accent);
   transform: translateY(-2px);
 }
 
 .med-ico-label {
   font-size: 11px;
   font-weight: 500;
-  color: var(--buildrick-text-secondary);
+  color: var(--bd-fg-secondary);
   margin-top: 8px;
   width: 100%;
   text-align: center;
@@ -217,15 +217,15 @@
 .med-fnt-card {
   padding: 16px;
   border-radius: 10px;
-  border: 1px solid var(--buildrick-border-light);
-  background: var(--buildrick-bg-card);
+  border: 1px solid var(--bd-border-light);
+  background: var(--bd-bg-card);
   cursor: pointer;
   position: relative;
   transition: all 0.2s ease;
 }
 
 .med-fnt-card:hover {
-  border-color: var(--buildrick-accent);
+  border-color: var(--bd-accent);
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
@@ -239,12 +239,12 @@
 .med-fnt-name {
   font-size: 14px;
   font-weight: 600;
-  color: var(--buildrick-text-primary);
+  color: var(--bd-fg-primary);
 }
 
 .med-fnt-preview {
   font-size: 24px;
-  color: var(--buildrick-text-secondary);
+  color: var(--bd-fg-secondary);
   white-space: nowrap;
   overflow: hidden;
 }
@@ -260,7 +260,7 @@
 .med-no-project {
   padding: 48px 24px;
   text-align: center;
-  color: var(--buildrick-text-muted);
+  color: var(--bd-fg-muted);
   font-size: 15px;
   line-height: 1.6;
 }
@@ -270,7 +270,7 @@
   font-weight: 600;
   padding: 4px 12px;
   border-radius: 6px;
-  background: var(--buildrick-accent);
+  background: var(--bd-accent);
   color: white;
   border: none;
   cursor: pointer;
@@ -295,8 +295,8 @@
 .stock-modal {
   width: min(720px, 90vw);
   max-height: 80vh;
-  background: var(--buildrick-bg-panel);
-  border: 1px solid var(--buildrick-border-light, rgba(255,255,255,0.08));
+  background: var(--bd-bg-panel);
+  border: 1px solid var(--bd-border-light, rgba(255,255,255,0.08));
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -309,20 +309,20 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px 12px;
-  border-bottom: 1px solid var(--buildrick-border-light);
+  border-bottom: 1px solid var(--bd-border-light);
 }
 
 .stock-modal-title {
   font-size: 15px;
   font-weight: 600;
-  color: var(--buildrick-text-primary);
+  color: var(--bd-fg-primary);
   margin: 0;
 }
 
 .stock-modal-close {
   background: none;
   border: none;
-  color: var(--buildrick-text-disabled);
+  color: var(--bd-fg-disabled);
   cursor: pointer;
   padding: 4px;
   border-radius: 6px;
@@ -330,14 +330,14 @@
 }
 
 .stock-modal-close:hover {
-  background: var(--buildrick-bg-subtle);
-  color: var(--buildrick-text-primary);
+  background: var(--bd-bg-subtle);
+  color: var(--bd-fg-primary);
 }
 
 .stock-modal-tabs {
   display: flex;
   gap: 0;
-  border-bottom: 1px solid var(--buildrick-border-light);
+  border-bottom: 1px solid var(--bd-border-light);
   padding: 0 20px;
 }
 
@@ -346,7 +346,7 @@
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
-  color: var(--buildrick-text-disabled);
+  color: var(--bd-fg-disabled);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -354,12 +354,12 @@
 }
 
 .stock-tab:hover {
-  color: var(--buildrick-text-secondary);
+  color: var(--bd-fg-secondary);
 }
 
 .stock-tab.active {
-  color: var(--buildrick-accent);
-  border-bottom-color: var(--buildrick-accent);
+  color: var(--bd-accent);
+  border-bottom-color: var(--bd-accent);
 }
 
 .stock-modal-search {
@@ -375,7 +375,7 @@
 
 .stock-orientation-group {
   display: flex;
-  background: var(--buildrick-bg-subtle);
+  background: var(--bd-bg-subtle);
   border-radius: 6px;
   padding: 2px;
 }
@@ -388,20 +388,20 @@
   font-weight: 600;
   cursor: pointer;
   background: transparent;
-  color: var(--buildrick-text-disabled);
+  color: var(--bd-fg-disabled);
   transition: all 0.15s;
 }
 
 .stock-orient-btn.active {
-  background: var(--buildrick-bg-card);
-  color: var(--buildrick-accent);
+  background: var(--bd-bg-card);
+  color: var(--bd-accent);
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .stock-filter-divider {
   width: 1px;
   height: 16px;
-  background: var(--buildrick-border-light);
+  background: var(--bd-border-light);
 }
 
 .stock-color-row {
@@ -416,7 +416,7 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 1px solid var(--buildrick-border-light);
+  border: 1px solid var(--bd-border-light);
   padding: 0;
   flex-shrink: 0;
   cursor: pointer;
@@ -424,12 +424,12 @@
   align-items: center;
   justify-content: center;
   font-size: 8px;
-  color: var(--buildrick-text-disabled);
+  color: var(--bd-fg-disabled);
   box-sizing: border-box;
 }
 
 .stock-color-dot.active {
-  border: 2px solid var(--buildrick-accent);
+  border: 2px solid var(--bd-accent);
 }
 
 .stock-modal-content {
@@ -441,14 +441,14 @@
 .stock-loading {
   padding: 24px;
   text-align: center;
-  color: var(--buildrick-accent);
+  color: var(--bd-accent);
   font-size: 13px;
 }
 
 .stock-empty {
   padding: 32px;
   text-align: center;
-  color: var(--buildrick-text-disabled);
+  color: var(--bd-fg-disabled);
   font-size: 13px;
 }
 
@@ -459,7 +459,7 @@
 .stock-browse-all {
   background: none;
   border: none;
-  color: var(--buildrick-accent);
+  color: var(--bd-accent);
   font-size: 12px;
   cursor: pointer;
   display: flex;
@@ -472,17 +472,17 @@
   width: 100%;
   margin-top: 16px;
   padding: 10px;
-  background: var(--buildrick-bg-subtle);
-  border: 1px solid var(--buildrick-border-light);
+  background: var(--bd-bg-subtle);
+  border: 1px solid var(--bd-border-light);
   border-radius: 8px;
-  color: var(--buildrick-text-secondary);
+  color: var(--bd-fg-secondary);
   font-size: 13px;
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .stock-load-more:hover {
-  background: var(--buildrick-bg-card);
+  background: var(--bd-bg-card);
 }
 
 .stock-load-more:disabled {
@@ -495,10 +495,10 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: var(--buildrick-bg-subtle);
-  border: 1px dashed var(--buildrick-border-light);
+  background: var(--bd-bg-subtle);
+  border: 1px dashed var(--bd-border-light);
   border-radius: 8px;
-  color: var(--buildrick-accent);
+  color: var(--bd-accent);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -506,6 +506,6 @@
 }
 
 .med-stock-btn:hover {
-  background: var(--buildrick-accent-tint, rgba(124, 109, 250, 0.08));
-  border-color: var(--buildrick-accent);
+  background: var(--bd-accent-tint, rgba(124, 109, 250, 0.08));
+  border-color: var(--bd-accent);
 }

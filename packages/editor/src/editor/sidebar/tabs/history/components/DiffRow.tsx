@@ -12,10 +12,10 @@ interface DiffRowProps {
 }
 
 const opColors: Record<string, string> = {
-  add: "var(--buildrick-success, #22c55e)",
-  remove: "var(--buildrick-error, #ef4444)",
-  replace: "var(--buildrick-accent, #2d6dff)",
-  info: "var(--buildrick-text-muted, #908D85)",
+  add: "var(--bd-success, #22c55e)",
+  remove: "var(--bd-error, #ef4444)",
+  replace: "var(--bd-accent, #2d6dff)",
+  info: "var(--bd-fg-muted, #908D85)",
 };
 
 const opIcons: Record<string, string> = {

@@ -10,7 +10,7 @@ export const containerStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   height: "100%",
-  background: "var(--buildrick-surface-2)",
+  background: "var(--bd-bg-subtle)",
 };
 
 export const searchContainerStyles: React.CSSProperties = {
@@ -21,9 +21,9 @@ export const dialogInputStyles: React.CSSProperties = {
   padding: "8px 12px",
   borderRadius: 8,
   fontSize: 13,
-  background: "var(--buildrick-surface-3)",
-  border: "1px solid var(--buildrick-border)",
-  color: "var(--buildrick-text-primary)",
+  background: "var(--bd-bg-subtle)",
+  border: "1px solid var(--bd-border)",
+  color: "var(--bd-fg-primary)",
   outline: "none",
   width: "100%",
 };
@@ -33,9 +33,9 @@ export const dialogCancelBtnStyles: React.CSSProperties = {
   borderRadius: 6,
   fontSize: 13,
   cursor: "pointer",
-  background: "var(--buildrick-surface-3)",
-  border: "1px solid var(--buildrick-border)",
-  color: "var(--buildrick-text-secondary)",
+  background: "var(--bd-bg-subtle)",
+  border: "1px solid var(--bd-border)",
+  color: "var(--bd-fg-secondary)",
 };
 
 export const dialogPrimaryBtnStyles: React.CSSProperties = {
@@ -43,7 +43,7 @@ export const dialogPrimaryBtnStyles: React.CSSProperties = {
   borderRadius: 6,
   fontSize: 13,
   cursor: "pointer",
-  background: "var(--buildrick-accent)",
-  border: "1px solid var(--buildrick-accent)",
-  color: "var(--buildrick-text-on-accent)",
+  background: "var(--bd-accent)",
+  border: "1px solid var(--bd-accent)",
+  color: "var(--bd-fg-on-accent)",
 };

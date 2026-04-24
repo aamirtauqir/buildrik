@@ -54,14 +54,14 @@ const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
       alignItems: "center",
       gap: 6,
       padding: "4px 10px",
-      borderRadius: "var(--buildrick-radius-full)",
-      fontSize: "var(--buildrick-text-xs, 12px)",
+      borderRadius: "var(--bd-radius-full)",
+      fontSize: "var(--bd-text-xs, 12px)",
       fontWeight: 600,
       letterSpacing: "0.02em",
       background: isPublished
-        ? "var(--buildrick-success-light, rgba(34, 197, 94, 0.12))"
+        ? "var(--bd-success-bg, rgba(34, 197, 94, 0.12))"
         : "rgba(245, 158, 11, 0.15)",
-      color: isPublished ? "var(--buildrick-success, #22c55e)" : "#F59E0B",
+      color: isPublished ? "var(--bd-success, #22c55e)" : "#F59E0B",
     }}
   >
     <span
@@ -70,7 +70,7 @@ const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
         height: 6,
         borderRadius: "50%",
         background: isPublished
-          ? "var(--buildrick-success, #22c55e)"
+          ? "var(--bd-success, #22c55e)"
           : "#F59E0B",
       }}
     />
@@ -92,7 +92,7 @@ const ChecklistItem: React.FC<{
       padding: "6px 8px",
       borderRadius: 6,
       background: ok ? "rgba(34,197,94,0.06)" : "rgba(255,255,255,0.02)",
-      border: `1px solid ${ok ? "rgba(34,197,94,0.15)" : "var(--buildrick-border-light, var(--buildrick-border))"}`,
+      border: `1px solid ${ok ? "rgba(34,197,94,0.15)" : "var(--bd-border-light, var(--bd-border))"}`,
       fontSize: 13,
     }}
     aria-label={`${label}: ${ok ? "complete" : "incomplete"}`}
@@ -102,12 +102,12 @@ const ChecklistItem: React.FC<{
       style={{
         width: 16,
         height: 16,
-        borderRadius: "var(--buildrick-radius-sm)",
+        borderRadius: "var(--bd-radius-sm)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: ok ? "var(--buildrick-success, #22c55e)" : "transparent",
-        border: ok ? "none" : "1px solid var(--buildrick-border-light, var(--buildrick-border))",
+        background: ok ? "var(--bd-success, #22c55e)" : "transparent",
+        border: ok ? "none" : "1px solid var(--bd-border-light, var(--bd-border))",
         flexShrink: 0,
         transition: "background 0.15s",
       }}
@@ -122,7 +122,7 @@ const ChecklistItem: React.FC<{
     <span
       style={{
         flex: 1,
-        color: ok ? "var(--buildrick-text-muted)" : "var(--buildrick-text-secondary)",
+        color: ok ? "var(--bd-fg-muted)" : "var(--bd-fg-secondary)",
         textDecoration: ok ? "line-through" : "none",
         fontSize: 13,
       }}
@@ -130,10 +130,10 @@ const ChecklistItem: React.FC<{
       {label}
     </span>
     {required && !ok && (
-      <span style={{ fontSize: 12, color: "var(--buildrick-error)", fontWeight: 500 }}>Required</span>
+      <span style={{ fontSize: 12, color: "var(--bd-error)", fontWeight: 500 }}>Required</span>
     )}
     {hint && !ok && (
-      <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>{hint}</span>
+      <span style={{ fontSize: 12, color: "var(--bd-fg-muted)" }}>{hint}</span>
     )}
   </div>
 );
@@ -356,14 +356,14 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           </div>
           {projectId && (
             <p style={{ ...metaTextStyles, marginTop: 4 }}>
-              Publishing to <strong style={{ color: "var(--buildrick-text-primary)" }}>buildrik.app/{projectId}</strong>
+              Publishing to <strong style={{ color: "var(--bd-fg-primary)" }}>buildrik.app/{projectId}</strong>
             </p>
           )}
         </section>
 
         {/* Trust signal */}
         <div style={trustBadgeStyles}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" style={{ flexShrink: 0, color: "var(--buildrick-success, #22c55e)" }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" style={{ flexShrink: 0, color: "var(--bd-success, #22c55e)" }}>
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
           <span>Your site data is encrypted and stored securely.</span>
@@ -376,9 +376,9 @@ export const PublishTab: React.FC<PublishTabProps> = ({
               padding: "12px",
               background: "rgba(245, 158, 11, 0.08)",
               border: "1px solid rgba(245, 158, 11, 0.2)",
-              borderRadius: "var(--buildrick-radius-md)",
+              borderRadius: "var(--bd-radius-md)",
               fontSize: 12,
-              color: "var(--buildrick-text-secondary)",
+              color: "var(--bd-fg-secondary)",
               lineHeight: 1.5,
             }}>
               Publishing not configured. Contact your administrator to link this project.
@@ -491,7 +491,7 @@ const RocketIcon: React.FC = () => (
     height="20"
     viewBox="0 0 24 24"
     fill="none"
-    stroke="var(--buildrick-accent, #6366f1)"
+    stroke="var(--bd-accent, #6366f1)"
     strokeWidth="1.5"
     style={{ flexShrink: 0, marginTop: 2 }}
     aria-hidden="true"
@@ -511,7 +511,7 @@ const containerStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   height: "100%",
-  background: "var(--buildrick-bg-panel)",
+  background: "var(--bd-bg-panel)",
 };
 
 const contentStyles: React.CSSProperties = {
@@ -528,9 +528,9 @@ const sectionStyles: React.CSSProperties = {
   flexDirection: "column",
   gap: 8,
   padding: 12,
-  background: "var(--buildrick-surface-2)",
-  borderRadius: "var(--buildrick-radius-md)",
-  border: "1px solid var(--buildrick-border)",
+  background: "var(--bd-bg-subtle)",
+  borderRadius: "var(--bd-radius-md)",
+  border: "1px solid var(--bd-border)",
 };
 
 const sectionHeaderStyles: React.CSSProperties = {
@@ -541,21 +541,21 @@ const sectionHeaderStyles: React.CSSProperties = {
 
 const sectionTitleStyles: React.CSSProperties = {
   margin: 0,
-  fontSize: "var(--buildrick-text-sm, 13px)",
+  fontSize: "var(--bd-text-sm, 13px)",
   fontWeight: 600,
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bd-fg-primary)",
 };
 
 const metaTextStyles: React.CSSProperties = {
   margin: 0,
-  fontSize: "var(--buildrick-text-xs, 12px)",
-  color: "var(--buildrick-text-muted)",
+  fontSize: "var(--bd-text-xs, 12px)",
+  color: "var(--bd-fg-muted)",
 };
 
 const labelStyles: React.CSSProperties = {
-  fontSize: "var(--buildrick-text-xs, 12px)",
+  fontSize: "var(--bd-text-xs, 12px)",
   fontWeight: 500,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bd-fg-secondary)",
   marginBottom: 4,
 };
 
@@ -569,15 +569,15 @@ const urlRowStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 6,
   padding: "6px 8px",
-  background: "var(--buildrick-surface-3)",
-  borderRadius: "var(--buildrick-radius-sm)",
-  border: "1px solid var(--buildrick-border)",
+  background: "var(--bd-bg-subtle)",
+  borderRadius: "var(--bd-radius-sm)",
+  border: "1px solid var(--bd-border)",
 };
 
 const urlLinkStyles: React.CSSProperties = {
   flex: 1,
-  fontSize: "var(--buildrick-text-xs, 12px)",
-  color: "var(--buildrick-accent)",
+  fontSize: "var(--bd-text-xs, 12px)",
+  color: "var(--bd-accent)",
   textDecoration: "none",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -593,8 +593,8 @@ const copyButtonStyles: React.CSSProperties = {
   padding: 0,
   background: "transparent",
   border: "none",
-  borderRadius: "var(--buildrick-radius-sm)",
-  color: "var(--buildrick-text-secondary)",
+  borderRadius: "var(--bd-radius-sm)",
+  color: "var(--bd-fg-secondary)",
   cursor: "pointer",
   flexShrink: 0,
 };
@@ -608,7 +608,7 @@ const actionRowStyles: React.CSSProperties = {
 const disabledReasonStyles: React.CSSProperties = {
   margin: 0,
   fontSize: 11,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bd-fg-muted)",
   lineHeight: 1.4,
 };
 
@@ -616,23 +616,23 @@ const infoSectionStyles: React.CSSProperties = {
   display: "flex",
   gap: 12,
   padding: 12,
-  background: "var(--buildrick-accent-tint, rgba(99, 102, 241, 0.06))",
-  borderRadius: "var(--buildrick-radius-md)",
-  border: "1px solid var(--buildrick-accent-subtle, rgba(99, 102, 241, 0.12))",
+  background: "var(--bd-accent-tint, rgba(99, 102, 241, 0.06))",
+  borderRadius: "var(--bd-radius-md)",
+  border: "1px solid var(--bd-accent-subtle, rgba(99, 102, 241, 0.12))",
 };
 
 const infoTitleStyles: React.CSSProperties = {
   margin: 0,
-  fontSize: "var(--buildrick-text-sm, 13px)",
+  fontSize: "var(--bd-text-sm, 13px)",
   fontWeight: 600,
-  color: "var(--buildrick-text-primary)",
+  color: "var(--bd-fg-primary)",
 };
 
 const infoDescStyles: React.CSSProperties = {
   margin: "4px 0 0",
-  fontSize: "var(--buildrick-text-xs, 12px)",
+  fontSize: "var(--bd-text-xs, 12px)",
   lineHeight: 1.5,
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bd-fg-secondary)",
 };
 
 const errorStyles: React.CSSProperties = {
@@ -641,11 +641,11 @@ const errorStyles: React.CSSProperties = {
   justifyContent: "space-between",
   gap: 8,
   padding: "8px 12px",
-  background: "var(--buildrick-error-light, rgba(239, 68, 68, 0.1))",
-  borderRadius: "var(--buildrick-radius-md)",
-  border: "1px solid var(--buildrick-error-light, rgba(239, 68, 68, 0.2))",
-  color: "var(--buildrick-error, #ef4444)",
-  fontSize: "var(--buildrick-text-xs, 12px)",
+  background: "var(--bd-error-tint, rgba(239, 68, 68, 0.1))",
+  borderRadius: "var(--bd-radius-md)",
+  border: "1px solid var(--bd-error-tint, rgba(239, 68, 68, 0.2))",
+  color: "var(--bd-error, #ef4444)",
+  fontSize: "var(--bd-text-xs, 12px)",
 };
 
 const errorDismissStyles: React.CSSProperties = {
@@ -668,24 +668,24 @@ const trustBadgeStyles: React.CSSProperties = {
   gap: 6,
   padding: "7px 10px",
   background: "rgba(34, 197, 94, 0.06)",
-  borderRadius: "var(--buildrick-radius-md)",
+  borderRadius: "var(--bd-radius-md)",
   border: "1px solid rgba(34, 197, 94, 0.15)",
   fontSize: 12,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bd-fg-muted)",
   lineHeight: 1.4,
 };
 
 const privacyFooterStyles: React.CSSProperties = {
   padding: "10px 16px",
-  borderTop: "1px solid var(--buildrick-border)",
+  borderTop: "1px solid var(--bd-border)",
   fontSize: 12,
   lineHeight: 1.5,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bd-fg-muted)",
   textAlign: "center",
 };
 
 const privacyLinkStyles: React.CSSProperties = {
-  color: "var(--buildrick-accent, #3b82f6)",
+  color: "var(--bd-accent, #3b82f6)",
   textDecoration: "none",
 };
 

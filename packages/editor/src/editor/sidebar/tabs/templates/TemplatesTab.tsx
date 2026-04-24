@@ -157,7 +157,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
               </svg>
               <span>Back to grid</span>
             </button>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--buildrick-text-secondary, #94A3B8)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--bd-fg-secondary, #94A3B8)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 18l6-6-6-6" />
             </svg>
             <span className="tpl-breadcrumb-cat">{detailTemplate.category ?? "All"}</span>

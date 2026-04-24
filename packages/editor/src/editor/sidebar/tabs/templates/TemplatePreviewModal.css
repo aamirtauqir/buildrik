@@ -19,12 +19,12 @@
   position: relative;
   width: min(1100px, 92vw);
   height: min(780px, 88vh);
-  background: var(--buildrick-bg-dark);
+  background: var(--bd-bg-panel);
   display: flex;
   flex-direction: column;
-  border-radius: var(--buildrick-radius-lg);
+  border-radius: var(--bd-radius-lg);
   overflow: hidden;
-  border: 1px solid var(--buildrick-border);
+  border: 1px solid var(--bd-border);
   animation: tmpl-preview-in 0.15s ease;
 }
 
@@ -48,8 +48,8 @@
   align-items: center;
   height: 42px;
   padding: 0 12px;
-  background: var(--buildrick-bg-panel);
-  border-bottom: 1px solid var(--buildrick-border);
+  background: var(--bd-bg-panel);
+  border-bottom: 1px solid var(--bd-border);
   flex-shrink: 0;
   gap: 8px;
 }
@@ -115,21 +115,21 @@
 .tmpl-preview__close {
   width: 24px;
   height: 24px;
-  border-radius: var(--buildrick-radius-sm);
+  border-radius: var(--bd-radius-sm);
   border: none;
-  background: var(--buildrick-bg-hover);
-  color: var(--buildrick-text-muted);
+  background: var(--bd-bg-hover);
+  color: var(--bd-fg-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: background var(--buildrick-duration-fast, 100ms);
+  transition: background var(--bd-duration-fast, 100ms);
 }
 
 .tmpl-preview__close:hover {
-  background: var(--buildrick-bg-active);
-  color: var(--buildrick-text-secondary);
+  background: var(--bd-accent-tint);
+  color: var(--bd-fg-secondary);
 }
 
 /* ── Preview canvas ── */
@@ -138,14 +138,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--buildrick-bg-subtle);
+  background: var(--bd-bg-subtle);
   padding: 12px;
   overflow: hidden;
 }
 
 .tmpl-preview__frame {
-  background: var(--buildrick-bg-card);
-  border: 1px solid var(--buildrick-border);
+  background: var(--bd-bg-card);
+  border: 1px solid var(--bd-border);
   border-radius: 5px;
   overflow: hidden;
   height: 100%;
@@ -163,8 +163,8 @@
 /* ── Bottom bar ── */
 .tmpl-preview__bottom {
   padding: 8px 12px;
-  background: var(--buildrick-bg-panel);
-  border-top: 1px solid var(--buildrick-border);
+  background: var(--bd-bg-panel);
+  border-top: 1px solid var(--bd-border);
   display: flex;
   gap: 6px;
   flex-shrink: 0;
@@ -173,35 +173,35 @@
 .tmpl-preview__back {
   flex: 0 0 auto;
   padding: 7px 12px;
-  border-radius: var(--buildrick-radius-sm);
-  border: 1px solid var(--buildrick-border);
-  background: var(--buildrick-bg-hover);
-  color: var(--buildrick-text-muted);
+  border-radius: var(--bd-radius-sm);
+  border: 1px solid var(--bd-border);
+  background: var(--bd-bg-hover);
+  color: var(--bd-fg-muted);
   font-size: 10.5px;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
-  transition: background var(--buildrick-duration-fast, 100ms), color var(--buildrick-duration-fast, 100ms);
+  transition: background var(--bd-duration-fast, 100ms), color var(--bd-duration-fast, 100ms);
 }
 
 .tmpl-preview__back:hover {
-  background: var(--buildrick-bg-active);
-  color: var(--buildrick-text-secondary);
+  background: var(--bd-accent-tint);
+  color: var(--bd-fg-secondary);
 }
 
 /* "Use this template" CTA — primary style */
 .tmpl-preview__use {
   flex: 1;
   padding: 7px 12px;
-  border-radius: var(--buildrick-radius-sm);
+  border-radius: var(--bd-radius-sm);
   border: none;
-  background: var(--buildrick-accent);
+  background: var(--bd-accent);
   color: #fff;
   font-size: 10.5px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
-  transition: opacity var(--buildrick-duration-fast, 100ms);
+  transition: opacity var(--bd-duration-fast, 100ms);
 }
 
 .tmpl-preview__use:hover {

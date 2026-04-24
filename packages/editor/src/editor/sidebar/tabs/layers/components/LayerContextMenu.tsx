@@ -81,7 +81,7 @@ export const LayerContextMenu: React.FC<LayerContextMenuProps> = ({
         <span>{isLocked ? "Unlock" : "Lock"}</span>
       </button>
       <div style={dividerStyles} />
-      <button style={{ ...itemStyles, color: "var(--buildrick-error, #ef4444)" }} role="menuitem" onClick={() => handleAction(onDelete)}>
+      <button style={{ ...itemStyles, color: "var(--bd-error, #ef4444)" }} role="menuitem" onClick={() => handleAction(onDelete)}>
         <Trash2 size={14} />
         <span>Delete</span>
       </button>
@@ -112,7 +112,7 @@ export const DragTooltip: React.FC<DragTooltipProps> = ({
       ...tooltipStyles,
       left: position.x + 12,
       top: position.y + 12,
-      background: variant === "error" ? "var(--buildrick-error, #ef4444)" : "var(--buildrick-surface-4, #2e2e38)",
+      background: variant === "error" ? "var(--bd-error, #ef4444)" : "var(--bd-bg-hover)",
     }}
     role="tooltip"
   >
@@ -127,12 +127,12 @@ export const DragTooltip: React.FC<DragTooltipProps> = ({
 const menuStyles: React.CSSProperties = {
   position: "fixed",
   zIndex: 10000,
-  background: "var(--buildrick-bg-elevated)",
-  border: "1px solid var(--buildrick-border)",
-  borderRadius: "var(--buildrick-radius-sm)",
+  background: "var(--bd-bg-elevated)",
+  border: "1px solid var(--bd-border)",
+  borderRadius: "var(--bd-radius-sm)",
   padding: "4px 0",
   minWidth: 160,
-  boxShadow: "var(--buildrick-shadow-dropdown)",
+  boxShadow: "var(--bd-shadow-dropdown)",
 };
 
 const itemStyles: React.CSSProperties = {
@@ -143,7 +143,7 @@ const itemStyles: React.CSSProperties = {
   padding: "8px 12px",
   border: "none",
   background: "transparent",
-  color: "var(--buildrick-text-primary, #F5F5F0)",
+  color: "var(--bd-fg-primary, #F5F5F0)",
   fontSize: 13,
   cursor: "pointer",
   fontFamily: "inherit",
@@ -152,7 +152,7 @@ const itemStyles: React.CSSProperties = {
 
 const dividerStyles: React.CSSProperties = {
   height: 1,
-  background: "var(--buildrick-border, rgba(255, 255, 255, 0.08))",
+  background: "var(--bd-border, rgba(255, 255, 255, 0.08))",
   margin: "4px 0",
 };
 
@@ -160,11 +160,11 @@ const tooltipStyles: React.CSSProperties = {
   position: "fixed",
   zIndex: 10001,
   padding: "6px 10px",
-  borderRadius: "var(--buildrick-radius-sm)",
-  color: "var(--buildrick-text-on-accent)",
+  borderRadius: "var(--bd-radius-sm)",
+  color: "var(--bd-fg-on-accent)",
   fontSize: 12,
   fontWeight: 500,
   whiteSpace: "nowrap" as const,
   pointerEvents: "none" as const,
-  boxShadow: "var(--buildrick-shadow-md)",
+  boxShadow: "var(--bd-shadow-md)",
 };
