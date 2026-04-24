@@ -77,6 +77,12 @@ export function useInspectorState(selectedElement: SelectedElement | null): Insp
     setActiveTab(recommendedTab);
   }, [elementId, selectedElement]);
 
+  // Reset pseudo-state when element changes — :hover on element A
+  // must not persist onto element B's edit session.
+  useEffect(() => {
+    setCurrentPseudoState("normal");
+  }, [elementId]);
+
   const handleSetActiveTab = useCallback((tab: TabName) => {
     setActiveTab(tab);
   }, []);
