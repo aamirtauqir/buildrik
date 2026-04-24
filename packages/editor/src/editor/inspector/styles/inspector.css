@@ -95,7 +95,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  background: linear-gradient(180deg, #fff 0%, #F8FAFC 100%);
+  background: linear-gradient(180deg, var(--bd-bg-card, #fff) 0%, #F8FAFC 100%);
   border-bottom: 1px solid var(--bd-border);
 }
 .bdi-ehdr .bdi-eic {
