@@ -63,8 +63,75 @@
 }
 .bd-pg-search input::placeholder { color: var(--bd-fg-muted); }
 .bd-pg-search svg { width: 12px; height: 12px; color: var(--bd-fg-muted); flex-shrink: 0; }
+.bd-pg-search-wrap { padding: 0 12px 8px; }
+.bd-pg-search-clear {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--bd-fg-muted);
+  cursor: pointer;
+  font: 600 12px var(--bd-font);
+  line-height: 1;
+}
+.bd-pg-search-clear:hover {
+  background: rgba(15, 23, 42, 0.08);
+  color: var(--bd-fg-heading);
+}
+.bd-pg-selectall {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 12px;
+  margin: 0 6px 4px;
+  border-radius: 4px;
+  background: var(--bd-bg-subtle);
+  cursor: pointer;
+  font: 500 11.5px var(--bd-font);
+  color: var(--bd-fg-muted);
+}
+.bd-pg-selectall:hover { background: rgba(15, 23, 42, 0.06); color: var(--bd-fg-heading); }
+.bd-pg-selectall-checkbox {
+  width: 14px; height: 14px;
+  display: grid;
+  place-items: center;
+  border-radius: 3px;
+  border: 1.5px solid var(--bd-border-medium);
+  background: var(--bd-bg-card);
+}
+.bd-pg-selectall-checkbox.on {
+  background: var(--bd-accent);
+  border-color: var(--bd-accent);
+  color: var(--bd-fg-on-accent);
+}
+.bd-pg-footer-stats {
+  display: flex;
+  gap: 6px;
+  font: 500 10.5px var(--bd-font);
+  color: var(--bd-fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+.bd-pg-footer-stats b { color: var(--bd-fg-heading); font-weight: 600; }
+.bd-pg-add-ghost {
+  background: transparent !important;
+  color: var(--bd-fg-primary) !important;
+  border: 1px solid var(--bd-border-medium) !important;
+}
+.bd-pg-add-ghost:hover { background: var(--bd-bg-subtle) !important; }
 
 /* ─── LIST ────────────────────────────────────────────────────────────── */
+.bd-pg-list-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
 .bd-pg-list {
   flex: 1;
   overflow: auto;

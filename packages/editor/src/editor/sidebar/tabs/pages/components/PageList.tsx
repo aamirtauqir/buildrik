@@ -1,6 +1,10 @@
 /**
- * PageList — Renders pages list + Add Page CTA + conditional search.
- * Zero business logic. All state/actions received as props from usePages.
+ * PageList — search input + pages tree + bulk toolbar mount + footer + Add CTA.
+ * Zero business logic. All state/actions received as props from usePages + useFolders.
+ *
+ * Class namespace: `.bd-pg-list` is the scroll container (CSS owns `overflow:auto`).
+ * `.buildrick-scrollbar` shared utility class kept on the scroll container per
+ * Task 1 CSS contract.
  *
  * @license BSD-3-Clause
  */
@@ -21,10 +25,8 @@ interface Props {
   canSearch: boolean;
   openContextMenuPageId?: string | null;
   composer: Composer | null;
-  // Folder support
   folders: FolderItem[];
   pageToFolder: Map<string, string>;
-  // Bulk select
   selectedIds: Set<string>;
   onAddPage: () => void;
   onAddFolder: () => void;
@@ -41,7 +43,6 @@ interface Props {
   onRenameCommit: (id: string, name: string) => void;
   onRenameCancel: () => void;
   onRequestTemplates?: () => void;
-  // Folder handlers
   onFolderToggle: (folderId: string) => void;
   onFolderRename: (folderId: string, name: string) => void;
   onFolderDelete: (folderId: string) => void;
@@ -110,83 +111,79 @@ export const PageList: React.FC<Props> = ({
 
   if (pages.length === 0) {
     return (
-      <div className="pg-list pg-list--empty">
-        <div className="pg-empty">
-          <div className="pg-empty__illus" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-            </svg>
+      <div className="bd-pg-list-shell">
+        <div className="bd-pg-list buildrick-scrollbar empty" role="tree" aria-label="Pages">
+          <div className="bd-pg-empty">
+            <div className="bd-pg-empty-title">No pages yet</div>
+            <div className="bd-pg-empty-body">
+              Add your first page to get started. Pages are the screens visitors see.
+            </div>
+            <div className="bd-pg-empty-action">
+              <button className="bd-pg-add" type="button" onClick={onAddPage}>
+                Create blank page
+              </button>
+              {onRequestTemplates && (
+                <button
+                  className="bd-pg-add bd-pg-add-ghost"
+                  type="button"
+                  onClick={onRequestTemplates}
+                >
+                  From template
+                </button>
+              )}
+            </div>
           </div>
-          <h4 className="pg-empty__title">No pages yet</h4>
-          <p className="pg-empty__sub">Pages are the screens visitors see. Start with a blank canvas or pick a template.</p>
-          <div className="pg-empty__actions">
-            <button className="pg-empty__cta pg-empty__cta--primary" onClick={onAddPage}>Create blank page</button>
-            {onRequestTemplates && (
-              <button className="pg-empty__cta pg-empty__cta--ghost" onClick={onRequestTemplates}>From template</button>
-            )}
-          </div>
+          <div className="bd-pg-drop-indicator" aria-hidden="true" />
         </div>
       </div>
     );
   }
 
+  const showSelectAll = selectedIds.size > 0;
+  const allSelected = selectedIds.size === pages.length && pages.length > 0;
+
   return (
-    <div className="pg-list">
-      {/* Search — only show when 5+ pages */}
+    <div className="bd-pg-list-shell">
       {canSearch && (
-        <div className="pg-list__search-wrap">
-          <svg
-            className="pg-list__search-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            aria-hidden="true"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input
-            ref={searchRef}
-            className="pg-list__search"
-            placeholder="Search pages..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Escape") setSearch("");
-            }}
-            aria-label="Search pages"
-          />
-          {search ? (
-            <button
-              className="pg-list__search-clear"
-              onClick={() => setSearch("")}
-              aria-label="Clear search"
-            >
-              ✕
-            </button>
-          ) : (
-            <span className="pg-list__search-kbd" aria-hidden="true">/</span>
-          )}
+        <div className="bd-pg-search-wrap">
+          <div className="bd-pg-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              ref={searchRef}
+              type="text"
+              placeholder="Search pages..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setSearch("");
+              }}
+              aria-label="Search pages"
+            />
+            {search && (
+              <button
+                className="bd-pg-search-clear"
+                type="button"
+                onClick={() => setSearch("")}
+                aria-label="Clear search"
+              >
+                ×
+              </button>
+            )}
+          </div>
         </div>
       )}
 
-      {/* Group label — shown when pages exist and search is inactive */}
-      {pages.length > 0 && !search && (
-        <div className="pg-list__group">Site</div>
-      )}
-
-      {/* Select-all row — visible only in bulk mode (prototype .pg-selectall) */}
-      {selectedIds.size > 0 && (
+      {showSelectAll && (
         <div
-          className="pg-selectall"
+          className="bd-pg-selectall"
           role="button"
           tabIndex={0}
           aria-label={`Select all ${pages.length} pages`}
           onClick={() => {
-            if (selectedIds.size === pages.length) {
+            if (allSelected) {
               onClearSelection();
             } else {
               pages.forEach((p) => {
@@ -195,14 +192,14 @@ export const PageList: React.FC<Props> = ({
             }
           }}
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") e.currentTarget.click();
+            if (e.key === "Enter" || e.key === " ") (e.currentTarget as HTMLElement).click();
           }}
         >
           <span
-            className={`pg-selectall__checkbox${selectedIds.size === pages.length ? " pg-selectall__checkbox--on" : ""}`}
+            className={`bd-pg-selectall-checkbox${allSelected ? " on" : ""}`}
             aria-hidden="true"
           >
-            {selectedIds.size === pages.length ? (
+            {allSelected ? (
               <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
                 <polyline points="4 12 10 18 20 6" />
               </svg>
@@ -212,18 +209,18 @@ export const PageList: React.FC<Props> = ({
         </div>
       )}
 
-      {/* Page rows + folders */}
-      <div className="pg-list__rows buildrick-scrollbar" role="list" aria-label="Pages">
+      <div className="bd-pg-list buildrick-scrollbar" role="tree" aria-label="Pages">
         {visible.length === 0 && search ? (
-          <div className="pages-empty-search">
-            <div className="pages-empty-search__msg">No pages match &ldquo;{search}&rdquo;</div>
-            <button className="pages-empty-search__clear" onClick={() => setSearch("")}>
-              Clear search
-            </button>
+          <div className="bd-pg-empty">
+            <div className="bd-pg-empty-title">No pages match &ldquo;{search}&rdquo;</div>
+            <div className="bd-pg-empty-action">
+              <button className="bd-pg-add bd-pg-add-ghost" type="button" onClick={() => setSearch("")}>
+                Clear search
+              </button>
+            </div>
           </div>
         ) : (
           <>
-            {/* Folders (hidden when searching — search shows all matches flat) */}
             {!search && folders.map((folder) => {
               const folderPages = folder.pageIds
                 .map((id) => pages.find((p) => p.id === id))
@@ -253,7 +250,6 @@ export const PageList: React.FC<Props> = ({
               );
             })}
 
-            {/* Ungrouped pages */}
             {visible
               .filter((p) => !pageToFolder.has(p.id))
               .map((page) => (
@@ -278,9 +274,11 @@ export const PageList: React.FC<Props> = ({
               ))}
           </>
         )}
+
+        {/* Drop indicator placeholder — toggled via .show during dragover (CSS owns visibility) */}
+        <div className="bd-pg-drop-indicator" aria-hidden="true" />
       </div>
 
-      {/* Bulk action toolbar — shown when 2+ pages selected */}
       {selectedIds.size >= 2 && (
         <BulkToolbar
           selectedCount={selectedIds.size}
@@ -293,9 +291,8 @@ export const PageList: React.FC<Props> = ({
         />
       )}
 
-      {/* Footer stats */}
-      <div className="pg-list__footer">
-        <div className="pg-list__stats">
+      <div className="bd-pg-footer">
+        <div className="bd-pg-footer-stats">
           <span><b>{stats.total}</b> page{stats.total !== 1 ? "s" : ""}</span>
           {stats.drafts > 0 && (
             <><span>·</span><span>{stats.drafts} draft{stats.drafts !== 1 ? "s" : ""}</span></>
@@ -307,10 +304,8 @@ export const PageList: React.FC<Props> = ({
             <><span>·</span><span>{stats.hidden} hidden</span></>
           )}
         </div>
+        <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
       </div>
-
-      {/* Add Page CTA — sticky bottom */}
-      <AddPageButton onAddBlank={onAddPage} onFromTemplate={onRequestTemplates} onAddFolder={onAddFolder} />
     </div>
   );
 };
