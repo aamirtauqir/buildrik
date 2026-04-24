@@ -7,6 +7,7 @@
 
 import { useCallback, useState, useEffect, useRef } from "react";
 import type { Composer } from "../../../engine";
+import { getBreakpointQuery } from "../../../shared/constants/breakpoints";
 import { getDefaultStyles } from "../../../shared/constants/defaultStyles";
 import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
@@ -99,7 +100,11 @@ export function useStyleHandlers(
     // Layer pseudo-state styles on top of base
     if (currentPseudoState !== "normal" && composer?.styles) {
       const pseudoSelector = `[data-buildrick-id="${selectedElement.id}"]:${currentPseudoState}`;
-      const pseudoRule = composer.styles.getRule(pseudoSelector, undefined);
+      const mq =
+        currentBreakpoint === "desktop"
+          ? undefined
+          : getBreakpointQuery(currentBreakpoint) ?? undefined;
+      const pseudoRule = composer.styles.getRule(pseudoSelector, mq);
       if (pseudoRule) {
         setStyles((prev) => ({ ...prev, ...pseudoRule.properties }));
       }
@@ -145,22 +150,26 @@ export function useStyleHandlers(
         composer?.beginTransaction?.("style-change");
         try {
           if (currentPseudoState !== "normal" && composer?.styles) {
-            // Handle pseudo-state styling
+            const mq =
+              currentBreakpoint === "desktop"
+                ? undefined
+                : getBreakpointQuery(currentBreakpoint) ?? undefined;
+            const pseudoSelector = `${selector}:${currentPseudoState}`;
             if (value === "" || value == null) {
-              const pseudoSelector = `${selector}:${currentPseudoState}`;
-              const existingRule = composer.styles.getRule(pseudoSelector, undefined);
+              const existingRule = composer.styles.getRule(pseudoSelector, mq);
               if (existingRule) {
                 const props = { ...existingRule.properties };
                 delete props[property];
                 composer.styles.setRule(selector, props, {
                   pseudo: `:${currentPseudoState}`,
+                  mediaQuery: mq,
                 });
               }
             } else {
               composer.styles.setRule(
                 selector,
                 { [property]: value },
-                { pseudo: `:${currentPseudoState}` }
+                { pseudo: `:${currentPseudoState}`, mediaQuery: mq }
               );
             }
           } else if (value === "" || value == null) {
@@ -214,7 +223,11 @@ export function useStyleHandlers(
         if (currentPseudoState !== "normal" && composer?.styles) {
           const selector = `[data-buildrick-id="${selectedElement.id}"]`;
           const pseudoSelector = `${selector}:${currentPseudoState}`;
-          const existingRule = composer.styles.getRule(pseudoSelector, undefined);
+          const mq =
+            currentBreakpoint === "desktop"
+              ? undefined
+              : getBreakpointQuery(currentBreakpoint) ?? undefined;
+          const existingRule = composer.styles.getRule(pseudoSelector, mq);
           const existing = existingRule ? { ...existingRule.properties } : {};
 
           Object.entries(changes).forEach(([prop, val]) => {
@@ -225,7 +238,7 @@ export function useStyleHandlers(
             }
           });
 
-          composer.styles.setRule(selector, existing, { pseudo: `:${currentPseudoState}` });
+          composer.styles.setRule(selector, existing, { pseudo: `:${currentPseudoState}`, mediaQuery: mq });
           setStyles((prev) => {
             const merged = { ...prev };
             Object.entries(changes).forEach(([prop, val]) => {
