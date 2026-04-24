@@ -58,6 +58,13 @@ Deferred work from CEO reviews and implementation sessions. Ordered by priority.
 **Effort:** XS (human: ~30 min / CC: ~2 min)
 **Depends on:** Task 1 (Command Palette) must be implemented first.
 
+### T-DS-SHADOW-PAGES-MENUS: Tokenize 2 raw dropdown shadows in PagesTab.css
+**What:** PagesTab.css:493 and :574 both ship `box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18)` (identical) on `.bd-pg-add-options` and `.bd-pg-bulk-menu` (popover menus). Landed in Pages tab rewrites between commits f378cc3 and 244b792 while Gate 2 was failing and masking Gate 12.
+**Why:** SSOT violation — same shadow duplicated. Alpha 0.18 is 3× heavier than `--bd-shadow-dropdown` (0.06), so this isn't a drop-in tokenization — author chose a deliberately heavier elevation. Either matches an existing token semantic the team wants to extend (modal-style elevation on menus) or warrants a new token like `--buildrick-shadow-popover-elevated`.
+**How to apply:** Decide intent: (a) accept lighter look, swap both to `var(--bd-shadow-dropdown)`; (b) keep heavy look, add new token `--buildrick-shadow-popover-elevated: 0 8px 24px rgba(15, 23, 42, 0.18)` to shadow.css + `--bd-shadow-popover-elevated` alias in bd-aliases.css, then tokenize both call sites. After tokenization, lower baseline 177 → 175 in `.chrome-axioms-baseline`.
+**Effort:** XS (human: ~10 min / CC: ~2 min)
+**Depends on:** Designer call on visual intent — heavier vs lighter shadow on these menus.
+
 ### T-DS-SHADOW-01: Replace 25 raw rgba(0,0,0,*) shadows with --bd-shadow-* tokens
 **What:** Codex DS audit caught 25 sites still using inline `rgba(0,0,0,*)` box-shadows instead of consuming `--bd-shadow-*` tokens. Locations: components.css:470,493,812,1298,1308; ux-fixes.css:164; SelectFontField.tsx:131; SharedDialogs.css:22; Tooltip.tsx:93; Toast.tsx:231; CommandPalette.tsx:150; LayoutShell.css:126 (and 13 more).
 **Why:** Same SSOT violation as token leak. Shadow values can drift across components. DESIGN.md says shadows should be tokenized. Also blocks Gate 12 from passing — currently 188 > 179 baseline because detector only counts tokenized shadows.
