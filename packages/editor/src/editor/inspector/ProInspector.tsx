@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import { ChevronDown, Lock, Monitor, Tablet, Smartphone, Crosshair, CornerLeftUp } from "lucide-react";
+import { ChevronDown, Monitor, Tablet, Smartphone, Crosshair, CornerLeftUp } from "lucide-react";
 import * as React from "react";
 import { BindingPopover } from "./components/BindingPopover";
 import type { Composer } from "../../engine";
@@ -503,14 +503,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             composer={composer ?? null}
             onOpenCreateCollection={onOpenCreateCollection}
           />
-          <button
-            type="button"
-            className="bdi-icon-btn"
-            title="Lock element"
-            aria-label="Lock element"
-          >
-            <Lock size={12} aria-hidden="true" />
-          </button>
           {onDelete && (
             <InspectorElementMenu
               composer={composer}

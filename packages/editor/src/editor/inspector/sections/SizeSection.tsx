@@ -159,8 +159,6 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
   const hidden = (prop: string) => propertyStates[prop]?.hidden;
   const disabled = (prop: string) => propertyStates[prop]?.disabled;
   const reason = (prop: string) => propertyStates[prop]?.reason;
-  const [aspectLocked, setAspectLocked] = React.useState(false);
-
   const w = styles.width || "";
   const h = styles.height || "";
   const sizePreview =
@@ -212,16 +210,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
               </div>
             )}
           </div>
-          <button
-            type="button"
-            className={`bdi-link${aspectLocked ? " on" : ""}`}
-            onClick={() => setAspectLocked((v) => !v)}
-            title={aspectLocked ? "Unlock aspect ratio" : "Lock aspect ratio"}
-            aria-label={aspectLocked ? "Unlock aspect ratio" : "Lock aspect ratio"}
-            aria-pressed={aspectLocked}
-          >
-            {aspectLocked ? <Link2 size={11} aria-hidden="true" /> : <Link2Off size={11} aria-hidden="true" />}
-          </button>
+          <span className="bdi-pair-sep" aria-hidden="true" />
           <div
             style={{ position: "relative", display: "flex", alignItems: "center" }}
             className="buildrick-row-hover-chain"
