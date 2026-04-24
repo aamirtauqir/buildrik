@@ -50,13 +50,19 @@ export function useStyleHandlers(
   const [styles, setStyles] = useState<Record<string, string>>({});
   const [overriddenProperties, setOverriddenProperties] = useState<Set<string>>(new Set());
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingFlushRef = useRef<(() => void) | null>(null);
 
-  // Flush any pending debounced style change when element/breakpoint/pseudoState changes
+  // Flush any pending debounced style change when element/breakpoint/pseudoState changes.
+  // Prior: cleanup silently dropped the last keystroke. Now we commit it first.
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
         debounceTimerRef.current = null;
+        if (pendingFlushRef.current) {
+          pendingFlushRef.current();
+          pendingFlushRef.current = null;
+        }
       }
     };
   }, [selectedElement?.id, currentBreakpoint, currentPseudoState]);
@@ -141,19 +147,17 @@ export function useStyleHandlers(
         pseudoState: currentPseudoState,
       });
 
-      // 2. Debounced engine mutation — batches rapid typing into one history entry
+      // 2. Debounced engine mutation — batches rapid typing into one history entry.
+      // Stores the flush closure in pendingFlushRef so the cleanup effect can
+      // commit it when element/breakpoint/pseudo changes before the timer fires.
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-      debounceTimerRef.current = setTimeout(() => {
-        // Re-read element inside timeout — avoids stale closure if element was replaced
+      const flush = () => {
         const el = composer?.elements.getElement(selectedElement.id);
         if (!el) return;
         composer?.beginTransaction?.("style-change");
         try {
           if (currentPseudoState !== "normal" && composer?.styles) {
-            const mq =
-              currentBreakpoint === "desktop"
-                ? undefined
-                : getBreakpointQuery(currentBreakpoint) ?? undefined;
+            const mq = currentBreakpoint === "desktop" ? undefined : getBreakpointQuery(currentBreakpoint) ?? undefined;
             const pseudoSelector = `${selector}:${currentPseudoState}`;
             if (value === "" || value == null) {
               const existingRule = composer.styles.getRule(pseudoSelector, mq);
@@ -173,7 +177,6 @@ export function useStyleHandlers(
               );
             }
           } else if (value === "" || value == null) {
-            // Remove style (normal state)
             if (currentBreakpoint === "desktop") {
               el.removeStyle?.(property);
             } else if (composer?.styles) {
@@ -184,7 +187,6 @@ export function useStyleHandlers(
               );
             }
           } else {
-            // Set style (normal state)
             if (currentBreakpoint === "desktop") {
               el.setStyle?.(property, value);
             } else if (composer?.styles) {
@@ -196,6 +198,11 @@ export function useStyleHandlers(
         } finally {
           composer?.endTransaction?.();
         }
+      };
+      pendingFlushRef.current = flush;
+      debounceTimerRef.current = setTimeout(() => {
+        flush();
+        pendingFlushRef.current = null;
       }, 300);
     },
     [selectedElement, composer, currentBreakpoint, currentPseudoState]
