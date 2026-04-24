@@ -1,3 +1,36 @@
+/**
+ * components.css — LEGACY FILE, retirement in progress (2026-04-25).
+ *
+ * Grab-bag of class rules for legacy components. Per v3 plan Week 3,
+ * target is <=300 lines or renamed to legacy-components.css after
+ * per-component extraction.
+ *
+ * 2026-04-25: deleted dead .buildrick-layer-{node,row,toggle,bullet,
+ * icon,meta,name} cluster (~92 lines) — 0 consumers after LayersTab
+ * rewrite replaced class family with .bdc-* namespace.
+ *
+ * REMAINING rules cover active legacy components:
+ *   - .tb-* (37 rules) — PageTabBar.tsx
+ *   - .buildrick-form-field (13) — shared/ui/FormField.tsx legacy variant
+ *   - .buildrick-btn-group (13) — legacy button groups
+ *   - .buildrick-btn (10) — legacy button class hooks
+ *   - .buildrick-input / select / textarea (9/4/3)
+ *   - .buildrick-empty-state (9)
+ *   - .buildrick-icon-btn (8)
+ *   - .buildrick-number-btn / stepper (6/4)
+ *   - .buildrick-slider (5)
+ *   - .pill (4)
+ *   - .buildrick-switch / switch-input (3) — legacy Switch component
+ *   - .buildrick-color-swatch / preset (4/4)
+ *   - .buildrick-canvas, nav-*, @keyframes buildrick-*
+ *
+ * Full retirement is blocked on per-component migration to primitives
+ * (Button, FormInput, NumericStepper from Week 1, plus not-yet-built
+ * Switch, Slider, ColorSwatch primitives). Tracked as Week 4+ work.
+ *
+ * DO NOT add new rules here. Put them on the consuming component.
+ */
+
 .buildrick-canvas {
   flex: 1;
   /* Light canvas wrapper - matches inline styles in Canvas.tsx */
@@ -1060,99 +1093,12 @@
   overflow-y: auto;
 }
 
-.buildrick-layer-node {
-  position: relative;
-}
-
-.buildrick-layer-row {
-  --layer-depth: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  padding-left: calc(10px + var(--layer-depth) * 14px);
-  border-radius: 6px;
-  color: var(--buildrick-text-secondary);
-  background: transparent;
-  border: 1px solid transparent;
-  transition: all 0.15s ease;
-  cursor: pointer;
-  user-select: none;
-}
-
-.buildrick-layer-row:hover {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.buildrick-layer-row.is-selected {
-  background: rgba(45, 109, 255, 0.1);
-  border-color: rgba(45, 109, 255, 0.25);
-  color: var(--buildrick-text-primary);
-}
-
-.buildrick-layer-row:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
-  outline-offset: 2px;
-}
-
-.buildrick-layer-toggle,
-.buildrick-layer-bullet {
-  width: 20px;
-  height: 20px;
-  border-radius: 7px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.02);
-  color: var(--buildrick-text-muted);
-  font-size: 12px;
-  line-height: 1;
-  transition: all var(--buildrick-transition-fast);
-}
-
-.buildrick-layer-toggle {
-  cursor: pointer;
-}
-
-.buildrick-layer-toggle:hover {
-  border-color: var(--buildrick-info);
-  color: var(--buildrick-text-primary);
-}
-
-.buildrick-layer-toggle.is-open {
-  color: var(--buildrick-text-primary);
-  border-color: var(--buildrick-info);
-  transform: rotate(90deg);
-}
-
-.buildrick-layer-icon {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--buildrick-text-muted);
-  flex-shrink: 0;
-}
-
-.buildrick-layer-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 0;
-}
-
-.buildrick-layer-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--buildrick-text-primary);
-  text-transform: lowercase;
-}
+/* .buildrick-layer-* (node/row/toggle/bullet/icon/meta/name) — DELETED
+ * 2026-04-25. Zero consumers remaining. LayersTab rewrite (commits
+ * 0ed8d40 + 1f02f4d + 34189df) replaced this class family with
+ * .bdc-* namespace under editor/sidebar/tabs/layers/.
+ *
+ * .buildrick-layer-id (below) retained pending consumer audit. */
 
 .buildrick-layer-id {
   margin-left: auto;
