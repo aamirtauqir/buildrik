@@ -41,7 +41,7 @@ describe("Section — preview prop", () => {
     expect(screen.getByTestId("preview-swatch")).toBeInTheDocument();
   });
 
-  it("hides preview when expanded", () => {
+  it("shows preview when expanded (always visible indicator)", () => {
     const preview = <span data-testid="preview-swatch" />;
     render(
       <Section title="Background" preview={preview}>
@@ -49,7 +49,7 @@ describe("Section — preview prop", () => {
       </Section>
     );
     fireEvent.click(screen.getByRole("button"));
-    expect(screen.queryByTestId("preview-swatch")).not.toBeInTheDocument();
+    expect(screen.getByTestId("preview-swatch")).toBeInTheDocument();
   });
 
   it("shows no preview when none provided", () => {
