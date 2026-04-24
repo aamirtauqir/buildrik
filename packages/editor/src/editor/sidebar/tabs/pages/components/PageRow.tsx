@@ -16,6 +16,7 @@
 import * as React from "react";
 import type { Composer } from "../../../../../engine";
 import type { PageItem } from "../types";
+import { getStatusLabel } from "../utils/statusLabel";
 
 interface Props {
   page: PageItem;
@@ -38,28 +39,6 @@ interface Props {
   onRenameStart: () => void;
   onContextMenu: (x: number, y: number) => void;
   onSettingsClick: () => void;
-}
-
-function statusLabel(status: PageItem["status"]): string | null {
-  switch (status) {
-    case "live":
-    case undefined:
-      return "Live";
-    case "draft":
-      return "Draft";
-    case "scheduled":
-      return "Scheduled";
-    case "hidden":
-      return "Hidden";
-    case "password":
-      return "Password";
-    case "external":
-      return "External";
-    case "error":
-      return "Error";
-    default:
-      return null;
-  }
 }
 
 export const PageRow = React.memo<Props>(
@@ -130,7 +109,7 @@ export const PageRow = React.memo<Props>(
       onContextMenu(cx, cy);
     };
 
-    const label = statusLabel(page.status);
+    const label = getStatusLabel(page.status ?? "live");
 
     const ariaLabel = [
       page.name,
