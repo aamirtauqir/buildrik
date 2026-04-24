@@ -180,14 +180,16 @@ check_gate() {
 GRADIENT_COUNT=$(count_chrome '(linear-gradient|radial-gradient|conic-gradient)')
 check_gate 11 "$GRADIENT_COUNT" "$BASE_11" "A1.1 — no chrome gradients" || exit 1
 
-# Gate 12: Chrome Axiom A1.2 — box-shadow must use --buildrick-shadow-* token.
+# Gate 12: Chrome Axiom A1.2 — box-shadow must use shadow/glow token (--buildrick-* OR --bd-* alias).
 # Broadened: CSS (box-shadow:) + TSX camelCase (boxShadow:). Exempts lines
-# where the next non-whitespace token is var(--buildrick-shadow or var(--buildrick-glow.
+# where the next non-whitespace token is var(--buildrick-shadow|glow) or
+# var(--bd-shadow|glow). The --bd-* aliases (added 2026-04-25) point at canonical
+# --buildrick-shadow-* tokens — both qualify as tokenized.
 # Match all box-shadow / boxShadow occurrences first, then subtract token-bound ones.
 SHADOW_ALL=$(count_chrome '(box-shadow|boxShadow)[[:space:]]*:')
-SHADOW_TOKENIZED=$(count_chrome "(box-shadow|boxShadow)[[:space:]]*:[[:space:]]*[\"']?var\(--buildrick-(shadow|glow)")
+SHADOW_TOKENIZED=$(count_chrome "(box-shadow|boxShadow)[[:space:]]*:[[:space:]]*[\"']?var\(--(buildrick|bd)-(shadow|glow)")
 SHADOW_COUNT=$((SHADOW_ALL - SHADOW_TOKENIZED))
-check_gate 12 "$SHADOW_COUNT" "$BASE_12" "A1.2 — box-shadow via --buildrick-shadow-* token" || exit 1
+check_gate 12 "$SHADOW_COUNT" "$BASE_12" "A1.2 — box-shadow via shadow/glow token (--buildrick-*|--bd-*)" || exit 1
 
 # Gate 13: Chrome Axiom A1.3 — border-radius ≤ 4px on panel chrome (form atoms exempt).
 # Broadened: CSS (border-radius:) + TSX camelCase (borderRadius:).
@@ -252,8 +254,8 @@ for p in data.get('files', []):
       # since grep's no-match would append a second "0" and break arithmetic.
       file_gradients=$(grep -cE '(linear-gradient|radial-gradient|conic-gradient)' "$green_file" 2>/dev/null); file_gradients=${file_gradients:-0}
       file_shadow_all=$(grep -cE '(box-shadow|boxShadow)[[:space:]]*:' "$green_file" 2>/dev/null); file_shadow_all=${file_shadow_all:-0}
-      # Token-bound shadow check allows both ' and " quote styles.
-      file_shadow_tok=$(grep -cE "(box-shadow|boxShadow)[[:space:]]*:[[:space:]]*[\"']?var\(--buildrick-(shadow|glow)" "$green_file" 2>/dev/null); file_shadow_tok=${file_shadow_tok:-0}
+      # Token-bound shadow check allows both ' and " quote styles AND --bd-* aliases.
+      file_shadow_tok=$(grep -cE "(box-shadow|boxShadow)[[:space:]]*:[[:space:]]*[\"']?var\(--(buildrick|bd)-(shadow|glow)" "$green_file" 2>/dev/null); file_shadow_tok=${file_shadow_tok:-0}
       file_shadow_raw=$((file_shadow_all - file_shadow_tok))
       file_radius=$(grep -cE "(border-radius|borderRadius)[[:space:]]*:[[:space:]]*[\"']?([5-9]|1[0-9]|2[0-9]|3[0-9]|50%|999)" "$green_file" 2>/dev/null); file_radius=${file_radius:-0}
       # Layout literal: CSS (Npx) + TSX bare-number (camelCase property).

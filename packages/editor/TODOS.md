@@ -72,12 +72,8 @@ Deferred work from CEO reviews and implementation sessions. Ordered by priority.
 **Effort:** XL (human: ~1 week / CC: ~half-day with adversarial review per cluster)
 **Depends on:** T-DS-LEAK-01 should run first (sweep --buildrick-* → --bd-* in remaining rules first, so the retirement narrative is clean before extraction).
 
-### T-GATE-12-DETECTOR: Update box-shadow gate to recognize --bd-shadow-*
-**What:** Gate 12 (chrome-axiom A1.2 — box-shadow via --buildrick-shadow-* token) currently fails 188 > 179 baseline because the detector only counts `--buildrick-shadow-*` references, not the new `--bd-shadow-*` aliases that primitives consume.
-**Why:** Pre-existing false positive. Detector lags the alias layer. Gate fails on every CI run, blocking downstream gates 13-16 from running on full sweep.
-**How to apply:** Edit `packages/editor/scripts/find-buildrick-shadow-gate.mjs` (or wherever Gate 12 lives) to count `var(--bd-shadow-*)` AND `var(--buildrick-shadow-*)` references as tokenized. Re-run gate, lower baseline to actual count.
-**Effort:** XS (human: ~30 min / CC: ~5 min)
-**Depends on:** None.
+### ~~T-GATE-12-DETECTOR~~: Update box-shadow gate to recognize --bd-shadow-* — SHIPPED 2026-04-25
+**Status:** DONE. Detector regex extended at `packages/editor/scripts/ds-grep-gates.sh:188` and `:256` from `var\(--buildrick-(shadow|glow)` to `var\(--(buildrick|bd)-(shadow|glow)`. Recognized 7 additional tokenized box-shadows (Tooltip, Toast, etc.) that previously counted as raw. Gate 12 raw count dropped 182 → 175. Baseline lowered to 175 in `.chrome-axioms-baseline`. Gate 11 also dropped 85 → 78 due to indigo-gradient removal in `fe0c792` + `17c6be0`; baseline lowered. Unblocks downstream gates 13-17 from running once Gate 2 (pre-existing) is unblocked.
 
 ### T-GATE-16-FLIP: Flip Gate 16 from REGRESSION to ERROR mode
 **What:** Gate 16 currently runs `find-inline-hex-v2.mjs --editor-only --exclude-fallback` (regression mode, baseline 684). When editor-scoped baseline reaches 0, flip to `--fail` mode + rename gate "ERROR mode (zero tolerance)".
