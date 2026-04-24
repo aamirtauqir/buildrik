@@ -8,6 +8,14 @@
 
 /* ─── PANEL SHELL ─────────────────────────────────────────────────────── */
 .bd-pg-panel {
+  /* File-local design knobs — keep the four most-coupled dimensions in one place
+     so density tweaks and footer-clearance edits stay coherent. */
+  --pg-row-h: 28px;
+  --pg-row-h-active: 32px;
+  --pg-icon-box: 22px;
+  --pg-icon-glyph: 12px;
+  --pg-footer-clearance: 120px;
+
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -60,7 +68,7 @@
 .bd-pg-list {
   flex: 1;
   overflow: auto;
-  padding: 4px 6px 120px;
+  padding: 4px 6px var(--pg-footer-clearance);
 }
 
 /* ─── ROW ─────────────────────────────────────────────────────────────── */
@@ -76,13 +84,13 @@
   user-select: none;
   color: var(--bd-fg-primary);
   transition: background 100ms;
-  min-height: 28px;
+  min-height: var(--pg-row-h);
 }
 .bd-pg-row:hover { background: rgba(15,23,42,0.04); color: var(--bd-fg-heading); }
 .bd-pg-row.active {
   background: var(--bd-accent-tint);
   color: var(--bd-fg-heading);
-  min-height: 32px;
+  min-height: var(--pg-row-h-active);
 }
 .bd-pg-row.active::before {
   content: "";
@@ -147,7 +155,7 @@
   display: grid;
   place-items: center;
 }
-.bd-pg-row-icon svg { width: 12px; height: 12px; }
+.bd-pg-row-icon svg { width: var(--pg-icon-glyph); height: var(--pg-icon-glyph); }
 .bd-pg-row.active .bd-pg-row-icon { color: var(--bd-accent); }
 
 .bd-pg-row-name {
@@ -179,7 +187,7 @@
 
 /* Single overflow button — replaces per-row action strip (DESIGN.md anti-slop #12) */
 .bd-pg-row-overflow {
-  width: 22px; height: 22px;
+  width: var(--pg-icon-box); height: var(--pg-icon-box);
   display: none;
   place-items: center;
   border-radius: 4px;
@@ -191,7 +199,7 @@
 }
 .bd-pg-row:hover .bd-pg-row-overflow { display: grid; }
 .bd-pg-row-overflow:hover { background: rgba(15,23,42,0.06); color: var(--bd-fg-heading); }
-.bd-pg-row-overflow svg { width: 12px; height: 12px; }
+.bd-pg-row-overflow svg { width: var(--pg-icon-glyph); height: var(--pg-icon-glyph); }
 
 /* ─── HOME CHIP + STATUS CHIP ─────────────────────────────────────────── */
 .bd-pg-home-chip,
@@ -267,7 +275,7 @@
 
 /* ─── LOADING SKELETON ────────────────────────────────────────────────── */
 .bd-pg-skeleton-row {
-  height: 28px;
+  height: var(--pg-row-h);
   margin: 2px 0;
   border-radius: 4px;
   background: linear-gradient(
