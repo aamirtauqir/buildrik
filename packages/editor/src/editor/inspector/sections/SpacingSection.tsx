@@ -3,7 +3,7 @@
  */
 
 import * as React from "react";
-import { Section, FourSideInput, InputWithUnit, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
+import { Section, SpacingBox, InputWithUnit, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
 import { MixedValueBadge } from "../shared/MixedValueBadge";
 import { parseCssShorthand } from "../shared/utils/parseCssShorthand";
 
@@ -136,49 +136,30 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
       tier={tier}
       id="inspector-section-spacing"
     >
-      {/* Margin Controls */}
+      {/* Webflow-style nested spacing box (margin outside, padding inside) */}
       <div style={{ position: "relative" }}>
-        {marginMixed && (
+        {(marginMixed || paddingMixed) && (
           <span style={{ position: "absolute", right: 0, top: 0, zIndex: 1 }}>
             <MixedValueBadge compact />
           </span>
         )}
-        <FourSideInput
-          label="Margin"
-          values={marginValues}
-          onChange={handleMarginChange}
-          linked={marginLinked}
-          onLinkToggle={() => setMarginLinked(!marginLinked)}
-          disabledSides={{
+        <SpacingBox
+          margin={marginValues}
+          padding={paddingValues}
+          onMarginChange={handleMarginChange}
+          onPaddingChange={handlePaddingChange}
+          disabledMargin={{
             top: disabledMargin("top")?.disabled,
             right: disabledMargin("right")?.disabled,
             bottom: disabledMargin("bottom")?.disabled,
             left: disabledMargin("left")?.disabled,
           }}
-          disabledReason={disabledMargin("top")?.reason || disabledMargin("bottom")?.reason}
-        />
-      </div>
-
-      {/* Padding Controls */}
-      <div style={{ position: "relative" }}>
-        {paddingMixed && (
-          <span style={{ position: "absolute", right: 0, top: 0, zIndex: 1 }}>
-            <MixedValueBadge compact />
-          </span>
-        )}
-        <FourSideInput
-          label="Padding"
-          values={paddingValues}
-          onChange={handlePaddingChange}
-          linked={paddingLinked}
-          onLinkToggle={() => setPaddingLinked(!paddingLinked)}
-          disabledSides={{
+          disabledPadding={{
             top: disabledPadding("top")?.disabled,
             right: disabledPadding("right")?.disabled,
             bottom: disabledPadding("bottom")?.disabled,
             left: disabledPadding("left")?.disabled,
           }}
-          disabledReason={disabledPadding("top")?.reason || disabledPadding("bottom")?.reason}
         />
       </div>
 
