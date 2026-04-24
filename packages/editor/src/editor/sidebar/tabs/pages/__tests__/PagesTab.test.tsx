@@ -148,18 +148,18 @@ describe("PageRow active indicator", () => {
     onSettingsClick: vi.fn(),
   };
 
-  it("does not have pg-row--active class when page is not active", () => {
+  it("does not have .active class when page is not active", () => {
     const page = makePage({ isActive: false });
     const { container } = render(<PageRow page={page} {...baseProps} />);
-    const row = container.querySelector(".pg-row");
-    expect(row?.classList.contains("pg-row--active")).toBe(false);
+    const row = container.querySelector(".bd-pg-row");
+    expect(row?.classList.contains("active")).toBe(false);
   });
 
-  it("has pg-row--active class when page is active", () => {
+  it("has .active class when page is active", () => {
     const page = makePage({ isActive: true });
     const { container } = render(<PageRow page={page} {...baseProps} />);
-    const row = container.querySelector(".pg-row");
-    expect(row?.classList.contains("pg-row--active")).toBe(true);
+    const row = container.querySelector(".bd-pg-row");
+    expect(row?.classList.contains("active")).toBe(true);
   });
 
   it("renders page name in the row", () => {
@@ -168,27 +168,29 @@ describe("PageRow active indicator", () => {
     expect(screen.getByText("About Us")).toBeTruthy();
   });
 
-  it("gear (settings) button is present in the row", () => {
+  it("overflow button is present in the row", () => {
     const page = makePage();
-    render(<PageRow page={page} {...baseProps} />);
-    // The settings button has aria-label including "settings"
-    const settingsBtn = screen.getByLabelText(/open settings for home/i);
-    expect(settingsBtn).toBeTruthy();
+    const { container } = render(<PageRow page={page} {...baseProps} />);
+    expect(container.querySelector(".bd-pg-row-overflow")).toBeTruthy();
   });
 
-  it("calls onSettingsClick when gear button is clicked", () => {
-    const onSettingsClick = vi.fn();
+  it("overflow click invokes onContextMenu (settings now lives in context menu)", () => {
+    const onContextMenu = vi.fn();
     const page = makePage();
-    render(<PageRow page={page} {...baseProps} onSettingsClick={onSettingsClick} />);
-    fireEvent.click(screen.getByLabelText(/open settings for home/i));
-    expect(onSettingsClick).toHaveBeenCalledTimes(1);
+    const { container } = render(
+      <PageRow page={page} {...baseProps} onContextMenu={onContextMenu} />,
+    );
+    const overflow = container.querySelector(".bd-pg-row-overflow") as HTMLElement;
+    fireEvent.click(overflow);
+    expect(onContextMenu).toHaveBeenCalled();
   });
 
   it("renders Scheduled chip when page.status is scheduled", () => {
     const page = makePage({ status: "scheduled" });
     const { container } = render(<PageRow page={page} {...baseProps} />);
-    const badge = container.querySelector(".pg-row__status--scheduled");
-    expect(badge).toBeTruthy();
+    const chip = container.querySelector(".bd-pg-chip.scheduled");
+    expect(chip).toBeTruthy();
+    expect(chip).toHaveTextContent("Scheduled");
   });
 });
 
