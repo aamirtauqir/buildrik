@@ -159,12 +159,13 @@ export const PagesTab: React.FC<PagesTabProps> = ({
   }, [bulk.selectedIds, f.removePageFromFolder, bulk.clearSelection]);
 
   return (
-    // `pages-panel` is retained as a scoping class — PagesTab.css uses it to
-    // namespace ~2400 lines of `.pages-panel .pg-*` rules. Dropping it would
-    // leave those rules orphaned.
+    // `bd-pg-panel` is the DS V2 root class — new PagesTab.css uses it as the
+    // scope for all `.bd-pg-*` rules including the active-row 2px cobalt bar
+    // and absolute-positioned bulk toolbar (requires `position: relative`).
+    // `.bulk-mode` toggle activates the row checkbox column when selection exists.
     // No width prop — Pages host (LeftSidebar drawer, width from tabsConfig.ts)
-    // controls the 200px sizing. PanelShell fills the host via width:100%.
-    <PanelShell className="pages-panel">
+    // controls sizing. PanelShell fills the host via width:100%.
+    <PanelShell className={`bd-pg-panel${bulk.hasSelection ? " bulk-mode" : ""}`}>
       <PanelShell.Header
         title="Pages"
         isPinned={isPinned}
