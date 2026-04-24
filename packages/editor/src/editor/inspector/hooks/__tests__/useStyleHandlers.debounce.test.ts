@@ -7,7 +7,7 @@ describe("useStyleHandlers flushes pending edit on element change", () => {
 
   it("commits pending debounced edit when selection changes before 300ms, exactly once", () => {
     vi.useFakeTimers();
-    const el = { getStyles: () => ({}), setStyle: vi.fn(), removeStyle: vi.fn() };
+    const el = { getId: () => "e1", getStyles: () => ({}), setStyle: vi.fn(), removeStyle: vi.fn() };
     const composer = {
       beginTransaction: vi.fn(),
       endTransaction: vi.fn(),

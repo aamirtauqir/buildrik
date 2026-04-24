@@ -10,7 +10,7 @@ function makeMockComposer() {
     beginTransaction: vi.fn(),
     endTransaction: vi.fn(),
     elements: {
-      getElement: vi.fn(() => ({ getStyles: () => ({}), setStyle: vi.fn(), removeStyle: vi.fn() })),
+      getElement: vi.fn(() => ({ getId: () => "el1", getStyles: () => ({}), setStyle: vi.fn(), removeStyle: vi.fn() })),
     },
     styles: {
       getRule: vi.fn((sel: string, mq?: string) => rules.get(key(sel, mq))),

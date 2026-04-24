@@ -5,6 +5,7 @@ import { useStyleHandlers } from "../useStyleHandlers";
 function makeMockElement(id = "el-1") {
   return {
     id,
+    getId: () => id,
     getStyles: vi.fn(() => ({ color: "red" })),
     setStyle: vi.fn(),
     removeStyle: vi.fn(),

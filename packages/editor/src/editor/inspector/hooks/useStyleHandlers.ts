@@ -12,6 +12,7 @@ import { getDefaultStyles } from "../../../shared/constants/defaultStyles";
 import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
 import { devLogger } from "../../../shared/utils/devLogger";
+import { computeEffectiveStyles } from "../config/cssContext";
 
 // ============================================================================
 // TYPES
@@ -67,53 +68,37 @@ export function useStyleHandlers(
     };
   }, [selectedElement?.id, currentBreakpoint, currentPseudoState]);
 
-  // Load styles when element or breakpoint changes
+  // Load styles when element or breakpoint changes. Cascade (base → breakpoint
+  // overlay → pseudo) is delegated to computeEffectiveStyles so there's ONE
+  // source of truth for the layering logic — shared with useBatchStyleHandler
+  // and deriveCssContext. Only the default-style layer and the overriddenKeys
+  // indicator stay local to this hook.
   useEffect(() => {
     if (!selectedElement?.id || !composer) {
       setStyles({});
+      setOverriddenProperties(new Set());
       return;
     }
 
     const el = composer.elements.getElement(selectedElement.id);
     if (!el) {
       setStyles({});
+      setOverriddenProperties(new Set());
       return;
     }
 
-    // Get element's actual styles
-    const elementStyles = el.getStyles ? el.getStyles() : {};
-
-    // Get default styles based on element type and tagName
-    // This ensures Inspector always shows values even for new elements
     const defaultStyles = getDefaultStyles(selectedElement.type, selectedElement.tagName);
+    const effective = computeEffectiveStyles(el, composer, currentBreakpoint, currentPseudoState);
+    setStyles({ ...defaultStyles, ...effective });
 
-    // Merge: defaults first, then element styles take precedence
-    // This way user-set styles always override defaults
-    const baseStyles = { ...defaultStyles, ...elementStyles };
-
+    // Overridden-keys indicator — which keys come from the breakpoint layer
+    // specifically (not pseudo or base). Separate from the effective map
+    // because the UI needs to highlight these differently.
     if (currentBreakpoint !== "desktop" && composer.styles) {
-      const breakpointStyles = composer.styles.getBreakpointStyle(
-        selectedElement.id,
-        currentBreakpoint
-      );
-      setStyles({ ...baseStyles, ...breakpointStyles });
-      setOverriddenProperties(new Set(Object.keys(breakpointStyles)));
+      const bpStyles = composer.styles.getBreakpointStyle(selectedElement.id, currentBreakpoint);
+      setOverriddenProperties(new Set(Object.keys(bpStyles)));
     } else {
-      setStyles(baseStyles);
       setOverriddenProperties(new Set());
-    }
-
-    // Layer pseudo-state styles on top of base
-    if (currentPseudoState !== "normal" && composer?.styles) {
-      const pseudoSelector = `[data-buildrick-id="${selectedElement.id}"]:${currentPseudoState}`;
-      const mq =
-        currentBreakpoint === "desktop"
-          ? undefined
-          : getBreakpointQuery(currentBreakpoint) ?? undefined;
-      const pseudoRule = composer.styles.getRule(pseudoSelector, mq);
-      if (pseudoRule) {
-        setStyles((prev) => ({ ...prev, ...pseudoRule.properties }));
-      }
     }
   }, [selectedElement, composer, currentBreakpoint, currentPseudoState]);
 
