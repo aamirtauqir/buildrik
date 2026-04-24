@@ -1,6 +1,7 @@
 /**
- * BulkToolbar — Sticky action bar shown when 2+ pages are selected.
- * Visual port of prototype .bulk-toolbar.
+ * BulkToolbar — dark floating pill, absolute-positioned at bottom of pages panel.
+ * Shown when 2+ pages are selected. Disabled Publish/Unpublish buttons removed
+ * per DESIGN.md anti-slop rule (no disabled actions in primary chrome).
  *
  * @license BSD-3-Clause
  */
@@ -40,16 +41,15 @@ export const BulkToolbar: React.FC<Props> = ({
   }, [folderPickerOpen]);
 
   return (
-    <div className="pg-bulk" role="toolbar" aria-label={`${selectedCount} pages selected`}>
-      <span className="pg-bulk__count"><b>{selectedCount}</b> selected</span>
-      <span className="pg-bulk__spacer" />
+    <div className="bd-pg-bulk-toolbar" role="toolbar" aria-label={`${selectedCount} pages selected`}>
+      <span className="bd-pg-bulk-count tabular">
+        <b>{selectedCount}</b> selected
+      </span>
+      <span className="bd-pg-bulk-spacer" />
 
-      <button className="pg-bulk__btn" disabled title="Coming soon — publish flow">Publish</button>
-      <button className="pg-bulk__btn" disabled title="Coming soon — unpublish flow">Unpublish</button>
-
-      <div className="pg-bulk__folder-wrap" ref={pickerRef}>
+      <div className="bd-pg-bulk-folder" ref={pickerRef}>
         <button
-          className="pg-bulk__btn"
+          type="button"
           onClick={() => setFolderPickerOpen((o) => !o)}
           aria-expanded={folderPickerOpen}
           aria-haspopup="menu"
@@ -57,24 +57,34 @@ export const BulkToolbar: React.FC<Props> = ({
           Move to…
         </button>
         {folderPickerOpen && (
-          <div className="pg-bulk__folder-menu" role="menu">
+          <div className="bd-pg-bulk-menu" role="menu">
             {folders.length === 0 ? (
-              <div className="pg-bulk__folder-empty">No folders yet</div>
-            ) : folders.map((f) => (
-              <button
-                key={f.id}
-                className="pg-bulk__folder-item"
-                role="menuitem"
-                onClick={() => { onMoveToFolder(f.id); setFolderPickerOpen(false); }}
-              >
-                {f.name}
-              </button>
-            ))}
-            <div className="pg-bulk__folder-sep" />
+              <div className="bd-pg-bulk-menu-empty">No folders yet</div>
+            ) : (
+              folders.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  className="bd-pg-bulk-menu-item"
+                  role="menuitem"
+                  onClick={() => {
+                    onMoveToFolder(f.id);
+                    setFolderPickerOpen(false);
+                  }}
+                >
+                  {f.name}
+                </button>
+              ))
+            )}
+            <div className="bd-pg-bulk-menu-sep" />
             <button
-              className="pg-bulk__folder-item"
+              type="button"
+              className="bd-pg-bulk-menu-item"
               role="menuitem"
-              onClick={() => { onRemoveFromFolders(); setFolderPickerOpen(false); }}
+              onClick={() => {
+                onRemoveFromFolders();
+                setFolderPickerOpen(false);
+              }}
             >
               Remove from folder
             </button>
@@ -82,11 +92,17 @@ export const BulkToolbar: React.FC<Props> = ({
         )}
       </div>
 
-      <button className="pg-bulk__btn" onClick={onDuplicate}>Duplicate</button>
-      <button className="pg-bulk__btn pg-bulk__btn--danger" onClick={onDelete}>Delete</button>
+      <button type="button" onClick={onDuplicate}>Duplicate</button>
+      <button type="button" className="danger" onClick={onDelete}>Delete</button>
 
-      <button className="pg-bulk__clear" onClick={onClear} aria-label="Clear selection" title="Clear selection">
-        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+      <button
+        type="button"
+        className="bd-pg-bulk-close"
+        onClick={onClear}
+        aria-label="Clear selection"
+        title="Clear selection"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
           <line x1="18" y1="6" x2="6" y2="18" />
           <line x1="6" y1="6" x2="18" y2="18" />
         </svg>
