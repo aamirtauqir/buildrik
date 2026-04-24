@@ -24,15 +24,7 @@
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04);
 }
-/* Defeat themes/ux-fixes.css global `button { min-height: 40px }` which
-   bloats every inspector button (tabs, chips, section headers, fields,
-   switches, quick action cards, etc) to 40px. */
-.bdi-panel button,
-.bdi-panel input,
-.bdi-panel select,
-.bdi-panel textarea {
-  min-height: 0;
-}
+/* ux-fixes.css 40px button global deleted 2026-04-25 — override no longer needed. */
 .bdi-panel-scroll {
   flex: 1;
   overflow-y: auto;

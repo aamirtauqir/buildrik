@@ -443,11 +443,13 @@ button:disabled::after,
   }
 }
 
-.buildrick-input,
-.buildrick-select,
-button {
-  min-height: 40px;
-}
+/* button 40px min-height global — DELETED 2026-04-25.
+ * Removed per v3 plan Week 3. Primitives (Button, FormInput, etc) now
+ * set their own height explicitly via Emotion styled props. Inspector
+ * and LeftSidebar overrides that defeated this rule are removed in
+ * the same commit.
+ *
+ * sm/lg variants retained on legacy input/select/btn classes only. */
 
 .buildrick-input-sm,
 .buildrick-select-sm,
