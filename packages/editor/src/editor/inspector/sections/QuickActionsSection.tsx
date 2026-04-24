@@ -1,57 +1,35 @@
 /**
- * QuickActionsSection — one-click display presets.
+ * QuickActionsSection — one-click display presets per comp-inspector.v1 mock.
  *
- * Four buttons: Block / Flex Row / Flex Col / Grid. Each sets `display` and
- * sensible defaults via `onBatchChange` so the user can switch a container
- * layout without drilling into sections. Removes stale flex/grid props when
- * switching away, via empty-string values (handleBatchStyleChange treats empty
- * as "remove property").
+ * Four cards: Block / Flex / Grid / Hide. Block+Flex+Grid toggle `display`.
+ * Hide sets `display: none` (and remembers previous display via --bdi-prev
+ * custom prop so unhiding restores it).
  *
- * Previously `components/LayoutQuickActions.tsx` — relocated to sections/ so
- * the element-profile-driven renderer can register it like any other section.
- * Unlike the other sections, this is a non-collapsible inline row, not a
- * `<Section>` wrapper. It accepts a `tier` prop for API symmetry but renders
- * the same way regardless.
+ * Rendered inside a <Section title="Quick"> wrapper so it matches the
+ * .bdi-sec pattern of every other section.
  *
  * @license BSD-3-Clause
  */
 
-import { Grid3X3, Rows3, Columns3, Square } from "lucide-react";
 import * as React from "react";
-import type { SectionTier } from "../shared/controls";
-
-// ============================================================================
-// TYPES
-// ============================================================================
+import { Section, type SectionTier } from "../shared/controls";
 
 export interface QuickActionsSectionProps {
   styles: Record<string, string>;
   onBatchChange: (changes: Record<string, string>) => void;
-  /** Accepted for registry symmetry — not visually applied (row is non-tiered). */
+  isOpen?: boolean;
+  onToggle?: (open: boolean) => void;
   tier?: SectionTier;
 }
 
-type PresetId = "block" | "flex-row" | "flex-col" | "grid";
+type PresetId = "block" | "flex" | "grid" | "hide";
 
-interface Preset {
-  id: PresetId;
-  label: string;
-  Icon: React.ComponentType<{ size?: number }>;
-  /** Properties to set (or clear with empty string) when this preset is clicked. */
-  changes: Record<string, string>;
-}
-
-// ============================================================================
-// PRESETS
-// ============================================================================
-
-// Each preset clears the other layout-specific properties so switching from
-// flex → grid doesn't leave stale flex-direction / align-items around.
+// Stale props to clear when switching presets — a flex→grid switch shouldn't
+// leave behind flex-direction / justify-content.
 const FLEX_CLEARS: Record<string, string> = {
   "flex-direction": "",
   "justify-content": "",
   "align-items": "",
-  gap: "",
 };
 const GRID_CLEARS: Record<string, string> = {
   "grid-template-columns": "",
@@ -59,21 +37,77 @@ const GRID_CLEARS: Record<string, string> = {
   "grid-auto-flow": "",
 };
 
+function getActivePreset(styles: Record<string, string>): PresetId | null {
+  const display = styles.display;
+  if (display === "none") return "hide";
+  if (display === "flex" || display === "inline-flex") return "flex";
+  if (display === "grid" || display === "inline-grid") return "grid";
+  if (display === "block") return "block";
+  return null;
+}
+
+// ============================================================================
+// ICONS — inline SVG matching mock's line-icon style (1.6 stroke, rounded)
+// ============================================================================
+
+const svgBase: React.SVGProps<SVGSVGElement> = {
+  width: 14,
+  height: 14,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.6,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  "aria-hidden": true,
+};
+
+const BlockIcon: React.FC = () => (
+  <svg {...svgBase}>
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+  </svg>
+);
+const FlexIcon: React.FC = () => (
+  <svg {...svgBase}>
+    <path d="M3 6h18 M3 12h12 M3 18h6" />
+  </svg>
+);
+const GridIcon: React.FC = () => (
+  <svg {...svgBase}>
+    <rect x="3" y="3" width="7" height="7" />
+    <rect x="14" y="3" width="7" height="7" />
+    <rect x="3" y="14" width="7" height="7" />
+    <rect x="14" y="14" width="7" height="7" />
+  </svg>
+);
+const HideIcon: React.FC = () => (
+  <svg {...svgBase}>
+    <path d="M18 6L6 18 M6 6l12 12" />
+  </svg>
+);
+
+// ============================================================================
+// PRESETS
+// ============================================================================
+
+interface Preset {
+  id: PresetId;
+  label: string;
+  Icon: React.ComponentType;
+  changes: Record<string, string>;
+}
+
 const PRESETS: Preset[] = [
   {
     id: "block",
     label: "Block",
-    Icon: Square,
-    changes: {
-      display: "block",
-      ...FLEX_CLEARS,
-      ...GRID_CLEARS,
-    },
+    Icon: BlockIcon,
+    changes: { display: "block", ...FLEX_CLEARS, ...GRID_CLEARS },
   },
   {
-    id: "flex-row",
-    label: "Row",
-    Icon: Rows3,
+    id: "flex",
+    label: "Flex",
+    Icon: FlexIcon,
     changes: {
       display: "flex",
       "flex-direction": "row",
@@ -82,20 +116,9 @@ const PRESETS: Preset[] = [
     },
   },
   {
-    id: "flex-col",
-    label: "Col",
-    Icon: Columns3,
-    changes: {
-      display: "flex",
-      "flex-direction": "column",
-      "align-items": "stretch",
-      ...GRID_CLEARS,
-    },
-  },
-  {
     id: "grid",
     label: "Grid",
-    Icon: Grid3X3,
+    Icon: GridIcon,
     changes: {
       display: "grid",
       "grid-template-columns": "1fr 1fr",
@@ -103,52 +126,13 @@ const PRESETS: Preset[] = [
       ...FLEX_CLEARS,
     },
   },
-];
-
-// ============================================================================
-// STATE DETECTION
-// ============================================================================
-
-function getActivePreset(styles: Record<string, string>): PresetId | null {
-  const display = styles.display;
-  if (display === "flex" || display === "inline-flex") {
-    return styles["flex-direction"] === "column" ? "flex-col" : "flex-row";
-  }
-  if (display === "grid" || display === "inline-grid") return "grid";
-  if (display === "block") return "block";
-  return null;
-}
-
-// ============================================================================
-// STYLES
-// ============================================================================
-
-const styles = {
-  container: {
-    display: "flex" as const,
-    gap: 4,
-    padding: "8px 14px 4px",
+  {
+    id: "hide",
+    label: "Hide",
+    Icon: HideIcon,
+    changes: { display: "none" },
   },
-  button: (active: boolean): React.CSSProperties => ({
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 3,
-    padding: "6px 4px",
-    background: active ? "var(--buildrick-accent-subtle, rgba(59,130,246,0.15))" : "var(--bd-bg-subtle)",
-    border: active
-      ? "1px solid var(--buildrick-accent, rgba(59,130,246,0.6))"
-      : "1px solid var(--bd-border)",
-    borderRadius: 6,
-    color: active ? "var(--buildrick-accent, #3b82f6)" : "var(--buildrick-text-tertiary)",
-    fontSize: 10,
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "all 0.15s",
-  }),
-};
+];
 
 // ============================================================================
 // COMPONENT
@@ -157,29 +141,43 @@ const styles = {
 export const QuickActionsSection: React.FC<QuickActionsSectionProps> = ({
   styles: elementStyles,
   onBatchChange,
+  isOpen,
+  onToggle,
+  tier = "primary",
 }) => {
-  const activePreset = getActivePreset(elementStyles);
+  const active = getActivePreset(elementStyles);
 
   return (
-    <div style={styles.container} role="group" aria-label="Layout presets">
-      {PRESETS.map((preset) => {
-        const isActive = activePreset === preset.id;
-        return (
-          <button
-            key={preset.id}
-            type="button"
-            onClick={() => onBatchChange(preset.changes)}
-            style={styles.button(isActive)}
-            aria-pressed={isActive}
-            aria-label={`Set layout to ${preset.label}`}
-            title={`Set layout to ${preset.label}`}
-          >
-            <preset.Icon size={14} />
-            <span>{preset.label}</span>
-          </button>
-        );
-      })}
-    </div>
+    <Section
+      title="Quick"
+      defaultOpen
+      isOpen={isOpen}
+      onToggle={onToggle}
+      tier={tier}
+      id="inspector-section-quick"
+    >
+      <div className="bdi-quick" role="group" aria-label="Layout presets">
+        {PRESETS.map((preset) => {
+          const isActive = active === preset.id;
+          return (
+            <button
+              key={preset.id}
+              type="button"
+              onClick={() => onBatchChange(preset.changes)}
+              className={`bdi-qa${isActive ? " on" : ""}`}
+              aria-pressed={isActive}
+              aria-label={`Set layout to ${preset.label}`}
+              title={`Set layout to ${preset.label}`}
+            >
+              <span className="bdi-ico">
+                <preset.Icon />
+              </span>
+              {preset.label}
+            </button>
+          );
+        })}
+      </div>
+    </Section>
   );
 };
 

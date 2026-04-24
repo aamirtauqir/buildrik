@@ -116,19 +116,12 @@ export const SpacingSection: React.FC<SpacingSectionProps> = ({
     paddingValues.bottom,
     paddingValues.left
   );
+  const bothLinked = marginLinked && paddingLinked;
+  const anyLinked = marginLinked || paddingLinked;
   const spacingPreview =
-    marginSummary || paddingSummary ? (
-      <span
-        style={{
-          fontSize: 11,
-          color: "var(--buildrick-text-tertiary)",
-          fontFamily: "var(--buildrick-font-family-mono)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {marginSummary ? `m:${marginSummary}` : ""}
-        {marginSummary && paddingSummary ? " " : ""}
-        {paddingSummary ? `p:${paddingSummary}` : ""}
+    anyLinked || marginSummary || paddingSummary ? (
+      <span className={`bdi-ind${marginMixed || paddingMixed ? " mixed" : ""}`}>
+        {bothLinked ? "link" : anyLinked ? (marginLinked ? "m·link" : "p·link") : `${marginSummary ? `m ${marginSummary}` : ""}${paddingSummary ? ` p ${paddingSummary}` : ""}`.trim()}
       </span>
     ) : undefined;
 

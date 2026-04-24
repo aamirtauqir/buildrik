@@ -49,7 +49,8 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
 
   const gradientUI = bgType === "gradient" ? extractGradientUI(styles.background || styles["background-image"] || "") : null;
 
-  // Compute color preview from styles
+  // Compute color preview from styles — mock shows a small swatch chip as the
+  // collapsed-state indicator for Background.
   const bgColor = styles["background-color"] || styles["backgroundColor"] || styles["background"];
   const preview = bgColor ? (
     <span
@@ -66,11 +67,33 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
     />
   ) : undefined;
 
+  // "+" action in header — opens media library for image bg (falls through if
+  // handler not wired). Matches mock's "+ add background layer" affordance.
+  const addAction = onOpenMediaLibrary ? (
+    <button
+      type="button"
+      className="bdi-plus"
+      onClick={(e) => {
+        e.stopPropagation();
+        onOpenMediaLibrary(["image"], (asset) => {
+          onChange("background-image", `url(${asset.src})`);
+        });
+      }}
+      aria-label="Add background image"
+      title="Add background image"
+    >
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M12 5v14 M5 12h14" />
+      </svg>
+    </button>
+  ) : undefined;
+
   return (
     <Section
       title="Background"
       icon="Palette"
       preview={preview}
+      action={addAction}
       isOpen={isOpen}
       onToggle={onToggle}
       tier={tier}

@@ -54,14 +54,14 @@ const CONTAINER_PROFILE: ElementProfile = {
   style: {
     order: [
       "quick-actions",
-      "layout",
-      "flex",
-      "grid",
       "size",
       "spacing",
+      "flex",
+      "typography",
       "background",
       "border",
-      "typography",
+      "layout",
+      "grid",
     ],
   },
   element: { order: ["css-classes", "element-properties", "all-css"] },
