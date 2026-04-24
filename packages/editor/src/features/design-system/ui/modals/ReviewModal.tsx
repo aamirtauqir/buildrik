@@ -253,7 +253,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             onClick={onConfirm}
             style={{
               padding: "7px 14px",
-              background: "linear-gradient(135deg, #8b5cf6, #3b82f6)",
+              background: "var(--bd-accent)",
               border: "none",
               borderRadius: 6,
               color: "var(--bd-fg-on-accent)",

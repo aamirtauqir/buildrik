@@ -267,12 +267,12 @@ const FormView: React.FC<FormViewProps> = ({
               ...styleCardStyles,
               borderColor:
                 stylePreset === preset.value
-                  ? "var(--buildrick-accent, #6366f1)"
-                  : "var(--buildrick-bg-panel)",
+                  ? "var(--bd-accent)"
+                  : "var(--bd-bg-panel)",
               background:
                 stylePreset === preset.value
-                  ? "rgba(99, 102, 241, 0.1)"
-                  : "rgba(255, 255, 255, 0.03)",
+                  ? "var(--bd-accent-tint)"
+                  : "var(--bd-bg-subtle)",
             }}
           >
             <div style={{ fontWeight: 600, fontSize: 14, color: "var(--buildrick-text-primary)" }}>
@@ -328,7 +328,7 @@ const LoadingView: React.FC<LoadingViewProps> = ({ steps, progress, onCancel }) 
               <span style={{ color: "var(--green, #38d07a)" }}>&#10003;</span>
             )}
             {step.status === "generating" && (
-              <span style={{ color: "var(--buildrick-accent, #6366f1)" }}>&#9673;</span>
+              <span style={{ color: "var(--bd-accent)" }}>&#9673;</span>
             )}
             {step.status === "pending" && (
               <span style={{ color: "var(--muted, #b7c5dc)", opacity: 0.4 }}>&#9675;</span>
@@ -506,7 +506,7 @@ const generateBtnStyles: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   padding: "14px 32px",
-  background: "var(--buildrick-accent, #6366f1)",
+  background: "var(--bd-accent)",
   color: "var(--buildrick-text-on-accent)",
   border: "none",
   borderRadius: 10,
@@ -553,7 +553,7 @@ const progressBarTrackStyles: React.CSSProperties = {
 
 const progressBarFillStyles: React.CSSProperties = {
   height: "100%",
-  background: "var(--buildrick-accent, #6366f1)",
+  background: "var(--bd-accent)",
   borderRadius: 3,
   transition: "width 0.4s ease",
 };

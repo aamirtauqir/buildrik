@@ -50,8 +50,8 @@ const baseStyle: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   fontWeight: 600,
-  background: "linear-gradient(135deg, var(--buildrick-accent), #a78bfa)",
-  color: "var(--buildrick-text-on-accent)",
+  background: "var(--bd-accent)",
+  color: "var(--bd-fg-on-accent)",
   borderRadius: 100,
   whiteSpace: "nowrap",
 };

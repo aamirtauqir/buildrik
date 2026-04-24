@@ -54,7 +54,7 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
       disabled={!isDirty}
       style={{
         padding: "6px 14px",
-        background: isDirty ? "linear-gradient(135deg, #8b5cf6, #3b82f6)" : "rgba(139,92,246,0.2)",
+        background: isDirty ? "var(--bd-accent)" : "var(--bd-accent-tint)",
         border: "none",
         borderRadius: 6,
         color: isDirty ? "#fff" : "var(--bd-fg-muted)",

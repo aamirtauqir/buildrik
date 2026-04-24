@@ -20,7 +20,7 @@ interface Member {
 // Sample existing members (in real app: from API)
 const MOCK_MEMBERS: Member[] = [
   { name: "Sarah Chen", email: "sarah@acme.io", role: "Editor", avatarColor: "#3B82F6", initials: "SC" },
-  { name: "Mike Rosa", email: "mike.rosa@acme.io", role: "Admin", avatarColor: "#8B5CF6", initials: "MR" },
+  { name: "Mike Rosa", email: "mike.rosa@acme.io", role: "Admin", avatarColor: "#64748B", initials: "MR" },
   { name: "Nora Patel", email: "nora.patel@acme.io", role: "Viewer", avatarColor: "#10B981", initials: "NP" },
 ];
 

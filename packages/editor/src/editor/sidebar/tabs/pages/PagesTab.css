@@ -29,8 +29,8 @@
 }
 
 @keyframes pg-save-pulse {
-  0%, 100% { box-shadow: 0 0 0 2px var(--bd-accent-subtle, rgba(99, 102, 241, 0.35)); }
-  50%       { box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12); }
+  0%, 100% { box-shadow: 0 0 0 2px var(--bd-accent-alpha-30); }
+  50%       { box-shadow: 0 0 0 4px var(--bd-accent-tint); }
 }
 
 @keyframes pg-ctx-in {
@@ -451,7 +451,7 @@
 
 .pg-row-wrap--expanded .pg-row {
   border-radius: 7px 7px 0 0;
-  border-bottom: 1px solid rgba(99,102,241,0.15);
+  border-bottom: 1px solid var(--bd-accent-alpha-15);
 }
 
 .pages-panel .pg-list__group {

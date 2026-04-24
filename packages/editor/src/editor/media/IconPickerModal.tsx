@@ -119,12 +119,12 @@ const styles = {
     color: "var(--buildrick-text-primary)",
   },
   iconBtnHover: {
-    background: "rgba(99, 102, 241, 0.1)",
-    borderColor: "rgba(99, 102, 241, 0.3)",
+    background: "var(--bd-accent-tint)",
+    borderColor: "var(--bd-accent-alpha-30)",
   },
   iconBtnSelected: {
-    border: "2px solid var(--buildrick-accent)",
-    background: "rgba(99, 102, 241, 0.15)",
+    border: "2px solid var(--bd-accent)",
+    background: "var(--bd-accent-alpha-15)",
   },
   preview: {
     display: "flex",

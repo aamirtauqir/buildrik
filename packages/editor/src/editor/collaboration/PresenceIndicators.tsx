@@ -28,8 +28,8 @@ interface PresenceIndicatorsProps {
 
 /** Predefined avatar palette — cycled via user ID hash */
 const AVATAR_PALETTE = [
-  "#6366f1",
-  "#8b5cf6",
+  "#0891B2",
+  "#DC2626",
   "#ec4899",
   "#f59e0b",
   "#10b981",

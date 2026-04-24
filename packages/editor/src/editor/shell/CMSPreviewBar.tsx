@@ -29,8 +29,8 @@ const s: Record<string, React.CSSProperties> = {
     gap: 8,
     height: 36,
     padding: "0 16px",
-    background: "var(--buildrick-accent-subtle)",
-    borderBottom: "1px solid rgba(99, 102, 241, 0.3)",
+    background: "var(--bd-accent-subtle)",
+    borderBottom: "1px solid var(--bd-accent-alpha-30)",
     flexShrink: 0,
     zIndex: 10,
     userSelect: "none" as const,
@@ -54,8 +54,8 @@ const s: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: "center",
     background: "transparent",
-    border: "1px solid rgba(99, 102, 241, 0.3)",
-    borderRadius: "var(--buildrick-radius-sm)",
+    border: "1px solid var(--bd-accent-alpha-30)",
+    borderRadius: "var(--bd-radius-sm)",
     color: "var(--buildrick-text-secondary)",
     cursor: "pointer",
     transition: "background 0.15s, border-color 0.15s",
@@ -153,14 +153,14 @@ export const CMSPreviewBar: React.FC<CMSPreviewBarProps> = ({ composer }) => {
         aria-label="Previous record"
         onMouseEnter={(e) => {
           (e.currentTarget as HTMLElement).style.background =
-            "rgba(99, 102, 241, 0.15)";
+            "var(--bd-accent-alpha-15)";
           (e.currentTarget as HTMLElement).style.borderColor =
             "var(--buildrick-accent)";
         }}
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLElement).style.background = "transparent";
           (e.currentTarget as HTMLElement).style.borderColor =
-            "rgba(99, 102, 241, 0.3)";
+            "var(--bd-accent-alpha-30)";
         }}
       >
         <ChevronLeft size={14} aria-hidden />
@@ -174,14 +174,14 @@ export const CMSPreviewBar: React.FC<CMSPreviewBarProps> = ({ composer }) => {
         aria-label="Next record"
         onMouseEnter={(e) => {
           (e.currentTarget as HTMLElement).style.background =
-            "rgba(99, 102, 241, 0.15)";
+            "var(--bd-accent-alpha-15)";
           (e.currentTarget as HTMLElement).style.borderColor =
             "var(--buildrick-accent)";
         }}
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLElement).style.background = "transparent";
           (e.currentTarget as HTMLElement).style.borderColor =
-            "rgba(99, 102, 241, 0.3)";
+            "var(--bd-accent-alpha-30)";
         }}
       >
         <ChevronRight size={14} aria-hidden />

@@ -67,8 +67,8 @@ export const assetCardStyles = {
     background: "var(--buildrick-bg-panel)",
   },
   cardSelected: {
-    border: "2px solid var(--buildrick-accent)",
-    boxShadow: "0 0 0 2px rgba(99, 102, 241, 0.2)",
+    border: "2px solid var(--bd-accent)",
+    boxShadow: "0 0 0 2px var(--bd-accent-alpha-15)",
   },
   thumbnail: {
     width: "100%",

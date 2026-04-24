@@ -491,7 +491,7 @@ const RocketIcon: React.FC = () => (
     height="20"
     viewBox="0 0 24 24"
     fill="none"
-    stroke="var(--bd-accent, #6366f1)"
+    stroke="var(--bd-accent)"
     strokeWidth="1.5"
     style={{ flexShrink: 0, marginTop: 2 }}
     aria-hidden="true"
@@ -616,9 +616,9 @@ const infoSectionStyles: React.CSSProperties = {
   display: "flex",
   gap: 12,
   padding: 12,
-  background: "var(--bd-accent-tint, rgba(99, 102, 241, 0.06))",
+  background: "var(--bd-accent-tint)",
   borderRadius: "var(--bd-radius-md)",
-  border: "1px solid var(--bd-accent-subtle, rgba(99, 102, 241, 0.12))",
+  border: "1px solid var(--bd-accent-subtle)",
 };
 
 const infoTitleStyles: React.CSSProperties = {

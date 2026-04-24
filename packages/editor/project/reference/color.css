@@ -99,6 +99,7 @@
   --buildrick-success-bg: rgba(22, 163, 74, 0.10);
   --buildrick-status-synced: #16A34A;
   --buildrick-primary-alpha-15: rgba(45, 109, 255, 0.15);
+  --buildrick-primary-alpha-30: rgba(45, 109, 255, 0.30);
 
   /* Pill borders (retained for legacy component migration window) */
   --buildrick-pill-stroke: rgba(148, 163, 184, 0.35);

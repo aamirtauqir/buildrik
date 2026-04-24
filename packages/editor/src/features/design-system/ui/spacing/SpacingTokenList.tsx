@@ -39,7 +39,7 @@ const SPACE_META: Record<string, { semantic: string; size: "xs" | "sm" | "md" | 
 const BAR_COLORS: Record<"xs" | "sm" | "md" | "lg" | "xl", string> = {
   xs: "#22c55e",
   sm: "#3b82f6",
-  md: "#8b5cf6",
+  md: "#0891B2",
   lg: "#f59e0b",
   xl: "#ef4444",
 };

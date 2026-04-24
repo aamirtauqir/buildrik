@@ -51,6 +51,7 @@
   --bd-accent-subtle: var(--buildrick-accent-subtle);
   --bd-accent-tint: var(--buildrick-accent-tint);
   --bd-accent-alpha-15: var(--buildrick-primary-alpha-15);
+  --bd-accent-alpha-30: var(--buildrick-primary-alpha-30);
 
   /* ─── SEMANTIC STATUS ────────────────────────────────────────────────── */
   --bd-error: var(--buildrick-error);
