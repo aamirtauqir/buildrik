@@ -4,9 +4,9 @@ import { useBatchStyleHandler } from "../useBatchStyleHandler";
 import { getBreakpointQuery } from "../../../../shared/constants/breakpoints";
 
 function makeComposer() {
-  const elements = new Map<string, { getStyles: () => any; setStyle: any; removeStyle: any }>();
+  const elements = new Map<string, { getId: () => string; getStyles: () => any; setStyle: any; removeStyle: any }>();
   ["e1", "e2"].forEach((id) => {
-    elements.set(id, { getStyles: () => ({}), setStyle: vi.fn(), removeStyle: vi.fn() });
+    elements.set(id, { getId: () => id, getStyles: () => ({}), setStyle: vi.fn(), removeStyle: vi.fn() });
   });
   return {
     beginTransaction: vi.fn(),

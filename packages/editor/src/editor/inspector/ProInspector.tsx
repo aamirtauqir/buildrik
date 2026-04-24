@@ -10,7 +10,7 @@ import { ChevronDown, Monitor, Tablet, Smartphone, Crosshair, CornerLeftUp } fro
 import * as React from "react";
 import { BindingPopover } from "./components/BindingPopover";
 import type { Composer } from "../../engine";
-import { BREAKPOINTS, BREAKPOINT_ORDER, isValidBreakpoint } from "../../shared/constants/breakpoints";
+import { BREAKPOINTS, BREAKPOINT_ORDER, getBreakpointQuery, isValidBreakpoint } from "../../shared/constants/breakpoints";
 import type { DeviceType, PseudoStateId } from "../../shared/types";
 import type { BreakpointId } from "../../shared/types/breakpoints";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
@@ -255,14 +255,17 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedElement?.id, composer, currentBreakpoint, styles_state]);
 
-  // Pseudo-states with overrides
+  // Pseudo-states with overrides — breakpoint-qualified so mobile/tablet
+  // pseudo rules (stored under their media query) light up the indicator
+  // pills. Reads the current breakpoint's mediaQuery; desktop = undefined.
   const statesWithOverrides = React.useMemo<Set<PseudoStateId>>(
     () => {
       if (!selectedElement?.id || !composer?.styles) return new Set();
       const pseudoStates = ["hover", "focus", "active", "disabled"] as const;
+      const mq = currentBreakpoint === "desktop" ? undefined : getBreakpointQuery(currentBreakpoint) ?? undefined;
       const withOverrides = new Set<PseudoStateId>();
       pseudoStates.forEach((state) => {
-        const rule = composer.styles.getRule(`[data-buildrick-id="${selectedElement.id}"]:${state}`);
+        const rule = composer.styles.getRule(`[data-buildrick-id="${selectedElement.id}"]:${state}`, mq);
         if (rule && Object.keys(rule.properties ?? {}).length > 0) {
           withOverrides.add(state);
         }
@@ -270,7 +273,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       return withOverrides;
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedElement?.id, composer, styles_state]
+    [selectedElement?.id, composer, styles_state, currentBreakpoint]
   );
 
   const { expandedSections, toggleSection } = useInspectorSections({

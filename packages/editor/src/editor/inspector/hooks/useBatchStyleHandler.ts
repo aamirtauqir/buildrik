@@ -22,6 +22,7 @@ import type { Composer } from "../../../engine";
 import { getBreakpointQuery } from "../../../shared/constants/breakpoints";
 import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
+import { computeEffectiveStyles } from "../config/cssContext";
 
 // ============================================================================
 // TYPES
@@ -56,45 +57,62 @@ export function useBatchStyleHandler(
   currentBreakpoint: BreakpointId = "desktop",
   currentPseudoState: PseudoStateId = "normal"
 ): UseBatchStyleHandlerResult {
-  // Compute the agreed style view across the selection. For every property
-  // that appears on any selected element, check whether all selected elements
-  // have the same value. If they agree, the property lands in `styles`. If
-  // they disagree, it lands in `mixed` and is omitted from `styles` so the
-  // panel doesn't display one element's value as canonical.
-  const { styles, mixed } = React.useMemo<{
+  // Compute the agreed style view across the selection using EFFECTIVE styles
+  // (base + breakpoint overlay + pseudo layer), not base styles alone — so the
+  // panel reflects what the user sees under the active responsive context.
+  // Subscribes to composer `element:updated` events so external mutations
+  // (undo/redo, other panels) refresh the panel instead of leaving it stale.
+  const [{ styles, mixed }, setView] = React.useState<{
     styles: Record<string, string>;
     mixed: Set<string>;
-  }>(() => {
+  }>({ styles: {}, mixed: new Set() });
+
+  React.useEffect(() => {
     if (!composer || selectedIds.length === 0) {
-      return { styles: {}, mixed: new Set() };
+      setView({ styles: {}, mixed: new Set() });
+      return;
     }
 
-    const allStyles = selectedIds
-      .map((id) => composer.elements.getElement(id)?.getStyles?.() ?? {})
-      .filter(Boolean) as Record<string, string>[];
-    if (allStyles.length === 0) return { styles: {}, mixed: new Set() };
-
-    // Union of every property anyone in the selection has set. Using Set
-    // avoids duplicate work when elements share the same prop list.
-    const allProps = new Set<string>();
-    allStyles.forEach((s) => Object.keys(s).forEach((p) => allProps.add(p)));
-
-    const merged: Record<string, string> = {};
-    const mixedProps = new Set<string>();
-    for (const prop of allProps) {
-      const first = allStyles[0][prop] ?? "";
-      const allAgree = allStyles.every((s) => (s[prop] ?? "") === first);
-      if (allAgree) {
-        // Only emit non-empty values — an empty string means "not set on any"
-        // which is the same as absent from the record.
-        if (first) merged[prop] = first;
-      } else {
-        mixedProps.add(prop);
+    const compute = () => {
+      const allStyles = selectedIds
+        .map((id) => composer.elements.getElement(id))
+        .filter((el): el is NonNullable<typeof el> => !!el)
+        .map((el) => computeEffectiveStyles(el, composer, currentBreakpoint, currentPseudoState));
+      if (allStyles.length === 0) {
+        setView({ styles: {}, mixed: new Set() });
+        return;
       }
-    }
 
-    return { styles: merged, mixed: mixedProps };
-  }, [composer, selectedIds]);
+      const allProps = new Set<string>();
+      allStyles.forEach((s) => Object.keys(s).forEach((p) => allProps.add(p)));
+
+      const merged: Record<string, string> = {};
+      const mixedProps = new Set<string>();
+      for (const prop of allProps) {
+        const first = allStyles[0][prop] ?? "";
+        const allAgree = allStyles.every((s) => (s[prop] ?? "") === first);
+        if (allAgree) {
+          if (first) merged[prop] = first;
+        } else {
+          mixedProps.add(prop);
+        }
+      }
+      setView({ styles: merged, mixed: mixedProps });
+    };
+
+    compute();
+    const selectedSet = new Set(selectedIds);
+    const handler = (payload: unknown) => {
+      const id = (payload as { getId?: () => string } | undefined)?.getId?.();
+      if (!id || selectedSet.has(id)) compute();
+    };
+    composer.on?.("element:updated", handler);
+    return () => { composer.off?.("element:updated", handler); };
+    // selectedIds identity can change per-render even when contents are stable
+    // (parent closures recreate the array). Depend on a derived key instead so
+    // the effect only re-runs when the actual selection changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [composer, selectedIds.join(","), currentBreakpoint, currentPseudoState]);
 
   const handleBatchStyleChange = React.useCallback(
     (changes: Record<string, string>) => {
