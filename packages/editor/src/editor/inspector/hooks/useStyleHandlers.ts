@@ -152,6 +152,7 @@ export function useStyleHandlers(
       // commit it when element/breakpoint/pseudo changes before the timer fires.
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
       const flush = () => {
+        // Re-read element inside the flush — avoids stale closure if element was replaced.
         const el = composer?.elements.getElement(selectedElement.id);
         if (!el) return;
         composer?.beginTransaction?.("style-change");
