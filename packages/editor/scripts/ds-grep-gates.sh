@@ -305,6 +305,50 @@ if [ -n "$LEAK" ]; then
 fi
 pass "Gate 15: --bd-* defs only in bd-aliases.css"
 
+# Gate 17: --bd-* ghost-alias detection (added 2026-04-25).
+# Catches --bd-* aliases REFERENCED by consumers but NOT DEFINED in bd-aliases.css.
+# A ghost alias renders as initial/inherit value in CSS — silent visual bug,
+# no console error. Caught manually 2026-04-25 via Codex audit (4 ghosts shipped:
+# --bd-border-light, --bd-text-2xs-plus, --bd-success-light, --bd-warning-light).
+# This gate prevents the next ghost from slipping through.
+#
+# Scope mirrors Gate 15 chrome boundaries: shared/ui, editor, shared/forms, ai,
+# features/design-system/ui, themes/components.css, themes/ux-fixes.css.
+#
+# Ordering: must run AFTER Gate 15. If Gate 15 fails (extra --bd-* defs outside
+# canonical file), the DEFINED set below is intentionally limited to the
+# canonical file only — ghosts must be fixed by adding aliases to bd-aliases.css,
+# not by defining them in random consumer files.
+GHOST_DEFINED=$(grep -oE -- '--bd-[a-z0-9-]+:' "$CANONICAL" 2>/dev/null | sed 's/:$//' | sort -u)
+GHOST_USED=$(grep -rohE -- 'var\(--bd-[a-z0-9-]+' \
+  packages/editor/src/shared/ui \
+  packages/editor/src/editor \
+  packages/editor/src/shared/forms \
+  packages/editor/src/ai \
+  packages/editor/src/features/design-system/ui \
+  packages/editor/src/themes/components.css \
+  packages/editor/src/themes/ux-fixes.css \
+  2>/dev/null | sed 's/var(//' | sort -u)
+GHOSTS=$(comm -23 <(printf '%s\n' "$GHOST_USED") <(printf '%s\n' "$GHOST_DEFINED") | sed '/^$/d')
+if [ -n "$GHOSTS" ]; then
+  echo "Ghost --bd-* aliases (referenced but not defined in $CANONICAL):"
+  printf '%s\n' "$GHOSTS" | while IFS= read -r ghost; do
+    [ -z "$ghost" ] && continue
+    echo "  $ghost — first 3 consumers:"
+    grep -rn "var(${ghost}" \
+      packages/editor/src/shared/ui \
+      packages/editor/src/editor \
+      packages/editor/src/shared/forms \
+      packages/editor/src/ai \
+      packages/editor/src/features/design-system/ui \
+      packages/editor/src/themes/components.css \
+      packages/editor/src/themes/ux-fixes.css \
+      2>/dev/null | head -3 | sed 's/^/    /'
+  done
+  fail "Gate 17: ghost --bd-* aliases (define in bd-aliases.css or remove from consumer)"
+fi
+pass "Gate 17: zero ghost --bd-* aliases"
+
 # Gate 16: Editor-scoped hex regression gate (added 2026-04-25, renamed 2026-04-25).
 # Mode: REGRESSION (compares against scripts/.hex-baseline-editor — fails if count
 #       rises above baseline; 0-tolerance ERROR mode requires --fail flag instead).

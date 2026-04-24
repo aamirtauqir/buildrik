@@ -86,9 +86,5 @@ Deferred work from CEO reviews and implementation sessions. Ordered by priority.
 **Effort:** XS (human: ~10 min / CC: ~2 min)
 **Depends on:** Editor baseline reduced to 0 via T-DS-SHADOW-01 + per-tab inline-hex sweeps.
 
-### T-GATE-17-GHOSTS: Add ghost-alias detection gate
-**What:** Codex caught 4 ghost `--bd-*` aliases (border-light, text-2xs-plus, success-light, warning-light) that were referenced by consumers but undefined in bd-aliases.css. Silent CSS render-as-empty bug. No gate caught it; only adversarial audit did.
-**Why:** Without a gate, the next ghost alias also slips through. The cost of a Gate 17 is ~10 lines of bash; the cost of debugging a "why does my border not render" bug is hours.
-**How to apply:** Add Gate 17 to `ds-grep-gates.sh` after Gate 15: `comm -23 <(grep -rohE 'var\(--bd-[a-z0-9-]+' packages/editor/src/{shared/ui,editor,shared/forms,ai,features/design-system/ui} packages/editor/src/themes/{components,ux-fixes}.css | sed 's|var(||' | sort -u) <(grep -oE -- '--bd-[a-z0-9-]+:' packages/editor/src/themes/design-system/bd-aliases.css | sed 's|:$||' | sort -u)`. If output non-empty, fail with the list of ghosts.
-**Effort:** XS (human: ~30 min / CC: ~5 min)
-**Depends on:** None. Should land BEFORE T-DS-LEAK-01 to catch new ghosts during the sweep.
+### ~~T-GATE-17-GHOSTS~~: Add ghost-alias detection gate — SHIPPED 2026-04-25
+**Status:** DONE. Gate 17 landed at `packages/editor/scripts/ds-grep-gates.sh:308-345`. Failure path tested by injecting a fake `var(--bd-test-ghost-marker)` reference; gate detected it and reported the consumer file:line. Currently passes with zero ghosts. Unblocks T-DS-LEAK-01 (the 179-file --buildrick-* sweep can run with ghost-introduction protection).
