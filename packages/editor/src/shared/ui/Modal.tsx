@@ -20,9 +20,12 @@ export interface ModalProps {
   initialFocusRef?: React.RefObject<HTMLElement | null>;
 }
 
+// Sizes aligned to prototype comp-modals.html — sm=380, md=460.
+// lg/xl/full retained as extended sizes for surfaces beyond prototype scope
+// (PublishingHub, TemplatePreviewModal, etc).
 const sizeMap = {
-  sm: 400,
-  md: 560,
+  sm: 380,
+  md: 460,
   lg: 720,
   xl: 960,
   full: "90vw",
@@ -137,21 +140,22 @@ export const Modal: React.FC<ModalProps> = ({
   );
 };
 
+// Overlay: solid slate dimmer, no backdrop-filter (LOCKED 2026-04-25 per
+// P0c M4 — DESIGN.md forbids backdrop-filter in editor chrome).
 const overlayStyles: React.CSSProperties = {
   position: "fixed",
   inset: 0,
-  background: "rgba(0, 0, 0, 0.7)",
+  background: "var(--bd-overlay)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   zIndex: 1000,
-  backdropFilter: "blur(4px)",
 };
 
 const modalStyles: React.CSSProperties = {
-  background: "var(--buildrick-bg-panel)",
-  borderRadius: 12,
-  boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+  background: "var(--bd-bg-card)",
+  borderRadius: "var(--bd-radius-lg)",
+  boxShadow: "var(--bd-shadow-modal)",
   maxHeight: "90vh",
   display: "flex",
   flexDirection: "column",
@@ -159,8 +163,8 @@ const modalStyles: React.CSSProperties = {
 };
 
 const headerStyles: React.CSSProperties = {
-  padding: "16px 20px",
-  borderBottom: "1px solid var(--buildrick-border)",
+  padding: "var(--bd-space-4) var(--bd-space-5)",
+  borderBottom: "1px solid var(--bd-border)",
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
@@ -169,10 +173,10 @@ const headerStyles: React.CSSProperties = {
 const closeButtonStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
-  color: "var(--buildrick-text-secondary)",
+  color: "var(--bd-fg-secondary)",
   cursor: "pointer",
-  padding: 12, // Increased from 4px to meet WCAG 2.5.5 touch target (44x44px)
-  borderRadius: 6,
+  padding: 12, // WCAG 2.5.5 touch target (44x44)
+  borderRadius: "var(--bd-radius-sm)",
   display: "flex",
   minWidth: 44,
   minHeight: 44,
@@ -181,17 +185,17 @@ const closeButtonStyles: React.CSSProperties = {
 };
 
 const bodyStyles: React.CSSProperties = {
-  padding: 20,
+  padding: "var(--bd-space-5)",
   overflow: "auto",
   flex: 1,
 };
 
 const footerStyles: React.CSSProperties = {
-  padding: "16px 20px",
-  borderTop: "1px solid var(--buildrick-border)",
+  padding: "var(--bd-space-4) var(--bd-space-5)",
+  borderTop: "1px solid var(--bd-border)",
   display: "flex",
   justifyContent: "flex-end",
-  gap: 8,
+  gap: "var(--bd-space-2)",
 };
 
 // Confirm Dialog Helper
@@ -220,12 +224,12 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm" initialFocusRef={confirmRef}>
-      <p style={{ margin: 0, color: "var(--buildrick-text-secondary)" }}>{message}</p>
+      <p style={{ margin: 0, color: "var(--bd-fg-secondary)" }}>{message}</p>
       <div
         style={{
           display: "flex",
-          gap: 8,
-          marginTop: 20,
+          gap: "var(--bd-space-2)",
+          marginTop: "var(--bd-space-5)",
           justifyContent: "flex-end",
         }}
       >
