@@ -2,7 +2,7 @@
  * Aquibra Button Component
  *
  * Week 1 primitive reconciliation against project/preview/comp-buttons.html.
- * Variants: primary, secondary, ghost, danger (subtle), success, publish (pill CTA).
+ * Variants: primary, secondary, ghost, danger (subtle), publish (pill CTA).
  * Tokens: --bd-* only (per plan Premise 2).
  *
  * @license BSD-3-Clause
@@ -13,7 +13,7 @@ import styled from "@emotion/styled";
 import { Spinner } from "./Spinner";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "ghost" | "danger" | "success" | "publish";
+  variant?: "primary" | "secondary" | "ghost" | "danger" | "publish";
   size?: "sm" | "md" | "lg";
   icon?: React.ReactNode;
   iconPosition?: "left" | "right";
@@ -78,14 +78,6 @@ const variantMap: Record<Variant, VariantStyle> = {
     hoverBg: "var(--bd-error-bg)",
     hoverBorder: "1px solid var(--bd-error)",
     weight: 500,
-    radius: "var(--bd-radius-md)",
-  },
-  success: {
-    bg: "var(--bd-success)",
-    color: "var(--bd-fg-on-accent)",
-    border: "none",
-    hoverBg: "var(--bd-success)",
-    weight: 600,
     radius: "var(--bd-radius-md)",
   },
   // Publish CTA — pill radius, matches topbar Publish button in prototype
