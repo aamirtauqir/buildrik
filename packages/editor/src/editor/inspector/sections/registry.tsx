@@ -416,7 +416,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
     // including mixed-value badges and persisted advanced-toggle state.
     Component: USE_SCHEMA_BORDER ? SchemaBorderSection : BorderSection,
     advancedKey: "border",
-    styleKeys: ["border", "border-width", "border-style", "border-color", "outline-width", "outline-style", "outline-color", "outline-offset"],
+    styleKeys: ["border", "border-width", "border-style", "border-color", "border-top", "border-right", "border-bottom", "border-left", "outline-width", "outline-style", "outline-color", "outline-offset"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onBatchChange: ctx.onBatchChange,
