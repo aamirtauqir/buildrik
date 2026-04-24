@@ -6,7 +6,7 @@
 
 import { ChevronDown } from "lucide-react";
 import * as React from "react";
-import { Icon, type IconName } from "../../../../shared/ui";
+import type { IconName } from "../../../../shared/ui";
 
 // ============================================================================
 // TYPES
@@ -77,23 +77,8 @@ export const Section: React.FC<SectionProps> = ({
         aria-label={`${title} section, ${isOpen ? "expanded" : "collapsed"}`}
       >
         <span className="bdi-chev">
-          <ChevronDown size={10} aria-hidden="true" />
+          <ChevronDown size={9} aria-hidden="true" />
         </span>
-        {icon && (
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              color: "var(--bd-fg-muted)",
-            }}
-          >
-            {typeof icon === "string" && /^[A-Z]/.test(icon) ? (
-              <Icon name={icon as IconName} size="xs" color="inherit" />
-            ) : (
-              icon
-            )}
-          </span>
-        )}
         <span className="bdi-sec-name">{title}</span>
         {!isOpen && preview && <span>{preview}</span>}
         {action && (
