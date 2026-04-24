@@ -66,18 +66,12 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
 
   const radiusValues = getRadiusValues();
 
-  // Compute border preview
+  // Compute border preview — shown as section indicator pill when collapsed
   const borderStyle = styles["border-style"] || (styles["border"] ? "set" : undefined);
+  const borderWidth = styles["border-width"];
   const borderPreview = borderStyle ? (
-    <span
-      style={{
-        fontSize: 12,
-        color: "var(--buildrick-text-tertiary)",
-        fontFamily: "var(--buildrick-font-family-mono)",
-        whiteSpace: "nowrap" as const,
-      }}
-    >
-      {styles["border"] || `${borderStyle}`}
+    <span className="bdi-ind">
+      {borderWidth ? `${borderWidth} ${borderStyle}` : (styles["border"] || borderStyle)}
     </span>
   ) : undefined;
 
