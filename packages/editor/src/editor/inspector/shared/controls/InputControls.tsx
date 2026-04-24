@@ -319,27 +319,11 @@ export const SelectRow: React.FC<SelectRowProps> = ({
       {helperText && <HelperIcon text={helperText} />}
     </label>
     <div className="bdi-row-content">
-      <div className="bdi-num" style={{ paddingRight: 0 }}>
+      <div className="bdi-ddn">
         <select
+          className="bdi-v"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          style={{
-            flex: 1,
-            minWidth: 0,
-            height: "100%",
-            border: "none",
-            outline: "none",
-            background: "transparent",
-            padding: "0 24px 0 8px",
-            font: "500 11.5px var(--bd-font)",
-            color: "var(--bd-fg-primary)",
-            appearance: "none",
-            backgroundImage:
-              `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "right 8px center",
-            cursor: "pointer",
-          }}
         >
           <option value="">{placeholder}</option>
           {options.map((opt) => (
@@ -348,6 +332,11 @@ export const SelectRow: React.FC<SelectRowProps> = ({
             </option>
           ))}
         </select>
+        <span className="bdi-c" aria-hidden="true">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </span>
       </div>
     </div>
   </div>

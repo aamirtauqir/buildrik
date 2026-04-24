@@ -33,19 +33,27 @@ const parseNum = (val: string): { num: string; unit: string } => {
   return m ? { num: m[1], unit: m[2] || "px" } : { num: val, unit: "" };
 };
 
+const GapIcon: React.FC = () => (
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M7 4v16 M17 4v16 M3 12h4 M17 12h4" />
+  </svg>
+);
+
 const NumField: React.FC<{
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
   disabled?: boolean;
   ariaLabel?: string;
-}> = ({ value, onChange, placeholder = "0", disabled, ariaLabel }) => {
+  icon?: React.ReactNode;
+}> = ({ value, onChange, placeholder = "0", disabled, ariaLabel, icon }) => {
   const { num, unit } = parseNum(value);
   return (
     <div
-      className="bdi-num"
+      className="bdi-fld"
       style={disabled ? { opacity: 0.5, pointerEvents: "none" } : undefined}
     >
+      {icon && <span className="bdi-flb">{icon}</span>}
       <input
         type="text"
         value={num}
@@ -122,6 +130,7 @@ export const LinkedGapInput: React.FC<LinkedGapInputProps> = ({
             onChange={handleLinkedChange}
             disabled={disabled}
             ariaLabel={`${label} (linked)`}
+            icon={<GapIcon />}
           />
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, flex: 1 }}>
@@ -130,12 +139,14 @@ export const LinkedGapInput: React.FC<LinkedGapInputProps> = ({
               onChange={(v) => onChange("row-gap", v)}
               disabled={disabled}
               ariaLabel="Row gap"
+              icon={<span style={{ font: "600 10px var(--bd-font)" }}>R</span>}
             />
             <NumField
               value={elementStyles["column-gap"] || ""}
               onChange={(v) => onChange("column-gap", v)}
               disabled={disabled}
               ariaLabel="Column gap"
+              icon={<span style={{ font: "600 10px var(--bd-font)" }}>C</span>}
             />
           </div>
         )}

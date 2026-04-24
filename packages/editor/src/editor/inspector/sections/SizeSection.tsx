@@ -200,6 +200,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
               disabled={disabled("width")}
               disabledReason={reason("width")}
               isOverridden={propertyStates["width"]?.isOverridden}
+              fieldIcon={<span style={{ font: "600 10px var(--bd-font)" }}>W</span>}
             />
           </div>
           {!disabled("width") && (
@@ -224,6 +225,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
               disabled={disabled("height")}
               disabledReason={reason("height")}
               isOverridden={propertyStates["height"]?.isOverridden}
+              fieldIcon={<span style={{ font: "600 10px var(--bd-font)" }}>H</span>}
             />
           </div>
           {!disabled("height") && (
@@ -248,6 +250,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                 disabled={disabled("min-width")}
                 disabledReason={reason("min-width")}
                 isOverridden={propertyStates["min-width"]?.isOverridden}
+                fieldIcon={<span style={{ font: "600 9px var(--bd-font)" }}>min</span>}
               />
             </div>
           )}
@@ -263,6 +266,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                 disabled={disabled("max-width")}
                 disabledReason={reason("max-width")}
                 isOverridden={propertyStates["max-width"]?.isOverridden}
+                fieldIcon={<span style={{ font: "600 9px var(--bd-font)" }}>max</span>}
               />
             </div>
           )}
@@ -278,6 +282,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                 disabled={disabled("min-height")}
                 disabledReason={reason("min-height")}
                 isOverridden={propertyStates["min-height"]?.isOverridden}
+                fieldIcon={<span style={{ font: "600 9px var(--bd-font)" }}>min</span>}
               />
             </div>
           )}
@@ -293,6 +298,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
                 disabled={disabled("max-height")}
                 disabledReason={reason("max-height")}
                 isOverridden={propertyStates["max-height"]?.isOverridden}
+                fieldIcon={<span style={{ font: "600 9px var(--bd-font)" }}>max</span>}
               />
             </div>
           )}

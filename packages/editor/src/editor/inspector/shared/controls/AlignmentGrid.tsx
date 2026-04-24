@@ -1,5 +1,6 @@
 /**
- * AlignmentGrid — 3x3 visual justify/align picker. Ported to --bd-* tokens.
+ * AlignmentGrid — 9-dot justify/align picker. Ported to .bdi-pad per
+ * comp-inspector.html v2 mock. Shows a pad + kv meta block side-by-side.
  *
  * @license BSD-3-Clause
  */
@@ -12,73 +13,55 @@ export interface AlignmentGridProps {
   onChange: (property: string, value: string) => void;
 }
 
+const POSITIONS: { ji: string; ai: string }[] = [
+  { ji: "start", ai: "start" },
+  { ji: "center", ai: "start" },
+  { ji: "end", ai: "start" },
+  { ji: "start", ai: "center" },
+  { ji: "center", ai: "center" },
+  { ji: "end", ai: "center" },
+  { ji: "start", ai: "end" },
+  { ji: "center", ai: "end" },
+  { ji: "end", ai: "end" },
+];
+
 export const AlignmentGrid: React.FC<AlignmentGridProps> = ({
   justifyItems,
   alignItems,
   onChange,
-}) => {
-  const positions = [
-    { ji: "start", ai: "start" },
-    { ji: "center", ai: "start" },
-    { ji: "end", ai: "start" },
-    { ji: "start", ai: "center" },
-    { ji: "center", ai: "center" },
-    { ji: "end", ai: "center" },
-    { ji: "start", ai: "end" },
-    { ji: "center", ai: "end" },
-    { ji: "end", ai: "end" },
-  ];
-
-  return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: 2,
-        padding: 4,
-        background: "var(--bd-bg-subtle)",
-        borderRadius: 4,
-      }}
-    >
-      {positions.map((pos, i) => {
-        const isActive = justifyItems === pos.ji && alignItems === pos.ai;
+}) => (
+  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+    <div className="bdi-pad" title="Align items · justify-content">
+      {POSITIONS.map((pos, i) => {
+        const isActive =
+          justifyItems === pos.ji && alignItems === pos.ai;
         return (
           <button
             key={i}
             type="button"
+            className={`bdi-d${isActive ? " on" : ""}`}
             onClick={() => {
               onChange("justify-items", pos.ji);
               onChange("align-items", pos.ai);
             }}
-            style={{
-              width: 22,
-              height: 22,
-              background: isActive ? "var(--bd-accent)" : "#fff",
-              border: "none",
-              borderRadius: 3,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "background 120ms",
-            }}
             title={`justify: ${pos.ji}, align: ${pos.ai}`}
             aria-label={`justify: ${pos.ji}, align: ${pos.ai}`}
             aria-pressed={isActive}
-          >
-            <div
-              style={{
-                width: 6,
-                height: 6,
-                background: isActive ? "#fff" : "var(--bd-fg-muted)",
-                borderRadius: 1,
-              }}
-            />
-          </button>
+          />
         );
       })}
     </div>
-  );
-};
+    <div className="bdi-pad-meta">
+      <div className="bdi-pad-kv">
+        <span className="bdi-pk">justify</span>
+        <span className="bdi-pv">{justifyItems || "—"}</span>
+      </div>
+      <div className="bdi-pad-kv">
+        <span className="bdi-pk">items</span>
+        <span className="bdi-pv">{alignItems || "—"}</span>
+      </div>
+    </div>
+  </div>
+);
 
 export default AlignmentGrid;
