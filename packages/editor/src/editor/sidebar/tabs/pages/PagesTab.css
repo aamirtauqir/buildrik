@@ -652,6 +652,43 @@
   background: var(--bd-accent-tint);
   color: var(--bd-fg-heading);
 }
+.bd-pg-palette-item-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: var(--bd-fg-muted);
+  flex-shrink: 0;
+}
+.bd-pg-palette-item-icon svg { width: 12px; height: 12px; }
+.bd-pg-palette-item-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bd-pg-palette-empty {
+  padding: 24px 14px;
+  text-align: center;
+  font: 400 12.5px var(--bd-font);
+  color: var(--bd-fg-muted);
+}
+.bd-pg-palette-footer {
+  display: flex;
+  gap: 14px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--bd-border-light);
+  font: 400 11px var(--bd-font);
+  color: var(--bd-fg-muted);
+}
+.bd-pg-palette-footer kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  margin-right: 4px;
+  border-radius: 3px;
+  background: var(--bd-bg-subtle);
+  border: 1px solid var(--bd-border-light);
+  font: 500 10px var(--bd-mono);
+  color: var(--bd-fg-primary);
+}
 
 /* ─── CONTEXT MENU ────────────────────────────────────────────────────── */
 .bd-pg-menu {
@@ -667,14 +704,35 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
   padding: 6px 10px;
+  border: 0;
   border-radius: 4px;
+  background: transparent;
+  text-align: left;
   font: 500 12.5px var(--bd-font);
   color: var(--bd-fg-heading);
   cursor: pointer;
 }
-.bd-pg-menu-item:hover { background: var(--bd-bg-subtle); }
+.bd-pg-menu-item:hover:not(.disabled) { background: var(--bd-bg-subtle); }
 .bd-pg-menu-item.danger { color: var(--bd-error); }
+.bd-pg-menu-item.danger:hover:not(.disabled) {
+  background: rgba(220, 38, 38, 0.08);
+  color: var(--bd-error);
+}
+.bd-pg-menu-item.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.bd-pg-menu-item kbd {
+  margin-left: auto;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: var(--bd-bg-subtle);
+  border: 1px solid var(--bd-border-light);
+  font: 500 10px var(--bd-mono);
+  color: var(--bd-fg-muted);
+}
 .bd-pg-menu-divider {
   height: 1px;
   background: var(--bd-border);

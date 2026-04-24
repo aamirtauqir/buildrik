@@ -1,10 +1,10 @@
 /**
- * PageContextMenu — Portal context menu for page actions.
+ * PageContextMenu — portal context menu for page actions.
  *
  * Rules:
  * - Renders via createPortal(menu, document.body)
  * - "Delete Page" is DISABLED (not hidden) when: page is homepage OR only page
- * - Keyboard: Escape closes
+ * - Keyboard: Escape closes, ↑↓ rove focus
  *
  * @license BSD-3-Clause
  */
@@ -52,15 +52,13 @@ export const PageContextMenu: React.FC<Props> = ({
       ? "A site needs at least 1 page. Add another page first."
       : undefined;
 
-  // Focus first item on mount
   React.useEffect(() => {
     const first = menuRef.current?.querySelector<HTMLElement>(
-      '[role="menuitem"]:not([aria-disabled="true"])'
+      '[role="menuitem"]:not([aria-disabled="true"])',
     );
     first?.focus();
   }, []);
 
-  // Arrow key roving focus + Escape
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
       e.preventDefault();
@@ -70,15 +68,16 @@ export const PageContextMenu: React.FC<Props> = ({
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
     e.preventDefault();
     const items = Array.from(
-      menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []
+      menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [],
     );
     const idx = items.indexOf(document.activeElement as HTMLElement);
     const next =
-      e.key === "ArrowDown" ? (idx + 1) % items.length : (idx - 1 + items.length) % items.length;
+      e.key === "ArrowDown"
+        ? (idx + 1) % items.length
+        : (idx - 1 + items.length) % items.length;
     items[next]?.focus();
   };
 
-  // Keep within viewport
   const style: React.CSSProperties = {
     position: "fixed",
     top: Math.min(y, window.innerHeight - 260),
@@ -94,14 +93,15 @@ export const PageContextMenu: React.FC<Props> = ({
   const menu = (
     <div
       ref={menuRef}
-      className="pg-ctx-menu"
+      className="bd-pg-menu"
       style={style}
       role="menu"
       aria-label={`Options for ${page?.name ?? "page"}`}
       onKeyDown={handleKeyDown}
     >
       <button
-        className="pg-ctx-item"
+        type="button"
+        className="bd-pg-menu-item"
         role="menuitem"
         tabIndex={-1}
         onClick={() => act(() => onRename(pageId))}
@@ -109,7 +109,8 @@ export const PageContextMenu: React.FC<Props> = ({
         Rename <kbd>F2</kbd>
       </button>
       <button
-        className="pg-ctx-item"
+        type="button"
+        className="bd-pg-menu-item"
         role="menuitem"
         tabIndex={-1}
         onClick={() => act(() => onDuplicate(pageId))}
@@ -118,7 +119,8 @@ export const PageContextMenu: React.FC<Props> = ({
       </button>
       {!isHome && (
         <button
-          className="pg-ctx-item"
+          type="button"
+          className="bd-pg-menu-item"
           role="menuitem"
           tabIndex={-1}
           onClick={() => act(() => onSetHomepage(pageId))}
@@ -127,7 +129,8 @@ export const PageContextMenu: React.FC<Props> = ({
         </button>
       )}
       <button
-        className="pg-ctx-item"
+        type="button"
+        className="bd-pg-menu-item"
         role="menuitem"
         tabIndex={-1}
         onClick={() => act(() => onCopyLink(pageId))}
@@ -135,16 +138,18 @@ export const PageContextMenu: React.FC<Props> = ({
         Copy Page Link
       </button>
       <button
-        className="pg-ctx-item"
+        type="button"
+        className="bd-pg-menu-item"
         role="menuitem"
         tabIndex={-1}
         onClick={() => act(() => onSettings(pageId))}
       >
         Page Settings <kbd>⌘,</kbd>
       </button>
-      <div className="pg-ctx-divider" role="separator" />
+      <div className="bd-pg-menu-divider" role="separator" />
       <button
-        className={`pg-ctx-item pg-ctx-item--danger${deleteDisabled ? " pg-ctx-item--disabled" : ""}`}
+        type="button"
+        className={`bd-pg-menu-item danger${deleteDisabled ? " disabled" : ""}`}
         role="menuitem"
         tabIndex={-1}
         aria-disabled={deleteDisabled}

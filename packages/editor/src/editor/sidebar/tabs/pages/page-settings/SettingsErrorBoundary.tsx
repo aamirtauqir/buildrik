@@ -1,8 +1,5 @@
 /**
- * @lint-hex-policy: component-theme
- *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
- *
- * SettingsErrorBoundary — Catches render errors inside the page-settings
+ * SettingsErrorBoundary — catches render errors inside the page-settings
  * drawer so a bad page / composer state can't crash the whole Pages tab.
  *
  * Local to Pages to avoid cross-concern coupling with inspector/*.
@@ -52,17 +49,17 @@ export class SettingsErrorBoundary extends React.Component<Props, State> {
           <div className="pg-drawer-slide__title">Settings error</div>
         </div>
         <div className="pg-drawer-slide__body" style={{ padding: 20 }}>
-          <p style={{ color: "#f87171", fontSize: 13, marginBottom: 12 }}>
+          <p style={{ color: "var(--bd-error)", fontSize: 13, marginBottom: 12 }}>
             {this.state.message}
           </p>
           <button
             onClick={() => this.setState({ hasError: false, message: undefined })}
             style={{
               padding: "6px 12px",
-              background: "rgba(45,109,255,0.15)",
-              border: "1px solid rgba(45,109,255,0.4)",
+              background: "var(--bd-accent-tint)",
+              border: "1px solid var(--bd-accent)",
               borderRadius: 4,
-              color: "#a5c0ff",
+              color: "var(--bd-accent)",
               fontSize: 12,
               fontWeight: 500,
               cursor: "pointer",

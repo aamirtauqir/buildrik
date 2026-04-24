@@ -1,9 +1,5 @@
 /**
- * @lint-hex-policy: component-theme
- *   Intentional component-specific palette (error boundary / overlay / preview
- *   frame / warm neutral / onboarding theme). Chrome-hex lint rules do not apply.
- *
- * UnsavedWarningModal — Confirms tab switch with unsaved changes.
+ * UnsavedWarningModal — confirms tab switch with unsaved changes.
  * Form atoms (action buttons) use ROW_MD from layout constants + radius-sm
  * token per Chrome Axiom A1.3 (form atoms exempt for radius scale).
  *
@@ -54,7 +50,7 @@ export const UnsavedWarningModal: React.FC<Props> = ({
           style={{
             fontSize: 15,
             fontWeight: 600,
-            color: "#F5F5F0",
+            color: "var(--bd-fg-heading)",
             marginBottom: 8,
             letterSpacing: "-0.01em",
           }}
@@ -66,13 +62,13 @@ export const UnsavedWarningModal: React.FC<Props> = ({
         <div
           style={{
             fontSize: 13,
-            color: "#A09D96",
+            color: "var(--bd-fg-muted)",
             lineHeight: 1.5,
             marginBottom: 20,
           }}
         >
           You have unsaved changes in{" "}
-          <span style={{ color: "#F5F5F0", fontWeight: 500 }}>{tabLabel}</span> tab.
+          <span style={{ color: "var(--bd-fg-heading)", fontWeight: 500 }}>{tabLabel}</span> tab.
           What would you like to do?
         </div>
 
@@ -110,9 +106,9 @@ const discardBtn: React.CSSProperties = {
   height: ROW_MD,
   padding: "0 12px",
   borderRadius: "var(--bd-radius-sm)",
-  border: "1px solid rgba(239,68,68,0.25)",
-  background: "rgba(239,68,68,0.1)",
-  color: "#f5a3a3",
+  border: "1px solid var(--bd-error)",
+  background: "rgba(220, 38, 38, 0.08)",
+  color: "var(--bd-error)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
@@ -124,9 +120,9 @@ const cancelBtn: React.CSSProperties = {
   height: ROW_MD,
   padding: "0 12px",
   borderRadius: "var(--bd-radius-sm)",
-  border: "1px solid rgba(255,255,255,0.1)",
-  background: "rgba(255,255,255,0.06)",
-  color: "#A09D96",
+  border: "1px solid var(--bd-border-light)",
+  background: "var(--bd-bg-subtle)",
+  color: "var(--bd-fg-muted)",
   fontSize: 12,
   fontWeight: 500,
   cursor: "pointer",
@@ -139,7 +135,7 @@ const saveBtn: React.CSSProperties = {
   padding: "0 12px",
   borderRadius: "var(--bd-radius-sm)",
   border: "none",
-  background: "#2D6DFF",
+  background: "var(--bd-accent)",
   color: "var(--bd-fg-on-accent)",
   fontSize: 12,
   fontWeight: 600,
