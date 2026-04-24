@@ -18,6 +18,7 @@ export { ErrorMessage, type ErrorMessageProps } from "./ErrorMessage";
 export { Tabs, type TabsProps, type Tab } from "./Tabs";
 export { TextInput, type TextInputProps } from "./TextInput";
 export { FormInput, type FormInputProps } from "./FormInput";
+export { NumericStepper, type NumericStepperProps } from "./NumericStepper";
 export { Accordion, type AccordionProps, type AccordionItem } from "./Accordion";
 export {
   ContextMenu,
