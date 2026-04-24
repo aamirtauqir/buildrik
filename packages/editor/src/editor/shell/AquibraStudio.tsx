@@ -35,7 +35,6 @@ import { StudioModals } from "./StudioModals";
 import { StudioPanels } from "./StudioPanels";
 
 import "../../themes/default.css";
-import "../../themes/bridge-tokens.css";
 import "../../themes/ux-fixes.css";
 import "./chrome.css";
 
