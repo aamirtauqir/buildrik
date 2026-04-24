@@ -14,6 +14,15 @@
   color: var(--bd-fg-primary);
   overflow: hidden;
 }
+/* Defeat themes/ux-fixes.css global `button { min-height: 40px }` which
+   bloats every inspector button (tabs, chips, section headers, fields,
+   switches, quick action cards, etc) to 40px. */
+.bdi-panel button,
+.bdi-panel input,
+.bdi-panel select,
+.bdi-panel textarea {
+  min-height: 0;
+}
 .bdi-panel-scroll {
   flex: 1;
   overflow-y: auto;
@@ -127,7 +136,8 @@
 }
 .bdi-tab {
   flex: 1;
-  padding: 8px 6px;
+  padding: 7px 6px;
+  line-height: 1.25;
   font: 500 11px var(--bd-font);
   color: var(--bd-fg-secondary);
   background: transparent;
@@ -136,10 +146,11 @@
   cursor: pointer;
   letter-spacing: -0.005em;
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
+  text-align: center;
+}
+.bdi-tab .bdi-dot {
+  margin-left: 4px;
+  vertical-align: middle;
 }
 .bdi-tab:hover {
   color: var(--bd-fg-primary);
@@ -149,7 +160,7 @@
   font-weight: 600;
   border-bottom-color: var(--bd-accent);
 }
-.bdi-tab .bdi-dot {
+.bdi-dot {
   display: inline-block;
   width: 4px;
   height: 4px;
