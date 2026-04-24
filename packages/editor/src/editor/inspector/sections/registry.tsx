@@ -310,7 +310,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
   layout: defineSection({
     Component: LayoutSection,
     advancedKey: "layout",
-    styleKeys: ["display", "position", "top", "right", "bottom", "left", "z-index", "overflow", "float", "clear", "visibility"],
+    styleKeys: ["display", "position", "width", "height", "top", "right", "bottom", "left", "z-index", "overflow", "overflow-x", "overflow-y", "float", "clear", "visibility"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       propertyStates: ctx.propertyStates,
@@ -322,7 +322,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
   size: defineSection({
     Component: SizeSection,
     advancedKey: "size",
-    styleKeys: ["width", "height", "min-width", "min-height", "max-width", "max-height", "aspect-ratio"],
+    styleKeys: ["width", "height", "min-width", "min-height", "max-width", "max-height", "aspect-ratio", "object-fit"],
     adaptProps: (ctx) => {
       const profile = getProfileFor(ctx.selectedElement.type);
       const hasLayout = profile?.style?.order?.includes("layout") ?? false;
@@ -339,7 +339,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
   spacing: defineSection({
     Component: SpacingSection,
     advancedKey: "spacing",
-    styleKeys: ["padding", "padding-top", "padding-right", "padding-bottom", "padding-left", "margin", "margin-top", "margin-right", "margin-bottom", "margin-left", "gap"],
+    styleKeys: ["padding", "padding-top", "padding-right", "padding-bottom", "padding-left", "margin", "margin-top", "margin-right", "margin-bottom", "margin-left", "gap", "row-gap", "column-gap"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onBatchChange: ctx.onBatchChange,
@@ -351,7 +351,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
 
   flex: defineSection({
     Component: FlexboxSection,
-    styleKeys: ["flex-direction", "justify-content", "align-items", "align-content", "gap", "flex-wrap", "flex-grow", "flex-shrink", "flex-basis"],
+    styleKeys: ["display", "flex-direction", "flex-wrap", "justify-content", "align-items", "align-content", "align-self", "order", "flex-grow", "flex-shrink", "flex-basis", "gap"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onBatchChange: ctx.onBatchChange,
@@ -366,7 +366,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
 
   grid: defineSection({
     Component: GridSection,
-    styleKeys: ["grid-template-columns", "grid-template-rows", "grid-gap", "grid-column", "grid-row", "grid-auto-flow"],
+    styleKeys: ["grid-template-columns", "grid-template-rows", "grid-auto-flow", "grid-column", "grid-row", "gap", "row-gap", "column-gap", "justify-items", "justify-content", "justify-self", "align-items", "align-content", "align-self"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onBatchChange: ctx.onBatchChange,
@@ -380,7 +380,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
   typography: defineSection({
     Component: TypographySection,
     advancedKey: "typography",
-    styleKeys: ["font-family", "font-size", "font-weight", "line-height", "letter-spacing", "color", "text-align", "text-transform", "text-decoration"],
+    styleKeys: ["font-family", "font-size", "font-weight", "font-style", "line-height", "letter-spacing", "color", "text-align", "text-transform", "text-decoration", "white-space", "word-break"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       advancedExpanded: ctx.advancedExpanded,
@@ -394,7 +394,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
   background: defineSection({
     Component: BackgroundSection,
     advancedKey: "background",
-    styleKeys: ["background-color", "background-image", "background-size", "background-position", "background-repeat"],
+    styleKeys: ["background", "background-color", "backgroundColor", "background-image", "background-size", "background-position", "background-repeat", "background-attachment"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onOpenMediaLibrary: ctx.onOpenMediaLibrary,
@@ -410,7 +410,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
     // including mixed-value badges and persisted advanced-toggle state.
     Component: USE_SCHEMA_BORDER ? SchemaBorderSection : BorderSection,
     advancedKey: "border",
-    styleKeys: ["border", "border-width", "border-style", "border-color"],
+    styleKeys: ["border", "border-width", "border-style", "border-color", "outline-width", "outline-style", "outline-color", "outline-offset"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onBatchChange: ctx.onBatchChange,
@@ -499,7 +499,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
 
   effects: defineSection({
     Component: EffectsSection,
-    styleKeys: ["opacity", "box-shadow", "filter", "transform", "transition"],
+    styleKeys: ["opacity", "box-shadow", "filter", "transform", "cursor", "mix-blend-mode", "transition", "transition-property", "transition-duration", "transition-timing-function"],
     adaptProps: adaptBaseStyleProps,
   }),
 
