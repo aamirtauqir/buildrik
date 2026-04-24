@@ -17,12 +17,10 @@ import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/
 import { getElementIcon } from "../../shared/ui/Icons";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { DeleteConfirmModal } from "./components/DeleteConfirmModal";
-import { InspectorControls } from "./components/InspectorControls";
 import { InspectorElementMenu } from "./components/InspectorElementMenu";
 import { InspectorEmptyState } from "./components/InspectorEmptyState";
 import { InspectorErrorBoundary } from "./components/InspectorErrorBoundary";
 import { MultiSelectToolbar } from "./components/MultiSelectToolbar";
-import { PropertySearchResults } from "./components/PropertySearchResults";
 import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hooks";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
 import { VariantSection } from "./sections/VariantSection";
@@ -30,7 +28,6 @@ import { buildAdvancedPropsMapFromRegistry, SECTION_REGISTRY } from "./sections/
 import { deriveCssContext, getPropertyStates } from "./config/cssContext";
 import { detectMixedValues } from "./shared/detectMixedValues";
 import type { Element } from "../../engine";
-import { DevModeToggle } from "./shared/DevModeToggle";
 import { InspectorTabContent } from "./tabs/InspectorTabContent";
 import "./styles/inspector.css";
 
@@ -238,11 +235,10 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const {
     activeTab,
     currentPseudoState,
-    devMode,
     setActiveTab,
     setCurrentPseudoState,
-    setDevMode,
   } = useInspectorState(selectedElement);
+  const devMode = false;
 
   const {
     styles: styles_state,
@@ -277,17 +273,15 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     [selectedElement?.id, composer, styles_state]
   );
 
-  const { expandedSections, collapseAll, expandAll, toggleSection } = useInspectorSections({
+  const { expandedSections, toggleSection } = useInspectorSections({
     selectedElement,
     composer,
   });
 
-  const [searchQuery, setSearchQuery] = React.useState("");
-
   const advancedPropsMap = React.useMemo(() => buildAdvancedPropsMapFromRegistry(), []);
   const advancedState = useAdvancedSettings({
     advancedPropsMap,
-    searchQuery,
+    searchQuery: "",
     styles: styles_state,
     elementId: selectedElement?.id ?? null,
   });
@@ -305,25 +299,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     setStateSelectorManuallyShown(false);
   }, [selectedElement?.id]);
 
-  // Global "/" shortcut focuses search
-  React.useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key !== "/") return;
-      const target = e.target as HTMLElement | null;
-      if (!target) return;
-      const tag = target.tagName;
-      const inTypingContext =
-        tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
-      if (inTypingContext) return;
-      const input = document.getElementById("inspector-search-input") as HTMLInputElement | null;
-      if (!input) return;
-      e.preventDefault();
-      input.focus();
-      input.select();
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, []);
 
   const { selectedIds, isMultiSelect } = useComposerSelection({ composer: composer ?? null });
 
@@ -591,28 +566,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         )}
       </div>
 
-      {/* Inspector controls — search + collapse/expand + dev mode */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          padding: "6px 10px",
-          borderBottom: "1px solid var(--bd-border)",
-          background: "#fff",
-        }}
-      >
-        <div style={{ flex: 1 }}>
-          <InspectorControls
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onCollapseAll={collapseAll}
-            onExpandAll={expandAll}
-          />
-        </div>
-        <DevModeToggle enabled={devMode} onToggle={setDevMode} />
-      </div>
-
       {/* Scrollable body */}
       <div
         ref={contentRef}
@@ -623,40 +576,29 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       >
         <div className="bdi-body">
           <InspectorErrorBoundary>
-            {searchQuery.trim() ? (
-              <PropertySearchResults
-                searchQuery={searchQuery}
-                styles={styles_state}
-                onChange={handleStyleChange}
-                advancedState={advancedState}
+            <InspectorTabContent
+              tabId={activeTab}
+              composer={composer}
+              selectedElement={selectedElement}
+              styles={styles_state}
+              onChange={handleStyleChange}
+              onBatchChange={handleBatchStyleChange}
+              cssContext={enrichedContext}
+              propertyStates={propertyStates}
+              expandedSections={expandedSections}
+              onToggleSection={toggleSection}
+              advancedState={advancedState}
+              onOpenMediaLibrary={onOpenMediaLibrary}
+              onOpenIconPicker={onOpenIconPicker}
+              devMode={devMode}
+            />
+            {activeTab === "style" && selectedElement && (
+              <VariantSection
+                composer={composer ?? null}
+                elementId={selectedElement.id ?? null}
+                isOpen={expandedSections.has(`${selectedElement.type}:variants`)}
+                onToggle={() => toggleSection(selectedElement.type, "variants")}
               />
-            ) : (
-              <>
-                <InspectorTabContent
-                  tabId={activeTab}
-                  composer={composer}
-                  selectedElement={selectedElement}
-                  styles={styles_state}
-                  onChange={handleStyleChange}
-                  onBatchChange={handleBatchStyleChange}
-                  cssContext={enrichedContext}
-                  propertyStates={propertyStates}
-                  expandedSections={expandedSections}
-                  onToggleSection={toggleSection}
-                  advancedState={advancedState}
-                  onOpenMediaLibrary={onOpenMediaLibrary}
-                  onOpenIconPicker={onOpenIconPicker}
-                  devMode={devMode}
-                />
-                {activeTab === "style" && selectedElement && (
-                  <VariantSection
-                    composer={composer ?? null}
-                    elementId={selectedElement.id ?? null}
-                    isOpen={expandedSections.has(`${selectedElement.type}:variants`)}
-                    onToggle={() => toggleSection(selectedElement.type, "variants")}
-                  />
-                )}
-              </>
             )}
           </InspectorErrorBoundary>
         </div>
