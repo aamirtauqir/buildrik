@@ -1,5 +1,6 @@
 /**
- * Border Section - Border, Radius, Outline
+ * Stroke Section — border (width, style, color) + advanced (individual sides + outline).
+ * Corner radius split into its own section (CornerRadiusSection).
  */
 
 import * as React from "react";
@@ -8,13 +9,11 @@ import {
   SelectRow,
   ColorInput,
   InputWithUnit,
-  CornerRadiusInput,
   MoreSettingsToggle,
   type SectionTier,
 } from "../shared/controls";
 import { InputField } from "../../../shared/forms/InputField";
 import { MixedValueIndicator } from "../shared/controls";
-import { parseCssShorthand } from "../shared/utils/parseCssShorthand";
 
 export interface BorderSectionProps {
   styles: Record<string, string>;
@@ -51,22 +50,7 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
   mixedKeys,
   isMultiSelect,
 }) => {
-  const [radiusLinked, setRadiusLinked] = React.useState(true);
-
-  // Parse border radius values
-  const getRadiusValues = () => {
-    const { top: tl, right: tr, bottom: br, left: bl } = parseCssShorthand(styles["border-radius"] || "");
-    return {
-      tl: tl || styles["border-top-left-radius"] || "",
-      tr: tr || styles["border-top-right-radius"] || "",
-      br: br || styles["border-bottom-right-radius"] || "",
-      bl: bl || styles["border-bottom-left-radius"] || "",
-    };
-  };
-
-  const radiusValues = getRadiusValues();
-
-  // Compute border preview — shown as section indicator pill when collapsed
+  // Preview: width + style, shown as indicator pill
   const borderStyle = styles["border-style"] || (styles["border"] ? "set" : undefined);
   const borderWidth = styles["border-width"];
   const borderPreview = borderStyle ? (
@@ -75,22 +59,8 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
     </span>
   ) : undefined;
 
-  const handleRadiusChange = (corner: "tl" | "tr" | "br" | "bl", value: string) => {
-    if (radiusLinked) {
-      onChange("border-radius", value);
-    } else {
-      const map = {
-        tl: "border-top-left-radius",
-        tr: "border-top-right-radius",
-        br: "border-bottom-right-radius",
-        bl: "border-bottom-left-radius",
-      };
-      onChange(map[corner], value);
-    }
-  };
-
   return (
-    <Section title="Border" icon="Square" preview={borderPreview} isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-border">
+    <Section title="Stroke" icon="Square" preview={borderPreview} isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-border">
       {/* Border Width */}
       <div style={{ position: "relative" }}>
         <MixedValueIndicator prop="border-width" mixedKeys={mixedKeys} />
@@ -130,17 +100,6 @@ export const BorderSection: React.FC<BorderSectionProps> = ({
           label="Color"
           value={styles["border-color"] || ""}
           onChange={(v) => onChange("border-color", v)}
-        />
-      </div>
-
-      {/* Border Radius */}
-      <div style={{ position: "relative" }}>
-        <MixedValueIndicator prop="border-radius" mixedKeys={mixedKeys} offsetLeft={56} />
-        <CornerRadiusInput
-          values={radiusValues}
-          onChange={handleRadiusChange}
-          linked={radiusLinked}
-          onLinkToggle={() => setRadiusLinked(!radiusLinked)}
         />
       </div>
 

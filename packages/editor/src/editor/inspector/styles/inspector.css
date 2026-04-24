@@ -13,6 +13,9 @@
   font: 500 11px var(--bd-font);
   color: var(--bd-fg-primary);
   overflow: hidden;
+  border: 1px solid var(--bd-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04);
 }
 /* Defeat themes/ux-fixes.css global `button { min-height: 40px }` which
    bloats every inspector button (tabs, chips, section headers, fields,
@@ -463,6 +466,13 @@
 }
 .bdi-pair .bdi-link.on {
   color: var(--bd-accent);
+}
+.bdi-pair-sep {
+  width: 6px;
+  height: 1px;
+  background: var(--bd-border);
+  justify-self: center;
+  align-self: center;
 }
 
 /* ── Dropdown trigger ─────────────────────────────────── */
@@ -924,6 +934,49 @@
 .bdi-chip-add:hover {
   color: var(--bd-accent);
   border-color: var(--bd-accent);
+}
+.bdi-chip-input {
+  padding: 1px 4px 1px 6px;
+}
+.bdi-chip-input input {
+  font: 500 10px var(--bd-mono);
+  color: var(--bd-fg-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 8ch;
+  min-width: 6ch;
+  padding: 0;
+}
+.bdi-chip-suggest {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 20;
+  background: #fff;
+  border: 1px solid var(--bd-border);
+  border-radius: 4px;
+  padding: 2px;
+  min-width: 140px;
+  max-height: 180px;
+  overflow-y: auto;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1);
+}
+.bdi-chip-suggest button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 4px 6px;
+  font: 500 10px var(--bd-mono);
+  color: var(--bd-fg-primary);
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.bdi-chip-suggest button:hover {
+  background: var(--bd-accent-tint);
+  color: var(--bd-accent);
 }
 
 /* ── Advanced disclosure ─────────────────────────── */

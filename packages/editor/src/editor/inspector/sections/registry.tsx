@@ -53,6 +53,7 @@ import { AllCSSSection } from "./AllCSSSection";
 import { AnimationSection } from "./AnimationSection";
 import { BackgroundSection } from "./BackgroundSection";
 import { BorderSection } from "./BorderSection";
+import { CornerRadiusSection } from "./CornerRadiusSection";
 import { SchemaBorderSection } from "./border/SchemaBorderSection";
 import { USE_SCHEMA_BORDER } from "../renderer/featureFlags";
 import { CSSClassesSection } from "./CSSClassesSection";
@@ -92,6 +93,7 @@ export type SectionId =
   | "typography"
   | "background"
   | "border"
+  | "corner-radius"
   // Element tab
   | "link"
   | "element-properties"
@@ -408,13 +410,25 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
     // including mixed-value badges and persisted advanced-toggle state.
     Component: USE_SCHEMA_BORDER ? SchemaBorderSection : BorderSection,
     advancedKey: "border",
-    styleKeys: ["border", "border-width", "border-style", "border-color", "border-radius"],
+    styleKeys: ["border", "border-width", "border-style", "border-color"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onBatchChange: ctx.onBatchChange,
       advancedExpanded: ctx.advancedExpanded,
       onAdvancedToggle: ctx.onAdvancedToggle,
     }),
+  }),
+
+  "corner-radius": defineSection({
+    Component: CornerRadiusSection,
+    styleKeys: [
+      "border-radius",
+      "border-top-left-radius",
+      "border-top-right-radius",
+      "border-bottom-right-radius",
+      "border-bottom-left-radius",
+    ],
+    adaptProps: (ctx) => adaptBaseStyleProps(ctx),
   }),
 
   // ═══════════════════ ELEMENT TAB ═══════════════════

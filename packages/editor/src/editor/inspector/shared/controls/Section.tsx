@@ -80,7 +80,7 @@ export const Section: React.FC<SectionProps> = ({
           <ChevronDown size={9} aria-hidden="true" />
         </span>
         <span className="bdi-sec-name">{title}</span>
-        {!isOpen && preview && <span>{preview}</span>}
+        {preview && <span className="bdi-sec-preview">{preview}</span>}
         {action && (
           <span
             onClick={(e) => e.stopPropagation()}

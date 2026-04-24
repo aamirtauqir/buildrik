@@ -159,6 +159,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
   const hidden = (prop: string) => propertyStates[prop]?.hidden;
   const disabled = (prop: string) => propertyStates[prop]?.disabled;
   const reason = (prop: string) => propertyStates[prop]?.reason;
+  const [aspectLocked, setAspectLocked] = React.useState(false);
 
   const w = styles.width || "";
   const h = styles.height || "";
@@ -186,120 +187,136 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
       tier={tier}
       id="inspector-section-size"
     >
-      {/* Width */}
-      {showDimensions && !hidden("width") && (
-        <div style={{ position: "relative", display: "flex", alignItems: "center" }}
-          className="buildrick-row-hover-chain"
-        >
-          <MixedValueIndicator prop="width" mixedKeys={mixedKeys} />
-          <div style={{ flex: 1 }}>
-            <InputWithUnit
-              label="Width"
-              value={styles.width || ""}
-              onChange={(v) => onChange("width", v)}
-              disabled={disabled("width")}
-              disabledReason={reason("width")}
-              isOverridden={propertyStates["width"]?.isOverridden}
-              fieldIcon={<span style={{ font: "600 10px var(--bd-font)" }}>W</span>}
-            />
-          </div>
-          {!disabled("width") && (
-            <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", zIndex: 2 }}>
-              <ChainButton property="width" value={styles.width || ""} onChange={(v) => onChange("width", v)} />
+      {/* W | link | H pair */}
+      {showDimensions && !hidden("width") && !hidden("height") && (
+        <div className="bdi-pair" role="group" aria-label="Width and height">
+          <div
+            style={{ position: "relative", display: "flex", alignItems: "center" }}
+            className="buildrick-row-hover-chain"
+          >
+            <MixedValueIndicator prop="width" mixedKeys={mixedKeys} />
+            <div style={{ flex: 1 }}>
+              <InputWithUnit
+                label=""
+                value={styles.width || ""}
+                onChange={(v) => onChange("width", v)}
+                disabled={disabled("width")}
+                disabledReason={reason("width")}
+                isOverridden={propertyStates["width"]?.isOverridden}
+                fieldIcon={<span style={{ font: "600 10px var(--bd-font)" }}>W</span>}
+              />
             </div>
-          )}
+            {!disabled("width") && (
+              <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", zIndex: 2 }}>
+                <ChainButton property="width" value={styles.width || ""} onChange={(v) => onChange("width", v)} />
+              </div>
+            )}
+          </div>
+          <button
+            type="button"
+            className={`bdi-link${aspectLocked ? " on" : ""}`}
+            onClick={() => setAspectLocked((v) => !v)}
+            title={aspectLocked ? "Unlock aspect ratio" : "Lock aspect ratio"}
+            aria-label={aspectLocked ? "Unlock aspect ratio" : "Lock aspect ratio"}
+            aria-pressed={aspectLocked}
+          >
+            {aspectLocked ? <Link2 size={11} aria-hidden="true" /> : <Link2Off size={11} aria-hidden="true" />}
+          </button>
+          <div
+            style={{ position: "relative", display: "flex", alignItems: "center" }}
+            className="buildrick-row-hover-chain"
+          >
+            <MixedValueIndicator prop="height" mixedKeys={mixedKeys} />
+            <div style={{ flex: 1 }}>
+              <InputWithUnit
+                label=""
+                value={styles.height || ""}
+                onChange={(v) => onChange("height", v)}
+                disabled={disabled("height")}
+                disabledReason={reason("height")}
+                isOverridden={propertyStates["height"]?.isOverridden}
+                fieldIcon={<span style={{ font: "600 10px var(--bd-font)" }}>H</span>}
+              />
+            </div>
+            {!disabled("height") && (
+              <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", zIndex: 2 }}>
+                <ChainButton property="height" value={styles.height || ""} onChange={(v) => onChange("height", v)} />
+              </div>
+            )}
+          </div>
         </div>
       )}
 
-      {/* Height */}
-      {showDimensions && !hidden("height") && (
-        <div style={{ position: "relative", display: "flex", alignItems: "center" }}
-          className="buildrick-row-hover-chain"
-        >
-          <MixedValueIndicator prop="height" mixedKeys={mixedKeys} />
-          <div style={{ flex: 1 }}>
-            <InputWithUnit
-              label="Height"
-              value={styles.height || ""}
-              onChange={(v) => onChange("height", v)}
-              disabled={disabled("height")}
-              disabledReason={reason("height")}
-              isOverridden={propertyStates["height"]?.isOverridden}
-              fieldIcon={<span style={{ font: "600 10px var(--bd-font)" }}>H</span>}
-            />
-          </div>
-          {!disabled("height") && (
-            <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", zIndex: 2 }}>
-              <ChainButton property="height" value={styles.height || ""} onChange={(v) => onChange("height", v)} />
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ─── Advanced: min/max/ratio (behind More settings) ─── */}
+      {/* ─── Advanced: min/max pairs (behind More settings) ─── */}
       {advancedExpanded && (
         <>
-          {/* Min Width */}
-          {!hidden("min-width") && (
-            <div style={{ position: "relative" }}>
-              <MixedValueIndicator prop="min-width" mixedKeys={mixedKeys} />
-              <InputWithUnit
-                label="Min W"
-                value={styles["min-width"] || ""}
-                onChange={(v) => onChange("min-width", v)}
-                disabled={disabled("min-width")}
-                disabledReason={reason("min-width")}
-                isOverridden={propertyStates["min-width"]?.isOverridden}
-                fieldIcon={<span style={{ font: "600 9px var(--bd-font)" }}>min</span>}
-              />
+          {/* Min W | · | Max W */}
+          {(!hidden("min-width") || !hidden("max-width")) && (
+            <div className="bdi-pair" role="group" aria-label="Width constraints">
+              {!hidden("min-width") ? (
+                <div style={{ position: "relative" }}>
+                  <MixedValueIndicator prop="min-width" mixedKeys={mixedKeys} />
+                  <InputWithUnit
+                    label=""
+                    value={styles["min-width"] || ""}
+                    onChange={(v) => onChange("min-width", v)}
+                    disabled={disabled("min-width")}
+                    disabledReason={reason("min-width")}
+                    isOverridden={propertyStates["min-width"]?.isOverridden}
+                    fieldIcon={<span style={{ font: "600 9px var(--bd-font)" }}>min</span>}
+                  />
+                </div>
+              ) : <span />}
+              <span className="bdi-pair-sep" aria-hidden="true" />
+              {!hidden("max-width") ? (
+                <div style={{ position: "relative" }}>
+                  <MixedValueIndicator prop="max-width" mixedKeys={mixedKeys} />
+                  <InputWithUnit
+                    label=""
+                    value={styles["max-width"] || ""}
+                    onChange={(v) => onChange("max-width", v)}
+                    disabled={disabled("max-width")}
+                    disabledReason={reason("max-width")}
+                    isOverridden={propertyStates["max-width"]?.isOverridden}
+                    fieldIcon={<span style={{ font: "600 9px var(--bd-font)" }}>max</span>}
+                  />
+                </div>
+              ) : <span />}
             </div>
           )}
 
-          {/* Max Width */}
-          {!hidden("max-width") && (
-            <div style={{ position: "relative" }}>
-              <MixedValueIndicator prop="max-width" mixedKeys={mixedKeys} />
-              <InputWithUnit
-                label="Max W"
-                value={styles["max-width"] || ""}
-                onChange={(v) => onChange("max-width", v)}
-                disabled={disabled("max-width")}
-                disabledReason={reason("max-width")}
-                isOverridden={propertyStates["max-width"]?.isOverridden}
-                fieldIcon={<span style={{ font: "600 9px var(--bd-font)" }}>max</span>}
-              />
-            </div>
-          )}
-
-          {/* Min Height */}
-          {!hidden("min-height") && (
-            <div style={{ position: "relative" }}>
-              <MixedValueIndicator prop="min-height" mixedKeys={mixedKeys} />
-              <InputWithUnit
-                label="Min H"
-                value={styles["min-height"] || ""}
-                onChange={(v) => onChange("min-height", v)}
-                disabled={disabled("min-height")}
-                disabledReason={reason("min-height")}
-                isOverridden={propertyStates["min-height"]?.isOverridden}
-                fieldIcon={<span style={{ font: "600 9px var(--bd-font)" }}>min</span>}
-              />
-            </div>
-          )}
-
-          {/* Max Height */}
-          {!hidden("max-height") && (
-            <div style={{ position: "relative" }}>
-              <MixedValueIndicator prop="max-height" mixedKeys={mixedKeys} />
-              <InputWithUnit
-                label="Max H"
-                value={styles["max-height"] || ""}
-                onChange={(v) => onChange("max-height", v)}
-                disabled={disabled("max-height")}
-                disabledReason={reason("max-height")}
-                isOverridden={propertyStates["max-height"]?.isOverridden}
-                fieldIcon={<span style={{ font: "600 9px var(--bd-font)" }}>max</span>}
-              />
+          {/* Min H | · | Max H */}
+          {(!hidden("min-height") || !hidden("max-height")) && (
+            <div className="bdi-pair" role="group" aria-label="Height constraints">
+              {!hidden("min-height") ? (
+                <div style={{ position: "relative" }}>
+                  <MixedValueIndicator prop="min-height" mixedKeys={mixedKeys} />
+                  <InputWithUnit
+                    label=""
+                    value={styles["min-height"] || ""}
+                    onChange={(v) => onChange("min-height", v)}
+                    disabled={disabled("min-height")}
+                    disabledReason={reason("min-height")}
+                    isOverridden={propertyStates["min-height"]?.isOverridden}
+                    fieldIcon={<span style={{ font: "600 9px var(--bd-font)" }}>min</span>}
+                  />
+                </div>
+              ) : <span />}
+              <span className="bdi-pair-sep" aria-hidden="true" />
+              {!hidden("max-height") ? (
+                <div style={{ position: "relative" }}>
+                  <MixedValueIndicator prop="max-height" mixedKeys={mixedKeys} />
+                  <InputWithUnit
+                    label=""
+                    value={styles["max-height"] || ""}
+                    onChange={(v) => onChange("max-height", v)}
+                    disabled={disabled("max-height")}
+                    disabledReason={reason("max-height")}
+                    isOverridden={propertyStates["max-height"]?.isOverridden}
+                    fieldIcon={<span style={{ font: "600 9px var(--bd-font)" }}>max</span>}
+                  />
+                </div>
+              ) : <span />}
             </div>
           )}
         </>

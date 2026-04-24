@@ -7,7 +7,6 @@
 
 import * as React from "react";
 import type { Composer } from "../../../engine";
-import { InputField } from "../../../shared/forms/InputField";
 import { devWarn } from "../../../shared/utils/devLogger";
 import { runTransaction } from "../../../shared/utils/helpers";
 import { Section, type SectionTier } from "../shared/controls";
@@ -35,6 +34,8 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
 }) => {
   const [newClass, setNewClass] = React.useState("");
   const [showSuggestions, setShowSuggestions] = React.useState(false);
+  const [addingInline, setAddingInline] = React.useState(false);
+  const inlineInputRef = React.useRef<HTMLInputElement>(null);
 
   // SSOT: read directly from composer on every render (ARCH-05 / H-07 fix)
   const classes = React.useMemo<string[]>(() => {
@@ -91,97 +92,82 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
       .slice(0, 8);
   }, [newClass, globalClasses, classes]);
 
-  return (
-    <Section title="CSS Classes" icon="Tag" defaultOpen isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-css-classes">
-      {/* Applied Classes */}
-      <div className="bdi-chips" style={{ marginBottom: 6 }}>
-        {classes.length > 0 ? (
-          classes.map((cls, i) => (
-            <span key={cls} className={`bdi-chip${i === 0 ? " pri" : ""}`}>
-              .{cls}
-              <button
-                type="button"
-                className="bdi-chip-x"
-                onClick={() => removeClass(cls)}
-                aria-label={`Remove class ${cls}`}
-              >
-                ×
-              </button>
-            </span>
-          ))
-        ) : (
-          <span
-            style={{
-              font: "500 10px var(--bd-font)",
-              color: "var(--bd-fg-muted)",
-              fontStyle: "italic",
-            }}
-          >
-            No classes — add one below
-          </span>
-        )}
-      </div>
+  const startInlineAdd = () => {
+    setAddingInline(true);
+    setShowSuggestions(true);
+    requestAnimationFrame(() => inlineInputRef.current?.focus());
+  };
 
-      {/* Add Class Input */}
-      <div style={{ position: "relative" as const }}>
-        <div style={{ display: "flex", gap: 8 }}>
-          <InputField
-            type="text"
-            value={newClass}
-            onChange={(e) => {
-              setNewClass(e.target.value);
-              setShowSuggestions(true);
-            }}
-            onFocus={() => setShowSuggestions(true)}
-            onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                addClass(newClass);
-              }
-              if (e.key === "Tab") {
-                setShowSuggestions(false);
-              }
-            }}
-            placeholder="Add class name…"
-            aria-label="Add CSS class"
-          />
+  const cancelInlineAdd = () => {
+    setNewClass("");
+    setAddingInline(false);
+    setShowSuggestions(false);
+  };
+
+  return (
+    <Section title="Classes" icon="Tag" defaultOpen isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-css-classes">
+      <div className="bdi-chips" style={{ position: "relative" }}>
+        {classes.map((cls, i) => (
+          <span key={cls} className={`bdi-chip${i === 0 ? " pri" : ""}`}>
+            .{cls}
+            <button
+              type="button"
+              className="bdi-chip-x"
+              onClick={() => removeClass(cls)}
+              aria-label={`Remove class ${cls}`}
+            >
+              ×
+            </button>
+          </span>
+        ))}
+
+        {addingInline ? (
+          <span className="bdi-chip bdi-chip-input" role="presentation">
+            <span aria-hidden="true" style={{ opacity: 0.5 }}>.</span>
+            <input
+              ref={inlineInputRef}
+              type="text"
+              value={newClass}
+              onChange={(e) => {
+                setNewClass(e.target.value);
+                setShowSuggestions(true);
+              }}
+              onBlur={() => setTimeout(() => {
+                if (newClass.trim()) addClass(newClass);
+                else cancelInlineAdd();
+              }, 120)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addClass(newClass);
+                  setAddingInline(false);
+                }
+                if (e.key === "Escape") {
+                  e.preventDefault();
+                  cancelInlineAdd();
+                }
+              }}
+              placeholder="class-name"
+              aria-label="Add CSS class"
+            />
+          </span>
+        ) : (
           <button
             type="button"
-            onClick={() => addClass(newClass)}
+            className="bdi-chip bdi-chip-add"
+            onClick={startInlineAdd}
             aria-label="Add class"
-            style={{
-              padding: "10px 16px",
-              background: "var(--buildrick-accent)",
-              border: "none",
-              borderRadius: 6,
-              color: "var(--buildrick-text-on-accent)",
-              fontSize: 12,
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
+            title="Add class"
           >
-            Add
+            +
           </button>
-        </div>
+        )}
 
-        {/* Global class autocomplete (H-06 fix) */}
-        {showSuggestions && suggestions.length > 0 && (
+        {addingInline && showSuggestions && suggestions.length > 0 && (
           <div
             role="listbox"
             aria-label="Class suggestions"
-            style={{
-              position: "absolute" as const,
-              top: "100%",
-              left: 0,
-              right: 60,
-              marginTop: 4,
-              background: "var(--buildrick-surface-3)",
-              border: "1px solid var(--buildrick-border)",
-              borderRadius: 6,
-              overflow: "hidden",
-              zIndex: 10,
-            }}
+            className="bdi-chip-suggest"
           >
             {suggestions.map((suggestion) => (
               <button
@@ -189,17 +175,10 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
                 type="button"
                 role="option"
                 aria-selected={false}
-                onClick={() => addClass(suggestion)}
-                style={{
-                  width: "100%",
-                  padding: "8px 12px",
-                  background: "transparent",
-                  border: "none",
-                  borderBottom: "1px solid var(--buildrick-border-subtle)",
-                  color: "var(--buildrick-text-primary)",
-                  fontSize: 12,
-                  textAlign: "left" as const,
-                  cursor: "pointer",
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  addClass(suggestion);
+                  setAddingInline(false);
                 }}
               >
                 .{suggestion}

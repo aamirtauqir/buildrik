@@ -60,6 +60,7 @@ const CONTAINER_PROFILE: ElementProfile = {
       "typography",
       "background",
       "border",
+      "corner-radius",
       "layout",
       "grid",
     ],
@@ -79,6 +80,7 @@ const TEXT_PROFILE: ElementProfile = {
       "layout",
       "background",
       "border",
+      "corner-radius",
     ],
   },
   element: { order: ["css-classes", "all-css"] },
@@ -98,6 +100,7 @@ const FLEX_PROFILE: ElementProfile = {
       "spacing",
       "background",
       "border",
+      "corner-radius",
       "typography",
     ],
   },
@@ -118,6 +121,7 @@ const GRID_PROFILE: ElementProfile = {
       "spacing",
       "background",
       "border",
+      "corner-radius",
       "typography",
     ],
   },
@@ -129,7 +133,7 @@ const GRID_PROFILE: ElementProfile = {
  *  object-fit) and Element Properties (src, alt, etc.) matter first. */
 const MEDIA_PROFILE: ElementProfile = {
   defaultTab: "style",
-  style: { order: ["size", "layout", "spacing", "border", "background"] },
+  style: { order: ["size", "layout", "spacing", "border", "corner-radius", "background"] },
   element: { order: ["element-properties", "css-classes", "all-css"] },
   effects: { order: ["effects", "animation", "visibility", "interactions"] },
 };
@@ -144,6 +148,7 @@ const BUTTON_PROFILE: ElementProfile = {
       "typography",
       "background",
       "border",
+      "corner-radius",
       "spacing",
       "size",
       "layout",
@@ -162,6 +167,7 @@ const INPUT_PROFILE: ElementProfile = {
     order: [
       "typography",
       "border",
+      "corner-radius",
       "size",
       "spacing",
       "background",
