@@ -63,7 +63,6 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         color: "var(--buildrick-text-on-accent)",
         fontWeight: 600,
         border: "none",
-        boxShadow: "0 2px 8px rgba(99, 102, 241, 0.25)",
       },
       // Tier 2 — Secondary (Preview, Export, Cancel)
       secondary: {
