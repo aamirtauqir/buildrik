@@ -14,4 +14,17 @@ describe("useInspectorState pseudo reset", () => {
     rerender({ el: { id: "el2", type: "box" } });
     expect(result.current.currentPseudoState).toBe("normal");
   });
+
+  it("preserves pseudoState across non-id rerenders (new object, same id)", () => {
+    const { result, rerender } = renderHook(
+      ({ el }) => useInspectorState(el),
+      { initialProps: { el: { id: "el1", type: "box" } } }
+    );
+    act(() => { result.current.setCurrentPseudoState("hover"); });
+    expect(result.current.currentPseudoState).toBe("hover");
+
+    // Parent rerenders with a NEW object but same id — should NOT reset.
+    rerender({ el: { id: "el1", type: "box" } });
+    expect(result.current.currentPseudoState).toBe("hover");
+  });
 });

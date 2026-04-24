@@ -68,14 +68,18 @@ export function useInspectorState(selectedElement: SelectedElement | null): Insp
 
   // Extract element ID for dependency tracking
   const elementId = selectedElement?.id;
+  const elementType = selectedElement?.type;
+  const elementTagName = selectedElement?.tagName;
 
-  // Smart Tab Auto-Expand: Update when element selection changes
+  // Smart Tab Auto-Expand: Update when element selection changes.
+  // Deps deliberately narrowed to scalar keys — including the whole
+  // `selectedElement` object would cause parent-prop identity churn
+  // to reset the user's tab choice on every rerender.
   useEffect(() => {
-    if (!selectedElement) return;
-
-    const recommendedTab = getRecommendedTab(selectedElement.type, selectedElement.tagName);
+    if (!elementType) return;
+    const recommendedTab = getRecommendedTab(elementType, elementTagName);
     setActiveTab(recommendedTab);
-  }, [elementId, selectedElement]);
+  }, [elementId, elementType, elementTagName]);
 
   // Reset pseudo-state when element changes — :hover on element A
   // must not persist onto element B's edit session.
