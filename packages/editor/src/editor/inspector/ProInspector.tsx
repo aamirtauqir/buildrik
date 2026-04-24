@@ -10,7 +10,7 @@ import { ChevronDown, Monitor, Tablet, Smartphone, Crosshair, CornerLeftUp } fro
 import * as React from "react";
 import { BindingPopover } from "./components/BindingPopover";
 import type { Composer } from "../../engine";
-import { BREAKPOINTS, BREAKPOINT_ORDER, getBreakpointQuery, isValidBreakpoint } from "../../shared/constants/breakpoints";
+import { BREAKPOINTS, BREAKPOINT_ORDER, isValidBreakpoint } from "../../shared/constants/breakpoints";
 import type { DeviceType, PseudoStateId } from "../../shared/types";
 import type { BreakpointId } from "../../shared/types/breakpoints";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
@@ -26,6 +26,7 @@ import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
 import { VariantSection } from "./sections/VariantSection";
 import { buildAdvancedPropsMapFromRegistry, SECTION_REGISTRY } from "./sections/registry";
 import { deriveCssContext, getPropertyStates } from "./config/cssContext";
+import { computeStatesWithOverrides } from "./config/pseudoOverrides";
 import { detectMixedValues } from "./shared/detectMixedValues";
 import type { Element } from "../../engine";
 import { InspectorTabContent } from "./tabs/InspectorTabContent";
@@ -256,22 +257,10 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   }, [selectedElement?.id, composer, currentBreakpoint, styles_state]);
 
   // Pseudo-states with overrides — breakpoint-qualified so mobile/tablet
-  // pseudo rules (stored under their media query) light up the indicator
-  // pills. Reads the current breakpoint's mediaQuery; desktop = undefined.
+  // pseudo rules light up the indicator pills at the active zoom level.
+  // Logic extracted for testability; see config/pseudoOverrides.ts.
   const statesWithOverrides = React.useMemo<Set<PseudoStateId>>(
-    () => {
-      if (!selectedElement?.id || !composer?.styles) return new Set();
-      const pseudoStates = ["hover", "focus", "active", "disabled"] as const;
-      const mq = currentBreakpoint === "desktop" ? undefined : getBreakpointQuery(currentBreakpoint) ?? undefined;
-      const withOverrides = new Set<PseudoStateId>();
-      pseudoStates.forEach((state) => {
-        const rule = composer.styles.getRule(`[data-buildrick-id="${selectedElement.id}"]:${state}`, mq);
-        if (rule && Object.keys(rule.properties ?? {}).length > 0) {
-          withOverrides.add(state);
-        }
-      });
-      return withOverrides;
-    },
+    () => computeStatesWithOverrides(selectedElement?.id, composer, currentBreakpoint),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedElement?.id, composer, styles_state, currentBreakpoint]
   );
