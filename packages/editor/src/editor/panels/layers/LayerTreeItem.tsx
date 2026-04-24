@@ -45,38 +45,39 @@ export interface LayerTreeItemProps {
   displayPrefs: LayerDisplayPrefs;
 }
 
-export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
-  layer,
-  composer,
-  expandedIds,
-  dragState,
-  hiddenIds,
-  lockedIds,
-  selectedIds,
-  customNames,
-  canvasHoveredId,
-  editingId,
-  editingName,
-  editInputRef,
-  onToggleExpand,
-  onToggleVisibility,
-  onToggleLock,
-  onStartEditing,
-  onSaveEditedName,
-  onCancelEditing,
-  onEditingNameChange,
-  onMouseEnter,
-  onMouseLeave,
-  onDragStart,
-  onDragEnd,
-  onDragOver,
-  onDragLeave,
-  onDrop,
-  onSelect,
-  onContextMenu,
-  getVisibleLayerIds,
-  displayPrefs,
-}) => {
+export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
+  const {
+    layer,
+    composer,
+    expandedIds,
+    dragState,
+    hiddenIds,
+    lockedIds,
+    selectedIds,
+    customNames,
+    canvasHoveredId,
+    editingId,
+    editingName,
+    editInputRef,
+    onToggleExpand,
+    onToggleVisibility,
+    onToggleLock,
+    onStartEditing,
+    onSaveEditedName,
+    onCancelEditing,
+    onEditingNameChange,
+    onMouseEnter,
+    onMouseLeave,
+    onDragStart,
+    onDragEnd,
+    onDragOver,
+    onDragLeave,
+    onDrop,
+    onSelect,
+    onContextMenu,
+    getVisibleLayerIds,
+    displayPrefs,
+  } = props;
   const isSelected = selectedIds.has(layer.id);
   const isExpanded = expandedIds.has(layer.id);
   const hasChildren = layer.children.length > 0;
@@ -138,6 +139,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
   };
 
   return (
+    <>
     <div
       className={rowClassNames}
       role="treeitem"
@@ -270,6 +272,10 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
         </svg>
       </button>
     </div>
+    {isExpanded && hasChildren && layer.children.map((child) => (
+      <LayerTreeItem key={child.id} {...props} layer={child} />
+    ))}
+    </>
   );
 };
 
