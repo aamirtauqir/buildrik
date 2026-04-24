@@ -105,7 +105,10 @@ export const Popover: React.FC<PopoverProps> = ({
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen]);
 
-  // Styles for the portal content
+  // Styles for the portal content — tokens via --bd-* alias layer.
+  // Shadow updated from black rgba(0,0,0,0.4) to slate double-layer per
+  // prototype comp-popovers.html (P0c P2) + DESIGN.md §Shadows
+  // ("cool-tinted slate, never warm grey or black").
   const popoverStyles: React.CSSProperties = {
     position: "absolute",
     top: coords.top,
@@ -118,12 +121,12 @@ export const Popover: React.FC<PopoverProps> = ({
           : position === "left"
             ? "translateY(-50%) translateX(-100%)"
             : "translateY(-50%)",
-    background: "var(--buildrick-bg-panel)",
-    borderRadius: 8,
-    boxShadow: "0 8px 30px rgba(0,0,0,0.4)",
-    border: "1px solid var(--buildrick-border)",
-    padding: 12,
-    zIndex: 9999, // High Z-Index to stay on top
+    background: "var(--bd-bg-card)",
+    borderRadius: "var(--bd-radius-md)",
+    boxShadow: "var(--bd-shadow-lg)",
+    border: "1px solid var(--bd-border)",
+    padding: "var(--bd-space-3)",
+    zIndex: 9999, // Stay on top of any in-panel overlay
     minWidth: 200,
     animation: "buildrick-popover-in 0.15s ease",
   };
