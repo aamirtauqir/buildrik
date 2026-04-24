@@ -360,12 +360,12 @@
 
 @keyframes emptyCanvasPulse {
   0%, 100% {
-    border-color: #e2e8f0;
-    box-shadow: inset 0 0 0 rgba(139, 92, 246, 0);
+    border-color: var(--bd-border);
+    box-shadow: inset 0 0 0 transparent;
   }
   50% {
-    border-color: #cbd5e1;
-    box-shadow: inset 0 0 60px var(--buildrick-accent-tint);
+    border-color: var(--bd-border-medium);
+    box-shadow: inset 0 0 60px var(--bd-accent-tint);
   }
 }
 

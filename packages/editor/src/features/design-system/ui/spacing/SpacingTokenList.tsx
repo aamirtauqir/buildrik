@@ -301,7 +301,7 @@ const SpacingDiagram: React.FC<{ tokens: DesignToken[] }> = ({ tokens }) => {
           y="4"
           width={Math.min(getVal("space-4") * 2, 40)}
           height="52"
-          fill="rgba(139,92,246,0.15)"
+          fill="rgba(8,145,178,0.15)"
           rx="4"
         />
         <rect
@@ -309,7 +309,7 @@ const SpacingDiagram: React.FC<{ tokens: DesignToken[] }> = ({ tokens }) => {
           y="4"
           width={Math.min(getVal("space-4") * 2, 40)}
           height="52"
-          fill="rgba(139,92,246,0.15)"
+          fill="rgba(8,145,178,0.15)"
           rx="4"
         />
         <line

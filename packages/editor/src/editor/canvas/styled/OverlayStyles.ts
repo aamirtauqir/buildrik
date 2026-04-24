@@ -148,9 +148,9 @@ export const GridPattern = styled.div<{ gridSize?: number }>`
 
 export const ParentHighlightBox = styled.div<{ isLocked?: boolean }>`
   position: absolute;
-  border: 1px dashed rgba(139, 92, 246, 0.5);
+  border: 1px dashed var(--bd-accent-alpha-30);
   border-radius: ${radius.sm}px;
-  background: rgba(139, 92, 246, 0.03);
+  background: var(--bd-accent-subtle);
   pointer-events: none;
   ${cssFragments.transition}
 
@@ -173,7 +173,7 @@ export const ParentHighlightBadge = styled.div`
   background: ${colors.primary.alpha15};
   border-radius: ${radius.sm}px;
   font-size: 12px;
-  color: rgba(139, 92, 246, 0.8);
+  color: var(--bd-accent);
   font-weight: 500;
   white-space: nowrap;
 `;
