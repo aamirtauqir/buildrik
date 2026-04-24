@@ -1,4 +1,7 @@
 import type { Composer, Element } from "../../../engine";
+import { getBreakpointQuery } from "../../../shared/constants/breakpoints";
+import type { PseudoStateId } from "../../../shared/types";
+import type { BreakpointId } from "../../../shared/types/breakpoints";
 import type { InspectorContext } from "../config";
 import { buildInspectorContext } from "../config";
 
@@ -39,11 +42,44 @@ export interface PropertyState {
 const FLEX_DISPLAYS = new Set(["flex", "inline-flex"]);
 const GRID_DISPLAYS = new Set(["grid", "inline-grid"]);
 
+/**
+ * Compute the effective (merged) style map for an element at the given
+ * breakpoint + pseudo-state. Layers base styles with breakpoint overlay
+ * and pseudo rule — same cascade order as useStyleHandlers applies to the
+ * selected element. Used to derive parent styles for isFlexItem/isGridItem
+ * detection under responsive overrides.
+ */
+export function computeEffectiveStyles(
+  el: Element | null | undefined,
+  composer: Composer | null | undefined,
+  currentBreakpoint: BreakpointId,
+  currentPseudoState: PseudoStateId,
+): Record<string, string> {
+  if (!el) return {};
+  let out: Record<string, string> = { ...(el.getStyles?.() || {}) };
+
+  if (currentBreakpoint !== "desktop" && composer?.styles) {
+    const bpStyles = composer.styles.getBreakpointStyle(el.getId(), currentBreakpoint);
+    out = { ...out, ...bpStyles };
+  }
+
+  if (currentPseudoState !== "normal" && composer?.styles) {
+    const selector = `[data-buildrick-id="${el.getId()}"]:${currentPseudoState}`;
+    const mq = currentBreakpoint === "desktop" ? undefined : getBreakpointQuery(currentBreakpoint) ?? undefined;
+    const pseudoRule = composer.styles.getRule(selector, mq);
+    if (pseudoRule) out = { ...out, ...pseudoRule.properties };
+  }
+
+  return out;
+}
+
 export function deriveCssContext(
   selectedElement: { id: string; type: string } | null,
   composer?: Composer | null,
   devMode = false,
-  effectiveStyles?: Record<string, string>
+  effectiveStyles?: Record<string, string>,
+  currentBreakpoint: BreakpointId = "desktop",
+  currentPseudoState: PseudoStateId = "normal",
 ): CssContext {
   const elementType = selectedElement?.type || "";
 
@@ -79,7 +115,7 @@ export function deriveCssContext(
 
   const baseStyles = el?.getStyles?.() || {};
   const styles = effectiveStyles ?? baseStyles;
-  const parentStyles = parent?.getStyles?.() || {};
+  const parentStyles = computeEffectiveStyles(parent, composer, currentBreakpoint, currentPseudoState);
 
   const display = styles.display || "";
   const parentDisplay = parentStyles.display || "";

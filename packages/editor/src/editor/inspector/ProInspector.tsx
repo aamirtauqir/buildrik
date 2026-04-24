@@ -303,7 +303,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const { selectedIds, isMultiSelect } = useComposerSelection({ composer: composer ?? null });
 
   const [contextState, setContextState] = React.useState(() =>
-    deriveCssContext(selectedElement, composer, devMode, styles_state)
+    deriveCssContext(selectedElement, composer, devMode, styles_state, currentBreakpoint, currentPseudoState)
   );
   const propertyStates = getPropertyStates(contextState);
 
@@ -315,8 +315,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   }
 
   React.useEffect(() => {
-    setContextState(deriveCssContext(selectedElement, composer, devMode, styles_state));
-  }, [selectedElement, composer, styles_state, devMode]);
+    setContextState(deriveCssContext(selectedElement, composer, devMode, styles_state, currentBreakpoint, currentPseudoState));
+  }, [selectedElement, composer, styles_state, devMode, currentBreakpoint, currentPseudoState]);
 
   const selectedElements = React.useMemo<readonly Element[]>(() => {
     if (!composer || selectedIds.length === 0) return [];
