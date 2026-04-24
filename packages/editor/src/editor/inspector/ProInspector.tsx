@@ -391,7 +391,12 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   if (hasMultipleSelected) {
     return (
       <div className="bdi-panel">
-        <MultiSelectToolbar selectedIds={selectedIds} composer={composer ?? null} />
+        <MultiSelectToolbar
+          selectedIds={selectedIds}
+          composer={composer ?? null}
+          currentBreakpoint={currentBreakpoint}
+          currentPseudoState={currentPseudoState}
+        />
       </div>
     );
   }

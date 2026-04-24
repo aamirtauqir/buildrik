@@ -16,6 +16,8 @@ import {
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { AlignmentHandler } from "../../../engine/canvas/AlignmentHandler";
+import type { PseudoStateId } from "../../../shared/types";
+import type { BreakpointId } from "../../../shared/types/breakpoints";
 import { IconButton } from "../../../shared/ui/IconButton";
 import { BatchStylePanel } from "./BatchStylePanel";
 
@@ -28,6 +30,10 @@ export interface MultiSelectToolbarProps {
   selectedIds: string[];
   /** Composer instance for element manipulation */
   composer: Composer | null;
+  /** Active responsive breakpoint — threaded into batch edits so writes land on the right layer */
+  currentBreakpoint?: BreakpointId;
+  /** Active pseudo-state — threaded into batch edits so writes land on the right layer */
+  currentPseudoState?: PseudoStateId;
 }
 
 // ============================================================================
@@ -83,6 +89,8 @@ const countBadgeStyles: React.CSSProperties = {
 export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
   selectedIds,
   composer,
+  currentBreakpoint = "desktop",
+  currentPseudoState = "normal",
 }) => {
   // Memoize alignment handler
   const alignmentHandler = React.useMemo(() => {
@@ -265,7 +273,12 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
       </div>
 
       {/* Batch style editor — apply common style changes to all selected elements */}
-      <BatchStylePanel composer={composer} selectedIds={selectedIds} />
+      <BatchStylePanel
+        composer={composer}
+        selectedIds={selectedIds}
+        currentBreakpoint={currentBreakpoint}
+        currentPseudoState={currentPseudoState}
+      />
     </div>
   );
 };

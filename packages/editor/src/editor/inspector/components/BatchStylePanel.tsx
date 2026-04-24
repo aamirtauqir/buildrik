@@ -16,6 +16,8 @@
 
 import * as React from "react";
 import type { Composer } from "../../../engine";
+import type { PseudoStateId } from "../../../shared/types";
+import type { BreakpointId } from "../../../shared/types/breakpoints";
 import { useBatchStyleHandler } from "../hooks/useBatchStyleHandler";
 import { ColorInput, InputWithUnit } from "../shared/controls";
 
@@ -26,6 +28,8 @@ import { ColorInput, InputWithUnit } from "../shared/controls";
 export interface BatchStylePanelProps {
   composer: Composer | null;
   selectedIds: string[];
+  currentBreakpoint?: BreakpointId;
+  currentPseudoState?: PseudoStateId;
 }
 
 // ============================================================================
@@ -63,10 +67,14 @@ const styles = {
 export const BatchStylePanel: React.FC<BatchStylePanelProps> = ({
   composer,
   selectedIds,
+  currentBreakpoint = "desktop",
+  currentPseudoState = "normal",
 }) => {
   const { styles: elementStyles, mixed, handleStyleChange } = useBatchStyleHandler(
     composer,
-    selectedIds
+    selectedIds,
+    currentBreakpoint,
+    currentPseudoState
   );
 
   if (selectedIds.length < 2) return null;

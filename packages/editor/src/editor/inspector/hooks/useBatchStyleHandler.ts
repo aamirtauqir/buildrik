@@ -19,6 +19,9 @@
 
 import * as React from "react";
 import type { Composer } from "../../../engine";
+import { getBreakpointQuery } from "../../../shared/constants/breakpoints";
+import type { PseudoStateId } from "../../../shared/types";
+import type { BreakpointId } from "../../../shared/types/breakpoints";
 
 // ============================================================================
 // TYPES
@@ -49,7 +52,9 @@ export interface UseBatchStyleHandlerResult {
 
 export function useBatchStyleHandler(
   composer: Composer | null | undefined,
-  selectedIds: string[]
+  selectedIds: string[],
+  currentBreakpoint: BreakpointId = "desktop",
+  currentPseudoState: PseudoStateId = "normal"
 ): UseBatchStyleHandlerResult {
   // Compute the agreed style view across the selection. For every property
   // that appears on any selected element, check whether all selected elements
@@ -97,9 +102,53 @@ export function useBatchStyleHandler(
 
       composer.beginTransaction?.("batch-multi-style");
       try {
+        const mq =
+          currentBreakpoint === "desktop"
+            ? undefined
+            : getBreakpointQuery(currentBreakpoint) ?? undefined;
+
         selectedIds.forEach((id) => {
           const el = composer.elements.getElement(id);
           if (!el) return;
+
+          if (currentPseudoState !== "normal" && composer.styles) {
+            // Pseudo-state: merge new values into the element's :state rule.
+            const selector = `[data-buildrick-id="${id}"]`;
+            const pseudoSelector = `${selector}:${currentPseudoState}`;
+            const existingRule = composer.styles.getRule(pseudoSelector, mq);
+            const existing = existingRule ? { ...existingRule.properties } : {};
+
+            Object.entries(changes).forEach(([prop, val]) => {
+              if (val === "" || val == null) {
+                delete existing[prop];
+              } else {
+                existing[prop] = val;
+              }
+            });
+            composer.styles.setRule(selector, existing, {
+              pseudo: `:${currentPseudoState}`,
+              mediaQuery: mq,
+            });
+            return;
+          }
+
+          if (currentBreakpoint !== "desktop" && composer.styles) {
+            // Breakpoint overlay: partition changes into set/remove per bp.
+            const toSet: Record<string, string> = {};
+            Object.entries(changes).forEach(([prop, val]) => {
+              if (val === "" || val == null) {
+                composer.styles!.removeBreakpointStyleProperty(id, currentBreakpoint, prop);
+              } else {
+                toSet[prop] = val;
+              }
+            });
+            if (Object.keys(toSet).length > 0) {
+              composer.styles.setBreakpointStyle(id, currentBreakpoint, toSet);
+            }
+            return;
+          }
+
+          // Desktop base — existing behavior.
           Object.entries(changes).forEach(([prop, val]) => {
             if (val === "" || val == null) {
               el.removeStyle?.(prop);
@@ -112,7 +161,7 @@ export function useBatchStyleHandler(
         composer.endTransaction?.();
       }
     },
-    [composer, selectedIds]
+    [composer, selectedIds, currentBreakpoint, currentPseudoState]
   );
 
   const handleStyleChange = React.useCallback(
