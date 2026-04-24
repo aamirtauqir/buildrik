@@ -1,6 +1,6 @@
 /**
  * PublishingHub — stacks Domains + Export into a single "Publishing" screen
- * per new-design/project/left-panel/tab-settings.html spec.
+ * per packages/editor/project/left-panel/tab-settings.html spec.
  *
  * @license BSD-3-Clause
  */

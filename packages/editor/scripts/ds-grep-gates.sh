@@ -278,5 +278,21 @@ for p in data.get('files', []):
   set -e
 fi
 
+# Gate 15: --bd-* SSOT — alias tokens defined only in bd-aliases.css.
+# The --bd-* namespace is the chrome shorthand alias layer (contract documented
+# in bd-aliases.css header). Every --bd-* name must be defined in exactly one
+# file: themes/design-system/bd-aliases.css. Any other file defining --bd-*:
+# (literal or var()) is a cascade-override risk. Enforces the SSOT rule that
+# was broken by themes/bridge-tokens.css (deleted 2026-04-24) and the
+# src/new-design/project/ reference snapshot (deleted 2026-04-24).
+LEAK=$(grep -rnE '^\s*--bd-[a-z0-9-]+\s*:' packages/editor/src --include='*.css' 2>/dev/null \
+  | grep -v 'themes/design-system/bd-aliases.css' \
+  || true)
+if [ -n "$LEAK" ]; then
+  echo "$LEAK"
+  fail "Gate 15: --bd-* def outside bd-aliases.css"
+fi
+pass "Gate 15: --bd-* defs only in bd-aliases.css"
+
 echo ""
-echo "=== DS V1 gates: 10 passed + 4 chrome-axiom gates at baseline + green-panel check ==="
+echo "=== DS V1 gates: 11 passed + 4 chrome-axiom gates at baseline + green-panel check ==="
