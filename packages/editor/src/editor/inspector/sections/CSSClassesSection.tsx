@@ -37,11 +37,28 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
   const [addingInline, setAddingInline] = React.useState(false);
   const inlineInputRef = React.useRef<HTMLInputElement>(null);
 
-  // SSOT: read directly from composer on every render (ARCH-05 / H-07 fix)
-  const classes = React.useMemo<string[]>(() => {
-    if (!composer || !selectedElement?.id) return [];
-    const el = composer.elements.getElement(selectedElement.id);
-    return el?.getClasses?.() ?? [];
+  // SSOT: seed from composer and re-read on element:updated events so
+  // undo/redo or external panels don't leave this view stale.
+  const [classes, setClasses] = React.useState<string[]>([]);
+
+  React.useEffect(() => {
+    if (!composer || !selectedElement?.id) {
+      setClasses([]);
+      return;
+    }
+    const read = () => {
+      const el = composer.elements.getElement(selectedElement.id);
+      setClasses(el?.getClasses?.() ?? []);
+    };
+    read();
+    const handler = (payload: unknown) => {
+      // Payload is the Element; compare its id to our selection so we
+      // only re-read for OUR element, not any element change in the project.
+      const id = (payload as { getId?: () => string } | undefined)?.getId?.();
+      if (!id || id === selectedElement.id) read();
+    };
+    composer.on?.("element:updated", handler);
+    return () => { composer.off?.("element:updated", handler); };
   }, [composer, selectedElement?.id]);
 
   // Global class suggestions from project stylesheet (H-06 / L-05 fix: no Tailwind)

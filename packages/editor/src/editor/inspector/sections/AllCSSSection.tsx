@@ -8,6 +8,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { InputField } from "../../../shared/forms/InputField";
+import { runTransaction } from "../../../shared/utils/helpers";
 import { Section, type SectionTier } from "../shared/controls";
 
 // ============================================================================
@@ -92,12 +93,27 @@ export const AllCSSSection: React.FC<AllCSSSectionProps> = ({
   const [newProperty, setNewProperty] = React.useState("");
   const [newValue, setNewValue] = React.useState("");
 
-  // Get current styles from element
-  const elementStyles = React.useMemo(() => {
-    if (!composer || !selectedElement.id) return {};
-    const el = composer.elements.getElement(selectedElement.id);
-    return el?.getStyles?.() || {};
-  }, [composer, selectedElement.id]);
+  // SSOT: seed from composer and re-read on element:updated events so
+  // undo/redo or external panels don't leave this view stale.
+  const [elementStyles, setElementStyles] = React.useState<Record<string, string>>({});
+
+  React.useEffect(() => {
+    if (!composer || !selectedElement?.id) {
+      setElementStyles({});
+      return;
+    }
+    const read = () => {
+      const el = composer.elements.getElement(selectedElement.id);
+      setElementStyles(el?.getStyles?.() || {});
+    };
+    read();
+    const handler = (payload: unknown) => {
+      const id = (payload as { getId?: () => string } | undefined)?.getId?.();
+      if (!id || id === selectedElement.id) read();
+    };
+    composer.on?.("element:updated", handler);
+    return () => { composer.off?.("element:updated", handler); };
+  }, [composer, selectedElement?.id]);
 
   // Convert to array for display
   const cssProperties: CSSProperty[] = React.useMemo(() => {
@@ -111,10 +127,11 @@ export const AllCSSSection: React.FC<AllCSSSectionProps> = ({
     if (!newProperty.trim() || !composer) return;
 
     const el = composer.elements.getElement(selectedElement.id);
-    if (el) {
+    if (!el) return;
+
+    runTransaction(composer, "add-css-property", () => {
       el.setStyle?.(newProperty.trim(), newValue.trim() || "initial");
-      composer.emit("element:updated");
-    }
+    });
 
     setNewProperty("");
     setNewValue("");
@@ -124,20 +141,22 @@ export const AllCSSSection: React.FC<AllCSSSectionProps> = ({
     if (!composer) return;
 
     const el = composer.elements.getElement(selectedElement.id);
-    if (el) {
+    if (!el) return;
+
+    runTransaction(composer, "remove-css-property", () => {
       el.removeStyle?.(propName);
-      composer.emit("element:updated");
-    }
+    });
   };
 
   const handleUpdateProperty = (propName: string, newVal: string) => {
     if (!composer) return;
 
     const el = composer.elements.getElement(selectedElement.id);
-    if (el) {
+    if (!el) return;
+
+    runTransaction(composer, "update-css-property", () => {
       el.setStyle?.(propName, newVal);
-      composer.emit("element:updated");
-    }
+    });
   };
 
   return (
