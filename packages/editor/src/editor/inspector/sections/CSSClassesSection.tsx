@@ -94,52 +94,32 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
   return (
     <Section title="CSS Classes" icon="Tag" defaultOpen isOpen={isOpen} onToggle={onToggle} tier={tier} id="inspector-section-css-classes">
       {/* Applied Classes */}
-      <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 12, color: "var(--buildrick-text-tertiary)", marginBottom: 8 }}>
-          Applied Classes
-        </div>
-        <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 6 }}>
-          {classes.length > 0 ? (
-            classes.map((cls) => (
-              <span
-                key={cls}
-                style={{
-                  padding: "6px 10px",
-                  background: "var(--buildrick-accent-subtle)",
-                  border: "1px solid var(--buildrick-accent)",
-                  borderRadius: 6,
-                  fontSize: 12,
-                  color: "var(--buildrick-accent)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                }}
+      <div className="bdi-chips" style={{ marginBottom: 6 }}>
+        {classes.length > 0 ? (
+          classes.map((cls, i) => (
+            <span key={cls} className={`bdi-chip${i === 0 ? " pri" : ""}`}>
+              .{cls}
+              <button
+                type="button"
+                className="bdi-chip-x"
+                onClick={() => removeClass(cls)}
+                aria-label={`Remove class ${cls}`}
               >
-                .{cls}
-                <button
-                  type="button"
-                  onClick={() => removeClass(cls)}
-                  aria-label={`Remove class ${cls}`}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "var(--buildrick-error)",
-                    cursor: "pointer",
-                    padding: 0,
-                    fontSize: 14,
-                    lineHeight: 1,
-                  }}
-                >
-                  ×
-                </button>
-              </span>
-            ))
-          ) : (
-            <span style={{ fontSize: 12, color: "var(--buildrick-text-tertiary)", fontStyle: "italic" }}>
-              No classes applied — type a name below and click Add
+                ×
+              </button>
             </span>
-          )}
-        </div>
+          ))
+        ) : (
+          <span
+            style={{
+              font: "500 10px var(--bd-font)",
+              color: "var(--bd-fg-muted)",
+              fontStyle: "italic",
+            }}
+          >
+            No classes — add one below
+          </span>
+        )}
       </div>
 
       {/* Add Class Input */}

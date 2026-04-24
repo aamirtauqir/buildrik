@@ -99,27 +99,16 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
       tier={tier}
       id="inspector-section-background"
     >
-      {/* Background Type Selector */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
+      {/* Background Type Selector — segmented */}
+      <div className="bdi-seg" style={{ marginBottom: 6 }}>
         {(["color", "gradient", "image"] as const).map((type) => (
           <button
             key={type}
+            type="button"
             onClick={() => setBgType(type)}
-            style={{
-              flex: 1,
-              padding: "8px 12px",
-              background: bgType === type ? "var(--buildrick-accent-subtle)" : "var(--bd-bg-subtle)",
-              border:
-                bgType === type
-                  ? "1px solid var(--buildrick-accent)"
-                  : "1px solid var(--bd-border)",
-              borderRadius: 6,
-              color: bgType === type ? "var(--buildrick-accent)" : "var(--buildrick-text-muted)",
-              fontSize: 12,
-              fontWeight: 500,
-              cursor: "pointer",
-              textTransform: "capitalize",
-            }}
+            className={bgType === type ? "on" : ""}
+            style={{ textTransform: "capitalize" }}
+            aria-pressed={bgType === type}
           >
             {type}
           </button>
