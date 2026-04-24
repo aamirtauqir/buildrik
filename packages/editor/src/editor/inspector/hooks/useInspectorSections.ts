@@ -100,7 +100,7 @@ export interface UseInspectorSectionsResult {
   /** Expand every section in the currently selected element's profile. */
   expandAll: () => void;
   /** Toggle a single section for the currently selected element type. */
-  toggleSection: (elementType: string, sectionId: SectionId) => void;
+  toggleSection: (elementType: string, sectionId: SectionId | "variants") => void;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -237,7 +237,7 @@ export function useInspectorSections({
   }, [keysForCurrentElement, saveUserPreferences, selectedElement?.type]);
 
   const toggleSection = React.useCallback(
-    (elementType: string, sectionId: SectionId) => {
+    (elementType: string, sectionId: SectionId | "variants") => {
       const key = `${elementType}:${sectionId}`;
       setExpandedSections((prev) => {
         const next = new Set(prev);

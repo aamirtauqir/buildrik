@@ -75,6 +75,8 @@ function makeCssContext(overrides: Partial<CssContext> = {}): CssContext {
       isGridContainer: false,
       devMode: false,
     } as unknown as CssContext["inspectorContext"],
+    selectedElements: [],
+    mixedKeys: new Set<string>(),
   };
   return { ...base, ...overrides };
 }
