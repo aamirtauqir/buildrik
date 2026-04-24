@@ -5,10 +5,15 @@
  */
 
 :root {
-  /* FONT FAMILIES */
-  --buildrick-font-family: "Inter Tight", sans-serif;
-  --buildrick-font-family-display: "General Sans", sans-serif;
-  --buildrick-font-family-mono: "Geist Mono", monospace;
+  /* FONT FAMILIES
+   * Display family aligned to Inter Tight (matches shipped reality + project/README).
+   * General Sans was aspirational in DESIGN.md; no @font-face loaded. Inter Tight
+   * is the workhorse per project/README.md.
+   * Fallbacks widened to match bridge-tokens shipped values.
+   */
+  --buildrick-font-family: "Inter Tight", system-ui, -apple-system, sans-serif;
+  --buildrick-font-family-display: "Inter Tight", system-ui, sans-serif;
+  --buildrick-font-family-mono: "Geist Mono", "SF Mono", Menlo, monospace;
 
   /* FONT SIZE SCALE */
   --buildrick-text-xs: 11px;

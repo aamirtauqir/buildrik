@@ -111,4 +111,11 @@
   --bd-leading-tight: var(--buildrick-line-tight);
   --bd-leading-normal: var(--buildrick-line-normal);
   --bd-leading-relaxed: var(--buildrick-line-relaxed);
+
+  /* ─── SHELL LAYOUT ───────────────────────────────────────────────────── */
+  --bd-shell-header-h: var(--buildrick-header-height);
+  --bd-shell-rail-w: var(--buildrick-sidebar-width);
+  --bd-shell-panel-w: var(--buildrick-sidebar-panel-width);
+  --bd-shell-insp-w: var(--buildrick-right-panel-width);
+  --bd-shell-foot-h: var(--buildrick-footer-height);
 }

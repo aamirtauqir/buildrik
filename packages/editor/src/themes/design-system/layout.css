@@ -6,9 +6,13 @@
  */
 
 :root {
-  /* EDITOR SHELL DIMENSIONS */
-  --buildrick-sidebar-width: 56px;
-  --buildrick-sidebar-panel-width: 320px;
+  /* EDITOR SHELL DIMENSIONS
+   * Canonical values correspond to shipped reality (48px rail / 280px panel).
+   * D1-D6's 320px was aspirational; 280px is what editor/shell/chrome.css
+   * and editor/rail/LayoutShell.css consume.
+   */
+  --buildrick-sidebar-width: 48px;
+  --buildrick-sidebar-panel-width: 280px;
   --buildrick-right-panel-width: 280px;
   --buildrick-header-height: 48px;
   --buildrick-footer-height: 32px;
