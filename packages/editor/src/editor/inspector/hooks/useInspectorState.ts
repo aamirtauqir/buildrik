@@ -31,14 +31,10 @@ export interface InspectorState {
   activeTab: TabName;
   /** Current pseudo-state for styling (hover, focus, etc.) */
   currentPseudoState: PseudoStateId;
-  /** Whether developer mode is enabled (shows All CSS, raw CSS editor) */
-  devMode: boolean;
   /** Set active tab */
   setActiveTab: (tab: TabName) => void;
   /** Set pseudo-state */
   setCurrentPseudoState: (state: PseudoStateId) => void;
-  /** Toggle developer mode */
-  setDevMode: (enabled: boolean) => void;
 }
 
 // ============================================================================
@@ -64,7 +60,6 @@ function getRecommendedTab(elementType: string, _tagName?: string): TabName {
 export function useInspectorState(selectedElement: SelectedElement | null): InspectorState {
   const [activeTab, setActiveTab] = useState<TabName>("style");
   const [currentPseudoState, setCurrentPseudoState] = useState<PseudoStateId>("normal");
-  const [devMode, setDevMode] = useState<boolean>(false);
 
   // Extract element ID for dependency tracking
   const elementId = selectedElement?.id;
@@ -95,16 +90,10 @@ export function useInspectorState(selectedElement: SelectedElement | null): Insp
     setCurrentPseudoState(state);
   }, []);
 
-  const handleSetDevMode = useCallback((enabled: boolean) => {
-    setDevMode(enabled);
-  }, []);
-
   return {
     activeTab,
     currentPseudoState,
-    devMode,
     setActiveTab: handleSetActiveTab,
     setCurrentPseudoState: handleSetPseudoState,
-    setDevMode: handleSetDevMode,
   };
 }
