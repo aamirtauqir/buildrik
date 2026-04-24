@@ -1,11 +1,11 @@
 /**
- * ColorInput — swatch + hex field + unbind × — ported to .bdi-color.
- * Token binding model preserved. See legacy doc in git history for rationale.
+ * ColorInput — Figma Fill row. Ported to .bdi-fill per comp-inspector.html v2.
+ * Checkerboard swatch + hex + % opacity + eye toggle. Token binding preserved.
  *
  * @license BSD-3-Clause
  */
 
-import { Link2, Link2Off } from "lucide-react";
+import { Eye, EyeOff, Link2, Link2Off } from "lucide-react";
 import * as React from "react";
 import { Popover } from "../../../../shared/ui/Popover";
 import { useColorRegistry } from "../../../../features/design-system/state/TokenRegistryContext";
@@ -36,6 +36,13 @@ const extractVarName = (v: string) => {
   return m ? m[1] : null;
 };
 
+// Hex without "#" prefix — matches mock's "FFFFFF" display
+const stripHash = (val: string): string => (val.startsWith("#") ? val.slice(1) : val);
+
+// Opacity stub: real alpha channel support would require parsing rgba/hex8.
+// For now, hidden value reports 0% and visible reports 100%.
+const getPercent = (visible: boolean): string => (visible ? "100%" : "0%");
+
 // ============================================================================
 // COLOR INPUT
 // ============================================================================
@@ -47,6 +54,8 @@ export interface ColorInputProps {
 }
 
 export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }) => {
+  const [hidden, setHidden] = React.useState(false);
+
   const { tokens: colorTokens } = useColorRegistry();
   const tokenEntries = colorTokens.map((t) => ({
     id: t.id,
@@ -71,7 +80,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
       ? value
       : "transparent";
 
-  const displayText = isBound ? (boundToken?.name ?? value) : value || "";
+  const display = isBound ? (boundToken?.name ?? value) : stripHash(value || "");
 
   return (
     <div className="bdi-row-ctrl">
@@ -81,20 +90,14 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
           triggerOn="click"
           position="bottom"
           trigger={
-            <div className={`bdi-color${isBound ? " bound" : ""}`} role="button" tabIndex={0}>
-              <div className="bdi-sw" aria-hidden="true">
-                <div
-                  className="bdi-sw-fill"
-                  style={{ background: swatchColor }}
-                />
-              </div>
+            <div className={`bdi-fill${isBound ? " bound" : ""}`} role="button" tabIndex={0}>
+              <span className="bdi-sw" aria-hidden="true">
+                <span className="bdi-sw-fill" style={{ background: swatchColor }} />
+              </span>
+
               {isBound ? (
                 <>
-                  <Link2
-                    size={10}
-                    aria-hidden="true"
-                    style={{ color: "var(--bd-accent)", flexShrink: 0 }}
-                  />
+                  <Link2 size={10} aria-hidden="true" style={{ color: "var(--bd-accent)", flexShrink: 0 }} />
                   <span
                     className="bdi-hx"
                     style={{
@@ -104,27 +107,17 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {displayText}
+                    {display}
                   </span>
                   <button
                     type="button"
+                    className="bdi-eye"
                     onClick={(e) => {
                       e.stopPropagation();
                       onChange(resolveVar(value));
                     }}
                     aria-label={`Unlink ${label} token`}
-                    title="Unlink token — resolves to current value"
-                    style={{
-                      background: "none",
-                      border: "none",
-                      padding: 0,
-                      color: "var(--bd-accent)",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      flexShrink: 0,
-                      opacity: 0.7,
-                    }}
+                    title="Unlink token"
                   >
                     <Link2Off size={10} aria-hidden="true" />
                   </button>
@@ -134,20 +127,31 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
                   <input
                     type="text"
                     className="bdi-hx"
-                    value={displayText}
-                    onChange={(e) => onChange(e.target.value)}
+                    value={display}
+                    onChange={(e) => {
+                      const v = e.target.value.trim();
+                      if (!v) onChange("");
+                      else if (/^[0-9A-Fa-f]{3}$|^[0-9A-Fa-f]{6}$/.test(v)) onChange(`#${v}`);
+                      else if (v.startsWith("#")) onChange(v);
+                      else if (v === "transparent" || v === "inherit" || v === "currentColor") onChange(v);
+                    }}
                     onClick={(e) => e.stopPropagation()}
-                    placeholder="#000000"
+                    placeholder={isKeyword ? value : "000000"}
                     aria-label={`${label} value`}
                   />
-                  {isKeyword && (
-                    <span
-                      className="bdi-pct"
-                      title="CSS keyword"
-                    >
-                      {value}
-                    </span>
-                  )}
+                  <span className="bdi-pct">{getPercent(!hidden)}</span>
+                  <button
+                    type="button"
+                    className="bdi-eye"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setHidden((v) => !v);
+                    }}
+                    aria-label={hidden ? "Show color" : "Hide color"}
+                    title={hidden ? "Show color" : "Hide color"}
+                  >
+                    {hidden ? <EyeOff size={10} aria-hidden="true" /> : <Eye size={10} aria-hidden="true" />}
+                  </button>
                 </>
               )}
             </div>

@@ -99,6 +99,10 @@ export interface InputWithUnitProps {
   disabledReason?: string;
   isOverridden?: boolean;
   helperText?: string;
+  /** Optional single-char or short label shown as the leading icon slot
+   *  (Figma-style). When omitted the field renders without an inline icon
+   *  and uses the outer row label only. */
+  fieldIcon?: React.ReactNode;
 }
 
 function isValidCSSNumber(val: string): boolean {
@@ -119,6 +123,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
   disabledReason,
   isOverridden,
   helperText,
+  fieldIcon,
 }) => {
   const [isRowHovered, setIsRowHovered] = React.useState(false);
 
@@ -209,11 +214,12 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
       </label>
       <div className="bdi-row-content">
         <div
-          className={`bdi-num${isInvalid ? " invalid" : ""}`}
+          className={`bdi-fld${isInvalid ? " invalid" : ""}`}
           onMouseEnter={() => setIsRowHovered(true)}
           onMouseLeave={() => setIsRowHovered(false)}
           title={isInvalid ? "Invalid number — press Escape to revert" : disabledReason}
         >
+          {fieldIcon && <span className="bdi-flb">{fieldIcon}</span>}
           <input
             type="text"
             value={isKeywordUnit && !isTokenVar(inputValue) ? unit : inputValue}
@@ -221,15 +227,17 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
             onBlur={handleInputBlur}
             onKeyDown={handleInputKeyDown}
             placeholder={placeholder}
-            className={isKeywordUnit ? "muted" : ""}
+            className={isKeywordUnit ? "auto" : ""}
             disabled={disabled || (isKeywordUnit && !isTokenVar(inputValue))}
             aria-invalid={isInvalid}
-            style={{ paddingRight: showReset ? 22 : undefined }}
+            style={{
+              paddingLeft: fieldIcon ? 0 : 8,
+              paddingRight: showReset ? 22 : undefined,
+            }}
           />
           {showReset && (
             <button
               type="button"
-              className="bdi-reset visible"
               onClick={(e) => {
                 e.stopPropagation();
                 setInputValue("");
@@ -238,17 +246,35 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
               }}
               aria-label={`Reset ${label}`}
               title={`Reset ${label}`}
+              style={{
+                position: "absolute",
+                right: 28,
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: 14,
+                height: 14,
+                padding: 0,
+                background: "rgba(15, 23, 42, 0.06)",
+                border: "none",
+                borderRadius: 3,
+                color: "var(--bd-fg-muted)",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              <X size={10} aria-hidden="true" />
+              <X size={9} aria-hidden="true" />
             </button>
           )}
           {!isKeywordUnit && (
             <select
-              className="bdi-u select"
+              className="bdi-u"
               value={unit}
               onChange={(e) => handleUnitChange(e.target.value)}
               disabled={disabled}
               aria-label={`${label} unit`}
+              style={{ appearance: "none", WebkitAppearance: "none" }}
             >
               {units.map((u) => (
                 <option key={u} value={u}>
