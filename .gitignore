@@ -19,3 +19,9 @@ dist/
 .claude/
 packages/*.zip
 packages/editor.zip
+
+# Designer-facing spec mirror (reference docs, not runtime code).
+# Lives at packages/editor/src/project/ as a dev-local snapshot of the spec drop.
+# Excluded from git so it can't drift into the runtime tree, and from DS gates
+# via --exclude-dir=project (see packages/editor/scripts/ds-grep-gates.sh).
+packages/editor/src/project/

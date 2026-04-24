@@ -25,7 +25,8 @@ pass "Gate 1: no self-referential defs"
 
 # Gate 2: --buildrick-design-* defs only in canonical locations
 # Requires colon after var name to distinguish actual defs from comment text
-LEAK=$(grep -rE '^\s*--buildrick-design-[a-z0-9-]+\s*:' packages/editor/src --include='*.css' 2>/dev/null | grep -v 'design-system/design.css' || true)
+# --exclude-dir=project skips designer-facing spec mirror (untracked, not runtime)
+LEAK=$(grep -rE '^\s*--buildrick-design-[a-z0-9-]+\s*:' packages/editor/src --include='*.css' --exclude-dir=project 2>/dev/null | grep -v 'design-system/design.css' || true)
 if [ -n "$LEAK" ]; then
   echo "$LEAK"
   fail "Gate 2: --buildrick-design-* def outside design.css"
@@ -47,7 +48,7 @@ fi
 pass "Gate 3: chrome consumers of --buildrick-design-* eliminated"
 
 # Gate 4: No deprecated alias consumers (compat.css deleted; aliases must be gone)
-LEAK=$(grep -rE 'var\(--(ls-|rail-|surface-[a-z]|brand-|primary-[0-9]|buildrick-(control|build|ai)-|accent\)|accent,|bar\)|bar,|blue\)|blue,|txt\)|txt,)' packages/editor/src 2>/dev/null | grep -v __tests__ || true)
+LEAK=$(grep -rE 'var\(--(ls-|rail-|surface-[a-z]|brand-|primary-[0-9]|buildrick-(control|build|ai)-|accent\)|accent,|bar\)|bar,|blue\)|blue,|txt\)|txt,)' packages/editor/src --exclude-dir=project 2>/dev/null | grep -v __tests__ || true)
 if [ -n "$LEAK" ]; then
   echo "$LEAK"
   fail "Gate 4: deprecated alias consumer"
@@ -55,7 +56,7 @@ fi
 pass "Gate 4: no deprecated alias consumers"
 
 # Gate 5: No old --aqb-* / data-aqb-* (V3 legacy)
-LEAK=$(grep -rE '(--aqb-|data-aqb-)' packages/editor/src --include='*.ts' --include='*.tsx' --include='*.css' 2>/dev/null || true)
+LEAK=$(grep -rE '(--aqb-|data-aqb-)' packages/editor/src --include='*.ts' --include='*.tsx' --include='*.css' --exclude-dir=project 2>/dev/null || true)
 if [ -n "$LEAK" ]; then
   echo "$LEAK"
   fail "Gate 5: --aqb-* / data-aqb-* still present"
@@ -77,7 +78,7 @@ pass "Gate 6: no duplicate keys in any DS file"
 # WARN mode: 14 legacy CSS files have leaked @media (prefers-*) blocks (tracked, out
 # of scope for this remediation pass). Gate warns and lists files but does not fail CI.
 # Flip to fail mode once the backlog is cleared.
-LEAKED_MEDIA=$(grep -rlE '@media\s*\(\s*prefers-' packages/editor/src --include="*.css" 2>/dev/null | grep -v 'design-system/a11y.css' || true)
+LEAKED_MEDIA=$(grep -rlE '@media\s*\(\s*prefers-' packages/editor/src --include="*.css" --exclude-dir=project 2>/dev/null | grep -v 'design-system/a11y.css' || true)
 if [ -n "$LEAKED_MEDIA" ]; then
   echo "  WARN Gate 7: @media (prefers-*) outside a11y.css (backlog — not blocking):"
   echo "$LEAKED_MEDIA" | sed 's/^/    /'
@@ -85,7 +86,7 @@ fi
 pass "Gate 7: @media (prefers-*) audit complete (WARN mode — flip to fail after backlog cleared)"
 
 # Gate 8: No bare deprecated defs (--accent, --buildrick-text, --buildrick-surface)
-LEAK=$(grep -rE '^\s*(--accent|--buildrick-text|--buildrick-surface)\s*:' packages/editor/src --include='*.css' 2>/dev/null || true)
+LEAK=$(grep -rE '^\s*(--accent|--buildrick-text|--buildrick-surface)\s*:' packages/editor/src --include='*.css' --exclude-dir=project 2>/dev/null || true)
 if [ -n "$LEAK" ]; then
   echo "$LEAK"
   fail "Gate 8: bare deprecated def"
@@ -93,7 +94,7 @@ fi
 pass "Gate 8: no bare deprecated defs"
 
 # Gate 9: INSPECTOR_TOKENS fully removed (functional refs only; 1 comment about deprecation is OK)
-LEAK=$(grep -rE 'INSPECTOR_TOKENS' packages/editor/src --include='*.ts' --include='*.tsx' 2>/dev/null | grep -v 'constant was deprecated and removed' || true)
+LEAK=$(grep -rE 'INSPECTOR_TOKENS' packages/editor/src --include='*.ts' --include='*.tsx' --exclude-dir=project 2>/dev/null | grep -v 'constant was deprecated and removed' || true)
 if [ -n "$LEAK" ]; then
   echo "$LEAK"
   fail "Gate 9: INSPECTOR_TOKENS references remain"
@@ -294,10 +295,10 @@ fi
 # Exclusion is anchored to the exact canonical path to prevent a future
 # `/legacy/.../bd-aliases.css` from silently bypassing the gate.
 CANONICAL='packages/editor/src/themes/design-system/bd-aliases.css'
-LEAK_CSS=$(grep -rnE '^\s*--bd-[a-z0-9-]+\s*:' packages/editor/src --include='*.css' 2>/dev/null \
+LEAK_CSS=$(grep -rnE '^\s*--bd-[a-z0-9-]+\s*:' packages/editor/src --include='*.css' --exclude-dir=project 2>/dev/null \
   | grep -vE "(^|/)${CANONICAL}:" \
   || true)
-LEAK_TSX=$(grep -rnE '"--bd-[a-z0-9-]+"\s*:' packages/editor/src --include='*.tsx' --include='*.ts' 2>/dev/null \
+LEAK_TSX=$(grep -rnE '"--bd-[a-z0-9-]+"\s*:' packages/editor/src --include='*.tsx' --include='*.ts' --exclude-dir=project 2>/dev/null \
   | grep -v '__tests__' \
   || true)
 LEAK=$(printf '%s\n%s' "$LEAK_CSS" "$LEAK_TSX" | sed '/^$/d')
