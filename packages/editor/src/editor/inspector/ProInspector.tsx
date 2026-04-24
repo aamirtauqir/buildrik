@@ -22,6 +22,7 @@ import { InspectorEmptyState } from "./components/InspectorEmptyState";
 import { InspectorErrorBoundary } from "./components/InspectorErrorBoundary";
 import { MultiSelectToolbar } from "./components/MultiSelectToolbar";
 import { useInspectorState, useStyleHandlers, useInspectorSections } from "./hooks";
+import { usePickModeReset } from "./hooks/usePickModeReset";
 import { useAdvancedSettings } from "./hooks/useAdvancedSettings";
 import { VariantSection } from "./sections/VariantSection";
 import { buildAdvancedPropsMapFromRegistry, SECTION_REGISTRY } from "./sections/registry";
@@ -285,19 +286,9 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
   const [pickActive, setPickActive] = React.useState(false);
 
-  // Canvas signals pick completion/cancellation — drop pickActive back to
-  // false so the header button leaves its pressed state without the user
-  // having to click it again.
-  React.useEffect(() => {
-    if (!composer) return;
-    const clear = () => setPickActive(false);
-    composer.on("inspector:pick-result", clear);
-    composer.on("inspector:pick-cancel", clear);
-    return () => {
-      composer.off("inspector:pick-result", clear);
-      composer.off("inspector:pick-cancel", clear);
-    };
-  }, [composer]);
+  // Canvas signals pick completion/cancellation — clear pickActive so the
+  // header button leaves its pressed state without another click.
+  usePickModeReset(composer, setPickActive);
 
   // Show pseudo-state pills only when non-normal / overrides exist / user opts in
   const [stateSelectorManuallyShown, setStateSelectorManuallyShown] = React.useState(false);
