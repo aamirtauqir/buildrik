@@ -68,10 +68,21 @@ export const Section: React.FC<SectionProps> = ({
 
   return (
     <div className={`bdi-sec${isOpen ? "" : " closed"}`} id={id}>
-      <button
-        type="button"
+      {/* Rendered as div+role=button rather than <button> so sibling action
+          slots (e.g. BackgroundSection's bdi-plus) can contain their own
+          <button> without nesting <button> inside <button> — React DOM
+          validation flagged this at runtime on Container selection. */}
+      <div
+        role="button"
+        tabIndex={0}
         className="bdi-sec-h"
         onClick={handleToggle}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleToggle();
+          }
+        }}
         aria-expanded={isOpen}
         aria-controls={contentId}
         aria-label={`${title} section, ${isOpen ? "expanded" : "collapsed"}`}
@@ -89,7 +100,7 @@ export const Section: React.FC<SectionProps> = ({
             {action}
           </span>
         )}
-      </button>
+      </div>
       {isOpen && (
         <div id={contentId} className="bdi-sec-body">
           {children}
