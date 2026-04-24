@@ -14,27 +14,27 @@ import { ColorPicker } from "./ColorPicker";
 const WCAG_BADGE_STYLES: Record<WcagLevel, React.CSSProperties> = {
   aaa: {
     background: "rgba(34,197,94,0.15)",
-    color: "var(--buildrick-success)",
+    color: "var(--bd-success)",
     border: "1px solid rgba(34,197,94,0.3)",
   },
   aa: {
     background: "rgba(59,130,246,0.15)",
-    color: "var(--buildrick-accent)",
+    color: "var(--bd-accent)",
     border: "1px solid rgba(59,130,246,0.3)",
   },
   "aa-large": {
     background: "rgba(245,158,11,0.12)",
-    color: "var(--buildrick-warning)",
+    color: "var(--bd-warning)",
     border: "1px solid rgba(245,158,11,0.3)",
   },
   fail: {
     background: "rgba(239,68,68,0.12)",
-    color: "var(--buildrick-error)",
+    color: "var(--bd-error)",
     border: "1px solid rgba(239,68,68,0.3)",
   },
   na: {
     background: "rgba(113,113,122,0.15)",
-    color: "var(--buildrick-text-tertiary)",
+    color: "var(--bd-fg-muted)",
     border: "1px solid rgba(113,113,122,0.3)",
   },
 };
@@ -168,8 +168,8 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
         flexDirection: "column",
         borderRadius: 8,
         overflow: "hidden",
-        border: isChanged ? "1px solid rgba(245,158,11,0.4)" : "1px solid var(--buildrick-border)",
-        borderLeft: isChanged ? "3px solid #f59e0b" : "1px solid var(--buildrick-border)",
+        border: isChanged ? "1px solid rgba(245,158,11,0.4)" : "1px solid var(--bd-border)",
+        borderLeft: isChanged ? "3px solid #f59e0b" : "1px solid var(--bd-border)",
         background: isExpanded ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.03)",
         transition: "border-color 0.15s",
       }}
@@ -219,7 +219,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
               style={{
                 fontSize: 12,
                 fontWeight: 500,
-                color: "var(--buildrick-text-primary)",
+                color: "var(--bd-fg-primary)",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
@@ -234,7 +234,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
                   width: 6,
                   height: 6,
                   borderRadius: "50%",
-                  background: "var(--buildrick-warning)",
+                  background: "var(--bd-warning)",
                   flexShrink: 0,
                 }}
                 title="Unsaved change"
@@ -248,7 +248,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
               border: "none",
               padding: 0,
               cursor: "pointer",
-              color: copied ? "var(--buildrick-success)" : "var(--buildrick-text-muted)",
+              color: copied ? "var(--bd-success)" : "var(--bd-fg-muted)",
               fontSize: 12,
               fontFamily: "monospace",
               letterSpacing: "0.3px",
@@ -275,8 +275,8 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
                   position: "absolute",
                   top: "calc(100% + 4px)",
                   right: 0,
-                  background: "var(--buildrick-surface-3)",
-                  border: "1px solid var(--buildrick-border)",
+                  background: "var(--bd-bg-subtle)",
+                  border: "1px solid var(--bd-border)",
                   borderRadius: 8,
                   padding: "10px 12px",
                   zIndex: 50,
@@ -287,11 +287,11 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
                 {wcagLevel === "fail" ? (
                   <>
                     <div
-                      style={{ fontSize: 12, fontWeight: 600, color: "var(--buildrick-error)", marginBottom: 4 }}
+                      style={{ fontSize: 12, fontWeight: 600, color: "var(--bd-error)", marginBottom: 4 }}
                     >
                       Low contrast
                     </div>
-                    <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", lineHeight: 1.5 }}>
+                    <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", lineHeight: 1.5 }}>
                       This color may be hard to read. Ratio:{" "}
                       {calcContrastRatio(token.value, "#0A0A0A").toFixed(1)}:1 — needs 4.5:1 for AA.
                     </div>
@@ -308,7 +308,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
                     >
                       Good contrast ✓
                     </div>
-                    <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", lineHeight: 1.5 }}>
+                    <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", lineHeight: 1.5 }}>
                       Meets WCAG {wcagLevel?.toUpperCase()}. Ratio:{" "}
                       {calcContrastRatio(token.value, "#0A0A0A").toFixed(1)}:1.
                     </div>
@@ -328,7 +328,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
               border: "none",
               padding: 4,
               cursor: "pointer",
-              color: "var(--buildrick-warning)",
+              color: "var(--bd-warning)",
               borderRadius: 4,
               display: "flex",
               alignItems: "center",
@@ -349,7 +349,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
               border: "none",
               padding: 4,
               cursor: "pointer",
-              color: "var(--buildrick-text-muted)",
+              color: "var(--bd-fg-muted)",
               borderRadius: 4,
               display: "flex",
               alignItems: "center",

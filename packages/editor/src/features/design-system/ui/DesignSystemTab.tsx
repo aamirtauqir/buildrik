@@ -45,7 +45,7 @@ const containerStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   height: "100%",
-  background: "var(--buildrick-surface-2)",
+  background: "var(--bd-bg-subtle)",
 };
 
 const tokenListStyles: React.CSSProperties = {
@@ -406,8 +406,8 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           display: "flex",
           padding: "8px 12px 0",
           gap: 2,
-          borderBottom: "1px solid var(--buildrick-border)",
-          background: "var(--buildrick-surface-2)",
+          borderBottom: "1px solid var(--bd-border)",
+          background: "var(--bd-bg-subtle)",
           flexShrink: 0,
         }}
       >
@@ -423,12 +423,12 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                 borderRadius: "6px 6px 0 0",
                 border: "none",
                 background: "transparent",
-                color: activeTab === tab.id ? "var(--buildrick-text-primary)" : "var(--buildrick-text-muted)",
+                color: activeTab === tab.id ? "var(--bd-fg-primary)" : "var(--bd-fg-muted)",
                 fontSize: 13,
                 fontWeight: activeTab === tab.id ? 500 : 400,
                 cursor: "pointer",
                 borderBottom:
-                  activeTab === tab.id ? "2px solid var(--buildrick-accent)" : "2px solid transparent",
+                  activeTab === tab.id ? "2px solid var(--bd-accent)" : "2px solid transparent",
                 transition: "color 0.15s",
                 display: "flex",
                 alignItems: "center",
@@ -442,7 +442,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
                     width: 5,
                     height: 5,
                     borderRadius: "50%",
-                    background: "var(--buildrick-warning)",
+                    background: "var(--bd-warning)",
                     flexShrink: 0,
                   }}
                   aria-label="unsaved changes"
@@ -458,15 +458,15 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         style={{
           padding: "5px 12px",
           fontSize: 12,
-          color: "var(--buildrick-text-muted)",
-          background: "var(--buildrick-surface-2)",
-          borderBottom: "1px solid var(--buildrick-border)",
+          color: "var(--bd-fg-muted)",
+          background: "var(--bd-bg-subtle)",
+          borderBottom: "1px solid var(--bd-border)",
           flexShrink: 0,
         }}
       >
         Changes here apply to every page on your site
         {totalUsageCount > 0 && (
-          <span style={{ marginLeft: 6, color: "var(--buildrick-text-muted, var(--buildrick-text-muted))" }}>
+          <span style={{ marginLeft: 6, color: "var(--bd-fg-muted, var(--bd-fg-muted))" }}>
             · {totalUsageCount} token binding{totalUsageCount === 1 ? "" : "s"} in use
           </span>
         )}

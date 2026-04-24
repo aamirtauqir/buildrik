@@ -68,9 +68,9 @@ const StyleToggle: React.FC<{
       justifyContent: "center",
       borderRadius: 4,
       border: "1px solid",
-      borderColor: active ? "var(--buildrick-accent)" : "var(--buildrick-border)",
+      borderColor: active ? "var(--bd-accent)" : "var(--bd-border)",
       background: active ? "rgba(59,130,246,0.15)" : "transparent",
-      color: active ? "var(--buildrick-accent)" : "var(--buildrick-text-muted)",
+      color: active ? "var(--bd-accent)" : "var(--bd-fg-muted)",
       fontSize: 12,
       fontWeight: 700,
       cursor: "pointer",
@@ -137,10 +137,10 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
     >
       {/* Semantic label */}
       <div style={{ width: 64, flexShrink: 0 }}>
-        <div style={{ fontSize: 12, fontWeight: 500, color: "var(--buildrick-text-primary)" }}>
+        <div style={{ fontSize: 12, fontWeight: 500, color: "var(--bd-fg-primary)" }}>
           {info?.semantic ?? token.name}
         </div>
-        <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginTop: 1 }}>{token.id}</div>
+        <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginTop: 1 }}>{token.id}</div>
       </div>
 
       {/* Size input */}
@@ -155,15 +155,15 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
           width: 44,
           padding: "4px 6px",
           background: "rgba(255,255,255,0.05)",
-          border: "1px solid var(--buildrick-border)",
+          border: "1px solid var(--bd-border)",
           borderRadius: 4,
-          color: "var(--buildrick-text-primary)",
+          color: "var(--bd-fg-primary)",
           fontSize: 12,
           textAlign: "right",
           flexShrink: 0,
         }}
       />
-      <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)", flexShrink: 0 }}>{unit}</span>
+      <span style={{ fontSize: 12, color: "var(--bd-fg-muted)", flexShrink: 0 }}>{unit}</span>
 
       {/* Style toggles */}
       <div style={{ display: "flex", gap: 3 }}>
@@ -188,7 +188,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
           fontSize: token.value,
           fontWeight: bold ? 700 : 400,
           fontStyle: italic ? "italic" : "normal",
-          color: "var(--buildrick-text-secondary)",
+          color: "var(--bd-fg-secondary)",
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
@@ -202,7 +202,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
       {isExtreme && (
         <span
           title="Extreme font size may break layout"
-          style={{ color: "var(--buildrick-warning)", fontSize: 12, flexShrink: 0 }}
+          style={{ color: "var(--bd-warning)", fontSize: 12, flexShrink: 0 }}
         >
           ⚠
         </span>
@@ -218,7 +218,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
             border: "none",
             padding: 4,
             cursor: "pointer",
-            color: "var(--buildrick-warning)",
+            color: "var(--bd-warning)",
             fontSize: 13,
             flexShrink: 0,
           }}
@@ -237,7 +237,7 @@ const TypeScaleRow: React.FC<TypeScaleRowProps> = ({
             border: "none",
             padding: 4,
             cursor: "pointer",
-            color: "var(--buildrick-accent)",
+            color: "var(--bd-accent)",
             fontSize: 13,
             flexShrink: 0,
           }}
@@ -291,21 +291,21 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange }) => {
       }}
     >
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 12, fontWeight: 500, color: "var(--buildrick-text-primary)" }}>
+        <div style={{ fontSize: 12, fontWeight: 500, color: "var(--bd-fg-primary)" }}>
           {token.name}
         </div>
         <div
           style={{
             fontSize: 13,
             fontFamily: token.value,
-            color: "var(--buildrick-text-muted)",
+            color: "var(--bd-fg-muted)",
             marginTop: 2,
           }}
         >
           Aa Bb Cc 123
         </div>
         {fontLoadFailed && (
-          <div style={{ fontSize: 12, color: "var(--buildrick-warning)", marginTop: 2 }}>
+          <div style={{ fontSize: 12, color: "var(--bd-warning)", marginTop: 2 }}>
             Font unavailable — may fall back to system font
           </div>
         )}
@@ -316,9 +316,9 @@ const FontFamilyRow: React.FC<FontRowProps> = ({ token, onChange }) => {
         style={{
           padding: "5px 8px",
           background: "rgba(255,255,255,0.05)",
-          border: "1px solid var(--buildrick-border)",
+          border: "1px solid var(--bd-border)",
           borderRadius: 6,
-          color: "var(--buildrick-text-primary)",
+          color: "var(--bd-fg-primary)",
           fontSize: 12,
           cursor: "pointer",
         }}
@@ -365,7 +365,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
         padding: 12,
         background: "rgba(255,255,255,0.03)",
         borderRadius: 8,
-        border: "1px solid var(--buildrick-border)",
+        border: "1px solid var(--bd-border)",
         display: "flex",
         flexDirection: "column",
         gap: 8,
@@ -376,7 +376,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
           fontFamily: headingFont,
           fontSize: getSize("font-size-4xl"),
           fontWeight: 700,
-          color: "var(--buildrick-text-primary)",
+          color: "var(--bd-fg-primary)",
           lineHeight: 1.1,
         }}
       >
@@ -387,7 +387,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
           fontFamily: headingFont,
           fontSize: getSize("font-size-3xl"),
           fontWeight: 600,
-          color: "var(--buildrick-text-primary)",
+          color: "var(--bd-fg-primary)",
           lineHeight: 1.2,
         }}
       >
@@ -397,7 +397,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
         style={{
           fontFamily: bodyFont,
           fontSize: getSize("font-size-base"),
-          color: "var(--buildrick-text-secondary)",
+          color: "var(--bd-fg-secondary)",
           lineHeight: 1.6,
         }}
       >
@@ -406,7 +406,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
       <div
         style={{
           fontSize: 12,
-          color: "var(--buildrick-text-muted)",
+          color: "var(--bd-fg-muted)",
           textAlign: "right",
           letterSpacing: "0.3px",
         }}
@@ -422,7 +422,7 @@ const TypePreviewBand: React.FC<TypePreviewBandProps> = ({
 const SECTION_HEADER: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bd-fg-muted)",
   textTransform: "uppercase",
   letterSpacing: "0.5px",
   marginBottom: 4,
@@ -446,7 +446,7 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
     <div style={{ display: "flex", flexDirection: "column" }}>
       {/* Device hint */}
       <div
-        style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginBottom: 6, lineHeight: 1.5 }}
+        style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginBottom: 6, lineHeight: 1.5 }}
       >
         Type scale per device — changes here only affect the selected breakpoint.
       </div>
@@ -466,9 +466,9 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
             padding: "5px 10px",
             borderRadius: 6,
             border: "1px solid",
-            borderColor: responsiveMode === "desktop" ? "var(--buildrick-accent)" : "var(--buildrick-border)",
+            borderColor: responsiveMode === "desktop" ? "var(--bd-accent)" : "var(--bd-border)",
             background: responsiveMode === "desktop" ? "rgba(59,130,246,0.12)" : "transparent",
-            color: responsiveMode === "desktop" ? "var(--buildrick-accent)" : "var(--buildrick-text-muted)",
+            color: responsiveMode === "desktop" ? "var(--bd-accent)" : "var(--bd-fg-muted)",
             fontSize: 12,
             cursor: "pointer",
           }}
@@ -486,9 +486,9 @@ export const TypeTokenList: React.FC<TypeTokenListProps> = ({
             padding: "5px 10px",
             borderRadius: 6,
             border: "1px solid",
-            borderColor: responsiveMode === "mobile" ? "var(--buildrick-accent)" : "var(--buildrick-border)",
+            borderColor: responsiveMode === "mobile" ? "var(--bd-accent)" : "var(--bd-border)",
             background: responsiveMode === "mobile" ? "rgba(59,130,246,0.12)" : "transparent",
-            color: responsiveMode === "mobile" ? "var(--buildrick-accent)" : "var(--buildrick-text-muted)",
+            color: responsiveMode === "mobile" ? "var(--bd-accent)" : "var(--bd-fg-muted)",
             fontSize: 12,
             cursor: "pointer",
           }}

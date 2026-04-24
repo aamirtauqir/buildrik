@@ -121,7 +121,7 @@ const SpacingRow: React.FC<SpacingRowProps> = ({
           width: 64,
           flexShrink: 0,
           fontSize: 12,
-          color: "var(--buildrick-text-muted)",
+          color: "var(--bd-fg-muted)",
           fontFamily: "monospace",
           overflow: "hidden",
           textOverflow: "ellipsis",
@@ -167,21 +167,21 @@ const SpacingRow: React.FC<SpacingRowProps> = ({
           width: 44,
           padding: "4px 6px",
           background: "rgba(255,255,255,0.05)",
-          border: "1px solid var(--buildrick-border)",
+          border: "1px solid var(--bd-border)",
           borderRadius: 4,
-          color: "var(--buildrick-text-primary)",
+          color: "var(--bd-fg-primary)",
           fontSize: 12,
           textAlign: "right",
           flexShrink: 0,
         }}
       />
-      <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)", flexShrink: 0 }}>px</span>
+      <span style={{ fontSize: 12, color: "var(--bd-fg-muted)", flexShrink: 0 }}>px</span>
 
       {/* Zero-spacing warning */}
       {size === 0 && (
         <span
           title="Zero spacing will collapse layout gaps"
-          style={{ color: "var(--buildrick-warning)", fontSize: 12, flexShrink: 0 }}
+          style={{ color: "var(--bd-warning)", fontSize: 12, flexShrink: 0 }}
         >
           ⚠
         </span>
@@ -197,7 +197,7 @@ const SpacingRow: React.FC<SpacingRowProps> = ({
             border: "none",
             padding: 4,
             cursor: "pointer",
-            color: "var(--buildrick-warning)",
+            color: "var(--bd-warning)",
             fontSize: 13,
             flexShrink: 0,
           }}
@@ -216,7 +216,7 @@ const SpacingRow: React.FC<SpacingRowProps> = ({
             border: "none",
             padding: 4,
             cursor: "pointer",
-            color: "var(--buildrick-accent)",
+            color: "var(--bd-accent)",
             fontSize: 13,
             flexShrink: 0,
           }}
@@ -247,9 +247,9 @@ const PresetChip: React.FC<{
       padding: "5px 12px",
       borderRadius: 20,
       border: "1px solid",
-      borderColor: isActive ? "var(--buildrick-accent)" : "var(--buildrick-border)",
+      borderColor: isActive ? "var(--bd-accent)" : "var(--bd-border)",
       background: isActive ? "rgba(59,130,246,0.15)" : "transparent",
-      color: isActive ? "var(--buildrick-accent)" : "var(--buildrick-text-muted)",
+      color: isActive ? "var(--bd-accent)" : "var(--bd-fg-muted)",
       fontSize: 12,
       fontWeight: isActive ? 600 : 400,
       cursor: "pointer",
@@ -270,7 +270,7 @@ const SpacingDiagram: React.FC<{ tokens: DesignToken[] }> = ({ tokens }) => {
         padding: 12,
         background: "rgba(255,255,255,0.02)",
         borderRadius: 8,
-        border: "1px solid var(--buildrick-border)",
+        border: "1px solid var(--bd-border)",
         marginTop: 8,
       }}
     >
@@ -278,7 +278,7 @@ const SpacingDiagram: React.FC<{ tokens: DesignToken[] }> = ({ tokens }) => {
         style={{
           fontSize: 12,
           fontWeight: 600,
-          color: "var(--buildrick-text-muted)",
+          color: "var(--bd-fg-muted)",
           marginBottom: 8,
           textTransform: "uppercase",
           letterSpacing: "0.5px",
@@ -363,7 +363,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
           background: "transparent",
           border: "1px solid rgba(255,255,255,0.1)",
           borderRadius: 20,
-          color: "var(--buildrick-text-muted)",
+          color: "var(--bd-fg-muted)",
           fontSize: 12,
           cursor: "pointer",
           marginLeft: "auto",

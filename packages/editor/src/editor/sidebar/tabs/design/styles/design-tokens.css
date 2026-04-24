@@ -13,12 +13,12 @@
   border-radius: 6px;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: var(--buildrick-transition-fast);
+  transition: var(--bd-transition-fast);
 }
 
 .buildrick-color-swatch.active {
-  border-color: var(--buildrick-text-primary, #f1f5f9);
-  box-shadow: 0 0 0 2px var(--buildrick-accent);
+  border-color: var(--bd-fg-primary, #f1f5f9);
+  box-shadow: 0 0 0 2px var(--bd-accent);
 }
 
 .buildrick-token-row {
@@ -32,15 +32,15 @@
 }
 
 .buildrick-token-name {
-  font-size: var(--buildrick-text-xs);
-  color: var(--buildrick-text-muted);
+  font-size: var(--bd-text-xs);
+  color: var(--bd-fg-muted);
   font-family: 'Fira Code', monospace;
   flex: 1;
 }
 
 .buildrick-token-value {
-  font-size: var(--buildrick-text-xs);
-  color: var(--buildrick-text-secondary);
+  font-size: var(--bd-text-xs);
+  color: var(--bd-fg-secondary);
   font-family: 'Fira Code', monospace;
   background: rgba(0, 0, 0, 0.2);
   padding: 2px 6px;
@@ -51,16 +51,16 @@
   padding: 4px 8px;
   background: transparent;
   border: none;
-  color: var(--buildrick-text-muted);
-  font-size: var(--buildrick-text-xs);
+  color: var(--bd-fg-muted);
+  font-size: var(--bd-text-xs);
   cursor: pointer;
   border-radius: 4px;
-  transition: var(--buildrick-transition-fast);
+  transition: var(--bd-transition-fast);
 }
 
 .buildrick-copy-btn:hover {
-  background: var(--buildrick-surface-3);
-  color: var(--buildrick-text-primary);
+  background: var(--bd-bg-subtle);
+  color: var(--bd-fg-primary);
 }
 
 .buildrick-radius-preview {
@@ -72,8 +72,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--buildrick-text-2xs);
-  color: var(--buildrick-text-muted);
+  font-size: var(--bd-text-2xs);
+  color: var(--bd-fg-muted);
 }
 
 .buildrick-usage-hint {
@@ -84,14 +84,14 @@
 }
 
 .buildrick-usage-hint-title {
-  font-size: var(--buildrick-text-xs);
-  color: var(--buildrick-accent);
+  font-size: var(--bd-text-xs);
+  color: var(--bd-accent);
   margin-bottom: 4px;
 }
 
 .buildrick-usage-hint-text {
-  font-size: var(--buildrick-text-2xs-plus);
-  color: var(--buildrick-text-muted);
+  font-size: var(--bd-text-2xs-plus);
+  color: var(--bd-fg-muted);
   line-height: 1.5;
 }
 
@@ -102,9 +102,9 @@
   flex-direction: column;
   gap: 8px;
   padding: 10px;
-  background: var(--buildrick-surface-3);
+  background: var(--bd-bg-subtle);
   border-radius: 8px;
-  border: 1px solid var(--buildrick-border);
+  border: 1px solid var(--bd-border);
 }
 
 .buildrick-design-picker__sb-wrap {
@@ -163,7 +163,7 @@
   top: 50%;
   transform: translateY(-50%) translateX(calc(100% + 6px));
   font-size: 12px;
-  color: var(--buildrick-text-muted);
+  color: var(--bd-fg-muted);
   white-space: nowrap;
   pointer-events: none;
 }
@@ -189,7 +189,7 @@
   gap: 2px;
   padding: 0 8px;
   background: rgba(255,255,255,0.05);
-  border: 1px solid var(--buildrick-border);
+  border: 1px solid var(--bd-border);
   border-radius: 5px;
   height: 28px;
 }
@@ -200,7 +200,7 @@
 
 .buildrick-design-picker__hash {
   font-size: 12px;
-  color: var(--buildrick-text-muted);
+  color: var(--bd-fg-muted);
   font-family: monospace;
   user-select: none;
 }
@@ -210,7 +210,7 @@
   background: transparent;
   border: none;
   outline: none;
-  color: var(--buildrick-text-primary);
+  color: var(--bd-fg-primary);
   font-size: 12px;
   font-family: monospace;
   letter-spacing: 0.5px;
@@ -219,7 +219,7 @@
 
 .buildrick-design-picker__contrast-badge {
   font-size: 12px;
-  color: var(--buildrick-text-muted);
+  color: var(--bd-fg-muted);
   white-space: nowrap;
   font-family: monospace;
 }
@@ -249,16 +249,16 @@
 .buildrick-design-picker__cancel-btn {
   padding: 5px 12px;
   background: transparent;
-  border: 1px solid var(--buildrick-border);
+  border: 1px solid var(--bd-border);
   border-radius: 5px;
-  color: var(--buildrick-text-muted);
+  color: var(--bd-fg-muted);
   font-size: 12px;
   cursor: pointer;
 }
 
 .buildrick-design-picker__save-btn {
   padding: 5px 12px;
-  background: var(--buildrick-accent);
+  background: var(--bd-accent);
   border: none;
   border-radius: 5px;
   color: #fff;

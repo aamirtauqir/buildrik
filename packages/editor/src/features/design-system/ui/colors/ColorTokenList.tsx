@@ -51,17 +51,17 @@ const GroupHeader: React.FC<{ label: string; subtext?: string }> = ({ label, sub
           margin: 0,
           fontSize: 12,
           fontWeight: 600,
-          color: "var(--buildrick-text-muted)",
+          color: "var(--bd-fg-muted)",
           textTransform: "uppercase",
           letterSpacing: "0.5px",
         }}
       >
         {label}
       </h3>
-      <div style={{ flex: 1, height: 1, background: "var(--buildrick-border)" }} />
+      <div style={{ flex: 1, height: 1, background: "var(--bd-border)" }} />
     </div>
     {subtext && (
-      <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginTop: 2, lineHeight: 1.4 }}>
+      <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginTop: 2, lineHeight: 1.4 }}>
         {subtext}
       </div>
     )}
@@ -179,9 +179,9 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
               width: "100%",
               padding: "5px 8px",
               background: "rgba(255,255,255,0.04)",
-              border: "1px solid var(--buildrick-border)",
+              border: "1px solid var(--bd-border)",
               borderRadius: 6,
-              color: "var(--buildrick-text-primary)",
+              color: "var(--bd-fg-primary)",
               fontSize: 12,
               boxSizing: "border-box",
               outline: "none",
@@ -197,9 +197,9 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             fontSize: 12,
             fontWeight: 600,
             cursor: "pointer",
-            background: filterMode === "all" ? "var(--buildrick-accent)" : "transparent",
-            borderColor: filterMode === "all" ? "var(--buildrick-accent)" : "var(--buildrick-border)",
-            color: filterMode === "all" ? "#fff" : "var(--buildrick-text-muted)",
+            background: filterMode === "all" ? "var(--bd-accent)" : "transparent",
+            borderColor: filterMode === "all" ? "var(--bd-accent)" : "var(--bd-border)",
+            color: filterMode === "all" ? "#fff" : "var(--bd-fg-muted)",
           }}
         >
           All
@@ -214,8 +214,8 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
             fontWeight: 600,
             cursor: "pointer",
             background: filterMode === "issues" ? "#ef4444" : "transparent",
-            borderColor: filterMode === "issues" ? "#ef4444" : "var(--buildrick-border)",
-            color: filterMode === "issues" ? "#fff" : "var(--buildrick-text-muted)",
+            borderColor: filterMode === "issues" ? "#ef4444" : "var(--bd-border)",
+            color: filterMode === "issues" ? "#fff" : "var(--bd-fg-muted)",
           }}
           title={`${issuesCount} token${issuesCount !== 1 ? "s" : ""} fail WCAG AA`}
         >
@@ -246,7 +246,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                   borderRadius: 4,
                   border: "1px solid rgba(34,197,94,0.4)",
                   background: "rgba(34,197,94,0.1)",
-                  color: "var(--buildrick-success)",
+                  color: "var(--bd-success)",
                   fontSize: 12,
                   fontWeight: 600,
                   cursor: "pointer",
@@ -266,10 +266,10 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
       {isIssuesEmpty && (
         <div style={{ padding: "24px 0", textAlign: "center" }}>
           <div style={{ fontSize: 20, marginBottom: 6 }}>✓</div>
-          <div style={{ fontSize: 12, color: "var(--buildrick-success)", fontWeight: 600 }}>
+          <div style={{ fontSize: 12, color: "var(--bd-success)", fontWeight: 600 }}>
             All colors pass WCAG
           </div>
-          <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginTop: 4 }}>
+          <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginTop: 4 }}>
             No contrast issues found
           </div>
         </div>
@@ -278,7 +278,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
       {/* Empty search state */}
       {isEmpty && !isIssuesEmpty && (
         <div style={{ padding: "24px 0", textAlign: "center" }}>
-          <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
+          <div style={{ fontSize: 12, color: "var(--bd-fg-muted)" }}>
             No colors match "{searchQuery}"
           </div>
         </div>
@@ -319,7 +319,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                             gap: 8,
                             padding: "4px 8px 4px 28px",
                             fontSize: 12,
-                            color: "var(--buildrick-text-muted)",
+                            color: "var(--bd-fg-muted)",
                           }}
                         >
                           <span>Ratio: {ratio.toFixed(1)}:1 → needs 4.5:1</span>
@@ -332,7 +332,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                                 height: 14,
                                 borderRadius: 3,
                                 background: fix,
-                                border: "1px solid var(--buildrick-border)",
+                                border: "1px solid var(--bd-border)",
                                 verticalAlign: "middle",
                               }}
                               aria-hidden="true"
@@ -346,7 +346,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                               borderRadius: 3,
                               border: "1px solid rgba(34,197,94,0.4)",
                               background: "rgba(34,197,94,0.1)",
-                              color: "var(--buildrick-success)",
+                              color: "var(--bd-success)",
                               fontSize: 12,
                               fontWeight: 600,
                               cursor: "pointer",
@@ -374,9 +374,9 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
           width: "100%",
           padding: "10px",
           background: "transparent",
-          border: "1px dashed var(--buildrick-border)",
+          border: "1px dashed var(--bd-border)",
           borderRadius: 6,
-          color: "var(--buildrick-text-muted)",
+          color: "var(--bd-fg-muted)",
           fontSize: 12,
           cursor: "pointer",
         }}

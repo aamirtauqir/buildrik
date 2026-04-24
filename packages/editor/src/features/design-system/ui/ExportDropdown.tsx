@@ -38,9 +38,9 @@ export const ExportDropdown: React.FC<{
         style={{
           padding: "4px 10px",
           background: "rgba(255,255,255,0.05)",
-          border: "1px solid var(--buildrick-border)",
+          border: "1px solid var(--bd-border)",
           borderRadius: 6,
-          color: "var(--buildrick-text-secondary)",
+          color: "var(--bd-fg-secondary)",
           fontSize: 12,
           cursor: "pointer",
           display: "flex",
@@ -67,8 +67,8 @@ export const ExportDropdown: React.FC<{
             position: "absolute",
             top: "calc(100% + 4px)",
             right: 0,
-            background: "var(--buildrick-surface-3)",
-            border: "1px solid var(--buildrick-border)",
+            background: "var(--bd-bg-subtle)",
+            border: "1px solid var(--bd-border)",
             borderRadius: 8,
             overflow: "hidden",
             zIndex: 100,
@@ -80,11 +80,11 @@ export const ExportDropdown: React.FC<{
             <div
               style={{
                 padding: "10px 14px",
-                borderBottom: "1px solid var(--buildrick-border)",
+                borderBottom: "1px solid var(--bd-border)",
                 background: "rgba(245,158,11,0.06)",
               }}
             >
-              <div style={{ fontSize: 12, color: "var(--buildrick-warning)", marginBottom: 6, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 12, color: "var(--bd-warning)", marginBottom: 6, lineHeight: 1.5 }}>
                 ⚠ Exporting unsaved changes — not yet live on your site.
               </div>
               <button
@@ -94,7 +94,7 @@ export const ExportDropdown: React.FC<{
                 }}
                 style={{
                   fontSize: 12,
-                  color: "var(--buildrick-accent)",
+                  color: "var(--bd-accent)",
                   background: "none",
                   border: "none",
                   cursor: "pointer",
@@ -124,8 +124,8 @@ export const ExportDropdown: React.FC<{
                 textAlign: "left",
               }}
             >
-              <div style={{ fontSize: 12, color: "var(--buildrick-text-primary)" }}>{label}</div>
-              <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginTop: 1 }}>
+              <div style={{ fontSize: 12, color: "var(--bd-fg-primary)" }}>{label}</div>
+              <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginTop: 1 }}>
                 {desc}
               </div>
             </button>

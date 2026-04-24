@@ -25,12 +25,12 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
       alignItems: "center",
       gap: 8,
       padding: "10px 12px",
-      borderTop: "1px solid var(--buildrick-border)",
-      background: "var(--buildrick-surface-2)",
+      borderTop: "1px solid var(--bd-border)",
+      background: "var(--bd-bg-subtle)",
       flexShrink: 0,
     }}
   >
-    <div style={{ flex: 1, fontSize: 12, color: "var(--buildrick-text-muted)" }}>
+    <div style={{ flex: 1, fontSize: 12, color: "var(--bd-fg-muted)" }}>
       {isDirty ? `${dirtyCount} previewing` : "All changes saved"}
     </div>
     <button
@@ -39,9 +39,9 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
       style={{
         padding: "6px 12px",
         background: "transparent",
-        border: "1px solid var(--buildrick-border)",
+        border: "1px solid var(--bd-border)",
         borderRadius: 6,
-        color: isDirty ? "#ef4444" : "var(--buildrick-text-muted)",
+        color: isDirty ? "#ef4444" : "var(--bd-fg-muted)",
         fontSize: 12,
         cursor: isDirty ? "pointer" : "default",
         opacity: isDirty ? 1 : 0.4,
@@ -57,7 +57,7 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
         background: isDirty ? "linear-gradient(135deg, #8b5cf6, #3b82f6)" : "rgba(139,92,246,0.2)",
         border: "none",
         borderRadius: 6,
-        color: isDirty ? "#fff" : "var(--buildrick-text-muted)",
+        color: isDirty ? "#fff" : "var(--bd-fg-muted)",
         fontSize: 12,
         fontWeight: 600,
         cursor: isDirty ? "pointer" : "default",

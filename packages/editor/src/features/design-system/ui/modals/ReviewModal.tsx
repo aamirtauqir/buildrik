@@ -30,7 +30,7 @@ const DIFF_ROW_STYLE: React.CSSProperties = {
 const DIFF_SECTION_HEADER: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 700,
-  color: "var(--buildrick-text-muted)",
+  color: "var(--bd-fg-muted)",
   marginBottom: 8,
   textTransform: "uppercase",
   letterSpacing: "0.07em",
@@ -76,8 +76,8 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
     >
       <div
         style={{
-          background: "var(--buildrick-surface-3)",
-          border: "1px solid var(--buildrick-border)",
+          background: "var(--bd-bg-subtle)",
+          border: "1px solid var(--bd-border)",
           borderRadius: 12,
           padding: 20,
           width: 300,
@@ -90,13 +90,13 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
           style={{
             fontSize: 14,
             fontWeight: 600,
-            color: "var(--buildrick-text-primary)",
+            color: "var(--bd-fg-primary)",
             marginBottom: 4,
           }}
         >
           Review changes
         </div>
-        <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginBottom: 14 }}>
+        <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginBottom: 14 }}>
           {totalChanges} token{totalChanges !== 1 ? "s" : ""} will be updated
         </div>
 
@@ -134,7 +134,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                       height="12"
                       viewBox="0 0 12 12"
                       fill="none"
-                      stroke="var(--buildrick-text-muted)"
+                      stroke="var(--bd-fg-muted)"
                       strokeWidth="1.5"
                     >
                       <path d="M2 6h8M8 3l3 3-3 3" strokeLinecap="round" />
@@ -149,7 +149,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                         flexShrink: 0,
                       }}
                     />
-                    <span style={{ fontSize: 12, color: "var(--buildrick-text-primary)", flex: 1 }}>
+                    <span style={{ fontSize: 12, color: "var(--bd-fg-primary)", flex: 1 }}>
                       {token?.name ?? diff.tokenId}
                     </span>
                   </div>
@@ -167,25 +167,25 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               const savedVal = typeSavedTokens.find((s) => s.id === t.id)?.value ?? "—";
               return (
                 <div key={t.id} style={DIFF_ROW_STYLE}>
-                  <span style={{ fontSize: 12, color: "var(--buildrick-text-primary)", flex: 1 }}>
+                  <span style={{ fontSize: 12, color: "var(--bd-fg-primary)", flex: 1 }}>
                     {t.name}
                   </span>
                   <span
                     style={{
                       fontSize: 12,
                       fontFamily: "monospace",
-                      color: "var(--buildrick-text-muted)",
+                      color: "var(--bd-fg-muted)",
                       textDecoration: "line-through",
                     }}
                   >
                     {savedVal}
                   </span>
-                  <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>→</span>
+                  <span style={{ fontSize: 12, color: "var(--bd-fg-muted)" }}>→</span>
                   <span
                     style={{
                       fontSize: 12,
                       fontFamily: "monospace",
-                      color: "var(--buildrick-success)",
+                      color: "var(--bd-success)",
                     }}
                   >
                     {t.value}
@@ -204,25 +204,25 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               const savedVal = spacingSavedTokens.find((s) => s.id === t.id)?.value ?? "—";
               return (
                 <div key={t.id} style={DIFF_ROW_STYLE}>
-                  <span style={{ fontSize: 12, color: "var(--buildrick-text-primary)", flex: 1 }}>
+                  <span style={{ fontSize: 12, color: "var(--bd-fg-primary)", flex: 1 }}>
                     {t.name}
                   </span>
                   <span
                     style={{
                       fontSize: 12,
                       fontFamily: "monospace",
-                      color: "var(--buildrick-text-muted)",
+                      color: "var(--bd-fg-muted)",
                       textDecoration: "line-through",
                     }}
                   >
                     {savedVal}
                   </span>
-                  <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>→</span>
+                  <span style={{ fontSize: 12, color: "var(--bd-fg-muted)" }}>→</span>
                   <span
                     style={{
                       fontSize: 12,
                       fontFamily: "monospace",
-                      color: "var(--buildrick-success)",
+                      color: "var(--bd-success)",
                     }}
                   >
                     {t.value}
@@ -240,9 +240,9 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             style={{
               padding: "7px 14px",
               background: "transparent",
-              border: "1px solid var(--buildrick-border)",
+              border: "1px solid var(--bd-border)",
               borderRadius: 6,
-              color: "var(--buildrick-text-secondary)",
+              color: "var(--bd-fg-secondary)",
               fontSize: 12,
               cursor: "pointer",
             }}
@@ -256,7 +256,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               background: "linear-gradient(135deg, #8b5cf6, #3b82f6)",
               border: "none",
               borderRadius: 6,
-              color: "var(--buildrick-text-on-accent)",
+              color: "var(--bd-fg-on-accent)",
               fontSize: 12,
               fontWeight: 600,
               cursor: "pointer",
