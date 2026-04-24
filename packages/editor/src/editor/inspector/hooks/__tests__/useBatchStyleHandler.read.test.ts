@@ -143,4 +143,39 @@ describe("useBatchStyleHandler reads effective styles + refreshes on events", ()
     });
     expect(result.current.styles.color).toBe(before);
   });
+
+  it("ignores style:changed for non-selected ids (breakpoint payload)", () => {
+    const e1 = makeElement("e1", { color: "#000" });
+    const e2 = makeElement("e2", { color: "#000" });
+    const composer = makeComposer([e1, e2]);
+    const { result } = renderHook(() =>
+      useBatchStyleHandler(composer, ["e1"], "mobile", "normal")
+    );
+    const before = result.current.styles.color;
+
+    // style:changed for e2 under mobile — payload shape from setBreakpointStyle.
+    // Our view (selected=e1) must stay unchanged.
+    act(() => {
+      composer._fire("style:changed", { elementId: "e2", breakpoint: "mobile", styles: { color: "#f00" } });
+    });
+    expect(result.current.styles.color).toBe(before);
+  });
+
+  it("ignores style:changed for non-selected ids (selector payload)", () => {
+    const e1 = makeElement("e1", { color: "#000" });
+    const composer = makeComposer([e1]);
+    const { result } = renderHook(() =>
+      useBatchStyleHandler(composer, ["e1"], "desktop", "normal")
+    );
+    const before = result.current.styles.color;
+
+    // style:changed from setRule for some other element's :hover rule.
+    act(() => {
+      composer._fire("style:changed", {
+        selector: '[data-buildrick-id="e99"]:hover',
+        properties: { color: "#f00" },
+      });
+    });
+    expect(result.current.styles.color).toBe(before);
+  });
 });

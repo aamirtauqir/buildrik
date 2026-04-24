@@ -103,7 +103,32 @@ export function useBatchStyleHandler(
   React.useEffect(() => {
     computeRef.current();
     if (!composer) return;
-    const handler = () => computeRef.current();
+
+    const selectedSet = new Set(selectedIds);
+    // Try to extract a target element id from any payload shape the composer
+    // emits for element:updated / style:changed. Unknown shape → recompute.
+    const payloadId = (payload: unknown): string | null => {
+      if (!payload || typeof payload !== "object") return null;
+      const p = payload as Record<string, unknown>;
+      // Element instance from element:updated
+      if (typeof p.getId === "function") return (p.getId as () => string)();
+      // StyleEngine.setBreakpointStyle emits { elementId, breakpoint, styles }
+      if (typeof p.elementId === "string") return p.elementId;
+      // StyleEngine.setRule emits StyleData { selector, ... }; parse the id
+      // from the bracket attribute selector.
+      if (typeof p.selector === "string") {
+        const m = p.selector.match(/data-buildrick-id="([^"]+)"/);
+        return m?.[1] ?? null;
+      }
+      return null;
+    };
+
+    const handler = (payload: unknown) => {
+      const id = payloadId(payload);
+      // Unknown shape → recompute (conservative). Known shape → only refresh
+      // when the mutation targets one of our selected elements.
+      if (id === null || selectedSet.has(id)) computeRef.current();
+    };
     composer.on?.("element:updated", handler);
     composer.on?.("style:changed", handler);
     return () => {
