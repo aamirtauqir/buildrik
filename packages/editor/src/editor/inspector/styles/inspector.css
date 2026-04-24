@@ -81,6 +81,14 @@
   background: var(--bd-bg-subtle);
   color: var(--bd-fg-primary);
 }
+.bdi-icon-btn.on {
+  background: var(--bd-accent-tint);
+  color: var(--bd-accent);
+}
+.bdi-icon-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
 
 /* ── Element header (Figma-style) ──────────────────────── */
 .bdi-ehdr {

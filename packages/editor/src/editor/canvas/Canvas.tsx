@@ -147,6 +147,34 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
       onContextMenuClose: closeContextMenu,
     });
 
+    // Inspector pick mode — subscribe to inspector:pick-start/cancel events
+    // emitted by the ProInspector Crosshair button. While active, next canvas
+    // click resolves the element under cursor and selects it instead of
+    // running normal selection behavior. Escape key cancels.
+    const [pickMode, setPickMode] = React.useState(false);
+    React.useEffect(() => {
+      if (!composer) return;
+      const start = () => setPickMode(true);
+      const cancel = () => setPickMode(false);
+      composer.on("inspector:pick-start", start);
+      composer.on("inspector:pick-cancel", cancel);
+      return () => {
+        composer.off("inspector:pick-start", start);
+        composer.off("inspector:pick-cancel", cancel);
+      };
+    }, [composer]);
+    React.useEffect(() => {
+      if (!pickMode) return;
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          setPickMode(false);
+          composer?.emit("inspector:pick-cancel");
+        }
+      };
+      document.addEventListener("keydown", onKey);
+      return () => document.removeEventListener("keydown", onKey);
+    }, [pickMode, composer]);
+
     // Inline editing commands (delegated to useCanvasInlineCommands)
     const { handleInlineCommand } = useCanvasInlineCommands({
       composer,
@@ -340,15 +368,30 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     // ── Aria-live selection announcements (WCAG 4.1.3) ──────────────────────
     const liveAnnouncement = useSelectionAnnouncement({ composer, selectedId, selectedIds });
 
-    // Canvas click handler - wraps selection behavior with focus management
+    // Canvas click handler - wraps selection behavior with focus management.
+    // If inspector pick mode is active, intercept: resolve target element id
+    // from the nearest [data-buildrick-id] ancestor, select it via composer,
+    // emit inspector:pick-result, exit pick mode, and skip the normal
+    // click-through/additive selection path.
     const handleCanvasClick = React.useCallback(
       (e: React.MouseEvent) => {
-        // Focus wrapper for keyboard events
         wrapperRef.current?.focus();
-        // Delegate to selection behavior hook
+        if (pickMode && composer) {
+          const target = (e.target as HTMLElement).closest("[data-buildrick-id]") as HTMLElement | null;
+          const id = target?.getAttribute("data-buildrick-id") ?? null;
+          if (id) {
+            const el = composer.elements.getElement(id);
+            if (el) composer.selection.select(el);
+          }
+          composer.emit("inspector:pick-result", id);
+          setPickMode(false);
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
         handleSelectionClick(e);
       },
-      [handleSelectionClick]
+      [handleSelectionClick, pickMode, composer]
     );
 
     // Context menu handler - includes element stack detection for "Select from stack" feature
@@ -403,7 +446,10 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
             handleCanvasMouseLeave();
             handleMarqueeEnd();
           }}
-          style={getCanvasStyles(size, device, scale, isDragOver)}
+          style={{
+            ...getCanvasStyles(size, device, scale, isDragOver),
+            ...(pickMode ? { cursor: "crosshair" } : {}),
+          }}
         >
           {/* Canvas Content */}
           <div
