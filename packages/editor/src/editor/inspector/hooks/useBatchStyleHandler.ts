@@ -60,54 +60,56 @@ export function useBatchStyleHandler(
   // Compute the agreed style view across the selection using EFFECTIVE styles
   // (base + breakpoint overlay + pseudo layer), not base styles alone — so the
   // panel reflects what the user sees under the active responsive context.
-  // Subscribes to composer `element:updated` events so external mutations
-  // (undo/redo, other panels) refresh the panel instead of leaving it stale.
+  // Refreshes on both `element:updated` (emitted by Element.setStyle etc) and
+  // `style:changed` (emitted by StyleEngine.setRule / setBreakpointStyle) so
+  // responsive + pseudo writes from any panel keep the batch view in sync.
   const [{ styles, mixed }, setView] = React.useState<{
     styles: Record<string, string>;
     mixed: Set<string>;
   }>({ styles: {}, mixed: new Set() });
 
-  React.useEffect(() => {
+  // Ref-stable compute closure — updated every render so the event handler and
+  // handleBatchStyleChange always use the latest selection/breakpoint/pseudo.
+  const computeRef = React.useRef<() => void>(() => { /* noop until first effect */ });
+  computeRef.current = () => {
     if (!composer || selectedIds.length === 0) {
       setView({ styles: {}, mixed: new Set() });
       return;
     }
-
-    const compute = () => {
-      const allStyles = selectedIds
-        .map((id) => composer.elements.getElement(id))
-        .filter((el): el is NonNullable<typeof el> => !!el)
-        .map((el) => computeEffectiveStyles(el, composer, currentBreakpoint, currentPseudoState));
-      if (allStyles.length === 0) {
-        setView({ styles: {}, mixed: new Set() });
-        return;
+    const allStyles = selectedIds
+      .map((id) => composer.elements.getElement(id))
+      .filter((el): el is NonNullable<typeof el> => !!el)
+      .map((el) => computeEffectiveStyles(el, composer, currentBreakpoint, currentPseudoState));
+    if (allStyles.length === 0) {
+      setView({ styles: {}, mixed: new Set() });
+      return;
+    }
+    const allProps = new Set<string>();
+    allStyles.forEach((s) => Object.keys(s).forEach((p) => allProps.add(p)));
+    const merged: Record<string, string> = {};
+    const mixedProps = new Set<string>();
+    for (const prop of allProps) {
+      const first = allStyles[0][prop] ?? "";
+      const allAgree = allStyles.every((s) => (s[prop] ?? "") === first);
+      if (allAgree) {
+        if (first) merged[prop] = first;
+      } else {
+        mixedProps.add(prop);
       }
+    }
+    setView({ styles: merged, mixed: mixedProps });
+  };
 
-      const allProps = new Set<string>();
-      allStyles.forEach((s) => Object.keys(s).forEach((p) => allProps.add(p)));
-
-      const merged: Record<string, string> = {};
-      const mixedProps = new Set<string>();
-      for (const prop of allProps) {
-        const first = allStyles[0][prop] ?? "";
-        const allAgree = allStyles.every((s) => (s[prop] ?? "") === first);
-        if (allAgree) {
-          if (first) merged[prop] = first;
-        } else {
-          mixedProps.add(prop);
-        }
-      }
-      setView({ styles: merged, mixed: mixedProps });
-    };
-
-    compute();
-    const selectedSet = new Set(selectedIds);
-    const handler = (payload: unknown) => {
-      const id = (payload as { getId?: () => string } | undefined)?.getId?.();
-      if (!id || selectedSet.has(id)) compute();
-    };
+  React.useEffect(() => {
+    computeRef.current();
+    if (!composer) return;
+    const handler = () => computeRef.current();
     composer.on?.("element:updated", handler);
-    return () => { composer.off?.("element:updated", handler); };
+    composer.on?.("style:changed", handler);
+    return () => {
+      composer.off?.("element:updated", handler);
+      composer.off?.("style:changed", handler);
+    };
     // selectedIds identity can change per-render even when contents are stable
     // (parent closures recreate the array). Depend on a derived key instead so
     // the effect only re-runs when the actual selection changes.
@@ -178,6 +180,10 @@ export function useBatchStyleHandler(
       } finally {
         composer.endTransaction?.();
       }
+      // Force synchronous refresh — event listeners will also fire, but calling
+      // compute directly means the panel reflects the new values within the
+      // same commit instead of waiting for React to process the event.
+      computeRef.current();
     },
     [composer, selectedIds, currentBreakpoint, currentPseudoState]
   );

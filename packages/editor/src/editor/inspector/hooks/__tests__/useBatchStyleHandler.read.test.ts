@@ -82,6 +82,51 @@ describe("useBatchStyleHandler reads effective styles + refreshes on events", ()
     expect(result.current.styles.color).toBe("#abc");
   });
 
+  it("refreshes after handleBatchStyleChange writes to mobile overlay", () => {
+    const e1 = makeElement("e1", { color: "#000" });
+    const composer = makeComposer([e1]);
+    // StyleEngine stub: setBreakpointStyle mutates the overlay and emits.
+    const overlays = new Map<string, Record<string, string>>();
+    composer.styles.getBreakpointStyle = vi.fn((id: string, bp: string) =>
+      overlays.get(`${id}::${bp}`) ?? {}
+    );
+    composer.styles.setBreakpointStyle = vi.fn((id: string, bp: string, changes: Record<string, string>) => {
+      const key = `${id}::${bp}`;
+      overlays.set(key, { ...(overlays.get(key) ?? {}), ...changes });
+      composer._fire("style:changed", { elementId: id, breakpoint: bp, styles: changes });
+    });
+
+    const { result } = renderHook(() =>
+      useBatchStyleHandler(composer, ["e1"], "mobile", "normal")
+    );
+    expect(result.current.styles.color).toBe("#000");
+
+    act(() => {
+      result.current.handleBatchStyleChange({ color: "#f00" });
+    });
+
+    // Panel must reflect the new mobile overlay value, not the base.
+    expect(result.current.styles.color).toBe("#f00");
+  });
+
+  it("refreshes when an external style:changed fires for a selected id", () => {
+    const e1 = makeElement("e1", { color: "#000" });
+    const composer = makeComposer([e1]);
+    const { result } = renderHook(() =>
+      useBatchStyleHandler(composer, ["e1"], "desktop", "normal")
+    );
+    expect(result.current.styles.color).toBe("#000");
+
+    act(() => {
+      e1.setStyle("color", "#0f0");
+      composer._fire("style:changed", {
+        selector: '[data-buildrick-id="e1"]',
+        properties: { color: "#0f0" },
+      });
+    });
+    expect(result.current.styles.color).toBe("#0f0");
+  });
+
   it("ignores element:updated for non-selected ids", () => {
     const e1 = makeElement("e1", { color: "#000" });
     const e2 = makeElement("e2", { color: "#fff" });
@@ -91,7 +136,7 @@ describe("useBatchStyleHandler reads effective styles + refreshes on events", ()
     );
     const before = result.current.styles.color;
 
-    // Mutate e2 (not selected) and fire — should NOT refresh.
+    // Mutate e2 (not selected) and fire — should NOT change our view's color.
     act(() => {
       e2.setStyle("color", "#xyz");
       composer._fire("element:updated", e2);
