@@ -6,6 +6,13 @@ Deferred work from CEO reviews and implementation sessions. Ordered by priority.
 
 ## P2 — Should Do Soon
 
+### T-DS-LEAK-01: Migrate 179 chrome files from --buildrick-* to --bd-*
+**What:** Codex DS audit (2026-04-25) found 179 chrome files still referencing canonical `--buildrick-*` tokens directly instead of going through the `--bd-*` alias layer. The bridge contract holds for reconciled primitives (Button, FormInput, NumericStepper, Badge, Modal, Popover, TextInput, Section) but legacy chrome bypasses it.
+**Why:** Single Source of Truth violation. The `--bd-*` layer exists so canonical values can change in one place (color.css) without grepping 179 files. Right now changing the cobalt accent requires editing each consumer.
+**How to apply:** Mechanical sweep with `sed -i '' 's/var(--buildrick-/var(--bd-/g'` on chrome files (editor/, shared/ui/, shared/forms/, ai/, features/design-system/ui/, themes/components.css, themes/ux-fixes.css). For each consumer, verify alias exists in bd-aliases.css; add missing aliases as needed (use Gate 17 ghost-alias scan first). Test visually after each tab/feature directory. Sample violators: components.css:56-79, ux-fixes.css:22-23, LibraryManager.css:4-14, Canvas.css:3-31, CMSCollectionSetupModal.tsx:66-99, AccountModal.tsx:76-107, SelectFontField.tsx:87-131.
+**Effort:** L (human: ~2 days / CC: ~half-day with adversarial review per phase)
+**Depends on:** Add Gate 17 (ghost-alias guard) FIRST so the sweep doesn't introduce silent renders.
+
 ### T-ISO-01: Component isolation mode — auto-exit on page navigation
 **What:** When a user is in component isolation mode (Task 24: double-click to edit master component) and navigates to a different page, the editor has no defined behavior.
 **Why:** Users can accidentally get stuck in isolation mode on a different page context. The canvas would show the wrong scope.
@@ -50,3 +57,38 @@ Deferred work from CEO reviews and implementation sessions. Ordered by priority.
 **How to apply:** When fuzzy search returns 0 results: show centered "No results for 'xyz'" with a helpful suggestion ("Try 'Add text' or press Escape").
 **Effort:** XS (human: ~30 min / CC: ~2 min)
 **Depends on:** Task 1 (Command Palette) must be implemented first.
+
+### T-DS-SHADOW-01: Replace 25 raw rgba(0,0,0,*) shadows with --bd-shadow-* tokens
+**What:** Codex DS audit caught 25 sites still using inline `rgba(0,0,0,*)` box-shadows instead of consuming `--bd-shadow-*` tokens. Locations: components.css:470,493,812,1298,1308; ux-fixes.css:164; SelectFontField.tsx:131; SharedDialogs.css:22; Tooltip.tsx:93; Toast.tsx:231; CommandPalette.tsx:150; LayoutShell.css:126 (and 13 more).
+**Why:** Same SSOT violation as token leak. Shadow values can drift across components. DESIGN.md says shadows should be tokenized. Also blocks Gate 12 from passing — currently 188 > 179 baseline because detector only counts tokenized shadows.
+**How to apply:** Audit each site against `--bd-shadow-{xs,sm,md,lg,xl,modal,dropdown}` (defined in shadow.css). Pick the closest token by visual blur+spread. For one-off shadows, add to canonical shadow.css if reused, or accept as `@lint-hex-policy:` exempted with rationale.
+**Effort:** M (human: ~4h / CC: ~30 min)
+**Depends on:** None. Can run after or in parallel with T-DS-LEAK-01.
+
+### T-DS-LEGACY-01: Delete components.css + ux-fixes.css runtime imports
+**What:** components.css (1771 lines) is imported via `themes/default.css:18` and ux-fixes.css (362 lines) via `editor/shell/AquibraStudio.tsx:38`. Both have honest "retirement in progress" headers but their consumers (legacy `.buildrick-*` class hooks like `.tb-*`, `.buildrick-input/select/textarea/switch/slider`, `.buildrick-empty-state`, `.buildrick-icon-btn`, etc.) still need them on the runtime path.
+**Why:** Dead-code retirement is partial. Codex called it "theater" because the files themselves still ship. Honest end-state: per-component extraction so those rules live with their consumers (FormInput, Toast, Spinner) and the legacy files can be deleted.
+**How to apply:** For each cluster listed in components.css header (.tb-* PageTabBar, .buildrick-form-field, .buildrick-btn-group, .buildrick-input/select/textarea, .buildrick-empty-state, .buildrick-icon-btn, .buildrick-number-btn/stepper, .buildrick-slider, .pill, .buildrick-switch, .buildrick-color-swatch/preset, .buildrick-canvas, nav-*, @keyframes buildrick-*): identify owning component, extract rules into co-located CSS or Emotion styled-components, verify visual parity, delete cluster from components.css. When components.css and ux-fixes.css both reach 0 active rules, delete the imports.
+**Effort:** XL (human: ~1 week / CC: ~half-day with adversarial review per cluster)
+**Depends on:** T-DS-LEAK-01 should run first (sweep --buildrick-* → --bd-* in remaining rules first, so the retirement narrative is clean before extraction).
+
+### T-GATE-12-DETECTOR: Update box-shadow gate to recognize --bd-shadow-*
+**What:** Gate 12 (chrome-axiom A1.2 — box-shadow via --buildrick-shadow-* token) currently fails 188 > 179 baseline because the detector only counts `--buildrick-shadow-*` references, not the new `--bd-shadow-*` aliases that primitives consume.
+**Why:** Pre-existing false positive. Detector lags the alias layer. Gate fails on every CI run, blocking downstream gates 13-16 from running on full sweep.
+**How to apply:** Edit `packages/editor/scripts/find-buildrick-shadow-gate.mjs` (or wherever Gate 12 lives) to count `var(--bd-shadow-*)` AND `var(--buildrick-shadow-*)` references as tokenized. Re-run gate, lower baseline to actual count.
+**Effort:** XS (human: ~30 min / CC: ~5 min)
+**Depends on:** None.
+
+### T-GATE-16-FLIP: Flip Gate 16 from REGRESSION to ERROR mode
+**What:** Gate 16 currently runs `find-inline-hex-v2.mjs --editor-only --exclude-fallback` (regression mode, baseline 684). When editor-scoped baseline reaches 0, flip to `--fail` mode + rename gate "ERROR mode (zero tolerance)".
+**Why:** Stop shipping new inline hex in editor/** non-inspector code. Currently the baseline lets 684 sites slide.
+**How to apply:** When `.hex-baseline-editor` hits 0: edit `ds-grep-gates.sh:317` to add `--fail` flag, update pass message to "ERROR mode (zero tolerance)", remove `.hex-baseline-editor` file (no longer needed in --fail mode).
+**Effort:** XS (human: ~10 min / CC: ~2 min)
+**Depends on:** Editor baseline reduced to 0 via T-DS-SHADOW-01 + per-tab inline-hex sweeps.
+
+### T-GATE-17-GHOSTS: Add ghost-alias detection gate
+**What:** Codex caught 4 ghost `--bd-*` aliases (border-light, text-2xs-plus, success-light, warning-light) that were referenced by consumers but undefined in bd-aliases.css. Silent CSS render-as-empty bug. No gate caught it; only adversarial audit did.
+**Why:** Without a gate, the next ghost alias also slips through. The cost of a Gate 17 is ~10 lines of bash; the cost of debugging a "why does my border not render" bug is hours.
+**How to apply:** Add Gate 17 to `ds-grep-gates.sh` after Gate 15: `comm -23 <(grep -rohE 'var\(--bd-[a-z0-9-]+' packages/editor/src/{shared/ui,editor,shared/forms,ai,features/design-system/ui} packages/editor/src/themes/{components,ux-fixes}.css | sed 's|var(||' | sort -u) <(grep -oE -- '--bd-[a-z0-9-]+:' packages/editor/src/themes/design-system/bd-aliases.css | sed 's|:$||' | sort -u)`. If output non-empty, fail with the list of ghosts.
+**Effort:** XS (human: ~30 min / CC: ~5 min)
+**Depends on:** None. Should land BEFORE T-DS-LEAK-01 to catch new ghosts during the sweep.
