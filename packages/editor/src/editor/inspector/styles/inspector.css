@@ -1,7 +1,14 @@
 /*
- * Inspector panel styles — tokens: --bd-* only.
- * Ported from packages/editor/project/preview/comp-inspector.html (v2, Figma-style).
- * Namespace: .bdi-* (buildrik-design inspector)
+ * Inspector panel styles.
+ * Namespace: .bdi-* (buildrik-design inspector).
+ *
+ * Color policy:
+ *   - Prefer `--bd-*` tokens for every value that has a defined token.
+ *   - `#fff` is wrapped in `var(--bd-bg-card, #fff)` so a future token swap
+ *     is one-line.
+ *   - Alpha-blended literals (rgba(...) shadows, focus glows, mixed-value
+ *     badge tints) stay as raw values until the design system defines
+ *     alpha-scale tokens — see docs/ideation/2026-04-24-bd-token-reconciliation.md.
  */
 
 /* ── Panel shell ──────────────────────────────────────── */
@@ -38,7 +45,7 @@
   align-items: center;
   gap: 6px;
   padding: 6px 8px 6px 10px;
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border-bottom: 1px solid var(--bd-border);
   position: sticky;
   top: 0;
@@ -143,7 +150,7 @@
   display: flex;
   padding: 0 8px;
   border-bottom: 1px solid var(--bd-border);
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
 }
 .bdi-tab {
   flex: 1;
@@ -393,11 +400,11 @@
   position: relative;
 }
 .bdi-fld:hover {
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border-color: var(--bd-border);
 }
 .bdi-fld:focus-within {
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border-color: var(--bd-accent);
   box-shadow: 0 0 0 2px rgba(45, 109, 255, 0.12);
 }
@@ -500,11 +507,11 @@
   width: 100%;
 }
 .bdi-ddn:hover {
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border-color: var(--bd-border);
 }
 .bdi-ddn:focus-within {
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border-color: var(--bd-accent);
   box-shadow: 0 0 0 2px rgba(45, 109, 255, 0.12);
 }
@@ -558,7 +565,7 @@
   font: 500 9.5px var(--bd-font);
 }
 .bdi-qa:hover {
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border-color: var(--bd-border);
   color: var(--bd-fg-primary);
 }
@@ -605,7 +612,7 @@
   transform: translateY(-50%);
   font: 600 8px var(--bd-font);
   letter-spacing: 0.08em;
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   padding: 0 4px;
   color: var(--bd-warning);
   text-transform: uppercase;
@@ -630,11 +637,11 @@
   outline: none;
 }
 .bdi-ax:hover {
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border-color: var(--bd-border);
 }
 .bdi-ax:focus {
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border-color: var(--bd-accent);
   box-shadow: 0 0 0 2px rgba(45, 109, 255, 0.12);
 }
@@ -670,7 +677,7 @@
   transform: translateY(-50%);
 }
 .bdi-center-rect {
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border: 1px solid var(--bd-border-medium);
   border-radius: 3px;
   padding: 5px 14px;
@@ -764,7 +771,7 @@
   color: var(--bd-fg-primary);
 }
 .bdi-seg button.on {
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   color: var(--bd-fg-heading);
   font-weight: 600;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
@@ -786,7 +793,7 @@
   width: 100%;
 }
 .bdi-fill:hover {
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border-color: var(--bd-border);
 }
 .bdi-fill .bdi-sw {
@@ -877,7 +884,7 @@
   left: 12px;
   width: 8px;
   height: 8px;
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border-radius: 50%;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);
   transition: left 120ms;
@@ -903,7 +910,7 @@
 .bdi-chip {
   font: 500 10px var(--bd-mono);
   color: var(--bd-fg-primary);
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border: 1px solid var(--bd-border);
   padding: 1px 4px 1px 6px;
   border-radius: 3px;
@@ -961,7 +968,7 @@
   top: calc(100% + 4px);
   left: 0;
   z-index: 20;
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border: 1px solid var(--bd-border);
   border-radius: 4px;
   padding: 2px;
@@ -1057,7 +1064,7 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--bd-fg-secondary);
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   padding: 1px 5px;
   border-radius: 3px;
   flex-shrink: 0;
@@ -1095,11 +1102,11 @@
   transition: background 120ms, border-color 120ms;
 }
 .bdi-text:hover {
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border-color: var(--bd-border);
 }
 .bdi-text:focus {
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border-color: var(--bd-accent);
   box-shadow: 0 0 0 2px rgba(45, 109, 255, 0.12);
 }
@@ -1165,11 +1172,11 @@ textarea.bdi-text {
   position: relative;
 }
 .bdi-num:hover {
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border-color: var(--bd-border);
 }
 .bdi-num:focus-within {
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border-color: var(--bd-accent);
   box-shadow: 0 0 0 2px rgba(45, 109, 255, 0.12);
 }
@@ -1240,7 +1247,7 @@ textarea.bdi-text {
   cursor: pointer;
 }
 .bdi-color:hover {
-  background: #fff;
+  background: var(--bd-bg-card, #fff);
   border-color: var(--bd-border);
 }
 .bdi-color .bdi-sw,
