@@ -42,7 +42,8 @@ const GRID_DISPLAYS = new Set(["grid", "inline-grid"]);
 export function deriveCssContext(
   selectedElement: { id: string; type: string } | null,
   composer?: Composer | null,
-  devMode = false
+  devMode = false,
+  effectiveStyles?: Record<string, string>
 ): CssContext {
   const elementType = selectedElement?.type || "";
 
@@ -76,7 +77,8 @@ export function deriveCssContext(
   const el = composer.elements.getElement(selectedElement.id);
   const parent = el?.getParent?.();
 
-  const styles = el?.getStyles?.() || {};
+  const baseStyles = el?.getStyles?.() || {};
+  const styles = effectiveStyles ?? baseStyles;
   const parentStyles = parent?.getStyles?.() || {};
 
   const display = styles.display || "";

@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import { ChevronDown, Lock, Monitor, Tablet, Smartphone } from "lucide-react";
+import { ChevronDown, Lock, Monitor, Tablet, Smartphone, Crosshair, CornerLeftUp } from "lucide-react";
 import * as React from "react";
 import { BindingPopover } from "./components/BindingPopover";
 import type { Composer } from "../../engine";
@@ -291,7 +291,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const previousElementIdRef = React.useRef<string | null>(null);
 
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
-  const [idCopied, setIdCopied] = React.useState(false);
+  const [pickActive, setPickActive] = React.useState(false);
 
   // Show pseudo-state pills only when non-normal / overrides exist / user opts in
   const [stateSelectorManuallyShown, setStateSelectorManuallyShown] = React.useState(false);
@@ -303,7 +303,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   const { selectedIds, isMultiSelect } = useComposerSelection({ composer: composer ?? null });
 
   const [contextState, setContextState] = React.useState(() =>
-    deriveCssContext(selectedElement, composer, devMode)
+    deriveCssContext(selectedElement, composer, devMode, styles_state)
   );
   const propertyStates = getPropertyStates(contextState);
 
@@ -315,7 +315,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
   }
 
   React.useEffect(() => {
-    setContextState(deriveCssContext(selectedElement, composer, devMode));
+    setContextState(deriveCssContext(selectedElement, composer, devMode, styles_state));
   }, [selectedElement, composer, styles_state, devMode]);
 
   const selectedElements = React.useMemo<readonly Element[]>(() => {
@@ -445,8 +445,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         {elementLabel} selected
       </div>
 
-      {/* Selection breadcrumb */}
-      {breadcrumbPath.length > 1 && (
+      {/* Selection breadcrumb — always visible when element selected */}
+      {breadcrumbPath.length > 0 && (
         <div className="bdi-ssel">
           <div className="bdi-crumb" title={breadcrumbPath.map((p) => p.label).join(" / ")}>
             {breadcrumbPath.map((p, i) => (
@@ -458,29 +458,27 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           </div>
           <button
             type="button"
-            className="bdi-icon-btn"
-            title="Copy element ID"
-            aria-label="Copy element ID"
-            onClick={async () => {
-              try {
-                await navigator.clipboard.writeText(`#${selectedElement.id}`);
-                setIdCopied(true);
-                setTimeout(() => setIdCopied(false), 1500);
-              } catch {
-                /* clipboard unavailable */
-              }
+            className={`bdi-icon-btn${pickActive ? " on" : ""}`}
+            title="Pick element on canvas"
+            aria-label="Pick element on canvas"
+            aria-pressed={pickActive}
+            onClick={() => {
+              const next = !pickActive;
+              setPickActive(next);
+              composer?.emit(next ? "inspector:pick-start" : "inspector:pick-cancel");
             }}
           >
-            {idCopied ? (
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M20 6L9 17l-5-5" />
-              </svg>
-            ) : (
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <rect x="9" y="9" width="11" height="11" rx="1" />
-                <path d="M5 15V5a1 1 0 011-1h10" />
-              </svg>
-            )}
+            <Crosshair size={12} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className="bdi-icon-btn"
+            title="Select parent"
+            aria-label="Select parent element"
+            disabled={!selectedInstance?.getParent()}
+            onClick={() => composer?.selection.selectParent()}
+          >
+            <CornerLeftUp size={12} aria-hidden="true" />
           </button>
         </div>
       )}
