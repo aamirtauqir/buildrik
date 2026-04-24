@@ -409,6 +409,35 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
     ? (["normal", "hover", "focus", "active", "disabled"] as const)
     : (["normal"] as const);
 
+  // Build ancestor breadcrumb path from composer. Walks parent chain and
+  // caps at 4 segments so a deep tree doesn't overflow the strip.
+  const breadcrumbPath: { label: string; isCurrent: boolean }[] = (() => {
+    const path: { label: string; isCurrent: boolean }[] = [];
+    if (!composer?.elements || !selectedElement?.id) return path;
+    let current: Element | null =
+      composer.elements.getElement(selectedElement.id) ?? null;
+    let depth = 0;
+    while (current && depth < 8) {
+      const tag = (current.getTagName() || current.getType() || "").toLowerCase();
+      const cls = current.getClasses()[0];
+      const label = cls ? `${tag}.${cls}` : tag || "element";
+      path.unshift({ label, isCurrent: current.getId() === selectedElement.id });
+      current = current.getParent();
+      depth++;
+    }
+    return path.slice(-4);
+  })();
+
+  // Meta line for the Figma-style header: tag.class
+  const selectedInstance = composer?.elements?.getElement(selectedElement.id) ?? null;
+  const firstClass = selectedInstance?.getClasses()[0] ?? "";
+  const metaPrimary = selectedElement.tagName
+    ? `${selectedElement.tagName.toLowerCase()}${firstClass ? `.${firstClass}` : ""}`
+    : `#${selectedElement.id.slice(-6)}`;
+
+  const bpMeta = BREAKPOINTS[currentBreakpoint];
+  const bpSizeLabel = bpMeta.maxWidth !== undefined ? `${bpMeta.maxWidth}+` : "1200+";
+
   return (
     <div className="bdi-panel">
       {/* Live region for selection announcement */}
@@ -416,57 +445,77 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         {elementLabel} selected
       </div>
 
-      {/* Header — element identity strip */}
-      <div className="bdi-h">
-        <div className="bdi-el">
-          <span className="bdi-el-ic">
-            <ElementIcon size="sm" />
-          </span>
-          <span className="bdi-el-name">{elementLabel}</span>
+      {/* Selection breadcrumb */}
+      {breadcrumbPath.length > 1 && (
+        <div className="bdi-ssel">
+          <div className="bdi-crumb" title={breadcrumbPath.map((p) => p.label).join(" / ")}>
+            {breadcrumbPath.map((p, i) => (
+              <React.Fragment key={i}>
+                {i > 0 && <span className="bdi-sep">/</span>}
+                <span className={p.isCurrent ? "bdi-cur" : undefined}>{p.label}</span>
+              </React.Fragment>
+            ))}
+          </div>
           <button
             type="button"
-            className="bdi-tag"
+            className="bdi-icon-btn"
+            title="Copy element ID"
+            aria-label="Copy element ID"
             onClick={async () => {
               try {
                 await navigator.clipboard.writeText(`#${selectedElement.id}`);
                 setIdCopied(true);
                 setTimeout(() => setIdCopied(false), 1500);
               } catch {
-                /* clipboard API unavailable */
+                /* clipboard unavailable */
               }
             }}
-            aria-label="Copy element ID"
-            title={idCopied ? "Copied!" : "Click to copy element ID"}
-            style={{ cursor: "pointer" }}
           >
-            {selectedElement.tagName
-              ? `${selectedElement.tagName.toLowerCase()} · #${selectedElement.id.slice(-6)}`
-              : `#${selectedElement.id.slice(-6)}`}
-            {idCopied && " ✓"}
+            {idCopied ? (
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            ) : (
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="9" y="9" width="11" height="11" rx="1" />
+                <path d="M5 15V5a1 1 0 011-1h10" />
+              </svg>
+            )}
           </button>
         </div>
+      )}
 
-        {/* Binding popover — link element to CMS field */}
-        <BindingPopover
-          elementId={selectedElement?.id ?? null}
-          composer={composer ?? null}
-          onOpenCreateCollection={onOpenCreateCollection}
-        />
-
-        {/* Lock placeholder (future) */}
-        <button className="bdi-mini" title="Lock element" aria-label="Lock element" type="button">
-          <Lock size={12} aria-hidden="true" />
-        </button>
-
-        {/* Overflow menu */}
-        {onDelete && (
-          <InspectorElementMenu
-            composer={composer}
-            selectedElementId={selectedElement.id}
-            onRequestDelete={() => setShowDeleteConfirm(true)}
+      {/* Figma-style element header */}
+      <div className="bdi-ehdr">
+        <div className="bdi-eic" aria-hidden="true">
+          <ElementIcon size="sm" />
+        </div>
+        <div className="bdi-ename">
+          <div className="bdi-n">{elementLabel}</div>
+          <div className="bdi-t">{metaPrimary}</div>
+        </div>
+        <div className="bdi-eact">
+          <BindingPopover
+            elementId={selectedElement?.id ?? null}
+            composer={composer ?? null}
+            onOpenCreateCollection={onOpenCreateCollection}
           />
-        )}
-
+          <button
+            type="button"
+            className="bdi-icon-btn"
+            title="Lock element"
+            aria-label="Lock element"
+          >
+            <Lock size={12} aria-hidden="true" />
+          </button>
+          {onDelete && (
+            <InspectorElementMenu
+              composer={composer}
+              selectedElementId={selectedElement.id}
+              onRequestDelete={() => setShowDeleteConfirm(true)}
+            />
+          )}
+        </div>
         <DeleteConfirmModal
           isOpen={showDeleteConfirm}
           onClose={() => setShowDeleteConfirm(false)}
@@ -478,7 +527,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         />
       </div>
 
-      {/* Tabs */}
+      {/* Tabs — no count badges; dot reserved for future "has changes" state */}
       <div
         className="bdi-tabs"
         role="tablist"
@@ -503,11 +552,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       >
         {(["style", "element", "effects"] as const).map((tab) => {
           const tabLabels = { style: "Style", element: "Element", effects: "Effects" };
-          const tabAriaLabels = {
-            style: "Style tab — Layout, Size, Spacing, Typography, Background, Border",
-            element: "Element tab — Link, CSS classes, element properties",
-            effects: "Effects tab — Shadows, Transforms, Animation, Interactions",
-          };
           return (
             <button
               key={tab}
@@ -518,7 +562,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               tabIndex={activeTab === tab ? 0 : -1}
               className={`bdi-tab${activeTab === tab ? " on" : ""}`}
               onClick={() => setActiveTab(tab)}
-              aria-label={tabAriaLabels[tab]}
               type="button"
             >
               {tabLabels[tab]}
@@ -527,15 +570,13 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         })}
       </div>
 
-      {/* Breakpoint + state ribbon */}
+      {/* Breakpoint + state strip (mock pattern: pill + states + size right) */}
       <div className="bdi-bpr">
-        <span>Editing</span>
         <BreakpointPill
           current={currentBreakpoint}
           onChange={onBreakpointChange}
           hasOverride={breakpointHasOverride}
         />
-        <span className="bdi-bpr-spacer" />
         {showStatePills ? (
           <StatePills
             current={currentPseudoState}
@@ -549,21 +590,13 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             onClick={() => setStateSelectorManuallyShown(true)}
             aria-label="Show state override selector"
             title="Add hover / focus / active styles"
-            style={{
-              padding: "2px 6px",
-              background: "transparent",
-              border: "1px dashed var(--bd-border)",
-              borderRadius: 3,
-              color: "var(--bd-fg-muted)",
-              fontSize: 10,
-              fontWeight: 500,
-              cursor: "pointer",
-              fontFamily: "var(--bd-font)",
-            }}
+            className="bdi-state-pill"
+            style={{ borderStyle: "dashed", borderWidth: 1, borderColor: "var(--bd-border)" }}
           >
             + state
           </button>
         )}
+        <span className="bdi-sz">{bpSizeLabel}</span>
       </div>
 
       {/* Scrollable body */}
