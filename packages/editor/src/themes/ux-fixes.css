@@ -1,39 +1,4 @@
-*:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
-  outline-offset: 2px;
-  border-radius: var(--buildrick-radius-sm);
-}
-
-*:focus:not(:focus-visible) {
-  outline: none;
-}
-
-button:focus-visible,
-a:focus-visible,
-[role="button"]:focus-visible,
-[tabindex]:not([tabindex="-1"]):focus-visible {
-  outline: 2px solid var(--buildrick-accent);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px var(--buildrick-accent-subtle);
-}
-
-.buildrick-skip-link {
-  position: absolute;
-  top: -100px;
-  left: 0;
-  background: var(--buildrick-accent);
-  color: white;
-  padding: 8px 16px;
-  border-radius: var(--buildrick-radius-md);
-  z-index: var(--buildrick-z-max);
-  text-decoration: none;
-  font-weight: var(--buildrick-font-weight-semibold);
-}
-
-.buildrick-skip-link:focus {
-  top: 16px;
-  left: 16px;
-}
+/* focus-visible, skip-link — migrated to themes/design-system/a11y.css (2026-04-25) */
 
 .buildrick-input:hover:not(:disabled):not(:focus) {
   border-color: var(--buildrick-border-hover);
@@ -508,49 +473,9 @@ button {
   margin-top: var(--buildrick-space-4);
 }
 
-@media print {
-.buildrick-toolbar,
-  .buildrick-sidebar,
-  .buildrick-panel-header-actions,
-  button,
-  .buildrick-btn {
-    display: none !important;
-  }
-
-.buildrick-canvas {
-    background: white !important;
-  }
-
-* {
-    box-shadow: none !important;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-*,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-@media (prefers-contrast: high) {
-.buildrick-input,
-  .buildrick-select,
-  .buildrick-btn {
-    border-width: 2px;
-  }
-
-.buildrick-input:focus,
-  .buildrick-select:focus,
-  .buildrick-btn:focus-visible {
-    outline-width: 3px;
-    outline-offset: 3px;
-  }
-}
+/* @media print, prefers-reduced-motion, prefers-contrast — migrated to
+   themes/design-system/a11y.css (2026-04-25). a11y.css has richer
+   prefers-contrast block covering the rules from here. */
 
 .buildrick-row-hover-chain:hover .buildrick-chain-btn,
 .buildrick-row-hover-chain:focus-within .buildrick-chain-btn {
