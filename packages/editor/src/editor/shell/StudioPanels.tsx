@@ -66,6 +66,7 @@ export interface StudioPanelsProps {
     currentIcon: IconConfig | undefined,
     onSelect: (icon: IconConfig) => void
   ) => void;
+  onOpenCreateCollection?: () => void;
   onOpenImageEditor?: (imageSrc: string, onSave: (editedSrc: string) => void) => void;
   onExportForDeploy?: () => Promise<{
     files: Array<{ path: string; content: string }>;
@@ -177,6 +178,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   onAIRequest,
   onOpenMediaLibrary,
   onOpenIconPicker,
+  onOpenCreateCollection,
   onOpenImageEditor,
   onExportForDeploy,
   canvasRef,
@@ -426,10 +428,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           onDelete={handleDelete}
           onOpenMediaLibrary={onOpenMediaLibrary}
           onOpenIconPicker={onOpenIconPicker}
-          onOpenCreateCollection={() => {
-            // TODO: wire CMS collection setup modal
-            console.log("[StudioPanels] onOpenCreateCollection called — modal not yet wired");
-          }}
+          onOpenCreateCollection={onOpenCreateCollection}
         />
       </LayoutShell.Inspector>
 

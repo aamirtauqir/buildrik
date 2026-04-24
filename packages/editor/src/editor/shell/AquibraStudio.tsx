@@ -490,6 +490,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onAIRequest={handlers.handleAIRequest}
         onOpenMediaLibrary={modals.openMediaLibrary}
         onOpenIconPicker={modals.openIconPicker}
+        onOpenCreateCollection={modals.openCMSCollectionSetup}
         onOpenTemplates={modals.openTemplates}
         onExportForDeploy={handleExportForDeploy}
         aiEnabled={featureFlags?.aiEnabled ?? true}
