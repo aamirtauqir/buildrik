@@ -273,7 +273,7 @@ describe("InspectorTabContent — per-element-type reshaping", () => {
     for (const type of ["container", "text", "image", "button", "input"]) {
       const { unmount } = renderTab({ tabId: "element", elementType: type });
       expect(
-        screen.getByRole("button", { name: /CSS Classes section/i }),
+        screen.getByRole("button", { name: /^Classes section/i }),
         `css-classes missing for ${type}`
       ).toBeInTheDocument();
       unmount();
