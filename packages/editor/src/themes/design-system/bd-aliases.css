@@ -118,4 +118,46 @@
   --bd-shell-panel-w: var(--buildrick-sidebar-panel-width);
   --bd-shell-insp-w: var(--buildrick-right-panel-width);
   --bd-shell-foot-h: var(--buildrick-footer-height);
+
+  /* ─── RADIUS ─────────────────────────────────────────────────────────── */
+  --bd-radius-sm: var(--buildrick-radius-sm);
+  --bd-radius-md: var(--buildrick-radius-md);
+  --bd-radius-lg: var(--buildrick-radius-lg);
+  --bd-radius-xl: var(--buildrick-radius-xl);
+  --bd-radius-full: var(--buildrick-radius-full);
+
+  /* ─── SPACING (4px base) ─────────────────────────────────────────────── */
+  --bd-space-1: var(--buildrick-space-1);   /* 4px  */
+  --bd-space-2: var(--buildrick-space-2);   /* 8px  */
+  --bd-space-3: var(--buildrick-space-3);   /* 12px */
+  --bd-space-4: var(--buildrick-space-4);   /* 16px */
+  --bd-space-5: var(--buildrick-space-5);   /* 20px */
+  --bd-space-6: var(--buildrick-space-6);   /* 24px */
+  --bd-space-8: var(--buildrick-space-8);   /* 32px */
+  --bd-space-10: var(--buildrick-space-10); /* 40px */
+  --bd-space-12: var(--buildrick-space-12); /* 48px */
+
+  /* ─── ELEVATION / SHADOWS ────────────────────────────────────────────── */
+  --bd-shadow-xs: var(--buildrick-shadow-xs);
+  --bd-shadow-sm: var(--buildrick-shadow-sm);
+  --bd-shadow-md: var(--buildrick-shadow-md);
+  --bd-shadow-lg: var(--buildrick-shadow-lg);
+  --bd-shadow-xl: var(--buildrick-shadow-xl);
+  --bd-shadow-modal: var(--buildrick-shadow-modal);
+  --bd-shadow-dropdown: var(--buildrick-shadow-dropdown);
+
+  /* ─── GLOW (focus rings, selection) ──────────────────────────────────── */
+  --bd-glow-primary: var(--buildrick-glow-primary);
+  --bd-glow-selection: var(--buildrick-glow-selection);
+  --bd-glow-cta: var(--buildrick-glow-cta);
+
+  /* ─── MOTION — durations + easings + transitions ─────────────────────── */
+  --bd-duration-fast: var(--buildrick-duration-fast);
+  --bd-duration-normal: var(--buildrick-duration-normal);
+  --bd-duration-slow: var(--buildrick-duration-slow);
+  --bd-ease-default: var(--buildrick-ease-default);
+  --bd-transition-fast: var(--buildrick-transition-fast);
+  --bd-transition-normal: var(--buildrick-transition-normal);
+  --bd-transition-colors: var(--buildrick-transition-colors);
+  --bd-transition-transform: var(--buildrick-transition-transform);
 }
