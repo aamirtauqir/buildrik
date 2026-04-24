@@ -38,6 +38,7 @@
 
   /* ─── BORDERS ────────────────────────────────────────────────────────── */
   --bd-border: var(--buildrick-border);
+  --bd-border-light: var(--buildrick-border);
   --bd-border-medium: var(--buildrick-border-medium);
   --bd-border-strong: var(--buildrick-border-strong);
   --bd-border-subtle: var(--buildrick-border-subtle);
@@ -58,10 +59,13 @@
   --bd-error-border: var(--buildrick-error-border);
   --bd-success: var(--buildrick-success);
   --bd-success-bg: var(--buildrick-success-bg);
+  --bd-success-tint: var(--buildrick-success-light);
+  --bd-success-light: var(--buildrick-success-light);
   --bd-success-border: var(--buildrick-success-border);
   --bd-warning: var(--buildrick-warning);
   --bd-warning-bg: var(--buildrick-warning-bg);
   --bd-warning-tint: var(--buildrick-warning-light);
+  --bd-warning-light: var(--buildrick-warning-light);
   --bd-warning-border: var(--buildrick-warning-border);
   --bd-info: var(--buildrick-info);
 
@@ -82,6 +86,7 @@
 
   /* ─── TYPOGRAPHY — SCALE ─────────────────────────────────────────────── */
   --bd-text-2xs: var(--buildrick-text-2xs);
+  --bd-text-2xs-plus: var(--buildrick-text-2xs-plus);
   --bd-text-xs: var(--buildrick-text-xs);
   --bd-text-sm: var(--buildrick-text-sm);
   --bd-text-sm-plus: var(--buildrick-text-sm-plus);
