@@ -1,16 +1,17 @@
 /**
- * useLayerSelection - Manages multi-select state and canvas hover highlighting.
+ * useLayerSelection - Mirrors Composer selection state.
  *
- * Responsibilities:
- * - Single, meta (toggle), and shift (range) selection
- * - Sync selection to Composer engine
- * - Hover highlight via DOM class + layer hover state
+ * Composer.selection is the single source of truth. Local selectedIds
+ * is a read-only mirror updated via composer events. User actions (click,
+ * shift+click, meta+click) call composer methods only — composer emits
+ * `selection:changed` / `selection:cleared` and the mirror updates.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import type { Composer } from "../../../../engine";
+import { EVENTS } from "../../../../shared/constants/events";
 import { flattenTree } from "../data/layerUtils";
 import type { LayerItem } from "../types";
 
@@ -29,17 +30,31 @@ export function useLayerSelection(
   layers: LayerItem[],
   _expandedIds: Set<string>
 ): UseLayerSelectionReturn {
-  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
+  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(() => {
+    if (!composer) return new Set();
+    return new Set(composer.selection.getSelectedIds());
+  });
   const [hoveredLayerId, setHoveredLayerId] = React.useState<string | null>(null);
-  // Ref keeps shift-click range anchor current without adding selectedIds to selectLayer deps
   const selectedIdsRef = React.useRef(selectedIds);
   React.useEffect(() => {
     selectedIdsRef.current = selectedIds;
   }, [selectedIds]);
 
+  // Mirror composer selection — composer is SSOT
+  React.useEffect(() => {
+    if (!composer) return;
+    const sync = () => setSelectedIds(new Set(composer.selection.getSelectedIds()));
+    sync();
+    composer.on(EVENTS.SELECTION_CHANGED, sync);
+    composer.on(EVENTS.SELECTION_CLEARED, sync);
+    return () => {
+      composer.off(EVENTS.SELECTION_CHANGED, sync);
+      composer.off(EVENTS.SELECTION_CLEARED, sync);
+    };
+  }, [composer]);
+
   const selectSingle = React.useCallback(
     (id: string) => {
-      setSelectedIds(new Set([id]));
       if (!composer) return;
       const el = composer.elements.getElement(id);
       if (el) composer.selection.select(el);
@@ -49,17 +64,10 @@ export function useLayerSelection(
 
   const selectLayer = React.useCallback(
     (id: string, modifiers: { shift?: boolean; meta?: boolean } = {}) => {
+      if (!composer) return;
       if (modifiers.meta && !modifiers.shift) {
-        setSelectedIds((prev) => {
-          const next = new Set(prev);
-          if (next.has(id)) next.delete(id);
-          else next.add(id);
-          return next;
-        });
-        if (composer) {
-          const el = composer.elements.getElement(id);
-          if (el) composer.selection.toggle(el);
-        }
+        const el = composer.elements.getElement(id);
+        if (el) composer.selection.toggle(el);
         return;
       }
       if (modifiers.shift) {
@@ -79,13 +87,10 @@ export function useLayerSelection(
             rangeIds = flat.slice(lo, hi + 1).map((n) => n.id);
           }
         }
-        setSelectedIds((prev) => new Set([...prev, ...rangeIds]));
-        if (composer) {
-          rangeIds.forEach((rid) => {
-            const el = composer.elements.getElement(rid);
-            if (el) composer.selection.addToSelection(el);
-          });
-        }
+        rangeIds.forEach((rid) => {
+          const el = composer.elements.getElement(rid);
+          if (el) composer.selection.addToSelection(el);
+        });
         return;
       }
       selectSingle(id);
@@ -94,7 +99,6 @@ export function useLayerSelection(
   );
 
   const clearSelection = React.useCallback(() => {
-    setSelectedIds(new Set());
     if (composer) composer.selection.clear();
   }, [composer]);
 

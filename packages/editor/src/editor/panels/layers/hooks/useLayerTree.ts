@@ -34,7 +34,7 @@ export function useLayerTree(
   canvasHoveredId?: string | null
 ): UseLayerTreeReturn {
   const [layers, setLayers] = React.useState<LayerItem[]>([]);
-  const [expandedIds, setExpandedIds] = React.useState<Set<string>>(new Set(["root"]));
+  const [expandedIds, setExpandedIds] = React.useState<Set<string>>(new Set());
   const [currentPageId, setCurrentPageId] = React.useState<string | null>(null);
   const isHydrated = React.useRef(false);
   const hasAutoExpandedRoot = React.useRef(false);
@@ -42,14 +42,17 @@ export function useLayerTree(
   const scrollPositionsRef = React.useRef<Map<string, number>>(new Map());
   const previousPageIdRef = React.useRef<string | null>(null);
 
-  const hydrateExpandedFromStorage = React.useCallback((pageId: string) => {
-    const stored = loadSetFromStorage(pageId, "expanded");
-    if (stored.size > 0) {
-      setExpandedIds(stored);
-    } else {
-      setExpandedIds(new Set(["root"]));
-    }
-  }, []);
+  const hydrateExpandedFromStorage = React.useCallback(
+    (pageId: string, rootId: string | null) => {
+      const stored = loadSetFromStorage(pageId, "expanded");
+      if (stored.size > 0) {
+        setExpandedIds(stored);
+      } else {
+        setExpandedIds(rootId ? new Set([rootId]) : new Set());
+      }
+    },
+    []
+  );
 
   const buildLayersFromEngine = React.useCallback(() => {
     if (!composer) {
@@ -89,7 +92,8 @@ export function useLayerTree(
       if (pageId !== currentPageId) {
         setCurrentPageId(pageId);
         isHydrated.current = false;
-        hydrateExpandedFromStorage(pageId);
+        hasAutoExpandedRoot.current = false;
+        hydrateExpandedFromStorage(pageId, page?.root?.id ?? null);
         isHydrated.current = true;
       }
     };

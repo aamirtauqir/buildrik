@@ -29,6 +29,8 @@
 
 .bdc-lr:hover { background: var(--bd-bg-subtle); }
 
+.bdc-lr.bdc-canvas-hover { background: var(--bd-bg-subtle); }
+
 .bdc-lr.bdc-sel {
   background: var(--bd-accent-tint);
   color: var(--bd-accent);

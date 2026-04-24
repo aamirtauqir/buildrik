@@ -75,9 +75,9 @@ export interface StudioPanelsProps {
   composerContainerRef?: React.RefObject<HTMLDivElement>;
   /** Whether AI suggestions in the Add tab are enabled */
   aiEnabled?: boolean;
-  /** Whether the active tab is in fullpage mode (derived from usePanelState) */
+  /** Whether the active tab is in fullpage mode (derived from useStudioState) */
   isFullPageMode?: boolean;
-  /** Drawer width in pixels for the active tab (derived from usePanelState) */
+  /** Drawer width in pixels for the active tab (derived from useStudioState) */
   drawerWidth?: number;
   panelPinned?: boolean;
   onPanelPinnedToggle?: () => void;

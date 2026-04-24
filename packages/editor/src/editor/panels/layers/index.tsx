@@ -150,7 +150,14 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         }
 
         const targetIndex = parent.getChildIndex(targetEl);
-        const dropIndex = position === "before" ? targetIndex : targetIndex + 1;
+        let dropIndex = position === "before" ? targetIndex : targetIndex + 1;
+
+        // Same-parent move: account for source removal shifting indices
+        const sourceParent = sourceEl.getParent?.();
+        if (sourceParent && sourceParent.getId() === parent.getId()) {
+          const sourceIndex = parent.getChildIndex(sourceEl);
+          if (sourceIndex < dropIndex) dropIndex -= 1;
+        }
 
         newParent = parent;
         index = dropIndex;
@@ -190,10 +197,10 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
       ancestorIds.unshift(parent.getId());
       current = parent;
     }
-    if (ancestorIds.length > 0) state.treeHook.expandIds(ancestorIds);
+    if (ancestorIds.length > 0) expandIds(ancestorIds);
     const scrollTimeout = setTimeout(scrollToSelection, 50);
     return () => clearTimeout(scrollTimeout);
-  }, [selectedElement?.id, composer, state.treeHook, scrollToSelection]);
+  }, [selectedElement?.id, composer, expandIds, scrollToSelection]);
 
   // Listen for explicit scroll requests ("Show in Layers" button)
   React.useEffect(() => {
@@ -328,6 +335,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
 
   // Filter tree by search only (no category filters in Minimal Tree design)
   const filteredLayers = state.filterTree(state.layers);
+  const matchCount = state.searchHook.countMatches(state.layers, state.actionsHook.customNames);
 
   return (
     <div className="bdc-layers-panel">
@@ -350,9 +358,9 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
 
       {/* Screen reader announcement for search results (WCAG 4.1.3) */}
       <div aria-live="polite" aria-atomic="true" className="bdc-sr-only">
-        {state.search && filteredLayers.length > 0
-          ? `${filteredLayers.length} layer${filteredLayers.length === 1 ? "" : "s"} found`
-          : state.search && filteredLayers.length === 0
+        {state.search && matchCount > 0
+          ? `${matchCount} layer${matchCount === 1 ? "" : "s"} found`
+          : state.search && matchCount === 0
             ? "No layers match your search"
             : ""}
       </div>
@@ -389,7 +397,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         role="tree"
         aria-label="Page structure"
       >
-        {state.layers.length === 0 && <LayersEmptyState />}
+        {state.layers.length === 0 && <LayersEmptyState onAddBlockClick={onAddBlockClick} />}
 
         {state.searchHook.isSearching && filteredLayers.length === 0 && (
           <div className="bdc-layers-empty-search" role="status">
@@ -406,7 +414,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             key={layer.id}
             layer={layer}
             composer={composer}
-            selectedElementId={selectedElement?.id ?? null}
             expandedIds={state.expandedIds}
             dragState={state.dragState}
             hiddenIds={state.hiddenIds}
@@ -414,7 +421,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             selectedIds={state.selectionHook.selectedIds}
             customNames={state.customNames}
             canvasHoveredId={canvasHoveredId ?? null}
-            hoveredLayerId={state.hoveredLayerId}
             editingId={state.editingId}
             editingName={state.editingName}
             editInputRef={state.editInputRef}

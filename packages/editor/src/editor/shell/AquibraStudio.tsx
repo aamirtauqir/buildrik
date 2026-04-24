@@ -327,13 +327,14 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   }, [composer, modals]);
 
   // Listen for "Show in Layers" navigation requests (Phase 6: UX Audit)
+  const { setLeftPanelTab, setIsLeftPanelOpen } = state;
   React.useEffect(() => {
     if (!composer) return;
 
     const handleShowInLayers = () => {
       // Switch to Layers tab and open drawer
-      state.setLeftPanelTab("layers");
-      state.setIsLeftPanelOpen(true);
+      setLeftPanelTab("layers");
+      setIsLeftPanelOpen(true);
       // Also emit scroll event for LayersPanel to scroll to selection
       // This handles the case when already on Layers tab
       setTimeout(() => {
@@ -345,17 +346,18 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     return () => {
       composer.off(EVENTS.SHOW_IN_LAYERS, handleShowInLayers);
     };
-  }, [composer, state]);
+  }, [composer, setLeftPanelTab, setIsLeftPanelOpen]);
 
   // Load overlay defaults
+  const { setShowSpacingIndicators, setShowBadges, setShowGuides, setShowGrid } = state;
   React.useEffect(() => {
     if (!composer?.canvasIndicators) return;
     const overlay = composer.canvasIndicators.getOverlay();
-    state.setShowSpacingIndicators(overlay.showSpacing ?? !hasManuallyToggledSpacing.current);
-    state.setShowBadges(overlay.showBadges ?? false);
-    state.setShowGuides(overlay.showGuides ?? true);
-    state.setShowGrid(overlay.showGrid ?? false);
-  }, [composer, state]);
+    setShowSpacingIndicators(overlay.showSpacing ?? !hasManuallyToggledSpacing.current);
+    setShowBadges(overlay.showBadges ?? false);
+    setShowGuides(overlay.showGuides ?? true);
+    setShowGrid(overlay.showGrid ?? false);
+  }, [composer, setShowSpacingIndicators, setShowBadges, setShowGuides, setShowGrid]);
 
   // Auto-enable spacing on first selection
   React.useEffect(() => {

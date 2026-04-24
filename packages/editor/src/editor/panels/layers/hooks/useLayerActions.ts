@@ -57,18 +57,45 @@ export function useLayerActions(
   const editInputRef = React.useRef<HTMLInputElement>(null);
   const pendingVisibilityRef = React.useRef<{ id: string; hidden: boolean } | null>(null);
   const pendingLockRef = React.useRef<{ id: string; locked: boolean } | null>(null);
+  const hydrateTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const hydrateFromStorage = React.useCallback((pageId: string) => {
-    // Set flag BEFORE state setters so persistence effects see it during the commit
-    isHydrated.current = false;
-    const storedHidden = loadSetFromStorage(pageId, "hidden");
-    const storedLocked = loadSetFromStorage(pageId, "locked");
-    const storedNames = loadMapFromStorage(pageId);
-    setHiddenIds(storedHidden);
-    setLockedIds(storedLocked);
-    setCustomNames(storedNames);
-    setTimeout(() => applyStoredStatesToDOM(storedHidden, storedLocked), 100);
-    // NOTE: isHydrated.current is reset to true in the useEffect below, AFTER commit
+  const hydrateFromStorage = React.useCallback(
+    (pageId: string) => {
+      // Cancel any in-flight hydration from a prior page
+      if (hydrateTimeoutRef.current !== null) {
+        clearTimeout(hydrateTimeoutRef.current);
+        hydrateTimeoutRef.current = null;
+      }
+      // Set flag BEFORE state setters so persistence effects see it during the commit
+      isHydrated.current = false;
+      const storedHidden = loadSetFromStorage(pageId, "hidden");
+      const storedLocked = loadSetFromStorage(pageId, "locked");
+      const storedNames = loadMapFromStorage(pageId);
+      setHiddenIds(storedHidden);
+      setLockedIds(storedLocked);
+      setCustomNames(storedNames);
+      // Apply engine lock state immediately so transactions respect locks
+      if (composer) {
+        storedLocked.forEach((id) => {
+          composer.elements.getElement(id)?.setLocked(true);
+        });
+      }
+      hydrateTimeoutRef.current = setTimeout(() => {
+        applyStoredStatesToDOM(storedHidden, storedLocked);
+        hydrateTimeoutRef.current = null;
+      }, 100);
+      // NOTE: isHydrated.current is reset to true in the useEffect below, AFTER commit
+    },
+    [composer]
+  );
+
+  // Cancel pending DOM apply on unmount
+  React.useEffect(() => {
+    return () => {
+      if (hydrateTimeoutRef.current !== null) {
+        clearTimeout(hydrateTimeoutRef.current);
+      }
+    };
   }, []);
 
   // Re-enable persistence after the hydration state commits to DOM

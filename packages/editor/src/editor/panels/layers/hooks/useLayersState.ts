@@ -64,8 +64,6 @@ export interface UseLayersStateReturn {
   // Display settings
   displayPrefs: LayerDisplayPrefs;
   updateDisplayPrefs: (partial: Partial<LayerDisplayPrefs>) => void;
-  displaySettingsOpen: boolean;
-  setDisplaySettingsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 
   // Context menu
   contextMenu: LayerContextMenuState | null;
@@ -113,7 +111,6 @@ export function useLayersState({
 
   const [displayPrefs, setDisplayPrefs] = React.useState<LayerDisplayPrefs>(loadDisplayPrefs);
   const [contextMenu, setContextMenu] = React.useState<LayerContextMenuState | null>(null);
-  const [displaySettingsOpen, setDisplaySettingsOpen] = React.useState(false);
 
   // Hydrate actions from storage when page changes
   React.useEffect(() => {
@@ -170,8 +167,6 @@ export function useLayersState({
     // Display settings
     displayPrefs,
     updateDisplayPrefs,
-    displaySettingsOpen,
-    setDisplaySettingsOpen,
 
     // Context menu
     contextMenu,

@@ -13,7 +13,6 @@ import type { LayerItem, DragState, LayerDisplayPrefs } from "./types";
 export interface LayerTreeItemProps {
   layer: LayerItem;
   composer: Composer | null;
-  selectedElementId: string | null;
   expandedIds: Set<string>;
   dragState: DragState;
   hiddenIds: Set<string>;
@@ -21,7 +20,6 @@ export interface LayerTreeItemProps {
   selectedIds: Set<string>;
   customNames: Map<string, string>;
   canvasHoveredId: string | null;
-  hoveredLayerId: string | null;
   editingId: string | null;
   editingName: string;
   editInputRef: React.RefObject<HTMLInputElement | null>;
@@ -50,12 +48,13 @@ export interface LayerTreeItemProps {
 export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
   layer,
   composer,
-  selectedElementId,
   expandedIds,
   dragState,
   hiddenIds,
   lockedIds,
+  selectedIds,
   customNames,
+  canvasHoveredId,
   editingId,
   editingName,
   editInputRef,
@@ -78,7 +77,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
   getVisibleLayerIds,
   displayPrefs,
 }) => {
-  const isSelected = selectedElementId === layer.id;
+  const isSelected = selectedIds.has(layer.id);
   const isExpanded = expandedIds.has(layer.id);
   const hasChildren = layer.children.length > 0;
   const IconComponent = getElementIcon(layer.type);
@@ -88,6 +87,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
   const isHidden = hiddenIds.has(layer.id);
   const isLocked = lockedIds.has(layer.id);
   const isEditing = editingId === layer.id;
+  const isCanvasHovered = canvasHoveredId === layer.id;
   const displayName =
     customNames.get(layer.id) ||
     (ELEMENT_TYPE_LABELS[layer.type] ?? layer.type.charAt(0).toUpperCase() + layer.type.slice(1));
@@ -100,6 +100,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = ({
   const rowClassNames = [
     "bdc-lr",
     isSelected ? "bdc-sel" : "",
+    isCanvasHovered ? "bdc-canvas-hover" : "",
     isHidden ? "bdc-hidden" : "",
     isEditing ? "bdc-editing" : "",
     isDragging ? "is-dragging" : "",
