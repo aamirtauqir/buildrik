@@ -29,17 +29,17 @@ const fontSize: Record<Size, string> = {
 
 const Input = styled.input<{ s: Size; inv: boolean }>`
   width: 100%;
-  padding: 0 var(--buildrick-space-2);
+  padding: 0 var(--bd-space-2);
   height: ${(p) => heightPx[p.s]}px;
   background: var(--bd-bg-subtle);
   border: 1px solid ${(p) => (p.inv ? "var(--bd-error)" : "transparent")};
-  border-radius: var(--buildrick-radius-sm);
+  border-radius: var(--bd-radius-sm);
   font-family: var(--bd-font);
   font-size: ${(p) => fontSize[p.s]};
   font-weight: var(--bd-weight-medium);
   color: var(--bd-fg-primary);
   outline: none;
-  transition: var(--buildrick-transition-colors);
+  transition: var(--bd-transition-colors);
   box-sizing: border-box;
 
   &::placeholder {
@@ -54,7 +54,7 @@ const Input = styled.input<{ s: Size; inv: boolean }>`
   &:focus {
     background: var(--bd-bg-card);
     border-color: ${(p) => (p.inv ? "var(--bd-error)" : "var(--bd-accent)")};
-    box-shadow: var(--buildrick-glow-primary);
+    box-shadow: var(--bd-glow-primary);
   }
 
   &:disabled {
