@@ -51,7 +51,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
 
   // Compute color preview from styles — mock shows a small swatch chip as the
   // collapsed-state indicator for Background.
-  const bgColor = styles["background-color"] || styles["backgroundColor"] || styles["background"];
+  const bgColor = styles["background-color"] || styles["background"];
   const preview = bgColor ? (
     <span
       style={{

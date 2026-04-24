@@ -207,6 +207,12 @@ export interface SectionEntry<P extends object = object> {
    * triggers re-render of sections that actually care about that property.
    * Sections that don't read ctx.styles (animation, interactions, link, etc.)
    * should declare an empty array.
+   *
+   * MUST be exhaustive — every `styles["foo"]` / `styles.foo` read in the
+   * section's source files must appear here. The invariant is enforced by
+   * `sections/__tests__/registry.styleKeys.test.ts`, which greps section
+   * files and asserts every read key is declared. Under-declaring slices
+   * away real values and silently blanks controls.
    */
   styleKeys: readonly string[];
 }
@@ -394,7 +400,7 @@ export const SECTION_REGISTRY: Record<SectionId, AnySectionEntry> = {
   background: defineSection({
     Component: BackgroundSection,
     advancedKey: "background",
-    styleKeys: ["background", "background-color", "backgroundColor", "background-image", "background-size", "background-position", "background-repeat", "background-attachment"],
+    styleKeys: ["background", "background-color", "background-image", "background-size", "background-position", "background-repeat", "background-attachment"],
     adaptProps: (ctx) => ({
       ...adaptBaseStyleProps(ctx),
       onOpenMediaLibrary: ctx.onOpenMediaLibrary,

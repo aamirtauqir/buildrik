@@ -20,8 +20,8 @@ vi.mock("../shared/controls", async () => {
 });
 
 describe("BackgroundSection — preview", () => {
-  it("shows color swatch when backgroundColor is set", () => {
-    render(<BackgroundSection styles={{ backgroundColor: "#ff0000" }} onChange={vi.fn()} />);
+  it("shows color swatch when background-color is set", () => {
+    render(<BackgroundSection styles={{ "background-color": "#ff0000" }} onChange={vi.fn()} />);
     const swatch = screen.getByTitle("#ff0000");
     expect(swatch).toBeInTheDocument();
   });
