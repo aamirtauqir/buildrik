@@ -59,7 +59,7 @@ export const TemplatePreviewPanel: React.FC<TemplatePreviewPanelProps> = ({
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body {
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
               background: #fff;
               transform-origin: top left;
               overflow-x: hidden;

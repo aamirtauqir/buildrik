@@ -54,8 +54,8 @@ export function getCanvasStyles(
 export const contentStyles: React.CSSProperties = {
   minHeight: "100%",
   padding: 20,
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-  color: "#1a1a2e",
+  fontFamily: "var(--bd-font)",
+  color: "var(--bd-fg-primary)",
   lineHeight: 1.6,
   position: "relative",
 };

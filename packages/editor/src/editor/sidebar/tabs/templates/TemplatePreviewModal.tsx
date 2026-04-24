@@ -118,7 +118,7 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { width: 100%; height: 100%; background: #080810; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; overflow: hidden; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; }
         .tmpl-scale-root { transform: scale(0.2); transform-origin: top left; width: ${w}px; }
       </style>
     </head><body><div class="tmpl-scale-root">${template.html}</div></body></html>`;
