@@ -68,9 +68,6 @@ export {
   getBreakpointForWidth,
 } from "./breakpoints";
 
-// Layout dimension constants
-export { LAYOUT } from "./layout";
-
 // Default element styles
 export { DEFAULT_ELEMENT_STYLES, getDefaultStyles, hasDefaultStyles } from "./defaultStyles";
 

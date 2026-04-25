@@ -71,19 +71,3 @@ export const ROW_LG = 48;
 // DESIGN.md forbids 40px rows — "never 40" is load-bearing. Any layout
 // property rendering a 40px row is a design bug. The gate 14 regex catches
 // raw `40` in layout-property context (height/width/padding/margin/etc).
-
-// ============================================================================
-// LEGACY OBJECT — kept for backwards compatibility; unused as of 2026-04-20
-// ============================================================================
-
-/**
- * Pre-Week-1 object export. No current consumers (grep-verified 2026-04-20).
- * Superseded by the named exports above. Will be removed when code migrates.
- */
-export const LAYOUT = {
-  RAIL_WIDTH: RAIL_W,
-  DRAWER_WIDTH: 280, // legacy value — see SIDEBAR_WIDE drift note
-  DRAWER_WIDTH_NARROW: SIDEBAR_W,
-  INSPECTOR_WIDTH: INSPECTOR_W,
-  HEADER_HEIGHT: 52, // legacy value — see TOPBAR_H drift note
-} as const;
