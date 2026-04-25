@@ -18,9 +18,9 @@ const WCAG_BADGE_STYLES: Record<WcagLevel, React.CSSProperties> = {
     border: "1px solid rgba(34,197,94,0.3)",
   },
   aa: {
-    background: "rgba(59,130,246,0.15)",
+    background: "rgba(45, 109, 255, 0.15)",
     color: "var(--bd-accent)",
-    border: "1px solid rgba(59,130,246,0.3)",
+    border: "1px solid rgba(45, 109, 255, 0.3)",
   },
   "aa-large": {
     background: "rgba(245,158,11,0.12)",

@@ -227,7 +227,7 @@ const badgeStyles: React.CSSProperties = {
 };
 
 const planBadgeStyles: React.CSSProperties = {
-  background: "var(--buildrick-accent-tint, rgba(45, 109, 255, 0.10))",
+  background: "var(--buildrick-accent-tint)",
   color: "var(--buildrick-accent)",
   fontSize: 10,
   fontWeight: 700,

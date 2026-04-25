@@ -108,5 +108,5 @@ export const RULER_COLORS = {
   /** Guide line color */
   GUIDE_LINE: "rgba(137,180,250,0.8)",
   /** Guide being dragged */
-  GUIDE_DRAG: "#3b82f6",
+  GUIDE_DRAG: "var(--bd-accent)",
 } as const;

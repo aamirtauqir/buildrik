@@ -231,11 +231,11 @@ export function DeviceFrameToggle({ active, onToggle, device }: DeviceFrameToggl
   const style: React.CSSProperties = {
     ...toggleBaseStyle,
     background: active
-      ? "rgba(37, 99, 235, 0.2)"
+      ? "rgba(45, 109, 255, 0.2)"
       : isHovered
         ? "rgba(255,255,255,0.08)"
         : "transparent",
-    color: active ? "#2563EB" : "#a1a1aa",
+    color: active ? "var(--bd-accent)" : "#a1a1aa",
   };
 
   return (

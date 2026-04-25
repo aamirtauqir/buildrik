@@ -186,7 +186,7 @@ const primaryButtonStyle: React.CSSProperties = {
   justifyContent: "center",
   gap: "6px",
   padding: "8px 16px",
-  background: "var(--buildrick-accent, #3b82f6)",
+  background: "var(--buildrick-accent)",
   color: "var(--buildrick-text-on-accent)",
   border: "none",
   borderRadius: "6px",

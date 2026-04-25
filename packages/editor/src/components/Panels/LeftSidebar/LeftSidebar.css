@@ -2398,7 +2398,7 @@
 }
 
 .buildrick-element-category-row:hover .buildrick-element-category-icon {
-  background: rgba(59, 130, 246, 0.15);
+  background: rgba(45, 109, 255, 0.15);
   color: var(--buildrick-accent);
 }
 
@@ -3648,7 +3648,7 @@
 }
 
 .buildrick-page-row--active:hover {
-  background: rgba(59, 130, 246, 0.18);
+  background: rgba(45, 109, 255, 0.18);
 }
 
 .buildrick-page-row:focus-visible {
@@ -5881,7 +5881,7 @@
 }
 
 .buildrick-context-banner-replace {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(45, 109, 255, 0.1) 100%);
   border-bottom-color: var(--buildrick-accent-tint);
 }
 

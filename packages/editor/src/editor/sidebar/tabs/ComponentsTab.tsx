@@ -423,7 +423,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                   fontSize: 13,
                   cursor: "pointer",
                   textAlign: "left" as const,
-                  background: isCurrent ? "var(--bd-accent-alpha-15, rgba(59,130,246,0.15))" : "var(--bd-bg-subtle)",
+                  background: isCurrent ? "var(--bd-accent-alpha-15)" : "var(--bd-bg-subtle)",
                   border: isCurrent
                     ? "1px solid var(--bd-accent)"
                     : "1px solid var(--bd-border)",

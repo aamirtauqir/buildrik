@@ -685,7 +685,7 @@ const privacyFooterStyles: React.CSSProperties = {
 };
 
 const privacyLinkStyles: React.CSSProperties = {
-  color: "var(--bd-accent, #3b82f6)",
+  color: "var(--bd-accent)",
   textDecoration: "none",
 };
 

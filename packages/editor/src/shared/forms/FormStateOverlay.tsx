@@ -174,7 +174,7 @@ const errorItemStyles: React.CSSProperties = {
 };
 
 const buttonStyles: React.CSSProperties = {
-  background: "var(--buildrick-accent, #3b82f6)",
+  background: "var(--buildrick-accent)",
   color: "var(--buildrick-text-on-accent)",
   border: "none",
   padding: "12px 24px",

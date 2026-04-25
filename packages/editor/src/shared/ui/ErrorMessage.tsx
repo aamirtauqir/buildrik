@@ -157,8 +157,8 @@ const VARIANT_COLORS = {
     action: "var(--buildrick-accent)",
   },
   info: {
-    bg: "rgba(59, 130, 246, 0.08)",
-    border: "rgba(59, 130, 246, 0.2)",
+    bg: "rgba(45, 109, 255, 0.08)",
+    border: "rgba(45, 109, 255, 0.2)",
     icon: "var(--buildrick-info)",
     title: "var(--buildrick-text-primary)",
     text: "var(--buildrick-text-secondary)",

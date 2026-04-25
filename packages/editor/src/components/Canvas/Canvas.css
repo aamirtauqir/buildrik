@@ -64,7 +64,7 @@
   --buildrick-badge-tag: #10B981;       /* Emerald - HTML tag badges */
   --buildrick-badge-id: var(--buildrick-accent); /* Cobalt - ID attribute badges */
   --buildrick-badge-class: #f59e0b;     /* Amber - class badges */
-  --buildrick-badge-data: #3b82f6;      /* Blue - data attribute badges */
+  --buildrick-badge-data: var(--bd-accent);      /* Blue - data attribute badges */
   --buildrick-badge-default: var(--bd-fg-muted);   /* Gray - default/custom badges */
 
   /* ============================================
@@ -101,8 +101,8 @@
   /* ============================================
      Drop Feedback Colors - Unified Blue Palette
      ============================================ */
-  --buildrick-drop-valid-border: #3B82F6;
-  --buildrick-drop-valid-bg: rgba(59, 130, 246, 0.08);
+  --buildrick-drop-valid-border: var(--bd-accent);
+  --buildrick-drop-valid-bg: rgba(45, 109, 255, 0.08);
   --buildrick-drop-invalid-border: #ef4444;
   --buildrick-drop-invalid-bg: rgba(239, 68, 68, 0.1);
 
@@ -138,7 +138,7 @@
 }
 
 .buildrick-canvas[data-show-outlines="true"] [data-buildrick-id] {
-  outline: 1px dashed rgba(59, 130, 246, 0.35);
+  outline: 1px dashed rgba(45, 109, 255, 0.35);
   outline-offset: -1px;
 }
 
@@ -327,7 +327,7 @@
 }
 
 [data-buildrick-id][data-drop-target="true"] {
-  outline: 2px solid var(--buildrick-drop-valid-border, #3b82f6);
+  outline: 2px solid var(--buildrick-drop-valid-border);
   outline-offset: 2px;
   transition: outline-color 150ms ease;
 }
@@ -639,8 +639,8 @@
 }
 
 [data-buildrick-id][data-drop-target="true"][data-drop-valid="true"] {
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3),
-              0 0 12px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 2px rgba(45, 109, 255, 0.3),
+              0 0 12px rgba(45, 109, 255, 0.1);
   transition: box-shadow 150ms ease, outline 150ms ease;
 }
 
@@ -650,7 +650,7 @@
   bottom: -14px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--buildrick-drop-valid-border, #3B82F6);
+  background: var(--buildrick-drop-valid-border);
   color: white;
   width: 20px;
   height: 20px;
@@ -660,7 +660,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 2px 6px rgba(45, 109, 255, 0.3);
   z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
   pointer-events: none;
 }

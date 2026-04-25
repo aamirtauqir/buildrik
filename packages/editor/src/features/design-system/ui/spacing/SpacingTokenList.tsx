@@ -248,7 +248,7 @@ const PresetChip: React.FC<{
       borderRadius: 20,
       border: "1px solid",
       borderColor: isActive ? "var(--bd-accent)" : "var(--bd-border)",
-      background: isActive ? "rgba(59,130,246,0.15)" : "transparent",
+      background: isActive ? "rgba(45, 109, 255, 0.15)" : "transparent",
       color: isActive ? "var(--bd-accent)" : "var(--bd-fg-muted)",
       fontSize: 12,
       fontWeight: isActive ? 600 : 400,
@@ -317,7 +317,7 @@ const SpacingDiagram: React.FC<{ tokens: DesignToken[] }> = ({ tokens }) => {
           y1="10"
           x2="110"
           y2="50"
-          stroke="rgba(59,130,246,0.4)"
+          stroke="rgba(45, 109, 255, 0.4)"
           strokeWidth="1"
           strokeDasharray="3,2"
         />

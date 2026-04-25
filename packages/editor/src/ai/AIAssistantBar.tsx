@@ -191,7 +191,7 @@ const barStyles: React.CSSProperties = {
 
 const iconStyles: React.CSSProperties = {
   fontSize: 20,
-  filter: "drop-shadow(0 0 8px rgba(0, 163, 255, 0.5))",
+  filter: "drop-shadow(0 0 8px rgba(45, 109, 255, 0.5))",
 };
 
 const inputStyles: React.CSSProperties = {

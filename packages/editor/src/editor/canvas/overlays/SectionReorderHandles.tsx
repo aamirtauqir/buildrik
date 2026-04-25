@@ -55,10 +55,10 @@ function getHandleStyle(
     height: HANDLE_SIZE,
     borderRadius: 4,
     background: isDragging
-      ? "#2563EB"
+      ? "var(--bd-accent)"
       : isHovered
-        ? "rgba(37, 99, 235, 0.9)"
-        : "rgba(37, 99, 235, 0.7)",
+        ? "rgba(45, 109, 255, 0.9)"
+        : "rgba(45, 109, 255, 0.7)",
     cursor: isDragging ? "grabbing" : "grab",
     display: "grid",
     gridTemplateColumns: "repeat(2, 1fr)",
@@ -70,7 +70,7 @@ function getHandleStyle(
     opacity: isHovered || isDragging ? 1 : 0,
     transform: isHovered || isDragging ? "scale(1)" : "scale(0.8)",
     boxShadow: isDragging
-      ? "0 2px 8px rgba(37, 99, 235, 0.4)"
+      ? "0 2px 8px rgba(45, 109, 255, 0.4)"
       : "0 1px 4px rgba(0, 0, 0, 0.15)",
   };
 }
@@ -97,7 +97,7 @@ function getDropLineStyle(top: number): React.CSSProperties {
     background: "var(--buildrick-accent-hover)",
     borderRadius: 1.5,
     pointerEvents: "none",
-    boxShadow: "0 0 8px rgba(37, 99, 235, 0.5)",
+    boxShadow: "0 0 8px rgba(45, 109, 255, 0.5)",
     transition: "top 0.15s ease",
   };
 }

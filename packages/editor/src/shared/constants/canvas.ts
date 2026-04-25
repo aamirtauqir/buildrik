@@ -124,14 +124,14 @@ export const CANVAS_COLORS = {
   badgeTag: "#10B981",
   badgeId: "var(--buildrick-accent)", // Blue badge for IDs
   badgeClass: "#F59E0B",
-  badgeData: "#3B82F6",
+  badgeData: "var(--bd-accent)",
   badgeCustom: "var(--bd-fg-muted)",
 
   // Status
   success: "#22C55E",
   error: "#EF4444",
   warning: "#F59E0B",
-  info: "#3B82F6",
+  info: "var(--bd-accent)",
   errorBg: "rgba(239, 68, 68, 0.15)",
   errorBorder: "rgba(239, 68, 68, 0.3)",
 } as const;

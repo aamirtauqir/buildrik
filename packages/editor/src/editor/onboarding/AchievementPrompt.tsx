@@ -104,7 +104,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
             height: 3,
             background: isLastStep
               ? "var(--buildrick-success, #10b981)"
-              : "var(--buildrick-accent, #3b82f6)",
+              : "var(--buildrick-accent)",
             width: `${progress}%`,
             transition: "width 50ms linear",
           }}
@@ -123,7 +123,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                 borderRadius: "50%",
                 background: isLastStep
                   ? "rgba(16,185,129,0.15)"
-                  : "rgba(59,130,246,0.15)",
+                  : "rgba(45, 109, 255, 0.15)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -244,7 +244,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
               padding: "11px 20px",
               background: isLastStep
                 ? "var(--buildrick-success, #10b981)"
-                : "var(--buildrick-accent, #3b82f6)",
+                : "var(--buildrick-accent)",
               border: "none",
               borderRadius: 10,
               color: "var(--buildrick-text-on-accent)",

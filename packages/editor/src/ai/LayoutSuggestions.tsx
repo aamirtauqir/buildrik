@@ -81,7 +81,7 @@ const SuggestionItem: React.FC<{
   const severityColors = {
     error: { bg: "rgba(239, 68, 68, 0.1)", border: "#ef4444", icon: "🔴" },
     warning: { bg: "rgba(234, 179, 8, 0.1)", border: "#eab308", icon: "🟡" },
-    info: { bg: "rgba(59, 130, 246, 0.1)", border: "#3b82f6", icon: "🔵" },
+    info: { bg: "rgba(45, 109, 255, 0.1)", border: "var(--bd-accent)", icon: "🔵" },
   };
 
   const colors = severityColors[suggestion.severity];

@@ -26,15 +26,15 @@ export function InfoBanner({ children, dismissible, onDismiss, className }: Info
         alignItems: "flex-start",
         gap: 8,
         padding: "10px 12px",
-        background: "var(--buildrick-info-light, rgba(59, 130, 246, 0.12))",
-        borderLeft: "3px solid var(--buildrick-info, #3b82f6)",
+        background: "var(--buildrick-info-light)",
+        borderLeft: "3px solid var(--buildrick-info)",
         borderRadius: "0 6px 6px 0",
       }}
     >
       <Info
         size={16}
         aria-hidden="true"
-        style={{ flexShrink: 0, marginTop: 1, color: "var(--buildrick-info, #3b82f6)" }}
+        style={{ flexShrink: 0, marginTop: 1, color: "var(--buildrick-info)" }}
       />
       <span
         style={{

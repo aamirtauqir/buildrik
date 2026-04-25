@@ -753,7 +753,7 @@
   gap: 10px;
   padding: 10px var(--bd-space-3);
   margin: 0 0 var(--bd-space-3) 0;
-  background: linear-gradient(135deg, var(--bd-accent-tint, rgba(45, 109, 255, 0.08)) 0%, rgba(45, 109, 255, 0.04) 100%);
+  background: linear-gradient(135deg, var(--bd-accent-tint) 0%, rgba(45, 109, 255, 0.04) 100%);
   border: 1px solid var(--bd-accent, var(--bd-accent));
   border-radius: 8px;
   font-size: 12px;
