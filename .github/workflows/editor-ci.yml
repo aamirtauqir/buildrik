@@ -64,6 +64,33 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Bundle-drop guard: designer reference snapshots (HTML mocks, comp
+      # previews, ui-kits) must live under docs/reference/, NOT inside the
+      # editor source tree. A reference/ or project/ folder under
+      # packages/editor/src signals a designer dropped a spec mirror back
+      # into runtime — same failure mode that motivated the 2026-04-26
+      # src/project/ relocation. Excludes node_modules/ and dist/ (vendor
+      # packages legitimately ship reference folders). No untrusted input
+      # is interpolated into the run block.
+      - name: Reference snapshot guard
+        run: |
+          set -euo pipefail
+          check_reference_drift() {
+            find "$1" -path '*/node_modules' -prune -o \
+                      -path '*/dist' -prune -o \
+                      -type d \( -name 'reference' -o -name 'project' \) -print 2>/dev/null \
+              | grep -q .
+          }
+          if check_reference_drift packages/editor/src; then
+            echo "ERROR: Designer reference snapshot found inside packages/editor/src."
+            echo "Move it to docs/reference/ (see .gitignore + bridge plan v2)."
+            find packages/editor/src -path '*/node_modules' -prune -o \
+                                     -path '*/dist' -prune -o \
+                                     -type d \( -name 'reference' -o -name 'project' \) -print
+            exit 1
+          fi
+          echo "Reference snapshot guard: PASS"
+
       # Authoritative gate: catches every unresolved import in the editor source
       # tree. This is the exact check that would have caught the missing
       # PinPopover, TemplateCard, useSectionInsert, and ../styles imports.
