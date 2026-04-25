@@ -41,8 +41,8 @@ export const INSPECTOR_W = 320;
 /**
  * Top bar height. Canonical per DESIGN.md §Layout ("Topbar height: 56px —
  * canonical. All other chrome heights flow from this rhythm.").
- * Drift note: LayoutShell.css:32 currently ships 52px via
- * `--layout-topbar-height` fallback. Week 3 PanelShell converges to 56.
+ * chrome-ssot Stage 1/3 landed 2026-04-26: LayoutShell.css and
+ * design-system/layout.css both ship 56 now. No drift.
  */
 export const TOPBAR_H = 56;
 

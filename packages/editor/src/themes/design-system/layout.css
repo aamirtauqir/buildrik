@@ -2,6 +2,11 @@
  * themes/design-system/layout.css
  * Buildrik DS V1 — chrome layout dimensions
  * Distinct from --buildrick-design-layout-* (user site layout, in design.css).
+ *
+ * chrome-ssot Stage 1/3 landed 2026-04-26: vertical chrome converged to
+ * vibcoder reference values (header 48->56, footer 32->40). Horizontal
+ * chrome (rail width) stays 48px — Stage 2 territory.
+ *
  * @license BSD-3-Clause
  */
 
@@ -14,8 +19,8 @@
   --buildrick-sidebar-width: 48px;
   --buildrick-sidebar-panel-width: 280px;
   --buildrick-right-panel-width: 280px;
-  --buildrick-header-height: 48px;
-  --buildrick-footer-height: 32px;
+  --buildrick-header-height: 56px;
+  --buildrick-footer-height: 40px;
   --buildrick-layout-gap: 0px;
 
   /* PANEL INTERNALS */
