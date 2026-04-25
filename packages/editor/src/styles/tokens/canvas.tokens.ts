@@ -14,19 +14,21 @@ export const canvasTokens = {
   colors: {
     // Premium Aquibra Blue Palette
     primary: {
-      default: "#2563EB", // Aquibra Blue (aligned with CSS token)
-      light: "#3B82F6",
+      default: "var(--bd-accent)",
+      light: "var(--bd-accent-hover)",
       dark: "#1D4ED8",
       subtle: "rgba(37, 99, 235, 0.1)",
       alpha10: "rgba(37, 99, 235, 0.1)",
       alpha15: "rgba(37, 99, 235, 0.15)",
       alpha20: "rgba(37, 99, 235, 0.2)",
+      // alpha30 is passed to ctx.fillStyle (RulersOverlay) — must stay raw rgba
       alpha30: "rgba(37, 99, 235, 0.3)",
       alpha40: "rgba(37, 99, 235, 0.4)",
     },
 
     // Obsidian Surface Colors
     surface: {
+      // background is passed to ctx.fillStyle (RulersOverlay) — must stay raw hex
       background: "#0A0A0A", // True Obsidian
       backgroundSecondary: "#121212", // Secondary dark
       backgroundTertiary: "#1A1A1A",
@@ -38,9 +40,9 @@ export const canvasTokens = {
 
     // Text Colors
     text: {
-      primary: "#F5F5F0", // 14.1:1 on dark — WCAG AAA
+      primary: "var(--bd-fg-primary)",
       secondary: "#B8B5AD", // 6.5:1 on dark — WCAG AA
-      muted: "#908D85", // 4.6:1 on dark — WCAG AA
+      muted: "var(--bd-fg-muted)",
       onPrimary: "#ffffff",
     },
 
@@ -106,7 +108,7 @@ export const canvasTokens = {
     glowMd: "0 4px 14px rgba(0, 163, 255, 0.4)",
     glowLg: "0 8px 25px rgba(0, 163, 255, 0.5)",
     badge: "0 4px 12px rgba(0, 163, 255, 0.4)",
-    panel: "0 20px 40px rgba(0, 0, 0, 0.8)",
+    panel: "var(--bd-shadow-modal)",
     glass: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
   },
 
@@ -114,12 +116,12 @@ export const canvasTokens = {
   animation: {
     duration: {
       instant: "50ms",
-      fast: "150ms",
-      normal: "200ms",
-      slow: "300ms",
+      fast: "var(--bd-duration-fast)",
+      normal: "var(--bd-duration-normal)",
+      slow: "var(--bd-duration-slow)",
     },
     easing: {
-      default: "cubic-bezier(0.4, 0, 0.2, 1)",
+      default: "var(--bd-ease-default)",
       smooth: "ease-out",
       spring: "cubic-bezier(0.34, 1.56, 0.64, 1)",
       bounce: "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
@@ -137,10 +139,10 @@ export const canvasTokens = {
 
   // Border Radius
   radius: {
-    sm: 4,
-    md: 6,
-    lg: 8,
-    xl: 10,
+    sm: "var(--bd-radius-sm)",
+    md: "var(--bd-radius-md)",
+    lg: "var(--bd-radius-lg)",
+    xl: "var(--bd-radius-xl)",
     round: 50,
   },
 
