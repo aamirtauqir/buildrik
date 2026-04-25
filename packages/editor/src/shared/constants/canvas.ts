@@ -11,23 +11,24 @@ import type React from "react";
 // ============================================
 
 /**
- * Aquibra Brand Color Palette
- * References CSS variables from Canvas.css - the single source of truth
- * Updated: Blue palette (#2563EB) - Phase 4 Canvas Styling Audit
+ * Buildrik Brand Accent Palette
+ * References CSS variables from themes/design-system/color.css (canonical
+ * cobalt accent ramp). Renamed from BRAND_PURPLE 2026-04-26 — name was
+ * a pre-cobalt-era leftover; values were already pointing at cobalt vars.
  */
-export const BRAND_PURPLE = {
-  // Core shades - now reference CSS variables (Blue palette)
-  DEFAULT: "var(--buildrick-accent)", // #2563EB - Main brand blue
-  light: "var(--buildrick-accent-subtle)", // #3B82F6 - Hover states
-  dark: "var(--buildrick-accent-pressed)", // #1D4ED8 - Active/pressed states
-  subtle: "var(--buildrick-accent-tint)", // #DBEAFE - Very light tint
+export const BRAND_ACCENT = {
+  // Core shades — resolve via cobalt accent ramp (color.css:33-37)
+  DEFAULT: "var(--buildrick-accent)", // #2D6DFF — Main cobalt
+  light: "var(--buildrick-accent-subtle)", // rgba(45, 109, 255, 0.05) — Faint background
+  dark: "var(--buildrick-accent-pressed)", // #1E58D9 — Active/pressed states
+  subtle: "var(--buildrick-accent-tint)", // rgba(45, 109, 255, 0.10) — Very light tint
 
-  // Alpha variations for glows and overlays (using blue)
-  alpha10: "var(--buildrick-accent-tint)", // rgba(37, 99, 235, 0.15)
-  alpha15: "rgba(37, 99, 235, 0.15)",
-  alpha20: "rgba(37, 99, 235, 0.2)",
-  alpha30: "rgba(37, 99, 235, 0.3)",
-  alpha40: "rgba(37, 99, 235, 0.4)",
+  // Alpha variations for glows and overlays — cobalt rgba (45, 109, 255, x)
+  alpha10: "var(--buildrick-accent-tint)", // rgba(45, 109, 255, 0.10)
+  alpha15: "rgba(45, 109, 255, 0.15)",
+  alpha20: "rgba(45, 109, 255, 0.2)",
+  alpha30: "rgba(45, 109, 255, 0.3)",
+  alpha40: "rgba(45, 109, 255, 0.4)",
 } as const;
 
 /**
@@ -46,10 +47,10 @@ export const SELECTION_COLORS = {
   // Glow effects - reference CSS vars
   glow: "var(--buildrick-selection-glow)",
   glowStrong: "var(--buildrick-selection-glow-strong)",
-  glowSubtle: "0 0 0 2px rgba(37, 99, 235, 0.3)",
+  glowSubtle: "0 0 0 2px rgba(45, 109, 255, 0.3)",
 
   // Multi-select
-  multiSelectOutline: "rgba(37, 99, 235, 0.4)",
+  multiSelectOutline: "rgba(45, 109, 255, 0.4)",
   multiSelectFill: "var(--buildrick-accent-tint)",
 } as const;
 
@@ -68,7 +69,7 @@ export const CANVAS_SURFACE = {
 
   // Grid/pattern overlay
   gridDot: "var(--bd-border)",
-  gridLine: "rgba(37, 99, 235, 0.08)", // Blue grid lines
+  gridLine: "rgba(45, 109, 255, 0.08)", // Blue grid lines
 } as const;
 
 /**
@@ -92,7 +93,7 @@ export const CANVAS_COLORS = {
   bgPanel: "#1e1e2e",
   bgPanelSecondary: "#181825",
   bgInput: "var(--buildrick-bg-input, #181825)",
-  bgHover: BRAND_PURPLE.alpha15,
+  bgHover: BRAND_ACCENT.alpha15,
 
   // Text
   textPrimary: "#cdd6f4",
@@ -104,12 +105,12 @@ export const CANVAS_COLORS = {
   borderLight: "rgba(255,255,255,0.06)",
   borderInput: "var(--buildrick-border, #313244)",
 
-  // Accent - NOW USING PURPLE!
-  primary: BRAND_PURPLE.DEFAULT,
-  primaryLight: BRAND_PURPLE.light,
-  primaryDark: BRAND_PURPLE.dark,
-  primaryGradient: `linear-gradient(135deg, ${BRAND_PURPLE.DEFAULT} 0%, ${BRAND_PURPLE.light} 100%)`,
-  accentGradient: `linear-gradient(135deg, ${BRAND_PURPLE.dark} 0%, ${BRAND_PURPLE.DEFAULT} 100%)`,
+  // Accent — cobalt accent ramp via BRAND_ACCENT
+  primary: BRAND_ACCENT.DEFAULT,
+  primaryLight: BRAND_ACCENT.light,
+  primaryDark: BRAND_ACCENT.dark,
+  primaryGradient: `linear-gradient(135deg, ${BRAND_ACCENT.DEFAULT} 0%, ${BRAND_ACCENT.light} 100%)`,
+  accentGradient: `linear-gradient(135deg, ${BRAND_ACCENT.dark} 0%, ${BRAND_ACCENT.DEFAULT} 100%)`,
 
   // Selection
   selection: SELECTION_COLORS.outline,
@@ -179,16 +180,16 @@ export const SHADOWS = {
   xl: "0 12px 32px rgba(0, 0, 0, 0.15)",
 
   // Blue glow shadows (matches primary brand color)
-  glowSm: "0 2px 8px rgba(37, 99, 235, 0.2)",
-  glowMd: "0 4px 14px rgba(37, 99, 235, 0.3)",
-  glowLg: "0 8px 25px rgba(37, 99, 235, 0.4)",
+  glowSm: "0 2px 8px rgba(45, 109, 255, 0.2)",
+  glowMd: "0 4px 14px rgba(45, 109, 255, 0.3)",
+  glowLg: "0 8px 25px rgba(45, 109, 255, 0.4)",
 
   // Selection shadows
   selection: SELECTION_COLORS.glow,
   selectionStrong: SELECTION_COLORS.glowStrong,
 
   // Hover lift shadow
-  hoverLift: "0 8px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(37, 99, 235, 0.1)",
+  hoverLift: "0 8px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(45, 109, 255, 0.1)",
 } as const;
 
 // ============================================
