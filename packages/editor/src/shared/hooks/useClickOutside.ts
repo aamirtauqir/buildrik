@@ -11,20 +11,16 @@ interface UseClickOutsideOptions {
   enabled?: boolean;
   /** Additional elements to exclude from click detection */
   excludeRefs?: React.RefObject<HTMLElement | null>[];
+  /** Also fire callback on Escape keypress */
+  closeOnEscape?: boolean;
 }
 
-/**
- * Hook that calls a callback when clicking outside specified elements
- * @param ref - Ref to the element to detect clicks outside of
- * @param callback - Function to call when clicking outside
- * @param options - Optional configuration
- */
 export function useClickOutside(
   ref: React.RefObject<HTMLElement | null>,
   callback: () => void,
   options: UseClickOutsideOptions = {}
 ): void {
-  const { enabled = true, excludeRefs = [] } = options;
+  const { enabled = true, excludeRefs = [], closeOnEscape = false } = options;
 
   React.useEffect(() => {
     if (!enabled) return;
@@ -32,24 +28,27 @@ export function useClickOutside(
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
 
-      // Check main ref
-      if (ref.current && ref.current.contains(target)) {
-        return;
-      }
+      if (ref.current && ref.current.contains(target)) return;
 
-      // Check excluded refs
       for (const excludeRef of excludeRefs) {
-        if (excludeRef.current && excludeRef.current.contains(target)) {
-          return;
-        }
+        if (excludeRef.current && excludeRef.current.contains(target)) return;
       }
 
       callback();
     };
 
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") callback();
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [ref, callback, enabled, excludeRefs]);
+    if (closeOnEscape) document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      if (closeOnEscape) document.removeEventListener("keydown", handleEscape);
+    };
+  }, [ref, callback, enabled, excludeRefs, closeOnEscape]);
 }
 
 export default useClickOutside;

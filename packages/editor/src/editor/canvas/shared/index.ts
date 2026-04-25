@@ -25,7 +25,6 @@ export {
 // ============================================
 export { useCanvasDOM } from "./useCanvasDOM";
 export type { CanvasElement, UseCanvasDOMOptions, UseCanvasDOMResult } from "./useCanvasDOM";
-export { useClickOutside } from "./useClickOutside";
 
 // ============================================
 // Geometry Utilities

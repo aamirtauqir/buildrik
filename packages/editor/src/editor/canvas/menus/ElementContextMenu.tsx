@@ -5,7 +5,8 @@
  */
 
 import * as React from "react";
-import { useClickOutside, CANVAS_COLORS, PANEL_STYLE, Z_INDEX } from "../shared";
+import { CANVAS_COLORS, PANEL_STYLE, Z_INDEX } from "../shared";
+import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import type { ContextAction, ActionContext } from "./contextMenuRegistry";
 import { MenuItem } from "./MenuItem";
 import { SubmenuItem } from "./SubmenuItem";
@@ -32,7 +33,7 @@ export const ElementContextMenu: React.FC<ElementContextMenuProps> = ({
   const [focusedIndex, setFocusedIndex] = React.useState<number>(0);
   const submenuTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useClickOutside(menuRef, onClose);
+  useClickOutside(menuRef, onClose, { closeOnEscape: true });
 
   // Flatten actions into ordered list for keyboard navigation
   const mainItems = React.useMemo(() => actions.filter((a) => a.group === "main"), [actions]);
