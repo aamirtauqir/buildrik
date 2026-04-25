@@ -115,7 +115,7 @@ const dot = (active: boolean): React.CSSProperties => ({
   minHeight: 5,
   padding: 0,
   border: "none",
-  borderRadius: "50%",
+  borderRadius: "var(--buildrick-radius-full)",
   background: active ? "var(--bd-accent)" : "var(--bd-border-medium)",
   cursor: "pointer",
   transform: active ? "scale(1.1)" : "none",

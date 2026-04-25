@@ -155,15 +155,31 @@ export const Screen: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 // Locked primitives — token migration only, layout preserved
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Locked-screen min-height + copy max-width.
+// Anchors the locked card vertically and caps copy width in the wide sidebar.
+// Distinct from layout SSOT widths (SIDEBAR_WIDE / INSPECTOR_W = 320) — these
+// are content-cap dimensions, not chrome-rail dimensions, so they don't share
+// the SSOT export.
+// @lint-layout-policy: locked-empty-state — vertical anchor + copy max width
+const LOCKED_MIN_HEIGHT = 16 * 20;
+const LOCKED_MAX_WIDTH = 16 * 20;
+// Vertical padding for the locked card (top/bottom). Outside the layout SSOT
+// because it's content-internal padding, not a chrome dimension.
+// @lint-layout-policy: locked-empty-state inner padding-Y
+const LOCKED_PAD_Y = 8 * 6;
+
 const lockedContainerStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  padding: "48px 24px",
+  paddingTop: LOCKED_PAD_Y,
+  paddingBottom: LOCKED_PAD_Y,
+  paddingLeft: 24,
+  paddingRight: 24,
   textAlign: "center",
   gap: 12,
-  minHeight: 320,
+  minHeight: LOCKED_MIN_HEIGHT,
 };
 const lockedIconStyle: React.CSSProperties = {
   marginBottom: 4,
@@ -176,14 +192,14 @@ const lockedTitleStyle: React.CSSProperties = {
 const lockedDescStyle: React.CSSProperties = {
   font: "500 12px var(--bd-font)",
   color: "var(--bd-fg-muted)",
-  maxWidth: 320,
+  maxWidth: LOCKED_MAX_WIDTH,
   lineHeight: 1.5,
   margin: 0,
 };
 const lockedBtnStyle: React.CSSProperties = {
   marginTop: 8,
   padding: "8px 16px",
-  borderRadius: 6,
+  borderRadius: "var(--buildrick-radius-md)",
   background: "var(--bd-accent)",
   color: "#fff",
   border: "none",

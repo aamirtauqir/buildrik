@@ -1,6 +1,6 @@
 /**
  * Unified ControlRow — label + control row. Ported to .bdi-row-ctrl.
- * Grid: 44px label | 1fr content. Variants keep legacy API.
+ * Grid: sm-label | 1fr content. Variants keep legacy API.
  *
  * @license BSD-3-Clause
  */
@@ -9,7 +9,7 @@ import * as React from "react";
 
 export interface ControlRowProps {
   label: string;
-  /** Label width preset: sm=44px (default), md=64px, lg=90px */
+  /** Label width preset: sm=44 (default), md=64, lg=90 */
   labelWidth?: "sm" | "md" | "lg";
   tooltip?: string;
   disabled?: boolean;
