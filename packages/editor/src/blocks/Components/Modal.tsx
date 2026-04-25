@@ -19,7 +19,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
     styles: {
       padding: "12px 24px",
       background: "#8b5cf6",
-      color: "var(--bd-bg-card)",
+      color: "var(--bd-fg-on-accent)",
       border: "none",
       borderRadius: "8px",
       fontSize: "14px",

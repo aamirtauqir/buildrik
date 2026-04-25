@@ -353,7 +353,7 @@
   width: 16px;
   height: 16px;
   background: var(--buildrick-selection-color);
-  color: var(--bd-bg-card);
+  color: var(--bd-fg-on-accent);
   border-radius: 50%;
   font-size: var(--buildrick-text-md);
   font-weight: bold;

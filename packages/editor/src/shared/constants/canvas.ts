@@ -59,15 +59,15 @@ export const SELECTION_COLORS = {
  */
 export const CANVAS_SURFACE = {
   // Canvas wrapper (outer area)
-  wrapper: "#F8FAFC",
-  wrapperGradient: "linear-gradient(180deg, #FAFAFB 0%, #F1F5F9 100%)",
+  wrapper: "var(--bd-bg-panel)",
+  wrapperGradient: "linear-gradient(180deg, #FAFAFB 0%, var(--bd-bg-subtle) 100%)",
 
   // Canvas content (white editing area)
-  content: "#FFFFFF",
+  content: "var(--bd-bg-card)",
   contentBorder: "#E4E4E7",
 
   // Grid/pattern overlay
-  gridDot: "#E2E8F0",
+  gridDot: "var(--bd-border)",
   gridLine: "rgba(37, 99, 235, 0.08)", // Blue grid lines
 } as const;
 
@@ -124,7 +124,7 @@ export const CANVAS_COLORS = {
   badgeId: "var(--buildrick-accent)", // Blue badge for IDs
   badgeClass: "#F59E0B",
   badgeData: "#3B82F6",
-  badgeCustom: "#94A3B8",
+  badgeCustom: "var(--bd-fg-muted)",
 
   // Status
   success: "#22C55E",

@@ -361,14 +361,14 @@
   margin-left: 2px;
   background: var(--buildrick-accent);
   border-radius: 999px;
-  color: var(--bd-bg-card);
+  color: var(--bd-fg-on-accent);
   font-size: var(--buildrick-text-xs);
   font-weight: 600;
 }
 
 .buildrick-pill.active .buildrick-pill-badge {
   background: var(--buildrick-accent);
-  color: var(--bd-bg-card);
+  color: var(--bd-fg-on-accent);
 }
 
 .buildrick-pill-tip {
@@ -2045,7 +2045,7 @@
   font-size: var(--buildrick-text-xl);
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: var(--bd-bg-card);
+  color: var(--bd-fg-on-accent);
   margin-bottom: var(--bd-space-4);
   position: relative;
   z-index: 1;
@@ -2094,7 +2094,7 @@
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 12px;
-  color: var(--bd-bg-card);
+  color: var(--bd-fg-on-accent);
   font-size: var(--buildrick-text-base);
   font-weight: 500;
   cursor: pointer;
@@ -2941,12 +2941,12 @@
 
 .buildrick-status-pill.free {
   background: #10b981;
-  color: var(--bd-bg-card);
+  color: var(--bd-fg-on-accent);
 }
 
 .buildrick-status-pill.premium {
   background: #f59e0b;
-  color: var(--bd-bg-card);
+  color: var(--bd-fg-on-accent);
 }
 
 /* Reset Filters Button */
@@ -3203,7 +3203,7 @@
   margin: var(--bd-space-2) var(--bd-space-3) var(--bd-space-3);
   padding: 14px var(--bd-space-6);
   background: linear-gradient(135deg, #8B5CF6, #7C3AED);
-  color: var(--bd-bg-card);
+  color: var(--bd-fg-on-accent);
   border: none;
   border-radius: 10px;
   font-size: var(--buildrick-text-md);
@@ -3690,7 +3690,7 @@
   margin-left: 2px;
   background: var(--buildrick-accent);
   border-radius: 999px;
-  color: var(--bd-bg-card);
+  color: var(--bd-fg-on-accent);
   font-size: var(--buildrick-text-xs);
   font-weight: 600;
 }

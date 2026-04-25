@@ -29,7 +29,7 @@ const DEFAULT_ICON_SVG = `<svg
   stroke-linejoin="round"
   data-icon="star"
   data-library="lucide"
-  style="color: var(--bd-bg-card);"
+  style="color: var(--bd-fg-on-accent);"
 >
   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
 </svg>`;
@@ -55,7 +55,7 @@ function buildIconBlock(
     "justify-content": "center",
     width: "32px",
     height: "32px",
-    color: "var(--bd-bg-card)",
+    color: "var(--bd-fg-on-accent)",
   });
 
   // Add data attributes for icon config

@@ -30,7 +30,7 @@ export const canvasTokens = {
       background: "#0A0A0A", // True Obsidian
       backgroundSecondary: "#121212", // Secondary dark
       backgroundTertiary: "#1A1A1A",
-      content: "#FFFFFF",
+      content: "var(--bd-bg-card)",
       border: "rgba(255, 255, 255, 0.08)",
       borderLight: "rgba(255, 255, 255, 0.04)",
       glass: "rgba(10, 10, 10, 0.6)", // Glassmorphism base
