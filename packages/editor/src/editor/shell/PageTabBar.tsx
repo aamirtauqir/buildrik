@@ -11,6 +11,7 @@ import type { PageData } from "../../shared/types";
 import { ConfirmDialog } from "../../shared/ui/Modal";
 import { useToast } from "../../shared/ui/Toast";
 import { getDefaultPageName } from "../../shared/utils/pageUtils";
+import { normalizeSlug } from "../sidebar/tabs/pages/utils/slug";
 
 // ============================================================================
 // TYPES
@@ -40,18 +41,13 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
   const [dirtyPages, setDirtyPages] = React.useState<Set<string>>(new Set());
   const { addToast } = useToast();
 
-  /** Generate URL slug from page name */
-  const toSlug = (name: string): string =>
-    name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-
-  /** Validation state derived from editName */
   const nameValidation = React.useMemo<{
     error?: string;
     warning?: string;
     slug: string;
   }>(() => {
     const trimmed = editName.trim();
-    const slug = toSlug(trimmed);
+    const slug = normalizeSlug(trimmed);
     if (!trimmed) return { error: "Page name is required", slug: "" };
     if (trimmed.length < 3) return { warning: "Short name — consider 3+ characters", slug };
     return { slug };
