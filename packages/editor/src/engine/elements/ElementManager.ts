@@ -6,10 +6,12 @@
  * @license BSD-3-Clause
  */
 
+import { EVENTS } from "../../shared/constants/events";
 import type { ElementData, PageData, ExportOptions } from "../../shared/types";
 import { generateId } from "../../shared/utils/helpers";
 import type { Composer } from "../Composer";
 import { Element } from "./Element";
+import { PreviewLayer } from "./PreviewLayer";
 import { ElementCRUD } from "./manager/ElementCRUD";
 import { HTMLParser } from "./manager/HTMLParser";
 import { PageManager } from "./manager/PageManager";
@@ -24,6 +26,7 @@ export class ElementManager {
   private pages: Map<string, PageData> = new Map();
   private elements: Map<string, Element> = new Map();
   private activePageId: string | null = null;
+  private previewLayer: PreviewLayer = new PreviewLayer();
 
   // Sub-managers
   private pageManager: PageManager;
@@ -142,6 +145,25 @@ export class ElementManager {
    */
   getAllElements(): Element[] {
     return Array.from(this.elements.values());
+  }
+
+  previewUpdate(id: string, props: Record<string, unknown>): void {
+    this.previewLayer.set(id, props);
+    this.composer.emit(EVENTS.ELEMENT_PREVIEW_CHANGED, id);
+  }
+
+  clearPreview(id: string): void {
+    if (!this.previewLayer.has(id)) return;
+    this.previewLayer.clear(id);
+    this.composer.emit(EVENTS.ELEMENT_PREVIEW_CHANGED, id);
+  }
+
+  getPreview(id: string): Record<string, unknown> | undefined {
+    return this.previewLayer.get(id);
+  }
+
+  hasPreview(id: string): boolean {
+    return this.previewLayer.has(id);
   }
 
   /** Register an element (internal use) */

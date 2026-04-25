@@ -52,6 +52,8 @@ export const EVENTS = {
   ELEMENT_NEEDS_ASSET: "element:needs-asset",
   /** Edit alt text of an image element */
   ELEMENT_EDIT_ALT: "element:edit-alt",
+  /** Preview layer changed for element (T8 — AI tab live-preview channel) */
+  ELEMENT_PREVIEW_CHANGED: "element:preview:changed",
 
   // ============================================
   // Layer Panel Events
