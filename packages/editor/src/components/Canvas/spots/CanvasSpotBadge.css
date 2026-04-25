@@ -5,8 +5,8 @@
 .buildrick-canvas-spot-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
+  gap: var(--bd-space-1);
+  padding: var(--bd-space-1) var(--bd-space-2);
   border-radius: 4px;
   font-size: 11px;
   font-weight: 600;
@@ -33,7 +33,7 @@
   width: 16px;
   height: 16px;
   padding: 0;
-  margin-left: 4px;
+  margin-left: var(--bd-space-1);
   background: rgba(255, 255, 255, 0.2);
   border: none;
   border-radius: 50%;

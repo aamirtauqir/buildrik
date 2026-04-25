@@ -24,7 +24,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 20px;
+  padding: 14px var(--bd-space-5);
   border-bottom: 1px solid var(--buildrick-border-light, var(--bd-border));
   background: var(--buildrick-bg-card, #fff);
 }
@@ -39,12 +39,12 @@
 .ie-header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--bd-space-2);
 }
 
 .ie-btn-ghost {
   height: 32px;
-  padding: 0 12px;
+  padding: 0 var(--bd-space-3);
   border-radius: 6px;
   border: 1px solid var(--buildrick-border, #D1D9E6);
   background: var(--buildrick-bg-card, #fff);
@@ -122,7 +122,7 @@
   color: #fff;
   font-size: 13px;
   text-align: center;
-  padding: 20px;
+  padding: var(--bd-space-5);
   pointer-events: none;
 }
 
@@ -157,7 +157,7 @@
 
 .ie-tab {
   flex: 1;
-  padding: 10px 8px;
+  padding: 10px var(--bd-space-2);
   font-size: 12px;
   font-weight: 500;
   color: var(--buildrick-text-disabled, var(--bd-border-medium));
@@ -183,7 +183,7 @@
 .ie-controls {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: var(--bd-space-4);
 }
 
 .ie-section-label {
@@ -192,8 +192,8 @@
   color: var(--buildrick-text-disabled);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 8px;
-  margin-top: 16px;
+  margin-bottom: var(--bd-space-2);
+  margin-top: var(--bd-space-4);
 }
 
 .ie-section-label:first-child { margin-top: 0; }
@@ -202,7 +202,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 4px;
+  margin-bottom: var(--bd-space-1);
 }
 
 .ie-slider {
@@ -238,7 +238,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-bottom: 8px;
+  margin-bottom: var(--bd-space-2);
 }
 
 .ie-preset {
@@ -291,7 +291,7 @@
 .ie-resize-inputs {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--bd-space-2);
 }
 
 .ie-resize-field {
@@ -310,7 +310,7 @@
   background: var(--buildrick-bg-card);
   color: var(--buildrick-text-primary);
   font-size: 13px;
-  padding: 0 8px;
+  padding: 0 var(--bd-space-2);
   text-align: center;
   outline: none;
 }

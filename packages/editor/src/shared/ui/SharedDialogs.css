@@ -16,7 +16,7 @@
   background: var(--buildrick-surface-3);
   border-radius: 12px;
   border: 1px solid var(--buildrick-border, rgba(255, 255, 255, 0.08));
-  padding: 20px 24px;
+  padding: var(--bd-space-5) var(--bd-space-6);
   max-width: 420px;
   width: 100%;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -32,18 +32,18 @@
 .sd-body {
   font-size: 13px;
   color: var(--buildrick-text-secondary, #B8B5AD);
-  margin: 8px 0 16px;
+  margin: var(--bd-space-2) 0 var(--bd-space-4);
   line-height: 1.5;
 }
 
 .sd-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: var(--bd-space-2);
 }
 
 .sd-btn {
-  padding: 8px 16px;
+  padding: var(--bd-space-2) var(--bd-space-4);
   border-radius: 6px;
   font-size: 13px;
   font-weight: 500;
@@ -77,19 +77,19 @@
 .sd-btn--danger:hover { opacity: 0.9; }
 
 /* Form fields (AddPageDialog) */
-.sd-form { display: flex; flex-direction: column; gap: 12px; margin: 12px 0; }
+.sd-form { display: flex; flex-direction: column; gap: var(--bd-space-3); margin: var(--bd-space-3) 0; }
 
 .sd-label {
   display: block;
   font-size: 12px;
   font-weight: 500;
   color: var(--buildrick-text-secondary, #B8B5AD);
-  margin-bottom: 4px;
+  margin-bottom: var(--bd-space-1);
 }
 
 .sd-input {
   width: 100%;
-  padding: 8px 12px;
+  padding: var(--bd-space-2) var(--bd-space-3);
   border-radius: 6px;
   border: 1px solid var(--buildrick-border, rgba(255, 255, 255, 0.08));
   background: var(--buildrick-surface-2);

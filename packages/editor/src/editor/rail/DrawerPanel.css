@@ -40,7 +40,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: var(--bd-space-3) var(--bd-space-4);
   border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
   flex-shrink: 0;
 }
@@ -56,7 +56,7 @@
 .drawer-panel__controls {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--bd-space-1);
 }
 
 /* Pin button styling */
@@ -118,7 +118,7 @@
    Footer (Optional)
    ============================================ */
 .drawer-panel__footer {
-  padding: 12px 16px;
+  padding: var(--bd-space-3) var(--bd-space-4);
   border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
   flex-shrink: 0;
 }

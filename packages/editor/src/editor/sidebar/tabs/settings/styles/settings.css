@@ -7,7 +7,7 @@
    ───────────────────────────────────────────── */
 
 .buildrick-form-group {
-  margin-bottom: 12px;
+  margin-bottom: var(--bd-space-3);
 }
 
 .bd-input-error,

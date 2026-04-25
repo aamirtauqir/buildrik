@@ -10,8 +10,8 @@
 .comp-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 12px;
+  gap: var(--bd-space-2);
+  padding: 0 var(--bd-space-3);
   height: 36px;
   cursor: pointer;
   border-radius: 6px;
@@ -47,8 +47,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 32px 20px;
+  gap: var(--bd-space-2);
+  padding: var(--bd-space-8) var(--bd-space-5);
   text-align: center;
 }
 

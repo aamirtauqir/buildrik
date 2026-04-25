@@ -116,7 +116,7 @@
 [data-buildrick-id] h6 {
   font-family: var(--buildrick-heading-font);
   color: var(--buildrick-text-primary);
-  margin: 0 0 16px 0;
+  margin: 0 0 var(--bd-space-4) 0;
 }
 
 [data-buildrick-id] h1 {
@@ -137,7 +137,7 @@
 
 [data-buildrick-id] p {
   color: var(--buildrick-text-primary);
-  margin: 0 0 12px 0;
+  margin: 0 0 var(--bd-space-3) 0;
 }
 
 [data-buildrick-id] a {
@@ -192,21 +192,21 @@
   font-size: var(--buildrick-text-sm-plus);
   font-weight: 500;
   text-align: center;
-  padding: 8px 16px;
+  padding: var(--bd-space-2) var(--bd-space-4);
 }
 
 .row,
 [data-buildrick-type="columns"] {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: var(--bd-space-4);
   width: 100%;
 }
 
 .col {
   flex: 1;
   min-width: 0;
-  padding: 16px;
+  padding: var(--bd-space-4);
   background: var(--buildrick-bg-subtle);
   border: 1px dashed var(--buildrick-border-medium);
   border-radius: 8px;
@@ -382,14 +382,14 @@
   justify-content: center;
   z-index: 5;
   text-align: center;
-  padding: 40px;
+  padding: var(--bd-space-10);
   background: transparent;
   animation: buildrick-fade-in 0.4s ease-out;
 }
 
 .buildrick-canvas-empty-cta__icon {
   color: var(--buildrick-text-muted);
-  margin-bottom: 16px;
+  margin-bottom: var(--bd-space-4);
   opacity: 0.6;
 }
 
@@ -397,13 +397,13 @@
   font-size: 20px;
   font-weight: 600;
   color: var(--buildrick-text-primary);
-  margin: 0 0 8px;
+  margin: 0 0 var(--bd-space-2);
 }
 
 .buildrick-canvas-empty-cta__desc {
   font-size: 14px;
   color: var(--buildrick-text-muted);
-  margin: 0 0 24px;
+  margin: 0 0 var(--bd-space-6);
   max-width: 320px;
   line-height: 1.5;
 }
@@ -412,7 +412,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 12px 20px;
+  padding: var(--bd-space-3) var(--bd-space-5);
   background: var(--buildrick-accent);
   color: #fff;
   border: none;
@@ -429,8 +429,8 @@
 }
 
 .buildrick-canvas-empty-cta__blank {
-  margin-top: 12px;
-  padding: 6px 16px;
+  margin-top: var(--bd-space-3);
+  padding: 6px var(--bd-space-4);
   background: transparent;
   color: var(--buildrick-text-muted);
   border: none;
@@ -479,7 +479,7 @@
   background: rgba(17, 17, 27, 0.85);
   border: 1px solid var(--buildrick-accent);
   border-radius: 4px;
-  padding: 2px 8px;
+  padding: 2px var(--bd-space-2);
   font-size: var(--buildrick-text-xs);
   font-weight: 600;
   color: var(--buildrick-selection-color);
@@ -675,7 +675,7 @@
   font-family: monospace;
   background: rgba(30, 30, 46, 0.9);
   color: var(--buildrick-selection-color);
-  padding: 1px 4px;
+  padding: 1px var(--bd-space-1);
   border-radius: 2px;
   pointer-events: none;
   z-index: 2000; /* Z_LAYERS.dropFeedback - unified registry */
@@ -741,7 +741,7 @@
   font-weight: 600;
   background: rgba(30, 30, 46, 0.85);
   color: var(--buildrick-badge-tag);
-  padding: 1px 4px;
+  padding: 1px var(--bd-space-1);
   border-radius: 2px;
   pointer-events: none;
   z-index: 1500;
@@ -845,7 +845,7 @@
   left: 0;
   background: var(--buildrick-accent, #667eea);
   color: white;
-  padding: 8px 16px;
+  padding: var(--bd-space-2) var(--bd-space-4);
   z-index: 10000;
   text-decoration: none;
   border-radius: 0 0 4px 0;

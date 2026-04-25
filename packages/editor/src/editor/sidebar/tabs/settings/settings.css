@@ -23,7 +23,7 @@
   overflow-y: auto;
 }
 .bd-set-snav-h {
-  padding: 11px 12px 8px;
+  padding: 11px var(--bd-space-3) var(--bd-space-2);
   font: 600 11px var(--bd-font);
   color: var(--bd-fg-heading);
   border-bottom: 1px solid var(--bd-border);
@@ -37,8 +37,8 @@
 .bd-set-snav-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
+  gap: var(--bd-space-2);
+  padding: 6px var(--bd-space-2);
   border: none;
   border-radius: 5px;
   background: transparent;
@@ -62,7 +62,7 @@
   outline-offset: 2px;
 }
 .bd-set-snav-row.bd-set-snav-row-sep {
-  margin-top: 12px;
+  margin-top: var(--bd-space-3);
   border-top: 1px solid var(--bd-border);
   padding-top: 10px;
 }
@@ -112,7 +112,7 @@
 
 /* ── Section block ── */
 .bd-set-section {
-  padding: 12px 12px 16px;
+  padding: var(--bd-space-3) var(--bd-space-3) var(--bd-space-4);
   border-bottom: 1px solid var(--bd-border);
 }
 .bd-set-section:last-child {
@@ -145,7 +145,7 @@
   font: 500 10px var(--bd-mono);
   color: var(--bd-fg-secondary);
   letter-spacing: -0.01em;
-  margin-bottom: 4px;
+  margin-bottom: var(--bd-space-1);
 }
 .bd-set-field-hint {
   color: var(--bd-fg-muted);
@@ -189,7 +189,7 @@ textarea.bd-set-input {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 0;
+  padding: var(--bd-space-2) 0;
 }
 .bd-set-switch-row-info {
   flex: 1;
@@ -242,7 +242,7 @@ textarea.bd-set-input {
   align-items: center;
   justify-content: space-between;
   gap: 6px;
-  padding: 8px 10px;
+  padding: var(--bd-space-2) 10px;
   background: var(--bd-bg-card, #fff);
   border-top: 1px solid var(--bd-border);
   transform: translateY(100%);
@@ -255,13 +255,13 @@ textarea.bd-set-input {
 .bd-set-savebar-note {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--bd-space-1);
   font: 500 10px var(--bd-font);
   color: var(--bd-warning);
 }
 .bd-set-savebar-actions {
   display: flex;
-  gap: 4px;
+  gap: var(--bd-space-1);
 }
 .bd-set-btn {
   padding: 5px 10px;
@@ -295,12 +295,12 @@ textarea.bd-set-input {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
-  padding: 16px 12px;
+  gap: var(--bd-space-2);
+  padding: var(--bd-space-4) var(--bd-space-3);
   background: var(--bd-bg-subtle);
   border: 1px dashed var(--bd-border-medium);
   border-radius: 6px;
-  margin: 12px;
+  margin: var(--bd-space-3);
 }
 .bd-set-branding-placeholder-t {
   font: 600 11.5px var(--bd-font);
@@ -317,7 +317,7 @@ textarea.bd-set-input {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 11px 12px 10px;
+  padding: 11px var(--bd-space-3) 10px;
   border-bottom: 1px solid var(--bd-border);
   background: var(--bd-bg-card, #fff);
   flex-shrink: 0;
@@ -389,19 +389,19 @@ textarea.bd-set-input {
   background: var(--bd-bg-card, #fff);
   border: 1px solid var(--bd-border);
   border-radius: 8px;
-  padding: 16px;
+  padding: var(--bd-space-4);
   box-shadow: 0 16px 48px -12px rgba(15, 23, 42, 0.25);
 }
 .bd-set-guard-title {
   font: 600 13px var(--bd-font);
   color: var(--bd-fg-heading);
-  margin: 0 0 4px;
+  margin: 0 0 var(--bd-space-1);
 }
 .bd-set-guard-body {
   font: 500 11.5px var(--bd-font);
   color: var(--bd-fg-secondary);
   line-height: 1.5;
-  margin-bottom: 12px;
+  margin-bottom: var(--bd-space-3);
 }
 .bd-set-guard-actions {
   display: flex;

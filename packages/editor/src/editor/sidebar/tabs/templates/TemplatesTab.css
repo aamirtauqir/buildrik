@@ -37,14 +37,14 @@
 
 /* ── Search ── */
 .tpl-search-wrap {
-  padding: 2px 24px;
+  padding: 2px var(--bd-space-6);
   flex-shrink: 0;
   background: var(--bd-bg-card, var(--bd-bg-card));
 }
 .tpl-search-input-box {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--bd-space-2);
   height: 36px;
   padding: 0 10px;
   background: var(--bd-bg-subtle, var(--bd-bg-subtle));
@@ -94,8 +94,8 @@
 .tpl-pills {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 24px;
+  gap: var(--bd-space-2);
+  padding: 10px var(--bd-space-6);
   flex-shrink: 0;
   background: var(--bd-bg-card, var(--bd-bg-card));
   border-bottom: 1px solid var(--bd-border-light, var(--bd-border));
@@ -106,7 +106,7 @@
 
 .tpl-pill {
   height: 28px;
-  padding: 0 16px;
+  padding: 0 var(--bd-space-4);
   border-radius: 20px;
   border: 1px solid var(--bd-border-light, var(--bd-border));
   background: var(--bd-bg-card, var(--bd-bg-card));
@@ -133,15 +133,15 @@
 .tpl-tags {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 24px;
+  gap: var(--bd-space-2);
+  padding: 10px var(--bd-space-6);
   flex-shrink: 0;
   background: var(--bd-bg-card, var(--bd-bg-card));
   border-bottom: 1px solid var(--bd-border-light, var(--bd-border));
 }
 .tpl-tag {
   height: 24px;
-  padding: 0 12px;
+  padding: 0 var(--bd-space-3);
   border-radius: 14px;
   border: none;
   background: var(--bd-bg-subtle, var(--bd-bg-subtle));
@@ -184,7 +184,7 @@
   height: 100%;
 }
 .tpl-content-inner--with-detail {
-  padding: 16px;
+  padding: var(--bd-space-4);
 }
 .tpl-content-inner--with-detail .tpl-grid-area {
   display: none;
@@ -198,7 +198,7 @@
 .tpl-grid-area {
   flex: 1;
   min-width: 0;
-  padding: 24px;
+  padding: var(--bd-space-6);
   transition: opacity 0.2s;
 }
 .tpl-grid-area--dimmed {
@@ -210,7 +210,7 @@
 .tpl-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: var(--bd-space-4);
 }
 
 /* ── Template card ── */
@@ -249,7 +249,7 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 10px 12px;
+  padding: 10px var(--bd-space-3);
 }
 .tpl-card-name {
   font-size: 13px;
@@ -270,8 +270,8 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 20px;
+  gap: var(--bd-space-4);
+  padding: var(--bd-space-5);
   border: 1px solid var(--bd-border-light, var(--bd-border));
   border-radius: 8px;
   background: var(--bd-bg-card, var(--bd-bg-card));
@@ -310,7 +310,7 @@
 .tpl-detail-buttons {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--bd-space-2);
 }
 .tpl-detail-btn {
   display: flex;
@@ -361,7 +361,7 @@
   justify-content: center;
   gap: 6px;
   height: 48px;
-  padding: 0 24px;
+  padding: 0 var(--bd-space-6);
   flex-shrink: 0;
   background: var(--bd-bg-panel, var(--bd-bg-panel));
   border-top: 1px solid var(--bd-border-light, var(--bd-border));
@@ -404,8 +404,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 24px;
-  gap: 12px;
+  padding: 60px var(--bd-space-6);
+  gap: var(--bd-space-3);
   text-align: center;
 }
 .tpl-empty-icon {
@@ -439,8 +439,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: var(--bd-space-3);
+  padding: var(--bd-space-3) var(--bd-space-4);
   background: #FEE2E2;
   border: 1px solid #FECACA;
   border-radius: 8px;
@@ -451,11 +451,11 @@
 .tpl-error-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--bd-space-2);
   flex-shrink: 0;
 }
 .tpl-error-retry {
-  padding: 4px 12px;
+  padding: var(--bd-space-1) var(--bd-space-3);
   border: 1px solid var(--bd-accent, #1D4ED8);
   border-radius: 6px;
   background: transparent;
@@ -508,7 +508,7 @@
   background: var(--bd-bg-card, var(--bd-bg-card));
   border: 1px solid var(--bd-border-light, var(--bd-border));
   border-radius: 8px;
-  padding: 20px;
+  padding: var(--bd-space-5);
   width: 420px;
   max-height: 90%;
   overflow-y: auto;
@@ -517,14 +517,14 @@
   font-size: 16px;
   font-weight: 600;
   color: var(--bd-fg-primary);
-  margin: 0 0 16px;
+  margin: 0 0 var(--bd-space-4);
 }
 .tpl-modal-warning {
-  padding: 12px;
+  padding: var(--bd-space-3);
   border-radius: 6px;
   background: #FFFBEB;
   border: 1px solid #FDE68A;
-  margin-bottom: 16px;
+  margin-bottom: var(--bd-space-4);
 }
 .tpl-modal-warning-text {
   font-size: 13px;
@@ -534,12 +534,12 @@
 }
 .tpl-modal-btns {
   display: flex;
-  gap: 8px;
+  gap: var(--bd-space-2);
   justify-content: flex-end;
 }
 .tpl-modal-btn {
   height: 36px;
-  padding: 0 16px;
+  padding: 0 var(--bd-space-4);
   border-radius: 6px;
   font-size: 13px;
   font-weight: 500;
@@ -585,7 +585,7 @@
   align-items: center;
   justify-content: space-between;
   height: 48px;
-  padding: 0 24px;
+  padding: 0 var(--bd-space-6);
   flex-shrink: 0;
   border-bottom: 1px solid var(--bd-border-light, var(--bd-border));
   background: var(--bd-bg-card, var(--bd-bg-card));
@@ -611,7 +611,7 @@
 .tpl-breadcrumb-back {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--bd-space-1);
   background: none;
   border: none;
   color: var(--bd-fg-muted, var(--bd-fg-secondary));
@@ -642,7 +642,7 @@
 }
 .tpl-newpage-chip {
   height: 28px;
-  padding: 0 12px;
+  padding: 0 var(--bd-space-3);
   border-radius: 999px;
   background: var(--bd-accent-tint, #DBEAFE);
   color: var(--bd-fg-primary, #1E40AF);
@@ -659,14 +659,14 @@
   min-height: 200px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--bd-space-4);
   box-shadow: var(--bd-shadow-modal, 0 4px 24px rgba(0, 0, 0, 0.2));
   border-color: var(--bd-border-medium, #D8E0EA);
 }
 .tpl-modal-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--bd-space-2);
 }
 .tpl-modal-row-text {
   font-size: 13px;
@@ -697,11 +697,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--bd-space-2);
 }
 .tpl-detail-preview-retry {
   height: 28px;
-  padding: 0 12px;
+  padding: 0 var(--bd-space-3);
   border-radius: 6px;
   border: 1px solid var(--bd-accent, #1D4ED8);
   background: transparent;

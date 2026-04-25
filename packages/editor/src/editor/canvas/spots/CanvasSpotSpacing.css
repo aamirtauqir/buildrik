@@ -68,7 +68,7 @@
 
 .buildrick-spacing-indicator-input {
   width: 50px;
-  padding: 2px 4px;
+  padding: 2px var(--bd-space-1);
   border: none;
   border-radius: 2px;
   background: rgba(255, 255, 255, 0.9);

@@ -154,7 +154,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 14px;
-  gap: 16px;
+  gap: var(--bd-space-4);
   background: var(--buildrick-bg-card);
   border-top: 1px solid var(--buildrick-border);
   font: 500 11px "Geist Mono", "SF Mono", Menlo, monospace;

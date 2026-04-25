@@ -36,7 +36,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 8px 6px 10px;
+  padding: 6px var(--bd-space-2) 6px 10px;
   background: var(--bd-bg-card, #fff);
   border-bottom: 1px solid var(--bd-border);
   position: sticky;
@@ -48,7 +48,7 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--bd-space-1);
   font: 500 10.5px var(--bd-mono);
   color: var(--bd-fg-muted);
   white-space: nowrap;
@@ -93,8 +93,8 @@
 .bdi-ehdr {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
+  gap: var(--bd-space-2);
+  padding: 10px var(--bd-space-3);
   background: linear-gradient(180deg, var(--bd-bg-card, #fff) 0%, var(--bd-bg-panel) 100%);
   border-bottom: 1px solid var(--bd-border);
 }
@@ -140,7 +140,7 @@
 /* ── Tabs ─────────────────────────────────────────────── */
 .bdi-tabs {
   display: flex;
-  padding: 0 8px;
+  padding: 0 var(--bd-space-2);
   border-bottom: 1px solid var(--bd-border);
   background: var(--bd-bg-card, #fff);
 }
@@ -159,7 +159,7 @@
   text-align: center;
 }
 .bdi-tab .bdi-dot {
-  margin-left: 4px;
+  margin-left: var(--bd-space-1);
   vertical-align: middle;
 }
 .bdi-tab:hover {
@@ -257,7 +257,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 10px 7px 12px;
+  padding: 7px 10px 7px var(--bd-space-3);
   cursor: pointer;
   user-select: none;
   position: relative;
@@ -365,7 +365,7 @@
   letter-spacing: -0.005em;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--bd-space-1);
 }
 .bdi-row-ctrl.disabled {
   opacity: 0.5;
@@ -374,7 +374,7 @@
 .bdi-row-ctrl .bdi-row-content {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--bd-space-1);
   min-width: 0;
 }
 
@@ -423,7 +423,7 @@
 .bdi-fld input {
   flex: 1;
   min-width: 0;
-  padding: 0 4px 0 0;
+  padding: 0 var(--bd-space-1) 0 0;
   background: transparent;
   border: none;
   outline: none;
@@ -486,9 +486,9 @@
 .bdi-ddn {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--bd-space-1);
   height: 24px;
-  padding: 0 6px 0 8px;
+  padding: 0 6px 0 var(--bd-space-2);
   background: var(--bd-bg-subtle);
   border: 1px solid transparent;
   border-radius: 4px;
@@ -541,7 +541,7 @@
 .bdi-quick {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
+  gap: var(--bd-space-1);
 }
 .bdi-qa {
   display: flex;
@@ -570,7 +570,7 @@
 /* ── Webflow-style nested spacing box ──────────────── */
 .bdi-box {
   position: relative;
-  padding: 18px 4px 14px;
+  padding: 18px var(--bd-space-1) 14px;
   display: flex;
   flex-direction: column;
 }
@@ -605,7 +605,7 @@
   font: 600 8px var(--bd-font);
   letter-spacing: 0.08em;
   background: var(--bd-bg-card, #fff);
-  padding: 0 4px;
+  padding: 0 var(--bd-space-1);
   color: var(--bd-warning);
   text-transform: uppercase;
 }
@@ -619,7 +619,7 @@
   font-variant-numeric: tabular-nums;
   background: transparent;
   border: 1px solid transparent;
-  padding: 1px 4px;
+  padding: 1px var(--bd-space-1);
   border-radius: 3px;
   min-width: 26px;
   max-width: 48px;
@@ -691,7 +691,7 @@
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   padding: 6px;
-  gap: 4px;
+  gap: var(--bd-space-1);
 }
 .bdi-pad .bdi-d {
   width: 5px;
@@ -778,7 +778,7 @@
   align-items: center;
   gap: 6px;
   height: 24px;
-  padding: 0 4px 0 2px;
+  padding: 0 var(--bd-space-1) 0 2px;
   background: var(--bd-bg-subtle);
   border: 1px solid transparent;
   border-radius: 4px;
@@ -904,7 +904,7 @@
   color: var(--bd-fg-primary);
   background: var(--bd-bg-card, #fff);
   border: 1px solid var(--bd-border);
-  padding: 1px 4px 1px 6px;
+  padding: 1px var(--bd-space-1) 1px 6px;
   border-radius: 3px;
   display: inline-flex;
   align-items: center;
@@ -943,7 +943,7 @@
   border-color: var(--bd-accent);
 }
 .bdi-chip-input {
-  padding: 1px 4px 1px 6px;
+  padding: 1px var(--bd-space-1) 1px 6px;
 }
 .bdi-chip-input input {
   font: 500 10px var(--bd-mono);
@@ -973,7 +973,7 @@
   display: block;
   width: 100%;
   text-align: left;
-  padding: 4px 6px;
+  padding: var(--bd-space-1) 6px;
   font: 500 10px var(--bd-mono);
   color: var(--bd-fg-primary);
   background: transparent;
@@ -990,7 +990,7 @@
 .bdi-adv {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--bd-space-1);
   font: 500 10px var(--bd-font);
   color: var(--bd-fg-secondary);
   background: transparent;
@@ -1013,7 +1013,7 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 18px 12px;
+  padding: 18px var(--bd-space-3);
   text-align: center;
   border: 1px dashed var(--bd-border);
   border-radius: 6px;
@@ -1029,11 +1029,11 @@
 .bdi-empty .bdi-empty-add {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--bd-space-1);
   font: 500 10.5px var(--bd-font);
   color: var(--bd-accent);
   background: var(--bd-accent-tint);
-  padding: 3px 8px;
+  padding: 3px var(--bd-space-2);
   border-radius: 4px;
   margin-top: 2px;
   cursor: pointer;
@@ -1045,7 +1045,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 6px;
+  padding: var(--bd-space-1) 6px;
   background: var(--bd-bg-subtle);
   border-radius: 4px;
   font: 500 10.5px var(--bd-font);
@@ -1083,7 +1083,7 @@
 /* ── Text input ─────────────────────────────────── */
 .bdi-text {
   width: 100%;
-  padding: 0 8px;
+  padding: 0 var(--bd-space-2);
   height: 24px;
   background: var(--bd-bg-subtle);
   border: 1px solid transparent;
@@ -1109,7 +1109,7 @@
 textarea.bdi-text {
   height: auto;
   min-height: 60px;
-  padding: 6px 8px;
+  padding: 6px var(--bd-space-2);
   resize: vertical;
   font-family: var(--bd-font);
 }
@@ -1146,7 +1146,7 @@ textarea.bdi-text {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 10px;
+  padding: var(--bd-space-2) 10px;
   background: var(--bd-bg-panel);
   border-bottom: 1px solid var(--bd-border);
 }
@@ -1178,7 +1178,7 @@ textarea.bdi-text {
   border: none;
   outline: none;
   background: transparent;
-  padding: 0 4px 0 8px;
+  padding: 0 var(--bd-space-1) 0 var(--bd-space-2);
   font: 500 11px var(--bd-font);
   color: var(--bd-fg-primary);
   font-variant-numeric: tabular-nums;
@@ -1199,7 +1199,7 @@ textarea.bdi-text {
   cursor: pointer;
 }
 .bdi-num .bdi-u.select {
-  padding-right: 4px;
+  padding-right: var(--bd-space-1);
 }
 .bdi-num.mixed {
   background: rgba(217, 119, 6, 0.06);
@@ -1223,7 +1223,7 @@ textarea.bdi-text {
 .bdi-quad {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px;
+  gap: var(--bd-space-1);
 }
 .bdi-color {
   /* Alias for .bdi-fill */
@@ -1235,7 +1235,7 @@ textarea.bdi-text {
   background: var(--bd-bg-subtle);
   border: 1px solid transparent;
   border-radius: 4px;
-  padding: 0 4px 0 2px;
+  padding: 0 var(--bd-space-1) 0 2px;
   cursor: pointer;
 }
 .bdi-color:hover {

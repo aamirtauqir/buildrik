@@ -77,7 +77,7 @@
   height: 1px;
   background: var(--buildrick-border);
   flex-shrink: 0;
-  margin: 4px 0;
+  margin: var(--bd-space-1) 0;
 }
 
 /* ─────────────────────────────────────────────
@@ -267,10 +267,10 @@
 .ls-panel-header {
   display: flex;
   align-items: center;
-  padding: 11px 12px 10px;
+  padding: 11px var(--bd-space-3) 10px;
   border-bottom: 1px solid var(--buildrick-border);
   flex-shrink: 0;
-  gap: 8px;
+  gap: var(--bd-space-2);
 }
 
 .ls-panel-title {
@@ -337,8 +337,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
+  gap: var(--bd-space-3);
+  padding: var(--bd-space-4);
   overflow-y: auto;
   overflow-x: hidden;
   background: var(--buildrick-bg-card);

@@ -4,7 +4,7 @@
 .buildrick-token-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 4px;
+  gap: var(--bd-space-1);
 }
 
 .buildrick-color-swatch {
@@ -24,11 +24,11 @@
 .buildrick-token-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
+  gap: var(--bd-space-2);
+  padding: 6px var(--bd-space-2);
   background: rgba(255, 255, 255, 0.02);
   border-radius: 6px;
-  margin-bottom: 4px;
+  margin-bottom: var(--bd-space-1);
 }
 
 .buildrick-token-name {
@@ -48,7 +48,7 @@
 }
 
 .buildrick-copy-btn {
-  padding: 4px 8px;
+  padding: var(--bd-space-1) var(--bd-space-2);
   background: transparent;
   border: none;
   color: var(--bd-fg-muted);
@@ -77,16 +77,16 @@
 }
 
 .buildrick-usage-hint {
-  padding: 12px;
+  padding: var(--bd-space-3);
   background: rgba(0, 115, 230, 0.1);
   border-radius: 8px;
-  margin-top: 16px;
+  margin-top: var(--bd-space-4);
 }
 
 .buildrick-usage-hint-title {
   font-size: var(--bd-text-xs);
   color: var(--bd-accent);
-  margin-bottom: 4px;
+  margin-bottom: var(--bd-space-1);
 }
 
 .buildrick-usage-hint-text {
@@ -100,7 +100,7 @@
 .buildrick-design-picker {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--bd-space-2);
   padding: 10px;
   background: var(--bd-bg-subtle);
   border-radius: 8px;
@@ -171,7 +171,7 @@
 .buildrick-design-picker__hex-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--bd-space-2);
 }
 
 .buildrick-design-picker__swatch-preview {
@@ -187,7 +187,7 @@
   display: flex;
   align-items: center;
   gap: 2px;
-  padding: 0 8px;
+  padding: 0 var(--bd-space-2);
   background: rgba(255,255,255,0.05);
   border: 1px solid var(--bd-border);
   border-radius: 5px;
@@ -236,7 +236,7 @@
   background: rgba(245,158,11,0.08);
   border: 1px solid rgba(245,158,11,0.2);
   border-radius: 5px;
-  padding: 5px 8px;
+  padding: 5px var(--bd-space-2);
 }
 
 .buildrick-design-picker__actions {
@@ -247,7 +247,7 @@
 }
 
 .buildrick-design-picker__cancel-btn {
-  padding: 5px 12px;
+  padding: 5px var(--bd-space-3);
   background: transparent;
   border: 1px solid var(--bd-border);
   border-radius: 5px;
@@ -257,7 +257,7 @@
 }
 
 .buildrick-design-picker__save-btn {
-  padding: 5px 12px;
+  padding: 5px var(--bd-space-3);
   background: var(--bd-accent);
   border: none;
   border-radius: 5px;
