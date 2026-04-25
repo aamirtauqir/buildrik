@@ -49,9 +49,8 @@
   --buildrick-boxmodel-margin: rgba(246, 178, 107, 0.66);   /* Orange - margin */
 
   /* Shadows — canonical defs in themes/design-system/shadow.css */
-  --buildrick-shadow-accent: 0 4px 14px rgba(37, 99, 235, 0.3);
-  --buildrick-shadow-purple: var(--buildrick-shadow-accent); /* Legacy alias */
-  --buildrick-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(37, 99, 235, 0.1);
+  --buildrick-shadow-accent: 0 4px 14px rgba(45, 109, 255, 0.3);
+  --buildrick-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(45, 109, 255, 0.1);
 
   /* Transitions */
   --buildrick-transition-fast: 150ms ease;
@@ -63,7 +62,7 @@
      For inspector badges, annotations, etc.
      ============================================ */
   --buildrick-badge-tag: #10B981;       /* Emerald - HTML tag badges */
-  --buildrick-badge-id: #7c3aed;        /* Purple - ID attribute badges */
+  --buildrick-badge-id: var(--buildrick-accent); /* Cobalt - ID attribute badges */
   --buildrick-badge-class: #f59e0b;     /* Amber - class badges */
   --buildrick-badge-data: #3b82f6;      /* Blue - data attribute badges */
   --buildrick-badge-default: var(--bd-fg-muted);   /* Gray - default/custom badges */
@@ -111,7 +110,7 @@
      Spacing Indicator Colors
      ============================================ */
   --buildrick-spacing-margin: #10B981;  /* Emerald - margin indicators */
-  --buildrick-spacing-padding: #7c3aed; /* Purple - padding indicators */
+  --buildrick-spacing-padding: var(--buildrick-accent); /* Cobalt - padding indicators */
 }
 
 .buildrick-canvas {
