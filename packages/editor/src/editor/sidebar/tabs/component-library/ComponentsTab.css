@@ -25,7 +25,7 @@
 }
 
 .comp-row--selected {
-  background: var(--bd-accent-tint, #DBEAFE);
+  background: var(--bd-accent-tint);
   color: var(--bd-fg-primary);
 }
 

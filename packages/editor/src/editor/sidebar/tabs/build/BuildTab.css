@@ -316,7 +316,7 @@
 }
 
 .bld-search-group-count:hover {
-  background: linear-gradient(135deg, var(--bd-accent-tint, #DBEAFE) 0%, #E0E7FF 100%);
+  background: linear-gradient(135deg, var(--bd-accent-tint) 0%, #E0E7FF 100%);
   color: var(--bd-accent, var(--bd-accent));
   box-shadow: 0 2px 4px rgba(45, 109, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 1.0);
 }
@@ -405,7 +405,7 @@
 }
 
 .bld-sec-type-card:hover {
-  background: linear-gradient(135deg, var(--bd-accent-tint, #DBEAFE) 0%, #E0E7FF 100%);
+  background: linear-gradient(135deg, var(--bd-accent-tint) 0%, #E0E7FF 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(45, 109, 255, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1.0);
   position: relative;
@@ -475,7 +475,7 @@
 }
 
 .bld-sec-type-card--active {
-  background: linear-gradient(135deg, var(--bd-accent-tint, #DBEAFE) 0%, #E0E7FF 100%);
+  background: linear-gradient(135deg, var(--bd-accent-tint) 0%, #E0E7FF 100%);
   box-shadow: 0 0 0 2px var(--bd-accent, var(--bd-accent)), 0 2px 8px rgba(45, 109, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 1.0);
   position: relative;
 }

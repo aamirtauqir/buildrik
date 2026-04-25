@@ -256,7 +256,7 @@
 .ie-preset:hover { background: var(--buildrick-bg-subtle); }
 
 .ie-preset.active {
-  background: var(--buildrick-accent-tint, #DBEAFE);
+  background: var(--buildrick-accent-tint);
   color: var(--buildrick-text-primary);
   border-color: var(--buildrick-accent);
 }

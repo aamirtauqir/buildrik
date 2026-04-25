@@ -1,6 +1,6 @@
 /**
  * Media Tab — Selection Banner (XSWRz spec)
- * Fill #DBEAFE, Move/Download/Deselect all/More buttons
+ * Fill cobalt-accent-tint, Move/Download/Deselect all/More buttons
  * @license BSD-3-Clause
  */
 
