@@ -308,14 +308,12 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
   const handleRailTabChange = React.useCallback(
     (tab: GroupedTabId) => {
-      if (onLeftPanelTabChange) {
-        onLeftPanelTabChange(tab);
-      }
-      if (!isLeftPanelOpen && onLeftPanelToggle) {
-        onLeftPanelToggle();
-      }
+      // Tab-only switcher. Drawer-toggle lives in LeftSidebar.handleBtnClick;
+      // duplicating it here caused both setters to fire setIsLeftPanelOpen(v=>!v)
+      // in the same batch, netting zero on different-tab clicks (2-click bug).
+      onLeftPanelTabChange?.(tab);
     },
-    [onLeftPanelTabChange, isLeftPanelOpen, onLeftPanelToggle]
+    [onLeftPanelTabChange]
   );
 
   const handleFullPageClose = React.useCallback(() => {
