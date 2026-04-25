@@ -8,6 +8,7 @@ export type PlanLimitKey =
   | "storageMB"
   | "bandwidthMB"
   | "aiGenerations"
+  | "aiPromptsPerDay"
   | "fileUploadMaxMB"
   | "formSubmissions"
   | "urlRedirects"
@@ -29,6 +30,7 @@ export const PLAN_LIMITS: Record<PlanName, PlanLimits> = {
     storageMB: 500,
     bandwidthMB: 1024,
     aiGenerations: 3,
+    aiPromptsPerDay: 10,
     fileUploadMaxMB: 10,
     formSubmissions: 100,
     urlRedirects: 100,
@@ -47,6 +49,7 @@ export const PLAN_LIMITS: Record<PlanName, PlanLimits> = {
     storageMB: 5120,
     bandwidthMB: 10240,
     aiGenerations: 20,
+    aiPromptsPerDay: 200,
     fileUploadMaxMB: 50,
     formSubmissions: 2500,
     urlRedirects: 500,
@@ -65,6 +68,7 @@ export const PLAN_LIMITS: Record<PlanName, PlanLimits> = {
     storageMB: 51200,
     bandwidthMB: 102400,
     aiGenerations: -1,
+    aiPromptsPerDay: -1,
     fileUploadMaxMB: 200,
     formSubmissions: -1,
     urlRedirects: -1,

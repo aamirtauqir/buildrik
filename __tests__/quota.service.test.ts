@@ -13,7 +13,7 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-import { checkQuota, recordUsage, TIER_LIMITS } from "@server/services/quota.service";
+import { checkQuota, recordUsage, UNLIMITED } from "@server/services/quota.service";
 
 describe("quota.service", () => {
   beforeEach(() => {
@@ -26,7 +26,7 @@ describe("quota.service", () => {
     workspaceMemberFindFirst.mockResolvedValueOnce(null);
     aiUsageFindUnique.mockResolvedValueOnce(null);
     const result = await checkQuota("user-1");
-    expect(result.limit).toBe(TIER_LIMITS.FREE);
+    expect(result.limit).toBe(10);
     expect(result.used).toBe(0);
     expect(result.ok).toBe(true);
   });
@@ -48,12 +48,24 @@ describe("quota.service", () => {
     expect(result.used).toBe(10);
   });
 
-  it("BUSINESS tier is unlimited (Infinity)", async () => {
+  it("BUSINESS tier is unlimited (-1) and remains ok past any count", async () => {
     workspaceMemberFindFirst.mockResolvedValueOnce({ workspace: { plan: "BUSINESS" } });
     aiUsageFindUnique.mockResolvedValueOnce({ count: 100000 });
     const result = await checkQuota("user-1");
     expect(result.ok).toBe(true);
-    expect(result.limit).toBe(Infinity);
+    expect(result.limit).toBe(UNLIMITED);
+    expect(result.limit).toBe(-1);
+  });
+
+  it("queries workspaceMember with status ACTIVE and orderBy joinedAt asc", async () => {
+    workspaceMemberFindFirst.mockResolvedValueOnce({ workspace: { plan: "FREE" } });
+    aiUsageFindUnique.mockResolvedValueOnce(null);
+    await checkQuota("user-1");
+    expect(workspaceMemberFindFirst).toHaveBeenCalledWith({
+      where: { userId: "user-1", status: "ACTIVE" },
+      include: { workspace: { select: { plan: true } } },
+      orderBy: { joinedAt: "asc" },
+    });
   });
 
   it("recordUsage upserts +1 for the right dayBucket", async () => {

@@ -1,10 +1,7 @@
 import { prisma } from "@/lib/prisma";
+import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 
-export const TIER_LIMITS: Record<string, number> = {
-  FREE: 10,
-  PRO: 200,
-  BUSINESS: Infinity,
-};
+export const UNLIMITED = -1;
 
 export interface QuotaStatus {
   ok: boolean;
@@ -15,15 +12,15 @@ export interface QuotaStatus {
 
 function todayBucket(): string {
   const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, "0");
-  const d = String(now.getDate()).padStart(2, "0");
+  const y = now.getUTCFullYear();
+  const m = String(now.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(now.getUTCDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
 
-function nextMidnight(): Date {
+function nextMidnightUTC(): Date {
   const next = new Date();
-  next.setHours(24, 0, 0, 0);
+  next.setUTCHours(24, 0, 0, 0);
   return next;
 }
 
@@ -33,8 +30,8 @@ async function getTierLimit(userId: string): Promise<number> {
     include: { workspace: { select: { plan: true } } },
     orderBy: { joinedAt: "asc" },
   });
-  const plan = member?.workspace?.plan ?? "FREE";
-  return TIER_LIMITS[plan] ?? TIER_LIMITS.FREE;
+  const plan = (member?.workspace?.plan ?? "FREE") as PlanName;
+  return PLAN_LIMITS[plan].aiPromptsPerDay as number;
 }
 
 export async function checkQuota(userId: string): Promise<QuotaStatus> {
@@ -45,10 +42,10 @@ export async function checkQuota(userId: string): Promise<QuotaStatus> {
   });
   const used = usage?.count ?? 0;
   return {
-    ok: used < limit,
+    ok: limit === UNLIMITED || used < limit,
     used,
     limit,
-    resetsAt: nextMidnight(),
+    resetsAt: nextMidnightUTC(),
   };
 }
 
