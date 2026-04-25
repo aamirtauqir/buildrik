@@ -159,7 +159,7 @@ const warningBannerStyles: React.CSSProperties = {
   padding: "10px 12px",
   background: "rgba(217, 119, 6, 0.08)",
   border: "1px solid rgba(217, 119, 6, 0.3)",
-  borderRadius: "var(--buildrick-radius-md)",
+  borderRadius: "var(--buildrick-radius-sm)",
   font: "500 11.5px var(--bd-font)",
   color: "var(--bd-warning)",
   lineHeight: 1.5,

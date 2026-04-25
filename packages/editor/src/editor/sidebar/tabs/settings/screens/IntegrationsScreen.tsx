@@ -18,7 +18,7 @@ const cardStyles: React.CSSProperties = {
   gap: 10,
   padding: "10px 12px",
   background: "var(--bd-bg-subtle)",
-  borderRadius: "var(--buildrick-radius-md)",
+  borderRadius: "var(--buildrick-radius-sm)",
   marginBottom: 6,
 };
 

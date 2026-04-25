@@ -64,7 +64,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
           justifyContent: "space-between",
           padding: "12px 14px",
           background: "var(--bd-bg-subtle)",
-          borderRadius: "var(--buildrick-radius-md)",
+          borderRadius: "var(--buildrick-radius-sm)",
           border: "1px solid var(--bd-border)",
         }}
       >
@@ -106,7 +106,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
           style={{
             padding: "14px",
             background: "rgba(45,109,255,0.06)",
-            borderRadius: "var(--buildrick-radius-md)",
+            borderRadius: "var(--buildrick-radius-sm)",
             border: "1px solid rgba(45,109,255,0.15)",
           }}
         >
@@ -148,7 +148,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
               padding: "9px 16px",
               background: "var(--bd-accent)",
               border: "none",
-              borderRadius: "var(--buildrick-radius-md)",
+              borderRadius: "var(--buildrick-radius-sm)",
               color: "var(--bd-fg-on-accent)",
               fontSize: 13,
               fontWeight: 600,
@@ -168,7 +168,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
           style={{
             padding: "12px 14px",
             background: "rgba(34,197,94,0.06)",
-            borderRadius: "var(--buildrick-radius-md)",
+            borderRadius: "var(--buildrick-radius-sm)",
             border: "1px solid rgba(34,197,94,0.15)",
             fontSize: 13,
             color: "var(--bd-fg-secondary)",

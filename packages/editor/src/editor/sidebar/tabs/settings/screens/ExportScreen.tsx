@@ -230,7 +230,7 @@ const downloadBtnStyles: React.CSSProperties = {
   padding: "10px 16px",
   background: "var(--bd-accent)",
   border: "none",
-  borderRadius: "var(--buildrick-radius-md)",
+  borderRadius: "var(--buildrick-radius-sm)",
   color: "var(--bd-fg-on-accent)",
   fontSize: 13,
   fontWeight: 600,
