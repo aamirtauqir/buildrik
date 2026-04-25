@@ -175,7 +175,7 @@ export const CreatePageErrorModal: React.FC<CreatePageErrorModalProps> = ({
     <div className="tpl-modal-overlay" onClick={onCancel}>
       <div className="tpl-modal tpl-modal--create" onClick={(e) => e.stopPropagation()}>
         <div className="tpl-modal-icon">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--bd-error, #DC2626)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--bd-error, var(--bd-error))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
             <path d="M12 8v4M12 16h.01" />
           </svg>

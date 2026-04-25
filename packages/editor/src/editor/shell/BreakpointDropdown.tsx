@@ -184,7 +184,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.background = "#F1F5F9";
+                      e.currentTarget.style.background = "var(--bd-bg-subtle)";
                     }
                   }}
                   onMouseLeave={(e) => {

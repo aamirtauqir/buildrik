@@ -21,7 +21,7 @@
 }
 
 .comp-row:hover {
-  background: var(--bd-bg-subtle, #F1F5F9);
+  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
 }
 
 .comp-row--selected {
@@ -33,7 +33,7 @@
 .comp-count-badge {
   margin-left: auto;
   padding: 2px 6px;
-  background: var(--bd-bg-subtle, #F1F5F9);
+  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
   border-radius: 999px;
   font-size: 11px;
   color: var(--bd-fg-muted, var(--bd-fg-secondary));
@@ -54,7 +54,7 @@
 
 .comp-empty__icon {
   font-size: 32px;
-  color: var(--bd-fg-disabled, #CBD5E1);
+  color: var(--bd-fg-disabled, var(--bd-border-medium));
   line-height: 1;
 }
 

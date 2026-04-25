@@ -27,7 +27,7 @@ const MOCK_MEMBERS: Member[] = [
 const ROLE_COLORS: Record<Role, { bg: string; text: string }> = {
   Editor: { bg: "#EFF6FF", text: "#1D4ED8" },
   Admin:  { bg: "#FEF3C7", text: "#92400E" },
-  Viewer: { bg: "#F1F5F9", text: "#475569" },
+  Viewer: { bg: "var(--bd-bg-subtle)", text: "#475569" },
 };
 
 interface InviteModalProps {
@@ -129,7 +129,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
             alignItems: "center",
             justifyContent: "space-between",
             padding: "18px 20px 16px",
-            borderBottom: "1px solid #F1F5F9",
+            borderBottom: "1px solid var(--bd-bg-subtle)",
           }}
         >
           <div>
@@ -206,7 +206,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                   borderRadius: 6,
                   fontSize: 12,
                   fontWeight: 600,
-                  color: copied ? "#166534" : "#334155",
+                  color: copied ? "#166534" : "var(--bd-fg-primary)",
                   cursor: "pointer",
                   flexShrink: 0,
                   transition: "color 0.1s ease",
@@ -372,7 +372,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
             justifyContent: "flex-end",
             gap: 8,
             padding: "14px 20px",
-            borderTop: "1px solid #F1F5F9",
+            borderTop: "1px solid var(--bd-bg-subtle)",
           }}
         >
           <button

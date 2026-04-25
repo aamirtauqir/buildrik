@@ -163,7 +163,7 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({
       style={{
         background: "var(--buildrick-bg-panel-secondary, #2d2d44)",
         borderRadius: "var(--buildrick-radius-lg)",
-        border: "1px solid var(--buildrick-border, #334155)",
+        border: "1px solid var(--buildrick-border, var(--bd-fg-primary))",
         overflow: "hidden",
       }}
     >
@@ -258,7 +258,7 @@ export const SkeletonTable: React.FC<SkeletonTableProps> = ({
         gap: 2,
         background: "var(--buildrick-bg-panel-secondary, #2d2d44)",
         borderRadius: "var(--buildrick-radius-lg)",
-        border: "1px solid var(--buildrick-border, #334155)",
+        border: "1px solid var(--buildrick-border, var(--bd-fg-primary))",
         overflow: "hidden",
         padding: 4,
       }}

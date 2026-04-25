@@ -17,7 +17,7 @@
 }
 
 .buildrick-color-swatch.active {
-  border-color: var(--bd-fg-primary, #f1f5f9);
+  border-color: var(--bd-fg-primary, var(--bd-bg-subtle));
   box-shadow: 0 0 0 2px var(--bd-accent);
 }
 

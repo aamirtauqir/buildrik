@@ -24,7 +24,7 @@ export interface SliderInputProps {
 const sliderStyle: React.CSSProperties = {
   flex: 1,
   height: 4,
-  background: "var(--bd-border-medium, #CBD5E1)",
+  background: "var(--bd-border-medium, var(--bd-border-medium))",
   borderRadius: 2,
   appearance: "none",
   cursor: "pointer",

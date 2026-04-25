@@ -31,7 +31,7 @@
   transition: background 0.12s, color 0.12s;
 }
 .tpl-header-btn:hover {
-  background: var(--bd-bg-subtle, #F1F5F9);
+  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
   color: var(--bd-fg-primary);
 }
 
@@ -47,7 +47,7 @@
   gap: 8px;
   height: 36px;
   padding: 0 10px;
-  background: var(--bd-bg-subtle, #F1F5F9);
+  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
   border: 1px solid var(--bd-border-light, var(--bd-border));
   border-radius: 4px;
   transition: border-color 0.12s;
@@ -144,7 +144,7 @@
   padding: 0 12px;
   border-radius: 14px;
   border: none;
-  background: var(--bd-bg-subtle, #F1F5F9);
+  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
   color: var(--bd-fg-muted, #475569);
   font-size: 12px;
   font-weight: 500;
@@ -170,12 +170,12 @@
   overflow-y: auto;
   min-height: 0;
   scrollbar-width: thin;
-  scrollbar-color: var(--bd-border, #CBD5E1) transparent;
+  scrollbar-color: var(--bd-border, var(--bd-border-medium)) transparent;
 }
 .tpl-content::-webkit-scrollbar { width: 4px; }
 .tpl-content::-webkit-scrollbar-track { background: transparent; }
 .tpl-content::-webkit-scrollbar-thumb {
-  background: var(--bd-border, #CBD5E1);
+  background: var(--bd-border, var(--bd-border-medium));
   border-radius: 2px;
 }
 
@@ -241,7 +241,7 @@
 
 .tpl-card-thumb {
   height: 160px;
-  background: var(--bd-bg-subtle, #F1F5F9);
+  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
   flex-shrink: 0;
 }
 
@@ -281,7 +281,7 @@
 .tpl-detail-preview {
   height: 240px;
   border-radius: 6px;
-  background: var(--bd-bg-subtle, #F1F5F9);
+  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
   flex-shrink: 0;
   position: relative;
   display: flex;
@@ -351,7 +351,7 @@
   border: 1px solid var(--bd-border-light, var(--bd-border));
 }
 .tpl-detail-btn--ghost:hover {
-  background: var(--bd-bg-subtle, #F1F5F9);
+  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
 }
 
 /* ── Pagination ── */
@@ -549,11 +549,11 @@
 }
 .tpl-modal-btn--ghost {
   background: transparent;
-  border: 1px solid var(--bd-border, #CBD5E1);
+  border: 1px solid var(--bd-border, var(--bd-border-medium));
   color: var(--bd-fg-muted, #475569);
 }
 .tpl-modal-btn--ghost:hover {
-  background: var(--bd-bg-subtle, #F1F5F9);
+  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
 }
 .tpl-modal-btn--primary {
   background: var(--bd-accent, #1D4ED8);

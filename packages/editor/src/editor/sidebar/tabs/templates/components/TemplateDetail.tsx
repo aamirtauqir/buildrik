@@ -33,8 +33,8 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
         style={{
           background:
             previewState === "ready"
-              ? (template.gradient ?? "var(--bd-bg-subtle, #F1F5F9)")
-              : "var(--bd-bg-subtle, #F1F5F9)",
+              ? (template.gradient ?? "var(--bd-bg-subtle, var(--bd-bg-subtle))")
+              : "var(--bd-bg-subtle, var(--bd-bg-subtle))",
         }}
       >
         {previewState === "loading" && (

@@ -88,7 +88,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     },
     dashed: {
       background: "transparent",
-      border: "1px dashed var(--buildrick-border, #334155)",
+      border: "1px dashed var(--buildrick-border, var(--bd-fg-primary))",
     },
     minimal: {
       background: "transparent",

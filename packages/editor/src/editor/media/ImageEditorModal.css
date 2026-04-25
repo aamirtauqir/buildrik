@@ -54,7 +54,7 @@
   cursor: pointer;
 }
 
-.ie-btn-ghost:hover { background: var(--buildrick-bg-subtle, #F1F5F9); }
+.ie-btn-ghost:hover { background: var(--buildrick-bg-subtle, var(--bd-bg-subtle)); }
 
 .ie-btn-primary {
   height: 32px;
@@ -160,7 +160,7 @@
   padding: 10px 8px;
   font-size: 12px;
   font-weight: 500;
-  color: var(--buildrick-text-disabled, #CBD5E1);
+  color: var(--buildrick-text-disabled, var(--bd-border-medium));
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;

@@ -52,7 +52,7 @@ function buildSwitch(composer: Composer, parentId: string, dropIndex?: number): 
       position: "relative",
       width: "44px",
       height: "24px",
-      background: "#cbd5e1",
+      background: "var(--bd-border-medium)",
       borderRadius: "24px",
       transition: "background 0.2s ease",
     },

@@ -337,7 +337,7 @@ export const FormActions: React.FC<FormActionsProps> = ({
         gap,
         marginTop: 20,
         paddingTop: bordered ? 20 : 0,
-        borderTop: bordered ? "1px solid var(--buildrick-border, #334155)" : "none",
+        borderTop: bordered ? "1px solid var(--buildrick-border, var(--bd-fg-primary))" : "none",
         ...alignStyles[align],
       }}
     >

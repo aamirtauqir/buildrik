@@ -65,7 +65,7 @@
 
 .mgr-breadcrumb .mgr-crumb-current { color: var(--buildrick-text-primary); font-weight: 600; }
 
-.mgr-breadcrumb .mgr-sep { color: var(--buildrick-text-disabled, #CBD5E1); }
+.mgr-breadcrumb .mgr-sep { color: var(--buildrick-text-disabled, var(--bd-border-medium)); }
 
 .mgr-search {
   flex: 1;
@@ -74,7 +74,7 @@
   height: 34px;
   border: 1px solid var(--buildrick-border, #D1D9E6);
   border-radius: 4px;
-  background: var(--buildrick-bg-subtle, #F1F5F9);
+  background: var(--buildrick-bg-subtle, var(--bd-bg-subtle));
   display: flex;
   align-items: center;
   gap: 8px;
@@ -588,7 +588,7 @@
 }
 
 .mgr-node-del:hover {
-  color: var(--buildrick-error, #DC2626);
+  color: var(--buildrick-error, var(--bd-error));
 }
 
 .mgr-bulk-bar {
@@ -821,7 +821,7 @@
 }
 
 .mgr-det-actions .mgr-btn.danger {
-  color: var(--buildrick-error, #DC2626);
+  color: var(--buildrick-error, var(--bd-error));
   border-color: #FECACA;
 }
 

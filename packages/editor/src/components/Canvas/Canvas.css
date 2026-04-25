@@ -371,7 +371,7 @@
 }
 
 [data-buildrick-id][data-drop-invalid="true"] {
-  outline: 2px solid var(--buildrick-drop-invalid-border, #dc2626);
+  outline: 2px solid var(--buildrick-drop-invalid-border, var(--bd-error));
   outline-offset: 2px;
   cursor: not-allowed !important;
 }
@@ -422,7 +422,7 @@
     box-shadow: inset 0 0 0 rgba(139, 92, 246, 0);
   }
   50% {
-    border-color: #cbd5e1;
+    border-color: var(--bd-border-medium);
     box-shadow: inset 0 0 60px var(--buildrick-accent-purple-08);
   }
 }
@@ -557,7 +557,7 @@
 .buildrick-canvas {
   --buildrick-drop-valid-border: var(--buildrick-selection-color);
   --buildrick-drop-valid-bg: var(--buildrick-accent-purple-08);
-  --buildrick-drop-invalid-border: #dc2626;
+  --buildrick-drop-invalid-border: var(--bd-error);
   --buildrick-drop-invalid-bg: rgba(220, 38, 38, 0.04);
 }
 

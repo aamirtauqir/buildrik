@@ -187,7 +187,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           {/* Gradient Colors */}
           <ColorInput
             label="Color 1"
-            value={gradientUI?.color1 || "#2d6dff"}
+            value={gradientUI?.color1 || "var(--bd-accent)"}
             onChange={(v) => {
               const result = composeGradient({
                 type: (gradientUI?.gradientType || "linear") as "linear" | "radial",

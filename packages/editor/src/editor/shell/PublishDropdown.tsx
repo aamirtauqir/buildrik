@@ -293,7 +293,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
                   padding: "8px 12px",
                   background: "transparent",
                   border: "none",
-                  color: opt.danger ? "#EF4444" : opt.disabled ? "var(--bd-fg-muted)" : "#334155",
+                  color: opt.danger ? "#EF4444" : opt.disabled ? "var(--bd-fg-muted)" : "var(--bd-fg-primary)",
                   fontSize: 13,
                   fontWeight: opt.checked ? 600 : 400,
                   cursor: opt.disabled ? "default" : "pointer",

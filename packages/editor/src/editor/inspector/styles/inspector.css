@@ -408,7 +408,7 @@
   color: var(--bd-warning);
 }
 .bdi-fld.invalid {
-  border-color: var(--bd-error, #dc2626);
+  border-color: var(--bd-error, var(--bd-error));
   box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12);
 }
 .bdi-fld .bdi-flb {
@@ -576,7 +576,7 @@
 }
 .bdi-mbox {
   position: relative;
-  border: 1px dashed #CBD5E1;
+  border: 1px dashed var(--bd-border-medium);
   border-radius: 4px;
   padding: 18px 34px;
   display: flex;

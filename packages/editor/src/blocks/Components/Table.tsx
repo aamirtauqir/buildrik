@@ -184,7 +184,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
       },
       styles: {
         padding: "6px 12px",
-        background: "#f1f5f9",
+        background: "var(--bd-bg-subtle)",
         border: "none",
         borderRadius: "6px",
         fontSize: "12px",

@@ -282,7 +282,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
             padding: 12,
             background: "rgba(0, 0, 0, 0.3)",
             borderRadius: "var(--buildrick-radius-md)",
-            border: "1px solid var(--buildrick-border, #334155)",
+            border: "1px solid var(--buildrick-border, var(--bd-fg-primary))",
             fontSize: 12,
             fontFamily: "var(--buildrick-font-family-mono)",
             color: "var(--buildrick-text-secondary, var(--bd-fg-muted))",

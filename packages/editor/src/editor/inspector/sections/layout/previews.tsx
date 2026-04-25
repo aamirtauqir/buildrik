@@ -141,7 +141,7 @@ export const PositionPreview: React.FC<{ type: string }> = ({ type }) => {
     case "fixed":
       return (
         <div style={containerStyle}>
-          <div style={{ ...boxStyle, bottom: 2, right: 2, background: "var(--bd-success, #16A34A)" }} />
+          <div style={{ ...boxStyle, bottom: 2, right: 2, background: "var(--bd-success, var(--bd-success))" }} />
         </div>
       );
     case "sticky":

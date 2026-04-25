@@ -313,7 +313,7 @@
 }
 
 [data-buildrick-id][data-drop-invalid="true"] {
-  outline: 2px solid var(--buildrick-drop-invalid-border, #dc2626);
+  outline: 2px solid var(--buildrick-drop-invalid-border, var(--bd-error));
   outline-offset: 2px;
   cursor: not-allowed !important;
 }
@@ -496,7 +496,7 @@
 .buildrick-canvas {
   --buildrick-drop-valid-border: var(--buildrick-selection-color);
   --buildrick-drop-valid-bg: var(--buildrick-accent-tint);
-  --buildrick-drop-invalid-border: #dc2626;
+  --buildrick-drop-invalid-border: var(--bd-error);
   --buildrick-drop-invalid-bg: rgba(220, 38, 38, 0.04);
 }
 

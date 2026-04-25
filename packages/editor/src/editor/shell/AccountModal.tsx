@@ -30,7 +30,7 @@ const MOCK_MEMBERS: Member[] = [
 const ROLE_COLORS: Record<Role, { bg: string; text: string }> = {
   Editor: { bg: "#EFF6FF", text: "#1D4ED8" },
   Admin:  { bg: "#FEF3C7", text: "#92400E" },
-  Viewer: { bg: "#F1F5F9", text: "#475569" },
+  Viewer: { bg: "var(--bd-bg-subtle)", text: "#475569" },
 };
 
 const NAV_ITEMS: { id: Tab; label: string }[] = [
@@ -301,7 +301,7 @@ const TabBilling: React.FC = () => (
     <div
       style={{
         background: "var(--buildrick-bg-card)",
-        border: "1px solid #CBD5E1",
+        border: "1px solid var(--bd-border-medium)",
         borderRadius: 10,
         padding: 16,
         display: "flex",
@@ -367,7 +367,7 @@ const TabBilling: React.FC = () => (
             justifyContent: "space-between",
             alignItems: "center",
             padding: "8px 0",
-            borderBottom: "1px solid #F1F5F9",
+            borderBottom: "1px solid var(--bd-bg-subtle)",
           }}
         >
           <span style={{ fontSize: 13, fontWeight: 500, color: "var(--buildrick-text-primary)" }}>{inv.amount}</span>
@@ -432,7 +432,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
             fontWeight: 500,
             color: "var(--buildrick-text-primary)",
             background: "var(--buildrick-bg-card)",
-            border: "1px solid #CBD5E1",
+            border: "1px solid var(--bd-border-medium)",
             borderRadius: 8,
             padding: "8px 10px",
             cursor: "pointer",

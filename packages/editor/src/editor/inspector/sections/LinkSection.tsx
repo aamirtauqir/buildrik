@@ -31,7 +31,7 @@ const ErrorText: React.FC<{ message: string }> = ({ message }) => (
   <div style={{
     marginTop: 4,
     fontSize: 11,
-    color: "var(--buildrick-error, #DC2626)",
+    color: "var(--buildrick-error, var(--bd-error))",
     display: "flex",
     alignItems: "center",
     gap: 4,

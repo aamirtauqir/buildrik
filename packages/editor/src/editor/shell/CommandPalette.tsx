@@ -161,7 +161,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
             alignItems: "center",
             gap: 10,
             padding: "12px 16px",
-            borderBottom: "1px solid #F1F5F9",
+            borderBottom: "1px solid var(--bd-bg-subtle)",
           }}
         >
           <IconSearch />
@@ -241,7 +241,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
                       padding: "8px 16px",
                       background: isActive ? "#EFF6FF" : "transparent",
                       border: "none",
-                      color: isActive ? "#1D4ED8" : "#334155",
+                      color: isActive ? "#1D4ED8" : "var(--bd-fg-primary)",
                       fontSize: 13,
                       cursor: "pointer",
                       textAlign: "left",
@@ -286,7 +286,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
             alignItems: "center",
             gap: 16,
             padding: "8px 16px",
-            borderTop: "1px solid #F1F5F9",
+            borderTop: "1px solid var(--bd-bg-subtle)",
           }}
           aria-hidden="true"
         >
