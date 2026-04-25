@@ -34,10 +34,10 @@ export class SettingsErrorBoundary extends React.Component<Props, State> {
   render(): React.ReactNode {
     if (!this.state.hasError) return this.props.children;
     return (
-      <div className="pg-drawer-slide" role="alert">
-        <div className="pg-drawer-slide__hdr">
+      <div className="bd-pg-drawer" role="alert">
+        <div className="bd-pg-drawer-hdr">
           <button
-            className="pg-drawer-slide__back"
+            className="bd-pg-drawer-back"
             onClick={this.props.onClose}
             aria-label="Close page settings"
             title="Close"
@@ -46,9 +46,9 @@ export class SettingsErrorBoundary extends React.Component<Props, State> {
               <polyline points="15 18 9 12 15 6" />
             </svg>
           </button>
-          <div className="pg-drawer-slide__title">Settings error</div>
+          <div className="bd-pg-drawer-title">Settings error</div>
         </div>
-        <div className="pg-drawer-slide__body" style={{ padding: 20 }}>
+        <div className="bd-pg-drawer-body" style={{ padding: 20 }}>
           <p style={{ color: "var(--bd-error)", fontSize: 13, marginBottom: 12 }}>
             {this.state.message}
           </p>

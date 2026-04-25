@@ -79,11 +79,11 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
 
   return (
     <>
-      <div className="pg-drawer-slide" role="dialog" aria-modal="true" aria-label={`${page.name} settings`}>
+      <div className="bd-pg-drawer" role="dialog" aria-modal="true" aria-label={`${page.name} settings`}>
         {/* ── Header ─────────────────────────────────────────────── */}
-        <div className="pg-drawer-slide__hdr">
+        <div className="bd-pg-drawer-hdr">
           <button
-            className="pg-drawer-slide__back"
+            className="bd-pg-drawer-back"
             onClick={handleClose}
             aria-label="Close page settings"
             title="Close"
@@ -93,12 +93,12 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
             </svg>
           </button>
 
-          <div className="pg-drawer-slide__title-block">
-            <div className="pg-drawer-slide__title" title={page.name}>
+          <div className="bd-pg-drawer-title-block">
+            <div className="bd-pg-drawer-title" title={page.name}>
               {page.name}
             </div>
             {s.domain && page.slug && (
-              <div className="pg-drawer-slide__slug">
+              <div className="bd-pg-drawer-slug">
                 {s.domain}/{page.slug.replace(/^\//, "")}
               </div>
             )}
@@ -107,11 +107,11 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
           {/* Save button */}
           <button
             className={[
-              "pg-drawer-slide__save",
-              s.saveState === "saving" ? "pg-drawer-slide__save--saving" : "",
-              s.saveState === "error" ? "pg-drawer-slide__save--error" : "",
-              s.isDirty ? "pg-drawer-slide__save--dirty" : "",
-              !s.isDirty && s.saveState === "clean" ? "pg-drawer-slide__save--clean" : "",
+              "bd-pg-drawer-save",
+              s.saveState === "saving" ? "bd-pg-drawer-save--saving" : "",
+              s.saveState === "error" ? "bd-pg-drawer-save--error" : "",
+              s.isDirty ? "bd-pg-drawer-save--dirty" : "",
+              !s.isDirty && s.saveState === "clean" ? "bd-pg-drawer-save--clean" : "",
             ].filter(Boolean).join(" ")}
             onClick={() => s.isDirty && s.saveState !== "saving" && s.save()}
             disabled={!s.isDirty || s.saveState === "saving"}
@@ -122,26 +122,26 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
         </div>
 
         {/* ── Tab bar ────────────────────────────────────────────── */}
-        <div className="pg-drawer-slide__tabs" role="tablist" aria-label="Settings sections">
+        <div className="bd-pg-drawer-tabs" role="tablist" aria-label="Settings sections">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               role="tab"
               aria-selected={s.activeTab === tab.id}
               aria-controls={`pg-drawer-tab-${tab.id}`}
-              className={["pg-drawer-slide__tab", s.activeTab === tab.id ? "pg-drawer-slide__tab--active" : ""].filter(Boolean).join(" ")}
+              className={["bd-pg-drawer-tab", s.activeTab === tab.id ? "bd-pg-drawer-tab--active" : ""].filter(Boolean).join(" ")}
               onClick={() => handleTabClick(tab.id)}
             >
               {tab.label}
               {tab.id === "seo" && s.seoScore < 80 && s.allowIndex && (
-                <span className="pg-drawer-slide__tab-chip" aria-hidden="true">{s.seoScore}</span>
+                <span className="bd-pg-drawer-tab-chip" aria-hidden="true">{s.seoScore}</span>
               )}
             </button>
           ))}
         </div>
 
         {/* ── Tab content ─────────────────────────────────────────── */}
-        <div className="pg-drawer-slide__body">
+        <div className="bd-pg-drawer-body">
           {s.activeTab === "seo" && (
             <div id="pg-drawer-tab-seo" role="tabpanel" aria-label="SEO settings">
               <SeoTab s={s} page={page} />
