@@ -3,9 +3,9 @@ import { AnthropicProvider } from "@server/services/anthropic.client";
 
 const mockStream = vi.fn();
 vi.mock("@anthropic-ai/sdk", () => ({
-  default: vi.fn().mockImplementation(() => ({
-    messages: { stream: mockStream },
-  })),
+  default: class MockAnthropic {
+    messages = { stream: mockStream };
+  },
 }));
 
 describe("AnthropicProvider", () => {

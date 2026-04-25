@@ -4,12 +4,7 @@ import type { AIModel, AIProvider, TokenChunk } from "./types";
 let _anthropic: Anthropic | null = null;
 function getClient(): Anthropic {
   if (!_anthropic) {
-    const opts = { apiKey: process.env.ANTHROPIC_API_KEY };
-    try {
-      _anthropic = new Anthropic(opts);
-    } catch {
-      _anthropic = (Anthropic as unknown as (o: typeof opts) => Anthropic)(opts);
-    }
+    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   }
   return _anthropic;
 }
