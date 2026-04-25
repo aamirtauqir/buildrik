@@ -137,10 +137,10 @@ const containerStyles: React.CSSProperties = {
   margin: 0,
   padding: "0 8px",
   height: 36,
-  background: "var(--buildrick-bg-card, #FFFFFF)",
+  background: "var(--buildrick-bg-card, var(--bd-bg-card))",
   border: "1px solid var(--buildrick-border, #D1D9E6)",
   borderRadius: 4,
-  color: "var(--buildrick-text-secondary, #94A3B8)",
+  color: "var(--buildrick-text-secondary, var(--bd-fg-muted))",
   transition: "border-color 0.15s ease, box-shadow 0.15s ease",
 };
 
@@ -163,7 +163,7 @@ const clearButtonStyles: React.CSSProperties = {
   background: "transparent",
   border: "none",
   cursor: "pointer",
-  color: "var(--buildrick-text-muted, #64748B)",
+  color: "var(--buildrick-text-muted, var(--bd-fg-secondary))",
   borderRadius: 4,
 };
 

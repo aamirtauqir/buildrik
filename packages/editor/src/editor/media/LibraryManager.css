@@ -1,7 +1,7 @@
 .mgr {
   width: 100%;
   height: 100%;
-  background: var(--buildrick-bg-panel, #F8FAFC);
+  background: var(--buildrick-bg-panel, var(--bd-bg-panel));
   display: grid;
   grid-template-rows: 56px 1fr 36px;
   overflow: hidden;
@@ -11,7 +11,7 @@
 
 .mgr-top {
   background: var(--buildrick-bg-card, #fff);
-  border-bottom: 1px solid var(--buildrick-border-light, #E2E8F0);
+  border-bottom: 1px solid var(--buildrick-border-light, var(--bd-border));
   padding: 0 16px;
   display: grid;
   grid-template-columns: auto 1fr auto;

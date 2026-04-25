@@ -36,7 +36,7 @@
   background: var(--bd-bg-subtle, #F1F5F9);
   border-radius: 999px;
   font-size: 11px;
-  color: var(--bd-fg-muted, #64748B);
+  color: var(--bd-fg-muted, var(--bd-fg-secondary));
   font-weight: 500;
   flex-shrink: 0;
 }
@@ -67,7 +67,7 @@
 
 .comp-empty__body {
   font-size: 12px;
-  color: var(--bd-fg-muted, #64748B);
+  color: var(--bd-fg-muted, var(--bd-fg-secondary));
   margin: 0;
   max-width: 200px;
   line-height: 1.5;

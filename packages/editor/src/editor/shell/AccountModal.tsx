@@ -23,7 +23,7 @@ interface Member {
 
 const MOCK_MEMBERS: Member[] = [
   { name: "Sarah Chen",  email: "sarah@acme.io",         role: "Editor", avatarColor: "#3B82F6", initials: "SC" },
-  { name: "Mike Rosa",   email: "mike.rosa@acme.io",     role: "Admin",  avatarColor: "#64748B", initials: "MR" },
+  { name: "Mike Rosa",   email: "mike.rosa@acme.io",     role: "Admin",  avatarColor: "var(--bd-fg-secondary)", initials: "MR" },
   { name: "Nora Patel",  email: "nora.patel@acme.io",    role: "Viewer", avatarColor: "#10B981", initials: "NP" },
 ];
 
@@ -52,13 +52,13 @@ const Toggle: React.FC<{ on: boolean }> = ({ on }) => (
       height: 20,
       width: 40,
       borderRadius: 999,
-      background: on ? "#2563EB" : "#E2E8F0",
+      background: on ? "#2563EB" : "var(--bd-border)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       cursor: "pointer",
       border: "none",
-      color: on ? "#FFFFFF" : "#94A3B8",
+      color: on ? "var(--bd-bg-card)" : "var(--bd-fg-muted)",
       fontSize: 11,
       fontWeight: 700,
       fontFamily: "inherit",
@@ -205,7 +205,7 @@ const TabTeam: React.FC = () => (
             key={m.email}
             style={{
               background: "var(--buildrick-bg-card)",
-              border: "1px solid #E2E8F0",
+              border: "1px solid var(--bd-border)",
               borderRadius: 8,
               padding: "10px 12px",
               display: "flex",
@@ -259,7 +259,7 @@ const TabCollaboration: React.FC = () => (
       <div
         style={{
           background: "var(--buildrick-bg-card)",
-          border: "1px solid #E2E8F0",
+          border: "1px solid var(--bd-border)",
           borderRadius: 8,
           height: 48,
           padding: "0 14px",
@@ -274,7 +274,7 @@ const TabCollaboration: React.FC = () => (
       <div
         style={{
           background: "var(--buildrick-bg-card)",
-          border: "1px solid #E2E8F0",
+          border: "1px solid var(--bd-border)",
           borderRadius: 8,
           height: 48,
           padding: "0 14px",
@@ -315,7 +315,7 @@ const TabBilling: React.FC = () => (
         <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginBottom: 6 }}>Sites: 2 of 5</div>
         <div
           style={{
-            background: "#E2E8F0",
+            background: "var(--bd-border)",
             height: 6,
             borderRadius: 999,
             overflow: "hidden",
@@ -482,7 +482,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
                   fontSize: 13,
                   fontWeight: isActive ? 600 : 500,
                   background: isActive ? "#EFF6FF" : "transparent",
-                  color: isActive ? "#1D4ED8" : "#64748B",
+                  color: isActive ? "#1D4ED8" : "var(--bd-fg-secondary)",
                 }}
               >
                 {item.label}

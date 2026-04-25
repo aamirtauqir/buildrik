@@ -21,7 +21,7 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
-  color: var(--buildrick-text-secondary, #94A3B8);
+  color: var(--buildrick-text-secondary, var(--bd-fg-muted));
 }
 
 .empty-title {

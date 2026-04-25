@@ -57,7 +57,7 @@ function buildAccordion(
         class: `accordion-item${index === 0 ? " open" : ""}`,
       },
       styles: {
-        border: "1px solid #e2e8f0",
+        border: "1px solid var(--bd-border)",
         borderRadius: "8px",
         marginBottom: "8px",
         overflow: "hidden",
@@ -123,7 +123,7 @@ function buildAccordion(
       content: item.content,
       styles: {
         margin: "0",
-        color: "#64748b",
+        color: "var(--bd-fg-secondary)",
         lineHeight: "1.6",
       },
     });

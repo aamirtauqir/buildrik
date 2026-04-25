@@ -74,7 +74,7 @@ export const ProModal: React.FC<ProModalProps> = ({ templateName, onCancel, onUp
     <div className="tpl-modal-overlay" onClick={onCancel}>
       <div className="tpl-modal" onClick={(e) => e.stopPropagation()}>
         <h3 className="tpl-modal-title">Pro Template</h3>
-        <p style={{ fontSize: 13, color: "var(--bd-fg-muted, #64748B)", lineHeight: 1.5, margin: "0 0 16px" }}>
+        <p style={{ fontSize: 13, color: "var(--bd-fg-muted, var(--bd-fg-secondary))", lineHeight: 1.5, margin: "0 0 16px" }}>
           <strong>{templateName}</strong> is available on the Pro plan. Upgrade to unlock 40+ premium templates.
         </p>
         <div className="tpl-modal-btns">
@@ -110,7 +110,7 @@ export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
       <div className="tpl-modal tpl-modal--create" onClick={(e) => e.stopPropagation()}>
         <h3 className="tpl-modal-title">Create page?</h3>
         <div className="tpl-modal-row">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--bd-fg-muted, #64748B)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--bd-fg-muted, var(--bd-fg-secondary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" />
             <path d="M3 9h18M9 21V9" />
           </svg>

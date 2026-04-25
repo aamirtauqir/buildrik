@@ -140,7 +140,7 @@ export const FormField: React.FC<FormFieldProps> = ({
             style={{
               fontSize: sizes.labelSize,
               fontWeight: 600,
-              color: "var(--buildrick-text-secondary, #94a3b8)",
+              color: "var(--buildrick-text-secondary, var(--bd-fg-muted))",
               letterSpacing: "0.3px",
             }}
           >
@@ -162,7 +162,7 @@ export const FormField: React.FC<FormFieldProps> = ({
             <span
               style={{
                 fontSize: 12,
-                color: "var(--buildrick-text-muted, #64748b)",
+                color: "var(--buildrick-text-muted, var(--bd-fg-secondary))",
                 background: "rgba(255, 255, 255, 0.05)",
                 padding: "2px 6px",
                 borderRadius: 4,
@@ -182,7 +182,7 @@ export const FormField: React.FC<FormFieldProps> = ({
             style={{
               margin: 0,
               fontSize: sizes.descSize,
-              color: "var(--buildrick-text-muted, #64748b)",
+              color: "var(--buildrick-text-muted, var(--bd-fg-secondary))",
               lineHeight: 1.4,
             }}
           >
@@ -276,7 +276,7 @@ export const FormGroup: React.FC<FormGroupProps> = ({
               style={{
                 fontSize: 14,
                 fontWeight: 700,
-                color: "var(--buildrick-text-primary, #f8fafc)",
+                color: "var(--buildrick-text-primary, var(--bd-bg-panel))",
                 marginBottom: description ? 4 : 0,
               }}
             >
@@ -288,7 +288,7 @@ export const FormGroup: React.FC<FormGroupProps> = ({
               style={{
                 margin: 0,
                 fontSize: 12,
-                color: "var(--buildrick-text-muted, #64748b)",
+                color: "var(--buildrick-text-muted, var(--bd-fg-secondary))",
               }}
             >
               {description}

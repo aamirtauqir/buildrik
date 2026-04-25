@@ -123,7 +123,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         style={{
           fontSize: sizes.titleSize,
           fontWeight: 600,
-          color: "var(--buildrick-text-primary, #f8fafc)",
+          color: "var(--buildrick-text-primary, var(--bd-bg-panel))",
           marginBottom: description ? sizes.gap / 2 : 0,
           margin: 0,
         }}
@@ -136,7 +136,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           className="buildrick-empty-state-desc"
           style={{
             fontSize: sizes.descSize,
-            color: "var(--buildrick-text-muted, #64748b)",
+            color: "var(--buildrick-text-muted, var(--bd-fg-secondary))",
             maxWidth: 300,
             lineHeight: 1.5,
             margin: 0,
@@ -173,7 +173,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
               style={{
                 background: "transparent",
                 border: "none",
-                color: "var(--buildrick-text-secondary, #94a3b8)",
+                color: "var(--buildrick-text-secondary, var(--bd-fg-muted))",
                 fontSize: size === "sm" ? 12 : 13,
                 cursor: "pointer",
                 textDecoration: "underline",

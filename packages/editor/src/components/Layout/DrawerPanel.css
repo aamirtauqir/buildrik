@@ -49,7 +49,7 @@
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary, var(--bd-bg-card));
   letter-spacing: -0.01em;
 }
 

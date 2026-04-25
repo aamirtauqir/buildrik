@@ -36,9 +36,9 @@ function buildStack(composer: Composer, parentId: string, dropIndex?: number): s
       },
       styles: {
         padding: "16px",
-        background: "#f8fafc",
+        background: "var(--bd-bg-panel)",
         borderRadius: "8px",
-        border: "1px solid #e2e8f0",
+        border: "1px solid var(--bd-border)",
       },
     });
     composer.elements.addElement(child, stackId);
@@ -48,7 +48,7 @@ function buildStack(composer: Composer, parentId: string, dropIndex?: number): s
       content: `Stack Item ${i}`,
       styles: {
         margin: "0",
-        color: "#64748b",
+        color: "var(--bd-fg-secondary)",
       },
     });
     composer.elements.addElement(text, child.getId());

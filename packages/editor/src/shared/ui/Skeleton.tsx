@@ -370,7 +370,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
           <span
             style={{
               fontSize: 13,
-              color: "var(--buildrick-text-secondary, #94a3b8)",
+              color: "var(--buildrick-text-secondary, var(--bd-fg-muted))",
             }}
           >
             {message}

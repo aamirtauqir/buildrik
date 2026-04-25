@@ -266,7 +266,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     (parentId: string | null, depth: number): React.ReactNode => {
       const children = state.folders.filter((f) => f.parentId === parentId);
       if (children.length === 0) return null;
-      const FOLDER_COLORS = ["#F59E0B", "#10B981", "#EC4899", "#64748B", "#0EA5E9"];
+      const FOLDER_COLORS = ["#F59E0B", "#10B981", "#EC4899", "var(--bd-fg-secondary)", "#0EA5E9"];
       return children.map((folder, i) => {
         const hasChildren = state.folders.some((f) => f.parentId === folder.id);
         const isCollapsed = collapsedFolders.has(folder.id);

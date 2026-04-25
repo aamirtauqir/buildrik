@@ -100,10 +100,10 @@ export const CanvasSpotBadge: React.FC<CanvasSpotBadgeProps> = ({
     id: "#7c3aed",
     class: "#f59e0b",
     data: "#3b82f6",
-    custom: badge.color || "#94a3b8",
+    custom: badge.color || "var(--bd-fg-muted)",
   };
 
-  const color = badgeColors[badge.type] || "#94a3b8";
+  const color = badgeColors[badge.type] || "var(--bd-fg-muted)";
 
   return (
     <div

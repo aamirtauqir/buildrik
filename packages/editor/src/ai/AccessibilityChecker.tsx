@@ -95,7 +95,7 @@ function checkAccessibility(composer: Composer | null): A11yIssue[] {
     // Check: Color contrast
     if (type === "text" || type === "paragraph" || type === "heading") {
       const color = styles.color || "#000000";
-      const bg = styles.backgroundColor || "#ffffff";
+      const bg = styles.backgroundColor || "var(--bd-bg-card)";
       const ratio = calculateContrastRatio(color, bg);
 
       if (ratio < 4.5) {

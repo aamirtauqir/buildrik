@@ -38,8 +38,8 @@ const STATE_CONFIG: Record<PublishState, StateConfig> = {
     buttonLabel: "Publish",
     bg: "#2563EB",
     hoverBg: "#1D4ED8",
-    iconColor: "#FFFFFF",
-    textColor: "#FFFFFF",
+    iconColor: "var(--bd-bg-card)",
+    textColor: "var(--bd-bg-card)",
     chevronColor: "#DBEAFE",
     badge: { label: "Draft", bg: "#1E3A8A", text: "#BFDBFE" },
   },
@@ -55,16 +55,16 @@ const STATE_CONFIG: Record<PublishState, StateConfig> = {
     buttonLabel: "Approved · Publish Now",
     bg: "#166534",
     hoverBg: "#14532D",
-    iconColor: "#FFFFFF",
-    textColor: "#FFFFFF",
+    iconColor: "var(--bd-bg-card)",
+    textColor: "var(--bd-bg-card)",
     chevronColor: "#DCFCE7",
   },
   published: {
     buttonLabel: "Published",
     bg: "#0EA5E9",
     hoverBg: "#0284C7",
-    iconColor: "#FFFFFF",
-    textColor: "#FFFFFF",
+    iconColor: "var(--bd-bg-card)",
+    textColor: "var(--bd-bg-card)",
     chevronColor: "#E0F2FE",
   },
 };
@@ -268,7 +268,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
             right: window.innerWidth - buttonRef.current.getBoundingClientRect().right - 26,
             width: 240,
             background: "var(--buildrick-bg-card)",
-            border: "1px solid #E2E8F0",
+            border: "1px solid var(--bd-border)",
             borderRadius: 10,
             boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
             overflow: "hidden",
@@ -293,7 +293,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
                   padding: "8px 12px",
                   background: "transparent",
                   border: "none",
-                  color: opt.danger ? "#EF4444" : opt.disabled ? "#94A3B8" : "#334155",
+                  color: opt.danger ? "#EF4444" : opt.disabled ? "var(--bd-fg-muted)" : "#334155",
                   fontSize: 13,
                   fontWeight: opt.checked ? 600 : 400,
                   cursor: opt.disabled ? "default" : "pointer",
@@ -303,7 +303,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
                 }}
                 onMouseEnter={(e) => {
                   if (!opt.disabled) {
-                    e.currentTarget.style.background = opt.danger ? "#FEF2F2" : "#F8FAFC";
+                    e.currentTarget.style.background = opt.danger ? "#FEF2F2" : "var(--bd-bg-panel)";
                   }
                 }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}

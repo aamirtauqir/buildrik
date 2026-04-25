@@ -28,7 +28,7 @@ const COLORS: Array<{ id: DiscColor; hex?: string; label: string }> = [
   { id: "all", label: "All Colors" },
   { id: "black_and_white", label: "B&W", hex: "linear-gradient(45deg, #000 50%, #fff 50%)" },
   { id: "black", hex: "#000000", label: "Black" },
-  { id: "white", hex: "#ffffff", label: "White" },
+  { id: "white", hex: "var(--bd-bg-card)", label: "White" },
   { id: "red", hex: "#ef4444", label: "Red" },
   { id: "orange", hex: "#f97316", label: "Orange" },
   { id: "yellow", hex: "#eab308", label: "Yellow" },

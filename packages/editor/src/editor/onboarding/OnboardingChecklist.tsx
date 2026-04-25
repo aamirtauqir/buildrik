@@ -194,7 +194,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
                 <span
                   style={{
                     ...stepLabelStyles,
-                    color: isCompleted ? "rgba(255,255,255,0.45)" : isActive ? "#f8fafc" : "rgba(255,255,255,0.8)",
+                    color: isCompleted ? "rgba(255,255,255,0.45)" : isActive ? "var(--bd-bg-panel)" : "rgba(255,255,255,0.8)",
                     textDecoration: isCompleted ? "line-through" : "none",
                   }}
                 >
@@ -310,7 +310,7 @@ const headerStyles: React.CSSProperties = {
 const headerTitleStyles: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 700,
-  color: "#f8fafc",
+  color: "var(--bd-bg-panel)",
   letterSpacing: -0.1,
 };
 

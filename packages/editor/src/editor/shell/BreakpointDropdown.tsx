@@ -115,7 +115,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
           fontFamily: "inherit",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = "#94A3B8";
+          e.currentTarget.style.borderColor = "var(--bd-fg-muted)";
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.borderColor = "#D1D9E6";
@@ -213,7 +213,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
           </div>
 
           {/* Divider */}
-          <div style={{ height: 1, background: "#E2E8F0", margin: "0" }} />
+          <div style={{ height: 1, background: "var(--bd-border)", margin: "0" }} />
 
           {/* Custom size input */}
           <div style={{ padding: "8px 12px" }}>

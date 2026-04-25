@@ -20,7 +20,7 @@ interface Member {
 // Sample existing members (in real app: from API)
 const MOCK_MEMBERS: Member[] = [
   { name: "Sarah Chen", email: "sarah@acme.io", role: "Editor", avatarColor: "#3B82F6", initials: "SC" },
-  { name: "Mike Rosa", email: "mike.rosa@acme.io", role: "Admin", avatarColor: "#64748B", initials: "MR" },
+  { name: "Mike Rosa", email: "mike.rosa@acme.io", role: "Admin", avatarColor: "var(--bd-fg-secondary)", initials: "MR" },
   { name: "Nora Patel", email: "nora.patel@acme.io", role: "Viewer", avatarColor: "#10B981", initials: "NP" },
 ];
 
@@ -112,7 +112,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
           transform: "translate(-50%, -50%)",
           width: 480,
           background: "var(--buildrick-bg-card)",
-          border: "1px solid #E2E8F0",
+          border: "1px solid var(--bd-border)",
           borderRadius: 14,
           boxShadow: "0 24px 64px rgba(0,0,0,0.15)",
           zIndex: 20001,
@@ -156,7 +156,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               cursor: "pointer",
               transition: "background 0.1s ease",
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "#F8FAFC"; }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bd-bg-panel)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
           >
             <IconClose />
@@ -178,7 +178,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                 gap: 8,
                 padding: "8px 10px",
                 background: "var(--buildrick-bg-panel)",
-                border: "1px solid #E2E8F0",
+                border: "1px solid var(--bd-border)",
                 borderRadius: 8,
               }}
             >
@@ -202,7 +202,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                 style={{
                   padding: "3px 10px",
                   background: "var(--buildrick-bg-card)",
-                  border: "1px solid #E2E8F0",
+                  border: "1px solid var(--bd-border)",
                   borderRadius: 6,
                   fontSize: 12,
                   fontWeight: 600,
@@ -237,7 +237,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                   height: 36,
                   padding: "0 12px",
                   background: "var(--buildrick-bg-card)",
-                  border: "1px solid #E2E8F0",
+                  border: "1px solid var(--bd-border)",
                   borderRadius: 8,
                   fontSize: 13,
                   color: "var(--buildrick-text-primary)",
@@ -246,7 +246,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                   transition: "border-color 0.1s ease",
                 }}
                 onFocus={(e) => { e.currentTarget.style.borderColor = "#2563EB"; }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = "#E2E8F0"; }}
+                onBlur={(e) => { e.currentTarget.style.borderColor = "var(--bd-border)"; }}
               />
               <select
                 value={role}
@@ -256,7 +256,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                   height: 36,
                   padding: "0 10px",
                   background: "var(--buildrick-bg-card)",
-                  border: "1px solid #E2E8F0",
+                  border: "1px solid var(--bd-border)",
                   borderRadius: 8,
                   fontSize: 13,
                   color: "var(--buildrick-text-secondary)",
@@ -287,7 +287,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                 width: "100%",
                 padding: "8px 12px",
                 background: "var(--buildrick-bg-card)",
-                border: "1px solid #E2E8F0",
+                border: "1px solid var(--bd-border)",
                 borderRadius: 8,
                 fontSize: 13,
                 color: "var(--buildrick-text-primary)",
@@ -298,7 +298,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                 transition: "border-color 0.1s ease",
               }}
               onFocus={(e) => { e.currentTarget.style.borderColor = "#2563EB"; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = "#E2E8F0"; }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = "var(--bd-border)"; }}
             />
           </div>
 
@@ -322,7 +322,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                         borderRadius: 8,
                         transition: "background 0.1s ease",
                       }}
-                      onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = "#F8FAFC"; }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = "var(--bd-bg-panel)"; }}
                       onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = "transparent"; }}
                     >
                       <div
@@ -380,7 +380,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
             style={{
               padding: "7px 16px",
               background: "var(--buildrick-bg-card)",
-              border: "1px solid #E2E8F0",
+              border: "1px solid var(--bd-border)",
               borderRadius: 8,
               fontSize: 13,
               fontWeight: 500,
@@ -389,8 +389,8 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               fontFamily: "inherit",
               transition: "background 0.1s ease",
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "#F8FAFC"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "#FFFFFF"; }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bd-bg-panel)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--bd-bg-card)"; }}
           >
             Cancel
           </button>
@@ -399,7 +399,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
             disabled={!email.trim()}
             style={{
               padding: "7px 16px",
-              background: email.trim() ? "#2563EB" : "#94A3B8",
+              background: email.trim() ? "#2563EB" : "var(--bd-fg-muted)",
               border: "none",
               borderRadius: 8,
               fontSize: 13,
@@ -410,7 +410,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               transition: "background 0.1s ease",
             }}
             onMouseEnter={(e) => { if (email.trim()) e.currentTarget.style.background = "#1D4ED8"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = email.trim() ? "#2563EB" : "#94A3B8"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = email.trim() ? "#2563EB" : "var(--bd-fg-muted)"; }}
           >
             Send Invite
           </button>

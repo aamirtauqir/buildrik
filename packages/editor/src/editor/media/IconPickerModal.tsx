@@ -226,7 +226,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
   const [selectedCategory, setSelectedCategory] = React.useState<string>("all");
   const [selectedIcon, setSelectedIcon] = React.useState<IconDefinition | null>(null);
   const [iconSize, setIconSize] = React.useState(currentIcon?.size || 24);
-  const [iconColor, setIconColor] = React.useState(currentIcon?.color || "#ffffff");
+  const [iconColor, setIconColor] = React.useState(currentIcon?.color || "var(--bd-bg-card)");
   const [strokeWidth, setStrokeWidth] = React.useState(currentIcon?.strokeWidth || 2);
   const [recentIcons, setRecentIcons] = React.useState<string[]>([]);
   const categoryLabels = React.useMemo(
@@ -259,7 +259,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
         if (existing) {
           setSelectedIcon(existing);
           setIconSize(currentIcon.size || 24);
-          setIconColor(currentIcon.color || "#ffffff");
+          setIconColor(currentIcon.color || "var(--bd-bg-card)");
           setStrokeWidth(currentIcon.strokeWidth || 2);
         }
       }

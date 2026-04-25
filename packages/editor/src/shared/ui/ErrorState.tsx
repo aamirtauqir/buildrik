@@ -149,7 +149,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           style={{
             flex: 1,
             fontSize: 13,
-            color: "var(--buildrick-text-primary, #f8fafc)",
+            color: "var(--buildrick-text-primary, var(--bd-bg-panel))",
           }}
         >
           {message}
@@ -224,7 +224,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           marginBottom: sizes.gap / 2,
           fontSize: sizes.titleSize,
           fontWeight: 600,
-          color: "var(--buildrick-text-primary, #f8fafc)",
+          color: "var(--buildrick-text-primary, var(--bd-bg-panel))",
         }}
       >
         {title || defaultTitles[severity]}
@@ -236,7 +236,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           margin: 0,
           marginBottom: sizes.gap,
           fontSize: sizes.messageSize,
-          color: "var(--buildrick-text-muted, #64748b)",
+          color: "var(--buildrick-text-muted, var(--bd-fg-secondary))",
           maxWidth: 320,
           lineHeight: 1.5,
         }}
@@ -251,7 +251,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           style={{
             background: "transparent",
             border: "none",
-            color: "var(--buildrick-text-secondary, #94a3b8)",
+            color: "var(--buildrick-text-secondary, var(--bd-fg-muted))",
             fontSize: 12,
             cursor: "pointer",
             display: "flex",
@@ -285,7 +285,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
             border: "1px solid var(--buildrick-border, #334155)",
             fontSize: 12,
             fontFamily: "var(--buildrick-font-family-mono)",
-            color: "var(--buildrick-text-secondary, #94a3b8)",
+            color: "var(--buildrick-text-secondary, var(--bd-fg-muted))",
             textAlign: "left",
             maxWidth: "100%",
             maxHeight: 200,

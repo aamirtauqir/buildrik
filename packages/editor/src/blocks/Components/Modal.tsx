@@ -19,7 +19,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
     styles: {
       padding: "12px 24px",
       background: "#8b5cf6",
-      color: "#ffffff",
+      color: "var(--bd-bg-card)",
       border: "none",
       borderRadius: "8px",
       fontSize: "14px",
@@ -68,7 +68,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
       class: "modal-content",
     },
     styles: {
-      background: "#ffffff",
+      background: "var(--bd-bg-card)",
       borderRadius: "12px",
       maxWidth: "480px",
       width: "100%",
@@ -90,7 +90,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
       justifyContent: "space-between",
       alignItems: "center",
       padding: "20px 24px",
-      borderBottom: "1px solid #e2e8f0",
+      borderBottom: "1px solid var(--bd-border)",
     },
   });
   composer.elements.addElement(header, modalContent.getId());
@@ -116,7 +116,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
       border: "none",
       fontSize: "24px",
       cursor: "pointer",
-      color: "#94a3b8",
+      color: "var(--bd-fg-muted)",
       padding: "0",
       lineHeight: "1",
     },
@@ -146,7 +146,7 @@ function buildModal(composer: Composer, parentId: string, dropIndex?: number): s
     content: "This is the modal content. Add your text, forms, or any other content here.",
     styles: {
       margin: "0",
-      color: "#64748b",
+      color: "var(--bd-fg-secondary)",
       lineHeight: "1.6",
     },
   });

@@ -394,7 +394,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        background: "var(--buildrick-bg-app, #F8FAFC)",
+        background: "var(--buildrick-bg-app, var(--bd-bg-panel))",
         color: "var(--buildrick-text-primary)",
         fontFamily: "var(--buildrick-font-family)",
         position: "relative",

@@ -361,14 +361,14 @@
   margin-left: 2px;
   background: var(--buildrick-accent);
   border-radius: 999px;
-  color: #ffffff;
+  color: var(--bd-bg-card);
   font-size: var(--buildrick-text-xs);
   font-weight: 600;
 }
 
 .buildrick-pill.active .buildrick-pill-badge {
   background: var(--buildrick-accent);
-  color: #ffffff;
+  color: var(--bd-bg-card);
 }
 
 .buildrick-pill-tip {
@@ -2045,7 +2045,7 @@
   font-size: var(--buildrick-text-xl);
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: #ffffff;
+  color: var(--bd-bg-card);
   margin-bottom: 16px;
   position: relative;
   z-index: 1;
@@ -2063,7 +2063,7 @@
 .buildrick-hero-btn-primary {
   width: 100%;
   padding: 12px 16px;
-  background: #ffffff;
+  background: var(--bd-bg-card);
   border: none;
   border-radius: 12px;
   color: #6366f1;
@@ -2077,7 +2077,7 @@
 .buildrick-hero-btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-  background: #ffffff;
+  background: var(--bd-bg-card);
 }
 
 .buildrick-hero-btn-primary:active {
@@ -2094,7 +2094,7 @@
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 12px;
-  color: #ffffff;
+  color: var(--bd-bg-card);
   font-size: var(--buildrick-text-base);
   font-weight: 500;
   cursor: pointer;
@@ -2941,12 +2941,12 @@
 
 .buildrick-status-pill.free {
   background: #10b981;
-  color: #ffffff;
+  color: var(--bd-bg-card);
 }
 
 .buildrick-status-pill.premium {
   background: #f59e0b;
-  color: #ffffff;
+  color: var(--bd-bg-card);
 }
 
 /* Reset Filters Button */
@@ -3172,7 +3172,7 @@
 .buildrick-preview-content {
   flex: 1;
   overflow: hidden;
-  background: #ffffff;
+  background: var(--bd-bg-card);
   border-radius: 8px;
   margin: 8px 12px;
   min-height: 80px;
@@ -3203,7 +3203,7 @@
   margin: 8px 12px 12px;
   padding: 14px 24px;
   background: linear-gradient(135deg, #8B5CF6, #7C3AED);
-  color: #ffffff;
+  color: var(--bd-bg-card);
   border: none;
   border-radius: 10px;
   font-size: var(--buildrick-text-md);
@@ -3690,7 +3690,7 @@
   margin-left: 2px;
   background: var(--buildrick-accent);
   border-radius: 999px;
-  color: #ffffff;
+  color: var(--bd-bg-card);
   font-size: var(--buildrick-text-xs);
   font-weight: 600;
 }
@@ -4638,7 +4638,7 @@
 .tmpl-progress__title {
   font-size: var(--buildrick-font-sm, 13px);
   font-weight: 600;
-  color: #e2e8f0;
+  color: var(--bd-border);
   margin: 0;
   text-align: center;
 }
@@ -5113,7 +5113,7 @@
 .tmpl-pro-modal__title {
   font-size: var(--buildrick-font-sm, 13px);
   font-weight: 600;
-  color: #e2e8f0;
+  color: var(--bd-border);
   margin: 0 0 6px;
 }
 
@@ -5524,7 +5524,7 @@
 .buildrick-elements-title {
   font-size: var(--buildrick-font-md, 14px);
   font-weight: 600;
-  color: var(--buildrick-text-primary, #f8fafc);
+  color: var(--buildrick-text-primary, var(--bd-bg-panel));
 }
 
 /* New Help button style - cleaner design */
@@ -5545,7 +5545,7 @@
 
 .buildrick-elements-help-btn:hover {
   background: rgba(255, 255, 255, 0.08);
-  color: var(--buildrick-text-primary, #f8fafc);
+  color: var(--buildrick-text-primary, var(--bd-bg-panel));
 }
 
 /* ─────────────────────────────────────────────
@@ -6525,7 +6525,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, #e2e8f0 0%, #d1d8e0 100%);
+  background: linear-gradient(180deg, var(--bd-border) 0%, #d1d8e0 100%);
   transform: translateX(-20px);
   opacity: 0;
   transition: transform 200ms ease-out, opacity 200ms ease-out;

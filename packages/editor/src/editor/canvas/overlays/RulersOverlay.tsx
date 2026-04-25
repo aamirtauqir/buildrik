@@ -28,8 +28,8 @@ const MINOR_TICK = 10;
 /** Colors - using design tokens */
 const COLORS = {
   background: canvasTokens.colors.surface.background,
-  tick: "#64748b",
-  number: "#94a3b8",
+  tick: "var(--bd-fg-secondary)",
+  number: "var(--bd-fg-muted)",
   hover: canvasTokens.colors.primary.alpha30,
 };
 

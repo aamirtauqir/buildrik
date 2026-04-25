@@ -39,7 +39,7 @@ interface CommandPaletteProps {
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
 const IconSearch: React.FC = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--bd-fg-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <circle cx="11" cy="11" r="8" />
     <line x1="21" y1="21" x2="16.65" y2="16.65" />
   </svg>
@@ -145,7 +145,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
           width: 480,
           maxHeight: 400,
           background: "var(--buildrick-bg-card)",
-          border: "1px solid #E2E8F0",
+          border: "1px solid var(--bd-border)",
           borderRadius: 12,
           boxShadow: "0 20px 60px rgba(0,0,0,0.18)",
           zIndex: 20001,
@@ -186,7 +186,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
             style={{
               padding: "2px 6px",
               background: "var(--buildrick-bg-subtle)",
-              border: "1px solid #E2E8F0",
+              border: "1px solid var(--bd-border)",
               borderRadius: 4,
               fontSize: 11,
               color: "var(--buildrick-text-muted)",
@@ -250,7 +250,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ color: isActive ? "#2563EB" : "#94A3B8", flexShrink: 0 }}>
+                      <span style={{ color: isActive ? "#2563EB" : "var(--bd-fg-muted)", flexShrink: 0 }}>
                         <IconArrow dir="right" />
                       </span>
                       <span>{action.label}</span>
@@ -259,11 +259,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
                       <kbd
                         style={{
                           padding: "2px 6px",
-                          background: isActive ? "#DBEAFE" : "#F8FAFC",
-                          border: `1px solid ${isActive ? "#BFDBFE" : "#E2E8F0"}`,
+                          background: isActive ? "#DBEAFE" : "var(--bd-bg-panel)",
+                          border: `1px solid ${isActive ? "#BFDBFE" : "var(--bd-border)"}`,
                           borderRadius: 4,
                           fontSize: 10,
-                          color: isActive ? "#1D4ED8" : "#64748B",
+                          color: isActive ? "#1D4ED8" : "var(--bd-fg-secondary)",
                           fontFamily: "inherit",
                           whiteSpace: "nowrap",
                           flexShrink: 0,
@@ -300,7 +300,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
                 style={{
                   padding: "1px 5px",
                   background: "var(--buildrick-bg-panel)",
-                  border: "1px solid #E2E8F0",
+                  border: "1px solid var(--bd-border)",
                   borderRadius: 3,
                   fontSize: 10,
                   color: "var(--buildrick-text-muted)",

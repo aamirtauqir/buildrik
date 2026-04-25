@@ -124,7 +124,7 @@ export class AccessibilityValidator {
 
     if (bgHex === "transparent" || bgHex === "#00000000") return;
 
-    const ratio = getContrastRatio(colorHex, bgHex || "#FFFFFF");
+    const ratio = getContrastRatio(colorHex, bgHex || "var(--bd-bg-card)");
     const fontSize = parseFloat(styles.fontSize);
     const isLargeText = fontSize >= 18 || (fontSize >= 14 && styles.fontWeight === "bold");
 

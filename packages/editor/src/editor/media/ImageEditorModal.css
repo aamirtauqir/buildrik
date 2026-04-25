@@ -12,7 +12,7 @@
 .ie-modal {
   width: min(1100px, 95vw);
   height: min(720px, 90vh);
-  background: var(--buildrick-bg-panel, #F8FAFC);
+  background: var(--buildrick-bg-panel, var(--bd-bg-panel));
   border-radius: 12px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   display: flex;
@@ -25,7 +25,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  border-bottom: 1px solid var(--buildrick-border-light, #E2E8F0);
+  border-bottom: 1px solid var(--buildrick-border-light, var(--bd-border));
   background: var(--buildrick-bg-card, #fff);
 }
 
@@ -209,7 +209,7 @@
   flex: 1;
   height: 4px;
   appearance: none;
-  background: var(--buildrick-border-light, #E2E8F0);
+  background: var(--buildrick-border-light, var(--bd-border));
   border-radius: 2px;
   outline: none;
 }

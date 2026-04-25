@@ -68,8 +68,8 @@ const headerContainerStyles: React.CSSProperties = {
   height: 44,
   minHeight: 44,
   padding: "0 12px",
-  borderBottom: "1px solid var(--buildrick-border-light, #E2E8F0)",
-  background: "var(--buildrick-bg-panel, #F8FAFC)",
+  borderBottom: "1px solid var(--buildrick-border-light, var(--bd-border))",
+  background: "var(--buildrick-bg-panel, var(--bd-bg-panel))",
   flexShrink: 0,
 };
 
@@ -101,7 +101,7 @@ const iconBtnStyles: React.CSSProperties = {
   background: "transparent",
   borderRadius: 4,
   cursor: "pointer",
-  color: "var(--buildrick-text-muted, #64748B)",
+  color: "var(--buildrick-text-muted, var(--bd-fg-secondary))",
 };
 
 // ============================================
@@ -133,7 +133,7 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
           ...iconBtnStyles,
           color: isPinned
             ? "var(--buildrick-accent, #2D6DFF)"
-            : "var(--buildrick-text-muted, #64748B)",
+            : "var(--buildrick-text-muted, var(--bd-fg-secondary))",
         }}
         title={isPinned ? "Unpin panel" : "Pin panel"}
         aria-label={isPinned ? "Unpin panel" : "Pin panel"}
@@ -208,7 +208,7 @@ export const PanelHeader: React.FC<PanelHeaderProps> = ({
             display: "flex",
             alignItems: "center",
             marginRight: 8,
-            color: "var(--buildrick-text-muted, #64748B)",
+            color: "var(--buildrick-text-muted, var(--bd-fg-secondary))",
             flexShrink: 0,
             width: 16,
             height: 16,

@@ -58,7 +58,7 @@ const COLORS = {
   invalid: {
     border: "var(--buildrick-error)", // Red for invalid drops
     bg: "var(--buildrick-error-light)",
-    text: "#ffffff",
+    text: "var(--bd-bg-card)",
   },
 };
 
@@ -390,7 +390,7 @@ const DropBreadcrumb: React.FC<DropBreadcrumbProps> = ({ path, targetRect }) => 
           <span
             style={{
               color: item.isCurrent
-                ? "var(--buildrick-text-primary, #f8fafc)"
+                ? "var(--buildrick-text-primary, var(--bd-bg-panel))"
                 : "var(--buildrick-text-secondary, #a0a0b0)",
               fontWeight: item.isCurrent ? 600 : 400,
             }}

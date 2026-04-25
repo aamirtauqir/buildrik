@@ -288,7 +288,7 @@ const panelStyles: React.CSSProperties = {
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  background: "linear-gradient(180deg, #e2e8f0 0%, #d1d8e0 100%)",
+  background: "linear-gradient(180deg, var(--bd-border) 0%, #d1d8e0 100%)",
   zIndex: 50,
   // Animation handled by CSS class .buildrick-template-preview-panel + .visible
 };

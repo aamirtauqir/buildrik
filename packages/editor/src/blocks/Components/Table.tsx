@@ -32,7 +32,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
     styles: {
       width: "100%",
       borderCollapse: "collapse",
-      background: "#ffffff",
+      background: "var(--bd-bg-card)",
       borderRadius: "8px",
       overflow: "hidden",
       boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
@@ -45,7 +45,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
   const thead = composer.elements.createElement("container", {
     tagName: "thead",
     styles: {
-      background: "#f8fafc",
+      background: "var(--bd-bg-panel)",
     },
   });
   composer.elements.addElement(thead, tableId);
@@ -64,10 +64,10 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
         textAlign: "left",
         fontWeight: "600",
         fontSize: "12px",
-        color: "#64748b",
+        color: "var(--bd-fg-secondary)",
         textTransform: "uppercase",
         letterSpacing: "0.05em",
-        borderBottom: "2px solid #e2e8f0",
+        borderBottom: "2px solid var(--bd-border)",
       },
     });
     composer.elements.addElement(th, headerRow.getId());
@@ -96,7 +96,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
     const tr = composer.elements.createElement("container", {
       tagName: "tr",
       styles: {
-        borderBottom: "1px solid #e2e8f0",
+        borderBottom: "1px solid var(--bd-border)",
       },
     });
     composer.elements.addElement(tr, tbody.getId());
@@ -123,7 +123,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
       tagName: "td",
       styles: {
         padding: "14px 16px",
-        color: "#64748b",
+        color: "var(--bd-fg-secondary)",
       },
     });
     composer.elements.addElement(tdEmail, tr.getId());
@@ -189,7 +189,7 @@ function buildTable(composer: Composer, parentId: string, dropIndex?: number): s
         borderRadius: "6px",
         fontSize: "12px",
         fontWeight: "500",
-        color: "#64748b",
+        color: "var(--bd-fg-secondary)",
         cursor: "pointer",
       },
     });
