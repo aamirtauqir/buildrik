@@ -32,6 +32,11 @@ ruleTester.run("no-legacy-components-import", rule, {
       filename: "src/editor/sidebar/tabs/pages/PagesTab.tsx",
       errors: [{ messageId: "legacyImport" }],
     },
+    {
+      code: `import { X } from "../../components/LegacyThing";`,
+      filename: "src/editor/sidebar/PagesTab.tsx",
+      errors: [{ messageId: "legacyImport" }],
+    },
   ],
 });
 console.log("no-legacy-components-import: all tests pass");

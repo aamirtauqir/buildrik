@@ -10,11 +10,15 @@
 // Three forms covered:
 //   1. Alias   @components/*     (tsconfig paths: ./src/components/*)
 //   2. Alias   @/components/*    (tsconfig paths: ./src/*)
-//   3. Deep-relative from src/editor/**: three or more '../' segments landing on components/
+//   3. Relative from src/editor/**: two or more '../' segments landing on components/
+//      `src/editor/X.tsx` → `../components/...` (1 up) is intentionally NOT
+//      flagged: rare 1-up could resolve to a co-located `editor/components/`
+//      folder. The existing no-restricted-imports block (eslint.config.mjs)
+//      catches the 1-up case via enumerated paths.
 const LEGACY_PATTERNS = [
   /^@components\//,
   /^@\/components\//,
-  /^(\.\.\/){3,}components\//,
+  /^(\.\.\/){2,}components\//,
 ];
 
 function isEditorFile(filename) {
