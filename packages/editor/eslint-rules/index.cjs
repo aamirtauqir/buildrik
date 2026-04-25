@@ -9,5 +9,6 @@ module.exports = {
     "no-inline-hex": require("./no-inline-hex.cjs"),
     "no-inspector-tokens": require("./no-inspector-tokens.cjs"),
     "no-get-property-value-ds": require("./no-get-property-value-ds.cjs"),
+    "no-legacy-components-import": require("./no-legacy-components-import.cjs"),
   },
 };

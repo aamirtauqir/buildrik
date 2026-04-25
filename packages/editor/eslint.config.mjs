@@ -91,6 +91,7 @@ export default [
       "buildrik/no-inline-hex": "error",
       "buildrik/no-inspector-tokens": "error",
       "buildrik/no-get-property-value-ds": "error",
+      "buildrik/no-legacy-components-import": "error",
       "no-unused-vars": "off",
       "no-undef": "off",
     },
