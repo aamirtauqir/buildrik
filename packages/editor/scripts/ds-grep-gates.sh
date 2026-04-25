@@ -383,10 +383,15 @@ pass "Gate 16: editor-scoped hex at or below baseline (REGRESSION mode)"
 #     #EFF6FF (blue-50), #DBEAFE (blue-100), #BFDBFE (blue-200),
 #     #60A5FA (blue-400), #3B82F6 (blue-500), #2563EB (blue-600),
 #     #1E3A8A (blue-900)
-#   - Tailwind blue + azure rgba families (C-arc):
-#     rgba(0, 163, 255, x)   — azure (legacy editor accent)
-#     rgba(37, 99, 235, x)   — blue-600 alpha
-#     rgba(59, 130, 246, x)  — blue-500 alpha
+#   - Tailwind indigo palette hex (D-arc 2026-04-26):
+#     #E0E7FF (indigo-100), #C7D2FE (indigo-200), #A5B4FC (indigo-300),
+#     #818CF8 (indigo-400), #6366F1 (indigo-500)
+#   - Tailwind blue + azure + indigo rgba families:
+#     rgba(0, 163, 255, x)    — azure (legacy editor accent)
+#     rgba(37, 99, 235, x)    — blue-600 alpha
+#     rgba(59, 130, 246, x)   — blue-500 alpha
+#     rgba(99, 102, 241, x)   — indigo-500 alpha (D-arc)
+#     rgba(129, 140, 248, x)  — indigo-400 alpha (D-arc)
 #   - Words: indigo, violet, purple (case-insensitive, word-boundary).
 # Canonical accent: --buildrick-accent #2D6DFF (cobalt). See color.css:33-37.
 # Allowlist (paths with legitimate non-chrome usage):
@@ -415,7 +420,7 @@ pass "Gate 16: editor-scoped hex at or below baseline (REGRESSION mode)"
 # History:
 #   docs/ideation/2026-04-26-banned-color-cleanup.md  — H-arc (G1-H4)
 #   docs/ideation/2026-04-26-tailwind-blue-migration.md — C-arc (C1-C6)
-GATE18_RAW=$(grep -rniE '#1D4ED8|#1E40AF|#4F46E5|#EFF6FF|#DBEAFE|#BFDBFE|#60A5FA|#3B82F6|#2563EB|#1E3A8A|rgba\(\s*(0,\s*163,\s*255|37,\s*99,\s*235|59,\s*130,\s*246)|\b(indigo|violet|purple)\b' packages/editor/src \
+GATE18_RAW=$(grep -rniE '#1D4ED8|#1E40AF|#4F46E5|#EFF6FF|#DBEAFE|#BFDBFE|#60A5FA|#3B82F6|#2563EB|#1E3A8A|#E0E7FF|#C7D2FE|#A5B4FC|#818CF8|#6366F1|rgba\(\s*(0,\s*163,\s*255|37,\s*99,\s*235|59,\s*130,\s*246|99,\s*102,\s*241|129,\s*140,\s*248)|\b(indigo|violet|purple)\b' packages/editor/src \
   --include='*.css' --include='*.ts' --include='*.tsx' --include='*.js' --include='*.jsx' \
   --exclude-dir=__tests__ \
   --exclude-dir=project \

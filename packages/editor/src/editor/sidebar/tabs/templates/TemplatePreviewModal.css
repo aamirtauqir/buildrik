@@ -108,7 +108,7 @@
 
 .tmpl-preview__vp-btn--active {
   background: rgba(124, 109, 250, 0.2);
-  color: #a5b4fc;
+  color: var(--bd-accent-hover);
 }
 
 /* Close button — top right X */

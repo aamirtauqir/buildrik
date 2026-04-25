@@ -1983,10 +1983,10 @@
   flex-direction: column;
   padding: var(--bd-space-5);
   margin: 0 10px var(--bd-space-4);
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(168, 85, 247, 0.9) 100%);
+  background: linear-gradient(135deg, rgba(45, 109, 255, 0.9) 0%, rgba(168, 85, 247, 0.9) 100%);
   border-radius: 16px;
   box-shadow:
-    0 10px 30px -10px rgba(99, 102, 241, 0.5),
+    0 10px 30px -10px rgba(45, 109, 255, 0.5),
     0 4px 12px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
   position: relative;
@@ -1997,7 +1997,7 @@
 .buildrick-hero-card:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 14px 40px -10px rgba(99, 102, 241, 0.6),
+    0 14px 40px -10px rgba(45, 109, 255, 0.6),
     0 6px 16px rgba(0, 0, 0, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
@@ -2053,7 +2053,7 @@
   background: var(--bd-bg-card);
   border: none;
   border-radius: 12px;
-  color: #6366f1;
+  color: var(--bd-accent);
   font-size: var(--buildrick-text-base);
   font-weight: 600;
   cursor: pointer;
@@ -2147,8 +2147,8 @@
 }
 
 .buildrick-quick-add-btn:hover {
-  background: rgba(99, 102, 241, 0.15);
-  border-color: rgba(99, 102, 241, 0.3);
+  background: rgba(45, 109, 255, 0.15);
+  border-color: rgba(45, 109, 255, 0.3);
   color: var(--buildrick-text-primary);
   transform: translateY(-2px);
 }
@@ -2842,7 +2842,7 @@
   padding: var(--bd-space-1) 10px;
   border: none;
   border-radius: 6px;
-  background: rgba(99, 102, 241, 0.9);
+  background: rgba(45, 109, 255, 0.9);
   color: #fff;
   font-size: 11px;
   font-weight: 600;
@@ -2858,7 +2858,7 @@
 }
 
 .buildrick-template-preview-btn:hover {
-  background: rgba(99, 102, 241, 1);
+  background: rgba(45, 109, 255, 1);
 }
 
 /* Template Thumbnail (40x40 - design spec) */
@@ -3376,8 +3376,8 @@
 }
 
 .buildrick-icon-rail-btn:hover::after {
-  background: rgba(99, 102, 241, 0.08);
-  box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.15);
+  background: rgba(45, 109, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(45, 109, 255, 0.15);
 }
 
 /* Active indicator - left border (animated) */
@@ -3411,8 +3411,8 @@
 }
 
 .buildrick-icon-rail-btn--active::after {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(139, 92, 246, 0.12));
-  box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.25);
+  background: linear-gradient(135deg, rgba(45, 109, 255, 0.12), rgba(139, 92, 246, 0.12));
+  box-shadow: inset 0 0 0 1px rgba(45, 109, 255, 0.25);
 }
 
 .buildrick-icon-rail-btn--active {
@@ -3424,7 +3424,7 @@
 }
 
 .buildrick-icon-rail-btn--active:hover::after {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(139, 92, 246, 0.18));
+  background: linear-gradient(135deg, rgba(45, 109, 255, 0.18), rgba(139, 92, 246, 0.18));
 }
 
 /* Icon button inside the rail */
@@ -3443,8 +3443,8 @@
 }
 
 .buildrick-icon-rail-btn:focus-visible::after {
-  background: rgba(99, 102, 241, 0.12);
-  box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.3);
+  background: rgba(45, 109, 255, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(45, 109, 255, 0.3);
 }
 
 /* Label underneath icon */
@@ -4483,7 +4483,7 @@
 
 .tmpl-preview__vp-btn--active {
   background: rgba(124, 109, 250, 0.2);
-  color: #a5b4fc;
+  color: var(--bd-accent-hover);
 }
 
 /* Close button */
@@ -4564,7 +4564,7 @@
   padding: var(--bd-space-2) var(--bd-space-4);
   border: none;
   border-radius: 8px;
-  background: linear-gradient(135deg, #6366f1, #818cf8);
+  background: linear-gradient(135deg, var(--bd-accent), var(--bd-accent-hover));
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -4624,7 +4624,7 @@
 
 .tmpl-progress__fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--buildrick-accent, #818cf8), #00d4aa);
+  background: linear-gradient(90deg, var(--buildrick-accent), #00d4aa);
   border-radius: 2px;
   transition: width 0.3s ease;
 }
@@ -4674,7 +4674,7 @@
 }
 
 .tmpl-progress__icon--active {
-  background: rgba(99, 102, 241, 0.3);
+  background: rgba(45, 109, 255, 0.3);
 }
 
 .tmpl-progress__icon--done {
@@ -4687,8 +4687,8 @@
   display: block;
   width: 8px;
   height: 8px;
-  border: 1.5px solid rgba(129, 140, 248, 0.3);
-  border-top-color: #818cf8;
+  border: 1.5px solid rgba(45, 109, 255, 0.3);
+  border-top-color: var(--bd-accent-hover);
   border-radius: 50%;
   animation: tmpl-spin 0.6s linear infinite;
 }
@@ -4748,9 +4748,9 @@
   padding: 5px var(--bd-space-2);
   font-size: 11px;
   font-family: inherit;
-  color: #a5b4fc;
-  background: rgba(99, 102, 241, 0.08);
-  border: 1px solid rgba(99, 102, 241, 0.15);
+  color: var(--bd-accent-hover);
+  background: rgba(45, 109, 255, 0.08);
+  border: 1px solid rgba(45, 109, 255, 0.15);
   border-radius: 6px;
   cursor: pointer;
   text-align: left;
@@ -4758,7 +4758,7 @@
 }
 
 .tmpl-applied-banner__action:hover {
-  background: rgba(99, 102, 241, 0.15);
+  background: rgba(45, 109, 255, 0.15);
 }
 
 .tmpl-applied-banner__dismiss {
@@ -4798,7 +4798,7 @@
   position: fixed;
   border-radius: 6px;
   box-shadow:
-    0 0 0 2px rgba(99, 102, 241, 0.6),
+    0 0 0 2px rgba(45, 109, 255, 0.6),
     0 0 0 3000px rgba(0, 0, 0, 0.55);
   pointer-events: none;
   transition: all 0.3s ease;
@@ -4956,14 +4956,14 @@
 }
 
 .tmpl-onboarding__dot--active {
-  background: #818cf8;
+  background: var(--bd-accent-hover);
 }
 
 .tmpl-onboarding__next {
   font-size: 10px;
   font-family: inherit;
   font-weight: 600;
-  color: #a5b4fc;
+  color: var(--bd-accent-hover);
   background: none;
   border: none;
   cursor: pointer;
@@ -4971,7 +4971,7 @@
 }
 
 .tmpl-onboarding__next:hover {
-  color: #c7d2fe;
+  color: var(--bd-accent-hover);
 }
 
 /* ─────────────────────────────────────────────
@@ -5097,7 +5097,7 @@
   font-family: inherit;
   font-weight: 600;
   color: #fff;
-  background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+  background: linear-gradient(135deg, var(--bd-accent) 0%, var(--bd-accent-hover) 100%);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -5423,7 +5423,7 @@
 }
 
 .buildrick-btn-primary:hover {
-  background: #6366f1;
+  background: var(--bd-accent);
 }
 
 .buildrick-btn-primary.danger {
@@ -6643,7 +6643,7 @@
 
 .buildrick-radio-option.selected {
   border-color: var(--buildrick-accent);
-  background: rgba(99, 102, 241, 0.08);
+  background: rgba(45, 109, 255, 0.08);
 }
 
 .buildrick-radio-option.danger.selected {
