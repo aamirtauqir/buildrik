@@ -374,42 +374,69 @@ if ! node packages/editor/scripts/find-inline-hex-v2.mjs --editor-only --exclude
 fi
 pass "Gate 16: editor-scoped hex at or below baseline (REGRESSION mode)"
 
-# Gate 18: No banned indigo/violet/purple bleed (added 2026-04-26 after H1-H4 cleanup).
+# Gate 18: No banned Tailwind/indigo/violet/purple bleed (added 2026-04-26 after
+# H1-H4 cleanup. Extended 2026-04-26 with C1-C4 Tailwind blue migration).
 # Bans:
-#   - Hex literals: #1D4ED8 (Tailwind blue-700), #1E40AF (Tailwind blue-800),
-#     #4F46E5 (Tailwind indigo-600). All pre-cobalt-era stale palette values.
+#   - Indigo/blue-700/blue-800/indigo-600 hex (original H-arc):
+#     #1D4ED8, #1E40AF, #4F46E5
+#   - Tailwind blue palette hex (C-arc 2026-04-26):
+#     #EFF6FF (blue-50), #DBEAFE (blue-100), #BFDBFE (blue-200),
+#     #60A5FA (blue-400), #3B82F6 (blue-500), #2563EB (blue-600),
+#     #1E3A8A (blue-900)
+#   - Tailwind blue + azure rgba families (C-arc):
+#     rgba(0, 163, 255, x)   — azure (legacy editor accent)
+#     rgba(37, 99, 235, x)   — blue-600 alpha
+#     rgba(59, 130, 246, x)  — blue-500 alpha
 #   - Words: indigo, violet, purple (case-insensitive, word-boundary).
 # Canonical accent: --buildrick-accent #2D6DFF (cobalt). See color.css:33-37.
-# Allowlist (paths with legitimate non-design-token usage):
-#   - shared/utils/parsers/colorTypes.ts — CSS color name parser data
-#   - shared/utils/devLogger.ts — dev tool log color ramp
-#   - engine/collaboration/CollaborationManager.ts — collab cursor colors
-#   - engine/canvas/constants.ts — canvas debug overlay color comments
-#   - features/design-system/ui/modals/AddTokenModal.tsx — UI placeholder hint
-#   - editor/sidebar/tabs/media/components/StockSourceModal.tsx — stock photo color filter (user-facing)
-#   - editor/sidebar/tabs/media/data/mediaTypes.ts — stock filter type union
-#   - **/__tests__/** — test fixtures (input data, not chrome rendering)
-# History: docs/ideation/2026-04-26-banned-color-cleanup.md tracks cleanup commits G1-H4.
-GATE18_RAW=$(grep -rniE '#1D4ED8|#1E40AF|#4F46E5|\b(indigo|violet|purple)\b' packages/editor/src \
+# Allowlist (paths with legitimate non-chrome usage):
+#   Original (H-arc):
+#     shared/utils/parsers/colorTypes.ts          — CSS color-name parser data
+#     shared/utils/devLogger.ts                   — dev tool log color ramp
+#     engine/collaboration/CollaborationManager.ts — collab cursor colors
+#     engine/canvas/constants.ts                  — canvas debug overlay comments
+#     features/design-system/ui/modals/AddTokenModal.tsx — placeholder hint
+#     editor/sidebar/tabs/media/components/StockSourceModal.tsx — stock photo
+#                                                                  color filter
+#     editor/sidebar/tabs/media/data/mediaTypes.ts — stock filter type union
+#   Extended (C-arc 2026-04-26 — user-facing token displays / published HTML):
+#     blocks/Ecommerce/                — published HTML for user's website
+#     features/design-system/           — user design system token UI
+#     themes/design-system/design.css   — user design token defaults
+#     shared/forms/ColorField.tsx       — color picker preset palette
+#     shared/ui/index.tsx               — doc/example strings
+#     shared/constants/config.ts        — USER ELEMENT_COLOR / PRIMARY_COLOR
+#     ai/ColorPalette.tsx               — color picker initial state
+#     editor/collaboration/PresenceIndicators.tsx — user avatar palette
+#     editor/ecommerce/CollectionSetupModal.tsx   — collection accent
+#     editor/sidebar/tabs/templates/templatesData.ts — template HTML content
+#     editor/canvas/overlays/MediaQuickActions.tsx — color swatch picker
+#   - **/__tests__/** + colocated *.test.ts — test fixtures
+# History:
+#   docs/ideation/2026-04-26-banned-color-cleanup.md  — H-arc (G1-H4)
+#   docs/ideation/2026-04-26-tailwind-blue-migration.md — C-arc (C1-C6)
+GATE18_RAW=$(grep -rniE '#1D4ED8|#1E40AF|#4F46E5|#EFF6FF|#DBEAFE|#BFDBFE|#60A5FA|#3B82F6|#2563EB|#1E3A8A|rgba\(\s*(0,\s*163,\s*255|37,\s*99,\s*235|59,\s*130,\s*246)|\b(indigo|violet|purple)\b' packages/editor/src \
   --include='*.css' --include='*.ts' --include='*.tsx' --include='*.js' --include='*.jsx' \
   --exclude-dir=__tests__ \
   --exclude-dir=project \
   --exclude-dir=node_modules \
   --exclude-dir=dist 2>/dev/null || true)
 GATE18_VIOLATIONS=$(echo "$GATE18_RAW" | grep -vE \
-  'shared/utils/parsers/colorTypes\.ts|shared/utils/devLogger\.ts|engine/collaboration/CollaborationManager\.ts|engine/canvas/constants\.ts|features/design-system/ui/modals/AddTokenModal\.tsx|editor/sidebar/tabs/media/components/StockSourceModal\.tsx|editor/sidebar/tabs/media/data/mediaTypes\.ts' \
+  'shared/utils/parsers/colorTypes\.ts|shared/utils/devLogger\.ts|engine/collaboration/CollaborationManager\.ts|engine/canvas/constants\.ts|features/design-system/|themes/design-system/design\.css|blocks/Ecommerce/|shared/forms/ColorField\.tsx|shared/ui/index\.tsx|shared/constants/config\.ts|ai/ColorPalette\.tsx|editor/collaboration/PresenceIndicators\.tsx|editor/ecommerce/CollectionSetupModal\.tsx|editor/sidebar/tabs/templates/templatesData\.ts|editor/canvas/overlays/MediaQuickActions\.tsx|editor/sidebar/tabs/media/components/StockSourceModal\.tsx|editor/sidebar/tabs/media/data/mediaTypes\.ts|\.test\.ts' \
   | grep -v '^$' || true)
 if [ -n "$GATE18_VIOLATIONS" ]; then
   echo "$GATE18_VIOLATIONS" | head -20
   echo ""
   echo "Gate 18 explanation: cobalt --buildrick-accent (#2D6DFF) is the canonical accent."
-  echo "Stale Tailwind blue/indigo/purple hex + indigo/violet/purple words in chrome paths"
-  echo "are banned. If your case is legitimate (debug tooling, color-name parser, user-facing"
-  echo "stock filter, etc.), add the path to the allowlist in this gate's grep -vE."
-  echo "See docs/ideation/2026-04-26-banned-color-cleanup.md for cleanup history."
-  fail "Gate 18: banned indigo/violet/purple bleed"
+  echo "Banned: stale Tailwind blue/indigo/purple hex + Tailwind blue/azure rgba families"
+  echo "        + indigo/violet/purple words in chrome paths."
+  echo "If your case is legitimate (debug tooling, color-name parser, user-facing"
+  echo "stock filter, user design tokens, published HTML, etc.), add the path to the"
+  echo "allowlist in this gate's grep -vE."
+  echo "See docs/ideation/2026-04-26-tailwind-blue-migration.md for C-arc cleanup history."
+  fail "Gate 18: banned Tailwind/indigo/violet/purple bleed"
 fi
-pass "Gate 18: no banned indigo/violet/purple bleed"
+pass "Gate 18: no banned Tailwind/indigo/violet/purple bleed"
 
 echo ""
 echo "=== DS V1 gates: 13 passed + 4 chrome-axiom gates at baseline + green-panel check ==="

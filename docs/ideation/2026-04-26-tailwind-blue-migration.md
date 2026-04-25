@@ -3,9 +3,23 @@
 **Trigger:** TODOS.md "CI grep rule for banned indigo/violet hex" RESOLVED commit (`9b690ff`) flagged Tailwind blue palette as same-class drift, separate workstream.
 **Followup to:** `docs/ideation/2026-04-26-banned-color-cleanup.md` (the original cobalt convergence cleanup).
 
-## STATUS: RESUMING 2026-04-26 — policy P1 chosen (lint-only interpretation)
+## STATUS: COMPLETE 2026-04-26 — all 6 clusters landed
 
-**Decision (2026-04-26):** P1 selected. Author confirmed marker rationale is lost — was reflexive lint-quietener during 74483e4f cleanup, not load-bearing design statement. Marker means "skip Gate 16 baseline". SSOT cobalt convergence overrides marker. Workstream proceeds full 109 sites. Marker is removed from files where all hex is migrated (becomes vestigial post-cleanup).
+**Final commits:**
+  C1 ebb1519  chrome shell (5 files, 27 sites incl. avatar #3B82F6 add-ins)
+  C2 0e579a8  sidebar tab CSS (6 files, 17 sites — fallback drops)
+  C3 c89de7b  canvas.tokens.ts (12 sites: hex + 8 azure rgba)
+  C4 d99bac5  full chrome sweep (28 files, 50+ sites incl. rgba families)
+  C5 (folded into C4 — most singletons absorbed by sweep; remainder allowlisted)
+  C6 (this commit) — Gate 18 ratchet to lock cleanup permanently
+
+**Final state:** 0 chrome Tailwind blue hex, 0 chrome Tailwind blue rgba.
+Allowlist preserves user-token displays, published HTML, color picker presets,
+dev tooling, and test fixtures.
+
+## Resolved decision history
+
+**P1 chosen 2026-04-26 (lint-only interpretation).** Author confirmed marker rationale is lost — was reflexive lint-quietener during 74483e4f cleanup, not load-bearing design statement. Marker means "skip Gate 16 baseline". SSOT cobalt convergence overrides marker. Workstream proceeded full 109 sites. Markers removed from files where all hex is migrated (became vestigial post-cleanup).
 
 ## Original conflict context (preserved for archaeology)
 
