@@ -10,5 +10,6 @@ module.exports = {
     "no-inspector-tokens": require("./no-inspector-tokens.cjs"),
     "no-get-property-value-ds": require("./no-get-property-value-ds.cjs"),
     "no-legacy-components-import": require("./no-legacy-components-import.cjs"),
+    "no-magic-layout-literals": require("./no-magic-layout-literals.cjs"),
   },
 };

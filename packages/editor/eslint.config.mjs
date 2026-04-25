@@ -166,6 +166,7 @@ export default [
             "Survivor #3: magic layout literal (string form) banned. Import from src/shared/constants/layout.ts and interpolate, e.g. height: `${HEADER_H}px`.",
         },
       ],
+      "buildrik/no-magic-layout-literals": "warn",
     },
   },
   // Chrome Axiom A1.3 — border-radius ≤ 4 on panel chrome. Form atoms exempt.
