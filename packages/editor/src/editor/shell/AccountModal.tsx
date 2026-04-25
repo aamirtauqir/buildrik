@@ -28,7 +28,7 @@ const MOCK_MEMBERS: Member[] = [
 ];
 
 const ROLE_COLORS: Record<Role, { bg: string; text: string }> = {
-  Editor: { bg: "#EFF6FF", text: "#1D4ED8" },
+  Editor: { bg: "#EFF6FF", text: "var(--bd-accent)" },
   Admin:  { bg: "#FEF3C7", text: "#92400E" },
   Viewer: { bg: "var(--bd-bg-subtle)", text: "#475569" },
 };
@@ -482,7 +482,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
                   fontSize: 13,
                   fontWeight: isActive ? 600 : 500,
                   background: isActive ? "#EFF6FF" : "transparent",
-                  color: isActive ? "#1D4ED8" : "var(--bd-fg-secondary)",
+                  color: isActive ? "var(--bd-accent)" : "var(--bd-fg-secondary)",
                 }}
               >
                 {item.label}

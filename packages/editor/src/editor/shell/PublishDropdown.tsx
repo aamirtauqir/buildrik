@@ -37,7 +37,7 @@ const STATE_CONFIG: Record<PublishState, StateConfig> = {
   draft: {
     buttonLabel: "Publish",
     bg: "#2563EB",
-    hoverBg: "#1D4ED8",
+    hoverBg: "var(--bd-accent-pressed)",
     iconColor: "var(--bd-bg-card)",
     textColor: "var(--bd-bg-card)",
     chevronColor: "#DBEAFE",

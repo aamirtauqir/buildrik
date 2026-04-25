@@ -218,7 +218,7 @@ const inputStyle: React.CSSProperties = {
 };
 
 const saveBtnStyle: React.CSSProperties = {
-  background: "var(--buildrick-accent, #1D4ED8)",
+  background: "var(--buildrick-accent)",
   border: "none",
   borderRadius: "4px",
   width: "24px",

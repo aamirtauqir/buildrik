@@ -25,7 +25,7 @@ const MOCK_MEMBERS: Member[] = [
 ];
 
 const ROLE_COLORS: Record<Role, { bg: string; text: string }> = {
-  Editor: { bg: "#EFF6FF", text: "#1D4ED8" },
+  Editor: { bg: "#EFF6FF", text: "var(--bd-accent)" },
   Admin:  { bg: "#FEF3C7", text: "#92400E" },
   Viewer: { bg: "var(--bd-bg-subtle)", text: "#475569" },
 };
@@ -409,7 +409,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               fontFamily: "inherit",
               transition: "background 0.1s ease",
             }}
-            onMouseEnter={(e) => { if (email.trim()) e.currentTarget.style.background = "#1D4ED8"; }}
+            onMouseEnter={(e) => { if (email.trim()) e.currentTarget.style.background = "var(--bd-accent-pressed)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = email.trim() ? "#2563EB" : "var(--bd-fg-muted)"; }}
           >
             Send Invite

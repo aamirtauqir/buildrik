@@ -137,7 +137,7 @@ function MediaTabWithComposer({
       {/* 0. Selection Mode Header (Snap-back context) */}
       {state.selectionContext && (
         <div className="med-selection-bar" style={{
-          background: 'var(--bd-accent, #1D4ED8)',
+          background: 'var(--bd-accent)',
           color: 'white',
           padding: '8px 16px',
           display: 'flex',
