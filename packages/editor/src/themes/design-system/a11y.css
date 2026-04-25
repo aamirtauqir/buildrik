@@ -40,6 +40,36 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+
+  /* Force-show overlay/feedback elements at full opacity. Universal rule above
+   * kills transition-duration but element may be stuck at opacity:0 (animation
+   * start state). Migrated from editor/canvas/Canvas.css 2026-04-26. */
+  .buildrick-hover-overlay,
+  .buildrick-drop-feedback-badge,
+  .buildrick-drop-feedback-target {
+    opacity: 1 !important;
+  }
+
+  /* Suppress :active scale-down on icon button SVGs. Transform isn't a
+   * transition so universal rule doesn't cancel it. Migrated from
+   * editor/sidebar/LeftSidebar.css 2026-04-26. */
+  .ls-btn:active svg {
+    transform: none;
+  }
+
+  /* Suppress :hover lift on drawer close button. Same reason as above.
+   * Migrated from editor/rail/DrawerPanel.css 2026-04-26. */
+  .drawer-panel__close-btn:hover {
+    transform: none;
+  }
+}
+
+/* Counterpart to reduced-motion: only run flash animation when user has
+ * NOT requested reduced motion. Migrated from themes/components.css 2026-04-26. */
+@media (prefers-reduced-motion: no-preference) {
+  .buildrick-element-flash {
+    animation: buildrick-flash 0.3s ease-out;
+  }
 }
 
 /* ─── Focus rings — default (cobalt) ─────────────────────────────────────
