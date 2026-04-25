@@ -371,5 +371,42 @@ if ! node packages/editor/scripts/find-inline-hex-v2.mjs --editor-only --exclude
 fi
 pass "Gate 16: editor-scoped hex at or below baseline (REGRESSION mode)"
 
+# Gate 18: No banned indigo/violet/purple bleed (added 2026-04-26 after H1-H4 cleanup).
+# Bans:
+#   - Hex literals: #1D4ED8 (Tailwind blue-700), #1E40AF (Tailwind blue-800),
+#     #4F46E5 (Tailwind indigo-600). All pre-cobalt-era stale palette values.
+#   - Words: indigo, violet, purple (case-insensitive, word-boundary).
+# Canonical accent: --buildrick-accent #2D6DFF (cobalt). See color.css:33-37.
+# Allowlist (paths with legitimate non-design-token usage):
+#   - shared/utils/parsers/colorTypes.ts — CSS color name parser data
+#   - shared/utils/devLogger.ts — dev tool log color ramp
+#   - engine/collaboration/CollaborationManager.ts — collab cursor colors
+#   - engine/canvas/constants.ts — canvas debug overlay color comments
+#   - features/design-system/ui/modals/AddTokenModal.tsx — UI placeholder hint
+#   - editor/sidebar/tabs/media/components/StockSourceModal.tsx — stock photo color filter (user-facing)
+#   - editor/sidebar/tabs/media/data/mediaTypes.ts — stock filter type union
+#   - **/__tests__/** — test fixtures (input data, not chrome rendering)
+# History: docs/ideation/2026-04-26-banned-color-cleanup.md tracks cleanup commits G1-H4.
+GATE18_RAW=$(grep -rniE '#1D4ED8|#1E40AF|#4F46E5|\b(indigo|violet|purple)\b' packages/editor/src \
+  --include='*.css' --include='*.ts' --include='*.tsx' --include='*.js' --include='*.jsx' \
+  --exclude-dir=__tests__ \
+  --exclude-dir=project \
+  --exclude-dir=node_modules \
+  --exclude-dir=dist 2>/dev/null || true)
+GATE18_VIOLATIONS=$(echo "$GATE18_RAW" | grep -vE \
+  'shared/utils/parsers/colorTypes\.ts|shared/utils/devLogger\.ts|engine/collaboration/CollaborationManager\.ts|engine/canvas/constants\.ts|features/design-system/ui/modals/AddTokenModal\.tsx|editor/sidebar/tabs/media/components/StockSourceModal\.tsx|editor/sidebar/tabs/media/data/mediaTypes\.ts' \
+  | grep -v '^$' || true)
+if [ -n "$GATE18_VIOLATIONS" ]; then
+  echo "$GATE18_VIOLATIONS" | head -20
+  echo ""
+  echo "Gate 18 explanation: cobalt --buildrick-accent (#2D6DFF) is the canonical accent."
+  echo "Stale Tailwind blue/indigo/purple hex + indigo/violet/purple words in chrome paths"
+  echo "are banned. If your case is legitimate (debug tooling, color-name parser, user-facing"
+  echo "stock filter, etc.), add the path to the allowlist in this gate's grep -vE."
+  echo "See docs/ideation/2026-04-26-banned-color-cleanup.md for cleanup history."
+  fail "Gate 18: banned indigo/violet/purple bleed"
+fi
+pass "Gate 18: no banned indigo/violet/purple bleed"
+
 echo ""
-echo "=== DS V1 gates: 12 passed + 4 chrome-axiom gates at baseline + green-panel check ==="
+echo "=== DS V1 gates: 13 passed + 4 chrome-axiom gates at baseline + green-panel check ==="

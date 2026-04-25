@@ -4000,7 +4000,7 @@
   flex-shrink: 0;
 }
 
-/* Component Add Button — cobalt accent (was purple pre-cobalt; converged 2026-04-26) */
+/* Component Add Button — cobalt accent */
 .buildrick-component-add-btn {
   display: flex;
   align-items: center;
