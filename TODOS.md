@@ -104,9 +104,9 @@
 ### ~~Decide a11y.css fold direction (vibcoder bridge)~~ — RESOLVED 2026-04-26
 **Decision:** **Cherry-pick + verified no fold needed.** Vibcoder a11y.css `@media (prefers-contrast: high)` block defines `--buildrick-border: #64748B` and `--buildrick-border-light: #94A3B8`. Shipped a11y.css already defines exact same values at lines 13-15. Diff-verified 2026-04-26: zero delta in border values. Vibcoder's `.bdr-btn` BEM selectors are bridge-rename targets per Premise 3 (port-time renames `bdr-X` → `bd-{domain}-X`). Shipped's 65 extra lines (focus rings, skip link, print styles) stay canonical. Commit 2 annotates a11y.css row as `SKIP (vibcoder is older + thinner; values already overlap)`.
 
-### Define vocabulary expansion sign-off process (vibcoder bridge) — RULE DEFINED 2026-04-26
-**STATUS:** Rule defined inline this session. Application to commit-msg template REMAINS as future work.
-**RULE (defined):** Each Commit 3.x vocab-add fold MUST contain in commit body, one line per new tier:
+### ~~Define vocabulary expansion sign-off process (vibcoder bridge)~~ — ENFORCEMENT LANDED 2026-04-26
+**STATUS:** Rule defined + automated enforcement shipped same day.
+**RULE:** Each Commit 3.x vocab-add fold MUST contain in commit body, one line per new tier:
 ```
 vocab-add: <token name> | tier=<tier> | design-md=<section updated OR "no-change-required: <reason>"> | ack=<initials>
 ```
@@ -118,9 +118,7 @@ For pure refactor (literal→alias indirection, same resolved value), use:
 ```
 vocab-add: --buildrick-info | tier=alias-only | design-md=no-change-required: literal #2D6DFF replaced with var(--buildrick-accent), same resolved value | ack=SG
 ```
-**Application as commit-msg template:** future work item. Commit-msg hook in `.git/hooks/commit-msg` or via husky should validate body contains `vocab-add:` line for any commit touching `themes/design-system/*.css` that adds a new `--buildrick-*` token name. Until template lands, rule lives in plan v2 + this TODO + author discipline.
-**Effort:** Template implementation human ~30 min / CC ~15 min.
-**Priority:** P2 (downgraded from P1 — rule exists, enforcement automation deferred)
+**ENFORCEMENT:** `packages/editor/scripts/check-vocab-add.sh` validates HEAD (or any sha). Wired as `DS vocab-add gate` step in `.github/workflows/editor-ci.yml`. Triggers only when a commit (a) touches `packages/editor/src/themes/design-system/*.css` AND (b) introduces at least one NEW `--buildrick-*` token name. Value-only changes + non-DS commits + merge commits auto-skip. Self-tested (4/4 pass): missing-vocab rejection, valid vocab acceptance, value-change skip, non-DS-touch skip.
 
 ---
 
@@ -140,9 +138,5 @@ vocab-add: --buildrick-info | tier=alias-only | design-md=no-change-required: li
 **Priority:** P2
 **Depends on:** Layers tab migration shipped
 
-### Post-migration hardcoded indigo audit
-**What:** Audit `editor/rail/LayoutShell.css` (lines 59, 258) for `--surface-base`/`--surface-canvas` light fallbacks (`#F0F4F8`, `#EEF2F7`). Update to dark fallbacks.
-**Why:** LeftSidebar.css Task 4 noted these files still have light-mode fallbacks for `--surface-*` tokens.
-**Effort:** S (human: ~1 hr / CC: ~10 min)
-**Priority:** P2
-**Depends on:** Layers tab migration shipped
+### ~~Post-migration hardcoded indigo audit~~ — RESOLVED 2026-04-26
+**Decision:** No work needed. Theme unification (2026-04-18 light-theme flip) already swept these. Verified 2026-04-26: `grep -rE '#F0F4F8|#EEF2F7|--surface-base|--surface-canvas' packages/editor/src --include='*.css'` returns zero hits. LayoutShell.css line numbers in original TODO predate theme unification — file has been rewritten since. No code change required.

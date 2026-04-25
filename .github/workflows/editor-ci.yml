@@ -106,6 +106,17 @@ jobs:
         working-directory: packages/editor
         run: pnpm run lint:ds-hex
 
+      # Vocab sign-off gate: any commit that introduces a NEW --buildrick-*
+      # token under themes/design-system/*.css must include a vocab-add: line
+      # in its commit body (rule defined in TODOS.md "Vibcoder DS Bridge —
+      # Define vocabulary expansion sign-off process"). Self-tested via
+      # `scripts/check-vocab-add.sh --self-test`. Validates HEAD; PR merge
+      # commits auto-skip via the merge-commit guard (intentional — solo
+      # workflow direct to main is the enforced path). No untrusted input
+      # interpolated into the run block.
+      - name: DS vocab-add gate
+        run: bash packages/editor/scripts/check-vocab-add.sh HEAD
+
       # ESLint runs advisory-only by design. DS V1 rules (no-inline-hex,
       # no-inspector-tokens, no-get-property-value-ds) and Chrome Axiom
       # rules (A1.1-A1.3) surface as IDE warnings; real enforcement lives
