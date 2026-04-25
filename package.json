@@ -16,6 +16,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.91.1",
     "@auth/prisma-adapter": "^2.0.0",
     "@prisma/client": "^5.22.0",
     "@react-email/components": "^1.0.10",
