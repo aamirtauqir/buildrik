@@ -46,7 +46,11 @@
    * start state). Migrated from editor/canvas/Canvas.css 2026-04-26. */
   .buildrick-hover-overlay,
   .buildrick-drop-feedback-badge,
-  .buildrick-drop-feedback-target {
+  .buildrick-drop-feedback-target,
+  .buildrick-drop-position-line,
+  .buildrick-drop-slot-preview,
+  .buildrick-drop-breadcrumb,
+  .buildrick-depth-badge {
     opacity: 1 !important;
   }
 
@@ -61,6 +65,18 @@
    * Migrated from editor/rail/DrawerPanel.css 2026-04-26. */
   .drawer-panel__close-btn:hover {
     transform: none;
+  }
+
+  /* Force-stop spinner + skeleton loop animations. Universal rule sets
+   * iteration-count to 1 but spinners use infinite loops with deferred name
+   * resolution; explicit `animation: none` is needed to halt them.
+   * Migrated from themes/components.css + editor/sidebar/tabs/templates/
+   * ApplyProgressOverlay.css 2026-04-26. */
+  .buildrick-spinner,
+  .buildrick-skeleton-pulse,
+  .buildrick-skeleton-wave,
+  .tmpl-progress__spinner {
+    animation: none !important;
   }
 }
 

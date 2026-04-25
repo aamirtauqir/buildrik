@@ -1241,19 +1241,6 @@
    prefer reduced motion and enables stable
    Playwright screenshots via emulateMedia().
    ───────────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .buildrick-skeleton-shimmer,
-  .buildrick-skeleton-card,
-  .buildrick-skeleton-row,
-  .buildrick-skeleton-text,
-  .buildrick-skeleton-icon,
-  .buildrick-animate-spin,
-  .buildrick-animate-pulse {
-    animation: none !important;
-    transition: none !important;
-  }
-}
-
 /* ─────────────────────────────────────────────
    DIVIDER STYLES
    ───────────────────────────────────────────── */
@@ -4590,12 +4577,6 @@
   opacity: 0.9;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .tmpl-preview { animation: none; }
-  .tmpl-preview--closing { transition: none; }
-  .tmpl-preview__frame { transition: none; }
-}
-
 /* ─────────────────────────────────────────────
    TEMPLATE APPLY PROGRESS OVERLAY (Phase 6)
    ───────────────────────────────────────────── */
@@ -4728,12 +4709,6 @@
 
 .tmpl-progress__step--active .tmpl-progress__label {
   color: #c7cad6;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tmpl-progress { animation: none; }
-  .tmpl-progress__spinner { animation: none; }
-  .tmpl-progress__fill { transition: none; }
 }
 
 /* ─────────────────────────────────────────────
@@ -4997,11 +4972,6 @@
 
 .tmpl-onboarding__next:hover {
   color: #c7d2fe;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tmpl-onboarding__spotlight { transition: none; }
-  .tmpl-onboarding__tooltip { transition: none; }
 }
 
 /* ─────────────────────────────────────────────
@@ -7000,15 +6970,3 @@
   animation: buildrick-panel-fade-in 150ms ease both;
 }
 
-/* ═══ Reduced Motion ═══ */
-@media (prefers-reduced-motion: reduce) {
-  .buildrick-left-sidebar *,
-  .buildrick-left-sidebar *::before,
-  .buildrick-left-sidebar *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-}

@@ -416,11 +416,3 @@
   outline: 2px solid var(--buildrick-accent);
   outline-offset: -2px;
 }
-
-/* Reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  .layout-shell__drawer,
-  .layout-shell__inspector {
-    transition: opacity var(--duration-fast, 150ms) ease;
-  }
-}

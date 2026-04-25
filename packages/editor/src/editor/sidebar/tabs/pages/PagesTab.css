@@ -1355,16 +1355,6 @@
   line-height: 1.4;
 }
 
-/* ─── REDUCED MOTION GUARD ────────────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .bd-pg-panel *,
-  .bd-pg-panel *::before,
-  .bd-pg-panel *::after {
-    transition: none !important;
-    animation: none !important;
-  }
-}
-
 /* ─── A11Y FOCUS RING ─────────────────────────────────────────────────── */
 .bd-pg-row:focus-visible,
 .bd-pg-add:focus-visible,

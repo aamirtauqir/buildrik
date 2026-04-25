@@ -122,16 +122,3 @@
   border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
   flex-shrink: 0;
 }
-
-/* ============================================
-   Accessibility - Reduced Motion
-   ============================================ */
-@media (prefers-reduced-motion: reduce) {
-  .drawer-panel__close-btn {
-    transition: none;
-  }
-
-  .drawer-panel__close-btn:hover {
-    transform: none;
-  }
-}

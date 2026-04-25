@@ -207,14 +207,3 @@
 .tmpl-preview__use:hover {
   opacity: 0.85;
 }
-
-/* ── Reduced motion ── */
-@media (prefers-reduced-motion: reduce) {
-  .tmpl-preview,
-  .tmpl-preview--closing {
-    animation: none;
-  }
-  .tmpl-preview__frame {
-    transition: none;
-  }
-}

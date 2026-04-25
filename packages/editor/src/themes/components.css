@@ -1557,23 +1557,6 @@ textarea:focus-visible,
   border: 0;
 }
 
-@media (prefers-contrast: high) {
-:root {
-    --buildrick-border: #64748b;
-    --buildrick-border-light: #94a3b8;
-  }
-
-.buildrick-btn {
-    border: 2px solid currentColor;
-  }
-
-.buildrick-input,
-  .buildrick-select,
-  .buildrick-textarea {
-    border-width: 2px;
-  }
-}
-
 @media (max-width: 640px) {
 .navBar .left,
   .navBar .right {
@@ -1583,26 +1566,6 @@ textarea:focus-visible,
 .pill {
     padding: 0 10px;
     font-size: 12px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-*,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
-.buildrick-spinner {
-    animation: none !important;
-  }
-
-.buildrick-skeleton-pulse,
-  .buildrick-skeleton-wave {
-    animation: none !important;
   }
 }
 
@@ -1753,12 +1716,6 @@ textarea:disabled {
 
   100% {
     transform: scale(1);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-.buildrick-element-flash {
-    animation: buildrick-flash 0.3s ease-out;
   }
 }
 

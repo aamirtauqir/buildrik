@@ -665,18 +665,6 @@
   pointer-events: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-.buildrick-drop-feedback-badge,
-  .buildrick-drop-feedback-target,
-  .buildrick-drop-position-line,
-  .buildrick-drop-slot-preview,
-  .buildrick-drop-breadcrumb,
-  .buildrick-depth-badge {
-    animation: none !important;
-    transition: none !important;
-    opacity: 1 !important;
-  }
-}
 
 @keyframes flashOnDrop {
   0% {
@@ -711,14 +699,6 @@
 .buildrick-element-settle {
   animation: settleElement 0.3s ease-out;
 }
-
-@media (prefers-reduced-motion: reduce) {
-.buildrick-element-flash,
-  .buildrick-element-settle {
-    animation: none !important;
-  }
-}
-
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-id] {
   outline: 1px dashed var(--bd-box-content) !important;
   outline-offset: -1px;
@@ -858,46 +838,3 @@
   top: 0;
 }
 
-@media (prefers-contrast: high) {
-:focus-visible {
-    outline: 3px solid CanvasText;
-    outline-offset: 2px;
-  }
-
-[data-buildrick-id][data-selected="true"] {
-    outline: 3px solid Highlight;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-:focus-visible {
-    transition: none;
-  }
-
-.buildrick-selection-box,
-  .buildrick-selection-box--appearing,
-  .buildrick-drag-handle,
-  .buildrick-drop-indicator-top,
-  .buildrick-drop-indicator-bottom,
-  .buildrick-drop-indicator-left,
-  .buildrick-drop-indicator-right,
-  .buildrick-layer-hover-highlight {
-    animation: none !important;
-    transition: none !important;
-  }
-
-[data-buildrick-id],
-  [data-buildrick-id]:hover,
-  [data-buildrick-id][data-selected="true"],
-  [data-buildrick-id][data-drop-target="true"] {
-    transition: none !important;
-  }
-
-.buildrick-hover-overlay,
-  .buildrick-drop-feedback-badge,
-  .buildrick-drop-feedback-target {
-    animation: none !important;
-    transition: none !important;
-    opacity: 1 !important;
-  }
-}
