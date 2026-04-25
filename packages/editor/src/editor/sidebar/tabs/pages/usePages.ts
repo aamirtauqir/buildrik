@@ -132,7 +132,7 @@ export function usePages(composer: Composer | null): UsePagesReturn {
   React.useEffect(() => {
     if (!contextMenu) return;
     const handle = (e: MouseEvent) => {
-      if ((e.target as Element).closest?.(".pg-ctx-menu")) return;
+      if ((e.target as Element).closest?.(".bd-pg-menu")) return;
       setContextMenu(null);
     };
     document.addEventListener("mousedown", handle);
