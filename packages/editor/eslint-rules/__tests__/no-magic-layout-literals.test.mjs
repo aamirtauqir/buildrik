@@ -39,6 +39,25 @@ ruleTester.run("no-magic-layout-literals", rule, {
       code: "const s = `width: 60px`;",
       errors: [{ messageId: "magicLiteral" }],
     },
+    // Coverage: long-hand padding variants must fire in template strings.
+    {
+      code: "const s = `padding-top: 60px`;",
+      errors: [{ messageId: "magicLiteral" }],
+    },
+    // Coverage: flex-basis must fire in template strings.
+    {
+      code: "const s = `flex-basis: 240px`;",
+      errors: [{ messageId: "magicLiteral" }],
+    },
+    // Scope: a policy comment at file top does NOT exempt later sites.
+    // First decl is exempt (comment on its line). Second decl must still error.
+    {
+      code:
+        "// @lint-layout-policy: ok\n" +
+        "const a = { width: 60 };\n" +
+        "const b = { width: 60 };\n",
+      errors: [{ messageId: "magicLiteral" }],
+    },
   ],
 });
 console.log("no-magic-layout-literals: all tests pass");
