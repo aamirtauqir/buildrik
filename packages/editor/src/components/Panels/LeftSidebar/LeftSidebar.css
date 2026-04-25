@@ -372,14 +372,14 @@
 }
 
 .buildrick-pill-tip {
-  background: rgba(124, 125, 255, 0.08);
-  border-color: rgba(124, 125, 255, 0.15);
+  background: rgba(45, 109, 255, 0.08);
+  border-color: rgba(45, 109, 255, 0.15);
   color: var(--buildrick-accent);
 }
 
 .buildrick-pill-tip:hover {
-  background: rgba(124, 125, 255, 0.12);
-  border-color: rgba(124, 125, 255, 0.25);
+  background: rgba(45, 109, 255, 0.12);
+  border-color: rgba(45, 109, 255, 0.25);
 }
 
 .buildrick-pill-dismiss {
@@ -461,7 +461,7 @@
 
 .buildrick-element-star:hover {
   color: var(--buildrick-accent);
-  background: rgba(124, 125, 255, 0.1);
+  background: rgba(45, 109, 255, 0.1);
 }
 
 .buildrick-element-star.favorited {
@@ -495,7 +495,7 @@
 
 .buildrick-element-insert:hover {
   color: var(--buildrick-accent);
-  background: rgba(124, 125, 255, 0.1);
+  background: rgba(45, 109, 255, 0.1);
 }
 
 /* ─────────────────────────────────────────────
@@ -557,7 +557,7 @@
   padding-right: var(--bd-space-5); /* Space for star icon (prevents text overlap) */
 }
 
-/* Purple icon with background */
+/* Element icon container — sized 28px wide, no background */
 .buildrick-element-card-icon {
   display: flex;
   align-items: center;
@@ -2269,15 +2269,6 @@
   border-color: var(--buildrick-amber-border);
 }
 
-.buildrick-feature-icon--purple {
-  background: linear-gradient(135deg, var(--buildrick-purple-light), var(--buildrick-purple-dark));
-  color: var(--buildrick-accent);
-}
-
-.buildrick-feature-row--purple:hover {
-  border-color: var(--buildrick-purple-border);
-}
-
 /* Feature content */
 .buildrick-feature-content {
   display: flex;
@@ -2323,7 +2314,6 @@
 .buildrick-feature-row--blue:hover .buildrick-feature-chevron { color: var(--buildrick-accent); }
 .buildrick-feature-row--emerald:hover .buildrick-feature-chevron { color: var(--buildrick-accent-emerald); }
 .buildrick-feature-row--amber:hover .buildrick-feature-chevron { color: var(--buildrick-accent-amber); }
-.buildrick-feature-row--purple:hover .buildrick-feature-chevron { color: var(--buildrick-accent); }
 
 /* ============================================
    Sub-Tab Toggle (IA Redesign 2026 - 8-tab structure)
@@ -2853,7 +2843,7 @@
 
 .buildrick-template-row.selected {
   border-left: 2px solid var(--buildrick-accent);
-  background: rgba(124, 125, 255, 0.08);
+  background: rgba(45, 109, 255, 0.08);
 }
 
 /* Preview → button (hover-visible on card) */
@@ -3878,8 +3868,8 @@
   gap: var(--bd-space-2);
   padding: 10px var(--bd-space-3);
   margin: 0 var(--bd-space-3) var(--bd-space-2);
-  background: rgba(124, 125, 255, 0.08);
-  border: 1px solid rgba(124, 125, 255, 0.2);
+  background: rgba(45, 109, 255, 0.08);
+  border: 1px solid rgba(45, 109, 255, 0.2);
   border-radius: 10px;
 }
 
@@ -3938,7 +3928,7 @@
 
 .buildrick-create-component-btn:hover {
   transform: scale(1.02);
-  box-shadow: 0 4px 12px rgba(124, 125, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(45, 109, 255, 0.3);
 }
 
 /* Component List (40px rows per wireframe spec) */
@@ -3964,7 +3954,7 @@
 
 .buildrick-component-row:hover {
   background: var(--buildrick-surface-4);
-  border-color: rgba(124, 125, 255, 0.3);
+  border-color: rgba(45, 109, 255, 0.3);
 }
 
 .buildrick-component-row:active {
@@ -3973,7 +3963,7 @@
 
 .buildrick-component-row.selected {
   border-color: var(--buildrick-accent);
-  background: rgba(124, 125, 255, 0.08);
+  background: rgba(45, 109, 255, 0.08);
 }
 
 /* Component Thumbnail (18x18 per wireframe spec) */
@@ -4010,15 +4000,15 @@
   flex-shrink: 0;
 }
 
-/* Component Add Button - Purple accent */
+/* Component Add Button — cobalt accent (was purple pre-cobalt; converged 2026-04-26) */
 .buildrick-component-add-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 28px;
   padding: 0 var(--bd-space-3);
-  background: rgba(124, 125, 255, 0.18);
-  border: 1px solid rgba(124, 125, 255, 0.55);
+  background: rgba(45, 109, 255, 0.10);
+  border: 1px solid rgba(45, 109, 255, 0.45);
   border-radius: 8px;
   font-size: var(--buildrick-text-sm-plus);
   font-weight: 700;
@@ -4034,8 +4024,8 @@
 }
 
 .buildrick-component-add-btn:hover {
-  background: rgba(124, 125, 255, 0.28);
-  border-color: rgba(124, 125, 255, 0.75);
+  background: rgba(45, 109, 255, 0.18);
+  border-color: rgba(45, 109, 255, 0.65);
 }
 
 /* Component Info */
@@ -4194,7 +4184,7 @@
 
 .buildrick-empty-state-inline button:hover {
   background: var(--buildrick-surface-3);
-  border-color: rgba(124, 125, 255, 0.3);
+  border-color: rgba(45, 109, 255, 0.3);
   color: var(--buildrick-accent);
 }
 
@@ -5251,7 +5241,7 @@
 
 .buildrick-radio-option:hover {
   background: var(--buildrick-surface-4);
-  border-color: rgba(124, 125, 255, 0.3);
+  border-color: rgba(45, 109, 255, 0.3);
 }
 
 .buildrick-radio-option.selected {
@@ -5446,7 +5436,7 @@
 
 .buildrick-btn-secondary:hover {
   background: var(--buildrick-surface-4);
-  border-color: rgba(124, 125, 255, 0.3);
+  border-color: rgba(45, 109, 255, 0.3);
 }
 
 .buildrick-btn-primary {
@@ -5771,8 +5761,8 @@
   flex-direction: column;
   gap: var(--bd-space-2);
   padding: var(--bd-space-3);
-  background: rgba(124, 125, 255, 0.08);
-  border: 1px solid rgba(124, 125, 255, 0.2);
+  background: rgba(45, 109, 255, 0.08);
+  border: 1px solid rgba(45, 109, 255, 0.2);
   border-radius: var(--buildrick-radius-md);
 }
 
