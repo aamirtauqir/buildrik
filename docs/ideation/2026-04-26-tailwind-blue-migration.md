@@ -3,7 +3,11 @@
 **Trigger:** TODOS.md "CI grep rule for banned indigo/violet hex" RESOLVED commit (`9b690ff`) flagged Tailwind blue palette as same-class drift, separate workstream.
 **Followup to:** `docs/ideation/2026-04-26-banned-color-cleanup.md` (the original cobalt convergence cleanup).
 
-## STATUS: PAUSED 2026-04-26 — pending @lint-hex-policy decision
+## STATUS: RESUMING 2026-04-26 — policy P1 chosen (lint-only interpretation)
+
+**Decision (2026-04-26):** P1 selected. Author confirmed marker rationale is lost — was reflexive lint-quietener during 74483e4f cleanup, not load-bearing design statement. Marker means "skip Gate 16 baseline". SSOT cobalt convergence overrides marker. Workstream proceeds full 109 sites. Marker is removed from files where all hex is migrated (becomes vestigial post-cleanup).
+
+## Original conflict context (preserved for archaeology)
 
 Phase 1 inventory + initial C1 bulk sed surfaced a major repo convention I missed in the inventory pass:
 

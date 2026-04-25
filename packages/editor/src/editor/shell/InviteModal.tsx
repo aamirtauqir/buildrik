@@ -19,13 +19,13 @@ interface Member {
 
 // Sample existing members (in real app: from API)
 const MOCK_MEMBERS: Member[] = [
-  { name: "Sarah Chen", email: "sarah@acme.io", role: "Editor", avatarColor: "#3B82F6", initials: "SC" },
+  { name: "Sarah Chen", email: "sarah@acme.io", role: "Editor", avatarColor: "var(--bd-accent)", initials: "SC" },
   { name: "Mike Rosa", email: "mike.rosa@acme.io", role: "Admin", avatarColor: "var(--bd-fg-secondary)", initials: "MR" },
   { name: "Nora Patel", email: "nora.patel@acme.io", role: "Viewer", avatarColor: "#10B981", initials: "NP" },
 ];
 
 const ROLE_COLORS: Record<Role, { bg: string; text: string }> = {
-  Editor: { bg: "#EFF6FF", text: "var(--bd-accent)" },
+  Editor: { bg: "var(--bd-accent-tint)", text: "var(--bd-accent)" },
   Admin:  { bg: "#FEF3C7", text: "#92400E" },
   Viewer: { bg: "var(--bd-bg-subtle)", text: "#475569" },
 };
@@ -245,7 +245,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                   fontFamily: "inherit",
                   transition: "border-color 0.1s ease",
                 }}
-                onFocus={(e) => { e.currentTarget.style.borderColor = "#2563EB"; }}
+                onFocus={(e) => { e.currentTarget.style.borderColor = "var(--bd-accent)"; }}
                 onBlur={(e) => { e.currentTarget.style.borderColor = "var(--bd-border)"; }}
               />
               <select
@@ -297,7 +297,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                 boxSizing: "border-box",
                 transition: "border-color 0.1s ease",
               }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = "#2563EB"; }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = "var(--bd-accent)"; }}
               onBlur={(e) => { e.currentTarget.style.borderColor = "var(--bd-border)"; }}
             />
           </div>
@@ -399,7 +399,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
             disabled={!email.trim()}
             style={{
               padding: "7px 16px",
-              background: email.trim() ? "#2563EB" : "var(--bd-fg-muted)",
+              background: email.trim() ? "var(--bd-accent)" : "var(--bd-fg-muted)",
               border: "none",
               borderRadius: 8,
               fontSize: 13,
@@ -410,7 +410,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               transition: "background 0.1s ease",
             }}
             onMouseEnter={(e) => { if (email.trim()) e.currentTarget.style.background = "var(--bd-accent-pressed)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = email.trim() ? "#2563EB" : "var(--bd-fg-muted)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = email.trim() ? "var(--bd-accent)" : "var(--bd-fg-muted)"; }}
           >
             Send Invite
           </button>

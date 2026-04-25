@@ -1,7 +1,4 @@
 /**
- * @lint-hex-policy: component-theme
- *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
- *
  * AccountModal — Full-screen account settings overlay
  * 4 tabs: Profile, Team & Access, Collaboration Settings, Plans & Billing.
  *
@@ -22,13 +19,13 @@ interface Member {
 }
 
 const MOCK_MEMBERS: Member[] = [
-  { name: "Sarah Chen",  email: "sarah@acme.io",         role: "Editor", avatarColor: "#3B82F6", initials: "SC" },
+  { name: "Sarah Chen",  email: "sarah@acme.io",         role: "Editor", avatarColor: "var(--bd-accent)", initials: "SC" },
   { name: "Mike Rosa",   email: "mike.rosa@acme.io",     role: "Admin",  avatarColor: "var(--bd-fg-secondary)", initials: "MR" },
   { name: "Nora Patel",  email: "nora.patel@acme.io",    role: "Viewer", avatarColor: "#10B981", initials: "NP" },
 ];
 
 const ROLE_COLORS: Record<Role, { bg: string; text: string }> = {
-  Editor: { bg: "#EFF6FF", text: "var(--bd-accent)" },
+  Editor: { bg: "var(--bd-accent-tint)", text: "var(--bd-accent)" },
   Admin:  { bg: "#FEF3C7", text: "#92400E" },
   Viewer: { bg: "var(--bd-bg-subtle)", text: "#475569" },
 };
@@ -52,7 +49,7 @@ const Toggle: React.FC<{ on: boolean }> = ({ on }) => (
       height: 20,
       width: 40,
       borderRadius: 999,
-      background: on ? "#2563EB" : "var(--bd-border)",
+      background: on ? "var(--bd-accent)" : "var(--bd-border)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -475,13 +472,13 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
                   display: "flex",
                   alignItems: "center",
                   cursor: "pointer",
-                  border: isActive ? "1px solid #BFDBFE" : "1px solid transparent",
+                  border: isActive ? "1px solid var(--bd-accent-alpha-30)" : "1px solid transparent",
                   width: "100%",
                   textAlign: "left",
                   fontFamily: "inherit",
                   fontSize: 13,
                   fontWeight: isActive ? 600 : 500,
-                  background: isActive ? "#EFF6FF" : "transparent",
+                  background: isActive ? "var(--bd-accent-tint)" : "transparent",
                   color: isActive ? "var(--bd-accent)" : "var(--bd-fg-secondary)",
                 }}
               >

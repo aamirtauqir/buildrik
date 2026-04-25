@@ -2,7 +2,7 @@
  * PublishDropdown — Topbar publish button with 4 workflow states.
  *
  * States:
- *   draft      → blue  #2563EB  — Submit for Review / Publish Directly / View Live Site
+ *   draft      → cobalt accent — Submit for Review / Publish Directly / View Live Site
  *   in-review  → amber #92400E  — Approve (disabled) / Request Changes / View Live Site
  *   approved   → green #166534  — Publish Now / View Live Site
  *   published  → cyan  #0EA5E9  — Submit for Review / Unpublish / View Live Site / Copy URL / Deployment Status
@@ -36,12 +36,12 @@ interface StateConfig {
 const STATE_CONFIG: Record<PublishState, StateConfig> = {
   draft: {
     buttonLabel: "Publish",
-    bg: "#2563EB",
+    bg: "var(--bd-accent)",
     hoverBg: "var(--bd-accent-pressed)",
     iconColor: "var(--bd-bg-card)",
     textColor: "var(--bd-bg-card)",
-    chevronColor: "#DBEAFE",
-    badge: { label: "Draft", bg: "#1E3A8A", text: "#BFDBFE" },
+    chevronColor: "var(--bd-accent-tint)",
+    badge: { label: "Draft", bg: "var(--bd-accent-pressed)", text: "var(--bd-accent-alpha-30)" },
   },
   "in-review": {
     buttonLabel: "In Review",

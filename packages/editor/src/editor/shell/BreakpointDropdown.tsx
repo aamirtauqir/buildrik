@@ -1,7 +1,4 @@
 /**
- * @lint-hex-policy: component-theme
- *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
- *
  * BreakpointDropdown - Viewport width selector
  * Shows current viewport width, preset sizes, and custom input.
  * Used alongside DeviceSwitcherPill in the topbar.
@@ -174,9 +171,9 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
                     width: "100%",
                     height: 32,
                     padding: "0 12px",
-                    background: isActive ? "#EFF6FF" : "transparent",
+                    background: isActive ? "var(--bd-accent-tint)" : "transparent",
                     border: "none",
-                    color: isActive ? "#2563EB" : "#475569",
+                    color: isActive ? "var(--bd-accent)" : "#475569",
                     fontSize: 13,
                     cursor: "pointer",
                     textAlign: "left",
@@ -188,7 +185,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
                     }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = isActive ? "#EFF6FF" : "transparent";
+                    e.currentTarget.style.background = isActive ? "var(--bd-accent-tint)" : "transparent";
                   }}
                 >
                   <span style={{ flex: 1 }}>{preset.label}</span>
@@ -253,7 +250,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
                   MozAppearance: "textfield" as React.CSSProperties["MozAppearance"],
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#2563EB";
+                  e.currentTarget.style.borderColor = "var(--bd-accent)";
                 }}
                 aria-label="Custom viewport width in pixels"
               />

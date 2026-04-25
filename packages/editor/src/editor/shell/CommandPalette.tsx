@@ -239,7 +239,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
                       justifyContent: "space-between",
                       width: "100%",
                       padding: "8px 16px",
-                      background: isActive ? "#EFF6FF" : "transparent",
+                      background: isActive ? "var(--bd-accent-tint)" : "transparent",
                       border: "none",
                       color: isActive ? "var(--bd-accent)" : "var(--bd-fg-primary)",
                       fontSize: 13,
@@ -250,7 +250,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ color: isActive ? "#2563EB" : "var(--bd-fg-muted)", flexShrink: 0 }}>
+                      <span style={{ color: isActive ? "var(--bd-accent)" : "var(--bd-fg-muted)", flexShrink: 0 }}>
                         <IconArrow dir="right" />
                       </span>
                       <span>{action.label}</span>
@@ -259,8 +259,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
                       <kbd
                         style={{
                           padding: "2px 6px",
-                          background: isActive ? "#DBEAFE" : "var(--bd-bg-panel)",
-                          border: `1px solid ${isActive ? "#BFDBFE" : "var(--bd-border)"}`,
+                          background: isActive ? "var(--bd-accent-tint)" : "var(--bd-bg-panel)",
+                          border: `1px solid ${isActive ? "var(--bd-accent-alpha-30)" : "var(--bd-border)"}`,
                           borderRadius: 4,
                           fontSize: 10,
                           color: isActive ? "var(--bd-accent)" : "var(--bd-fg-secondary)",
