@@ -1,7 +1,7 @@
 /**
  * FormInput — form-sized single-line text field for settings/pages/dialog forms.
  *
- * Week 1 primitive extraction from project/preview/comp-inputs.html (.inp).
+ * Week 1 primitive extraction from docs/reference/preview/comp-inputs.html (.inp).
  * Distinct from TextInput (which is inspector-sized at 20/24/28px).
  * This one is form-sized at 28/34/40px with white background and medium border.
  *

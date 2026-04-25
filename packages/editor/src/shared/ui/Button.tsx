@@ -1,7 +1,7 @@
 /**
  * Aquibra Button Component
  *
- * Week 1 primitive reconciliation against project/preview/comp-buttons.html.
+ * Week 1 primitive reconciliation against docs/reference/preview/comp-buttons.html.
  * Variants: primary, secondary, ghost, danger (subtle), publish (pill CTA).
  * Tokens: --bd-* only (per plan Premise 2).
  *

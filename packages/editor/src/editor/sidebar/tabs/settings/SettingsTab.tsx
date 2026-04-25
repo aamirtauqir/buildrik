@@ -5,7 +5,7 @@
  * Branding renders a placeholder linking to the Palette tab (no embedded
  * DesignSystemTab chrome).
  *
- * Spec: packages/editor/project/left-panel/tab-settings.html
+ * Spec: docs/reference/left-panel/tab-settings.html
  *
  * @license BSD-3-Clause
  */

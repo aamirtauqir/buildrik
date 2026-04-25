@@ -1,6 +1,6 @@
 /**
  * IntegrationsHub — stacks Analytics + Integrations + Advanced into a single
- * "Integrations" screen per packages/editor/project/left-panel/tab-settings.html
+ * "Integrations" screen per docs/reference/left-panel/tab-settings.html
  * spec. Backend data models untouched; each child still owns its own fields
  * and save path.
  *
