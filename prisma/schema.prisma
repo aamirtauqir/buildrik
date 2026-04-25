@@ -8,27 +8,28 @@ datasource db {
 }
 
 model User {
-  id               String    @id @default(cuid())
-  email            String    @unique
-  fullName         String
-  displayName      String?
-  passwordHash     String?
-  avatar           String?
-  bio              String?
-  language         String    @default("en")
-  timezone         String    @default("UTC")
-  emailVerified    DateTime?
-  twoFactorEnabled Boolean   @default(false)
-  twoFactorSecret  String?
-  backupCodes      String[]
-  provider         String    @default("email")
-  lockedUntil      DateTime?
-  failedAttempts   Int       @default(0)
-  lastLoginAt      DateTime?
-  emailBounceCount Int       @default(0)
-  deletedAt        DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                String    @id @default(cuid())
+  email             String    @unique
+  fullName          String
+  displayName       String?
+  passwordHash      String?
+  avatar            String?
+  bio               String?
+  language          String    @default("en")
+  timezone          String    @default("UTC")
+  emailVerified     DateTime?
+  twoFactorEnabled  Boolean   @default(false)
+  twoFactorSecret   String?
+  backupCodes       String[]
+  provider          String    @default("email")
+  lockedUntil       DateTime?
+  failedAttempts    Int       @default(0)
+  lastLoginAt       DateTime?
+  emailBounceCount  Int       @default(0)
+  deletedAt         DateTime?
+  passwordChangedAt DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   accounts         Account[]
   sessions         Session[]
@@ -38,7 +39,7 @@ model User {
 }
 
 model Account {
-  id                String  @id @default(cuid())
+  id                String   @id @default(cuid())
   userId            String
   type              String
   provider          String
@@ -49,10 +50,12 @@ model Account {
   token_type        String?
   scope             String?
   id_token          String?
+  createdAt         DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@unique([userId, provider])
   @@map("accounts")
 }
 
@@ -88,15 +91,15 @@ model VerificationToken {
 }
 
 model WorkspaceMember {
-  id          String    @id @default(cuid())
-  userId      String
-  workspaceId String
-  role        String    @default("EDITOR")
-  status      String    @default("ACTIVE")
-  invitedBy   String?
+  id           String    @id @default(cuid())
+  userId       String
+  workspaceId  String
+  role         String    @default("EDITOR")
+  status       String    @default("ACTIVE")
+  invitedBy    String?
   lastActiveAt DateTime?
-  suspendedAt DateTime?
-  joinedAt    DateTime  @default(now())
+  suspendedAt  DateTime?
+  joinedAt     DateTime  @default(now())
 
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   workspace       Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
@@ -107,29 +110,29 @@ model WorkspaceMember {
 }
 
 model Workspace {
-  id                   String    @id @default(cuid())
-  name                 String
-  slug                 String    @unique
-  ownerId              String
-  plan                 String    @default("FREE")
-  defaultLanguage      String    @default("en")
-  timezone             String    @default("UTC")
-  stripeCustomerId     String?   @unique
-  deletionScheduledAt  DateTime?
-  deletedAt            DateTime?
-  iconUrl              String?
-  accentColor          String?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  id                  String    @id @default(cuid())
+  name                String
+  slug                String    @unique
+  ownerId             String
+  plan                String    @default("FREE")
+  defaultLanguage     String    @default("en")
+  timezone            String    @default("UTC")
+  stripeCustomerId    String?   @unique
+  deletionScheduledAt DateTime?
+  deletedAt           DateTime?
+  iconUrl             String?
+  accentColor         String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
-  members       WorkspaceMember[]
-  sites         Site[]
-  invites       Invite[]
-  subscription  Subscription?
-  integrations  WorkspaceIntegration[]
+  members         WorkspaceMember[]
+  sites           Site[]
+  invites         Invite[]
+  subscription    Subscription?
+  integrations    WorkspaceIntegration[]
   sharingSettings WSSharingSettings?
-  folders       Folder[]
-  activityLogs  ActivityLog[]
+  folders         Folder[]
+  activityLogs    ActivityLog[]
 
   @@map("workspaces")
 }
@@ -182,18 +185,18 @@ model Site {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
-  workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  folder         Folder?         @relation(fields: [folderId], references: [id], onDelete: SetNull)
-  sitePages      Page[]
-  domains        Domain[]
-  shareLinks     ShareLink[]
-  permissions    SitePermission[]
-  analytics      SiteAnalytics[]
-  formBlocks     FormBlock[]
+  workspace       Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  folder          Folder?           @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  sitePages       Page[]
+  domains         Domain[]
+  shareLinks      ShareLink[]
+  permissions     SitePermission[]
+  analytics       SiteAnalytics[]
+  formBlocks      FormBlock[]
   formSubmissions FormSubmission[]
-  redirects      Redirect[]
-  slugHistory    SlugHistory[]
-  publishJobs    PublishBuildJob[]
+  redirects       Redirect[]
+  slugHistory     SlugHistory[]
+  publishJobs     PublishBuildJob[]
   analyticsEvents AnalyticsEvent[]
 
   @@index([workspaceId])
@@ -303,13 +306,13 @@ model ShareLink {
 }
 
 model SitePermission {
-  id           String   @id @default(cuid())
-  memberId     String
-  siteId       String
-  roleOverride String
-  grantedBy    String
+  id            String   @id @default(cuid())
+  memberId      String
+  siteId        String
+  roleOverride  String
+  grantedBy     String
   grantedByName String?
-  createdAt    DateTime @default(now())
+  createdAt     DateTime @default(now())
 
   member WorkspaceMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
   site   Site            @relation(fields: [siteId], references: [id], onDelete: Cascade)
@@ -319,23 +322,23 @@ model SitePermission {
 }
 
 model Subscription {
-  id                        String   @id @default(cuid())
-  workspaceId               String   @unique
-  stripeSubscriptionId      String   @unique
-  stripeCurrentPeriodStart  DateTime
-  stripeCurrentPeriodEnd    DateTime
-  stripePriceId             String
-  plan                      String   @default("FREE")
-  status                    String   @default("ACTIVE")
-  interval                  String   @default("MONTHLY")
-  price                     Int
-  currency                  String   @default("usd")
-  cancelAtPeriodEnd         Boolean  @default(false)
-  cancelReason              String?
-  cancelFeedback            String?
-  isGrandfathered           Boolean  @default(false)
-  createdAt                 DateTime @default(now())
-  updatedAt                 DateTime @updatedAt
+  id                       String   @id @default(cuid())
+  workspaceId              String   @unique
+  stripeSubscriptionId     String   @unique
+  stripeCurrentPeriodStart DateTime
+  stripeCurrentPeriodEnd   DateTime
+  stripePriceId            String
+  plan                     String   @default("FREE")
+  status                   String   @default("ACTIVE")
+  interval                 String   @default("MONTHLY")
+  price                    Int
+  currency                 String   @default("usd")
+  cancelAtPeriodEnd        Boolean  @default(false)
+  cancelReason             String?
+  cancelFeedback           String?
+  isGrandfathered          Boolean  @default(false)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
 
   workspace     Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   paymentMethod PaymentMethod?
@@ -344,14 +347,14 @@ model Subscription {
 }
 
 model PaymentMethod {
-  id                     String @id @default(cuid())
-  subscriptionId         String @unique
-  stripePaymentMethodId  String
-  type                   String
-  brand                  String
-  last4                  String
-  expMonth               Int
-  expYear                Int
+  id                    String @id @default(cuid())
+  subscriptionId        String @unique
+  stripePaymentMethodId String
+  type                  String
+  brand                 String
+  last4                 String
+  expMonth              Int
+  expYear               Int
 
   subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
 
@@ -453,8 +456,8 @@ model SiteAnalytics {
 
   site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
-  @@index([siteId, date])
   @@unique([siteId, date])
+  @@index([siteId, date])
   @@map("site_analytics")
 }
 
@@ -476,19 +479,19 @@ model AnalyticsEvent {
 }
 
 model FormBlock {
-  id              String   @id @default(cuid())
-  siteId          String
-  pageId          String?
-  blockId         String
-  name            String
-  fields          Json
-  submitButtonText String @default("Submit")
-  successMessage  String?
-  notifyEmail     String?
-  webhookUrl      String?
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               String   @id @default(cuid())
+  siteId           String
+  pageId           String?
+  blockId          String
+  name             String
+  fields           Json
+  submitButtonText String   @default("Submit")
+  successMessage   String?
+  notifyEmail      String?
+  webhookUrl       String?
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   site        Site             @relation(fields: [siteId], references: [id], onDelete: Cascade)
   submissions FormSubmission[]
@@ -525,7 +528,7 @@ model Template {
   description String?
   thumbnail   String?
   previewUrl  String?
-  difficulty    String    @default("BEGINNER")
+  difficulty  String   @default("BEGINNER")
   pages       Json
   usageCount  Int      @default(0)
   isActive    Boolean  @default(true)
@@ -717,14 +720,4 @@ model Redirect {
 
   @@index([siteId])
   @@map("redirects")
-}
-
-model ConnectedAccount {
-  id             String @id @default(cuid())
-  userId         String
-  provider       String
-  providerUserId String
-  tokens         Json?
-
-  @@map("connected_accounts")
 }

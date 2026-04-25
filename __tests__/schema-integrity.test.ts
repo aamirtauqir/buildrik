@@ -22,13 +22,13 @@ describe("Prisma Schema Integrity", () => {
       "WorkspaceIntegration", "WSSharingSettings",
       "HelpArticle", "SupportTicket", "ExportJob", "UserPreference",
       "SlugHistory", "WorkspaceTransfer", "AccountDeletionReq",
-      "LoginAttempt", "PublishBuildJob", "Redirect", "ConnectedAccount",
+      "LoginAttempt", "PublishBuildJob", "Redirect",
     ];
 
     for (const model of expectedModels) {
       expect(schema, `Missing model: ${model}`).toContain(`model ${model}`);
     }
-    expect(expectedModels).toHaveLength(41);
+    expect(expectedModels).toHaveLength(40);
   });
 
   it("schema has required unique constraints", () => {
