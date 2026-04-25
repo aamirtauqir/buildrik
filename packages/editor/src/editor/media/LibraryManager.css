@@ -29,11 +29,11 @@
   white-space: nowrap;
 }
 
-.mgr-title svg { width: 16px; height: 16px; color: var(--buildrick-accent, #1D4ED8); }
+.mgr-title svg { width: 16px; height: 16px; color: var(--buildrick-accent); }
 
 .mgr-title .mgr-tag {
   background: var(--buildrick-accent-tint, #DBEAFE);
-  color: var(--buildrick-text-primary, #1E40AF);
+  color: var(--buildrick-text-primary);
   font-size: 10px;
   font-weight: 700;
   padding: 2px 7px;
@@ -134,7 +134,7 @@
   padding: 0 14px;
   border-radius: 6px;
   border: 1px solid var(--buildrick-accent);
-  background: var(--buildrick-accent, #1D4ED8);
+  background: var(--buildrick-accent);
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -250,7 +250,7 @@
 
 .mgr-node.active {
   background: var(--buildrick-accent-tint, #DBEAFE);
-  color: var(--buildrick-text-primary, #1E40AF);
+  color: var(--buildrick-text-primary);
   font-weight: 600;
 }
 
@@ -339,7 +339,7 @@
 
 .mgr-pill.active {
   background: var(--buildrick-accent-tint, #DBEAFE);
-  color: var(--buildrick-text-primary, #1E40AF);
+  color: var(--buildrick-text-primary);
 }
 
 .mgr-spacer { flex: 1; }
@@ -597,7 +597,7 @@
   gap: var(--bd-space-2);
   padding: var(--bd-space-2) var(--bd-space-5);
   background: var(--buildrick-accent-tint, #DBEAFE);
-  border-bottom: 1px solid var(--buildrick-accent, #1D4ED8);
+  border-bottom: 1px solid var(--buildrick-accent);
   animation: mgr-slide-down 0.15s ease-out;
 }
 
@@ -609,7 +609,7 @@
 .mgr-bulk-count {
   font-size: 13px;
   font-weight: 600;
-  color: var(--buildrick-text-primary, #1E40AF);
+  color: var(--buildrick-text-primary);
   margin-right: var(--bd-space-2);
 }
 

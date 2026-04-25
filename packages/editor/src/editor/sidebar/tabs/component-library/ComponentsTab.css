@@ -26,7 +26,7 @@
 
 .comp-row--selected {
   background: var(--bd-accent-tint, #DBEAFE);
-  color: var(--bd-fg-primary, #1E40AF);
+  color: var(--bd-fg-primary);
 }
 
 /* ── comp-count-badge: usage count "6x" pill ────────────────────────────── */

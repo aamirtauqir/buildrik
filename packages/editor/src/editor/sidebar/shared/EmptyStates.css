@@ -43,7 +43,7 @@
   padding: var(--bd-space-2) var(--bd-space-4);
   border-radius: 6px;
   border: none;
-  background: var(--buildrick-accent, #1D4ED8);
+  background: var(--buildrick-accent);
   color: #fff;
   font-size: 12px;
   font-weight: 500;

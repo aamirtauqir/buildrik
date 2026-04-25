@@ -60,8 +60,8 @@
   height: 32px;
   padding: 0 14px;
   border-radius: 6px;
-  border: 1px solid var(--buildrick-accent, #1D4ED8);
-  background: var(--buildrick-accent, #1D4ED8);
+  border: 1px solid var(--buildrick-accent);
+  background: var(--buildrick-accent);
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -175,8 +175,8 @@
 .ie-tab:hover { color: var(--buildrick-text-secondary); }
 
 .ie-tab.active {
-  color: var(--buildrick-accent, #1D4ED8);
-  border-bottom-color: var(--buildrick-accent, #1D4ED8);
+  color: var(--buildrick-accent);
+  border-bottom-color: var(--buildrick-accent);
   font-weight: 600;
 }
 
@@ -219,7 +219,7 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: var(--buildrick-accent, #1D4ED8);
+  background: var(--buildrick-accent);
   cursor: pointer;
   border: 2px solid #fff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.15);
@@ -257,8 +257,8 @@
 
 .ie-preset.active {
   background: var(--buildrick-accent-tint, #DBEAFE);
-  color: var(--buildrick-text-primary, #1E40AF);
-  border-color: var(--buildrick-accent, #1D4ED8);
+  color: var(--buildrick-text-primary);
+  border-color: var(--buildrick-accent);
 }
 
 .ie-transform-btns {
