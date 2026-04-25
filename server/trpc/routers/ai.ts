@@ -8,6 +8,9 @@ import {
   summarizeChanges,
   suggestMilestone,
 } from "../../services/ai.service";
+import { streamContent } from "../../services/ai.service";
+import { checkQuota, recordUsage } from "../../services/quota.service";
+import { modelSchema, DEFAULT_MODEL } from "../../services/types";
 
 const contentInputSchema = z.object({
   prompt: z.string().min(1).max(5000),
@@ -70,6 +73,17 @@ const milestoneSuggestInputSchema = z.object({
       elementCount: z.number().int().nonnegative(),
     })
     .optional(),
+});
+
+const scopeSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("element"), id: z.string().min(1) }),
+  z.object({ kind: z.literal("page") }),
+]);
+
+const streamPromptInputSchema = z.object({
+  prompt: z.string().min(1).max(5000),
+  scope: scopeSchema,
+  model: modelSchema.default(DEFAULT_MODEL),
 });
 
 export const aiRouter = router({
@@ -183,5 +197,27 @@ export const aiRouter = router({
           message: err.message ?? "Milestone suggestion failed",
         });
       }
+    }),
+
+  getQuotaStatus: protectedProcedure.query(async ({ ctx }) => {
+    return checkQuota(ctx.session.user.id);
+  }),
+
+  streamPrompt: protectedProcedure
+    .input(streamPromptInputSchema)
+    .subscription(async function* ({ ctx, input, signal }) {
+      const userId = ctx.session.user.id;
+      const quota = await checkQuota(userId);
+      if (!quota.ok) {
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: `Daily limit reached (${quota.limit}). Resets at ${quota.resetsAt.toISOString()}.`,
+        });
+      }
+      const ac = signal ?? new AbortController().signal;
+      for await (const chunk of streamContent(input.prompt, input.model, ac)) {
+        yield chunk;
+      }
+      await recordUsage(userId, input.model);
     }),
 });
