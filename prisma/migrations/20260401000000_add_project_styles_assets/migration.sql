@@ -1,4 +1,3 @@
--- AlterTable
-ALTER TABLE "sites" ADD COLUMN "projectStyles" JSONB;
-ALTER TABLE "sites" ADD COLUMN "projectAssets" JSONB;
-ALTER TABLE "sites" ADD COLUMN "projectSettings" JSONB;
+-- No-op. Originally added projectStyles/Assets/Settings JSONB columns to "sites".
+-- Those columns are now part of the 20260101000000_initial_baseline migration.
+-- This file remains as historical placeholder so _prisma_migrations rows align.

@@ -34,6 +34,7 @@ model User {
   accounts         Account[]
   sessions         Session[]
   workspaceMembers WorkspaceMember[]
+  aiUsage          AIUsage[]
 
   @@map("users")
 }
@@ -393,6 +394,20 @@ model Notification {
 
   @@index([userId, read])
   @@map("notifications")
+}
+
+model AIUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dayBucket String
+  count     Int      @default(0)
+  model     String
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, dayBucket])
+  @@index([userId])
+  @@map("ai_usage")
 }
 
 model NotificationPref {
