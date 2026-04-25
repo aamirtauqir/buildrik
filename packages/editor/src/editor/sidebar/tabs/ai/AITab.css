@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--bd-bg);
+  background: var(--bd-bg-panel);
 }
 
 .bd-ai-thread {
@@ -29,7 +29,7 @@
   border: 1px solid var(--bd-border);
   border-radius: var(--bd-radius-md);
   padding: var(--bd-space-2) var(--bd-space-3);
-  background: var(--bd-bg);
+  background: var(--bd-bg-input);
   color: var(--bd-fg-primary);
   font: 500 var(--bd-text-sm) var(--bd-font);
   resize: none;
