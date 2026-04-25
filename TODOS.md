@@ -77,6 +77,53 @@
 
 ---
 
+## Vibcoder DS Bridge (2026-04-26)
+
+### Resolve chrome-ssot-convergence.md (designer call to self) — STAGE 1/3 LANDED 2026-04-26
+**What:** Pick canonical chrome dimensions across DESIGN.md, `shared/constants/layout.ts`, `editor/rail/tabsConfig.ts`, `editor/shell/LayoutShell.css`. Reconcile rail width (48 vs 56), structure-zone panel width (280 vs 320), inspector width, header/footer heights. Update all 4 sources to one set.
+**STATUS 2026-04-26:** Designer chose **Option C from chrome-ssot doc — phased convergence**. Stage 1 (vertical: topbar 48→56, footer 32→40) LANDED THIS SESSION. Stages 2+3 deferred:
+  - Stage 2 (sidebar 280→240 nav / 320 authoring) — affects Layers/Pages/Components nav panels (shrink) + Add/Publish/History authoring panels (grow). Per-tab QA required. Effort: human ~3 hr + per-tab QA, CC ~30 min.
+  - Stage 3 (rail 48→60, inspector 280→320) — canvas shrinks 52px combined. Affects rail icon spacing + inspector content reflow. Effort: human ~2 hr + QA, CC ~30 min.
+**Why:** Blocks Gate 3 of vibcoder bridge phase (`shahg-main-design-vibcoder-integration-20260425-235606.md`). Stage 1 unblocks vertical-token folds; Stages 2+3 still gate the layout.css 56/320 vs 280/280 reconciliation.
+**Depends on / blocked by:** None. Stage 2 ideal next; Stage 3 after Stage 2 verified clean.
+**Priority:** P1 (downgraded from blocking — Stage 1 done, vibcoder layout fold still gates on Stages 2+3)
+
+### Triage vibcoder non-chrome surfaces for separate canvas/dashboard initiative
+**What:** When dashboard / CMS / mobile-editor work starts (months from now), triage vibcoder's 73-component bundle to identify components that belong to non-editor-chrome domains: dashboard surfaces, CMS table-frame, mobile/tablet rail variant, FAB, asset-library workspace, color-picker popover. Decide scope per-domain.
+**Why:** Codex flag #7 (plan-eng-review of vibcoder bridge addendum, 2026-04-26) — vibcoder's `COMPONENTS.md` includes surfaces beyond editor chrome (dashboard `screens/dashboard.html`, CMS `bdr-table-frame`, mobile rail `bdr-rail--horizontal`, FAB `bdr-fab`, etc.). Without this triage, future canvas/dashboard work risks rebuilding what vibcoder already specs OR pulling non-chrome surfaces into editor-chrome React by mistake.
+**Pros:** Visible reminder that vibcoder is partial spec for canvas/dashboard, not just chrome. Stops scope-creep into v3 rollout. Reuses existing design work when canvas/dashboard initiative starts.
+**Cons:** Triage is 2-hour work item, low complexity but needs domain context.
+**Context:** Vibcoder bundle at `docs/reference/vibcoder/` (post-Commit 1 of bridge phase). Scope-flag rows in `docs/reference/vibcoder/components/COMPONENTS.md` lines 70-90 + 130-150. Plan addendum's Out-of-Scope section already documents this; this TODO surfaces it on the action board.
+**Effort:** Human ~2 hr / CC ~30 min.
+**Depends on / blocked by:** Vibcoder bridge phase Commit 1 (relocates bundle to docs/reference/). Otherwise no dependency — can sit until canvas/dashboard initiative scopes up.
+**Priority:** P3
+
+### ~~Decide typography display font — Inter Tight vs General Sans~~ — RESOLVED 2026-04-26
+**Decision:** **KEEP Inter Tight.** Vibcoder typography.css's `"General Sans"` display token will NOT fold. Shipped `--buildrick-font-family-display: "Inter Tight", system-ui, sans-serif` remains canonical. Plan line 287 (General Sans .woff2 OOS) holds. Vibcoder spec deviates on this one row; acceptable per "partial reference, not authoritative" framing. Commit 2 mechanical-diff doc annotates typography.css display row as `LEAVE (vibcoder spec deviates)`.
+
+### ~~Decide a11y.css fold direction (vibcoder bridge)~~ — RESOLVED 2026-04-26
+**Decision:** **Cherry-pick + verified no fold needed.** Vibcoder a11y.css `@media (prefers-contrast: high)` block defines `--buildrick-border: #64748B` and `--buildrick-border-light: #94A3B8`. Shipped a11y.css already defines exact same values at lines 13-15. Diff-verified 2026-04-26: zero delta in border values. Vibcoder's `.bdr-btn` BEM selectors are bridge-rename targets per Premise 3 (port-time renames `bdr-X` → `bd-{domain}-X`). Shipped's 65 extra lines (focus rings, skip link, print styles) stay canonical. Commit 2 annotates a11y.css row as `SKIP (vibcoder is older + thinner; values already overlap)`.
+
+### Define vocabulary expansion sign-off process (vibcoder bridge) — RULE DEFINED 2026-04-26
+**STATUS:** Rule defined inline this session. Application to commit-msg template REMAINS as future work.
+**RULE (defined):** Each Commit 3.x vocab-add fold MUST contain in commit body, one line per new tier:
+```
+vocab-add: <token name> | tier=<tier> | design-md=<section updated OR "no-change-required: <reason>"> | ack=<initials>
+```
+Example for adding `--buildrick-radius-md-plus`:
+```
+vocab-add: --buildrick-radius-md-plus | tier=10px (between md=8 and lg=12) | design-md=A1.3 Border-radius scale (added md-plus row) | ack=SG
+```
+For pure refactor (literal→alias indirection, same resolved value), use:
+```
+vocab-add: --buildrick-info | tier=alias-only | design-md=no-change-required: literal #2D6DFF replaced with var(--buildrick-accent), same resolved value | ack=SG
+```
+**Application as commit-msg template:** future work item. Commit-msg hook in `.git/hooks/commit-msg` or via husky should validate body contains `vocab-add:` line for any commit touching `themes/design-system/*.css` that adds a new `--buildrick-*` token name. Until template lands, rule lives in plan v2 + this TODO + author discipline.
+**Effort:** Template implementation human ~30 min / CC ~15 min.
+**Priority:** P2 (downgraded from P1 — rule exists, enforcement automation deferred)
+
+---
+
 ## Post-Migration: Layers Tab Theme (2026-04-17)
 
 ### Playwright visual regression infra
