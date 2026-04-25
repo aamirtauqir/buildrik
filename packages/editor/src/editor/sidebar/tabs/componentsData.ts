@@ -28,18 +28,3 @@ export const FILTER_CHIPS: FilterChip[] = [
 ];
 
 export const FAVORITES_STORAGE_KEY = "buildrick-component-favorites";
-
-// ============================================
-// Utilities
-// ============================================
-
-export function formatDate(timestamp: number): string {
-  const date = new Date(timestamp);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-
-  if (diff < 60000) return "just now";
-  if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-  if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
-  return date.toLocaleDateString();
-}

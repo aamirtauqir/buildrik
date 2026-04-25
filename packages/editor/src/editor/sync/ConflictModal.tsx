@@ -5,6 +5,7 @@
  */
 
 import * as React from "react";
+import { formatRelativeTime } from "../../shared/utils/relativeTime";
 import type { SyncConflict, ConflictResolution } from "../../services/CloudSyncService";
 
 // ============================================================================
@@ -29,13 +30,12 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({ conflict, onResolv
     return new Date(timestamp).toLocaleString();
   };
 
-  const formatTimeDiff = (timestamp: number) => {
-    const diff = Date.now() - timestamp;
-    if (diff < 60000) return "just now";
-    if (diff < 3600000) return `${Math.floor(diff / 60000)} min ago`;
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)} hours ago`;
-    return `${Math.floor(diff / 86400000)} days ago`;
-  };
+  const formatTimeDiff = (timestamp: number) =>
+    formatRelativeTime(timestamp, {
+      format: "long",
+      fallback: "days",
+      justNowLabel: "just now",
+    });
 
   return (
     <div style={overlayStyles}>

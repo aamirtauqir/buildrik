@@ -5,6 +5,7 @@
 
 import { VersionHistoryManager } from "../../../../engine/VersionHistoryManager";
 import type { ChangeType, HistoryChange } from "../../../../engine/historyTypes";
+import { formatRelativeTime as sharedFormatRelativeTime } from "../../../../shared/utils/relativeTime";
 
 /**
  * Collapsed change group — one row in the diff preview.
@@ -70,14 +71,5 @@ export function groupByDate<T extends { timestamp: number }>(
 }
 
 export function formatRelativeTime(timestamp: number): string {
-  const now = Date.now();
-  const diff = now - timestamp;
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-
-  if (seconds < 60) return "Just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  return new Date(timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return sharedFormatRelativeTime(timestamp, { fallback: "time" });
 }

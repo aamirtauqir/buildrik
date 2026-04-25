@@ -5,6 +5,7 @@
  */
 
 import * as React from "react";
+import { formatRelativeTime } from "../../shared/utils/relativeTime";
 import type { SyncManagerState } from "../../engine/sync/SyncManager";
 import type { SyncStatus } from "../../services/CloudSyncService";
 
@@ -63,16 +64,7 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
 
   const { icon, label, color } = getStatusInfo();
 
-  const formatLastSync = () => {
-    if (!status.lastSyncedAt) return null;
-    const diff = Date.now() - status.lastSyncedAt;
-    if (diff < 60000) return "Just now";
-    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
-    return new Date(status.lastSyncedAt).toLocaleDateString();
-  };
-
-  const lastSync = formatLastSync();
+  const lastSync = status.lastSyncedAt ? formatRelativeTime(status.lastSyncedAt) : null;
 
   if (compact) {
     return (

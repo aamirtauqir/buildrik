@@ -8,6 +8,7 @@
 import * as React from "react";
 import { SvgSave, SvgSync, SvgWarning, SvgCheck } from "../../shared/ui/Icons";
 import { Tooltip } from "../../shared/ui/Tooltip";
+import { formatRelativeTime } from "../../shared/utils/relativeTime";
 import type { SyncStatus, Issue } from "./hooks/useStudioState";
 
 // ============================================
@@ -20,21 +21,8 @@ interface SaveStatusProps {
   onRetry?: () => void;
 }
 
-/** Format relative time for last saved */
-const formatLastSaved = (timestamp: number | undefined): string => {
-  if (!timestamp) return "Not saved yet";
-  const now = Date.now();
-  const diffMs = now - timestamp;
-  const diffSec = Math.floor(diffMs / 1000);
-  const diffMin = Math.floor(diffSec / 60);
-  const diffHour = Math.floor(diffMin / 60);
-
-  if (diffSec < 10) return "Just now";
-  if (diffSec < 60) return `${diffSec}s ago`;
-  if (diffMin < 60) return `${diffMin}m ago`;
-  if (diffHour < 24) return `${diffHour}h ago`;
-  return new Date(timestamp).toLocaleDateString();
-};
+const formatLastSaved = (timestamp: number | undefined): string =>
+  timestamp ? formatRelativeTime(timestamp, { showSeconds: true }) : "Not saved yet";
 
 // Inline SVG for cloud-off icon (no external dep needed)
 const SvgCloudOff: React.FC = () => (
