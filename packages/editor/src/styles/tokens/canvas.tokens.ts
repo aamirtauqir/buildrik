@@ -12,18 +12,18 @@ import { css, keyframes } from "@emotion/react";
 
 export const canvasTokens = {
   colors: {
-    // Premium Aquibra Blue Palette
+    // Cobalt accent ramp — references themes/design-system/color.css canonical values
     primary: {
       default: "var(--bd-accent)",
       light: "var(--bd-accent-hover)",
-      dark: "#1D4ED8",
-      subtle: "rgba(37, 99, 235, 0.1)",
-      alpha10: "rgba(37, 99, 235, 0.1)",
-      alpha15: "rgba(37, 99, 235, 0.15)",
-      alpha20: "rgba(37, 99, 235, 0.2)",
+      dark: "var(--bd-accent-pressed)",
+      subtle: "rgba(45, 109, 255, 0.1)",
+      alpha10: "rgba(45, 109, 255, 0.1)",
+      alpha15: "rgba(45, 109, 255, 0.15)",
+      alpha20: "rgba(45, 109, 255, 0.2)",
       // alpha30 is passed to ctx.fillStyle (RulersOverlay) — must stay raw rgba
-      alpha30: "rgba(37, 99, 235, 0.3)",
-      alpha40: "rgba(37, 99, 235, 0.4)",
+      alpha30: "rgba(45, 109, 255, 0.3)",
+      alpha40: "rgba(45, 109, 255, 0.4)",
     },
 
     // Obsidian Surface Colors
