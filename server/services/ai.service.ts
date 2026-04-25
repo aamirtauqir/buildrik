@@ -441,7 +441,7 @@ ${pageInfo}`,
 }
 
 // ─── Provider abstraction (T3) ────────────────────────────────────────────
-import { anthropicProvider, AnthropicProvider } from "./anthropic.client";
+import { anthropicProvider } from "./anthropic.client";
 import {
   isClaudeModel,
   type AIModel,
@@ -493,5 +493,3 @@ export async function* streamContent(
 ): AsyncIterable<TokenChunk> {
   yield* getProvider(model).stream(prompt, model, signal);
 }
-
-export { AnthropicProvider };
