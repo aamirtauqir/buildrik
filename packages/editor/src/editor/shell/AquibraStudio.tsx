@@ -157,6 +157,20 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     openCollectionSetup: modals.openCollectionSetup,
   });
 
+  // Hide wizard if canvas already has content (returning users on reload)
+  React.useEffect(() => {
+    if (!composer) return;
+    const checkContent = () => {
+      const existing = composer.elements?.getAllElements?.() ?? [];
+      if (existing.length > 0) setShowWizard(false);
+    };
+    checkContent();
+    composer.on(EVENTS.PROJECT_LOADED, checkContent);
+    return () => {
+      composer.off?.(EVENTS.PROJECT_LOADED, checkContent);
+    };
+  }, [composer]);
+
   // Single source of truth for selection - derived from Composer
   const selection = useComposerSelection({ composer });
 
