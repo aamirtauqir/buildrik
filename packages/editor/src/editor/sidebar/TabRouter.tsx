@@ -85,7 +85,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
       return <BuildTab composer={composer} onBlockClick={onBlockClick} {...commonTabProps} />;
 
     case "ai":
-      return <AITab />;
+      return <AITab composer={composer} {...commonTabProps} />;
 
     case "layers":
       return (

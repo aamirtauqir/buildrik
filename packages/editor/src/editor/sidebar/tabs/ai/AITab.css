@@ -1,0 +1,36 @@
+.bd-ai-tab {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bd-bg);
+}
+
+.bd-ai-thread {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--bd-space-3);
+}
+
+.bd-ai-empty {
+  text-align: center;
+  color: var(--bd-fg-muted);
+  font: 500 var(--bd-text-sm) var(--bd-font);
+}
+
+.bd-ai-composer {
+  border-top: 1px solid var(--bd-border);
+  padding: var(--bd-space-2);
+  background: var(--bd-bg-elevated);
+}
+
+.bd-ai-composer-input {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid var(--bd-border);
+  border-radius: var(--bd-radius-md);
+  padding: var(--bd-space-2) var(--bd-space-3);
+  background: var(--bd-bg);
+  color: var(--bd-fg-primary);
+  font: 500 var(--bd-text-sm) var(--bd-font);
+  resize: none;
+}
