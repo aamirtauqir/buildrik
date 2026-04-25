@@ -371,5 +371,11 @@ if ! node packages/editor/scripts/find-inline-hex-v2.mjs --editor-only --exclude
 fi
 pass "Gate 16: editor-scoped hex at or below baseline (REGRESSION mode)"
 
+# Gate 18: .ds-green-panels.json allowlist structural integrity.
+# Allowlist is append-only per docs/ideation/2026-04-20-editor-chrome-ds-ideation.md.
+# (Numbered 18 because gates 15/16/17 already taken at time of landing.)
+node "$SCRIPT_DIR/verify-green-panels.mjs" || fail "Gate 18: green-panel allowlist invalid"
+pass "Gate 18: green-panel allowlist valid"
+
 echo ""
 echo "=== DS V1 gates: 12 passed + 4 chrome-axiom gates at baseline + green-panel check ==="

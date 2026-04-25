@@ -12,6 +12,7 @@
     "lint:ds": "bash scripts/ds-grep-gates.sh",
     "verify:ds": "node scripts/verify-design-baselines.mjs && bash scripts/ds-grep-gates.sh",
     "lint:ds-hex": "node scripts/find-inline-hex-v2.mjs",
+    "verify:green-panels": "node scripts/verify-green-panels.mjs",
     "lint": "eslint . --ext .ts,.tsx"
   },
   "dependencies": {
