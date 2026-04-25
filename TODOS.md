@@ -131,12 +131,11 @@ vocab-add: --buildrick-info | tier=alias-only | design-md=no-change-required: li
 **Priority:** P2
 **Depends on:** Layers tab migration shipped
 
-### CI grep rule for banned indigo/violet hex
-**What:** Add a CI step that greps for banned indigo/violet hex values (`#1D4ED8|#1E40AF|#4F46E5|indigo|violet`) in `packages/editor/src` and fails the build.
-**Why:** Prevent indigo regression — the root cause of the light-theme leakage was 50 hardcoded indigo hex values.
-**Effort:** S (human: ~1 day / CC: ~30 min)
-**Priority:** P2
-**Depends on:** Layers tab migration shipped
+### ~~CI grep rule for banned indigo/violet hex~~ — RESOLVED 2026-04-26 (8-commit cleanup workstream)
+**What landed:** Gate 18 in `packages/editor/scripts/ds-grep-gates.sh` — FAIL mode on `#1D4ED8|#1E40AF|#4F46E5|\b(indigo|violet|purple)\b` across `packages/editor/src/**/*.{css,ts,tsx,js,jsx}` with 8-path allowlist (color parsers, dev tools, collab cursors, canvas debug overlays, UI placeholders, user-facing stock photo color filter, test fixtures).
+**Cleanup workstream:** 8 commits G1-H4+I (`69155ac..5997e1a`). 50+ chrome drift sites cleaned. 1 dead block deleted (LeftSidebar.css purple feature rows pointing at undefined tokens). 1 stale constant rename (BRAND_PURPLE → BRAND_ACCENT). Reality bigger than original TODO ~30 min CC estimate (took ~3 hr) — TODO predated cobalt accent convergence which created the drift.
+**Doc:** `docs/ideation/2026-04-26-banned-color-cleanup.md` — full inventory + commit plan + replacement value reference.
+**Followup (separate workstream):** Tailwind blue palette migration — `#EFF6FF/#2563EB/#DBEAFE/#BFDBFE/#1E3A8A` and azure `rgba(0, 163, 255, x)` still litter CommandPalette/InviteModal/AccountModal/PublishDropdown/canvas.tokens.ts. Gate 18 doesn't catch these (out of original TODO scope), but they're the same drift class and worth a future cleanup pass.
 
 ### ~~Post-migration hardcoded indigo audit~~ — RESOLVED 2026-04-26
 **Decision:** No work needed. Theme unification (2026-04-18 light-theme flip) already swept these. Verified 2026-04-26: `grep -rE '#F0F4F8|#EEF2F7|--surface-base|--surface-canvas' packages/editor/src --include='*.css'` returns zero hits. LayoutShell.css line numbers in original TODO predate theme unification — file has been rewritten since. No code change required.
