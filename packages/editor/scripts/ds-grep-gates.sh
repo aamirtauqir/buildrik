@@ -75,15 +75,18 @@ pass "Gate 6: no duplicate keys in any DS file"
 
 
 # Gate 7: @media (prefers-*) must only appear in a11y.css
-# WARN mode: 14 legacy CSS files have leaked @media (prefers-*) blocks (tracked, out
-# of scope for this remediation pass). Gate warns and lists files but does not fail CI.
-# Flip to fail mode once the backlog is cleared.
+# FAIL mode: backlog cleared 2026-04-26 (J1+J2 commits 0d5e272..61bd942 migrated 22
+# blocks across 11 files into themes/design-system/a11y.css). Any new @media
+# (prefers-*) outside a11y.css now blocks CI. To add a new override, edit a11y.css
+# directly — DESIGN.md §10 Gate 7 makes a11y.css the single canonical home.
 LEAKED_MEDIA=$(grep -rlE '@media\s*\(\s*prefers-' packages/editor/src --include="*.css" --exclude-dir=project 2>/dev/null | grep -v 'design-system/a11y.css' || true)
 if [ -n "$LEAKED_MEDIA" ]; then
-  echo "  WARN Gate 7: @media (prefers-*) outside a11y.css (backlog — not blocking):"
+  echo "  Gate 7 FAIL: @media (prefers-*) found outside themes/design-system/a11y.css:"
   echo "$LEAKED_MEDIA" | sed 's/^/    /'
+  echo "  → Move the override into a11y.css. See DESIGN.md §10 Gate 7."
+  fail "Gate 7: @media (prefers-*) leak outside a11y.css"
 fi
-pass "Gate 7: @media (prefers-*) audit complete (WARN mode — flip to fail after backlog cleared)"
+pass "Gate 7: @media (prefers-*) consolidated to a11y.css (0 leaks)"
 
 # Gate 8: No bare deprecated defs (--accent, --buildrick-text, --buildrick-surface)
 LEAK=$(grep -rE '^\s*(--accent|--buildrick-text|--buildrick-surface)\s*:' packages/editor/src --include='*.css' --exclude-dir=project 2>/dev/null || true)
