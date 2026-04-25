@@ -51,7 +51,7 @@ export const canvasTokens = {
       success: "#10B981",
       error: "#EF4444",
       warning: "#F59E0B",
-      info: "#2563EB",
+      info: "var(--bd-accent)",
       errorBg: "rgba(239, 68, 68, 0.1)",
       errorBorder: "rgba(239, 68, 68, 0.3)",
     },
@@ -74,7 +74,7 @@ export const canvasTokens = {
 
     // DevTools Box Model Colors
     devtools: {
-      content: "rgba(0, 163, 255, 0.3)",
+      content: "rgba(45, 109, 255, 0.3)",
       padding: "rgba(16, 185, 129, 0.3)",
       margin: "rgba(245, 158, 11, 0.3)",
       border: "rgba(255, 229, 153, 0.4)",
@@ -91,11 +91,11 @@ export const canvasTokens = {
 
   // Selection Effects
   selection: {
-    outline: "#2563EB",
-    handleGradient: "linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)",
-    glow: "0 0 0 3px rgba(0, 163, 255, 0.2)",
-    glowStrong: "0 0 0 4px rgba(0, 163, 255, 0.4)",
-    glowSubtle: "0 0 0 2px rgba(0, 163, 255, 0.15)",
+    outline: "var(--bd-accent)",
+    handleGradient: "linear-gradient(135deg, var(--bd-accent) 0%, var(--bd-accent-hover) 100%)",
+    glow: "0 0 0 3px rgba(45, 109, 255, 0.2)",
+    glowStrong: "0 0 0 4px rgba(45, 109, 255, 0.4)",
+    glowSubtle: "0 0 0 2px rgba(45, 109, 255, 0.15)",
   },
 
   // Shadows
@@ -104,10 +104,10 @@ export const canvasTokens = {
     md: "0 4px 12px rgba(0, 0, 0, 0.5)",
     lg: "0 8px 25px rgba(0, 0, 0, 0.6)",
     xl: "0 12px 32px rgba(0, 0, 0, 0.7)",
-    glowSm: "0 2px 8px rgba(0, 163, 255, 0.3)",
-    glowMd: "0 4px 14px rgba(0, 163, 255, 0.4)",
-    glowLg: "0 8px 25px rgba(0, 163, 255, 0.5)",
-    badge: "0 4px 12px rgba(0, 163, 255, 0.4)",
+    glowSm: "0 2px 8px rgba(45, 109, 255, 0.3)",
+    glowMd: "0 4px 14px rgba(45, 109, 255, 0.4)",
+    glowLg: "0 8px 25px rgba(45, 109, 255, 0.5)",
+    badge: "0 4px 12px rgba(45, 109, 255, 0.4)",
     panel: "var(--bd-shadow-modal)",
     glass: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
   },
