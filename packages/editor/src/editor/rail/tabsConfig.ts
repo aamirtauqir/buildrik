@@ -1,7 +1,7 @@
 /**
  * Tab Configuration — canonical source of truth.
  *
- * GROUPED_TABS_CONFIG — 10 sidebar panel definitions (shortcuts, mode, width, zone)
+ * GROUPED_TABS_CONFIG — 11 sidebar panel definitions (shortcuts, mode, width, zone)
  *
  * Tabs with a `zone` appear as rail buttons in that zone.
  * Tabs without a zone (design, publish) are not in the rail.
@@ -13,6 +13,7 @@
 
 export type GroupedTabId =
   | "add"
+  | "ai"
   | "templates"
   | "layers"
   | "pages"
@@ -60,6 +61,18 @@ export const GROUPED_TABS_CONFIG: GroupedTabConfig[] = [
     shortcut: "A",
     mode: "panel",
     panelWidth: 280,
+    zone: "creation",
+  },
+  {
+    id: "ai",
+    iconName: "Sparkles",
+    label: "AI",
+    ariaLabel: "AI assistant — chat with Claude to edit elements",
+    section: "top",
+    pattern: "standalone",
+    shortcut: "I",
+    mode: "panel",
+    panelWidth: 320,
     zone: "creation",
   },
   {

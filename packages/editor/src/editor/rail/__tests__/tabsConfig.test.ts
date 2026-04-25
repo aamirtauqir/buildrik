@@ -91,8 +91,8 @@ describe("tabsConfig helpers", () => {
   });
 
   describe("GROUPED_TABS_CONFIG integrity", () => {
-    it("has 10 tabs defined", () => {
-      expect(GROUPED_TABS_CONFIG).toHaveLength(10);
+    it("has 11 tabs defined", () => {
+      expect(GROUPED_TABS_CONFIG).toHaveLength(11);
     });
 
     it("every tab has required fields", () => {
