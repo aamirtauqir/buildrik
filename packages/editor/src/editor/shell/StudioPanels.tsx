@@ -74,8 +74,6 @@ export interface StudioPanelsProps {
   }>;
   canvasRef?: React.RefObject<CanvasRef>;
   composerContainerRef?: React.RefObject<HTMLDivElement>;
-  /** Whether AI suggestions in the Add tab are enabled */
-  aiEnabled?: boolean;
   /** Whether the active tab is in fullpage mode (derived from useStudioState) */
   isFullPageMode?: boolean;
   /** Drawer width in pixels for the active tab (derived from useStudioState) */
@@ -183,7 +181,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   onExportForDeploy,
   canvasRef,
   composerContainerRef,
-  aiEnabled = true,
   isFullPageMode = false,
   drawerWidth = 280,
   panelPinned = true,
@@ -375,7 +372,6 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           canvasHoveredId={canvasHoveredId}
           projectId={projectId}
           onOpenLibrary={handleOpenLibrary}
-          aiEnabled={aiEnabled}
         />
       </LayoutShell.Sidebar>
 

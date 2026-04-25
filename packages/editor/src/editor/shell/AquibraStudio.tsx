@@ -47,11 +47,6 @@ export interface AquibraStudioProps {
   options?: Partial<ComposerConfig> & {
     project?: { type?: string; default?: { pages?: Array<{ name: string; component: string }> } };
   };
-  /** Feature flags — currently only aiEnabled is supported */
-  featureFlags?: {
-    /** Whether AI suggestions in the Add tab are enabled */
-    aiEnabled?: boolean;
-  };
   onEditor?: (composer: Composer) => void;
   onReady?: (composer: Composer) => void;
   onUpdate?: (data: ProjectData) => void;
@@ -115,7 +110,6 @@ class StudioErrorBoundary extends React.Component<
 
 const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   licenseKey: _licenseKey,
-  featureFlags,
   options,
   onEditor,
   onReady,
@@ -507,7 +501,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         onOpenCreateCollection={modals.openCMSCollectionSetup}
         onOpenTemplates={modals.openTemplates}
         onExportForDeploy={handleExportForDeploy}
-        aiEnabled={featureFlags?.aiEnabled ?? true}
         canvasRef={canvasRef}
         composerContainerRef={composerContainerRef}
       />

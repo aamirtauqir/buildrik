@@ -37,6 +37,9 @@ const MediaTab = React.lazy(() =>
 const PublishTab = React.lazy(() => import("./tabs/publish/PublishTab"));
 const HistoryTab = React.lazy(() => import("./tabs/history/HistoryTab"));
 const SettingsTab = React.lazy(() => import("./tabs/settings/SettingsTab"));
+const AITab = React.lazy(() =>
+  import("./tabs/ai/AITab").then((m) => ({ default: m.AITab })),
+);
 
 export interface TabRouterProps {
   activeTab: GroupedTabId;
@@ -59,8 +62,6 @@ export interface TabRouterProps {
   onUnpublish?: (projectId: string) => Promise<void>;
   onSettingsDirtyChange?: (dirty: boolean) => void;
   onTemplatesSwitchTab?: (tab: string) => void;
-  /** Whether AI suggestions in the Add tab are enabled */
-  aiEnabled?: boolean;
 }
 
 export const TabRouter: React.FC<TabRouterProps> = ({
@@ -78,11 +79,13 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   onUnpublish,
   onSettingsDirtyChange,
   onReplayTour,
-  aiEnabled,
 }) => {
   switch (activeTab) {
     case "add":
-      return <BuildTab composer={composer} onBlockClick={onBlockClick} {...commonTabProps} aiEnabled={aiEnabled} />;
+      return <BuildTab composer={composer} onBlockClick={onBlockClick} {...commonTabProps} />;
+
+    case "ai":
+      return <AITab />;
 
     case "layers":
       return (

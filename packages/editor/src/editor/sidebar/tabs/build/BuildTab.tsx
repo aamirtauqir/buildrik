@@ -33,7 +33,6 @@ export interface BuildTabProps {
   onPinToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
-  aiEnabled?: boolean;
 }
 
 export const BuildTab: React.FC<BuildTabProps> = ({ composer, onBlockClick }) => {
