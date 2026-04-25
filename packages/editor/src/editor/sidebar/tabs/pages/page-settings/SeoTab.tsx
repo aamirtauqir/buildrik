@@ -39,27 +39,27 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
   const range = titleRange(s.seoTitle);
 
   return (
-    <div className="pg-seo">
+    <div className="bd-pg-seo">
       {/* ── 1. GOOGLE PREVIEW — TOP ────────────────────────────────────── */}
-      <div className="pg-seo__section-label">How your page looks in Google Search</div>
+      <div className="bd-pg-seo-section-label">How your page looks in Google Search</div>
       {/* Google preview — prototype .gpreview */}
-      <div className="pg-seo__gp">
-        <div className="pg-seo__gp-domain">
+      <div className="bd-pg-seo-gp">
+        <div className="bd-pg-seo-gp-domain">
           {s.domain ?? "yoursite.aquibra.io"} › {page.slug?.replace(/^\//, "") || page.id}
         </div>
-        <div className="pg-seo__gp-title">{s.seoTitle || page.name}</div>
-        <div className={`pg-seo__gp-desc${!s.seoDesc ? " pg-seo__gp-desc--missing" : ""}`}>
+        <div className="bd-pg-seo-gp-title">{s.seoTitle || page.name}</div>
+        <div className={`bd-pg-seo-gp-desc${!s.seoDesc ? " bd-pg-seo-gp-desc--missing" : ""}`}>
           {s.seoDesc || "No description — add one below to improve ranking"}
         </div>
       </div>
 
       {/* ── 2. SEO SCORE ────────────────────────────────────────────────── */}
       {!s.allowIndex ? (
-        <div className="pg-seo__noindex-warning" role="alert">
-          <div className="pg-seo__noindex-msg">
+        <div className="bd-pg-seo-noindex-warning" role="alert">
+          <div className="bd-pg-seo-noindex-msg">
             <strong>noIndex is ON</strong> — search engines won't index this page regardless of your
             SEO settings.
-            <button className="pg-seo__noindex-fix" onClick={() => s.setAllowIndex(true)}>
+            <button className="bd-pg-seo-noindex-fix" onClick={() => s.setAllowIndex(true)}>
               Turn indexing on →
             </button>
           </div>
@@ -67,30 +67,30 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
       ) : (
         <>
           {/* Score row + checks grid — prototype .seo-score-row + .seo-checks */}
-          <div className="pg-seo__score-row">
-            <div className={`pg-seo__score-num${s.seoScore >= 80 ? " pg-seo__score-num--ok" : ""}`}>
+          <div className="bd-pg-seo-score-row">
+            <div className={`bd-pg-seo-score-num${s.seoScore >= 80 ? " bd-pg-seo-score-num--ok" : ""}`}>
               {s.seoScore}
             </div>
-            <div className="pg-seo__score-meta">
-              <div className="pg-seo__score-label">
+            <div className="bd-pg-seo-score-meta">
+              <div className="bd-pg-seo-score-label">
                 {s.seoScore >= 80 ? "Looks good" : "Needs work"}
               </div>
-              <div className="pg-seo__checks">
-                <div className={`pg-seo__check${s.seoChecks.titleSet ? " pg-seo__check--ok" : ""}`}>
+              <div className="bd-pg-seo-checks">
+                <div className={`bd-pg-seo-check${s.seoChecks.titleSet ? " bd-pg-seo-check--ok" : ""}`}>
                   <span>Page title</span>
-                  <span className="pg-seo__check-pts">+20 pts</span>
+                  <span className="bd-pg-seo-check-pts">+20 pts</span>
                 </div>
-                <div className={`pg-seo__check${s.seoChecks.descSet ? " pg-seo__check--ok" : ""}`}>
+                <div className={`bd-pg-seo-check${s.seoChecks.descSet ? " bd-pg-seo-check--ok" : ""}`}>
                   <span>Meta description</span>
-                  <span className="pg-seo__check-pts">+30 pts</span>
+                  <span className="bd-pg-seo-check-pts">+30 pts</span>
                 </div>
-                <div className={`pg-seo__check${s.seoChecks.slugClean ? " pg-seo__check--ok" : ""}`}>
+                <div className={`bd-pg-seo-check${s.seoChecks.slugClean ? " bd-pg-seo-check--ok" : ""}`}>
                   <span>Clean URL slug</span>
-                  <span className="pg-seo__check-pts">+10 pts</span>
+                  <span className="bd-pg-seo-check-pts">+10 pts</span>
                 </div>
-                <div className={`pg-seo__check${s.seoChecks.indexingOn ? " pg-seo__check--ok" : ""}`}>
+                <div className={`bd-pg-seo-check${s.seoChecks.indexingOn ? " bd-pg-seo-check--ok" : ""}`}>
                   <span>Allow indexing</span>
-                  <span className="pg-seo__check-pts">+40 pts</span>
+                  <span className="bd-pg-seo-check-pts">+40 pts</span>
                 </div>
               </div>
             </div>
@@ -98,7 +98,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
 
           {/* Reach 80+ banner — shown when score < 80 and indexing is on */}
           {s.seoScore < 80 && s.allowIndex && (
-            <div className="pg-seo__banner-warn" role="note">
+            <div className="bd-pg-seo-banner-warn" role="note">
               Reach 80+ before publishing{s.seoChecks.descSet ? "" : " — add a meta description (+30 pts)"}
             </div>
           )}
@@ -106,17 +106,17 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
       )}
 
       {/* ── 3. TITLE ────────────────────────────────────────────────────── */}
-      <div className="pg-seo__field">
-        <div className="pg-seo__field-header">
-          <label className="pg-seo__label" htmlFor="seo-title">
+      <div className="bd-pg-seo-field">
+        <div className="bd-pg-seo-field-header">
+          <label className="bd-pg-seo-label" htmlFor="seo-title">
             Title
           </label>
-          <span className={`pg-seo__counter pg-seo__counter--${range}`}>
+          <span className={`bd-pg-seo-counter bd-pg-seo-counter--${range}`}>
             {s.seoTitle.length}/60{rangeLabel[range]}
           </span>
         </div>
         {s.seoTitle.length < 10 && (
-          <button type="button" className="pg-seo__ai-chip" aria-label="Suggest SEO title">
+          <button type="button" className="bd-pg-seo-ai-chip" aria-label="Suggest SEO title">
             <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
               <path d="M5 3l14 9-14 9V3z" />
             </svg>
@@ -125,23 +125,23 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         )}
         <input
           id="seo-title"
-          className="pg-seo__input"
+          className="bd-pg-seo-input"
           value={s.seoTitle}
           onChange={(e) => s.setSeoTitle(e.target.value.slice(0, 80))}
           maxLength={80}
           aria-describedby="seo-title-hint"
         />
-        <div id="seo-title-hint" className="pg-seo__hint">
+        <div id="seo-title-hint" className="bd-pg-seo-hint">
           Aim for 50–60 characters for best Google ranking
         </div>
       </div>
 
       {/* ── 4. META DESCRIPTION ─────────────────────────────────────────── */}
-      <div className="pg-seo__field">
-        <div className="pg-seo__field-header">
+      <div className="bd-pg-seo-field">
+        <div className="bd-pg-seo-field-header">
           {/* label + info icon in a flex row — button must NOT be inside <label> (HTML spec) */}
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <label className="pg-seo__label" htmlFor="seo-desc">
+            <label className="bd-pg-seo-label" htmlFor="seo-desc">
               Meta Description
             </label>
             <Tooltip
@@ -184,11 +184,11 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             </Tooltip>
           </div>
           <span
-            className={`pg-seo__counter ${
+            className={`bd-pg-seo-counter ${
               s.seoDesc.length > 160
-                ? "pg-seo__counter--long"
+                ? "bd-pg-seo-counter--long"
                 : s.seoDesc.length > 50
-                  ? "pg-seo__counter--ideal"
+                  ? "bd-pg-seo-counter--ideal"
                   : ""
             }`}
           >
@@ -197,28 +197,28 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         </div>
         <textarea
           id="seo-desc"
-          className="pg-seo__textarea"
+          className="bd-pg-seo-textarea"
           rows={3}
           value={s.seoDesc}
           onChange={(e) => s.setSeoDesc(e.target.value.slice(0, 200))}
           placeholder='E.g. "We help small businesses build professional websites. Start free today."'
           aria-describedby="seo-desc-hint"
         />
-        <div id="seo-desc-hint" className="pg-seo__hint">
+        <div id="seo-desc-hint" className="bd-pg-seo-hint">
           Briefly describe this page (150–160 chars). Appears in Google results below your title.
         </div>
       </div>
 
       {/* ── 5. URL SLUG ─────────────────────────────────────────────────── */}
-      <div className="pg-seo__field">
-        <label className="pg-seo__label" htmlFor="seo-slug">
+      <div className="bd-pg-seo-field">
+        <label className="bd-pg-seo-label" htmlFor="seo-slug">
           URL Slug
         </label>
-        <div className="pg-seo__slug-wrap">
-          <span className="pg-seo__slug-prefix">{domain}/</span>
+        <div className="bd-pg-seo-slug-wrap">
+          <span className="bd-pg-seo-slug-prefix">{domain}/</span>
           <input
             id="seo-slug"
-            className={`pg-seo__input pg-seo__input--slug${s.slugError ? " pg-seo__input--error" : ""}`}
+            className={`bd-pg-seo-input bd-pg-seo-input--slug${s.slugError ? " bd-pg-seo-input--error" : ""}`}
             value={s.slug}
             onChange={(e) => s.setSlug(e.target.value)}
             aria-describedby="seo-slug-hint"
@@ -227,9 +227,9 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         </div>
         {/* Slug destructive warning — shown when slug changes on a live page */}
         {s.slug !== page.slug && page.status === "live" && !s.slugError && (
-          <div className="pg-seo__slug-warning" role="alert">
+          <div className="bd-pg-seo-slug-warning" role="alert">
             <svg
-              className="pg-seo__slug-warning-icon"
+              className="bd-pg-seo-slug-warning-icon"
               viewBox="0 0 24 24"
               width="14"
               height="14"
@@ -251,11 +251,11 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           </div>
         )}
         {s.slugError ? (
-          <div className="pg-seo__error" role="alert">
+          <div className="bd-pg-seo-error" role="alert">
             {s.slugError}
           </div>
         ) : (
-          <div id="seo-slug-hint" className="pg-seo__hint">
+          <div id="seo-slug-hint" className="bd-pg-seo-hint">
             Lowercase letters, numbers, and hyphens only — auto-formatted as you type
           </div>
         )}
