@@ -174,21 +174,21 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         onClose={onClose}
       >
         <button
-          className="pg-panel-kbd-btn"
+          className="bd-pg-panel-kbd-btn"
           onClick={() => setPaletteOpen(true)}
           aria-label="Open command palette"
         >
-          <span className="pg-panel-kbd">⌘K</span>
+          <span className="bd-pg-panel-kbd">⌘K</span>
         </button>
       </PanelShell.Header>
 
       {/* Error state — takes priority over everything */}
       {p.loadError ? (
         <PanelShell.Content>
-          <div className="pg-error" role="alert" aria-live="assertive">
-            <div className="pg-error__msg">{p.loadError}</div>
-            <div className="pg-error__sub">Your connection dropped. Work is safe — nothing was lost.</div>
-            <button className="pg-error__retry" onClick={p.retrySync}>
+          <div className="bd-pg-error" role="alert" aria-live="assertive">
+            <div className="bd-pg-error-msg">{p.loadError}</div>
+            <div className="bd-pg-error-sub">Your connection dropped. Work is safe — nothing was lost.</div>
+            <button className="bd-pg-error-retry" onClick={p.retrySync}>
               Try again
             </button>
           </div>
