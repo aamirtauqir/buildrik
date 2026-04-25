@@ -439,3 +439,59 @@ ${pageInfo}`,
     };
   }
 }
+
+// ─── Provider abstraction (T3) ────────────────────────────────────────────
+import { anthropicProvider, AnthropicProvider } from "./anthropic.client";
+import {
+  isClaudeModel,
+  type AIModel,
+  type AIProvider,
+  type TokenChunk,
+} from "./types";
+
+class OpenAIProvider implements AIProvider {
+  async *stream(
+    prompt: string,
+    model: AIModel,
+    signal: AbortSignal,
+  ): AsyncIterable<TokenChunk> {
+    const sdkStream = await getOpenAI().chat.completions.create({
+      model,
+      stream: true,
+      messages: [{ role: "user", content: prompt }],
+    });
+    for await (const event of sdkStream) {
+      if (signal.aborted) return;
+      const text = event.choices[0]?.delta?.content;
+      if (text) yield { type: "text", text };
+      if (event.choices[0]?.finish_reason) {
+        yield { type: "done" };
+        return;
+      }
+    }
+  }
+
+  async generate(prompt: string, model: AIModel): Promise<string> {
+    const res = await getOpenAI().chat.completions.create({
+      model,
+      messages: [{ role: "user", content: prompt }],
+    });
+    return res.choices[0]?.message?.content ?? "";
+  }
+}
+
+const openAIProvider = new OpenAIProvider();
+
+export function getProvider(model: AIModel): AIProvider {
+  return isClaudeModel(model) ? anthropicProvider : openAIProvider;
+}
+
+export async function* streamContent(
+  prompt: string,
+  model: AIModel,
+  signal: AbortSignal,
+): AsyncIterable<TokenChunk> {
+  yield* getProvider(model).stream(prompt, model, signal);
+}
+
+export { AnthropicProvider };
