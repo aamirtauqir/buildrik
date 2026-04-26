@@ -464,5 +464,16 @@ if [ -n "$LEAK" ]; then
 fi
 pass "Gate 19: no bdr-* class leaks"
 
+# Gate 21: No new vibcoder-shape token defs in chrome source
+# Vibcoder uses --buildrick-color-* / --buildrick-color-fg-* shapes.
+# Buildrik canonical is --buildrick-bg-* / --buildrick-fg-*. New defs
+# in vibcoder shape mean someone bypassed codemod 2.
+LEAK=$(grep -rE '^\s*--buildrick-(color|color-fg|color-bg)-[a-z0-9-]+\s*:' packages/editor/src --include='*.css' --exclude-dir=components --exclude-dir=project 2>/dev/null || true)
+if [ -n "$LEAK" ]; then
+  echo "$LEAK"
+  fail "Gate 21: vibcoder-shape token def in non-vendored CSS (bypass of codemod 2)"
+fi
+pass "Gate 21: no vibcoder-shape defs outside vendored components"
+
 echo ""
 echo "=== DS V1 gates: 13 passed + 4 chrome-axiom gates at baseline + green-panel check ==="
