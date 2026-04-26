@@ -52,11 +52,13 @@
     --bd-radius-md-plus: var(--buildrick-radius-md-plus);
     --bd-radius-sm: var(--buildrick-radius-sm);
     --bd-rounded: var(--buildrick-rounded);
+    --bd-shadow-md: var(--buildrick-shadow-md);
     --bd-space-1: var(--buildrick-space-1);
     --bd-space-2: var(--buildrick-space-2);
     --bd-space-3: var(--buildrick-space-3);
     --bd-space-4: var(--buildrick-space-4);
     --bd-space-5: var(--buildrick-space-5);
+    --bd-space-6: var(--buildrick-space-6);
     --bd-success: var(--buildrick-success);
     --bd-success-border: var(--buildrick-success-border);
     --bd-success-light: var(--buildrick-success-light);
@@ -67,6 +69,7 @@
     --bd-text-3xs-plus: var(--buildrick-text-3xs-plus);
     --bd-text-disabled: var(--buildrick-text-disabled);
     --bd-text-heading: var(--buildrick-text-heading);
+    --bd-text-lg: var(--buildrick-text-lg);
     --bd-text-md: var(--buildrick-text-md);
     --bd-text-muted: var(--buildrick-text-muted);
     --bd-text-on-accent: var(--buildrick-text-on-accent);
@@ -82,5 +85,6 @@
     --bd-warning-border: var(--buildrick-warning-border);
     --bd-warning-light: var(--buildrick-warning-light);
     --bd-warning-soft: var(--buildrick-warning-soft);
+    --bd-z-sticky: var(--buildrick-z-sticky);
   }
 }

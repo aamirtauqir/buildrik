@@ -1,0 +1,120 @@
+/**
+ * bdr-surface-head — surface header strip.
+ *
+ * Consolidates 10+ panel-header reimplementations across modal, drawer, sheet,
+ * inspector, notification-center, history-panel, plus screen-level repeats in
+ * cms / form-builder / screens. One header molecule for any surface: title +
+ * meta + eyebrow + actions slot.
+ *
+ * Slots:
+ *   __body     — left flex column (eyebrow + title + meta + tag)
+ *   __eyebrow  — small uppercase mono label above the title
+ *   __title    — primary heading (h1–h4 element)
+ *   __meta     — secondary muted line below the title (mono)
+ *   __tag      — inline tag/badge slot beside meta (composes bdr-tag/bdr-badge)
+ *   __actions  — right cluster: icon-btn / close / overflow menu / button
+ *
+ * Variants:  --sm  --lg  --flush  --centered  --inset  --sticky  --subtle
+ * States:    passive — interactive children own their own a11y states.
+ *
+ * Tokens: ONLY --buildrick-*. Compose with bdr-icon-btn, bdr-icon, bdr-tag,
+ * bdr-badge, bdr-count, bdr-btn.
+ */
+
+.bd-surface-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--buildrick-space-3);
+  padding: var(--buildrick-space-4) var(--buildrick-space-5);
+  border-bottom: 1px solid var(--buildrick-border);
+  background: transparent;
+}
+
+.bd-surface-head__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bd-surface-head__eyebrow {
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-3xs-plus);
+  font-weight: var(--buildrick-font-weight-semibold);
+  color: var(--buildrick-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.bd-surface-head__title {
+  margin: 0;
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-md);
+  font-weight: var(--buildrick-font-weight-semibold);
+  color: var(--buildrick-text-heading);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.bd-surface-head__meta {
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bd-surface-head__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--buildrick-space-1);
+  margin-top: var(--buildrick-space-1);
+}
+
+.bd-surface-head__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--buildrick-space-1);
+  flex-shrink: 0;
+}
+
+/* ---- Variants ---- */
+.bd-surface-head--sm {
+  padding: var(--buildrick-space-2) var(--buildrick-space-3);
+}
+.bd-surface-head--sm .bd-surface-head__title { font-size: var(--buildrick-text-sm); }
+
+.bd-surface-head--lg {
+  padding: var(--buildrick-space-5) var(--buildrick-space-6);
+}
+.bd-surface-head--lg .bd-surface-head__title { font-size: var(--buildrick-text-lg); }
+
+.bd-surface-head--flush { border-bottom: none; }
+
+.bd-surface-head--centered {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.bd-surface-head--centered .bd-surface-head__body { align-items: center; }
+.bd-surface-head--centered .bd-surface-head__actions { margin-top: var(--buildrick-space-2); }
+
+.bd-surface-head--inset {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.bd-surface-head--sticky {
+  position: sticky;
+  top: 0;
+  background: var(--buildrick-bg-card);
+  z-index: var(--buildrick-z-sticky);
+}
+
+.bd-surface-head--subtle {
+  background: var(--buildrick-bg-subtle);
+}
