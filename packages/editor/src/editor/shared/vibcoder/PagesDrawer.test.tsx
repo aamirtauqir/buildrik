@@ -108,7 +108,7 @@ describe("PagesDrawer — composition", () => {
     expect(desc).toHaveClass("bd-pages-drawer__desc");
   });
 
-  it("renders children inside body wrapper with bd-pages-drawer__body class", () => {
+  it("renders children inside body wrapper with bd-drawer__body + bd-pages-drawer__body classes", () => {
     render(
       <OverlayMount>
         <PagesDrawer open={true} onOpenChange={() => {}}>
@@ -117,7 +117,10 @@ describe("PagesDrawer — composition", () => {
       </OverlayMount>,
     );
     const child = screen.getByTestId("child");
-    expect(child.parentElement).toHaveClass("bd-pages-drawer__body");
+    expect(child.parentElement).toHaveClass(
+      "bd-drawer__body",
+      "bd-pages-drawer__body",
+    );
   });
 
   it("DrawerContent has data-side='left' (hardcoded)", () => {
@@ -140,7 +143,10 @@ describe("PagesDrawer — composition", () => {
         </PagesDrawer>
       </OverlayMount>,
     );
-    expect(screen.getByText("Pages")).toHaveClass("bd-pages-drawer__title");
+    expect(screen.getByText("Pages")).toHaveClass(
+      "bd-drawer__title",
+      "bd-pages-drawer__title",
+    );
   });
 });
 

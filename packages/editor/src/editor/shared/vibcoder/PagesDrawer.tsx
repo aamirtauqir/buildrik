@@ -71,7 +71,7 @@ export function PagesDrawer({
             {description}
           </DrawerDescription>
         )}
-        <div className="bd-pages-drawer__body">{children}</div>
+        <div className="bd-drawer__body bd-pages-drawer__body">{children}</div>
       </DrawerContent>
     </Drawer>
   );

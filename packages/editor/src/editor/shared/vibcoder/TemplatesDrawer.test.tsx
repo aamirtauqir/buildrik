@@ -110,7 +110,7 @@ describe("TemplatesDrawer — composition", () => {
     expect(desc).toHaveClass("bd-templates-drawer__desc");
   });
 
-  it("renders children inside grid wrapper with bd-templates-drawer__grid class", () => {
+  it("renders children inside grid wrapper with bd-drawer__body + bd-templates-drawer__grid classes", () => {
     render(
       <OverlayMount>
         <TemplatesDrawer open={true} onOpenChange={() => {}}>
@@ -119,7 +119,10 @@ describe("TemplatesDrawer — composition", () => {
       </OverlayMount>,
     );
     const child = screen.getByTestId("child");
-    expect(child.parentElement).toHaveClass("bd-templates-drawer__grid");
+    expect(child.parentElement).toHaveClass(
+      "bd-drawer__body",
+      "bd-templates-drawer__grid",
+    );
   });
 
   it("DrawerContent has data-side='right' (hardcoded; default with no modifier class)", () => {
@@ -147,6 +150,7 @@ describe("TemplatesDrawer — composition", () => {
       </OverlayMount>,
     );
     expect(screen.getByText("Templates")).toHaveClass(
+      "bd-drawer__title",
       "bd-templates-drawer__title",
     );
   });

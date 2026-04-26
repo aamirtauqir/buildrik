@@ -78,7 +78,7 @@ export function TemplatesDrawer({
             {description}
           </DrawerDescription>
         )}
-        <div className="bd-templates-drawer__grid">{children}</div>
+        <div className="bd-drawer__body bd-templates-drawer__grid">{children}</div>
       </DrawerContent>
     </Drawer>
   );
