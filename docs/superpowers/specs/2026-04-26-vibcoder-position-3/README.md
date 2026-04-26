@@ -80,5 +80,6 @@ For execution start:
 - [x] Self-review pass (5 counting bugs fixed)
 - [x] Pass 6 plan-eng-review (3 reviewers, 15 findings, all addressed inline)
 - [x] User review gate
-- [ ] Hand off to writing-plans skill
+- [x] Hand off to writing-plans skill
+- [x] Phase A infrastructure landed
 - [ ] Phase 0 POC dispatched
