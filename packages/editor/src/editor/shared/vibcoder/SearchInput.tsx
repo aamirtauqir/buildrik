@@ -72,11 +72,6 @@ export interface SearchInputProps
   /** Visual error state. */
   error?: boolean;
   size?: SearchInputSize;
-  /**
-   * aria-label override. The wrapper has no inherent label text (search
-   * inputs typically use placeholder). If a screen-reader-only label is
-   * needed, pass aria-label via the standard prop.
-   */
 }
 
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
@@ -129,6 +124,8 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             className="bd-search__clear"
             size="xs"
             aria-label="Clear search"
+            // preserve input focus on clear — mousedown default would steal it
+            onMouseDown={(e) => e.preventDefault()}
             onClick={() => onChange("")}
             disabled={disabled}
           >

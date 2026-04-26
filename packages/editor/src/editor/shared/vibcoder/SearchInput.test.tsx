@@ -67,6 +67,24 @@ describe("vibcoder SearchInput wrapper — Contract B (always-controlled)", () =
     expect(onChange).toHaveBeenCalledWith("");
   });
 
+  it("preserves input focus when clear button is clicked (onMouseDown preventDefault)", () => {
+    const { container } = render(
+      <SearchInput value="hello" onChange={() => {}} clearable />,
+    );
+    const input = container.querySelector("input") as HTMLInputElement;
+    input.focus();
+    expect(document.activeElement).toBe(input);
+    const clearBtn = container.querySelector(
+      "button[aria-label='Clear search']",
+    ) as HTMLButtonElement;
+    const mouseDownEvent = new MouseEvent("mousedown", {
+      bubbles: true,
+      cancelable: true,
+    });
+    clearBtn.dispatchEvent(mouseDownEvent);
+    expect(mouseDownEvent.defaultPrevented).toBe(true);
+  });
+
   it("emits .is-dirty class when value non-empty (CSS hook for auto-show-clear)", () => {
     const { container } = render(
       <SearchInput value="x" onChange={() => {}} />,

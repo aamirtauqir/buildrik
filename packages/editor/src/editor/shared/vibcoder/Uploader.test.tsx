@@ -262,6 +262,102 @@ describe("vibcoder Uploader — click-to-browse via hidden file input", () => {
     fireEvent.change(input, { target: { files: fileList(file) } });
     expect(onFiles).toHaveBeenCalledOnce();
   });
+
+  it("hidden input click does NOT re-trigger root handleClick (stopPropagation prevents infinite loop)", () => {
+    // The infinite-loop foot-gun: handleClick on root → input.click() →
+    // synthetic click bubbles to root onClick → handleClick → input.click() …
+    // The hidden input's onClick={stopPropagation} breaks the cycle. We verify
+    // by spying on the input.click() method itself: clicking the input should
+    // NOT cause a second input.click() to fire from the bubbled handler.
+    const onClickSpy = vi.fn();
+    const { container } = render(
+      <Uploader prompt="Drop" onFiles={() => {}} onClick={onClickSpy} />,
+    );
+    const input = container.querySelector(
+      "input[type='file']",
+    ) as HTMLInputElement;
+    const inputClickSpy = vi.spyOn(input, "click");
+    // Simulate the browser's programmatic input.click() dispatch
+    fireEvent.click(input);
+    // Without stopPropagation, root onClick would fire (and re-trigger
+    // input.click()). Both must be 0 to confirm the cycle is broken.
+    expect(onClickSpy).not.toHaveBeenCalled();
+    expect(inputClickSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe("vibcoder Uploader — keyboard accessibility (role=button + Enter/Space)", () => {
+  it("emits role=button and aria-label=prompt for AT users", () => {
+    const { container } = render(
+      <Uploader prompt="Upload your media" onFiles={() => {}} />,
+    );
+    const dropzone = container.querySelector(".bd-uploader")!;
+    expect(dropzone.getAttribute("role")).toBe("button");
+    expect(dropzone.getAttribute("aria-label")).toBe("Upload your media");
+  });
+
+  it("non-disabled tabIndex is 0 (keyboard-focusable); disabled tabIndex is -1", () => {
+    const { container: enabled } = render(
+      <Uploader prompt="x" onFiles={() => {}} />,
+    );
+    expect(
+      (enabled.querySelector(".bd-uploader") as HTMLDivElement).tabIndex,
+    ).toBe(0);
+    const { container: disabled } = render(
+      <Uploader prompt="x" onFiles={() => {}} disabled />,
+    );
+    expect(
+      (disabled.querySelector(".bd-uploader") as HTMLDivElement).tabIndex,
+    ).toBe(-1);
+  });
+
+  it("Enter key on dropzone triggers file picker", () => {
+    const { container } = render(
+      <Uploader prompt="Drop" onFiles={() => {}} />,
+    );
+    const dropzone = container.querySelector(".bd-uploader") as HTMLDivElement;
+    const input = container.querySelector(
+      "input[type='file']",
+    ) as HTMLInputElement;
+    const clickSpy = vi.spyOn(input, "click");
+    fireEvent.keyDown(dropzone, { key: "Enter" });
+    expect(clickSpy).toHaveBeenCalledOnce();
+  });
+
+  it("Space key on dropzone triggers file picker AND prevents page scroll", () => {
+    const { container } = render(
+      <Uploader prompt="Drop" onFiles={() => {}} />,
+    );
+    const dropzone = container.querySelector(".bd-uploader") as HTMLDivElement;
+    const input = container.querySelector(
+      "input[type='file']",
+    ) as HTMLInputElement;
+    const clickSpy = vi.spyOn(input, "click");
+    // Dispatch a real DOM KeyboardEvent so we can observe defaultPrevented
+    // after React's onKeyDown handler runs.
+    const event = new KeyboardEvent("keydown", {
+      key: " ",
+      bubbles: true,
+      cancelable: true,
+    });
+    dropzone.dispatchEvent(event);
+    expect(clickSpy).toHaveBeenCalledOnce();
+    expect(event.defaultPrevented).toBe(true);
+  });
+
+  it("disabled prevents Enter/Space keydown from triggering file picker", () => {
+    const { container } = render(
+      <Uploader prompt="Drop" onFiles={() => {}} disabled />,
+    );
+    const dropzone = container.querySelector(".bd-uploader") as HTMLDivElement;
+    const input = container.querySelector(
+      "input[type='file']",
+    ) as HTMLInputElement;
+    const clickSpy = vi.spyOn(input, "click");
+    fireEvent.keyDown(dropzone, { key: "Enter" });
+    fireEvent.keyDown(dropzone, { key: " " });
+    expect(clickSpy).not.toHaveBeenCalled();
+  });
 });
 
 describe("vibcoder Uploader — base wrapper conventions", () => {

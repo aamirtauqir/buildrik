@@ -62,6 +62,7 @@ import {
   type DragEvent,
   type ChangeEvent,
   type MouseEvent,
+  type KeyboardEvent,
   forwardRef,
   useRef,
 } from "react";
@@ -134,6 +135,16 @@ export const Uploader = forwardRef<HTMLDivElement, UploaderProps>(
       inputRef.current?.click();
     };
 
+    const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+      if (disabled) return;
+      // Enter + Space activate the dropzone like a native button.
+      // preventDefault on Space stops the page from scrolling.
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        inputRef.current?.click();
+      }
+    };
+
     const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
       // CRITICAL: preventDefault REQUIRED on dragover or browser navigates
       // to the dropped file and the drop event never fires.
@@ -166,8 +177,12 @@ export const Uploader = forwardRef<HTMLDivElement, UploaderProps>(
       <div
         ref={ref}
         className={classes}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
         aria-disabled={disabled || undefined}
+        aria-label={prompt}
         onClick={handleClick}
+        onKeyDown={handleKeyDown}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
