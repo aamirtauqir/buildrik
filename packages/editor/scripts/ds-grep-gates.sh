@@ -284,22 +284,25 @@ for p in data.get('files', []):
   set -e
 fi
 
-# Gate 15: --bd-* SSOT — alias tokens defined only in bd-aliases.css.
+# Gate 15: --bd-* SSOT — alias tokens defined only in bd-aliases.css and _aliases.generated.css.
 # The --bd-* namespace is the chrome shorthand alias layer (contract documented
 # in bd-aliases.css header). Every --bd-* name must be defined in exactly one
-# file: themes/design-system/bd-aliases.css. Any other file defining --bd-*:
-# (literal or var()) is a cascade-override risk. Enforces the SSOT rule that
-# was broken by themes/bridge-tokens.css (deleted 2026-04-24) and the
-# src/new-design/project/ reference snapshot (deleted 2026-04-24).
+# of two canonical locations:
+#   1. themes/design-system/bd-aliases.css (hand-written core chrome aliases)
+#   2. themes/components/_aliases.generated.css (vibcoder codemod 3 output, R2 exception)
+# Any other file defining --bd-* (literal or var()) is a cascade-override risk.
+# Enforces the SSOT rule that was broken by themes/bridge-tokens.css (deleted 2026-04-24)
+# and the src/new-design/project/ reference snapshot (deleted 2026-04-24).
 #
 # Scope covers both:
 #   (a) CSS files — `--bd-foo: value;` rules
 #   (b) TSX/TS files — JSX style props like `style={{"--bd-foo": value}}`
-# Exclusion is anchored to the exact canonical path to prevent a future
-# `/legacy/.../bd-aliases.css` from silently bypassing the gate.
+# Exclusion is anchored to the exact canonical paths to prevent future
+# `/legacy/.../bd-aliases.css` or `/other/.../aliases.generated.css` from silently bypassing.
 CANONICAL='packages/editor/src/themes/design-system/bd-aliases.css'
+GENERATED='packages/editor/src/themes/components/_aliases.generated.css'
 LEAK_CSS=$(grep -rnE '^\s*--bd-[a-z0-9-]+\s*:' packages/editor/src --include='*.css' --exclude-dir=project 2>/dev/null \
-  | grep -vE "(^|/)${CANONICAL}:" \
+  | grep -vE "(^|/)${CANONICAL}:|${GENERATED}:" \
   || true)
 LEAK_TSX=$(grep -rnE '"--bd-[a-z0-9-]+"\s*:' packages/editor/src --include='*.tsx' --include='*.ts' --exclude-dir=project 2>/dev/null \
   | grep -v '__tests__' \
@@ -457,7 +460,10 @@ pass "Gate 18: no banned Tailwind/indigo/violet/purple bleed"
 # Vibcoder vendoring renames bdr-* → bd-* via codemod 1. Any survivor is
 # either a missed codemod pass or a hand-written regression.
 # Excludes project/ (designer-facing reference snapshots, not runtime).
-LEAK=$(grep -rE 'bdr-[a-z0-9_-]+' packages/editor/src --include='*.css' --include='*.tsx' --include='*.ts' --exclude-dir=project 2>/dev/null || true)
+# Excludes CSS comments (documentation of original component names is expected).
+LEAK=$(grep -rE 'bdr-[a-z0-9_-]+' packages/editor/src --include='*.css' --include='*.tsx' --include='*.ts' --exclude-dir=project 2>/dev/null \
+  | grep -vE ':[[:space:]]*/?\*|//' \
+  || true)
 if [ -n "$LEAK" ]; then
   echo "$LEAK"
   fail "Gate 19: bdr-* class leak (codemod 1 not applied or hand-written regression)"

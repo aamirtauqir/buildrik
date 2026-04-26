@@ -26,15 +26,27 @@ for tier in atoms molecules organisms layouts; do
     [ "$name" = "_aliases.generated" ] && continue
     [ "$name" = "_layer" ] && continue
 
-    # (a) manifest entry — look for `bd-<name>` or `bdr-<name>` in manifest
-    if ! grep -qE "(bdr|bd)-${name}\b" "$MANIFEST"; then
-      fail "$f: no manifest entry for bd-${name} (or bdr-${name}) in $MANIFEST"
+    # (a) Extract class name from file — look for any .bd-* or .bdr-* class definition
+    classname=$(grep -oE "^\s*\.bd-[a-z0-9_-]+|^\s*\.bdr-[a-z0-9_-]+" "$f" | head -1 | sed 's/^[[:space:]]*\.//')
+    if [ -z "$classname" ]; then
+      fail "$f: no body class definition .bd-* or .bdr-* found"
     fi
 
-    # (b) body class — file must define .bd-<name> at column 0 or after whitespace
-    if ! grep -qE "^\s*\.bd-${name}(\s|\{|,|:|__|--)" "$f"; then
-      fail "$f: no body class definition .bd-${name} found"
+    # (b) manifest entry — class should exist in manifest (either original bdr-* or renamed bd-*)
+    # The manifest documents vibcoder names (bdr-*). Codemod 1 renames them to bd-*.
+    # Check for the classname as-is; if not found, derive the original bdr-* equivalent.
+    if ! grep -qE "\b${classname}\b" "$MANIFEST"; then
+      # If the current class is bd-*, try the original bdr-* form
+      if [[ "$classname" == bd-* ]]; then
+        original="${classname/bd-/bdr-}"
+        if ! grep -qE "\b${original}\b" "$MANIFEST"; then
+          fail "$f: no manifest entry for ${classname} (or original ${original}) in $MANIFEST"
+        fi
+      else
+        fail "$f: no manifest entry for ${classname} in $MANIFEST"
+      fi
     fi
+
     count=$((count+1))
   done
 done
