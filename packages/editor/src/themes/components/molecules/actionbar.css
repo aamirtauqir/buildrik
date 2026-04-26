@@ -1,0 +1,95 @@
+/**
+ * bdr-actionbar — sticky save/action bar.
+ *
+ * Source: screens/_screens.css:262-284 (.bd-settings__actionbar*)
+ * Will recur in CMS edit, form-builder save, settings panes.
+ *
+ * Composition:
+ *   <div class="bdr-actionbar">
+ *     <div class="bdr-actionbar__status"> <bdr-status-dot> All saved </div>
+ *     <div class="bdr-actionbar__actions">
+ *       <bdr-btn>Discard</bdr-btn> <bdr-btn primary>Save</bdr-btn>
+ *     </div>
+ *   </div>
+ *
+ * Variants:
+ *   --floating  — fixed, centered "you have unsaved changes" toast-bar
+ *   --inset     — no border-top, padded inset (use inside cards)
+ *   --dirty     — left accent border + warning-soft tint (state changed)
+ *
+ * Buttons inside follow their own a11y baseline; the bar is a layout shell.
+ *
+ * Compose-only. ONLY --buildrick-* tokens.
+ */
+
+.bd-actionbar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--buildrick-space-3);
+  padding: var(--buildrick-space-3) var(--buildrick-space-4);
+  background: var(--buildrick-bg-card);
+  border-top: 1px solid var(--buildrick-border);
+  z-index: var(--buildrick-z-sticky);
+  transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
+              border-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+}
+
+/* ---- Left status slot ---- */
+.bd-actionbar__status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--buildrick-space-2);
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-xs);
+  color: var(--buildrick-text-muted);
+  min-width: 0;
+}
+
+/* ---- Right action cluster ---- */
+.bd-actionbar__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--buildrick-space-2);
+  flex-shrink: 0;
+}
+
+/* ---- Variants ---- */
+
+/* Floating — center-bottom unsaved-changes bar */
+.bd-actionbar--floating {
+  position: fixed;
+  bottom: var(--buildrick-space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 1px solid var(--buildrick-border);
+  border-top: 1px solid var(--buildrick-border);
+  border-radius: var(--buildrick-radius-md-plus);
+  box-shadow: var(--buildrick-shadow-md);
+  width: auto;
+  max-width: calc(100% - var(--buildrick-space-6));
+}
+
+/* Inset — sits inside a card, no top divider */
+.bd-actionbar--inset {
+  position: static;
+  border-top: 0;
+  padding: var(--buildrick-space-3) var(--buildrick-space-4);
+}
+
+/* Dirty — accent left border + warning tint, status text shifts to warning */
+.bd-actionbar--dirty {
+  border-left: 3px solid var(--buildrick-warning);
+  background: var(--buildrick-warning-soft);
+}
+.bd-actionbar--dirty .bd-actionbar__status {
+  color: var(--buildrick-warning);
+  font-weight: var(--buildrick-font-weight-medium);
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .bd-actionbar { transition: none; }
+}

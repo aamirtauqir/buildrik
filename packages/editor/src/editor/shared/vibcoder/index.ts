@@ -87,3 +87,45 @@ export type {
   SurfaceHeadSize,
   SurfaceHeadVariant,
 } from "./SurfaceHead";
+export { ActionBar, ActionBarStatus, ActionBarActions } from "./ActionBar";
+export type {
+  ActionBarProps,
+  ActionBarVariant,
+  ActionBarStatusProps,
+  ActionBarActionsProps,
+} from "./ActionBar";
+export {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbSeparator,
+  BreadcrumbIcon,
+} from "./Breadcrumb";
+export type {
+  BreadcrumbProps,
+  BreadcrumbSize,
+  BreadcrumbVariant,
+  BreadcrumbItemProps,
+  BreadcrumbSeparatorProps,
+  BreadcrumbIconProps,
+} from "./Breadcrumb";
+export { Chipbar, ChipbarAdd, ChipbarOverflow } from "./Chipbar";
+export type {
+  ChipbarProps,
+  ChipbarAddProps,
+  ChipbarAddSize,
+  ChipbarOverflowProps,
+  ChipbarOverflowSize,
+} from "./Chipbar";
+export { ColorTrigger } from "./ColorTrigger";
+export type {
+  ColorTriggerProps,
+  ColorTriggerSize,
+  ColorTriggerVariant,
+} from "./ColorTrigger";
+export { Tabs, Tab, PillGroup, PillButton } from "./Tabs";
+export type {
+  TabsProps,
+  TabProps,
+  PillGroupProps,
+  PillButtonProps,
+} from "./Tabs";

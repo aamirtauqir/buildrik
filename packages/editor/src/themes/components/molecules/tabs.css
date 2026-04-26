@@ -1,0 +1,87 @@
+/**
+ * bdr-tabs — segmented + underlined tabs molecule.
+ * Variants: bdr-tabs (underlined panel tabs), bdr-pillgroup (segmented buttons)
+ */
+
+.bd-tabs {
+  display: flex;
+  gap: var(--buildrick-space-1);
+  padding: var(--buildrick-space-2) var(--buildrick-space-2) 0;
+  background: var(--buildrick-bg-card);
+  border: 1px solid var(--buildrick-border);
+  border-radius: var(--buildrick-radius-md-plus, 10px);
+}
+.bd-tabs__tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--buildrick-space-1);
+  padding: var(--buildrick-space-3) var(--buildrick-space-3);
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-sm);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-secondary);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color var(--buildrick-duration-fast) var(--buildrick-ease-default),
+              background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
+              border-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+}
+.bd-tabs__tab:hover {
+  color: var(--buildrick-text-primary);
+  background: var(--buildrick-bg-subtle);
+}
+.bd-tabs__tab[aria-selected="true"],
+.bd-tabs__tab.is-active {
+  color: var(--buildrick-text-primary);
+  background: var(--buildrick-bg-subtle);
+  border-bottom-color: var(--buildrick-accent);
+  font-weight: var(--buildrick-font-weight-semibold);
+}
+
+/* Pill group (segmented control — used for breakpoint-like switches inline) */
+.bd-pillgroup {
+  display: inline-flex;
+  background: var(--buildrick-bg-card);
+  border: 1px solid var(--buildrick-border-medium);
+  border-radius: var(--buildrick-radius-md);
+  overflow: hidden;
+}
+.bd-pillgroup__btn {
+  padding: var(--buildrick-space-2) var(--buildrick-space-3);
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-sm);
+  font-weight: var(--buildrick-font-weight-medium);
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--buildrick-border);
+  color: var(--buildrick-text-secondary);
+  cursor: pointer;
+}
+.bd-pillgroup__btn:first-child { border-left: none; }
+.bd-pillgroup__btn[aria-pressed="true"],
+.bd-pillgroup__btn.is-on {
+  background: var(--buildrick-bg-subtle);
+  color: var(--buildrick-text-primary);
+  font-weight: var(--buildrick-font-weight-semibold);
+}
+
+/* States — a11y baseline */
+.bd-tabs__tab:focus-visible,
+.bd-pillgroup__btn:focus-visible {
+  outline: none;
+  box-shadow: var(--buildrick-glow-primary);
+  position: relative;
+  z-index: 1;
+}
+.bd-tabs__tab[disabled],
+.bd-tabs__tab[aria-disabled="true"],
+.bd-pillgroup__btn[disabled],
+.bd-pillgroup__btn[aria-disabled="true"] {
+  color: var(--buildrick-text-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
