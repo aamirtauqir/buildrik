@@ -165,6 +165,23 @@ describe("vibcoder ColorTrigger wrapper — Contract B (always-controlled)", () 
     );
   });
 
+  it("renders without throwing when value is empty string (used by variant='add')", () => {
+    const { container } = render(
+      <ColorTrigger value="" variant="add" onChange={() => {}} />,
+    );
+    const root = container.querySelector(".bd-color-trigger");
+    expect(root).toBeTruthy();
+    // hex span text should be empty
+    const hex = container.querySelector(".bd-color-trigger__hex");
+    expect(hex?.textContent ?? "").toBe("");
+    // swatch background should be empty (CSS handles dashed-border affordance)
+    const swatch = container.querySelector(
+      ".bd-color-trigger__swatch",
+    ) as HTMLElement | null;
+    expect(swatch).toBeTruthy();
+    expect(swatch!.style.background).toBe("");
+  });
+
   it("preserves caller onClick alongside onOpenChange", () => {
     const onChange = vi.fn();
     const onOpenChange = vi.fn();

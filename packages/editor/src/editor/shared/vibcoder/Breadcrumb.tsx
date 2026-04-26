@@ -48,6 +48,7 @@
 import {
   type HTMLAttributes,
   type AnchorHTMLAttributes,
+  type Ref,
   forwardRef,
 } from "react";
 
@@ -102,35 +103,46 @@ export interface BreadcrumbItemProps
   current?: boolean;
 }
 
-export const BreadcrumbItem = forwardRef<HTMLAnchorElement, BreadcrumbItemProps>(
-  ({ current, className, children, ...rest }, ref) => {
-    const classes = [
-      "bd-crumbs__item",
-      current && "bd-crumbs__item--current",
-      className,
-    ]
-      .filter(Boolean)
-      .join(" ");
-    if (current) {
-      // <span> render: drop anchor-only props (href) at the type level via
-      // attribute spread. Native span ignores href.
-      return (
-        <span
-          aria-current="page"
-          className={classes}
-          {...(rest as HTMLAttributes<HTMLSpanElement>)}
-        >
-          {children}
-        </span>
-      );
-    }
+export const BreadcrumbItem = forwardRef<
+  HTMLAnchorElement | HTMLSpanElement,
+  BreadcrumbItemProps
+>(({ current, className, children, ...rest }, ref) => {
+  const classes = [
+    "bd-crumbs__item",
+    current && "bd-crumbs__item--current",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  if (current) {
+    // `current=true` renders a <span aria-current="page">. Anchor-only props
+    // (href/target/rel/download) are explicitly dropped before spread because
+    // they would emit as invalid attributes on a span. Ref widened to
+    // HTMLSpanElement so callers measuring the terminal crumb still work.
+    const {
+      href: _href,
+      target: _target,
+      rel: _rel,
+      download: _download,
+      ...spanRest
+    } = rest;
     return (
-      <a ref={ref} className={classes} {...rest}>
+      <span
+        ref={ref as Ref<HTMLSpanElement>}
+        aria-current="page"
+        className={classes}
+        {...spanRest}
+      >
         {children}
-      </a>
+      </span>
     );
-  },
-);
+  }
+  return (
+    <a ref={ref as Ref<HTMLAnchorElement>} className={classes} {...rest}>
+      {children}
+    </a>
+  );
+});
 BreadcrumbItem.displayName = "BreadcrumbItem";
 
 export type BreadcrumbSeparatorProps = HTMLAttributes<HTMLSpanElement>;

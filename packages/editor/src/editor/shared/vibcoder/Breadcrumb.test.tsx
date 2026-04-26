@@ -109,6 +109,39 @@ describe("vibcoder BreadcrumbItem sibling", () => {
     );
     expect(ref.current).toBeInstanceOf(HTMLAnchorElement);
   });
+
+  it("forwards ref to <span> on current branch (ref type widened to HTMLAnchorElement | HTMLSpanElement)", () => {
+    const ref = createRef<HTMLAnchorElement | HTMLSpanElement>();
+    render(
+      <Breadcrumb>
+        <BreadcrumbItem current ref={ref}>
+          Final
+        </BreadcrumbItem>
+      </Breadcrumb>,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLSpanElement);
+  });
+
+  it("does NOT emit href/target/rel/download attrs on <span> when current=true (anchor-only props are dropped)", () => {
+    const { container } = render(
+      <Breadcrumb>
+        <BreadcrumbItem
+          current
+          href="/foo"
+          target="_blank"
+          rel="noopener"
+          download="x"
+        >
+          Final
+        </BreadcrumbItem>
+      </Breadcrumb>,
+    );
+    const span = container.querySelector('[aria-current="page"]')!;
+    expect(span.getAttribute("href")).toBeNull();
+    expect(span.getAttribute("target")).toBeNull();
+    expect(span.getAttribute("rel")).toBeNull();
+    expect(span.getAttribute("download")).toBeNull();
+  });
 });
 
 describe("vibcoder BreadcrumbSeparator sibling", () => {

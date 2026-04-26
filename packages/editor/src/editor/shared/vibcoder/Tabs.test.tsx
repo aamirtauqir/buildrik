@@ -84,6 +84,21 @@ describe("vibcoder Tabs wrapper — Contract B (always-controlled)", () => {
     expect(onValueChange).not.toHaveBeenCalled();
   });
 
+  it("Tab — caller onClick can call e.preventDefault() to gate onValueChange (defaultPrevented escape hatch)", () => {
+    const onValueChange = vi.fn();
+    const { container } = render(
+      <Tabs value="a" onValueChange={onValueChange}>
+        <Tab id="a">A</Tab>
+        <Tab id="b" onClick={(e) => e.preventDefault()}>
+          B
+        </Tab>
+      </Tabs>,
+    );
+    const tabs = container.querySelectorAll(".bd-tabs__tab");
+    fireEvent.click(tabs[1]);
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
   it("Tab outside <Tabs> throws", () => {
     // Suppress the React error log for this assertion.
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -214,6 +229,20 @@ describe("vibcoder PillGroup wrapper — Contract B mirror of Tabs", () => {
       <PillGroup value="a" onValueChange={onValueChange}>
         <PillButton id="a">A</PillButton>
         <PillButton id="b" disabled>
+          B
+        </PillButton>
+      </PillGroup>,
+    );
+    fireEvent.click(container.querySelectorAll(".bd-pillgroup__btn")[1]);
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it("PillButton — caller onClick can call e.preventDefault() to gate onValueChange", () => {
+    const onValueChange = vi.fn();
+    const { container } = render(
+      <PillGroup value="a" onValueChange={onValueChange}>
+        <PillButton id="a">A</PillButton>
+        <PillButton id="b" onClick={(e) => e.preventDefault()}>
           B
         </PillButton>
       </PillGroup>,

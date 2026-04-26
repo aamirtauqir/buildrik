@@ -123,7 +123,8 @@ export const Tab = forwardRef<HTMLButtonElement, TabProps>(
         className={classes}
         onClick={(e) => {
           onClick?.(e);
-          if (!disabled && !isActive) ctx.onValueChange(id);
+          if (!e.defaultPrevented && !disabled && !isActive)
+            ctx.onValueChange(id);
         }}
         {...rest}
       >
@@ -199,7 +200,8 @@ export const PillButton = forwardRef<HTMLButtonElement, PillButtonProps>(
         className={classes}
         onClick={(e) => {
           onClick?.(e);
-          if (!disabled && !isOn) ctx.onValueChange(id);
+          if (!e.defaultPrevented && !disabled && !isOn)
+            ctx.onValueChange(id);
         }}
         {...rest}
       >
