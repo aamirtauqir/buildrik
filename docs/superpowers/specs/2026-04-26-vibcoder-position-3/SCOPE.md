@@ -180,6 +180,35 @@ Re-evaluate when:
 
 Components: table, table-frame
 
+## Token Filter for Codemod 3 (Pass 6 finding #9)
+
+Codemod 3 auto-mirrors new `--bd-X` aliases for every `--buildrick-X` token vibcoder
+ships. To prevent pollution of `bd-aliases.css` with tokens for deferred buckets
+(dashboard/mobile/CMS), Codemod 3 SKIPS aliases for tokens whose names match these
+patterns:
+
+| Pattern | Reason |
+|---|---|
+| `--buildrick-mobile-*` | Mobile-only surfaces, editor is desktop-only |
+| `--buildrick-dashboard-*` | Dashboard surfaces, separate workspace |
+| `--buildrick-cms-*` | CMS records, separate scoping |
+| `--buildrick-canvas-internal-*` | Engine-rendered canvas internals |
+| `--buildrick-fab-*` | Floating action button (mobile/dashboard pattern) |
+| `--buildrick-stage-dark` | Explicit "dark demo backdrop only" per token-diff doc |
+
+When vibcoder ships a token matching a skip pattern, Codemod 3 logs the skip:
+
+```
+SKIPPED: --buildrick-mobile-fab-shadow (matches deferred-bucket pattern: --buildrick-mobile-*)
+```
+
+If Buildrik later needs a deferred-bucket token (e.g., dashboard initiative scopes
+up), the pattern entry is removed from this filter and Codemod 3 mirrors on the
+next bundle update.
+
+Tokens NOT in this filter are mirrored automatically — the default is inclusion,
+exception is exclusion.
+
 ## Extensions
 
 This section tracks Buildrik-specific component variants that exist outside the

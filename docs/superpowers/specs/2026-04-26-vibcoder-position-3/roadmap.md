@@ -60,62 +60,67 @@ phases. C should land before Phase 1 atoms ship to avoid layout reflow during
 component port QA. D should land before Phase 3 organisms (drawer dimensions
 depend on rail width).
 
-## Phase A — Infrastructure (~1 week dispatched)
+## Phase A — Infrastructure (~1 week dispatched, ~7 hr CC after Pass 6 trim)
 
-### A1: Build codemod toolchain (~3 hr CC)
+### A1: Build codemod toolchain + bundle pinning (~3.5 hr CC)
 
-- Write `scripts/vibcoder-codemod-1.ts` (class rename)
+- Write `scripts/vibcoder-codemod-1.ts` (class rename, includes @keyframes and
+  animation-name reference handling per Pass 6 finding #2)
 - Write `scripts/vibcoder-codemod-2.ts` (token fold surface)
-- Write `scripts/vibcoder-codemod-3.ts` (namespace bridge + alias mirror)
-- Write `scripts/__tests__/codemod-rename.test.ts` (5 unit tests minimum)
-- Add npm script: `"vibcoder:vendor": "bun run scripts/vibcoder-vendor.ts"`
+- Write `scripts/vibcoder-codemod-3.ts` (namespace bridge + alias mirror, with
+  SCOPE.md token allowlist filter to skip dashboard/mobile/CMS tokens)
+- Write `scripts/__tests__/codemod-rename.test.ts` (12 unit tests minimum — see
+  design.md Section 5)
+- Write `scripts/vibcoder-bundle-pin.ts` — bundle pinning artifact manager
+  (computes SHA256 of reference + components dirs, writes
+  `docs/reference/vibcoder/.bundle-version`, refuses codemod run on hash mismatch)
+- Add `.gitignore` exception: `!docs/reference/vibcoder/.bundle-version`
+- Add npm scripts:
+  - `"vibcoder:diff"` — surface bundle changes vs pinned version
+  - `"vibcoder:pin"` — bump `.bundle-version` after intentional bundle update
+  - `"vibcoder:vendor"` — refuses if hash mismatch; runs all 3 codemods if pinned
 
-**Validation:** All 5 unit tests pass. Manual run on Button vibcoder source produces
-expected output in `themes/components/bd-btn.css` + `src/preview/button.html`.
+**Validation:** All 12 unit tests pass. Bundle pinning refuses codemod when on-disk
+hash differs from `.bundle-version`. Manual run on Button source produces expected
+output in `themes/components/bd-btn.css` + `src/preview/button.html`.
 
-### A2: Write Plan v3 (~30 min CC)
+### A2: Write SCOPE.md token allowlist section (~15 min CC)
 
-- Create `~/.gstack/projects/aamirtauqir-buildrik/shahg-main-design-vibcoder-integration-position3-20260426-XXXXXX.md`
-- Frontmatter: supersedes Plan v2
-- Update Premise 2 (R2 namespace exception explicit)
-- Update Premise 3 (Path B Hybrid architecture explicit)
-- Add scope triage section referencing SCOPE.md
+SCOPE.md already lives in this spec folder. Add new section: "Token Filter for
+Codemod 3" listing `--buildrick-X` name patterns to skip during alias auto-mirror
+(dashboard/mobile/CMS tokens). Initially populated based on dashboard-bucket
+component CSS inspection.
 
-### A3: Write SCOPE.md (~30 min CC)
+(Plan v3 task A2 from earlier roadmap version REMOVED per Pass 6 scope-guardian
+finding #5 — spec set IS the plan in solo workflow.)
 
-- Create `docs/reference/vibcoder/SCOPE.md`
-- Per-component bucket assignment (chrome / dashboard-mobile / CMS / engine)
-- Extensions section (initially empty, populated as vibcoder-debt arises)
-- Reference to design.md
-
-### A4: Add 3 new gates + 1 vibcoder-port gate (~2 hr CC)
+### A3: Add 3 new gates (~1.5 hr CC, Gate 20 cut, Gate 22 cut)
 
 - Gate 19 (bdr-X leak detection) added to `ds-grep-gates.sh`
-- Gate 20 (COMPONENTS.md presence check) — needs markdown table parser, ~1 hr CC
 - Gate 21 (namespace direction R2) — extends existing partial coverage
-- vibcoder-port gate (separate script, similar to check-vocab-add.sh)
+- vibcoder-port gate (separate script, similar to `check-vocab-add.sh`) — ALSO
+  performs COMPONENTS.md presence check (merged Gate 20 functionality per Pass 6
+  finding #13)
 - Negative tests for each new gate
+- Gate 20 NOT added separately — coverage merged into vibcoder-port gate
+- Gate 22 (gallery presence) NOT added — broken gallery is its own signal per
+  Pass 6 finding #14
 
-**Validation:** Gates 19, 20, 21 all PASS on shipped state. Negative tests fire
-correctly. vibcoder-port gate fires on a test commit lacking the body line.
+**Validation:** Gates 19, 21, vibcoder-port all PASS on shipped state. Negative
+tests fire correctly.
 
-### A5: Update editor CLAUDE.md (~30 min CC)
+### A4: Update editor CLAUDE.md (~30 min CC)
 
 - Add "Vibcoder Bridge" section under DESIGN SYSTEM area
-- R2 namespace exception documented
-- Codex routing rule added
+- R2 namespace exception documented (with permanence framing)
+- Codex routing rule added — advisory throughout migration arc
 - Position 3 framing explicit
+- Bundle pinning workflow documented
 
-### A6: Pass 6 plan-eng-review (~30 min CC + Codex round)
+### A5: User review gate
 
-- Invoke `/plan-eng-review` skill on Plan v3 + design.md
-- Resolve flags inline OR escalate as blocker decisions
-- Lock spec set after review
-
-### A7: User review gate
-
-- User reviews this spec set
-- Approves or requests changes
+- User reviews amended spec set
+- Approves or requests further changes
 - Hand off to `/writing-plans` skill
 
 ## Phase B — Token Folds (~3 hr CC, parallel after A)
@@ -261,6 +266,11 @@ ButtonSplit) and tag.css. 22 atom files remain post-POC:
 
 Each batch = 1 commit with 3-5 primitives, ~3 hr CC per batch.
 
+**Per-batch canary protocol (Pass 6 finding #7):** Each batch starts with codemod
+run on FIRST primitive only. Vendor + gate check + spot-check gallery. If pass,
+proceed with remaining batch primitives. If fail, halt batch + investigate codemod
++ fix + re-run. Adds ~5 min per batch.
+
 ## Phase 2 — Molecules (~1.5 weeks dispatched, ~4 commits)
 
 Four batches grouped by usage frequency. POC pre-shipped list-row.css. 17 molecule
@@ -281,7 +291,9 @@ Four batches in dependency order. 16 organism files (no POC overlap):
   color-picker, empty-state, a11y-overlay
 - **Drawer variants (2):** pages-drawer, templates-drawer
 
-**Milestone:** End of Phase 3 → Codex routing transitions to BLOCKING mode.
+**Milestone (per Pass 6 finding #15):** Codex routing remains advisory throughout
+migration. Reconsider blocking mode post-Phase 5 based on realized false positive
+rate.
 
 ## Phase 4 — Layouts (~3 days dispatched, ~2 commits)
 
@@ -317,22 +329,26 @@ UpgradeGate, UpgradeModal) audited individually:
 | **M2: POC validated** | Phase 0 complete | Decide whether to proceed Phase 1 |
 | **M3: Atoms complete** | Phase 1 complete | All 25 atoms in gallery, gates green |
 | **M4: Molecules complete** | Phase 2 complete | Composition working |
-| **M5: Codex blocking active** | Phase 3 complete | Tiered routing transitions |
+| **M5: Migration complete** | Phase 3 complete | Codex routing remains advisory through Phase 5 (per Pass 6 finding #15) |
 | **M6: Layout coverage** | Phase 4 complete | Existing tabs use new layouts |
 | **M7: Re-port complete** | Phase 5 complete | Single architecture across all primitives |
 | **M8: Visual regression live** | Phase 6 complete | Pixel-level drift detection |
 
-## Risk register
+## Risk register (post-Pass 6)
 
 | Risk | Mitigation |
 |---|---|
-| Codemod fails edge case in Phase 1+ scale | 5 unit tests minimum, expand on failure |
-| Vibcoder bundle updates break in-flight phase | Pin bundle version (sha or date) per phase |
-| Codex blocking false positive rate too high | Tiered rollout with escape hatches; quarterly audit |
-| Re-port loses existing primitive logic | Test suite per primitive catches before merge |
+| Codemod fails edge case in Phase 1+ scale | 12 unit tests + per-batch canary protocol (Pass 6 #7) |
+| Vibcoder bundle updates break in-flight phase | `.bundle-version` pin file enforced by codemod (Pass 6 #1) |
+| Codex routing false positives | Advisory throughout migration arc; reconsider blocking post-Phase 5 (Pass 6 #15) |
+| Re-port loses existing primitive logic | Per-primitive preservation contract + test backfill before re-port (Pass 6 #4) |
 | Stage 2/3 breaks per-tab content | P0/P1 QA tier; ratchet baseline only after verification |
 | Gallery infra hostile to Vite | Time-box Q7 to 1 day; fall back to vendored vibcoder gallery only |
-| Pass 6 surfaces fundamental flaw | Resolve inline OR loop back to brainstorm Q1-Q9 |
+| Emotion + vendored CSS cascade collision | `@layer` strategy (Pass 6 #3) |
+| Codemod 3 token alias pollution | SCOPE.md Token Filter section + Codemod 3 allowlist check (Pass 6 #9) |
+| Solo-QA capacity for 14 surfaces × 3 viewports | Accepted advisory risk; P1 tabs verified post-ship |
+| Arc abandonment mid-stream | Phase 0 POC = kill gate at 1 day; Phases 1-5 each ship visible value at gate-pass |
+| Pass 6 surfaces fundamental flaw | DONE — 15 findings addressed inline before writing-plans handoff |
 
 ## Success conditions for arc complete
 

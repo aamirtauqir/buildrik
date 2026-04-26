@@ -4,7 +4,8 @@
 **Owner:** shahg
 **Branch:** main
 **Brainstorm session:** 9 questions, 9 decisions locked
-**Plan supersession:** Plan v3 supersedes Plan v2 (`~/.gstack/projects/aamirtauqir-buildrik/shahg-main-design-vibcoder-integration-20260425-235606.md`)
+**Pass 6 review:** 3 adversarial reviewers, 15 findings, all addressed inline (Pass 6 commit follows initial spec commit dad08d0)
+**Plan note:** No separate Plan v3 doc. Per Pass 6 scope-guardian finding, this spec set IS the plan in solo workflow. Plan v2 (`~/.gstack/projects/aamirtauqir-buildrik/shahg-main-design-vibcoder-integration-20260425-235606.md`) preserved as historical reference.
 
 ## What this is
 
@@ -43,8 +44,8 @@ tracked and visible to team + CI. Vibcoder bundle remains pristine in
 | Q5 (C) Chrome-ssot | Stage 2 first (sidebar 280→240/320, only Layers nav) then Stage 3 (rail 48→60, inspector 280→320). 200ms ease-out animation |
 | Q6 (A) Port strategy | Strategy C Hybrid — POC → atoms → molecules → organisms → layouts → re-port existing 37. ~25 commits, per-category batches |
 | Q7 Gallery | Minimal gallery at `packages/editor/src/preview/`, side-by-side HTML + React, vendor + codemod per bundle update |
-| Q8 Codex routing + gates | Editor CLAUDE.md section, tiered Codex routing (advisory → blocking at Phase 3), Gates 19/20/21 added now, Gate 22 after gallery, vibcoder-port gate separate |
-| Q9 Plan + spec output | Plan v3 new doc supersedes v2, Pass 6 plan-eng-review before final lock, hybrid spec output (this folder), full trifecta review |
+| Q8 Codex routing + gates | Editor CLAUDE.md section. Codex routing advisory throughout migration, blocking only post-Phase 5 (per Pass 6 scope-guardian finding — solo workflow makes mid-arc tier transition theater). Gates 19 (bdr-X leak) + 21 (namespace direction) + vibcoder-port (manifest + body line) added. Gate 20 merged into vibcoder-port. Gate 22 cut (broken gallery is its own signal). |
+| Q9 Plan + spec output | Plan v3 CUT per Pass 6 (spec set IS the plan in solo workflow). Pass 6 plan-eng-review run, 15 findings addressed inline. Hybrid spec output (this folder). |
 
 ## Reading order
 
@@ -76,9 +77,8 @@ For execution start:
 - [x] Brainstorm complete (9 questions, 9 decisions)
 - [x] Design presented (5 sections, all confirmed)
 - [x] Spec written (this set)
-- [ ] Self-review pass
-- [ ] Pass 6 plan-eng-review
-- [ ] User review gate
+- [x] Self-review pass (5 counting bugs fixed)
+- [x] Pass 6 plan-eng-review (3 reviewers, 15 findings, all addressed inline)
+- [x] User review gate
 - [ ] Hand off to writing-plans skill
-- [ ] Plan v3 created
 - [ ] Phase 0 POC dispatched

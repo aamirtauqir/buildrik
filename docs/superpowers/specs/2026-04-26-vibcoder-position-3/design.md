@@ -49,9 +49,14 @@ over upstream `--buildrick-*` tokens. Upstream tokens defined in domain files
 
 When the vibcoder bundle updates, three codemods run in sequence:
 
-**Codemod 1 — class rename.** Reads `docs/reference/vibcoder/components/*/`. For each
-`.css` and `.html` file, renames `.bdr-X` selectors and `class="bdr-X"` attributes to
-`.bd-X` and `class="bd-X"`. Outputs to `themes/components/bd-{name}.css` and
+**Codemod 1 — class rename.** Reads
+`docs/reference/vibcoder/components/{atoms,molecules,organisms,layouts}/*.css` and
+`*.html` (flat structure, not per-component subdirectories). For each file, renames:
+- `.bdr-X` selectors → `.bd-X`
+- `class="bdr-X"` attributes → `class="bd-X"`
+- `@keyframes bdr-X` identifier definitions → `@keyframes bd-X`
+- `animation: bdr-X ...` and `animation-name: bdr-X` references → `bd-X`
+Outputs to `themes/components/bd-{name}.css` and
 `packages/editor/src/preview/{name}.html`.
 
 **Codemod 2 — token fold surface.** Diffs `vibcoder/reference/*.css` against shipped
@@ -60,8 +65,71 @@ line). Drives the vocab-add commit construction. No automatic commit; surfaces
 decisions for explicit ack.
 
 **Codemod 3 — namespace bridge (R2).** Scans vendored CSS files for
-`var(--buildrick-X)` references. Renames to `var(--bd-X)`. Auto-adds matching
-`--bd-X: var(--buildrick-X)` aliases to `bd-aliases.css` for tokens that lack one.
+`var(--buildrick-X)` references including `var(--buildrick-X, fallback)` defaults
+and `var()` chains. Renames to `var(--bd-X)`. Auto-adds matching
+`--bd-X: var(--buildrick-X)` aliases to `bd-aliases.css` for tokens that lack one,
+EXCEPT tokens whose names match SCOPE.md's deferred bucket prefixes (e.g.,
+`--buildrick-mobile-*`, `--buildrick-cms-*` per future SCOPE.md token allowlist
+section). Skips circular alias creation by always referencing upstream
+`--buildrick-X` directly.
+
+### Bundle version pinning (Pass 6 finding #1)
+
+The `docs/reference/vibcoder/` directory is gitignored as a dev-local snapshot.
+Without a pin mechanism, in-flight execution arcs have no rollback baseline if the
+designer ships breaking changes mid-stream.
+
+Pinning artifact: `docs/reference/vibcoder/.bundle-version` (committed despite
+parent gitignore, via `!.bundle-version` exception). Contents:
+
+```
+SHA256_OF_REFERENCE_DIR: <sha256 hash>
+SHA256_OF_COMPONENTS_DIR: <sha256 hash>
+SHIPPED_DATE: 2026-04-25
+PINNED_AT_COMMIT: dad08d0  (initial spec commit)
+```
+
+Codemod pipeline (`bun run vibcoder:vendor`) refuses to run if on-disk hashes don't
+match `.bundle-version`. Bundle update workflow:
+
+1. Designer ships new bundle to `docs/reference/vibcoder/`
+2. Run `bun run vibcoder:diff` to surface changes
+3. Verify changes intentional (vs accidental designer overwrite)
+4. Bump `.bundle-version` with new hashes
+5. Run `bun run vibcoder:vendor` (now permitted)
+6. Single commit: bundle update + vendor outputs + `.bundle-version` bump
+
+Mid-arc breaking change recovery: revert `.bundle-version`, restore vibcoder dir
+from git via `.bundle-version`'s `PINNED_AT_COMMIT` ref OR designer re-ships.
+
+### CSS layer strategy (Pass 6 finding #3)
+
+During Phase 5 transition, 37 existing Emotion primitives co-exist with new
+vendored CSS for weeks. Emotion injects `<style>` tags AT RUNTIME, appended last
+to `<head>`. Without explicit layering, Emotion wins every cascade collision —
+masking vendored variant styles.
+
+Mitigation: declare CSS layer order in `themes/design-system/index.css`:
+
+```css
+@layer tokens, components, overrides;
+```
+
+Vendored component CSS files declare `@layer components`:
+
+```css
+/* themes/components/bd-btn.css */
+@layer components {
+  .bd-btn { ... }
+  .bd-btn--primary { ... }
+}
+```
+
+Emotion runtime styles default to no layer, which wins against any layer (per CSS
+spec). When a primitive is re-ported (Phase 5), Emotion `styled()` is removed
+entirely so cascade conflict disappears. During transition, Emotion overrides win
+intentionally — Phase 5 cutover order matches consumer order to minimize visual
+flicker.
 
 ### Position 3 with R2 namespace exception
 
@@ -69,7 +137,22 @@ Vibcoder COMPONENTS.md states: "Legacy `--bd-*` namespace was retired. Do not
 reintroduce." This conflicts with shipped state (115 `--bd-*` aliases, 152 files,
 3192 references). Position 3 with R2 resolves: vibcoder is canonical for tokens AND
 React components; the `--bd-*` alias layer is a Buildrik-specific exception
-preserved per Plan v3 Premise 2. Codemod 3 enforces the bridge mechanically.
+preserved as canonical chrome consumer namespace. Codemod 3 enforces the bridge
+mechanically.
+
+**Permanence acceptance (Pass 6 finding #2).** The two-namespace state
+(`--buildrick-*` upstream, `--bd-*` consumer) is PERMANENT, not transitional. No
+sunset criteria. Forward maintenance plan:
+
+1. Codemod 3 auto-mirrors new `--bd-X` aliases as vibcoder ships new
+   `--buildrick-X` tokens, EXCEPT tokens in deferred-bucket allowlist (SCOPE.md
+   Token Filter section).
+2. Buildrik chrome ALWAYS consumes `--bd-X`. Violations trigger Gate 21.
+3. Token files (`themes/design-system/`) ALWAYS define `--buildrick-X`. New
+   `--bd-X` definition outside `bd-aliases.css` triggers Gate 15.
+
+Cost of permanence: ~1 line per alias in `bd-aliases.css`. At current ~115 plus
+expected ~50 from this fold = ~165 lines maintained automatically. Acceptable.
 
 ### Cost shape
 
@@ -121,6 +204,39 @@ cluster), then universal (grid, center, frame, switcher).
 **Phase 5 — Re-port existing 37.** Codemod processes each existing primitive in
 `shared/ui/`. Manual review per primitive, ~10 min each. Buildrik-specific
 primitives (no vibcoder equivalent) audited individually.
+
+**Re-port preservation contract (Pass 6 finding #4).** Before any Phase 5 re-port,
+audit existing primitive for non-stylistic logic that MUST survive:
+
+1. **Refs:** does the component use `React.forwardRef`? Re-port preserves ref
+   forwarding signature.
+2. **Hooks:** which hooks does it call? Catalog: `useFocusTrap`, `useEscape`,
+   `useClickOutside`, custom hooks. Each must remain wired identically.
+3. **Event handlers:** which DOM events does it bind beyond simple onClick?
+   `onKeyDown`, `onMouseEnter`, `onPointerLeave`, focus-trap behavior, etc.
+4. **Portals:** does it render via `createPortal`? Re-port keeps portal target.
+5. **Controlled state:** does the component manage internal state? Where does
+   state-vs-props boundary sit?
+6. **a11y attributes:** which aria-* attributes does it set dynamically?
+   `aria-expanded`, `aria-pressed`, `aria-disabled`, `aria-invalid` etc.
+
+Per primitive, write preservation contract entry in PR/commit body before
+re-port lands:
+
+```
+preservation: Modal.tsx
+  refs: forwardRef<HTMLDivElement>
+  hooks: useFocusTrap, useEscape
+  events: onKeyDown (Esc), backdrop onClick
+  portal: document.body
+  state: open prop controlled by parent
+  a11y: aria-modal, aria-labelledby, aria-describedby
+```
+
+Tests verify each preservation point. If existing test coverage is insufficient
+to verify (most primitives have partial test coverage), backfill tests BEFORE
+re-port. Phase 5 includes test backfill time in budget (~10 min review + up to
+~30 min backfill per primitive that needs it).
 
 ### Per-port contract
 
@@ -264,11 +380,16 @@ Per CLAUDE.md, validation concentrates at system boundaries. Five identified:
 | Gate 17 (ghost aliases) | --bd-X has no upstream --buildrick-X | Add upstream OR remove alias |
 | Gate 18 (banned colors) | Tailwind/indigo/violet/purple bleed | Replace with cobalt accent |
 | Gate 19 (bdr-X leak) | Codemod missed rename | Fix codemod regex, re-run |
-| Gate 20 (COMPONENTS.md presence) | Shipped bd-X not in manifest | Add to vibcoder COMPONENTS.md OR remove orphan |
 | Gate 21 (namespace direction R2) | Chrome consumer uses --buildrick-X direct | Switch to --bd-X via codemod or manual |
-| Gate 22 (gallery presence — deferred) | New primitive without preview | Vendor preview/{name}.html |
 | vocab-add gate | Token add without commit body line | Add `vocab-add:` line per spec |
-| vibcoder-port gate (new) | Component CSS without commit body line | Add `vibcoder-port:` line per spec |
+| vibcoder-port gate (replaces Gate 20) | Component CSS without commit body line OR class not in COMPONENTS.md | Add `vibcoder-port:` line per spec; if class missing from manifest, add to vibcoder COMPONENTS.md OR remove orphan class |
+
+**Cut per Pass 6 scope-guardian:**
+- Gate 20 (separate COMPONENTS.md presence check) merged into vibcoder-port gate to
+  avoid redundant manifest-check coverage.
+- Gate 22 (gallery presence) cut entirely. Broken gallery is its own signal —
+  enforcement-for-enforcement adds nothing beyond what a broken `localhost:5050/preview`
+  surfaces immediately.
 
 ### Vibcoder-debt escape hatch
 
@@ -288,23 +409,47 @@ Procedure:
 Gate 20 recognizes `vibcoder-debt:` flag. Allowlists the class. Re-fails after
 `resolution-by` date passes (auto-stale = visible reminder).
 
-### Codex routing tiered rollout
+### Codex routing — advisory throughout migration (Pass 6 finding #15)
 
-**Phase 0-2 (Advisory):** Codex flags drift as suggestion. User decides per case.
-False positives common during POC tuning. Bypass: ignore.
+Per Pass 6 scope-guardian: in solo workflow, the developer is both gatekeeper and
+bypass authority. Mid-arc tier transition from advisory to blocking is enforcement
+theater. Adopted simpler model:
 
-**Phase 3 organisms-complete (Blocking):** Codex rejects PRs without COMPONENTS.md
-reference. Bypass: `vibcoder-debt:` commit flag OR `[skip-vibcoder-check]` PR title
-flag (logged for audit).
+- **Phases 0-5 (entire migration arc):** Codex routing in ADVISORY mode. Flags
+  drift as suggestion. User decides per case. False positives don't block work.
+- **Post-Phase 5 (after migration stable):** Reconsider blocking mode based on
+  realized false positive rate + bypass count from advisory phase.
 
-### Quarterly post-mortem
+This collapses the original tiered rollout into one transition (post-arc, not
+mid-arc) and avoids inventing bypass mechanisms (`vibcoder-debt:`, `[skip-vibcoder-check]`)
+that solo workflow renders meaningless.
 
-Run quarterly:
+### Bundle-update review (replaces quarterly cadence per Pass 6 finding #12)
 
-1. Audit allowlist entries — remove stale
-2. Audit `vibcoder-debt` past resolution-by — chase or extend
-3. Audit Codex bypass count — high count signals prompt drift
-4. Audit gate trigger frequency — high signals real problem or noisy gate
+Per Pass 6 scope-guardian: quarterly post-mortem is operations practice for team
+engineering. Solo project = state visible in files at any time. Replaced with a
+single contextual trigger:
+
+**Before any vibcoder bundle update**, review SCOPE.md Extensions section to:
+
+1. Check `vibcoder-debt` entries past `resolution-by` date — bundle update may
+   include the upstream variant that resolves the debt
+2. Check accumulated extensions against new bundle — fold what's now upstream
+
+No calendar cadence. State-driven trigger only. Eliminates audit machinery.
+
+### bd-* deprecation/rename policy (Pass 6 finding #10)
+
+When Buildrik internally renames a `bd-X` class (rare — typically only when
+vibcoder upstream renames first):
+
+1. Rename in `themes/components/bd-X.css` (vendor regen handles auto)
+2. Sweep all consumers via codemod: `grep -rE "\.bd-OLD\b" packages/editor/src`
+3. Single rename commit: bundle re-vendor + consumer sweep + tests
+4. No deprecated alias (`bd-OLD` → `bd-NEW`). Cutover atomic.
+
+Buildrik internal renames driven by vibcoder upstream. No independent rename
+authority — Position 3 means vibcoder names are canonical.
 
 ### Prevention over recovery
 
@@ -370,18 +515,46 @@ test("Button — disabled prevents click", async () => {
 Helper: `__tests__/helpers/assertOnlyBdTokens.ts` extracted, reused across all
 primitives.
 
-### Codemod unit tests
+### Codemod unit tests (expanded per Pass 6 finding #2)
 
-`scripts/__tests__/codemod-rename.test.ts` — 5 minimum cases:
+`scripts/__tests__/codemod-rename.test.ts` — 12 minimum cases (was 5; expanded for
+real bundle edge cases):
 
 1. Simple class rename (`.bdr-btn` → `.bd-btn`)
 2. Modifier rename (`.bdr-btn--primary` → `.bd-btn--primary`)
 3. Element rename (`.bdr-btn__icon` → `.bd-btn__icon`)
 4. Nested selector (`.bdr-card .bdr-btn` → `.bd-card .bd-btn`)
 5. HTML attribute (`class="bdr-btn"` → `class="bd-btn"`)
+6. **Pseudo-class** (`.bdr-btn:hover` → `.bd-btn:hover`)
+7. **Attribute selector** (`.bdr-btn[disabled]` → `.bd-btn[disabled]`)
+8. **Compound selector** (`.bdr-btn.is-active` → `.bd-btn.is-active`)
+9. **Adjacent siblings** (`.bdr-btn + .bdr-btn` → `.bd-btn + .bd-btn`)
+10. **@keyframes identifier** (`@keyframes bdr-btn-spin {}` → `@keyframes bd-btn-spin {}`)
+11. **animation-name reference** (`animation: bdr-btn-spin 1s` → `animation: bd-btn-spin 1s`;
+    also `animation-name: bdr-btn-spin` → `bd-btn-spin`)
+12. **var() with default fallback** (`var(--buildrick-X, #fallback)` → `var(--bd-X, #fallback)`
+    via Codemod 3)
 
-Edge cases added over time: pseudo-classes, attribute selectors, compound
-selectors, adjacent siblings.
+Edge cases added on encounter (not pre-imagined): @supports blocks, container
+queries, CSS nesting (if vibcoder adopts), media queries, custom property
+declarations vs references, false-positive prevention (`.bdrXYZ` should NOT
+rename).
+
+### Per-batch canary protocol (Pass 6 finding #7)
+
+Codemod blast radius is real — subtle bug ships across 65 components before
+noticed. Canary mitigation:
+
+After Phase 0 POC validates infrastructure end-to-end, EACH subsequent batch
+follows this canary protocol:
+
+1. Run codemod on FIRST primitive of batch only
+2. Vendor outputs → run gates → spot-check gallery
+3. If pass: run codemod on remaining batch primitives
+4. If fail: halt batch, investigate codemod, fix, re-run from step 1
+
+Canary cost: ~5 min per batch (codemod runs on 1 file, then on N-1 more files
+after pass). Catches codemod regressions before they multiply.
 
 ### Gate negative tests
 
