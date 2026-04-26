@@ -63,11 +63,16 @@ const inputOverlayStyle: CSSProperties = {
 export const Slider = forwardRef<HTMLInputElement, SliderProps>(
   ({ value, onChange, min = 0, max = 100, step = 1, label, unit, className, ...rest }, ref) => {
     const range = max - min;
+    // Guard against NaN / ±Infinity propagating into the percent computation
+    // (would emit `width: NaN%` styles and `aria-valuenow="NaN"`). Parity with
+    // Progress.tsx's NaN guard. Falls back to `min` (not 0) because Slider has
+    // arbitrary min/max range — `min` is the safe in-range floor.
+    const safeValue = Number.isFinite(value) ? value : min;
     // Clamp to [0, 100] so out-of-range values can't overflow the visual track.
     // Native input clamps internally for keyboard input but the styled divs
     // render the raw computed percent — guard against state-lag during step
     // transitions or external writes that overshoot bounds.
-    const rawPercent = range > 0 ? ((value - min) / range) * 100 : 0;
+    const rawPercent = range > 0 ? ((safeValue - min) / range) * 100 : 0;
     const percent = Math.max(0, Math.min(100, rawPercent));
     const classes = ["bd-slider", className].filter(Boolean).join(" ");
     return (
@@ -76,7 +81,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
           <div className="bd-slider__head">
             <span className="bd-slider__label">{label}</span>
             <span className="bd-slider__value">
-              {value}
+              {safeValue}
               {unit && <span className="bd-slider__value-unit">{unit}</span>}
             </span>
           </div>
@@ -90,7 +95,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
             min={min}
             max={max}
             step={step}
-            value={value}
+            value={safeValue}
             onChange={(e) => onChange(Number(e.target.value))}
             style={inputOverlayStyle}
             {...rest}

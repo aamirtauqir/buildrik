@@ -84,4 +84,5 @@ For execution start:
 - [x] Phase A infrastructure landed
 - [x] Phase 0 POC dispatched
 - [x] Phase 0 POC complete (button atom, findings captured at poc-findings.md)
-- [ ] Phase 1 atoms — fan-out (blocked on poc-findings tuning items)
+- [x] Phase 1 atoms — fan-out complete (23 atoms across 6 batches)
+- [ ] Phase 2 molecules — fan-out (unblocked once Phase 1 findings reviewed)

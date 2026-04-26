@@ -4,7 +4,9 @@ import { Label } from "../editor/shared/vibcoder/Label";
 import { sectionLabel, stack } from "./_galleryStyles";
 
 const stackForms = { ...stack, gap: 16, maxWidth: 360 };
-const field = { display: "flex" as const, flexDirection: "column" as const, gap: 4 };
+// Local column-flex row for label-over-input. Renamed from `field` to avoid
+// shadowing `_galleryStyles.field` (block + maxWidth, different shape).
+const formRow = { display: "flex" as const, flexDirection: "column" as const, gap: 4 };
 const fieldMock = {
   padding: "6px 10px",
   border: "1px solid #ccc",
@@ -17,7 +19,7 @@ function Demo() {
     <>
       <h2 style={sectionLabel}>default</h2>
       <div style={stackForms}>
-        <div style={field}>
+        <div style={formRow}>
           <Label htmlFor="f1">Page title</Label>
           <input id="f1" style={fieldMock} defaultValue="Home" />
         </div>
@@ -25,7 +27,7 @@ function Demo() {
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>required + info</h2>
       <div style={stackForms}>
-        <div style={field}>
+        <div style={formRow}>
           <Label
             htmlFor="f2"
             required
@@ -47,7 +49,7 @@ function Demo() {
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>disabled</h2>
       <div style={stackForms}>
-        <div style={field}>
+        <div style={formRow}>
           <Label htmlFor="f4" disabled>API key (read-only)</Label>
           <input id="f4" style={fieldMock} value="sk_live_***" readOnly />
         </div>

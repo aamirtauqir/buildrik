@@ -91,6 +91,20 @@ describe("vibcoder Label wrapper", () => {
       .toBe("Show field guidance");
   });
 
+  it("info={{}} (empty object) collapses to identical behavior as info={true}", () => {
+    // Closes the discriminator coverage matrix: truthy empty object MUST land
+    // on the same default props path as the boolean-true form (default
+    // aria-label, no onClick handler, button still present).
+    const { container } = render(<Label info={{}}>x</Label>);
+    const btn = container.querySelector("button.bd-label__info")! as HTMLButtonElement;
+    expect(btn).toBeTruthy();
+    expect(btn.getAttribute("type")).toBe("button");
+    expect(btn.getAttribute("aria-label")).toBe("More info");
+    expect(btn.querySelector("svg.bd-icon")).toBeTruthy();
+    // No caller-supplied onClick: clicking is a no-op (does not throw).
+    fireEvent.click(btn);
+  });
+
   it("renders required + info together, in that order", () => {
     const { container } = render(<Label required info>Email</Label>);
     const label = container.querySelector("label")!;

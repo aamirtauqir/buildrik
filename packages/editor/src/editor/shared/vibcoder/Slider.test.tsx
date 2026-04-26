@@ -109,4 +109,38 @@ describe("vibcoder Slider wrapper", () => {
     );
     expect(container.querySelector(".bd-slider")!.className).toContain("extra");
   });
+
+  // NaN / Infinity guard parity with Progress.tsx — falls back to `min` (the
+  // safe in-range floor for arbitrary slider ranges, not 0).
+  it("falls back to min when value is NaN (no NaN in DOM or input)", () => {
+    const { container } = render(
+      <Slider value={NaN} min={10} max={20} onChange={() => {}} />
+    );
+    const input = container.querySelector("input[type=range]") as HTMLInputElement;
+    expect(input.value).toBe("10");
+    const fill = container.querySelector(".bd-slider__fill")! as HTMLDivElement;
+    const thumb = container.querySelector(".bd-slider__thumb")! as HTMLDivElement;
+    expect(fill.style.width).toBe("0%");
+    expect(thumb.style.left).toBe("0%");
+  });
+
+  it("falls back to min when value is +Infinity", () => {
+    const { container } = render(
+      <Slider value={Infinity} min={10} max={20} onChange={() => {}} />
+    );
+    const input = container.querySelector("input[type=range]") as HTMLInputElement;
+    expect(input.value).toBe("10");
+    const fill = container.querySelector(".bd-slider__fill")! as HTMLDivElement;
+    expect(fill.style.width).toBe("0%");
+  });
+
+  it("falls back to min when value is -Infinity", () => {
+    const { container } = render(
+      <Slider value={-Infinity} min={10} max={20} onChange={() => {}} />
+    );
+    const input = container.querySelector("input[type=range]") as HTMLInputElement;
+    expect(input.value).toBe("10");
+    const fill = container.querySelector(".bd-slider__fill")! as HTMLDivElement;
+    expect(fill.style.width).toBe("0%");
+  });
 });

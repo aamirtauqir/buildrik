@@ -22,7 +22,10 @@ const COMPONENTS = join(ROOT, "packages/editor/src/themes/components");
 
 // Heuristic buckets. Modifier name pattern → group label.
 const SIZE_TOKENS = new Set(["xs", "sm", "md", "lg", "xl", "2xl"]);
-const STATE_TOKENS = new Set(["busy", "loading", "active", "disabled", "hover", "focus", "selected", "checked", "indeterminate", "open", "closed", "expanded", "collapsed"]);
+// State tokens — modifier names that semantically represent UI state (paired
+// with aria-* by the wrapper) rather than visual variant. Phase 1 added
+// `selectable` (Tag toggle), `pressed` (IconButton toggle), `pulse` (StatusDot).
+const STATE_TOKENS = new Set(["busy", "loading", "active", "disabled", "hover", "focus", "selected", "checked", "indeterminate", "open", "closed", "expanded", "collapsed", "selectable", "pressed", "pulse"]);
 
 export function classify(modifier) {
   if (SIZE_TOKENS.has(modifier)) return "sizes";

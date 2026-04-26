@@ -4,7 +4,9 @@ import { HelperText } from "../editor/shared/vibcoder/HelperText";
 import { sectionLabel, stack } from "./_galleryStyles";
 
 const stackWide = { ...stack, gap: 16, maxWidth: 360 };
-const field = { display: "flex" as const, flexDirection: "column" as const, gap: 4 };
+// Local column-flex row for input-over-helper. Renamed from `field` to avoid
+// shadowing `_galleryStyles.field` (block + maxWidth, different shape).
+const formRow = { display: "flex" as const, flexDirection: "column" as const, gap: 4 };
 const fieldMock = {
   padding: "6px 10px",
   border: "1px solid #ccc",
@@ -17,7 +19,7 @@ function Demo() {
     <>
       <h2 style={sectionLabel}>default (muted)</h2>
       <div style={stackWide}>
-        <div style={field}>
+        <div style={formRow}>
           <input style={fieldMock} defaultValue="Home" />
           <HelperText>Shown in browser tab and search results.</HelperText>
         </div>
@@ -25,7 +27,7 @@ function Demo() {
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>error</h2>
       <div style={stackWide}>
-        <div style={field}>
+        <div style={formRow}>
           <input style={fieldMock} defaultValue="Too short" />
           <HelperText tone="error" aria-live="polite">
             Must be at least 70 characters.
@@ -35,7 +37,7 @@ function Demo() {
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>success</h2>
       <div style={stackWide}>
-        <div style={field}>
+        <div style={formRow}>
           <input style={fieldMock} defaultValue="/pricing" />
           <HelperText tone="success">Slug is available.</HelperText>
         </div>
@@ -43,7 +45,7 @@ function Demo() {
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>warning</h2>
       <div style={stackWide}>
-        <div style={field}>
+        <div style={formRow}>
           <input style={fieldMock} defaultValue="acme.dev" />
           <HelperText tone="warning">
             DNS not yet verified — propagation can take up to 24h.
