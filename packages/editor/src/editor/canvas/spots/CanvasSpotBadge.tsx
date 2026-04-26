@@ -97,7 +97,7 @@ export const CanvasSpotBadge: React.FC<CanvasSpotBadgeProps> = ({
 
   const badgeColors: Record<string, string> = {
     tag: "#00d4aa",
-    id: "#7c3aed",
+    id: "var(--bd-accent-pressed)",
     class: "#f59e0b",
     data: "var(--bd-accent)",
     custom: badge.color || "var(--bd-fg-muted)",

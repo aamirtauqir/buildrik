@@ -1697,7 +1697,7 @@ textarea:disabled {
 .buildrick-icon-btn:focus-visible {
   outline: 2px solid var(--buildrick-accent) !important;
   outline-offset: 2px !important;
-  box-shadow: 0 0 0 4px rgba(124, 109, 250, 0.2) !important;
+  box-shadow: 0 0 0 4px rgba(45, 109, 255, 0.2) !important;
 }
 
 .buildrick-btn:focus:not(:focus-visible),

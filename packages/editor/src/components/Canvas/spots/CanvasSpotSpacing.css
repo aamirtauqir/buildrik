@@ -39,7 +39,7 @@
 }
 
 .buildrick-spacing-indicator--padding .buildrick-spacing-indicator-label {
-  background-color: #7c3aed;
+  background-color: var(--bd-accent-pressed);
 }
 
 .buildrick-spacing-indicator--top .buildrick-spacing-indicator-label {

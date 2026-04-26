@@ -111,7 +111,7 @@
 }
 
 .buildrick-icon-btn--active:hover {
-  background: rgba(139, 92, 246, 0.15);
+  background: rgba(45, 109, 255, 0.15);
 }
 
 /* Pin Icon states */
@@ -275,7 +275,7 @@
 .buildrick-card.selected {
   background: var(--buildrick-surface-4);
   border: 2px solid var(--buildrick-accent);
-  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2), var(--buildrick-shadow-md);
+  box-shadow: 0 0 0 4px rgba(45, 109, 255, 0.2), var(--buildrick-shadow-md);
 }
 
 .buildrick-card.dragging {
@@ -566,7 +566,7 @@
   height: 28px;
   flex-shrink: 0;
   color: var(--buildrick-accent);
-  background: rgba(139, 92, 246, 0.1);
+  background: rgba(45, 109, 255, 0.1);
   border-radius: 6px;
 }
 
@@ -630,7 +630,7 @@
 /* Background only on hover */
 .buildrick-element-card-star:hover {
   color: var(--buildrick-accent);
-  background: rgba(139, 92, 246, 0.15);
+  background: rgba(45, 109, 255, 0.15);
 }
 
 .buildrick-element-card-star.favorited {
@@ -640,7 +640,7 @@
 }
 
 .buildrick-element-card-star.favorited:hover {
-  background: rgba(139, 92, 246, 0.15);
+  background: rgba(45, 109, 255, 0.15);
 }
 
 /* Drag ghost for card preview */
@@ -1983,7 +1983,7 @@
   flex-direction: column;
   padding: var(--bd-space-5);
   margin: 0 10px var(--bd-space-4);
-  background: linear-gradient(135deg, rgba(45, 109, 255, 0.9) 0%, rgba(168, 85, 247, 0.9) 100%);
+  background: linear-gradient(135deg, rgba(45, 109, 255, 0.9) 0%, rgba(45, 109, 255, 0.9) 100%);
   border-radius: 16px;
   box-shadow:
     0 10px 30px -10px rgba(45, 109, 255, 0.5),
@@ -3179,20 +3179,20 @@
   gap: var(--bd-space-2);
   margin: var(--bd-space-2) var(--bd-space-3) var(--bd-space-3);
   padding: 14px var(--bd-space-6);
-  background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+  background: linear-gradient(135deg, var(--bd-accent), var(--bd-accent-pressed));
   color: var(--bd-fg-on-accent);
   border: none;
   border-radius: 10px;
   font-size: var(--buildrick-text-md);
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 4px 14px rgba(45, 109, 255, 0.4);
   transition: all 200ms ease;
 }
 
 .buildrick-insert-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+  box-shadow: 0 6px 20px rgba(45, 109, 255, 0.5);
 }
 
 .buildrick-insert-btn:active {
@@ -3206,7 +3206,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+  background: linear-gradient(135deg, var(--bd-accent), var(--bd-accent-pressed));
   border-radius: 6px;
   color: #fff;
   margin-right: var(--bd-space-2);
@@ -3251,7 +3251,7 @@
 
 /* Highlight Match (Search Results) */
 .buildrick-highlight-match {
-  background: rgba(139, 92, 246, 0.3);
+  background: rgba(45, 109, 255, 0.3);
   color: inherit;
   padding: 0 2px;
   border-radius: 2px;
@@ -3411,7 +3411,7 @@
 }
 
 .buildrick-icon-rail-btn--active::after {
-  background: linear-gradient(135deg, rgba(45, 109, 255, 0.12), rgba(139, 92, 246, 0.12));
+  background: linear-gradient(135deg, rgba(45, 109, 255, 0.12), rgba(45, 109, 255, 0.12));
   box-shadow: inset 0 0 0 1px rgba(45, 109, 255, 0.25);
 }
 
@@ -3424,7 +3424,7 @@
 }
 
 .buildrick-icon-rail-btn--active:hover::after {
-  background: linear-gradient(135deg, rgba(45, 109, 255, 0.18), rgba(139, 92, 246, 0.18));
+  background: linear-gradient(135deg, rgba(45, 109, 255, 0.18), rgba(45, 109, 255, 0.18));
 }
 
 /* Icon button inside the rail */
@@ -3877,7 +3877,7 @@
   align-items: center;
   gap: var(--bd-space-1);
   padding: 6px var(--bd-space-3);
-  background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+  background: linear-gradient(135deg, var(--bd-accent), var(--bd-accent-pressed));
   border: none;
   border-radius: 6px;
   color: white;
@@ -4482,7 +4482,7 @@
 }
 
 .tmpl-preview__vp-btn--active {
-  background: rgba(124, 109, 250, 0.2);
+  background: rgba(45, 109, 255, 0.2);
   color: var(--bd-accent-hover);
 }
 
@@ -4809,7 +4809,7 @@
   position: fixed;
   width: var(--tmpl-tooltip-w, 162px);
   background: #12121e;
-  border: 1px solid rgba(124, 109, 250, 0.28);
+  border: 1px solid rgba(45, 109, 255, 0.28);
   border-radius: 10px;
   padding: 10px var(--bd-space-3);
   pointer-events: auto;
@@ -4833,7 +4833,7 @@
   height: 0;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-bottom: 6px solid rgba(124, 109, 250, 0.28);
+  border-bottom: 6px solid rgba(45, 109, 255, 0.28);
 }
 
 .tmpl-onboarding__tooltip--arrow-up::after {
@@ -4860,7 +4860,7 @@
   height: 0;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-top: 6px solid rgba(124, 109, 250, 0.28);
+  border-top: 6px solid rgba(45, 109, 255, 0.28);
 }
 
 .tmpl-onboarding__tooltip--arrow-down::after {
@@ -4887,7 +4887,7 @@
   height: 0;
   border-top: 6px solid transparent;
   border-bottom: 6px solid transparent;
-  border-right: 6px solid rgba(124, 109, 250, 0.28);
+  border-right: 6px solid rgba(45, 109, 255, 0.28);
 }
 
 .tmpl-onboarding__tooltip--arrow-left::after {
@@ -4907,7 +4907,7 @@
 .tmpl-onboarding__header {
   font-size: 9px;
   font-weight: 600;
-  color: rgba(124, 109, 250, 0.7);
+  color: rgba(45, 109, 255, 0.7);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 6px;
@@ -5670,7 +5670,7 @@
 .buildrick-component-detail-insert-btn {
   width: 100%;
   padding: var(--bd-space-3) var(--bd-space-4);
-  background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+  background: linear-gradient(135deg, var(--bd-accent), var(--bd-accent-pressed));
   border: none;
   border-radius: var(--buildrick-radius-md);
   color: white;
@@ -5681,7 +5681,7 @@
 }
 
 .buildrick-component-detail-insert-btn:hover {
-  background: linear-gradient(135deg, #9D6FFF, #8B5CF6);
+  background: linear-gradient(135deg, var(--bd-accent-hover), var(--bd-accent));
   transform: translateY(-1px);
 }
 
@@ -5881,7 +5881,7 @@
 }
 
 .buildrick-context-banner-replace {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(45, 109, 255, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(45, 109, 255, 0.1) 0%, rgba(45, 109, 255, 0.1) 100%);
   border-bottom-color: var(--buildrick-accent-tint);
 }
 

@@ -386,12 +386,18 @@ pass "Gate 16: editor-scoped hex at or below baseline (REGRESSION mode)"
 #   - Tailwind indigo palette hex (D-arc 2026-04-26):
 #     #E0E7FF (indigo-100), #C7D2FE (indigo-200), #A5B4FC (indigo-300),
 #     #818CF8 (indigo-400), #6366F1 (indigo-500)
-#   - Tailwind blue + azure + indigo rgba families:
+#   - Tailwind violet + lavender + custom violet hex (E-arc 2026-04-26):
+#     #8B5CF6 (violet-500), #7C3AED (violet-600), #7C6DFA (lavender —
+#     legacy pre-cobalt accent), #9D6FFF (custom violet variant)
+#   - Tailwind blue + azure + indigo + violet rgba families:
 #     rgba(0, 163, 255, x)    — azure (legacy editor accent)
 #     rgba(37, 99, 235, x)    — blue-600 alpha
 #     rgba(59, 130, 246, x)   — blue-500 alpha
 #     rgba(99, 102, 241, x)   — indigo-500 alpha (D-arc)
 #     rgba(129, 140, 248, x)  — indigo-400 alpha (D-arc)
+#     rgba(124, 109, 250, x)  — lavender alpha (E-arc)
+#     rgba(139, 92, 246, x)   — violet-500 alpha (E-arc)
+#     rgba(168, 85, 247, x)   — purple-500 alpha (E-arc)
 #   - Words: indigo, violet, purple (case-insensitive, word-boundary).
 # Canonical accent: --buildrick-accent #2D6DFF (cobalt). See color.css:33-37.
 # Allowlist (paths with legitimate non-chrome usage):
@@ -416,18 +422,22 @@ pass "Gate 16: editor-scoped hex at or below baseline (REGRESSION mode)"
 #     editor/ecommerce/CollectionSetupModal.tsx   — collection accent
 #     editor/sidebar/tabs/templates/templatesData.ts — template HTML content
 #     editor/canvas/overlays/MediaQuickActions.tsx — color swatch picker
+#   Extended (E-arc 2026-04-26 — violet/lavender added):
+#     blocks/Components/                — published HTML user blocks (Tabs, Modal)
+#     shared/forms/GradientPicker.tsx   — gradient picker default-value example
+#     engine/ai/PageGenerator.ts        — AI emits hex as user CSS-variable default
 #   - **/__tests__/** + colocated *.test.ts — test fixtures
 # History:
 #   docs/ideation/2026-04-26-banned-color-cleanup.md  — H-arc (G1-H4)
 #   docs/ideation/2026-04-26-tailwind-blue-migration.md — C-arc (C1-C6)
-GATE18_RAW=$(grep -rniE '#1D4ED8|#1E40AF|#4F46E5|#EFF6FF|#DBEAFE|#BFDBFE|#60A5FA|#3B82F6|#2563EB|#1E3A8A|#E0E7FF|#C7D2FE|#A5B4FC|#818CF8|#6366F1|rgba\(\s*(0,\s*163,\s*255|37,\s*99,\s*235|59,\s*130,\s*246|99,\s*102,\s*241|129,\s*140,\s*248)|\b(indigo|violet|purple)\b' packages/editor/src \
+GATE18_RAW=$(grep -rniE '#1D4ED8|#1E40AF|#4F46E5|#EFF6FF|#DBEAFE|#BFDBFE|#60A5FA|#3B82F6|#2563EB|#1E3A8A|#E0E7FF|#C7D2FE|#A5B4FC|#818CF8|#6366F1|#8B5CF6|#7C3AED|#7C6DFA|#9D6FFF|rgba\(\s*(0,\s*163,\s*255|37,\s*99,\s*235|59,\s*130,\s*246|99,\s*102,\s*241|129,\s*140,\s*248|124,\s*109,\s*250|139,\s*92,\s*246|168,\s*85,\s*247)|\b(indigo|violet|purple)\b' packages/editor/src \
   --include='*.css' --include='*.ts' --include='*.tsx' --include='*.js' --include='*.jsx' \
   --exclude-dir=__tests__ \
   --exclude-dir=project \
   --exclude-dir=node_modules \
   --exclude-dir=dist 2>/dev/null || true)
 GATE18_VIOLATIONS=$(echo "$GATE18_RAW" | grep -vE \
-  'shared/utils/parsers/colorTypes\.ts|shared/utils/devLogger\.ts|engine/collaboration/CollaborationManager\.ts|engine/canvas/constants\.ts|features/design-system/|themes/design-system/design\.css|blocks/Ecommerce/|shared/forms/ColorField\.tsx|shared/ui/index\.tsx|shared/constants/config\.ts|ai/ColorPalette\.tsx|editor/collaboration/PresenceIndicators\.tsx|editor/ecommerce/CollectionSetupModal\.tsx|editor/sidebar/tabs/templates/templatesData\.ts|editor/canvas/overlays/MediaQuickActions\.tsx|editor/sidebar/tabs/media/components/StockSourceModal\.tsx|editor/sidebar/tabs/media/data/mediaTypes\.ts|\.test\.ts' \
+  'shared/utils/parsers/colorTypes\.ts|shared/utils/devLogger\.ts|engine/collaboration/CollaborationManager\.ts|engine/canvas/constants\.ts|engine/ai/PageGenerator\.ts|features/design-system/|themes/design-system/design\.css|blocks/Ecommerce/|blocks/Components/|shared/forms/ColorField\.tsx|shared/forms/GradientPicker\.tsx|shared/ui/index\.tsx|shared/constants/config\.ts|ai/ColorPalette\.tsx|editor/collaboration/PresenceIndicators\.tsx|editor/ecommerce/CollectionSetupModal\.tsx|editor/sidebar/tabs/templates/templatesData\.ts|editor/canvas/overlays/MediaQuickActions\.tsx|editor/sidebar/tabs/media/components/StockSourceModal\.tsx|editor/sidebar/tabs/media/data/mediaTypes\.ts|\.test\.ts' \
   | grep -v '^$' || true)
 if [ -n "$GATE18_VIOLATIONS" ]; then
   echo "$GATE18_VIOLATIONS" | head -20

@@ -107,7 +107,7 @@
 }
 
 .tmpl-preview__vp-btn--active {
-  background: rgba(124, 109, 250, 0.2);
+  background: rgba(45, 109, 255, 0.2);
   color: var(--bd-accent-hover);
 }
 

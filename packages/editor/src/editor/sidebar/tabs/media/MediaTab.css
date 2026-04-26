@@ -506,6 +506,6 @@
 }
 
 .med-stock-btn:hover {
-  background: var(--bd-accent-tint, rgba(124, 109, 250, 0.08));
+  background: var(--bd-accent-tint, rgba(45, 109, 255, 0.08));
   border-color: var(--bd-accent);
 }
