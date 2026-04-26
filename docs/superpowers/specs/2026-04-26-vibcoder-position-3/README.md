@@ -82,4 +82,6 @@ For execution start:
 - [x] User review gate
 - [x] Hand off to writing-plans skill
 - [x] Phase A infrastructure landed
-- [ ] Phase 0 POC dispatched
+- [x] Phase 0 POC dispatched
+- [x] Phase 0 POC complete (button atom, findings captured at poc-findings.md)
+- [ ] Phase 1 atoms — fan-out (blocked on poc-findings tuning items)
