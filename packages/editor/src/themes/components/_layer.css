@@ -1,0 +1,8 @@
+/**
+ * Vibcoder vendored CSS cascade layer.
+ * Order: tokens (defs) < components (vendored vibcoder) < overrides (Emotion + page-level).
+ * Emotion writes unlayered styles which always win against layered ones, so existing
+ * styled() components remain authoritative during Phase 1-5 transition.
+ * @license BSD-3-Clause
+ */
+@layer tokens, components, overrides;
