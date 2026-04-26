@@ -99,7 +99,7 @@ export const SectionHead = forwardRef<HTMLButtonElement, SectionHeadProps>(
             </span>
           )}
           <span className="bd-section-head__title">{title}</span>
-          {count !== undefined && (
+          {Number.isFinite(count) && (
             <span className="bd-section-head__count">{count}</span>
           )}
         </span>

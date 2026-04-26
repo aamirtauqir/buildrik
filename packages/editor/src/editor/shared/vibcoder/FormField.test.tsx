@@ -78,6 +78,20 @@ describe("vibcoder FormField wrapper", () => {
     expect(helpers[0].className).toContain("bd-helper-text--error");
   });
 
+  it("treats error=\"\" as absent and falls through to helper (locked behavior — controlled-form pattern emits empty string for no error)", () => {
+    const { container } = render(
+      <FormField label="Email" helper="We'll never share it." error="">
+        <input type="email" />
+      </FormField>,
+    );
+    // helper text should render with default/muted tone
+    const helper = container.querySelector(".bd-helper-text");
+    expect(helper).toBeTruthy();
+    expect(helper!.textContent).toBe("We'll never share it.");
+    // and the helper should NOT carry the error tone
+    expect(helper!.className).not.toContain("bd-helper-text--error");
+  });
+
   it("OMITS helper-text element when neither helper nor error is set", () => {
     const { container } = render(
       <FormField label="x">

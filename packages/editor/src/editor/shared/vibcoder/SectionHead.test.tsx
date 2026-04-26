@@ -51,6 +51,21 @@ describe("vibcoder SectionHead wrapper", () => {
     expect(el!.textContent).toBe("0");
   });
 
+  it("OMITS __count slot when count is NaN (parity with Phase 1 Slider/Progress NaN guards)", () => {
+    const { container } = render(<SectionHead title="Pages" count={NaN} />);
+    expect(container.querySelector(".bd-section-head__count")).toBeNull();
+  });
+
+  it("OMITS __count slot when count is +Infinity", () => {
+    const { container } = render(<SectionHead title="Pages" count={Infinity} />);
+    expect(container.querySelector(".bd-section-head__count")).toBeNull();
+  });
+
+  it("OMITS __count slot when count is -Infinity", () => {
+    const { container } = render(<SectionHead title="Pages" count={-Infinity} />);
+    expect(container.querySelector(".bd-section-head__count")).toBeNull();
+  });
+
   it("OMITS __actions wrapper when no children passed", () => {
     const { container } = render(<SectionHead title="x" />);
     expect(container.querySelector(".bd-section-head__actions")).toBeNull();
