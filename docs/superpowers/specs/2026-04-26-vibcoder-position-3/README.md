@@ -86,4 +86,6 @@ For execution start:
 - [x] Phase 0 POC complete (button atom, findings captured at poc-findings.md)
 - [x] Phase 1 atoms — fan-out complete (23 atoms across 6 batches)
 - [x] Phase 2 molecules — fan-out complete (18 molecules / 46 wrappers across 5 batches)
-- [ ] Phase 3 organisms — fan-out (unblocked once Phase 2 findings reviewed)
+- [x] Phase 3 organisms — fan-out complete (16 organisms / ~54 wrappers / 4 batches; M5 milestone 2026-04-27, see `poc-findings.md` Phase 3 section)
+- [ ] Phase 4 — re-port existing 37 chrome components (queued; design pending)
+- [ ] Phase 5 — chrome integration (Floating-UI + first production consumers; #93 PopoverArrow reconciled here)

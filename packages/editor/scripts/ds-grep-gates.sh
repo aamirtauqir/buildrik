@@ -213,8 +213,20 @@ check_gate 13 "$RADIUS_COUNT" "$BASE_13" "A1.3 — panel-chrome border-radius �
 # Gate 14: Magic layout literals (Survivor #3 target).
 # Broadened: CSS (Npx), TSX camelCase bare numbers, and Emotion interpolated ${N}px.
 # TSX pattern: identifier keyword + colon + space + literal number in target set.
-LAYOUT_CSS=$(count_chrome '\b(28|32|36|40|44|48|56|60|240|300|320)px\b')
-LAYOUT_TSX=$(count_chrome '(height|width|minHeight|maxWidth|minWidth|maxHeight|padding|paddingLeft|paddingRight|paddingTop|paddingBottom|margin|marginLeft|marginRight|marginTop|marginBottom|top|bottom|left|right|gap|rowGap|columnGap)[[:space:]]*:[[:space:]]*(28|32|36|40|44|48|56|60|240|300|320)[^0-9pxPX]')
+# Excludes JSDoc/comment lines via the same pattern Gate 19 uses
+# (`grep -vE ':[[:space:]]*/?\*|//`) — drops lines where `:` is followed by `/*`
+# (CSS comment opener) OR contains `//` (JS line comment). Without this,
+# documentation that mentions canonical chrome dimensions (e.g. JSDoc strings
+# referencing the 280px panel or 48px header) trips the gate. (#91 — Gate 19
+# parity, applied 2026-04-27 in M5 Phase 3 close.)
+LAYOUT_CSS=$(grep -rE '\b(28|32|36|40|44|48|56|60|240|300|320)px\b' $CHROME_PATHS --include='*.ts' --include='*.tsx' --include='*.css' 2>/dev/null \
+  | grep -vE "$CHROME_EXCLUDE" \
+  | grep -vE ':[[:space:]]*/?\*|//' \
+  | wc -l | tr -d ' ')
+LAYOUT_TSX=$(grep -rE '(height|width|minHeight|maxWidth|minWidth|maxHeight|padding|paddingLeft|paddingRight|paddingTop|paddingBottom|margin|marginLeft|marginRight|marginTop|marginBottom|top|bottom|left|right|gap|rowGap|columnGap)[[:space:]]*:[[:space:]]*(28|32|36|40|44|48|56|60|240|300|320)[^0-9pxPX]' $CHROME_PATHS --include='*.ts' --include='*.tsx' --include='*.css' 2>/dev/null \
+  | grep -vE "$CHROME_EXCLUDE" \
+  | grep -vE ':[[:space:]]*/?\*|//' \
+  | wc -l | tr -d ' ')
 LITERAL_COUNT=$((LAYOUT_CSS + LAYOUT_TSX))
 check_gate 14 "$LITERAL_COUNT" "$BASE_14" "layout literals → src/shared/constants/layout.ts" || exit 1
 

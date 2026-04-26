@@ -245,3 +245,201 @@ The full carry-forward list (M3 leftovers + new Phase 2 surface) is documented i
 
 Master gallery index updated at `packages/editor/src/preview/vibcoder-index.html` with the Phase 2 section linking 20 molecule galleries (popover.css splits into popover + tooltip + menu).
 
+---
+
+## Phase 3 — Organisms findings (M5 milestone)
+
+**Date:** 2026-04-27
+**Scope:** 16 chrome organisms (Modal canary + T2 mega-batch of 12 + T3 composed pair) ported across 4 commits
+**Outcome:** PASS-with-tuning — all 16 organisms ported, 2 polish items folded into M5 commit, 1 follow-up (#93 PopoverArrow) deferred to Phase 5 with reasoning documented below.
+
+### Per-task summary
+
+| Task | Organisms | Components shipped | Tests shipped | Review fixup | Notes |
+|---|---|---|---|---|---|
+| T1 (canary) | modal | 1 family (Modal + Trigger + Close + Header + Title + Description + Body + Footer) | 27 | folded into ed023a7 | Modal as Phase 3 canary; established Radix.Dialog wrapper template + asChild boundary (E1) + portal discipline (E3); commit `ed023a7` |
+| T2 (mega-batch) | drawer, command-palette, color-picker, overlay-mount, topbar, footer, rail, left-panel, inspector, history-panel, empty-state, a11y-overlay, notification-center | ~38 React exports | ~430 | partial fold (T2 cleanup `0fc750c` dropped unused @radix-ui/react-toast) | Single mega-commit reduced subagent dispatch overhead; commit `0a95283` + cleanup `0fc750c` |
+| T3 (composed) | pages-drawer, templates-drawer | 2 wrappers | 35 | `e7d242b` (T3 fix: body wrappers inherit `bd-drawer__body` so scroll/flex behavior survives composition) | First multi-organism composition (Drawer + ListRow / Drawer + Card); commit `7d745e3` + fix `e7d242b` |
+
+**Total components shipped:** ~54 React exports across 16 organism CSS files (or 15 vendored CSS — overlay-mount is portal infrastructure with no CSS file).
+**Total Phase 3 tests:** ~492 net-new (1107 → 1599 cumulative pass count from baseline + Phase 3 additions; some delta comes from incremental test additions across batches).
+**Cumulative wrapper count:** 60 wrapper `.tsx` files in `packages/editor/src/editor/shared/vibcoder/` (44 pre-Phase-3 → 60 post-M5).
+
+### Per-organism CSS↔Radix DOM alignment notes
+
+**Overlay engine wrappers (4):**
+
+- **Modal** (`Radix.Dialog`) — `bd-modal__overlay`, `bd-modal__panel`, `bd-modal__header/title/desc/body/footer/close`. asChild on `ModalTrigger` + `ModalClose`. Portal targeted via `useOverlayContainer()`.
+- **Drawer** (`Radix.Dialog` + side variant) — same engine as Modal. Adds `side?: "left" | "right" | "bottom"` (default `"right"`) which maps to `bd-drawer--{side}`. asChild on `DrawerTrigger` + `DrawerClose`. Slide-in animation comes from vendored CSS, not Radix.
+- **CommandPalette** (`cmdk`) — `bd-cmdk` namespace. Wraps `Command.Dialog` from cmdk. Sibling exports for Input/List/Empty/Group/Item. Search filter logic owned by cmdk; wrapper exposes `value`/`onValueChange` controlled-only props.
+- **ColorPicker** (`react-colorful` inside `Radix.Popover`) — composite: `RadixPopover.Root` + `RadixPopover.Trigger` (asChild via `ColorPickerSwatch`) + `RadixPopover.Content` (`bd-color-picker` panel) wrapping `<HexColorPicker>` from react-colorful. Wrapper API exposes `value: string` (hex format), NOT react-colorful's internal `RgbaColor` shape. E2/E4 enforced.
+
+**Portal infrastructure (1):**
+
+- **OverlayMount** — single `<div id="vibcoder-overlay-root">` lazy DOM singleton. Mount once at app root. `useOverlayContainer()` returns the element for downstream Radix `Portal container=` props. Allow-listed for Gate 22 (only file allowed to reference `document.body`).
+
+**Layout-only organisms (8):**
+
+- **Topbar** — `bd-topbar` with `__brand/__nav/__actions` slots. Pure presentational.
+- **Footer** — `bd-footer` with `__left/__center/__right` slots. Pure presentational.
+- **Rail** — `bd-rail` with `__top/__main/__bottom` regions. Hosts `RailTile` (Phase 2 molecule) instances.
+- **LeftPanel** — `bd-left-panel` 320px panel with `__head/__body/__foot` slot tree. Width set canonically per chrome-ssot decision (Q5).
+- **Inspector** — `bd-inspector` 320px right panel. Mirror of LeftPanel structure, opposite anchor.
+- **HistoryPanel** — `bd-history-panel` with `__entry` row composition.
+- **EmptyState** — `bd-empty-state` with `__icon/__title/__desc/__cta` slots.
+- **A11yOverlay** — `bd-a11y-overlay` debug overlay surface; toggleable focus/landmark visualization. Layout-only; consumer wires hot-key.
+
+**Toast→panel pivot (1):**
+
+- **NotificationCenter** — see "T2 NotificationCenter pivot" finding below for details. Implementation = layout-only sibling tree (NotificationCenter + Mark + Tabs + Tab + Body + Group + Foot), NOT a Radix.Toast queue.
+
+**Composed organisms (2):**
+
+- **PagesDrawer** — composes `Drawer` (right side) + `ListRow` (Phase 2 molecule). Plan-prescribed slot classes (`bd-pages-drawer__title/desc/body/group/item`) shipped as additive markers ON TOP of canonical drawer/list-row classes. T3 fix added `bd-drawer__body` co-class to body wrapper.
+- **TemplatesDrawer** — composes `Drawer` (right side) + `Card` (Phase 2 molecule). Same additive-marker pattern. Same T3 fix applied to body wrapper.
+
+### asChild boundary patterns (E1)
+
+asChild Trigger/Close exports verified across **3 organism families**:
+
+- `Modal` — `ModalTrigger` + `ModalClose` both accept `asChild` and forward to `RadixDialog.Trigger`/`.Close` (verified in tests).
+- `Drawer` — `DrawerTrigger` + `DrawerClose` follow the same pattern.
+- `ColorPicker` — `ColorPickerSwatch` accepts `asChild` and forwards to `RadixPopover.Trigger` (verified in tests).
+
+(Note: PagesDrawer and TemplatesDrawer compose `Drawer`'s API rather than re-exposing their own asChild surface — their triggers are external/caller-owned.)
+
+### Engine encapsulation enforcement (E2 + E4)
+
+ESLint rule `packages/editor/eslint-rules/no-engine-public-export.cjs` shipped in T1 forbids `export … from '@radix-ui/*'` / `from 'cmdk'` / `from 'react-colorful'` patterns inside `packages/editor/src/editor/shared/vibcoder/*.tsx`. Verified:
+
+- Zero `@radix-ui/*` types or values re-exported from `vibcoder/index.ts`.
+- Zero `cmdk` types re-exported.
+- Zero `react-colorful` types re-exported.
+- All wrapper APIs expose vibcoder-shaped props (e.g., `ColorPicker` takes `value: string` hex, NOT `RgbaColor`).
+
+This keeps the engine swappable: a future Phase 5 Floating-UI replacement of Radix.Popover can land without touching consumer call sites.
+
+### Portal discipline (E3)
+
+All 4 overlay engine wrappers (Modal, Drawer, CommandPalette, ColorPicker) call `useOverlayContainer()` and pass the returned element to Radix `Portal container={…}`. Gate 22 (grep gate added in M5 prep — see Phase 3 plan §Infrastructure) verifies that **only** `OverlayMount.tsx` references `document.body`. PASS at baseline.
+
+### Stateful gallery harness (E5)
+
+ESLint rule `packages/editor/eslint-rules/no-hardcoded-open-prop.cjs` shipped in T1 forbids hardcoded `open={true}` / `open={false}` JSX attributes inside `packages/editor/src/preview/vibcoder-*.tsx`. Six overlay galleries use the `<DemoTrigger>` + `useState` pattern to drive the open/close state realistically:
+
+1. `vibcoder-modal.tsx`
+2. `vibcoder-drawer.tsx`
+3. `vibcoder-command-palette.tsx`
+4. `vibcoder-color-picker.tsx`
+5. `vibcoder-pages-drawer.tsx`
+6. `vibcoder-templates-drawer.tsx`
+
+`vibcoder-notification-center.tsx` ships an inline static demo (justified by the panel-not-queue pivot — there is no overlay state to drive). The other 9 layout-only organism galleries (topbar/footer/rail/left-panel/inspector/history-panel/empty-state/a11y-overlay) ship inline static demos because they have no overlay state.
+
+### T2 NotificationCenter pivot finding
+
+The plan specified `@radix-ui/react-toast` as the engine for NotificationCenter. The vendored CSS at `packages/editor/src/themes/components/organisms/notification-center.css` is a **380px-wide persistent dropdown panel** with `.bd-nc__head/__body/__group/__foot/__mark/__tabs/__tab/__foot` slots — **NOT** a transient toast queue. Implementation choice (sibling-tree layout-only) matches the actual CSS contract, not the plan's engine assumption.
+
+`@radix-ui/react-toast` was installed at T1 (in case mega-batch needed it) and dropped at T2 cleanup commit `0fc750c` once it was confirmed unused. No production code referenced it. Bundle implication: zero (production tree-shake already excluded it).
+
+**Lesson:** vendored CSS is the contract, not the plan's engine assumption. Read the CSS file before assuming the engine.
+
+### T3 slot-class divergence finding
+
+Plan prescribed slot classes following the pattern `bd-{pages,templates}-drawer__{title,desc,body,group,item,...}`. Vendored CSS for these organisms uses different slot taxonomies:
+
+- `pages-drawer.css` ships `__tree`, `__row`, `__detail` slot names.
+- `templates-drawer.css` ships `__filters`, `__chip`, `__card` slot names.
+
+Implementer kept the plan-prescribed classnames as **additive markers** layered on top of the canonical drawer/list-row/card slot classes. Code-quality reviewer caught that the body wrappers needed `bd-drawer__body` as a co-class so scroll/flex behavior would inherit through composition. The gallery had only 4-7 children per drawer body, which masked the bug visually until it was traced and fixed. Fix shipped at `e7d242b`.
+
+**Lesson:** when composing organism-of-organisms, the wrapping component must apply BOTH its own additive marker class AND the parent organism's slot class. Co-class composition is the rule when adding plan-prescribed markers over vendored slot taxonomies.
+
+### Test infra additions
+
+- **`packages/editor/src/test-setup.ts`** (NEW in T1) — polyfills `ResizeObserver` and `Element.prototype.scrollIntoView` for cmdk under jsdom. Required because cmdk uses both APIs internally during list rendering and jsdom omits them by default. Vitest config `setupFiles: ['./src/test-setup.ts']` reference shipped in same commit.
+
+### Bundle deps added (live in `packages/editor/package.json`)
+
+| Package | Version | Tier | Notes |
+|---|---|---|---|
+| `@radix-ui/react-dialog` | ^1.1.15 | Modal + Drawer engine | T1 |
+| `@radix-ui/react-popover` | ^1.1.15 | ColorPicker engine | T2 |
+| `@radix-ui/react-portal` | ^1.1.10 | Used by Dialog + Popover transitively | T1 |
+| `@radix-ui/react-slot` | ^1.2.4 | asChild forwarding (E1) | T1 |
+| `cmdk` | ^1.1.1 | CommandPalette engine | T2 |
+| `react-colorful` | ^5.6.1 | ColorPicker swatch | T2 |
+| ~~`@radix-ui/react-toast`~~ | — | Removed at `0fc750c` | Plan-spec engine; pivot eliminated need |
+
+On-disk dep size (resolved via pnpm store):
+
+- `@radix-ui/react-dialog`: 124 KB
+- `@radix-ui/react-popover`: 112 KB
+- `@radix-ui/react-portal`: ~25 KB (transitive; not directly measured)
+- `@radix-ui/react-slot`: 60 KB
+- `cmdk`: 116 KB
+- `react-colorful`: 488 KB
+- **Total cold disk impact: ~925 KB** across all six new direct + transitive engine deps.
+
+### Bundle delta measurement (production `dist/`)
+
+| Metric | Phase 2 (commit `d146bb0`) | Phase 3 (commit pre-M5, `e7d242b`) | Delta |
+|---|---|---|---|
+| Total `dist/` | 2.7 MB | 2.7 MB | **0 bytes** |
+| Total JS bytes | 2,490,279 | 2,490,279 | **0 bytes** |
+| Total CSS bytes | 273,899 | 273,899 | **0 bytes** |
+| Main bundle (`index-*.js`) | 1,847.07 kB / 524.52 kB gz | 1,847.07 kB / 524.52 kB gz | 0 bytes |
+
+**Methodology:** built both states in matching git worktree-isolated environments (`pnpm install --frozen-lockfile` + `pnpm exec vite build`), compared `dist/assets` totals.
+
+**Why zero delta?** Vite builds production from `demo/index.html` only (`vite.config.ts` `root: "./demo"`). The vibcoder gallery files at `src/preview/vibcoder-*.tsx` are dev-server-only and never enter the production graph. The wrapper files at `src/editor/shared/vibcoder/*.tsx` are tree-shaken because chrome does NOT yet consume them — Phase 5 chrome integration will land the first production import. So the Phase 3 ship is **zero-cost to end users** until consumption begins.
+
+**What this means for Phase 5:** the ~925 KB of new engine deps will land in production exactly once chrome starts importing wrappers. Floating-UI integration (deferred to Phase 5) is also outside today's measurement. Phase 5 will be the first time we report a non-zero `dist/` delta from this arc.
+
+### ESLint rules shipped (Phase 3)
+
+- `packages/editor/eslint-rules/no-engine-public-export.cjs` (T1) — E2/E4 enforcement: forbid Radix/cmdk/react-colorful re-exports from `vibcoder/*.tsx`.
+- `packages/editor/eslint-rules/no-hardcoded-open-prop.cjs` (T1) — E5 enforcement: forbid hardcoded `open={true}` in overlay galleries.
+
+### Grep gates shipped (Phase 3)
+
+- **Gate 22** (`packages/editor/scripts/ds-grep-gates.sh`) — E3 portal discipline. Verifies only `OverlayMount.tsx` references `document.body`. PASS at baseline.
+
+### Polish pass folded into M5
+
+1. **#91 — Gate 14 JSDoc parity with Gate 19.** Gate 19 already excluded CSS comments via `grep -vE ':[[:space:]]*/?\*|//'`; Gate 14 (magic layout literals 28/32/36/40/44/48/56/60/240/300/320 px) did not, so JSDoc strings mentioning canonical chrome dimensions (e.g., the 280px panel reference, 48px header dimension) occasionally tripped the gate. Fixed by piping each Gate 14 grep through the same Gate 19 exclusion regex inline (NOT in `count_chrome` — other gates may want strict counting). Baseline rebased downward from 351 → 328 once false-positive comment hits were excluded. PASS at new baseline.
+2. **`vibcoder-index.html` Phase 3 section** — added 15 entries + overlay-mount note (`<em>overlay-mount (no gallery — infrastructure)</em>`). Header `<p>` updated to "Phase 1+2+3 (24 atoms + 18 molecules + 16 organisms ported)".
+
+### Phase 5 handoff items
+
+- **#93 PopoverArrow** — **deferred to Phase 5** with reasoning. The Phase 2 task said "decide Phase 3 fate." Reality at M5: the current `PopoverArrow` is a `<span aria-hidden="true" className="bd-popover__arrow">` decorative wrapper — NOT a Radix component. The vibcoder Popover wrapper itself is hand-rolled (Phase 2), so swapping `PopoverArrow` for `RadixPopover.Arrow` would throw `Component must be inside Popover.Root` at runtime (Radix.Arrow requires Radix.Content ancestry). Phase 5 will reconcile the entire Popover surface with Radix when CommandPalette/ColorPicker patterns prove out the engine — at that point #93 has a clean home (re-export `RadixPopover.Arrow` from a Radix-based Popover). Until then, the `<span>` + CSS pseudo-element approach holds.
+- **Floating-UI integration** — anchor + offset + flip + shift positioning for Popover/Tooltip/Menu. Carried forward from Phase 2.
+- **Chrome integration** — the first time real chrome consumes vibcoder organisms (Phase 5). This is also when production bundle delta will materialize (~925 KB of engine deps).
+- **#77 Icon sprite production-build** — still open from Phase 1; chrome integration phase blocker.
+- **Vendoring fix-policy doc full version (#82)** — molecule + organism cases now available.
+- **Carry-forward** from Phase 2: #74-76, #81, #89, #90, #92.
+
+### Conventions reaffirmed (still hold after 16 organism ports + 54 React exports)
+
+- All Phase 1 + Phase 2 conventions still hold (filename != classname, default-prop omits modifier class, forwardRef + displayName, state→aria pairing, sibling exports, controlled-only state, slot composition, cross-tier imports).
+- **Engine encapsulation contract** held across 4 overlay engines (Radix.Dialog × 2, Radix.Popover, cmdk). Zero engine types leaked to wrapper APIs.
+- **asChild boundary contract** held across 3 organism families. Trigger/Close siblings forward `asChild` to the underlying Radix primitive cleanly.
+- **Portal discipline contract** held — Gate 22 PASS, single `vibcoder-overlay-root` div, all 4 overlay engine wrappers route through `useOverlayContainer()`.
+- **Stateful gallery contract** held — 6 overlay galleries use `<DemoTrigger>` + `useState`, ESLint rule prevents regression.
+
+### Per-task CC time (actuals from commit timestamps)
+
+| Task | Estimate (Phase 2 ratio) | Actual (incl. fixup) | Notes |
+|---|---|---|---|
+| T1 (Modal canary + Phase 3 infra) | ~75 min | ~33 min | Established Radix.Dialog template + asChild boundary + portal discipline + 2 ESLint rules + Gate 22 + test-setup.ts polyfills |
+| T2 (mega-batch of 12) | ~3 hr | ~25 min + ~3 min cleanup | Single-commit dispatch reduced overhead; `0fc750c` cleanup dropped unused @radix-ui/react-toast |
+| T3 (composed pair) | ~45 min | ~12 min + ~6 min fix | First multi-organism composition; reviewer caught body co-class bug |
+
+Total Phase 3 organism port: roughly 80 minutes of CC dispatch time including review fixups vs ~5 hr roadmap estimate. Mega-batch dispatch + locked per-component template held.
+
+### Recommendation
+
+**Proceed to Phase 5 chrome integration** (Phase 4 = re-port existing 37 components, sequenced separately). Organism alphabet complete (15 source CSS + 1 portal infra + 16 React families = 16 organisms / ~54 wrappers). All 22 DS gates green, 1599 tests passing, lint clean against pre-Phase-3 baseline (no new vibcoder lint errors), production bundle untouched (zero delta to consumers). Engine encapsulation + portal discipline + stateful gallery contracts proved across 4 distinct overlay engines (Radix.Dialog × 2, Radix.Popover, cmdk).
+
+Master gallery index updated at `packages/editor/src/preview/vibcoder-index.html` with the Phase 3 section listing 15 organism gallery links + overlay-mount infrastructure note.
+
