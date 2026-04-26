@@ -1,0 +1,103 @@
+/**
+ * bdr-templates-drawer — half-screen template gallery organism.
+ * Composes on bdr-drawer. Body = filter chips + grid of template cards.
+ */
+
+.bd-templates-drawer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--buildrick-bg-panel);
+  min-height: 0;
+}
+
+.bd-templates-drawer__filters {
+  padding: var(--buildrick-space-2) var(--buildrick-space-4);
+  border-bottom: 1px solid var(--buildrick-border);
+  background: var(--buildrick-bg-panel);
+  display: flex;
+  align-items: center;
+  gap: var(--buildrick-space-3);
+  overflow-x: auto;
+}
+.bd-templates-drawer__chip {
+  padding: var(--buildrick-space-1) var(--buildrick-space-3);
+  border-radius: var(--buildrick-rounded);
+  cursor: pointer;
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-secondary);
+  white-space: nowrap;
+  background: transparent;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.bd-templates-drawer__chip:hover {
+  background: var(--buildrick-bg-card);
+  color: var(--buildrick-text-primary);
+}
+.bd-templates-drawer__chip[aria-pressed="true"],
+.bd-templates-drawer__chip.is-on {
+  background: var(--buildrick-bg-card);
+  color: var(--buildrick-accent);
+  font-weight: var(--buildrick-font-weight-semibold);
+  box-shadow: 0 1px 2px var(--buildrick-ink-08), inset 0 0 0 1px var(--buildrick-primary-alpha-15);
+}
+.bd-templates-drawer__chip-count {
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-3xs-plus);
+  color: var(--buildrick-text-muted);
+  padding: 1px 5px;
+  background: var(--buildrick-bg-subtle);
+  border-radius: var(--buildrick-radius-xs);
+}
+
+.bd-templates-drawer__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--buildrick-space-4);
+}
+.bd-templates-drawer__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--buildrick-space-3);
+}
+
+.bd-templates-drawer__card {
+  display: flex;
+  flex-direction: column;
+  background: var(--buildrick-bg-card);
+  border: 1px solid var(--buildrick-border);
+  border-radius: var(--buildrick-rounded);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
+              box-shadow var(--buildrick-duration-fast) var(--buildrick-ease-default);
+}
+.bd-templates-drawer__card:hover {
+  border-color: var(--buildrick-accent);
+  box-shadow: 0 0 0 3px var(--buildrick-accent-tint);
+}
+.bd-templates-drawer__thumb {
+  aspect-ratio: 4 / 3;
+  background: var(--buildrick-bg-subtle);
+  border-bottom: 1px solid var(--buildrick-border);
+}
+.bd-templates-drawer__meta {
+  padding: var(--buildrick-space-2);
+}
+.bd-templates-drawer__name {
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-semibold);
+  color: var(--buildrick-text-heading);
+}
+.bd-templates-drawer__sub {
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-3xs-plus);
+  color: var(--buildrick-text-muted);
+  margin-top: 1px;
+}

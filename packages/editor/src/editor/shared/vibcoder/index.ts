@@ -369,3 +369,23 @@ export type {
   A11yOverlayHitProps,
   A11yOverlayHitKind,
 } from "./A11yOverlay";
+export {
+  PagesDrawer,
+  PagesDrawerGroup,
+  PagesDrawerItem,
+} from "./PagesDrawer";
+export type {
+  PagesDrawerProps,
+  PagesDrawerGroupProps,
+  PagesDrawerItemProps,
+} from "./PagesDrawer";
+export {
+  TemplatesDrawer,
+  TemplatesDrawerCategory,
+  TemplatesDrawerItem,
+} from "./TemplatesDrawer";
+export type {
+  TemplatesDrawerProps,
+  TemplatesDrawerCategoryProps,
+  TemplatesDrawerItemProps,
+} from "./TemplatesDrawer";

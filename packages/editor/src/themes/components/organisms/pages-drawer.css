@@ -1,0 +1,106 @@
+/**
+ * bdr-pages-drawer — large half-screen drawer organism for site pages.
+ * Composes on bdr-drawer shell. Body = tree (340px) + detail panel.
+ * For shell + chrome use bdr-drawer; this file is the BODY layout.
+ */
+
+.bd-pages-drawer {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  min-height: 0;
+  background: var(--buildrick-bg-panel);
+  height: 100%;
+}
+
+/* Tree column */
+.bd-pages-drawer__tree {
+  border-right: 1px solid var(--buildrick-border);
+  background: var(--buildrick-bg-card);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.bd-pages-drawer__tree-head {
+  padding: var(--buildrick-space-3) var(--buildrick-space-3) var(--buildrick-space-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--buildrick-border);
+}
+.bd-pages-drawer__tree-label {
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-2xs);
+  font-weight: var(--buildrick-font-weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--buildrick-text-muted);
+}
+.bd-pages-drawer__tree-count {
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-2xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-muted);
+}
+.bd-pages-drawer__tree-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--buildrick-space-2) var(--buildrick-space-1);
+}
+
+.bd-pages-drawer__row {
+  display: flex;
+  align-items: center;
+  gap: var(--buildrick-space-1);
+  padding: 5px var(--buildrick-space-2);
+  border-radius: var(--buildrick-rounded);
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-sm);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-primary);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+.bd-pages-drawer__row:hover { background: var(--buildrick-bg-subtle); }
+.bd-pages-drawer__row.is-selected,
+.bd-pages-drawer__row[aria-selected="true"] {
+  background: var(--buildrick-accent-tint);
+  color: var(--buildrick-accent);
+  font-weight: var(--buildrick-font-weight-semibold);
+}
+.bd-pages-drawer__row-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bd-pages-drawer__row-slug {
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-2xs);
+  color: var(--buildrick-text-muted);
+  margin-left: auto;
+}
+
+/* Detail column */
+.bd-pages-drawer__detail {
+  padding: var(--buildrick-space-4) var(--buildrick-space-5);
+  overflow-y: auto;
+  background: var(--buildrick-bg-panel);
+}
+.bd-pages-drawer__detail-title {
+  margin: 0 0 var(--buildrick-space-1);
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-md-plus);
+  font-weight: var(--buildrick-font-weight-semibold);
+  color: var(--buildrick-text-heading);
+  letter-spacing: -0.01em;
+}
+.bd-pages-drawer__detail-meta {
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-muted);
+  margin-bottom: var(--buildrick-space-4);
+}
