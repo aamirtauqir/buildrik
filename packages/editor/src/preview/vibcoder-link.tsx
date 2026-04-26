@@ -1,15 +1,9 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Link } from "../editor/shared/vibcoder/Link";
-import { sectionLabel, stack } from "./_galleryStyles";
+import { sectionLabel, stack, darkSurface } from "./_galleryStyles";
 
 const stackP = { ...stack, gap: 12 };
-const darkSurface = {
-  background: "var(--buildrick-stage-dark, #111)",
-  padding: 16,
-  borderRadius: 6,
-  color: "var(--buildrick-text-on-accent, #fff)",
-};
 
 function Demo() {
   return (

@@ -44,3 +44,14 @@ export const gridRow = (cols: number, minPx = 120) => ({
   gridTemplateColumns: `repeat(${cols}, minmax(${minPx}px, 1fr))`,
   gap: 12,
 });
+
+/**
+ * Inverse-tone surface for previewing atoms with dark-context variants
+ * (Link tone="inverse", future Switch dark-mode demos, etc.).
+ */
+export const darkSurface = {
+  background: "var(--buildrick-stage-dark, #111)",
+  padding: 16,
+  borderRadius: 6,
+  color: "var(--buildrick-text-on-accent, #fff)",
+};

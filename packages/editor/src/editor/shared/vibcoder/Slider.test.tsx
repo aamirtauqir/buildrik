@@ -62,6 +62,26 @@ describe("vibcoder Slider wrapper", () => {
     expect(fill.style.width).toBe("0%");
   });
 
+  it("clamps percent to 0% when value < min (out-of-range guard)", () => {
+    const { container } = render(
+      <Slider value={-50} min={0} max={100} onChange={() => {}} />
+    );
+    const fill = container.querySelector(".bd-slider__fill")! as HTMLDivElement;
+    const thumb = container.querySelector(".bd-slider__thumb")! as HTMLDivElement;
+    expect(fill.style.width).toBe("0%");
+    expect(thumb.style.left).toBe("0%");
+  });
+
+  it("clamps percent to 100% when value > max (out-of-range guard)", () => {
+    const { container } = render(
+      <Slider value={150} min={0} max={100} onChange={() => {}} />
+    );
+    const fill = container.querySelector(".bd-slider__fill")! as HTMLDivElement;
+    const thumb = container.querySelector(".bd-slider__thumb")! as HTMLDivElement;
+    expect(fill.style.width).toBe("100%");
+    expect(thumb.style.left).toBe("100%");
+  });
+
   it("forwards min/max/step to native input", () => {
     const { container } = render(
       <Slider value={5} min={0} max={10} step={0.5} onChange={() => {}} />

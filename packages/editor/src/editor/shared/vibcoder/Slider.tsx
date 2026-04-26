@@ -63,7 +63,12 @@ const inputOverlayStyle: CSSProperties = {
 export const Slider = forwardRef<HTMLInputElement, SliderProps>(
   ({ value, onChange, min = 0, max = 100, step = 1, label, unit, className, ...rest }, ref) => {
     const range = max - min;
-    const percent = range > 0 ? ((value - min) / range) * 100 : 0;
+    // Clamp to [0, 100] so out-of-range values can't overflow the visual track.
+    // Native input clamps internally for keyboard input but the styled divs
+    // render the raw computed percent — guard against state-lag during step
+    // transitions or external writes that overshoot bounds.
+    const rawPercent = range > 0 ? ((value - min) / range) * 100 : 0;
+    const percent = Math.max(0, Math.min(100, rawPercent));
     const classes = ["bd-slider", className].filter(Boolean).join(" ");
     return (
       <div className={classes}>
