@@ -1,0 +1,81 @@
+/**
+ * bdr-link — text link atom.
+ * Inline anchor styling with full state baseline (hover/active/focus/disabled),
+ * tone variants for muted + inverse surfaces, and an external-link affordance.
+ */
+
+.bd-link {
+  color: var(--buildrick-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  cursor: pointer;
+  transition: color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+}
+
+.bd-link:hover {
+  color: var(--buildrick-accent-hover);
+  text-decoration-thickness: 2px;
+}
+.bd-link:active {
+  color: var(--buildrick-accent-pressed);
+}
+.bd-link:focus-visible {
+  outline: none;
+  box-shadow: var(--buildrick-glow-primary);
+  border-radius: var(--buildrick-radius-sm);
+}
+
+.bd-link[disabled],
+.bd-link[aria-disabled="true"],
+.bd-link.bd-link--disabled {
+  color: var(--buildrick-text-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ─── TONES ─── */
+
+.bd-link--muted {
+  color: var(--buildrick-text-muted);
+}
+.bd-link--muted:hover {
+  color: var(--buildrick-text-primary);
+}
+.bd-link--muted:active {
+  color: var(--buildrick-text-heading);
+}
+
+/* Inverse — for use on dark surfaces (stage-dark, accent fills, overlay) */
+.bd-link--inverse {
+  color: var(--buildrick-text-on-accent);
+}
+.bd-link--inverse:hover {
+  color: var(--buildrick-bg-card);
+}
+.bd-link--inverse:active {
+  color: var(--buildrick-on-dark-40);
+}
+.bd-link--inverse:focus-visible {
+  box-shadow: 0 0 0 3px var(--buildrick-on-dark-15);
+}
+
+/* ─── MODIFIERS ─── */
+
+.bd-link--no-underline {
+  text-decoration: none;
+}
+.bd-link--no-underline:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+/* External link — appends ↗ glyph after content (12px, accent-inheriting). */
+.bd-link--external::after {
+  content: "\2197"; /* ↗ NORTH EAST ARROW */
+  display: inline-block;
+  margin-left: var(--buildrick-space-1);
+  font-size: var(--buildrick-text-sm);
+  line-height: 1;
+  text-decoration: none;
+}

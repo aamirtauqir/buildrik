@@ -1,0 +1,77 @@
+/**
+ * bdr-slider — single-thumb slider atom (used in inspector + color picker).
+ * For multi-thumb / range, compose two thumbs on one track.
+ */
+
+.bd-slider { display: flex; flex-direction: column; gap: var(--buildrick-space-2); }
+
+.bd-slider__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.bd-slider__label {
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-xs-plus);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-primary);
+}
+.bd-slider__value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-sm-half);
+  font-weight: var(--buildrick-font-weight-semibold);
+  color: var(--buildrick-text-heading);
+  font-variant-numeric: tabular-nums;
+}
+.bd-slider__value-unit {
+  font-weight: var(--buildrick-font-weight-medium);
+  font-size: var(--buildrick-text-2xs-plus);
+  color: var(--buildrick-text-muted);
+}
+
+.bd-slider__track {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  background: var(--buildrick-bg-subtle);
+  border-radius: var(--buildrick-radius-full);
+}
+.bd-slider__fill {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  background: var(--buildrick-accent);
+  border-radius: var(--buildrick-radius-full);
+}
+.bd-slider__thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  border-radius: var(--buildrick-radius-circle);
+  background: var(--buildrick-bg-card);
+  box-shadow: 0 0 0 1.5px var(--buildrick-accent), 0 1px 3px var(--buildrick-ink-15);
+  cursor: grab;
+}
+.bd-slider__thumb::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: var(--buildrick-radius-circle);
+  background: var(--buildrick-accent);
+}
+.bd-slider__thumb:active { cursor: grabbing; }
+
+.bd-slider__ticks {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-3xs-plus);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-muted);
+  margin-top: 2px;
+}

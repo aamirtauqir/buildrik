@@ -14,6 +14,7 @@
     --bd-bg-card: var(--buildrick-bg-card);
     --bd-bg-hover: var(--buildrick-bg-hover);
     --bd-bg-input: var(--buildrick-bg-input);
+    --bd-bg-pressed: var(--buildrick-bg-pressed);
     --bd-bg-subtle: var(--buildrick-bg-subtle);
     --bd-border: var(--buildrick-border);
     --bd-border-focus: var(--buildrick-border-focus);
@@ -34,9 +35,11 @@
     --bd-font-weight-normal: var(--buildrick-font-weight-normal);
     --bd-font-weight-semibold: var(--buildrick-font-weight-semibold);
     --bd-glow-primary: var(--buildrick-glow-primary);
+    --bd-ink-15: var(--buildrick-ink-15);
     --bd-ink-20: var(--buildrick-ink-20);
     --bd-layer-muted-alpha: var(--buildrick-layer-muted-alpha);
     --bd-line-normal: var(--buildrick-line-normal);
+    --bd-on-dark-15: var(--buildrick-on-dark-15);
     --bd-on-dark-40: var(--buildrick-on-dark-40);
     --bd-pill-stroke: var(--buildrick-pill-stroke);
     --bd-primary-alpha-30: var(--buildrick-primary-alpha-30);
@@ -55,8 +58,10 @@
     --bd-success-light: var(--buildrick-success-light);
     --bd-success-soft: var(--buildrick-success-soft);
     --bd-text-2xs: var(--buildrick-text-2xs);
+    --bd-text-2xs-plus: var(--buildrick-text-2xs-plus);
     --bd-text-3xs: var(--buildrick-text-3xs);
     --bd-text-3xs-plus: var(--buildrick-text-3xs-plus);
+    --bd-text-disabled: var(--buildrick-text-disabled);
     --bd-text-heading: var(--buildrick-text-heading);
     --bd-text-md: var(--buildrick-text-md);
     --bd-text-muted: var(--buildrick-text-muted);
@@ -64,9 +69,11 @@
     --bd-text-primary: var(--buildrick-text-primary);
     --bd-text-secondary: var(--buildrick-text-secondary);
     --bd-text-sm: var(--buildrick-text-sm);
+    --bd-text-sm-half: var(--buildrick-text-sm-half);
     --bd-text-sm-plus: var(--buildrick-text-sm-plus);
     --bd-text-xl: var(--buildrick-text-xl);
     --bd-text-xs: var(--buildrick-text-xs);
+    --bd-text-xs-plus: var(--buildrick-text-xs-plus);
     --bd-warning: var(--buildrick-warning);
     --bd-warning-border: var(--buildrick-warning-border);
     --bd-warning-light: var(--buildrick-warning-light);
