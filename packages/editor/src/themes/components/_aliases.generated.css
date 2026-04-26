@@ -6,5 +6,37 @@
  */
 @layer tokens {
   :root {
+    --bd-accent: var(--buildrick-accent);
+    --bd-accent-hover: var(--buildrick-accent-hover);
+    --bd-accent-pressed: var(--buildrick-accent-pressed);
+    --bd-bg-card: var(--buildrick-bg-card);
+    --bd-bg-hover: var(--buildrick-bg-hover);
+    --bd-bg-subtle: var(--buildrick-bg-subtle);
+    --bd-border-medium: var(--buildrick-border-medium);
+    --bd-border-strong: var(--buildrick-border-strong);
+    --bd-duration-normal: var(--buildrick-duration-normal);
+    --bd-ease-default: var(--buildrick-ease-default);
+    --bd-error: var(--buildrick-error);
+    --bd-error-bg: var(--buildrick-error-bg);
+    --bd-error-border: var(--buildrick-error-border);
+    --bd-font-family: var(--buildrick-font-family);
+    --bd-font-weight-medium: var(--buildrick-font-weight-medium);
+    --bd-font-weight-semibold: var(--buildrick-font-weight-semibold);
+    --bd-glow-primary: var(--buildrick-glow-primary);
+    --bd-on-dark-40: var(--buildrick-on-dark-40);
+    --bd-primary-alpha-30: var(--buildrick-primary-alpha-30);
+    --bd-radius-circle: var(--buildrick-radius-circle);
+    --bd-radius-full: var(--buildrick-radius-full);
+    --bd-radius-md: var(--buildrick-radius-md);
+    --bd-rounded: var(--buildrick-rounded);
+    --bd-space-2: var(--buildrick-space-2);
+    --bd-space-3: var(--buildrick-space-3);
+    --bd-space-4: var(--buildrick-space-4);
+    --bd-text-md: var(--buildrick-text-md);
+    --bd-text-on-accent: var(--buildrick-text-on-accent);
+    --bd-text-primary: var(--buildrick-text-primary);
+    --bd-text-secondary: var(--buildrick-text-secondary);
+    --bd-text-sm: var(--buildrick-text-sm);
+    --bd-text-sm-plus: var(--buildrick-text-sm-plus);
   }
 }
