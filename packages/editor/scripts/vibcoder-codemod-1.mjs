@@ -16,15 +16,22 @@ const TARGET = join(ROOT, "packages/editor/src/themes/components");
 export function transform(css) {
   let out = css;
   // 1. Class selectors and BEM parts: .bdr-foo, .bdr-foo__bar, .bdr-foo--var
+  //    Note: also rewrites .bdr-* inside string literals (e.g., content: ".bdr-x").
+  //    Acceptable — vibcoder bundle doesn't use such literals (verified 2026-04-26).
   out = out.replace(/\.bdr-([a-z0-9_-]+)/g, ".bd-$1");
   // 2. Attribute selectors: [class*="bdr-foo"]
+  //    Quoted values only. Unquoted [class=bdr-foo] are valid CSS but rare and
+  //    out of scope; vibcoder bundle uses quoted form everywhere (verified 2026-04-26).
   out = out.replace(/(\[class[*~|^$]?=["'])bdr-/g, "$1bd-");
   // 3. @keyframes definitions
   out = out.replace(/@keyframes\s+bdr-([a-z0-9_-]+)/g, "@keyframes bd-$1");
   // 4. animation-name property values
   out = out.replace(/(animation-name\s*:\s*)bdr-/g, "$1bd-");
-  // 5. Shorthand animation: bdr-name 200ms ...
-  out = out.replace(/(animation\s*:\s*[^;]*?)\bbdr-([a-z0-9_-]+)/g, "$1bd-$2");
+  // 5. Shorthand animation: handles single OR multiple bdr-* names per declaration.
+  //    `animation: bdr-foo, bdr-bar;` rewrites BOTH (lazy quantifier in earlier
+  //    revision missed the second). Captures the full `animation: ...;` value
+  //    (greedy up to ;) then runs an inner replace over the body.
+  out = out.replace(/(animation\s*:[^;]*)/g, (m) => m.replace(/\bbdr-([a-z0-9_-]+)/g, "bd-$1"));
   return out;
 }
 
