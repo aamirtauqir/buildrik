@@ -1,0 +1,103 @@
+/**
+ * bdr-input — text/number/url input atom + bdr-stepper composite.
+ * Variants: default, error
+ * Sizes:    sm, md (default)
+ */
+
+/* DEPRECATED: prefer bdr-form-field molecule + bdr-label + bdr-helper-text atoms */
+.bd-field { display: flex; flex-direction: column; gap: var(--buildrick-space-2); }
+
+/* DEPRECATED: prefer bdr-form-field molecule + bdr-label + bdr-helper-text atoms */
+.bd-field__label {
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  line-height: 1.2;
+  color: var(--buildrick-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.bd-input {
+  width: 100%;
+  padding: var(--buildrick-space-2) var(--buildrick-space-3);
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-sm-plus);
+  font-weight: var(--buildrick-font-weight-normal);
+  color: var(--buildrick-text-primary);
+  background: var(--buildrick-bg-input);
+  border: 1px solid var(--buildrick-border-medium);
+  border-radius: var(--buildrick-radius-md);
+  outline: none;
+  transition: border-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
+              box-shadow var(--buildrick-duration-fast) var(--buildrick-ease-default);
+}
+.bd-input::placeholder { color: var(--buildrick-text-muted); }
+.bd-input:focus {
+  border-color: var(--buildrick-border-focus);
+  box-shadow: var(--buildrick-glow-primary);
+}
+.bd-input:disabled {
+  background: var(--buildrick-bg-subtle);
+  color: var(--buildrick-text-muted);
+  cursor: not-allowed;
+}
+.bd-input--error {
+  border-color: var(--buildrick-error);
+  box-shadow: 0 0 0 3px var(--buildrick-error-light);
+}
+
+/* DEPRECATED: prefer bdr-form-field molecule + bdr-label + bdr-helper-text atoms */
+.bd-field__hint {
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-muted);
+}
+/* DEPRECATED: prefer bdr-form-field molecule + bdr-label + bdr-helper-text atoms */
+.bd-field__hint--error { color: var(--buildrick-error); }
+
+/* Numeric stepper (used heavily in inspector) */
+.bd-stepper {
+  display: flex;
+  background: var(--buildrick-bg-input);
+  border: 1px solid var(--buildrick-border-medium);
+  border-radius: var(--buildrick-radius-md);
+  overflow: hidden;
+}
+.bd-stepper__btn {
+  width: 30px;
+  background: transparent;
+  border: none;
+  color: var(--buildrick-text-muted);
+  cursor: pointer;
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-md);
+  font-weight: var(--buildrick-font-weight-semibold);
+}
+.bd-stepper__btn:hover {
+  background: var(--buildrick-bg-hover);
+  color: var(--buildrick-text-primary);
+}
+.bd-stepper__input {
+  flex: 1;
+  min-width: 40px;
+  padding: var(--buildrick-space-2) var(--buildrick-space-1);
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-sm-plus);
+  font-weight: var(--buildrick-font-weight-medium);
+  text-align: center;
+  color: var(--buildrick-text-primary);
+}
+.bd-stepper__unit {
+  padding: 0 var(--buildrick-space-3);
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-muted);
+  display: flex;
+  align-items: center;
+  border-left: 1px solid var(--buildrick-border);
+}

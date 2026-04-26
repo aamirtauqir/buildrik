@@ -1,0 +1,43 @@
+/**
+ * bdr-textarea — multi-line text input atom.
+ * Same surface as bdr-input. Resize: vertical only by default.
+ * Sizes: sm (3 rows), md (5 rows, default), lg (8 rows).
+ */
+
+.bd-textarea {
+  width: 100%;
+  min-height: calc(var(--buildrick-space-3) * 8);
+  padding: var(--buildrick-space-2) var(--buildrick-space-3);
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-sm-plus);
+  font-weight: var(--buildrick-font-weight-normal);
+  line-height: 1.5;
+  color: var(--buildrick-text-primary);
+  background: var(--buildrick-bg-input);
+  border: 1px solid var(--buildrick-border-medium);
+  border-radius: var(--buildrick-radius-md);
+  outline: none;
+  resize: vertical;
+  transition: border-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
+              box-shadow var(--buildrick-duration-fast) var(--buildrick-ease-default);
+}
+.bd-textarea::placeholder { color: var(--buildrick-text-muted); }
+.bd-textarea:focus {
+  border-color: var(--buildrick-border-focus);
+  box-shadow: var(--buildrick-glow-primary);
+}
+.bd-textarea:disabled {
+  background: var(--buildrick-bg-subtle);
+  color: var(--buildrick-text-muted);
+  cursor: not-allowed;
+  resize: none;
+}
+
+.bd-textarea--sm { min-height: 64px; }
+.bd-textarea--lg { min-height: 180px; }
+.bd-textarea--fixed { resize: none; }
+
+.bd-textarea--error {
+  border-color: var(--buildrick-error);
+  box-shadow: 0 0 0 3px var(--buildrick-error-light);
+}
