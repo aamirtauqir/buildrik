@@ -1,21 +1,9 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Icon, type IconName } from "../editor/shared/vibcoder/Icon";
+import { sectionLabel, flexRow } from "./_galleryStyles";
 
-const sectionLabel = {
-  fontSize: 12,
-  margin: "0 0 8px",
-  opacity: 0.6,
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.04em",
-};
-
-const row = {
-  display: "flex" as const,
-  gap: 16,
-  alignItems: "center" as const,
-  flexWrap: "wrap" as const,
-};
+const wideRow = { ...flexRow, gap: 16 };
 
 const grid = {
   display: "grid" as const,
@@ -49,7 +37,7 @@ function Demo() {
   return (
     <>
       <h2 style={sectionLabel}>sizes (chevron-down)</h2>
-      <div style={row}>
+      <div style={wideRow}>
         <Icon name="chevron-down" size="xs" />
         <Icon name="chevron-down" size="sm" />
         <Icon name="chevron-down" />
@@ -59,7 +47,7 @@ function Demo() {
       </div>
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>color via parent (currentColor)</h2>
-      <div style={row}>
+      <div style={wideRow}>
         <span style={{ color: "var(--bd-fg-primary, #000)" }}>
           <Icon name="info" /> primary
         </span>
@@ -75,7 +63,7 @@ function Demo() {
       </div>
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>aria-label override (meaningful icon)</h2>
-      <div style={row}>
+      <div style={wideRow}>
         <Icon name="trash" aria-label="Delete page" aria-hidden={false} />
       </div>
 

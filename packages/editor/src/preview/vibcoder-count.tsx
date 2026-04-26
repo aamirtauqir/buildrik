@@ -1,27 +1,13 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Count } from "../editor/shared/vibcoder/Count";
-
-const sectionLabel = {
-  fontSize: 12,
-  margin: "0 0 8px",
-  opacity: 0.6,
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.04em",
-};
-
-const row = {
-  display: "flex" as const,
-  gap: 12,
-  alignItems: "center" as const,
-  flexWrap: "wrap" as const,
-};
+import { sectionLabel, flexRow } from "./_galleryStyles";
 
 function Demo() {
   return (
     <>
       <h2 style={sectionLabel}>variants (md)</h2>
-      <div style={row}>
+      <div style={flexRow}>
         <Count>3</Count>
         <Count variant="accent">9</Count>
         <Count variant="success">42</Count>
@@ -31,7 +17,7 @@ function Demo() {
       </div>
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>sizes</h2>
-      <div style={row}>
+      <div style={flexRow}>
         <Count size="xs">3</Count>
         <Count size="sm">3</Count>
         <Count>3</Count>
@@ -39,7 +25,7 @@ function Demo() {
       </div>
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>dot (xs / sm / md / lg + tones)</h2>
-      <div style={row}>
+      <div style={flexRow}>
         <Count dot size="xs" />
         <Count dot size="sm" />
         <Count dot />

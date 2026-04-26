@@ -1,27 +1,15 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Badge } from "../editor/shared/vibcoder/Badge";
+import { sectionLabel, flexRow } from "./_galleryStyles";
 
-const sectionLabel = {
-  fontSize: 12,
-  margin: "0 0 8px",
-  opacity: 0.6,
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.04em",
-};
-
-const row = {
-  display: "flex" as const,
-  gap: 8,
-  alignItems: "center" as const,
-  flexWrap: "wrap" as const,
-};
+const tightRow = { ...flexRow, gap: 8 };
 
 function Demo() {
   return (
     <>
       <h2 style={sectionLabel}>variants</h2>
-      <div style={row}>
+      <div style={tightRow}>
         <Badge variant="published">Published</Badge>
         <Badge variant="draft">Draft</Badge>
         <Badge variant="issues">Issues</Badge>
@@ -33,7 +21,7 @@ function Demo() {
       </div>
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>with dot</h2>
-      <div style={row}>
+      <div style={tightRow}>
         <Badge variant="published" dot>Published</Badge>
         <Badge variant="draft" dot>Draft</Badge>
         <Badge variant="issues" dot>Issues</Badge>

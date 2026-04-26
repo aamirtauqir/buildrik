@@ -1,20 +1,9 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Thumb } from "../editor/shared/vibcoder/Thumb";
+import { sectionLabel, gridRow } from "./_galleryStyles";
 
-const sectionLabel = {
-  fontSize: 12,
-  margin: "0 0 8px",
-  opacity: 0.6,
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.04em",
-};
-
-const row = {
-  display: "grid" as const,
-  gridTemplateColumns: "repeat(3, minmax(120px, 1fr))",
-  gap: 12,
-};
+const row = gridRow(3);
 
 function Demo() {
   return (

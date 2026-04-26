@@ -1,27 +1,20 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Input } from "../editor/shared/vibcoder/Input";
+import { sectionLabel, field } from "./_galleryStyles";
 
-const sectionLabel = {
-  fontSize: 12,
-  margin: "0 0 8px",
-  opacity: 0.6,
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.04em",
-};
-
-const field = { display: "block" as const, maxWidth: 280, marginBottom: 8 };
+const wrap = field(280);
 
 function Demo() {
   return (
     <>
       <h2 style={sectionLabel}>variants</h2>
-      <div style={field}><Input placeholder="default" /></div>
-      <div style={field}><Input error defaultValue="bad" placeholder="error" /></div>
+      <div style={wrap}><Input placeholder="default" /></div>
+      <div style={wrap}><Input error defaultValue="bad" placeholder="error" /></div>
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>states</h2>
-      <div style={field}><Input disabled placeholder="disabled" /></div>
-      <div style={field}><Input type="number" defaultValue="42" /></div>
+      <div style={wrap}><Input disabled placeholder="disabled" /></div>
+      <div style={wrap}><Input type="number" defaultValue="42" /></div>
     </>
   );
 }

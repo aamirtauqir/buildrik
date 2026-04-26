@@ -1,16 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Checkbox } from "../editor/shared/vibcoder/Checkbox";
-
-const sectionLabel = {
-  fontSize: 12,
-  margin: "0 0 8px",
-  opacity: 0.6,
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.04em",
-};
-
-const stack = { display: "flex" as const, flexDirection: "column" as const, gap: 8 };
+import { sectionLabel, stack } from "./_galleryStyles";
 
 function Demo() {
   return (

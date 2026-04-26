@@ -1,27 +1,13 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Avatar } from "../editor/shared/vibcoder/Avatar";
-
-const sectionLabel = {
-  fontSize: 12,
-  margin: "0 0 8px",
-  opacity: 0.6,
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.04em",
-};
-
-const row = {
-  display: "flex" as const,
-  gap: 12,
-  alignItems: "center" as const,
-  flexWrap: "wrap" as const,
-};
+import { sectionLabel, flexRow } from "./_galleryStyles";
 
 function Demo() {
   return (
     <>
       <h2 style={sectionLabel}>variants (md)</h2>
-      <div style={row}>
+      <div style={flexRow}>
         <Avatar>SK</Avatar>
         <Avatar variant="neutral">N</Avatar>
         <Avatar variant="ink">K</Avatar>
@@ -31,7 +17,7 @@ function Demo() {
       </div>
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>sizes</h2>
-      <div style={row}>
+      <div style={flexRow}>
         <Avatar size="xs">S</Avatar>
         <Avatar size="sm">SM</Avatar>
         <Avatar>MD</Avatar>
@@ -40,14 +26,14 @@ function Demo() {
       </div>
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>presence dots</h2>
-      <div style={row}>
+      <div style={flexRow}>
         <Avatar presence="online">SK</Avatar>
         <Avatar presence="away">SK</Avatar>
         <Avatar presence="offline">SK</Avatar>
       </div>
 
       <h2 style={{ ...sectionLabel, marginTop: 24 }}>image</h2>
-      <div style={row}>
+      <div style={flexRow}>
         <Avatar src="https://i.pravatar.cc/64?img=12" alt="Dev" size="lg" />
         <Avatar src="https://i.pravatar.cc/64?img=24" alt="Dev" presence="online" size="lg" />
       </div>
