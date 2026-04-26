@@ -453,5 +453,16 @@ if [ -n "$GATE18_VIOLATIONS" ]; then
 fi
 pass "Gate 18: no banned Tailwind/indigo/violet/purple bleed"
 
+# Gate 19: No bdr-* class leaks in editor source
+# Vibcoder vendoring renames bdr-* → bd-* via codemod 1. Any survivor is
+# either a missed codemod pass or a hand-written regression.
+# Excludes project/ (designer-facing reference snapshots, not runtime).
+LEAK=$(grep -rE 'bdr-[a-z0-9_-]+' packages/editor/src --include='*.css' --include='*.tsx' --include='*.ts' --exclude-dir=project 2>/dev/null || true)
+if [ -n "$LEAK" ]; then
+  echo "$LEAK"
+  fail "Gate 19: bdr-* class leak (codemod 1 not applied or hand-written regression)"
+fi
+pass "Gate 19: no bdr-* class leaks"
+
 echo ""
 echo "=== DS V1 gates: 13 passed + 4 chrome-axiom gates at baseline + green-panel check ==="
