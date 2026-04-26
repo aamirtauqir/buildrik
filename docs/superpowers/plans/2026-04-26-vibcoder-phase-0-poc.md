@@ -4,7 +4,7 @@
 
 **Goal:** Port one vibcoder atom (`button`) end-to-end through the Phase A infrastructure to prove the loop, surface tuning needs, and lock the per-component port template before fanning out to the rest of the atoms.
 
-**Architecture:** Vendored CSS lives at `packages/editor/src/themes/components/atoms/button.css` (codemod output, generated). A thin React wrapper at `packages/editor/src/editor/shared/vibcoder/Button.tsx` renders the `bd-button` className with variant/size props. Side-by-side gallery at `packages/editor/src/preview/vibcoder-button.html` proves the React render is visually identical to the vendored HTML demo.
+**Architecture:** Vendored CSS lives at `packages/editor/src/themes/components/atoms/button.css` (codemod output, generated). A thin React wrapper at `packages/editor/src/editor/shared/vibcoder/Button.tsx` renders the `bd-btn` className with variant/size props. Side-by-side gallery at `packages/editor/src/preview/vibcoder-button.html` proves the React render is visually identical to the vendored HTML demo.
 
 **Tech Stack:** Bun (codemod runtime), React 18 + TypeScript (wrapper), Vite (preview), browser visual diff (manual eyeball — automated visual regression lands in Phase 6).
 
@@ -23,7 +23,7 @@
 | `docs/reference/vibcoder/components/atoms/button.css` | Source (vendored bundle, gitignored) — read-only input |
 | `packages/editor/src/themes/components/atoms/button.css` | Codemod output — generated, NOT hand-edited |
 | `packages/editor/src/themes/components/_aliases.generated.css` | Codemod 3 output, auto-extended with button's tokens |
-| `packages/editor/src/editor/shared/vibcoder/Button.tsx` | React wrapper rendering `bd-button` className with props |
+| `packages/editor/src/editor/shared/vibcoder/Button.tsx` | React wrapper rendering `bd-btn` className with props |
 | `packages/editor/src/editor/shared/vibcoder/Button.test.tsx` | Wrapper unit test |
 | `packages/editor/src/editor/shared/vibcoder/index.ts` | Barrel export for the namespace |
 | `packages/editor/src/preview/vibcoder-button.html` | Side-by-side gallery: vendored HTML demo + React wrapper render |
@@ -70,7 +70,7 @@ head -40 packages/editor/src/themes/components/atoms/button.css
 grep -E '\.bdr-' packages/editor/src/themes/components/atoms/button.css || echo "no bdr-* survivors"
 grep -E 'var\(--buildrick-color-' packages/editor/src/themes/components/atoms/button.css || echo "no vibcoder-shape token consumers"
 ```
-Expected: top of file shows `.bd-button` selector(s); no `bdr-*` survivors; no `--buildrick-color-*` consumers (all folded).
+Expected: top of file shows `.bd-btn` selector(s); no `bdr-*` survivors; no `--buildrick-color-*` consumers (all folded).
 
 - [ ] **Step 5:** Run gates
 
@@ -147,12 +147,24 @@ EOF
 **Files:**
 - Create: `packages/editor/src/editor/shared/vibcoder/Button.tsx`
 
-- [ ] **Step 1:** Read the manifest to confirm Button's variants + sizes
+- [ ] **Step 1:** Discover actual variants + sizes + states from vendored CSS
+
+Vibcoder convention: filename != classname. `button.css` defines `.bd-btn`. Use the variants helper (landed pre-Phase 1) to enumerate modifiers exhaustively — manifest is descriptive, CSS is authoritative.
 
 ```bash
-grep -A 8 '^| `bdr-button`' docs/reference/vibcoder/components/COMPONENTS.md
+bun packages/editor/scripts/vibcoder-variants.mjs atoms/button
 ```
-Expected: a row showing variants (e.g., `primary | secondary | ghost`) and sizes (e.g., `sm | md | lg`). If the manifest format differs, adapt the props to whatever it specifies.
+Expected output (current as of 2026-04-26):
+```
+bd-btn:
+  variants: danger, ghost, primary, publish, secondary
+  sizes: sm, lg
+  states: busy
+```
+
+**Critical finding to encode in wrapper:** `sizes` lists only `sm, lg` (NOT `md`). Vibcoder convention is that the **default size is the base class with no modifier**. The wrapper must NOT emit `bd-btn--md` — there is no such CSS rule and emitting it is a dead-class no-op.
+
+If the script's output disagrees with the snippet above (bundle update drift), prefer the script.
 
 - [ ] **Step 2:** Write the wrapper
 
@@ -160,30 +172,35 @@ Expected: a row showing variants (e.g., `primary | secondary | ghost`) and sizes
 // packages/editor/src/editor/shared/vibcoder/Button.tsx
 /**
  * Vibcoder Button wrapper.
- * Renders the `bd-button` class from src/themes/components/atoms/button.css
- * with `--variant` and `--size` BEM modifiers.
+ * Renders the `bd-btn` class from src/themes/components/atoms/button.css
+ * with `--variant`, `--size`, and `--busy` BEM modifiers.
+ *
+ * Variant + size + state union sourced from `vibcoder-variants.mjs atoms/button`.
  * @license BSD-3-Clause
  */
 import { type ButtonHTMLAttributes, forwardRef } from "react";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "publish";
 export type ButtonSize = "sm" | "md" | "lg";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
+  busy?: boolean;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = "primary", size = "md", className, children, ...rest }, ref) => {
+  ({ variant = "primary", size = "md", busy = false, className, children, ...rest }, ref) => {
     const classes = [
-      "bd-button",
-      `bd-button--${variant}`,
-      `bd-button--${size}`,
+      "bd-btn",
+      `bd-btn--${variant}`,
+      // md is base default — no `bd-btn--md` rule exists in vendored CSS
+      size !== "md" && `bd-btn--${size}`,
+      busy && "bd-btn--busy",
       className,
     ].filter(Boolean).join(" ");
     return (
-      <button ref={ref} className={classes} {...rest}>
+      <button ref={ref} className={classes} aria-busy={busy || undefined} {...rest}>
         {children}
       </button>
     );
@@ -206,7 +223,7 @@ git add packages/editor/src/editor/shared/vibcoder/Button.tsx
 git commit -m "$(cat <<'EOF'
 feat(editor): vibcoder Button wrapper
 
-Phase 0 Task 3. forwardRef wrapper renders bd-button + variant + size
+Phase 0 Task 3. forwardRef wrapper renders bd-btn + variant + size
 modifier classes. Pure className mapping; no logic, no state.
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
@@ -230,19 +247,41 @@ import { render } from "@testing-library/react";
 import { Button } from "./Button";
 
 describe("vibcoder Button wrapper", () => {
-  it("renders default variant + size classes", () => {
+  it("renders base + default variant; OMITS bd-btn--md (md is base default)", () => {
     const { container } = render(<Button>Click</Button>);
     const btn = container.querySelector("button")!;
-    expect(btn.className).toContain("bd-button");
-    expect(btn.className).toContain("bd-button--primary");
-    expect(btn.className).toContain("bd-button--md");
+    expect(btn.className).toContain("bd-btn");
+    expect(btn.className).toContain("bd-btn--primary");
+    // Critical: md is the base default size; no `bd-btn--md` CSS rule exists.
+    expect(btn.className).not.toContain("bd-btn--md");
   });
 
-  it("respects variant + size props", () => {
-    const { container } = render(<Button variant="ghost" size="lg">x</Button>);
+  it("emits explicit size class for sm + lg", () => {
+    const sm = render(<Button size="sm">x</Button>).container.querySelector("button")!;
+    const lg = render(<Button size="lg">x</Button>).container.querySelector("button")!;
+    expect(sm.className).toContain("bd-btn--sm");
+    expect(lg.className).toContain("bd-btn--lg");
+  });
+
+  it("supports all 5 variants", () => {
+    for (const v of ["primary", "secondary", "ghost", "danger", "publish"] as const) {
+      const { container } = render(<Button variant={v}>x</Button>);
+      expect(container.querySelector("button")!.className).toContain(`bd-btn--${v}`);
+    }
+  });
+
+  it("emits busy state class + aria-busy when busy", () => {
+    const { container } = render(<Button busy>x</Button>);
     const btn = container.querySelector("button")!;
-    expect(btn.className).toContain("bd-button--ghost");
-    expect(btn.className).toContain("bd-button--lg");
+    expect(btn.className).toContain("bd-btn--busy");
+    expect(btn.getAttribute("aria-busy")).toBe("true");
+  });
+
+  it("omits busy state by default (no aria-busy attr)", () => {
+    const { container } = render(<Button>x</Button>);
+    const btn = container.querySelector("button")!;
+    expect(btn.className).not.toContain("bd-btn--busy");
+    expect(btn.hasAttribute("aria-busy")).toBe(false);
   });
 
   it("merges caller className", () => {
@@ -268,17 +307,18 @@ describe("vibcoder Button wrapper", () => {
 ```bash
 cd packages/editor && npx vitest run src/editor/shared/vibcoder/Button.test.tsx
 ```
-Expected: 4 passing.
+Expected: 7 passing.
 
 - [ ] **Step 3:** Commit
 
 ```bash
 git add packages/editor/src/editor/shared/vibcoder/Button.test.tsx
 git commit -m "$(cat <<'EOF'
-test(editor): vibcoder Button wrapper unit tests (4 cases)
+test(editor): vibcoder Button wrapper unit tests (7 cases)
 
-Phase 0 Task 4. Default classes, variant + size, className merge,
-event forwarding.
+Phase 0 Task 4. Base default class, default-size omission (md is base),
+explicit sm/lg sizes, all 5 variants, busy state + aria-busy, className
+merge, event forwarding.
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 EOF
@@ -326,16 +366,24 @@ ls packages/editor/src/preview/
     <div class="col">
       <h2>Vendored HTML (raw className)</h2>
 
-      <h2>variants × sizes</h2>
+      <h2>sizes (md = base, no modifier)</h2>
       <div class="row">
-        <button class="bd-button bd-button--primary bd-button--sm">primary sm</button>
-        <button class="bd-button bd-button--primary bd-button--md">primary md</button>
-        <button class="bd-button bd-button--primary bd-button--lg">primary lg</button>
+        <button class="bd-btn bd-btn--primary bd-btn--sm">primary sm</button>
+        <button class="bd-btn bd-btn--primary">primary md (base)</button>
+        <button class="bd-btn bd-btn--primary bd-btn--lg">primary lg</button>
       </div>
+      <h2>variants (md base)</h2>
       <div class="row">
-        <button class="bd-button bd-button--secondary bd-button--md">secondary</button>
-        <button class="bd-button bd-button--ghost bd-button--md">ghost</button>
-        <button class="bd-button bd-button--primary bd-button--md" disabled>disabled</button>
+        <button class="bd-btn bd-btn--primary">primary</button>
+        <button class="bd-btn bd-btn--secondary">secondary</button>
+        <button class="bd-btn bd-btn--ghost">ghost</button>
+        <button class="bd-btn bd-btn--danger">danger</button>
+        <button class="bd-btn bd-btn--publish">publish</button>
+      </div>
+      <h2>states</h2>
+      <div class="row">
+        <button class="bd-btn bd-btn--primary bd-btn--busy" aria-busy="true">busy</button>
+        <button class="bd-btn bd-btn--primary" disabled>disabled</button>
       </div>
     </div>
 
@@ -379,22 +427,35 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { Button } from "../editor/shared/vibcoder/Button";
 
+const H = (s: string) => (
+  <h2 style={{ fontSize: 12, margin: "16px 0 8px", opacity: 0.6, textTransform: "uppercase", letterSpacing: "0.04em" }}>{s}</h2>
+);
+const Row = ({ children }: { children: React.ReactNode }) => (
+  <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>{children}</div>
+);
+
 function Demo() {
   return (
     <>
-      <h2 style={{ fontSize: 12, margin: "0 0 8px", opacity: 0.6, textTransform: "uppercase", letterSpacing: "0.04em" }}>
-        variants × sizes
-      </h2>
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+      {H("sizes (md = base, no modifier)")}
+      <Row>
         <Button variant="primary" size="sm">primary sm</Button>
-        <Button variant="primary" size="md">primary md</Button>
+        <Button variant="primary">primary md (base)</Button>
         <Button variant="primary" size="lg">primary lg</Button>
-      </div>
-      <div style={{ display: "flex", gap: 12, marginTop: 12, flexWrap: "wrap" }}>
+      </Row>
+      {H("variants (md base)")}
+      <Row>
+        <Button variant="primary">primary</Button>
         <Button variant="secondary">secondary</Button>
         <Button variant="ghost">ghost</Button>
-        <Button disabled>disabled</Button>
-      </div>
+        <Button variant="danger">danger</Button>
+        <Button variant="publish">publish</Button>
+      </Row>
+      {H("states")}
+      <Row>
+        <Button variant="primary" busy>busy</Button>
+        <Button variant="primary" disabled>disabled</Button>
+      </Row>
     </>
   );
 }
@@ -481,12 +542,18 @@ http://localhost:5050/src/preview/vibcoder-button.html
 
 - [ ] **Step 3:** Compare both columns side-by-side
 
-For each variant + size pair, the HTML side and the React side must be **pixel-identical**:
+For each variant + size + state cell, the HTML side and the React side must be **pixel-identical**:
 - Same background color, border, radius
 - Same padding + height
 - Same font, weight, letter-spacing
 - Same hover, focus, active states (manually hover/focus each)
 - `disabled` state on both renders the same opacity + cursor
+- `busy` state shows the same loading affordance + same `aria-busy="true"` in DOM inspector
+
+Cells to verify (15 total):
+- 3 sizes × 1 variant (sm, md base, lg) — confirms md-no-modifier rendering
+- 5 variants × md (primary, secondary, ghost, danger, publish)
+- 2 states (busy, disabled)
 
 - [ ] **Step 4:** Capture findings
 
@@ -495,6 +562,7 @@ If anything differs, write the diff to a findings doc (Task 9 commits it). Commo
 - Codemod 1 missed a class form → some selectors didn't rewrite
 - Cascade order wrong → Emotion's `<button>` reset overrides vendored styles
 - Size variant naming mismatch → vibcoder uses `--small` not `--sm`
+- Default-size convention drift — if the variants script reports `md` as a size, the wrapper must emit it (current convention is md = base, no modifier)
 
 - [ ] **Step 5:** Stop dev server (Ctrl+C)
 
@@ -524,14 +592,24 @@ If anything differs, write the diff to a findings doc (Task 9 commits it). Commo
 
 ## Visual diff
 
-| Variant + size | HTML | React | Match? | Notes |
+| Cell | HTML | React | Match? | Notes |
 |---|---|---|---|---|
 | primary sm | ✓ | ✓ | yes | |
-| primary md | ✓ | ✓ | yes | |
+| primary md (base, no modifier) | ✓ | ✓ | yes | |
 | primary lg | ✓ | ✓ | yes | |
 | secondary md | ✓ | ✓ | yes | |
 | ghost md | ✓ | ✓ | yes | |
+| danger md | ✓ | ✓ | yes | |
+| publish md | ✓ | ✓ | yes | |
+| busy state | ✓ | ✓ | yes | aria-busy=true present in both |
 | disabled | ✓ | ✓ | yes | |
+
+## Conventions confirmed by this POC
+
+- **Filename != classname.** `button.css` defines `.bd-btn`. Wrapper authors must inspect CSS, not infer from filename.
+- **Default size = base class, no modifier.** `md` does not have a `bd-btn--md` rule; emitting it would be a dead-class no-op. Wrapper omits modifier when prop equals default.
+- **Variants helper is ground truth.** `bun packages/editor/scripts/vibcoder-variants.mjs <tier>/<name>` is authoritative for the variant/size/state union.
+- **State props map to BEM `--state` modifiers.** `busy={true}` → `bd-btn--busy` + `aria-busy="true"`.
 
 ## Tuning needed for Phase 1
 
@@ -548,11 +626,12 @@ For each future atom/molecule/organism port, the steps are:
 1. `cp docs/reference/vibcoder/components/<tier>/<name>.css packages/editor/src/themes/components/<tier>/<name>.css`
 2. `npm run vibcoder:vendor`
 3. Verify gates: `bash packages/editor/scripts/ds-grep-gates.sh && bash packages/editor/scripts/check-vibcoder-port.sh`
-4. Write wrapper at `packages/editor/src/editor/shared/vibcoder/<Name>.tsx` mirroring the manifest's variant + state matrix
-5. Add wrapper unit test at `<Name>.test.tsx`
-6. Add gallery entry at `packages/editor/src/preview/vibcoder-<name>.html` + `.tsx`
-7. Visual diff in browser
-8. Commit per-component (one PR per batch of N components — see roadmap)
+4. **Discover variants:** `bun packages/editor/scripts/vibcoder-variants.mjs <tier>/<name>` — copy the variants/sizes/states output into the wrapper's type unions verbatim. Do NOT infer from manifest or filename.
+5. Write wrapper at `packages/editor/src/editor/shared/vibcoder/<Name>.tsx`. Rules: emit base class always; emit `--variant` always; emit `--size` only when size != default; emit `--state` only when state is truthy. Add `aria-*` attribute alongside any state class.
+6. Add wrapper unit test at `<Name>.test.tsx` with at minimum: default-size omission test, all-variants enumeration test, each state on/off test.
+7. Add gallery entry at `packages/editor/src/preview/vibcoder-<name>.html` + `.tsx`. Group cells by sizes / variants / states (3-section layout).
+8. Visual diff in browser — every cell from step 4's output must be present in the gallery.
+9. Commit per-component (one PR per batch of N components — see roadmap)
 
 ## Recommendation
 
