@@ -496,5 +496,23 @@ if [ -n "$LEAK" ]; then
 fi
 pass "Gate 21: no vibcoder-shape defs outside vendored components"
 
+# Gate 22: E3 portal discipline — no document.body in vibcoder wrappers (except OverlayMount)
+# Phase 3 overlays MUST portal through #vibcoder-overlay-root via useOverlayContainer().
+# OverlayMount.tsx is allow-listed because it owns the root.
+# Test files (*.test.tsx, *.test.ts) are exempt — they may reference document.body
+# for fixture cleanup or assertions about portal containment.
+GATE22_HITS=$(grep -RIn 'document\.body' \
+  packages/editor/src/editor/shared/vibcoder/ \
+  --include='*.tsx' --include='*.ts' \
+  | grep -v '^[^:]*OverlayMount\.tsx:' \
+  | grep -v '\.test\.tsx:' \
+  | grep -v '\.test\.ts:' \
+  || true)
+if [ -n "$GATE22_HITS" ]; then
+  echo "$GATE22_HITS"
+  fail "Gate 22: document.body referenced outside OverlayMount.tsx (E3 portal discipline)"
+fi
+pass "Gate 22: E3 portal discipline (no document.body outside OverlayMount)"
+
 echo ""
 echo "=== DS V1 gates: 13 passed + 4 chrome-axiom gates at baseline + green-panel check ==="

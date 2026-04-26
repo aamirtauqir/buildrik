@@ -196,6 +196,27 @@ export default [
       "buildrik/no-gallery-shadow": "error",
     },
   },
+  // Phase 3 contract E2 + E4 — engine encapsulation + companion-lib boundary.
+  // Forbids re-exporting types or values from @radix-ui/*, cmdk, react-colorful
+  // in vibcoder wrapper files. Internal imports remain allowed; only public
+  // re-export is forbidden. Scope is enforced inside the rule itself
+  // (path-aware filter) so registering it here is a no-op for non-vibcoder files.
+  {
+    files: ["src/editor/shared/vibcoder/*.tsx"],
+    rules: {
+      "buildrik/no-engine-public-export": "error",
+    },
+  },
+  // Phase 3 contract E5 — mandatory stateful gallery harness for overlay
+  // organisms. Forbids `open={true}` literal in overlay gallery files; they
+  // MUST drive open state via <DemoTrigger>. The rule self-filters to the
+  // 7 overlay-organism gallery filenames.
+  {
+    files: ["src/preview/vibcoder-*.tsx"],
+    rules: {
+      "buildrik/no-hardcoded-open-prop": "error",
+    },
+  },
   // Survivor #6 — ban legacy src/components/ imports from editor/** code.
   // CLAUDE.md already forbids this socially; this makes it a build gate.
   //

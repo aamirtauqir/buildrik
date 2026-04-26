@@ -174,3 +174,23 @@ export type {
   UploaderSize,
   UploaderVariant,
 } from "./Uploader";
+export { OverlayMount, useOverlayContainer } from "./OverlayMount";
+export {
+  Modal,
+  ModalTrigger,
+  ModalContent,
+  ModalClose,
+  ModalTitle,
+  ModalDescription,
+  ModalFooter,
+} from "./Modal";
+export type {
+  ModalProps,
+  ModalSize,
+  ModalTriggerProps,
+  ModalContentProps,
+  ModalCloseProps,
+  ModalTitleProps,
+  ModalDescriptionProps,
+  ModalFooterProps,
+} from "./Modal";
