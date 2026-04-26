@@ -151,3 +151,26 @@ export { ToggleRow } from "./ToggleRow";
 export type { ToggleRowProps } from "./ToggleRow";
 export { TileMeta } from "./TileMeta";
 export type { TileMetaProps, TileMetaVariant } from "./TileMeta";
+export { RailTile } from "./RailTile";
+export type {
+  RailTileProps,
+  RailTileSize,
+  RailTileOrientation,
+} from "./RailTile";
+export { SearchInput } from "./SearchInput";
+export type { SearchInputProps, SearchInputSize } from "./SearchInput";
+export { Toolbar, ToolbarGroup, ToolbarLabel, ToolbarSpacer } from "./Toolbar";
+export type {
+  ToolbarProps,
+  ToolbarSize,
+  ToolbarVariant,
+  ToolbarGroupProps,
+  ToolbarLabelProps,
+  ToolbarSpacerProps,
+} from "./Toolbar";
+export { Uploader } from "./Uploader";
+export type {
+  UploaderProps,
+  UploaderSize,
+  UploaderVariant,
+} from "./Uploader";

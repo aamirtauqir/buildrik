@@ -1,0 +1,144 @@
+/**
+ * bdr-search — search input molecule.
+ * Extracted from organism duplicates that all reimplemented the same
+ * "icon + input + (clear|kbd)" frame:
+ *   - bdr-cmd__search-input         (command-palette, with ⌘K kbd hint)
+ *   - bdr-left-panel__search        (left-panel, panel-top search)
+ *   - bdr-cms__search               (CMS topbar)
+ *
+ * Composes:  bdr-icon-btn--xs (clear button), bdr-kbd (shortcut hint)
+ * Sizes:     --sm (28), default (32), --lg (40)
+ * States:    :focus-within, --error, --disabled
+ *
+ * Compose-only. ONLY --buildrick-* tokens.
+ */
+
+.bd-search {
+  display: flex;
+  align-items: center;
+  gap: var(--buildrick-space-2);
+  padding: 0 var(--buildrick-space-3);
+  height: 32px;
+  background: var(--buildrick-bg-input);
+  border: 1px solid var(--buildrick-border-medium);
+  border-radius: var(--buildrick-radius-md);
+  color: var(--buildrick-text-muted);
+  transition: border-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
+              box-shadow var(--buildrick-duration-fast) var(--buildrick-ease-default);
+}
+
+/* ---- Leading magnifier icon ---- */
+.bd-search__icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--buildrick-text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.bd-search__icon > svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ---- The actual input ---- */
+.bd-search__input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-sm);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-primary);
+  /* inputs inherit font-family by default in some UAs but not all — set it explicitly */
+}
+.bd-search__input::placeholder {
+  color: var(--buildrick-text-muted);
+}
+.bd-search__input:disabled {
+  cursor: not-allowed;
+}
+
+/* ---- Trailing clear button (×) ----
+ * Hidden by default. Show when wrapper carries `.is-dirty` (input has value)
+ * or when the .bd-search__input is :not(:placeholder-shown). The class hook
+ * is the source of truth so consumers without JS can still reveal it
+ * declaratively via markup.
+ */
+.bd-search__clear {
+  display: none;
+  flex-shrink: 0;
+}
+.bd-search.is-dirty .bd-search__clear,
+.bd-search:has(.bd-search__input:not(:placeholder-shown)) .bd-search__clear {
+  display: inline-flex;
+}
+
+/* ---- Trailing keyboard hint slot (e.g. ⌘K) ---- */
+.bd-search__kbd {
+  flex-shrink: 0;
+}
+
+/* ---- States (a11y baseline) ---- */
+.bd-search:hover {
+  border-color: var(--buildrick-border-strong);
+}
+.bd-search:focus-within {
+  border-color: var(--buildrick-border-focus);
+  box-shadow: var(--buildrick-glow-primary);
+}
+.bd-search:focus-within .bd-search__icon {
+  color: var(--buildrick-text-secondary);
+}
+
+.bd-search--error {
+  border-color: var(--buildrick-error);
+}
+.bd-search--error:focus-within {
+  border-color: var(--buildrick-error);
+  box-shadow: 0 0 0 3px var(--buildrick-error-light);
+}
+
+.bd-search--disabled,
+.bd-search[aria-disabled="true"] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ---- Sizes ----
+ * Heights are part of the contract — raw px is intentional here.
+ * Internal token usage stays the same; only height + horizontal padding shift.
+ */
+.bd-search--sm {
+  height: 28px;
+  padding: 0 var(--buildrick-space-2);
+  gap: var(--buildrick-space-1);
+}
+.bd-search--sm .bd-search__icon {
+  width: 14px;
+  height: 14px;
+}
+.bd-search--sm .bd-search__input {
+  font-size: var(--buildrick-text-xs);
+}
+
+.bd-search--lg {
+  height: 40px;
+  padding: 0 var(--buildrick-space-4);
+}
+.bd-search--lg .bd-search__icon {
+  width: 18px;
+  height: 18px;
+}
+.bd-search--lg .bd-search__input {
+  font-size: var(--buildrick-text-sm-plus);
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .bd-search { transition: none; }
+}

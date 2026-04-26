@@ -90,6 +90,7 @@
     --bd-text-xl: var(--buildrick-text-xl);
     --bd-text-xs: var(--buildrick-text-xs);
     --bd-text-xs-plus: var(--buildrick-text-xs-plus);
+    --bd-tracking-widest: var(--buildrick-tracking-widest);
     --bd-warning: var(--buildrick-warning);
     --bd-warning-bg-light: var(--buildrick-warning-bg-light);
     --bd-warning-border: var(--buildrick-warning-border);
