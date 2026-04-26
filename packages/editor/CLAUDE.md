@@ -361,3 +361,34 @@ Use the `/browse` skill from gstack for all web browsing. Never use `mcp__claude
 - /guard
 - /unfreeze
 - /gstack-upgrade
+
+## Vibcoder Position 3 — Chrome Routing Rules
+
+The chrome layer (sidebar/rail/inspector/topbar/footer) is now governed by the
+vibcoder bundle vendored at `src/themes/components/`. Position 3 + R2 namespace
+exception: vibcoder canonical names are authoritative; `--bd-*` short aliases
+remain for existing chrome JSX via the generated alias layer.
+
+### When porting / modifying chrome
+
+- **Source of truth:** `docs/reference/vibcoder/components/COMPONENTS.md` manifest. Do NOT invent components.
+- **Vendoring pipeline:** `npm run vibcoder:vendor` (orchestrates pin + 3 codemods). Never hand-edit files in `src/themes/components/` — they're generated output.
+- **Bundle pin:** `.bundle-version` artifact MUST change when bundle changes. PR diff makes "bundle drift" vs "codemod drift" visible.
+- **Cascade:** `@layer tokens, components, overrides;`. Vendored CSS lands in `components`. Emotion remains unlayered (always wins) so existing styled() chrome stays authoritative through Phase 1-5 transition.
+- **Tokens:** Use canonical `--buildrick-*` names in vendored CSS. Use short `--bd-*` aliases in chrome JSX. Never define new `--buildrick-color-*` shapes (vibcoder shape) in chrome — Gate 21 blocks it.
+
+### CI gates this section enforces
+
+- Gate 19: no `bdr-*` class leaks (codemod 1 must run cleanly)
+- Gate 21: no vibcoder-shape token defs in non-vendored CSS
+- `vibcoder:check-port`: every file in `components/<tier>/` has manifest entry + body class def
+
+### Codex routing
+
+Codex review for vibcoder ports is **advisory** during Phase 1-4 migration arc and
+**blocking** post-Phase 5 (per Pass 6 scope-guardian finding — solo workflow
+mid-arc tier transition is theater, single-mode is honest).
+
+### Phase status
+
+See `docs/superpowers/specs/2026-04-26-vibcoder-position-3/roadmap.md`.
