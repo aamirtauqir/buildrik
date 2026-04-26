@@ -22,7 +22,7 @@
 
 | File | Purpose |
 |---|---|
-| `packages/editor/src/themes/components/_layer.css` | `@layer tokens, components, overrides;` declaration consumed by `_base.css` |
+| `packages/editor/src/themes/components/_layer.css` | `@layer tokens, components, overrides;` declaration consumed by `default.css` |
 | `packages/editor/src/themes/components/.bundle-version` | SHA256 of vendored bundle (generated) |
 | `packages/editor/src/themes/components/atoms/` | Vendored atom CSS (created empty for now) |
 | `packages/editor/src/themes/components/molecules/` | Vendored molecule CSS (empty) |
@@ -37,7 +37,7 @@
 | `packages/editor/scripts/check-vibcoder-port.sh` | Per-PR gate: every ported component has manifest entry + body line |
 | `packages/editor/scripts/ds-grep-gates.sh` | Modify: add Gate 19 (bdr-X leak) + Gate 21 (namespace direction) |
 | `packages/editor/package.json` | Add 4 npm scripts |
-| `packages/editor/src/themes/_base.css` | Add `@import "./components/_layer.css";` at top |
+| `packages/editor/src/themes/default.css` | Add `@import "./components/_layer.css";` at top |
 | `packages/editor/CLAUDE.md` | Add "Vibcoder Position 3" routing section |
 
 ---
@@ -85,7 +85,7 @@ EOF
 
 **Files:**
 - Create: `packages/editor/src/themes/components/_layer.css`
-- Modify: `packages/editor/src/themes/_base.css` (top of file)
+- Modify: `packages/editor/src/themes/default.css` (top of file)
 
 - [ ] **Step 1:** Write the layer file
 
@@ -101,13 +101,13 @@ EOF
 @layer tokens, components, overrides;
 ```
 
-- [ ] **Step 2:** Read `_base.css` to find safe import location
+- [ ] **Step 2:** Read `default.css` to find safe import location
 
 ```bash
-head -20 packages/editor/src/themes/_base.css
+head -20 packages/editor/src/themes/default.css
 ```
 
-- [ ] **Step 3:** Add import as the FIRST line of `_base.css`
+- [ ] **Step 3:** Add import as the FIRST line of `default.css`
 
 `@layer` must be declared before any other rule references the layer. The Edit tool old_string should be the existing first line; new_string prepends `@import "./components/_layer.css";` followed by a blank line.
 
@@ -121,7 +121,7 @@ Expected: PASS (no errors).
 - [ ] **Step 5:** Commit
 
 ```bash
-git add packages/editor/src/themes/components/_layer.css packages/editor/src/themes/_base.css
+git add packages/editor/src/themes/components/_layer.css packages/editor/src/themes/default.css
 git commit -m "$(cat <<'EOF'
 feat(editor): declare vibcoder cascade layers
 

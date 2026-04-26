@@ -308,7 +308,7 @@ ls packages/editor/src/preview/
   <meta charset="utf-8" />
   <title>Vibcoder Button — POC gallery</title>
   <link rel="stylesheet" href="/src/themes/components/_layer.css" />
-  <link rel="stylesheet" href="/src/themes/_base.css" />
+  <link rel="stylesheet" href="/src/themes/default.css" />
   <link rel="stylesheet" href="/src/themes/components/_aliases.generated.css" />
   <link rel="stylesheet" href="/src/themes/components/atoms/button.css" />
   <style>
