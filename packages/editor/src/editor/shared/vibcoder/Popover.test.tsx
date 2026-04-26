@@ -96,6 +96,38 @@ describe("vibcoder Popover wrapper — Contract B (always-controlled surface)", 
     expect(ref.current).toBeNull();
   });
 
+  it("attaches ref after open flips false→true (mount lifecycle)", () => {
+    const ref = createRef<HTMLDivElement>();
+    const { rerender } = render(
+      <Popover open={false} onOpenChange={() => {}} ref={ref}>
+        x
+      </Popover>,
+    );
+    expect(ref.current).toBeNull();
+    rerender(
+      <Popover open={true} onOpenChange={() => {}} ref={ref}>
+        x
+      </Popover>,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+  });
+
+  it("releases ref after open flips true→false (unmount lifecycle)", () => {
+    const ref = createRef<HTMLDivElement>();
+    const { rerender } = render(
+      <Popover open={true} onOpenChange={() => {}} ref={ref}>
+        x
+      </Popover>,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    rerender(
+      <Popover open={false} onOpenChange={() => {}} ref={ref}>
+        x
+      </Popover>,
+    );
+    expect(ref.current).toBeNull();
+  });
+
   it("forwards arbitrary HTMLAttributes (id, data-*) onto the surface", () => {
     const onOpenChange = vi.fn();
     const { container } = render(

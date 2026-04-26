@@ -79,7 +79,7 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(
     {
       open,
       onOpenChange: _onOpenChange,
-      tone,
+      tone = "info",
       title,
       description,
       action,

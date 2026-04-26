@@ -73,6 +73,37 @@ describe("vibcoder MenuItem — base + state + slot composition", () => {
     expect(btn.getAttribute("aria-checked")).toBe("true");
   });
 
+  it("upgrades role from menuitem to menuitemcheckbox when selected is defined (ARIA 1.2 — aria-checked invalid on plain menuitem)", () => {
+    const { container, rerender } = render(<MenuItem>X</MenuItem>);
+    let item = container.querySelector(".bd-menu__item")!;
+    expect(item.getAttribute("role")).toBe("menuitem");
+
+    rerender(<MenuItem selected={false}>X</MenuItem>);
+    item = container.querySelector(".bd-menu__item")!;
+    expect(item.getAttribute("role")).toBe("menuitemcheckbox");
+    expect(item.getAttribute("aria-checked")).toBe("false");
+
+    rerender(<MenuItem selected={true}>X</MenuItem>);
+    item = container.querySelector(".bd-menu__item")!;
+    expect(item.getAttribute("role")).toBe("menuitemcheckbox");
+    expect(item.getAttribute("aria-checked")).toBe("true");
+  });
+
+  it("emits .is-on + aria-checked + disabled + aria-disabled when selected+disabled together", () => {
+    const { container } = render(
+      <MenuItem selected disabled>
+        X
+      </MenuItem>,
+    );
+    const btn = container.querySelector(".bd-menu__item") as HTMLButtonElement;
+    expect(btn.className).toContain("is-on");
+    expect(btn.getAttribute("aria-checked")).toBe("true");
+    expect(btn.getAttribute("aria-disabled")).toBe("true");
+    expect(btn.disabled).toBe(true);
+    // After Fix #1, role should be menuitemcheckbox
+    expect(btn.getAttribute("role")).toBe("menuitemcheckbox");
+  });
+
   it("OMITS --danger modifier when danger undefined", () => {
     const { container } = render(<MenuItem>Open</MenuItem>);
     expect(container.querySelector(".bd-menu__item")!.className).not.toContain(

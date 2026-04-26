@@ -36,7 +36,13 @@ export interface ToggleRowProps
   label: string;
   /** Optional supportive description text shown below the label. */
   helper?: string;
-  /** Adds .is-disabled (CSS dims meta block + makes switch not-allowed). */
+  /**
+   * Visual-only disabled state — dims the row and adds `is-disabled` class
+   * (CSS sets `cursor: not-allowed` on the row).
+   *
+   * Note: pass `disabled` to your control child separately for true input
+   * disabling. This prop only styles the row, it does NOT propagate.
+   */
   disabled?: boolean;
   /** Adds the --first variant (kills top border + top padding). */
   first?: boolean;

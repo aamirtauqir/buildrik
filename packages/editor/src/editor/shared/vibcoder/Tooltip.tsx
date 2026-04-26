@@ -33,7 +33,8 @@
  */
 import { type HTMLAttributes, type ReactNode, forwardRef } from "react";
 
-export interface TooltipProps extends HTMLAttributes<HTMLDivElement> {
+export interface TooltipProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "role"> {
   /** Toggles the --multiline CSS variant (wraps + widens padding). */
   multiline?: boolean;
   children: ReactNode;

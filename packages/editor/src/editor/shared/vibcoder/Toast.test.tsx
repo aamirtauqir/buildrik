@@ -27,17 +27,11 @@ describe("vibcoder Toast wrapper — Contract B (always-controlled surface)", ()
     expect(container.firstChild).toBeNull();
   });
 
-  it("OMITS tone modifier when tone undefined (default 'info' visual)", () => {
-    const onOpenChange = vi.fn();
+  it("defaults tone to 'info' when omitted (matches JSDoc — ensures icon coloring rule applies)", () => {
     const { container } = render(
-      <Toast open onOpenChange={onOpenChange} title="x" />,
+      <Toast open={true} onOpenChange={() => {}} title="x" />,
     );
-    const cls = container.querySelector(".bd-toast")!.className;
-    expect(cls).not.toContain("bd-toast--info");
-    expect(cls).not.toContain("bd-toast--success");
-    expect(cls).not.toContain("bd-toast--warning");
-    expect(cls).not.toContain("bd-toast--error");
-    expect(cls).not.toContain("bd-toast--neutral");
+    expect(container.querySelector(".bd-toast--info")).toBeTruthy();
   });
 
   it("emits matching tone modifier for each ToastTone value", () => {
@@ -117,6 +111,30 @@ describe("vibcoder Toast wrapper — Contract B (always-controlled surface)", ()
   it("ref stays null when open=false", () => {
     const ref = createRef<HTMLDivElement>();
     render(<Toast open={false} onOpenChange={vi.fn()} title="t" ref={ref} />);
+    expect(ref.current).toBeNull();
+  });
+
+  it("attaches ref after open flips false→true (mount lifecycle)", () => {
+    const ref = createRef<HTMLDivElement>();
+    const { rerender } = render(
+      <Toast open={false} onOpenChange={() => {}} title="x" ref={ref} />,
+    );
+    expect(ref.current).toBeNull();
+    rerender(
+      <Toast open={true} onOpenChange={() => {}} title="x" ref={ref} />,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+  });
+
+  it("releases ref after open flips true→false (unmount lifecycle)", () => {
+    const ref = createRef<HTMLDivElement>();
+    const { rerender } = render(
+      <Toast open={true} onOpenChange={() => {}} title="x" ref={ref} />,
+    );
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    rerender(
+      <Toast open={false} onOpenChange={() => {}} title="x" ref={ref} />,
+    );
     expect(ref.current).toBeNull();
   });
 

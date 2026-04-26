@@ -45,7 +45,7 @@ import {
   forwardRef,
 } from "react";
 
-export type MenuProps = HTMLAttributes<HTMLDivElement>;
+export type MenuProps = Omit<HTMLAttributes<HTMLDivElement>, "role">;
 
 export const Menu = forwardRef<HTMLDivElement, MenuProps>(
   ({ className, children, ...rest }, ref) => {
@@ -59,7 +59,7 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(
 );
 Menu.displayName = "Menu";
 
-export type MenuGroupProps = HTMLAttributes<HTMLDivElement>;
+export type MenuGroupProps = Omit<HTMLAttributes<HTMLDivElement>, "role">;
 
 export const MenuGroup = forwardRef<HTMLDivElement, MenuGroupProps>(
   ({ className, children, ...rest }, ref) => {
@@ -89,9 +89,9 @@ MenuLabel.displayName = "MenuLabel";
 
 export interface MenuItemProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /**
-   * Marks the item as the active selection. Applies .is-on +
-   * aria-checked="true" (CSS targets both [aria-checked="true"] and
-   * .is-on so either selector matches at the visual layer).
+   * When set, upgrades ARIA role from "menuitem" to "menuitemcheckbox" so
+   * `aria-checked` is valid per ARIA 1.2. Applies `is-on` class + `aria-checked={true|false}`.
+   * Leave undefined for plain action items (no checkable semantics).
    */
   selected?: boolean;
   /** Applies .bd-menu__item--danger (red treatment for destructive ops). */
@@ -132,8 +132,8 @@ export const MenuItem = forwardRef<HTMLButtonElement, MenuItemProps>(
       <button
         ref={ref}
         type={type}
-        role="menuitem"
-        aria-checked={selected ? true : undefined}
+        role={selected !== undefined ? "menuitemcheckbox" : "menuitem"}
+        aria-checked={selected !== undefined ? selected : undefined}
         aria-disabled={disabled ? true : undefined}
         disabled={disabled}
         className={classes}
