@@ -20,12 +20,8 @@ dist/
 packages/*.zip
 packages/editor.zip
 
-# Designer-facing spec mirror (reference docs, not runtime code).
-# Lives at docs/reference/ as a dev-local snapshot of the spec drop.
-# Relocated 2026-04-26 from packages/editor/src/project/ per vibcoder bridge plan.
-# Excluded from git so it can't drift into the runtime tree.
-# DS gates exclude via --exclude-dir=project (legacy guard; src/project/ now
-# only contains assets/ + README.md + SKILL.md).
+# Designer-facing spec drop, dev-local snapshot. Vendored output lives under
+# packages/editor/src/themes/components/ and IS tracked.
 docs/reference/
 
 # Per-developer dev-only artifacts (not source, not committed)
