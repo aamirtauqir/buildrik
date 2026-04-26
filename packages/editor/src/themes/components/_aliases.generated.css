@@ -44,6 +44,7 @@
     --bd-on-dark-15: var(--buildrick-on-dark-15);
     --bd-on-dark-40: var(--buildrick-on-dark-40);
     --bd-pill-stroke: var(--buildrick-pill-stroke);
+    --bd-primary-alpha-15: var(--buildrick-primary-alpha-15);
     --bd-primary-alpha-30: var(--buildrick-primary-alpha-30);
     --bd-radius-circle: var(--buildrick-radius-circle);
     --bd-radius-full: var(--buildrick-radius-full);
@@ -55,6 +56,7 @@
     --bd-space-2: var(--buildrick-space-2);
     --bd-space-3: var(--buildrick-space-3);
     --bd-space-4: var(--buildrick-space-4);
+    --bd-space-5: var(--buildrick-space-5);
     --bd-success: var(--buildrick-success);
     --bd-success-border: var(--buildrick-success-border);
     --bd-success-light: var(--buildrick-success-light);

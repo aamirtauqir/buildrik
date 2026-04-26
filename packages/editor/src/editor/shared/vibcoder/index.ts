@@ -53,3 +53,5 @@ export { Label } from "./Label";
 export type { LabelSize, LabelInfoProps, LabelProps } from "./Label";
 export { Kbd, KbdSeq } from "./Kbd";
 export type { KbdVariant, KbdSize, KbdProps, KbdSeqProps } from "./Kbd";
+export { ListRow } from "./ListRow";
+export type { ListRowProps, ListRowSize } from "./ListRow";
