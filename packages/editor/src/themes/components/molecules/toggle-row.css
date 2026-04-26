@@ -1,0 +1,71 @@
+/**
+ * bdr-toggle-row — label-on-left + description + control-on-right molecule.
+ *
+ * Replaces:
+ *   .bd-settings__toggle*  (settings.html · Preferences card)
+ *   .bd-fb__inline*        (form-builder.html · Required + opt-in toggles)
+ *
+ * Composition:
+ *   <div class="bdr-toggle-row">
+ *     <div class="bdr-toggle-row__meta">
+ *       <span class="bdr-toggle-row__name">…</span>
+ *       <span class="bdr-toggle-row__desc">…</span>
+ *     </div>
+ *     <button class="bdr-switch" …>…</button>     <!-- consumer drops control here -->
+ *   </div>
+ *
+ * Modifiers:
+ *   --first   no top border (or rely on :first-child)
+ *   --inset   adds horizontal padding (use when not inside a card with its own padding)
+ */
+
+.bd-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--buildrick-space-4);
+  padding: var(--buildrick-space-3) 0;
+  border-top: 1px solid var(--buildrick-border);
+}
+.bd-toggle-row:first-child,
+.bd-toggle-row--first {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.bd-toggle-row--inset {
+  padding-left: var(--buildrick-space-4);
+  padding-right: var(--buildrick-space-4);
+}
+
+.bd-toggle-row__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.bd-toggle-row__name {
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-sm-plus);
+  font-weight: var(--buildrick-font-weight-semibold);
+  color: var(--buildrick-text-heading);
+}
+
+.bd-toggle-row__desc {
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-xs);
+  color: var(--buildrick-text-secondary);
+  line-height: 1.45;
+}
+
+/* Disabled treatment — when the control is aria-checked="false" AND the row
+   carries an is-disabled flag. Dim the meta block. The switch atom handles
+   its own off-state colour. */
+.bd-toggle-row.is-disabled .bd-toggle-row__name,
+.bd-toggle-row.is-disabled .bd-toggle-row__desc {
+  opacity: 0.55;
+}
+.bd-toggle-row.is-disabled .bd-switch {
+  cursor: not-allowed;
+}

@@ -1,0 +1,108 @@
+/**
+ * bd-tile-meta — tile foot row (label + meta strip).
+ *
+ * Source: screens/_screens.css:471-488 (.bd-dash__tile-meta, .bd-dash__tile-name)
+ * Used in project / template / asset tile feet.
+ *
+ * Composition:
+ *   <div class="bd-tile-meta">
+ *     <div class="bd-tile-meta__body">
+ *       <span class="bd-tile-meta__name">Project name</span>
+ *       <span class="bd-tile-meta__sub">Edited 3h ago</span>
+ *     </div>
+ *     <div class="bd-tile-meta__action"> <bdr-icon-btn> | <bdr-status-dot> </div>
+ *   </div>
+ *
+ * Variants:
+ *   --inline       — single row, no sub
+ *   --centered     — text-align center (no action slot)
+ *   --with-status  — leading status dot before name
+ *
+ * Compose-only. ONLY --buildrick-* tokens.
+ */
+
+.bd-tile-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--buildrick-space-2);
+  padding: var(--buildrick-space-2) var(--buildrick-space-1) 0;
+  width: 100%;
+  font-family: var(--buildrick-font-family);
+  min-width: 0;
+}
+
+/* ---- Body (name + sub stack) ---- */
+.bd-tile-meta__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.bd-tile-meta__name {
+  font-size: var(--buildrick-text-sm);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-primary);
+  letter-spacing: -0.01em;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.bd-tile-meta__sub {
+  font-size: var(--buildrick-text-2xs);
+  color: var(--buildrick-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Right action slot ---- */
+.bd-tile-meta__action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--buildrick-space-1);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* ---- Variants ---- */
+
+/* Inline — single row, no sub */
+.bd-tile-meta--inline .bd-tile-meta__sub {
+  display: none;
+}
+.bd-tile-meta--inline .bd-tile-meta__body {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--buildrick-space-2);
+}
+
+/* Centered — title-only template tiles, no action slot */
+.bd-tile-meta--centered {
+  justify-content: center;
+  text-align: center;
+}
+.bd-tile-meta--centered .bd-tile-meta__body {
+  align-items: center;
+  flex: 0 0 auto;
+}
+.bd-tile-meta--centered .bd-tile-meta__name {
+  text-align: center;
+}
+.bd-tile-meta--centered .bd-tile-meta__action {
+  display: none;
+}
+
+/* With status — leading status dot before the body (consumer drops a
+   bd-status-dot atom as the first child of .bd-tile-meta) */
+.bd-tile-meta--with-status {
+  align-items: center;
+}
+.bd-tile-meta--with-status > .bd-status-dot {
+  flex-shrink: 0;
+}
