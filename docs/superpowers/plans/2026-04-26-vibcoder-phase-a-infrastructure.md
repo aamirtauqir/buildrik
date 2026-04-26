@@ -526,11 +526,14 @@ Expected: 13 passing.
 ```bash
 git add packages/editor/scripts/__tests__/vibcoder-codemod.test.mjs
 git commit -m "$(cat <<'EOF'
-test(editor): vibcoder codemods 1+2 unit suite (12 cases)
+test(editor): vibcoder codemods 1+2 unit suite (13 cases)
 
 Phase A Task 7. Covers selectors, BEM, attribute selectors, @keyframes,
-animation longhand + shorthand, idempotency, no-op on non-vibcoder
-classes, token fold, no double-fold, multi-token declarations.
+animation longhand + shorthand + multi-name (regression for bdc5f13),
+idempotency, no-op on non-vibcoder classes, token fold, no double-fold,
+multi-token declarations.
+
+Plan updated 12 → 13 to reflect the regression test addition.
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 EOF
