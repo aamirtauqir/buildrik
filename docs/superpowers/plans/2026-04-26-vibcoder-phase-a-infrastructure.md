@@ -451,7 +451,7 @@ EOF
 
 ---
 
-## Task 7: Codemod unit tests (12 cases)
+## Task 7: Codemod unit tests (13 cases)
 
 **Files:**
 - Create: `packages/editor/scripts/__tests__/vibcoder-codemod.test.mjs`
@@ -486,6 +486,9 @@ describe("vibcoder-codemod-1: class + animation rename", () => {
   it("rewrites animation shorthand", () => {
     expect(cm1(".x { animation: bdr-spin 1s linear; }")).toBe(".x { animation: bd-spin 1s linear; }");
   });
+  it("rewrites all names in multi-animation shorthand (regression for bdc5f13)", () => {
+    expect(cm1(".x { animation: bdr-foo, bdr-bar; }")).toBe(".x { animation: bd-foo, bd-bar; }");
+  });
   it("is idempotent", () => {
     const once = cm1(".bdr-foo {}");
     expect(cm1(once)).toBe(once);
@@ -516,7 +519,7 @@ describe("vibcoder-codemod-2: token fold", () => {
 ```bash
 cd packages/editor && npx vitest run scripts/__tests__/vibcoder-codemod.test.mjs
 ```
-Expected: 12 passing.
+Expected: 13 passing.
 
 - [ ] **Step 3:** Commit
 
@@ -1011,7 +1014,7 @@ bash packages/editor/scripts/ds-grep-gates.sh
 bash packages/editor/scripts/check-vibcoder-port.sh
 cd packages/editor && npx vitest run scripts/__tests__/vibcoder-codemod.test.mjs
 ```
-Expected: all gates PASS, all 12 codemod tests PASS.
+Expected: all gates PASS, all 13 codemod tests PASS.
 
 - [ ] **Step 2:** Run vendoring pipeline once end-to-end
 
