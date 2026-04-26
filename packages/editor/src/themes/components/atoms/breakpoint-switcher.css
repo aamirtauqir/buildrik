@@ -1,0 +1,47 @@
+/**
+ * bdr-bp-switcher — segmented breakpoint switcher atom.
+ * Variants: icon-only, labelled
+ * Tokens: desktop (1440), tablet (768), mobile (375)
+ */
+
+.bd-bp-switcher {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  background: var(--buildrick-bg-subtle);
+  border-radius: var(--buildrick-radius-md);
+  border: 1px solid var(--buildrick-border);
+}
+.bd-bp-switcher__btn {
+  width: 34px;
+  height: 28px;
+  border-radius: var(--buildrick-rounded);
+  border: 0;
+  cursor: pointer;
+  background: transparent;
+  color: var(--buildrick-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
+              color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+}
+.bd-bp-switcher__btn:hover {
+  background: var(--buildrick-bg-hover);
+  color: var(--buildrick-text-primary);
+}
+.bd-bp-switcher__btn[aria-pressed="true"],
+.bd-bp-switcher__btn.is-on {
+  background: var(--buildrick-bg-card);
+  color: var(--buildrick-accent);
+  box-shadow: 0 1px 2px var(--buildrick-ink-08);
+}
+
+.bd-bp-switcher--labelled .bd-bp-switcher__btn {
+  width: auto;
+  padding: 0 var(--buildrick-space-3);
+  gap: var(--buildrick-space-1);
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-sm);
+  font-weight: var(--buildrick-font-weight-medium);
+}

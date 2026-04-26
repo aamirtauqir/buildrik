@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Vibcoder BreakpointSwitcher — Phase 1 gallery</title>
+  <link rel="stylesheet" href="/src/themes/default.css" />
+  <link rel="stylesheet" href="/src/themes/components/_aliases.generated.css" />
+  <link rel="stylesheet" href="/src/themes/components/atoms/breakpoint-switcher.css" />
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 24px; background: var(--bd-bg-panel, #fff); color: var(--bd-fg-primary, #000); }
+    h1 { font-size: 16px; margin: 0 0 16px; }
+    h2 { font-size: 12px; margin: 24px 0 8px; opacity: .6; text-transform: uppercase; letter-spacing: .04em; }
+    .stack { display: flex; flex-direction: column; gap: 16px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    .col { border: 1px solid #ccc3; padding: 16px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <h1>Vibcoder BreakpointSwitcher — Phase 1 side-by-side (compound atom canary)</h1>
+  <div class="grid">
+    <div class="col">
+      <h2>Vendored HTML (raw className)</h2>
+
+      <h2>icon-only (default) — desktop active</h2>
+      <div class="stack">
+        <div role="group" aria-label="Breakpoint" class="bd-bp-switcher">
+          <button type="button" class="bd-bp-switcher__btn" aria-pressed="true" aria-label="Desktop">D</button>
+          <button type="button" class="bd-bp-switcher__btn" aria-pressed="false" aria-label="Tablet">T</button>
+          <button type="button" class="bd-bp-switcher__btn" aria-pressed="false" aria-label="Mobile">M</button>
+        </div>
+      </div>
+
+      <h2>labelled — tablet active</h2>
+      <div class="stack">
+        <div role="group" aria-label="Breakpoint" class="bd-bp-switcher bd-bp-switcher--labelled">
+          <button type="button" class="bd-bp-switcher__btn" aria-pressed="false" aria-label="Desktop">Desktop</button>
+          <button type="button" class="bd-bp-switcher__btn" aria-pressed="true" aria-label="Tablet">Tablet</button>
+          <button type="button" class="bd-bp-switcher__btn" aria-pressed="false" aria-label="Mobile">Mobile</button>
+        </div>
+      </div>
+
+      <h2>each value pinned</h2>
+      <div class="stack">
+        <div role="group" aria-label="Breakpoint" class="bd-bp-switcher">
+          <button type="button" class="bd-bp-switcher__btn" aria-pressed="true">D</button>
+          <button type="button" class="bd-bp-switcher__btn" aria-pressed="false">T</button>
+          <button type="button" class="bd-bp-switcher__btn" aria-pressed="false">M</button>
+        </div>
+        <div role="group" aria-label="Breakpoint" class="bd-bp-switcher">
+          <button type="button" class="bd-bp-switcher__btn" aria-pressed="false">D</button>
+          <button type="button" class="bd-bp-switcher__btn" aria-pressed="true">T</button>
+          <button type="button" class="bd-bp-switcher__btn" aria-pressed="false">M</button>
+        </div>
+        <div role="group" aria-label="Breakpoint" class="bd-bp-switcher">
+          <button type="button" class="bd-bp-switcher__btn" aria-pressed="false">D</button>
+          <button type="button" class="bd-bp-switcher__btn" aria-pressed="false">T</button>
+          <button type="button" class="bd-bp-switcher__btn" aria-pressed="true">M</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <h2>React wrapper (interactive)</h2>
+      <div id="react-root"></div>
+    </div>
+  </div>
+  <script type="module" src="./vibcoder-breakpoint-switcher.tsx"></script>
+</body>
+</html>

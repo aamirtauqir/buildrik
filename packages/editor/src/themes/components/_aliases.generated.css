@@ -35,10 +35,12 @@
     --bd-font-weight-normal: var(--buildrick-font-weight-normal);
     --bd-font-weight-semibold: var(--buildrick-font-weight-semibold);
     --bd-glow-primary: var(--buildrick-glow-primary);
+    --bd-ink-08: var(--buildrick-ink-08);
     --bd-ink-15: var(--buildrick-ink-15);
     --bd-ink-20: var(--buildrick-ink-20);
     --bd-layer-muted-alpha: var(--buildrick-layer-muted-alpha);
     --bd-line-normal: var(--buildrick-line-normal);
+    --bd-on-dark-12: var(--buildrick-on-dark-12);
     --bd-on-dark-15: var(--buildrick-on-dark-15);
     --bd-on-dark-40: var(--buildrick-on-dark-40);
     --bd-pill-stroke: var(--buildrick-pill-stroke);

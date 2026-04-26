@@ -1,0 +1,89 @@
+/**
+ * bdr-grip — drag handle glyph atom.
+ *
+ * Consolidates three screen-scoped reimplementations:
+ *   - screens/_cms.css:441-448         (.bd-cms__grip)
+ *   - screens/_form-builder.css:107-112 (.bd-fb__tile-grip)
+ *   - screens/_form-builder.css:192-202 (.bd-fb__row-grip)
+ *
+ * Always pair with the i-grip-vertical sprite glyph from atoms/icons.svg
+ * via the bdr-icon atom — composition, not repaint. The grip itself is
+ * the SIZED HIT TARGET + grab/grabbing cursor + muted->secondary tone shift.
+ *
+ * Variants:
+ *   Default: 12 × 16 vertical handle (drag rows)
+ *   --horizontal: 16 × 12 (rotated 90deg) for row-grab handles in tables
+ *   Sizes:   --sm (10 × 12), default (12 × 16), --lg (14 × 20)
+ *
+ * States: :hover, :active (cursor: grabbing), [disabled] / [aria-disabled].
+ * Compose-only. ALL surfaces use --buildrick-* tokens.
+ */
+
+.bd-grip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 16px;
+  cursor: grab;
+  color: var(--buildrick-text-muted);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  flex-shrink: 0;
+  user-select: none;
+  touch-action: none;
+  transition: color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+}
+
+/* Render any nested SVG glyph at a sensible default — caller can override
+ * by passing bdr-icon--xs / bdr-icon--sm. */
+.bd-grip > svg {
+  width: 12px;
+  height: 16px;
+  display: block;
+  pointer-events: none;
+}
+
+/* ---- States (a11y baseline) ---- */
+.bd-grip:hover {
+  color: var(--buildrick-text-secondary);
+}
+.bd-grip:focus-visible {
+  outline: none;
+  border-radius: var(--buildrick-radius-sm);
+  box-shadow: var(--buildrick-glow-primary);
+}
+.bd-grip:active {
+  cursor: grabbing;
+  color: var(--buildrick-text-primary);
+}
+.bd-grip[disabled],
+.bd-grip[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ---- Orientation ---- */
+.bd-grip--horizontal {
+  width: 16px;
+  height: 12px;
+}
+.bd-grip--horizontal > svg {
+  width: 16px;
+  height: 12px;
+  transform: rotate(90deg);
+  transform-origin: center;
+}
+
+/* ---- Sizes ---- */
+.bd-grip--sm { width: 10px; height: 12px; }
+.bd-grip--sm > svg { width: 10px; height: 12px; }
+.bd-grip--sm.bd-grip--horizontal { width: 12px; height: 10px; }
+.bd-grip--sm.bd-grip--horizontal > svg { width: 12px; height: 10px; }
+
+.bd-grip--lg { width: 14px; height: 20px; }
+.bd-grip--lg > svg { width: 14px; height: 20px; }
+.bd-grip--lg.bd-grip--horizontal { width: 20px; height: 14px; }
+.bd-grip--lg.bd-grip--horizontal > svg { width: 20px; height: 14px; }

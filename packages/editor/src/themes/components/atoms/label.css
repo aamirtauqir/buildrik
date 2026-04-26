@@ -1,0 +1,82 @@
+/**
+ * bdr-label — form label atom.
+ * Promoted from the implicit bdr-field__label living in input.css.
+ *
+ * Variants:
+ *   --sm       smaller, text-xs (default is text-sm)
+ *   --inline   no margin/block flow when sitting beside a control
+ *
+ * Elements:
+ *   __required  trailing accent dot/asterisk (use --buildrick-error)
+ *   __info      info-icon trigger (composes with bdr-tooltip)
+ *
+ * States:
+ *   Labels themselves carry no interactive states (they are not controls).
+ *   When wrapping a disabled control, set [data-disabled] or .is-disabled
+ *   on the label — opacity drops to 0.5 and color becomes text-disabled.
+ */
+
+.bd-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--buildrick-space-1);
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-sm);
+  font-weight: var(--buildrick-font-weight-medium);
+  line-height: 1.2;
+  color: var(--buildrick-text-primary);
+  letter-spacing: 0.02em;
+}
+
+/* Required marker — small asterisk after label text */
+.bd-label__required {
+  display: inline-block;
+  margin-left: var(--buildrick-space-1);
+  color: var(--buildrick-error);
+  font-weight: var(--buildrick-font-weight-semibold);
+  line-height: 1;
+}
+.bd-label__required::before { content: "*"; }
+
+/* Info-icon trigger — 14px wrapper, muted by default; composes with bdr-tooltip */
+.bd-label__info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-left: var(--buildrick-space-1);
+  color: var(--buildrick-text-muted);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: help;
+  border-radius: var(--buildrick-radius-full);
+  transition: color var(--buildrick-duration-fast) var(--buildrick-ease-default),
+              box-shadow var(--buildrick-duration-fast) var(--buildrick-ease-default);
+}
+.bd-label__info:hover { color: var(--buildrick-text-primary); }
+.bd-label__info:focus-visible {
+  outline: none;
+  color: var(--buildrick-text-primary);
+  box-shadow: var(--buildrick-glow-primary);
+}
+.bd-label__info:active { color: var(--buildrick-accent); }
+.bd-label__info[disabled],
+.bd-label__info[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Variants */
+.bd-label--sm { font-size: var(--buildrick-text-xs); }
+.bd-label--inline { margin: 0; }
+
+/* Disabled treatment — applied when wrapping a disabled control */
+.bd-label[data-disabled],
+.bd-label.is-disabled {
+  opacity: 0.5;
+  color: var(--buildrick-text-disabled);
+  cursor: not-allowed;
+}
