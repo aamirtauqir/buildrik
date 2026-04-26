@@ -85,4 +85,5 @@ For execution start:
 - [x] Phase 0 POC dispatched
 - [x] Phase 0 POC complete (button atom, findings captured at poc-findings.md)
 - [x] Phase 1 atoms — fan-out complete (23 atoms across 6 batches)
-- [ ] Phase 2 molecules — fan-out (unblocked once Phase 1 findings reviewed)
+- [x] Phase 2 molecules — fan-out complete (18 molecules / 46 wrappers across 5 batches)
+- [ ] Phase 3 organisms — fan-out (unblocked once Phase 2 findings reviewed)

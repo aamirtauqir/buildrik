@@ -185,6 +185,17 @@ export default [
       ],
     },
   },
+  // Polish #72 — ban local declarations of _galleryStyles exports inside
+  // preview/vibcoder-*.tsx. Phase 1 caught two such shadows (Label gallery,
+  // HelperText gallery) where the local `field` const had a different shape
+  // than the shared `field()` helper. Lock the convention: future galleries
+  // must import from ./_galleryStyles, never redeclare.
+  {
+    files: ["src/preview/vibcoder-*.tsx"],
+    rules: {
+      "buildrik/no-gallery-shadow": "error",
+    },
+  },
   // Survivor #6 — ban legacy src/components/ imports from editor/** code.
   // CLAUDE.md already forbids this socially; this makes it a build gate.
   //

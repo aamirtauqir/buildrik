@@ -11,5 +11,6 @@ module.exports = {
     "no-get-property-value-ds": require("./no-get-property-value-ds.cjs"),
     "no-legacy-components-import": require("./no-legacy-components-import.cjs"),
     "no-magic-layout-literals": require("./no-magic-layout-literals.cjs"),
+    "no-gallery-shadow": require("./no-gallery-shadow.cjs"),
   },
 };

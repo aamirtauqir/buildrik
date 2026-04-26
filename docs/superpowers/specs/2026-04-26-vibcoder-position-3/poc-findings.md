@@ -166,3 +166,82 @@ Two distinct fix-policy decisions surfaced during Phase 1:
 - #81 (grip.css upstream fix) is documentation-only; local snapshot is correct.
 
 Master gallery index lives at `packages/editor/src/preview/vibcoder-index.html` for visual review.
+
+---
+
+## Phase 2 — Molecules findings (M4 milestone)
+
+**Date:** 2026-04-26
+**Scope:** 18 chrome molecules (list-row catch-up + 4 category batches)
+**Outcome:** PASS-with-tuning — all 18 molecules ported, 2 polish items folded into M4 commit, 9 follow-ups carried forward to Phase 3.
+
+### Per-batch summary
+
+| Batch | Molecules | Components shipped | Tests shipped | Review fixup | Notes |
+|---|---|---|---|---|---|
+| T1 (catch-up) | list-row | 1 | 10 | none | slot composition canary; richest molecule first; commit `f85ccef` |
+| T2 (nav/comp) | card, form-field, section-head, surface-head | 10 (Card×7 sibling exports + 3 primary) | 53 + 4 fixup | `5a1cff2` (FormField error="" lock + SectionHead NaN guard) | first cross-atom imports (FormField → Label + HelperText); commit `c721d78` |
+| T3 (interactive) | actionbar, breadcrumb, chipbar, color-trigger, tabs | 15 (ActionBar×3 + Breadcrumb×4 + Chipbar×3 + Tabs×4 + ColorTrigger) | 69 + 5 fixup | `0303739` (Breadcrumb ref/prop leak + Tabs defaultPrevented + ColorTrigger value="" test) | first Contract B controlled state (color-trigger, tabs); first Contract D trigger wiring; commit `323927a` |
+| T4 (notification) | popover, toast, toggle-row, tile-meta | 13 (popover.css splits into Popover×2 + Tooltip×4 + Menu×4 + Toast + ToggleRow + TileMeta) | 74 + 6 fixup | `3f2424d` (MenuItem ARIA role + lifecycle tests + role Omit + Toast tone default) | popover.css triple-split into 3 wrapper files; commit `c781719` |
+| T5 (specialized) | rail-tile, search-input, toolbar, uploader | 7 (RailTile + SearchInput + Toolbar×4 + Uploader) | 70 + 7 fixup | `72819b1` (Uploader keyboard a11y + SearchInput focus preservation + cleanups) | rail-tile proves cross-molecule import (Tooltip from T4); uploader first non-trivial event handling; commit `76e06ff` |
+
+Total components shipped: 46 React exports (vs 18 source CSS files — sibling exports + popover-split account for the multiplier).
+Total Phase 2 tests: 298 new (10+57+74+80+77). Cumulative Phase 1+2: 233 → 531.
+
+### Polish pass folded into M4
+
+1. **#72 Gallery convention ESLint rule** — added custom rule `buildrik/no-gallery-shadow` at `packages/editor/eslint-rules/no-gallery-shadow.cjs`. Scoped to `src/preview/vibcoder-*.tsx`. Forbids module-scope declarations of `sectionLabel`, `stack`, `flexRow`, `field`, `darkSurface` — must import from `./_galleryStyles`. Error mode (not warn). Plant-and-revert verified the rule fires on a planted `const field = {}` in `vibcoder-list-row.tsx`. Phase 1's existing two shadows had already been fixed in M3 polish; Phase 2 lock prevents recurrence.
+2. **#79 Gate 7 negative test** — added vitest test at `packages/editor/scripts/__tests__/ds-grep-gates.test.mjs`. Plants a fixture CSS file in `themes/design-system/` carrying `@media (prefers-reduced-motion: reduce) { … }`, runs `bash ds-grep-gates.sh`, asserts non-zero exit AND that stdout/stderr mentions `Gate 7`. Hard-coded fixture path (no shell injection surface), `existsSync` guard refuses to overwrite an existing file, `finally` block always cleans up.
+3. **#73 Codemod 2 fold-table** — DEFERRED to Phase 3. Verification: `grep -E 'buildrick-color-' docs/reference/vibcoder/components/molecules/*.css` returns zero matches. No Phase 2 molecule shipped a `--buildrick-color-*` shape token in upstream source, so the seed fold table was never exercised. Defer extension until a Phase 3 organism actually surfaces a vibcoder-shape token.
+
+### Per-batch CC time (actuals)
+
+| Batch | Estimate (Phase 1 ratio) | Actual (incl. fixup) | Notes |
+|---|---|---|---|
+| T1 (catch-up) | ~30 min | ~8 min | Slot composition canary; richest molecule first; no review fixup |
+| T2 (nav/comp) | ~50 min | ~9 min + ~3 min fixup | Card sibling exports + FormField cross-atom imports |
+| T3 (interactive) | ~60 min | ~15 min + ~4 min fixup | First Contract B + first Contract D — judgment-call density (highest defect rate of Phase 2) |
+| T4 (notification) | ~70 min | ~17 min + ~5 min fixup | popover.css triple-split into 3 wrapper files |
+| T5 (specialized) | ~50 min | ~18 min + ~5 min fixup | uploader event handling + SearchInput focus preservation |
+
+Total Phase 2 molecule port: roughly 90 minutes of CC dispatch time including review fixups. Sub-agent dispatching + locked per-component template kept defect rates flat across batches (~15-25% first-pass, all caught by code-quality reviewer before commit).
+
+### Conventions reaffirmed (still hold after 18 molecule ports + 28 sibling exports)
+
+- All Phase 1 conventions still hold (filename != classname, default-prop omits modifier class, forwardRef + displayName, state→aria pairing, sibling exports, Number.isFinite guards, defensive Omit<…>).
+- **Slot composition contract** held across 5 molecules (form-field, surface-head, section-head, toggle-row, tile-meta + list-row canary). Slot props are typed as `ReactNode`; absence renders nothing.
+- **Always-controlled state contract** held across 5 molecules (popover, tabs, toast, color-trigger, search-input). No internal state — caller owns it. Mirrors Phase 1's Switch/Checkbox controlled-only pattern.
+- **Cross-atom imports proved scalable** — ~7 molecules import sibling atoms (FormField → Label + HelperText, RailTile → Tooltip, etc.). Bundle-size impact negligible because vendored CSS is layered once.
+- **Cross-molecule imports proved** — RailTile imports Tooltip from T4 (first cross-batch dependency in the molecule tier). No structural rework needed.
+
+### New tuning needed for Phase 3
+
+(Carve-outs Phase 3 must address before organisms start.)
+
+- [ ] **#73** — Codemod 2 fold-table extension. Re-evaluate during Phase 3 organisms; extend fold map per any `--buildrick-color-*` shape that surfaces.
+- [ ] **Floating-UI integration** for Popover/Menu/Tooltip positioning (anchor + offset + flip + shift). Today's wrappers ship the surface and contract; Phase 3 organisms wire the positioning engine.
+- [ ] **Toast queue manager** — Toast atom is single-instance. NotificationCenter organism scope owns the queue + ARIA-live region.
+- [ ] **Tabs keyboard navigation** — arrow keys / Home / End. Ships in the Tabs organism that wraps `<Tabs>` + `<Tab>` primitives.
+- [ ] **Color-picker organism** wires ColorTrigger to the actual swatch picker.
+- [ ] **#90** Vendoring fix-policy upstream forwarding — the T3 source-edit fixes (chipbar + color-trigger + tile-meta + toolbar) and #81 grip.css comment fix should land upstream before next bundle pin bump.
+- [ ] **#91** Gate 14 JSDoc exclusion parity with Gate 19 — Gate 19 already excludes CSS comments; Gate 14 (magic layout literals) does not, so JSDoc references to layout pixel sizes occasionally trip it.
+- [ ] **#92** TileMeta lead slot — organism integration may want a first-child StatusDot composition shortcut on TileMeta. Defer until consumer surfaces the need.
+- [ ] **#93** PopoverArrow Phase 3 fate — decide whether PopoverArrow stays a separate sibling export, gets folded into Popover, or moves to the floating-UI integration layer.
+
+### Open follow-ups carrying forward to Phase 3
+
+The full carry-forward list (M3 leftovers + new Phase 2 surface) is documented in the Phase 2 plan §Open follow-ups section. Summary: 9 items.
+
+- #74-#76 (Switch button-reset footgun + preventDefault test + Thumb refactor) — chrome consumer prep.
+- #77 (Icon sprite production-build resolution) — chrome integration phase blocker.
+- #81 (grip.css upstream forward-fix) — vendoring fix-policy item.
+- #82 (Vendoring fix-policy doc full version) — molecule-tier cases now available to inform the policy.
+- #89 (ListRow negative ARIA test) — lock caller-owned ARIA contract.
+- #90, #91, #92, #93 — see above.
+
+### Recommendation
+
+**Proceed to Phase 3 organisms.** Molecule alphabet complete (18 source CSS + 46 React exports, all gates green, 531 tests passing + 1 new Gate 7 negative test, type-check clean against 188-error baseline). API contracts (slot composition + always-controlled state + sibling exports + cross-atom + cross-molecule imports) held without re-write across all 18 molecules. Deferred items remain open; none block organism fan-out.
+
+Master gallery index updated at `packages/editor/src/preview/vibcoder-index.html` with the Phase 2 section linking 20 molecule galleries (popover.css splits into popover + tooltip + menu).
+
