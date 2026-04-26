@@ -1,0 +1,71 @@
+/**
+ * bdr-badge — status pill atom.
+ * Variants: published, draft, issues, unsaved, syncing, new, premium, count
+ */
+
+.bd-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--buildrick-space-1);
+  padding: 3px 9px;
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-semibold);
+  border-radius: var(--buildrick-radius-full);
+  border: 1px solid;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.bd-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--buildrick-radius-circle);
+  background: currentColor;
+}
+
+.bd-badge--published {
+  background: var(--buildrick-success-light);
+  border-color: var(--buildrick-success-border);
+  color: var(--buildrick-success);
+}
+.bd-badge--draft {
+  background: var(--buildrick-layer-muted-alpha);
+  border-color: var(--buildrick-pill-stroke);
+  color: var(--buildrick-text-secondary);
+}
+.bd-badge--issues {
+  background: var(--buildrick-error-light);
+  border-color: var(--buildrick-error);
+  color: var(--buildrick-error);
+}
+.bd-badge--unsaved {
+  background: var(--buildrick-warning-light);
+  border-color: var(--buildrick-warning-border);
+  color: var(--buildrick-warning);
+}
+.bd-badge--syncing {
+  background: var(--buildrick-accent-alpha-08);
+  border-color: var(--buildrick-primary-alpha-30);
+  color: var(--buildrick-accent);
+}
+.bd-badge--new {
+  background: var(--buildrick-accent-tint);
+  border-color: var(--buildrick-primary-alpha-30);
+  color: var(--buildrick-accent);
+}
+.bd-badge--premium {
+  background: var(--buildrick-text-heading);
+  border-color: var(--buildrick-text-heading);
+  color: var(--buildrick-text-on-accent);
+}
+
+/* Inline tab counter */
+.bd-badge--count {
+  font-size: var(--buildrick-text-2xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  padding: 1px 6px;
+  border-radius: var(--buildrick-radius-md-plus);
+  background: var(--buildrick-accent-tint);
+  border-color: transparent;
+  color: var(--buildrick-accent);
+}

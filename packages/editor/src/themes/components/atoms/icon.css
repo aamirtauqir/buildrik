@@ -1,0 +1,47 @@
+/**
+ * bdr-icon — sprite-backed SVG icon atom.
+ *
+ * Usage:
+ *   <svg class="bdr-icon" aria-hidden="true">
+ *     <use href="<path-to>/icons.svg#i-NAME" />
+ *   </svg>
+ *
+ * Path resolution (sprite is a local file, not bundled):
+ *   - From a screen at  screens/foo.html              → "../components/atoms/icons.svg#i-NAME"
+ *   - From an atom demo at components/atoms/foo.html  → "./icons.svg#i-NAME"
+ *   - From an organism at components/organisms/foo.html → "../atoms/icons.svg#i-NAME"
+ *   - From components/index.html (gallery)            → "./atoms/icons.svg#i-NAME"
+ *
+ * Sizes (px — intentional grid-snap, NOT on the typography scale):
+ *   bdr-icon--xs (12) · bdr-icon--sm (14) · bdr-icon (16, default)
+ *   bdr-icon--md (20) · bdr-icon--lg (24) · bdr-icon--xl (32)
+ *
+ * Color: ALWAYS inherits from the parent's `color` token via `currentColor`.
+ *   Drop the icon inside a tinted parent (e.g. `.bd-tag--success`,
+ *   `.bd-btn--danger`) and it picks up that color automatically. Do not
+ *   add tone modifiers to bdr-icon itself — compose, don't repaint.
+ */
+
+.bd-icon {
+  /* default 16px — grid-snap, not on the type scale */
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  /* Icon glyphs in the sprite all use stroke="currentColor" / fill="currentColor".
+     Setting `color: currentColor` here makes the cascade explicit and survives
+     reset stylesheets that would otherwise drop the inherited color on <svg>. */
+  color: currentColor;
+  fill: currentColor;
+  stroke: currentColor;
+  /* Avoid the icon being a flex/grid item that stretches */
+  pointer-events: none;
+}
+
+/* Sizes — keep px, intentional grid-snap (icons are not type) */
+.bd-icon--xs { width: 12px; height: 12px; }
+.bd-icon--sm { width: 14px; height: 14px; }
+.bd-icon--md { width: 20px; height: 20px; }
+.bd-icon--lg { width: 24px; height: 24px; }
+.bd-icon--xl { width: 32px; height: 32px; }

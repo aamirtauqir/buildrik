@@ -7,6 +7,7 @@
 @layer tokens {
   :root {
     --bd-accent: var(--buildrick-accent);
+    --bd-accent-alpha-08: var(--buildrick-accent-alpha-08);
     --bd-accent-hover: var(--buildrick-accent-hover);
     --bd-accent-pressed: var(--buildrick-accent-pressed);
     --bd-accent-tint: var(--buildrick-accent-tint);
@@ -34,12 +35,15 @@
     --bd-font-weight-semibold: var(--buildrick-font-weight-semibold);
     --bd-glow-primary: var(--buildrick-glow-primary);
     --bd-ink-20: var(--buildrick-ink-20);
+    --bd-layer-muted-alpha: var(--buildrick-layer-muted-alpha);
     --bd-line-normal: var(--buildrick-line-normal);
     --bd-on-dark-40: var(--buildrick-on-dark-40);
+    --bd-pill-stroke: var(--buildrick-pill-stroke);
     --bd-primary-alpha-30: var(--buildrick-primary-alpha-30);
     --bd-radius-circle: var(--buildrick-radius-circle);
     --bd-radius-full: var(--buildrick-radius-full);
     --bd-radius-md: var(--buildrick-radius-md);
+    --bd-radius-md-plus: var(--buildrick-radius-md-plus);
     --bd-radius-sm: var(--buildrick-radius-sm);
     --bd-rounded: var(--buildrick-rounded);
     --bd-space-1: var(--buildrick-space-1);
@@ -47,8 +51,12 @@
     --bd-space-3: var(--buildrick-space-3);
     --bd-space-4: var(--buildrick-space-4);
     --bd-success: var(--buildrick-success);
+    --bd-success-border: var(--buildrick-success-border);
     --bd-success-light: var(--buildrick-success-light);
+    --bd-success-soft: var(--buildrick-success-soft);
     --bd-text-2xs: var(--buildrick-text-2xs);
+    --bd-text-3xs: var(--buildrick-text-3xs);
+    --bd-text-3xs-plus: var(--buildrick-text-3xs-plus);
     --bd-text-heading: var(--buildrick-text-heading);
     --bd-text-md: var(--buildrick-text-md);
     --bd-text-muted: var(--buildrick-text-muted);
@@ -57,8 +65,11 @@
     --bd-text-secondary: var(--buildrick-text-secondary);
     --bd-text-sm: var(--buildrick-text-sm);
     --bd-text-sm-plus: var(--buildrick-text-sm-plus);
+    --bd-text-xl: var(--buildrick-text-xl);
     --bd-text-xs: var(--buildrick-text-xs);
     --bd-warning: var(--buildrick-warning);
+    --bd-warning-border: var(--buildrick-warning-border);
+    --bd-warning-light: var(--buildrick-warning-light);
     --bd-warning-soft: var(--buildrick-warning-soft);
   }
 }

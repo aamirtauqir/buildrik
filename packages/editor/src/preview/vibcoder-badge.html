@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Vibcoder Badge — Phase 1 gallery</title>
+  <link rel="stylesheet" href="/src/themes/default.css" />
+  <link rel="stylesheet" href="/src/themes/components/_aliases.generated.css" />
+  <link rel="stylesheet" href="/src/themes/components/atoms/badge.css" />
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 24px; background: var(--bd-bg-panel, #fff); color: var(--bd-fg-primary, #000); }
+    h1 { font-size: 16px; margin: 0 0 16px; }
+    h2 { font-size: 12px; margin: 24px 0 8px; opacity: .6; text-transform: uppercase; letter-spacing: .04em; }
+    .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    .col { border: 1px solid #ccc3; padding: 16px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <h1>Vibcoder Badge — Phase 1 side-by-side</h1>
+  <div class="grid">
+    <div class="col">
+      <h2>Vendored HTML (raw className)</h2>
+
+      <h2>variants</h2>
+      <div class="row">
+        <span class="bd-badge bd-badge--published">Published</span>
+        <span class="bd-badge bd-badge--draft">Draft</span>
+        <span class="bd-badge bd-badge--issues">Issues</span>
+        <span class="bd-badge bd-badge--unsaved">Unsaved</span>
+        <span class="bd-badge bd-badge--syncing">Syncing</span>
+        <span class="bd-badge bd-badge--new">New</span>
+        <span class="bd-badge bd-badge--premium">Premium</span>
+        <span class="bd-badge bd-badge--count">12</span>
+      </div>
+
+      <h2>with dot</h2>
+      <div class="row">
+        <span class="bd-badge bd-badge--published"><span class="bd-badge__dot"></span>Published</span>
+        <span class="bd-badge bd-badge--draft"><span class="bd-badge__dot"></span>Draft</span>
+        <span class="bd-badge bd-badge--issues"><span class="bd-badge__dot"></span>Issues</span>
+      </div>
+    </div>
+
+    <div class="col">
+      <h2>React wrapper</h2>
+      <div id="react-root"></div>
+    </div>
+  </div>
+  <script type="module" src="./vibcoder-badge.tsx"></script>
+</body>
+</html>
