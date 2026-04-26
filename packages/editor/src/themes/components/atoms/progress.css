@@ -1,0 +1,69 @@
+/**
+ * bdr-progress — linear progress bar atom.
+ * Variants: default (accent), success, warning, error
+ * Modes:    determinate (set --value 0..1 OR aria-valuenow + max), indeterminate
+ * Sizes:    sm (4px), md (6px, default), lg (8px)
+ */
+
+.bd-progress {
+  --bdr-progress-value: 0;
+  position: relative;
+  width: 100%;
+  height: 6px;
+  border-radius: var(--buildrick-radius-full);
+  background: var(--buildrick-bg-subtle);
+  overflow: hidden;
+}
+.bd-progress--sm { height: 4px; }
+.bd-progress--lg { height: 8px; }
+
+.bd-progress__bar {
+  height: 100%;
+  background: var(--buildrick-accent);
+  border-radius: inherit;
+  transform-origin: left center;
+  transform: scaleX(var(--bdr-progress-value));
+  transition: transform var(--buildrick-duration-normal) var(--buildrick-ease-default);
+}
+
+/* Tone variants */
+.bd-progress--success .bd-progress__bar { background: var(--buildrick-success); }
+.bd-progress--warning .bd-progress__bar { background: var(--buildrick-warning); }
+.bd-progress--error   .bd-progress__bar { background: var(--buildrick-error); }
+
+/* Indeterminate — sliding bar, infinite */
+.bd-progress--indeterminate .bd-progress__bar {
+  width: 35%;
+  transform: none;
+  animation: bd-progress-slide 1.4s var(--buildrick-ease-default) infinite;
+}
+@keyframes bd-progress-slide {
+  0%   { margin-left: -35%; }
+  100% { margin-left: 100%; }
+}
+
+/* With label row above — count + percentage */
+.bd-progress-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--buildrick-space-2);
+}
+.bd-progress-row__label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-xs, 11px);
+  color: var(--buildrick-text-secondary);
+}
+.bd-progress-row__pct {
+  font-family: var(--buildrick-font-family-mono);
+  font-weight: var(--buildrick-font-weight-semibold);
+  color: var(--buildrick-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bd-progress__bar { transition: none; }
+  .bd-progress--indeterminate .bd-progress__bar { animation: none; width: 100%; }
+}

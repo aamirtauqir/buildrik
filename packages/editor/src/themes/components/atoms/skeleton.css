@@ -1,0 +1,73 @@
+/**
+ * bdr-skeleton — loading placeholder atom.
+ * Use to reserve layout while async content streams in. Pair shapes for
+ * realistic mocks (circle + lines = avatar row, multiple lines = paragraph).
+ */
+
+.bd-skeleton {
+  display: block;
+  background: var(--buildrick-bg-subtle);
+  border-radius: var(--buildrick-radius-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.bd-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--buildrick-accent-alpha-08),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: bd-skeleton-shimmer 1.4s infinite ease-in-out;
+}
+
+@keyframes bd-skeleton-shimmer {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+/* ─── SHAPE VARIANTS ─── */
+
+/* Default rect — full-width block, 16px tall */
+.bd-skeleton--rect {
+  width: 100%;
+  height: 16px;
+}
+
+/* Text line — pill-rounded, 12px tall */
+.bd-skeleton--line {
+  width: 100%;
+  height: 12px;
+  border-radius: var(--buildrick-radius-full);
+}
+
+/* Circle — 1:1 ratio, default 32px */
+.bd-skeleton--circle {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--buildrick-radius-circle);
+  aspect-ratio: 1;
+}
+
+/* ─── SIZE MODIFIERS (rect height; circle both dims) ─── */
+
+.bd-skeleton--xs.bd-skeleton--rect    { height: 16px; }
+.bd-skeleton--sm.bd-skeleton--rect    { height: 24px; }
+.bd-skeleton--lg.bd-skeleton--rect    { height: 48px; }
+
+.bd-skeleton--xs.bd-skeleton--circle  { width: 16px; height: 16px; }
+.bd-skeleton--sm.bd-skeleton--circle  { width: 24px; height: 24px; }
+.bd-skeleton--lg.bd-skeleton--circle  { width: 48px; height: 48px; }
+
+/* ─── A11Y — REDUCED MOTION ─── */
+@media (prefers-reduced-motion: reduce) {
+  .bd-skeleton::after {
+    animation: none;
+    transform: none;
+  }
+}

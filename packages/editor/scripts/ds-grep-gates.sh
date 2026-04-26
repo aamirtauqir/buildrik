@@ -466,12 +466,18 @@ fi
 pass "Gate 18: no banned Tailwind/indigo/violet/purple bleed"
 
 # Gate 19: No bdr-* class leaks in editor source
-# Vibcoder vendoring renames bdr-* → bd-* via codemod 1. Any survivor is
-# either a missed codemod pass or a hand-written regression.
+# Vibcoder vendoring renames bdr-* CLASSES → bd-* via codemod 1. Any class
+# survivor is either a missed codemod pass or a hand-written regression.
 # Excludes project/ (designer-facing reference snapshots, not runtime).
 # Excludes CSS comments (documentation of original component names is expected).
+# Excludes --bdr-* CSS CUSTOM PROPERTIES — codemod 1 intentionally leaves these
+# untouched (vibcoder's API contract for value threading, e.g.,
+# --bdr-progress-value in atoms/progress.css). Wrappers must reference the
+# vendored custom-prop name verbatim. (Added Phase 1 Batch 4 — first atom that
+# exercises this contract was progress; pre-batch atoms had no value-threading.)
 LEAK=$(grep -rE 'bdr-[a-z0-9_-]+' packages/editor/src --include='*.css' --include='*.tsx' --include='*.ts' --exclude-dir=project 2>/dev/null \
   | grep -vE ':[[:space:]]*/?\*|//' \
+  | grep -vE -- '--bdr-' \
   || true)
 if [ -n "$LEAK" ]; then
   echo "$LEAK"
