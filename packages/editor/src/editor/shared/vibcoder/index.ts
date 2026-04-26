@@ -7,3 +7,5 @@
  * @license BSD-3-Clause
  */
 export { Button } from "./Button";
+export { Tag } from "./Tag";
+export type { TagVariant, TagSize, TagProps } from "./Tag";

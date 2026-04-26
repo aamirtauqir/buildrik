@@ -9,16 +9,20 @@
     --bd-accent: var(--buildrick-accent);
     --bd-accent-hover: var(--buildrick-accent-hover);
     --bd-accent-pressed: var(--buildrick-accent-pressed);
+    --bd-accent-tint: var(--buildrick-accent-tint);
     --bd-bg-card: var(--buildrick-bg-card);
     --bd-bg-hover: var(--buildrick-bg-hover);
     --bd-bg-subtle: var(--buildrick-bg-subtle);
+    --bd-border: var(--buildrick-border);
     --bd-border-medium: var(--buildrick-border-medium);
     --bd-border-strong: var(--buildrick-border-strong);
+    --bd-duration-fast: var(--buildrick-duration-fast);
     --bd-duration-normal: var(--buildrick-duration-normal);
     --bd-ease-default: var(--buildrick-ease-default);
     --bd-error: var(--buildrick-error);
     --bd-error-bg: var(--buildrick-error-bg);
     --bd-error-border: var(--buildrick-error-border);
+    --bd-error-light: var(--buildrick-error-light);
     --bd-font-family: var(--buildrick-font-family);
     --bd-font-weight-medium: var(--buildrick-font-weight-medium);
     --bd-font-weight-semibold: var(--buildrick-font-weight-semibold);
@@ -32,11 +36,18 @@
     --bd-space-2: var(--buildrick-space-2);
     --bd-space-3: var(--buildrick-space-3);
     --bd-space-4: var(--buildrick-space-4);
+    --bd-success: var(--buildrick-success);
+    --bd-success-light: var(--buildrick-success-light);
+    --bd-text-2xs: var(--buildrick-text-2xs);
+    --bd-text-heading: var(--buildrick-text-heading);
     --bd-text-md: var(--buildrick-text-md);
     --bd-text-on-accent: var(--buildrick-text-on-accent);
     --bd-text-primary: var(--buildrick-text-primary);
     --bd-text-secondary: var(--buildrick-text-secondary);
     --bd-text-sm: var(--buildrick-text-sm);
     --bd-text-sm-plus: var(--buildrick-text-sm-plus);
+    --bd-text-xs: var(--buildrick-text-xs);
+    --bd-warning: var(--buildrick-warning);
+    --bd-warning-soft: var(--buildrick-warning-soft);
   }
 }
