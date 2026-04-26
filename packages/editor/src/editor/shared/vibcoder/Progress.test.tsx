@@ -55,6 +55,27 @@ describe("vibcoder Progress wrapper", () => {
     ).toBe("1");
   });
 
+  it("falls back to 0 when value is NaN (e.g. used/quota with quota=0 during async load)", () => {
+    const { container } = render(<Progress value={NaN} />);
+    const bar = container.querySelector(".bd-progress") as HTMLDivElement;
+    expect(bar.style.getPropertyValue("--bdr-progress-value")).toBe("0");
+    expect(bar.getAttribute("aria-valuenow")).toBe("0");
+  });
+
+  it("falls back to 0 when value is +Infinity (Number.isFinite catches it; safer default than 100)", () => {
+    const { container } = render(<Progress value={Infinity} />);
+    const bar = container.querySelector(".bd-progress") as HTMLDivElement;
+    expect(bar.style.getPropertyValue("--bdr-progress-value")).toBe("0");
+    expect(bar.getAttribute("aria-valuenow")).toBe("0");
+  });
+
+  it("falls back to 0 when value is -Infinity", () => {
+    const { container } = render(<Progress value={-Infinity} />);
+    const bar = container.querySelector(".bd-progress") as HTMLDivElement;
+    expect(bar.style.getPropertyValue("--bdr-progress-value")).toBe("0");
+    expect(bar.getAttribute("aria-valuenow")).toBe("0");
+  });
+
   it("sets aria-valuenow as rounded percent (determinate)", () => {
     const { container } = render(<Progress value={0.625} />);
     const bar = container.querySelector(".bd-progress")!;
@@ -102,12 +123,11 @@ describe("vibcoder Progress wrapper", () => {
     expect(pct.textContent).toBe("63%");
   });
 
-  it("OMITS percent text in row when indeterminate (no value to display)", () => {
+  it("OMITS the percent span entirely when indeterminate", () => {
     const { container } = render(
-      <Progress label="Publishing" showPercent indeterminate />,
+      <Progress value={0.5} indeterminate showPercent label="Loading" />,
     );
-    const pct = container.querySelector(".bd-progress-row__pct")!;
-    expect(pct.textContent).toBe("");
+    expect(container.querySelector(".bd-progress-row__pct")).toBeNull();
   });
 
   it("renders row composite with showPercent alone (no label text)", () => {

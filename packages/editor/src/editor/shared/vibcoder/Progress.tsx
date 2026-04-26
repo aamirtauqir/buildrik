@@ -66,7 +66,14 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
     },
     ref,
   ) => {
-    const clamped = Math.max(0, Math.min(1, value));
+    // Math.max/min propagate NaN per IEEE 754 — `value=NaN` would otherwise
+    // produce aria-valuenow="NaN" (ARIA contract violation) and a
+    // "--bdr-progress-value: NaN" custom prop. Number.isFinite catches NaN
+    // AND ±Infinity in one check; both fall back to 0 (Infinity also clamps
+    // to 0 here, not 100 — safer default for streaming usage panels where
+    // upstream `used / quota` may divide by an in-flight quota=0).
+    const safe = Number.isFinite(value) ? value : 0;
+    const clamped = Math.max(0, Math.min(1, safe));
     const pct = Math.round(clamped * 100);
 
     const barClasses = [
@@ -119,10 +126,8 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       <div ref={ref} className={rowClasses} style={style} {...rest}>
         <div className="bd-progress-row__label">
           <span>{label}</span>
-          {showPercent && (
-            <span className="bd-progress-row__pct">
-              {indeterminate ? "" : `${pct}%`}
-            </span>
+          {showPercent && !indeterminate && (
+            <span className="bd-progress-row__pct">{`${pct}%`}</span>
           )}
         </div>
         <div className={barClasses} style={barStyle} {...ariaProps}>
