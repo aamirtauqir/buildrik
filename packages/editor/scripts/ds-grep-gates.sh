@@ -213,19 +213,21 @@ check_gate 13 "$RADIUS_COUNT" "$BASE_13" "A1.3 — panel-chrome border-radius �
 # Gate 14: Magic layout literals (Survivor #3 target).
 # Broadened: CSS (Npx), TSX camelCase bare numbers, and Emotion interpolated ${N}px.
 # TSX pattern: identifier keyword + colon + space + literal number in target set.
-# Excludes JSDoc/comment lines via the same pattern Gate 19 uses
-# (`grep -vE ':[[:space:]]*/?\*|//`) — drops lines where `:` is followed by `/*`
-# (CSS comment opener) OR contains `//` (JS line comment). Without this,
-# documentation that mentions canonical chrome dimensions (e.g. JSDoc strings
-# referencing the 280px panel or 48px header) trips the gate. (#91 — Gate 19
-# parity, applied 2026-04-27 in M5 Phase 3 close.)
+# Excludes JSDoc/comment lines via `grep -vE '^[[:space:]]*//|:[[:space:]]*/?\*'`:
+# drops pure JS comment lines (`^//` after optional whitespace) OR lines where
+# `:` is followed by `/*` (CSS comment opener). Without this, documentation
+# referencing canonical chrome dimensions (280px panel, 48px header) trips
+# the gate. (#91 — Gate 19 parity, applied 2026-04-27 in M5 Phase 3 close.)
+# NOTE: `//` is anchored to line start to avoid hiding real magic-literal
+# violations on code lines with trailing line comments like `height: 28, // 12px`
+# (revised 2026-04-27 after M5 code-quality review caught false-negative leak).
 LAYOUT_CSS=$(grep -rE '\b(28|32|36|40|44|48|56|60|240|300|320)px\b' $CHROME_PATHS --include='*.ts' --include='*.tsx' --include='*.css' 2>/dev/null \
   | grep -vE "$CHROME_EXCLUDE" \
-  | grep -vE ':[[:space:]]*/?\*|//' \
+  | grep -vE '^[[:space:]]*//|:[[:space:]]*/?\*' \
   | wc -l | tr -d ' ')
 LAYOUT_TSX=$(grep -rE '(height|width|minHeight|maxWidth|minWidth|maxHeight|padding|paddingLeft|paddingRight|paddingTop|paddingBottom|margin|marginLeft|marginRight|marginTop|marginBottom|top|bottom|left|right|gap|rowGap|columnGap)[[:space:]]*:[[:space:]]*(28|32|36|40|44|48|56|60|240|300|320)[^0-9pxPX]' $CHROME_PATHS --include='*.ts' --include='*.tsx' --include='*.css' 2>/dev/null \
   | grep -vE "$CHROME_EXCLUDE" \
-  | grep -vE ':[[:space:]]*/?\*|//' \
+  | grep -vE '^[[:space:]]*//|:[[:space:]]*/?\*' \
   | wc -l | tr -d ' ')
 LITERAL_COUNT=$((LAYOUT_CSS + LAYOUT_TSX))
 check_gate 14 "$LITERAL_COUNT" "$BASE_14" "layout literals → src/shared/constants/layout.ts" || exit 1
@@ -488,7 +490,7 @@ pass "Gate 18: no banned Tailwind/indigo/violet/purple bleed"
 # vendored custom-prop name verbatim. (Added Phase 1 Batch 4 — first atom that
 # exercises this contract was progress; pre-batch atoms had no value-threading.)
 LEAK=$(grep -rE 'bdr-[a-z0-9_-]+' packages/editor/src --include='*.css' --include='*.tsx' --include='*.ts' --exclude-dir=project 2>/dev/null \
-  | grep -vE ':[[:space:]]*/?\*|//' \
+  | grep -vE '^[[:space:]]*//|:[[:space:]]*/?\*' \
   | grep -vE -- '--bdr-' \
   || true)
 if [ -n "$LEAK" ]; then
