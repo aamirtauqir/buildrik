@@ -12,7 +12,7 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     include: ["src/**/*.{test,spec}.{ts,tsx}", "scripts/__tests__/*.mjs"],
-    setupFiles: ["@testing-library/jest-dom"],
+    setupFiles: ["./src/test-setup.ts"],
     testTimeout: 15000,
   },
   resolve: {

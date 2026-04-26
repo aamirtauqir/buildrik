@@ -1,0 +1,136 @@
+/**
+ * bdr-nc — persistent notification center organism (380px wide).
+ * Layout: head (bdr-surface-head) → flush tabs strip → grouped list (bdr-list-row)
+ *         → foot CTA button.
+ * Composes: bdr-surface-head (--sm), bdr-list-row (--bordered, --unread),
+ *           bdr-avatar (--sm, --neutral), bdr-count.
+ */
+
+.bd-nc {
+  width: 380px;
+  background: var(--buildrick-bg-card);
+  border-radius: var(--buildrick-radius-md-plus, 10px);
+  border: 1px solid var(--buildrick-border);
+  box-shadow: 0 14px 40px -10px var(--buildrick-ink-18);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 540px;
+}
+
+/* __head removed — composes .bd-surface-head--sm. */
+/* __title / __title-count removed — composes .bd-surface-head__title + .bd-count--accent. */
+
+/* Mark-all-read action — slim text button used inside surface-head__actions. */
+.bd-nc__mark {
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-2xs-plus);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+.bd-nc__mark:hover { color: var(--buildrick-accent); }
+.bd-nc__mark:focus-visible {
+  outline: none;
+  box-shadow: var(--buildrick-glow-primary);
+  border-radius: var(--buildrick-radius-sm);
+}
+
+/* Flush tabs row — kept bespoke because bdr-tabs has its own border + radius
+ * and is meant as a standalone surface; here we want a borderless underline
+ * row glued under the head. */
+.bd-nc__tabs {
+  display: flex;
+  padding: 0 var(--buildrick-space-3);
+  gap: var(--buildrick-space-1);
+  border-bottom: 1px solid var(--buildrick-border);
+  background: var(--buildrick-bg-panel);
+}
+.bd-nc__tab {
+  padding: var(--buildrick-space-2) var(--buildrick-space-3);
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-secondary);
+  cursor: pointer;
+  position: relative;
+  background: transparent;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.bd-nc__tab.is-on,
+.bd-nc__tab[aria-selected="true"] {
+  color: var(--buildrick-text-heading);
+  font-weight: var(--buildrick-font-weight-semibold);
+}
+.bd-nc__tab.is-on::after,
+.bd-nc__tab[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: var(--buildrick-space-2);
+  right: var(--buildrick-space-2);
+  height: 2px;
+  background: var(--buildrick-accent);
+}
+/* __tab-num removed — composes .bd-count--xs. */
+
+/* Body + day groupings — unique to this organism (other list molecules don't
+ * have a "Today / Yesterday" sub-header pattern). */
+.bd-nc__body {
+  flex: 1;
+  overflow-y: auto;
+}
+.bd-nc__group { padding: var(--buildrick-space-2) 0; }
+.bd-nc__group-label {
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-3xs-plus);
+  font-weight: var(--buildrick-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--buildrick-text-muted);
+  padding: var(--buildrick-space-2) var(--buildrick-space-3) 4px;
+  margin: 0;
+}
+
+/* Unread row tint — list-row's --unread modifier only adds the dot, but in
+ * this organism the entire row gets a soft accent wash. Scoped override. */
+.bd-nc__body .bd-list-row--unread {
+  background: var(--buildrick-accent-alpha-025);
+}
+.bd-nc__body .bd-list-row--unread:hover {
+  background: var(--buildrick-bg-panel);
+}
+
+/* __item / __avatar / __item-body / __msg / __meta removed —
+ * composes .bd-list-row + .bd-avatar--sm + slots. */
+
+/* Foot — full-width CTA. Differs from any canonical button (it's a flush
+ * footer link, not a button shape). */
+.bd-nc__foot {
+  padding: var(--buildrick-space-3);
+  border: none;
+  border-top: 1px solid var(--buildrick-border);
+  background: var(--buildrick-bg-subtle);
+  text-align: center;
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-accent);
+  cursor: pointer;
+  width: 100%;
+}
+
+/* States — a11y baseline */
+.bd-nc__tab:focus-visible,
+.bd-nc__foot:focus-visible {
+  outline: none;
+  box-shadow: var(--buildrick-glow-primary);
+  position: relative;
+  z-index: 1;
+}

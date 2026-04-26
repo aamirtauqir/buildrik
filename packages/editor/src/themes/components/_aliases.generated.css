@@ -7,13 +7,17 @@
 @layer tokens {
   :root {
     --bd-accent: var(--buildrick-accent);
+    --bd-accent-alpha-025: var(--buildrick-accent-alpha-025);
     --bd-accent-alpha-08: var(--buildrick-accent-alpha-08);
     --bd-accent-hover: var(--buildrick-accent-hover);
     --bd-accent-pressed: var(--buildrick-accent-pressed);
+    --bd-accent-subtle: var(--buildrick-accent-subtle);
     --bd-accent-tint: var(--buildrick-accent-tint);
+    --bd-amber-soft: var(--buildrick-amber-soft);
     --bd-bg-card: var(--buildrick-bg-card);
     --bd-bg-hover: var(--buildrick-bg-hover);
     --bd-bg-input: var(--buildrick-bg-input);
+    --bd-bg-panel: var(--buildrick-bg-panel);
     --bd-bg-pressed: var(--buildrick-bg-pressed);
     --bd-bg-subtle: var(--buildrick-bg-subtle);
     --bd-border: var(--buildrick-border);
@@ -40,10 +44,12 @@
     --bd-glow-primary: var(--buildrick-glow-primary);
     --bd-ink-06: var(--buildrick-ink-06);
     --bd-ink-08: var(--buildrick-ink-08);
+    --bd-ink-10: var(--buildrick-ink-10);
     --bd-ink-12: var(--buildrick-ink-12);
     --bd-ink-15: var(--buildrick-ink-15);
     --bd-ink-18: var(--buildrick-ink-18);
     --bd-ink-20: var(--buildrick-ink-20);
+    --bd-ink-25: var(--buildrick-ink-25);
     --bd-ink-30: var(--buildrick-ink-30);
     --bd-ink-48: var(--buildrick-ink-48);
     --bd-ink-50: var(--buildrick-ink-50);
@@ -55,20 +61,30 @@
     --bd-pill-stroke: var(--buildrick-pill-stroke);
     --bd-primary-alpha-15: var(--buildrick-primary-alpha-15);
     --bd-primary-alpha-30: var(--buildrick-primary-alpha-30);
+    --bd-radius-2xl: var(--buildrick-radius-2xl);
+    --bd-radius-2xs: var(--buildrick-radius-2xs);
     --bd-radius-circle: var(--buildrick-radius-circle);
     --bd-radius-full: var(--buildrick-radius-full);
+    --bd-radius-lg: var(--buildrick-radius-lg);
     --bd-radius-md: var(--buildrick-radius-md);
     --bd-radius-md-plus: var(--buildrick-radius-md-plus);
     --bd-radius-sm: var(--buildrick-radius-sm);
     --bd-radius-xs: var(--buildrick-radius-xs);
     --bd-rounded: var(--buildrick-rounded);
+    --bd-shadow-black-20: var(--buildrick-shadow-black-20);
+    --bd-shadow-black-30: var(--buildrick-shadow-black-30);
     --bd-shadow-md: var(--buildrick-shadow-md);
+    --bd-shadow-sm: var(--buildrick-shadow-sm);
+    --bd-shadow-xs: var(--buildrick-shadow-xs);
     --bd-space-1: var(--buildrick-space-1);
+    --bd-space-10: var(--buildrick-space-10);
+    --bd-space-12: var(--buildrick-space-12);
     --bd-space-2: var(--buildrick-space-2);
     --bd-space-3: var(--buildrick-space-3);
     --bd-space-4: var(--buildrick-space-4);
     --bd-space-5: var(--buildrick-space-5);
     --bd-space-6: var(--buildrick-space-6);
+    --bd-space-8: var(--buildrick-space-8);
     --bd-success: var(--buildrick-success);
     --bd-success-bg-light: var(--buildrick-success-bg-light);
     --bd-success-border: var(--buildrick-success-border);
@@ -83,6 +99,7 @@
     --bd-text-heading: var(--buildrick-text-heading);
     --bd-text-lg: var(--buildrick-text-lg);
     --bd-text-md: var(--buildrick-text-md);
+    --bd-text-md-plus: var(--buildrick-text-md-plus);
     --bd-text-muted: var(--buildrick-text-muted);
     --bd-text-on-accent: var(--buildrick-text-on-accent);
     --bd-text-primary: var(--buildrick-text-primary);
@@ -100,6 +117,7 @@
     --bd-warning-border-soft: var(--buildrick-warning-border-soft);
     --bd-warning-light: var(--buildrick-warning-light);
     --bd-warning-soft: var(--buildrick-warning-soft);
+    --bd-z-drawer: var(--buildrick-z-drawer);
     --bd-z-modal: var(--buildrick-z-modal);
     --bd-z-popover: var(--buildrick-z-popover);
     --bd-z-sticky: var(--buildrick-z-sticky);

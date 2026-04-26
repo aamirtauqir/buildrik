@@ -1,0 +1,42 @@
+/**
+ * bdr-footer — 32px editor status bar.
+ * Composes: status chip + meta chips + zoom controls + breakpoint chip.
+ */
+
+.bd-footer {
+  height: 32px;
+  background: var(--buildrick-bg-card);
+  border: 1px solid var(--buildrick-border);
+  border-radius: var(--buildrick-radius-md);
+  padding: 0 var(--buildrick-space-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-secondary);
+}
+.bd-footer__group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--buildrick-space-3);
+}
+.bd-footer__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: var(--buildrick-radius-sm);
+  background: var(--buildrick-bg-subtle);
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-2xs-plus);
+}
+.bd-footer__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--buildrick-radius-circle);
+  background: var(--buildrick-success);
+}
+/* bdr-footer__icon-btn removed — use atom .bd-icon-btn (atoms/icon-button.css). */
+/* bdr-footer__sep removed — use atom `bdr-divider bdr-divider--vertical` (see atoms/divider.css). */

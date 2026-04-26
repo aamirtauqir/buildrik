@@ -1,0 +1,169 @@
+/**
+ * bdr-inspector — 280px right-side editor panel organism.
+ * Shows selected element + tabbed property sections.
+ * Composes: bdr-crumbs (--mono), bdr-surface-head (--sm) for the element head,
+ *           bdr-tabs for the sub-nav, bdr-count (--xs) for section indicators.
+ *           Sections + paired-field grid stay bespoke (inspector-specific shape).
+ */
+
+.bd-inspector {
+  width: 280px;
+  background: var(--buildrick-bg-card);
+  border: 1px solid var(--buildrick-border);
+  border-radius: var(--buildrick-radius-md-plus, 10px);
+  overflow: hidden;
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-xs);
+  color: var(--buildrick-text-primary);
+  box-shadow: var(--buildrick-shadow-sm);
+}
+
+/* __crumbs / __crumb-current / __crumb-sep removed — composes .bd-crumbs--mono. */
+/* Inspector-scoped overrides for the crumbs strip: tighter padding + bottom border. */
+.bd-inspector__crumbs {
+  display: flex;
+  padding: var(--buildrick-space-2) var(--buildrick-space-2) var(--buildrick-space-2) var(--buildrick-space-3);
+  border-bottom: 1px solid var(--buildrick-border);
+  overflow: hidden;
+}
+
+/* Element header — composes .bd-surface-head--sm. Adds a leading icon-tile
+ * (surface-head has no icon slot) and the gradient + denser type unique to
+ * the inspector. __head-name / __head-meta / __head-tag removed. */
+.bd-inspector__head {
+  background: linear-gradient(180deg, var(--buildrick-bg-card) 0%, var(--buildrick-bg-panel) 100%);
+  align-items: center;
+}
+.bd-inspector__head-icon {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--buildrick-rounded);
+  background: var(--buildrick-accent-tint);
+  color: var(--buildrick-accent);
+}
+.bd-inspector__head .bd-surface-head__title { font-size: var(--buildrick-text-sm-half); }
+.bd-inspector__head .bd-surface-head__meta {
+  font-size: var(--buildrick-text-3xs-plus);
+  letter-spacing: -0.01em;
+}
+
+/* Section (collapsible) — kept bespoke: the left 2px stripe accent that
+ * shifts from border to accent on expand is unique to the inspector and has
+ * no equivalent on bdr-section-head (which uses a rotating chevron). */
+.bd-inspector__sec { border-bottom: 1px solid var(--buildrick-border); }
+.bd-inspector__sec:last-child { border-bottom: none; }
+.bd-inspector__sec-head {
+  display: flex;
+  align-items: center;
+  gap: var(--buildrick-space-1);
+  padding: 7px var(--buildrick-space-3);
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  background: transparent;
+  border: none;
+}
+.bd-inspector__sec-head::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 10px; bottom: 10px;
+  width: 2px;
+  border-radius: 0 var(--buildrick-radius-2xs) var(--buildrick-radius-2xs) 0;
+  background: var(--buildrick-border);
+  transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+}
+.bd-inspector__sec[aria-expanded="true"] .bd-inspector__sec-head::before,
+.bd-inspector__sec.is-open .bd-inspector__sec-head::before { background: var(--buildrick-accent); }
+.bd-inspector__sec-name {
+  flex: 1;
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-semibold);
+  color: var(--buildrick-text-heading);
+}
+/* __sec-ind removed — composes .bd-count--xs. */
+.bd-inspector__sec-body {
+  padding: 2px var(--buildrick-space-3) var(--buildrick-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--buildrick-space-1);
+}
+.bd-inspector__sec[aria-expanded="false"] .bd-inspector__sec-body { display: none; }
+
+/* Compact field (icon-led) — kept bespoke: inspector-specific 24px-row
+ * input shape with embedded leading glyph + trailing unit. The form-field /
+ * input molecules don't model this dense in-place editing layout. */
+.bd-inspector__field {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  background: var(--buildrick-bg-subtle);
+  border: 1px solid transparent;
+  border-radius: var(--buildrick-radius-sm);
+  overflow: hidden;
+  transition: background-color var(--buildrick-duration-fast) var(--buildrick-ease-default),
+              border-color var(--buildrick-duration-fast) var(--buildrick-ease-default);
+}
+.bd-inspector__field:hover { background: var(--buildrick-bg-card); border-color: var(--buildrick-border); }
+.bd-inspector__field:focus-within {
+  background: var(--buildrick-bg-card);
+  border-color: var(--buildrick-accent);
+  box-shadow: var(--buildrick-glow-primary);
+}
+.bd-inspector__field-icon {
+  width: 22px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--buildrick-text-muted);
+  font-size: var(--buildrick-text-2xs);
+  font-weight: var(--buildrick-font-weight-semibold);
+}
+.bd-inspector__field input {
+  flex: 1;
+  min-width: 0;
+  padding: 0 var(--buildrick-space-1) 0 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.bd-inspector__field-unit {
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-3xs-plus);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-muted);
+  padding-right: var(--buildrick-space-1);
+  text-transform: lowercase;
+}
+
+/* Paired field grid (W↔H, padding axes) — inspector-specific layout primitive. */
+.bd-inspector__pair {
+  display: grid;
+  grid-template-columns: 1fr 14px 1fr;
+  align-items: center;
+}
+.bd-inspector__pair-link {
+  width: 14px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--buildrick-text-muted);
+  cursor: pointer;
+  border-radius: var(--buildrick-radius-xs);
+  background: transparent;
+  border: none;
+}
+.bd-inspector__pair-link:hover { color: var(--buildrick-accent); background: var(--buildrick-accent-tint); }
+.bd-inspector__pair-link.is-on { color: var(--buildrick-accent); }

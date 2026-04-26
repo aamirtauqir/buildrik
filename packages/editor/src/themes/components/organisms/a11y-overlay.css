@@ -1,0 +1,123 @@
+/**
+ * bdr-a11y-overlay — accessibility audit overlay organism.
+ * Tile grid showing focus / touch / contrast / motion compliance.
+ * Use as a panel inside the editor for quick WCAG 2.2 AA inspection.
+ */
+
+.bd-a11y {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--buildrick-space-3);
+}
+
+.bd-a11y__tile {
+  background: var(--buildrick-bg-card);
+  border: 1px solid var(--buildrick-border);
+  border-radius: var(--buildrick-radius-md-plus, 10px);
+  padding: var(--buildrick-space-3) var(--buildrick-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--buildrick-space-3);
+}
+.bd-a11y__tile h4 {
+  margin: 0;
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-sm-half);
+  font-weight: var(--buildrick-font-weight-semibold);
+  color: var(--buildrick-text-heading);
+}
+.bd-a11y__tile p {
+  margin: 0;
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-xs-plus);
+  font-weight: var(--buildrick-font-weight-normal);
+  color: var(--buildrick-text-secondary);
+  line-height: 1.55;
+}
+.bd-a11y__tile code {
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  background: var(--buildrick-bg-subtle);
+  padding: 1px 5px;
+  border-radius: var(--buildrick-radius-xs);
+  color: var(--buildrick-text-primary);
+}
+
+/* Contrast ratio swatches */
+.bd-a11y__contrast {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-xs);
+}
+.bd-a11y__swatch {
+  padding: var(--buildrick-space-2);
+  border-radius: var(--buildrick-rounded);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--buildrick-border);
+  background: var(--buildrick-bg-card);
+}
+.bd-a11y__ratio {
+  font-weight: var(--buildrick-font-weight-semibold);
+  color: var(--buildrick-success);
+}
+.bd-a11y__swatch--warn .bd-a11y__ratio { color: var(--buildrick-warning); }
+.bd-a11y__swatch--fail .bd-a11y__ratio { color: var(--buildrick-error); }
+
+/* Touch target spec */
+.bd-a11y__hit {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--buildrick-radius-circle);
+  background: var(--buildrick-accent-tint);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.bd-a11y__hit-inner {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--buildrick-radius-circle);
+  background: var(--buildrick-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--buildrick-text-on-accent);
+}
+.bd-a11y__hit-label {
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-2xs);
+  color: var(--buildrick-text-muted);
+  margin-top: var(--buildrick-space-1);
+  display: block;
+  text-align: center;
+}
+.bd-a11y__hit--fail { width: 32px; height: 32px; background: var(--buildrick-error-soft); }
+.bd-a11y__hit--fail .bd-a11y__hit-inner { width: 24px; height: 24px; background: var(--buildrick-error); }
+
+/* Code sample */
+.bd-a11y__code {
+  margin: 0;
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-primary);
+  background: var(--buildrick-bg-subtle);
+  padding: var(--buildrick-space-2);
+  border-radius: var(--buildrick-rounded);
+  line-height: 1.5;
+  white-space: pre;
+  overflow-x: auto;
+}
+.bd-a11y__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}

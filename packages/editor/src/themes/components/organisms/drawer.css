@@ -1,0 +1,108 @@
+/**
+ * bdr-drawer — slide-out panel organism.
+ * Sides: right (default), left, bottom
+ * Sizes: sm (340), md (420), lg (520) — bottom uses height instead
+ * Composes: bdr-tabs (sub-nav), bdr-input, bdr-btn
+ * A11y: role="dialog" aria-modal="false"; canvas stays scrollable.
+ */
+
+.bd-drawer {
+  position: relative;
+  background: var(--buildrick-bg-card);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-left: 1px solid var(--buildrick-border);
+  box-shadow: -12px 0 40px -10px var(--buildrick-ink-30);
+  z-index: var(--buildrick-z-drawer, 40);
+}
+
+.bd-drawer--sm { width: 340px; }
+.bd-drawer--md { width: 420px; }
+.bd-drawer--lg { width: 520px; }
+
+.bd-drawer--left {
+  border-left: none;
+  border-right: 1px solid var(--buildrick-border);
+  box-shadow: 12px 0 40px -10px var(--buildrick-ink-30);
+}
+.bd-drawer--bottom {
+  width: 100%;
+  height: 340px;
+  border-left: none;
+  border-top: 1px solid var(--buildrick-border);
+  box-shadow: 0 -12px 40px -10px var(--buildrick-ink-30);
+  /* off-grid 14px top corners — bottom drawer top-edge curl, wider than radius-lg(12) for sheet-like presence */
+  border-radius: 14px 14px 0 0;
+}
+.bd-drawer__handle {
+  position: absolute;
+  top: var(--buildrick-space-2);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 3px;
+  background: var(--buildrick-border-medium);
+  border-radius: var(--buildrick-radius-2xs);
+}
+
+.bd-drawer__head {
+  padding: var(--buildrick-space-3) var(--buildrick-space-4) var(--buildrick-space-3);
+  border-bottom: 1px solid var(--buildrick-border);
+  display: flex;
+  align-items: center;
+  gap: var(--buildrick-space-3);
+}
+.bd-drawer__meta { flex: 1; min-width: 0; }
+.bd-drawer__title {
+  margin: 0;
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-sm-plus);
+  font-weight: var(--buildrick-font-weight-semibold);
+  color: var(--buildrick-text-heading);
+  letter-spacing: -0.01em;
+}
+.bd-drawer__subtitle {
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-2xs);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-muted);
+  letter-spacing: -0.01em;
+}
+.bd-drawer__actions {
+  display: flex;
+  gap: 3px;
+}
+/* bdr-drawer__icon-btn removed — use atom .bd-icon-btn (atoms/icon-button.css). */
+
+.bd-drawer__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--buildrick-space-3) var(--buildrick-space-4);
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-xs-plus);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-primary);
+}
+.bd-drawer__section { margin-bottom: var(--buildrick-space-4); }
+.bd-drawer__section:last-child { margin-bottom: 0; }
+.bd-drawer__section-title {
+  margin: 0 0 var(--buildrick-space-2);
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-2xs);
+  font-weight: var(--buildrick-font-weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--buildrick-text-muted);
+}
+
+.bd-drawer__foot {
+  padding: var(--buildrick-space-3);
+  border-top: 1px solid var(--buildrick-border);
+  background: var(--buildrick-bg-subtle);
+  display: flex;
+  gap: var(--buildrick-space-2);
+  justify-content: flex-end;
+}
+

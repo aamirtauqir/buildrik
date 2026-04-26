@@ -1,0 +1,155 @@
+/**
+ * bdr-color-picker — color picker organism (saturation + hue + alpha + hex/RGB).
+ * Composes: bdr-slider (hue/alpha), bdr-input (hex), bdr-pillgroup (mode).
+ * Width: 240px standard, 280px wide variant.
+ */
+
+.bd-color-picker {
+  width: 240px;
+  background: var(--buildrick-bg-card);
+  border: 1px solid var(--buildrick-border);
+  border-radius: var(--buildrick-radius-md);
+  padding: var(--buildrick-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--buildrick-space-2);
+  box-shadow: var(--buildrick-shadow-md);
+}
+.bd-color-picker--wide { width: 280px; }
+
+/* Saturation/value canvas */
+.bd-color-picker__sat {
+  position: relative;
+  height: 120px;
+  border-radius: var(--buildrick-radius-sm);
+  background: var(--buildrick-accent);
+  background-image:
+    linear-gradient(to bottom, transparent, var(--buildrick-text-heading)),
+    linear-gradient(to right, var(--buildrick-bg-card), transparent);
+  box-shadow: inset 0 0 0 1px var(--buildrick-ink-08);
+}
+.bd-color-picker__sat-pin {
+  position: absolute;
+  top: 22%;
+  left: 62%;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--buildrick-radius-circle);
+  background: transparent;
+  border: 2px solid var(--buildrick-bg-card);
+  box-shadow: 0 0 0 1px var(--buildrick-ink-25), 0 1px 3px var(--buildrick-shadow-black-30);
+  transform: translate(-50%, -50%);
+}
+
+/* Hue / alpha strips (visual; input semantics via bdr-slider when interactive) */
+.bd-color-picker__strip {
+  height: 10px;
+  border-radius: var(--buildrick-radius-full);
+  position: relative;
+  box-shadow: inset 0 0 0 1px var(--buildrick-ink-08);
+}
+/* Hue strip: pure RGB spectrum is structural input — exempt from token rule (same exemption as canvas dot grid). */
+.bd-color-picker__strip--hue {
+  background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+}
+.bd-color-picker__strip--alpha {
+  background:
+    linear-gradient(to right, rgba(45, 109, 255, 0), rgba(45, 109, 255, 1)),
+    repeating-conic-gradient(var(--buildrick-border-medium) 0% 25%, var(--buildrick-bg-card) 0% 50%) 50% / 8px 8px;
+}
+.bd-color-picker__strip-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 18px;
+  border-radius: var(--buildrick-radius-sm);
+  background: var(--buildrick-bg-card);
+  border: 1.5px solid var(--buildrick-text-heading);
+  box-shadow: 0 1px 2px var(--buildrick-shadow-black-20);
+}
+
+/* Swatch + hex input row */
+.bd-color-picker__swatch-row {
+  display: flex;
+  align-items: center;
+  gap: var(--buildrick-space-2);
+}
+.bd-color-picker__swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--buildrick-radius-md);
+  background: var(--buildrick-accent);
+  box-shadow: inset 0 0 0 1px var(--buildrick-ink-10);
+  flex-shrink: 0;
+}
+.bd-color-picker__hex {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--buildrick-space-1);
+  height: 32px;
+  padding: 0 var(--buildrick-space-3);
+  background: var(--buildrick-bg-subtle);
+  border: 1px solid transparent;
+  border-radius: var(--buildrick-rounded);
+  font-variant-numeric: tabular-nums;
+}
+.bd-color-picker__hex-prefix {
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-sm);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-muted);
+}
+.bd-color-picker__hex-value {
+  flex: 1;
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-sm-half);
+  font-weight: var(--buildrick-font-weight-medium);
+  color: var(--buildrick-text-primary);
+  letter-spacing: 0.01em;
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+}
+.bd-color-picker__alpha-pct {
+  font-family: var(--buildrick-font-family-mono);
+  font-size: var(--buildrick-text-2xs);
+  color: var(--buildrick-text-muted);
+}
+
+/* Recent swatches */
+.bd-color-picker__recents {
+  display: flex;
+  align-items: center;
+  gap: var(--buildrick-space-2);
+}
+.bd-color-picker__recents-label {
+  font-family: var(--buildrick-font-family);
+  font-size: var(--buildrick-text-3xs-plus);
+  font-weight: var(--buildrick-font-weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--buildrick-text-muted);
+}
+.bd-color-picker__swatches {
+  display: flex;
+  gap: 4px;
+}
+.bd-color-picker__ss {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--buildrick-radius-sm);
+  box-shadow: inset 0 0 0 1px var(--buildrick-ink-08);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+.bd-color-picker__ss.is-on,
+.bd-color-picker__ss[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 1px var(--buildrick-ink-08),
+              0 0 0 2px var(--buildrick-bg-card),
+              0 0 0 4px var(--buildrick-accent);
+}
