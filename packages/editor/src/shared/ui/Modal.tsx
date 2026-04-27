@@ -1,37 +1,90 @@
+// PHASE 5 DELETE — Phase 4 adapter shim. Replaces hand-rolled Modal.
 /**
- * Aquibra Modal Component
+ * Adapter shim — translates legacy Modal API to vibcoder Modal (Radix.Dialog).
+ *
+ * Prop translations (Phase 4 Q4 mapping):
+ *   isOpen → open
+ *   onClose → onOpenChange (next: boolean) => !next && onClose()
+ *   title → ModalTitle child
+ *   children → body content (rendered between header and footer)
+ *   footer → ModalFooter child
+ *   size: sm | md | lg | xl | full
+ *     sm/md → vibcoder size="lg" (Phase 3 Modal supports lg/xl only)
+ *     lg → vibcoder size="lg"
+ *     xl → vibcoder size="xl"
+ *     full → vibcoder size="xl" + style={{maxWidth:"90vw"}}
+ *   closeOnOverlay → vibcoder Modal handles via Radix.Dialog onPointerDownOutside (default: closes)
+ *     If closeOnOverlay=false: Radix.Dialog onPointerDownOutside={e => e.preventDefault()}
+ *   closeOnEscape → Radix.Dialog handles (default: closes)
+ *     If closeOnEscape=false: onEscapeKeyDown={e => e.preventDefault()}
+ *   showCloseButton → conditionally renders ModalClose
+ *   initialFocusRef → Radix.Dialog onOpenAutoFocus callback focuses ref
+ *
+ * Untranslatable: none. Strategy is "compose-or-style" not "throw".
+ *
+ * Focus trap migration: useFocusTrap hook NO LONGER USED here. Radix.Dialog
+ * provides internal focus trap. T7 deletes useFocusTrap after T6 Popover
+ * also migrates (only 2 call sites total — Modal + Popover).
+ *
+ * Body scroll lock: Radix.Dialog handles via overlay scroll-locking. The
+ * legacy `document.body.style.overflow = "hidden"` effect is removed.
+ *
  * @license BSD-3-Clause
  */
+import {
+  type ComponentType,
+  type ReactNode,
+  type RefObject,
+  type CSSProperties,
+} from "react";
+import {
+  Modal as VibcoderModal,
+  ModalContent,
+  ModalTitle,
+  ModalClose,
+  ModalFooter,
+  OverlayMount,
+  Button as VibcoderButton,
+} from "@/editor/shared/vibcoder";
 
-import * as React from "react";
-import { Button } from "./Button";
-import { useFocusTrap } from "../hooks/useFocusTrap";
+// Phase 4 shim escape hatch: Radix.Dialog.Content props (onPointerDownOutside,
+// onEscapeKeyDown, onOpenAutoFocus) are intentionally hidden from vibcoder's
+// public ModalContentProps per Contract E2 (no Radix types leaked). Vibcoder's
+// ModalContent still spreads these to Radix at runtime. Cast bypasses the
+// narrowed type without changing behavior. Phase 5 deletes this whole file.
+type ModalContentEscapeProps = {
+  size?: "lg" | "xl";
+  style?: CSSProperties;
+  onPointerDownOutside?: (e: { preventDefault: () => void }) => void;
+  onEscapeKeyDown?: (e: { preventDefault: () => void }) => void;
+  onOpenAutoFocus?: (e: { preventDefault: () => void }) => void;
+  children: ReactNode;
+};
+const ModalContentTyped =
+  ModalContent as unknown as ComponentType<ModalContentEscapeProps>;
 
 export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title?: React.ReactNode;
-  children: React.ReactNode;
-  footer?: React.ReactNode;
+  title?: ReactNode;
+  children: ReactNode;
+  footer?: ReactNode;
   size?: "sm" | "md" | "lg" | "xl" | "full";
   closeOnOverlay?: boolean;
   closeOnEscape?: boolean;
   showCloseButton?: boolean;
-  initialFocusRef?: React.RefObject<HTMLElement | null>;
+  initialFocusRef?: RefObject<HTMLElement | null>;
 }
 
-// Sizes aligned to prototype comp-modals.html — sm=380, md=460.
-// lg/xl/full retained as extended sizes for surfaces beyond prototype scope
-// (PublishingHub, TemplatePreviewModal, etc).
-const sizeMap = {
-  sm: 380,
-  md: 460,
-  lg: 720,
-  xl: 960,
-  full: "90vw",
+const SIZE_MAP: Record<NonNullable<ModalProps["size"]>, "lg" | "xl"> = {
+  sm: "lg",
+  md: "lg",
+  lg: "lg",
+  xl: "xl",
+  full: "xl",
 };
 
-export const Modal: React.FC<ModalProps> = ({
+export function Modal({
   isOpen,
   onClose,
   title,
@@ -42,163 +95,61 @@ export const Modal: React.FC<ModalProps> = ({
   closeOnEscape = true,
   showCloseButton = true,
   initialFocusRef,
-}) => {
-  const modalRef = React.useRef<HTMLDivElement>(null);
-  useFocusTrap(modalRef, isOpen);
-
-  // Override default first-focus when initialFocusRef is provided
-  React.useEffect(() => {
-    if (!isOpen || !initialFocusRef?.current) return;
-    initialFocusRef.current.focus();
-  }, [isOpen, initialFocusRef]);
-
-  // Handle escape key
-  React.useEffect(() => {
-    if (!closeOnEscape || !isOpen) return;
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [isOpen, closeOnEscape, onClose]);
-
-  // Prevent body scroll when open
-  React.useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
-
-  // Generate stable ID for accessibility - must be called before any early returns (Rules of Hooks)
-  const titleId = React.useId();
-
-  if (!isOpen) return null;
+}: ModalProps) {
+  const vibcoderSize = SIZE_MAP[size];
+  const fullStyle: CSSProperties | undefined =
+    size === "full" ? { maxWidth: "90vw" } : undefined;
 
   return (
-    <div
-      className="buildrick-modal-overlay"
-      style={overlayStyles}
-      onClick={closeOnOverlay ? onClose : undefined}
-      role="presentation"
-    >
-      <div
-        ref={modalRef}
-        className="buildrick-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={title ? titleId : undefined}
-        style={{
-          ...modalStyles,
-          width: typeof sizeMap[size] === "number" ? sizeMap[size] : sizeMap[size],
+    <OverlayMount>
+      <VibcoderModal
+        open={isOpen}
+        onOpenChange={(next) => {
+          if (!next) onClose();
         }}
-        onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        {(title || showCloseButton) && (
-          <div className="buildrick-modal-header" style={headerStyles}>
-            <div id={titleId} style={{ fontWeight: 600, fontSize: 16 }}>
-              {title}
-            </div>
-            {showCloseButton && (
-              <button onClick={onClose} style={closeButtonStyles} aria-label="Close modal">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  aria-hidden="true"
-                >
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Body */}
-        <div className="buildrick-modal-body" style={bodyStyles}>
-          {children}
-        </div>
-
-        {/* Footer */}
-        {footer && (
-          <div className="buildrick-modal-footer" style={footerStyles}>
-            {footer}
-          </div>
-        )}
-      </div>
-    </div>
+        <ModalContentTyped
+          size={vibcoderSize}
+          style={fullStyle}
+          onPointerDownOutside={
+            closeOnOverlay ? undefined : (e) => e.preventDefault()
+          }
+          onEscapeKeyDown={
+            closeOnEscape ? undefined : (e) => e.preventDefault()
+          }
+          onOpenAutoFocus={(e) => {
+            if (initialFocusRef?.current) {
+              e.preventDefault();
+              initialFocusRef.current.focus();
+            }
+          }}
+        >
+          {title && <ModalTitle>{title}</ModalTitle>}
+          {showCloseButton && (
+            <ModalClose aria-label="Close modal">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden="true"
+              >
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </ModalClose>
+          )}
+          <div className="bd-modal__body">{children}</div>
+          {footer && <ModalFooter>{footer}</ModalFooter>}
+        </ModalContentTyped>
+      </VibcoderModal>
+    </OverlayMount>
   );
-};
+}
+Modal.displayName = "Modal";
 
-// Overlay: solid slate dimmer, no backdrop-filter (LOCKED 2026-04-25 per
-// P0c M4 — DESIGN.md forbids backdrop-filter in editor chrome).
-const overlayStyles: React.CSSProperties = {
-  position: "fixed",
-  inset: 0,
-  background: "var(--bd-overlay)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  zIndex: 1000,
-};
-
-const modalStyles: React.CSSProperties = {
-  background: "var(--bd-bg-card)",
-  borderRadius: "var(--bd-radius-lg)",
-  boxShadow: "var(--bd-shadow-modal)",
-  maxHeight: "90vh",
-  display: "flex",
-  flexDirection: "column",
-  animation: "buildrick-modal-in 0.2s ease",
-};
-
-const headerStyles: React.CSSProperties = {
-  padding: "var(--bd-space-4) var(--bd-space-5)",
-  borderBottom: "1px solid var(--bd-border)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-};
-
-const closeButtonStyles: React.CSSProperties = {
-  background: "transparent",
-  border: "none",
-  color: "var(--bd-fg-secondary)",
-  cursor: "pointer",
-  padding: 12, // WCAG 2.5.5 touch target (44x44)
-  borderRadius: "var(--bd-radius-sm)",
-  display: "flex",
-  minWidth: 44,
-  minHeight: 44,
-  alignItems: "center",
-  justifyContent: "center",
-};
-
-const bodyStyles: React.CSSProperties = {
-  padding: "var(--bd-space-5)",
-  overflow: "auto",
-  flex: 1,
-};
-
-const footerStyles: React.CSSProperties = {
-  padding: "var(--bd-space-4) var(--bd-space-5)",
-  borderTop: "1px solid var(--bd-border)",
-  display: "flex",
-  justifyContent: "flex-end",
-  gap: "var(--bd-space-2)",
-};
-
-// Confirm Dialog Helper
+// ConfirmDialog helper — Phase 4 keeps the API surface, internals delegate to Modal shim.
 export interface ConfirmDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -210,7 +161,7 @@ export interface ConfirmDialogProps {
   variant?: "danger" | "primary";
 }
 
-export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
+export function ConfirmDialog({
   isOpen,
   onClose,
   onConfirm,
@@ -219,25 +170,22 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   confirmText = "Confirm",
   cancelText = "Cancel",
   variant = "primary",
-}) => {
-  const confirmRef = React.useRef<HTMLButtonElement>(null);
-
+}: ConfirmDialogProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm" initialFocusRef={confirmRef}>
-      <p style={{ margin: 0, color: "var(--bd-fg-secondary)" }}>{message}</p>
+    <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">
+      <p style={{ margin: 0 }}>{message}</p>
       <div
         style={{
           display: "flex",
-          gap: "var(--bd-space-2)",
-          marginTop: "var(--bd-space-5)",
+          gap: 8,
+          marginTop: 16,
           justifyContent: "flex-end",
         }}
       >
-        <Button variant="ghost" onClick={onClose}>
+        <VibcoderButton variant="ghost" onClick={onClose}>
           {cancelText}
-        </Button>
-        <Button
-          ref={confirmRef}
+        </VibcoderButton>
+        <VibcoderButton
           variant={variant === "danger" ? "danger" : "primary"}
           onClick={() => {
             onConfirm();
@@ -245,10 +193,10 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           }}
         >
           {confirmText}
-        </Button>
+        </VibcoderButton>
       </div>
     </Modal>
   );
-};
+}
 
 export default Modal;
