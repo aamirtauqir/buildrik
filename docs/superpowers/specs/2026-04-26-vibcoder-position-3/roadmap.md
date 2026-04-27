@@ -302,7 +302,12 @@ Four batches in dependency order. 16 organism files (no POC overlap):
 migration. Reconsider blocking mode post-Phase 5 based on realized false positive
 rate.
 
-## Phase 4 — Layouts (~3 days dispatched, ~2 commits)
+## Phase 4 — Layouts (~3 days dispatched, ~2 commits) — DEFERRED
+
+**Status:** deferred and folded into Phase 5 chrome integration (see header
+"Phase numbering note" — chrome re-port shipped as Phase 4 at M8). Layout
+primitives (sidebar-shell, stack, cluster, grid, center, frame, switcher) ship
+alongside consumer rewrites in Phase 5 rather than as a standalone batch.
 
 Two batches:
 
@@ -383,7 +388,7 @@ InfoBanner. Not primitive ports; Buildrik domain code.
 - [ ] 37 existing primitives re-ported (Phase 5)
 - [ ] Stages 2 + 3 chrome-ssot landed
 - [ ] Gallery shows side-by-side parity for all primitives
-- [ ] 4 new gates active (19, 20, 21, 22)
+- [ ] 5 new gates active (19, 21, 22, 23, 24) — Gate 20 skipped during arc; 23+24 added in Phase 4 chrome re-port
 - [ ] Codex routing in blocking mode
 - [ ] Visual snapshot infra catches drift
 - [ ] Quarterly post-mortem cadence established
