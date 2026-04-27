@@ -1,3 +1,5 @@
+import { Select } from "@/shared/ui/Select";
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * Input Controls — InputRow, InputWithUnit, SelectRow.
@@ -74,7 +76,7 @@ export const InputRow: React.FC<InputRowProps> = ({
           placeholder={placeholder}
         />
       ) : (
-        <input
+        <TextInput
           className="bdi-text"
           type={type}
           value={value}
@@ -221,7 +223,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
           title={isInvalid ? "Invalid number — press Escape to revert" : disabledReason}
         >
           {fieldIcon && <span className="bdi-flb">{fieldIcon}</span>}
-          <input
+          <TextInput
             type="text"
             value={isKeywordUnit && !isTokenVar(inputValue) ? unit : inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
@@ -269,7 +271,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
             </Button>
           )}
           {!isKeywordUnit && (
-            <select
+            <Select
               className="bdi-u"
               value={unit}
               onChange={(e) => handleUnitChange(e.target.value)}
@@ -282,7 +284,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
                   {u}
                 </option>
               ))}
-            </select>
+            </Select>
           )}
         </div>
       </div>
@@ -321,7 +323,7 @@ export const SelectRow: React.FC<SelectRowProps> = ({
     </label>
     <div className="bdi-row-content">
       <div className="bdi-ddn">
-        <select
+        <Select
           className="bdi-v"
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -332,7 +334,7 @@ export const SelectRow: React.FC<SelectRowProps> = ({
               {opt.label}
             </option>
           ))}
-        </select>
+        </Select>
         <span className="bdi-c" aria-hidden="true">
           <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M6 9l6 6 6-6" />

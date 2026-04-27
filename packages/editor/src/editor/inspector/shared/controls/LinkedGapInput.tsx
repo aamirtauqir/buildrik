@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * LinkedGapInput — shared linked/unlinked gap input for flex + grid.
@@ -55,7 +56,7 @@ const NumField: React.FC<{
       style={disabled ? { opacity: 0.5, pointerEvents: "none" } : undefined}
     >
       {icon && <span className="bdi-flb">{icon}</span>}
-      <input
+      <TextInput
         type="text"
         value={num}
         onChange={(e) => {

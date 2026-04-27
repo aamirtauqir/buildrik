@@ -1,3 +1,5 @@
+import { Checkbox } from "@/shared/ui/Checkbox";
+import { TextInput } from "@/shared/ui/TextInput";
 /**
  * CreateComponentModal - Modal for creating reusable components
  * Allows users to save selected elements as reusable components
@@ -140,7 +142,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           <label style={labelStyles}>
             Name <span style={{ color: "var(--buildrick-accent)" }}>*</span>
           </label>
-          <input
+          <TextInput
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -163,7 +165,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
         <div>
           <label style={labelStyles}>Category</label>
-          <input
+          <TextInput
             type="text"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -174,7 +176,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
         <div>
           <label style={labelStyles}>Tags</label>
-          <input
+          <TextInput
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
@@ -188,12 +190,10 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
         <div style={variantSectionStyles}>
           <label style={labelStyles}>Variant Options</label>
           <label style={checkboxLabelStyles}>
-            <input
-              type="checkbox"
+            <Checkbox
               checked={isVariantSet}
               onChange={(e) => setIsVariantSet(e.target.checked)}
-              style={checkboxStyles}
-            />
+              style={checkboxStyles} />
             <span>This is a variant set (has multiple variants)</span>
           </label>
 

@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * LayersTab - Layers sidebar tab.
@@ -119,7 +120,7 @@ export const LayersTab: React.FC<LayersTabProps> = ({
           <circle cx="11" cy="11" r="7" />
           <path d="M21 21l-4.3-4.3" />
         </svg>
-        <input
+        <TextInput
           type="text"
           placeholder="Find a layer"
           value={search}

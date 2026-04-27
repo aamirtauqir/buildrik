@@ -1,3 +1,4 @@
+import { Checkbox } from "@/shared/ui/Checkbox";
 /**
  * Collection Setup Modal
  * Prompts user to create Products collection when dropping e-commerce blocks
@@ -59,12 +60,10 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
 
         <div style={checkboxContainerStyles}>
           <label style={checkboxLabelStyles}>
-            <input
-              type="checkbox"
+            <Checkbox
               checked={includeSample}
               onChange={(e) => setIncludeSample(e.target.checked)}
-              style={checkboxStyles}
-            />
+              style={checkboxStyles} />
             <div style={checkboxContentStyles}>
               <div style={checkboxTitleStyles}>
                 <Package size={16} />
@@ -90,7 +89,6 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
           </div>
         </div>
       </div>
-
       <div style={footerStyles}>
         <Button variant="ghost" onClick={handleSkip} disabled={isCreating}>
           Skip for now

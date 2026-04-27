@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 /**
  * Canvas Spot Spacing
  * Interactive spacing editor for elements
@@ -81,7 +82,7 @@ export const CanvasSpotSpacing: React.FC<CanvasSpotSpacingProps> = ({
             {indicator.position.width > 20 && indicator.position.height > 20 && (
               <div className="buildrick-spacing-indicator-label" style={{ backgroundColor: color }}>
                 {isEditing ? (
-                  <input
+                  <TextInput
                     type="number"
                     value={tempValue}
                     onChange={handleValueChange}

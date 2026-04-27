@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 /**
  * Video Preview Component
  * Video player with controls, thumbnail extraction, and duration display
@@ -342,7 +343,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             >
               {state.isMuted || state.volume === 0 ? "🔇" : "🔊"}
             </Button>
-            <input
+            <TextInput
               type="range"
               min={0}
               max={1}

@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * Media Tab — Asset Detail Overlay (vSrqD spec)
@@ -140,7 +141,7 @@ export function AssetDetailOverlay({
 
           {/* Metadata — gap 8, padding [10,12] */}
           <div className="med-detail-meta-section">
-            <input
+            <TextInput
               ref={inputRef}
               className="med-detail-name"
               value={name}

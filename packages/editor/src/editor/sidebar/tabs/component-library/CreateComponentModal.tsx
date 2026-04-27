@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * CreateComponentModal - Simple modal for creating a new reusable component
@@ -37,7 +38,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           >
             Name
           </label>
-          <input
+          <TextInput
             id="create-component-name"
             type="text"
             value={name}

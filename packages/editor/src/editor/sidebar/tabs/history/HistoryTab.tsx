@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * HistoryTab — Version history sidebar panel
@@ -140,7 +141,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         <span className="search-icon" aria-hidden="true">
           <SearchIconSvg />
         </span>
-        <input
+        <TextInput
           className="search-input"
           type="search"
           value={searchQuery}

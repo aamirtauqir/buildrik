@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * @lint-hex-policy: component-theme
@@ -320,7 +321,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           </div>
           <div className="mgr-search">
             <Search size={14} />
-            <input
+            <TextInput
               ref={searchRef}
               type="text"
               placeholder="Search across all folders..."
@@ -902,7 +903,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         </div>
       </div>
       {/* Hidden file input */}
-      <input
+      <TextInput
         ref={fileInputRef}
         type="file"
         multiple

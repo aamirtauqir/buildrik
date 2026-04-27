@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * FlexItemControls - Flex item (child) properties: grow, shrink, basis, order
@@ -77,7 +78,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         >
           Grow
         </span>
-        <input
+        <TextInput
           type="number"
           value={styles["flex-grow"] || ""}
           onChange={(e) => onChange("flex-grow", e.target.value)}
@@ -103,7 +104,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         >
           Shrink
         </span>
-        <input
+        <TextInput
           type="number"
           value={styles["flex-shrink"] || ""}
           onChange={(e) => onChange("flex-shrink", e.target.value)}
@@ -129,7 +130,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
         >
           Basis
         </span>
-        <input
+        <TextInput
           type="text"
           value={styles["flex-basis"] || ""}
           onChange={(e) => onChange("flex-basis", e.target.value)}
@@ -176,7 +177,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
     {/* Order */}
     <div style={rowStyle}>
       <label style={labelStyle}>Order</label>
-      <input
+      <TextInput
         type="number"
         value={styles.order || ""}
         onChange={(e) => onChange("order", e.target.value)}

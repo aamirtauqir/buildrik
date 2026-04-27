@@ -1,3 +1,5 @@
+import { Select } from "@/shared/ui/Select";
+import { TextInput } from "@/shared/ui/TextInput";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -384,7 +386,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             <label style={s.label}>
               Collection name <span style={{ color: "var(--buildrick-error)" }}>*</span>
             </label>
-            <input
+            <TextInput
               style={s.input}
               type="text"
               placeholder="Blog Posts"
@@ -405,7 +407,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           {/* Content type */}
           <div>
             <label style={s.label}>Content type</label>
-            <select
+            <Select
               style={s.select}
               value={contentType}
               onChange={(e) => setContentType(e.target.value as ContentType)}
@@ -415,7 +417,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                   {ct.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           {/* Description */}
@@ -484,14 +486,14 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           <div style={{ maxHeight: 240, overflowY: "auto" }}>
             {fields.map((field) => (
               <div key={field.id} style={s.fieldRow}>
-                <input
+                <TextInput
                   style={s.fieldNameInput}
                   type="text"
                   placeholder="field_name"
                   value={field.name}
                   onChange={(e) => updateFieldName(field.id, e.target.value)}
                 />
-                <select
+                <Select
                   style={s.fieldTypeSelect}
                   value={field.type}
                   onChange={(e) => updateFieldType(field.id, e.target.value as FieldType)}
@@ -501,7 +503,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                       {ft}
                     </option>
                   ))}
-                </select>
+                </Select>
                 <Button
                   type="button"
                   style={s.removeBtn}

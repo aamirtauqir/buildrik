@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 /**
  * SocialTab — Open Graph + Twitter sharing preview & fields.
  *
@@ -35,14 +36,13 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
           <div className="bd-pg-social-og-desc">{desc || "Add a description to preview here"}</div>
         </div>
       </div>
-
       {/* OG Title */}
       <div className="bd-pg-seo-field">
         <div className="bd-pg-seo-field-header">
           <label className="bd-pg-seo-label" htmlFor="og-title">Open Graph Title</label>
           <span className="bd-pg-seo-counter">{s.ogTitle.length}/60</span>
         </div>
-        <input
+        <TextInput
           id="og-title"
           className="bd-pg-seo-input"
           value={s.ogTitle}
@@ -51,7 +51,6 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
         />
         <div className="bd-pg-seo-hint">Title shown when the page is shared on social networks. Defaults to SEO title.</div>
       </div>
-
       {/* OG Description */}
       <div className="bd-pg-seo-field">
         <div className="bd-pg-seo-field-header">
@@ -66,11 +65,10 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
           placeholder={s.seoDesc || "Brief summary shown on social"}
         />
       </div>
-
       {/* OG Image URL */}
       <div className="bd-pg-seo-field">
         <label className="bd-pg-seo-label" htmlFor="og-image">Image URL</label>
-        <input
+        <TextInput
           id="og-image"
           className="bd-pg-seo-input"
           value={s.ogImageUrl ?? ""}

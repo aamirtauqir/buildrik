@@ -1,3 +1,6 @@
+import { Checkbox } from "@/shared/ui/Checkbox";
+import { Select } from "@/shared/ui/Select";
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * Default control registry — maps each Field discriminator to a React
@@ -74,7 +77,7 @@ const LengthControl: React.FC<ControlProps<LengthField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <input
+    <TextInput
       id={`field-${field.prop}`}
       type="text"
       value={value}
@@ -98,7 +101,7 @@ const NumberControl: React.FC<ControlProps<NumberField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <input
+    <TextInput
       id={`field-${field.prop}`}
       type="number"
       value={value}
@@ -124,7 +127,7 @@ const SelectControl: React.FC<ControlProps<SelectField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <select
+    <Select
       id={`field-${field.prop}`}
       value={value}
       onChange={(e) => onChange(e.target.value)}
@@ -135,7 +138,7 @@ const SelectControl: React.FC<ControlProps<SelectField>> = ({
           {opt.label}
         </option>
       ))}
-    </select>
+    </Select>
   </div>
 );
 
@@ -154,12 +157,10 @@ const ToggleControl: React.FC<ControlProps<ToggleField>> = ({
       <label style={labelStyle} htmlFor={`field-${field.prop}`}>
         {field.label}
       </label>
-      <input
+      <Checkbox
         id={`field-${field.prop}`}
-        type="checkbox"
         checked={checked}
-        onChange={(e) => onChange(e.target.checked ? field.on : field.off)}
-      />
+        onChange={(e) => onChange(e.target.checked ? field.on : field.off)} />
     </div>
   );
 };
@@ -177,7 +178,7 @@ const ColorControl: React.FC<ControlProps<ColorField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <input
+    <TextInput
       id={`field-${field.prop}`}
       type="color"
       value={value || "#000000"}
@@ -262,7 +263,7 @@ const Spacing4Control: React.FC<ControlProps<Spacing4Field>> = ({
           >
             {side}
           </label>
-          <input
+          <TextInput
             id={`field-${field.group}-${side}`}
             type="text"
             value={values[side]}
@@ -288,7 +289,7 @@ const TextControl: React.FC<ControlProps<TextField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <input
+    <TextInput
       id={`field-${field.prop}`}
       type="text"
       value={value}
@@ -364,7 +365,7 @@ const Corners4Control: React.FC<ControlProps<Corners4Field>> = ({
           <label style={labelStyle} htmlFor={`field-${c.prop}`}>
             {c.label}
           </label>
-          <input
+          <TextInput
             id={`field-${c.prop}`}
             type="text"
             value={cornerValues[c.id]}

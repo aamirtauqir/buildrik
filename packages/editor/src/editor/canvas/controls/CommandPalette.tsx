@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * Command Palette Component
@@ -295,7 +296,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       >
         {/* Search Input */}
         <div style={{ padding: 12, borderBottom: `1px solid ${CANVAS_COLORS.border}` }}>
-          <input
+          <TextInput
             ref={inputRef}
             type="text"
             placeholder="Type a command or search..."

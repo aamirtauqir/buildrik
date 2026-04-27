@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 /**
  * Interaction Editor Component
  * Editor panel for configuring a single interaction's animation settings
@@ -117,11 +118,10 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
         onChange={handleAnimationTypeChange}
         options={ANIMATION_PRESETS}
       />
-
       <div style={styles.inputRow}>
         <div style={styles.inputWrapper}>
           <label style={styles.label}>Duration</label>
-          <input
+          <TextInput
             type="number"
             value={interaction.animation.duration / 1000}
             onChange={handleDurationChange}
@@ -133,7 +133,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
         </div>
         <div style={styles.inputWrapper}>
           <label style={styles.label}>Delay</label>
-          <input
+          <TextInput
             type="number"
             value={interaction.animation.delay / 1000}
             onChange={handleDelayChange}
@@ -144,14 +144,12 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
           />
         </div>
       </div>
-
       <SelectField
         label="Easing"
         value={interaction.animation.easing}
         onChange={handleEasingChange}
         options={EASING_OPTIONS}
       />
-
       <div style={styles.buttonRow}>
         <Button
           onClick={() => onPreview?.(interaction)}
@@ -170,7 +168,6 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
           Timeline
         </Button>
       </div>
-
       <div style={styles.buttonRowSecondary}>
         <Button
           onClick={() => onToggleEnabled(interaction.id)}

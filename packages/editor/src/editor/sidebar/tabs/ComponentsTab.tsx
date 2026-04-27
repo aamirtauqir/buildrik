@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * ComponentsTab - Reusable components library (orchestrator)
@@ -378,7 +379,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         size="sm"
       >
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <input
+          <TextInput
             type="text"
             value={renameInput}
             onChange={(e) => setRenameInput(e.target.value)}

@@ -1,3 +1,5 @@
+import { Checkbox } from "@/shared/ui/Checkbox";
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * Export Options Panel
@@ -198,12 +200,10 @@ const ToggleOption: React.FC<ToggleOptionProps> = ({ label, checked, onChange })
       fontSize: 13,
     }}
   >
-    <input
-      type="checkbox"
+    <Checkbox
       checked={checked}
       onChange={(e) => onChange(e.target.checked)}
-      style={{ cursor: "pointer" }}
-    />
+      style={{ cursor: "pointer" }} />
     {label}
   </label>
 );
@@ -237,7 +237,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
       {/* Page Title */}
       <div>
         <label style={{ display: "block", fontSize: 12, marginBottom: 6 }}>Page Title</label>
-        <input
+        <TextInput
           type="text"
           value={config.pageTitle || ""}
           onChange={(e) => onChange({ pageTitle: e.target.value })}

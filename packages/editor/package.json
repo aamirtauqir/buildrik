@@ -17,7 +17,12 @@
     "vibcoder:pin": "bun scripts/vibcoder-bundle-pin.mjs",
     "vibcoder:test": "vitest run scripts/__tests__/vibcoder-codemod.test.mjs",
     "vibcoder:vendor": "bash scripts/vibcoder-vendor.sh",
-    "codemod:phase4:button": "jscodeshift -t scripts/codemods/phase4/button.ts --extensions=ts,tsx --parser=tsx src/editor/"
+    "codemod:phase4:button": "jscodeshift -t scripts/codemods/phase4/button.ts --extensions=ts,tsx --parser=tsx src/editor/",
+    "codemod:phase4:input": "jscodeshift -t scripts/codemods/phase4/input.ts --extensions=ts,tsx --parser=tsx src/editor/",
+    "codemod:phase4:select": "jscodeshift -t scripts/codemods/phase4/select.ts --extensions=ts,tsx --parser=tsx src/editor/",
+    "codemod:phase4:switch": "jscodeshift -t scripts/codemods/phase4/switch.ts --extensions=ts,tsx --parser=tsx src/editor/",
+    "codemod:phase4:checkbox": "jscodeshift -t scripts/codemods/phase4/checkbox.ts --extensions=ts,tsx --parser=tsx src/editor/",
+    "codemod:phase4:slider": "jscodeshift -t scripts/codemods/phase4/slider.ts --extensions=ts,tsx --parser=tsx src/editor/"
   },
   "dependencies": {
     "@buildrik/shared": "workspace:*",

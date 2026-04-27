@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * CommandPalette — Studio-level Command Palette
@@ -322,7 +323,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
             <line x1={21} y1={21} x2={16.65} y2={16.65} />
           </svg>
 
-          <input
+          <TextInput
             ref={inputRef}
             type="text"
             placeholder="Search commands..."

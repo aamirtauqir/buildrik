@@ -1,3 +1,5 @@
+import { Select } from "@/shared/ui/Select";
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * Settings tab — shared primitives.
@@ -70,7 +72,7 @@ export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, children }) 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, ...rest }, ref) => (
-    <input
+    <TextInput
       ref={ref}
       className={`bd-set-input${className ? " " + className : ""}`}
       {...rest}
@@ -94,13 +96,13 @@ Textarea.displayName = "Textarea";
 type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement>;
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, children, ...rest }, ref) => (
-    <select
+    <Select
       ref={ref}
       className={`bd-set-input${className ? " " + className : ""}`}
       {...rest}
     >
       {children}
-    </select>
+    </Select>
   )
 );
 Select.displayName = "Select";

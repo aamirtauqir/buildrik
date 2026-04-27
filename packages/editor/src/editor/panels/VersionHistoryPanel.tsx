@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * @lint-hex-policy: component-theme
@@ -903,7 +904,7 @@ export function VersionHistoryPanel({
                 <label className="form-label" htmlFor="buildrick-save-name">
                   Version name *
                 </label>
-                <input
+                <TextInput
                   id="buildrick-save-name"
                   type="text"
                   value={newVersionName}

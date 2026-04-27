@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * Spacing Controls — nested Webflow box (margin + padding) + CornerRadiusInput.
@@ -67,7 +68,7 @@ const AxisInput: React.FC<AxisInputProps> = ({ side, value, onChange, disabled }
   const display = local.isKeyword ? local.num : local.num;
 
   return (
-    <input
+    <TextInput
       type="text"
       className={`bdi-ax ${SIDE_POS[side]}${local.isKeyword ? " muted" : ""}`}
       value={display}
@@ -192,7 +193,7 @@ export const FourSideInput: React.FC<FourSideInputProps> = ({
             data-axis={SIDE_POS[side].toUpperCase()}
             style={disabledSides?.[side] ? { opacity: 0.5, pointerEvents: "none" } : undefined}
           >
-            <input
+            <TextInput
               type="text"
               value={num}
               onChange={(e) => {
@@ -261,7 +262,7 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
         const { num, unit } = parseValue(values[corner]);
         return (
           <div key={corner} className="bdi-num axis" data-axis={corner.toUpperCase()}>
-            <input
+            <TextInput
               type="text"
               value={num}
               onChange={(e) => {

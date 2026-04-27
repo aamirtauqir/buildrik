@@ -1,3 +1,4 @@
+import { Checkbox } from "@/shared/ui/Checkbox";
 import { Button } from "@/shared/ui/Button";
 /**
  * TemplatesTabModals — Replace confirm + Pro intercept modals
@@ -39,12 +40,10 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
           </p>
         </div>
         <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--bd-fg-muted, #475569)", cursor: "pointer", margin: "0 0 4px" }}>
-          <input
-            type="checkbox"
+          <Checkbox
             checked={resetGlobalStyles}
             onChange={(e) => onResetChange(e.target.checked)}
-            style={{ width: 14, height: 14, cursor: "pointer" }}
-          />
+            style={{ width: 14, height: 14, cursor: "pointer" }} />
           Also reset global styles
         </label>
         <div className="tpl-modal-btns">

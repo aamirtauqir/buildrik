@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * PageRow — single page row in the pages tree.
@@ -210,7 +211,7 @@ export const PageRow = React.memo<Props>(
 
           {isRenaming ? (
             <>
-              <input
+              <TextInput
                 ref={inputRef}
                 className="bd-pg-row-rename"
                 value={renameValue}

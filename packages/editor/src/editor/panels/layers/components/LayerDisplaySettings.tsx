@@ -1,3 +1,4 @@
+import { Checkbox } from "@/shared/ui/Checkbox";
 import { Button } from "@/shared/ui/Button";
 /**
  * LayerDisplaySettings - Popover for toggling layer display preferences.
@@ -53,36 +54,30 @@ export function LayerDisplaySettings({ prefs, onChange, onClose }: LayerDisplayS
           Show HTML tags
           <span> div, section, h1…</span>
         </span>
-        <input
-          type="checkbox"
+        <Checkbox
           className="bdc-switch"
           checked={prefs.showHtmlBadges}
           onChange={(e) => onChange({ showHtmlBadges: e.target.checked })}
-          aria-label="Show HTML tags"
-        />
+          aria-label="Show HTML tags" />
       </label>
       <label className="bdc-toggle-row">
         <span>
           Show element IDs
           <span> #abc123 format</span>
         </span>
-        <input
-          type="checkbox"
+        <Checkbox
           className="bdc-switch"
           checked={prefs.showElementIds}
           onChange={(e) => onChange({ showElementIds: e.target.checked })}
-          aria-label="Show element IDs"
-        />
+          aria-label="Show element IDs" />
       </label>
       <label className="bdc-toggle-row">
         <span>Compact rows</span>
-        <input
-          type="checkbox"
+        <Checkbox
           className="bdc-switch"
           checked={prefs.treeDensity === "compact"}
           onChange={(e) => onChange({ treeDensity: e.target.checked ? "compact" : "comfortable" })}
-          aria-label="Compact row density"
-        />
+          aria-label="Compact row density" />
       </label>
     </div>
   );

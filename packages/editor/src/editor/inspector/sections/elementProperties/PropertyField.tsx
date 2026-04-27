@@ -1,3 +1,4 @@
+import { Checkbox } from "@/shared/ui/Checkbox";
 import { Button } from "@/shared/ui/Button";
 /**
  * PropertyField Component
@@ -97,12 +98,10 @@ export const PropertyField: React.FC<PropertyFieldProps> = ({
       <div style={styles.checkboxRow}>
         <label style={styles.checkboxLabel}>{prop.label}</label>
         <label style={styles.checkboxWrapper}>
-          <input
-            type="checkbox"
+          <Checkbox
             checked={value === "true" || value === prop.id}
             onChange={(e) => onChange(prop.id, e.target.checked ? "true" : "")}
-            style={{ width: 16, height: 16 }}
-          />
+            style={{ width: 16, height: 16 }} />
           <span style={styles.checkboxText}>{value ? "Enabled" : "Disabled"}</span>
         </label>
       </div>

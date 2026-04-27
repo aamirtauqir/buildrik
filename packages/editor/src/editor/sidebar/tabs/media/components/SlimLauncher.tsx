@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * SlimLauncher — 280px panel launcher for the Media tab.
@@ -203,7 +204,7 @@ export function SlimLauncher({
           Open library
         </Button>
       ) : null}
-      <input
+      <TextInput
         ref={fileInputRef}
         type="file"
         multiple

@@ -1,3 +1,4 @@
+import { Select } from "@/shared/ui/Select";
 import { Button } from "@/shared/ui/Button";
 /**
  * Size Section - Width, Height, Min/Max dimensions
@@ -236,7 +237,6 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
           </div>
         </div>
       )}
-
       {/* ─── Advanced: min/max pairs (behind More settings) ─── */}
       {advancedExpanded && (
         <>
@@ -311,7 +311,6 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
           )}
         </>
       )}
-
       {/* Object Fit (for images/videos) */}
       {!hidden("object-fit") && (
         <div
@@ -334,7 +333,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
           >
             Object Fit
           </label>
-          <select
+          <Select
             value={styles["object-fit"] || ""}
             onChange={(e) => onChange("object-fit", e.target.value)}
             style={{
@@ -356,10 +355,9 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
             <option value="cover">Cover</option>
             <option value="none">None</option>
             <option value="scale-down">Scale Down</option>
-          </select>
+          </Select>
         </div>
       )}
-
       {onAdvancedToggle && (
         <MoreSettingsToggle
           isOpen={advancedExpanded}

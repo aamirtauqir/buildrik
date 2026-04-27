@@ -1,3 +1,5 @@
+import { Select } from "@/shared/ui/Select";
+import { TextInput } from "@/shared/ui/TextInput";
 /**
  * Aquibra Rich Text Editor
  * WYSIWYG text editing toolbar
@@ -123,7 +125,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
       }}
     >
       {/* Heading Selector */}
-      <select
+      <Select
         onChange={(e) => onCommand("formatBlock", e.target.value)}
         style={{
           padding: "4px 8px",
@@ -140,9 +142,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             {h.label}
           </option>
         ))}
-      </select>
+      </Select>
       {/* Font Size */}
-      <select
+      <Select
         onChange={(e) => onCommand("fontSize", e.target.value)}
         style={{
           padding: "4px 8px",
@@ -159,7 +161,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             {s.label}
           </option>
         ))}
-      </select>
+      </Select>
       <Divider />
       {/* Format Buttons */}
       {toolbarGroups.map((group, gi) => (
@@ -232,7 +234,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         }
         content={
           <div style={{ width: 250 }}>
-            <input
+            <TextInput
               type="text"
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}

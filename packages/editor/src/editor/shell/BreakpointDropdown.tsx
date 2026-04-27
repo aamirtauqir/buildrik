@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * BreakpointDropdown - Viewport width selector
@@ -227,7 +228,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
               Custom
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <input
+              <TextInput
                 ref={inputRef}
                 type="number"
                 min={320}

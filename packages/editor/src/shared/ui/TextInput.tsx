@@ -1,84 +1,43 @@
+// PHASE 5 DELETE — Phase 4 adapter shim. Replaces hand-rolled TextInput.
 /**
- * TextInput — compact single-line text field for inspector/sidebar controls.
+ * Adapter shim — translates legacy TextInput API to vibcoder Input.
  *
- * Phase 2 primitive port (new). Ported from drop's `.text-input` pattern
- * (editor.css:237-245): 24px height, subtle bg by default, transparent border
- * that appears on hover, cobalt-accent focus ring.
+ * Filename preserved as `TextInput.tsx` (not `Input.tsx`) so existing
+ * consumers and barrel re-exports keep importing from the same path.
+ *
+ * Prop translations (Phase 4 Q4 mapping):
+ *   invalid: maps to error={invalid} (vibcoder uses `error` for the
+ *            same-meaning state modifier)
+ *   inputSize (sm | md | lg): silently dropped — vibcoder Input has no
+ *            size variants in vendored CSS. Tracked in plan as a known
+ *            visual delta (no production consumer outside legacy tests
+ *            sets this prop). Phase 5 cleanup: drop the prop entirely.
+ *   className: passthrough
+ *   type / value / onChange / placeholder / disabled / readOnly /
+ *     name / autoFocus / etc.: native InputHTMLAttributes pass through
+ *     via {...rest}
+ *
+ * Untranslatable: none in active use. Throws-at-render strategy (Phase 4
+ * Q4) applies if a future legacy-only prop arrives without a vibcoder
+ * mapping.
  *
  * @license BSD-3-Clause
  */
+import { forwardRef, type InputHTMLAttributes } from "react";
+import { Input as VibcoderInput } from "@/editor/shared/vibcoder";
 
-import * as React from "react";
-import styled from "@emotion/styled";
-
-export interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  /** Visual size — sm = narrowest, md = default inspector row, lg = form section. */
+export interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
+  /** Visual size — legacy prop, currently a no-op (vibcoder Input is single-size). */
   inputSize?: "sm" | "md" | "lg";
-  /** Show focus ring even without focus (for validation error state). */
+  /** Show focus ring even without focus (validation error state). */
   invalid?: boolean;
 }
 
-type Size = NonNullable<TextInputProps["inputSize"]>;
-
-const heightPx: Record<Size, number> = { sm: 20, md: 24, lg: 28 };
-const fontSize: Record<Size, string> = {
-  sm: "var(--bd-text-2xs)",
-  md: "var(--bd-text-xs)",
-  lg: "var(--bd-text-sm)",
-};
-
-const Input = styled.input<{ s: Size; inv: boolean }>`
-  width: 100%;
-  padding: 0 var(--bd-space-2);
-  height: ${(p) => heightPx[p.s]}px;
-  background: var(--bd-bg-subtle);
-  border: 1px solid ${(p) => (p.inv ? "var(--bd-error)" : "transparent")};
-  border-radius: var(--bd-radius-sm);
-  font-family: var(--bd-font);
-  font-size: ${(p) => fontSize[p.s]};
-  font-weight: var(--bd-weight-medium);
-  color: var(--bd-fg-primary);
-  outline: none;
-  transition: var(--bd-transition-colors);
-  box-sizing: border-box;
-
-  &::placeholder {
-    color: var(--bd-fg-muted);
-  }
-
-  &:hover:not(:disabled):not(:focus) {
-    background: var(--bd-bg-card);
-    border-color: var(--bd-border);
-  }
-
-  &:focus {
-    background: var(--bd-bg-card);
-    border-color: ${(p) => (p.inv ? "var(--bd-error)" : "var(--bd-accent)")};
-    box-shadow: var(--bd-glow-primary);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(
-  ({ inputSize = "md", invalid = false, className, type = "text", ...props }, ref) => {
-    return (
-      <Input
-        ref={ref}
-        s={inputSize}
-        inv={invalid}
-        type={type}
-        aria-invalid={invalid || undefined}
-        className={className}
-        {...props}
-      />
-    );
-  }
+export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
+  ({ invalid = false, inputSize: _inputSize, type = "text", ...rest }, ref) => {
+    return <VibcoderInput ref={ref} type={type} error={invalid} {...rest} />;
+  },
 );
-
 TextInput.displayName = "TextInput";
 
 export default TextInput;

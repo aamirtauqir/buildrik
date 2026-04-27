@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * Background Section - Color, Image, Gradient
@@ -231,7 +232,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               >
                 Angle
               </label>
-              <input
+              <TextInput
                 type="range"
                 min="0"
                 max="360"

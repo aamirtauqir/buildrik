@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * FontPickerDropdown - Dropdown components for font selection
@@ -32,7 +33,7 @@ interface FontSearchInputProps {
 
 export const FontSearchInput: React.FC<FontSearchInputProps> = ({ value, onChange }) => (
   <div style={{ padding: 8, borderBottom: `1px solid ${"var(--buildrick-border)"}` }}>
-    <input
+    <TextInput
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}

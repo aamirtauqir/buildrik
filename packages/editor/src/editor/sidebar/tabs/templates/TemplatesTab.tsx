@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * TemplatesTab v4 — Full-page template browser matching .pen Screens 4-7.
@@ -191,7 +192,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         <div className="tpl-search-wrap">
           <div className="tpl-search-input-box">
             <Search size={16} className="tpl-search-icon" />
-            <input
+            <TextInput
               className="tpl-search-input"
               placeholder="Search templates..."
               value={sel.searchQ}

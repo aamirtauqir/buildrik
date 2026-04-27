@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * PageList — search input + pages tree + bulk toolbar mount + footer + Add CTA.
@@ -152,7 +153,7 @@ export const PageList: React.FC<Props> = ({
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <input
+            <TextInput
               ref={searchRef}
               type="text"
               placeholder="Search pages..."

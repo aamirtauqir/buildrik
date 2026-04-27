@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 /**
  * Slider Control Component
  * Reusable slider input for image adjustments
@@ -24,7 +25,7 @@ export const SliderControl: React.FC<SliderControlProps> = ({
 }) => (
   <div style={styles.container}>
     <span style={styles.label}>{label}</span>
-    <input
+    <TextInput
       type="range"
       min={min}
       max={max}

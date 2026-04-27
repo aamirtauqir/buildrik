@@ -1,3 +1,5 @@
+import { Select } from "@/shared/ui/Select";
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * PageWizard - Full-screen AI page generation wizard
@@ -230,7 +232,7 @@ const FormView: React.FC<FormViewProps> = ({
     {/* Page Type Dropdown */}
     <div style={fieldGroupStyles}>
       <label style={labelStyles}>Page type</label>
-      <select
+      <Select
         value={pageType}
         onChange={(e) => onPageTypeChange(e.target.value as PageType)}
         style={selectStyles}
@@ -240,13 +242,13 @@ const FormView: React.FC<FormViewProps> = ({
             {pt.label}
           </option>
         ))}
-      </select>
+      </Select>
     </div>
 
     {/* Business Description */}
     <div style={fieldGroupStyles}>
       <label style={labelStyles}>Describe your business in one sentence</label>
-      <input
+      <TextInput
         type="text"
         value={description}
         onChange={(e) => onDescriptionChange(e.target.value)}

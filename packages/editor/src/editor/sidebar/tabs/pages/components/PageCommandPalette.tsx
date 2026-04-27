@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 /**
  * PageCommandPalette — Cmd+K fuzzy-search overlay for quick page navigation.
  *
@@ -97,7 +98,7 @@ export const PageCommandPalette: React.FC<Props> = ({ pages, onSelect, onClose }
       onClick={handleBackdropClick}
     >
       <div className="bd-pg-palette">
-        <input
+        <TextInput
           ref={inputRef}
           type="text"
           className="bd-pg-palette-input"

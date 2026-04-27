@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 /**
  * Aquibra Icon Picker Modal
  * Browse and select icons from Lucide library (300+ icons)
@@ -439,7 +440,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
             <div style={styles.controls}>
               <div style={styles.controlGroup}>
                 <span style={styles.controlLabel}>Size</span>
-                <input
+                <TextInput
                   type="number"
                   value={iconSize}
                   onChange={(e) => setIconSize(Math.max(12, Math.min(96, Number(e.target.value))))}
@@ -450,7 +451,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
               </div>
               <div style={styles.controlGroup}>
                 <span style={styles.controlLabel}>Stroke</span>
-                <input
+                <TextInput
                   type="number"
                   value={strokeWidth}
                   onChange={(e) =>
@@ -464,7 +465,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
               </div>
               <div style={styles.controlGroup}>
                 <span style={styles.controlLabel}>Color</span>
-                <input
+                <TextInput
                   type="color"
                   value={iconColor}
                   onChange={(e) => setIconColor(e.target.value)}

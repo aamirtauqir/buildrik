@@ -1,3 +1,5 @@
+import { Checkbox } from "@/shared/ui/Checkbox";
+import { TextInput } from "@/shared/ui/TextInput";
 /**
  * ProjectSettingsModal - Modal for managing project-wide configurations
  * Allows users to update project name, canvas defaults, and SEO settings.
@@ -121,7 +123,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
           {activeTab === "general" && (
             <div style={formGroupStyles}>
               <label style={labelStyles}>Project Name</label>
-              <input
+              <TextInput
                 type="text"
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
@@ -130,7 +132,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
               />
 
               <label style={labelStyles}>Author / Description</label>
-              <input
+              <TextInput
                 type="text"
                 value={projectDescription}
                 onChange={(e) => setProjectDescription(e.target.value)}
@@ -144,7 +146,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
             <div style={formGroupStyles}>
               <label style={labelStyles}>Grid Size (px)</label>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <input
+                <TextInput
                   type="number"
                   value={gridSize}
                   onChange={(e) => setGridSize(Number(e.target.value))}
@@ -159,12 +161,10 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
 
               <div style={{ marginTop: 16 }}>
                 <label style={checkboxLabelStyles}>
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={snapToGrid}
                     onChange={(e) => setSnapToGrid(e.target.checked)}
-                    style={checkboxStyles}
-                  />
+                    style={checkboxStyles} />
                   <span>Snap to Grid</span>
                 </label>
               </div>
@@ -174,7 +174,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
           {activeTab === "seo" && (
             <div style={formGroupStyles}>
               <label style={labelStyles}>Site Name (SEO Default)</label>
-              <input
+              <TextInput
                 type="text"
                 value={siteTitle}
                 onChange={(e) => setSiteTitle(e.target.value)}

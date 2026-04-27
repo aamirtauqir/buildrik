@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * TimeTravelScrubber - Bottom drawer for time-travel mode
@@ -319,7 +320,7 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
                   ? `Previewing: ${formatTime(currentEntry.timestamp)} — ${currentEntry.label}`
                   : "No entry selected"}
               </div>
-              <input
+              <TextInput
                 type="range"
                 className="tt-slider"
                 min={0}

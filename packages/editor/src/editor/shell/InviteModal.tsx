@@ -1,3 +1,5 @@
+import { Select } from "@/shared/ui/Select";
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * InviteModal — "Invite to Buildrik" overlay
@@ -224,7 +226,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               Invite by email
             </label>
             <div style={{ display: "flex", gap: 8 }}>
-              <input
+              <TextInput
                 ref={emailRef}
                 type="email"
                 placeholder="Enter email address…"
@@ -248,7 +250,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                 onFocus={(e) => { e.currentTarget.style.borderColor = "var(--bd-accent)"; }}
                 onBlur={(e) => { e.currentTarget.style.borderColor = "var(--bd-border)"; }}
               />
-              <select
+              <Select
                 value={role}
                 onChange={(e) => setRole(e.target.value as Role)}
                 aria-label="Select role"
@@ -268,7 +270,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                 <option>Editor</option>
                 <option>Admin</option>
                 <option>Viewer</option>
-              </select>
+              </Select>
             </div>
           </div>
 

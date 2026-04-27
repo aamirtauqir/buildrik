@@ -1,3 +1,4 @@
+import { Select } from "@/shared/ui/Select";
 import { Button } from "@/shared/ui/Button";
 /**
  * Overflow & Visibility Controls - Overflow, visibility, float, and clear controls
@@ -99,7 +100,7 @@ const OverflowXYControls: React.FC<OverflowXYControlsProps> = ({
   >
     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
       <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)", width: 14 }}>X</span>
-      <select
+      <Select
         value={styles["overflow-x"] || ""}
         onChange={(e) => onChange("overflow-x", e.target.value)}
         style={{ ...inputStyle, cursor: "pointer" }}
@@ -109,11 +110,11 @@ const OverflowXYControls: React.FC<OverflowXYControlsProps> = ({
         <option value="hidden">hidden</option>
         <option value="scroll">scroll</option>
         <option value="auto">auto</option>
-      </select>
+      </Select>
     </div>
     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
       <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)", width: 14 }}>Y</span>
-      <select
+      <Select
         value={styles["overflow-y"] || ""}
         onChange={(e) => onChange("overflow-y", e.target.value)}
         style={{ ...inputStyle, cursor: "pointer" }}
@@ -123,7 +124,7 @@ const OverflowXYControls: React.FC<OverflowXYControlsProps> = ({
         <option value="hidden">hidden</option>
         <option value="scroll">scroll</option>
         <option value="auto">auto</option>
-      </select>
+      </Select>
     </div>
   </div>
 );

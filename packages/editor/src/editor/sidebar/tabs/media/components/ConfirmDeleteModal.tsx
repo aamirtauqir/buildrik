@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * Media Tab — Confirm Delete Modal
@@ -60,7 +61,7 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
             <p className="med-modal-gate-label">
               Type <strong>DELETE</strong> to confirm:
             </p>
-            <input
+            <TextInput
               className="med-modal-gate-input"
               value={confirmInput}
               onChange={(e) => setConfirmInput(e.target.value)}

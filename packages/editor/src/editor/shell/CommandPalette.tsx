@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * CommandPalette — ⌘K overlay
@@ -165,7 +166,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
           }}
         >
           <IconSearch />
-          <input
+          <TextInput
             ref={inputRef}
             type="text"
             placeholder="Search actions…"

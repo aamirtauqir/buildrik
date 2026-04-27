@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * Media Quick Actions Component
@@ -142,7 +143,7 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
         <div style={popoverStyle}>
           <div style={popoverTitleStyle}>Alt Text (SEO)</div>
           <div style={{ display: "flex", gap: "4px" }}>
-            <input
+            <TextInput
               autoFocus
               type="text"
               value={altValue}

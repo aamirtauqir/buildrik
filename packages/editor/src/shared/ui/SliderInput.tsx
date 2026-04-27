@@ -1,12 +1,37 @@
+// PHASE 5 DELETE — Phase 4 adapter shim. Replaces hand-rolled SliderInput.
 /**
- * SliderInput Component
- * Numeric input with drag-to-adjust and slider
+ * Adapter shim — translates legacy SliderInput API to vibcoder Slider.
+ *
+ * Filename preserved as `SliderInput.tsx` (not `Slider.tsx`) so existing
+ * consumers and barrel re-exports keep importing from the same path.
+ *
+ * Prop translations (Phase 4 Q4 mapping):
+ *   value:    passthrough (required number)
+ *   onChange: passthrough (vibcoder fires (next: number))
+ *   min / max / step: passthrough
+ *   unit / label: passthrough
+ *   disabled: applied as inline `pointerEvents: none` + `opacity: 0.5`
+ *             on the wrapper. Vibcoder Slider has no `disabled` prop —
+ *             the native input still receives the attribute via
+ *             {...rest} so keyboard focus + change handlers respect it.
+ *   className / style: composed onto the vibcoder wrapper. Disabled
+ *             style merges with caller-supplied style (caller wins on
+ *             same-key conflicts).
+ *
+ * Untranslatable: legacy SliderInput supported double-click-to-edit and
+ * drag-the-track to scrub. Vibcoder Slider is keyboard + range-input
+ * only. This is a known visual/interaction delta tracked in the plan;
+ * production consumers (the SliderInput in
+ * editor/inspector/shared/controls is a SEPARATE component, NOT this
+ * shim) are unaffected. Phase 5 cleanup: drop the shim entirely.
+ *
  * @license BSD-3-Clause
  */
+import { forwardRef, type CSSProperties, type InputHTMLAttributes } from "react";
+import { Slider as VibcoderSlider } from "@/editor/shared/vibcoder";
 
-import * as React from "react";
-
-export interface SliderInputProps {
+export interface SliderInputProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "type" | "min" | "max" | "step"> {
   value: number;
   min?: number;
   max?: number;
@@ -16,201 +41,35 @@ export interface SliderInputProps {
   disabled?: boolean;
   onChange: (value: number) => void;
   className?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }
 
-export const SliderInput: React.FC<SliderInputProps> = ({
-  value,
-  min = 0,
-  max = 100,
-  step = 1,
-  unit = "",
-  label,
-  disabled = false,
-  onChange,
-  className = "",
-  style,
-}) => {
-  const [isDragging, setIsDragging] = React.useState(false);
-  const [isEditing, setIsEditing] = React.useState(false);
-  const [inputValue, setInputValue] = React.useState(String(value));
-  const dragRef = React.useRef<{ startX: number; startValue: number } | null>(null);
-
-  React.useEffect(() => {
-    if (!isEditing) {
-      setInputValue(String(value));
-    }
-  }, [value, isEditing]);
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (disabled || isEditing) return;
-    e.preventDefault();
-    setIsDragging(true);
-    dragRef.current = { startX: e.clientX, startValue: value };
-    document.body.style.cursor = "ew-resize";
-  };
-
-  React.useEffect(() => {
-    if (!isDragging) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!dragRef.current) return;
-      const delta = e.clientX - dragRef.current.startX;
-      const sensitivity = (max - min) / 200;
-      const newValue = Math.round((dragRef.current.startValue + delta * sensitivity) / step) * step;
-      onChange(Math.max(min, Math.min(max, newValue)));
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-      dragRef.current = null;
-      document.body.style.cursor = "";
-    };
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDragging, min, max, step, onChange]);
-
-  const handleDoubleClick = () => {
-    if (disabled) return;
-    setIsEditing(true);
-    setInputValue(String(value));
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-  };
-
-  const handleInputBlur = () => {
-    setIsEditing(false);
-    const parsed = parseFloat(inputValue);
-    if (!isNaN(parsed)) {
-      onChange(Math.max(min, Math.min(max, parsed)));
-    }
-  };
-
-  const handleInputKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleInputBlur();
-    } else if (e.key === "Escape") {
-      setIsEditing(false);
-      setInputValue(String(value));
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      onChange(Math.min(max, value + step));
-    } else if (e.key === "ArrowDown") {
-      e.preventDefault();
-      onChange(Math.max(min, value - step));
-    }
-  };
-
-  const percentage = ((value - min) / (max - min)) * 100;
-
-  const containerStyles: React.CSSProperties = {
-    display: "flex",
-    flexDirection: "column",
-    gap: 4,
-    ...style,
-  };
-
-  const labelStyles: React.CSSProperties = {
-    fontSize: 12,
-    color: "var(--buildrick-text-tertiary)",
-    fontWeight: 500,
-    textTransform: "uppercase",
-    letterSpacing: "0.05em",
-  };
-
-  const inputWrapperStyles: React.CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    background: "var(--buildrick-bg-input)",
-    borderRadius: "var(--buildrick-radius-sm)",
-    padding: "4px 8px",
-    border: "1px solid var(--buildrick-border-medium)",
-    cursor: disabled ? "not-allowed" : isDragging ? "ew-resize" : "default",
-    opacity: disabled ? 0.5 : 1,
-    transition: "all var(--buildrick-transition-fast)",
-  };
-
-  const valueDisplayStyles: React.CSSProperties = {
-    minWidth: 40,
-    textAlign: "right",
-    fontSize: 12,
-    fontWeight: 500,
-    color: "var(--buildrick-text-primary)",
-    cursor: disabled ? "not-allowed" : "ew-resize",
-    userSelect: "none",
-  };
-
-  const inputStyles: React.CSSProperties = {
-    width: 50,
-    background: "transparent",
-    border: "none",
-    color: "var(--buildrick-text-primary)",
-    fontSize: 12,
-    fontWeight: 500,
-    textAlign: "right",
-    outline: "none",
-  };
-
-  const sliderTrackStyles: React.CSSProperties = {
-    flex: 1,
-    height: 4,
-    background: "var(--buildrick-surface-4)",
-    borderRadius: 2,
-    position: "relative",
-    overflow: "hidden",
-  };
-
-  const sliderFillStyles: React.CSSProperties = {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    height: "100%",
-    width: `${percentage}%`,
-    background: "var(--buildrick-accent)",
-    borderRadius: 2,
-    transition: isDragging ? "none" : "width var(--buildrick-transition-fast)",
-  };
-
-  const unitStyles: React.CSSProperties = {
-    fontSize: 12,
-    color: "var(--buildrick-text-muted)",
-    marginLeft: 2,
-  };
-
-  return (
-    <div className={`buildrick-slider-input ${className}`} style={containerStyles}>
-      {label && <span style={labelStyles}>{label}</span>}
-      <div style={inputWrapperStyles} onMouseDown={handleMouseDown}>
-        <div style={sliderTrackStyles}>
-          <div style={sliderFillStyles} />
-        </div>
-        {isEditing ? (
-          <input
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            onBlur={handleInputBlur}
-            onKeyDown={handleInputKeyDown}
-            style={inputStyles}
-            autoFocus
-          />
-        ) : (
-          <span style={valueDisplayStyles} onDoubleClick={handleDoubleClick}>
-            {value}
-            {unit && <span style={unitStyles}>{unit}</span>}
-          </span>
-        )}
+export const SliderInput = forwardRef<HTMLInputElement, SliderInputProps>(
+  (
+    { value, onChange, min = 0, max = 100, step = 1, unit, label, disabled = false, className, style, ...rest },
+    ref,
+  ) => {
+    const composedStyle: CSSProperties | undefined = disabled
+      ? { pointerEvents: "none", opacity: 0.5, ...style }
+      : style;
+    return (
+      <div className={className} style={composedStyle}>
+        <VibcoderSlider
+          ref={ref}
+          value={value}
+          onChange={onChange}
+          min={min}
+          max={max}
+          step={step}
+          label={label}
+          unit={unit}
+          disabled={disabled}
+          {...rest}
+        />
       </div>
-    </div>
-  );
-};
+    );
+  },
+);
+SliderInput.displayName = "SliderInput";
 
 export default SliderInput;

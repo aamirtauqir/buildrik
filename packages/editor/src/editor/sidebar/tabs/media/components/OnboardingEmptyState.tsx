@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * Media Tab — Onboarding Empty State
@@ -47,7 +48,7 @@ export function OnboardingEmptyState({
       >
         Upload files
       </Button>
-      <input
+      <TextInput
         ref={inputRef}
         type="file"
         multiple

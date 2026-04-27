@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * AdvancedTab — Visibility, schedule, password, indexing, head code.
@@ -51,7 +52,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
       {s.visibility === "password" && (
         <div className="bd-pg-adv-password">
           <div className="bd-pg-adv-password-row">
-            <input
+            <TextInput
               className="bd-pg-adv-password-input"
               type={s.showPassword ? "text" : "password"}
               value={s.password}

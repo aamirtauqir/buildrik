@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * TokenPickerPopover — pick a design-system token or enter a raw value.
@@ -223,7 +224,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
         <div onKeyDown={handleKeyDown}>
           {/* Search */}
           <div style={{ padding: "8px 8px 4px" }}>
-            <input
+            <TextInput
               ref={searchRef}
               type="text"
               value={query}
@@ -450,7 +451,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                 flexShrink: 0,
               }}
             />
-            <input
+            <TextInput
               type="text"
               value={customInput}
               autoFocus

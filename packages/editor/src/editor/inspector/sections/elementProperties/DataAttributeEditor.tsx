@@ -1,3 +1,4 @@
+import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
  * @lint-hex-policy: component-theme
@@ -78,14 +79,14 @@ export const DataAttributeEditor: React.FC<DataAttributeEditorProps> = ({
   return (
     <div>
       <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-        <input
+        <TextInput
           type="text"
           value={newKey}
           onChange={(e) => setNewKey(e.target.value)}
           placeholder="data-*"
           style={styles.input}
         />
-        <input
+        <TextInput
           type="text"
           value={newValue}
           onChange={(e) => setNewValue(e.target.value)}
