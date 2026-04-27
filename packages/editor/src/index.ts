@@ -43,7 +43,6 @@ export {
   ToastProvider,
   useToast,
   Tooltip,
-  Tabs,
   Accordion,
   ContextMenu,
   useContextMenu,

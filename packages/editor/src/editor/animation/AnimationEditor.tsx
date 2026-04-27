@@ -9,7 +9,7 @@ import { SelectField, NumberField, SliderField } from "../../shared/forms";
 import type { AnimationConfig, AnimationTrigger } from "../../shared/types/animations";
 import { DEFAULT_ANIMATION } from "../../shared/types/animations";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { Tabs } from "@/shared/ui/Tabs";
+import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
 
 // Re-export for backwards compatibility
 export type { AnimationConfig } from "../../shared/types/animations";
@@ -87,16 +87,11 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
   return (
     <div className="buildrick-animation-editor" style={{ padding: 12 }}>
       {/* Animation Type */}
-      <Tabs
-        tabs={[
-          { id: "entrance", label: "Entrance" },
-          { id: "attention", label: "Attention" },
-          { id: "exit", label: "Exit" },
-        ]}
-        activeTab={activeTab}
-        onChange={setActiveTab}
-        size="sm"
-      />
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="bd-tabs--sm">
+        <Tab id="entrance">Entrance</Tab>
+        <Tab id="attention">Attention</Tab>
+        <Tab id="exit">Exit</Tab>
+      </Tabs>
       <div style={{ marginTop: 16 }}>
         <div
           style={{

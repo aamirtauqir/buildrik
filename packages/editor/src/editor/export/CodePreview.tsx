@@ -12,7 +12,7 @@
 
 import * as React from "react";
 import type { CodeTab } from "../../shared/types/export";
-import { Tabs } from "@/shared/ui/Tabs";
+import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
 import { CopyButton } from "../../shared/ui/CopyButton";
 
 // ============================================================================
@@ -255,13 +255,12 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
       {/* Tabs */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Tabs
-          tabs={[
-            { id: "html", label: "HTML" },
-            { id: "css", label: "CSS" },
-          ]}
-          activeTab={activeTab}
-          onChange={(tab) => setActiveTab(tab as CodeTab)}
-        />
+          value={activeTab}
+          onValueChange={(tab) => setActiveTab(tab as CodeTab)}
+        >
+          <Tab id="html">HTML</Tab>
+          <Tab id="css">CSS</Tab>
+        </Tabs>
         <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
           {activeTab === "html"
             ? `${html.split("\n").length} lines`

@@ -11,7 +11,7 @@ import { STORAGE_KEYS } from "../shared/constants/config";
 import { InputField } from "../shared/forms";
 import { Modal } from "@/shared/ui/Modal";
 import { Spinner } from "@/editor/shared/vibcoder/Spinner";
-import { Tabs } from "@/shared/ui/Tabs";
+import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
 import { MyTemplates } from "./MyTemplates";
 import { SectionTemplates, type SectionTemplate } from "./SectionTemplates";
 import { TemplatePreview } from "./TemplatePreview";
@@ -272,15 +272,11 @@ export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Template Library" size="lg">
       {/* Tabs */}
-      <Tabs
-        tabs={[
-          { id: "library", label: "📚 Library" },
-          { id: "sections", label: "🧱 Sections" },
-          { id: "my", label: "📁 My Templates" },
-        ]}
-        activeTab={activeTab}
-        onChange={setActiveTab}
-      />
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tab id="library">📚 Library</Tab>
+        <Tab id="sections">🧱 Sections</Tab>
+        <Tab id="my">📁 My Templates</Tab>
+      </Tabs>
 
       {/* Tab Content */}
       {activeTab === "library" && (

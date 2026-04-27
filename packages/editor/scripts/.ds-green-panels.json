@@ -175,7 +175,6 @@
     "packages/editor/src/shared/ui/Icons.tsx",
     "packages/editor/src/shared/ui/InfoBanner.tsx",
     "packages/editor/src/shared/ui/QuickSwitcher.tsx",
-    "packages/editor/src/shared/ui/Tabs.tsx",
     "packages/editor/src/shared/ui/TreeView.tsx",
     "packages/editor/src/shared/ui/panel/PanelShell.tsx"
   ],

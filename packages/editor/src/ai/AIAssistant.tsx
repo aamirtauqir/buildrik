@@ -10,7 +10,7 @@ import { LayoutAnalyzer } from "../engine/ai";
 import { TextareaField, SelectField } from "../shared/forms";
 import { Modal } from "@/shared/ui/Modal";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { Tabs } from "@/shared/ui/Tabs";
+import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
 import {
   generateContent,
   generateLayout,
@@ -140,18 +140,14 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
           Target: {contextLabel}
         </div>
       )}
-      <Tabs
-        tabs={[
-          { id: "content", label: "📝 Content" },
-          { id: "layout", label: "🎨 Layout" },
-          { id: "image", label: "🖼️ Image" },
-          { id: "analyze", label: "🔍 Analyze" },
-          { id: "colors", label: "🎨 Colors" },
-          { id: "a11y", label: "♿ A11y" },
-        ]}
-        activeTab={activeTab}
-        onChange={setActiveTab}
-      />
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tab id="content">📝 Content</Tab>
+        <Tab id="layout">🎨 Layout</Tab>
+        <Tab id="image">🖼️ Image</Tab>
+        <Tab id="analyze">🔍 Analyze</Tab>
+        <Tab id="colors">🎨 Colors</Tab>
+        <Tab id="a11y">♿ A11y</Tab>
+      </Tabs>
       <div style={{ marginTop: 20 }}>
         {activeTab === "content" && (
           <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>

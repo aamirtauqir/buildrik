@@ -11,7 +11,7 @@ import type { Composer } from "../../engine";
 import { InputField, FileField } from "../../shared/forms";
 import type { MediaAsset, MediaAssetType, MediaViewMode } from "../../shared/types/media";
 import { Modal } from "@/shared/ui/Modal";
-import { Tabs } from "@/shared/ui/Tabs";
+import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Spinner } from "@/editor/shared/vibcoder/Spinner";
 import { useMediaManager } from "../shell/hooks";
@@ -128,16 +128,12 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="lg">
-      <Tabs
-        tabs={[
-          { id: "library", label: "Library" },
-          { id: "upload", label: "Upload" },
-          { id: "url", label: "From URL" },
-          { id: "optimize", label: "Optimize" },
-        ]}
-        activeTab={activeTab}
-        onChange={setActiveTab}
-      />
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tab id="library">Library</Tab>
+        <Tab id="upload">Upload</Tab>
+        <Tab id="url">From URL</Tab>
+        <Tab id="optimize">Optimize</Tab>
+      </Tabs>
 
       <div style={styles.container}>
         {activeTab === "library" && (

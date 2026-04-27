@@ -11,7 +11,7 @@ import type { ExportConfig, ExportResult, PreviewDevice } from "../../shared/typ
 import { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "../../shared/types/export";
 import { Modal } from "@/shared/ui/Modal";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { Tabs } from "@/shared/ui/Tabs";
+import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
 import { Spinner } from "@/editor/shared/vibcoder/Spinner";
 import { devError } from "../../shared/utils/devLogger";
 import { CodePreview } from "./CodePreview";
@@ -157,14 +157,13 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
           {/* Tabs */}
           <div style={{ marginBottom: 16 }}>
             <Tabs
-              tabs={[
-                { id: "preview", label: "Preview" },
-                { id: "code", label: "Code" },
-                { id: "options", label: "Options" },
-              ]}
-              activeTab={activeTab}
-              onChange={(tab) => setActiveTab(tab as ExportTab)}
-            />
+              value={activeTab}
+              onValueChange={(tab) => setActiveTab(tab as ExportTab)}
+            >
+              <Tab id="preview">Preview</Tab>
+              <Tab id="code">Code</Tab>
+              <Tab id="options">Options</Tab>
+            </Tabs>
           </div>
 
           {/* Content */}
