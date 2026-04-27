@@ -1,4 +1,4 @@
-import { Checkbox } from "@/shared/ui/Checkbox";
+import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**

@@ -1,4 +1,4 @@
-import { Checkbox } from "@/shared/ui/Checkbox";
+import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 /**
  * Collection Setup Modal
  * Prompts user to create Products collection when dropping e-commerce blocks

@@ -1,4 +1,4 @@
-import { Checkbox } from "@/shared/ui/Checkbox";
+import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 import { TextInput } from "@/shared/ui/TextInput";
 /**
  * ProjectSettingsModal - Modal for managing project-wide configurations

@@ -1,4 +1,4 @@
-import { Checkbox } from "@/shared/ui/Checkbox";
+import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 import { Button } from "@/shared/ui/Button";
 /**
  * LayerDisplaySettings - Popover for toggling layer display preferences.
