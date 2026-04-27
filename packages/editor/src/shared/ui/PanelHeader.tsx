@@ -1,13 +1,54 @@
+// PHASE 5 DELETE — Phase 4 adapter shim. Replaces hand-rolled PanelHeader.
 /**
- * PanelHeader — canonical 48px panel header, used by all 10 sidebar tabs.
- * PRD §9.1: title + pin/help/close actions.
+ * Adapter shim — translates legacy PanelHeader API to the vibcoder
+ * SurfaceHead primitive (header strip molecule).
+ *
+ * Strategy: bridge. Renders `<VibcoderSurfaceHead title>` internally and
+ * builds the right-cluster actions (pin/help/close) inside the SurfaceHead
+ * `actions` slot from the legacy on*Click props. The icon prop is rendered
+ * as a leading element inside the title via the SurfaceHead `tag` slot
+ * (closest semantic match — eyebrow/meta are textual, tag accepts ReactNode).
+ *
+ * Prop translations (Phase 4 T4.D mapping):
+ *   icon (ReactNode)    → rendered into vibcoder SurfaceHead `tag` slot
+ *                         (the only ReactNode slot besides actions; sits
+ *                         alongside the title in __body). Legacy rendered
+ *                         it inline left of the title with 8px gap; the
+ *                         tag slot's __tag CSS class is the equivalent
+ *                         left-of-title decorator in vibcoder's surface-head.
+ *   title (string)      → vibcoder title.
+ *   isPinned (boolean)  → wires pin button aria-pressed + legacy filled-icon
+ *                         visual (PinIcon takes isPinned). Forwarded into
+ *                         the actions cluster.
+ *   onPinToggle (cb)    → renders Pin button in actions cluster when set.
+ *   onHelpClick (cb)    → renders Help button in actions cluster when set.
+ *   onClose (cb)        → renders Close button in actions cluster when set.
+ *   children (ReactNode)→ rendered inside the actions cluster, BEFORE the
+ *                         pin/help/close buttons (legacy order: extra
+ *                         content (e.g. draft chip) sits between title and
+ *                         action buttons).
+ *   className           → composed onto vibcoder SurfaceHead root.
+ *
+ * Visual note: vibcoder bd-surface-head renders <header> with a flex body
+ * (eyebrow/title/meta/tag stack on left) and an actions cluster on right.
+ * Legacy PanelHeader rendered <header> with title left-of-actions in the
+ * same flex direction. Class structure differs — bd-surface-head__body /
+ * __title / __actions vs the legacy inline-styled spans — but the visual
+ * shape is preserved.
+ *
+ * HeaderActions: retained as an exported sub-component for callers that
+ * want the action cluster standalone (e.g. DrillInHeader). Re-implemented
+ * here to remove the inline-styled SVG icon definitions and route through
+ * the canonical SurfaceHead actions when called inside a PanelHeader.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { SurfaceHead as VibcoderSurfaceHead } from "@/editor/shared/vibcoder";
 
 // ============================================
-// Icons (inline SVGs — no external dependency)
+// Action icons (inline SVGs — 16px, no external dependency)
 // ============================================
 
 const PinIcon: React.FC<{ isPinned: boolean }> = ({ isPinned }) => (
@@ -58,37 +99,9 @@ const CloseIcon: React.FC = () => (
 );
 
 // ============================================
-// Styles (inline CSS-in-JS — Emotion not used here to keep shared/ leaf-clean)
+// HeaderActions — shared action buttons (Pin, Help, Close)
+// Used by PanelHeader and standalone (DrillInHeader, etc.).
 // ============================================
-
-const headerContainerStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  height: 44,
-  minHeight: 44,
-  padding: "0 12px",
-  borderBottom: "1px solid var(--buildrick-border-light, var(--bd-border))",
-  background: "var(--buildrick-bg-panel, var(--bd-bg-panel))",
-  flexShrink: 0,
-};
-
-const titleStyles: React.CSSProperties = {
-  margin: 0,
-  flex: 1,
-  fontSize: 14,
-  fontWeight: 600,
-  lineHeight: "20px",
-  color: "var(--buildrick-text-primary)",
-  letterSpacing: "-0.01em",
-};
-
-const actionsContainerStyles: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 2,
-  marginRight: 2,
-};
 
 const iconBtnStyles: React.CSSProperties = {
   display: "flex",
@@ -104,10 +117,12 @@ const iconBtnStyles: React.CSSProperties = {
   color: "var(--buildrick-text-muted, var(--bd-fg-secondary))",
 };
 
-// ============================================
-// HeaderActions — shared action buttons (Pin, Help, Close)
-// Extracted to avoid duplication between PanelHeader and DrillInHeader
-// ============================================
+const actionsContainerStyles: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 2,
+  marginRight: 2,
+};
 
 export interface HeaderActionsProps {
   isPinned?: boolean;
@@ -168,7 +183,7 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
 );
 
 // ============================================
-// PanelHeader
+// PanelHeader — bridge to vibcoder SurfaceHead
 // ============================================
 
 export interface PanelHeaderProps {
@@ -200,47 +215,26 @@ export const PanelHeader: React.FC<PanelHeaderProps> = ({
   children,
   className,
 }) => {
+  const hasActions = onPinToggle || onHelpClick || onClose || children;
+
   return (
-    <header style={headerContainerStyles} className={className}>
-      {icon && (
-        <span
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginRight: 8,
-            color: "var(--buildrick-text-muted, var(--bd-fg-secondary))",
-            flexShrink: 0,
-            width: 16,
-            height: 16,
-          }}
-        >
-          {icon}
-        </span>
-      )}
-
-      <h2 style={titleStyles}>{title}</h2>
-
-      {children && (
-        <span
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginLeft: "auto",
-            marginRight: 4,
-            flexShrink: 0,
-          }}
-        >
+    <VibcoderSurfaceHead
+      title={title}
+      tag={icon}
+      className={className}
+    >
+      {hasActions && (
+        <>
           {children}
-        </span>
+          <HeaderActions
+            isPinned={isPinned}
+            onPinToggle={onPinToggle}
+            onHelpClick={onHelpClick}
+            onClose={onClose}
+          />
+        </>
       )}
-
-      <HeaderActions
-        isPinned={isPinned}
-        onPinToggle={onPinToggle}
-        onHelpClick={onHelpClick}
-        onClose={onClose}
-      />
-    </header>
+    </VibcoderSurfaceHead>
   );
 };
 
