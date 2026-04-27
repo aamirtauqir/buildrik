@@ -1,10 +1,42 @@
+// PHASE 5 DELETE — Phase 4 adapter shim. Replaces hand-rolled Popover surface.
 /**
- * Aquibra Popover Component
+ * Adapter shim — translates legacy Popover API to render the vibcoder
+ * `<Popover>` surface (bd-popover skin) inside the existing legacy behavior
+ * shell (positioning, outside-click, Escape, focus trap).
+ *
+ * Hybrid scope explanation:
+ *   Phase 3 vibcoder Popover is intentionally a PASSIVE controlled surface
+ *   (NO Radix.Popover backing, NO outside-click, NO Escape, NO focus trap,
+ *   NO positioning) — see `editor/shared/vibcoder/Popover.tsx` Contract D
+ *   docstring. The behavior (anchor calculation, Esc, click-outside,
+ *   focus-trap-on-open) MUST stay in the shim until Phase 5 organisms wire
+ *   floating-ui + a Radix-backed Popover. This shim swaps only the rendered
+ *   surface element so consumers get the canonical bd-popover CSS skin
+ *   today, without losing any behavior.
+ *
+ * Prop translations (Phase 4 Q4 mapping):
+ *   trigger          → rendered as the anchor wrapper (no change)
+ *   content          → passed as children to vibcoder <Popover>
+ *   position         → drives the absolute coords math (no change)
+ *   triggerOn        → click | hover (no change — drives mouse handlers)
+ *   closeOnClickOutside → drives the document mousedown listener (no change)
+ *
+ * Untranslatable: none. The legacy public API is preserved 1:1.
+ *
+ * Focus trap migration note: useFocusTrap hook is STILL USED here. Vibcoder
+ * Popover provides no focus trap of its own (Phase 3 deferred this to
+ * Phase 5 floating-ui integration). T7 useFocusTrap deletion is contingent
+ * on this hook becoming dead — Modal (T5) was one call site, Popover (T6)
+ * is the OTHER. T7 will keep the hook alive while Popover still relies on
+ * it. Phase 5 floating-ui adoption (or a Radix.Popover-backed vibcoder
+ * Popover replacement) is the trigger to retire useFocusTrap.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import { createPortal } from "react-dom";
+import { Popover as VibcoderPopover } from "@/editor/shared/vibcoder";
 import { useFocusTrap } from "../hooks/useFocusTrap";
 
 export interface PopoverProps {
@@ -105,11 +137,11 @@ export const Popover: React.FC<PopoverProps> = ({
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen]);
 
-  // Styles for the portal content — tokens via --bd-* alias layer.
-  // Shadow updated from black rgba(0,0,0,0.4) to slate double-layer per
-  // prototype comp-popovers.html (P0c P2) + DESIGN.md §Shadows
-  // ("cool-tinted slate, never warm grey or black").
-  const popoverStyles: React.CSSProperties = {
+  // Positioning style — applied to the portaled wrapper that holds the
+  // vibcoder Popover surface. The vibcoder surface itself renders the
+  // bd-popover class (background, border, shadow, padding) so we no longer
+  // hand-roll those tokens here.
+  const wrapperStyle: React.CSSProperties = {
     position: "absolute",
     top: coords.top,
     left: coords.left,
@@ -121,14 +153,8 @@ export const Popover: React.FC<PopoverProps> = ({
           : position === "left"
             ? "translateY(-50%) translateX(-100%)"
             : "translateY(-50%)",
-    background: "var(--bd-bg-card)",
-    borderRadius: "var(--bd-radius-md)",
-    boxShadow: "var(--bd-shadow-lg)",
-    border: "1px solid var(--bd-border)",
-    padding: "var(--bd-space-3)",
     zIndex: 9999, // Stay on top of any in-panel overlay
     minWidth: 200,
-    animation: "buildrick-popover-in 0.15s ease",
   };
 
   return (
@@ -149,19 +175,24 @@ export const Popover: React.FC<PopoverProps> = ({
       >
         {trigger}
       </div>
-      {isOpen &&
-        createPortal(
-          <div
-            ref={contentRef}
-            className="buildrick-popover"
-            style={popoverStyles}
-            onMouseEnter={triggerOn === "hover" ? () => setIsOpen(true) : undefined}
-            onMouseLeave={triggerOn === "hover" ? () => setIsOpen(false) : undefined}
+      {createPortal(
+        <div
+          ref={contentRef}
+          style={wrapperStyle}
+          onMouseEnter={triggerOn === "hover" ? () => setIsOpen(true) : undefined}
+          onMouseLeave={triggerOn === "hover" ? () => setIsOpen(false) : undefined}
+        >
+          <VibcoderPopover
+            open={isOpen}
+            onOpenChange={(next) => {
+              if (!next) setIsOpen(false);
+            }}
           >
             {content}
-          </div>,
-          document.body
-        )}
+          </VibcoderPopover>
+        </div>,
+        document.body,
+      )}
     </>
   );
 };
