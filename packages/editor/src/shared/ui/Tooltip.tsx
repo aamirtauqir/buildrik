@@ -1,4 +1,22 @@
 /**
+ * Phase 4 T7 triage: keep-as-extension.
+ *
+ * Rationale: Vibcoder Tooltip (Phase 3 `bd-tooltip`) is a passive CSS
+ * surface only — no hover-intent, no positioning math, no delay, no
+ * portal, no ESC dismiss. Legacy Buildrik Tooltip provides all of
+ * those plus viewport-fit anchoring + shortcut hint slot. A hybrid
+ * bridge would re-host all behavior for a CSS-skin-only win, with
+ * visual-regression risk in highly visible chrome (Topbar,
+ * StatusIndicators, CanvasFooterToolbar). 7 consumers; not worth
+ * codemodding twice.
+ *
+ * Phase 5 disposition: when vibcoder Tooltip gains Radix.Tooltip
+ * backing, port via codemod + delete this file. Cascades to
+ * HelpTooltip in the same commit.
+ *
+ * @license BSD-3-Clause
+ */
+/**
  * Aquibra Tooltip Component
  * @license BSD-3-Clause
  */

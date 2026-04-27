@@ -1,4 +1,16 @@
 /**
+ * Phase 4 T7 triage: keep-as-extension.
+ *
+ * Rationale: No vibcoder ContextMenu primitive — would require a
+ * Radix.ContextMenu install to source one in Phase 5. Custom right-click
+ * positioning + useContextMenu hook are Buildrik-specific.
+ *
+ * Phase 5 disposition: reconsider if Radix.ContextMenu lands and a
+ * vibcoder ContextMenu wrapper ships in a future phase.
+ *
+ * @license BSD-3-Clause
+ */
+/**
  * Aquibra Context Menu Component
  * @license BSD-3-Clause
  */

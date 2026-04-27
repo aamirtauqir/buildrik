@@ -1,4 +1,16 @@
 /**
+ * Phase 4 T7 triage: keep-as-extension.
+ *
+ * Rationale: title/why/action accessibility shape is Buildrik-specific
+ * (UX Audit 2026 Task 5 contract). No vibcoder banner / error / alert
+ * molecule covers this prop surface.
+ *
+ * Phase 5 disposition: reconsider if vibcoder ships an Alert or Banner
+ * organism with a comparable structured-error shape.
+ *
+ * @license BSD-3-Clause
+ */
+/**
  * ErrorMessage Component
  * Shows errors with title, why, and action (UX Audit 2026 Task 5)
  *

@@ -1,4 +1,15 @@
 /**
+ * Phase 4 T7 triage: keep-as-extension.
+ *
+ * Rationale: Buildrik plan-gating business logic (free / pro /
+ * enterprise tier check + locked-overlay rendering). Not a primitive;
+ * vibcoder has no analogue and shouldn't.
+ *
+ * Phase 5 disposition: keep. Pure business logic.
+ *
+ * @license BSD-3-Clause
+ */
+/**
  * UpgradeGate - Conditionally gates premium content behind plan check
  * Shows locked overlay when user plan is insufficient.
  *

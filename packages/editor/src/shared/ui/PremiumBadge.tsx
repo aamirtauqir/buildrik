@@ -1,4 +1,16 @@
 /**
+ * Phase 4 T7 triage: keep-as-extension.
+ *
+ * Rationale: Variant of Badge atom — Buildrik plan/billing styling
+ * (Pro / Enterprise label with lock affordance). Composes business
+ * semantics into a Badge variant; not a primitive.
+ *
+ * Phase 5 disposition: keep. May internally adopt the T3.B Badge atom
+ * shim if a styling refresh lands.
+ *
+ * @license BSD-3-Clause
+ */
+/**
  * PremiumBadge - Consistent premium/pro status indicator
  * Replaces scattered lock emoji + icon implementations.
  *

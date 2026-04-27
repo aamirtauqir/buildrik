@@ -1,4 +1,17 @@
 /**
+ * Phase 4 T7 triage: keep-as-extension.
+ *
+ * Rationale: Decorative composition over Button — Buildrik-specific
+ * copy-to-clipboard UX (animated checkmark feedback + Toast trigger).
+ * Not a primitive; sits above the T1 Button shim and the kept Toast
+ * extension.
+ *
+ * Phase 5 disposition: keep — composition stays. Button + Toast
+ * substrate may evolve underneath.
+ *
+ * @license BSD-3-Clause
+ */
+/**
  * CopyButton - Reusable copy to clipboard button with toast feedback
  * @license BSD-3-Clause
  */

@@ -1,4 +1,16 @@
 /**
+ * Phase 4 T7 triage: keep-as-extension.
+ *
+ * Rationale: No vibcoder Accordion / Disclosure primitive in the Phase 3
+ * organism alphabet. Self-contained collapse/expand logic; not on the
+ * chrome rendering path.
+ *
+ * Phase 5 disposition: reconsider if vibcoder ships an Accordion /
+ * Disclosure organism (likely Radix.Accordion-backed).
+ *
+ * @license BSD-3-Clause
+ */
+/**
  * Aquibra Accordion Component
  * @license BSD-3-Clause
  */

@@ -1,4 +1,16 @@
 /**
+ * Phase 4 T7 triage: keep-as-extension.
+ *
+ * Rationale: Generic `TreeView<T>` data component (hierarchical with
+ * drag-drop support, used by the Layers panel). No vibcoder Tree /
+ * TreeView primitive in the Phase 3 organism alphabet.
+ *
+ * Phase 5 disposition: reconsider if vibcoder ships a Tree primitive;
+ * otherwise keep.
+ *
+ * @license BSD-3-Clause
+ */
+/**
  * TreeView Component
  * Hierarchical tree with drag-drop support for Layers panel
  * @license BSD-3-Clause

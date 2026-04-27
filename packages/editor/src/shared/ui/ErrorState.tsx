@@ -1,4 +1,19 @@
 /**
+ * Phase 4 T7 triage: keep-as-extension.
+ *
+ * Rationale: Multi-export module — ErrorState (full screen / panel
+ * fallback) + FieldError (inline) + ErrorBoundary (class component).
+ * Vibcoder EmptyState is close but not 1:1 with the recovery-options
+ * shape (severity, retry/back/home action triplet, error.stack
+ * surfacing). ErrorBoundary class component has no vibcoder analogue.
+ *
+ * Phase 5 disposition: ErrorBoundary stays regardless. ErrorState
+ * surface may compose vibcoder EmptyState + Button if we land an
+ * EmptyState shim in a future phase.
+ *
+ * @license BSD-3-Clause
+ */
+/**
  * Aquibra ErrorState Component
  * Professional error display with recovery options
  * @license BSD-3-Clause

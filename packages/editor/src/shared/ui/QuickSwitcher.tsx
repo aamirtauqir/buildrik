@@ -1,4 +1,19 @@
 /**
+ * Phase 4 T7 triage: keep-as-extension.
+ *
+ * Rationale: Composes Modal (T5 shim, inherits automatically), cmdk,
+ * and bespoke search ranking + recent-items provider. Orchestration
+ * layer above primitives, not a primitive itself. Vibcoder
+ * CommandPalette organism overlaps but with a different surface
+ * contract.
+ *
+ * Phase 5 disposition: reconsider migration onto vibcoder
+ * CommandPalette organism if a unifying surface contract is agreed.
+ * Until then this is the canonical Cmd+K shell.
+ *
+ * @license BSD-3-Clause
+ */
+/**
  * QuickSwitcher - Phase 3 UX Global Search & Navigation
  *
  * Extended from CommandPalette.tsx to become a unified Quick Switcher (Cmd+K).

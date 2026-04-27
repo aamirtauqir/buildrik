@@ -1,4 +1,18 @@
 /**
+ * Phase 4 T7 triage: keep-as-extension (composition).
+ *
+ * Rationale: Composes `Modal` (T5 shim — already inherited automatically
+ * via the local `./Modal` import on line 11) + `PremiumBadge` + 403
+ * event listener. Business orchestration above primitives, not a
+ * primitive itself. The visual surface already routes through the T5
+ * Modal -> Radix.Dialog swap with no codemod required.
+ *
+ * Phase 5 disposition: keep. Substrate (Modal, PremiumBadge) may
+ * evolve underneath without touching this file.
+ *
+ * @license BSD-3-Clause
+ */
+/**
  * UpgradeModal - Modal prompt for plan upgrades
  * Can be triggered by 403 responses or UI interactions.
  * Listens for "upgrade-modal-open" custom events.

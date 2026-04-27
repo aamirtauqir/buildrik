@@ -1,4 +1,16 @@
 /**
+ * Phase 4 T7 triage: keep-as-extension.
+ *
+ * Rationale: Drag-handle utility wrapper for resizable panels. No
+ * vibcoder Resizable / SplitPane primitive in the Phase 3 organism
+ * alphabet.
+ *
+ * Phase 5 disposition: reconsider if vibcoder ships a SplitPane /
+ * Resizable primitive; otherwise keep.
+ *
+ * @license BSD-3-Clause
+ */
+/**
  * Aquibra Resizable Panel
  * @license BSD-3-Clause
  */

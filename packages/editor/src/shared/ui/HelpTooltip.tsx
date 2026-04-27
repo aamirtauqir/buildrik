@@ -1,4 +1,17 @@
 /**
+ * Phase 4 T7 triage: keep-as-extension.
+ *
+ * Rationale: Cascades from Tooltip decision — composes the kept
+ * Tooltip extension with a "?" icon trigger. No vibcoder primitive
+ * covers this docs-link shape.
+ *
+ * Phase 5 disposition: when Tooltip ports (Radix.Tooltip-backed
+ * vibcoder Tooltip), port HelpTooltip in the same commit. Two
+ * consumers; trivial codemod.
+ *
+ * @license BSD-3-Clause
+ */
+/**
  * HelpTooltip Component
  * "What's this?" helper for complex properties
  * UX Audit 2026 - Task 9: Help tooltips for inspector

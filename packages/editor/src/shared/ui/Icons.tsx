@@ -1,4 +1,20 @@
 /**
+ * Phase 4 T7 triage: keep-as-extension.
+ *
+ * Rationale: Buildrik glyph palette — 869 lines of named element
+ * glyphs (IconLink, IconImage, IconForm, IconNavigation, etc.) over
+ * Lucide React. Distinct from the generic Icon atom shipped at T3.C
+ * (which wraps an arbitrary lucide-react component). These are
+ * pre-named domain icons used by the element library / sidebar /
+ * inspector. No vibcoder equivalent for this glyph set.
+ *
+ * Phase 5 disposition: keep. The vibcoder Icon atom is the right
+ * primitive for ad-hoc icon usage; this file is a domain palette
+ * orthogonal to the primitive.
+ *
+ * @license BSD-3-Clause
+ */
+/**
  * Aquibra Icon Components
  * Professional SVG icons using Lucide React
  *

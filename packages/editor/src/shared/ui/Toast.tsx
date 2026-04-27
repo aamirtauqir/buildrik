@@ -1,4 +1,20 @@
 /**
+ * Phase 4 T7 triage: keep-as-extension.
+ *
+ * Rationale: Phase 3 dropped @radix-ui/react-toast at commit 0fc750c.
+ * Vibcoder Toast is a passive surface only — no provider, no queue,
+ * no auto-dismiss, no module-level HMR-persistent store. The legacy
+ * Toast provides ToastProvider + useToast hook + queue/dedupe + HMR
+ * persistence — full provider/queue API the vibcoder surface lacks.
+ * 26 direct consumers (heavily used).
+ *
+ * Phase 5 disposition: reconsider only if NotificationCenter organism
+ * gains a queue + provider API matching this surface contract.
+ * Otherwise legacy stays indefinitely.
+ *
+ * @license BSD-3-Clause
+ */
+/**
  * Aquibra Toast/Notification Component
  * @license BSD-3-Clause
  *

@@ -1,4 +1,17 @@
 /**
+ * Phase 4 T7 triage: keep-as-extension.
+ *
+ * Rationale: Triple-export module (InfoBanner + Tip + WarningBanner) —
+ * standardized in-panel guidance with dismiss + variant scaffolding.
+ * No vibcoder banner / callout / alert primitive in the Phase 3
+ * organism alphabet.
+ *
+ * Phase 5 disposition: reconsider if vibcoder ships a Banner /
+ * Callout primitive; otherwise keep.
+ *
+ * @license BSD-3-Clause
+ */
+/**
  * InfoBanner — Standardized in-panel guidance components.
  * Three variants: InfoBanner (panel messages), Tip (inline hints), Warning.
  * @license BSD-3-Clause
