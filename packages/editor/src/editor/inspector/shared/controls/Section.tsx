@@ -6,7 +6,6 @@
 
 import { ChevronDown } from "lucide-react";
 import * as React from "react";
-import type { IconName } from "../../../../shared/ui";
 
 // ============================================================================
 // TYPES
@@ -16,7 +15,7 @@ export type SectionTier = "primary" | "secondary" | "tertiary";
 
 export interface SectionProps {
   title: string;
-  icon?: string | IconName;
+  icon?: string;
   defaultOpen?: boolean;
   isOpen?: boolean;
   onToggle?: (isOpen: boolean) => void;

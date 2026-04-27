@@ -166,6 +166,7 @@
     "packages/editor/src/shared/forms/NumberField.tsx",
     "packages/editor/src/shared/forms/SelectField.tsx",
     "packages/editor/src/shared/ui/Accordion.tsx",
+    "packages/editor/src/shared/ui/Badge.tsx",
     "packages/editor/src/shared/ui/Card.tsx",
     "packages/editor/src/shared/ui/CopyButton.tsx",
     "packages/editor/src/shared/ui/ErrorMessage.tsx",

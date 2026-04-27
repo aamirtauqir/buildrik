@@ -27,6 +27,7 @@ export {
   type ContextMenuItem,
 } from "./ContextMenu";
 export { Spinner, type SpinnerProps } from "./Spinner";
+export { Badge, type BadgeProps } from "./Badge";
 export { Kbd, type KbdProps } from "./Kbd";
 export { Popover, type PopoverProps } from "./Popover";
 export { Resizable, type ResizableProps } from "./Resizable";
