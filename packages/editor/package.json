@@ -17,7 +17,7 @@
     "vibcoder:pin": "bun scripts/vibcoder-bundle-pin.mjs",
     "vibcoder:test": "vitest run scripts/__tests__/vibcoder-codemod.test.mjs",
     "vibcoder:vendor": "bash scripts/vibcoder-vendor.sh",
-    "codemod:phase4": "pnpm codemod:phase4:button && pnpm codemod:phase4:input && pnpm codemod:phase4:select && pnpm codemod:phase4:switch && pnpm codemod:phase4:checkbox && pnpm codemod:phase4:slider && pnpm codemod:phase4:spinner && pnpm codemod:phase4:skeleton && pnpm codemod:phase4:icon && pnpm codemod:phase4:icon-button && pnpm codemod:phase4:kbd && pnpm codemod:phase4:badge && pnpm codemod:phase4:card && pnpm codemod:phase4:tabs && pnpm codemod:phase4:form-field && pnpm codemod:phase4:panel-header && pnpm codemod:phase4:modal && pnpm codemod:phase4:popover",
+    "codemod:phase4": "pnpm codemod:phase4:button && pnpm codemod:phase4:input && pnpm codemod:phase4:select && pnpm codemod:phase4:switch && pnpm codemod:phase4:checkbox && pnpm codemod:phase4:slider && pnpm codemod:phase4:spinner && pnpm codemod:phase4:skeleton && pnpm codemod:phase4:icon && pnpm codemod:phase4:icon-button && pnpm codemod:phase4:kbd && pnpm codemod:phase4:card && pnpm codemod:phase4:tabs && pnpm codemod:phase4:form-field && pnpm codemod:phase4:panel-header && pnpm codemod:phase4:modal && pnpm codemod:phase4:popover",
     "codemod:phase4:popover": "jscodeshift -t scripts/codemods/phase4/popover.ts --extensions=ts,tsx --parser=tsx src/editor/",
     "codemod:phase4:modal": "jscodeshift -t scripts/codemods/phase4/modal.ts --extensions=ts,tsx --parser=tsx src/editor/",
     "codemod:phase4:card": "jscodeshift -t scripts/codemods/phase4/card.ts --extensions=ts,tsx --parser=tsx src/editor/",
@@ -34,8 +34,7 @@
     "codemod:phase4:skeleton": "jscodeshift -t scripts/codemods/phase4/skeleton.ts --extensions=ts,tsx --parser=tsx src/editor/",
     "codemod:phase4:icon": "jscodeshift -t scripts/codemods/phase4/icon.ts --extensions=ts,tsx --parser=tsx src/editor/",
     "codemod:phase4:icon-button": "jscodeshift -t scripts/codemods/phase4/icon-button.ts --extensions=ts,tsx --parser=tsx src/editor/",
-    "codemod:phase4:kbd": "jscodeshift -t scripts/codemods/phase4/kbd.ts --extensions=ts,tsx --parser=tsx src/editor/",
-    "codemod:phase4:badge": "jscodeshift -t scripts/codemods/phase4/badge.ts --extensions=ts,tsx --parser=tsx src/editor/"
+    "codemod:phase4:kbd": "jscodeshift -t scripts/codemods/phase4/kbd.ts --extensions=ts,tsx --parser=tsx src/editor/"
   },
   "dependencies": {
     "@buildrik/shared": "workspace:*",
