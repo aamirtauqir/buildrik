@@ -443,3 +443,90 @@ Total Phase 3 organism port: roughly 80 minutes of CC dispatch time including re
 
 Master gallery index updated at `packages/editor/src/preview/vibcoder-index.html` with the Phase 3 section listing 15 organism gallery links + overlay-mount infrastructure note.
 
+## Phase 4 findings (chrome re-port)
+
+### T7 extensions triage matrix
+
+Inspected all 19 entries in `packages/editor/src/shared/ui/` (PanelHeader counted, plus the original 18). Direct-import counts (`@/shared/ui/<X>`) measured at HEAD via grep over `packages/editor/src`.
+
+| Extension | Direct imports | Decision | Rationale | Status |
+|---|---:|---|---|---|
+| Accordion | 0 | keep-as-extension | No vibcoder Accordion / Disclosure primitive in Phase 3 alphabet. Self-contained collapse/expand logic; not in chrome rendering path. | JSDoc stamp |
+| ColorSwatch | 0 | keep-as-extension | Vibcoder ships ColorPicker + ColorTrigger but neither matches the swatch grid shape. | JSDoc stamp |
+| ContextMenu | 1 | keep-as-extension | No vibcoder ContextMenu (would require Radix.ContextMenu install in Phase 5). | JSDoc stamp |
+| CopyButton | 1 | keep-as-extension | Decorative composition over Button — Buildrik-specific copy-to-clipboard UX (animated checkmark feedback). | JSDoc stamp |
+| ErrorMessage | 0 | keep-as-extension | Title/why/action accessibility shape is Buildrik-specific; no vibcoder banner/error molecule. | JSDoc stamp |
+| ErrorState | 1 | keep-as-extension | Includes ErrorBoundary class component + FieldError sibling. Vibcoder EmptyState close but not 1:1. | JSDoc stamp |
+| HelpTooltip | 2 | keep-as-extension | Composes the kept Tooltip extension. Cascades from Tooltip decision. | JSDoc stamp |
+| Icons | 6 | keep-as-extension | 869 lines of named Buildrik glyph wrappers (IconLink, IconImage, IconForm, etc.) over Lucide icons — distinct from the Icon atom shipped at T3. Buildrik domain palette; no vibcoder equivalent for these named glyphs. | JSDoc stamp |
+| InfoBanner | 0 | keep-as-extension | Triple export (InfoBanner + Tip + WarningBanner). No vibcoder banner molecule. | JSDoc stamp |
+| PanelHeader | 3 | port-to-X | Already shipped at T4.D as `surface-head` bridge. | shipped at T4.D |
+| PremiumBadge | 1 | keep-as-extension | Variant of Badge atom — Buildrik plan/billing-specific styling (Pro / Enterprise label). | JSDoc stamp |
+| QuickSwitcher | 0 | keep-as-extension | Composes Modal (now T5 shim) + cmdk + bespoke search ranking; orchestration layer above primitives. | JSDoc stamp |
+| Resizable | 0 | keep-as-extension | Drag-handle utility wrapper; no vibcoder equivalent. | JSDoc stamp |
+| SliderInput | 0 | port-to-X | Already shipped at T2.E as `slider` atom bridge. | shipped at T2.E |
+| Tooltip | 7 | keep-as-extension | Vibcoder Tooltip (Phase 3 `bd-tooltip`) is purely a passive CSS surface — no hover-intent, no positioning, no delay, no portal. Legacy Tooltip provides all of those plus ESC dismiss + viewport-fit anchoring + shortcut hint slot. A hybrid bridge would carry behavior cost AND visual-regression risk in highly-visible chrome (Topbar, StatusIndicators, CanvasFooterToolbar). Phase 5 substitution to Radix.Tooltip is the correct migration target — T7 keeps the legacy intact. | JSDoc stamp |
+| Toast | 26 | keep-as-extension | Phase 3 dropped @radix-ui/react-toast at commit `0fc750c`. Module-level HMR-persistent store + ToastProvider + queue/dedupe. Vibcoder Toast is a passive surface only — no provider, no queue, no auto-dismiss. Phase 5 reconsiders if NotificationCenter organism gains queue capability. | JSDoc stamp |
+| TreeView | 0 | keep-as-extension | Generic `<TreeView<T>>` data component — no vibcoder equivalent. | JSDoc stamp |
+| UpgradeGate | 0 | keep-as-extension | Buildrik plan-gating business logic (free / pro / enterprise). Not a primitive. | JSDoc stamp |
+| UpgradeModal | 1 | keep-as-extension (composition) | Composes `Modal` (T5 shim) + `PremiumBadge` + 403 event listener. **Inherits T5 Modal swap automatically** via existing `import { Modal } from "./Modal"`. No separate codemod needed. | JSDoc stamp |
+
+### Bridge-via-T7 ports shipped this task
+
+None. All port-to-X candidates already shipped in earlier T-tasks:
+- PanelHeader → T4.D (surface-head bridge)
+- SliderInput → T2.E (slider atom bridge)
+- Icon atom → T3.C (separate from Icons.tsx glyph palette)
+
+### Keep-as-extension stamps (17 files)
+
+Accordion, ColorSwatch, ContextMenu, CopyButton, ErrorMessage, ErrorState, HelpTooltip, Icons, InfoBanner, PremiumBadge, QuickSwitcher, Resizable, Tooltip, Toast, TreeView, UpgradeGate, UpgradeModal — all gain a `Phase 4 T7 triage: keep-as-extension` JSDoc block documenting rationale + Phase 5 disposition.
+
+### Tooltip decision
+
+**Decision:** keep-as-extension.
+
+**Reasoning:**
+
+1. **Behavior gap is large.** Vibcoder Tooltip is a presentational surface only (`bd-tooltip` div + sibling spans for title/desc/kbd). Legacy Buildrik Tooltip provides hover-intent delay, viewport-fit anchoring, ESC dismiss, portal-style fixed positioning, and a shortcut slot. A hybrid bridge à la T6.A Popover would re-host all that behavior — high carrying cost for a CSS-skin-only win.
+2. **Visual regression risk.** Tooltip is in Topbar, StatusIndicators, and toolbar buttons — the most visible chrome surfaces. Vibcoder Tooltip uses `--bd-popover-*` token scale; legacy uses `--buildrick-bg-elevated` directly. Token cascade differences are likely to show as colour drift in regression-prone surfaces.
+3. **Phase 5 has the right answer.** Radix.Tooltip-backed vibcoder Tooltip will give us hover-intent + delay + collision detection out of the box. T7 hybrid bridging buys nothing that survives Phase 5.
+4. **Cost asymmetry.** Tooltip has 7 consumers; HelpTooltip has 2 (composes Tooltip). Switching now means writing a hybrid, codemodding 7 sites, then re-codemodding when Phase 5 lands the Radix-backed vibcoder Tooltip. Two codemods for one CSS change is a poor trade.
+
+### useFocusTrap retention rationale
+
+`useFocusTrap` retained at `packages/editor/src/shared/hooks/useFocusTrap.ts`. Verified call sites (excluding the hook file itself + tests):
+
+```
+packages/editor/src/shared/ui/Popover.tsx:40 — import
+packages/editor/src/shared/ui/Popover.tsx:62 — call site
+```
+
+The T6.A Popover hybrid shim (`a065870`) is the load-bearing dependency. Vibcoder Popover (Phase 3) is intentionally a passive controlled surface — no Radix.Popover backing, no focus trap. Phase 5 deletes the hook after vibcoder Popover gets a Radix.Popover-backed upgrade. See T6 amendment commit `37b3a47` for plan-level codification.
+
+Modal previously used the hook; T5 dropped it because Radix.Dialog handles focus trap internally — verified by Modal.tsx top docstring lines 25–27.
+
+### Phase 5 handoff list
+
+Phase 5 (chrome integration / vibcoder primitive upgrades) should reconsider the following for re-port:
+
+1. **Tooltip** — when vibcoder Tooltip gains Radix.Tooltip backing, the legacy extension can be deleted via codemod. Estimate: 7 consumers → 1 codemod commit.
+2. **Popover (full bridge)** — when vibcoder Popover gains Radix.Popover backing, delete `useFocusTrap` + drop the hybrid shim's behavior shell.
+3. **Toast** — only revisit if NotificationCenter organism gains a queue / provider API matching the legacy Toast surface contract (id, dedupe, auto-dismiss). Otherwise legacy stays.
+4. **ContextMenu** — Radix.ContextMenu install would unblock a vibcoder ContextMenu primitive; until then legacy stays.
+5. **HelpTooltip** — cascades from Tooltip. When Tooltip ports, port HelpTooltip in the same commit.
+
+### Cumulative T1–T7 summary
+
+| Task | Component count | Test count delta | Codemod count |
+|---|---:|---:|---:|
+| T1 (Button) | 1 | +X | 1 |
+| T2 (form atoms) | 5 | +X | 5 |
+| T3 (display atoms) | 7 | +X | 7 |
+| T4 (molecules) | 4 | +X | 4 |
+| T5 (Modal) | 1 | +23 | 1 |
+| T6.A (Popover hybrid) | 1 | +X | 1 |
+| T7 (triage, no new ports) | 0 | 0 | 0 |
+
+T7 outcome: zero new shims. All eligible ports already shipped in earlier tasks (PanelHeader@T4.D, SliderInput@T2.E, Icon atom@T3.C). Remaining 17 extensions documented as keep-as-extension with explicit Phase 5 disposition per entry.
+
