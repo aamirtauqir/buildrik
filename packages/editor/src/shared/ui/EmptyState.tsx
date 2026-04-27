@@ -158,7 +158,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             <Button
               variant={action.variant || "primary"}
               size={size === "lg" ? "md" : "sm"}
-              onClick={action.onClick}>
+              onClick={action.onClick}
+            >
+              {action.icon}
               {action.label}
             </Button>
           )}

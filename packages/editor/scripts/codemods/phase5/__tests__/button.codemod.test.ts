@@ -109,4 +109,22 @@ describe("phase5/button codemod — Button shim deletion", () => {
     const result = runCodemod(transform, "/fake/src/editor/__tests__/Foo.test.tsx", before);
     expect(result).toBe(before);
   });
+
+  it("merges fullWidth + style={varName} (identifier) via Object.assign — width first", () => {
+    const before = `import { Button } from "@/shared/ui/Button";\nconst s = { color: "red" };\nexport const X = () => <Button fullWidth style={s}>Wide</Button>;`;
+    const result = runCodemod(transform, FAKE_PATH, before);
+    expect(result).not.toContain("fullWidth");
+    expect(result).toContain("Object.assign(");
+    expect(result).toContain('width: "100%"');
+    expect(result).toContain("s)");
+  });
+
+  it("merges fullWidth + style={fn()} (call expression) via Object.assign — width first", () => {
+    const before = `import { Button } from "@/shared/ui/Button";\nexport const X = () => <Button fullWidth style={getStyles()}>Wide</Button>;`;
+    const result = runCodemod(transform, FAKE_PATH, before);
+    expect(result).not.toContain("fullWidth");
+    expect(result).toContain("Object.assign(");
+    expect(result).toContain('width: "100%"');
+    expect(result).toContain("getStyles()");
+  });
 });
