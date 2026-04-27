@@ -70,6 +70,13 @@ describe("Card adapter shim (bridge to vibcoder)", () => {
     expect(onClick).toHaveBeenCalledOnce();
   });
 
+  it("clickable=false (default) does NOT fire onClick (parity with role/tabIndex)", () => {
+    const onClick = vi.fn();
+    const { container } = render(<Card onClick={onClick}>x</Card>);
+    fireEvent.click(container.querySelector(".bd-card") as HTMLElement);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
   it("forwards className composed with bd-card", () => {
     const { container } = render(<Card className="extra">x</Card>);
     const root = container.querySelector(".bd-card") as HTMLElement;

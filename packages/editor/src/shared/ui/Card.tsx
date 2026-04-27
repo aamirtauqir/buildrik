@@ -22,9 +22,9 @@
  *   hoverable     → marker className "is-hoverable" (no inline transform).
  *   clickable     → adds role="button", tabIndex=0, and forwards onClick to
  *                   vibcoder Card root. Marker className "is-clickable".
- *   onClick       → forwarded to vibcoder Card root (also when clickable=false
- *                   for prop-pass-through symmetry — vibcoder root accepts any
- *                   HTMLAttributes<HTMLDivElement>).
+ *   onClick       → forwarded to vibcoder Card root only when clickable=true
+ *                   (parity with role/tabIndex semantics — non-interactive
+ *                   cards never fire onClick).
  *   className     → composed with vibcoder root's className.
  *   style         → forwarded as-is.
  *
@@ -114,7 +114,7 @@ export const Card: React.FC<CardProps> = ({
       flush={flush}
       className={mergedClassName}
       style={style}
-      onClick={clickable ? onClick : onClick}
+      onClick={clickable ? onClick : undefined}
       role={clickable ? "button" : undefined}
       tabIndex={clickable ? 0 : undefined}
     >
