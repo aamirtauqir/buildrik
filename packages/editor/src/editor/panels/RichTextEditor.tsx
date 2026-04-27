@@ -1,4 +1,4 @@
-import { Select } from "@/shared/ui/Select";
+import { Select } from "@/editor/shared/vibcoder/Select";
 import { TextInput } from "@/shared/ui/TextInput";
 /**
  * Aquibra Rich Text Editor

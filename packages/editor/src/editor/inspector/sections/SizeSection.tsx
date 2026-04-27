@@ -1,4 +1,4 @@
-import { Select } from "@/shared/ui/Select";
+import { Select } from "@/editor/shared/vibcoder/Select";
 import { Button } from "@/shared/ui/Button";
 /**
  * Size Section - Width, Height, Min/Max dimensions

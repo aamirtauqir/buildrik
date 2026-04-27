@@ -1,5 +1,5 @@
 import { Checkbox } from "@/shared/ui/Checkbox";
-import { Select } from "@/shared/ui/Select";
+import { Select } from "@/editor/shared/vibcoder/Select";
 import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
