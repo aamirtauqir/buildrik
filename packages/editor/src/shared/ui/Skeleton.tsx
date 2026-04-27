@@ -1,9 +1,24 @@
+// PHASE 5 DELETE — Phase 4 adapter shim. Legacy/vibcoder shapes diverge;
+// translation deferred. The legacy file ships compound exports
+// (StudioSkeleton, SkeletonText, SkeletonAvatar, SkeletonCard,
+// SkeletonListItem, SkeletonTable, LoadingOverlay) that vibcoder doesn't
+// have — Phase 5 will decompose these into vibcoder Skeleton primitive
+// calls or move them to layout-level components.
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
  *
  * Aquibra Skeleton/Loading State Components
  * Professional loading placeholders with animation
+ *
+ * Legacy prop surface (preserved by this shim):
+ *   width, height: number | string
+ *   radius: "none" | "sm" | "md" | "lg" | "full"
+ *   animation: "pulse" | "wave" | "none"
+ *
+ * Vibcoder Skeleton has shape (rect/line/circle) + size (xs/sm/lg) +
+ * derives width from `style`. Translation lands in Phase 5.
+ *
  * @license BSD-3-Clause
  */
 

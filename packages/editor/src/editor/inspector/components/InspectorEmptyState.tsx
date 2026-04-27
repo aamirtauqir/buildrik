@@ -1,3 +1,4 @@
+import { Kbd } from "@/shared/ui/Kbd";
 import { Button } from "@/shared/ui/Button";
 /* @lint-hex-policy: component-theme
    "Template applied!" success banner uses a slightly brighter emerald than
@@ -116,9 +117,9 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
       </div>
       {/* Keyboard Tips */}
       <div style={tipStyle}>
-        <span style={{ opacity: 0.7 }}>Tip:</span> Press <kbd style={kbdStyle}>A</kbd> to open Build
+        <span style={{ opacity: 0.7 }}>Tip:</span> Press <Kbd style={kbdStyle}>A</Kbd> to open Build
         panel{" · "}
-        <kbd style={kbdStyle}>Esc</kbd> to deselect
+        <Kbd style={kbdStyle}>Esc</Kbd> to deselect
       </div>
     </div>
   );

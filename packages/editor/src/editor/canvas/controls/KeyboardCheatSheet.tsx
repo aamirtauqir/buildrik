@@ -1,3 +1,4 @@
+import { Kbd } from "@/shared/ui/Kbd";
 import { Button } from "@/shared/ui/Button";
 /**
  * Keyboard Shortcuts Cheat Sheet
@@ -99,7 +100,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
  * Renders a single keyboard key badge
  */
 const KeyBadge: React.FC<{ keyName: string }> = ({ keyName }) => (
-  <kbd
+  <Kbd
     style={{
       display: "inline-flex",
       alignItems: "center",
@@ -118,7 +119,7 @@ const KeyBadge: React.FC<{ keyName: string }> = ({ keyName }) => (
     }}
   >
     {keyName}
-  </kbd>
+  </Kbd>
 );
 
 /**

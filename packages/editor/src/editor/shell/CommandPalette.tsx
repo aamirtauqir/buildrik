@@ -1,3 +1,4 @@
+import { Kbd } from "@/shared/ui/Kbd";
 import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
@@ -183,7 +184,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
               fontFamily: "inherit",
             }}
           />
-          <kbd
+          <Kbd
             style={{
               padding: "2px 6px",
               background: "var(--buildrick-bg-subtle)",
@@ -195,7 +196,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
             }}
           >
             Esc
-          </kbd>
+          </Kbd>
         </div>
 
         {/* Results */}
@@ -257,7 +258,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
                       <span>{action.label}</span>
                     </div>
                     {action.shortcut && (
-                      <kbd
+                      <Kbd
                         style={{
                           padding: "2px 6px",
                           background: isActive ? "var(--bd-accent-tint)" : "var(--bd-bg-panel)",
@@ -271,7 +272,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
                         }}
                       >
                         {action.shortcut}
-                      </kbd>
+                      </Kbd>
                     )}
                   </Button>
                 );
@@ -297,7 +298,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
             { key: "Esc", label: "close" },
           ].map(({ key, label }) => (
             <span key={key} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "var(--buildrick-text-tertiary)" }}>
-              <kbd
+              <Kbd
                 style={{
                   padding: "1px 5px",
                   background: "var(--buildrick-bg-panel)",
@@ -309,7 +310,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
                 }}
               >
                 {key}
-              </kbd>
+              </Kbd>
               {label}
             </span>
           ))}

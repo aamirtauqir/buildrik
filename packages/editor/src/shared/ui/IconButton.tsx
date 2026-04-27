@@ -1,3 +1,10 @@
+// PHASE 5 DELETE — Phase 4 adapter shim. Legacy/vibcoder shapes diverge;
+// translation deferred. Legacy IconButton: `icon` (ReactNode) +
+// `tooltip` + `variant: 'ghost'|'subtle'|'solid'` + `active` + `rounded`.
+// Vibcoder IconButton: `children` + `variant: 'ghost'|'primary'|'accent'|'danger'`
+// + `pressed`. Translation needs a tooltip wrapper, an `active`→`pressed`
+// rename, and a variant-union remap. Phase 5 will land this; until then
+// the shim is the canonical import route.
 /**
  * IconButton — compact button for toolbar actions + inspector controls.
  *

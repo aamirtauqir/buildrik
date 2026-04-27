@@ -1,3 +1,8 @@
+// PHASE 5 DELETE — Phase 4 adapter shim. Legacy/vibcoder shapes diverge;
+// translation deferred. Legacy Kbd: `size: 'sm' | 'md'`; vibcoder Kbd:
+// `size: 'xs'` + `variant: 'bare' | 'inverted'`. Translation will land
+// alongside Phase 5 chrome migration; until then the legacy
+// implementation stays as the canonical import route.
 /**
  * Kbd — keyboard hint pill (mono font, subtle bg, thin border).
  *
@@ -12,10 +17,9 @@
 import * as React from "react";
 import styled from "@emotion/styled";
 
-export interface KbdProps {
+export interface KbdProps extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactNode;
   size?: "sm" | "md";
-  className?: string;
 }
 
 const Key = styled.kbd<{ s: NonNullable<KbdProps["size"]> }>`
@@ -35,9 +39,11 @@ const Key = styled.kbd<{ s: NonNullable<KbdProps["size"]> }>`
   font-variant-numeric: tabular-nums;
 `;
 
-export const Kbd: React.FC<KbdProps> = ({ children, size = "md", className }) => {
+// Spread `...rest` (style, id, role, aria-*, data-*) so codemod-rewritten
+// `<kbd style={...}>` → `<Kbd style={...}>` consumers preserve inline styles.
+export const Kbd: React.FC<KbdProps> = ({ children, size = "md", ...rest }) => {
   return (
-    <Key s={size} className={className}>
+    <Key s={size} {...rest}>
       {children}
     </Key>
   );

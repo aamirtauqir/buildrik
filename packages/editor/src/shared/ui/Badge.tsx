@@ -1,3 +1,11 @@
+// PHASE 5 DELETE — Phase 4 adapter shim. Legacy/vibcoder shapes diverge;
+// translation deferred. Legacy Badge variants:
+// `default|primary|success|warning|error|info`. Vibcoder Badge variants:
+// `published|draft|issues|unsaved|syncing|new|premium|count`. The two
+// unions are semantically different (legacy = generic status palette;
+// vibcoder = chrome-specific page/document states). Translation will
+// land alongside Phase 5 chrome migration; consumers in `src/ai/`,
+// `src/templates/` keep using the legacy semantic palette in the meantime.
 /**
  * Badge — pill-shaped label for status/counter/tag.
  *

@@ -1,3 +1,4 @@
+import { Kbd } from "@/shared/ui/Kbd";
 import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
@@ -145,7 +146,7 @@ export function SlimLauncher({
       >
         <Search size={14} className="sl-search__icon" />
         <span className="sl-search__ghost">Search media…</span>
-        <kbd className="sl-search__kbd">⌘K</kbd>
+        <Kbd className="sl-search__kbd">⌘K</Kbd>
       </div>
       {recent.length > 0 ? (
         <section className="sl-strip" aria-label="Recent uploads">

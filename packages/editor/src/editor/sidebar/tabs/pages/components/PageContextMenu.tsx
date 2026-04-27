@@ -1,3 +1,4 @@
+import { Kbd } from "@/shared/ui/Kbd";
 import { Button } from "@/shared/ui/Button";
 /**
  * PageContextMenu — portal context menu for page actions.
@@ -107,7 +108,7 @@ export const PageContextMenu: React.FC<Props> = ({
         tabIndex={-1}
         onClick={() => act(() => onRename(pageId))}
       >
-        Rename <kbd>F2</kbd>
+        Rename <Kbd>F2</Kbd>
       </Button>
       <Button
         type="button"
@@ -116,7 +117,7 @@ export const PageContextMenu: React.FC<Props> = ({
         tabIndex={-1}
         onClick={() => act(() => onDuplicate(pageId))}
       >
-        Duplicate <kbd>⌘D</kbd>
+        Duplicate <Kbd>⌘D</Kbd>
       </Button>
       {!isHome && (
         <Button
@@ -145,7 +146,7 @@ export const PageContextMenu: React.FC<Props> = ({
         tabIndex={-1}
         onClick={() => act(() => onSettings(pageId))}
       >
-        Page Settings <kbd>⌘,</kbd>
+        Page Settings <Kbd>⌘,</Kbd>
       </Button>
       <div className="bd-pg-menu-divider" role="separator" />
       <Button

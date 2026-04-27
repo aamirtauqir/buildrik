@@ -1,3 +1,4 @@
+import { Kbd } from "@/shared/ui/Kbd";
 import { Button } from "@/shared/ui/Button";
 /**
  * Delete Confirmation Modal
@@ -33,7 +34,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
         }}
       >
         Delete <strong>{elementLabel}</strong>? You can undo this with{" "}
-        <kbd style={{ fontFamily: "var(--buildrick-font-family-mono)", fontSize: "0.9em" }}>Ctrl+Z</kbd>.
+        <Kbd style={{ fontFamily: "var(--buildrick-font-family-mono)", fontSize: "0.9em" }}>Ctrl+Z</Kbd>.
       </p>
       <div style={{ display: "flex", gap: "var(--buildrick-space-3)", justifyContent: "flex-end" }}>
         <Button

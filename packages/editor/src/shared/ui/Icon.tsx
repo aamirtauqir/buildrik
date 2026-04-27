@@ -1,3 +1,9 @@
+// PHASE 5 DELETE — Phase 4 adapter shim. Legacy/vibcoder shapes diverge;
+// translation deferred. Legacy Icon takes a Lucide-library name union
+// (`keyof typeof LucideIcons`); vibcoder Icon takes a 41-glyph sprite-id
+// union and renders `<svg><use href="...#i-NAME">`. Translation requires
+// a name-mapping table per glyph. Phase 5 will migrate consumers and
+// retire the Lucide-name path.
 /**
  * Unified Icon Component
  * Standardized icon rendering using Lucide icons

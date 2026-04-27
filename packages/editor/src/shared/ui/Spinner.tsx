@@ -1,5 +1,19 @@
+// PHASE 5 DELETE — Phase 4 adapter shim. Legacy/vibcoder shapes diverge;
+// translation deferred. Marker reserves the file as the canonical
+// `@/shared/ui/Spinner` route during the Phase 4 → Phase 5 swap.
 /**
  * Aquibra Spinner Component
+ *
+ * Legacy prop surface (preserved by this shim):
+ *   size: "sm" | "md" | "lg" | number  (legacy — pixel-precise; vibcoder = "sm" | "lg")
+ *   color: string (legacy — vibcoder relies on CSS accent token, no color prop)
+ *   thickness: number (legacy — vibcoder uses fixed 2px border)
+ *
+ * Existing consumers (e.g., Button.tsx) pass `color="currentColor"` and a
+ * numeric `size`. Until Phase 5 lands a vibcoder-only Spinner, the legacy
+ * implementation stays — the shim's job here is to be the single import
+ * route (`@/shared/ui/Spinner`) so the codemod-emitted imports resolve.
+ *
  * @license BSD-3-Clause
  */
 

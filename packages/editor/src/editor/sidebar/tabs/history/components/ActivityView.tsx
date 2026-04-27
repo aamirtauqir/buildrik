@@ -1,3 +1,4 @@
+import { Kbd } from "@/shared/ui/Kbd";
 import { Button } from "@/shared/ui/Button";
 /**
  * ActivityView — Undo/redo activity timeline
@@ -446,17 +447,17 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
   const renderKeyboardHints = () => (
     <div className="keyboard-hints" aria-hidden="true">
       <span className="kbd-hint">
-        <kbd>j</kbd>
-        <kbd>k</kbd>
+        <Kbd>j</Kbd>
+        <Kbd>k</Kbd>
         navigate
       </span>
       <span className="kbd-hint">
-        <kbd>Enter</kbd>
+        <Kbd>Enter</Kbd>
         expand
       </span>
       <span className="kbd-hint">
-        <kbd>g</kbd>
-        <kbd>G</kbd>
+        <Kbd>g</Kbd>
+        <Kbd>G</Kbd>
         start/end
       </span>
     </div>
@@ -690,7 +691,7 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
           <p className="empty-hint">
             {historyStack.length === 0 ? (
               <>
-                Use <kbd>Ctrl+Z</kbd> to undo changes
+                Use <Kbd>Ctrl+Z</Kbd> to undo changes
               </>
             ) : (
               "Try a different search term"

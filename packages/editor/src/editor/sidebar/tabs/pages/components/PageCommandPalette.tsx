@@ -1,3 +1,4 @@
+import { Kbd } from "@/shared/ui/Kbd";
 import { TextInput } from "@/shared/ui/TextInput";
 /**
  * PageCommandPalette — Cmd+K fuzzy-search overlay for quick page navigation.
@@ -177,9 +178,9 @@ export const PageCommandPalette: React.FC<Props> = ({ pages, onSelect, onClose }
         </div>
 
         <div className="bd-pg-palette-footer">
-          <span><kbd>↑↓</kbd> navigate</span>
-          <span><kbd>↵</kbd> select</span>
-          <span><kbd>esc</kbd> close</span>
+          <span><Kbd>↑↓</Kbd> navigate</span>
+          <span><Kbd>↵</Kbd> select</span>
+          <span><Kbd>esc</Kbd> close</span>
         </div>
       </div>
     </div>
