@@ -1,9 +1,61 @@
+// PHASE 5 DELETE — Phase 4 adapter shim. Replaces hand-rolled Card.
 /**
- * Aquibra Card Component
+ * Adapter shim — translates legacy Card API to vibcoder Card sibling tree.
+ *
+ * Strategy: bridge. Renders `<VibcoderCard>` (`<div class="bd-card">`)
+ * internally and re-exports the sibling primitives so consumers keep
+ * importing `Card`, `CardHeader`, `CardBody`, `CardFooter` from the same
+ * shim path.
+ *
+ * Prop translations (Phase 4 T4.A mapping):
+ *   children      → forwarded as-is into vibcoder Card root.
+ *   variant       → "outlined" → vibcoder flush={true} (no shadow, bordered).
+ *                   "default"|"elevated"|"filled" → vibcoder default (no flush).
+ *                   Visual nuance for "elevated"/"filled" is dropped — vibcoder
+ *                   only ships base + flush; the legacy distinction was visual
+ *                   theming, not structural.
+ *   padding       → marker className "bd-card--pad-{sm|md|lg|none}" so callers
+ *                   migrating away from inline-padding still get a stable hook
+ *                   for future CSS targeting. Default "md" emits no marker.
+ *   radius        → marker className "bd-card--radius-{sm|md|lg|full|none}".
+ *                   Default "md" emits no marker.
+ *   hoverable     → marker className "is-hoverable" (no inline transform).
+ *   clickable     → adds role="button", tabIndex=0, and forwards onClick to
+ *                   vibcoder Card root. Marker className "is-clickable".
+ *   onClick       → forwarded to vibcoder Card root (also when clickable=false
+ *                   for prop-pass-through symmetry — vibcoder root accepts any
+ *                   HTMLAttributes<HTMLDivElement>).
+ *   className     → composed with vibcoder root's className.
+ *   style         → forwarded as-is.
+ *
+ * CardHeader translations:
+ *   children      → forwarded into bd-card__head.
+ *   action        → rendered as a flex-aligned right cluster inside the
+ *                   header (mirrors legacy "title left, action right" shape).
+ *
+ * CardBody translations:
+ *   children      → forwarded into bd-card__body.
+ *
+ * CardFooter translations:
+ *   children      → forwarded into bd-card__foot.
+ *   align         → marker className "bd-card__foot--align-{left|center|right|between}".
+ *                   Default "right" emits no marker (vibcoder __foot is right-
+ *                   aligned by default per molecules/card.css).
+ *
+ * Untranslatable: none currently throws. Visual richness from variant
+ * "elevated"/"filled" collapses to base flush styling — acceptable for
+ * Phase 4 (chrome consumers default to "default" or "outlined").
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import {
+  Card as VibcoderCard,
+  CardHeader as VibcoderCardHeader,
+  CardBody as VibcoderCardBody,
+  CardFooter as VibcoderCardFooter,
+} from "@/editor/shared/vibcoder";
 
 export interface CardProps {
   children: React.ReactNode;
@@ -45,93 +97,60 @@ export const Card: React.FC<CardProps> = ({
   className,
   style,
 }) => {
-  const paddingMap = { none: 0, sm: 8, md: 16, lg: 24 };
-  const radiusMap = { none: 0, sm: 4, md: 8, lg: 16, full: 9999 };
-
-  const variantStyles: Record<string, React.CSSProperties> = {
-    default: {
-      background: "var(--buildrick-bg-panel)",
-      border: "1px solid var(--buildrick-border)",
-    },
-    elevated: {
-      background: "var(--buildrick-bg-panel)",
-      boxShadow: "var(--buildrick-shadow-lg)",
-    },
-    outlined: {
-      background: "transparent",
-      border: "1px solid var(--buildrick-border)",
-    },
-    filled: {
-      background: "var(--buildrick-bg-panel-secondary)",
-    },
-  };
+  const flush = variant === "outlined";
+  const mergedClassName =
+    [
+      className,
+      padding !== "md" && `bd-card--pad-${padding}`,
+      radius !== "md" && `bd-card--radius-${radius}`,
+      hoverable && "is-hoverable",
+      clickable && "is-clickable",
+    ]
+      .filter(Boolean)
+      .join(" ") || undefined;
 
   return (
-    <div
-      className={`buildrick-card buildrick-card--${variant} ${className || ""}`}
-      onClick={clickable ? onClick : undefined}
-      style={{
-        ...variantStyles[variant],
-        padding: paddingMap[padding],
-        borderRadius: radiusMap[radius],
-        cursor: clickable ? "pointer" : "default",
-        transition: "all 0.2s ease",
-        ...(hoverable && {
-          ":hover": {
-            transform: "translateY(-2px)",
-            boxShadow: "var(--buildrick-shadow-xl)",
-          },
-        }),
-        ...style,
-      }}
+    <VibcoderCard
+      flush={flush}
+      className={mergedClassName}
+      style={style}
+      onClick={clickable ? onClick : onClick}
+      role={clickable ? "button" : undefined}
+      tabIndex={clickable ? 0 : undefined}
     >
       {children}
-    </div>
+    </VibcoderCard>
   );
 };
 
-export const CardHeader: React.FC<CardHeaderProps> = ({ children, action, className }) => (
-  <div
-    className={`buildrick-card-header ${className || ""}`}
-    style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: 12,
-    }}
-  >
-    <div style={{ fontWeight: 600, fontSize: 16 }}>{children}</div>
-    {action && <div>{action}</div>}
-  </div>
+export const CardHeader: React.FC<CardHeaderProps> = ({
+  children,
+  action,
+  className,
+}) => (
+  <VibcoderCardHeader className={className}>
+    <span style={{ flex: 1 }}>{children}</span>
+    {action && <span>{action}</span>}
+  </VibcoderCardHeader>
 );
 
 export const CardBody: React.FC<CardBodyProps> = ({ children, className }) => (
-  <div className={`buildrick-card-body ${className || ""}`}>{children}</div>
+  <VibcoderCardBody className={className}>{children}</VibcoderCardBody>
 );
 
-export const CardFooter: React.FC<CardFooterProps> = ({ children, align = "right", className }) => {
-  const alignMap = {
-    left: "flex-start",
-    center: "center",
-    right: "flex-end",
-    between: "space-between",
-  };
-
+export const CardFooter: React.FC<CardFooterProps> = ({
+  children,
+  align = "right",
+  className,
+}) => {
+  const mergedClassName =
+    [className, align !== "right" && `bd-card__foot--align-${align}`]
+      .filter(Boolean)
+      .join(" ") || undefined;
   return (
-    <div
-      className={`buildrick-card-footer ${className || ""}`}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: alignMap[align],
-        marginTop: 16,
-        paddingTop: 12,
-        borderTop: "1px solid var(--buildrick-border)",
-        gap: 8,
-      }}
-    >
+    <VibcoderCardFooter className={mergedClassName}>
       {children}
-    </div>
+    </VibcoderCardFooter>
   );
 };
 
