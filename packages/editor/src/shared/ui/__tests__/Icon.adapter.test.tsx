@@ -1,10 +1,14 @@
 /**
- * Phase 4 contract tests — verify Icon adapter shim still honors the
- * legacy Lucide-name prop surface.
+ * Phase 4 contract tests — verify Icon shim renders correctly under the
+ * keep-legacy strategy.
  *
- * Icon is a "keep legacy implementation" shim during Phase 4. Vibcoder
- * Icon takes a sprite-id union; legacy Icon takes a Lucide-library name.
- * Translation deferred to Phase 5.
+ * Strategy: keep-legacy (NOT a vibcoder bridge). The legacy Lucide-name
+ * union (~1000 names) has no 1:1 mapping to vibcoder's 41-glyph sprite,
+ * and throws-at-render would brick every consumer. See Icon.tsx top-of-file
+ * JSDoc for full reasoning + Phase 5 handoff requirements.
+ *
+ * These tests verify the canonical-import route resolves and that the
+ * legacy lucide-name path still renders.
  *
  * @license BSD-3-Clause
  */
@@ -12,7 +16,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
 import { Icon } from "../Icon";
 
-describe("Icon adapter shim (legacy implementation, Phase 4)", () => {
+describe("Icon shim (keep-legacy strategy)", () => {
   it("renders an svg with buildrick-icon class", () => {
     const { container } = render(<Icon name="Search" />);
     const svg = container.querySelector("svg");

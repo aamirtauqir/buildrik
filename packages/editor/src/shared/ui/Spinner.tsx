@@ -1,23 +1,36 @@
-// PHASE 5 DELETE — Phase 4 adapter shim. Legacy/vibcoder shapes diverge;
-// translation deferred. Marker reserves the file as the canonical
-// `@/shared/ui/Spinner` route during the Phase 4 → Phase 5 swap.
+// PHASE 5 DELETE — Phase 4 adapter shim. Replaces hand-rolled Spinner.
 /**
- * Aquibra Spinner Component
+ * Adapter shim — translates legacy Spinner API to vibcoder Spinner.
  *
- * Legacy prop surface (preserved by this shim):
- *   size: "sm" | "md" | "lg" | number  (legacy — pixel-precise; vibcoder = "sm" | "lg")
- *   color: string (legacy — vibcoder relies on CSS accent token, no color prop)
- *   thickness: number (legacy — vibcoder uses fixed 2px border)
+ * Strategy: bridge. Renders `<VibcoderSpinner>` (`<span class="bd-spinner">`)
+ * internally and maps the legacy prop surface onto vibcoder's narrower one.
  *
- * Existing consumers (e.g., Button.tsx) pass `color="currentColor"` and a
- * numeric `size`. Until Phase 5 lands a vibcoder-only Spinner, the legacy
- * implementation stays — the shim's job here is to be the single import
- * route (`@/shared/ui/Spinner`) so the codemod-emitted imports resolve.
+ * Prop translations (Phase 4 Q4 mapping):
+ *   size:
+ *     "sm"    → vibcoder size="sm"
+ *     "md"    → vibcoder undefined (base 14px — no modifier)
+ *     "lg"    → vibcoder size="lg"
+ *     number  → vibcoder undefined + style={{ width: N, height: N }}
+ *               (pixel-precise size — vibcoder doesn't model arbitrary px,
+ *               so we override the CSS-driven size with inline style)
+ *   color:
+ *     string  → style={{ color }} (vibcoder CSS uses `currentColor` for
+ *               the spinner border, so setting `color` cascades correctly)
+ *   thickness:
+ *     defined → throws-at-render. Vibcoder spinner uses a fixed 2px border
+ *               in the vendored CSS (atoms/spinner.css). There is no token
+ *               or modifier to vary the stroke width, and faking it via
+ *               inline style would mis-paint at non-default sizes.
+ *
+ * Existing consumers (e.g., Button.tsx) pass `size={n}` + `color="currentColor"`
+ * — both translate cleanly through inline style. Verified by
+ * Button.adapter.test.tsx's loading-state assertions.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { Spinner as VibcoderSpinner } from "@/editor/shared/vibcoder";
 
 export interface SpinnerProps {
   size?: "sm" | "md" | "lg" | number;
@@ -25,35 +38,36 @@ export interface SpinnerProps {
   thickness?: number;
 }
 
-const sizeMap = { sm: 16, md: 24, lg: 40 };
-
 export const Spinner: React.FC<SpinnerProps> = ({
   size = "md",
-  color = "var(--buildrick-accent)",
-  thickness = 2,
+  color,
+  thickness,
 }) => {
-  const pixelSize = typeof size === "number" ? size : sizeMap[size];
+  if (thickness !== undefined) {
+    throw new Error(
+      "Spinner: `thickness` prop is not translatable — vibcoder Spinner uses a fixed 2px border with no modifier or token override. Drop the prop or migrate the consumer to vibcoder Spinner directly."
+    );
+  }
 
-  return (
-    <svg
-      className="buildrick-spinner"
-      width={pixelSize}
-      height={pixelSize}
-      viewBox="0 0 24 24"
-      fill="none"
-      style={{ animation: "buildrick-spin 1s linear infinite" }}
-    >
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-        stroke={color}
-        strokeWidth={thickness}
-        strokeLinecap="round"
-        strokeDasharray="60 30"
-      />
-    </svg>
-  );
+  let mappedSize: "sm" | "lg" | undefined;
+  let pixelOverride: { width: number; height: number } | undefined;
+  if (typeof size === "number") {
+    mappedSize = undefined;
+    pixelOverride = { width: size, height: size };
+  } else if (size === "sm") {
+    mappedSize = "sm";
+  } else if (size === "lg") {
+    mappedSize = "lg";
+  } else {
+    mappedSize = undefined; // md = base default
+  }
+
+  const style: React.CSSProperties | undefined =
+    color || pixelOverride
+      ? { ...(color ? { color } : {}), ...(pixelOverride ?? {}) }
+      : undefined;
+
+  return <VibcoderSpinner size={mappedSize} style={style} />;
 };
 
 export default Spinner;

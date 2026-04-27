@@ -1,12 +1,23 @@
-// PHASE 5 DELETE — Phase 4 adapter shim. Legacy/vibcoder shapes diverge;
-// translation deferred. Legacy Icon takes a Lucide-library name union
-// (`keyof typeof LucideIcons`); vibcoder Icon takes a 41-glyph sprite-id
-// union and renders `<svg><use href="...#i-NAME">`. Translation requires
-// a name-mapping table per glyph. Phase 5 will migrate consumers and
-// retire the Lucide-name path.
+// PHASE 5 DELETE — Phase 4 adapter strategy: keep-legacy.
 /**
- * Unified Icon Component
- * Standardized icon rendering using Lucide icons
+ * Strategy: keep-legacy (NOT a vibcoder bridge).
+ *
+ * Why: legacy Icon takes a name from the lucide-react union (~1000 names);
+ * vibcoder Icon takes a name from a 41-glyph sprite. No 1:1 translation
+ * table exists, and no per-call mapping is possible without a domain model
+ * the shim layer doesn't have.
+ *
+ * Throws-at-render rejected: every consumer would brick on first render
+ * because the legacy lucide name is not in the vibcoder sprite. Silent
+ * fallback would render a wrong glyph silently — worse than a visible bug.
+ *
+ * Phase 5 handoff: this primitive cannot be migrated by file-deletion
+ * alone. Consumers must be rewritten to pick from the vibcoder sprite
+ * union (e.g., drop arbitrary lucide names; use an icon-mapping registry
+ * at call sites).
+ *
+ * Standardized icon rendering using Lucide icons.
+ *
  * @license BSD-3-Clause
  */
 

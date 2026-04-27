@@ -1,27 +1,58 @@
-// PHASE 5 DELETE — Phase 4 adapter shim. Legacy/vibcoder shapes diverge;
-// translation deferred. Legacy IconButton: `icon` (ReactNode) +
-// `tooltip` + `variant: 'ghost'|'subtle'|'solid'` + `active` + `rounded`.
-// Vibcoder IconButton: `children` + `variant: 'ghost'|'primary'|'accent'|'danger'`
-// + `pressed`. Translation needs a tooltip wrapper, an `active`→`pressed`
-// rename, and a variant-union remap. Phase 5 will land this; until then
-// the shim is the canonical import route.
+// PHASE 5 DELETE — Phase 4 adapter shim. Replaces hand-rolled IconButton.
 /**
- * IconButton — compact button for toolbar actions + inspector controls.
+ * Adapter shim — translates legacy IconButton API to vibcoder IconButton.
  *
- * Phase 2 primitive port (augment, props API preserved).
- * Previous impl used inline style objects, raw hex fallbacks, a background
- * gradient (gate violation), and useState-based hover. This version:
- * Emotion styled.button, --bd-* tokens, CSS :hover, flat background.
+ * Strategy: bridge. Renders `<VibcoderIconButton>`
+ * (`<button class="bd-icon-btn">`) internally and remaps the legacy variant
+ * union, the `icon`-prop slot model, and the `active`/`rounded` add-ons.
  *
- * Props preserved for existing consumers: icon, tooltip, ariaLabel, size,
- * variant, active, rounded, disabled, className, plus standard button attrs
- * via rest.
+ * Prop translations (Phase 4 Q4 mapping):
+ *   icon (ReactNode) → rendered as children of vibcoder IconButton
+ *                      (vibcoder uses `.bd-icon-btn > svg` for sizing —
+ *                      caller still supplies the inner glyph element).
+ *   tooltip (string) → wraps the vibcoder button in legacy `<Tooltip>`
+ *                      (vibcoder has a presentational `<Tooltip>` surface
+ *                      but no hover-intent overlay engine yet — Phase 6
+ *                      ports the overlay layer; the legacy Tooltip stays
+ *                      the canonical hover-intent wrapper meanwhile).
+ *                      Also passed as `aria-label` fallback when ariaLabel
+ *                      is unset, preserving prior accessibility behavior.
+ *   ariaLabel        → forwarded as `aria-label` (overrides tooltip text).
+ *   size:
+ *     "sm" → vibcoder size="sm"
+ *     "md" → vibcoder undefined (base default — no modifier)
+ *     "lg" → vibcoder size="lg"
+ *   variant:
+ *     "ghost"  → vibcoder variant="ghost"   (transparent → bg-subtle hover)
+ *     "subtle" → vibcoder variant="primary" (text-primary, hover bg-subtle —
+ *                closest match for "subtle" intent in vibcoder's union)
+ *     "solid"  → vibcoder variant="accent"  (most prominent / filled-feel
+ *                option; vibcoder has no true "solid" tone — accent is the
+ *                vendored CSS's strongest visual treatment)
+ *   active (boolean) → vibcoder pressed={active}. Always passed (not just
+ *                      when truthy) so `aria-pressed="false"` keeps emitting
+ *                      for the legacy contract (IconButton.test asserts
+ *                      both true and false branches). When true, also adds
+ *                      the vibcoder-defined "is-on" marker class (an explicit
+ *                      duplicate of `[aria-pressed="true"]` in icon-button.css)
+ *                      so the legacy classNames-differ contract holds.
+ *   rounded (boolean):
+ *     true  → adds marker className "is-rounded" + inline style
+ *             borderRadius: var(--buildrick-radius-full). Vibcoder has no
+ *             rounded modifier for icon-button; the marker class keeps the
+ *             className-distinctness contract green (legacy test asserts
+ *             rounded ≠ default classNames) while the inline style is the
+ *             actual visual mechanism.
+ *     false → no marker, no style override.
+ *
+ * Untranslatable: none currently. Throws-at-render reserved for future
+ * legacy props that have no vibcoder mapping.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
-import styled from "@emotion/styled";
+import { IconButton as VibcoderIconButton, type IconButtonVariant } from "@/editor/shared/vibcoder";
 import { Tooltip } from "./Tooltip";
 
 export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -35,62 +66,17 @@ export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEl
   rounded?: boolean;
 }
 
-type Size = NonNullable<IconButtonProps["size"]>;
-type Variant = NonNullable<IconButtonProps["variant"]>;
+const VARIANT_MAP: Record<NonNullable<IconButtonProps["variant"]>, IconButtonVariant> = {
+  ghost: "ghost",
+  subtle: "primary",
+  solid: "accent",
+};
 
-const sizePx: Record<Size, number> = { sm: 24, md: 32, lg: 44 };
-const iconPx: Record<Size, number> = { sm: 14, md: 16, lg: 20 };
-
-const Btn = styled.button<{ s: Size; v: Variant; a: boolean; r: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: ${(p) => sizePx[p.s]}px;
-  height: ${(p) => sizePx[p.s]}px;
-  border: none;
-  border-radius: ${(p) => (p.r ? "var(--buildrick-radius-full)" : "var(--buildrick-radius-md)")};
-  cursor: pointer;
-  transition: var(--buildrick-transition-colors);
-  flex-shrink: 0;
-  padding: 0;
-  background: ${(p) => {
-    if (p.a) return "var(--bd-accent-subtle)";
-    if (p.v === "subtle") return "var(--bd-bg-subtle)";
-    if (p.v === "solid") return "var(--bd-accent)";
-    return "transparent";
-  }};
-  color: ${(p) => {
-    if (p.a) return "var(--bd-accent)";
-    if (p.v === "solid") return "var(--bd-fg-on-accent)";
-    return "var(--bd-fg-secondary)";
-  }};
-
-  &:hover:not(:disabled) {
-    background: ${(p) => {
-      if (p.a) return "var(--bd-accent-subtle)";
-      if (p.v === "solid") return "var(--bd-accent-hover)";
-      return "var(--bd-bg-hover)";
-    }};
-    color: ${(p) => {
-      if (p.a) return "var(--bd-accent)";
-      if (p.v === "solid") return "var(--bd-fg-on-accent)";
-      return "var(--bd-fg-primary)";
-    }};
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-`;
-
-const IconSpan = styled.span<{ s: Size }>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: ${(p) => iconPx[p.s]}px;
-  height: ${(p) => iconPx[p.s]}px;
-`;
+const SIZE_MAP: Record<NonNullable<IconButtonProps["size"]>, "sm" | "md" | "lg"> = {
+  sm: "sm",
+  md: "md",
+  lg: "lg",
+};
 
 export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
   (
@@ -104,25 +90,33 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
       rounded = false,
       disabled,
       className,
+      style,
       ...props
     },
     ref
   ) => {
+    const mergedClassName =
+      [className, active && "is-on", rounded && "is-rounded"]
+        .filter(Boolean)
+        .join(" ") || undefined;
+    const mergedStyle: React.CSSProperties | undefined = rounded
+      ? { borderRadius: "var(--buildrick-radius-full)", ...style }
+      : style;
+
     const button = (
-      <Btn
+      <VibcoderIconButton
         ref={ref}
-        s={size}
-        v={variant}
-        a={active}
-        r={rounded}
+        variant={VARIANT_MAP[variant]}
+        size={SIZE_MAP[size]}
+        pressed={active}
         disabled={disabled}
-        aria-pressed={active}
         aria-label={ariaLabel || tooltip}
-        className={className}
+        className={mergedClassName}
+        style={mergedStyle}
         {...props}
       >
-        <IconSpan s={size}>{icon}</IconSpan>
-      </Btn>
+        {icon}
+      </VibcoderIconButton>
     );
 
     if (tooltip) {

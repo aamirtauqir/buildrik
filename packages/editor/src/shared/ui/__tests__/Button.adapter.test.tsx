@@ -24,12 +24,12 @@ describe("Button adapter shim", () => {
 
   it("renders Spinner when loading=true", () => {
     const { container } = render(<Button loading>Save</Button>);
-    expect(container.querySelector(".buildrick-spinner")).not.toBeNull();
+    expect(container.querySelector(".bd-spinner")).not.toBeNull();
   });
 
   it("does NOT render Spinner when loading=false", () => {
     const { container } = render(<Button>Save</Button>);
-    expect(container.querySelector(".buildrick-spinner")).toBeNull();
+    expect(container.querySelector(".bd-spinner")).toBeNull();
   });
 
   it("applies fullWidth as inline style width:100%", () => {

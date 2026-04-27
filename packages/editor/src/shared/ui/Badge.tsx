@@ -1,12 +1,26 @@
-// PHASE 5 DELETE — Phase 4 adapter shim. Legacy/vibcoder shapes diverge;
-// translation deferred. Legacy Badge variants:
-// `default|primary|success|warning|error|info`. Vibcoder Badge variants:
-// `published|draft|issues|unsaved|syncing|new|premium|count`. The two
-// unions are semantically different (legacy = generic status palette;
-// vibcoder = chrome-specific page/document states). Translation will
-// land alongside Phase 5 chrome migration; consumers in `src/ai/`,
-// `src/templates/` keep using the legacy semantic palette in the meantime.
+// PHASE 5 DELETE — Phase 4 adapter strategy: keep-legacy.
 /**
+ * Strategy: keep-legacy (NOT a vibcoder bridge).
+ *
+ * Why: legacy Badge variant union is a semantic palette
+ * (`default | primary | success | warning | error | info`).
+ * Vibcoder Badge variant union is chrome-specific state
+ * (`published | draft | issues | unsaved | syncing | new | premium | count`).
+ * The two are semantically disjoint — there is no honest mapping from a
+ * "success" badge to a "published" badge, or from a "warning" badge to
+ * "syncing".
+ *
+ * Throws-at-render rejected: consumers in `src/ai/` + `src/templates/` use
+ * the legacy semantic union heavily. Throwing at the variant boundary
+ * would brick those features at first render.
+ *
+ * Phase 5 handoff: this primitive cannot be migrated by file-deletion
+ * alone. Either: (a) consumers in src/ai/ + src/templates/ are rewritten
+ * to use vibcoder's chrome-state union (likely impossible — wrong domain),
+ * (b) vibcoder gains a parallel "semantic" Badge primitive, or (c) legacy
+ * Badge is renamed to SemanticBadge and kept indefinitely with the chrome
+ * Badge as a separate import path.
+ *
  * Badge — pill-shaped label for status/counter/tag.
  *
  * Week 1 reconciliation per P0c audit BD1, BD3, BD4.

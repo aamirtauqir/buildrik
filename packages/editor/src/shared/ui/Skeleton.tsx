@@ -1,28 +1,57 @@
-// PHASE 5 DELETE — Phase 4 adapter shim. Legacy/vibcoder shapes diverge;
-// translation deferred. The legacy file ships compound exports
-// (StudioSkeleton, SkeletonText, SkeletonAvatar, SkeletonCard,
-// SkeletonListItem, SkeletonTable, LoadingOverlay) that vibcoder doesn't
-// have — Phase 5 will decompose these into vibcoder Skeleton primitive
-// calls or move them to layout-level components.
+// PHASE 5 DELETE — Phase 4 adapter shim. Replaces hand-rolled primary
+// Skeleton; keeps compound exports as legacy hand-rolls (carve-out).
 /**
- * @lint-hex-policy: component-theme
- *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
+ * Adapter shim — translates legacy Skeleton API to vibcoder Skeleton.
  *
- * Aquibra Skeleton/Loading State Components
- * Professional loading placeholders with animation
+ * Strategy: bridge for the primary `Skeleton` component. Compound exports
+ * (StudioSkeleton, SkeletonText, SkeletonAvatar, SkeletonCard,
+ * SkeletonListItem, SkeletonTable, LoadingOverlay) are kept as legacy
+ * hand-rolls. They are layout-level compositions, not adapter targets —
+ * Phase 5 either decomposes them at consumer sites or re-implements them
+ * on top of the vibcoder Skeleton primitive directly.
  *
- * Legacy prop surface (preserved by this shim):
- *   width, height: number | string
- *   radius: "none" | "sm" | "md" | "lg" | "full"
- *   animation: "pulse" | "wave" | "none"
- *
- * Vibcoder Skeleton has shape (rect/line/circle) + size (xs/sm/lg) +
- * derives width from `style`. Translation lands in Phase 5.
+ * Prop translations (primary Skeleton, Phase 4 Q4 mapping):
+ *   width, height (number | string):
+ *     → style={{ width, height }} on vibcoder Skeleton (vibcoder CSS
+ *       sizes via shape modifiers; arbitrary px requires inline style).
+ *   radius:
+ *     → style={{ borderRadius }} (vibcoder has no radius modifier — caller
+ *       always supplies it via shape="rect|circle|line"; we keep the
+ *       legacy radius union by mapping to CSS values).
+ *   animation:
+ *     "pulse" → vibcoder default (vendored CSS owns the animation).
+ *     "none"  → style={{ animation: "none" }} (inline override of vendored
+ *               keyframe; the more graceful path vs throwing — caller may
+ *               legitimately need a still-frame skeleton in tests/print).
+ *     "wave"  → throws-at-render. Vibcoder Skeleton has no wave animation
+ *               variant; faking the wave gradient via inline style would
+ *               require ~6 css declarations and a custom keyframe injection
+ *               that the vendored CSS would later silently override.
+ *   role + aria-label:
+ *     Legacy Skeleton emits `role="status" aria-label="Loading..."` for
+ *     consumers that rely on screen-reader announcement. Forwarded
+ *     explicitly; vibcoder defaults to `aria-hidden="true"` which we
+ *     unset via `aria-hidden={false}`.
+ *   className:
+ *     Forwarded; vibcoder appends after its own classes.
+ *   style:
+ *     Spread last so caller's style overrides our radius/animation
+ *     overrides if explicitly conflicting.
  *
  * @license BSD-3-Clause
  */
 
+/**
+ * @lint-hex-policy: component-theme
+ *   Intentional component-specific palette in compound exports
+ *   (StudioSkeleton, SkeletonCard, SkeletonListItem, SkeletonTable,
+ *   LoadingOverlay). Chrome-hex lint rules do not apply here — these
+ *   are layout-level skeleton compositions kept as legacy hand-rolls
+ *   under the Phase 5 carve-out described above.
+ */
+
 import * as React from "react";
+import { Skeleton as VibcoderSkeleton } from "@/editor/shared/vibcoder";
 
 /** Detect prefers-reduced-motion for accessible animation control */
 function useReducedMotion(): boolean {
@@ -56,7 +85,7 @@ export interface SkeletonProps {
   style?: React.CSSProperties;
 }
 
-const radiusMap = {
+const radiusMap: Record<NonNullable<SkeletonProps["radius"]>, string | number> = {
   none: 0,
   sm: "var(--buildrick-radius-sm)",
   md: "var(--buildrick-radius-md)",
@@ -69,40 +98,46 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   height = 16,
   radius = "md",
   animation = "pulse",
-  className = "",
+  className,
   style,
 }) => {
   const prefersReduced = useReducedMotion();
   const effectiveAnimation = prefersReduced ? "none" : animation;
 
-  const animationStyles: Record<string, React.CSSProperties> = {
-    pulse: {
-      animation: "buildrick-skeleton-pulse 1.5s ease-in-out infinite",
-    },
-    wave: {
-      backgroundImage: "linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent)",
-      backgroundSize: "200% 100%",
-      animation: "buildrick-skeleton-wave 1.5s ease-in-out infinite",
-    },
-    none: {},
+  if (effectiveAnimation === "wave") {
+    throw new Error(
+      "Skeleton: animation=\"wave\" is not translatable — vibcoder Skeleton has no wave animation variant in the vendored CSS. Use animation=\"pulse\" or migrate the consumer to vibcoder Skeleton directly."
+    );
+  }
+
+  const widthValue = typeof width === "number" ? `${width}px` : width;
+  const heightValue = typeof height === "number" ? `${height}px` : height;
+
+  const composedStyle: React.CSSProperties = {
+    width: widthValue,
+    height: heightValue,
+    borderRadius: radiusMap[radius],
+    ...(effectiveAnimation === "none" ? { animation: "none" } : {}),
+    ...style,
   };
 
   return (
-    <div
-      className={`buildrick-skeleton buildrick-skeleton-${effectiveAnimation} ${className}`}
+    <VibcoderSkeleton
+      className={className}
+      style={composedStyle}
       role="status"
       aria-label="Loading..."
-      style={{
-        width: typeof width === "number" ? `${width}px` : width,
-        height: typeof height === "number" ? `${height}px` : height,
-        borderRadius: radiusMap[radius],
-        background: "rgba(255, 255, 255, 0.06)",
-        ...animationStyles[effectiveAnimation],
-        ...style,
-      }}
+      aria-hidden={false}
     />
   );
 };
+
+// ─── Compound exports (legacy hand-rolls, Phase 5 carve-out) ────────────────
+// These are layout-level compositions, not adapter targets. Phase 5 either
+// decomposes them at consumer sites or re-implements them on top of the
+// vibcoder Skeleton primitive directly. They internally render the primary
+// `Skeleton` shim above (which IS bridged), so they inherit the vibcoder
+// `bd-skeleton` class through that path.
 
 // Skeleton Text - for text content
 export interface SkeletonTextProps {
