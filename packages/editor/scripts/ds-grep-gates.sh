@@ -499,6 +499,26 @@ if [ -n "$LEAK" ]; then
 fi
 pass "Gate 19: no bdr-* class leaks"
 
+# Gate 20: No barrel imports of @/shared/ui (Phase 5 shim-deletion safety).
+# Reason: shim-deletion codemods rewrite direct path imports. Barrel imports
+# (`import { Modal, Button } from "@/shared/ui"` or `from "../*/shared/ui"`)
+# bundle multiple symbols and survive per-shim rewrites only partially. T2.X
+# barrel-explosion codemod normalized the codebase to direct named-path imports
+# at commit a8e2ce0; this gate prevents regression. The Badge rollback (e288230)
+# was caused by a "0 consumers" check that counted only direct paths and missed
+# barrel consumers in src/ai/ + src/templates/. Gate scope: ALL packages/editor/src/**
+# (not just src/editor/) — that mismatch was the root cause of the rollback.
+# Excludes: barrel files themselves (index.ts, index.tsx) which legitimately
+# re-export from sibling shim files.
+LEAK=$(grep -rEn 'from\s+"(@/shared/ui|(\.\./)+shared/ui)"' packages/editor/src --include='*.ts' --include='*.tsx' --exclude-dir=__tests__ 2>/dev/null \
+  | grep -v 'shared/ui/index\.ts\(x\)\?:' \
+  || true)
+if [ -n "$LEAK" ]; then
+  echo "$LEAK"
+  fail "Gate 20: barrel import of @/shared/ui — use direct named path (e.g. @/shared/ui/Button)"
+fi
+pass "Gate 20: no barrel imports of @/shared/ui"
+
 # Gate 21: No new vibcoder-shape token defs in chrome source
 # Vibcoder uses --buildrick-color-* / --buildrick-color-fg-* shapes.
 # Buildrik canonical is --buildrick-bg-* / --buildrick-fg-*. New defs
