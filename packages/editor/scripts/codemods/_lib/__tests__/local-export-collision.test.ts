@@ -6,9 +6,11 @@
  *
  * @license BSD-3-Clause
  */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import jscodeshift from "jscodeshift";
 import { ensureNamedImport } from "../import-swap";
+import { makeRenameJsxCodemod } from "../codemod-factory";
+import { runCodemod } from "./test-helpers";
 
 const j = jscodeshift.withParser("tsx");
 
@@ -63,5 +65,36 @@ const Modal = () => null;
     const result = ensureNamedImport(j, root, "Modal", "@/shared/ui/Modal");
     expect(result.skipped).toBe(true);
     expect(result.reason).toMatch(/local declaration/i);
+  });
+});
+
+describe("codemod-factory — caller-side collision warning", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("emits console.warn when skipped due to local-export collision", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+    const t = makeRenameJsxCodemod({
+      fromTag: "button",
+      toName: "Button",
+      toImport: "@/shared/ui/Button",
+    });
+
+    // Source exports "Button" locally — ensureNamedImport will skip and
+    // the codemod-factory caller must emit a warning.
+    const source = `
+export function Button() { return null; }
+export function X() { return <button>Hi</button>; }
+`.trim();
+
+    runCodemod(t, "/fake/src/editor/Widget.tsx", source);
+
+    expect(warnSpy).toHaveBeenCalledOnce();
+    const [msg] = warnSpy.mock.calls[0];
+    expect(msg).toMatch(/\[codemod\]/);
+    expect(msg).toMatch(/Button/);
+    expect(msg).toMatch(/Widget\.tsx/);
   });
 });

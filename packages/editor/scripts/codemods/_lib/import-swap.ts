@@ -37,67 +37,85 @@ export function ensureNamedImport(
   // Scan ExportNamedDeclaration nodes for:
   //   (a) export const/let/var/function/class <importName>
   //   (b) export { foo as importName } or export { importName }
-  const exports = root.find(j.ExportNamedDeclaration);
-  for (const exportPath of exports.paths()) {
-    const node = exportPath.node;
+  const hasExportedVar =
+    root
+      .find(j.ExportNamedDeclaration, {
+        declaration: { type: "VariableDeclaration" },
+      })
+      .filter((p) =>
+        (p.node.declaration as { declarations: Array<{ id: { type: string; name?: string } }> })
+          .declarations.some(
+            (d) => d.id.type === "Identifier" && d.id.name === importName,
+          ),
+      )
+      .size() > 0;
+  if (hasExportedVar) {
+    return { skipped: true, reason: `local export: '${importName}' is exported from this file` };
+  }
 
-    // (a) export const/function/class X — check the declaration's id(s)
-    if (node.declaration) {
-      const decl = node.declaration;
-      if (
-        (decl.type === "VariableDeclaration") &&
-        decl.declarations.some(
-          (d) =>
-            d.id &&
-            d.id.type === "Identifier" &&
-            (d.id as { name: string }).name === importName,
-        )
-      ) {
-        return { skipped: true, reason: `local export: '${importName}' is exported from this file` };
-      }
-      if (
-        (decl.type === "FunctionDeclaration" || decl.type === "ClassDeclaration") &&
-        decl.id &&
-        (decl.id as { name: string }).name === importName
-      ) {
-        return { skipped: true, reason: `local export: '${importName}' is exported from this file` };
-      }
-    }
+  const hasExportedFnOrClass =
+    root
+      .find(j.ExportNamedDeclaration)
+      .filter(
+        (p) =>
+          p.node.declaration != null &&
+          (p.node.declaration.type === "FunctionDeclaration" ||
+            p.node.declaration.type === "ClassDeclaration") &&
+          (p.node.declaration as { id?: { name?: string } }).id?.name === importName,
+      )
+      .size() > 0;
+  if (hasExportedFnOrClass) {
+    return { skipped: true, reason: `local export: '${importName}' is exported from this file` };
+  }
 
-    // (b) export { foo as importName } or export { importName }
-    if (node.specifiers) {
-      for (const spec of node.specifiers) {
-        const exported = spec.exported;
-        if (exported && (exported as { name: string }).name === importName) {
-          return { skipped: true, reason: `local export: '${importName}' is re-exported from this file` };
-        }
-      }
-    }
+  const hasReExport =
+    root
+      .find(j.ExportNamedDeclaration)
+      .filter((p) =>
+        (p.node.specifiers ?? []).some(
+          (s) => s.exported && (s.exported as { name: string }).name === importName,
+        ),
+      )
+      .size() > 0;
+  if (hasReExport) {
+    return { skipped: true, reason: `local export: '${importName}' is re-exported from this file` };
   }
 
   // --- Top-level local declaration collision check ---
   // If a top-level `const/let/var/function/class <importName>` exists (even
   // without export), adding an import would shadow or conflict with it.
-  const program = root.find(j.Program).paths()[0];
-  if (program) {
-    for (const stmt of program.node.body) {
-      if (stmt.type === "VariableDeclaration") {
-        const vd = stmt as { declarations: Array<{ id: { type: string; name?: string } }> };
-        if (
-          vd.declarations.some(
-            (d) => d.id.type === "Identifier" && d.id.name === importName,
-          )
-        ) {
-          return { skipped: true, reason: `local declaration: '${importName}' is declared at the top level of this file` };
-        }
-      }
-      if (
-        (stmt.type === "FunctionDeclaration" || stmt.type === "ClassDeclaration") &&
-        (stmt as { id?: { name?: string } }).id?.name === importName
-      ) {
-        return { skipped: true, reason: `local declaration: '${importName}' is declared at the top level of this file` };
-      }
-    }
+  const hasLocalVar =
+    root
+      .find(j.VariableDeclaration)
+      .filter(
+        (p) =>
+          // Must be a direct body statement of Program (top-level only).
+          p.parent?.node.type === "Program" &&
+          p.node.declarations.some(
+            (d) =>
+              d.id &&
+              d.id.type === "Identifier" &&
+              (d.id as { name: string }).name === importName,
+          ),
+      )
+      .size() > 0;
+  if (hasLocalVar) {
+    return { skipped: true, reason: `local declaration: '${importName}' is declared at the top level of this file` };
+  }
+
+  const hasLocalFnOrClass =
+    root
+      .find(j.Declaration)
+      .filter(
+        (p) =>
+          p.parent?.node.type === "Program" &&
+          (p.node.type === "FunctionDeclaration" ||
+            p.node.type === "ClassDeclaration") &&
+          (p.node as { id?: { name?: string } }).id?.name === importName,
+      )
+      .size() > 0;
+  if (hasLocalFnOrClass) {
+    return { skipped: true, reason: `local declaration: '${importName}' is declared at the top level of this file` };
   }
 
   // --- Cross-path import collision check ---
@@ -105,18 +123,15 @@ export function ensureNamedImport(
   // binding name is already in use. If so, bail — the file already has that
   // name bound from some path, so the rename codemod's JSX swap will resolve
   // correctly without a new import.
-  const allImports = root.find(j.ImportDeclaration);
-  let alreadyBoundElsewhere = false;
-  allImports.forEach((path) => {
-    const decl = path.node;
-    for (const spec of decl.specifiers ?? []) {
-      // Local binding name is `local` (alias if `as`, otherwise the imported name).
-      if (spec.local && spec.local.name === importName) {
-        alreadyBoundElsewhere = true;
-        return;
-      }
-    }
-  });
+  const alreadyBoundElsewhere =
+    root
+      .find(j.ImportDeclaration)
+      .filter((p) =>
+        (p.node.specifiers ?? []).some(
+          (s) => s.local && s.local.name === importName,
+        ),
+      )
+      .size() > 0;
   if (alreadyBoundElsewhere) return { skipped: true, reason: `cross-path import: '${importName}' is already bound via another import` };
 
   const existing = root.find(j.ImportDeclaration, {

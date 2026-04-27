@@ -45,7 +45,12 @@ export function makeRenameJsxCodemod(opts: RenameJsxCodemodOptions): Transform {
       didSwap = true;
     });
     if (!didSwap) return file.source;
-    ensureNamedImport(j, root, opts.toName, opts.toImport);
+    const result = ensureNamedImport(j, root, opts.toName, opts.toImport);
+    if (result.skipped) {
+      console.warn(
+        `[codemod] skipped import of '${opts.toName}' in ${file.path}: ${result.reason}`,
+      );
+    }
     return root.toSource({ quote: "double" });
   };
 }

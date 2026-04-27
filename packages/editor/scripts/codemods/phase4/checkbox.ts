@@ -61,7 +61,12 @@ const transform: Transform = (file: FileInfo, api: API, _options: Options) => {
 
   if (aHits === 0 && bHits === 0) return file.source;
 
-  ensureNamedImport(j, root, "Checkbox", "@/shared/ui/Checkbox");
+  const result = ensureNamedImport(j, root, "Checkbox", "@/shared/ui/Checkbox");
+  if (result.skipped) {
+    console.warn(
+      `[codemod] skipped import of 'Checkbox' in ${file.path}: ${result.reason}`,
+    );
+  }
 
   return root.toSource({ quote: "double" });
 };
