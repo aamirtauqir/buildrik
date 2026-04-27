@@ -1,45 +1,77 @@
+// PHASE 5 DELETE — Phase 4 adapter shim. Replaces hand-rolled FormField.
 /**
- * Aquibra FormField Component
- * Professional form field wrapper with validation UI
+ * Adapter shim — translates legacy FormField API to the vibcoder FormField
+ * primitive (single-component, slot-driven via flat string props).
+ *
+ * Strategy: bridge. Renders `<VibcoderFormField label htmlFor required helper
+ * error inline row disabled>` internally. Vibcoder FormField composes its
+ * own Label + HelperText sibling tree from the flat prop API, so the shim
+ * just needs to translate the legacy flat props onto vibcoder's flat props.
+ *
+ * Prop translations (Phase 4 T4.C mapping):
+ *   label (string?)    → vibcoder label. REQUIRED at vibcoder layer; when
+ *                        legacy `label` is absent, the shim passes empty
+ *                        string and adds marker className "is-labelless"
+ *                        so CSS can hide the empty Label slot.
+ *   description (str)  → vibcoder helper (when no error/warning).
+ *   error (string)     → vibcoder error (overrides helper, tone="error").
+ *   warning (string)   → mapped onto vibcoder helper with marker className
+ *                        "is-warning" since vibcoder HelperText has tones
+ *                        {muted|info|success|error} only — warning collapses
+ *                        to a marker class for re-theming.
+ *   success (string)   → mapped onto vibcoder helper text + we lower it as
+ *                        a class hook; vibcoder HelperText tone="success"
+ *                        IS available, so we pass tone via the helper +
+ *                        an additional marker className "is-success" on root
+ *                        for consistent re-theming. NOTE: vibcoder FormField
+ *                        does not expose tone forwarding for non-error
+ *                        helpers — legacy success messages render as plain
+ *                        helper text. Acceptable Phase 4 fidelity loss.
+ *   required (boolean) → vibcoder required.
+ *   disabled (boolean) → vibcoder disabled (visual marker; caller still
+ *                        disables the underlying control).
+ *   optional (boolean) → marker className "is-optional" on root. Vibcoder
+ *                        has no "optional badge" concept — the marker class
+ *                        keeps a CSS hook for future styling. Legacy
+ *                        rendered an inline "Optional" badge; that pixel-
+ *                        level chrome is acceptable to drop.
+ *   htmlFor (string)   → vibcoder htmlFor.
+ *   size (sm|md|lg)    → marker className "bd-form-field--{size}". "md"
+ *                        (default) emits no marker.
+ *   layout (vertical|  → "horizontal" → vibcoder row={true}; "vertical"
+ *           horizontal)  (default) → no row prop.
+ *   className          → composed with vibcoder root.
+ *   children           → forwarded as the input slot.
+ *
+ * Untranslatable: legacy success/warning visual treatment loses its colored
+ * icon — vibcoder helper text has no icon slot. Acceptable Phase 4 chrome
+ * fidelity loss; the marker classNames preserve the styling hook.
+ *
+ * FormGroup + FormActions: NOT bridged — they have no vibcoder equivalent
+ * and remain hand-rolled fieldsets. Re-exported as-is from the original
+ * implementation logic, simplified to keep the shim focused.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { FormField as VibcoderFormField } from "@/editor/shared/vibcoder";
 
 export interface FormFieldProps {
-  /** Field label */
   label?: string;
-  /** Field description/help text */
   description?: string;
-  /** Error message */
   error?: string;
-  /** Warning message */
   warning?: string;
-  /** Success message */
   success?: string;
-  /** Whether the field is required */
   required?: boolean;
-  /** Whether the field is disabled */
   disabled?: boolean;
-  /** Whether the field is optional (shows "Optional" badge) */
   optional?: boolean;
-  /** Field ID for accessibility */
   htmlFor?: string;
-  /** Size variant */
   size?: "sm" | "md" | "lg";
-  /** Layout direction */
   layout?: "vertical" | "horizontal";
-  /** Children (input element) */
   children: React.ReactNode;
-  /** Additional class name */
   className?: string;
 }
-
-const sizeStyles = {
-  sm: { labelSize: 11, descSize: 11, gap: 4, inputGap: 6 },
-  md: { labelSize: 12, descSize: 12, gap: 6, inputGap: 8 },
-  lg: { labelSize: 14, descSize: 13, gap: 8, inputGap: 10 },
-};
 
 export const FormField: React.FC<FormFieldProps> = ({
   label,
@@ -54,194 +86,52 @@ export const FormField: React.FC<FormFieldProps> = ({
   size = "md",
   layout = "vertical",
   children,
-  className = "",
+  className,
 }) => {
-  const sizes = sizeStyles[size];
-  const hasMessage = error || warning || success;
-  const messageType = error ? "error" : warning ? "warning" : success ? "success" : null;
-  const message = error || warning || success;
+  // Resolve the helper text — error wins, then warning, then success, then description.
+  const helperText = error
+    ? undefined
+    : warning ?? success ?? description;
 
-  const messageColors = {
-    error: "var(--buildrick-error, #ef4444)",
-    warning: "var(--buildrick-warning, #f59e0b)",
-    success: "var(--buildrick-success, #10b981)",
-  };
-
-  const messageIcons = {
-    error: (
-      <svg
-        width={12}
-        height={12}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <circle cx="12" cy="12" r="10" />
-        <line x1="15" y1="9" x2="9" y2="15" />
-        <line x1="9" y1="9" x2="15" y2="15" />
-      </svg>
-    ),
-    warning: (
-      <svg
-        width={12}
-        height={12}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-        <line x1="12" y1="9" x2="12" y2="13" />
-        <line x1="12" y1="17" x2="12.01" y2="17" />
-      </svg>
-    ),
-    success: (
-      <svg
-        width={12}
-        height={12}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-        <polyline points="22 4 12 14.01 9 11.01" />
-      </svg>
-    ),
-  };
-
-  const isHorizontal = layout === "horizontal";
+  const mergedClassName =
+    [
+      className,
+      !label && "is-labelless",
+      optional && "is-optional",
+      warning && "is-warning",
+      success && "is-success",
+      size !== "md" && `bd-form-field--${size}`,
+    ]
+      .filter(Boolean)
+      .join(" ") || undefined;
 
   return (
-    <div
-      className={`buildrick-form-field buildrick-form-field-${size} buildrick-form-field-${layout} ${
-        error ? "buildrick-form-field-error" : ""
-      } ${disabled ? "buildrick-form-field-disabled" : ""} ${className}`}
-      style={{
-        display: "flex",
-        flexDirection: isHorizontal ? "row" : "column",
-        gap: isHorizontal ? 12 : sizes.gap,
-        opacity: disabled ? 0.6 : 1,
-      }}
+    <VibcoderFormField
+      label={label ?? ""}
+      htmlFor={htmlFor}
+      required={required}
+      helper={helperText}
+      error={error}
+      row={layout === "horizontal"}
+      disabled={disabled}
+      className={mergedClassName}
     >
-      {/* Label Section */}
-      {label && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            ...(isHorizontal ? { minWidth: 100, paddingTop: 8 } : {}),
-          }}
-        >
-          <label
-            htmlFor={htmlFor}
-            style={{
-              fontSize: sizes.labelSize,
-              fontWeight: 600,
-              color: "var(--buildrick-text-secondary, var(--bd-fg-muted))",
-              letterSpacing: "0.3px",
-            }}
-          >
-            {label}
-          </label>
-          {required && (
-            <span
-              style={{
-                color: "var(--buildrick-error, #ef4444)",
-                fontWeight: 600,
-                fontSize: sizes.labelSize,
-              }}
-              aria-hidden="true"
-            >
-              *
-            </span>
-          )}
-          {optional && !required && (
-            <span
-              style={{
-                fontSize: 12,
-                color: "var(--buildrick-text-muted, var(--bd-fg-secondary))",
-                background: "rgba(255, 255, 255, 0.05)",
-                padding: "2px 6px",
-                borderRadius: 4,
-              }}
-            >
-              Optional
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Input Section */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: sizes.inputGap }}>
-        {/* Description above input */}
-        {description && !hasMessage && (
-          <p
-            style={{
-              margin: 0,
-              fontSize: sizes.descSize,
-              color: "var(--buildrick-text-muted, var(--bd-fg-secondary))",
-              lineHeight: 1.4,
-            }}
-          >
-            {description}
-          </p>
-        )}
-
-        {/* Input element with error styling context */}
-        <div
-          className={`buildrick-form-field-input ${error ? "has-error" : ""}`}
-          style={
-            error
-              ? ({
-                  "--input-border-color": "var(--buildrick-error)",
-                  "--input-focus-shadow": "0 0 0 2px rgba(239, 68, 68, 0.2)",
-                } as React.CSSProperties)
-              : undefined
-          }
-        >
-          {children}
-        </div>
-
-        {/* Message below input */}
-        {hasMessage && messageType && (
-          <div
-            className={`buildrick-form-field-message buildrick-form-field-${messageType}`}
-            role={messageType === "error" ? "alert" : "status"}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              fontSize: sizes.descSize,
-              color: messageColors[messageType],
-            }}
-          >
-            <span style={{ flexShrink: 0 }}>{messageIcons[messageType]}</span>
-            <span>{message}</span>
-          </div>
-        )}
-      </div>
-    </div>
+      {children}
+    </VibcoderFormField>
   );
 };
 
-// Form Group - for grouping related fields
+// FormGroup + FormActions retained as plain fieldset/row primitives — no
+// vibcoder equivalent. Kept minimal; pre-existing visual richness was inline
+// styling that should migrate to CSS in Phase 5.
+
 export interface FormGroupProps {
-  /** Group title */
   title?: string;
-  /** Group description */
   description?: string;
-  /** Children fields */
   children: React.ReactNode;
-  /** Layout direction */
   layout?: "vertical" | "horizontal" | "grid";
-  /** Number of columns for grid layout */
   columns?: number;
-  /** Gap between fields */
   gap?: number;
-  /** Additional class name */
   className?: string;
 }
 
@@ -263,34 +153,17 @@ export const FormGroup: React.FC<FormGroupProps> = ({
   return (
     <fieldset
       className={`buildrick-form-group buildrick-form-group-${layout} ${className}`}
-      style={{
-        margin: 0,
-        padding: 0,
-        border: "none",
-      }}
+      style={{ margin: 0, padding: 0, border: "none" }}
     >
       {(title || description) && (
         <div style={{ marginBottom: 16 }}>
           {title && (
-            <legend
-              style={{
-                fontSize: 14,
-                fontWeight: 700,
-                color: "var(--buildrick-text-primary, var(--bd-bg-panel))",
-                marginBottom: description ? 4 : 0,
-              }}
-            >
+            <legend style={{ fontSize: 14, fontWeight: 700, marginBottom: description ? 4 : 0 }}>
               {title}
             </legend>
           )}
           {description && (
-            <p
-              style={{
-                margin: 0,
-                fontSize: 12,
-                color: "var(--buildrick-text-muted, var(--bd-fg-secondary))",
-              }}
-            >
+            <p style={{ margin: 0, fontSize: 12, color: "var(--bd-fg-secondary)" }}>
               {description}
             </p>
           )}
@@ -301,16 +174,11 @@ export const FormGroup: React.FC<FormGroupProps> = ({
   );
 };
 
-// Form Actions - for form buttons
 export interface FormActionsProps {
   children: React.ReactNode;
-  /** Alignment */
   align?: "left" | "center" | "right" | "between";
-  /** Gap between buttons */
   gap?: number;
-  /** Add top border */
   bordered?: boolean;
-  /** Additional class name */
   className?: string;
 }
 
@@ -337,7 +205,7 @@ export const FormActions: React.FC<FormActionsProps> = ({
         gap,
         marginTop: 20,
         paddingTop: bordered ? 20 : 0,
-        borderTop: bordered ? "1px solid var(--buildrick-border, var(--bd-fg-primary))" : "none",
+        borderTop: bordered ? "1px solid var(--bd-border)" : "none",
         ...alignStyles[align],
       }}
     >
