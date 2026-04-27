@@ -1,4 +1,3 @@
-import { Select } from "@/shared/ui/Select";
 import { TextInput } from "@/shared/ui/TextInput";
 import { Button } from "@/shared/ui/Button";
 /**
@@ -96,13 +95,13 @@ Textarea.displayName = "Textarea";
 type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement>;
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, children, ...rest }, ref) => (
-    <Select
+    <select
       ref={ref}
       className={`bd-set-input${className ? " " + className : ""}`}
       {...rest}
     >
       {children}
-    </Select>
+    </select>
   )
 );
 Select.displayName = "Select";
