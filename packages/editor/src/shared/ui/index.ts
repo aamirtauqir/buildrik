@@ -84,7 +84,6 @@ export {
   type IconSize,
   type IconColor,
 } from "./Icon";
-export { SliderInput, type SliderInputProps } from "./SliderInput";
 export { ColorSwatch, ColorSwatchGroup, type ColorSwatchProps } from "./ColorSwatch";
 export { TreeView, type TreeViewProps, type TreeNode } from "./TreeView";
 export { PremiumBadge, type PremiumBadgeProps } from "./PremiumBadge";
