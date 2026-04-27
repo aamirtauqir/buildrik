@@ -11,7 +11,7 @@
 
 import * as React from "react";
 import "./DrawerPanel.css";
-import { IconButton } from "../../shared/ui";
+import { IconButton } from "@/shared/ui/IconButton";
 import { SvgChevronLeft, SvgPin } from "../../shared/ui/Icons";
 
 // ============================================

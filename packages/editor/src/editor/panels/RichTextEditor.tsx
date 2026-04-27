@@ -8,7 +8,9 @@ import { TextInput } from "@/shared/ui/TextInput";
 
 import * as React from "react";
 import { ColorField } from "../../shared/forms";
-import { Button, Popover, Tooltip } from "../../shared/ui";
+import { Button } from "@/shared/ui/Button";
+import { Popover } from "@/shared/ui/Popover";
+import { Tooltip } from "@/shared/ui/Tooltip";
 
 export interface RichTextEditorProps {
   onCommand: (command: string, value?: string) => void;

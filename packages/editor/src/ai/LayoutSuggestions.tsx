@@ -9,7 +9,8 @@
 
 import * as React from "react";
 import type { LayoutSuggestion, LayoutAnalysisResult } from "../engine/ai";
-import { Button, Badge } from "../shared/ui";
+import { Button } from "@/shared/ui/Button";
+import { Badge } from "@/shared/ui/Badge";
 
 // ============================================================================
 // TYPES

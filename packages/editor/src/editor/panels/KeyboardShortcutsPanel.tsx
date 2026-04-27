@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { Modal } from "../../shared/ui";
+import { Modal } from "@/shared/ui/Modal";
 import { GROUPED_TABS_CONFIG } from "../rail/tabsConfig";
 
 // =============================================================================

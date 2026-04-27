@@ -20,7 +20,8 @@ import {
 } from "../../shared/constants/icons";
 import { InputField } from "../../shared/forms";
 import type { IconConfig, IconLibrary } from "../../shared/types/media";
-import { Modal, Button } from "../../shared/ui";
+import { Modal } from "@/shared/ui/Modal";
+import { Button } from "@/shared/ui/Button";
 
 // ============================================
 // Types

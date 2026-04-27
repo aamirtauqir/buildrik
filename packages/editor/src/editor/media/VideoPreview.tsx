@@ -6,7 +6,8 @@ import { TextInput } from "@/shared/ui/TextInput";
  */
 
 import * as React from "react";
-import { Button, Modal } from "../../shared/ui";
+import { Button } from "@/shared/ui/Button";
+import { Modal } from "@/shared/ui/Modal";
 
 // ============================================================================
 // TYPES

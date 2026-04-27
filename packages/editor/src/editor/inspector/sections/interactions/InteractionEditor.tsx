@@ -7,7 +7,7 @@ import { TextInput } from "@/shared/ui/TextInput";
 
 import * as React from "react";
 import { SelectField } from "../../../../shared/forms";
-import { Button } from "../../../../shared/ui";
+import { Button } from "@/shared/ui/Button";
 import { type Interaction, ANIMATION_PRESETS, EASING_OPTIONS } from "./types";
 
 // ============================================================================

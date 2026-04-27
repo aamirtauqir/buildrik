@@ -9,7 +9,8 @@ import DOMPurify from "dompurify";
 import { Sparkles, Send, Layout, FileText, RefreshCw, Plus, Copy, Bot, User, X } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../engine";
-import { Modal, Button } from "../shared/ui";
+import { Modal } from "@/shared/ui/Modal";
+import { Button } from "@/shared/ui/Button";
 import { generateContent, generateLayout, generateImagePrompt } from "../shared/utils/openai";
 import { AI_AVAILABLE } from "./AIAssistantBar";
 

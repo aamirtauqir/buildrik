@@ -6,7 +6,7 @@ import { Button } from "@/shared/ui/Button";
  */
 
 import * as React from "react";
-import { IconButton } from "../../shared/ui";
+import { IconButton } from "@/shared/ui/IconButton";
 import { ZOOM_PRESETS } from "./shared";
 
 export interface ZoomControlsProps {

@@ -11,7 +11,8 @@ import { TextInput } from "@/shared/ui/TextInput";
 import * as React from "react";
 import { MediaOptimizer, formatBytes } from "../../engine/media";
 import type { ImageExportFormat } from "../../shared/types/media";
-import { Button, Spinner } from "../../shared/ui";
+import { Button } from "@/shared/ui/Button";
+import { Spinner } from "@/shared/ui/Spinner";
 
 // ============================================================================
 // TYPES

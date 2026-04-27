@@ -8,7 +8,9 @@ import * as React from "react";
 import type { Composer } from "../engine";
 import { LayoutAnalyzer } from "../engine/ai";
 import { TextareaField, SelectField } from "../shared/forms";
-import { Modal, Button, Tabs } from "../shared/ui";
+import { Modal } from "@/shared/ui/Modal";
+import { Button } from "@/shared/ui/Button";
+import { Tabs } from "@/shared/ui/Tabs";
 import {
   generateContent,
   generateLayout,

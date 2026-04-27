@@ -6,7 +6,8 @@
 
 import * as React from "react";
 import { InputField } from "../shared/forms";
-import { Button, Badge } from "../shared/ui";
+import { Button } from "@/shared/ui/Button";
+import { Badge } from "@/shared/ui/Badge";
 import type { Template } from "./TemplateLibrary";
 
 // ============================================================================

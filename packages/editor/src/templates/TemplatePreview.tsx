@@ -6,7 +6,9 @@
 
 import DOMPurify from "dompurify";
 import * as React from "react";
-import { Modal, Button, Badge } from "../shared/ui";
+import { Modal } from "@/shared/ui/Modal";
+import { Button } from "@/shared/ui/Button";
+import { Badge } from "@/shared/ui/Badge";
 import type { Template } from "./TemplateLibrary";
 
 // ============================================================================

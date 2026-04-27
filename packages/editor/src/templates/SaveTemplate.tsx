@@ -5,7 +5,8 @@
 
 import * as React from "react";
 import { InputField, TextareaField, SelectField } from "../shared/forms";
-import { Modal, Button } from "../shared/ui";
+import { Modal } from "@/shared/ui/Modal";
+import { Button } from "@/shared/ui/Button";
 
 export interface SaveTemplateProps {
   isOpen: boolean;

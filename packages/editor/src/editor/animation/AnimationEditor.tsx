@@ -8,7 +8,8 @@ import * as React from "react";
 import { SelectField, NumberField, SliderField } from "../../shared/forms";
 import type { AnimationConfig, AnimationTrigger } from "../../shared/types/animations";
 import { DEFAULT_ANIMATION } from "../../shared/types/animations";
-import { Button, Tabs } from "../../shared/ui";
+import { Button } from "@/shared/ui/Button";
+import { Tabs } from "@/shared/ui/Tabs";
 
 // Re-export for backwards compatibility
 export type { AnimationConfig } from "../../shared/types/animations";

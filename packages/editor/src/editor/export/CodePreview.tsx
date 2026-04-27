@@ -12,7 +12,7 @@
 
 import * as React from "react";
 import type { CodeTab } from "../../shared/types/export";
-import { Tabs } from "../../shared/ui";
+import { Tabs } from "@/shared/ui/Tabs";
 import { CopyButton } from "../../shared/ui/CopyButton";
 
 // ============================================================================

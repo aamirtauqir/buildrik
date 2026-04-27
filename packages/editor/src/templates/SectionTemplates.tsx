@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Badge } from "../shared/ui";
+import { Badge } from "@/shared/ui/Badge";
 
 // ============================================================================
 // TYPES

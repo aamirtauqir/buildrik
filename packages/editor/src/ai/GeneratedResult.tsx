@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Button } from "../shared/ui";
+import { Button } from "@/shared/ui/Button";
 
 export interface GeneratedResultProps {
   result: string;

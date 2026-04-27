@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { DEFAULT_ANIMATION } from "../../../../shared/types/animations";
-import { Button } from "../../../../shared/ui";
+import { Button } from "@/shared/ui/Button";
 import { Section } from "../../shared/controls";
 import { AddInteractionPanel } from "./AddInteractionPanel";
 import { InteractionItem } from "./InteractionItem";
