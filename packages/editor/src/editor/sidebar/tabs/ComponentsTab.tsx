@@ -13,7 +13,7 @@ import { Button } from "@/shared/ui/Button";
 import { ChevronDown, Layers, Plus } from "lucide-react";
 import * as React from "react";
 import { ConfirmDialog, Modal } from "../../../shared/ui/Modal";
-import { SkeletonListItem } from "../../../shared/ui/Skeleton";
+import { SkeletonListItem } from "@/editor/shared/vibcoder/Skeleton";
 import { useToast } from "../../../shared/ui/Toast";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { PanelShell } from "@shared/ui/panel";

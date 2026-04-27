@@ -43,22 +43,6 @@ export {
 export { Grid, GridItem, GridPresets, type GridProps, type GridItemProps } from "./Grid";
 export { EmptyState, type EmptyStateProps } from "./EmptyState";
 export {
-  Skeleton,
-  SkeletonText,
-  SkeletonAvatar,
-  SkeletonCard,
-  SkeletonListItem,
-  SkeletonTable,
-  LoadingOverlay,
-  type SkeletonProps,
-  type SkeletonTextProps,
-  type SkeletonAvatarProps,
-  type SkeletonCardProps,
-  type SkeletonListItemProps,
-  type SkeletonTableProps,
-  type LoadingOverlayProps,
-} from "./Skeleton";
-export {
   ErrorState,
   ErrorBoundary,
   FieldError,
