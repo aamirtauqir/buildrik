@@ -18,7 +18,7 @@ import { ExportEngine } from "../../engine/export";
 import { EVENTS } from "../../shared/constants/events";
 import { useElementFlash } from "../../shared/hooks";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
-import { StudioSkeleton } from "@/editor/shared/vibcoder/Skeleton";
+import { StudioSkeleton } from "@/shared/extensions/Skeleton";
 import { ToastProvider, useToast } from "../../shared/ui/Toast";
 import { UpgradeModal } from "../../shared/ui/UpgradeModal";
 import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";

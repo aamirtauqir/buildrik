@@ -104,4 +104,10 @@
   /* Pill borders (retained for legacy component migration window) */
   --buildrick-pill-stroke: rgba(148, 163, 184, 0.35);
   --buildrick-pill-stroke-strong: rgba(148, 163, 184, 0.50);
+
+  /* Skeleton / shimmer loading placeholders */
+  --buildrick-bg-shimmer-light: rgba(15, 23, 42, 0.02);
+  --buildrick-bg-shimmer-mid: rgba(15, 23, 42, 0.04);
+  --buildrick-bg-shimmer-dark: rgba(15, 23, 42, 0.08);
+  --buildrick-bg-shimmer-overlay: rgba(15, 23, 42, 0.50);
 }

@@ -7,7 +7,7 @@ import { Button } from "@/shared/ui/Button";
  */
 
 import * as React from "react";
-import { SkeletonListItem } from "@/editor/shared/vibcoder/Skeleton";
+import { SkeletonListItem } from "@/shared/extensions/Skeleton";
 
 /** Loading skeleton shown while lazy-loaded tab chunks download */
 export const PanelSkeleton: React.FC = () => (

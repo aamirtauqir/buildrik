@@ -12,6 +12,7 @@
 import * as React from "react";
 import "./DrawerPanel.css";
 import { IconButton } from "@/editor/shared/vibcoder/IconButton";
+import { Tooltip } from "@/shared/ui/Tooltip";
 import { SvgChevronLeft, SvgPin } from "../../shared/ui/Icons";
 
 // ============================================
@@ -117,27 +118,29 @@ export const DrawerPanel: React.FC<DrawerPanelProps> = ({
         <div className="drawer-panel__controls">
           {/* Pin button - keeps panel open */}
           {onPinToggle && (
-            <IconButton
-              size="sm"
-              variant="ghost"
-              pressed={isPinned}
-              title={isPinned ? "Unpin panel" : "Pin panel"}
-              aria-label={isPinned ? "Unpin panel" : "Pin panel"}
-              onClick={onPinToggle}
-              className="drawer-panel__pin-btn"
-            ><SvgPin /></IconButton>
+            <Tooltip content={isPinned ? "Unpin panel" : "Pin panel"}>
+              <IconButton
+                size="sm"
+                variant="ghost"
+                pressed={isPinned}
+                aria-label={isPinned ? "Unpin panel" : "Pin panel"}
+                onClick={onPinToggle}
+                className="drawer-panel__pin-btn"
+              ><SvgPin /></IconButton>
+            </Tooltip>
           )}
 
           {/* Close button */}
           {onClose && (
-            <IconButton
-              size="sm"
-              variant="ghost"
-              title="Close panel"
-              aria-label="Close panel"
-              onClick={handleClose}
-              className="drawer-panel__close-btn"
-            ><SvgChevronLeft /></IconButton>
+            <Tooltip content="Close panel">
+              <IconButton
+                size="sm"
+                variant="ghost"
+                aria-label="Close panel"
+                onClick={handleClose}
+                className="drawer-panel__close-btn"
+              ><SvgChevronLeft /></IconButton>
+            </Tooltip>
           )}
         </div>
       </div>

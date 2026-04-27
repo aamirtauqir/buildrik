@@ -7,6 +7,7 @@ import { Button } from "@/shared/ui/Button";
 
 import * as React from "react";
 import { IconButton } from "@/editor/shared/vibcoder/IconButton";
+import { Tooltip } from "@/shared/ui/Tooltip";
 import { ZOOM_PRESETS } from "./shared";
 
 export interface ZoomControlsProps {
@@ -47,12 +48,14 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
 
   return (
     <div style={containerStyles}>
-      <IconButton
-        size="sm"
-        title="Zoom Out"
-        onClick={handleZoomOut}
-        disabled={zoom <= minZoom}
-      ><ZoomOutIcon /></IconButton>
+      <Tooltip content="Zoom Out">
+        <IconButton
+          size="sm"
+          aria-label="Zoom Out"
+          onClick={handleZoomOut}
+          disabled={zoom <= minZoom}
+        ><ZoomOutIcon /></IconButton>
+      </Tooltip>
       <div style={sliderContainerStyles}>
         <TextInput
           type="range"
@@ -63,12 +66,14 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
           style={sliderStyles}
         />
       </div>
-      <IconButton
-        size="sm"
-        title="Zoom In"
-        onClick={handleZoomIn}
-        disabled={zoom >= maxZoom}
-      ><ZoomInIcon /></IconButton>
+      <Tooltip content="Zoom In">
+        <IconButton
+          size="sm"
+          aria-label="Zoom In"
+          onClick={handleZoomIn}
+          disabled={zoom >= maxZoom}
+        ><ZoomInIcon /></IconButton>
+      </Tooltip>
       <div style={dividerStyles} />
       <Button
         onClick={() => setShowPresets(!showPresets)}
@@ -80,11 +85,13 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
       {onFitToScreen && (
         <>
           <div style={dividerStyles} />
-          <IconButton
-            size="sm"
-            title="Fit to Screen"
-            onClick={onFitToScreen}
-          ><FitIcon /></IconButton>
+          <Tooltip content="Fit to Screen">
+            <IconButton
+              size="sm"
+              aria-label="Fit to Screen"
+              onClick={onFitToScreen}
+            ><FitIcon /></IconButton>
+          </Tooltip>
         </>
       )}
       {showPresets && (
