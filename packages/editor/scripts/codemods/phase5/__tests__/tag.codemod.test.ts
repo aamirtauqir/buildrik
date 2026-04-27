@@ -50,4 +50,10 @@ describe("phase5/tag codemod — rewrite Tag import path", () => {
     const twice = runCodemod(transform, FAKE_PATH, once);
     expect(twice).toBe(once);
   });
+
+  it("respects shouldSkipPath — does not rewrite imports in __tests__/ paths", () => {
+    const before = `import { Tag } from "@/shared/ui/Tag";\n<Tag>x</Tag>;`;
+    const result = runCodemod(transform, "/fake/src/editor/__tests__/Foo.test.tsx", before);
+    expect(result).toBe(before);
+  });
 });
