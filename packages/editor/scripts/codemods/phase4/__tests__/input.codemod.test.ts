@@ -3,54 +3,30 @@
  * @license BSD-3-Clause
  */
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import jscodeshift from "jscodeshift";
+import { runCodemod, runCodemodFixture } from "../../_lib/__tests__/test-helpers";
 import transform from "../input";
 
 const FIXTURES = join(__dirname, "fixtures");
 
 describe("input codemod", () => {
   it("swaps inline <input> → <TextInput> + adds import; leaves <input type='checkbox'> alone", () => {
-    const input = readFileSync(join(FIXTURES, "input.input.tsx"), "utf-8");
-    const expected = readFileSync(join(FIXTURES, "input.output.tsx"), "utf-8").trim();
-
-    const result = transform(
-      { path: "/fake/src/editor/Foo.tsx", source: input },
-      { jscodeshift: jscodeshift.withParser("tsx"), j: jscodeshift.withParser("tsx"), stats: () => undefined, report: () => undefined },
-      {},
-    );
-
-    expect((result as string).trim()).toBe(expected);
+    const { actual, expected } = runCodemodFixture(transform, FIXTURES, "input");
+    expect(actual).toBe(expected);
   });
 
   it("honors shouldSkipPath (smoke: __tests__/ path)", () => {
     const input = `<input type="text" />`;
-    const result = transform(
-      { path: "/fake/src/editor/__tests__/Foo.test.tsx", source: input },
-      { jscodeshift: jscodeshift.withParser("tsx"), j: jscodeshift.withParser("tsx"), stats: () => undefined, report: () => undefined },
-      {},
-    );
-    expect(result).toBe(input);
+    expect(runCodemod(transform, "/fake/src/editor/__tests__/Foo.test.tsx", input)).toBe(input);
   });
 
   it("skips files with no <input>", () => {
     const input = `export const x = 1;`;
-    const result = transform(
-      { path: "/fake/src/editor/Foo.tsx", source: input },
-      { jscodeshift: jscodeshift.withParser("tsx"), j: jscodeshift.withParser("tsx"), stats: () => undefined, report: () => undefined },
-      {},
-    );
-    expect(result).toBe(input);
+    expect(runCodemod(transform, "/fake/src/editor/Foo.tsx", input)).toBe(input);
   });
 
   it("does NOT add TextInput import when only <input type='checkbox'> exists", () => {
     const input = `export function X() { return <input type="checkbox" />; }`;
-    const result = transform(
-      { path: "/fake/src/editor/Foo.tsx", source: input },
-      { jscodeshift: jscodeshift.withParser("tsx"), j: jscodeshift.withParser("tsx"), stats: () => undefined, report: () => undefined },
-      {},
-    );
-    expect(result).toBe(input);
+    expect(runCodemod(transform, "/fake/src/editor/Foo.tsx", input)).toBe(input);
   });
 });

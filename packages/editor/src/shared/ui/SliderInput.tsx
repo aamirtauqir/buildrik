@@ -10,10 +10,14 @@
  *   onChange: passthrough (vibcoder fires (next: number))
  *   min / max / step: passthrough
  *   unit / label: passthrough
- *   disabled: applied as inline `pointerEvents: none` + `opacity: 0.5`
- *             on the wrapper. Vibcoder Slider has no `disabled` prop —
- *             the native input still receives the attribute via
- *             {...rest} so keyboard focus + change handlers respect it.
+ *   disabled: applied two ways:
+ *               (1) inline `pointerEvents: none` + `opacity: 0.5` on the
+ *                   outer wrapper for visual + click-blocking effect, and
+ *               (2) forwarded explicitly to the vibcoder Slider — the
+ *                   typed interface omits `disabled`, but the prop flows
+ *                   through to the underlying `<input type="range">` so
+ *                   keyboard focus + change handlers respect it. Confirmed
+ *                   by Slider.adapter.test.tsx.
  *   className / style: composed onto the vibcoder wrapper. Disabled
  *             style merges with caller-supplied style (caller wins on
  *             same-key conflicts).

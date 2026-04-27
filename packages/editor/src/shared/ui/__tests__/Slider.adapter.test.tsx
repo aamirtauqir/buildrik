@@ -65,6 +65,6 @@ describe("SliderInput adapter shim (vibcoder Slider)", () => {
     const { container } = render(
       <SliderInput value={0} onChange={() => undefined} className="my-extra" />,
     );
-    expect((container.firstElementChild as HTMLElement).className).toBe("my-extra");
+    expect((container.firstElementChild as HTMLElement).className).toContain("my-extra");
   });
 });

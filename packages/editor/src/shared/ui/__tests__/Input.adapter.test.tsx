@@ -64,7 +64,15 @@ describe("TextInput adapter shim (vibcoder Input)", () => {
     expect(input.className.split(" ")).toContain("bd-input");
   });
 
-  it("accepts inputSize prop without crashing (legacy prop, no-op)", () => {
+  it("silently drops inputSize prop (no class side effect)", () => {
+    const { container } = render(<TextInput inputSize="sm" placeholder="hi" />);
+    const input = container.querySelector("input");
+    expect(input).not.toBeNull();
+    expect(input!.className).not.toContain("bd-input--sm");
+    expect(input!.className).not.toContain("bd-input--lg");
+  });
+
+  it("accepts every inputSize value without crashing (legacy prop, no-op)", () => {
     const sizes: Array<"sm" | "md" | "lg"> = ["sm", "md", "lg"];
     sizes.forEach((s) => {
       const { unmount } = render(<TextInput inputSize={s} />);

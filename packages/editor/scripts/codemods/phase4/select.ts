@@ -13,27 +13,12 @@
  *
  * @license BSD-3-Clause
  */
-import type { Transform, FileInfo, API, Options } from "jscodeshift";
-import { findJsxElementsByTag, renameJsxTag } from "../_lib/jsx-query";
-import { ensureNamedImport } from "../_lib/import-swap";
-import { shouldSkipPath } from "../_lib/skip-rules";
+import { makeRenameJsxCodemod } from "../_lib/codemod-factory";
 
-const transform: Transform = (file: FileInfo, api: API, _options: Options) => {
-  const j = api.jscodeshift;
-  if (shouldSkipPath(file.path)) return file.source;
+export default makeRenameJsxCodemod({
+  fromTag: "select",
+  toName: "Select",
+  toImport: "@/shared/ui/Select",
+});
 
-  const root = j(file.source);
-  const selects = findJsxElementsByTag(j, root, "select");
-  if (selects.size() === 0) return file.source;
-
-  selects.forEach((path) => {
-    renameJsxTag(j, path.node, "Select");
-  });
-
-  ensureNamedImport(j, root, "Select", "@/shared/ui/Select");
-
-  return root.toSource({ quote: "double" });
-};
-
-export default transform;
 export const parser = "tsx";

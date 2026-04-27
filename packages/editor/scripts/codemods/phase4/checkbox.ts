@@ -3,7 +3,7 @@
  * Phase 4 codemod: route checkbox JSX in `src/editor/` consumers through
  * the vibcoder Checkbox via the shim layer at `@/shared/ui/Checkbox`.
  *
- * Two scopes:
+ * Two scopes (does not fit the rename-jsx factory shape):
  *   (a) `<input type="checkbox">` → `<Checkbox>` (with `type` attribute
  *       removed, since Checkbox sets it internally)
  *   (b) `<Checkbox>` (PascalCase) — adds the shim import if no existing
@@ -20,31 +20,10 @@
  *
  * @license BSD-3-Clause
  */
-import type { Transform, FileInfo, API, Options, JSXAttribute, Literal } from "jscodeshift";
-import { findJsxElementsByTag, renameJsxTag } from "../_lib/jsx-query";
+import type { Transform, FileInfo, API, Options, JSXAttribute } from "jscodeshift";
+import { findJsxElementsByTag, renameJsxTag, hasStringLiteralAttr } from "../_lib/jsx-query";
 import { ensureNamedImport } from "../_lib/import-swap";
 import { shouldSkipPath } from "../_lib/skip-rules";
-
-/** True when the JSX element has a literal `type="checkbox"` attribute. */
-function isCheckboxInput(element: { openingElement: { attributes?: unknown[] } }): boolean {
-  const attrs = (element.openingElement.attributes ?? []) as JSXAttribute[];
-  for (const attr of attrs) {
-    if (attr.type !== "JSXAttribute") continue;
-    if (!attr.name || attr.name.name !== "type") continue;
-    const v = attr.value as Literal | null | undefined;
-    if (v && v.type === "Literal" && typeof v.value === "string" && v.value === "checkbox") {
-      return true;
-    }
-    if (
-      v &&
-      (v as { type?: string; value?: unknown }).type === "StringLiteral" &&
-      (v as { value?: unknown }).value === "checkbox"
-    ) {
-      return true;
-    }
-  }
-  return false;
-}
 
 /** Strip the `type` attribute (Checkbox component sets it internally). */
 function stripTypeAttr(element: {
@@ -70,7 +49,7 @@ const transform: Transform = (file: FileInfo, api: API, _options: Options) => {
   const inputs = findJsxElementsByTag(j, root, "input");
   let aHits = 0;
   inputs.forEach((path) => {
-    if (!isCheckboxInput(path.node)) return;
+    if (!hasStringLiteralAttr(path.node, "type", "checkbox")) return;
     stripTypeAttr(path.node);
     renameJsxTag(j, path.node, "Checkbox");
     aHits++;

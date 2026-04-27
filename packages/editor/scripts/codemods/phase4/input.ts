@@ -19,59 +19,15 @@
  *
  * @license BSD-3-Clause
  */
-import type { Transform, FileInfo, API, Options, JSXAttribute, Literal } from "jscodeshift";
-import { findJsxElementsByTag, renameJsxTag } from "../_lib/jsx-query";
-import { ensureNamedImport } from "../_lib/import-swap";
-import { shouldSkipPath } from "../_lib/skip-rules";
+import { makeRenameJsxCodemod } from "../_lib/codemod-factory";
+import { hasStringLiteralAttr } from "../_lib/jsx-query";
 
-/**
- * True when the JSX element has `type="checkbox"` as a literal-string attribute.
- * Only matches the static-literal form. JSX-expression `type` values
- * (e.g. `type={dynamic}`) are conservatively NOT skipped — a dynamic type
- * value is rare and the swap-to-TextInput case is benign even if some
- * branch sets type=checkbox at runtime (TextInput passes type through).
- */
-function isCheckboxInput(element: { openingElement: { attributes?: unknown[] } }): boolean {
-  const attrs = (element.openingElement.attributes ?? []) as JSXAttribute[];
-  for (const attr of attrs) {
-    if (attr.type !== "JSXAttribute") continue;
-    if (!attr.name || attr.name.name !== "type") continue;
-    const v = attr.value as Literal | null | undefined;
-    if (v && v.type === "Literal" && typeof v.value === "string" && v.value === "checkbox") {
-      return true;
-    }
-    // StringLiteral form (some parser variants)
-    if (
-      v &&
-      (v as { type?: string; value?: unknown }).type === "StringLiteral" &&
-      (v as { value?: unknown }).value === "checkbox"
-    ) {
-      return true;
-    }
-  }
-  return false;
-}
+export default makeRenameJsxCodemod({
+  fromTag: "input",
+  toName: "TextInput",
+  toImport: "@/shared/ui/TextInput",
+  // Skip <input type="checkbox"> — owned by the checkbox codemod.
+  shouldSkipElement: (_, el) => hasStringLiteralAttr(el, "type", "checkbox"),
+});
 
-const transform: Transform = (file: FileInfo, api: API, _options: Options) => {
-  const j = api.jscodeshift;
-  if (shouldSkipPath(file.path)) return file.source;
-
-  const root = j(file.source);
-  const inputs = findJsxElementsByTag(j, root, "input");
-  if (inputs.size() === 0) return file.source;
-
-  let swapped = 0;
-  inputs.forEach((path) => {
-    if (isCheckboxInput(path.node)) return; // owned by checkbox codemod
-    renameJsxTag(j, path.node, "TextInput");
-    swapped++;
-  });
-
-  if (swapped === 0) return file.source;
-  ensureNamedImport(j, root, "TextInput", "@/shared/ui/TextInput");
-
-  return root.toSource({ quote: "double" });
-};
-
-export default transform;
 export const parser = "tsx";
