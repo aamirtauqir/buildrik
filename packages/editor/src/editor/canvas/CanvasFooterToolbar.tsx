@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * CanvasFooterToolbar - Canvas Overlays & Zoom Controls
  * Bottom toolbar for canvas overlay toggles and zoom controls (IA Redesign 2026)
@@ -109,7 +110,7 @@ const OverlayButton: React.FC<OverlayButtonProps> = ({
   onClick,
 }) => (
   <Tooltip content={label} shortcut={shortcut}>
-    <button
+    <Button
       type="button"
       className={`canvas-footer-btn ${active ? "canvas-footer-btn--active" : ""}`}
       onClick={onClick}
@@ -134,7 +135,7 @@ const OverlayButton: React.FC<OverlayButtonProps> = ({
       <span style={{ display: "flex", opacity: active ? 1 : 0.7 }}>{icon}</span>
       <span>{label}</span>
       {active && <span style={{ marginLeft: "2px", color: "var(--buildrick-accent)" }}>✓</span>}
-    </button>
+    </Button>
   </Tooltip>
 );
 
@@ -211,13 +212,11 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
           onClick={() => onOverlayChange("xray", !overlays.xray)}
         />
       </div>
-
       {/* Divider */}
       <div style={dividerStyles} />
-
       {/* Zoom Controls */}
       <div style={{ ...zoomGroupStyles, position: "relative" }} ref={presetsRef}>
-        <button
+        <Button
           type="button"
           style={zoomBtnStyles}
           onClick={handleZoomOut}
@@ -225,10 +224,10 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
           disabled={zoom <= ZOOM_PRESETS[0]}
         >
           −
-        </button>
+        </Button>
 
         {/* % display — click to open preset dropdown */}
-        <button
+        <Button
           type="button"
           style={zoomPctStyles}
           onClick={() => setShowPresets((v) => !v)}
@@ -236,9 +235,9 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
           title="Click for zoom presets"
         >
           {Math.round(zoom)}%
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
           style={zoomBtnStyles}
           onClick={handleZoomIn}
@@ -246,13 +245,13 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
           disabled={zoom >= ZOOM_PRESETS[ZOOM_PRESETS.length - 1]}
         >
           +
-        </button>
+        </Button>
 
         {/* Preset dropdown */}
         {showPresets && (
           <div style={presetsDropdownStyles}>
             {ZOOM_PRESETS.map((preset) => (
-              <button
+              <Button
                 key={preset}
                 type="button"
                 onClick={() => {
@@ -269,12 +268,12 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                 }}
               >
                 {preset}%
-              </button>
+              </Button>
             ))}
             {onFitToScreen && (
               <>
                 <div style={presetDividerStyles} />
-                <button
+                <Button
                   type="button"
                   onClick={() => {
                     onFitToScreen();
@@ -283,26 +282,25 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
                   style={presetItemStyles}
                 >
                   Fit to screen
-                </button>
+                </Button>
               </>
             )}
           </div>
         )}
       </div>
-
       {/* Help Button */}
       {onHelpClick && (
         <>
           <div style={dividerStyles} />
           <Tooltip content="Keyboard shortcuts" shortcut="?">
-            <button
+            <Button
               type="button"
               style={{ ...zoomBtnStyles, width: "28px", height: "28px" }}
               onClick={onHelpClick}
               aria-label="Show keyboard shortcuts (press ? key)"
             >
               <HelpIcon />
-            </button>
+            </Button>
           </Tooltip>
         </>
       )}

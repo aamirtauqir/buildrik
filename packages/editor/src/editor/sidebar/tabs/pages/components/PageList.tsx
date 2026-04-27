@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * PageList — search input + pages tree + bulk toolbar mount + footer + Add CTA.
  * Zero business logic. All state/actions received as props from usePages + useFolders.
@@ -119,17 +120,17 @@ export const PageList: React.FC<Props> = ({
               Add your first page to get started. Pages are the screens visitors see.
             </div>
             <div className="bd-pg-empty-action">
-              <button className="bd-pg-add" type="button" onClick={onAddPage}>
+              <Button className="bd-pg-add" type="button" onClick={onAddPage}>
                 Create blank page
-              </button>
+              </Button>
               {onRequestTemplates && (
-                <button
+                <Button
                   className="bd-pg-add bd-pg-add-ghost"
                   type="button"
                   onClick={onRequestTemplates}
                 >
                   From template
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -163,19 +164,18 @@ export const PageList: React.FC<Props> = ({
               aria-label="Search pages"
             />
             {search && (
-              <button
+              <Button
                 className="bd-pg-search-clear"
                 type="button"
                 onClick={() => setSearch("")}
                 aria-label="Clear search"
               >
                 ×
-              </button>
+              </Button>
             )}
           </div>
         </div>
       )}
-
       {showSelectAll && (
         <div
           className="bd-pg-selectall"
@@ -208,15 +208,14 @@ export const PageList: React.FC<Props> = ({
           <span>Select all ({pages.length} page{pages.length !== 1 ? "s" : ""})</span>
         </div>
       )}
-
       <div className="bd-pg-list buildrick-scrollbar" role="tree" aria-label="Pages">
         {visible.length === 0 && search ? (
           <div className="bd-pg-empty">
             <div className="bd-pg-empty-title">No pages match &ldquo;{search}&rdquo;</div>
             <div className="bd-pg-empty-action">
-              <button className="bd-pg-add bd-pg-add-ghost" type="button" onClick={() => setSearch("")}>
+              <Button className="bd-pg-add bd-pg-add-ghost" type="button" onClick={() => setSearch("")}>
                 Clear search
-              </button>
+              </Button>
             </div>
           </div>
         ) : (
@@ -278,7 +277,6 @@ export const PageList: React.FC<Props> = ({
         {/* Drop indicator placeholder — toggled via .show during dragover (CSS owns visibility) */}
         <div className="bd-pg-drop-indicator" aria-hidden="true" />
       </div>
-
       {selectedIds.size >= 2 && (
         <BulkToolbar
           selectedCount={selectedIds.size}
@@ -290,7 +288,6 @@ export const PageList: React.FC<Props> = ({
           onClear={onClearSelection}
         />
       )}
-
       <div className="bd-pg-footer">
         <div className="bd-pg-footer-stats">
           <span><b>{stats.total}</b> page{stats.total !== 1 ? "s" : ""}</span>

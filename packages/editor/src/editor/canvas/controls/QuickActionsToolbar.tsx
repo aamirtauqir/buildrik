@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Quick Actions Toolbar Component
  * Floating toolbar below selected element with common actions
@@ -367,7 +368,7 @@ export const QuickActionsToolbar: React.FC<QuickActionsToolbarProps> = ({
       <div style={toolbarStyles}>
         {/* Add button */}
         <div style={{ position: "relative" }}>
-          <button
+          <Button
             onClick={() => setShowAddMenu(!showAddMenu)}
             style={{
               ...actionBtnStyles,
@@ -389,7 +390,7 @@ export const QuickActionsToolbar: React.FC<QuickActionsToolbarProps> = ({
             >
               <path d="M12 5v14M5 12h14" />
             </svg>
-          </button>
+          </Button>
 
           {/* Add menu dropdown */}
           {showAddMenu && (
@@ -400,7 +401,7 @@ export const QuickActionsToolbar: React.FC<QuickActionsToolbarProps> = ({
               aria-label="Add element options"
             >
               {addOptions.map((option) => (
-                <button
+                <Button
                   key={option.label}
                   onClick={option.action}
                   style={addMenuItemStyles}
@@ -409,7 +410,7 @@ export const QuickActionsToolbar: React.FC<QuickActionsToolbarProps> = ({
                 >
                   {option.icon}
                   <span>{option.label}</span>
-                </button>
+                </Button>
               ))}
             </div>
           )}
@@ -418,7 +419,7 @@ export const QuickActionsToolbar: React.FC<QuickActionsToolbarProps> = ({
         <div style={dividerStyles} />
 
         {/* Cut */}
-        <button
+        <Button
           onClick={handleCut}
           style={actionBtnStyles}
           title="Cut (Cmd+X)"
@@ -438,10 +439,10 @@ export const QuickActionsToolbar: React.FC<QuickActionsToolbarProps> = ({
             <line x1="14.47" y1="14.48" x2="20" y2="20" />
             <line x1="8.12" y1="8.12" x2="12" y2="12" />
           </svg>
-        </button>
+        </Button>
 
         {/* Duplicate */}
-        <button
+        <Button
           onClick={handleDuplicate}
           style={actionBtnStyles}
           title="Duplicate (Cmd+D)"
@@ -458,12 +459,12 @@ export const QuickActionsToolbar: React.FC<QuickActionsToolbarProps> = ({
             <rect x="9" y="9" width="13" height="13" rx="2" />
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
           </svg>
-        </button>
+        </Button>
 
         <div style={dividerStyles} />
 
         {/* Delete */}
-        <button
+        <Button
           onClick={handleDelete}
           style={{
             ...actionBtnStyles,
@@ -484,13 +485,13 @@ export const QuickActionsToolbar: React.FC<QuickActionsToolbarProps> = ({
             <line x1="10" y1="11" x2="10" y2="17" />
             <line x1="14" y1="11" x2="14" y2="17" />
           </svg>
-        </button>
+        </Button>
 
         <div style={dividerStyles} />
 
         {/* More button */}
         <div style={{ position: "relative" }}>
-          <button
+          <Button
             onClick={() => setShowMoreMenu(!showMoreMenu)}
             style={{
               ...actionBtnStyles,
@@ -506,7 +507,7 @@ export const QuickActionsToolbar: React.FC<QuickActionsToolbarProps> = ({
               <circle cx="12" cy="12" r="2" />
               <circle cx="19" cy="12" r="2" />
             </svg>
-          </button>
+          </Button>
 
           {/* More menu dropdown */}
           {showMoreMenu && (
@@ -517,7 +518,7 @@ export const QuickActionsToolbar: React.FC<QuickActionsToolbarProps> = ({
               aria-label="More element options"
             >
               {moreOptions.map((option) => (
-                <button
+                <Button
                   key={option.label}
                   onClick={option.action}
                   style={addMenuItemStyles}
@@ -526,13 +527,12 @@ export const QuickActionsToolbar: React.FC<QuickActionsToolbarProps> = ({
                 >
                   {option.icon}
                   <span>{option.label}</span>
-                </button>
+                </Button>
               ))}
             </div>
           )}
         </div>
       </div>
-
       {/* Block Picker Modal */}
       {pickerOpen && insertionPosition && (
         <BlockPickerModal

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * FlexItemControls - Flex item (child) properties: grow, shrink, basis, order
  * @license BSD-3-Clause
@@ -158,7 +159,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
                   ? "baseline"
                   : val;
           return (
-            <button
+            <Button
               key={val}
               style={compactBtn(styles["align-self"] === actualVal)}
               onClick={() => onChange("align-self", actualVal)}
@@ -166,7 +167,7 @@ export const FlexItemControls: React.FC<FlexItemControlsProps> = ({
               title={reason("align-self")}
             >
               {val.slice(0, 3)}
-            </button>
+            </Button>
           );
         })}
       </div>

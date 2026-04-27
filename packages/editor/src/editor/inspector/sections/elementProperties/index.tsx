@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Element Properties Section - Per-element specific attributes
  * href, src, alt, placeholder, etc.
@@ -111,14 +112,14 @@ const IconPickerButton: React.FC<IconPickerButtonProps> = ({
   handleIconSelect,
 }) => (
   <div style={styles.iconPickerContainer}>
-    <button
+    <Button
       onClick={() => onOpenIconPicker(getCurrentIconConfig(), handleIconSelect)}
       style={styles.iconPickerButton}
       title="Open icon picker"
     >
       <span style={{ fontSize: 16 }}>&#x1F3A8;</span>
       Change Icon
-    </button>
+    </Button>
     <div style={styles.iconHint}>Current: {iconName || "star"}</div>
   </div>
 );

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Export screen
  * @license BSD-3-Clause
@@ -126,7 +127,7 @@ export const ExportScreen: React.FC<ScreenProps> = ({ composer }) => {
                 aria-label="Email address for export waitlist notification"
                 style={waitlistInputStyles}
               />
-              <button
+              <Button
                 onClick={() => {
                   if (isValidEmail(waitlistEmail)) setWaitlistSubmitted(true);
                 }}
@@ -134,7 +135,7 @@ export const ExportScreen: React.FC<ScreenProps> = ({ composer }) => {
                 style={waitlistBtnStyles}
               >
                 Notify me
-              </button>
+              </Button>
             </div>
           </div>
         ) : (
@@ -154,7 +155,7 @@ export const ExportScreen: React.FC<ScreenProps> = ({ composer }) => {
       <Section title="Export Format">
         <div style={exportOptionsStyles}>
           {FORMAT_OPTIONS.map((fmt) => (
-            <button
+            <Button
               key={fmt.id}
               style={{
                 ...exportOptionStyles,
@@ -171,13 +172,12 @@ export const ExportScreen: React.FC<ScreenProps> = ({ composer }) => {
               <span style={optionHintStyles}>
                 {fmt.enabled ? fmt.hint : "Coming soon"}
               </span>
-            </button>
+            </Button>
           ))}
         </div>
       </Section>
-
       <Section title="Download">
-        <button
+        <Button
           style={{
             ...downloadBtnStyles,
             ...(isLoading || !isFormatEnabled ? downloadBtnDisabledStyles : {}),
@@ -189,7 +189,7 @@ export const ExportScreen: React.FC<ScreenProps> = ({ composer }) => {
           {isLoading
             ? "Exporting..."
             : `\u2B07 Download as ${selectedOption?.label ?? selectedFormat} (ZIP)`}
-        </button>
+        </Button>
 
         {status === "success" && (
           <div style={successMsgStyles} role="status">

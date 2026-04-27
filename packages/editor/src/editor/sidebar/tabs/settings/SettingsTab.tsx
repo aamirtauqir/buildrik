@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * SettingsTab — prototype-aligned shell.
  *
@@ -72,14 +73,14 @@ const BrandingPlaceholder: React.FC<BrandingPlaceholderProps> = ({ onOpenPalette
       <div className="bd-set-branding-placeholder-d">
         Palette owns the design system for this project. Changes there apply to every page.
       </div>
-      <button
+      <Button
         type="button"
         className="bd-set-btn pri"
         onClick={onOpenPalette}
         disabled={!onOpenPalette}
       >
         Open Palette →
-      </button>
+      </Button>
     </div>
   </div>
 );
@@ -210,7 +211,7 @@ export const SettingsTab: React.FC<
     const locked = isScreenLocked(n.id, userPlan);
     const Icon = n.icon;
     return (
-      <button
+      <Button
         key={n.id}
         type="button"
         onClick={() => handleNav(n.id)}
@@ -222,7 +223,7 @@ export const SettingsTab: React.FC<
         </span>
         <span className="bd-set-snav-label">{n.title}</span>
         {locked ? <span className="bd-set-snav-badge">Pro</span> : null}
-      </button>
+      </Button>
     );
   };
 
@@ -235,7 +236,7 @@ export const SettingsTab: React.FC<
         </div>
         <div className="bd-set-panel-acts">
           {onHelpClick ? (
-            <button
+            <Button
               type="button"
               className="bd-set-icon-btn"
               onClick={onHelpClick}
@@ -246,10 +247,10 @@ export const SettingsTab: React.FC<
                 <circle cx="12" cy="12" r="9" />
                 <path d="M12 17v-.5 M12 8a2 2 0 012 2c0 2-2 2-2 3.5" />
               </svg>
-            </button>
+            </Button>
           ) : null}
           {onClose ? (
-            <button
+            <Button
               type="button"
               className="bd-set-icon-btn"
               onClick={onClose}
@@ -259,7 +260,7 @@ export const SettingsTab: React.FC<
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <path d="M4 4l16 16M20 4L4 20" />
               </svg>
-            </button>
+            </Button>
           ) : null}
         </div>
       </div>
@@ -270,7 +271,7 @@ export const SettingsTab: React.FC<
             <div className="bd-set-snav-list">
               {NAV.map(renderRow)}
               {onReplayTour ? (
-                <button
+                <Button
                   type="button"
                   onClick={onReplayTour}
                   className="bd-set-snav-row bd-set-snav-row-sep"
@@ -279,7 +280,7 @@ export const SettingsTab: React.FC<
                     <TourIcon />
                   </span>
                   <span className="bd-set-snav-label">Tour</span>
-                </button>
+                </Button>
               ) : null}
             </div>
           </nav>
@@ -297,12 +298,12 @@ export const SettingsTab: React.FC<
                 <span>{dirtyCount} unsaved</span>
               </span>
               <div className="bd-set-savebar-actions">
-                <button type="button" className="bd-set-btn sec" onClick={handleDiscard}>
+                <Button type="button" className="bd-set-btn sec" onClick={handleDiscard}>
                   Discard
-                </button>
-                <button type="button" className="bd-set-btn pri" onClick={handleSave}>
+                </Button>
+                <Button type="button" className="bd-set-btn pri" onClick={handleSave}>
                   Save
-                </button>
+                </Button>
               </div>
             </div>
           </div>

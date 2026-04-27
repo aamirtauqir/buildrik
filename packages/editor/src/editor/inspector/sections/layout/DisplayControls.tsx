@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Display Controls - Display mode selection with visual previews
  * @license BSD-3-Clause
@@ -59,7 +60,6 @@ export const DisplayControls: React.FC<DisplayControlsProps> = ({ display, onCha
           position="right"
         />
       </div>
-
       {/* Display mode buttons */}
       <div
         style={{
@@ -70,7 +70,7 @@ export const DisplayControls: React.FC<DisplayControlsProps> = ({ display, onCha
         }}
       >
         {DISPLAY_OPTIONS.map((option) => (
-          <button
+          <Button
             key={option.value}
             style={cardBtn(display === option.value)}
             onClick={() => onChange("display", option.value)}
@@ -78,10 +78,9 @@ export const DisplayControls: React.FC<DisplayControlsProps> = ({ display, onCha
           >
             <DisplayPreview type={option.value} />
             <span>{option.label}</span>
-          </button>
+          </Button>
         ))}
       </div>
-
       {/* Tip for Flex/Grid */}
       {(isFlex || isGrid) && (
         <div style={tipBoxStyle}>

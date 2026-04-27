@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Media Tab — Confirm Delete Modal
  * Shows in-use warning, bulk type-DELETE gate, and file names.
@@ -72,17 +73,17 @@ export function ConfirmDeleteModal({ payload, onConfirm, onCancel }: ConfirmDele
 
         {/* Actions */}
         <div className="med-modal-actions">
-          <button className="med-modal-cancel" onClick={onCancel}>
+          <Button className="med-modal-cancel" onClick={onCancel}>
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             className="med-modal-confirm danger"
             onClick={onConfirm}
             disabled={!canConfirm}
             aria-disabled={!canConfirm}
           >
             Delete{keys.length > 1 ? ` ${keys.length} files` : ""}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Aquibra Quick Add Bar
  * Quick access to common blocks
@@ -68,7 +69,7 @@ export const QuickAddBar: React.FC<QuickAddBarProps> = ({ blocks, onAdd, disable
         Quick Add
       </span>
       {quickBlocks.map((block) => (
-        <button
+        <Button
           key={block.id}
           onClick={() => !disabled && onAdd(block)}
           onMouseEnter={() => !disabled && setHovered(block.id)}
@@ -100,7 +101,7 @@ export const QuickAddBar: React.FC<QuickAddBarProps> = ({ blocks, onAdd, disable
         >
           <block.Icon size={14} strokeWidth={1.5} />
           <span>{block.displayLabel}</span>
-        </button>
+        </Button>
       ))}
     </div>
   );

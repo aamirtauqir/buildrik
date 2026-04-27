@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * AlignmentSection - Alignment grid and justify/align controls
  * @license BSD-3-Clause
@@ -86,13 +87,13 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
                         ? "space-evenly"
                         : val;
             return (
-              <button
+              <Button
                 key={val}
                 style={compactBtn(styles["justify-content"] === actualVal)}
                 onClick={() => onChange("justify-content", actualVal)}
               >
                 {val.slice(0, 3)}
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -114,13 +115,13 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
           {["start", "center", "end", "stretch", "baseline"].map((val) => {
             const actualVal = val === "start" ? "flex-start" : val === "end" ? "flex-end" : val;
             return (
-              <button
+              <Button
                 key={val}
                 style={compactBtn(styles["align-items"] === actualVal)}
                 onClick={() => onChange("align-items", actualVal)}
               >
                 {val.slice(0, 3)}
-              </button>
+              </Button>
             );
           })}
         </div>

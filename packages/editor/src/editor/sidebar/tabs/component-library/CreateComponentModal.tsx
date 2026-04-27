@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * CreateComponentModal - Simple modal for creating a new reusable component
  * Shown when user clicks "+" in the Components tab header.
@@ -51,10 +52,10 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           />
         </div>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-          <button onClick={onClose} style={dialogCancelBtnStyles}>
+          <Button onClick={onClose} style={dialogCancelBtnStyles}>
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSubmit}
             disabled={!name.trim()}
             style={{
@@ -64,7 +65,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             }}
           >
             Create
-          </button>
+          </Button>
         </div>
       </div>
     </Modal>

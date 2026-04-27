@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * AllCSSSection - Raw CSS property editor (Dev Mode only)
  * Allows adding any CSS property directly
@@ -175,18 +176,17 @@ export const AllCSSSection: React.FC<AllCSSSectionProps> = ({
               value={prop.value}
               onChange={(e) => handleUpdateProperty(prop.name, e.target.value)}
             />
-            <button
+            <Button
               type="button"
               style={styles.removeBtn}
               onClick={() => handleRemoveProperty(prop.name)}
               title="Remove property"
             >
               ✕
-            </button>
+            </Button>
           </div>
         ))
       )}
-
       {/* Add new property */}
       <div style={styles.addForm}>
         <InputField
@@ -202,14 +202,14 @@ export const AllCSSSection: React.FC<AllCSSSectionProps> = ({
           onChange={(e) => setNewValue(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAddProperty()}
         />
-        <button
+        <Button
           type="button"
           style={styles.addBtn}
           onClick={handleAddProperty}
           disabled={!newProperty.trim()}
         >
           Add
-        </button>
+        </Button>
       </div>
     </Section>
   );

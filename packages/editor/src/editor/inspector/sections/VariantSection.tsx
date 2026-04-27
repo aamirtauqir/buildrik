@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * VariantSection - Component variant picker for instances
  * Shows when selected element is a component instance with variants
@@ -192,7 +193,7 @@ export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elemen
               {prop.values.map((value) => {
                 const isSelected = getCurrentValue(prop.name) === value;
                 return (
-                  <button
+                  <Button
                     key={value}
                     style={styles.chip(isSelected)}
                     onClick={() => handleVariantChange(prop.name, value)}
@@ -200,7 +201,7 @@ export const VariantSection: React.FC<VariantSectionProps> = ({ composer, elemen
                     aria-pressed={isSelected}
                   >
                     {value}
-                  </button>
+                  </Button>
                 );
               })}
             </div>

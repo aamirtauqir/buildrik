@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Media Tab — Standardized Rebuild (10-Star Experience)
  * Flattened hierarchy, canonical SearchBar integration, and high-visibility Bulk Actions.
@@ -150,7 +151,7 @@ function MediaTabWithComposer({
             <div style={{ width: 8, height: 8, borderRadius: 'var(--bd-radius-full)', background: 'rgba(255,255,255,0.6)', animation: 'pulse 2s infinite' }} />
             Selecting image for: <span style={{ opacity: 0.9 }}>{state.selectionContext.label || 'Canvas Element'}</span>
           </div>
-          <button 
+          <Button 
             onClick={() => state.setSelectionContext(null)}
             style={{
               background: 'rgba(255,255,255,0.1)',
@@ -163,10 +164,9 @@ function MediaTabWithComposer({
             }}
           >
             Cancel Selection
-          </button>
+          </Button>
         </div>
       )}
-
       {/* 1. Header bar — type pills + stock button + close */}
       <div className="med-tabs-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: ROW_LG }}>
         <TypePills
@@ -177,20 +177,19 @@ function MediaTabWithComposer({
         />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <button className="med-stock-btn" onClick={() => setStockModalOpen(true)}>
+          <Button className="med-stock-btn" onClick={() => setStockModalOpen(true)}>
             <Plus size={14} />
             Add from Stock
-          </button>
+          </Button>
           <div style={{ width: 1, height: 24, background: 'var(--bd-border-light)' }} />
-          <button onClick={onClose} style={{
+          <Button onClick={onClose} style={{
             background: 'none', border: 'none', color: 'var(--bd-fg-muted)',
             cursor: 'pointer', padding: 4, display: 'flex'
           }}>
             <Upload size={18} style={{ transform: 'rotate(180deg)' }} />
-          </button>
+          </Button>
         </div>
       </div>
-
       {/* 2. Unified Library */}
       <div className="med-content">
         <LibraryView
@@ -230,7 +229,6 @@ function MediaTabWithComposer({
           onEditImage={handleEditImage}
         />
       </div>
-
       {/* 5. Upload Zone (Library only) */}
       {(
         <UploadZone
@@ -240,7 +238,6 @@ function MediaTabWithComposer({
           disabled={state.storage.used >= state.storage.total}
         />
       )}
-
       {/* Drag Feedback Overlay */}
       {state.panelDragOver && (
         <div className="med-drag-overlay">
@@ -248,7 +245,6 @@ function MediaTabWithComposer({
           <div className="med-drag-label">Drop to upload to Library</div>
         </div>
       )}
-
       {/* Action Modals */}
       {state.ctxMenu && (
         <MediaContextMenu
@@ -264,7 +260,6 @@ function MediaTabWithComposer({
           onEditImage={handleEditImage}
         />
       )}
-
       {state.confirmDelete && (
         <ConfirmDeleteModal
           payload={state.confirmDelete}
@@ -272,7 +267,6 @@ function MediaTabWithComposer({
           onCancel={state.cancelDelete}
         />
       )}
-
       {state.detailItem && (
         <AssetDetailOverlay
           item={state.detailItem}
@@ -287,7 +281,6 @@ function MediaTabWithComposer({
           onEditImage={handleEditImage}
         />
       )}
-
       {/* Stock Source Modal — replaces old Discovery tab */}
       <StockSourceModal
         open={stockModalOpen}

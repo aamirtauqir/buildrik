@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * TypePills — horizontal filter chips for media type (All / Img / Vid / Ico / Fnt).
  * Emits onTypeChange with the new filter. `counts` populate small badges.
@@ -36,7 +37,7 @@ export function TypePills({
         const isActive = p.key === activeType;
         const count = counts[p.key];
         return (
-          <button
+          <Button
             key={p.key}
             type="button"
             role="tab"
@@ -48,7 +49,7 @@ export function TypePills({
             {!discMode && count > 0 ? (
               <span className="med-type-pill__count">{count}</span>
             ) : null}
-          </button>
+          </Button>
         );
       })}
     </div>

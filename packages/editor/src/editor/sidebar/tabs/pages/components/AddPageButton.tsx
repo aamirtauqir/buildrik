@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * AddPageButton — sticky cobalt CTA in pages footer.
  * Overflow (⋮) menu reveals secondary actions: "From template" + "New folder".
@@ -34,7 +35,7 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
 
   return (
     <div className="bd-pg-add-wrap" ref={wrapRef}>
-      <button
+      <Button
         type="button"
         className="bd-pg-add"
         onClick={onAddBlank}
@@ -45,10 +46,9 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
           <line x1="5" y1="12" x2="19" y2="12" />
         </svg>
         Add page
-      </button>
-
+      </Button>
       {hasOverflow && (
-        <button
+        <Button
           type="button"
           className="bd-pg-add-overflow"
           onClick={() => setMenuOpen((o) => !o)}
@@ -61,13 +61,12 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
             <circle cx="12" cy="12" r="1.6" />
             <circle cx="19" cy="12" r="1.6" />
           </svg>
-        </button>
+        </Button>
       )}
-
       {menuOpen && hasOverflow && (
         <div className="bd-pg-add-popover" role="menu">
           {onFromTemplate && (
-            <button
+            <Button
               type="button"
               className="bd-pg-add-option"
               role="menuitem"
@@ -77,10 +76,10 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
               }}
             >
               From template
-            </button>
+            </Button>
           )}
           {onAddFolder && (
-            <button
+            <Button
               type="button"
               className="bd-pg-add-option"
               role="menuitem"
@@ -90,7 +89,7 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
               }}
             >
               New folder
-            </button>
+            </Button>
           )}
         </div>
       )}

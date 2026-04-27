@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * PageWizard - Full-screen AI page generation wizard
  * Shown on first load when canvas is blank.
@@ -259,7 +260,7 @@ const FormView: React.FC<FormViewProps> = ({
       <label style={labelStyles}>Style</label>
       <div style={styleGridStyles}>
         {STYLE_PRESETS.map((preset) => (
-          <button
+          <Button
             key={preset.value}
             type="button"
             onClick={() => onStylePresetChange(preset.value)}
@@ -281,21 +282,21 @@ const FormView: React.FC<FormViewProps> = ({
             <div style={{ fontSize: 12, color: "var(--muted, #b7c5dc)", marginTop: 4 }}>
               {preset.description}
             </div>
-          </button>
+          </Button>
         ))}
       </div>
     </div>
 
     {/* Generate Button */}
-    <button type="button" onClick={onGenerate} style={generateBtnStyles}>
+    <Button type="button" onClick={onGenerate} style={generateBtnStyles}>
       <SparkleIcon />
       Generate Page
-    </button>
+    </Button>
 
     {/* Skip Link */}
-    <button type="button" onClick={onSkip} style={skipLinkStyles}>
+    <Button type="button" onClick={onSkip} style={skipLinkStyles}>
       or start with a blank canvas →
-    </button>
+    </Button>
   </>
 );
 
@@ -358,9 +359,9 @@ const LoadingView: React.FC<LoadingViewProps> = ({ steps, progress, onCancel }) 
     </div>
 
     {/* Cancel */}
-    <button type="button" onClick={onCancel} style={cancelBtnStyles}>
+    <Button type="button" onClick={onCancel} style={cancelBtnStyles}>
       Cancel
-    </button>
+    </Button>
   </>
 );
 
@@ -377,12 +378,12 @@ const ErrorView: React.FC<ErrorViewProps> = ({ onRetry, onSkip }) => (
       Something went wrong during generation. You can try again or start from a template.
     </p>
     <div style={{ display: "flex", gap: 12 }}>
-      <button type="button" onClick={onSkip} style={templateBtnStyles}>
+      <Button type="button" onClick={onSkip} style={templateBtnStyles}>
         Browse Templates Instead
-      </button>
-      <button type="button" onClick={onRetry} style={generateBtnStyles}>
+      </Button>
+      <Button type="button" onClick={onRetry} style={generateBtnStyles}>
         Try Again
-      </button>
+      </Button>
     </div>
   </>
 );

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Keyboard Shortcuts Cheat Sheet
  * Floating overlay triggered by '?' key showing all available shortcuts
@@ -241,7 +242,7 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
             <span style={{ fontSize: 20 }}>⌨️</span>
             Keyboard Shortcuts
           </h2>
-          <button
+          <Button
             onClick={onClose}
             aria-label="Close keyboard shortcuts"
             style={{
@@ -261,7 +262,7 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
             onMouseOut={(e) => (e.currentTarget.style.background = "transparent")}
           >
             <span style={{ fontSize: 18 }}>✕</span>
-          </button>
+          </Button>
         </div>
 
         {/* Content - Scrollable grid of shortcut groups */}

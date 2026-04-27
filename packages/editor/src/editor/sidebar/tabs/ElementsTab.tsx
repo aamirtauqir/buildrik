@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * ElementsTab - Block library (orchestrator)
  * Quick Access Pills, animated accordion by category, favorites, recents.
@@ -48,7 +49,7 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
     <div className="buildrick-sidebar-container">
       {/* Quick Access Pills */}
       <div className="buildrick-quick-pills">
-        <button
+        <Button
           className={`buildrick-pill ${showRecentsOverlay ? "active" : ""}`}
           onClick={() => {
             setShowRecentsOverlay(!showRecentsOverlay);
@@ -58,9 +59,9 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
           <History size={14} />
           Recents
           {recentIds.length > 0 && <span className="buildrick-pill-badge">{recentIds.length}</span>}
-        </button>
+        </Button>
 
-        <button
+        <Button
           className={`buildrick-pill ${showFavoritesOverlay ? "active" : ""}`}
           onClick={() => {
             setShowFavoritesOverlay(!showFavoritesOverlay);
@@ -70,25 +71,24 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
           <Star size={14} />
           Favorites
           {favorites.length > 0 && <span className="buildrick-pill-badge">{favorites.length}</span>}
-        </button>
+        </Button>
 
         {showTip && (
-          <button className="buildrick-pill buildrick-pill-tip" onClick={dismissTip}>
+          <Button className="buildrick-pill buildrick-pill-tip" onClick={dismissTip}>
             <Lightbulb size={14} />
             Drag onto canvas
             <X size={12} className="buildrick-pill-dismiss" />
-          </button>
+          </Button>
         )}
       </div>
-
       {/* Recents overlay */}
       {showRecentsOverlay && (
         <div className="buildrick-quick-overlay">
           <div className="buildrick-overlay-header">
             <span>Recent Elements</span>
-            <button onClick={() => setShowRecentsOverlay(false)}>
+            <Button onClick={() => setShowRecentsOverlay(false)}>
               <X size={14} />
-            </button>
+            </Button>
           </div>
           {recentBlocks.length > 0 ? (
             <div className="buildrick-overlay-grid">
@@ -111,15 +111,14 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
           )}
         </div>
       )}
-
       {/* Favorites overlay */}
       {showFavoritesOverlay && (
         <div className="buildrick-quick-overlay">
           <div className="buildrick-overlay-header">
             <span>Favorite Elements</span>
-            <button onClick={() => setShowFavoritesOverlay(false)}>
+            <Button onClick={() => setShowFavoritesOverlay(false)}>
               <X size={14} />
-            </button>
+            </Button>
           </div>
           {favoriteBlocks.length > 0 ? (
             <div className="buildrick-overlay-grid">
@@ -143,7 +142,6 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
           )}
         </div>
       )}
-
       {/* Main content — category accordions */}
       {!showRecentsOverlay && !showFavoritesOverlay && (
         <div className="buildrick-sidebar-content buildrick-scrollbar" aria-live="polite">
@@ -152,7 +150,7 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
             const CategoryIcon = CATEGORY_ICONS[cat];
             return (
               <div key={cat} className="buildrick-accordion">
-                <button
+                <Button
                   className={`buildrick-accordion-header ${isOpen ? "open" : ""}`}
                   onClick={() => toggleCategory(cat)}
                   aria-expanded={isOpen}
@@ -165,7 +163,7 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
                     <span className="buildrick-accordion-count">{filtered[cat].length}</span>
                   </span>
                   <ChevronIcon expanded={isOpen} />
-                </button>
+                </Button>
                 <AnimatedAccordionContent isOpen={isOpen}>
                   <div className="buildrick-element-grid">
                     {filtered[cat].map((block) => (

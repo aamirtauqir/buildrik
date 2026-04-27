@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Smart Suggestions Component
  * Context-aware action suggestions below selected element
@@ -300,7 +301,7 @@ export const SmartSuggestions: React.FC<SmartSuggestionsProps> = ({
       }}
     >
       {suggestions.map((suggestion) => (
-        <button
+        <Button
           key={suggestion.id}
           onClick={() => handleSuggestionClick(suggestion)}
           title={suggestion.label}
@@ -327,11 +328,10 @@ export const SmartSuggestions: React.FC<SmartSuggestionsProps> = ({
         >
           <span style={{ fontSize: 14 }}>{suggestion.icon}</span>
           <span>{suggestion.label}</span>
-        </button>
+        </Button>
       ))}
-
       {/* Dismiss button */}
-      <button
+      <Button
         onClick={handleDismiss}
         title="Dismiss suggestions"
         style={{
@@ -359,7 +359,7 @@ export const SmartSuggestions: React.FC<SmartSuggestionsProps> = ({
         }}
       >
         ×
-      </button>
+      </Button>
     </div>
   );
 };

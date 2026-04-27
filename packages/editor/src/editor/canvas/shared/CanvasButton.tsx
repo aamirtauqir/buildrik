@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Canvas Button Component
  * Shared button component for canvas UI elements
@@ -111,7 +112,7 @@ export const CanvasButton: React.FC<CanvasButtonProps> = ({
   };
 
   return (
-    <button
+    <Button
       {...rest}
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
@@ -123,7 +124,7 @@ export const CanvasButton: React.FC<CanvasButtonProps> = ({
     >
       {icon && <span>{icon}</span>}
       {label && <span>{label}</span>}
-    </button>
+    </Button>
   );
 };
 

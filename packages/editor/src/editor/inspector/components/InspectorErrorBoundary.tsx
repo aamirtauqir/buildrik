@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -65,7 +66,7 @@ export class InspectorErrorBoundary extends React.Component<
           <div style={{ fontSize: 12, color: "#f87171", marginBottom: 12 }}>
             {this.state.message}
           </div>
-          <button
+          <Button
             onClick={() => this.setState({ hasError: false, message: undefined })}
             style={{
               padding: "6px 12px",
@@ -79,7 +80,7 @@ export class InspectorErrorBoundary extends React.Component<
             }}
           >
             Try Again
-          </button>
+          </Button>
         </div>
       );
     }

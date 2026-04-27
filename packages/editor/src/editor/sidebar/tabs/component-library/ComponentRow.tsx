@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * ComponentRow - Single component item in the component list
  * Handles drag, selection, context menu (insert/rename/duplicate/favorite/delete).
@@ -70,7 +71,7 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
       </span>
     )}
 
-    <button
+    <Button
       className="buildrick-component-add-btn"
       onClick={(e) => {
         e.stopPropagation();
@@ -79,10 +80,10 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
       title={`Add ${component.name} to canvas`}
     >
       Add
-    </button>
+    </Button>
 
     <div className="buildrick-component-menu-wrapper">
-      <button
+      <Button
         className="buildrick-component-menu-btn"
         onClick={(e) => {
           e.stopPropagation();
@@ -92,31 +93,31 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
         title="More options"
       >
         <MoreHorizontal size={16} />
-      </button>
+      </Button>
 
       {openMenuId === component.id && (
         <div className="buildrick-component-dropdown" onClick={(e) => e.stopPropagation()}>
-          <button onClick={() => onInstantiate(component.id)}>
+          <Button onClick={() => onInstantiate(component.id)}>
             <Plus size={14} /> Insert
-          </button>
-          <button onClick={() => onRename(component.id)}>
+          </Button>
+          <Button onClick={() => onRename(component.id)}>
             <Edit3 size={14} /> Rename
-          </button>
-          <button onClick={() => onDuplicate(component.id)}>
+          </Button>
+          <Button onClick={() => onDuplicate(component.id)}>
             <Copy size={14} /> Duplicate
-          </button>
+          </Button>
           {hasVariants(component.id) && (
-            <button onClick={() => onSwapVariant(component.id)}>
+            <Button onClick={() => onSwapVariant(component.id)}>
               <RefreshCw size={14} /> Swap Variant
-            </button>
+            </Button>
           )}
-          <button onClick={(e) => onToggleFavorite(component.id, e)}>
+          <Button onClick={(e) => onToggleFavorite(component.id, e)}>
             <Star size={14} fill={isFavorite(component.id) ? "currentColor" : "none"} />
             {isFavorite(component.id) ? "Unfavorite" : "Favorite"}
-          </button>
-          <button className="buildrick-menu-danger" onClick={() => onDelete(component.id)}>
+          </Button>
+          <Button className="buildrick-menu-danger" onClick={() => onDelete(component.id)}>
             <Trash2 size={14} /> Delete
-          </button>
+          </Button>
         </div>
       )}
     </div>

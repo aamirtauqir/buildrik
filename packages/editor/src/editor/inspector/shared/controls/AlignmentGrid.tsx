@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * AlignmentGrid — 9-dot justify/align picker. Ported to .bdi-pad per
  * comp-inspector.html v2 mock. Shows a pad + kv meta block side-by-side.
@@ -36,7 +37,7 @@ export const AlignmentGrid: React.FC<AlignmentGridProps> = ({
         const isActive =
           justifyItems === pos.ji && alignItems === pos.ai;
         return (
-          <button
+          <Button
             key={i}
             type="button"
             className={`bdi-d${isActive ? " on" : ""}`}

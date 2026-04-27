@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * CommandPalette — ⌘K overlay
  * Matches design spec: search input, action groups (Navigation/Edit/Save),
@@ -131,7 +132,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
         }}
         aria-hidden="true"
       />
-
       {/* Panel */}
       <div
         role="dialog"
@@ -227,7 +227,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
                 const isActive = flatIndex === activeIndex;
                 const currentIndex = flatIndex++;
                 return (
-                  <button
+                  <Button
                     key={action.id}
                     role="option"
                     aria-selected={isActive}
@@ -272,7 +272,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
                         {action.shortcut}
                       </kbd>
                     )}
-                  </button>
+                  </Button>
                 );
               })}
             </div>

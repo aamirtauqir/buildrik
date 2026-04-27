@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * AchievementPrompt — Game-like step completion overlay
  *
@@ -63,7 +64,6 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
           pointerEvents: "none",
         }}
       />
-
       {/* Dim overlay — click to dismiss */}
       <div
         onClick={onDismiss}
@@ -76,7 +76,6 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
           cursor: "pointer",
         }}
       />
-
       {/* Achievement card */}
       <div
         role="dialog"
@@ -235,7 +234,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
           )}
 
           {/* Primary action button */}
-          <button
+          <Button
             type="button"
             onClick={onDismiss}
             autoFocus
@@ -255,7 +254,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
             }}
           >
             {isLastStep ? "Done" : "Continue →"}
-          </button>
+          </Button>
         </div>
       </div>
     </>

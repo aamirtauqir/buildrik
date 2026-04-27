@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Default control registry — maps each Field discriminator to a React
  * component. Session 1 ships minimal controls for length, number, select,
@@ -231,7 +232,7 @@ const Spacing4Control: React.FC<ControlProps<Spacing4Field>> = ({
       <div style={rowStyle}>
         <span style={labelStyle}>{field.label}</span>
         {field.linkable !== false && (
-          <button
+          <Button
             type="button"
             onClick={() => setLinked((v) => !v)}
             aria-pressed={linked}
@@ -250,7 +251,7 @@ const Spacing4Control: React.FC<ControlProps<Spacing4Field>> = ({
             }}
           >
             {linked ? "Linked" : "Link"}
-          </button>
+          </Button>
         )}
       </div>
       {SIDES.map((side) => (
@@ -336,7 +337,7 @@ const Corners4Control: React.FC<ControlProps<Corners4Field>> = ({
       <div style={rowStyle}>
         <span style={labelStyle}>{field.label}</span>
         {field.linkable !== false && (
-          <button
+          <Button
             type="button"
             onClick={() => setLinked((v) => !v)}
             aria-pressed={linked}
@@ -355,7 +356,7 @@ const Corners4Control: React.FC<ControlProps<Corners4Field>> = ({
             }}
           >
             {linked ? "Linked" : "Link"}
-          </button>
+          </Button>
         )}
       </div>
       {CORNERS.map((c) => (

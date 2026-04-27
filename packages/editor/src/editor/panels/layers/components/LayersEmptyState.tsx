@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * LayersEmptyState - Empty state for Layers panel when canvas has no elements.
  * @license BSD-3-Clause
@@ -20,9 +21,9 @@ export const LayersEmptyState: React.FC<LayersEmptyStateProps> = ({ onAddBlockCl
       <h3>No layers yet</h3>
       <p>Drop in a block to get started.</p>
       {onAddBlockClick && (
-        <button className="bdc-btn bdc-primary" onClick={onAddBlockClick}>
+        <Button className="bdc-btn bdc-primary" onClick={onAddBlockClick}>
           Browse blocks
-        </button>
+        </Button>
       )}
     </div>
   );

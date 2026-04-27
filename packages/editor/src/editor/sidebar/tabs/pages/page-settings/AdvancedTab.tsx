@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * AdvancedTab — Visibility, schedule, password, indexing, head code.
  *
@@ -18,27 +19,27 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
       <div className="bd-pg-adv-section">
         <div className="bd-pg-adv-section-label">Visibility</div>
         <div className="bd-pg-adv-seg" role="radiogroup" aria-label="Page visibility">
-          <button
+          <Button
             type="button"
             role="radio"
             aria-checked={s.visibility === "live"}
             className={`bd-pg-adv-seg-btn${s.visibility === "live" ? " bd-pg-adv-seg-btn--on" : ""}`}
             onClick={() => s.setVisibility("live")}
-          >Live</button>
-          <button
+          >Live</Button>
+          <Button
             type="button"
             role="radio"
             aria-checked={s.visibility === "hidden"}
             className={`bd-pg-adv-seg-btn${s.visibility === "hidden" ? " bd-pg-adv-seg-btn--on" : ""}`}
             onClick={() => s.setVisibility("hidden")}
-          >Hidden</button>
-          <button
+          >Hidden</Button>
+          <Button
             type="button"
             role="radio"
             aria-checked={s.visibility === "password"}
             className={`bd-pg-adv-seg-btn${s.visibility === "password" ? " bd-pg-adv-seg-btn--on" : ""}`}
             onClick={() => s.setVisibility("password")}
-          >Password</button>
+          >Password</Button>
         </div>
         <div className="bd-pg-adv-hint">
           {s.visibility === "live" && "Page is publicly accessible."}
@@ -46,7 +47,6 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
           {s.visibility === "password" && "Visitors must enter a password to view this page."}
         </div>
       </div>
-
       {/* Password input — only when visibility=password */}
       {s.visibility === "password" && (
         <div className="bd-pg-adv-password">
@@ -59,24 +59,23 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
               placeholder="Enter password"
               aria-label="Page access password"
             />
-            <button
+            <Button
               className="bd-pg-adv-password-btn"
               onClick={() => s.setShowPassword(!s.showPassword)}
               type="button"
               aria-label={s.showPassword ? "Hide password" : "Show password"}
-            >{s.showPassword ? "Hide" : "Show"}</button>
-            <button
+            >{s.showPassword ? "Hide" : "Show"}</Button>
+            <Button
               className="bd-pg-adv-password-btn"
               onClick={() => s.copyPassword()}
               type="button"
               aria-label="Copy password"
               disabled={!s.password}
-            >Copy</button>
+            >Copy</Button>
           </div>
           <div className="bd-pg-seo-hint">Share this password with visitors who need access.</div>
         </div>
       )}
-
       {/* Indexing */}
       <div className="bd-pg-adv-section">
         <div className="bd-pg-adv-section-label">Search Engine Indexing</div>
@@ -85,7 +84,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
             <div className="bd-pg-adv-toggle-label">Allow indexing</div>
             <div className="bd-pg-adv-toggle-hint">Let search engines list this page in results.</div>
           </div>
-          <button
+          <Button
             type="button"
             role="switch"
             aria-checked={s.allowIndex}
@@ -99,7 +98,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
             <div className="bd-pg-adv-toggle-label">Follow links</div>
             <div className="bd-pg-adv-toggle-hint">Let search engines follow outbound links on this page.</div>
           </div>
-          <button
+          <Button
             type="button"
             role="switch"
             aria-checked={s.allowFollow}
@@ -109,7 +108,6 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
           />
         </div>
       </div>
-
       {/* Head code */}
       <div className="bd-pg-adv-section">
         <div className="bd-pg-adv-section-label">Custom &lt;head&gt; code</div>

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette (error boundary / overlay / preview
@@ -104,13 +105,13 @@ export const TemplatePreviewPanel: React.FC<TemplatePreviewPanelProps> = ({
     <div className={`buildrick-template-preview-panel ${visible ? "visible" : ""}`} style={panelStyles}>
       {!template ? (
         /* Empty State */
-        <div style={emptyStateStyles}>
+        (<div style={emptyStateStyles}>
           <GridIcon />
           <p style={emptyTextStyles}>Select a template to start building</p>
-        </div>
+        </div>)
       ) : (
         /* Selected Template Preview */
-        <>
+        (<>
           {/* Preview Area */}
           <div style={previewAreaStyles}>
             <div style={iframeWrapperStyles}>
@@ -128,7 +129,6 @@ export const TemplatePreviewPanel: React.FC<TemplatePreviewPanelProps> = ({
               )}
             </div>
           </div>
-
           {/* Info Card */}
           <div style={infoCardStyles}>
             <div style={infoHeaderStyles}>
@@ -146,16 +146,16 @@ export const TemplatePreviewPanel: React.FC<TemplatePreviewPanelProps> = ({
             {/* Action Buttons */}
             <div style={actionsStyles}>
               {isPremium ? (
-                <button style={upgradeButtonStyles}>
+                <Button style={upgradeButtonStyles}>
                   <UpgradeIcon />
                   Upgrade to Pro
-                </button>
+                </Button>
               ) : (
                 <>
-                  <button style={primaryButtonStyles} onClick={() => onUseTemplate(template)}>
+                  <Button style={primaryButtonStyles} onClick={() => onUseTemplate(template)}>
                     Use Template
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     style={ghostButtonStyles}
                     onClick={() => {
                       // Open full preview in new tab (safe external link)
@@ -166,22 +166,21 @@ export const TemplatePreviewPanel: React.FC<TemplatePreviewPanelProps> = ({
                     title="Open full preview"
                   >
                     <ExternalIcon />
-                  </button>
+                  </Button>
                 </>
               )}
             </div>
           </div>
-
           {/* Close button */}
-          <button
+          <Button
             style={closeButtonStyles}
             onClick={onClose}
             title="Close preview (ESC)"
             aria-label="Close preview"
           >
             <CloseIcon />
-          </button>
-        </>
+          </Button>
+        </>)
       )}
     </div>
   );

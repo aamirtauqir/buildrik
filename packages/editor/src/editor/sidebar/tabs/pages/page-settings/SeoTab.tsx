@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * SeoTab — Pure form renderer. No state. No logic.
  * All state via UsePageSettingsReturn (s prop).
@@ -52,16 +53,15 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           {s.seoDesc || "No description — add one below to improve ranking"}
         </div>
       </div>
-
       {/* ── 2. SEO SCORE ────────────────────────────────────────────────── */}
       {!s.allowIndex ? (
         <div className="bd-pg-seo-noindex-warning" role="alert">
           <div className="bd-pg-seo-noindex-msg">
             <strong>noIndex is ON</strong> — search engines won't index this page regardless of your
             SEO settings.
-            <button className="bd-pg-seo-noindex-fix" onClick={() => s.setAllowIndex(true)}>
+            <Button className="bd-pg-seo-noindex-fix" onClick={() => s.setAllowIndex(true)}>
               Turn indexing on →
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
@@ -104,7 +104,6 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           )}
         </>
       )}
-
       {/* ── 3. TITLE ────────────────────────────────────────────────────── */}
       <div className="bd-pg-seo-field">
         <div className="bd-pg-seo-field-header">
@@ -116,12 +115,12 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           </span>
         </div>
         {s.seoTitle.length < 10 && (
-          <button type="button" className="bd-pg-seo-ai-chip" aria-label="Suggest SEO title">
+          <Button type="button" className="bd-pg-seo-ai-chip" aria-label="Suggest SEO title">
             <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
               <path d="M5 3l14 9-14 9V3z" />
             </svg>
             Write with AI
-          </button>
+          </Button>
         )}
         <input
           id="seo-title"
@@ -135,7 +134,6 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           Aim for 50–60 characters for best Google ranking
         </div>
       </div>
-
       {/* ── 4. META DESCRIPTION ─────────────────────────────────────────── */}
       <div className="bd-pg-seo-field">
         <div className="bd-pg-seo-field-header">
@@ -154,7 +152,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
               position="right"
               delay={200}
             >
-              <button
+              <Button
                 type="button"
                 aria-label="About Meta Description"
                 style={{
@@ -180,7 +178,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
                   <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
                   <line x1="12" y1="17" x2="12.01" y2="17" />
                 </svg>
-              </button>
+              </Button>
             </Tooltip>
           </div>
           <span
@@ -208,7 +206,6 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           Briefly describe this page (150–160 chars). Appears in Google results below your title.
         </div>
       </div>
-
       {/* ── 5. URL SLUG ─────────────────────────────────────────────────── */}
       <div className="bd-pg-seo-field">
         <label className="bd-pg-seo-label" htmlFor="seo-slug">

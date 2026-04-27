@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * UnsavedWarningModal — confirms tab switch with unsaved changes.
  * Form atoms (action buttons) use ROW_MD from layout constants + radius-sm
@@ -74,28 +75,28 @@ export const UnsavedWarningModal: React.FC<Props> = ({
 
         {/* Actions */}
         <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
-          <button
+          <Button
             ref={discardRef}
             onClick={onDiscard}
             style={discardBtn}
             aria-label="Discard changes and switch tab"
           >
             Discard
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onCancel}
             style={cancelBtn}
             aria-label="Cancel and stay on current tab"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onSaveAndSwitch}
             style={saveBtn}
             aria-label="Save changes and switch tab"
           >
             Save &amp; Switch
-          </button>
+          </Button>
         </div>
       </div>
     </Modal>

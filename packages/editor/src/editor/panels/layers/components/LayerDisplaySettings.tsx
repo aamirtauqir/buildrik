@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * LayerDisplaySettings - Popover for toggling layer display preferences.
  *
@@ -43,11 +44,10 @@ export function LayerDisplaySettings({ prefs, onChange, onClose }: LayerDisplayS
     >
       <div className="bdc-popover-h">
         <span>Display Settings</span>
-        <button className="bdc-icon-btn" onClick={onClose} aria-label="Close display settings">
+        <Button className="bdc-icon-btn" onClick={onClose} aria-label="Close display settings">
           ×
-        </button>
+        </Button>
       </div>
-
       <label className="bdc-toggle-row">
         <span>
           Show HTML tags
@@ -61,7 +61,6 @@ export function LayerDisplaySettings({ prefs, onChange, onClose }: LayerDisplayS
           aria-label="Show HTML tags"
         />
       </label>
-
       <label className="bdc-toggle-row">
         <span>
           Show element IDs
@@ -75,7 +74,6 @@ export function LayerDisplaySettings({ prefs, onChange, onClose }: LayerDisplayS
           aria-label="Show element IDs"
         />
       </label>
-
       <label className="bdc-toggle-row">
         <span>Compact rows</span>
         <input

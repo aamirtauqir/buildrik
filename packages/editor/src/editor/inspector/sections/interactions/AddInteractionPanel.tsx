@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Add Interaction Panel Component
  * Panel for selecting and adding new interaction triggers
@@ -100,14 +101,14 @@ const TriggerGroup: React.FC<TriggerGroupProps> = ({ groupName, triggers, onAdd 
     <div style={styles.groupLabel}>{GROUP_LABELS[groupName] || groupName}</div>
     <div style={styles.triggerGrid}>
       {triggers.map((trigger) => (
-        <button
+        <Button
           key={trigger.value}
           onClick={() => onAdd(trigger.value as InteractionTrigger)}
           style={styles.triggerButton}
         >
           <span>{trigger.icon}</span>
           <span>{trigger.label}</span>
-        </button>
+        </Button>
       ))}
     </div>
   </div>
@@ -121,9 +122,9 @@ export const AddInteractionPanel: React.FC<AddInteractionPanelProps> = ({ onAdd,
   <div style={styles.container}>
     <div style={styles.header}>
       <span style={styles.title}>Choose Trigger</span>
-      <button onClick={onClose} style={styles.closeButton}>
+      <Button onClick={onClose} style={styles.closeButton}>
         &#215;
-      </button>
+      </Button>
     </div>
 
     {Object.entries(TRIGGER_GROUPS).map(([groupName, triggers]) => (

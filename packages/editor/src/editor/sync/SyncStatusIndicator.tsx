@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * SyncStatusIndicator - Display sync status in the UI
  * @module components/Sync/SyncStatusIndicator
@@ -68,7 +69,7 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
 
   if (compact) {
     return (
-      <button
+      <Button
         onClick={onSync}
         style={{ ...compactButtonStyles, color }}
         title={label}
@@ -78,19 +79,19 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
         {managerState.pendingOperations > 0 && (
           <span style={badgeStyles}>{managerState.pendingOperations}</span>
         )}
-      </button>
+      </Button>
     );
   }
 
   return (
     <div style={containerStyles}>
-      <button onClick={onSync} style={buttonStyles} disabled={status.isSyncing}>
+      <Button onClick={onSync} style={buttonStyles} disabled={status.isSyncing}>
         <span style={{ color }}>{icon}</span>
         <div style={textContainerStyles}>
           <span style={labelStyles}>{label}</span>
           {lastSync && <span style={lastSyncStyles}>{lastSync}</span>}
         </div>
-      </button>
+      </Button>
       {managerState.pendingOperations > 0 && (
         <span style={{ ...badgeStyles, position: "static", marginLeft: "8px" }}>
           {managerState.pendingOperations} pending

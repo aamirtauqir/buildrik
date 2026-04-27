@@ -377,7 +377,6 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           <span style={step === 2 ? s.stepActive : {}}>Fields</span>
         </div>
       </div>
-
       {step === 1 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {/* Collection name */}
@@ -439,7 +438,6 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           </div>
         </div>
       )}
-
       {step === 2 && (
         <div>
           <div
@@ -504,7 +502,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                     </option>
                   ))}
                 </select>
-                <button
+                <Button
                   type="button"
                   style={s.removeBtn}
                   onClick={() => removeField(field.id)}
@@ -520,7 +518,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
                   }}
                 >
                   <Trash2 size={12} aria-hidden />
-                </button>
+                </Button>
               </div>
             ))}
           </div>

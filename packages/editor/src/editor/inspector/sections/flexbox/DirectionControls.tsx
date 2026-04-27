@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * DirectionControls - Flex direction selection with visual icons
  * @license BSD-3-Clause
@@ -67,7 +68,7 @@ export const DirectionControls: React.FC<DirectionControlsProps> = ({
       }}
     >
       {["row", "column", "row-reverse", "column-reverse"].map((val) => (
-        <button
+        <Button
           key={val}
           style={visualBtn(currentDirection === val)}
           onClick={() => onChange("flex-direction", val)}
@@ -81,7 +82,7 @@ export const DirectionControls: React.FC<DirectionControlsProps> = ({
                 ? "Col-R"
                 : val.charAt(0).toUpperCase() + val.slice(1)}
           </span>
-        </button>
+        </Button>
       ))}
     </div>
   </>

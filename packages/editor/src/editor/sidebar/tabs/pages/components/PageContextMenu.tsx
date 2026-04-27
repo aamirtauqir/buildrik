@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * PageContextMenu — portal context menu for page actions.
  *
@@ -99,7 +100,7 @@ export const PageContextMenu: React.FC<Props> = ({
       aria-label={`Options for ${page?.name ?? "page"}`}
       onKeyDown={handleKeyDown}
     >
-      <button
+      <Button
         type="button"
         className="bd-pg-menu-item"
         role="menuitem"
@@ -107,8 +108,8 @@ export const PageContextMenu: React.FC<Props> = ({
         onClick={() => act(() => onRename(pageId))}
       >
         Rename <kbd>F2</kbd>
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
         className="bd-pg-menu-item"
         role="menuitem"
@@ -116,9 +117,9 @@ export const PageContextMenu: React.FC<Props> = ({
         onClick={() => act(() => onDuplicate(pageId))}
       >
         Duplicate <kbd>⌘D</kbd>
-      </button>
+      </Button>
       {!isHome && (
-        <button
+        <Button
           type="button"
           className="bd-pg-menu-item"
           role="menuitem"
@@ -126,9 +127,9 @@ export const PageContextMenu: React.FC<Props> = ({
           onClick={() => act(() => onSetHomepage(pageId))}
         >
           Set as Homepage
-        </button>
+        </Button>
       )}
-      <button
+      <Button
         type="button"
         className="bd-pg-menu-item"
         role="menuitem"
@@ -136,8 +137,8 @@ export const PageContextMenu: React.FC<Props> = ({
         onClick={() => act(() => onCopyLink(pageId))}
       >
         Copy Page Link
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
         className="bd-pg-menu-item"
         role="menuitem"
@@ -145,9 +146,9 @@ export const PageContextMenu: React.FC<Props> = ({
         onClick={() => act(() => onSettings(pageId))}
       >
         Page Settings <kbd>⌘,</kbd>
-      </button>
+      </Button>
       <div className="bd-pg-menu-divider" role="separator" />
-      <button
+      <Button
         type="button"
         className={`bd-pg-menu-item danger${deleteDisabled ? " disabled" : ""}`}
         role="menuitem"
@@ -159,7 +160,7 @@ export const PageContextMenu: React.FC<Props> = ({
         }}
       >
         Delete Page
-      </button>
+      </Button>
     </div>
   );
 

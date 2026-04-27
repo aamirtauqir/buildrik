@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette (error boundary / overlay / preview
@@ -93,7 +94,6 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
   // ── Full panel ──────────────────────────────────────────────────────────
   return (
     <div ref={containerRef} style={panelStyles} role="region" aria-label="Getting started checklist">
-
       {/* Header */}
       <div style={headerStyles}>
         <div style={{ display: "flex", flexDirection: "column", gap: 2, flex: 1, minWidth: 0 }}>
@@ -107,7 +107,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
 
         <div style={headerActionsStyles}>
           {/* Minimize */}
-          <button
+          <Button
             type="button"
             style={iconBtnStyles}
             onClick={onMinimize}
@@ -115,21 +115,21 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
             title="Minimize"
           >
             <Minus size={13} />
-          </button>
+          </Button>
 
           {/* Close / Confirm */}
           {confirmingDismiss ? (
             <div style={confirmRowStyles}>
               <span style={confirmTextStyles}>Hide this?</span>
-              <button type="button" style={confirmYesStyles} onClick={onDismiss}>
+              <Button type="button" style={confirmYesStyles} onClick={onDismiss}>
                 Yes
-              </button>
-              <button type="button" style={confirmNoStyles} onClick={() => setConfirmingDismiss(false)}>
+              </Button>
+              <Button type="button" style={confirmNoStyles} onClick={() => setConfirmingDismiss(false)}>
                 No
-              </button>
+              </Button>
             </div>
           ) : (
-            <button
+            <Button
               type="button"
               style={iconBtnStyles}
               onClick={() => setConfirmingDismiss(true)}
@@ -137,11 +137,10 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
               title="Close"
             >
               <X size={13} />
-            </button>
+            </Button>
           )}
         </div>
       </div>
-
       {/* Progress bar */}
       <div style={progressTrackStyles}>
         <div
@@ -152,7 +151,6 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
           }}
         />
       </div>
-
       {/* Steps */}
       <ul style={listStyles} aria-label="Onboarding steps">
         {steps.map((step) => {
@@ -172,7 +170,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
               }}
             >
               {/* Step header row */}
-              <button
+              <Button
                 type="button"
                 style={stepRowStyles}
                 onClick={() => onSetActiveStepId(isActive ? null : step.id)}
@@ -210,21 +208,20 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
                     }
                   </span>
                 )}
-              </button>
-
+              </Button>
               {/* Expanded body */}
               {isActive && !isCompleted && (
                 <div style={stepBodyStyles}>
                   <p style={stepDescStyles}>{step.description}</p>
                   {step.actionKey && step.actionLabel && (
-                    <button
+                    <Button
                       type="button"
                       style={ctaBtnStyles}
                       onClick={() => onAction(step.actionKey!)}
                     >
                       {step.actionLabel}
                       <ArrowRight size={12} style={{ marginLeft: 6, flexShrink: 0 }} />
-                    </button>
+                    </Button>
                   )}
                 </div>
               )}
@@ -232,16 +229,15 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
           );
         })}
       </ul>
-
       {/* All-done footer */}
       {allDone && (
         <div style={allDoneFooterStyles}>
           <p style={allDoneTextStyles}>
             You have completed all the getting started steps. Go build something great.
           </p>
-          <button type="button" style={dismissBtnStyles} onClick={onDismiss}>
+          <Button type="button" style={dismissBtnStyles} onClick={onDismiss}>
             Close checklist
-          </button>
+          </Button>
         </div>
       )}
     </div>

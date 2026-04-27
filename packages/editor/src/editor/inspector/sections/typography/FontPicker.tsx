@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * FontPicker - Font family dropdown with Google Fonts integration
  * Part of Typography section refactoring
@@ -106,9 +107,8 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
       >
         Font Family
       </label>
-
       {/* Current Font Display / Toggle Button */}
-      <button
+      <Button
         onClick={() => setShowFontPicker(!showFontPicker)}
         aria-haspopup="listbox"
         aria-expanded={showFontPicker}
@@ -133,8 +133,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
         <span style={{ fontSize: 12, color: "var(--buildrick-text-tertiary)" }}>
           {showFontPicker ? "\u25B2" : "\u25BC"}
         </span>
-      </button>
-
+      </Button>
       {/* Font Picker Dropdown */}
       {showFontPicker && (
         <div

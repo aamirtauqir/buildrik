@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Menu Item Component
  * Individual menu item with keyboard hint support
@@ -27,7 +28,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   const [isHovered, setIsHovered] = React.useState(false);
 
   return (
-    <button
+    <Button
       onClick={onClick}
       disabled={!enabled && !hasSubmenu}
       style={{
@@ -56,7 +57,6 @@ export const MenuItem: React.FC<MenuItemProps> = ({
         <MenuIcon name={action.icon} />
         <span>{action.label}</span>
       </div>
-
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         {/* Keyboard shortcut */}
         {action.shortcut && <KeyboardHint shortcut={action.shortcut} />}
@@ -74,7 +74,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
           </span>
         )}
       </div>
-    </button>
+    </Button>
   );
 };
 

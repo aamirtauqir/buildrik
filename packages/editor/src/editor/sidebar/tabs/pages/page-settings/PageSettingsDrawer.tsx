@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * PageSettingsDrawer — 580px slide-over for page-level settings.
  *
@@ -82,7 +83,7 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
       <div className="bd-pg-drawer" role="dialog" aria-modal="true" aria-label={`${page.name} settings`}>
         {/* ── Header ─────────────────────────────────────────────── */}
         <div className="bd-pg-drawer-hdr">
-          <button
+          <Button
             className="bd-pg-drawer-back"
             onClick={handleClose}
             aria-label="Close page settings"
@@ -91,7 +92,7 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <polyline points="15 18 9 12 15 6" />
             </svg>
-          </button>
+          </Button>
 
           <div className="bd-pg-drawer-title-block">
             <div className="bd-pg-drawer-title" title={page.name}>
@@ -105,7 +106,7 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
           </div>
 
           {/* Save button */}
-          <button
+          <Button
             className={[
               "bd-pg-drawer-save",
               s.saveState === "saving" ? "bd-pg-drawer-save--saving" : "",
@@ -118,13 +119,13 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
             aria-label={s.isDirty ? "Save changes" : "No unsaved changes"}
           >
             {s.saveState === "saving" ? "Saving..." : s.saveState === "error" ? "Retry" : s.isDirty ? "Save" : "Saved"}
-          </button>
+          </Button>
         </div>
 
         {/* ── Tab bar ────────────────────────────────────────────── */}
         <div className="bd-pg-drawer-tabs" role="tablist" aria-label="Settings sections">
           {TABS.map((tab) => (
-            <button
+            <Button
               key={tab.id}
               role="tab"
               aria-selected={s.activeTab === tab.id}
@@ -136,7 +137,7 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
               {tab.id === "seo" && s.seoScore < 80 && s.allowIndex && (
                 <span className="bd-pg-drawer-tab-chip" aria-hidden="true">{s.seoScore}</span>
               )}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -159,7 +160,6 @@ export const PageSettingsDrawer: React.FC<Props> = ({ page, allPages, composer, 
           )}
         </div>
       </div>
-
       <UnsavedWarningModal
         isOpen={s.showDiscardConfirm}
         pendingTab={s.pendingTabChange ?? "seo"}

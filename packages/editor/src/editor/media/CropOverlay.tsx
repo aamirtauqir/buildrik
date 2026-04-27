@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -261,7 +262,7 @@ export const CropOverlay: React.FC<CropOverlayProps> = ({
       {/* Aspect Ratio Presets */}
       <div style={styles.presetBar}>
         {ASPECT_RATIO_PRESETS.slice(0, 6).map((preset) => (
-          <button
+          <Button
             key={preset.id}
             onClick={() => onAspectRatioChange(preset)}
             style={{
@@ -270,10 +271,9 @@ export const CropOverlay: React.FC<CropOverlayProps> = ({
             }}
           >
             {preset.label}
-          </button>
+          </Button>
         ))}
       </div>
-
       {/* Crop Area */}
       <div ref={containerRef} style={styles.container}>
         <img src={imageSrc} alt="Crop preview" style={styles.image} />

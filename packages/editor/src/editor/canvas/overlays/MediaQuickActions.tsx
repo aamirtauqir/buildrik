@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Media Quick Actions Component
  * Floating toolbar for image elements on canvas
@@ -87,25 +88,25 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
           pointerEvents: "auto",
         }}
       >
-        <button onClick={handleReplace} title="Replace Media" style={actionBtnStyle}>
+        <Button onClick={handleReplace} title="Replace Media" style={actionBtnStyle}>
           <Image size={14} />
           <span style={{ fontSize: "11px", fontWeight: 600 }}>Replace</span>
-        </button>
+        </Button>
 
         {isImage && (
           <>
             <div style={{ width: 1, height: 16, background: "var(--buildrick-border-light, #313244)" }} />
-            <button onClick={handleEdit} title="Edit Image" style={actionBtnStyle}>
+            <Button onClick={handleEdit} title="Edit Image" style={actionBtnStyle}>
               <Edit2 size={14} />
               <span style={{ fontSize: "11px", fontWeight: 600 }}>Edit</span>
-            </button>
+            </Button>
           </>
         )}
 
         {isIcon && (
           <>
             <div style={{ width: 1, height: 16, background: "var(--buildrick-border-light, #313244)" }} />
-            <button 
+            <Button 
               onClick={() => setShowColorPopover(!showColorPopover)} 
               title="Change Color" 
               style={{
@@ -115,14 +116,14 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
             >
               <Palette size={14} />
               <span style={{ fontSize: "11px", fontWeight: 600 }}>Color</span>
-            </button>
+            </Button>
           </>
         )}
 
         {isImage && (
           <>
             <div style={{ width: 1, height: 16, background: "var(--buildrick-border-light, #313244)" }} />
-            <button 
+            <Button 
               onClick={() => setShowAltPopover(!showAltPopover)} 
               title="Alt Text" 
               style={{
@@ -132,11 +133,10 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
             >
               <Type size={14} />
               <span style={{ fontSize: "11px", fontWeight: 600 }}>Alt</span>
-            </button>
+            </Button>
           </>
         )}
       </div>
-
       {/* Alt Popover */}
       {showAltPopover && (
         <div style={popoverStyle}>
@@ -151,18 +151,17 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
               placeholder="Describe this image..."
               style={inputStyle}
             />
-            <button onClick={handleSaveAlt} style={saveBtnStyle}><Check size={14} /></button>
+            <Button onClick={handleSaveAlt} style={saveBtnStyle}><Check size={14} /></Button>
           </div>
         </div>
       )}
-
       {/* Color Popover */}
       {showColorPopover && (
         <div style={popoverStyle}>
           <div style={popoverTitleStyle}>Icon Color</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "6px" }}>
             {ICON_COLORS.map(c => (
-              <button
+              <Button
                 key={c}
                 onClick={() => handleSetColor(c)}
                 style={{

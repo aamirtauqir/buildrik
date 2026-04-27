@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * PageRow — single page row in the pages tree.
  *
@@ -264,7 +265,7 @@ export const PageRow = React.memo<Props>(
             </span>
           )}
 
-          <button
+          <Button
             className="bd-pg-row-overflow"
             type="button"
             aria-label={`More options for ${page.name}`}
@@ -277,7 +278,7 @@ export const PageRow = React.memo<Props>(
               <circle cx="12" cy="12" r="1" fill="currentColor" />
               <circle cx="19" cy="12" r="1" fill="currentColor" />
             </svg>
-          </button>
+          </Button>
         </div>
       </div>
     );

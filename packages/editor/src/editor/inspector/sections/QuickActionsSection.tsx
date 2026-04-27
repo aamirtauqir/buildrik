@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * QuickActionsSection — one-click display presets per comp-inspector.v1 mock.
  *
@@ -160,7 +161,7 @@ export const QuickActionsSection: React.FC<QuickActionsSectionProps> = ({
         {PRESETS.map((preset) => {
           const isActive = active === preset.id;
           return (
-            <button
+            <Button
               key={preset.id}
               type="button"
               onClick={() => onBatchChange(preset.changes)}
@@ -173,7 +174,7 @@ export const QuickActionsSection: React.FC<QuickActionsSectionProps> = ({
                 <preset.Icon />
               </span>
               {preset.label}
-            </button>
+            </Button>
           );
         })}
       </div>

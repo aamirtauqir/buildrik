@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * ReplaceAcrossDialog — confirms and surfaces results of replace-across-canvas.
  *
@@ -106,17 +107,17 @@ export function ReplaceAcrossDialog({
               </div>
             </div>
             <footer className="med-rx-footer">
-              <button type="button" className="med-rx-btn" onClick={onClose}>
+              <Button type="button" className="med-rx-btn" onClick={onClose}>
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 className="med-rx-btn med-rx-btn--primary"
                 onClick={handleCommit}
                 disabled={state.usageCount === 0}
               >
                 Replace {state.usageCount} use{state.usageCount === 1 ? "" : "s"}
-              </button>
+              </Button>
             </footer>
           </>
         ) : null}
@@ -157,13 +158,13 @@ function ResultView({
           Replaced {replaced.length} use{replaced.length === 1 ? "" : "s"} ✓
         </p>
         <footer className="med-rx-footer">
-          <button
+          <Button
             type="button"
             className="med-rx-btn med-rx-btn--primary"
             onClick={onClose}
           >
             Done
-          </button>
+          </Button>
         </footer>
       </>
     );
@@ -187,9 +188,9 @@ function ResultView({
           </ul>
         </details>
         <footer className="med-rx-footer">
-          <button type="button" className="med-rx-btn" onClick={onClose}>
+          <Button type="button" className="med-rx-btn" onClick={onClose}>
             Close
-          </button>
+          </Button>
         </footer>
       </>
     );
@@ -212,16 +213,16 @@ function ResultView({
         </ul>
       </details>
       <footer className="med-rx-footer">
-        <button type="button" className="med-rx-btn" onClick={onClose}>
+        <Button type="button" className="med-rx-btn" onClick={onClose}>
           Close
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           className="med-rx-btn med-rx-btn--primary"
           onClick={onRetryFailed}
         >
           Retry failed
-        </button>
+        </Button>
       </footer>
     </>
   );

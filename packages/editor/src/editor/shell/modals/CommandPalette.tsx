@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * CommandPalette — Studio-level Command Palette
  * Triggered by Ctrl+K / ⌘+K
@@ -271,7 +272,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           zIndex: "calc(var(--buildrick-z-modal) - 1)",
         }}
       />
-
       {/* Panel */}
       <div
         role="dialog"
@@ -383,14 +383,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                   >
                     {group}
                   </div>
-
                   {/* Items */}
                   {cmds.map((cmd) => {
                     const globalIdx = filteredCommands.indexOf(cmd);
                     const isSelected = globalIdx === selectedIndex;
 
                     return (
-                      <button
+                      <Button
                         key={cmd.id}
                         data-idx={globalIdx}
                         onClick={cmd.handler}
@@ -442,9 +441,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
                             {cmd.label}
                           </span>
                         </div>
-
                         {cmd.shortcut && <ShortcutBadge shortcut={cmd.shortcut} />}
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>

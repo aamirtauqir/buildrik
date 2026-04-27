@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * MilestoneSuggestionBanner - Inline banner for auto-milestone suggestions
  * Phase 5: Shows AI-suggested version name with Save/Edit/Dismiss actions
@@ -82,7 +83,6 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
           <path d="M8 5v3l2 1" />
         </svg>
       </div>
-
       {/* Content */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 11, color: "var(--bd-fg-muted)", marginBottom: 2 }}>
@@ -139,32 +139,31 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
           </div>
         )}
       </div>
-
       {/* Actions */}
       <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
         {isEditing ? (
-          <button
+          <Button
             onClick={handleEditSave}
             className="milestone-btn milestone-btn--primary"
             style={{ background: "var(--bd-accent)", color: "var(--bd-fg-on-accent)" }}
           >
             Save
-          </button>
+          </Button>
         ) : (
           <>
-            <button
+            <Button
               onClick={() => onAccept(null)}
               className="milestone-btn milestone-btn--primary"
               disabled={isLoading}
             >
               {isLoading ? "..." : "Save"}
-            </button>
-            <button onClick={handleEditStart} className="milestone-btn milestone-btn--ghost">
+            </Button>
+            <Button onClick={handleEditStart} className="milestone-btn milestone-btn--ghost">
               Edit
-            </button>
-            <button onClick={onDismiss} className="milestone-btn milestone-btn--ghost">
+            </Button>
+            <Button onClick={onDismiss} className="milestone-btn milestone-btn--ghost">
               Dismiss
-            </button>
+            </Button>
           </>
         )}
       </div>

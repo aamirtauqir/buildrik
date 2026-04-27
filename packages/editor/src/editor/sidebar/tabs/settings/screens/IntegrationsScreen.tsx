@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Integrations screen — L1: actionable cards with external links
  * Real integration API not yet available; each card links to docs/external setup.
@@ -78,13 +79,13 @@ export const IntegrationsScreen: React.FC<ScreenProps> = () => (
               <div style={descStyles}>{integration.description}</div>
             </div>
             <span style={badgeStyles}>Coming Soon</span>
-            <button
+            <Button
               style={learnBtnStyles}
               onClick={() => window.open(integration.docsUrl, "_blank", "noopener")}
               aria-label={`Learn more about ${integration.name}`}
             >
               Learn More
-            </button>
+            </Button>
           </div>
         ))}
       </Section>

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * LayerTreeItem - Minimal Tree Design
  * Clean rows with hover-reveal actions (Hide/Lock)
@@ -140,141 +141,141 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
 
   return (
     <>
-    <div
-      className={rowClassNames}
-      role="treeitem"
-      tabIndex={0}
-      draggable={canDrag}
-      aria-selected={isSelected}
-      aria-expanded={hasChildren ? isExpanded : undefined}
-      aria-label={`${displayName}, ${layer.type} element${isHidden ? ", hidden" : ""}${isLocked ? ", locked" : ""}`}
-      aria-level={layer.depth + 1}
-      title={`${displayName}${isHidden ? " (Hidden)" : ""}${isLocked ? " (Locked)" : ""}`}
-      style={rowStyle}
-      data-drop={dropPosition ?? undefined}
-      onMouseEnter={() => onMouseEnter(layer.id)}
-      onMouseLeave={onMouseLeave}
-      onDragStart={canDrag ? (e) => onDragStart(e, layer.id, layer.type) : undefined}
-      onDragEnd={onDragEnd}
-      onDragOver={(e) => onDragOver(e, layer.id, layer.type)}
-      onDragLeave={onDragLeave}
-      onDrop={(e) => onDrop(e, layer.id)}
-      onClick={(e) => {
-        onSelect(layer.id, { shift: e.shiftKey, meta: e.metaKey || e.ctrlKey });
-      }}
-      onContextMenu={(e) => {
-        e.preventDefault();
-        onContextMenu(e, layer.id);
-      }}
-      onDoubleClick={(e) => {
-        if (!isLocked) onStartEditing(layer.id, displayName, e);
-      }}
-      onKeyDown={handleKeyDown}
-    >
-      <button
-        type="button"
-        className="bdc-lr-chev"
-        aria-label={hasChildren ? (isExpanded ? "Collapse children" : "Expand children") : undefined}
-        aria-hidden={!hasChildren}
-        tabIndex={hasChildren ? undefined : -1}
+      <div
+        className={rowClassNames}
+        role="treeitem"
+        tabIndex={0}
+        draggable={canDrag}
+        aria-selected={isSelected}
+        aria-expanded={hasChildren ? isExpanded : undefined}
+        aria-label={`${displayName}, ${layer.type} element${isHidden ? ", hidden" : ""}${isLocked ? ", locked" : ""}`}
+        aria-level={layer.depth + 1}
+        title={`${displayName}${isHidden ? " (Hidden)" : ""}${isLocked ? " (Locked)" : ""}`}
+        style={rowStyle}
+        data-drop={dropPosition ?? undefined}
+        onMouseEnter={() => onMouseEnter(layer.id)}
+        onMouseLeave={onMouseLeave}
+        onDragStart={canDrag ? (e) => onDragStart(e, layer.id, layer.type) : undefined}
+        onDragEnd={onDragEnd}
+        onDragOver={(e) => onDragOver(e, layer.id, layer.type)}
+        onDragLeave={onDragLeave}
+        onDrop={(e) => onDrop(e, layer.id)}
         onClick={(e) => {
-          e.stopPropagation();
-          if (hasChildren) onToggleExpand(layer.id);
+          onSelect(layer.id, { shift: e.shiftKey, meta: e.metaKey || e.ctrlKey });
         }}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          onContextMenu(e, layer.id);
+        }}
+        onDoubleClick={(e) => {
+          if (!isLocked) onStartEditing(layer.id, displayName, e);
+        }}
+        onKeyDown={handleKeyDown}
       >
-        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M6 9l6 6 6-6" />
-        </svg>
-      </button>
-
-      <span className="bdc-lr-ic" aria-hidden>
-        <IconComponent size="sm" />
-      </span>
-
-      {isEditing ? (
-        <input
-          ref={editInputRef}
-          type="text"
-          className="bdc-lr-edit"
-          value={editingName}
-          onChange={(e) => onEditingNameChange(e.target.value)}
-          onBlur={onSaveEditedName}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") onSaveEditedName();
-            else if (e.key === "Escape") onCancelEditing();
+        <Button
+          type="button"
+          className="bdc-lr-chev"
+          aria-label={hasChildren ? (isExpanded ? "Collapse children" : "Expand children") : undefined}
+          aria-hidden={!hasChildren}
+          tabIndex={hasChildren ? undefined : -1}
+          onClick={(e) => {
             e.stopPropagation();
+            if (hasChildren) onToggleExpand(layer.id);
           }}
-          onClick={(e) => e.stopPropagation()}
-        />
-      ) : (
-        <>
-          <span className="bdc-lr-nm">{displayName}</span>
-          {displayPrefs.showHtmlBadges && (
-            <span className="bdc-lr-tag" aria-hidden>{layer.tagName}</span>
-          )}
-          {displayPrefs.showElementIds && (
-            <span className="bdc-lr-id" aria-hidden>#{layer.id.slice(0, 8)}</span>
-          )}
-          {layer.isComponent && (
-            <span className="bdc-lr-cmp" title="Component instance" aria-label="Component instance">⚡</span>
-          )}
-          {layer.breakpointOverrides?.mobile?.hidden && (
-            <span className="bdc-lr-bp" title="Hidden on mobile" role="img" aria-label="Hidden on mobile">M</span>
-          )}
-          {layer.breakpointOverrides?.tablet?.hidden && (
-            <span className="bdc-lr-bp" title="Hidden on tablet" role="img" aria-label="Hidden on tablet">T</span>
-          )}
-        </>
-      )}
+        >
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </Button>
 
-      <button
-        type="button"
-        className={`bdc-lr-lock${isLocked ? " bdc-on" : ""}`}
-        title={isLocked ? "Unlock element" : "Lock element"}
-        aria-label={isLocked ? "Unlock element" : "Lock element"}
-        onClick={(e) => onToggleLock(layer.id, e)}
-      >
-        <svg viewBox="0 0 24 24">
-          {isLocked ? (
-            <>
-              <rect x="5" y="11" width="14" height="10" rx="2" />
-              <path d="M8 11V7a4 4 0 018 0v4" />
-            </>
-          ) : (
-            <>
-              <rect x="5" y="11" width="14" height="10" rx="2" />
-              <path d="M8 11V7a4 4 0 018 0" />
-            </>
-          )}
-        </svg>
-      </button>
+        <span className="bdc-lr-ic" aria-hidden>
+          <IconComponent size="sm" />
+        </span>
 
-      <button
-        type="button"
-        className={`bdc-lr-eye${isHidden ? " bdc-off" : ""}`}
-        title={isHidden ? "Show element" : "Hide element"}
-        aria-label={isHidden ? "Show element" : "Hide element"}
-        onClick={(e) => onToggleVisibility(layer.id, e)}
-      >
-        <svg viewBox="0 0 24 24">
-          {isHidden ? (
-            <>
-              <path d="M3 3l18 18" />
-              <path d="M10.6 10.6a2 2 0 002.8 2.8" />
-              <path d="M9.9 5.1A9.5 9.5 0 0121 12a9.5 9.5 0 01-2.1 3" />
-            </>
-          ) : (
-            <>
-              <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" />
-              <circle cx="12" cy="12" r="2.5" />
-            </>
-          )}
-        </svg>
-      </button>
-    </div>
-    {isExpanded && hasChildren && layer.children.map((child) => (
-      <LayerTreeItem key={child.id} {...props} layer={child} />
-    ))}
+        {isEditing ? (
+          <input
+            ref={editInputRef}
+            type="text"
+            className="bdc-lr-edit"
+            value={editingName}
+            onChange={(e) => onEditingNameChange(e.target.value)}
+            onBlur={onSaveEditedName}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") onSaveEditedName();
+              else if (e.key === "Escape") onCancelEditing();
+              e.stopPropagation();
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          <>
+            <span className="bdc-lr-nm">{displayName}</span>
+            {displayPrefs.showHtmlBadges && (
+              <span className="bdc-lr-tag" aria-hidden>{layer.tagName}</span>
+            )}
+            {displayPrefs.showElementIds && (
+              <span className="bdc-lr-id" aria-hidden>#{layer.id.slice(0, 8)}</span>
+            )}
+            {layer.isComponent && (
+              <span className="bdc-lr-cmp" title="Component instance" aria-label="Component instance">⚡</span>
+            )}
+            {layer.breakpointOverrides?.mobile?.hidden && (
+              <span className="bdc-lr-bp" title="Hidden on mobile" role="img" aria-label="Hidden on mobile">M</span>
+            )}
+            {layer.breakpointOverrides?.tablet?.hidden && (
+              <span className="bdc-lr-bp" title="Hidden on tablet" role="img" aria-label="Hidden on tablet">T</span>
+            )}
+          </>
+        )}
+
+        <Button
+          type="button"
+          className={`bdc-lr-lock${isLocked ? " bdc-on" : ""}`}
+          title={isLocked ? "Unlock element" : "Lock element"}
+          aria-label={isLocked ? "Unlock element" : "Lock element"}
+          onClick={(e) => onToggleLock(layer.id, e)}
+        >
+          <svg viewBox="0 0 24 24">
+            {isLocked ? (
+              <>
+                <rect x="5" y="11" width="14" height="10" rx="2" />
+                <path d="M8 11V7a4 4 0 018 0v4" />
+              </>
+            ) : (
+              <>
+                <rect x="5" y="11" width="14" height="10" rx="2" />
+                <path d="M8 11V7a4 4 0 018 0" />
+              </>
+            )}
+          </svg>
+        </Button>
+
+        <Button
+          type="button"
+          className={`bdc-lr-eye${isHidden ? " bdc-off" : ""}`}
+          title={isHidden ? "Show element" : "Hide element"}
+          aria-label={isHidden ? "Show element" : "Hide element"}
+          onClick={(e) => onToggleVisibility(layer.id, e)}
+        >
+          <svg viewBox="0 0 24 24">
+            {isHidden ? (
+              <>
+                <path d="M3 3l18 18" />
+                <path d="M10.6 10.6a2 2 0 002.8 2.8" />
+                <path d="M9.9 5.1A9.5 9.5 0 0121 12a9.5 9.5 0 01-2.1 3" />
+              </>
+            ) : (
+              <>
+                <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" />
+                <circle cx="12" cy="12" r="2.5" />
+              </>
+            )}
+          </svg>
+        </Button>
+      </div>
+      {isExpanded && hasChildren && layer.children.map((child) => (
+        <LayerTreeItem key={child.id} {...props} layer={child} />
+      ))}
     </>
   );
 };

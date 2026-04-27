@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Media Tab — Asset Detail Overlay (vSrqD spec)
  * Back nav row h=30 + preview h=140 + metadata + actions.
@@ -89,20 +90,19 @@ export function AssetDetailOverlay({
     <div ref={overlayRef} className="med-detail-overlay" role="dialog" aria-modal="true" aria-label={item.name}>
       {/* Back nav row (vSrqD) — h=30, padding [8,10] */}
       <div className="med-detail-nav">
-        <button className="med-detail-back" onClick={onClose} aria-label="Back to media grid">
+        <Button className="med-detail-back" onClick={onClose} aria-label="Back to media grid">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
           Back to media grid
-        </button>
+        </Button>
         <span className="med-strip-spacer" />
-        {onPrev && <button className="med-detail-navbtn" onClick={onPrev}>Prev</button>}
-        {onNext && <button className="med-detail-navbtn" onClick={onNext}>Next</button>}
+        {onPrev && <Button className="med-detail-navbtn" onClick={onPrev}>Prev</Button>}
+        {onNext && <Button className="med-detail-navbtn" onClick={onNext}>Next</Button>}
       </div>
-
       {metaError ? (
         /* COb2m — Metadata error state */
-        <div className="med-detail-error-body">
+        (<div className="med-detail-error-body">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bd-fg-secondary, var(--bd-fg-muted))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" />
             <line x1="9" y1="9" x2="15" y2="15" />
@@ -110,13 +110,13 @@ export function AssetDetailOverlay({
           </svg>
           <p className="med-detail-error-title">Preview metadata unavailable</p>
           <p className="med-detail-error-sub">The file may have been moved or deleted.</p>
-          <button
+          <Button
             className="med-detail-retry"
             onClick={() => setMetaError(false)}
           >
             Retry
-          </button>
-        </div>
+          </Button>
+        </div>)
       ) : (
         <>
           {/* Preview — h=140, fill var(--bd-bg-card), cornerRadius 4 */}
@@ -182,19 +182,19 @@ export function AssetDetailOverlay({
 
           {/* Action buttons row — padding [4,12,12,12], gap 6 */}
           <div className="med-detail-actions">
-            <button
+            <Button
               className="med-detail-action-btn med-detail-action-btn--primary"
               onClick={handleInsert}
               disabled={inserted}
             >
               {inserted ? "Added ✓" : "Add to page"}
-            </button>
-            <button
+            </Button>
+            <Button
               className="med-detail-action-btn med-detail-action-btn--danger"
               onClick={() => onDelete(item.key)}
             >
               Delete
-            </button>
+            </Button>
           </div>
         </>
       )}

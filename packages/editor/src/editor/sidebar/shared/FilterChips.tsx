@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * FilterChips - Scrollable horizontal filter chip row
  * Used for category filtering in Suggestions, Styling tabs
@@ -64,7 +65,7 @@ export const FilterChips: React.FC<FilterChipsProps> = ({
       {chips.map((chip, index) => {
         const isActive = value === chip.id;
         return (
-          <button
+          <Button
             key={chip.id}
             role="tab"
             aria-selected={isActive}
@@ -78,7 +79,7 @@ export const FilterChips: React.FC<FilterChipsProps> = ({
           >
             {chip.icon && <span style={iconStyles}>{chip.icon}</span>}
             {chip.label}
-          </button>
+          </Button>
         );
       })}
     </div>

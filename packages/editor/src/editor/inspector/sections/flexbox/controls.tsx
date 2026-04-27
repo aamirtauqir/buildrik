@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Flexbox Control Components
  * AlignmentGrid (9-dot picker) and GapSlider
@@ -75,7 +76,7 @@ export const FlexAlignmentGrid: React.FC<FlexAlignmentGridProps> = ({
             ? row === currentAlign && col === currentJustify
             : row === currentAlign && col === currentJustify;
           return (
-            <button
+            <Button
               key={`${row}-${col}`}
               onClick={() => handleClick(row, col)}
               style={{
@@ -100,7 +101,7 @@ export const FlexAlignmentGrid: React.FC<FlexAlignmentGridProps> = ({
                   background: isActive ? "#fff" : "var(--buildrick-text-tertiary)",
                 }}
               />
-            </button>
+            </Button>
           );
         })
       )}

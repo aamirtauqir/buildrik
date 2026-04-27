@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * SearchBar - Search input for sidebar tabs
  * Debounces onChange to parent (300ms default) while keeping input visually instant
@@ -92,9 +93,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         aria-label={ariaLabel}
       />
       {inputValue ? (
-        <button onClick={handleClear} style={clearButtonStyles} aria-label="Clear search">
+        <Button onClick={handleClear} style={clearButtonStyles} aria-label="Clear search">
           <ClearIcon />
-        </button>
+        </Button>
       ) : kbdHint ? (
         <span className="bld-kbd-hint" aria-hidden="true">{kbdHint}</span>
       ) : null}

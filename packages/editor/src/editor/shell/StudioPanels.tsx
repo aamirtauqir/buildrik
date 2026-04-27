@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * StudioPanels - Main panel layout component
  * Manages left sidebar, canvas area, right inspector, and fullpage views.
@@ -349,97 +350,97 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
   return (
     <TokenRegistryProvider projectId={projectId}>
-    <LayoutShell
-      drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
-      drawerPinned={panelPinned}
-      drawerWidth={drawerWidth}
-      fullPageMode={effectiveFullPageMode && isLeftPanelOpen}
-      inspectorOpen={!!selectedElement && !effectiveFullPageMode}
-      style={styles.container}
-    >
-      {/* Left Sidebar — merged rail + panel */}
-      <LayoutShell.Sidebar>
-        <LeftSidebar
-          composer={composer}
-          activeTab={activeTabId}
-          onTabChange={handleRailTabChange}
-          drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
-          onDrawerToggle={onLeftPanelToggle ?? (() => {})}
-          isPinned={panelPinned}
-          onPinToggle={onPanelPinnedToggle}
-          onElementSelect={handleElementSelect}
-          onBlockClick={handleBlockClick}
-          canvasHoveredId={canvasHoveredId}
-          projectId={projectId}
-          onOpenLibrary={handleOpenLibrary}
-        />
-      </LayoutShell.Sidebar>
-
-      {/* Canvas Area — main editing surface */}
-      <LayoutShell.Canvas>
-        <PageTabBar composer={composer} />
-        <div style={styles.canvasPattern} />
-        <div ref={composerContainerRef} style={styles.canvasContent}>
-          <Canvas
-            ref={canvasRef}
+      <LayoutShell
+        drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
+        drawerPinned={panelPinned}
+        drawerWidth={drawerWidth}
+        fullPageMode={effectiveFullPageMode && isLeftPanelOpen}
+        inspectorOpen={!!selectedElement && !effectiveFullPageMode}
+        style={styles.container}
+      >
+        {/* Left Sidebar — merged rail + panel */}
+        <LayoutShell.Sidebar>
+          <LeftSidebar
             composer={composer}
-            device={device}
-            zoom={zoom}
-            showSpacing={showSpacingIndicators}
-            showBadges={showBadges}
-            showGuides={showGuides}
-            showGrid={showGrid}
-            showComponentView={showComponentView}
-            showXRay={showXRay}
-            devMode={devMode}
-            onAIRequest={onAIRequest}
-            onOpenImageEditor={handleEditMedia}
+            activeTab={activeTabId}
+            onTabChange={handleRailTabChange}
+            drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
+            onDrawerToggle={onLeftPanelToggle ?? (() => {})}
+            isPinned={panelPinned}
+            onPinToggle={onPanelPinnedToggle}
+            onElementSelect={handleElementSelect}
+            onBlockClick={handleBlockClick}
+            canvasHoveredId={canvasHoveredId}
+            projectId={projectId}
+            onOpenLibrary={handleOpenLibrary}
           />
-          {isVersionPreview && (
-            <div style={previewBannerStyle}>
-              <span style={{ fontWeight: 500 }}>Preview</span>
-              <span style={{ color: "var(--text-muted, rgba(255,255,255,0.45))", fontSize: 12 }}>
-                — not saved
-              </span>
-              <button
-                style={previewExitBtnStyle}
-                onClick={() => composer?.versionHistory?.clearPreview()}
-              >
-                Exit
-              </button>
-            </div>
-          )}
-        </div>
-      </LayoutShell.Canvas>
+        </LayoutShell.Sidebar>
 
-      {/* Right Inspector — element properties */}
-      <LayoutShell.Inspector>
-        <ProInspector
-          composer={composer}
-          selectedElement={selectedElement}
-          currentBreakpoint={device}
-          onBreakpointChange={onDeviceChange}
-          onDelete={handleDelete}
-          onOpenMediaLibrary={onOpenMediaLibrary}
-          onOpenIconPicker={onOpenIconPicker}
-          onOpenCreateCollection={onOpenCreateCollection}
-        />
-      </LayoutShell.Inspector>
+        {/* Canvas Area — main editing surface */}
+        <LayoutShell.Canvas>
+          <PageTabBar composer={composer} />
+          <div style={styles.canvasPattern} />
+          <div ref={composerContainerRef} style={styles.canvasContent}>
+            <Canvas
+              ref={canvasRef}
+              composer={composer}
+              device={device}
+              zoom={zoom}
+              showSpacing={showSpacingIndicators}
+              showBadges={showBadges}
+              showGuides={showGuides}
+              showGrid={showGrid}
+              showComponentView={showComponentView}
+              showXRay={showXRay}
+              devMode={devMode}
+              onAIRequest={onAIRequest}
+              onOpenImageEditor={handleEditMedia}
+            />
+            {isVersionPreview && (
+              <div style={previewBannerStyle}>
+                <span style={{ fontWeight: 500 }}>Preview</span>
+                <span style={{ color: "var(--text-muted, rgba(255,255,255,0.45))", fontSize: 12 }}>
+                  — not saved
+                </span>
+                <Button
+                  style={previewExitBtnStyle}
+                  onClick={() => composer?.versionHistory?.clearPreview()}
+                >
+                  Exit
+                </Button>
+              </div>
+            )}
+          </div>
+        </LayoutShell.Canvas>
 
-      {/* FullPage View — Templates, Settings, History, Design (replaces canvas area) */}
-      <LayoutShell.FullPage>
-        <FullPageView
-          activeTab={activeTabId}
-          composer={composer}
-          onClose={handleFullPageClose}
-          onSwitchToAdd={() => onLeftPanelTabChange?.("add")}
-          onReplayTour={undefined}
-          projectId={projectId}
-          onOpenImageEditor={onOpenImageEditor}
-          onOpenIconPicker={onOpenIconPicker}
-        />
-      </LayoutShell.FullPage>
-    </LayoutShell>
+        {/* Right Inspector — element properties */}
+        <LayoutShell.Inspector>
+          <ProInspector
+            composer={composer}
+            selectedElement={selectedElement}
+            currentBreakpoint={device}
+            onBreakpointChange={onDeviceChange}
+            onDelete={handleDelete}
+            onOpenMediaLibrary={onOpenMediaLibrary}
+            onOpenIconPicker={onOpenIconPicker}
+            onOpenCreateCollection={onOpenCreateCollection}
+          />
+        </LayoutShell.Inspector>
+
+        {/* FullPage View — Templates, Settings, History, Design (replaces canvas area) */}
+        <LayoutShell.FullPage>
+          <FullPageView
+            activeTab={activeTabId}
+            composer={composer}
+            onClose={handleFullPageClose}
+            onSwitchToAdd={() => onLeftPanelTabChange?.("add")}
+            onReplayTour={undefined}
+            projectId={projectId}
+            onOpenImageEditor={onOpenImageEditor}
+            onOpenIconPicker={onOpenIconPicker}
+          />
+        </LayoutShell.FullPage>
+      </LayoutShell>
     </TokenRegistryProvider>
   );
 };

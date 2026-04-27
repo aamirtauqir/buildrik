@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * ToolbarNavSection — Parent navigation + element name chip + ancestor dropdown
  * Extracted sub-component of UnifiedSelectionToolbar.
@@ -39,7 +40,7 @@ export const ToolbarNavSection: React.FC<ToolbarNavSectionProps> = ({
     {/* Parent button */}
     {hasParent && (
       <Tooltip content="Select Parent" shortcut="⌥↑" position="bottom">
-        <button onClick={onSelectParent} style={parentBtnStyles} aria-label="Select parent element">
+        <Button onClick={onSelectParent} style={parentBtnStyles} aria-label="Select parent element">
           <svg
             width="12"
             height="12"
@@ -52,13 +53,13 @@ export const ToolbarNavSection: React.FC<ToolbarNavSectionProps> = ({
           >
             <path d="M18 15l-6-6-6 6" />
           </svg>
-        </button>
+        </Button>
       </Tooltip>
     )}
 
     {/* Element name — clickable for ancestor dropdown */}
     <div style={{ position: "relative" }}>
-      <button
+      <Button
         onClick={onAncestorMenuToggle}
         style={nameBtnStyles}
         aria-label="Show element path"
@@ -80,7 +81,7 @@ export const ToolbarNavSection: React.FC<ToolbarNavSectionProps> = ({
             <path d="M6 9l6 6 6-6" />
           </svg>
         )}
-      </button>
+      </Button>
 
       {/* Ancestor dropdown */}
       {showAncestorMenu && ancestors.length > 0 && (
@@ -91,7 +92,7 @@ export const ToolbarNavSection: React.FC<ToolbarNavSectionProps> = ({
           style={dropdownStyles}
         >
           {ancestors.map((ancestor, i) => (
-            <button
+            <Button
               key={ancestor.id}
               role="menuitem"
               onClick={() => onSelectAncestor(ancestor.id)}
@@ -101,7 +102,7 @@ export const ToolbarNavSection: React.FC<ToolbarNavSectionProps> = ({
                 ↑
               </span>
               {ancestor.name}
-            </button>
+            </Button>
           ))}
         </div>
       )}

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * WelcomeModal — first-time welcome screen
  * Single step: pick a template or start blank.
@@ -67,7 +68,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
           }}
         >
           {FEATURED_TEMPLATES.map((t) => (
-            <button
+            <Button
               key={t.id}
               onClick={() => onSelectTemplate(t.id)}
               style={{
@@ -92,11 +93,11 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
               <div style={{ fontSize: 11, color: "var(--buildrick-text-muted, #9ca3af)" }}>
                 {t.tag}
               </div>
-            </button>
+            </Button>
           ))}
         </div>
 
-        <button
+        <Button
           onClick={onStartBlank}
           style={{
             width: "100%",
@@ -111,7 +112,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
           }}
         >
           Start with blank canvas →
-        </button>
+        </Button>
       </div>
     </div>
   );

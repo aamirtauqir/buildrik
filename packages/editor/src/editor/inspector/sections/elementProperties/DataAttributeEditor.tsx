@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -91,9 +92,9 @@ export const DataAttributeEditor: React.FC<DataAttributeEditorProps> = ({
           placeholder="value"
           style={styles.input}
         />
-        <button onClick={addAttribute} style={styles.addButton}>
+        <Button onClick={addAttribute} style={styles.addButton}>
           +
-        </button>
+        </Button>
       </div>
       <div style={styles.hint}>Add custom data-* or aria-* attributes</div>
     </div>

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * MoreSettingsToggle — progressive disclosure. Ported to .bdi-adv.
  *
@@ -29,7 +30,7 @@ export const MoreSettingsToggle: React.FC<MoreSettingsToggleProps> = ({
   };
 
   return (
-    <button
+    <Button
       type="button"
       className="bdi-adv"
       onClick={handleClick}
@@ -54,7 +55,7 @@ export const MoreSettingsToggle: React.FC<MoreSettingsToggleProps> = ({
           {advancedCount}
         </span>
       )}
-    </button>
+    </Button>
   );
 };
 

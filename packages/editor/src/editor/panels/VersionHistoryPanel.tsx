@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -166,7 +167,7 @@ function CompareView({
     <div className="compare-view">
       {/* Visual / Semantic toggle */}
       <div style={TOGGLE_PILL_CONTAINER} role="tablist" aria-label="Compare mode">
-        <button
+        <Button
           type="button"
           role="tab"
           aria-selected={mode === "visual"}
@@ -176,8 +177,8 @@ function CompareView({
           title={hasVisual ? undefined : "No visual snapshot available for this version."}
         >
           Visual
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           role="tab"
           aria-selected={mode === "semantic"}
@@ -185,16 +186,14 @@ function CompareView({
           onClick={() => setMode("semantic")}
         >
           Semantic
-        </button>
+        </Button>
       </div>
-
       {/* AI Summary text */}
       {(version.aiSummary || aiSummaryState.result) && (
         <div className="ai-summary">
           {aiSummaryState.result ?? version.aiSummary}
         </div>
       )}
-
       {/* Visual mode — screenshots side-by-side */}
       {mode === "visual" && hasVisual && (
         <div className="compare-screenshots">
@@ -212,7 +211,6 @@ function CompareView({
           )}
         </div>
       )}
-
       {/* Change summary badges — shown in both modes */}
       {summary && (
         <div className="diff-summary-badges">
@@ -235,7 +233,6 @@ function CompareView({
           )}
         </div>
       )}
-
       {/* Page-level add/remove counts (Wave 1 CompareSummary fields) */}
       {summary && (summary.pagesAdded > 0 || summary.pagesDeleted > 0) && (
         <p style={{ fontSize: 11, color: "var(--buildrick-text-muted)", margin: "4px 0 0" }}>
@@ -244,7 +241,6 @@ function CompareView({
           {summary.pagesDeleted > 0 && `${summary.pagesDeleted} page${summary.pagesDeleted === 1 ? "" : "s"} removed`}
         </p>
       )}
-
       {/* Semantic mode — change list */}
       {mode === "semantic" && changes.length > 0 && (
         <div className="diff-change-list">
@@ -273,9 +269,8 @@ function CompareView({
           )}
         </div>
       )}
-
       {/* AI Summary button — visible in both modes */}
-      <button
+      <Button
         className={`ai-summary-btn${aiSummaryState.loading ? " loading" : ""}`}
         onClick={onGetAiSummary}
         disabled={aiDisabled}
@@ -291,7 +286,7 @@ function CompareView({
             {aiButtonLabel}
           </>
         )}
-      </button>
+      </Button>
       {aiSummaryState.error && (
         <p className="ai-summary-error">{aiSummaryState.error}</p>
       )}
@@ -384,35 +379,34 @@ function VersionRow({
           <div className="version-actions">
             {isDeleteConfirm ? (
               <>
-                <button onClick={onDeleteConfirm} className="action-btn danger" aria-label="Confirm delete">
+                <Button onClick={onDeleteConfirm} className="action-btn danger" aria-label="Confirm delete">
                   Delete
-                </button>
-                <button onClick={onDeleteCancel} className="action-btn" aria-label="Cancel">
+                </Button>
+                <Button onClick={onDeleteCancel} className="action-btn" aria-label="Cancel">
                   ×
-                </button>
+                </Button>
               </>
             ) : (
               <>
-                <button onClick={onCompare} className="action-btn primary" aria-label={`Compare "${version.name}"`}>
+                <Button onClick={onCompare} className="action-btn primary" aria-label={`Compare "${version.name}"`}>
                   Compare
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={onRestore}
                   className="action-btn"
                   disabled={isRestoring}
                   aria-label={`Restore "${version.name}"`}
                 >
                   {isRestoring ? "..." : "Restore"}
-                </button>
-                <button onClick={onDeleteRequest} className="action-btn danger" aria-label={`Delete "${version.name}"`}>
+                </Button>
+                <Button onClick={onDeleteRequest} className="action-btn danger" aria-label={`Delete "${version.name}"`}>
                   ×
-                </button>
+                </Button>
               </>
             )}
           </div>
         </div>
       </div>
-
       {/* Snapshot Preview Tooltip */}
       {showPreview && version.visualSnapshot && previewRect && (
         <SnapshotPreview
@@ -866,7 +860,6 @@ export function VersionHistoryPanel({
           </FixedSizeList>
         ) : null}
       </div>
-
       {/* Inline restore confirmation — rendered outside the virtualized list.
           Appears as a pinned section below the list for the pending version. */}
       {restoreConfirmVersion && (
@@ -874,18 +867,17 @@ export function VersionHistoryPanel({
           <span className="restore-confirm-text">
             Restore to "{restoreConfirmVersion.name}"?
           </span>
-          <button
+          <Button
             onClick={() => handleRestoreConfirm(restoreConfirmVersion.id)}
             className="action-btn primary"
           >
             Restore
-          </button>
-          <button onClick={handleRestoreCancel} className="action-btn">
+          </Button>
+          <Button onClick={handleRestoreCancel} className="action-btn">
             Cancel
-          </button>
+          </Button>
         </div>
       )}
-
       {/* Expanded CompareView — rendered outside the virtualized list so it
           can grow freely. Shown as an inline detail section anchored below. */}
       {expandedVersion && (
@@ -902,7 +894,6 @@ export function VersionHistoryPanel({
           />
         </div>
       )}
-
       {/* Save Version FAB / inline form — fixed at bottom-right of saves-view */}
       <div className="fab-container">
         {showSaveForm ? (
@@ -927,7 +918,7 @@ export function VersionHistoryPanel({
               </div>
             </div>
             <div className="form-row" style={{ justifyContent: "flex-end", gap: 8 }}>
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   setShowSaveForm(false);
@@ -936,19 +927,19 @@ export function VersionHistoryPanel({
                 className="cancel-btn"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={handleCreateVersion}
                 className="save-btn"
                 disabled={!newVersionName.trim() || isSaving}
               >
                 {isSaving ? "Saving..." : "Save Version"}
-              </button>
+              </Button>
             </div>
           </div>
         ) : (
-          <button
+          <Button
             type="button"
             onClick={() => setShowSaveForm(true)}
             className="fab"
@@ -959,10 +950,9 @@ export function VersionHistoryPanel({
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-          </button>
+          </Button>
         )}
       </div>
-
       {/* Toast stack — fixed bottom-right, above FAB z-index */}
       <ToastStack toasts={toasts} />
     </div>

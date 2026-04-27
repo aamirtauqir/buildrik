@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * ElementCard, AnimatedAccordionContent, ChevronIcon — UI sub-components for ElementsTab
  * Also exports handleDragStart and highlightMatch as standalone helpers.
@@ -48,13 +49,13 @@ export const ElementCard: React.FC<ElementCardProps> = ({
       onDragStart={(e) => onDragStart(e as unknown as React.DragEvent, block, true)}
       title={`Drag or click to add ${block.label}`}
     >
-      <button
+      <Button
         className={`buildrick-element-card-star${isFavorite ? " favorited" : ""}`}
         onClick={(e) => onToggleFavorite(block.id, e)}
         title={isFavorite ? "Remove from favorites" : "Add to favorites"}
       >
         <Star size={12} fill={isFavorite ? "currentColor" : "none"} />
-      </button>
+      </Button>
       <div className="buildrick-element-card-header">
         <div className="buildrick-element-card-icon">
           <Icon size={18} strokeWidth={1.5} />

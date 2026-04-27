@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -171,7 +172,7 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
           </div>
           <div className="tmpl-preview__viewports">
             {VIEWPORT_CONFIGS.map((vp) => (
-              <button
+              <Button
                 key={vp.id}
                 className={`tmpl-preview__vp-btn ${viewport === vp.id ? "tmpl-preview__vp-btn--active" : ""}`}
                 onClick={() => setViewport(vp.id)}
@@ -180,10 +181,10 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
                 aria-pressed={viewport === vp.id}
               >
                 {VIEWPORT_ICONS[vp.id]}
-              </button>
+              </Button>
             ))}
           </div>
-          <button
+          <Button
             className="tmpl-preview__close"
             onClick={handleClose}
             title="Close"
@@ -200,7 +201,7 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
             >
               <path d="M4 4l8 8M12 4l-8 8" />
             </svg>
-          </button>
+          </Button>
         </div>
 
         {/* Preview Canvas */}
@@ -217,16 +218,16 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
 
         {/* Bottom Bar */}
         <div className="tmpl-preview__bottom">
-          <button className="tmpl-preview__back" onClick={handleClose}>
+          <Button className="tmpl-preview__back" onClick={handleClose}>
             ← Back
-          </button>
-          <button className="tmpl-preview__use" onClick={() => onUseTemplate(template)}>
+          </Button>
+          <Button className="tmpl-preview__use" onClick={() => onUseTemplate(template)}>
             {template.status === "premium"
               ? "🔒 Upgrade to Use"
               : hasExistingContent
                 ? "Replace Canvas with This"
                 : "Apply to Canvas"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>,

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * LeftSidebar — Merged rail + panel component
  * Rail: 60px icon navigation with 3 zones (creation, structure, config)
@@ -107,7 +108,7 @@ function RailZone({
         const isDirty = dirtyTabIds?.has(tab.id) ?? false;
 
         return (
-          <button
+          <Button
             key={tab.id}
             className={`ls-btn${isSelectedTab ? " ls-btn--active" : ""}${!drawerOpen && isSelectedTab ? " ls-btn--last" : ""}`}
             onClick={() => onBtnClick(tab.id)}
@@ -119,7 +120,7 @@ function RailZone({
             {isVisibleActive && <div className="ls-btn-bar" />}
             {isDirty && <div className="ls-btn__dirty-dot" aria-hidden="true" />}
             <Icon size={20} />
-          </button>
+          </Button>
         );
       })}
     </div>
@@ -299,7 +300,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
         <div className="ls-spacer" />
       </nav>
-
       {/* Panel */}
       <div
         className={`ls-panel${!drawerOpen ? " ls-panel--closed" : ""}`}
@@ -308,7 +308,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         aria-hidden={!drawerOpen}
       >
         {drawerOpen && (
-          <button
+          <Button
             type="button"
             className="ls-panel-close"
             onClick={onDrawerToggle}
@@ -319,7 +319,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
               <path d="M18 6 6 18" />
               <path d="m6 6 12 12" />
             </svg>
-          </button>
+          </Button>
         )}
         <div ref={panelContentRef} className="ls-panel-content ls-panel-content--no-padding" tabIndex={-1}>
           <InspectorErrorBoundary
@@ -350,7 +350,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
           </InspectorErrorBoundary>
         </div>
       </div>
-
       {/* Settings dirty guard */}
       <ConfirmDialog
         isOpen={tabGuard.open}

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * InspectorRenderer — turns a SectionSchema into React.
  *
@@ -157,14 +158,14 @@ const AdvancedGroupShell: React.FC<AdvancedGroupShellProps> = ({
   const [expanded, setExpanded] = React.useState(Boolean(defaultExpanded));
   return (
     <div>
-      <button
+      <Button
         type="button"
         aria-expanded={expanded}
         onClick={() => setExpanded((v) => !v)}
         style={discloseButtonStyle}
       >
         {expanded ? "▾" : "▸"} {label}
-      </button>
+      </Button>
       {expanded && (
         <div style={{ display: "grid", gap: 8, marginTop: 8 }}>{children}</div>
       )}

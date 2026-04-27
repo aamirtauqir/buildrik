@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * PropertyField Component
  * Renders different input types for element properties
@@ -139,7 +140,7 @@ export const PropertyField: React.FC<PropertyFieldProps> = ({
             placeholder={prop.placeholder}
           />
         </div>
-        <button
+        <Button
           onClick={() =>
             onOpenMediaLibrary([mediaType], (asset) => {
               onChange("src", asset.src);
@@ -149,7 +150,7 @@ export const PropertyField: React.FC<PropertyFieldProps> = ({
           title="Browse media library"
         >
           Browse
-        </button>
+        </Button>
       </div>
     );
   }

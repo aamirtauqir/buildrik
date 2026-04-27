@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Canvas Spot Badge
  * Element badges showing tags, IDs, classes
@@ -119,7 +120,7 @@ export const CanvasSpotBadge: React.FC<CanvasSpotBadgeProps> = ({
     >
       <span className="buildrick-canvas-spot-badge-content">{badge.content}</span>
       {onRemove && (
-        <button
+        <Button
           className="buildrick-canvas-spot-badge-close"
           onClick={(e) => {
             e.stopPropagation();
@@ -128,7 +129,7 @@ export const CanvasSpotBadge: React.FC<CanvasSpotBadgeProps> = ({
           aria-label="Remove badge"
         >
           ×
-        </button>
+        </Button>
       )}
     </div>
   );

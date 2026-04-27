@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * ActivityView — Undo/redo activity timeline
  * Pixel-aligned with the History Tab prototype:
@@ -399,23 +400,23 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
         {onClearHistory && (
           confirmingClear ? (
             <>
-              <button
+              <Button
                 onClick={handleClearClick}
                 className="action-btn danger"
                 aria-label="Confirm clear history"
               >
                 Clear all
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setConfirmingClear(false)}
                 className="action-btn"
                 aria-label="Cancel clear"
               >
                 Cancel
-              </button>
+              </Button>
             </>
           ) : (
-            <button
+            <Button
               onClick={handleClearClick}
               className="action-btn"
               disabled={!canClear}
@@ -423,11 +424,11 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
               title="Clear undo history"
             >
               Clear
-            </button>
+            </Button>
           )
         )}
         {onOpenTimeTravel && (
-          <button
+          <Button
             type="button"
             className="tt-btn"
             onClick={onOpenTimeTravel}
@@ -436,7 +437,7 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
           >
             <TimeTravelIcon />
             Time-Travel
-          </button>
+          </Button>
         )}
       </div>
     </div>
@@ -518,7 +519,7 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
               <div>
                 <div className="entry-label">{entry.label}</div>
                 <div className="entry-meta">
-                  <button
+                  <Button
                     type="button"
                     className="entry-time-btn"
                     onClick={(e) => {
@@ -530,7 +531,7 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
                     style={STYLE_TIME_BTN}
                   >
                     <span className="entry-time">{timeLabel}</span>
-                  </button>
+                  </Button>
                   <span style={STYLE_RELATIVE_TIME}>
                     {formatRelativeTime(entry.timestamp)}
                   </span>
@@ -601,7 +602,7 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
                   </div>
                 ))}
                 {hasMore && (
-                  <button
+                  <Button
                     className="action-btn"
                     style={STYLE_SHOW_ALL_BTN}
                     onClick={(e) => {
@@ -612,7 +613,7 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
                     {showAll
                       ? "Show less"
                       : `Show all ${collapsed.length} changes`}
-                  </button>
+                  </Button>
                 )}
               </div>
             )}
@@ -640,9 +641,9 @@ export const ActivityView: React.FC<ExtendedActivityViewProps> = ({
           <div className="empty-icon" aria-hidden="true">⚠</div>
           <p className="empty-title">Failed to load activity</p>
           {onRetry && (
-            <button className="action-btn primary" onClick={onRetry}>
+            <Button className="action-btn primary" onClick={onRetry}>
               Retry
-            </button>
+            </Button>
           )}
         </div>
       </div>

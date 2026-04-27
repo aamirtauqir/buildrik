@@ -68,7 +68,7 @@ export const DomainsScreen: React.FC<ScreenProps> = () => {
           }}>
             project.builder.aquibra.com
           </span>
-          <button
+          <Button
             type="button"
             onClick={handleCopy}
             aria-label={copied ? "Copied to clipboard" : "Copy default domain to clipboard"}
@@ -83,13 +83,12 @@ export const DomainsScreen: React.FC<ScreenProps> = () => {
             }}
           >
             {copied ? "✓ Copied" : "Copy"}
-          </button>
+          </Button>
           <span aria-live="assertive" aria-atomic="true" style={srOnlyStyles}>
             {copied ? "Copied to clipboard" : ""}
           </span>
         </div>
       </Section>
-
       <Section title="Custom Domain">
         <Field label="Enter your domain">
           <Input
@@ -122,7 +121,6 @@ export const DomainsScreen: React.FC<ScreenProps> = () => {
           }}>CNAME: builder.aquibra.com</code>
         </div>
       </Section>
-
       <Section title="SSL Certificate">
         {/* Status row */}
         <div style={{

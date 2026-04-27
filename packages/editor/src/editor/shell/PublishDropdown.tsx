@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * PublishDropdown — Topbar publish button with 4 workflow states.
  *
@@ -185,7 +186,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
 
   return (
     <div style={{ position: "relative", display: "flex" }}>
-      <button
+      <Button
         ref={buttonRef}
         onClick={handleMainClick}
         disabled={loading}
@@ -229,11 +230,10 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
             {cfg.badge.label}
           </span>
         )}
-      </button>
-
+      </Button>
       {/* Chevron trigger (draft only shows as separate segment) */}
       {publishState !== "approved" && (
-        <button
+        <Button
           onClick={() => setIsOpen((v) => !v)}
           aria-label="Open publish options"
           style={{
@@ -253,9 +253,8 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
           onMouseLeave={(e) => { e.currentTarget.style.background = cfg.bg; }}
         >
           <IconChevronDown color={cfg.chevronColor} />
-        </button>
+        </Button>
       )}
-
       {/* Dropdown panel */}
       {isOpen && buttonRef.current && (
         <div
@@ -277,7 +276,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
         >
           <div style={{ padding: "4px 0" }}>
             {options.map((opt, i) => (
-              <button
+              <Button
                 key={i}
                 role="menuitem"
                 disabled={opt.disabled}
@@ -324,7 +323,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
                     <IconExternal />
                   </span>
                 )}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

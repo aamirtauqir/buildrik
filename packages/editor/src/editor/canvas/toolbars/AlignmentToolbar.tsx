@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Alignment Toolbar
  * Floating toolbar for multi-select alignment and distribution
@@ -175,7 +176,7 @@ export const AlignmentToolbar: React.FC<AlignmentToolbarProps> = ({ composer, se
   const canDistribute = selectedIds.length >= 3;
 
   const renderButton = (button: AlignmentButton, disabled = false) => (
-    <button
+    <Button
       key={button.id}
       style={{
         ...styles.button(false),
@@ -191,7 +192,7 @@ export const AlignmentToolbar: React.FC<AlignmentToolbarProps> = ({ composer, se
       aria-label={button.label}
     >
       {button.icon}
-    </button>
+    </Button>
   );
 
   return (

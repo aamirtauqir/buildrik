@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * EnableFlexPrompt - Prompts user to enable Flexbox on a container
  * @license BSD-3-Clause
@@ -36,7 +37,7 @@ export const EnableFlexPrompt: React.FC<EnableFlexPromptProps> = ({ onChange }) 
     >
       Enable Flexbox
     </div>
-    <button
+    <Button
       onClick={() => onChange("display", "flex")}
       style={{
         padding: "6px 14px",
@@ -50,7 +51,7 @@ export const EnableFlexPrompt: React.FC<EnableFlexPromptProps> = ({ onChange }) 
       }}
     >
       Enable Flex
-    </button>
+    </Button>
   </div>
 );
 

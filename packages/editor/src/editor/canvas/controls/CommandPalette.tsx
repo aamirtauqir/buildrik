@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Command Palette Component
  * Searchable action list triggered by Cmd+Shift+P (like VS Code)
@@ -273,7 +274,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         }}
         onClick={onClose}
       />
-
       {/* Palette */}
       <div
         style={{
@@ -360,7 +360,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   const isDisabled = Boolean(cmd.requiresSelection && selectedId === null);
 
                   return (
-                    <button
+                    <Button
                       key={cmd.id}
                       onClick={() => executeCommand(cmd)}
                       disabled={isDisabled}
@@ -413,9 +413,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                           </span>
                         )}
                       </div>
-
                       {cmd.shortcut && !isDisabled && <ShortcutBadge shortcut={cmd.shortcut} />}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>

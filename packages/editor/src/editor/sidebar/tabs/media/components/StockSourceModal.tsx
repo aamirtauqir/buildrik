@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Stock Source Modal — Browse and save stock assets to library.
  * Replaces the old Discovery tab. Opens on demand via "+ Add from Stock".
@@ -93,21 +94,21 @@ export function StockSourceModal({
         {/* Header */}
         <div className="stock-modal-header">
           <h3 className="stock-modal-title">Add from Stock</h3>
-          <button className="stock-modal-close" onClick={onClose} aria-label="Close">
+          <Button className="stock-modal-close" onClick={onClose} aria-label="Close">
             <X size={18} />
-          </button>
+          </Button>
         </div>
 
         {/* Tab bar */}
         <div className="stock-modal-tabs">
           {TABS.map((tab) => (
-            <button
+            <Button
               key={tab.id}
               className={`stock-tab${activeTab === tab.id ? " active" : ""}`}
               onClick={() => setActiveTab(tab.id)}
             >
               {tab.label}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -126,19 +127,19 @@ export function StockSourceModal({
           <div className="stock-modal-filters">
             <div className="stock-orientation-group">
               {(["all", "landscape", "portrait", "squarish"] as DiscOrientation[]).map((o) => (
-                <button
+                <Button
                   key={o}
                   onClick={() => onSetOrientation(o)}
                   className={`stock-orient-btn${orientation === o ? " active" : ""}`}
                 >
                   {o === "all" ? "Any" : o.charAt(0).toUpperCase()}
-                </button>
+                </Button>
               ))}
             </div>
             <div className="stock-filter-divider" />
             <div className="stock-color-row">
               {COLORS.map((c) => (
-                <button
+                <Button
                   key={c.id}
                   onClick={() => onSetColor(c.id)}
                   title={c.label}
@@ -146,7 +147,7 @@ export function StockSourceModal({
                   style={{ background: c.hex || "var(--bd-bg-subtle)" }}
                 >
                   {c.id === "all" && "\u00d7"}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -210,12 +211,12 @@ export function StockSourceModal({
             <>
               {onOpenIconPicker && (
                 <div className="stock-icon-header">
-                  <button
+                  <Button
                     onClick={() => onOpenIconPicker(undefined, () => {})}
                     className="stock-browse-all"
                   >
                     Browse full icon library <SquareArrowOutUpRight size={12} />
-                  </button>
+                  </Button>
                 </div>
               )}
               {icons.length > 0 ? (
@@ -245,7 +246,7 @@ export function StockSourceModal({
                 <div key={f.id} className="med-fnt-card" onClick={() => onInsert(f.id)}>
                   <div className="med-fnt-top">
                     <span className="med-fnt-name">{f.family}</span>
-                    <button className="med-action-btn">Use</button>
+                    <Button className="med-action-btn">Use</Button>
                   </div>
                   <div className="med-fnt-preview" style={{ fontFamily: f.family }}>Aa Bb Cc 123</div>
                 </div>
@@ -269,13 +270,13 @@ export function StockSourceModal({
           {(activeTab === "img" || activeTab === "vid") && (
             (activeTab === "img" ? photos.length : videos.length) > 0
           ) && (
-            <button
+            <Button
               className="stock-load-more"
               onClick={() => onLoadMore(activeTab)}
               disabled={isLoading}
             >
               {isLoading ? "Loading..." : "Load more"}
-            </button>
+            </Button>
           )}
         </div>
       </div>

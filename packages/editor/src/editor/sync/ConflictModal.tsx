@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * ConflictModal - Display and resolve sync conflicts
  * @module components/Sync/ConflictModal
@@ -59,12 +60,12 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({ conflict, onResolv
               <div>Modified: {formatDate(conflict.localModifiedAt)}</div>
               <div style={timeAgoStyles}>{formatTimeDiff(conflict.localModifiedAt)}</div>
             </div>
-            <button
+            <Button
               onClick={() => onResolve("keep-local")}
               style={{ ...buttonStyles, ...primaryButtonStyles }}
             >
               Keep Local
-            </button>
+            </Button>
           </div>
 
           <div style={vsStyles}>VS</div>
@@ -78,20 +79,20 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({ conflict, onResolv
               <div>Modified: {formatDate(conflict.remoteModifiedAt)}</div>
               <div style={timeAgoStyles}>{formatTimeDiff(conflict.remoteModifiedAt)}</div>
             </div>
-            <button
+            <Button
               onClick={() => onResolve("keep-remote")}
               style={{ ...buttonStyles, ...secondaryButtonStyles }}
             >
               Keep Cloud
-            </button>
+            </Button>
           </div>
         </div>
 
         <div style={footerStyles}>
           {onCancel && (
-            <button onClick={onCancel} style={cancelButtonStyles}>
+            <Button onClick={onCancel} style={cancelButtonStyles}>
               Cancel
-            </button>
+            </Button>
           )}
         </div>
       </div>

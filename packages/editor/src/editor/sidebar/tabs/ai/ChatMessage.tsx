@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 import * as React from "react";
 import type { ChatMessage as ChatMessageType, DiffEdit } from "./types";
 
@@ -22,11 +23,11 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         {stopped && <span className="bd-ai-msg-stopped">(stopped)</span>}
       </div>
       {role === "assistant" && !streaming && (
-        <button
+        <Button
           type="button"
           className="bd-ai-msg-regenerate"
           onClick={() => onRegenerate(message.id)}
-        >↻ Regenerate</button>
+        >↻ Regenerate</Button>
       )}
     </div>
   );

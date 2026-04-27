@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * ViewSwitcher - Dropdown for switching between views (e.g., Layers/Pages)
  * Replaces horizontal sub-tabs with a cleaner dropdown pattern
@@ -73,7 +74,7 @@ export function ViewSwitcher<T extends string = string>({
 
   return (
     <div ref={containerRef} style={{ ...containerStyles, ...(fullWidth ? { width: "100%" } : {}) }}>
-      <button
+      <Button
         onClick={() => setIsOpen(!isOpen)}
         style={{
           ...triggerStyles,
@@ -89,12 +90,11 @@ export function ViewSwitcher<T extends string = string>({
           <span style={labelValueStyles}>{selectedOption?.label || "Select..."}</span>
         </span>
         <ChevronIcon isOpen={isOpen} />
-      </button>
-
+      </Button>
       {isOpen && (
         <div style={dropdownStyles} role="listbox">
           {options.map((option) => (
-            <button
+            <Button
               key={option.id}
               onClick={() => handleSelect(option.id)}
               style={{
@@ -107,7 +107,7 @@ export function ViewSwitcher<T extends string = string>({
               {option.icon && <span style={optionIconStyles}>{option.icon}</span>}
               <span>{option.label}</span>
               {option.id === value && <CheckIcon />}
-            </button>
+            </Button>
           ))}
         </div>
       )}

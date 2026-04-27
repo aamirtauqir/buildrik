@@ -202,7 +202,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
               <small style={hintStyles}>Select variant properties:</small>
               <div style={variantChipsStyles}>
                 {VARIANT_PRESETS.map((preset) => (
-                  <button
+                  <Button
                     key={preset.name}
                     type="button"
                     onClick={() => toggleVariantProp(preset.name)}
@@ -218,7 +218,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                   >
                     {preset.name}
                     <span style={variantChipValuesStyles}>({preset.values.join(", ")})</span>
-                  </button>
+                  </Button>
                 ))}
               </div>
               <small style={hintStyles}>You can configure variant values after creation</small>

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * FontPickerDropdown - Dropdown components for font selection
  * Part of Typography section refactoring
@@ -71,7 +72,7 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({ selected, onSelect }
     }}
   >
     {(["all", "sans-serif", "serif", "display", "monospace"] as const).map((cat) => (
-      <button
+      <Button
         key={cat}
         onClick={() => onSelect(cat)}
         style={{
@@ -86,7 +87,7 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({ selected, onSelect }
         }}
       >
         {cat === "all" ? "All" : CATEGORY_LABELS[cat]}
-      </button>
+      </Button>
     ))}
   </div>
 );
@@ -130,7 +131,7 @@ export const FontList: React.FC<FontListProps> = ({
         {systemFonts
           .filter((f) => f.label.toLowerCase().includes(fontSearch.toLowerCase()))
           .map((font) => (
-            <button
+            <Button
               key={font.value}
               onClick={() => onSelect(font)}
               role="option"
@@ -150,7 +151,7 @@ export const FontList: React.FC<FontListProps> = ({
               }}
             >
               {font.label}
-            </button>
+            </Button>
           ))}
       </div>
     )}
@@ -169,7 +170,7 @@ export const FontList: React.FC<FontListProps> = ({
         Google Fonts
       </div>
       {googleFonts.map((font) => (
-        <button
+        <Button
           key={font.family}
           onClick={() => onSelect(font)}
           role="option"
@@ -197,7 +198,7 @@ export const FontList: React.FC<FontListProps> = ({
           >
             {font.category}
           </span>
-        </button>
+        </Button>
       ))}
     </div>
   </div>

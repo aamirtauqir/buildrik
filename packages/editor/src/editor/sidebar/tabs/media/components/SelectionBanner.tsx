@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Media Tab — Selection Banner (XSWRz spec)
  * Fill cobalt-accent-tint, Move/Download/Deselect all/More buttons
@@ -27,7 +28,7 @@ export function UploadProgressBanner({ fileName, progress, showCancel = false, o
         <div className="med-progress__bar" style={{ width: `${progress}%` }} />
       </div>
       {(showCancel || onCancel != null) && (
-        <button className="med-banner__cancel" onClick={onCancel} aria-label="Cancel upload">✕</button>
+        <Button className="med-banner__cancel" onClick={onCancel} aria-label="Cancel upload">✕</Button>
       )}
     </div>
   );
@@ -46,11 +47,11 @@ export function SelectionBanner({ count, onExit, onDelete }: SelectionBannerProp
   return (
     <div className="med-selection-banner" role="status" aria-live="polite">
       <span className="med-selection-count">{count} selected</span>
-      <button className="med-selection-action">Move</button>
-      <button className="med-selection-action">Download</button>
+      <Button className="med-selection-action">Move</Button>
+      <Button className="med-selection-action">Download</Button>
       <span className="med-strip-spacer" />
-      <button className="med-selection-secondary" onClick={onExit}>Deselect all</button>
-      <button className="med-selection-more">More</button>
+      <Button className="med-selection-secondary" onClick={onExit}>Deselect all</Button>
+      <Button className="med-selection-more">More</Button>
     </div>
   );
 }

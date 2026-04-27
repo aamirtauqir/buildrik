@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Button Group controls — ported to .bdi-seg per comp-inspector.v1.
  * ButtonGroup = full-row segmented control. CompactButtonGroup = dense variant.
@@ -27,7 +28,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({ label, value, onChange
       }}
     >
       {options.map((opt) => (
-        <button
+        <Button
           key={opt.value}
           type="button"
           className={value === opt.value ? "on" : ""}
@@ -43,7 +44,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({ label, value, onChange
           ) : (
             opt.label
           )}
-        </button>
+        </Button>
       ))}
     </div>
   );
@@ -85,7 +86,7 @@ export const CompactButtonGroup: React.FC<CompactButtonGroupProps> = ({
       }}
     >
       {options.map((opt) => (
-        <button
+        <Button
           key={opt.value}
           type="button"
           className={value === opt.value ? "on" : ""}
@@ -95,7 +96,7 @@ export const CompactButtonGroup: React.FC<CompactButtonGroupProps> = ({
           aria-pressed={value === opt.value}
         >
           {opt.label}
-        </button>
+        </Button>
       ))}
     </div>
   );

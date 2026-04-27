@@ -141,7 +141,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
           </option>
         ))}
       </select>
-
       {/* Font Size */}
       <select
         onChange={(e) => onCommand("fontSize", e.target.value)}
@@ -161,9 +160,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
           </option>
         ))}
       </select>
-
       <Divider />
-
       {/* Format Buttons */}
       {toolbarGroups.map((group, gi) => (
         <React.Fragment key={group.name}>
@@ -173,7 +170,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             const itemStyle = "style" in item ? item.style : {};
             return (
               <Tooltip key={item.command} content={item.label}>
-                <button
+                <Button
                   onClick={() => onCommand(item.command)}
                   style={{
                     ...toolbarButtonStyle,
@@ -183,36 +180,33 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
                   }}
                 >
                   {item.icon}
-                </button>
+                </Button>
               </Tooltip>
             );
           })}
         </React.Fragment>
       ))}
-
       <Divider />
-
       {/* Colors */}
       <Popover
         trigger={
-          <button style={toolbarButtonStyle} title="Text Color" aria-label="Change text color">
+          <Button style={toolbarButtonStyle} title="Text Color" aria-label="Change text color">
             <span style={{ borderBottom: "2px solid var(--buildrick-accent)" }}>A</span>
-          </button>
+          </Button>
         }
         content={
           <ColorField label="Text Color" onChange={(color) => onCommand("foreColor", color)} />
         }
       />
-
       <Popover
         trigger={
-          <button
+          <Button
             style={toolbarButtonStyle}
             title="Background Color"
             aria-label="Change background highlight color"
           >
             <span style={{ background: "var(--buildrick-warning)", padding: "0 4px" }}>A</span>
-          </button>
+          </Button>
         }
         content={
           <ColorField
@@ -221,13 +215,11 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
           />
         }
       />
-
       <Divider />
-
       {/* Link */}
       <Popover
         trigger={
-          <button
+          <Button
             style={{
               ...toolbarButtonStyle,
               background: activeStyles.link ? "var(--buildrick-accent)" : "transparent",
@@ -236,7 +228,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             title="Insert Link"
           >
             🔗
-          </button>
+          </Button>
         }
         content={
           <div style={{ width: 250 }}>
@@ -267,12 +259,11 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
           </div>
         }
       />
-
       {/* Clear Formatting */}
       <Tooltip content="Clear Formatting">
-        <button onClick={() => onCommand("removeFormat")} style={toolbarButtonStyle}>
+        <Button onClick={() => onCommand("removeFormat")} style={toolbarButtonStyle}>
           ✕
-        </button>
+        </Button>
       </Tooltip>
     </div>
   );

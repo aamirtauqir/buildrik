@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * StickyFooter - Save/Apply/Cancel footer for drill-in screens
  * Sticks to bottom of panel, shows unsaved indicator
@@ -52,11 +53,11 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({
       </div>
       <div style={buttonsStyles}>
         {secondaryLabel && onSecondary && (
-          <button style={secondaryBtnStyles} onClick={onSecondary}>
+          <Button style={secondaryBtnStyles} onClick={onSecondary}>
             {secondaryLabel}
-          </button>
+          </Button>
         )}
-        <button
+        <Button
           style={{
             ...primaryBtnStyles,
             ...(disabled ? disabledStyles : {}),
@@ -66,7 +67,7 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({
           aria-disabled={disabled}
         >
           {primaryLabel}
-        </button>
+        </Button>
       </div>
     </div>
   );

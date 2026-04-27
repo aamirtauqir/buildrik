@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * PagesTab — Shell component.
  *
@@ -173,24 +174,23 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         onHelpClick={onHelpClick}
         onClose={onClose}
       >
-        <button
+        <Button
           className="bd-pg-panel-kbd-btn"
           onClick={() => setPaletteOpen(true)}
           aria-label="Open command palette"
         >
           <span className="bd-pg-panel-kbd">⌘K</span>
-        </button>
+        </Button>
       </PanelShell.Header>
-
       {/* Error state — takes priority over everything */}
       {p.loadError ? (
         <PanelShell.Content>
           <div className="bd-pg-error" role="alert" aria-live="assertive">
             <div className="bd-pg-error-msg">{p.loadError}</div>
             <div className="bd-pg-error-sub">Your connection dropped. Work is safe — nothing was lost.</div>
-            <button className="bd-pg-error-retry" onClick={p.retrySync}>
+            <Button className="bd-pg-error-retry" onClick={p.retrySync}>
               Try again
-            </button>
+            </Button>
           </div>
         </PanelShell.Content>
       ) : (
@@ -228,7 +228,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           />
         </PanelShell.Content>
       )}
-
       {/* Context menu (portal) */}
       {p.contextMenu && (
         <PageContextMenu
@@ -245,7 +244,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           onSettings={p.openSettings}
         />
       )}
-
       {/* Delete confirmation dialog */}
       <ConfirmDialog
         isOpen={!!deleteTargetId}
@@ -259,7 +257,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         confirmText="Delete Page"
         variant="danger"
       />
-
       {/* ⌘K command palette */}
       {paletteOpen && (
         <PageCommandPalette
@@ -268,7 +265,6 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           onClose={() => setPaletteOpen(false)}
         />
       )}
-
       {/* Page settings drawer — opened by gear / context-menu via openSettings */}
       {settingsPage && (
         <SettingsErrorBoundary onClose={p.closeSettings}>

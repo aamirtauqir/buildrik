@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Spacing Controls — nested Webflow box (margin + padding) + CornerRadiusInput.
  * Ported to .bdi-box / .bdi-mbox / .bdi-pbox / .bdi-ax per comp-inspector.html v2.
@@ -165,7 +166,7 @@ export const FourSideInput: React.FC<FourSideInputProps> = ({
         {label}
       </span>
       {onLinkToggle && (
-        <button
+        <Button
           type="button"
           onClick={onLinkToggle}
           title={linked ? "Unlink sides" : "Link all sides"}
@@ -178,7 +179,7 @@ export const FourSideInput: React.FC<FourSideInputProps> = ({
           }}
         >
           {linked ? <Link size={11} aria-hidden="true" /> : <Unlink size={11} aria-hidden="true" />}
-        </button>
+        </Button>
       )}
     </div>
     <div className="bdi-quad">
@@ -239,7 +240,7 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
     >
       <span className="bdi-sub-label">Radius</span>
       {onLinkToggle && (
-        <button
+        <Button
           type="button"
           onClick={onLinkToggle}
           title={linked ? "Unlink corners" : "Link all corners"}
@@ -252,7 +253,7 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
           }}
         >
           {linked ? <Link size={11} aria-hidden="true" /> : <Unlink size={11} aria-hidden="true" />}
-        </button>
+        </Button>
       )}
     </div>
     <div className="bdi-quad">

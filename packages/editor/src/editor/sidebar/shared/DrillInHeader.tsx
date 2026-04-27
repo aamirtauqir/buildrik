@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * DrillInHeader - "← Back to [Parent]" header for drill-in screens
  * Shows breadcrumb path and back button for nested navigation
@@ -86,7 +87,7 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
     <header style={drillInHeaderContainerStyles}>
       {/* Back button + title area */}
       <div style={leftSectionStyles}>
-        <button
+        <Button
           ref={backBtnRef}
           onClick={handleBackClick}
           className="buildrick-back-btn"
@@ -96,7 +97,7 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
         >
           <BackArrowIcon />
           <span>Back to {parentName}</span>
-        </button>
+        </Button>
 
         {/* Breadcrumb (smaller, below back button) */}
         <nav style={breadcrumbStyles} aria-label="Breadcrumb">
@@ -115,7 +116,6 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
           ))}
         </nav>
       </div>
-
       {/* Action buttons */}
       <HeaderActions
         isPinned={isPinned}

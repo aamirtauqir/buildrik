@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * LayersPanel - Minimal Tree Design. Search + Tree only.
  * @license BSD-3-Clause
@@ -346,7 +347,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           onClose={() => onDisplaySettingsToggle?.()}
         />
       )}
-
       {state.selectionHook.selectedIds.size === 1 && (
         <LayerBreadcrumb
           selectedId={[...state.selectionHook.selectedIds][0]}
@@ -355,7 +355,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           onSelect={state.selectionHook.selectLayer}
         />
       )}
-
       {/* Screen reader announcement for search results (WCAG 4.1.3) */}
       <div aria-live="polite" aria-atomic="true" className="bdc-sr-only">
         {state.search && matchCount > 0
@@ -364,7 +363,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
             ? "No layers match your search"
             : ""}
       </div>
-
       {/* Drop feedback message (UX improvement - Phase 3) */}
       {dropFeedback && (
         <div className="bdc-layers-drop-alert" role="alert" aria-live="assertive">
@@ -372,7 +370,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           {dropFeedback.message}
         </div>
       )}
-
       <LayerSelectionBanner
         count={state.selectionHook.selectedIds.size}
         onGroup={handleBannerGroup}
@@ -380,15 +377,13 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
         onDelete={handleBannerDelete}
         onExit={state.selectionHook.clearSelection}
       />
-
       {pendingBannerDelete && state.selectionHook.selectedIds.size > 1 && (
         <div className="bdc-layers-confirm" role="alert">
           <span>Delete {state.selectionHook.selectedIds.size} layers?</span>
-          <button className="bdc-btn bdc-btn-danger" onClick={confirmBannerDelete}>Delete</button>
-          <button className="bdc-btn bdc-btn-ghost" onClick={() => setPendingBannerDelete(false)}>Cancel</button>
+          <Button className="bdc-btn bdc-btn-danger" onClick={confirmBannerDelete}>Delete</Button>
+          <Button className="bdc-btn bdc-btn-ghost" onClick={() => setPendingBannerDelete(false)}>Cancel</Button>
         </div>
       )}
-
       {/* Clean Tree View - Maximum space for content */}
       <div
         ref={state.treeContainerRef}
@@ -403,9 +398,9 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           <div className="bdc-layers-empty-search" role="status">
             <span className="bdc-les-icon">🔍</span>
             <p className="bdc-les-title">No layers match &quot;{state.search}&quot;</p>
-            <button className="bdc-les-clear" onClick={() => onSearchChange ? onSearchChange("") : setSearch("")}>
+            <Button className="bdc-les-clear" onClick={() => onSearchChange ? onSearchChange("") : setSearch("")}>
               Clear search
-            </button>
+            </Button>
           </div>
         )}
 
@@ -445,7 +440,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           />
         ))}
       </div>
-
       {state.contextMenu && (
         <LayerContextMenu
           x={state.contextMenu.x}
@@ -460,7 +454,6 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
           onClose={state.closeContextMenu}
         />
       )}
-
     </div>
   );
 };

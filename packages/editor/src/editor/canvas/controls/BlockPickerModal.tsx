@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * BlockPickerModal - Block picker modal for QuickActionsToolbar
  * Opens a modal with ElementsTab to select block type for insertion
@@ -173,7 +174,7 @@ export const BlockPickerModal: React.FC<BlockPickerModalProps> = ({
         {/* Header */}
         <div style={headerStyles}>
           <div style={titleStyles}>{positionLabels[insertionContext.position]}</div>
-          <button onClick={onClose} style={closeButtonStyles} aria-label="Close">
+          <Button onClick={onClose} style={closeButtonStyles} aria-label="Close">
             <svg
               width="18"
               height="18"
@@ -184,7 +185,7 @@ export const BlockPickerModal: React.FC<BlockPickerModalProps> = ({
             >
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
-          </button>
+          </Button>
         </div>
 
         {/* Search bar */}

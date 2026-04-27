@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * InviteModal — "Invite to Buildrik" overlay
  * Matches design spec: share link, email + role, existing members list.
@@ -99,7 +100,6 @@ export const InviteModal: React.FC<InviteModalProps> = ({
           zIndex: 20000,
         }}
       />
-
       {/* Modal */}
       <div
         role="dialog"
@@ -140,7 +140,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               Collaborate on your project in real time
             </div>
           </div>
-          <button
+          <Button
             onClick={onClose}
             aria-label="Close invite modal"
             style={{
@@ -160,7 +160,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
             onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
           >
             <IconClose />
-          </button>
+          </Button>
         </div>
 
         {/* Body */}
@@ -197,7 +197,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               >
                 {shareUrl}
               </span>
-              <button
+              <Button
                 onClick={handleCopy}
                 style={{
                   padding: "3px 10px",
@@ -214,7 +214,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                 }}
               >
                 {copied ? "Copied!" : "Copy"}
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -375,7 +375,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
             borderTop: "1px solid var(--bd-bg-subtle)",
           }}
         >
-          <button
+          <Button
             onClick={onClose}
             style={{
               padding: "7px 16px",
@@ -393,8 +393,8 @@ export const InviteModal: React.FC<InviteModalProps> = ({
             onMouseLeave={(e) => { e.currentTarget.style.background = "var(--bd-bg-card)"; }}
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSend}
             disabled={!email.trim()}
             style={{
@@ -413,7 +413,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
             onMouseLeave={(e) => { e.currentTarget.style.background = email.trim() ? "var(--bd-accent)" : "var(--bd-fg-muted)"; }}
           >
             Send Invite
-          </button>
+          </Button>
         </div>
       </div>
     </>

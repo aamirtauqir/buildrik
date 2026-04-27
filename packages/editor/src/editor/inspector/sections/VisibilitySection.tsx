@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Visibility Section — per-breakpoint show/hide toggles.
  * Ported to .bdi-sw-row + .bdi-sw-ctrl pattern per comp-inspector.v1.
@@ -74,7 +75,7 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
         return (
           <div key={bp.id} className="bdi-sw-row">
             <span>Show on {bp.label}</span>
-            <button
+            <Button
               type="button"
               className={`bdi-sw-ctrl${isVisible ? "" : " off"}`}
               onClick={() => toggleVisibility(bp.id)}
@@ -83,7 +84,7 @@ export const VisibilitySection: React.FC<VisibilitySectionProps> = ({
               title={isVisible ? `Hide on ${bp.label}` : `Show on ${bp.label}`}
             >
               <span className="bdi-thumb" aria-hidden="true" />
-            </button>
+            </Button>
           </div>
         );
       })}

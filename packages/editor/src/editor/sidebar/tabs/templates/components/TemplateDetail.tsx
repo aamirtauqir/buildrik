@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * TemplateDetail — 420px side panel matching .pen Screen 6 design.
  * Preview image, title, description, and 3 action buttons.
@@ -52,9 +53,9 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
               Preview unavailable
             </p>
             {onPreviewRetry && (
-              <button className="tpl-detail-preview-retry" onClick={onPreviewRetry}>
+              <Button className="tpl-detail-preview-retry" onClick={onPreviewRetry}>
                 Retry
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -74,37 +75,37 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
       </div>
       <div className="tpl-detail-buttons">
         {template.status === "premium" ? (
-          <button className="tpl-detail-btn tpl-detail-btn--primary" disabled>
+          <Button className="tpl-detail-btn tpl-detail-btn--primary" disabled>
             Pro Plan Required
-          </button>
+          </Button>
         ) : (
           <>
-            <button
+            <Button
               className="tpl-detail-btn tpl-detail-btn--primary"
               onClick={() => onApplyToCurrent(template.id)}
             >
               Apply to Current Page
-            </button>
-            <button
+            </Button>
+            <Button
               className="tpl-detail-btn tpl-detail-btn--outline"
               onClick={() => onAddAsNewPage(template.id)}
             >
               Add as New Page
-            </button>
+            </Button>
           </>
         )}
-        <button
+        <Button
           className="tpl-detail-btn tpl-detail-btn--ghost"
           onClick={() => onPreview(template.id)}
         >
           Preview
-        </button>
-        <button
+        </Button>
+        <Button
           className="tpl-detail-btn tpl-detail-btn--ghost"
           onClick={onCancel}
         >
           Cancel
-        </button>
+        </Button>
       </div>
     </div>
   );

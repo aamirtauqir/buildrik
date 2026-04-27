@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * TokenPickerPopover — pick a design-system token or enter a raw value.
  *
@@ -195,7 +196,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
         }}
       >
         {(["tokens", "custom"] as const).map((t) => (
-          <button
+          <Button
             key={t}
             type="button"
             onClick={() => setTab(t)}
@@ -215,10 +216,9 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
             }}
           >
             {t === "tokens" ? "Tokens" : "Custom"}
-          </button>
+          </Button>
         ))}
       </div>
-
       {tab === "tokens" && (
         <div onKeyDown={handleKeyDown}>
           {/* Search */}
@@ -309,7 +309,7 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
 
                 return showSwatch ? (
                   // ── Grid item (color swatch) ──
-                  <button
+                  (<Button
                     key={token.id}
                     role="option"
                     aria-selected={selected}
@@ -372,10 +372,10 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                     >
                       {token.name}
                     </span>
-                  </button>
+                  </Button>)
                 ) : (
                   // ── List item (spacing / type) ──
-                  <button
+                  (<Button
                     key={token.id}
                     role="option"
                     aria-selected={selected}
@@ -426,14 +426,13 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                       {token.name}
                     </span>
                     <span style={valueBadgeStyle}>{token.value}</span>
-                  </button>
+                  </Button>)
                 );
               })}
             </div>
           )}
         </div>
       )}
-
       {tab === "custom" && (
         <div style={{ padding: 10 }}>
           <div style={{ fontSize: 11, color: "var(--buildrick-text-tertiary)", marginBottom: 6 }}>

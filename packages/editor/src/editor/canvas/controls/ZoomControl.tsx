@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Aquibra Zoom Control
  * Canvas zoom controls
@@ -62,10 +63,9 @@ export const ZoomControl: React.FC<ZoomControlProps> = ({
         size="sm"
         style={{ width: 28, height: 28, fontSize: 16 }}
       />
-
       {/* Zoom value with dropdown */}
       <div style={{ position: "relative" }}>
-        <button
+        <Button
           onClick={() => setShowPresets(!showPresets)}
           style={{
             ...INPUT_STYLE,
@@ -75,7 +75,7 @@ export const ZoomControl: React.FC<ZoomControlProps> = ({
           }}
         >
           {zoom}%
-        </button>
+        </Button>
 
         {/* Presets dropdown */}
         {showPresets && (
@@ -100,7 +100,7 @@ export const ZoomControl: React.FC<ZoomControlProps> = ({
               }}
             >
               {presets.map((preset) => (
-                <button
+                <Button
                   key={preset}
                   onClick={() => {
                     onChange(preset);
@@ -119,13 +119,12 @@ export const ZoomControl: React.FC<ZoomControlProps> = ({
                   }}
                 >
                   {preset}%
-                </button>
+                </Button>
               ))}
             </div>
           </>
         )}
       </div>
-
       {/* Zoom in */}
       <CanvasButton
         onClick={handleZoomIn}
@@ -135,7 +134,6 @@ export const ZoomControl: React.FC<ZoomControlProps> = ({
         size="sm"
         style={{ width: 28, height: 28, fontSize: 16 }}
       />
-
       {/* Fit to screen */}
       <CanvasButton
         onClick={handleFit}

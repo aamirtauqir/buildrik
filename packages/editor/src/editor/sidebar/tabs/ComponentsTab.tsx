@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * ComponentsTab - Reusable components library (orchestrator)
  * Displays, creates, and manages saved components.
@@ -85,14 +86,14 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   // ── "+" header action button ──────────────────────────────────────────────────
 
   const headerAddBtn = (
-    <button
+    <Button
       className="buildrick-comp-header-add-btn"
       onClick={() => setShowCreateModal(true)}
       title="Create a new component"
       aria-label="Create component"
     >
       <Plus size={14} />
-    </button>
+    </Button>
   );
 
   // ── Guard: components not available ──────────────────────────────────────────
@@ -168,13 +169,13 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         <div className="buildrick-compact-empty">
           <span className="buildrick-compact-empty-text">No components saved yet</span>
           {onCreateNew && (
-            <button
+            <Button
               className="buildrick-compact-new-btn"
               onClick={onCreateNew}
               title="Right-click any element to save as component"
             >
               + New
-            </button>
+            </Button>
           )}
         </div>
       );
@@ -211,13 +212,13 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                   {state.canvasSelection.length !== 1 ? "s" : ""}
                 </span>
               </div>
-              <button
+              <Button
                 className="buildrick-create-component-btn"
                 onClick={onCreateNew}
                 title="Create a reusable component from selection"
               >
                 <Plus size={14} /> Create Component
-              </button>
+              </Button>
             </div>
           )}
           <div className="buildrick-empty-state buildrick-comp-empty-state comp-empty">
@@ -231,7 +232,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             </a>
           </div>
         </div>
-
         {showCreateModal && (
           <CreateComponentModal
             onClose={() => setShowCreateModal(false)}
@@ -266,7 +266,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           </div>
         </>
       )}
-
       <div className="buildrick-sidebar-container buildrick-scrollbar" style={{ flex: 1, overflow: "auto" }}>
         {!state.isLoaded && (
           <div style={{ padding: "12px" }}>
@@ -285,13 +284,13 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
         <div className="buildrick-component-chips">
           {FILTER_CHIPS.map((chip) => (
-            <button
+            <Button
               key={chip.id}
               className={`buildrick-chip ${state.activeFilter === chip.id ? "active" : ""}`}
               onClick={() => state.setActiveFilter(chip.id)}
             >
               {chip.label}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -300,14 +299,14 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           {state.filteredComponents.length === 0 ? (
             <div className="buildrick-empty-state-inline">
               <span>No components match filters</span>
-              <button onClick={() => state.setActiveFilter("all" as ComponentFilter)}>
+              <Button onClick={() => state.setActiveFilter("all" as ComponentFilter)}>
                 Clear filters
-              </button>
+              </Button>
             </div>
           ) : (
             Object.entries(state.groupedComponents).map(([category, items]) => (
               <div key={category} className="buildrick-accordion">
-                <button
+                <Button
                   className={`buildrick-accordion-header ${!state.collapsedGroups.has(category) ? "open" : ""}`}
                   onClick={() => state.toggleGroup(category)}
                 >
@@ -319,7 +318,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                     size={14}
                     className={`buildrick-accordion-chevron ${!state.collapsedGroups.has(category) ? "open" : "closed"}`}
                   />
-                </button>
+                </Button>
 
                 {!state.collapsedGroups.has(category) && (
                   <div className="buildrick-component-list">
@@ -352,16 +351,13 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           )}
         </div>
       </div>
-
       {/* ── Dialogs ─────────────────────────────────────────────────────────── */}
-
       {showCreateModal && (
         <CreateComponentModal
           onClose={() => setShowCreateModal(false)}
           onSubmit={handleCreateComponent}
         />
       )}
-
       <ConfirmDialog
         isOpen={!!state.confirmDelete}
         onClose={() => state.setConfirmDelete(null)}
@@ -375,7 +371,6 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         confirmText="Delete"
         variant="danger"
       />
-
       <Modal
         isOpen={!!state.renameTarget}
         onClose={() => state.setRenameTarget(null)}
@@ -394,16 +389,15 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             style={dialogInputStyles}
           />
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-            <button onClick={() => state.setRenameTarget(null)} style={dialogCancelBtnStyles}>
+            <Button onClick={() => state.setRenameTarget(null)} style={dialogCancelBtnStyles}>
               Cancel
-            </button>
-            <button onClick={() => state.confirmRename(renameInput)} style={dialogPrimaryBtnStyles}>
+            </Button>
+            <Button onClick={() => state.confirmRename(renameInput)} style={dialogPrimaryBtnStyles}>
               Rename
-            </button>
+            </Button>
           </div>
         </div>
       </Modal>
-
       <Modal
         isOpen={!!state.variantPicker}
         onClose={() => state.setVariantPicker(null)}
@@ -414,7 +408,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           {state.variantPicker?.variants.map((v) => {
             const isCurrent = v.id === state.variantPicker?.currentVariantId;
             return (
-              <button
+              <Button
                 key={v.id}
                 onClick={() => state.confirmVariant(v.id)}
                 style={{
@@ -436,12 +430,11 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                     (current)
                   </span>
                 )}
-              </button>
+              </Button>
             );
           })}
         </div>
       </Modal>
-
       <Modal
         isOpen={!!state.duplicateInfo}
         onClose={() => state.setDuplicateInfo(null)}

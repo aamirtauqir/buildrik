@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * TemplatesTabModals — Replace confirm + Pro intercept modals
  * Restyled to match .pen Screen 7 design (light theme).
@@ -47,12 +48,12 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
           Also reset global styles
         </label>
         <div className="tpl-modal-btns">
-          <button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onCancel}>
+          <Button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onCancel}>
             Cancel
-          </button>
-          <button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onApply}>
+          </Button>
+          <Button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onApply}>
             Replace
-          </button>
+          </Button>
         </div>
       </div>
     </div>,
@@ -78,12 +79,12 @@ export const ProModal: React.FC<ProModalProps> = ({ templateName, onCancel, onUp
           <strong>{templateName}</strong> is available on the Pro plan. Upgrade to unlock 40+ premium templates.
         </p>
         <div className="tpl-modal-btns">
-          <button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onCancel}>
+          <Button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onCancel}>
             Cancel
-          </button>
-          <button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onUpgrade}>
+          </Button>
+          <Button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onUpgrade}>
             Upgrade to Pro
-          </button>
+          </Button>
         </div>
       </div>
     </div>,
@@ -117,8 +118,8 @@ export const CreatePageConfirmModal: React.FC<CreatePageConfirmModalProps> = ({
           <span className="tpl-modal-row-text">Using: {templateName}</span>
         </div>
         <div className="tpl-modal-btns">
-          <button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onCancel}>Cancel</button>
-          <button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onConfirm}>Create page</button>
+          <Button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onCancel}>Cancel</Button>
+          <Button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onConfirm}>Create page</Button>
         </div>
       </div>
     </div>,
@@ -150,8 +151,8 @@ export const CreatePageSuccessModal: React.FC<CreatePageSuccessModalProps> = ({
         <h3 className="tpl-modal-title tpl-modal-title--lg">Page created!</h3>
         <p className="tpl-modal-desc">Your new page has been created from the template and is ready to edit.</p>
         <div className="tpl-modal-btns">
-          <button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onClose}>Close</button>
-          <button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onGoToPage}>Go to page</button>
+          <Button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onClose}>Close</Button>
+          <Button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onGoToPage}>Go to page</Button>
         </div>
       </div>
     </div>,
@@ -187,8 +188,8 @@ export const CreatePageErrorModal: React.FC<CreatePageErrorModalProps> = ({
           </p>
         </div>
         <div className="tpl-modal-btns">
-          <button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onCancel}>Cancel</button>
-          <button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onRetry}>Try again</button>
+          <Button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onCancel}>Cancel</Button>
+          <Button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onRetry}>Try again</Button>
         </div>
       </div>
     </div>,

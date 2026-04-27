@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * SlimLauncher — 280px panel launcher for the Media tab.
  *
@@ -100,7 +101,7 @@ export function SlimLauncher({
       <header className="sl-header">
         <h3 className="sl-title">Media</h3>
         <div className="sl-header-actions">
-          <button
+          <Button
             type="button"
             className="sl-icon-btn"
             onClick={handleUploadClick}
@@ -108,8 +109,8 @@ export function SlimLauncher({
             aria-label="Upload files"
           >
             <Upload size={16} />
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             className="sl-icon-btn"
             onClick={() => onOpenLibrary()}
@@ -117,9 +118,9 @@ export function SlimLauncher({
             aria-label="Open full library"
           >
             <Maximize2 size={16} />
-          </button>
+          </Button>
           {onClose ? (
-            <button
+            <Button
               type="button"
               className="sl-icon-btn"
               onClick={onClose}
@@ -127,11 +128,10 @@ export function SlimLauncher({
               aria-label="Close panel"
             >
               <X size={16} />
-            </button>
+            </Button>
           ) : null}
         </div>
       </header>
-
       {/* Path 3: search opens full manager with prefill. */}
       <div
         className="sl-search"
@@ -146,22 +146,21 @@ export function SlimLauncher({
         <span className="sl-search__ghost">Search media…</span>
         <kbd className="sl-search__kbd">⌘K</kbd>
       </div>
-
       {recent.length > 0 ? (
         <section className="sl-strip" aria-label="Recent uploads">
           <div className="sl-strip__header">
             <span className="sl-strip__label">Recent</span>
-            <button
+            <Button
               type="button"
               className="sl-strip__more"
               onClick={() => onOpenLibrary()}
             >
               View all
-            </button>
+            </Button>
           </div>
           <div className="sl-tiles">
             {recent.map((item) => (
-              <button
+              <Button
                 key={item.key}
                 type="button"
                 className="sl-tile"
@@ -180,7 +179,7 @@ export function SlimLauncher({
                 ) : (
                   <div className="sl-tile__placeholder" aria-hidden="true" />
                 )}
-              </button>
+              </Button>
             ))}
           </div>
         </section>
@@ -190,22 +189,20 @@ export function SlimLauncher({
           <p className="sl-empty__body">
             Upload your brand assets or browse free stock. Everything you add lives here.
           </p>
-          <button type="button" className="sl-empty__cta" onClick={() => onOpenLibrary()}>
+          <Button type="button" className="sl-empty__cta" onClick={() => onOpenLibrary()}>
             Open library
-          </button>
+          </Button>
         </section>
       )}
-
       {recent.length > 0 ? (
-        <button
+        <Button
           type="button"
           className="sl-open-library"
           onClick={() => onOpenLibrary()}
         >
           Open library
-        </button>
+        </Button>
       ) : null}
-
       <input
         ref={fileInputRef}
         type="file"
@@ -215,7 +212,6 @@ export function SlimLauncher({
         onChange={handleFileInputChange}
         aria-hidden="true"
       />
-
       {dragOver ? (
         <div className="sl-drag-overlay" role="status" aria-live="polite">
           <Upload size={24} />

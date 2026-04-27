@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * LayerContextMenu — Right-click context menu for layer tree rows
  * Per .pen Screen 11: Delete, Group, Rename, Lock/Unlock actions.
@@ -68,23 +69,23 @@ export const LayerContextMenu: React.FC<LayerContextMenuProps> = ({
       role="menu"
       aria-label="Layer actions"
     >
-      <button style={itemStyles} role="menuitem" onClick={() => handleAction(onRename)}>
+      <Button style={itemStyles} role="menuitem" onClick={() => handleAction(onRename)}>
         <Edit3 size={14} />
         <span>Rename</span>
-      </button>
-      <button style={itemStyles} role="menuitem" onClick={() => handleAction(onGroup)}>
+      </Button>
+      <Button style={itemStyles} role="menuitem" onClick={() => handleAction(onGroup)}>
         <Group size={14} />
         <span>Group</span>
-      </button>
-      <button style={itemStyles} role="menuitem" onClick={() => handleAction(onToggleLock)}>
+      </Button>
+      <Button style={itemStyles} role="menuitem" onClick={() => handleAction(onToggleLock)}>
         {isLocked ? <Unlock size={14} /> : <Lock size={14} />}
         <span>{isLocked ? "Unlock" : "Lock"}</span>
-      </button>
+      </Button>
       <div style={dividerStyles} />
-      <button style={{ ...itemStyles, color: "var(--bd-error, #ef4444)" }} role="menuitem" onClick={() => handleAction(onDelete)}>
+      <Button style={{ ...itemStyles, color: "var(--bd-error, #ef4444)" }} role="menuitem" onClick={() => handleAction(onDelete)}>
         <Trash2 size={14} />
         <span>Delete</span>
-      </button>
+      </Button>
     </div>
   );
 };

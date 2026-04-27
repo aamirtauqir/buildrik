@@ -102,7 +102,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
         {/* Tabs */}
         <div style={tabBarStyles}>
           {(["general", "canvas", "seo"] as const).map((tab) => (
-            <button
+            <Button
               key={tab}
               onClick={() => setActiveTab(tab)}
               style={{
@@ -112,7 +112,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
               }}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
+            </Button>
           ))}
         </div>
 

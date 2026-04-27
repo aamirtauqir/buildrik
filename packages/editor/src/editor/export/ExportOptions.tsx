@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Export Options Panel
  * Configuration UI for export settings
@@ -58,7 +59,7 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
       {AVAILABLE_FORMATS.map((fmt) => {
         const isSelected = selectedFormat === fmt;
         return (
-          <button
+          <Button
             key={fmt}
             onClick={() => onFormatChange(fmt)}
             style={{
@@ -103,7 +104,7 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
             >
               {FORMAT_DESCRIPTIONS[fmt]}
             </div>
-          </button>
+          </Button>
         );
       })}
 
@@ -250,13 +251,12 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
           }}
         />
       </div>
-
       {/* CSS Style */}
       <div>
         <label style={{ display: "block", fontSize: 12, marginBottom: 6 }}>CSS Style</label>
         <div style={{ display: "flex", gap: 8 }}>
           {(["embedded", "external", "inline"] as CSSExportStyle[]).map((style) => (
-            <button
+            <Button
               key={style}
               onClick={() => onChange({ cssStyle: style })}
               style={{
@@ -275,11 +275,10 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
               }}
             >
               {style}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
-
       {/* Toggle Options */}
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <ToggleOption
@@ -303,7 +302,6 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
           onChange={(includeViewport) => onChange({ includeViewport })}
         />
       </div>
-
       {/* CMS Export Options - only show if project has CMS bindings */}
       {hasCMSBindings && onCMSChange && (
         <div style={{ borderTop: "1px solid var(--buildrick-border)", paddingTop: 16 }}>
@@ -312,7 +310,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
           </label>
           <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
             {(["none", "static", "template"] as CMSExportMode[]).map((mode) => (
-              <button
+              <Button
                 key={mode}
                 onClick={() => onCMSChange({ mode })}
                 style={{
@@ -330,7 +328,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
                 }}
               >
                 {mode === "none" ? "None" : mode === "static" ? "Embed Data" : "Template"}
-              </button>
+              </Button>
             ))}
           </div>
 
@@ -348,7 +346,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
               </label>
               <div style={{ display: "flex", gap: 8 }}>
                 {(["handlebars", "liquid"] as TemplateSyntax[]).map((syntax) => (
-                  <button
+                  <Button
                     key={syntax}
                     onClick={() => onCMSChange({ syntax })}
                     style={{
@@ -365,7 +363,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
                     }}
                   >
                     {syntax}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>

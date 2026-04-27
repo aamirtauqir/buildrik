@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Position Controls - Position mode selection and offset inputs
  * @license BSD-3-Clause
@@ -76,7 +77,6 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
           position="right"
         />
       </div>
-
       {/* Position mode buttons */}
       <div
         role="group"
@@ -89,7 +89,7 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
         }}
       >
         {POSITION_OPTIONS.map((option) => (
-          <button
+          <Button
             key={option.value}
             style={{
               ...cardBtn(styles.position === option.value),
@@ -103,10 +103,9 @@ export const PositionControls: React.FC<PositionControlsProps> = ({
           >
             <PositionPreview type={option.value} />
             <span style={{ fontSize: 9 }}>{option.label}</span>
-          </button>
+          </Button>
         ))}
       </div>
-
       {/* Position offset controls */}
       {hasPosition && (
         <PositionOffsetControls

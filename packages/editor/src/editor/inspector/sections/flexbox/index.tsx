@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Flexbox Section - Enhanced visual controls with icons and grid picker
  * @license BSD-3-Clause
@@ -100,7 +101,6 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
     >
       {/* Enable Flex */}
       {!isFlexContainer && <EnableFlexPrompt onChange={onChange} />}
-
       {isFlexContainer && (
         <>
           {/* Direction Toggle */}
@@ -115,13 +115,13 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
             <label style={labelStyle}>Wrap</label>
             <div style={{ display: "flex", gap: 2, flex: 1 }}>
               {["nowrap", "wrap", "wrap-reverse"].map((val) => (
-                <button
+                <Button
                   key={val}
                   style={compactBtn(styles["flex-wrap"] === val)}
                   onClick={() => onChange("flex-wrap", val)}
                 >
                   {val === "wrap-reverse" ? "rev" : val}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -152,20 +152,19 @@ export const FlexboxSection: React.FC<FlexboxSectionProps> = ({
                           ? "space-around"
                           : val;
                 return (
-                  <button
+                  <Button
                     key={val}
                     style={compactBtn(styles["align-content"] === actualVal)}
                     onClick={() => onChange("align-content", actualVal)}
                   >
                     {val.slice(0, 3)}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
           </div>
         </>
       )}
-
       {/* Flex Item Properties — only meaningful when this element's parent is a flex container */}
       {isFlexItem && (
         <FlexItemControls

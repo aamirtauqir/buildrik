@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Media Tab — My Library View
  * Renders all 4 type sections inline (img/vid/ico/fnt).
@@ -94,7 +95,7 @@ function ImageSection({
             <div className="med-img-overlay" />
             <div className="med-img-top">
               {selMode && (
-                <button
+                <Button
                   className="med-chk"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -103,9 +104,9 @@ function ImageSection({
                   aria-label={sel ? "Deselect" : "Select"}
                 >
                   {sel && "✓"}
-                </button>
+                </Button>
               )}
-              <button
+              <Button
                 className="med-del-btn"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -114,7 +115,7 @@ function ImageSection({
                 aria-label="Delete"
               >
                 ×
-              </button>
+              </Button>
             </div>
             <div className="med-img-meta">
               <span className={`med-ext-badge ${extStyle(item.mimeType)}`} data-type={item.type}>
@@ -123,7 +124,7 @@ function ImageSection({
               <div className="med-img-name">{item.name}</div>
               <div className="med-img-size">{fmtSize(item.size)}</div>
             </div>
-            <button
+            <Button
               className="med-insert-btn"
               onClick={(e) => {
                 e.stopPropagation();
@@ -132,7 +133,7 @@ function ImageSection({
               aria-label={`Add ${item.name} to page`}
             >
               Add
-            </button>
+            </Button>
           </div>
         );
       })}
@@ -184,7 +185,7 @@ function VideoSection({
             }}
           >
             {selMode && (
-              <button
+              <Button
                 className="med-chk"
                 style={{ position: "absolute", top: 6, left: 6, zIndex: 2 }}
                 onClick={(e) => {
@@ -194,7 +195,7 @@ function VideoSection({
                 aria-label={sel ? "Deselect" : "Select"}
               >
                 {sel && "✓"}
-              </button>
+              </Button>
             )}
             {item.thumb && (
               <div className="med-img-card-bg">
@@ -211,7 +212,7 @@ function VideoSection({
                 {fmtDur(item.duration)}
               </div>
             )}
-            <button
+            <Button
               className="med-insert-btn"
               onClick={(e) => {
                 e.stopPropagation();
@@ -220,7 +221,7 @@ function VideoSection({
               aria-label={`Add ${item.name} to page`}
             >
               Add
-            </button>
+            </Button>
           </div>
         );
       })}
@@ -269,7 +270,7 @@ function IconSection({
             }}
           >
             {selMode && (
-              <button
+              <Button
                 className="med-chk"
                 style={{ position: "absolute", top: 2, left: 2, zIndex: 2 }}
                 onClick={(e) => {
@@ -279,7 +280,7 @@ function IconSection({
                 aria-label={sel ? "Deselect" : "Select"}
               >
                 {sel && "✓"}
-              </button>
+              </Button>
             )}
             <img src={item.thumb ?? item.src} alt={item.name} width="16" height="16" />
             <span className="med-ico-label">{item.name}</span>
@@ -327,7 +328,7 @@ function FontSection({
             }}
           >
             {selMode && (
-              <button
+              <Button
                 className="med-chk"
                 style={{ position: "absolute", top: 6, right: 6, zIndex: 2 }}
                 onClick={(e) => {
@@ -337,18 +338,18 @@ function FontSection({
                 aria-label={sel ? "Deselect" : "Select"}
               >
                 {sel && "✓"}
-              </button>
+              </Button>
             )}
             <div className="med-fnt-top">
               <span className="med-fnt-name">{item.name}</span>
-              <button
+              <Button
                 className="med-insert-btn"
                 style={{ position: "static", display: "flex" }}
                 onClick={() => onInsert(item.key)}
                 aria-label="Use font"
               >
                 Use
-              </button>
+              </Button>
             </div>
             <div className="med-fnt-preview" style={{ fontFamily: `"${item.name}", serif` }}>
               Aa Bb Cc 123
@@ -460,20 +461,20 @@ export function LibraryView({
         {activeType !== "all" && fmtOpts.length > 0 && (
           <div className="med-fmt-strip">
             {fmtOpts.map((f) => (
-              <button
+              <Button
                 key={f}
                 className={`med-fmt-btn${fmtFilter === f ? " active" : ""}`}
                 onClick={() => onFmt(fmtFilter === f ? "" : f)}
               >
                 {f.toUpperCase()}
-              </button>
+              </Button>
             ))}
           </div>
         )}
 
         {/* Sort dropdown + direction toggle */}
         <div ref={sortRef} className="med-sort-wrap" style={{ position: "relative" }}>
-          <button className="med-sort-lbl" onClick={() => setSortOpen((v) => !v)}>
+          <Button className="med-sort-lbl" onClick={() => setSortOpen((v) => !v)}>
             {currentSortLabel}
             <svg
               width="7"
@@ -486,14 +487,14 @@ export function LibraryView({
             >
               <path d="M6 9l6 6 6-6" />
             </svg>
-          </button>
-          <button
+          </Button>
+          <Button
             className="med-sort-dir"
             onClick={() => onSort(sort, sortDir === "asc" ? "desc" : "asc")}
             aria-label={sortDir === "asc" ? "Sort descending" : "Sort ascending"}
           >
             {sortDir === "asc" ? "↑" : "↓"}
-          </button>
+          </Button>
           {sortOpen && (
             <div className="med-sort-dd">
               {SORT_OPTIONS.map((opt) => (
@@ -517,35 +518,34 @@ export function LibraryView({
 
         {/* Grid toggle */}
         {([2, 3, 4] as const).map((n) => (
-          <button
+          <Button
             key={n}
             className={`med-grid-tog${gridN === n ? " active" : ""}`}
             onClick={() => onGridN(n)}
             aria-label={`${n} columns`}
           >
             {n}
-          </button>
+          </Button>
         ))}
 
         {/* Sel mode toggle */}
-        <button
+        <Button
           className={`med-grid-tog${selMode ? " active" : ""}`}
           onClick={onSelToggle}
           aria-label="Select mode"
           aria-pressed={selMode}
         >
           ☑
-        </button>
+        </Button>
       </div>
-
       {/* Bulk select bar */}
       {selMode && selectedKeys.size > 0 && (
         <div className="med-bulk-bar">
           <span className="med-bulk-count">{selectedKeys.size} selected</span>
-          <button className="med-bulk-btn" onClick={onSelectAll}>
+          <Button className="med-bulk-btn" onClick={onSelectAll}>
             All
-          </button>
-          <button
+          </Button>
+          <Button
             className="med-bulk-btn danger"
             onClick={() => {
               const selectedItems = items.filter((i) => selectedKeys.has(i.key));
@@ -553,10 +553,9 @@ export function LibraryView({
             }}
           >
             Delete
-          </button>
+          </Button>
         </div>
       )}
-
       {/* Upload ghost cards */}
       {ghosts.length > 0 && (
         <div className="med-grid" data-cols={gridN}>
@@ -569,7 +568,6 @@ export function LibraryView({
           ))}
         </div>
       )}
-
       {/* Image section */}
       {(showAll || activeType === "img") && (
         <>
@@ -596,7 +594,6 @@ export function LibraryView({
           )}
         </>
       )}
-
       {/* Video section */}
       {(showAll || activeType === "vid") && (
         <>
@@ -623,7 +620,6 @@ export function LibraryView({
           )}
         </>
       )}
-
       {/* Icon section */}
       {(showAll || activeType === "ico") && (
         <>
@@ -648,7 +644,6 @@ export function LibraryView({
           )}
         </>
       )}
-
       {/* Font section */}
       {(showAll || activeType === "fnt") && (
         <>

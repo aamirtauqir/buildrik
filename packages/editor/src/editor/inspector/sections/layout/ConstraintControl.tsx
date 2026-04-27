@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Constraint Control - Fixed / Fill / Hug size controls
  * @license BSD-3-Clause
@@ -55,7 +56,7 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
       </div>
       <div style={{ display: "flex", gap: 4 }}>
         {/* Fixed */}
-        <button
+        <Button
           style={constraintBtnStyle(currentType === "fixed")}
           onClick={() => handleConstraintChange("fixed")}
           title="Fixed size - element has a specific pixel or unit value"
@@ -73,10 +74,10 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
             <line x1="13" y1="8" x2="15" y2="8" />
           </svg>
           <span>Fixed</span>
-        </button>
+        </Button>
 
         {/* Fill */}
-        <button
+        <Button
           style={constraintBtnStyle(currentType === "fill")}
           onClick={() => handleConstraintChange("fill")}
           title="Fill - element expands to fill available space (100%)"
@@ -96,10 +97,10 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
             <path d="M13 8L11 6.5V9.5L13 8Z" fill="currentColor" />
           </svg>
           <span>Fill</span>
-        </button>
+        </Button>
 
         {/* Hug */}
-        <button
+        <Button
           style={constraintBtnStyle(currentType === "hug")}
           onClick={() => handleConstraintChange("hug")}
           title="Hug content - element shrinks to fit its content (fit-content)"
@@ -119,9 +120,8 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
             <line x1="11" y1="8" x2="13" y2="8" strokeLinecap="round" />
           </svg>
           <span>Hug</span>
-        </button>
+        </Button>
       </div>
-
       {/* Fixed value input - only show when in fixed mode */}
       {currentType === "fixed" && (
         <div

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * LayerContextMenu - Right-click context menu for layer rows.
  * Props-only, no hook imports. Closes on click-outside + Escape.
@@ -67,55 +68,55 @@ export function LayerContextMenu({
       role="menu"
       aria-label={`Actions for ${nodeName}`}
     >
-      <button className="bdc-menu-item" role="menuitem" onClick={() => act("rename")}>
+      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("rename")}>
         <span className="bdc-menu-lbl">Rename</span>
         <span className="bdc-menu-kbd">F2</span>
-      </button>
-      <button className="bdc-menu-item" role="menuitem" onClick={() => act("duplicate")}>
+      </Button>
+      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("duplicate")}>
         <span className="bdc-menu-lbl">Duplicate</span>
         <span className="bdc-menu-kbd">⌘D</span>
-      </button>
+      </Button>
       <div className="bdc-menu-sep" />
-      <button
+      <Button
         className="bdc-menu-item"
         role="menuitem"
         onClick={() => act(isHidden ? "show" : "hide")}
       >
         {isHidden ? "Show" : "Hide"}
-      </button>
-      <button
+      </Button>
+      <Button
         className="bdc-menu-item"
         role="menuitem"
         onClick={() => act(isLocked ? "unlock" : "lock")}
       >
         {isLocked ? "Unlock" : "Lock"}
-      </button>
+      </Button>
       <div className="bdc-menu-sep" />
       {selectedCount > 1 && (
-        <button className="bdc-menu-item" role="menuitem" onClick={() => act("group")}>
+        <Button className="bdc-menu-item" role="menuitem" onClick={() => act("group")}>
           <span className="bdc-menu-lbl">Group {selectedCount} layers</span>
           <span className="bdc-menu-kbd">⌘G</span>
-        </button>
+        </Button>
       )}
       {childCount > 0 && (
-        <button
+        <Button
           className="bdc-menu-item"
           role="menuitem"
           onClick={() => act("selectChildren")}
         >
           Select children
-        </button>
+        </Button>
       )}
-      <button className="bdc-menu-item" role="menuitem" onClick={() => act("moveToTop")}>
+      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("moveToTop")}>
         <span className="bdc-menu-lbl">Move to top</span>
         <span className="bdc-menu-kbd">⌘⇧]</span>
-      </button>
-      <button className="bdc-menu-item" role="menuitem" onClick={() => act("moveToBottom")}>
+      </Button>
+      <Button className="bdc-menu-item" role="menuitem" onClick={() => act("moveToBottom")}>
         <span className="bdc-menu-lbl">Move to bottom</span>
         <span className="bdc-menu-kbd">⌘⇧[</span>
-      </button>
+      </Button>
       <div className="bdc-menu-sep" />
-      <button
+      <Button
         className="bdc-menu-item bdc-menu-danger"
         role="menuitem"
         onClick={() => act("delete")}
@@ -125,7 +126,7 @@ export function LayerContextMenu({
           {childCount > 0 ? ` (+ ${childCount} child${childCount === 1 ? "" : "ren"})` : ""}
         </span>
         <span className="bdc-menu-kbd">⌫</span>
-      </button>
+      </Button>
     </div>
   );
 }

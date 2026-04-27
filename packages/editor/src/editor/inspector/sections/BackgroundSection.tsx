@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Background Section - Color, Image, Gradient
  */
@@ -70,7 +71,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
   // "+" action in header — opens media library for image bg (falls through if
   // handler not wired). Matches mock's "+ add background layer" affordance.
   const addAction = onOpenMediaLibrary ? (
-    <button
+    <Button
       type="button"
       className="bdi-plus"
       onClick={(e) => {
@@ -85,7 +86,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M12 5v14 M5 12h14" />
       </svg>
-    </button>
+    </Button>
   ) : undefined;
 
   return (
@@ -102,7 +103,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
       {/* Background Type Selector — segmented */}
       <div className="bdi-seg" style={{ marginBottom: 6 }}>
         {(["color", "gradient", "image"] as const).map((type) => (
-          <button
+          <Button
             key={type}
             type="button"
             onClick={() => setBgType(type)}
@@ -111,10 +112,9 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
             aria-pressed={bgType === type}
           >
             {type}
-          </button>
+          </Button>
         ))}
       </div>
-
       {/* Color Background */}
       {bgType === "color" && (
         <div style={{ position: "relative" }}>
@@ -126,7 +126,6 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           />
         </div>
       )}
-
       {/* Gradient Background */}
       {bgType === "gradient" && (
         <>
@@ -143,7 +142,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               Gradient Type
             </label>
             <div style={{ display: "flex", gap: 4 }}>
-              <button
+              <Button
                 onClick={() => {
                   const color1 = "var(--buildrick-accent)";
                   const color2 = "var(--buildrick-success)";
@@ -161,8 +160,8 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                 }}
               >
                 Linear
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => {
                   const color1 = "var(--buildrick-accent)";
                   const color2 = "var(--buildrick-success)";
@@ -180,7 +179,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                 }}
               >
                 Radial
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -253,7 +252,6 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
           )}
         </>
       )}
-
       {/* Image Background */}
       {bgType === "image" && (
         <>
@@ -268,7 +266,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
               />
             </div>
             {onOpenMediaLibrary && (
-              <button
+              <Button
                 onClick={() =>
                   onOpenMediaLibrary(["image"], (asset) => {
                     onChange("background-image", `url('${asset.src}')`);
@@ -289,7 +287,7 @@ export const BackgroundSection: React.FC<BackgroundSectionProps> = ({
                 title="Browse media library"
               >
                 Browse
-              </button>
+              </Button>
             )}
           </div>
 

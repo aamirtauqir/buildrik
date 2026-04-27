@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * TipsFooter — PRO TIPS carousel at bottom of Add panel.
  *
@@ -188,7 +189,7 @@ export const TipsFooter: React.FC<TipsFooterProps> = ({
           {tipIdx + 1} / {TIPS.length}
         </span>
         <div style={nav}>
-          <button
+          <Button
             type="button"
             style={arr}
             onClick={onPrev}
@@ -197,8 +198,8 @@ export const TipsFooter: React.FC<TipsFooterProps> = ({
             aria-label="Previous tip"
           >
             <ChevronLeft size={12} />
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             style={arr}
             onClick={onNext}
@@ -207,9 +208,9 @@ export const TipsFooter: React.FC<TipsFooterProps> = ({
             aria-label="Next tip"
           >
             <ChevronRight size={12} />
-          </button>
+          </Button>
           {onToggleCollapsed && (
-            <button
+            <Button
               type="button"
               style={arr}
               onClick={onToggleCollapsed}
@@ -219,7 +220,7 @@ export const TipsFooter: React.FC<TipsFooterProps> = ({
               aria-expanded={true}
             >
               <ChevronDown size={12} />
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -229,7 +230,7 @@ export const TipsFooter: React.FC<TipsFooterProps> = ({
       </div>
       <div style={dots}>
         {TIPS.map((_, i) => (
-          <button
+          <Button
             key={i}
             type="button"
             style={dot(i === tipIdx)}

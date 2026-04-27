@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Preset Grid Controls — TemplateButtonGrid + PresetButtonGrid.
  * Ported to .bdi-qa pattern per comp-inspector.v1 quick actions row.
@@ -32,7 +33,7 @@ export const TemplateButtonGrid: React.FC<TemplateButtonGridProps> = ({
     }}
   >
     {templates.map((tpl) => (
-      <button
+      <Button
         key={tpl.label}
         type="button"
         onClick={() => onChange(tpl.value)}
@@ -41,7 +42,7 @@ export const TemplateButtonGrid: React.FC<TemplateButtonGridProps> = ({
         aria-pressed={currentValue === tpl.value}
       >
         {tpl.label}
-      </button>
+      </Button>
     ))}
   </div>
 );
@@ -71,7 +72,7 @@ export const PresetButtonGrid: React.FC<PresetButtonGridProps> = ({
     }}
   >
     {presets.map((preset) => (
-      <button
+      <Button
         key={preset.label}
         type="button"
         onClick={() => onChange(preset.value)}
@@ -79,7 +80,7 @@ export const PresetButtonGrid: React.FC<PresetButtonGridProps> = ({
         aria-pressed={currentValue === preset.value}
       >
         {preset.label}
-      </button>
+      </Button>
     ))}
   </div>
 );

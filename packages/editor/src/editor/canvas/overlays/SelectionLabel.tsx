@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Selection Label Component
  * Shows element name with parent navigation and settings at top-left of selection
@@ -154,7 +155,7 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({
       <div style={labelBarStyles}>
         {/* Parent button */}
         {parent && (
-          <button
+          <Button
             onClick={onSelectParent}
             style={parentBtnStyles}
             title={`Go to parent: ${parentName} (Alt+↑)`}
@@ -169,11 +170,11 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({
             >
               <path d="M12 19V5M5 12l7-7 7 7" />
             </svg>
-          </button>
+          </Button>
         )}
 
         {/* Element name (clickable for dropdown) */}
-        <button onClick={() => setShowDropdown(!showDropdown)} style={nameBtnStyles}>
+        <Button onClick={() => setShowDropdown(!showDropdown)} style={nameBtnStyles}>
           <span style={{ opacity: 0.7, marginRight: 4 }}>{getTypeIcon(elementType)}</span>
           {elementName}
           {ancestors.length > 0 && (
@@ -189,11 +190,11 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({
               <path d="M6 9l6 6 6-6" />
             </svg>
           )}
-        </button>
+        </Button>
 
         {/* Settings gear */}
         {onOpenSettings && (
-          <button onClick={onOpenSettings} style={gearBtnStyles} title="Element settings">
+          <Button onClick={onOpenSettings} style={gearBtnStyles} title="Element settings">
             <svg
               width="12"
               height="12"
@@ -205,15 +206,14 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({
               <circle cx="12" cy="12" r="3" />
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
             </svg>
-          </button>
+          </Button>
         )}
       </div>
-
       {/* Ancestor dropdown */}
       {showDropdown && ancestors.length > 0 && (
         <div ref={dropdownRef} style={dropdownStyles}>
           {ancestors.map((ancestor, i) => (
-            <button
+            <Button
               key={ancestor.id}
               onClick={() => {
                 onAncestorClick?.(ancestor.id);
@@ -228,7 +228,7 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({
                 {getTypeIcon(ancestor.type)}
               </span>
               {ancestor.name}
-            </button>
+            </Button>
           ))}
           {/* Current element */}
           <div

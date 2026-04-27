@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Overflow & Visibility Controls - Overflow, visibility, float, and clear controls
  * @license BSD-3-Clause
@@ -54,7 +55,7 @@ export const OverflowControls: React.FC<OverflowVisibilityControlsProps> = ({
         {mixedKeys?.has("overflow") && <MixedValueBadge compact />}
         <div style={{ display: "flex", gap: 2, flex: 1 }}>
           {OVERFLOW_OPTIONS.map((option) => (
-            <button
+            <Button
               key={option.value}
               style={compactBtn(styles.overflow === option.value)}
               onClick={() => onChange("overflow", option.value)}
@@ -63,11 +64,10 @@ export const OverflowControls: React.FC<OverflowVisibilityControlsProps> = ({
               aria-pressed={styles.overflow === option.value}
             >
               {option.label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
-
       {/* Overflow X/Y */}
       <OverflowXYControls styles={styles} onChange={onChange} inputStyle={inputStyle} />
     </>
@@ -145,47 +145,45 @@ export const VisibilityFloatControls: React.FC<OverflowVisibilityControlsProps> 
         <label style={labelStyle}>Visible</label>
         <div style={{ display: "flex", gap: 2, flex: 1 }}>
           {VISIBILITY_OPTIONS.map((val) => (
-            <button
+            <Button
               key={val}
               style={compactBtn(styles.visibility === val)}
               onClick={() => onChange("visibility", val)}
             >
               {val.slice(0, 3)}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
-
       {/* Float */}
       <div style={rowStyle}>
         {mixedKeys?.has("float") && <MixedValueBadge compact />}
         <label style={labelStyle}>Float</label>
         <div style={{ display: "flex", gap: 2, flex: 1 }}>
           {FLOAT_OPTIONS.map((val) => (
-            <button
+            <Button
               key={val}
               style={compactBtn(styles.float === val)}
               onClick={() => onChange("float", val)}
             >
               {val}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
-
       {/* Clear */}
       <div style={rowStyle}>
         {mixedKeys?.has("clear") && <MixedValueBadge compact />}
         <label style={labelStyle}>Clear</label>
         <div style={{ display: "flex", gap: 2, flex: 1 }}>
           {CLEAR_OPTIONS.map((val) => (
-            <button
+            <Button
               key={val}
               style={compactBtn(styles.clear === val)}
               onClick={() => onChange("clear", val)}
             >
               {val}
-            </button>
+            </Button>
           ))}
         </div>
       </div>

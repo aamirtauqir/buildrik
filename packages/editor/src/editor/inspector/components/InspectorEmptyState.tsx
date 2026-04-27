@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /* @lint-hex-policy: component-theme
    "Template applied!" success banner uses a slightly brighter emerald than
    canonical --buildrick-success — intentional tonal choice for the post-apply
@@ -50,16 +51,15 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
             {appliedName}
           </p>
           {composer && (
-            <button
+            <Button
               onClick={() => composer.emit(EVENTS.UI_OPEN_DESIGN_PANEL, {})}
               style={appliedActionStyle}
               aria-label="Set brand colors in Global Styles"
             >
               Set Brand Colors
-            </button>
+            </Button>
           )}
         </div>
-
         {/* Still show default tips below */}
         <div style={{ ...tipStyle, marginTop: 12 }}>
           <span style={{ opacity: 0.7 }}>Tip:</span> Click an element to edit its properties
@@ -74,20 +74,17 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
       <div style={iconCircleStyle} aria-hidden="true">
         <SvgPointer style={{ opacity: 0.5 }} />
       </div>
-
       {/* Title */}
       <h3 style={titleStyle}>Nothing Selected</h3>
-
       {/* Description */}
       <p style={descriptionStyle}>
         Click an element on the canvas or use the Layers panel to select and edit properties.
       </p>
-
       {/* CTA Buttons */}
       <div style={ctaContainerStyle}>
         {composer && (
           <>
-            <button
+            <Button
               onClick={() => composer.emit(EVENTS.UI_OPEN_BUILD_PANEL, {})}
               style={primaryButtonStyle}
               aria-label="Open Build panel to add elements"
@@ -106,18 +103,17 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
                 <path d="M12 5v14M5 12h14" />
               </svg>
               Open Build Panel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => composer.emit(EVENTS.UI_BROWSE_TEMPLATES, {})}
               style={secondaryButtonStyle}
               aria-label="Browse available templates"
             >
               Browse Templates
-            </button>
+            </Button>
           </>
         )}
       </div>
-
       {/* Keyboard Tips */}
       <div style={tipStyle}>
         <span style={{ opacity: 0.7 }}>Tip:</span> Press <kbd style={kbdStyle}>A</kbd> to open Build

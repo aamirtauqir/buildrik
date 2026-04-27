@@ -242,7 +242,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
         <label style={styles.label}>Output Format</label>
         <div style={styles.formatRow}>
           {formats.map(({ id, label, supported }) => (
-            <button
+            <Button
               key={id}
               onClick={() => supported && handleFormatChange(id)}
               disabled={!supported}
@@ -255,11 +255,10 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
             >
               {label}
               {id === "webp" && " (Recommended)"}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
-
       {/* Quality Slider */}
       <div style={styles.section}>
         <label style={styles.label}>Quality</label>
@@ -275,7 +274,6 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
           <span style={styles.qualityValue}>{state.quality}%</span>
         </div>
       </div>
-
       {/* Stats */}
       <div style={styles.statsRow}>
         <div style={styles.stat}>
@@ -295,7 +293,6 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
           </div>
         </div>
       </div>
-
       {/* Preview Comparison */}
       <div style={styles.previewContainer}>
         <div style={styles.previewBox}>
@@ -311,7 +308,6 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
           <div style={styles.previewLabel}>Optimized</div>
         </div>
       </div>
-
       {/* Actions */}
       <div style={styles.footer}>
         {onClose && (

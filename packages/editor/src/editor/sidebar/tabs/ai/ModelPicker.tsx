@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 import * as React from "react";
 import type { AIModel } from "./types";
 
@@ -18,7 +19,7 @@ export const ModelPicker: React.FC<ModelPickerProps> = ({ model, onChange }) => 
   const current = MODELS.find((m) => m.id === model) ?? MODELS[1];
   return (
     <div className="bd-ai-model">
-      <button
+      <Button
         type="button"
         className="bd-ai-model-trigger"
         aria-label="Model"
@@ -27,11 +28,11 @@ export const ModelPicker: React.FC<ModelPickerProps> = ({ model, onChange }) => 
         onClick={() => setOpen((v) => !v)}
       >
         {current.label.replace(/^.+ · /, "")}
-      </button>
+      </Button>
       {open && (
         <div className="bd-ai-model-menu" role="menu">
           {MODELS.map((m) => (
-            <button
+            <Button
               key={m.id}
               type="button"
               role="menuitem"
@@ -43,7 +44,7 @@ export const ModelPicker: React.FC<ModelPickerProps> = ({ model, onChange }) => 
               }}
             >
               {m.label}
-            </button>
+            </Button>
           ))}
         </div>
       )}

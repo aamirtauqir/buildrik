@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * TemplatePagination — page-number bar for the Templates grid.
  *
@@ -31,7 +32,7 @@ export const TemplatePagination: React.FC<TemplatePaginationProps> = ({
 
   return (
     <nav className="tpl-pagination" aria-label="Templates pagination">
-      <button
+      <Button
         type="button"
         className="tpl-pagination-btn tpl-pagination-prev"
         onClick={goPrev}
@@ -39,12 +40,11 @@ export const TemplatePagination: React.FC<TemplatePaginationProps> = ({
         aria-label="Previous page"
       >
         ‹
-      </button>
-
+      </Button>
       {pages.map((p) => {
         const isActive = p === currentPage;
         return (
-          <button
+          <Button
             key={p}
             type="button"
             className={`tpl-pagination-btn tpl-pagination-page${
@@ -55,11 +55,10 @@ export const TemplatePagination: React.FC<TemplatePaginationProps> = ({
             aria-label={`Page ${p}`}
           >
             {p}
-          </button>
+          </Button>
         );
       })}
-
-      <button
+      <Button
         type="button"
         className="tpl-pagination-btn tpl-pagination-next"
         onClick={goNext}
@@ -67,7 +66,7 @@ export const TemplatePagination: React.FC<TemplatePaginationProps> = ({
         aria-label="Next page"
       >
         ›
-      </button>
+      </Button>
     </nav>
   );
 };

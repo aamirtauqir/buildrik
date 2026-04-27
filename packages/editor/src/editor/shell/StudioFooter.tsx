@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * StudioFooter — 32px status bar at bottom of editor shell.
  * Left: sync status + breadcrumb path to selected element.
@@ -127,7 +128,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
             background: "var(--buildrick-bg-subtle)",
           }}
         >
-          <button
+          <Button
             type="button"
             style={zoomBtnStyle}
             onClick={onZoomOut}
@@ -135,7 +136,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
             disabled={zoom <= ZOOM_PRESETS[0]}
           >
             −
-          </button>
+          </Button>
           <span
             style={{
               minWidth: 36,
@@ -146,7 +147,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
           >
             {zoomLabel}
           </span>
-          <button
+          <Button
             type="button"
             style={zoomBtnStyle}
             onClick={onZoomIn}
@@ -154,7 +155,7 @@ export const StudioFooter: React.FC<StudioFooterProps> = ({
             disabled={zoom >= ZOOM_PRESETS[ZOOM_PRESETS.length - 1]}
           >
             +
-          </button>
+          </Button>
         </span>
         <span>{VERSION}</span>
       </span>

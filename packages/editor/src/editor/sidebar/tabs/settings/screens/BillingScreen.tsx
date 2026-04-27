@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Billing screen — plan info and upgrade prompt
  * Shows plan badge, feature list with lock icons, and upgrade CTA on free plan.
@@ -99,7 +100,6 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
           {planLabel}
         </span>
       </div>
-
       {/* Upgrade prompt — only for free plan */}
       {isFreePlan && (
         <div
@@ -141,7 +141,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
             ))}
           </div>
 
-          <button
+          <Button
             onClick={handleUpgrade}
             style={{
               width: "100%",
@@ -158,10 +158,9 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
             aria-label="Upgrade to Pro plan"
           >
             Upgrade to Pro
-          </button>
+          </Button>
         </div>
       )}
-
       {/* Already on Pro/Enterprise */}
       {!isFreePlan && (
         <div
@@ -177,7 +176,6 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
           You have access to all {planLabel} features.
         </div>
       )}
-
       <div
         style={{
           fontSize: 12,

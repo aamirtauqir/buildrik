@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * PageTabBar - Horizontal tab bar for page switching
  * @license BSD-3-Clause
@@ -328,16 +329,15 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
           ))}
         </div>
         {/* Add button outside tablist — ARIA: only role="tab" may be tablist children */}
-        <button
+        <Button
           onClick={handleAddPage}
           style={addButtonStyles}
           title="Add page"
           aria-label="Add new page"
         >
           +
-        </button>
+        </Button>
       </div>
-
       {/* Context menu — portal so it escapes overflow:hidden parents */}
       {contextMenu &&
         createPortal(
@@ -364,40 +364,39 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
               }
             }}
           >
-            <button
+            <Button
               style={menuItemStyles}
               role="menuitem"
               onClick={() => handleRename(contextMenu.pageId)}
             >
               ✏️ Rename
-            </button>
-            <button
+            </Button>
+            <Button
               style={menuItemStyles}
               role="menuitem"
               onClick={() => handleDuplicate(contextMenu.pageId)}
             >
               📋 Duplicate
-            </button>
-            <button
+            </Button>
+            <Button
               style={menuItemStyles}
               role="menuitem"
               onClick={() => handleSetHome(contextMenu.pageId)}
             >
               🏠 Set as Home
-            </button>
+            </Button>
             {pages.length > 1 && (
-              <button
+              <Button
                 style={{ ...menuItemStyles, color: "var(--buildrick-error)" }}
                 role="menuitem"
                 onClick={() => handleDeleteRequest(contextMenu.pageId)}
               >
                 🗑️ Delete
-              </button>
+              </Button>
             )}
           </div>,
           document.body
         )}
-
       {/* Delete confirmation dialog */}
       <ConfirmDialog
         isOpen={!!deleteConfirmPageId}

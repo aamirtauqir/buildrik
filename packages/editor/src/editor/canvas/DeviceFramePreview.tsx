@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -239,7 +240,7 @@ export function DeviceFrameToggle({ active, onToggle, device }: DeviceFrameToggl
   };
 
   return (
-    <button
+    <Button
       type="button"
       aria-label={active ? "Hide device frame" : "Show device frame"}
       aria-pressed={active}
@@ -271,6 +272,6 @@ export function DeviceFrameToggle({ active, onToggle, device }: DeviceFrameToggl
           </>
         )}
       </svg>
-    </button>
+    </Button>
   );
 }

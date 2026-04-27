@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Settings tab — shared primitives.
  *
@@ -130,7 +131,7 @@ export const SwitchRow: React.FC<SwitchRowProps> = ({
       <div className="bd-set-switch-row-t">{title}</div>
       {description ? <div className="bd-set-switch-row-d">{description}</div> : null}
     </div>
-    <button
+    <Button
       type="button"
       role="switch"
       aria-checked={checked}
@@ -140,7 +141,7 @@ export const SwitchRow: React.FC<SwitchRowProps> = ({
       className={`bd-set-switch${checked ? " on" : ""}`}
     >
       <span className="bd-set-switch-knob" />
-    </button>
+    </Button>
   </div>
 );
 
@@ -223,9 +224,9 @@ export const LockedDesc: React.FC<{ children: React.ReactNode }> = ({ children }
 export const LockedBtn: React.FC<
   React.ButtonHTMLAttributes<HTMLButtonElement>
 > = ({ style, type = "button", children, ...rest }) => (
-  <button type={type} style={{ ...lockedBtnStyle, ...style }} {...rest}>
+  <Button type={type} style={{ ...lockedBtnStyle, ...style }} {...rest}>
     {children}
-  </button>
+  </Button>
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -259,12 +260,12 @@ export const SettingsNavGuard: React.FC<SettingsNavGuardProps> = ({
           You have unsaved edits in this section. Switching will discard them. Save first to keep your changes.
         </p>
         <div className="bd-set-guard-actions">
-          <button type="button" className="bd-set-btn sec" onClick={onCancel}>
+          <Button type="button" className="bd-set-btn sec" onClick={onCancel}>
             Keep editing
-          </button>
-          <button type="button" className="bd-set-btn pri" onClick={onDiscard}>
+          </Button>
+          <Button type="button" className="bd-set-btn pri" onClick={onDiscard}>
             Discard & switch
-          </button>
+          </Button>
         </div>
       </div>
     </div>

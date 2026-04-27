@@ -196,7 +196,6 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
     <div style={{ position: "relative", borderRadius: 8, overflow: "hidden" }}>
       {/* Hidden canvas for thumbnail extraction */}
       <canvas ref={canvasRef} style={{ display: "none" }} />
-
       {/* Video element */}
       <video
         ref={videoRef}
@@ -215,7 +214,6 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
           maxHeight: 400,
         }}
       />
-
       {/* Loading overlay */}
       {state.isLoading && (
         <div
@@ -231,7 +229,6 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
           <span style={{ color: "var(--buildrick-text-on-accent)", fontSize: 14 }}>Loading...</span>
         </div>
       )}
-
       {/* Controls */}
       <div
         style={{
@@ -275,7 +272,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
           }}
         >
           {/* Skip back */}
-          <button
+          <Button
             onClick={() => skipSeconds(-10)}
             style={{
               background: "transparent",
@@ -288,10 +285,10 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             title="Skip back 10s"
           >
             ⏪
-          </button>
+          </Button>
 
           {/* Play/Pause */}
-          <button
+          <Button
             onClick={togglePlay}
             style={{
               background: "rgba(255,255,255,0.2)",
@@ -304,10 +301,10 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             }}
           >
             {state.isPlaying ? "⏸️" : "▶️"}
-          </button>
+          </Button>
 
           {/* Skip forward */}
-          <button
+          <Button
             onClick={() => skipSeconds(10)}
             style={{
               background: "transparent",
@@ -320,7 +317,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
             title="Skip forward 10s"
           >
             ⏩
-          </button>
+          </Button>
 
           {/* Time display */}
           <span style={{ color: "var(--buildrick-text-on-accent)", fontSize: 12, fontFamily: "monospace" }}>
@@ -332,7 +329,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
 
           {/* Volume */}
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <button
+            <Button
               onClick={toggleMute}
               style={{
                 background: "transparent",
@@ -344,7 +341,7 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
               }}
             >
               {state.isMuted || state.volume === 0 ? "🔇" : "🔊"}
-            </button>
+            </Button>
             <input
               type="range"
               min={0}
@@ -357,7 +354,6 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
           </div>
         </div>
       </div>
-
       {/* Title overlay */}
       {title && (
         <div

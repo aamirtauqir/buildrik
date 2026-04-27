@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * ApplyProgressOverlay — shows while template apply animation runs.
  * Fires onComplete after a brief delay so the UI has time to settle.
@@ -43,9 +44,9 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
         <h3 className="tmpl-progress__title">Applying {templateName}...</h3>
         <span className="tmpl-progress__spinner" style={{ width: 24, height: 24, borderWidth: 2 }} />
         {onCancel && (
-          <button className="tmpl-progress__cancel" onClick={onCancel}>
+          <Button className="tmpl-progress__cancel" onClick={onCancel}>
             Cancel
-          </button>
+          </Button>
         )}
       </div>
     </div>,

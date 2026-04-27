@@ -96,7 +96,6 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
         onChange={setActiveTab}
         size="sm"
       />
-
       <div style={{ marginTop: 16 }}>
         <div
           style={{
@@ -106,7 +105,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
           }}
         >
           {animations[activeTab as keyof typeof animations]?.map((anim) => (
-            <button
+            <Button
               key={anim.value}
               onClick={() => updateAnimation({ type: anim.value })}
               style={{
@@ -124,11 +123,10 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
               }}
             >
               {anim.label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
-
       {/* Timing */}
       <div style={{ marginTop: 24 }}>
         <div
@@ -180,7 +178,6 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
           />
         </div>
       </div>
-
       {/* Trigger */}
       <div style={{ marginTop: 24 }}>
         <div
@@ -197,7 +194,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
 
         <div style={{ display: "flex", gap: 8 }}>
           {["load", "scroll", "hover", "click"].map((trigger) => (
-            <button
+            <Button
               key={trigger}
               onClick={() => updateAnimation({ trigger: trigger as AnimationTrigger })}
               style={{
@@ -216,7 +213,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
               }}
             >
               {trigger}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -233,14 +230,12 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
           </div>
         )}
       </div>
-
       {/* Preview */}
       <div style={{ marginTop: 24 }}>
         <Button onClick={onPreview} fullWidth variant="secondary">
           ▶️ Preview Animation
         </Button>
       </div>
-
       {/* Generated CSS */}
       <div style={{ marginTop: 16 }}>
         <div

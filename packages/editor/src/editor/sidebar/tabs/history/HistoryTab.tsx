@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * HistoryTab — Version history sidebar panel
  *
@@ -118,11 +119,10 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
         onHelpClick={onHelpClick}
         onClose={onClose}
       />
-
       {/* View switcher — prototype tabs with helper text */}
       <div className="view-switcher" role="tablist" aria-label="History view">
         {(["changes", "saves"] as const).map((view) => (
-          <button
+          <Button
             key={view}
             type="button"
             role="tab"
@@ -132,10 +132,9 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           >
             {view === "changes" ? "Changes" : "Saves"}
             <span className="tab-helper">{HELPER_TEXT[view]}</span>
-          </button>
+          </Button>
         ))}
       </div>
-
       {/* Search bar — prototype markup */}
       <div className="search-bar">
         <span className="search-icon" aria-hidden="true">
@@ -150,17 +149,16 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           aria-label={SEARCH_PLACEHOLDER[activeView]}
         />
         {searchQuery && (
-          <button
+          <Button
             type="button"
             className="search-clear visible"
             onClick={() => setSearchQuery("")}
             aria-label="Clear search"
           >
             <ClearXSvg />
-          </button>
+          </Button>
         )}
       </div>
-
       {/* List container — switches between Changes / Saves */}
       <div className="list-container" role="tabpanel">
         {activeView === "changes" && (
@@ -188,7 +186,6 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           </>
         )}
       </div>
-
       {/* Time-Travel scrubber drawer (overlays canvas, not sidebar) */}
       {showScrubber && (
         <TimeTravelScrubber

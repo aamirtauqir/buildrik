@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * ColorInput — Figma Fill row. Ported to .bdi-fill per comp-inspector.html v2.
  * Checkerboard swatch + hex + % opacity + eye toggle. Token binding preserved.
@@ -109,7 +110,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
                   >
                     {display}
                   </span>
-                  <button
+                  <Button
                     type="button"
                     className="bdi-eye"
                     onClick={(e) => {
@@ -120,7 +121,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
                     title="Unlink token"
                   >
                     <Link2Off size={10} aria-hidden="true" />
-                  </button>
+                  </Button>
                 </>
               ) : (
                 <>
@@ -140,7 +141,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
                     aria-label={`${label} value`}
                   />
                   <span className="bdi-pct">{getPercent(!hidden)}</span>
-                  <button
+                  <Button
                     type="button"
                     className="bdi-eye"
                     onClick={(e) => {
@@ -151,7 +152,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
                     title={hidden ? "Show color" : "Hide color"}
                   >
                     {hidden ? <EyeOff size={10} aria-hidden="true" /> : <Eye size={10} aria-hidden="true" />}
-                  </button>
+                  </Button>
                 </>
               )}
             </div>

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * TemplatesTab v4 — Full-page template browser matching .pen Screens 4-7.
  * Light theme, 4-column grid, pagination, inline detail panel, two-stage filtering.
@@ -146,8 +147,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       <div className="tpl-header">
         {detailTemplate ? (
           /* Breadcrumb (Screen cV3OT) */
-          <div className="tpl-breadcrumb">
-            <button
+          (<div className="tpl-breadcrumb">
+            <Button
               className="tpl-breadcrumb-back"
               onClick={() => sel.setDetailId(null)}
               aria-label="Back to grid"
@@ -156,12 +157,12 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
                 <path d="M19 12H5M12 19l-7-7 7-7" />
               </svg>
               <span>Back to grid</span>
-            </button>
+            </Button>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--bd-fg-secondary, var(--bd-fg-muted))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 18l6-6-6-6" />
             </svg>
             <span className="tpl-breadcrumb-cat">{detailTemplate.category ?? "All"}</span>
-          </div>
+          </div>)
         ) : newPageMode ? (
           <div className="tpl-newpage-header">
             <h2 className="tpl-header-title tpl-header-title--sm">Choose a template for your new page</h2>
@@ -171,21 +172,20 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           <h2 className="tpl-header-title">Templates</h2>
         )}
         <div className="tpl-header-actions">
-          <button
+          <Button
             className="tpl-header-btn"
             onClick={() => setShowSearch(!showSearch)}
             aria-label={showSearch ? "Close search" : "Search templates"}
           >
             <Search size={16} />
-          </button>
+          </Button>
           {onClose && (
-            <button className="tpl-header-btn" onClick={onClose} aria-label="Close templates">
+            <Button className="tpl-header-btn" onClick={onClose} aria-label="Close templates">
               <X size={16} />
-            </button>
+            </Button>
           )}
         </div>
       </div>
-
       {/* Search input */}
       {showSearch && (
         <div className="tpl-search-wrap">
@@ -200,25 +200,24 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
               autoFocus
             />
             {sel.searchQ.length > 0 && (
-              <button
+              <Button
                 className="tpl-search-clear"
                 onClick={() => sel.setSearchQ("")}
                 aria-label="Clear search"
               >
                 <X size={14} />
-              </button>
+              </Button>
             )}
           </div>
         </div>
       )}
-
       <>
 
       {/* Filter pills — two-stage */}
       {sel.templateType === null ? (
         <div className="tpl-pills" role="tablist" aria-label="Template categories">
           {SITE_CATEGORY_PILLS.map((pill) => (
-            <button
+            <Button
               key={pill.id}
               className={`tpl-pill${sel.activeFilter === pill.id ? " tpl-pill--active" : ""}`}
               onClick={() => sel.setActiveFilter(pill.id)}
@@ -226,7 +225,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
               aria-selected={sel.activeFilter === pill.id}
             >
               {pill.label}
-            </button>
+            </Button>
           ))}
         </div>
       ) : (
@@ -234,7 +233,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           {/* Type toggle — Page Templates / Section Templates */}
           <div className="tpl-pills" role="tablist" aria-label="Template type">
             {TEMPLATE_TYPE_PILLS.map((pill) => (
-              <button
+              <Button
                 key={pill.id}
                 className={`tpl-pill${sel.templateType === pill.id ? " tpl-pill--active" : ""}`}
                 onClick={() => sel.setTemplateType(pill.id)}
@@ -242,19 +241,19 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
                 aria-selected={sel.templateType === pill.id}
               >
                 {pill.label}
-              </button>
+              </Button>
             ))}
           </div>
           {/* Sub-category tags */}
           <div className="tpl-tags">
             {SUB_CATEGORY_TAGS.map((tag) => (
-              <button
+              <Button
                 key={tag.id}
                 className={`tpl-tag${sel.subCategory === tag.id ? " tpl-tag--active" : ""}`}
                 onClick={() => sel.setSubCategory(sel.subCategory === tag.id ? null : tag.id)}
               >
                 {tag.label}
-              </button>
+              </Button>
             ))}
           </div>
         </>
@@ -270,9 +269,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
                 ? `No templates found for "${sel.searchQ}"`
                 : "No templates in this category"}
             </p>
-            <button className="tpl-empty-btn" onClick={sel.clearAll}>
+            <Button className="tpl-empty-btn" onClick={sel.clearAll}>
               {sel.searchQ.trim() ? "Clear search" : "Show all templates"}
-            </button>
+            </Button>
           </div>
         ) : (
           <div className={`tpl-content-inner${sel.detailId ? " tpl-content-inner--with-detail" : ""}`}>
@@ -309,28 +308,26 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       />
 
       </>
-
       {/* Error banner */}
       {applyError && (
         <div className="tpl-error-banner">
           <span>{applyError}</span>
           <div className="tpl-error-actions">
             {canRetry && (
-              <button className="tpl-error-retry" onClick={handleRetry}>
+              <Button className="tpl-error-retry" onClick={handleRetry}>
                 Try again
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               className="tpl-error-dismiss"
               onClick={() => { setApplyError(null); setCanRetry(false); }}
               aria-label="Dismiss error"
             >
               <X size={14} />
-            </button>
+            </Button>
           </div>
         </div>
       )}
-
       {/* Modals */}
       {sel.showReplace && (
         <ReplaceModal

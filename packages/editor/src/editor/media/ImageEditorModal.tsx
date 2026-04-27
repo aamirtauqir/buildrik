@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Aquibra Image Editor Modal
  * Crop, resize, rotate, flip, and adjust images.
@@ -242,12 +243,12 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
         <div className="ie-header">
           <h3 className="ie-title">Edit Image</h3>
           <div className="ie-header-actions">
-            <button className="ie-btn-ghost" onClick={handleReset}>Reset</button>
-            <button className="ie-btn-primary" onClick={handleSave} disabled={saving}>
+            <Button className="ie-btn-ghost" onClick={handleReset}>Reset</Button>
+            <Button className="ie-btn-primary" onClick={handleSave} disabled={saving}>
               <Download size={14} />
               {saving ? "Saving..." : "Save"}
-            </button>
-            <button className="ie-close" onClick={onClose}><X size={16} /></button>
+            </Button>
+            <Button className="ie-close" onClick={onClose}><X size={16} /></Button>
           </div>
         </div>
 
@@ -293,15 +294,15 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
           <div className="ie-sidebar">
             {/* Tab bar */}
             <div className="ie-tabs">
-              <button className={`ie-tab${tab === "crop" ? " active" : ""}`} onClick={() => setTab("crop")}>
+              <Button className={`ie-tab${tab === "crop" ? " active" : ""}`} onClick={() => setTab("crop")}>
                 <Crop size={14} /> Crop
-              </button>
-              <button className={`ie-tab${tab === "adjust" ? " active" : ""}`} onClick={() => setTab("adjust")}>
+              </Button>
+              <Button className={`ie-tab${tab === "adjust" ? " active" : ""}`} onClick={() => setTab("adjust")}>
                 <SlidersHorizontal size={14} /> Adjust
-              </button>
-              <button className={`ie-tab${tab === "resize" ? " active" : ""}`} onClick={() => setTab("resize")}>
+              </Button>
+              <Button className={`ie-tab${tab === "resize" ? " active" : ""}`} onClick={() => setTab("resize")}>
                 <Maximize size={14} /> Resize
-              </button>
+              </Button>
             </div>
 
             {/* Tab content */}
@@ -312,13 +313,13 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   <div className="ie-section-label">Aspect Ratio</div>
                   <div className="ie-presets">
                     {CROP_PRESETS.map((p) => (
-                      <button
+                      <Button
                         key={p.label}
                         className={`ie-preset${aspect === p.value ? " active" : ""}`}
                         onClick={() => setAspect(p.value)}
                       >
                         {p.label}
-                      </button>
+                      </Button>
                     ))}
                   </div>
 
@@ -339,18 +340,18 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                   {/* Quick rotate + flip */}
                   <div className="ie-section-label">Transform</div>
                   <div className="ie-transform-btns">
-                    <button className="ie-tool-btn" onClick={() => setRotation((r) => r - 90)} title="Rotate left">
+                    <Button className="ie-tool-btn" onClick={() => setRotation((r) => r - 90)} title="Rotate left">
                       <RotateCcw size={16} />
-                    </button>
-                    <button className="ie-tool-btn" onClick={() => setRotation((r) => r + 90)} title="Rotate right">
+                    </Button>
+                    <Button className="ie-tool-btn" onClick={() => setRotation((r) => r + 90)} title="Rotate right">
                       <RotateCw size={16} />
-                    </button>
-                    <button className={`ie-tool-btn${flipH ? " active" : ""}`} onClick={() => setFlipH(!flipH)} title="Flip horizontal">
+                    </Button>
+                    <Button className={`ie-tool-btn${flipH ? " active" : ""}`} onClick={() => setFlipH(!flipH)} title="Flip horizontal">
                       <FlipHorizontal size={16} />
-                    </button>
-                    <button className={`ie-tool-btn${flipV ? " active" : ""}`} onClick={() => setFlipV(!flipV)} title="Flip vertical">
+                    </Button>
+                    <Button className={`ie-tool-btn${flipV ? " active" : ""}`} onClick={() => setFlipV(!flipV)} title="Flip vertical">
                       <FlipVertical size={16} />
-                    </button>
+                    </Button>
                   </div>
 
                   {/* Zoom */}

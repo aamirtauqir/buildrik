@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * CSS Classes Section - Add/Remove CSS classes
  * SSOT: reads classes from composer.elements.getElement().getClasses() on each render.
@@ -127,14 +128,14 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
         {classes.map((cls, i) => (
           <span key={cls} className={`bdi-chip${i === 0 ? " pri" : ""}`}>
             .{cls}
-            <button
+            <Button
               type="button"
               className="bdi-chip-x"
               onClick={() => removeClass(cls)}
               aria-label={`Remove class ${cls}`}
             >
               ×
-            </button>
+            </Button>
           </span>
         ))}
 
@@ -169,7 +170,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
             />
           </span>
         ) : (
-          <button
+          <Button
             type="button"
             className="bdi-chip bdi-chip-add"
             onClick={startInlineAdd}
@@ -177,7 +178,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
             title="Add class"
           >
             +
-          </button>
+          </Button>
         )}
 
         {addingInline && showSuggestions && suggestions.length > 0 && (
@@ -187,7 +188,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
             className="bdi-chip-suggest"
           >
             {suggestions.map((suggestion) => (
-              <button
+              <Button
                 key={suggestion}
                 type="button"
                 role="option"
@@ -199,7 +200,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
                 }}
               >
                 .{suggestion}
-              </button>
+              </Button>
             ))}
           </div>
         )}

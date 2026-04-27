@@ -205,7 +205,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
           )}
 
           {/* Primary export button */}
-          <button
+          <Button
             onClick={config.format === "zip" ? handleDownloadZip : handleDownloadHTML}
             disabled={!result?.html || loading || zipLoading}
             style={{
@@ -236,7 +236,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
             ) : (
               exportLabel
             )}
-          </button>
+          </Button>
 
           {/* Secondary actions row */}
           <div
@@ -312,7 +312,7 @@ const PreviewTab: React.FC<{
   <div>
     <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
       {(Object.keys(PREVIEW_DEVICES) as PreviewDevice[]).map((device) => (
-        <button
+        <Button
           key={device}
           onClick={() => onDeviceChange(device)}
           style={{
@@ -327,7 +327,7 @@ const PreviewTab: React.FC<{
           }}
         >
           {PREVIEW_DEVICES[device].label}
-        </button>
+        </Button>
       ))}
     </div>
     <PreviewFrame html={html} device={previewDevice} />

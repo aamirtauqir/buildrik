@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * FontControls - Font weight, style, and decoration controls
  * Part of Typography section refactoring
@@ -66,7 +67,7 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
 
   if (isBound) {
     return (
-      <button
+      <Button
         type="button"
         onClick={() => onChange(resolveVar(value))}
         aria-label={`Unlink ${property} type token`}
@@ -93,7 +94,7 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
           </span>
         )}
         <Link2Off size={9} aria-hidden="true" style={{ opacity: 0.7 }} />
-      </button>
+      </Button>
     );
   }
 
@@ -102,7 +103,7 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
       triggerOn="click"
       position="bottom"
       trigger={
-        <button
+        <Button
           type="button"
           aria-label={`Link ${property} to type token`}
           title="Link to type token"
@@ -121,7 +122,7 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
           }}
         >
           <Link2 size={12} aria-hidden="true" />
-        </button>
+        </Button>
       }
       content={
         <TokenPickerPopover

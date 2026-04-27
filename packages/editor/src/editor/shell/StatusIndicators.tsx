@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * StatusIndicators Component
  * Displays save status, sync status, and issues count in the topbar
@@ -384,7 +385,7 @@ const IssuesBadge: React.FC<IssuesBadgeProps> = ({ issues, onClick }) => {
 
   return (
     <Tooltip content={tooltip}>
-      <button
+      <Button
         className="status-indicator issues-badge"
         style={{
           display: "flex",
@@ -405,7 +406,7 @@ const IssuesBadge: React.FC<IssuesBadgeProps> = ({ issues, onClick }) => {
       >
         <SvgWarning />
         <span>{issues.length}</span>
-      </button>
+      </Button>
     </Tooltip>
   );
 };

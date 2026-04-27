@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * PageFolder — collapsible folder row + flat list of child PageRows.
  *
@@ -119,7 +120,7 @@ export const PageFolder: React.FC<Props> = ({
             }
           }}
         >
-          <button
+          <Button
             className="bd-pg-row-disclosure"
             type="button"
             aria-label={isExpanded ? `Collapse ${folder.name}` : `Expand ${folder.name}`}
@@ -131,7 +132,7 @@ export const PageFolder: React.FC<Props> = ({
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
               <polyline points="9 6 15 12 9 18" />
             </svg>
-          </button>
+          </Button>
 
           <span className="bd-pg-row-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -179,7 +180,7 @@ export const PageFolder: React.FC<Props> = ({
           <span style={{ flex: 1 }} aria-hidden="true" />
 
           <div className="bd-pg-folder-actions">
-            <button
+            <Button
               className="bd-pg-folder-act"
               type="button"
               title="Rename folder"
@@ -193,8 +194,8 @@ export const PageFolder: React.FC<Props> = ({
                 <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
                 <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
               </svg>
-            </button>
-            <button
+            </Button>
+            <Button
               className="bd-pg-folder-act danger"
               type="button"
               title="Delete folder (pages kept)"
@@ -209,16 +210,15 @@ export const PageFolder: React.FC<Props> = ({
                 <path d="M19 6l-1 14H6L5 6" />
                 <path d="M10 11v6M14 11v6" />
               </svg>
-            </button>
+            </Button>
           </div>
         </div>
       </div>
-
       {isExpanded && pages.length > 0 && (
         <div className="bd-pg-folder-children">
           {pages.map((page) => (
             <div key={page.id} className="bd-pg-page-wrap">
-              <button
+              <Button
                 className="bd-pg-page-eject"
                 type="button"
                 title="Remove from folder"
@@ -229,7 +229,7 @@ export const PageFolder: React.FC<Props> = ({
                   <line x1="18" y1="6" x2="6" y2="18" />
                   <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
-              </button>
+              </Button>
               <PageRow
                 page={page}
                 pages={allPages}
@@ -250,7 +250,6 @@ export const PageFolder: React.FC<Props> = ({
           ))}
         </div>
       )}
-
       {isExpanded && pages.length === 0 && (
         <div
           className="bd-pg-row--empty-folder"

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * BulkToolbar — dark floating pill, absolute-positioned at bottom of pages panel.
  * Shown when 2+ pages are selected. Disabled Publish/Unpublish buttons removed
@@ -46,23 +47,22 @@ export const BulkToolbar: React.FC<Props> = ({
         <b>{selectedCount}</b> selected
       </span>
       <span className="bd-pg-bulk-spacer" />
-
       <div className="bd-pg-bulk-folder" ref={pickerRef}>
-        <button
+        <Button
           type="button"
           onClick={() => setFolderPickerOpen((o) => !o)}
           aria-expanded={folderPickerOpen}
           aria-haspopup="menu"
         >
           Move to…
-        </button>
+        </Button>
         {folderPickerOpen && (
           <div className="bd-pg-bulk-menu" role="menu">
             {folders.length === 0 ? (
               <div className="bd-pg-bulk-menu-empty">No folders yet</div>
             ) : (
               folders.map((f) => (
-                <button
+                <Button
                   key={f.id}
                   type="button"
                   className="bd-pg-bulk-menu-item"
@@ -73,11 +73,11 @@ export const BulkToolbar: React.FC<Props> = ({
                   }}
                 >
                   {f.name}
-                </button>
+                </Button>
               ))
             )}
             <div className="bd-pg-bulk-menu-sep" />
-            <button
+            <Button
               type="button"
               className="bd-pg-bulk-menu-item"
               role="menuitem"
@@ -87,15 +87,13 @@ export const BulkToolbar: React.FC<Props> = ({
               }}
             >
               Remove from folder
-            </button>
+            </Button>
           </div>
         )}
       </div>
-
-      <button type="button" onClick={onDuplicate}>Duplicate</button>
-      <button type="button" className="danger" onClick={onDelete}>Delete</button>
-
-      <button
+      <Button type="button" onClick={onDuplicate}>Duplicate</Button>
+      <Button type="button" className="danger" onClick={onDelete}>Delete</Button>
+      <Button
         type="button"
         className="bd-pg-bulk-close"
         onClick={onClear}
@@ -106,7 +104,7 @@ export const BulkToolbar: React.FC<Props> = ({
           <line x1="18" y1="6" x2="6" y2="18" />
           <line x1="6" y1="6" x2="18" y2="18" />
         </svg>
-      </button>
+      </Button>
     </div>
   );
 };

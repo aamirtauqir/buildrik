@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * SearchResults — grouped search results with zero-results state
  * Pure render component — never calls searchElements() internally
@@ -33,10 +34,9 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
             stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
         </svg>
         <p className="bld-no-results-headline">Nothing matches "{query}"</p>
-
-        <button className="bld-clear-search" onClick={onClearSearch}>
+        <Button className="bld-clear-search" onClick={onClearSearch}>
           Clear search
-        </button>
+        </Button>
       </div>
     );
   }

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * CMSPreviewBar — Preview bar for CMS collection records (WS-14c)
  * PRD §12.4 — Shows above the canvas when a collection is bound and has records.
@@ -143,9 +144,8 @@ export const CMSPreviewBar: React.FC<CMSPreviewBarProps> = ({ composer }) => {
       <span style={s.counter}>
         {currentIndex + 1} / {total}
       </span>
-
       {/* Navigation arrows */}
-      <button
+      <Button
         type="button"
         style={s.navBtn}
         onClick={prev}
@@ -164,9 +164,8 @@ export const CMSPreviewBar: React.FC<CMSPreviewBarProps> = ({ composer }) => {
         }}
       >
         <ChevronLeft size={14} aria-hidden />
-      </button>
-
-      <button
+      </Button>
+      <Button
         type="button"
         style={s.navBtn}
         onClick={next}
@@ -185,10 +184,9 @@ export const CMSPreviewBar: React.FC<CMSPreviewBarProps> = ({ composer }) => {
         }}
       >
         <ChevronRight size={14} aria-hidden />
-      </button>
-
+      </Button>
       {/* Exit */}
-      <button
+      <Button
         type="button"
         style={s.exitLink}
         onClick={exit}
@@ -201,7 +199,7 @@ export const CMSPreviewBar: React.FC<CMSPreviewBarProps> = ({ composer }) => {
         }}
       >
         Exit preview
-      </button>
+      </Button>
     </div>
   );
 };

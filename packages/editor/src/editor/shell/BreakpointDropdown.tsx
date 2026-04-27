@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * BreakpointDropdown - Viewport width selector
  * Shows current viewport width, preset sizes, and custom input.
@@ -88,7 +89,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
   return (
     <div style={{ position: "relative" }}>
       {/* Trigger button */}
-      <button
+      <Button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
@@ -131,8 +132,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
         >
           ▾
         </span>
-      </button>
-
+      </Button>
       {/* Dropdown panel */}
       {isOpen && buttonRef.current && (
         <div
@@ -157,7 +157,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
             {PRESETS.map((preset) => {
               const isActive = preset.id === device;
               return (
-                <button
+                <Button
                   key={preset.id}
                   role="option"
                   aria-selected={isActive}
@@ -204,7 +204,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
                       ✓
                     </span>
                   )}
-                </button>
+                </Button>
               );
             })}
           </div>

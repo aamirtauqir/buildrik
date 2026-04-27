@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 import * as React from "react";
 import type { AIModel } from "./types";
 import { ModelPicker } from "./ModelPicker";
@@ -41,20 +42,20 @@ export const Composer: React.FC<ComposerProps> = ({
       <div className="bd-ai-composer-bar">
         <ModelPicker model={model} onChange={onModelChange} />
         {streaming ? (
-          <button
+          <Button
             type="button"
             className="bd-ai-composer-stop"
             aria-label="Stop"
             onClick={onStop}
-          >■</button>
+          >■</Button>
         ) : (
-          <button
+          <Button
             type="button"
             className="bd-ai-composer-send"
             aria-label="Send"
             disabled={!trimmed}
             onClick={submit}
-          >↑</button>
+          >↑</Button>
         )}
       </div>
     </div>

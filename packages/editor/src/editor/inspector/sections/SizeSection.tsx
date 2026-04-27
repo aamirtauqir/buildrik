@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Size Section - Width, Height, Min/Max dimensions
  * CP3: W and H rows each have a hover-reveal chain button that opens a spacing
@@ -51,7 +52,7 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
 
   if (isBound) {
     return (
-      <button
+      <Button
         type="button"
         onClick={() => onChange(resolveVar(value))}
         aria-label={`Unlink ${property} spacing token`}
@@ -78,7 +79,7 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
           </span>
         )}
         <Link2Off size={9} aria-hidden="true" style={{ opacity: 0.7 }} />
-      </button>
+      </Button>
     );
   }
 
@@ -87,7 +88,7 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
       triggerOn="click"
       position="bottom"
       trigger={
-        <button
+        <Button
           type="button"
           aria-label={`Link ${property} to spacing token`}
           title="Link to spacing token"
@@ -106,7 +107,7 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
           }}
         >
           <Link2 size={12} aria-hidden="true" />
-        </button>
+        </Button>
       }
       content={
         <TokenPickerPopover

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * LayerBreadcrumb - Shows ancestor path when exactly 1 layer is selected.
  * Props-only, no hook imports.
@@ -28,13 +29,13 @@ export function LayerBreadcrumb({
     <div className="bdc-layers-crumb" role="navigation" aria-label="Layer ancestry">
       {ancestors.map((node, i) => (
         <React.Fragment key={node.id}>
-          <button
+          <Button
             className="bdc-layers-crumb-btn"
             onClick={() => onSelect(node.id, {})}
             title={`Select ${getDisplayName(node.id, node.type, customNames)}`}
           >
             {getDisplayName(node.id, node.type, customNames)}
-          </button>
+          </Button>
           {i < ancestors.length - 1 && (
             <span className="bdc-layers-crumb-sep" aria-hidden>
               /

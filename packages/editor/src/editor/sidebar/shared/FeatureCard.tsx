@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -29,7 +30,7 @@ export interface FeatureCardProps {
 export const FeatureCard = React.memo<FeatureCardProps>(
   ({ title, subtitle, icon, onClick, badge, isActive = false, disabled = false }) => {
     return (
-      <button
+      <Button
         onClick={onClick}
         disabled={disabled}
         style={{
@@ -42,13 +43,11 @@ export const FeatureCard = React.memo<FeatureCardProps>(
       >
         {/* Icon container */}
         <div style={iconContainerStyles}>{icon}</div>
-
         {/* Text content */}
         <div style={textContainerStyles}>
           <span style={titleStyles}>{title}</span>
           <span style={subtitleStyles}>{subtitle}</span>
         </div>
-
         {/* Right side: badge or chevron */}
         <div style={rightSectionStyles}>
           {badge !== undefined && (
@@ -67,7 +66,7 @@ export const FeatureCard = React.memo<FeatureCardProps>(
           )}
           <ChevronRightIcon />
         </div>
-      </button>
+      </Button>
     );
   }
 );

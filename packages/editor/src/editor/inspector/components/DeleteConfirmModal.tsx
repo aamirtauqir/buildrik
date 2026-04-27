@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Delete Confirmation Modal
  * Extracted from ProInspector.tsx for 500-line compliance.
@@ -35,7 +36,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
         <kbd style={{ fontFamily: "var(--buildrick-font-family-mono)", fontSize: "0.9em" }}>Ctrl+Z</kbd>.
       </p>
       <div style={{ display: "flex", gap: "var(--buildrick-space-3)", justifyContent: "flex-end" }}>
-        <button
+        <Button
           onClick={onClose}
           style={{
             padding: "8px 16px",
@@ -48,8 +49,8 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           }}
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={onConfirm}
           style={{
             padding: "8px 16px",
@@ -62,7 +63,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           }}
         >
           Delete
-        </button>
+        </Button>
       </div>
     </div>
   </Modal>

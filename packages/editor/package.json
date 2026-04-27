@@ -16,7 +16,8 @@
     "vibcoder:check-port": "bash scripts/check-vibcoder-port.sh",
     "vibcoder:pin": "bun scripts/vibcoder-bundle-pin.mjs",
     "vibcoder:test": "vitest run scripts/__tests__/vibcoder-codemod.test.mjs",
-    "vibcoder:vendor": "bash scripts/vibcoder-vendor.sh"
+    "vibcoder:vendor": "bash scripts/vibcoder-vendor.sh",
+    "codemod:phase4:button": "jscodeshift -t scripts/codemods/phase4/button.ts --extensions=ts,tsx --parser=tsx src/editor/"
   },
   "dependencies": {
     "@buildrik/shared": "workspace:*",

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * ComponentDetailScreen - Detail view for a component
  * Shows large preview, info, actions, and variants
@@ -158,7 +159,6 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         onBack={onBack}
         onClose={onClose}
       />
-
       {/* Scrollable content */}
       <div className="buildrick-component-detail-content">
         {/* Large Preview */}
@@ -195,50 +195,50 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         </div>
 
         {/* Primary Action */}
-        <button className="buildrick-component-detail-insert-btn" onClick={handleInsert}>
+        <Button className="buildrick-component-detail-insert-btn" onClick={handleInsert}>
           Insert Component
-        </button>
+        </Button>
 
         {/* Secondary Actions */}
         <div className="buildrick-component-detail-actions">
-          <button
+          <Button
             className="buildrick-component-detail-action-btn"
             onClick={handleDuplicate}
             title="Duplicate component"
           >
             <Copy size={14} />
             <span>Duplicate</span>
-          </button>
-          <button
+          </Button>
+          <Button
             className="buildrick-component-detail-action-btn danger"
             onClick={handleDelete}
             title="Delete component"
           >
             <Trash2 size={14} />
             <span>Delete</span>
-          </button>
+          </Button>
         </div>
 
         {/* Instance Actions (shown when instance is selected on canvas) */}
         {isInstanceSelected && (
           <div className="buildrick-component-detail-instance-actions">
             <h4 className="buildrick-component-detail-section-title">Instance Actions</h4>
-            <button
+            <Button
               className="buildrick-component-detail-instance-btn"
               onClick={handleDetach}
               title="Detach this instance from the component"
             >
               <Unlink size={14} />
               <span>Detach instance</span>
-            </button>
-            <button
+            </Button>
+            <Button
               className="buildrick-component-detail-instance-btn"
               onClick={handleSwap}
               title="Swap with another component"
             >
               <RefreshCw size={14} />
               <span>Swap component</span>
-            </button>
+            </Button>
           </div>
         )}
 
@@ -257,7 +257,6 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
           </div>
         )}
       </div>
-
       {/* Delete confirmation dialog */}
       <ConfirmDialog
         isOpen={showDeleteConfirm}
@@ -292,13 +291,13 @@ const VariantPicker: React.FC<VariantPickerProps> = ({ property, selectedValue, 
       <span className="buildrick-variant-picker-label">{property.name}:</span>
       <div className="buildrick-variant-picker-pills">
         {property.values.map((value) => (
-          <button
+          <Button
             key={value}
             className={`buildrick-variant-pill ${selectedValue === value ? "active" : ""}`}
             onClick={() => onChange(value)}
           >
             {value}
-          </button>
+          </Button>
         ))}
       </div>
     </div>

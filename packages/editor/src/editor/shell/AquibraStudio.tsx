@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette (error boundary / overlay / preview
@@ -86,7 +87,7 @@ class StudioErrorBoundary extends React.Component<
           <h2 style={{ margin: 0 }}>Something went wrong</h2>
           <div style={{ color: "#f38ba8" }}>{this.state.message}</div>
           <div style={{ fontSize: 13, color: "#a6adc8" }}>Please reload the editor.</div>
-          <button
+          <Button
             onClick={() => window.location.reload()}
             style={{
               alignSelf: "flex-start",
@@ -100,7 +101,7 @@ class StudioErrorBoundary extends React.Component<
             }}
           >
             Reload
-          </button>
+          </Button>
         </div>
       );
     }

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * BindingPopover — Link element content to a CMS collection field (WS-14b)
  * PRD §12.3 — Chain icon button + popover with collection/field selection
@@ -215,7 +216,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
   return (
     <div ref={wrapperRef} style={s.wrapper}>
       {/* Chain icon button */}
-      <button
+      <Button
         type="button"
         style={{
           ...s.chainBtn,
@@ -241,8 +242,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
         }}
       >
         {isActive ? <Link size={12} aria-hidden /> : <Link size={12} aria-hidden />}
-      </button>
-
+      </Button>
       {/* Popover */}
       {open && (
         <div style={s.popover} role="dialog" aria-label="Bind to collection field">
@@ -256,14 +256,14 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
                   <Link size={10} style={{ color: "var(--buildrick-accent)" }} />
                   {boundLabel}
                 </span>
-                <button
+                <Button
                   type="button"
                   style={s.unbindBtn}
                   onClick={handleUnbind}
                   title="Remove binding"
                 >
                   <Link2Off size={10} />
-                </button>
+                </Button>
               </div>
             )}
 
@@ -281,7 +281,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
               <>
                 <div style={s.sectionTitle}>Collections</div>
                 {collections.map((col) => (
-                  <button
+                  <Button
                     key={col.id}
                     type="button"
                     style={s.listItem}
@@ -304,7 +304,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
                     >
                       {col.fields.length} fields
                     </span>
-                  </button>
+                  </Button>
                 ))}
               </>
             )}
@@ -312,7 +312,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
             {/* Field list (when collection selected) */}
             {selectedCollection && (
               <>
-                <button
+                <Button
                   type="button"
                   style={{
                     ...s.listItem,
@@ -322,14 +322,14 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
                   onClick={() => setSelectedCollection(null)}
                 >
                   ← {selectedCollection.name}
-                </button>
+                </Button>
                 <div style={s.divider} />
                 <div style={s.sectionTitle}>Fields</div>
                 {selectedCollection.fields.length === 0 && (
                   <div style={{ ...s.emptyMsg, padding: "10px 12px" }}>No fields defined</div>
                 )}
                 {selectedCollection.fields.map((field) => (
-                  <button
+                  <Button
                     key={field.id}
                     type="button"
                     style={s.listItem}
@@ -354,14 +354,14 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
                     >
                       {field.type}
                     </span>
-                  </button>
+                  </Button>
                 ))}
               </>
             )}
           </div>
 
           {/* Create collection link */}
-          <button
+          <Button
             type="button"
             style={s.footerLink}
             onClick={() => {
@@ -377,7 +377,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
             }}
           >
             + Create Collection
-          </button>
+          </Button>
         </div>
       )}
     </div>

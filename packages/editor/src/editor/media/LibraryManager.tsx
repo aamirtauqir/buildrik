@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -331,31 +332,30 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         </div>
 
         <div className="mgr-right">
-          <button className="mgr-btn" onClick={handleImportFromUrl}>
+          <Button className="mgr-btn" onClick={handleImportFromUrl}>
             <Download size={14} />
             Import URL
-          </button>
-          <button className="mgr-btn" onClick={handleUploadClick}>
+          </Button>
+          <Button className="mgr-btn" onClick={handleUploadClick}>
             <Upload size={14} />
             Upload
-          </button>
-          <button className="mgr-btn-primary" onClick={() => setStockModalOpen(true)}>
+          </Button>
+          <Button className="mgr-btn-primary" onClick={() => setStockModalOpen(true)}>
             <Plus size={14} />
             Add from stock
-          </button>
-          <button className="mgr-close" onClick={onClose} aria-label="Close">
+          </Button>
+          <Button className="mgr-close" onClick={onClose} aria-label="Close">
             <X size={14} />
-          </button>
+          </Button>
         </div>
       </div>
-
       {/* ═══ BODY ═══ */}
       <div className="mgr-body">
         {/* ─── LEFT: Folder tree ─── */}
         <div className="mgr-left">
           <div className="mgr-left-head">
             Folders
-            <button
+            <Button
               className="mgr-tree-add"
               title="New folder"
               onClick={() => {
@@ -364,7 +364,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
               }}
             >
               <Plus size={12} />
-            </button>
+            </Button>
           </div>
 
           <div className="mgr-tree">
@@ -451,14 +451,14 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
               <span className="mgr-bulk-count">{state.selectedKeys.size} selected</span>
               {/* Bug #4 fix: Move → folder picker popover */}
               <div className="mgr-sort-wrap">
-                <button className="mgr-btn" onClick={() => setBulkMovePickerOpen((o) => !o)}>
+                <Button className="mgr-btn" onClick={() => setBulkMovePickerOpen((o) => !o)}>
                   <FolderOpen size={12} /> Move to...
-                </button>
+                </Button>
                 {bulkMovePickerOpen && (
                   <>
                     <div className="mgr-sort-scrim" onClick={() => setBulkMovePickerOpen(false)} />
                     <div className="mgr-sort-menu" style={{ minWidth: 200, maxHeight: 280, overflowY: "auto" }}>
-                      <button
+                      <Button
                         className="mgr-sort-item"
                         onClick={() => {
                           const keys = Array.from(state.selectedKeys);
@@ -469,10 +469,10 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                         }}
                       >
                         <FolderOpen size={12} /> Root
-                      </button>
+                      </Button>
                       {state.folders.length > 0 && <div className="mgr-sort-sep" />}
                       {state.folders.map((folder) => (
-                        <button
+                        <Button
                           key={folder.id}
                           className="mgr-sort-item"
                           onClick={() => {
@@ -485,13 +485,13 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                         >
                           <div className="mgr-folder-dot" style={{ background: "var(--buildrick-warning)" }} />
                           {folder.name}
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </>
                 )}
               </div>
-              <button
+              <Button
                 className="mgr-btn danger"
                 onClick={() => {
                   const items = state.libraryItems.filter((i) => state.selectedKeys.has(i.key));
@@ -499,17 +499,17 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                 }}
               >
                 <Trash2 size={12} /> Delete
-              </button>
+              </Button>
               <div className="mgr-spacer" />
-              <button className="mgr-btn" onClick={state.selectAll}>Select all</button>
-              <button className="mgr-btn" onClick={state.toggleSelMode}>Cancel</button>
+              <Button className="mgr-btn" onClick={state.selectAll}>Select all</Button>
+              <Button className="mgr-btn" onClick={state.toggleSelMode}>Cancel</Button>
             </div>
           )}
 
           <div className="mgr-subbar">
             <div className="mgr-pills">
               {TYPE_PILLS.map((pill) => (
-                <button
+                <Button
                   key={pill.id}
                   className={`mgr-pill${state.activeType === pill.id ? " active" : ""}`}
                   onClick={() => state.setType(pill.id)}
@@ -518,23 +518,23 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                   {state.counts[pill.id] > 0 && (
                     <span style={{ marginLeft: 4, opacity: 0.7 }}>{state.counts[pill.id]}</span>
                   )}
-                </button>
+                </Button>
               ))}
             </div>
             <div className="mgr-spacer" />
             {/* Bug #3 fix: Sort dropdown */}
             <div className="mgr-sort-wrap">
-              <button className="mgr-sort" onClick={() => setSortMenuOpen((o) => !o)}>
+              <Button className="mgr-sort" onClick={() => setSortMenuOpen((o) => !o)}>
                 <SlidersHorizontal size={12} />
                 Sort: {SORT_OPTIONS.find((o) => o.value === state.sort)?.label || "Recent"}
                 <ChevronDown size={12} />
-              </button>
+              </Button>
               {sortMenuOpen && (
                 <>
                   <div className="mgr-sort-scrim" onClick={() => setSortMenuOpen(false)} />
                   <div className="mgr-sort-menu">
                     {SORT_OPTIONS.map((opt) => (
-                      <button
+                      <Button
                         key={opt.value}
                         className={`mgr-sort-item${state.sort === opt.value ? " active" : ""}`}
                         onClick={() => {
@@ -544,10 +544,10 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                       >
                         {opt.label}
                         {state.sort === opt.value && <Check size={12} />}
-                      </button>
+                      </Button>
                     ))}
                     <div className="mgr-sort-sep" />
-                    <button
+                    <Button
                       className="mgr-sort-item"
                       onClick={() => {
                         state.setSort(state.sort, state.sortDir === "asc" ? "desc" : "asc");
@@ -555,26 +555,26 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                       }}
                     >
                       {state.sortDir === "asc" ? "Ascending ↑" : "Descending ↓"}
-                    </button>
+                    </Button>
                   </div>
                 </>
               )}
             </div>
             <div className="mgr-view-toggle">
-              <button
+              <Button
                 className={viewMode === "grid" ? "active" : ""}
                 onClick={() => setViewMode("grid")}
                 title="Grid view"
               >
                 <Grid2X2 size={12} />
-              </button>
-              <button
+              </Button>
+              <Button
                 className={viewMode === "list" ? "active" : ""}
                 onClick={() => setViewMode("list")}
                 title="List view"
               >
                 <List size={12} />
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -691,14 +691,14 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                 </p>
                 {!state.librarySearch && (
                   <div className="mgr-empty-actions">
-                    <button className="mgr-btn-primary" onClick={handleUploadClick}>
+                    <Button className="mgr-btn-primary" onClick={handleUploadClick}>
                       <Upload size={14} />
                       Upload files
-                    </button>
-                    <button className="mgr-btn" onClick={() => setStockModalOpen(true)}>
+                    </Button>
+                    <Button className="mgr-btn" onClick={() => setStockModalOpen(true)}>
                       <Search size={14} />
                       Browse stock
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -737,26 +737,26 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                 ) : null}
               </div>
               <div className="mgr-det-tabs">
-                <button
+                <Button
                   className={`mgr-det-tab${detailTab === "details" ? " active" : ""}`}
                   onClick={() => setDetailTab("details")}
                 >
                   Details
-                </button>
+                </Button>
                 {versions.length > 1 && (
-                  <button
+                  <Button
                     className={`mgr-det-tab${detailTab === "versions" ? " active" : ""}`}
                     onClick={() => setDetailTab("versions")}
                   >
                     Versions · {versions.length}
-                  </button>
+                  </Button>
                 )}
-                <button
+                <Button
                   className={`mgr-det-tab${detailTab === "used" ? " active" : ""}`}
                   onClick={() => setDetailTab("used")}
                 >
                   Used in · {usageCount}
-                </button>
+                </Button>
               </div>
               <div className="mgr-det-body">
                 {detailTab === "details" && (
@@ -802,7 +802,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                           </div>
                         </div>
                         {i > 0 && v.key !== selectedItem.key && (
-                          <button
+                          <Button
                             className="mgr-btn"
                             style={{ height: 24, fontSize: 10, padding: "0 8px" }}
                             onClick={(e) => {
@@ -815,7 +815,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                             }}
                           >
                             Revert
-                          </button>
+                          </Button>
                         )}
                       </div>
                     ))}
@@ -838,12 +838,12 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                   </div>
                 )}
                 <div className="mgr-det-actions">
-                  <button className="mgr-btn" onClick={() => state.insertToCanvas(selectedItem.key)}>
+                  <Button className="mgr-btn" onClick={() => state.insertToCanvas(selectedItem.key)}>
                     <Download size={12} />
                     Insert
-                  </button>
+                  </Button>
                   {/* Bug #1 fix: Edit → image editor for images, rename overlay otherwise */}
-                  <button
+                  <Button
                     className="mgr-btn"
                     onClick={() => {
                       if (selectedItem.type === "img") {
@@ -855,24 +855,24 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                   >
                     <Pencil size={12} />
                     {selectedItem.type === "img" ? "Edit" : "Rename"}
-                  </button>
+                  </Button>
                   {/* Bug #5 fix: Replace all opens library picker instead of URL prompt */}
                   {usageCount > 0 && (
-                    <button
+                    <Button
                       className="mgr-btn"
                       onClick={() => setReplaceAllPickerOpen(true)}
                     >
                       <Replace size={12} />
                       Replace all
-                    </button>
+                    </Button>
                   )}
-                  <button
+                  <Button
                     className="mgr-btn danger"
                     onClick={() => state.requestDelete(selectedItem.key)}
                   >
                     <Trash2 size={12} />
                     Delete
-                  </button>
+                  </Button>
                 </div>
               </div>
             </>
@@ -886,7 +886,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           )}
         </div>
       </div>
-
       {/* ═══ STATUS BAR ═══ */}
       <div className="mgr-status">
         <span><strong style={{ color: "var(--buildrick-text-secondary)" }}>{state.counts.all}</strong> assets</span>
@@ -902,7 +901,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           </span>
         </div>
       </div>
-
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -912,7 +910,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         style={{ display: "none" }}
         onChange={handleFileChange}
       />
-
       {/* Modals */}
       <StockSourceModal
         open={stockModalOpen}
@@ -934,7 +931,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         onInsert={state.insertToCanvas}
         onOpenIconPicker={handleOpenIconPicker}
       />
-
       {state.confirmDelete && (
         <ConfirmDeleteModal
           payload={state.confirmDelete}
@@ -942,7 +938,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onCancel={state.cancelDelete}
         />
       )}
-
       {state.ctxMenu && (
         <MediaContextMenu
           x={state.ctxMenu.x}
@@ -957,7 +952,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onEditImage={handleEditImage}
         />
       )}
-
       {/* Bug #2 fix: mount AssetDetailOverlay so rename from context menu actually shows */}
       {state.detailItem && (
         <AssetDetailOverlay
@@ -973,7 +967,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onEditImage={handleEditImage}
         />
       )}
-
       {/* Bug #5 fix: Replace-all picker modal (select asset from library) */}
       {replaceAllPickerOpen && selectedItem && (
         <div className="stock-modal-backdrop" onClick={() => setReplaceAllPickerOpen(false)}>
@@ -984,9 +977,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           >
             <div className="stock-modal-header">
               <h3 className="stock-modal-title">Replace "{selectedItem.name}" across {usageCount} use{usageCount !== 1 ? "s" : ""}</h3>
-              <button className="stock-modal-close" onClick={() => setReplaceAllPickerOpen(false)}>
+              <Button className="stock-modal-close" onClick={() => setReplaceAllPickerOpen(false)}>
                 <X size={18} />
-              </button>
+              </Button>
             </div>
             <div className="stock-modal-content">
               <p style={{ fontSize: 12, color: "var(--buildrick-text-disabled)", marginBottom: 12 }}>
@@ -1063,13 +1056,13 @@ function TreeNode({
   return (
     <div className={`mgr-node${active ? " active" : ""}${depthClass}`} onClick={onClick}>
       {expandable ? (
-        <button
+        <Button
           className="mgr-chev-btn"
           onClick={(e) => { e.stopPropagation(); onToggleExpand?.(); }}
           aria-label={expanded ? "Collapse" : "Expand"}
         >
           {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-        </button>
+        </Button>
       ) : (
         <span className="mgr-chev hidden" style={{ width: 12, height: 12 }} />
       )}
@@ -1077,13 +1070,13 @@ function TreeNode({
       <span className="mgr-node-name">{label}</span>
       {count !== undefined && <span className="mgr-node-count">{count}</span>}
       {onDelete && (
-        <button
+        <Button
           className="mgr-node-del"
           onClick={(e) => { e.stopPropagation(); onDelete(); }}
           aria-label="Delete folder"
         >
           <Trash2 size={11} />
-        </button>
+        </Button>
       )}
     </div>
   );

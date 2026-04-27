@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * InspectorElementMenu — three-dot overflow menu for element actions.
  *
@@ -225,7 +226,7 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
 
   return (
     <>
-      <button
+      <Button
         ref={triggerRef}
         type="button"
         onClick={() => setIsOpen((v) => !v)}
@@ -241,14 +242,13 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
         }}
       >
         <MoreHorizontal size={16} aria-hidden="true" />
-      </button>
-
+      </Button>
       {isOpen && (
         <div ref={menuRef} role="menu" style={styles.menu}>
           {items.map((item, index) => (
             <React.Fragment key={item.id}>
               {index === items.length - 1 && <div style={styles.divider} />}
-              <button
+              <Button
                 type="button"
                 role="menuitem"
                 onClick={item.onClick}
@@ -267,7 +267,7 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
               >
                 {item.icon}
                 {item.label}
-              </button>
+              </Button>
             </React.Fragment>
           ))}
         </div>

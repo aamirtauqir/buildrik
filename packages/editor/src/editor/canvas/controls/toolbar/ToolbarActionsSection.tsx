@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * ToolbarActionsSection — Add/Duplicate/More menu/Delete action buttons
  * Extracted sub-component of UnifiedSelectionToolbar.
@@ -49,7 +50,7 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
 
     {/* Add button */}
     <Tooltip content="Add Element" position="bottom">
-      <button onClick={onAdd} style={actionBtnStyles} aria-label="Add child element">
+      <Button onClick={onAdd} style={actionBtnStyles} aria-label="Add child element">
         <svg
           width="12"
           height="12"
@@ -62,12 +63,12 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
         >
           <path d="M12 5v14M5 12h14" />
         </svg>
-      </button>
+      </Button>
     </Tooltip>
 
     {/* Duplicate button */}
     <Tooltip content="Duplicate" shortcut="⌘D" position="bottom">
-      <button onClick={onDuplicate} style={actionBtnStyles} aria-label="Duplicate element">
+      <Button onClick={onDuplicate} style={actionBtnStyles} aria-label="Duplicate element">
         <svg
           width="12"
           height="12"
@@ -81,7 +82,7 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
           <rect x="9" y="9" width="13" height="13" rx="2" />
           <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
         </svg>
-      </button>
+      </Button>
     </Tooltip>
 
     <div style={dividerStyles} />
@@ -89,7 +90,7 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
     {/* More button + dropdown */}
     <div style={{ position: "relative" }}>
       <Tooltip content="More" position="bottom">
-        <button
+        <Button
           onClick={onMoreMenuToggle}
           style={{
             ...actionBtnStyles,
@@ -104,7 +105,7 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
             <circle cx="12" cy="12" r="2" />
             <circle cx="19" cy="12" r="2" />
           </svg>
-        </button>
+        </Button>
       </Tooltip>
 
       {showMoreMenu && (
@@ -114,7 +115,7 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
           aria-label="More actions"
           style={{ ...dropdownStyles, right: 0, left: "auto" }}
         >
-          <button role="menuitem" onClick={onCopy} style={menuItemStyles}>
+          <Button role="menuitem" onClick={onCopy} style={menuItemStyles}>
             <svg
               aria-hidden="true"
               width="12"
@@ -128,11 +129,11 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
             </svg>
             <span>Copy</span>
-          </button>
+          </Button>
 
           <div role="separator" style={menuDividerStyles} />
 
-          <button role="menuitem" onClick={onWrap} style={menuItemStyles}>
+          <Button role="menuitem" onClick={onWrap} style={menuItemStyles}>
             <svg
               aria-hidden="true"
               width="12"
@@ -146,11 +147,11 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
               <rect x="7" y="7" width="10" height="10" rx="1" />
             </svg>
             <span>Wrap in Container</span>
-          </button>
+          </Button>
 
           <div role="separator" style={menuDividerStyles} />
 
-          <button role="menuitem" onClick={onMoveUp} style={menuItemStyles}>
+          <Button role="menuitem" onClick={onMoveUp} style={menuItemStyles}>
             <svg
               aria-hidden="true"
               width="12"
@@ -163,8 +164,8 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
               <path d="M12 19V5M5 12l7-7 7 7" />
             </svg>
             <span>Bring Forward</span>
-          </button>
-          <button role="menuitem" onClick={onMoveDown} style={menuItemStyles}>
+          </Button>
+          <Button role="menuitem" onClick={onMoveDown} style={menuItemStyles}>
             <svg
               aria-hidden="true"
               width="12"
@@ -177,7 +178,7 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
               <path d="M12 5v14M5 12l7 7 7-7" />
             </svg>
             <span>Send Backward</span>
-          </button>
+          </Button>
         </div>
       )}
     </div>
@@ -185,7 +186,7 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
     {/* Delete button — spatially separated at far right */}
     <div style={deleteContainerStyles}>
       <Tooltip content="Delete" shortcut="⌫" position="bottom">
-        <button onClick={onDelete} style={isolatedDeleteStyles} aria-label="Delete element">
+        <Button onClick={onDelete} style={isolatedDeleteStyles} aria-label="Delete element">
           <svg
             width="12"
             height="12"
@@ -198,7 +199,7 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
           >
             <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
           </svg>
-        </button>
+        </Button>
       </Tooltip>
     </div>
   </>

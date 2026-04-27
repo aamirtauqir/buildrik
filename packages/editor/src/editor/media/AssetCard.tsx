@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -62,7 +63,7 @@ const AssetThumbnail: React.FC<{
         )}
         <span style={{ position: "relative", zIndex: 1 }}>🎬</span>
         {onPreviewVideo && (
-          <button
+          <Button
             onClick={(e) => {
               e.stopPropagation();
               onPreviewVideo(asset);
@@ -71,7 +72,7 @@ const AssetThumbnail: React.FC<{
             style={styles.previewBtn}
           >
             ▶ Preview
-          </button>
+          </Button>
         )}
       </div>
     );
@@ -173,9 +174,9 @@ export const AssetCard: React.FC<AssetCardProps> = ({
           {asset.width && asset.height && ` • ${asset.width}×${asset.height}`}
         </div>
       </div>
-      <button onClick={(e) => onDelete(asset.id, e)} style={styles.deleteBtn}>
+      <Button onClick={(e) => onDelete(asset.id, e)} style={styles.deleteBtn}>
         ✕
-      </button>
+      </Button>
     </div>
   );
 };

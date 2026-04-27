@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Canvas Empty State CTA
  * Shown when the canvas has no content.
@@ -38,12 +39,12 @@ export function CanvasEmptyCTA({
       <p className="buildrick-canvas-empty-cta__desc">
         Click + in the sidebar to add elements, or drag a template onto the canvas.
       </p>
-      <button className="buildrick-canvas-empty-cta__browse" onClick={onBrowseTemplates}>
+      <Button className="buildrick-canvas-empty-cta__browse" onClick={onBrowseTemplates}>
         Browse templates
-      </button>
-      <button className="buildrick-canvas-empty-cta__blank" onClick={onStartBlank}>
+      </Button>
+      <Button className="buildrick-canvas-empty-cta__blank" onClick={onStartBlank}>
         Start Blank
-      </button>
+      </Button>
     </div>
   );
 }

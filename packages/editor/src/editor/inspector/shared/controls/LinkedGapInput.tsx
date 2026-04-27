@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * LinkedGapInput — shared linked/unlinked gap input for flex + grid.
  * Ported to .bdi-row-ctrl + .bdi-num.
@@ -106,7 +107,7 @@ export const LinkedGapInput: React.FC<LinkedGapInputProps> = ({
     <div className={`bdi-row-ctrl${disabled ? " disabled" : ""}`}>
       <label className="bdi-lb">
         {label}
-        <button
+        <Button
           type="button"
           onClick={toggleLink}
           title={linked ? "Unlink row and column gap" : "Link row and column gap"}
@@ -121,7 +122,7 @@ export const LinkedGapInput: React.FC<LinkedGapInputProps> = ({
           }}
         >
           {linked ? <Link size={10} aria-hidden="true" /> : <Link2Off size={10} aria-hidden="true" />}
-        </button>
+        </Button>
       </label>
       <div className="bdi-row-content">
         {linked ? (

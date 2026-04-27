@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * TimeTravelScrubber - Bottom drawer for time-travel mode
  * Phase 5: Canvas preview scrubbing with slider, restore, and exit
@@ -298,7 +299,6 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
         className={`tt-overlay ${isDragging ? "active" : ""}`}
         style={reducedMotion ? { transition: "none" } : undefined}
       />
-
       {/* Bottom drawer */}
       <div
         className={drawerClass}
@@ -347,19 +347,19 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
             </div>
 
             <div className="tt-actions">
-              <button
+              <Button
                 className="tt-restore-btn"
                 onClick={handleRestore}
                 disabled={!currentEntry}
               >
                 Restore this point
-              </button>
-              <button className="tt-exit-btn" onClick={onExit}>
+              </Button>
+              <Button className="tt-exit-btn" onClick={onExit}>
                 Exit time-travel
                 <span style={{ marginLeft: 6, fontSize: 11, opacity: 0.7 }}>
                   Ctrl+Shift+T
                 </span>
-              </button>
+              </Button>
             </div>
           </>
         )}

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * AccountModal — Full-screen account settings overlay
  * 4 tabs: Profile, Team & Access, Collaboration Settings, Plans & Billing.
@@ -44,7 +45,7 @@ interface AccountModalProps {
 // ─── Toggle ───────────────────────────────────────────────────────────────────
 
 const Toggle: React.FC<{ on: boolean }> = ({ on }) => (
-  <button
+  <Button
     style={{
       height: 20,
       width: 40,
@@ -62,7 +63,7 @@ const Toggle: React.FC<{ on: boolean }> = ({ on }) => (
     }}
   >
     {on ? "On" : "Off"}
-  </button>
+  </Button>
 );
 
 // ─── Tab: Profile ─────────────────────────────────────────────────────────────
@@ -98,7 +99,7 @@ const TabProfile: React.FC = () => (
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--buildrick-text-primary)" }}>Aamir Siddiqui</div>
-        <button
+        <Button
           style={{
             fontSize: 12,
             color: "var(--buildrick-accent-hover)",
@@ -110,7 +111,7 @@ const TabProfile: React.FC = () => (
           }}
         >
           Change photo
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -169,7 +170,7 @@ const TabProfile: React.FC = () => (
     </div>
 
     {/* Save button */}
-    <button
+    <Button
       style={{
         background: "var(--buildrick-accent-hover)",
         height: 38,
@@ -185,7 +186,7 @@ const TabProfile: React.FC = () => (
       }}
     >
       Save Changes
-    </button>
+    </Button>
   </>
 );
 
@@ -422,7 +423,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
           gap: 16,
         }}
       >
-        <button
+        <Button
           onClick={onClose}
           style={{
             fontSize: 13,
@@ -437,12 +438,11 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
           }}
         >
           ← Back to Editor
-        </button>
+        </Button>
         <div style={{ fontSize: 16, fontWeight: 600, color: "var(--buildrick-text-primary)", fontFamily: "Inter, sans-serif" }}>
           Account Settings
         </div>
       </div>
-
       {/* Content area */}
       <div style={{ display: "flex", flex: 1, overflow: "hidden", minHeight: 0 }}>
 
@@ -462,7 +462,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
           {NAV_ITEMS.map((item) => {
             const isActive = activeTab === item.id;
             return (
-              <button
+              <Button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
                 style={{
@@ -483,7 +483,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
                 }}
               >
                 {item.label}
-              </button>
+              </Button>
             );
           })}
         </div>

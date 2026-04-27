@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Buildrik Editor Topbar — v2 (new-design).
  * Layout: Brand · Undo/Redo/History · | · Breadcrumb · Breakpoints · | · Saved · Preview · Publish
@@ -294,33 +295,33 @@ export const Topbar: React.FC<TopbarProps> = ({
         {/* Undo / Redo / History */}
         <div className="bdc-group">
           <Tooltip content="Undo" shortcut="⌘Z">
-            <button
+            <Button
               className="bdc-btn bdc-icon"
               onClick={onUndo}
               disabled={!canUndo}
               aria-label="Undo"
             >
               <IconUndo />
-            </button>
+            </Button>
           </Tooltip>
           <Tooltip content="Redo" shortcut="⌘⇧Z">
-            <button
+            <Button
               className="bdc-btn bdc-icon"
               onClick={onRedo}
               disabled={!canRedo}
               aria-label="Redo"
             >
               <IconRedo />
-            </button>
+            </Button>
           </Tooltip>
           <Tooltip content="History">
-            <button
+            <Button
               className="bdc-btn bdc-icon"
               onClick={onOpenHistory}
               aria-label="History"
             >
               <IconHistory />
-            </button>
+            </Button>
           </Tooltip>
         </div>
 
@@ -329,7 +330,7 @@ export const Topbar: React.FC<TopbarProps> = ({
         {/* Breadcrumb / Issues */}
         <div className="bdc-title">
           {issues.length > 0 ? (
-            <button
+            <Button
               className="bdc-btn"
               onClick={onOpenIssues}
               aria-label={`${issueLabel} — open issues`}
@@ -337,7 +338,7 @@ export const Topbar: React.FC<TopbarProps> = ({
             >
               <IconWarn />
               {issueLabel}
-            </button>
+            </Button>
           ) : (
             <>
               <span>{projectName}</span>
@@ -354,14 +355,14 @@ export const Topbar: React.FC<TopbarProps> = ({
         <div className="bdc-group bdc-bp-group" role="group" aria-label="Breakpoint">
           {bpItems.map((b) => (
             <Tooltip content={b.label} key={b.k}>
-              <button
+              <Button
                 className={`bdc-btn bdc-icon${device === b.k ? " bdc-bp-on" : ""}`}
                 onClick={() => onDeviceChange?.(b.k)}
                 aria-label={b.label}
                 aria-pressed={device === b.k}
               >
                 {b.icon}
-              </button>
+              </Button>
             </Tooltip>
           ))}
         </div>
@@ -409,28 +410,28 @@ export const Topbar: React.FC<TopbarProps> = ({
         {collaborationSlot}
 
         <Tooltip content="Invite team">
-          <button
+          <Button
             className="bdc-btn bdc-secondary"
             onClick={() => setInviteOpen(true)}
             aria-label="Invite team"
           >
             + Invite
-          </button>
+          </Button>
         </Tooltip>
 
         <div className="bdc-group">
           <Tooltip content="Command palette" shortcut="⌘K">
-            <button
+            <Button
               className="bdc-btn bdc-icon"
               onClick={() => setCmdOpen(true)}
               aria-label="Command palette"
             >
               <IconKbd />
-            </button>
+            </Button>
           </Tooltip>
 
           <Tooltip content="Preview" shortcut="⌘P">
-            <button
+            <Button
               className="bdc-btn bdc-secondary"
               onClick={onPreview}
               disabled={previewLoading}
@@ -438,7 +439,7 @@ export const Topbar: React.FC<TopbarProps> = ({
             >
               <IconEye />
               <span>{previewLoading ? "Loading…" : "Preview"}</span>
-            </button>
+            </Button>
           </Tooltip>
 
           <div style={{ position: "relative" }}>
@@ -454,13 +455,13 @@ export const Topbar: React.FC<TopbarProps> = ({
           </div>
 
           <Tooltip content="Help">
-            <button className="bdc-btn bdc-icon" onClick={onHelp} aria-label="Help">
+            <Button className="bdc-btn bdc-icon" onClick={onHelp} aria-label="Help">
               ?
-            </button>
+            </Button>
           </Tooltip>
 
           <Tooltip content="Account">
-            <button
+            <Button
               className="bdc-btn bdc-icon"
               onClick={() => {
                 setAccountOpen(true);
@@ -469,11 +470,10 @@ export const Topbar: React.FC<TopbarProps> = ({
               aria-label="Account"
             >
               <IconUser />
-            </button>
+            </Button>
           </Tooltip>
         </div>
       </div>
-
       {cmdOpen && <CommandPalette onClose={() => setCmdOpen(false)} />}
       {inviteOpen && <InviteModal onClose={() => setInviteOpen(false)} />}
       {accountOpen && <AccountModal onClose={() => setAccountOpen(false)} />}

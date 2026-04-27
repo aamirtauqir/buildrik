@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Animation Section - CSS Animations with presets
  * AQUI-026: Basic Interactions/Animations
@@ -127,7 +128,7 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
         >
           {enabled ? "Animation Enabled" : "No Animation"}
         </span>
-        <button
+        <Button
           onClick={handleToggle}
           style={{
             padding: "6px 12px",
@@ -142,9 +143,8 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
           }}
         >
           {enabled ? "Disable" : "Enable"}
-        </button>
+        </Button>
       </div>
-
       {/* Animation Editor */}
       {enabled && (
         <>
@@ -172,7 +172,6 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
           </div>
         </>
       )}
-
       {/* Quick Tips */}
       {!enabled && (
         <div

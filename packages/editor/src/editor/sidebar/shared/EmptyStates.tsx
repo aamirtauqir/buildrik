@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * EmptyStates — Per-tab empty state components
  * Each empty state has: icon, title, message, primary action.
@@ -24,7 +25,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({ icon, title, message, actionLab
     <h3 className="empty-title">{title}</h3>
     <p className="empty-message">{message}</p>
     {actionLabel && onAction && (
-      <button className="empty-action" onClick={onAction}>{actionLabel}</button>
+      <Button className="empty-action" onClick={onAction}>{actionLabel}</Button>
     )}
   </div>
 );

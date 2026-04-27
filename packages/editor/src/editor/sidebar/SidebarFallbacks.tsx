@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * SidebarFallbacks — Skeleton + Error boundary fallback for LeftSidebar
  * Extracted from index.tsx for single-responsibility compliance
@@ -25,7 +26,7 @@ export const SidebarErrorFallback: React.FC<{ onRetry: () => void }> = ({ onRetr
     <div style={{ fontSize: 12, marginBottom: 16, color: "var(--buildrick-text-muted)" }}>
       This panel encountered an error. Your work is safe.
     </div>
-    <button
+    <Button
       onClick={onRetry}
       style={{
         padding: "6px 16px",
@@ -39,6 +40,6 @@ export const SidebarErrorFallback: React.FC<{ onRetry: () => void }> = ({ onRetr
       }}
     >
       Try Again
-    </button>
+    </Button>
   </div>
 );

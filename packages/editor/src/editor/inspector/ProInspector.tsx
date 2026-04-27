@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Aquibra Pro Inspector Panel
  * Redesign: ported to .bdi-* namespace per /design-system/preview/comp-inspector.v1.html
@@ -96,7 +97,7 @@ const BreakpointPill: React.FC<{
 
   return (
     <div ref={ref} style={{ position: "relative", display: "inline-block" }}>
-      <button
+      <Button
         type="button"
         className="bdi-bpr-pill"
         onClick={() => onChange && setOpen((v) => !v)}
@@ -125,7 +126,7 @@ const BreakpointPill: React.FC<{
           />
         )}
         {onChange && <ChevronDown size={10} aria-hidden="true" style={{ opacity: 0.7 }} />}
-      </button>
+      </Button>
       {open && onChange && (
         <div
           role="listbox"
@@ -146,7 +147,7 @@ const BreakpointPill: React.FC<{
             const bpMeta = BREAKPOINTS[bp];
             const active = bp === current;
             return (
-              <button
+              <Button
                 key={bp}
                 type="button"
                 role="option"
@@ -185,7 +186,7 @@ const BreakpointPill: React.FC<{
                     ≤{bpMeta.maxWidth}px
                   </span>
                 )}
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -202,7 +203,7 @@ const StatePills: React.FC<{
 }> = ({ current, onChange, withOverrides, visibleStates }) => (
   <div className="bdi-states" role="group" aria-label="Element state selector">
     {visibleStates.map((s) => (
-      <button
+      <Button
         key={s}
         type="button"
         className={`bdi-state-pill${current === s ? " on" : ""}${withOverrides.has(s) ? " has-override" : ""}`}
@@ -211,7 +212,7 @@ const StatePills: React.FC<{
         title={s === "normal" ? "Base styles" : `Styles for :${s}`}
       >
         {PSEUDO_LABELS[s]}
-      </button>
+      </Button>
     ))}
   </div>
 );
@@ -446,7 +447,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
       <div role="status" aria-live="polite" aria-atomic="true" className="bdi-sr-only">
         {elementLabel} selected
       </div>
-
       {/* Selection breadcrumb — always visible when element selected */}
       {breadcrumbPath.length > 0 && (
         <div className="bdi-ssel">
@@ -458,7 +458,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               </React.Fragment>
             ))}
           </div>
-          <button
+          <Button
             type="button"
             className={`bdi-icon-btn${pickActive ? " on" : ""}`}
             title="Pick element on canvas"
@@ -471,8 +471,8 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             }}
           >
             <Crosshair size={12} aria-hidden="true" />
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             className="bdi-icon-btn"
             title="Select parent"
@@ -481,10 +481,9 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             onClick={() => composer?.selection.selectParent()}
           >
             <CornerLeftUp size={12} aria-hidden="true" />
-          </button>
+          </Button>
         </div>
       )}
-
       {/* Figma-style element header */}
       <div className="bdi-ehdr">
         <div className="bdi-eic" aria-hidden="true">
@@ -518,7 +517,6 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           elementLabel={elementLabel}
         />
       </div>
-
       {/* Tabs — no count badges; dot reserved for future "has changes" state */}
       <div
         className="bdi-tabs"
@@ -545,7 +543,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
         {(["style", "element", "effects"] as const).map((tab) => {
           const tabLabels = { style: "Style", element: "Element", effects: "Effects" };
           return (
-            <button
+            <Button
               key={tab}
               role="tab"
               id={`inspector-tab-${tab}`}
@@ -557,11 +555,10 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
               type="button"
             >
               {tabLabels[tab]}
-            </button>
+            </Button>
           );
         })}
       </div>
-
       {/* Breakpoint + state strip (mock pattern: pill + states + size right) */}
       <div className="bdi-bpr">
         <BreakpointPill
@@ -577,7 +574,7 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             visibleStates={visibleStates}
           />
         ) : (
-          <button
+          <Button
             type="button"
             onClick={() => setStateSelectorManuallyShown(true)}
             aria-label="Show state override selector"
@@ -586,11 +583,10 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
             style={{ borderStyle: "dashed", borderWidth: 1, borderColor: "var(--bd-border)" }}
           >
             + state
-          </button>
+          </Button>
         )}
         <span className="bdi-sz">{bpSizeLabel}</span>
       </div>
-
       {/* Scrollable body */}
       <div
         ref={contentRef}

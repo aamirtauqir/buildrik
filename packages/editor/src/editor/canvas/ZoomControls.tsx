@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * ZoomControls - Canvas zoom slider and controls
  * @license BSD-3-Clause
@@ -52,7 +53,6 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
         onClick={handleZoomOut}
         disabled={zoom <= minZoom}
       />
-
       <div style={sliderContainerStyles}>
         <input
           type="range"
@@ -63,7 +63,6 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
           style={sliderStyles}
         />
       </div>
-
       <IconButton
         icon={<ZoomInIcon />}
         tooltip="Zoom In"
@@ -71,17 +70,14 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
         onClick={handleZoomIn}
         disabled={zoom >= maxZoom}
       />
-
       <div style={dividerStyles} />
-
-      <button
+      <Button
         onClick={() => setShowPresets(!showPresets)}
         style={percentButtonStyles}
         title="Zoom presets"
       >
         {Math.round(zoom)}%
-      </button>
-
+      </Button>
       {onFitToScreen && (
         <>
           <div style={dividerStyles} />
@@ -93,11 +89,10 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
           />
         </>
       )}
-
       {showPresets && (
         <div style={presetsDropdownStyles}>
           {ZOOM_PRESETS.map((preset) => (
-            <button
+            <Button
               key={preset}
               onClick={() => handlePresetSelect(preset)}
               style={{
@@ -106,7 +101,7 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
               }}
             >
               {preset}%
-            </button>
+            </Button>
           ))}
         </div>
       )}

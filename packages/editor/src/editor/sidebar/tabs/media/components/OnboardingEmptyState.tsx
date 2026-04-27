@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * Media Tab — Onboarding Empty State
  * Shown when the library is empty. Upload CTA + browse stock.
@@ -39,15 +40,13 @@ export function OnboardingEmptyState({
       </div>
       <h3 className="med-empty-title">{msg.title}</h3>
       <p className="med-empty-sub">{msg.sub}</p>
-
-      <button
+      <Button
         className="med-upload-btn med-empty-upload"
         onClick={() => inputRef.current?.click()}
         aria-label="Upload files"
       >
         Upload files
-      </button>
-
+      </Button>
       <input
         ref={inputRef}
         type="file"
@@ -56,20 +55,18 @@ export function OnboardingEmptyState({
         style={{ display: "none" }}
         onChange={(e) => handleFiles(e.target.files)}
       />
-
       {activeType === "all" && (
         <p className="med-empty-formats" aria-label="Supported file formats">
           {SUPPORTED_FORMATS_LABEL}
         </p>
       )}
-
       {activeType === "all" && (
-        <button
+        <Button
           className="med-disc-cta"
           onClick={() => onBrowseStock?.()}
         >
           Browse stock photos
-        </button>
+        </Button>
       )}
     </div>
   );

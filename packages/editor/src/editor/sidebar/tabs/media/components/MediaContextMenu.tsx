@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/Button";
 /**
  * MediaContextMenu — right-click menu for an asset in the library grid.
  * Positioned at (x, y) in viewport coords; clamps to stay on-screen.
@@ -73,17 +74,17 @@ export function MediaContextMenu({
         aria-label="Asset actions"
         style={{ position: "fixed", left, top, width: MENU_WIDTH, zIndex: 200 }}
       >
-        <button role="menuitem" className="med-ctx-item" onClick={act(() => onRename(item))}>
+        <Button role="menuitem" className="med-ctx-item" onClick={act(() => onRename(item))}>
           Rename
-        </button>
+        </Button>
         {item.type === "img" ? (
-          <button role="menuitem" className="med-ctx-item" onClick={act(() => onEditImage(item))}>
+          <Button role="menuitem" className="med-ctx-item" onClick={act(() => onEditImage(item))}>
             Edit image
-          </button>
+          </Button>
         ) : null}
-        <button role="menuitem" className="med-ctx-item" onClick={act(() => onCopyUrl(item))}>
+        <Button role="menuitem" className="med-ctx-item" onClick={act(() => onCopyUrl(item))}>
           Copy URL
-        </button>
+        </Button>
         <div
           role="menuitem"
           className="med-ctx-item med-ctx-item--submenu"
@@ -93,34 +94,34 @@ export function MediaContextMenu({
           Move to ▸
           {moveOpen && folders.length > 0 ? (
             <div className="med-ctx-submenu" role="menu">
-              <button
+              <Button
                 role="menuitem"
                 className="med-ctx-item"
                 onClick={act(() => onMove(item, null))}
               >
                 (Root)
-              </button>
+              </Button>
               {folders.map((f) => (
-                <button
+                <Button
                   key={f.id}
                   role="menuitem"
                   className="med-ctx-item"
                   onClick={act(() => onMove(item, f.id))}
                 >
                   {f.name}
-                </button>
+                </Button>
               ))}
             </div>
           ) : null}
         </div>
         <div className="med-ctx-sep" aria-hidden="true" />
-        <button
+        <Button
           role="menuitem"
           className="med-ctx-item med-ctx-item--danger"
           onClick={act(() => onDelete(item))}
         >
           Delete
-        </button>
+        </Button>
       </div>
     </>
   );

@@ -344,7 +344,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
 
         {/* Categories */}
         <div style={styles.categories}>
-          <button
+          <Button
             style={{
               ...styles.categoryBtn,
               ...(selectedCategory === "all" ? styles.categoryBtnActive : {}),
@@ -355,9 +355,9 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
             }}
           >
             All
-          </button>
+          </Button>
           {ICON_CATEGORY_IDS.map((catId) => (
-            <button
+            <Button
               key={catId}
               style={{
                 ...styles.categoryBtn,
@@ -369,7 +369,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
               }}
             >
               {categoryLabels[catId] || catId}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -379,7 +379,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
             <div style={styles.sectionTitle}>Recently Used</div>
             <div style={{ ...styles.grid, maxHeight: "none" }}>
               {recentIconDefs.map((icon) => (
-                <button
+                <Button
                   key={`recent-${icon.name}`}
                   style={{
                     ...styles.iconBtn,
@@ -389,7 +389,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
                   title={icon.name}
                 >
                   {renderIcon(icon)}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -408,7 +408,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
           {filteredIcons.length > 0 ? (
             <div style={styles.grid}>
               {filteredIcons.map((icon) => (
-                <button
+                <Button
                   key={icon.name}
                   style={{
                     ...styles.iconBtn,
@@ -418,7 +418,7 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
                   title={icon.name}
                 >
                   {renderIcon(icon)}
-                </button>
+                </Button>
               ))}
             </div>
           ) : (

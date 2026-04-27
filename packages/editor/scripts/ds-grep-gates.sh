@@ -528,5 +528,34 @@ if [ -n "$GATE22_HITS" ]; then
 fi
 pass "Gate 22: E3 portal discipline (no document.body outside OverlayMount)"
 
+# Gate 23: Shim layer is gate-keeper for mapped primitives.
+# Forbids direct imports of `@/shared/ui/<MappedPrimitive>` outside
+# `shared/ui/` itself. Every consumer must go through the barrel which
+# goes through the shim which goes through vibcoder. Bypass is regression.
+# Mapped primitives = the shims actually shipped by Phase 4 T1-T6.
+GATE23_PRIMITIVES='Button|Input|Select|Switch|Checkbox|Slider|Spinner|Skeleton|Icon|IconButton|Kbd|Badge|Tag|Card|Tabs|FormField|TextInput|PanelHeader|Modal|Popover|Tooltip|Toast'
+GATE23_HITS=$(grep -rE "from ['\"]@/shared/ui/(${GATE23_PRIMITIVES})['\"]" packages/editor/src --include='*.ts' --include='*.tsx' --exclude-dir=__tests__ --exclude-dir=project 2>/dev/null \
+  | grep -v 'shared/ui/' \
+  | grep -vE '^[[:space:]]*//|:[[:space:]]*/?\*' \
+  || true)
+if [ -n "$GATE23_HITS" ]; then
+  echo "$GATE23_HITS"
+  fail "Gate 23: direct shim-primitive import outside shared/ui/ (use barrel @/shared/ui)"
+fi
+pass "Gate 23: shim layer is gate-keeper for mapped primitives"
+
+# Gate 24: Inline-pattern enforcement.
+# Forbids inline lowercase HTML JSX (<button>, <input>, <select>, <textarea>)
+# in src/editor/ chrome consumers. Vibcoder Button/Input/Select/Textarea
+# replaces these. Baseline+ratchet mode (capture current count, ratchet down
+# per task as codemods clean up). Uses anchored ^[[:space:]]*// JS comment
+# exclusion (per M5 Gate 14 lesson — `//` global hides trailing-comment
+# violations).
+GATE24_HITS=$(grep -rEho '<(button|input|select|textarea)[^a-zA-Z]' packages/editor/src/editor --include='*.tsx' --exclude-dir=__tests__ --exclude-dir=preview 2>/dev/null \
+  | grep -vE '^[[:space:]]*//|:[[:space:]]*/?\*' \
+  | wc -l | tr -d ' ')
+BASE_24=$(sed -n '5p' "$BASELINE_FILE" 2>/dev/null || echo "0")
+check_gate 24 "$GATE24_HITS" "$BASE_24" "inline <button>/<input>/<select>/<textarea> in editor/ (use vibcoder shim @/shared/ui)" || exit 1
+
 echo ""
 echo "=== DS V1 gates: 13 passed + 4 chrome-axiom gates at baseline + green-panel check ==="
