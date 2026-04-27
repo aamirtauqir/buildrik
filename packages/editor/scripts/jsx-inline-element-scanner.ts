@@ -54,7 +54,7 @@ export function scanInlineElements(source: string, file: string): InlineElementH
 }
 
 // CLI entry point: read files passed as args, output count to stderr + JSON to stdout.
-if (process.argv[1]?.endsWith("jsx-inline-element-scanner.ts")) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const fs = await import("fs");
   const files = process.argv.slice(2);
   const allHits: InlineElementHit[] = [];
