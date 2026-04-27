@@ -1,4 +1,4 @@
-import { Kbd } from "@/shared/ui/Kbd";
+import { Kbd } from "@/editor/shared/vibcoder/Kbd";
 import { TextInput } from "@/shared/ui/TextInput";
 /**
  * PageCommandPalette — Cmd+K fuzzy-search overlay for quick page navigation.

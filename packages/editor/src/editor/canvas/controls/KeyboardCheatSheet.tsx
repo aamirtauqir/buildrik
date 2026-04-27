@@ -1,4 +1,4 @@
-import { Kbd } from "@/shared/ui/Kbd";
+import { Kbd } from "@/editor/shared/vibcoder/Kbd";
 import { Button } from "@/shared/ui/Button";
 /**
  * Keyboard Shortcuts Cheat Sheet

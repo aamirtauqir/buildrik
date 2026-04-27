@@ -1,4 +1,4 @@
-import { Kbd } from "@/shared/ui/Kbd";
+import { Kbd } from "@/editor/shared/vibcoder/Kbd";
 import { Button } from "@/shared/ui/Button";
 /* @lint-hex-policy: component-theme
    "Template applied!" success banner uses a slightly brighter emerald than
