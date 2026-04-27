@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Display Controls - Display mode selection with visual previews
  * @license BSD-3-Clause

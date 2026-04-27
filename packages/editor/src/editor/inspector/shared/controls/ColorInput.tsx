@@ -1,5 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ColorInput — Figma Fill row. Ported to .bdi-fill per comp-inspector.html v2.
  * Checkerboard swatch + hex + % opacity + eye toggle. Token binding preserved.

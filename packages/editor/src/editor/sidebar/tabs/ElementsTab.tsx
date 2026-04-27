@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ElementsTab - Block library (orchestrator)
  * Quick Access Pills, animated accordion by category, favorites, recents.

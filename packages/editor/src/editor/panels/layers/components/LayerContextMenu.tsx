@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LayerContextMenu - Right-click context menu for layer rows.
  * Props-only, no hook imports. Closes on click-outside + Escape.

@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * StickyFooter - Save/Apply/Cancel footer for drill-in screens
  * Sticks to bottom of panel, shows unsaved indicator

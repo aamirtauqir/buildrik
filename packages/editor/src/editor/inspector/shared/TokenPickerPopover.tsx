@@ -1,5 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * TokenPickerPopover — pick a design-system token or enter a raw value.
  *

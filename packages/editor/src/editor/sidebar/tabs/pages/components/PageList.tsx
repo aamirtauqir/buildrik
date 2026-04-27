@@ -1,5 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * PageList — search input + pages tree + bulk toolbar mount + footer + Add CTA.
  * Zero business logic. All state/actions received as props from usePages + useFolders.

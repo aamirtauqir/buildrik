@@ -1,5 +1,5 @@
 import { Select } from "@/editor/shared/vibcoder/Select";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Size Section - Width, Height, Min/Max dimensions
  * CP3: W and H rows each have a hover-reveal chain button that opens a spacing

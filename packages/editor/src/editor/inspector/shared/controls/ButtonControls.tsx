@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Button Group controls — ported to .bdi-seg per comp-inspector.v1.
  * ButtonGroup = full-row segmented control. CompactButtonGroup = dense variant.

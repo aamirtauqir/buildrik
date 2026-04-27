@@ -14,7 +14,7 @@ import { Input } from "@/editor/shared/vibcoder/Input";
 import { X, Plus, Trash2, Check } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine";
-import { Button } from "../../../shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { Modal } from "../../../shared/ui/Modal";
 
 // =============================================================================
@@ -335,7 +335,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         <Button
           variant="primary"
           size="sm"
-          loading={creating}
+          busy={creating}
           disabled={!canProceed || creating}
           onClick={handleCreate}
         >
@@ -453,12 +453,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             <span style={{ fontSize: 12, color: "var(--buildrick-text-secondary)" }}>
               Fields for <strong style={{ color: "var(--buildrick-text-primary, #e4e4e7)" }}>{name}</strong>
             </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={<Plus size={12} />}
-              onClick={addField}
-            >
+            <Button variant="ghost" size="sm" onClick={addField}>
               Add Field
             </Button>
           </div>

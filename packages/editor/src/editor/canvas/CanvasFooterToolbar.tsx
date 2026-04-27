@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * CanvasFooterToolbar - Canvas Overlays & Zoom Controls
  * Bottom toolbar for canvas overlay toggles and zoom controls (IA Redesign 2026)

@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * SyncStatusIndicator - Display sync status in the UI
  * @module components/Sync/SyncStatusIndicator

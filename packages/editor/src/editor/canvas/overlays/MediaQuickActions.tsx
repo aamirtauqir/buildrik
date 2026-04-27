@@ -1,5 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Media Quick Actions Component
  * Floating toolbar for image elements on canvas

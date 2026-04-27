@@ -38,7 +38,6 @@ export { LayersPanel, StylesPanel, TraitPanel, RichTextEditor } from "./componen
 // UI Components
 // ============================================
 export {
-  Button,
   Modal,
   ConfirmDialog,
   ToastProvider,

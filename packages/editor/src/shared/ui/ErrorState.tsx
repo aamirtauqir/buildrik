@@ -20,7 +20,7 @@
  */
 
 import * as React from "react";
-import { Button } from "./Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 
 export type ErrorSeverity = "error" | "warning" | "info";
 
@@ -231,7 +231,6 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           {config.icon}
         </span>
       </div>
-
       {/* Title */}
       <h3
         style={{
@@ -244,7 +243,6 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
       >
         {title || defaultTitles[severity]}
       </h3>
-
       {/* Message */}
       <p
         style={{
@@ -258,7 +256,6 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
       >
         {message}
       </p>
-
       {/* Details toggle */}
       {details && showDetailsToggle && (
         <button
@@ -287,7 +284,6 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           {showDetails ? "Hide details" : "Show details"}
         </button>
       )}
-
       {/* Details content */}
       {details && showDetails && (
         <pre
@@ -312,7 +308,6 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           {details}
         </pre>
       )}
-
       {/* Actions */}
       {(onRetry || secondaryAction) && (
         <div
@@ -324,24 +319,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           }}
         >
           {onRetry && (
-            <Button
-              variant="primary"
-              size={size === "lg" ? "md" : "sm"}
-              onClick={onRetry}
-              icon={
-                <svg
-                  width={14}
-                  height={14}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path d="M1 4v6h6M23 20v-6h-6" />
-                  <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15" />
-                </svg>
-              }
-            >
+            <Button variant="primary" size={size === "lg" ? "md" : "sm"} onClick={onRetry}>
               {retryLabel}
             </Button>
           )}

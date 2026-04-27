@@ -1,5 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * TemplatesTab v4 — Full-page template browser matching .pen Screens 4-7.
  * Light theme, 4-column grid, pagination, inline detail panel, two-stage filtering.

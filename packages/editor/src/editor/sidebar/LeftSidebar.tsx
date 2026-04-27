@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LeftSidebar — Merged rail + panel component
  * Rail: 60px icon navigation with 3 zones (creation, structure, config)

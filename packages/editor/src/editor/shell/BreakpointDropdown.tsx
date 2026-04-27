@@ -1,5 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * BreakpointDropdown - Viewport width selector
  * Shows current viewport width, preset sizes, and custom input.

@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 
 // ============================================================================
 // TYPES

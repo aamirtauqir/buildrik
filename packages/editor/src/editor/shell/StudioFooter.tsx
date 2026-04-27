@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * StudioFooter — 32px status bar at bottom of editor shell.
  * Left: sync status + breadcrumb path to selected element.

@@ -9,7 +9,7 @@
 
 import * as React from "react";
 import type { LayoutSuggestion, LayoutAnalysisResult } from "../engine/ai";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { Badge } from "@/shared/ui/Badge";
 
 // ============================================================================
@@ -150,7 +150,7 @@ export const LayoutSuggestions: React.FC<LayoutSuggestionsProps> = ({
           Analyze your layout to get AI-powered suggestions for improving spacing, alignment,
           contrast, and accessibility.
         </div>
-        <Button onClick={onAnalyze} loading={loading}>
+        <Button onClick={onAnalyze} busy={loading}>
           🧠 Analyze Layout
         </Button>
       </div>

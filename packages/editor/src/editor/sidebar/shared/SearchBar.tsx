@@ -1,5 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * SearchBar - Search input for sidebar tabs
  * Debounces onChange to parent (300ms default) while keeping input visually instant

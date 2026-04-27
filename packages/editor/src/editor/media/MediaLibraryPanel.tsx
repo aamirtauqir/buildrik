@@ -12,7 +12,7 @@ import { InputField, FileField } from "../../shared/forms";
 import type { MediaAsset, MediaAssetType, MediaViewMode } from "../../shared/types/media";
 import { Modal } from "@/shared/ui/Modal";
 import { Tabs } from "@/shared/ui/Tabs";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { Spinner } from "@/editor/shared/vibcoder/Spinner";
 import { useMediaManager } from "../shell/hooks";
 import { AssetCard } from "./AssetCard";

@@ -1,5 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LinkedGapInput — shared linked/unlinked gap input for flex + grid.
  * Ported to .bdi-row-ctrl + .bdi-num.

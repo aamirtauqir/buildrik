@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * CMSPreviewBar — Preview bar for CMS collection records (WS-14c)
  * PRD §12.4 — Shows above the canvas when a collection is bound and has records.

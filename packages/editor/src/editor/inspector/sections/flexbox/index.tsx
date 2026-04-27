@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Flexbox Section - Enhanced visual controls with icons and grid picker
  * @license BSD-3-Clause

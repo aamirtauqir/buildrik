@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * AllCSSSection - Raw CSS property editor (Dev Mode only)
  * Allows adding any CSS property directly

@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * EnableFlexPrompt - Prompts user to enable Flexbox on a container
  * @license BSD-3-Clause

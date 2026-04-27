@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ComponentDetailScreen - Detail view for a component
  * Shows large preview, info, actions, and variants

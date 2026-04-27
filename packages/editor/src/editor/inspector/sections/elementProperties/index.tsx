@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Element Properties Section - Per-element specific attributes
  * href, src, alt, placeholder, etc.

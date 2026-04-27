@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * BindingPopover — Link element content to a CMS collection field (WS-14b)
  * PRD §12.3 — Chain icon button + popover with collection/field selection

@@ -7,7 +7,7 @@ import { Input } from "@/editor/shared/vibcoder/Input";
 
 import * as React from "react";
 import { SelectField } from "../../../../shared/forms";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { type Interaction, ANIMATION_PRESETS, EASING_OPTIONS } from "./types";
 
 // ============================================================================

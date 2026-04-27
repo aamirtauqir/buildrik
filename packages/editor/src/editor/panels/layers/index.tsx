@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LayersPanel - Minimal Tree Design. Search + Tree only.
  * @license BSD-3-Clause

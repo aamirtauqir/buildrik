@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ComponentRow - Single component item in the component list
  * Handles drag, selection, context menu (insert/rename/duplicate/favorite/delete).

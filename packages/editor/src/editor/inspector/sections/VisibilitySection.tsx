@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Visibility Section — per-breakpoint show/hide toggles.
  * Ported to .bdi-sw-row + .bdi-sw-ctrl pattern per comp-inspector.v1.

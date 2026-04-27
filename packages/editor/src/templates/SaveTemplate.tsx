@@ -6,7 +6,7 @@
 import * as React from "react";
 import { InputField, TextareaField, SelectField } from "../shared/forms";
 import { Modal } from "@/shared/ui/Modal";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 
 export interface SaveTemplateProps {
   isOpen: boolean;
@@ -73,7 +73,6 @@ export const SaveTemplate: React.FC<SaveTemplateProps> = ({
           rows={3}
         />
       </div>
-
       <div
         style={{
           display: "flex",
@@ -85,7 +84,7 @@ export const SaveTemplate: React.FC<SaveTemplateProps> = ({
         <Button variant="ghost" onClick={onClose}>
           Cancel
         </Button>
-        <Button onClick={handleSave} loading={saving} disabled={!name.trim()}>
+        <Button onClick={handleSave} busy={saving} disabled={!name.trim()}>
           Save Template
         </Button>
       </div>

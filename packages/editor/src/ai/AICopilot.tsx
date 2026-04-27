@@ -10,7 +10,7 @@ import { Sparkles, Send, Layout, FileText, RefreshCw, Plus, Copy, Bot, User, X }
 import * as React from "react";
 import type { Composer } from "../engine";
 import { Modal } from "@/shared/ui/Modal";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { generateContent, generateLayout, generateImagePrompt } from "../shared/utils/openai";
 import { AI_AVAILABLE } from "./AIAssistantBar";
 

@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Aquibra Pro Inspector Panel
  * Redesign: ported to .bdi-* namespace per /design-system/preview/comp-inspector.v1.html

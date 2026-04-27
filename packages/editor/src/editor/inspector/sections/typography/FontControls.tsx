@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * FontControls - Font weight, style, and decoration controls
  * Part of Typography section refactoring

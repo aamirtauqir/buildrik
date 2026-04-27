@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * SidebarFallbacks — Skeleton + Error boundary fallback for LeftSidebar
  * Extracted from index.tsx for single-responsibility compliance

@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LayerSelectionBanner - Bulk action bar shown when 2+ layers are selected.
  * Props-only, no hook imports. Escape closes via keyboard listener.

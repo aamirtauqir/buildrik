@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ViewSwitcher - Dropdown for switching between views (e.g., Layers/Pages)
  * Replaces horizontal sub-tabs with a cleaner dropdown pattern

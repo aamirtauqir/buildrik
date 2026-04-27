@@ -8,7 +8,7 @@ import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 import { ShoppingBag, Package, Check } from "lucide-react";
 import * as React from "react";
 import { useState } from "react";
-import { Button } from "../../shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { Modal } from "../../shared/ui/Modal";
 
 export interface CollectionSetupModalProps {

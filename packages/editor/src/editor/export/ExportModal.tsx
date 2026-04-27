@@ -10,7 +10,7 @@ import { ExportEngine } from "../../engine/export";
 import type { ExportConfig, ExportResult, PreviewDevice } from "../../shared/types/export";
 import { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "../../shared/types/export";
 import { Modal } from "@/shared/ui/Modal";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { Tabs } from "@/shared/ui/Tabs";
 import { Spinner } from "@/editor/shared/vibcoder/Spinner";
 import { devError } from "../../shared/utils/devLogger";

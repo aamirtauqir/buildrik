@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ApplyProgressOverlay — shows while template apply animation runs.
  * Fires onComplete after a brief delay so the UI has time to settle.

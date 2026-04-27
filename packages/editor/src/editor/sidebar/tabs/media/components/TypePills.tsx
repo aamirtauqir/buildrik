@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * TypePills — horizontal filter chips for media type (All / Img / Vid / Ico / Fnt).
  * Emits onTypeChange with the new filter. `counts` populate small badges.

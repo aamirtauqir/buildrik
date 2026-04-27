@@ -1,6 +1,6 @@
 import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Export Options Panel
  * Configuration UI for export settings

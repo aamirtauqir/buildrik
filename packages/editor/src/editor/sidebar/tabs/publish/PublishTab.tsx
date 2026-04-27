@@ -11,7 +11,7 @@
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { usePublish, type PublishResult } from "../../../../shared/hooks/usePublish";
-import { Button } from "../../../../shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { useToast } from "../../../../shared/ui/Toast";
 import { PanelHeader } from "../../shared/PanelHeader";
 

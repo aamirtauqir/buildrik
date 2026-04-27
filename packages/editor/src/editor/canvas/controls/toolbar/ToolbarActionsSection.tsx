@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ToolbarActionsSection — Add/Duplicate/More menu/Delete action buttons
  * Extracted sub-component of UnifiedSelectionToolbar.

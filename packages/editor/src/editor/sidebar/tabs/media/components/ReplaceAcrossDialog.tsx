@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ReplaceAcrossDialog — confirms and surfaces results of replace-across-canvas.
  *

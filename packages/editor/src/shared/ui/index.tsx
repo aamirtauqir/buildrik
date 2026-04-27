@@ -8,7 +8,6 @@
  */
 
 // Shared UI components
-export * from "./Button";
 export * from "./Modal";
 export * from "./Tooltip";
 export * from "./Popover";

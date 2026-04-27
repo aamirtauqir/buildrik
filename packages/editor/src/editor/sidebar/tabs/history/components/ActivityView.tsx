@@ -1,5 +1,5 @@
 import { Kbd } from "@/editor/shared/vibcoder/Kbd";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ActivityView — Undo/redo activity timeline
  * Pixel-aligned with the History Tab prototype:

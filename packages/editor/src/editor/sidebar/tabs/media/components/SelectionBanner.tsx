@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Media Tab — Selection Banner (XSWRz spec)
  * Fill cobalt-accent-tint, Move/Download/Deselect all/More buttons

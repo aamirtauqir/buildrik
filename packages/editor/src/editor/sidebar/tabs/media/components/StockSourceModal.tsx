@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Stock Source Modal — Browse and save stock assets to library.
  * Replaces the old Discovery tab. Opens on demand via "+ Add from Stock".

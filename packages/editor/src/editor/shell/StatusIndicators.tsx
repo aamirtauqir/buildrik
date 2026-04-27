@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * StatusIndicators Component
  * Displays save status, sync status, and issues count in the topbar

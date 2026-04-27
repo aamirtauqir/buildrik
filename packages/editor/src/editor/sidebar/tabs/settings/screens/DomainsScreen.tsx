@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { Button } from "../../../../../shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { FEATURE_FLAGS } from "../constants";
 import { Section, Field, Screen, Input } from "../shared";
 import { LockedScreen } from "./LockedScreen";
@@ -98,7 +98,9 @@ export const DomainsScreen: React.FC<ScreenProps> = () => {
             placeholder="www.example.com"
           />
         </Field>
-        <Button onClick={handleConnect} disabled={!domain.trim()} variant="primary" fullWidth>
+        <Button onClick={handleConnect} disabled={!domain.trim()} variant="primary" style={{
+          width: "100%"
+        }}>
           Connect Domain
         </Button>
         {/* DNS help block */}

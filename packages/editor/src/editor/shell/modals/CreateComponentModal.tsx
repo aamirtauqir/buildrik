@@ -8,7 +8,7 @@ import { Input } from "@/editor/shared/vibcoder/Input";
 
 import * as React from "react";
 import type { Composer } from "../../../engine";
-import { Button } from "../../../shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { Modal } from "../../../shared/ui/Modal";
 import { useToast } from "../../../shared/ui/Toast";
 

@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Media Tab — My Library View
  * Renders all 4 type sections inline (img/vid/ico/fnt).

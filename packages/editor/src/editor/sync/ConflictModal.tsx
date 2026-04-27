@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ConflictModal - Display and resolve sync conflicts
  * @module components/Sync/ConflictModal

@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * BulkToolbar — dark floating pill, absolute-positioned at bottom of pages panel.
  * Shown when 2+ pages are selected. Disabled Publish/Unpublish buttons removed

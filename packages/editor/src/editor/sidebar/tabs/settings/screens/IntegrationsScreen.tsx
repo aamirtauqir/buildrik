@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Integrations screen — L1: actionable cards with external links
  * Real integration API not yet available; each card links to docs/external setup.

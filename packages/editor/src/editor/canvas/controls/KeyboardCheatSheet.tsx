@@ -1,5 +1,5 @@
 import { Kbd } from "@/editor/shared/vibcoder/Kbd";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Keyboard Shortcuts Cheat Sheet
  * Floating overlay triggered by '?' key showing all available shortcuts

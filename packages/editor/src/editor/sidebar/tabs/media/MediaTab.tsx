@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Media Tab — Standardized Rebuild (10-Star Experience)
  * Flattened hierarchy, canonical SearchBar integration, and high-visibility Bulk Actions.

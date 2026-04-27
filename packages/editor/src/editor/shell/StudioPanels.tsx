@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * StudioPanels - Main panel layout component
  * Manages left sidebar, canvas area, right inspector, and fullpage views.

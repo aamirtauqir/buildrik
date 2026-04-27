@@ -1,5 +1,5 @@
 import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * PropertyField Component
  * Renders different input types for element properties

@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Animation Section - CSS Animations with presets
  * AQUI-026: Basic Interactions/Animations

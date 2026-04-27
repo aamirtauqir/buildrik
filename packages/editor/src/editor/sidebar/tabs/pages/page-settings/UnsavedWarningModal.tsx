@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * UnsavedWarningModal — confirms tab switch with unsaved changes.
  * Form atoms (action buttons) use ROW_MD from layout constants + radius-sm

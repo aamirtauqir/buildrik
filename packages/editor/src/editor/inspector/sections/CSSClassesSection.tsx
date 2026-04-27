@@ -1,5 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * CSS Classes Section - Add/Remove CSS classes
  * SSOT: reads classes from composer.elements.getElement().getClasses() on each render.

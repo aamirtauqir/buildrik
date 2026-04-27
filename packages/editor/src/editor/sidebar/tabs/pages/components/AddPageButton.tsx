@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * AddPageButton — sticky cobalt CTA in pages footer.
  * Overflow (⋮) menu reveals secondary actions: "From template" + "New folder".

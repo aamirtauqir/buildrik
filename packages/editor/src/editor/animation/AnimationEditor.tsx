@@ -8,7 +8,7 @@ import * as React from "react";
 import { SelectField, NumberField, SliderField } from "../../shared/forms";
 import type { AnimationConfig, AnimationTrigger } from "../../shared/types/animations";
 import { DEFAULT_ANIMATION } from "../../shared/types/animations";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { Tabs } from "@/shared/ui/Tabs";
 
 // Re-export for backwards compatibility
@@ -233,7 +233,9 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
       </div>
       {/* Preview */}
       <div style={{ marginTop: 24 }}>
-        <Button onClick={onPreview} fullWidth variant="secondary">
+        <Button onClick={onPreview} style={{
+          width: "100%"
+        }} variant="secondary">
           ▶️ Preview Animation
         </Button>
       </div>

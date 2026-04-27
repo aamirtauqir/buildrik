@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * TemplateDetail — 420px side panel matching .pen Screen 6 design.
  * Preview image, title, description, and 3 action buttons.

@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Preset Grid Controls — TemplateButtonGrid + PresetButtonGrid.
  * Ported to .bdi-qa pattern per comp-inspector.v1 quick actions row.

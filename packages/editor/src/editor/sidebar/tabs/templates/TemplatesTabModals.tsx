@@ -1,5 +1,5 @@
 import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * TemplatesTabModals — Replace confirm + Pro intercept modals
  * Restyled to match .pen Screen 7 design (light theme).

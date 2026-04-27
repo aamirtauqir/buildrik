@@ -1,5 +1,5 @@
 import { Input as VibcoderInput } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Settings tab — shared primitives.
  *

@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * FontPicker - Font family dropdown with Google Fonts integration
  * Part of Typography section refactoring

@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * DrillInHeader - "← Back to [Parent]" header for drill-in screens
  * Shows breadcrumb path and back button for nested navigation

@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Billing screen — plan info and upgrade prompt
  * Shows plan badge, feature list with lock icons, and upgrade CTA on free plan.

@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * VariantSection - Component variant picker for instances
  * Shows when selected element is a component instance with variants

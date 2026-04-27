@@ -1,5 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * CreateComponentModal - Simple modal for creating a new reusable component
  * Shown when user clicks "+" in the Components tab header.

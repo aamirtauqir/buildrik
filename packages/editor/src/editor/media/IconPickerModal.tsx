@@ -21,7 +21,7 @@ import {
 import { InputField } from "../../shared/forms";
 import type { IconConfig, IconLibrary } from "../../shared/types/media";
 import { Modal } from "@/shared/ui/Modal";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 
 // ============================================
 // Types

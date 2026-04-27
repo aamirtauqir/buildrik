@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * DirectionControls - Flex direction selection with visual icons
  * @license BSD-3-Clause

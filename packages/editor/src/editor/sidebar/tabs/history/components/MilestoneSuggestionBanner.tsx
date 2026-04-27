@@ -1,5 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * MilestoneSuggestionBanner - Inline banner for auto-milestone suggestions
  * Phase 5: Shows AI-suggested version name with Save/Edit/Dismiss actions

@@ -1,6 +1,6 @@
 import { Select } from "@/editor/shared/vibcoder/Select";
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * InviteModal — "Invite to Buildrik" overlay
  * Matches design spec: share link, email + role, existing members list.

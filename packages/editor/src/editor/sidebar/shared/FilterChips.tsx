@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * FilterChips - Scrollable horizontal filter chip row
  * Used for category filtering in Suggestions, Styling tabs

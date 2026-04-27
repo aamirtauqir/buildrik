@@ -9,7 +9,7 @@ import type { Composer } from "../engine";
 import { LayoutAnalyzer } from "../engine/ai";
 import { TextareaField, SelectField } from "../shared/forms";
 import { Modal } from "@/shared/ui/Modal";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { Tabs } from "@/shared/ui/Tabs";
 import {
   generateContent,
@@ -152,7 +152,6 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
         activeTab={activeTab}
         onChange={setActiveTab}
       />
-
       <div style={{ marginTop: 20 }}>
         {activeTab === "content" && (
           <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
@@ -203,7 +202,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
           </div>
         )}
         <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-          <Button onClick={handleGenerate} loading={loading} disabled={!prompt.trim() || !AI_AVAILABLE}>
+          <Button onClick={handleGenerate} busy={loading} disabled={!prompt.trim() || !AI_AVAILABLE}>
             ✨ Generate
           </Button>
           {result && (
@@ -264,7 +263,6 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
           <AccessibilityChecker composer={composer ?? null} onSelectElement={onSelectElement} />
         )}
       </div>
-
       {/* Quick Prompts - only for generation tabs */}
       {(activeTab === "content" || activeTab === "layout" || activeTab === "image") && (
         <div

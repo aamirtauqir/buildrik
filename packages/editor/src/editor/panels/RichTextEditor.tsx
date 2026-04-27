@@ -8,7 +8,7 @@ import { Input } from "@/editor/shared/vibcoder/Input";
 
 import * as React from "react";
 import { ColorField } from "../../shared/forms";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { Popover } from "@/shared/ui/Popover";
 import { Tooltip } from "@/shared/ui/Tooltip";
 

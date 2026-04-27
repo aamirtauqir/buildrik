@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ToolbarNavSection — Parent navigation + element name chip + ancestor dropdown
  * Extracted sub-component of UnifiedSelectionToolbar.

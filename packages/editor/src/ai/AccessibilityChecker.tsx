@@ -10,7 +10,7 @@
 
 import * as React from "react";
 import type { Composer } from "../engine";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { Badge } from "@/shared/ui/Badge";
 
 // ============================================================================

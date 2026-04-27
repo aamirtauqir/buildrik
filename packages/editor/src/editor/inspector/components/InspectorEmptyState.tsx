@@ -1,5 +1,5 @@
 import { Kbd } from "@/editor/shared/vibcoder/Kbd";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /* @lint-hex-policy: component-theme
    "Template applied!" success banner uses a slightly brighter emerald than
    canonical --buildrick-success — intentional tonal choice for the post-apply

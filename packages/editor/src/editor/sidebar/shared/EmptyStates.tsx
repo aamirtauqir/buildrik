@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * EmptyStates — Per-tab empty state components
  * Each empty state has: icon, title, message, primary action.

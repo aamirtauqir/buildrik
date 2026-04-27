@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Selection Label Component
  * Shows element name with parent navigation and settings at top-left of selection

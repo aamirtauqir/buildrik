@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * QuickActionsSection — one-click display presets per comp-inspector.v1 mock.
  *

@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Button, type ButtonProps } from "./Button";
+import { Button, type ButtonProps } from "@/editor/shared/vibcoder/Button";
 
 export interface EmptyStateProps {
   /** Icon or emoji to display */
@@ -117,7 +117,6 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           {icon}
         </div>
       )}
-
       <h3
         className="buildrick-empty-state-title"
         style={{
@@ -130,7 +129,6 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       >
         {title}
       </h3>
-
       {description && (
         <p
           className="buildrick-empty-state-desc"
@@ -146,7 +144,6 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           {description}
         </p>
       )}
-
       {(action || secondaryAction) && (
         <div
           className="buildrick-empty-state-actions"
@@ -161,9 +158,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             <Button
               variant={action.variant || "primary"}
               size={size === "lg" ? "md" : "sm"}
-              icon={action.icon}
-              onClick={action.onClick}
-            >
+              onClick={action.onClick}>
               {action.label}
             </Button>
           )}

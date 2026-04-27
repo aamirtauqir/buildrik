@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Buildrik Editor Topbar — v2 (new-design).
  * Layout: Brand · Undo/Redo/History · | · Breadcrumb · Breakpoints · | · Saved · Preview · Publish

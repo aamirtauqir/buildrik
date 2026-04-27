@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * MediaContextMenu — right-click menu for an asset in the library grid.
  * Positioned at (x, y) in viewport coords; clamps to stay on-screen.

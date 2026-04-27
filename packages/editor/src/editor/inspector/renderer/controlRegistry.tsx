@@ -1,7 +1,7 @@
 import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 import { Select } from "@/editor/shared/vibcoder/Select";
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Default control registry — maps each Field discriminator to a React
  * component. Session 1 ships minimal controls for length, number, select,

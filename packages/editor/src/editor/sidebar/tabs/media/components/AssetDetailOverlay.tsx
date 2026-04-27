@@ -1,5 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Media Tab — Asset Detail Overlay (vSrqD spec)
  * Back nav row h=30 + preview h=140 + metadata + actions.

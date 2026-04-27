@@ -1,5 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Spacing Controls — nested Webflow box (margin + padding) + CornerRadiusInput.
  * Ported to .bdi-box / .bdi-mbox / .bdi-pbox / .bdi-ax per comp-inspector.html v2.

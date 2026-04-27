@@ -1,5 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * TimeTravelScrubber - Bottom drawer for time-travel mode
  * Phase 5: Canvas preview scrubbing with slider, restore, and exit

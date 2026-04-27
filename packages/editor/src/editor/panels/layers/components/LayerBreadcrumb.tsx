@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LayerBreadcrumb - Shows ancestor path when exactly 1 layer is selected.
  * Props-only, no hook imports.

@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * ElementCard, AnimatedAccordionContent, ChevronIcon — UI sub-components for ElementsTab
  * Also exports handleDragStart and highlightMatch as standalone helpers.

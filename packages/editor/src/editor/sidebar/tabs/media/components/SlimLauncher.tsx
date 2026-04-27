@@ -1,6 +1,6 @@
 import { Kbd } from "@/editor/shared/vibcoder/Kbd";
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * SlimLauncher — 280px panel launcher for the Media tab.
  *

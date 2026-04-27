@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * LayerContextMenu — Right-click context menu for layer tree rows
  * Per .pen Screen 11: Delete, Group, Rename, Lock/Unlock actions.

@@ -1,5 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * AccountModal — Full-screen account settings overlay
  * 4 tabs: Profile, Team & Access, Collaboration Settings, Plans & Billing.

@@ -11,7 +11,7 @@ import { Input } from "@/editor/shared/vibcoder/Input";
 import * as React from "react";
 import { MediaOptimizer, formatBytes } from "../../engine/media";
 import type { ImageExportFormat } from "../../shared/types/media";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { Spinner } from "@/editor/shared/vibcoder/Spinner";
 
 // ============================================================================

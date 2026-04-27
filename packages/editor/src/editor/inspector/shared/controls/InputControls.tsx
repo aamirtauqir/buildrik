@@ -1,6 +1,6 @@
 import { Select } from "@/editor/shared/vibcoder/Select";
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/shared/ui/Button";
+import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Input Controls — InputRow, InputWithUnit, SelectRow.
  * Ported to .bdi-num / .bdi-text / .bdi-row-ctrl per comp-inspector.v1 design.
