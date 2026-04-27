@@ -169,7 +169,6 @@
     "packages/editor/src/shared/ui/Badge.tsx",
     "packages/editor/src/shared/ui/CopyButton.tsx",
     "packages/editor/src/shared/ui/ErrorMessage.tsx",
-    "packages/editor/src/shared/ui/FormField.tsx",
     "packages/editor/src/shared/ui/Grid.tsx",
     "packages/editor/src/shared/ui/HelpTooltip.tsx",
     "packages/editor/src/shared/ui/Icons.tsx",

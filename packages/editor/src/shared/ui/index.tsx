@@ -13,7 +13,6 @@ export * from "./Tooltip";
 export * from "./Popover";
 export * from "./Accordion";
 export * from "./Grid";
-export * from "./FormField";
 export * from "./SliderInput";
 export * from "./ColorSwatch";
 export * from "./TreeView";
