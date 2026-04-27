@@ -6,7 +6,7 @@ import { Button } from "@/shared/ui/Button";
  */
 
 import * as React from "react";
-import { IconButton } from "@/shared/ui/IconButton";
+import { IconButton } from "@/editor/shared/vibcoder/IconButton";
 import { ZOOM_PRESETS } from "./shared";
 
 export interface ZoomControlsProps {
@@ -48,12 +48,11 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
   return (
     <div style={containerStyles}>
       <IconButton
-        icon={<ZoomOutIcon />}
-        tooltip="Zoom Out"
         size="sm"
+        title="Zoom Out"
         onClick={handleZoomOut}
         disabled={zoom <= minZoom}
-      />
+      ><ZoomOutIcon /></IconButton>
       <div style={sliderContainerStyles}>
         <TextInput
           type="range"
@@ -65,12 +64,11 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
         />
       </div>
       <IconButton
-        icon={<ZoomInIcon />}
-        tooltip="Zoom In"
         size="sm"
+        title="Zoom In"
         onClick={handleZoomIn}
         disabled={zoom >= maxZoom}
-      />
+      ><ZoomInIcon /></IconButton>
       <div style={dividerStyles} />
       <Button
         onClick={() => setShowPresets(!showPresets)}
@@ -83,11 +81,10 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
         <>
           <div style={dividerStyles} />
           <IconButton
-            icon={<FitIcon />}
-            tooltip="Fit to Screen"
             size="sm"
+            title="Fit to Screen"
             onClick={onFitToScreen}
-          />
+          ><FitIcon /></IconButton>
         </>
       )}
       {showPresets && (

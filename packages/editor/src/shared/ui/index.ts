@@ -75,7 +75,6 @@ export {
   type FormGroupProps,
   type FormActionsProps,
 } from "./FormField";
-export { IconButton, type IconButtonProps } from "./IconButton";
 export { ColorSwatch, ColorSwatchGroup, type ColorSwatchProps } from "./ColorSwatch";
 export { TreeView, type TreeViewProps, type TreeNode } from "./TreeView";
 export { PremiumBadge, type PremiumBadgeProps } from "./PremiumBadge";

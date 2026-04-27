@@ -11,7 +11,7 @@
 
 import * as React from "react";
 import "./DrawerPanel.css";
-import { IconButton } from "@/shared/ui/IconButton";
+import { IconButton } from "@/editor/shared/vibcoder/IconButton";
 import { SvgChevronLeft, SvgPin } from "../../shared/ui/Icons";
 
 // ============================================
@@ -118,28 +118,26 @@ export const DrawerPanel: React.FC<DrawerPanelProps> = ({
           {/* Pin button - keeps panel open */}
           {onPinToggle && (
             <IconButton
-              icon={<SvgPin />}
-              tooltip={isPinned ? "Unpin panel" : "Pin panel"}
-              ariaLabel={isPinned ? "Unpin panel" : "Pin panel"}
               size="sm"
               variant="ghost"
-              active={isPinned}
+              pressed={isPinned}
+              title={isPinned ? "Unpin panel" : "Pin panel"}
+              aria-label={isPinned ? "Unpin panel" : "Pin panel"}
               onClick={onPinToggle}
               className="drawer-panel__pin-btn"
-            />
+            ><SvgPin /></IconButton>
           )}
 
           {/* Close button */}
           {onClose && (
             <IconButton
-              icon={<SvgChevronLeft />}
-              tooltip="Close panel"
-              ariaLabel="Close panel"
               size="sm"
               variant="ghost"
+              title="Close panel"
+              aria-label="Close panel"
               onClick={handleClose}
               className="drawer-panel__close-btn"
-            />
+            ><SvgChevronLeft /></IconButton>
           )}
         </div>
       </div>

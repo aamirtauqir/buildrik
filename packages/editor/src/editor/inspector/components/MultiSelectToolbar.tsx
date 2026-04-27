@@ -18,7 +18,7 @@ import type { Composer } from "../../../engine";
 import { AlignmentHandler } from "../../../engine/canvas/AlignmentHandler";
 import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
-import { IconButton } from "../../../shared/ui/IconButton";
+import { IconButton } from "@/editor/shared/vibcoder/IconButton";
 import { BatchStylePanel } from "./BatchStylePanel";
 
 // ============================================================================
@@ -158,32 +158,29 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
         <span style={sectionLabelStyles}>Align Horizontal</span>
         <div style={buttonGroupStyles}>
           <IconButton
-            icon={<AlignLeft size={16} />}
-            tooltip={getAlignTooltip("Align Left")}
-            ariaLabel="Align elements to left"
             size="sm"
             variant="ghost"
+            title={getAlignTooltip("Align Left")}
+            aria-label="Align elements to left"
             onClick={handleAlignLeft}
             disabled={isDisabled}
-          />
+          ><AlignLeft size={16} /></IconButton>
           <IconButton
-            icon={<AlignCenter size={16} />}
-            tooltip={getAlignTooltip("Align Center")}
-            ariaLabel="Align elements to center horizontally"
             size="sm"
             variant="ghost"
+            title={getAlignTooltip("Align Center")}
+            aria-label="Align elements to center horizontally"
             onClick={handleAlignCenterH}
             disabled={isDisabled}
-          />
+          ><AlignCenter size={16} /></IconButton>
           <IconButton
-            icon={<AlignRight size={16} />}
-            tooltip={getAlignTooltip("Align Right")}
-            ariaLabel="Align elements to right"
             size="sm"
             variant="ghost"
+            title={getAlignTooltip("Align Right")}
+            aria-label="Align elements to right"
             onClick={handleAlignRight}
             disabled={isDisabled}
-          />
+          ><AlignRight size={16} /></IconButton>
         </div>
       </div>
 
@@ -192,32 +189,29 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
         <span style={sectionLabelStyles}>Align Vertical</span>
         <div style={buttonGroupStyles}>
           <IconButton
-            icon={<AlignStartVertical size={16} />}
-            tooltip={getAlignTooltip("Align Top")}
-            ariaLabel="Align elements to top"
             size="sm"
             variant="ghost"
+            title={getAlignTooltip("Align Top")}
+            aria-label="Align elements to top"
             onClick={handleAlignTop}
             disabled={isDisabled}
-          />
+          ><AlignStartVertical size={16} /></IconButton>
           <IconButton
-            icon={<AlignCenterVertical size={16} />}
-            tooltip={getAlignTooltip("Align Middle")}
-            ariaLabel="Align elements to middle vertically"
             size="sm"
             variant="ghost"
+            title={getAlignTooltip("Align Middle")}
+            aria-label="Align elements to middle vertically"
             onClick={handleAlignMiddle}
             disabled={isDisabled}
-          />
+          ><AlignCenterVertical size={16} /></IconButton>
           <IconButton
-            icon={<AlignEndVertical size={16} />}
-            tooltip={getAlignTooltip("Align Bottom")}
-            ariaLabel="Align elements to bottom"
             size="sm"
             variant="ghost"
+            title={getAlignTooltip("Align Bottom")}
+            aria-label="Align elements to bottom"
             onClick={handleAlignBottom}
             disabled={isDisabled}
-          />
+          ><AlignEndVertical size={16} /></IconButton>
         </div>
       </div>
 
@@ -226,49 +220,33 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
         <span style={sectionLabelStyles}>Distribute</span>
         <div style={buttonGroupStyles}>
           <IconButton
-            icon={
-              <svg
-                width={16}
-                height={16}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <rect x="4" y="5" width="4" height="14" rx="1" />
-                <rect x="10" y="5" width="4" height="14" rx="1" />
-                <rect x="16" y="5" width="4" height="14" rx="1" />
-              </svg>
-            }
-            tooltip={getDistributeTooltip("Horizontally")}
-            ariaLabel="Distribute elements horizontally with equal spacing"
             size="sm"
             variant="ghost"
+            title={getDistributeTooltip("Horizontally")}
+            aria-label="Distribute elements horizontally with equal spacing"
             onClick={handleDistributeH}
             disabled={distributeDisabled}
-          />
+          >
+            <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <rect x="4" y="5" width="4" height="14" rx="1" />
+              <rect x="10" y="5" width="4" height="14" rx="1" />
+              <rect x="16" y="5" width="4" height="14" rx="1" />
+            </svg>
+          </IconButton>
           <IconButton
-            icon={
-              <svg
-                width={16}
-                height={16}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <rect x="5" y="4" width="14" height="4" rx="1" />
-                <rect x="5" y="10" width="14" height="4" rx="1" />
-                <rect x="5" y="16" width="14" height="4" rx="1" />
-              </svg>
-            }
-            tooltip={getDistributeTooltip("Vertically")}
-            ariaLabel="Distribute elements vertically with equal spacing"
             size="sm"
             variant="ghost"
+            title={getDistributeTooltip("Vertically")}
+            aria-label="Distribute elements vertically with equal spacing"
             onClick={handleDistributeV}
             disabled={distributeDisabled}
-          />
+          >
+            <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <rect x="5" y="4" width="14" height="4" rx="1" />
+              <rect x="5" y="10" width="14" height="4" rx="1" />
+              <rect x="5" y="16" width="14" height="4" rx="1" />
+            </svg>
+          </IconButton>
         </div>
       </div>
 
