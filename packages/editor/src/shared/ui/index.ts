@@ -76,14 +76,6 @@ export {
   type FormActionsProps,
 } from "./FormField";
 export { IconButton, type IconButtonProps } from "./IconButton";
-export {
-  Icon,
-  SECTION_ICONS,
-  type IconProps,
-  type IconName,
-  type IconSize,
-  type IconColor,
-} from "./Icon";
 export { ColorSwatch, ColorSwatchGroup, type ColorSwatchProps } from "./ColorSwatch";
 export { TreeView, type TreeViewProps, type TreeNode } from "./TreeView";
 export { PremiumBadge, type PremiumBadgeProps } from "./PremiumBadge";
