@@ -27,16 +27,6 @@ export {
 export { Badge, type BadgeProps } from "./Badge";
 export { Popover, type PopoverProps } from "./Popover";
 export { Resizable, type ResizableProps } from "./Resizable";
-export {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  type CardProps,
-  type CardHeaderProps,
-  type CardBodyProps,
-  type CardFooterProps,
-} from "./Card";
 export { Grid, GridItem, GridPresets, type GridProps, type GridItemProps } from "./Grid";
 export { EmptyState, type EmptyStateProps } from "./EmptyState";
 export {
