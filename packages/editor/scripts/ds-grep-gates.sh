@@ -544,16 +544,24 @@ if [ -n "$GATE23_HITS" ]; then
 fi
 pass "Gate 23: shim layer is gate-keeper for mapped primitives"
 
-# Gate 24: Inline-pattern enforcement.
-# Forbids inline lowercase HTML JSX (<button>, <input>, <select>, <textarea>)
-# in src/editor/ chrome consumers. Vibcoder Button/Input/Select/Textarea
-# replaces these. Baseline+ratchet mode (capture current count, ratchet down
-# per task as codemods clean up). Uses anchored ^[[:space:]]*// JS comment
-# exclusion (per M5 Gate 14 lesson — `//` global hides trailing-comment
-# violations).
-GATE24_HITS=$(grep -rEho '<(button|input|select|textarea)[^a-zA-Z]' packages/editor/src/editor --include='*.tsx' --exclude-dir=__tests__ --exclude-dir=preview 2>/dev/null \
-  | grep -vE '^[[:space:]]*//|:[[:space:]]*/?\*' \
-  | wc -l | tr -d ' ')
+# Gate 24: Inline-pattern enforcement (AST-based — catches multi-line JSX).
+# Forbids inline lowercase HTML JSX (<button>, <input>, <select>, <textarea>) in editor/.
+# Replaces previous grep `<(button|input|select|textarea)[^a-zA-Z]` which missed
+# multi-line JSX like `<select\n  ref={ref}\n>` (newline not in pattern space).
+GATE24_FILE_COUNT=$(find packages/editor/src/editor -name '*.tsx' \
+  -not -path '*/__tests__/*' \
+  -not -path '*/preview/*' 2>/dev/null | wc -l | tr -d ' ')
+
+if [ "$GATE24_FILE_COUNT" -eq 0 ]; then
+  GATE24_HITS=0
+else
+  GATE24_HITS=$(find packages/editor/src/editor -name '*.tsx' \
+    -not -path '*/__tests__/*' \
+    -not -path '*/preview/*' 2>/dev/null \
+    | xargs npx tsx packages/editor/scripts/jsx-inline-element-scanner.ts 2>/dev/null \
+    | jq -s 'add | length' 2>/dev/null || echo "0")
+fi
+
 BASE_24=$(sed -n '5p' "$BASELINE_FILE" 2>/dev/null || echo "0")
 check_gate 24 "$GATE24_HITS" "$BASE_24" "inline <button>/<input>/<select>/<textarea> in editor/ (use vibcoder shim @/shared/ui)" || exit 1
 
