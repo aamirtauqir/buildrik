@@ -1,5 +1,5 @@
 import { Select } from "@/editor/shared/vibcoder/Select";
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -386,7 +386,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             <label style={s.label}>
               Collection name <span style={{ color: "var(--buildrick-error)" }}>*</span>
             </label>
-            <TextInput
+            <Input
               style={s.input}
               type="text"
               placeholder="Blog Posts"
@@ -486,7 +486,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           <div style={{ maxHeight: 240, overflowY: "auto" }}>
             {fields.map((field) => (
               <div key={field.id} style={s.fieldRow}>
-                <TextInput
+                <Input
                   style={s.fieldNameInput}
                   type="text"
                   placeholder="field_name"

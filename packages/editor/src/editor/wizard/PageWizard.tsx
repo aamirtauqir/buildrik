@@ -1,5 +1,5 @@
 import { Select } from "@/editor/shared/vibcoder/Select";
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * PageWizard - Full-screen AI page generation wizard
@@ -248,7 +248,7 @@ const FormView: React.FC<FormViewProps> = ({
     {/* Business Description */}
     <div style={fieldGroupStyles}>
       <label style={labelStyles}>Describe your business in one sentence</label>
-      <TextInput
+      <Input
         type="text"
         value={description}
         onChange={(e) => onDescriptionChange(e.target.value)}

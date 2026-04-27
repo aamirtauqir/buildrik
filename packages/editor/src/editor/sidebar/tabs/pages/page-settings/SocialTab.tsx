@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * SocialTab — Open Graph + Twitter sharing preview & fields.
  *
@@ -42,7 +42,7 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
           <label className="bd-pg-seo-label" htmlFor="og-title">Open Graph Title</label>
           <span className="bd-pg-seo-counter">{s.ogTitle.length}/60</span>
         </div>
-        <TextInput
+        <Input
           id="og-title"
           className="bd-pg-seo-input"
           value={s.ogTitle}
@@ -68,7 +68,7 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
       {/* OG Image URL */}
       <div className="bd-pg-seo-field">
         <label className="bd-pg-seo-label" htmlFor="og-image">Image URL</label>
-        <TextInput
+        <Input
           id="og-image"
           className="bd-pg-seo-input"
           value={s.ogImageUrl ?? ""}

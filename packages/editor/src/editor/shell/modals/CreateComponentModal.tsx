@@ -1,5 +1,5 @@
 import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * CreateComponentModal - Modal for creating reusable components
  * Allows users to save selected elements as reusable components
@@ -142,7 +142,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           <label style={labelStyles}>
             Name <span style={{ color: "var(--buildrick-accent)" }}>*</span>
           </label>
-          <TextInput
+          <Input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -165,7 +165,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
         <div>
           <label style={labelStyles}>Category</label>
-          <TextInput
+          <Input
             type="text"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -176,7 +176,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
         <div>
           <label style={labelStyles}>Tags</label>
-          <TextInput
+          <Input
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}

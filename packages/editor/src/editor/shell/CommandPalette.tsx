@@ -1,5 +1,5 @@
 import { Kbd } from "@/editor/shared/vibcoder/Kbd";
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * CommandPalette — ⌘K overlay
@@ -167,7 +167,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
           }}
         >
           <IconSearch />
-          <TextInput
+          <Input
             ref={inputRef}
             type="text"
             placeholder="Search actions…"

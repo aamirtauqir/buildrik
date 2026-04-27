@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * ZoomControls - Canvas zoom slider and controls
@@ -57,7 +57,7 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
         ><ZoomOutIcon /></IconButton>
       </Tooltip>
       <div style={sliderContainerStyles}>
-        <TextInput
+        <Input
           type="range"
           min={minZoom}
           max={maxZoom}

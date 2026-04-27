@@ -1,5 +1,5 @@
 import { Kbd } from "@/editor/shared/vibcoder/Kbd";
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * SlimLauncher — 280px panel launcher for the Media tab.
@@ -205,7 +205,7 @@ export function SlimLauncher({
           Open library
         </Button>
       ) : null}
-      <TextInput
+      <Input
         ref={fileInputRef}
         type="file"
         multiple

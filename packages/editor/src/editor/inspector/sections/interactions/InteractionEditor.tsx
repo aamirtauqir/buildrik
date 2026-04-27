@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Interaction Editor Component
  * Editor panel for configuring a single interaction's animation settings
@@ -121,7 +121,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
       <div style={styles.inputRow}>
         <div style={styles.inputWrapper}>
           <label style={styles.label}>Duration</label>
-          <TextInput
+          <Input
             type="number"
             value={interaction.animation.duration / 1000}
             onChange={handleDurationChange}
@@ -133,7 +133,7 @@ export const InteractionEditor: React.FC<InteractionEditorProps> = ({
         </div>
         <div style={styles.inputWrapper}>
           <label style={styles.label}>Delay</label>
-          <TextInput
+          <Input
             type="number"
             value={interaction.animation.delay / 1000}
             onChange={handleDelayChange}

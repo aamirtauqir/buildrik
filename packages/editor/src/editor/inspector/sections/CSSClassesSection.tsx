@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * CSS Classes Section - Add/Remove CSS classes
@@ -143,7 +143,7 @@ export const CSSClassesSection: React.FC<CSSClassesSectionProps> = ({
         {addingInline ? (
           <span className="bdi-chip bdi-chip-input" role="presentation">
             <span aria-hidden="true" style={{ opacity: 0.5 }}>.</span>
-            <TextInput
+            <Input
               ref={inlineInputRef}
               type="text"
               value={newClass}

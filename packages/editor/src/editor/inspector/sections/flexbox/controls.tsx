@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * Flexbox Control Components
@@ -127,7 +127,7 @@ export const GapSlider: React.FC<GapSliderProps> = ({ value, onChange, disabled 
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
-      <TextInput
+      <Input
         type="range"
         min="0"
         max={maxGap}
@@ -148,7 +148,7 @@ export const GapSlider: React.FC<GapSliderProps> = ({ value, onChange, disabled 
           opacity: disabled ? 0.5 : 1,
         }}
       />
-      <TextInput
+      <Input
         type="text"
         value={value || "0"}
         onChange={(e) => onChange(e.target.value)}

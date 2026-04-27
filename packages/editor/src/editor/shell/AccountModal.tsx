@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * AccountModal — Full-screen account settings overlay
@@ -123,7 +123,7 @@ const TabProfile: React.FC = () => (
       >
         Email
       </label>
-      <TextInput
+      <Input
         type="email"
         placeholder="aamir@buildrik.app"
         readOnly

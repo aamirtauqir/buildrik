@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * LayerTreeItem - Minimal Tree Design
@@ -194,7 +194,7 @@ export const LayerTreeItem: React.FC<LayerTreeItemProps> = (props) => {
         </span>
 
         {isEditing ? (
-          <TextInput
+          <Input
             ref={editInputRef}
             type="text"
             className="bdc-lr-edit"

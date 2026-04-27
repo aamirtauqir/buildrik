@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * Export screen
@@ -119,7 +119,7 @@ export const ExportScreen: React.FC<ScreenProps> = ({ composer }) => {
               Get notified when it launches
             </label>
             <div style={{ display: "flex", gap: 6 }}>
-              <TextInput
+              <Input
                 id="export-waitlist-email"
                 type="email"
                 value={waitlistEmail}

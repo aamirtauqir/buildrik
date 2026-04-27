@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Slider Controls — SliderInput, RangeSlider. Ported to .bdi-row-ctrl with
  * numeric value display on the right.
@@ -43,7 +43,7 @@ export const SliderInput: React.FC<SliderInputProps> = ({
   <div className="bdi-row-ctrl">
     <label className="bdi-lb">{label}</label>
     <div className="bdi-row-content">
-      <TextInput
+      <Input
         type="range"
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
@@ -96,7 +96,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
   <div className="bdi-row-ctrl">
     <label className="bdi-lb">{label}</label>
     <div className="bdi-row-content">
-      <TextInput
+      <Input
         type="range"
         min={min}
         max={max}

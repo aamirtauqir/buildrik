@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -265,7 +265,7 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
       <div style={styles.section}>
         <label style={styles.label}>Quality</label>
         <div style={styles.sliderContainer}>
-          <TextInput
+          <Input
             type="range"
             min={10}
             max={100}

@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Media Tab — Upload Zone
  * Dashed drop area matching .pen Screen 8 design.
@@ -41,7 +41,7 @@ export function UploadZone({ storage, onUpload, disabled = false }: UploadZonePr
       <span className="med-upload-zone__label">
         {isFull ? "Storage full" : "Drag files or click to browse"}
       </span>
-      <TextInput
+      <Input
         ref={inputRef}
         type="file"
         multiple

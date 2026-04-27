@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * Constraint Control - Fixed / Fill / Hug size controls
@@ -136,7 +136,7 @@ export const ConstraintControl: React.FC<ConstraintControlProps> = ({ label, val
           <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)", width: 32 }}>
             {isWidth ? "W" : "H"}
           </span>
-          <TextInput
+          <Input
             type="text"
             value={value}
             onChange={(e) => onChange(e.target.value)}

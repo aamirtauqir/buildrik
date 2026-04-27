@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input as VibcoderInput } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * Settings tab — shared primitives.
@@ -71,7 +71,7 @@ export const Field: React.FC<FieldProps> = ({ label, hint, htmlFor, children }) 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, ...rest }, ref) => (
-    <TextInput
+    <VibcoderInput
       ref={ref}
       className={`bd-set-input${className ? " " + className : ""}`}
       {...rest}

@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * MilestoneSuggestionBanner - Inline banner for auto-milestone suggestions
@@ -90,7 +90,7 @@ export const MilestoneSuggestionBanner: React.FC<MilestoneSuggestionBannerProps>
           {triggerLabel}
         </div>
         {isEditing ? (
-          <TextInput
+          <Input
             ref={inputRef}
             type="text"
             value={editValue}

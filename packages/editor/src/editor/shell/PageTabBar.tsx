@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * PageTabBar - Horizontal tab bar for page switching
@@ -257,7 +257,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
               {page.isHome && <span style={homeIconStyles}>🏠</span>}
               {editingPageId === page.id ? (
                 <span style={{ position: "relative" }}>
-                  <TextInput
+                  <Input
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}

@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * PageFolder — collapsible folder row + flat list of child PageRows.
@@ -142,7 +142,7 @@ export const PageFolder: React.FC<Props> = ({
           </span>
 
           {isRenamingFolder ? (
-            <TextInput
+            <Input
               ref={renameInputRef}
               className="bd-pg-row-rename"
               value={renameValue}

@@ -1,5 +1,5 @@
 import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * ProjectSettingsModal - Modal for managing project-wide configurations
  * Allows users to update project name, canvas defaults, and SEO settings.
@@ -123,7 +123,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
           {activeTab === "general" && (
             <div style={formGroupStyles}>
               <label style={labelStyles}>Project Name</label>
-              <TextInput
+              <Input
                 type="text"
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
@@ -132,7 +132,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
               />
 
               <label style={labelStyles}>Author / Description</label>
-              <TextInput
+              <Input
                 type="text"
                 value={projectDescription}
                 onChange={(e) => setProjectDescription(e.target.value)}
@@ -146,7 +146,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
             <div style={formGroupStyles}>
               <label style={labelStyles}>Grid Size (px)</label>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <TextInput
+                <Input
                   type="number"
                   value={gridSize}
                   onChange={(e) => setGridSize(Number(e.target.value))}
@@ -174,7 +174,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
           {activeTab === "seo" && (
             <div style={formGroupStyles}>
               <label style={labelStyles}>Site Name (SEO Default)</label>
-              <TextInput
+              <Input
                 type="text"
                 value={siteTitle}
                 onChange={(e) => setSiteTitle(e.target.value)}

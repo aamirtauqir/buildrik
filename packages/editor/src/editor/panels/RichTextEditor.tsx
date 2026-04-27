@@ -1,5 +1,5 @@
 import { Select } from "@/editor/shared/vibcoder/Select";
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Aquibra Rich Text Editor
  * WYSIWYG text editing toolbar
@@ -236,7 +236,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         }
         content={
           <div style={{ width: 250 }}>
-            <TextInput
+            <Input
               type="text"
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}

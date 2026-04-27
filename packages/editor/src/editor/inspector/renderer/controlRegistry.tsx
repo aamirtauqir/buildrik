@@ -1,6 +1,6 @@
 import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 import { Select } from "@/editor/shared/vibcoder/Select";
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * Default control registry — maps each Field discriminator to a React
@@ -77,7 +77,7 @@ const LengthControl: React.FC<ControlProps<LengthField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <TextInput
+    <Input
       id={`field-${field.prop}`}
       type="text"
       value={value}
@@ -101,7 +101,7 @@ const NumberControl: React.FC<ControlProps<NumberField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <TextInput
+    <Input
       id={`field-${field.prop}`}
       type="number"
       value={value}
@@ -178,7 +178,7 @@ const ColorControl: React.FC<ControlProps<ColorField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <TextInput
+    <Input
       id={`field-${field.prop}`}
       type="color"
       value={value || "#000000"}
@@ -263,7 +263,7 @@ const Spacing4Control: React.FC<ControlProps<Spacing4Field>> = ({
           >
             {side}
           </label>
-          <TextInput
+          <Input
             id={`field-${field.group}-${side}`}
             type="text"
             value={values[side]}
@@ -289,7 +289,7 @@ const TextControl: React.FC<ControlProps<TextField>> = ({
     <label style={labelStyle} htmlFor={`field-${field.prop}`}>
       {field.label}
     </label>
-    <TextInput
+    <Input
       id={`field-${field.prop}`}
       type="text"
       value={value}
@@ -365,7 +365,7 @@ const Corners4Control: React.FC<ControlProps<Corners4Field>> = ({
           <label style={labelStyle} htmlFor={`field-${c.prop}`}>
             {c.label}
           </label>
-          <TextInput
+          <Input
             id={`field-${c.prop}`}
             type="text"
             value={cornerValues[c.id]}

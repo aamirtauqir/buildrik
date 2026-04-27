@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * Media Tab — Onboarding Empty State
@@ -48,7 +48,7 @@ export function OnboardingEmptyState({
       >
         Upload files
       </Button>
-      <TextInput
+      <Input
         ref={inputRef}
         type="file"
         multiple

@@ -1,5 +1,5 @@
 import { Select } from "@/editor/shared/vibcoder/Select";
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * Input Controls — InputRow, InputWithUnit, SelectRow.
@@ -76,7 +76,7 @@ export const InputRow: React.FC<InputRowProps> = ({
           placeholder={placeholder}
         />
       ) : (
-        <TextInput
+        <Input
           className="bdi-text"
           type={type}
           value={value}
@@ -223,7 +223,7 @@ export const InputWithUnit: React.FC<InputWithUnitProps> = ({
           title={isInvalid ? "Invalid number — press Escape to revert" : disabledReason}
         >
           {fieldIcon && <span className="bdi-flb">{fieldIcon}</span>}
-          <TextInput
+          <Input
             type="text"
             value={isKeywordUnit && !isTokenVar(inputValue) ? unit : inputValue}
             onChange={(e) => handleInputChange(e.target.value)}

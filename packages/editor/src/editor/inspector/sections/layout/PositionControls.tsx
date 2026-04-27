@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * Position Controls - Position mode selection and offset inputs
@@ -179,7 +179,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
       >
         {/* Top */}
         <div />
-        <TextInput
+        <Input
           type="text"
           value={styles.top || ""}
           onChange={(e) => onChange("top", e.target.value)}
@@ -191,7 +191,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
         <div />
 
         {/* Left - Box - Right */}
-        <TextInput
+        <Input
           type="text"
           value={styles.left || ""}
           onChange={(e) => onChange("left", e.target.value)}
@@ -201,7 +201,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
           title={reason("left")}
         />
         <div style={positionOffsetBoxStyle} />
-        <TextInput
+        <Input
           type="text"
           value={styles.right || ""}
           onChange={(e) => onChange("right", e.target.value)}
@@ -213,7 +213,7 @@ const PositionOffsetControls: React.FC<PositionOffsetControlsProps> = ({
 
         {/* Bottom */}
         <div />
-        <TextInput
+        <Input
           type="text"
           value={styles.bottom || ""}
           onChange={(e) => onChange("bottom", e.target.value)}

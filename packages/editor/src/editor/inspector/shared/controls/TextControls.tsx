@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Text Controls — TextInputRow, InlineInput, SectionLabel, SubSectionTitle.
  * Ported to .bdi-text + .bdi-row-ctrl + .bdi-sub-label.
@@ -29,7 +29,7 @@ export const TextInputRow: React.FC<TextInputRowProps> = ({
   <div className="bdi-row-ctrl">
     <label className="bdi-lb">{label}</label>
     <div className="bdi-row-content">
-      <TextInput
+      <Input
         type="text"
         className="bdi-text"
         value={value}
@@ -61,7 +61,7 @@ export const InlineInput: React.FC<InlineInputProps> = ({
   <div className="bdi-row-ctrl">
     <label className="bdi-lb">{label}</label>
     <div className="bdi-row-content">
-      <TextInput
+      <Input
         type="text"
         className="bdi-text"
         value={value}

@@ -1,5 +1,5 @@
 import { Select } from "@/editor/shared/vibcoder/Select";
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * InviteModal — "Invite to Buildrik" overlay
@@ -226,7 +226,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               Invite by email
             </label>
             <div style={{ display: "flex", gap: 8 }}>
-              <TextInput
+              <Input
                 ref={emailRef}
                 type="email"
                 placeholder="Enter email address…"

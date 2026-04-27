@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * ColorInput — Figma Fill row. Ported to .bdi-fill per comp-inspector.html v2.
@@ -126,7 +126,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
                 </>
               ) : (
                 <>
-                  <TextInput
+                  <Input
                     type="text"
                     className="bdi-hx"
                     value={display}

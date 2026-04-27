@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * Slider Control Component
  * Reusable slider input for image adjustments
@@ -25,7 +25,7 @@ export const SliderControl: React.FC<SliderControlProps> = ({
 }) => (
   <div style={styles.container}>
     <span style={styles.label}>{label}</span>
-    <TextInput
+    <Input
       type="range"
       min={min}
       max={max}

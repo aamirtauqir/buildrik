@@ -1,5 +1,5 @@
 import { Kbd } from "@/editor/shared/vibcoder/Kbd";
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 /**
  * PageCommandPalette — Cmd+K fuzzy-search overlay for quick page navigation.
  *
@@ -99,7 +99,7 @@ export const PageCommandPalette: React.FC<Props> = ({ pages, onSelect, onClose }
       onClick={handleBackdropClick}
     >
       <div className="bd-pg-palette">
-        <TextInput
+        <Input
           ref={inputRef}
           type="text"
           className="bd-pg-palette-input"

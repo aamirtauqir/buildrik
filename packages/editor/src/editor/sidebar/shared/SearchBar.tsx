@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * SearchBar - Search input for sidebar tabs
@@ -84,7 +84,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div style={containerStyles} role="search">
       <SearchIcon />
-      <TextInput
+      <Input
         type="text"
         id={id}
         value={inputValue}

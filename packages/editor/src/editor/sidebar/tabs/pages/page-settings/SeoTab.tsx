@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * SeoTab — Pure form renderer. No state. No logic.
@@ -123,7 +123,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             Write with AI
           </Button>
         )}
-        <TextInput
+        <Input
           id="seo-title"
           className="bd-pg-seo-input"
           value={s.seoTitle}
@@ -214,7 +214,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         </label>
         <div className="bd-pg-seo-slug-wrap">
           <span className="bd-pg-seo-slug-prefix">{domain}/</span>
-          <TextInput
+          <Input
             id="seo-slug"
             className={`bd-pg-seo-input bd-pg-seo-input--slug${s.slugError ? " bd-pg-seo-input--error" : ""}`}
             value={s.slug}

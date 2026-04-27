@@ -1,4 +1,4 @@
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * BlockPickerModal - Block picker modal for QuickActionsToolbar
@@ -203,7 +203,7 @@ export const BlockPickerModal: React.FC<BlockPickerModalProps> = ({
             <circle cx="11" cy="11" r="8" />
             <path d="M21 21l-4.35-4.35" />
           </svg>
-          <TextInput
+          <Input
             type="text"
             placeholder="Search elements..."
             value={searchQuery}

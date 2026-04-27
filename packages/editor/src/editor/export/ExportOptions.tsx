@@ -1,5 +1,5 @@
 import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
-import { TextInput } from "@/shared/ui/TextInput";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/shared/ui/Button";
 /**
  * Export Options Panel
@@ -237,7 +237,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
       {/* Page Title */}
       <div>
         <label style={{ display: "block", fontSize: 12, marginBottom: 6 }}>Page Title</label>
-        <TextInput
+        <Input
           type="text"
           value={config.pageTitle || ""}
           onChange={(e) => onChange({ pageTitle: e.target.value })}
