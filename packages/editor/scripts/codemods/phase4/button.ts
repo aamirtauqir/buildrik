@@ -23,19 +23,12 @@
 import type { Transform, FileInfo, API, Options } from "jscodeshift";
 import { findJsxElementsByTag, renameJsxTag } from "../_lib/jsx-query";
 import { ensureNamedImport } from "../_lib/import-swap";
+import { shouldSkipPath } from "../_lib/skip-rules";
 
 const transform: Transform = (file: FileInfo, api: API, _options: Options) => {
   const j = api.jscodeshift;
-  // Skip files we never want to touch.
-  if (
-    file.path.includes("/__tests__/") ||
-    file.path.includes("/scripts/") ||
-    file.path.includes("/preview/") ||
-    file.path.includes("/shared/vibcoder/") ||
-    /\.(test|spec)\.tsx?$/.test(file.path)
-  ) {
-    return file.source;
-  }
+  // Skip files we never want to touch (see _lib/skip-rules.ts).
+  if (shouldSkipPath(file.path)) return file.source;
 
   const root = j(file.source);
   const buttons = findJsxElementsByTag(j, root, "button");

@@ -10,7 +10,7 @@ import type { JSCodeshift, Collection, JSXElement, JSXIdentifier } from "jscodes
 /** Find all JSX elements with a specific lowercase tag name (e.g., "button"). */
 export function findJsxElementsByTag(
   j: JSCodeshift,
-  root: Collection<unknown>,
+  root: Collection<any>,
   tagName: string,
 ): Collection<JSXElement> {
   return root.find(j.JSXElement, {

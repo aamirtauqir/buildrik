@@ -24,7 +24,9 @@ describe("button codemod", () => {
     expect((result as string).trim()).toBe(expected);
   });
 
-  it("skips files in __tests__/", () => {
+  // Integration smoke test: confirms the codemod wires shouldSkipPath through
+  // (per-rule branch coverage lives in _lib/__tests__/skip-rules.test.ts).
+  it("honors shouldSkipPath (smoke: __tests__/ path)", () => {
     const input = `<button>Test</button>`;
     const result = transform(
       { path: "/fake/src/editor/__tests__/Foo.test.tsx", source: input },
@@ -38,26 +40,6 @@ describe("button codemod", () => {
     const input = `export const x = 1;`;
     const result = transform(
       { path: "/fake/src/editor/Foo.tsx", source: input },
-      { jscodeshift: jscodeshift.withParser("tsx"), j: jscodeshift.withParser("tsx"), stats: () => undefined, report: () => undefined },
-      {},
-    );
-    expect(result).toBe(input);
-  });
-
-  it("skips files in shared/vibcoder/ (wrapper layer would self-recurse)", () => {
-    const input = `<button>Vibcoder</button>`;
-    const result = transform(
-      { path: "/fake/src/editor/shared/vibcoder/Button.tsx", source: input },
-      { jscodeshift: jscodeshift.withParser("tsx"), j: jscodeshift.withParser("tsx"), stats: () => undefined, report: () => undefined },
-      {},
-    );
-    expect(result).toBe(input);
-  });
-
-  it("skips co-located .test.tsx files (tests own their JSX)", () => {
-    const input = `<button>Test</button>`;
-    const result = transform(
-      { path: "/fake/src/editor/canvas/Foo.test.tsx", source: input },
       { jscodeshift: jscodeshift.withParser("tsx"), j: jscodeshift.withParser("tsx"), stats: () => undefined, report: () => undefined },
       {},
     );

@@ -17,7 +17,7 @@ import type { JSCodeshift, Collection, ImportDeclaration } from "jscodeshift";
  */
 export function ensureNamedImport(
   j: JSCodeshift,
-  root: Collection<unknown>,
+  root: Collection<any>,
   importName: string,
   fromPath: string,
 ): void {
