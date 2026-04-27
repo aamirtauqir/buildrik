@@ -445,6 +445,131 @@ Master gallery index updated at `packages/editor/src/preview/vibcoder-index.html
 
 ## Phase 4 findings (chrome re-port)
 
+**Status:** SHIPPED 2026-04-28. M8 milestone closed.
+**Scope:** Adapter shim layer for legacy `packages/editor/src/shared/ui/` primitives. Path-redirection contract — chrome consumers keep `@/shared/ui/<X>` imports while the shim translates props to vibcoder underneath.
+**Goal:** Establish gate-keeper layer for vibcoder adoption without rewriting consumers. Phase 5 deletes shims after consumer rewrites.
+
+### T-by-T summary
+
+| Task | Commit(s) | Outcome |
+|---|---|---|
+| **T1** Button canary + Phase 4 infrastructure | `c7c870d`, polish `93d57c2` | First adapter shim. Established `_lib/` codemod helpers (`import-swap`, `skip-rules`, `jsx-query`). 1 shim, 1 codemod, baseline test pattern. |
+| **T2** Form atoms (Input, Select, Switch, Checkbox, Slider) | `3faca35`, polish `51810c6` | 5 shims. T2 polish extracted `_lib/codemod-factory.ts` — eliminated boilerplate from per-codemod files. Checkbox kept bespoke (dual-scope label/wrapper). |
+| **T3** Display atoms (Spinner, Skeleton, Icon, IconButton, Kbd, Badge, Tag) | `6257928`, spec correction `02de76f` | 7 shims initial. Spec correction at T3.5 — Spinner/Kbd/IconButton/Skeleton bumped from keep-legacy to bridge after audit found vibcoder coverage adequate. |
+| **T4** Molecules (Card, Tabs, FormField, PanelHeader) | `a1492a4`, `2ad4b26`, `d5d657c`, `87b155a`, fix `cd5b080` | 4 shims. Card→`bd-card`, Tabs→Radix.Tabs-via-vibcoder, FormField→`bd-form-field`, PanelHeader→`surface-head` (closes the keep-as-extension entry from triage). T4.A fix scoped onClick to `clickable=true` only. |
+| **T5** Modal canary | `3028d84`, `2ad8c65`, `cfe0289` | Highest-blast-radius shim. Three sub-tasks: Modal adapter shim, codemod with import-path forward-guard, 23 adapter contract tests. Radix.Dialog handles focus trap + scroll lock — `useFocusTrap` dropped on the Modal path. |
+| **T6** Popover hybrid + plan amendment | T6.A `a065870`, plan amendment `37b3a47` | T6.1 inventory caught vibcoder Popover/Tooltip/Toast NOT being Radix-backed in Phase 3. Popover shipped as a hybrid (vibcoder CSS surface + retained `useFocusTrap`). Tooltip + Toast deferred to Phase 5. T7 plan amended to retain `useFocusTrap` and add Tooltip/Toast to the triage matrix. |
+| **T7** Extensions triage | matrix `3cca170`, JSDoc stamps `aa77927` | 19-entry matrix. 0 new shims (PanelHeader@T4.D, SliderInput@T2.E, Icon@T3.C already shipped in earlier tasks). 17 keep-as-extension JSDoc stamps with per-entry Phase 5 disposition. |
+| **T8** M8 milestone close | this commit | Doc consolidation, memory file, bundle delta documentation, stale-comment cleanup in Modal.tsx. |
+
+### Codemod toolchain
+
+**Location:** `packages/editor/scripts/codemods/phase4/` (19 codemods + 19 test files in `__tests__/`).
+**Shared helpers:** `packages/editor/scripts/codemods/_lib/` — `codemod-factory.ts` (T2 polish extraction), `import-swap.ts`, `skip-rules.ts`, `jsx-query.ts`.
+
+| Adoption | Codemods |
+|---|---|
+| Factory-based (`codemod-factory.ts`) | button, badge, card, form-field, icon, icon-button, input, kbd, modal, panel-header, popover, select, skeleton, slider, spinner, switch, tabs, tag (18 of 19) |
+| Bespoke | checkbox (dual-scope: label sibling + wrapper) |
+
+**Test pattern:** Each codemod has fixture-driven tests in `__tests__/<name>.codemod.test.ts`. Cumulative codemod test count: ~140 across 19 files.
+
+**Adapter contract tests:** Each shim has companion `<Component>.adapter.test.tsx` in `src/shared/ui/__tests__/` — 21 adapter test files at HEAD, validating prop translation, untranslatable-prop drops, and behavior parity. Cumulative: 329 tests across the codemod + adapter contract suites combined (45 test files).
+
+### Adapter shim strategy table
+
+Per-primitive disposition at HEAD. "Bridge" = full prop translation; "Hybrid" = vibcoder CSS + retained legacy behavior; "Keep-legacy" = JSDoc stamp only.
+
+| Primitive | Strategy | Vibcoder target | Phase 5 disposition |
+|---|---|---|---|
+| Button | bridge | `bd-btn` | shim deletion after consumer rewrite |
+| Input | bridge | `bd-input` | shim deletion |
+| Select | bridge | `bd-select` | shim deletion |
+| Switch | bridge | `bd-switch` | shim deletion |
+| Checkbox | bridge | `bd-checkbox` | shim deletion |
+| Slider | bridge | `bd-slider` | shim deletion |
+| Spinner | bridge | `bd-spinner` | shim deletion |
+| Skeleton | bridge | `bd-skeleton` | shim deletion |
+| Icon | bridge | `bd-icon` | shim deletion (distinct from Icons.tsx glyph palette) |
+| IconButton | bridge | `bd-icon-btn` | shim deletion |
+| Kbd | bridge | `bd-kbd` | shim deletion |
+| Badge | bridge | `bd-badge` | shim deletion |
+| Tag | bridge | `bd-tag` | shim deletion |
+| Card | bridge | `bd-card` | shim deletion |
+| Tabs | bridge | `bd-tabs` (Radix.Tabs) | shim deletion |
+| FormField | bridge | `bd-form-field` | shim deletion |
+| PanelHeader | bridge | `surface-head` | shim deletion (closes keep-as-extension from T7 matrix) |
+| SliderInput | re-export → Slider | `bd-slider` | re-export removal after consumers rename |
+| TextInput | re-export → Input | `bd-input` | re-export removal after consumers rename |
+| Modal | bridge | `bd-modal` (Radix.Dialog) | shim deletion |
+| Popover | hybrid | `bd-popover` + retained `useFocusTrap` | hybrid → bridge after vibcoder gets Radix.Popover backing |
+| Tooltip | keep-legacy | (none — vibcoder Tooltip is passive surface only) | port after vibcoder Tooltip gets Radix.Tooltip backing |
+| Toast | keep-legacy | (none — vibcoder Toast lacks queue/provider) | port if NotificationCenter organism gains queue capability |
+| Accordion | keep-legacy | (none in alphabet) | re-evaluate with vibcoder Disclosure/Accordion primitive |
+| ColorSwatch | keep-legacy | (none — distinct from ColorPicker/ColorTrigger) | re-evaluate |
+| ContextMenu | keep-legacy | (none — needs Radix.ContextMenu install) | port after Radix.ContextMenu added |
+| CopyButton | keep-legacy | (decorative composition over Button) | rewrite as composition over Button shim |
+| ErrorMessage | keep-legacy | (none — Buildrik a11y shape) | re-evaluate |
+| ErrorState | keep-legacy | (close to vibcoder EmptyState but not 1:1) | re-evaluate |
+| HelpTooltip | keep-legacy | (cascades from Tooltip) | port with Tooltip in same commit |
+| Icons.tsx | keep-legacy | (Buildrik domain glyph palette over Lucide) | stays — domain-specific, not a primitive |
+| InfoBanner | keep-legacy | (triple export — InfoBanner + Tip + WarningBanner) | re-evaluate |
+| PremiumBadge | keep-legacy | (Buildrik plan/billing variant of Badge) | rewrite as composition over Badge shim |
+| QuickSwitcher | keep-legacy | (orchestration: Modal + cmdk + ranking) | stays — orchestration layer above primitives |
+| Resizable | keep-legacy | (drag-handle utility) | stays |
+| TreeView | keep-legacy | (generic data component) | stays |
+| UpgradeGate | keep-legacy | (plan-gating business logic) | stays — not a primitive |
+| UpgradeModal | keep-legacy | (composition: Modal + PremiumBadge + 403 listener) | inherits Modal swap automatically; rewrite when PremiumBadge ports |
+
+### Gate movement
+
+| Gate | Pre-Phase-4 | Post-Phase-4 | Notes |
+|---|---|---|---|
+| Gate 23 (shim layer is gate-keeper for mapped primitives) | not present | PASS | Wired in Phase 4. Forbids chrome consumers reaching into `@/editor/shared/vibcoder` directly for primitives that have a shim. |
+| Gate 24 (inline `<button>/<input>/<select>/<textarea>` in editor/) | 264 | 100 (baseline 100) | Ratcheted 264 → 100 across Phase 4 (-164 / -62%). Codemods migrated chrome consumers to shim imports; bare elements that remain are non-chrome (engine/canvas/etc.) or test fixtures. |
+| All other DS gates | green | green | No regressions. Gate 21 (no vibcoder-shape defs outside vendored components) holds. |
+
+### Cumulative metrics (T1–T8)
+
+```
+Commits:                20  (21d80d0 → HEAD inclusive of T8)
+Files changed (cumulative diff):  325
+Insertions:             ~7,704
+Deletions:              ~3,113
+Adapter shims (PHASE 5 DELETE markers):  19
+Keep-as-extension stamps (T7):           17
+Codemods (factory + bespoke):            19  (18 factory + 1 bespoke)
+Codemod test files:                      19
+Adapter contract test files:             21
+Cumulative tests passing (codemod + adapter):  329 across 45 files
+Gate 24 ratchet:        264 → 100  (-164 / -62%)
+Gate 23 added:          PASS at HEAD
+```
+
+### Bundle delta
+
+Measured via `vite build` on baseline (pre-Phase-4 = `21d80d0~1` = `845f160`) vs HEAD (post-T7 = `aa77927`).
+
+```
+Baseline JS total:  2,490,279 B  (gzip main chunk:  524.52 KB)
+HEAD JS total:      2,600,381 B  (gzip main chunk:  558.21 KB)
+Delta:              +110,102 B   (+4.4% raw / +6.4% gzip on main chunk)
+```
+
+The growth concentrates in the main `index-*.js` chunk (1,847 KB → 1,959 KB). Source: vibcoder primitives + their Radix dependencies pulled into production via the new shim layer (Modal → `@radix-ui/react-dialog`, Tabs → `@radix-ui/react-tabs`, Popover hybrid → `@radix-ui/react-popover` references via vibcoder, plus cmdk transitive references via overlay infra).
+
+This is a one-time adoption cost for Radix-backed primitives. Phase 5 consumer rewrites do not add code; they delete shim layers, so bundle should plateau or shrink slightly post-Phase-5. The +4.4% delta is documented and accepted — Phase 3's "zero delta" claim was specific to galleries-only landing; Phase 4 is the first phase that pulls vibcoder code into chrome consumers' production graph.
+
+### Plan-vs-reality findings
+
+**T3 spec correction (`02de76f`).** Initial T3 plan classified Spinner, Kbd, IconButton, and Skeleton as keep-legacy. Audit during T3.5 found vibcoder coverage was adequate for all four — they bumped to bridge. Lesson: per-primitive triage decisions need validation against the latest vibcoder alphabet, not the design-time decision table.
+
+**T6.1 inventory (Popover/Tooltip/Toast not Radix-backed).** T6 originally scoped 3 shims. Inventory step found vibcoder Popover/Tooltip/Toast in Phase 3 are passive CSS surfaces — no Radix.Popover/Tooltip/Toast backing yet. T6.A shipped Popover as a hybrid (vibcoder CSS + retained `useFocusTrap`). Tooltip + Toast deferred to Phase 5. Lesson: vibcoder phase claims need a "what's actually shipped" audit step before consumption.
+
+**T7 plan amendment (`37b3a47`).** Original T7 plan called for `useFocusTrap` deletion. After T6.A hybrid kept the hook, T7 was amended to retain `useFocusTrap` and document the call-site dependency. The Modal.tsx docstring carried a stale claim that "T7 deletes useFocusTrap" — fixed in T8 to match reality.
+
+**T7 zero new shims.** All keep-as-extension candidates that originally hinted at potential ports (PanelHeader, SliderInput, Icon-atom-vs-Icons.tsx) were already shipped in earlier T-tasks. T7 reduced to documentation: 17 JSDoc stamps + the triage matrix. Lesson: when triage is the last task, the eligible-port count is usually 0 by virtue of earlier tasks doing the work.
+
 ### T7 extensions triage matrix
 
 Inspected all 19 entries in `packages/editor/src/shared/ui/` (PanelHeader counted, plus the original 18). Direct-import counts (`@/shared/ui/<X>`) measured at HEAD via grep over `packages/editor/src`.
@@ -508,25 +633,43 @@ Modal previously used the hook; T5 dropped it because Radix.Dialog handles focus
 
 ### Phase 5 handoff list
 
-Phase 5 (chrome integration / vibcoder primitive upgrades) should reconsider the following for re-port:
+Phase 5 (chrome integration / vibcoder primitive upgrades) inherits the following work in three buckets:
 
-1. **Tooltip** — when vibcoder Tooltip gains Radix.Tooltip backing, the legacy extension can be deleted via codemod. Estimate: 7 consumers → 1 codemod commit.
-2. **Popover (full bridge)** — when vibcoder Popover gains Radix.Popover backing, delete `useFocusTrap` + drop the hybrid shim's behavior shell.
-3. **Toast** — only revisit if NotificationCenter organism gains a queue / provider API matching the legacy Toast surface contract (id, dedupe, auto-dismiss). Otherwise legacy stays.
-4. **ContextMenu** — Radix.ContextMenu install would unblock a vibcoder ContextMenu primitive; until then legacy stays.
-5. **HelpTooltip** — cascades from Tooltip. When Tooltip ports, port HelpTooltip in the same commit.
+**Bucket A — Hybrid simplification (delete legacy behavior shells after vibcoder Radix upgrades).**
 
-### Cumulative T1–T7 summary
+1. **Popover (full bridge).** When vibcoder Popover gains Radix.Popover backing, delete `useFocusTrap` + drop the hybrid shim's behavior shell. Single load-bearing call site at `packages/editor/src/shared/ui/Popover.tsx:62` — see `useFocusTrap retention rationale` below.
 
-| Task | Component count | Test count delta | Codemod count |
-|---|---:|---:|---:|
-| T1 (Button) | 1 | +X | 1 |
-| T2 (form atoms) | 5 | +X | 5 |
-| T3 (display atoms) | 7 | +X | 7 |
-| T4 (molecules) | 4 | +X | 4 |
-| T5 (Modal) | 1 | +23 | 1 |
-| T6.A (Popover hybrid) | 1 | +X | 1 |
-| T7 (triage, no new ports) | 0 | 0 | 0 |
+**Bucket B — Keep-legacy → bridge ports (when vibcoder gets the missing Radix backing).**
 
-T7 outcome: zero new shims. All eligible ports already shipped in earlier tasks (PanelHeader@T4.D, SliderInput@T2.E, Icon atom@T3.C). Remaining 17 extensions documented as keep-as-extension with explicit Phase 5 disposition per entry.
+2. **Tooltip.** When vibcoder Tooltip gains Radix.Tooltip backing, the legacy extension can be deleted via codemod. Estimate: 7 consumers → 1 codemod commit.
+3. **Toast.** Only revisit if NotificationCenter organism gains a queue / provider API matching the legacy Toast surface contract (id, dedupe, auto-dismiss). Otherwise legacy stays. 26 consumers — highest dependency count of any keep-legacy extension.
+4. **ContextMenu.** Radix.ContextMenu install would unblock a vibcoder ContextMenu primitive; until then legacy stays. 1 consumer.
+5. **HelpTooltip.** Cascades from Tooltip. When Tooltip ports, port HelpTooltip in the same commit. 2 consumers.
+
+**Bucket C — Adapter shim deletion (after consumer rewrites land).**
+
+The 19 adapter shims (PHASE 5 DELETE markers in `packages/editor/src/shared/ui/`) are deleted once chrome consumers swap their `@/shared/ui/<X>` imports for `@/editor/shared/vibcoder` direct imports. This is the bulk of Phase 5 — codemod-driven consumer rewrites, then shim file removal. Order suggestion: T1-T4 atoms/molecules first (lowest blast radius), then T5 Modal (highest), then T6 Popover (after the Radix upgrade in Bucket A).
+
+**Bucket D — Composition rewrites (no codemod, manual review).**
+
+6. **CopyButton** — rewrite as composition over Button shim during shim deletion pass.
+7. **PremiumBadge** — rewrite as composition over Badge shim.
+8. **UpgradeModal** — already composes Modal shim transitively; rewrite when PremiumBadge ports.
+
+**Bucket E — Stays as extension permanently.**
+
+Icons.tsx (domain glyph palette), QuickSwitcher (orchestration layer), Resizable, TreeView, UpgradeGate, ErrorBoundary class component, InfoBanner triple-export. These are not primitive ports; they are Buildrik domain code that composes primitives.
+
+### Acceptance summary (Phase 4 close-out)
+
+- [x] T1–T7 shipped: 19 adapter shims, 17 keep-as-extension JSDoc stamps
+- [x] Codemod toolchain reusable (factory + 19 codemods + 19 codemod test files)
+- [x] Adapter contract tests (21 files); cumulative 329 tests passing across 45 files
+- [x] Gate 23 wired (shim layer is gate-keeper)
+- [x] Gate 24 ratcheted 264 → 100 (-62%)
+- [x] All other DS gates green
+- [x] `useFocusTrap` retained per T6.1 inventory + T7 amendment (`37b3a47`)
+- [x] Modal.tsx stale comment fixed (T8)
+- [x] Bundle delta documented (+4.4% raw / +6.4% gzip-main — one-time Radix adoption cost)
+- [x] Phase 5 handoff list captured in 5 buckets above
 

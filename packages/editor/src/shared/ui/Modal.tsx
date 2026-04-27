@@ -22,9 +22,11 @@
  *
  * Untranslatable: none. Strategy is "compose-or-style" not "throw".
  *
- * Focus trap migration: useFocusTrap hook NO LONGER USED here. Radix.Dialog
- * provides internal focus trap. T7 deletes useFocusTrap after T6 Popover
- * also migrates (only 2 call sites total — Modal + Popover).
+ * Focus trap migration: useFocusTrap hook is NOT used in this shim. Radix.Dialog
+ * provides internal focus trap. (T6.1 inventory found vibcoder Popover lacks
+ * Radix backing, so the Popover shim retains useFocusTrap. Phase 5 deletes the
+ * hook after vibcoder Popover gets its Radix.Popover upgrade — see T7 plan
+ * amendment commit `37b3a47`.)
  *
  * Body scroll lock: Radix.Dialog handles via overlay scroll-locking. The
  * legacy `document.body.style.overflow = "hidden"` effect is removed.

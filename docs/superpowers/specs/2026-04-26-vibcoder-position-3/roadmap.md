@@ -1,8 +1,15 @@
 # Vibcoder Position 3 Integration — Execution Roadmap
 
-**Date:** 2026-04-26
+**Date:** 2026-04-26 (last updated 2026-04-28 at M8 close)
 **Companion:** `design.md` (this folder)
 **Total scope:** ~6-8 weeks dispatched CC + ~10-12 hr human QA
+
+**Phase numbering note (post-M8):** The execution plan renumbered late in the
+arc. What this roadmap originally called "Phase 4 — Layouts" was deferred; the
+chrome re-port (originally Phase 5) shipped as **Phase 4 chrome re-port** at
+M8 (2026-04-28). The layout phase folds into Phase 5 chrome integration where
+layout primitives land alongside consumer rewrites. See `poc-findings.md`
+Phase 4 section for the actual delivered scope.
 
 ## Phase dependency graph
 
@@ -302,17 +309,33 @@ Two batches:
 - **Most-needed:** sidebar-shell, stack, cluster
 - **Universal:** grid, center, frame, switcher
 
-## Phase 5 — Re-port existing 37 (~6 hr CC review + per-primitive)
+## Phase 5 — Chrome integration (post-M8 inheritance)
 
-Codemod processes each existing primitive. Manual review per primitive (~10 min
-each). Buildrik-specifics (Accordion, ColorSwatch, ContextMenu, CopyButton,
-ErrorMessage, ErrorState, HelpTooltip, Icons, InfoBanner, PanelHeader,
-PremiumBadge, QuickSwitcher, Resizable, SliderInput, Tooltip, TreeView,
-UpgradeGate, UpgradeModal) audited individually:
+Phase 4 (chrome re-port) shipped at M8 (2026-04-28) — 19 adapter shims (`PHASE 5
+DELETE` markers in `packages/editor/src/shared/ui/`) + 17 keep-as-extension JSDoc
+stamps. Phase 5 inherits the consumer-rewrite + shim-deletion work in 5 buckets
+(see `poc-findings.md` Phase 5 handoff list for the canonical version):
 
-- Does vibcoder cover this concept under different name?
-- If yes: port + alias names
-- If no: keep as Emotion (justified exception, document in SCOPE.md Extensions)
+**Bucket A — Hybrid simplification.** Vibcoder Popover gains Radix.Popover backing
+→ delete `useFocusTrap` + drop hybrid behavior shell from `Popover.tsx` shim.
+
+**Bucket B — Keep-legacy → bridge ports.** Tooltip (7 consumers), Toast
+(26 consumers — only if NotificationCenter gains queue/provider), ContextMenu
+(needs Radix.ContextMenu install), HelpTooltip (cascades from Tooltip).
+
+**Bucket C — Adapter shim deletion.** Codemod-driven consumer rewrites swap
+`@/shared/ui/<X>` imports for direct vibcoder imports; then delete the 19 shim
+files. Order: atoms/molecules first (T1–T4), then Modal (T5), then Popover (T6 —
+after Bucket A's Radix upgrade).
+
+**Bucket D — Composition rewrites.** CopyButton, PremiumBadge, UpgradeModal —
+manual review, not codemod-eligible.
+
+**Bucket E — Stays as extension permanently.** Icons.tsx (domain glyph palette),
+QuickSwitcher (orchestration), Resizable, TreeView, UpgradeGate, ErrorBoundary,
+InfoBanner. Not primitive ports; Buildrik domain code.
+
+**Open issue:** #93 PopoverArrow reconciled here (Phase 3 deferred).
 
 ## Phase 6 — Visual regression infrastructure (~1 week dispatched)
 
@@ -329,10 +352,11 @@ UpgradeGate, UpgradeModal) audited individually:
 | **M2: POC validated** | Phase 0 complete | Decide whether to proceed Phase 1 |
 | **M3: Atoms complete** | Phase 1 complete | All 25 atoms in gallery, gates green |
 | **M4: Molecules complete** | Phase 2 complete | Composition working |
-| **M5: Migration complete** | Phase 3 complete | Codex routing remains advisory through Phase 5 (per Pass 6 finding #15) |
-| **M6: Layout coverage** | Phase 4 complete | Existing tabs use new layouts |
-| **M7: Re-port complete** | Phase 5 complete | Single architecture across all primitives |
-| **M8: Visual regression live** | Phase 6 complete | Pixel-level drift detection |
+| **M5: Organisms complete** | Phase 3 complete | Codex routing remains advisory through chrome re-port (per Pass 6 finding #15) — SHIPPED 2026-04-27 (`bcfeda1`+`d146bb0`+organism close) |
+| **M6: Layout coverage** | (merged into Phase 5 chrome integration) | Layout primitives ship alongside consumer rewrites |
+| **M7: Re-port complete** | (renumbered → M8 — see Phase numbering note) | Adapter shim layer landed, consumer rewrites pending in Phase 5 |
+| **M8: Phase 4 chrome re-port shipped** | T1–T8 complete | 19 adapter shims + 19 codemods + 17 keep-as-extension stamps + Gate 23 wired + Gate 24 ratcheted 264→100 — SHIPPED 2026-04-28 |
+| **M9: Visual regression live** | Phase 6 complete (post-Phase-5) | Pixel-level drift detection |
 
 ## Risk register (post-Pass 6)
 

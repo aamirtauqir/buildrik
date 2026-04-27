@@ -87,5 +87,5 @@ For execution start:
 - [x] Phase 1 atoms — fan-out complete (23 atoms across 6 batches)
 - [x] Phase 2 molecules — fan-out complete (18 molecules / 46 wrappers across 5 batches)
 - [x] Phase 3 organisms — fan-out complete (16 organisms / ~54 React exports across 60 cumulative wrapper files / 4 batches; M5 milestone 2026-04-27, see `poc-findings.md` Phase 3 section)
-- [ ] Phase 4 — re-port existing 37 chrome components (queued; design pending)
-- [ ] Phase 5 — chrome integration (Floating-UI + first production consumers; #93 PopoverArrow reconciled here)
+- [x] Phase 4 chrome re-port — adapter shim layer complete (19 shims with `PHASE 5 DELETE` markers, 19 codemods, 17 keep-as-extension JSDoc stamps, Gate 23 wired, Gate 24 ratcheted 264→100; M8 milestone 2026-04-28, see `poc-findings.md` Phase 4 section)
+- [ ] Phase 5 — chrome integration (consumer rewrites + shim deletion + vibcoder Radix upgrades for Tooltip/Popover/Toast/ContextMenu; #93 PopoverArrow reconciled here)
