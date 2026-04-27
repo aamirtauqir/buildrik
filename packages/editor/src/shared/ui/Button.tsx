@@ -16,7 +16,7 @@
  */
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode, type CSSProperties } from "react";
 import { Button as VibcoderButton } from "@/editor/shared/vibcoder";
-import { Spinner } from "./Spinner";
+import { Spinner } from "@/editor/shared/vibcoder/Spinner";
 
 export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "color"> {
   variant?: "primary" | "secondary" | "ghost" | "danger" | "publish";
@@ -44,7 +44,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         style={composedStyle}
         {...rest}
       >
-        {loading && <Spinner size={size === "sm" ? 12 : 16} color="currentColor" />}
+        {loading && <Spinner size={size === "sm" ? "sm" : "lg"} />}
         {!loading && icon && iconPosition === "left" && icon}
         {children}
         {!loading && icon && iconPosition === "right" && icon}

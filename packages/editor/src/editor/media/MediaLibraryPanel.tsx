@@ -13,7 +13,7 @@ import type { MediaAsset, MediaAssetType, MediaViewMode } from "../../shared/typ
 import { Modal } from "@/shared/ui/Modal";
 import { Tabs } from "@/shared/ui/Tabs";
 import { Button } from "@/shared/ui/Button";
-import { Spinner } from "@/shared/ui/Spinner";
+import { Spinner } from "@/editor/shared/vibcoder/Spinner";
 import { useMediaManager } from "../shell/hooks";
 import { AssetCard } from "./AssetCard";
 import { mediaLibraryStyles as styles } from "./MediaLibraryStyles";

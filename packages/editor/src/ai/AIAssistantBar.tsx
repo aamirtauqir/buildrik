@@ -7,7 +7,7 @@
 
 import * as React from "react";
 import type { Composer } from "../engine";
-import { Spinner } from "../shared/ui/Spinner";
+import { Spinner } from "@/editor/shared/vibcoder/Spinner";
 import { useToast } from "../shared/ui/Toast";
 import { devError } from "../shared/utils/devLogger";
 import { generateContent, generateLayout } from "../shared/utils/openai";
@@ -125,7 +125,7 @@ export const AIAssistantBar: React.FC<AIAssistantBarProps> = ({ isOpen, onClose,
         />
         {isGenerating ? (
           <div style={loaderStyles}>
-            <Spinner size={16} />
+            <Spinner size="sm" />
           </div>
         ) : (
           <div style={shortcutStyles}>⏎</div>

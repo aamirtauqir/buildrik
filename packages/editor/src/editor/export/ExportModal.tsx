@@ -12,7 +12,7 @@ import { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "../../shared/types/expor
 import { Modal } from "@/shared/ui/Modal";
 import { Button } from "@/shared/ui/Button";
 import { Tabs } from "@/shared/ui/Tabs";
-import { Spinner } from "@/shared/ui/Spinner";
+import { Spinner } from "@/editor/shared/vibcoder/Spinner";
 import { devError } from "../../shared/utils/devLogger";
 import { CodePreview } from "./CodePreview";
 import { FormatGrid, OptionsPanel } from "./ExportOptions";

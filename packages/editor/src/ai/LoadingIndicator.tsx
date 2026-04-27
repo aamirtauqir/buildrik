@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { Spinner } from "@/shared/ui/Spinner";
+import { Spinner } from "@/editor/shared/vibcoder/Spinner";
 
 export interface LoadingIndicatorProps {
   message?: string;

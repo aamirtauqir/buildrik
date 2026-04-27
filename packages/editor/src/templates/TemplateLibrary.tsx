@@ -10,7 +10,7 @@ import type { Composer } from "../engine";
 import { STORAGE_KEYS } from "../shared/constants/config";
 import { InputField } from "../shared/forms";
 import { Modal } from "@/shared/ui/Modal";
-import { Spinner } from "@/shared/ui/Spinner";
+import { Spinner } from "@/editor/shared/vibcoder/Spinner";
 import { Tabs } from "@/shared/ui/Tabs";
 import { MyTemplates } from "./MyTemplates";
 import { SectionTemplates, type SectionTemplate } from "./SectionTemplates";

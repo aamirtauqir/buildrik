@@ -48,7 +48,6 @@ export {
   Accordion,
   ContextMenu,
   useContextMenu,
-  Spinner,
   Badge,
   Popover,
 } from "./components";
