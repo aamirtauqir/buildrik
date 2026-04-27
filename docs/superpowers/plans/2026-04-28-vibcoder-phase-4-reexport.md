@@ -1391,7 +1391,10 @@ T6 scope (per T6.1 inventory):
 **Files:**
 - Modify: `docs/superpowers/specs/2026-04-26-vibcoder-position-3/poc-findings.md` (NEW Phase 4 section subheader: "T7 extensions triage")
 - Optional creates: per-extension shim files for any port-to-X decisions
-- Optional deletes: `packages/editor/src/shared/hooks/useFocusTrap.ts` (if T5 + T6 killed both call sites)
+
+**Plan amendment (post-T6.1 inventory, 2026-04-27):** vibcoder Popover/Tooltip/Toast are NOT Radix-backed in Phase 3 (verified via `editor/shared/vibcoder/Popover.tsx` — passive surface only). T6 shipped Popover as a HYBRID shim (legacy useFocusTrap + outside-click + Escape preserved; only rendered surface swapped to vibcoder for CSS skin). Cascading impact:
+- `useFocusTrap` is **NOT deleted** — still load-bearing for the Popover shim. Phase 5 deletes it after vibcoder Popover gets a Radix.Popover upgrade.
+- Tooltip + Toast deferred from T6 → T7 triage (matrix rows updated below).
 
 ### T7.A — Extensions triage matrix
 
@@ -1405,7 +1408,7 @@ For EACH of the 18 extensions in `shared/ui/`:
 | CopyButton | keep-as-extension | Decorative composition over Button — Buildrik-specific UX |
 | ErrorMessage | keep-as-extension OR port-to-X | TBD per inspection |
 | ErrorState | keep-as-extension | Empty-state shape; vibcoder EmptyState close but not 1:1 |
-| HelpTooltip | port-to-X (Tooltip if T6 included) OR keep-as-extension | Depends on T6 outcome |
+| HelpTooltip | depends on Tooltip row decision | If Tooltip ships hybrid bridge → port-to-X via shim; else keep-as-extension |
 | Icons | port-to-X (Icon atom) | Variant of Icon atom — likely re-export |
 | InfoBanner | keep-as-extension | No vibcoder banner molecule |
 | PanelHeader | port-to-X (surface-head) — already DONE in T4.D | Mark as "shipped at T4.D" |
@@ -1413,7 +1416,8 @@ For EACH of the 18 extensions in `shared/ui/`:
 | QuickSwitcher | keep-as-extension | Composes Modal + cmdk; bespoke UX |
 | Resizable | keep-as-extension | No vibcoder equivalent — utility wrapper |
 | SliderInput | port-to-X (slider atom) — already DONE in T2.E | Mark as "shipped at T2.E" |
-| Tooltip | DEPENDS on T6 — if T6 shipped Tooltip: port-to-X; else keep-as-extension | T6.1 outcome decides |
+| Tooltip | hybrid bridge OR keep-as-extension | T6.1 found vibcoder Tooltip is presentation-only (no hover-intent, delay, anchoring). Hybrid bridge possible (legacy behavior + vibcoder CSS skin) — T7 inspector decides per usage volume |
+| Toast | keep-as-extension | Phase 3 dropped @radix-ui/react-toast at commit 0fc750c. NotificationCenter pivoted to panel; queue/provider API has no vibcoder parity. Phase 5 reconsiders if NotificationCenter organism gains queue capability |
 | TreeView | keep-as-extension | No vibcoder equivalent |
 | UpgradeGate | keep-as-extension | Buildrik-specific business logic |
 | UpgradeModal | port-to-X (Modal shim from T5) | Composes Modal + business logic — likely already inherits |
@@ -1430,20 +1434,17 @@ done
 
 Use T1 template (codemod + shim + contract tests). For each KEEP decision: add JSDoc note at top of the legacy file documenting "Phase 4 T7 triage: keep-as-extension because Y".
 
-- [ ] **Step 3: Delete useFocusTrap hook (if both call sites killed by T5 + T6)**
+- [ ] **Step 3: useFocusTrap hook — DEFER deletion to Phase 5**
+
+Per T6.1 inventory + amendment above: vibcoder Popover is not Radix-backed, so the T6 hybrid shim still uses `useFocusTrap`. Verify call sites with:
 
 ```bash
 cd /Users/shahg/Desktop/pencil/buildrik && grep -rn "useFocusTrap" packages/editor/src --include="*.tsx" --include="*.ts" | grep -v "useFocusTrap.ts\|test"
 ```
 
-If output is empty: hook is dead. Delete it:
-```bash
-rm packages/editor/src/shared/hooks/useFocusTrap.ts
-# Update barrel:
-# packages/editor/src/shared/hooks/index.ts — remove the useFocusTrap export line
-```
+Expected: at least the Popover shim (`packages/editor/src/shared/ui/Popover.tsx`). Possibly Tooltip shim if T7 ships it as hybrid bridge.
 
-If output non-empty: hook still has consumers. Document in T7 commit + carry to M8.
+DO NOT delete the hook. Document in poc-findings.md Phase 4 section: "useFocusTrap retained — Popover shim load-bearing dependency. Phase 5 deletes after vibcoder Popover gets Radix.Popover upgrade."
 
 ### T7.B — Final T7 verification + commit
 
@@ -1459,16 +1460,19 @@ git add packages/editor/src/shared/ui/ \
 git add -u packages/editor/src/editor/
 
 git commit -m "$(cat <<'EOF'
-feat(vibcoder-phase-4): T7 extensions triage + useFocusTrap cleanup
+feat(vibcoder-phase-4): T7 extensions triage + T6 deferrals
 
 18 extensions triaged. Per-extension decision documented in poc-findings.md
 Phase 4 section: K port-to-X (shipped) + (18-K) keep-as-extension (JSDoc
 note added).
 
-useFocusTrap hook DELETED — T5 + T6 killed both call sites.
+T6 deferrals resolved:
+- Tooltip: [hybrid bridge OR keep-as-extension per inspection]
+- Toast: keep-as-extension (queue API gap; Phase 5 reconsiders)
 
-T6 deferral cleanup (if any): Toast/Tooltip keep-as-extension OR ports
-shipped here.
+useFocusTrap hook RETAINED — Popover shim load-bearing dependency
+(vibcoder Popover not Radix-backed in Phase 3). Phase 5 deletes after
+vibcoder Popover gets Radix.Popover upgrade.
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 EOF
