@@ -286,7 +286,10 @@ export class HistoryManager {
       checkpointIndex--;
     }
 
-    if (checkpointIndex < 0) throw new Error("No checkpoint found in history");
+    if (checkpointIndex < 0) {
+      console.warn("[HistoryManager] no checkpoint found at targetIndex", targetIndex);
+      return deepClone(this.undoStack[this.undoStack.length - 1]?.snapshot ?? ({} as ProjectData));
+    }
 
     const checkpoint = this.undoStack[checkpointIndex] as CheckpointEntry;
     let state = deepClone(checkpoint.snapshot);
