@@ -9,7 +9,12 @@ import DOMPurify from "dompurify";
 import { Sparkles, Send, Layout, FileText, RefreshCw, Plus, Copy, Bot, User, X } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../engine";
-import { Modal } from "@/shared/ui/Modal";
+import {
+  Modal,
+  ModalContent,
+  ModalClose,
+  OverlayMount,
+} from "@/editor/shared/vibcoder";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { generateContent, generateLayout, generateImagePrompt } from "../shared/utils/openai";
 import { AI_AVAILABLE } from "./AIAssistantBar";
@@ -322,7 +327,15 @@ export const AICopilot: React.FC<AICopilotProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="" size="lg">
+    <OverlayMount>
+      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+        <ModalContent size="lg">
+          <ModalClose aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </ModalClose>
+          <div className="bd-modal__body">
       <div style={styles.container}>
         {/* Header */}
         <div style={styles.header}>
@@ -461,7 +474,10 @@ export const AICopilot: React.FC<AICopilotProps> = ({
           </>
         )}
       </div>
-    </Modal>
+          </div>
+        </ModalContent>
+      </Modal>
+    </OverlayMount>
   );
 };
 

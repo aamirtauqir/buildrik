@@ -9,7 +9,13 @@ import { useTemplateManager } from "../editor/shell/hooks";
 import type { Composer } from "../engine";
 import { STORAGE_KEYS } from "../shared/constants/config";
 import { InputField } from "../shared/forms";
-import { Modal } from "@/shared/ui/Modal";
+import {
+  Modal,
+  ModalContent,
+  ModalTitle,
+  ModalClose,
+  OverlayMount,
+} from "@/editor/shared/vibcoder";
 import { Spinner } from "@/editor/shared/vibcoder/Spinner";
 import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
 import { MyTemplates } from "./MyTemplates";
@@ -270,7 +276,16 @@ export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Template Library" size="lg">
+    <OverlayMount>
+      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+        <ModalContent size="lg">
+          <ModalTitle>Template Library</ModalTitle>
+          <ModalClose aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </ModalClose>
+          <div className="bd-modal__body">
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <Tab id="library">📚 Library</Tab>
@@ -430,7 +445,10 @@ export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({
           }}
         />
       )}
-    </Modal>
+          </div>
+        </ModalContent>
+      </Modal>
+    </OverlayMount>
   );
 };
 

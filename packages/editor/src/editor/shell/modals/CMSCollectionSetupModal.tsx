@@ -15,7 +15,14 @@ import { X, Plus, Trash2, Check } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { Modal } from "../../../shared/ui/Modal";
+import {
+  Modal,
+  ModalContent,
+  ModalTitle,
+  ModalClose,
+  ModalFooter,
+  OverlayMount,
+} from "@/editor/shared/vibcoder";
 
 // =============================================================================
 // TYPES
@@ -346,13 +353,16 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
   );
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Create Collection"
-      size="md"
-      footer={footer}
-    >
+    <OverlayMount>
+      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+        <ModalContent size="lg">
+          <ModalTitle>Create Collection</ModalTitle>
+          <ModalClose aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </ModalClose>
+          <div className="bd-modal__body">
       {/* Step indicator */}
       <div style={s.stepIndicator}>
         <div style={s.step}>
@@ -545,7 +555,11 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           )}
         </div>
       )}
-    </Modal>
+          </div>
+          <ModalFooter>{footer}</ModalFooter>
+        </ModalContent>
+      </Modal>
+    </OverlayMount>
   );
 };
 

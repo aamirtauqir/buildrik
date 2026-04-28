@@ -9,7 +9,14 @@ import { Input } from "@/editor/shared/vibcoder/Input";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { Modal } from "../../../shared/ui/Modal";
+import {
+  Modal,
+  ModalContent,
+  ModalTitle,
+  ModalClose,
+  ModalFooter,
+  OverlayMount,
+} from "@/editor/shared/vibcoder";
 import { useToast } from "../../../shared/ui/Toast";
 import { devError } from "../../../shared/utils/devLogger";
 
@@ -84,22 +91,16 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Project Settings"
-      size="md"
-      footer={
-        <>
-          <Button variant="ghost" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={handleSave}>
-            Save Changes
-          </Button>
-        </>
-      }
-    >
+    <OverlayMount>
+      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+        <ModalContent size="lg">
+          <ModalTitle>Project Settings</ModalTitle>
+          <ModalClose aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </ModalClose>
+          <div className="bd-modal__body">
       <div style={containerStyles}>
         {/* Tabs */}
         <div style={tabBarStyles}>
@@ -189,7 +190,18 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
           )}
         </div>
       </div>
-    </Modal>
+          </div>
+          <ModalFooter>
+            <Button variant="ghost" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleSave}>
+              Save Changes
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </OverlayMount>
   );
 };
 

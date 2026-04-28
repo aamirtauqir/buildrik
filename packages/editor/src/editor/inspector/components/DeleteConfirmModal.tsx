@@ -7,7 +7,13 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import { Modal } from "../../../shared/ui/Modal";
+import {
+  Modal,
+  ModalContent,
+  ModalTitle,
+  ModalClose,
+  OverlayMount,
+} from "@/editor/shared/vibcoder";
 
 export interface DeleteConfirmModalProps {
   isOpen: boolean;
@@ -22,8 +28,25 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   onConfirm,
   elementLabel,
 }) => (
-  <Modal isOpen={isOpen} onClose={onClose} title="Delete Element" size="sm">
-    <div style={{ padding: "var(--buildrick-space-4)" }}>
+  <OverlayMount>
+    <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+      <ModalContent size="lg">
+        <ModalTitle>Delete Element</ModalTitle>
+        <ModalClose aria-label="Close modal">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            aria-hidden="true"
+          >
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </ModalClose>
+        <div className="bd-modal__body">
+          <div style={{ padding: "var(--buildrick-space-4)" }}>
       <p
         role="alert"
         style={{
@@ -67,5 +90,8 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
         </Button>
       </div>
     </div>
-  </Modal>
+        </div>
+      </ModalContent>
+    </Modal>
+  </OverlayMount>
 );

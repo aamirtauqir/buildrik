@@ -9,7 +9,13 @@ import { ShoppingBag, Package, Check } from "lucide-react";
 import * as React from "react";
 import { useState } from "react";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { Modal } from "../../shared/ui/Modal";
+import {
+  Modal,
+  ModalContent,
+  ModalTitle,
+  ModalClose,
+  OverlayMount,
+} from "@/editor/shared/vibcoder";
 
 export interface CollectionSetupModalProps {
   isOpen: boolean;
@@ -47,7 +53,16 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Set Up Products Collection" size="sm">
+    <OverlayMount>
+      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+        <ModalContent size="lg">
+          <ModalTitle>Set Up Products Collection</ModalTitle>
+          <ModalClose aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </ModalClose>
+          <div className="bd-modal__body">
       <div style={containerStyles}>
         <div style={iconContainerStyles}>
           <ShoppingBag size={48} style={{ color: "var(--buildrick-accent)" }} />
@@ -97,7 +112,10 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
           {isCreating ? "Creating..." : "Create Collection"}
         </Button>
       </div>
-    </Modal>
+          </div>
+        </ModalContent>
+      </Modal>
+    </OverlayMount>
   );
 };
 

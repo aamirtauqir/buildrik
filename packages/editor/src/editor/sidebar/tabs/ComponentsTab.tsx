@@ -12,7 +12,14 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { ChevronDown, Layers, Plus } from "lucide-react";
 import * as React from "react";
-import { ConfirmDialog, Modal } from "../../../shared/ui/Modal";
+import { ConfirmDialog } from "../../../shared/ui/ConfirmDialog";
+import {
+  Modal,
+  ModalContent,
+  ModalTitle,
+  ModalClose,
+  OverlayMount,
+} from "@/editor/shared/vibcoder";
 import { SkeletonListItem } from "@/shared/extensions/Skeleton";
 import { useToast } from "../../../shared/ui/Toast";
 import { PanelErrorState } from "../shared/PanelErrorState";
@@ -372,93 +379,114 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         confirmText="Delete"
         variant="danger"
       />
-      <Modal
-        isOpen={!!state.renameTarget}
-        onClose={() => state.setRenameTarget(null)}
-        title="Rename Component"
-        size="sm"
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <Input
-            type="text"
-            value={renameInput}
-            onChange={(e) => setRenameInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") state.confirmRename(renameInput);
-            }}
-            placeholder="Component name"
-            style={dialogInputStyles}
-          />
-          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-            <Button onClick={() => state.setRenameTarget(null)} style={dialogCancelBtnStyles}>
-              Cancel
-            </Button>
-            <Button onClick={() => state.confirmRename(renameInput)} style={dialogPrimaryBtnStyles}>
-              Rename
-            </Button>
-          </div>
-        </div>
-      </Modal>
-      <Modal
-        isOpen={!!state.variantPicker}
-        onClose={() => state.setVariantPicker(null)}
-        title={`Select Variant — ${state.variantPicker?.componentName ?? ""}`}
-        size="sm"
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {state.variantPicker?.variants.map((v) => {
-            const isCurrent = v.id === state.variantPicker?.currentVariantId;
-            return (
-              <Button
-                key={v.id}
-                onClick={() => state.confirmVariant(v.id)}
-                style={{
-                  padding: "10px 14px",
-                  borderRadius: "var(--bd-radius-sm)",
-                  fontSize: 13,
-                  cursor: "pointer",
-                  textAlign: "left" as const,
-                  background: isCurrent ? "var(--bd-accent-alpha-15)" : "var(--bd-bg-subtle)",
-                  border: isCurrent
-                    ? "1px solid var(--bd-accent)"
-                    : "1px solid var(--bd-border)",
-                  color: "var(--bd-fg-primary)",
-                }}
-              >
-                {v.name}
-                {isCurrent && (
-                  <span style={{ marginLeft: 8, fontSize: 12, color: "var(--bd-accent)" }}>
-                    (current)
-                  </span>
-                )}
-              </Button>
-            );
-          })}
-        </div>
-      </Modal>
-      <Modal
-        isOpen={!!state.duplicateInfo}
-        onClose={() => state.setDuplicateInfo(null)}
-        title="Duplicate Component"
-        size="sm"
-      >
-        <div style={{ color: "var(--bd-fg-secondary)", fontSize: 13, lineHeight: 1.5 }}>
-          <p style={{ margin: "0 0 12px" }}>
-            To duplicate &quot;{state.duplicateInfo?.name}&quot;:
-          </p>
-          <ol style={{ margin: 0, paddingLeft: 20 }}>
-            <li>Insert the component onto canvas (double-click)</li>
-            <li>Select the inserted instance</li>
-            <li>
-              Right-click → &quot;Create Component&quot; with name &quot;
-              {state.duplicateInfo?.copyName}&quot;
-            </li>
-          </ol>
-          <p style={{ margin: "12px 0 0", fontSize: 12, color: "var(--bd-fg-muted)" }}>
-            This ensures a proper deep copy with new element IDs.
-          </p>
-        </div>
-      </Modal>
+      <OverlayMount>
+        <Modal open={!!state.renameTarget} onOpenChange={(next) => !next && state.setRenameTarget(null)}>
+          <ModalContent size="lg">
+            <ModalTitle>Rename Component</ModalTitle>
+            <ModalClose aria-label="Close modal">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </ModalClose>
+            <div className="bd-modal__body">
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <Input
+                  type="text"
+                  value={renameInput}
+                  onChange={(e) => setRenameInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") state.confirmRename(renameInput);
+                  }}
+                  placeholder="Component name"
+                  style={dialogInputStyles}
+                />
+                <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                  <Button onClick={() => state.setRenameTarget(null)} style={dialogCancelBtnStyles}>
+                    Cancel
+                  </Button>
+                  <Button onClick={() => state.confirmRename(renameInput)} style={dialogPrimaryBtnStyles}>
+                    Rename
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </ModalContent>
+        </Modal>
+      </OverlayMount>
+      <OverlayMount>
+        <Modal open={!!state.variantPicker} onOpenChange={(next) => !next && state.setVariantPicker(null)}>
+          <ModalContent size="lg">
+            <ModalTitle>{`Select Variant — ${state.variantPicker?.componentName ?? ""}`}</ModalTitle>
+            <ModalClose aria-label="Close modal">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </ModalClose>
+            <div className="bd-modal__body">
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {state.variantPicker?.variants.map((v) => {
+                  const isCurrent = v.id === state.variantPicker?.currentVariantId;
+                  return (
+                    <Button
+                      key={v.id}
+                      onClick={() => state.confirmVariant(v.id)}
+                      style={{
+                        padding: "10px 14px",
+                        borderRadius: "var(--bd-radius-sm)",
+                        fontSize: 13,
+                        cursor: "pointer",
+                        textAlign: "left" as const,
+                        background: isCurrent ? "var(--bd-accent-alpha-15)" : "var(--bd-bg-subtle)",
+                        border: isCurrent
+                          ? "1px solid var(--bd-accent)"
+                          : "1px solid var(--bd-border)",
+                        color: "var(--bd-fg-primary)",
+                      }}
+                    >
+                      {v.name}
+                      {isCurrent && (
+                        <span style={{ marginLeft: 8, fontSize: 12, color: "var(--bd-accent)" }}>
+                          (current)
+                        </span>
+                      )}
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+          </ModalContent>
+        </Modal>
+      </OverlayMount>
+      <OverlayMount>
+        <Modal open={!!state.duplicateInfo} onOpenChange={(next) => !next && state.setDuplicateInfo(null)}>
+          <ModalContent size="lg">
+            <ModalTitle>Duplicate Component</ModalTitle>
+            <ModalClose aria-label="Close modal">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </ModalClose>
+            <div className="bd-modal__body">
+              <div style={{ color: "var(--bd-fg-secondary)", fontSize: 13, lineHeight: 1.5 }}>
+                <p style={{ margin: "0 0 12px" }}>
+                  To duplicate &quot;{state.duplicateInfo?.name}&quot;:
+                </p>
+                <ol style={{ margin: 0, paddingLeft: 20 }}>
+                  <li>Insert the component onto canvas (double-click)</li>
+                  <li>Select the inserted instance</li>
+                  <li>
+                    Right-click → &quot;Create Component&quot; with name &quot;
+                    {state.duplicateInfo?.copyName}&quot;
+                  </li>
+                </ol>
+                <p style={{ margin: "12px 0 0", fontSize: 12, color: "var(--bd-fg-muted)" }}>
+                  This ensures a proper deep copy with new element IDs.
+                </p>
+              </div>
+            </div>
+          </ModalContent>
+        </Modal>
+      </OverlayMount>
     </PanelShell>
   );
 };

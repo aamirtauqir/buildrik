@@ -553,7 +553,7 @@ pass "Gate 22: E3 portal discipline (no document.body outside OverlayMount)"
 # `shared/ui/` itself. Every consumer must go through the barrel which
 # goes through the shim which goes through vibcoder. Bypass is regression.
 # Mapped primitives = the shims actually shipped by Phase 4 T1-T6.
-GATE23_PRIMITIVES='Button|Input|Select|Switch|Checkbox|Slider|Spinner|Skeleton|Icon|IconButton|Kbd|Badge|Tag|Card|Tabs|FormField|TextInput|PanelHeader|Modal|Popover|Tooltip|Toast'
+GATE23_PRIMITIVES='Button|Input|Select|Switch|Checkbox|Slider|Spinner|Skeleton|Icon|IconButton|Kbd|Badge|Tag|Card|Tabs|FormField|TextInput|PanelHeader|Popover|Tooltip|Toast'
 GATE23_HITS=$(grep -rE "from ['\"]@/shared/ui/(${GATE23_PRIMITIVES})['\"]" packages/editor/src --include='*.ts' --include='*.tsx' --exclude-dir=__tests__ --exclude-dir=project 2>/dev/null \
   | grep -v 'shared/ui/' \
   | grep -vE '^[[:space:]]*//|:[[:space:]]*/?\*' \

@@ -6,7 +6,13 @@
  */
 
 import * as React from "react";
-import { Modal } from "@/shared/ui/Modal";
+import {
+  Modal,
+  ModalContent,
+  ModalTitle,
+  ModalClose,
+  OverlayMount,
+} from "@/editor/shared/vibcoder";
 import { GROUPED_TABS_CONFIG } from "../rail/tabsConfig";
 
 // =============================================================================
@@ -103,7 +109,16 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
   onClose,
 }) => {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Keyboard Shortcuts" size="lg">
+    <OverlayMount>
+      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+        <ModalContent size="lg">
+          <ModalTitle>Keyboard Shortcuts</ModalTitle>
+          <ModalClose aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </ModalClose>
+          <div className="bd-modal__body">
       <div
         style={{
           display: "grid",
@@ -178,7 +193,10 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
       >
         On Mac, use ⌘ Command instead of Ctrl
       </div>
-    </Modal>
+          </div>
+        </ModalContent>
+      </Modal>
+    </OverlayMount>
   );
 };
 

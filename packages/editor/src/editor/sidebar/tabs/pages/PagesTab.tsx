@@ -15,7 +15,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import type { Composer } from "../../../../engine";
-import { ConfirmDialog } from "../../../../shared/ui/Modal";
+import { ConfirmDialog } from "../../../../shared/ui/ConfirmDialog";
 import { PanelShell } from "@shared/ui/panel";
 import { PageCommandPalette } from "./components/PageCommandPalette";
 import { PageContextMenu } from "./components/PageContextMenu";

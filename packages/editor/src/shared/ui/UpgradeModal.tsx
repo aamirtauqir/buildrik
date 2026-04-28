@@ -21,7 +21,13 @@
  */
 
 import * as React from "react";
-import { Modal } from "./Modal";
+import {
+  Modal,
+  ModalContent,
+  ModalTitle,
+  ModalClose,
+  OverlayMount,
+} from "@/editor/shared/vibcoder";
 import { PremiumBadge } from "./PremiumBadge";
 
 export interface UpgradeModalProps {
@@ -65,7 +71,16 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Upgrade Your Plan" size="sm">
+    <OverlayMount>
+      <Modal open={isOpen} onOpenChange={(next) => !next && handleClose()}>
+        <ModalContent size="lg">
+          <ModalTitle>Upgrade Your Plan</ModalTitle>
+          <ModalClose aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </ModalClose>
+          <div className="bd-modal__body">
       <div style={contentStyle}>
         <PremiumBadge size="lg" label={requiredPlan} />
 
@@ -103,7 +118,10 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({
           </button>
         </div>
       </div>
-    </Modal>
+          </div>
+        </ModalContent>
+      </Modal>
+    </OverlayMount>
   );
 };
 

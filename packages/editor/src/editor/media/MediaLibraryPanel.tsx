@@ -10,7 +10,13 @@ import * as React from "react";
 import type { Composer } from "../../engine";
 import { InputField, FileField } from "../../shared/forms";
 import type { MediaAsset, MediaAssetType, MediaViewMode } from "../../shared/types/media";
-import { Modal } from "@/shared/ui/Modal";
+import {
+  Modal,
+  ModalContent,
+  ModalTitle,
+  ModalClose,
+  OverlayMount,
+} from "@/editor/shared/vibcoder";
 import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Spinner } from "@/editor/shared/vibcoder/Spinner";
@@ -127,7 +133,16 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
   const filteredAssets = assets.filter((asset) => allowedTypes.includes(asset.type));
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} size="lg">
+    <OverlayMount>
+      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+        <ModalContent size="lg">
+          <ModalTitle>{title}</ModalTitle>
+          <ModalClose aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </ModalClose>
+          <div className="bd-modal__body">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <Tab id="library">Library</Tab>
         <Tab id="upload">Upload</Tab>
@@ -326,7 +341,10 @@ export const MediaLibraryPanel: React.FC<MediaLibraryPanelProps> = ({
             </div>
           );
         })()}
-    </Modal>
+          </div>
+        </ModalContent>
+      </Modal>
+    </OverlayMount>
   );
 };
 

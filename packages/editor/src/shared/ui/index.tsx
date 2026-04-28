@@ -8,7 +8,7 @@
  */
 
 // Shared UI components
-export * from "./Modal";
+export * from "./ConfirmDialog";
 export * from "./Tooltip";
 export * from "./Popover";
 export * from "./Accordion";

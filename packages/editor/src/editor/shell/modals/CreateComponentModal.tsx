@@ -9,7 +9,14 @@ import { Input } from "@/editor/shared/vibcoder/Input";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { Modal } from "../../../shared/ui/Modal";
+import {
+  Modal,
+  ModalContent,
+  ModalTitle,
+  ModalClose,
+  ModalFooter,
+  OverlayMount,
+} from "@/editor/shared/vibcoder";
 import { useToast } from "../../../shared/ui/Toast";
 
 export interface CreateComponentModalProps {
@@ -121,22 +128,16 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Create Component"
-      size="md"
-      footer={
-        <>
-          <Button variant="ghost" onClick={onClose} disabled={isCreating}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={handleSubmit} disabled={!name.trim() || isCreating}>
-            {isCreating ? "Creating..." : "Create Component"}
-          </Button>
-        </>
-      }
-    >
+    <OverlayMount>
+      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+        <ModalContent size="lg">
+          <ModalTitle>Create Component</ModalTitle>
+          <ModalClose aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </ModalClose>
+          <div className="bd-modal__body">
       <div style={containerStyles} onKeyDown={handleKeyPress}>
         <div>
           <label style={labelStyles}>
@@ -226,7 +227,18 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           )}
         </div>
       </div>
-    </Modal>
+          </div>
+          <ModalFooter>
+            <Button variant="ghost" onClick={onClose} disabled={isCreating}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleSubmit} disabled={!name.trim() || isCreating}>
+              {isCreating ? "Creating..." : "Create Component"}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </OverlayMount>
   );
 };
 

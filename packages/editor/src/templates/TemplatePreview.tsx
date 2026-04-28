@@ -6,7 +6,12 @@
 
 import DOMPurify from "dompurify";
 import * as React from "react";
-import { Modal } from "@/shared/ui/Modal";
+import {
+  Modal,
+  ModalContent,
+  ModalClose,
+  OverlayMount,
+} from "@/editor/shared/vibcoder";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Badge } from "@/shared/ui/Badge";
 import type { Template } from "./TemplateLibrary";
@@ -138,7 +143,15 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   const previewWidth = deviceWidths[device];
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="" size="full">
+    <OverlayMount>
+      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+        <ModalContent size="xl" style={{ maxWidth: "90vw" }}>
+          <ModalClose aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </ModalClose>
+          <div className="bd-modal__body">
       <div style={{ display: "flex", flexDirection: "column", height: "80vh" }}>
         {/* Header */}
         <div
@@ -224,7 +237,10 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
           )}
         </div>
       </div>
-    </Modal>
+          </div>
+        </ModalContent>
+      </Modal>
+    </OverlayMount>
   );
 };
 

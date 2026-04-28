@@ -7,7 +7,13 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import { Modal } from "../../../../shared/ui/Modal";
+import {
+  Modal,
+  ModalContent,
+  ModalTitle,
+  ModalClose,
+  OverlayMount,
+} from "@/editor/shared/vibcoder";
 import { dialogCancelBtnStyles, dialogInputStyles, dialogPrimaryBtnStyles } from "./styles";
 
 export interface CreateComponentModalProps {
@@ -29,7 +35,16 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
   };
 
   return (
-    <Modal isOpen onClose={onClose} title="Create Component" size="sm">
+    <OverlayMount>
+      <Modal open onOpenChange={(next) => !next && onClose()}>
+        <ModalContent size="lg">
+          <ModalTitle>Create Component</ModalTitle>
+          <ModalClose aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </ModalClose>
+          <div className="bd-modal__body">
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           <label
@@ -69,6 +84,9 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
           </Button>
         </div>
       </div>
-    </Modal>
+          </div>
+        </ModalContent>
+      </Modal>
+    </OverlayMount>
   );
 };

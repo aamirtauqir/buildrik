@@ -3,7 +3,7 @@
  * @license BSD-3-Clause
  */
 
-export { Modal, ConfirmDialog, type ModalProps, type ConfirmDialogProps } from "./Modal";
+export { ConfirmDialog, type ConfirmDialogProps } from "./ConfirmDialog";
 export {
   ToastProvider,
   useToast,

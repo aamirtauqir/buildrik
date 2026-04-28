@@ -7,7 +7,13 @@ import { Input } from "@/editor/shared/vibcoder/Input";
 
 import * as React from "react";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { Modal } from "@/shared/ui/Modal";
+import {
+  Modal,
+  ModalContent,
+  ModalTitle,
+  ModalClose,
+  OverlayMount,
+} from "@/editor/shared/vibcoder";
 
 // ============================================================================
 // TYPES
@@ -384,26 +390,37 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
 
 export const VideoPreview: React.FC<VideoPreviewProps> = (props) => {
   if (props.isModal) {
+    const handleClose = props.onClose || (() => {});
     return (
-      <Modal
-        isOpen={props.isOpen || false}
-        onClose={props.onClose || (() => {})}
-        title={props.title || "Video Preview"}
-        size="lg"
-      >
-        <VideoPlayerCore {...props} />
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginTop: 16,
-          }}
+      <OverlayMount>
+        <Modal
+          open={props.isOpen || false}
+          onOpenChange={(next) => !next && handleClose()}
         >
-          <Button variant="ghost" onClick={props.onClose}>
-            Close
-          </Button>
-        </div>
-      </Modal>
+          <ModalContent size="lg">
+            <ModalTitle>{props.title || "Video Preview"}</ModalTitle>
+            <ModalClose aria-label="Close modal">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </ModalClose>
+            <div className="bd-modal__body">
+              <VideoPlayerCore {...props} />
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  marginTop: 16,
+                }}
+              >
+                <Button variant="ghost" onClick={props.onClose}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          </ModalContent>
+        </Modal>
+      </OverlayMount>
     );
   }
 

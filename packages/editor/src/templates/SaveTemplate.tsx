@@ -5,7 +5,13 @@
 
 import * as React from "react";
 import { InputField, TextareaField, SelectField } from "../shared/forms";
-import { Modal } from "@/shared/ui/Modal";
+import {
+  Modal,
+  ModalContent,
+  ModalTitle,
+  ModalClose,
+  OverlayMount,
+} from "@/editor/shared/vibcoder";
 import { Button } from "@/editor/shared/vibcoder/Button";
 
 export interface SaveTemplateProps {
@@ -41,7 +47,16 @@ export const SaveTemplate: React.FC<SaveTemplateProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Save as Template" size="sm">
+    <OverlayMount>
+      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+        <ModalContent size="lg">
+          <ModalTitle>Save as Template</ModalTitle>
+          <ModalClose aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </ModalClose>
+          <div className="bd-modal__body">
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         <InputField
           label="Template Name"
@@ -88,7 +103,10 @@ export const SaveTemplate: React.FC<SaveTemplateProps> = ({
           Save Template
         </Button>
       </div>
-    </Modal>
+          </div>
+        </ModalContent>
+      </Modal>
+    </OverlayMount>
   );
 };
 

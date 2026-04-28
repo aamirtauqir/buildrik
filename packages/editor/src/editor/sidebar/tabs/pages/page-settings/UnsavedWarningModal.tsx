@@ -13,8 +13,24 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import { Modal } from "@shared/ui/Modal";
+import {
+  Modal,
+  ModalContent as VibcoderModalContent,
+  OverlayMount,
+} from "@/editor/shared/vibcoder";
 import { ROW_MD } from "@shared/constants/layout";
+
+// Phase 5 escape: Radix.Dialog.Content props (onOpenAutoFocus) are hidden
+// from vibcoder's public ModalContentProps per Contract E2 (no Radix types
+// leaked). Vibcoder's ModalContent still spreads these to Radix at runtime.
+// Cast bypasses the narrowed type without changing behavior.
+type ModalContentEscapeProps = {
+  size?: "lg" | "xl";
+  onOpenAutoFocus?: (e: { preventDefault: () => void }) => void;
+  children: React.ReactNode;
+};
+const ModalContent =
+  VibcoderModalContent as unknown as React.ComponentType<ModalContentEscapeProps>;
 
 interface Props {
   isOpen: boolean;
@@ -36,15 +52,18 @@ export const UnsavedWarningModal: React.FC<Props> = ({
   const tabLabel = pendingTab === "social" ? "Social" : pendingTab === "advanced" ? "Advanced" : "SEO";
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onCancel}
-      size="sm"
-      closeOnOverlay
-      closeOnEscape
-      showCloseButton={false}
-      initialFocusRef={discardRef}
-    >
+    <OverlayMount>
+      <Modal open={isOpen} onOpenChange={(next) => !next && onCancel()}>
+        <ModalContent
+          size="lg"
+          onOpenAutoFocus={(e) => {
+            if (discardRef.current) {
+              e.preventDefault();
+              discardRef.current.focus();
+            }
+          }}
+        >
+          <div className="bd-modal__body">
       <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
         {/* Title */}
         <div
@@ -99,7 +118,10 @@ export const UnsavedWarningModal: React.FC<Props> = ({
           </Button>
         </div>
       </div>
-    </Modal>
+          </div>
+        </ModalContent>
+      </Modal>
+    </OverlayMount>
   );
 };
 
