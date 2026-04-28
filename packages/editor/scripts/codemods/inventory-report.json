@@ -1,19 +1,12 @@
 {
   "counts": {
-    "stack-clean": 18,
     "stack-multi-prop": 57,
     "cluster-clean": 3,
     "stack-off-grid": 7,
+    "stack-clean": 2,
     "cluster-off-grid": 2
   },
   "sites": [
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/animation/AnimationEditor.tsx",
-      "line": 140,
-      "bucket": "stack-clean",
-      "gap": 16,
-      "extraProps": []
-    },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/canvas/CanvasFooterToolbar.tsx",
       "line": 400,
@@ -73,13 +66,6 @@
       ]
     },
     {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/export/CodePreview.tsx",
-      "line": 254,
-      "bucket": "stack-clean",
-      "gap": 12,
-      "extraProps": []
-    },
-    {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/export/ExportModal.tsx",
       "line": 296,
       "bucket": "stack-multi-prop",
@@ -102,7 +88,7 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/export/ExportOptions.tsx",
-      "line": 67,
+      "line": 68,
       "bucket": "stack-multi-prop",
       "gap": 8,
       "extraProps": [
@@ -114,7 +100,7 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/export/ExportOptions.tsx",
-      "line": 118,
+      "line": 119,
       "bucket": "stack-multi-prop",
       "gap": 8,
       "extraProps": [
@@ -127,20 +113,6 @@
         "pointerEvents",
         "userSelect"
       ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/export/ExportOptions.tsx",
-      "line": 236,
-      "bucket": "stack-clean",
-      "gap": 16,
-      "extraProps": []
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/export/ExportOptions.tsx",
-      "line": 283,
-      "bucket": "stack-clean",
-      "gap": 8,
-      "extraProps": []
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/media/CropOverlay.tsx",
@@ -234,14 +206,7 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 101,
-      "bucket": "stack-clean",
-      "gap": 4,
-      "extraProps": []
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 152,
+      "line": 153,
       "bucket": "stack-multi-prop",
       "gap": 10,
       "extraProps": [
@@ -253,21 +218,14 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 199,
+      "line": 200,
       "bucket": "stack-off-grid",
       "gap": 6,
       "extraProps": []
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 257,
-      "bucket": "stack-clean",
-      "gap": 8,
-      "extraProps": []
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 301,
+      "line": 302,
       "bucket": "stack-multi-prop",
       "gap": 10,
       "extraProps": [
@@ -279,21 +237,7 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 336,
-      "bucket": "stack-clean",
-      "gap": 8,
-      "extraProps": []
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 356,
-      "bucket": "stack-clean",
-      "gap": 8,
-      "extraProps": []
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 405,
+      "line": 406,
       "bucket": "stack-multi-prop",
       "gap": null,
       "extraProps": [
@@ -305,7 +249,7 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 452,
+      "line": 453,
       "bucket": "stack-multi-prop",
       "gap": 6,
       "extraProps": [
@@ -318,7 +262,7 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 494,
+      "line": 495,
       "bucket": "stack-multi-prop",
       "gap": 20,
       "extraProps": [
@@ -375,7 +319,7 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/InviteModal.tsx",
-      "line": 110,
+      "line": 111,
       "bucket": "stack-multi-prop",
       "gap": null,
       "extraProps": [
@@ -392,13 +336,6 @@
         "maxHeight",
         "overflow"
       ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/InviteModal.tsx",
-      "line": 313,
-      "bucket": "stack-clean",
-      "gap": 4,
-      "extraProps": []
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/SidebarFallbacks.tsx",
@@ -738,20 +675,6 @@
       ]
     },
     {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/ComponentsTab.tsx",
-      "line": 392,
-      "bucket": "stack-clean",
-      "gap": 12,
-      "extraProps": []
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/ComponentsTab.tsx",
-      "line": 426,
-      "bucket": "stack-clean",
-      "gap": 8,
-      "extraProps": []
-    },
-    {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/inspector/sections/flexbox/AlignmentSection.tsx",
       "line": 75,
       "bucket": "cluster-off-grid",
@@ -796,34 +719,6 @@
       "line": 47,
       "bucket": "stack-off-grid",
       "gap": 3,
-      "extraProps": []
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/inspector/shared/controls/SpacingControls.tsx",
-      "line": 157,
-      "bucket": "stack-clean",
-      "gap": 4,
-      "extraProps": []
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/inspector/shared/controls/SpacingControls.tsx",
-      "line": 233,
-      "bucket": "stack-clean",
-      "gap": 4,
-      "extraProps": []
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/component-library/CreateComponentModal.tsx",
-      "line": 48,
-      "bucket": "stack-clean",
-      "gap": 12,
-      "extraProps": []
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/component-library/CreateComponentModal.tsx",
-      "line": 49,
-      "bucket": "stack-clean",
-      "gap": 4,
       "extraProps": []
     },
     {
@@ -924,13 +819,6 @@
         "textAlign",
         "color"
       ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/settings/screens/SiteSettingsScreen.tsx",
-      "line": 167,
-      "bucket": "stack-clean",
-      "gap": 4,
-      "extraProps": []
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/settings/styles/index.ts",

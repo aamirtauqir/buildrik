@@ -10,6 +10,7 @@ import type { AnimationConfig, AnimationTrigger } from "../../shared/types/anima
 import { DEFAULT_ANIMATION } from "../../shared/types/animations";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
+import { Stack } from "@/editor/shared/vibcoder";
 
 // Re-export for backwards compatibility
 export type { AnimationConfig } from "../../shared/types/animations";
@@ -137,7 +138,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
           Timing
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <Stack gap="lg">
           <SliderField
             label="Duration"
             value={animation.duration}
@@ -172,7 +173,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
             unit=""
             units={[]}
           />
-        </div>
+        </Stack>
       </div>
       {/* Trigger */}
       <div style={{ marginTop: 24 }}>

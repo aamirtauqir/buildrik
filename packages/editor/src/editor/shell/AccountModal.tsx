@@ -8,6 +8,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Stack } from "@/editor/shared/vibcoder";
 
 type Tab = "profile" | "team" | "collaboration" | "billing";
 type Role = "Editor" | "Admin" | "Viewer";
@@ -98,7 +99,7 @@ const TabProfile: React.FC = () => (
           AS
         </span>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      <Stack gap="xs">
         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--buildrick-text-primary)" }}>Aamir Siddiqui</div>
         <Button
           style={{
@@ -113,7 +114,7 @@ const TabProfile: React.FC = () => (
         >
           Change photo
         </Button>
-      </div>
+      </Stack>
     </div>
 
     {/* Email field */}
@@ -254,7 +255,7 @@ const TabTeam: React.FC = () => (
 const TabCollaboration: React.FC = () => (
   <>
     <div style={{ fontSize: 24, fontWeight: 700, color: "var(--buildrick-text-primary)" }}>Collaboration Settings</div>
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <Stack gap="sm">
       <div
         style={{
           background: "var(--buildrick-bg-card)",
@@ -286,7 +287,7 @@ const TabCollaboration: React.FC = () => (
         <span style={{ fontSize: 13, fontWeight: 500, color: "var(--buildrick-text-secondary)" }}>Guest access</span>
         <Toggle on={false} />
       </div>
-    </div>
+    </Stack>
   </>
 );
 
@@ -333,7 +334,7 @@ const TabBilling: React.FC = () => (
     </div>
 
     {/* Payment Method */}
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <Stack gap="sm">
       <div style={{ fontSize: 13, fontWeight: 600, color: "var(--buildrick-text-secondary)" }}>Payment Method</div>
       <div
         style={{
@@ -350,10 +351,10 @@ const TabBilling: React.FC = () => (
         </span>
         <span style={{ fontSize: 11, color: "var(--buildrick-text-tertiary)" }}>Exp 12/27</span>
       </div>
-    </div>
+    </Stack>
 
     {/* Billing History */}
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <Stack gap="sm">
       <div style={{ fontSize: 13, fontWeight: 600, color: "var(--buildrick-text-secondary)" }}>Billing History</div>
       {[
         { amount: "$12.00", detail: "Mar 3, 2026 · Pro Plan" },
@@ -373,7 +374,7 @@ const TabBilling: React.FC = () => (
           <span style={{ fontSize: 11, color: "var(--buildrick-text-muted)" }}>{inv.detail}</span>
         </div>
       ))}
-    </div>
+    </Stack>
   </>
 );
 

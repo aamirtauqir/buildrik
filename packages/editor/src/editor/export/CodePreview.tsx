@@ -14,6 +14,7 @@ import * as React from "react";
 import type { CodeTab } from "../../shared/types/export";
 import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
 import { CopyButton } from "@/shared/extensions/CopyButton";
+import { Stack } from "@/editor/shared/vibcoder";
 
 // ============================================================================
 // TYPES
@@ -251,7 +252,7 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
   const [activeTab, setActiveTab] = React.useState<CodeTab>(defaultTab);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <Stack>
       {/* Tabs */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Tabs
@@ -275,7 +276,7 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
       {activeTab === "css" && (
         <CodeBlock code={css} language="css" showLineNumbers={showLineNumbers} />
       )}
-    </div>
+    </Stack>
   );
 };
 

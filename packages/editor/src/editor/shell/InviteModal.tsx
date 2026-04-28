@@ -9,6 +9,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { Stack } from "@/editor/shared/vibcoder";
 
 type Role = "Editor" | "Admin" | "Viewer";
 
@@ -310,7 +311,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               <div style={{ fontSize: 12, fontWeight: 600, color: "var(--buildrick-text-secondary)", marginBottom: 8 }}>
                 Team members ({MOCK_MEMBERS.length})
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <Stack gap="xs">
                 {MOCK_MEMBERS.map((m) => {
                   const roleStyle = ROLE_COLORS[m.role];
                   return (
@@ -362,7 +363,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                     </div>
                   );
                 })}
-              </div>
+              </Stack>
             </div>
           )}
         </div>

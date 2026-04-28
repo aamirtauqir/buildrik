@@ -10,6 +10,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import type { CMSExportMode, TemplateSyntax } from "../../engine/cms/CMSExportResolver";
 import type { ExportConfig, CSSExportStyle, ExportFormat } from "../../shared/types/export";
+import { Stack } from "@/editor/shared/vibcoder";
 
 // ============================================================================
 // FORMAT CONFIG
@@ -233,7 +234,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
   hasCMSBindings = false,
 }) => {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <Stack gap="lg">
       {/* Page Title */}
       <div>
         <label style={{ display: "block", fontSize: 12, marginBottom: 6 }}>Page Title</label>
@@ -280,7 +281,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
         </div>
       </div>
       {/* Toggle Options */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <Stack gap="sm">
         <ToggleOption
           label="Minify output"
           checked={config.minify}
@@ -301,7 +302,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
           checked={config.includeViewport}
           onChange={(includeViewport) => onChange({ includeViewport })}
         />
-      </div>
+      </Stack>
       {/* CMS Export Options - only show if project has CMS bindings */}
       {hasCMSBindings && onCMSChange && (
         <div style={{ borderTop: "1px solid var(--buildrick-border)", paddingTop: 16 }}>
@@ -377,7 +378,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
           </div>
         </div>
       )}
-    </div>
+    </Stack>
   );
 };
 
