@@ -7,23 +7,55 @@ describe("Composer listener hygiene", () => {
   beforeAll(() => {
     // Polyfill indexedDB for jsdom (Composer.initialize opens MediaStorage)
     if (typeof globalThis.indexedDB === "undefined") {
+      const fireOnSuccess = (req: any) => {
+        Promise.resolve().then(() => req.onsuccess?.());
+      };
       Object.defineProperty(globalThis, "indexedDB", {
         value: {
-          open: () => ({
-            onsuccess: () => {},
-            onerror: () => {},
-            onupgradeneeded: () => {},
-            result: {
-              createObjectStore: () => ({}),
-              transaction: () => ({
-                objectStore: () => ({
-                  get: () => ({ onsuccess: () => {} }),
-                  put: () => ({ onsuccess: () => {} }),
+          open: () => {
+            const req = {
+              onsuccess: () => {},
+              onerror: () => {},
+              onupgradeneeded: () => {},
+              result: {
+                createObjectStore: () => ({
+                  createIndex: () => {},
                 }),
-              }),
-              close: () => {},
-            },
-          }),
+                transaction: () => ({
+                  objectStore: () => ({
+                    get: () => {
+                      const r = { result: undefined };
+                      fireOnSuccess(r);
+                      return r;
+                    },
+                    put: () => {
+                      const r = {};
+                      fireOnSuccess(r);
+                      return r;
+                    },
+                    getAll: () => {
+                      const r = { result: [] };
+                      fireOnSuccess(r);
+                      return r;
+                    },
+                    index: () => ({
+                      getAll: () => {
+                        const r = { result: [] };
+                        fireOnSuccess(r);
+                        return r;
+                      },
+                    }),
+                  }),
+                }),
+                close: () => {},
+                objectStoreNames: {
+                  contains: () => false,
+                },
+              },
+            };
+            fireOnSuccess(req);
+            return req;
+          },
           deleteDatabase: () => ({
             onsuccess: () => {},
             onerror: () => {},
@@ -90,5 +122,11 @@ describe("Composer listener hygiene", () => {
     expect(offSpy).toHaveBeenCalledWith("selection:multiple", expect.any(Function));
     expect(offSpy).toHaveBeenCalledWith("selection:cleared", expect.any(Function));
     expect(collabOffSpy).toHaveBeenCalledWith("operation:apply", expect.any(Function));
+  });
+
+  it("whenReady resolves after init completes", async () => {
+    const composer = new Composer({} as any);
+    await expect(composer.whenReady()).resolves.toBeUndefined();
+    expect(composer.isReady()).toBe(true);
   });
 });

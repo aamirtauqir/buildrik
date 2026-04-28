@@ -61,6 +61,7 @@ export class Composer extends EventEmitter {
 
   private collaborationHandlers: Set<(...args: any[]) => void> = new Set();
   private selectionHandlers: Set<(...args: any[]) => void> = new Set();
+  private initPromise: Promise<void> | null = null;
 
   private transactionDepth = 0;
   private transactionDirty = false;
@@ -184,7 +185,10 @@ export class Composer extends EventEmitter {
     this.selectionHandlers.add(selectionClearedHandler);
     this.on("selection:cleared", selectionClearedHandler);
 
-    this.initialize();
+    this.initPromise = this.initialize().catch((err) => {
+      this.emit(EVENTS.ERROR, { error: err, operation: "init" });
+      throw err;
+    });
   }
 
   /**
@@ -505,6 +509,14 @@ ${html}
    */
   isReady(): boolean {
     return this.state.ready;
+  }
+
+  /**
+   * Returns a promise that resolves when initialization completes.
+   * Rejects if initialization fails.
+   */
+  whenReady(): Promise<void> {
+    return this.initPromise ?? Promise.resolve();
   }
 
   /**
