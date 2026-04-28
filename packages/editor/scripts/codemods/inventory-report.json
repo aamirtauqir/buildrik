@@ -2,8 +2,7 @@
   "counts": {
     "stack-multi-prop": 57,
     "cluster-clean": 3,
-    "stack-off-grid": 7,
-    "stack-clean": 2,
+    "stack-off-grid": 3,
     "cluster-off-grid": 2
   },
   "sites": [
@@ -186,13 +185,6 @@
       ]
     },
     {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/panels/KeyboardShortcutsPanel.tsx",
-      "line": 151,
-      "bucket": "stack-off-grid",
-      "gap": 6,
-      "extraProps": []
-    },
-    {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/panels/RichTextEditor.tsx",
       "line": 130,
       "bucket": "cluster-clean",
@@ -215,13 +207,6 @@
         "borderRadius",
         "padding"
       ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 200,
-      "bucket": "stack-off-grid",
-      "gap": 6,
-      "extraProps": []
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
@@ -581,13 +566,6 @@
       ]
     },
     {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/modals/CMSCollectionSetupModal.tsx",
-      "line": 393,
-      "bucket": "stack-off-grid",
-      "gap": 14,
-      "extraProps": []
-    },
-    {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/modals/CommandPalette.tsx",
       "line": 281,
       "bucket": "stack-multi-prop",
@@ -609,14 +587,7 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/modals/CreateComponentModal.tsx",
-      "line": 249,
-      "bucket": "stack-clean",
-      "gap": 16,
-      "extraProps": []
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/modals/CreateComponentModal.tsx",
-      "line": 315,
+      "line": 310,
       "bucket": "cluster-clean",
       "gap": 8,
       "extraProps": [
@@ -625,19 +596,12 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/modals/ProjectSettingsModal.tsx",
-      "line": 212,
+      "line": 213,
       "bucket": "stack-multi-prop",
       "gap": null,
       "extraProps": [
         "minHeight"
       ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/modals/ProjectSettingsModal.tsx",
-      "line": 240,
-      "bucket": "stack-clean",
-      "gap": 12,
-      "extraProps": []
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/shared/DrillInHeader.tsx",
@@ -733,14 +697,7 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/publish/PublishTab.tsx",
-      "line": 349,
-      "bucket": "stack-off-grid",
-      "gap": 6,
-      "extraProps": []
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/publish/PublishTab.tsx",
-      "line": 508,
+      "line": 509,
       "bucket": "stack-multi-prop",
       "gap": null,
       "extraProps": [
@@ -750,7 +707,7 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/publish/PublishTab.tsx",
-      "line": 515,
+      "line": 516,
       "bucket": "stack-multi-prop",
       "gap": 16,
       "extraProps": [
@@ -761,7 +718,7 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/publish/PublishTab.tsx",
-      "line": 524,
+      "line": 525,
       "bucket": "stack-multi-prop",
       "gap": 8,
       "extraProps": [
