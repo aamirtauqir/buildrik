@@ -18,7 +18,7 @@ import { ExportEngine } from "../../engine/export";
 import { EVENTS } from "../../shared/constants/events";
 import { useElementFlash } from "../../shared/hooks";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
-import { TooltipProvider } from "@/editor/shared/vibcoder";
+import { TooltipProvider, ToastProvider as VibcoderToastProvider } from "@/editor/shared/vibcoder";
 import { StudioSkeleton } from "@/shared/extensions/Skeleton";
 import { ToastProvider, useToast } from "../../shared/ui/Toast";
 import { UpgradeModal } from "@/shared/extensions/UpgradeModal";
@@ -594,20 +594,27 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
  * Main Aquibra Studio Editor (with providers).
  *
  * Provider stack (outer → inner):
- *   TooltipProvider — Radix.Tooltip ambient. delayDuration=500 matches the
- *     deleted Phase 4 Tooltip shim default (no perceptible behavior change
- *     for chrome users post-Bucket-B1).
- *   ToastProvider — current passive Phase 4 toast queue (B3 will rewrap
- *     this with Radix.Toast).
- *   StudioErrorBoundary — last-resort UI fallback.
+ *   TooltipProvider          — Radix.Tooltip ambient (B1 T2, delayDuration=500
+ *                              matches deleted shim default).
+ *   VibcoderToastProvider    — New Radix.Toast queue + Viewport (B3 T1). Hosts
+ *                              the vibcoder useToast hook for consumers that
+ *                              have migrated off the shim.
+ *   ToastProvider (shim)     — Phase 4 shim Provider. Hosts shim useToast for
+ *                              the 27 chrome consumers still using the shim's
+ *                              imperative API. T4 will atomically migrate the
+ *                              consumers + remove this line + delete the shim
+ *                              file. Until then, both Providers coexist.
+ *   StudioErrorBoundary      — last-resort UI fallback.
  */
 export const AquibraStudio: React.FC<AquibraStudioProps> = (props) => (
   <TooltipProvider delayDuration={500}>
-    <ToastProvider>
-      <StudioErrorBoundary>
-        <AquibraStudioShell {...props} />
-      </StudioErrorBoundary>
-    </ToastProvider>
+    <VibcoderToastProvider>
+      <ToastProvider>
+        <StudioErrorBoundary>
+          <AquibraStudioShell {...props} />
+        </StudioErrorBoundary>
+      </ToastProvider>
+    </VibcoderToastProvider>
   </TooltipProvider>
 );
 
