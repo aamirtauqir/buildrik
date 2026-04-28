@@ -122,6 +122,7 @@ export async function initBuildrikSync(
     importProject: (data: ProjectData) => void;
     exportProject: () => ProjectData;
     on: (event: string, cb: () => void) => void;
+    emit: (event: string) => void;
   },
   siteId: string,
   onSaveError?: (error: Error) => void
@@ -130,21 +131,35 @@ export async function initBuildrikSync(
   composer.importProject(data);
 
   let saveTimeout: ReturnType<typeof setTimeout> | null = null;
+  let isSaving = false;
+  let pendingChanges = false;
   composer.on("project:changed", () => {
     if (saveTimeout) clearTimeout(saveTimeout);
+    if (isSaving) {
+      pendingChanges = true;
+      return;
+    }
     saveTimeout = setTimeout(() => {
+      isSaving = true;
       const projectData = composer.exportProject();
-      saveProject(siteId, projectData).catch((err: unknown) => {
-        const error =
-          err instanceof Error ? err : new Error("Save failed");
-        console.error("[BuildrikSync] save failed, retrying once:", error.message);
-        saveProject(siteId, projectData).catch((retryErr: unknown) => {
-          const retryError =
-            retryErr instanceof Error ? retryErr : new Error("Save retry failed");
+      saveProject(siteId, projectData)
+        .catch((err: unknown) => {
+          const error = err instanceof Error ? err : new Error("Save failed");
+          console.error("[BuildrikSync] save failed, retrying once:", error.message);
+          return saveProject(siteId, projectData);
+        })
+        .catch((retryErr: unknown) => {
+          const retryError = retryErr instanceof Error ? retryErr : new Error("Save retry failed");
           console.error("[BuildrikSync] retry failed:", retryError.message);
           onSaveError?.(retryError);
+        })
+        .finally(() => {
+          isSaving = false;
+          if (pendingChanges) {
+            pendingChanges = false;
+            composer.emit("project:changed");
+          }
         });
-      });
     }, 5000);
   });
 }
