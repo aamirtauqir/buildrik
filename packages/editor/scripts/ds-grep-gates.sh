@@ -585,5 +585,30 @@ fi
 BASE_24=$(sed -n '5p' "$BASELINE_FILE" 2>/dev/null || echo "0")
 check_gate 24 "$GATE24_HITS" "$BASE_24" "inline <button>/<input>/<select>/<textarea> in editor/ (use vibcoder shim @/shared/ui)" || exit 1
 
+# Gate 25: Orphan codemod fixtures.
+# Every `__tests__/fixtures/<name>.input.tsx` (and `.output.tsx`) must have a
+# matching `__tests__/<name>.codemod.test.ts` sibling. Catches the leftover-
+# fixture trap surfaced during Bucket A T4: prior codemod-deletion commits
+# removed `.ts` + `.codemod.test.ts` but left fixtures behind, with nothing
+# blocking `rmdir` of the parent directory or signalling dead test data.
+GATE25_ORPHANS=""
+while IFS= read -r fixture; do
+  [ -z "$fixture" ] && continue
+  base=$(basename "$fixture")
+  name="${base%.input.tsx}"
+  name="${name%.output.tsx}"
+  fixtures_dir=$(dirname "$fixture")
+  tests_dir=$(dirname "$fixtures_dir")
+  test_file="${tests_dir}/${name}.codemod.test.ts"
+  if [ ! -f "$test_file" ]; then
+    GATE25_ORPHANS="${GATE25_ORPHANS}${fixture} (missing ${test_file})"$'\n'
+  fi
+done < <(find packages/editor/scripts/codemods -type f \( -name '*.input.tsx' -o -name '*.output.tsx' \) 2>/dev/null)
+if [ -n "$GATE25_ORPHANS" ]; then
+  printf '%s' "$GATE25_ORPHANS"
+  fail "Gate 25: orphan codemod fixture (no matching .codemod.test.ts)"
+fi
+pass "Gate 25: no orphan codemod fixtures"
+
 echo ""
-echo "=== DS V1 gates: 13 passed + 4 chrome-axiom gates at baseline + green-panel check ==="
+echo "=== DS V1 gates: 14 passed + 4 chrome-axiom gates at baseline + green-panel check ==="
