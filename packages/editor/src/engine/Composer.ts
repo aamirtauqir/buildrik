@@ -59,6 +59,9 @@ export class Composer extends EventEmitter {
   private config: ComposerConfig;
   private state: ComposerState;
 
+  private collaborationHandlers: Set<(...args: any[]) => void> = new Set();
+  private selectionHandlers: Set<(...args: any[]) => void> = new Set();
+
   private transactionDepth = 0;
   private transactionDirty = false;
 
@@ -151,29 +154,35 @@ export class Composer extends EventEmitter {
     this.interactions = new InteractionManager(this);
     this.drag = new DragManager(this);
 
-    // Listen for remote operations from collaboration
-    this.collaboration.on("operation:apply", (patch: Patch) => {
+    const operationApplyHandler = (patch: Patch) => {
       this.history.applyRemoteOperation(patch);
-    });
+    };
+    this.collaborationHandlers.add(operationApplyHandler);
+    this.collaboration.on("operation:apply", operationApplyHandler);
 
-    // Wire selection sync to collaboration
-    this.on("element:selected", (element: import("./elements/Element").Element | null) => {
+    const elementSelectedHandler = (element: import("./elements/Element").Element | null) => {
       if (this.collaboration.isConnected()) {
         this.collaboration.updateSelection(element ? [element.getId()] : []);
       }
-    });
+    };
+    this.selectionHandlers.add(elementSelectedHandler);
+    this.on("element:selected", elementSelectedHandler);
 
-    this.on("selection:multiple", (elements: import("./elements/Element").Element[]) => {
+    const selectionMultipleHandler = (elements: import("./elements/Element").Element[]) => {
       if (this.collaboration.isConnected()) {
         this.collaboration.updateSelection(elements.map((el) => el.getId()));
       }
-    });
+    };
+    this.selectionHandlers.add(selectionMultipleHandler);
+    this.on("selection:multiple", selectionMultipleHandler);
 
-    this.on("selection:cleared", () => {
+    const selectionClearedHandler = () => {
       if (this.collaboration.isConnected()) {
         this.collaboration.updateSelection([]);
       }
-    });
+    };
+    this.selectionHandlers.add(selectionClearedHandler);
+    this.on("selection:cleared", selectionClearedHandler);
 
     this.initialize();
   }
@@ -688,6 +697,19 @@ ${html}
     if (this.versionHistory?.destroy) this.versionHistory.destroy();
     if (this.storage?.destroy) this.storage.destroy();
     if (this.viewport?.destroy) this.viewport.destroy();
+
+    // Remove individually tracked handlers before global teardown
+    for (const handler of this.collaborationHandlers) {
+      this.collaboration.off("operation:apply", handler);
+    }
+    this.collaborationHandlers.clear();
+
+    for (const handler of this.selectionHandlers) {
+      this.off("element:selected", handler);
+      this.off("selection:multiple", handler);
+      this.off("selection:cleared", handler);
+    }
+    this.selectionHandlers.clear();
 
     this.removeAllListeners();
     this.emit(EVENTS.COMPOSER_DESTROY);
