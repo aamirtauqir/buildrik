@@ -879,3 +879,51 @@ Baselines locked at the new lower values. Future regressions on these gates will
 3. Pre-flight check for transitive shim-internal cross-imports (the HelpTooltip-class trap)
 4. Strongly consider a jscodeshift codemod given the consumer count, with inline-string tests (Gate 25 enforces no orphan fixtures)
 
+
+---
+
+## Bucket B3 findings (Toast — Radix.Toast backing, 2026-04-30)
+
+### What shipped
+
+| Task | SHA | Description |
+|------|-----|-------------|
+| T1 | `99288b1` | Vibcoder Toast wrapper migrated from Phase 2 passive single-instance surface to Radix.Toast-backed compound + queue + `useToast` hook bridge. Module-level `globalThis` store renamed `__AQUIBRA_TOAST_STORE__` → `__VIBCODER_TOAST_STORE__` (clean break from legacy namespace; HMR persistence preserved). Q1-Q4 architectural decisions resolved in docstring (NotificationCenter retired — Radix.Toast queue subsumes it; AquibraStudio mount in T2; codemod in T3; 5000ms default duration). E2 + E3 waivers (E3 reasoning differs from Tooltip: ToastViewport is a fixed-position region, not trigger-anchored). |
+| T2 | `1ea18e6` | Outer `<VibcoderToastProvider>` mounted at AquibraStudio shell as outer wrapper around shim `<ToastProvider>`. Both Providers coexisted in T2-T3 window so unmigrated consumers kept working through the shim. |
+| T3 | `35a32a4` + `126686c` | jscodeshift codemod at `scripts/codemods/bucket-b3/toast.ts`: 3 import-path shapes + `addToast({})` ObjectExpression prop rename (`message`→`description`, `variant`→`tone`) + type-import rename (`ToastVariant`→`ToastTone`). 19 inline-string tests (Gate 25 — zero fixture files). T3 fix-loop chose to **expand** shorthand `{ message, variant }` → `{ description: message, tone: variant }` rather than skip-with-warn, producing correct migrated code with no manual sweep needed for the 5 shorthand sites in editActions.ts. Idempotent + collision-guarded + skip-rules respected. |
+| T4 | `b2f41e3` | Codemod ran across `src/`, migrated **28 consumers** (vs 27 predicted by hardened grep — see "Inventory undercount" below). Phase 4 shim at `src/shared/ui/Toast.tsx` deleted (~318 LOC). Barrels purged in 3 places. AquibraStudio provider stack collapsed: inner shim Provider removed, alias `VibcoderToastProvider` dropped, now just `<ToastProvider>` from vibcoder hosts the shell. Local `ToastParams` interfaces (StudioHeader, useStudioHandlers) and inline `addToast: (params: {...})` types (useComposerInit, useHistoryFeedback) replaced with imported `ToastInput` from vibcoder — codemod scope was call-sites only, so these 4 type defs were a known manual-sweep target. Gate 12 (chrome shadows) floor lowered 176→175 as a codemod side-effect. |
+
+Net delta across T1-T4: 39 files changed in T4 commit alone, +246/−602 (net −356 LOC). T1-T3 added test + codemod LOC. Total bucket arc closed ~600 LOC of Phase 4 shim debt.
+
+### Inventory undercount — 4th recurrence
+
+Hardened pattern from Bucket B1 (`from ['\"]([@/.][^'\"]*shared/ui/X|\\.\\./.*shared/ui/X|@shared/ui/X)['\"]`) reported 27 Toast consumers. Codemod actually migrated **28**. The extra files (StudioHeader, useComposerInit, useHistoryFeedback, useStudioHandlers, editActions, PagesTab.test) were caught by the codemod's broader path matching that the regex missed. This is the **4th consecutive bucket** with a grep undercount (B2: type-only-imports inflated count downward; B1: 13 vs 10; B3: 28 vs 27).
+
+**Action item still pending:** the proposed `scripts/grep-shim-consumers.sh <ShimName>` helper from the B1 findings was not built. Worth landing as a Phase 6 cleanup task. The script should:
+
+- Accept `<ShimName>` (e.g., `Toast`)
+- Try import-path shapes: `@/shared/ui/X`, `@shared/ui/X`, `../**/shared/ui/X`, `./X` from inside `shared/ui/`
+- Cross-check by attempting a dry-run of the same `find` jscodeshift would do
+- Output a single deduplicated list
+
+The recurrence pattern suggests the regex approach has a fundamental ceiling; either accept ~10% undercount as the inventory floor, or use jscodeshift dry-run as the source of truth for consumer counts (matches what the codemod actually rewrites).
+
+### Manual-sweep gap — type definitions vs call sites
+
+The codemod is intentionally syntactic on call-site `addToast({...})` ObjectExpression keys. It does NOT touch `interface ToastParams { message: string; variant: ... }` or inline `addToast: (params: { message: string; variant: ... }) => void` parameter types. Result: codemod ran clean, but tsc surfaced 19 type errors at the boundaries where chrome internals (StudioHeader, useStudioHandlers, useComposerInit, useHistoryFeedback) defined their own narrow `ToastParams` shape. Fix was uniform: replace each local type with `import type { ToastInput } from "@/editor/shared/vibcoder";` and re-type as `(input: ToastInput) => string`. This pattern is reusable for future buckets that have local re-typings of imperative API params.
+
+### Provider stack atomic-swap pattern
+
+T2 mounted the new vibcoder `<ToastProvider>` as an OUTER wrapper around the still-active shim `<ToastProvider>` (alias `VibcoderToastProvider` to disambiguate). T3 codemod rewrote import paths so consumers now resolved to the new wrapper's `useToast`. T4 atomically removed the inner shim Provider in the same commit as the codemod sweep + shim file deletion + barrel cleanup. This pattern (outer-wrap → atomic-swap) is cleaner than big-bang replacement because each step is independently reversible until the final atomic commit. Worth re-using for any future provider-backed shim deletion.
+
+### Shorthand expansion vs skip-with-warn
+
+The T3 plan + initial implementer brief specified shorthand-skip-with-warn behavior. Code-quality reviewer flagged this as latent footgun (silent ReferenceError if any consumer used `addToast({ message })` shorthand). Pre-flight grep confirmed zero consumers used shorthand. Fix-loop dispatch: implementer (correctly) chose to **expand** shorthand `{ message, variant }` → `{ description: message, tone: variant }` instead of skip-with-warn. This produced correct migrated output for the 5 shorthand sites in editActions.ts that the original brief expected to manual-sweep. Lesson: when an AST-codemod has a "skip-with-warn vs expand" choice, expand is preferable when the expansion is mechanically correct and lossless. Skip-with-warn forces manual sweep on every shorthand site; expand handles them mechanically.
+
+### Side-effect gate improvement
+
+Gate 12 (box-shadow via shadow/glow token) dropped 176 → 175 as a codemod side-effect (one consumer rewrite removed an inline shadow). Baseline locked at 175.
+
+### Recommendation
+
+**Bucket B3 closes 2026-04-30. Phase 5 chrome arc fully complete.** All Bucket A (Popover) + Buckets B1 (Tooltip) + B2 (ContextMenu pure deletion) + B3 (Toast) shipped. No remaining Phase 4 shims in chrome. The "deferred upstream" framing from the original Phase 5 close-out is now obsolete — every bucket landed in the local arc rather than waiting on vibcoder upstream changes. Phase 5 chrome integration is genuinely complete.

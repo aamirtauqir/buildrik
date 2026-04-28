@@ -401,7 +401,7 @@ precedents.
 | **M6: Layout coverage** | (merged into Phase 5 chrome integration) | Layout primitives ship alongside consumer rewrites |
 | **M7: Re-port complete** | (renumbered → M8 — see Phase numbering note) | Adapter shim layer landed, consumer rewrites pending in Phase 5 |
 | **M8: Phase 4 chrome re-port shipped** | T1–T8 complete | 19 adapter shims + 19 codemods + 17 keep-as-extension stamps + Gate 23 wired + Gate 24 ratcheted 264→100 — SHIPPED 2026-04-28 |
-| **M9: Phase 5 chrome integration shipped** | T1–T5 complete | 19 adapter shims deleted (Bucket C) + 6 compositions in `src/shared/extensions/` (Bucket D) + Gate 24 stable at 79 + tsc 71 stable + vitest 213/1743 + Buckets A+B deferred upstream — SHIPPED 2026-04-28 |
+| **M9: Phase 5 chrome integration shipped** | T1–T5 complete | 19 adapter shims deleted (Bucket C) + 6 compositions in `src/shared/extensions/` (Bucket D) + Gate 24 stable at 79 + tsc 71 stable + vitest 213/1743 — SHIPPED 2026-04-28. Bucket A (Popover Radix backing) shipped 2026-04-28. Buckets B1 (Tooltip Radix backing — 13 consumers), B2 (ContextMenu pure deletion — 257 LOC dead code) and B3 (Toast Radix backing — 28 consumers + jscodeshift codemod) closed 2026-04-30 at `7b1d7d4` / `b2f41e3`. Phase 5 chrome arc fully complete; no Phase 4 shims remain in chrome. |
 | **M10: Visual regression live** | Phase 6 complete (post-Phase-5) | Pixel-level drift detection |
 
 ## Risk register (post-Pass 6)
