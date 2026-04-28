@@ -23,6 +23,7 @@ import {
   ModalFooter,
   OverlayMount,
 } from "@/editor/shared/vibcoder";
+import { Stack } from "@/editor/shared/vibcoder";
 
 // =============================================================================
 // TYPES
@@ -390,7 +391,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         </div>
       </div>
       {step === 1 && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <Stack gap="lg">
           {/* Collection name */}
           <div>
             <label style={s.label}>
@@ -448,7 +449,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
               }}
             />
           </div>
-        </div>
+        </Stack>
       )}
       {step === 2 && (
         <div>

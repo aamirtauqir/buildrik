@@ -14,6 +14,7 @@ import { usePublish, type PublishResult } from "../../../../shared/hooks/usePubl
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { useToast } from "@/editor/shared/vibcoder";
 import { PanelHeader } from "@/shared/extensions/PanelHeader";
+import { Stack } from "@/editor/shared/vibcoder";
 
 // ============================================
 // Types
@@ -346,13 +347,13 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         {/* Pre-Publish Checklist */}
         <section style={sectionStyles}>
           <h3 style={sectionTitleStyles}>Pre-publish checklist</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <Stack gap="sm">
             <ChecklistItem label="Page title set" ok={checks.hasPageTitle} hint="Settings → Site" />
             <ChecklistItem label="Favicon uploaded" ok={checks.hasFavicon} hint="Settings → Site" />
             <ChecklistItem label="At least 1 page" ok={checks.hasPages} required />
             <ChecklistItem label="SEO title set" ok={checks.hasSeoTitle} hint="Pages → SEO" />
             <ChecklistItem label="Meta description added" ok={checks.hasMetaDesc} hint="Pages → SEO" />
-          </div>
+          </Stack>
           {projectId && (
             <p style={{ ...metaTextStyles, marginTop: 4 }}>
               Publishing to <strong style={{ color: "var(--bd-fg-primary)" }}>buildrik.app/{projectId}</strong>

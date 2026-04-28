@@ -197,7 +197,7 @@ const TabProfile: React.FC = () => (
 const TabTeam: React.FC = () => (
   <>
     <div style={{ fontSize: 24, fontWeight: 700, color: "var(--buildrick-text-primary)" }}>Team & Access</div>
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+    <Stack gap="sm">
       {MOCK_MEMBERS.map((m) => {
         const roleStyle = ROLE_COLORS[m.role];
         return (
@@ -246,7 +246,7 @@ const TabTeam: React.FC = () => (
           </div>
         );
       })}
-    </div>
+    </Stack>
   </>
 );
 

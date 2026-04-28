@@ -18,6 +18,7 @@ import {
   OverlayMount,
 } from "@/editor/shared/vibcoder";
 import { useToast } from "@/editor/shared/vibcoder";
+import { Stack } from "@/editor/shared/vibcoder";
 import { devError } from "../../../shared/utils/devLogger";
 
 export interface ProjectSettingsModalProps {
@@ -122,7 +123,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
         {/* Tab Content */}
         <div style={contentStyles}>
           {activeTab === "general" && (
-            <div style={formGroupStyles}>
+            <Stack gap="md">
               <label style={labelStyles}>Project Name</label>
               <Input
                 type="text"
@@ -140,11 +141,11 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                 style={inputStyles}
                 placeholder="John Doe"
               />
-            </div>
+            </Stack>
           )}
 
           {activeTab === "canvas" && (
-            <div style={formGroupStyles}>
+            <Stack gap="md">
               <label style={labelStyles}>Grid Size (px)</label>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <Input
@@ -169,11 +170,11 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                   <span>Snap to Grid</span>
                 </label>
               </div>
-            </div>
+            </Stack>
           )}
 
           {activeTab === "seo" && (
-            <div style={formGroupStyles}>
+            <Stack gap="md">
               <label style={labelStyles}>Site Name (SEO Default)</label>
               <Input
                 type="text"
@@ -186,7 +187,7 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
                 This will be used as the default title for your site if not overridden on individual
                 pages.
               </small>
-            </div>
+            </Stack>
           )}
         </div>
       </div>
@@ -235,12 +236,6 @@ const tabButtonStyles: React.CSSProperties = {
 
 const contentStyles: React.CSSProperties = {
   flex: 1,
-};
-
-const formGroupStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 12,
 };
 
 const labelStyles: React.CSSProperties = {

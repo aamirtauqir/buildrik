@@ -14,6 +14,7 @@ import {
   OverlayMount,
 } from "@/editor/shared/vibcoder";
 import { GROUPED_TABS_CONFIG } from "../rail/tabsConfig";
+import { Stack } from "@/editor/shared/vibcoder";
 
 // =============================================================================
 // SHORTCUT DATA
@@ -148,7 +149,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
             </div>
 
             {/* Shortcut rows */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <Stack gap="sm">
               {group.shortcuts.map((row, idx) => (
                 <div
                   key={idx}
@@ -175,7 +176,7 @@ export const KeyboardShortcutsPanel: React.FC<KeyboardShortcutsPanelProps> = ({
                   <KeyBadge>{row.key}</KeyBadge>
                 </div>
               ))}
-            </div>
+            </Stack>
           </div>
         ))}
       </div>

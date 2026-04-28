@@ -18,6 +18,7 @@ import {
   OverlayMount,
 } from "@/editor/shared/vibcoder";
 import { useToast } from "@/editor/shared/vibcoder";
+import { Stack } from "@/editor/shared/vibcoder";
 
 export interface CreateComponentModalProps {
   isOpen: boolean;
@@ -138,7 +139,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             </svg>
           </ModalClose>
           <div className="bd-modal__body">
-      <div style={containerStyles} onKeyDown={handleKeyPress}>
+      <Stack gap="lg" onKeyDown={handleKeyPress}>
         <div>
           <label style={labelStyles}>
             Name <span style={{ color: "var(--buildrick-accent)" }}>*</span>
@@ -226,7 +227,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             </div>
           )}
         </div>
-      </div>
+      </Stack>
           </div>
           <ModalFooter>
             <Button variant="ghost" onClick={onClose} disabled={isCreating}>
@@ -245,12 +246,6 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 // ============================================================================
 // STYLES
 // ============================================================================
-
-const containerStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 16,
-};
 
 const labelStyles: React.CSSProperties = {
   display: "block",
