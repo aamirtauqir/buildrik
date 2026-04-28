@@ -100,6 +100,8 @@ export class MediaManager extends MediaEventEmitter {
    * cleared when refs go back up or the timer fires (5s grace period).
    */
   private pendingRevokes = new Map<string, ReturnType<typeof setTimeout>>();
+  /** Deduplicate concurrent getAssetSrc requests for the same id */
+  private inFlight = new Map<string, Promise<string | null>>();
 
   constructor() {
     super();
@@ -122,7 +124,17 @@ export class MediaManager extends MediaEventEmitter {
    * Increments the ref count. Callers should call `releaseAssetSrc(id)`
    * in cleanup when the URL is no longer needed.
    */
-  async getAssetSrc(id: string): Promise<string | null> {
+  getAssetSrc(id: string): Promise<string | null> {
+    const existing = this.inFlight.get(id);
+    if (existing) return existing;
+
+    const promise = this._getAssetSrc(id);
+    this.inFlight.set(id, promise);
+    promise.finally(() => this.inFlight.delete(id));
+    return promise;
+  }
+
+  private async _getAssetSrc(id: string): Promise<string | null> {
     const asset = this.state.assets.find((a) => a.id === id);
     if (!asset) return null;
 
