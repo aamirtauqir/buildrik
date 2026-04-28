@@ -13,6 +13,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { Link, Unlink } from "lucide-react";
 import * as React from "react";
+import { Stack } from "@/editor/shared/vibcoder";
 
 // ============================================================================
 // AXIS INPUT — absolutely positioned input inside a box edge
@@ -154,7 +155,7 @@ export const FourSideInput: React.FC<FourSideInputProps> = ({
   disabledSides,
   disabledReason,
 }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+  <Stack gap="xs">
     <div
       style={{
         display: "flex",
@@ -210,7 +211,7 @@ export const FourSideInput: React.FC<FourSideInputProps> = ({
         );
       })}
     </div>
-  </div>
+  </Stack>
 );
 
 // ============================================================================
@@ -230,7 +231,7 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
   linked = false,
   onLinkToggle,
 }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+  <Stack gap="xs">
     <div
       style={{
         display: "flex",
@@ -278,5 +279,5 @@ export const CornerRadiusInput: React.FC<CornerRadiusInputProps> = ({
         );
       })}
     </div>
-  </div>
+  </Stack>
 );
