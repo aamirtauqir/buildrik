@@ -1,0 +1,39 @@
+import { describe, it, expect } from "vitest";
+import { readFileSync } from "fs";
+import { resolve } from "path";
+import { transform } from "./migrate-stack-cluster";
+
+const fix = (name: string) => readFileSync(resolve(__dirname, "__fixtures__", name), "utf8");
+
+describe("migrate-stack-cluster codemod", () => {
+  it("converts clean stack flex column to <Stack gap='sm'>", () => {
+    expect(transform(fix("stack-clean.input.tsx"))).toBe(fix("stack-clean.output.tsx"));
+  });
+
+  it("omits gap prop when value maps to default md (12px)", () => {
+    expect(transform(fix("stack-default-gap.input.tsx"))).toBe(fix("stack-default-gap.output.tsx"));
+  });
+
+  it("converts flex-wrap row to <Cluster>", () => {
+    expect(transform(fix("cluster.input.tsx"))).toBe(fix("cluster.output.tsx"));
+  });
+
+  it("leaves multi-prop sites untouched (preserves padding/background)", () => {
+    const input = fix("non-target.input.tsx");
+    const result = transform(input);
+    expect(result).toContain("padding: 16");
+    expect(result).toContain('background: "white"');
+    expect(result).not.toContain("<Stack");
+  });
+
+  it("leaves off-grid gap (10px) untouched", () => {
+    const result = transform(fix("non-target.input.tsx"));
+    expect(result).toContain("gap: 10");
+    expect(result).not.toContain('gap="sm"');
+  });
+
+  it("leaves computed gap (ternary) untouched", () => {
+    const result = transform(fix("non-target.input.tsx"));
+    expect(result).toContain("dense ? 4 : 8");
+  });
+});

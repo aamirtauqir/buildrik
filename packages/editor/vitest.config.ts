@@ -16,6 +16,7 @@ export default defineConfig({
       "scripts/__tests__/*.mjs",
       "scripts/__tests__/*.{test,spec}.{ts,tsx}",
       "scripts/codemods/**/__tests__/*.{test,spec}.{ts,tsx}",
+      "scripts/codemods/*.{test,spec}.{ts,tsx}",
     ],
     setupFiles: ["./src/test-setup.ts"],
     testTimeout: 15000,
