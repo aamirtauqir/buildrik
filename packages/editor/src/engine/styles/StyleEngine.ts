@@ -554,7 +554,14 @@ export class StyleEngine {
   private updateStylesheet(): void {
     this.pendingUpdate = true;
     if (this.rafId === null) {
-      this.rafId = requestAnimationFrame(() => this.flush());
+      if (typeof requestAnimationFrame !== "undefined") {
+        this.rafId = requestAnimationFrame(() => {
+          this.rafId = null;
+          this.flush();
+        });
+      } else {
+        this.flush();
+      }
     }
   }
 
@@ -563,10 +570,6 @@ export class StyleEngine {
    */
   flush(): void {
     if (!this.pendingUpdate || !this.styleElement) return;
-    if (this.rafId !== null) {
-      cancelAnimationFrame(this.rafId);
-      this.rafId = null;
-    }
     this.styleElement.textContent = this.toCSS();
     this.pendingUpdate = false;
   }
