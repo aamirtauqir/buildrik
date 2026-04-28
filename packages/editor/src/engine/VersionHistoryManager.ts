@@ -647,15 +647,16 @@ export class VersionHistoryManager {
     const currentData = current.snapshot;
     const targetData = target.snapshot;
 
+    const currentMap = this.flattenSnapshot(currentData);
+    const targetMap = this.flattenSnapshot(targetData);
+
     // Collect all element IDs from both snapshots
-    const allElementIds = new Set<string>();
-    this.collectElementIds(currentData, allElementIds);
-    this.collectElementIds(targetData, allElementIds);
+    const allElementIds = new Set<string>([...currentMap.keys(), ...targetMap.keys()]);
 
     // Process each element
     for (const elementId of allElementIds) {
-      const currentElement = this.findElementById(currentData, elementId);
-      const targetElement = this.findElementById(targetData, elementId);
+      const currentElement = currentMap.get(elementId) || null;
+      const targetElement = targetMap.get(elementId) || null;
 
       if (!targetElement && currentElement) {
         // Element was removed
@@ -665,13 +666,13 @@ export class VersionHistoryManager {
           before: currentElement.id,
           after: "",
         });
-      } else if (currentElement && !targetElement) {
+      } else if (!currentElement && targetElement) {
         // Element was added
         changes.push({
           type: "other",
           property: "element",
           before: "",
-          after: currentElement.id,
+          after: targetElement.id,
         });
       } else if (currentElement && targetElement) {
         // Element exists in both, compare properties
@@ -718,33 +719,6 @@ export class VersionHistoryManager {
   }
 
   /**
-   * Recursively collect all element IDs from a project
-   */
-  private collectElementIds(project: ProjectData, ids: Set<string>): void {
-    const traverse = (elements: unknown[]) => {
-      if (!elements || !Array.isArray(elements)) return;
-      for (const el of elements) {
-        const element = el as { id?: string; children?: unknown[] };
-        if (element.id) {
-          ids.add(element.id);
-        }
-        if (element.children) {
-          traverse(element.children);
-        }
-      }
-    };
-
-    for (const page of project.pages) {
-      if (page.root) {
-        if (page.root.id) ids.add(page.root.id);
-        if (page.root.children) {
-          traverse(page.root.children as unknown[]);
-        }
-      }
-    }
-  }
-
-  /**
    * Find an element by ID in a project snapshot
    */
   private findElementById(
@@ -778,6 +752,29 @@ export class VersionHistoryManager {
       }
     }
     return null;
+  }
+
+  private flattenSnapshot(project: ProjectData): Map<string, { id: string; type?: string; tagName?: string; attributes?: Record<string, string>; classes?: string[]; styles?: Record<string, string>; content?: string; children?: unknown[]; traits?: unknown[] }> {
+    const map = new Map<string, { id: string; type?: string; tagName?: string; attributes?: Record<string, string>; classes?: string[]; styles?: Record<string, string>; content?: string; children?: unknown[]; traits?: unknown[] }>();
+    const traverse = (elements: unknown[]) => {
+      if (!elements || !Array.isArray(elements)) return;
+      for (const el of elements) {
+        const element = el as { id?: string; children?: unknown[] };
+        if (element.id) {
+          map.set(element.id, element as { id: string; type?: string; tagName?: string; attributes?: Record<string, string>; classes?: string[]; styles?: Record<string, string>; content?: string; children?: unknown[]; traits?: unknown[] });
+        }
+        if (element.children) {
+          traverse(element.children);
+        }
+      }
+    };
+    for (const page of project.pages) {
+      if (page.root) {
+        if (page.root.id) map.set(page.root.id, page.root);
+        if (page.root.children) traverse(page.root.children as unknown[]);
+      }
+    }
+    return map;
   }
 
   /**
