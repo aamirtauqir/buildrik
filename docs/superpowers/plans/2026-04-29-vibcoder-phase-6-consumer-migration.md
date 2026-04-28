@@ -566,7 +566,7 @@ Expected: build succeeds (no missing imports, no runtime errors at module-load).
 - [ ] **Step 6: Run DS gates**
 
 Run: `cd /Users/shahg/Desktop/pencil/buildrik && bash scripts/ds-grep-gates.sh 2>&1 | tail -10`
-Expected: 25/25 pass. Inline-flex baselines should DROP (Gate 24 inline-element count goes down). If a gate fails, investigate and fix.
+Expected: 25/25 pass (or 24/25 if Gate 25 orphan-fixture pre-exists from T2 — track separately). Gate 24 measures inline form atoms, NOT inline `<div>` elements — Stack migrations will NOT move it. Migration value is structural (DS adoption + spacing token SSOT), not gate metric.
 
 - [ ] **Step 7: Commit**
 
@@ -577,8 +577,9 @@ git commit -m "$(cat <<'EOF'
 refactor(vibcoder-phase-6): T3 sidebar batch — migrate to <Stack>/<Cluster>
 
 Codemod applied to packages/editor/src/editor/sidebar/. Inline-flex
-column/wrap layouts replaced with Phase 4 wrappers. Gate 24 inline-element
-baseline drops accordingly.
+column/wrap layouts replaced with Phase 4 wrappers. Structural migration
+(DS adoption + spacing token SSOT). Gate 24 stays unchanged — it measures
+inline form atoms, not inline divs.
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 EOF
@@ -638,7 +639,7 @@ git commit -m "$(cat <<'EOF'
 refactor(vibcoder-phase-6): T4 canvas+inspector batch — migrate to <Stack>/<Cluster>
 
 Codemod applied to packages/editor/src/editor/canvas/ and inspector/.
-Gate 24 inline-element baseline drops. Tsc 71 stable.
+Tsc 71 stable. Structural migration; Gate 24 unchanged.
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 EOF
@@ -806,10 +807,10 @@ node -e "const r = require('./packages/editor/scripts/codemods/inventory-report.
 ```
 Expected: Console output shows the bucket counts. `stack-clean` and `cluster-clean` should be 0 (or each remaining one has a documented reason in T6 commit).
 
-- [ ] **Step 3: Verify Gate 24 baseline drop**
+- [ ] **Step 3: Verify gate baselines stable**
 
 Run: `cd /Users/shahg/Desktop/pencil/buildrik && cat packages/editor/scripts/.chrome-axioms-baseline`
-Expected: Inline-element count line is LOWER than pre-Phase-6 baseline. Update baseline file if gate auto-baselines on pass.
+Expected: Counts stable (Gate 24 measures inline form atoms — Stack migration is structural, not metric-moving). If counts shifted unexpectedly, investigate before close-out.
 
 - [ ] **Step 4: Commit**
 
@@ -817,10 +818,11 @@ Expected: Inline-element count line is LOWER than pre-Phase-6 baseline. Update b
 cd /Users/shahg/Desktop/pencil/buildrik
 git add packages/editor/scripts/codemods/inventory-report.json packages/editor/scripts/.chrome-axioms-baseline
 git commit -m "$(cat <<'EOF'
-chore(vibcoder-phase-6): T7 final inventory + Gate 24 baseline update
+chore(vibcoder-phase-6): T7 final inventory verification
 
-Post-migration inventory: clean buckets at zero. Gate 24 inline-element
-baseline drops by ~110 (Stack + Cluster combined consumer count).
+Post-migration inventory: clean buckets at zero. Structural migration
+complete. Chrome-axioms baseline stable (Gate 24 measures inline form
+atoms, not inline divs — Stack migration doesn't move that metric).
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 EOF

@@ -36,4 +36,13 @@ describe("migrate-stack-cluster codemod", () => {
     const result = transform(fix("non-target.input.tsx"));
     expect(result).toContain("dense ? 4 : 8");
   });
+
+  // Regression: T3 sidebar batch surfaced two ts-morph bugs the original
+  // 6 fixtures missed. Nested stacks need bottom-up iteration (parent rename
+  // forgets child refs in pre-order) AND closing-tag-first rename (else
+  // ts-morph re-validates the AST mid-op against transient <Stack>...</div>
+  // mismatch). Fixed in c44ba2c. This fixture pins the contract.
+  it("converts nested stacks (bottom-up iteration + closing-tag-first rename)", () => {
+    expect(transform(fix("nested-stack.input.tsx"))).toBe(fix("nested-stack.output.tsx"));
+  });
 });

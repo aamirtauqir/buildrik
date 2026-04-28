@@ -586,11 +586,12 @@ BASE_24=$(sed -n '5p' "$BASELINE_FILE" 2>/dev/null || echo "0")
 check_gate 24 "$GATE24_HITS" "$BASE_24" "inline <button>/<input>/<select>/<textarea> in editor/ (use vibcoder shim @/shared/ui)" || exit 1
 
 # Gate 25: Orphan codemod fixtures.
-# Every `__tests__/fixtures/<name>.input.tsx` (and `.output.tsx`) must have a
-# matching `__tests__/<name>.codemod.test.ts` sibling. Catches the leftover-
-# fixture trap surfaced during Bucket A T4: prior codemod-deletion commits
-# removed `.ts` + `.codemod.test.ts` but left fixtures behind, with nothing
-# blocking `rmdir` of the parent directory or signalling dead test data.
+# Every `*.input.tsx`/`*.output.tsx` must be referenced by SOME test file —
+# either a 1:1 sibling `<name>.codemod.test.ts` (Phase 5 Bucket pattern) OR
+# a shared `*.test.ts` in the parent dir that loads the fixture by filename
+# (Phase 6 migrate-stack-cluster pattern). Catches the leftover-fixture
+# trap (Bucket A T4: codemod deletion left fixtures behind) without
+# forcing a 1:1 file-naming convention on shared test files.
 GATE25_ORPHANS=""
 while IFS= read -r fixture; do
   [ -z "$fixture" ] && continue
@@ -599,9 +600,10 @@ while IFS= read -r fixture; do
   name="${name%.output.tsx}"
   fixtures_dir=$(dirname "$fixture")
   tests_dir=$(dirname "$fixtures_dir")
-  test_file="${tests_dir}/${name}.codemod.test.ts"
-  if [ ! -f "$test_file" ]; then
-    GATE25_ORPHANS="${GATE25_ORPHANS}${fixture} (missing ${test_file})"$'\n'
+  per_fixture_test="${tests_dir}/${name}.codemod.test.ts"
+  shared_test_match=$(grep -l "${name}\.\(input\|output\)" "${tests_dir}"/*.test.ts "${tests_dir}"/*.codemod.test.ts 2>/dev/null | head -1)
+  if [ ! -f "$per_fixture_test" ] && [ -z "$shared_test_match" ]; then
+    GATE25_ORPHANS="${GATE25_ORPHANS}${fixture} (no per-fixture test at ${per_fixture_test} and no shared test references it)"$'\n'
   fi
 done < <(find packages/editor/scripts/codemods -type f \( -name '*.input.tsx' -o -name '*.output.tsx' \) 2>/dev/null)
 if [ -n "$GATE25_ORPHANS" ]; then
