@@ -9,7 +9,6 @@
 
 // Shared UI components
 export * from "./Tooltip";
-export * from "./Popover";
 export * from "./Accordion";
 export * from "./Grid";
 export * from "./SliderInput";

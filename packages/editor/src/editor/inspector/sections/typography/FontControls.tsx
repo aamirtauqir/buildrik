@@ -15,7 +15,12 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
 import { useTypeRegistry } from "../../../../features/design-system/state/TokenRegistryContext";
-import { Popover } from "../../../../shared/ui/Popover";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverPortal,
+  PopoverContent,
+} from "@/editor/shared/vibcoder";
 import { TokenPickerPopover } from "../../shared/TokenPickerPopover";
 import { SelectRow, ButtonGroup, InputWithUnit, MixedValueIndicator } from "../../shared/controls";
 
@@ -54,6 +59,7 @@ interface TypeChainButtonProps {
 }
 
 const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onChange }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
   const { tokens: typeTokens } = useTypeRegistry();
   const tokenEntries = typeTokens.map((t) => ({
     id: t.id,
@@ -99,10 +105,8 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
   }
 
   return (
-    <Popover
-      triggerOn="click"
-      position="bottom"
-      trigger={
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
         <Button
           type="button"
           aria-label={`Link ${property} to type token`}
@@ -123,18 +127,20 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
         >
           <Link2 size={12} aria-hidden="true" />
         </Button>
-      }
-      content={
-        <TokenPickerPopover
-          tokens={tokenEntries}
-          currentValue={value}
-          showSwatch={false}
-          tokenLabel="type"
-          onSelect={(_id, cssVarRef) => onChange(cssVarRef)}
-          onCustomValue={onChange}
-        />
-      }
-    />
+      </PopoverTrigger>
+      <PopoverPortal>
+        <PopoverContent sideOffset={8}>
+          <TokenPickerPopover
+            tokens={tokenEntries}
+            currentValue={value}
+            showSwatch={false}
+            tokenLabel="type"
+            onSelect={(_id, cssVarRef) => onChange(cssVarRef)}
+            onCustomValue={onChange}
+          />
+        </PopoverContent>
+      </PopoverPortal>
+    </Popover>
   );
 };
 

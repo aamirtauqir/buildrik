@@ -45,7 +45,6 @@ export {
   ContextMenu,
   useContextMenu,
   Badge,
-  Popover,
 } from "./components";
 
 // ============================================

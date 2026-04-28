@@ -9,7 +9,12 @@ import { Input } from "@/editor/shared/vibcoder/Input";
 import * as React from "react";
 import { ColorField } from "../../shared/forms";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { Popover } from "@/shared/ui/Popover";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverPortal,
+  PopoverContent,
+} from "@/editor/shared/vibcoder";
 import { Tooltip } from "@/shared/ui/Tooltip";
 
 export interface RichTextEditorProps {
@@ -25,11 +30,15 @@ export interface RichTextEditorProps {
 
 export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activeStyles = {} }) => {
   const [linkUrl, setLinkUrl] = React.useState("");
+  const [textColorOpen, setTextColorOpen] = React.useState(false);
+  const [bgColorOpen, setBgColorOpen] = React.useState(false);
+  const [linkOpen, setLinkOpen] = React.useState(false);
 
   const handleLink = () => {
     if (linkUrl) {
       onCommand("createLink", linkUrl);
       setLinkUrl("");
+      setLinkOpen(false);
     }
   };
 
@@ -192,18 +201,20 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
       ))}
       <Divider />
       {/* Colors */}
-      <Popover
-        trigger={
+      <Popover open={textColorOpen} onOpenChange={setTextColorOpen}>
+        <PopoverTrigger asChild>
           <Button style={toolbarButtonStyle} title="Text Color" aria-label="Change text color">
             <span style={{ borderBottom: "2px solid var(--buildrick-accent)" }}>A</span>
           </Button>
-        }
-        content={
-          <ColorField label="Text Color" onChange={(color) => onCommand("foreColor", color)} />
-        }
-      />
-      <Popover
-        trigger={
+        </PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent sideOffset={8}>
+            <ColorField label="Text Color" onChange={(color) => onCommand("foreColor", color)} />
+          </PopoverContent>
+        </PopoverPortal>
+      </Popover>
+      <Popover open={bgColorOpen} onOpenChange={setBgColorOpen}>
+        <PopoverTrigger asChild>
           <Button
             style={toolbarButtonStyle}
             title="Background Color"
@@ -211,18 +222,20 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
           >
             <span style={{ background: "var(--buildrick-warning)", padding: "0 4px" }}>A</span>
           </Button>
-        }
-        content={
-          <ColorField
-            label="Highlight Color"
-            onChange={(color) => onCommand("hiliteColor", color)}
-          />
-        }
-      />
+        </PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent sideOffset={8}>
+            <ColorField
+              label="Highlight Color"
+              onChange={(color) => onCommand("hiliteColor", color)}
+            />
+          </PopoverContent>
+        </PopoverPortal>
+      </Popover>
       <Divider />
       {/* Link */}
-      <Popover
-        trigger={
+      <Popover open={linkOpen} onOpenChange={setLinkOpen}>
+        <PopoverTrigger asChild>
           <Button
             style={{
               ...toolbarButtonStyle,
@@ -233,36 +246,38 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
           >
             🔗
           </Button>
-        }
-        content={
-          <div style={{ width: 250 }}>
-            <Input
-              type="text"
-              value={linkUrl}
-              onChange={(e) => setLinkUrl(e.target.value)}
-              placeholder="https://..."
-              style={{
-                width: "100%",
-                padding: "8px 12px",
-                background: "var(--buildrick-bg-dark)",
-                border: "1px solid var(--buildrick-border)",
-                borderRadius: 6,
-                color: "var(--buildrick-text-primary)",
-                fontSize: 13,
-                marginBottom: 8,
-              }}
-            />
-            <div style={{ display: "flex", gap: 8 }}>
-              <Button size="sm" variant="ghost" onClick={() => onCommand("unlink")}>
-                Remove
-              </Button>
-              <Button size="sm" onClick={handleLink}>
-                Apply
-              </Button>
+        </PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent sideOffset={8}>
+            <div style={{ width: 250 }}>
+              <Input
+                type="text"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                placeholder="https://..."
+                style={{
+                  width: "100%",
+                  padding: "8px 12px",
+                  background: "var(--buildrick-bg-dark)",
+                  border: "1px solid var(--buildrick-border)",
+                  borderRadius: 6,
+                  color: "var(--buildrick-text-primary)",
+                  fontSize: 13,
+                  marginBottom: 8,
+                }}
+              />
+              <div style={{ display: "flex", gap: 8 }}>
+                <Button size="sm" variant="ghost" onClick={() => onCommand("unlink")}>
+                  Remove
+                </Button>
+                <Button size="sm" onClick={handleLink}>
+                  Apply
+                </Button>
+              </div>
             </div>
-          </div>
-        }
-      />
+          </PopoverContent>
+        </PopoverPortal>
+      </Popover>
       {/* Clear Formatting */}
       <Tooltip content="Clear Formatting">
         <Button onClick={() => onCommand("removeFormat")} style={toolbarButtonStyle}>

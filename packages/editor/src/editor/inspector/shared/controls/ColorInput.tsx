@@ -9,7 +9,12 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { Eye, EyeOff, Link2, Link2Off } from "lucide-react";
 import * as React from "react";
-import { Popover } from "../../../../shared/ui/Popover";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverPortal,
+  PopoverContent,
+} from "@/editor/shared/vibcoder";
 import { useColorRegistry } from "../../../../features/design-system/state/TokenRegistryContext";
 import { TokenPickerPopover } from "../TokenPickerPopover";
 
@@ -57,6 +62,7 @@ export interface ColorInputProps {
 
 export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }) => {
   const [hidden, setHidden] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(false);
 
   const { tokens: colorTokens } = useColorRegistry();
   const tokenEntries = colorTokens.map((t) => ({
@@ -88,11 +94,19 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
     <div className="bdi-row-ctrl">
       <label className="bdi-lb">{label}</label>
       <div className="bdi-row-content">
-        <Popover
-          triggerOn="click"
-          position="bottom"
-          trigger={
-            <div className={`bdi-fill${isBound ? " bound" : ""}`} role="button" tabIndex={0}>
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+          <PopoverTrigger asChild>
+            <div
+              className={`bdi-fill${isBound ? " bound" : ""}`}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setIsOpen((v) => !v);
+                }
+              }}
+            >
               <span className="bdi-sw" aria-hidden="true">
                 <span className="bdi-sw-fill" style={{ background: swatchColor }} />
               </span>
@@ -157,18 +171,20 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
                 </>
               )}
             </div>
-          }
-          content={
-            <TokenPickerPopover
-              tokens={tokenEntries}
-              currentValue={value}
-              showSwatch={true}
-              tokenLabel="color"
-              onSelect={(_tokenId, cssVarRef) => onChange(cssVarRef)}
-              onCustomValue={onChange}
-            />
-          }
-        />
+          </PopoverTrigger>
+          <PopoverPortal>
+            <PopoverContent sideOffset={8}>
+              <TokenPickerPopover
+                tokens={tokenEntries}
+                currentValue={value}
+                showSwatch={true}
+                tokenLabel="color"
+                onSelect={(_tokenId, cssVarRef) => onChange(cssVarRef)}
+                onCustomValue={onChange}
+              />
+            </PopoverContent>
+          </PopoverPortal>
+        </Popover>
       </div>
     </div>
   );
