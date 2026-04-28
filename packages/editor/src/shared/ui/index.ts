@@ -16,12 +16,6 @@ export { ErrorMessage, type ErrorMessageProps } from "./ErrorMessage";
 export { FormInput, type FormInputProps } from "./FormInput";
 export { NumericStepper, type NumericStepperProps } from "./NumericStepper";
 export { Accordion, type AccordionProps, type AccordionItem } from "./Accordion";
-export {
-  ContextMenu,
-  useContextMenu,
-  type ContextMenuProps,
-  type ContextMenuItem,
-} from "./ContextMenu";
 export { Badge, type BadgeProps } from "./Badge";
 export { Resizable, type ResizableProps } from "./Resizable";
 export { Grid, GridItem, GridPresets, type GridProps, type GridItemProps } from "./Grid";

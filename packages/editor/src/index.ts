@@ -42,8 +42,6 @@ export {
   useToast,
   Tooltip,
   Accordion,
-  ContextMenu,
-  useContextMenu,
   Badge,
 } from "./components";
 

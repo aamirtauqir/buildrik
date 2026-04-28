@@ -10,7 +10,6 @@ import * as React from "react";
 import { getBlockById, insertBlock } from "../../../../blocks/blockRegistry";
 import type { Composer } from "../../../../engine";
 import type { ElementType, GrapesElement } from "../../../../shared/types";
-import type { ContextMenuItem } from "../../../../shared/ui/ContextMenu";
 import { devError } from "../../../../shared/utils/devLogger";
 import {
   findDropTargetElement,
@@ -36,7 +35,6 @@ export interface DropContext {
   freshDropPosition: DropPosition;
   onDropError?: (error: DropError) => void;
   onDropSuccess?: (success: DropSuccess) => void;
-  onShowContextMenu?: (items: ContextMenuItem[], x: number, y: number) => void;
 }
 
 // =============================================================================
@@ -359,73 +357,6 @@ export function handleBlockDrop(e: React.DragEvent, ctx: DropContext): boolean {
 
   try {
     const block = JSON.parse(blockData);
-
-    // GAP-FIX: Intercept "heading" drop to show context menu for H1-H6 selection
-    // Use setTimeout to ensure drag operation is fully cleared and state updates reliably
-    if (block.id === "heading" && ctx.onShowContextMenu) {
-      const clientX = e.clientX;
-      const clientY = e.clientY;
-
-      // Determine potential drop target
-      const activePage = composer.elements.getActivePage();
-      if (!activePage) return false;
-      const rootElement = composer.elements.getElement(activePage.root.id);
-      if (!rootElement) return false;
-
-      let targetEl = (freshTargetId && composer.elements.getElement(freshTargetId)) || null;
-
-      if (!targetEl) {
-        // Fallback: find target from DOM
-        const domTarget = (e.target as HTMLElement).closest("[data-buildrick-id]") as HTMLElement | null;
-        const fallbackId = domTarget?.getAttribute("data-buildrick-id");
-        if (fallbackId) {
-          targetEl = composer.elements.getElement(fallbackId) || null;
-        }
-      }
-
-      // Resolve drop target context
-      // We assume 'heading' maps to 'heading' generic type for validation
-      const resolved = findValidDropTargetWithFallback(targetEl, rootElement, "heading", {});
-
-      if (!resolved.success || !resolved.result) {
-        onDropError?.({ type: "NO_VALID_TARGET", message: "Cannot place heading here" });
-        return true;
-      }
-
-      const { parent: parentElement, index: dropIndex } = resolved.result;
-
-      // Show Context Menu
-      const menuItems: ContextMenuItem[] = [1, 2, 3, 4, 5, 6].map((level) => ({
-        id: `h${level}`,
-        label: `Heading ${level}`,
-        icon: <span style={{ fontSize: 12, fontWeight: 700 }}> H{level} </span>,
-        onClick: () => {
-          composer.beginTransaction("insert-heading");
-          try {
-            const specificDef = getBlockById(`heading${level}`);
-            if (specificDef) {
-              const newId = insertBlock(composer, specificDef, parentElement.getId(), dropIndex);
-              if (newId) {
-                const newEl = composer.elements.getElement(newId);
-                setTimeout(() => {
-                  if (newEl) composer.selection.select(newEl);
-                  onDropSuccess?.({ elementLabel: `Heading ${level}`, elementType: `h${level}` });
-                }, 0);
-              }
-            }
-          } catch {
-            composer.rollbackTransaction();
-            onDropError?.({ type: "INSERT_FAILED", message: "Failed to insert heading" });
-          }
-          composer.endTransaction();
-        },
-      }));
-
-      setTimeout(() => {
-        ctx.onShowContextMenu?.(menuItems, clientX, clientY);
-      }, 0);
-      return true; // Handled
-    }
 
     const def = getBlockById(block.id);
 
