@@ -8,7 +8,6 @@
 // UI interaction hooks (no external deps)
 export { useClickOutside } from "./useClickOutside";
 export { useEscapeKey } from "./useEscapeKey";
-export { useFocusTrap } from "./useFocusTrap";
 export { useReducedMotion } from "./useReducedMotion";
 
 // Feedback hooks (depend on Composer + events)
