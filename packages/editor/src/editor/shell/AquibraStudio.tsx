@@ -18,6 +18,7 @@ import { ExportEngine } from "../../engine/export";
 import { EVENTS } from "../../shared/constants/events";
 import { useElementFlash } from "../../shared/hooks";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
+import { TooltipProvider } from "@/editor/shared/vibcoder";
 import { StudioSkeleton } from "@/shared/extensions/Skeleton";
 import { ToastProvider, useToast } from "../../shared/ui/Toast";
 import { UpgradeModal } from "@/shared/extensions/UpgradeModal";
@@ -589,13 +590,25 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   );
 };
 
-/** Main Aquibra Studio Editor (with providers) */
+/**
+ * Main Aquibra Studio Editor (with providers).
+ *
+ * Provider stack (outer → inner):
+ *   TooltipProvider — Radix.Tooltip ambient. delayDuration=500 matches the
+ *     deleted Phase 4 Tooltip shim default (no perceptible behavior change
+ *     for chrome users post-Bucket-B1).
+ *   ToastProvider — current passive Phase 4 toast queue (B3 will rewrap
+ *     this with Radix.Toast).
+ *   StudioErrorBoundary — last-resort UI fallback.
+ */
 export const AquibraStudio: React.FC<AquibraStudioProps> = (props) => (
-  <ToastProvider>
-    <StudioErrorBoundary>
-      <AquibraStudioShell {...props} />
-    </StudioErrorBoundary>
-  </ToastProvider>
+  <TooltipProvider delayDuration={500}>
+    <ToastProvider>
+      <StudioErrorBoundary>
+        <AquibraStudioShell {...props} />
+      </StudioErrorBoundary>
+    </ToastProvider>
+  </TooltipProvider>
 );
 
 export default AquibraStudio;
