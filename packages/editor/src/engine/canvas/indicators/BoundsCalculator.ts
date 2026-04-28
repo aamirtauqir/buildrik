@@ -16,6 +16,8 @@ import type { Element } from "../../elements/Element";
  */
 export class BoundsCalculator {
   private composer: Composer;
+  private boundsCache: Map<string, ElementBounds> = new Map();
+  private cacheVersion = 0;
 
   constructor(composer: Composer) {
     this.composer = composer;
@@ -28,8 +30,12 @@ export class BoundsCalculator {
   getElementBounds(element: Element): ElementBounds | null {
     if (typeof document === "undefined") return null;
 
+    const elementId = element.getId();
+    const cached = this.boundsCache.get(elementId);
+    if (cached) return cached;
+
     const domElement = document.querySelector(
-      `[data-buildrick-id="${element.getId()}"]`
+      `[data-buildrick-id="${elementId}"]`
     ) as HTMLElement | null;
 
     if (!domElement) return null;
@@ -46,8 +52,8 @@ export class BoundsCalculator {
 
     const computedStyle = window.getComputedStyle(domElement);
 
-    return {
-      elementId: element.getId(),
+    const bounds: ElementBounds = {
+      elementId,
       x: elementRect.left - containerRect.left,
       y: elementRect.top - containerRect.top,
       width: elementRect.width,
@@ -65,6 +71,9 @@ export class BoundsCalculator {
         left: parseNumericValue(computedStyle.paddingLeft),
       },
     };
+
+    this.boundsCache.set(elementId, bounds);
+    return bounds;
   }
 
   /**
@@ -74,6 +83,25 @@ export class BoundsCalculator {
     const element = this.composer.elements.getElement(elementId);
     if (!element) return null;
     return this.getElementBounds(element);
+  }
+
+  /**
+   * Invalidate the cached bounds for a specific element, or clear the entire cache
+   */
+  invalidateCache(elementId?: string): void {
+    if (elementId) {
+      this.boundsCache.delete(elementId);
+    } else {
+      this.boundsCache.clear();
+      this.cacheVersion++;
+    }
+  }
+
+  /**
+   * Get the current cache version (increments on full invalidation)
+   */
+  getCacheVersion(): number {
+    return this.cacheVersion;
   }
 
   /**
