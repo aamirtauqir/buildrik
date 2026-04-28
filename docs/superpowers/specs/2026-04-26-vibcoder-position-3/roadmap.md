@@ -7,9 +7,10 @@
 **Phase numbering note (post-M8):** The execution plan renumbered late in the
 arc. What this roadmap originally called "Phase 4 — Layouts" was deferred; the
 chrome re-port (originally Phase 5) shipped as **Phase 4 chrome re-port** at
-M8 (2026-04-28). The layout phase folds into Phase 5 chrome integration where
-layout primitives land alongside consumer rewrites. See `poc-findings.md`
-Phase 4 section for the actual delivered scope.
+M8 (2026-04-28). The deferred layout phase was subsequently revived as a
+standalone arc and SHIPPED 2026-04-29 (M6) — see "Phase 4 — Layouts — SHIPPED
+2026-04-29 (revival)" section below. See `poc-findings.md` Phase 4 section for
+the chrome re-port scope.
 
 ## Phase dependency graph
 
@@ -302,17 +303,34 @@ Four batches in dependency order. 16 organism files (no POC overlap):
 migration. Reconsider blocking mode post-Phase 5 based on realized false positive
 rate.
 
-## Phase 4 — Layouts (~3 days dispatched, ~2 commits) — DEFERRED
+## Phase 4 — Layouts — SHIPPED 2026-04-29 (revival)
 
-**Status:** deferred and folded into Phase 5 chrome integration (see header
-"Phase numbering note" — chrome re-port shipped as Phase 4 at M8). Layout
-primitives (sidebar-shell, stack, cluster, grid, center, frame, switcher) ship
-alongside consumer rewrites in Phase 5 rather than as a standalone batch.
+**Status:** SHIPPED 2026-04-29 as a standalone revival arc. Originally deferred
+and folded into Phase 5 chrome integration (see header "Phase numbering note" —
+chrome re-port shipped as Phase 4 at M8). After Phase 5 + Buckets A/B closed
+2026-04-30, the deferred layout phase was revived as the highest-leverage
+remaining DS gap before Phase 6 visual regression baselines.
 
-Two batches:
+**Delivered:** 7 React forwardRef wrappers + 7 vendored CSS files +
+per-primitive tests + galleries + barrel exports. Manifest layouts table marked
+SHIPPED with per-row commit SHAs.
 
-- **Most-needed:** sidebar-shell, stack, cluster
-- **Universal:** grid, center, frame, switcher
+| Task | Commit | Scope |
+|------|--------|-------|
+| T1 vendor pipeline bootstrap | `4cade9d` | 7 layout CSS vendored to `src/themes/components/layouts/` via codemod 1 (`bdr-*` → `bd-*`) |
+| T2 Stack (PILOT) | `c5d6251` | Vertical/horizontal + gap + separator + tests + gallery |
+| T3 Cluster | `67777ae` | Horizontal-with-wrap + align variants + tests + gallery |
+| T4 Center + Grid + Frame batch | `d7f19ad` | 3 simpler primitives: page/inline center, fixed-cols + auto-fit grid, ratio-locked frame |
+| T5 Switcher | `e9d5a5a` | Responsive flex that wraps to stack below threshold |
+| T6 SidebarShell | `a9bfdbb` | 2-slot primitive (sidebar + children) with width/side/bordered modifiers |
+
+**Out of scope:** chrome consumer migration of inline-flex sites (deferred to
+touch-as-needed pattern per Bucket B3 codemod-scope-risk lesson). 4-zone editor
+shell at `AquibraStudio.tsx` remains hand-rolled CSS Grid — SidebarShell could
+compose with Stack + a top rail to express it later if the need arises.
+
+Original two-batch plan superseded by 6-task per-primitive cadence after T2
+Stack pilot validated the wrapper shape.
 
 ## Phase 5 — Chrome integration — SHIPPED 2026-04-28 (M9)
 
@@ -398,7 +416,7 @@ precedents.
 | **M3: Atoms complete** | Phase 1 complete | All 25 atoms in gallery, gates green |
 | **M4: Molecules complete** | Phase 2 complete | Composition working |
 | **M5: Organisms complete** | Phase 3 complete | Codex routing remains advisory through chrome re-port (per Pass 6 finding #15) — SHIPPED 2026-04-27 (`bcfeda1`+`d146bb0`+organism close) |
-| **M6: Layout coverage** | (merged into Phase 5 chrome integration) | Layout primitives ship alongside consumer rewrites |
+| **M6: Layout coverage** | T1-T6 complete | 7 layout primitives revived as standalone arc — Stack/Cluster/Center/Grid/Frame/Switcher/SidebarShell + vendored CSS + wrappers + tests + galleries — SHIPPED 2026-04-29 (`4cade9d`..`a9bfdbb`). Chrome consumer migration deferred to touch-as-needed. |
 | **M7: Re-port complete** | (renumbered → M8 — see Phase numbering note) | Adapter shim layer landed, consumer rewrites pending in Phase 5 |
 | **M8: Phase 4 chrome re-port shipped** | T1–T8 complete | 19 adapter shims + 19 codemods + 17 keep-as-extension stamps + Gate 23 wired + Gate 24 ratcheted 264→100 — SHIPPED 2026-04-28 |
 | **M9: Phase 5 chrome integration shipped** | T1–T5 complete | 19 adapter shims deleted (Bucket C) + 6 compositions in `src/shared/extensions/` (Bucket D) + Gate 24 stable at 79 + tsc 71 stable + vitest 213/1743 — SHIPPED 2026-04-28. Bucket A (Popover Radix backing) shipped 2026-04-28. Buckets B1 (Tooltip Radix backing — 13 consumers), B2 (ContextMenu pure deletion — 257 LOC dead code) and B3 (Toast Radix backing — 28 consumers + jscodeshift codemod) closed 2026-04-30 at `7b1d7d4` / `b2f41e3`. Phase 5 chrome arc fully complete; no Phase 4 shims remain in chrome. |
