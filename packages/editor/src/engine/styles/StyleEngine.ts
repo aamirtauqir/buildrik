@@ -26,6 +26,8 @@ export class StyleEngine {
   private composer: Composer;
   private styles: Map<string, StyleData> = new Map();
   private styleElement: HTMLStyleElement | null = null;
+  private pendingUpdate = false;
+  private rafId: number | null = null;
 
   constructor(composer: Composer) {
     this.composer = composer;
@@ -547,11 +549,23 @@ export class StyleEngine {
 
   /**
    * Update the stylesheet element
+   * Batched: multiple calls coalesce into a single RAF-aligned flush
    */
   private updateStylesheet(): void {
-    if (this.styleElement) {
-      this.styleElement.textContent = this.toCSS();
+    this.pendingUpdate = true;
+    if (this.rafId === null) {
+      this.rafId = requestAnimationFrame(() => this.flush());
     }
+  }
+
+  /**
+   * Synchronously flush any pending stylesheet update
+   */
+  flush(): void {
+    if (!this.pendingUpdate || !this.styleElement) return;
+    this.styleElement.textContent = this.toCSS();
+    this.pendingUpdate = false;
+    this.rafId = null;
   }
 
   // ============================================
@@ -569,6 +583,7 @@ export class StyleEngine {
 
     const propsToInherit = properties || Object.keys(fromStyles.properties);
 
+    // Batched: setProperty calls are coalesced into a single RAF flush
     propsToInherit.forEach((prop) => {
       if (fromStyles.properties[prop]) {
         this.setProperty(`[data-buildrick-id="${to.getId()}"]`, prop, fromStyles.properties[prop]);
@@ -651,7 +666,12 @@ export class StyleEngine {
    * Destroy the style engine
    */
   destroy(): void {
+    if (this.rafId !== null) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
     this.clear();
+    this.flush();
     if (this.styleElement && this.styleElement.parentNode) {
       this.styleElement.parentNode.removeChild(this.styleElement);
     }
