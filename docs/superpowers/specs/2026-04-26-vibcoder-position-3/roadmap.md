@@ -51,7 +51,12 @@ Phase A (Infrastructure)      Phase B (Token Folds)      Phase C (Chrome-ssot St
             - Buildrik-specifics audited
                     │
                     ▼
-            Phase 6 (Visual regression infra)
+            Phase 6 (Layout consumer migration) — SHIPPED 2026-04-29
+            - 22 inline-flex sites → <Stack> wrappers
+            - ts-morph codemod + per-batch commits
+                    │
+                    ▼
+            Phase 7 (Visual regression infra)
             - Playwright snapshot infra
             - Per-component snapshots
             - Gate 22 (gallery presence) ships
@@ -59,7 +64,7 @@ Phase A (Infrastructure)      Phase B (Token Folds)      Phase C (Chrome-ssot St
 
 ## Parallel tracks
 
-**Track 1 (Infrastructure → Components):** A → 0 → 1 → 2 → 3 → 4 → 5 → 6 (sequential)
+**Track 1 (Infrastructure → Components):** A → 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 (sequential)
 
 **Track 2 (Token Folds):** B (8 commits, can run anytime after A)
 
@@ -400,7 +405,30 @@ capture commit tables, LOC deltas, surfaced lessons (5 inventory-script gaps +
 decision rubric, extensions/ folder contract, and E2/E3 contract waiver
 precedents.
 
-## Phase 6 — Visual regression infrastructure (~1 week dispatched)
+## Phase 6 — Layout consumer migration — SHIPPED 2026-04-29
+
+22 inline-flex chrome consumer sites migrated to Phase 4 `<Stack>` wrappers via ts-morph codemod + manual review. 57 multi-prop sites deferred to Phase 6.1. 25/25 gates green throughout.
+
+| Task | SHA | Description |
+|------|-----|-------------|
+| T1 | `0be3e0b` | Inventory scanner + categorization report — ts-morph AST scan produced 87-row inventory across 5 categories. |
+| T2 | `9fcd8ce` | Codemod transform + 6 fixture pairs (TDD). |
+| Plan | `86c42c4` | Phase 6 plan committed (out-of-band). |
+| T3 | `a455aed` | Sidebar batch — 3 files / 5 sites. |
+| T3 fix | `c44ba2c` | Codemod nested-stack fix (closing-tag-first + bottom-up iteration). |
+| T3.5 | `4c0a67d` | Detour: nested fixture + Gate 25 shared-test logic. |
+| T4 | `68f080b` | Inspector batch — 1 file / 2 sites. |
+| T5 | `70580f5` | Remaining batch — 5 files / 9 sites (animation/export/shell). |
+| T6 | `248ed897` | Manual review — 4 normalized + 2 const-migrated + dispositions for kept/deferred. |
+| T7 | `3e681a6d` | Final inventory rescan. |
+
+Net delta: 22 sites migrated (16 codemod + 4 normalize-then-codemod + 2 manual const-migrate). 57 stack-multi-prop sites deferred (top-5 = AccountModal/OnboardingChecklist/TemplatePreviewPanel/PublishTab/ExportModal carry ~30% of remaining debt). 3 cluster-clean false-positives kept (Record-style consts). 5 off-grid + 2 cluster-off-grid kept (intentional design / complex code paths).
+
+**Reference:** `poc-findings.md` "Phase 6 (Layout Consumer Migration) — 2026-04-29" section captures the 10 surfaced lessons (AST > regex inventory, plan-vs-reality drift, codemod nested-stack bugs, Gate 25 logic refresh, off-grid as design drift, per-batch commit discipline, duplicate-import codemod gap, Track A parallel-track tsc drift).
+
+## Phase 7 — Visual regression infrastructure (~1 week dispatched)
+
+(Renumbered from Phase 6 after the Phase 6 layout-consumer-migration arc landed.)
 
 - Wire Playwright visual snapshot infra (per TODOS T-VISUAL-REG)
 - Add snapshot per primitive
@@ -420,7 +448,8 @@ precedents.
 | **M7: Re-port complete** | (renumbered → M8 — see Phase numbering note) | Adapter shim layer landed, consumer rewrites pending in Phase 5 |
 | **M8: Phase 4 chrome re-port shipped** | T1–T8 complete | 19 adapter shims + 19 codemods + 17 keep-as-extension stamps + Gate 23 wired + Gate 24 ratcheted 264→100 — SHIPPED 2026-04-28 |
 | **M9: Phase 5 chrome integration shipped** | T1–T5 complete | 19 adapter shims deleted (Bucket C) + 6 compositions in `src/shared/extensions/` (Bucket D) + Gate 24 stable at 79 + tsc 71 stable + vitest 213/1743 — SHIPPED 2026-04-28. Bucket A (Popover Radix backing) shipped 2026-04-28. Buckets B1 (Tooltip Radix backing — 13 consumers), B2 (ContextMenu pure deletion — 257 LOC dead code) and B3 (Toast Radix backing — 28 consumers + jscodeshift codemod) closed 2026-04-30 at `7b1d7d4` / `b2f41e3`. Phase 5 chrome arc fully complete; no Phase 4 shims remain in chrome. |
-| **M10: Visual regression live** | Phase 6 complete (post-Phase-5) | Pixel-level drift detection |
+| **M10: Layout consumer migration shipped** | T1-T7 complete | 22 inline-flex chrome consumer sites migrated to Phase 4 `<Stack>` via ts-morph codemod + manual review — SHIPPED 2026-04-29 (`0be3e0b`..`3e681a6d`). 57 multi-prop sites deferred to Phase 6.1; codemod hardening (duplicate-import merge + multi-prop transform) = Phase 6.2 candidate. Gate 25 logic updated to recognize shared-test fixture pattern. Stack/Cluster wrappers now demonstrably load-bearing in chrome. |
+| **M11: Visual regression live** | Phase 7 complete (post-Phase-6) | Pixel-level drift detection |
 
 ## Risk register (post-Pass 6)
 

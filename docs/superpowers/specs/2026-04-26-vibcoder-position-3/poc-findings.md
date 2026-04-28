@@ -986,3 +986,69 @@ Originally listed as Phase 4 in the position-3 roadmap, deferred during the Phas
 ### Recommendation
 
 Phase 4 closes 2026-04-29. Roadmap row retired. The 7 layout primitives are now generally available at `@/editor/shared/vibcoder` for any future chrome layout work. Pre-Phase-5 close-out (Bucket B3 above) is the sole remaining open arc; Phase 4 layouts unblock no downstream phases.
+
+
+---
+
+## Phase 6 (Layout Consumer Migration) — 2026-04-29
+
+### What shipped
+
+| Task | SHA | Description |
+|------|-----|-------------|
+| T1 | `0be3e0b` | Inventory scanner + categorization report — ts-morph AST scan of chrome surfaces produced 87-row inventory across 5 categories (stack-clean / stack-multi-prop / off-grid / cluster-clean / cluster-off-grid). |
+| T2 | `9fcd8ce` | Codemod transform + 6 fixture pairs (TDD) — input/output `.tsx` pair fixtures; one shared test runner asserts equivalence. |
+| Plan | `86c42c4` | Phase 6 plan committed (out-of-band). |
+| T3 | `a455aed` | Sidebar batch — 3 files / 5 sites migrated to `<Stack>` via codemod. |
+| T3 fix | `c44ba2c` | Codemod nested-stack fix — closing-tag-first rename + bottom-up reversed iteration. |
+| T3.5 | `4c0a67d` | Detour: nested fixture + Gate 25 shared-test-pattern recognition logic. |
+| T4 | `68f080b` | Inspector batch — 1 file / 2 sites (canvas surface was empty in inventory). |
+| T5 | `70580f5` | Remaining batch — 5 files / 9 sites across animation/export/shell. |
+| T6 | `248ed897` | Manual review — 4 off-grid sites normalized to nearest token + 2 const-migrated (CreateComponentModal, ProjectSettingsModal) + dispositions for kept/deferred sites. |
+| T7 | `3e681a6d` | Final inventory rescan — confirms residual debt scope. |
+
+Migration math: 22 sites migrated across 12+ files (T3+T4+T5 codemod = 16; T6 normalize-then-codemod = 4 off-grid via gap 6→8 ×3 + gap 14→16; T6 manual const-migration = 2). Stack imports added to ~12 files. Residual: 57 multi-prop sites deferred to Phase 6.1 (top-5 = AccountModal/OnboardingChecklist/TemplatePreviewPanel/PublishTab/ExportModal carrying ~30% of debt); 3 cluster-clean false-positives kept; 5 off-grid kept/deferred; 2 cluster-off-grid kept. 25/25 gates green throughout.
+
+### Plan-vs-reality drift recurred
+
+Plan estimated ~110 Stack candidates from regex-only recon (T1 commit `0be3e0b`). AST inventory found 87 total = 18 stack-clean + 57 multi-prop + 7 off-grid + 3 cluster-clean + 2 cluster-off-grid. Real codemod-eligible was 18+3=21, not 110. Lesson: regex undercounts multi-line style objects, but AST overcounts because it sweeps in const-style declarations the codemod can't safely transform. Both biases need accounting in next pre-flight estimate.
+
+### ts-morph AST > regex for JSX-style scanning
+
+Multi-line style objects (74% of candidates) are invisible to regex but trivial for AST. T1's switch from regex pre-recon to ts-morph inventory is the load-bearing methodology change. Cost: AST also includes false positives where `style={someConst}` references an externally-defined `CSSProperties` object — codemod must distinguish JSX-inline literal from const reference and skip the latter. The 3 cluster-clean false-positives kept are precisely this case.
+
+### Default-omits-modifier discipline survived end-to-end
+
+3+ sites with `gap: 12` (matches `--space-3` = `gap-md` default) correctly emitted `<Stack>` with no `gap` prop, not `<Stack gap="md">`. Phase 4 T2 pilot rule held through Phase 6 consumer migration without re-litigation.
+
+### Real consumer code surfaced 2 codemod bugs T2 fixtures missed
+
+Bug 1: Renaming the opening tag before the closing tag triggers ts-morph mid-op revalidation failure. Bug 2: Pre-order JSX iteration forgets child nodes when the parent is modified, breaking nested cases. Both fixed at `c44ba2c` with closing-first rename + bottom-up reversed iteration. T3.5 (`4c0a67d`) added a regression fixture (`nested-stack.input/output.tsx`) so future codemod edits cannot silently regress these. Lesson: synthetic TDD fixtures cover the happy path; real consumer code is the ultimate fuzz corpus. Always add a regression fixture from the first bug found in the wild.
+
+### Gate 25 logic was behind the codemod era it codified
+
+Gate 25 was written for Phase 5-era inline-string `runCodemod()` calls; T2 introduced the fixture-file pattern (one shared test runner reading `*.input.tsx` / `*.output.tsx` pairs). The gate's existence-check assumed per-fixture sibling test files, which the new pattern doesn't produce. T3.5 updated Gate 25 to recognize either pattern: per-fixture sibling test OR shared-test grep-match. Architecturally honest — the gate evolved with the code rather than the code being forced to satisfy a stale gate.
+
+### Off-grid gap is design drift made visible
+
+9 sites used 6/10/14/2/3/0 px gaps not in the spacing scale. T6 dispositioned: 4 normalized to nearest token (44%), 3 kept (intentional tight toolbars), 2 deferred (complex code paths). Codemod refused to round; humans decided. Right division of labor — automation enforces invariants, humans handle judgment calls.
+
+### Per-batch commits prevented Phase 4 Toast B3 type-import regression pattern
+
+T3 sidebar (5 sites), T4 inspector (2 sites), T5 remaining (9 sites) — each batch shipped with its own tsc verification. A mid-batch regression would have been caught batch-local rather than buried in a 16-file mega-commit. Direct counter to the Bucket B3 inventory undercount lesson where type-only imports inflated consumer counts and a single commit smuggled regressions.
+
+### Plan baseline prediction wrong — corrected inline
+
+Plan said Gate 24 inline-element baseline drops with Stack migration. Reality: Gate 24 measures inline form atoms (`button`/`input`/`select`/`textarea`), NOT inline divs. Stack migration is structural (DS adoption + spacing-token SSOT enforcement), not metric-moving on Gate 24. Plan corrected inline at T3. Lesson: gate scope must be re-read against the measurement target before promising a delta in a plan.
+
+### Duplicate-import bug never fixed
+
+Codemod `addImportDeclaration` always appends a new import line; doesn't merge with the existing named-imports list. Surfaced in CreateComponentModal (T3) and AccountModal (T6); each fixed manually post-codemod. Codemod hardening = Phase 6.2 candidate.
+
+### Track A parallel workstream landed ~40 tsc errors mid-Phase-6
+
+Six perf commits between T3 and T5 changed function signatures in `SnapCalculator`/`BoundsCalculator`/`SpacingCalculator` without updating Canvas consumers. Phase 6 stayed clean of the drift; Track A regression is a separate concern. Lesson: parallel-track tsc baselines must be tracked per-track, not as a shared "is the build clean" check.
+
+### Recommendation
+
+Phase 6 closes 2026-04-29. 22 sites migrated. 57 multi-prop sites deferred to Phase 6.1 (top-5 carry 30% of remaining debt). Codemod hardening (duplicate-import merge + multi-prop transform support) candidate for Phase 6.2. The Stack/Cluster wrappers from Phase 4 layouts are now demonstrably load-bearing in chrome — first concrete validation that the revival was worth the day spent.
