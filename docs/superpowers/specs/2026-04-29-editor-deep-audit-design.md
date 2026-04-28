@@ -161,29 +161,13 @@ The editor has accumulated 1020 commits since 2025. Three independent audit trac
 
 ## Track B: Duplications & Wrappers
 
-### B1 — `ComponentManager.ts`: Delete 8 pass-through methods
-
-**Methods:** `instantiateComponent`, `getInstancesOfComponent`, `detachInstance`, `syncInstance`, `updateInstanceVariant`, `findInstanceContainingElement`, `getVariantStylesForElement`, `getOverridesForElement`.
-
-**Fix:** Delete methods. Call standalone utility functions directly from consumers. Update imports.
-
-**Files:** `engine/components/ComponentManager.ts`
-
-### B2 — `canvasGeometry.ts`: Remove duplicate aliases
+### B1 — `canvasGeometry.ts`: Remove duplicate aliases
 
 **Fix:** Delete `getDOMElementById` alias. Export `getDOMElement` only. Redirect `getCanvasContainer` to direct reference.
 
 **Files:** `engine/canvas/canvasGeometry.ts`
 
-### B3 — Merge duplicate geometry modules
-
-**Problem:** `engine/canvas/canvasGeometry.ts` and `editor/canvas/shared/geometry.ts` share 6 functions with different names.
-
-**Fix:** Canonicalize to `shared/utils/geometry.ts`. Delete `engine/canvas/canvasGeometry.ts`. Update `engine/` and `editor/` imports to use `shared/utils/geometry.ts`.
-
-**Files:** `engine/canvas/canvasGeometry.ts`, `editor/canvas/shared/geometry.ts`
-
-### B4 — Extract duplicate constants
+### B3 — Extract duplicate constants
 
 **Constants:** `DEFAULT_SNAP_CONFIG`, `CANVAS_COLORS`, `MAX_RECENT`, `DEFAULT_IMAGE_ADJUSTMENTS`, `DEFAULT_IMAGE_FILTERS`.
 
@@ -191,7 +175,7 @@ The editor has accumulated 1020 commits since 2025. Three independent audit trac
 
 **Files:** `engine/canvas/resize/constants.ts`, `engine/canvas/constants.ts`, `shared/constants/canvas.ts`, `shared/types/media-image-editor.ts`, `shared/types/media.ts`, `shared/ui/QuickSwitcher.styles.ts`, `editor/sidebar/tabs/elements/constants.ts`
 
-### B5 — Inline identical `getComputedStyle` pattern
+### B4 — Inline identical `getComputedStyle` pattern
 
 **Pattern:** `getComputedStyle(document.documentElement).getPropertyValue(varName).trim() || ""`.
 
@@ -199,15 +183,7 @@ The editor has accumulated 1020 commits since 2025. Three independent audit trac
 
 **Files:** `editor/inspector/sections/SizeSection.tsx`, `editor/inspector/sections/typography/FontControls.tsx`
 
-### B6 — Delete Radix pass-through wrappers
-
-**Components:** `Popover.tsx` (`PopoverTrigger`, `PopoverPortal`, `PopoverArrow`), `Tooltip.tsx` (`TooltipProvider`, `TooltipTrigger`, `TooltipPortal`), `Toast.tsx` (`Toast = RadixToast.Root`).
-
-**Fix:** Audit each wrapper. If it adds zero CSS, props, or behavior, delete and import from Radix directly at call sites. If it is an intentional composition point, document the reason in a file-level comment.
-
-**Files:** `editor/shared/vibcoder/Popover.tsx`, `editor/shared/vibcoder/Tooltip.tsx`, `editor/shared/vibcoder/Toast.tsx`
-
-### B7 — Delete legacy barrel redirects
+### B5 — Delete legacy barrel redirects
 
 **Problem:** `components/Canvas/styled/OverlayStyles.ts` and `components/Canvas/styled/SelectionStyles.ts` re-export from `editor/canvas/styled/`.
 
@@ -219,18 +195,26 @@ The editor has accumulated 1020 commits since 2025. Three independent audit trac
 
 ## Success Criteria
 
-- Track A: Drag frame time ≤ 16 ms on 500-element page. Memory leak count = 0 in Chrome DevTools heap snapshot after 10 Composer create/destroy cycles.
-- Track C: All 12 bug categories covered by unit tests. Zero unhandled promise rejections in `services/` and `engine/sync/`.
-- Track B: Deletion-only diff; no new logic. Net LOC reduction ≥ 500.
+- Track A: Drag frame time ≤ 16 ms on 500-element page. Provide a `__tests__/performance/drag-benchmark.test.ts` harness that asserts this programmatically.
+- Track C: All 8 bug categories covered by unit tests. Zero unhandled promise rejections in `services/` and `engine/sync/`.
+- Track B: Deletion-only diff; no new logic. Net LOC reduction ≥ 300.
 
 ## Out of Scope
 
 - God-class refactors (VersionHistoryManager, CollaborationManager, ExportEngine) — architectural, not performance. Separate initiative.
 - `components/` → `editor/` full migration — ongoing, not part of this audit.
 - New features (undo for component deletion, soft delete) — noted but deferred.
+- `ComponentManager.ts` pass-through methods — live public API surface with active consumers (`useComponentsState.ts:250`, `dropOperations.tsx:250`). Not dead wrappers.
+- Vibcoder `Popover`/`Tooltip`/`Toast` wrappers — intentional compositions with CSS, store, context, hook, queue logic. Not pass-throughs.
+
+## Codex Review Corrections (2026-04-29)
+
+- **Deleted phantom bugs:** C2 (`SyncManager` already guarded), C3 (`OfflineQueue` mutation-before-await means no JS interleaving), C8 (`trimHistory` re-materializes checkpoints), C12 (auto-checkpoint handlers registered only after storage load).
+- **Fixed incorrect fixes:** C5 (keep throw contract, don't break callers/tests), C11 (use `settings.seo.*` not `page.seo.*`), C6 (trailing-dirty flag, not mutex), C1 (add reject/failure-state semantics), A2 (key by `selector+mediaQuery`, not rule ID), A1 (target `setProperty` double-rebuild + `inheritStyles` loop, no `getStyles` flush), A3/A4 (add scroll/resize invalidation), A7 (remove unsafe "different object keys" early-exit).
+- **Dropped from Track B:** B1 (live API), B3 (different layers — DOM/canvas-runtime vs pure math), B6 (intentional compositions).
 
 ## Risks
 
-1. **Cache invalidation bugs** (A3, A4) — missed invalidation events cause stale snap/spacing data. Mitigation: exhaustive event-list coverage in tests.
-2. **Import path changes** (B3, B6, B7) — risk breaking consumers outside `packages/editor/`. Mitigation: full-project grep before each change.
+1. **Cache invalidation bugs** (A3, A4) — missed scroll/resize events cause stale snap/spacing data. Mitigation: exhaustive event-list coverage in tests.
+2. **Import path changes** (B5) — risk breaking consumers outside `packages/editor/`. Mitigation: full-project grep before each change.
 3. **Async init contract change** (C1) — external consumers may await `isReady()` polling loop. Mitigation: keep `isReady()` working, add `whenReady()` as new API.
