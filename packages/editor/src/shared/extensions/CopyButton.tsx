@@ -18,7 +18,7 @@
 
 import { Copy, Check } from "lucide-react";
 import * as React from "react";
-import { useToast } from "./Toast";
+import { useToast } from "@/shared/ui/Toast";
 
 export interface CopyButtonProps {
   /** Content to copy to clipboard */

@@ -20,7 +20,7 @@ import { useElementFlash } from "../../shared/hooks";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
 import { StudioSkeleton } from "@/shared/extensions/Skeleton";
 import { ToastProvider, useToast } from "../../shared/ui/Toast";
-import { UpgradeModal } from "../../shared/ui/UpgradeModal";
+import { UpgradeModal } from "@/shared/extensions/UpgradeModal";
 import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";

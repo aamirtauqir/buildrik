@@ -13,7 +13,7 @@
 import * as React from "react";
 import type { CodeTab } from "../../shared/types/export";
 import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
-import { CopyButton } from "../../shared/ui/CopyButton";
+import { CopyButton } from "@/shared/extensions/CopyButton";
 
 // ============================================================================
 // TYPES

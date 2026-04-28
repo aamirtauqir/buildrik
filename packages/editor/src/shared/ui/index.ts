@@ -38,9 +38,7 @@ export {
 } from "./ErrorState";
 export { ColorSwatch, ColorSwatchGroup, type ColorSwatchProps } from "./ColorSwatch";
 export { TreeView, type TreeViewProps, type TreeNode } from "./TreeView";
-export { PremiumBadge, type PremiumBadgeProps } from "./PremiumBadge";
 export { UpgradeGate, type UpgradeGateProps, type PlanLevel } from "./UpgradeGate";
-export { UpgradeModal, type UpgradeModalProps } from "./UpgradeModal";
 export {
   QuickSwitcher,
   useQuickSwitcher,

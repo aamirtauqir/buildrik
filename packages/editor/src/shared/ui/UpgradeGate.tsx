@@ -17,7 +17,7 @@
  */
 
 import * as React from "react";
-import { PremiumBadge } from "./PremiumBadge";
+import { PremiumBadge } from "@/shared/extensions/PremiumBadge";
 
 export type PlanLevel = "free" | "pro" | "enterprise";
 

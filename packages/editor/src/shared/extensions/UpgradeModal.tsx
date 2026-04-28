@@ -28,7 +28,7 @@ import {
   ModalClose,
   OverlayMount,
 } from "@/editor/shared/vibcoder";
-import { PremiumBadge } from "./PremiumBadge";
+import { PremiumBadge } from "@/shared/extensions/PremiumBadge";
 
 export interface UpgradeModalProps {
   /** Controlled open state (optional — also responds to events) */

@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { PremiumBadge } from "../../../../../shared/ui/PremiumBadge";
+import { PremiumBadge } from "@/shared/extensions/PremiumBadge";
 import {
   LockedContainer,
   LockedIcon,

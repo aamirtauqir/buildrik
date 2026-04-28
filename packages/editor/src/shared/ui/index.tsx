@@ -27,7 +27,6 @@ export * from "./ErrorState";
 export * from "./LoadingState";
 export * from "./Toast";
 export * from "./HelpTooltip";
-export * from "./CopyButton";
 export * from "./ContextMenu";
 export * from "./QuickSwitcher";
 export * from "./ErrorMessage";
