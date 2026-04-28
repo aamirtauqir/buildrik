@@ -25,6 +25,7 @@ import type { Element } from "../elements/Element";
 export class StyleEngine {
   private composer: Composer;
   private styles: Map<string, StyleData> = new Map();
+  private ruleIndex: Map<string, StyleData> = new Map();
   private styleElement: HTMLStyleElement | null = null;
   private pendingUpdate = false;
   private rafId: number | null = null;
@@ -34,6 +35,13 @@ export class StyleEngine {
     this.createStyleElement();
     // Inject animation keyframes CSS (AQUI-026)
     injectAnimationCSS();
+  }
+
+  /**
+   * Composite key for rule index lookup
+   */
+  private ruleKey(selector: string, mediaQuery?: string): string {
+    return mediaQuery ? `${selector}|${mediaQuery}` : selector;
   }
 
   /**
@@ -80,6 +88,7 @@ export class StyleEngine {
         pseudo: options?.pseudo,
       };
       this.styles.set(style.id, style);
+      this.ruleIndex.set(this.ruleKey(fullSelector, options?.mediaQuery), style);
     }
 
     this.updateStylesheet();
@@ -103,6 +112,7 @@ export class StyleEngine {
     const style = this.findRule(selector, mediaQuery);
     if (style) {
       this.styles.delete(style.id);
+      this.ruleIndex.delete(this.ruleKey(selector, mediaQuery));
       this.updateStylesheet();
       this.composer.emit("style:removed", style);
       this.composer.markDirty();
@@ -409,6 +419,10 @@ export class StyleEngine {
   importStyles(styles: StyleData[]): void {
     styles.forEach((style) => {
       this.styles.set(style.id, style);
+      this.ruleIndex.set(
+        this.ruleKey(style.selector, style.mediaQuery ?? undefined),
+        style
+      );
     });
     this.updateStylesheet();
   }
@@ -542,9 +556,7 @@ export class StyleEngine {
    * Find rule by selector and media query
    */
   private findRule(selector: string, mediaQuery?: string): StyleData | undefined {
-    return Array.from(this.styles.values()).find(
-      (s) => s.selector === selector && s.mediaQuery === mediaQuery
-    );
+    return this.ruleIndex.get(this.ruleKey(selector, mediaQuery));
   }
 
   /**
@@ -665,6 +677,7 @@ export class StyleEngine {
    */
   clear(): void {
     this.styles.clear();
+    this.ruleIndex.clear();
     this.updateStylesheet();
   }
 
@@ -678,6 +691,7 @@ export class StyleEngine {
     }
     this.pendingUpdate = false;
     this.styles.clear();
+    this.ruleIndex.clear();
     if (this.styleElement && this.styleElement.parentNode) {
       this.styleElement.parentNode.removeChild(this.styleElement);
     }

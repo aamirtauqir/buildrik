@@ -81,3 +81,43 @@ describe("StyleEngine RAF batching", () => {
     expect(toCSSSpy).not.toHaveBeenCalled();
   });
 });
+
+describe("StyleEngine rule index", () => {
+  let engine: StyleEngine;
+  let composer: ReturnType<typeof makeComposer>;
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame"] });
+    composer = makeComposer();
+    engine = new StyleEngine(composer);
+  });
+
+  afterEach(() => {
+    engine.destroy();
+    vi.useRealTimers();
+  });
+
+  it("finds a rule by selector after setRule", () => {
+    engine.setRule(".a", { color: "red" });
+    const found = engine.getRule(".a");
+    expect(found).toBeDefined();
+    expect(found?.selector).toBe(".a");
+    expect(found?.properties.color).toBe("red");
+  });
+
+  it("finds a rule with media query", () => {
+    engine.setRule(".b", { color: "blue" }, { mediaQuery: "(max-width: 768px)" });
+    const found = engine.getRule(".b", "(max-width: 768px)");
+    expect(found).toBeDefined();
+    expect(found?.selector).toBe(".b");
+    expect(found?.mediaQuery).toBe("(max-width: 768px)");
+  });
+
+  it("removes rule from index on removeRule", () => {
+    engine.setRule(".a", { color: "red" });
+    expect(engine.getRule(".a")).toBeDefined();
+
+    engine.removeRule(".a");
+    expect(engine.getRule(".a")).toBeUndefined();
+  });
+});
