@@ -48,40 +48,45 @@ const DEFAULT_ROOT: ElementData = {
 };
 
 export async function loadProject(siteId: string): Promise<ProjectData> {
-  const client = getClient();
-  const site = await client.sites.get.query({ id: siteId });
-  const pages = await client.pages.list.query({ siteId });
+  try {
+    const client = getClient();
+    const site = await client.sites.get.query({ id: siteId });
+    const pages = await client.pages.list.query({ siteId });
 
-  // Sort by position once, then map — Phase 1 round-trips the new fields
-  // (updatedAt, slugManuallySet, slugHistory, settings) so folder/slug-redirect/
-  // custom-head/etc. data survives the dashboard save boundary.
-  const sortedPages: DashboardPageRow[] = (pages as DashboardPageRow[])
-    .slice()
-    .sort((a, b) => a.position - b.position);
+    // Sort by position once, then map — Phase 1 round-trips the new fields
+    // (updatedAt, slugManuallySet, slugHistory, settings) so folder/slug-redirect/
+    // custom-head/etc. data survives the dashboard save boundary.
+    const sortedPages: DashboardPageRow[] = (pages as DashboardPageRow[])
+      .slice()
+      .sort((a, b) => a.position - b.position);
 
-  return {
-    version: "1.0",
-    pagesOrder: sortedPages.map((p) => p.id),
-    pages: sortedPages.map((p) => ({
-      id: p.id,
-      name: p.name,
-      slug: p.slug,
-      isHome: p.isHomePage,
-      root: p.blocks ?? DEFAULT_ROOT,
-      settings: p.settings,
-      updatedAt: p.updatedAt,
-      slugManuallySet: p.slugManuallySet ?? false,
-      slugHistory: p.slugHistory ?? [],
-    })),
-    styles: [],
-    assets: [],
-    metadata: {
-      name: site.name,
-      // Domain lives on the dashboard site record; read-through for copy-link
-      // and SEO preview. Falls back to undefined if not configured.
-      domain: (site as { domain?: string }).domain,
-    },
-  };
+    return {
+      version: "1.0",
+      pagesOrder: sortedPages.map((p) => p.id),
+      pages: sortedPages.map((p) => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        isHome: p.isHomePage,
+        root: p.blocks ?? DEFAULT_ROOT,
+        settings: p.settings,
+        updatedAt: p.updatedAt,
+        slugManuallySet: p.slugManuallySet ?? false,
+        slugHistory: p.slugHistory ?? [],
+      })),
+      styles: [],
+      assets: [],
+      metadata: {
+        name: site.name,
+        // Domain lives on the dashboard site record; read-through for copy-link
+        // and SEO preview. Falls back to undefined if not configured.
+        domain: (site as { domain?: string }).domain,
+      },
+    };
+  } catch (cause) {
+    const error = cause instanceof Error ? cause : new Error(String(cause));
+    throw new Error(`BuildrikSyncProvider.loadProject failed for site ${siteId}: ${error.message}`, { cause: error });
+  }
 }
 
 export async function saveProject(
