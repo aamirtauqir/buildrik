@@ -19,6 +19,7 @@ dist/
 .claude/
 packages/*.zip
 packages/editor.zip
+packages/editor/*.zip
 
 # Designer-facing spec drop, dev-local snapshot. Vendored output lives under
 # packages/editor/src/themes/components/ and IS tracked.
@@ -27,6 +28,7 @@ packages/editor.zip
 # DS gates exclude via --exclude-dir=project (legacy guard; src/project/ now
 # only contains assets/ + README.md + SKILL.md).
 docs/reference/
+packages/editor/src/project/
 
 # Per-developer dev-only artifacts (not source, not committed)
 packages/editor/src/editor-live.jpeg
