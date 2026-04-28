@@ -57,6 +57,8 @@ export { Frame } from "./Frame";
 export type { FrameProps, FrameRatio } from "./Frame";
 export { Switcher } from "./Switcher";
 export type { SwitcherProps, SwitcherThreshold } from "./Switcher";
+export { SidebarShell } from "./SidebarShell";
+export type { SidebarShellProps, SidebarShellWidth, SidebarShellSide } from "./SidebarShell";
 export { Grip } from "./Grip";
 export type { GripOrientation, GripSize, GripProps } from "./Grip";
 export { BreakpointSwitcher } from "./BreakpointSwitcher";
