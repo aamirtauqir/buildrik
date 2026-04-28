@@ -129,8 +129,14 @@ export type {
   PillGroupProps,
   PillButtonProps,
 } from "./Tabs";
-export { Popover, PopoverArrow } from "./Popover";
-export type { PopoverProps, PopoverArrowProps } from "./Popover";
+export {
+  Popover,
+  PopoverTrigger,
+  PopoverPortal,
+  PopoverContent,
+  PopoverArrow,
+} from "./Popover";
+export type { PopoverProps, PopoverContentProps } from "./Popover";
 export { Tooltip, TooltipTitle, TooltipDesc, TooltipKbd } from "./Tooltip";
 export type {
   TooltipProps,

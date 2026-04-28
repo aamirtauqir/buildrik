@@ -1,164 +1,212 @@
-import { createRef } from "react";
-import { describe, it, expect, vi } from "vitest";
-import { render } from "@testing-library/react";
-import { Popover, PopoverArrow } from "./Popover";
+/**
+ * Popover tests — verify the Radix.Popover-backed compound after the T7
+ * upgrade. The Phase 2 passive-surface tests are gone; we now test the
+ * compound shape (Root/Trigger/Portal/Content/Arrow), the bd-popover CSS
+ * skin, the --with-arrow modifier, and the standard Radix dismiss
+ * behavior the wrapper inherits (Esc + outside click).
+ *
+ * What we DON'T re-test (Radix owns these): focus management, ARIA
+ * correctness, animation states. Re-testing duplicates Radix's own suite.
+ *
+ * @license BSD-3-Clause
+ */
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, cleanup } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { useState, type ReactNode } from "react";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverPortal,
+  PopoverContent,
+  PopoverArrow,
+} from "./Popover";
 
-describe("vibcoder Popover wrapper — Contract B (always-controlled surface)", () => {
-  it("renders <div role='dialog'> with bd-popover base class when open=true", () => {
-    const onOpenChange = vi.fn();
-    const { container } = render(
-      <Popover open onOpenChange={onOpenChange}>
-        content
-      </Popover>,
-    );
-    const root = container.querySelector("div.bd-popover");
-    expect(root).toBeTruthy();
-    expect(root!.getAttribute("role")).toBe("dialog");
-    expect(root!.textContent).toBe("content");
-  });
+beforeEach(() => {
+  cleanup();
+});
 
-  it("returns null (renders nothing) when open=false", () => {
-    const onOpenChange = vi.fn();
-    const { container } = render(
-      <Popover open={false} onOpenChange={onOpenChange}>
-        content
-      </Popover>,
-    );
-    expect(container.querySelector(".bd-popover")).toBeNull();
-    expect(container.firstChild).toBeNull();
-  });
+// Helper: a controlled wrapper that lets userEvent drive the trigger so
+// Radix sees a real open-state transition (mirrors how chrome consumers
+// will hold open state in T2+).
+function ControlledPopover({
+  initialOpen = false,
+  onOpenChange,
+  children,
+}: {
+  initialOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(initialOpen);
+  return (
+    <Popover
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        onOpenChange?.(next);
+      }}
+    >
+      {children}
+    </Popover>
+  );
+}
 
-  it("OMITS --with-arrow modifier when withArrow undefined (default)", () => {
-    const onOpenChange = vi.fn();
-    const { container } = render(
-      <Popover open onOpenChange={onOpenChange}>
-        x
-      </Popover>,
-    );
-    expect(container.querySelector(".bd-popover")!.className).not.toContain(
-      "bd-popover--with-arrow",
-    );
-  });
-
-  it("emits bd-popover--with-arrow when withArrow=true", () => {
-    const onOpenChange = vi.fn();
-    const { container } = render(
-      <Popover open withArrow onOpenChange={onOpenChange}>
-        x
-      </Popover>,
-    );
-    expect(container.querySelector(".bd-popover")!.className).toContain(
-      "bd-popover--with-arrow",
-    );
-  });
-
-  it("does NOT call onOpenChange on mount or render (Phase 2 passive surface)", () => {
-    const onOpenChange = vi.fn();
+describe("Popover — compound shape", () => {
+  it("renders no content when open=false", () => {
     render(
-      <Popover open onOpenChange={onOpenChange}>
-        x
+      <Popover open={false} onOpenChange={() => {}}>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent>body</PopoverContent>
+        </PopoverPortal>
       </Popover>,
     );
-    expect(onOpenChange).not.toHaveBeenCalled();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.queryByText("body")).not.toBeInTheDocument();
   });
 
-  it("merges caller className", () => {
-    const onOpenChange = vi.fn();
-    const { container } = render(
-      <Popover open onOpenChange={onOpenChange} className="extra">
-        x
-      </Popover>,
-    );
-    expect(container.querySelector(".bd-popover")!.className).toContain(
-      "extra",
-    );
-  });
-
-  it("forwards ref to surface <div> when open=true", () => {
-    const onOpenChange = vi.fn();
-    const ref = createRef<HTMLDivElement>();
+  it("renders content with bd-popover className when open=true", () => {
     render(
-      <Popover open onOpenChange={onOpenChange} ref={ref}>
-        x
+      <Popover open={true} onOpenChange={() => {}}>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent>body</PopoverContent>
+        </PopoverPortal>
       </Popover>,
     );
-    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    const content = screen.getByText("body");
+    expect(content).toHaveClass("bd-popover");
   });
 
-  it("ref stays null when open=false (nothing rendered)", () => {
-    const onOpenChange = vi.fn();
-    const ref = createRef<HTMLDivElement>();
+  it("renders the trigger button regardless of open state", () => {
     render(
-      <Popover open={false} onOpenChange={onOpenChange} ref={ref}>
-        x
+      <Popover open={false} onOpenChange={() => {}}>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent>body</PopoverContent>
+        </PopoverPortal>
       </Popover>,
     );
-    expect(ref.current).toBeNull();
-  });
-
-  it("attaches ref after open flips false→true (mount lifecycle)", () => {
-    const ref = createRef<HTMLDivElement>();
-    const { rerender } = render(
-      <Popover open={false} onOpenChange={() => {}} ref={ref}>
-        x
-      </Popover>,
-    );
-    expect(ref.current).toBeNull();
-    rerender(
-      <Popover open={true} onOpenChange={() => {}} ref={ref}>
-        x
-      </Popover>,
-    );
-    expect(ref.current).toBeInstanceOf(HTMLDivElement);
-  });
-
-  it("releases ref after open flips true→false (unmount lifecycle)", () => {
-    const ref = createRef<HTMLDivElement>();
-    const { rerender } = render(
-      <Popover open={true} onOpenChange={() => {}} ref={ref}>
-        x
-      </Popover>,
-    );
-    expect(ref.current).toBeInstanceOf(HTMLDivElement);
-    rerender(
-      <Popover open={false} onOpenChange={() => {}} ref={ref}>
-        x
-      </Popover>,
-    );
-    expect(ref.current).toBeNull();
-  });
-
-  it("forwards arbitrary HTMLAttributes (id, data-*) onto the surface", () => {
-    const onOpenChange = vi.fn();
-    const { container } = render(
-      <Popover open onOpenChange={onOpenChange} id="pop-1" data-testid="surf">
-        x
-      </Popover>,
-    );
-    const root = container.querySelector(".bd-popover")!;
-    expect(root.getAttribute("id")).toBe("pop-1");
-    expect(root.getAttribute("data-testid")).toBe("surf");
+    expect(screen.getByRole("button", { name: "Open" })).toBeInTheDocument();
   });
 });
 
-describe("vibcoder PopoverArrow sibling export", () => {
-  it("renders <span aria-hidden='true'> with bd-popover__arrow class", () => {
-    const { container } = render(<PopoverArrow />);
-    const arrow = container.querySelector("span.bd-popover__arrow");
-    expect(arrow).toBeTruthy();
-    expect(arrow!.getAttribute("aria-hidden")).toBe("true");
-  });
-
-  it("merges caller className", () => {
-    const { container } = render(<PopoverArrow className="extra" />);
-    expect(container.querySelector(".bd-popover__arrow")!.className).toContain(
-      "extra",
+describe("Popover — bd-popover--with-arrow modifier", () => {
+  it("omits --with-arrow when withArrow undefined", () => {
+    render(
+      <Popover open={true} onOpenChange={() => {}}>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent>body</PopoverContent>
+        </PopoverPortal>
+      </Popover>,
+    );
+    expect(screen.getByText("body").className).not.toContain(
+      "bd-popover--with-arrow",
     );
   });
 
-  it("forwards ref to <span>", () => {
-    const ref = createRef<HTMLSpanElement>();
-    render(<PopoverArrow ref={ref} />);
-    expect(ref.current).toBeInstanceOf(HTMLSpanElement);
+  it("adds --with-arrow when withArrow=true", () => {
+    render(
+      <Popover open={true} onOpenChange={() => {}}>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent withArrow>body</PopoverContent>
+        </PopoverPortal>
+      </Popover>,
+    );
+    expect(screen.getByText("body")).toHaveClass("bd-popover--with-arrow");
+  });
+
+  it("merges caller className with bd-popover", () => {
+    render(
+      <Popover open={true} onOpenChange={() => {}}>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent className="extra">body</PopoverContent>
+        </PopoverPortal>
+      </Popover>,
+    );
+    const content = screen.getByText("body");
+    expect(content).toHaveClass("bd-popover");
+    expect(content).toHaveClass("extra");
+  });
+});
+
+describe("Popover — onOpenChange dismiss behavior (Radix-default)", () => {
+  it("fires onOpenChange(false) when Esc is pressed", async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    render(
+      <ControlledPopover initialOpen={true} onOpenChange={onOpenChange}>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent>body</PopoverContent>
+        </PopoverPortal>
+      </ControlledPopover>,
+    );
+    expect(screen.getByText("body")).toBeInTheDocument();
+    await user.keyboard("{Escape}");
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("fires onOpenChange(false) when an outside click happens", async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    render(
+      <div>
+        <button data-testid="outside">outside</button>
+        <ControlledPopover initialOpen={true} onOpenChange={onOpenChange}>
+          <PopoverTrigger>Open</PopoverTrigger>
+          <PopoverPortal>
+            <PopoverContent>body</PopoverContent>
+          </PopoverPortal>
+        </ControlledPopover>
+      </div>,
+    );
+    expect(screen.getByText("body")).toBeInTheDocument();
+    await user.click(screen.getByTestId("outside"));
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+});
+
+describe("Popover — PopoverTrigger asChild", () => {
+  it("anchors to a custom button element via asChild", async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    render(
+      <ControlledPopover onOpenChange={onOpenChange}>
+        <PopoverTrigger asChild>
+          <button data-testid="custom-trigger">Custom</button>
+        </PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent>body</PopoverContent>
+        </PopoverPortal>
+      </ControlledPopover>,
+    );
+    const trigger = screen.getByTestId("custom-trigger");
+    // Radix wires aria-haspopup onto the asChild target
+    expect(trigger).toHaveAttribute("aria-haspopup", "dialog");
+    await user.click(trigger);
+    expect(onOpenChange).toHaveBeenCalledWith(true);
+    expect(screen.getByText("body")).toBeInTheDocument();
+  });
+});
+
+describe("Popover — PopoverArrow export", () => {
+  it("renders the Radix arrow inside the content", () => {
+    render(
+      <Popover open={true} onOpenChange={() => {}}>
+        <PopoverTrigger>Open</PopoverTrigger>
+        <PopoverPortal>
+          <PopoverContent>
+            body
+            <PopoverArrow data-testid="arrow" />
+          </PopoverContent>
+        </PopoverPortal>
+      </Popover>,
+    );
+    expect(screen.getByTestId("arrow")).toBeInTheDocument();
   });
 });

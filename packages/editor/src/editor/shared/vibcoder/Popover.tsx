@@ -1,108 +1,79 @@
 /**
- * Vibcoder Popover wrapper — floating surface molecule.
- * Renders the bd-popover composite from
- * src/themes/components/molecules/popover.css.
+ * Vibcoder Popover wrapper — Radix.Popover-backed compound.
  *
- * Phase 2 SCOPE — Popover IS the rendered SURFACE. NOT a trigger anchor.
+ * Phase 5 T7 upgrade: replaces the Phase 2 passive surface. The bd-popover
+ * CSS skin (src/themes/components/molecules/popover.css) is now applied to
+ * PopoverContent; bd-popover--with-arrow gates the CSS ::before arrow.
  *
- * Contract D (trigger wiring) — implementer choice DOCUMENTED:
- *   Popover does NOT wrap a trigger element in Phase 2. The caller renders
- *   their trigger button separately (e.g., next to the Popover or as a
- *   sibling node) and decides positioning with their own `style={{ top,
- *   left }}` or wrapper div. We deliberately ship NO asChild /
- *   cloneElement / render-prop / ref-forwarding API here — Phase 3
- *   organisms (CommandPalette, Inspector menus) will add a separate
- *   PopoverTrigger or asChild API once floating-ui is integrated for
- *   anchor/offset/flip/shift positioning. This keeps Phase 2 honest: a
- *   passive controlled surface, no positioning logic, no implicit
- *   anchoring.
+ * Compound exports:
+ *   Popover           — Root (controlled via open + onOpenChange)
+ *   PopoverTrigger    — anchor element; supports asChild
+ *   PopoverPortal     — portal escape (Radix default container; see E3 waiver)
+ *   PopoverContent    — surface with bd-popover className; honors withArrow
+ *   PopoverArrow      — Radix.Popover.Arrow re-export (closes #93)
  *
- * Slots (from CSS):
- *   .bd-popover               base surface (background, border, shadow)
- *   .bd-popover--with-arrow   adds the ::before triangle pointer
+ * E2 contract waiver — Radix types deliberately leak through PopoverContentProps:
+ *   Modal/Drawer use `Omit<HTMLAttributes<HTMLDivElement>, "role">` to keep Radix
+ *   types out of the public API (E2 from Phase 3). Popover deviates because the
+ *   positioning props (side, sideOffset, align, alignOffset, avoidCollisions,
+ *   collisionBoundary, onPointerDownOutside, onEscapeKeyDown) ARE the contract —
+ *   chrome consumers need them to anchor menus correctly. Re-typing every Radix
+ *   prop would be lossy. Trade-off: a Radix v2 breaking change ripples to consumers.
  *
- * Sibling exports (Contract C):
- *   Popover       the surface itself; renders nothing when open=false
- *   PopoverArrow  optional explicit arrow node when callers want to
- *                 position it inside the surface; the CSS `::before`
- *                 pseudo-element gated by `--with-arrow` covers the
- *                 default (top-center) case, so PopoverArrow is mostly
- *                 useful when callers need a custom position later
- *
- * Contract B (always-controlled state) — Phase 2 mandate:
- *   open          REQUIRED — caller controls visibility. NO defaultOpen.
- *                 NO internal useState.
- *   onOpenChange  REQUIRED — wrapper does NOT call this directly in
- *                 Phase 2 (no outside-click / Esc handling here yet — that
- *                 lives in Phase 3 organisms). The contract is required at
- *                 the type level so callers can't ship a Popover that
- *                 silently drops dismiss-intent when Phase 3 wires it.
- *
- * Render policy:
- *   open=false → return null (no DOM, no role attrs, no class merging)
- *   open=true  → renders a <div role="dialog" className="bd-popover">
- *
- * forwardRef on the surface <div> — measurement consumers (anchor +
- * offset calculations, scroll-into-view) need it.
+ * E3 portal-discipline waiver — PopoverPortal does NOT route via useOverlayContainer:
+ *   Modal/Drawer mount into #vibcoder-overlay-root for centralized z-index ordering
+ *   (E3 from Phase 3). Popover deliberately uses Radix's default portal target
+ *   because popovers are anchored to triggers, not part of the modal stack —
+ *   Radix's anchor positioning relies on its default parenting and fights
+ *   re-parenting. Z-index for popovers is local to the bd-popover layer, not the
+ *   modal stack.
  *
  * @license BSD-3-Clause
  */
-import { type HTMLAttributes, type ReactNode, forwardRef } from "react";
+import * as RadixPopover from "@radix-ui/react-popover";
+import {
+  forwardRef,
+  type ComponentPropsWithoutRef,
+  type ElementRef,
+  type ReactNode,
+} from "react";
 
-export interface PopoverProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "role"> {
-  /** REQUIRED — caller controls visibility. NO defaultOpen. */
+export interface PopoverProps {
   open: boolean;
-  /**
-   * REQUIRED — invoked when the surface requests dismissal (Phase 3 will
-   * wire outside-click / Esc handling). Required at the type level so
-   * callers can't ship a Popover that silently drops dismiss intent.
-   */
   onOpenChange: (open: boolean) => void;
-  /** Toggles the --with-arrow CSS variant (top-center triangle pointer). */
-  withArrow?: boolean;
   children: ReactNode;
 }
-
-export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
-  (
-    {
-      open,
-      onOpenChange: _onOpenChange,
-      withArrow,
-      className,
-      children,
-      ...rest
-    },
-    ref,
-  ) => {
-    if (!open) return null;
-    const classes = [
-      "bd-popover",
-      withArrow && "bd-popover--with-arrow",
-      className,
-    ]
-      .filter(Boolean)
-      .join(" ");
-    return (
-      <div ref={ref} role="dialog" className={classes} {...rest}>
-        {children}
-      </div>
-    );
-  },
+export const Popover = ({ open, onOpenChange, children }: PopoverProps) => (
+  <RadixPopover.Root open={open} onOpenChange={onOpenChange}>
+    {children}
+  </RadixPopover.Root>
 );
 Popover.displayName = "Popover";
 
-export type PopoverArrowProps = HTMLAttributes<HTMLSpanElement>;
+export const PopoverTrigger = RadixPopover.Trigger;
+export const PopoverPortal = RadixPopover.Portal;
 
-export const PopoverArrow = forwardRef<HTMLSpanElement, PopoverArrowProps>(
-  ({ className, ...rest }, ref) => {
-    // The default arrow is the CSS `::before` pseudo-element on
-    // .bd-popover--with-arrow. PopoverArrow is an explicit wrapper for
-    // callers who need to position the arrow themselves (e.g., bottom-
-    // anchored popovers when Phase 3 floating-ui integration lands).
-    const classes = ["bd-popover__arrow", className].filter(Boolean).join(" ");
-    return <span ref={ref} aria-hidden="true" className={classes} {...rest} />;
-  },
-);
-PopoverArrow.displayName = "PopoverArrow";
+export interface PopoverContentProps
+  extends ComponentPropsWithoutRef<typeof RadixPopover.Content> {
+  withArrow?: boolean;
+}
+export const PopoverContent = forwardRef<
+  ElementRef<typeof RadixPopover.Content>,
+  PopoverContentProps
+>(({ className, withArrow, children, ...rest }, ref) => {
+  const classes = [
+    "bd-popover",
+    withArrow && "bd-popover--with-arrow",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return (
+    <RadixPopover.Content ref={ref} className={classes} {...rest}>
+      {children}
+    </RadixPopover.Content>
+  );
+});
+PopoverContent.displayName = "PopoverContent";
+
+export const PopoverArrow = RadixPopover.Arrow;
