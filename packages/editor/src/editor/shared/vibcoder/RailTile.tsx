@@ -19,21 +19,19 @@
  *             aria-current — same precedent as Tabs/SectionHead.
  *
  * Cross-MOLECULE imports (FIRST in Phase 2 — proves cross-molecule pattern):
- *   Tooltip + TooltipTitle + TooltipDesc + TooltipKbd from sibling
- *   ./Tooltip molecule. The tooltip prop accepts either a plain string
- *   (rendered inline as raw label text inside Tooltip) or a ReactNode for
- *   richer compositions like <><TooltipTitle/><TooltipDesc/></>.
+ *   Tooltip + TooltipTrigger + TooltipPortal + TooltipContent +
+ *   TooltipTitle + TooltipDesc + TooltipKbd from sibling ./Tooltip molecule.
+ *   The tooltip prop accepts either a plain string (rendered inline inside
+ *   TooltipContent) or a ReactNode for richer compositions like
+ *   <><TooltipTitle/><TooltipDesc/></>.
  *
- * Tooltip render approach (CHOSEN: Option B — conditional render).
- *   The vendored CSS does NOT bundle a `:hover` / `:focus-visible` selector
- *   that automatically shows a sibling tooltip — Tooltip is a pure visual
- *   surface (renders unconditionally when present; show/hide is the caller
- *   or Phase 3 hover-intent organism's job). Rendering Tooltip ALWAYS as a
- *   sibling DOM node would emit a permanently-visible tooltip surface,
- *   which is wrong. So: when `tooltip` is provided, we render the Tooltip
- *   sibling node next to the button and let the caller (or a Phase 3
- *   wrapper) wire visibility. When `tooltip` is omitted, no Tooltip node
- *   ships — keeps the DOM clean.
+ * Tooltip render approach (Bucket B1 T1 update — Radix-backed compound).
+ *   When `tooltip` is provided, the button is wrapped in a Tooltip Root with
+ *   TooltipTrigger asChild + TooltipPortal + TooltipContent siblings. Radix
+ *   handles hover/focus visibility per the ambient TooltipProvider's
+ *   delayDuration (consumers must mount TooltipProvider once at the app
+ *   shell). When `tooltip` is omitted, no Tooltip node ships — keeps the
+ *   DOM clean.
  *
  * Variants from `vibcoder-variants.mjs molecules/rail-tile`:
  *   variants: horizontal (default flex row), vertical (column for grids)
@@ -48,7 +46,12 @@ import {
   type ReactNode,
   forwardRef,
 } from "react";
-import { Tooltip } from "./Tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipPortal,
+  TooltipContent,
+} from "./Tooltip";
 
 export type RailTileSize = "sm";
 export type RailTileOrientation = "horizontal" | "vertical";
@@ -131,10 +134,12 @@ export const RailTile = forwardRef<HTMLButtonElement, RailTileProps>(
     );
     if (tooltip === undefined) return button;
     return (
-      <>
-        {button}
-        <Tooltip>{tooltip}</Tooltip>
-      </>
+      <Tooltip>
+        <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>{tooltip}</TooltipContent>
+        </TooltipPortal>
+      </Tooltip>
     );
   },
 );

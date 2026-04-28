@@ -1,65 +1,88 @@
 /**
- * Vibcoder Tooltip wrapper — small dark hover affordance.
- * Renders the bd-tooltip composite from
- * src/themes/components/molecules/popover.css (one CSS file ships three
- * conceptually distinct molecules — Popover + Tooltip + Menu — split into
- * three wrapper files per the Phase 2 plan).
+ * Vibcoder Tooltip wrapper — Radix.Tooltip-backed compound.
  *
- * Slot composition (Contract A from Phase 2 design):
- *   children  variable content slot — short label OR a composition of
- *             TooltipTitle + TooltipDesc + TooltipKbd siblings
+ * Bucket B1 upgrade: replaces the Phase 2 passive surface. The bd-tooltip
+ * CSS skin (src/themes/components/molecules/popover.css) is now applied
+ * to TooltipContent; bd-tooltip--multiline gates the wrap+wide-padding
+ * variant.
  *
- * Always-rendered. Tooltip ships NO open / onOpenChange (different from
- * Popover): the caller controls visibility via show/hide CSS, conditional
- * render at the call site, or a Phase 3 hover-intent organism. Phase 2
- * keeps this a pure presentation surface.
+ * Compound exports:
+ *   TooltipProvider — Radix.Tooltip.Provider re-export. Mount once at app
+ *                    shell root (delayDuration governs all tooltips).
+ *   Tooltip        — Radix.Tooltip.Root (controlled via open + onOpenChange,
+ *                    or uncontrolled with defaultOpen)
+ *   TooltipTrigger — anchor element; supports asChild
+ *   TooltipPortal  — portal escape (Radix's default portal target; see E3 waiver)
+ *   TooltipContent — surface with bd-tooltip className; honors multiline
+ *   TooltipTitle   — bd-tooltip__title sibling span (visual only, unchanged)
+ *   TooltipDesc    — bd-tooltip__desc sibling span (visual only, unchanged)
+ *   TooltipKbd     — bd-tooltip__kbd sibling span (visual only, unchanged)
  *
- * Variants from `vibcoder-variants.mjs molecules/popover` (filtered to
- * bd-tooltip):
- *   variants: multiline (white-space: normal, max-width: 220px,
- *             padding: 8px 10px — for two-line tooltips)
+ * E2 contract waiver — Radix types deliberately leak through TooltipContentProps.
+ *   Same precedent as Popover (Bucket A T1, commit e0ef916). Positioning props
+ *   (side, sideOffset, align, alignOffset, avoidCollisions, collisionBoundary)
+ *   ARE the contract; re-typing them as a buildrik subset would lose pixel-
+ *   positioning fidelity.
  *
- * Sibling exports (Contract C):
- *   Tooltip       bd-tooltip surface (single-line by default)
- *   TooltipTitle  bd-tooltip__title — semibold heading line (use with
- *                 multiline tooltip when paired with TooltipDesc)
- *   TooltipDesc   bd-tooltip__desc — muted body text (multiline only)
- *   TooltipKbd    bd-tooltip__kbd — inline keyboard shortcut chip
- *
- * forwardRef on every export — Tooltip root is anchor measurement target;
- * sibling spans are visual only but still expose ref for symmetry.
+ * E3 portal-discipline waiver — TooltipPortal does NOT route via useOverlayContainer.
+ *   Same precedent as Popover. Tooltips are anchored to triggers, not part of
+ *   the modal stack — Radix's anchor positioning relies on its default parenting
+ *   and fights re-parenting. Z-index for tooltips is local to the bd-tooltip
+ *   layer.
  *
  * @license BSD-3-Clause
  */
-import { type HTMLAttributes, type ReactNode, forwardRef } from "react";
+import * as RadixTooltip from "@radix-ui/react-tooltip";
+import {
+  forwardRef,
+  type ComponentPropsWithoutRef,
+  type ElementRef,
+  type HTMLAttributes,
+  type ReactNode,
+} from "react";
 
-export interface TooltipProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, "role"> {
-  /** Toggles the --multiline CSS variant (wraps + widens padding). */
-  multiline?: boolean;
+export const TooltipProvider = RadixTooltip.Provider;
+
+export interface TooltipProps {
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  delayDuration?: number;
   children: ReactNode;
 }
-
-export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
-  ({ multiline, className, children, ...rest }, ref) => {
-    const classes = [
-      "bd-tooltip",
-      multiline && "bd-tooltip--multiline",
-      className,
-    ]
-      .filter(Boolean)
-      .join(" ");
-    return (
-      <div ref={ref} role="tooltip" className={classes} {...rest}>
-        {children}
-      </div>
-    );
-  },
+export const Tooltip = ({ children, ...rest }: TooltipProps) => (
+  <RadixTooltip.Root {...rest}>{children}</RadixTooltip.Root>
 );
 Tooltip.displayName = "Tooltip";
 
-export type TooltipTitleProps = HTMLAttributes<HTMLSpanElement>;
+export const TooltipTrigger = RadixTooltip.Trigger;
+export const TooltipPortal = RadixTooltip.Portal;
 
+export interface TooltipContentProps
+  extends ComponentPropsWithoutRef<typeof RadixTooltip.Content> {
+  multiline?: boolean;
+}
+export const TooltipContent = forwardRef<
+  ElementRef<typeof RadixTooltip.Content>,
+  TooltipContentProps
+>(({ className, multiline, children, ...rest }, ref) => {
+  const classes = [
+    "bd-tooltip",
+    multiline && "bd-tooltip--multiline",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return (
+    <RadixTooltip.Content ref={ref} className={classes} {...rest}>
+      {children}
+    </RadixTooltip.Content>
+  );
+});
+TooltipContent.displayName = "TooltipContent";
+
+// Sibling visual-only spans — unchanged from Phase 2 wrapper.
+export type TooltipTitleProps = HTMLAttributes<HTMLSpanElement>;
 export const TooltipTitle = forwardRef<HTMLSpanElement, TooltipTitleProps>(
   ({ className, children, ...rest }, ref) => {
     const classes = ["bd-tooltip__title", className].filter(Boolean).join(" ");
@@ -73,7 +96,6 @@ export const TooltipTitle = forwardRef<HTMLSpanElement, TooltipTitleProps>(
 TooltipTitle.displayName = "TooltipTitle";
 
 export type TooltipDescProps = HTMLAttributes<HTMLSpanElement>;
-
 export const TooltipDesc = forwardRef<HTMLSpanElement, TooltipDescProps>(
   ({ className, children, ...rest }, ref) => {
     const classes = ["bd-tooltip__desc", className].filter(Boolean).join(" ");
@@ -87,7 +109,6 @@ export const TooltipDesc = forwardRef<HTMLSpanElement, TooltipDescProps>(
 TooltipDesc.displayName = "TooltipDesc";
 
 export type TooltipKbdProps = HTMLAttributes<HTMLSpanElement>;
-
 export const TooltipKbd = forwardRef<HTMLSpanElement, TooltipKbdProps>(
   ({ className, children, ...rest }, ref) => {
     const classes = ["bd-tooltip__kbd", className].filter(Boolean).join(" ");

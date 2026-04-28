@@ -137,9 +137,19 @@ export {
   PopoverArrow,
 } from "./Popover";
 export type { PopoverProps, PopoverContentProps } from "./Popover";
-export { Tooltip, TooltipTitle, TooltipDesc, TooltipKbd } from "./Tooltip";
+export {
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipPortal,
+  TooltipContent,
+  TooltipTitle,
+  TooltipDesc,
+  TooltipKbd,
+} from "./Tooltip";
 export type {
   TooltipProps,
+  TooltipContentProps,
   TooltipTitleProps,
   TooltipDescProps,
   TooltipKbdProps,

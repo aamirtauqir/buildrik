@@ -1,9 +1,15 @@
 import { createRef } from "react";
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { RailTile } from "./RailTile";
 import { Icon } from "./Icon";
-import { TooltipTitle, TooltipDesc, TooltipKbd } from "./Tooltip";
+import {
+  TooltipProvider,
+  TooltipTitle,
+  TooltipDesc,
+  TooltipKbd,
+} from "./Tooltip";
 
 describe("vibcoder RailTile wrapper — Contract A (slot composition) + cross-molecule import", () => {
   it("renders <button type='button'> with bd-rail-tile class + icon + label", () => {
@@ -104,30 +110,46 @@ describe("vibcoder RailTile wrapper — Contract A (slot composition) + cross-mo
     expect(container.querySelector(".bd-tooltip")).toBeNull();
   });
 
-  it("renders Tooltip sibling with string tooltip (cross-MOLECULE import)", () => {
+  it("renders Tooltip sibling with string tooltip (cross-MOLECULE import) on hover", async () => {
+    const user = userEvent.setup();
     const { container } = render(
-      <RailTile icon={<Icon name="folder" />} label="Pages" tooltip="Pages panel" />,
+      <TooltipProvider delayDuration={0}>
+        <RailTile
+          icon={<Icon name="folder" />}
+          label="Pages"
+          tooltip="Pages panel"
+        />
+      </TooltipProvider>,
     );
-    const tt = container.querySelector(".bd-tooltip");
+    // Closed by default — Radix only renders content on hover/focus
+    expect(document.querySelector(".bd-tooltip")).toBeNull();
+    await user.hover(container.querySelector("button.bd-rail-tile")!);
+    const tt = document.querySelector(".bd-tooltip");
     expect(tt).toBeTruthy();
-    expect(tt!.textContent).toBe("Pages panel");
+    // Radix mirrors the text into a visually-hidden a11y span, so .textContent
+    // returns "Pages panelPages panel" — assert containment, not equality.
+    expect(tt!.textContent).toContain("Pages panel");
   });
 
-  it("renders Tooltip sibling with ReactNode tooltip composing TooltipTitle+Desc+Kbd", () => {
+  it("renders Tooltip sibling with ReactNode tooltip composing TooltipTitle+Desc+Kbd on hover", async () => {
+    const user = userEvent.setup();
     const { container } = render(
-      <RailTile
-        icon={<Icon name="folder" />}
-        label="Pages"
-        tooltip={
-          <>
-            <TooltipTitle>Pages</TooltipTitle>
-            <TooltipDesc>Manage site pages.</TooltipDesc>
-            <TooltipKbd>P</TooltipKbd>
-          </>
-        }
-      />,
+      <TooltipProvider delayDuration={0}>
+        <RailTile
+          icon={<Icon name="folder" />}
+          label="Pages"
+          tooltip={
+            <>
+              <TooltipTitle>Pages</TooltipTitle>
+              <TooltipDesc>Manage site pages.</TooltipDesc>
+              <TooltipKbd>P</TooltipKbd>
+            </>
+          }
+        />
+      </TooltipProvider>,
     );
-    const tt = container.querySelector(".bd-tooltip")!;
+    await user.hover(container.querySelector("button.bd-rail-tile")!);
+    const tt = document.querySelector(".bd-tooltip")!;
     expect(tt.querySelector(".bd-tooltip__title")!.textContent).toBe("Pages");
     expect(tt.querySelector(".bd-tooltip__desc")!.textContent).toBe(
       "Manage site pages.",
