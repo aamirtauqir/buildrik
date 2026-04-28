@@ -673,3 +673,65 @@ Icons.tsx (domain glyph palette), QuickSwitcher (orchestration layer), Resizable
 - [x] Bundle delta documented (+4.4% raw / +6.4% gzip-main — one-time Radix adoption cost)
 - [x] Phase 5 handoff list captured in 5 buckets above
 
+## Phase 5 findings (chrome integration / shim deletion)
+
+**Milestone:** M9 (2026-04-28) — same calendar day as M8 Phase 4 ship.
+
+**Outcome:** PASS for Buckets C + D. Bucket A (Popover Radix upgrade) deferred upstream — see `lane-4-upstream-handoff.md`. Bucket B (Tooltip/Toast/ContextMenu/HelpTooltip) and Bucket E (permanent extensions) are no-action by design — Bucket E lives in `src/shared/extensions/` already.
+
+**Scope shipped:** All 19 Phase 4 adapter shims deleted. 3 standalone compositions (CopyButton, PremiumBadge, UpgradeModal) relocated to `src/shared/extensions/`. 1 in-flight composition extraction (ConfirmDialog) created during T4 + relocated to extensions in T4 follow-up.
+
+### Commit landings
+
+| Task | Description | Commits |
+|---|---|---|
+| **T1** | Toolchain hardening (codemod factory + AST scanner) | `c951a53`, `f31e6f6`, `df16f81`, `50bf799` |
+| **T2** | 15 atom shim deletions (Tag, Badge, Skeleton, IconButton, Icon, Kbd, Spinner, Switch, Slider, SliderInput, Checkbox, Select, Input, TextInput, Button) + 19 keep-as-extension JSDoc stamps | thru `543fe28`, follow-up `a0c50a2` |
+| **T2.X** | Barrel-explosion codemod (split `from "../shared/ui"` → direct named-path imports across 25 files) | `a8e2ce0` |
+| **T3.A** | Card molecule shim deletion (dead code — 0 production consumers) | `874d523` |
+| **T3.B** | Tabs molecule shim deletion + 6 consumer hand-port (data-driven → compound API) | `64236e7` |
+| **T3.C** | FormField molecule shim deletion (dead code — 0 production consumers) | `2341b5e` |
+| **T3.D** | PanelHeader molecule shim → `src/shared/extensions/` (composition move) + 4 consumer rewrites | `20262fc` |
+| **T4** | Modal shim deletion + 24 consumer hand-port + ConfirmDialog extracted | `b821002`, follow-up `c6f20e0` |
+| **T5** | Composition rewrites — CopyButton, PremiumBadge, UpgradeModal → `src/shared/extensions/` | `524037d` |
+
+### LOC delta
+
+Approximate net-removed across T1-T5: **−1,800 LOC** of shim code + adapter tests + Phase 4 codemod artifacts. Each Phase 4 codemod retired alongside its corresponding shim deletion (Phase 4 chain reduced from 6 entries → 1 entry — only `popover` remains, blocked on Bucket A). Three barrel layers cleaned: `shared/ui/index.{ts,tsx}` + root `src/index.ts` (transitive fan-out) + `editor/sidebar/shared/index.ts` (sibling fan-out).
+
+### Surfaced lessons (5 distinct inventory-script gaps)
+
+The Phase 5 plan inventory script (`scripts/phase5-shim-inventory.mjs`) under-reports consumer counts in 5 specific failure modes. Each surfaced through real Phase 5 task drift:
+
+1. **Transitive root barrel re-exports** (T3.B, T3.D, T4): `src/index.ts` re-exports from `./components` which re-exports from `shared/ui/index.ts`. Inventory script does not trace transitive fan-out — manual grep required.
+2. **Sub-barrel re-exports** (T3.D): `src/editor/sidebar/shared/index.ts` re-exported PanelHeader independently. Sub-barrels at the same depth as middle-man wrappers go undetected.
+3. **Middle-man wrapper files** (T3.D): `src/editor/sidebar/shared/PanelHeader.tsx` was a pure pass-through re-export. Inventory treats these as siblings, not redirect-only files. Detection rule: file body is a single `export * from "X"` + `export { default } from "X"`.
+4. **Legacy `components/` folder redirects** (T3.D): `src/components/Panels/LeftSidebar/shared/PanelHeader.tsx` was a deeper redirect that the inventory script's scan-root excluded.
+5. **Stale `vi.mock` paths** (T4 follow-up): test files mocking deleted module IDs. `vi.mock("X", …)` is silently inert when module ID does not match an actual import — tests pass under jsdom even when mock never applies.
+
+### Decision rubric for Phase 5 task types
+
+Phase 5 surfaced 3 distinct task patterns. T6+ should triage shim-deletion work using this rubric:
+
+| Pattern | Signal | Approach | Reference |
+|---|---|---|---|
+| **Pure dead code** | 0 production consumers, only barrel re-exports | Inline delete: shim + adapter test + barrels + Phase 4 codemod | T3.A Card, T3.C FormField |
+| **Translation shim** | N production consumers, prop translations are mechanical | Hand-port if N≤10, codemod if N>10 (assess composition complexity first) | T3.B Tabs (6, hand-port), T2.B.14 Button (180, codemod), T4 Modal (24, hand-port) |
+| **Composition layer** | Shim adds project-specific composition on top of vibcoder primitive | Move to `src/shared/extensions/` — preserve abstraction, not deletion | T2.B Skeleton, T3.D PanelHeader, T4 ConfirmDialog, T5 ×3 |
+
+### `src/shared/extensions/` folder contract
+
+After T1-T5 the folder contains 6 files: `Skeleton.tsx`, `PanelHeader.tsx`, `ConfirmDialog.tsx`, `CopyButton.tsx`, `PremiumBadge.tsx`, `UpgradeModal.tsx`. Contract: project-specific compositions on top of vibcoder primitives. NOT vendored vibcoder code (those live in `src/editor/shared/vibcoder/`). NOT raw chrome JSX (that lives in `src/editor/`). NOT primitive design-system pieces (those stay in `src/shared/ui/`). Test: "if vibcoder ever ships this exact composition upstream, this file deletes and consumers swap import paths." If the answer is yes, it belongs in `extensions/`; otherwise in `editor/` or `shared/ui/` per existing rules.
+
+### Open follow-ups (post-T5)
+
+1. **Bucket A — Popover Radix upgrade** blocked on upstream vibcoder Popover gaining Radix.Popover backing. After upgrade lands, T7 deletes `useFocusTrap` from chrome + drops Popover hybrid shell. `codemod:phase4:popover` script entry retains until Popover shim deletes.
+2. **Bucket B — Tooltip/Toast/ContextMenu/HelpTooltip** keep-legacy until vibcoder substrates upgrade. Tooltip/Toast in particular need Radix.Tooltip / Radix.Toast backing on the vibcoder side. T7 disposition.
+3. **Inventory script enhancements** (5 failure modes above). Optional ratchet — each was caught manually in T1-T5; codifying would prevent recurrence in T7+.
+4. **Stale `vi.mock` path detection** — single CI gate would prevent the T4 follow-up class of bug. Greppable: mock module IDs vs actual file existence.
+5. **Bundle delta measurement** — Phase 4 reported +4.4% raw / +6.4% gzip-main from Radix adoption. Phase 5 expected to plateau or shrink slightly (only deletes consumer-side shim layers). Re-measure post-T5 to confirm hypothesis.
+
+### Recommendation
+
+**Phase 5 closes at T5.** Buckets C + D shipped (atom + molecule + Modal shim deletions + composition relocations). Bucket A blocked on upstream Popover Radix work; Bucket B blocked on upstream Tooltip/Toast Radix work. Both deferred to a future phase (T7) gated on the upstream vibcoder substrate upgrades. Phase 6 (visual regression infrastructure) is unblocked and should be next per the roadmap's dependency graph.
+

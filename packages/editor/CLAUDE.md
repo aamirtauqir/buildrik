@@ -198,7 +198,14 @@ src/
 │   ├── constants/   # All constants (SSOT for constants)
 │   ├── hooks/       # Reusable React hooks
 │   ├── utils/       # Pure utility functions
-│   ├── ui/          # Design system primitives (Button, Modal, Tooltip, etc.)
+│   ├── ui/          # Design system primitives (Tooltip, Toast, ContextMenu, etc.)
+│   ├── extensions/  # Project-specific compositions on top of vibcoder primitives.
+│   │                # NOT vendored vibcoder code (lives in editor/shared/vibcoder/).
+│   │                # NOT primitives (live in shared/ui/).
+│   │                # Test: "if vibcoder ever ships this exact composition upstream,
+│   │                # this file deletes and consumers swap import paths."
+│   │                # Examples: PanelHeader, ConfirmDialog, CopyButton, PremiumBadge,
+│   │                # UpgradeModal, Skeleton compounds.
 │   └── forms/       # Form field components
 │
 ├── features/        # FEATURE MODULES — Self-contained feature units
@@ -220,7 +227,12 @@ editor/    → engine/, shared/, features/, blocks/, templates/
 components/ → engine/, shared/ (LEGACY — don't add new imports)
 features/  → engine/, shared/
 services/  → shared/ (ONLY)
-shared/    → NOTHING from other src/ folders (leaf dependency)
+shared/    → NOTHING from other src/ folders (leaf dependency).
+            EXCEPTION: shared/extensions/ files MAY import from
+            @/editor/shared/vibcoder (the vendored vibcoder primitive
+            bundle). This is the only intentional shared/→editor/ edge
+            in the graph — extensions/ exists specifically to compose
+            vibcoder primitives.
 blocks/    → shared/ (ONLY)
 templates/ → shared/ (ONLY)
 themes/    → shared/ (ONLY)
@@ -391,4 +403,8 @@ mid-arc tier transition is theater, single-mode is honest).
 
 ### Phase status
 
-See `docs/superpowers/specs/2026-04-26-vibcoder-position-3/roadmap.md`.
+Phases 1-5 SHIPPED 2026-04-28 (M5 organisms, M8 chrome re-port, M9 Phase 5
+shim deletion). 19 Phase 4 adapter shims deleted; 6 compositions live at
+`src/shared/extensions/`. Buckets A+B (Popover/Tooltip/Toast Radix backings)
+deferred upstream. See `docs/superpowers/specs/2026-04-26-vibcoder-position-3/roadmap.md`
+and `poc-findings.md` Phase 5 findings section for full details.

@@ -314,33 +314,42 @@ Two batches:
 - **Most-needed:** sidebar-shell, stack, cluster
 - **Universal:** grid, center, frame, switcher
 
-## Phase 5 — Chrome integration (post-M8 inheritance)
+## Phase 5 — Chrome integration — SHIPPED 2026-04-28 (M9)
 
-Phase 4 (chrome re-port) shipped at M8 (2026-04-28) — 19 adapter shims (`PHASE 5
-DELETE` markers in `packages/editor/src/shared/ui/`) + 17 keep-as-extension JSDoc
-stamps. Phase 5 inherits the consumer-rewrite + shim-deletion work in 5 buckets
-(see `poc-findings.md` Phase 5 handoff list for the canonical version):
+Phase 5 shipped at M9 same calendar day as M8 Phase 4 — Buckets C + D fully
+landed. Buckets A + B deferred upstream pending vibcoder Popover/Tooltip/Toast
+Radix-backing upgrades. Bucket E was already at `src/shared/extensions/` by
+design, no work required.
 
-**Bucket A — Hybrid simplification.** Vibcoder Popover gains Radix.Popover backing
-→ delete `useFocusTrap` + drop hybrid behavior shell from `Popover.tsx` shim.
+**Bucket A — Hybrid simplification — DEFERRED upstream.** Vibcoder Popover still
+needs Radix.Popover backing. `useFocusTrap` retained, Popover shim retained,
+`codemod:phase4:popover` retained as the sole entry in the Phase 4 codemod chain.
+See `lane-4-upstream-handoff.md` for the upstream change requirements.
 
-**Bucket B — Keep-legacy → bridge ports.** Tooltip (7 consumers), Toast
-(26 consumers — only if NotificationCenter gains queue/provider), ContextMenu
-(needs Radix.ContextMenu install), HelpTooltip (cascades from Tooltip).
+**Bucket B — Keep-legacy → bridge ports — DEFERRED upstream.** Tooltip / Toast /
+ContextMenu / HelpTooltip retained. Each blocks on vibcoder substrate upgrades
+(Radix.Tooltip / Radix.Toast / Radix.ContextMenu install). T7 disposition.
 
-**Bucket C — Adapter shim deletion.** Codemod-driven consumer rewrites swap
-`@/shared/ui/<X>` imports for direct vibcoder imports; then delete the 19 shim
-files. Order: atoms/molecules first (T1–T4), then Modal (T5), then Popover (T6 —
-after Bucket A's Radix upgrade).
+**Bucket C — Adapter shim deletion — SHIPPED.** All 19 Phase 4 shims deleted
+across T1-T4. Atoms (T2 ×15 + T2.X barrel codemod), molecules (T3 ×4), Modal (T4
++ ConfirmDialog extracted as a side-effect composition).
 
-**Bucket D — Composition rewrites.** CopyButton, PremiumBadge, UpgradeModal —
-manual review, not codemod-eligible.
+**Bucket D — Composition rewrites — SHIPPED.** CopyButton, PremiumBadge,
+UpgradeModal moved to `src/shared/extensions/` (T5). PanelHeader (T3.D) and
+ConfirmDialog (T4 follow-up) joined the same folder during their respective
+tasks, plus Skeleton (extracted in T2.B). 6 files total now in `extensions/`.
 
-**Bucket E — Stays as extension permanently.** Icons.tsx (domain glyph palette),
-QuickSwitcher (orchestration), Resizable, TreeView, UpgradeGate, ErrorBoundary,
-InfoBanner. Not primitive ports; Buildrik domain code.
+**Bucket E — Stays as extension permanently — NO ACTION.** Icons.tsx,
+QuickSwitcher, Resizable, TreeView, UpgradeGate, ErrorBoundary, InfoBanner stay
+at `src/shared/ui/` per existing folder ownership rules. Not vibcoder primitive
+ports; Buildrik domain code.
 
-**Open issue:** #93 PopoverArrow reconciled here (Phase 3 deferred).
+**Open issue:** #93 PopoverArrow remains deferred (cascades from Bucket A —
+reconciles when vibcoder Popover gains Radix backing).
+
+**Reference:** `poc-findings.md` Phase 5 findings section captures commit table,
+LOC delta, surfaced lessons (5 inventory-script gaps), decision rubric, and
+extensions/ folder contract.
 
 ## Phase 6 — Visual regression infrastructure (~1 week dispatched)
 
@@ -361,7 +370,8 @@ InfoBanner. Not primitive ports; Buildrik domain code.
 | **M6: Layout coverage** | (merged into Phase 5 chrome integration) | Layout primitives ship alongside consumer rewrites |
 | **M7: Re-port complete** | (renumbered → M8 — see Phase numbering note) | Adapter shim layer landed, consumer rewrites pending in Phase 5 |
 | **M8: Phase 4 chrome re-port shipped** | T1–T8 complete | 19 adapter shims + 19 codemods + 17 keep-as-extension stamps + Gate 23 wired + Gate 24 ratcheted 264→100 — SHIPPED 2026-04-28 |
-| **M9: Visual regression live** | Phase 6 complete (post-Phase-5) | Pixel-level drift detection |
+| **M9: Phase 5 chrome integration shipped** | T1–T5 complete | 19 adapter shims deleted (Bucket C) + 6 compositions in `src/shared/extensions/` (Bucket D) + Gate 24 stable at 79 + tsc 71 stable + vitest 213/1743 + Buckets A+B deferred upstream — SHIPPED 2026-04-28 |
+| **M10: Visual regression live** | Phase 6 complete (post-Phase-5) | Pixel-level drift detection |
 
 ## Risk register (post-Pass 6)
 
