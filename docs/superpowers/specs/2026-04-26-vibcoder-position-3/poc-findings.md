@@ -927,3 +927,62 @@ Gate 12 (box-shadow via shadow/glow token) dropped 176 → 175 as a codemod side
 ### Recommendation
 
 **Bucket B3 closes 2026-04-30. Phase 5 chrome arc fully complete.** All Bucket A (Popover) + Buckets B1 (Tooltip) + B2 (ContextMenu pure deletion) + B3 (Toast) shipped. No remaining Phase 4 shims in chrome. The "deferred upstream" framing from the original Phase 5 close-out is now obsolete — every bucket landed in the local arc rather than waiting on vibcoder upstream changes. Phase 5 chrome integration is genuinely complete.
+
+
+---
+
+## Phase 4 (Layout Primitives) revival — 2026-04-29
+
+### What shipped
+
+| Task | SHA | Description |
+|------|-----|-------------|
+| T1 | `4cade9d` | Vendor pipeline bootstrap — 7 layout CSS files dropped at `packages/editor/src/themes/components/layouts/` (Stack, Cluster, Center, Grid, Frame, Switcher, SidebarShell) and run through `npm run vibcoder:vendor` so codemod 1 (`bdr-` → `bd-`) and codemod 2 (token folds) applied cleanly. |
+| T2 | `c5d6251` | Stack pilot — first wrapper at `packages/editor/src/editor/shared/vibcoder/Stack.tsx`. Established the three propagation rules (ref test asserts base class; docstring warns against manual modifier injection; combination test for non-default modifiers + caller className). |
+| T3 | `67777ae` | Cluster wrapper + tests + gallery. |
+| T4 | `d7f19ad` | Center + Grid + Frame batch — three primitives in one commit because each was small and shared the propagation pattern. |
+| T5 | `e9d5a5a` | Switcher wrapper — only `--threshold` knob shipped (vendored CSS does not expose gap/align/direction despite plan asking for them). |
+| T6 | `a9bfdbb` | SidebarShell — 2-column primitive (not the 4-zone shell the plan originally framed). DOM-order vs visual-order a11y contract test added. |
+| T7 | `7ba8c4a` | Manifest + roadmap + plan backfill — `docs/reference/vibcoder/components/COMPONENTS.md` updated, body-class defs verified, Phase 4 row in the position-3 roadmap retired. |
+
+Net delta: 7 vendored CSS files + 7 wrappers + tests + galleries. 814/814 tests pass, tsc 71 stable, 25/25 gates green.
+
+### Vendoring pipeline transforms but doesn't copy
+
+T1's initial implementer reported BLOCKED — `npm run vibcoder:vendor` ran clean but produced zero CSS output. Root cause: the pipeline ingests files **already present** at the target path and applies codemods on top. It does not bootstrap from the manifest source. Fix was a manual copy from the upstream bundle directory into `themes/components/layouts/`, then re-run the pipeline so codemod 1 and codemod 2 applied. This matches how Phase 1-3 originally seeded — must be added to the vendor docs as a known prerequisite step. Future vendored-port tasks should include "manually copy source CSS into target dir, then run vendor pipeline" as the explicit first sub-step.
+
+### Plan vs vendored CSS drift — 4 of 6 components
+
+API drift between the plan (written from an editor designer's perspective) and the shipped vendored CSS surfaced repeatedly:
+
+- **Stack** — plan said `direction` prop; vendored CSS is vertical-only. Prop dropped.
+- **Switcher** — plan said gap + align + direction; vendored CSS only exposes `--threshold`. Simplified.
+- **SidebarShell** — plan framed it as a 4-zone application shell; vendored CSS is a 2-column primitive. Scope corrected at T6 dispatch.
+- **Frame** — plan said `fit` prop; vendored CSS hardcodes `object-fit: cover`. Prop dropped.
+
+Lesson: when planning future vendored-port tasks, **read the vendored CSS first and mirror its grammar exactly**. Vendored CSS is the source of truth (Position 3 routing). Per-component plan drafts should start with `cat <vendored-css>` and an explicit field-by-field knob inventory before the wrapper API gets sketched.
+
+### Default-omits-modifier discipline
+
+When a CSS base class already encodes a default (e.g., `.bd-stack` gap defaults to `--space-3` matching `--gap-md`), the wrapper must **omit** the modifier class for that default value — emitting `bd-stack--md` would be redundant. Tests must explicitly assert the absence. T2 pilot established the rule; T3-T6 reused it. Stack, Cluster, Switcher, and SidebarShell all follow. This complements the propagation rules (ref test + docstring + combination test) and applies any time the base class isn't a no-op.
+
+### Required vs optional prop pattern
+
+Two props ended up REQUIRED because the base class is meaningless without them:
+
+- `Grid.cols` — no meaningful default; caller must pick a column count
+- `Frame.ratio` — no meaningful default; aspect must be explicit
+
+All others have an opinionated default. The pattern emerges from asking *"what does the base class produce on its own?"* — if the answer is "nothing useful", the modifier is required and TypeScript enforces it.
+
+### DOM order vs visual order in SidebarShell
+
+`side="right"` flips visual position via `flex-direction: row-reverse` on the row, but the DOM keeps the sidebar element first. A11y test asserts that contract (`children[0]` is always the sidebar regardless of `side` prop). Pattern is reusable for any directional layout primitive that mirrors visually but should preserve reading order.
+
+### Phase 4 was a revival, not new work
+
+Originally listed as Phase 4 in the position-3 roadmap, deferred during the Phase 5 / M9 organism arc. Reviving it 9 months later worked because: (a) the vendor pipeline existed, (b) the gate stack existed (Gates 19/21/22 + chrome-axiom gates 11-14), and (c) Phase 1-3 patterns were canonical and reusable verbatim. The cost was 1 day of focused subagent-driven execution. Lesson: **deferred phases CAN be revived cheaply when infrastructure has matured around them.** This is the inverse of the usual deferred-work cost calculus — instead of paying interest on the deferred work, the surrounding maturity (gates, codemods, Phase 1-3 propagation rules) made the revival mechanical rather than exploratory.
+
+### Recommendation
+
+Phase 4 closes 2026-04-29. Roadmap row retired. The 7 layout primitives are now generally available at `@/editor/shared/vibcoder` for any future chrome layout work. Pre-Phase-5 close-out (Bucket B3 above) is the sole remaining open arc; Phase 4 layouts unblock no downstream phases.
