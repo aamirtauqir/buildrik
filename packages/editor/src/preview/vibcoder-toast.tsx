@@ -1,56 +1,113 @@
-import { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Toast, type ToastTone } from "../editor/shared/vibcoder/Toast";
+import {
+  ToastProvider,
+  useToast,
+  type ToastTone,
+} from "../editor/shared/vibcoder/Toast";
 import { sectionLabel, stack } from "./_galleryStyles";
 
 const stackWide = { ...stack, gap: 16, maxWidth: 480 };
 
 const TONES: ToastTone[] = ["info", "success", "warning", "error", "neutral"];
 
-function Demo() {
-  // Per Contract B: caller owns open state. NO internal useState in
-  // wrapper. Demo wires a per-tone open map locally; Phase 3
-  // NotificationCenter organism will manage queue/stacking.
-  const [openMap, setOpenMap] = useState<Record<string, boolean>>(
-    Object.fromEntries(TONES.map((t) => [t, true])),
-  );
-  const dismiss = (tone: string) =>
-    setOpenMap((m) => ({ ...m, [tone]: false }));
-  const restoreAll = () =>
-    setOpenMap(Object.fromEntries(TONES.map((t) => [t, true])));
+const buttonStyle: React.CSSProperties = {
+  alignSelf: "flex-start",
+  padding: "6px 12px",
+  borderRadius: 4,
+  border: "1px solid var(--buildrick-border, #ccc)",
+  background: "var(--buildrick-bg-card, white)",
+  cursor: "pointer",
+};
 
+function Triggers() {
+  const { addToast, removeToast, toasts } = useToast();
   return (
     <div style={stackWide}>
-      <h2 style={sectionLabel}>tones (controlled open per toast)</h2>
-      <button type="button" onClick={restoreAll} style={{ alignSelf: "flex-start" }}>
-        Restore all
-      </button>
+      <h2 style={sectionLabel}>tones (push toasts via addToast)</h2>
       {TONES.map((tone) => (
-        <Toast
+        <button
           key={tone}
-          open={openMap[tone]}
-          onOpenChange={(o) => !o && dismiss(tone)}
-          tone={tone}
-          title={`${tone[0].toUpperCase()}${tone.slice(1)} toast`}
-          description={`This is a ${tone} severity message.`}
-          action={
-            <button type="button" onClick={() => dismiss(tone)}>
-              Dismiss
-            </button>
+          type="button"
+          style={buttonStyle}
+          onClick={() =>
+            addToast({
+              tone,
+              title: `${tone[0].toUpperCase()}${tone.slice(1)} toast`,
+              description: `This is a ${tone} severity message.`,
+            })
           }
-          icon={<span>•</span>}
-        />
+        >
+          Push {tone}
+        </button>
       ))}
 
-      <h2 style={sectionLabel}>title-only (no description, no action)</h2>
-      <Toast open onOpenChange={() => {}} title="Saved." />
+      <h2 style={sectionLabel}>title-only / description-only</h2>
+      <button
+        type="button"
+        style={buttonStyle}
+        onClick={() =>
+          addToast({
+            tone: "success",
+            description: "Saved.",
+          })
+        }
+      >
+        Push description-only success
+      </button>
 
-      <h2 style={sectionLabel}>open=false (renders nothing)</h2>
-      <Toast open={false} onOpenChange={() => {}} title="hidden" />
-      <small style={{ opacity: 0.6 }}>
-        ↑ Verify: no .bd-toast element in DOM above this line.
-      </small>
+      <h2 style={sectionLabel}>with action</h2>
+      <button
+        type="button"
+        style={buttonStyle}
+        onClick={() =>
+          addToast({
+            tone: "info",
+            title: "File deleted",
+            description: "1 file moved to trash.",
+            action: {
+              label: "Undo",
+              onClick: () => addToast({ description: "Restored." }),
+            },
+          })
+        }
+      >
+        Push with Undo action
+      </button>
+
+      <h2 style={sectionLabel}>custom duration (1s)</h2>
+      <button
+        type="button"
+        style={buttonStyle}
+        onClick={() =>
+          addToast({
+            tone: "warning",
+            description: "I disappear in 1 second.",
+            duration: 1000,
+          })
+        }
+      >
+        Push 1s warning
+      </button>
+
+      <h2 style={sectionLabel}>programmatic dismiss</h2>
+      <button
+        type="button"
+        style={buttonStyle}
+        onClick={() => {
+          for (const t of [...toasts]) removeToast(t.id);
+        }}
+      >
+        Dismiss all ({toasts.length})
+      </button>
     </div>
+  );
+}
+
+function Demo() {
+  return (
+    <ToastProvider>
+      <Triggers />
+    </ToastProvider>
   );
 }
 
