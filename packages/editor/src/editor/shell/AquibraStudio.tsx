@@ -18,9 +18,8 @@ import { ExportEngine } from "../../engine/export";
 import { EVENTS } from "../../shared/constants/events";
 import { useElementFlash } from "../../shared/hooks";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
-import { TooltipProvider, ToastProvider as VibcoderToastProvider } from "@/editor/shared/vibcoder";
+import { TooltipProvider, ToastProvider, useToast } from "@/editor/shared/vibcoder";
 import { StudioSkeleton } from "@/shared/extensions/Skeleton";
-import { ToastProvider, useToast } from "../../shared/ui/Toast";
 import { UpgradeModal } from "@/shared/extensions/UpgradeModal";
 import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";
@@ -207,8 +206,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         state.setIsDirty(false);
         addToast({
           title: "Saved",
-          message: "Project saved successfully",
-          variant: "success",
+          description: "Project saved successfully",
+          tone: "success",
           duration: 1800,
         });
       })
@@ -228,8 +227,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         state.setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
         addToast({
           title: "Save failed",
-          message: userMessage,
-          variant: "error",
+          description: userMessage,
+          tone: "error",
           action: { label: "Retry", onClick: () => saveProject() },
         });
       });
@@ -293,15 +292,15 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       await exportEngine.downloadZip("site-export.zip");
       addToast({
         title: "Export complete",
-        message: "Your site has been downloaded as a zip file.",
-        variant: "success",
+        description: "Your site has been downloaded as a zip file.",
+        tone: "success",
         duration: 3000,
       });
     } catch (err) {
       addToast({
         title: "Export failed",
-        message: err instanceof Error ? err.message : "Could not export your site.",
-        variant: "error",
+        description: err instanceof Error ? err.message : "Could not export your site.",
+        tone: "error",
       });
     } finally {
       modals.setExportLoading(false);
@@ -596,25 +595,17 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
  * Provider stack (outer → inner):
  *   TooltipProvider          — Radix.Tooltip ambient (B1 T2, delayDuration=500
  *                              matches deleted shim default).
- *   VibcoderToastProvider    — New Radix.Toast queue + Viewport (B3 T1). Hosts
- *                              the vibcoder useToast hook for consumers that
- *                              have migrated off the shim.
- *   ToastProvider (shim)     — Phase 4 shim Provider. Hosts shim useToast for
- *                              the 27 chrome consumers still using the shim's
- *                              imperative API. T4 will atomically migrate the
- *                              consumers + remove this line + delete the shim
- *                              file. Until then, both Providers coexist.
+ *   ToastProvider            — Radix.Toast queue + Viewport (B3). Hosts the
+ *                              vibcoder useToast hook for all chrome consumers.
  *   StudioErrorBoundary      — last-resort UI fallback.
  */
 export const AquibraStudio: React.FC<AquibraStudioProps> = (props) => (
   <TooltipProvider delayDuration={500}>
-    <VibcoderToastProvider>
-      <ToastProvider>
-        <StudioErrorBoundary>
-          <AquibraStudioShell {...props} />
-        </StudioErrorBoundary>
-      </ToastProvider>
-    </VibcoderToastProvider>
+    <ToastProvider>
+      <StudioErrorBoundary>
+        <AquibraStudioShell {...props} />
+      </StudioErrorBoundary>
+    </ToastProvider>
   </TooltipProvider>
 );
 

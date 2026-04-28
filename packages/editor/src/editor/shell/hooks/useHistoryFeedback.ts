@@ -12,6 +12,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { EVENTS } from "../../../shared/constants";
+import type { ToastInput } from "@/editor/shared/vibcoder";
 
 /** Map of action labels to user-friendly descriptions */
 const ACTION_DESCRIPTIONS: Record<string, string> = {
@@ -49,13 +50,7 @@ const DESTRUCTIVE_LABELS = new Set([
 
 export function useHistoryFeedback(
   composer: Composer | null,
-  addToast: (params: {
-    title: string;
-    message: string;
-    variant: "info" | "success" | "warning" | "error";
-    duration?: number;
-    action?: { label: string; onClick: () => void };
-  }) => void
+  addToast: (input: ToastInput) => string
 ) {
   React.useEffect(() => {
     if (!composer) return;
@@ -97,8 +92,8 @@ export function useHistoryFeedback(
       const isDestructive = DESTRUCTIVE_LABELS.has(data.entry.label?.toLowerCase() ?? "");
       addToast({
         title: "↩ Undo",
-        message: action,
-        variant: "info",
+        description: action,
+        tone: "info",
         duration: isDestructive ? 4000 : 2500,
         ...(isDestructive && {
           action: { label: "Redo", onClick: () => composer.history.redo() },
@@ -111,8 +106,8 @@ export function useHistoryFeedback(
       const isDestructive = DESTRUCTIVE_LABELS.has(data.entry.label?.toLowerCase() ?? "");
       addToast({
         title: "↪ Redo",
-        message: action,
-        variant: "info",
+        description: action,
+        tone: "info",
         duration: isDestructive ? 4000 : 2500,
         ...(isDestructive && {
           action: { label: "Undo", onClick: () => composer.history.undo() },

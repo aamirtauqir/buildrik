@@ -7,7 +7,7 @@
 
 import * as React from "react";
 import { EVENTS } from "../../shared/constants/events";
-import { useToast } from "../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import { getElementId } from "../../shared/utils/dragDrop";
 import type { CanvasProps, CanvasRef } from "./Canvas.types";
 import { DEVICE_SIZES } from "./Canvas.types";
@@ -88,8 +88,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     const handleDropError = React.useCallback(
       (error: DropError) => {
         addToast({
-          message: error.message,
-          variant: "warning",
+          description: error.message,
+          tone: "warning",
           duration: 3000,
         });
       },
@@ -100,8 +100,8 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
     const handleDropSuccess = React.useCallback(
       (success: DropSuccess) => {
         addToast({
-          message: `Inserted: ${success.elementLabel}`,
-          variant: "success",
+          description: `Inserted: ${success.elementLabel}`,
+          tone: "success",
           duration: 2000,
         });
       },

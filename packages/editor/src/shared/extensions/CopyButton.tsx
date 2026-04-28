@@ -18,7 +18,7 @@
 
 import { Copy, Check } from "lucide-react";
 import * as React from "react";
-import { useToast } from "@/shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 
 export interface CopyButtonProps {
   /** Content to copy to clipboard */
@@ -97,16 +97,16 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       await navigator.clipboard.writeText(content);
       setCopied(true);
       addToast({
-        message: "Copied to clipboard!",
-        variant: "success",
+        description: "Copied to clipboard!",
+        tone: "success",
         duration: 2000,
       });
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // P1-4: Enhanced error message with context
       addToast({
-        message: "Failed to copy — your browser may not support clipboard access",
-        variant: "error",
+        description: "Failed to copy — your browser may not support clipboard access",
+        tone: "error",
         duration: 4000,
       });
     }

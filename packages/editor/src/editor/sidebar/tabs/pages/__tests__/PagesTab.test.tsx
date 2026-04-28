@@ -9,10 +9,14 @@ import { render, screen, fireEvent } from "@testing-library/react";
 // ─── Mock heavy engine/shared deps before importing components ────────────────
 
 vi.mock("@/engine", () => ({ Composer: class {} }));
-vi.mock("@/shared/ui/Toast", () => ({
-  useToast: () => ({ addToast: vi.fn() }),
-  ToastProvider: ({ children }: { children: React.ReactNode }) => children,
-}));
+vi.mock("@/editor/shared/vibcoder", async () => {
+  const actual = await vi.importActual<Record<string, unknown>>("@/editor/shared/vibcoder");
+  return {
+    ...actual,
+    useToast: () => ({ addToast: vi.fn(), removeToast: vi.fn(), toasts: [] }),
+    ToastProvider: ({ children }: { children: React.ReactNode }) => children,
+  };
+});
 vi.mock("@/shared/extensions/ConfirmDialog", () => ({
   ConfirmDialog: () => null,
 }));

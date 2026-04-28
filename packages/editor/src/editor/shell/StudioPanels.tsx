@@ -16,7 +16,7 @@ import type { GroupedTabId } from "../rail/tabsConfig";
 import { getTabMode } from "../rail/tabsConfig";
 import type { BlockData, DeviceType } from "../../shared/types";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../shared/types/media";
-import { useToast } from "../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import { Canvas, type CanvasRef } from "../canvas/Canvas";
 import type { CanvasOverlayState } from "../canvas/CanvasFooterToolbar";
 import { ProInspector } from "../inspector/ProInspector";
@@ -290,8 +290,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
       const elementLabel = elementType.charAt(0).toUpperCase() + elementType.slice(1);
       composer.elements.removeElement(id);
       addToast({
-        message: `${elementLabel} deleted`,
-        variant: "info",
+        description: `${elementLabel} deleted`,
+        tone: "info",
         duration: 5000,
         action: {
           label: "Undo",

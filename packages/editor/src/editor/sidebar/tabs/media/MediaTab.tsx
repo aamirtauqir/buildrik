@@ -22,7 +22,7 @@ import { UploadZone } from "./components/UploadZone";
 import { useMediaState } from "./hooks/useMediaState";
 import { SlimLauncher } from "./components/SlimLauncher";
 import "./MediaTab.css";
-import { useToast } from "../../../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import type { LibraryItem } from "./data/mediaTypes";
 import type { IconConfig } from "../../../../../shared/types/media";
 
@@ -67,7 +67,7 @@ function MediaTabWithComposer({
   const [stockModalOpen, setStockModalOpen] = React.useState(false);
 
   const showToast = React.useCallback((msg: string, type: "success" | "error" | "info") => {
-    addToast({ message: msg, variant: type });
+    addToast({ description: msg, tone: type });
   }, [addToast]);
 
   const handleEditImage = React.useCallback(

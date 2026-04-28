@@ -15,7 +15,7 @@
 
 import * as React from "react";
 import type { Composer, Element } from "../../../engine";
-import { useToast } from "../../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import { getElementId } from "../../../shared/utils/dragDrop";
 import { buildElementStack, findElementWithHitExpansion } from "../shared/hitTesting";
 
@@ -87,8 +87,8 @@ export function useSelectionBehavior({
           if (element) {
             if (element.isLocked()) {
               addToast({
-                message: "This element is locked. Unlock it in the Layers panel.",
-                variant: "info",
+                description: "This element is locked. Unlock it in the Layers panel.",
+                tone: "info",
                 duration: 2500,
               });
               return;
@@ -105,8 +105,8 @@ export function useSelectionBehavior({
           if (element) {
             if (element.isLocked()) {
               addToast({
-                message: "This element is locked. Unlock it in the Layers panel.",
-                variant: "info",
+                description: "This element is locked. Unlock it in the Layers panel.",
+                tone: "info",
                 duration: 2500,
               });
             } else {
@@ -133,8 +133,8 @@ export function useSelectionBehavior({
           if (element) {
             if (element.isLocked()) {
               addToast({
-                message: "This element is locked. Unlock it in the Layers panel.",
-                variant: "info",
+                description: "This element is locked. Unlock it in the Layers panel.",
+                tone: "info",
                 duration: 2500,
               });
               return;

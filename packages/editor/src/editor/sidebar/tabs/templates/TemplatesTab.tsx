@@ -9,7 +9,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import { Search, X } from "lucide-react";
 import type { Composer } from "../../../../engine";
-import { useToast } from "../../../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import { PanelShell } from "@shared/ui/panel";
 import { type TemplateItem, SITE_CATEGORY_PILLS, SITE_TEMPLATES, TEMPLATE_TYPE_PILLS, SUB_CATEGORY_TAGS, type SiteCategory, type TemplateType } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
@@ -117,8 +117,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       setCanRetry(true);
       setApplyError(msg);
       addToast({
-        message: "Template apply failed — nothing was changed",
-        variant: "error",
+        description: "Template apply failed — nothing was changed",
+        tone: "error",
         action: { label: "Retry", onClick: handleRetry },
       });
       return;
@@ -130,7 +130,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     requestAnimationFrame(() => {
       setAppliedId(id);
       setResetStyles(false);
-      addToast({ message: `"${t.name}" applied successfully`, variant: "success" });
+      addToast({ description: `"${t.name}" applied successfully`, tone: "success" });
       recordTemplateApplied(t);
       saveAppliedId(id);
       onTemplateUsed?.();

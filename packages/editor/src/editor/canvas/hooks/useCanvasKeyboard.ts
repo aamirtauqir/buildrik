@@ -9,7 +9,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine/Composer";
 import type { Element } from "../../../engine/elements/Element";
-import type { ToastAction, ToastVariant } from "../../../shared/ui/Toast";
+import type { ToastActionPayload, ToastTone } from "@/editor/shared/vibcoder";
 import { devLogger } from "../../../shared/utils/devLogger";
 import { getElementNameFromType } from "../utils/elementInfo";
 import {
@@ -34,10 +34,10 @@ export interface UseCanvasKeyboardOptions {
   onOpenContextMenu?: (elementId: string, position: { x: number; y: number }) => void;
   /** Toast function for showing undo notifications */
   addToast?: (toast: {
-    message: string;
-    variant?: ToastVariant;
+    description: string;
+    tone?: ToastTone;
     duration?: number;
-    action?: ToastAction;
+    action?: ToastActionPayload;
   }) => void;
 }
 
@@ -150,8 +150,8 @@ export function useCanvasKeyboard({
 
           if (addToast) {
             addToast({
-              message: `Deleted ${idsToDelete.length} elements`,
-              variant: "info",
+              description: `Deleted ${idsToDelete.length} elements`,
+              tone: "info",
               duration: 4000,
               action: {
                 label: "Undo",
@@ -204,8 +204,8 @@ export function useCanvasKeyboard({
                   : `${elementName} deleted`;
 
               addToast({
-                message,
-                variant: "info",
+                description: message,
+                tone: "info",
                 duration: 5000,
                 action: {
                   label: "Undo",
@@ -323,8 +323,8 @@ export function useCanvasKeyboard({
                 const elementType = element.getType?.() || "element";
                 const elementName = getElementNameFromType(elementType);
                 addToast({
-                  message: `${elementName} duplicated`,
-                  variant: "success",
+                  description: `${elementName} duplicated`,
+                  tone: "success",
                   duration: 2000,
                 });
               }
@@ -343,15 +343,15 @@ export function useCanvasKeyboard({
               if (addToast) {
                 const styleCount = Object.keys(styles).length;
                 addToast({
-                  message: `${styleCount} style${styleCount === 1 ? "" : "s"} copied`,
-                  variant: "info",
+                  description: `${styleCount} style${styleCount === 1 ? "" : "s"} copied`,
+                  tone: "info",
                   duration: 2000,
                 });
               }
             } else if (addToast) {
               addToast({
-                message: "No styles to copy",
-                variant: "warning",
+                description: "No styles to copy",
+                tone: "warning",
                 duration: 2000,
               });
             }
@@ -363,8 +363,8 @@ export function useCanvasKeyboard({
             composer.clipboard = element.toJSON?.() || null;
             if (addToast) {
               addToast({
-                message: `${elementName} copied to clipboard`,
-                variant: "info",
+                description: `${elementName} copied to clipboard`,
+                tone: "info",
                 duration: 2000,
               });
             }
@@ -388,8 +388,8 @@ export function useCanvasKeyboard({
                 syncFromComposer();
                 if (addToast) {
                   addToast({
-                    message: `${styleKeys.length} style${styleKeys.length === 1 ? "" : "s"} applied`,
-                    variant: "success",
+                    description: `${styleKeys.length} style${styleKeys.length === 1 ? "" : "s"} applied`,
+                    tone: "success",
                     duration: 2000,
                     action: {
                       label: "Undo",
@@ -420,8 +420,8 @@ export function useCanvasKeyboard({
                   syncFromComposer();
                   if (addToast) {
                     addToast({
-                      message: "Element pasted",
-                      variant: "success",
+                      description: "Element pasted",
+                      tone: "success",
                       duration: 2000,
                     });
                   }
@@ -458,8 +458,8 @@ export function useCanvasKeyboard({
 
               if (addToast) {
                 addToast({
-                  message: `${elementName} cut to clipboard`,
-                  variant: "info",
+                  description: `${elementName} cut to clipboard`,
+                  tone: "info",
                   duration: 3000,
                   action: {
                     label: "Undo",

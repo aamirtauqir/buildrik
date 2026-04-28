@@ -8,7 +8,7 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { Z_LAYERS } from "../../../shared/constants/canvas";
-import { useToast } from "../../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import { getElementNameFromType } from "../utils/elementInfo";
 import { BlockPickerModal } from "./BlockPickerModal";
 import { ToolbarActionsSection } from "./toolbar/ToolbarActionsSection";
@@ -208,8 +208,8 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
           : `${elName} deleted`;
 
       addToast({
-        message,
-        variant: "info",
+        description: message,
+        tone: "info",
         duration: 5000,
         action: {
           label: "Undo",

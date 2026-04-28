@@ -16,19 +16,13 @@ import { canNestElement } from "../../../shared/utils/nesting";
 import { applyTemplate } from "../../../templates/templateActions";
 import type { Template } from "../../../templates/TemplateLibrary";
 import type { AIContext } from "./useStudioModals";
-
-interface ToastParams {
-  title: string;
-  message: string;
-  variant: "info" | "success" | "warning" | "error";
-  duration?: number;
-}
+import type { ToastInput } from "@/editor/shared/vibcoder";
 
 export interface UseStudioHandlersParams {
   composer: Composer | null;
   selectedElement: { id: string; type: string; tagName?: string } | null;
   aiContext: AIContext | null;
-  addToast: (params: ToastParams) => void;
+  addToast: (input: ToastInput) => string;
   openAI: (context?: AIContext) => void;
   closeTemplates: () => void;
 }
@@ -138,8 +132,8 @@ export function useStudioHandlers(params: UseStudioHandlersParams): UseStudioHan
           composer.elements.insertHTMLToElement(root.getId(), content);
           addToast({
             title: "Layout Inserted",
-            message: "AI-generated layout added",
-            variant: "success",
+            description: "AI-generated layout added",
+            tone: "success",
           });
         } else if (type === "text") {
           const textEl = composer.elements.createElement("text");
@@ -150,8 +144,8 @@ export function useStudioHandlers(params: UseStudioHandlersParams): UseStudioHan
           }
           addToast({
             title: "Text Inserted",
-            message: "AI-generated text added",
-            variant: "success",
+            description: "AI-generated text added",
+            tone: "success",
           });
         } else if (type === "image") {
           const imgEl = composer.elements.createElement("image");
@@ -163,8 +157,8 @@ export function useStudioHandlers(params: UseStudioHandlersParams): UseStudioHan
           }
           addToast({
             title: "Image Inserted",
-            message: "AI-generated image added",
-            variant: "success",
+            description: "AI-generated image added",
+            tone: "success",
           });
         }
       } finally {
@@ -182,15 +176,15 @@ export function useStudioHandlers(params: UseStudioHandlersParams): UseStudioHan
           closeTemplates();
           addToast({
             title: "Template applied",
-            message: `${template.name} added`,
-            variant: "success",
+            description: `${template.name} added`,
+            tone: "success",
             duration: 1800,
           });
         } catch {
           addToast({
             title: "Template failed",
-            message: "Could not apply template.",
-            variant: "error",
+            description: "Could not apply template.",
+            tone: "error",
           });
         }
       }
@@ -216,12 +210,12 @@ export function useStudioHandlers(params: UseStudioHandlersParams): UseStudioHan
         localStorage.setItem(STORAGE_KEYS.MY_TEMPLATES, JSON.stringify(myTemplates));
         addToast({
           title: "Template saved",
-          message: `${data.name} saved to My Templates`,
-          variant: "success",
+          description: `${data.name} saved to My Templates`,
+          tone: "success",
           duration: 2000,
         });
       } catch {
-        addToast({ title: "Save failed", message: "Could not save template.", variant: "error" });
+        addToast({ title: "Save failed", description: "Could not save template.", tone: "error" });
       }
     },
     [composer, addToast]

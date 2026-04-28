@@ -15,13 +15,7 @@ import { SyncStatusIndicator } from "../sync/SyncStatusIndicator";
 import type { SyncStatus, Issue } from "./hooks/useStudioState";
 import { useSyncStatus } from "./hooks/useSyncStatus";
 import { Topbar } from "./Topbar";
-
-/** Toast notification interface */
-interface ToastParams {
-  title: string;
-  message: string;
-  variant: "info" | "success" | "warning" | "error";
-}
+import type { ToastInput } from "@/editor/shared/vibcoder";
 
 /** Selected element minimal info */
 export interface SelectedElementInfo {
@@ -97,7 +91,7 @@ export interface StudioHeaderProps {
   onExportHTML?: () => void;
 
   // Toast notifications
-  addToast: (params: ToastParams) => void;
+  addToast: (input: ToastInput) => string;
 }
 
 
@@ -181,8 +175,8 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     } else {
       addToast({
         title: "Preview blocked",
-        message: "Allow pop-ups.",
-        variant: "warning",
+        description: "Allow pop-ups.",
+        tone: "warning",
       });
     }
 

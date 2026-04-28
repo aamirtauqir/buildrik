@@ -21,7 +21,7 @@ import {
   OverlayMount,
 } from "@/editor/shared/vibcoder";
 import { SkeletonListItem } from "@/shared/extensions/Skeleton";
-import { useToast } from "../../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import { PanelErrorState } from "../shared/PanelErrorState";
 import { PanelShell } from "@shared/ui/panel";
 import { SearchBar } from "../shared/SearchBar";
@@ -86,7 +86,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   const { pendingToast, setPendingToast } = state;
   React.useEffect(() => {
     if (pendingToast) {
-      addToast({ message: pendingToast.message, variant: pendingToast.variant });
+      addToast({ description: pendingToast.message, tone: pendingToast.variant });
       setPendingToast(null);
     }
   }, [pendingToast, addToast, setPendingToast]);
@@ -372,7 +372,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         onConfirm={() => {
           const name = state.confirmDelete?.name;
           state.confirmDeleteAction();
-          addToast({ message: `"${name}" deleted`, variant: "warning", duration: 4000 });
+          addToast({ description: `"${name}" deleted`, tone: "warning", duration: 4000 });
         }}
         title="Delete Component"
         message={`Are you sure you want to delete "${state.confirmDelete?.name}"? This action cannot be undone.`}

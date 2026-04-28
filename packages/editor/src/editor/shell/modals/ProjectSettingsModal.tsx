@@ -17,7 +17,7 @@ import {
   ModalFooter,
   OverlayMount,
 } from "@/editor/shared/vibcoder";
-import { useToast } from "../../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import { devError } from "../../../shared/utils/devLogger";
 
 export interface ProjectSettingsModalProps {
@@ -82,10 +82,10 @@ export const ProjectSettingsModal: React.FC<ProjectSettingsModalProps> = ({
         },
       });
 
-      addToast({ message: "Project settings updated successfully", variant: "success" });
+      addToast({ description: "Project settings updated successfully", tone: "success" });
       onClose();
     } catch (error) {
-      addToast({ message: "Failed to update project settings", variant: "error" });
+      addToast({ description: "Failed to update project settings", tone: "error" });
       devError("ProjectSettingsModal", "Failed to update settings", error);
     }
   };

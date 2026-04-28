@@ -23,15 +23,15 @@ export const editSubmenu: ContextAction[] = [
         ?.writeText(text)
         .then(() => {
           addToast?.({
-            message: "Copied to clipboard",
-            variant: "success",
+            description: "Copied to clipboard",
+            tone: "success",
             duration: 2000,
           });
         })
         .catch(() => {
           addToast?.({
-            message: "Failed to copy to clipboard",
-            variant: "error",
+            description: "Failed to copy to clipboard",
+            tone: "error",
             duration: 3000,
           });
         });
@@ -54,8 +54,8 @@ export const editSubmenu: ContextAction[] = [
       const text = JSON.stringify(data, null, 2);
       navigator?.clipboard?.writeText(text).catch(() => {
         addToast?.({
-          message: "Failed to copy to clipboard",
-          variant: "warning",
+          description: "Failed to copy to clipboard",
+          tone: "warning",
           duration: 3000,
         });
       });
@@ -71,8 +71,8 @@ export const editSubmenu: ContextAction[] = [
             ? `${elementName} (${childCount} ${childCount === 1 ? "child" : "children"}) cut`
             : `${elementName} cut`;
         addToast({
-          message,
-          variant: "info",
+          description: message,
+          tone: "info",
           duration: 5000,
           action: {
             label: "Undo",
@@ -141,8 +141,8 @@ export const editSubmenu: ContextAction[] = [
             ? `${elementName} (${childCount} ${childCount === 1 ? "child" : "children"}) deleted`
             : `${elementName} deleted`;
         addToast({
-          message,
-          variant: "info",
+          description: message,
+          tone: "info",
           duration: 5000,
           action: {
             label: "Undo",

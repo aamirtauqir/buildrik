@@ -11,7 +11,7 @@ import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants";
 import type { PageData } from "../../shared/types";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
-import { useToast } from "../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import { getDefaultPageName } from "../../shared/utils/pageUtils";
 import { normalizeSlug } from "../sidebar/tabs/pages/utils/slug";
 
@@ -169,8 +169,8 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
     if (!page) return;
     if (page.isHome) {
       addToast({
-        message: "Set another page as Homepage before deleting this one.",
-        variant: "warning",
+        description: "Set another page as Homepage before deleting this one.",
+        tone: "warning",
         duration: 4000,
       });
       setContextMenu(null);
@@ -187,8 +187,8 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
     composer.elements.deletePage(deleteConfirmPageId);
     setDeleteConfirmPageId(null);
     addToast({
-      message: `"${pageName}" deleted`,
-      variant: "info",
+      description: `"${pageName}" deleted`,
+      tone: "info",
       duration: 8000,
       action: { label: "Undo", onClick: () => composer.history?.undo?.() },
     });

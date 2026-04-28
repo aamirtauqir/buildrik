@@ -16,7 +16,7 @@ import { PanelErrorState } from "../../../editor/sidebar/shared/PanelErrorState"
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";
 import type { DesignTokenRecord } from "../../../shared/types/project";
-import { useToast } from "../../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import { DEFAULT_TOKENS } from "../constants";
 import { useColorRegistry, useSpacingRegistry, useTypeRegistry, useRegistryConfig } from "../state/TokenRegistryContext";
 import { useTokenUsageMap } from "../state/useTokenUsageMap";
@@ -188,8 +188,8 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     const handleSettingsChange = () => {
       if (isDirtyRef.current) {
         addToast({
-          message: "Design tokens changed from another window. Your edits may conflict.",
-          variant: "warning",
+          description: "Design tokens changed from another window. Your edits may conflict.",
+          tone: "warning",
         });
       } else {
         loadFromComposer();
@@ -296,9 +296,9 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
       spacingState.markSaved();
       setShowReview(false); // close modal on success
       setIsFirstLoad(false);
-      addToast({ message: "Design tokens applied successfully", variant: "success" });
+      addToast({ description: "Design tokens applied successfully", tone: "success" });
     } catch {
-      addToast({ message: "Failed to apply tokens. Try again.", variant: "error" });
+      addToast({ description: "Failed to apply tokens. Try again.", tone: "error" });
     }
   };
 
@@ -321,8 +321,8 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     spacingState.discardAll();
 
     addToast({
-      message: `${count} change${count !== 1 ? "s" : ""} discarded`,
-      variant: "info",
+      description: `${count} change${count !== 1 ? "s" : ""} discarded`,
+      tone: "info",
       action: {
         label: "Undo",
         onClick: () => {
@@ -338,7 +338,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   // ─ Reset spacing to factory defaults ─
   const handleResetSpacingToDefaults = () => {
     spacingState.stageDefaults(DEFAULT_TOKENS);
-    addToast({ message: "Spacing reset to defaults — review and Apply to save.", variant: "info" });
+    addToast({ description: "Spacing reset to defaults — review and Apply to save.", tone: "info" });
   };
 
   // ─ Export ─
@@ -350,7 +350,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     ];
     const { content, filename } = buildExport(allTokens, format);
     downloadFile(content, filename);
-    addToast({ message: `Exported ${filename}`, variant: "success" });
+    addToast({ description: `Exported ${filename}`, tone: "success" });
   };
 
   // ─ Add token ─
@@ -366,7 +366,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     };
     colorState.addToken(newToken);
     setShowAddToken(false);
-    addToast({ message: `Token "${name}" added`, variant: "success" });
+    addToast({ description: `Token "${name}" added`, tone: "success" });
   };
 
   const handleColorChange = (id: string, hex: string) => {

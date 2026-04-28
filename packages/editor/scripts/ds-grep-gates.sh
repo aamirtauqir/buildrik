@@ -145,7 +145,7 @@ CHROME_EXCLUDE='__tests__|\.test\.|\.stories\.|sidebar/tabs/design/|inspector/se
 
 # Form atoms — exempt from radius-above-4 (Gate 13) only. Gradient + raw shadow
 # (Gates 11, 12) still apply.
-FORM_ATOM_EXCLUDE='shared/ui/Button\.tsx|shared/ui/IconButton\.tsx|shared/ui/Tooltip\.tsx|shared/ui/Toast\.tsx|shared/ui/Modal\.tsx|shared/ui/Badge\.tsx|shared/ui/PremiumBadge\.tsx|shared/ui/Kbd\.tsx|shared/ui/SharedDialogs\.tsx|shared/forms/'
+FORM_ATOM_EXCLUDE='shared/ui/Button\.tsx|shared/ui/IconButton\.tsx|shared/ui/Tooltip\.tsx|shared/ui/Modal\.tsx|shared/ui/Badge\.tsx|shared/ui/PremiumBadge\.tsx|shared/ui/Kbd\.tsx|shared/ui/SharedDialogs\.tsx|shared/forms/'
 
 count_chrome() {
   # $1 = pattern. $2 (optional) = extra exclusion pattern piped in addition to base.

@@ -8,7 +8,7 @@
 import * as React from "react";
 import type { Composer } from "../engine";
 import { Spinner } from "@/editor/shared/vibcoder/Spinner";
-import { useToast } from "../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import { devError } from "../shared/utils/devLogger";
 import { generateContent, generateLayout } from "../shared/utils/openai";
 
@@ -75,8 +75,8 @@ export const AIAssistantBar: React.FC<AIAssistantBarProps> = ({ isOpen, onClose,
       devError("AIAssistantBar", "AI Generation failed", error);
       addToast({
         title: "AI Generation Failed",
-        message: "Could not generate content. Please try again.",
-        variant: "error",
+        description: "Could not generate content. Please try again.",
+        tone: "error",
       });
     } finally {
       setIsGenerating(false);

@@ -12,7 +12,7 @@ import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { usePublish, type PublishResult } from "../../../../shared/hooks/usePublish";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { useToast } from "../../../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import { PanelHeader } from "@/shared/extensions/PanelHeader";
 
 // ============================================
@@ -144,10 +144,10 @@ const UrlDisplay: React.FC<{ url: string }> = ({ url }) => {
     navigator.clipboard
       .writeText(url)
       .then(() => {
-        addToast?.({ message: "URL copied to clipboard", variant: "success", duration: 2000 });
+        addToast?.({ description: "URL copied to clipboard", tone: "success", duration: 2000 });
       })
       .catch(() => {
-        addToast?.({ message: "Failed to copy URL", variant: "error" });
+        addToast?.({ description: "Failed to copy URL", tone: "error" });
       });
   };
 
@@ -226,8 +226,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
     const success = await publish();
     if (success) {
       addToast?.({
-        message: "Site published successfully",
-        variant: "success",
+        description: "Site published successfully",
+        tone: "success",
         duration: 4000,
         action: {
           label: "Open Site",
@@ -240,8 +240,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
       });
     } else {
       addToast?.({
-        message: "Publish failed. Check your connection and try again.",
-        variant: "error",
+        description: "Publish failed. Check your connection and try again.",
+        tone: "error",
         duration: 5000,
         action: { label: "Retry", onClick: () => void handlePublish() },
       });
@@ -252,11 +252,11 @@ export const PublishTab: React.FC<PublishTabProps> = ({
     clearError();
     const success = await unpublish();
     if (success) {
-      addToast?.({ message: "Site unpublished", variant: "info", duration: 3000 });
+      addToast?.({ description: "Site unpublished", tone: "info", duration: 3000 });
     } else {
       addToast?.({
-        message: "Unpublish failed. Please try again.",
-        variant: "error",
+        description: "Unpublish failed. Please try again.",
+        tone: "error",
         duration: 5000,
       });
     }

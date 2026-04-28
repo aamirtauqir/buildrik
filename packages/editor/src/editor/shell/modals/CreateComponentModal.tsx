@@ -17,7 +17,7 @@ import {
   ModalFooter,
   OverlayMount,
 } from "@/editor/shared/vibcoder";
-import { useToast } from "../../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 
 export interface CreateComponentModalProps {
   isOpen: boolean;
@@ -71,12 +71,12 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
   const handleSubmit = async () => {
     if (!name.trim()) {
-      addToast({ message: "Component name is required", variant: "error" });
+      addToast({ description: "Component name is required", tone: "error" });
       return;
     }
 
     if (!composer || !elementId) {
-      addToast({ message: "Invalid state", variant: "error" });
+      addToast({ description: "Invalid state", tone: "error" });
       return;
     }
 
@@ -104,17 +104,17 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
       if (component) {
         addToast({
-          message: `Component "${name}" created successfully!`,
-          variant: "success",
+          description: `Component "${name}" created successfully!`,
+          tone: "success",
         });
         onClose();
       } else {
-        addToast({ message: "Failed to create component", variant: "error" });
+        addToast({ description: "Failed to create component", tone: "error" });
       }
     } catch (error) {
       addToast({
-        message: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-        variant: "error",
+        description: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+        tone: "error",
       });
     } finally {
       setIsCreating(false);

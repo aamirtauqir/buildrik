@@ -8,7 +8,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import { Z_INDEX } from "../../../shared/constants/canvas";
-import { useToast } from "../../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import { canvasTokens } from "../../../styles/tokens";
 import { getElementNameFromType } from "../utils/elementInfo";
 import { BlockPickerModal } from "./BlockPickerModal";
@@ -218,8 +218,8 @@ export const QuickActionsToolbar: React.FC<QuickActionsToolbarProps> = ({
         : `${elName} ${actionText}`;
 
     addToast({
-      message,
-      variant: "info",
+      description: message,
+      tone: "info",
       duration: 5000,
       action: {
         label: "Undo",

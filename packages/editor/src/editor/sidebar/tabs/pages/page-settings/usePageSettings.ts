@@ -11,7 +11,7 @@
 
 import * as React from "react";
 import type { Composer } from "../../../../../engine";
-import { useToast } from "../../../../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import type { PageItem, DrawerTab } from "../types";
 import { calculateSeoScore } from "../utils/seoScore";
 import { normalizeSlug, validateSlug, isSlugDuplicate } from "../utils/slug";
@@ -242,17 +242,17 @@ export function usePageSettings(
   const save = React.useCallback(async () => {
     if (!composer || !page) return;
     if (slugError) {
-      addToast({ message: "Fix slug error before saving", variant: "warning" });
+      addToast({ description: "Fix slug error before saving", tone: "warning" });
       return;
     }
     const codeErr = validateHeadCode(customHead);
     if (codeErr) {
       setHeadCodeError(codeErr);
-      addToast({ message: codeErr, variant: "warning" });
+      addToast({ description: codeErr, tone: "warning" });
       return;
     }
     if (visibility === "password" && !password.trim()) {
-      addToast({ message: "Set an access password before saving", variant: "warning" });
+      addToast({ description: "Set an access password before saving", tone: "warning" });
       return;
     }
     setSaveState("saving");
@@ -292,12 +292,12 @@ export function usePageSettings(
         allowFollow,
         customHead,
       });
-      addToast({ message: "Page settings saved", variant: "success" });
+      addToast({ description: "Page settings saved", tone: "success" });
     } catch {
       setSaveState("error");
       addToast({
-        message: "Save failed — your changes are still here.",
-        variant: "error",
+        description: "Save failed — your changes are still here.",
+        tone: "error",
         duration: 0,
         action: { label: "Retry", onClick: () => save() },
       });
@@ -339,7 +339,7 @@ export function usePageSettings(
   const copyPassword = React.useCallback(() => {
     if (!password) return;
     navigator.clipboard?.writeText?.(password).catch(() => {
-      addToast({ message: "Could not copy password", variant: "error" });
+      addToast({ description: "Could not copy password", tone: "error" });
     });
   }, [password, addToast]);
 

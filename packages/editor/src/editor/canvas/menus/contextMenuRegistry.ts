@@ -5,7 +5,7 @@
  */
 
 import type { Composer, Element } from "../../../engine";
-import type { ToastAction, ToastVariant } from "../../../shared/ui/Toast";
+import type { ToastActionPayload, ToastTone } from "@/editor/shared/vibcoder";
 import {
   editSubmenu,
   insertSubmenu,
@@ -16,10 +16,10 @@ import {
 
 /** Toast notification function signature */
 export type AddToastFn = (toast: {
-  message: string;
-  variant?: ToastVariant;
+  description: string;
+  tone?: ToastTone;
   duration?: number;
-  action?: ToastAction;
+  action?: ToastActionPayload;
 }) => void;
 
 export type ActionContext = {

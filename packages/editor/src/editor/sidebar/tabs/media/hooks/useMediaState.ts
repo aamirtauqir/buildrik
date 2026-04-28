@@ -9,7 +9,7 @@ import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
 import type { Composer } from "../../../../../engine/Composer";
 import { STORAGE_QUOTA_BYTES } from "../../../../../shared/constants/media";
-import { useToast } from "../../../../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import type { CtxMenuState, LibraryItem, MediaStateResult, MediaTypeFilter } from "../data/mediaTypes";
 import { useLibraryState } from "./useLibraryState";
 import { useSelectionState } from "./useSelectionState";
@@ -21,7 +21,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
 
   const showToast = useCallback(
     (msg: string, type: "success" | "error" | "info") => {
-      addToast({ message: msg, variant: type });
+      addToast({ description: msg, tone: type });
     },
     [addToast]
   );

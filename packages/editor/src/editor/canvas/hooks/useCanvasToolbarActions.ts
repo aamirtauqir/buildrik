@@ -10,12 +10,12 @@
 import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { Element } from "../../../engine/elements/Element";
-import type { ToastProps } from "../../../shared/ui/Toast";
+import type { ToastInput } from "@/editor/shared/vibcoder";
 
 interface UseCanvasToolbarActionsParams {
   composer: Composer | null;
   selectedId: string | null;
-  addToast: (toast: Omit<ToastProps, "id">) => string;
+  addToast: (toast: ToastInput) => string;
   select: (elementOrId: Element | string | null) => void;
 }
 
@@ -66,8 +66,8 @@ export function useCanvasToolbarActions({
         ? `${elName} (${childCount} ${childCount === 1 ? "child" : "children"}) deleted`
         : `${elName} deleted`;
     addToast({
-      message,
-      variant: "info",
+      description: message,
+      tone: "info",
       duration: 5000,
       action: { label: "Undo", onClick: () => composer.history.undo() },
     });
@@ -81,8 +81,8 @@ export function useCanvasToolbarActions({
       const elType = element.getType?.() || "element";
       const elName = elType.charAt(0).toUpperCase() + elType.slice(1);
       addToast({
-        message: `${elName} copied to clipboard`,
-        variant: "info",
+        description: `${elName} copied to clipboard`,
+        tone: "info",
         duration: 2000,
       });
     }

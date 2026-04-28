@@ -7,7 +7,7 @@
 import * as React from "react";
 import { getBlockDefinitions, getBlockById } from "../../../../blocks/blockRegistry";
 import type { BlockData } from "../../../../shared/types";
-import { useToast } from "../../../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import { trackSidebar } from "../../../../shared/utils/sidebarAnalytics";
 import {
   RECENT_STORAGE_KEY,
@@ -155,7 +155,7 @@ export function useElementsState({
         label: block.label,
         source: "click",
       });
-      addToast({ message: `Added ${block.label} to canvas`, variant: "success", duration: 2000 });
+      addToast({ description: `Added ${block.label} to canvas`, tone: "success", duration: 2000 });
       addRecent(block.id);
       onBlockClick?.(block);
     },

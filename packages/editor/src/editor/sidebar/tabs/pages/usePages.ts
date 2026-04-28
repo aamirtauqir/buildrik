@@ -21,7 +21,7 @@
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { EVENTS } from "../../../../shared/constants/events";
-import { useToast } from "../../../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import { getDefaultPageName } from "../../../../shared/utils/pageUtils";
 import type { PageItem } from "./types";
 
@@ -157,8 +157,8 @@ export function usePages(composer: Composer | null): UsePagesReturn {
       if (newest) setRenamingPageId(newest.id);
     } catch (err) {
       addToast({
-        message: "Couldn't add page right now. Try again.",
-        variant: "error",
+        description: "Couldn't add page right now. Try again.",
+        tone: "error",
         duration: 4000,
       });
       console.error("[pages] addPage failed", err);
@@ -204,15 +204,15 @@ export function usePages(composer: Composer | null): UsePagesReturn {
         const copy = composer.elements.duplicatePage(pageId);
         if (!copy) {
           addToast({
-            message: "Couldn't duplicate — source page not found.",
-            variant: "warning",
+            description: "Couldn't duplicate — source page not found.",
+            tone: "warning",
             duration: 3000,
           });
         }
       } catch (err) {
         addToast({
-          message: "Duplicate failed — page may have corrupt content.",
-          variant: "error",
+          description: "Duplicate failed — page may have corrupt content.",
+          tone: "error",
           duration: 4000,
         });
         console.error("[pages] duplicatePage failed", err);
@@ -230,14 +230,14 @@ export function usePages(composer: Composer | null): UsePagesReturn {
 
       // Guard: last page
       if (pages.length <= 1) {
-        addToast({ message: "Can't delete — your site needs at least 1 page", variant: "warning" });
+        addToast({ description: "Can't delete — your site needs at least 1 page", tone: "warning" });
         return;
       }
       // Guard: homepage
       if (page.isHome) {
         addToast({
-          message: "Set another page as Homepage before deleting this one",
-          variant: "warning",
+          description: "Set another page as Homepage before deleting this one",
+          tone: "warning",
         });
         return;
       }
@@ -245,8 +245,8 @@ export function usePages(composer: Composer | null): UsePagesReturn {
       const name = page.name;
       composer.elements.deletePage(pageId);
       addToast({
-        message: `"${name}" deleted`,
-        variant: "info",
+        description: `"${name}" deleted`,
+        tone: "info",
         duration: 8000,
         action: {
           label: "Undo",
@@ -265,8 +265,8 @@ export function usePages(composer: Composer | null): UsePagesReturn {
       setContextMenu(null);
       if (page?.status === "external") {
         addToast({
-          message: "External link pages can't be set as the homepage.",
-          variant: "warning",
+          description: "External link pages can't be set as the homepage.",
+          tone: "warning",
           duration: 4000,
         });
         return;
@@ -275,14 +275,14 @@ export function usePages(composer: Composer | null): UsePagesReturn {
       try {
         composer.elements.setHomePage?.(pageId);
         addToast({
-          message: "Homepage updated. Your navigation menu may need updating manually.",
-          variant: "success",
+          description: "Homepage updated. Your navigation menu may need updating manually.",
+          tone: "success",
           duration: 4000,
         });
       } catch (err) {
         addToast({
-          message: "Couldn't update homepage. Try again.",
-          variant: "error",
+          description: "Couldn't update homepage. Try again.",
+          tone: "error",
           duration: 4000,
         });
         console.error("[pages] setHomepage failed", err);
@@ -311,8 +311,8 @@ export function usePages(composer: Composer | null): UsePagesReturn {
       // can copy manually, instead of throwing TypeError.
       if (!navigator.clipboard?.writeText) {
         addToast({
-          message: `Copy manually: ${url}`,
-          variant: "info",
+          description: `Copy manually: ${url}`,
+          tone: "info",
           duration: 8000,
         });
         return;
@@ -320,11 +320,11 @@ export function usePages(composer: Composer | null): UsePagesReturn {
 
       navigator.clipboard
         .writeText(url)
-        .then(() => addToast({ message: successMsg, variant: "success", duration: 5000 }))
+        .then(() => addToast({ description: successMsg, tone: "success", duration: 5000 }))
         .catch(() => {
           addToast({
-            message: `Couldn't copy. Link: ${url}`,
-            variant: "error",
+            description: `Couldn't copy. Link: ${url}`,
+            tone: "error",
             duration: 8000,
           });
         });

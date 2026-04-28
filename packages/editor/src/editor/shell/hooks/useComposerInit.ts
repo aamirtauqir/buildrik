@@ -13,6 +13,7 @@ import type { Element } from "../../../engine/elements/Element";
 import { THRESHOLDS } from "../../../shared/constants/config";
 import type { ComposerConfig, ProjectData, DeviceType, ElementType } from "../../../shared/types";
 import { getSiteIdFromUrl, loadProject, saveProject } from "@/services/BuildrikSyncProvider";
+import type { ToastInput } from "@/editor/shared/vibcoder";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
   project?: {
@@ -27,11 +28,7 @@ export interface UseComposerInitParams {
   onReady?: (composer: Composer) => void;
   onEditor?: (composer: Composer) => void;
   onUpdate?: (data: ProjectData) => void;
-  addToast: (params: {
-    title: string;
-    message: string;
-    variant: "info" | "success" | "warning" | "error";
-  }) => void;
+  addToast: (input: ToastInput) => string;
   setCanUndo: (can: boolean) => void;
   setCanRedo: (can: boolean) => void;
   setDevice: (d: DeviceType) => void;
@@ -93,16 +90,16 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             instance.importProject(data);
             addToast({
               title: "Project loaded",
-              message: "Loaded from dashboard.",
-              variant: "success",
+              description: "Loaded from dashboard.",
+              tone: "success",
             });
           })
           .catch((err) => {
             console.error("[BuildrikSync] load failed:", err);
             addToast({
               title: "Load failed",
-              message: "Could not load project from dashboard. Falling back to local.",
-              variant: "warning",
+              description: "Could not load project from dashboard. Falling back to local.",
+              tone: "warning",
             });
             loadFromLocalStorage(instance, projectConfig);
           });
@@ -125,8 +122,8 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
         .catch(() => {
           addToast({
             title: "Load failed",
-            message: "Could not load saved project.",
-            variant: "warning",
+            description: "Could not load saved project.",
+            tone: "warning",
           });
         })
         .finally(() => {
@@ -241,8 +238,8 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
             if (siteId) {
               addToast({
                 title: "Save failed",
-                message: "Could not save to dashboard. Changes are unsaved.",
-                variant: "error",
+                description: "Could not save to dashboard. Changes are unsaved.",
+                tone: "error",
               });
             }
           });
@@ -305,10 +302,10 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
         await svc.createProductsCollection(includeSampleData);
         addToast({
           title: "Collection Created",
-          message: includeSampleData
+          description: includeSampleData
             ? "Products collection created with sample data"
             : "Products collection created",
-          variant: "success",
+          tone: "success",
         });
       });
     };

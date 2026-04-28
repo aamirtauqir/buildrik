@@ -11,7 +11,7 @@ import * as React from "react";
 import type { Composer } from "../../../../engine";
 import type { ComponentDefinition, VariantProperty } from "../../../../shared/types/components";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
-import { useToast } from "../../../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import { DrillInHeader } from "../../shared/DrillInHeader";
 
 // ============================================
@@ -132,7 +132,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
     await composer.components.deleteComponent(component.id);
     setShowDeleteConfirm(false);
     // TODO: Add soft-delete + undo when backend supports it
-    addToast({ message: `"${component.name}" deleted`, variant: "warning", duration: 4000 });
+    addToast({ description: `"${component.name}" deleted`, tone: "warning", duration: 4000 });
     onDelete?.();
     onBack();
   };

@@ -24,7 +24,7 @@ import { ConfirmDeleteModal } from "../sidebar/tabs/media/components/ConfirmDele
 import { MediaContextMenu } from "../sidebar/tabs/media/components/MediaContextMenu";
 import { AssetDetailOverlay } from "../sidebar/tabs/media/components/AssetDetailOverlay";
 import { STORAGE_QUOTA_BYTES } from "../../shared/constants/media";
-import { useToast } from "../../shared/ui/Toast";
+import { useToast } from "@/editor/shared/vibcoder";
 import type { LibraryItem } from "../sidebar/tabs/media/data/mediaTypes";
 import type { IconConfig } from "../../shared/types/media";
 import "./LibraryManager.css";
@@ -171,7 +171,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     const url = window.prompt("Paste image or media URL:");
     if (!url?.trim()) return;
     try {
-      addToast({ message: "Importing...", variant: "info", duration: 2000 });
+      addToast({ description: "Importing...", tone: "info", duration: 2000 });
       const res = await fetch(url.trim());
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const blob = await res.blob();
@@ -179,9 +179,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
       const name = url.split("/").pop()?.split("?")[0] || `imported.${ext}`;
       const file = new File([blob], name, { type: blob.type });
       state.upload([file]);
-      addToast({ message: `${name} imported`, variant: "success" });
+      addToast({ description: `${name} imported`, tone: "success" });
     } catch {
-      addToast({ message: "Could not import from that URL", variant: "error" });
+      addToast({ description: "Could not import from that URL", tone: "error" });
     }
   }, [state, addToast]);
 
@@ -200,9 +200,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     onOpenIconPicker(undefined, (icon) => {
       try {
         composer.mediaCommands.insertMedia(icon.name, "icon");
-        addToast({ message: `${icon.name} icon added`, variant: "success" });
+        addToast({ description: `${icon.name} icon added`, tone: "success" });
       } catch {
-        addToast({ message: "Could not add icon", variant: "error" });
+        addToast({ description: "Could not add icon", tone: "error" });
       }
     });
   }, [onOpenIconPicker, composer, addToast]);
@@ -212,11 +212,11 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   const handleEditImage = React.useCallback(
     async (item: LibraryItem) => {
       if (!onOpenImageEditor) {
-        addToast({ message: "Image editor unavailable", variant: "error" });
+        addToast({ description: "Image editor unavailable", tone: "error" });
         return;
       }
       if (item.type !== "img") {
-        addToast({ message: "Only images can be edited", variant: "info" });
+        addToast({ description: "Only images can be edited", tone: "info" });
         return;
       }
       // Resolve to a fresh blob URL — the stored src may be dead across sessions
@@ -231,9 +231,9 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           const fileName = `${cleanName}_v${timestamp % 10000}.${ext}`;
           const file = new File([blob], fileName, { type: blob.type });
           state.upload([file]);
-          addToast({ message: `New version of ${item.name} saved`, variant: "success" });
+          addToast({ description: `New version of ${item.name} saved`, tone: "success" });
         } catch {
-          addToast({ message: "Could not save edited version", variant: "error" });
+          addToast({ description: "Could not save edited version", tone: "error" });
         }
       });
     },
@@ -439,7 +439,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
               label="Trash"
               count={0}
               active={false}
-              onClick={() => addToast({ message: "Trash coming soon", variant: "info" })}
+              onClick={() => addToast({ description: "Trash coming soon", tone: "info" })}
             />
           </div>
         </div>
@@ -464,7 +464,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                         onClick={() => {
                           const keys = Array.from(state.selectedKeys);
                           state.bulkMoveAssets(keys, null);
-                          addToast({ message: `Moved ${keys.length} to root`, variant: "success" });
+                          addToast({ description: `Moved ${keys.length} to root`, tone: "success" });
                           setBulkMovePickerOpen(false);
                           state.toggleSelMode();
                         }}
@@ -479,7 +479,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                           onClick={() => {
                             const keys = Array.from(state.selectedKeys);
                             state.bulkMoveAssets(keys, folder.id);
-                            addToast({ message: `Moved ${keys.length} to ${folder.name}`, variant: "success" });
+                            addToast({ description: `Moved ${keys.length} to ${folder.name}`, tone: "success" });
                             setBulkMovePickerOpen(false);
                             state.toggleSelMode();
                           }}
@@ -811,7 +811,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                               // Revert: replace all usages of current version with this one
                               if (versions[0]) {
                                 composer.mediaCommands.replaceAcross(versions[0].src, v.src);
-                                addToast({ message: `Reverted to ${v.name}`, variant: "success" });
+                                addToast({ description: `Reverted to ${v.name}`, tone: "success" });
                               }
                             }}
                           >
@@ -997,14 +997,14 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                         const result = composer.mediaCommands.replaceAcross(selectedItem.src, i.src);
                         if (result.replaced.length > 0) {
                           addToast({
-                            message: `Replaced in ${result.replaced.length} element${result.replaced.length > 1 ? "s" : ""}`,
-                            variant: "success",
+                            description: `Replaced in ${result.replaced.length} element${result.replaced.length > 1 ? "s" : ""}`,
+                            tone: "success",
                           });
                         }
                         if (result.failed.length > 0) {
                           addToast({
-                            message: `${result.failed.length} replacement${result.failed.length > 1 ? "s" : ""} failed`,
-                            variant: "error",
+                            description: `${result.failed.length} replacement${result.failed.length > 1 ? "s" : ""} failed`,
+                            tone: "error",
                           });
                         }
                         setReplaceAllPickerOpen(false);
