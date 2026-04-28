@@ -317,18 +317,26 @@ Two batches:
 ## Phase 5 — Chrome integration — SHIPPED 2026-04-28 (M9)
 
 Phase 5 shipped at M9 same calendar day as M8 Phase 4 — Buckets C + D fully
-landed. Buckets A + B deferred upstream pending vibcoder Popover/Tooltip/Toast
-Radix-backing upgrades. Bucket E was already at `src/shared/extensions/` by
-design, no work required.
+landed. Bucket A subsequently shipped 2026-04-28 once verified the vibcoder
+bundle was already vendored in-repo (re-classified from "DEFERRED upstream" to
+"single-repo work"). Bucket B remains deferred upstream pending Tooltip/Toast/
+ContextMenu Radix-backing upgrades. Bucket E was already at
+`src/shared/extensions/` by design, no work required.
 
-**Bucket A — Hybrid simplification — DEFERRED upstream.** Vibcoder Popover still
-needs Radix.Popover backing. `useFocusTrap` retained, Popover shim retained,
-`codemod:phase4:popover` retained as the sole entry in the Phase 4 codemod chain.
-See `lane-4-upstream-handoff.md` for the upstream change requirements.
+**Bucket A — Hybrid simplification — SHIPPED 2026-04-28.** Vibcoder Popover now
+Radix.Popover-backed compound (T1 `e0ef916`). `src/shared/ui/Popover.tsx` shim
+deleted with 4 consumer hand-ports (T2 `e1874f9`). `useFocusTrap` deleted as
+orphaned after shim removal (T3 `343957f`). `codemod:phase4` chain fully retired
+including 12 orphan fixture pairs (T4 `309890b`). 34 files / +452 / −1155
+(net −703 LOC). E2 + E3 contract waivers documented inline in vibcoder
+Popover.tsx docstring as precedent for future Bucket B Radix-backings.
+See `poc-findings.md` Bucket A findings section for full detail.
 
 **Bucket B — Keep-legacy → bridge ports — DEFERRED upstream.** Tooltip / Toast /
 ContextMenu / HelpTooltip retained. Each blocks on vibcoder substrate upgrades
-(Radix.Tooltip / Radix.Toast / Radix.ContextMenu install). T7 disposition.
+(Radix.Tooltip / Radix.Toast / Radix.ContextMenu install). T7 disposition. This
+is the final remaining shim-deletion work in the chrome arc — Phase 5 is
+otherwise fully complete.
 
 **Bucket C — Adapter shim deletion — SHIPPED.** All 19 Phase 4 shims deleted
 across T1-T4. Atoms (T2 ×15 + T2.X barrel codemod), molecules (T3 ×4), Modal (T4
@@ -344,12 +352,15 @@ QuickSwitcher, Resizable, TreeView, UpgradeGate, ErrorBoundary, InfoBanner stay
 at `src/shared/ui/` per existing folder ownership rules. Not vibcoder primitive
 ports; Buildrik domain code.
 
-**Open issue:** #93 PopoverArrow remains deferred (cascades from Bucket A —
-reconciles when vibcoder Popover gains Radix backing).
+**Open issue:** #93 PopoverArrow — CLOSED 2026-04-28. `Popover.Arrow` now
+re-exports `RadixPopover.Arrow` from the vibcoder compound (Bucket A T1
+`e0ef916`).
 
-**Reference:** `poc-findings.md` Phase 5 findings section captures commit table,
-LOC delta, surfaced lessons (5 inventory-script gaps), decision rubric, and
-extensions/ folder contract.
+**Reference:** `poc-findings.md` Phase 5 findings + Bucket A findings sections
+capture commit tables, LOC deltas, surfaced lessons (5 inventory-script gaps +
+6th gap from Bucket A T4: orphan fixture pairs after codemod-script deletion),
+decision rubric, extensions/ folder contract, and E2/E3 contract waiver
+precedents.
 
 ## Phase 6 — Visual regression infrastructure (~1 week dispatched)
 

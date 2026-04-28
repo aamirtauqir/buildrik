@@ -735,3 +735,50 @@ After T1-T5 the folder contains 6 files: `Skeleton.tsx`, `PanelHeader.tsx`, `Con
 
 **Phase 5 closes at T5.** Buckets C + D shipped (atom + molecule + Modal shim deletions + composition relocations). Bucket A blocked on upstream Popover Radix work; Bucket B blocked on upstream Tooltip/Toast Radix work. Both deferred to a future phase (T7) gated on the upstream vibcoder substrate upgrades. Phase 6 (visual regression infrastructure) is unblocked and should be next per the roadmap's dependency graph.
 
+## Bucket A findings (Popover Radix.Popover backing)
+
+**Milestone:** Bucket A close-out (2026-04-28) — same calendar day as M8 Phase 4 + M9 Phase 5 ship. Re-classified from "DEFERRED upstream" to "single-repo work" once verified the vibcoder bundle was already vendored in-repo.
+
+**Outcome:** PASS. Popover compound now Radix.Popover-backed at `src/editor/shared/vibcoder/Popover.tsx`. The Phase 4 hybrid shim at `src/shared/ui/Popover.tsx` is deleted. `useFocusTrap` is no longer a chrome concept. The `codemod:phase4` chain is fully retired (last entry `popover` removed in T4). Issue #93 (PopoverArrow) is now resolved — `Popover.Arrow` re-exports `RadixPopover.Arrow` from the vibcoder compound.
+
+### Commit landings
+
+| Task | Description | Commit |
+|---|---|---|
+| **T1** | Vibcoder Popover wrapper rebuilt as Radix.Popover-backed compound (Root/Trigger/Anchor/Portal/Content/Arrow/Close) + E2/E3 contract waivers documented in docstring | `e0ef916` |
+| **T2** | `src/shared/ui/Popover.tsx` shim deleted + 4 consumer hand-port (SizeSection, FontControls, ColorInput, RichTextEditor) | `e1874f9` |
+| **T3** | `useFocusTrap` hook deleted (orphaned after T2) — file + tests + barrel export removed | `343957f` |
+| **T4** | Phase 4 codemod toolchain officially retired — `popover` codemod + 12 orphan fixture pairs (checkbox/icon-button/kbd/select/skeleton/spinner) deleted; `codemod:phase4` script entry removed from package.json | `309890b` |
+
+### LOC delta
+
+34 files changed, 452 insertions, 1155 deletions (**net −703 LOC**). Larger gross-deletion than Phase 5's net average per task because T4 swept the entire Phase 4 codemod chain — not just `popover` but 6 already-orphaned fixture pairs left behind by prior Phase 5 codemod-deletion commits.
+
+### Open issue #93 resolved
+
+PopoverArrow now lives as `RadixPopover.Arrow` re-export from the vibcoder compound. Phase 3 deferral note in this doc (line 415) and the `lane-4-upstream-handoff.md` Bucket A unblocker both fold into T1's commit.
+
+### T2 code-review concern (resolved inline)
+
+Codex flagged an "Important" keyboard-activation gap on `ColorInput.tsx`: the popover trigger was a `<div role="button">` without keyboard handlers. Real `<button>` outer was infeasible because the trigger contains an `<Input>` plus a nested `<Button>` (button-in-button HTML invalid). Resolved via `onKeyDown` handler on the `<div>` — Enter / Space toggle `setIsOpen`. Equivalent behavior, valid HTML, same commit.
+
+### T4 scope expansion + inventory-script gap
+
+T4 was scoped as "remove `codemod:phase4:popover` + the popover codemod file + its fixtures." Inventory walk surfaced 12 additional orphan fixture pairs (checkbox / icon-button / kbd / select / skeleton / spinner) left behind by earlier Phase 5 commits that deleted the corresponding codemod scripts but not their `__tests__/fixtures/*.input.tsx` + `*.output.tsx` pairs. T4 deleted them alongside the popover sweep.
+
+**Inventory-script gap (codify in T7+):** `scripts/phase5-shim-inventory.mjs` does not flag fixture-pair files as orphaned when their parent codemod script is deleted. This is a 6th distinct failure mode to add to the existing 5-item list above (Phase 5 surfaced lessons section). Detection rule: if `scripts/codemods/phase4/<X>.ts` is missing, then any `scripts/codemods/phase4/__tests__/fixtures/<X>.{input,output}.tsx` are orphans.
+
+### E2 + E3 contract waivers (precedent for Bucket B)
+
+The vibcoder `Popover.tsx` docstring captures two intentional deviations from Phase 3 wrapper contracts:
+
+- **E2 waiver — Radix types deliberately leak.** Phase 3 wrappers were supposed to keep Radix types out of public APIs (E2 contract). Popover deviates because the positioning props (`side`, `sideOffset`, `align`, `alignOffset`, `avoidCollisions`, `collisionPadding`) **are the API**. Re-defining these as a buildrik-shaped subset would lose pixel-positioning fidelity that consumers rely on. Radix types pass through.
+
+- **E3 waiver — PopoverPortal opts out of OverlayMount routing.** Phase 3 organisms route portals through `useOverlayContainer` for modal-stack discipline (E3 contract). Popover deliberately uses Radix's default portal target because Radix's anchor-relative positioning fights `useOverlayContainer`'s flat-stack reparenting. Popovers anchor to triggers; they do not stack like modals.
+
+These two waivers are documented inline in the Popover.tsx docstring and are NOT placeholder TODOs — they are intentional architectural decisions. Future Bucket B Radix-backed wrappers (Tooltip / Toast / ContextMenu) should consult these waivers as precedent: positioning props are part of the API surface, and anchored overlays opt out of modal-stack portal routing.
+
+### Recommendation
+
+**Bucket A closes today (2026-04-28).** Phase 5 chrome arc is fully complete *sans* Bucket B (Tooltip / Toast / ContextMenu / HelpTooltip — still pending Radix.Tooltip / Radix.Toast / Radix.ContextMenu wraps in vibcoder). Phase 6 (visual regression infrastructure) remains the next unblocked roadmap target.
+
