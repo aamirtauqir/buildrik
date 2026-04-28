@@ -55,6 +55,8 @@ export { Grid } from "./Grid";
 export type { GridProps, GridGap, GridCols } from "./Grid";
 export { Frame } from "./Frame";
 export type { FrameProps, FrameRatio } from "./Frame";
+export { Switcher } from "./Switcher";
+export type { SwitcherProps, SwitcherThreshold } from "./Switcher";
 export { Grip } from "./Grip";
 export type { GripOrientation, GripSize, GripProps } from "./Grip";
 export { BreakpointSwitcher } from "./BreakpointSwitcher";
