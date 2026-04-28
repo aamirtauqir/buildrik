@@ -15,6 +15,7 @@ import {
   OverlayMount,
 } from "@/editor/shared/vibcoder";
 import { dialogCancelBtnStyles, dialogInputStyles, dialogPrimaryBtnStyles } from "./styles";
+import { Stack } from "@/editor/shared/vibcoder";
 
 export interface CreateComponentModalProps {
   onClose: () => void;
@@ -45,8 +46,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             </svg>
           </ModalClose>
           <div className="bd-modal__body">
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      <Stack>
+        <Stack gap="xs">
           <label
             htmlFor="create-component-name"
             style={{ fontSize: 12, color: "var(--bd-fg-muted)" }}
@@ -66,7 +67,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             autoFocus
             style={dialogInputStyles}
           />
-        </div>
+        </Stack>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
           <Button onClick={onClose} style={dialogCancelBtnStyles}>
             Cancel
@@ -83,7 +84,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
             Create
           </Button>
         </div>
-      </div>
+      </Stack>
           </div>
         </ModalContent>
       </Modal>

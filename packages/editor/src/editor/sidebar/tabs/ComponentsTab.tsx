@@ -40,6 +40,7 @@ import type { ComponentsTabProps } from "./component-library/types";
 import { useComponentsState } from "./component-library/useComponentsState";
 import { type ComponentFilter, FILTER_CHIPS } from "./componentsData";
 import "./component-library/ComponentsTab.css";
+import { Stack } from "@/editor/shared/vibcoder";
 
 export type { ComponentsTabProps };
 
@@ -389,7 +390,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               </svg>
             </ModalClose>
             <div className="bd-modal__body">
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <Stack>
                 <Input
                   type="text"
                   value={renameInput}
@@ -408,7 +409,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                     Rename
                   </Button>
                 </div>
-              </div>
+              </Stack>
             </div>
           </ModalContent>
         </Modal>
@@ -423,7 +424,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               </svg>
             </ModalClose>
             <div className="bd-modal__body">
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <Stack gap="sm">
                 {state.variantPicker?.variants.map((v) => {
                   const isCurrent = v.id === state.variantPicker?.currentVariantId;
                   return (
@@ -452,7 +453,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                     </Button>
                   );
                 })}
-              </div>
+              </Stack>
             </div>
           </ModalContent>
         </Modal>

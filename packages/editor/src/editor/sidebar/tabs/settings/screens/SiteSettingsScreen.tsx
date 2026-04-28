@@ -7,6 +7,7 @@ import * as React from "react";
 import { Field, Input, Screen, Section, Select } from "../shared";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
 import type { ScreenProps } from "../types";
+import { Stack } from "@/editor/shared/vibcoder";
 
 interface IdentitySettings {
   siteName: string;
@@ -164,7 +165,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
       </Section>
 
       <Section title="Legal">
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <Stack gap="xs">
           <a
             href="/privacy"
             target="_blank"
@@ -184,7 +185,7 @@ export const SiteSettingsScreen: React.FC<ScreenProps> = ({ composer, onDirtyCha
           <span style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginTop: 4 }}>
             Your data is stored securely. We do not sell or share your site data.
           </span>
-        </div>
+        </Stack>
       </Section>
     </Screen>
   );
