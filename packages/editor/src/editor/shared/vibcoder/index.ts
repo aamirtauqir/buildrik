@@ -45,6 +45,8 @@ export { HelperText } from "./HelperText";
 export type { HelperTextTone, HelperTextProps } from "./HelperText";
 export { Divider } from "./Divider";
 export type { DividerOrientation, DividerStyle, DividerTone, DividerProps } from "./Divider";
+export { Stack } from "./Stack";
+export type { StackGap, StackProps } from "./Stack";
 export { Grip } from "./Grip";
 export type { GripOrientation, GripSize, GripProps } from "./Grip";
 export { BreakpointSwitcher } from "./BreakpointSwitcher";
