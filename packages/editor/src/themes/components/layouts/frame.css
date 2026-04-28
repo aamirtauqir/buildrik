@@ -1,0 +1,30 @@
+/**
+ * bdr-frame — aspect-ratio media container.
+ * Clips an <img> or block child to a fixed aspect ratio with object-fit cover.
+ * Use for asset-library tiles, template thumbnails, uploader previews,
+ * video posters — anywhere a media slot needs a stable footprint.
+ */
+
+.bd-frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--buildrick-radius-md);
+  background: var(--buildrick-bg-subtle);
+}
+
+.bd-frame--1-1  { aspect-ratio: 1 / 1; }
+.bd-frame--16-9 { aspect-ratio: 16 / 9; }
+.bd-frame--4-3  { aspect-ratio: 4 / 3; }
+.bd-frame--3-2  { aspect-ratio: 3 / 2; }
+
+.bd-frame > img,
+.bd-frame > video,
+.bd-frame > picture,
+.bd-frame > div {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}

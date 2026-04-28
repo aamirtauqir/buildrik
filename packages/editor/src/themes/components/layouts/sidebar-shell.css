@@ -1,0 +1,44 @@
+/**
+ * bdr-sidebar-shell — two-column shell with fixed-width sidebar + flex main.
+ * Used by editor shell, asset library, history panel, inspector panel —
+ * any "rail + content" layout. Side, width, and divider are configurable.
+ */
+
+.bd-sidebar-shell {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  min-height: 0;
+}
+
+.bd-sidebar-shell__sidebar {
+  flex: 0 0 auto;
+  width: 280px;
+  min-width: 0;
+}
+
+.bd-sidebar-shell__main {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Width variants — raw px IS the contract for fixed rails. */
+.bd-sidebar-shell--sidebar-sm .bd-sidebar-shell__sidebar { width: 220px; }
+.bd-sidebar-shell--sidebar-md .bd-sidebar-shell__sidebar { width: 280px; }
+.bd-sidebar-shell--sidebar-lg .bd-sidebar-shell__sidebar { width: 320px; }
+
+/* Place the sidebar on the right (e.g. inspector panel). */
+.bd-sidebar-shell--side-right {
+  flex-direction: row-reverse;
+}
+
+/* Hairline divider between rail and main. */
+.bd-sidebar-shell--bordered .bd-sidebar-shell__sidebar {
+  border-right: 1px solid var(--buildrick-border);
+}
+
+.bd-sidebar-shell--bordered.bd-sidebar-shell--side-right .bd-sidebar-shell__sidebar {
+  border-right: 0;
+  border-left: 1px solid var(--buildrick-border);
+}

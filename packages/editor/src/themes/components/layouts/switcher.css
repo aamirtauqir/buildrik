@@ -1,0 +1,24 @@
+/**
+ * bdr-switcher — auto-collapsing horizontal/vertical group.
+ * Lays children in a row when total width exceeds a threshold, else stacks
+ * them vertically. Pure CSS via flex-basis math — no JS, no media queries.
+ * Use for responsive form rows, toolbar groups that should reflow on narrow rails.
+ */
+
+.bd-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--buildrick-space-3);
+  align-items: stretch;
+}
+
+.bd-switcher > * {
+  flex-grow: 1;
+  flex-basis: calc((var(--bdr-switcher-threshold, 480px) - 100%) * 999);
+  min-width: 0;
+}
+
+/* Threshold variants — the breakpoint at which row collapses to stack. */
+.bd-switcher--threshold-sm { --bdr-switcher-threshold: 320px; }
+.bd-switcher--threshold-md { --bdr-switcher-threshold: 480px; }
+.bd-switcher--threshold-lg { --bdr-switcher-threshold: 640px; }
