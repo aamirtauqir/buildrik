@@ -278,6 +278,18 @@ export class OTEngine extends EventEmitter {
           }
         }
 
+        // Fast path: both are replace on same path → remote wins, skip local
+        if (opA.op === "replace" && opB.op === "replace" && opA.path === opB.path) {
+          shouldInclude = false;
+          break;
+        }
+
+        // Fast path: both are add on same array path → remote wins, skip local
+        if (opA.op === "add" && opB.op === "add" && opA.path === opB.path) {
+          shouldInclude = false;
+          break;
+        }
+
         // Check if local op is on a child of removed parent
         if (opA.op === "remove" && this.isChildPath(opB.path, opA.path)) {
           shouldInclude = false;
