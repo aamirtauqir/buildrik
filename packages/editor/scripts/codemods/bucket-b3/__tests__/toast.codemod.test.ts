@@ -115,4 +115,42 @@ describe("bucket-b3/toast codemod — import rewrite + prop translation", () => 
     const before = `export const useToast = () => ({ addToast: () => null });\nimport { useToast as VibToast } from "@/shared/ui/Toast";`;
     expect(runCodemod(transform, FAKE_PATH, before)).toBe(before);
   });
+
+  it("skips shorthand addToast({ message, variant }) — rename would break the value identifier", () => {
+    // Renaming a shorthand Property's key.name flips BOTH key + value text in
+    // the printed source (Property { shorthand: true, key: Identifier "message",
+    // value: Identifier "message" }). That would produce `{ description }`
+    // referencing a nonexistent local. Codemod skips with warn instead.
+    const before = `import { useToast } from "@/shared/ui/Toast";\nconst { addToast } = useToast();\nconst message = "x";\nconst variant = "info" as const;\naddToast({ message, variant });`;
+    const after = `import { useToast } from "@/editor/shared/vibcoder";\nconst { addToast } = useToast();\nconst message = "x";\nconst variant = "info" as const;\naddToast({ message, variant });`;
+    expect(runCodemod(transform, FAKE_PATH, before)).toBe(after);
+  });
+
+  it("leaves string-literal keys alone — only Identifier keys are renamed", () => {
+    // Documented intentional limitation: codemod only touches Identifier
+    // keys. StringLiteral keys ("message", "variant") stay as-is. Pinned
+    // here so future contributors don't "fix" it without realizing it's
+    // deliberate.
+    const before = `import { useToast } from "@/shared/ui/Toast";\nconst { addToast } = useToast();\naddToast({ "message": "x", "variant": "info" });`;
+    const after = `import { useToast } from "@/editor/shared/vibcoder";\nconst { addToast } = useToast();\naddToast({ "message": "x", "variant": "info" });`;
+    expect(runCodemod(transform, FAKE_PATH, before)).toBe(after);
+  });
+
+  it("leaves aliased-addToast call alone — only literal addToast Identifier matches", () => {
+    // Codemod matches CallExpression callee === Identifier "addToast" exactly.
+    // Destructure-aliased `addToast: addT` invocations slip through. Pinned
+    // here so the limitation is visible.
+    const before = `import { useToast } from "@/shared/ui/Toast";\nconst { addToast: addT } = useToast();\naddT({ message: "x", variant: "info" });`;
+    const after = `import { useToast } from "@/editor/shared/vibcoder";\nconst { addToast: addT } = useToast();\naddT({ message: "x", variant: "info" });`;
+    expect(runCodemod(transform, FAKE_PATH, before)).toBe(after);
+  });
+
+  it("renames `ToastVariant as TV` imported name only — local alias and body usage preserved", () => {
+    // Verifies the aliased-rename code path the docstring promises: only
+    // `imported` name flips (ToastVariant → ToastTone), the local alias
+    // `TV` and any body usage of `TV` are preserved.
+    const before = `import type { ToastVariant as TV } from "@/shared/ui/Toast";\nconst x: TV = "info";`;
+    const after = `import type { ToastTone as TV } from "@/editor/shared/vibcoder";\nconst x: TV = "info";`;
+    expect(runCodemod(transform, FAKE_PATH, before)).toBe(after);
+  });
 });

@@ -162,6 +162,19 @@ const transform: Transform = (file, api) => {
       // Only rename plain Identifier keys. String-literal keys (e.g.
       // "message") are left alone — out of scope, conservative.
       if (key.type !== "Identifier" || typeof key.name !== "string") continue;
+      if (key.name !== "message" && key.name !== "variant") continue;
+      // Shorthand properties like `addToast({ message, variant })` share
+      // the key + value Identifier node in the printed source. Renaming
+      // `key.name` would flip BOTH the key AND the local value reference,
+      // producing `addToast({ description })` that points at a missing
+      // local. Skip with a warn so the human running the codemod can
+      // hand-fix instead of silently corrupting the call.
+      if ((prop as { shorthand?: boolean }).shorthand) {
+        console.warn(
+          `[codemod] skipped shorthand prop '${key.name}' in ${file.path}: rename would break the value identifier`,
+        );
+        continue;
+      }
       if (key.name === "message") {
         key.name = "description";
         modified = true;
