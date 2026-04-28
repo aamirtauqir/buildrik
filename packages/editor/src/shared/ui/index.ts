@@ -3,7 +3,6 @@
  * @license BSD-3-Clause
  */
 
-export { ConfirmDialog, type ConfirmDialogProps } from "./ConfirmDialog";
 export {
   ToastProvider,
   useToast,

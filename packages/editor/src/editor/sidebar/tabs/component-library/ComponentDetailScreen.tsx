@@ -10,7 +10,7 @@ import { Copy, Trash2, Unlink, RefreshCw } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import type { ComponentDefinition, VariantProperty } from "../../../../shared/types/components";
-import { ConfirmDialog } from "../../../../shared/ui/ConfirmDialog";
+import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { useToast } from "../../../../shared/ui/Toast";
 import { DrillInHeader } from "../../shared/DrillInHeader";
 

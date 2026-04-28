@@ -10,7 +10,7 @@ import { createPortal } from "react-dom";
 import type { Composer } from "../../engine";
 import { EVENTS } from "../../shared/constants";
 import type { PageData } from "../../shared/types";
-import { ConfirmDialog } from "../../shared/ui/ConfirmDialog";
+import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { useToast } from "../../shared/ui/Toast";
 import { getDefaultPageName } from "../../shared/utils/pageUtils";
 import { normalizeSlug } from "../sidebar/tabs/pages/utils/slug";

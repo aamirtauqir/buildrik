@@ -13,10 +13,10 @@ vi.mock("@/shared/ui/Toast", () => ({
   useToast: () => ({ addToast: vi.fn() }),
   ToastProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
-vi.mock("@/shared/ui/Modal", () => ({
+vi.mock("@/shared/extensions/ConfirmDialog", () => ({
   ConfirmDialog: () => null,
 }));
-vi.mock("@/editor/sidebar/shared/PanelHeader", () => ({
+vi.mock("@/shared/extensions/PanelHeader", () => ({
   PanelHeader: ({ title }: { title: string }) => {
     const React = require("react");
     return React.createElement("div", { "data-testid": "panel-header" }, title);

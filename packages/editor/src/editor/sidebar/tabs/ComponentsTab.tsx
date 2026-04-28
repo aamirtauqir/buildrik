@@ -12,7 +12,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { ChevronDown, Layers, Plus } from "lucide-react";
 import * as React from "react";
-import { ConfirmDialog } from "../../../shared/ui/ConfirmDialog";
+import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import {
   Modal,
   ModalContent,
