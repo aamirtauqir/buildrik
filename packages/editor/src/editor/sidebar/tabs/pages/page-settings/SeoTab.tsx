@@ -10,7 +10,12 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import { Tooltip } from "@shared/ui/Tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipPortal,
+  TooltipContent,
+} from "@/editor/shared/vibcoder";
 import type { PageItem } from "../types";
 import type { UsePageSettingsReturn } from "./usePageSettings";
 
@@ -143,43 +148,44 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             <label className="bd-pg-seo-label" htmlFor="seo-desc">
               Meta Description
             </label>
-            <Tooltip
-              content={
-                <span style={{ display: "block", whiteSpace: "normal", maxWidth: 244 }}>
-                  A short summary of your page shown in Google search results (keep under 160
-                  characters)
-                </span>
-              }
-              position="right"
-              delay={200}
-            >
-              <Button
-                type="button"
-                aria-label="About Meta Description"
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: 2,
-                  color: "var(--bd-fg-muted)",
-                  display: "inline-flex",
-                  lineHeight: 0,
-                }}
-              >
-                <svg
-                  width="13"
-                  height="13"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  aria-hidden="true"
+            <Tooltip delayDuration={200}>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  aria-label="About Meta Description"
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 2,
+                    color: "var(--bd-fg-muted)",
+                    display: "inline-flex",
+                    lineHeight: 0,
+                  }}
                 >
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                  <line x1="12" y1="17" x2="12.01" y2="17" />
-                </svg>
-              </Button>
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg>
+                </Button>
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent side="right">
+                  <span style={{ display: "block", whiteSpace: "normal", maxWidth: 244 }}>
+                    A short summary of your page shown in Google search results (keep under 160
+                    characters)
+                  </span>
+                </TooltipContent>
+              </TooltipPortal>
             </Tooltip>
           </div>
           <span

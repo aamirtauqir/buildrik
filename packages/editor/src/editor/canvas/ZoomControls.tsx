@@ -7,7 +7,12 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { IconButton } from "@/editor/shared/vibcoder/IconButton";
-import { Tooltip } from "@/shared/ui/Tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipPortal,
+  TooltipContent,
+} from "@/editor/shared/vibcoder";
 import { ZOOM_PRESETS } from "./shared";
 
 export interface ZoomControlsProps {
@@ -48,13 +53,18 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
 
   return (
     <div style={containerStyles}>
-      <Tooltip content="Zoom Out">
-        <IconButton
-          size="sm"
-          aria-label="Zoom Out"
-          onClick={handleZoomOut}
-          disabled={zoom <= minZoom}
-        ><ZoomOutIcon /></IconButton>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <IconButton
+            size="sm"
+            aria-label="Zoom Out"
+            onClick={handleZoomOut}
+            disabled={zoom <= minZoom}
+          ><ZoomOutIcon /></IconButton>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>Zoom Out</TooltipContent>
+        </TooltipPortal>
       </Tooltip>
       <div style={sliderContainerStyles}>
         <Input
@@ -66,13 +76,18 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
           style={sliderStyles}
         />
       </div>
-      <Tooltip content="Zoom In">
-        <IconButton
-          size="sm"
-          aria-label="Zoom In"
-          onClick={handleZoomIn}
-          disabled={zoom >= maxZoom}
-        ><ZoomInIcon /></IconButton>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <IconButton
+            size="sm"
+            aria-label="Zoom In"
+            onClick={handleZoomIn}
+            disabled={zoom >= maxZoom}
+          ><ZoomInIcon /></IconButton>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>Zoom In</TooltipContent>
+        </TooltipPortal>
       </Tooltip>
       <div style={dividerStyles} />
       <Button
@@ -85,12 +100,17 @@ export const ZoomControls: React.FC<ZoomControlsProps> = ({
       {onFitToScreen && (
         <>
           <div style={dividerStyles} />
-          <Tooltip content="Fit to Screen">
-            <IconButton
-              size="sm"
-              aria-label="Fit to Screen"
-              onClick={onFitToScreen}
-            ><FitIcon /></IconButton>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <IconButton
+                size="sm"
+                aria-label="Fit to Screen"
+                onClick={onFitToScreen}
+              ><FitIcon /></IconButton>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>Fit to Screen</TooltipContent>
+            </TooltipPortal>
           </Tooltip>
         </>
       )}

@@ -6,7 +6,13 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import { Tooltip } from "../../../../shared/ui/Tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipPortal,
+  TooltipContent,
+  TooltipKbd,
+} from "@/editor/shared/vibcoder";
 import { canvasTokens } from "../../../../styles/tokens";
 import {
   actionBtnStyles,
@@ -49,63 +55,78 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
     <div style={dividerStyles} />
 
     {/* Add button */}
-    <Tooltip content="Add Element" position="bottom">
-      <Button onClick={onAdd} style={actionBtnStyles} aria-label="Add child element">
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          aria-hidden="true"
-        >
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-      </Button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button onClick={onAdd} style={actionBtnStyles} aria-label="Add child element">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </Button>
+      </TooltipTrigger>
+      <TooltipPortal>
+        <TooltipContent side="bottom">Add Element</TooltipContent>
+      </TooltipPortal>
     </Tooltip>
 
     {/* Duplicate button */}
-    <Tooltip content="Duplicate" shortcut="⌘D" position="bottom">
-      <Button onClick={onDuplicate} style={actionBtnStyles} aria-label="Duplicate element">
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          aria-hidden="true"
-        >
-          <rect x="9" y="9" width="13" height="13" rx="2" />
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-        </svg>
-      </Button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button onClick={onDuplicate} style={actionBtnStyles} aria-label="Duplicate element">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+        </Button>
+      </TooltipTrigger>
+      <TooltipPortal>
+        <TooltipContent side="bottom">Duplicate <TooltipKbd>⌘D</TooltipKbd></TooltipContent>
+      </TooltipPortal>
     </Tooltip>
 
     <div style={dividerStyles} />
 
     {/* More button + dropdown */}
     <div style={{ position: "relative" }}>
-      <Tooltip content="More" position="bottom">
-        <Button
-          onClick={onMoreMenuToggle}
-          style={{
-            ...actionBtnStyles,
-            background: showMoreMenu ? colors.surface.border : "transparent",
-          }}
-          aria-label="More actions menu"
-          aria-expanded={showMoreMenu}
-          aria-haspopup="menu"
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <circle cx="5" cy="12" r="2" />
-            <circle cx="12" cy="12" r="2" />
-            <circle cx="19" cy="12" r="2" />
-          </svg>
-        </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            onClick={onMoreMenuToggle}
+            style={{
+              ...actionBtnStyles,
+              background: showMoreMenu ? colors.surface.border : "transparent",
+            }}
+            aria-label="More actions menu"
+            aria-expanded={showMoreMenu}
+            aria-haspopup="menu"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <circle cx="5" cy="12" r="2" />
+              <circle cx="12" cy="12" r="2" />
+              <circle cx="19" cy="12" r="2" />
+            </svg>
+          </Button>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent side="bottom">More</TooltipContent>
+        </TooltipPortal>
       </Tooltip>
 
       {showMoreMenu && (
@@ -185,21 +206,26 @@ export const ToolbarActionsSection: React.FC<ToolbarActionsSectionProps> = ({
 
     {/* Delete button — spatially separated at far right */}
     <div style={deleteContainerStyles}>
-      <Tooltip content="Delete" shortcut="⌫" position="bottom">
-        <Button onClick={onDelete} style={isolatedDeleteStyles} aria-label="Delete element">
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            aria-hidden="true"
-          >
-            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-          </svg>
-        </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button onClick={onDelete} style={isolatedDeleteStyles} aria-label="Delete element">
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            </svg>
+          </Button>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent side="bottom">Delete <TooltipKbd>⌫</TooltipKbd></TooltipContent>
+        </TooltipPortal>
       </Tooltip>
     </div>
   </>

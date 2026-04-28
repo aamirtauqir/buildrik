@@ -6,7 +6,13 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import { Tooltip } from "../../../../shared/ui/Tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipPortal,
+  TooltipContent,
+  TooltipKbd,
+} from "@/editor/shared/vibcoder";
 import {
   parentBtnStyles,
   nameBtnStyles,
@@ -39,21 +45,26 @@ export const ToolbarNavSection: React.FC<ToolbarNavSectionProps> = ({
   <>
     {/* Parent button */}
     {hasParent && (
-      <Tooltip content="Select Parent" shortcut="⌥↑" position="bottom">
-        <Button onClick={onSelectParent} style={parentBtnStyles} aria-label="Select parent element">
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            aria-hidden="true"
-          >
-            <path d="M18 15l-6-6-6 6" />
-          </svg>
-        </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button onClick={onSelectParent} style={parentBtnStyles} aria-label="Select parent element">
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <path d="M18 15l-6-6-6 6" />
+            </svg>
+          </Button>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent side="bottom">Select Parent <TooltipKbd>⌥↑</TooltipKbd></TooltipContent>
+        </TooltipPortal>
       </Tooltip>
     )}
 

@@ -20,7 +20,12 @@
  */
 
 import * as React from "react";
-import { Tooltip } from "./Tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipPortal,
+  TooltipContent,
+} from "@/editor/shared/vibcoder";
 
 export interface HelpTooltipProps {
   /** Help text explaining the property */
@@ -76,24 +81,29 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({
   );
 
   return (
-    <Tooltip content={tooltipContent} position={position} delay={200}>
-      <button type="button" style={buttonStyles} aria-label="What's this?" tabIndex={0}>
-        <svg
-          width={iconSize}
-          height={iconSize}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-          <line x1="12" y1="17" x2="12.01" y2="17" />
-        </svg>
-      </button>
+    <Tooltip delayDuration={200}>
+      <TooltipTrigger asChild>
+        <button type="button" style={buttonStyles} aria-label="What's this?" tabIndex={0}>
+          <svg
+            width={iconSize}
+            height={iconSize}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+        </button>
+      </TooltipTrigger>
+      <TooltipPortal>
+        <TooltipContent side={position}>{tooltipContent}</TooltipContent>
+      </TooltipPortal>
     </Tooltip>
   );
 };

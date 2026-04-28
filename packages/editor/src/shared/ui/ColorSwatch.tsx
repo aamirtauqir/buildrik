@@ -17,7 +17,12 @@
  */
 
 import * as React from "react";
-import { Tooltip } from "./Tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipPortal,
+  TooltipContent,
+} from "@/editor/shared/vibcoder";
 
 export interface ColorSwatchProps {
   color: string;
@@ -120,8 +125,11 @@ export const ColorSwatch: React.FC<ColorSwatchProps> = ({
 
   if (tooltip) {
     return (
-      <Tooltip content={tooltip} position="top">
-        {swatch}
+      <Tooltip>
+        <TooltipTrigger asChild>{swatch}</TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>{tooltip}</TooltipContent>
+        </TooltipPortal>
       </Tooltip>
     );
   }

@@ -40,7 +40,6 @@ export { LayersPanel, StylesPanel, TraitPanel, RichTextEditor } from "./componen
 export {
   ToastProvider,
   useToast,
-  Tooltip,
   Accordion,
   Badge,
 } from "./components";

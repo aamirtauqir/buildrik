@@ -8,7 +8,6 @@
  */
 
 // Shared UI components
-export * from "./Tooltip";
 export * from "./Accordion";
 export * from "./Grid";
 export * from "./SliderInput";

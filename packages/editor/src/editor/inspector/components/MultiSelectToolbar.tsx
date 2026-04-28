@@ -19,7 +19,12 @@ import { AlignmentHandler } from "../../../engine/canvas/AlignmentHandler";
 import type { PseudoStateId } from "../../../shared/types";
 import type { BreakpointId } from "../../../shared/types/breakpoints";
 import { IconButton } from "@/editor/shared/vibcoder/IconButton";
-import { Tooltip } from "@/shared/ui/Tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipPortal,
+  TooltipContent,
+} from "@/editor/shared/vibcoder";
 import { BatchStylePanel } from "./BatchStylePanel";
 
 // ============================================================================
@@ -158,32 +163,47 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
       <div style={sectionStyles}>
         <span style={sectionLabelStyles}>Align Horizontal</span>
         <div style={buttonGroupStyles}>
-          <Tooltip content={getAlignTooltip("Align Left")}>
-            <IconButton
-              size="sm"
-              variant="ghost"
-              aria-label="Align elements to left"
-              onClick={handleAlignLeft}
-              disabled={isDisabled}
-            ><AlignLeft size={16} /></IconButton>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <IconButton
+                size="sm"
+                variant="ghost"
+                aria-label="Align elements to left"
+                onClick={handleAlignLeft}
+                disabled={isDisabled}
+              ><AlignLeft size={16} /></IconButton>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>{getAlignTooltip("Align Left")}</TooltipContent>
+            </TooltipPortal>
           </Tooltip>
-          <Tooltip content={getAlignTooltip("Align Center")}>
-            <IconButton
-              size="sm"
-              variant="ghost"
-              aria-label="Align elements to center horizontally"
-              onClick={handleAlignCenterH}
-              disabled={isDisabled}
-            ><AlignCenter size={16} /></IconButton>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <IconButton
+                size="sm"
+                variant="ghost"
+                aria-label="Align elements to center horizontally"
+                onClick={handleAlignCenterH}
+                disabled={isDisabled}
+              ><AlignCenter size={16} /></IconButton>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>{getAlignTooltip("Align Center")}</TooltipContent>
+            </TooltipPortal>
           </Tooltip>
-          <Tooltip content={getAlignTooltip("Align Right")}>
-            <IconButton
-              size="sm"
-              variant="ghost"
-              aria-label="Align elements to right"
-              onClick={handleAlignRight}
-              disabled={isDisabled}
-            ><AlignRight size={16} /></IconButton>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <IconButton
+                size="sm"
+                variant="ghost"
+                aria-label="Align elements to right"
+                onClick={handleAlignRight}
+                disabled={isDisabled}
+              ><AlignRight size={16} /></IconButton>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>{getAlignTooltip("Align Right")}</TooltipContent>
+            </TooltipPortal>
           </Tooltip>
         </div>
       </div>
@@ -192,32 +212,47 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
       <div style={sectionStyles}>
         <span style={sectionLabelStyles}>Align Vertical</span>
         <div style={buttonGroupStyles}>
-          <Tooltip content={getAlignTooltip("Align Top")}>
-            <IconButton
-              size="sm"
-              variant="ghost"
-              aria-label="Align elements to top"
-              onClick={handleAlignTop}
-              disabled={isDisabled}
-            ><AlignStartVertical size={16} /></IconButton>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <IconButton
+                size="sm"
+                variant="ghost"
+                aria-label="Align elements to top"
+                onClick={handleAlignTop}
+                disabled={isDisabled}
+              ><AlignStartVertical size={16} /></IconButton>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>{getAlignTooltip("Align Top")}</TooltipContent>
+            </TooltipPortal>
           </Tooltip>
-          <Tooltip content={getAlignTooltip("Align Middle")}>
-            <IconButton
-              size="sm"
-              variant="ghost"
-              aria-label="Align elements to middle vertically"
-              onClick={handleAlignMiddle}
-              disabled={isDisabled}
-            ><AlignCenterVertical size={16} /></IconButton>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <IconButton
+                size="sm"
+                variant="ghost"
+                aria-label="Align elements to middle vertically"
+                onClick={handleAlignMiddle}
+                disabled={isDisabled}
+              ><AlignCenterVertical size={16} /></IconButton>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>{getAlignTooltip("Align Middle")}</TooltipContent>
+            </TooltipPortal>
           </Tooltip>
-          <Tooltip content={getAlignTooltip("Align Bottom")}>
-            <IconButton
-              size="sm"
-              variant="ghost"
-              aria-label="Align elements to bottom"
-              onClick={handleAlignBottom}
-              disabled={isDisabled}
-            ><AlignEndVertical size={16} /></IconButton>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <IconButton
+                size="sm"
+                variant="ghost"
+                aria-label="Align elements to bottom"
+                onClick={handleAlignBottom}
+                disabled={isDisabled}
+              ><AlignEndVertical size={16} /></IconButton>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>{getAlignTooltip("Align Bottom")}</TooltipContent>
+            </TooltipPortal>
           </Tooltip>
         </div>
       </div>
@@ -226,35 +261,45 @@ export const MultiSelectToolbar: React.FC<MultiSelectToolbarProps> = ({
       <div style={sectionStyles}>
         <span style={sectionLabelStyles}>Distribute</span>
         <div style={buttonGroupStyles}>
-          <Tooltip content={getDistributeTooltip("Horizontally")}>
-            <IconButton
-              size="sm"
-              variant="ghost"
-              aria-label="Distribute elements horizontally with equal spacing"
-              onClick={handleDistributeH}
-              disabled={distributeDisabled}
-            >
-              <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <rect x="4" y="5" width="4" height="14" rx="1" />
-                <rect x="10" y="5" width="4" height="14" rx="1" />
-                <rect x="16" y="5" width="4" height="14" rx="1" />
-              </svg>
-            </IconButton>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <IconButton
+                size="sm"
+                variant="ghost"
+                aria-label="Distribute elements horizontally with equal spacing"
+                onClick={handleDistributeH}
+                disabled={distributeDisabled}
+              >
+                <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <rect x="4" y="5" width="4" height="14" rx="1" />
+                  <rect x="10" y="5" width="4" height="14" rx="1" />
+                  <rect x="16" y="5" width="4" height="14" rx="1" />
+                </svg>
+              </IconButton>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>{getDistributeTooltip("Horizontally")}</TooltipContent>
+            </TooltipPortal>
           </Tooltip>
-          <Tooltip content={getDistributeTooltip("Vertically")}>
-            <IconButton
-              size="sm"
-              variant="ghost"
-              aria-label="Distribute elements vertically with equal spacing"
-              onClick={handleDistributeV}
-              disabled={distributeDisabled}
-            >
-              <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <rect x="5" y="4" width="14" height="4" rx="1" />
-                <rect x="5" y="10" width="14" height="4" rx="1" />
-                <rect x="5" y="16" width="14" height="4" rx="1" />
-              </svg>
-            </IconButton>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <IconButton
+                size="sm"
+                variant="ghost"
+                aria-label="Distribute elements vertically with equal spacing"
+                onClick={handleDistributeV}
+                disabled={distributeDisabled}
+              >
+                <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <rect x="5" y="4" width="14" height="4" rx="1" />
+                  <rect x="5" y="10" width="14" height="4" rx="1" />
+                  <rect x="5" y="16" width="14" height="4" rx="1" />
+                </svg>
+              </IconButton>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>{getDistributeTooltip("Vertically")}</TooltipContent>
+            </TooltipPortal>
           </Tooltip>
         </div>
       </div>

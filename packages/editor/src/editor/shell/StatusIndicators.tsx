@@ -8,7 +8,12 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { SvgSave, SvgSync, SvgWarning, SvgCheck } from "../../shared/ui/Icons";
-import { Tooltip } from "../../shared/ui/Tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipPortal,
+  TooltipContent,
+} from "@/editor/shared/vibcoder";
 import { formatRelativeTime } from "../../shared/utils/relativeTime";
 import type { SyncStatus, Issue } from "./hooks/useStudioState";
 
@@ -66,28 +71,33 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
   // Offline state: pill background
   if (status === "offline") {
     return (
-      <Tooltip content="No internet connection — changes will sync when reconnected">
-        <div
-          className="status-indicator save-status save-status--offline"
-          role="status"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "4px 8px",
-            borderRadius: "var(--buildrick-radius-md)",
-            fontSize: 12,
-            fontWeight: 600,
-            color: "var(--buildrick-text-muted)",
-            background: "var(--buildrick-surface-3)",
-            transition: `opacity var(--buildrick-duration-normal, 200ms) ease`,
-          }}
-        >
-          <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 14, height: 14 }}>
-            <SvgCloudOff />
-          </span>
-          <span>Offline</span>
-        </div>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            className="status-indicator save-status save-status--offline"
+            role="status"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "4px 8px",
+              borderRadius: "var(--buildrick-radius-md)",
+              fontSize: 12,
+              fontWeight: 600,
+              color: "var(--buildrick-text-muted)",
+              background: "var(--buildrick-surface-3)",
+              transition: `opacity var(--buildrick-duration-normal, 200ms) ease`,
+            }}
+          >
+            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 14, height: 14 }}>
+              <SvgCloudOff />
+            </span>
+            <span>Offline</span>
+          </div>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>No internet connection — changes will sync when reconnected</TooltipContent>
+        </TooltipPortal>
       </Tooltip>
     );
   }
@@ -95,34 +105,39 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
   // Unsaved changes state
   if (status === "unsaved") {
     return (
-      <Tooltip content="You have unsaved changes">
-        <div
-          className="status-indicator save-status save-status--unsaved"
-          role="status"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "4px 10px",
-            borderRadius: 8,
-            fontSize: 12,
-            fontWeight: 600,
-            color: "var(--buildrick-text-muted)",
-            transition: `opacity var(--buildrick-duration-normal, 200ms) ease`,
-          }}
-        >
-          <span
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            className="status-indicator save-status save-status--unsaved"
+            role="status"
             style={{
-              display: "inline-block",
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              background: "var(--buildrick-warning)",
-              flexShrink: 0,
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "4px 10px",
+              borderRadius: 8,
+              fontSize: 12,
+              fontWeight: 600,
+              color: "var(--buildrick-text-muted)",
+              transition: `opacity var(--buildrick-duration-normal, 200ms) ease`,
             }}
-          />
-          <span>Unsaved changes</span>
-        </div>
+          >
+            <span
+              style={{
+                display: "inline-block",
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: "var(--buildrick-warning)",
+                flexShrink: 0,
+              }}
+            />
+            <span>Unsaved changes</span>
+          </div>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>You have unsaved changes</TooltipContent>
+        </TooltipPortal>
       </Tooltip>
     );
   }
@@ -130,36 +145,41 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
   // Saving in-progress state
   if (status === "saving") {
     return (
-      <Tooltip content="Saving changes...">
-        <div
-          className="status-indicator save-status save-status--saving"
-          role="status"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "4px 10px",
-            borderRadius: 8,
-            fontSize: 12,
-            fontWeight: 600,
-            color: "var(--buildrick-text-secondary)",
-            transition: `opacity var(--buildrick-duration-normal, 200ms) ease`,
-          }}
-        >
-          <span
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            className="status-indicator save-status save-status--saving"
+            role="status"
             style={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              width: 14,
-              height: 14,
-              animation: "buildrick-spin 1s linear infinite",
+              gap: 6,
+              padding: "4px 10px",
+              borderRadius: 8,
+              fontSize: 12,
+              fontWeight: 600,
+              color: "var(--buildrick-text-secondary)",
+              transition: `opacity var(--buildrick-duration-normal, 200ms) ease`,
             }}
           >
-            <SvgSync />
-          </span>
-          <span>Saving...</span>
-        </div>
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 14,
+                height: 14,
+                animation: "buildrick-spin 1s linear infinite",
+              }}
+            >
+              <SvgSync />
+            </span>
+            <span>Saving...</span>
+          </div>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>Saving changes...</TooltipContent>
+        </TooltipPortal>
       </Tooltip>
     );
   }
@@ -167,43 +187,48 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
   // Error state
   if (status === "error") {
     return (
-      <Tooltip content="Save failed — click Retry to try again">
-        <div
-          className="status-indicator save-status save-status--error"
-          role="button"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "4px 10px",
-            borderRadius: 8,
-            fontSize: 12,
-            fontWeight: 600,
-            color: "var(--buildrick-error)",
-            background: "var(--buildrick-error-light)",
-            transition: `opacity var(--buildrick-duration-normal, 200ms) ease`,
-            cursor: "default",
-          }}
-        >
-          <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 14, height: 14 }}>
-            <SvgWarning />
-          </span>
-          <span>Save failed</span>
-          <span
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            className="status-indicator save-status save-status--error"
             role="button"
-            tabIndex={0}
-            onClick={onRetry}
-            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onRetry?.(); }}
             style={{
-              textDecoration: "underline",
-              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "4px 10px",
+              borderRadius: 8,
+              fontSize: 12,
+              fontWeight: 600,
               color: "var(--buildrick-error)",
+              background: "var(--buildrick-error-light)",
+              transition: `opacity var(--buildrick-duration-normal, 200ms) ease`,
+              cursor: "default",
             }}
-            aria-label="Retry save"
           >
-            Retry
-          </span>
-        </div>
+            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 14, height: 14 }}>
+              <SvgWarning />
+            </span>
+            <span>Save failed</span>
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={onRetry}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onRetry?.(); }}
+              style={{
+                textDecoration: "underline",
+                cursor: "pointer",
+                color: "var(--buildrick-error)",
+              }}
+              aria-label="Retry save"
+            >
+              Retry
+            </span>
+          </div>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>Save failed — click Retry to try again</TooltipContent>
+        </TooltipPortal>
       </Tooltip>
     );
   }
@@ -211,28 +236,33 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
   // Idle state — "Saved ✓" shows for 3s post-save then fades; otherwise invisible
   if (justSaved) {
     return (
-      <Tooltip content={`Last saved: ${formatLastSaved(lastSavedAt)}`}>
-        <div
-          className="status-indicator save-status save-status--saved"
-          role="status"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "4px 10px",
-            borderRadius: 8,
-            fontSize: 12,
-            fontWeight: 600,
-            color: "var(--buildrick-text-muted)",
-            transition: `opacity var(--buildrick-duration-normal, 200ms) ease`,
-            opacity: savedVisible ? 1 : 0,
-          }}
-        >
-          <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 14, height: 14 }}>
-            <SvgCheck />
-          </span>
-          <span>Saved</span>
-        </div>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            className="status-indicator save-status save-status--saved"
+            role="status"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "4px 10px",
+              borderRadius: 8,
+              fontSize: 12,
+              fontWeight: 600,
+              color: "var(--buildrick-text-muted)",
+              transition: `opacity var(--buildrick-duration-normal, 200ms) ease`,
+              opacity: savedVisible ? 1 : 0,
+            }}
+          >
+            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 14, height: 14 }}>
+              <SvgCheck />
+            </span>
+            <span>Saved</span>
+          </div>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>{`Last saved: ${formatLastSaved(lastSavedAt)}`}</TooltipContent>
+        </TooltipPortal>
       </Tooltip>
     );
   }
@@ -274,22 +304,27 @@ const SyncDot: React.FC<SyncDotProps> = ({ status }) => {
   const config = SYNC_DOT_CONFIG[status];
 
   return (
-    <Tooltip content={`Sync: ${config.label}`}>
-      <span
-        className="status-indicator sync-dot"
-        role="img"
-        aria-label={`Sync status: ${config.label}`}
-        style={{
-          display: "inline-block",
-          width: 8,
-          height: 8,
-          borderRadius: "50%",
-          background: config.color,
-          flexShrink: 0,
-          animation: config.pulse ? "buildrick-pulse 1s ease-in-out infinite" : "none",
-          transition: `background var(--buildrick-duration-normal, 200ms) ease`,
-        }}
-      />
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span
+          className="status-indicator sync-dot"
+          role="img"
+          aria-label={`Sync status: ${config.label}`}
+          style={{
+            display: "inline-block",
+            width: 8,
+            height: 8,
+            borderRadius: "50%",
+            background: config.color,
+            flexShrink: 0,
+            animation: config.pulse ? "buildrick-pulse 1s ease-in-out infinite" : "none",
+            transition: `background var(--buildrick-duration-normal, 200ms) ease`,
+          }}
+        />
+      </TooltipTrigger>
+      <TooltipPortal>
+        <TooltipContent>{`Sync: ${config.label}`}</TooltipContent>
+      </TooltipPortal>
     </Tooltip>
   );
 };
@@ -330,34 +365,39 @@ const SyncIndicator: React.FC<SyncIndicatorProps> = ({ status }) => {
   const config = statusConfig[status];
 
   return (
-    <Tooltip content={`Sync: ${config.label}`}>
-      <div
-        className="status-indicator sync-status"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 28,
-          height: 28,
-          borderRadius: 6,
-          color: config.color,
-          background: config.bg,
-          transition: `all var(--buildrick-duration-normal, 200ms) ease`,
-        }}
-      >
-        <span
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div
+          className="status-indicator sync-status"
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: 14,
-            height: 14,
-            animation: config.animate ? "buildrick-spin 1.5s linear infinite" : "none",
+            width: 28,
+            height: 28,
+            borderRadius: 6,
+            color: config.color,
+            background: config.bg,
+            transition: `all var(--buildrick-duration-normal, 200ms) ease`,
           }}
         >
-          <SvgSync />
-        </span>
-      </div>
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 14,
+              height: 14,
+              animation: config.animate ? "buildrick-spin 1.5s linear infinite" : "none",
+            }}
+          >
+            <SvgSync />
+          </span>
+        </div>
+      </TooltipTrigger>
+      <TooltipPortal>
+        <TooltipContent>{`Sync: ${config.label}`}</TooltipContent>
+      </TooltipPortal>
     </Tooltip>
   );
 };
@@ -384,29 +424,34 @@ const IssuesBadge: React.FC<IssuesBadgeProps> = ({ issues, onClick }) => {
   const tooltip = `${errorCount} error${errorCount !== 1 ? "s" : ""}, ${warningCount} warning${warningCount !== 1 ? "s" : ""}`;
 
   return (
-    <Tooltip content={tooltip}>
-      <Button
-        className="status-indicator issues-badge"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 5,
-          padding: "4px 8px",
-          borderRadius: 6,
-          fontSize: 12,
-          fontWeight: 700,
-          color,
-          background: bg,
-          border: "none",
-          cursor: "pointer",
-          transition: `all var(--buildrick-duration-normal, 200ms) ease`,
-        }}
-        onClick={onClick}
-        aria-label={`${issues.length} issues found`}
-      >
-        <SvgWarning />
-        <span>{issues.length}</span>
-      </Button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          className="status-indicator issues-badge"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 5,
+            padding: "4px 8px",
+            borderRadius: 6,
+            fontSize: 12,
+            fontWeight: 700,
+            color,
+            background: bg,
+            border: "none",
+            cursor: "pointer",
+            transition: `all var(--buildrick-duration-normal, 200ms) ease`,
+          }}
+          onClick={onClick}
+          aria-label={`${issues.length} issues found`}
+        >
+          <SvgWarning />
+          <span>{issues.length}</span>
+        </Button>
+      </TooltipTrigger>
+      <TooltipPortal>
+        <TooltipContent>{tooltip}</TooltipContent>
+      </TooltipPortal>
     </Tooltip>
   );
 };

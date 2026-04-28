@@ -10,7 +10,6 @@ export {
   type ToastVariant,
   type ToastContainerProps,
 } from "./Toast";
-export { Tooltip, type TooltipProps } from "./Tooltip";
 export { HelpTooltip, type HelpTooltipProps } from "./HelpTooltip";
 export { ErrorMessage, type ErrorMessageProps } from "./ErrorMessage";
 export { FormInput, type FormInputProps } from "./FormInput";

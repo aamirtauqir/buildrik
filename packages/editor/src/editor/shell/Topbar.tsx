@@ -8,7 +8,13 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import type { Composer } from "../../engine";
-import { Tooltip } from "../../shared/ui/Tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipPortal,
+  TooltipContent,
+  TooltipKbd,
+} from "@/editor/shared/vibcoder";
 import type { Issue } from "./hooks/useStudioState";
 import { AccountModal } from "./AccountModal";
 import { CommandPalette } from "./CommandPalette";
@@ -294,34 +300,49 @@ export const Topbar: React.FC<TopbarProps> = ({
 
         {/* Undo / Redo / History */}
         <div className="bdc-group">
-          <Tooltip content="Undo" shortcut="⌘Z">
-            <Button
-              className="bdc-btn bdc-icon"
-              onClick={onUndo}
-              disabled={!canUndo}
-              aria-label="Undo"
-            >
-              <IconUndo />
-            </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className="bdc-btn bdc-icon"
+                onClick={onUndo}
+                disabled={!canUndo}
+                aria-label="Undo"
+              >
+                <IconUndo />
+              </Button>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>Undo <TooltipKbd>⌘Z</TooltipKbd></TooltipContent>
+            </TooltipPortal>
           </Tooltip>
-          <Tooltip content="Redo" shortcut="⌘⇧Z">
-            <Button
-              className="bdc-btn bdc-icon"
-              onClick={onRedo}
-              disabled={!canRedo}
-              aria-label="Redo"
-            >
-              <IconRedo />
-            </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className="bdc-btn bdc-icon"
+                onClick={onRedo}
+                disabled={!canRedo}
+                aria-label="Redo"
+              >
+                <IconRedo />
+              </Button>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>Redo <TooltipKbd>⌘⇧Z</TooltipKbd></TooltipContent>
+            </TooltipPortal>
           </Tooltip>
-          <Tooltip content="History">
-            <Button
-              className="bdc-btn bdc-icon"
-              onClick={onOpenHistory}
-              aria-label="History"
-            >
-              <IconHistory />
-            </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className="bdc-btn bdc-icon"
+                onClick={onOpenHistory}
+                aria-label="History"
+              >
+                <IconHistory />
+              </Button>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>History</TooltipContent>
+            </TooltipPortal>
           </Tooltip>
         </div>
 
@@ -354,15 +375,20 @@ export const Topbar: React.FC<TopbarProps> = ({
         {/* Breakpoints */}
         <div className="bdc-group bdc-bp-group" role="group" aria-label="Breakpoint">
           {bpItems.map((b) => (
-            <Tooltip content={b.label} key={b.k}>
-              <Button
-                className={`bdc-btn bdc-icon${device === b.k ? " bdc-bp-on" : ""}`}
-                onClick={() => onDeviceChange?.(b.k)}
-                aria-label={b.label}
-                aria-pressed={device === b.k}
-              >
-                {b.icon}
-              </Button>
+            <Tooltip key={b.k}>
+              <TooltipTrigger asChild>
+                <Button
+                  className={`bdc-btn bdc-icon${device === b.k ? " bdc-bp-on" : ""}`}
+                  onClick={() => onDeviceChange?.(b.k)}
+                  aria-label={b.label}
+                  aria-pressed={device === b.k}
+                >
+                  {b.icon}
+                </Button>
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent>{b.label}</TooltipContent>
+              </TooltipPortal>
             </Tooltip>
           ))}
         </div>
@@ -409,37 +435,52 @@ export const Topbar: React.FC<TopbarProps> = ({
 
         {collaborationSlot}
 
-        <Tooltip content="Invite team">
-          <Button
-            className="bdc-btn bdc-secondary"
-            onClick={() => setInviteOpen(true)}
-            aria-label="Invite team"
-          >
-            + Invite
-          </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className="bdc-btn bdc-secondary"
+              onClick={() => setInviteOpen(true)}
+              aria-label="Invite team"
+            >
+              + Invite
+            </Button>
+          </TooltipTrigger>
+          <TooltipPortal>
+            <TooltipContent>Invite team</TooltipContent>
+          </TooltipPortal>
         </Tooltip>
 
         <div className="bdc-group">
-          <Tooltip content="Command palette" shortcut="⌘K">
-            <Button
-              className="bdc-btn bdc-icon"
-              onClick={() => setCmdOpen(true)}
-              aria-label="Command palette"
-            >
-              <IconKbd />
-            </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className="bdc-btn bdc-icon"
+                onClick={() => setCmdOpen(true)}
+                aria-label="Command palette"
+              >
+                <IconKbd />
+              </Button>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>Command palette <TooltipKbd>⌘K</TooltipKbd></TooltipContent>
+            </TooltipPortal>
           </Tooltip>
 
-          <Tooltip content="Preview" shortcut="⌘P">
-            <Button
-              className="bdc-btn bdc-secondary"
-              onClick={onPreview}
-              disabled={previewLoading}
-              aria-label="Preview"
-            >
-              <IconEye />
-              <span>{previewLoading ? "Loading…" : "Preview"}</span>
-            </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className="bdc-btn bdc-secondary"
+                onClick={onPreview}
+                disabled={previewLoading}
+                aria-label="Preview"
+              >
+                <IconEye />
+                <span>{previewLoading ? "Loading…" : "Preview"}</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>Preview <TooltipKbd>⌘P</TooltipKbd></TooltipContent>
+            </TooltipPortal>
           </Tooltip>
 
           <div style={{ position: "relative" }}>
@@ -454,23 +495,33 @@ export const Topbar: React.FC<TopbarProps> = ({
             )}
           </div>
 
-          <Tooltip content="Help">
-            <Button className="bdc-btn bdc-icon" onClick={onHelp} aria-label="Help">
-              ?
-            </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button className="bdc-btn bdc-icon" onClick={onHelp} aria-label="Help">
+                ?
+              </Button>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>Help</TooltipContent>
+            </TooltipPortal>
           </Tooltip>
 
-          <Tooltip content="Account">
-            <Button
-              className="bdc-btn bdc-icon"
-              onClick={() => {
-                setAccountOpen(true);
-                onAccount?.();
-              }}
-              aria-label="Account"
-            >
-              <IconUser />
-            </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className="bdc-btn bdc-icon"
+                onClick={() => {
+                  setAccountOpen(true);
+                  onAccount?.();
+                }}
+                aria-label="Account"
+              >
+                <IconUser />
+              </Button>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>Account</TooltipContent>
+            </TooltipPortal>
           </Tooltip>
         </div>
       </div>

@@ -14,8 +14,11 @@ import {
   PopoverTrigger,
   PopoverPortal,
   PopoverContent,
+  Tooltip,
+  TooltipTrigger,
+  TooltipPortal,
+  TooltipContent,
 } from "@/editor/shared/vibcoder";
-import { Tooltip } from "@/shared/ui/Tooltip";
 
 export interface RichTextEditorProps {
   onCommand: (command: string, value?: string) => void;
@@ -182,18 +185,23 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             const isActive = "active" in item ? item.active : false;
             const itemStyle = "style" in item ? item.style : {};
             return (
-              <Tooltip key={item.command} content={item.label}>
-                <Button
-                  onClick={() => onCommand(item.command)}
-                  style={{
-                    ...toolbarButtonStyle,
-                    background: isActive ? "var(--buildrick-accent)" : "transparent",
-                    color: isActive ? "#fff" : "var(--buildrick-text-secondary)",
-                    ...itemStyle,
-                  }}
-                >
-                  {item.icon}
-                </Button>
+              <Tooltip key={item.command}>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={() => onCommand(item.command)}
+                    style={{
+                      ...toolbarButtonStyle,
+                      background: isActive ? "var(--buildrick-accent)" : "transparent",
+                      color: isActive ? "#fff" : "var(--buildrick-text-secondary)",
+                      ...itemStyle,
+                    }}
+                  >
+                    {item.icon}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipPortal>
+                  <TooltipContent>{item.label}</TooltipContent>
+                </TooltipPortal>
               </Tooltip>
             );
           })}
@@ -279,10 +287,15 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
         </PopoverPortal>
       </Popover>
       {/* Clear Formatting */}
-      <Tooltip content="Clear Formatting">
-        <Button onClick={() => onCommand("removeFormat")} style={toolbarButtonStyle}>
-          ✕
-        </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button onClick={() => onCommand("removeFormat")} style={toolbarButtonStyle}>
+            ✕
+          </Button>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>Clear Formatting</TooltipContent>
+        </TooltipPortal>
       </Tooltip>
     </div>
   );

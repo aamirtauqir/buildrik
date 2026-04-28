@@ -16,7 +16,13 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import { Tooltip } from "../../shared/ui/Tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipPortal,
+  TooltipContent,
+  TooltipKbd,
+} from "@/editor/shared/vibcoder";
 import { ZOOM_PRESETS } from "./shared";
 
 // ============================================
@@ -109,33 +115,41 @@ const OverlayButton: React.FC<OverlayButtonProps> = ({
   active,
   onClick,
 }) => (
-  <Tooltip content={label} shortcut={shortcut}>
-    <Button
-      type="button"
-      className={`canvas-footer-btn ${active ? "canvas-footer-btn--active" : ""}`}
-      onClick={onClick}
-      aria-pressed={active}
-      aria-label={label}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "4px",
-        padding: "4px 8px",
-        height: "28px",
-        fontSize: "11px",
-        fontWeight: 500,
-        color: active ? "var(--buildrick-text-primary)" : "var(--buildrick-text-secondary)",
-        background: active ? "var(--buildrick-surface-3)" : "transparent",
-        border: active ? "1px solid var(--buildrick-accent)" : "1px solid transparent",
-        borderRadius: "var(--buildrick-radius-sm)",
-        cursor: "pointer",
-        transition: "all 0.15s ease",
-      }}
-    >
-      <span style={{ display: "flex", opacity: active ? 1 : 0.7 }}>{icon}</span>
-      <span>{label}</span>
-      {active && <span style={{ marginLeft: "2px", color: "var(--buildrick-accent)" }}>✓</span>}
-    </Button>
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <Button
+        type="button"
+        className={`canvas-footer-btn ${active ? "canvas-footer-btn--active" : ""}`}
+        onClick={onClick}
+        aria-pressed={active}
+        aria-label={label}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "4px",
+          padding: "4px 8px",
+          height: "28px",
+          fontSize: "11px",
+          fontWeight: 500,
+          color: active ? "var(--buildrick-text-primary)" : "var(--buildrick-text-secondary)",
+          background: active ? "var(--buildrick-surface-3)" : "transparent",
+          border: active ? "1px solid var(--buildrick-accent)" : "1px solid transparent",
+          borderRadius: "var(--buildrick-radius-sm)",
+          cursor: "pointer",
+          transition: "all 0.15s ease",
+        }}
+      >
+        <span style={{ display: "flex", opacity: active ? 1 : 0.7 }}>{icon}</span>
+        <span>{label}</span>
+        {active && <span style={{ marginLeft: "2px", color: "var(--buildrick-accent)" }}>✓</span>}
+      </Button>
+    </TooltipTrigger>
+    <TooltipPortal>
+      <TooltipContent>
+        {label}
+        {shortcut && <> <TooltipKbd>{shortcut}</TooltipKbd></>}
+      </TooltipContent>
+    </TooltipPortal>
   </Tooltip>
 );
 
@@ -292,15 +306,20 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
       {onHelpClick && (
         <>
           <div style={dividerStyles} />
-          <Tooltip content="Keyboard shortcuts" shortcut="?">
-            <Button
-              type="button"
-              style={{ ...zoomBtnStyles, width: "28px", height: "28px" }}
-              onClick={onHelpClick}
-              aria-label="Show keyboard shortcuts (press ? key)"
-            >
-              <HelpIcon />
-            </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                style={{ ...zoomBtnStyles, width: "28px", height: "28px" }}
+                onClick={onHelpClick}
+                aria-label="Show keyboard shortcuts (press ? key)"
+              >
+                <HelpIcon />
+              </Button>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>Keyboard shortcuts <TooltipKbd>?</TooltipKbd></TooltipContent>
+            </TooltipPortal>
           </Tooltip>
         </>
       )}
