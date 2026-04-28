@@ -1,55 +1,31 @@
-// PHASE 5 DELETE — Phase 4 adapter shim. Replaces hand-rolled PanelHeader.
 /**
- * Adapter shim — translates legacy PanelHeader API to the vibcoder
- * SurfaceHead primitive (header strip molecule).
+ * PanelHeader extension — composition built on vibcoder SurfaceHead.
  *
- * Strategy: bridge. Renders `<VibcoderSurfaceHead title>` internally and
- * builds the right-cluster actions (pin/help/close) inside the SurfaceHead
- * `actions` slot from the legacy on*Click props. The icon prop is rendered
- * as a leading element inside the title via the SurfaceHead `tag` slot
- * (closest semantic match — eyebrow/meta are textual, tag accepts ReactNode).
+ * Composes `<SurfaceHead>` with a project-specific action cluster (Pin, Help,
+ * Close) plus the inline SVG glyphs the chrome layer expects. Lives outside
+ * the vendored vibcoder bundle because vibcoder ships SurfaceHead as a primitive
+ * but does not provide the pin/help/close action cluster preset.
  *
- * Prop translations (Phase 4 T4.D mapping):
- *   icon (ReactNode)    → rendered into vibcoder SurfaceHead `tag` slot
- *                         (the only ReactNode slot besides actions; sits
- *                         alongside the title in __body). Legacy rendered
- *                         it inline left of the title with 8px gap; the
- *                         tag slot's __tag CSS class is the equivalent
- *                         left-of-title decorator in vibcoder's surface-head.
- *   title (string)      → vibcoder title.
- *   isPinned (boolean)  → wires pin button aria-pressed + legacy filled-icon
- *                         visual (PinIcon takes isPinned). Forwarded into
- *                         the actions cluster.
- *   onPinToggle (cb)    → renders Pin button in actions cluster when set.
- *   onHelpClick (cb)    → renders Help button in actions cluster when set.
- *   onClose (cb)        → renders Close button in actions cluster when set.
- *   children (ReactNode)→ rendered inside the actions cluster, BEFORE the
- *                         pin/help/close buttons (legacy order: extra
- *                         content (e.g. draft chip) sits between title and
- *                         action buttons).
- *   className           → composed onto vibcoder SurfaceHead root.
+ * Two exports:
+ *   PanelHeader      — full panel header with title + tag + action cluster.
+ *   HeaderActions    — standalone action cluster, used by DrillInHeader for
+ *                      its own header layout (back arrow + breadcrumb + actions).
  *
- * Visual note: vibcoder bd-surface-head renders <header> with a flex body
- * (eyebrow/title/meta/tag stack on left) and an actions cluster on right.
- * Legacy PanelHeader rendered <header> with title left-of-actions in the
- * same flex direction. Class structure differs — bd-surface-head__body /
- * __title / __actions vs the legacy inline-styled spans — but the visual
- * shape is preserved.
- *
- * HeaderActions: retained as an exported sub-component for callers that
- * want the action cluster standalone (e.g. DrillInHeader). Re-implemented
- * here to remove the inline-styled SVG icon definitions and route through
- * the canonical SurfaceHead actions when called inside a PanelHeader.
+ * Slot mapping:
+ *   icon (ReactNode) → vibcoder SurfaceHead `tag` slot (left-of-title decorator)
+ *   title (string)   → vibcoder SurfaceHead `title`
+ *   children         → rendered into actions cluster BEFORE pin/help/close
+ *                      (legacy order: extra content e.g. draft chip sits
+ *                      between title and action buttons)
+ *   pin/help/close   → rendered as 24×24 icon buttons in actions cluster.
+ *                      Each button only renders when its callback is provided.
+ *   isPinned         → wires Pin button aria-pressed + filled-glyph visual.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
 import { SurfaceHead as VibcoderSurfaceHead } from "@/editor/shared/vibcoder";
-
-// ============================================
-// Action icons (inline SVGs — 16px, no external dependency)
-// ============================================
 
 const PinIcon: React.FC<{ isPinned: boolean }> = ({ isPinned }) => (
   <svg
@@ -97,11 +73,6 @@ const CloseIcon: React.FC = () => (
     <path d="M4 4l8 8M12 4l-8 8" />
   </svg>
 );
-
-// ============================================
-// HeaderActions — shared action buttons (Pin, Help, Close)
-// Used by PanelHeader and standalone (DrillInHeader, etc.).
-// ============================================
 
 const iconBtnStyles: React.CSSProperties = {
   display: "flex",
@@ -181,10 +152,6 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
     )}
   </div>
 );
-
-// ============================================
-// PanelHeader — bridge to vibcoder SurfaceHead
-// ============================================
 
 export interface PanelHeaderProps {
   /** Optional icon rendered before the title (16×16 node) */

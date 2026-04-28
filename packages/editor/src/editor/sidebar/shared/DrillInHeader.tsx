@@ -8,7 +8,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import { BackArrowIcon } from "./headerIcons";
 import { drillInHeaderContainerStyles } from "./headerStyles";
-import { HeaderActions } from "./PanelHeader";
+import { HeaderActions } from "@/shared/extensions/PanelHeader";
 
 export interface DrillInHeaderProps {
   /** Current screen title (e.g., "Elements") */

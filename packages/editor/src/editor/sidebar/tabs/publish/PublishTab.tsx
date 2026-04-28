@@ -13,7 +13,7 @@ import type { Composer } from "../../../../engine";
 import { usePublish, type PublishResult } from "../../../../shared/hooks/usePublish";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { useToast } from "../../../../shared/ui/Toast";
-import { PanelHeader } from "../../shared/PanelHeader";
+import { PanelHeader } from "@/shared/extensions/PanelHeader";
 
 // ============================================
 // Types

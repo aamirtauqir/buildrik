@@ -81,7 +81,6 @@
     "packages/editor/src/editor/sidebar/shared/DrillInHeader.tsx",
     "packages/editor/src/editor/sidebar/shared/EmptyStates.tsx",
     "packages/editor/src/editor/sidebar/shared/PanelErrorState.tsx",
-    "packages/editor/src/editor/sidebar/shared/PanelHeader.tsx",
     "packages/editor/src/editor/sidebar/shared/SkeletonStates.tsx",
     "packages/editor/src/editor/sidebar/shared/headerIcons.tsx",
     "packages/editor/src/editor/sidebar/tabs/ComponentsTab.tsx",

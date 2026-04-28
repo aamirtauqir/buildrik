@@ -15,10 +15,6 @@ export {
   drillInHeaderContainerStyles,
 } from "./headerStyles";
 
-// Panel Header + HeaderActions
-export { PanelHeader, HeaderActions } from "./PanelHeader";
-export type { PanelHeaderProps, HeaderActionsProps } from "./PanelHeader";
-
 // View Switcher (for Navigator, History tabs)
 export { ViewSwitcher } from "./ViewSwitcher";
 export type { ViewSwitcherProps, ViewOption } from "./ViewSwitcher";

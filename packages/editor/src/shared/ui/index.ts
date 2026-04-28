@@ -59,9 +59,3 @@ export {
   type TipProps,
   type WarningBannerProps,
 } from "./InfoBanner";
-export {
-  PanelHeader,
-  HeaderActions,
-  type PanelHeaderProps,
-  type HeaderActionsProps,
-} from "./PanelHeader";

@@ -20,10 +20,9 @@
     "phase5:inventory": "node scripts/phase5-shim-inventory.mjs",
     "phase5:inventory:pretty": "node scripts/phase5-shim-inventory.mjs --pretty",
     "phase5:inventory:strict": "node scripts/phase5-shim-inventory.mjs --strict",
-    "codemod:phase4": "pnpm codemod:phase4:panel-header && pnpm codemod:phase4:modal && pnpm codemod:phase4:popover",
+    "codemod:phase4": "pnpm codemod:phase4:modal && pnpm codemod:phase4:popover",
     "codemod:phase4:popover": "jscodeshift -t scripts/codemods/phase4/popover.ts --extensions=ts,tsx --parser=tsx src/editor/",
-    "codemod:phase4:modal": "jscodeshift -t scripts/codemods/phase4/modal.ts --extensions=ts,tsx --parser=tsx src/editor/",
-    "codemod:phase4:panel-header": "jscodeshift -t scripts/codemods/phase4/panel-header.ts --extensions=ts,tsx --parser=tsx src/editor/"
+    "codemod:phase4:modal": "jscodeshift -t scripts/codemods/phase4/modal.ts --extensions=ts,tsx --parser=tsx src/editor/"
   },
   "dependencies": {
     "@buildrik/shared": "workspace:*",

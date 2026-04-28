@@ -11,7 +11,7 @@
  */
 
 import * as React from "react";
-import { PanelHeader } from "../../../shared/ui/PanelHeader";
+import { PanelHeader } from "@/shared/extensions/PanelHeader";
 import { PanelErrorState } from "../../../editor/sidebar/shared/PanelErrorState";
 import type { Composer } from "../../../engine/Composer";
 import { EVENTS } from "../../../shared/constants/events";

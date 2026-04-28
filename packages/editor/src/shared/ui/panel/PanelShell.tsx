@@ -42,8 +42,8 @@ import {
   ROW_MD,
   ROW_LG,
 } from "@shared/constants/layout";
-import { PanelHeader } from "../PanelHeader";
-import type { PanelHeaderProps } from "../PanelHeader";
+import { PanelHeader } from "@/shared/extensions/PanelHeader";
+import type { PanelHeaderProps } from "@/shared/extensions/PanelHeader";
 
 // ============================================================================
 // Root
