@@ -334,9 +334,14 @@ See `poc-findings.md` Bucket A findings section for full detail.
 
 **Bucket B — Keep-legacy → bridge ports — IN PROGRESS.**
 
-- **B1 Tooltip — PENDING.** Plan written 2026-04-30 at
-  `docs/superpowers/plans/2026-04-30-vibcoder-bucket-b1-tooltip.md`. 10 chrome
-  consumers. Awaits execution.
+- **B1 Tooltip — SHIPPED 2026-04-30.** Vibcoder Tooltip now Radix.Tooltip-backed
+  compound (T1 `affe6fd`). TooltipProvider mounted at AquibraStudio shell with
+  delayDuration=500 matching the deleted shim default (T2 `e72b9db`). 13
+  consumers hand-ported (T3 `8c9888b`) — 10 listed + 3 transitive (HelpTooltip,
+  ColorSwatch, SeoTab) caught by tsc post-shim-deletion. 4 chrome-axiom gates
+  improved (gradients 77→76, box-shadow 179→176, panel-radius 377→371, layout
+  literals 335→322); baselines locked. E2 + E3 contract waivers in Tooltip.tsx
+  docstring follow Bucket A Popover precedent.
 - **B2 ContextMenu — SHIPPED 2026-04-30 (pure deletion).** Pre-flight
   inventory revealed the shim was effectively dead: zero callers of the
   component or `useContextMenu` hook; the 1 type-importer (dropOperations.tsx)

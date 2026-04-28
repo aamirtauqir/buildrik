@@ -821,3 +821,61 @@ The half-finished heading-block drop-menu flow is a *separate* problem: it needs
 - **Type-only imports inflate consumer counts.** Grep `from "@/shared/ui/X"` catches both component imports and bare type imports. Inventory scripts should distinguish — a type-only consumer is dead code in disguise when the type is only used in callback signatures with no live callers.
 - **Half-finished features rot quietly.** A code path gated on a never-passed callback compiles, type-checks, ships, and lingers indefinitely. Worth a future gate: detect optional callback params with no caller-supplied implementations across the consumer graph.
 
+---
+
+## Bucket B1 findings (Tooltip — Radix.Tooltip backing, 2026-04-30)
+
+### What shipped
+
+| Task | SHA | Description |
+|------|-----|-------------|
+| T1 | `affe6fd` | Vibcoder Tooltip wrapper migrated from Phase 2 passive surface to Radix.Tooltip compound (Provider/Root/Trigger/Portal/Content + Title/Desc/Kbd siblings). E2 + E3 contract waivers in docstring follow Bucket A Popover precedent. RailTile (intra-vibcoder cross-import) updated to keep main green. Test fixture used `<span tabIndex={0}>` for asChild (avoids Gate 24 baseline bump). |
+| T2 | `e72b9db` | `<TooltipProvider delayDuration={500}>` mounted at AquibraStudio shell, outermost in the provider stack. The 500ms delay matches the deleted Phase 4 shim default — chrome hover-intent behavior preserved bit-for-bit. |
+| T3 | `8c9888b` | Phase 4 Tooltip shim deleted. 13 consumers hand-ported (10 listed in plan + 3 transitive: HelpTooltip, ColorSwatch, SeoTab — caught by tsc post-shim-deletion because the inventory grep regex missed `@shared/ui/Tooltip` and `./Tooltip` (relative within `shared/ui/`) shapes). 4 chrome-axiom gates improved as a side-effect (gradients 77→76, box-shadow 179→176, panel-radius 377→371, layout literals 335→322); baselines lowered to lock the wins. |
+
+Net delta across T1-T3: 27 files changed, +1391/−965 (net +426 LOC, mostly from new test coverage and inline TooltipKbd usages replacing the old `shortcut` prop). Shim itself was 183 LOC; new wrapper is 138 LOC; rest is rewrites in 13 consumer files.
+
+### Inventory grep gap (recurring)
+
+For the third consecutive bucket (B2 ContextMenu was the second instance), the consumer grep regex `from ['\"](@/shared/ui/X|\\.\\./.*shared/ui/X)['\"]` missed import variants. B1 specifically missed:
+
+- `@shared/ui/Tooltip` — alias without leading slash (used by SeoTab)
+- `./Tooltip` — relative within `shared/ui/` itself (used by HelpTooltip, ColorSwatch)
+
+Hardened grep that catches all four shapes:
+
+```bash
+grep -rEln "from ['\"]([@/.][^'\"]*shared/ui/Tooltip|\\.\\./.*shared/ui/Tooltip|@shared/ui/Tooltip)['\"]" src/
+```
+
+Action item: extract a reusable inventory helper (e.g., `scripts/grep-shim-consumers.sh <ShimName>`) so future Bucket B3 (Toast — 27 consumers) and Phase 6 onward don't undercount.
+
+### Per-instance delayDuration overrides
+
+Two consumers needed non-default delay (200ms): HelpTooltip and SeoTab help-icons. Translated to `<Tooltip delayDuration={200}>` on the Radix Root (overriding ambient Provider). All other 11 consumers use the implicit default 500 from the Provider — covered without per-instance overrides.
+
+### asChild compatibility
+
+All 13 consumers used DOM-element children (`<span>`, `<button>`, `<div>`) or vibcoder forwardRef components (`<Button>`, `<IconButton>`) as triggers. No asChild ref-forwarding issues encountered. This held because vibcoder atoms (Button, IconButton from Phase 1 atoms) all forward refs by spec.
+
+### Side-effect gate improvements
+
+4 of the 4 chrome-axiom gates improved because consumer rewrites replaced inline JSX with compound shapes that don't count toward inline-element gates:
+
+| Gate | Before | After | Delta |
+|------|--------|-------|-------|
+| Gate 11 (chrome gradients) | 77 | 76 | −1 |
+| Gate 12 (box-shadow tokens) | 179 | 176 | −3 |
+| Gate 13 (panel-chrome border-radius) | 377 | 371 | −6 |
+| Gate 14 (layout literals) | 335 | 322 | −13 |
+
+Baselines locked at the new lower values. Future regressions on these gates will fail CI.
+
+### Recommendation
+
+**Bucket B1 closes 2026-04-30.** B3 (Toast — 27 consumers) is the last remaining bucket in the chrome arc. B3 should:
+1. Use the hardened consumer-grep helper from the action item above
+2. Reuse the TooltipProvider precedent at AquibraStudio (mount ToastProvider similarly outermost)
+3. Pre-flight check for transitive shim-internal cross-imports (the HelpTooltip-class trap)
+4. Strongly consider a jscodeshift codemod given the consumer count, with inline-string tests (Gate 25 enforces no orphan fixtures)
+
