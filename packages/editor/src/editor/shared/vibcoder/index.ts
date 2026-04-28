@@ -47,6 +47,8 @@ export { Divider } from "./Divider";
 export type { DividerOrientation, DividerStyle, DividerTone, DividerProps } from "./Divider";
 export { Stack } from "./Stack";
 export type { StackGap, StackProps } from "./Stack";
+export { Cluster } from "./Cluster";
+export type { ClusterGap, ClusterAlign, ClusterProps } from "./Cluster";
 export { Grip } from "./Grip";
 export type { GripOrientation, GripSize, GripProps } from "./Grip";
 export { BreakpointSwitcher } from "./BreakpointSwitcher";
