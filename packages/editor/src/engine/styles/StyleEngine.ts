@@ -563,9 +563,12 @@ export class StyleEngine {
    */
   flush(): void {
     if (!this.pendingUpdate || !this.styleElement) return;
+    if (this.rafId !== null) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
     this.styleElement.textContent = this.toCSS();
     this.pendingUpdate = false;
-    this.rafId = null;
   }
 
   // ============================================
@@ -670,8 +673,8 @@ export class StyleEngine {
       cancelAnimationFrame(this.rafId);
       this.rafId = null;
     }
-    this.clear();
-    this.flush();
+    this.pendingUpdate = false;
+    this.styles.clear();
     if (this.styleElement && this.styleElement.parentNode) {
       this.styleElement.parentNode.removeChild(this.styleElement);
     }
