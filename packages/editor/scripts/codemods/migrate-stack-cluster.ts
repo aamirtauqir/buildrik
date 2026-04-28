@@ -62,10 +62,14 @@ export function transform(source: string): string {
   let needsStack = false;
   let needsCluster = false;
 
+  // Process bottom-up (deepest first). getDescendantsOfKind is pre-order
+  // (parent before child); reversing means children process first. Required
+  // for nested stack/cluster cases — modifying a parent forgets all child
+  // node references and subsequent operations on those children throw.
   const jsxElements = [
     ...sf.getDescendantsOfKind(SyntaxKind.JsxElement),
     ...sf.getDescendantsOfKind(SyntaxKind.JsxSelfClosingElement),
-  ];
+  ].reverse();
 
   for (const jsx of jsxElements) {
     const opening = Node.isJsxElement(jsx) ? jsx.getOpeningElement() : jsx;
@@ -89,8 +93,12 @@ export function transform(source: string): string {
     if (analysis.isStack) needsStack = true;
     if (analysis.isCluster) needsCluster = true;
 
-    opening.getTagNameNode().replaceWithText(wrapper);
+    // Rename closing tag BEFORE opening tag. If the opening is renamed first,
+    // ts-morph re-validates the AST mid-operation and rejects the transient
+    // <Stack>...</div> mismatch with "syntax error" — most visible on nested
+    // stacks (T3 sidebar batch). Renaming closing first keeps the tree valid.
     if (Node.isJsxElement(jsx)) jsx.getClosingElement().getTagNameNode().replaceWithText(wrapper);
+    opening.getTagNameNode().replaceWithText(wrapper);
     styleAttr.remove();
     if (token) {
       opening.addAttribute({ name: "gap", initializer: `"${token}"` });
