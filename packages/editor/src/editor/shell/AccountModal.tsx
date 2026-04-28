@@ -155,19 +155,18 @@ const TabProfile: React.FC = () => (
           border: "1px solid #D1D5DB",
           borderRadius: 8,
           padding: 12,
-          display: "flex",
-          flexDirection: "column",
-          gap: 10,
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: 13, fontWeight: 500, color: "var(--buildrick-text-muted)" }}>Email notifications</span>
-          <Toggle on={true} />
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: 13, fontWeight: 500, color: "var(--buildrick-text-muted)" }}>Push notifications</span>
-          <Toggle on={false} />
-        </div>
+        <Stack gap="sm">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: 13, fontWeight: 500, color: "var(--buildrick-text-muted)" }}>Email notifications</span>
+            <Toggle on={true} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: 13, fontWeight: 500, color: "var(--buildrick-text-muted)" }}>Push notifications</span>
+            <Toggle on={false} />
+          </div>
+        </Stack>
       </div>
     </div>
 
@@ -304,14 +303,12 @@ const TabBilling: React.FC = () => (
         border: "1px solid var(--bd-border-medium)",
         borderRadius: 10,
         padding: 16,
-        display: "flex",
-        flexDirection: "column",
-        gap: 10,
       }}
     >
-      <div style={{ fontSize: 16, fontWeight: 700, color: "var(--buildrick-text-primary)" }}>Pro Plan</div>
-      <div style={{ fontSize: 13, color: "var(--buildrick-text-muted)" }}>Everything you need for professional sites</div>
-      <div>
+      <Stack gap="sm">
+        <div style={{ fontSize: 16, fontWeight: 700, color: "var(--buildrick-text-primary)" }}>Pro Plan</div>
+        <div style={{ fontSize: 13, color: "var(--buildrick-text-muted)" }}>Everything you need for professional sites</div>
+        <div>
         <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)", marginBottom: 6 }}>Sites: 2 of 5</div>
         <div
           style={{
@@ -331,6 +328,7 @@ const TabBilling: React.FC = () => (
           />
         </div>
       </div>
+      </Stack>
     </div>
 
     {/* Payment Method */}

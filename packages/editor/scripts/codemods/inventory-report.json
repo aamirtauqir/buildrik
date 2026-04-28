@@ -1,69 +1,11 @@
 {
   "counts": {
-    "stack-multi-prop": 57,
-    "cluster-clean": 3,
-    "stack-off-grid": 3,
-    "cluster-off-grid": 2
+    "stack-multi-prop": 24,
+    "cluster-clean": 1,
+    "cluster-off-grid": 2,
+    "stack-off-grid": 2
   },
   "sites": [
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/canvas/CanvasFooterToolbar.tsx",
-      "line": 400,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "position",
-        "bottom",
-        "left",
-        "transform",
-        "padding",
-        "background",
-        "border",
-        "borderRadius",
-        "boxShadow",
-        "zIndex",
-        "minWidth"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/canvas/DeviceFramePreview.tsx",
-      "line": 85,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "position",
-        "background",
-        "boxShadow",
-        "justifyContent",
-        "transition"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/canvas/ZoomControls.tsx",
-      "line": 238,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "position",
-        "bottom",
-        "right",
-        "marginBottom",
-        "padding",
-        "background",
-        "border",
-        "borderRadius",
-        "boxShadow"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/ecommerce/CollectionSetupModal.tsx",
-      "line": 180,
-      "bucket": "stack-multi-prop",
-      "gap": "8px",
-      "extraProps": [
-        "padding"
-      ]
-    },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/export/ExportModal.tsx",
       "line": 296,
@@ -114,15 +56,6 @@
       ]
     },
     {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/media/CropOverlay.tsx",
-      "line": 70,
-      "bucket": "cluster-clean",
-      "gap": 6,
-      "extraProps": [
-        "marginBottom"
-      ]
-    },
-    {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/media/VideoPreview.tsx",
       "line": 186,
       "bucket": "stack-multi-prop",
@@ -143,45 +76,6 @@
       "extraProps": [
         "flex",
         "minWidth"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/onboarding/OnboardingChecklist.tsx",
-      "line": 249,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "position",
-        "right",
-        "bottom",
-        "width",
-        "maxHeight",
-        "background",
-        "border",
-        "borderRadius",
-        "boxShadow",
-        "zIndex",
-        "overflow",
-        "fontFamily"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/onboarding/OnboardingChecklist.tsx",
-      "line": 435,
-      "bucket": "stack-multi-prop",
-      "gap": 10,
-      "extraProps": [
-        "padding"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/onboarding/OnboardingChecklist.tsx",
-      "line": 465,
-      "bucket": "stack-multi-prop",
-      "gap": 10,
-      "extraProps": [
-        "padding",
-        "borderTop"
       ]
     },
     {
@@ -332,55 +226,6 @@
       ]
     },
     {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sync/ConflictModal.tsx",
-      "line": 181,
-      "bucket": "stack-multi-prop",
-      "gap": "12px",
-      "extraProps": [
-        "flex",
-        "padding",
-        "background",
-        "borderRadius"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/wizard/PageWizard.tsx",
-      "line": 427,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "width",
-        "maxWidth",
-        "padding",
-        "textAlign"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/wizard/PageWizard.tsx",
-      "line": 564,
-      "bucket": "stack-multi-prop",
-      "gap": 14,
-      "extraProps": [
-        "width",
-        "textAlign",
-        "marginBottom"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/canvas/controls/BlockPickerModal.tsx",
-      "line": 238,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "background",
-        "borderRadius",
-        "boxShadow",
-        "width",
-        "maxHeight",
-        "animation"
-      ]
-    },
-    {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/canvas/controls/CommandPalette.tsx",
       "line": 280,
       "bucket": "stack-multi-prop",
@@ -427,116 +272,6 @@
       ]
     },
     {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/canvas/overlays/MediaQuickActions.tsx",
-      "line": 185,
-      "bucket": "stack-multi-prop",
-      "gap": "8px",
-      "extraProps": [
-        "position",
-        "top",
-        "left",
-        "transform",
-        "background",
-        "border",
-        "borderRadius",
-        "padding",
-        "boxShadow",
-        "zIndex",
-        "pointerEvents"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/canvas/overlays/RemoteCursorsOverlay.tsx",
-      "line": 39,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "position",
-        "transition",
-        "pointerEvents"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/canvas/overlays/TemplatePreviewPanel.tsx",
-      "line": 283,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "position",
-        "inset",
-        "justifyContent",
-        "background",
-        "zIndex"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/canvas/overlays/TemplatePreviewPanel.tsx",
-      "line": 295,
-      "bucket": "stack-multi-prop",
-      "gap": 16,
-      "extraProps": [
-        "justifyContent",
-        "color"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/canvas/overlays/TemplatePreviewPanel.tsx",
-      "line": 340,
-      "bucket": "stack-multi-prop",
-      "gap": 8,
-      "extraProps": [
-        "position",
-        "inset",
-        "justifyContent",
-        "background",
-        "backdropFilter",
-        "color",
-        "fontSize",
-        "fontWeight"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/inspector/components/InspectorEmptyState.tsx",
-      "line": 132,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "justifyContent",
-        "height",
-        "padding",
-        "textAlign",
-        "color",
-        "marginTop"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/inspector/components/InspectorEmptyState.tsx",
-      "line": 171,
-      "bucket": "stack-multi-prop",
-      "gap": "8px",
-      "extraProps": [
-        "marginTop",
-        "width",
-        "maxWidth"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/inspector/components/MultiSelectToolbar.tsx",
-      "line": 49,
-      "bucket": "stack-multi-prop",
-      "gap": "var(--buildrick-space-4)",
-      "extraProps": [
-        "padding"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/inspector/shared/TokenPickerPopover.tsx",
-      "line": 299,
-      "bucket": "stack-off-grid",
-      "gap": 2,
-      "extraProps": []
-    },
-    {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/inspector/shared/TokenPickerPopover.tsx",
       "line": 321,
       "bucket": "stack-multi-prop",
@@ -546,22 +281,6 @@
         "borderRadius",
         "cursor",
         "transition",
-        "outline"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shared/vibcoder/Toast.tsx",
-      "line": 270,
-      "bucket": "stack-multi-prop",
-      "gap": 8,
-      "extraProps": [
-        "position",
-        "top",
-        "right",
-        "zIndex",
-        "listStyle",
-        "margin",
-        "padding",
         "outline"
       ]
     },
@@ -583,59 +302,6 @@
         "boxShadow",
         "zIndex",
         "overflow"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/modals/CreateComponentModal.tsx",
-      "line": 310,
-      "bucket": "cluster-clean",
-      "gap": 8,
-      "extraProps": [
-        "marginTop"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/modals/ProjectSettingsModal.tsx",
-      "line": 213,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "minHeight"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/shared/DrillInHeader.tsx",
-      "line": 135,
-      "bucket": "stack-multi-prop",
-      "gap": 4,
-      "extraProps": [
-        "flex",
-        "minWidth"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/shared/FeatureCard.tsx",
-      "line": 178,
-      "bucket": "stack-multi-prop",
-      "gap": 2,
-      "extraProps": [
-        "flex",
-        "minWidth",
-        "overflow"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/shared/StickyFooter.tsx",
-      "line": 80,
-      "bucket": "stack-multi-prop",
-      "gap": 8,
-      "extraProps": [
-        "position",
-        "bottom",
-        "padding",
-        "background",
-        "borderTop",
-        "marginTop"
       ]
     },
     {
@@ -686,70 +352,6 @@
       "extraProps": []
     },
     {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/component-library/styles.ts",
-      "line": 9,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "height",
-        "background"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/publish/PublishTab.tsx",
-      "line": 509,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "height",
-        "background"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/publish/PublishTab.tsx",
-      "line": 516,
-      "bucket": "stack-multi-prop",
-      "gap": 16,
-      "extraProps": [
-        "flex",
-        "overflowY",
-        "padding"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/publish/PublishTab.tsx",
-      "line": 525,
-      "bucket": "stack-multi-prop",
-      "gap": 8,
-      "extraProps": [
-        "padding",
-        "background",
-        "borderRadius",
-        "border"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/settings/shared.tsx",
-      "line": 173,
-      "bucket": "stack-multi-prop",
-      "gap": 12,
-      "extraProps": [
-        "justifyContent",
-        "paddingLeft",
-        "paddingRight",
-        "textAlign"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/build/components/TipsFooter.tsx",
-      "line": 30,
-      "bucket": "stack-multi-prop",
-      "gap": 6,
-      "extraProps": [
-        "fontFamily"
-      ]
-    },
-    {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/pages/page-settings/UnsavedWarningModal.tsx",
       "line": 67,
       "bucket": "stack-off-grid",
@@ -763,44 +365,6 @@
       "gap": 8,
       "extraProps": [
         "marginBottom"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/settings/screens/ExportScreen.tsx",
-      "line": 272,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "justifyContent",
-        "padding",
-        "textAlign",
-        "color"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/settings/styles/index.ts",
-      "line": 14,
-      "bucket": "stack-multi-prop",
-      "gap": 16,
-      "extraProps": [
-        "padding"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/settings/styles/index.ts",
-      "line": 29,
-      "bucket": "stack-multi-prop",
-      "gap": 4,
-      "extraProps": [
-        "justifyContent",
-        "padding",
-        "background",
-        "border",
-        "borderRadius",
-        "color",
-        "cursor",
-        "fontSize",
-        "transition"
       ]
     }
   ]

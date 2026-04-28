@@ -55,11 +55,24 @@ function categorize(obj: ObjectLiteralExpression): { bucket: Bucket; gap: number
   return { bucket: "skip", gap, extraProps };
 }
 
+// Only count ObjectLiteralExpression nodes that are inline JSX `style={{...}}`
+// attribute values. Const-style declarations (`const styles: CSSProperties = {...}`)
+// are skipped — codemod can't transform them, so listing them in the report is
+// a recurring false-positive (caught 6+ times across Phase 6 T1, T6, P6.1 recon).
+function isJsxStyleAttributeValue(obj: ObjectLiteralExpression): boolean {
+  const expr = obj.getParent();
+  if (!expr || !Node.isJsxExpression(expr)) return false;
+  const attr = expr.getParent();
+  if (!attr || !Node.isJsxAttribute(attr)) return false;
+  return attr.getNameNode().getText() === "style";
+}
+
 const project = new Project({ tsConfigFilePath: "packages/editor/tsconfig.json" });
 const sites: SiteReport[] = [];
 
 for (const sf of project.getSourceFiles("packages/editor/src/editor/**/*.{ts,tsx}")) {
   for (const obj of sf.getDescendantsOfKind(SyntaxKind.ObjectLiteralExpression)) {
+    if (!isJsxStyleAttributeValue(obj)) continue;
     const result = categorize(obj);
     if (result.bucket === "skip") continue;
     sites.push({
