@@ -332,11 +332,26 @@ including 12 orphan fixture pairs (T4 `309890b`). 34 files / +452 / −1155
 Popover.tsx docstring as precedent for future Bucket B Radix-backings.
 See `poc-findings.md` Bucket A findings section for full detail.
 
-**Bucket B — Keep-legacy → bridge ports — DEFERRED upstream.** Tooltip / Toast /
-ContextMenu / HelpTooltip retained. Each blocks on vibcoder substrate upgrades
-(Radix.Tooltip / Radix.Toast / Radix.ContextMenu install). T7 disposition. This
-is the final remaining shim-deletion work in the chrome arc — Phase 5 is
-otherwise fully complete.
+**Bucket B — Keep-legacy → bridge ports — IN PROGRESS.**
+
+- **B1 Tooltip — PENDING.** Plan written 2026-04-30 at
+  `docs/superpowers/plans/2026-04-30-vibcoder-bucket-b1-tooltip.md`. 10 chrome
+  consumers. Awaits execution.
+- **B2 ContextMenu — SHIPPED 2026-04-30 (pure deletion).** Pre-flight
+  inventory revealed the shim was effectively dead: zero callers of the
+  component or `useContextMenu` hook; the 1 type-importer (dropOperations.tsx)
+  housed a half-finished feature path gated on `onShowContextMenu` callback
+  that no caller ever supplied. Original plan assumed live consumer + Radix
+  shape match — both wrong. Pure deletion was the correct disposition: shim
+  (179 LOC) + dead heading-menu branch (~65 LOC) + dead callback param +
+  type imports + barrel cleanups, 257 deletions. No Radix.ContextMenu
+  install. No new wrapper. Commit `d81bed1`.
+- **B3 Toast — PENDING.** Plan written 2026-04-30 at
+  `docs/superpowers/plans/2026-04-30-vibcoder-bucket-b3-toast.md`. 27 chrome
+  consumers, codemod-assisted. Awaits execution.
+
+HelpTooltip retained as a separate molecule (Phase 5 carry-over); not part of
+Bucket B execution.
 
 **Bucket C — Adapter shim deletion — SHIPPED.** All 19 Phase 4 shims deleted
 across T1-T4. Atoms (T2 ×15 + T2.X barrel codemod), molecules (T3 ×4), Modal (T4

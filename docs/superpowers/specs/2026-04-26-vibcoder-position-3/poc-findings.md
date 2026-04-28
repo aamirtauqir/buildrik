@@ -782,3 +782,42 @@ These two waivers are documented inline in the Popover.tsx docstring and are NOT
 
 **Bucket A closes today (2026-04-28).** Phase 5 chrome arc is fully complete *sans* Bucket B (Tooltip / Toast / ContextMenu / HelpTooltip — still pending Radix.Tooltip / Radix.Toast / Radix.ContextMenu wraps in vibcoder). Phase 6 (visual regression infrastructure) remains the next unblocked roadmap target.
 
+---
+
+## Bucket B2 findings (ContextMenu — pure deletion, 2026-04-30)
+
+### Disposition: shim was dead code
+
+Bucket B2 was originally planned as a Radix.ContextMenu backing arc (install dep, create wrapper from scratch, migrate the 1 chrome consumer). Pre-flight inventory falsified both core assumptions:
+
+1. **No live consumer of the component or hook.** The shim's `<ContextMenu>` and `useContextMenu()` had zero callers anywhere in `src/`. The single grep hit (`dropOperations.tsx`) imported only the *type* `ContextMenuItem`.
+
+2. **The "consumer" path was a half-finished feature.** Inside `dropOperations.tsx`, ~65 LOC built a heading-block H1-H6 selection menu (drag a "heading" block → show a level picker) gated on `ctx.onShowContextMenu` being truthy. No caller ever passed `onShowContextMenu`. The branch had been silently dead since whoever wrote it.
+
+3. **Shape mismatch — Radix.ContextMenu would not have fit anyway.** The dropOperations heading-menu flow needs an absolute-positioned drop-completion menu (callsite computes x/y from the drop event). Radix.ContextMenu models right-click anchored menus on a trigger element. Even with a live consumer, migrating to Radix would have required rewriting the architecture, not just translating props.
+
+### What shipped
+
+Single commit `d81bed1`. 5 files changed, 257 deletions, 0 insertions:
+
+- `src/shared/ui/ContextMenu.tsx` deleted (179 LOC shim)
+- Dead heading-menu branch deleted from `dropOperations.tsx` (~65 LOC) + `onShowContextMenu` callback param + `ContextMenuItem` type import
+- Barrel cleanups: `shared/ui/index.ts`, `shared/ui/index.tsx`, `src/index.ts` (top-level re-export of `ContextMenu` + `useContextMenu`)
+- No Radix.ContextMenu install. No new wrapper. No new tests.
+
+### Forward note
+
+If a right-click context menu is genuinely needed in the chrome later, the future implementer should:
+
+1. Install `@radix-ui/react-context-menu` at that time.
+2. Create a vibcoder wrapper following the Bucket A Popover.tsx precedent (E2 + E3 waivers apply — anchored overlay).
+3. Consult `docs/superpowers/plans/2026-04-30-vibcoder-bucket-b2-contextmenu.md` for the original plan as a starting reference (the plan's Task 1 wrapper-creation steps remain valid; Task 2 should be skipped since no consumer exists today).
+
+The half-finished heading-block drop-menu flow is a *separate* problem: it needs a drop-completion floating panel, not a right-click context menu. Product design call before code.
+
+### Lessons surfaced
+
+- **Audit before architecture, applied to plans too.** B2's plan was written assuming a live consumer based on grep matches that turned out to be type-only imports. The inventory step is not optional — it's the first verification gate. Original Bucket A plan-writing memory entry says "Inventory before architecture for theme specs" — extends to every Radix-backing plan.
+- **Type-only imports inflate consumer counts.** Grep `from "@/shared/ui/X"` catches both component imports and bare type imports. Inventory scripts should distinguish — a type-only consumer is dead code in disguise when the type is only used in callback signatures with no live callers.
+- **Half-finished features rot quietly.** A code path gated on a never-passed callback compiles, type-checks, ships, and lingers indefinitely. Worth a future gate: detect optional callback params with no caller-supplied implementations across the consumer graph.
+
