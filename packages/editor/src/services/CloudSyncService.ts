@@ -5,6 +5,7 @@
  */
 
 import type { ProjectData } from "../shared/types";
+import { ProjectDataSchema } from "@shared/schemas/project";
 
 // ============================================================================
 // VALIDATION
@@ -429,14 +430,14 @@ export class CloudSyncService {
           headers: { Authorization: `Bearer ${apiKey}`, apikey: apiKey },
         });
         if (!res.ok) return null;
-        return res.json();
+        return this.parseProjectResponse(res);
       }
 
       case "firebase": {
         const url = `${endpoint}/${projectId}.json?auth=${apiKey}`;
         const res = await fetch(url);
         if (!res.ok) return null;
-        return res.json();
+        return this.parseProjectResponse(res);
       }
 
       case "custom": {
@@ -445,12 +446,27 @@ export class CloudSyncService {
           headers: { Authorization: `Bearer ${apiKey}` },
         });
         if (!res.ok) return null;
-        return res.json();
+        return this.parseProjectResponse(res);
       }
 
       default:
         return null;
     }
+  }
+
+  private async parseProjectResponse(res: Response): Promise<ProjectData | null> {
+    const ct = res.headers.get("content-type");
+    if (!ct || !ct.includes("application/json")) {
+      console.warn("[CloudSync] unexpected Content-Type:", ct);
+      return null;
+    }
+    const raw = await res.json();
+    const parsed = ProjectDataSchema.safeParse(raw);
+    if (!parsed.success) {
+      console.warn("[CloudSync] invalid project schema:", parsed.error.flatten());
+      return null;
+    }
+    return parsed.data as ProjectData;
   }
 
   /**
