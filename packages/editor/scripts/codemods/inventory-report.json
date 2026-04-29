@@ -1,6 +1,6 @@
 {
   "counts": {
-    "stack-multi-prop": 12
+    "stack-multi-prop": 8
   },
   "sites": [
     {
@@ -24,43 +24,6 @@
       "extraProps": [
         "flex",
         "minWidth"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 404,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "position",
-        "inset",
-        "zIndex",
-        "background"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 451,
-      "bucket": "stack-multi-prop",
-      "gap": 6,
-      "extraProps": [
-        "width",
-        "flexShrink",
-        "background",
-        "borderRight",
-        "padding"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 493,
-      "bucket": "stack-multi-prop",
-      "gap": 20,
-      "extraProps": [
-        "flex",
-        "overflowY",
-        "padding",
-        "background"
       ]
     },
     {
@@ -105,26 +68,6 @@
         "borderRadius",
         "boxShadow",
         "zIndex",
-        "overflow"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/InviteModal.tsx",
-      "line": 112,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "position",
-        "top",
-        "left",
-        "transform",
-        "width",
-        "background",
-        "border",
-        "borderRadius",
-        "boxShadow",
-        "zIndex",
-        "maxHeight",
         "overflow"
       ]
     },

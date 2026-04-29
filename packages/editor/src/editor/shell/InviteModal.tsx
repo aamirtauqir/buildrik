@@ -105,7 +105,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
         }}
       />
       {/* Modal */}
-      <div
+      <Stack
         role="dialog"
         aria-label="Invite to Buildrik"
         aria-modal="true"
@@ -120,10 +120,9 @@ export const InviteModal: React.FC<InviteModalProps> = ({
           borderRadius: 14,
           boxShadow: "0 24px 64px rgba(0,0,0,0.15)",
           zIndex: 20001,
-          display: "flex",
-          flexDirection: "column",
           maxHeight: "90vh",
           overflow: "hidden",
+          gap: 0,
         }}
       >
         {/* Header */}
@@ -419,7 +418,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
             Send Invite
           </Button>
         </div>
-      </div>
+      </Stack>
     </>
   );
 };

@@ -397,7 +397,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
   };
 
   return (
-    <div
+    <Stack
       role="dialog"
       aria-label="Account Settings"
       aria-modal="true"
@@ -406,8 +406,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
         inset: 0,
         zIndex: 20001,
         background: "var(--buildrick-bg-panel)",
-        display: "flex",
-        flexDirection: "column",
+        gap: 0,
       }}
     >
       {/* Top bar */}
@@ -447,15 +446,13 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
       <div style={{ display: "flex", flex: 1, overflow: "hidden", minHeight: 0 }}>
 
         {/* Left sidebar nav */}
-        <div
+        <Stack
           style={{
             width: 280,
             flexShrink: 0,
             background: "var(--buildrick-bg-card)",
             borderRight: "1px solid #D1D5DB",
             padding: "20px 16px",
-            display: "flex",
-            flexDirection: "column",
             gap: 6,
           }}
         >
@@ -486,24 +483,22 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
               </Button>
             );
           })}
-        </div>
+        </Stack>
 
         {/* Right content area */}
-        <div
+        <Stack
           style={{
             flex: 1,
             overflowY: "auto",
             padding: "24px 28px",
             background: "var(--buildrick-bg-panel)",
-            display: "flex",
-            flexDirection: "column",
             gap: 20,
           }}
         >
           {renderContent()}
-        </div>
+        </Stack>
       </div>
-    </div>
+    </Stack>
   );
 };
 
