@@ -62,7 +62,7 @@ const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
       background: isPublished
         ? "var(--bd-success-bg, rgba(34, 197, 94, 0.12))"
         : "rgba(245, 158, 11, 0.15)",
-      color: isPublished ? "var(--bd-success, #22c55e)" : "#F59E0B",
+      color: isPublished ? "var(--bd-success, #22c55e)" : "var(--bd-warning)",
     }}
   >
     <span
@@ -72,7 +72,7 @@ const StatusBadge: React.FC<{ isPublished: boolean }> = ({ isPublished }) => (
         borderRadius: "50%",
         background: isPublished
           ? "var(--bd-success, #22c55e)"
-          : "#F59E0B",
+          : "var(--bd-warning)",
       }}
     />
     {isPublished ? "Published" : "Draft"}

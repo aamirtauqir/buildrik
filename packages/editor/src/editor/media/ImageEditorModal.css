@@ -127,7 +127,7 @@
 }
 
 .ie-canvas-error svg {
-  color: #F59E0B;
+  color: var(--bd-warning);
   opacity: 0.9;
 }
 
