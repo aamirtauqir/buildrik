@@ -205,7 +205,7 @@ const lockedBtnStyle: React.CSSProperties = {
   padding: "8px 16px",
   borderRadius: "var(--buildrick-radius-sm)",
   background: "var(--bd-accent)",
-  color: "#fff",
+  color: "var(--bd-fg-on-accent)",
   border: "none",
   font: "600 12px var(--bd-font)",
   cursor: "pointer",
