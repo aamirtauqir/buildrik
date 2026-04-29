@@ -1,5 +1,6 @@
 import { Select } from "@/editor/shared/vibcoder/Select";
 import { Input } from "@/editor/shared/vibcoder/Input";
+import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette. Chrome-hex lint rules do not apply.
@@ -434,7 +435,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
           {/* Description */}
           <div>
             <label style={s.label}>Description (optional)</label>
-            <textarea
+            <Textarea
               style={s.textarea}
               placeholder="Describe the purpose of this collection…"
               value={description}

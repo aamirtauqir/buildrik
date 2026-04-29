@@ -1,5 +1,6 @@
 import { Checkbox } from "@/editor/shared/vibcoder/Checkbox";
 import { Input } from "@/editor/shared/vibcoder/Input";
+import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 /**
  * CreateComponentModal - Modal for creating reusable components
  * Allows users to save selected elements as reusable components
@@ -156,7 +157,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
 
         <div>
           <label style={labelStyles}>Description</label>
-          <textarea
+          <Textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Optional description..."

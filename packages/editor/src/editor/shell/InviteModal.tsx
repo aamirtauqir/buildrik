@@ -1,5 +1,6 @@
 import { Select } from "@/editor/shared/vibcoder/Select";
 import { Input } from "@/editor/shared/vibcoder/Input";
+import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * InviteModal — "Invite to Buildrik" overlay
@@ -280,7 +281,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
             <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--buildrick-text-secondary)", marginBottom: 6 }}>
               Message <span style={{ fontWeight: 400, color: "var(--buildrick-text-tertiary)" }}>(optional)</span>
             </label>
-            <textarea
+            <Textarea
               placeholder="Add a personal message…"
               value={message}
               onChange={(e) => setMessage(e.target.value)}

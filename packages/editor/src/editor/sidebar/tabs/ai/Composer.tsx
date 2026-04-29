@@ -1,4 +1,5 @@
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import * as React from "react";
 import type { AIModel } from "./types";
 import { ModelPicker } from "./ModelPicker";
@@ -25,7 +26,7 @@ export const Composer: React.FC<ComposerProps> = ({
 
   return (
     <div className="bd-ai-composer">
-      <textarea
+      <Textarea
         className="bd-ai-composer-input"
         placeholder="Ask Claude…"
         aria-label="Prompt"
