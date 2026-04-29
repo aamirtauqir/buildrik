@@ -1,100 +1,10 @@
 {
   "token-match": [
     {
-      "file": "packages/editor/src/editor/animation/AnimationEditor.tsx",
-      "line": 116,
-      "hex": "#FFF",
-      "snippet": "color: animation.type === anim.value ? \"#fff\" : \"var(--buildrick-text-secondary)\",",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/animation/AnimationEditor.tsx",
-      "line": 206,
-      "hex": "#FFF",
-      "snippet": "color: animation.trigger === trigger ? \"#fff\" : \"var(--buildrick-text-secondary)\",",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/canvas/Canvas.css",
-      "line": 149,
-      "hex": "#FFF",
-      "snippet": "color: #fff;",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/canvas/Canvas.css",
-      "line": 170,
-      "hex": "#FFF",
-      "snippet": "background: #fff;",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/canvas/Canvas.css",
-      "line": 417,
-      "hex": "#FFF",
-      "snippet": "color: #fff;",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/canvas/controls/QuickAddBar.tsx",
-      "line": 90,
-      "hex": "#FFF",
-      "snippet": "color: hovered === block.id && !disabled ? \"#fff\" : \"#cdd6f4\",",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/canvas/overlays/RemoteCursorsOverlay.tsx",
-      "line": 94,
-      "hex": "#FFF",
-      "snippet": "stroke=\"#fff\"",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
       "file": "packages/editor/src/editor/canvas/overlays/TemplatePreviewPanel.tsx",
       "line": 64,
       "hex": "#FFF",
       "snippet": "background: #fff;",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/export/ExportModal.tsx",
-      "line": 341,
-      "hex": "#FFF",
-      "snippet": "color: previewDevice === device ? \"#fff\" : \"var(--buildrick-text-primary)\",",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/export/ExportOptions.tsx",
-      "line": 269,
-      "hex": "#FFF",
-      "snippet": "color: config.cssStyle === style ? \"#fff\" : \"var(--buildrick-text-primary)\",",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/export/ExportOptions.tsx",
-      "line": 323,
-      "hex": "#FFF",
-      "snippet": "color: cmsSettings.mode === mode ? \"#fff\" : \"var(--buildrick-text-primary)\",",
       "class": "token-match",
       "token": "--buildrick-bg-card",
       "distance": 0
@@ -109,145 +19,10 @@
       "distance": 0
     },
     {
-      "file": "packages/editor/src/editor/media/ImageEditorModal.css",
-      "line": 65,
-      "hex": "#FFF",
-      "snippet": "color: #fff;",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/media/ImageEditorModal.css",
-      "line": 122,
-      "hex": "#FFF",
-      "snippet": "color: #fff;",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/media/ImageEditorModal.css",
-      "line": 224,
-      "hex": "#FFF",
-      "snippet": "border: 2px solid #fff;",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/media/LibraryManager.css",
-      "line": 138,
-      "hex": "#FFF",
-      "snippet": "color: #fff;",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/media/LibraryManager.css",
-      "line": 463,
-      "hex": "#FFF",
-      "snippet": "color: #fff;",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/media/LibraryManager.css",
-      "line": 496,
-      "hex": "#FFF",
-      "snippet": "color: #fff;",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
       "file": "packages/editor/src/editor/onboarding/OnboardingChecklist.tsx",
       "line": 189,
       "hex": "#FFF",
       "snippet": "{isCompleted && <Check size={10} strokeWidth={3} color=\"#fff\" />}",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/panels/RichTextEditor.tsx",
-      "line": 193,
-      "hex": "#FFF",
-      "snippet": "color: isActive ? \"#fff\" : \"var(--buildrick-text-secondary)\",",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/panels/RichTextEditor.tsx",
-      "line": 249,
-      "hex": "#FFF",
-      "snippet": "color: activeStyles.link ? \"#fff\" : \"var(--buildrick-text-secondary)\",",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/shared/EmptyStates.css",
-      "line": 47,
-      "hex": "#FFF",
-      "snippet": "color: #fff;",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/media/components/StockSourceModal.tsx",
-      "line": 30,
-      "hex": "#FFF",
-      "snippet": "{ id: \"black_and_white\", label: \"B&W\", hex: \"linear-gradient(45deg, #000 50%, #fff 50%)\" },",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.css",
-      "line": 529,
-      "hex": "#FFF",
-      "snippet": ".bd-pg-bulk-count b { color: #fff; font-weight: 600; }",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.css",
-      "line": 541,
-      "hex": "#FFF",
-      "snippet": ".bd-pg-bulk-toolbar button:hover { background: rgba(255,255,255,0.10); color: #fff; }",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.css",
-      "line": 543,
-      "hex": "#FFF",
-      "snippet": ".bd-pg-bulk-toolbar button.danger:hover { background: rgba(252,165,165,0.15); color: #fff; }",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/settings/shared.tsx",
-      "line": 208,
-      "hex": "#FFF",
-      "snippet": "color: \"#fff\",",
-      "class": "token-match",
-      "token": "--buildrick-bg-card",
-      "distance": 0
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/templates/TemplatePreviewModal.css",
-      "line": 199,
-      "hex": "#FFF",
-      "snippet": "color: #fff;",
       "class": "token-match",
       "token": "--buildrick-bg-card",
       "distance": 0
@@ -912,42 +687,6 @@
       "distance": 6.782329983125268
     },
     {
-      "file": "packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 133,
-      "hex": "#D1D5DB",
-      "snippet": "border: \"1px solid #D1D5DB\",",
-      "class": "near-match",
-      "token": "--buildrick-border-medium",
-      "distance": 8.48528137423857
-    },
-    {
-      "file": "packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 155,
-      "hex": "#D1D5DB",
-      "snippet": "border: \"1px solid #D1D5DB\",",
-      "class": "near-match",
-      "token": "--buildrick-border-medium",
-      "distance": 8.48528137423857
-    },
-    {
-      "file": "packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 418,
-      "hex": "#D1D5DB",
-      "snippet": "borderBottom: \"1px solid #D1D5DB\",",
-      "class": "near-match",
-      "token": "--buildrick-border-medium",
-      "distance": 8.48528137423857
-    },
-    {
-      "file": "packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 454,
-      "hex": "#D1D5DB",
-      "snippet": "borderRight: \"1px solid #D1D5DB\",",
-      "class": "near-match",
-      "token": "--buildrick-border-medium",
-      "distance": 8.48528137423857
-    },
-    {
       "file": "packages/editor/src/editor/shell/BreakpointDropdown.tsx",
       "line": 106,
       "hex": "#D1D9E6",
@@ -982,15 +721,6 @@
       "class": "near-match",
       "token": "--buildrick-border-medium",
       "distance": 8.774964387392123
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/history/components/TimeTravelScrubber.tsx",
-      "line": 170,
-      "hex": "#F5F5F5",
-      "snippet": "layer.style.background = \"#f5f5f5\";",
-      "class": "near-match",
-      "token": "--buildrick-bg-subtle",
-      "distance": 5.656854249492381
     },
     {
       "file": "packages/editor/src/editor/sidebar/tabs/templates/templatesData.ts",
@@ -1140,60 +870,6 @@
     },
     {
       "file": "packages/editor/src/editor/canvas/Canvas.css",
-      "line": 668,
-      "hex": "#1E1E2E",
-      "snippet": "color: #1e1e2e;",
-      "class": "off-token",
-      "token": null,
-      "distance": 17.029386365926403
-    },
-    {
-      "file": "packages/editor/src/editor/canvas/Canvas.css",
-      "line": 674,
-      "hex": "#1E1E2E",
-      "snippet": "color: #1e1e2e;",
-      "class": "off-token",
-      "token": null,
-      "distance": 17.029386365926403
-    },
-    {
-      "file": "packages/editor/src/editor/canvas/Canvas.css",
-      "line": 679,
-      "hex": "#1E1E2E",
-      "snippet": "color: #1e1e2e;",
-      "class": "off-token",
-      "token": null,
-      "distance": 17.029386365926403
-    },
-    {
-      "file": "packages/editor/src/editor/canvas/Canvas.css",
-      "line": 685,
-      "hex": "#1E1E2E",
-      "snippet": "color: #1e1e2e;",
-      "class": "off-token",
-      "token": null,
-      "distance": 17.029386365926403
-    },
-    {
-      "file": "packages/editor/src/editor/canvas/Canvas.css",
-      "line": 690,
-      "hex": "#1E1E2E",
-      "snippet": "color: #1e1e2e;",
-      "class": "off-token",
-      "token": null,
-      "distance": 17.029386365926403
-    },
-    {
-      "file": "packages/editor/src/editor/canvas/Canvas.css",
-      "line": 695,
-      "hex": "#1E1E2E",
-      "snippet": "color: #1e1e2e;",
-      "class": "off-token",
-      "token": null,
-      "distance": 17.029386365926403
-    },
-    {
-      "file": "packages/editor/src/editor/canvas/Canvas.css",
       "line": 748,
       "hex": "#F97316",
       "snippet": "color: #f97316;",
@@ -1241,7 +917,7 @@
       "file": "packages/editor/src/editor/canvas/controls/QuickAddBar.tsx",
       "line": 90,
       "hex": "#CDD6F4",
-      "snippet": "color: hovered === block.id && !disabled ? \"#fff\" : \"#cdd6f4\",",
+      "snippet": "color: hovered === block.id && !disabled ? \"var(--buildrick-bg-card)\" : \"#cdd6f4\",",
       "class": "off-token",
       "token": null,
       "distance": 19.131126469708992
@@ -1308,15 +984,6 @@
       "class": "off-token",
       "token": null,
       "distance": 28.948229652260256
-    },
-    {
-      "file": "packages/editor/src/editor/canvas/overlays/DropFeedbackOverlay.tsx",
-      "line": 55,
-      "hex": "#1E1E2E",
-      "snippet": "badgeBg: \"#1e1e2e\",",
-      "class": "off-token",
-      "token": null,
-      "distance": 17.029386365926403
     },
     {
       "file": "packages/editor/src/editor/canvas/overlays/ElementHoverOverlaySubComponents.tsx",
@@ -1416,15 +1083,6 @@
       "class": "off-token",
       "token": null,
       "distance": 48.27007354458868
-    },
-    {
-      "file": "packages/editor/src/editor/canvas/spots/CanvasSpotSpacing.css",
-      "line": 75,
-      "hex": "#1A1A2E",
-      "snippet": "color: #1a1a2e;",
-      "class": "off-token",
-      "token": null,
-      "distance": 12.083045973594572
     },
     {
       "file": "packages/editor/src/editor/canvas/spots/CanvasSpotSpacing.tsx",
@@ -1569,15 +1227,6 @@
       "class": "off-token",
       "token": null,
       "distance": 70.34912934784623
-    },
-    {
-      "file": "packages/editor/src/editor/export/ExportOptions.tsx",
-      "line": 357,
-      "hex": "#1E1E2E",
-      "snippet": "color: cmsSettings.syntax === syntax ? \"#1e1e2e\" : \"var(--buildrick-text-primary)\",",
-      "class": "off-token",
-      "token": null,
-      "distance": 17.029386365926403
     },
     {
       "file": "packages/editor/src/editor/export/PreviewFrame.tsx",
@@ -2175,27 +1824,9 @@
     },
     {
       "file": "packages/editor/src/editor/sidebar/tabs/build/BuildTab.css",
-      "line": 808,
-      "hex": "#4D7FFF",
-      "snippet": "background: linear-gradient(135deg, var(--bd-accent, var(--bd-accent)) 0%, #4D7FFF 100%);",
-      "class": "off-token",
-      "token": null,
-      "distance": 14.142135623730951
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/build/BuildTab.css",
-      "line": 832,
-      "hex": "#4D7FFF",
-      "snippet": "background: linear-gradient(135deg, #4D7FFF 0%, #6D8FFF 100%);",
-      "class": "off-token",
-      "token": null,
-      "distance": 14.142135623730951
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/build/BuildTab.css",
       "line": 832,
       "hex": "#6D8FFF",
-      "snippet": "background: linear-gradient(135deg, #4D7FFF 0%, #6D8FFF 100%);",
+      "snippet": "background: linear-gradient(135deg, var(--bd-accent-hover) 0%, #6D8FFF 100%);",
       "class": "off-token",
       "token": null,
       "distance": 34.058772731852805
@@ -2240,7 +1871,7 @@
       "file": "packages/editor/src/editor/sidebar/tabs/media/components/StockSourceModal.tsx",
       "line": 30,
       "hex": "#000",
-      "snippet": "{ id: \"black_and_white\", label: \"B&W\", hex: \"linear-gradient(45deg, #000 50%, #fff 50%)\" },",
+      "snippet": "{ id: \"black_and_white\", label: \"B&W\", hex: \"linear-gradient(45deg, #000 50%, var(--buildrick-bg-card) 50%)\" },",
       "class": "off-token",
       "token": null,
       "distance": 50.17967716117751
