@@ -300,9 +300,27 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         return true; // assume true if API not available
       } catch { return true; }
     })();
-    const hasSeoTitle = false;   // TODO: wire when composer.getSeoData() is available
-    const hasMetaDesc = false;   // TODO: wire when composer.getSeoData() is available
-    const hasSocialImg = false;  // TODO: wire when composer.getSeoData() is available
+    const hasSeoTitle = (() => {
+      try {
+        const settings = _composer?.getProjectSettings?.();
+        const title = settings?.seo?.metaTitle;
+        return typeof title === "string" && title.trim().length > 0;
+      } catch { return false; }
+    })();
+    const hasMetaDesc = (() => {
+      try {
+        const settings = _composer?.getProjectSettings?.();
+        const desc = settings?.seo?.metaDescription;
+        return typeof desc === "string" && desc.trim().length > 0;
+      } catch { return false; }
+    })();
+    const hasSocialImg = (() => {
+      try {
+        const settings = _composer?.getProjectSettings?.();
+        const img = settings?.seo?.ogImage;
+        return typeof img === "string" && img.trim().length > 0;
+      } catch { return false; }
+    })();
     return { hasContent, hasPageTitle, hasFavicon, hasPages, hasSeoTitle, hasMetaDesc, hasSocialImg };
   }, [_composer]);
 
