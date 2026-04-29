@@ -586,8 +586,7 @@ else
     | jq -s 'add | length' 2>/dev/null || echo "0")
 fi
 
-BASE_24=$(sed -n '5p' "$BASELINE_FILE" 2>/dev/null || echo "0")
-check_gate 24 "$GATE24_HITS" "$BASE_24" "inline <button>/<input>/<select>/<textarea> in editor/ (use vibcoder shim @/shared/ui)" || exit 1
+check_gate 24 "$GATE24_HITS" "0" "inline <button>/<input>/<select>/<textarea> in editor/ (use vibcoder shim @/shared/ui) — ZERO TOLERANCE" || exit 1
 
 # Gate 25: Orphan codemod fixtures.
 # Every `*.input.tsx`/`*.output.tsx` must be referenced by SOME test file —
