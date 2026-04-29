@@ -834,24 +834,6 @@
   "off-token": [
     {
       "file": "packages/editor/src/editor/canvas/Canvas.css",
-      "line": 229,
-      "hex": "#F0F0F0",
-      "snippet": "background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);",
-      "class": "off-token",
-      "token": null,
-      "distance": 10.344080432788601
-    },
-    {
-      "file": "packages/editor/src/editor/canvas/Canvas.css",
-      "line": 229,
-      "hex": "#E0E0E0",
-      "snippet": "background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);",
-      "class": "off-token",
-      "token": null,
-      "distance": 18
-    },
-    {
-      "file": "packages/editor/src/editor/canvas/Canvas.css",
       "line": 257,
       "hex": "#F38BA8",
       "snippet": "outline: 2px dotted #f38ba8;",
@@ -975,15 +957,6 @@
       "class": "off-token",
       "token": null,
       "distance": 69.03622237637282
-    },
-    {
-      "file": "packages/editor/src/editor/canvas/overlays/DropFeedbackOverlay.tsx",
-      "line": 54,
-      "hex": "#1E293B",
-      "snippet": "text: \"#1e293b\",",
-      "class": "off-token",
-      "token": null,
-      "distance": 28.948229652260256
     },
     {
       "file": "packages/editor/src/editor/canvas/overlays/ElementHoverOverlaySubComponents.tsx",
@@ -1110,15 +1083,6 @@
       "class": "off-token",
       "token": null,
       "distance": 85.0881895447306
-    },
-    {
-      "file": "packages/editor/src/editor/ecommerce/CollectionSetupModal.tsx",
-      "line": 159,
-      "hex": "#3B82F6",
-      "snippet": "accentColor: \"#3b82f6\",",
-      "class": "off-token",
-      "token": null,
-      "distance": 21.400934559032695
     },
     {
       "file": "packages/editor/src/editor/export/CodePreview.tsx",
@@ -1335,51 +1299,6 @@
       "class": "off-token",
       "token": null,
       "distance": 34.79942528261063
-    },
-    {
-      "file": "packages/editor/src/editor/media/ImageEditorModal.css",
-      "line": 130,
-      "hex": "#F59E0B",
-      "snippet": "color: #F59E0B;",
-      "class": "off-token",
-      "token": null,
-      "distance": 48.27007354458868
-    },
-    {
-      "file": "packages/editor/src/editor/media/LibraryManager.css",
-      "line": 825,
-      "hex": "#FECACA",
-      "snippet": "border-color: #FECACA;",
-      "class": "off-token",
-      "token": null,
-      "distance": 55.92852581643825
-    },
-    {
-      "file": "packages/editor/src/editor/media/LibraryManager.css",
-      "line": 828,
-      "hex": "#FEE2E2",
-      "snippet": ".mgr-det-actions .mgr-btn.danger:hover { background: #FEE2E2; }",
-      "class": "off-token",
-      "token": null,
-      "distance": 31.874754901018456
-    },
-    {
-      "file": "packages/editor/src/editor/media/LibraryManager.css",
-      "line": 873,
-      "hex": "#FEF3C7",
-      "snippet": "background: #FEF3C7;",
-      "class": "off-token",
-      "token": null,
-      "distance": 50.85272854036448
-    },
-    {
-      "file": "packages/editor/src/editor/media/LibraryManager.css",
-      "line": 874,
-      "hex": "#92400E",
-      "snippet": "color: #92400E;",
-      "class": "off-token",
-      "token": null,
-      "distance": 82.02438661763951
     },
     {
       "file": "packages/editor/src/editor/media/LibraryManager.tsx",
@@ -1661,15 +1580,6 @@
       "distance": 34.64101615137755
     },
     {
-      "file": "packages/editor/src/editor/shell/InviteModal.tsx",
-      "line": 212,
-      "hex": "#166534",
-      "snippet": "color: copied ? \"#166534\" : \"var(--bd-fg-primary)\",",
-      "class": "off-token",
-      "token": null,
-      "distance": 56.79788728465171
-    },
-    {
       "file": "packages/editor/src/editor/shell/PublishDropdown.tsx",
       "line": 49,
       "hex": "#92400E",
@@ -1769,33 +1679,6 @@
       "distance": 17.320508075688775
     },
     {
-      "file": "packages/editor/src/editor/shell/PublishDropdown.tsx",
-      "line": 127,
-      "hex": "#166534",
-      "snippet": "<svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#166534\" strokeWidth=\"2.5\" strokeLinecap=\"round\" strokeLinejoin=\"round\" aria-hidden=\"true\">",
-      "class": "off-token",
-      "token": null,
-      "distance": 56.79788728465171
-    },
-    {
-      "file": "packages/editor/src/editor/shell/PublishDropdown.tsx",
-      "line": 295,
-      "hex": "#EF4444",
-      "snippet": "color: opt.danger ? \"#EF4444\" : opt.disabled ? \"var(--bd-fg-muted)\" : \"var(--bd-fg-primary)\",",
-      "class": "off-token",
-      "token": null,
-      "distance": 46.486557196677836
-    },
-    {
-      "file": "packages/editor/src/editor/shell/PublishDropdown.tsx",
-      "line": 305,
-      "hex": "#FEF2F2",
-      "snippet": "e.currentTarget.style.background = opt.danger ? \"#FEF2F2\" : \"var(--bd-bg-panel)\";",
-      "class": "off-token",
-      "token": null,
-      "distance": 14.142135623730951
-    },
-    {
       "file": "packages/editor/src/editor/shell/modals/CMSCollectionSetupModal.tsx",
       "line": 213,
       "hex": "#86EFAC",
@@ -1830,42 +1713,6 @@
       "class": "off-token",
       "token": null,
       "distance": 34.058772731852805
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/design/styles/design-tokens.css",
-      "line": 198,
-      "hex": "#EF4444",
-      "snippet": "border-color: #ef4444;",
-      "class": "off-token",
-      "token": null,
-      "distance": 46.486557196677836
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/design/styles/design-tokens.css",
-      "line": 229,
-      "hex": "#EF4444",
-      "snippet": "color: #ef4444;",
-      "class": "off-token",
-      "token": null,
-      "distance": 46.486557196677836
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/design/styles/design-tokens.css",
-      "line": 235,
-      "hex": "#F59E0B",
-      "snippet": "color: #f59e0b;",
-      "class": "off-token",
-      "token": null,
-      "distance": 48.27007354458868
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/history/components/TimeTravelScrubber.tsx",
-      "line": 227,
-      "hex": "#666",
-      "snippet": "label.style.color = \"#666\";",
-      "class": "off-token",
-      "token": null,
-      "distance": 39.61060464067672
     },
     {
       "file": "packages/editor/src/editor/sidebar/tabs/media/components/StockSourceModal.tsx",
@@ -1977,15 +1824,6 @@
     },
     {
       "file": "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.css",
-      "line": 277,
-      "hex": "#475569",
-      "snippet": ".bd-pg-chip.draft     { background: var(--bd-bg-subtle); color: #475569; }",
-      "class": "off-token",
-      "token": null,
-      "distance": 34.64101615137755
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.css",
       "line": 278,
       "hex": "#FEF3C7",
       "snippet": ".bd-pg-chip.scheduled { background: #FEF3C7; color: #92400E; }",
@@ -2001,15 +1839,6 @@
       "class": "off-token",
       "token": null,
       "distance": 82.02438661763951
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.css",
-      "line": 279,
-      "hex": "#475569",
-      "snippet": ".bd-pg-chip.hidden    { background: var(--bd-bg-subtle); color: #475569; } /* contrast-fix per design review */",
-      "class": "off-token",
-      "token": null,
-      "distance": 34.64101615137755
     },
     {
       "file": "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.css",
@@ -2031,48 +1860,12 @@
     },
     {
       "file": "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.css",
-      "line": 282,
-      "hex": "#FEE2E2",
-      "snippet": ".bd-pg-chip.error     { background: #FEE2E2; color: #991B1B; }",
-      "class": "off-token",
-      "token": null,
-      "distance": 31.874754901018456
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.css",
-      "line": 282,
-      "hex": "#991B1B",
-      "snippet": ".bd-pg-chip.error     { background: #FEE2E2; color: #991B1B; }",
-      "class": "off-token",
-      "token": null,
-      "distance": 68.78226515607058
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/pages/PagesTab.css",
       "line": 542,
       "hex": "#FCA5A5",
       "snippet": ".bd-pg-bulk-toolbar button.danger { color: #FCA5A5; }",
       "class": "off-token",
       "token": null,
       "distance": 91.13177272499422
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/publish/PublishTab.tsx",
-      "line": 65,
-      "hex": "#F59E0B",
-      "snippet": "color: isPublished ? \"var(--bd-success, #22c55e)\" : \"#F59E0B\",",
-      "class": "off-token",
-      "token": null,
-      "distance": 48.27007354458868
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/publish/PublishTab.tsx",
-      "line": 75,
-      "hex": "#F59E0B",
-      "snippet": ": \"#F59E0B\",",
-      "class": "off-token",
-      "token": null,
-      "distance": 48.27007354458868
     },
     {
       "file": "packages/editor/src/editor/sidebar/tabs/templates/TemplatePreviewModal.tsx",
@@ -2082,69 +1875,6 @@
       "class": "off-token",
       "token": null,
       "distance": 30.822070014844883
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/templates/TemplatesTab.css",
-      "line": 444,
-      "hex": "#FEE2E2",
-      "snippet": "background: #FEE2E2;",
-      "class": "off-token",
-      "token": null,
-      "distance": 31.874754901018456
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/templates/TemplatesTab.css",
-      "line": 445,
-      "hex": "#FECACA",
-      "snippet": "border: 1px solid #FECACA;",
-      "class": "off-token",
-      "token": null,
-      "distance": 55.92852581643825
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/templates/TemplatesTab.css",
-      "line": 448,
-      "hex": "#991B1B",
-      "snippet": "color: #991B1B;",
-      "class": "off-token",
-      "token": null,
-      "distance": 68.78226515607058
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/templates/TemplatesTab.css",
-      "line": 478,
-      "hex": "#991B1B",
-      "snippet": "color: #991B1B;",
-      "class": "off-token",
-      "token": null,
-      "distance": 68.78226515607058
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/templates/TemplatesTab.css",
-      "line": 525,
-      "hex": "#FFFBEB",
-      "snippet": "background: #FFFBEB;",
-      "class": "off-token",
-      "token": null,
-      "distance": 18.411952639521967
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/templates/TemplatesTab.css",
-      "line": 526,
-      "hex": "#FDE68A",
-      "snippet": "border: 1px solid #FDE68A;",
-      "class": "off-token",
-      "token": null,
-      "distance": 101.7742600071354
-    },
-    {
-      "file": "packages/editor/src/editor/sidebar/tabs/templates/TemplatesTab.css",
-      "line": 531,
-      "hex": "#92400E",
-      "snippet": "color: #92400E;",
-      "class": "off-token",
-      "token": null,
-      "distance": 82.02438661763951
     },
     {
       "file": "packages/editor/src/editor/sidebar/tabs/templates/templatesData.ts",
