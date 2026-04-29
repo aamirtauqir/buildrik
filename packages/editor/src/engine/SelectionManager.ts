@@ -6,7 +6,8 @@
  * @license BSD-3-Clause
  */
 
-import { getDOMElement, getElementBounds, type Rect } from "./canvas/canvasGeometry";
+import { getElementBounds, type Rect } from "./canvas/canvasGeometry";
+import { getDOMElement } from "./canvas/resize/utils";
 import type { Composer } from "./Composer";
 import type { Element } from "./elements/Element";
 

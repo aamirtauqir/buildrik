@@ -9,10 +9,7 @@
 import type { Rect } from "../../shared/types/geometry";
 import { parseNumericValue } from "../../shared/utils/helpers";
 // Import canonical DOM utilities from resize/utils.ts
-import {
-  getCanvasContainer as _getCanvasContainer,
-  getDOMElement as _getDOMElement,
-} from "./resize/utils";
+import { getCanvasContainer as _getCanvasContainer } from "./resize/utils";
 
 // ============================================
 // Types
@@ -36,35 +33,14 @@ export interface ElementBoundsWithSpacing extends Rect {
 // ============================================
 
 /**
- * Get canvas container element
- * @canonical src/engine/canvas/resize/utils.ts - Import from there for new code
- */
-export const getCanvasContainer: () => HTMLElement | null = _getCanvasContainer;
-
-/**
  * Get canvas container rect
  */
 export function getCanvasRect():
   | DOMRect
   | { left: number; top: number; width: number; height: number } {
-  const canvas = getCanvasContainer();
+  const canvas = _getCanvasContainer();
   return canvas?.getBoundingClientRect() || { left: 0, top: 0, width: 0, height: 0 };
 }
-
-/**
- * Get DOM element by ID
- * @deprecated Use getDOMElement from resize/utils.ts instead
- * @canonical src/engine/canvas/resize/utils.ts
- */
-
-export const getDOMElementById: (elementId: string) => HTMLElement | null = _getDOMElement;
-
-/**
- * Get DOM element by element ID (canonical name)
- * @canonical src/engine/canvas/resize/utils.ts
- */
-
-export const getDOMElement: (elementId: string) => HTMLElement | null = _getDOMElement;
 
 // ============================================
 // Bounds Calculation
