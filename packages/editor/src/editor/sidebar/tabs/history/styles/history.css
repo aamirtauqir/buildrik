@@ -300,7 +300,7 @@
 
 .entry-badge.current-badge {
   background: var(--bd-accent);
-  color: #fff;
+  color: var(--bd-bg-card);
 }
 
 .entry-badge.auto-save {
@@ -571,7 +571,7 @@
   border: none;
   border-radius: var(--bd-radius-md);
   background: var(--bd-accent);
-  color: #fff;
+  color: var(--bd-bg-card);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -675,7 +675,7 @@
 .save-btn {
   padding: 7px var(--bd-space-4);
   background: var(--bd-accent);
-  color: #fff;
+  color: var(--bd-bg-card);
   border: none;
   border-radius: var(--bd-radius-sm);
   font-size: 13px;
@@ -1023,7 +1023,7 @@
 .tt-restore-btn {
   padding: var(--bd-space-2) var(--bd-space-5);
   background: var(--bd-accent);
-  color: #fff;
+  color: var(--bd-bg-card);
   border: none;
   border-radius: var(--bd-radius-sm);
   font-size: 13px;
@@ -1218,7 +1218,7 @@
 
 .milestone-btn.milestone-btn--primary {
   background: var(--bd-accent);
-  color: #fff;
+  color: var(--bd-bg-card);
 }
 
 .milestone-btn.milestone-btn--primary:hover {

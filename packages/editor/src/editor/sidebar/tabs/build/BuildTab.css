@@ -309,7 +309,7 @@
   font-size: 10px;
   padding: 2px 6px;
   border-radius: 4px;
-  background: linear-gradient(135deg, var(--bd-bg-subtle, var(--bd-bg-subtle)) 0%, #E8EEF5 100%);
+  background: linear-gradient(135deg, var(--bd-bg-subtle, var(--bd-bg-subtle)) 0%, var(--bd-border) 100%);
   color: var(--bd-fg-secondary, var(--bd-fg-muted));
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1.0);
   transition: all 0.2s ease-out;
@@ -397,7 +397,7 @@
   gap: var(--bd-space-1);
   padding: var(--bd-space-2) var(--bd-space-1);
   border-radius: 6px;
-  background: linear-gradient(135deg, var(--bd-bg-subtle, var(--bd-bg-subtle)) 0%, #E8EEF5 100%);
+  background: linear-gradient(135deg, var(--bd-bg-subtle, var(--bd-bg-subtle)) 0%, var(--bd-border) 100%);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
@@ -544,7 +544,7 @@
 
 .bld-sec-card:hover {
   border-color: var(--bd-accent, var(--bd-accent));
-  background: linear-gradient(135deg, var(--bd-bg-card, var(--bd-bg-card)) 0%, #F0F7FF 100%);
+  background: linear-gradient(135deg, var(--bd-bg-card, var(--bd-bg-card)) 0%, var(--bd-bg-subtle) 100%);
   box-shadow: 0 4px 16px rgba(45, 109, 255, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1.0);
   transform: translateY(-1px);
 }
@@ -806,7 +806,7 @@
   margin-left: 6px;
   padding: 2px 10px;
   background: linear-gradient(135deg, var(--bd-accent, var(--bd-accent)) 0%, #4D7FFF 100%);
-  color: #fff;
+  color: var(--bd-bg-card);
   border: 0;
   border-radius: 6px;
   font: inherit;

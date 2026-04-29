@@ -92,7 +92,7 @@
 }
 .bd-set-snav-row.on .bd-set-snav-badge {
   color: var(--bd-accent);
-  background: #fff;
+  background: var(--bd-bg-card);
 }
 
 /* ── Pane ── */
@@ -166,7 +166,7 @@
 .bd-set-input {
   width: 100%;
   padding: 7px 9px;
-  background: #fff;
+  background: var(--bd-bg-card);
   border: 1px solid var(--bd-border);
   border-radius: 5px;
   font: 500 11.5px var(--bd-font);
@@ -222,7 +222,7 @@ textarea.bd-set-input {
   top: 2px;
   width: 12px;
   height: 12px;
-  background: #fff;
+  background: var(--bd-bg-card);
   border-radius: 50%;
   transition: left 120ms;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
@@ -280,7 +280,7 @@ textarea.bd-set-input {
 }
 .bd-set-btn.pri {
   background: var(--bd-accent);
-  color: #fff;
+  color: var(--bd-bg-card);
 }
 .bd-set-btn.pri:hover {
   background: var(--bd-accent-hover);

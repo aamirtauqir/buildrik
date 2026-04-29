@@ -256,7 +256,7 @@
   cursor: pointer;
 }
 .bdc-layers-banner .bdc-icon-btn:hover {
-  background: #fff;
+  background: var(--bd-bg-card);
   color: var(--bd-fg-primary);
 }
 .bdc-layers-banner .bdc-icon-btn svg {
@@ -314,7 +314,7 @@
 .bdc-menu {
   position: fixed;
   z-index: 1000;
-  background: #fff;
+  background: var(--bd-bg-card);
   border: 1px solid var(--bd-border);
   border-radius: 8px;
   box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.18);
@@ -384,7 +384,7 @@
 .bdc-popover {
   position: absolute;
   z-index: 1000;
-  background: #fff;
+  background: var(--bd-bg-card);
   border: 1px solid var(--bd-border);
   border-radius: 8px;
   box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.18);
@@ -428,7 +428,7 @@
   left: 1px;
   width: 8px;
   height: 8px;
-  background: #fff;
+  background: var(--bd-bg-card);
   border-radius: 50%;
   transition: transform 120ms;
 }
@@ -505,7 +505,7 @@
 
 .bdc-layers-confirm .bdc-btn-danger {
   background: var(--bd-error);
-  color: #fff;
+  color: var(--bd-bg-card);
   border-color: var(--bd-error);
 }
 .bdc-layers-confirm .bdc-btn-danger:hover {
