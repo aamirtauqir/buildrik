@@ -62,7 +62,7 @@
   border-radius: 6px;
   border: 1px solid var(--buildrick-accent);
   background: var(--buildrick-accent);
-  color: #fff;
+  color: var(--buildrick-bg-card);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -119,7 +119,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  color: #fff;
+  color: var(--buildrick-bg-card);
   font-size: 13px;
   text-align: center;
   padding: var(--bd-space-5);
@@ -221,7 +221,7 @@
   border-radius: 50%;
   background: var(--buildrick-accent);
   cursor: pointer;
-  border: 2px solid #fff;
+  border: 2px solid var(--buildrick-bg-card);
   box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 

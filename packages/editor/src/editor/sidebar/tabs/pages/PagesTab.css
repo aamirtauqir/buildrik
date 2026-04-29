@@ -526,7 +526,7 @@
   color: rgba(255,255,255,0.85);
   font: 500 12px var(--bd-font);
 }
-.bd-pg-bulk-count b { color: #fff; font-weight: 600; }
+.bd-pg-bulk-count b { color: var(--buildrick-bg-card); font-weight: 600; }
 .bd-pg-bulk-spacer { flex: 1; }
 .bd-pg-bulk-toolbar button {
   padding: var(--bd-space-1) var(--bd-space-2);
@@ -538,9 +538,9 @@
   cursor: pointer;
   transition: background 100ms;
 }
-.bd-pg-bulk-toolbar button:hover { background: rgba(255,255,255,0.10); color: #fff; }
+.bd-pg-bulk-toolbar button:hover { background: rgba(255,255,255,0.10); color: var(--buildrick-bg-card); }
 .bd-pg-bulk-toolbar button.danger { color: #FCA5A5; }
-.bd-pg-bulk-toolbar button.danger:hover { background: rgba(252,165,165,0.15); color: #fff; }
+.bd-pg-bulk-toolbar button.danger:hover { background: rgba(252,165,165,0.15); color: var(--buildrick-bg-card); }
 .bd-pg-bulk-close {
   width: 22px; height: 22px;
   display: grid;

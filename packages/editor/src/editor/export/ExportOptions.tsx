@@ -266,7 +266,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
                     : "var(--buildrick-bg-panel-secondary)",
                 border: "none",
                 borderRadius: 6,
-                color: config.cssStyle === style ? "#fff" : "var(--buildrick-text-primary)",
+                color: config.cssStyle === style ? "var(--buildrick-bg-card)" : "var(--buildrick-text-primary)",
                 cursor: "pointer",
                 fontSize: 12,
                 textTransform: "capitalize",
@@ -320,7 +320,7 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
                       : "var(--buildrick-bg-panel-secondary)",
                   border: "none",
                   borderRadius: 6,
-                  color: cmsSettings.mode === mode ? "#fff" : "var(--buildrick-text-primary)",
+                  color: cmsSettings.mode === mode ? "var(--buildrick-bg-card)" : "var(--buildrick-text-primary)",
                   cursor: "pointer",
                   fontSize: 12,
                 }}

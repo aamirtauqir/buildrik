@@ -130,7 +130,7 @@ const TabProfile: React.FC = () => (
         readOnly
         style={{
           height: 40,
-          border: "1px solid #D1D5DB",
+          border: "1px solid var(--buildrick-border-medium)",
           borderRadius: 8,
           padding: "0 12px",
           fontSize: 13,
@@ -152,7 +152,7 @@ const TabProfile: React.FC = () => (
       <div
         style={{
           background: "var(--buildrick-bg-card)",
-          border: "1px solid #D1D5DB",
+          border: "1px solid var(--buildrick-border-medium)",
           borderRadius: 8,
           padding: 12,
         }}
@@ -415,7 +415,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
           height: 64,
           flexShrink: 0,
           background: "var(--buildrick-bg-card)",
-          borderBottom: "1px solid #D1D5DB",
+          borderBottom: "1px solid var(--buildrick-border-medium)",
           padding: "0 16px",
           display: "flex",
           alignItems: "center",
@@ -451,7 +451,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
             width: 280,
             flexShrink: 0,
             background: "var(--buildrick-bg-card)",
-            borderRight: "1px solid #D1D5DB",
+            borderRight: "1px solid var(--buildrick-border-medium)",
             padding: "20px 16px",
             gap: 6,
           }}

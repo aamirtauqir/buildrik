@@ -167,7 +167,7 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
       ? "none"
       : "opacity 150ms ease-out";
     layer.style.zIndex = "199";
-    layer.style.background = "#f5f5f5";
+    layer.style.background = "var(--buildrick-bg-subtle)";
     layer.style.display = "flex";
     layer.style.alignItems = "center";
     layer.style.justifyContent = "center";

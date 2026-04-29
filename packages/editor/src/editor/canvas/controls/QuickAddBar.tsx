@@ -87,7 +87,7 @@ export const QuickAddBar: React.FC<QuickAddBarProps> = ({ blocks, onAdd, disable
                 : "rgba(255,255,255,0.06)",
             border: "1px solid rgba(255,255,255,0.1)",
             borderRadius: 6,
-            color: hovered === block.id && !disabled ? "#fff" : "#cdd6f4",
+            color: hovered === block.id && !disabled ? "var(--buildrick-bg-card)" : "#cdd6f4",
             fontSize: 12,
             fontWeight: 500,
             cursor: disabled ? "not-allowed" : "pointer",

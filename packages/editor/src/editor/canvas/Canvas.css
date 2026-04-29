@@ -146,7 +146,7 @@
 
 [data-buildrick-id] button {
   background: var(--buildrick-accent);
-  color: #fff;
+  color: var(--buildrick-bg-card);
   border: none;
   border-radius: var(--buildrick-radius-md);
   padding: var(--buildrick-spacing-sm) var(--buildrick-spacing-md);
@@ -167,7 +167,7 @@
 [data-buildrick-id] textarea,
 [data-buildrick-id] select {
   color: var(--buildrick-text-primary);
-  background: #fff;
+  background: var(--buildrick-bg-card);
   border: 1px solid var(--buildrick-border);
   border-radius: var(--buildrick-radius-sm);
   padding: var(--buildrick-spacing-sm);
@@ -414,7 +414,7 @@
   gap: 6px;
   padding: var(--bd-space-3) var(--bd-space-5);
   background: var(--buildrick-accent);
-  color: #fff;
+  color: var(--buildrick-bg-card);
   border: none;
   border-radius: var(--buildrick-radius-md);
   font-size: 14px;

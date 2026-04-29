@@ -190,7 +190,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
                     style={{
                       ...toolbarButtonStyle,
                       background: isActive ? "var(--buildrick-accent)" : "transparent",
-                      color: isActive ? "#fff" : "var(--buildrick-text-secondary)",
+                      color: isActive ? "var(--buildrick-bg-card)" : "var(--buildrick-text-secondary)",
                       ...itemStyle,
                     }}
                   >
@@ -246,7 +246,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
             style={{
               ...toolbarButtonStyle,
               background: activeStyles.link ? "var(--buildrick-accent)" : "transparent",
-              color: activeStyles.link ? "#fff" : "var(--buildrick-text-secondary)",
+              color: activeStyles.link ? "var(--buildrick-bg-card)" : "var(--buildrick-text-secondary)",
             }}
             title="Insert Link"
           >
