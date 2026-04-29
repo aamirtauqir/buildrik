@@ -1,5 +1,6 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
  * CommandPalette — Studio-level Command Palette
  * Triggered by Ctrl+K / ⌘+K
@@ -274,11 +275,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
         }}
       />
       {/* Panel */}
-      <div
+      <Stack
         role="dialog"
         aria-label="Command Palette"
         aria-modal="true"
         style={{
+          gap: 0,
           position: "fixed",
           top: "20%",
           left: "50%",
@@ -290,8 +292,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           borderRadius: "var(--buildrick-radius-xl)",
           boxShadow: "var(--buildrick-shadow-2xl)",
           zIndex: "var(--buildrick-z-modal)",
-          display: "flex",
-          flexDirection: "column",
           overflow: "hidden",
         }}
       >
@@ -469,7 +469,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose, compose
           <span>↵ run</span>
           <span>Esc close</span>
         </div>
-      </div>
+      </Stack>
     </>
   );
 };

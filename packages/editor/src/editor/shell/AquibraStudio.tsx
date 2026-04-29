@@ -1,4 +1,5 @@
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
  * @lint-hex-policy: component-theme
  *   Intentional component-specific palette (error boundary / overlay / preview
@@ -73,15 +74,12 @@ class StudioErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div
+        <Stack
           style={{
             padding: 24,
             color: "#cdd6f4",
             background: "#11111b",
             height: "100vh",
-            display: "flex",
-            flexDirection: "column",
-            gap: 12,
           }}
         >
           <h2 style={{ margin: 0 }}>Something went wrong</h2>
@@ -102,7 +100,7 @@ class StudioErrorBoundary extends React.Component<
           >
             Reload
           </Button>
-        </div>
+        </Stack>
       );
     }
     return this.props.children;
@@ -383,11 +381,10 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   }
 
   return (
-    <div
+    <Stack
       className={`buildrick-studio ${className}`}
       style={{
-        display: "flex",
-        flexDirection: "column",
+        gap: 0,
         height: "100%",
         background: "var(--buildrick-bg-app, var(--bd-bg-panel))",
         color: "var(--buildrick-text-primary)",
@@ -585,7 +582,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onSkip={() => setShowWizard(false)}
         />
       )}
-    </div>
+    </Stack>
   );
 };
 

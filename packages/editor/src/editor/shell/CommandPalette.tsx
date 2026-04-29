@@ -1,6 +1,7 @@
 import { Kbd } from "@/editor/shared/vibcoder/Kbd";
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
  * CommandPalette — ⌘K overlay
  * Matches design spec: search input, action groups (Navigation/Edit/Save),
@@ -135,11 +136,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
         aria-hidden="true"
       />
       {/* Panel */}
-      <div
+      <Stack
         role="dialog"
         aria-label="Command palette"
         aria-modal="true"
         style={{
+          gap: 0,
           position: "fixed",
           top: 120,
           left: "50%",
@@ -151,8 +153,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
           borderRadius: 12,
           boxShadow: "0 20px 60px rgba(0,0,0,0.18)",
           zIndex: 20001,
-          display: "flex",
-          flexDirection: "column",
           overflow: "hidden",
         }}
       >
@@ -315,7 +315,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ onClose }) => {
             </span>
           ))}
         </div>
-      </div>
+      </Stack>
     </>
   );
 };

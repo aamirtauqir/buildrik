@@ -1,6 +1,6 @@
 {
   "counts": {
-    "stack-multi-prop": 8
+    "stack-multi-prop": 4
   },
   "sites": [
     {
@@ -27,77 +27,12 @@
       ]
     },
     {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AquibraStudio.tsx",
-      "line": 77,
-      "bucket": "stack-multi-prop",
-      "gap": 12,
-      "extraProps": [
-        "padding",
-        "color",
-        "background",
-        "height"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AquibraStudio.tsx",
-      "line": 388,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "height",
-        "background",
-        "color",
-        "fontFamily",
-        "position"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/CommandPalette.tsx",
-      "line": 142,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "position",
-        "top",
-        "left",
-        "transform",
-        "width",
-        "maxHeight",
-        "background",
-        "border",
-        "borderRadius",
-        "boxShadow",
-        "zIndex",
-        "overflow"
-      ]
-    },
-    {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/SidebarFallbacks.tsx",
       "line": 14,
       "bucket": "stack-multi-prop",
       "gap": 10,
       "extraProps": [
         "padding"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/modals/CommandPalette.tsx",
-      "line": 281,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "position",
-        "top",
-        "left",
-        "transform",
-        "width",
-        "maxWidth",
-        "background",
-        "border",
-        "borderRadius",
-        "boxShadow",
-        "zIndex",
-        "overflow"
       ]
     },
     {
