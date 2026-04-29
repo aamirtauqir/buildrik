@@ -20,9 +20,16 @@
         themes/design-system/color.css. Literal values here because this paints
         before default.css loads. Values MUST match the canonical DS V1 set.
         See DESIGN.md § Color.
+
+        The universal reset is wrapped in `@layer reset` so vendored vibcoder
+        atom rules (in @layer components) can override defaults like padding
+        on .bd-btn, .bd-topbar__status, etc. Cascade order is finalized in
+        themes/components/_layer.css: `@layer reset, tokens, components, overrides`.
       */
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      html, body, #root { min-height: 100vh; }
+      @layer reset {
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body, #root { min-height: 100vh; }
+      }
       body {
         font-family: 'Inter Tight', sans-serif;
         background: #F8FAFC;      /* --buildrick-bg-panel */
