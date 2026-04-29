@@ -94,7 +94,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 );
 Textarea.displayName = "Textarea";
 
-type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement>;
+type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "size">;
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, children, ...rest }, ref) => (
     <VibcoderSelect
