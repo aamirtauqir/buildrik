@@ -74,47 +74,47 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
               padding: 16,
               cursor: "pointer",
               textAlign: "left",
-              display: "flex",
-              flexDirection: "column",
-              gap: 8,
             }}
           >
-            {/* Icon placeholder */}
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                background: "var(--buildrick-surface-5)",
-                borderRadius: "var(--buildrick-radius-sm)",
-                flexShrink: 0,
-              }}
-            />
-            <div
-              style={{
-                fontSize: 14,
-                fontWeight: 500,
-                color: "var(--buildrick-text-primary)",
-              }}
-            >
-              {FORMAT_LABELS[fmt]}
-            </div>
-            <div
-              style={{
-                fontSize: 12,
-                color: "var(--buildrick-text-muted)",
-                lineHeight: 1.4,
-              }}
-            >
-              {FORMAT_DESCRIPTIONS[fmt]}
-            </div>
+            <Stack gap="sm">
+              {/* Icon placeholder */}
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  background: "var(--buildrick-surface-5)",
+                  borderRadius: "var(--buildrick-radius-sm)",
+                  flexShrink: 0,
+                }}
+              />
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: "var(--buildrick-text-primary)",
+                }}
+              >
+                {FORMAT_LABELS[fmt]}
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "var(--buildrick-text-muted)",
+                  lineHeight: 1.4,
+                }}
+              >
+                {FORMAT_DESCRIPTIONS[fmt]}
+              </div>
+            </Stack>
           </Button>
         );
       })}
 
       {/* Coming soon formats — non-interactive */}
       {COMING_SOON_FORMATS.map((fmt) => (
-        <div
+        <Stack
           key={fmt}
+          gap="sm"
           title="Coming soon"
           style={{
             background: "var(--buildrick-surface-3)",
@@ -122,9 +122,6 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
             borderRadius: "var(--buildrick-radius-md)",
             padding: 16,
             textAlign: "left",
-            display: "flex",
-            flexDirection: "column",
-            gap: 8,
             opacity: 0.5,
             pointerEvents: "none",
             userSelect: "none",
@@ -175,7 +172,7 @@ export const FormatGrid: React.FC<FormatGridProps> = ({ selectedFormat, onFormat
           >
             {FORMAT_DESCRIPTIONS[fmt]}
           </div>
-        </div>
+        </Stack>
       ))}
     </div>
   </div>

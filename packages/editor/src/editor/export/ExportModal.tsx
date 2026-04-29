@@ -17,6 +17,7 @@ import {
   OverlayMount,
 } from "@/editor/shared/vibcoder";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
 import { Tabs, Tab } from "@/editor/shared/vibcoder/Tabs";
 import { Spinner } from "@/editor/shared/vibcoder/Spinner";
 import { devError } from "../../shared/utils/devLogger";
@@ -292,36 +293,32 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
 // ============================================================================
 
 const LoadingState: React.FC = () => (
-  <div
+  <Stack
+    gap="lg"
     style={{
-      display: "flex",
-      flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
       height: 300,
-      gap: 16,
     }}
   >
     <Spinner size="lg" />
     <span style={{ color: "var(--buildrick-text-muted)" }}>Generating export...</span>
-  </div>
+  </Stack>
 );
 
 const ErrorState: React.FC<{ error: string }> = ({ error }) => (
-  <div
+  <Stack
+    gap="lg"
     style={{
-      display: "flex",
-      flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
       height: 300,
-      gap: 16,
       color: "var(--buildrick-error)",
     }}
   >
     <span style={{ fontSize: 32 }}>Error</span>
     <span>{error}</span>
-  </div>
+  </Stack>
 );
 
 const PreviewTab: React.FC<{

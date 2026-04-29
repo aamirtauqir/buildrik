@@ -1,57 +1,8 @@
 {
   "counts": {
-    "stack-multi-prop": 19
+    "stack-multi-prop": 15
   },
   "sites": [
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/export/ExportModal.tsx",
-      "line": 296,
-      "bucket": "stack-multi-prop",
-      "gap": 16,
-      "extraProps": [
-        "justifyContent",
-        "height"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/export/ExportModal.tsx",
-      "line": 312,
-      "bucket": "stack-multi-prop",
-      "gap": 16,
-      "extraProps": [
-        "justifyContent",
-        "height",
-        "color"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/export/ExportOptions.tsx",
-      "line": 68,
-      "bucket": "stack-multi-prop",
-      "gap": 8,
-      "extraProps": [
-        "borderRadius",
-        "padding",
-        "cursor",
-        "textAlign"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/export/ExportOptions.tsx",
-      "line": 119,
-      "bucket": "stack-multi-prop",
-      "gap": 8,
-      "extraProps": [
-        "background",
-        "border",
-        "borderRadius",
-        "padding",
-        "textAlign",
-        "opacity",
-        "pointerEvents",
-        "userSelect"
-      ]
-    },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/media/VideoPreview.tsx",
       "line": 186,
