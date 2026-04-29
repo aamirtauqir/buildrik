@@ -44,10 +44,10 @@
   --buildrick-success: #16A34A;
   --buildrick-success-light: rgba(22, 163, 74, 0.10);
   --buildrick-success-border: rgba(22, 163, 74, 0.30);
-  --buildrick-warning: #D97706;
-  --buildrick-warning-light: rgba(217, 119, 6, 0.10);
-  --buildrick-warning-border: rgba(217, 119, 6, 0.30);
-  --buildrick-warning-bg: rgba(217, 119, 6, 0.05);
+  --buildrick-warning: #B45309;             /* amber-700 — fixes WCAG AA on warning-bg (was #D97706 amber-600 → 3.19:1 fail; now 5.04:1 pass) */
+  --buildrick-warning-light: rgba(180, 83, 9, 0.10);
+  --buildrick-warning-border: rgba(180, 83, 9, 0.30);
+  --buildrick-warning-bg: rgba(180, 83, 9, 0.05);
   --buildrick-info: #2D6DFF;
   --buildrick-info-light: rgba(45, 109, 255, 0.08);
 

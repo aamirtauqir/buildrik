@@ -11,8 +11,8 @@
    * is the workhorse per project/README.md.
    * Fallbacks widened to match bridge-tokens shipped values.
    */
-  --buildrick-font-family: "Inter Tight", system-ui, -apple-system, sans-serif;
-  --buildrick-font-family-display: "Inter Tight", system-ui, sans-serif;
+  --buildrick-font-family: "Inter Tight", "Geist", sans-serif;             /* FINDING-003 — was system-ui, -apple-system; curated Geist fallback so font-load failure stays in design-system, not OS default (the AI-slop signal) */
+  --buildrick-font-family-display: "Inter Tight", "Geist", sans-serif;     /* FINDING-003 — same swap for display token */
   --buildrick-font-family-mono: "Geist Mono", "SF Mono", Menlo, monospace;
 
   /* FONT SIZE SCALE */
