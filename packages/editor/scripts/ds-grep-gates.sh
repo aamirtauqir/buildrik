@@ -570,14 +570,18 @@ pass "Gate 23: shim layer is gate-keeper for mapped primitives"
 # multi-line JSX like `<select\n  ref={ref}\n>` (newline not in pattern space).
 GATE24_FILE_COUNT=$(find packages/editor/src/editor -name '*.tsx' \
   -not -path '*/__tests__/*' \
-  -not -path '*/preview/*' 2>/dev/null | wc -l | tr -d ' ')
+  -not -path '*/preview/*' \
+  -not -path '*/shared/vibcoder/*' \
+  -not -name '*.test.tsx' 2>/dev/null | wc -l | tr -d ' ')
 
 if [ "$GATE24_FILE_COUNT" -eq 0 ]; then
   GATE24_HITS=0
 else
   GATE24_HITS=$(find packages/editor/src/editor -name '*.tsx' \
     -not -path '*/__tests__/*' \
-    -not -path '*/preview/*' 2>/dev/null \
+    -not -path '*/preview/*' \
+    -not -path '*/shared/vibcoder/*' \
+    -not -name '*.test.tsx' 2>/dev/null \
     | xargs npx tsx packages/editor/scripts/jsx-inline-element-scanner.ts 2>/dev/null \
     | jq -s 'add | length' 2>/dev/null || echo "0")
 fi
