@@ -52,7 +52,7 @@ const COLORS = {
     border: "var(--buildrick-accent)", // Green for valid drops
     bg: "var(--buildrick-accent-tint)",
     text: "#1e293b",
-    badgeBg: "#1e1e2e",
+    badgeBg: "var(--buildrick-text-heading)",
     badgeText: "var(--buildrick-accent-subtle)",
   },
   invalid: {

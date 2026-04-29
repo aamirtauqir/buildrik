@@ -665,34 +665,34 @@
 
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="container"]::before {
   background: rgba(180, 190, 254, 0.9);
-  color: #1e1e2e;
+  color: var(--buildrick-text-heading);
 }
 
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="columns"]::before,
 .buildrick-canvas[data-xray-mode="true"] .row::before {
   background: rgba(203, 166, 247, 0.9);
-  color: #1e1e2e;
+  color: var(--buildrick-text-heading);
 }
 
 .buildrick-canvas[data-xray-mode="true"] .col::before {
   background: rgba(245, 194, 231, 0.9);
-  color: #1e1e2e;
+  color: var(--buildrick-text-heading);
 }
 
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="text"]::before,
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="heading"]::before {
   background: rgba(148, 226, 213, 0.9);
-  color: #1e1e2e;
+  color: var(--buildrick-text-heading);
 }
 
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="button"]::before {
   background: rgba(166, 227, 161, 0.9);
-  color: #1e1e2e;
+  color: var(--buildrick-text-heading);
 }
 
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-type="image"]::before {
   background: rgba(250, 179, 135, 0.9);
-  color: #1e1e2e;
+  color: var(--buildrick-text-heading);
 }
 
 .buildrick-canvas[data-xray-mode="true"] [data-buildrick-id][data-selected="true"]::before {

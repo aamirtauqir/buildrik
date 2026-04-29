@@ -72,7 +72,7 @@
   border: none;
   border-radius: 2px;
   background: rgba(255, 255, 255, 0.9);
-  color: #1a1a2e;
+  color: var(--buildrick-text-heading);
   font-size: 12px;
   font-weight: 600;
   text-align: center;
