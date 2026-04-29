@@ -1,7 +1,6 @@
 {
   "counts": {
-    "stack-multi-prop": 22,
-    "cluster-off-grid": 2
+    "stack-multi-prop": 22
   },
   "sites": [
     {
@@ -265,20 +264,6 @@
         "zIndex",
         "overflow"
       ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/inspector/sections/flexbox/AlignmentSection.tsx",
-      "line": 75,
-      "bucket": "cluster-off-grid",
-      "gap": 2,
-      "extraProps": []
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/inspector/sections/flexbox/AlignmentSection.tsx",
-      "line": 114,
-      "bucket": "cluster-off-grid",
-      "gap": 2,
-      "extraProps": []
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/inspector/sections/layout/previews.tsx",

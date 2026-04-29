@@ -1,4 +1,5 @@
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Cluster } from "@/editor/shared/vibcoder/Cluster";
 /**
  * AlignmentSection - Alignment grid and justify/align controls
  * @license BSD-3-Clause
@@ -72,7 +73,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
           {mixedKeys?.has("justify-content") && <MixedValueBadge compact />}
           Justify Content
         </div>
-        <div style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+        <Cluster gap="xs">
           {["start", "center", "end", "between", "around", "evenly"].map((val) => {
             const actualVal =
               val === "start"
@@ -96,7 +97,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
               </Button>
             );
           })}
-        </div>
+        </Cluster>
       </div>
       <div>
         <div
@@ -111,7 +112,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
           {mixedKeys?.has("align-items") && <MixedValueBadge compact />}
           Align Items
         </div>
-        <div style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+        <Cluster gap="xs">
           {["start", "center", "end", "stretch", "baseline"].map((val) => {
             const actualVal = val === "start" ? "flex-start" : val === "end" ? "flex-end" : val;
             return (
@@ -124,7 +125,7 @@ export const AlignmentSection: React.FC<AlignmentSectionProps> = ({
               </Button>
             );
           })}
-        </div>
+        </Cluster>
       </div>
     </div>
   </div>
