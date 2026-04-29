@@ -1,4 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
+import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * SeoTab — Pure form renderer. No state. No logic.
@@ -200,7 +201,7 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
             {s.seoDesc.length}/160
           </span>
         </div>
-        <textarea
+        <Textarea
           id="seo-desc"
           className="bd-pg-seo-textarea"
           rows={3}

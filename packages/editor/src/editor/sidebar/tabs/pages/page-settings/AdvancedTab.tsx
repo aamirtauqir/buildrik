@@ -1,4 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
+import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * AdvancedTab — Visibility, schedule, password, indexing, head code.
@@ -112,7 +113,7 @@ export const AdvancedTab: React.FC<Props> = ({ s }) => {
       {/* Head code */}
       <div className="bd-pg-adv-section">
         <div className="bd-pg-adv-section-label">Custom &lt;head&gt; code</div>
-        <textarea
+        <Textarea
           className="bd-pg-seo-textarea bd-pg-adv-head"
           value={s.customHead}
           onChange={(e) => s.setCustomHead(e.target.value)}

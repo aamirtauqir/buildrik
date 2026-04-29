@@ -1,4 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
+import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 /**
  * SocialTab — Open Graph + Twitter sharing preview & fields.
  *
@@ -57,7 +58,7 @@ export const SocialTab: React.FC<Props> = ({ s, page }) => {
           <label className="bd-pg-seo-label" htmlFor="og-desc">Open Graph Description</label>
           <span className="bd-pg-seo-counter">{s.ogDesc.length}/160</span>
         </div>
-        <textarea
+        <Textarea
           id="og-desc"
           className="bd-pg-seo-textarea"
           value={s.ogDesc}
