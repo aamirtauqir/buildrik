@@ -805,7 +805,7 @@
 .bld-retry-btn {
   margin-left: 6px;
   padding: 2px 10px;
-  background: linear-gradient(135deg, var(--bd-accent, var(--bd-accent)) 0%, #4D7FFF 100%);
+  background: linear-gradient(135deg, var(--bd-accent) 0%, var(--bd-accent-hover) 100%);
   color: var(--bd-bg-card);
   border: 0;
   border-radius: 6px;
@@ -829,7 +829,7 @@
 }
 
 .bld-retry-btn:hover {
-  background: linear-gradient(135deg, #4D7FFF 0%, #6D8FFF 100%);
+  background: linear-gradient(135deg, var(--bd-accent-hover) 0%, #6D8FFF 100%);
   box-shadow: 0 4px 10px rgba(45, 109, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.7);
   transform: translateY(-1px);
 }
