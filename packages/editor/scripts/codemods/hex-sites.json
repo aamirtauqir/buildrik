@@ -642,36 +642,6 @@
     "snippet": "color: \"#fca5a5\","
   },
   {
-    "file": "packages/editor/src/editor/panels/layers/styles/layers-v2.css",
-    "line": 259,
-    "hex": "#FFF",
-    "snippet": "background: #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/panels/layers/styles/layers-v2.css",
-    "line": 317,
-    "hex": "#FFF",
-    "snippet": "background: #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/panels/layers/styles/layers-v2.css",
-    "line": 387,
-    "hex": "#FFF",
-    "snippet": "background: #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/panels/layers/styles/layers-v2.css",
-    "line": 431,
-    "hex": "#FFF",
-    "snippet": "background: #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/panels/layers/styles/layers-v2.css",
-    "line": 508,
-    "hex": "#FFF",
-    "snippet": "color: #fff;"
-  },
-  {
     "file": "packages/editor/src/editor/shell/AccountModal.tsx",
     "line": 27,
     "hex": "#10B981",
@@ -906,120 +876,6 @@
     "snippet": "e.currentTarget.style.background = opt.danger ? \"#FEF2F2\" : \"var(--bd-bg-panel)\";"
   },
   {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 26,
-    "hex": "#FFF",
-    "snippet": "background: #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 31,
-    "hex": "#FFF",
-    "snippet": ".bdc-top .bdc-brand .bdc-mark { width: 22px; height: 22px; background: var(--bd-accent); border-radius: 6px; color: #fff; font: 700 12px var(--bd-font); display: flex; align-items: center; justify-content: center; letter-spacing: -0.04em; }"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 47,
-    "hex": "#FFF",
-    "snippet": "background: #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 67,
-    "hex": "#FFF",
-    "snippet": "background: #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 83,
-    "hex": "#FFF",
-    "snippet": ".bdc-panel-search .bdc-kbd { font: 500 10px var(--bd-mono); color: var(--bd-fg-muted); background:#fff; border:1px solid var(--bd-border); padding: 1px 5px; border-radius: 3px; }"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 90,
-    "hex": "#FFF",
-    "snippet": "background: #fff; border: 1px solid var(--bd-border); border-radius: 8px; cursor: grab;"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 100,
-    "hex": "#FFF",
-    "snippet": ".bdc-bp-group .bdc-btn.bdc-icon.bdc-bp-on { background: #fff; color: var(--bd-fg-heading); box-shadow: 0 1px 2px rgba(15,23,42,0.08); }"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 143,
-    "hex": "#FFF",
-    "snippet": "background: #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 153,
-    "hex": "#FFF",
-    "snippet": ".bdc-insp-h .bdc-tag { font: 500 10px var(--bd-mono); color: var(--bd-fg-muted); background: #fff; border: 1px solid var(--bd-border); padding: 1px 5px; border-radius: 3px; }"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 154,
-    "hex": "#FFF",
-    "snippet": ".bdc-insp-tabs { display: flex; padding: 0 6px; border-bottom: 1px solid var(--bd-border); background: #fff; }"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 180,
-    "hex": "#FFF",
-    "snippet": ".bdc-num-input:hover { background: #fff; border-color: var(--bd-border); }"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 193,
-    "hex": "#FFF",
-    "snippet": ".bdc-num-input:focus-within { background: #fff; border-color: var(--bd-accent); box-shadow: 0 0 0 2px rgba(45,109,255,0.12); }"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 202,
-    "hex": "#FFF",
-    "snippet": ".bdc-text-input:hover { background: #fff; border-color: var(--bd-border); }"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 203,
-    "hex": "#FFF",
-    "snippet": ".bdc-text-input:focus { background: #fff; border-color: var(--bd-accent); box-shadow: 0 0 0 2px rgba(45,109,255,0.12); }"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 213,
-    "hex": "#FFF",
-    "snippet": ".bdc-seg button.bdc-on { background: #fff; color: var(--bd-fg-heading); font-weight: 600; box-shadow: 0 1px 2px rgba(15,23,42,0.08); }"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 220,
-    "hex": "#FFF",
-    "snippet": ".bdc-btn.bdc-secondary { background: #fff; border-color: var(--bd-border-medium); color: var(--bd-fg-primary); }"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 222,
-    "hex": "#FFF",
-    "snippet": ".bdc-btn.bdc-primary { background: var(--bd-accent); color: #fff; padding: 7px 14px; font-weight: 500; }"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 224,
-    "hex": "#FFF",
-    "snippet": ".bdc-btn.bdc-publish { background: var(--bd-accent); color: #fff; padding: 7px 14px; border-radius: 9999px; font-weight: 600; }"
-  },
-  {
-    "file": "packages/editor/src/editor/shell/chrome.css",
-    "line": 237,
-    "hex": "#FFF",
-    "snippet": "background: #fff; border-top: 1px solid var(--bd-border);"
-  },
-  {
     "file": "packages/editor/src/editor/shell/modals/CMSCollectionSetupModal.tsx",
     "line": 213,
     "hex": "#86EFAC",
@@ -1045,33 +901,9 @@
   },
   {
     "file": "packages/editor/src/editor/sidebar/tabs/build/BuildTab.css",
-    "line": 312,
-    "hex": "#E8EEF5",
-    "snippet": "background: linear-gradient(135deg, var(--bd-bg-subtle, var(--bd-bg-subtle)) 0%, #E8EEF5 100%);"
-  },
-  {
-    "file": "packages/editor/src/editor/sidebar/tabs/build/BuildTab.css",
-    "line": 400,
-    "hex": "#E8EEF5",
-    "snippet": "background: linear-gradient(135deg, var(--bd-bg-subtle, var(--bd-bg-subtle)) 0%, #E8EEF5 100%);"
-  },
-  {
-    "file": "packages/editor/src/editor/sidebar/tabs/build/BuildTab.css",
-    "line": 547,
-    "hex": "#F0F7FF",
-    "snippet": "background: linear-gradient(135deg, var(--bd-bg-card, var(--bd-bg-card)) 0%, #F0F7FF 100%);"
-  },
-  {
-    "file": "packages/editor/src/editor/sidebar/tabs/build/BuildTab.css",
     "line": 808,
     "hex": "#4D7FFF",
     "snippet": "background: linear-gradient(135deg, var(--bd-accent, var(--bd-accent)) 0%, #4D7FFF 100%);"
-  },
-  {
-    "file": "packages/editor/src/editor/sidebar/tabs/build/BuildTab.css",
-    "line": 809,
-    "hex": "#FFF",
-    "snippet": "color: #fff;"
   },
   {
     "file": "packages/editor/src/editor/sidebar/tabs/build/BuildTab.css",
@@ -1084,24 +916,6 @@
     "line": 832,
     "hex": "#6D8FFF",
     "snippet": "background: linear-gradient(135deg, #4D7FFF 0%, #6D8FFF 100%);"
-  },
-  {
-    "file": "packages/editor/src/editor/sidebar/tabs/design/styles/design-tokens.css",
-    "line": 129,
-    "hex": "#FFF",
-    "snippet": "border: 2px solid #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/sidebar/tabs/design/styles/design-tokens.css",
-    "line": 153,
-    "hex": "#FFF",
-    "snippet": "background: #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/sidebar/tabs/design/styles/design-tokens.css",
-    "line": 154,
-    "hex": "#FFF",
-    "snippet": "border: 2px solid #fff;"
   },
   {
     "file": "packages/editor/src/editor/sidebar/tabs/design/styles/design-tokens.css",
@@ -1122,12 +936,6 @@
     "snippet": "color: #f59e0b;"
   },
   {
-    "file": "packages/editor/src/editor/sidebar/tabs/design/styles/design-tokens.css",
-    "line": 264,
-    "hex": "#FFF",
-    "snippet": "color: #fff;"
-  },
-  {
     "file": "packages/editor/src/editor/sidebar/tabs/history/components/TimeTravelScrubber.tsx",
     "line": 170,
     "hex": "#F5F5F5",
@@ -1138,36 +946,6 @@
     "line": 227,
     "hex": "#666",
     "snippet": "label.style.color = \"#666\";"
-  },
-  {
-    "file": "packages/editor/src/editor/sidebar/tabs/history/styles/history.css",
-    "line": 303,
-    "hex": "#FFF",
-    "snippet": "color: #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/sidebar/tabs/history/styles/history.css",
-    "line": 574,
-    "hex": "#FFF",
-    "snippet": "color: #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/sidebar/tabs/history/styles/history.css",
-    "line": 678,
-    "hex": "#FFF",
-    "snippet": "color: #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/sidebar/tabs/history/styles/history.css",
-    "line": 1026,
-    "hex": "#FFF",
-    "snippet": "color: #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/sidebar/tabs/history/styles/history.css",
-    "line": 1221,
-    "hex": "#FFF",
-    "snippet": "color: #fff;"
   },
   {
     "file": "packages/editor/src/editor/sidebar/tabs/media/components/StockSourceModal.tsx",
@@ -1330,30 +1108,6 @@
     "line": 75,
     "hex": "#F59E0B",
     "snippet": ": \"#F59E0B\","
-  },
-  {
-    "file": "packages/editor/src/editor/sidebar/tabs/settings/settings.css",
-    "line": 95,
-    "hex": "#FFF",
-    "snippet": "background: #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/sidebar/tabs/settings/settings.css",
-    "line": 169,
-    "hex": "#FFF",
-    "snippet": "background: #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/sidebar/tabs/settings/settings.css",
-    "line": 225,
-    "hex": "#FFF",
-    "snippet": "background: #fff;"
-  },
-  {
-    "file": "packages/editor/src/editor/sidebar/tabs/settings/settings.css",
-    "line": 283,
-    "hex": "#FFF",
-    "snippet": "color: #fff;"
   },
   {
     "file": "packages/editor/src/editor/sidebar/tabs/settings/shared.tsx",
