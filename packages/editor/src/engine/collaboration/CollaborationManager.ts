@@ -25,6 +25,7 @@ import { EventEmitter } from "../EventEmitter";
 import { OTEngine } from "./OTEngine";
 import type { OTOperation } from "./OTTypes";
 import type { CollaborationTransport } from "./types";
+import { ProjectDataSchema } from "../../shared/schemas/project";
 
 // ============================================================================
 // CONSTANTS
@@ -715,12 +716,15 @@ export class CollaborationManager extends EventEmitter {
   private handleSyncResponse(event: CollaborationEvent): void {
     const { project, version } = event.payload as SyncResponsePayload;
 
-    // Import the project state
-    this.composer.importProject(project);
+    const parsed = ProjectDataSchema.safeParse(project);
+    if (!parsed.success) {
+      console.warn("[CollaborationManager] invalid sync project payload:", parsed.error.flatten());
+      this.emit("sync:error", { type: "invalid-payload", error: parsed.error });
+      return;
+    }
 
-    // Sync OT version
+    this.composer.importProject(parsed.data);
     this.otEngine.setVersion(version);
-
     this.emit("sync:complete", { version });
   }
 
