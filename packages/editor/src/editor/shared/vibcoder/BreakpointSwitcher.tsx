@@ -35,9 +35,9 @@
  *
  * @license BSD-3-Clause
  */
-import { type HTMLAttributes, forwardRef } from "react";
+import { type HTMLAttributes, type ReactNode, forwardRef } from "react";
 
-export type Breakpoint = "desktop" | "tablet" | "mobile";
+export type Breakpoint = "wide" | "desktop" | "tablet" | "mobile";
 
 export interface BreakpointSwitcherProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "onChange" | "children"> {
@@ -45,20 +45,28 @@ export interface BreakpointSwitcherProps
   onChange: (next: Breakpoint) => void;
   /** When true, renders full breakpoint names instead of short glyphs. */
   labelled?: boolean;
+  /** When true, prepends a "wide" (1920+) cell ahead of desktop/tablet/mobile. */
+  includeWide?: boolean;
+  /** Optional glyph map for a richer icon set (overrides default text glyphs). */
+  glyphs?: Partial<Record<Breakpoint, ReactNode>>;
 }
 
-const BREAKPOINTS: ReadonlyArray<{
+interface BreakpointEntry {
   id: Breakpoint;
   glyph: string;
   label: string;
-}> = [
+}
+
+const CORE_BREAKPOINTS: ReadonlyArray<BreakpointEntry> = [
   { id: "desktop", glyph: "D", label: "Desktop" },
   { id: "tablet", glyph: "T", label: "Tablet" },
   { id: "mobile", glyph: "M", label: "Mobile" },
 ];
 
+const WIDE_BREAKPOINT: BreakpointEntry = { id: "wide", glyph: "W", label: "Wide" };
+
 export const BreakpointSwitcher = forwardRef<HTMLDivElement, BreakpointSwitcherProps>(
-  ({ value, onChange, labelled = false, className, ...rest }, ref) => {
+  ({ value, onChange, labelled = false, includeWide = false, glyphs, className, ...rest }, ref) => {
     const classes = [
       "bd-bp-switcher",
       labelled && "bd-bp-switcher--labelled",
@@ -66,6 +74,9 @@ export const BreakpointSwitcher = forwardRef<HTMLDivElement, BreakpointSwitcherP
     ]
       .filter(Boolean)
       .join(" ");
+    const entries: ReadonlyArray<BreakpointEntry> = includeWide
+      ? [WIDE_BREAKPOINT, ...CORE_BREAKPOINTS]
+      : CORE_BREAKPOINTS;
     return (
       <div
         ref={ref}
@@ -74,7 +85,7 @@ export const BreakpointSwitcher = forwardRef<HTMLDivElement, BreakpointSwitcherP
         className={classes}
         {...rest}
       >
-        {BREAKPOINTS.map((bp) => (
+        {entries.map((bp) => (
           <button
             key={bp.id}
             type="button"
@@ -83,7 +94,7 @@ export const BreakpointSwitcher = forwardRef<HTMLDivElement, BreakpointSwitcherP
             aria-label={bp.label}
             onClick={() => onChange(bp.id)}
           >
-            {labelled ? bp.label : bp.glyph}
+            {labelled ? bp.label : (glyphs?.[bp.id] ?? bp.glyph)}
           </button>
         ))}
       </div>

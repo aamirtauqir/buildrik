@@ -17,4 +17,19 @@
  */
 
 @import "./design-system/index.css";
+
+/* Vibcoder vendored bundle — partial wiring for chrome topbar.
+ * Loads atom + organism CSS into @layer components per cascade contract
+ * (themes/components/_layer.css). Full-bundle wiring (all 64 files) is
+ * tracked as follow-up; this scope-limited set unblocks Topbar.tsx M8
+ * re-port without pulling visual regressions into untouched chrome.
+ *
+ * Ordering: atoms first, then organism that composes them.
+ */
+@import "./components/atoms/icon-button.css" layer(components);
+@import "./components/atoms/button.css" layer(components);
+@import "./components/atoms/breakpoint-switcher.css" layer(components);
+@import "./components/atoms/divider.css" layer(components);
+@import "./components/organisms/topbar.css" layer(components);
+
 @import "./components.css";

@@ -1,7 +1,11 @@
-import { Button } from "@/editor/shared/vibcoder/Button";
 /**
- * Buildrik Editor Topbar — v2 (new-design).
- * Layout: Brand · Undo/Redo/History · | · Breadcrumb · Breakpoints · | · Saved · Preview · Publish
+ * Buildrik Editor Topbar — v2 (vibcoder bd-* re-port).
+ * Layout: Brand · Undo/Redo/History · | · Breadcrumb · Breakpoints · Saved · Collab/Invite · Right-actions
+ *
+ * Skin: vibcoder canonical `bd-topbar` (organisms/topbar.css) extended via
+ * `themes/design-system/bd-topbar-overrides.css` (8-col grid + slot widening).
+ * Sunsets to pure canonical when upstream PR lands. See
+ * `docs/superpowers/specs/2026-04-29-vibcoder-bd-topbar-evolution.md`.
  *
  * @license BSD-3-Clause
  */
@@ -9,11 +13,20 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import type { Composer } from "../../engine";
 import {
+  BreakpointSwitcher,
+  Button,
+  Divider,
+  IconButton,
   Tooltip,
   TooltipTrigger,
   TooltipPortal,
   TooltipContent,
   TooltipKbd,
+  Topbar as VibcoderTopbar,
+  TopbarBrand,
+  TopbarGroup,
+  TopbarStatus,
+  TopbarStatusDot,
 } from "@/editor/shared/vibcoder";
 import type { Issue } from "./hooks/useStudioState";
 import { AccountModal } from "./AccountModal";
@@ -254,62 +267,63 @@ export const Topbar: React.FC<TopbarProps> = ({
     .filter(Boolean)
     .join(" · ");
 
-  const savedLabel =
+  const savedVariant: "ok" | "saving" | "warn" | "error" =
     saveStatus === "saving"
-      ? "Saving…"
+      ? "saving"
       : saveStatus === "error"
-        ? "Save failed"
-        : isDirty
-          ? "Unsaved"
-          : lastSavedAt
-            ? `Saved · ${formatSavedAgo(lastSavedAt)}`
-            : "Not saved";
+        ? "error"
+        : isDirty || !lastSavedAt
+          ? "warn"
+          : "ok";
 
-  const savedVariant =
-    saveStatus === "error"
-      ? "error"
-      : isDirty || !lastSavedAt
-        ? "warn"
-        : "ok";
+  const renderSavedLabel = (): React.ReactNode => {
+    if (saveStatus === "saving") return "Saving…";
+    if (saveStatus === "error") return "Save failed";
+    if (isDirty) return "Unsaved";
+    if (lastSavedAt) {
+      return (
+        <>
+          Saved · <span className="bd-topbar__status-time">{formatSavedAgo(lastSavedAt)}</span>
+        </>
+      );
+    }
+    return "Not saved";
+  };
 
-  const bpItems: Array<{ k: "desktop" | "tablet" | "mobile" | "wide"; icon: React.ReactNode; label: string }> = [
-    { k: "wide", icon: <IconWide />, label: "Wide" },
-    { k: "desktop", icon: <IconDesktop />, label: "Desktop" },
-    { k: "tablet", icon: <IconTablet />, label: "Tablet" },
-    { k: "mobile", icon: <IconMobile />, label: "Mobile" },
-  ];
+  const isStatusInteractive = savedVariant === "warn" || savedVariant === "error";
+
+  const bpGlyphs = {
+    wide: <IconWide />,
+    desktop: <IconDesktop />,
+    tablet: <IconTablet />,
+    mobile: <IconMobile />,
+  } as const;
 
   return (
     <>
-      <div className="bdc-top bdc" role="banner">
-        {/* Brand */}
-        <div className="bdc-brand">
+      <VibcoderTopbar>
+        {/* Cell 1 — Brand group (mark + label + chevron) */}
+        <div className="bd-topbar__brand-group">
           <a
             href={`${dashboardUrl}/dashboard/sites`}
-            className="bdc-mark"
+            className="bd-topbar__brand-mark"
             aria-label="Back to Dashboard"
-            style={{ textDecoration: "none" }}
           >
             B
           </a>
-          <div className="bdc-name">Buildrik</div>
-          <span style={{ color: "var(--bd-fg-muted)", display: "inline-flex" }}>
+          <TopbarBrand>Buildrik</TopbarBrand>
+          <IconButton size="xs" aria-label="Switch project">
             <IconChevDown />
-          </span>
+          </IconButton>
         </div>
 
-        {/* Undo / Redo / History */}
-        <div className="bdc-group">
+        {/* Cell 2 — Undo / Redo / History */}
+        <TopbarGroup>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                className="bdc-btn bdc-icon"
-                onClick={onUndo}
-                disabled={!canUndo}
-                aria-label="Undo"
-              >
+              <IconButton onClick={onUndo} disabled={!canUndo} aria-label="Undo">
                 <IconUndo />
-              </Button>
+              </IconButton>
             </TooltipTrigger>
             <TooltipPortal>
               <TooltipContent>Undo <TooltipKbd>⌘Z</TooltipKbd></TooltipContent>
@@ -317,14 +331,9 @@ export const Topbar: React.FC<TopbarProps> = ({
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                className="bdc-btn bdc-icon"
-                onClick={onRedo}
-                disabled={!canRedo}
-                aria-label="Redo"
-              >
+              <IconButton onClick={onRedo} disabled={!canRedo} aria-label="Redo">
                 <IconRedo />
-              </Button>
+              </IconButton>
             </TooltipTrigger>
             <TooltipPortal>
               <TooltipContent>Redo <TooltipKbd>⌘⇧Z</TooltipKbd></TooltipContent>
@@ -332,134 +341,94 @@ export const Topbar: React.FC<TopbarProps> = ({
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                className="bdc-btn bdc-icon"
-                onClick={onOpenHistory}
-                aria-label="History"
-              >
+              <IconButton onClick={onOpenHistory} aria-label="History">
                 <IconHistory />
-              </Button>
+              </IconButton>
             </TooltipTrigger>
             <TooltipPortal>
               <TooltipContent>History</TooltipContent>
             </TooltipPortal>
           </Tooltip>
-        </div>
+        </TopbarGroup>
 
-        <div className="bdc-divider" />
+        {/* Cell 3 — Divider */}
+        <Divider orientation="vertical" />
 
-        {/* Breadcrumb / Issues */}
-        <div className="bdc-title">
-          {issues.length > 0 ? (
+        {/* Cell 4 — Title (centered, 1fr) — switches to issue pill when issues > 0 */}
+        {issues.length > 0 ? (
+          <div className="bd-topbar__title bd-topbar__title--issues">
             <Button
-              className="bdc-btn"
+              variant="ghost"
+              size="sm"
+              className="bd-topbar__issue-pill"
               onClick={onOpenIssues}
               aria-label={`${issueLabel} — open issues`}
-              style={{ color: "var(--bd-warning)" }}
             >
               <IconWarn />
               {issueLabel}
             </Button>
-          ) : (
-            <>
-              <span>{projectName}</span>
-              <span className="bdc-slash">/</span>
-              <span className="bdc-page">{pageName}</span>
-              <span style={{ color: "var(--bd-fg-muted)" }}>
-                <IconChevDown />
-              </span>
-            </>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="bd-topbar__title">
+            <span>{projectName}</span>
+            <span className="bd-topbar__title-slash">/</span>
+            <span className="bd-topbar__title-page">{pageName}</span>
+            <IconChevDown />
+          </div>
+        )}
 
-        {/* Breakpoints */}
-        <div className="bdc-group bdc-bp-group" role="group" aria-label="Breakpoint">
-          {bpItems.map((b) => (
-            <Tooltip key={b.k}>
-              <TooltipTrigger asChild>
-                <Button
-                  className={`bdc-btn bdc-icon${device === b.k ? " bdc-bp-on" : ""}`}
-                  onClick={() => onDeviceChange?.(b.k)}
-                  aria-label={b.label}
-                  aria-pressed={device === b.k}
-                >
-                  {b.icon}
-                </Button>
-              </TooltipTrigger>
-              <TooltipPortal>
-                <TooltipContent>{b.label}</TooltipContent>
-              </TooltipPortal>
-            </Tooltip>
-          ))}
-        </div>
+        {/* Cell 5 — Breakpoint switcher (4 cells: wide/desktop/tablet/mobile) */}
+        <BreakpointSwitcher
+          value={device as "wide" | "desktop" | "tablet" | "mobile"}
+          onChange={(d) => onDeviceChange?.(d)}
+          includeWide
+          glyphs={bpGlyphs}
+        />
 
-        <div className="bdc-divider" />
-
-        {/* Saved / Collab / Cmd / Preview / Publish */}
-        <span
-          className={`bdc-badge${savedVariant === "ok" ? " bdc-saved" : ""}`}
-          style={
-            savedVariant === "warn"
-              ? {
-                  background: "var(--bd-warning-bg)",
-                  borderColor: "var(--bd-warning-border)",
-                  color: "var(--bd-warning)",
-                }
-              : savedVariant === "error"
-                ? {
-                    background: "var(--bd-error-bg)",
-                    borderColor: "var(--bd-error-border)",
-                    color: "var(--bd-error)",
-                  }
-                : undefined
-          }
-          onClick={() => {
-            if (savedVariant !== "ok") onSave();
-          }}
-          role={savedVariant !== "ok" ? "button" : undefined}
-          tabIndex={savedVariant !== "ok" ? 0 : undefined}
+        {/* Cell 6 — Status pill */}
+        <TopbarStatus
+          className={`bd-topbar__status--${savedVariant}`}
+          onClick={isStatusInteractive ? onSave : undefined}
+          role={isStatusInteractive ? "button" : undefined}
+          tabIndex={isStatusInteractive ? 0 : undefined}
         >
-          <span
-            className="bdc-dot"
-            style={{
-              background:
-                savedVariant === "ok"
-                  ? "var(--bd-success)"
-                  : savedVariant === "warn"
-                    ? "var(--bd-warning)"
-                    : "var(--bd-error)",
-            }}
-          />
-          {savedLabel}
-        </span>
+          <TopbarStatusDot />
+          {renderSavedLabel()}
+        </TopbarStatus>
 
-        {collaborationSlot}
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className="bdc-btn bdc-secondary"
-              onClick={() => setInviteOpen(true)}
-              aria-label="Invite team"
-            >
-              + Invite
-            </Button>
-          </TooltipTrigger>
-          <TooltipPortal>
-            <TooltipContent>Invite team</TooltipContent>
-          </TooltipPortal>
-        </Tooltip>
-
-        <div className="bdc-group">
+        {/* Cell 7 — Collab presence + offline indicator + Invite */}
+        <TopbarGroup>
+          {collaborationSlot}
+          {isOffline && (
+            <span className="bd-topbar__offline" aria-label="Offline">
+              <span className="bd-topbar__offline-dot" />
+              Offline
+            </span>
+          )}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                className="bdc-btn bdc-icon"
-                onClick={() => setCmdOpen(true)}
-                aria-label="Command palette"
+                variant="secondary"
+                size="sm"
+                onClick={() => setInviteOpen(true)}
+                aria-label="Invite team"
               >
-                <IconKbd />
+                + Invite
               </Button>
+            </TooltipTrigger>
+            <TooltipPortal>
+              <TooltipContent>Invite team</TooltipContent>
+            </TooltipPortal>
+          </Tooltip>
+        </TopbarGroup>
+
+        {/* Cell 8 — Right actions: Cmd / Preview / Publish / Help / Account */}
+        <TopbarGroup>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <IconButton onClick={() => setCmdOpen(true)} aria-label="Command palette">
+                <IconKbd />
+              </IconButton>
             </TooltipTrigger>
             <TooltipPortal>
               <TooltipContent>Command palette <TooltipKbd>⌘K</TooltipKbd></TooltipContent>
@@ -469,7 +438,8 @@ export const Topbar: React.FC<TopbarProps> = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                className="bdc-btn bdc-secondary"
+                variant="secondary"
+                size="sm"
                 onClick={onPreview}
                 disabled={previewLoading}
                 aria-label="Preview"
@@ -497,9 +467,9 @@ export const Topbar: React.FC<TopbarProps> = ({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button className="bdc-btn bdc-icon" onClick={onHelp} aria-label="Help">
+              <IconButton onClick={onHelp} aria-label="Help">
                 ?
-              </Button>
+              </IconButton>
             </TooltipTrigger>
             <TooltipPortal>
               <TooltipContent>Help</TooltipContent>
@@ -508,8 +478,7 @@ export const Topbar: React.FC<TopbarProps> = ({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                className="bdc-btn bdc-icon"
+              <IconButton
                 onClick={() => {
                   setAccountOpen(true);
                   onAccount?.();
@@ -517,14 +486,14 @@ export const Topbar: React.FC<TopbarProps> = ({
                 aria-label="Account"
               >
                 <IconUser />
-              </Button>
+              </IconButton>
             </TooltipTrigger>
             <TooltipPortal>
               <TooltipContent>Account</TooltipContent>
             </TooltipPortal>
           </Tooltip>
-        </div>
-      </div>
+        </TopbarGroup>
+      </VibcoderTopbar>
       {cmdOpen && <CommandPalette onClose={() => setCmdOpen(false)} />}
       {inviteOpen && <InviteModal onClose={() => setInviteOpen(false)} />}
       {accountOpen && <AccountModal onClose={() => setAccountOpen(false)} />}
