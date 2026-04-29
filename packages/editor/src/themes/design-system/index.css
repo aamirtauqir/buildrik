@@ -15,3 +15,8 @@
 @import "./design.css";
 @import "./a11y.css";
 @import "./bd-aliases.css";
+
+/* Forward-looking override layer for vibcoder canonical bd-topbar.
+ * See docs/superpowers/specs/2026-04-29-vibcoder-bd-topbar-evolution.md.
+ * Sunset on next vibcoder:vendor after upstream PR lands. */
+@import "./bd-topbar-overrides.css";

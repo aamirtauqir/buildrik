@@ -1,0 +1,260 @@
+/**
+ * themes/design-system/bd-topbar-overrides.css
+ *
+ * TEMPORARY OVERRIDE LAYER — extends vibcoder canonical `bd-topbar` to
+ * full DESIGN.md §Layout spec until upstream vibcoder bundle catches up.
+ *
+ * Lives in @layer overrides (per components/_layer.css cascade contract:
+ * @layer tokens, components, overrides;). Vendored bundle CSS in
+ * components/ stays untouched. Gates 19, 21, vibcoder:check-port green.
+ *
+ * Source spec:  docs/superpowers/specs/2026-04-29-vibcoder-bd-topbar-evolution.md
+ * Sunset trigger: when upstream vibcoder PR merges and the next
+ *   `npm run vibcoder:vendor` regenerates `components/organisms/topbar.css`
+ *   with these slots/variants. Delete this file at that point and remove
+ *   the @import from `themes/design-system/index.css`.
+ *
+ * Tokens used: ONLY canonical `--buildrick-*` (preferred) and `--bd-*`
+ * aliases. NO raw hex literals. NO new tokens defined here.
+ *
+ * @license BSD-3-Clause
+ */
+
+@layer overrides {
+  /* ────────────────────────────────────────────────────────────────────
+   * Container — flush 56px bar, NOT the canonical 48px floating panel.
+   * Honors DESIGN.md §Layout topbar height + §Color §Surfaces (white card
+   * on slate-50 page, hairline bottom, no shadow on chrome).
+   * ──────────────────────────────────────────────────────────────────── */
+  .bd-topbar {
+    height: var(--bd-shell-header-h);             /* 56px via --buildrick-header-height */
+    background: var(--buildrick-bg-card);
+    border: 0;
+    border-bottom: 1px solid var(--buildrick-border);
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0 var(--buildrick-space-3);
+    gap: var(--buildrick-space-3);
+
+    display: grid;
+    grid-template-columns: auto auto auto 1fr auto auto auto auto;
+    align-items: center;
+  }
+
+  /* ────────────────────────────────────────────────────────────────────
+   * NEW SLOT — brand-mark (cobalt B square).
+   * Replaces hand-rolled `.bdc-mark` in production .bdc-* shell.
+   * Always paired with `.bd-topbar__brand` text.
+   * ──────────────────────────────────────────────────────────────────── */
+  .bd-topbar__brand-mark {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--buildrick-accent);
+    color: var(--buildrick-text-on-accent);
+    border-radius: var(--buildrick-radius-md);
+    font-family: var(--buildrick-font-family);
+    font-weight: var(--buildrick-font-weight-bold);
+    font-size: var(--buildrick-text-sm);
+    letter-spacing: -0.04em;
+    text-decoration: none;
+  }
+
+  /* Tighten brand text spacing to match DESIGN.md §Typography
+     (13/600/-0.01em on slate-800 heading). */
+  .bd-topbar__brand {
+    font-family: var(--buildrick-font-family);
+    font-size: var(--buildrick-text-sm-plus);
+    font-weight: var(--buildrick-font-weight-semibold);
+    color: var(--buildrick-text-heading);
+    letter-spacing: -0.01em;
+    border-right: 0;
+    padding-right: 0;
+    margin-right: 0;
+  }
+
+  /* Brand group wraps mark + label + chevron. */
+  .bd-topbar__brand-group {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--buildrick-space-2);
+    padding-right: var(--buildrick-space-2);
+  }
+  .bd-topbar__brand-group > .bd-icon-btn {
+    color: var(--buildrick-text-muted);
+  }
+
+  /* ────────────────────────────────────────────────────────────────────
+   * NEW SLOT — title (centered breadcrumb).
+   * Lives in the `1fr` grid column so it auto-centers between the
+   * left history group and the right breakpoint switcher.
+   * ──────────────────────────────────────────────────────────────────── */
+  .bd-topbar__title {
+    justify-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--buildrick-space-2);
+    font-family: var(--buildrick-font-family);
+    font-size: var(--buildrick-text-sm-plus);
+    font-weight: var(--buildrick-font-weight-medium);
+    color: var(--buildrick-text-secondary);
+  }
+  .bd-topbar__title-slash { color: var(--buildrick-text-muted); }
+  .bd-topbar__title-page {
+    color: var(--buildrick-text-heading);
+    font-weight: var(--buildrick-font-weight-semibold);
+  }
+
+  /* Issue pill replaces breadcrumb when issues > 0
+     (matches Topbar.tsx:353-372 behaviour). */
+  .bd-topbar__title--issues > .bd-topbar__issue-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--buildrick-space-1);
+    padding: 3px var(--buildrick-space-2);
+    border-radius: var(--buildrick-radius-full);
+    background: var(--buildrick-warning-bg);
+    border: 1px solid var(--buildrick-warning-border);
+    color: var(--buildrick-warning);
+    font-family: var(--buildrick-font-family);
+    font-size: var(--buildrick-text-sm);
+    font-weight: var(--buildrick-font-weight-medium);
+    cursor: pointer;
+  }
+  .bd-topbar__title--issues > .bd-topbar__issue-pill > svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* ────────────────────────────────────────────────────────────────────
+   * STATUS PILL — variant modifiers added to existing
+   * `bd-topbar__status` atom (see organisms/topbar.css).
+   * Each variant sets dot color + pill bg/border to match WCAG AA on
+   * `--buildrick-bg-card`. All from canonical semantic tokens.
+   * ──────────────────────────────────────────────────────────────────── */
+  .bd-topbar__status--ok > .bd-topbar__status-dot   { background: var(--buildrick-success); }
+
+  .bd-topbar__status--saving {
+    color: var(--buildrick-accent);
+    background: var(--buildrick-accent-subtle);
+    border: 1px solid var(--buildrick-accent);
+  }
+  .bd-topbar__status--saving > .bd-topbar__status-dot {
+    background: var(--buildrick-accent);
+    animation: bd-topbar-pulse 1.2s ease-in-out infinite;
+  }
+
+  .bd-topbar__status--warn {
+    color: var(--buildrick-warning);
+    background: var(--buildrick-warning-bg);
+    border: 1px solid var(--buildrick-warning-border);
+    cursor: pointer;
+  }
+  .bd-topbar__status--warn > .bd-topbar__status-dot { background: var(--buildrick-warning); }
+
+  .bd-topbar__status--error {
+    color: var(--buildrick-error);
+    background: var(--buildrick-error-bg);
+    border: 1px solid var(--buildrick-error-border);
+    cursor: pointer;
+  }
+  .bd-topbar__status--error > .bd-topbar__status-dot { background: var(--buildrick-error); }
+
+  /* Saved badge timestamp uses tabular nums per DESIGN.md §Typography
+     (Geist Mono required for time/dimensions/counts).
+     Applied via inline span class .bd-topbar__status-time. */
+  .bd-topbar__status-time {
+    font-family: var(--buildrick-font-family-mono);
+    font-feature-settings: "tnum";
+  }
+
+  @keyframes bd-topbar-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.35; }
+  }
+
+  /* ────────────────────────────────────────────────────────────────────
+   * NEW SLOT — account avatar (cobalt circular initials).
+   * Replaces legacy `#1F2937` near-black pill flagged by DESIGN.md
+   * §NO BLACK rule (decision log 2026-04-18).
+   * ──────────────────────────────────────────────────────────────────── */
+  .bd-topbar__account {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: var(--buildrick-radius-full);
+    background: var(--buildrick-accent);
+    color: var(--buildrick-text-on-accent);
+    cursor: pointer;
+    font-family: var(--buildrick-font-family);
+    font-size: var(--buildrick-text-xs);
+    font-weight: var(--buildrick-font-weight-semibold);
+    letter-spacing: -0.02em;
+  }
+  .bd-topbar__account:focus-visible {
+    outline: 0;
+    box-shadow: var(--buildrick-glow-primary);
+  }
+
+  /* ────────────────────────────────────────────────────────────────────
+   * NEW SLOT — offline indicator pill.
+   * Sits inline with status pill. Subtle muted styling — informational
+   * only, not a status that needs an action.
+   * ──────────────────────────────────────────────────────────────────── */
+  .bd-topbar__offline {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--buildrick-space-1);
+    padding: 3px var(--buildrick-space-2);
+    border-radius: var(--buildrick-radius-full);
+    background: var(--buildrick-bg-subtle);
+    border: 1px solid var(--buildrick-border);
+    color: var(--buildrick-text-secondary);
+    font-family: var(--buildrick-font-family);
+    font-size: var(--buildrick-text-xs);
+    font-weight: var(--buildrick-font-weight-medium);
+  }
+  .bd-topbar__offline-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--buildrick-radius-circle);
+    background: var(--buildrick-text-muted);
+  }
+
+  /* ────────────────────────────────────────────────────────────────────
+   * NEW SLOT — collab presence stack.
+   * Per-user color scheme deferred to /design-consultation (TODO).
+   * For now: cobalt for current user, muted slate for others.
+   * ──────────────────────────────────────────────────────────────────── */
+  .bd-topbar__collab {
+    display: inline-flex;
+    align-items: center;
+  }
+  .bd-topbar__collab-av {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--buildrick-radius-full);
+    border: 2px solid var(--buildrick-bg-card);
+    margin-left: -6px;
+    color: var(--buildrick-text-on-accent);
+    font-family: var(--buildrick-font-family);
+    font-size: var(--buildrick-text-2xs);
+    font-weight: var(--buildrick-font-weight-semibold);
+    letter-spacing: -0.02em;
+  }
+  .bd-topbar__collab-av:first-child { margin-left: 0; }
+  .bd-topbar__collab-av--me    { background: var(--buildrick-accent); }
+  .bd-topbar__collab-av--peer  { background: var(--buildrick-text-muted); }
+
+  /* Reduced-motion handling: per Gate 7, all media queries with user-pref
+   * predicates live in themes/design-system/a11y.css. The bd-topbar-pulse
+   * keyframe is suppressed there alongside other infinite-loop animations. */
+}
