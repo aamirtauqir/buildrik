@@ -7,6 +7,7 @@ import { Input } from "@/editor/shared/vibcoder/Input";
 
 import * as React from "react";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
 import {
   Modal,
   ModalContent,
@@ -182,21 +183,20 @@ const VideoPlayerCore: React.FC<VideoPreviewProps & { extractThumbnail?: boolean
 
   if (state.error) {
     return (
-      <div
+      <Stack
         style={{
-          display: "flex",
-          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           padding: 40,
           background: "var(--buildrick-bg-panel-secondary)",
           borderRadius: 8,
           color: "var(--buildrick-text-muted)",
+          gap: 0,
         }}
       >
         <span style={{ fontSize: 32, marginBottom: 12 }}>⚠️</span>
         <span>{state.error}</span>
-      </div>
+      </Stack>
     );
   }
 

@@ -8,14 +8,15 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { SkeletonListItem } from "@/shared/extensions/Skeleton";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
 
 /** Loading skeleton shown while lazy-loaded tab chunks download */
 export const PanelSkeleton: React.FC = () => (
-  <div style={{ padding: "16px 12px", display: "flex", flexDirection: "column", gap: 10 }}>
+  <Stack style={{ padding: "16px 12px", gap: 10 }}>
     {Array.from({ length: 5 }).map((_, i) => (
       <SkeletonListItem key={i} hasAvatar avatarSize={24} textLines={1} />
     ))}
-  </div>
+  </Stack>
 );
 
 /** Error fallback shown when a tab panel crashes */

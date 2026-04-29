@@ -8,6 +8,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import type { PlanTier } from "../types";
 import { Screen } from "../shared";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
 
 interface BillingScreenProps {
   /** Current user plan — controls whether upgrade prompt is shown */
@@ -121,7 +122,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
             Unlock Pro features
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
+          <Stack gap="sm" style={{ marginBottom: 14 }}>
             {PRO_FEATURES.map((feature) => (
               <div
                 key={feature}
@@ -139,7 +140,7 @@ export const BillingScreen: React.FC<BillingScreenProps> = ({
                 {feature}
               </div>
             ))}
-          </div>
+          </Stack>
 
           <Button
             onClick={handleUpgrade}

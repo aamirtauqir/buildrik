@@ -23,6 +23,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { Check, ChevronUp, ChevronDown, Minus, X, ArrowRight } from "lucide-react";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
 import type { OnboardingStep } from "../../shared/constants/onboardingSteps";
 
 // ── Props ───────────────────────────────────────────────────────────────────
@@ -96,14 +97,14 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
     <div ref={containerRef} style={panelStyles} role="region" aria-label="Getting started checklist">
       {/* Header */}
       <div style={headerStyles}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 2, flex: 1, minWidth: 0 }}>
+        <Stack style={{ gap: 2, flex: 1, minWidth: 0 }}>
           <span style={headerTitleStyles}>
             {allDone ? "All done — keep building!" : "Get started"}
           </span>
           <span style={headerCountStyles}>
             {completedCount} of {totalCount} complete
           </span>
-        </div>
+        </Stack>
 
         <div style={headerActionsStyles}>
           {/* Minimize */}
