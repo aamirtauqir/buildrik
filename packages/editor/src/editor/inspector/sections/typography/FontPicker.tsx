@@ -1,4 +1,5 @@
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
  * FontPicker - Font family dropdown with Google Fonts integration
  * Part of Typography section refactoring
@@ -136,11 +137,12 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
       </Button>
       {/* Font Picker Dropdown */}
       {showFontPicker && (
-        <div
+        <Stack
           id="font-picker-listbox"
           role="listbox"
           aria-label="Font family selection"
           style={{
+            gap: 0,
             position: "absolute",
             left: 0,
             right: 0,
@@ -151,8 +153,6 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
             zIndex: 100,
             maxHeight: 300,
             overflow: "hidden",
-            display: "flex",
-            flexDirection: "column",
           }}
         >
           <FontSearchInput value={fontSearch} onChange={setFontSearch} />
@@ -175,7 +175,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
             currentValue={value}
             onSelect={handleFontSelect}
           />
-        </div>
+        </Stack>
       )}
     </div>
   );

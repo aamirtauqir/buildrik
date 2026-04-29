@@ -1,6 +1,6 @@
 {
   "counts": {
-    "stack-multi-prop": 15
+    "stack-multi-prop": 12
   },
   "sites": [
     {
@@ -138,19 +138,6 @@
       ]
     },
     {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/inspector/shared/TokenPickerPopover.tsx",
-      "line": 321,
-      "bucket": "stack-multi-prop",
-      "gap": 3,
-      "extraProps": [
-        "padding",
-        "borderRadius",
-        "cursor",
-        "transition",
-        "outline"
-      ]
-    },
-    {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/modals/CommandPalette.tsx",
       "line": 281,
       "bucket": "stack-multi-prop",
@@ -167,32 +154,6 @@
         "borderRadius",
         "boxShadow",
         "zIndex",
-        "overflow"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/inspector/sections/layout/previews.tsx",
-      "line": 21,
-      "bucket": "stack-multi-prop",
-      "gap": 2,
-      "extraProps": [
-        "width"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/inspector/sections/typography/FontPicker.tsx",
-      "line": 143,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "position",
-        "left",
-        "right",
-        "marginTop",
-        "background",
-        "borderRadius",
-        "zIndex",
-        "maxHeight",
         "overflow"
       ]
     },

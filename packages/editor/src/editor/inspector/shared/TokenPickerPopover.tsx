@@ -1,5 +1,6 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
  * TokenPickerPopover — pick a design-system token or enter a raw value.
  *
@@ -319,10 +320,6 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                     tabIndex={focused ? 0 : -1}
                     onClick={() => onSelect(token.id, cssVarRef)}
                     style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: 3,
                       padding: "4px 2px",
                       background: selected || focused ? "var(--buildrick-accent-subtle)" : "transparent",
                       border: selected
@@ -346,33 +343,35 @@ export const TokenPickerPopover: React.FC<TokenPickerPopoverProps> = ({
                     }}
                     onFocus={() => setFocusedIndex(idx)}
                   >
-                    {/* Swatch */}
-                    <div
-                      style={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: 5,
-                        background: token.value,
-                        border: `1px solid var(--bd-border-medium)`,
-                        flexShrink: 0,
-                      }}
-                    />
-                    {/* Name */}
-                    <span
-                      style={{
-                        fontSize: 9,
-                        color: "var(--buildrick-text-tertiary)",
-                        textAlign: "center",
-                        lineHeight: 1.2,
-                        wordBreak: "break-word",
-                        maxWidth: 44,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {token.name}
-                    </span>
+                    <Stack style={{ gap: 3, alignItems: "center" }}>
+                      {/* Swatch */}
+                      <div
+                        style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: 5,
+                          background: token.value,
+                          border: `1px solid var(--bd-border-medium)`,
+                          flexShrink: 0,
+                        }}
+                      />
+                      {/* Name */}
+                      <span
+                        style={{
+                          fontSize: 9,
+                          color: "var(--buildrick-text-tertiary)",
+                          textAlign: "center",
+                          lineHeight: 1.2,
+                          wordBreak: "break-word",
+                          maxWidth: 44,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {token.name}
+                      </span>
+                    </Stack>
                   </Button>)
                 ) : (
                   // ── List item (spacing / type) ──

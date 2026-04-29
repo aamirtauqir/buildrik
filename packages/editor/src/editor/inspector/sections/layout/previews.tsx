@@ -5,6 +5,7 @@
  */
 
 import * as React from "react";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
 
 // ============================================================================
 // DISPLAY PREVIEW
@@ -17,17 +18,10 @@ export const DisplayPreview: React.FC<{ type: string }> = ({ type }) => {
   switch (type) {
     case "block":
       return (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-            width: 28,
-          }}
-        >
+        <Stack style={{ gap: 2, width: 28 }}>
           <div style={{ ...box, height: 5 }} />
           <div style={{ ...box, height: 5 }} />
-        </div>
+        </Stack>
       );
     case "flex":
       return (
