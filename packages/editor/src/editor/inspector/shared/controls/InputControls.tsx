@@ -1,5 +1,6 @@
 import { Select } from "@/editor/shared/vibcoder/Select";
 import { Input } from "@/editor/shared/vibcoder/Input";
+import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Input Controls — InputRow, InputWithUnit, SelectRow.
@@ -79,7 +80,7 @@ export const InputRow: React.FC<InputRowProps> = ({
     </label>
     <div className="bdi-row-content">
       {textarea ? (
-        <textarea
+        <Textarea
           className="bdi-text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
