@@ -18,6 +18,7 @@ import {
 } from "@/editor/shared/vibcoder";
 import { TokenPickerPopover } from "../shared/TokenPickerPopover";
 import { Section, InputWithUnit, MoreSettingsToggle, type SectionTier, MixedValueIndicator } from "../shared/controls";
+import { getCssVariable } from "@/shared/utils/getCssVariable";
 
 // ============================================================================
 // HELPERS
@@ -27,7 +28,7 @@ const isTokenVar = (val: string): boolean => /^var\(--buildrick-design-/.test(va
 
 const resolveVar = (cssVar: string): string => {
   const varName = cssVar.replace(/^var\(/, "").replace(/\)$/, "");
-  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim() || "";
+  return getCssVariable(varName);
 };
 
 // ============================================================================
