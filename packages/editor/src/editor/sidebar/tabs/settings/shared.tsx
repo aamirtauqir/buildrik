@@ -1,4 +1,6 @@
 import { Input as VibcoderInput } from "@/editor/shared/vibcoder/Input";
+import { Textarea as VibcoderTextarea } from "@/editor/shared/vibcoder/Textarea";
+import { Select as VibcoderSelect } from "@/editor/shared/vibcoder/Select";
 import { Button } from "@/editor/shared/vibcoder/Button";
 /**
  * Settings tab — shared primitives.
@@ -83,7 +85,7 @@ Input.displayName = "Input";
 type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, ...rest }, ref) => (
-    <textarea
+    <VibcoderTextarea
       ref={ref}
       className={`bd-set-input${className ? " " + className : ""}`}
       {...rest}
@@ -95,13 +97,13 @@ Textarea.displayName = "Textarea";
 type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement>;
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, children, ...rest }, ref) => (
-    <select
+    <VibcoderSelect
       ref={ref}
       className={`bd-set-input${className ? " " + className : ""}`}
       {...rest}
     >
       {children}
-    </select>
+    </VibcoderSelect>
   )
 );
 Select.displayName = "Select";

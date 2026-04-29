@@ -8,7 +8,7 @@ import type { CustomCodeConfig } from "../../../../../shared/types/project";
 import { validateHtml, type HtmlValidationResult } from "../../../../../shared/utils/validateHtml";
 import { validateCss, type CssValidationResult } from "../../../../../shared/utils/validateCss";
 import { useSettingsScreen } from "../hooks/useSettingsScreen";
-import { Input, Screen, Section } from "../shared";
+import { Input, Screen, Section, Textarea } from "../shared";
 
 import type { ScreenProps } from "../types";
 
@@ -88,7 +88,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange 
       <div style={warningBannerStyles}>⚠️ Custom code runs on all pages. Test thoroughly.</div>
 
       <Section title="Head Scripts">
-        <textarea
+        <Textarea
           id="section-head-scripts"
           value={headCode}
           onChange={(e) => {
@@ -115,7 +115,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange 
       </Section>
 
       <Section title="Body Scripts (End)">
-        <textarea
+        <Textarea
           id="section-body-scripts"
           value={bodyCode}
           onChange={(e) => {
@@ -128,7 +128,7 @@ export const AdvancedScreen: React.FC<ScreenProps> = ({ composer, onDirtyChange 
       </Section>
 
       <Section title="Global CSS">
-        <textarea
+        <Textarea
           id="section-global-css"
           value={cssCode}
           onChange={(e) => {
