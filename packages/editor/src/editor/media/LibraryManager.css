@@ -822,10 +822,10 @@
 
 .mgr-det-actions .mgr-btn.danger {
   color: var(--buildrick-error, var(--bd-error));
-  border-color: #FECACA;
+  border-color: var(--bd-error-border);
 }
 
-.mgr-det-actions .mgr-btn.danger:hover { background: #FEE2E2; }
+.mgr-det-actions .mgr-btn.danger:hover { background: var(--bd-error-tint); }
 
 .mgr-status {
   background: var(--buildrick-bg-card);
@@ -870,8 +870,8 @@
   align-items: center;
   gap: 5px;
   padding: 3px var(--bd-space-2);
-  background: #FEF3C7;
-  color: #92400E;
+  background: var(--bd-warning-tint);
+  color: var(--bd-warning);
   border-radius: 12px;
   font-size: 10px;
   font-weight: 600;

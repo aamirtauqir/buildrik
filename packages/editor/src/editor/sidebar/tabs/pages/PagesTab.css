@@ -279,7 +279,7 @@
 .bd-pg-chip.hidden    { background: var(--bd-bg-subtle); color: #475569; } /* contrast-fix per design review */
 .bd-pg-chip.password  { background: #E0F2FE; color: #0369A1; }
 .bd-pg-chip.external  { background: var(--bd-bg-panel); color: var(--bd-fg-secondary); }
-.bd-pg-chip.error     { background: #FEE2E2; color: #991B1B; }
+.bd-pg-chip.error     { background: var(--bd-error-tint); color: var(--bd-error); }
 .bd-pg-chip .dot,
 .bd-pg-home-chip .dot {
   width: 4px; height: 4px;

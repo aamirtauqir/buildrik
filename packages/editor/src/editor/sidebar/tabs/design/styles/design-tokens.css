@@ -195,7 +195,7 @@
 }
 
 .buildrick-design-picker__hex-input-wrap--error {
-  border-color: #ef4444;
+  border-color: var(--bd-error);
 }
 
 .buildrick-design-picker__hash {
@@ -226,7 +226,7 @@
 
 .buildrick-design-picker__hex-error {
   font-size: 12px;
-  color: #ef4444;
+  color: var(--bd-error);
   padding-top: 2px;
 }
 

@@ -209,7 +209,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                   borderRadius: 6,
                   fontSize: 12,
                   fontWeight: 600,
-                  color: copied ? "#166534" : "var(--bd-fg-primary)",
+                  color: copied ? "var(--bd-success)" : "var(--bd-fg-primary)",
                   cursor: "pointer",
                   flexShrink: 0,
                   transition: "color 0.1s ease",

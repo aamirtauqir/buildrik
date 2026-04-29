@@ -124,7 +124,7 @@ const IconChevronDown: React.FC<{ color: string }> = ({ color }) => (
 );
 
 const IconCheck: React.FC = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#166534" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--bd-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <polyline points="20 6 9 17 4 12" />
   </svg>
 );
@@ -292,7 +292,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
                   padding: "8px 12px",
                   background: "transparent",
                   border: "none",
-                  color: opt.danger ? "#EF4444" : opt.disabled ? "var(--bd-fg-muted)" : "var(--bd-fg-primary)",
+                  color: opt.danger ? "var(--bd-error)" : opt.disabled ? "var(--bd-fg-muted)" : "var(--bd-fg-primary)",
                   fontSize: 13,
                   fontWeight: opt.checked ? 600 : 400,
                   cursor: opt.disabled ? "default" : "pointer",
@@ -302,7 +302,7 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
                 }}
                 onMouseEnter={(e) => {
                   if (!opt.disabled) {
-                    e.currentTarget.style.background = opt.danger ? "#FEF2F2" : "var(--bd-bg-panel)";
+                    e.currentTarget.style.background = opt.danger ? "var(--bd-error-tint)" : "var(--bd-bg-panel)";
                   }
                 }}
                 onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}

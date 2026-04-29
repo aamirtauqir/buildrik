@@ -156,7 +156,7 @@ const checkboxStyles: React.CSSProperties = {
   width: "18px",
   height: "18px",
   marginTop: "2px",
-  accentColor: "#3b82f6",
+  accentColor: "var(--bd-accent)",
 };
 
 const checkboxContentStyles: React.CSSProperties = {

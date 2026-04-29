@@ -224,7 +224,7 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
         ? `Time-traveling: ${currentEntry.label}`
         : "Select a point to preview";
       label.style.fontSize = "14px";
-      label.style.color = "#666";
+      label.style.color = "var(--bd-fg-secondary)";
       label.style.fontFamily = "inherit";
       label.style.padding = "16px";
       layer.appendChild(label);

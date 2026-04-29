@@ -226,7 +226,7 @@
 [data-buildrick-type="image"]:not([src]),
 [data-buildrick-type="image"][src=""] {
   min-height: 100px;
-  background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+  background: linear-gradient(135deg, var(--bd-bg-subtle) 0%, var(--bd-border) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
