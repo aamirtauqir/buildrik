@@ -35,12 +35,10 @@ export class PluginManager extends EventEmitter {
 
     const { id, name, version } = plugin;
 
-    // Check if already registered
     if (this.plugins.has(id)) {
       throw new Error(`Plugin "${id}" is already registered`);
     }
 
-    // Check dependencies
     if (plugin.dependencies) {
       for (const depId of plugin.dependencies) {
         if (!this.plugins.has(depId)) {
@@ -49,7 +47,11 @@ export class PluginManager extends EventEmitter {
       }
     }
 
-    // Store metadata
+    // Load before storing so a failure does not leave a half-registered plugin
+    if (config.enabled !== false) {
+      await this.load(id, plugin);
+    }
+
     this.metadata.set(id, {
       id,
       name,
@@ -57,18 +59,12 @@ export class PluginManager extends EventEmitter {
       description: plugin.description,
       author: plugin.author,
       enabled: config.enabled !== false,
-      loaded: false,
+      loaded: config.enabled !== false,
     });
 
-    // Store plugin
     this.plugins.set(id, plugin);
 
     this.emit(EVENTS.PLUGIN_REGISTERED, { id, plugin });
-
-    // Auto-load if enabled
-    if (config.enabled !== false) {
-      await this.load(id);
-    }
   }
 
   /**
@@ -132,15 +128,15 @@ export class PluginManager extends EventEmitter {
   /**
    * Load/initialize a plugin
    */
-  async load(id: string): Promise<void> {
-    const plugin = this.plugins.get(id);
+  async load(id: string, instance?: Plugin): Promise<void> {
+    const plugin = instance ?? this.plugins.get(id);
     const meta = this.metadata.get(id);
 
-    if (!plugin || !meta) {
+    if (!plugin) {
       throw new Error(`Plugin "${id}" not found`);
     }
 
-    if (meta.loaded) {
+    if (meta?.loaded) {
       return; // Already loaded
     }
 
@@ -157,13 +153,17 @@ export class PluginManager extends EventEmitter {
         await plugin.initialize(this.composer);
 
         // Update metadata
-        meta.loaded = true;
-        meta.enabled = true;
-        meta.error = undefined;
+        if (meta) {
+          meta.loaded = true;
+          meta.enabled = true;
+          meta.error = undefined;
+        }
 
         this.emit(EVENTS.PLUGIN_LOADED, { id, plugin });
       } catch (error) {
-        meta.error = error instanceof Error ? error.message : String(error);
+        if (meta) {
+          meta.error = error instanceof Error ? error.message : String(error);
+        }
         this.emit(EVENTS.PLUGIN_ERROR, { id, error });
         throw error;
       } finally {
@@ -263,6 +263,13 @@ export class PluginManager extends EventEmitter {
    */
   has(id: string): boolean {
     return this.plugins.has(id);
+  }
+
+  /**
+   * Alias for has
+   */
+  isRegistered(id: string): boolean {
+    return this.has(id);
   }
 
   /**
