@@ -115,9 +115,12 @@ function scanFile(file) {
 
 const args = process.argv.slice(2);
 const mode = args.includes("--fail") ? "FAIL"
+  : args.includes("--json") ? "JSON"
   : args.includes("--group-by-value") ? "GROUP"
   : args.includes("--count") ? "COUNT"
   : "LIST";
+const outIdx = args.indexOf("--out");
+const OUT_PATH = outIdx >= 0 ? args[outIdx + 1] : null;
 
 const allSites = [];
 for (const f of collectFiles()) {
@@ -128,6 +131,23 @@ const count = allSites.length;
 
 if (mode === "COUNT") {
   console.log(count);
+  process.exit(0);
+}
+
+if (mode === "JSON") {
+  const payload = allSites.map((s) => ({
+    file: path.relative(REPO_ROOT, s.file),
+    line: s.line,
+    hex: s.hex,
+    snippet: s.snippet,
+  }));
+  const json = JSON.stringify(payload, null, 2);
+  if (OUT_PATH) {
+    fs.writeFileSync(OUT_PATH, json);
+    console.log(`Wrote ${count} sites to ${OUT_PATH}`);
+  } else {
+    console.log(json);
+  }
   process.exit(0);
 }
 
