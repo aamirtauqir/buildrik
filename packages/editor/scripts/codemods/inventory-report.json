@@ -1,7 +1,6 @@
 {
   "counts": {
     "stack-multi-prop": 22,
-    "cluster-clean": 1,
     "cluster-off-grid": 2,
     "stack-off-grid": 2
   },
@@ -76,18 +75,6 @@
       "extraProps": [
         "flex",
         "minWidth"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/panels/RichTextEditor.tsx",
-      "line": 130,
-      "bucket": "cluster-clean",
-      "gap": 4,
-      "extraProps": [
-        "padding",
-        "background",
-        "borderRadius",
-        "border"
       ]
     },
     {

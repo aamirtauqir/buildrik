@@ -1,5 +1,6 @@
 import { Select } from "@/editor/shared/vibcoder/Select";
 import { Input } from "@/editor/shared/vibcoder/Input";
+import { Cluster } from "@/editor/shared/vibcoder/Cluster";
 /**
  * Aquibra Rich Text Editor
  * WYSIWYG text editing toolbar
@@ -125,13 +126,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
   ];
 
   return (
-    <div
+    <Cluster
+      gap="xs"
       className="buildrick-rte"
       style={{
-        display: "flex",
-        flexWrap: "wrap",
-        alignItems: "center",
-        gap: 4,
         padding: 8,
         background: "var(--buildrick-bg-panel)",
         borderRadius: 8,
@@ -297,7 +295,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
           <TooltipContent>Clear Formatting</TooltipContent>
         </TooltipPortal>
       </Tooltip>
-    </div>
+    </Cluster>
   );
 };
 
