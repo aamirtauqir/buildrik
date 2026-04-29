@@ -11,6 +11,7 @@
  */
 
 import * as React from "react";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
 import type { BoxModel, ElementInfo } from "../utils/elementInfo";
 
 /**
@@ -182,7 +183,7 @@ interface InfoBadgeProps {
 }
 
 export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
-  <div
+  <Stack
     style={{
       position: "absolute",
       left: rect.left,
@@ -194,8 +195,6 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
       fontSize: 12,
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       whiteSpace: "nowrap",
-      display: "flex",
-      flexDirection: "column",
       gap: 2,
       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
     }}
@@ -239,7 +238,7 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
         <span style={{ color: "#f9e2af", opacity: 0.8 }}>.{info.classes[0]}</span>
       )}
     </div>
-  </div>
+  </Stack>
 );
 
 // =============================================================================

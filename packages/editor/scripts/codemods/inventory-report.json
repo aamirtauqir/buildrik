@@ -1,6 +1,6 @@
 {
   "counts": {
-    "stack-multi-prop": 22
+    "stack-multi-prop": 19
   },
   "sites": [
     {
@@ -184,52 +184,6 @@
       "gap": 10,
       "extraProps": [
         "padding"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/canvas/controls/CommandPalette.tsx",
-      "line": 280,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "position",
-        "top",
-        "left",
-        "transform",
-        "width",
-        "maxWidth",
-        "maxHeight",
-        "overflow"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/canvas/controls/KeyboardCheatSheet.tsx",
-      "line": 207,
-      "bucket": "stack-multi-prop",
-      "gap": null,
-      "extraProps": [
-        "width",
-        "maxHeight",
-        "overflow",
-        "animation",
-        "outline"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/canvas/overlays/ElementHoverOverlaySubComponents.tsx",
-      "line": 186,
-      "bucket": "stack-multi-prop",
-      "gap": 2,
-      "extraProps": [
-        "position",
-        "background",
-        "color",
-        "padding",
-        "borderRadius",
-        "fontSize",
-        "fontFamily",
-        "whiteSpace",
-        "boxShadow"
       ]
     },
     {

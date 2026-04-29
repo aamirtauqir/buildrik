@@ -1,5 +1,6 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
  * Command Palette Component
  * Searchable action list triggered by Cmd+Shift+P (like VS Code)
@@ -276,7 +277,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         onClick={onClose}
       />
       {/* Palette */}
-      <div
+      <Stack
         style={{
           ...PANEL_STYLE,
           position: "fixed",
@@ -287,8 +288,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           maxWidth: "90vw",
           maxHeight: "60vh",
           zIndex: Z_INDEX.modal,
-          display: "flex",
-          flexDirection: "column",
+          gap: 0,
           overflow: "hidden",
         }}
         role="dialog"
@@ -438,7 +438,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           <span>↵ Select</span>
           <span>Esc Close</span>
         </div>
-      </div>
+      </Stack>
     </>
   );
 };

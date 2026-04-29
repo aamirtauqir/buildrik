@@ -1,5 +1,6 @@
 import { Kbd } from "@/editor/shared/vibcoder/Kbd";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
 /**
  * Keyboard Shortcuts Cheat Sheet
  * Floating overlay triggered by '?' key showing all available shortcuts
@@ -200,7 +201,7 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
         animation: "buildrick-fade-in 0.15s ease",
       }}
     >
-      <div
+      <Stack
         ref={containerRef}
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
@@ -212,8 +213,7 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
           border: `1px solid ${tokens.colors.borderSubtle}`,
           boxShadow: tokens.shadows.lg,
           overflow: "hidden",
-          display: "flex",
-          flexDirection: "column",
+          gap: 0,
           animation: "buildrick-scale-in 0.2s ease",
           outline: "none",
         }}
@@ -337,7 +337,7 @@ export const KeyboardCheatSheet: React.FC<KeyboardCheatSheetProps> = ({ isOpen, 
             opens command palette
           </span>
         </div>
-      </div>
+      </Stack>
     </div>
   );
 };
