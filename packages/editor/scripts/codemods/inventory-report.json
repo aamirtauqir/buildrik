@@ -1,6 +1,6 @@
 {
   "counts": {
-    "stack-multi-prop": 24,
+    "stack-multi-prop": 22,
     "cluster-clean": 1,
     "cluster-off-grid": 2,
     "stack-off-grid": 2
@@ -92,31 +92,7 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 153,
-      "bucket": "stack-multi-prop",
-      "gap": 10,
-      "extraProps": [
-        "background",
-        "border",
-        "borderRadius",
-        "padding"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 302,
-      "bucket": "stack-multi-prop",
-      "gap": 10,
-      "extraProps": [
-        "background",
-        "border",
-        "borderRadius",
-        "padding"
-      ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 406,
+      "line": 404,
       "bucket": "stack-multi-prop",
       "gap": null,
       "extraProps": [
@@ -128,7 +104,7 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 453,
+      "line": 451,
       "bucket": "stack-multi-prop",
       "gap": 6,
       "extraProps": [
@@ -141,7 +117,7 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/AccountModal.tsx",
-      "line": 495,
+      "line": 493,
       "bucket": "stack-multi-prop",
       "gap": 20,
       "extraProps": [
@@ -198,7 +174,7 @@
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/shell/InviteModal.tsx",
-      "line": 111,
+      "line": 112,
       "bucket": "stack-multi-prop",
       "gap": null,
       "extraProps": [
