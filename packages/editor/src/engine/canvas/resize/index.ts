@@ -25,7 +25,6 @@ export type {
 // Constants
 export {
   DEFAULT_CONSTRAINTS,
-  DEFAULT_SNAP_CONFIG,
   ELEMENT_CONSTRAINTS,
   DEFAULT_HANDLE_HIT_AREA,
   DEFAULT_BORDER_HIT_WIDTH,
@@ -35,6 +34,7 @@ export {
   ROTATION_SNAP_THRESHOLD,
   SHIFT_ROTATION_SNAP_ANGLE,
 } from "./constants";
+export { DEFAULT_SNAP_CONFIG } from "../../shared/constants/canvas";
 
 // Utilities
 export {

@@ -15,7 +15,6 @@ import type { QuickSwitcherSection } from "./QuickSwitcher.types";
 // ============================================
 
 export const STORAGE_KEY = "buildrick-quick-switcher-recent";
-export const MAX_RECENT = 8;
 
 export const SECTIONS: QuickSwitcherSection[] = [
   { type: "recent", label: "Recent", icon: "\u{1F550}", emptyMessage: "No recent items" },

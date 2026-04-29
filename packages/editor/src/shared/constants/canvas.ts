@@ -116,6 +116,10 @@ export const CANVAS_COLORS = {
   selection: SELECTION_COLORS.outline,
   selectionGlow: SELECTION_COLORS.glow,
 
+  // Backward-compatible aliases for engine/canvas/ consumers
+  SELECTION: "#0D99FF",
+  HOVER: "#0D99FF33",
+
   // Indicators
   margin: "#10B981", // Emerald green
   padding: "var(--buildrick-accent-pressed)", // Blue for padding indicator
@@ -381,3 +385,19 @@ export const ZOOM_LIMITS = {
   max: 300,
   step: 10,
 } as const;
+
+// ============================================
+// SNAP CONFIGURATION
+// ============================================
+
+export const DEFAULT_SNAP_CONFIG = {
+  snapToGrid: false,
+  gridSize: 10,
+  snapToElements: true,
+  snapThreshold: 5,
+  snapToGuides: true,
+  rotationSnapAngles: [
+    0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, -15, -30, -45, -60, -75, -90, -105,
+    -120, -135, -150, -165,
+  ],
+};

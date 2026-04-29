@@ -12,7 +12,7 @@
 
 import type { SelectionBox, HoverHighlight } from "../../../shared/types/canvas";
 import type { Composer } from "../../Composer";
-import { CANVAS_COLORS as COLORS } from "../constants";
+import { CANVAS_COLORS as COLORS } from "../../../shared/constants/canvas";
 import { BoundsCalculator } from "./BoundsCalculator";
 
 /**

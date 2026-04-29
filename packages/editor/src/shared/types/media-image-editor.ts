@@ -106,33 +106,6 @@ export interface ImageAdjustments {
 }
 
 /**
- * Default image adjustments
- */
-export const DEFAULT_IMAGE_ADJUSTMENTS: Readonly<ImageAdjustments> = {
-  brightness: 0,
-  contrast: 0,
-  saturation: 0,
-  hue: 0,
-  exposure: 0,
-  highlights: 0,
-  shadows: 0,
-  temperature: 0,
-  tint: 0,
-  vibrance: 0,
-};
-
-/**
- * Default image filters
- */
-export const DEFAULT_IMAGE_FILTERS: Readonly<ImageFilters> = {
-  grayscale: 0,
-  sepia: 0,
-  blur: 0,
-  sharpen: 0,
-  invert: false,
-};
-
-/**
  * Image edit operation types
  */
 export type ImageEditOperation =

@@ -70,7 +70,6 @@ export const RECENT_STORAGE_KEY = "buildrick-elements-recent";
 export const FAVORITES_STORAGE_KEY = "buildrick-elements-favorites";
 export const TIP_DISMISSED_KEY = "buildrick-elements-tip-dismissed";
 export const EXPANDED_CATEGORY_KEY = "buildrick-elements-expanded-category";
-export const MAX_RECENT = 8;
 export const MOST_USED_IDS = [
   "section",
   "grid",

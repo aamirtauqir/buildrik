@@ -21,19 +21,6 @@ export const DEFAULT_CONSTRAINTS: SizeConstraints = {
   lockAspectRatio: false,
 };
 
-/** Default snap configuration */
-export const DEFAULT_SNAP_CONFIG: SnapConfig = {
-  snapToGrid: false,
-  gridSize: 10,
-  snapToElements: true,
-  snapThreshold: 5,
-  snapToGuides: true,
-  rotationSnapAngles: [
-    0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165, 180, -15, -30, -45, -60, -75, -90, -105,
-    -120, -135, -150, -165,
-  ],
-};
-
 // =============================================================================
 // ELEMENT-SPECIFIC CONSTRAINTS
 // =============================================================================

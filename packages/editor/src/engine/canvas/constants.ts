@@ -30,27 +30,6 @@ export const SELECTION_HANDLE_SIZE = 12;
 export const ROTATION_HANDLE_OFFSET = 24;
 
 // ============================================
-// Colors (Figma-inspired)
-// ============================================
-
-export const CANVAS_COLORS = {
-  /** Selection highlight color (Figma blue) */
-  SELECTION: "#0D99FF",
-  /** Smart guide color (Magenta) */
-  SMART_GUIDE: "#FF00FF",
-  /** Equal spacing indicator (Red-pink) */
-  EQUAL_SPACING: "#FF5757",
-  /** Distance measurement (Red-pink) */
-  DISTANCE: "#FF5757",
-  /** Hover highlight with opacity */
-  HOVER: "#0D99FF33",
-  /** Constraint indicators (Gray) */
-  CONSTRAINT: "#B3B3B3",
-  /** Parent guide (Purple) */
-  PARENT_GUIDE: "#9747FF",
-} as const;
-
-// ============================================
 // Constraints
 // ============================================
 
@@ -73,15 +52,6 @@ export const DEFAULT_SIZE_CONSTRAINTS = {
   aspectRatio: undefined,
   snapToGrid: false,
   gridSize: GRID_SIZE,
-} as const;
-
-/** Default snap configuration */
-export const DEFAULT_SNAP_CONFIG = {
-  snapToGrid: false,
-  gridSize: GRID_SIZE,
-  snapToElements: true,
-  snapThreshold: SNAP_THRESHOLD,
-  showSnapLines: true,
 } as const;
 
 // ============================================

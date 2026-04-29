@@ -14,9 +14,9 @@ export {
   FAVORITES_STORAGE_KEY,
   TIP_DISMISSED_KEY,
   EXPANDED_CATEGORY_KEY,
-  MAX_RECENT,
   MOST_USED_IDS,
 } from "./constants";
+export { MAX_RECENT } from "@/shared/constants/ui";
 export { useElementsState } from "./useElementsState";
 export type { UseElementsStateReturn } from "./useElementsState";
 export {

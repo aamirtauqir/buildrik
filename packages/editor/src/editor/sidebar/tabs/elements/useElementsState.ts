@@ -14,11 +14,11 @@ import {
   FAVORITES_STORAGE_KEY,
   TIP_DISMISSED_KEY,
   EXPANDED_CATEGORY_KEY,
-  MAX_RECENT,
   MOST_USED_IDS,
   NEW_CATEGORY_ORDER,
   CATEGORY_REMAP,
 } from "./constants";
+import { MAX_RECENT } from "@/shared/constants/ui";
 import type { ElementsTabProps } from "./types";
 
 // ─── Return type ──────────────────────────────────────────────────────────────

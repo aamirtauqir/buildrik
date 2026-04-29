@@ -38,7 +38,6 @@
 import * as React from "react";
 import {
   STORAGE_KEY,
-  MAX_RECENT,
   SECTIONS,
   backdropStyles,
   containerStyles,
@@ -58,6 +57,7 @@ import {
   emptyStyles,
   hintKeyStyles,
 } from "./QuickSwitcher.styles";
+import { MAX_RECENT } from "@/shared/constants/ui";
 import type {
   QuickSwitcherItem,
   QuickSwitcherItemType,
