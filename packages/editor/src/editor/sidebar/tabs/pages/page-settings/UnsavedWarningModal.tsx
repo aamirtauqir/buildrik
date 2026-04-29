@@ -18,6 +18,7 @@ import {
   ModalContent as VibcoderModalContent,
   OverlayMount,
 } from "@/editor/shared/vibcoder";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
 import { ROW_MD } from "@shared/constants/layout";
 
 // Phase 5 escape: Radix.Dialog.Content props (onOpenAutoFocus) are hidden
@@ -64,7 +65,7 @@ export const UnsavedWarningModal: React.FC<Props> = ({
           }}
         >
           <div className="bd-modal__body">
-      <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+      <Stack gap="xs">
         {/* Title */}
         <div
           style={{
@@ -117,7 +118,7 @@ export const UnsavedWarningModal: React.FC<Props> = ({
             Save &amp; Switch
           </Button>
         </div>
-      </div>
+      </Stack>
           </div>
         </ModalContent>
       </Modal>

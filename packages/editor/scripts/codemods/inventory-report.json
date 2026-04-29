@@ -1,8 +1,7 @@
 {
   "counts": {
     "stack-multi-prop": 22,
-    "cluster-off-grid": 2,
-    "stack-off-grid": 2
+    "cluster-off-grid": 2
   },
   "sites": [
     {
@@ -306,20 +305,6 @@
         "maxHeight",
         "overflow"
       ]
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/inspector/shared/controls/ControlRow.tsx",
-      "line": 47,
-      "bucket": "stack-off-grid",
-      "gap": 3,
-      "extraProps": []
-    },
-    {
-      "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/pages/page-settings/UnsavedWarningModal.tsx",
-      "line": 67,
-      "bucket": "stack-off-grid",
-      "gap": 0,
-      "extraProps": []
     },
     {
       "file": "/Users/shahg/Desktop/pencil/buildrik/packages/editor/src/editor/sidebar/tabs/settings/screens/BillingScreen.tsx",
