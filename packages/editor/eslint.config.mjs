@@ -91,7 +91,6 @@ export default [
       "buildrik/no-inline-hex": "error",
       "buildrik/no-inspector-tokens": "error",
       "buildrik/no-get-property-value-ds": "error",
-      "buildrik/no-legacy-components-import": "error",
       "no-unused-vars": "off",
       "no-undef": "off",
     },
@@ -217,11 +216,10 @@ export default [
       "buildrik/no-hardcoded-open-prop": "error",
     },
   },
-  // Survivor #6 — REMOVED 2026-05-02. src/components/ deleted entirely;
-  // ban-rule had nothing left to enforce. Past-tense doc kept here as a
-  // marker for git blame / future archaeology: the rule guarded against
-  // adding imports back to the legacy folder during migration; folder
-  // is now gone, guard is moot.
+  // Survivor #6 — REMOVED 2026-05-04. src/components/ deleted 2026-05-02;
+  // `buildrik/no-legacy-components-import` rule (file + plugin registration
+  // + config wiring + tests) drained 2026-05-04 once the actual cleanup
+  // confirmed the rule had nothing left to enforce.
   {
     ignores: [
       "dist/**",

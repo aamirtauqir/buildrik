@@ -24,7 +24,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),
-      "@components": resolve(__dirname, "./src/components"),
       "@hooks": resolve(__dirname, "./src/hooks"),
       "@utils": resolve(__dirname, "./src/utils"),
       "@shared": resolve(__dirname, "./src/shared"),
