@@ -1,17 +1,20 @@
 /**
- * Aquibra UI Components
+ * Aquibra UI Components — surviving Buildrik primitives.
+ *
+ * Post-cleanup (2026-05-02): 12 dead files + ds/ subfolder + broken index.tsx
+ * deleted; only files with verified consumers remain. Audit findings:
+ *   - Badge — 5 consumers (semantic palette; distinct from vibcoder Badge
+ *     chrome-state palette per Phase 4 keep-legacy decision)
+ *   - ErrorState — 1 consumer (sidebar PanelErrorState)
+ *   - HelpTooltip — 2 consumers (inspector layout controls)
+ *   - Icons — 6 consumers (editor/inspector/, panels/, rail/, shell/)
+ *   - panel/PanelShell — 7 consumers (every sidebar tab)
+ *
  * @license BSD-3-Clause
  */
 
 export { HelpTooltip, type HelpTooltipProps } from "./HelpTooltip";
-export { ErrorMessage, type ErrorMessageProps } from "./ErrorMessage";
-export { FormInput, type FormInputProps } from "./FormInput";
-export { NumericStepper, type NumericStepperProps } from "./NumericStepper";
-export { Accordion, type AccordionProps, type AccordionItem } from "./Accordion";
 export { Badge, type BadgeProps } from "./Badge";
-export { Resizable, type ResizableProps } from "./Resizable";
-export { Grid, GridItem, GridPresets, type GridProps, type GridItemProps } from "./Grid";
-export { EmptyState, type EmptyStateProps } from "./EmptyState";
 export {
   ErrorState,
   ErrorBoundary,
@@ -21,23 +24,3 @@ export {
   type FieldErrorProps,
   type ErrorSeverity,
 } from "./ErrorState";
-export { ColorSwatch, ColorSwatchGroup, type ColorSwatchProps } from "./ColorSwatch";
-export { TreeView, type TreeViewProps, type TreeNode } from "./TreeView";
-export { UpgradeGate, type UpgradeGateProps, type PlanLevel } from "./UpgradeGate";
-export {
-  QuickSwitcher,
-  useQuickSwitcher,
-  type QuickSwitcherProps,
-  type QuickSwitcherItem,
-  type QuickSwitcherItemType,
-  type UseQuickSwitcherResult,
-} from "./QuickSwitcher";
-export type { QuickSwitcherSection } from "./QuickSwitcher.types";
-export {
-  InfoBanner,
-  Tip,
-  WarningBanner,
-  type InfoBannerProps,
-  type TipProps,
-  type WarningBannerProps,
-} from "./InfoBanner";
