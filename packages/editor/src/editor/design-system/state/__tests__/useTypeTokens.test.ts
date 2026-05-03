@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
-import type { DesignToken } from "../../../../../features/design-system/types";
-import { useTypeTokens } from "./useTypeTokens";
+import type { DesignToken } from "../../types";
+import { useTypeTokens } from "../useTypeTokens";
 
 const MOCK_TYPE_TOKEN: DesignToken = {
   id: "font-size-4xl",

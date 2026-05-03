@@ -18,7 +18,6 @@ export default defineConfig({
       "@": resolve(__dirname, "./src"),
       "@hooks": resolve(__dirname, "./src/hooks"),
       "@utils": resolve(__dirname, "./src/utils"),
-      "@features": resolve(__dirname, "./src/features"),
       "@shared": resolve(__dirname, "./src/shared"),
     },
   },

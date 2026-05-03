@@ -1,5 +1,5 @@
 /**
- * features/design-system — public API
+ * editor/design-system — public API
  * @license BSD-3-Clause
  */
 

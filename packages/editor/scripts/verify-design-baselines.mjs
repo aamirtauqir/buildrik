@@ -28,7 +28,7 @@ for (const line of css.split("\n")) {
 
 // Parse constants.ts DEFAULT_TOKENS. Each DesignToken object contains cssVar + value.
 const ts = fs.readFileSync(
-  path.join(root, "src/features/design-system/constants.ts"),
+  path.join(root, "src/editor/design-system/constants.ts"),
   "utf8"
 );
 const tsValues = {};

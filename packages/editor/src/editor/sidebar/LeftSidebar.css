@@ -1,6 +1,6 @@
 @import "./tabs/history/styles/history.css";
 @import "./tabs/settings/styles/settings.css";
-@import "./tabs/design/styles/design-tokens.css";
+@import "../design-system/styles/design-tokens.css";
 @import "./tabs/media/MediaTab.css";
 @import "./shared/SkeletonStates.css";
 @import "./shared/EmptyStates.css";

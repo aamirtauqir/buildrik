@@ -39,7 +39,6 @@ const FULL_CHROME_ROOTS = [
   "src/shared/ui",
   "src/shared/forms",
   "src/ai",
-  "src/features/design-system/ui",
 ];
 const EDITOR_ONLY_ROOTS = ["src/editor"];
 const EDITOR_EXCLUDE_DIRS = ["inspector"]; // mid-flight port; re-include later

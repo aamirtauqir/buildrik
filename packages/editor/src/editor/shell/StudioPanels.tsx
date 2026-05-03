@@ -23,7 +23,7 @@ import { ProInspector } from "../inspector/ProInspector";
 import { LayoutShell } from "../rail/LayoutShell";
 import { LeftSidebar } from "../sidebar/LeftSidebar";
 import { FullPageView } from "../sidebar/FullPageView";
-import { TokenRegistryProvider } from "../../features/design-system";
+import { TokenRegistryProvider } from "@/editor/design-system";
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { PageTabBar } from "./PageTabBar";
 

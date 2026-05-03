@@ -9,7 +9,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import { Link2, Link2Off } from "lucide-react";
 import * as React from "react";
-import { useSpacingRegistry } from "../../../features/design-system/state/TokenRegistryContext";
+import { useSpacingRegistry } from "@/editor/design-system/state/TokenRegistryContext";
 import {
   Popover,
   PopoverTrigger,

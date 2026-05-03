@@ -2,7 +2,7 @@
  * themes/design-system/design.css
  * Buildrik DS V1 — user-editable SITE tokens (pre-render baselines)
  *
- * Values MUST match DEFAULT_TOKENS in features/design-system/constants.ts.
+ * Values MUST match DEFAULT_TOKENS in editor/design-system/constants.ts.
  * Runtime setProperty (Design tab) overrides these after hydration.
  *
  * @license BSD-3-Clause

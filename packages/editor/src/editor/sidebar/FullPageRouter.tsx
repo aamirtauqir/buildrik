@@ -11,7 +11,7 @@ import type { GroupedTabId } from "../rail/tabsConfig";
 
 // Lazy-loaded fullpage tab components
 const TemplatesTab = React.lazy(() => import("./tabs/templates/TemplatesTab"));
-const DesignSystemTab = React.lazy(() => import("./tabs/DesignSystemTab"));
+const DesignSystemTab = React.lazy(() => import("@/editor/design-system/ui/DesignSystemTab"));
 const SettingsTab = React.lazy(() => import("./tabs/settings/SettingsTab"));
 const LibraryManager = React.lazy(() =>
   import("../media/LibraryManager").then((m) => ({ default: m.LibraryManager }))

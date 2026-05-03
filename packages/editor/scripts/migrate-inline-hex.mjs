@@ -18,7 +18,6 @@ const ROOTS = [
   path.resolve(__dirname, "../src/shared/ui"),
   path.resolve(__dirname, "../src/shared/forms"),
   path.resolve(__dirname, "../src/ai"),
-  path.resolve(__dirname, "../src/features/design-system/ui"),
 ];
 
 // Safe mappings — only the most common, unambiguous hex values.

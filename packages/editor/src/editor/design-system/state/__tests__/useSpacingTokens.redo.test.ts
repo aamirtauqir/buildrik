@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
-import type { DesignToken } from "../../../../../features/design-system/types";
-import { useSpacingTokens } from "./useSpacingTokens";
+import type { DesignToken } from "../../types";
+import { useSpacingTokens } from "../useSpacingTokens";
 
 const MOCK_SPACING: DesignToken = {
   id: "space-4",

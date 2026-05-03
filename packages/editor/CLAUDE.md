@@ -22,12 +22,12 @@ Demo app: `demo/main.tsx` on port 5050.
 ```
 @/*       → ./src/*
 @shared/* → ./src/shared/*
-@features/* → ./src/features/*
 @hooks/*  → ./src/hooks/*
 @utils/*  → ./src/utils/*
 ```
 
 (`@components/*` removed 2026-05-02 with src/components/ deletion.)
+(`@features/*` removed 2026-05-03 with single-tenant src/features/ deletion — design-system folded into editor/design-system/.)
 
 ---
 
@@ -212,8 +212,12 @@ src/
 │   │                # UpgradeModal, Skeleton compounds.
 │   └── forms/       # Form field components
 │
-├── features/        # FEATURE MODULES — Self-contained feature units
-│   └── design-system/  # Design tokens (colors, typography, spacing)
+│                    # NOTE: src/features/ DELETED 2026-05-03. Held only
+│                    # `design-system/` (site-builder tokens). Single-tenant
+│                    # top-level dir = smell — folded into `editor/design-system/`
+│                    # alongside peer domains (editor/media/, editor/animation/,
+│                    # editor/onboarding/, etc.). 18 bridge shims at
+│                    # `editor/sidebar/tabs/design/` deleted in same PR.
 │
 ├── blocks/          # BLOCKS — Pre-built element templates (read-only data)
 ├── templates/       # TEMPLATES — Page templates (read-only data)
@@ -227,9 +231,7 @@ src/
 
 ```
 engine/    → shared/ (ONLY)
-editor/    → engine/, shared/, features/, blocks/, templates/
-components/ → engine/, shared/ (LEGACY — don't add new imports)
-features/  → engine/, shared/
+editor/    → engine/, shared/, blocks/, templates/
 services/  → shared/ (ONLY)
 shared/    → NOTHING from other src/ folders (leaf dependency).
             EXCEPTION: shared/extensions/ files MAY import from
@@ -248,9 +250,9 @@ themes/    → shared/ (ONLY)
 // src/engine/SomeManager.ts
 import { SomePanel } from '../editor/sidebar/tabs/SomePanel'; // NAHI!
 
-// GALAT — shared importing from features
+// GALAT — shared importing from editor
 // src/shared/utils/something.ts
-import { designTokens } from '../../features/design-system'; // NAHI!
+import { designTokens } from '../../editor/design-system'; // NAHI!
 ```
 
 ### New Code = editor/ folder
@@ -285,7 +287,7 @@ Ek concept = ek canonical home. Duplicate allowed nahi. Violation = auto-reject.
 | Vibcoder primitive React wrappers | `src/editor/shared/vibcoder/` | CANONICAL — generated, 288 consumers |
 | Compositions on vibcoder primitives | `src/shared/extensions/` | CANONICAL — PanelHeader, ConfirmDialog, etc. |
 | Buildrik non-vibcoder primitives | `src/shared/ui/` | AUDIT COMPLETE 2026-05-02 — 4 files (Badge/ErrorState/HelpTooltip/Icons) + `panel/PanelShell` retained, 12 dead files + ds/ + broken index.tsx deleted |
-| Site-builder tokens (user output, not chrome) | `src/features/design-system/` | CANONICAL — different domain, never merge with chrome DS |
+| Site-builder tokens (user output, not chrome) | `src/editor/design-system/` | CANONICAL — different domain, never merge with chrome DS. Moved from `src/features/design-system/` 2026-05-03. |
 | Legacy class rules | `src/themes/components.css` | RETIRING → drain to <300 lines, then rename `legacy-components.css` |
 | ~~Legacy chrome components~~ | ~~`src/components/`~~ | DELETED 2026-05-02 — graveyard fully drained |
 
@@ -334,6 +336,16 @@ Memory: 4 prior architecture attempts (V1 spec, V2 spec, axioms draft, editor-v2
   - Phase 4: `src/index.ts` (public API barrel) trimmed to canonical-only exports. `@buildrik/editor` package has no `main`/`module`/`exports` field — not published, no external consumers.
   - Phase 5: `rm -rf src/components/` (-219 files). Removed `@components/*` alias from `tsconfig.json` + `vite.config.ts`. Retired ESLint Survivor #6 ban-rule (had nothing left to enforce).
   - Net: top-level `src/` from 13 → 12 dirs. Combined with project/+react/ deletions earlier this session: **15 → 12 dirs, ~707 files removed from src/**.
+- **2026-05-03 — `src/features/` KILLED** (single-tenant top-level dir collapse):
+  - Inventory: `src/features/` held only `design-system/` (29 files). 1 entry, never grew.
+  - 18 bridge shim files at `src/editor/sidebar/tabs/design{,/components,/hooks,/utils,/modals}/` re-exported from `features/design-system/` — same anti-pattern as the components/ graveyard (95% redirect shims).
+  - Moved `src/features/design-system/` → `src/editor/design-system/` via `git mv` (preserves history). Now sits alongside peer domains: `editor/media/`, `editor/animation/`, `editor/onboarding/`, `editor/ecommerce/`, `editor/export/`, `editor/sync/`.
+  - 3 real cross-folder consumers re-pointed: `editor/sidebar/FullPageRouter.tsx`, `editor/shell/StudioPanels.tsx`, `editor/inspector/sections/SizeSection.tsx`.
+  - 18 bridge shims deleted. 3 bridge tests (smoke tests for re-export pattern) moved to canonical `state/__tests__/`, with `useSpacingTokens.test.ts` renamed to `.redo.test.ts` to avoid collision with existing preset tests.
+  - 3 build scripts updated: `find-inline-hex-v2.mjs`, `verify-design-baselines.mjs`, `migrate-inline-hex.mjs`.
+  - `@features/*` alias dropped from `tsconfig.json`, `vite.config.ts`, `vitest.config.ts`.
+  - 1 CSS file (`design-tokens.css`, 283 lines) restored from `tabs/design/styles/` to `editor/design-system/styles/`; LeftSidebar.css `@import` rewritten.
+  - Net: top-level `src/` from 12 → 11 dirs. Single-tenant containers deleted. 4th architecture-style cleanup of "code lives in wrong place; consumers vote with imports."
 
 ---
 

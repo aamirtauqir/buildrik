@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
-import type { DesignToken } from "../../../../../features/design-system/types";
-import { useColorTokens } from "./useColorTokens";
+import type { DesignToken } from "../../types";
+import { useColorTokens } from "../useColorTokens";
 
 const MOCK_TOKEN: DesignToken = {
   id: "color-primary",
