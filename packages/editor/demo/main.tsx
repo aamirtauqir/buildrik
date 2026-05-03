@@ -6,11 +6,12 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { Agentation } from "agentation";
-import { AquibraStudio } from "../src/components/Editor/AquibraStudio";
+import { AquibraStudio } from "../src/editor/shell/AquibraStudio";
 import type { Composer } from "../src/engine/Composer";
 // Global styles
 import "../src/themes/default.css";
-import "../src/components/Canvas/Canvas.css";
+// Note: canvas CSS now loaded via src/editor/canvas/Canvas.tsx import (./Canvas.css).
+// Legacy import "../src/components/Canvas/Canvas.css" deleted 2026-05-02 with src/components/.
 
 const App: React.FC = () => {
   const composerRef = React.useRef<Composer | null>(null);

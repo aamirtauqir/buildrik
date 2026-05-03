@@ -1,6 +1,14 @@
 /**
- * Aquibra - Visual Web Composer
- * Modern, lightweight visual web composer built for developers
+ * Aquibra — @buildrik/editor public API
+ *
+ * Notes:
+ *   - Package has no `main`/`module`/`exports` in package.json — not published.
+ *     No external consumers. Active runtime entry is demo/main.tsx → editor/shell/.
+ *   - This barrel kept as a clean re-export surface for any future consumer.
+ *   - Components dropped from this barrel (Topbar, Canvas, LayersPanel,
+ *     StylesPanel, TraitPanel, RichTextEditor, Accordion, Badge, form fields):
+ *     2026-05-02 graveyard cleanup. Future consumers import from canonical
+ *     paths under src/editor/, src/shared/ui/, or src/shared/forms/ directly.
  *
  * @module aquibra
  * @version 1.0.0
@@ -25,35 +33,9 @@ export {
 } from "./engine";
 
 // ============================================
-// Editor Components
+// Editor Shell
 // ============================================
-export { AquibraStudio, Topbar, Canvas } from "./components";
-
-// ============================================
-// Panel Components
-// ============================================
-export { LayersPanel, StylesPanel, TraitPanel, RichTextEditor } from "./components";
-
-// ============================================
-// UI Components
-// ============================================
-export { Accordion, Badge } from "./components";
-
-// ============================================
-// Form Components
-// ============================================
-export {
-  InputField,
-  NumberField,
-  SelectField,
-  ColorField,
-  SwitchField,
-  TextareaField,
-  SliderField,
-  CodeField,
-  FileField,
-  GradientPicker,
-} from "./components";
+export { AquibraStudio } from "./editor/shell/AquibraStudio";
 
 // ============================================
 // Types
@@ -81,5 +63,5 @@ export type {
 // ============================================
 // Default Export
 // ============================================
-import { AquibraStudio } from "./components";
+import { AquibraStudio } from "./editor/shell/AquibraStudio";
 export default AquibraStudio;
