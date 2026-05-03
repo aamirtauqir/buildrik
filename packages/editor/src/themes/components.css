@@ -33,8 +33,7 @@
 
 .buildrick-canvas {
   flex: 1;
-  /* Light canvas wrapper - matches inline styles in Canvas.tsx */
-  background: #f1f5f9;
+  background: var(--buildrick-bg-subtle);
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
@@ -56,11 +55,6 @@
   background: var(--buildrick-accent-subtle);
   color: var(--buildrick-accent);
   border-color: rgba(45, 109, 255, 0.3);
-}
-
-.buildrick-page-card.is-active {
-  border-color: #4fd1a1;
-  box-shadow: 0 12px 30px rgba(79, 209, 161, 0.18);
 }
 
 .pCard.isActive {
@@ -1294,7 +1288,7 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   background: var(--buildrick-accent);
   cursor: pointer;
-  border: 2px solid #fff;
+  border: 2px solid var(--buildrick-bg-card);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
@@ -1304,7 +1298,7 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 50%;
   background: var(--buildrick-accent);
   cursor: pointer;
-  border: 2px solid #fff;
+  border: 2px solid var(--buildrick-bg-card);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 

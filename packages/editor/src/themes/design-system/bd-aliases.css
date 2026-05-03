@@ -1,13 +1,25 @@
 /**
  * themes/design-system/bd-aliases.css
- * Buildrik DS — --bd-* alias layer for user-provided design-system drop.
+ * Buildrik DS — chrome --bd-* alias layer (hand-written canonical).
  *
- * Maps drop's --bd-* shorthand onto canonical --buildrick-* tokens.
+ * Maps chrome shorthand --bd-* names onto canonical --buildrick-* tokens.
  * Every alias is: one --bd-* name on the left, one canonical token reference
  * on the right. NO standalone values. All values live in canonical files.
  *
- * Rule enforced by gate: grep `^\s*--bd-[a-z0-9-]+:` across packages/editor/src
- * must match ONLY this file. Consumers use `var(--bd-*)` in their own styles.
+ * SSOT contract — DUAL-CANONICAL by design (Gate 15 + Gate 17):
+ *   1. THIS FILE (bd-aliases.css) — chrome's hand-written aliases. Loaded
+ *      UNLAYERED via design-system/index.css → wins cascade over @layer rules.
+ *      Required to be self-sufficient: Gate 17 (ghost-alias detection) only
+ *      reads aliases from THIS file, so any --bd-* referenced by chrome
+ *      consumers must be defined here even if also defined in (2).
+ *   2. components/_aliases.generated.css — vibcoder codemod 3 output, R2
+ *      exception. Loaded inside @layer components. Defines aliases for
+ *      vendored vibcoder atoms/molecules/organisms. ~54 aliases overlap
+ *      with (1) by design — both are independent canonical sources for
+ *      their respective consumer surfaces (chrome vs vendored).
+ *
+ * Gate 15 ban: no --bd-* defs anywhere outside (1) + (2).
+ * Gate 17 ban: no --bd-* references in chrome consumers without a def in (1).
  *
  * Source drop: external design-system snapshot (colors_and_type.css).
  * Canonical verified against: themes/design-system/{color,typography,radius,shadow,spacing,motion,layout}.css
