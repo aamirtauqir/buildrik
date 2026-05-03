@@ -15,7 +15,7 @@ import {
   PopoverPortal,
   PopoverContent,
 } from "@/editor/shared/vibcoder";
-import { useColorRegistry } from "../../../../features/design-system/state/TokenRegistryContext";
+import { useColorRegistry } from "../../../design-system/state/TokenRegistryContext";
 import { TokenPickerPopover } from "../TokenPickerPopover";
 
 // ============================================================================
