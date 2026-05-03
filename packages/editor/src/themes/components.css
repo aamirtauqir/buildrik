@@ -1,28 +1,39 @@
 /**
- * components.css — LEGACY FILE, retirement in progress (2026-04-25).
+ * components.css — LEGACY FILE, retirement in progress.
  *
  * Grab-bag of class rules for legacy components. Per v3 plan Week 3,
  * target is <=300 lines or renamed to legacy-components.css after
  * per-component extraction.
  *
- * 2026-04-25: deleted dead .buildrick-layer-{node,row,toggle,bullet,
- * icon,meta,name} cluster (~92 lines) — 0 consumers after LayersTab
- * rewrite replaced class family with .bdc-* namespace.
+ * Cleanup history:
+ *   2026-04-25: deleted dead .buildrick-layer-* family (~92 lines)
+ *               after LayersTab rewrite to .bdc-* namespace.
+ *   2026-05-03: deleted 45 dead selectors + 1 orphan @keyframes
+ *               (-620 lines, 1728 -> 1108).
+ *               Audit method: className= attr scan + classList op scan
+ *               + standalone-class strict re-check across src/**.tsx.
+ *               Removed: brand, brandName, navBar, pCard, ico, pill,
+ *               zoom, all .tb* except .tbOfflineTooltip (still used by
+ *               Topbar.tsx), buildrick-action-disabled, buildrick-btn-
+ *               group-{full,lg,sm}, buildrick-drop-indicator, buildrick-
+ *               empty-state-compact, buildrick-focusable, buildrick-form-
+ *               field*, buildrick-icon-btn, buildrick-input-group,
+ *               buildrick-layers, buildrick-layers-{count,panel,tree},
+ *               buildrick-left-tab, buildrick-quick-action-btn,
+ *               @keyframes tbSpin (orphan after .tb* deletion).
  *
- * REMAINING rules cover active legacy components:
- *   - .tb-* (37 rules) — PageTabBar.tsx
- *   - .buildrick-form-field (13) — shared/ui/FormField.tsx legacy variant
- *   - .buildrick-btn-group (13) — legacy button groups
- *   - .buildrick-btn (10) — legacy button class hooks
- *   - .buildrick-input / select / textarea (9/4/3)
- *   - .buildrick-empty-state (9)
- *   - .buildrick-icon-btn (8)
- *   - .buildrick-number-btn / stepper (6/4)
- *   - .buildrick-slider (5)
- *   - .pill (4)
- *   - .buildrick-switch / switch-input (3) — legacy Switch component
- *   - .buildrick-color-swatch / preset (4/4)
- *   - .buildrick-canvas, nav-*, @keyframes buildrick-*
+ * REMAINING (THIN bucket — 1-3 consumers each, migrate to per-component
+ * Emotion or fold into vibcoder primitive):
+ *   form atoms: btn, btn-group*, color-*, input*, number-*, select,
+ *               slider*, switch*, textarea, field*, sr-only, skip-link
+ *   chrome: viewport-frame, dragging, layers-tree, empty-state-*
+ *
+ * REMAINING (THICK bucket — 4+ consumers, blocks full retirement):
+ *   - .buildrick-field         (8 consumers)
+ *   - .buildrick-canvas        (7 consumers)
+ *   - .buildrick-field-label   (7 consumers)
+ *   - .buildrick-empty-state   (4 consumers)
+ *   - .buildrick-field-error   (4 consumers)
  *
  * Full retirement is blocked on per-component migration to primitives
  * (Button, FormInput, NumericStepper from Week 1, plus not-yet-built
@@ -51,304 +62,6 @@
   border: none;
 }
 
-.buildrick-left-tab.is-active {
-  background: var(--buildrick-accent-subtle);
-  color: var(--buildrick-accent);
-  border-color: rgba(45, 109, 255, 0.3);
-}
-
-.pCard.isActive {
-  border-color: var(--buildrick-info);
-  background: rgba(45, 109, 255, 0.08);
-}
-
-.tbWrap {
-  width: 100%;
-  height: var(--buildrick-header-height);
-  min-height: var(--buildrick-header-height);
-  background: var(--buildrick-bg-panel);
-  border-bottom: 1px solid var(--buildrick-border-medium);
-  flex-shrink: 0;
-  box-sizing: border-box;
-  font-family: var(--buildrick-font-family);
-}
-
-.tbBar {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-}
-
-.tbLeft, .tbRight {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 0 0 auto;
-}
-
-.tbCenter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.tbIconBtn {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--buildrick-radius-md);
-  background: var(--buildrick-bg-card);
-  border: 1px solid var(--buildrick-border-medium);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--buildrick-text-primary);
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 120ms ease, border-color 120ms ease;
-  text-decoration: none;
-  padding: 0;
-  font-family: inherit;
-}
-
-.tbIconBtn:hover:not(:disabled) {
-  background: var(--buildrick-bg-subtle);
-  border-color: var(--buildrick-border-strong);
-}
-
-.tbIconBtn:active:not(:disabled) {
-  background: var(--buildrick-surface-4);
-}
-
-.tbIconBtn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.tbDivider {
-  width: 1px;
-  height: 20px;
-  background: var(--buildrick-border-medium);
-  flex-shrink: 0;
-}
-
-.tbBreadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.tbBreadcrumb-project {
-  font-size: 13px;
-  font-weight: 400;
-  color: var(--buildrick-text-secondary);
-  white-space: nowrap;
-}
-
-.tbBreadcrumb-sep {
-  font-size: 13px;
-  color: var(--buildrick-text-muted);
-}
-
-.tbBreadcrumb-page {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--buildrick-text-primary);
-  white-space: nowrap;
-}
-
-.tbIssuesBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  background: var(--buildrick-error-light);
-  border: 1px solid var(--buildrick-error);
-  border-radius: var(--buildrick-radius-full);
-  color: var(--buildrick-error);
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  font-family: inherit;
-  transition: background 120ms ease;
-}
-
-.tbIssuesBadge:hover {
-  background: rgba(220, 38, 38, 0.14);
-}
-
-.tbInviteBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  background: transparent;
-  border: 1px solid var(--buildrick-border-medium);
-  border-radius: var(--buildrick-radius-md);
-  color: var(--buildrick-text-secondary);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  font-family: inherit;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
-}
-
-.tbInviteBtn:hover {
-  background: var(--buildrick-bg-subtle);
-  border-color: var(--buildrick-border-strong);
-  color: var(--buildrick-text-primary);
-}
-
-.tbCmdBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  background: var(--buildrick-bg-card);
-  border: 1px solid var(--buildrick-border-medium);
-  border-radius: var(--buildrick-radius-md);
-  cursor: pointer;
-  white-space: nowrap;
-  font-family: inherit;
-  color: var(--buildrick-text-primary);
-  transition: background 120ms ease, border-color 120ms ease;
-}
-
-.tbCmdBtn:hover {
-  background: var(--buildrick-bg-subtle);
-  border-color: var(--buildrick-border-strong);
-}
-
-.tbCmdText {
-  font-family: var(--buildrick-font-family-mono);
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--buildrick-text-secondary);
-}
-
-.tbPreviewBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  background: var(--buildrick-bg-card);
-  border: 1px solid var(--buildrick-border-medium);
-  border-radius: var(--buildrick-radius-md);
-  color: var(--buildrick-text-primary);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  font-family: inherit;
-  transition: background 120ms ease, border-color 120ms ease;
-}
-
-.tbPreviewBtn:hover:not(:disabled) {
-  background: var(--buildrick-bg-subtle);
-  border-color: var(--buildrick-border-strong);
-}
-
-.tbPreviewBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.tbHelpBtn {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--buildrick-radius-md);
-  background: var(--buildrick-bg-card);
-  border: 1px solid var(--buildrick-border-medium);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--buildrick-text-secondary);
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
-  font-family: inherit;
-  padding: 0;
-}
-
-.tbHelpBtn:hover {
-  background: var(--buildrick-bg-subtle);
-  border-color: var(--buildrick-border-strong);
-  color: var(--buildrick-text-primary);
-}
-
-.tbAccountBtn {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--buildrick-radius-md);
-  background: var(--buildrick-accent);
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--buildrick-text-on-accent);
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 120ms ease;
-  text-decoration: none;
-  padding: 0;
-  font-family: inherit;
-}
-
-.tbAccountBtn:hover {
-  background: var(--buildrick-accent-hover);
-}
-
-.tbBar--compact .tbIconBtn {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-}
-
-.tbBar--compact .tbInviteBtn {
-  height: 28px;
-  padding: 4px 8px;
-  border-radius: 999px;
-}
-
-.tbBar--compact .tbCmdBtn {
-  height: 28px;
-  padding: 4px 8px;
-  border-radius: 999px;
-}
-
-.tbBar--compact .tbPreviewBtn {
-  height: 28px;
-  padding: 4px 8px;
-  border-radius: 999px;
-}
-
-.tbBar--compact .tbHelpBtn {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-}
-
-.tbBar--compact .tbAccountBtn {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-}
-
-.tbBar--offline .tbIconBtn:nth-child(3),
-.tbBar--offline .tbIconBtn:nth-child(4) {
-  opacity: 0.45;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
 .tbOfflineTooltip {
   position: absolute;
   top: calc(100% + 6px);
@@ -363,132 +76,6 @@
   color: var(--buildrick-error);
   pointer-events: none;
   z-index: var(--buildrick-z-tooltip);
-}
-
-@keyframes tbSpin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (max-width: 860px) {
-.tbCenter {
-    display: none;
-  }
-}
-
-.navBar .left,
-.navBar .center,
-.navBar .right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-
-.navBar .left {
-  flex: 1 1 auto;
-  overflow: hidden;
-}
-
-.navBar .center {
-  flex: 0 0 auto;
-}
-
-.navBar .right {
-  flex: 0 0 auto;
-  margin-left: auto;
-}
-
-.pill {
-  height: 34px;
-  border-radius: 10px;
-  background: transparent;
-  border: 1px solid var(--buildrick-border, rgba(255, 255, 255, 0.12));
-  color: var(--buildrick-text-muted);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 12px;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.1px;
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-  transition: 0.14s ease;
-}
-
-.pill:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  color: var(--buildrick-text-primary, var(--buildrick-text-primary));
-  background: rgba(255, 255, 255, 0.04);
-  transform: translateY(-1px);
-}
-
-.pill:disabled {
-  cursor: not-allowed;
-}
-
-.ico {
-  width: 16px;
-  height: 16px;
-  display: grid;
-  place-items: center;
-  color: rgba(235, 245, 255, 0.9);
-  opacity: 0.95;
-  flex: 0 0 auto;
-}
-
-.ico svg {
-  width: 16px;
-  height: 16px;
-  display: block;
-}
-
-.brand {
-  height: 34px;
-  border-radius: 10px;
-  background: linear-gradient(180deg,
-      rgba(255, 255, 255, 0.03),
-      rgba(255, 255, 255, 0.01));
-  border: 1px solid var(--pillStroke);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 12px 0 10px;
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.18) inset;
-  white-space: nowrap;
-  flex: 0 0 auto;
-}
-
-.brandName {
-  font-size: 12.4px;
-  font-weight: 800;
-  color: var(--buildrick-text-primary);
-  letter-spacing: 0.15px;
-}
-
-.zoom {
-  height: 34px;
-  border-radius: 10px;
-  border: 1px solid var(--pillStroke);
-  background: linear-gradient(180deg,
-      rgba(255, 255, 255, 0.03),
-      rgba(255, 255, 255, 0.01));
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 10px;
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.18) inset;
-  color: var(--buildrick-text-primary);
-  font-weight: 800;
-  font-size: 12px;
-  white-space: nowrap;
 }
 
 @keyframes pulse {
@@ -508,14 +95,8 @@
     transform: rotate(0deg);
   }
 
-  to {
+to {
     transform: rotate(360deg);
-  }
-}
-
-@media (max-width: 860px) {
-.navBar .center {
-    display: none;
   }
 }
 
@@ -629,18 +210,6 @@
 .buildrick-select:focus {
   border-color: var(--buildrick-border-focus);
   box-shadow: var(--buildrick-input-ring);
-}
-
-.buildrick-input-group .buildrick-input {
-  border-radius: 0;
-}
-
-.buildrick-input-group .buildrick-input:first-child {
-  border-radius: var(--buildrick-radius-md) 0 0 var(--buildrick-radius-md);
-}
-
-.buildrick-input-group .buildrick-input:last-child {
-  border-radius: 0 var(--buildrick-radius-md) var(--buildrick-radius-md) 0;
 }
 
 .buildrick-field {
@@ -990,11 +559,6 @@
   border: 1px solid var(--buildrick-border);
 }
 
-.buildrick-btn-group-full {
-  display: flex;
-  width: 100%;
-}
-
 .buildrick-btn-group-item {
   flex: 0 0 auto;
   display: flex;
@@ -1010,10 +574,6 @@
   font-weight: var(--buildrick-font-weight-medium);
   cursor: pointer;
   transition: all var(--buildrick-transition-fast);
-}
-
-.buildrick-btn-group-full .buildrick-btn-group-item {
-  flex: 1;
 }
 
 .buildrick-btn-group-item:first-child {
@@ -1052,33 +612,6 @@
   justify-content: center;
 }
 
-.buildrick-btn-group-sm .buildrick-btn-group-item {
-  padding: 5px 10px;
-  font-size: var(--buildrick-text-xs);
-}
-
-.buildrick-btn-group-lg .buildrick-btn-group-item {
-  padding: 10px 18px;
-  font-size: var(--buildrick-text-sm-plus);
-}
-
-.buildrick-layers-panel {
-  background: var(--buildrick-bg-panel);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--buildrick-radius-md);
-  overflow: hidden;
-}
-
-.buildrick-layers-count {
-  font-size: 12px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--buildrick-text-secondary);
-  letter-spacing: 0.4px;
-}
-
 .buildrick-layers-tree {
   display: flex;
   flex-direction: column;
@@ -1092,34 +625,12 @@
  * 0ed8d40 + 1f02f4d + 34189df) replaced this class family with
  * .bdc-* namespace under editor/sidebar/tabs/layers/.
  *
- * .buildrick-layer-id (below) retained pending consumer audit. */
-
-.buildrick-layer-id {
-  margin-left: auto;
-  font-family: var(--buildrick-font-family-mono);
-  font-size: 12px;
-  color: var(--buildrick-text-muted);
-  padding: 4px 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 7px;
-  letter-spacing: 0.5px;
-}
-
-.buildrick-layer-children {
-  margin-top: 2px;
-}
-
-.buildrick-layers {
-  padding: 8px;
-}
-
-@keyframes buildrick-spin {
+ * .buildrick-layer-id (below) retained pending consumer audit. */@keyframes buildrick-spin {
   from {
     transform: rotate(0deg);
   }
 
-  to {
+to {
     transform: rotate(360deg);
   }
 }
@@ -1130,7 +641,7 @@
     transform: scale(0.95);
   }
 
-  to {
+to {
     opacity: 1;
     transform: scale(1);
   }
@@ -1142,7 +653,7 @@
     transform: translateX(100%);
   }
 
-  to {
+to {
     opacity: 1;
     transform: translateX(0);
   }
@@ -1154,7 +665,7 @@
     transform: translateX(0);
   }
 
-  to {
+to {
     opacity: 0;
     transform: translateX(100%);
   }
@@ -1166,7 +677,7 @@
     transform: scale(0.9);
   }
 
-  to {
+to {
     opacity: 1;
     transform: scale(1);
   }
@@ -1177,7 +688,7 @@
     opacity: 1;
   }
 
-  to {
+to {
     opacity: 0;
   }
 }
@@ -1188,7 +699,7 @@
     transform: translateY(-4px);
   }
 
-  to {
+to {
     opacity: 1;
     transform: translateY(0);
   }
@@ -1200,7 +711,7 @@
     transform: scale(0.95);
   }
 
-  to {
+to {
     opacity: 1;
     transform: scale(1);
   }
@@ -1212,7 +723,7 @@
     transform: translateX(-10px) scale(0.95);
   }
 
-  to {
+to {
     opacity: 1;
     transform: translateX(0) scale(1);
   }
@@ -1223,7 +734,7 @@
     opacity: 0;
   }
 
-  to {
+to {
     opacity: 1;
   }
 }
@@ -1234,7 +745,7 @@
     transform: translateY(10px);
   }
 
-  to {
+to {
     opacity: 1;
     transform: translateY(0);
   }
@@ -1331,16 +842,7 @@ input[type="color"]::-webkit-color-swatch {
   cursor: grabbing !important;
 }
 
-.buildrick-drop-indicator {
-  position: absolute;
-  background: var(--buildrick-accent);
-  z-index: 1000;
-  pointer-events: none;
-  animation: buildrick-pulse 1s ease infinite;
-}
-
-.buildrick-btn:disabled,
-.buildrick-action-disabled {
+.buildrick-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed !important;
   pointer-events: none;
@@ -1423,25 +925,6 @@ input[type="color"]::-webkit-color-swatch {
   margin-bottom: var(--buildrick-space-4);
 }
 
-.buildrick-empty-state-compact .buildrick-empty-state-icon {
-  width: 40px;
-  height: 40px;
-  margin-bottom: var(--buildrick-space-3);
-}
-
-.buildrick-empty-state-compact .buildrick-empty-state-icon svg {
-  width: 18px;
-  height: 18px;
-}
-
-.buildrick-empty-state-compact .buildrick-empty-state-title {
-  font-size: var(--buildrick-text-sm-plus);
-}
-
-.buildrick-empty-state-compact .buildrick-empty-state-desc {
-  font-size: var(--buildrick-text-sm);
-}
-
 .buildrick-quick-actions {
   position: absolute;
   top: -40px;
@@ -1456,45 +939,6 @@ input[type="color"]::-webkit-color-swatch {
   box-shadow: var(--buildrick-shadow-md);
   z-index: 1000;
   animation: buildrick-fade-in 0.15s ease;
-}
-
-.buildrick-quick-action-btn.danger:hover {
-  background: rgba(239, 68, 68, 0.15);
-  color: var(--buildrick-error);
-}
-
-.buildrick-form-field-input input,
-.buildrick-form-field-input select,
-.buildrick-form-field-input textarea {
-  width: 100%;
-  padding: 10px 12px;
-  font-size: 13px;
-  color: var(--buildrick-text-primary);
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid var(--buildrick-border);
-  border-radius: var(--buildrick-radius-md);
-  outline: none;
-  transition: all var(--buildrick-transition-fast);
-}
-
-.buildrick-form-field-input input:focus,
-.buildrick-form-field-input select:focus,
-.buildrick-form-field-input textarea:focus {
-  border-color: var(--buildrick-accent);
-  box-shadow: 0 0 0 3px var(--buildrick-accent-subtle);
-}
-
-.buildrick-form-field-input.has-error input,
-.buildrick-form-field-input.has-error select,
-.buildrick-form-field-input.has-error textarea {
-  border-color: var(--buildrick-error);
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15);
-}
-
-.buildrick-form-field-input.has-error input:focus,
-.buildrick-form-field-input.has-error select:focus,
-.buildrick-form-field-input.has-error textarea:focus {
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
 }
 
 .buildrick-skip-link {
@@ -1524,19 +968,9 @@ input[type="color"]::-webkit-color-swatch {
   outline: none;
 }
 
-.buildrick-focusable:focus-visible,
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-[tabindex]:focus-visible {
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
   outline: 2px solid var(--buildrick-accent);
   outline-offset: 2px;
-}
-
-.buildrick-form-field:focus-within label {
-  color: var(--buildrick-accent);
 }
 
 .buildrick-sr-only {
@@ -1551,13 +985,7 @@ textarea:focus-visible,
   border: 0;
 }
 
-@media (max-width: 640px) {
-.navBar .left,
-  .navBar .right {
-    gap: 6px;
-  }
-
-.pill {
+@media (max-width: 640px) {.pill {
     padding: 0 10px;
     font-size: 12px;
   }
@@ -1569,40 +997,6 @@ textarea:focus-visible,
 
 .buildrick-btn:not(:disabled):active {
   transform: translateY(0);
-}
-
-.buildrick-icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--buildrick-radius-md);
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--buildrick-text-secondary);
-  cursor: pointer;
-  transition: all var(--buildrick-transition-fast);
-}
-
-.buildrick-icon-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--buildrick-text-primary);
-  border-color: var(--buildrick-border);
-}
-
-.buildrick-icon-btn:active {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.buildrick-icon-btn.buildrick-icon-btn-sm {
-  width: 24px;
-  height: 24px;
-}
-
-.buildrick-icon-btn.buildrick-icon-btn-lg {
-  width: 40px;
-  height: 40px;
 }
 
 [data-buildrick-id][data-selected="true"] {
@@ -1647,7 +1041,7 @@ textarea:focus-visible,
     transform: translateY(8px);
   }
 
-  to {
+to {
     opacity: 1;
     transform: translateY(0);
   }
@@ -1659,7 +1053,7 @@ textarea:focus-visible,
     transform: translateX(8px);
   }
 
-  to {
+to {
     opacity: 1;
     transform: translateX(0);
   }
@@ -1671,7 +1065,7 @@ textarea:focus-visible,
     transform: scale(0.95);
   }
 
-  to {
+to {
     opacity: 1;
     transform: scale(1);
   }
@@ -1687,15 +1081,13 @@ textarea:disabled {
   opacity: 0.5;
 }
 
-.buildrick-btn:focus-visible,
-.buildrick-icon-btn:focus-visible {
+.buildrick-btn:focus-visible {
   outline: 2px solid var(--buildrick-accent) !important;
   outline-offset: 2px !important;
   box-shadow: 0 0 0 4px rgba(45, 109, 255, 0.2) !important;
 }
 
-.buildrick-btn:focus:not(:focus-visible),
-.buildrick-icon-btn:focus:not(:focus-visible) {
+.buildrick-btn:focus:not(:focus-visible) {
   outline: none !important;
 }
 
@@ -1715,8 +1107,4 @@ textarea:disabled {
 
 .buildrick-btn:active {
   transform: scale(0.97);
-}
-
-.buildrick-icon-btn:active {
-  transform: scale(0.95);
 }
