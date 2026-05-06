@@ -1,8 +1,7 @@
-import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/editor/shared/vibcoder/Button";
 /**
- * BreakpointDropdown - Viewport width selector
- * Shows current viewport width, preset sizes, and custom input.
+ * BreakpointDropdown - Viewport width selector.
+ * Shows current viewport width and preset device sizes.
  * Used alongside DeviceSwitcherPill in the topbar.
  *
  * @license BSD-3-Clause
@@ -36,10 +35,8 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
   onDeviceChange,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
-  const [customValue, setCustomValue] = React.useState("");
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const menuRef = React.useRef<HTMLDivElement>(null);
-  const inputRef = React.useRef<HTMLInputElement>(null);
 
   const currentWidth = DEVICE_WIDTH[device] ?? DEVICE_WIDTH.desktop;
 
@@ -69,23 +66,6 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen]);
-
-  const applyCustomWidth = () => {
-    const parsed = parseInt(customValue, 10);
-    if (!isNaN(parsed) && parsed >= 320 && parsed <= 3840) {
-      // Find nearest preset
-      const nearest = PRESETS.reduce((prev, curr) =>
-        Math.abs(curr.width - parsed) < Math.abs(prev.width - parsed) ? curr : prev
-      );
-      onDeviceChange(nearest.id);
-      setIsOpen(false);
-    }
-  };
-
-  const handleCustomKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") applyCustomWidth();
-    if (e.key === "Escape") setIsOpen(false);
-  };
 
   return (
     <div style={{ position: "relative" }}>
@@ -210,62 +190,6 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
             })}
           </div>
 
-          {/* Divider */}
-          <div style={{ height: 1, background: "var(--bd-border)", margin: "0" }} />
-
-          {/* Custom size input */}
-          <div style={{ padding: "8px 12px" }}>
-            <div
-              style={{
-                fontSize: 11,
-                color: "var(--buildrick-text-tertiary)",
-                marginBottom: 6,
-                fontWeight: 500,
-                textTransform: "uppercase",
-                letterSpacing: "0.04em",
-              }}
-            >
-              Custom
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <Input
-                ref={inputRef}
-                type="number"
-                min={320}
-                max={3840}
-                placeholder={String(currentWidth)}
-                value={customValue}
-                onChange={(e) => setCustomValue(e.target.value)}
-                onKeyDown={handleCustomKeyDown}
-                onBlur={applyCustomWidth}
-                style={{
-                  flex: 1,
-                  height: 28,
-                  padding: "0 8px",
-                  background: "var(--buildrick-bg-panel)",
-                  border: "1px solid #D1D9E6",
-                  borderRadius: 6,
-                  color: "var(--buildrick-text-secondary)",
-                  fontSize: 12,
-                  outline: "none",
-                  MozAppearance: "textfield" as React.CSSProperties["MozAppearance"],
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "var(--bd-accent)";
-                }}
-                aria-label="Custom viewport width in pixels"
-              />
-              <span
-                style={{
-                  fontSize: 12,
-                  color: "var(--buildrick-text-muted)",
-                  flexShrink: 0,
-                }}
-              >
-                px
-              </span>
-            </div>
-          </div>
         </div>
       )}
     </div>

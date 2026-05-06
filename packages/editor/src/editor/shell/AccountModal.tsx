@@ -21,6 +21,8 @@ interface Member {
   initials: string;
 }
 
+// SCAFFOLD: replace with `workspaceMember.list` tRPC query when team backend ships (Phase 3).
+// Modal is gated behind VITE_FEATURE_ACCOUNT — visible in dev only until then.
 const MOCK_MEMBERS: Member[] = [
   { name: "Sarah Chen",  email: "sarah@acme.io",         role: "Editor", avatarColor: "var(--bd-accent)", initials: "SC" },
   { name: "Mike Rosa",   email: "mike.rosa@acme.io",     role: "Admin",  avatarColor: "var(--bd-fg-secondary)", initials: "MR" },
@@ -100,6 +102,7 @@ const TabProfile: React.FC = () => (
         </span>
       </div>
       <Stack gap="xs">
+        {/* SCAFFOLD: hardcoded user — replace with `user.me` tRPC query when Profile backend ships (Phase 2). */}
         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--buildrick-text-primary)" }}>Aamir Siddiqui</div>
         <Button
           style={{

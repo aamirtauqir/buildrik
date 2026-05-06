@@ -22,7 +22,8 @@ interface Member {
   initials: string;
 }
 
-// Sample existing members (in real app: from API)
+// SCAFFOLD: replace with `workspaceMember.list` tRPC query when invite backend ships (Phase 4).
+// Modal is gated behind VITE_FEATURE_INVITE — visible in dev only until then.
 const MOCK_MEMBERS: Member[] = [
   { name: "Sarah Chen", email: "sarah@acme.io", role: "Editor", avatarColor: "var(--bd-accent)", initials: "SC" },
   { name: "Mike Rosa", email: "mike.rosa@acme.io", role: "Admin", avatarColor: "var(--bd-fg-secondary)", initials: "MR" },
@@ -56,7 +57,8 @@ const IconLink: React.FC = () => (
 
 export const InviteModal: React.FC<InviteModalProps> = ({
   onClose,
-  shareUrl = "https://buildrik.app/share/project-abc123",
+  // SCAFFOLD: default empty — replace with `shareLink.create` tRPC mutation result when invite backend ships (Phase 4).
+  shareUrl = "",
 }) => {
   const [email, setEmail] = React.useState("");
   const [role, setRole] = React.useState<Role>("Editor");

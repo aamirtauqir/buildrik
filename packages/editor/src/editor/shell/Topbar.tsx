@@ -30,9 +30,10 @@ import {
 } from "@/editor/shared/vibcoder";
 import type { Issue } from "./hooks/useStudioState";
 import { AccountModal } from "./AccountModal";
-import { CommandPalette } from "./CommandPalette";
+import { CommandPalette } from "./modals/CommandPalette";
 import { InviteModal } from "./InviteModal";
 import { PublishDropdown, type PublishState } from "./PublishDropdown";
+import { isFeatureEnabled } from "@/shared/utils/featureFlags";
 
 import "./chrome.css";
 
@@ -217,6 +218,7 @@ function formatSavedAgo(ts?: number): string {
 // ── component ────────────────────────────────────────────────────────────────
 
 export const Topbar: React.FC<TopbarProps> = ({
+  composer,
   canUndo,
   canRedo,
   issues = [],
@@ -240,8 +242,12 @@ export const Topbar: React.FC<TopbarProps> = ({
   onOpenHistory,
   onHelp,
   onAccount,
+  onExportHTML,
   onDeviceChange,
 }) => {
+  const publishEnabled = isFeatureEnabled("publish");
+  const accountEnabled = isFeatureEnabled("account");
+  const inviteEnabled = isFeatureEnabled("invite");
   const [cmdOpen, setCmdOpen] = React.useState(false);
   const [inviteOpen, setInviteOpen] = React.useState(false);
   const [accountOpen, setAccountOpen] = React.useState(false);
@@ -412,21 +418,23 @@ export const Topbar: React.FC<TopbarProps> = ({
               Offline
             </span>
           )}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setInviteOpen(true)}
-                aria-label="Invite team"
-              >
-                + Invite
-              </Button>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>Invite team</TooltipContent>
-            </TooltipPortal>
-          </Tooltip>
+          {inviteEnabled && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setInviteOpen(true)}
+                  aria-label="Invite team"
+                >
+                  + Invite
+                </Button>
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent>Invite team</TooltipContent>
+              </TooltipPortal>
+            </Tooltip>
+          )}
         </TopbarGroup>
 
         {/* Cell 8 — Right actions: Cmd / Preview / Publish / Help / Account */}
@@ -460,17 +468,35 @@ export const Topbar: React.FC<TopbarProps> = ({
             </TooltipPortal>
           </Tooltip>
 
-          <div style={{ position: "relative" }}>
-            <PublishDropdown
-              publishState={publishState}
-              loading={publishLoading}
-              onPublish={onPublish}
-              onSave={onSave}
-            />
-            {isOffline && (
-              <div className="tbOfflineTooltip">Cannot publish while offline</div>
-            )}
-          </div>
+          {publishEnabled ? (
+            <div style={{ position: "relative" }}>
+              <PublishDropdown
+                publishState={publishState}
+                loading={publishLoading}
+                onPublish={onPublish}
+                onSave={onSave}
+              />
+              {isOffline && (
+                <div className="tbOfflineTooltip">Cannot publish while offline</div>
+              )}
+            </div>
+          ) : (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={onExportHTML}
+                  aria-label="Export HTML"
+                >
+                  Export
+                </Button>
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent>Export HTML — publish to web coming soon</TooltipContent>
+              </TooltipPortal>
+            </Tooltip>
+          )}
 
           <Tooltip>
             <TooltipTrigger asChild>
@@ -483,27 +509,29 @@ export const Topbar: React.FC<TopbarProps> = ({
             </TooltipPortal>
           </Tooltip>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <IconButton
-                onClick={() => {
-                  setAccountOpen(true);
-                  onAccount?.();
-                }}
-                aria-label="Account"
-              >
-                <IconUser />
-              </IconButton>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>Account</TooltipContent>
-            </TooltipPortal>
-          </Tooltip>
+          {accountEnabled && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <IconButton
+                  onClick={() => {
+                    setAccountOpen(true);
+                    onAccount?.();
+                  }}
+                  aria-label="Account"
+                >
+                  <IconUser />
+                </IconButton>
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent>Account</TooltipContent>
+              </TooltipPortal>
+            </Tooltip>
+          )}
         </TopbarGroup>
       </VibcoderTopbar>
-      {cmdOpen && <CommandPalette onClose={() => setCmdOpen(false)} />}
-      {inviteOpen && <InviteModal onClose={() => setInviteOpen(false)} />}
-      {accountOpen && <AccountModal onClose={() => setAccountOpen(false)} />}
+      {cmdOpen && <CommandPalette onClose={() => setCmdOpen(false)} composer={composer ?? null} />}
+      {inviteOpen && inviteEnabled && <InviteModal onClose={() => setInviteOpen(false)} />}
+      {accountOpen && accountEnabled && <AccountModal onClose={() => setAccountOpen(false)} />}
     </>
   );
 };
