@@ -100,85 +100,6 @@ to {
   }
 }
 
-.buildrick-input {
-  width: 100%;
-  padding: 10px 12px;
-  font-family: var(--buildrick-font-family);
-  font-size: var(--buildrick-text-sm-plus);
-  font-weight: var(--buildrick-font-weight-normal);
-  line-height: var(--buildrick-line-normal);
-  color: var(--buildrick-text-primary);
-  background: var(--buildrick-bg-input);
-  border: 1px solid var(--buildrick-border-medium);
-  border-radius: var(--buildrick-radius-md);
-  outline: none;
-  transition: border-color var(--buildrick-transition-fast),
-    background var(--buildrick-transition-fast),
-    box-shadow var(--buildrick-transition-fast);
-}
-
-.buildrick-input:hover:not(:disabled):not(:focus) {
-  border-color: var(--buildrick-border-hover);
-  background: var(--buildrick-bg-subtle);
-}
-
-.buildrick-input:focus {
-  border-color: var(--buildrick-border-focus);
-  background: var(--buildrick-bg-input);
-  box-shadow: var(--buildrick-input-ring);
-}
-
-.buildrick-input::placeholder {
-  color: var(--buildrick-text-muted);
-  opacity: 1;
-}
-
-.buildrick-input:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: var(--buildrick-bg-panel);
-}
-
-.buildrick-input-error,
-.buildrick-input.has-error {
-  border-color: var(--buildrick-error);
-}
-
-.buildrick-input-error:focus,
-.buildrick-input.has-error:focus {
-  border-color: var(--buildrick-error);
-  box-shadow: var(--buildrick-input-ring-error);
-}
-
-.buildrick-input-sm {
-  padding: 7px 10px;
-  font-size: var(--buildrick-text-sm);
-  border-radius: var(--buildrick-radius-sm);
-}
-
-.buildrick-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--buildrick-space-1);
-}
-
-.buildrick-field-label {
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-secondary);
-  letter-spacing: var(--buildrick-tracking-wide);
-}
-
-.buildrick-field-hint {
-  font-size: var(--buildrick-text-xs);
-  color: var(--buildrick-text-muted);
-}
-
-.buildrick-field-error {
-  font-size: var(--buildrick-text-xs);
-  color: var(--buildrick-error);
-}
-
 .buildrick-slider {
   appearance: none;
   width: 100%;
@@ -217,93 +138,6 @@ to {
 
 .buildrick-slider:focus-visible::-webkit-slider-thumb {
   box-shadow: var(--buildrick-shadow-md), 0 0 0 3px var(--buildrick-accent-subtle);
-}
-
-.buildrick-number-row {
-  display: flex;
-  gap: var(--buildrick-space-2);
-}
-
-.buildrick-number-stepper {
-  display: flex;
-  flex: 1;
-  background: var(--buildrick-bg-input);
-  border: 1px solid var(--buildrick-border-medium);
-  border-radius: var(--buildrick-radius-md);
-  overflow: hidden;
-  transition: border-color var(--buildrick-transition-fast), box-shadow var(--buildrick-transition-fast);
-}
-
-.buildrick-number-stepper:focus-within {
-  border-color: var(--buildrick-border-focus);
-  box-shadow: var(--buildrick-input-ring);
-}
-
-.buildrick-number-stepper.has-error {
-  border-color: var(--buildrick-error);
-}
-
-.buildrick-number-stepper.has-error:focus-within {
-  box-shadow: var(--buildrick-input-ring-error);
-}
-
-.buildrick-number-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  background: transparent;
-  border: none;
-  color: var(--buildrick-text-tertiary);
-  cursor: pointer;
-  transition: all var(--buildrick-transition-fast);
-  flex-shrink: 0;
-}
-
-.buildrick-number-btn:hover:not(:disabled) {
-  background: var(--buildrick-bg-hover);
-  color: var(--buildrick-text-secondary);
-}
-
-.buildrick-number-btn:active:not(:disabled) {
-  background: var(--buildrick-bg-active);
-}
-
-.buildrick-number-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.buildrick-number-btn-dec {
-  border-right: 1px solid var(--buildrick-border);
-}
-
-.buildrick-number-btn-inc {
-  border-left: 1px solid var(--buildrick-border);
-}
-
-.buildrick-number-input {
-  flex: 1;
-  min-width: 40px;
-  padding: 8px 4px;
-  background: transparent;
-  border: none;
-  color: var(--buildrick-text-primary);
-  font-size: var(--buildrick-text-sm-plus);
-  font-family: var(--buildrick-font-family-mono);
-  text-align: center;
-  outline: none;
-}
-
-.buildrick-number-input:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.buildrick-number-unit {
-  width: auto;
-  min-width: 60px;
-  padding-right: 28px;
 }
 
 .buildrick-layers-tree {
@@ -361,13 +195,6 @@ to {
   50% {
     opacity: 0.5;
   }
-}
-
-.buildrick-input:focus,
-.buildrick-select:focus,
-.buildrick-textarea:focus {
-  border-color: var(--buildrick-accent);
-  box-shadow: 0 0 0 2px var(--buildrick-accent-subtle);
 }
 
 input[type="range"]::-webkit-slider-thumb {
