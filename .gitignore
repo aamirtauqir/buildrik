@@ -12,6 +12,8 @@ next-env.d.ts
 docs/designs/
 latest-screenshots/
 dist/
+coverage/
+packages/editor/coverage/
 
 # Session / tooling scratch
 .context/

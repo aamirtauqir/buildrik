@@ -20,6 +20,28 @@ export default defineConfig({
     ],
     setupFiles: ["./src/test-setup.ts"],
     testTimeout: 15000,
+    coverage: {
+      // Baseline coverage config for Phase D god-component splits
+      // (E-007/E-006/E-014). Run `npm run test:coverage` to produce a report
+      // before refactoring high-risk files. Provider v8 = native, no Babel
+      // instrumentation overhead.
+      provider: "v8",
+      reporter: ["text", "html"],
+      reportsDirectory: "./coverage",
+      // Scope to the engine + the canvas/inspector hook layers that Phase D
+      // is most likely to touch. Widen `include` later if coverage matters
+      // outside these areas.
+      include: [
+        "src/engine/**/*.{ts,tsx}",
+        "src/editor/canvas/hooks/**/*.{ts,tsx}",
+        "src/editor/inspector/hooks/**/*.{ts,tsx}",
+      ],
+      exclude: [
+        "**/__tests__/**",
+        "**/*.{test,spec}.{ts,tsx}",
+        "**/*.d.ts",
+      ],
+    },
   },
   resolve: {
     alias: {
