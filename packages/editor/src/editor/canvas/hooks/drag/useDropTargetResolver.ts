@@ -52,7 +52,7 @@ export interface UseDropTargetResolverOptions {
 export interface UseDropTargetResolverResult {
   /** Resolve target + position + validation for this dragOver event. */
   resolve: (e: React.DragEvent) => void;
-  /** Wipe the lingering `.buildrick-drop-target--active` class. */
+  /** Wipe the lingering `.bd-drop-target--active` class. */
   clearAffordance: () => void;
 }
 
@@ -64,24 +64,24 @@ export function useDropTargetResolver({
   draggingElementId,
 }: UseDropTargetResolverOptions): UseDropTargetResolverResult {
   // Track the currently highlighted drop-affordance element so we can
-  // remove the `.buildrick-drop-target--active` class when the target
+  // remove the `.bd-drop-target--active` class when the target
   // changes or drag ends.
   const dropAffordanceElRef = React.useRef<HTMLElement | null>(null);
 
   const applyDropAffordance = React.useCallback((el: HTMLElement | null) => {
     if (dropAffordanceElRef.current === el) return;
     if (dropAffordanceElRef.current) {
-      dropAffordanceElRef.current.classList.remove("buildrick-drop-target--active");
+      dropAffordanceElRef.current.classList.remove("bd-drop-target--active");
     }
     if (el) {
-      el.classList.add("buildrick-drop-target--active");
+      el.classList.add("bd-drop-target--active");
     }
     dropAffordanceElRef.current = el;
   }, []);
 
   const clearAffordance = React.useCallback(() => {
     if (dropAffordanceElRef.current) {
-      dropAffordanceElRef.current.classList.remove("buildrick-drop-target--active");
+      dropAffordanceElRef.current.classList.remove("bd-drop-target--active");
       dropAffordanceElRef.current = null;
     }
   }, []);

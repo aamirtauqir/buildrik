@@ -186,8 +186,8 @@ export function cleanupDropIndicators(container: HTMLElement | null): void {
     });
 
     // Remove shake animation class
-    container.querySelectorAll(".buildrick-invalid-drop-shake").forEach((el) => {
-      el.classList.remove("buildrick-invalid-drop-shake");
+    container.querySelectorAll(".bd-invalid-drop-shake").forEach((el) => {
+      el.classList.remove("bd-invalid-drop-shake");
     });
   } catch {
     // Container may have been unmounted

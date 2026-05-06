@@ -275,19 +275,19 @@
   transition: outline-color 150ms ease;
 }
 
-.buildrick-dragging {
+.bd-dragging {
   opacity: 0.4 !important;
   cursor: grabbing !important;
   user-select: none;
 }
 
-.buildrick-clone-mode {
+.bd-clone-mode {
   cursor: copy !important;
   outline: 2px dashed var(--buildrick-selection-color) !important;
   outline-offset: 2px;
 }
 
-.buildrick-clone-mode::before {
+.bd-clone-mode::before {
   content: "+";
   position: absolute;
   top: -8px;

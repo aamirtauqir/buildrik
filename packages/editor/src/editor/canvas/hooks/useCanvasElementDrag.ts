@@ -273,7 +273,7 @@ export function useCanvasElementDrag({
       // Create enhanced drag ghost with element type label
       const rect = draggableEl.getBoundingClientRect();
       const dragGhost = document.createElement("div");
-      dragGhost.className = "buildrick-drag-ghost";
+      dragGhost.className = "bd-drag-ghost";
       dragGhost.style.cssText = `
         position: absolute;
         top: -9999px;
@@ -332,11 +332,11 @@ export function useCanvasElementDrag({
 
       // Visual feedback during drag
       draggableEl.style.opacity = "0.4";
-      draggableEl.classList.add("buildrick-dragging");
+      draggableEl.classList.add("bd-dragging");
 
       // Clone mode visual feedback
       if (isCloneModeRef.current) {
-        draggableEl.classList.add("buildrick-clone-mode");
+        draggableEl.classList.add("bd-clone-mode");
         // Set copy effect for cursor feedback
         e.dataTransfer!.effectAllowed = "copy";
       }
@@ -376,16 +376,16 @@ export function useCanvasElementDrag({
       if (draggableEl) {
         draggableEl.style.opacity = "1";
         draggableEl.style.cursor = "grab";
-        draggableEl.classList.remove("buildrick-dragging");
-        draggableEl.classList.remove("buildrick-clone-mode");
+        draggableEl.classList.remove("bd-dragging");
+        draggableEl.classList.remove("bd-clone-mode");
       }
 
       // Also clean up via ref in case DOM was recreated during drag
       if (draggingElementRef.current && draggingElementRef.current !== draggableEl) {
         draggingElementRef.current.style.opacity = "1";
         draggingElementRef.current.style.cursor = "grab";
-        draggingElementRef.current.classList.remove("buildrick-dragging");
-        draggingElementRef.current.classList.remove("buildrick-clone-mode");
+        draggingElementRef.current.classList.remove("bd-dragging");
+        draggingElementRef.current.classList.remove("bd-clone-mode");
       }
 
       // Reset modifier state

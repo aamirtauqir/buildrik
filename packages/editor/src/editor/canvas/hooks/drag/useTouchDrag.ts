@@ -97,7 +97,7 @@ export function useTouchDrag({
         ) as HTMLElement | null;
         if (draggedEl) {
           draggedEl.style.opacity = "1";
-          draggedEl.classList.remove("buildrick-dragging");
+          draggedEl.classList.remove("bd-dragging");
         }
 
         // Unified cleanup for all drop indicators
@@ -160,7 +160,7 @@ export function useTouchDrag({
 
             // Visual feedback
             capturedDraggableEl.style.opacity = "0.4";
-            capturedDraggableEl.classList.add("buildrick-dragging");
+            capturedDraggableEl.classList.add("bd-dragging");
           }
         },
         LONG_PRESS_DELAY
@@ -338,10 +338,10 @@ export function useTouchDrag({
       ) as HTMLElement | null;
       if (targetDomEl) {
         targetDomEl.setAttribute("data-drop-invalid", "true");
-        targetDomEl.classList.add("buildrick-invalid-drop-shake");
+        targetDomEl.classList.add("bd-invalid-drop-shake");
         setTimeout(() => {
           targetDomEl.removeAttribute("data-drop-invalid");
-          targetDomEl.classList.remove("buildrick-invalid-drop-shake");
+          targetDomEl.classList.remove("bd-invalid-drop-shake");
         }, 500);
       }
     },
