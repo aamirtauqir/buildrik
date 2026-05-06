@@ -115,7 +115,7 @@ a:focus-visible,
 /* ─── Skip link — keyboard accessibility entry point ────────────────────
  * Migrated from themes/ux-fixes.css.
  */
-.buildrick-skip-link {
+.bd-skip-link {
   position: absolute;
   top: -100px;
   left: 0;
@@ -128,7 +128,7 @@ a:focus-visible,
   font-weight: var(--bd-weight-semibold);
 }
 
-.buildrick-skip-link:focus {
+.bd-skip-link:focus {
   top: 16px;
   left: 16px;
 }

@@ -40,7 +40,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
 
   // Screen reader announcement on mount
   React.useEffect(() => {
-    const el = document.getElementById("buildrick-achievement-live");
+    const el = document.getElementById("bd-achievement-live");
     if (!el) return;
     el.textContent = isLastStep
       ? "Congratulations! You have completed all getting started steps."
@@ -51,7 +51,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
     <>
       {/* Accessible live region — invisible, read by screen readers on mount */}
       <div
-        id="buildrick-achievement-live"
+        id="bd-achievement-live"
         role="status"
         aria-live="polite"
         aria-atomic="true"

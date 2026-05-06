@@ -819,7 +819,7 @@
   border: 0;
 }
 
-.buildrick-skip-link {
+.bd-skip-link {
   position: absolute;
   top: -100px;
   left: 0;
@@ -831,7 +831,7 @@
   border-radius: 0 0 4px 0;
 }
 
-.buildrick-skip-link:focus {
+.bd-skip-link:focus {
   top: 0;
 }
 

@@ -1,5 +1,5 @@
 {
-  "count": 202,
+  "count": 196,
   "mode": "WARN",
   "perPanel": {
     "animation": 17,
@@ -9,10 +9,10 @@
     "export": 6,
     "inspector": 6,
     "media": 1,
-    "onboarding": 2,
+    "onboarding": 0,
     "panels": 10,
-    "rail": 1,
+    "rail": 0,
     "shell": 6,
-    "sidebar": 34
+    "sidebar": 31
   }
 }
