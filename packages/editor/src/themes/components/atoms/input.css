@@ -64,6 +64,17 @@
   border-radius: var(--buildrick-radius-md);
   overflow: hidden;
 }
+.bd-stepper--error {
+  border-color: var(--buildrick-error);
+}
+.bd-stepper:focus-within {
+  border-color: var(--buildrick-border-focus);
+  box-shadow: var(--buildrick-glow-primary);
+}
+.bd-stepper--error:focus-within {
+  border-color: var(--buildrick-error);
+  box-shadow: var(--buildrick-glow-danger, var(--buildrick-glow-primary));
+}
 .bd-stepper__btn {
   width: 30px;
   background: transparent;

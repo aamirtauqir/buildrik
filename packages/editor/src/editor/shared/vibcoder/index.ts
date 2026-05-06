@@ -34,6 +34,8 @@ export { IconButton } from "./IconButton";
 export type { IconButtonVariant, IconButtonSize, IconButtonProps } from "./IconButton";
 export { Slider } from "./Slider";
 export type { SliderProps } from "./Slider";
+export { NumericStepper } from "./NumericStepper";
+export type { NumericStepperProps } from "./NumericStepper";
 export { Link } from "./Link";
 export type { LinkTone, LinkProps } from "./Link";
 export { Progress } from "./Progress";
