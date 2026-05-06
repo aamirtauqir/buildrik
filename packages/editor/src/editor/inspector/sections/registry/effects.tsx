@@ -110,7 +110,7 @@ export const EFFECTS_SECTIONS: Record<string, AnySectionEntry> = {
         if (anim) {
           domEl.style.animation = "";
           void domEl.offsetHeight;
-          domEl.style.animation = `buildrick-${anim.type} ${anim.duration}ms ${anim.easing} ${anim.delay}ms 1 normal forwards`;
+          domEl.style.animation = `bd-anim-${anim.type} ${anim.duration}ms ${anim.easing} ${anim.delay}ms 1 normal forwards`;
         }
       };
       return {
