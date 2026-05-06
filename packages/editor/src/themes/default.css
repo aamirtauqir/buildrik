@@ -25,7 +25,8 @@
  * Ordering: atoms → layouts → molecules → organisms
  */
 
-/* Atoms (24 files) */
+/* Atoms (25 files) */
+@import "./components/atoms/animation-utils.css" layer(components);
 @import "./components/atoms/avatar.css" layer(components);
 @import "./components/atoms/badge.css" layer(components);
 @import "./components/atoms/breakpoint-switcher.css" layer(components);

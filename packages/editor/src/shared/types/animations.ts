@@ -107,13 +107,13 @@ export interface EasingPreset {
 
 /**
  * Generates CSS animation property string from config
- * Uses aqb- prefixed keyframe names to match AnimationPresets.ts
+ * Uses bd-anim- prefixed keyframe names defined in
+ * themes/components/atoms/animation-utils.css.
  */
 export function generateAnimationCSS(config: AnimationConfig): string {
   const iterations = config.iterations === -1 ? "infinite" : config.iterations.toString();
   const fill = config.fillMode || "forwards";
-  // Add buildrick- prefix to match keyframe names
-  const animName = `buildrick-${config.type}`;
+  const animName = `bd-anim-${config.type}`;
 
   return `${animName} ${config.duration}ms ${config.easing} ${config.delay}ms ${iterations} ${config.direction} ${fill}`;
 }

@@ -214,13 +214,13 @@ export class ElementOperations {
 
   /**
    * Generate CSS animation value from config
-   * Uses aqb- prefixed keyframe names
+   * Uses bd-anim- prefixed keyframe names defined in
+   * themes/components/atoms/animation-utils.css.
    */
   private generateAnimationCSS(config: AnimationConfig): string {
     const iterations = config.iterations === -1 ? "infinite" : config.iterations.toString();
     const fill = config.fillMode || "forwards";
-    // Add buildrick- prefix to match keyframe names in AnimationPresets.ts
-    const animName = `buildrick-${config.type}`;
+    const animName = `bd-anim-${config.type}`;
     return `${animName} ${config.duration}ms ${config.easing} ${config.delay}ms ${iterations} ${config.direction} ${fill}`;
   }
 

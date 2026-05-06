@@ -8,5 +8,4 @@ export {
   type AnimationConfig,
   type AnimationEditorProps,
 } from "./AnimationEditor";
-export { animationCSS, injectAnimationCSS } from "./AnimationPresets";
 // TimelineEditor, ScrollTriggerEditor — L0 stubs, files not yet created

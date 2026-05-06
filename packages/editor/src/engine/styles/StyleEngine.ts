@@ -6,7 +6,6 @@
  * @license BSD-3-Clause
  */
 
-import { injectAnimationCSS } from "../../editor/animation/AnimationPresets";
 import { EVENTS } from "../../shared/constants/events";
 import {
   BREAKPOINT_ORDER,
@@ -34,8 +33,6 @@ export class StyleEngine {
   constructor(composer: Composer) {
     this.composer = composer;
     this.createStyleElement();
-    // Inject animation keyframes CSS (AQUI-026)
-    injectAnimationCSS();
   }
 
   /**
