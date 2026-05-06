@@ -1,0 +1,86 @@
+#!/usr/bin/env node
+/**
+ * Vibcoder-finish CI gate.
+ * Counts .buildrick-* className refs in src/editor/.
+ * WARN mode: blocks regressions, auto-ratchets baseline on shrink.
+ * ERROR mode: zero-tolerance — any ref fails the build.
+ * Per-panel locks: panels at 0 must stay at 0.
+ */
+import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
+import { resolve, relative, sep } from 'node:path';
+
+const ROOT = process.cwd();
+const BASELINE = resolve(ROOT, 'scripts', 'baselines', 'buildrick.json');
+const EDITOR_ROOT = resolve(ROOT, 'src', 'editor');
+const CLASS_RE = /\bbuildrick-[a-z][a-z0-9-]*\b/g;
+
+function* walk(dir) {
+  for (const entry of readdirSync(dir)) {
+    const full = resolve(dir, entry);
+    const st = statSync(full);
+    if (st.isDirectory()) yield* walk(full);
+    else if (/\.(tsx?|ts)$/.test(entry) && !/\.d\.ts$/.test(entry)) yield full;
+  }
+}
+
+function countMatches(file) {
+  const src = readFileSync(file, 'utf8');
+  return [...src.matchAll(CLASS_RE)].length;
+}
+
+function panelOf(file) {
+  const rel = relative(EDITOR_ROOT, file);
+  return rel.split(sep)[0];
+}
+
+function scan() {
+  let total = 0;
+  const perPanel = {};
+  try {
+    for (const f of walk(EDITOR_ROOT)) {
+      const n = countMatches(f);
+      if (!n) continue;
+      total += n;
+      const p = panelOf(f);
+      perPanel[p] = (perPanel[p] ?? 0) + n;
+    }
+  } catch (e) {
+    if (e.code !== 'ENOENT') throw e;
+  }
+  return { total, perPanel };
+}
+
+function fail(msg) {
+  console.error(`[buildrick gate] FAIL — ${msg}`);
+  process.exit(1);
+}
+function pass(msg) {
+  if (msg) console.log(`[buildrick gate] ${msg}`);
+  process.exit(0);
+}
+
+const baseline = JSON.parse(readFileSync(BASELINE, 'utf8'));
+const { total, perPanel } = scan();
+
+if (baseline.mode === 'ERROR') {
+  if (total > 0) fail(`Zero-tolerance violation: ${total} legacy refs found, expected 0`);
+  pass('ERROR mode, count: 0. PASS.');
+}
+
+if (total > baseline.count) {
+  fail(`Baseline regression: was ${baseline.count}, now ${total} (+${total - baseline.count}). Drain or remove.`);
+}
+
+for (const [panel, lockCount] of Object.entries(baseline.perPanel ?? {})) {
+  if (lockCount === 0 && (perPanel[panel] ?? 0) > 0) {
+    fail(`Panel ${panel} drained, no new .buildrick-* allowed (found ${perPanel[panel]})`);
+  }
+}
+
+if (total < baseline.count) {
+  const updated = { ...baseline, count: total, perPanel };
+  writeFileSync(BASELINE, JSON.stringify(updated, null, 2) + '\n');
+  pass(`count: ${baseline.count} → ${total} (-${baseline.count - total}). Baseline updated.`);
+}
+
+pass(`count: ${total} (baseline ${baseline.count}). OK.`);

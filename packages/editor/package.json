@@ -13,6 +13,7 @@
     "lint:ds": "bash scripts/ds-grep-gates.sh",
     "verify:ds": "node scripts/verify-design-baselines.mjs && bash scripts/ds-grep-gates.sh",
     "lint:ds-hex": "node scripts/find-inline-hex-v2.mjs",
+    "gate:buildrick": "node scripts/check-buildrick-baseline.mjs",
     "lint": "eslint . --ext .ts,.tsx",
     "phase5:inventory": "node scripts/phase5-shim-inventory.mjs",
     "phase5:inventory:pretty": "node scripts/phase5-shim-inventory.mjs --pretty",
