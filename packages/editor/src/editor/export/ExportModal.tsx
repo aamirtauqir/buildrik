@@ -27,25 +27,6 @@ import { FormatGrid, OptionsPanel } from "./ExportOptions";
 import { downloadFile, formatBytes } from "./ExportUtils";
 import { PreviewFrame } from "./PreviewFrame";
 
-// Scoped CSS override — makes this modal narrower with the token-based design spec
-const EXPORT_MODAL_STYLE = `
-  .buildrick-export-modal-scope .buildrick-modal {
-    width: 480px !important;
-    max-width: 90vw !important;
-    border-radius: var(--buildrick-radius-xl) !important;
-    box-shadow: var(--buildrick-shadow-2xl) !important;
-    border: 1px solid var(--buildrick-border) !important;
-    background: var(--buildrick-bg-panel) !important;
-  }
-  .buildrick-export-modal-scope .buildrick-modal-header {
-    min-height: 52px;
-    padding: 0 20px;
-  }
-  .buildrick-export-modal-scope .buildrick-modal-body {
-    padding: 20px;
-  }
-`;
-
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -174,20 +155,16 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
         : `Export as ${config.format.toUpperCase()}`;
 
   return (
-    <>
-      {/* Scoped style override for export modal sizing/tokens */}
-      <style>{EXPORT_MODAL_STYLE}</style>
-      <div>
-        <OverlayMount>
-          <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
-            <ModalContent size="lg">
-              <ModalTitle>Export</ModalTitle>
-              <ModalClose aria-label="Close modal">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </ModalClose>
-              <div className="bd-modal__body">
+    <OverlayMount>
+      <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
+        <ModalContent size="lg">
+          <ModalTitle>Export</ModalTitle>
+          <ModalClose aria-label="Close modal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </ModalClose>
+          <div className="bd-modal__body">
           {/* Format grid — always visible at top */}
           <div style={{ marginBottom: 20 }}>
             <FormatGrid
@@ -333,12 +310,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
               )}
             </div>
           </div>
-              </div>
-            </ModalContent>
-          </Modal>
-        </OverlayMount>
-      </div>
-    </>
+          </div>
+        </ModalContent>
+      </Modal>
+    </OverlayMount>
   );
 };
 

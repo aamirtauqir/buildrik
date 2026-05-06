@@ -901,11 +901,11 @@ export function VersionHistoryPanel({
           <div className="save-form open">
             <div className="form-row">
               <div className="form-field" style={{ flex: 1 }}>
-                <label className="form-label" htmlFor="buildrick-save-name">
+                <label className="form-label" htmlFor="bd-save-name">
                   Version name *
                 </label>
                 <Input
-                  id="buildrick-save-name"
+                  id="bd-save-name"
                   type="text"
                   value={newVersionName}
                   onChange={(e) => setNewVersionName(e.target.value)}

@@ -105,13 +105,13 @@ export function useLayerSelection(
   const handleLayerMouseEnter = React.useCallback((id: string) => {
     setHoveredLayerId(id);
     const el = document.querySelector(`[data-buildrick-id="${id}"]`) as HTMLElement | null;
-    if (el) el.classList.add("buildrick-layer-hover-highlight");
+    if (el) el.classList.add("bd-layer-hover-highlight");
   }, []);
 
   const handleLayerMouseLeave = React.useCallback(() => {
     if (hoveredLayerId) {
       const el = document.querySelector(`[data-buildrick-id="${hoveredLayerId}"]`) as HTMLElement | null;
-      if (el) el.classList.remove("buildrick-layer-hover-highlight");
+      if (el) el.classList.remove("bd-layer-hover-highlight");
     }
     setHoveredLayerId(null);
   }, [hoveredLayerId]);

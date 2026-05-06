@@ -140,7 +140,7 @@ to {
   box-shadow: var(--buildrick-shadow-md), 0 0 0 3px var(--buildrick-accent-subtle);
 }
 
-.buildrick-layers-tree {
+.bd-layers-tree {
   display: flex;
   flex-direction: column;
   gap: 4px;

@@ -387,7 +387,7 @@ export const LayersPanel: React.FC<LayersPanelProps> = ({
       {/* Clean Tree View - Maximum space for content */}
       <div
         ref={state.treeContainerRef}
-        id="buildrick-layers-tree"
+        id="bd-layers-tree"
         className={`bdc-layers-tree${state.displayPrefs.treeDensity === "compact" ? " bdc-layers-tree-compact" : ""}`}
         role="tree"
         aria-label="Page structure"

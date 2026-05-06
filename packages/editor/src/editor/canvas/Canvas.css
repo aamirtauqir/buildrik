@@ -553,7 +553,7 @@
   }
 }
 
-.buildrick-layer-hover-highlight {
+.bd-layer-hover-highlight {
   outline: 1px solid var(--buildrick-selection-color) !important;
   outline-offset: 1px;
   background: var(--buildrick-accent-subtle) !important;

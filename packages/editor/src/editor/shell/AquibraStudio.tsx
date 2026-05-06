@@ -438,7 +438,7 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
 
   return (
     <Stack
-      className={`buildrick-studio ${className}`}
+      className={`bd-studio ${className}`}
       style={{
         gap: 0,
         height: "100%",
