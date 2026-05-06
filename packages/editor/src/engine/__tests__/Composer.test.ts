@@ -129,4 +129,33 @@ describe("Composer listener hygiene", () => {
     await expect(composer.whenReady()).resolves.toBeUndefined();
     expect(composer.isReady()).toBe(true);
   });
+
+  // Regression for E-004 (audit): setDevice previously emitted
+  // BREAKPOINT_CHANGED twice — once from Viewport.setDevice and again
+  // from Composer.setDevice. Viewport is the single source of truth,
+  // so exactly one emission per setDevice call is the contract.
+  it("setDevice emits BREAKPOINT_CHANGED exactly once", () => {
+    const composer = new Composer({} as any);
+    const handler = vi.fn();
+    composer.on("breakpoint:changed", handler);
+
+    composer.setDevice("mobile");
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(handler).toHaveBeenCalledWith("mobile");
+
+    // Same device is a no-op (early exit in setDevice).
+    composer.setDevice("mobile");
+    expect(handler).toHaveBeenCalledTimes(1);
+
+    // Different device fires once more.
+    composer.setDevice("tablet");
+    expect(handler).toHaveBeenCalledTimes(2);
+  });
+
+  it("setDevice keeps state.device in sync with viewport", () => {
+    const composer = new Composer({} as any);
+    composer.setDevice("tablet");
+    expect(composer.getState().device).toBe("tablet");
+    expect((composer as any).viewport.getDevice()).toBe("tablet");
+  });
 });

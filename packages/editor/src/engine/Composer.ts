@@ -606,13 +606,17 @@ ${html}
   // ============================================
 
   /**
-   * Set active device for responsive preview
+   * Set active device for responsive preview.
+   *
+   * Source of truth is `viewport.currentDevice`. `state.device` is a
+   * read-only mirror kept in sync for `getState()` serialization. The
+   * `BREAKPOINT_CHANGED` event is emitted once by `viewport.setDevice`
+   * (Viewport.ts:70) — do not emit again here.
    */
   setDevice(device: import("../shared/types").DeviceType): void {
     if (this.state.device !== device) {
       this.state.device = device;
       this.viewport.setDevice(device);
-      this.emit(EVENTS.BREAKPOINT_CHANGED, device);
     }
   }
 
