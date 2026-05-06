@@ -7,23 +7,13 @@
 
 import * as React from "react";
 import type { Composer } from "../../../engine";
-import { findDropTargetElement } from "../../../shared/utils/dragDrop";
 import type { InvalidDropReason } from "../../../shared/utils/dragDrop/dropValidation";
-import { calculateFreshDropTarget } from "./drag/dragCalculations";
-import {
-  handleMultiElementDrop,
-  handleElementDrop,
-  handleComponentDrop,
-  handleTemplateDrop,
-  handleBlockDrop,
-  type DropContext,
-  type DropPayloads,
-} from "./drag/dropOperations";
 import { useDragAutoScroll } from "./useDragAutoScroll";
 import { useDragSession } from "./useDragSession";
 import type { DropPosition, DropSlotRect, BreadcrumbItem } from "./useDragSession";
 import { useDragSnapGuides } from "./drag/useDragSnapGuides";
 import { useDragVisuals } from "./useDragVisuals";
+import { useDropExecution } from "./drag/useDropExecution";
 import { useDropTargetResolver } from "./drag/useDropTargetResolver";
 
 // Extracted drop handlers
@@ -216,238 +206,22 @@ export function useCanvasDragDrop({
     [composer, resetSession, visuals, autoScroll, clearDropAffordance]
   );
 
-  // ==========================================================================
-  // DROP HANDLER
-  // ==========================================================================
-  const handleDrop = React.useCallback(
-    async (e: React.DragEvent) => {
-      e.preventDefault();
-
-      // =========================================================================
-      // CRITICAL: Snapshot every DataTransfer channel SYNCHRONOUSLY, BEFORE any
-      // React state updates, awaits, or sub-handler calls. In real browsers the
-      // DataTransfer object is only reliably readable inside the synchronous
-      // native drop handler — a single microtask boundary (e.g. `await`) zeros
-      // it out. We pre-read once and pass the cached payloads down.
-      // =========================================================================
-      const payloads: DropPayloads = {
-        multiData: e.dataTransfer.getData("application/x-aquibra-multi"),
-        elementData: e.dataTransfer.getData("element"),
-        componentId: e.dataTransfer.getData("application/x-aquibra-component"),
-        templateData: e.dataTransfer.getData("application/aquibra-template"),
-        blockData: e.dataTransfer.getData("block"),
-      };
-
-      resetSession();
-      onSnapLinesChangeRef.current([]);
-      visuals.clearAllIndicators();
-      clearDropAffordance();
-      autoScroll.stopCurrentAutoScroll();
-
-      if (!composer || isEditing) {
-        if (isEditing) {
-          onDropErrorRef.current?.({
-            type: "EDITING_MODE",
-            message: "Cannot drop while editing text",
-          });
-        }
-        return;
-      }
-
-      // Both e.clientX/clientY and rects (from getBoundingClientRect) are in
-      // viewport space — already scroll-invariant. No scroll correction needed.
-      const { targetId: freshTargetId, dropPosition: freshDropPosition } = calculateFreshDropTarget(
-        e.clientX,
-        e.clientY,
-        composer,
-        canvasRef,
-        findDropTargetElement
-      );
-
-      // Create drop context for handlers
-      const ctx: DropContext = {
-        composer,
-        canvasRef,
-        freshTargetId,
-        freshDropPosition,
-        onDropError: onDropErrorRef.current,
-        onDropSuccess: onDropSuccessRef.current,
-      };
-
-      // =========================================================================
-      // OS FILE DROP HANDLER (Desktop-to-Canvas Direct Drop)
-      // =========================================================================
-      if (e.dataTransfer.files.length > 0) {
-        const files = Array.from(e.dataTransfer.files);
-        const imageFiles = files.filter((f) => f.type.startsWith("image/"));
-
-        if (imageFiles.length > 0) {
-          const { targetId: freshTargetId } = calculateFreshDropTarget(
-            e.clientX,
-            e.clientY,
-            composer,
-            canvasRef,
-            findDropTargetElement
-          );
-
-          if (freshTargetId) {
-            const el = composer.elements.getElement(freshTargetId);
-            if (el) {
-              // Upload and apply first image to target element
-              const file = imageFiles[0];
-              onDropSuccessRef.current?.({
-                elementLabel: `Uploading ${file.name}...`,
-                elementType: "image",
-              });
-
-              try {
-                const result = await composer.media.uploadFile(file);
-                if (result.success && result.asset) {
-                  el.setAttribute("src", result.asset.src);
-                  onDropSuccessRef.current?.({
-                    elementLabel: `${file.name} applied ✓`,
-                    elementType: "image",
-                  });
-                }
-              } catch (err) {
-                onDropErrorRef.current?.({
-                  type: "INSERT_FAILED",
-                  message: "Could not upload dropped image",
-                });
-              }
-            }
-          }
-          return;
-        }
-      }
-
-      // Try each drop type in order
-      let dropSucceeded = false;
-      if (handleMultiElementDrop(e, ctx, payloads)) {
-        dropSucceeded = true;
-      } else if (handleElementDrop(e, ctx, dropTargetId, payloads)) {
-        dropSucceeded = true;
-      } else if (await handleComponentDrop(e, ctx, payloads)) {
-        dropSucceeded = true;
-      } else if (handleTemplateDrop(e, ctx, payloads)) {
-        dropSucceeded = true;
-      } else {
-        handleBlockDrop(e, ctx, payloads);
-        dropSucceeded = true;
-      }
-
-      // Notify DragManager SSOT
-      composer.drag?.end(dropSucceeded);
-    },
-    [
-      composer,
-      isEditing,
-      dropTargetId,
-      canvasRef,
-      resetSession,
-      visuals,
-      autoScroll,
-      clearDropAffordance,
-    ]
-  );
-
-  const handleInternalMediaDrop = React.useCallback(
-    async (e: React.DragEvent) => {
-      const src = e.dataTransfer.getData("application/x-aquibra-media-src");
-      const rawType = e.dataTransfer.getData("application/x-aquibra-media-type");
-      const name = e.dataTransfer.getData("application/x-aquibra-media-name");
-      if (!src || !composer) return;
-
-      // Translate drop viewport coords to canvas-space coords. If we're
-      // over a specific element (section with bg-image, img placeholder),
-      // prefer that as targetElementId so the src replaces rather than
-      // creates a new element. Otherwise fall back to coords-on-root.
-      const { targetId } = calculateFreshDropTarget(
-        e.clientX,
-        e.clientY,
-        composer,
-        canvasRef,
-        findDropTargetElement,
-      );
-
-      const canvasEl = canvasRef.current;
-      const rect = canvasEl?.getBoundingClientRect();
-      const x = rect ? Math.round(e.clientX - rect.left) : undefined;
-      const y = rect ? Math.round(e.clientY - rect.top) : undefined;
-
-      // Normalize the legacy "img"/"vid"/"ico"/"fnt" filter keys to the
-      // engine's MediaInsertType vocabulary.
-      const insertType =
-        rawType === "img"
-          ? "image"
-          : rawType === "vid"
-            ? "video"
-            : rawType === "ico"
-              ? "icon"
-              : rawType === "fnt"
-                ? "font"
-                : (rawType as "image" | "video" | "icon" | "svg" | "audio" | "lottie" | "font");
-
-      try {
-        const result = composer.mediaCommands.insertMediaAt(src, insertType, {
-          x,
-          y,
-          targetElementId: targetId ?? undefined,
-          path: "drag",
-        });
-
-        if (result) {
-          onDropSuccessRef.current?.({
-            elementLabel: `${name || "Media"} ${targetId ? "applied" : "added"} ✓`,
-            elementType: insertType,
-          });
-        } else {
-          onDropErrorRef.current?.({
-            type: "INSERT_FAILED",
-            message: "Could not place media",
-          });
-        }
-      } catch (err) {
-        // MediaNoActivePageError and friends land here.
-        onDropErrorRef.current?.({
-          type: "INSERT_FAILED",
-          message: err instanceof Error ? err.message : String(err),
-        });
-      }
-
-      // Auto-save remote (stock/discovery) assets to the library so the
-      // user's next session has them locally.
-      if ((insertType === "image" || rawType === "img") && src.startsWith("http")) {
-        try {
-          const res = await fetch(src);
-          const blob = await res.blob();
-          const file = new File(
-            [blob],
-            `imported-${(name || "img").substring(0, 10)}.webp`,
-            { type: blob.type || "image/webp" },
-          );
-          await composer.media.uploadFile(file);
-        } catch (err) {
-          // Non-fatal — drop already succeeded, library is just the cache.
-          console.warn("Media auto-save to library failed:", err);
-        }
-      }
-    },
-    [composer, canvasRef],
-  );
-
-  const handleDropWithInternal = React.useCallback(
-    async (e: React.DragEvent) => {
-      const internalSrc = e.dataTransfer.getData("application/x-aquibra-media-src");
-      if (internalSrc) {
-        e.preventDefault();
-        await handleInternalMediaDrop(e);
-        return;
-      }
-      await handleDrop(e);
-    },
-    [handleDrop, handleInternalMediaDrop]
-  );
+  // Drop dispatcher — extracted into useDropExecution (Phase D D1 stage 3).
+  // Owns DataTransfer pre-snapshot, OS file drop, internal media drop, and
+  // the 5-handler dispatch chain.
+  const dropExecution = useDropExecution({
+    composer,
+    canvasRef,
+    isEditing,
+    dropTargetId,
+    resetSession,
+    visuals,
+    autoScroll,
+    clearDropAffordance,
+    onSnapLinesChangeRef,
+    onDropErrorRef,
+    onDropSuccessRef,
+  });
 
   // ==========================================================================
   // CLEANUP EFFECTS
@@ -480,7 +254,7 @@ export function useCanvasDragDrop({
     dropTargetPath,
     handleDragOver,
     handleDragLeave,
-    handleDrop: handleDropWithInternal,
+    handleDrop: dropExecution.drop,
     setDraggingElementId,
   };
 }
