@@ -83,4 +83,22 @@ describe('check-buildrick-baseline', () => {
     expect(r.code).not.toBe(0);
     expect(r.out).toMatch(/footer/);
   });
+
+  it('preserves per-panel locks when auto-ratcheting baseline', () => {
+    // Live tree: 1 ref in inspector panel only (footer is clean)
+    mkdirSync(`${TMP}/src/editor/inspector`, { recursive: true });
+    writeFileSync(`${TMP}/src/editor/inspector/Foo.tsx`,
+      `export const F = () => <div className="buildrick-row">x</div>;`);
+    // Baseline: count was 5, footer locked at 0, inspector unlocked
+    writeFileSync(`${TMP}/scripts/baselines/buildrick.json`,
+      JSON.stringify({ count: 5, mode: 'WARN', perPanel: { footer: 0 } }, null, 2));
+    const r = run();
+    expect(r.code).toBe(0);
+    const updated = JSON.parse(
+      readFileSync(`${TMP}/scripts/baselines/buildrick.json`, 'utf8')
+    );
+    expect(updated.count).toBe(1);
+    expect(updated.perPanel.footer).toBe(0); // lock preserved
+    expect(updated.perPanel.inspector).toBe(1); // live count
+  });
 });

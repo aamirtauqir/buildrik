@@ -12,7 +12,10 @@ import { resolve, relative, sep } from 'node:path';
 const ROOT = process.cwd();
 const BASELINE = resolve(ROOT, 'scripts', 'baselines', 'buildrick.json');
 const EDITOR_ROOT = resolve(ROOT, 'src', 'editor');
-const CLASS_RE = /\bbuildrick-[a-z][a-z0-9-]*\b/g;
+// Match JSX className refs only — exclude --buildrick-* CSS tokens (canonical, MUST stay)
+// and data-buildrick-* DOM attrs (engine hooks, MUST stay). Negative-lookbehind blocks
+// any preceding `-` (catches `--buildrick`, `data-buildrick`) or alpha char (identifier-internal).
+const CLASS_RE = /(?<![-a-zA-Z])buildrick-[a-z][a-z0-9-]*\b/g;
 
 function* walk(dir) {
   for (const entry of readdirSync(dir)) {
@@ -78,7 +81,10 @@ for (const [panel, lockCount] of Object.entries(baseline.perPanel ?? {})) {
 }
 
 if (total < baseline.count) {
-  const updated = { ...baseline, count: total, perPanel };
+  // Preserve baseline locks (zero entries) that don't appear in live scan
+  // (zero-count panels are absent from `perPanel` because zero-count files don't increment).
+  const mergedPerPanel = { ...(baseline.perPanel ?? {}), ...perPanel };
+  const updated = { ...baseline, count: total, perPanel: mergedPerPanel };
   writeFileSync(BASELINE, JSON.stringify(updated, null, 2) + '\n');
   pass(`count: ${baseline.count} → ${total} (-${baseline.count - total}). Baseline updated.`);
 }

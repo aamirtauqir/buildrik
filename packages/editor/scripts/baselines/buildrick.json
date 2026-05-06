@@ -1,5 +1,18 @@
 {
-  "count": 1652,
+  "count": 202,
   "mode": "WARN",
-  "perPanel": {}
+  "perPanel": {
+    "animation": 17,
+    "canvas": 94,
+    "collaboration": 1,
+    "design-system": 24,
+    "export": 6,
+    "inspector": 6,
+    "media": 1,
+    "onboarding": 2,
+    "panels": 10,
+    "rail": 1,
+    "shell": 6,
+    "sidebar": 34
+  }
 }
