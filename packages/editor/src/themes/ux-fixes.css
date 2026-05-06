@@ -355,8 +355,3 @@ button:disabled,
    themes/design-system/a11y.css (2026-04-25). a11y.css has richer
    prefers-contrast block covering the rules from here. */
 
-.buildrick-row-hover-chain:hover .buildrick-chain-btn,
-.buildrick-row-hover-chain:focus-within .buildrick-chain-btn {
-  opacity: 1 !important;
-  pointer-events: auto !important;
-}

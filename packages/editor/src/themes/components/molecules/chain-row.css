@@ -1,0 +1,21 @@
+/**
+ * bd-chain-row — row container that reveals an inner bd-chain-btn on hover/focus.
+ *
+ * Used in inspector chrome where action buttons (link-to-token, chain-to-sibling)
+ * sit hidden until the user hovers/focuses the row. Keeps the row visually
+ * uncluttered while keeping the action discoverable.
+ *
+ * Composition:
+ *   <div class="bd-chain-row">
+ *     ...row content...
+ *     <button class="bd-chain-btn">...</button>  (opacity:0 by default)
+ *   </div>
+ *
+ * No size or variant modifiers — single shape.
+ */
+
+.bd-chain-row:hover .bd-chain-btn,
+.bd-chain-row:focus-within .bd-chain-btn {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}

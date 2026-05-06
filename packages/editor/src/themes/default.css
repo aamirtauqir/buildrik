@@ -64,6 +64,7 @@
 @import "./components/molecules/actionbar.css" layer(components);
 @import "./components/molecules/breadcrumb.css" layer(components);
 @import "./components/molecules/card.css" layer(components);
+@import "./components/molecules/chain-row.css" layer(components);
 @import "./components/molecules/chipbar.css" layer(components);
 @import "./components/molecules/color-trigger.css" layer(components);
 @import "./components/molecules/form-field.css" layer(components);

@@ -98,7 +98,7 @@ const ChainButton: React.FC<ChainButtonProps> = ({ property, value, onChange }) 
           type="button"
           aria-label={`Link ${property} to spacing token`}
           title="Link to spacing token"
-          className="buildrick-chain-btn"
+          className="bd-chain-btn"
           style={{
             padding: 2,
             background: "none",
@@ -199,7 +199,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
         <div className="bdi-pair" role="group" aria-label="Width and height">
           <div
             style={{ position: "relative", display: "flex", alignItems: "center" }}
-            className="buildrick-row-hover-chain"
+            className="bd-chain-row"
           >
             <MixedValueIndicator prop="width" mixedKeys={mixedKeys} />
             <div style={{ flex: 1 }}>
@@ -222,7 +222,7 @@ export const SizeSection: React.FC<SizeSectionProps> = ({
           <span className="bdi-pair-sep" aria-hidden="true" />
           <div
             style={{ position: "relative", display: "flex", alignItems: "center" }}
-            className="buildrick-row-hover-chain"
+            className="bd-chain-row"
           >
             <MixedValueIndicator prop="height" mixedKeys={mixedKeys} />
             <div style={{ flex: 1 }}>

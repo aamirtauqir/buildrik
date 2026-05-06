@@ -112,7 +112,7 @@ const TypeChainButton: React.FC<TypeChainButtonProps> = ({ property, value, onCh
           type="button"
           aria-label={`Link ${property} to type token`}
           title="Link to type token"
-          className="buildrick-chain-btn"
+          className="bd-chain-btn"
           style={{
             padding: 2,
             background: "none",
@@ -162,7 +162,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
       {/* Font Size — CP5: chain button for type token binding */}
       <div
         style={{ position: "relative", display: "flex", alignItems: "center" }}
-        className="buildrick-row-hover-chain"
+        className="bd-chain-row"
       >
         <MixedValueIndicator prop="font-size" mixedKeys={mixedKeys} />
         <div style={{ flex: 1 }}>
@@ -196,7 +196,7 @@ export const FontControls: React.FC<FontControlsProps> = ({ styles, onChange, mi
       {/* Line Height — CP5: chain button for type token binding */}
       <div
         style={{ position: "relative", display: "flex", alignItems: "center" }}
-        className="buildrick-row-hover-chain"
+        className="bd-chain-row"
       >
         <MixedValueIndicator prop="line-height" mixedKeys={mixedKeys} />
         <div style={{ flex: 1 }}>
