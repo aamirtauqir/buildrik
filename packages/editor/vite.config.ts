@@ -9,6 +9,11 @@ export default defineConfig({
     }),
   ],
   root: "./demo",
+  // Read env from monorepo root so a single `.env.local` serves both
+  // Next.js (dashboard) and Vite (editor). Without this, Vite would look
+  // for `.env*` next to `root` (./demo) — Phase 1d would silently miss
+  // VITE_FEATURE_PUBLISH=true. Only VITE_*-prefixed vars are exposed.
+  envDir: resolve(__dirname, "../.."),
   build: {
     outDir: resolve(__dirname, "dist"),
     emptyOutDir: true,

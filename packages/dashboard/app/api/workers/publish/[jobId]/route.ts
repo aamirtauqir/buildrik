@@ -59,6 +59,14 @@ export async function POST(
   // Otherwise fall back to dev simulation so existing flows keep working.
   const useVercel = isVercelConfigured() && pages.length > 0;
 
+  // Single log line — primary debug signal for Phase 1d ("did real Vercel
+  // path fire or did we fall through to sim?"). See editor CLAUDE.md
+  // "Phase 1d — Local publish smoke test" runbook.
+  console.log(
+    `[publish-worker] job=${jobId} site=${job.siteId} pages=${pages.length} ` +
+      `mode=${useVercel ? "vercel" : "simulation"}`,
+  );
+
   try {
     await prisma.publishBuildJob.update({
       where: { id: jobId },

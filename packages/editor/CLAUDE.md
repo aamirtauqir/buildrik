@@ -424,6 +424,62 @@ Notes:
   fallback `http://localhost:3000` is dev-only.
 - Sentry DSN absent in dev is intentional — `errorTracking.ts` no-ops when
   unset so we don't spam Sentry from local runs.
+- Vite reads `.env.local` from the **monorepo root** (configured via
+  `envDir` in `vite.config.ts`) so the same file serves Next.js
+  (dashboard) and Vite (editor). Only `VITE_*`-prefixed vars are exposed
+  to the editor bundle.
+
+---
+
+## Phase 1d — Local publish smoke test (real Vercel)
+
+Phases 1a/b/c shipped the publish backend + editor wiring. To smoke-test
+real Vercel deploys end-to-end (instead of the dev simulation):
+
+1. **Add Vercel creds to `.env.local` (monorepo root):**
+   ```
+   VERCEL_TOKEN=<from vercel.com/account/tokens — use a team token>
+   VERCEL_TEAM_ID=<optional, omit if personal token>
+   VERCEL_PROJECT_PREFIX=buildrik-site-
+   ```
+
+2. **Flip the editor flag in the same file:**
+   ```
+   VITE_FEATURE_PUBLISH=true
+   ```
+
+3. **Restart both dev servers** — Vite caches env at startup, so a
+   running `npm run dev` won't see the new flag until restarted.
+
+4. **Walk through the flow:**
+   - Sign in to dashboard at `http://localhost:3000`
+   - Create or pick an existing site
+   - Click "Open in Editor" — redirects to
+     `http://localhost:5050/?siteId=<id>`
+   - The Topbar should now show a real Publish dropdown (gated on
+     `VITE_FEATURE_PUBLISH`)
+   - Click **Publish** → editor exports all pages → POSTs to dashboard
+     tRPC `sites.publish` → creates publish job → worker route picks
+     up the job → calls Vercel `/v13/deployments`
+   - Editor polls every 2s → toast on completion shows the live URL
+
+5. **What "real" looks like vs sim:**
+   - Real path (`isVercelConfigured() && pages.length > 0`): worker
+     calls `runVercelDeploy`, `lib/vercel.ts:createVercelDeployment`,
+     poll for ready, return `https://<projectName>.vercel.app`
+   - Sim path (no `VERCEL_TOKEN` or zero pages): worker calls
+     `runSimulation` → 10-second fake delay → returns
+     `https://<siteId>.vercel.app` placeholder
+
+6. **Debug checklist if it 'silently' fails:**
+   - DevTools network tab → `sites.publish` should return a `jobId`
+     (not an error)
+   - Worker logs (Next.js dev server stdout) should show
+     `[publish-worker] job=… site=… pages=N mode=vercel`
+     (`mode=simulation` means it fell through — see next bullet)
+   - If sim runs anyway, `process.env.VERCEL_TOKEN` is undefined in
+     the dashboard process — check `.env.local` is at monorepo root,
+     not nested
 
 ---
 
