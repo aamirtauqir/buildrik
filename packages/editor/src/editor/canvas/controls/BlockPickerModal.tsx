@@ -159,13 +159,13 @@ export const BlockPickerModal: React.FC<BlockPickerModalProps> = ({
 
   return createPortal(
     <div
-      className="buildrick-block-picker-overlay"
+     
       style={overlayStyles}
       onClick={onClose}
       role="presentation"
     >
       <div
-        className="buildrick-block-picker-modal"
+       
         role="dialog"
         aria-modal="true"
         aria-label={positionLabels[insertionContext.position]}

@@ -56,13 +56,13 @@ export const ElementCard: React.FC<ElementCardProps> = ({
       >
         <Star size={12} fill={isFavorite ? "currentColor" : "none"} />
       </Button>
-      <div className="buildrick-element-card-header">
-        <div className="buildrick-element-card-icon">
+      <div>
+        <div>
           <Icon size={18} strokeWidth={1.5} />
         </div>
-        <span className="buildrick-element-card-label">{block.label}</span>
+        <span>{block.label}</span>
       </div>
-      {description && <span className="buildrick-element-card-desc">{description}</span>}
+      {description && <span>{description}</span>}
     </div>
   );
 };

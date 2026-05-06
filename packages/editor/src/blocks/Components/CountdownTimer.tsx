@@ -107,7 +107,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   );
 
   return (
-    <div className="buildrick-countdown" style={{ padding: 60, textAlign: "center" }}>
+    <div style={{ padding: 60, textAlign: "center" }}>
       {title && (
         <h2
           style={{

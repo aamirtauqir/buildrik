@@ -109,7 +109,7 @@ export const Slider: React.FC<SliderProps> = ({
         {slides.map((slide) => (
           <div
             key={slide.id}
-            className="buildrick-slide"
+           
             style={{
               minWidth: "100%",
               height: "100%",

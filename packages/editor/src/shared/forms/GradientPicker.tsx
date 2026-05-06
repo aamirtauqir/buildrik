@@ -95,7 +95,7 @@ export const GradientPicker: React.FC<GradientPickerProps> = ({
   };
 
   return (
-    <div className="buildrick-gradient-picker" style={{ opacity: disabled ? 0.5 : 1 }}>
+    <div style={{ opacity: disabled ? 0.5 : 1 }}>
       {label && (
         <label
           style={{

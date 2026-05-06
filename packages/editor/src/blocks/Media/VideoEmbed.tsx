@@ -42,7 +42,7 @@ export const VideoEmbed: React.FC<VideoEmbedProps> = ({
 
   return (
     <div
-      className="buildrick-video-embed"
+     
       style={{
         position: "relative",
         paddingBottom: ratioMap[aspectRatio],

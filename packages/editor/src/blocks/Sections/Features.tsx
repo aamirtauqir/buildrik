@@ -60,7 +60,7 @@ export const Features: React.FC<FeaturesProps> = ({
   variant = "cards",
 }) => {
   return (
-    <section className="buildrick-features" style={{ padding: "60px 40px" }}>
+    <section style={{ padding: "60px 40px" }}>
       {(title || subtitle) && (
         <div
           style={{
@@ -108,7 +108,7 @@ export const Features: React.FC<FeaturesProps> = ({
         {features.map((feature, index) => (
           <div
             key={index}
-            className="buildrick-feature-card"
+           
             style={{
               padding: variant === "cards" ? 32 : 24,
               background: variant === "cards" ? "var(--buildrick-design-color-background)" : "transparent",

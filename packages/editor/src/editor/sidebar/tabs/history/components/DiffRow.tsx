@@ -27,15 +27,15 @@ const opIcons: Record<string, string> = {
 
 export const DiffRow = React.memo<DiffRowProps>(({ change }) => {
   return (
-    <div className="buildrick-ht-diff__row">
+    <div>
       <span
-        className="buildrick-ht-diff__op"
+       
         style={{ color: opColors[change.operation] }}
       >
         {opIcons[change.operation]}
       </span>
-      <span className="buildrick-ht-diff__property">{change.property}</span>
-      <span className="buildrick-ht-diff__desc">{change.description}</span>
+      <span>{change.property}</span>
+      <span>{change.description}</span>
     </div>
   );
 });

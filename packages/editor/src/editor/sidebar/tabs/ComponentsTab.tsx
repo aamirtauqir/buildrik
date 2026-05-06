@@ -96,7 +96,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
   const headerAddBtn = (
     <Button
-      className="buildrick-comp-header-add-btn"
+     
       onClick={() => setShowCreateModal(true)}
       title="Create a new component"
       aria-label="Create component"
@@ -175,11 +175,11 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
   if (state.components.length === 0) {
     if (compactMode) {
       return (
-        <div className="buildrick-compact-empty">
-          <span className="buildrick-compact-empty-text">No components saved yet</span>
+        <div>
+          <span>No components saved yet</span>
           {onCreateNew && (
             <Button
-              className="buildrick-compact-new-btn"
+             
               onClick={onCreateNew}
               title="Right-click any element to save as component"
             >
@@ -211,10 +211,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             </div>
           </>
         )}
-        <div className="buildrick-sidebar-container">
+        <div>
           {state.canCreateComponent && (
-            <div className="buildrick-context-banner">
-              <div className="buildrick-context-banner-text">
+            <div>
+              <div>
                 <Layers size={14} />
                 <span>
                   Selected: {state.canvasSelection.length} layer
@@ -222,7 +222,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                 </span>
               </div>
               <Button
-                className="buildrick-create-component-btn"
+               
                 onClick={onCreateNew}
                 title="Create a reusable component from selection"
               >
@@ -236,7 +236,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             <p className="buildrick-empty-state-desc buildrick-comp-empty-desc comp-empty__body">
               Select elements on the canvas and save them as reusable components.
             </p>
-            <a href="#" className="buildrick-comp-learn-more-btn" onClick={(e) => e.preventDefault()}>
+            <a href="#" onClick={(e) => e.preventDefault()}>
               Learn more
             </a>
           </div>
@@ -275,7 +275,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           </div>
         </>
       )}
-      <div className="buildrick-sidebar-container buildrick-scrollbar" style={{ flex: 1, overflow: "auto" }}>
+      <div style={{ flex: 1, overflow: "auto" }}>
         {!state.isLoaded && (
           <div style={{ padding: "12px" }}>
             {Array.from({ length: 4 }).map((_, i) => (
@@ -284,14 +284,14 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           </div>
         )}
 
-        <div className="buildrick-context-banner-hint">
-          <span className="buildrick-context-hint-title">Create components from canvas:</span>
-          <span className="buildrick-context-hint-text">
+        <div>
+          <span>Create components from canvas:</span>
+          <span>
             Select layers → Right-click → Create component
           </span>
         </div>
 
-        <div className="buildrick-component-chips">
+        <div>
           {FILTER_CHIPS.map((chip) => (
             <Button
               key={chip.id}
@@ -303,10 +303,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           ))}
         </div>
 
-        <div className="buildrick-sidebar-content buildrick-scrollbar" aria-live="polite">
+        <div aria-live="polite">
           <span className="buildrick-sr-only">{state.filteredComponents.length} components found</span>
           {state.filteredComponents.length === 0 ? (
-            <div className="buildrick-empty-state-inline">
+            <div>
               <span>No components match filters</span>
               <Button onClick={() => state.setActiveFilter("all" as ComponentFilter)}>
                 Clear filters
@@ -314,14 +314,14 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             </div>
           ) : (
             Object.entries(state.groupedComponents).map(([category, items]) => (
-              <div key={category} className="buildrick-accordion">
+              <div key={category}>
                 <Button
                   className={`buildrick-accordion-header ${!state.collapsedGroups.has(category) ? "open" : ""}`}
                   onClick={() => state.toggleGroup(category)}
                 >
-                  <span className="buildrick-accordion-label">
+                  <span>
                     {category}
-                    <span className="buildrick-accordion-count">{items.length}</span>
+                    <span>{items.length}</span>
                   </span>
                   <ChevronDown
                     size={14}
@@ -330,7 +330,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                 </Button>
 
                 {!state.collapsedGroups.has(category) && (
-                  <div className="buildrick-component-list">
+                  <div>
                     {items.map((component) => (
                       <ComponentRow
                         key={component.id}

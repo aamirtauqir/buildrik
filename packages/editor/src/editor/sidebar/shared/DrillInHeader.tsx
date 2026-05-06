@@ -90,7 +90,7 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
         <Button
           ref={backBtnRef}
           onClick={handleBackClick}
-          className="buildrick-back-btn"
+         
           style={backButtonStyles}
           title={`Back to ${parentName}`}
           aria-label={`Back to ${parentName}`}

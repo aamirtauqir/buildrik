@@ -29,7 +29,7 @@ export const MapEmbed: React.FC<MapEmbedProps> = ({
 
   return (
     <div
-      className="buildrick-map-embed"
+     
       style={{
         width: "100%",
         height,

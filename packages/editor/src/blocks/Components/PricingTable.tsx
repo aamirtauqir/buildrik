@@ -73,7 +73,7 @@ export const PricingTable: React.FC<PricingTableProps> = ({
 }) => {
   return (
     <div
-      className="buildrick-pricing-table"
+     
       style={{
         display: "grid",
         gridTemplateColumns: `repeat(${columns}, 1fr)`,

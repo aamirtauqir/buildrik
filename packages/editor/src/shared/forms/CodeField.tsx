@@ -49,7 +49,7 @@ export const CodeField: React.FC<CodeFieldProps> = ({
   };
 
   return (
-    <div className="buildrick-code-field">
+    <div>
       {label && (
         <div
           style={{

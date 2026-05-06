@@ -151,7 +151,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
   };
 
   return (
-    <div className="buildrick-component-detail">
+    <div>
       {/* Header with breadcrumb */}
       <DrillInHeader
         title={component.name}
@@ -160,49 +160,49 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
         onClose={onClose}
       />
       {/* Scrollable content */}
-      <div className="buildrick-component-detail-content">
+      <div>
         {/* Large Preview */}
-        <div className="buildrick-component-detail-preview">
+        <div>
           {component.thumbnail ? (
             <img
               src={component.thumbnail}
               alt={component.name}
-              className="buildrick-component-detail-preview-img"
+             
             />
           ) : (
-            <div className="buildrick-component-detail-preview-placeholder">
+            <div>
               <span>No Preview</span>
             </div>
           )}
         </div>
 
         {/* Info Section */}
-        <div className="buildrick-component-detail-info">
-          <div className="buildrick-component-detail-info-row">
-            <span className="buildrick-component-detail-info-label">Type:</span>
-            <span className="buildrick-component-detail-info-value">{displayType}</span>
+        <div>
+          <div>
+            <span>Type:</span>
+            <span>{displayType}</span>
           </div>
-          <div className="buildrick-component-detail-info-row">
-            <span className="buildrick-component-detail-info-label">Tags:</span>
-            <span className="buildrick-component-detail-info-value">{displayTags}</span>
+          <div>
+            <span>Tags:</span>
+            <span>{displayTags}</span>
           </div>
           {component.description && (
-            <div className="buildrick-component-detail-info-row">
-              <span className="buildrick-component-detail-info-label">Description:</span>
-              <span className="buildrick-component-detail-info-value">{component.description}</span>
+            <div>
+              <span>Description:</span>
+              <span>{component.description}</span>
             </div>
           )}
         </div>
 
         {/* Primary Action */}
-        <Button className="buildrick-component-detail-insert-btn" onClick={handleInsert}>
+        <Button onClick={handleInsert}>
           Insert Component
         </Button>
 
         {/* Secondary Actions */}
-        <div className="buildrick-component-detail-actions">
+        <div>
           <Button
-            className="buildrick-component-detail-action-btn"
+           
             onClick={handleDuplicate}
             title="Duplicate component"
           >
@@ -210,7 +210,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
             <span>Duplicate</span>
           </Button>
           <Button
-            className="buildrick-component-detail-action-btn danger"
+            className="danger"
             onClick={handleDelete}
             title="Delete component"
           >
@@ -221,10 +221,10 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 
         {/* Instance Actions (shown when instance is selected on canvas) */}
         {isInstanceSelected && (
-          <div className="buildrick-component-detail-instance-actions">
-            <h4 className="buildrick-component-detail-section-title">Instance Actions</h4>
+          <div>
+            <h4>Instance Actions</h4>
             <Button
-              className="buildrick-component-detail-instance-btn"
+             
               onClick={handleDetach}
               title="Detach this instance from the component"
             >
@@ -232,7 +232,7 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
               <span>Detach instance</span>
             </Button>
             <Button
-              className="buildrick-component-detail-instance-btn"
+             
               onClick={handleSwap}
               title="Swap with another component"
             >
@@ -244,8 +244,8 @@ export const ComponentDetailScreen: React.FC<ComponentDetailScreenProps> = ({
 
         {/* Variants Section */}
         {component.variantProperties && component.variantProperties.length > 0 && (
-          <div className="buildrick-component-detail-variants">
-            <h4 className="buildrick-component-detail-section-title">Variants</h4>
+          <div>
+            <h4>Variants</h4>
             {component.variantProperties.map((prop) => (
               <VariantPicker
                 key={prop.name}
@@ -287,9 +287,9 @@ interface VariantPickerProps {
 
 const VariantPicker: React.FC<VariantPickerProps> = ({ property, selectedValue, onChange }) => {
   return (
-    <div className="buildrick-variant-picker">
-      <span className="buildrick-variant-picker-label">{property.name}:</span>
-      <div className="buildrick-variant-picker-pills">
+    <div>
+      <span>{property.name}:</span>
+      <div>
         {property.values.map((value) => (
           <Button
             key={value}

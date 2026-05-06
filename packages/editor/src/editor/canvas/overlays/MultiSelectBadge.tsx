@@ -35,7 +35,7 @@ export const MultiSelectBadge: React.FC<MultiSelectBadgeProps> = ({
     : `${selectedIds.length} elements selected`;
 
   return (
-    <MultiSelectBadgeContainer className="buildrick-multiselect-badge">
+    <MultiSelectBadgeContainer>
       <PrimaryIndicator title="Primary selection">★</PrimaryIndicator>
       <span>{displayText}</span>
       <MultiSelectClearButton

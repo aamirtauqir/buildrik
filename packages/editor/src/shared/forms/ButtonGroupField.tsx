@@ -96,7 +96,7 @@ export const ButtonGroupField: React.FC<ButtonGroupFieldProps> = ({
               aria-disabled={disabled || option.disabled}
             >
               {option.icon && <span className="buildrick-btn-group-icon">{option.icon}</span>}
-              {option.label && <span className="buildrick-btn-group-label">{option.label}</span>}
+              {option.label && <span>{option.label}</span>}
             </button>
           );
         })}

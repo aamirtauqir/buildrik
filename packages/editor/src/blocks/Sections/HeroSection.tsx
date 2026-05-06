@@ -32,7 +32,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 }) => {
   return (
     <section
-      className="buildrick-hero-section"
+     
       style={{
         position: "relative",
         display: "flex",

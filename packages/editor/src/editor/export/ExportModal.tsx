@@ -177,7 +177,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
     <>
       {/* Scoped style override for export modal sizing/tokens */}
       <style>{EXPORT_MODAL_STYLE}</style>
-      <div className="buildrick-export-modal-scope">
+      <div>
         <OverlayMount>
           <Modal open={isOpen} onOpenChange={(next) => !next && onClose()}>
             <ModalContent size="lg">

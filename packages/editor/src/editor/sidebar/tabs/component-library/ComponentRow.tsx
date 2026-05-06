@@ -55,16 +55,16 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
     onClick={() => onViewDetail(component)}
     onDoubleClick={() => onInstantiate(component.id)}
   >
-    <div className="buildrick-component-thumb">
+    <div>
       <ComponentIcon />
     </div>
-    <span className="buildrick-component-name" style={{ flex: 1 }}>
+    <span style={{ flex: 1 }}>
       {component.name}
     </span>
 
     {instanceCount > 0 && (
       <span
-        className="buildrick-instance-badge comp-count-badge"
+        className="comp-count-badge"
         title={`${instanceCount} instance${instanceCount !== 1 ? "s" : ""} on canvas`}
       >
         {instanceCount}x
@@ -72,7 +72,7 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
     )}
 
     <Button
-      className="buildrick-component-add-btn"
+     
       onClick={(e) => {
         e.stopPropagation();
         onInstantiate(component.id);
@@ -82,9 +82,9 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
       Add
     </Button>
 
-    <div className="buildrick-component-menu-wrapper">
+    <div>
       <Button
-        className="buildrick-component-menu-btn"
+       
         onClick={(e) => {
           e.stopPropagation();
           onSetOpenMenuId(openMenuId === component.id ? null : component.id);
@@ -96,7 +96,7 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
       </Button>
 
       {openMenuId === component.id && (
-        <div className="buildrick-component-dropdown" onClick={(e) => e.stopPropagation()}>
+        <div onClick={(e) => e.stopPropagation()}>
           <Button onClick={() => onInstantiate(component.id)}>
             <Plus size={14} /> Insert
           </Button>
@@ -115,7 +115,7 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
             <Star size={14} fill={isFavorite(component.id) ? "currentColor" : "none"} />
             {isFavorite(component.id) ? "Unfavorite" : "Favorite"}
           </Button>
-          <Button className="buildrick-menu-danger" onClick={() => onDelete(component.id)}>
+          <Button onClick={() => onDelete(component.id)}>
             <Trash2 size={14} /> Delete
           </Button>
         </div>

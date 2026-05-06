@@ -69,7 +69,7 @@ export const FileField: React.FC<FileFieldProps> = ({
   };
 
   return (
-    <div className="buildrick-file-field">
+    <div>
       {label && (
         <label
           style={{

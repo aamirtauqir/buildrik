@@ -48,7 +48,7 @@ export const SocialIcons: React.FC<SocialIconsProps> = ({
   const iconSize = sizeMap[size];
 
   return (
-    <div className="buildrick-social-icons" style={{ display: "flex", gap: 12 }}>
+    <div style={{ display: "flex", gap: 12 }}>
       {links.map((link, index) => (
         <a
           key={index}

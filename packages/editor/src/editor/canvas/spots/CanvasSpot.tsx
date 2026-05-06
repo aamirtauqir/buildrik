@@ -75,7 +75,7 @@ export const PointerBadge: React.FC<PointerBadgeProps> = ({
 
   return (
     <div
-      className="buildrick-pointer-badge"
+     
       style={{
         position: "absolute",
         top: position.y - 24,

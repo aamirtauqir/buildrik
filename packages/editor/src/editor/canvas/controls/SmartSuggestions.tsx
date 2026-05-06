@@ -282,7 +282,7 @@ export const SmartSuggestions: React.FC<SmartSuggestionsProps> = ({
 
   return (
     <div
-      className="buildrick-smart-suggestions"
+     
       style={{
         position: "absolute",
         left: Math.max(8, left),

@@ -46,9 +46,9 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
   } = state;
 
   return (
-    <div className="buildrick-sidebar-container">
+    <div>
       {/* Quick Access Pills */}
-      <div className="buildrick-quick-pills">
+      <div>
         <Button
           className={`buildrick-pill ${showRecentsOverlay ? "active" : ""}`}
           onClick={() => {
@@ -58,7 +58,7 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
         >
           <History size={14} />
           Recents
-          {recentIds.length > 0 && <span className="buildrick-pill-badge">{recentIds.length}</span>}
+          {recentIds.length > 0 && <span>{recentIds.length}</span>}
         </Button>
 
         <Button
@@ -70,28 +70,28 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
         >
           <Star size={14} />
           Favorites
-          {favorites.length > 0 && <span className="buildrick-pill-badge">{favorites.length}</span>}
+          {favorites.length > 0 && <span>{favorites.length}</span>}
         </Button>
 
         {showTip && (
-          <Button className="buildrick-pill buildrick-pill-tip" onClick={dismissTip}>
+          <Button className="buildrick-pill-tip" onClick={dismissTip}>
             <Lightbulb size={14} />
             Drag onto canvas
-            <X size={12} className="buildrick-pill-dismiss" />
+            <X size={12} />
           </Button>
         )}
       </div>
       {/* Recents overlay */}
       {showRecentsOverlay && (
-        <div className="buildrick-quick-overlay">
-          <div className="buildrick-overlay-header">
+        <div>
+          <div>
             <span>Recent Elements</span>
             <Button onClick={() => setShowRecentsOverlay(false)}>
               <X size={14} />
             </Button>
           </div>
           {recentBlocks.length > 0 ? (
-            <div className="buildrick-overlay-grid">
+            <div>
               {recentBlocks.map((block) => (
                 <ElementCard
                   key={block.id}
@@ -104,7 +104,7 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
               ))}
             </div>
           ) : (
-            <div className="buildrick-overlay-empty">
+            <div>
               <History size={24} strokeWidth={1.5} />
               <span>No recent elements</span>
             </div>
@@ -113,15 +113,15 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
       )}
       {/* Favorites overlay */}
       {showFavoritesOverlay && (
-        <div className="buildrick-quick-overlay">
-          <div className="buildrick-overlay-header">
+        <div>
+          <div>
             <span>Favorite Elements</span>
             <Button onClick={() => setShowFavoritesOverlay(false)}>
               <X size={14} />
             </Button>
           </div>
           {favoriteBlocks.length > 0 ? (
-            <div className="buildrick-overlay-grid">
+            <div>
               {favoriteBlocks.map((block) => (
                 <ElementCard
                   key={block.id}
@@ -134,38 +134,38 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
               ))}
             </div>
           ) : (
-            <div className="buildrick-overlay-empty">
+            <div>
               <Star size={24} strokeWidth={1.5} />
               <span>No favorites yet</span>
-              <span className="buildrick-overlay-hint">Click the star on any element</span>
+              <span>Click the star on any element</span>
             </div>
           )}
         </div>
       )}
       {/* Main content — category accordions */}
       {!showRecentsOverlay && !showFavoritesOverlay && (
-        <div className="buildrick-sidebar-content buildrick-scrollbar" aria-live="polite">
+        <div aria-live="polite">
           {sortedCategories.map((cat) => {
             const isOpen = expandedCategory === cat;
             const CategoryIcon = CATEGORY_ICONS[cat];
             return (
-              <div key={cat} className="buildrick-accordion">
+              <div key={cat}>
                 <Button
                   className={`buildrick-accordion-header ${isOpen ? "open" : ""}`}
                   onClick={() => toggleCategory(cat)}
                   aria-expanded={isOpen}
                 >
-                  <span className="buildrick-accordion-label">
+                  <span>
                     {CategoryIcon && (
-                      <CategoryIcon size={18} strokeWidth={2} className="buildrick-accordion-icon" />
+                      <CategoryIcon size={18} strokeWidth={2} />
                     )}
                     {cat}
-                    <span className="buildrick-accordion-count">{filtered[cat].length}</span>
+                    <span>{filtered[cat].length}</span>
                   </span>
                   <ChevronIcon expanded={isOpen} />
                 </Button>
                 <AnimatedAccordionContent isOpen={isOpen}>
-                  <div className="buildrick-element-grid">
+                  <div>
                     {filtered[cat].map((block) => (
                       <ElementCard
                         key={block.id}

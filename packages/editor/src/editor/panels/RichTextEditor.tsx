@@ -128,7 +128,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ onCommand, activ
   return (
     <Cluster
       gap="xs"
-      className="buildrick-rte"
+     
       style={{
         padding: 8,
         background: "var(--buildrick-bg-panel)",

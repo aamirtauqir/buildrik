@@ -142,7 +142,7 @@ export const SelectionLabel: React.FC<SelectionLabelProps> = ({
 
   return (
     <div
-      className="buildrick-selection-label"
+     
       style={{
         position: "absolute",
         left: labelLeft,

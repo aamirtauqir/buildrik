@@ -55,7 +55,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
 
   if (variant === "carousel") {
     return (
-      <div className="buildrick-testimonials-carousel" style={{ padding: 40, textAlign: "center" }}>
+      <div style={{ padding: 40, textAlign: "center" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           <div style={{ fontSize: 24, marginBottom: 24 }}>
             {[...Array(testimonials[activeIndex].rating || 5)].map((_, i) => (
@@ -151,7 +151,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
 
   return (
     <div
-      className="buildrick-testimonials"
+     
       style={{
         display: "grid",
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
@@ -162,7 +162,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
       {testimonials.map((testimonial, index) => (
         <div
           key={index}
-          className="buildrick-testimonial-card"
+         
           style={{
             padding: 24,
             background: "var(--buildrick-design-color-background)",

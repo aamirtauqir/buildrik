@@ -89,7 +89,7 @@ export const ParentHighlight: React.FC<ParentHighlightProps> = ({
 
   return (
     <ParentHighlightBox
-      className="buildrick-parent-highlight"
+     
       style={{
         left: parentRect.left - 2,
         top: parentRect.top - 2,

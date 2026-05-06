@@ -149,7 +149,7 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
       {/* Visual overlay — only rendered when rects are measured */}
       {showVisual && relativeRect && (
         <div
-          className="buildrick-drop-feedback-overlay"
+         
           style={{
             position: "absolute",
             top: 0,
@@ -331,7 +331,7 @@ const DestinationLabel: React.FC<DestinationLabelProps> = ({
 
   return (
     <div
-      className="buildrick-drop-destination-label"
+     
       style={{
         position: "absolute",
         left: targetRect.left + targetRect.width + 8,

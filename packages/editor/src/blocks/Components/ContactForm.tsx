@@ -132,7 +132,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
 
   if (isSuccess) {
     return (
-      <div className="buildrick-contact-form" style={{ padding: 40, textAlign: "center" }}>
+      <div style={{ padding: 40, textAlign: "center" }}>
         <div style={{ fontSize: 64, marginBottom: 24 }}>✅</div>
         <h3
           style={{
@@ -170,7 +170,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
   }
 
   return (
-    <div className="buildrick-contact-form" style={{ padding: 40, maxWidth: 600, margin: "0 auto" }}>
+    <div style={{ padding: 40, maxWidth: 600, margin: "0 auto" }}>
       {title && (
         <h2
           style={{

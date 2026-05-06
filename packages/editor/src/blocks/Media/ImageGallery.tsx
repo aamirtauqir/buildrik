@@ -57,7 +57,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
   return (
     <>
       <div
-        className="buildrick-image-gallery"
+       
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${columns}, 1fr)`,
@@ -68,7 +68,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
         {images.map((image, index) => (
           <div
             key={index}
-            className="buildrick-gallery-item"
+           
             onClick={() => openLightbox(index)}
             style={{
               position: "relative",
@@ -105,7 +105,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
               </div>
             )}
             <div
-              className="buildrick-gallery-overlay"
+             
               style={{
                 position: "absolute",
                 inset: 0,
@@ -133,7 +133,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
       {/* Lightbox */}
       {lightboxOpen && (
         <div
-          className="buildrick-lightbox"
+         
           onClick={() => setLightboxOpen(false)}
           style={{
             position: "fixed",

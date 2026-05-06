@@ -86,7 +86,7 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
   // ];
 
   return (
-    <div className="buildrick-animation-editor" style={{ padding: 12 }}>
+    <div style={{ padding: 12 }}>
       {/* Animation Type */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="bd-tabs--sm">
         <Tab id="entrance">Entrance</Tab>

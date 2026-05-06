@@ -114,7 +114,7 @@ export const PageList: React.FC<Props> = ({
   if (pages.length === 0) {
     return (
       <div className="bd-pg-list-shell">
-        <div className="bd-pg-list buildrick-scrollbar empty" role="tree" aria-label="Pages">
+        <div className="bd-pg-list empty" role="tree" aria-label="Pages">
           <div className="bd-pg-empty">
             <div className="bd-pg-empty-title">No pages yet</div>
             <div className="bd-pg-empty-body">
@@ -209,7 +209,7 @@ export const PageList: React.FC<Props> = ({
           <span>Select all ({pages.length} page{pages.length !== 1 ? "s" : ""})</span>
         </div>
       )}
-      <div className="bd-pg-list buildrick-scrollbar" role="tree" aria-label="Pages">
+      <div className="bd-pg-list" role="tree" aria-label="Pages">
         {visible.length === 0 && search ? (
           <div className="bd-pg-empty">
             <div className="bd-pg-empty-title">No pages match &ldquo;{search}&rdquo;</div>

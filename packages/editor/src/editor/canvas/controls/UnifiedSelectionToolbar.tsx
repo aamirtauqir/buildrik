@@ -261,7 +261,7 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
   return (
     <div
       ref={toolbarRef}
-      className="buildrick-unified-toolbar"
+     
       onMouseDown={stopPropagation}
       onClick={stopPropagation}
       style={{

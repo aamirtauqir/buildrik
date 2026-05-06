@@ -117,7 +117,7 @@ export const PageCommandPalette: React.FC<Props> = ({ pages, onSelect, onClose }
 
         <div
           ref={listRef}
-          className="bd-pg-palette-list buildrick-scrollbar"
+          className="bd-pg-palette-list"
           role="listbox"
           aria-label="Pages"
         >

@@ -333,7 +333,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
         onHelpClick={onHelpClick}
         onClose={onClose}
       />
-      <div className="buildrick-scrollbar" style={contentStyles}>
+      <div style={contentStyles}>
         {/* Status Section */}
         <section style={sectionStyles}>
           <div style={sectionHeaderStyles}>
