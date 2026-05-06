@@ -189,6 +189,10 @@ export const EVENTS = {
   BADGE_SET: "badge:set",
   BADGE_REMOVED: "badge:removed",
   GRID_TOGGLED: "grid:toggled",
+  /** Snap-to-grid mode toggled — payload { snapToGrid: boolean } */
+  SNAP_TOGGLE: "snap:toggle",
+  /** Grid size changed — payload { gridSize: number } */
+  GRID_CHANGED: "grid:changed",
   GUIDES_TOGGLED: "guides:toggled",
   GUIDE_ADDED: "guide:added",
   GUIDE_REMOVED: "guide:removed",

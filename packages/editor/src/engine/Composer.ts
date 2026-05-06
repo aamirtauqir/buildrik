@@ -638,7 +638,7 @@ ${html}
   setSnapToGrid(enabled: boolean): void {
     if (this.state.snapToGrid !== enabled) {
       this.state.snapToGrid = enabled;
-      this.emit("snap:toggle", { snapToGrid: enabled });
+      this.emit(EVENTS.SNAP_TOGGLE, { snapToGrid: enabled });
     }
   }
 
@@ -649,7 +649,7 @@ ${html}
     const clampedSize = clamp(size, 1, 100);
     if (this.state.gridSize !== clampedSize) {
       this.state.gridSize = clampedSize;
-      this.emit("grid:changed", { gridSize: clampedSize });
+      this.emit(EVENTS.GRID_CHANGED, { gridSize: clampedSize });
     }
   }
 
