@@ -184,17 +184,6 @@ export default [
       ],
     },
   },
-  // Polish #72 — ban local declarations of _galleryStyles exports inside
-  // preview/vibcoder-*.tsx. Phase 1 caught two such shadows (Label gallery,
-  // HelperText gallery) where the local `field` const had a different shape
-  // than the shared `field()` helper. Lock the convention: future galleries
-  // must import from ./_galleryStyles, never redeclare.
-  {
-    files: ["src/preview/vibcoder-*.tsx"],
-    rules: {
-      "buildrik/no-gallery-shadow": "error",
-    },
-  },
   // Phase 3 contract E2 + E4 — engine encapsulation + companion-lib boundary.
   // Forbids re-exporting types or values from @radix-ui/*, cmdk, react-colorful
   // in vibcoder wrapper files. Internal imports remain allowed; only public
@@ -204,16 +193,6 @@ export default [
     files: ["src/editor/shared/vibcoder/*.tsx"],
     rules: {
       "buildrik/no-engine-public-export": "error",
-    },
-  },
-  // Phase 3 contract E5 — mandatory stateful gallery harness for overlay
-  // organisms. Forbids `open={true}` literal in overlay gallery files; they
-  // MUST drive open state via <DemoTrigger>. The rule self-filters to the
-  // 7 overlay-organism gallery filenames.
-  {
-    files: ["src/preview/vibcoder-*.tsx"],
-    rules: {
-      "buildrik/no-hardcoded-open-prop": "error",
     },
   },
   // Survivor #6 — REMOVED 2026-05-04. src/components/ deleted 2026-05-02;

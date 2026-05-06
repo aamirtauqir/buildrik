@@ -10,8 +10,6 @@ module.exports = {
     "no-inspector-tokens": require("./no-inspector-tokens.cjs"),
     "no-get-property-value-ds": require("./no-get-property-value-ds.cjs"),
     "no-magic-layout-literals": require("./no-magic-layout-literals.cjs"),
-    "no-gallery-shadow": require("./no-gallery-shadow.cjs"),
     "no-engine-public-export": require("./no-engine-public-export.cjs"),
-    "no-hardcoded-open-prop": require("./no-hardcoded-open-prop.cjs"),
   },
 };

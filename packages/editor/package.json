@@ -13,10 +13,6 @@
     "verify:ds": "node scripts/verify-design-baselines.mjs && bash scripts/ds-grep-gates.sh",
     "lint:ds-hex": "node scripts/find-inline-hex-v2.mjs",
     "lint": "eslint . --ext .ts,.tsx",
-    "vibcoder:check-port": "bash scripts/check-vibcoder-port.sh",
-    "vibcoder:pin": "bun scripts/vibcoder-bundle-pin.mjs",
-    "vibcoder:test": "vitest run scripts/__tests__/vibcoder-codemod.test.mjs",
-    "vibcoder:vendor": "bash scripts/vibcoder-vendor.sh",
     "phase5:inventory": "node scripts/phase5-shim-inventory.mjs",
     "phase5:inventory:pretty": "node scripts/phase5-shim-inventory.mjs --pretty",
     "phase5:inventory:strict": "node scripts/phase5-shim-inventory.mjs --strict"

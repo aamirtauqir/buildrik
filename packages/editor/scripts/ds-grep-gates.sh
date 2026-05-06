@@ -307,12 +307,12 @@ for p in data.get('files', []):
   set -e
 fi
 
-# Gate 15: --bd-* SSOT — alias tokens defined only in bd-aliases.css and _aliases.generated.css.
+# Gate 15: --bd-* SSOT — alias tokens defined only in bd-aliases.css and _aliases.css.
 # The --bd-* namespace is the chrome shorthand alias layer (contract documented
 # in bd-aliases.css header). Every --bd-* name must be defined in exactly one
 # of two canonical locations:
 #   1. themes/design-system/bd-aliases.css (hand-written core chrome aliases)
-#   2. themes/components/_aliases.generated.css (vibcoder codemod 3 output, R2 exception)
+#   2. themes/components/_aliases.css (vibcoder R2-namespace alias map)
 # Any other file defining --bd-* (literal or var()) is a cascade-override risk.
 # Enforces the SSOT rule that was broken by themes/bridge-tokens.css (deleted 2026-04-24)
 # and the src/new-design/project/ reference snapshot (deleted 2026-04-24).
@@ -321,9 +321,9 @@ fi
 #   (a) CSS files — `--bd-foo: value;` rules
 #   (b) TSX/TS files — JSX style props like `style={{"--bd-foo": value}}`
 # Exclusion is anchored to the exact canonical paths to prevent future
-# `/legacy/.../bd-aliases.css` or `/other/.../aliases.generated.css` from silently bypassing.
+# `/legacy/.../bd-aliases.css` or `/other/.../aliases.css` from silently bypassing.
 CANONICAL='packages/editor/src/themes/design-system/bd-aliases.css'
-GENERATED='packages/editor/src/themes/components/_aliases.generated.css'
+GENERATED='packages/editor/src/themes/components/_aliases.css'
 LEAK_CSS=$(grep -rnE '^\s*--bd-[a-z0-9-]+\s*:' packages/editor/src --include='*.css' --exclude-dir=project 2>/dev/null \
   | grep -vE "(^|/)${CANONICAL}:|${GENERATED}:" \
   || true)
@@ -479,26 +479,6 @@ if [ -n "$GATE18_VIOLATIONS" ]; then
 fi
 pass "Gate 18: no banned Tailwind/indigo/violet/purple bleed"
 
-# Gate 19: No bdr-* class leaks in editor source
-# Vibcoder vendoring renames bdr-* CLASSES → bd-* via codemod 1. Any class
-# survivor is either a missed codemod pass or a hand-written regression.
-# Excludes project/ (designer-facing reference snapshots, not runtime).
-# Excludes CSS comments (documentation of original component names is expected).
-# Excludes --bdr-* CSS CUSTOM PROPERTIES — codemod 1 intentionally leaves these
-# untouched (vibcoder's API contract for value threading, e.g.,
-# --bdr-progress-value in atoms/progress.css). Wrappers must reference the
-# vendored custom-prop name verbatim. (Added Phase 1 Batch 4 — first atom that
-# exercises this contract was progress; pre-batch atoms had no value-threading.)
-LEAK=$(grep -rE 'bdr-[a-z0-9_-]+' packages/editor/src --include='*.css' --include='*.tsx' --include='*.ts' --exclude-dir=project 2>/dev/null \
-  | grep -vE '^[[:space:]]*//|:[[:space:]]*/?\*' \
-  | grep -vE -- '--bdr-' \
-  || true)
-if [ -n "$LEAK" ]; then
-  echo "$LEAK"
-  fail "Gate 19: bdr-* class leak (codemod 1 not applied or hand-written regression)"
-fi
-pass "Gate 19: no bdr-* class leaks"
-
 # Gate 20: No barrel imports of @/shared/ui (Phase 5 shim-deletion safety).
 # Reason: shim-deletion codemods rewrite direct path imports. Barrel imports
 # (`import { Modal, Button } from "@/shared/ui"` or `from "../*/shared/ui"`)
@@ -518,17 +498,6 @@ if [ -n "$LEAK" ]; then
   fail "Gate 20: barrel import of @/shared/ui — use direct named path (e.g. @/shared/ui/Button)"
 fi
 pass "Gate 20: no barrel imports of @/shared/ui"
-
-# Gate 21: No new vibcoder-shape token defs in chrome source
-# Vibcoder uses --buildrick-color-* / --buildrick-color-fg-* shapes.
-# Buildrik canonical is --buildrick-bg-* / --buildrick-fg-*. New defs
-# in vibcoder shape mean someone bypassed codemod 2.
-LEAK=$(grep -rE '^\s*--buildrick-(color|color-fg|color-bg)-[a-z0-9-]+\s*:' packages/editor/src --include='*.css' --exclude-dir=components --exclude-dir=project 2>/dev/null || true)
-if [ -n "$LEAK" ]; then
-  echo "$LEAK"
-  fail "Gate 21: vibcoder-shape token def in non-vendored CSS (bypass of codemod 2)"
-fi
-pass "Gate 21: no vibcoder-shape defs outside vendored components"
 
 # Gate 22: E3 portal discipline — no document.body in vibcoder wrappers (except OverlayMount)
 # Phase 3 overlays MUST portal through #vibcoder-overlay-root via useOverlayContainer().
