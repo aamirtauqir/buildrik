@@ -647,88 +647,6 @@ to {
   }
 }
 
-@keyframes buildrick-toast-in {
-  from {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-
-to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes buildrick-toast-out {
-  from {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-to {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-}
-
-@keyframes buildrick-tooltip-in {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-
-to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes buildrick-fade-out {
-  from {
-    opacity: 1;
-  }
-
-to {
-    opacity: 0;
-  }
-}
-
-@keyframes buildrick-popover-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-
-to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes buildrick-menu-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-
-to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes buildrick-float-in {
-  from {
-    opacity: 0;
-    transform: translateX(-10px) scale(0.95);
-  }
-
-to {
-    opacity: 1;
-    transform: translateX(0) scale(1);
-  }
-}
-
 @keyframes buildrick-fade-in {
   from {
     opacity: 0;
@@ -736,18 +654,6 @@ to {
 
 to {
     opacity: 1;
-  }
-}
-
-@keyframes buildrick-slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -760,28 +666,6 @@ to {
 
   50% {
     opacity: 0.5;
-  }
-}
-
-@keyframes buildrick-skeleton-pulse {
-
-  0%,
-  100% {
-    opacity: 0.4;
-  }
-
-  50% {
-    opacity: 0.8;
-  }
-}
-
-@keyframes buildrick-skeleton-wave {
-  0% {
-    background-position: 200% 0;
-  }
-
-  100% {
-    background-position: -200% 0;
   }
 }
 
@@ -846,34 +730,6 @@ input[type="color"]::-webkit-color-swatch {
   opacity: 0.4;
   cursor: not-allowed !important;
   pointer-events: none;
-}
-
-@keyframes buildrick-success-flash {
-
-  0%,
-  100% {
-    background-color: inherit;
-  }
-
-  50% {
-    background-color: var(--buildrick-success);
-  }
-}
-
-@keyframes buildrick-error-shake {
-
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-
-  25% {
-    transform: translateX(-8px);
-  }
-
-  75% {
-    transform: translateX(8px);
-  }
 }
 
 .buildrick-empty-state {
@@ -1009,66 +865,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 [data-buildrick-id]:hover:not([data-selected="true"]) {
   outline: 1px dashed rgba(45, 109, 255, 0.6) !important;
   outline-offset: 0px;
-}
-
-@keyframes buildrick-status-pulse {
-
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 0.6;
-    transform: scale(1.1);
-  }
-}
-
-@keyframes buildrick-progress-slide {
-  0% {
-    transform: translateX(-100%);
-  }
-
-  100% {
-    transform: translateX(400%);
-  }
-}
-
-@keyframes buildrick-stagger-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes buildrick-stagger-fade-in-x {
-  from {
-    opacity: 0;
-    transform: translateX(8px);
-  }
-
-to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes buildrick-stagger-scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-
-to {
-    opacity: 1;
-    transform: scale(1);
-  }
 }
 
 input:disabled,
