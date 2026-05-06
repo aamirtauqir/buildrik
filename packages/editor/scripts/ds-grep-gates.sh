@@ -34,10 +34,12 @@ fi
 pass "Gate 2: --buildrick-design-* defs only in design.css"
 
 # Gate 3: No --buildrick-design-* CONSUMERS in editor chrome
-# Excludes features/design-system/ui (Design Tab legitimately displays user tokens)
+# Excludes editor/design-system/ui (Design Tab legitimately displays user tokens —
+#   was features/design-system/ui before the 2026-05-03 single-tenant cleanup)
 # Excludes .test.tsx files and JSDoc comments (documentation of binding behavior)
 LEAK=$(grep -rnE 'var\(--buildrick-design-' packages/editor/src/editor packages/editor/src/shared/ui packages/editor/src/shared/forms packages/editor/src/ai 2>/dev/null \
   | grep -v '__tests__' \
+  | grep -v 'packages/editor/src/editor/design-system/ui/' \
   | grep -vE ':[[:space:]]*/?\*' \
   | grep -vE '//.*var\(--buildrick-design-' \
   || true)

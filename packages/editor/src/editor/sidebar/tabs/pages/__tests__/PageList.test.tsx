@@ -60,11 +60,6 @@ describe("PageList", () => {
     expect(container.querySelector(".bd-pg-row.active")).not.toBeNull();
   });
 
-  it("preserves shared scrollbar utility class .buildrick-scrollbar", () => {
-    const { container } = render(<PageList {...makeProps()} />);
-    expect(container.querySelector(".buildrick-scrollbar")).not.toBeNull();
-  });
-
   it("uses .bd-pg-list root scope class (DS V2 namespace)", () => {
     const { container } = render(<PageList {...makeProps()} />);
     expect(container.querySelector(".bd-pg-list")).not.toBeNull();

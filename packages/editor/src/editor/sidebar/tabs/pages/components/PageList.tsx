@@ -5,8 +5,6 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  * Zero business logic. All state/actions received as props from usePages + useFolders.
  *
  * Class namespace: `.bd-pg-list` is the scroll container (CSS owns `overflow:auto`).
- * `.buildrick-scrollbar` shared utility class kept on the scroll container per
- * Task 1 CSS contract.
  *
  * @license BSD-3-Clause
  */
