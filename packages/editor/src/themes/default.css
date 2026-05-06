@@ -18,18 +18,83 @@
 
 @import "./design-system/index.css";
 
-/* Vibcoder vendored bundle — partial wiring for chrome topbar.
- * Loads atom + organism CSS into @layer components per cascade contract
- * (themes/components/_layer.css). Full-bundle wiring (all 64 files) is
- * tracked as follow-up; this scope-limited set unblocks Topbar.tsx M8
- * re-port without pulling visual regressions into untouched chrome.
+/* ─── Vibcoder vendored bundle — full wiring (76 files) ───
+ * Loads atom + layout + molecule + organism CSS into @layer components
+ * per cascade contract (themes/components/_layer.css).
  *
- * Ordering: atoms first, then organism that composes them.
+ * Ordering: atoms → layouts → molecules → organisms
  */
-@import "./components/atoms/icon-button.css" layer(components);
-@import "./components/atoms/button.css" layer(components);
+
+/* Atoms (24 files) */
+@import "./components/atoms/avatar.css" layer(components);
+@import "./components/atoms/badge.css" layer(components);
 @import "./components/atoms/breakpoint-switcher.css" layer(components);
+@import "./components/atoms/button.css" layer(components);
+@import "./components/atoms/checkbox.css" layer(components);
+@import "./components/atoms/count.css" layer(components);
 @import "./components/atoms/divider.css" layer(components);
+@import "./components/atoms/grip.css" layer(components);
+@import "./components/atoms/helper-text.css" layer(components);
+@import "./components/atoms/icon-button.css" layer(components);
+@import "./components/atoms/icon.css" layer(components);
+@import "./components/atoms/input.css" layer(components);
+@import "./components/atoms/kbd.css" layer(components);
+@import "./components/atoms/label.css" layer(components);
+@import "./components/atoms/link.css" layer(components);
+@import "./components/atoms/progress.css" layer(components);
+@import "./components/atoms/select.css" layer(components);
+@import "./components/atoms/skeleton.css" layer(components);
+@import "./components/atoms/slider.css" layer(components);
+@import "./components/atoms/spinner.css" layer(components);
+@import "./components/atoms/switch.css" layer(components);
+@import "./components/atoms/tag.css" layer(components);
+@import "./components/atoms/textarea.css" layer(components);
+@import "./components/atoms/thumb.css" layer(components);
+
+/* Layouts (7 files) */
+@import "./components/layouts/center.css" layer(components);
+@import "./components/layouts/cluster.css" layer(components);
+@import "./components/layouts/frame.css" layer(components);
+@import "./components/layouts/grid.css" layer(components);
+@import "./components/layouts/sidebar-shell.css" layer(components);
+@import "./components/layouts/stack.css" layer(components);
+@import "./components/layouts/switcher.css" layer(components);
+
+/* Molecules (23 files) */
+@import "./components/molecules/actionbar.css" layer(components);
+@import "./components/molecules/breadcrumb.css" layer(components);
+@import "./components/molecules/card.css" layer(components);
+@import "./components/molecules/chipbar.css" layer(components);
+@import "./components/molecules/color-trigger.css" layer(components);
+@import "./components/molecules/form-field.css" layer(components);
+@import "./components/molecules/list-row.css" layer(components);
+@import "./components/molecules/popover.css" layer(components);
+@import "./components/molecules/rail-tile.css" layer(components);
+@import "./components/molecules/search-input.css" layer(components);
+@import "./components/molecules/section-head.css" layer(components);
+@import "./components/molecules/surface-head.css" layer(components);
+@import "./components/molecules/tabs.css" layer(components);
+@import "./components/molecules/tile-meta.css" layer(components);
+@import "./components/molecules/toast.css" layer(components);
+@import "./components/molecules/toggle-row.css" layer(components);
+@import "./components/molecules/toolbar.css" layer(components);
+@import "./components/molecules/uploader.css" layer(components);
+
+/* Organisms (15 files — asset-library.css + canvas.css not yet vendored) */
+@import "./components/organisms/a11y-overlay.css" layer(components);
+@import "./components/organisms/color-picker.css" layer(components);
+@import "./components/organisms/command-palette.css" layer(components);
+@import "./components/organisms/drawer.css" layer(components);
+@import "./components/organisms/empty-state.css" layer(components);
+@import "./components/organisms/footer.css" layer(components);
+@import "./components/organisms/history-panel.css" layer(components);
+@import "./components/organisms/inspector.css" layer(components);
+@import "./components/organisms/left-panel.css" layer(components);
+@import "./components/organisms/modal.css" layer(components);
+@import "./components/organisms/notification-center.css" layer(components);
+@import "./components/organisms/pages-drawer.css" layer(components);
+@import "./components/organisms/rail.css" layer(components);
+@import "./components/organisms/templates-drawer.css" layer(components);
 @import "./components/organisms/topbar.css" layer(components);
 
 @import "./components.css";
