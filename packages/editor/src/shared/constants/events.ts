@@ -373,6 +373,14 @@ export const EVENTS = {
   // ============================================
   SYNC_STARTED: "sync:started",
   SYNC_COMPLETED: "sync:completed",
+  // KNOWN COLLISION: shares value "sync:error" with COLLAB_SYNC_ERROR (line 208).
+  // Both are actively emitted — SyncManager fires for cloud-sync failures,
+  // CollaborationManager fires for OT-protocol failures. useSaveIndicator
+  // subscribes to "sync:error" and currently handles BOTH classes of errors
+  // identically. If save-indicator semantics need to distinguish them,
+  // split values (e.g., "sync:cloud:error" vs "sync:collab:error") and
+  // update the 3 emit sites + 1 subscribe site. Tracked separately from
+  // E-005 unification arc.
   SYNC_ERROR: "sync:error",
   SYNC_CONFLICT: "sync:conflict",
   SYNC_CONFLICT_RESOLVED: "sync:conflict:resolved",
@@ -429,12 +437,6 @@ export const EVENTS = {
   CACHE_CLEARED: "cache:cleared",
 
   // ============================================
-  // Collaboration Events
-  // ============================================
-  STATE_CHANGE: "state:change",
-  SYNC_COMPLETE: "sync:complete",
-
-  // ============================================
   // Additional Canvas Events
   // ============================================
   CANVAS_FORCE_SYNC: "canvas:force-sync",
@@ -455,11 +457,6 @@ export const EVENTS = {
   // Additional Style Events
   // ============================================
   STYLES_CLEARED: "styles:cleared",
-
-  // ============================================
-  // Additional Font Events
-  // ============================================
-  GOOGLE_FONTS_FETCHED: "google-fonts:fetched",
 
   // ============================================
   // Additional Project Events
