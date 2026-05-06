@@ -465,6 +465,7 @@ const labelStyles: React.CSSProperties = {
 
 const selectStyles: React.CSSProperties = {
   width: "100%",
+  height: "auto",
   padding: "12px 14px",
   background: "rgba(255, 255, 255, 0.05)",
   border: "1px solid var(--buildrick-bg-panel)",
@@ -474,6 +475,7 @@ const selectStyles: React.CSSProperties = {
   outline: "none",
   cursor: "pointer",
   appearance: "auto",
+  boxSizing: "border-box",
 };
 
 const inputStyles: React.CSSProperties = {
@@ -495,6 +497,11 @@ const styleGridStyles: React.CSSProperties = {
 };
 
 const styleCardStyles: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  height: "auto",
   padding: "16px 12px",
   border: "1px solid var(--buildrick-bg-panel)",
   borderRadius: 10,
@@ -502,6 +509,7 @@ const styleCardStyles: React.CSSProperties = {
   textAlign: "center",
   transition: "border-color 0.2s, background 0.2s",
   background: "rgba(255, 255, 255, 0.03)",
+  whiteSpace: "normal",
 };
 
 const generateBtnStyles: React.CSSProperties = {
