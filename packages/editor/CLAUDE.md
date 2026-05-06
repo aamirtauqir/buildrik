@@ -402,6 +402,31 @@ npx tsc --noEmit     # Type check
 
 ---
 
+## ENV VARIABLES (Vite — `import.meta.env.*`)
+
+All editor-runtime env vars must be prefixed `VITE_` so Vite inlines them at
+build time. Dev-time defaults live in `.env.local`. Production values must be
+set in the host platform (Vercel project settings → Environment Variables).
+
+| Var | Purpose | Dev default | Production value |
+|-----|---------|-------------|-----------------|
+| `VITE_DASHBOARD_URL` | tRPC API base for dashboard package (publish jobs, BuildrikSyncProvider) | `http://localhost:3000` | `https://app.buildrik.com` (or canonical dashboard host) |
+| `VITE_SENTRY_DSN` | Sentry error reporting DSN | unset → console-only | Sentry project DSN (required) |
+| `VITE_FEATURE_PUBLISH` | Gate for Publish dropdown + publish flow | `false` | `true` once Vercel pipeline live |
+| `VITE_FEATURE_ACCOUNT` | Gate for AccountModal | `false` | `true` once account UI is real |
+| `VITE_FEATURE_INVITE` | Gate for InviteModal | `false` | `true` once invite flow ships |
+
+Notes:
+- Feature flags read via `shared/utils/featureFlags.ts` — never read
+  `import.meta.env.VITE_FEATURE_*` directly elsewhere.
+- Dashboard URL is consumed by `services/PublishService.ts`,
+  `services/BuildrikSyncProvider.ts`, and `editor/shell/Topbar.tsx` —
+  fallback `http://localhost:3000` is dev-only.
+- Sentry DSN absent in dev is intentional — `errorTracking.ts` no-ops when
+  unset so we don't spam Sentry from local runs.
+
+---
+
 ## QUICK REFERENCE: BEFORE WRITING ANY CODE
 
 1. Kya yeh change `components/` mein ja rahi hai? → `editor/` mein daalo instead
