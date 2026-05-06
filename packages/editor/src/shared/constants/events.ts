@@ -81,6 +81,16 @@ export const EVENTS = {
   STYLE_APPLIED: "style:applied",
   STYLE_BREAKPOINT_SET: "style:breakpoint:set",
   STYLE_BREAKPOINT_CLEARED: "style:breakpoint:cleared",
+  /** Global style defined by GlobalStyleManager */
+  STYLE_DEFINED: "style:defined",
+  /** Global style updated */
+  STYLE_UPDATED: "style:updated",
+  /** Global style deleted */
+  STYLE_DELETED: "style:deleted",
+  /** Class created from a global style */
+  STYLE_CLASS_CREATED: "style:class:created",
+  /** Bulk style import completed */
+  STYLES_IMPORTED: "styles:imported",
 
   // ============================================
   // Transaction Events
@@ -270,6 +280,22 @@ export const EVENTS = {
   // ============================================
   FONT_LOADED: "font:loaded",
   FONT_APPLIED: "font:applied",
+  FONT_ERROR: "font:error",
+  FONT_UPLOADED: "font:uploaded",
+  FONT_DELETED: "font:deleted",
+  FONT_FAVORITE_TOGGLED: "font:favorite-toggled",
+  FONTS_GOOGLE_FETCHED: "google-fonts:fetched",
+  FONTS_GOOGLE_ERROR: "google-fonts:error",
+
+  // ============================================
+  // Data Source Events
+  // ============================================
+  DATA_SOURCE_REGISTERED: "source:registered",
+  DATA_SOURCE_UPDATED: "source:updated",
+  DATA_SOURCE_UNREGISTERED: "source:unregistered",
+  DATA_GLOBAL_UPDATED: "global:updated",
+  DATA_SAMPLE_IMPORTED: "sample:imported",
+  DATA_CLEARED: "data:cleared",
 
   // ============================================
   // Export Events

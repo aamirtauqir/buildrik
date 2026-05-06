@@ -20,6 +20,7 @@ import type {
   ConditionExpression,
   LogicGroup,
 } from "../../shared/types/data";
+import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import type { Element } from "../elements/Element";
 import { EventEmitter } from "../EventEmitter";
@@ -49,8 +50,8 @@ export class DataManager extends EventEmitter {
     }
 
     this.sources.set(source.id, source);
-    this.emit("source:registered", source);
-    this.emit("source:updated", { id: source.id, data: source.data });
+    this.emit(EVENTS.DATA_SOURCE_REGISTERED, source);
+    this.emit(EVENTS.DATA_SOURCE_UPDATED, { id: source.id, data: source.data });
   }
 
   /**
@@ -61,8 +62,8 @@ export class DataManager extends EventEmitter {
     if (!source) return;
 
     this.sources.delete(id);
-    this.emit("source:unregistered", { id });
-    this.emit("source:updated", { id, data: undefined });
+    this.emit(EVENTS.DATA_SOURCE_UNREGISTERED, { id });
+    this.emit(EVENTS.DATA_SOURCE_UPDATED, { id, data: undefined });
   }
 
   /**
@@ -89,7 +90,7 @@ export class DataManager extends EventEmitter {
     }
 
     source.data = data as DataSource["data"];
-    this.emit("source:updated", { id, data });
+    this.emit(EVENTS.DATA_SOURCE_UPDATED, { id, data });
   }
 
   /**
@@ -255,7 +256,7 @@ export class DataManager extends EventEmitter {
    */
   setGlobalVariable(name: string, value: unknown): void {
     this.globalContext.set(name, value);
-    this.emit("global:updated", { name, value });
+    this.emit(EVENTS.DATA_GLOBAL_UPDATED, { name, value });
   }
 
   /**
@@ -284,7 +285,7 @@ export class DataManager extends EventEmitter {
       });
     });
 
-    this.emit("sample:imported", data);
+    this.emit(EVENTS.DATA_SAMPLE_IMPORTED, data);
   }
 
   /**
@@ -308,7 +309,7 @@ export class DataManager extends EventEmitter {
   clear(): void {
     this.sources.clear();
     this.globalContext = this.createContext();
-    this.emit("data:cleared");
+    this.emit(EVENTS.DATA_CLEARED);
   }
 
   /**

@@ -20,6 +20,7 @@ import type {
   FontWeight,
   FontStyle,
 } from "../../shared/types/fonts";
+import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import { EventEmitter } from "../EventEmitter";
 
@@ -201,11 +202,11 @@ export class FontManager extends EventEmitter {
         }
       });
 
-      this.emit("google-fonts:fetched", { count: googleFonts.length });
+      this.emit(EVENTS.FONTS_GOOGLE_FETCHED, { count: googleFonts.length });
 
       return googleFonts;
     } catch (error) {
-      this.emit("google-fonts:error", { error });
+      this.emit(EVENTS.FONTS_GOOGLE_ERROR, { error });
       return [];
     }
   }
@@ -264,13 +265,13 @@ export class FontManager extends EventEmitter {
       font.loaded = true;
       this.loadedFonts.add(fontId);
 
-      this.emit("font:loaded", { font });
+      this.emit(EVENTS.FONT_LOADED, { font });
 
       if (options.onLoad) {
         options.onLoad(font);
       }
     } catch (error) {
-      this.emit("font:error", { font, error });
+      this.emit(EVENTS.FONT_ERROR, { font, error });
 
       if (options.onError) {
         options.onError(error as Error);
@@ -337,7 +338,7 @@ export class FontManager extends EventEmitter {
     // Load font
     await this.loadCustomFont(fontId);
 
-    this.emit("font:uploaded", { font: customFont });
+    this.emit(EVENTS.FONT_UPLOADED, { font: customFont });
 
     return customFont;
   }
@@ -370,9 +371,9 @@ export class FontManager extends EventEmitter {
       font.loaded = true;
       this.loadedFonts.add(fontId);
 
-      this.emit("font:loaded", { font });
+      this.emit(EVENTS.FONT_LOADED, { font });
     } catch (error) {
-      this.emit("font:error", { font, error });
+      this.emit(EVENTS.FONT_ERROR, { font, error });
       throw error;
     }
   }
@@ -467,7 +468,7 @@ export class FontManager extends EventEmitter {
     const font = this.fonts.get(fontId);
     if (font) {
       font.favorite = !font.favorite;
-      this.emit("font:favorite-toggled", { font });
+      this.emit(EVENTS.FONT_FAVORITE_TOGGLED, { font });
     }
   }
 
@@ -479,7 +480,7 @@ export class FontManager extends EventEmitter {
     if (font && font.source === "custom") {
       this.fonts.delete(fontId);
       this.loadedFonts.delete(fontId);
-      this.emit("font:deleted", { font });
+      this.emit(EVENTS.FONT_DELETED, { font });
     }
   }
 

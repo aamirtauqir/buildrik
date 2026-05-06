@@ -9,6 +9,7 @@
  * @license BSD-3-Clause
  */
 
+import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import { EventEmitter } from "../EventEmitter";
 
@@ -181,7 +182,7 @@ export class GlobalStyleManager extends EventEmitter {
     }
 
     this.styles.set(style.id, style);
-    this.emit("style:defined", style);
+    this.emit(EVENTS.STYLE_DEFINED, style);
 
     // Mark project as dirty
     this.composer.markDirty();
@@ -205,7 +206,7 @@ export class GlobalStyleManager extends EventEmitter {
     Object.assign(style, updates);
     this.styles.set(id, style);
 
-    this.emit("style:updated", { id, style });
+    this.emit(EVENTS.STYLE_UPDATED, { id, style });
 
     // Update all elements using this style
     this.updateElementsUsingStyle(id);
@@ -229,7 +230,7 @@ export class GlobalStyleManager extends EventEmitter {
     }
 
     this.styles.delete(id);
-    this.emit("style:deleted", { id });
+    this.emit(EVENTS.STYLE_DELETED, { id });
 
     // Mark project as dirty
     this.composer.markDirty();
@@ -297,7 +298,7 @@ export class GlobalStyleManager extends EventEmitter {
     // Store reference to global style (for updates)
     element.setData("globalStyleId", styleId);
 
-    this.emit("style:applied", { styleId, elementId });
+    this.emit(EVENTS.STYLE_APPLIED, { styleId, elementId });
   }
 
   /**
@@ -313,7 +314,7 @@ export class GlobalStyleManager extends EventEmitter {
     // Create CSS rule for this class
     this.composer.styles.setRule(`.${className}`, style.styles);
 
-    this.emit("style:class:created", { styleId, className });
+    this.emit(EVENTS.STYLE_CLASS_CREATED, { styleId, className });
   }
 
   /**
@@ -377,7 +378,7 @@ export class GlobalStyleManager extends EventEmitter {
       }
     });
 
-    this.emit("styles:imported", { count: styles.length });
+    this.emit(EVENTS.STYLES_IMPORTED, { count: styles.length });
   }
 
   /**
@@ -387,7 +388,7 @@ export class GlobalStyleManager extends EventEmitter {
     const toDelete = this.getAll().filter((s) => !s.system);
     toDelete.forEach((s) => this.styles.delete(s.id));
 
-    this.emit("styles:cleared");
+    this.emit(EVENTS.STYLES_CLEARED);
   }
 
   /**

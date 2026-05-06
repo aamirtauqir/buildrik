@@ -263,8 +263,8 @@ export class ResizeHandler extends EventEmitter {
       }
     }
     this.composer.canvasIndicators?.createSelectionBox(state.elementId);
-    this.emit("resize:cancel", { elementId: state.elementId });
-    this.composer.emit?.("resize:cancel", { elementId: state.elementId });
+    this.emit(EVENTS.RESIZE_CANCEL, { elementId: state.elementId });
+    this.composer.emit?.(EVENTS.RESIZE_CANCEL, { elementId: state.elementId });
 
     this.cleanup();
   }
