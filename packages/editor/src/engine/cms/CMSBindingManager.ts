@@ -1,6 +1,21 @@
 /**
  * CMS Binding Manager
- * Connects canvas elements to CMS content fields
+ * Connects canvas elements to CMS collection content fields (collection + field selection).
+ *
+ * SCOPE — what this owns:
+ *   - Mapping (collectionId, itemId | "context", fieldSlug) → element property
+ *   - Repeater context resolution (when itemId === "context")
+ *   - CMS-specific events (CMS collection updates, item edits)
+ *
+ * NOT COVERED:
+ *   - Generic data source registration / resolution → DataManager
+ *   - Style / attribute / text application for non-CMS bindings → Style/Trait/TextDataBinding
+ *
+ * Why split out from the data/* trio: CMS bindings have collection-aware semantics
+ * (context vs explicit item, field schema, repeater iteration) that don't fit the
+ * generic DataBinding shape. Keeping CMS as its own manager prevents leaking
+ * collection concepts into the generic binding pipeline.
+ *
  * @license BSD-3-Clause
  */
 

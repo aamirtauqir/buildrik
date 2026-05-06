@@ -1,9 +1,20 @@
 /**
  * Style Data Binding System
- * Bind CSS styles to dynamic data sources
+ * Applies resolved data values to element CSS style properties.
  *
- * FRESH IMPLEMENTATION for Aquibra
- * Enables dynamic styling based on data (e.g., color from user preference)
+ * SCOPE — what this owns:
+ *   - Mapping a DataBinding → a single CSS style property on an element
+ *   - Re-applying styles when the underlying data source emits change events
+ *
+ * NOT COVERED:
+ *   - Resolving the DataBinding itself → DataManager (this consumes resolved values)
+ *   - HTML attribute application → TraitDataBinding
+ *   - Text/content application → TextDataBinding
+ *   - CMS-specific binding → CMSBindingManager
+ *
+ * Why split: every binding manager pairs a DataBinding with ONE property kind.
+ * Keeping them per-property means events, transforms, and lifecycle stay tight
+ * to that property's semantics. See DataManager header for full split rationale.
  *
  * @module engine/data/StyleDataBinding
  * @license BSD-3-Clause

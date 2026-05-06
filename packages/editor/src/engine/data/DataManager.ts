@@ -1,9 +1,22 @@
 /**
  * Aquibra Data Manager
- * Manages data sources and resolves data bindings
+ * Manages data sources and resolves data bindings.
  *
- * FRESH IMPLEMENTATION - Not copied from back-dist
- * Designed specifically for Aquibra's architecture
+ * SCOPE — what this owns:
+ *   - DataSource registry (register / get / list / unregister sources)
+ *   - DataContext lifecycle (per-element context for repeaters, etc.)
+ *   - Resolving a DataBinding → DataResolverResult against a context
+ *   - Variable / Collection / Condition / LogicGroup evaluation primitives
+ *
+ * NOT COVERED — these live in sibling managers (intentional split, do NOT merge):
+ *   - Applying a resolved value to an element style → StyleDataBinding
+ *   - Applying a resolved value to an element attribute → TraitDataBinding
+ *   - Applying a resolved value to element text/content → TextDataBinding
+ *   - CMS collection-specific binding (collection + field selection) → CMSBindingManager
+ *
+ * Why split: DataManager is the resolution engine (data → value); the per-property
+ * managers are the application engines (value → DOM property). Different lifecycles,
+ * different inputs, different events. Single source for "how to resolve".
  *
  * @module engine/data/DataManager
  * @license BSD-3-Clause

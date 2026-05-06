@@ -1,9 +1,20 @@
 /**
  * Trait Data Binding System
- * Bind HTML attributes to dynamic data sources
+ * Applies resolved data values to element HTML attributes (href, src, alt, etc.).
  *
- * FRESH IMPLEMENTATION for Aquibra
- * Enables dynamic attributes based on data (e.g., href from CMS, alt from database)
+ * SCOPE — what this owns:
+ *   - Mapping a DataBinding → a single HTML attribute on an element
+ *   - Attribute-specific transforms (e.g., URL encoding) via attributeTransforms
+ *   - Re-applying attributes when the underlying data source emits change events
+ *
+ * NOT COVERED:
+ *   - Resolving the DataBinding itself → DataManager
+ *   - CSS style application → StyleDataBinding
+ *   - Text/content application → TextDataBinding
+ *   - CMS-specific binding → CMSBindingManager
+ *
+ * Why split: see DataManager header. Per-property managers exist so each
+ * application path can own its own transforms and validation rules.
  *
  * @module engine/data/TraitDataBinding
  * @license BSD-3-Clause
