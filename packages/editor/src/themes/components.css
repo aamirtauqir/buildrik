@@ -255,49 +255,11 @@ input[type="color"]::-webkit-color-swatch {
   animation: buildrick-fade-in 0.15s ease;
 }
 
-.buildrick-skip-link {
-  position: absolute;
-  top: -100px;
-  left: 0;
-  background: var(--buildrick-accent);
-  color: white;
-  padding: 12px 24px;
-  text-decoration: none;
-  font-weight: 600;
-  z-index: 9999;
-  border-radius: 0 0 var(--buildrick-radius-md) 0;
-  transition: top 0.2s ease;
-}
-
-.buildrick-skip-link:focus {
-  top: 0;
-}
-
-:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
-  outline-offset: var(--buildrick-focus-ring-offset, 2px);
-}
-
-:focus:not(:focus-visible) {
-  outline: none;
-}
-
-button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
-  outline: 2px solid var(--buildrick-accent);
-  outline-offset: 2px;
-}
-
-.buildrick-sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
+/* .buildrick-skip-link, :focus-visible blocks, .buildrick-sr-only — moved
+ * to themes/design-system/a11y.css 2026-05-07. a11y.css is canonical home
+ * for accessibility utilities; components.css had duplicate rules with
+ * subtly different specs (older legacy padding/border-radius). Trust a11y.css
+ * as SSOT. */
 
 @media (max-width: 640px) {.pill {
     padding: 0 10px;

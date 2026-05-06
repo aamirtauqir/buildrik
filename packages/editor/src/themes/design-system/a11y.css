@@ -133,6 +133,21 @@ a:focus-visible,
   left: 16px;
 }
 
+/* ─── Screen-reader-only utility ─────────────────────────────────────────
+ * Migrated from themes/components.css 2026-05-07.
+ */
+.buildrick-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ─── Print styles ───────────────────────────────────────────────────────
  * Migrated from themes/ux-fixes.css.
  */
