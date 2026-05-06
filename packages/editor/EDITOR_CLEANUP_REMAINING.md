@@ -9,7 +9,7 @@ This plan sequences the remaining audit issues into 4 phases by risk and depende
 
 ---
 
-## Closed already (14 of 22)
+## Closed already (19 of 22)
 
 | ID | Closed in | Commit |
 |---|---|---|
@@ -27,6 +27,11 @@ This plan sequences the remaining audit issues into 4 phases by risk and depende
 | E-022 Env var docs | Phase A1 | `3e2d16f1` |
 | E-009 Inspector registry split | Phase B1 | `bd90b389` |
 | E-018 VersionTimelineManager rename | Phase B3 | `a0140ffc` |
+| E-008 QuickActionsToolbar (deleted dead) | Phase C1 | `a7b1630a` |
+| E-012 Real crash recovery | Phase C2 | `273ff177` |
+| E-019 Canvas re-render benchmark | Phase C3 | `f6f8a4c6` |
+| E-015 TabRouter+FullPageRouter unify | Phase B4 (deferred) | — |
+| E-021 Section factory split | Phase B2 (skipped) | — |
 
 ---
 
@@ -231,4 +236,10 @@ Solo pace: 4-7 sessions to complete all four phases.
 - 2026-05-07 — B3/E-018 VersionTimelineManager rename shipped (`a0140ffc`)
 - 2026-05-07 — B4/E-015 deferred: unification would bloat code (see B4 entry above)
 - 2026-05-07 — **Phase B CLOSED** (1 ship + 2 skip + 1 defer)
-- … Phase C begins next (E-008, E-012, E-019)
+- 2026-05-07 — C1/E-008 dead QuickActionsToolbar deleted (-648 LOC) (`a7b1630a`)
+- 2026-05-07 — C2/E-012 real crash recovery shipped (error+rejection listeners) (`273ff177`)
+- 2026-05-07 — C3/E-019 canvas re-render benchmark shipped (`f6f8a4c6`)
+  - Baseline: mean 4.73 ms, p95 8.70 ms on 1000 elements / 50 edits
+  - Audit's perf concern not confirmed — no fix step needed
+- 2026-05-07 — **Phase C CLOSED** (3 items, 1 turned into delete-not-split)
+- … Phase D gated on per-file coverage ≥70% (E-007, E-006, E-014)
