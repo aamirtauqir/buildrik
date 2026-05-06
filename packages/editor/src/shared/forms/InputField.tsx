@@ -1,90 +1,75 @@
 /**
- * Aquibra Input Field Component
- * Premium styled input with full accessibility
+ * InputField — labelled input wrapper.
+ * Internal: composes vibcoder <FormField> + <Input>.
+ * Bare path (no label/error/hint) renders just <Input>.
  *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { Input, FormField } from "@/editor/shared/vibcoder";
 
-export interface InputFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> {
+export interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   hint?: string;
-  size?: "sm" | "md" | "lg";
   leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  fullWidth?: boolean;
 }
+
+const ICON_PAD = 32;
 
 export const InputField: React.FC<InputFieldProps> = ({
   label,
   error,
   hint,
-  size = "md",
   leftIcon,
-  rightIcon,
-  fullWidth = true,
-  className = "",
-  disabled,
+  className,
   id,
+  style,
   ...props
 }) => {
   const generatedId = React.useId();
   const inputId = id || generatedId;
-  const errorId = error ? `${inputId}-error` : undefined;
-  const hintId = hint && !error ? `${inputId}-hint` : undefined;
+  const inputStyle = leftIcon ? { paddingLeft: ICON_PAD, ...style } : style;
+  const inputEl = <Input {...props} id={inputId} error={!!error} style={inputStyle} />;
 
-  const sizeClasses = {
-    sm: "buildrick-input-sm",
-    md: "",
-    lg: "buildrick-input-lg",
-  };
+  const inputWithIcon = leftIcon ? (
+    <div style={{ position: "relative" }}>
+      <span
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          left: 10,
+          top: "50%",
+          transform: "translateY(-50%)",
+          pointerEvents: "none",
+          color: "var(--buildrick-text-tertiary)",
+          display: "inline-flex",
+        }}
+      >
+        {leftIcon}
+      </span>
+      {inputEl}
+    </div>
+  ) : (
+    inputEl
+  );
 
-  const inputClasses = [
-    "buildrick-input",
-    sizeClasses[size],
-    error ? "buildrick-input-error" : "",
-    leftIcon ? "buildrick-input-with-left-icon" : "",
-    rightIcon ? "buildrick-input-with-right-icon" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
+  if (!label && !error && !hint) {
+    return className ? <div className={className}>{inputWithIcon}</div> : inputWithIcon;
+  }
 
   return (
-    <div className={`buildrick-field ${className}`} style={{ width: fullWidth ? "100%" : "auto" }}>
-      {label && (
-        <label htmlFor={inputId} className="buildrick-field-label">
-          {label}
-        </label>
-      )}
-      <div className="buildrick-input-wrapper">
-        {leftIcon && <span className="buildrick-input-icon buildrick-input-icon-left">{leftIcon}</span>}
-        <input
-          {...props}
-          id={inputId}
-          disabled={disabled}
-          className={inputClasses}
-          aria-invalid={error ? "true" : undefined}
-          aria-describedby={errorId || hintId}
-          style={{
-            paddingLeft: leftIcon ? 38 : undefined,
-            paddingRight: rightIcon ? 38 : undefined,
-          }}
-        />
-        {rightIcon && <span className="buildrick-input-icon buildrick-input-icon-right">{rightIcon}</span>}
-      </div>
-      {error && (
-        <span id={errorId} className="buildrick-field-error" role="alert">
-          {error}
-        </span>
-      )}
-      {hint && !error && (
-        <span id={hintId} className="buildrick-field-hint">
-          {hint}
-        </span>
-      )}
-    </div>
+    <FormField
+      label={label ?? ""}
+      htmlFor={inputId}
+      error={error}
+      helper={hint}
+      disabled={props.disabled}
+      className={className}
+    >
+      {inputWithIcon}
+    </FormField>
   );
 };
 
