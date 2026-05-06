@@ -1,4 +1,5 @@
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { EmptyState, EmptyStateDesc } from "@/editor/shared/vibcoder";
 /**
  * ElementsTab - Block library (orchestrator)
  * Quick Access Pills, animated accordion by category, favorites, recents.
@@ -184,9 +185,9 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
           })}
 
           {sortedCategories.length === 0 && (
-            <div className="buildrick-empty-state">
-              <p>No elements found</p>
-            </div>
+            <EmptyState size="compact">
+              <EmptyStateDesc>No elements found</EmptyStateDesc>
+            </EmptyState>
           )}
         </div>
       )}

@@ -1,5 +1,11 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import {
+  EmptyState,
+  EmptyStateSpot,
+  EmptyStateTitle,
+  EmptyStateDesc,
+} from "@/editor/shared/vibcoder";
 /**
  * ComponentsTab - Reusable components library (orchestrator)
  * Displays, creates, and manages saved components.
@@ -121,15 +127,17 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             {headerAddBtn}
           </PanelShell.Header>
         )}
-        <div className="buildrick-empty-state">
-          <ComponentIcon />
-          <p className="buildrick-empty-state-title">Components not available</p>
-          <p className="buildrick-empty-state-desc">
+        <EmptyState>
+          <EmptyStateSpot>
+            <ComponentIcon />
+          </EmptyStateSpot>
+          <EmptyStateTitle>Components not available</EmptyStateTitle>
+          <EmptyStateDesc>
             Components require storage access.
             <br />
             Try opening in a regular browser window.
-          </p>
-        </div>
+          </EmptyStateDesc>
+        </EmptyState>
       </PanelShell>
     );
   }
@@ -230,16 +238,16 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               </Button>
             </div>
           )}
-          <div className="buildrick-empty-state buildrick-comp-empty-state comp-empty">
+          <EmptyState className="comp-empty">
             <span className="comp-empty__icon" aria-hidden="true">◇</span>
-            <p className="buildrick-empty-state-title buildrick-comp-empty-title comp-empty__title">No components yet</p>
-            <p className="buildrick-empty-state-desc buildrick-comp-empty-desc comp-empty__body">
+            <EmptyStateTitle className="comp-empty__title">No components yet</EmptyStateTitle>
+            <EmptyStateDesc className="comp-empty__body">
               Select elements on the canvas and save them as reusable components.
-            </p>
+            </EmptyStateDesc>
             <a href="#" onClick={(e) => e.preventDefault()}>
               Learn more
             </a>
-          </div>
+          </EmptyState>
         </div>
         {showCreateModal && (
           <CreateComponentModal
