@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { PrePublishChecksResult } from "@buildrik/shared/schemas/publish";
+import type { PrePublishChecksResult, PublishPage } from "@buildrik/shared/schemas/publish";
 import { notifyWorkspaceOwner } from "@/server/services/notification.trigger";
 
 export async function runPrePublishChecks(siteId: string): Promise<PrePublishChecksResult> {
@@ -59,7 +59,12 @@ export async function runPrePublishChecks(siteId: string): Promise<PrePublishChe
   return { ready: !hasFail, checks };
 }
 
-export async function startPublish(siteId: string, workspaceId: string, userId: string) {
+export async function startPublish(
+  siteId: string,
+  workspaceId: string,
+  userId: string,
+  pages?: PublishPage[],
+) {
   const existing = await prisma.publishBuildJob.findFirst({
     where: { siteId, status: { in: ["QUEUED", "BUILDING", "DEPLOYING"] } },
   });
@@ -72,6 +77,9 @@ export async function startPublish(siteId: string, workspaceId: string, userId: 
     select: { name: true },
   });
 
+  // Persist HTML payload (if provided) on the job so the worker can deploy
+  // without re-fetching from the editor. `log` is an existing Json column.
+  // Pages omitted = worker falls back to dev simulation (current behavior).
   const job = await prisma.publishBuildJob.create({
     data: {
       siteId,
@@ -79,6 +87,7 @@ export async function startPublish(siteId: string, workspaceId: string, userId: 
       status: "QUEUED",
       progress: 0,
       steps: [],
+      log: pages ? { pages } : undefined,
     },
   });
 

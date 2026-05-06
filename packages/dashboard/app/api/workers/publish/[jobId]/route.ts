@@ -1,5 +1,14 @@
 import { type NextRequest } from "next/server";
 import { prisma } from "@lib/prisma";
+import {
+  isVercelConfigured,
+  createVercelDeployment,
+  waitForDeploymentReady,
+  slugifyProjectName,
+  VercelApiError,
+  type VercelFile,
+} from "@lib/vercel";
+import type { PublishPage } from "@buildrik/shared/schemas/publish";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -42,8 +51,15 @@ export async function POST(
     return new Response("Job not found or not in QUEUED state", { status: 400 });
   }
 
+  // Read HTML payload persisted by sites.publish (if editor provided one).
+  const payload = (job.log ?? null) as { pages?: PublishPage[] } | null;
+  const pages = payload?.pages ?? [];
+
+  // Branch: real Vercel path requires both env config AND pages payload.
+  // Otherwise fall back to dev simulation so existing flows keep working.
+  const useVercel = isVercelConfigured() && pages.length > 0;
+
   try {
-    // Mark as building
     await prisma.publishBuildJob.update({
       where: { id: jobId },
       data: {
@@ -54,48 +70,9 @@ export async function POST(
       },
     });
 
-    for (let i = 0; i < STEPS.length; i++) {
-      // Check if cancelled between steps
-      const current = await prisma.publishBuildJob.findUnique({
-        where: { id: jobId },
-        select: { status: true },
-      });
-      if (current?.status === "CANCELLED") {
-        return new Response("Cancelled", { status: 200 });
-      }
-
-      await prisma.publishBuildJob.update({
-        where: { id: jobId },
-        data: {
-          progress: Math.round((i / STEPS.length) * 100),
-          steps: buildSteps(i),
-        },
-      });
-
-      // Simulate work for each step (~2s each in production, shortened for now)
-      await delay(2000);
-
-      await prisma.publishBuildJob.update({
-        where: { id: jobId },
-        data: {
-          progress: stepProgress(i),
-          steps: buildSteps(i + 1),
-        },
-      });
-    }
-
-    // Determine public URL
-    const site = await prisma.site.findUnique({
-      where: { id: job.siteId },
-      select: { slug: true },
-    });
-    const domain = await prisma.domain.findFirst({
-      where: { siteId: job.siteId, status: "VERIFIED", isPrimary: true },
-      select: { domain: true },
-    });
-    const publicUrl = domain?.domain
-      ? `https://${domain.domain}`
-      : `https://${site?.slug ?? job.siteId}.buildrik.app`;
+    const publicUrl = useVercel
+      ? await runVercelDeploy(jobId, job.siteId, pages)
+      : await runSimulation(jobId, job.siteId);
 
     await prisma.$transaction([
       prisma.publishBuildJob.update({
@@ -104,7 +81,7 @@ export async function POST(
           status: "COMPLETED",
           progress: 100,
           completedAt: new Date(),
-          deploymentId: `deploy_${jobId.slice(0, 8)}`,
+          steps: buildSteps(STEPS.length),
         },
       }),
       prisma.site.update({
@@ -119,17 +96,144 @@ export async function POST(
 
     return new Response("OK", { status: 200 });
   } catch (err) {
+    if (err instanceof CancelledError) {
+      return new Response("Cancelled", { status: 200 });
+    }
     const message = err instanceof Error ? err.message : "Unknown error";
     await prisma.publishBuildJob.update({
       where: { id: jobId },
-      data: { status: "FAILED", error: message },
+      data: { status: "FAILED", error: message, steps: buildSteps(0, true) },
     });
     await prisma.site.update({
       where: { id: job.siteId },
-      data: { status: "DRAFT" },
+      data: { status: "DRAFT", lastPublishError: message },
     });
     return new Response("Error", { status: 500 });
   }
+}
+
+class CancelledError extends Error {
+  constructor() {
+    super("CANCELLED");
+    this.name = "CancelledError";
+  }
+}
+
+async function checkCancelled(jobId: string): Promise<void> {
+  const current = await prisma.publishBuildJob.findUnique({
+    where: { id: jobId },
+    select: { status: true },
+  });
+  if (current?.status === "CANCELLED") throw new CancelledError();
+}
+
+async function setStep(jobId: string, stepIndex: number): Promise<void> {
+  await prisma.publishBuildJob.update({
+    where: { id: jobId },
+    data: {
+      progress: stepProgress(stepIndex),
+      steps: buildSteps(stepIndex + 1),
+    },
+  });
+}
+
+/**
+ * Real Vercel deployment path.
+ * Returns the public URL on success. Throws on failure.
+ */
+async function runVercelDeploy(
+  jobId: string,
+  siteId: string,
+  pages: PublishPage[],
+): Promise<string> {
+  const site = await prisma.site.findUnique({
+    where: { id: siteId },
+    select: { slug: true, name: true },
+  });
+  if (!site) throw new Error("SITE_NOT_FOUND");
+
+  const projectName = slugifyProjectName(site.slug);
+  const files: VercelFile[] = pages.map((p) => ({ file: p.path, data: p.html }));
+
+  // Step 0 — Generating pages: editor already rendered HTML; just mark done.
+  await checkCancelled(jobId);
+  await setStep(jobId, 0);
+
+  // Step 1 — Optimizing images: skipped in MVP.
+  await checkCancelled(jobId);
+  await setStep(jobId, 1);
+
+  // Step 2 — Deploying to CDN: actual Vercel API call.
+  await checkCancelled(jobId);
+  let deployment;
+  try {
+    deployment = await createVercelDeployment(projectName, files);
+  } catch (e) {
+    if (e instanceof VercelApiError) {
+      throw new Error(`Vercel ${e.status} ${e.code}: ${e.message}`);
+    }
+    throw e;
+  }
+  await prisma.publishBuildJob.update({
+    where: { id: jobId },
+    data: { deploymentId: deployment.id },
+  });
+  await setStep(jobId, 2);
+
+  // Step 3 — Verifying SSL: poll Vercel until READY (or ERROR/CANCELED).
+  await checkCancelled(jobId);
+  const status = await waitForDeploymentReady(deployment.id);
+  if (status.readyState !== "READY") {
+    throw new Error(
+      `Vercel deployment ${status.readyState}${status.errorMessage ? `: ${status.errorMessage}` : ""}`,
+    );
+  }
+  await setStep(jobId, 3);
+
+  // Step 4 — Performance check: skipped in MVP (Lighthouse comes later).
+  await setStep(jobId, 4);
+
+  // Prefer custom verified domain if configured, else Vercel-provided URL.
+  const domain = await prisma.domain.findFirst({
+    where: { siteId, status: "VERIFIED", isPrimary: true },
+    select: { domain: true },
+  });
+  return domain?.domain ? `https://${domain.domain}` : `https://${status.url}`;
+}
+
+/**
+ * Dev simulation fallback. Used when VERCEL_TOKEN is unset or no HTML
+ * payload was sent. Preserves existing dev-without-credentials behavior.
+ */
+async function runSimulation(jobId: string, siteId: string): Promise<string> {
+  for (let i = 0; i < STEPS.length; i++) {
+    await checkCancelled(jobId);
+    await prisma.publishBuildJob.update({
+      where: { id: jobId },
+      data: {
+        progress: Math.round((i / STEPS.length) * 100),
+        steps: buildSteps(i),
+      },
+    });
+    await delay(2000);
+    await setStep(jobId, i);
+  }
+
+  const site = await prisma.site.findUnique({
+    where: { id: siteId },
+    select: { slug: true },
+  });
+  const domain = await prisma.domain.findFirst({
+    where: { siteId, status: "VERIFIED", isPrimary: true },
+    select: { domain: true },
+  });
+  await prisma.publishBuildJob.update({
+    where: { id: jobId },
+    data: { deploymentId: `sim_${jobId.slice(0, 8)}` },
+  });
+  return domain?.domain
+    ? `https://${domain.domain}`
+    : `https://${site?.slug ?? siteId}.buildrik.app`;
 }
 
 function delay(ms: number) {

@@ -40,7 +40,7 @@ import {
   saveProjectDataSchema,
   getProjectDataSchema,
 } from "@buildrik/shared/schemas/sites";
-import { prePublishCheckSchema } from "@buildrik/shared/schemas/publish";
+import { prePublishCheckSchema, publishInputSchema } from "@buildrik/shared/schemas/publish";
 
 async function getWorkspaceId(ctx: {
   prisma: { workspaceMember: { findFirst: Function } };
@@ -296,7 +296,7 @@ export const sitesRouter = router({
     }),
 
   publish: protectedProcedure
-    .input(z.object({ siteId: z.string() }))
+    .input(publishInputSchema)
     .mutation(async ({ ctx, input }) => {
       try {
         await checkSiteRole(ctx.prisma, ctx.session.user!.id!, input.siteId, "ADMIN");
@@ -306,7 +306,7 @@ export const sitesRouter = router({
       }
       const workspaceId = await getWorkspaceId(ctx);
       try {
-        return await startPublish(input.siteId, workspaceId, ctx.session.user.id);
+        return await startPublish(input.siteId, workspaceId, ctx.session.user.id, input.pages);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "ALREADY_PUBLISHING")
           throw new TRPCError({
