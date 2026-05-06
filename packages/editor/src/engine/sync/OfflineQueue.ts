@@ -1,5 +1,10 @@
 /**
- * OfflineQueue - Queue operations for offline-first sync
+ * OfflineQueue - Queue operations for offline-first sync.
+ *
+ * SCAFFOLD — used only by SyncManager, which is itself not production-wired.
+ * See SyncManager.ts header for the full status. The queue logic itself is
+ * sound; it just has no real consumer until cloud sync ships.
+ *
  * @module engine/sync/OfflineQueue
  * @license BSD-3-Clause
  */

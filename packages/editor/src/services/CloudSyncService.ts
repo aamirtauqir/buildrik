@@ -1,5 +1,16 @@
 /**
- * CloudSyncService - Handle cloud storage synchronization
+ * CloudSyncService - Handle cloud storage synchronization.
+ *
+ * SCAFFOLD — NOT PRODUCTION-WIRED.
+ *   - Singleton `cloudSyncService` exists and is referenced by SyncManager.
+ *   - `configure()` is never called outside this file → `isConfigured()`
+ *     returns false in production → every public method returns a
+ *     "not configured" error gracefully.
+ *   - When real cloud sync ships, call `cloudSyncService.configure(...)`
+ *     from app bootstrap and flip `VITE_FEATURE_SYNC=true`.
+ *
+ * See SyncManager.ts header for full status.
+ *
  * @module services/CloudSyncService
  * @license BSD-3-Clause
  */

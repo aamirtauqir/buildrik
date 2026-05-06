@@ -10,10 +10,8 @@ import type { Composer } from "../../engine";
 import type { DeviceType } from "../../shared/types";
 import { sanitizeHTMLForPreview, setupPreviewWindow } from "../export/ExportUtils";
 import { useCollaboration } from "../canvas/hooks/useCollaboration";
-import { PresenceIndicators, ConnectionQualityIndicator } from "../collaboration";
-import { SyncStatusIndicator } from "../sync/SyncStatusIndicator";
+import { PresenceIndicators } from "../collaboration";
 import type { SyncStatus, Issue } from "./hooks/useStudioState";
-import { useSyncStatus } from "./hooks/useSyncStatus";
 import { Topbar } from "./Topbar";
 import type { ToastInput } from "@/editor/shared/vibcoder";
 
@@ -158,18 +156,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
     currentUser,
     state: collaborationState,
     isConnected,
-    connectionStats,
   } = useCollaboration(composer);
 
   // Gate: no real-time transport in demo — flip when WebSocket/OT transport is connected
   const hasTransport = isConnected;
-
-  // Sync state
-  const {
-    status: syncStatus,
-    managerState: syncManagerState,
-    sync: handleSync,
-  } = useSyncStatus(composer);
 
   /**
    * Handle preview - opens sanitized HTML in new window with sandboxed iframe

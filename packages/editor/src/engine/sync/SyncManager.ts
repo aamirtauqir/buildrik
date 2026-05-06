@@ -1,5 +1,25 @@
 /**
- * SyncManager - Orchestrate cloud sync with offline support
+ * SyncManager - Orchestrate cloud sync with offline support.
+ *
+ * ┌─────────────────────────────────────────────────────────────────┐
+ * │ SCAFFOLD — NOT PRODUCTION-WIRED                                 │
+ * │                                                                 │
+ * │ Status: instantiated in Composer, callable, fully no-op at      │
+ * │ runtime because CloudSyncService.configure() is never called    │
+ * │ anywhere in the codebase. Every sync method returns "Cloud      │
+ * │ sync not configured" gracefully.                                │
+ * │                                                                 │
+ * │ Production path requires:                                       │
+ * │   1. A backend (Supabase/Firebase/AWS/custom) chosen + wired    │
+ * │   2. cloudSyncService.configure({ provider, endpoint, apiKey }) │
+ * │      called from app bootstrap with real credentials            │
+ * │   3. VITE_FEATURE_SYNC=true to render sync UI                   │
+ * │                                                                 │
+ * │ Until then: keep file (subscribers exist), but do not extend.   │
+ * │ When real sync ships, drop SCAFFOLD marker and the feature flag │
+ * │ in shared/utils/featureFlags.ts.                                │
+ * └─────────────────────────────────────────────────────────────────┘
+ *
  * @module engine/sync/SyncManager
  * @license BSD-3-Clause
  */

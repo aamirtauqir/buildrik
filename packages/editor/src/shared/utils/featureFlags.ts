@@ -17,6 +17,8 @@ export const FEATURES = {
   account: env.VITE_FEATURE_ACCOUNT === "true",
   /** Invite modal (team invitations via Resend). Phase 4. */
   invite: env.VITE_FEATURE_INVITE === "true",
+  /** Cloud sync (CloudSyncService + SyncManager). SCAFFOLD — never wired. */
+  sync: env.VITE_FEATURE_SYNC === "true",
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURES;
