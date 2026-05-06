@@ -7,15 +7,9 @@
 
 import * as React from "react";
 import type { Composer } from "../../../engine";
-import { findDropTargetElement, getElementId } from "../../../shared/utils/dragDrop";
+import { findDropTargetElement } from "../../../shared/utils/dragDrop";
 import type { InvalidDropReason } from "../../../shared/utils/dragDrop/dropValidation";
-import {
-  calculateDropPositionFromCursor,
-  calculateDropSlotRect,
-  validateDropOperation,
-  buildBreadcrumbPath,
-  calculateFreshDropTarget,
-} from "./drag/dragCalculations";
+import { calculateFreshDropTarget } from "./drag/dragCalculations";
 import {
   handleMultiElementDrop,
   handleElementDrop,
@@ -30,6 +24,7 @@ import { useDragSession } from "./useDragSession";
 import type { DropPosition, DropSlotRect, BreadcrumbItem } from "./useDragSession";
 import { useDragSnapGuides } from "./drag/useDragSnapGuides";
 import { useDragVisuals } from "./useDragVisuals";
+import { useDropTargetResolver } from "./drag/useDropTargetResolver";
 
 // Extracted drop handlers
 
@@ -134,25 +129,17 @@ export function useCanvasDragDrop({
 
   const SNAP_THROTTLE_MS = 50;
 
-  // Track the currently highlighted drop-affordance element so we can remove
-  // the `.buildrick-drop-target--active` class when the target changes or drag ends.
-  const dropAffordanceElRef = React.useRef<HTMLElement | null>(null);
-  const applyDropAffordance = React.useCallback((el: HTMLElement | null) => {
-    if (dropAffordanceElRef.current === el) return;
-    if (dropAffordanceElRef.current) {
-      dropAffordanceElRef.current.classList.remove("buildrick-drop-target--active");
-    }
-    if (el) {
-      el.classList.add("buildrick-drop-target--active");
-    }
-    dropAffordanceElRef.current = el;
-  }, []);
-  const clearDropAffordance = React.useCallback(() => {
-    if (dropAffordanceElRef.current) {
-      dropAffordanceElRef.current.classList.remove("buildrick-drop-target--active");
-      dropAffordanceElRef.current = null;
-    }
-  }, []);
+  // Drop target resolution + validation + visuals coordination — extracted
+  // into its own hook (Phase D D1 stage 2). Owns the per-dragOver target
+  // lookup, breadcrumb build, validation, and the drop-affordance CSS class.
+  const dropTargetResolver = useDropTargetResolver({
+    composer,
+    canvasRef,
+    session,
+    visuals,
+    draggingElementId,
+  });
+  const clearDropAffordance = dropTargetResolver.clearAffordance;
 
   // Refs for callbacks to avoid recreating handlers
   const onSnapLinesChangeRef = React.useRef(onSnapLinesChange);
@@ -195,99 +182,8 @@ export function useCanvasDragDrop({
 
       setIsDragOver(true);
 
-      // Find drop target
-      const dropTarget = findDropTargetElement(e.clientX, e.clientY);
-      let targetId = getElementId(dropTarget);
-
-      // Fallback to root if no target
-      if (!targetId && composer) {
-        const page = composer.elements.getActivePage();
-        if (page?.root?.id) targetId = page.root.id;
-      }
-
-      if (targetId && composer) {
-        setDropTargetId(targetId);
-
-        const targetEl = canvasRef.current?.querySelector(
-          `[data-buildrick-id="${targetId}"]`
-        ) as HTMLElement | null;
-
-        if (targetEl) {
-          applyDropAffordance(targetEl);
-          const rect = targetEl.getBoundingClientRect();
-          const canvasRect = canvasRef.current?.getBoundingClientRect();
-
-          // Both e.clientX/clientY and rect (from getBoundingClientRect) are in
-          // viewport space — already scroll-invariant. No scroll correction needed.
-          const { position, isParentHorizontal } = calculateDropPositionFromCursor(
-            e.clientX,
-            e.clientY,
-            rect,
-            targetEl.parentElement
-          );
-          setDropPosition(position);
-
-          // Calculate drop slot rect
-          if (canvasRect) {
-            const slotRect = calculateDropSlotRect({
-              position,
-              targetRect: rect,
-              canvasRect,
-              isParentHorizontal,
-            });
-            setDropSlotRect(slotRect);
-          }
-
-          // Show visual feedback
-          visuals.showDropTarget(targetEl, position);
-          visuals.clearInvalidTarget();
-
-          // Validate drop operation
-          const validation = validateDropOperation({
-            composer,
-            draggingElementId,
-            targetId,
-            position,
-            dataTransferTypes: e.dataTransfer.types,
-          });
-          setIsValidDrop(validation.isValid);
-          setInvalidDropReason(validation.reason);
-
-          if (!validation.isValid) {
-            visuals.showInvalidTarget(targetEl);
-          }
-
-          // Build breadcrumb path
-          setDropTargetPath(buildBreadcrumbPath(composer, targetId));
-
-          // Update DragManager SSOT (fires throttled DRAG_MOVE event)
-          composer.drag?.move(
-            { x: e.clientX, y: e.clientY },
-            targetId,
-            position,
-            validation.isValid
-          );
-        } else {
-          // Target element not found in DOM
-          setDropPosition("inside");
-          setIsValidDrop(true);
-          setInvalidDropReason(null);
-          setDropSlotRect(null);
-          setDropTargetPath([]);
-          visuals.clearDropTarget();
-          visuals.clearInvalidTarget();
-          clearDropAffordance();
-        }
-      } else {
-        setDropTargetId(null);
-        setDropPosition(null);
-        setIsValidDrop(true);
-        setInvalidDropReason(null);
-        setDropSlotRect(null);
-        setDropTargetPath([]);
-        visuals.clearDropTarget();
-        clearDropAffordance();
-      }
+      // Resolve target + position + validation + visuals via the resolver hook.
+      dropTargetResolver.resolve(e);
 
       // Skip expensive snap calculation if throttled
       if (!isThrottled) {
@@ -297,17 +193,7 @@ export function useCanvasDragDrop({
       // Auto-scroll when near canvas edges
       autoScroll.handleAutoScroll(e.clientX, e.clientY);
     },
-    [
-      composer,
-      showGuides,
-      draggingElementId,
-      isEditing,
-      canvasRef,
-      visuals,
-      autoScroll,
-      applyDropAffordance,
-      clearDropAffordance,
-    ]
+    [isEditing, setIsDragOver, dropTargetResolver, snapGuides, autoScroll],
   );
 
   // ==========================================================================
