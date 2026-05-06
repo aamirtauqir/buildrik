@@ -9,7 +9,7 @@ This plan sequences the remaining audit issues into 4 phases by risk and depende
 
 ---
 
-## Closed already (12 of 22)
+## Closed already (14 of 22)
 
 | ID | Closed in | Commit |
 |---|---|---|
@@ -25,6 +25,8 @@ This plan sequences the remaining audit issues into 4 phases by risk and depende
 | E-017 Binding manager docs | Phase A2 | `50b0991b` |
 | E-020 Vitest coverage config | Phase A4 | `74c73b59` |
 | E-022 Env var docs | Phase A1 | `3e2d16f1` |
+| E-009 Inspector registry split | Phase B1 | `bd90b389` |
+| E-018 VersionTimelineManager rename | Phase B3 | `a0140ffc` |
 
 ---
 
@@ -91,11 +93,14 @@ Execute back-to-back as small commits. Each <30 min. No tests needed beyond exis
 - **Effort:** 1 hour with grep + sed.
 - **Decision:** confirm with user that "Versions" is the desired UI label (current UI says "Saves").
 
-### B4. E-015 — Unify TabRouter + FullPageRouter
-- **Scope:** Replace `editor/sidebar/TabRouter.tsx` + `FullPageRouter.tsx` with single `editor/sidebar/RouteResolver.tsx` returning `{ component, layoutMode }`. Caller picks layout based on result.
-- **Risk:** Medium (touches sidebar routing, all 11 tabs).
-- **Validation:** manual smoke — every tab opens, layout mode correct.
-- **Effort:** 2-3 hours.
+### B4. E-015 — Unify TabRouter + FullPageRouter — **DEFERRED** (no win)
+- **Original scope:** Replace `editor/sidebar/TabRouter.tsx` + `FullPageRouter.tsx` with single `editor/sidebar/RouteResolver.tsx` returning `{ component, layoutMode }`.
+- **Why deferred:** On inspection, the two routers exist for two genuinely different layout slots (panel mode vs fullpage mode) with **different prop shapes** — TabRouter takes pin/help/close + 9 panel-specific handlers; FullPageRouter takes help/close + media-editor / icon-picker callbacks (no pinning). Unifying would either:
+  1. Bloat the unified shape with the union of all props, OR
+  2. Add a discriminated `mode: "panel" | "fullpage"` with conditional prop typing.
+  Either path adds code and abstraction without reducing the actual switch-on-tabId logic. There is no shared body to dedupe — both routers just `React.lazy` + `switch`, which is the standard React pattern.
+- **Decision:** Skip. Same judgment as B2 (over-fragmentation that wasn't actually fragmented).
+- **If reconsidering:** the right unification would be at the *layout* layer (one shell that picks panel vs fullpage based on tab metadata), not the router layer. That's outside this audit's scope.
 
 **Phase B total: ~5-7 hours, 3-4 commits.**
 
@@ -221,4 +226,9 @@ Solo pace: 4-7 sessions to complete all four phases.
 - 2026-05-07 — A3/E-010 sync stack SCAFFOLD-flagged + dead UI imports removed (`7a915287`)
 - 2026-05-07 — A4/E-020 vitest coverage config shipped (`74c73b59`)
 - 2026-05-07 — **Phase A CLOSED** (4 items + 1 hotfix, ~90 min, 5 commits)
-- … Phase B begins next (E-009, E-021, E-018, E-015)
+- 2026-05-07 — B1/E-009 inspector registry split shipped (`bd90b389`)
+- 2026-05-07 — B2/E-021 skipped: B1 left families small enough (per plan rule)
+- 2026-05-07 — B3/E-018 VersionTimelineManager rename shipped (`a0140ffc`)
+- 2026-05-07 — B4/E-015 deferred: unification would bloat code (see B4 entry above)
+- 2026-05-07 — **Phase B CLOSED** (1 ship + 2 skip + 1 defer)
+- … Phase C begins next (E-008, E-012, E-019)
