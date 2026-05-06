@@ -6,6 +6,7 @@
  * @license BSD-3-Clause
  */
 
+import { EVENTS } from "../shared/constants/events";
 import { getElementBounds, type Rect } from "./canvas/canvasGeometry";
 import { getDOMElement } from "./canvas/resize/utils";
 import type { Composer } from "./Composer";
@@ -37,10 +38,10 @@ export class SelectionManager {
       this.multiSelected.add(element);
     }
 
-    this.composer.emit("element:selected", element);
+    this.composer.emit(EVENTS.ELEMENT_SELECTED, element);
 
     if (previous) {
-      this.composer.emit("element:deselected", previous);
+      this.composer.emit(EVENTS.ELEMENT_DESELECTED, previous);
     }
   }
 
@@ -51,7 +52,7 @@ export class SelectionManager {
    */
   reselect(): void {
     if (this.selected) {
-      this.composer.emit("element:selected", this.selected);
+      this.composer.emit(EVENTS.ELEMENT_SELECTED, this.selected);
     }
   }
 
@@ -66,7 +67,7 @@ export class SelectionManager {
         this.selected = element;
       }
 
-      this.composer.emit("selection:added", element);
+      this.composer.emit(EVENTS.SELECTION_ADDED, element);
     }
   }
 
@@ -81,7 +82,7 @@ export class SelectionManager {
         this.selected = this.multiSelected.size > 0 ? Array.from(this.multiSelected)[0] : null;
       }
 
-      this.composer.emit("selection:removed", element);
+      this.composer.emit(EVENTS.SELECTION_REMOVED, element);
     }
   }
 
@@ -105,7 +106,7 @@ export class SelectionManager {
     this.multiSelected.clear();
 
     if (hadSelection) {
-      this.composer.emit("selection:cleared");
+      this.composer.emit(EVENTS.SELECTION_CLEARED);
     }
   }
 
@@ -214,8 +215,8 @@ export class SelectionManager {
     // Add all to multi-select set
     elements.forEach((el) => this.multiSelected.add(el));
 
-    this.composer.emit("selection:multiple", elements);
-    this.composer.emit("element:selected", this.selected);
+    this.composer.emit(EVENTS.SELECTION_MULTIPLE, elements);
+    this.composer.emit(EVENTS.ELEMENT_SELECTED, this.selected);
   }
 
   /**
