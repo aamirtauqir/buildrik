@@ -6,8 +6,8 @@
  * @license BSD-3-Clause
  */
 
-import {
 import { EVENTS } from "../../shared/constants/events";
+import {
   generateCode,
   generateLayout,
   type ProgrammingLanguage,
