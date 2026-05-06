@@ -33,3 +33,10 @@ packages/editor/src/project/
 
 # Per-developer dev-only artifacts (not source, not committed)
 packages/editor/src/editor-live.jpeg
+
+# Buildrik showcase video — binaries not tracked (text artifacts in
+# prompts/ and deliverables/*.md ARE tracked)
+video/buildrik-showcase/assets/
+video/buildrik-showcase/shot-renders/
+video/buildrik-showcase/ae-project/
+video/buildrik-showcase/deliverables/*.mp4
