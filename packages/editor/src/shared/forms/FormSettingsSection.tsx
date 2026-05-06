@@ -5,6 +5,7 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/shared/vibcoder";
 import { useFormHandler } from "../hooks/useFormHandler";
 import type { Composer } from "../../engine";
 import type { Element } from "../../engine/elements/Element";
@@ -82,9 +83,9 @@ export const FormSettingsSection: React.FC<FormSettingsSectionProps> = ({
   if (!hasFormId) {
     return (
       <div style={sectionStyles}>
-        <button onClick={handleCreateForm} style={buttonStyles}>
+        <Button variant="primary" onClick={handleCreateForm}>
           Enable Form Handling
-        </button>
+        </Button>
         <p style={hintStyles}>
           Enable form handling to add submission actions, validation, and notifications.
         </p>
@@ -224,17 +225,6 @@ const inputStyles: React.CSSProperties = {
 
 const selectStyles: React.CSSProperties = {
   ...inputStyles,
-  cursor: "pointer",
-};
-
-const buttonStyles: React.CSSProperties = {
-  padding: "10px 16px",
-  background: "var(--buildrick-accent)",
-  color: "var(--buildrick-text-on-accent)",
-  border: "none",
-  borderRadius: "6px",
-  fontSize: "13px",
-  fontWeight: 500,
   cursor: "pointer",
 };
 

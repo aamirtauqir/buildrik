@@ -6,6 +6,7 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/shared/vibcoder";
 import type { ColorHSB } from "../../types";
 import {
   hexToHsb,
@@ -315,17 +316,17 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
 
       {/* Action buttons */}
       <div className="buildrick-design-picker__actions">
-        <button className="buildrick-design-picker__cancel-btn" onClick={onCancel} type="button">
+        <Button variant="ghost" onClick={onCancel} type="button">
           Cancel
-        </button>
-        <button
-          className="buildrick-design-picker__save-btn"
+        </Button>
+        <Button
+          variant="primary"
           onClick={() => onSave(currentHex)}
           type="button"
-          disabled={hexError}
+          disabled={!!hexError}
         >
           Set color
-        </button>
+        </Button>
       </div>
     </div>
   );

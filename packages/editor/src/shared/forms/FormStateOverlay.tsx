@@ -5,6 +5,7 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/shared/vibcoder";
 import type { FormState } from "../../engine/forms/FormHandler";
 
 // ============================================================================
@@ -85,9 +86,9 @@ export const FormStateOverlay: React.FC<FormStateOverlayProps> = ({
             ))}
           </ul>
         )}
-        <button onClick={handleDismiss} style={buttonStyles}>
+        <Button variant="primary" onClick={handleDismiss}>
           {isSuccess ? "Continue" : "Try Again"}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -171,18 +172,6 @@ const errorItemStyles: React.CSSProperties = {
   background: "rgba(239, 68, 68, 0.1)",
   borderRadius: "6px",
   marginBottom: "8px",
-};
-
-const buttonStyles: React.CSSProperties = {
-  background: "var(--buildrick-accent)",
-  color: "var(--buildrick-text-on-accent)",
-  border: "none",
-  padding: "12px 24px",
-  borderRadius: "8px",
-  fontSize: "14px",
-  fontWeight: 500,
-  cursor: "pointer",
-  transition: "background 150ms ease",
 };
 
 export default FormStateOverlay;

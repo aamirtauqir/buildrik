@@ -21,6 +21,7 @@
 
 import * as React from "react";
 import {
+  IconButton,
   Tooltip,
   TooltipTrigger,
   TooltipPortal,
@@ -83,7 +84,13 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({
   return (
     <Tooltip delayDuration={200}>
       <TooltipTrigger asChild>
-        <button type="button" style={buttonStyles} aria-label="What's this?" tabIndex={0}>
+        <IconButton
+          variant="ghost"
+          size="xs"
+          type="button"
+          aria-label="What's this?"
+          style={buttonStyles}
+        >
           <svg
             width={iconSize}
             height={iconSize}
@@ -99,7 +106,7 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({
             <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
             <line x1="12" y1="17" x2="12.01" y2="17" />
           </svg>
-        </button>
+        </IconButton>
       </TooltipTrigger>
       <TooltipPortal>
         <TooltipContent side={position}>{tooltipContent}</TooltipContent>
