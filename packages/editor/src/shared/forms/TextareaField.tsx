@@ -1,70 +1,47 @@
 /**
- * Aquibra Textarea Field Component
+ * TextareaField — labelled textarea wrapper.
+ * Internal: composes vibcoder <FormField> + <Textarea>.
+ * Bare path (no label/error/hint) renders just <Textarea>.
+ *
  * @license BSD-3-Clause
  */
 
 import * as React from "react";
+import { Textarea, FormField } from "@/editor/shared/vibcoder";
 
 export interface TextareaFieldProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   error?: string;
   hint?: string;
-  resize?: "none" | "vertical" | "horizontal" | "both";
 }
 
 export const TextareaField: React.FC<TextareaFieldProps> = ({
   label,
   error,
   hint,
-  resize = "vertical",
-  className = "",
-  style,
+  className,
+  id,
   ...props
 }) => {
+  const generatedId = React.useId();
+  const fieldId = id || generatedId;
+  const textarea = <Textarea {...props} id={fieldId} error={!!error} />;
+
+  if (!label && !error && !hint) {
+    return className ? <div className={className}>{textarea}</div> : textarea;
+  }
+
   return (
-    <div className={`buildrick-textarea-field ${className}`} style={{ width: "100%", ...style }}>
-      {label && (
-        <label
-          style={{
-            display: "block",
-            marginBottom: 6,
-            fontSize: 12,
-            color: "var(--buildrick-text-secondary)",
-          }}
-        >
-          {label}
-        </label>
-      )}
-      <textarea
-        {...props}
-        style={{
-          width: "100%",
-          minHeight: 80,
-          padding: "8px 12px",
-          background: "var(--buildrick-bg-dark)",
-          border: `1px solid ${error ? "var(--buildrick-error)" : "var(--buildrick-border)"}`,
-          borderRadius: 6,
-          color: "var(--buildrick-text-primary)",
-          fontSize: 13,
-          fontFamily: "inherit",
-          outline: "none",
-          resize,
-          transition: "border-color 0.15s ease",
-        }}
-      />
-      {(error || hint) && (
-        <span
-          style={{
-            display: "block",
-            marginTop: 4,
-            fontSize: 12,
-            color: error ? "var(--buildrick-error)" : "var(--buildrick-text-muted)",
-          }}
-        >
-          {error || hint}
-        </span>
-      )}
-    </div>
+    <FormField
+      label={label ?? ""}
+      htmlFor={fieldId}
+      error={error}
+      helper={hint}
+      disabled={props.disabled}
+      className={className}
+    >
+      {textarea}
+    </FormField>
   );
 };
 
