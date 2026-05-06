@@ -164,6 +164,30 @@ export const EVENTS = {
   TEMPLATE_SAVED: "template:saved",
   TEMPLATE_APPLIED: "template:applied",
   TEMPLATE_REMOVED: "template:removed",
+  /** Template begins loading from a source */
+  TEMPLATE_LOADING: "template:loading",
+  /** Template load failed */
+  TEMPLATE_ERROR: "template:error",
+  /** Template deleted via TemplateManager */
+  TEMPLATE_DELETED: "template:deleted",
+  /** Template source registered with TemplateManager */
+  TEMPLATE_SOURCE_REGISTERED: "template:source:registered",
+  /** TemplateManager cache cleared */
+  TEMPLATE_CACHE_CLEARED: "template:cache:cleared",
+  /** Bulk template import completed */
+  TEMPLATES_IMPORTED: "templates:imported",
+
+  // ============================================
+  // CMS Events
+  // ============================================
+  CMS_COLLECTION_CREATED: "collection:created",
+  CMS_COLLECTION_UPDATED: "collection:updated",
+  CMS_COLLECTION_DELETED: "collection:deleted",
+  CMS_CONTENT_CREATED: "content:created",
+  CMS_CONTENT_UPDATED: "content:updated",
+  CMS_CONTENT_DELETED: "content:deleted",
+  CMS_CONTENT_PUBLISHED: "content:published",
+  CMS_CONTENT_UNPUBLISHED: "content:unpublished",
 
   // ============================================
   // Plugin Events

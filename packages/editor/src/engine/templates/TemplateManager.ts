@@ -18,6 +18,7 @@ import type {
   TemplateSaveOptions,
   TemplateCategory,
 } from "../../shared/types/templates";
+import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import { TemplateEngine } from "../data/TemplateEngine";
 import { EventEmitter } from "../EventEmitter";
@@ -48,7 +49,7 @@ export class TemplateManager extends EventEmitter {
    */
   registerSource(source: TemplateSource): void {
     this.sources.push(source);
-    this.emit("source:registered", { source });
+    this.emit(EVENTS.TEMPLATE_SOURCE_REGISTERED, { source });
   }
 
   /**
@@ -228,7 +229,7 @@ export class TemplateManager extends EventEmitter {
       }
     }
 
-    this.emit("template:loading", { template });
+    this.emit(EVENTS.TEMPLATE_LOADING, { template });
 
     try {
       // Load template data
@@ -248,14 +249,14 @@ export class TemplateManager extends EventEmitter {
         template.downloads++;
       }
 
-      this.emit("template:loaded", { template });
+      this.emit(EVENTS.TEMPLATE_LOADED, { template });
 
       // Call after load callback
       if (options.onAfterLoad) {
         await options.onAfterLoad(template);
       }
     } catch (error) {
-      this.emit("template:error", { template, error });
+      this.emit(EVENTS.TEMPLATE_ERROR, { template, error });
       throw error;
     }
   }
@@ -322,7 +323,7 @@ export class TemplateManager extends EventEmitter {
     // Save to local templates
     this.templates.set(template.id, template);
 
-    this.emit("template:saved", { template });
+    this.emit(EVENTS.TEMPLATE_SAVED, { template });
 
     // Clear cache
     this.cache.clear();
@@ -382,7 +383,7 @@ export class TemplateManager extends EventEmitter {
     if (this.templates.has(id)) {
       const template = this.templates.get(id)!;
       this.templates.delete(id);
-      this.emit("template:deleted", { template });
+      this.emit(EVENTS.TEMPLATE_DELETED, { template });
       this.cache.clear();
     }
   }
@@ -410,7 +411,7 @@ export class TemplateManager extends EventEmitter {
    */
   clearCache(): void {
     this.cache.clear();
-    this.emit("cache:cleared");
+    this.emit(EVENTS.TEMPLATE_CACHE_CLEARED);
   }
 
   /**
@@ -441,7 +442,7 @@ export class TemplateManager extends EventEmitter {
       this.templates.set(template.id, template);
     });
 
-    this.emit("templates:imported", { count: templates.length });
+    this.emit(EVENTS.TEMPLATES_IMPORTED, { count: templates.length });
     this.cache.clear();
   }
 

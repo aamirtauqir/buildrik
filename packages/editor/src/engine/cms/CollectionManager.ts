@@ -12,6 +12,7 @@ import type {
   CMSQueryResult,
 } from "../../shared/types/cms";
 import { validateFieldValue } from "../../shared/types/cms";
+import { EVENTS } from "../../shared/constants/events";
 import { EventEmitter } from "../EventEmitter";
 import * as Storage from "./CollectionStorage";
 
@@ -67,7 +68,7 @@ export class CollectionManager extends EventEmitter {
 
     await Storage.saveCollection(collection);
     this.collections.set(collection.id, collection);
-    this.emit("collection:created", collection);
+    this.emit(EVENTS.CMS_COLLECTION_CREATED, collection);
 
     return collection;
   }
@@ -89,7 +90,7 @@ export class CollectionManager extends EventEmitter {
 
     await Storage.saveCollection(updated);
     this.collections.set(id, updated);
-    this.emit("collection:updated", updated);
+    this.emit(EVENTS.CMS_COLLECTION_UPDATED, updated);
 
     return updated;
   }
@@ -102,7 +103,7 @@ export class CollectionManager extends EventEmitter {
     await Storage.deleteCollection(id);
     this.collections.delete(id);
     this.contentCache.delete(id);
-    this.emit("collection:deleted", id);
+    this.emit(EVENTS.CMS_COLLECTION_DELETED, id);
 
     return true;
   }
@@ -216,7 +217,7 @@ export class CollectionManager extends EventEmitter {
 
     await Storage.saveContentItem(item);
     this.invalidateContentCache(collectionId);
-    this.emit("content:created", item);
+    this.emit(EVENTS.CMS_CONTENT_CREATED, item);
 
     return item;
   }
@@ -243,11 +244,11 @@ export class CollectionManager extends EventEmitter {
     this.invalidateContentCache(existing.collectionId);
 
     if (updates.status === "published" && existing.status !== "published") {
-      this.emit("content:published", updated);
+      this.emit(EVENTS.CMS_CONTENT_PUBLISHED, updated);
     } else if (updates.status !== "published" && existing.status === "published") {
-      this.emit("content:unpublished", updated);
+      this.emit(EVENTS.CMS_CONTENT_UNPUBLISHED, updated);
     } else {
-      this.emit("content:updated", updated);
+      this.emit(EVENTS.CMS_CONTENT_UPDATED, updated);
     }
 
     return updated;
@@ -259,7 +260,7 @@ export class CollectionManager extends EventEmitter {
 
     await Storage.deleteContentItem(id);
     this.invalidateContentCache(existing.collectionId);
-    this.emit("content:deleted", id, existing.collectionId);
+    this.emit(EVENTS.CMS_CONTENT_DELETED, id, existing.collectionId);
 
     return true;
   }
