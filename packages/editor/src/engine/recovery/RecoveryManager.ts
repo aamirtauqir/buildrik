@@ -7,6 +7,7 @@
  */
 
 import { devLog, devWarn, devError } from "../../shared/utils/devLogger";
+import { EVENTS } from "../../shared/constants/events";
 import { generateId } from "../../shared/utils/helpers";
 import type { Composer } from "../Composer";
 import type { ElementManagerContext } from "../elements/manager/types";
@@ -66,7 +67,7 @@ export class RecoveryManager {
       }
 
       // Check 4: Force canvas re-sync
-      this.composer.emit("canvas:force-sync");
+      this.composer.emit(EVENTS.CANVAS_FORCE_SYNC);
 
       devLog("Recovery", "State recovery complete");
     } catch (error) {
@@ -106,7 +107,7 @@ export class RecoveryManager {
       // Update page reference
       page.root = newRootData;
 
-      this.composer.emit("page:recovered", { page });
+      this.composer.emit(EVENTS.PAGE_RECOVERED, { page });
     }
   }
 

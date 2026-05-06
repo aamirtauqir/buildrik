@@ -7,6 +7,7 @@
  */
 
 import {
+import { EVENTS } from "../../shared/constants/events";
   generateContent,
   generateContentVariations,
   improveContent,
@@ -169,7 +170,7 @@ export class ContentWriter {
     }
 
     // Emit event
-    this.composer.emit("ai:content-generated", result);
+    this.composer.emit(EVENTS.AI_CONTENT_GENERATED, result);
 
     return result;
   }
@@ -188,7 +189,7 @@ export class ContentWriter {
       const callbacks: StreamCallbacks = {
         onChunk: (chunk) => {
           fullContent += chunk;
-          this.composer.emit("ai:content-stream-chunk", { chunk, fullContent });
+          this.composer.emit(EVENTS.AI_CONTENT_STREAM_CHUNK, { chunk, fullContent });
         },
         onComplete: (content) => {
           resolve(content);
@@ -221,7 +222,7 @@ export class ContentWriter {
       this.applyToElement(elementId, improved);
     }
 
-    this.composer.emit("ai:content-improved", { original: content, improved, improvement });
+    this.composer.emit(EVENTS.AI_CONTENT_IMPROVED, { original: content, improved, improvement });
 
     return improved;
   }
@@ -236,7 +237,7 @@ export class ContentWriter {
       this.applyToElement(elementId, translated);
     }
 
-    this.composer.emit("ai:content-translated", { original: content, translated, targetLanguage });
+    this.composer.emit(EVENTS.AI_CONTENT_TRANSLATED, { original: content, translated, targetLanguage });
 
     return translated;
   }
@@ -251,7 +252,7 @@ export class ContentWriter {
       this.applyToElement(elementId, summary);
     }
 
-    this.composer.emit("ai:content-summarized", { original: content, summary });
+    this.composer.emit(EVENTS.AI_CONTENT_SUMMARIZED, { original: content, summary });
 
     return summary;
   }
@@ -304,7 +305,7 @@ export class ContentWriter {
     if (!element) return;
 
     element.setContent(content);
-    this.composer.emit("element:updated");
+    this.composer.emit(EVENTS.ELEMENT_UPDATED);
   }
 
   /**

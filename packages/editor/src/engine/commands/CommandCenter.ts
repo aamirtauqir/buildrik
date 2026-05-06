@@ -11,6 +11,7 @@
  */
 
 import type { CommandData, CommandOptions, CommandResult } from "../../shared/types";
+import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import { buildDefaultCommands } from "./defaultCommands";
 import { KeybindingManager } from "./KeybindingManager";
@@ -39,14 +40,14 @@ export class CommandCenter {
   register(command: CommandData): void {
     this.commands.set(command.id, command);
     this.keybindings.indexCommand(command);
-    this.composer.emit("command:registered", command);
+    this.composer.emit(EVENTS.COMMAND_REGISTERED, command);
   }
 
   unregister(id: string): boolean {
     const existed = this.commands.delete(id);
     if (existed) {
       this.keybindings.removeByCommandId(id);
-      this.composer.emit("command:unregistered", id);
+      this.composer.emit(EVENTS.COMMAND_UNREGISTERED, id);
     }
     return existed;
   }
@@ -57,15 +58,15 @@ export class CommandCenter {
     const command = this.commands.get(id);
     if (!command) return;
 
-    this.composer.emit("command:before", { id, options });
+    this.composer.emit(EVENTS.COMMAND_BEFORE, { id, options });
 
     try {
       const result = command.run(this.composer, options);
       this.activeCommands.add(id);
-      this.composer.emit("command:run", { id, options, result });
+      this.composer.emit(EVENTS.COMMAND_RUN, { id, options, result });
       return result;
     } catch (error) {
-      this.composer.emit("command:error", { id, error });
+      this.composer.emit(EVENTS.COMMAND_ERROR, { id, error });
       throw error;
     }
   }
@@ -75,7 +76,7 @@ export class CommandCenter {
     if (command?.stop) {
       command.stop(this.composer, options);
       this.activeCommands.delete(id);
-      this.composer.emit("command:stop", { id, options });
+      this.composer.emit(EVENTS.COMMAND_STOP, { id, options });
     }
   }
 

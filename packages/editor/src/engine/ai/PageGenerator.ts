@@ -7,6 +7,7 @@
  */
 
 import { devWarn } from "../../shared/utils/devLogger";
+import { EVENTS } from "../../shared/constants/events";
 import { generateLayout, type LayoutStyle } from "../../shared/utils/openai";
 import type { Composer } from "../Composer";
 
@@ -241,7 +242,7 @@ export class PageGenerator {
       prompt,
     };
 
-    this.composer.emit("ai:page-generated", page);
+    this.composer.emit(EVENTS.AI_PAGE_GENERATED, page);
     return page;
   }
 
@@ -312,13 +313,13 @@ export class PageGenerator {
     // Apply each section's HTML to the page via events
     // Canvas components listen for these events and handle insertion
     page.sections.forEach((section) => {
-      this.composer.emit("ai:section-apply", {
+      this.composer.emit(EVENTS.AI_SECTION_APPLY, {
         html: section.html,
         type: section.type,
       });
     });
 
-    this.composer.emit("ai:page-applied", page);
+    this.composer.emit(EVENTS.AI_PAGE_APPLIED, page);
   }
 
   /**

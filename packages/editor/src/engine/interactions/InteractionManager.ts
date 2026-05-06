@@ -10,6 +10,7 @@
  */
 
 import type { Composer } from "../Composer";
+import { EVENTS } from "../../shared/constants/events";
 import type { Element } from "../elements/Element";
 import { InteractionRuntime } from "./InteractionRuntime";
 import type {
@@ -47,13 +48,13 @@ export class InteractionManager {
       this.runtime = new InteractionRuntime();
     }
     this.runtime.start(root);
-    this.composer.emit("interactions:runtime:started");
+    this.composer.emit(EVENTS.INTERACTIONS_RUNTIME_STARTED);
   }
 
   /** Stop the interactions runtime */
   stopRuntime(): void {
     this.runtime?.stop();
-    this.composer.emit("interactions:runtime:stopped");
+    this.composer.emit(EVENTS.INTERACTIONS_RUNTIME_STOPPED);
   }
 
   /** Check if runtime is active */
@@ -101,7 +102,7 @@ export class InteractionManager {
     this.setInteractions(element, [...this.getInteractions(elementId), interaction]);
 
     const eventData: InteractionEventData = { elementId, interaction };
-    this.composer.emit("interaction:added", eventData);
+    this.composer.emit(EVENTS.INTERACTION_ADDED, eventData);
 
     return interaction;
   }
@@ -130,7 +131,7 @@ export class InteractionManager {
       interaction: updated,
       previousInteraction: previous,
     };
-    this.composer.emit("interaction:updated", eventData);
+    this.composer.emit(EVENTS.INTERACTION_UPDATED, eventData);
 
     return updated;
   }
@@ -148,7 +149,7 @@ export class InteractionManager {
     this.setInteractions(element, filtered);
 
     const eventData: InteractionEventData = { elementId, interaction };
-    this.composer.emit("interaction:removed", eventData);
+    this.composer.emit(EVENTS.INTERACTION_REMOVED, eventData);
 
     return true;
   }
@@ -162,7 +163,7 @@ export class InteractionManager {
     if (interactions.length === 0) return;
 
     this.setInteractions(element, []);
-    this.composer.emit("interactions:cleared", { elementId });
+    this.composer.emit(EVENTS.INTERACTIONS_CLEARED, { elementId });
   }
 
   // ===========================================================================
@@ -179,7 +180,7 @@ export class InteractionManager {
     });
 
     if (updated) {
-      this.composer.emit("interaction:toggled", {
+      this.composer.emit(EVENTS.INTERACTION_TOGGLED, {
         elementId,
         interaction: updated,
         enabled: updated.enabled,
@@ -244,7 +245,7 @@ export class InteractionManager {
     interactions.splice(clampedIndex, 0, interaction);
 
     this.setInteractions(element, interactions);
-    this.composer.emit("interactions:reordered", { elementId, interactions });
+    this.composer.emit(EVENTS.INTERACTIONS_REORDERED, { elementId, interactions });
 
     return true;
   }

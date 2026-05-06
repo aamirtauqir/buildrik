@@ -18,6 +18,7 @@
  */
 
 import type { Composer } from "../Composer";
+import { EVENTS } from "../../shared/constants/events";
 import type { Element } from "../elements/Element";
 import { MEDIA_EVENTS } from "../../shared/constants/media";
 import { isSafeSrc } from "./MediaHelpers";
@@ -288,7 +289,7 @@ export class MediaCommandLayer {
     } else {
       element.setAttribute("src", newSrc);
     }
-    this.composer.emit("element:style-updated", {
+    this.composer.emit(EVENTS.ELEMENT_STYLE_UPDATED, {
       elementIds: [element.getId()],
       property: "src",
       value: newSrc,

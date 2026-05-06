@@ -467,6 +467,89 @@ export const EVENTS = {
   // Additional Project Events
   // ============================================
   PROJECT_SAVING: "project:saving",
+
+  // ============================================
+  // OT Engine Events
+  // ============================================
+  OT_OPERATION_PENDING: "operation:pending",
+  OT_OPERATION_ACKED: "operation:acked",
+  OT_OPERATION_TIMEOUT: "operation:timeout",
+  OT_OPERATION_TRANSFORMED: "operation:transformed",
+  OT_PENDING_CLEANUP: "pending:cleanup",
+  OT_DIVERGENCE_DETECTED: "divergence:detected",
+
+  // ============================================
+  // Interaction Manager Events
+  // ============================================
+  INTERACTIONS_RUNTIME_STARTED: "interactions:runtime:started",
+  INTERACTIONS_RUNTIME_STOPPED: "interactions:runtime:stopped",
+  INTERACTION_ADDED: "interaction:added",
+  INTERACTION_UPDATED: "interaction:updated",
+  INTERACTION_REMOVED: "interaction:removed",
+  INTERACTION_TOGGLED: "interaction:toggled",
+  INTERACTIONS_CLEARED: "interactions:cleared",
+  INTERACTIONS_REORDERED: "interactions:reordered",
+
+  // ============================================
+  // Recovery Events
+  // ============================================
+  CANVAS_FORCE_SYNC: "canvas:force-sync",
+  PAGE_RECOVERED: "page:recovered",
+
+  // ============================================
+  // Additional Style Events
+  // ============================================
+  STYLE_REMOVED: "style:removed",
+  STYLE_INHERITED: "style:inherited",
+
+  // ============================================
+  // Element Style Update Events
+  // ============================================
+  ELEMENT_STYLE_UPDATED: "element:style-updated",
+
+  // ============================================
+  // CMS Binding Events
+  // ============================================
+  CMS_COLLECTION_BOUND: "cms:collection:bound",
+  CMS_COLLECTION_UNBOUND: "cms:collection:unbound",
+
+  // ============================================
+  // AI Events
+  // ============================================
+  AI_PAGE_GENERATED: "ai:page-generated",
+  AI_PAGE_APPLIED: "ai:page-applied",
+  AI_SECTION_APPLY: "ai:section-apply",
+  AI_CONTENT_GENERATED: "ai:content-generated",
+  AI_CONTENT_STREAM_CHUNK: "ai:content-stream-chunk",
+  AI_CONTENT_IMPROVED: "ai:content-improved",
+  AI_CONTENT_TRANSLATED: "ai:content-translated",
+  AI_CONTENT_SUMMARIZED: "ai:content-summarized",
+  AI_CODE_GENERATED: "ai:code-generated",
+
+  // ============================================
+  // Command Center Events
+  // ============================================
+  COMMAND_REGISTERED: "command:registered",
+  COMMAND_UNREGISTERED: "command:unregistered",
+  COMMAND_BEFORE: "command:before",
+  COMMAND_RUN: "command:run",
+  COMMAND_ERROR: "command:error",
+  COMMAND_STOP: "command:stop",
+
+  // ============================================
+  // Timeline (Animation) Events
+  // ============================================
+  TIMELINE_CREATED: "timeline:created",
+  TIMELINE_DELETED: "timeline:deleted",
+  TIMELINE_TRACK_ADDED: "timeline:track-added",
+  TIMELINE_KEYFRAME_ADDED: "timeline:keyframe-added",
+  TIMELINE_KEYFRAME_UPDATED: "timeline:keyframe-updated",
+  TIMELINE_KEYFRAME_REMOVED: "timeline:keyframe-removed",
+  TIMELINE_PLAY: "timeline:play",
+  TIMELINE_PAUSE: "timeline:pause",
+  TIMELINE_STOP: "timeline:stop",
+  TIMELINE_SCRUB: "timeline:scrub",
+  TIMELINE_IMPORTED: "timeline:imported",
 } as const;
 
 /**

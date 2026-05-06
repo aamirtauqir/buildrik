@@ -7,6 +7,7 @@
  */
 
 import { injectAnimationCSS } from "../../editor/animation/AnimationPresets";
+import { EVENTS } from "../../shared/constants/events";
 import {
   BREAKPOINT_ORDER,
   getBreakpointQuery,
@@ -92,7 +93,7 @@ export class StyleEngine {
     }
 
     this.updateStylesheet();
-    this.composer.emit("style:changed", style);
+    this.composer.emit(EVENTS.STYLE_CHANGED, style);
     this.composer.markDirty();
 
     return style;
@@ -114,7 +115,7 @@ export class StyleEngine {
       this.styles.delete(style.id);
       this.ruleIndex.delete(this.ruleKey(selector, mediaQuery));
       this.updateStylesheet();
-      this.composer.emit("style:removed", style);
+      this.composer.emit(EVENTS.STYLE_REMOVED, style);
       this.composer.markDirty();
       return true;
     }
@@ -128,7 +129,7 @@ export class StyleEngine {
     const style = this.findRule(selector) || this.setRule(selector, {});
     style.properties[property] = value;
     this.updateStylesheet();
-    this.composer.emit("style:changed", style);
+    this.composer.emit(EVENTS.STYLE_CHANGED, style);
     this.composer.markDirty();
   }
 
@@ -140,7 +141,7 @@ export class StyleEngine {
     if (style && style.properties[property]) {
       delete style.properties[property];
       this.updateStylesheet();
-      this.composer.emit("style:changed", style);
+      this.composer.emit(EVENTS.STYLE_CHANGED, style);
       this.composer.markDirty();
     }
   }
@@ -220,7 +221,7 @@ export class StyleEngine {
     // Also store in element data for serialization
     this.updateElementBreakpointStyles(element, breakpoint, styles);
 
-    this.composer.emit("style:changed", { elementId, breakpoint, styles });
+    this.composer.emit(EVENTS.STYLE_CHANGED, { elementId, breakpoint, styles });
   }
 
   /**
@@ -284,7 +285,7 @@ export class StyleEngine {
     if (style && style.properties[property]) {
       delete style.properties[property];
       this.updateStylesheet();
-      this.composer.emit("style:changed", style);
+      this.composer.emit(EVENTS.STYLE_CHANGED, style);
       this.composer.markDirty();
     }
   }
@@ -608,7 +609,7 @@ export class StyleEngine {
       }
     });
 
-    this.composer.emit("style:inherited", {
+    this.composer.emit(EVENTS.STYLE_INHERITED, {
       from,
       to,
       properties: propsToInherit,

@@ -5,6 +5,7 @@
  */
 
 import type { ConnectionQuality, ConnectionQualityStats } from "../../shared/types/collaboration";
+import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import { EventEmitter } from "../EventEmitter";
 import type { Patch } from "../utils/JsonPatch";
@@ -79,7 +80,7 @@ export class OTEngine extends EventEmitter {
       );
 
       // Emit warning event
-      this.emit("operation:timeout", {
+      this.emit(EVENTS.OT_OPERATION_TIMEOUT, {
         opKey: key,
         sentAt: timing?.sentAt,
         duration: now - (timing?.sentAt || 0),
@@ -87,7 +88,7 @@ export class OTEngine extends EventEmitter {
     }
 
     if (staleKeys.length > 0) {
-      this.emit("pending:cleanup", { count: staleKeys.length });
+      this.emit(EVENTS.OT_PENDING_CLEANUP, { count: staleKeys.length });
     }
   }
 
@@ -140,7 +141,7 @@ export class OTEngine extends EventEmitter {
         severity = "severe";
       }
 
-      this.emit("divergence:detected", {
+      this.emit(EVENTS.OT_DIVERGENCE_DETECTED, {
         remote: remoteOp,
         expected: expectedParent,
         actual: remoteParent,
@@ -185,7 +186,7 @@ export class OTEngine extends EventEmitter {
     this.pendingWithTiming.set(opKey, { sentAt: Date.now(), retries: 0 });
 
     // Emit pending event
-    this.emit("operation:pending", { id: op.id, timestamp: Date.now() });
+    this.emit(EVENTS.OT_OPERATION_PENDING, { id: op.id, timestamp: Date.now() });
 
     return op;
   }
@@ -220,7 +221,7 @@ export class OTEngine extends EventEmitter {
       this.state.lastApplied = remoteOp.id;
 
       // Emit acked event with latency
-      this.emit("operation:acked", { id: remoteOp.id, latency });
+      this.emit(EVENTS.OT_OPERATION_ACKED, { id: remoteOp.id, latency });
 
       return null;
     }
@@ -243,7 +244,7 @@ export class OTEngine extends EventEmitter {
     }
 
     this.state.lastApplied = remoteOp.id;
-    this.emit("operation:transformed", { original: remoteOp, transformed: transformedPatch });
+    this.emit(EVENTS.OT_OPERATION_TRANSFORMED, { original: remoteOp, transformed: transformedPatch });
 
     return transformedPatch;
   }

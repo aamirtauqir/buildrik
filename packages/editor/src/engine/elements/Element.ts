@@ -7,6 +7,7 @@
  * @license BSD-3-Clause
  */
 
+import { EVENTS } from "../../shared/constants/events";
 import type { ElementData, TraitData, TraitValue } from "../../shared/types";
 import type { AnimationConfig } from "../../shared/types/animations";
 import type { DataBinding } from "../../shared/types/data";
@@ -123,19 +124,19 @@ export class Element {
 
   setContent(content: string): void {
     this.data.content = content;
-    this.composer.emit("element:updated", this);
+    this.composer.emit(EVENTS.ELEMENT_UPDATED, this);
     this.composer.markDirty();
   }
 
   setTagName(tagName: string): void {
     this.data.tagName = tagName;
-    this.composer.emit("element:updated", this);
+    this.composer.emit(EVENTS.ELEMENT_UPDATED, this);
     this.composer.markDirty();
   }
 
   setLocked(locked: boolean): void {
     this.data.locked = locked;
-    this.composer.emit("element:updated", this);
+    this.composer.emit(EVENTS.ELEMENT_UPDATED, this);
     this.composer.markDirty();
   }
 

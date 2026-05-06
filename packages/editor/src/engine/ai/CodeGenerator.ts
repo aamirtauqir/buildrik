@@ -7,6 +7,7 @@
  */
 
 import {
+import { EVENTS } from "../../shared/constants/events";
   generateCode,
   generateLayout,
   type ProgrammingLanguage,
@@ -297,7 +298,7 @@ export class CodeGenerator {
       });
     }
 
-    this.composer.emit("ai:code-generated", result);
+    this.composer.emit(EVENTS.AI_CODE_GENERATED, result);
 
     return result;
   }
@@ -364,7 +365,7 @@ export class CodeGenerator {
       element.setStyle(prop, value);
     });
 
-    this.composer.emit("element:updated");
+    this.composer.emit(EVENTS.ELEMENT_UPDATED);
   }
 
   /**

@@ -349,7 +349,7 @@ export class ElementManager {
       if (applied.length === 0) {
         return { kind: "failed", reason: "no-text-selected" };
       }
-      this.composer.emit("element:style-updated", {
+      this.composer.emit(EVENTS.ELEMENT_STYLE_UPDATED, {
         elementIds: applied,
         property: "font-family",
         value: src,
@@ -379,7 +379,7 @@ export class ElementManager {
         } else {
           target.setAttribute("src", src);
         }
-        this.composer.emit("element:style-updated", {
+        this.composer.emit(EVENTS.ELEMENT_STYLE_UPDATED, {
           elementIds: [opts.targetElementId],
           property: "src",
           value: src,
@@ -439,7 +439,7 @@ export class ElementManager {
     const added = this.addElement(element, parentId, insertIndex);
     if (!added) return null;
 
-    this.composer.emit("element:inserted", {
+    this.composer.emit(EVENTS.ELEMENT_INSERTED, {
       elementId: element.getId(),
       type: elementType,
       src,

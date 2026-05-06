@@ -7,6 +7,7 @@
  */
 
 import { devError } from "../../shared/utils/devLogger";
+import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import type { GSAPAnimationConfig, TimelineStep } from "./GSAPEngine";
 import { gsapEngine, GSAPEngine } from "./GSAPEngine";
@@ -89,7 +90,7 @@ export class TimelineManager {
     };
 
     this.timelines.set(id, timeline);
-    this.composer.emit("timeline:created", timeline);
+    this.composer.emit(EVENTS.TIMELINE_CREATED, timeline);
 
     return timeline;
   }
@@ -111,7 +112,7 @@ export class TimelineManager {
     };
 
     timeline.tracks.push(track);
-    this.composer.emit("timeline:track-added", { timeline, track });
+    this.composer.emit(EVENTS.TIMELINE_TRACK_ADDED, { timeline, track });
 
     return track;
   }
@@ -152,7 +153,7 @@ export class TimelineManager {
       timeline.duration = time + 0.5;
     }
 
-    this.composer.emit("timeline:keyframe-added", { timeline, track, keyframe });
+    this.composer.emit(EVENTS.TIMELINE_KEYFRAME_ADDED, { timeline, track, keyframe });
     return keyframe;
   }
 
@@ -181,7 +182,7 @@ export class TimelineManager {
       track.keyframes.sort((a, b) => a.time - b.time);
     }
 
-    this.composer.emit("timeline:keyframe-updated", { timeline, track, keyframe });
+    this.composer.emit(EVENTS.TIMELINE_KEYFRAME_UPDATED, { timeline, track, keyframe });
     return true;
   }
 
@@ -198,7 +199,7 @@ export class TimelineManager {
     const removed = track.keyframes.splice(keyframeIndex, 1);
     if (removed.length === 0) return false;
 
-    this.composer.emit("timeline:keyframe-removed", {
+    this.composer.emit(EVENTS.TIMELINE_KEYFRAME_REMOVED, {
       timeline,
       track,
       keyframe: removed[0],
@@ -279,7 +280,7 @@ export class TimelineManager {
     });
 
     this.activeTimelineId = timelineId;
-    this.composer.emit("timeline:play", { timelineId });
+    this.composer.emit(EVENTS.TIMELINE_PLAY, { timelineId });
     return true;
   }
 
@@ -291,7 +292,7 @@ export class TimelineManager {
     configs.forEach((config) => {
       gsapEngine.pause(config.id);
     });
-    this.composer.emit("timeline:pause", { timelineId });
+    this.composer.emit(EVENTS.TIMELINE_PAUSE, { timelineId });
     return true;
   }
 
@@ -303,7 +304,7 @@ export class TimelineManager {
     configs.forEach((config) => {
       gsapEngine.stop(config.id);
     });
-    this.composer.emit("timeline:stop", { timelineId });
+    this.composer.emit(EVENTS.TIMELINE_STOP, { timelineId });
     return true;
   }
 
@@ -322,7 +323,7 @@ export class TimelineManager {
     });
 
     this.playheadPosition = time;
-    this.composer.emit("timeline:scrub", { timelineId, time, progress });
+    this.composer.emit(EVENTS.TIMELINE_SCRUB, { timelineId, time, progress });
     return true;
   }
 
@@ -359,7 +360,7 @@ export class TimelineManager {
       this.activeTimelineId = null;
     }
 
-    this.composer.emit("timeline:deleted", { timelineId });
+    this.composer.emit(EVENTS.TIMELINE_DELETED, { timelineId });
     return true;
   }
 
@@ -395,7 +396,7 @@ export class TimelineManager {
       // Generate new ID to avoid conflicts
       data.id = `timeline-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
       this.timelines.set(data.id, data);
-      this.composer.emit("timeline:imported", data);
+      this.composer.emit(EVENTS.TIMELINE_IMPORTED, data);
       return data;
     } catch (error) {
       devError("TimelineManager", "Failed to import timeline", error);

@@ -5,6 +5,7 @@
  */
 
 import type { CMSContentItem } from "../../shared/types/cms";
+import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import { BaseBindingManager, type BindingWithData } from "../data/BaseBindingManager";
 import type { CollectionManager } from "./CollectionManager";
@@ -204,7 +205,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     });
 
     this.composer.markDirty();
-    this.composer.emit("cms:collection:bound", { elementId, collectionId });
+    this.composer.emit(EVENTS.CMS_COLLECTION_BOUND, { elementId, collectionId });
   }
 
   /**
@@ -214,7 +215,7 @@ export class CMSBindingManager extends BaseBindingManager<CMSElementBinding> {
     if (this.collectionBindings.has(elementId)) {
       this.collectionBindings.delete(elementId);
       this.composer.markDirty();
-      this.composer.emit("cms:collection:unbound", { elementId });
+      this.composer.emit(EVENTS.CMS_COLLECTION_UNBOUND, { elementId });
     }
   }
 
