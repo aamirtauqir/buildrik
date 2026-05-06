@@ -9,6 +9,7 @@ import type { DesignToken, TokenDiff } from "../../types";
 import { calcWcagLevel, calcContrastRatio } from "../../utils/colorUtils";
 import { suggestContrastFix } from "../../utils/contrastFix";
 import { ColorTokenRow } from "./ColorTokenRow";
+import { Stack } from "@/editor/shared/vibcoder";
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -286,11 +287,11 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
 
       {/* Token groups */}
       {!isEmpty && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <Stack gap="xs">
           {groups.map((group) => (
             <div key={group.key}>
               <GroupHeader label={group.label} subtext={group.subtext} />
-              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <Stack gap="xs">
                 {group.tokens.map((token) => {
                   const diff = pendingDiff[token.id];
                   const fix = filterMode === "issues" ? contrastFixes[token.id] : undefined;
@@ -360,10 +361,10 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
                     </React.Fragment>
                   );
                 })}
-              </div>
+              </Stack>
             </div>
           ))}
-        </div>
+        </Stack>
       )}
 
       {/* Add token */}
