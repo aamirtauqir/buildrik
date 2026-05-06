@@ -7,8 +7,6 @@
 
 import * as React from "react";
 import type { Composer } from "../../../engine";
-import { SNAP_THRESHOLD } from "../../../engine/canvas/constants";
-import type { SnapPoint, SmartGuide } from "../../../shared/types/canvas";
 import { findDropTargetElement, getElementId } from "../../../shared/utils/dragDrop";
 import type { InvalidDropReason } from "../../../shared/utils/dragDrop/dropValidation";
 import {
@@ -30,6 +28,7 @@ import {
 import { useDragAutoScroll } from "./useDragAutoScroll";
 import { useDragSession } from "./useDragSession";
 import type { DropPosition, DropSlotRect, BreadcrumbItem } from "./useDragSession";
+import { useDragSnapGuides } from "./drag/useDragSnapGuides";
 import { useDragVisuals } from "./useDragVisuals";
 
 // Extracted drop handlers
@@ -133,8 +132,6 @@ export function useCanvasDragDrop({
     resetSession,
   } = session;
 
-  // Throttle ref for snap calculation
-  const lastSnapCalcRef = React.useRef<number>(0);
   const SNAP_THROTTLE_MS = 50;
 
   // Track the currently highlighted drop-affordance element so we can remove
@@ -166,6 +163,16 @@ export function useCanvasDragDrop({
     onSnapLinesChangeRef.current = onSnapLinesChange;
   }, [onSnapLinesChange]);
 
+  // Snap guide computation extracted into its own hook (Phase D D1 stage 1).
+  const snapGuides = useDragSnapGuides({
+    composer,
+    canvasRef,
+    showGuides,
+    draggingElementId,
+    snapCalculator,
+    onSnapLinesChangeRef,
+  });
+
   React.useEffect(() => {
     onDropErrorRef.current = onDropError;
   }, [onDropError]);
@@ -184,7 +191,7 @@ export function useCanvasDragDrop({
       e.stopPropagation();
 
       const now = Date.now();
-      const isThrottled = now - lastSnapCalcRef.current < SNAP_THROTTLE_MS;
+      const isThrottled = now - snapGuides.lastSnapCalcRef.current < SNAP_THROTTLE_MS;
 
       setIsDragOver(true);
 
@@ -284,7 +291,7 @@ export function useCanvasDragDrop({
 
       // Skip expensive snap calculation if throttled
       if (!isThrottled) {
-        calculateSnapGuides(e, now);
+        snapGuides.calculate(e, now);
       }
 
       // Auto-scroll when near canvas edges
@@ -301,101 +308,6 @@ export function useCanvasDragDrop({
       applyDropAffordance,
       clearDropAffordance,
     ]
-  );
-
-  // Snap guide calculation (extracted for readability)
-  const calculateSnapGuides = React.useCallback(
-    (e: React.DragEvent, now: number) => {
-      if (!composer?.canvasIndicators || !showGuides || !canvasRef.current || !draggingElementId) {
-        onSnapLinesChangeRef.current([]);
-        lastSnapCalcRef.current = now;
-        return;
-      }
-
-      const rect = canvasRef.current.getBoundingClientRect();
-      const localX = e.clientX - rect.left;
-      const localY = e.clientY - rect.top;
-
-      const draggedDomEl = canvasRef.current.querySelector(
-        `[data-buildrick-id="${draggingElementId}"]`
-      ) as HTMLElement | null;
-
-      const lines: import("./useCanvasSnapping").SnapLine[] = [];
-
-      if (draggedDomEl) {
-        const draggedRect = draggedDomEl.getBoundingClientRect();
-        const draggedBounds = {
-          x: draggedRect.left - rect.left,
-          y: draggedRect.top - rect.top,
-          width: draggedRect.width,
-          height: draggedRect.height,
-        };
-
-        if (snapCalculator) {
-          const snapResult = snapCalculator(
-            draggingElementId,
-            {
-              left: draggedBounds.x,
-              top: draggedBounds.y,
-              width: draggedBounds.width,
-              height: draggedBounds.height,
-            },
-            1
-          );
-          if (snapResult.snapLines) lines.push(...snapResult.snapLines);
-        } else {
-          const smartGuides = composer.canvasIndicators.calculateSmartGuides(
-            draggingElementId,
-            draggedBounds
-          );
-          smartGuides.forEach((guide: SmartGuide) => {
-            lines.push({
-              orientation: guide.axis,
-              position: guide.position,
-              start: -99999,
-              end: 99999,
-            });
-          });
-        }
-      }
-
-      // Check snap points
-      const snapPoints = composer.canvasIndicators.calculateSnapPoints(draggingElementId) || [];
-      snapPoints.forEach((pt: SnapPoint) => {
-        if (pt.axis === "vertical" && Math.abs(localX - pt.position) <= SNAP_THRESHOLD) {
-          if (
-            !lines.some(
-              (l) => l.orientation === "vertical" && Math.abs(l.position - pt.position) < 2
-            )
-          ) {
-            lines.push({
-              orientation: "vertical",
-              position: pt.position,
-              start: -99999,
-              end: 99999,
-            });
-          }
-        }
-        if (pt.axis === "horizontal" && Math.abs(localY - pt.position) <= SNAP_THRESHOLD) {
-          if (
-            !lines.some(
-              (l) => l.orientation === "horizontal" && Math.abs(l.position - pt.position) < 2
-            )
-          ) {
-            lines.push({
-              orientation: "horizontal",
-              position: pt.position,
-              start: -99999,
-              end: 99999,
-            });
-          }
-        }
-      });
-
-      onSnapLinesChangeRef.current(lines);
-      lastSnapCalcRef.current = now;
-    },
-    [composer, showGuides, draggingElementId, canvasRef, snapCalculator]
   );
 
   // ==========================================================================
@@ -654,11 +566,7 @@ export function useCanvasDragDrop({
   // ==========================================================================
   // CLEANUP EFFECTS
   // ==========================================================================
-  React.useEffect(() => {
-    if (!draggingElementId) {
-      lastSnapCalcRef.current = 0;
-    }
-  }, [draggingElementId]);
+  // Snap-throttle reset effect lives in useDragSnapGuides now.
 
   // Global dragend listener for cleanup
   React.useEffect(() => {
