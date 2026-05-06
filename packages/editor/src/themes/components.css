@@ -255,11 +255,6 @@ input[type="color"]::-webkit-color-swatch {
   animation: buildrick-fade-in 0.15s ease;
 }
 
-/* .buildrick-skip-link, :focus-visible blocks, .buildrick-sr-only — moved
- * to themes/design-system/a11y.css 2026-05-07. a11y.css is canonical home
- * for accessibility utilities; components.css had duplicate rules with
- * subtly different specs (older legacy padding/border-radius). Trust a11y.css
- * as SSOT. */
 
 @media (max-width: 640px) {.pill {
     padding: 0 10px;

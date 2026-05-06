@@ -21,15 +21,6 @@ export interface NumberFieldProps {
   max?: number;
   step?: number;
   unit?: string;
-  /**
-   * @deprecated Unit-select dropdown was unused (zero callers pre-Day-2).
-   * Prop kept for API compat but ignored. Remove once consumers stop passing.
-   */
-  units?: string[];
-  /**
-   * @deprecated See `units`. Ignored.
-   */
-  onUnitChange?: (unit: string) => void;
   disabled?: boolean;
   error?: string;
   hint?: string;

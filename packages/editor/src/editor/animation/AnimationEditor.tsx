@@ -170,8 +170,6 @@ export const AnimationEditor: React.FC<AnimationEditorProps> = ({
             onChange={(v) => updateAnimation({ iterations: v })}
             min={1}
             max={10}
-            unit=""
-            units={[]}
           />
         </Stack>
       </div>
