@@ -426,8 +426,6 @@ export const EVENTS = {
   // ============================================
   // Additional Template Events
   // ============================================
-  TEMPLATE_DELETED: "template:deleted",
-  TEMPLATES_IMPORTED: "templates:imported",
   CACHE_CLEARED: "cache:cleared",
 
   // ============================================
@@ -493,8 +491,9 @@ export const EVENTS = {
   // ============================================
   // Recovery Events
   // ============================================
-  CANVAS_FORCE_SYNC: "canvas:force-sync",
   PAGE_RECOVERED: "page:recovered",
+  /** Emitted when RecoveryManager catches a window error / unhandledrejection */
+  RUNTIME_FAULT_CAUGHT: "recovery:runtime-fault-caught",
 
   // ============================================
   // Additional Style Events

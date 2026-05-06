@@ -703,6 +703,7 @@ ${html}
     if (this.collaboration?.destroy) this.collaboration.destroy();
     if (this.forms?.destroy) this.forms.destroy();
     if (this.sync?.destroy) this.sync.destroy();
+    if (this.recovery?.destroy) this.recovery.destroy();
     if (this.drag?.destroy) this.drag.destroy();
     if (this.router?.clear) this.router.clear();
     if (this.elements?.destroy) this.elements.destroy();
