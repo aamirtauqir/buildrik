@@ -9,7 +9,7 @@ This plan sequences the remaining audit issues into 4 phases by risk and depende
 
 ---
 
-## Closed already (8 of 22)
+## Closed already (12 of 22)
 
 | ID | Closed in | Commit |
 |---|---|---|
@@ -18,9 +18,13 @@ This plan sequences the remaining audit issues into 4 phases by risk and depende
 | E-003 AccountModal mock | Phase 0 | `a7a5dbe9` |
 | E-004 BREAKPOINT_CHANGED dual emit | Standalone | `71a2ea0c` |
 | E-005 Event names | 6 batches | `05e3537e` → `82227d21` |
+| E-010 Sync scaffold | Phase A3 | `7a915287` |
 | E-011 Custom-width fake | Phase 0 | `a7a5dbe9` |
 | E-013 InviteModal hardcoded URL | Phase 0 | `a7a5dbe9` |
 | E-016 Composer getters | retired | (audit error: getter conversion unsafe) |
+| E-017 Binding manager docs | Phase A2 | `50b0991b` |
+| E-020 Vitest coverage config | Phase A4 | `74c73b59` |
+| E-022 Env var docs | Phase A1 | `3e2d16f1` |
 
 ---
 
@@ -210,5 +214,11 @@ Solo pace: 4-7 sessions to complete all four phases.
 
 ## Execution log (live)
 
-- Phase A start: 2026-05-07
-- … (filled per commit)
+- 2026-05-07 — Phase A start
+- 2026-05-07 — A1/E-022 env var docs shipped (`3e2d16f1`)
+- 2026-05-07 — Pre-A2 hotfix: E-005 batch-6 awk fallout in 2 ai/* files (`4a54999c`)
+- 2026-05-07 — A2/E-017 binding manager scope headers shipped (`50b0991b`)
+- 2026-05-07 — A3/E-010 sync stack SCAFFOLD-flagged + dead UI imports removed (`7a915287`)
+- 2026-05-07 — A4/E-020 vitest coverage config shipped (`74c73b59`)
+- 2026-05-07 — **Phase A CLOSED** (4 items + 1 hotfix, ~90 min, 5 commits)
+- … Phase B begins next (E-009, E-021, E-018, E-015)
