@@ -20,6 +20,7 @@ import type {
   ElementLock,
   LockEventPayload,
 } from "../../shared/types/collaboration";
+import { EVENTS } from "../../shared/constants/events";
 import type { Composer } from "../Composer";
 import { EventEmitter } from "../EventEmitter";
 import { OTEngine } from "./OTEngine";
@@ -132,7 +133,7 @@ export class CollaborationManager extends EventEmitter {
 
     await this.connectToRoom(roomId, userId);
 
-    this.emit("room:created", this.room);
+    this.emit(EVENTS.COLLAB_ROOM_CREATED, this.room);
     return this.room;
   }
 
@@ -190,7 +191,7 @@ export class CollaborationManager extends EventEmitter {
     this.editingStates.clear();
     this.setState("disconnected");
 
-    this.emit("room:left", { roomId });
+    this.emit(EVENTS.COLLAB_ROOM_LEFT, { roomId });
   }
 
   // ============================================================================
@@ -281,7 +282,7 @@ export class CollaborationManager extends EventEmitter {
       payload: { elementId, timestamp: Date.now() } as EditingEventPayload,
     });
 
-    this.emit("editing:update", state);
+    this.emit(EVENTS.COLLAB_EDITING_UPDATE, state);
   }
 
   /**
@@ -312,7 +313,7 @@ export class CollaborationManager extends EventEmitter {
     this.editingStates.forEach((state, key) => {
       if (now - state.lastEditTime > CollaborationManager.EDITING_TIMEOUT) {
         this.editingStates.delete(key);
-        this.emit("editing:cleared", { userId: state.userId, elementId: state.elementId });
+        this.emit(EVENTS.COLLAB_EDITING_CLEARED, { userId: state.userId, elementId: state.elementId });
       }
     });
   }
@@ -345,7 +346,7 @@ export class CollaborationManager extends EventEmitter {
       payload: { elementId, action: "acquire" } as LockEventPayload,
     });
 
-    this.emit("lock:acquired", lock);
+    this.emit(EVENTS.COLLAB_LOCK_ACQUIRED, lock);
   }
 
   /**
@@ -365,7 +366,7 @@ export class CollaborationManager extends EventEmitter {
         payload: { elementId, action: "release" } as LockEventPayload,
       });
 
-      this.emit("lock:released", { elementId, userId: this.currentUser.id });
+      this.emit(EVENTS.COLLAB_LOCK_RELEASED, { elementId, userId: this.currentUser.id });
     }
   }
 
@@ -441,7 +442,7 @@ export class CollaborationManager extends EventEmitter {
       const lock = this.elementLocks.get(elementId);
       this.elementLocks.delete(elementId);
       if (lock) {
-        this.emit("lock:expired", { elementId, userId: lock.userId });
+        this.emit(EVENTS.COLLAB_LOCK_EXPIRED, { elementId, userId: lock.userId });
       }
     }
   }
@@ -554,7 +555,7 @@ export class CollaborationManager extends EventEmitter {
       case "operation": {
         const transformedPatch = this.otEngine.applyRemoteOperation(event.payload as OTOperation);
         if (transformedPatch) {
-          this.emit("operation:apply", transformedPatch);
+          this.emit(EVENTS.COLLAB_OPERATION_APPLY, transformedPatch);
         }
         break;
       }
@@ -577,7 +578,7 @@ export class CollaborationManager extends EventEmitter {
       this.room.users.push(payload.user);
     }
 
-    this.emit("user:join", payload.user);
+    this.emit(EVENTS.COLLAB_USER_JOIN, payload.user);
   }
 
   private handleUserLeave(payload: LeaveEventPayload): void {
@@ -589,7 +590,7 @@ export class CollaborationManager extends EventEmitter {
     this.cleanupEditingStatesForUser(payload.userId);
     this.cleanupLocksForUser(payload.userId);
 
-    this.emit("user:leave", payload.userId);
+    this.emit(EVENTS.COLLAB_USER_LEAVE, payload.userId);
   }
 
   /**
@@ -608,7 +609,7 @@ export class CollaborationManager extends EventEmitter {
       const state = this.editingStates.get(key);
       this.editingStates.delete(key);
       if (state) {
-        this.emit("editing:cleared", { userId: state.userId, elementId: state.elementId });
+        this.emit(EVENTS.COLLAB_EDITING_CLEARED, { userId: state.userId, elementId: state.elementId });
       }
     }
   }
@@ -618,7 +619,7 @@ export class CollaborationManager extends EventEmitter {
     if (user) {
       user.cursor = payload.position;
       user.lastActive = Date.now();
-      this.emit("cursor:update", { userId, position: payload.position });
+      this.emit(EVENTS.COLLAB_CURSOR_UPDATE, { userId, position: payload.position });
     }
   }
 
@@ -627,7 +628,7 @@ export class CollaborationManager extends EventEmitter {
     if (user) {
       user.selection = payload.elementIds;
       user.lastActive = Date.now();
-      this.emit("selection:update", { userId, elementIds: payload.elementIds });
+      this.emit(EVENTS.COLLAB_SELECTION_UPDATE, { userId, elementIds: payload.elementIds });
     }
   }
 
@@ -644,7 +645,7 @@ export class CollaborationManager extends EventEmitter {
     };
 
     this.editingStates.set(`${userId}:${payload.elementId}`, state);
-    this.emit("editing:update", state);
+    this.emit(EVENTS.COLLAB_EDITING_UPDATE, state);
 
     // Schedule cleanup
     setTimeout(() => this.cleanupEditingStates(), CollaborationManager.EDITING_TIMEOUT + 100);
@@ -666,10 +667,10 @@ export class CollaborationManager extends EventEmitter {
         lockedAt: Date.now(),
       };
       this.elementLocks.set(payload.elementId, lock);
-      this.emit("lock:acquired", lock);
+      this.emit(EVENTS.COLLAB_LOCK_ACQUIRED, lock);
     } else if (payload.action === "release") {
       this.elementLocks.delete(payload.elementId);
-      this.emit("lock:released", { elementId: payload.elementId, userId });
+      this.emit(EVENTS.COLLAB_LOCK_RELEASED, { elementId: payload.elementId, userId });
     }
   }
 
@@ -687,7 +688,7 @@ export class CollaborationManager extends EventEmitter {
 
     for (const elementId of locksToRemove) {
       this.elementLocks.delete(elementId);
-      this.emit("lock:released", { elementId, userId });
+      this.emit(EVENTS.COLLAB_LOCK_RELEASED, { elementId, userId });
     }
   }
 
@@ -719,13 +720,13 @@ export class CollaborationManager extends EventEmitter {
     const parsed = ProjectDataSchema.safeParse(project);
     if (!parsed.success) {
       console.warn("[CollaborationManager] invalid sync project payload:", parsed.error.flatten());
-      this.emit("sync:error", { type: "invalid-payload", error: parsed.error });
+      this.emit(EVENTS.COLLAB_SYNC_ERROR, { type: "invalid-payload", error: parsed.error });
       return;
     }
 
     this.composer.importProject(parsed.data);
     this.otEngine.setVersion(version);
-    this.emit("sync:complete", { version });
+    this.emit(EVENTS.COLLAB_SYNC_COMPLETE, { version });
   }
 
   private handleDisconnect(): void {
@@ -733,22 +734,22 @@ export class CollaborationManager extends EventEmitter {
 
     // Clear all editing states on disconnect
     this.editingStates.forEach((state) => {
-      this.emit("editing:cleared", { userId: state.userId, elementId: state.elementId });
+      this.emit(EVENTS.COLLAB_EDITING_CLEARED, { userId: state.userId, elementId: state.elementId });
     });
     this.editingStates.clear();
 
     // Clear all locks on disconnect
     this.elementLocks.forEach((lock) => {
-      this.emit("lock:released", { elementId: lock.elementId, userId: lock.userId });
+      this.emit(EVENTS.COLLAB_LOCK_RELEASED, { elementId: lock.elementId, userId: lock.userId });
     });
     this.elementLocks.clear();
 
-    this.emit("connection:lost");
+    this.emit(EVENTS.COLLAB_CONNECTION_LOST);
   }
 
   private handleReconnect(): void {
     this.setState("connected");
-    this.emit("connection:restored");
+    this.emit(EVENTS.COLLAB_CONNECTION_RESTORED);
   }
 
   private broadcast(event: CollaborationEvent): void {
@@ -758,7 +759,7 @@ export class CollaborationManager extends EventEmitter {
   private setState(state: CollaborationState): void {
     if (this.state !== state) {
       this.state = state;
-      this.emit("state:change", state);
+      this.emit(EVENTS.COLLAB_STATE_CHANGE, state);
     }
   }
 

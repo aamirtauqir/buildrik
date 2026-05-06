@@ -190,6 +190,27 @@ export const EVENTS = {
   CMS_CONTENT_UNPUBLISHED: "content:unpublished",
 
   // ============================================
+  // Collaboration Events
+  // ============================================
+  COLLAB_ROOM_CREATED: "room:created",
+  COLLAB_ROOM_LEFT: "room:left",
+  COLLAB_USER_JOIN: "user:join",
+  COLLAB_USER_LEAVE: "user:leave",
+  COLLAB_STATE_CHANGE: "state:change",
+  COLLAB_CURSOR_UPDATE: "cursor:update",
+  COLLAB_SELECTION_UPDATE: "selection:update",
+  COLLAB_EDITING_UPDATE: "editing:update",
+  COLLAB_EDITING_CLEARED: "editing:cleared",
+  COLLAB_LOCK_ACQUIRED: "lock:acquired",
+  COLLAB_LOCK_RELEASED: "lock:released",
+  COLLAB_LOCK_EXPIRED: "lock:expired",
+  COLLAB_OPERATION_APPLY: "operation:apply",
+  COLLAB_SYNC_ERROR: "sync:error",
+  COLLAB_SYNC_COMPLETE: "sync:complete",
+  COLLAB_CONNECTION_LOST: "connection:lost",
+  COLLAB_CONNECTION_RESTORED: "connection:restored",
+
+  // ============================================
   // Plugin Events
   // ============================================
   PLUGIN_REGISTERED: "plugin:registered",
