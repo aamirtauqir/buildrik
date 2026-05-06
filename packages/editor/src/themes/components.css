@@ -257,25 +257,6 @@ to {
   cursor: not-allowed;
 }
 
-.buildrick-slider-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--buildrick-space-2);
-}
-
-.buildrick-slider-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.buildrick-slider-value {
-  font-size: var(--buildrick-text-sm);
-  font-weight: var(--buildrick-font-weight-medium);
-  color: var(--buildrick-text-primary);
-  font-family: var(--buildrick-font-family-mono);
-}
-
 .buildrick-slider {
   appearance: none;
   width: 100%;
@@ -314,23 +295,6 @@ to {
 
 .buildrick-slider:focus-visible::-webkit-slider-thumb {
   box-shadow: var(--buildrick-shadow-md), 0 0 0 3px var(--buildrick-accent-subtle);
-}
-
-.buildrick-slider-marks {
-  display: flex;
-  justify-content: space-between;
-  margin-top: var(--buildrick-space-1);
-}
-
-.buildrick-slider-mark {
-  font-size: var(--buildrick-text-xs);
-  color: var(--buildrick-text-muted);
-  cursor: pointer;
-  transition: color var(--buildrick-transition-fast);
-}
-
-.buildrick-slider-mark:hover {
-  color: var(--buildrick-text-secondary);
 }
 
 .buildrick-number-row {
