@@ -18,6 +18,8 @@ export type PublishState = "draft" | "in-review" | "approved" | "published";
 interface PublishDropdownProps {
   publishState?: PublishState;
   loading?: boolean;
+  /** Live site URL after a successful publish — enables View Live + Copy options. */
+  publishedUrl?: string | null;
   onPublish: () => void;
   onSave?: () => void;
 }
@@ -142,6 +144,7 @@ const IconExternal: React.FC = () => (
 export const PublishDropdown: React.FC<PublishDropdownProps> = ({
   publishState = "draft",
   loading = false,
+  publishedUrl = null,
   onPublish,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -149,7 +152,32 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
   const menuRef = React.useRef<HTMLDivElement>(null);
 
   const cfg = STATE_CONFIG[publishState];
-  const options = STATE_OPTIONS[publishState];
+
+  // Wire the live-site actions for any state. Static options without onClicks
+  // pass through unchanged (Submit-for-Review / Approve / Unpublish need
+  // backend RBAC — Phase 7 work, currently no-ops).
+  const options = React.useMemo<DropdownOption[]>(() => {
+    const handleViewLive = publishedUrl
+      ? () => window.open(publishedUrl, "_blank", "noopener,noreferrer")
+      : undefined;
+    const handleCopyUrl = publishedUrl
+      ? () => navigator.clipboard.writeText(publishedUrl).catch(() => {})
+      : undefined;
+    const handlePublishNow = () => onPublish();
+
+    return STATE_OPTIONS[publishState].map((opt) => {
+      if (opt.label === "View Live Site") {
+        return { ...opt, onClick: handleViewLive, disabled: !publishedUrl };
+      }
+      if (opt.label === "Copy Published URL") {
+        return { ...opt, onClick: handleCopyUrl, disabled: !publishedUrl };
+      }
+      if (opt.label === "Publish Now" || opt.label === "Publish Directly") {
+        return { ...opt, onClick: handlePublishNow };
+      }
+      return opt;
+    });
+  }, [publishState, publishedUrl, onPublish]);
 
   // Close on click outside
   React.useEffect(() => {

@@ -155,6 +155,7 @@ export interface TopbarProps {
 
   publishState?: PublishState;
   publishLoading?: boolean;
+  publishedUrl?: string | null;
   isPublished?: boolean;
   isOffline?: boolean;
 
@@ -226,6 +227,7 @@ export const Topbar: React.FC<TopbarProps> = ({
   pageName = "Home",
   publishState = "draft",
   publishLoading = false,
+  publishedUrl = null,
   isOffline = false,
   previewLoading = false,
   device = "desktop",
@@ -473,6 +475,7 @@ export const Topbar: React.FC<TopbarProps> = ({
               <PublishDropdown
                 publishState={publishState}
                 loading={publishLoading}
+                publishedUrl={publishedUrl}
                 onPublish={onPublish}
                 onSave={onSave}
               />

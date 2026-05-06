@@ -26,8 +26,10 @@ import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMi
 import type { CanvasRef } from "../canvas/Canvas";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { PageWizard } from "../wizard/PageWizard";
+import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
+import { usePublishJob } from "./hooks/usePublishJob";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
 import { useStudioModals } from "./hooks/useStudioModals";
 import { useStudioState } from "./hooks/useStudioState";
@@ -318,6 +320,60 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     };
   }, [composer]);
 
+  // Vercel publish flow — exports pages, sends to dashboard, polls status.
+  // Hidden behind VITE_FEATURE_PUBLISH; falls back to Export HTML otherwise.
+  const publishJob = usePublishJob();
+  const handleVercelPublish = React.useCallback(async () => {
+    const siteId = getSiteIdFromUrl();
+    if (!siteId) {
+      addToast({
+        title: "Cannot publish",
+        description: "Open this editor from a site URL with ?siteId=… to publish.",
+        tone: "error",
+      });
+      return;
+    }
+    try {
+      const exported = await handleExportForDeploy();
+      const pages = exported.files
+        .filter((f) => f.path.endsWith(".html"))
+        .map((f) => ({ path: f.path, html: f.content }));
+      if (pages.length === 0) {
+        addToast({
+          title: "Nothing to publish",
+          description: "Add at least one page before publishing.",
+          tone: "warning",
+        });
+        return;
+      }
+      await publishJob.publish(siteId, pages);
+    } catch (err) {
+      addToast({
+        title: "Publish failed",
+        description: err instanceof Error ? err.message : "Could not start publish.",
+        tone: "error",
+      });
+    }
+  }, [handleExportForDeploy, publishJob, addToast]);
+
+  // Surface publish completion / failure as toasts.
+  React.useEffect(() => {
+    if (publishJob.uiState === "published" && publishJob.publishedUrl) {
+      addToast({
+        title: "Site published",
+        description: publishJob.publishedUrl,
+        tone: "success",
+        duration: 6000,
+      });
+    } else if (publishJob.uiState === "failed" && publishJob.error) {
+      addToast({
+        title: "Publish failed",
+        description: publishJob.error,
+        tone: "error",
+      });
+    }
+  }, [publishJob.uiState, publishJob.publishedUrl, publishJob.error, addToast]);
+
   // Listen for component creation requests
   React.useEffect(() => {
     if (!composer) return;
@@ -456,6 +512,10 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
           onOpenIssues={() => state.openLeftPanelToTab("settings")}
           onSave={saveProject}
           onExportHTML={handleExportHTML}
+          onVercelPublish={handleVercelPublish}
+          publishState={publishJob.uiState === "published" ? "published" : "draft"}
+          publishLoading={publishJob.uiState === "publishing"}
+          publishedUrl={publishJob.publishedUrl}
           addToast={addToast}
         />
       </header>

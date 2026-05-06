@@ -90,6 +90,15 @@ export interface StudioHeaderProps {
   /** Export HTML as zip download */
   onExportHTML?: () => void;
 
+  /** Vercel publish flow — when present, replaces fallback handleExport on Publish click */
+  onVercelPublish?: () => void;
+  /** Publish workflow state — drives PublishDropdown visuals */
+  publishState?: "draft" | "in-review" | "approved" | "published";
+  /** True while a publish job is in flight */
+  publishLoading?: boolean;
+  /** Live URL after successful publish */
+  publishedUrl?: string | null;
+
   // Toast notifications
   addToast: (input: ToastInput) => string;
 }
@@ -137,6 +146,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   onOpenIssues,
   onSave,
   onExportHTML,
+  onVercelPublish,
+  publishState,
+  publishLoading,
+  publishedUrl,
   addToast,
 }) => {
   // Collaboration state
@@ -244,7 +257,10 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
       onShowAI={onShowAI}
       onShowCopilot={onShowCopilot}
       onPreview={handlePreview}
-      onPublish={onOpenPublish || handleExport}
+      onPublish={onVercelPublish ?? onOpenPublish ?? handleExport}
+      publishState={publishState}
+      publishLoading={publishLoading}
+      publishedUrl={publishedUrl}
       onExportHTML={onExportHTML}
       onSave={onSave}
       onToggleXRay={onToggleXRay}
