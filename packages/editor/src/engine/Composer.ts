@@ -48,7 +48,7 @@ import { StyleEngine } from "./styles/StyleEngine";
 import { SyncManager } from "./sync/SyncManager";
 import { TemplateManager } from "./templates/TemplateManager";
 import type { Patch } from "./utils/JsonPatch";
-import { VersionHistoryManager } from "./VersionHistoryManager";
+import { VersionTimelineManager } from "./VersionTimelineManager";
 import { Viewport } from "./Viewport";
 
 /**
@@ -88,7 +88,7 @@ export class Composer extends EventEmitter {
   readonly commands!: CommandCenter;
   readonly selection!: SelectionManager;
   readonly history!: HistoryManager;
-  readonly versionHistory!: VersionHistoryManager;
+  readonly versionHistory!: VersionTimelineManager;
   readonly storage!: StorageAdapter;
   readonly viewport!: Viewport;
   readonly plugins!: PluginManager;
@@ -129,7 +129,7 @@ export class Composer extends EventEmitter {
     this.commands = new CommandCenter(this);
     this.selection = new SelectionManager(this);
     this.history = new HistoryManager(this);
-    this.versionHistory = new VersionHistoryManager(this);
+    this.versionHistory = new VersionTimelineManager(this);
     this.storage = new StorageAdapter(this, this.config.storage);
     this.viewport = new Viewport(this);
     this.plugins = new PluginManager(this);

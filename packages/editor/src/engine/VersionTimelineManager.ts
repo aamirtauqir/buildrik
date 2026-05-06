@@ -2,7 +2,7 @@
  * Version History Manager
  * Manages named version snapshots for persistent version history
  *
- * @module engine/VersionHistoryManager
+ * @module engine/VersionTimelineManager
  * @license BSD-3-Clause
  */
 
@@ -49,7 +49,7 @@ function generateVersionId(): string {
 /**
  * Manages persistent named version snapshots
  */
-export class VersionHistoryManager {
+export class VersionTimelineManager {
   private composer: Composer;
   private config: VersionHistoryConfig;
   private versions: NamedVersion[] = [];
@@ -533,16 +533,16 @@ export class VersionHistoryManager {
    */
   public static classifyProperty(property: string): ChangeType {
     const normalizedProp = property.replace(/^(style|styles)\./, "");
-    if (VersionHistoryManager.STYLE_PROPERTIES.has(normalizedProp)) {
+    if (VersionTimelineManager.STYLE_PROPERTIES.has(normalizedProp)) {
       return "style";
     }
-    if (VersionHistoryManager.TEXT_PROPERTIES.has(normalizedProp)) {
+    if (VersionTimelineManager.TEXT_PROPERTIES.has(normalizedProp)) {
       return "text";
     }
-    if (VersionHistoryManager.LAYOUT_PROPERTIES.has(normalizedProp)) {
+    if (VersionTimelineManager.LAYOUT_PROPERTIES.has(normalizedProp)) {
       return "layout";
     }
-    if (VersionHistoryManager.CONTENT_PROPERTIES.has(normalizedProp)) {
+    if (VersionTimelineManager.CONTENT_PROPERTIES.has(normalizedProp)) {
       return "content";
     }
     if (normalizedProp.startsWith("font")) {
@@ -868,7 +868,7 @@ export class VersionHistoryManager {
       const afterVal = target[key];
 
       if (beforeVal !== afterVal) {
-        const type = VersionHistoryManager.classifyProperty(key);
+        const type = VersionTimelineManager.classifyProperty(key);
         changes.push({
           type: type === "other" ? defaultType : type,
           property: key,

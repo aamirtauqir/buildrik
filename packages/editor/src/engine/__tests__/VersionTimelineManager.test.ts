@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 
-describe("VersionHistoryManager compareVersions performance", () => {
+describe("VersionTimelineManager compareVersions performance", () => {
   it("flattens snapshots into Maps for O(n) comparison", async () => {
-    const manager = new (await import("../VersionHistoryManager")).VersionHistoryManager({} as any);
+    const manager = new (await import("../VersionTimelineManager")).VersionTimelineManager({} as any);
     const snapshot = {
       pages: [{
         id: "p1",

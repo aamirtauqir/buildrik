@@ -120,13 +120,13 @@ export const EVENTS = {
   VERSION_IMPORTED: "version:imported",
   VERSION_LIST_UPDATED: "version:list:updated",
   VERSION_LOAD_ERROR: "version:load:error",
-  /** Emitted by VersionRow on mouseenter after 300ms — consumed by VersionHistoryManager */
+  /** Emitted by VersionRow on mouseenter after 300ms — consumed by VersionTimelineManager */
   VERSION_PREVIEW: "version:preview",
-  /** Emitted by VersionRow on mouseleave — consumed by VersionHistoryManager */
+  /** Emitted by VersionRow on mouseleave — consumed by VersionTimelineManager */
   VERSION_PREVIEW_CLEAR: "version:preview-clear",
-  /** Emitted by VersionHistoryManager once preview snapshot is applied to canvas */
+  /** Emitted by VersionTimelineManager once preview snapshot is applied to canvas */
   VERSION_PREVIEW_STARTED: "version:preview:started",
-  /** Emitted by VersionHistoryManager once original state is restored after preview */
+  /** Emitted by VersionTimelineManager once original state is restored after preview */
   VERSION_PREVIEW_CLEARED: "version:preview:cleared",
 
   // ============================================

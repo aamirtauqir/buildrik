@@ -1,5 +1,5 @@
 /**
- * useVersionHistory - Wrapper hook for VersionHistoryManager
+ * useVersionHistory - Wrapper hook for VersionTimelineManager
  * Part of Phase 2: Custom hooks for History Tab redesign
  *
  * @license BSD-3-Clause

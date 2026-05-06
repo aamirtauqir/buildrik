@@ -3,7 +3,7 @@
  * @license BSD-3-Clause
  */
 
-import { VersionHistoryManager } from "../../../../engine/VersionHistoryManager";
+import { VersionTimelineManager } from "../../../../engine/VersionTimelineManager";
 import type { ChangeType, HistoryChange } from "../../../../engine/historyTypes";
 import { formatRelativeTime as sharedFormatRelativeTime } from "../../../../shared/utils/relativeTime";
 
@@ -30,7 +30,7 @@ export function collapseIdenticalChanges(
   const map = new Map<string, CollapsedChange>();
   for (const change of changes) {
     const op = (change.operation || "info") as CollapsedChange["operation"];
-    const type = VersionHistoryManager.classifyProperty(change.property);
+    const type = VersionTimelineManager.classifyProperty(change.property);
     const key = `${change.property}|${op}|${type}`;
     const existing = map.get(key);
     if (existing) {

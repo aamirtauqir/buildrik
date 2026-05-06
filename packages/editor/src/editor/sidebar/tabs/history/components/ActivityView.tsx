@@ -44,7 +44,7 @@ const OP_ICON: Record<string, string> = {
   info: "·",
 };
 
-// Canonical canvas id — see VersionHistoryManager.ts:904
+// Canonical canvas id — see VersionTimelineManager.ts:904
 const CANVAS_ID = "editor-canvas";
 const CROSSFADE_MS = 300;
 

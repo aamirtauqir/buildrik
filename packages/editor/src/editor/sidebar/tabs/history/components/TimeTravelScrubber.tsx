@@ -10,7 +10,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  *   caches, event listeners must be disposed per frame). Instead we render
  *   preview frames as an <img> fed from the nearest NamedVersion's
  *   `visualSnapshot` (JPEG data URL captured by
- *   VersionHistoryManager.captureVisualSnapshot). When no snapshot is
+ *   VersionTimelineManager.captureVisualSnapshot). When no snapshot is
  *   available for the scrubbed point, we fall back to a labelled placeholder.
  *   This trades per-patch fidelity for correctness, zero leaks, and
  *   sub-frame scrub cost — good enough for the "see the gap" UX §4.5 calls
