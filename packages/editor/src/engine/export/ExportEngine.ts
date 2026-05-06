@@ -30,6 +30,7 @@ import {
 import { FormspreeInjector } from "./FormspreeInjector";
 import { SEOInjector } from "./SEOInjector";
 import { SitemapGenerator } from "./SitemapGenerator";
+import { ReactExporter } from "./ReactExporter";
 import { generateStripeScripts } from "./StripeInjector";
 
 // ============================================================================
@@ -100,6 +101,11 @@ export class ExportEngine {
     const exportConfig = { ...this.config, ...config };
 
     try {
+      if (exportConfig.format === "react") {
+        const reactExporter = new ReactExporter(this.composer);
+        return reactExporter.export();
+      }
+
       const html = this.generateHTML(exportConfig);
       const css = this.generateCSS(exportConfig);
       const stats = this.calculateStats(html, css);

@@ -17,10 +17,10 @@ import { Stack } from "@/editor/shared/vibcoder";
 // ============================================================================
 
 /** Formats that are fully implemented and available in demo */
-const AVAILABLE_FORMATS: ExportFormat[] = ["html", "zip"];
+const AVAILABLE_FORMATS: ExportFormat[] = ["html", "zip", "react"];
 
 /** Formats that exist in the type but require future implementation */
-const COMING_SOON_FORMATS: ExportFormat[] = ["react", "vue", "nextjs"];
+const COMING_SOON_FORMATS: ExportFormat[] = ["vue", "nextjs"];
 
 const FORMAT_LABELS: Record<ExportFormat, string> = {
   html: "HTML",

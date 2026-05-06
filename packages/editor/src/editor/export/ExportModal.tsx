@@ -7,6 +7,7 @@
 import * as React from "react";
 import type { Composer } from "../../engine/Composer";
 import { ExportEngine } from "../../engine/export";
+import { ReactExporter } from "../../engine/export/ReactExporter";
 import type { ExportConfig, ExportResult, PreviewDevice } from "../../shared/types/export";
 import { DEFAULT_EXPORT_CONFIG, PREVIEW_DEVICES } from "../../shared/types/export";
 import {
@@ -140,6 +141,31 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
     }
   };
 
+  const handleDownloadReact = async () => {
+    if (!composer) return;
+    setZipLoading(true);
+    try {
+      const reactExporter = new ReactExporter(composer);
+      const zipBlob = await reactExporter.exportZip();
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${config.pageTitle || "export"}-react.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      devError("ExportModal", "React export failed", error);
+      setResult({
+        success: false,
+        error: error instanceof Error ? error.message : "Export failed",
+      });
+    } finally {
+      setZipLoading(false);
+    }
+  };
+
   const exportLabel =
     config.format === "zip"
       ? "Export as ZIP"
@@ -197,8 +223,14 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
                     onDeviceChange={setPreviewDevice}
                   />
                 )}
+                {activeTab === "preview" && config.format === "react" && result?.files && (
+                  <NoPreviewMessage format="React" />
+                )}
                 {activeTab === "code" && result?.html && (
                   <CodePreview html={result.html} css={result.css || ""} showLineNumbers />
+                )}
+                {activeTab === "code" && config.format === "react" && result?.files && (
+                  <ReactCodePreview files={result.files} />
                 )}
                 {activeTab === "options" && (
                   <OptionsPanel config={config} onChange={handleConfigChange} />
@@ -208,7 +240,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
           </div>
 
           {/* Stats row */}
-          {result?.stats && (
+          {result?.stats && config.format !== "react" && (
             <div
               style={{
                 fontSize: 12,
@@ -224,8 +256,18 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
 
           {/* Primary export button */}
           <Button
-            onClick={config.format === "zip" ? handleDownloadZip : handleDownloadHTML}
-            disabled={!result?.html || loading || zipLoading}
+            onClick={
+              config.format === "zip"
+                ? handleDownloadZip
+                : config.format === "react"
+                  ? handleDownloadReact
+                  : handleDownloadHTML
+            }
+            disabled={
+              (config.format === "react" ? !result?.files?.length : !result?.html) ||
+              loading ||
+              zipLoading
+            }
             style={{
               width: "100%",
               height: 44,
@@ -236,8 +278,18 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
               borderRadius: "var(--buildrick-radius-md)",
               fontSize: 14,
               fontWeight: 600,
-              cursor: !result?.html || loading || zipLoading ? "not-allowed" : "pointer",
-              opacity: !result?.html || loading || zipLoading ? 0.6 : 1,
+              cursor:
+                (config.format === "react" ? !result?.files?.length : !result?.html) ||
+                loading ||
+                zipLoading
+                  ? "not-allowed"
+                  : "pointer",
+              opacity:
+                (config.format === "react" ? !result?.files?.length : !result?.html) ||
+                loading ||
+                zipLoading
+                  ? 0.6
+                  : 1,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -269,14 +321,16 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, compo
               Cancel
             </Button>
             <div style={{ display: "flex", gap: 8 }}>
-              {config.cssStyle === "external" && (
+              {config.format !== "react" && config.cssStyle === "external" && (
                 <Button variant="secondary" onClick={handleDownloadCSS} disabled={!result?.css}>
                   Download CSS
                 </Button>
               )}
-              <Button variant="secondary" onClick={handleDownloadAll} disabled={!result?.html}>
-                Download All
-              </Button>
+              {config.format !== "react" && (
+                <Button variant="secondary" onClick={handleDownloadAll} disabled={!result?.html}>
+                  Download All
+                </Button>
+              )}
             </div>
           </div>
               </div>
@@ -350,5 +404,29 @@ const PreviewTab: React.FC<{
     <PreviewFrame html={html} device={previewDevice} />
   </div>
 );
+
+const NoPreviewMessage: React.FC<{ format: string }> = ({ format }) => (
+  <Stack
+    gap="lg"
+    style={{
+      alignItems: "center",
+      justifyContent: "center",
+      height: 300,
+      color: "var(--buildrick-text-muted)",
+    }}
+  >
+    <span style={{ fontSize: 32 }}>⚛</span>
+    <span>{format} components cannot be previewed directly.</span>
+    <span style={{ fontSize: 12 }}>Download and run locally to preview.</span>
+  </Stack>
+);
+
+const ReactCodePreview: React.FC<{ files: NonNullable<ExportResult["files"]> }> = ({ files }) => {
+  const componentFile = files.find((f) => f.name.endsWith(".tsx") && f.name !== "index.tsx");
+  const cssFile = files.find((f) => f.name.endsWith(".css"));
+  const html = componentFile?.content ?? "// No component found";
+  const css = cssFile?.content ?? "";
+  return <CodePreview html={html} css={css} showLineNumbers />;
+};
 
 export default ExportModal;

@@ -7,6 +7,7 @@
 import JSZip from "jszip";
 import type { ElementData, PageData } from "../../shared/types";
 import type { Composer } from "../Composer";
+import type { ExportResult, ExportedFile } from "../../shared/types/export";
 import { getTagForType, camelToKebab, escapeHTML } from "./ExportHelpers";
 
 // ============================================================================
@@ -18,8 +19,10 @@ interface ReactExportFile {
   content: string;
 }
 
-interface ReactExportResult {
-  files: ReactExportFile[];
+interface CSSClassEntry {
+  base: Record<string, string>;
+  tablet?: Record<string, string>;
+  mobile?: Record<string, string>;
 }
 
 // ============================================================================
@@ -64,10 +67,13 @@ export class ReactExporter {
    */
   async exportZip(): Promise<Blob> {
     const result = this.export();
+    if (!result.success || !result.files) {
+      throw new Error(result.error ?? "Export failed");
+    }
     const zip = new JSZip();
 
     for (const file of result.files) {
-      zip.file(file.path, file.content);
+      zip.file(file.name, file.content);
     }
 
     return zip.generateAsync({
@@ -80,42 +86,60 @@ export class ReactExporter {
   /**
    * Generate React component files from all pages
    */
-  export(): ReactExportResult {
-    const pages = this.composer.elements.getAllPages?.() ?? [];
-    const files: ReactExportFile[] = [];
-    const componentNames: string[] = [];
+  export(): ExportResult {
+    try {
+      const pages = this.composer.elements.getAllPages?.() ?? [];
+      if (pages.length === 0) {
+        return { success: false, error: "No pages to export" };
+      }
 
-    for (const page of pages) {
-      const name = this.pageToComponentName(page);
-      componentNames.push(name);
+      const files: ReactExportFile[] = [];
+      const componentNames: string[] = [];
 
-      const { jsx, cssClasses } = this.pageToJSX(page);
-      const cssContent = this.generateCSSModule(cssClasses);
+      for (const page of pages) {
+        const name = this.pageToComponentName(page);
+        componentNames.push(name);
+
+        const { jsx, cssClasses } = this.pageToJSX(page);
+        const cssContent = this.generateCSSModule(cssClasses);
+
+        files.push({
+          path: `components/${name}.tsx`,
+          content: this.wrapComponent(name, jsx, cssClasses.size > 0),
+        });
+
+        if (cssClasses.size > 0) {
+          files.push({
+            path: `components/${name}.module.css`,
+            content: cssContent,
+          });
+        }
+      }
 
       files.push({
-        path: `components/${name}.tsx`,
-        content: this.wrapComponent(name, jsx, cssClasses.size > 0),
+        path: "index.tsx",
+        content: this.generateIndex(componentNames),
       });
 
-      if (cssClasses.size > 0) {
-        files.push({
-          path: `components/${name}.module.css`,
-          content: cssContent,
-        });
-      }
+      files.push({
+        path: "package.json",
+        content: this.generatePackageJson(),
+      });
+
+      return {
+        success: true,
+        files: files.map((f) => ({
+          name: f.path,
+          content: f.content,
+          mimeType: this.inferMimeType(f.path),
+        })),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Export failed",
+      };
     }
-
-    files.push({
-      path: "index.tsx",
-      content: this.generateIndex(componentNames),
-    });
-
-    files.push({
-      path: "package.json",
-      content: this.generatePackageJson(),
-    });
-
-    return { files };
   }
 
   // ============================================================================
@@ -125,8 +149,8 @@ export class ReactExporter {
   /**
    * Convert a page's element tree to JSX string + collected CSS classes
    */
-  private pageToJSX(page: PageData): { jsx: string; cssClasses: Map<string, Record<string, string>> } {
-    const cssClasses = new Map<string, Record<string, string>>();
+  private pageToJSX(page: PageData): { jsx: string; cssClasses: Map<string, CSSClassEntry> } {
+    const cssClasses = new Map<string, CSSClassEntry>();
 
     if (!page.root) {
       return { jsx: "      <div />\n", cssClasses };
@@ -141,7 +165,7 @@ export class ReactExporter {
    */
   private elementToJSX(
     element: ElementData,
-    cssClasses: Map<string, Record<string, string>>,
+    cssClasses: Map<string, CSSClassEntry>,
     indent: number
   ): string {
     const tag = getTagForType(element.type);
@@ -150,12 +174,20 @@ export class ReactExporter {
     const content = element.content ?? "";
     const styles = element.styles ?? {};
     const attrs = element.attributes ?? {};
+    const breakpointStyles = element.breakpointStyles;
 
     // Extract styles to CSS module class
     let className: string | undefined;
-    if (Object.keys(styles).length > 0) {
+    if (Object.keys(styles).length > 0 || breakpointStyles?.tablet || breakpointStyles?.mobile) {
       className = this.generateClassName(element);
-      cssClasses.set(className, styles);
+      const entry: CSSClassEntry = { base: styles };
+      if (breakpointStyles?.tablet && Object.keys(breakpointStyles.tablet).length > 0) {
+        entry.tablet = breakpointStyles.tablet;
+      }
+      if (breakpointStyles?.mobile && Object.keys(breakpointStyles.mobile).length > 0) {
+        entry.mobile = breakpointStyles.mobile;
+      }
+      cssClasses.set(className, entry);
     }
 
     // Build JSX attributes
@@ -201,17 +233,45 @@ export class ReactExporter {
   /**
    * Generate CSS module content from collected class map
    */
-  private generateCSSModule(cssClasses: Map<string, Record<string, string>>): string {
+  private generateCSSModule(cssClasses: Map<string, CSSClassEntry>): string {
     const parts: string[] = [];
 
-    for (const [className, styles] of cssClasses) {
-      const props = Object.entries(styles)
-        .map(([key, value]) => `  ${camelToKebab(key)}: ${value};`)
-        .join("\n");
-      parts.push(`.${className} {\n${props}\n}`);
+    for (const [className, entry] of cssClasses) {
+      const baseProps = this.stylesToCSS(entry.base, 1);
+      parts.push(`.${className} {\n${baseProps}\n}`);
+
+      if (entry.tablet) {
+        const tabletProps = this.stylesToCSS(entry.tablet, 2);
+        parts.push(`@media (max-width: 1023px) {\n  .${className} {\n${tabletProps}\n  }\n}`);
+      }
+
+      if (entry.mobile) {
+        const mobileProps = this.stylesToCSS(entry.mobile, 2);
+        parts.push(`@media (max-width: 767px) {\n  .${className} {\n${mobileProps}\n  }\n}`);
+      }
     }
 
     return parts.join("\n\n") + "\n";
+  }
+
+  /**
+   * Convert styles object to indented CSS properties
+   */
+  private stylesToCSS(styles: Record<string, string>, indentLevel: number): string {
+    const indent = "  ".repeat(indentLevel);
+    return Object.entries(styles)
+      .map(([key, value]) => `${indent}${camelToKebab(key)}: ${value};`)
+      .join("\n");
+  }
+
+  /**
+   * Infer MIME type from file path
+   */
+  private inferMimeType(path: string): string {
+    if (path.endsWith(".tsx")) return "text/typescript";
+    if (path.endsWith(".css")) return "text/css";
+    if (path.endsWith(".json")) return "application/json";
+    return "text/plain";
   }
 
   // ============================================================================
