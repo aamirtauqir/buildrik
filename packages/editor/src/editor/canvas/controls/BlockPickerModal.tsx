@@ -1,7 +1,7 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/editor/shared/vibcoder/Button";
 /**
- * BlockPickerModal - Block picker modal for QuickActionsToolbar
+ * BlockPickerModal - Block picker modal for UnifiedSelectionToolbar
  * Opens a modal with ElementsTab to select block type for insertion
  *
  * @license BSD-3-Clause

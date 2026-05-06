@@ -239,22 +239,6 @@ input[type="color"]::-webkit-color-swatch {
   cursor: grabbing !important;
 }
 
-.buildrick-quick-actions {
-  position: absolute;
-  top: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 4px;
-  background: var(--buildrick-bg-panel);
-  border: 1px solid var(--buildrick-border);
-  border-radius: 8px;
-  padding: 4px;
-  box-shadow: var(--buildrick-shadow-md);
-  z-index: 1000;
-  animation: buildrick-fade-in 0.15s ease;
-}
-
 
 @media (max-width: 640px) {.pill {
     padding: 0 10px;

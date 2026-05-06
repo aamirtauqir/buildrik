@@ -15,9 +15,6 @@ export type { UndoRedoControlsProps } from "./UndoRedoControls";
 
 export { QuickAddBar } from "./QuickAddBar";
 
-export { QuickActionsToolbar } from "./QuickActionsToolbar";
-export type { QuickActionsToolbarProps } from "./QuickActionsToolbar";
-
 export { UnifiedSelectionToolbar } from "./UnifiedSelectionToolbar";
 export type { UnifiedSelectionToolbarProps } from "./UnifiedSelectionToolbar";
 
