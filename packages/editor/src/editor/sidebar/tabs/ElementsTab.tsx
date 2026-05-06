@@ -51,7 +51,7 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
       {/* Quick Access Pills */}
       <div>
         <Button
-          className={`buildrick-pill ${showRecentsOverlay ? "active" : ""}`}
+          className={`bd-pill ${showRecentsOverlay ? "active" : ""}`}
           onClick={() => {
             setShowRecentsOverlay(!showRecentsOverlay);
             setShowFavoritesOverlay(false);
@@ -63,7 +63,7 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
         </Button>
 
         <Button
-          className={`buildrick-pill ${showFavoritesOverlay ? "active" : ""}`}
+          className={`bd-pill ${showFavoritesOverlay ? "active" : ""}`}
           onClick={() => {
             setShowFavoritesOverlay(!showFavoritesOverlay);
             setShowRecentsOverlay(false);
@@ -75,7 +75,7 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
         </Button>
 
         {showTip && (
-          <Button className="buildrick-pill-tip" onClick={dismissTip}>
+          <Button className="bd-pill-tip" onClick={dismissTip}>
             <Lightbulb size={14} />
             Drag onto canvas
             <X size={12} />
@@ -152,7 +152,7 @@ export const ElementsTab: React.FC<ElementsTabProps> = ({
             return (
               <div key={cat}>
                 <Button
-                  className={`buildrick-accordion-header ${isOpen ? "open" : ""}`}
+                  className={`bd-accordion-header ${isOpen ? "open" : ""}`}
                   onClick={() => toggleCategory(cat)}
                   aria-expanded={isOpen}
                 >

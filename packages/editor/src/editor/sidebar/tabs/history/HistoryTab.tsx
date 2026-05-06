@@ -112,7 +112,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   }, []);
 
   return (
-    <PanelShell className="buildrick-history-container">
+    <PanelShell className="bd-history-container">
       <PanelShell.Header
         title="Version History"
         isPinned={isPinned}

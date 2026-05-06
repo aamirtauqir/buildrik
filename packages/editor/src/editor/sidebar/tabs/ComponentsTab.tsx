@@ -303,7 +303,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           {FILTER_CHIPS.map((chip) => (
             <Button
               key={chip.id}
-              className={`buildrick-chip ${state.activeFilter === chip.id ? "active" : ""}`}
+              className={`bd-chip ${state.activeFilter === chip.id ? "active" : ""}`}
               onClick={() => state.setActiveFilter(chip.id)}
             >
               {chip.label}
@@ -312,7 +312,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
         </div>
 
         <div aria-live="polite">
-          <span className="buildrick-sr-only">{state.filteredComponents.length} components found</span>
+          <span className="bd-sr-only">{state.filteredComponents.length} components found</span>
           {state.filteredComponents.length === 0 ? (
             <div>
               <span>No components match filters</span>
@@ -324,7 +324,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             Object.entries(state.groupedComponents).map(([category, items]) => (
               <div key={category}>
                 <Button
-                  className={`buildrick-accordion-header ${!state.collapsedGroups.has(category) ? "open" : ""}`}
+                  className={`bd-accordion-header ${!state.collapsedGroups.has(category) ? "open" : ""}`}
                   onClick={() => state.toggleGroup(category)}
                 >
                   <span>
@@ -333,7 +333,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
                   </span>
                   <ChevronDown
                     size={14}
-                    className={`buildrick-accordion-chevron ${!state.collapsedGroups.has(category) ? "open" : "closed"}`}
+                    className={`bd-accordion-chevron ${!state.collapsedGroups.has(category) ? "open" : "closed"}`}
                   />
                 </Button>
 

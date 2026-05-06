@@ -174,7 +174,7 @@ export function useElementsState({
     if (isCard) {
       const target = e.currentTarget as HTMLElement;
       const ghost = target.cloneNode(true) as HTMLElement;
-      ghost.classList.add("buildrick-drag-ghost");
+      ghost.classList.add("bd-drag-ghost");
       ghost.style.cssText = "position:absolute;top:-1000px;";
       ghost.style.width = `${target.offsetWidth}px`;
       document.body.appendChild(ghost);

@@ -136,7 +136,7 @@ a:focus-visible,
 /* ─── Screen-reader-only utility ─────────────────────────────────────────
  * Migrated from themes/components.css 2026-05-07.
  */
-.buildrick-sr-only {
+.bd-sr-only {
   position: absolute;
   width: 1px;
   height: 1px;

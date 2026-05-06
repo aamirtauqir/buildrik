@@ -47,7 +47,7 @@ export const ComponentRow: React.FC<ComponentRowProps> = ({
 }) => (
   <div
     className={[
-      "buildrick-component-row comp-row",
+      "bd-component-row comp-row",
       isSelected && "selected comp-row--selected",
     ].filter(Boolean).join(" ")}
     draggable

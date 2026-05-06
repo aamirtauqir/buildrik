@@ -17,7 +17,7 @@ export const PinIcon: React.FC<{ isPinned: boolean }> = ({ isPinned }) => (
     strokeWidth="1.5"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className={isPinned ? "buildrick-pin-icon--pinned" : "buildrick-pin-icon"}
+    className={isPinned ? "bd-pin-icon--pinned" : "bd-pin-icon"}
   >
     <path d="M3 6l3-3 4 4-1 3 4 4-1 1-4-4-3 1-4-4 2-2z" />
     <path d="M5 11l-2 2" />

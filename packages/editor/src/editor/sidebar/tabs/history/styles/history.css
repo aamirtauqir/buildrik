@@ -1,11 +1,11 @@
-.ls-panel-animate:has(> .buildrick-history-container) {
+.ls-panel-animate:has(> .bd-history-container) {
   display: flex;
   flex-direction: column;
   min-height: 0;
   height: 100%;
 }
 
-.buildrick-history-container {
+.bd-history-container {
   display: flex;
   flex-direction: column;
   flex: 1 1 0;
@@ -58,14 +58,14 @@
   margin-top: 1px;
 }
 
-.buildrick-history-container .search-bar {
+.bd-history-container .search-bar {
   position: relative;
   padding: var(--bd-space-2) var(--bd-space-3);
   border-bottom: 1px solid var(--bd-border);
   flex-shrink: 0;
 }
 
-.buildrick-history-container .search-input {
+.bd-history-container .search-input {
   width: 100%;
   background: var(--bd-bg-subtle);
   border: 1px solid var(--bd-border);
@@ -78,15 +78,15 @@
   transition: border-color 150ms ease-out;
 }
 
-.buildrick-history-container .search-input::placeholder {
+.bd-history-container .search-input::placeholder {
   color: var(--bd-fg-muted);
 }
 
-.buildrick-history-container .search-input:focus {
+.bd-history-container .search-input:focus {
   border-color: var(--bd-accent);
 }
 
-.buildrick-history-container .search-icon {
+.bd-history-container .search-icon {
   position: absolute;
   left: 22px;
   top: 50%;
@@ -97,7 +97,7 @@
   align-items: center;
 }
 
-.buildrick-history-container .search-clear {
+.bd-history-container .search-clear {
   position: absolute;
   right: 18px;
   top: 50%;
@@ -111,11 +111,11 @@
   border-radius: 3px;
 }
 
-.buildrick-history-container .search-clear.visible {
+.bd-history-container .search-clear.visible {
   display: flex;
 }
 
-.buildrick-history-container .search-clear:hover {
+.bd-history-container .search-clear:hover {
   color: var(--bd-fg-primary);
   background: var(--bd-bg-hover);
 }
@@ -1115,7 +1115,7 @@
   gap: var(--bd-space-1);
 }
 
-.buildrick-history-container kbd {
+.bd-history-container kbd {
   display: inline-block;
   padding: 2px 5px;
   font-family: var(--bd-mono);
@@ -1235,11 +1235,11 @@
   color: var(--bd-fg-primary);
 }
 
-.buildrick-history-container :focus-visible {
+.bd-history-container :focus-visible {
   outline: 2px solid var(--bd-accent);
   outline-offset: 2px;
 }
 
-.buildrick-history-container .hidden {
+.bd-history-container .hidden {
   display: none !important;
 }

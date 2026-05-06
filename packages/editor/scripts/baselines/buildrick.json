@@ -1,9 +1,9 @@
 {
-  "count": 169,
+  "count": 149,
   "mode": "WARN",
   "perPanel": {
     "animation": 0,
-    "canvas": 96,
+    "canvas": 97,
     "collaboration": 1,
     "design-system": 24,
     "export": 0,
@@ -13,6 +13,6 @@
     "panels": 5,
     "rail": 0,
     "shell": 5,
-    "sidebar": 31
+    "sidebar": 10
   }
 }

@@ -293,7 +293,7 @@ const VariantPicker: React.FC<VariantPickerProps> = ({ property, selectedValue, 
         {property.values.map((value) => (
           <Button
             key={value}
-            className={`buildrick-variant-pill ${selectedValue === value ? "active" : ""}`}
+            className={`bd-variant-pill ${selectedValue === value ? "active" : ""}`}
             onClick={() => onChange(value)}
           >
             {value}

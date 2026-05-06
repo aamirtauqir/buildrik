@@ -17,8 +17,8 @@ import { extStyle, fmtDur, fmtSize } from "../data/mediaUtils";
 function useFontFaceInjection(fntItems: LibraryItem[]) {
   useEffect(() => {
     const style = document.createElement("style");
-    style.id = "buildrick-media-font-faces";
-    const existing = document.getElementById("buildrick-media-font-faces");
+    style.id = "bd-media-font-faces";
+    const existing = document.getElementById("bd-media-font-faces");
     if (existing) existing.remove();
     const rules = fntItems
       .map(
