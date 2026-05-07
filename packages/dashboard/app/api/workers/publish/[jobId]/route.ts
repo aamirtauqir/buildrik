@@ -9,6 +9,7 @@ import {
   type VercelFile,
 } from "@lib/vercel";
 import type { PublishPage } from "@buildrik/shared/schemas/publish";
+import { record as recordActivity } from "@server/services/activity-log.service";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -102,6 +103,23 @@ export async function POST(
       }),
     ]);
 
+    const completedSite = await prisma.site.findUnique({
+      where: { id: job.siteId },
+      select: { workspaceId: true, lastPublishedBy: true },
+    });
+    if (completedSite) {
+      await recordActivity({
+        workspaceId: completedSite.workspaceId,
+        siteId: job.siteId,
+        actorId: completedSite.lastPublishedBy,
+        action: "site.published",
+        targetType: "publishJob",
+        targetId: jobId,
+        description: `Published to ${publicUrl}`,
+        metadata: { jobId, publicUrl, mode: useVercel ? "vercel" : "simulation", pages: pages.length },
+      });
+    }
+
     return new Response("OK", { status: 200 });
   } catch (err) {
     if (err instanceof CancelledError) {
@@ -116,6 +134,24 @@ export async function POST(
       where: { id: job.siteId },
       data: { status: "DRAFT", lastPublishError: message },
     });
+
+    const failedSite = await prisma.site.findUnique({
+      where: { id: job.siteId },
+      select: { workspaceId: true, lastPublishedBy: true },
+    });
+    if (failedSite) {
+      await recordActivity({
+        workspaceId: failedSite.workspaceId,
+        siteId: job.siteId,
+        actorId: failedSite.lastPublishedBy,
+        action: "site.publish_failed",
+        targetType: "publishJob",
+        targetId: jobId,
+        description: `Publish failed: ${message}`,
+        metadata: { jobId, error: message, mode: useVercel ? "vercel" : "simulation" },
+      });
+    }
+
     return new Response("Error", { status: 500 });
   }
 }

@@ -5,6 +5,7 @@ import { checkSiteRole, assertSiteAccess, PermissionError } from "@/server/servi
 import type { PlanName } from "@/lib/constants/plan-limits";
 import { getSiteOverview } from "@/server/services/site-detail.service";
 import { getSiteSettings, updateSiteSettings } from "@/server/services/site-settings.service";
+import { recordForSite } from "@/server/services/activity-log.service";
 import { listRedirects, createRedirect, updateRedirect, deleteRedirect, importRedirects, exportRedirects } from "@/server/services/redirect.service";
 import { listDomains, connectDomain, removeDomain, setPrimaryDomain } from "@/server/services/domain.service";
 import { listShareLinks, createShareLink, revokeShareLink } from "@/server/services/share-link.service";
@@ -48,7 +49,18 @@ export const siteDetailRouter = router({
         }
         const { id, ...data } = input;
         try {
-          return await updateSiteSettings(id, data);
+          const result = await updateSiteSettings(id, data);
+          const changedKeys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
+          await recordForSite({
+            siteId: id,
+            actorId: ctx.session.user!.id!,
+            action: "site.settings.updated",
+            targetType: "site",
+            targetId: id,
+            description: `Updated ${changedKeys.length} setting${changedKeys.length === 1 ? "" : "s"}`,
+            metadata: { changedKeys },
+          });
+          return result;
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "CUSTOM_CODE_NOT_AVAILABLE")
             throw new TRPCError({ code: "FORBIDDEN", message: "Custom code requires Pro or above" });
@@ -189,7 +201,17 @@ export const siteDetailRouter = router({
           throw e;
         }
         try {
-          return await connectDomain(input.siteId, input.domain);
+          const domain = await connectDomain(input.siteId, input.domain);
+          await recordForSite({
+            siteId: input.siteId,
+            actorId: ctx.session.user!.id!,
+            action: "site.domain.connected",
+            targetType: "domain",
+            targetId: domain.id,
+            description: `Connected ${input.domain}`,
+            metadata: { domain: input.domain },
+          });
+          return domain;
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "DOMAIN_IN_USE")
             throw new TRPCError({ code: "CONFLICT", message: "Domain already in use." });
@@ -202,7 +224,7 @@ export const siteDetailRouter = router({
       .mutation(async ({ ctx, input }) => {
         const domain = await ctx.prisma.domain.findUnique({
           where: { id: input.id },
-          select: { siteId: true },
+          select: { siteId: true, domain: true },
         });
         if (!domain) throw new TRPCError({ code: "NOT_FOUND" });
         try {
@@ -211,7 +233,17 @@ export const siteDetailRouter = router({
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
-        return removeDomain(input.id);
+        const result = await removeDomain(input.id);
+        await recordForSite({
+          siteId: domain.siteId,
+          actorId: ctx.session.user!.id!,
+          action: "site.domain.removed",
+          targetType: "domain",
+          targetId: input.id,
+          description: `Removed ${domain.domain}`,
+          metadata: { domain: domain.domain },
+        });
+        return result;
       }),
 
     setPrimary: protectedProcedure
@@ -251,7 +283,21 @@ export const siteDetailRouter = router({
         }
         const { siteId, ...data } = input;
         try {
-          return await createShareLink(siteId, data, ctx.session.user!.id!);
+          const link = await createShareLink(siteId, data, ctx.session.user!.id!);
+          await recordForSite({
+            siteId,
+            actorId: ctx.session.user!.id!,
+            action: "site.share_link.created",
+            targetType: "shareLink",
+            targetId: link.id,
+            description: `Share link "${data.name}" created`,
+            metadata: {
+              name: data.name,
+              hasPassword: Boolean(data.password),
+              expiresInDays: data.expiresInDays ?? null,
+            },
+          });
+          return link;
         } catch (e: unknown) {
           if (e instanceof Error && e.message === "NOT_WORKSPACE_MEMBER")
             throw new TRPCError({ code: "FORBIDDEN", message: "You are not an active member of this workspace" });
@@ -266,7 +312,7 @@ export const siteDetailRouter = router({
       .mutation(async ({ ctx, input }) => {
         const shareLink = await ctx.prisma.shareLink.findUnique({
           where: { id: input.id },
-          select: { siteId: true },
+          select: { siteId: true, name: true },
         });
         if (!shareLink) throw new TRPCError({ code: "NOT_FOUND" });
         try {
@@ -275,7 +321,17 @@ export const siteDetailRouter = router({
           if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
           throw e;
         }
-        return revokeShareLink(input.id);
+        const result = await revokeShareLink(input.id);
+        await recordForSite({
+          siteId: shareLink.siteId,
+          actorId: ctx.session.user!.id!,
+          action: "site.share_link.revoked",
+          targetType: "shareLink",
+          targetId: input.id,
+          description: `Share link "${shareLink.name}" revoked`,
+          metadata: { name: shareLink.name },
+        });
+        return result;
       }),
   }),
 

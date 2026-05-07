@@ -42,6 +42,7 @@ import {
   getProjectDataSchema,
 } from "@buildrik/shared/schemas/sites";
 import { prePublishCheckSchema, publishInputSchema } from "@buildrik/shared/schemas/publish";
+import { recordForSite } from "@/server/services/activity-log.service";
 
 async function getWorkspaceId(ctx: {
   prisma: { workspaceMember: { findFirst: Function } };
@@ -373,7 +374,16 @@ export const sitesRouter = router({
         if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
         throw e;
       }
-      return unpublishSite(input.siteId);
+      const result = await unpublishSite(input.siteId);
+      await recordForSite({
+        siteId: input.siteId,
+        actorId: ctx.session.user!.id!,
+        action: "site.unpublished",
+        targetType: "site",
+        targetId: input.siteId,
+        description: "Site unpublished",
+      });
+      return result;
     }),
 
   saveProjectData: protectedProcedure
