@@ -342,7 +342,6 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onUploadClick={handleUploadClick}
           onOpenStockModal={() => setStockModalOpen(true)}
           addToast={addToast}
-          composer={composer}
         />
         {/* ─── RIGHT: Details rail ─── */}
         {/* D5 Stage 2 (audit-remediation 2026-05-08): RIGHT panel +

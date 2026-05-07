@@ -158,7 +158,11 @@ function makeComposer(usages: Record<string, number> = {}) {
     mediaOps: {
       getUsages: (src: string) => ({ count: usages[src] ?? 0, usages: [] }),
       insertMedia: vi.fn(),
-      replaceAcross: vi.fn(() => 0),
+      // Real shape: `{ replaced: ElementId[]; failed: ElementId[] }`.
+      // The replace-all picker reads `result.replaced.length` and
+      // `result.failed.length` — returning a number here would crash the
+      // first test that exercises the picker click path.
+      replaceAcross: vi.fn(() => ({ replaced: [], failed: [] })),
     },
     media: {
       getAssets: () => [] as Array<{ key: string; tags?: string[] }>,

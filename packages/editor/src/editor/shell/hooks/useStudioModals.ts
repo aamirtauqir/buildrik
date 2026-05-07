@@ -182,27 +182,43 @@ export interface UseStudioModalsReturn {
 export function useStudioModals(): UseStudioModalsReturn {
   // Three domain sub-hooks own their state machinery; this composer
   // merges their flat returns into the public `UseStudioModalsReturn`.
-  const global = useGlobalModals();
-  const content = useContentModals();
-  const domain = useDomainModals();
+  const globalModals = useGlobalModals();
+  const contentModals = useContentModals();
+  const domainModals = useDomainModals();
+
+  // Destructure the reset fans-out so they don't leak into the public
+  // spread (the public `UseStudioModalsReturn` does NOT declare
+  // resetContentModals / resetDomainModals — they're internal hooks).
+  const { resetContentModals, ...contentPublic } = contentModals;
+  const { resetDomainModals, ...domainPublic } = domainModals;
 
   // Loading states are studio-wide, not modal-specific. Stay here.
   const [previewLoading, setPreviewLoading] = React.useState(false);
   const [exportLoading, setExportLoading] = React.useState(false);
 
-  // Cross-cutting: fan out closeAll to every sub-hook.
+  // Cross-cutting: fan out closeAll to every sub-hook. Deps reference the
+  // individual stable callbacks (each is `useCallback([], ...)` in its
+  // sub-hook) rather than the unstable parent objects, so closeAll itself
+  // stays referentially stable across parent renders.
+  const { closeShortcuts, closeProjectSettings, closeCommandPalette } = globalModals;
   const closeAll = React.useCallback(() => {
-    global.closeShortcuts();
-    global.closeProjectSettings();
-    global.closeCommandPalette();
-    content.resetContentModals();
-    domain.resetDomainModals();
-  }, [global, content, domain]);
+    closeShortcuts();
+    closeProjectSettings();
+    closeCommandPalette();
+    resetContentModals();
+    resetDomainModals();
+  }, [
+    closeShortcuts,
+    closeProjectSettings,
+    closeCommandPalette,
+    resetContentModals,
+    resetDomainModals,
+  ]);
 
   return {
-    ...content,
-    ...domain,
-    ...global,
+    ...contentPublic,
+    ...domainPublic,
+    ...globalModals,
     previewLoading,
     setPreviewLoading,
     exportLoading,

@@ -51,7 +51,6 @@ import {
   Upload,
 } from "lucide-react";
 import * as React from "react";
-import type { Composer } from "../../../engine/Composer";
 import type {
   LibraryItem,
   MediaSortBy,
@@ -107,9 +106,6 @@ export interface AssetGridProps {
   onOpenStockModal(): void;
   /** Bulk-move toast trigger. */
   addToast(t: ToastInput): void;
-  /** Composer is unused inside the panel today; reserved for future
-   *  drag-drop / context-menu hooks that need engine access. */
-  composer: Composer;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────
