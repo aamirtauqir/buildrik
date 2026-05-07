@@ -200,20 +200,21 @@ export default [
       "buildrik/no-engine-public-export": "error",
     },
   },
-  // Layer-boundary rules (Audit Remediation 2026-05-07, plan-eng-review-corrected).
+  // Layer-boundary rules (Audit Remediation 2026-05-07, PR2 ERROR-flip 2026-05-08).
   // Enforces import direction per packages/editor/CLAUDE.md "Import Direction Rules":
   //   engine/   → shared/ ONLY
   //   shared/   → leaf (no editor/), EXCEPT shared/extensions/ → editor/shared/vibcoder/
   //   services/ → shared/ ONLY
   // Uses @typescript-eslint/no-restricted-imports with allowTypeImports: true so
-  // type-only imports (e.g. HandlePosition from engine/canvas/ResizeHandler) stay
-  // legal where they're already idiomatic. WARN until drain PRs land — flip to
-  // ERROR after engine/media boundary fix + shared/ui+forms drain (matches
-  // vibcoder-finish gate-then-drain-then-flip playbook).
+  // type-only imports stay legal where idiomatic. ERROR mode flipped 2026-05-08
+  // after PR1 closed the only engine→editor value import (StockService) and
+  // shared/forms + 2 shared/ui keep-as-extension files were exempted (composing
+  // vibcoder is the documented intent of shared/extensions; physical relocation
+  // deferred to a separate "extensions consolidation" arc).
   {
     files: ["src/engine/**/*.{ts,tsx}"],
     rules: {
-      "@typescript-eslint/no-restricted-imports": ["warn", {
+      "@typescript-eslint/no-restricted-imports": ["error", {
         patterns: [{
           group: ["**/editor/**", "@/editor/**", "@editor/**"],
           message: "engine/ may not import from editor/ (engine is pure logic). Type-only imports allowed via `import type`.",
@@ -224,9 +225,22 @@ export default [
   },
   {
     files: ["src/shared/**/*.{ts,tsx}"],
-    ignores: ["src/shared/extensions/**"],
+    ignores: [
+      "src/shared/extensions/**",
+      // shared/forms/* are vibcoder-primitive compositions by design
+      // (Phase 4 keep-as-extension tier). Same intent as shared/extensions/;
+      // physically still in forms/ pending a future relocation arc.
+      "src/shared/forms/**",
+      // Phase 4 T7 keep-as-extension files: ErrorState composes vibcoder
+      // EmptyState/Button + class-component ErrorBoundary; HelpTooltip
+      // composes the Tooltip extension. Headers self-document the
+      // intent. Move to shared/extensions/ when their consumer counts
+      // shrink enough for a low-touch codemod (currently broad reach).
+      "src/shared/ui/ErrorState.tsx",
+      "src/shared/ui/HelpTooltip.tsx",
+    ],
     rules: {
-      "@typescript-eslint/no-restricted-imports": ["warn", {
+      "@typescript-eslint/no-restricted-imports": ["error", {
         patterns: [{
           group: ["**/editor/**", "@/editor/**", "@editor/**"],
           message: "shared/ is leaf — may not import from editor/. Use shared/extensions/ for vibcoder compositions.",
@@ -238,7 +252,7 @@ export default [
   {
     files: ["src/services/**/*.{ts,tsx}"],
     rules: {
-      "@typescript-eslint/no-restricted-imports": ["warn", {
+      "@typescript-eslint/no-restricted-imports": ["error", {
         patterns: [{
           group: ["**/editor/**", "@/editor/**", "@editor/**"],
           message: "services/ may not import from editor/ (services consume shared/ only). Type-only imports allowed via `import type`.",
