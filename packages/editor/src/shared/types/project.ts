@@ -252,19 +252,31 @@ export interface DesignTokenRecord {
 
 /**
  * Site-wide SEO defaults
+ *
+ * P0.2b SSOT: fields below marked [Site column] persist to dashboard
+ * Site table via siteDetail.settings.update tRPC. Other fields stay
+ * in projectSettings JSON.
  */
 export interface SiteSEO {
   /** Site name - used in og:site_name */
   siteName?: string;
-  /** Default Open Graph image for pages without one */
+  /** [Site column] Default meta title (overrides per-page if set) */
+  metaTitle?: string;
+  /** [Site column] Default meta description */
+  metaDescription?: string;
+  /** [Site column] Title template, e.g. "{page} — Site Name" */
+  metaTitleTemplate?: string;
+  /** [Site column] Default Open Graph image (also `ogImage` server-side) */
   defaultOgImage?: string;
   /** Twitter handle (e.g., "@aquibra") - used in twitter:site */
   twitterHandle?: string;
   /** Favicon URL */
   favicon?: string;
+  /** [Site column] Apple touch icon URL */
+  touchIcon?: string;
   /** Default language (e.g., "en") */
   language?: string;
-  /** Social media profile links */
+  /** [Site column] Social media profile links (server: socialLinks JSON) */
   socialLinks?: {
     twitter?: string;
     facebook?: string;
@@ -278,6 +290,8 @@ export interface SiteSEO {
 export interface PublishingConfig {
   /** Active provider */
   provider?: "vercel" | "netlify" | "github";
+  /** [Site column] Published-site password gate (Argon2-hashed server-side) */
+  publishedPassword?: string | null;
   /** Last deployment info */
   lastDeployment?: {
     id: string;

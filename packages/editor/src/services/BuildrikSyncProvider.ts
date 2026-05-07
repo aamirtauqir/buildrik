@@ -9,7 +9,7 @@
  */
 
 import { createBuildrikApiClient } from "@buildrik/shared";
-import type { PageMeta, PageSettings, ProjectData, SlugChange } from "@/shared/types/project";
+import type { PageMeta, PageSettings, ProjectData, SiteSEO, SlugChange } from "@/shared/types/project";
 import type { ElementData } from "@/shared/types/element";
 
 /**
@@ -49,18 +49,106 @@ const DEFAULT_ROOT: ElementData = {
   children: [],
 };
 
+/**
+ * P0.2b SSOT: shape of Site columns that mirror editor projectSettings fields.
+ * `siteDetail.settings.get` returns these alongside name/slug/etc.
+ */
+interface SiteColumnSettings {
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  metaTitleTemplate?: string | null;
+  ogImage?: string | null;
+  headCode?: string | null;
+  bodyCode?: string | null;
+  socialLinks?: Record<string, string> | null;
+  publishedPassword?: string | null;
+  touchIcon?: string | null;
+}
+
+/**
+ * Extract Site-column fields from editor projectSettings. Returns only fields
+ * that are present (non-undefined) so the tRPC payload doesn't accidentally
+ * null out untouched server values via partial update semantics.
+ *
+ * Editor → server name mapping:
+ *   settings.seo.metaTitle          → metaTitle
+ *   settings.seo.metaDescription    → metaDescription
+ *   settings.seo.metaTitleTemplate  → metaTitleTemplate
+ *   settings.seo.defaultOgImage     → ogImage
+ *   settings.seo.touchIcon          → touchIcon
+ *   settings.seo.socialLinks        → socialLinks
+ *   settings.customCode.headScripts → headCode
+ *   settings.customCode.bodyScripts → bodyCode
+ *   settings.publishing.publishedPassword → publishedPassword
+ */
+function extractSiteColumnPatch(projectData: ProjectData): SiteColumnSettings {
+  const settings = projectData.settings;
+  if (!settings) return {};
+  const seo = settings.seo;
+  const customCode = settings.customCode;
+  const publishing = settings.publishing;
+  const patch: SiteColumnSettings = {};
+  if (seo?.metaTitle !== undefined) patch.metaTitle = seo.metaTitle;
+  if (seo?.metaDescription !== undefined) patch.metaDescription = seo.metaDescription;
+  if (seo?.metaTitleTemplate !== undefined) patch.metaTitleTemplate = seo.metaTitleTemplate;
+  if (seo?.defaultOgImage !== undefined) patch.ogImage = seo.defaultOgImage;
+  if (seo?.touchIcon !== undefined) patch.touchIcon = seo.touchIcon;
+  if (seo?.socialLinks !== undefined) patch.socialLinks = seo.socialLinks as Record<string, string>;
+  if (customCode?.headScripts !== undefined) patch.headCode = customCode.headScripts;
+  if (customCode?.bodyScripts !== undefined) patch.bodyCode = customCode.bodyScripts;
+  if (publishing?.publishedPassword !== undefined) patch.publishedPassword = publishing.publishedPassword;
+  return patch;
+}
+
+/**
+ * Inverse of extractSiteColumnPatch: merge Site columns into editor's
+ * projectSettings shape on load. Server is canonical for these fields,
+ * so any value present on the Site row wins over projectSettings JSON.
+ */
+function mergeSiteColumnsIntoSettings(
+  baseSettings: ProjectData["settings"],
+  siteCols: SiteColumnSettings
+): ProjectData["settings"] {
+  const settings = { ...(baseSettings ?? {}) };
+  const seo = { ...(settings.seo ?? {}) };
+  const customCode = { ...(settings.customCode ?? { headScripts: "", bodyScripts: "", globalCss: "" }) };
+  const publishing = { ...(settings.publishing ?? {}) };
+
+  if (siteCols.metaTitle != null) seo.metaTitle = siteCols.metaTitle;
+  if (siteCols.metaDescription != null) seo.metaDescription = siteCols.metaDescription;
+  if (siteCols.metaTitleTemplate != null) seo.metaTitleTemplate = siteCols.metaTitleTemplate;
+  if (siteCols.ogImage != null) seo.defaultOgImage = siteCols.ogImage;
+  if (siteCols.touchIcon != null) seo.touchIcon = siteCols.touchIcon;
+  if (siteCols.socialLinks != null) seo.socialLinks = siteCols.socialLinks as SiteSEO["socialLinks"];
+  if (siteCols.headCode != null) customCode.headScripts = siteCols.headCode;
+  if (siteCols.bodyCode != null) customCode.bodyScripts = siteCols.bodyCode;
+  if (siteCols.publishedPassword !== undefined) publishing.publishedPassword = siteCols.publishedPassword;
+
+  settings.seo = seo;
+  settings.customCode = customCode;
+  settings.publishing = publishing;
+  return settings;
+}
+
 export async function loadProject(siteId: string): Promise<ProjectData> {
   try {
     const client = getClient();
-    const site = await client.sites.get.query({ id: siteId });
-    const pages = await client.pages.list.query({ siteId });
+    // P0.2b: pull Site columns alongside core site + pages so editor's view
+    // of metaTitle/etc reflects what the dashboard saved.
+    const [site, pages, settingsResult] = await Promise.all([
+      client.sites.get.query({ id: siteId }),
+      client.pages.list.query({ siteId }),
+      client.siteDetail.settings.get.query({ siteId }).catch(() => null),
+    ]);
 
-    // Sort by position once, then map — Phase 1 round-trips the new fields
-    // (updatedAt, slugManuallySet, slugHistory, settings) so folder/slug-redirect/
-    // custom-head/etc. data survives the dashboard save boundary.
     const sortedPages: DashboardPageRow[] = (pages as DashboardPageRow[])
       .slice()
       .sort((a, b) => a.position - b.position);
+
+    const baseSettings = undefined; // load-from-server: projectSettings JSON not exported by sites.get yet
+    const mergedSettings = settingsResult
+      ? mergeSiteColumnsIntoSettings(baseSettings, settingsResult as SiteColumnSettings)
+      : baseSettings;
 
     return {
       version: "1.0",
@@ -72,8 +160,6 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
         isHome: p.isHomePage,
         root: p.blocks ?? DEFAULT_ROOT,
         settings: p.settings,
-        // Phase -1: meta carries applied-template state + forward-compat keys.
-        // Server returns null for un-set; coerce to undefined so editor uses spread-undefined semantics.
         meta: p.meta ?? undefined,
         updatedAt: p.updatedAt,
         slugManuallySet: p.slugManuallySet ?? false,
@@ -81,10 +167,9 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
       })),
       styles: [],
       assets: [],
+      settings: mergedSettings,
       metadata: {
         name: site.name,
-        // Domain lives on the dashboard site record; read-through for copy-link
-        // and SEO preview. Falls back to undefined if not configured.
         domain: (site as { domain?: string }).domain,
       },
     };
@@ -94,11 +179,32 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
   }
 }
 
+/**
+ * P0.2b dual-save: routes Site-column fields to siteDetail.settings.update
+ * (canonical for those fields server-side) and the rest of projectData to
+ * sites.saveProject (page tree, element data, non-mirrored config).
+ *
+ * Both calls run in parallel. If only one half changes, the other is skipped.
+ */
 export async function saveProject(
   siteId: string,
   projectData: ProjectData
 ): Promise<{ success: boolean; savedAt: Date }> {
-  return getClient().sites.saveProject.mutate({ siteId, projectData });
+  const client = getClient();
+  const siteColumnPatch = extractSiteColumnPatch(projectData);
+  const hasSiteColumnChanges = Object.keys(siteColumnPatch).length > 0;
+
+  const calls: Array<Promise<unknown>> = [
+    client.sites.saveProject.mutate({ siteId, projectData }),
+  ];
+  if (hasSiteColumnChanges) {
+    calls.push(
+      client.siteDetail.settings.update.mutate({ id: siteId, ...siteColumnPatch })
+    );
+  }
+
+  const [primaryResult] = await Promise.all(calls);
+  return primaryResult as { success: boolean; savedAt: Date };
 }
 
 /**
