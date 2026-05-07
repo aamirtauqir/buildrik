@@ -3,6 +3,12 @@
  * @license BSD-3-Clause
  */
 
+/**
+ * Legacy 9-category union used for the existing UI chip filter and the shipped
+ * color/spacing/type hooks. Kept for backward compat; new code should prefer
+ * `TokenKind` (spec §5.3, defined below) which is the canonical 14-kind axis.
+ * Phase A.4 polish will reconcile or remove this once all consumers migrate.
+ */
 export type TokenCategory =
   | "colors"
   | "typography"
@@ -94,9 +100,13 @@ export interface DesignToken {
 
   // Phase A.0 additions — optional so existing tokens remain valid.
   kind?: TokenKind;              // spec §5.3 — discriminator for new tokens
-  friendlyName?: string;         // spec §5.3 — beginner-mode label, falls back to `name`
+  friendlyName?: string;         // spec §5.3 — beginner-mode label.
+                                 // RESOLUTION RULE: render sites should use `friendlyName ?? name`.
   aliasOf?: string;              // Phase A.2 — populated then; declared here so type compiles
-  typedValue?: TokenValue;       // structured value for new kinds; legacy `value` stays for old
+  typedValue?: TokenValue;       // Structured value for the 11 NEW kinds (radius/shadow/motion/
+                                 // border/opacity/zindex/breakpoint/grid/sizing/icon/imagery).
+                                 // The 3 LEGACY kinds (color/type/spacing) keep using `value: string`
+                                 // until Phase A.4 polish converges everything onto `typedValue`.
 }
 
 export type ThemeMode = "light" | "dark" | "system";
