@@ -21,10 +21,10 @@
 | 7. Legacy residual triage | 11 | **11** (annotation pass — 0 deletions expected) | Minor |
 | 8. CLAUDE.md doc-vs-reality drift | 0 (scanner) | **3** (manual review surfaced drift the scanner doesn't detect) | Minor / Important |
 
-- **Total real fixable:** 87 (1 + 2 + 54 + 3 + 1 + 12 + 11 + 3 — note §5 Badge is the same item as §1 and is counted in both rows; deduped count = 86). **Scanner-reported total: 97 (87 fixable + 10 confirmed false positives) · Real fixable: 87 · False positives confirmed: 10** (1 Skeleton basename match in §1 + 9 child-selector substring matches in §4). Excludes the 3197 deferred dead-export tail discussed in §6.
-- **Severity breakdown (of the 87 fixable):** Critical 0 · Important 63 · Minor 24
-  - Important 63 = 1 (Badge §1) + 2 (keyframes §2) + 54 (token aliases §3) + 2 (real selector dupes §4: `.bd-depth-badge`, `.bd-skip-link`) + 1 (Badge §5, same as §1) + 3 (CLAUDE.md drift §8)
-  - Minor 24 = 1 (`.bd-topbar` allowed override §4) + 12 (pass-through wrappers §6) + 11 (legacy residual annotations §7)
+- **Total real fixable:** 86 (1 + 2 + 54 + 3 + 12 + 11 + 3 — §5 Badge is the same item as §1 and is counted **once** in this total). **Scanner-reported total: 96 (86 fixable + 10 confirmed false positives) · Real fixable: 86 · False positives confirmed: 10** (1 Skeleton basename match in §1 + 9 child-selector substring matches in §4). Excludes the 3197 deferred dead-export tail discussed in §6. *Note: §5 Badge row references the same Badge item as §1; counted once in this total.*
+- **Severity breakdown (of the 86 fixable):** Critical 0 · Important 62 · Minor 24
+  - Important 62 = 1 (Badge §1+§5 deduped) + 2 (keyframes §2: `fadeIn` rename, `spin` drain) + 54 (token aliases §3) + 2 (real selector dupes §4: `.bd-depth-badge`, `.bd-skip-link`) + 3 (CLAUDE.md drift §8). Note: §7 also tags 3 bare-name keyframe rows Important (`pulse`, `spin`, `buildrick-flash`) — these are out-of-scope for §7's Phase 6 annotation pass and are absorbed into Phase 3's keyframe-drain fix-PR (whose scope is captured by §2's count of 2; the Cross-cutting summary surfaces the §7-only items `pulse` and `buildrick-flash` as a separate row for visibility, not double-counted here).
+  - Minor 24 = 1 (`.bd-topbar` allowed override §4) + 12 (pass-through wrappers §6) + 11 (legacy residual annotations §7, non-keyframe)
 - **Categories with violations after triage:** 8 of 8
 - **Estimated fix PRs (Phase 2-6 per spec):** **5** (token aliases · keyframes · Badge · home + anti-pattern · legacy + doc-drift). Matches spec §3 plan.
 
@@ -53,8 +53,8 @@ Confirms scanner.
 
 | Keyframe name | Defined in (paths) | Identical? | Severity | Suggested fix |
 |---|---|---|---|---|
-| `fadeIn` | `packages/editor/src/editor/sidebar/tabs/history/styles/history.css:893`<br>`packages/editor/src/themes/ux-fixes.css:240` | **Need to read both** to confirm. Common animation name; bodies likely diverge (different durations/opacity curves per surface). | **Important** | Rename both to namespaced versions. `history.css` → `bd-history-fade-in`; `ux-fixes.css` → drop the keyframe entirely if not consumed (likely dead from prior arc) OR rename to `bd-uxfix-fade-in`. Update consumers in lockstep. Bare-name `fadeIn` collides at runtime — last @import wins, surfaces a flicker bug. |
-| `spin` | `packages/editor/src/themes/legacy-components.css:39`<br>`packages/editor/src/themes/ux-fixes.css:273` | **No.** `legacy-components.css` body: `from { transform: rotate(0deg); } to { transform: rotate(360deg); }`. `ux-fixes.css` body presumed different. Both are bare-name re-implementations of `bd-spin` (canonical at `themes/components/atoms/spinner.css:17`) and `bd-btn-spin` (`button.css:114`). | **Important** | Drain both. Find consumers via `grep -rn 'animation:.*\\bspin\\b' src/`; migrate to `bd-spin` (canonical). Delete the legacy `@keyframes spin` from `legacy-components.css:39` and `ux-fixes.css:273`. This also closes Phase 6 of the prior arc whose doc-drift entry (CLAUDE.md line 325) incorrectly claims `@keyframes buildrick-spin`/`buildrick-pulse` were drained — see §8. |
+| `fadeIn` | `packages/editor/src/editor/sidebar/tabs/history/styles/history.css:893`<br>`packages/editor/src/themes/ux-fixes.css:240` | **Identical: no — bodies diverge.** `history.css:893-900` is opacity-only (`from { opacity: 0 } to { opacity: 1 }`). `ux-fixes.css:240-249` adds a transform slide (`from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: translateY(0) }`). Different visual effect; bare-name collision = whichever @import comes last clobbers the other. | **Important** | Rename both to namespaced versions. `history.css` → `bd-history-fade-in`; `ux-fixes.css` → `bd-uxfix-fade-in` (or drop entirely if unused — the `ux-fixes.css` variant is consumed by sibling rules in the same file, so likely keep + rename). Update consumers in lockstep. |
+| `spin` | `packages/editor/src/themes/legacy-components.css:39`<br>`packages/editor/src/themes/ux-fixes.css:273` | **Identical: no — keyframe shape differs (functionally equivalent rotation).** `legacy-components.css:39` body: `from { transform: rotate(0deg) } to { transform: rotate(360deg) }` (2 stops). `ux-fixes.css:273` body: `to { transform: rotate(360deg) }` (single `to` stop, implicit `0deg` start). End-state animation is the same 360° rotation; bodies are textually different. Both are bare-name re-implementations of `bd-spin` (canonical at `themes/components/atoms/spinner.css:17`) and `bd-btn-spin` (`button.css:114`). | **Important** | Drain both. Find consumers via `grep -rn 'animation:.*\\bspin\\b' src/`; migrate to `bd-spin` (canonical). Delete the legacy `@keyframes spin` from `legacy-components.css:39` and `ux-fixes.css:273`. This also closes Phase 6 of the prior arc whose doc-drift entry (CLAUDE.md line 325) incorrectly claims `@keyframes buildrick-spin`/`buildrick-pulse` were drained — see §8. |
 
 **Cross-check:**
 ```
@@ -80,7 +80,7 @@ Scanner correct. Note bare `pulse` at `legacy-components.css:38` is unique (no s
 **Fix-PR shape (Phase 2 — single PR):** consolidate to ONE alias file. The 54 overlapping tokens have identical right-hand-sides (both map to the same `var(--buildrick-*)`); no value conflicts to resolve. Action:
 - Pick `src/themes/design-system/bd-aliases.css` as canonical (larger, top-level domain, chrome-side authoritative per the prior comment intent).
 - Delete the 54 overlapping definitions from `src/themes/components/_aliases.css`.
-- Verify any aliases unique to `_aliases.css` (`125 LOC - 54 dupes ≈ 71 unique candidates`) are still required by vibcoder atoms — if so, KEEP them in `_aliases.css` (vibcoder consumer surface) and document the kept set.
+- Verify any aliases unique to `_aliases.css` are still required by vibcoder atoms — if so, KEEP them in `_aliases.css` (vibcoder consumer surface) and document the kept set. **Actual unique-token counts (re-run 2026-05-08 against `src/themes/components/_aliases.css` and `src/themes/design-system/bd-aliases.css`):** 62 tokens defined only in `_aliases.css`, 61 tokens defined only in `bd-aliases.css`, 54 tokens overlapping (the SSOT-violating set). Total alias defs: 116 in `_aliases.css`, 115 in `bd-aliases.css`. The original spec command in this section pointed at `src/themes/_aliases.css`, which does not exist — corrected paths above.
 - Update `themes/components/_layer.css` cascade contract comment + Gate 15 description in CLAUDE.md to reflect single-file canonical.
 
 **Severity:** all 54 are **Important** (duplicate definitions, ambiguous source of truth). Listing all 54 inline would inflate this doc — they all collapse to the same fix action, so a category-level row + sample suffices:
@@ -164,7 +164,13 @@ Spot evidence: `/tmp/ssot-scan.txt:148-200` shows a dense block of `Dead export 
 
 ## 7. Legacy residual triage
 
-11 rules in `packages/editor/src/themes/legacy-components.css` (72 LOC total). Each requires a `/* keep: <reason> */` annotation per spec §3 Phase 6. None are obvious-deletes; all have living consumers verified during the prior vibcoder-finish arc (`project_vibcoder_finish_arc_20260507.md`). Phase 6 is mostly a documentation pass.
+14 rules in `packages/editor/src/themes/legacy-components.css` (72 LOC). 11
+non-keyframe rules need `/* keep: <reason> */` annotation per spec §3 Phase 6.
+3 keyframes (`pulse`, `spin`, `buildrick-flash`) are listed below for
+completeness but their fix-PR target is Phase 3 (keyframe-drain), not Phase 6.
+None of the non-keyframe rules are obvious-deletes; all have living consumers
+verified during the prior vibcoder-finish arc (`project_vibcoder_finish_arc_20260507.md`).
+Phase 6 is a documentation pass.
 
 | Rule (file:line) | Reason kept | Move to tier? | Delete? | Severity |
 |---|---|---|---|---|
@@ -183,7 +189,7 @@ Spot evidence: `/tmp/ssot-scan.txt:148-200` shows a dense block of `Dead export 
 | `[data-buildrick-id]:hover:not([data-selected="true"])` (`:61`) | Canonical engine attribute selector — hover ring. | No | No | Minor — annotate same |
 | `input:disabled, select:disabled, textarea:disabled` (`:66`) | Generic disabled-state styling. Cross-cutting. | No | No | Minor — annotate `/* keep: native disabled state — element selectors required */` |
 
-**Phase 6 fix-PR scope:** apply 11 inline annotations + 0 deletes (the 3 keyframes are Phase 3's job). Net LOC change ≈ +11 comment lines, 0 rules removed. Maps to spec §7 Risk 5 ("legacy-components.css triage produces no movements — acceptable, doc-everything pass is the value").
+**Phase 6 fix-PR scope: 11 inline annotations, 0 deletes** (the 3 keyframes are Phase 3's job). Net LOC change ≈ +11 comment lines, 0 rules removed. Maps to spec §7 Risk 5 ("legacy-components.css triage produces no movements — acceptable, doc-everything pass is the value").
 
 ---
 
@@ -204,20 +210,22 @@ Notes:
 
 ## Cross-cutting summary
 
-| Concern | Real count | Worst severity | Fix arc PR (per spec §3) |
-|---|---:|---|---|
-| Component duplicates (Badge rename) | 1 | Important | Phase 4 |
-| Component duplicates (Skeleton false positive) | 0 | — | None |
-| Keyframe duplicates (`fadeIn`, `spin`) | 2 | Important | Phase 3 |
-| Bare-name keyframes (`pulse` solo, `buildrick-flash` rename) | 2 | Important | Phase 3 (combine with keyframe-dupe PR) |
-| Token alias overlap | 54 (1 fix-PR consolidates) | Important | Phase 2 |
-| CSS selector duplicates (Canvas.css shadowing a11y.css) | 2 | Important | Phase 5 |
-| CSS selector duplicates (scanner false positives) | 9 | Minor | Phase 1 (scanner improvement, not fix-PR) |
-| Three-home contract (Badge — same as #1) | 1 | Important | Phase 4 (combined) |
-| Pass-through wrappers | 12 (likely 4-8 after readability triage) | Minor | Phase 5 |
-| Dead exports (filtered to high-confidence) | ~30 estimated | Minor | Defer to separate dead-code arc |
-| Legacy residuals (annotation pass) | 11 | Minor | Phase 6 |
-| CLAUDE.md doc drift | 3 | Important | Phase Final |
+| Concern | Real count | Counted in fixable total? | Worst severity | Fix arc PR (per spec §3) |
+|---|---:|---|---|---|
+| Component duplicates (Badge rename) | 1 | Yes | Important | Phase 4 |
+| Component duplicates (Skeleton false positive) | 0 | No (false positive) | — | None |
+| Keyframe duplicates (`fadeIn`, `spin`) | 2 | Yes (§2) | Important | Phase 3 |
+| Bare-name keyframes (`pulse`, `buildrick-flash`) | 2 | No — Phase 3 PR scope is captured by §2's row of 2; these surface here for visibility (`spin` overlaps §2; `pulse` and `buildrick-flash` are §7-only entries flagged Important) | Important | Phase 3 (combine with keyframe-dupe PR) |
+| Token alias overlap | 54 (1 fix-PR consolidates) | Yes | Important | Phase 2 |
+| CSS selector duplicates (Canvas.css shadowing a11y.css) | 2 | Yes | Important | Phase 5 |
+| CSS selector duplicates — `.bd-topbar` allowed override | 1 | Yes (Minor) | Minor | Phase 5 (annotate-only) |
+| CSS selector duplicates (scanner false positives) | 9 | No (scanner false positives) | — | Phase 1 (scanner improvement, not fix-PR) |
+| Three-home contract (Badge — same as §1) | 1 | No (deduped — same item as Badge §1) | Important | Phase 4 (combined) |
+| Pass-through wrappers | 12 (likely 4-8 after readability triage) | Yes | Minor | Phase 5 |
+| Dead exports (filtered to high-confidence) | ~30 estimated | No — deferred to separate dead-code arc | Minor | Defer to separate dead-code arc |
+| Legacy residuals (annotation pass, non-keyframe) | 11 | Yes | Minor | Phase 6 |
+| CLAUDE.md doc drift | 3 | Yes | Important | Phase Final |
+| **Total fixable** | **86** = 1 + 2 + 54 + 2 + 1 + 12 + 11 + 3 | — | **62 Important / 24 Minor** | — |
 
 ### Mapping to spec §3 PR sequence
 
