@@ -21,8 +21,10 @@
 | 7. Legacy residual triage | 11 | **11** (annotation pass — 0 deletions expected) | Minor |
 | 8. CLAUDE.md doc-vs-reality drift | 0 (scanner) | **3** (manual review surfaced drift the scanner doesn't detect) | Minor / Important |
 
-- **Total real violations:** ~84 (1 + 2 + 54 + 3 + 1 + 12 + 11 + 3) — **scanner-reported 3289 → de-noised 84.**
-- **Severity breakdown:** Critical 0 · Important 60 · Minor 24
+- **Total real fixable:** 87 (1 + 2 + 54 + 3 + 1 + 12 + 11 + 3 — note §5 Badge is the same item as §1 and is counted in both rows; deduped count = 86). **Scanner-reported total: 97 (87 fixable + 10 confirmed false positives) · Real fixable: 87 · False positives confirmed: 10** (1 Skeleton basename match in §1 + 9 child-selector substring matches in §4). Excludes the 3197 deferred dead-export tail discussed in §6.
+- **Severity breakdown (of the 87 fixable):** Critical 0 · Important 63 · Minor 24
+  - Important 63 = 1 (Badge §1) + 2 (keyframes §2) + 54 (token aliases §3) + 2 (real selector dupes §4: `.bd-depth-badge`, `.bd-skip-link`) + 1 (Badge §5, same as §1) + 3 (CLAUDE.md drift §8)
+  - Minor 24 = 1 (`.bd-topbar` allowed override §4) + 12 (pass-through wrappers §6) + 11 (legacy residual annotations §7)
 - **Categories with violations after triage:** 8 of 8
 - **Estimated fix PRs (Phase 2-6 per spec):** **5** (token aliases · keyframes · Badge · home + anti-pattern · legacy + doc-drift). Matches spec §3 plan.
 
