@@ -250,11 +250,10 @@ export function scanHomeContractViolations(root) {
 /**
  * Anti-pattern scan: pass-through wrappers + dead exports.
  *
- * NOTE on dead-export accuracy: matches export names against a global Set
- * of all import names project-wide. Two modules exporting the same name
- * where only one is imported will NOT be flagged. Audit results from
- * category 6 should be treated as approximate; prefer manual review.
- * Hardening to ts-morph findReferencesAsNodes() is Phase 1+ work.
+ * Dead-export detection walks barrel re-export chains
+ * (`export * from`, `export { X } from`) so names exported from a
+ * leaf module and re-shipped via an index.ts barrel are treated as
+ * reachable. Hardened 2026-05-09 per audit Appendix #4.
  */
 export function scanAntiPatterns(root) {
   const violations = [];
@@ -287,6 +286,33 @@ export function scanAntiPatterns(root) {
       if (def) importNames.add(def.getText());
     }
   }
+  // In addition to import-name collection, walk export declarations.
+  // Names that appear as `export { X } from "..."` or `export * from "..."`
+  // targets are public-API; treat them as imported for dead-export purposes.
+  // Audit Appendix fix #4 — drops 3197 false-positive dead-export count.
+  const reExportedNames = new Set();
+  for (const sf of project.getSourceFiles()) {
+    for (const exp of sf.getExportDeclarations()) {
+      if (exp.getModuleSpecifierValue() === undefined) continue; // local re-export, not from another module
+      if (exp.isNamespaceExport()) {
+        // export * from "./foo" — pull every export from the target module
+        const target = exp.getModuleSpecifierSourceFile();
+        if (target) {
+          for (const [name] of target.getExportedDeclarations()) {
+            reExportedNames.add(name);
+          }
+        }
+      } else {
+        // export { A, B as C } from "./foo" — add A and original-name of C
+        for (const spec of exp.getNamedExports()) {
+          const name = spec.getNameNode().getText();
+          reExportedNames.add(name);
+        }
+      }
+    }
+  }
+  // Combine for dead-export check
+  const reachableNames = new Set([...importNames, ...reExportedNames]);
   for (const sf of project.getSourceFiles()) {
     const filePath = relative(root, sf.getFilePath());
     for (const fn of sf.getFunctions()) {
@@ -315,7 +341,7 @@ export function scanAntiPatterns(root) {
     for (const decl of sf.getExportedDeclarations()) {
       const [name] = decl;
       if (!name || name === 'default') continue;
-      if (!importNames.has(name)) {
+      if (!reachableNames.has(name)) {
         violations.push({
           path: filePath,
           line: 1,

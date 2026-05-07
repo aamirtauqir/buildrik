@@ -242,6 +242,34 @@ describe('scanAntiPatterns', () => {
     expect(cat6.violations.length).toBeGreaterThanOrEqual(1);
     rmSync(dir, { recursive: true, force: true });
   });
+
+  it('does not flag exports re-exported via barrel chain as dead', () => {
+    const dir = makeFixture({
+      'src/feature/Foo.ts': 'export const Foo = 1;',
+      'src/feature/index.ts': 'export { Foo } from "./Foo";',
+      'src/consumer.ts': 'import { Foo } from "./feature";\nconsole.log(Foo);',
+      'tsconfig.json': '{"compilerOptions":{"target":"es2020","module":"esnext","moduleResolution":"node"},"include":["src/**/*"]}',
+    });
+    const results = run(dir, ['--category=6']);
+    const cat6 = results.find((r) => r.category === 'antiPatterns');
+    const fooDead = cat6.violations.find((v) => v.message.includes('Foo') && v.message.toLowerCase().includes('dead'));
+    expect(fooDead).toBeUndefined();
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('does not flag exports re-exported via export-star as dead', () => {
+    const dir = makeFixture({
+      'src/feature/Bar.ts': 'export const Bar = 2;',
+      'src/feature/index.ts': 'export * from "./Bar";',
+      'src/consumer.ts': 'import { Bar } from "./feature";\nconsole.log(Bar);',
+      'tsconfig.json': '{"compilerOptions":{"target":"es2020","module":"esnext","moduleResolution":"node"},"include":["src/**/*"]}',
+    });
+    const results = run(dir, ['--category=6']);
+    const cat6 = results.find((r) => r.category === 'antiPatterns');
+    const barDead = cat6.violations.find((v) => v.message.includes('Bar') && v.message.toLowerCase().includes('dead'));
+    expect(barDead).toBeUndefined();
+    rmSync(dir, { recursive: true, force: true });
+  });
 });
 
 describe('scanLegacyResiduals', () => {
