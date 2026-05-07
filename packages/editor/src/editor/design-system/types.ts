@@ -38,6 +38,38 @@ export interface UndoEntry {
   snapshot: string; // previous value to restore
 }
 
+/**
+ * Spec §5.3 token kinds — 14 total. The 3 existing kinds (color/type/spacing)
+ * have already-shipped hook + context implementations. The 11 new kinds plug
+ * into the same architecture via the factory hook in useTokensForKind.ts.
+ */
+export type TokenKind =
+  | "color" | "type" | "spacing"
+  | "radius" | "shadow" | "motion"
+  | "border" | "opacity" | "zindex"
+  | "breakpoint" | "grid" | "sizing"
+  | "icon" | "imagery";
+
+/**
+ * Per-kind value shape. Discriminated by `kind`. Validators in
+ * packages/shared/schemas/designToken.ts enforce the per-kind shape.
+ */
+export type TokenValue =
+  | { kind: "color"; value: string }                       // hex, rgb, hsl
+  | { kind: "type"; family: string; weight?: number; size?: string; lineHeight?: string }
+  | { kind: "spacing"; value: string }                     // px, rem, em
+  | { kind: "radius"; value: string }                      // px, rem, %
+  | { kind: "shadow"; value: string }                      // CSS box-shadow string
+  | { kind: "motion"; duration: string; easing: string }   // "200ms", "ease-out"
+  | { kind: "border"; width: string; style: string; color?: string }
+  | { kind: "opacity"; value: number }                     // 0–1
+  | { kind: "zindex"; value: number }                      // integer
+  | { kind: "breakpoint"; value: string }                  // "768px"
+  | { kind: "grid"; columns: number; gap?: string }
+  | { kind: "sizing"; value: string }
+  | { kind: "icon"; name: string; size?: string }          // ref to icon library
+  | { kind: "imagery"; url: string; alt?: string };
+
 export type TokenType =
   | "color"
   | "font-family"
@@ -49,15 +81,22 @@ export type TokenType =
   | "select";
 
 export interface DesignToken {
+  // Existing fields — keep all for backward compat with shipped color/spacing/type.
   id: string;
-  name: string;
-  value: string;
-  category: TokenCategory;
+  name: string;                  // legacy; spec §5.3 calls this `friendlyName`
+  value: string;                 // legacy single-string value (color/spacing/type still use this)
+  category: TokenCategory;       // legacy 9-category union
   cssVar: string;
-  type: TokenType;
+  type: TokenType;               // legacy
   group?: string;
   options?: string[];
   description?: string;
+
+  // Phase A.0 additions — optional so existing tokens remain valid.
+  kind?: TokenKind;              // spec §5.3 — discriminator for new tokens
+  friendlyName?: string;         // spec §5.3 — beginner-mode label, falls back to `name`
+  aliasOf?: string;              // Phase A.2 — populated then; declared here so type compiles
+  typedValue?: TokenValue;       // structured value for new kinds; legacy `value` stays for old
 }
 
 export type ThemeMode = "light" | "dark" | "system";
