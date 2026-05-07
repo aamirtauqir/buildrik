@@ -15,6 +15,39 @@ function hasPolicyComment(context, node) {
   return commentsBefore.some((c) => POLICY_RE.test(c.value));
 }
 
+/**
+ * Audit-remediation PR3 (2026-05-08): detect whether a TemplateLiteral
+ * is the body of an Emotion-tagged template. Emotion uses tagged-template
+ * forms like:
+ *   css`color: #fff`                  // Identifier `css`
+ *   styled.div`color: #fff`           // MemberExpression styled.div
+ *   styled(Component)`color: #fff`    // CallExpression styled(C)
+ *   keyframes`from { color: #fff }`   // Identifier `keyframes`
+ * The rule's intent per its docstring is "chrome JSX/Emotion" — fire
+ * on Emotion templates only, not on raw template literals storing
+ * HTML/markdown/data strings.
+ */
+function isEmotionTaggedTemplate(node) {
+  const parent = node.parent;
+  if (!parent || parent.type !== "TaggedTemplateExpression") return false;
+  if (parent.quasi !== node) return false;
+  const tag = parent.tag;
+  if (!tag) return false;
+  // `css\`...\`` or `keyframes\`...\``
+  if (tag.type === "Identifier") {
+    return tag.name === "css" || tag.name === "keyframes";
+  }
+  // `styled.X\`...\``
+  if (tag.type === "MemberExpression" && tag.object.type === "Identifier") {
+    return tag.object.name === "styled";
+  }
+  // `styled(C)\`...\`` — CallExpression with styled as callee
+  if (tag.type === "CallExpression" && tag.callee.type === "Identifier") {
+    return tag.callee.name === "styled" || tag.callee.name === "css";
+  }
+  return false;
+}
+
 module.exports = {
   meta: {
     type: "problem",
@@ -53,6 +86,16 @@ module.exports = {
       TemplateLiteral(node) {
         const raw = node.quasis.map((q) => q.value.cooked).join("");
         if (!HEX_RE.test(raw)) return;
+        // Audit-remediation PR3 (2026-05-08): only fire when the template
+        // literal is the body of an Emotion-tagged tag — i.e. `css`,
+        // `styled.X`, `keyframes`, etc. Pre-fix, EVERY template literal
+        // anywhere in the file fired the rule, producing 700+ false
+        // positives in templates/ + blocks/ where the literal stores
+        // user-content HTML strings, not chrome styling. The rule's
+        // doc-comment said "Emotion template literals," so this matches
+        // the documented intent.
+        const isEmotionTagged = isEmotionTaggedTemplate(node);
+        if (!isEmotionTagged) return;
         if (hasPolicyComment(context, node)) return;
         const matches = raw.match(HEX_RE);
         for (const hex of matches) {
