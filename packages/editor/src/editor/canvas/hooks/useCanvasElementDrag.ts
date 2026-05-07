@@ -281,10 +281,10 @@ export function useCanvasElementDrag({
         width: ${Math.min(rect.width, 300)}px;
         max-height: 200px;
         overflow: hidden;
-        background: #1e1e2e;
-        border: 2px solid #89b4fa;
+        background: var(--buildrick-bg-card);
+        border: 2px solid var(--buildrick-accent);
         border-radius: 8px;
-        box-shadow: 0 8px 32px rgba(137, 180, 250, 0.3);
+        box-shadow: var(--buildrick-shadow-lg, 0 8px 32px rgba(45, 109, 255, 0.18));
         pointer-events: none;
         z-index: 99999;
       `;
@@ -305,8 +305,8 @@ export function useCanvasElementDrag({
         bottom: -8px;
         left: 50%;
         transform: translateX(-50%);
-        background: linear-gradient(135deg, #89b4fa 0%, #b4befe 100%);
-        color: #1e1e2e;
+        background: var(--buildrick-accent);
+        color: var(--buildrick-text-on-accent);
         padding: 2px 10px;
         border-radius: 4px;
         font-size: 12px;

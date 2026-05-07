@@ -258,7 +258,7 @@ export const BreadcrumbSegment = styled.button<{
 export const BreadcrumbSeparator = styled.span`
   display: flex;
   align-items: center;
-  color: #45475a;
+  color: var(--buildrick-text-secondary);
 `;
 
 export const BreadcrumbHint = styled.div`

@@ -156,6 +156,6 @@ export const MultiSelectClearButton = styled.button<{ isHovered?: boolean }>`
 
 export const PrimaryIndicator = styled.span`
   font-size: 14px;
-  color: #fbbf24;
+  color: var(--buildrick-warning);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 `;
