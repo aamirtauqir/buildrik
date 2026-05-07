@@ -138,6 +138,59 @@ export interface MediaAsset {
 
   /** Extended metadata */
   metadata?: MediaMetadata;
+
+  /**
+   * Server-side asset row ID (Prisma CUID). Set when the upload mirrors
+   * to the server via RemoteAssetSync; absent when running offline /
+   * unauthenticated / dashboard unconfigured. Phase B2.
+   */
+  serverId?: string;
+
+  /**
+   * Marks an asset that exists in local IndexedDB but failed to mirror
+   * to the server. The retry queue picks these up on next 'online' event
+   * or next upload attempt. UI surfaces a "pending sync" badge. Phase B2.
+   */
+  localOnly?: boolean;
+}
+
+/**
+ * RemoteAssetSync — dependency injection interface for editor → server
+ * asset mirroring. Lives in shared/ so engine can import it; the actual
+ * implementation (services/AssetUploadService + tRPC client) wires in
+ * via ComposerConfig from the editor layer.
+ *
+ * Each method returns null/false instead of throwing so the engine can
+ * gracefully fall back to local-only mode without try/catch noise.
+ *
+ * Phase B2.
+ */
+export interface RemoteAssetSync {
+  /**
+   * Upload a file to remote storage and create the asset row server-side.
+   * Returns the server-assigned CUID + final URL on success. The engine
+   * uses the CUID as the canonical asset ID once persistence succeeds.
+   * Returns null on auth fail, offline, quota rejection, or any error —
+   * caller marks the asset localOnly and queues for retry.
+   */
+  uploadAndCreate(
+    file: Blob,
+    meta: {
+      filename: string;
+      mimeType: string;
+      bytes: number;
+      type: "image" | "video" | "icon" | "font";
+      folderId?: string | null;
+      siteId?: string | null;
+    }
+  ): Promise<{ serverId: string; url: string } | null>;
+
+  /**
+   * Delete an asset row server-side. Returns true on success or 404
+   * (already gone). Returns false on transient failures so the caller
+   * can queue for retry.
+   */
+  deleteRemote(serverId: string): Promise<boolean>;
 }
 
 /**

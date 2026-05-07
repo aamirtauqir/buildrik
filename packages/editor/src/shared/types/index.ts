@@ -43,6 +43,14 @@ export interface ComposerConfig {
   onReady?: (composer: Composer) => void;
   /** Callback on project update */
   onUpdate?: (data: ProjectData) => void;
+  /**
+   * Optional remote asset sync (Phase B2). When provided, MediaManager mirrors
+   * uploads/deletes to the server in addition to local IndexedDB. Mirrored
+   * field — duplicate of `shared/types/config.ts` ComposerConfig (pre-existing
+   * SSOT violation; index.ts is what Composer.ts resolves to). Both must
+   * stay in sync until the duplication is collapsed.
+   */
+  remoteSync?: import("./media").RemoteAssetSync;
 }
 
 export interface StorageConfig {

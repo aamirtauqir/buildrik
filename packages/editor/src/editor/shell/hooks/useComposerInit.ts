@@ -13,6 +13,7 @@ import type { Element } from "../../../engine/elements/Element";
 import { THRESHOLDS } from "../../../shared/constants/config";
 import type { ComposerConfig, ProjectData, DeviceType, ElementType } from "../../../shared/types";
 import { getSiteIdFromUrl, loadProject, saveProject } from "@/services/BuildrikSyncProvider";
+import { createRemoteAssetSync } from "@/services/AssetUploadService";
 import type { ToastInput } from "@/editor/shared/vibcoder";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
@@ -73,9 +74,14 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
   // Initialize composer
   React.useEffect(() => {
     const { project: projectConfig, ...composerOptions } = options || {};
+    // Phase B2: wire remote asset sync. Always provided — the service
+    // gracefully falls back to local-only on auth fail / offline / dashboard
+    // unconfigured. siteId scopes asset rows when known.
+    const remoteSync = createRemoteAssetSync({ siteId: getSiteIdFromUrl() });
     const instance = createComposer({
       container: containerRef.current || document.createElement("div"),
       ...composerOptions,
+      remoteSync,
     } as ComposerConfig);
 
     // Store event handlers for proper cleanup

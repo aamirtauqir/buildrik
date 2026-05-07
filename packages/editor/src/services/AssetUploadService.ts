@@ -1,36 +1,53 @@
 /**
- * AssetUploadService — Phase B1.4 — editor → Vercel Blob bridge.
+ * AssetUploadService — Phase B1.4 + B2 — editor → Vercel Blob bridge.
  *
- * Wraps `@vercel/blob/client` `upload()` against the dashboard's
- * `/api/asset-upload` route (which Vercel Blob's `handleUpload` helper
- * uses for client-token issuance + auth + quota gating).
+ * Two surfaces:
+ *   - `uploadBlob(blob, filename, contentType)` — low-level Vercel Blob client
+ *     wrapper. Used directly by editor flows that already have a File object.
+ *   - `createRemoteAssetSync()` — RemoteAssetSync factory (Phase B2 contract).
+ *     Composes the uploadBlob primitive with the tRPC `media.createAsset` /
+ *     `media.deleteAsset` mutations. Composer wires the resulting object into
+ *     MediaManager via ComposerConfig.remoteSync.
  *
  * Why a separate service (vs inline in MediaManager):
  *   Engine code lives in `engine/` and per CLAUDE.md "Import Direction Rules"
  *   may only import from `shared/`. This service lives in `services/`
  *   alongside BuildrikSyncProvider and PublishService — same vendor-bridge
- *   tier. Composer wires this into MediaManager via dependency injection
- *   (the RemoteAssetSync interface in shared/types/), keeping engine pure.
+ *   tier. The RemoteAssetSync interface in `shared/types/media.ts` is the
+ *   contract MediaManager depends on; this service is one implementation.
  *
  * @license BSD-3-Clause
  */
 
 import { upload } from "@vercel/blob/client";
+import { createBuildrikApiClient } from "@buildrik/shared";
+import type { RemoteAssetSync } from "@/shared/types/media";
 
 const DASHBOARD_URL =
   import.meta.env.VITE_DASHBOARD_URL || "http://localhost:3000";
 
+let _client: ReturnType<typeof createBuildrikApiClient> | null = null;
+function getClient() {
+  if (!_client) _client = createBuildrikApiClient(DASHBOARD_URL);
+  return _client;
+}
+
 export interface UploadBlobResult {
   /** Public URL where Vercel Blob now serves the file. */
   url: string;
-  /** Byte size as reported by the upload (mirrors local file.size). */
+  /** Byte size as reported by the upload (mirrors local blob.size). */
   bytes: number;
   /** Content-type as accepted by the route's allowedContentTypes filter. */
   contentType: string;
 }
 
 /**
- * Upload a File blob to Vercel Blob via the dashboard's signing route.
+ * Upload a Blob to Vercel Blob via the dashboard's signing route.
+ *
+ * MediaManager passes the post-sanitization, post-optimization Blob (which
+ * may differ from the original File — SVG sanitization rewrites the bytes;
+ * WebP optimization swaps mime). The filename + contentType are passed
+ * separately so we don't depend on File-only metadata.
  *
  * Flow:
  *   1. `@vercel/blob/client` `upload()` POSTs metadata to `/api/asset-upload`
@@ -40,26 +57,27 @@ export interface UploadBlobResult {
  *   4. Resolved promise gives us the public URL.
  *
  * Throws on auth failure, quota rejection, oversized file, or network error.
- * Caller (MediaManager via RemoteAssetSync interface) decides retry behavior.
+ * Caller decides retry behavior.
  */
-export async function uploadBlob(file: File): Promise<UploadBlobResult> {
-  // Path inside Vercel Blob storage. The route's onBeforeGenerateToken
-  // returns tokenPayload with userId, so blobs end up scoped per user
-  // even though the path here is just a filename.
-  const blob = await upload(file.name, file, {
+export async function uploadBlob(
+  blob: Blob,
+  filename: string,
+  contentType: string,
+): Promise<UploadBlobResult> {
+  const result = await upload(filename, blob, {
     access: "public",
     handleUploadUrl: `${DASHBOARD_URL}/api/asset-upload`,
-    // Editor's File.size is the canonical bytes count. Sending it as a
+    // Editor's blob.size is the canonical bytes count. Sending it as a
     // clientPayload lets the server reject oversized uploads BEFORE
     // issuing a token instead of after the upload finishes.
-    clientPayload: JSON.stringify({ bytes: file.size }),
-    contentType: file.type || undefined,
+    clientPayload: JSON.stringify({ bytes: blob.size }),
+    contentType: contentType || undefined,
   });
 
   return {
-    url: blob.url,
-    bytes: file.size,
-    contentType: file.type,
+    url: result.url,
+    bytes: blob.size,
+    contentType,
   };
 }
 
@@ -79,11 +97,53 @@ export async function isUploadServiceReachable(): Promise<boolean> {
       // itself responds. Network/auth errors give different status codes.
       body: JSON.stringify({}),
     });
-    // 400 means the route ran (Vercel's handleUpload rejected empty body).
-    // 401 means auth failed but route exists.
-    // Network error throws.
     return res.status === 400 || res.status === 401;
   } catch {
     return false;
   }
+}
+
+/**
+ * Phase B2: build a RemoteAssetSync implementation backed by Vercel Blob
+ * + media tRPC. Composer accepts this in ComposerConfig and threads it
+ * into MediaManager. Returns null on any failure so MediaManager can
+ * fall back to local-only without try/catch noise.
+ *
+ * Optional siteId scopes assets to a specific site row server-side.
+ */
+export function createRemoteAssetSync(opts?: { siteId?: string | null }): RemoteAssetSync {
+  const siteId = opts?.siteId ?? null;
+
+  return {
+    async uploadAndCreate(blob, meta) {
+      try {
+        const uploaded = await uploadBlob(blob, meta.filename, meta.mimeType);
+        const created = (await getClient().media.createAsset.mutate({
+          url: uploaded.url,
+          bytes: meta.bytes,
+          type: meta.type,
+          mimeType: meta.mimeType,
+          filename: meta.filename,
+          folderId: meta.folderId ?? null,
+          siteId: meta.siteId ?? siteId,
+        })) as { id: string; url: string; bytes: number };
+        return { serverId: created.id, url: uploaded.url };
+      } catch {
+        // Auth / quota / network — caller falls back to localOnly + retry queue.
+        return null;
+      }
+    },
+
+    async deleteRemote(serverId) {
+      try {
+        await getClient().media.deleteAsset.mutate({ assetId: serverId });
+        return true;
+      } catch (err) {
+        // 404 = already gone, treat as success. Anything else = transient.
+        const message = err instanceof Error ? err.message : String(err);
+        if (message.includes("NOT_FOUND") || message.includes("not found")) return true;
+        return false;
+      }
+    },
+  };
 }

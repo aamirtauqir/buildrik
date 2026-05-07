@@ -14,6 +14,7 @@ import type {
   MediaFolder,
   MediaLibraryState,
   MediaSortBy,
+  RemoteAssetSync,
   SortDirection,
   UploadProgress,
   UploadResult,
@@ -31,6 +32,35 @@ import {
 import { MediaStorage } from "./MediaStorage";
 import { MediaOptimizer } from "./MediaOptimizer";
 // P5 (2026-05-07): engine→services import deleted; stock search lives in editor UI
+
+/**
+ * Phase B2: narrow MediaAssetType to the server's mediaTypeEnum subset.
+ *  - Engine type: "image" | "video" | "audio" | "icon" | "svg" | "font"
+ *  - Server enum: "image" | "video" | "icon" | "font"
+ *
+ *  - svg → image (SVGs are stored as image rows server-side; the type
+ *    discriminator is mimeType, not the asset.type field)
+ *  - audio → null (no server-side schema; local-only forever)
+ */
+function toServerAssetType(
+  type: MediaAssetType,
+): "image" | "video" | "icon" | "font" | null {
+  switch (type) {
+    case "image":
+    case "svg":
+      return "image";
+    case "video":
+      return "video";
+    case "icon":
+      return "icon";
+    case "font":
+      return "font";
+    case "audio":
+      return null;
+    default:
+      return null;
+  }
+}
 // only via dashboard.media.searchStock tRPC. Engine no longer touches I/O for stock.
 
 // --- Discovery stub types ---
@@ -104,11 +134,126 @@ export class MediaManager extends MediaEventEmitter {
   /** Deduplicate concurrent getAssetSrc requests for the same id */
   private inFlight = new Map<string, Promise<string | null>>();
 
-  constructor() {
+  /**
+   * Phase B2: optional remote sync. Wired by Composer from ComposerConfig.
+   * Null = local-only mode (no dashboard URL configured / unauthenticated).
+   */
+  private remoteSync: RemoteAssetSync | null;
+
+  /**
+   * Phase B2: asset IDs needing server retry. Populated when uploadAndCreate
+   * returns null (offline / 5xx). Drained by retryLocalOnlyAssets() on
+   * 'online' event or next successful upload.
+   */
+  private retryQueue = new Set<string>();
+
+  /** Phase B2: pending server-side deletes when offline. Asset already gone locally. */
+  private pendingRemoteDeletes = new Set<string>();
+
+  constructor(remoteSync?: RemoteAssetSync) {
     super();
     this.storage = new MediaStorage();
     this.optimizer = new MediaOptimizer();
     this.state = this.createInitialState();
+    this.remoteSync = remoteSync ?? null;
+
+    // Trigger retry when network returns. Browser may not have addEventListener
+    // in some test envs (jsdom does); guard for safety.
+    if (typeof window !== "undefined" && this.remoteSync) {
+      window.addEventListener("online", this.handleOnline);
+    }
+  }
+
+  /**
+   * Phase B2: re-attempt server sync for any localOnly assets and any
+   * pending remote deletes. Called on 'online' event and after each
+   * successful upload (chained retries).
+   */
+  private handleOnline = (): void => {
+    void this.retryLocalOnlyAssets();
+  };
+
+  /**
+   * Phase B2: drain the retry queue. Best-effort — failures stay queued.
+   */
+  async retryLocalOnlyAssets(): Promise<void> {
+    if (!this.remoteSync) return;
+    // Snapshot the queue; new entries during iteration retry next call.
+    const ids = Array.from(this.retryQueue);
+    for (const id of ids) {
+      const asset = this.state.assets.find((a) => a.id === id);
+      if (!asset || !asset.localOnly) {
+        this.retryQueue.delete(id);
+        continue;
+      }
+      const serverType = toServerAssetType(asset.type);
+      if (!serverType) {
+        // Unsupported on server (audio) — local-only forever; drop from queue.
+        this.retryQueue.delete(id);
+        continue;
+      }
+      const blob = await this.storage.getBlob(id);
+      if (!blob) {
+        // Local blob lost — drop from retry; nothing to upload.
+        this.retryQueue.delete(id);
+        continue;
+      }
+      const result = await this.remoteSync.uploadAndCreate(blob, {
+        filename: asset.originalName,
+        mimeType: asset.mimeType,
+        bytes: asset.size,
+        type: serverType,
+        folderId: asset.folderId ?? null,
+      });
+      if (result) {
+        // Replace local id with server CUID, clear localOnly flag,
+        // re-key IndexedDB so engine and server agree on identity.
+        await this.replaceAssetId(id, result.serverId, result.url);
+        this.retryQueue.delete(id);
+      }
+    }
+    // Drain pending deletes too.
+    const deletes = Array.from(this.pendingRemoteDeletes);
+    for (const serverId of deletes) {
+      const ok = await this.remoteSync.deleteRemote(serverId);
+      if (ok) this.pendingRemoteDeletes.delete(serverId);
+    }
+  }
+
+  /**
+   * Phase B2: rewrite an asset's ID from the engine-generated local UUID
+   * to the server CUID. Updates state, IndexedDB, blob URL map, and emits
+   * MEDIA_UPDATED so the UI re-keys.
+   */
+  private async replaceAssetId(
+    oldId: string,
+    newId: string,
+    remoteUrl: string,
+  ): Promise<void> {
+    const idx = this.state.assets.findIndex((a) => a.id === oldId);
+    if (idx === -1) return;
+    const old = this.state.assets[idx];
+    const updated: MediaAsset = {
+      ...old,
+      id: newId,
+      serverId: newId,
+      src: remoteUrl,
+      localOnly: false,
+      updatedAt: new Date().toISOString(),
+    };
+    // Move IndexedDB record under the new key, then drop old key.
+    const blob = await this.storage.getBlob(oldId);
+    if (blob) {
+      await this.storage.saveAsset(updated, blob);
+      await this.storage.deleteAsset(oldId);
+    }
+    this.state.assets[idx] = updated;
+    const blobUrl = this.blobUrlMap.get(oldId);
+    if (blobUrl) {
+      this.blobUrlMap.delete(oldId);
+      this.blobUrlMap.set(newId, blobUrl);
+    }
+    this.emit(MEDIA_EVENTS.MEDIA_UPDATED, updated);
   }
 
   /**
@@ -401,19 +546,51 @@ export class MediaManager extends MediaEventEmitter {
         updatedAt: new Date().toISOString(),
       };
 
-      // Save both metadata and binary blob
+      // Save both metadata and binary blob locally first — server mirror is
+      // best-effort; offline / auth-fail / quota all fall back to localOnly.
       await this.storage.saveAsset(asset, finalBlob);
       this.blobUrlMap.set(assetId, previewUrl);
       this.state.assets.push(asset);
 
+      // Phase B2: mirror to server when remoteSync is wired. On success the
+      // server-assigned CUID becomes the engine asset ID (replaceAssetId
+      // re-keys IndexedDB + state in one pass and emits MEDIA_UPDATED so
+      // the UI updates the row identity).
+      let finalAsset: MediaAsset = asset;
+      const serverType = toServerAssetType(asset.type);
+      if (this.remoteSync && serverType) {
+        const remote = await this.remoteSync.uploadAndCreate(finalBlob, {
+          filename: file.name,
+          mimeType: finalMime,
+          bytes: finalSize,
+          type: serverType,
+          folderId: asset.folderId ?? null,
+        });
+        if (remote) {
+          await this.replaceAssetId(assetId, remote.serverId, remote.url);
+          finalAsset = this.state.assets.find((a) => a.id === remote.serverId) ?? asset;
+        } else {
+          // Remote sync failed — flag local-only and queue for retry.
+          asset.localOnly = true;
+          this.retryQueue.add(assetId);
+          await this.storage.saveAsset(asset, finalBlob);
+        }
+      }
+      // serverType=null (audio) means we keep the asset local without queuing
+      // — there's no server schema for audio uploads today.
+
       progress.status = "complete";
       progress.progress = 100;
-      progress.assetId = assetId;
+      progress.assetId = finalAsset.id;
       this.emit(MEDIA_EVENTS.UPLOAD_PROGRESS, progress);
-      this.emit(MEDIA_EVENTS.UPLOAD_COMPLETE, { success: true, asset, fileName: file.name });
-      this.emit(MEDIA_EVENTS.MEDIA_ADDED, asset);
+      this.emit(MEDIA_EVENTS.UPLOAD_COMPLETE, {
+        success: true,
+        asset: finalAsset,
+        fileName: file.name,
+      });
+      this.emit(MEDIA_EVENTS.MEDIA_ADDED, finalAsset);
 
-      return { success: true, asset, fileName: file.name };
+      return { success: true, asset: finalAsset, fileName: file.name };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Upload failed";
       progress.status = "error";
@@ -424,6 +601,10 @@ export class MediaManager extends MediaEventEmitter {
   }
 
   async deleteAsset(id: string): Promise<void> {
+    // Capture serverId BEFORE local delete so we can mirror to server.
+    const asset = this.state.assets.find((a) => a.id === id);
+    const serverId = asset?.serverId;
+
     await this.storage.deleteAsset(id);
     this.state.assets = this.state.assets.filter((a) => a.id !== id);
     this.state.selectedAssetIds = this.state.selectedAssetIds.filter((sid) => sid !== id);
@@ -434,6 +615,14 @@ export class MediaManager extends MediaEventEmitter {
       this.blobUrlMap.delete(id);
     }
     this.blobUrlRefs.delete(id);
+
+    // Phase B2: mirror server-side delete. If offline / 5xx, queue for
+    // retry on next 'online' event. Local delete already happened — server
+    // is the eventually-consistent side.
+    if (this.remoteSync && serverId) {
+      const ok = await this.remoteSync.deleteRemote(serverId);
+      if (!ok) this.pendingRemoteDeletes.add(serverId);
+    }
 
     this.emit(MEDIA_EVENTS.MEDIA_DELETED, { id });
   }

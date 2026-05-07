@@ -154,7 +154,7 @@ export class Composer extends EventEmitter {
     this.templates = new TemplateManager(this);
     this.fonts = new FontManager(this);
     this.components = new ComponentManager(this);
-    this.media = new MediaManager();
+    this.media = new MediaManager(this.config.remoteSync);
     this.mediaOps = new MediaCommandLayer(this);
     this.forms = new FormHandler(this);
     this.router = new PageRouter();

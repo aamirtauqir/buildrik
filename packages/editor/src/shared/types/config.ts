@@ -40,6 +40,13 @@ export interface ComposerConfig {
   onReady?: (composer: Composer) => void;
   /** Callback on project update */
   onUpdate?: (data: ProjectData) => void;
+  /**
+   * Optional remote asset sync (Phase B2). When provided, MediaManager mirrors
+   * uploads/deletes to the server in addition to the local IndexedDB write.
+   * When omitted, MediaManager runs local-only. Editor app wires this from
+   * AssetUploadService + the tRPC client; engine/ stays import-pure.
+   */
+  remoteSync?: import("./media").RemoteAssetSync;
 }
 
 export interface StorageConfig {
