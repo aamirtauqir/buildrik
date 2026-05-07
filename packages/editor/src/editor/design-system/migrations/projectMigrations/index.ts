@@ -3,9 +3,8 @@ import type { ProjectMigration } from "./types";
 /**
  * Registry, keyed by toVersion. Append future migrations here.
  *
- * Currently empty — migration 0001 lands in T6.
- * Once T6 ships, replace with:
- *   { 1: migration0001 } and uncomment the import below.
+ * Currently empty — migration 0001 lands in T6, which will register it
+ * here as `{ 1: migration0001 }` after importing from `./0001-extend-token-kinds`.
  */
 export const PROJECT_MIGRATIONS: Record<number, ProjectMigration> = {};
 

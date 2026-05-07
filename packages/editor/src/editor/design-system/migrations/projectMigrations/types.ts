@@ -20,6 +20,7 @@ export interface ProjectPayload {
 export interface ProjectMigration {
   fromVersion: number;
   toVersion: number;
+  /** Human-readable label used in error messages and migration audit logs. */
   description: string;
   up: (project: ProjectPayload) => ProjectPayload;
   validate: (project: ProjectPayload) => void;
