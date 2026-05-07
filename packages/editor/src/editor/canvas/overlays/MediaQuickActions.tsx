@@ -16,6 +16,7 @@ interface MediaQuickActionsProps {
   onEdit: (item: any) => void;
 }
 
+// @lint-hex-policy: user-data icon-tint palette (color picker swatches, not chrome theme)
 const ICON_COLORS = [
   "var(--bd-bg-card)", "#000000", "#3b82f6", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"
 ];
@@ -78,8 +79,8 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
     <div style={{ position: "relative" }}>
       <div
         style={{
-          background: "var(--buildrick-bg-card, #1e1e2e)",
-          border: "1px solid var(--buildrick-border-light, #313244)",
+          background: "var(--buildrick-bg-card)",
+          border: "1px solid var(--buildrick-border-light)",
           borderRadius: "6px",
           display: "flex",
           alignItems: "center",
@@ -96,7 +97,7 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
 
         {isImage && (
           <>
-            <div style={{ width: 1, height: 16, background: "var(--buildrick-border-light, #313244)" }} />
+            <div style={{ width: 1, height: 16, background: "var(--buildrick-border-light)" }} />
             <Button onClick={handleEdit} title="Edit Image" style={actionBtnStyle}>
               <Edit2 size={14} />
               <span style={{ fontSize: "11px", fontWeight: 600 }}>Edit</span>
@@ -106,13 +107,13 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
 
         {isIcon && (
           <>
-            <div style={{ width: 1, height: 16, background: "var(--buildrick-border-light, #313244)" }} />
+            <div style={{ width: 1, height: 16, background: "var(--buildrick-border-light)" }} />
             <Button 
               onClick={() => setShowColorPopover(!showColorPopover)} 
               title="Change Color" 
               style={{
                 ...actionBtnStyle,
-                background: showColorPopover ? "var(--buildrick-bg-subtle, #313244)" : "transparent"
+                background: showColorPopover ? "var(--buildrick-bg-subtle)" : "transparent"
               }}
             >
               <Palette size={14} />
@@ -123,13 +124,13 @@ export const MediaQuickActions: React.FC<MediaQuickActionsProps> = ({
 
         {isImage && (
           <>
-            <div style={{ width: 1, height: 16, background: "var(--buildrick-border-light, #313244)" }} />
+            <div style={{ width: 1, height: 16, background: "var(--buildrick-border-light)" }} />
             <Button 
               onClick={() => setShowAltPopover(!showAltPopover)} 
               title="Alt Text" 
               style={{
                 ...actionBtnStyle,
-                background: showAltPopover ? "var(--buildrick-bg-subtle, #313244)" : "transparent"
+                background: showAltPopover ? "var(--buildrick-bg-subtle)" : "transparent"
               }}
             >
               <Type size={14} />
@@ -187,8 +188,8 @@ const popoverStyle: React.CSSProperties = {
   top: "100%",
   left: "50%",
   transform: "translateX(-50%) translateY(8px)",
-  background: "var(--buildrick-bg-card, #1e1e2e)",
-  border: "1px solid var(--buildrick-border-light, #313244)",
+  background: "var(--buildrick-bg-card)",
+  border: "1px solid var(--buildrick-border-light)",
   borderRadius: "6px",
   padding: "10px",
   boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
@@ -202,17 +203,17 @@ const popoverStyle: React.CSSProperties = {
 const popoverTitleStyle: React.CSSProperties = {
   fontSize: "10px",
   fontWeight: 600,
-  color: "var(--buildrick-text-disabled, #949cbb)",
+  color: "var(--buildrick-text-disabled)",
   textTransform: "uppercase"
 };
 
 const inputStyle: React.CSSProperties = {
   flex: 1,
-  background: "var(--buildrick-bg-subtle, #313244)",
-  border: "1px solid var(--buildrick-border-light, #45475a)",
+  background: "var(--buildrick-bg-subtle)",
+  border: "1px solid var(--buildrick-border-light)",
   borderRadius: "4px",
   padding: "4px 8px",
-  color: "var(--buildrick-text-primary, #cdd6f4)",
+  color: "var(--buildrick-text-primary)",
   fontSize: "12px",
   outline: "none"
 };
@@ -233,7 +234,7 @@ const saveBtnStyle: React.CSSProperties = {
 const actionBtnStyle: React.CSSProperties = {
   background: "transparent",
   border: "none",
-  color: "var(--buildrick-text-primary, #cdd6f4)",
+  color: "var(--buildrick-text-primary)",
   padding: "4px 8px",
   borderRadius: "4px",
   display: "flex",

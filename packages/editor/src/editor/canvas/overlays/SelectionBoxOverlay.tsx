@@ -433,7 +433,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
             top: top - 20,
             width: 16,
             height: 16,
-            background: "var(--buildrick-warning, #f59e0b)",
+            background: "var(--buildrick-warning)",
             borderRadius: "50%",
             display: "flex",
             alignItems: "center",

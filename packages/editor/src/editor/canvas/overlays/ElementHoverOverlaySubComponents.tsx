@@ -182,13 +182,20 @@ interface InfoBadgeProps {
   colors: HoverColors;
 }
 
+// Dev-tool overlay palette — semantic, intentionally distinct from chrome theme.
+// Per file's @lint-hex-policy header, these are debug-info colors (badge bg,
+// monospace dimensions, class-name highlight), not panel/inspector chrome.
+const BADGE_OVERLAY_BG = "#3b3b3b";
+const DIMENSION_HIGHLIGHT_FG = "#a5f3fc";
+const CLASS_NAME_HIGHLIGHT_FG = "#f9e2af";
+
 export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
   <Stack
     style={{
       position: "absolute",
       left: rect.left,
       top: rect.top - (info.parentName ? 38 : 22),
-      background: "#3b3b3b",
+      background: BADGE_OVERLAY_BG,
       color: "white",
       padding: "4px 8px",
       borderRadius: 4,
@@ -224,18 +231,25 @@ export const InfoBadge: React.FC<InfoBadgeProps> = ({ rect, info, colors }) => (
         </span>
       )}
       {info.isGridContainer && (
-        <span style={{ background: "#ec4899", padding: "0 4px", borderRadius: 2, fontSize: 12 }}>
+        <span
+          style={{
+            background: "var(--buildrick-accent)",
+            padding: "0 4px",
+            borderRadius: 2,
+            fontSize: 12,
+          }}
+        >
           grid
         </span>
       )}
     </div>
     <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12 }}>
       {info.parentName && <span style={{ color: "var(--buildrick-text-muted)" }}>in {info.parentName}</span>}
-      <span style={{ color: "#a5f3fc", fontFamily: "monospace" }}>
+      <span style={{ color: DIMENSION_HIGHLIGHT_FG, fontFamily: "monospace" }}>
         {info.dimensions.width} × {info.dimensions.height}
       </span>
       {info.classes.length > 0 && info.classes[0] && (
-        <span style={{ color: "#f9e2af", opacity: 0.8 }}>.{info.classes[0]}</span>
+        <span style={{ color: CLASS_NAME_HIGHLIGHT_FG, opacity: 0.8 }}>.{info.classes[0]}</span>
       )}
     </div>
   </Stack>

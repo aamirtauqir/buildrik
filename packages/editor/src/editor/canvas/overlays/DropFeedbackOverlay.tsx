@@ -372,11 +372,11 @@ const DropBreadcrumb: React.FC<DropBreadcrumbProps> = ({ path, targetRect }) => 
         display: "flex",
         alignItems: "center",
         gap: 2,
-        backgroundColor: "var(--buildrick-toolbar-bg, #252536)",
+        backgroundColor: "var(--buildrick-toolbar-bg)",
         padding: "4px 8px",
         borderRadius: 4,
         fontSize: 12,
-        color: "var(--buildrick-text-secondary, #a0a0b0)",
+        color: "var(--buildrick-text-secondary)",
         boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
         animation: "breadcrumbFadeIn 150ms ease-out forwards",
         zIndex: Z_LAYERS.dropBreadcrumb,
@@ -391,14 +391,14 @@ const DropBreadcrumb: React.FC<DropBreadcrumbProps> = ({ path, targetRect }) => 
             style={{
               color: item.isCurrent
                 ? "var(--buildrick-text-primary, var(--bd-bg-panel))"
-                : "var(--buildrick-text-secondary, #a0a0b0)",
+                : "var(--buildrick-text-secondary)",
               fontWeight: item.isCurrent ? 600 : 400,
             }}
           >
             {item.label}
           </span>
           {idx < path.length - 1 && (
-            <span style={{ color: "var(--buildrick-text-tertiary, #71717a)", margin: "0 2px" }}>›</span>
+            <span style={{ color: "var(--buildrick-text-tertiary)", margin: "0 2px" }}>›</span>
           )}
         </React.Fragment>
       ))}
@@ -422,8 +422,8 @@ const DepthBadge: React.FC<DepthBadgeProps> = ({ depth, targetRect }) => {
         position: "absolute",
         left: targetRect.left + targetRect.width - 40,
         top: targetRect.top + targetRect.height + 4,
-        backgroundColor: "var(--buildrick-toolbar-bg, #252536)",
-        color: "var(--buildrick-text-secondary, #a0a0b0)",
+        backgroundColor: "var(--buildrick-toolbar-bg)",
+        color: "var(--buildrick-text-secondary)",
         padding: "2px 8px",
         borderRadius: 10,
         fontSize: 12,

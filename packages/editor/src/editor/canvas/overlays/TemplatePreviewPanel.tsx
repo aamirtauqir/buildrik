@@ -51,7 +51,9 @@ export const TemplatePreviewPanel: React.FC<TemplatePreviewPanelProps> = ({
     const doc = iframeRef.current.contentDocument;
     if (doc) {
       doc.open();
-      doc.write(`
+      doc.write(
+        /* @lint-hex-policy: iframe-rendered user-site template preview, not chrome theme */
+        `
         <!DOCTYPE html>
         <html>
         <head>
@@ -69,7 +71,8 @@ export const TemplatePreviewPanel: React.FC<TemplatePreviewPanelProps> = ({
         </head>
         <body>${template.html}</body>
         </html>
-      `);
+      `
+      );
       doc.close();
     }
   }, [template]);
@@ -287,7 +290,7 @@ const panelStyles: React.CSSProperties = {
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  background: "linear-gradient(180deg, var(--bd-border) 0%, #d1d8e0 100%)",
+  background: "var(--buildrick-bg-panel)",
   zIndex: 50,
   // Animation handled by CSS class .bd-template-preview-panel + .visible
 };
@@ -372,7 +375,7 @@ const infoHeaderStyles: React.CSSProperties = {
 const templateNameStyles: React.CSSProperties = {
   fontSize: 16,
   fontWeight: 600,
-  color: "#1a1a2e",
+  color: "var(--buildrick-text-heading)",
 };
 
 const badgeFreeStyles: React.CSSProperties = {
@@ -444,7 +447,7 @@ const upgradeButtonStyles: React.CSSProperties = {
   alignItems: "center",
   gap: 8,
   padding: "12px 24px",
-  background: "linear-gradient(135deg, #f59e0b 0%, #f97316 100%)",
+  background: "var(--buildrick-warning)",
   color: "var(--buildrick-text-on-accent)",
   border: "none",
   borderRadius: 8,

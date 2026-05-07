@@ -65,7 +65,7 @@ const COLORS = {
   hierarchyCurrent: "var(--buildrick-accent-subtle)",
 
   // Clone mode badge background
-  cloneMode: "var(--buildrick-success, #22c55e)",
+  cloneMode: "var(--buildrick-success)",
 };
 
 // =============================================================================
