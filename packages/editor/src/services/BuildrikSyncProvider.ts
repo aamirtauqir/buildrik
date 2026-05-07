@@ -169,9 +169,10 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
         slugManuallySet: p.slugManuallySet ?? false,
         slugHistory: p.slugHistory ?? [],
       })),
-      styles: [],
+      styles: ((site as { projectStyles?: unknown[] }).projectStyles ?? []) as ProjectData["styles"],
       assets: [],
       settings: mergedSettings,
+      dsSchemaVersion: (site as { dsSchemaVersion?: number }).dsSchemaVersion ?? 0,
       metadata: {
         name: site.name,
         domain: (site as { domain?: string }).domain,

@@ -42,6 +42,12 @@ export interface ProjectData {
   metadata?: ProjectMetadata;
   /** Project-wide settings (analytics, integrations) */
   settings?: ProjectSettings;
+  /**
+   * DS schema version of the persisted project payload. v0 = pre-A.1
+   * (color/spacing/type only). v1 = A.1 (+ 11 new token kinds seeded).
+   * Migration runner reads this to decide whether to bump and seed.
+   */
+  dsSchemaVersion?: number;
 }
 
 export interface ProjectMetadata {
