@@ -146,7 +146,7 @@ const ElementHoverOverlayComponent: React.FC<ElementHoverOverlayProps> = ({
 
   return (
     <div
-      className="buildrick-hover-overlay"
+      className="bd-hover-overlay"
       style={{
         position: "absolute",
         top: 0,

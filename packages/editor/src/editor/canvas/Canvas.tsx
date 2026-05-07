@@ -577,7 +577,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
         <KeyboardCheatSheet isOpen={isCheatSheetOpen} onClose={closeCheatSheet} />
 
         {/* Aria-live region for selection announcements (WCAG 4.1.3 — always in DOM) */}
-        <div aria-live="polite" aria-atomic="true" className="buildrick-sr-only">
+        <div aria-live="polite" aria-atomic="true" className="bd-sr-only">
           {liveAnnouncement}
         </div>
       </div>

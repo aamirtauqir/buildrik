@@ -44,13 +44,13 @@
   /* Force-show overlay/feedback elements at full opacity. Universal rule above
    * kills transition-duration but element may be stuck at opacity:0 (animation
    * start state). Migrated from editor/canvas/Canvas.css 2026-04-26. */
-  .buildrick-hover-overlay,
-  .buildrick-drop-feedback-badge,
-  .buildrick-drop-feedback-target,
-  .buildrick-drop-position-line,
-  .buildrick-drop-slot-preview,
-  .buildrick-drop-breadcrumb,
-  .buildrick-depth-badge {
+  .bd-hover-overlay,
+  .bd-drop-feedback-badge,
+  .bd-drop-feedback-target,
+  .bd-drop-position-line,
+  .bd-drop-slot-preview,
+  .bd-drop-breadcrumb,
+  .bd-depth-badge {
     opacity: 1 !important;
   }
 

@@ -109,7 +109,7 @@ export const CanvasSpotBadge: React.FC<CanvasSpotBadgeProps> = ({
   return (
     <div
       ref={badgeRef}
-      className={`buildrick-canvas-spot-badge buildrick-canvas-spot-badge--${badge.type}`}
+      className={`bd-canvas-spot-badge bd-canvas-spot-badge--${badge.type}`}
       style={{
         position: "absolute",
         left: `${position.x}px`,
@@ -118,10 +118,10 @@ export const CanvasSpotBadge: React.FC<CanvasSpotBadgeProps> = ({
         zIndex: 1001,
       }}
     >
-      <span className="buildrick-canvas-spot-badge-content">{badge.content}</span>
+      <span className="bd-canvas-spot-badge-content">{badge.content}</span>
       {onRemove && (
         <Button
-          className="buildrick-canvas-spot-badge-close"
+          className="bd-canvas-spot-badge-close"
           onClick={(e) => {
             e.stopPropagation();
             onRemove(elementId);

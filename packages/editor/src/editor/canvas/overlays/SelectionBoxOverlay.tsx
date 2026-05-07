@@ -328,7 +328,7 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
 
   return (
     <div
-      className="buildrick-selection-box"
+      className="bd-selection-box"
       style={{
         position: "absolute",
         left: 0,

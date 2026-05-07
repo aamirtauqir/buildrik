@@ -327,7 +327,7 @@
   cursor: not-allowed !important;
 }
 
-.buildrick-selection-box {
+.bd-selection-box {
   position: absolute;
   pointer-events: none;
   z-index: 1000; /* Z_LAYERS.selectionBox - use unified registry */
@@ -338,8 +338,8 @@
   /* NOTE: Removed infinite selectionBoxPulse animation per Phase 4 cleanup */
 }
 
-.buildrick-selection-box::before,
-.buildrick-selection-box::after {
+.bd-selection-box::before,
+.bd-selection-box::after {
   content: "";
   position: absolute;
   width: 6px;
@@ -348,12 +348,12 @@
   border-radius: 2px;
 }
 
-.buildrick-selection-box::before {
+.bd-selection-box::before {
   top: -3px;
   left: -3px;
 }
 
-.buildrick-selection-box::after {
+.bd-selection-box::after {
   bottom: -3px;
   right: -3px;
 }
@@ -520,25 +520,25 @@
   to { opacity: 1; transform: scaleX(1); }
 }
 
-.buildrick-drop-feedback-badge.invalid {
+.bd-drop-feedback-badge.invalid {
   animation: badgeFadeIn 150ms ease-out forwards;
 }
 
-.buildrick-drop-feedback-target.valid {
+.bd-drop-feedback-target.valid {
   border-color: var(--buildrick-drop-valid-border) !important;
   background: var(--buildrick-drop-valid-bg) !important;
 }
 
-.buildrick-drop-feedback-target.invalid {
+.bd-drop-feedback-target.invalid {
   border-color: var(--buildrick-drop-invalid-border) !important;
   background: var(--buildrick-drop-invalid-bg) !important;
 }
 
-.buildrick-drop-position-line {
+.bd-drop-position-line {
   animation: dropLineFadeIn 150ms ease-out forwards;
 }
 
-.buildrick-drag-handle {
+.bd-drag-handle {
   animation: dragHandleFadeIn 0.15s ease-out;
 }
 
@@ -560,7 +560,7 @@
   /* NOTE: Removed infinite layerHoverPulse animation - static highlight is cleaner */
 }
 
-.buildrick-drop-slot-preview {
+.bd-drop-slot-preview {
   animation: slotFadeIn 150ms ease-out forwards;
 }
 
@@ -569,12 +569,12 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-.buildrick-drop-breadcrumb {
+.bd-drop-breadcrumb {
   animation: breadcrumbFadeIn 150ms ease-out forwards;
   font-family: var(--buildrick-font-family);
 }
 
-.buildrick-depth-badge {
+.bd-depth-badge {
   font-family: var(--buildrick-font-family);
 }
 
@@ -807,17 +807,9 @@
   border-color: var(--buildrick-accent, #667eea);
 }
 
-.buildrick-sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
+/* .buildrick-sr-only deleted 2026-05-07 — duplicate of canonical .bd-sr-only
+ * in themes/design-system/a11y.css. Consumers (Canvas.tsx ARIA live + DropFeedbackOverlay
+ * ARIA live) migrated to bd-sr-only in lockstep. */
 
 .bd-skip-link {
   position: absolute;

@@ -49,7 +49,7 @@ export const CanvasSpot: React.FC<CanvasSpotProps> = ({
 
   return (
     <div
-      className={`buildrick-canvas-spot ${className || ""}`}
+      className={`bd-canvas-spot ${className || ""}`}
       style={{
         position: "absolute",
         zIndex,

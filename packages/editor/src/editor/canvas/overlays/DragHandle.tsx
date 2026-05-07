@@ -107,7 +107,7 @@ export const DragHandle: React.FC<DragHandleProps> = ({ rect, elementId, size = 
 
   return (
     <div
-      className="buildrick-drag-handle"
+      className="bd-drag-handle"
       role="button"
       aria-label="Drag to move element"
       aria-pressed={isDragging}

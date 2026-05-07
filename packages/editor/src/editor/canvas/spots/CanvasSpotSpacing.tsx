@@ -60,7 +60,7 @@ export const CanvasSpotSpacing: React.FC<CanvasSpotSpacingProps> = ({
   if (indicators.length === 0) return null;
 
   return (
-    <div className="buildrick-canvas-spot-spacing">
+    <div className="bd-canvas-spot-spacing">
       {indicators.map((indicator, index) => {
         const isEditing = editing === `${indicator.type}-${indicator.side}`;
         const color = indicator.type === "margin" ? "#00d4aa" : "var(--bd-accent-pressed)";
@@ -68,7 +68,7 @@ export const CanvasSpotSpacing: React.FC<CanvasSpotSpacingProps> = ({
         return (
           <div
             key={`${indicator.type}-${indicator.side}-${index}`}
-            className={`buildrick-spacing-indicator buildrick-spacing-indicator--${indicator.type} buildrick-spacing-indicator--${indicator.side}`}
+            className={`bd-spacing-indicator bd-spacing-indicator--${indicator.type} bd-spacing-indicator--${indicator.side}`}
             style={{
               position: "absolute",
               left: `${indicator.position.x}px`,
@@ -80,7 +80,7 @@ export const CanvasSpotSpacing: React.FC<CanvasSpotSpacingProps> = ({
             onClick={() => handleIndicatorClick(indicator)}
           >
             {indicator.position.width > 20 && indicator.position.height > 20 && (
-              <div className="buildrick-spacing-indicator-label" style={{ backgroundColor: color }}>
+              <div className="bd-spacing-indicator-label" style={{ backgroundColor: color }}>
                 {isEditing ? (
                   <Input
                     type="number"
@@ -89,7 +89,7 @@ export const CanvasSpotSpacing: React.FC<CanvasSpotSpacingProps> = ({
                     onBlur={() => handleValueCommit(indicator)}
                     onKeyDown={(e) => handleKeyDown(e, indicator)}
                     autoFocus
-                    className="buildrick-spacing-indicator-input"
+                    className="bd-spacing-indicator-input"
                   />
                 ) : (
                   <span>{indicator.value}px</span>

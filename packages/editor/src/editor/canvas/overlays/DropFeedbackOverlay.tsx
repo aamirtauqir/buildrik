@@ -142,7 +142,7 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
           assertive priority because drop feedback is time-sensitive: once the user
           releases the mouse the moment to announce has passed. aria-atomic ensures
           the full message is read even if it changes rapidly. */}
-      <div aria-live="assertive" aria-atomic="true" className="buildrick-sr-only">
+      <div aria-live="assertive" aria-atomic="true" className="bd-sr-only">
         {liveText}
       </div>
 
@@ -163,7 +163,7 @@ const DropFeedbackOverlayComponent: React.FC<DropFeedbackOverlayProps> = ({
           {/* Target highlight overlay - 2px solid border */}
           {/* BUG-009 FIX: Added z-index and pointerEvents to prevent visual overlap with text */}
           <div
-            className={`buildrick-drop-feedback-target ${isValidDrop ? "valid" : "invalid"}`}
+            className={`bd-drop-feedback-target ${isValidDrop ? "valid" : "invalid"}`}
             style={{
               position: "absolute",
               left: relativeRect.left,
@@ -234,7 +234,7 @@ const DropPositionLine: React.FC<DropPositionLineProps> = ({ position, targetRec
 
   return (
     <div
-      className="buildrick-drop-position-line"
+      className="bd-drop-position-line"
       style={{
         position: "absolute",
         left: targetRect.left - 4,
@@ -260,7 +260,7 @@ const DropSlotPreview: React.FC<DropSlotPreviewProps> = ({ slotRect }) => {
 
   return (
     <div
-      className="buildrick-drop-slot-preview"
+      className="bd-drop-slot-preview"
       style={{
         position: "absolute",
         left: slotRect.x,
@@ -288,7 +288,7 @@ interface DropFeedbackBadgeProps {
 const DropFeedbackBadge: React.FC<DropFeedbackBadgeProps> = ({ targetRect, message }) => {
   return (
     <div
-      className="buildrick-drop-feedback-badge invalid"
+      className="bd-drop-feedback-badge invalid"
       style={{
         position: "absolute",
         left: targetRect.left + targetRect.width + 8,
@@ -364,7 +364,7 @@ const DropBreadcrumb: React.FC<DropBreadcrumbProps> = ({ path, targetRect }) => 
 
   return (
     <div
-      className="buildrick-drop-breadcrumb"
+      className="bd-drop-breadcrumb"
       style={{
         position: "absolute",
         left: targetRect.left,
@@ -417,7 +417,7 @@ const DepthBadge: React.FC<DepthBadgeProps> = ({ depth, targetRect }) => {
 
   return (
     <div
-      className="buildrick-depth-badge"
+      className="bd-depth-badge"
       style={{
         position: "absolute",
         left: targetRect.left + targetRect.width - 40,
