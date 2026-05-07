@@ -8,6 +8,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { useClickOutside } from "@/shared/hooks";
 import type { FolderItem } from "../types";
 
 interface Props {
@@ -32,14 +33,7 @@ export const BulkToolbar: React.FC<Props> = ({
   const [folderPickerOpen, setFolderPickerOpen] = React.useState(false);
   const pickerRef = React.useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
-    if (!folderPickerOpen) return;
-    const handle = (e: MouseEvent) => {
-      if (!pickerRef.current?.contains(e.target as Node)) setFolderPickerOpen(false);
-    };
-    document.addEventListener("mousedown", handle);
-    return () => document.removeEventListener("mousedown", handle);
-  }, [folderPickerOpen]);
+  useClickOutside(pickerRef, () => setFolderPickerOpen(false), { enabled: folderPickerOpen });
 
   return (
     <div className="bd-pg-bulk-toolbar" role="toolbar" aria-label={`${selectedCount} pages selected`}>

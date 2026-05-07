@@ -6,6 +6,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { useClickOutside } from "@/shared/hooks";
 import { ChevronIcon, CheckIcon } from "./headerIcons";
 
 export interface ViewOption<T extends string = string> {
@@ -39,33 +40,11 @@ export function ViewSwitcher<T extends string = string>({
 
   const selectedOption = options.find((opt) => opt.id === value);
 
-  // Close on outside click
-  React.useEffect(() => {
-    if (!isOpen) return;
-
-    const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen]);
-
-  // Close on Escape
-  React.useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
+  // Close on outside click or Escape
+  useClickOutside(containerRef, () => setIsOpen(false), {
+    enabled: isOpen,
+    closeOnEscape: true,
+  });
 
   const handleSelect = (optionId: T) => {
     onChange(optionId);

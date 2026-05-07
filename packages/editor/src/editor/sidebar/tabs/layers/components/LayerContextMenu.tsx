@@ -9,6 +9,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { Trash2, Group, Edit3, Lock, Unlock } from "lucide-react";
+import { useClickOutside } from "@/shared/hooks";
 
 export interface LayerContextMenuProps {
   /** Screen coordinates where the menu should appear */
@@ -35,23 +36,7 @@ export const LayerContextMenu: React.FC<LayerContextMenuProps> = ({
 }) => {
   const menuRef = React.useRef<HTMLDivElement>(null);
 
-  // Close on click outside
-  React.useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        onClose();
-      }
-    };
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("mousedown", handleClick);
-    document.addEventListener("keydown", handleEscape);
-    return () => {
-      document.removeEventListener("mousedown", handleClick);
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [onClose]);
+  useClickOutside(menuRef, onClose, { closeOnEscape: true });
 
   const handleAction = (action: () => void) => {
     action();

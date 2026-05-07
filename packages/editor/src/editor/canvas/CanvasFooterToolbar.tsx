@@ -16,6 +16,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { useClickOutside } from "@/shared/hooks";
 import {
   Tooltip,
   TooltipTrigger,
@@ -179,17 +180,7 @@ export const CanvasFooterToolbar: React.FC<CanvasFooterToolbarProps> = ({
     onZoomChange(prev);
   }, [zoom, onZoomChange]);
 
-  // Close preset dropdown on outside click
-  React.useEffect(() => {
-    if (!showPresets) return;
-    const handleOutside = (e: MouseEvent) => {
-      if (presetsRef.current && !presetsRef.current.contains(e.target as Node)) {
-        setShowPresets(false);
-      }
-    };
-    document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
-  }, [showPresets]);
+  useClickOutside(presetsRef, () => setShowPresets(false), { enabled: showPresets });
 
   return (
     <div style={containerStyles}>

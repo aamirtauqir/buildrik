@@ -8,6 +8,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
+import { useClickOutside } from "@/shared/hooks";
 import { EMPTY_MSGS, FORMAT_OPTIONS, SORT_OPTIONS } from "../data/mediaData";
 import type { LibraryItem, LibraryViewProps } from "../data/mediaTypes";
 import { extStyle, fmtDur, fmtSize } from "../data/mediaUtils";
@@ -411,16 +412,7 @@ export function LibraryView({
   const [sortOpen, setSortOpen] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!sortOpen) return;
-    const handleClick = (e: MouseEvent) => {
-      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
-        setSortOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [sortOpen]);
+  useClickOutside(sortRef, () => setSortOpen(false), { enabled: sortOpen });
 
   const imgItems = items.filter((i) => i.type === "img");
   const vidItems = items.filter((i) => i.type === "vid");

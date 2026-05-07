@@ -7,6 +7,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { useClickOutside } from "@/shared/hooks";
 
 export interface AddPageButtonProps {
   onAddBlank: () => void;
@@ -22,14 +23,7 @@ export const AddPageButton: React.FC<AddPageButtonProps> = ({
   const [menuOpen, setMenuOpen] = React.useState(false);
   const wrapRef = React.useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
-    if (!menuOpen) return;
-    const onDown = (e: MouseEvent) => {
-      if (!wrapRef.current?.contains(e.target as Node)) setMenuOpen(false);
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, [menuOpen]);
+  useClickOutside(wrapRef, () => setMenuOpen(false), { enabled: menuOpen });
 
   const hasOverflow = !!onFromTemplate || !!onAddFolder;
 
