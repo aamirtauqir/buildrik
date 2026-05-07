@@ -4,6 +4,7 @@
  */
 
 import * as React from "react";
+import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import type { ExportFormat } from "../utils/exportUtils";
 
 const EXPORT_OPTIONS = [
@@ -20,14 +21,7 @@ export const ExportDropdown: React.FC<{
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
-    if (!open) return;
-    const handle = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handle);
-    return () => document.removeEventListener("mousedown", handle);
-  }, [open]);
+  useClickOutside(ref, () => setOpen(false), { enabled: open });
 
   return (
     <div ref={ref} style={{ position: "relative" }}>

@@ -7,6 +7,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { useClickOutside } from "../../../../../shared/hooks/useClickOutside";
 import type { LibraryItem, MediaFolder } from "../data/mediaTypes";
 
 interface MediaContextMenuProps {
@@ -38,23 +39,9 @@ export function MediaContextMenu({
   onClose,
 }: MediaContextMenuProps) {
   const [moveOpen, setMoveOpen] = React.useState(false);
+  const menuRef = React.useRef<HTMLDivElement>(null);
 
-  // Close on outside click or Escape.
-  React.useEffect(() => {
-    const onDown = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest(".med-ctx-menu")) onClose();
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("mousedown", onDown);
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("mousedown", onDown);
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [onClose]);
+  useClickOutside(menuRef, onClose, { closeOnEscape: true });
 
   // Clamp so the menu stays on-screen.
   const left = Math.min(x, window.innerWidth - MENU_WIDTH - 8);
@@ -69,6 +56,7 @@ export function MediaContextMenu({
     <>
       <div className="med-ctx-backdrop" onClick={onClose} aria-hidden="true" />
       <div
+        ref={menuRef}
         className="med-ctx-menu"
         role="menu"
         aria-label="Asset actions"

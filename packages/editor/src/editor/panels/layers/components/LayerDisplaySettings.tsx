@@ -10,6 +10,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { useClickOutside } from "../../../../shared/hooks/useClickOutside";
 import type { LayerDisplayPrefs } from "../types";
 
 interface LayerDisplaySettingsProps {
@@ -21,20 +22,7 @@ interface LayerDisplaySettingsProps {
 export function LayerDisplaySettings({ prefs, onChange, onClose }: LayerDisplaySettingsProps) {
   const ref = React.useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
-    };
-    const escHandler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("mousedown", handler);
-    document.addEventListener("keydown", escHandler);
-    return () => {
-      document.removeEventListener("mousedown", handler);
-      document.removeEventListener("keydown", escHandler);
-    };
-  }, [onClose]);
+  useClickOutside(ref, onClose, { closeOnEscape: true });
 
   return (
     <div

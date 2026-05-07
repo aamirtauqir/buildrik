@@ -19,6 +19,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import { Copy, ClipboardPaste, CopyPlus, MoreHorizontal, Trash2 } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine";
+import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 
 // ============================================================================
 // STYLE CLIPBOARD — module-level so it survives across element selections
@@ -132,24 +133,14 @@ export const InspectorElementMenu: React.FC<InspectorElementMenuProps> = ({
   const triggerRef = React.useRef<HTMLButtonElement | null>(null);
 
   // Close on outside click and on Escape — standard menu semantics.
-  React.useEffect(() => {
-    if (!isOpen) return;
-    const onDocClick = (e: MouseEvent) => {
-      const target = e.target as Node;
-      if (menuRef.current?.contains(target)) return;
-      if (triggerRef.current?.contains(target)) return;
-      setIsOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsOpen(false);
-    };
-    document.addEventListener("mousedown", onDocClick);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDocClick);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [isOpen]);
+  // excludeRefs memoized so the hook's effect doesn't re-attach each render.
+  const closeMenu = React.useCallback(() => setIsOpen(false), []);
+  const excludeTrigger = React.useMemo(() => [triggerRef], []);
+  useClickOutside(menuRef, closeMenu, {
+    enabled: isOpen,
+    excludeRefs: excludeTrigger,
+    closeOnEscape: true,
+  });
 
   // Reset clipboard feedback when the menu closes so the next open starts fresh.
   const handleDuplicate = () => {

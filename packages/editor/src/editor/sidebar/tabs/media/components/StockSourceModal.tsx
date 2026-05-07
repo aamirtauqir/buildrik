@@ -7,6 +7,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { X, Download, SquareArrowOutUpRight } from "lucide-react";
+import { useEscapeKey } from "../../../../../shared/hooks/useEscapeKey";
 import { SearchBar } from "../../../shared/SearchBar";
 import type {
   DiscoveryViewProps,
@@ -68,15 +69,7 @@ export function StockSourceModal({
 }: StockSourceModalProps) {
   const [activeTab, setActiveTab] = React.useState<"img" | "vid" | "ico" | "fnt">("img");
 
-  // Close on Escape
-  React.useEffect(() => {
-    if (!open) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [open, onClose]);
+  useEscapeKey(onClose, { enabled: open });
 
   if (!open) return null;
 

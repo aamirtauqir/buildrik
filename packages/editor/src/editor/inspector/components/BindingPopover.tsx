@@ -13,6 +13,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import { Link, Link2Off } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine";
+import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import type { CMSCollection } from "../../../shared/types/cms";
 
 // =============================================================================
@@ -171,18 +172,12 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
     setCollections(all);
   }, [open, composer]);
 
-  // Close on outside click
-  React.useEffect(() => {
-    if (!open) return;
-    const handleOutside = (e: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-        setOpen(false);
-        setSelectedCollection(null);
-      }
-    };
-    document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
-  }, [open]);
+  // Close on outside click — clear selection too so reopening starts fresh.
+  const handleClickOutside = React.useCallback(() => {
+    setOpen(false);
+    setSelectedCollection(null);
+  }, []);
+  useClickOutside(wrapperRef, handleClickOutside, { enabled: open });
 
   const handleSelectCollection = React.useCallback(
     (col: CMSCollection) => {

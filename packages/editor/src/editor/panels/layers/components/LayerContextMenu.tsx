@@ -5,6 +5,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { useClickOutside } from "../../../../shared/hooks/useClickOutside";
 import type { LayerAction } from "../types";
 
 interface LayerContextMenuProps {
@@ -40,20 +41,7 @@ export function LayerContextMenu({
     firstItem?.focus();
   }, []);
 
-  React.useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) onClose();
-    };
-    const escHandler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("mousedown", handler);
-    document.addEventListener("keydown", escHandler);
-    return () => {
-      document.removeEventListener("mousedown", handler);
-      document.removeEventListener("keydown", escHandler);
-    };
-  }, [onClose]);
+  useClickOutside(menuRef, onClose, { closeOnEscape: true });
 
   const act = (action: LayerAction) => {
     onAction(action, nodeId);

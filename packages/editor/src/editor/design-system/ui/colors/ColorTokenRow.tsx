@@ -5,6 +5,7 @@
  */
 
 import * as React from "react";
+import { useClickOutside } from "../../../../shared/hooks/useClickOutside";
 import type { DesignToken, WcagLevel } from "../../types";
 import { calcWcagLevel, wcagTooltip, calcContrastRatio } from "../../utils/colorUtils";
 import { ColorPicker } from "./ColorPicker";
@@ -133,16 +134,7 @@ export const ColorTokenRow: React.FC<ColorTokenRowProps> = ({
   const rowRef = React.useRef<HTMLDivElement>(null);
   const wcagLevel = calcWcagLevel(token.value, "#0A0A0A");
 
-  React.useEffect(() => {
-    if (!showWcagPopover) return;
-    const handle = (e: MouseEvent) => {
-      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
-        setShowWcagPopover(false);
-      }
-    };
-    document.addEventListener("mousedown", handle);
-    return () => document.removeEventListener("mousedown", handle);
-  }, [showWcagPopover]);
+  useClickOutside(popoverRef, () => setShowWcagPopover(false), { enabled: showWcagPopover });
 
   // Skip WCAG badge for pure background/border tokens (they're not used as text colors)
   const showWcag = !token.id.includes("background") && !token.id.includes("border");
