@@ -1,6 +1,17 @@
 import * as React from "react";
 import type { DesignToken, TokenKind } from "../types";
 
+/**
+ * Apply a token value to :root so the canvas live-previews the change
+ * via CSS variables. Mirrors useColorTokens' applyToRoot. SSR-safe via
+ * typeof guard; cssVar is required and validated by Zod regex
+ * (`/^--[a-z0-9-]+$/`).
+ */
+function applyToRoot(cssVar: string, value: string): void {
+  if (typeof document === "undefined") return;
+  document.documentElement.style.setProperty(cssVar, value);
+}
+
 interface TokensForKindState {
   tokens: DesignToken[];
   savedTokens: DesignToken[];
@@ -56,12 +67,16 @@ export function useTokensForKind(
       const idx = prev.findIndex((t) => t.id === id);
       if (idx === -1) return prev;
       const old = prev[idx];
+      // No-op guard: setting the same value should not push an undo entry
+      // (mirrors useColorTokens contract).
+      if (old.value === value) return prev;
       const stack = undoStackRef.current.get(id) ?? [];
       stack.push(old.value);
       undoStackRef.current.set(id, stack);
       redoStackRef.current.set(id, []);
       const next = [...prev];
       next[idx] = { ...old, value };
+      applyToRoot(old.cssVar, value);
       return next;
     });
   }, []);
@@ -78,6 +93,7 @@ export function useTokensForKind(
       redoStackRef.current.set(id, redoStack);
       const next = [...cur];
       next[idx] = { ...next[idx], value: prev };
+      applyToRoot(next[idx].cssVar, prev);
       return next;
     });
   }, []);
@@ -94,6 +110,7 @@ export function useTokensForKind(
       undoStackRef.current.set(id, undoStack);
       const out = [...cur];
       out[idx] = { ...out[idx], value: next };
+      applyToRoot(out[idx].cssVar, next);
       return out;
     });
   }, []);
@@ -116,6 +133,10 @@ export function useTokensForKind(
 
   const discardAll = React.useCallback(() => {
     setTokens(savedTokens);
+    // Restore :root CSS vars to saved values so canvas snaps back.
+    for (const t of savedTokens) {
+      applyToRoot(t.cssVar, t.value);
+    }
     undoStackRef.current.clear();
     redoStackRef.current.clear();
   }, [savedTokens]);
