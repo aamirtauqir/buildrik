@@ -12,6 +12,7 @@ import { EVENTS } from "../../shared/constants";
 import type { PageData } from "../../shared/types";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { useToast } from "@/editor/shared/vibcoder";
+import { useClickOutside } from "@/shared/hooks";
 import { getDefaultPageName } from "../../shared/utils/pageUtils";
 import { normalizeSlug } from "../sidebar/tabs/pages/utils/slug";
 
@@ -41,6 +42,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
   const [editName, setEditName] = React.useState("");
   const [deleteConfirmPageId, setDeleteConfirmPageId] = React.useState<string | null>(null);
   const [dirtyPages, setDirtyPages] = React.useState<Set<string>>(new Set());
+  const ctxMenuRef = React.useRef<HTMLDivElement>(null);
   const { addToast } = useToast();
 
   const nameValidation = React.useMemo<{
@@ -105,16 +107,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
     };
   }, [composer]);
 
-  // Close context menu on outside mousedown
-  React.useEffect(() => {
-    if (!contextMenu) return;
-    const handle = (e: MouseEvent) => {
-      if ((e.target as Element).closest?.(".ptb-ctx-menu")) return;
-      setContextMenu(null);
-    };
-    document.addEventListener("mousedown", handle);
-    return () => document.removeEventListener("mousedown", handle);
-  }, [contextMenu]);
+  useClickOutside(ctxMenuRef, () => setContextMenu(null), { enabled: !!contextMenu });
 
   const handleTabClick = (pageId: string) => {
     if (editingPageId) return;
@@ -343,6 +336,7 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
       {contextMenu &&
         createPortal(
           <div
+            ref={ctxMenuRef}
             className="ptb-ctx-menu"
             style={{ ...menuStyles, left: contextMenu.x, top: contextMenu.y }}
             role="menu"
