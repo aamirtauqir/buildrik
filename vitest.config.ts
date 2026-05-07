@@ -5,7 +5,11 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
-    include: ["__tests__/**/*.test.{ts,tsx}", "packages/editor/src/**/*.test.{ts,tsx}"],
+    include: [
+      "__tests__/**/*.test.{ts,tsx}",
+      "packages/editor/src/**/*.test.{ts,tsx}",
+      "packages/shared/**/*.test.{ts,tsx}",
+    ],
     exclude: ["**/node_modules/**", ".worktrees/**"],
   },
   resolve: {
