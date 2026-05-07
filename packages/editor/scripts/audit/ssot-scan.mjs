@@ -20,6 +20,17 @@ function walk(dir, exts = ['.tsx', '.ts', '.css', '.md']) {
 const HOMES = ['src/editor/shared/vibcoder', 'src/shared/ui', 'src/shared/extensions'];
 const PSEUDO_STATES = [':focus-visible', ':hover', ':active', ':focus', ':disabled'];
 
+function fileExportsSymbol(filePath, symbolName) {
+  const content = readFileSync(filePath, 'utf8');
+  // Match: export const|function|class <name>, export default <name>, export { <name> }
+  const patterns = [
+    new RegExp(`export\\s+(?:const|function|class|let|var)\\s+${symbolName}\\b`),
+    new RegExp(`export\\s+default\\s+(?:function\\s+)?${symbolName}\\b`),
+    new RegExp(`export\\s*\\{[^}]*\\b${symbolName}\\b[^}]*\\}`),
+  ];
+  return patterns.some((p) => p.test(content));
+}
+
 export function scanComponentDuplicates(root) {
   const byName = new Map();
   for (const home of HOMES) {
@@ -36,13 +47,20 @@ export function scanComponentDuplicates(root) {
   const violations = [];
   for (const [name, paths] of byName) {
     if (paths.length > 1) {
-      violations.push({
-        path: paths[0],
-        line: 1,
-        severity: 'important',
-        message: `Primitive "${name}" defined in ${paths.length} homes: ${paths.join(', ')}`,
-        suggestion: 'Pick canonical home per CLAUDE.md three-home contract; delete duplicates.',
-      });
+      // Audit Appendix #3: basename collision is only a real duplicate when
+      // each file actually exports the basename-matching symbol. Skeleton.tsx
+      // (vibcoder primitive) + Skeleton.tsx (extensions, exports
+      // SkeletonListItem/StudioSkeleton compositions) was a false positive.
+      const matchingPaths = paths.filter((p) => fileExportsSymbol(resolve(root, p), name));
+      if (matchingPaths.length > 1) {
+        violations.push({
+          path: matchingPaths[0],
+          line: 1,
+          severity: 'important',
+          message: `Primitive "${name}" defined in ${matchingPaths.length} homes: ${matchingPaths.join(', ')}`,
+          suggestion: 'Pick canonical home per CLAUDE.md three-home contract; delete duplicates.',
+        });
+      }
     }
   }
   return { category: 'componentDuplicates', violations };

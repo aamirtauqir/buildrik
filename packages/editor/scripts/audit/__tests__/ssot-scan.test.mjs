@@ -55,6 +55,29 @@ describe('scanComponentDuplicates', () => {
     expect(cat1.violations).toHaveLength(0);
     rmSync(dir, { recursive: true, force: true });
   });
+
+  it('does not flag basename collision when files export different symbols', () => {
+    const dir = makeFixture({
+      'src/editor/shared/vibcoder/Foo.tsx': 'export const Foo = () => null;',
+      'src/shared/extensions/Foo.tsx': 'export const FooListItem = () => null;\nexport const StudioFoo = () => null;',
+    });
+    const results = run(dir, ['--category=1']);
+    const cat1 = results.find((r) => r.category === 'componentDuplicates');
+    expect(cat1.violations).toHaveLength(0);
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('still flags basename collision when both files export matching symbol', () => {
+    const dir = makeFixture({
+      'src/editor/shared/vibcoder/Bar.tsx': 'export const Bar = () => null;',
+      'src/shared/ui/Bar.tsx': 'export const Bar = () => null;',
+    });
+    const results = run(dir, ['--category=1']);
+    const cat1 = results.find((r) => r.category === 'componentDuplicates');
+    expect(cat1.violations).toHaveLength(1);
+    expect(cat1.violations[0].message).toMatch(/Bar/);
+    rmSync(dir, { recursive: true, force: true });
+  });
 });
 
 describe('scanKeyframeDuplicates', () => {
