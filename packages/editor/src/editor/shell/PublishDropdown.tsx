@@ -12,6 +12,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { useClickOutside } from "@/shared/hooks";
 
 export type PublishState = "draft" | "in-review" | "approved" | "published";
 
@@ -179,30 +180,12 @@ export const PublishDropdown: React.FC<PublishDropdownProps> = ({
     });
   }, [publishState, publishedUrl, onPublish]);
 
-  // Close on click outside
-  React.useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e: MouseEvent) => {
-      if (
-        menuRef.current && !menuRef.current.contains(e.target as Node) &&
-        buttonRef.current && !buttonRef.current.contains(e.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [isOpen]);
-
-  // Close on Escape
-  React.useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsOpen(false);
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [isOpen]);
+  // Close on click outside or Escape
+  useClickOutside(menuRef, () => setIsOpen(false), {
+    enabled: isOpen,
+    excludeRefs: [buttonRef],
+    closeOnEscape: true,
+  });
 
   const handleMainClick = () => {
     if (publishState === "approved") {

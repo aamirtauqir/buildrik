@@ -11,6 +11,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { Stack } from "@/editor/shared/vibcoder";
+import { useEscapeKey } from "@/shared/hooks";
 
 type Role = "Editor" | "Admin" | "Viewer";
 
@@ -71,14 +72,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
     emailRef.current?.focus();
   }, []);
 
-  // Escape to close
-  React.useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [onClose]);
+  useEscapeKey(onClose);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shareUrl).catch(() => {});

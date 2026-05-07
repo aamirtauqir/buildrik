@@ -8,6 +8,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import { useClickOutside } from "@/shared/hooks";
 
 export type DeviceType = "desktop" | "tablet" | "mobile" | "wide";
 
@@ -40,32 +41,12 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
 
   const currentWidth = DEVICE_WIDTH[device] ?? DEVICE_WIDTH.desktop;
 
-  // Close on click outside
-  React.useEffect(() => {
-    if (!isOpen) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(e.target as Node) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(e.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen]);
-
-  // Close on Escape key
-  React.useEffect(() => {
-    if (!isOpen) return;
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsOpen(false);
-    };
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [isOpen]);
+  // Close on click outside or Escape
+  useClickOutside(menuRef, () => setIsOpen(false), {
+    enabled: isOpen,
+    excludeRefs: [buttonRef],
+    closeOnEscape: true,
+  });
 
   return (
     <div style={{ position: "relative" }}>

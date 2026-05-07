@@ -9,6 +9,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { Stack } from "@/editor/shared/vibcoder";
+import { useEscapeKey } from "@/shared/hooks";
 
 type Tab = "profile" | "team" | "collaboration" | "billing";
 type Role = "Editor" | "Admin" | "Viewer";
@@ -384,13 +385,7 @@ const TabBilling: React.FC = () => (
 export const AccountModal: React.FC<AccountModalProps> = ({ onClose }) => {
   const [activeTab, setActiveTab] = React.useState<Tab>("profile");
 
-  React.useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [onClose]);
+  useEscapeKey(onClose);
 
   const renderContent = () => {
     if (activeTab === "profile")       return <TabProfile />;
