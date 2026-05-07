@@ -147,14 +147,15 @@ Execute back-to-back as small commits. Each <30 min. No tests needed beyond exis
 - **Risk:** High — DnD is core UX.
 - **Effort:** 4-6 hours including test additions.
 
-### D2. E-006 — Split `AquibraStudio.tsx` (609 lines)
-- **Scope:** Extract:
-  - `useEditorShortcuts()` — keyboard handlers
-  - `useSaveCallback()` — save flow + autosave
-  - `useEditorModals()` — modal state aggregator
-  - Keep `AquibraStudio` as slim provider tree + `LayoutShell` host
-- **Risk:** High — central orchestrator.
-- **Effort:** 4-6 hours.
+### D2. E-006 — Split `AquibraStudio.tsx` ✅ SHIPPED 2026-05-07
+- **Status:** Complete. 4 stages, commits e331b1c8 → af8fb7c1 → f339f272 → 3a603f0a.
+- **Result:** Orchestrator 669 → 472 LOC (-197, -29.5%). 4 single-concern hooks, 56 new test cases.
+- **Hooks shipped:**
+  - `useEditorShortcuts()` — global keydown handler (8 shortcut branches + editable-surface guard).
+  - `useSaveCallback()` — composer.saveProject + 5 user-friendly error mappings + Retry action.
+  - `useEditorEventListeners()` — 4 composer-driven side-effects (PROJECT_LOADED, COMPONENT_CREATE_REQUESTED, SHOW_IN_LAYERS, overlay-defaults init).
+  - `useExportHandlers()` — handleExportHTML + handleExportForDeploy + handleVercelPublish + usePublishJob() + publish-toast effect.
+- **Test mock learning:** ExportEngine `new`-construction + arrow-function vi.mock factories incompatible. Use plain function constructor returning a mutable shared instance. Documented inline in `useExportHandlers.test.ts`.
 
 ### D3. E-014 — Composer manager grouping
 - **Scope:** Group 30 managers in `Composer` constructor under domain facades:
