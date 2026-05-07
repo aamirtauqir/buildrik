@@ -13,84 +13,24 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import { useVersionHistory } from "../../shared/hooks/useVersionHistory";
-import { formatRelativeTime } from "../../editor/sidebar/tabs/history/helpers";
 import type { CompareResult } from "../../shared/types/versions";
 import type { NamedVersion } from "../../shared/types/versions";
-import { SnapshotPreview } from "../../editor/sidebar/tabs/history/components/SnapshotPreview";
 import type { Composer } from "../../engine";
-
-// react-window 1.8.11 ships without TS types (the installed @types/react-window@2.0.0
-// is a deprecated stub for v2). Import as an untyped module and wrap in a local typed
-// alias so this file stays strict. The file scope for Wave 2B is one file — a shared
-// .d.ts shim can be added in a follow-up to keep the fix local here.
-// @ts-expect-error — no declaration file for react-window@1.8.x
-import { FixedSizeList as FixedSizeListUntyped } from "react-window";
-
-interface ListChildComponentProps {
-  index: number;
-  style: React.CSSProperties;
-  data?: unknown;
-}
-interface FixedSizeListProps {
-  height: number;
-  width: number | string;
-  itemCount: number;
-  itemSize: number;
-  overscanCount?: number;
-  itemKey?: (index: number, data?: unknown) => React.Key;
-  children: (props: ListChildComponentProps) => React.ReactNode;
-}
-const FixedSizeList = FixedSizeListUntyped as unknown as React.ComponentType<FixedSizeListProps>;
+// D3 Stage 1 (audit-remediation 2026-05-08): list virtualization +
+// VersionRow + EmptyState lifted into version-history/VersionList.tsx.
+// The orchestrator passes filteredVersions + per-row handlers down.
+import {
+  VersionList,
+  EmptyState,
+  formatTime,
+} from "./version-history/VersionList";
 
 // ============================================
 // Constants
 // ============================================
 
-const ROW_HEIGHT = 64; // version row (48px) + 16px breathing room
-const OVERSCAN = 5;
 const AI_COOLDOWN_MS = 60_000;
 const TOAST_DURATION_MS = 3000;
-
-// ============================================
-// Date Helpers
-// ============================================
-
-function getDateGroup(timestamp: number): string {
-  const now = new Date();
-  const date = new Date(timestamp);
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const yesterday = new Date(today.getTime() - 86400000);
-
-  if (date >= today) return "Today";
-  if (date >= yesterday) return "Yesterday";
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
-
-function formatTime(timestamp: number): string {
-  return new Date(timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-}
-
-// ============================================
-// Flat Row Types (for virtualization)
-// ============================================
-
-type FlatRow =
-  | { kind: "date-header"; id: string; label: string }
-  | { kind: "version"; id: string; version: NamedVersion };
-
-// ============================================
-// Empty State
-// ============================================
-
-function EmptyState({ icon, message, hint }: { icon: React.ReactNode; message: string; hint?: React.ReactNode }) {
-  return (
-    <div className="empty-state">
-      <div className="empty-icon">{icon}</div>
-      <p className="empty-title">{message}</p>
-      {hint && <p className="empty-hint">{hint}</p>}
-    </div>
-  );
-}
 
 // ============================================
 // Compare View
@@ -295,130 +235,8 @@ function CompareView({
   );
 }
 
-// ============================================
-// Version Row Component
-// ============================================
-
-interface VersionRowProps {
-  version: NamedVersion;
-  isRestoring: boolean;
-  isDeleteConfirm: boolean;
-  onRestore: () => void;
-  onDeleteRequest: () => void;
-  onDeleteConfirm: () => void;
-  onDeleteCancel: () => void;
-  onCompare: () => void;
-  elementCount?: number;
-}
-
-function VersionRow({
-  version,
-  isRestoring,
-  isDeleteConfirm,
-  onRestore,
-  onDeleteRequest,
-  onDeleteConfirm,
-  onDeleteCancel,
-  onCompare,
-  elementCount = 0,
-}: VersionRowProps) {
-  const rowRef = React.useRef<HTMLDivElement>(null);
-  const hoverTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [showPreview, setShowPreview] = React.useState(false);
-  const [previewRect, setPreviewRect] = React.useState<DOMRect | null>(null);
-
-  const relative = formatRelativeTime(version.createdAt);
-
-  const handleMouseEnter = React.useCallback(() => {
-    if (!version.visualSnapshot) return;
-    hoverTimeoutRef.current = setTimeout(() => {
-      const rect = rowRef.current?.getBoundingClientRect();
-      if (rect) {
-        setPreviewRect(rect);
-        setShowPreview(true);
-      }
-    }, 300);
-  }, [version.visualSnapshot]);
-
-  const handleMouseLeave = React.useCallback(() => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = null;
-    }
-    setShowPreview(false);
-  }, []);
-
-  return (
-    <div className="version-row-wrapper">
-      <div
-        ref={rowRef}
-        className={`version-row${isDeleteConfirm ? " delete-confirm" : ""}`}
-        aria-label={`Version "${version.name}" from ${relative}`}
-        role="listitem"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        {/* Version Info */}
-        <div className="version-row-main">
-          <div>
-            <div className="version-name">{version.name}</div>
-            <div className="version-meta">
-              <span className="version-time">{formatTime(version.createdAt)}</span>
-              <span>{relative}</span>
-              {elementCount > 0 && (
-                <span className="entry-badge" style={{ background: "rgba(45,109,255,0.12)", color: "var(--buildrick-accent)" }}>
-                  {elementCount} el
-                </span>
-              )}
-              {version.isAutoCheckpoint && (
-                <span className="entry-badge auto-save">Auto</span>
-              )}
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="version-actions">
-            {isDeleteConfirm ? (
-              <>
-                <Button onClick={onDeleteConfirm} className="action-btn danger" aria-label="Confirm delete">
-                  Delete
-                </Button>
-                <Button onClick={onDeleteCancel} className="action-btn" aria-label="Cancel">
-                  ×
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button onClick={onCompare} className="action-btn primary" aria-label={`Compare "${version.name}"`}>
-                  Compare
-                </Button>
-                <Button
-                  onClick={onRestore}
-                  className="action-btn"
-                  disabled={isRestoring}
-                  aria-label={`Restore "${version.name}"`}
-                >
-                  {isRestoring ? "..." : "Restore"}
-                </Button>
-                <Button onClick={onDeleteRequest} className="action-btn danger" aria-label={`Delete "${version.name}"`}>
-                  ×
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-      {/* Snapshot Preview Tooltip */}
-      {showPreview && version.visualSnapshot && previewRect && (
-        <SnapshotPreview
-          snapshotUrl={version.visualSnapshot}
-          versionName={version.name}
-          anchorRect={previewRect}
-        />
-      )}
-    </div>
-  );
-}
+// VersionRow + EmptyState moved to ./version-history/VersionList.tsx
+// (D3 Stage 1, audit-remediation 2026-05-08).
 
 // ============================================
 // Toast
@@ -524,10 +342,6 @@ export function VersionHistoryPanel({
   // Toast state
   const [toasts, setToasts] = React.useState<Toast[]>([]);
 
-  // Virtualization — measured height
-  const listWrapperRef = React.useRef<HTMLDivElement>(null);
-  const [listHeight, setListHeight] = React.useState(0);
-
   const pushToast = React.useCallback((message: string, kind: "success" | "error" = "success") => {
     const id =
       typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -545,24 +359,6 @@ export function VersionHistoryPanel({
       setCurrentVisualSnapshot(composer.versions.captureVisualSnapshot());
     }
   }, [composer]);
-
-  // Measure list container height for FixedSizeList
-  React.useLayoutEffect(() => {
-    const el = listWrapperRef.current;
-    if (!el) return;
-
-    const measure = () => setListHeight(el.clientHeight);
-    measure();
-
-    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
-    ro?.observe(el);
-    window.addEventListener("resize", measure);
-
-    return () => {
-      ro?.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, []);
 
   // Handle create version
   const handleCreateVersion = async () => {
@@ -735,27 +531,6 @@ export function VersionHistoryPanel({
     return versions.filter((v) => v.name.toLowerCase().includes(query));
   }, [versions, searchQuery]);
 
-  // Flatten into a single row list for virtualization (excluding the expanded row's
-  // CompareView, which renders outside the list so it can grow freely).
-  const flatRows = React.useMemo<FlatRow[]>(() => {
-    const rows: FlatRow[] = [];
-    let currentGroup = "";
-    for (const v of filteredVersions) {
-      const group = getDateGroup(v.createdAt);
-      if (group !== currentGroup) {
-        currentGroup = group;
-        rows.push({ kind: "date-header", id: `group-${group}`, label: group });
-      }
-      rows.push({ kind: "version", id: v.id, version: v });
-    }
-    return rows;
-  }, [filteredVersions]);
-
-  // Row size: date headers are smaller than version rows, but FixedSizeList
-  // expects a single size. Use ROW_HEIGHT (64px) uniformly — the date header
-  // has enough vertical padding to look natural at that height.
-  const itemSize = ROW_HEIGHT;
-
   // Build the expanded version (if any) for rendering below the list.
   const expandedVersion = expandedId
     ? filteredVersions.find((v) => v.id === expandedId) ?? null
@@ -768,42 +543,6 @@ export function VersionHistoryPanel({
     const remaining = AI_COOLDOWN_MS - (Date.now() - last);
     return remaining > 0 ? Math.ceil(remaining / 1000) : 0;
   }, []);
-
-  // Render a single virtualized row.
-  const renderRow = React.useCallback(
-    ({ index, style }: ListChildComponentProps) => {
-      const row = flatRows[index];
-      if (!row) return null;
-
-      if (row.kind === "date-header") {
-        return (
-          <div style={{ ...style, display: "flex", alignItems: "flex-end", paddingBottom: 4 }}>
-            <div className="date-group-header" style={{ position: "static", width: "100%" }}>
-              {row.label}
-            </div>
-          </div>
-        );
-      }
-
-      const v = row.version;
-      return (
-        <div style={style}>
-          <VersionRow
-            version={v}
-            isRestoring={restoringId === v.id}
-            isDeleteConfirm={deleteConfirmId === v.id}
-            onRestore={() => handleRestoreClick(v.id)}
-            onDeleteRequest={() => handleDeleteRequest(v.id)}
-            onDeleteConfirm={() => handleDeleteConfirm(v.id)}
-            onDeleteCancel={handleDeleteCancel}
-            onCompare={() => handleCompare(v.id)}
-            elementCount={0}
-          />
-        </div>
-      );
-    },
-    [flatRows, restoringId, deleteConfirmId, handleCompare]
-  );
 
   // Version currently awaiting restore confirmation (rendered outside the list).
   const restoreConfirmVersion = restoreConfirmId
@@ -829,38 +568,19 @@ export function VersionHistoryPanel({
 
   return (
     <div className="saves-view">
-      {/* Version List — scrolls, fills available space above FAB */}
-      <div ref={listWrapperRef} className="version-list" role="list">
-        {filteredVersions.length === 0 ? (
-          <EmptyState
-            icon={
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <rect x="8" y="6" width="16" height="20" rx="2" />
-                <path d="M12 12h8M12 16h8M12 20h4" />
-              </svg>
-            }
-            message={versions.length === 0 ? "No saved versions yet" : "No matching versions"}
-            hint={
-              versions.length === 0 ? (
-                <>Save Version creates a named milestone you can restore anytime.</>
-              ) : (
-                "Try a different search term."
-              )
-            }
-          />
-        ) : listHeight > 0 ? (
-          <FixedSizeList
-            height={listHeight}
-            width="100%"
-            itemCount={flatRows.length}
-            itemSize={itemSize}
-            overscanCount={OVERSCAN}
-            itemKey={(index) => flatRows[index]?.id ?? index}
-          >
-            {renderRow}
-          </FixedSizeList>
-        ) : null}
-      </div>
+      {/* Version List — virtualization + row rendering owned by VersionList.
+          See ./version-history/VersionList.tsx (D3 Stage 1). */}
+      <VersionList
+        filteredVersions={filteredVersions}
+        totalCount={versions.length}
+        restoringId={restoringId}
+        deleteConfirmId={deleteConfirmId}
+        onRestoreRequest={handleRestoreClick}
+        onDeleteRequest={handleDeleteRequest}
+        onDeleteConfirm={handleDeleteConfirm}
+        onDeleteCancel={handleDeleteCancel}
+        onCompare={handleCompare}
+      />
       {/* Inline restore confirmation — rendered outside the virtualized list.
           Appears as a pinned section below the list for the pending version. */}
       {restoreConfirmVersion && (
