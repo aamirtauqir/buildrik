@@ -666,6 +666,7 @@ export async function getProjectData(siteId: string) {
       projectStyles: true,
       projectAssets: true,
       projectSettings: true,
+      dsSchemaVersion: true,
       sitePages: {
         select: {
           id: true,
@@ -696,5 +697,6 @@ export async function getProjectData(siteId: string) {
     styles: site.projectStyles ?? [],
     assets: site.projectAssets ?? [],
     settings: site.projectSettings ?? {},
+    dsSchemaVersion: site.dsSchemaVersion,
   };
 }
