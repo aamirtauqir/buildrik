@@ -23,6 +23,28 @@ import { useSpacingTokens } from "./useSpacingTokens";
 import type { SpacingTokensState, SpacingTokensActions } from "./useSpacingTokens";
 import { useTypeTokens } from "./useTypeTokens";
 import type { TypeTokensState, TypeTokensActions } from "./useTypeTokens";
+import { useRadiusTokens } from "./useRadiusTokens";
+import type { RadiusTokensState } from "./useRadiusTokens";
+import { useShadowTokens } from "./useShadowTokens";
+import type { ShadowTokensState } from "./useShadowTokens";
+import { useMotionTokens } from "./useMotionTokens";
+import type { MotionTokensState } from "./useMotionTokens";
+import { useBorderTokens } from "./useBorderTokens";
+import type { BorderTokensState } from "./useBorderTokens";
+import { useOpacityTokens } from "./useOpacityTokens";
+import type { OpacityTokensState } from "./useOpacityTokens";
+import { useZindexTokens } from "./useZindexTokens";
+import type { ZindexTokensState } from "./useZindexTokens";
+import { useBreakpointTokens } from "./useBreakpointTokens";
+import type { BreakpointTokensState } from "./useBreakpointTokens";
+import { useGridTokens } from "./useGridTokens";
+import type { GridTokensState } from "./useGridTokens";
+import { useSizingTokens } from "./useSizingTokens";
+import type { SizingTokensState } from "./useSizingTokens";
+import { useIconTokens } from "./useIconTokens";
+import type { IconTokensState } from "./useIconTokens";
+import { useImageryTokens } from "./useImageryTokens";
+import type { ImageryTokensState } from "./useImageryTokens";
 
 // ============================================================================
 // CONTEXT TYPES
@@ -31,6 +53,17 @@ import type { TypeTokensState, TypeTokensActions } from "./useTypeTokens";
 export type ColorRegistry = ColorTokensState & ColorTokensActions;
 export type SpacingRegistry = SpacingTokensState & SpacingTokensActions;
 export type TypeRegistry = TypeTokensState & TypeTokensActions;
+export type RadiusRegistry     = RadiusTokensState;
+export type ShadowRegistry     = ShadowTokensState;
+export type MotionRegistry     = MotionTokensState;
+export type BorderRegistry     = BorderTokensState;
+export type OpacityRegistry    = OpacityTokensState;
+export type ZindexRegistry     = ZindexTokensState;
+export type BreakpointRegistry = BreakpointTokensState;
+export type GridRegistry       = GridTokensState;
+export type SizingRegistry     = SizingTokensState;
+export type IconRegistry       = IconTokensState;
+export type ImageryRegistry    = ImageryTokensState;
 
 interface RegistryConfig {
   /** Save all current token values to localStorage (call after composer.setProjectSettings) */
@@ -44,6 +77,17 @@ interface RegistryConfig {
 const ColorRegistryContext = React.createContext<ColorRegistry | null>(null);
 const SpacingRegistryContext = React.createContext<SpacingRegistry | null>(null);
 const TypeRegistryContext = React.createContext<TypeRegistry | null>(null);
+const RadiusRegistryContext     = React.createContext<RadiusRegistry | null>(null);
+const ShadowRegistryContext     = React.createContext<ShadowRegistry | null>(null);
+const MotionRegistryContext     = React.createContext<MotionRegistry | null>(null);
+const BorderRegistryContext     = React.createContext<BorderRegistry | null>(null);
+const OpacityRegistryContext    = React.createContext<OpacityRegistry | null>(null);
+const ZindexRegistryContext     = React.createContext<ZindexRegistry | null>(null);
+const BreakpointRegistryContext = React.createContext<BreakpointRegistry | null>(null);
+const GridRegistryContext       = React.createContext<GridRegistry | null>(null);
+const SizingRegistryContext     = React.createContext<SizingRegistry | null>(null);
+const IconRegistryContext       = React.createContext<IconRegistry | null>(null);
+const ImageryRegistryContext    = React.createContext<ImageryRegistry | null>(null);
 const RegistryConfigContext = React.createContext<RegistryConfig | null>(null);
 
 // ============================================================================
@@ -105,6 +149,17 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
   const colorState = useColorTokens(initialTokens);
   const spacingState = useSpacingTokens(initialTokens);
   const typeState = useTypeTokens(initialTokens);
+  const radiusState     = useRadiusTokens(initialTokens);
+  const shadowState     = useShadowTokens(initialTokens);
+  const motionState     = useMotionTokens(initialTokens);
+  const borderState     = useBorderTokens(initialTokens);
+  const opacityState    = useOpacityTokens(initialTokens);
+  const zindexState     = useZindexTokens(initialTokens);
+  const breakpointState = useBreakpointTokens(initialTokens);
+  const gridState       = useGridTokens(initialTokens);
+  const sizingState     = useSizingTokens(initialTokens);
+  const iconState       = useIconTokens(initialTokens);
+  const imageryState    = useImageryTokens(initialTokens);
 
   // Save all tokens to localStorage in versioned format. Call this after apply.
   // Versioned format is {schemaVersion, tokens} — the loader accepts both
@@ -132,9 +187,31 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
     <ColorRegistryContext.Provider value={colorState}>
       <SpacingRegistryContext.Provider value={spacingState}>
         <TypeRegistryContext.Provider value={typeState}>
-          <RegistryConfigContext.Provider value={config}>
-            {children}
-          </RegistryConfigContext.Provider>
+          <RadiusRegistryContext.Provider value={radiusState}>
+            <ShadowRegistryContext.Provider value={shadowState}>
+              <MotionRegistryContext.Provider value={motionState}>
+                <BorderRegistryContext.Provider value={borderState}>
+                  <OpacityRegistryContext.Provider value={opacityState}>
+                    <ZindexRegistryContext.Provider value={zindexState}>
+                      <BreakpointRegistryContext.Provider value={breakpointState}>
+                        <GridRegistryContext.Provider value={gridState}>
+                          <SizingRegistryContext.Provider value={sizingState}>
+                            <IconRegistryContext.Provider value={iconState}>
+                              <ImageryRegistryContext.Provider value={imageryState}>
+                                <RegistryConfigContext.Provider value={config}>
+                                  {children}
+                                </RegistryConfigContext.Provider>
+                              </ImageryRegistryContext.Provider>
+                            </IconRegistryContext.Provider>
+                          </SizingRegistryContext.Provider>
+                        </GridRegistryContext.Provider>
+                      </BreakpointRegistryContext.Provider>
+                    </ZindexRegistryContext.Provider>
+                  </OpacityRegistryContext.Provider>
+                </BorderRegistryContext.Provider>
+              </MotionRegistryContext.Provider>
+            </ShadowRegistryContext.Provider>
+          </RadiusRegistryContext.Provider>
         </TypeRegistryContext.Provider>
       </SpacingRegistryContext.Provider>
     </ColorRegistryContext.Provider>
@@ -218,6 +295,72 @@ export function useSpacingRegistry(): SpacingRegistry {
 export function useTypeRegistry(): TypeRegistry {
   const ctx = React.useContext(TypeRegistryContext);
   return ctx ?? FALLBACK_TYPE;
+}
+
+export function useRadiusRegistry(): RadiusRegistry {
+  const ctx = React.useContext(RadiusRegistryContext);
+  if (!ctx) throw new Error("useRadiusRegistry must be used within TokenRegistryProvider");
+  return ctx;
+}
+
+export function useShadowRegistry(): ShadowRegistry {
+  const ctx = React.useContext(ShadowRegistryContext);
+  if (!ctx) throw new Error("useShadowRegistry must be used within TokenRegistryProvider");
+  return ctx;
+}
+
+export function useMotionRegistry(): MotionRegistry {
+  const ctx = React.useContext(MotionRegistryContext);
+  if (!ctx) throw new Error("useMotionRegistry must be used within TokenRegistryProvider");
+  return ctx;
+}
+
+export function useBorderRegistry(): BorderRegistry {
+  const ctx = React.useContext(BorderRegistryContext);
+  if (!ctx) throw new Error("useBorderRegistry must be used within TokenRegistryProvider");
+  return ctx;
+}
+
+export function useOpacityRegistry(): OpacityRegistry {
+  const ctx = React.useContext(OpacityRegistryContext);
+  if (!ctx) throw new Error("useOpacityRegistry must be used within TokenRegistryProvider");
+  return ctx;
+}
+
+export function useZindexRegistry(): ZindexRegistry {
+  const ctx = React.useContext(ZindexRegistryContext);
+  if (!ctx) throw new Error("useZindexRegistry must be used within TokenRegistryProvider");
+  return ctx;
+}
+
+export function useBreakpointRegistry(): BreakpointRegistry {
+  const ctx = React.useContext(BreakpointRegistryContext);
+  if (!ctx) throw new Error("useBreakpointRegistry must be used within TokenRegistryProvider");
+  return ctx;
+}
+
+export function useGridRegistry(): GridRegistry {
+  const ctx = React.useContext(GridRegistryContext);
+  if (!ctx) throw new Error("useGridRegistry must be used within TokenRegistryProvider");
+  return ctx;
+}
+
+export function useSizingRegistry(): SizingRegistry {
+  const ctx = React.useContext(SizingRegistryContext);
+  if (!ctx) throw new Error("useSizingRegistry must be used within TokenRegistryProvider");
+  return ctx;
+}
+
+export function useIconRegistry(): IconRegistry {
+  const ctx = React.useContext(IconRegistryContext);
+  if (!ctx) throw new Error("useIconRegistry must be used within TokenRegistryProvider");
+  return ctx;
+}
+
+export function useImageryRegistry(): ImageryRegistry {
+  const ctx = React.useContext(ImageryRegistryContext);
+  if (!ctx) throw new Error("useImageryRegistry must be used within TokenRegistryProvider");
+  return ctx;
 }
 
 export function useRegistryConfig(): RegistryConfig {
