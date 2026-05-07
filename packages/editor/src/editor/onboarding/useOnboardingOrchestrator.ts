@@ -16,6 +16,16 @@ import {
   type OnboardingStep,
 } from "../../shared/constants/onboardingSteps";
 
+// ── Constants ────────────────────────────────────────────────────────────────
+
+/**
+ * Achievement prompt auto-dismiss duration. Single source of truth — the
+ * orchestrator's setTimeout AND AchievementPrompt's progress-bar countdown
+ * both consume this value so the bar reaches 100% exactly when the modal
+ * dismisses (audit Pattern D — see docs/audits/2026-05-07-codebase-audit.md).
+ */
+export const ACHIEVEMENT_AUTO_DISMISS_MS = 4000;
+
 // ── Types ────────────────────────────────────────────────────────────────────
 
 export type OnboardingPhase = "active" | "done";
@@ -167,7 +177,7 @@ export function useOnboardingOrchestrator(): OnboardingOrchestratorState {
       achievementTimer.current = setTimeout(() => {
         setAchievement(null);
         if (isLastStep) persistPhase("done");
-      }, 3500);
+      }, ACHIEVEMENT_AUTO_DISMISS_MS);
     },
     [persistPhase]
   );

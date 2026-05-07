@@ -11,7 +11,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import type { AchievementPromptState } from "./useOnboardingOrchestrator";
+import { ACHIEVEMENT_AUTO_DISMISS_MS, type AchievementPromptState } from "./useOnboardingOrchestrator";
 
 export interface AchievementPromptProps extends AchievementPromptState {
   onDismiss: () => void;
@@ -23,15 +23,16 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
   isLastStep,
   onDismiss,
 }) => {
-  // Visual countdown bar — runs 0→100% over 4s, matching the orchestrator timer
+  // Visual countdown bar — runs 100→0% over ACHIEVEMENT_AUTO_DISMISS_MS,
+  // synced to the orchestrator's auto-dismiss setTimeout. Single source of
+  // truth lives in useOnboardingOrchestrator (audit Pattern D fix).
   const [progress, setProgress] = React.useState(100);
 
   React.useEffect(() => {
     const start = Date.now();
-    const duration = 4000;
     const interval = setInterval(() => {
       const elapsed = Date.now() - start;
-      const remaining = Math.max(0, 100 - (elapsed / duration) * 100);
+      const remaining = Math.max(0, 100 - (elapsed / ACHIEVEMENT_AUTO_DISMISS_MS) * 100);
       setProgress(remaining);
       if (remaining === 0) clearInterval(interval);
     }, 50);
