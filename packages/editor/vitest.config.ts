@@ -35,6 +35,7 @@ export default defineConfig({
         "src/engine/**/*.{ts,tsx}",
         "src/editor/canvas/hooks/**/*.{ts,tsx}",
         "src/editor/inspector/hooks/**/*.{ts,tsx}",
+        "src/editor/shell/hooks/**/*.{ts,tsx}",
       ],
       exclude: [
         "**/__tests__/**",
