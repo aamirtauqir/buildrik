@@ -66,6 +66,8 @@ export const updateSiteSettingsSchema = z.object({
     "unsafe-url",
   ]).nullable().optional(),
   permissionsPolicy: z.string().max(2048).nullable().optional(),
+  defaultLocale: z.string().min(2).max(10).optional(),
+  enabledLocales: z.array(z.string().min(2).max(10)).min(1).max(50).optional(),
 });
 
 export const createRedirectSchema = z.object({

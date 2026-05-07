@@ -54,6 +54,8 @@ export async function getSiteSettings(siteId: string) {
       xFrameOptions: true,
       referrerPolicy: true,
       permissionsPolicy: true,
+      defaultLocale: true,
+      enabledLocales: true,
       workspace: { select: { plan: true } },
     },
   });
@@ -90,6 +92,8 @@ export async function updateSiteSettings(
     xFrameOptions?: "DENY" | "SAMEORIGIN" | null;
     referrerPolicy?: string | null;
     permissionsPolicy?: string | null;
+    defaultLocale?: string;
+    enabledLocales?: string[];
   }
 ) {
   if (data.headCode !== undefined || data.bodyCode !== undefined || data.slug) {
@@ -121,6 +125,20 @@ export async function updateSiteSettings(
   const persistData = { ...data };
   if (data.publishedPassword !== undefined) {
     persistData.publishedPassword = await hashPublishedPassword(data.publishedPassword);
+  }
+
+  // Localization invariant: defaultLocale MUST be in enabledLocales.
+  // If either side is changing, validate against the post-update state.
+  if (data.defaultLocale !== undefined || data.enabledLocales !== undefined) {
+    const current = await prisma.site.findUnique({
+      where: { id: siteId },
+      select: { defaultLocale: true, enabledLocales: true },
+    });
+    const nextDefault = data.defaultLocale ?? current?.defaultLocale ?? "en";
+    const nextEnabled = data.enabledLocales ?? current?.enabledLocales ?? ["en"];
+    if (!nextEnabled.includes(nextDefault)) {
+      throw new Error("DEFAULT_LOCALE_NOT_ENABLED");
+    }
   }
 
   return prisma.site.update({

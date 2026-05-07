@@ -193,6 +193,8 @@ model Site {
   xFrameOptions     String?
   referrerPolicy    String?
   permissionsPolicy String?
+  defaultLocale     String    @default("en")
+  enabledLocales    String[]  @default(["en"])
   deletedAt         DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
@@ -230,6 +232,7 @@ model Page {
   settings        Json?
   slugHistory     Json?
   slugManuallySet Boolean  @default(false)
+  translations    Json?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

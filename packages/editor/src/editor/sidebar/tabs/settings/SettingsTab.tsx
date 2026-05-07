@@ -30,10 +30,10 @@ import {
   AdvancedScreen,
   SeoScreen,
   IntegrationsHub,
-  ComingSoonScreen,
   RedirectsScreen,
   FormsScreen,
   HeadersScreen,
+  LocalizationScreen,
   SettingsNavGuard,
 } from "./index";
 import "./settings.css";
@@ -48,7 +48,7 @@ import "./settings.css";
 // group (WORKSPACE) is deep-link only — clicking opens the dashboard URL.
 //
 // Existing screens reused: General/Branding/SEO/Analytics/Custom code (Advanced)/Integrations.
-// Stubs: Localization/Redirects/Headers/Forms — render ComingSoonScreen until Phase B ships.
+// A1 day-3: all 4 originally-stubbed sections (Redirects/Forms/Headers/Localization) now real.
 
 type InTabNavId =
   | "general" | "branding" | "seo"
@@ -261,9 +261,9 @@ export const SettingsTab: React.FC<
         return <AdvancedScreen composer={composer} onDirtyChange={handleScreenDirty} />;
       case "integrations":
         return <IntegrationsHub composer={composer} onDirtyChange={handleScreenDirty} />;
-      // A1 day-3 partial: Redirects is real; Localization/Headers/Forms still stubs.
+      // A1 day-3 complete: all 4 stubs drained (Redirects, Forms, Headers, Localization).
       case "localization":
-        return <ComingSoonScreen title="Localization" phase="Phase B" description="Locale claim with hierarchical fallback (e.g. fr-FR → fr → site default) and per-locale preview switcher." />;
+        return <LocalizationScreen projectId={projectId} onDirtyChange={handleScreenDirty} />;
       case "redirects":
         return <RedirectsScreen projectId={projectId} onDirtyChange={handleScreenDirty} />;
       case "headers":
