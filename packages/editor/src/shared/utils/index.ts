@@ -84,7 +84,6 @@ export {
   isNumber,
   isBoolean,
   isObject,
-  isArray,
   isFunction,
   isNull,
   isUndefined,
@@ -112,13 +111,10 @@ export {
   getTagCategory,
   getDefaultTagName,
   getElementTypeFromTag,
-  isContainerType,
   // Escape utilities
   escapeAttr,
   escapeHTML,
   unescapeHTML,
-  encodeHTML,
-  decodeHTML,
   // Sanitization
   sanitizeHTML,
   stripAllTags,
@@ -138,7 +134,6 @@ export {
   // DOM utilities
   $,
   $$,
-  byId,
   byClass,
   byTag,
   createDOMElement,
@@ -309,10 +304,8 @@ export {
 // =============================================================================
 
 export {
-  getCacheStats,
   clearCache,
   getRateLimitStatus,
-  getQueueLength,
   clearQueue,
   isAIError,
   getErrorMessage,

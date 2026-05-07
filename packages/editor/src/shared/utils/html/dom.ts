@@ -10,7 +10,6 @@
 export {
   $,
   $$,
-  byId,
   byClass,
   byTag,
   matches,

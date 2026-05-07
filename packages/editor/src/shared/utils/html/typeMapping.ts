@@ -189,9 +189,3 @@ export function getElementTypeFromTag(tag: string, dataType?: string | null): st
   return TAG_TO_TYPE_MAP[tag.toLowerCase()] || "container";
 }
 
-/**
- * Check if element type is a container
- */
-export function isContainerType(type: string): boolean {
-  return CONTAINER_TYPES.has(type);
-}

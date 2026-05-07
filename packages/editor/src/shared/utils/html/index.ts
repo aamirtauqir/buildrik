@@ -54,14 +54,13 @@ export {
   CONTAINER_TYPES,
   getDefaultTagName,
   getElementTypeFromTag,
-  isContainerType,
 } from "./typeMapping";
 
 // =============================================================================
 // ENCODING
 // =============================================================================
 
-export { escapeAttr, escapeHTML, unescapeHTML, encodeHTML, decodeHTML } from "./encoding";
+export { escapeAttr, escapeHTML, unescapeHTML } from "./encoding";
 
 // =============================================================================
 // SANITIZATION
@@ -105,7 +104,6 @@ export { parseHTML, parseHTMLToElementData, parseStyleString, type ParsedNode } 
 export {
   $,
   $$,
-  byId,
   byClass,
   byTag,
   createDOMElement,

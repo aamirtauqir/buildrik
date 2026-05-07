@@ -370,9 +370,6 @@ export const PROMPT_TEMPLATES = {
 // UTILITIES
 // -----------------------------------------------------------------------------
 
-export function getCacheStats() {
-  return aiCache.getStats();
-}
 export function clearCache(pattern?: string) {
   aiCache.invalidate(pattern);
 }
@@ -391,13 +388,6 @@ export function getRateLimitStatus(): { remaining: number; retryAfter: number } 
     remaining: 30 - aiTrpcClient.getRateLimitCount(),
     retryAfter: aiTrpcClient.getRetryAfter(),
   };
-}
-
-/**
- * Get request queue length
- */
-export function getQueueLength(): number {
-  return aiTrpcClient.getQueueLength();
 }
 
 /**

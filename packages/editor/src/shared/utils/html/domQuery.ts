@@ -21,13 +21,6 @@ export function $$(selector: string, context: Document | Element = document): El
 }
 
 /**
- * Find element by ID
- */
-export function byId(id: string): HTMLElement | null {
-  return document.getElementById(id);
-}
-
-/**
  * Find elements by class name
  */
 export function byClass(className: string, context: Document | Element = document): HTMLElement[] {

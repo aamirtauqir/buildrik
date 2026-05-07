@@ -96,16 +96,3 @@ export function unescapeHTML(html: string): string {
   return result;
 }
 
-/**
- * Encode text for use in HTML
- */
-export function encodeHTML(text: string): string {
-  return escapeHTML(text);
-}
-
-/**
- * Decode HTML entities
- */
-export function decodeHTML(html: string): string {
-  return unescapeHTML(html);
-}

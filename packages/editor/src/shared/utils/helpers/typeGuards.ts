@@ -28,13 +28,6 @@ export function isObject(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-/**
- * Check if value is an array
- */
-export function isArray(value: unknown): value is unknown[] {
-  return Array.isArray(value);
-}
-
 // =============================================================================
 // PRIMITIVE TYPE GUARDS
 // =============================================================================
@@ -147,7 +140,7 @@ export function isPromise<T = unknown>(value: unknown): value is Promise<T> {
  */
 export function isEmpty(value: unknown): boolean {
   if (isNil(value)) return true;
-  if (isString(value) || isArray(value)) return value.length === 0;
+  if (isString(value) || Array.isArray(value)) return value.length === 0;
   if (value instanceof Map || value instanceof Set) return value.size === 0;
   if (isObject(value)) return Object.keys(value).length === 0;
   return false;

@@ -238,13 +238,6 @@ export class GoogleFontsService {
 // ============================================================================
 
 /**
- * Get the Google Fonts service instance
- */
-export function getGoogleFontsService(): GoogleFontsService {
-  return GoogleFontsService.getInstance();
-}
-
-/**
  * Load a Google Font
  */
 export function loadGoogleFont(family: string, options?: FontLoadOptions): void {

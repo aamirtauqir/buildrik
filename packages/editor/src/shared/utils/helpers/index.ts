@@ -135,7 +135,6 @@ export {
 export {
   isPlainObject,
   isObject,
-  isArray,
   isString,
   isNumber,
   isBoolean,

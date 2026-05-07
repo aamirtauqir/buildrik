@@ -10,7 +10,7 @@ import { Stack } from "@/editor/shared/vibcoder/Stack";
 
 import * as React from "react";
 import {
-  getGoogleFontsService,
+  GoogleFontsService,
   loadGoogleFont,
   searchGoogleFonts,
   type GoogleFont,
@@ -55,7 +55,7 @@ export const FontPicker: React.FC<FontPickerProps> = ({ value, onChange }) => {
   const [fontSearch, setFontSearch] = React.useState("");
   const [showFontPicker, setShowFontPicker] = React.useState(false);
   const [selectedCategory, setSelectedCategory] = React.useState<FontCategory | "all">("all");
-  const fontsService = React.useMemo(() => getGoogleFontsService(), []);
+  const fontsService = React.useMemo(() => GoogleFontsService.getInstance(), []);
 
   // Get filtered fonts
   const googleFonts = React.useMemo(() => {
