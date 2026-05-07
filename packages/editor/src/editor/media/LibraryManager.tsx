@@ -13,8 +13,8 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 
 import * as React from "react";
 import {
-  Upload, Plus, X, Search, FolderOpen, ChevronDown, Trash2, Download, Pencil,
-  Replace, Grid2X2, List, SlidersHorizontal, AlertCircle, Check,
+  Upload, Plus, X, Search, FolderOpen, ChevronDown, Trash2, Download,
+  Grid2X2, List, SlidersHorizontal, AlertCircle, Check,
 } from "lucide-react";
 import type { Composer } from "../../engine/Composer";
 import { useMediaState } from "../sidebar/tabs/media/hooks/useMediaState";
@@ -27,6 +27,8 @@ import { useToast } from "@/editor/shared/vibcoder";
 import type { LibraryItem } from "../sidebar/tabs/media/data/mediaTypes";
 import type { IconConfig } from "../../shared/types/media";
 import { FolderTree, type SmartFolder } from "./components/FolderTree";
+import { AssetDetailsPanel } from "./components/AssetDetailsPanel";
+import { fmtBytes } from "./utils/fmtBytes";
 import "./LibraryManager.css";
 
 interface LibraryManagerProps {
@@ -39,12 +41,7 @@ interface LibraryManagerProps {
   ) => void;
 }
 
-// ─── Helper: format bytes ──────────────────────────────────
-function fmtBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
+// fmtBytes moved to ./utils/fmtBytes.ts (D5 Stage 2, audit-remediation 2026-05-08).
 
 // ─── Type pills config ──────────────────────────────────────
 const TYPE_PILLS = [
@@ -67,12 +64,10 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   const { addToast } = useToast();
   const [stockModalOpen, setStockModalOpen] = React.useState(false);
   const [selectedAssetId, setSelectedAssetId] = React.useState<string | null>(null);
-  const [detailTab, setDetailTab] = React.useState<"details" | "versions" | "used">("details");
   const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
   const [sortMenuOpen, setSortMenuOpen] = React.useState(false);
   const [smartFolder, setSmartFolder] = React.useState<SmartFolder>(null);
   const [bulkMovePickerOpen, setBulkMovePickerOpen] = React.useState(false);
-  const [replaceAllPickerOpen, setReplaceAllPickerOpen] = React.useState(false);
   const searchRef = React.useRef<HTMLInputElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -609,173 +604,22 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
         </div>
 
         {/* ─── RIGHT: Details rail ─── */}
-        <div className="mgr-details">
-          {selectedItem ? (
-            <>
-              <div className="mgr-det-head">
-                <div className="mgr-det-filename">{selectedItem.name}</div>
-                <div className="mgr-det-sub">
-                  {selectedItem.type.toUpperCase()} · {fmtBytes(selectedItem.size)}
-                </div>
-              </div>
-              <div className="mgr-det-preview">
-                {selectedItem.type === "img" || selectedItem.type === "vid" ? (
-                  <img src={selectedItem.src} alt={selectedItem.name} />
-                ) : selectedItem.type === "ico" ? (
-                  <img src={selectedItem.src} alt={selectedItem.name} style={{ width: 64, height: 64 }} />
-                ) : selectedItem.type === "fnt" ? (
-                  <span style={{ fontSize: 48, fontWeight: 700, color: "var(--buildrick-text-primary)" }}>Aa Bb</span>
-                ) : null}
-              </div>
-              <div className="mgr-det-tabs">
-                <Button
-                  className={`mgr-det-tab${detailTab === "details" ? " active" : ""}`}
-                  onClick={() => setDetailTab("details")}
-                >
-                  Details
-                </Button>
-                {versions.length > 1 && (
-                  <Button
-                    className={`mgr-det-tab${detailTab === "versions" ? " active" : ""}`}
-                    onClick={() => setDetailTab("versions")}
-                  >
-                    Versions · {versions.length}
-                  </Button>
-                )}
-                <Button
-                  className={`mgr-det-tab${detailTab === "used" ? " active" : ""}`}
-                  onClick={() => setDetailTab("used")}
-                >
-                  Used in · {usageCount}
-                </Button>
-              </div>
-              <div className="mgr-det-body">
-                {detailTab === "details" && (
-                  <div className="mgr-kv">
-                    <span className="mgr-kv-key">Type</span>
-                    <span className="mgr-kv-val">{selectedItem.type.toUpperCase()}</span>
-                    {selectedItem.width && selectedItem.height && (
-                      <>
-                        <span className="mgr-kv-key">Dimensions</span>
-                        <span className="mgr-kv-val">{selectedItem.width} × {selectedItem.height} px</span>
-                      </>
-                    )}
-                    <span className="mgr-kv-key">File size</span>
-                    <span className="mgr-kv-val">{fmtBytes(selectedItem.size)}</span>
-                    <span className="mgr-kv-key">MIME</span>
-                    <span className="mgr-kv-val">{selectedItem.mimeType}</span>
-                    <span className="mgr-kv-key">Added</span>
-                    <span className="mgr-kv-val">{new Date(selectedItem.createdAt).toLocaleDateString()}</span>
-                  </div>
-                )}
-                {detailTab === "versions" && (
-                  <div className="mgr-version-list">
-                    {versions.map((v, i) => (
-                      <div
-                        key={v.key}
-                        className={`mgr-version-row${v.key === selectedItem.key ? " active" : ""}`}
-                        onClick={() => setSelectedAssetId(v.key)}
-                      >
-                        <div className="mgr-version-thumb">
-                          {v.thumb ? (
-                            <img src={v.thumb || v.src} alt={v.name} />
-                          ) : (
-                            <span style={{ fontSize: 10 }}>{v.type.toUpperCase()}</span>
-                          )}
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 12, fontWeight: 500, color: "var(--buildrick-text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                            {v.name}
-                            {i === 0 && <span style={{ marginLeft: 6, fontSize: 9, background: "var(--buildrick-accent-tint)", color: "var(--buildrick-text-primary)", padding: "1px 5px", borderRadius: 6, fontWeight: 700 }}>CURRENT</span>}
-                          </div>
-                          <div style={{ fontSize: 10, color: "var(--buildrick-text-disabled)" }}>
-                            {fmtBytes(v.size)} · {new Date(v.createdAt).toLocaleString()}
-                          </div>
-                        </div>
-                        {i > 0 && v.key !== selectedItem.key && (
-                          <Button
-                            className="mgr-btn"
-                            style={{ height: 24, fontSize: 10, padding: "0 8px" }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // Revert: replace all usages of current version with this one
-                              if (versions[0]) {
-                                composer.mediaOps.replaceAcross(versions[0].src, v.src);
-                                addToast({ description: `Reverted to ${v.name}`, tone: "success" });
-                              }
-                            }}
-                          >
-                            Revert
-                          </Button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {detailTab === "used" && (
-                  <div>
-                    <div className="mgr-used-head">
-                      Used in <span className="mgr-used-count">{usageCount} places</span>
-                    </div>
-                    {usageCount === 0 ? (
-                      <div style={{ fontSize: 12, color: "var(--buildrick-text-disabled)", padding: 8 }}>
-                        Not used on any page yet
-                      </div>
-                    ) : (
-                      <div style={{ fontSize: 12, color: "var(--buildrick-text-disabled)", padding: 8 }}>
-                        {usageCount} element{usageCount !== 1 ? "s" : ""} reference this asset
-                      </div>
-                    )}
-                  </div>
-                )}
-                <div className="mgr-det-actions">
-                  <Button className="mgr-btn" onClick={() => state.insertToCanvas(selectedItem.key)}>
-                    <Download size={12} />
-                    Insert
-                  </Button>
-                  {/* Bug #1 fix: Edit → image editor for images, rename overlay otherwise */}
-                  <Button
-                    className="mgr-btn"
-                    onClick={() => {
-                      if (selectedItem.type === "img") {
-                        handleEditImage(selectedItem);
-                      } else {
-                        state.openDetail(selectedItem);
-                      }
-                    }}
-                  >
-                    <Pencil size={12} />
-                    {selectedItem.type === "img" ? "Edit" : "Rename"}
-                  </Button>
-                  {/* Bug #5 fix: Replace all opens library picker instead of URL prompt */}
-                  {usageCount > 0 && (
-                    <Button
-                      className="mgr-btn"
-                      onClick={() => setReplaceAllPickerOpen(true)}
-                    >
-                      <Replace size={12} />
-                      Replace all
-                    </Button>
-                  )}
-                  <Button
-                    className="mgr-btn danger"
-                    onClick={() => state.requestDelete(selectedItem.key)}
-                  >
-                    <Trash2 size={12} />
-                    Delete
-                  </Button>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 32 }}>
-              <div style={{ textAlign: "center", color: "var(--buildrick-text-disabled)" }}>
-                <FolderOpen size={32} style={{ marginBottom: 12, opacity: 0.4 }} />
-                <div style={{ fontSize: 13 }}>Select an asset to view details</div>
-              </div>
-            </div>
-          )}
-        </div>
+        {/* D5 Stage 2 (audit-remediation 2026-05-08): RIGHT panel +
+            detailTab + replaceAllPickerOpen all live in
+            ./components/AssetDetailsPanel.tsx now. */}
+        <AssetDetailsPanel
+          selectedItem={selectedItem}
+          versions={versions}
+          usageCount={usageCount}
+          libraryItems={state.libraryItems}
+          onSelectAsset={setSelectedAssetId}
+          onInsert={state.insertToCanvas}
+          onEditImage={handleEditImage}
+          onOpenRename={state.openDetail}
+          onRequestDelete={state.requestDelete}
+          composer={composer}
+          addToast={addToast}
+        />
       </div>
       {/* ═══ STATUS BAR ═══ */}
       <div className="mgr-status">
@@ -858,68 +702,8 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onEditImage={handleEditImage}
         />
       )}
-      {/* Bug #5 fix: Replace-all picker modal (select asset from library) */}
-      {replaceAllPickerOpen && selectedItem && (
-        <div className="stock-modal-backdrop" onClick={() => setReplaceAllPickerOpen(false)}>
-          <div
-            className="stock-modal"
-            onClick={(e) => e.stopPropagation()}
-            style={{ width: "min(640px, 90vw)" }}
-          >
-            <div className="stock-modal-header">
-              <h3 className="stock-modal-title">Replace "{selectedItem.name}" across {usageCount} use{usageCount !== 1 ? "s" : ""}</h3>
-              <Button className="stock-modal-close" onClick={() => setReplaceAllPickerOpen(false)}>
-                <X size={18} />
-              </Button>
-            </div>
-            <div className="stock-modal-content">
-              <p style={{ fontSize: 12, color: "var(--buildrick-text-disabled)", marginBottom: 12 }}>
-                Pick a replacement asset. All canvas usages will be swapped atomically (one undo reverses everything).
-              </p>
-              <div className="med-grid" data-cols="3">
-                {state.libraryItems
-                  .filter((i) => i.key !== selectedItem.key && i.type === selectedItem.type)
-                  .map((i) => (
-                    <div
-                      key={i.key}
-                      className="med-img-card"
-                      onClick={() => {
-                        const result = composer.mediaOps.replaceAcross(selectedItem.src, i.src);
-                        if (result.replaced.length > 0) {
-                          addToast({
-                            description: `Replaced in ${result.replaced.length} element${result.replaced.length > 1 ? "s" : ""}`,
-                            tone: "success",
-                          });
-                        }
-                        if (result.failed.length > 0) {
-                          addToast({
-                            description: `${result.failed.length} replacement${result.failed.length > 1 ? "s" : ""} failed`,
-                            tone: "error",
-                          });
-                        }
-                        setReplaceAllPickerOpen(false);
-                      }}
-                    >
-                      <div className="med-img-card-bg">
-                        {i.thumb || (i.type === "img" || i.type === "vid") ? (
-                          <img src={i.thumb || i.src} alt={i.name} loading="lazy" />
-                        ) : null}
-                      </div>
-                      <div style={{ padding: "4px 6px", fontSize: 11, color: "var(--buildrick-text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {i.name}
-                      </div>
-                    </div>
-                  ))}
-              </div>
-              {state.libraryItems.filter((i) => i.key !== selectedItem.key && i.type === selectedItem.type).length === 0 && (
-                <div className="stock-empty">
-                  No other {selectedItem.type === "img" ? "images" : "assets of the same type"} in your library.
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Replace-all picker now lives inside <AssetDetailsPanel> — see
+          ./components/AssetDetailsPanel.tsx (D5 Stage 2). */}
     </div>
   );
 }
