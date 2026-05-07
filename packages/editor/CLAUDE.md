@@ -286,7 +286,7 @@ Ek concept = ek canonical home. Duplicate allowed nahi. Violation = auto-reject.
 | Vibcoder primitive CSS (atoms/molecules/organisms/layouts) | `src/themes/components/` | CANONICAL — authored, hand-edit OK (vendor pipeline retired 2026-05-06) |
 | Vibcoder primitive React wrappers | `src/editor/shared/vibcoder/` | CANONICAL — authored, hand-edit OK, 286 consumers |
 | Compositions on vibcoder primitives | `src/shared/extensions/` | CANONICAL — PanelHeader, ConfirmDialog, etc. |
-| Buildrik non-vibcoder primitives | `src/shared/ui/` | AUDIT COMPLETE 2026-05-02 — 4 files (Badge/ErrorState/HelpTooltip/Icons) + `panel/PanelShell` retained, 12 dead files + ds/ + broken index.tsx deleted |
+| Buildrik non-vibcoder primitives | `src/shared/ui/` | AUDIT COMPLETE 2026-05-02 — 4 files (SemanticBadge/ErrorState/HelpTooltip/Icons) + `panel/PanelShell` retained, 12 dead files + ds/ + broken index.tsx deleted. Badge → SemanticBadge rename 2026-05-08 (DS SSOT Phase 4). |
 | Site-builder tokens (user output, not chrome) | `src/editor/design-system/` | CANONICAL — different domain, never merge with chrome DS. Moved from `src/features/design-system/` 2026-05-03. |
 | Final residual class rules | `src/themes/legacy-components.css` | DRAINED 2026-05-07 (Phase Final) — 72 LOC, renamed from components.css. DO NOT add new rules. |
 | ~~Legacy chrome components~~ | ~~`src/components/`~~ | DELETED 2026-05-02 — graveyard fully drained |
@@ -303,7 +303,9 @@ Ek concept = ek canonical home. Duplicate allowed nahi. Violation = auto-reject.
 
 - New file in `src/components/` → REJECT.
 - New `.buildrick-*` className in editor JSX (`src/editor/`) → REJECT — gate `scripts/check-buildrick-baseline.mjs` per-panel growth lock catches.
-- Component duplicating vibcoder primitive in `shared/ui/` → REJECT (audit-driven deletion).
+- Component duplicating vibcoder primitive in `shared/ui/` → REJECT — gate `gate:ds-ssot` (`scripts/check-ds-ssot.mjs`) ERROR-locks componentDuplicates at zero.
+- Duplicate `@keyframes` across CSS files → REJECT — `gate:ds-ssot` ERROR-locks keyframeDuplicates at zero.
+- Same `--bd-*` token defined in two alias files → REJECT — `gate:ds-ssot` ERROR-locks tokenAliasSSOT at zero.
 - Hex literal in chrome CSS → blocked by Gate 24 (zero-tolerance).
 
 ### Retirement targets (deletion mandates)
@@ -318,6 +320,16 @@ Memory: 4 prior architecture attempts (V1 spec, V2 spec, axioms draft, editor-v2
 
 ### Cleanup history (live record)
 
+- **2026-05-08 — DS SSOT audit + fix arc shipped** (commits `8c0b1327`..Phase Final):
+  - Phase 0: re-runnable scanner `scripts/audit/ssot-scan.mjs` (8 categories) + audit doc `docs/audits/2026-05-08-ds-ssot-audit.md`. 86 real fixable violations identified (62 Important, 24 Minor; 10 scanner false-positives confirmed).
+  - Phase 1: CI gate `scripts/check-ds-ssot.mjs` wired to `pnpm run gate:ds-ssot` and `editor-ci.yml`. Pattern mirrors prior `gate:buildrick`.
+  - Phase 2 (token aliases): drained 54 `--bd-*` overlaps from `_aliases.css`. Canonical home is `bd-aliases.css` (62 vibcoder-atom-unique tokens kept in `_aliases.css`).
+  - Phase 3 (keyframes): drained `pulse`/`spin` bare-name keyframes; renamed `fadeIn` (× 2 distinct bodies) to `bd-history-fade-in` + `bd-uxfix-fade-in`; renamed `buildrick-flash` → `bd-element-flash`. 7 cross-file consumers updated in lockstep.
+  - Phase 4 (Badge + Skeleton): rename-not-delete because APIs disjoint. `shared/ui/Badge.tsx` → `SemanticBadge.tsx` (semantic palette domain). `shared/extensions/Skeleton.tsx` → `SkeletonCompounds.tsx` (silences scanner false positive). 5 + 3 consumers updated.
+  - Phase 5 (anti-patterns): 8 of 12 pass-through wrappers drained (5 dead-export, 3 inlined). 4 predicate-named wrappers kept (`isInteractiveType`, `isLandmarkType`, `canHaveChildren`, `getTabConfig`) per audit caveat — names document intent at call sites. 3197-row dead-export tail deferred to separate arc.
+  - Phase 6 (legacy residuals): 12 inline `/* keep: <reason> */` annotations in `legacy-components.css`. 0 deletes (post-Task-5 keyframe drain handled the deletable rows).
+  - Phase Final: gate locked to ERROR mode for componentDuplicates / keyframeDuplicates / tokenAliasSSOT (no new violations allowed). selectorDuplicates stays WARN with grandfathered baseline (3 real concerns + 9 scanner false positives).
+  - Net: structural SSOT compliance enforced. Categories 5-8 (judgment-heavy) remain re-runnable via `node scripts/audit/ssot-scan.mjs`. 6th DS-simplification arc this quarter.
 - **2026-05-07 — Vibcoder-finish arc CLOSED** (commits `9f6a2e86`..Phase Final):
   - Original spec target was "drain 1622 .buildrick-* refs to 0." After Phase 0 audit + Task 1 gate-regex tightening, real chrome scope was 202 (vs 1622 broad-match overcount including 1291 `--buildrick-*` tokens + 159 `data-buildrick-*` DOM attrs). 7 drain PRs landed against the real scope.
   - Drained 137 refs (202 → 65). Final baseline 65 reflects legitimate residuals: 24 site-builder DS (out-of-scope domain), 13-14 canonical engine `.buildrick-canvas` refs, ~27 storage keys (Decision 1A — user data risk), 1 cssPrefix config.

@@ -97,4 +97,20 @@ describe('check-ds-ssot gate', () => {
     expect(baseline).toHaveLength(4);
     expect(baseline.every((c) => 'category' in c && 'violations' in c)).toBe(true);
   });
+
+  it('ERROR mode: locks cleared category at zero, fails any new violation', () => {
+    const dir = makeRepo({
+      baseline: [
+        { category: 'componentDuplicates', violations: [] },
+        { category: 'keyframeDuplicates', violations: [] },
+        { category: 'tokenAliasSSOT', violations: [] },
+        { category: 'selectorDuplicates', violations: [] },
+      ],
+      files: {
+        'src/editor/shared/vibcoder/X.tsx': 'export const X = () => null;',
+        'src/shared/ui/X.tsx': 'export const X = () => null;',
+      },
+    });
+    expect(() => execFileSync('node', ['scripts/check-ds-ssot.mjs'], { cwd: dir })).toThrow();
+  });
 });

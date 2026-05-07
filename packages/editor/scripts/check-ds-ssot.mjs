@@ -7,6 +7,12 @@ const ROOT = process.cwd();
 const BASELINE = resolve(ROOT, 'scripts/baselines/ssot.json');
 const SCANNER = resolve(ROOT, 'scripts/audit/ssot-scan.mjs');
 
+const ERROR_MODE_CATEGORIES = new Set([
+  'componentDuplicates',
+  'keyframeDuplicates',
+  'tokenAliasSSOT',
+]);
+
 let scannerOut;
 try {
   scannerOut = execFileSync('node', [SCANNER, '--json', '--category=1,2,3,4'], {
@@ -43,6 +49,11 @@ for (const liveCat of live) {
   }
   if (removals.length > 0) {
     console.log(`[ratchet] ${liveCat.category}: ${removals.length} violation(s) removed`);
+  }
+  if (ERROR_MODE_CATEGORIES.has(liveCat.category) && liveCat.violations.length > 0) {
+    failed = true;
+    console.error(`\n[FAIL] ${liveCat.category} is locked at zero — found ${liveCat.violations.length} violation(s):`);
+    for (const v of liveCat.violations) console.error(`  - ${v.path}:${v.line} — ${v.message}`);
   }
   updatedBaseline.push({ category: liveCat.category, violations: liveCat.violations });
 }
