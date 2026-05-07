@@ -15,6 +15,7 @@ export default defineConfig({
       "src/**/*.{test,spec}.{ts,tsx}",
       "scripts/__tests__/*.mjs",
       "scripts/__tests__/*.{test,spec}.{ts,tsx}",
+      "scripts/audit/__tests__/*.mjs",
       "scripts/codemods/**/__tests__/*.{test,spec}.{ts,tsx}",
       "scripts/codemods/*.{test,spec}.{ts,tsx}",
     ],
