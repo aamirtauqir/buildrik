@@ -554,7 +554,99 @@ model Template {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  versions    TemplateVersion[]
+
   @@map("templates")
+}
+
+// ─── Phase 0.5 — Media + Versions models ──────────────────────────────────
+
+/// Phase 0.5: server-backed media library. Replaces editor's IndexedDB-only
+/// model (MediaStorage + IndexedDBAdapter) with persisted asset rows. Storage
+/// caps enforced via PLAN_LIMITS[plan].storageMB. Editor IndexedDB stays as
+/// offline cache; reconciliation happens on connect.
+/// `type` values: "image" | "video" | "icon" | "font" (matches editor TypePills).
+/// Stored as String (not enum) to match repo convention; validated at Zod boundary.
+model MediaAsset {
+  id                String              @id @default(cuid())
+  userId            String
+  siteId            String?
+  folderId          String?
+  url               String
+  bytes             Int                 @default(0)
+  type              String
+  mimeType          String
+  filename          String
+  altText           String?
+  generatedMetadata Json?
+  userMetadata      Json?
+  lastJobKey        String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  versions MediaAssetVersion[]
+  folder   MediaFolder?        @relation(fields: [folderId], references: [id], onDelete: SetNull)
+
+  @@index([userId, type, createdAt])
+  @@index([folderId])
+  @@index([siteId])
+  @@map("media_assets")
+}
+
+/// Phase A: media-asset folders. Tree structure via parentId. Cascade-delete
+/// policy is "move assets to root" per resolved decision #6 (handled in
+/// media-folder.service.ts deleteFolder transaction, NOT via Prisma cascade).
+model MediaFolder {
+  id        String        @id @default(cuid())
+  userId    String
+  siteId    String?
+  name      String
+  parentId  String?
+
+  parent   MediaFolder?  @relation("MediaFolderTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children MediaFolder[] @relation("MediaFolderTree")
+  assets   MediaAsset[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([userId, parentId])
+  @@index([siteId])
+  @@map("media_folders")
+}
+
+/// Phase B: per-asset edit history. Image editor (crop/rotate/adjust) saves
+/// a new version row instead of overwriting the original. Retention capped
+/// via PLAN_LIMITS[plan].assetVersionsCap (decision #7: 5/25/100 by tier).
+model MediaAssetVersion {
+  id        String     @id @default(cuid())
+  assetId   String
+  url       String
+  bytes     Int        @default(0)
+  edits     Json
+  createdAt DateTime   @default(now())
+
+  asset MediaAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([assetId, createdAt])
+  @@map("media_asset_versions")
+}
+
+/// Phase B: template revisions. Lets "newer version available" banner + per-version
+/// restore work in the Templates extended drawer. Retention unlimited
+/// (decision #7: templates are deliberate artifacts, low churn).
+model TemplateVersion {
+  id          String   @id @default(cuid())
+  templateId  String
+  semver      String
+  pages       Json
+  changelogMd String?
+  createdAt   DateTime @default(now())
+
+  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@unique([templateId, semver])
+  @@index([templateId, createdAt])
+  @@map("template_versions")
 }
 
 model AIGenerationJob {
