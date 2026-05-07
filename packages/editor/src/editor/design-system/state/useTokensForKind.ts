@@ -1,0 +1,158 @@
+import * as React from "react";
+import type { DesignToken, TokenKind } from "../types";
+
+interface TokensForKindState {
+  tokens: DesignToken[];
+  savedTokens: DesignToken[];
+  pendingDiff: Record<string, string>;
+  isDirty: boolean;
+}
+
+interface TokensForKindActions {
+  updateToken: (id: string, value: string) => void;
+  undoToken: (id: string) => void;
+  redoToken: (id: string) => void;
+  canUndo: (id: string) => boolean;
+  canRedo: (id: string) => boolean;
+  markSaved: () => void;
+  discardAll: () => void;
+  resetFromSaved: () => void;
+  filterTokens: (q: string) => DesignToken[];
+  addToken: (token: DesignToken) => void;
+  deleteToken: (id: string) => void;
+}
+
+export type TokensForKindRegistry = TokensForKindState & TokensForKindActions;
+
+export function useTokensForKind(
+  kind: TokenKind,
+  initialTokens: DesignToken[]
+): TokensForKindRegistry {
+  const seed = React.useMemo(
+    () => initialTokens.filter((t) => t.kind === kind),
+    [initialTokens, kind]
+  );
+
+  const [tokens, setTokens] = React.useState<DesignToken[]>(seed);
+  const [savedTokens, setSavedTokens] = React.useState<DesignToken[]>(seed);
+  const undoStackRef = React.useRef<Map<string, string[]>>(new Map());
+  const redoStackRef = React.useRef<Map<string, string[]>>(new Map());
+
+  const pendingDiff = React.useMemo<Record<string, string>>(() => {
+    const diff: Record<string, string> = {};
+    for (const t of tokens) {
+      const saved = savedTokens.find((s) => s.id === t.id);
+      if (!saved || saved.value !== t.value) {
+        diff[t.id] = t.value;
+      }
+    }
+    return diff;
+  }, [tokens, savedTokens]);
+
+  const isDirty = Object.keys(pendingDiff).length > 0;
+
+  const updateToken = React.useCallback((id: string, value: string) => {
+    setTokens((prev) => {
+      const idx = prev.findIndex((t) => t.id === id);
+      if (idx === -1) return prev;
+      const old = prev[idx];
+      const stack = undoStackRef.current.get(id) ?? [];
+      stack.push(old.value);
+      undoStackRef.current.set(id, stack);
+      redoStackRef.current.set(id, []);
+      const next = [...prev];
+      next[idx] = { ...old, value };
+      return next;
+    });
+  }, []);
+
+  const undoToken = React.useCallback((id: string) => {
+    const stack = undoStackRef.current.get(id);
+    if (!stack || stack.length === 0) return;
+    const prev = stack.pop()!;
+    setTokens((cur) => {
+      const idx = cur.findIndex((t) => t.id === id);
+      if (idx === -1) return cur;
+      const redoStack = redoStackRef.current.get(id) ?? [];
+      redoStack.push(cur[idx].value);
+      redoStackRef.current.set(id, redoStack);
+      const next = [...cur];
+      next[idx] = { ...next[idx], value: prev };
+      return next;
+    });
+  }, []);
+
+  const redoToken = React.useCallback((id: string) => {
+    const stack = redoStackRef.current.get(id);
+    if (!stack || stack.length === 0) return;
+    const next = stack.pop()!;
+    setTokens((cur) => {
+      const idx = cur.findIndex((t) => t.id === id);
+      if (idx === -1) return cur;
+      const undoStack = undoStackRef.current.get(id) ?? [];
+      undoStack.push(cur[idx].value);
+      undoStackRef.current.set(id, undoStack);
+      const out = [...cur];
+      out[idx] = { ...out[idx], value: next };
+      return out;
+    });
+  }, []);
+
+  const canUndo = React.useCallback(
+    (id: string) => (undoStackRef.current.get(id) ?? []).length > 0,
+    []
+  );
+
+  const canRedo = React.useCallback(
+    (id: string) => (redoStackRef.current.get(id) ?? []).length > 0,
+    []
+  );
+
+  const markSaved = React.useCallback(() => {
+    setSavedTokens(tokens);
+    undoStackRef.current.clear();
+    redoStackRef.current.clear();
+  }, [tokens]);
+
+  const discardAll = React.useCallback(() => {
+    setTokens(savedTokens);
+    undoStackRef.current.clear();
+    redoStackRef.current.clear();
+  }, [savedTokens]);
+
+  const resetFromSaved = discardAll;
+
+  const filterTokens = React.useCallback(
+    (q: string) =>
+      tokens.filter((t) => t.name.toLowerCase().includes(q.toLowerCase())),
+    [tokens]
+  );
+
+  const addToken = React.useCallback((token: DesignToken) => {
+    setTokens((prev) => [...prev, token]);
+  }, []);
+
+  const deleteToken = React.useCallback((id: string) => {
+    setTokens((prev) => prev.filter((t) => t.id !== id));
+    undoStackRef.current.delete(id);
+    redoStackRef.current.delete(id);
+  }, []);
+
+  return {
+    tokens,
+    savedTokens,
+    pendingDiff,
+    isDirty,
+    updateToken,
+    undoToken,
+    redoToken,
+    canUndo,
+    canRedo,
+    markSaved,
+    discardAll,
+    resetFromSaved,
+    filterTokens,
+    addToken,
+    deleteToken,
+  };
+}
