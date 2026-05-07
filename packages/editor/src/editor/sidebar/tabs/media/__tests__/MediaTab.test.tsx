@@ -68,7 +68,7 @@ describe("UploadZone", () => {
         uploadQueue={[]}
       />
     );
-    expect(screen.getByLabelText(/drop files or click to browse/i)).toBeTruthy();
+    expect(screen.getByLabelText(/drag files or click to browse/i)).toBeTruthy();
   });
 
   it("applies drag-active class on drag over", async () => {
