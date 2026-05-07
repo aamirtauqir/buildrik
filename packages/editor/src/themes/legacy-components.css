@@ -1,8 +1,8 @@
 /**
  * legacy-components.css — final residual rules from original components.css.
  * Phase Final lock 2026-05-07. Contents: canonical engine selectors, 1
- * single-consumer chrome class, generic input element styling, shared
- * bare-name keyframes, and 1 cross-folder element-flash keyframe.
+ * single-consumer chrome class, generic input element styling, and 1
+ * cross-folder element-flash keyframe.
  *
  * DO NOT add new rules here. Add them to the consuming component or to a
  * tier file under themes/components/{atoms,molecules,organisms,layouts}/.
