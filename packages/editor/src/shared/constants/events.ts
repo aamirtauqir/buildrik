@@ -407,6 +407,26 @@ export const EVENTS = {
   STORAGE_QUOTA_CRITICAL: "storage:quota:critical",
 
   // ============================================
+  // Cross-tab Quick Jump (P11)
+  // ============================================
+  // Emitted when one tab wants another tab to open with a focused target.
+  // LeftSidebar.safeTabChange listens, switches active tab, and the target
+  // panel reads the asset/template id from a small ephemeral context to
+  // scroll-into-view + select. Phase 4 work; events declared early so other
+  // phases (where-used, replace-across) can emit them without a follow-up.
+  TAB_NAVIGATE_ASSET: "tab:navigate:asset",
+  TAB_NAVIGATE_TEMPLATE: "tab:navigate:template",
+
+  // ============================================
+  // Page Template Attach / Detach (P9)
+  // ============================================
+  // Page-scoped template events let useTemplateUsageMap invalidate efficiently
+  // when an applied template lands on or leaves a page (rather than re-walking
+  // the full project on every project:changed).
+  PAGE_TEMPLATE_ATTACHED: "page:template-attached",
+  PAGE_TEMPLATE_DETACHED: "page:template-detached",
+
+  // ============================================
   // Debug Events
   // ============================================
   DEBUG_LOG: "debug:log",
@@ -721,6 +741,14 @@ export interface EventPayloads {
   // Storage Quota Events
   [EVENTS.STORAGE_QUOTA_WARNING]: { percentage: number; used: number; quota: number };
   [EVENTS.STORAGE_QUOTA_CRITICAL]: { percentage: number; used: number; quota: number };
+
+  // Cross-tab Quick Jump (P11)
+  [EVENTS.TAB_NAVIGATE_ASSET]: { assetId: string; sourceTab: string };
+  [EVENTS.TAB_NAVIGATE_TEMPLATE]: { templateId: string; sourceTab: string };
+
+  // Page Template Attach / Detach (P9)
+  [EVENTS.PAGE_TEMPLATE_ATTACHED]: { pageId: string; templateId: string; version?: string };
+  [EVENTS.PAGE_TEMPLATE_DETACHED]: { pageId: string; templateId: string };
 }
 
 /**

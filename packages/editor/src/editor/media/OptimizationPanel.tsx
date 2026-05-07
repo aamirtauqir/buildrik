@@ -231,8 +231,11 @@ export const OptimizationPanel: React.FC<OptimizationPanelProps> = ({
   const savings =
     state.originalSize > 0 ? Math.round((1 - state.optimizedSize / state.originalSize) * 100) : 0;
 
+  // Phase D: AVIF added — formatSupport.avif is already probed at mount.
+  // Disabled state shown when browser/canvas doesn't support encoding.
   const formats: Array<{ id: ImageExportFormat; label: string; supported: boolean }> = [
     { id: "webp", label: "WebP", supported: formatSupport.webp },
+    { id: "avif", label: "AVIF", supported: formatSupport.avif },
     { id: "jpeg", label: "JPEG", supported: true },
     { id: "png", label: "PNG", supported: true },
   ];

@@ -467,17 +467,33 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
               </div>
               <div style={styles.controlGroup}>
                 <span style={styles.controlLabel}>Stroke</span>
-                <Input
-                  type="number"
-                  value={strokeWidth}
-                  onChange={(e) =>
-                    setStrokeWidth(Math.max(0.5, Math.min(4, Number(e.target.value))))
-                  }
-                  style={styles.strokeInput}
-                  min={0.5}
-                  max={4}
-                  step={0.5}
-                />
+                {/* Phase D: range slider replaces numeric input — matches v3
+                    prototype § 20. Live value shown to right of track. */}
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1 }}>
+                  <Input
+                    type="range"
+                    value={strokeWidth}
+                    onChange={(e) =>
+                      setStrokeWidth(Math.max(0.5, Math.min(4, Number(e.target.value))))
+                    }
+                    style={{ flex: 1, minWidth: 80 }}
+                    min={0.5}
+                    max={4}
+                    step={0.5}
+                    aria-label="Stroke width"
+                  />
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontFamily: "var(--bd-font-mono, ui-monospace, monospace)",
+                      color: "var(--bd-fg-muted, #6B7280)",
+                      minWidth: 24,
+                      textAlign: "right",
+                    }}
+                  >
+                    {strokeWidth.toFixed(1)}
+                  </span>
+                </div>
               </div>
               <div style={styles.controlGroup}>
                 <span style={styles.controlLabel}>Color</span>

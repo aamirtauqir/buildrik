@@ -37,13 +37,35 @@ interface Adjustments {
   contrast: number;    // -100 to 100
   saturation: number;  // -100 to 100
   blur: number;        // 0 to 20
+  // Phase D: named filter preset (B&W/Sepia/Cool/Warm/Vibrant) layered on top
+  // of brightness/contrast/saturation. "none" = no preset.
+  preset: FilterPreset;
 }
+
+type FilterPreset = "none" | "bw" | "sepia" | "cool" | "warm" | "vibrant";
+
+interface FilterPresetDef {
+  id: FilterPreset;
+  label: string;
+  /** CSS filter string applied AFTER user's brightness/contrast/saturation. */
+  cssFilter: string;
+}
+
+const FILTER_PRESETS: FilterPresetDef[] = [
+  { id: "none", label: "None", cssFilter: "" },
+  { id: "bw", label: "B&W", cssFilter: "grayscale(1)" },
+  { id: "sepia", label: "Sepia", cssFilter: "sepia(0.85) saturate(1.1)" },
+  { id: "cool", label: "Cool", cssFilter: "hue-rotate(-15deg) saturate(1.1) brightness(1.02)" },
+  { id: "warm", label: "Warm", cssFilter: "hue-rotate(15deg) saturate(1.15) brightness(1.05)" },
+  { id: "vibrant", label: "Vibrant", cssFilter: "saturate(1.4) contrast(1.1)" },
+];
 
 const DEFAULT_ADJUSTMENTS: Adjustments = {
   brightness: 0,
   contrast: 0,
   saturation: 0,
   blur: 0,
+  preset: "none",
 };
 
 const CROP_PRESETS = [
@@ -65,6 +87,10 @@ function buildCssFilter(adj: Adjustments): string {
   if (adj.contrast !== 0) parts.push(`contrast(${1 + adj.contrast / 100})`);
   if (adj.saturation !== 0) parts.push(`saturate(${1 + adj.saturation / 100})`);
   if (adj.blur > 0) parts.push(`blur(${adj.blur}px)`);
+  // Phase D: append named preset (B&W/Sepia/Cool/Warm/Vibrant) AFTER user
+  // adjustments so preset stylization is the final pass.
+  const presetDef = FILTER_PRESETS.find((p) => p.id === adj.preset);
+  if (presetDef && presetDef.cssFilter) parts.push(presetDef.cssFilter);
   return parts.length > 0 ? parts.join(" ") : "none";
 }
 
@@ -408,6 +434,34 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
                       onChange={(e) => setAdjustments((a) => ({ ...a, blur: Number(e.target.value) }))}
                     />
                     <span className="ie-slider-val">{adjustments.blur}px</span>
+                  </div>
+
+                  {/* Phase D: filter presets — applied AFTER user adjustments. */}
+                  <div className="ie-section-label" style={{ marginTop: 16 }}>Filters</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                    {FILTER_PRESETS.map((preset) => {
+                      const active = adjustments.preset === preset.id;
+                      return (
+                        <Button
+                          key={preset.id}
+                          onClick={() =>
+                            setAdjustments((a) => ({ ...a, preset: preset.id }))
+                          }
+                          style={{
+                            padding: "5px 8px",
+                            fontSize: 11,
+                            background: active ? "var(--bd-cobalt-soft, #EAF1FF)" : "transparent",
+                            border: `1px solid ${active ? "var(--bd-cobalt, #2D6DFF)" : "var(--bd-border, #E5E8EC)"}`,
+                            color: active ? "var(--bd-cobalt, #2D6DFF)" : "var(--bd-fg-secondary, #4A5568)",
+                            borderRadius: 4,
+                            cursor: "pointer",
+                            fontWeight: active ? 500 : 400,
+                          }}
+                        >
+                          {preset.label}
+                        </Button>
+                      );
+                    })}
                   </div>
                 </>
               )}
