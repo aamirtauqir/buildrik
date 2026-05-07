@@ -8,13 +8,13 @@
 import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
 import type { Composer } from "../../../../../engine/Composer";
-import { STORAGE_QUOTA_BYTES } from "../../../../../shared/constants/media";
 import { useToast } from "@/editor/shared/vibcoder";
 import type { CtxMenuState, LibraryItem, MediaStateResult, MediaTypeFilter } from "../data/mediaTypes";
 import { useLibraryState } from "./useLibraryState";
 import { useSelectionState } from "./useSelectionState";
 import { useUploadState } from "./useUploadState";
 import { useDiscoveryState } from "./useDiscoveryState";
+import { useServerStorageQuota } from "./useServerStorageQuota";
 
 export function useMediaState(composer: Composer): MediaStateResult {
   const { addToast } = useToast();
@@ -33,7 +33,10 @@ export function useMediaState(composer: Composer): MediaStateResult {
 
   // Sub-hooks
   const library = useLibraryState(composer);
-  const upload = useUploadState(composer, showToast, library.currentFolderId);
+  // Phase C: server-side quota replaces hardcoded 1GB IndexedDB cap when reachable.
+  // Returns null on offline / unconfigured / auth-fail — useUploadState falls back to local.
+  const serverQuota = useServerStorageQuota(composer);
+  const upload = useUploadState(composer, showToast, serverQuota.quota);
   const selection = useSelectionState(composer, library.libraryItems, showToast);
   const discovery = useDiscoveryState(composer, showToast);
 
@@ -296,7 +299,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
     // Shared
     librarySearch: library.librarySearch,
     setLibrarySearch: setUnifiedSearch,
-    storage: { used: upload.storageUsed, total: STORAGE_QUOTA_BYTES },
+    storage: { used: upload.storageUsed, total: upload.storageTotal },
 
     // Clipboard
     copyUrl,

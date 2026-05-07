@@ -113,6 +113,8 @@ export interface UploadStateResult {
   uploadQueue: UploadProgress[];
   failedUploads: FailedUpload[];
   storageUsed: number;
+  /** Phase C: total quota bytes. From server when available, else local IndexedDB cap. */
+  storageTotal: number;
   panelDragOver: boolean;
   upload(files: File[]): void;
   dismissFailedUploads(): void;

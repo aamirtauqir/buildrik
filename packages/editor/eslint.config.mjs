@@ -92,6 +92,10 @@ export default [
       "buildrik/no-inline-hex": "error",
       "buildrik/no-inspector-tokens": "error",
       "buildrik/no-get-property-value-ds": "error",
+      // Phase 0 sanitizer rule. Path-aware allowlist hard-coded inside
+      // the rule (Canvas.tsx + AICopilot.tsx). Live audit per
+      // 2026-05-07 plan: 2 expected hits — both inside the allowlist.
+      "buildrik/no-dangerous-html": "error",
       "no-unused-vars": "off",
       "no-undef": "off",
     },

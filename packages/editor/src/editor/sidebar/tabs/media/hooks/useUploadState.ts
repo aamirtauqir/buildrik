@@ -13,18 +13,28 @@ import type { FailedUpload, UploadStateResult } from "../data/mediaTypes";
 
 type ShowToast = (msg: string, type: "success" | "error" | "info") => void;
 
-export function useUploadState(composer: Composer, showToast: ShowToast): UploadStateResult {
+interface ServerQuota {
+  usedBytes: number;
+  totalBytes: number; // -1 for unlimited
+}
+
+export function useUploadState(
+  composer: Composer,
+  showToast: ShowToast,
+  serverQuota?: ServerQuota | null
+): UploadStateResult {
   const [uploadQueue, setUploadQueue] = useState<UploadProgress[]>([]);
   const [failedUploads, setFailedUploads] = useState<FailedUpload[]>([]);
-  const [storageUsed, setStorageUsed] = useState(0);
+  const [localStorageUsed, setLocalStorageUsed] = useState(0);
   const [panelDragOver, setPanelDragOver] = useState(false);
   const dragCounterRef = useRef(0);
 
-  // Recalculate storageUsed whenever assets change
+  // Recalculate localStorageUsed whenever assets change.
+  // Used as fallback when server quota unavailable.
   const recalcStorage = useCallback(() => {
     const assets = composer.media.getAssets();
     const total = assets.reduce((acc, a) => acc + a.size, 0);
-    setStorageUsed(total);
+    setLocalStorageUsed(total);
   }, [composer]);
 
   useEffect(() => {
@@ -85,11 +95,17 @@ export function useUploadState(composer: Composer, showToast: ShowToast): Upload
     };
   }, [composer, recalcStorage, showToast]);
 
+  // Phase C: prefer server quota when present. -1 totalBytes = unlimited (never cap).
+  const isUnlimited = serverQuota?.totalBytes === -1;
+  const storageUsed = serverQuota?.usedBytes ?? localStorageUsed;
+  const storageTotal =
+    serverQuota && !isUnlimited ? serverQuota.totalBytes : STORAGE_QUOTA_BYTES;
+
   const upload = useCallback(
     (files: File[]) => {
-      // Pre-check quota
       const totalNew = files.reduce((acc, f) => acc + f.size, 0);
-      if (storageUsed + totalNew > STORAGE_QUOTA_BYTES) {
+      // Skip cap check on unlimited tier (BUSINESS).
+      if (!isUnlimited && storageUsed + totalNew > storageTotal) {
         showToast("Not enough storage — delete some files to free space", "error");
         return;
       }
@@ -102,7 +118,7 @@ export function useUploadState(composer: Composer, showToast: ShowToast): Upload
         composer.media.uploadFile(file);
       });
     },
-    [composer, storageUsed, showToast]
+    [composer, storageUsed, storageTotal, isUnlimited, showToast]
   );
 
   const handlePanelDragEnter = useCallback((e: React.DragEvent) => {
@@ -141,6 +157,7 @@ export function useUploadState(composer: Composer, showToast: ShowToast): Upload
     uploadQueue,
     failedUploads,
     storageUsed,
+    storageTotal,
     panelDragOver,
     upload,
     dismissFailedUploads,

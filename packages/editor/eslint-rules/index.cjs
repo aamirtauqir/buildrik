@@ -11,5 +11,6 @@ module.exports = {
     "no-get-property-value-ds": require("./no-get-property-value-ds.cjs"),
     "no-magic-layout-literals": require("./no-magic-layout-literals.cjs"),
     "no-engine-public-export": require("./no-engine-public-export.cjs"),
+    "no-dangerous-html": require("./no-dangerous-html.cjs"),
   },
 };
