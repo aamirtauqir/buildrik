@@ -180,6 +180,7 @@ model Site {
   folderId          String?
   lastPublishedBy   String?
   projectStyles     Json?
+  dsSchemaVersion   Int       @default(0)
   projectAssets     Json?
   projectSettings   Json?
   deletedAt         DateTime?
@@ -206,21 +207,21 @@ model Site {
 }
 
 model Page {
-  id               String   @id @default(cuid())
-  siteId           String
-  name             String   @db.VarChar(100)
-  slug             String   @db.VarChar(100)
-  position         Int
-  blocks           Json     @default("[]")
-  isHomePage       Boolean  @default(false)
-  seoTitle         String?  @db.VarChar(60)
-  seoDescription   String?  @db.VarChar(160)
-  meta             Json?
-  settings         Json?
-  slugHistory      Json?
-  slugManuallySet  Boolean  @default(false)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id              String   @id @default(cuid())
+  siteId          String
+  name            String   @db.VarChar(100)
+  slug            String   @db.VarChar(100)
+  position        Int
+  blocks          Json     @default("[]")
+  isHomePage      Boolean  @default(false)
+  seoTitle        String?  @db.VarChar(60)
+  seoDescription  String?  @db.VarChar(160)
+  meta            Json?
+  settings        Json?
+  slugHistory     Json?
+  slugManuallySet Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
@@ -554,7 +555,7 @@ model Template {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  versions    TemplateVersion[]
+  versions TemplateVersion[]
 
   @@map("templates")
 }
@@ -568,12 +569,12 @@ model Template {
 /// `type` values: "image" | "video" | "icon" | "font" (matches editor TypePills).
 /// Stored as String (not enum) to match repo convention; validated at Zod boundary.
 model MediaAsset {
-  id                String              @id @default(cuid())
+  id                String   @id @default(cuid())
   userId            String
   siteId            String?
   folderId          String?
   url               String
-  bytes             Int                 @default(0)
+  bytes             Int      @default(0)
   type              String
   mimeType          String
   filename          String
@@ -581,8 +582,8 @@ model MediaAsset {
   generatedMetadata Json?
   userMetadata      Json?
   lastJobKey        String?
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   versions MediaAssetVersion[]
   folder   MediaFolder?        @relation(fields: [folderId], references: [id], onDelete: SetNull)
@@ -598,17 +599,17 @@ model MediaAsset {
 /// policy is "move assets to root" per resolved decision #6 (handled in
 /// media-folder.service.ts deleteFolder transaction, NOT via Prisma cascade).
 model MediaFolder {
-  id        String        @id @default(cuid())
-  userId    String
-  siteId    String?
-  name      String
-  parentId  String?
+  id       String  @id @default(cuid())
+  userId   String
+  siteId   String?
+  name     String
+  parentId String?
 
-  parent   MediaFolder?  @relation("MediaFolderTree", fields: [parentId], references: [id], onDelete: SetNull)
-  children MediaFolder[] @relation("MediaFolderTree")
-  assets   MediaAsset[]
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  parent    MediaFolder?  @relation("MediaFolderTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children  MediaFolder[] @relation("MediaFolderTree")
+  assets    MediaAsset[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
   @@index([userId, parentId])
   @@index([siteId])
@@ -619,12 +620,12 @@ model MediaFolder {
 /// a new version row instead of overwriting the original. Retention capped
 /// via PLAN_LIMITS[plan].assetVersionsCap (decision #7: 5/25/100 by tier).
 model MediaAssetVersion {
-  id        String     @id @default(cuid())
+  id        String   @id @default(cuid())
   assetId   String
   url       String
-  bytes     Int        @default(0)
+  bytes     Int      @default(0)
   edits     Json
-  createdAt DateTime   @default(now())
+  createdAt DateTime @default(now())
 
   asset MediaAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
 
