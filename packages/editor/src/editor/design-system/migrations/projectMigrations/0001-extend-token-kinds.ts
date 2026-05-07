@@ -1,5 +1,5 @@
 import type { ProjectMigration, ProjectPayload } from "./types";
-import type { TokenKind } from "../../types";
+import type { DesignToken, TokenKind } from "../../types";
 import { DEFAULT_TOKENS } from "../../constants";
 
 const NEW_KINDS: TokenKind[] = [
@@ -7,8 +7,8 @@ const NEW_KINDS: TokenKind[] = [
   "zindex", "breakpoint", "grid", "sizing", "icon", "imagery",
 ];
 
-const SEED_TOKENS = DEFAULT_TOKENS.filter((t) =>
-  NEW_KINDS.includes(t.kind as TokenKind)
+const SEED_TOKENS: DesignToken[] = DEFAULT_TOKENS.filter(
+  (t) => t.kind !== undefined && NEW_KINDS.includes(t.kind)
 );
 
 export const migration0001: ProjectMigration = {

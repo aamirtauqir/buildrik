@@ -4,11 +4,18 @@ import after from "../__fixtures__/0001.after.json";
 import { migration0001 } from "../0001-extend-token-kinds";
 import type { ProjectPayload } from "../types";
 
+/**
+ * Fixtures use `#000000` for `color-primary` — distinct from
+ * `DEFAULT_TOKENS`'s `#3B82F6` — to prove migration0001 does NOT touch
+ * existing tokens. If the fixture were `#3B82F6`, an accidental overwrite
+ * by the migration would still byte-equal the after fixture and silently
+ * pass.
+ */
 describe("migration 0001 · extend token kinds (v0 → v1)", () => {
   it("metadata is correct", () => {
     expect(migration0001.fromVersion).toBe(0);
     expect(migration0001.toVersion).toBe(1);
-    expect(migration0001.description).toMatch(/11 (token )?kinds?/i);
+    expect(migration0001.description).toContain("11 token kinds");
   });
 
   it("up(before) deep-equals after", () => {
@@ -34,7 +41,7 @@ describe("migration 0001 · extend token kinds (v0 → v1)", () => {
 
   it("validate() throws on a payload missing one of the 11 new kinds", () => {
     const broken = {
-      tokens: (after as ProjectPayload).tokens.filter((t: any) => t.kind !== "radius"),
+      tokens: (after as ProjectPayload).tokens.filter((t) => t.kind !== "radius"),
     };
     expect(() => migration0001.validate(broken)).toThrow(/radius/);
   });
@@ -47,7 +54,7 @@ describe("migration 0001 · extend token kinds (v0 → v1)", () => {
       ],
     };
     const result = migration0001.up(customised);
-    const radiusSm = result.tokens.find((t: any) => t.id === "radius-sm");
+    const radiusSm = result.tokens.find((t) => t.id === "radius-sm");
     expect(radiusSm?.value).toBe("6px"); // user value preserved, not overwritten by default
   });
 });
