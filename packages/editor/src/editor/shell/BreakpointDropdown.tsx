@@ -83,7 +83,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
           height: 30,
           padding: "0 10px",
           background: "var(--buildrick-bg-card)",
-          border: "1px solid #D1D9E6",
+          border: "1px solid var(--buildrick-border-light)",
           borderRadius: 8,
           color: "var(--buildrick-text-secondary)",
           fontSize: 12,
@@ -97,7 +97,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
           e.currentTarget.style.borderColor = "var(--bd-fg-muted)";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = "#D1D9E6";
+          e.currentTarget.style.borderColor = "var(--buildrick-border-light)";
         }}
       >
         <span style={{ color: "var(--buildrick-text-secondary)", fontSize: 12, fontWeight: 500 }}>
@@ -126,7 +126,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
             left: buttonRef.current.getBoundingClientRect().left,
             width: 200,
             background: "var(--buildrick-bg-card)",
-            border: "1px solid #D1D9E6",
+            border: "1px solid var(--buildrick-border-light)",
             borderRadius: 8,
             boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
             overflow: "hidden",
@@ -154,7 +154,7 @@ export const BreakpointDropdown: React.FC<BreakpointDropdownProps> = ({
                     padding: "0 12px",
                     background: isActive ? "var(--bd-accent-tint)" : "transparent",
                     border: "none",
-                    color: isActive ? "var(--bd-accent)" : "#475569",
+                    color: isActive ? "var(--bd-accent)" : "var(--buildrick-text-primary)",
                     fontSize: 13,
                     cursor: "pointer",
                     textAlign: "left",

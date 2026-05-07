@@ -215,7 +215,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
                         ? "var(--buildrick-accent)"
                         : "var(--buildrick-surface-3)",
                       color: selectedVariantProps.includes(preset.name)
-                        ? "#fff"
+                        ? "var(--buildrick-text-on-accent)"
                         : "var(--buildrick-text-secondary)",
                     }}
                   >

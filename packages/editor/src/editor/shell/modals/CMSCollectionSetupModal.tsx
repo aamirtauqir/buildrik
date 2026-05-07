@@ -463,7 +463,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
             }}
           >
             <span style={{ fontSize: 12, color: "var(--buildrick-text-secondary)" }}>
-              Fields for <strong style={{ color: "var(--buildrick-text-primary, #e4e4e7)" }}>{name}</strong>
+              Fields for <strong style={{ color: "var(--buildrick-text-primary)" }}>{name}</strong>
             </span>
             <Button variant="ghost" size="sm" onClick={addField}>
               <Plus size={12} aria-hidden="true" />

@@ -278,9 +278,9 @@ export const PageTabBar: React.FC<PageTabBarProps> = ({ composer }) => {
                     style={{
                       ...inputStyles,
                       borderColor: nameValidation.error
-                        ? "#EF4444"
+                        ? "var(--buildrick-error)"
                         : nameValidation.warning
-                        ? "#F59E0B"
+                        ? "var(--buildrick-warning)"
                         : "var(--buildrick-accent)",
                     }}
                     onClick={(e) => e.stopPropagation()}
