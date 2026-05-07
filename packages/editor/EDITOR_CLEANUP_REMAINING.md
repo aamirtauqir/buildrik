@@ -157,16 +157,22 @@ Execute back-to-back as small commits. Each <30 min. No tests needed beyond exis
   - `useExportHandlers()` — handleExportHTML + handleExportForDeploy + handleVercelPublish + usePublishJob() + publish-toast effect.
 - **Test mock learning:** ExportEngine `new`-construction + arrow-function vi.mock factories incompatible. Use plain function constructor returning a mutable shared instance. Documented inline in `useExportHandlers.test.ts`.
 
-### D3. E-014 — Composer manager grouping
-- **Scope:** Group 30 managers in `Composer` constructor under domain facades:
-  - `composer.media.{manager, commandLayer, optimizer, storage}`
-  - `composer.data.{manager, bindings: {style, trait, text}}`
-  - `composer.collab.{manager, sync, ot}`
-- **Risk:** High — every call site changes (`composer.mediaManager` → `composer.media.manager`).
-- **Pre-req:** All Phase D depends on this; codemod required.
-- **Effort:** 8-12 hours including codemod + verification.
+### D3. E-014 — Composer manager grouping ✅ SHIPPED 2026-05-07
+- **Status:** Complete. Stage 0 codemod + Stages 1-3 atomic sweep, commits 323fd111 + 6aae3b9c.
+- **Final shape: Option B-tight** (NOT plan's original Option A — inventory at Stage 0 found Option A would touch 138 hot-path call sites for `composer.media` + `composer.history`).
+- **Result:**
+  - 3 facades collapsing 8 fields:
+    - `composer.cms.{collections, bindings}` (was cmsManager + cmsBindings)
+    - `composer.collab.{manager, sync}` (was collaboration + sync)
+    - `composer.canvas.{indicators, resize, drag, interactions}`
+  - 2 flat renames: `versionHistory → versions`, `mediaCommands → mediaOps`.
+  - **Untouched (preserves hot paths):** media (77 sites), history (61 sites), recovery, elements, styles, commands, selection, data, templates, fonts, components, viewport, plugins, storage, forms, router, globalStyles, *Bindings.
+- **Codemod artifact:** `packages/editor/scripts/codemods/composer-manager-facades.ts` (idempotent, jscodeshift, 35 unit tests). Re-run with `npx tsx ...runner.ts` (dry-run) or `--apply` (write).
+- **Bugs caught pre-flight by Stage 0 dry-run:** (1) optional-chaining drop on `composer?.X.Y` rewrites — fixed; (2) bare `this.X` false-positive on CMSBindingManager.ts — codemod tightened to `composer.X` + `*.composer.X` only.
+- **Bugs caught during Stage 1-2:** (1) `replace_all` on `this.collaboration` mangled `this.collaborationHandlers` (substring match) — see `feedback_replace_all_word_boundary` memory; (2) one TSTypeQuery site in CMSExportResolver.ts outside codemod scope — hand-fixed.
+- **Verification:** 246/246 test files / 2019/2019 tests pass post-D3. Zero new editor-scope tsc errors.
 
-**Phase D total: ~16-24 hours, 3+ commits.**
+**Phase D total: SHIPPED.** All 3 god-component splits + manager grouping complete.
 
 ---
 
