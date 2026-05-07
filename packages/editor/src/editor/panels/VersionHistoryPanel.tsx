@@ -14,7 +14,6 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import { useVersionHistory } from "../../shared/hooks/useVersionHistory";
 import type { CompareResult } from "../../shared/types/versions";
-import type { NamedVersion } from "../../shared/types/versions";
 import type { Composer } from "../../engine";
 // D3 Stage 1 (audit-remediation 2026-05-08): list virtualization +
 // VersionRow + EmptyState lifted into version-history/VersionList.tsx.
@@ -25,75 +24,17 @@ import {
   formatTime,
 } from "./version-history/VersionList";
 import { CompareView } from "./version-history/CompareView";
-
-// ============================================
-// Constants
-// ============================================
-
-const AI_COOLDOWN_MS = 60_000;
-const TOAST_DURATION_MS = 3000;
+import { ToastStack, useToasts } from "./version-history/Toasts";
+import { useAISummary } from "./version-history/useAISummary";
 
 // CompareView + toggle-pill style constants moved to
 // ./version-history/CompareView.tsx (D3 Stage 2, audit-remediation 2026-05-08).
 // VersionRow + EmptyState moved to ./version-history/VersionList.tsx
 // (D3 Stage 1, audit-remediation 2026-05-08).
-
-// ============================================
-// Toast
-// ============================================
-
-type Toast = { id: string; message: string; kind: "success" | "error" };
-
-const TOAST_STACK_STYLE: React.CSSProperties = {
-  position: "fixed",
-  bottom: 16,
-  right: 16,
-  zIndex: 150,
-  display: "flex",
-  flexDirection: "column-reverse",
-  gap: 8,
-  pointerEvents: "none",
-};
-
-const TOAST_BASE_STYLE: React.CSSProperties = {
-  minWidth: 200,
-  maxWidth: 320,
-  padding: 12,
-  borderRadius: 8,
-  fontSize: 12,
-  lineHeight: 1.4,
-  color: "var(--buildrick-text-primary)",
-  background: "var(--buildrick-surface-3, #1a1a24)",
-  border: "1px solid var(--buildrick-border)",
-  boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-  pointerEvents: "auto",
-  animation: "bd-history-fade-in 150ms ease-out",
-};
-
-const TOAST_ERROR_STYLE: React.CSSProperties = {
-  ...TOAST_BASE_STYLE,
-  color: "#fca5a5",
-  borderColor: "rgba(239,68,68,0.4)",
-  background: "rgba(31, 18, 20, 0.96)",
-};
-
-function ToastStack({ toasts }: { toasts: Toast[] }) {
-  if (toasts.length === 0) return null;
-  return (
-    <div style={TOAST_STACK_STYLE}>
-      {toasts.map((t) => (
-        <div
-          key={t.id}
-          role="status"
-          aria-live={t.kind === "error" ? "assertive" : "polite"}
-          style={t.kind === "error" ? TOAST_ERROR_STYLE : TOAST_BASE_STYLE}
-        >
-          {t.message}
-        </div>
-      ))}
-    </div>
-  );
-}
+// ToastStack + useToasts moved to ./version-history/Toasts.tsx
+// (D3 Stage 4, audit-remediation 2026-05-08).
+// AI summary state machinery (rate-limit + cooldown tick + handler) moved to
+// ./version-history/useAISummary.ts (D3 Stage 4, audit-remediation 2026-05-08).
 
 // ============================================
 // Main Component
@@ -131,27 +72,12 @@ export function VersionHistoryPanel({
   const [compareResults, setCompareResults] = React.useState<Record<string, CompareResult | null>>({});
   const [currentVisualSnapshot, setCurrentVisualSnapshot] = React.useState<string | null>(null);
 
-  // AI summary state + rate-limit tracking
-  const [aiSummaryStates, setAiSummaryStates] = React.useState<
-    Record<string, { loading: boolean; result: string | null; error: string | null }>
-  >({});
-  const aiCallTimestamps = React.useRef<Map<string, number>>(new Map());
-  // Tick counter to force re-render once a cooldown expires (drives countdown UI).
-  const [, setCooldownTick] = React.useState(0);
+  // Toast state — hook owns the timer + id generation.
+  const { toasts, pushToast } = useToasts();
 
-  // Toast state
-  const [toasts, setToasts] = React.useState<Toast[]>([]);
-
-  const pushToast = React.useCallback((message: string, kind: "success" | "error" = "success") => {
-    const id =
-      typeof crypto !== "undefined" && "randomUUID" in crypto
-        ? crypto.randomUUID()
-        : `toast-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    setToasts((t) => [...t, { id, message, kind }]);
-    setTimeout(() => {
-      setToasts((t) => t.filter((x) => x.id !== id));
-    }, TOAST_DURATION_MS);
-  }, []);
+  // AI summary state — hook owns the rate-limit + cooldown tick + handler.
+  const { aiSummaryStates, handleGetAiSummary, getCooldownSeconds } =
+    useAISummary({ versions, compareResults, updateAiSummary });
 
   // Capture current canvas visual snapshot on mount
   React.useEffect(() => {
@@ -247,83 +173,6 @@ export function VersionHistoryPanel({
     [expandedId, compareResults, compareVersions, versions]
   );
 
-  // Handle AI Summary — with 60s per-version rate limit + cached-result short-circuit
-  const handleGetAiSummary = React.useCallback(
-    async (versionId: string) => {
-      const version = versions.find((v) => v.id === versionId);
-
-      // Cached result: surface immediately, no rate-limit penalty.
-      if (version?.aiSummary) {
-        setAiSummaryStates((prev) => ({
-          ...prev,
-          [versionId]: { loading: false, result: version.aiSummary ?? null, error: null },
-        }));
-        return;
-      }
-
-      // Rate-limit check.
-      const lastCall = aiCallTimestamps.current.get(versionId) ?? 0;
-      const elapsed = Date.now() - lastCall;
-      if (elapsed < AI_COOLDOWN_MS) {
-        const remaining = Math.ceil((AI_COOLDOWN_MS - elapsed) / 1000);
-        setAiSummaryStates((prev) => ({
-          ...prev,
-          [versionId]: {
-            loading: false,
-            result: null,
-            error: `Please wait ${remaining}s before requesting another summary`,
-          },
-        }));
-        return;
-      }
-
-      // Record timestamp BEFORE fetch so a failed call still counts (prevents retry spam).
-      aiCallTimestamps.current.set(versionId, Date.now());
-      // Schedule a re-render when the cooldown expires so the countdown UI clears.
-      setTimeout(() => setCooldownTick((n) => n + 1), AI_COOLDOWN_MS + 50);
-
-      setAiSummaryStates((prev) => ({
-        ...prev,
-        [versionId]: { loading: true, result: null, error: null },
-      }));
-
-      try {
-        const compareData = compareResults[versionId];
-        if (!compareData) {
-          throw new Error("Compare data not loaded yet");
-        }
-        const response = await fetch("/api/trpc/ai.summarize", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            versionName: version?.name ?? "",
-            changes: compareData,
-          }),
-        });
-
-        if (!response.ok) throw new Error("AI summary unavailable");
-        const json = await response.json();
-        // tRPC HTTP endpoint wraps the result in { result: { data: T } }
-        const summary: string = json?.result?.data?.summary ?? json?.summary ?? "";
-        if (!summary) throw new Error("Empty summary returned");
-
-        await updateAiSummary(versionId, summary);
-
-        setAiSummaryStates((prev) => ({
-          ...prev,
-          [versionId]: { loading: false, result: summary, error: null },
-        }));
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Summary unavailable";
-        setAiSummaryStates((prev) => ({
-          ...prev,
-          [versionId]: { loading: false, result: null, error: message },
-        }));
-      }
-    },
-    [compareResults, updateAiSummary, versions]
-  );
-
   // Filter versions by search query
   const filteredVersions = React.useMemo(() => {
     if (!searchQuery.trim()) return versions;
@@ -335,14 +184,6 @@ export function VersionHistoryPanel({
   const expandedVersion = expandedId
     ? filteredVersions.find((v) => v.id === expandedId) ?? null
     : null;
-
-  // Compute per-version AI cooldown seconds (0 if not cooling down).
-  const getCooldownSeconds = React.useCallback((versionId: string) => {
-    const last = aiCallTimestamps.current.get(versionId) ?? 0;
-    if (last === 0) return 0;
-    const remaining = AI_COOLDOWN_MS - (Date.now() - last);
-    return remaining > 0 ? Math.ceil(remaining / 1000) : 0;
-  }, []);
 
   // Version currently awaiting restore confirmation (rendered outside the list).
   const restoreConfirmVersion = restoreConfirmId
