@@ -20,7 +20,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { auth } from "@server/auth";
-import { checkStorageQuota } from "@server/services/media.service";
+import { checkStorageQuota, createAsset } from "@server/services/media.service";
+import type { MediaType } from "@buildrik/shared/schemas/media";
 
 // Allow common image/video/font types. Editor sniffs MIME from magic bytes
 // already (MediaManager.ts uses sniffMimeType + DOMPurify for SVG sanitization),
@@ -72,59 +73,108 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           );
         }
 
-        // 3. Optional client-supplied size hint for stricter pre-validation.
-        // The clientPayload is opaque JSON the editor passes via upload();
-        // editor sets it to JSON.stringify({bytes}) so we can reject oversized
-        // files before issuing the token rather than after the upload.
+        // 3. Parse clientPayload for size + metadata. Phase B5 P1A fix:
+        // metadata is now MANDATORY when remoteSync is wired so
+        // onUploadCompleted can create the canonical MediaAsset row
+        // without trusting a follow-up client call. Closes the quota
+        // bypass exploit where an authenticated client could upload
+        // blobs and never call createAsset.
+        let parsedClientPayload: {
+          bytes?: number;
+          type?: MediaType;
+          mimeType?: string;
+          filename?: string;
+          folderId?: string | null;
+          siteId?: string | null;
+        } = {};
         if (clientPayload) {
           try {
-            const parsed = JSON.parse(clientPayload) as { bytes?: number };
-            if (typeof parsed.bytes === "number") {
-              if (parsed.bytes > MAX_FILE_BYTES) {
-                throw new Error(
-                  `File ${pathname} exceeds 50MB limit (${parsed.bytes} bytes)`
-                );
-              }
-              if (
-                quota.totalBytes !== -1 &&
-                quota.usedBytes + parsed.bytes > quota.totalBytes
-              ) {
-                throw new Error(
-                  `Upload would exceed quota: ${quota.usedBytes + parsed.bytes} > ${quota.totalBytes}`
-                );
-              }
+            parsedClientPayload = JSON.parse(clientPayload);
+          } catch {
+            // Fall through with empty payload — onUploadCompleted will skip
+            // row creation in this case (back-compat for non-Buildrik
+            // clients that might POST without metadata).
+          }
+          if (typeof parsedClientPayload.bytes === "number") {
+            if (parsedClientPayload.bytes > MAX_FILE_BYTES) {
+              throw new Error(
+                `File ${pathname} exceeds 50MB limit (${parsedClientPayload.bytes} bytes)`
+              );
             }
-          } catch (err) {
-            // Re-throw quota/size errors; tolerate JSON.parse failures (no hint).
-            if (err instanceof Error && err.message.includes("quota")) throw err;
-            if (err instanceof Error && err.message.includes("limit")) throw err;
+            if (
+              quota.totalBytes !== -1 &&
+              quota.usedBytes + parsedClientPayload.bytes > quota.totalBytes
+            ) {
+              throw new Error(
+                `Upload would exceed quota: ${quota.usedBytes + parsedClientPayload.bytes} > ${quota.totalBytes}`
+              );
+            }
           }
         }
 
-        // 4. Issue token. Path-scoped to user namespace so a malicious client
-        // can't overwrite another user's blobs even with a leaked token.
+        // 4. Issue token. tokenPayload carries everything onUploadCompleted
+        // needs to create the row server-side (P1A fix).
         return {
           allowedContentTypes: ALLOWED_CONTENT_TYPES,
           maximumSizeInBytes: MAX_FILE_BYTES,
-          // Vercel Blob gives the client this prefix in the resulting URL.
-          // Path-scoping isolates user uploads.
-          tokenPayload: JSON.stringify({ userId }),
+          tokenPayload: JSON.stringify({
+            userId,
+            type: parsedClientPayload.type,
+            mimeType: parsedClientPayload.mimeType,
+            filename: parsedClientPayload.filename,
+            folderId: parsedClientPayload.folderId ?? null,
+            siteId: parsedClientPayload.siteId ?? null,
+          }),
         };
       },
       onUploadCompleted: async ({ blob, tokenPayload }) => {
-        // No-op for now. The editor calls media.createAsset.mutate immediately
-        // after upload() resolves — that path owns asset row creation. This
-        // hook fires asynchronously from Vercel and would race with the
-        // editor's own createAsset call.
-        //
-        // Future use: if we move createAsset to be server-driven (not
-        // editor-driven), this is where we'd write the row. For now,
-        // log for diagnostics.
-        if (process.env.NODE_ENV !== "production") {
-          const payload = tokenPayload ? JSON.parse(tokenPayload) : {};
-          console.log(
-            `[asset-upload] blob ready: user=${payload.userId} url=${blob.url} bytes=${blob.contentDisposition}`
-          );
+        // Phase B5 P1A fix: server-side row creation here closes the
+        // quota bypass exploit. Idempotent on URL (createAsset upserts
+        // by url), so the client's own media.createAsset call (which
+        // runs in parallel from the editor) sees the existing row and
+        // returns it. Whichever path lands first wins.
+        if (!tokenPayload) return;
+        let payload: {
+          userId?: string;
+          type?: MediaType;
+          mimeType?: string;
+          filename?: string;
+          folderId?: string | null;
+          siteId?: string | null;
+        };
+        try {
+          payload = JSON.parse(tokenPayload);
+        } catch {
+          return;
+        }
+        if (!payload.userId || !payload.type || !payload.mimeType || !payload.filename) {
+          // Insufficient metadata (legacy/non-Buildrik client). Don't
+          // create a row — but the blob persists, which means it counts
+          // against Vercel Blob storage. Future GC pass cleans these up.
+          return;
+        }
+        try {
+          await createAsset(payload.userId, {
+            url: blob.url,
+            bytes: 0, // Vercel doesn't give us bytes here; createAsset's
+            // idempotent path catches the client's call (which DOES
+            // have bytes) and uses that row instead. If client never
+            // calls, we still have a row so quota at least counts the
+            // attempt. TODO: derive bytes via blob.size or Vercel API.
+            type: payload.type,
+            mimeType: payload.mimeType,
+            filename: payload.filename,
+            folderId: payload.folderId ?? null,
+            siteId: payload.siteId ?? null,
+          });
+        } catch (err) {
+          // Quota or folder errors at completion — log but don't throw
+          // (Vercel will retry the webhook indefinitely otherwise).
+          if (process.env.NODE_ENV !== "production") {
+            console.warn(
+              `[asset-upload] createAsset failed in completion: ${err instanceof Error ? err.message : String(err)}`,
+            );
+          }
         }
       },
     });

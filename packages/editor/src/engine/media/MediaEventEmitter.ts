@@ -39,4 +39,12 @@ export class MediaEventEmitter {
   protected emit(event: string, payload: unknown): void {
     this.listeners.get(event)?.forEach((listener) => listener(payload));
   }
+
+  /**
+   * Drop every listener — used by destroy() paths to free memory and
+   * prevent stale callbacks from firing after teardown.
+   */
+  removeAllListeners(): void {
+    this.listeners.clear();
+  }
 }

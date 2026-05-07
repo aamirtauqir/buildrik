@@ -63,14 +63,30 @@ export async function uploadBlob(
   blob: Blob,
   filename: string,
   contentType: string,
+  /**
+   * Phase B5 P1A: full server-side row metadata. The route's
+   * onUploadCompleted handler uses these to create the canonical
+   * MediaAsset row, closing the quota bypass exploit. Without metadata
+   * the server can't create a row, so unscanned blobs would consume
+   * storage without quota accounting.
+   */
+  meta?: {
+    type?: "image" | "video" | "icon" | "font";
+    folderId?: string | null;
+    siteId?: string | null;
+  },
 ): Promise<UploadBlobResult> {
   const result = await upload(filename, blob, {
     access: "public",
     handleUploadUrl: `${DASHBOARD_URL}/api/asset-upload`,
-    // Editor's blob.size is the canonical bytes count. Sending it as a
-    // clientPayload lets the server reject oversized uploads BEFORE
-    // issuing a token instead of after the upload finishes.
-    clientPayload: JSON.stringify({ bytes: blob.size }),
+    clientPayload: JSON.stringify({
+      bytes: blob.size,
+      type: meta?.type,
+      mimeType: contentType,
+      filename,
+      folderId: meta?.folderId ?? null,
+      siteId: meta?.siteId ?? null,
+    }),
     contentType: contentType || undefined,
   });
 
@@ -117,7 +133,18 @@ export function createRemoteAssetSync(opts?: { siteId?: string | null }): Remote
   return {
     async uploadAndCreate(blob, meta) {
       try {
-        const uploaded = await uploadBlob(blob, meta.filename, meta.mimeType);
+        // Forward server-row metadata via clientPayload so the route's
+        // onUploadCompleted handler can create the canonical MediaAsset
+        // row independently (P1A defense in depth).
+        const uploaded = await uploadBlob(blob, meta.filename, meta.mimeType, {
+          type: meta.type,
+          folderId: meta.folderId ?? null,
+          siteId: meta.siteId ?? siteId,
+        });
+        // Client-driven createAsset is now idempotent on URL match
+        // server-side. If onUploadCompleted already created the row,
+        // this returns the existing one. If completion hasn't fired
+        // yet, this creates and the completion handler is the no-op.
         const created = (await getClient().media.createAsset.mutate({
           url: uploaded.url,
           bytes: meta.bytes,

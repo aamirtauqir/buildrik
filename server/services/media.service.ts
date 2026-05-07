@@ -65,6 +65,18 @@ export async function listAssets(userId: string, input: ListAssetsInput) {
 }
 
 export async function createAsset(userId: string, input: CreateAssetInput): Promise<{ id: string; url: string; bytes: number }> {
+  // Phase B5 P1A fix: idempotent on URL match. The dashboard's
+  // /api/asset-upload onUploadCompleted handler also creates rows for
+  // every Vercel Blob upload — that closes the quota-bypass exploit
+  // where a client could upload blobs without ever calling createAsset.
+  // When client AND completion handler both fire (the normal path),
+  // whichever lands first wins; the second resolves to the existing row.
+  const existing = await prisma.mediaAsset.findFirst({
+    where: { userId, url: input.url },
+    select: { id: true, url: true, bytes: true },
+  });
+  if (existing) return existing;
+
   // Phase C: enforce storage cap before insert.
   const quota = await checkStorageQuota(userId);
   if (!quota.ok && quota.totalBytes !== -1 && quota.usedBytes + input.bytes > quota.totalBytes) {

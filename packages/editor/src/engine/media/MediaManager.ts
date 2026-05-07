@@ -150,6 +150,29 @@ export class MediaManager extends MediaEventEmitter {
   /** Phase B2: pending server-side deletes when offline. Asset already gone locally. */
   private pendingRemoteDeletes = new Set<string>();
 
+  /**
+   * Phase B5 P1C fix: local IDs of assets currently mid-uploadAndCreate.
+   * If deleteAsset fires while one is in flight, we record a tombstone
+   * (deleteOnReconcile) so the upload completion handler immediately
+   * deletes the just-created server row instead of leaking it.
+   */
+  private inFlightUploads = new Set<string>();
+  private deleteOnReconcile = new Set<string>();
+
+  /**
+   * Phase B5 P1B fix: folder IDs that failed server-side and need retry
+   * before any asset that references them can be uploaded. Folders sync
+   * before assets in retryLocalOnlyAssets so the asset's folderId
+   * resolves on the server.
+   */
+  private folderRetryQueue = new Map<string, { name: string; parentId: string | null }>();
+
+  /**
+   * Phase B5 P2 (durability): rebuild this from persisted localOnly assets
+   * during init() so a refresh between mirror failures doesn't lose retry
+   * intent. The Set itself stays in-memory; the *intent* is stored in
+   * IndexedDB via asset.localOnly=true.
+   */
   constructor(remoteSync?: RemoteAssetSync) {
     super();
     this.storage = new MediaStorage();
@@ -165,6 +188,49 @@ export class MediaManager extends MediaEventEmitter {
   }
 
   /**
+   * Phase B5 P2 (listener leak fix): tear down window event listener +
+   * clear in-flight queues. Called from Composer.destroy() so repeated
+   * editor mounts (tests, hot reload, route nav) don't accumulate.
+   */
+  destroy(): void {
+    if (typeof window !== "undefined") {
+      window.removeEventListener("online", this.handleOnline);
+    }
+    // Clear in-flight + pending sets so any pending promises resolve
+    // into a no-op rather than mutating destroyed state.
+    this.inFlightUploads.clear();
+    this.deleteOnReconcile.clear();
+    this.retryQueue.clear();
+    this.pendingRemoteDeletes.clear();
+    this.folderRetryQueue.clear();
+    // Revoke all blob URLs to free memory.
+    for (const [, url] of this.blobUrlMap) {
+      URL.revokeObjectURL(url);
+    }
+    this.blobUrlMap.clear();
+    this.blobUrlRefs.clear();
+    for (const timer of this.pendingRevokes.values()) {
+      clearTimeout(timer);
+    }
+    this.pendingRevokes.clear();
+    this.removeAllListeners();
+  }
+
+  /**
+   * Phase B5 P2 (durability): scan persisted assets for localOnly=true and
+   * rebuild the retry queue. Call this once from MediaStorage.init()
+   * completion. Idempotent — running twice doesn't double-add (Set).
+   *
+   * Public so MediaCommandLayer / app init can also re-trigger after
+   * project import.
+   */
+  rebuildRetryQueueFromState(): void {
+    for (const asset of this.state.assets) {
+      if (asset.localOnly) this.retryQueue.add(asset.id);
+    }
+  }
+
+  /**
    * Phase B2: re-attempt server sync for any localOnly assets and any
    * pending remote deletes. Called on 'online' event and after each
    * successful upload (chained retries).
@@ -175,10 +241,33 @@ export class MediaManager extends MediaEventEmitter {
 
   /**
    * Phase B2: drain the retry queue. Best-effort — failures stay queued.
+   * Phase B5 P1B fix: sync folders first so assets referencing offline-
+   * created folders don't hit FOLDER_NOT_FOUND server-side. Asset
+   * folderId is rewritten from local UUID to server CUID before the
+   * asset's own retry runs.
    */
   async retryLocalOnlyAssets(): Promise<void> {
     if (!this.remoteSync) return;
-    // Snapshot the queue; new entries during iteration retry next call.
+
+    // Step 1: drain folder retry queue. Returns map of localId → serverCUID
+    // for any folders that synced this pass.
+    const folderRemap = await this.retryFolderQueue();
+
+    // Step 2: rewrite asset.folderId references in IndexedDB + state for
+    // any folder that just got a server CUID. This must happen BEFORE
+    // asset retries so the createAsset call carries the right folderId.
+    if (folderRemap.size > 0) {
+      for (const asset of this.state.assets) {
+        const newFolderId = asset.folderId ? folderRemap.get(asset.folderId) : undefined;
+        if (newFolderId) {
+          asset.folderId = newFolderId;
+          await this.storage.saveAsset({ ...asset });
+        }
+      }
+    }
+
+    // Step 3: drain the asset retry queue.
+    // Snapshot first; new entries during iteration retry next call.
     const ids = Array.from(this.retryQueue);
     for (const id of ids) {
       const asset = this.state.assets.find((a) => a.id === id);
@@ -454,6 +543,10 @@ export class MediaManager extends MediaEventEmitter {
 
     await this.storage.init();
     await this.loadFromStorage();
+    // Phase B5 P2 (durability): refresh between sync failures used to lose
+    // retry intent because retryQueue lived only in memory. Now we rebuild
+    // it from persisted localOnly markers so retry survives reload.
+    this.rebuildRetryQueueFromState();
     this.initialized = true;
   }
 
@@ -641,9 +734,15 @@ export class MediaManager extends MediaEventEmitter {
       // server-assigned CUID becomes the engine asset ID (replaceAssetId
       // re-keys IndexedDB + state in one pass and emits MEDIA_UPDATED so
       // the UI updates the row identity).
+      //
+      // Phase B5 P1C fix: track inFlightUploads while uploadAndCreate is
+      // pending; deleteAsset(localId) during this window sets a tombstone
+      // (deleteOnReconcile) so we delete the server row immediately on
+      // completion instead of leaking it.
       let finalAsset: MediaAsset = asset;
       const serverType = toServerAssetType(asset.type);
       if (this.remoteSync && serverType) {
+        this.inFlightUploads.add(assetId);
         const remote = await this.remoteSync.uploadAndCreate(finalBlob, {
           filename: file.name,
           mimeType: finalMime,
@@ -651,9 +750,34 @@ export class MediaManager extends MediaEventEmitter {
           type: serverType,
           folderId: asset.folderId ?? null,
         });
+        this.inFlightUploads.delete(assetId);
+
         if (remote) {
+          // P1C tombstone check — if user deleted local during in-flight
+          // upload, server row exists but engine state was already cleaned.
+          // Delete the server row + Vercel Blob to match.
+          if (this.deleteOnReconcile.has(assetId)) {
+            this.deleteOnReconcile.delete(assetId);
+            const deleteOk = await this.remoteSync.deleteRemote(remote.serverId);
+            if (!deleteOk) this.pendingRemoteDeletes.add(remote.serverId);
+            // Engine state was already cleaned by deleteAsset; nothing more to do.
+            // Fall through to the success branch's emit pattern below using
+            // the original (now-deleted) asset for UPLOAD_COMPLETE shape.
+            progress.status = "complete";
+            progress.progress = 100;
+            progress.assetId = assetId;
+            this.emit(MEDIA_EVENTS.UPLOAD_PROGRESS, progress);
+            return { success: true, asset, fileName: file.name };
+          }
           await this.replaceAssetId(assetId, remote.serverId, remote.url);
           finalAsset = this.state.assets.find((a) => a.id === remote.serverId) ?? asset;
+          // P2 fix: chain retry on success so other queued localOnly assets
+          // get a fresh attempt without waiting for an 'online' event.
+          if (this.retryQueue.size > 0 || this.folderRetryQueue.size > 0) {
+            // Fire-and-forget — do not await; current upload's caller
+            // doesn't need to wait for unrelated retries.
+            void this.retryLocalOnlyAssets();
+          }
         } else {
           // Remote sync failed — flag local-only and queue for retry.
           asset.localOnly = true;
@@ -690,6 +814,20 @@ export class MediaManager extends MediaEventEmitter {
     const asset = this.state.assets.find((a) => a.id === id);
     const serverId = asset?.serverId;
 
+    // Phase B5 P1C fix: if uploadAndCreate is in flight for this asset,
+    // tombstone it so completion handler immediately deletes the server
+    // row instead of leaving an orphan. Without this, deleteAsset returns
+    // before the upload completes, server row gets created, and B3 hydration
+    // re-imports the "deleted" asset on next reload.
+    if (this.inFlightUploads.has(id)) {
+      this.deleteOnReconcile.add(id);
+    }
+
+    // Phase B5 P2 + P1B: also drop from retry / folder-retry queues if
+    // present, so we don't accidentally re-create the asset server-side
+    // after the user explicitly deleted it locally.
+    this.retryQueue.delete(id);
+
     await this.storage.deleteAsset(id);
     this.state.assets = this.state.assets.filter((a) => a.id !== id);
     this.state.selectedAssetIds = this.state.selectedAssetIds.filter((sid) => sid !== id);
@@ -704,6 +842,8 @@ export class MediaManager extends MediaEventEmitter {
     // Phase B2: mirror server-side delete. If offline / 5xx, queue for
     // retry on next 'online' event. Local delete already happened — server
     // is the eventually-consistent side.
+    // Skipped when serverId absent — either local-only (nothing to delete)
+    // or in-flight (handled by tombstone above).
     if (this.remoteSync && serverId) {
       const ok = await this.remoteSync.deleteRemote(serverId);
       if (!ok) this.pendingRemoteDeletes.add(serverId);
@@ -788,8 +928,12 @@ export class MediaManager extends MediaEventEmitter {
   async createFolder(name: string, parentId?: string | null): Promise<MediaFolder> {
     // Phase B4: try server first when wired. If server returns a CUID,
     // use it as the engine folder id (single source of identity). On
-    // failure or no remoteSync, fall back to local-only id.
+    // failure, generate a local id AND queue for retry — without this
+    // queue, assets uploaded into the folder later would fail with
+    // FOLDER_NOT_FOUND server-side and uploadAndCreate would loop
+    // forever (Phase B5 P1B fix).
     let id = generateMediaId();
+    let serverSynced = false;
     if (this.remoteSync) {
       const created = await this.remoteSync.createFolder({
         name,
@@ -797,10 +941,13 @@ export class MediaManager extends MediaEventEmitter {
       });
       if (created) {
         id = created.serverId;
+        serverSynced = true;
+      } else {
+        // Queue for retry. retryLocalOnlyAssets syncs folders FIRST so
+        // any assets that reference this folder get the server CUID
+        // before their own retry hits createAsset.
+        this.folderRetryQueue.set(id, { name, parentId: parentId ?? null });
       }
-      // null = offline / auth-fail / quota — keep local id, no retry queue
-      // for folders today. Folder syncs are rare; if creation failed the
-      // user can rename or recreate.
     }
 
     const folder: MediaFolder = {
@@ -814,7 +961,45 @@ export class MediaManager extends MediaEventEmitter {
     await this.storage.saveFolder(folder);
     this.state.folders.push(folder);
     this.emit(MEDIA_EVENTS.FOLDER_CREATED, folder);
+
+    // Annotate so future debugging knows this folder isn't server-synced.
+    void serverSynced;
     return folder;
+  }
+
+  /**
+   * Phase B5 P1B fix: re-attempt folder server creation. Returns map
+   * of localId → serverId for successful syncs so retryLocalOnlyAssets
+   * can rewrite asset.folderId references in the same pass.
+   */
+  private async retryFolderQueue(): Promise<Map<string, string>> {
+    const remapped = new Map<string, string>();
+    if (!this.remoteSync || this.folderRetryQueue.size === 0) return remapped;
+    const entries = Array.from(this.folderRetryQueue.entries());
+    for (const [localId, payload] of entries) {
+      // Resolve parent id forward-mapping when parent was also offline-created
+      // and is being synced this same pass. Best-effort — if parent fails
+      // again, this folder still queues for next round.
+      const parentId = payload.parentId;
+      const created = await this.remoteSync.createFolder({
+        name: payload.name,
+        parentId: parentId,
+      });
+      if (created) {
+        // Rewrite engine folder id from local UUID to server CUID.
+        const idx = this.state.folders.findIndex((f) => f.id === localId);
+        if (idx >= 0) {
+          const old = this.state.folders[idx];
+          const updated: MediaFolder = { ...old, id: created.serverId };
+          await this.storage.saveFolder(updated);
+          await this.storage.deleteFolder(localId);
+          this.state.folders[idx] = updated;
+          remapped.set(localId, created.serverId);
+        }
+        this.folderRetryQueue.delete(localId);
+      }
+    }
+    return remapped;
   }
 
   async deleteFolder(id: string): Promise<void> {

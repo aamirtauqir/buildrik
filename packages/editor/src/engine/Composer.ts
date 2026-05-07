@@ -726,6 +726,7 @@ ${html}
     if (this.forms?.destroy) this.forms.destroy();
     if (this.collab.sync?.destroy) this.collab.sync.destroy();
     if (this.recovery?.destroy) this.recovery.destroy();
+    if (this.media?.destroy) this.media.destroy();
     if (this.canvas.drag?.destroy) this.canvas.drag.destroy();
     if (this.router?.clear) this.router.clear();
     if (this.elements?.destroy) this.elements.destroy();
