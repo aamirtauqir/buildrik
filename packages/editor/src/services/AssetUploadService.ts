@@ -64,14 +64,17 @@ export async function uploadBlob(
   filename: string,
   contentType: string,
   /**
-   * Phase B5 P1A: full server-side row metadata. The route's
-   * onUploadCompleted handler uses these to create the canonical
-   * MediaAsset row, closing the quota bypass exploit. Without metadata
-   * the server can't create a row, so unscanned blobs would consume
-   * storage without quota accounting.
+   * Phase B5+ codex re-review pass 3 P2 fix: tightened from optional
+   * `meta?` (B5) to required `meta` because `/api/asset-upload` now
+   * REJECTS the token request when `bytes`/`type`/`mimeType`/`filename`
+   * are missing. Type drift between caller (optional) and server
+   * (mandatory) hid the contract — every call site already passed the
+   * full object via createRemoteAssetSync; making it required surfaces
+   * any future caller's missing-metadata bug at compile time, not as
+   * a 400 at runtime.
    */
-  meta?: {
-    type?: "image" | "video" | "icon" | "font";
+  meta: {
+    type: "image" | "video" | "icon" | "font";
     folderId?: string | null;
     siteId?: string | null;
   },
@@ -81,11 +84,11 @@ export async function uploadBlob(
     handleUploadUrl: `${DASHBOARD_URL}/api/asset-upload`,
     clientPayload: JSON.stringify({
       bytes: blob.size,
-      type: meta?.type,
+      type: meta.type,
       mimeType: contentType,
       filename,
-      folderId: meta?.folderId ?? null,
-      siteId: meta?.siteId ?? null,
+      folderId: meta.folderId ?? null,
+      siteId: meta.siteId ?? null,
     }),
     contentType: contentType || undefined,
   });

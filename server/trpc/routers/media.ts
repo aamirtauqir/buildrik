@@ -138,6 +138,18 @@ export const mediaRouter = router({
         if (e instanceof Error && e.message === "FOLDER_NOT_FOUND") {
           throw new TRPCError({ code: "BAD_REQUEST", message: "Folder not found." });
         }
+        // Phase B5+ codex re-review pass 3 P0: cross-tenant URL collision.
+        // Returned as CONFLICT so the editor's defense-in-depth client
+        // createAsset can swallow + log without surfacing as a generic
+        // 500. Should be unreachable in practice — Vercel Blob URLs
+        // include a randomized suffix per upload, so legitimate flows
+        // never produce this error.
+        if (e instanceof Error && e.message === "URL_CONFLICT") {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Asset URL is already owned by another user.",
+          });
+        }
         throw e;
       }
     }),

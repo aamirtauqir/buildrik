@@ -93,14 +93,35 @@ export async function createAsset(userId: string, input: CreateAssetInput): Prom
     }
   }
 
-  // Pre-check: would creating consume more than allowed? Skipped on
-  // unlimited tier (-1) or when an existing row already accounts for it.
+  // Phase B5+ codex re-review pass 3 P0 fix [URL_CONFLICT]: reject if
+  // the URL is already owned by a different user. Without this an
+  // attacker can call createAsset({ url: someoneElsesPublicUrl }) to
+  // mint a row pointing at another tenant's blob, then call
+  // deleteAsset on their own row to wipe the shared underlying blob.
+  // The (userId, url) unique constraint allowed cross-tenant rows; the
+  // del() in deleteAsset turned that into cross-tenant data loss.
+  // Race window remains (two users both pass this check pre-upsert),
+  // bounded by deleteAsset's other-references guard.
+  const conflicting = await prisma.mediaAsset.findFirst({
+    where: { url: input.url, NOT: { userId } },
+    select: { id: true },
+  });
+  if (conflicting) {
+    throw new Error("URL_CONFLICT");
+  }
+
+  // Pre-fetch the existing row once. Two consumers downstream:
+  //   1. Quota delta check (skip when row already accounts for bytes)
+  //   2. Monotonic update gate (only repair bytes upward, never shrink)
+  const existing = await prisma.mediaAsset.findUnique({
+    where: { MediaAsset_userId_url_unique: { userId, url: input.url } },
+    select: { bytes: true },
+  });
+  const existedBefore = existing !== null;
+  const existingBytes = existing?.bytes ?? 0;
+
   if (quota.totalBytes !== -1) {
-    const existing = await prisma.mediaAsset.findUnique({
-      where: { MediaAsset_userId_url_unique: { userId, url: input.url } },
-      select: { bytes: true },
-    });
-    const delta = existing ? Math.max(input.bytes - existing.bytes, 0) : input.bytes;
+    const delta = existedBefore ? Math.max(input.bytes - existingBytes, 0) : input.bytes;
     if (!quota.ok && quota.usedBytes + delta > quota.totalBytes) {
       throw new Error("QUOTA_EXCEEDED");
     }
@@ -120,14 +141,33 @@ export async function createAsset(userId: string, input: CreateAssetInput): Prom
       altText: input.altText ?? null,
       userMetadata: (input.userMetadata as Prisma.InputJsonValue) ?? Prisma.JsonNull,
     },
-    update: {
-      // Repair bytes=0 from a webhook that landed before the client's
-      // metadata-bearing call. Only update when the new value is bigger
-      // — otherwise a stale call could shrink a valid row.
-      bytes: input.bytes,
-    },
+    update: buildMonotonicByteUpdate(existedBefore, existingBytes, input.bytes),
     select: { id: true, url: true, bytes: true },
   });
+}
+
+/**
+ * Phase B5+ codex re-review pass 3 P1 fix [bytes monotonic]: previously
+ * the upsert update branch wrote `input.bytes` unconditionally, which
+ * means a stale or smaller-bytes replay could SHRINK an already-correct
+ * row. Combined with the delta-based pre-quota check (delta=0 when
+ * input.bytes <= existing), users could replay with bytes=0 and silently
+ * undercount their storage usage. Update only when the new value is
+ * strictly bigger than the persisted value — i.e., the only legitimate
+ * write is the bytes=0→real-bytes repair from a webhook race.
+ *
+ * Race window: two concurrent calls both read existingBytes pre-upsert,
+ * the second one's pre-fetch sees the first one's not-yet-committed
+ * value. Acceptable bound: monotonic at row level, eventually correct.
+ */
+function buildMonotonicByteUpdate(
+  existedBefore: boolean,
+  existingBytes: number,
+  newBytes: number,
+): Prisma.MediaAssetUpdateInput {
+  if (!existedBefore) return {};
+  if (newBytes > existingBytes) return { bytes: newBytes };
+  return {};
 }
 
 export async function updateAsset(userId: string, input: UpdateAssetInput) {
@@ -176,22 +216,29 @@ export async function deleteAsset(userId: string, input: DeleteAssetInput) {
   // Versions cascade-delete via FK constraint.
   await prisma.mediaAsset.delete({ where: { id: input.assetId } });
 
-  // Phase B5+ codex re-review fix [P1C]: also delete the underlying
-  // Vercel Blob so storage isn't silently leaked. Pre-fix, deleting an
-  // asset removed the Prisma row but left the binary at vercel-storage.com
-  // forever — quota would re-fill on the next billing cycle even though
-  // the user "deleted" everything. Best-effort: legacy rows without a
-  // Vercel URL or environments without BLOB_READ_WRITE_TOKEN simply skip.
+  // Phase B5+ codex re-review pass 3 P0 defense-in-depth: only delete
+  // the Vercel Blob when no other MediaAsset row still references the
+  // same URL. Combined with createAsset's URL_CONFLICT guard, this
+  // makes cross-tenant blob deletion impossible: even if a stale row
+  // ever survives the createAsset gate (race, bug, schema drift),
+  // del() won't fire while another tenant's row still points at it.
+  // Cost: orphan blobs accumulate when references exist; recoverable
+  // via a future reconciliation job. Worth it for the safety property.
   if (asset.url && process.env.BLOB_READ_WRITE_TOKEN) {
-    try {
-      await del(asset.url);
-    } catch (err) {
-      // Don't fail the user-visible delete on a blob cleanup error;
-      // orphan blobs are recoverable via a future reconciliation job.
-      if (process.env.NODE_ENV !== "production") {
-        console.warn(
-          `[media.deleteAsset] Vercel Blob del failed for ${input.assetId}: ${err instanceof Error ? err.message : String(err)}`,
-        );
+    const otherReferences = await prisma.mediaAsset.count({
+      where: { url: asset.url },
+    });
+    if (otherReferences === 0) {
+      try {
+        await del(asset.url);
+      } catch (err) {
+        // Don't fail the user-visible delete on a blob cleanup error;
+        // orphan blobs are recoverable via a future reconciliation job.
+        if (process.env.NODE_ENV !== "production") {
+          console.warn(
+            `[media.deleteAsset] Vercel Blob del failed for ${input.assetId}: ${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
       }
     }
   }

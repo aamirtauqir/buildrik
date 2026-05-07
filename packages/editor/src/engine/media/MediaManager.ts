@@ -261,13 +261,49 @@ export class MediaManager extends MediaEventEmitter {
   };
 
   /**
+   * Phase B5+ codex re-review pass 3 P1 fix: serialize re-entrant
+   * drains. retryLocalOnlyAssets is called from `online`, from
+   * uploadFile success branch (chained retry), and from app init
+   * (loadServerMedia hooks). Two overlapping calls would both
+   * snapshot the same folderRetryQueue entries and both call
+   * remoteSync.createFolder before either pass deleted the entry —
+   * server gets duplicate folders, remap map fights itself.
+   */
+  private retryInFlight: Promise<void> | null = null;
+
+  /**
    * Phase B2: drain the retry queue. Best-effort — failures stay queued.
    * Phase B5 P1B fix: sync folders first so assets referencing offline-
    * created folders don't hit FOLDER_NOT_FOUND server-side. Asset
    * folderId is rewritten from local UUID to server CUID before the
    * asset's own retry runs.
+   *
+   * Phase B5+ pass 3: mutex via retryInFlight. Concurrent callers
+   * await the same in-flight drain. If a new drain is needed after
+   * the current one finishes (entry added during drain), retryFlag
+   * triggers a follow-up pass.
    */
   async retryLocalOnlyAssets(): Promise<void> {
+    if (!this.remoteSync) return;
+    if (this.retryInFlight) {
+      // Another drain is running; chain so we re-run after it finishes
+      // (in case our trigger reason added new queue entries the running
+      // drain already snapshotted past).
+      await this.retryInFlight;
+      // Only re-enter if there's still work — otherwise fall through to
+      // a no-op, avoiding infinite recursion if both queues stay empty.
+      if (this.retryQueue.size === 0 && this.folderRetryQueue.size === 0) {
+        return;
+      }
+      // Falls through to the in-flight setup below.
+    }
+    this.retryInFlight = this.doRetryLocalOnlyAssets().finally(() => {
+      this.retryInFlight = null;
+    });
+    return this.retryInFlight;
+  }
+
+  private async doRetryLocalOnlyAssets(): Promise<void> {
     if (!this.remoteSync) return;
 
     // Step 1: drain folder retry queue. Returns map of localId → serverCUID
@@ -1106,6 +1142,26 @@ export class MediaManager extends MediaEventEmitter {
   }
 
   async deleteFolder(id: string): Promise<void> {
+    // Phase B5+ codex re-review pass 3 P1 fix: drop the folder + any
+    // queued descendants from folderRetryQueue BEFORE removing them
+    // from state. Pre-fix, deleting an offline-created folder left
+    // its entry in folderRetryQueue, so on the next reconnect the
+    // server resurrected the folder the user had explicitly trashed
+    // (state had no row, but the queue still asked the server to
+    // create it). Walk the local subtree using state.folders, then
+    // purge each id from the queue.
+    const toPurgeFromQueue = new Set<string>();
+    const walk = (folderId: string) => {
+      toPurgeFromQueue.add(folderId);
+      for (const f of this.state.folders) {
+        if (f.parentId === folderId) walk(f.id);
+      }
+    };
+    walk(id);
+    for (const purgeId of toPurgeFromQueue) {
+      this.folderRetryQueue.delete(purgeId);
+    }
+
     await this.storage.deleteFolder(id);
     this.state.folders = this.state.folders.filter((f) => f.id !== id);
 

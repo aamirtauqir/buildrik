@@ -20,6 +20,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { auth } from "@server/auth";
+import { prisma } from "@/lib/prisma";
 import { checkStorageQuota, createAsset } from "@server/services/media.service";
 import type { MediaType } from "@buildrik/shared/schemas/media";
 
@@ -120,6 +121,27 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           throw new Error(
             `Upload would exceed quota: ${quota.usedBytes + parsedClientPayload.bytes} > ${quota.totalBytes}`
           );
+        }
+
+        // Phase B5+ codex re-review pass 3 P1 fix: validate folderId
+        // ownership BEFORE issuing the token. Pre-fix, an attacker
+        // could request a token with a fake/stolen folderId, upload
+        // the blob, and then both onUploadCompleted's createAsset
+        // call AND the client's defense-in-depth createAsset call
+        // would throw FOLDER_NOT_FOUND — the blob exists in storage
+        // with no row tracking it, no quota deduction, no cleanup
+        // path. Validating ownership here aborts the flow before
+        // the token mints anything.
+        if (parsedClientPayload.folderId) {
+          const folder = await prisma.mediaFolder.findUnique({
+            where: { id: parsedClientPayload.folderId },
+            select: { userId: true },
+          });
+          if (!folder || folder.userId !== userId) {
+            throw new Error(
+              `Asset upload folderId not owned by user: ${parsedClientPayload.folderId}`
+            );
+          }
         }
 
         // 4. Issue token. tokenPayload carries everything onUploadCompleted
