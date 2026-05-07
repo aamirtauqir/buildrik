@@ -1,5 +1,19 @@
 # TODOS
 
+## 2026-05-08 — DS Arc · Phase A.0 Token Foundation CLOSED
+
+- ✅ TokenKind union (14 kinds) + TokenValue discriminated union — types.ts
+- ✅ Zod validators for all 14 kinds — packages/shared/schemas/designToken.ts (18 unit tests)
+- ✅ useTokensForKind factory — 10 unit tests, replaces would-be 11x copy-paste; includes no-op guard + applyToRoot live-preview side effect
+- ✅ 11 per-kind wrapper hooks (radius/shadow/motion/border/opacity/zindex/breakpoint/grid/sizing/icon/imagery) — one commit each
+- ✅ TokenRegistryProvider wires all 14 contexts — existing 3 (color/spacing/type) untouched, 20/20 prior tests still pass
+- ✅ DEFAULT_TOKENS seeded with 18 placeholders covering 11 new kinds — all 86 tokens pass DesignTokenSchema
+- ✅ Hardening: T1 doc clarifications (TokenKind/TokenCategory relationship, friendlyName resolution, typedValue scope), T2 enum-pinning (category/type), T3 vitest config extended for packages/shared/, T4 no-op guard + applyToRoot side effect
+
+Phase A.1 (migration v0→v1) is now unblocked. Tokens shipped here read from
+existing localStorage; A.1 introduces the dsSchemaVersion-aware runner that
+bumps from 0→1 on first DS write per site.
+
 ## 2026-05-08 — DS Arc · Phase 0 Foundation Prereqs CLOSED
 
 - ✅ jsdom test environment verified healthy (was stale TODO; suite passes against React 19 + jsdom 28 + RTL 16, 2069/2069 tests on 2026-05-07)
