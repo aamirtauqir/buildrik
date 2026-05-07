@@ -275,12 +275,6 @@
   transition: outline-color 150ms ease;
 }
 
-.bd-dragging {
-  opacity: 0.4 !important;
-  cursor: grabbing !important;
-  user-select: none;
-}
-
 .bd-clone-mode {
   cursor: copy !important;
   outline: 2px dashed var(--buildrick-selection-color) !important;

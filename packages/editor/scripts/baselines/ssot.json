@@ -16,30 +16,23 @@
     "violations": [
       {
         "path": "src/editor/canvas/Canvas.css",
-        "line": 278,
+        "line": 571,
         "severity": "important",
-        "message": "Selector \".bd-dragging\" defined in 2 files: src/editor/canvas/Canvas.css:278, src/themes/legacy-components.css:61",
-        "suggestion": "Consolidate to single tier CSS file or document layered override."
-      },
-      {
-        "path": "src/editor/canvas/Canvas.css",
-        "line": 577,
-        "severity": "important",
-        "message": "Selector \".bd-depth-badge\" defined in 2 files: src/editor/canvas/Canvas.css:577, src/themes/design-system/a11y.css:53",
+        "message": "Selector \".bd-depth-badge\" defined in 2 files: src/editor/canvas/Canvas.css:571, src/themes/design-system/a11y.css:56",
         "suggestion": "Consolidate to single tier CSS file or document layered override."
       },
       {
         "path": "src/themes/components/organisms/topbar.css",
         "line": 8,
         "severity": "important",
-        "message": "Selector \".bd-topbar\" defined in 2 files: src/themes/components/organisms/topbar.css:8, src/themes/design-system/bd-topbar-overrides.css:29",
+        "message": "Selector \".bd-topbar\" defined in 2 files: src/themes/components/organisms/topbar.css:8, src/themes/design-system/bd-topbar-overrides.css:31",
         "suggestion": "Consolidate to single tier CSS file or document layered override."
       },
       {
         "path": "src/themes/components/organisms/topbar.css",
         "line": 27,
         "severity": "important",
-        "message": "Selector \".bd-topbar__brand\" defined in 2 files: src/themes/components/organisms/topbar.css:27, src/themes/design-system/bd-topbar-overrides.css:67",
+        "message": "Selector \".bd-topbar__brand\" defined in 2 files: src/themes/components/organisms/topbar.css:27, src/themes/design-system/bd-topbar-overrides.css:70",
         "suggestion": "Consolidate to single tier CSS file or document layered override."
       }
     ]

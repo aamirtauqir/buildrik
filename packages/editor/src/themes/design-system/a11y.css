@@ -45,6 +45,9 @@
    * kills transition-duration but element may be stuck at opacity:0 (animation
    * start state). Migrated from editor/canvas/Canvas.css 2026-04-26. */
   .bd-hover-overlay,
+  /* layered-override: motion-reduce mode pins opacity for drop-feedback +
+   * depth-badge classes. .bd-depth-badge appears here AND in Canvas.css (font
+   * override) — different intents, both legitimate per @media gating. */
   .bd-drop-feedback-badge,
   .bd-drop-feedback-target,
   .bd-drop-position-line,

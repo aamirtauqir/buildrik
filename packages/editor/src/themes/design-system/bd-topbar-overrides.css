@@ -26,6 +26,8 @@
    * Honors DESIGN.md §Layout topbar height + §Color §Surfaces (white card
    * on slate-50 page, hairline bottom, no shadow on chrome).
    * ──────────────────────────────────────────────────────────────────── */
+  /* layered-override: extends canonical .bd-topbar (organisms/topbar.css)
+   * via @layer overrides cascade. Scanner flags as duplicate; intentional. */
   .bd-topbar {
     height: var(--bd-shell-header-h);             /* 56px via --buildrick-header-height */
     background: var(--buildrick-bg-card);
@@ -63,7 +65,8 @@
   }
 
   /* Tighten brand text spacing to match DESIGN.md §Typography
-     (13/600/-0.01em on slate-800 heading). */
+     (13/600/-0.01em on slate-800 heading).
+     layered-override: extends canonical .bd-topbar__brand via @layer overrides. */
   .bd-topbar__brand {
     font-family: var(--buildrick-font-family);
     font-size: var(--buildrick-text-sm-plus);
