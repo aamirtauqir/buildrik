@@ -19,6 +19,9 @@ export interface ReplaceModalProps {
   currentPageCount: number;
   resetGlobalStyles: boolean;
   onResetChange: (v: boolean) => void;
+  /** P2 fix (codex A4): backup current page as new page before replacing. */
+  backupCurrentPage: boolean;
+  onBackupChange: (v: boolean) => void;
   onCancel: () => void;
   onApply: () => void;
 }
@@ -27,6 +30,8 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
   template,
   resetGlobalStyles,
   onResetChange,
+  backupCurrentPage,
+  onBackupChange,
   onCancel,
   onApply,
 }) =>
@@ -39,12 +44,25 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
             This will replace your current page content with <strong>{template.name}</strong>. This action cannot be undone.
           </p>
         </div>
-        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--bd-fg-muted, #475569)", cursor: "pointer", margin: "0 0 4px" }}>
+        <label style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--bd-fg-muted, #475569)", cursor: "pointer", margin: "0 0 6px" }}>
+          <Checkbox
+            checked={backupCurrentPage}
+            onChange={(e) => onBackupChange(e.target.checked)}
+            style={{ width: 14, height: 14, cursor: "pointer", marginTop: 2 }} />
+          <span>
+            <span style={{ display: "block", fontWeight: 500, color: "var(--bd-fg)" }}>Backup current page first</span>
+            <span style={{ display: "block", fontSize: 11, marginTop: 1 }}>Saves current content as a new page before replacing.</span>
+          </span>
+        </label>
+        <label style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--bd-fg-muted, #475569)", cursor: "pointer", margin: "0 0 4px" }}>
           <Checkbox
             checked={resetGlobalStyles}
             onChange={(e) => onResetChange(e.target.checked)}
-            style={{ width: 14, height: 14, cursor: "pointer" }} />
-          Also reset global styles
+            style={{ width: 14, height: 14, cursor: "pointer", marginTop: 2 }} />
+          <span>
+            <span style={{ display: "block", fontWeight: 500, color: "var(--bd-fg)" }}>Reset global styles</span>
+            <span style={{ display: "block", fontSize: 11, marginTop: 1 }}>Override your brand tokens with template defaults.</span>
+          </span>
         </label>
         <div className="tpl-modal-btns">
           <Button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onCancel}>

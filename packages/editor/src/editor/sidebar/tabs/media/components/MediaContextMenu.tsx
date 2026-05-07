@@ -85,6 +85,22 @@ export function MediaContextMenu({
         <Button role="menuitem" className="med-ctx-item" onClick={act(() => onCopyUrl(item))}>
           Copy URL
         </Button>
+        {item.type === "img" && item.altText ? (
+          <Button
+            role="menuitem"
+            className="med-ctx-item"
+            onClick={act(() => {
+              // P2 fix (codex B16): copy-alt-text item. Inert when no altText set.
+              try {
+                navigator.clipboard.writeText(item.altText ?? "");
+              } catch {
+                /* clipboard API unavailable — silent no-op */
+              }
+            })}
+          >
+            Copy alt text
+          </Button>
+        ) : null}
         <div
           role="menuitem"
           className="med-ctx-item med-ctx-item--submenu"

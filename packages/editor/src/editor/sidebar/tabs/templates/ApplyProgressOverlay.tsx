@@ -1,7 +1,11 @@
 import { Button } from "@/editor/shared/vibcoder/Button";
 /**
- * ApplyProgressOverlay — shows while template apply animation runs.
- * Fires onComplete after a brief delay so the UI has time to settle.
+ * ApplyProgressOverlay — shows 4-step progress while template apply runs.
+ *
+ * P2 fix (codex A8): was a single spinner; now sequenced status flow
+ * matching v3 prototype § 8: Importing → Resolving tokens → Rendering → Saving.
+ * Each step ≈300ms. onComplete fires after final step.
+ *
  * @license BSD-3-Clause
  */
 
@@ -16,7 +20,20 @@ export interface ApplyProgressOverlayProps {
   onError?: (err: Error) => void;
 }
 
-const APPLY_DELAY = 1200; // ms before firing onComplete
+interface Step {
+  id: string;
+  label: string;
+}
+
+const STEPS: Step[] = [
+  { id: "import", label: "Importing template HTML" },
+  { id: "tokens", label: "Resolving brand tokens" },
+  { id: "render", label: "Rendering on canvas" },
+  { id: "save", label: "Saving applied state" },
+];
+
+const STEP_DURATION = 300; // ms per step
+const FINAL_HOLD = 200; // ms hold on completed state before onComplete
 
 export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
   templateName,
@@ -24,12 +41,26 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
   onCancel,
   onError,
 }) => {
+  const [stepIndex, setStepIndex] = React.useState(0);
   const onCompleteRef = React.useRef(onComplete);
   React.useLayoutEffect(() => { onCompleteRef.current = onComplete; });
 
   React.useEffect(() => {
-    const timer = setTimeout(() => onCompleteRef.current(), APPLY_DELAY);
-    return () => clearTimeout(timer);
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    // Advance through each step.
+    for (let i = 1; i <= STEPS.length; i++) {
+      timers.push(
+        setTimeout(() => setStepIndex(i), STEP_DURATION * i)
+      );
+    }
+    // Fire complete after all steps + final hold.
+    timers.push(
+      setTimeout(
+        () => onCompleteRef.current(),
+        STEP_DURATION * STEPS.length + FINAL_HOLD
+      )
+    );
+    return () => timers.forEach((t) => clearTimeout(t));
   }, []);
 
   React.useEffect(() => {
@@ -39,10 +70,50 @@ export const ApplyProgressOverlay: React.FC<ApplyProgressOverlayProps> = ({
   }, [onError]);
 
   return createPortal(
-    <div className="tmpl-progress" role="status" aria-label="Applying template">
+    <div className="tmpl-progress" role="status" aria-label="Applying template" aria-live="polite">
       <div className="tmpl-progress__inner">
-        <h3 className="tmpl-progress__title">Applying {templateName}...</h3>
-        <span className="tmpl-progress__spinner" style={{ width: 24, height: 24, borderWidth: 2 }} />
+        <span className="tmpl-progress__spinner" style={{ width: 32, height: 32, borderWidth: 3 }} />
+        <h3 className="tmpl-progress__title">Applying {templateName}…</h3>
+        <ol
+          style={{
+            listStyle: "none",
+            padding: 0,
+            margin: "12px 0 0",
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+            fontSize: 12,
+            color: "var(--bd-fg-muted, #6B7280)",
+            textAlign: "left",
+            minWidth: 220,
+          }}
+        >
+          {STEPS.map((s, i) => {
+            const done = i < stepIndex;
+            const active = i === stepIndex;
+            return (
+              <li
+                key={s.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  color: done
+                    ? "var(--bd-success, #16A34A)"
+                    : active
+                      ? "var(--bd-cobalt, #2D6DFF)"
+                      : "var(--bd-fg-disabled, #B0B7C0)",
+                  fontWeight: active ? 500 : 400,
+                }}
+              >
+                <span style={{ width: 14, display: "inline-flex", justifyContent: "center" }}>
+                  {done ? "✓" : active ? "→" : "○"}
+                </span>
+                {s.label}
+              </li>
+            );
+          })}
+        </ol>
         {onCancel && (
           <Button className="tmpl-progress__cancel" onClick={onCancel}>
             Cancel

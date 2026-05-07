@@ -30,7 +30,8 @@ import {
 } from "./MediaHelpers";
 import { MediaStorage } from "./MediaStorage";
 import { MediaOptimizer } from "./MediaOptimizer";
-import { stockService } from "../../services/stock/StockService";
+// P5 (2026-05-07): engine→services import deleted; stock search lives in editor UI
+// only via dashboard.media.searchStock tRPC. Engine no longer touches I/O for stock.
 
 // --- Discovery stub types ---
 
@@ -578,24 +579,12 @@ export class MediaManager extends MediaEventEmitter {
   }
 
   // --- Discovery Stubs (wired with mock data for "functional" feel) ---
-
-  /**
-   * Search stock photos (Unsplash) or videos (Pexels).
-   */
-  async searchStock(
-    type: "img" | "vid", 
-    query: string, 
-    orientation?: string, 
-    color?: string
-  ): Promise<StockPhoto[] | StockVideo[]> {
-    if (!query) return [];
-
-    if (type === "img") {
-      return await stockService.searchPhotos(query, 1, orientation, color);
-    } else {
-      return await stockService.searchVideos(query, 1, orientation);
-    }
-  }
+  //
+  // P5 (2026-05-07): MediaManager.searchStock deleted. Stock search now lives
+  // in editor UI only — useDiscoveryState calls dashboard.media.searchStock
+  // tRPC directly (which itself proxies to Unsplash/Pexels with rate-limit +
+  // quota enforcement on the server). Engine purity restored: no engine→
+  // services import, no engine→external-API call.
 
   /**
    * Get built-in icon library.

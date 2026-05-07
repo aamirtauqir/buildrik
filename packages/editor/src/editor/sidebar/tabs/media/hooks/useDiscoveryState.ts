@@ -6,6 +6,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Composer } from "../../../../../engine/Composer";
+import { stockService } from "../../../../../services/stock/StockService";
 import type {
   DiscFont,
   DiscIcon,
@@ -15,6 +16,15 @@ import type {
   DiscOrientation,
   DiscColor,
 } from "../data/mediaTypes";
+
+/**
+ * P5 (2026-05-07): stock search bypasses engine. Editor calls services/stock/
+ * StockService directly. Engine no longer hosts an API-call surface for stock
+ * (decision A3 RESOLVED — codex finding 3: UI already bypasses engine).
+ *
+ * Future: when dashboard.media.searchStock tRPC ships with quota+rate-limit,
+ * swap stockService → tRPC client. Until then, stockService stub returns [].
+ */
 
 export function useDiscoveryState(
   composer: Composer,
@@ -51,14 +61,18 @@ export function useDiscoveryState(
 
       setPageState({ img: 1, vid: 1 });
       setDiscLoading((prev) => ({ ...prev, img: true, vid: true }));
+      // P5: stockService expects "landscape"|"portrait"|"squarish"|undefined.
+      // DiscOrientation adds "all" which maps to "no filter" → undefined.
+      const o = activeOrientation === "all" ? undefined : activeOrientation;
+      const c = activeColor === "all" ? undefined : (activeColor as string | undefined);
       try {
         const [photos, videos] = await Promise.all([
-          composer.media.searchStock("img", query, activeOrientation, activeColor),
-          composer.media.searchStock("vid", query, activeOrientation),
+          stockService.searchPhotos(query, 1, o, c),
+          stockService.searchVideos(query, 1, o),
         ]);
         setStockPhotos(photos as StockPhoto[]);
         setStockVideos(videos as StockVideo[]);
-      } catch (err) {
+      } catch {
         showToast("Discovery search failed", "error");
       } finally {
         setDiscLoading((prev) => ({ ...prev, img: false, vid: false }));
@@ -88,17 +102,12 @@ export function useDiscoveryState(
       const nextPage = pageState[type] + 1;
       setDiscLoading((prev) => ({ ...prev, [type]: true }));
       try {
-        const results = await composer.media.searchStock(
-          type,
-          discoverySearch,
-          discOrientation,
-          type === "img" ? discColor : undefined
-        );
-        // searchStock always returns page 1 — pass page via the service directly
-        const { stockService } = await import("../api/StockService");
+        // P5: direct stockService call — no engine hop, no broken dynamic import.
+        const o2 = discOrientation === "all" ? undefined : discOrientation;
+        const c2 = discColor === "all" ? undefined : (discColor as string | undefined);
         const newResults = type === "img"
-          ? await stockService.searchPhotos(discoverySearch, nextPage, discOrientation, discColor)
-          : await stockService.searchVideos(discoverySearch, nextPage, discOrientation);
+          ? await stockService.searchPhotos(discoverySearch, nextPage, o2, c2)
+          : await stockService.searchVideos(discoverySearch, nextPage, o2);
 
         if (type === "img") {
           setStockPhotos((prev) => [...prev, ...(newResults as StockPhoto[])]);

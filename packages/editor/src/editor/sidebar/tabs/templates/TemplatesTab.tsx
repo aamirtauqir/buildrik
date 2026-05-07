@@ -82,6 +82,11 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
 
   const sel = useTemplateSelection(showProgress);
 
+  // P2 fix (codex A4): backup-current-page checkbox state for ReplaceModal.
+  // When checked, apply path duplicates the current page as "<Name> (backup)"
+  // before replacing content.
+  const [backupCurrentPage, setBackupCurrentPage] = React.useState(false);
+
   // ── Derived ──
   const detailTemplate = sel.detailId
     ? SITE_TEMPLATES.find((t) => t.id === sel.detailId) ?? null
@@ -121,11 +126,22 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     if (!id) return;
     const t = SITE_TEMPLATES.find((x) => x.id === id);
     if (!t) return;
-    if (!composer) { setApplyError("Editor not ready — please reload and try again"); return; }
-    if (!t.html) { setApplyError("Template has no content"); return; }
+    // P2 fix (codex A6): capture newPageMode flag BEFORE null reset; needed for
+    // success/error modal routing below.
+    const wasNewPageMode = addAsNewPageRef.current;
+    if (!composer) {
+      setApplyError("Editor not ready — please reload and try again");
+      if (wasNewPageMode) setCreateResult("error");
+      return;
+    }
+    if (!t.html) {
+      setApplyError("Template has no content");
+      if (wasNewPageMode) setCreateResult("error");
+      return;
+    }
 
     try {
-      if (addAsNewPageRef.current) {
+      if (wasNewPageMode) {
         composer.elements.createPage(t.name);
       }
       if (resetStyles) composer.styles.clear();
@@ -139,8 +155,16 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         tone: "error",
         action: { label: "Retry", onClick: handleRetry },
       });
+      // P2 fix (codex A6): error path must set createResult so CreatePageErrorModal
+      // renders (it was previously never reachable; success was fired prematurely
+      // from onConfirm, so error-state was dead).
+      if (wasNewPageMode) setCreateResult("error");
       return;
     }
+
+    // P2 fix (codex A6): success modal now fires AFTER actual page creation +
+    // HTML import, not on confirm-click. Renders only in newPage flow.
+    if (wasNewPageMode) setCreateResult("success");
 
     pendingId.current = null;
     addAsNewPageRef.current = false;
@@ -364,8 +388,20 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           currentPageCount={composer?.elements?.getAllPages?.()?.length ?? 1}
           resetGlobalStyles={resetStyles}
           onResetChange={setResetStyles}
+          backupCurrentPage={backupCurrentPage}
+          onBackupChange={setBackupCurrentPage}
           onCancel={() => sel.setShowReplace(false)}
-          onApply={() => { sel.setShowReplace(false); startApply(); }}
+          onApply={() => {
+            sel.setShowReplace(false);
+            // P2 fix (codex A4): if user opted in, duplicate current page first.
+            if (backupCurrentPage && composer) {
+              const active = composer.elements.getActivePage();
+              if (active) {
+                composer.elements.duplicatePage(active.id);
+              }
+            }
+            startApply();
+          }}
         />
       )}
       {sel.showUpgrade && (
@@ -374,7 +410,9 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           onCancel={() => sel.setShowUpgrade(false)}
           onUpgrade={() => {
             sel.setShowUpgrade(false);
-            window.open("/dashboard/settings/billing", "_blank");
+            // P2 fix (codex finding A5): actual dashboard route is /dashboard/billing,
+            // not /dashboard/settings/billing. Verified via packages/dashboard/app/dashboard/billing/page.tsx.
+            window.open("/dashboard/billing", "_blank");
           }}
         />
       )}
@@ -383,9 +421,10 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           templateName={tName}
           onCancel={() => { setShowCreateConfirm(false); addAsNewPageRef.current = false; }}
           onConfirm={() => {
+            // P2 fix (codex A6): startApply only — success/error result is set
+            // inside handleProgressComplete after the actual page creation.
             setShowCreateConfirm(false);
             startApply();
-            setCreateResult("success");
           }}
         />
       )}
