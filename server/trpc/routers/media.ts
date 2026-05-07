@@ -223,6 +223,14 @@ export const mediaRouter = router({
         if (e instanceof Error && e.message === "NOT_FOUND") {
           throw new TRPCError({ code: "NOT_FOUND", message: "Asset not found." });
         }
+        // Phase B5++ pass 4: cross-tenant URL guard now applies to
+        // versions too. Same CONFLICT mapping as createAsset.
+        if (e instanceof Error && e.message === "URL_CONFLICT") {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Asset version URL is already owned by another user.",
+          });
+        }
         throw e;
       }
     }),
@@ -235,6 +243,13 @@ export const mediaRouter = router({
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "NOT_FOUND") {
           throw new TRPCError({ code: "NOT_FOUND", message: "Version not found." });
+        }
+        // Defense-in-depth URL guard at restore (legacy versions).
+        if (e instanceof Error && e.message === "URL_CONFLICT") {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Asset version URL is owned by another user; cannot restore.",
+          });
         }
         throw e;
       }

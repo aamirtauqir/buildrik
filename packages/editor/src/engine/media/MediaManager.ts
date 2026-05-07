@@ -278,27 +278,43 @@ export class MediaManager extends MediaEventEmitter {
    * folderId is rewritten from local UUID to server CUID before the
    * asset's own retry runs.
    *
-   * Phase B5+ pass 3: mutex via retryInFlight. Concurrent callers
-   * await the same in-flight drain. If a new drain is needed after
-   * the current one finishes (entry added during drain), retryFlag
-   * triggers a follow-up pass.
+   * Phase B5++ codex pass 4 fix: the pass-3 mutex was racy. After
+   * `await this.retryInFlight`, two callers could both find the size
+   * check pass and both start a new drain — exactly the multi-trigger
+   * pattern the mutex was meant to prevent. Replaced with the
+   * single-follow-up-pass pattern: while a drain is in flight, set
+   * `retryRequested` and let the running drain check + re-enter once
+   * before clearing. Only one follow-up drain is ever scheduled
+   * regardless of how many concurrent callers arrived during the
+   * in-flight window.
    */
+  private retryRequested = false;
+
   async retryLocalOnlyAssets(): Promise<void> {
     if (!this.remoteSync) return;
+
     if (this.retryInFlight) {
-      // Another drain is running; chain so we re-run after it finishes
-      // (in case our trigger reason added new queue entries the running
-      // drain already snapshotted past).
+      // A drain is already in flight. Mark that another follow-up
+      // pass is needed; the in-flight drain's finally hook will
+      // schedule exactly one re-entry, regardless of how many
+      // callers arrived during this window. Then await the in-flight
+      // promise so callers don't return before the work they
+      // requested has been attempted.
+      this.retryRequested = true;
       await this.retryInFlight;
-      // Only re-enter if there's still work — otherwise fall through to
-      // a no-op, avoiding infinite recursion if both queues stay empty.
-      if (this.retryQueue.size === 0 && this.folderRetryQueue.size === 0) {
-        return;
-      }
-      // Falls through to the in-flight setup below.
+      return;
     }
+
     this.retryInFlight = this.doRetryLocalOnlyAssets().finally(() => {
       this.retryInFlight = null;
+      // If any caller arrived during this drain, schedule a single
+      // follow-up — regardless of how many requesters there were.
+      if (this.retryRequested) {
+        this.retryRequested = false;
+        if (this.retryQueue.size > 0 || this.folderRetryQueue.size > 0) {
+          void this.retryLocalOnlyAssets();
+        }
+      }
     });
     return this.retryInFlight;
   }
@@ -1150,11 +1166,23 @@ export class MediaManager extends MediaEventEmitter {
     // (state had no row, but the queue still asked the server to
     // create it). Walk the local subtree using state.folders, then
     // purge each id from the queue.
+    // Pass 4 fix: cycle-safe walk + queue-relation traversal. The
+    // pass-3 walk only used the Set after recursing, so a malformed
+    // cycle (f1↔f2) would loop until stack overflow. Also limited
+    // to state.folders, missing queued descendants whose state row
+    // had a stale parent reference.
     const toPurgeFromQueue = new Set<string>();
     const walk = (folderId: string) => {
+      if (toPurgeFromQueue.has(folderId)) return;
       toPurgeFromQueue.add(folderId);
       for (const f of this.state.folders) {
         if (f.parentId === folderId) walk(f.id);
+      }
+      // Also walk queued descendants in case state and queue diverged
+      // (e.g., a parent was just remapped, breaking state.parentId
+      // references for queued children).
+      for (const [queuedId, payload] of this.folderRetryQueue) {
+        if (payload.parentId === folderId) walk(queuedId);
       }
     };
     walk(id);

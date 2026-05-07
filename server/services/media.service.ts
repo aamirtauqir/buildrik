@@ -30,6 +30,38 @@ async function getUserPlan(userId: string): Promise<PlanName> {
   return (member?.workspace?.plan ?? "FREE") as PlanName;
 }
 
+/**
+ * Phase B5++ codex re-review pass 4 P1 fix: cross-tenant URL guard
+ * applied at every URL-mutation surface, not just createAsset.
+ *
+ * The B5++ commit blocked URL_CONFLICT in createAsset, but missed two
+ * other surfaces that ALSO write to MediaAsset.url:
+ *   1. createAssetVersion accepts an arbitrary client-supplied URL
+ *      and stores it on a MediaAssetVersion row (which becomes the
+ *      MediaAsset.url after a restore call).
+ *   2. restoreAssetVersion copies that version URL onto MediaAsset.url
+ *      directly.
+ *
+ * Without a guard at all three surfaces, a user could smuggle another
+ * tenant's URL into their own MediaAsset row via version+restore,
+ * resurrecting the cross-tenant blob deletion vulnerability.
+ *
+ * This helper centralizes the check so future URL-mutation surfaces
+ * either use it or fail review.
+ */
+async function assertUrlNotOwnedByOther(
+  userId: string,
+  url: string,
+): Promise<void> {
+  const conflicting = await prisma.mediaAsset.findFirst({
+    where: { url, NOT: { userId } },
+    select: { id: true },
+  });
+  if (conflicting) {
+    throw new Error("URL_CONFLICT");
+  }
+}
+
 // ─── Asset CRUD (Phase 0.5 / A) ────────────────────────────────────────────
 
 export async function listAssets(userId: string, input: ListAssetsInput) {
@@ -98,76 +130,112 @@ export async function createAsset(userId: string, input: CreateAssetInput): Prom
   // attacker can call createAsset({ url: someoneElsesPublicUrl }) to
   // mint a row pointing at another tenant's blob, then call
   // deleteAsset on their own row to wipe the shared underlying blob.
-  // The (userId, url) unique constraint allowed cross-tenant rows; the
-  // del() in deleteAsset turned that into cross-tenant data loss.
-  // Race window remains (two users both pass this check pre-upsert),
-  // bounded by deleteAsset's other-references guard.
-  const conflicting = await prisma.mediaAsset.findFirst({
-    where: { url: input.url, NOT: { userId } },
-    select: { id: true },
-  });
-  if (conflicting) {
-    throw new Error("URL_CONFLICT");
-  }
+  // Pass 4: extracted into assertUrlNotOwnedByOther so the same guard
+  // applies at every URL-mutation surface (versions, restore).
+  await assertUrlNotOwnedByOther(userId, input.url);
 
-  // Pre-fetch the existing row once. Two consumers downstream:
-  //   1. Quota delta check (skip when row already accounts for bytes)
-  //   2. Monotonic update gate (only repair bytes upward, never shrink)
-  const existing = await prisma.mediaAsset.findUnique({
+  // Pre-fetch the existing row once for the quota delta. The actual
+  // monotonic gate runs INSIDE the transaction below with SELECT FOR
+  // UPDATE so the comparison is atomic — pass 4 fix.
+  const preExisting = await prisma.mediaAsset.findUnique({
     where: { MediaAsset_userId_url_unique: { userId, url: input.url } },
     select: { bytes: true },
   });
-  const existedBefore = existing !== null;
-  const existingBytes = existing?.bytes ?? 0;
 
   if (quota.totalBytes !== -1) {
-    const delta = existedBefore ? Math.max(input.bytes - existingBytes, 0) : input.bytes;
+    const delta = preExisting
+      ? Math.max(input.bytes - preExisting.bytes, 0)
+      : input.bytes;
     if (!quota.ok && quota.usedBytes + delta > quota.totalBytes) {
       throw new Error("QUOTA_EXCEEDED");
     }
   }
 
-  return prisma.mediaAsset.upsert({
-    where: { MediaAsset_userId_url_unique: { userId, url: input.url } },
-    create: {
-      userId,
-      siteId: input.siteId ?? null,
-      folderId: input.folderId ?? null,
-      url: input.url,
-      bytes: input.bytes,
-      type: input.type,
-      mimeType: input.mimeType,
-      filename: input.filename,
-      altText: input.altText ?? null,
-      userMetadata: (input.userMetadata as Prisma.InputJsonValue) ?? Prisma.JsonNull,
-    },
-    update: buildMonotonicByteUpdate(existedBefore, existingBytes, input.bytes),
-    select: { id: true, url: true, bytes: true },
-  });
+  return createAssetAtomic(userId, input);
 }
 
 /**
- * Phase B5+ codex re-review pass 3 P1 fix [bytes monotonic]: previously
- * the upsert update branch wrote `input.bytes` unconditionally, which
- * means a stale or smaller-bytes replay could SHRINK an already-correct
- * row. Combined with the delta-based pre-quota check (delta=0 when
- * input.bytes <= existing), users could replay with bytes=0 and silently
- * undercount their storage usage. Update only when the new value is
- * strictly bigger than the persisted value — i.e., the only legitimate
- * write is the bytes=0→real-bytes repair from a webhook race.
+ * Phase B5++ codex re-review pass 4 P1 fix [bytes monotonic atomic].
  *
- * Race window: two concurrent calls both read existingBytes pre-upsert,
- * the second one's pre-fetch sees the first one's not-yet-committed
- * value. Acceptable bound: monotonic at row level, eventually correct.
+ * Pre-fix: createAsset used Prisma upsert with a JS-side stale-read
+ * comparison. Two concurrent callers both saw existingBytes=0, both
+ * fell through to write their own value, and the second write SHRANK
+ * what the first wrote. The "monotonic" guarantee was monotonic at
+ * row level only when callers were serialized.
+ *
+ * Fix: SELECT FOR UPDATE inside a transaction locks the row for the
+ * bytes comparison. PostgreSQL READ COMMITTED isolation + row lock
+ * gives atomic compare-and-update. Concurrent inserts (no row to
+ * lock yet) are caught by the unique constraint as P2002, and the
+ * caller retries — the second pass finds the row, locks it, and
+ * applies the monotonic update.
+ *
+ * Why not raw INSERT ... ON CONFLICT ... DO UPDATE SET bytes = GREATEST:
+ * Prisma's @default(cuid()) generates IDs JS-side, so a raw INSERT
+ * would have to duplicate cuid generation (no available dep at root).
+ * SELECT FOR UPDATE achieves the same atomicity through Prisma's
+ * typed API without adding a runtime dep.
  */
-function buildMonotonicByteUpdate(
-  existedBefore: boolean,
-  existingBytes: number,
-  newBytes: number,
-): Prisma.MediaAssetUpdateInput {
-  if (!existedBefore) return {};
-  if (newBytes > existingBytes) return { bytes: newBytes };
-  return {};
+async function createAssetAtomic(
+  userId: string,
+  input: CreateAssetInput,
+  retryDepth = 0,
+): Promise<{ id: string; url: string; bytes: number }> {
+  if (retryDepth > 1) {
+    // Two consecutive P2002s on the same key indicate something
+    // pathological — bail rather than spin forever.
+    throw new Error("CREATE_ASSET_CONFLICT_RETRY_EXCEEDED");
+  }
+
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const locked = await tx.$queryRaw<{ id: string; bytes: number }[]>`
+        SELECT id, bytes FROM "media_assets"
+        WHERE "userId" = ${userId} AND url = ${input.url}
+        FOR UPDATE
+      `;
+
+      if (locked.length > 0) {
+        const row = locked[0];
+        if (input.bytes > row.bytes) {
+          return tx.mediaAsset.update({
+            where: { id: row.id },
+            data: { bytes: input.bytes },
+            select: { id: true, url: true, bytes: true },
+          });
+        }
+        // Existing row already has bytes >= input.bytes — no-op,
+        // monotonic invariant preserved.
+        return { id: row.id, url: input.url, bytes: row.bytes };
+      }
+
+      return tx.mediaAsset.create({
+        data: {
+          userId,
+          siteId: input.siteId ?? null,
+          folderId: input.folderId ?? null,
+          url: input.url,
+          bytes: input.bytes,
+          type: input.type,
+          mimeType: input.mimeType,
+          filename: input.filename,
+          altText: input.altText ?? null,
+          userMetadata: (input.userMetadata as Prisma.InputJsonValue) ?? Prisma.JsonNull,
+        },
+        select: { id: true, url: true, bytes: true },
+      });
+    });
+  } catch (e) {
+    if (
+      e instanceof Prisma.PrismaClientKnownRequestError &&
+      e.code === "P2002"
+    ) {
+      // Concurrent insert won the race. Re-enter — the row now
+      // exists, SELECT FOR UPDATE locks it, monotonic update fires.
+      return createAssetAtomic(userId, input, retryDepth + 1);
+    }
+    throw e;
+  }
 }
 
 export async function updateAsset(userId: string, input: UpdateAssetInput) {
@@ -297,6 +365,15 @@ export async function createAssetVersion(userId: string, input: CreateAssetVersi
     throw new Error("NOT_FOUND");
   }
 
+  // Phase B5++ codex re-review pass 4 P1 fix: cross-tenant URL guard.
+  // Pre-fix, createAssetVersion accepted any client-supplied URL and
+  // stored it on the version row. A user could then call
+  // restoreAssetVersion to copy that URL onto their MediaAsset, ending
+  // up with their tenant's row pointing at another tenant's blob —
+  // re-opening the cross-tenant blob deletion vulnerability that the
+  // B5++ createAsset URL_CONFLICT guard was meant to close.
+  await assertUrlNotOwnedByOther(userId, input.url);
+
   const plan = await getUserPlan(userId);
   const cap = PLAN_LIMITS[plan].assetVersionsCap as number;
 
@@ -343,6 +420,16 @@ export async function restoreAssetVersion(userId: string, input: RestoreAssetVer
   if (!version || version.asset.userId !== userId) {
     throw new Error("NOT_FOUND");
   }
+
+  // Phase B5++ codex re-review pass 4 P1 fix: defense-in-depth URL
+  // guard at restore time too. createAssetVersion now blocks adding
+  // cross-tenant URLs to new versions, but legacy versions created
+  // before the guard could still smuggle a foreign URL onto the
+  // parent asset row at restore. Re-checking here closes that gap
+  // for legacy data and protects against any future code path that
+  // bypasses the createAssetVersion guard.
+  await assertUrlNotOwnedByOther(userId, version.url);
+
   // Restore = update the parent asset to point at this version's URL.
   // The version row itself stays; parent asset reflects the active state.
   return prisma.mediaAsset.update({
