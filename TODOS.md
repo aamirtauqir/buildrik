@@ -1,5 +1,17 @@
 # TODOS
 
+## 2026-05-08 — DS Arc · Phase 0 Foundation Prereqs CLOSED
+
+- ✅ jsdom test environment verified healthy (was stale TODO; suite passes against React 19 + jsdom 28 + RTL 16, 2069/2069 tests on 2026-05-07)
+- ✅ `Site.dsSchemaVersion Int @default(0)` shipped + migration applied (column live, all existing rows = 0; bundled cleanup RenameIndex `MediaAsset_userId_url_unique` → `media_assets_userId_url_key` to align with Prisma's auto-derived constraint name)
+- ✅ Zod mirror N/A — `packages/shared/schemas/` only holds operation/input schemas; no full Site row mirror exists; Prisma is sole SSOT for the Site row shape
+- ⏭️ Component override preservation deferred to Phase E acceptance criteria (per design review)
+- ⏭️ Vibcoder 280→240/320 chrome split deferred (D1 chose 320; not on critical path)
+- ⏭️ Legacy `schemaVersion:2` localStorage handler deferred (DS arc uses its own runner)
+- ⏭️ DESIGN.md "missing" entry obsolete — file already exists at `/DESIGN.md` (356 lines)
+
+DS Arc Phase A (Token foundation + aliasing) is now unblocked. Phase 0 commit chain: 81ef980a (T1) → 6ced5e8d (T2) → 1d083d3e (T3) → this commit (T5).
+
 ## Deferred from Left Bar Redesign (2026-04-07)
 
 ### Mobile/Responsive Rail Behavior
