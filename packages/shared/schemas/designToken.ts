@@ -44,13 +44,26 @@ export const TokenValueSchema = z.discriminatedUnion("kind", [
 
 export type TokenValue = z.infer<typeof TokenValueSchema>;
 
+// Mirror of the legacy TS TokenCategory union (types.ts). 9 values; new code
+// should prefer TokenKindSchema. Pinned as z.enum so Zod is not weaker than TS.
+export const TokenCategorySchema = z.enum([
+  "colors", "typography", "spacing", "effects", "layout",
+  "icons", "buttons", "forms", "theme",
+]);
+
+// Mirror of the legacy TS TokenType union (types.ts). 8 values.
+export const TokenTypeSchema = z.enum([
+  "color", "font-family", "font-size", "length",
+  "shadow", "number", "string", "select",
+]);
+
 export const DesignTokenSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   value: z.string(),
-  category: z.string(),
+  category: TokenCategorySchema,
   cssVar: z.string().regex(/^--[a-z0-9-]+$/),
-  type: z.string(),
+  type: TokenTypeSchema,
   group: z.string().optional(),
   options: z.array(z.string()).optional(),
   description: z.string().optional(),
