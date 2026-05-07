@@ -3,10 +3,39 @@ import superjson from "superjson";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/server/auth";
 import { checkRateLimit } from "@/server/services/rate-limiter";
+import { extractBearer, verifyApiToken, type Scope } from "@/server/services/api-token.service";
+
+interface BearerSession {
+  user: { id: string };
+  apiToken: { workspaceId: string; scopes: Scope[]; tokenId: string };
+}
 
 export const createTRPCContext = async (opts?: { headers?: Headers }) => {
   const session = await auth();
-  return { prisma, session, headers: opts?.headers };
+
+  // Bearer fallback: if no cookie session and an Authorization header is
+  // present, try to verify it as an API token. Bearer-auth shapes the same
+  // session.user.id contract so downstream protectedProcedure stays unchanged.
+  let bearerSession: BearerSession | null = null;
+  if (!session?.user) {
+    const bearer = extractBearer(opts?.headers);
+    if (bearer) {
+      const verified = await verifyApiToken(bearer);
+      if (verified) {
+        bearerSession = {
+          user: { id: verified.userId },
+          apiToken: {
+            workspaceId: verified.workspaceId,
+            scopes: verified.scopes,
+            tokenId: verified.tokenId,
+          },
+        };
+      }
+    }
+  }
+
+  const effectiveSession = session ?? bearerSession;
+  return { prisma, session: effectiveSession, bearer: bearerSession, headers: opts?.headers };
 };
 
 const t = initTRPC.context<typeof createTRPCContext>().create({

@@ -52,6 +52,20 @@ export const updateSiteSettingsSchema = z.object({
   socialLinks: z.record(z.string()).optional(),
   publishedPassword: z.string().nullable().optional(),
   touchIcon: z.string().nullable().optional(),
+  cspPolicy: z.string().max(4096).nullable().optional(),
+  hstsMaxAge: z.number().int().min(0).max(63072000).nullable().optional(),
+  xFrameOptions: z.enum(["DENY", "SAMEORIGIN"]).nullable().optional(),
+  referrerPolicy: z.enum([
+    "no-referrer",
+    "no-referrer-when-downgrade",
+    "origin",
+    "origin-when-cross-origin",
+    "same-origin",
+    "strict-origin",
+    "strict-origin-when-cross-origin",
+    "unsafe-url",
+  ]).nullable().optional(),
+  permissionsPolicy: z.string().max(2048).nullable().optional(),
 });
 
 export const createRedirectSchema = z.object({

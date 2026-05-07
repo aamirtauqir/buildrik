@@ -15,6 +15,7 @@ import { formsRouter } from "./routers/forms";
 import { uploadRouter } from "./routers/upload";
 import { aiRouter } from "./routers/ai";
 import { mediaRouter } from "./routers/media";
+import { apiTokensRouter } from "./routers/api-tokens";
 
 export const appRouter = router({
   auth: authRouter,
@@ -33,6 +34,7 @@ export const appRouter = router({
   upload: uploadRouter,
   ai: aiRouter,
   media: mediaRouter,
+  apiTokens: apiTokensRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -49,6 +49,11 @@ export async function getSiteSettings(siteId: string) {
       socialLinks: true,
       publishedPassword: true,
       touchIcon: true,
+      cspPolicy: true,
+      hstsMaxAge: true,
+      xFrameOptions: true,
+      referrerPolicy: true,
+      permissionsPolicy: true,
       workspace: { select: { plan: true } },
     },
   });
@@ -80,6 +85,11 @@ export async function updateSiteSettings(
     socialLinks?: Record<string, string>;
     publishedPassword?: string | null;
     touchIcon?: string | null;
+    cspPolicy?: string | null;
+    hstsMaxAge?: number | null;
+    xFrameOptions?: "DENY" | "SAMEORIGIN" | null;
+    referrerPolicy?: string | null;
+    permissionsPolicy?: string | null;
   }
 ) {
   if (data.headCode !== undefined || data.bodyCode !== undefined || data.slug) {
