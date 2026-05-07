@@ -175,7 +175,10 @@ model Site {
   bodyCode          String?
   socialLinks       Json?
   publishedPassword String?
+  metaTitle         String?
+  metaDescription   String?
   metaTitleTemplate String?
+  ogImage           String?
   touchIcon         String?
   folderId          String?
   lastPublishedBy   String?

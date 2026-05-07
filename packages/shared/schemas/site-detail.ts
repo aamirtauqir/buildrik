@@ -46,6 +46,7 @@ export const updateSiteSettingsSchema = z.object({
   metaTitle: z.string().max(60).optional(),
   metaDescription: z.string().max(160).optional(),
   metaTitleTemplate: z.string().optional(),
+  ogImage: z.string().url().nullable().optional(),
   headCode: z.string().max(10240).optional(),
   bodyCode: z.string().max(10240).optional(),
   socialLinks: z.record(z.string()).optional(),

@@ -7,7 +7,10 @@ export async function getSiteSettings(siteId: string) {
       id: true,
       name: true,
       slug: true,
+      metaTitle: true,
+      metaDescription: true,
       metaTitleTemplate: true,
+      ogImage: true,
       headCode: true,
       bodyCode: true,
       socialLinks: true,
@@ -31,6 +34,7 @@ export async function updateSiteSettings(
     metaTitle?: string;
     metaDescription?: string;
     metaTitleTemplate?: string;
+    ogImage?: string | null;
     headCode?: string;
     bodyCode?: string;
     socialLinks?: Record<string, string>;
