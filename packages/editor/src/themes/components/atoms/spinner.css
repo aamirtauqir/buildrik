@@ -40,6 +40,16 @@
   100% { transform: scale(1.8); opacity: 0; }
 }
 
+/**
+ * Status indicator pulse — opacity-fade.
+ * Distinct from bd-pulse (scale-out, used by .bd-status-dot--pulse::after).
+ * Consumer: editor/shell/StatusIndicators.tsx:320 (SyncDot syncing/error states).
+ */
+@keyframes bd-status-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .bd-spinner,
   .bd-status-dot--pulse::after { animation-duration: 0.01ms; }
