@@ -145,5 +145,41 @@ export function createRemoteAssetSync(opts?: { siteId?: string | null }): Remote
         return false;
       }
     },
+
+    async createFolder(input) {
+      try {
+        const created = (await getClient().media.createFolder.mutate({
+          name: input.name,
+          parentId: input.parentId ?? null,
+          siteId: input.siteId ?? siteId,
+        })) as { id: string };
+        return { serverId: created.id };
+      } catch {
+        return null;
+      }
+    },
+
+    async deleteFolder(serverId) {
+      try {
+        await getClient().media.deleteFolder.mutate({ folderId: serverId });
+        return true;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        if (message.includes("NOT_FOUND") || message.includes("not found")) return true;
+        return false;
+      }
+    },
+
+    async moveAsset(serverId, folderId) {
+      try {
+        await getClient().media.moveAsset.mutate({
+          assetId: serverId,
+          folderId: folderId,
+        });
+        return true;
+      } catch {
+        return false;
+      }
+    },
   };
 }

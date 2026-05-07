@@ -95,14 +95,19 @@ export function useUploadState(
     };
   }, [composer, recalcStorage, showToast]);
 
-  // Phase C: server provides tier-aware quota CAP (totalBytes), but used-bytes
-  // must stay local until Phase B (asset upload-to-server) lands. Reason:
-  // composer.media.uploadFile() persists to local IndexedDB only — server's
-  // usedBytes does not see editor uploads, so reading it would understate
-  // usage and let the user overfill local storage. Per codex review of
-  // 3bdafc6f finding [P1A]. Re-wire usedBytes to server in the Phase B PR.
+  // Phase C re-wired in B4: now that uploads mirror to server (Phase B2),
+  // server's usedBytes accurately reflects engine state. Use server when
+  // wired; fall back to local IndexedDB sum when offline / unauthenticated /
+  // unconfigured. Local-only assets (mirror failed) still count via the
+  // local sum, so the cap check stays correct in both modes.
+  //   server reachable + asset mirrored     → server usedBytes (canonical)
+  //   server unreachable                    → local sum (degrades gracefully)
+  //   server reachable + local-only assets  → max(server, local) so the cap
+  //                                            check sees the true usage
   const isUnlimited = serverQuota?.totalBytes === -1;
-  const storageUsed = localStorageUsed;
+  const storageUsed = serverQuota
+    ? Math.max(serverQuota.usedBytes, localStorageUsed)
+    : localStorageUsed;
   const storageTotal =
     serverQuota && !isUnlimited && serverQuota.totalBytes > 0
       ? serverQuota.totalBytes

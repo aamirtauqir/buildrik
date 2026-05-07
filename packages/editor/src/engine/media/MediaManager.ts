@@ -730,6 +730,22 @@ export class MediaManager extends MediaEventEmitter {
       this.state.assets[index] = updated;
     }
 
+    // Phase B4: mirror folderId changes server-side. Only fires when the
+    // folderId field is explicitly part of `updates` (not all updateAsset
+    // calls — rename/altText changes don't move the asset). Asset must
+    // have a serverId (was uploaded successfully); local-only assets
+    // skip this mirror until they sync.
+    if (
+      this.remoteSync &&
+      asset.serverId &&
+      Object.prototype.hasOwnProperty.call(updates, "folderId") &&
+      asset.folderId !== updated.folderId
+    ) {
+      await this.remoteSync.moveAsset(asset.serverId, updated.folderId ?? null);
+      // Failure tolerated — local move stuck, server out of sync until
+      // next move or full sync. Phase B5 (deferred) would add a queue.
+    }
+
     this.emit(MEDIA_EVENTS.MEDIA_UPDATED, { asset: updated, changes: updates });
     return updated;
   }
@@ -770,8 +786,25 @@ export class MediaManager extends MediaEventEmitter {
   // ============================================
 
   async createFolder(name: string, parentId?: string | null): Promise<MediaFolder> {
+    // Phase B4: try server first when wired. If server returns a CUID,
+    // use it as the engine folder id (single source of identity). On
+    // failure or no remoteSync, fall back to local-only id.
+    let id = generateMediaId();
+    if (this.remoteSync) {
+      const created = await this.remoteSync.createFolder({
+        name,
+        parentId: parentId ?? null,
+      });
+      if (created) {
+        id = created.serverId;
+      }
+      // null = offline / auth-fail / quota — keep local id, no retry queue
+      // for folders today. Folder syncs are rare; if creation failed the
+      // user can rename or recreate.
+    }
+
     const folder: MediaFolder = {
-      id: generateMediaId(),
+      id,
       name,
       parentId: parentId ?? null,
       createdAt: new Date().toISOString(),
@@ -792,6 +825,14 @@ export class MediaManager extends MediaEventEmitter {
     const orphaned = this.state.assets.filter((a) => a.folderId === id);
     for (const asset of orphaned) {
       await this.updateAsset(asset.id, { folderId: undefined });
+    }
+
+    // Phase B4: mirror server delete. Server cascades assets-to-root
+    // independently per Phase A spec; we just notify it.
+    if (this.remoteSync) {
+      await this.remoteSync.deleteFolder(id);
+      // Failure ignored — local delete already happened. Server cleans
+      // up on next sync cycle if it ever adds one.
     }
 
     this.emit(MEDIA_EVENTS.FOLDER_DELETED, { id });

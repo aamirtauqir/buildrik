@@ -191,6 +191,29 @@ export interface RemoteAssetSync {
    * can queue for retry.
    */
   deleteRemote(serverId: string): Promise<boolean>;
+
+  /**
+   * Phase B4: create a folder server-side. Returns the server CUID on
+   * success — engine uses that as the canonical folder id (mirrors how
+   * uploadAndCreate replaces asset ids). Returns null on failure.
+   */
+  createFolder(input: {
+    name: string;
+    parentId?: string | null;
+    siteId?: string | null;
+  }): Promise<{ serverId: string } | null>;
+
+  /**
+   * Phase B4: delete a folder server-side. Server cascades assets-in-folder
+   * to root per Phase A spec decision #6. Returns true on success or 404.
+   */
+  deleteFolder(serverId: string): Promise<boolean>;
+
+  /**
+   * Phase B4: move an asset between folders server-side. folderId=null
+   * moves the asset to root. Returns true on success.
+   */
+  moveAsset(serverId: string, folderId: string | null): Promise<boolean>;
 }
 
 /**
