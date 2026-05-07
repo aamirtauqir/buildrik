@@ -99,7 +99,7 @@ export const FlexAlignmentGrid: React.FC<FlexAlignmentGridProps> = ({
                   width: 6,
                   height: 6,
                   borderRadius: 2,
-                  background: isActive ? "#fff" : "var(--buildrick-text-tertiary)",
+                  background: isActive ? "var(--buildrick-text-on-accent)" : "var(--buildrick-text-tertiary)",
                 }}
               />
             </Button>

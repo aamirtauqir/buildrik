@@ -135,7 +135,7 @@ export const AnimationSection: React.FC<AnimationSectionProps> = ({
             background: enabled ? "var(--bd-accent-tint)" : "var(--bd-border-medium)",
             border: "none",
             borderRadius: 6,
-            color: enabled ? "var(--bd-accent)" : "#a1a1aa",
+            color: enabled ? "var(--bd-accent)" : "var(--buildrick-text-disabled)",
             fontSize: 12,
             fontWeight: 600,
             cursor: "pointer",

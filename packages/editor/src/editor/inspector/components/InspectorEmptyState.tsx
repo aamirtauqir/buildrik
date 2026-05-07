@@ -47,8 +47,8 @@ export const InspectorEmptyState: React.FC<InspectorEmptyStateProps> = ({
     return (
       <div role="status" aria-live="polite" style={containerStyle}>
         <div style={appliedBannerStyle}>
-          <h3 style={{ ...titleStyle, color: "#4ade80", marginBottom: 4 }}>Template applied!</h3>
-          <p style={{ ...descriptionStyle, color: "rgba(74, 222, 128, 0.7)", marginBottom: 12 }}>
+          <h3 style={{ ...titleStyle, color: "var(--buildrick-success)", marginBottom: 4 }}>Template applied!</h3>
+          <p style={{ ...descriptionStyle, color: "var(--buildrick-success-light)", marginBottom: 12 }}>
             {appliedName}
           </p>
           {composer && (

@@ -135,7 +135,7 @@ const BreakpointPill: React.FC<{
             top: "calc(100% + 4px)",
             left: 0,
             zIndex: 200,
-            background: "#fff",
+            background: "var(--buildrick-bg-card)",
             border: "1px solid var(--bd-border)",
             borderRadius: 6,
             padding: 4,
