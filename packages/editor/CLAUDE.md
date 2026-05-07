@@ -559,8 +559,9 @@ The chrome layer (sidebar/rail/inspector/topbar/footer) is governed by the
 vibcoder primitives at `src/themes/components/` (CSS) and
 `src/editor/shared/vibcoder/` (React wrappers). Position 3 + R2 namespace
 exception: vibcoder canonical names are authoritative; `--bd-*` short aliases
-remain for existing chrome JSX via the alias layer at
-`src/themes/components/_aliases.css`.
+remain for existing chrome JSX via the single canonical alias layer at
+`src/themes/design-system/bd-aliases.css` (vibcoder-atom-unique tokens
+live in `src/themes/components/_aliases.css`).
 
 **Status (2026-05-06):** vibcoder-fork shipped. Vendor pipeline (codemods,
 bundle pin, manifest enforcement) retired. Vibcoder is Buildrik-owned canonical
@@ -572,7 +573,7 @@ authored code, not vendored generated output. Files at `themes/components/` and
 - **Existing primitive:** edit the file at `editor/shared/vibcoder/<Name>.tsx` and/or matching CSS at `themes/components/<tier>/<name>.css` directly. No codemod cycle. Tests live next to the source.
 - **New primitive:** add to `editor/shared/vibcoder/` + matching CSS in `themes/components/<tier>/`. Add the CSS `@import` line to `themes/default.css`. Add a preview at `src/preview/vibcoder-<name>.html` if useful for visual QA.
 - **Cascade:** `@layer tokens, components, overrides;`. Component CSS lands in `components`. Emotion remains unlayered (always wins) so existing `styled()` chrome stays authoritative.
-- **Tokens:** Use canonical `--buildrick-*` names in CSS. Use short `--bd-*` aliases in chrome JSX. Alias map is at `themes/components/_aliases.css` — extend hand-written when adding new aliases.
+- **Tokens:** Use canonical `--buildrick-*` names in CSS. Use short `--bd-*` aliases in chrome JSX. Single canonical alias map is at `themes/design-system/bd-aliases.css` — extend it for new chrome-wide aliases. `themes/components/_aliases.css` retains 62 vibcoder-atom-unique tokens; do not add chrome-wide aliases there.
 
 ### CI gates relevant to vibcoder
 

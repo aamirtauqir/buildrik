@@ -811,19 +811,9 @@
  * in themes/design-system/a11y.css. Consumers (Canvas.tsx ARIA live + DropFeedbackOverlay
  * ARIA live) migrated to bd-sr-only in lockstep. */
 
-.bd-skip-link {
-  position: absolute;
-  top: -100px;
-  left: 0;
-  background: var(--buildrick-accent, #667eea);
-  color: white;
-  padding: var(--bd-space-2) var(--bd-space-4);
-  z-index: 10000;
-  text-decoration: none;
-  border-radius: 0 0 4px 0;
-}
-
-.bd-skip-link:focus {
-  top: 0;
-}
+/* .bd-skip-link deleted 2026-05-07 — duplicate of canonical .bd-skip-link
+ * in themes/design-system/a11y.css. Canonical version uses --bd-accent /
+ * --bd-fg-on-accent / --bd-radius-md / --bd-weight-semibold tokens (newer DS
+ * tokens) and a 16px focus offset; this rule used hex fallbacks + 0px focus
+ * top + a quarter-rounded radius. a11y.css is authoritative. */
 

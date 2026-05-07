@@ -1,28 +1,20 @@
 /**
  * themes/design-system/bd-aliases.css
- * Buildrik DS — chrome --bd-* alias layer (hand-written canonical).
+ * Buildrik DS — chrome --bd-* alias layer (single canonical home).
  *
  * Maps chrome shorthand --bd-* names onto canonical --buildrick-* tokens.
  * Every alias is: one --bd-* name on the left, one canonical token reference
  * on the right. NO standalone values. All values live in canonical files.
  *
- * SSOT contract — DUAL-CANONICAL by design (Gate 15 + Gate 17):
- *   1. THIS FILE (bd-aliases.css) — chrome's hand-written aliases. Loaded
- *      UNLAYERED via design-system/index.css → wins cascade over @layer rules.
- *      Required to be self-sufficient: Gate 17 (ghost-alias detection) only
- *      reads aliases from THIS file, so any --bd-* referenced by chrome
- *      consumers must be defined here even if also defined in (2).
- *   2. components/_aliases.generated.css — vibcoder codemod 3 output, R2
- *      exception. Loaded inside @layer components. Defines aliases for
- *      vendored vibcoder atoms/molecules/organisms. ~54 aliases overlap
- *      with (1) by design — both are independent canonical sources for
- *      their respective consumer surfaces (chrome vs vendored).
+ * SSOT (post-vibcoder-fork 2026-05-06, single-canonical 2026-05-08):
+ *   - THIS FILE is the only home for chrome-wide --bd-* aliases. Loaded
+ *     UNLAYERED via design-system/index.css → wins cascade over @layer rules.
+ *   - components/_aliases.css retains 62 tokens unique to vibcoder-internal
+ *     atoms (atoms/molecules/organisms in themes/components/). It is NOT a
+ *     parallel canonical for chrome-wide aliases — those previously duplicated
+ *     here were drained 2026-05-08. Extend THIS file for new chrome aliases.
  *
- * Gate 15 ban: no --bd-* defs anywhere outside (1) + (2).
- * Gate 17 ban: no --bd-* references in chrome consumers without a def in (1).
- *
- * Source drop: external design-system snapshot (colors_and_type.css).
- * Canonical verified against: themes/design-system/{color,typography,radius,shadow,spacing,motion,layout}.css
+ * Gate 15 ban: no --bd-* defs anywhere outside this file + components/_aliases.css.
  *
  * @license BSD-3-Clause
  */

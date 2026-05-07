@@ -22,13 +22,6 @@
         "suggestion": "Pick canonical tier CSS; merge or rename if intentional namespace difference."
       },
       {
-        "path": "src/editor/canvas/Canvas.css",
-        "line": 814,
-        "severity": "important",
-        "message": "Selector \".bd-skip-link\" defined in 2 files: src/editor/canvas/Canvas.css, src/themes/design-system/a11y.css",
-        "suggestion": "Pick canonical tier CSS; merge or rename if intentional namespace difference."
-      },
-      {
         "path": "src/themes/components/_layer.css",
         "line": 8,
         "severity": "important",

@@ -22,9 +22,9 @@
  *   - brand color management UIs
  */
 
-/* Note: upstream `@import url("../_base.css")` removed — Buildrik vendoring
-   loads default.css + _aliases.generated.css at the gallery/app shell; vibcoder
-   per-component CSS files do not need a relative bridge import. */
+/* Note: upstream `@import url("../_base.css")` removed — Buildrik
+   loads default.css + bd-aliases.css + _aliases.css at the gallery/app shell;
+   vibcoder per-component CSS files do not need a relative bridge import. */
 
 /* Block — full-row button */
 .bd-color-trigger {
