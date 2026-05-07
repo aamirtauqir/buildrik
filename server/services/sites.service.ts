@@ -650,8 +650,7 @@ export async function saveProjectData(input: SaveProjectDataInput) {
           input.settings === undefined
             ? undefined
             : ((input.settings as Prisma.InputJsonValue) ?? Prisma.DbNull),
-        dsSchemaVersion:
-          input.dsSchemaVersion === undefined ? undefined : input.dsSchemaVersion,
+        dsSchemaVersion: input.dsSchemaVersion,
         lastEditedAt: savedAt,
         ...(isFullSnapshot ? { pages: input.pages.length } : {}),
       },

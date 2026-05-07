@@ -138,6 +138,7 @@ describe("saveProjectData · dsSchemaVersion write", () => {
       settings: {},
     });
 
-    expect(capturedSiteUpdate?.data?.dsSchemaVersion).toBeUndefined();
+    expect("dsSchemaVersion" in capturedSiteUpdate.data).toBe(true);
+    expect(capturedSiteUpdate.data.dsSchemaVersion).toBeUndefined();
   });
 });
