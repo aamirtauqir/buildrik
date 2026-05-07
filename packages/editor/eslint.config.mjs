@@ -18,6 +18,7 @@
  */
 import js from "@eslint/js";
 import tsParser from "@typescript-eslint/parser";
+import tseslintPlugin from "@typescript-eslint/eslint-plugin";
 import { createRequire } from "module";
 
 const require = createRequire(import.meta.url);
@@ -86,7 +87,7 @@ export default [
         ecmaFeatures: { jsx: true },
       },
     },
-    plugins: { buildrik },
+    plugins: { buildrik, "@typescript-eslint": tseslintPlugin },
     rules: {
       "buildrik/no-inline-hex": "error",
       "buildrik/no-inspector-tokens": "error",
@@ -193,6 +194,53 @@ export default [
     files: ["src/editor/shared/vibcoder/*.tsx"],
     rules: {
       "buildrik/no-engine-public-export": "error",
+    },
+  },
+  // Layer-boundary rules (Audit Remediation 2026-05-07, plan-eng-review-corrected).
+  // Enforces import direction per packages/editor/CLAUDE.md "Import Direction Rules":
+  //   engine/   → shared/ ONLY
+  //   shared/   → leaf (no editor/), EXCEPT shared/extensions/ → editor/shared/vibcoder/
+  //   services/ → shared/ ONLY
+  // Uses @typescript-eslint/no-restricted-imports with allowTypeImports: true so
+  // type-only imports (e.g. HandlePosition from engine/canvas/ResizeHandler) stay
+  // legal where they're already idiomatic. WARN until drain PRs land — flip to
+  // ERROR after engine/media boundary fix + shared/ui+forms drain (matches
+  // vibcoder-finish gate-then-drain-then-flip playbook).
+  {
+    files: ["src/engine/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": ["warn", {
+        patterns: [{
+          group: ["**/editor/**", "@/editor/**", "@editor/**"],
+          message: "engine/ may not import from editor/ (engine is pure logic). Type-only imports allowed via `import type`.",
+          allowTypeImports: true,
+        }],
+      }],
+    },
+  },
+  {
+    files: ["src/shared/**/*.{ts,tsx}"],
+    ignores: ["src/shared/extensions/**"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": ["warn", {
+        patterns: [{
+          group: ["**/editor/**", "@/editor/**", "@editor/**"],
+          message: "shared/ is leaf — may not import from editor/. Use shared/extensions/ for vibcoder compositions.",
+          allowTypeImports: true,
+        }],
+      }],
+    },
+  },
+  {
+    files: ["src/services/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": ["warn", {
+        patterns: [{
+          group: ["**/editor/**", "@/editor/**", "@editor/**"],
+          message: "services/ may not import from editor/ (services consume shared/ only). Type-only imports allowed via `import type`.",
+          allowTypeImports: true,
+        }],
+      }],
     },
   },
   // Survivor #6 — REMOVED 2026-05-04. src/components/ deleted 2026-05-02;
