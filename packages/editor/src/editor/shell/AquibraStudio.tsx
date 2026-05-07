@@ -408,6 +408,10 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
         createComponentContext={modals.createComponentContext}
         showProjectSettings={modals.showProjectSettings}
         onCloseProjectSettings={modals.closeProjectSettings}
+        showCMSCollectionSetup={modals.showCMSCollectionSetup}
+        onCloseCMSCollectionSetup={modals.closeCMSCollectionSetup}
+        showCommandPalette={modals.showCommandPalette}
+        onCloseCommandPalette={modals.closeCommandPalette}
       />
 
       <footer
