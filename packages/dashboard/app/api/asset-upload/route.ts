@@ -187,6 +187,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           }
           return;
         }
+        // Phase B5++++ codex re-review pass 5 P2 fix [folder TOCTOU]:
+        // if the folder was deleted between token issuance and upload
+        // completion, fall back to creating the asset at root rather
+        // than failing. Pre-fix the FOLDER_NOT_FOUND throw left the
+        // blob orphaned (no row, no quota deduction); the editor's
+        // client-side createAsset call ALSO failed; MediaManager then
+        // queued a localOnly retry which uploaded a SECOND blob,
+        // wasting storage. Falling back to root preserves the user's
+        // upload without producing a duplicate blob, matching the
+        // semantic that local deleteFolder already moves orphaned
+        // assets to root.
         try {
           await createAsset(payload.userId, {
             url: blob.url,
@@ -198,11 +209,33 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             siteId: payload.siteId ?? null,
           });
         } catch (err) {
-          // Quota or folder errors at completion — log but don't throw
+          const message = err instanceof Error ? err.message : String(err);
+          if (message === "FOLDER_NOT_FOUND" && payload.folderId) {
+            // Folder went away mid-flight. Retry at root.
+            try {
+              await createAsset(payload.userId, {
+                url: blob.url,
+                bytes: payload.bytes,
+                type: payload.type,
+                mimeType: payload.mimeType,
+                filename: payload.filename,
+                folderId: null,
+                siteId: payload.siteId ?? null,
+              });
+            } catch (rootErr) {
+              if (process.env.NODE_ENV !== "production") {
+                console.warn(
+                  `[asset-upload] createAsset root-fallback failed: ${rootErr instanceof Error ? rootErr.message : String(rootErr)}`,
+                );
+              }
+            }
+            return;
+          }
+          // Quota or other errors at completion — log but don't throw
           // (Vercel will retry the webhook indefinitely otherwise).
           if (process.env.NODE_ENV !== "production") {
             console.warn(
-              `[asset-upload] createAsset failed in completion: ${err instanceof Error ? err.message : String(err)}`,
+              `[asset-upload] createAsset failed in completion: ${message}`,
             );
           }
         }

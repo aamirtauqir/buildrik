@@ -53,11 +53,31 @@ async function assertUrlNotOwnedByOther(
   userId: string,
   url: string,
 ): Promise<void> {
-  const conflicting = await prisma.mediaAsset.findFirst({
+  const conflictingAsset = await prisma.mediaAsset.findFirst({
     where: { url, NOT: { userId } },
     select: { id: true },
   });
-  if (conflicting) {
+  if (conflictingAsset) {
+    throw new Error("URL_CONFLICT");
+  }
+
+  // Phase B5++++ codex re-review pass 5 P1 fix: also check
+  // MediaAssetVersion. Pre-fix the guard only saw MediaAsset.url
+  // refs, leaving versions as a 5th cross-tenant attack surface:
+  // user A had a retained version at URL `U_v1`, user B could
+  // create a MediaAsset at `U_v1` because the asset-only check
+  // saw no conflict; when B's row was later deleted, deleteAsset's
+  // ref-count guard ALSO only counted MediaAsset rows → del()
+  // fired → A's version blob permanently gone. A version is
+  // owned by whoever owns its parent asset.
+  const conflictingVersion = await prisma.mediaAssetVersion.findFirst({
+    where: {
+      url,
+      asset: { NOT: { userId } },
+    },
+    select: { id: true },
+  });
+  if (conflictingVersion) {
     throw new Error("URL_CONFLICT");
   }
 }
@@ -293,10 +313,17 @@ export async function deleteAsset(userId: string, input: DeleteAssetInput) {
   // Cost: orphan blobs accumulate when references exist; recoverable
   // via a future reconciliation job. Worth it for the safety property.
   if (asset.url && process.env.BLOB_READ_WRITE_TOKEN) {
-    const otherReferences = await prisma.mediaAsset.count({
-      where: { url: asset.url },
-    });
-    if (otherReferences === 0) {
+    // Phase B5++++ codex re-review pass 5 P1 fix: count BOTH tables.
+    // Pre-fix only counted MediaAsset rows, missing the case where
+    // another user's MediaAssetVersion still pointed at the URL —
+    // del() would fire and silently destroy that user's retained
+    // version blob. Versions are restorable refs, so they must
+    // protect the underlying blob from deletion just like assets.
+    const [otherAssetRefs, otherVersionRefs] = await Promise.all([
+      prisma.mediaAsset.count({ where: { url: asset.url } }),
+      prisma.mediaAssetVersion.count({ where: { url: asset.url } }),
+    ]);
+    if (otherAssetRefs === 0 && otherVersionRefs === 0) {
       try {
         await del(asset.url);
       } catch (err) {
