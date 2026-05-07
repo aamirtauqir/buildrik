@@ -20,22 +20,7 @@
   },
   {
     "category": "keyframeDuplicates",
-    "violations": [
-      {
-        "path": "src/editor/sidebar/tabs/history/styles/history.css",
-        "line": 893,
-        "severity": "important",
-        "message": "@keyframes \"fadeIn\" defined in 2 files: src/editor/sidebar/tabs/history/styles/history.css:893, src/themes/ux-fixes.css:240",
-        "suggestion": "Consolidate to single tier CSS file; rename if intentional namespace difference."
-      },
-      {
-        "path": "src/themes/legacy-components.css",
-        "line": 39,
-        "severity": "important",
-        "message": "@keyframes \"spin\" defined in 2 files: src/themes/legacy-components.css:39, src/themes/ux-fixes.css:273",
-        "suggestion": "Consolidate to single tier CSS file; rename if intentional namespace difference."
-      }
-    ]
+    "violations": []
   },
   {
     "category": "tokenAliasSSOT",

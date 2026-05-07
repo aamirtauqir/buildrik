@@ -85,7 +85,7 @@
  * NOT requested reduced motion. Migrated from themes/components.css 2026-04-26. */
 @media (prefers-reduced-motion: no-preference) {
   .buildrick-element-flash {
-    animation: buildrick-flash 0.3s ease-out;
+    animation: bd-element-flash 0.3s ease-out;
   }
 }
 

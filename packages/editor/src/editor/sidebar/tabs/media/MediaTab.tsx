@@ -148,7 +148,7 @@ function MediaTabWithComposer({
           fontWeight: 500
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 8, height: 8, borderRadius: 'var(--bd-radius-full)', background: 'rgba(255,255,255,0.6)', animation: 'pulse 2s infinite' }} />
+            <div style={{ width: 8, height: 8, borderRadius: 'var(--bd-radius-full)', background: 'rgba(255,255,255,0.6)', animation: 'bd-status-pulse 2s infinite' }} />
             Selecting image for: <span style={{ opacity: 0.9 }}>{state.selectionContext.label || 'Canvas Element'}</span>
           </div>
           <Button 

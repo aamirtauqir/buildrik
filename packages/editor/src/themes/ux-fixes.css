@@ -213,7 +213,7 @@ button:disabled,
   text-align: center;
   padding: var(--buildrick-space-8) var(--buildrick-space-4);
   color: var(--buildrick-text-muted);
-  animation: fadeIn 0.4s ease;
+  animation: bd-uxfix-fade-in 0.4s ease;
 }
 
 .buildrick-empty-state-icon {
@@ -237,7 +237,7 @@ button:disabled,
   line-height: var(--buildrick-leading-relaxed);
 }
 
-@keyframes fadeIn {
+@keyframes bd-uxfix-fade-in {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -270,10 +270,6 @@ button:disabled,
   font-size: var(--buildrick-text-sm);
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
 .buildrick-spinner {
   display: inline-block;
   width: 16px;
@@ -281,7 +277,7 @@ button:disabled,
   border: 2px solid rgba(255, 255, 255, 0.2);
   border-top-color: currentColor;
   border-radius: 50%;
-  animation: spin 0.6s linear infinite;
+  animation: bd-spin 0.6s linear infinite;
 }
 
 /* [data-tooltip] attribute-based tooltip — DELETED 2026-04-25.
@@ -301,7 +297,7 @@ button:disabled,
   border-radius: var(--buildrick-radius-lg);
   box-shadow: var(--buildrick-shadow-xl);
   z-index: var(--buildrick-z-toast);
-  animation: slideIn 0.3s ease, fadeIn 0.3s ease;
+  animation: slideIn 0.3s ease, bd-uxfix-fade-in 0.3s ease;
 }
 
 @keyframes slideIn {

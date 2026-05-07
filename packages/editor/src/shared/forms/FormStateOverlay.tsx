@@ -127,7 +127,7 @@ const overlayStyles: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   zIndex: 10000,
-  animation: "fadeIn 200ms ease-out",
+  animation: "bd-uxfix-fade-in 200ms ease-out",
 };
 
 const cardStyles: React.CSSProperties = {

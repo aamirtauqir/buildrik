@@ -449,7 +449,7 @@ const TOAST_BASE_STYLE: React.CSSProperties = {
   border: "1px solid var(--buildrick-border)",
   boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
   pointerEvents: "auto",
-  animation: "fadeIn 150ms ease-out",
+  animation: "bd-history-fade-in 150ms ease-out",
 };
 
 const TOAST_ERROR_STYLE: React.CSSProperties = {

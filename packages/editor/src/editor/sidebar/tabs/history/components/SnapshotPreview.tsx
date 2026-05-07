@@ -26,7 +26,7 @@ export const SnapshotPreview: React.FC<SnapshotPreviewProps> = ({
     zIndex: 100,
     width: 160,
     pointerEvents: "none",
-    animation: "fadeIn 150ms ease-out",
+    animation: "bd-history-fade-in 150ms ease-out",
   };
 
   return (

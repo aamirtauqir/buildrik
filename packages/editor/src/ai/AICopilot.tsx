@@ -616,7 +616,7 @@ const styles: Record<string, React.CSSProperties> = {
   loadingDots: {
     display: "flex",
     gap: 4,
-    animation: "pulse 1.5s ease-in-out infinite",
+    animation: "bd-status-pulse 1.5s ease-in-out infinite",
   },
   previewLabel: {
     fontSize: 12,

@@ -881,7 +881,7 @@
   z-index: 100;
   width: 160px;
   pointer-events: none;
-  animation: fadeIn 150ms ease-out;
+  animation: bd-history-fade-in 150ms ease-out;
 }
 
 .snapshot-preview img {
@@ -890,7 +890,7 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-@keyframes fadeIn {
+@keyframes bd-history-fade-in {
   from {
     opacity: 0;
   }
@@ -909,7 +909,7 @@
   background: var(--bd-error-tint);
   border: 1px solid rgba(239, 68, 68, 0.3);
   border-radius: var(--bd-radius-sm);
-  animation: fadeIn 150ms ease-out;
+  animation: bd-history-fade-in 150ms ease-out;
 }
 
 .restore-confirm-text,
