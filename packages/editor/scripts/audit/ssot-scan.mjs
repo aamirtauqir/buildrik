@@ -201,6 +201,15 @@ export function scanHomeContractViolations(root) {
   return { category: 'homeContractViolations', violations };
 }
 
+/**
+ * Anti-pattern scan: pass-through wrappers + dead exports.
+ *
+ * NOTE on dead-export accuracy: matches export names against a global Set
+ * of all import names project-wide. Two modules exporting the same name
+ * where only one is imported will NOT be flagged. Audit results from
+ * category 6 should be treated as approximate; prefer manual review.
+ * Hardening to ts-morph findReferencesAsNodes() is Phase 1+ work.
+ */
 export function scanAntiPatterns(root) {
   const violations = [];
   let Project;
@@ -281,17 +290,29 @@ export function scanLegacyResiduals(root) {
   const lines = content.split('\n');
   const violations = [];
   let depth = 0;
-  lines.forEach((line, i) => {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const opens = (line.match(/\{/g) || []).length;
     const closes = (line.match(/\}/g) || []).length;
     if (depth === 0 && opens > 0) {
-      const selector = line.split('{')[0].trim();
-      if (selector && !selector.startsWith('@')) {
+      const currentSelectorPart = line.split('{')[0].trim();
+      const selectorLines = currentSelectorPart ? [currentSelectorPart] : [];
+      let lineIdx = i - 1;
+      while (lineIdx >= 0) {
+        const prev = lines[lineIdx].trim();
+        if (prev === '' || prev.startsWith('//')) { lineIdx--; continue; }
+        if (prev.endsWith('}') || prev.endsWith('*/') || prev.endsWith(';')) break;
+        selectorLines.unshift(prev);
+        lineIdx--;
+      }
+      const fullSelector = selectorLines.join(' ').replace(/\s*,\s*/g, ', ').trim();
+      const startLine = lineIdx + 2;
+      if (fullSelector && !fullSelector.startsWith('@')) {
         violations.push({
           path: relative(root, file),
-          line: i + 1,
+          line: startLine,
           severity: 'minor',
-          message: `${selector} at line ${i + 1} — needs annotation`,
+          message: `${fullSelector} at line ${startLine} — needs annotation`,
           suggestion: 'Add /* keep: <reason> */ annotation or relocate to tier CSS.',
         });
       }
@@ -299,7 +320,7 @@ export function scanLegacyResiduals(root) {
     depth += opens;
     depth -= closes;
     if (depth < 0) depth = 0;
-  });
+  }
   return { category: 'legacyResiduals', violations };
 }
 
@@ -326,6 +347,7 @@ export function scanDocDrift(root) {
     const cells = line.split('|').map((c) => c.trim()).filter((c) => c.length > 0);
     if (cells.length < 3) return;
     const homeCell = cells[1] ?? '';
+    if (homeCell.startsWith('~~') && homeCell.endsWith('~~')) return;
     const m = homeCell.match(/`([^`]+)`/);
     if (!m) return;
     let claim = m[1];

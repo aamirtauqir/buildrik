@@ -175,6 +175,21 @@ describe('scanLegacyResiduals', () => {
     expect(cat7.violations).toHaveLength(0);
     rmSync(dir, { recursive: true, force: true });
   });
+
+  it('captures multi-line comma-separated selectors', () => {
+    const dir = makeFixture({
+      'src/themes/legacy-components.css': `.foo,
+.bar {
+  color: red;
+}
+`,
+    });
+    const results = run(dir, ['--category=7']);
+    const cat7 = results.find((r) => r.category === 'legacyResiduals');
+    expect(cat7.violations).toHaveLength(1);
+    expect(cat7.violations[0].message).toMatch(/\.foo.*\.bar/);
+    rmSync(dir, { recursive: true, force: true });
+  });
 });
 
 describe('scanDocDrift', () => {
@@ -192,6 +207,21 @@ describe('scanDocDrift', () => {
     const cat8 = results.find((r) => r.category === 'docDrift');
     expect(cat8.violations.length).toBeGreaterThanOrEqual(1);
     expect(cat8.violations.some((v) => /missing/.test(v.message))).toBe(true);
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('skips strikethrough rows where home cell is wrapped in ~~', () => {
+    const dir = makeFixture({
+      'packages/editor/CLAUDE.md': `# Test
+
+| Concept | Canonical Home | Status |
+|---------|---------------|--------|
+| ~~Old thing~~ | ~~\`src/old/\`~~ | DELETED |
+`,
+    });
+    const results = run(dir, ['--category=8']);
+    const cat8 = results.find((r) => r.category === 'docDrift');
+    expect(cat8.violations).toHaveLength(0);
     rmSync(dir, { recursive: true, force: true });
   });
 });
