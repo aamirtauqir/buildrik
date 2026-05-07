@@ -247,11 +247,21 @@ PR count estimate: **5 fix-PRs (Phase 2-6) + 1 gate-PR + 1 Phase Final = 7 PRs.*
 
 ## Codex review notes
 
-Codex review **pending — to be performed by user before Phase 1 begins.** The audit doc surfaces 3 judgment-heavy items where Codex challenge would add value:
+**Pre-Phase-1 (recorded 2026-05-08):** 3 judgment-heavy items flagged for Codex challenge:
 
 1. **Skeleton false-positive call (§1):** is "rename file to silence scanner" worth doing, or should the scanner gain symbol-level validation? Recommendation: scanner improvement — cheaper, less churn.
 2. **Pass-through wrapper readability triage (§6):** which of the 12 are predicate-name wins vs literal indirection waste? `isInteractiveType` arguably reads better than `INTERACTIVE_ELEMENTS.has(t)`. Codex should challenge the heuristic.
 3. **Token alias consolidation direction (§3):** picked `bd-aliases.css` as canonical; `_aliases.css` is older but "vibcoder-side." Codex should validate the SSOT direction matches the post-vibcoder-fork mental model.
+
+**Post-arc Codex review (run 2026-05-09 against this doc; see commit `889fe602`..`94a836b0`):** Codex found 4 Important + 1 structural miss. Status of each:
+
+1. **`.bd-depth-badge` overstated (§4 row + §5 dedup):** ✅ resolved by Task C 2026-05-09 (annotation in `a11y.css` documents dual-intent — motion-reduce opacity in a11y.css vs font-family in Canvas.css are intentionally different rules. Audit overstated this as confirmed Important; current state has clear `/* layered-override */` comment).
+2. **Category completeness — TS template-string keyframes (`uiStyles.ts:248` `@keyframes pulse`):** ⚠️ scanner blind spot. Scanner only walks `.css` files. `UI_ANIMATIONS` is dead code (verified by Task 5 spec review of DS SSOT arc) so no current bug; future-proofing belongs in next scanner-hardening pass.
+3. **Phase mapping shaky (lines 238-239 vs 223):** ⚠️ minor doc inconsistency in audit. Three-home (§5) is the same Badge case as §1; audit's cross-cutting summary correctly dedups it but section §5 still references "Phase 5" mapping that overlaps Phase 4. Acceptable as-shipped — implementer-side reading correctly threaded both phases.
+4. **Dead-export deferral under-evidenced (lines 132-161):** ✅ resolved by SSOT scanner hardening arc (commits `1e1af7ac`..`edcfe81d`) Task 4 walked barrel re-export chains. Real-codebase count dropped 3186 → 510 (-84%). Code-quality reviewer's spot-check of 5 surviving exports confirmed ~all are legitimately dead. Deferral now has empirical backing.
+5. **Preview entrypoint structural miss (`vibcoder-badge.html` imports `_aliases.css`):** ❌ false-positive. Preview chain is `default.css` → `design-system/index.css` → `bd-aliases.css` (line 17), THEN `_aliases.css` applies on top. Deleted overlap tokens still resolve via bd-aliases.css. Verified post-Task-4 of DS SSOT arc.
+
+Codex command: `codex exec --skip-git-repo-check "Review docs/audits/2026-05-08-ds-ssot-audit.md..."` from repo root, 200-word cap. Token usage: ~68k. Full output preserved in scanner-hardening session log.
 
 ---
 
