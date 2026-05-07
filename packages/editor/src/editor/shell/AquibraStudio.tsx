@@ -31,6 +31,7 @@ import { useComposerInit } from "./hooks/useComposerInit";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { usePublishJob } from "./hooks/usePublishJob";
+import { useSaveCallback } from "./hooks/useSaveCallback";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
 import { useStudioModals } from "./hooks/useStudioModals";
 import { useStudioState } from "./hooks/useStudioState";
@@ -195,45 +196,13 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // Enable descriptive history toasts
   useHistoryFeedback(composer, addToast);
 
-  // Save function
-  // P1-4: Enhanced error messages with "why" context
-  const saveProject = React.useCallback(() => {
-    if (!composer) return;
-    state.setSaveState((prev) => ({ ...prev, status: "saving", error: undefined }));
-    composer
-      .saveProject()
-      .then(() => {
-        state.setSaveState({ status: "idle", lastSavedAt: Date.now(), error: undefined });
-        state.setIsDirty(false);
-        addToast({
-          title: "Saved",
-          description: "Project saved successfully",
-          tone: "success",
-          duration: 1800,
-        });
-      })
-      .catch((err) => {
-        const errorMessage = err?.message || "Unknown error";
-        // Provide user-friendly error context
-        let userMessage = "Could not save project.";
-        if (errorMessage.includes("network") || errorMessage.includes("fetch")) {
-          userMessage = "Network error — check your internet connection and try again.";
-        } else if (errorMessage.includes("storage") || errorMessage.includes("quota")) {
-          userMessage = "Storage full — try clearing browser data or exporting your project.";
-        } else if (errorMessage.includes("permission") || errorMessage.includes("denied")) {
-          userMessage = "Permission denied — try refreshing the page.";
-        } else if (errorMessage.includes("timeout")) {
-          userMessage = "Request timed out — the server may be busy, try again shortly.";
-        }
-        state.setSaveState((prev) => ({ ...prev, status: "error", error: errorMessage }));
-        addToast({
-          title: "Save failed",
-          description: userMessage,
-          tone: "error",
-          action: { label: "Retry", onClick: () => saveProject() },
-        });
-      });
-  }, [addToast, composer, state]);
+  // Save function (extracted into useSaveCallback — D2 stage 2)
+  const saveProject = useSaveCallback({
+    composer,
+    addToast,
+    setSaveState: state.setSaveState,
+    setIsDirty: state.setIsDirty,
+  });
 
   // Keyboard shortcuts (extracted into useEditorShortcuts — D2 stage 1)
   useEditorShortcuts({ composer, canvasRef, modals, saveProject });
