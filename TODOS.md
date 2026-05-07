@@ -61,6 +61,8 @@
 **Why:** jsdom environment not properly initialized in Vitest config.
 **Priority:** P2 — blocks writing new tests
 
+- ~~jsdom test environment broken (render/renderHook fail)~~ — RESOLVED 2026-05-07. Verified suite-wide: SemanticBadge.test.tsx 12/12 pass, useCallout.test.ts 10/10 pass (renderHook works), full suite 2069/2069 pass across 250 files. Polyfills in `packages/editor/src/test-setup.ts` cover ResizeObserver, matchMedia, scrollIntoView. No further action needed.
+
 ---
 
 ## Component Tab Fixes (2026-04-17)
@@ -139,3 +141,235 @@ vocab-add: --buildrick-info | tier=alias-only | design-md=no-change-required: li
 
 ### ~~Post-migration hardcoded indigo audit~~ — RESOLVED 2026-04-26
 **Decision:** No work needed. Theme unification (2026-04-18 light-theme flip) already swept these. Verified 2026-04-26: `grep -rE '#F0F4F8|#EEF2F7|--surface-base|--surface-canvas' packages/editor/src --include='*.css'` returns zero hits. LayoutShell.css line numbers in original TODO predate theme unification — file has been rewritten since. No code change required.
+
+---
+
+## Deferred from DS+Components Arc CEO Review (2026-05-07)
+
+### Promote saved symbol to typed catalog component (AI-assist Phase 2)
+**What:** Convert a user-saved Component (Yours section) into a typed catalog ComponentType with variants. Uses AI to draft schema from existing master tree + user-defined variant mapping.
+**Why:** Users build patterns repeatedly. Promoting their best symbol into a typed catalog component compounds value across all their projects.
+**Pros:** Massive moat vs Webflow/Framer (neither has user-promoted catalogs). Gives Buildrik a unique distribution surface for community-contributed components.
+**Cons:** Tree-shape-to-schema serialization is non-trivial. Variant property inference needs careful UX.
+**Context:** Depends on AI-assist (D3) shipped Phase 1 + pure-data interpreter (2B) stable. Memory note: `project_ds_components_arc_shipped` will reference this as Phase 2 entry.
+**Effort:** M (human: ~2 weeks / CC: ~3 hours)
+**Priority:** P2
+**Depends on / blocked by:** DS arc Phase 1 ships, AI-assist (D3) live, pure-data interpreter battle-tested.
+
+### Live token-edit pulse animation across canvas
+**What:** When user edits a token in Design tab, all canvas elements bound to that token visibly pulse with a subtle glow animation as they restyle.
+**Why:** Makes DS↔canvas link tangible. Users see exactly which elements respond.
+**Pros:** Delight feature. Reduces "did my edit work?" uncertainty.
+**Cons:** Animation must be subtle to avoid distraction. Users with motion sensitivity need opt-out.
+**Context:** Surfaced as cherry-pick lower-priority during 2026-05-07 CEO review (D9 lower-priority list item 1).
+**Effort:** S (human: ~2 days / CC: ~30 min)
+**Priority:** P3
+**Depends on / blocked by:** DS arc Phase 1 ships.
+
+### Variant editor side-by-side preview (StylePresets)
+**What:** When editing a button preset variant (e.g., primary), show all variants (primary/secondary/ghost/link) on a right pane simultaneously to catch consistency drift.
+**Why:** Quality check on variant family. Spot when secondary has drifted from primary's design language.
+**Pros:** Quality moat. Helps designers maintain coherent variant families.
+**Cons:** Right-pane real estate competes with main editor.
+**Context:** Surfaced as cherry-pick lower-priority during 2026-05-07 CEO review (D9 list item 2).
+**Effort:** S (human: ~3 days / CC: ~45 min)
+**Priority:** P3
+**Depends on / blocked by:** DS arc Phase 1 Style Presets section ships (Phase B).
+
+### DS history / version snapshots
+**What:** "Save current DS as v1, branch to v2, switch back" — DS lifecycle versioning.
+**Why:** Designers iterate. Without snapshots, experimentation is lossy.
+**Pros:** Power feature. Makes DS workspace first-class iterative tool.
+**Cons:** Storage overhead. Versioning UX complexity.
+**Context:** Surfaced as cherry-pick lower-priority during 2026-05-07 CEO review (D9 list item 3).
+**Effort:** M (human: ~1 week / CC: ~1.5 hours)
+**Priority:** P3
+**Depends on / blocked by:** DS arc Phase 1 ships.
+
+### Inspector "extract DS from external HTML/CSS"
+**What:** User pastes external HTML/CSS, Buildrik extracts colors/spacing/fonts and proposes adding them as DS tokens.
+**Why:** Onboarding power feature. "Bring your existing brand in 30 seconds."
+**Pros:** Differentiation moat. Natural pairing with starter DS gallery.
+**Cons:** CSS parsing edge cases. Token deduplication logic complex.
+**Context:** Surfaced as cherry-pick lower-priority during 2026-05-07 CEO review (D9 list item 4).
+**Effort:** M (human: ~1 week / CC: ~1.5 hours)
+**Priority:** P3
+**Depends on / blocked by:** DS arc Phase 1 ships.
+
+### Catalog component responsive preview matrix
+**What:** Show Hero rendered at mobile/tablet/desktop side-by-side in catalog browse view.
+**Why:** Designers verify responsive behavior at glance before placing on canvas.
+**Pros:** Quality lift. Catches mobile breakage before user sees it.
+**Cons:** Browse view real estate competes.
+**Context:** Surfaced as cherry-pick lower-priority during 2026-05-07 CEO review (D9 list item 5).
+**Effort:** S (human: ~3 days / CC: ~1 hour)
+**Priority:** P3
+**Depends on / blocked by:** DS arc Phase 1 catalog ships.
+
+### Auto-generated component documentation from schema
+**What:** For each catalog component, auto-generate "How to use" doc from schema (variants/sizes/props/bindings).
+**Why:** Onboarding scaffold. Replaces manual docs.
+**Pros:** Zero-effort docs. Always current with schema.
+**Cons:** Generated docs feel generic without curated examples.
+**Context:** Surfaced as cherry-pick lower-priority during 2026-05-07 CEO review (D9 list item 6).
+**Effort:** S (human: ~3 days / CC: ~1 hour)
+**Priority:** P3
+**Depends on / blocked by:** DS arc Phase 1 catalog ships.
+
+### Catalog bulk multi-select drag-drop
+**What:** Multi-select components in catalog panel + drop multiple onto canvas in one operation.
+**Why:** Power-user efficiency. Common when scaffolding pages from component library.
+**Pros:** Speed boost for repetitive layouts.
+**Cons:** Selection model + drop placement logic added.
+**Context:** Phase 1 supports single-component drag only. Surfaced during CEO review (Section 4 finding 4.3).
+**Effort:** S (human: ~3 days / CC: ~45 min)
+**Priority:** P3
+**Depends on / blocked by:** DS arc Phase 1 catalog ships.
+
+### Token alias depth >1 (chained aliases)
+**What:** Allow alias → alias → raw chains beyond depth 1.
+**Why:** Pro DS workflows: "primary → brand-default → color-blue-500" enables semantic indirection on top of brand layer.
+**Pros:** Matches Tokens Studio v2 multi-level token capability.
+**Cons:** Cycle detection + resolution complexity grow. Performance regression risk on large alias graphs.
+**Context:** Phase 1 locks depth-1 only per Hour-4 resolution. Reopen if user demand surfaces.
+**Effort:** S (human: ~2 days / CC: ~30 min)
+**Priority:** P3
+**Depends on / blocked by:** DS arc Phase 1 alias layer (D4) ships.
+
+### Per-property dark/light pairs beyond color
+**What:** Spacing, radius, shadow tokens get dark/light pairs (not just color).
+**Why:** Some designs use tighter spacing or larger shadows in dark mode.
+**Pros:** Full theming parity with prefers-color-scheme.
+**Cons:** Doubles token storage for kinds where mode-pair rarely matters.
+**Context:** Phase 1 ships color-only dark mode (D8). Reopen if demand exists.
+**Effort:** S (human: ~2 days / CC: ~30 min)
+**Priority:** P3
+**Depends on / blocked by:** DS arc Phase 1 dark mode (D8) ships.
+
+### Cross-tab concurrent edit detection / CRDT
+**What:** Multi-tab/multi-editor concurrent DS editing without lost updates. CRDT-based or operational transform.
+**Why:** Phase 1 = single-editor by policy. Real concurrent use cases (agency teams, designer + dev pairing) need this.
+**Pros:** Unblocks real-time collab. Industry-table-stakes for pro tools.
+**Cons:** Major architecture investment. CRDT library choice + integration is multi-week work.
+**Context:** Surfaced during CEO review Section 1 finding 1.5. Spec Section 7.12 marks Phase 2.
+**Effort:** L (human: ~6 weeks / CC: ~10 hours)
+**Priority:** P2
+**Depends on / blocked by:** DS arc Phase 1 ships.
+
+### DS metrics + dashboards (token edits/min, AI success rate, lint trigger count)
+**What:** Production metrics: token edit volume per project, AI-assist success rate, lint warning count, mode toggle distribution.
+**Why:** Without metrics, Phase 2 sizing decisions are guesswork.
+**Pros:** Data-driven product decisions. Catches drift early.
+**Cons:** Metrics infra work. Dashboard maintenance.
+**Context:** Surfaced during CEO review Section 8 finding 8.1.
+**Effort:** S (human: ~3 days / CC: ~1 hour)
+**Priority:** P2
+**Depends on / blocked by:** DS arc Phase 1 ships, user base >50.
+
+### DS production alerts (catalog render error rate, migration failure rate)
+**What:** Alert thresholds: catalog render errors > 1%, migration failure rate > 0.5%, AI 5xx rate > 2%.
+**Why:** Catch production degradation before users complain.
+**Pros:** Proactive ops. Reduces time-to-detect.
+**Cons:** Alert tuning + on-call setup.
+**Context:** Surfaced during CEO review Section 8 finding 8.2.
+**Effort:** S (human: ~2 days / CC: ~45 min)
+**Priority:** P2
+**Depends on / blocked by:** DS metrics infra ships.
+
+### Beginner/Pro mode toggle telemetry
+**What:** Track which mode users default to + flip frequency. Inform Phase 2 mode-related decisions.
+**Why:** Confirms tiered-UX hypothesis. Shows whether beginner mode delivers value.
+**Pros:** Cheap signal. Validates audience tier strategy.
+**Cons:** Adds analytics event.
+**Context:** Surfaced during CEO review Section 8 finding 8.5.
+**Effort:** S (human: ~half day / CC: ~10 min)
+**Priority:** P3
+**Depends on / blocked by:** DS arc Phase 1 mode toggle ships.
+
+### Community catalog marketplace
+**What:** Public catalog where users publish ComponentTypes, browse + install community-contributed components.
+**Why:** Compounds D3 AI-assist + pure-data shipping. Becomes a network-effect moat.
+**Pros:** Distribution surface. Scales catalog beyond Buildrik's authoring capacity.
+**Cons:** Quality moderation. Trust + safety. Versioning. Significant ongoing operational work.
+**Context:** Phase 2+ moat surfaced during CEO review trajectory analysis (Section 10.6).
+**Effort:** XL (human: ~10 weeks / CC: ~15 hours)
+**Priority:** P3
+**Depends on / blocked by:** DS arc Phase 1 + AI-assist (D3) + sufficient user base for network effect.
+
+---
+
+## Deferred from DS+Components Arc Eng Review (2026-05-07)
+
+### AI-assist streaming UI (Server-Sent Events for D3)
+**What:** Replace blocking 2-8s spinner with streaming progress (skeleton schema preview as tokens arrive).
+**Why:** Eng review E13 — long blocking modal feels slow. Streaming UX standard for AI products.
+**Pros:** Better perceived latency. Modern AI-product UX standard.
+**Cons:** Adds SSE infrastructure on top of existing Claude API client. Complexity for marginal UX gain Phase 1.
+**Context:** D3 AI-assist ships Phase 1 with blocking modal + cancel button. Streaming Phase 2.
+**Effort:** S (human: ~3 days / CC: ~1 hour)
+**Priority:** P3
+**Depends on / blocked by:** D3 AI-assist Phase 1 ships.
+
+### Lazy-load behavior modules (catalog code-splitting)
+**What:** Behaviors load on-demand when component types using them mount. Currently Phase 1 bundles all ~10 behaviors.
+**Why:** Eng review E8 — catalog growth past 30 components inflates bundle.
+**Pros:** Smaller initial bundle. Future-proof for community catalog.
+**Cons:** Adds dynamic import paths. Race conditions on rapid mount/unmount.
+**Context:** Phase 1 ships ~10 behaviors bundled. Re-evaluate when catalog hits 30+ components.
+**Effort:** S (human: ~3 days / CC: ~45 min)
+**Priority:** P3
+**Depends on / blocked by:** Catalog grows >30 components.
+
+### Composer DesignSystemModule refactor (god-object cleanup)
+**What:** Bundle 8 new DS-related sub-surfaces (`aliasResolver`, `darkResolver`, `aiAssistService`, `dsLinter`, `cssBundler`, `auditLogger`, plus extended `tokens`/`presets`/`components`) into a `DesignSystemModule` that composer composes-in once.
+**Why:** Eng review E1 — composer surface grows unwieldy with each phase. Module pattern caps the namespace.
+**Pros:** Cleaner composer surface. Single coupling point. Easier to test in isolation.
+**Cons:** Breaking refactor. Touches every consumer of `composer.tokens` / `composer.presets` / etc.
+**Context:** Phase 1 ships with surfaces directly on composer. Refactor Phase I polish or post-launch.
+**Effort:** M (human: ~1 week / CC: ~1.5 hours)
+**Priority:** P3
+**Depends on / blocked by:** Phase 1 ships, surface stable.
+
+### Two-render-paths consolidation (canvas vs catalog interpreter)
+**What:** Investigate whether catalog interpreter's render path can unify with existing canvas element rendering (`data-buildrick-id` HTML mount per memory `project_canvas_render_path`).
+**Why:** Eng review E2 — two parallel render systems risk consistency drift. One unified path simpler long-term.
+**Pros:** Single render mental model. Easier debugging. Less divergence over time.
+**Cons:** Major architectural investigation. May discover unification impossible due to React-vs-DOM model mismatch.
+**Context:** Phase 1 ships separate paths. Investigate Phase C Week 6 with prototype.
+**Effort:** M (human: ~1 week investigation / CC: ~2 hours)
+**Priority:** P3
+**Depends on / blocked by:** Catalog interpreter ships Phase C; team has bandwidth for architectural investigation.
+
+---
+
+## Deferred from DS+Components Arc Design Review (2026-05-07)
+
+### Per-starter DS visual design pass (anti-AI-slop)
+**What:** Each of 6-8 starter DSes (Stripe-blue / Notion-warm / Apple-minimal / Linear-dark / Vercel-mono / +1-3 more) gets a dedicated ~2-day visual design treatment — not AI-templated.
+**Why:** Design review Pass 4 — D6 starter gallery is highest AI-slop risk in spec. Generic gradients + 3-column grids + uniform radius would feel like every SaaS starter. Each starter must visually evoke its namesake.
+**Pros:** Starters become marketing-ready demo material. Buildrik catalog feels intentional vs templated. Differentiates from shadcn/MUI defaults.
+**Cons:** ~2 weeks total design time (6 starters × 2 days each, possibly parallelizable). High quality bar = real design effort.
+**Context:** Phase F Week 14-15 budgets 2 weeks for D6. This work item explicitly documents that the time is for DESIGN, not just data entry.
+**Effort:** L (human: ~2 weeks / CC: limited assist)
+**Priority:** P2 (gates Phase F quality)
+**Depends on / blocked by:** Phase F kickoff; Token foundation Phase A complete.
+
+### Catalog visual mockups via gstack designer (Phase C kickoff)
+**What:** Generate visual mockups for all 10 Phase 1 catalog components (Button/Input/Select/Checkbox/Badge/Card/Form/Alert/Hero/Footer) via gstack designer at start of Phase C. Use as visual reference during catalog implementation.
+**Why:** Design review noted plan has functional spec but no visual direction. Mockups make pre-implementation visual review possible (per /design-review's "show before code" principle).
+**Pros:** Implementation phase has visual reference. Catches visual drift early. Cross-model quality check via designer's `check` command.
+**Cons:** ~2-3 hours generation + review. Mockups need to align with DESIGN.md (industrial/utilitarian, cobalt, no-black).
+**Context:** Phase C Week 6 kickoff. Use `$D variants --brief "..." --count 3 --output-dir ~/.gstack/projects/$SLUG/designs/catalog-phase-c-$(date)/`.
+**Effort:** S (human: ~3 hours / CC: ~1 hour)
+**Priority:** P2 (gates Phase C visual quality)
+**Depends on / blocked by:** Phase C kickoff; component schemas drafted (Week 6 Day 1).
+
+### DESIGN.md update for AI-assist UI + lint chip status tokens
+**What:** Extend DESIGN.md with two subsections: (1) AI-assist generate modal pattern (loading state, error states D14, accept/discard preview UX), (2) Status token vocabulary for Inspector chips (success/info/warning chip surfaces, mapped to DESIGN.md NO-BLACK + cobalt rules — NOT raw green/blue/yellow).
+**Why:** Design review Pass 7 — current DESIGN.md doesn't cover these new patterns. Without spec, implementer hand-rolls colors; risk of drift from cobalt direction.
+**Pros:** Single source of truth for new UI patterns. Future similar features (AI features Phase 2+) inherit conventions.
+**Cons:** ~half day to write + review. DESIGN.md grows.
+**Context:** Should land alongside Phase A token foundation so chip color tokens exist in DEFAULT_TOKENS from day 1.
+**Effort:** S (human: ~half day / CC: ~30 min)
+**Priority:** P2 (gates Inspector chip implementation Phase D)
+**Depends on / blocked by:** Phase A token foundation in flight; Inspector chip implementation Phase D.
