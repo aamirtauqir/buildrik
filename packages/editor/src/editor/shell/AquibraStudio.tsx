@@ -16,7 +16,6 @@ import { AIAssistantBar } from "../../ai/AIAssistantBar";
 import { getBlockDefinitions } from "../../blocks/blockRegistry";
 import type { Composer } from "../../engine";
 import { ExportEngine } from "../../engine/export";
-import { EVENTS } from "../../shared/constants/events";
 import { useElementFlash } from "../../shared/hooks";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
 import { TooltipProvider, ToastProvider, useToast } from "@/editor/shared/vibcoder";
@@ -28,6 +27,7 @@ import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { PageWizard } from "../wizard/PageWizard";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useComposerInit } from "./hooks/useComposerInit";
+import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { usePublishJob } from "./hooks/usePublishJob";
@@ -154,19 +154,23 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
     openCollectionSetup: modals.openCollectionSetup,
   });
 
-  // Hide wizard if canvas already has content (returning users on reload)
-  React.useEffect(() => {
-    if (!composer) return;
-    const checkContent = () => {
-      const existing = composer.elements?.getAllElements?.() ?? [];
-      if (existing.length > 0) setShowWizard(false);
-    };
-    checkContent();
-    composer.on(EVENTS.PROJECT_LOADED, checkContent);
-    return () => {
-      composer.off?.(EVENTS.PROJECT_LOADED, checkContent);
-    };
-  }, [composer]);
+  // 4 composer-driven side-effects (wizard hide, COMPONENT_CREATE_REQUESTED,
+  // SHOW_IN_LAYERS, overlay-defaults init) extracted into useEditorEventListeners
+  // — D2 stage 3.
+  useEditorEventListeners({
+    composer,
+    modals,
+    state: {
+      setLeftPanelTab: state.setLeftPanelTab,
+      setIsLeftPanelOpen: state.setIsLeftPanelOpen,
+      setShowSpacingIndicators: state.setShowSpacingIndicators,
+      setShowBadges: state.setShowBadges,
+      setShowGuides: state.setShowGuides,
+      setShowGrid: state.setShowGrid,
+    },
+    setShowWizard,
+    hasManuallyToggledSpacingRef: hasManuallyToggledSpacing,
+  });
 
   // Single source of truth for selection - derived from Composer
   const selection = useComposerSelection({ composer });
@@ -297,53 +301,6 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       });
     }
   }, [publishJob.uiState, publishJob.publishedUrl, publishJob.error, addToast]);
-
-  // Listen for component creation requests
-  React.useEffect(() => {
-    if (!composer) return;
-
-    const handleCreateComponentRequest = (event: { elementId: string }) => {
-      modals.openCreateComponent(event.elementId);
-    };
-
-    composer.on(EVENTS.COMPONENT_CREATE_REQUESTED, handleCreateComponentRequest);
-    return () => {
-      composer.off(EVENTS.COMPONENT_CREATE_REQUESTED, handleCreateComponentRequest);
-    };
-  }, [composer, modals]);
-
-  // Listen for "Show in Layers" navigation requests (Phase 6: UX Audit)
-  const { setLeftPanelTab, setIsLeftPanelOpen } = state;
-  React.useEffect(() => {
-    if (!composer) return;
-
-    const handleShowInLayers = () => {
-      // Switch to Layers tab and open drawer
-      setLeftPanelTab("layers");
-      setIsLeftPanelOpen(true);
-      // Also emit scroll event for LayersPanel to scroll to selection
-      // This handles the case when already on Layers tab
-      setTimeout(() => {
-        composer.emit(EVENTS.LAYERS_SCROLL_TO_SELECTION, {});
-      }, 100); // Small delay to ensure tab switch completes
-    };
-
-    composer.on(EVENTS.SHOW_IN_LAYERS, handleShowInLayers);
-    return () => {
-      composer.off(EVENTS.SHOW_IN_LAYERS, handleShowInLayers);
-    };
-  }, [composer, setLeftPanelTab, setIsLeftPanelOpen]);
-
-  // Load overlay defaults
-  const { setShowSpacingIndicators, setShowBadges, setShowGuides, setShowGrid } = state;
-  React.useEffect(() => {
-    if (!composer?.canvasIndicators) return;
-    const overlay = composer.canvasIndicators.getOverlay();
-    setShowSpacingIndicators(overlay.showSpacing ?? !hasManuallyToggledSpacing.current);
-    setShowBadges(overlay.showBadges ?? false);
-    setShowGuides(overlay.showGuides ?? true);
-    setShowGrid(overlay.showGrid ?? false);
-  }, [composer, setShowSpacingIndicators, setShowBadges, setShowGuides, setShowGrid]);
 
   // Auto-enable spacing on first selection
   React.useEffect(() => {
