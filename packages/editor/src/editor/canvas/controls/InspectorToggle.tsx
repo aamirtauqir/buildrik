@@ -121,7 +121,7 @@ export const InspectorToggle: React.FC<InspectorToggleProps> = ({
 
   return (
     <div
-      className={`buildrick-inspector-toggle ${className || ""}`}
+      className={`bd-inspector-toggle ${className || ""}`}
       style={{
         display: "flex",
         alignItems: "center",

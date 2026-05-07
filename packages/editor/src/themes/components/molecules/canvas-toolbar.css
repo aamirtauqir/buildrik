@@ -1,0 +1,61 @@
+/**
+ * canvas-toolbar — selection toolbar that floats above selected canvas elements
+ *
+ * Hover/focus/active styles for the unified selection toolbar's buttons. Layout
+ * styles still live as inline CSSProperties in `controls/toolbar/toolbarStyles.ts`
+ * (they depend on JS canvas tokens). These rules are the global state styles
+ * that previously lived as a runtime-injected <style> tag.
+ *
+ * Namespace: `bd-canvas-toolbar` — distinct from the generic `bd-toolbar`
+ * molecule (sidebar/inspector chipbar layouts).
+ *
+ * Token sourcing matches the original `canvasTokens` JS map:
+ *   colors.surface.border    → rgba(255, 255, 255, 0.08)
+ *   colors.text.primary      → var(--bd-fg-primary)
+ *   colors.primary.default   → var(--bd-accent)
+ *   colors.primary.alpha10   → rgba(45, 109, 255, 0.1)
+ *   colors.text.muted        → var(--bd-fg-muted)
+ *   colors.status.errorBg    → var(--bd-error-bg)
+ *   colors.status.error      → var(--bd-error)
+ */
+
+.bd-canvas-toolbar button:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--bd-fg-primary) !important;
+}
+
+.bd-canvas-toolbar button:active {
+  transform: scale(0.95);
+}
+
+.bd-canvas-toolbar button:focus-visible {
+  outline: 2px solid var(--bd-accent) !important;
+  outline-offset: 1px;
+  background: rgba(45, 109, 255, 0.1) !important;
+}
+
+.bd-canvas-toolbar button[aria-label="Delete element"] {
+  color: var(--bd-fg-muted);
+}
+
+.bd-canvas-toolbar button[aria-label="Delete element"]:hover {
+  background: var(--bd-error-bg) !important;
+  color: var(--bd-error) !important;
+}
+
+.bd-canvas-toolbar button[aria-label="Delete element"]:focus-visible {
+  outline-color: var(--bd-error) !important;
+}
+
+/* Dropdown menu keyboard navigation */
+.bd-canvas-toolbar [role="menu"] button:focus-visible {
+  background: rgba(255, 255, 255, 0.08) !important;
+  outline: none;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .bd-canvas-toolbar button:active {
+    transform: none;
+  }
+}

@@ -160,7 +160,7 @@ export function useCanvasInlineEdit({
     const handleBlur = (evt: FocusEvent) => {
       // Don't finish editing if focus is moving to the inline toolbar
       const relatedTarget = evt.relatedTarget as HTMLElement | null;
-      if (relatedTarget?.closest(".buildrick-inline-toolbar")) {
+      if (relatedTarget?.closest(".bd-inline-toolbar")) {
         // Re-focus the contentEditable element after toolbar interaction
         setTimeout(() => el.focus(), 0);
         return;
@@ -184,7 +184,7 @@ export function useCanvasInlineEdit({
       if (!target) return;
 
       // Don't finish editing if clicking on the inline toolbar
-      if (target.closest(".buildrick-inline-toolbar")) {
+      if (target.closest(".bd-inline-toolbar")) {
         return;
       }
 

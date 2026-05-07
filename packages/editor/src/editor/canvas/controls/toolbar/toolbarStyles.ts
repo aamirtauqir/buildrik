@@ -1,6 +1,13 @@
 /**
  * Toolbar styles — extracted from UnifiedSelectionToolbar for size compliance
- * All CSSProperties objects and CSS injection for the unified selection toolbar.
+ * All CSSProperties objects for the unified selection toolbar.
+ *
+ * State styles (hover/focus/active/delete) live as plain CSS at
+ * `themes/components/molecules/canvas-toolbar.css`, scoped under the
+ * `.bd-canvas-toolbar` class (applied to the toolbar root in
+ * `UnifiedSelectionToolbar.tsx`). The runtime <style> injection that used to
+ * live here was removed once the rules became authored CSS.
+ *
  * @license BSD-3-Clause
  */
 
@@ -135,53 +142,6 @@ export const menuDividerStyles: React.CSSProperties = {
   background: colors.surface.border,
   margin: "4px 8px",
 };
-
-// Inject global hover/focus styles via CSS using design tokens
-const styleSheet = `
-.buildrick-unified-toolbar button:hover {
-  background: ${colors.surface.border} !important;
-  color: ${colors.text.primary} !important;
-}
-.buildrick-unified-toolbar button:active {
-  transform: scale(0.95);
-}
-.buildrick-unified-toolbar button:focus-visible {
-  outline: 2px solid ${colors.primary.default} !important;
-  outline-offset: 1px;
-  background: ${colors.primary.alpha10} !important;
-}
-.buildrick-unified-toolbar button[aria-label="Delete element"] {
-  color: ${colors.text.muted};
-}
-.buildrick-unified-toolbar button[aria-label="Delete element"]:hover {
-  background: ${colors.status.errorBg} !important;
-  color: ${colors.status.error} !important;
-}
-.buildrick-unified-toolbar button[aria-label="Delete element"]:focus-visible {
-  outline-color: ${colors.status.error} !important;
-}
-/* Dropdown menu keyboard navigation */
-.buildrick-unified-toolbar [role="menu"] button:focus-visible {
-  background: ${colors.surface.border} !important;
-  outline: none;
-}
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  .buildrick-unified-toolbar button:active {
-    transform: none;
-  }
-}
-`;
-
-if (typeof document !== "undefined") {
-  const existingStyle = document.getElementById("buildrick-unified-toolbar-styles");
-  if (!existingStyle) {
-    const style = document.createElement("style");
-    style.id = "buildrick-unified-toolbar-styles";
-    style.textContent = styleSheet;
-    document.head.appendChild(style);
-  }
-}
 
 /** Format an element type string into a display name */
 export function formatElementName(type: string): string {

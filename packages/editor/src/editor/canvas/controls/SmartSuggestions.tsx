@@ -297,7 +297,7 @@ export const SmartSuggestions: React.FC<SmartSuggestionsProps> = ({
         boxShadow: "0 4px 16px rgba(0, 0, 0, 0.25)",
         zIndex: Z_LAYERS.contextMenu,
         pointerEvents: "auto",
-        animation: "buildrick-fade-in 0.15s ease-out",
+        animation: "bd-fade-in 0.15s ease-out",
       }}
     >
       {suggestions.map((suggestion) => (

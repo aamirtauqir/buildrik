@@ -454,7 +454,7 @@ export const Canvas = React.forwardRef<CanvasRef, CanvasProps>(
           {/* Canvas Content */}
           <div
             ref={canvasRef}
-            className={`buildrick-canvas${showComponentView ? " buildrick-canvas--component-view" : ""}`}
+            className={`buildrick-canvas${showComponentView ? " bd-canvas--component-view" : ""}`}
             data-buildrick-canvas="true"
             data-show-outlines={showOutlines ? "true" : undefined}
             data-xray-mode={showXRay ? "true" : undefined}

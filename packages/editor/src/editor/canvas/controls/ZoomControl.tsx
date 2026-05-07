@@ -44,7 +44,7 @@ export const ZoomControl: React.FC<ZoomControlProps> = ({
 
   return (
     <div
-      className={`buildrick-zoom-control ${className || ""}`}
+      className={`bd-zoom-control ${className || ""}`}
       style={{
         display: "flex",
         alignItems: "center",

@@ -18,10 +18,10 @@ export function CanvasEmptyCTA({
   onStartBlank,
 }: CanvasEmptyCTAProps): React.ReactElement {
   return (
-    <div className="buildrick-canvas-empty-cta" role="status" aria-label="Canvas is empty">
+    <div className="bd-canvas-empty-cta" role="status" aria-label="Canvas is empty">
       {/* Plus icon */}
       <svg
-        className="buildrick-canvas-empty-cta__icon"
+        className="bd-canvas-empty-cta__icon"
         width="48"
         height="48"
         viewBox="0 0 24 24"
@@ -35,14 +35,14 @@ export function CanvasEmptyCTA({
         <line x1="12" y1="5" x2="12" y2="19" />
         <line x1="5" y1="12" x2="19" y2="12" />
       </svg>
-      <h3 className="buildrick-canvas-empty-cta__title">Start building</h3>
-      <p className="buildrick-canvas-empty-cta__desc">
+      <h3 className="bd-canvas-empty-cta__title">Start building</h3>
+      <p className="bd-canvas-empty-cta__desc">
         Click + in the sidebar to add elements, or drag a template onto the canvas.
       </p>
-      <Button className="buildrick-canvas-empty-cta__browse" onClick={onBrowseTemplates}>
+      <Button className="bd-canvas-empty-cta__browse" onClick={onBrowseTemplates}>
         Browse templates
       </Button>
-      <Button className="buildrick-canvas-empty-cta__blank" onClick={onStartBlank}>
+      <Button className="bd-canvas-empty-cta__blank" onClick={onStartBlank}>
         Start Blank
       </Button>
     </div>

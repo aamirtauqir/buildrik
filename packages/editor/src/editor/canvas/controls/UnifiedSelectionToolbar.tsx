@@ -272,7 +272,7 @@ export const UnifiedSelectionToolbar: React.FC<UnifiedSelectionToolbarProps> = (
         pointerEvents: "auto",
       }}
     >
-      <div style={toolbarStyles}>
+      <div className="bd-canvas-toolbar" style={toolbarStyles}>
         <ToolbarNavSection
           hasParent={hasParent}
           elementName={elementName}

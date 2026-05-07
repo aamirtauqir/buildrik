@@ -226,9 +226,9 @@ export function useSelectionBehavior({
       // Ignore clicks on toolbar/control elements
       if (
         target.closest(
-          ".buildrick-unified-toolbar, .buildrick-selection-label, " +
-            ".buildrick-canvas-breadcrumb, .buildrick-alignment-toolbar, .buildrick-floating-helper, " +
-            ".buildrick-inspector-toggle, .buildrick-command-palette"
+          ".bd-canvas-toolbar, .bd-selection-label, " +
+            ".bd-canvas-breadcrumb, .bd-alignment-toolbar, .bd-floating-helper, " +
+            ".bd-inspector-toggle, .bd-command-palette"
         )
       ) {
         return;

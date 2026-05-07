@@ -68,7 +68,7 @@ export const UndoRedoControls: React.FC<UndoRedoControlsProps> = ({ composer, cl
 
   return (
     <div
-      className={`buildrick-undo-redo-controls ${className || ""}`}
+      className={`bd-undo-redo-controls ${className || ""}`}
       style={{
         display: "flex",
         alignItems: "center",

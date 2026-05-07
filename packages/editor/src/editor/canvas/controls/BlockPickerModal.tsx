@@ -243,7 +243,7 @@ const modalStyles: React.CSSProperties = {
   maxHeight: "80vh",
   display: "flex",
   flexDirection: "column",
-  animation: "buildrick-modal-in 0.2s ease",
+  animation: "bd-modal-in 0.2s ease",
 };
 
 const headerStyles: React.CSSProperties = {

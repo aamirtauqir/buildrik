@@ -39,7 +39,7 @@ export function useCanvasContent({
 
     if (!content) {
       // Minimal root wrapper — React overlay in Canvas.tsx handles the CTA UI
-      return `<div data-buildrick-id="${rootId || ""}" class="buildrick-empty-canvas-root"></div>`;
+      return `<div data-buildrick-id="${rootId || ""}" class="bd-empty-canvas-root"></div>`;
     }
 
     // Use resolvedContent (with CMS bindings applied) for DOM manipulation

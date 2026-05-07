@@ -35,7 +35,7 @@ export const DeviceSelector: React.FC<DeviceSelectorProps> = ({
 }) => {
   return (
     <div
-      className={`buildrick-device-selector ${className || ""}`}
+      className={`bd-device-selector ${className || ""}`}
       data-control="device"
       style={{
         display: "flex",

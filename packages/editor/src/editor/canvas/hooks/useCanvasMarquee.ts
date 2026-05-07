@@ -57,7 +57,7 @@ export function useCanvasMarquee({
       const target = e.target as HTMLElement;
       const clickedElement = target.closest("[data-buildrick-id]") as HTMLElement | null;
       const clickedToolbar = target.closest(
-        ".buildrick-unified-toolbar, .buildrick-selection-label, .buildrick-canvas-breadcrumb, .buildrick-alignment-toolbar, .buildrick-context-menu"
+        ".bd-canvas-toolbar, .bd-selection-label, .bd-canvas-breadcrumb, .bd-alignment-toolbar, .bd-context-menu"
       ) as HTMLElement | null;
 
       // If clicking on an element or toolbar, don't start marquee
