@@ -1,12 +1,15 @@
 import type { ProjectMigration } from "./types";
+import { migration0001 } from "./0001-extend-token-kinds";
 
 /**
  * Registry, keyed by toVersion. Append future migrations here.
  *
- * Currently empty — migration 0001 lands in T6, which will register it
- * here as `{ 1: migration0001 }` after importing from `./0001-extend-token-kinds`.
+ * Add new migrations by mapping `toVersion → migration` and bumping
+ * `TARGET_PROJECT_VERSION`.
  */
-export const PROJECT_MIGRATIONS: Record<number, ProjectMigration> = {};
+export const PROJECT_MIGRATIONS: Record<number, ProjectMigration> = {
+  1: migration0001,
+};
 
 /** Highest known target version. Bump when adding a migration. */
 export const TARGET_PROJECT_VERSION = 1;

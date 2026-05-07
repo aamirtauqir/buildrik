@@ -1,0 +1,5 @@
+{
+  "tokens": [
+    { "id": "color-primary", "name": "Primary", "value": "#000000", "category": "colors", "cssVar": "--buildrick-design-color-primary", "type": "color", "kind": "color", "friendlyName": "Primary color" }
+  ]
+}
