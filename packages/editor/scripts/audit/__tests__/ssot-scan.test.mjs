@@ -108,6 +108,17 @@ describe('scanSelectorDuplicates', () => {
     expect(cat4.violations).toHaveLength(0);
     rmSync(dir, { recursive: true, force: true });
   });
+
+  it('strips /* ... */ comments before matching selectors', () => {
+    const dir = makeFixture({
+      'src/themes/components.css': '.bd-btn { color: red; }',
+      'src/themes/_layer.css': '/* mentions .bd-btn in JSDoc */\n@layer { /* ok */ }',
+    });
+    const results = run(dir, ['--category=4']);
+    const cat4 = results.find((r) => r.category === 'selectorDuplicates');
+    expect(cat4.violations).toHaveLength(0);
+    rmSync(dir, { recursive: true, force: true });
+  });
 });
 
 describe('scanHomeContractViolations', () => {

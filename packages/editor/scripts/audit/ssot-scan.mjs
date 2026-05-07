@@ -115,7 +115,10 @@ export function scanSelectorDuplicates(root) {
   let cssFiles = [];
   try { cssFiles = walk(resolve(root, 'src'), ['.css']); } catch { return { category: 'selectorDuplicates', violations: [] }; }
   for (const f of cssFiles) {
-    const content = readFileSync(f, 'utf8');
+    let content = readFileSync(f, 'utf8');
+    // Strip /* ... */ block comments (multi-line aware) before selector matching.
+    // Audit Appendix fix #1 — JSDoc comments mention selectors that aren't real defs.
+    content = content.replace(/\/\*[\s\S]*?\*\//g, (match) => match.replace(/[^\n]/g, ' '));
     const lines = content.split('\n');
     lines.forEach((line, i) => {
       const m = line.match(/\.(bd-[a-z][a-z0-9-]*)\s*\{/);
