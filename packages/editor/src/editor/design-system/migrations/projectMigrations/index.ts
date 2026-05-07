@@ -15,3 +15,6 @@ export const PROJECT_MIGRATIONS: Record<number, ProjectMigration> = {
 export const TARGET_PROJECT_VERSION = 1;
 
 export type { ProjectPayload, ProjectMigration } from "./types";
+
+export { runProjectMigrations } from "./runner";
+export type { RunnerInput, RunnerResult } from "./runner";
