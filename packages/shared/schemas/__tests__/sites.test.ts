@@ -25,4 +25,22 @@ describe("saveProjectDataSchema", () => {
     const parsed = saveProjectDataSchema.parse(valid);
     expect(parsed.dsSchemaVersion).toBeUndefined();
   });
+
+  it("rejects non-integer dsSchemaVersion", () => {
+    const invalid = {
+      siteId: "site-1",
+      pages: [],
+      dsSchemaVersion: 1.5,
+    };
+    expect(() => saveProjectDataSchema.parse(invalid)).toThrow();
+  });
+
+  it("accepts dsSchemaVersion=0 (inclusive lower bound)", () => {
+    const valid = {
+      siteId: "site-1",
+      pages: [],
+      dsSchemaVersion: 0,
+    };
+    expect(() => saveProjectDataSchema.parse(valid)).not.toThrow();
+  });
 });
