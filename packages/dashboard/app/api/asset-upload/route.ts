@@ -223,21 +223,27 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
                 siteId: payload.siteId ?? null,
               });
             } catch (rootErr) {
-              if (process.env.NODE_ENV !== "production") {
-                console.warn(
-                  `[asset-upload] createAsset root-fallback failed: ${rootErr instanceof Error ? rootErr.message : String(rootErr)}`,
-                );
-              }
+              // Phase B5+++++ codex re-review pass 6 P3 fix: log
+              // root-fallback failures in production too. Pre-fix the
+              // log was gated to non-prod; if the fallback ALSO failed
+              // in production the orphan blob recreated invisibly with
+              // no cleanup signal. console.error makes it visible to
+              // log aggregators / Vercel's runtime logs. We don't
+              // throw because Vercel would retry the webhook
+              // indefinitely on permanent errors like quota.
+              console.error(
+                `[asset-upload] createAsset root-fallback failed: ${rootErr instanceof Error ? rootErr.message : String(rootErr)}`,
+              );
             }
             return;
           }
           // Quota or other errors at completion — log but don't throw
           // (Vercel will retry the webhook indefinitely otherwise).
-          if (process.env.NODE_ENV !== "production") {
-            console.warn(
-              `[asset-upload] createAsset failed in completion: ${message}`,
-            );
-          }
+          // Pass 6 P3 fix: log in prod too so orphan-blob causes are
+          // diagnosable from runtime logs.
+          console.error(
+            `[asset-upload] createAsset failed in completion: ${message}`,
+          );
         }
       },
     });
