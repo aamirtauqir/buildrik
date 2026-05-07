@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { del } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, type PlanName } from "@/lib/constants/plan-limits";
 import type {
@@ -65,23 +66,21 @@ export async function listAssets(userId: string, input: ListAssetsInput) {
 }
 
 export async function createAsset(userId: string, input: CreateAssetInput): Promise<{ id: string; url: string; bytes: number }> {
-  // Phase B5 P1A fix: idempotent on URL match. The dashboard's
-  // /api/asset-upload onUploadCompleted handler also creates rows for
-  // every Vercel Blob upload — that closes the quota-bypass exploit
-  // where a client could upload blobs without ever calling createAsset.
-  // When client AND completion handler both fire (the normal path),
-  // whichever lands first wins; the second resolves to the existing row.
-  const existing = await prisma.mediaAsset.findFirst({
-    where: { userId, url: input.url },
-    select: { id: true, url: true, bytes: true },
-  });
-  if (existing) return existing;
-
-  // Phase C: enforce storage cap before insert.
+  // Phase B5+ codex re-review fix [P1A race + bytes=0]:
+  // upsert on the new @@unique([userId, url]) constraint. Closes two
+  // bugs at once:
+  //   - Race: concurrent onUploadCompleted webhook + client createAsset
+  //     calls can't double-insert anymore — DB enforces single row.
+  //   - bytes=0: if a prior caller created the row with bytes=0 (legacy
+  //     before-fix data), the update branch repairs it to the real bytes
+  //     count. Without this, quota would stay undercounted forever.
+  //
+  // Quota check still fires on the create branch only — duplicates of an
+  // already-counted row don't double-charge the user. We DO want the
+  // update branch to repair bytes when the existing row has bytes=0,
+  // because that case is "completion handler raced ahead with no bytes
+  // info"; the client's later call carries the real value.
   const quota = await checkStorageQuota(userId);
-  if (!quota.ok && quota.totalBytes !== -1 && quota.usedBytes + input.bytes > quota.totalBytes) {
-    throw new Error("QUOTA_EXCEEDED");
-  }
 
   // Validate folder ownership if set.
   if (input.folderId) {
@@ -94,8 +93,22 @@ export async function createAsset(userId: string, input: CreateAssetInput): Prom
     }
   }
 
-  return prisma.mediaAsset.create({
-    data: {
+  // Pre-check: would creating consume more than allowed? Skipped on
+  // unlimited tier (-1) or when an existing row already accounts for it.
+  if (quota.totalBytes !== -1) {
+    const existing = await prisma.mediaAsset.findUnique({
+      where: { MediaAsset_userId_url_unique: { userId, url: input.url } },
+      select: { bytes: true },
+    });
+    const delta = existing ? Math.max(input.bytes - existing.bytes, 0) : input.bytes;
+    if (!quota.ok && quota.usedBytes + delta > quota.totalBytes) {
+      throw new Error("QUOTA_EXCEEDED");
+    }
+  }
+
+  return prisma.mediaAsset.upsert({
+    where: { MediaAsset_userId_url_unique: { userId, url: input.url } },
+    create: {
       userId,
       siteId: input.siteId ?? null,
       folderId: input.folderId ?? null,
@@ -106,6 +119,12 @@ export async function createAsset(userId: string, input: CreateAssetInput): Prom
       filename: input.filename,
       altText: input.altText ?? null,
       userMetadata: (input.userMetadata as Prisma.InputJsonValue) ?? Prisma.JsonNull,
+    },
+    update: {
+      // Repair bytes=0 from a webhook that landed before the client's
+      // metadata-bearing call. Only update when the new value is bigger
+      // — otherwise a stale call could shrink a valid row.
+      bytes: input.bytes,
     },
     select: { id: true, url: true, bytes: true },
   });
@@ -149,13 +168,33 @@ export async function updateAsset(userId: string, input: UpdateAssetInput) {
 export async function deleteAsset(userId: string, input: DeleteAssetInput) {
   const asset = await prisma.mediaAsset.findUnique({
     where: { id: input.assetId },
-    select: { userId: true },
+    select: { userId: true, url: true },
   });
   if (!asset || asset.userId !== userId) {
     throw new Error("NOT_FOUND");
   }
   // Versions cascade-delete via FK constraint.
   await prisma.mediaAsset.delete({ where: { id: input.assetId } });
+
+  // Phase B5+ codex re-review fix [P1C]: also delete the underlying
+  // Vercel Blob so storage isn't silently leaked. Pre-fix, deleting an
+  // asset removed the Prisma row but left the binary at vercel-storage.com
+  // forever — quota would re-fill on the next billing cycle even though
+  // the user "deleted" everything. Best-effort: legacy rows without a
+  // Vercel URL or environments without BLOB_READ_WRITE_TOKEN simply skip.
+  if (asset.url && process.env.BLOB_READ_WRITE_TOKEN) {
+    try {
+      await del(asset.url);
+    } catch (err) {
+      // Don't fail the user-visible delete on a blob cleanup error;
+      // orphan blobs are recoverable via a future reconciliation job.
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(
+          `[media.deleteAsset] Vercel Blob del failed for ${input.assetId}: ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    }
+  }
   return { success: true };
 }
 

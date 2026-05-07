@@ -587,6 +587,7 @@ model MediaAsset {
   versions MediaAssetVersion[]
   folder   MediaFolder?        @relation(fields: [folderId], references: [id], onDelete: SetNull)
 
+  @@unique([userId, url], name: "MediaAsset_userId_url_unique")
   @@index([userId, type, createdAt])
   @@index([folderId])
   @@index([siteId])

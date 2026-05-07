@@ -231,6 +231,27 @@ export class MediaManager extends MediaEventEmitter {
   }
 
   /**
+   * Phase B5+ codex re-review fix [P2 durability]: rebuild folderRetryQueue
+   * from persisted MediaFolder.localOnly markers. Pre-fix, the queue was
+   * memory-only — a reload between createFolder() failure and reconnect
+   * lost retry intent forever, so the folder stayed permanently absent
+   * from the server. Mirror of rebuildRetryQueueFromState for assets.
+   *
+   * Public so MediaCommandLayer / app init can also re-trigger after
+   * project import. Idempotent — Map.set on the same key just overwrites.
+   */
+  rebuildFolderRetryQueueFromState(): void {
+    for (const folder of this.state.folders) {
+      if (folder.localOnly) {
+        this.folderRetryQueue.set(folder.id, {
+          name: folder.name,
+          parentId: folder.parentId,
+        });
+      }
+    }
+  }
+
+  /**
    * Phase B2: re-attempt server sync for any localOnly assets and any
    * pending remote deletes. Called on 'online' event and after each
    * successful upload (chained retries).
@@ -545,8 +566,13 @@ export class MediaManager extends MediaEventEmitter {
     await this.loadFromStorage();
     // Phase B5 P2 (durability): refresh between sync failures used to lose
     // retry intent because retryQueue lived only in memory. Now we rebuild
-    // it from persisted localOnly markers so retry survives reload.
+    // it from persisted localOnly markers so retry survives reload — for
+    // both assets and folders. Order matters in spirit (folders before
+    // assets) but retryLocalOnlyAssets() always drains the folder queue
+    // first anyway, so the only requirement here is "both seeded before
+    // any retry runs."
     this.rebuildRetryQueueFromState();
+    this.rebuildFolderRetryQueueFromState();
     this.initialized = true;
   }
 
@@ -779,6 +805,22 @@ export class MediaManager extends MediaEventEmitter {
             void this.retryLocalOnlyAssets();
           }
         } else {
+          // Phase B5+ codex re-review fix [P1C failure path]: if the
+          // user deleted this asset locally while uploadAndCreate was
+          // in-flight, deleteAsset() set the tombstone and already
+          // removed the asset from state + IndexedDB + blobUrlMap.
+          // Without this guard the failure branch would resurrect the
+          // deleted asset as localOnly + queue a retry, silently
+          // undoing the user's delete the next time we come online.
+          if (this.deleteOnReconcile.has(assetId)) {
+            this.deleteOnReconcile.delete(assetId);
+            this.retryQueue.delete(assetId);
+            progress.status = "complete";
+            progress.progress = 100;
+            progress.assetId = assetId;
+            this.emit(MEDIA_EVENTS.UPLOAD_PROGRESS, progress);
+            return { success: true, asset, fileName: file.name };
+          }
           // Remote sync failed — flag local-only and queue for retry.
           asset.localOnly = true;
           this.retryQueue.add(assetId);
@@ -950,20 +992,26 @@ export class MediaManager extends MediaEventEmitter {
       }
     }
 
+    // Phase B5+ codex re-review fix [P2 durability]: stamp localOnly
+    // when we couldn't reach the server, mirroring the asset contract.
+    // Pre-fix the retry queue lived only in memory — a reload between
+    // creation and reconnection lost retry intent forever, leaving the
+    // folder permanently divergent from the server. With this marker
+    // rebuildFolderRetryQueueFromState() restores the queue on init.
+    const localOnly = this.remoteSync !== undefined && !serverSynced;
+
     const folder: MediaFolder = {
       id,
       name,
       parentId: parentId ?? null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      localOnly,
     };
 
     await this.storage.saveFolder(folder);
     this.state.folders.push(folder);
     this.emit(MEDIA_EVENTS.FOLDER_CREATED, folder);
-
-    // Annotate so future debugging knows this folder isn't server-synced.
-    void serverSynced;
     return folder;
   }
 
@@ -975,28 +1023,83 @@ export class MediaManager extends MediaEventEmitter {
   private async retryFolderQueue(): Promise<Map<string, string>> {
     const remapped = new Map<string, string>();
     if (!this.remoteSync || this.folderRetryQueue.size === 0) return remapped;
-    const entries = Array.from(this.folderRetryQueue.entries());
-    for (const [localId, payload] of entries) {
-      // Resolve parent id forward-mapping when parent was also offline-created
-      // and is being synced this same pass. Best-effort — if parent fails
-      // again, this folder still queues for next round.
-      const parentId = payload.parentId;
-      const created = await this.remoteSync.createFolder({
-        name: payload.name,
-        parentId: parentId,
-      });
-      if (created) {
-        // Rewrite engine folder id from local UUID to server CUID.
-        const idx = this.state.folders.findIndex((f) => f.id === localId);
-        if (idx >= 0) {
-          const old = this.state.folders[idx];
-          const updated: MediaFolder = { ...old, id: created.serverId };
-          await this.storage.saveFolder(updated);
-          await this.storage.deleteFolder(localId);
-          this.state.folders[idx] = updated;
-          remapped.set(localId, created.serverId);
+
+    // Phase B5+ codex re-review fix [P1B nested]: process in waves so
+    // children never sync ahead of their parents. Pre-fix the queue
+    // iterated in insertion order, which broke when:
+    //   1. A reload restored queue with no parent-before-child guarantee
+    //   2. A successful upload mid-sync re-entered retryFolderQueue
+    //      while a parent folder hadn't synced yet
+    // Result: child sent local-UUID parentId to server, server replied
+    // PARENT_NOT_FOUND, child stuck forever.
+    //
+    // Wave protocol: pick entries whose parent is either null (root),
+    // not in the queue (already server-side from a prior pass), or
+    // already remapped *this* pass. Skip the rest, re-evaluate next
+    // wave. Substitute parent's server CUID at call time. Stop when
+    // a wave makes no progress (avoids infinite loop on a cycle —
+    // shouldn't happen, but defensive).
+    let progressed = true;
+    while (this.folderRetryQueue.size > 0 && progressed) {
+      progressed = false;
+      const entries = Array.from(this.folderRetryQueue.entries());
+      for (const [localId, payload] of entries) {
+        const localParent = payload.parentId;
+        // Parent is queued but not yet remapped — wait for next wave.
+        if (
+          localParent &&
+          this.folderRetryQueue.has(localParent) &&
+          !remapped.has(localParent)
+        ) {
+          continue;
         }
-        this.folderRetryQueue.delete(localId);
+        // Substitute parent id: local UUID → server CUID if it was
+        // remapped earlier in this pass; otherwise pass through (it's
+        // already server-side, or null root).
+        const parentIdForServer = localParent
+          ? remapped.get(localParent) ?? localParent
+          : null;
+        const created = await this.remoteSync.createFolder({
+          name: payload.name,
+          parentId: parentIdForServer,
+        });
+        if (created) {
+          // Rewrite engine folder id from local UUID to server CUID.
+          // Clear localOnly — folder is now durably server-synced, so
+          // the next reload's rebuildFolderRetryQueueFromState() won't
+          // re-enqueue a phantom retry.
+          const idx = this.state.folders.findIndex((f) => f.id === localId);
+          if (idx >= 0) {
+            const old = this.state.folders[idx];
+            const updated: MediaFolder = {
+              ...old,
+              id: created.serverId,
+              localOnly: false,
+            };
+            await this.storage.saveFolder(updated);
+            await this.storage.deleteFolder(localId);
+            this.state.folders[idx] = updated;
+            remapped.set(localId, created.serverId);
+          }
+          // Carry forward: any folder in state.folders that pointed at
+          // this folder's local UUID as its parent must update to the
+          // new server CUID, or the UI tree shows orphans.
+          for (const f of this.state.folders) {
+            if (f.parentId === localId) {
+              f.parentId = created.serverId;
+              await this.storage.saveFolder(f);
+            }
+          }
+          // Same carry-forward for queued descendants — they need the
+          // server CUID parent, not the dead local UUID, on next wave.
+          for (const [, queued] of this.folderRetryQueue) {
+            if (queued.parentId === localId) {
+              queued.parentId = created.serverId;
+            }
+          }
+          this.folderRetryQueue.delete(localId);
+          progressed = true;
+        }
       }
     }
     return remapped;

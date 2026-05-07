@@ -240,6 +240,14 @@ export interface MediaFolder {
 
   /** Last update timestamp (ISO 8601) */
   updatedAt: string;
+
+  /**
+   * Phase B5+ codex re-review fix [P2]: persisted marker for folders
+   * that were created locally but never made it to the server.
+   * MediaManager rebuilds folderRetryQueue from this on init so retry
+   * intent survives a reload, mirroring the asset.localOnly contract.
+   */
+  localOnly?: boolean;
 }
 
 // ============================================

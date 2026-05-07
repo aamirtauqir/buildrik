@@ -73,12 +73,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           );
         }
 
-        // 3. Parse clientPayload for size + metadata. Phase B5 P1A fix:
-        // metadata is now MANDATORY when remoteSync is wired so
-        // onUploadCompleted can create the canonical MediaAsset row
-        // without trusting a follow-up client call. Closes the quota
-        // bypass exploit where an authenticated client could upload
-        // blobs and never call createAsset.
+        // 3. Parse clientPayload — REQUIRED. Phase B5+ codex re-review
+        // P1A fix: previously the route would issue a token when payload
+        // was missing/unparseable, which let an authenticated client
+        // upload blobs without ever creating a MediaAsset row. Now we
+        // require complete metadata up-front so onUploadCompleted always
+        // has what it needs to create the canonical row.
+        if (!clientPayload) {
+          throw new Error("Asset upload requires clientPayload metadata");
+        }
         let parsedClientPayload: {
           bytes?: number;
           type?: MediaType;
@@ -86,39 +89,48 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           filename?: string;
           folderId?: string | null;
           siteId?: string | null;
-        } = {};
-        if (clientPayload) {
-          try {
-            parsedClientPayload = JSON.parse(clientPayload);
-          } catch {
-            // Fall through with empty payload — onUploadCompleted will skip
-            // row creation in this case (back-compat for non-Buildrik
-            // clients that might POST without metadata).
-          }
-          if (typeof parsedClientPayload.bytes === "number") {
-            if (parsedClientPayload.bytes > MAX_FILE_BYTES) {
-              throw new Error(
-                `File ${pathname} exceeds 50MB limit (${parsedClientPayload.bytes} bytes)`
-              );
-            }
-            if (
-              quota.totalBytes !== -1 &&
-              quota.usedBytes + parsedClientPayload.bytes > quota.totalBytes
-            ) {
-              throw new Error(
-                `Upload would exceed quota: ${quota.usedBytes + parsedClientPayload.bytes} > ${quota.totalBytes}`
-              );
-            }
-          }
+        };
+        try {
+          parsedClientPayload = JSON.parse(clientPayload);
+        } catch {
+          throw new Error("Asset upload clientPayload is not valid JSON");
+        }
+        // bytes + type + mimeType + filename are mandatory. siteId/folderId optional.
+        if (typeof parsedClientPayload.bytes !== "number") {
+          throw new Error("Asset upload clientPayload missing 'bytes'");
+        }
+        if (!parsedClientPayload.type) {
+          throw new Error("Asset upload clientPayload missing 'type'");
+        }
+        if (!parsedClientPayload.mimeType) {
+          throw new Error("Asset upload clientPayload missing 'mimeType'");
+        }
+        if (!parsedClientPayload.filename) {
+          throw new Error("Asset upload clientPayload missing 'filename'");
+        }
+        if (parsedClientPayload.bytes > MAX_FILE_BYTES) {
+          throw new Error(
+            `File ${pathname} exceeds 50MB limit (${parsedClientPayload.bytes} bytes)`
+          );
+        }
+        if (
+          quota.totalBytes !== -1 &&
+          quota.usedBytes + parsedClientPayload.bytes > quota.totalBytes
+        ) {
+          throw new Error(
+            `Upload would exceed quota: ${quota.usedBytes + parsedClientPayload.bytes} > ${quota.totalBytes}`
+          );
         }
 
         // 4. Issue token. tokenPayload carries everything onUploadCompleted
-        // needs to create the row server-side (P1A fix).
+        // needs to create the row server-side. bytes included so the
+        // completion handler doesn't store bytes:0 (P1A bytes=0 fix).
         return {
           allowedContentTypes: ALLOWED_CONTENT_TYPES,
           maximumSizeInBytes: MAX_FILE_BYTES,
           tokenPayload: JSON.stringify({
             userId,
+            bytes: parsedClientPayload.bytes,
             type: parsedClientPayload.type,
             mimeType: parsedClientPayload.mimeType,
             filename: parsedClientPayload.filename,
@@ -128,39 +140,35 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         };
       },
       onUploadCompleted: async ({ blob, tokenPayload }) => {
-        // Phase B5 P1A fix: server-side row creation here closes the
-        // quota bypass exploit. Idempotent on URL (createAsset upserts
-        // by url), so the client's own media.createAsset call (which
-        // runs in parallel from the editor) sees the existing row and
-        // returns it. Whichever path lands first wins.
+        // Phase B5+ codex re-review fix: token issuance now REQUIRES
+        // complete metadata, so this handler always has what it needs.
+        // No graceful fallthrough on missing fields — onBeforeGenerateToken
+        // would have thrown earlier. createAsset is upsert-by-url
+        // server-side, idempotent under client+webhook racing.
         if (!tokenPayload) return;
         let payload: {
-          userId?: string;
-          type?: MediaType;
-          mimeType?: string;
-          filename?: string;
-          folderId?: string | null;
-          siteId?: string | null;
+          userId: string;
+          bytes: number;
+          type: MediaType;
+          mimeType: string;
+          filename: string;
+          folderId: string | null;
+          siteId: string | null;
         };
         try {
           payload = JSON.parse(tokenPayload);
         } catch {
-          return;
-        }
-        if (!payload.userId || !payload.type || !payload.mimeType || !payload.filename) {
-          // Insufficient metadata (legacy/non-Buildrik client). Don't
-          // create a row — but the blob persists, which means it counts
-          // against Vercel Blob storage. Future GC pass cleans these up.
+          // Token corruption — shouldn't happen since we control the
+          // tokenPayload. Log + abort. Vercel won't retry further.
+          if (process.env.NODE_ENV !== "production") {
+            console.warn("[asset-upload] tokenPayload not valid JSON");
+          }
           return;
         }
         try {
           await createAsset(payload.userId, {
             url: blob.url,
-            bytes: 0, // Vercel doesn't give us bytes here; createAsset's
-            // idempotent path catches the client's call (which DOES
-            // have bytes) and uses that row instead. If client never
-            // calls, we still have a row so quota at least counts the
-            // attempt. TODO: derive bytes via blob.size or Vercel API.
+            bytes: payload.bytes,
             type: payload.type,
             mimeType: payload.mimeType,
             filename: payload.filename,
