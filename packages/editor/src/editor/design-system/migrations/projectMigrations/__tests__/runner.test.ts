@@ -77,6 +77,8 @@ describe("runProjectMigrations", () => {
         overrideMigrations: { 1: badMigration },
       })
     ).toThrow(/validate-failed/);
+    expect(JSON.parse(localStorage.getItem(SNAPSHOT_KEY)!)).toEqual(v0Payload);
+    expect(localStorage.getItem(MARKER_KEY)).toBe("0");
   });
 
   it("crash-resume: marker present at start with same fromVersion → continues without re-snapshotting", () => {
@@ -89,6 +91,7 @@ describe("runProjectMigrations", () => {
     });
     expect(result.newVersion).toBe(1);
     expect(localStorage.getItem(MARKER_KEY)).toBeNull();
+    expect(localStorage.getItem(SNAPSHOT_KEY)).toBeNull();
   });
 
   it("does NOT touch document.documentElement (no parallel writers)", () => {

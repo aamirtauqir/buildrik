@@ -29,7 +29,7 @@ function safeRemove(key: string): void {
   try {
     localStorage.removeItem(key);
   } catch {
-    /* ignore */
+    /* private-mode → silent best-effort (mirrors safeSet) */
   }
 }
 
