@@ -10,7 +10,7 @@
 import * as React from "react";
 import type { LayoutSuggestion, LayoutAnalysisResult } from "../engine/ai";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { Badge } from "@/shared/ui/Badge";
+import { SemanticBadge } from "@/shared/ui/SemanticBadge";
 
 // ============================================================================
 // TYPES
@@ -102,9 +102,9 @@ const SuggestionItem: React.FC<{
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <span>{colors.icon}</span>
         <span style={{ fontWeight: 500, fontSize: 13 }}>{suggestion.title}</span>
-        <Badge variant="default" size="sm">
+        <SemanticBadge variant="default" size="sm">
           {suggestion.type}
-        </Badge>
+        </SemanticBadge>
       </div>
       <div
         style={{

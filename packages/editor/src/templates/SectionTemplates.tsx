@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Badge } from "@/shared/ui/Badge";
+import { SemanticBadge } from "@/shared/ui/SemanticBadge";
 
 // ============================================================================
 // TYPES
@@ -241,9 +241,9 @@ export const SectionTemplates: React.FC<SectionTemplatesProps> = ({ onInsert, fi
               </div>
             </div>
             <div style={{ marginTop: 8 }}>
-              <Badge variant="default" size="sm">
+              <SemanticBadge variant="default" size="sm">
                 {section.type}
-              </Badge>
+              </SemanticBadge>
             </div>
           </div>
         ))}

@@ -1,22 +1,7 @@
 [
   {
     "category": "componentDuplicates",
-    "violations": [
-      {
-        "path": "src/editor/shared/vibcoder/Badge.tsx",
-        "line": 1,
-        "severity": "important",
-        "message": "Primitive \"Badge\" defined in 2 homes: src/editor/shared/vibcoder/Badge.tsx, src/shared/ui/Badge.tsx",
-        "suggestion": "Pick canonical home per CLAUDE.md three-home contract; delete duplicates."
-      },
-      {
-        "path": "src/editor/shared/vibcoder/Skeleton.tsx",
-        "line": 1,
-        "severity": "important",
-        "message": "Primitive \"Skeleton\" defined in 2 homes: src/editor/shared/vibcoder/Skeleton.tsx, src/shared/extensions/Skeleton.tsx",
-        "suggestion": "Pick canonical home per CLAUDE.md three-home contract; delete duplicates."
-      }
-    ]
+    "violations": []
   },
   {
     "category": "keyframeDuplicates",

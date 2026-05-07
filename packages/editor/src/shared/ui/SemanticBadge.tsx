@@ -21,7 +21,7 @@
  * Badge is renamed to SemanticBadge and kept indefinitely with the chrome
  * Badge as a separate import path.
  *
- * Badge — pill-shaped label for status/counter/tag.
+ * SemanticBadge — pill-shaped label for status/counter/tag.
  *
  * Week 1 reconciliation per P0c audit BD1, BD3, BD4.
  * BD2 (premium variant) deferred pending PRO tier UI copy confirmation.
@@ -40,7 +40,7 @@
 import * as React from "react";
 import styled from "@emotion/styled";
 
-export interface BadgeProps {
+export interface SemanticBadgeProps {
   children?: React.ReactNode;
   variant?: "default" | "primary" | "success" | "warning" | "error" | "info";
   size?: "xs" | "sm" | "md" | "lg";
@@ -50,8 +50,8 @@ export interface BadgeProps {
   className?: string;
 }
 
-type Variant = NonNullable<BadgeProps["variant"]>;
-type Size = NonNullable<BadgeProps["size"]>;
+type Variant = NonNullable<SemanticBadgeProps["variant"]>;
+type Size = NonNullable<SemanticBadgeProps["size"]>;
 
 // info === accent family per DESIGN.md. Canonical --buildrick-info shares
 // the same cobalt value as --buildrick-accent (see color.css).
@@ -131,7 +131,7 @@ const Dot = styled.span<{ v: Variant; s: Size }>`
   flex-shrink: 0;
 `;
 
-export const Badge: React.FC<BadgeProps> = ({
+export const SemanticBadge: React.FC<SemanticBadgeProps> = ({
   children,
   variant = "default",
   size = "md",
@@ -153,4 +153,4 @@ export const Badge: React.FC<BadgeProps> = ({
   );
 };
 
-export default Badge;
+export default SemanticBadge;

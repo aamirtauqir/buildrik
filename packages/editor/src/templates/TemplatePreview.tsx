@@ -13,7 +13,7 @@ import {
   OverlayMount,
 } from "@/editor/shared/vibcoder";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { Badge } from "@/shared/ui/Badge";
+import { SemanticBadge } from "@/shared/ui/SemanticBadge";
 import type { Template } from "./TemplateLibrary";
 
 // ============================================================================
@@ -171,7 +171,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
                 {template.description}
               </div>
             </div>
-            <Badge variant="default">{template.category}</Badge>
+            <SemanticBadge variant="default">{template.category}</SemanticBadge>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
@@ -228,9 +228,9 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
               </div>
               <div style={{ display: "flex", gap: 4 }}>
                 {template.tags.map((tag) => (
-                  <Badge key={tag} variant="default" size="sm">
+                  <SemanticBadge key={tag} variant="default" size="sm">
                     {tag}
-                  </Badge>
+                  </SemanticBadge>
                 ))}
               </div>
             </div>

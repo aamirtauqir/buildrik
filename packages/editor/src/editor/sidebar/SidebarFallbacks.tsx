@@ -7,7 +7,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import { SkeletonListItem } from "@/shared/extensions/Skeleton";
+import { SkeletonListItem } from "@/shared/extensions/SkeletonCompounds";
 import { Stack } from "@/editor/shared/vibcoder/Stack";
 
 /** Loading skeleton shown while lazy-loaded tab chunks download */

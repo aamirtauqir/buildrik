@@ -18,7 +18,7 @@ import type { Composer } from "../../engine";
 import { useElementFlash } from "../../shared/hooks";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
 import { TooltipProvider, ToastProvider, useToast } from "@/editor/shared/vibcoder";
-import { StudioSkeleton } from "@/shared/extensions/Skeleton";
+import { StudioSkeleton } from "@/shared/extensions/SkeletonCompounds";
 import { UpgradeModal } from "@/shared/extensions/UpgradeModal";
 import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMigration";
 import type { CanvasRef } from "../canvas/Canvas";

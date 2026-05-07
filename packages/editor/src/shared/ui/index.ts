@@ -3,8 +3,8 @@
  *
  * Post-cleanup (2026-05-02): 12 dead files + ds/ subfolder + broken index.tsx
  * deleted; only files with verified consumers remain. Audit findings:
- *   - Badge — 5 consumers (semantic palette; distinct from vibcoder Badge
- *     chrome-state palette per Phase 4 keep-legacy decision)
+ *   - SemanticBadge — 5 consumers (semantic palette; renamed from Badge in
+ *     Phase 4 DS SSOT to disambiguate from vibcoder chrome-state Badge)
  *   - ErrorState — 1 consumer (sidebar PanelErrorState)
  *   - HelpTooltip — 2 consumers (inspector layout controls)
  *   - Icons — 6 consumers (editor/inspector/, panels/, rail/, shell/)
@@ -14,7 +14,7 @@
  */
 
 export { HelpTooltip, type HelpTooltipProps } from "./HelpTooltip";
-export { Badge, type BadgeProps } from "./Badge";
+export { SemanticBadge, type SemanticBadgeProps } from "./SemanticBadge";
 export {
   ErrorState,
   ErrorBoundary,

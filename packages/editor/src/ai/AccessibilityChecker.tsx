@@ -11,7 +11,7 @@
 import * as React from "react";
 import type { Composer } from "../engine";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { Badge } from "@/shared/ui/Badge";
+import { SemanticBadge } from "@/shared/ui/SemanticBadge";
 
 // ============================================================================
 // TYPES
@@ -286,9 +286,9 @@ export const AccessibilityChecker: React.FC<AccessibilityCheckerProps> = ({
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span>{colors.icon}</span>
-                  <Badge variant="default" size="sm">
+                  <SemanticBadge variant="default" size="sm">
                     {issue.rule}
-                  </Badge>
+                  </SemanticBadge>
                 </div>
                 <div
                   style={{

@@ -7,7 +7,7 @@
 import * as React from "react";
 import { InputField } from "../shared/forms";
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { Badge } from "@/shared/ui/Badge";
+import { SemanticBadge } from "@/shared/ui/SemanticBadge";
 import type { Template } from "./TemplateLibrary";
 
 // ============================================================================
@@ -249,7 +249,7 @@ export const MyTemplates: React.FC<MyTemplatesProps> = ({
 
       {/* Count */}
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <Badge variant="default">{templates.length}</Badge>
+        <SemanticBadge variant="default">{templates.length}</SemanticBadge>
         <span style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
           saved template{templates.length !== 1 ? "s" : ""}
         </span>
