@@ -8,6 +8,7 @@
  * tier file under themes/components/{atoms,molecules,organisms,layouts}/.
  */
 
+/* keep: canonical engine container, emitted by Canvas.tsx */
 .buildrick-canvas {
   flex: 1;
   background: var(--buildrick-bg-subtle);
@@ -21,8 +22,10 @@
   overflow: auto;
   padding: 32px;
 }
+/* keep: single-consumer viewport iframe styles */
 .buildrick-viewport-frame { width: 100%; height: 100%; border: none; }
 
+/* keep: single-consumer offline tooltip; rename to bd-* + move to organisms/topbar.css later */
 .tbOfflineTooltip {
   position: absolute; top: calc(100% + 6px); right: 0;
   white-space: nowrap;
@@ -35,8 +38,10 @@
   z-index: var(--buildrick-z-tooltip);
 }
 
+/* keep: cross-folder element-flash; consumers a11y.css; move to atoms/animation-utils.css later */
 @keyframes bd-element-flash { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
 
+/* keep: vendor pseudo-elements need element-level selectors */
 input[type="range"]::-webkit-slider-thumb,
 input[type="range"]::-moz-range-thumb {
   appearance: none; width: 16px; height: 16px;
@@ -45,22 +50,29 @@ input[type="range"]::-moz-range-thumb {
   border: 2px solid var(--buildrick-bg-card);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+/* keep: vendor pseudo-elements need element-level selectors */
 input[type="color"] { cursor: pointer; }
+/* keep: vendor pseudo-elements need element-level selectors */
 input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+/* keep: vendor pseudo-elements need element-level selectors */
 input[type="color"]::-webkit-color-swatch { border-radius: 4px; border: none; }
 
+/* keep: global drag cursor state — single 1-line rule */
 .bd-dragging, .bd-dragging * { cursor: grabbing !important; }
 
+/* keep: engine-emitted attribute selector for selection ring */
 [data-buildrick-id][data-selected="true"] {
   outline: 2px solid var(--buildrick-accent) !important;
   outline-offset: 1px;
   box-shadow: 0 0 0 4px rgba(0, 212, 170, 0.15), 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
+/* keep: engine-emitted attribute selector for hover ring */
 [data-buildrick-id]:hover:not([data-selected="true"]) {
   outline: 1px dashed rgba(45, 109, 255, 0.6) !important;
   outline-offset: 0px;
 }
 
+/* keep: native disabled state — element selectors required */
 input:disabled, select:disabled, textarea:disabled {
   background: var(--buildrick-surface-2) !important;
   color: var(--buildrick-text-muted) !important;
