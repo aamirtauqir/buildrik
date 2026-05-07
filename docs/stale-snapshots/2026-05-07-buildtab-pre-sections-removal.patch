@@ -1,0 +1,243 @@
+diff --git a/packages/editor/src/editor/sidebar/tabs/build/BuildTab.tsx b/packages/editor/src/editor/sidebar/tabs/build/BuildTab.tsx
+index ab16ccac..6e8fcffd 100644
+--- a/packages/editor/src/editor/sidebar/tabs/build/BuildTab.tsx
++++ b/packages/editor/src/editor/sidebar/tabs/build/BuildTab.tsx
+@@ -1,31 +1,36 @@
+ /**
+- * BuildTab — Add tab shell.
+- *
+- * Layout: PanelHeader / SearchBar / panel-scroll / panel-bottom
+- * where panel-bottom is pinned (flex-shrink: 0) and hidden during search.
+- *
+- * Sections mode (pre-built sections catalog + lazy chunk) was removed on
+- * 2026-04-23 — the UI switch had been stripped earlier and ~1300 lines
+- * across catalog/sections.ts, components/SectionsMode.tsx, and the
+- * accompanying hook were unreachable dead code. Only the elements grid
+- * remains.
++ * BuildTab — Add tab shell
++ * Matches §10.1 visual hierarchy: Mode switch → Search → Quick Picks (always) → Category browse
++ * Screens: RzB6V, nTVi6, SDgR2, fsI8j, GmdOe, gnyrB, QFUVG
++ * @license BSD-3-Clause
+  */
+ 
+ import * as React from "react";
+ import type { Composer } from "../../../../engine";
+ import type { BlockData } from "../../../../shared/types";
+-import { PanelShell } from "@shared/ui/panel";
++import { PanelHeader } from "../../shared/PanelHeader";
+ import { SearchBar } from "../../shared/SearchBar";
+-import { CATALOG, flatCatalog } from "./catalog/catalog";
++import { CATALOG } from "./catalog/catalog";
+ import { useBuildTab } from "./hooks/useBuildTab";
+-import { useCallout } from "./hooks/useCallout";
+-import { TipsFooter } from "./components/TipsFooter";
+ import { CatAccordion } from "./components/CatAccordion";
+ import { SearchResults } from "./components/SearchResults";
+-import { MyComponents } from "./components/MyComponents";
+-import { TransitionCallout } from "./components/TransitionCallout";
+ import "./BuildTab.css";
+ 
++// SectionsMode pulls in ~92 KB of inline HTML (54 section templates).
++// Lazy-load it so users who stay in Elements mode never pay that cost.
++// The chunk is fetched on first click of the "Sections" mode tab.
++const SectionsMode = React.lazy(() =>
++  import("./components/SectionsMode").then((m) => ({ default: m.SectionsMode }))
++);
++
++const SectionsFallback: React.FC = () => (
++  <div className="bld-sections-mode" aria-busy="true">
++    <div className="bld-sections-scroll">
++      <div className="bld-sections-family-header">Loading sections...</div>
++    </div>
++  </div>
++);
++
+ export interface BuildTabProps {
+   composer: Composer | null;
+   onBlockClick?: (data: BlockData) => void;
+@@ -35,38 +40,51 @@ export interface BuildTabProps {
+   onClose?: () => void;
+ }
+ 
+-export const BuildTab: React.FC<BuildTabProps> = ({ composer, onBlockClick }) => {
++export const BuildTab: React.FC<BuildTabProps> = ({
++  composer,
++  onBlockClick,
++  isPinned,
++  onPinToggle,
++  onClose,
++}) => {
+   const tab = useBuildTab(composer, onBlockClick);
+-  const callout = useCallout();
+   const isSearching = tab.searchQuery.trim().length > 0;
+ 
+-  // Global "/" shortcut: focus the Build tab search bar.
+-  React.useEffect(() => {
+-    const handler = (e: KeyboardEvent) => {
+-      if (e.key !== "/") return;
+-      const target = e.target as HTMLElement | null;
+-      if (!target) return;
+-      const tag = target.tagName;
+-      const inTypingContext =
+-        tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
+-      if (inTypingContext) return;
+-      const input = document.getElementById("bld-search-input") as HTMLInputElement | null;
+-      if (!input) return;
+-      e.preventDefault();
+-      input.focus();
+-      input.select();
+-    };
+-    document.addEventListener("keydown", handler);
+-    return () => document.removeEventListener("keydown", handler);
+-  }, []);
+-
+-  const blocksSubtitle = `${flatCatalog.length} blocks · ${CATALOG.length} categories`;
+-
+   return (
+-    <PanelShell className="bld-container">
+-      <PanelShell.Header title="Add" subtitle={blocksSubtitle} />
++    <div className="bld-container">
++      <PanelHeader title="Add" isPinned={isPinned} onPinToggle={onPinToggle} onClose={onClose} />
+ 
+       <div className="bld-content">
++        {/* 1. Mode Switch — top of panel per design (RzB6V, nTVi6, SDgR2)
++            Arrow keys, Home/End per §10.1 keyboard spec. */}
++        <div className="bld-mode-switch" role="tablist" aria-label="Add tab mode">
++          {(["elements", "sections"] as const).map((m) => (
++            <button
++              key={m}
++              className={`bld-mode-pill${tab.mode === m ? " bld-mode-pill--active" : ""}`}
++              onClick={() => tab.setMode(m)}
++              role="tab"
++              aria-selected={tab.mode === m}
++              tabIndex={tab.mode === m ? 0 : -1}
++              onKeyDown={(e) => {
++                if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
++                  e.preventDefault();
++                  tab.setMode(m === "elements" ? "sections" : "elements");
++                } else if (e.key === "Home") {
++                  e.preventDefault();
++                  tab.setMode("elements");
++                } else if (e.key === "End") {
++                  e.preventDefault();
++                  tab.setMode("sections");
++                }
++              }}
++            >
++              {m === "elements" ? "Elements" : "Sections"}
++            </button>
++          ))}
++        </div>
++
++        {/* 2. Search bar — Escape clears query */}
+         <div
+           className="bld-search-wrap"
+           onKeyDown={(e) => {
+@@ -77,66 +95,52 @@ export const BuildTab: React.FC<BuildTabProps> = ({ composer, onBlockClick }) =>
+           }}
+         >
+           <SearchBar
+-            id="bld-search-input"
+             value={tab.searchQuery}
+             onChange={tab.setSearchQuery}
+-            placeholder="Search blocks"
++            placeholder={tab.mode === "sections" ? "Search sections..." : "Search elements..."}
+             debounceMs={150}
+-            kbdHint="⌘K"
+           />
+         </div>
+ 
+-        {isSearching ? (
++        {/* 3. Scrollable content area — mode-aware:
++              - Sections mode ALWAYS renders SectionsMode (pass searchQuery so
++                it can filter sections inline when user types in the search bar).
++              - Elements mode: search renders SearchResults, else renders browse. */}
++        {tab.mode === "sections" ? (
++          <React.Suspense fallback={<SectionsFallback />}>
++            <SectionsMode composer={composer} searchQuery={tab.searchQuery} />
++          </React.Suspense>
++        ) : isSearching ? (
+           <div className="bld-scroll">
+             <SearchResults
+               query={tab.searchQuery}
+               groups={tab.searchResults}
+               onDragStart={tab.handleDragStart}
+               onElClick={tab.handleElClick}
+-              onClearSearch={() => tab.setSearchQuery("")}
+             />
+           </div>
+         ) : (
+-          <div className="bld-scroll">
+-            {callout.visible && <TransitionCallout />}
+-
+-            <MyComponents
+-              open={tab.myCompOpen}
+-              onToggle={() => tab.setMyCompOpen(!tab.myCompOpen)}
+-              composer={composer}
+-            />
+-
+-            <div className="bld-cats">
+-              {CATALOG.map((cat) => (
+-                <CatAccordion
+-                  key={cat.id}
+-                  cat={cat}
+-                  isOpen={tab.openCats.has(cat.id)}
+-                  onToggle={() => tab.toggleCat(cat.id)}
+-                  onDragStart={tab.handleDragStart}
+-                  onElClick={tab.handleElClick}
+-                />
+-              ))}
++          <>
++            {/* Category Browse — scrollable area */}
++            <div className="bld-cats-scroll">
++              <div className="bld-cats">
++                <div className="bld-sec-label">Browse</div>
++                {CATALOG.map((cat) => (
++                  <CatAccordion
++                    key={cat.id}
++                    cat={cat}
++                    isOpen={tab.openCats.has(cat.id)}
++                    onToggle={() => tab.toggleCat(cat.id)}
++                    onDragStart={tab.handleDragStart}
++                    onElClick={tab.handleElClick}
++                  />
++                ))}
++              </div>
+             </div>
+-          </div>
+-        )}
+-
+-        {!isSearching && (
+-          <div className="bld-panel-bottom">
+-            <TipsFooter
+-              tipIdx={tab.tipIdx}
+-              onPrev={tab.tipPrev}
+-              onNext={tab.tipNext}
+-              onDotClick={tab.tipSetAt}
+-              dismissed={tab.tipDismissed}
+-              onDismiss={tab.dismissTip}
+-              collapsed={tab.tipsCollapsed}
+-              onToggleCollapsed={tab.toggleTipsCollapsed}
+-            />
+-          </div>
++          </>
+         )}
+       </div>
+-    </PanelShell>
++    </div>
+   );
+ };
+ 
+diff --git a/packages/editor/src/editor/sidebar/tabs/media/__tests__/MediaTab.test.tsx b/packages/editor/src/editor/sidebar/tabs/media/__tests__/MediaTab.test.tsx
+index e57be9a4..08c885fd 100644
+--- a/packages/editor/src/editor/sidebar/tabs/media/__tests__/MediaTab.test.tsx
++++ b/packages/editor/src/editor/sidebar/tabs/media/__tests__/MediaTab.test.tsx
+@@ -68,7 +68,7 @@ describe("UploadZone", () => {
+         uploadQueue={[]}
+       />
+     );
+-    expect(screen.getByLabelText(/drop files or click to browse/i)).toBeTruthy();
++    expect(screen.getByLabelText(/drag files or click to browse/i)).toBeTruthy();
+   });
+ 
+   it("applies drag-active class on drag over", async () => {
