@@ -288,25 +288,63 @@ export function scanLegacyResiduals(root) {
   if (!existsSync(file)) return { category: 'legacyResiduals', violations: [] };
   const content = readFileSync(file, 'utf8');
   const lines = content.split('\n');
+  // Pre-compute which lines lie fully or partially inside a /* ... */ block
+  // (including the opening and closing lines). Used to (a) skip brace-counting
+  // inside JSDoc-style comments whose body contains literal { } characters,
+  // and (b) stop the backward selector walker from sweeping comment bodies.
+  const inCommentByLine = new Array(lines.length).fill(false);
+  let inBlockComment = false;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    let touchedComment = inBlockComment;
+    let scan = 0;
+    while (scan < line.length) {
+      if (!inBlockComment) {
+        const open = line.indexOf('/*', scan);
+        if (open === -1) break;
+        inBlockComment = true;
+        touchedComment = true;
+        scan = open + 2;
+      } else {
+        const close = line.indexOf('*/', scan);
+        if (close === -1) { scan = line.length; break; }
+        inBlockComment = false;
+        scan = close + 2;
+      }
+    }
+    inCommentByLine[i] = touchedComment;
+  }
   const violations = [];
   let depth = 0;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    // Skip brace counting on lines inside block comments — JSDoc bodies may
+    // contain literal { and } that would otherwise corrupt depth.
+    if (inCommentByLine[i]) continue;
     const opens = (line.match(/\{/g) || []).length;
     const closes = (line.match(/\}/g) || []).length;
     if (depth === 0 && opens > 0) {
       const currentSelectorPart = line.split('{')[0].trim();
       const selectorLines = currentSelectorPart ? [currentSelectorPart] : [];
+      let topLineIdx = i;
       let lineIdx = i - 1;
       while (lineIdx >= 0) {
         const prev = lines[lineIdx].trim();
         if (prev === '' || prev.startsWith('//')) { lineIdx--; continue; }
-        if (prev.endsWith('}') || prev.endsWith('*/') || prev.endsWith(';')) break;
+        if (
+          inCommentByLine[lineIdx] ||
+          prev.startsWith('*') ||
+          prev.startsWith('/*') ||
+          prev.endsWith('}') ||
+          prev.endsWith('*/') ||
+          prev.endsWith(';')
+        ) break;
         selectorLines.unshift(prev);
+        topLineIdx = lineIdx;
         lineIdx--;
       }
       const fullSelector = selectorLines.join(' ').replace(/\s*,\s*/g, ', ').trim();
-      const startLine = lineIdx + 2;
+      const startLine = topLineIdx + 1;
       if (fullSelector && !fullSelector.startsWith('@')) {
         violations.push({
           path: relative(root, file),

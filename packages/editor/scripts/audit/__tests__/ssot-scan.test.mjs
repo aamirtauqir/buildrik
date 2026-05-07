@@ -190,6 +190,43 @@ describe('scanLegacyResiduals', () => {
     expect(cat7.violations[0].message).toMatch(/\.foo.*\.bar/);
     rmSync(dir, { recursive: true, force: true });
   });
+
+  it('reports correct line number for selectors after blank-line gaps', () => {
+    const dir = makeFixture({
+      'src/themes/legacy-components.css': `.first {
+  color: red;
+}
+
+.gap-after-blank {
+  color: blue;
+}
+`,
+    });
+    const results = run(dir, ['--category=7']);
+    const cat7 = results.find((r) => r.category === 'legacyResiduals');
+    expect(cat7.violations).toHaveLength(2);
+    // .first is on line 1; .gap-after-blank is on line 5 (after } on line 3 + blank line 4)
+    expect(cat7.violations[1].line).toBe(5);
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('skips selectors inside JSDoc-style comments with embedded braces', () => {
+    const dir = makeFixture({
+      'src/themes/legacy-components.css': `/**
+ * Header doc with {curly} and {nested,things}.
+ */
+.real-selector {
+  color: red;
+}
+`,
+    });
+    const results = run(dir, ['--category=7']);
+    const cat7 = results.find((r) => r.category === 'legacyResiduals');
+    expect(cat7.violations).toHaveLength(1);
+    expect(cat7.violations[0].message).toMatch(/\.real-selector/);
+    expect(cat7.violations[0].message).not.toMatch(/Header doc/);
+    rmSync(dir, { recursive: true, force: true });
+  });
 });
 
 describe('scanDocDrift', () => {
