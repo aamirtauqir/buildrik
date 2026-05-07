@@ -320,6 +320,12 @@ Memory: 4 prior architecture attempts (V1 spec, V2 spec, axioms draft, editor-v2
 
 ### Cleanup history (live record)
 
+- **2026-05-09 — SSOT scanner hardening shipped**:
+  - Per audit Appendix #1-#4. Stripped /* */ comments before selector matching, anchored selectorDuplicates on right-most simple selector, added basename-symbol validation to componentDuplicates, walked barrel re-export chains in dead-export check.
+  - selectorDuplicates baseline ratchet: 11 → 4 (real concerns only — `bd-dragging`, `bd-depth-badge`, `bd-topbar`, `bd-topbar__brand` canonical chrome residuals).
+  - antiPatterns dead-export: ~3186 → 510 (~84% drop) after barrel-chain reachability.
+  - Gate retains ERROR-mode locks on cats 1, 2, 3. Cat 4 stays WARN with new lower baseline.
+  - Audit Appendix #5 (generalized doc-drift detector) remains documented limitation — manual review is SSOT.
 - **2026-05-08 — DS SSOT audit + fix arc shipped** (commits `8c0b1327`..Phase Final):
   - Phase 0: re-runnable scanner `scripts/audit/ssot-scan.mjs` (8 categories) + audit doc `docs/audits/2026-05-08-ds-ssot-audit.md`. 86 real fixable violations identified (62 Important, 24 Minor; 10 scanner false-positives confirmed).
   - Phase 1: CI gate `scripts/check-ds-ssot.mjs` wired to `pnpm run gate:ds-ssot` and `editor-ci.yml`. Pattern mirrors prior `gate:buildrick`.

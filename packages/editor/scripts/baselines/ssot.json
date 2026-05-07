@@ -16,80 +16,31 @@
     "violations": [
       {
         "path": "src/editor/canvas/Canvas.css",
+        "line": 278,
+        "severity": "important",
+        "message": "Selector \".bd-dragging\" defined in 2 files: src/editor/canvas/Canvas.css:278, src/themes/legacy-components.css:61",
+        "suggestion": "Consolidate to single tier CSS file or document layered override."
+      },
+      {
+        "path": "src/editor/canvas/Canvas.css",
         "line": 577,
         "severity": "important",
-        "message": "Selector \".bd-depth-badge\" defined in 2 files: src/editor/canvas/Canvas.css, src/themes/design-system/a11y.css",
-        "suggestion": "Pick canonical tier CSS; merge or rename if intentional namespace difference."
-      },
-      {
-        "path": "src/themes/components/_layer.css",
-        "line": 8,
-        "severity": "important",
-        "message": "Selector \".bd-btn\" defined in 2 files: src/themes/components/_layer.css, src/themes/components/atoms/button.css",
-        "suggestion": "Pick canonical tier CSS; merge or rename if intentional namespace difference."
-      },
-      {
-        "path": "src/themes/components/atoms/helper-text.css",
-        "line": 14,
-        "severity": "important",
-        "message": "Selector \".bd-helper-text\" defined in 2 files: src/themes/components/atoms/helper-text.css, src/themes/components/molecules/form-field.css",
-        "suggestion": "Pick canonical tier CSS; merge or rename if intentional namespace difference."
-      },
-      {
-        "path": "src/themes/components/atoms/icon-button.css",
-        "line": 14,
-        "severity": "important",
-        "message": "Selector \".bd-icon-btn\" defined in 2 files: src/themes/components/atoms/icon-button.css, src/themes/design-system/bd-topbar-overrides.css",
-        "suggestion": "Pick canonical tier CSS; merge or rename if intentional namespace difference."
-      },
-      {
-        "path": "src/themes/components/atoms/input.css",
-        "line": 60,
-        "severity": "important",
-        "message": "Selector \".bd-stepper\" defined in 2 files: src/themes/components/atoms/input.css, src/themes/components/molecules/form-field.css",
-        "suggestion": "Pick canonical tier CSS; merge or rename if intentional namespace difference."
-      },
-      {
-        "path": "src/themes/components/atoms/kbd.css",
-        "line": 8,
-        "severity": "important",
-        "message": "Selector \".bd-kbd\" defined in 2 files: src/themes/components/atoms/kbd.css, src/themes/components/organisms/rail.css",
-        "suggestion": "Pick canonical tier CSS; merge or rename if intentional namespace difference."
-      },
-      {
-        "path": "src/themes/components/atoms/label.css",
-        "line": 19,
-        "severity": "important",
-        "message": "Selector \".bd-label\" defined in 2 files: src/themes/components/atoms/label.css, src/themes/components/molecules/form-field.css",
-        "suggestion": "Pick canonical tier CSS; merge or rename if intentional namespace difference."
-      },
-      {
-        "path": "src/themes/components/atoms/spinner.css",
-        "line": 19,
-        "severity": "important",
-        "message": "Selector \".bd-status-dot\" defined in 2 files: src/themes/components/atoms/spinner.css, src/themes/components/molecules/tile-meta.css",
-        "suggestion": "Pick canonical tier CSS; merge or rename if intentional namespace difference."
-      },
-      {
-        "path": "src/themes/components/atoms/switch.css",
-        "line": 6,
-        "severity": "important",
-        "message": "Selector \".bd-switch\" defined in 2 files: src/themes/components/atoms/switch.css, src/themes/components/molecules/toggle-row.css",
-        "suggestion": "Pick canonical tier CSS; merge or rename if intentional namespace difference."
-      },
-      {
-        "path": "src/themes/components/molecules/list-row.css",
-        "line": 200,
-        "severity": "important",
-        "message": "Selector \".bd-list-row--unread\" defined in 2 files: src/themes/components/molecules/list-row.css, src/themes/components/organisms/notification-center.css",
-        "suggestion": "Pick canonical tier CSS; merge or rename if intentional namespace difference."
+        "message": "Selector \".bd-depth-badge\" defined in 2 files: src/editor/canvas/Canvas.css:577, src/themes/design-system/a11y.css:53",
+        "suggestion": "Consolidate to single tier CSS file or document layered override."
       },
       {
         "path": "src/themes/components/organisms/topbar.css",
         "line": 8,
         "severity": "important",
-        "message": "Selector \".bd-topbar\" defined in 2 files: src/themes/components/organisms/topbar.css, src/themes/design-system/bd-topbar-overrides.css",
-        "suggestion": "Pick canonical tier CSS; merge or rename if intentional namespace difference."
+        "message": "Selector \".bd-topbar\" defined in 2 files: src/themes/components/organisms/topbar.css:8, src/themes/design-system/bd-topbar-overrides.css:29",
+        "suggestion": "Consolidate to single tier CSS file or document layered override."
+      },
+      {
+        "path": "src/themes/components/organisms/topbar.css",
+        "line": 27,
+        "severity": "important",
+        "message": "Selector \".bd-topbar__brand\" defined in 2 files: src/themes/components/organisms/topbar.css:27, src/themes/design-system/bd-topbar-overrides.css:67",
+        "suggestion": "Consolidate to single tier CSS file or document layered override."
       }
     ]
   }
