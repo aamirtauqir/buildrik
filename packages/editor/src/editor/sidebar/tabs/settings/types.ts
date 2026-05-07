@@ -30,6 +30,8 @@ export interface ScreenProps {
   composer?: Composer | null;
   /** Called when the screen's unsaved-changes state changes — used by shell to show nav guard */
   onDirtyChange?: (isDirty: boolean) => void;
+  /** Site/project ID — required by screens that read server-side rows (Redirects, Forms, etc.) */
+  projectId?: string | null;
 }
 
 export interface BillingScreenProps {

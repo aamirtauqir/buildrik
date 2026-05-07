@@ -31,6 +31,7 @@ import {
   SeoScreen,
   IntegrationsHub,
   ComingSoonScreen,
+  RedirectsScreen,
   SettingsNavGuard,
 } from "./index";
 import "./settings.css";
@@ -258,11 +259,11 @@ export const SettingsTab: React.FC<
         return <AdvancedScreen composer={composer} onDirtyChange={handleScreenDirty} />;
       case "integrations":
         return <IntegrationsHub composer={composer} onDirtyChange={handleScreenDirty} />;
-      // A1 day-1 stubs — Phase B work
+      // A1 day-3 partial: Redirects is real; Localization/Headers/Forms still stubs.
       case "localization":
         return <ComingSoonScreen title="Localization" phase="Phase B" description="Locale claim with hierarchical fallback (e.g. fr-FR → fr → site default) and per-locale preview switcher." />;
       case "redirects":
-        return <ComingSoonScreen title="Redirects" phase="Phase B" description="301 (permanent) and 302 (temporary) redirects with 404-suggester surfacing broken inbound links." />;
+        return <RedirectsScreen projectId={projectId} onDirtyChange={handleScreenDirty} />;
       case "headers":
         return <ComingSoonScreen title="Headers / Security" phase="Phase B" description="CSP, HSTS, X-Frame-Options, password gate config. Headers applied at published-site middleware layer." />;
       case "forms":
