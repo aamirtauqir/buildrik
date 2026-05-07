@@ -169,7 +169,9 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
         slugManuallySet: p.slugManuallySet ?? false,
         slugHistory: p.slugHistory ?? [],
       })),
-      styles: ((site as { projectStyles?: unknown[] }).projectStyles ?? []) as ProjectData["styles"],
+      styles: (Array.isArray((site as { projectStyles?: unknown }).projectStyles)
+        ? (site as { projectStyles: unknown[] }).projectStyles
+        : []) as ProjectData["styles"],
       assets: [],
       settings: mergedSettings,
       dsSchemaVersion: (site as { dsSchemaVersion?: number }).dsSchemaVersion ?? 0,

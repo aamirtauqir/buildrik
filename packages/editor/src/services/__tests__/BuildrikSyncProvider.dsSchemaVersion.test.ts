@@ -26,13 +26,18 @@ describe("loadProject · projectStyles + dsSchemaVersion hydration", () => {
   });
 
   it("populates styles from server projectStyles, not []", async () => {
+    const validStyle = {
+      id: "color-x",
+      selector: ".class",
+      properties: { color: "#fff" },
+    };
     mocks.sitesGetQuery.mockResolvedValue({
       name: "test",
-      projectStyles: [{ id: "color-x", value: "#fff" }],
+      projectStyles: [validStyle],
       dsSchemaVersion: 0,
     });
     const data = await loadProject("site-1");
-    expect(data.styles).toEqual([{ id: "color-x", value: "#fff" }]);
+    expect(data.styles).toEqual([validStyle]);
   });
 
   it("populates dsSchemaVersion from server", async () => {
