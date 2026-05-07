@@ -21,12 +21,20 @@ const HOMES = ['src/editor/shared/vibcoder', 'src/shared/ui', 'src/shared/extens
 const PSEUDO_STATES = [':focus-visible', ':hover', ':active', ':focus', ':disabled'];
 
 function fileExportsSymbol(filePath, symbolName) {
-  const content = readFileSync(filePath, 'utf8');
-  // Match: export const|function|class <name>, export default <name>, export { <name> }
+  let content;
+  try {
+    content = readFileSync(filePath, 'utf8');
+  } catch {
+    return false;
+  }
+  // Three patterns matching common TS/TSX export shapes:
+  // 1. `export <kind> <name>` — const/function/class/let/var/interface/type/enum
+  // 2. `export default [async] [function|class] <name>`
+  // 3. `export { ..., <name>, ... }` (LOCAL block; re-export chains via `from` excluded)
   const patterns = [
-    new RegExp(`export\\s+(?:const|function|class|let|var)\\s+${symbolName}\\b`),
-    new RegExp(`export\\s+default\\s+(?:function\\s+)?${symbolName}\\b`),
-    new RegExp(`export\\s*\\{[^}]*\\b${symbolName}\\b[^}]*\\}`),
+    new RegExp(`export\\s+(?:const|function|class|let|var|interface|type|enum)\\s+${symbolName}\\b`),
+    new RegExp(`export\\s+default\\s+(?:async\\s+)?(?:function|class)?\\s*${symbolName}\\b`),
+    new RegExp(`export\\s*\\{[^}]*\\b${symbolName}\\b[^}]*\\}(?!\\s*from)`),
   ];
   return patterns.some((p) => p.test(content));
 }

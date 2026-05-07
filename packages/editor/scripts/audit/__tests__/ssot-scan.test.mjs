@@ -78,6 +78,40 @@ describe('scanComponentDuplicates', () => {
     expect(cat1.violations[0].message).toMatch(/Bar/);
     rmSync(dir, { recursive: true, force: true });
   });
+
+  it('does not flag basename collision when extension file re-exports primitive via from-chain', () => {
+    const dir = makeFixture({
+      'src/editor/shared/vibcoder/Foo.tsx': 'export const Foo = () => null;',
+      'src/shared/extensions/Foo.tsx': 'export { Foo } from "../../editor/shared/vibcoder/Foo";',
+    });
+    const results = run(dir, ['--category=1']);
+    const cat1 = results.find((r) => r.category === 'componentDuplicates');
+    expect(cat1.violations).toHaveLength(0);
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('flags basename collision when both files export type interface (not just runtime symbols)', () => {
+    const dir = makeFixture({
+      'src/editor/shared/vibcoder/Foo.tsx': 'export interface Foo { id: string }',
+      'src/shared/ui/Foo.tsx': 'export interface Foo { id: number }',
+    });
+    const results = run(dir, ['--category=1']);
+    const cat1 = results.find((r) => r.category === 'componentDuplicates');
+    expect(cat1.violations).toHaveLength(1);
+    expect(cat1.violations[0].message).toMatch(/Foo/);
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('flags basename collision when both use export default class form', () => {
+    const dir = makeFixture({
+      'src/editor/shared/vibcoder/Foo.tsx': 'export default class Foo {}',
+      'src/shared/ui/Foo.tsx': 'export default class Foo {}',
+    });
+    const results = run(dir, ['--category=1']);
+    const cat1 = results.find((r) => r.category === 'componentDuplicates');
+    expect(cat1.violations).toHaveLength(1);
+    rmSync(dir, { recursive: true, force: true });
+  });
 });
 
 describe('scanKeyframeDuplicates', () => {
