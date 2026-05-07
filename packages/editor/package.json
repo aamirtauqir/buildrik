@@ -15,6 +15,7 @@
     "lint:ds-hex": "node scripts/find-inline-hex-v2.mjs",
     "gate:buildrick": "node scripts/check-buildrick-baseline.mjs",
     "gate:ds-ssot": "node scripts/check-ds-ssot.mjs",
+    "gate:ds-migrations": "node scripts/check-ds-migrations.mjs",
     "lint": "eslint . --ext .ts,.tsx",
     "phase5:inventory": "node scripts/phase5-shim-inventory.mjs",
     "phase5:inventory:pretty": "node scripts/phase5-shim-inventory.mjs --pretty",
