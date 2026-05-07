@@ -1,6 +1,21 @@
 /**
- * useStudioModals - Hook for managing all modal states in AquibraStudio
- * Extracts modal visibility, context state, and handlers from AquibraStudio.tsx
+ * useStudioModals - Modal-state composer for AquibraStudio
+ *
+ * D4b Stage 1 (audit-remediation 2026-05-08): the 14 modals + their
+ * contexts that previously lived inline in this hook now live in
+ * three domain sub-hooks:
+ *
+ *   ./useGlobalModals.ts  — shortcuts, projectSettings, commandPalette
+ *   ./useContentModals.ts — templates, exporter, ai, copilot, mediaLibrary,
+ *                           imageEditor, iconPicker (8 with payloads)
+ *   ./useDomainModals.ts  — collectionSetup, createComponent,
+ *                           cmsCollectionSetup
+ *
+ * useStudioModals composes them and merges into the same flat
+ * `UseStudioModalsReturn` shape consumers already use. Zero external
+ * API change. Loading states (`previewLoading`, `exportLoading`)
+ * stay here since they're not modal-specific. The orchestrator-level
+ * `closeAll` fans out to each sub-hook's `resetAll`.
  *
  * @module Editor/hooks/useStudioModals
  * @license BSD-3-Clause
@@ -8,6 +23,9 @@
 
 import * as React from "react";
 import type { MediaAsset, MediaAssetType, IconConfig } from "../../../shared/types/media";
+import { useGlobalModals } from "./useGlobalModals";
+import { useContentModals } from "./useContentModals";
+import { useDomainModals } from "./useDomainModals";
 
 // ============================================
 // Context Types
@@ -162,262 +180,33 @@ export interface UseStudioModalsReturn {
  * Consolidates modal visibility, context, and handlers
  */
 export function useStudioModals(): UseStudioModalsReturn {
-  // Template modals
-  const [showTemplates, setShowTemplates] = React.useState(false);
-  const [showSaveTemplate, setShowSaveTemplate] = React.useState(false);
+  // Three domain sub-hooks own their state machinery; this composer
+  // merges their flat returns into the public `UseStudioModalsReturn`.
+  const global = useGlobalModals();
+  const content = useContentModals();
+  const domain = useDomainModals();
 
-  // Export modal
-  const [showExporter, setShowExporter] = React.useState(false);
-
-  // AI modals
-  const [showAI, setShowAI] = React.useState(false);
-  const [aiContext, setAIContext] = React.useState<AIContext | null>(null);
-  const [showCopilot, setShowCopilot] = React.useState(false);
-
-  // Shortcuts modal
-  const [showShortcuts, setShowShortcuts] = React.useState(false);
-
-  // Media modal states
-  const [showMediaLibrary, setShowMediaLibrary] = React.useState(false);
-  const [mediaLibraryContext, setMediaLibraryContext] = React.useState<MediaLibraryContext | null>(
-    null
-  );
-  const [showImageEditor, setShowImageEditor] = React.useState(false);
-  const [imageEditorContext, setImageEditorContext] = React.useState<ImageEditorContext | null>(
-    null
-  );
-  const [showIconPicker, setShowIconPicker] = React.useState(false);
-  const [iconPickerContext, setIconPickerContext] = React.useState<IconPickerContext | null>(null);
-
-  // Collection Setup modal state (e-commerce)
-  const [showCollectionSetup, setShowCollectionSetup] = React.useState(false);
-  const [collectionSetupContext, setCollectionSetupContext] =
-    React.useState<CollectionSetupContext | null>(null);
-
-  // Create Component modal state
-  const [showCreateComponent, setShowCreateComponent] = React.useState(false);
-  const [createComponentContext, setCreateComponentContext] =
-    React.useState<CreateComponentContext | null>(null);
-
-  // Project Settings modal state
-  const [showProjectSettings, setShowProjectSettings] = React.useState(false);
-
-  // CMS Collection Setup modal state (WS-14a)
-  const [showCMSCollectionSetup, setShowCMSCollectionSetup] = React.useState(false);
-
-  // Command Palette modal state
-  const [showCommandPalette, setShowCommandPalette] = React.useState(false);
-
-  // Loading states
+  // Loading states are studio-wide, not modal-specific. Stay here.
   const [previewLoading, setPreviewLoading] = React.useState(false);
   const [exportLoading, setExportLoading] = React.useState(false);
 
-  // Template handlers
-  const openTemplates = React.useCallback(() => setShowTemplates(true), []);
-  const closeTemplates = React.useCallback(() => setShowTemplates(false), []);
-  const openSaveTemplate = React.useCallback(() => setShowSaveTemplate(true), []);
-  const closeSaveTemplate = React.useCallback(() => setShowSaveTemplate(false), []);
-
-  // Export handlers
-  const openExporter = React.useCallback(() => setShowExporter(true), []);
-  const closeExporter = React.useCallback(() => setShowExporter(false), []);
-
-  // AI handlers
-  const openAI = React.useCallback((context?: AIContext) => {
-    setAIContext(context || null);
-    setShowAI(true);
-  }, []);
-
-  const closeAI = React.useCallback(() => {
-    setShowAI(false);
-    setAIContext(null);
-  }, []);
-
-  const openCopilot = React.useCallback(() => setShowCopilot(true), []);
-  const closeCopilot = React.useCallback(() => setShowCopilot(false), []);
-
-  // Shortcuts handlers
-  const toggleShortcuts = React.useCallback(() => {
-    setShowShortcuts((prev) => !prev);
-  }, []);
-  const closeShortcuts = React.useCallback(() => setShowShortcuts(false), []);
-
-  // Media Library handlers
-  const openMediaLibrary = React.useCallback(
-    (allowedTypes: MediaAssetType[], onSelect: (asset: MediaAsset) => void) => {
-      setMediaLibraryContext({ allowedTypes, onSelect });
-      setShowMediaLibrary(true);
-    },
-    []
-  );
-
-  const closeMediaLibrary = React.useCallback(() => {
-    setShowMediaLibrary(false);
-    setMediaLibraryContext(null);
-  }, []);
-
-  // Image Editor handlers
-  const openImageEditor = React.useCallback(
-    (imageSrc: string, onSave: (editedSrc: string) => void | Promise<void>) => {
-      setImageEditorContext({ imageSrc, onSave });
-      setShowImageEditor(true);
-    },
-    []
-  );
-
-  const closeImageEditor = React.useCallback(() => {
-    setShowImageEditor(false);
-    setImageEditorContext(null);
-  }, []);
-
-  // Icon Picker handlers
-  const openIconPicker = React.useCallback(
-    (currentIcon: IconConfig | undefined, onSelect: (icon: IconConfig) => void) => {
-      setIconPickerContext({ onSelect, currentIcon });
-      setShowIconPicker(true);
-    },
-    []
-  );
-
-  const closeIconPicker = React.useCallback(() => {
-    setShowIconPicker(false);
-    setIconPickerContext(null);
-  }, []);
-
-  // Collection Setup handlers
-  const openCollectionSetup = React.useCallback(
-    (onConfirm: (includeSampleData: boolean) => Promise<void>) => {
-      setCollectionSetupContext({ onConfirm });
-      setShowCollectionSetup(true);
-    },
-    []
-  );
-
-  const closeCollectionSetup = React.useCallback(() => {
-    setShowCollectionSetup(false);
-    setCollectionSetupContext(null);
-  }, []);
-
-  // Create Component handlers
-  const openCreateComponent = React.useCallback((elementId: string) => {
-    setCreateComponentContext({ elementId });
-    setShowCreateComponent(true);
-  }, []);
-
-  const closeCreateComponent = React.useCallback(() => {
-    setShowCreateComponent(false);
-    setCreateComponentContext(null);
-  }, []);
-
-  // Project Settings handlers
-  const openProjectSettings = React.useCallback(() => setShowProjectSettings(true), []);
-  const closeProjectSettings = React.useCallback(() => setShowProjectSettings(false), []);
-
-  // CMS Collection Setup handlers (WS-14a)
-  const openCMSCollectionSetup = React.useCallback(() => setShowCMSCollectionSetup(true), []);
-  const closeCMSCollectionSetup = React.useCallback(() => setShowCMSCollectionSetup(false), []);
-
-  // Command Palette handlers
-  const openCommandPalette = React.useCallback(() => setShowCommandPalette(true), []);
-  const closeCommandPalette = React.useCallback(() => setShowCommandPalette(false), []);
-
-  // Close all modals
+  // Cross-cutting: fan out closeAll to every sub-hook.
   const closeAll = React.useCallback(() => {
-    setShowTemplates(false);
-    setShowSaveTemplate(false);
-    setShowExporter(false);
-    setShowAI(false);
-    setAIContext(null);
-    setShowCopilot(false);
-    setShowShortcuts(false);
-    setShowMediaLibrary(false);
-    setMediaLibraryContext(null);
-    setShowImageEditor(false);
-    setImageEditorContext(null);
-    setShowIconPicker(false);
-    setIconPickerContext(null);
-    setShowCollectionSetup(false);
-    setCollectionSetupContext(null);
-    setShowCreateComponent(false);
-    setCreateComponentContext(null);
-    setShowProjectSettings(false);
-    setShowCMSCollectionSetup(false);
-    setShowCommandPalette(false);
-  }, []);
+    global.closeShortcuts();
+    global.closeProjectSettings();
+    global.closeCommandPalette();
+    content.resetContentModals();
+    domain.resetDomainModals();
+  }, [global, content, domain]);
 
   return {
-    // Template modals
-    showTemplates,
-    setShowTemplates,
-    showSaveTemplate,
-    setShowSaveTemplate,
-    openTemplates,
-    closeTemplates,
-    openSaveTemplate,
-    closeSaveTemplate,
-    // Export modal
-    showExporter,
-    setShowExporter,
-    openExporter,
-    closeExporter,
-    // AI modals
-    showAI,
-    setShowAI,
-    aiContext,
-    openAI,
-    closeAI,
-    showCopilot,
-    setShowCopilot,
-    openCopilot,
-    closeCopilot,
-    // Shortcuts modal
-    showShortcuts,
-    setShowShortcuts,
-    toggleShortcuts,
-    closeShortcuts,
-    // Media Library
-    showMediaLibrary,
-    mediaLibraryContext,
-    openMediaLibrary,
-    closeMediaLibrary,
-    // Image Editor
-    showImageEditor,
-    imageEditorContext,
-    openImageEditor,
-    closeImageEditor,
-    // Icon Picker
-    showIconPicker,
-    iconPickerContext,
-    openIconPicker,
-    closeIconPicker,
-    // Collection Setup (e-commerce)
-    showCollectionSetup,
-    collectionSetupContext,
-    openCollectionSetup,
-    closeCollectionSetup,
-    // Create Component
-    showCreateComponent,
-    createComponentContext,
-    openCreateComponent,
-    closeCreateComponent,
-    // Project Settings
-    showProjectSettings,
-    openProjectSettings,
-    closeProjectSettings,
-    // CMS Collection Setup (WS-14a)
-    showCMSCollectionSetup,
-    openCMSCollectionSetup,
-    closeCMSCollectionSetup,
-    // Command Palette
-    showCommandPalette,
-    openCommandPalette,
-    closeCommandPalette,
-    // Loading states
+    ...content,
+    ...domain,
+    ...global,
     previewLoading,
     setPreviewLoading,
     exportLoading,
     setExportLoading,
-    // Utility
     closeAll,
   };
 }
