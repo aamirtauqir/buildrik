@@ -32,6 +32,7 @@ import {
   IntegrationsHub,
   ComingSoonScreen,
   RedirectsScreen,
+  FormsScreen,
   SettingsNavGuard,
 } from "./index";
 import "./settings.css";
@@ -267,7 +268,7 @@ export const SettingsTab: React.FC<
       case "headers":
         return <ComingSoonScreen title="Headers / Security" phase="Phase B" description="CSP, HSTS, X-Frame-Options, password gate config. Headers applied at published-site middleware layer." />;
       case "forms":
-        return <ComingSoonScreen title="Forms" phase="Phase B" description="Form submissions inbox with cursor pagination, spam scoring, bulk actions, mail handoff for replies." />;
+        return <FormsScreen projectId={projectId} onDirtyChange={handleScreenDirty} />;
       default:
         return null;
     }
