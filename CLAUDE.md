@@ -108,6 +108,7 @@ Prefer `app/auth/login/page.tsx` over `app/auth/flows/credential/login/page.tsx`
 - Don't create utility files with one function.
 - Don't add error handling for scenarios that can't happen.
 - Don't use `any`. Don't use `as` unless truly necessary.
+- Don't `git stash` mid-execution to verify baselines. Read baseline state BEFORE making changes, OR use `git worktree add` for a sibling tree. (5 cumulative recovery incidents — see memory `feedback_no_stash_mid_execution`.)
 
 ## Design System
 
