@@ -200,7 +200,7 @@ export function useCanvasDragDrop({
         visuals.clearAllIndicators();
         clearDropAffordance();
         autoScroll.stopCurrentAutoScroll();
-        composer?.drag?.cancel("Left canvas");
+        composer?.canvas.drag?.cancel("Left canvas");
       }
     },
     [composer, resetSession, visuals, autoScroll, clearDropAffordance]
@@ -236,7 +236,7 @@ export function useCanvasDragDrop({
       clearDropAffordance();
       resetSession();
       autoScroll.stopCurrentAutoScroll();
-      composer?.drag?.cancel("Global dragend");
+      composer?.canvas.drag?.cancel("Global dragend");
     };
 
     document.addEventListener("dragend", handleGlobalDragEnd);

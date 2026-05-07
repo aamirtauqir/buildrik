@@ -82,13 +82,14 @@ export class Composer extends EventEmitter {
   // Style clipboard for copy/paste styles only
   styleClipboard: Record<string, string> | null = null;
 
-  // Core managers
+  // Core managers — flat fields (kept flat per Option B-tight: high-traffic
+  // hot paths like history/media/elements/styles all stay top-level).
   readonly elements: ElementManager;
   readonly styles: StyleEngine;
   readonly commands!: CommandCenter;
   readonly selection!: SelectionManager;
   readonly history!: HistoryManager;
-  readonly versionHistory!: VersionTimelineManager;
+  readonly versions!: VersionTimelineManager;
   readonly storage!: StorageAdapter;
   readonly viewport!: Viewport;
   readonly plugins!: PluginManager;
@@ -98,21 +99,33 @@ export class Composer extends EventEmitter {
   readonly traitBindings!: TraitDataBinding;
   readonly textBindings!: TextDataBinding;
   readonly templates!: TemplateManager;
-  readonly canvasIndicators!: CanvasIndicators;
-  readonly resizeHandler!: ResizeHandler;
   readonly fonts!: FontManager;
   readonly components!: ComponentManager;
-  readonly cmsManager!: CollectionManager;
-  readonly cmsBindings!: CMSBindingManager;
-  readonly collaboration!: CollaborationManager;
   readonly media!: MediaManager;
-  readonly mediaCommands!: MediaCommandLayer;
+  readonly mediaOps!: MediaCommandLayer;
   readonly forms!: FormHandler;
-  readonly sync!: SyncManager;
   readonly router!: PageRouter;
   readonly recovery!: RecoveryManager;
-  readonly interactions!: InteractionManager;
-  readonly drag!: DragManager;
+
+  // Facade groupings — D3 Stage 1 (Option B-tight). Three clusters where
+  // ≥2 managers share a domain:
+  //   cms.{collections, bindings}
+  //   collab.{manager, sync}
+  //   canvas.{indicators, resize, drag, interactions}
+  readonly cms!: {
+    readonly collections: CollectionManager;
+    readonly bindings: CMSBindingManager;
+  };
+  readonly collab!: {
+    readonly manager: CollaborationManager;
+    readonly sync: SyncManager;
+  };
+  readonly canvas!: {
+    readonly indicators: CanvasIndicators;
+    readonly resize: ResizeHandler;
+    readonly drag: DragManager;
+    readonly interactions: InteractionManager;
+  };
 
   constructor(config: ComposerConfig) {
     super();
@@ -129,7 +142,7 @@ export class Composer extends EventEmitter {
     this.commands = new CommandCenter(this);
     this.selection = new SelectionManager(this);
     this.history = new HistoryManager(this);
-    this.versionHistory = new VersionTimelineManager(this);
+    this.versions = new VersionTimelineManager(this);
     this.storage = new StorageAdapter(this, this.config.storage);
     this.viewport = new Viewport(this);
     this.plugins = new PluginManager(this);
@@ -139,47 +152,56 @@ export class Composer extends EventEmitter {
     this.traitBindings = new TraitDataBinding(this);
     this.textBindings = new TextDataBinding(this);
     this.templates = new TemplateManager(this);
-    this.canvasIndicators = new CanvasIndicators(this);
-    this.resizeHandler = new ResizeHandler(this);
     this.fonts = new FontManager(this);
     this.components = new ComponentManager(this);
-    this.cmsManager = new CollectionManager();
-    this.cmsBindings = new CMSBindingManager(this, this.cmsManager);
-    this.collaboration = new CollaborationManager(this);
     this.media = new MediaManager();
-    this.mediaCommands = new MediaCommandLayer(this);
+    this.mediaOps = new MediaCommandLayer(this);
     this.forms = new FormHandler(this);
-    this.sync = new SyncManager(this);
     this.router = new PageRouter();
     this.recovery = new RecoveryManager(this);
-    this.interactions = new InteractionManager(this);
-    this.drag = new DragManager(this);
+
+    // Facade groupings — D3 Stage 1.
+    const cmsCollections = new CollectionManager();
+    this.cms = {
+      collections: cmsCollections,
+      bindings: new CMSBindingManager(this, cmsCollections),
+    };
+    this.collab = {
+      manager: new CollaborationManager(this),
+      sync: new SyncManager(this),
+    };
+    this.canvas = {
+      indicators: new CanvasIndicators(this),
+      resize: new ResizeHandler(this),
+      drag: new DragManager(this),
+      interactions: new InteractionManager(this),
+    };
 
     const operationApplyHandler = (patch: Patch) => {
       this.history.applyRemoteOperation(patch);
     };
     this.collaborationHandlers.add(operationApplyHandler);
-    this.collaboration.on("operation:apply", operationApplyHandler);
+    this.collab.manager.on("operation:apply", operationApplyHandler);
 
     const elementSelectedHandler = (element: import("./elements/Element").Element | null) => {
-      if (this.collaboration.isConnected()) {
-        this.collaboration.updateSelection(element ? [element.getId()] : []);
+      if (this.collab.manager.isConnected()) {
+        this.collab.manager.updateSelection(element ? [element.getId()] : []);
       }
     };
     this.selectionHandlers.add(elementSelectedHandler);
     this.on("element:selected", elementSelectedHandler);
 
     const selectionMultipleHandler = (elements: import("./elements/Element").Element[]) => {
-      if (this.collaboration.isConnected()) {
-        this.collaboration.updateSelection(elements.map((el) => el.getId()));
+      if (this.collab.manager.isConnected()) {
+        this.collab.manager.updateSelection(elements.map((el) => el.getId()));
       }
     };
     this.selectionHandlers.add(selectionMultipleHandler);
     this.on("selection:multiple", selectionMultipleHandler);
 
     const selectionClearedHandler = () => {
-      if (this.collaboration.isConnected()) {
-        this.collaboration.updateSelection([]);
+      if (this.collab.manager.isConnected()) {
+        this.collab.manager.updateSelection([]);
       }
     };
     this.selectionHandlers.add(selectionClearedHandler);
@@ -199,7 +221,7 @@ export class Composer extends EventEmitter {
 
     // Initialize async managers
     await this.media.init();
-    await this.sync.init();
+    await this.collab.sync.init();
 
     // Load project if configured
     if (this.config.project?.autoLoad) {
@@ -667,9 +689,9 @@ ${html}
     this.state.isPreviewMode = enabled;
 
     if (enabled) {
-      this.interactions.startRuntime();
+      this.canvas.interactions.startRuntime();
     } else {
-      this.interactions.stopRuntime();
+      this.canvas.interactions.stopRuntime();
     }
 
     this.emit(EVENTS.PREVIEW_MODE_CHANGED, { enabled });
@@ -696,28 +718,28 @@ ${html}
     if (this.styleBindings?.destroy) this.styleBindings.destroy();
     if (this.traitBindings?.destroy) this.traitBindings.destroy();
     if (this.templates?.destroy) this.templates.destroy();
-    if (this.canvasIndicators?.destroy) this.canvasIndicators.destroy();
+    if (this.canvas.indicators?.destroy) this.canvas.indicators.destroy();
     if (this.fonts?.destroy) this.fonts.destroy();
     if (this.components?.destroy) this.components.destroy();
-    if (this.cmsBindings?.destroy) this.cmsBindings.destroy();
-    if (this.collaboration?.destroy) this.collaboration.destroy();
+    if (this.cms.bindings?.destroy) this.cms.bindings.destroy();
+    if (this.collab.manager?.destroy) this.collab.manager.destroy();
     if (this.forms?.destroy) this.forms.destroy();
-    if (this.sync?.destroy) this.sync.destroy();
+    if (this.collab.sync?.destroy) this.collab.sync.destroy();
     if (this.recovery?.destroy) this.recovery.destroy();
-    if (this.drag?.destroy) this.drag.destroy();
+    if (this.canvas.drag?.destroy) this.canvas.drag.destroy();
     if (this.router?.clear) this.router.clear();
     if (this.elements?.destroy) this.elements.destroy();
     if (this.styles?.destroy) this.styles.destroy();
     if (this.commands?.destroy) this.commands.destroy();
     if (this.selection?.destroy) this.selection.destroy();
     if (this.history?.destroy) this.history.destroy();
-    if (this.versionHistory?.destroy) this.versionHistory.destroy();
+    if (this.versions?.destroy) this.versions.destroy();
     if (this.storage?.destroy) this.storage.destroy();
     if (this.viewport?.destroy) this.viewport.destroy();
 
     // Remove individually tracked handlers before global teardown
     for (const handler of this.collaborationHandlers) {
-      this.collaboration.off("operation:apply", handler);
+      this.collab.manager.off("operation:apply", handler);
     }
     this.collaborationHandlers.clear();
 

@@ -215,7 +215,7 @@ export function useTouchDrag({
           }
 
           // Calculate snap lines
-          if (showGuides && composer?.canvasIndicators && canvas && elementId) {
+          if (showGuides && composer?.canvas.indicators && canvas && elementId) {
             const draggableEl = canvas.querySelector(
               `[data-buildrick-id="${elementId}"]`
             ) as HTMLElement | null;
@@ -223,7 +223,7 @@ export function useTouchDrag({
               const canvasRect = canvas.getBoundingClientRect();
               const elementRect = draggableEl.getBoundingClientRect();
 
-              const smartGuides = composer.canvasIndicators.calculateSmartGuides(elementId, {
+              const smartGuides = composer.canvas.indicators.calculateSmartGuides(elementId, {
                 x: elementRect.left - canvasRect.left,
                 y: elementRect.top - canvasRect.top,
                 width: elementRect.width,

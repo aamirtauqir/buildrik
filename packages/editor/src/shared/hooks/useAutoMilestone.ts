@@ -149,11 +149,11 @@ export function useAutoMilestone(
 
   const autoCheckpointCountRef = React.useRef(0);
 
-  const isAvailable = composer?.versionHistory?.isAvailable() ?? false;
+  const isAvailable = composer?.versions?.isAvailable() ?? false;
 
   const requestSuggestion = React.useCallback(
     async (trigger: MilestoneSuggestion["trigger"]) => {
-      if (!composer?.versionHistory || !isAvailable) return;
+      if (!composer?.versions || !isAvailable) return;
 
       // Rate limit: don't suggest if shown in last 30s
       if (Date.now() - lastSuggestionTime < SUGGESTION_COOLDOWN_MS) return;
@@ -259,9 +259,9 @@ export function useAutoMilestone(
 
   const accept = React.useCallback(
     async (name: string | null) => {
-      if (!composer?.versionHistory || !suggestion) return;
+      if (!composer?.versions || !suggestion) return;
       const versionName = name ?? suggestion.suggestedName;
-      await composer.versionHistory.createVersion(versionName);
+      await composer.versions.createVersion(versionName);
       setSuggestion(null);
     },
     [composer, suggestion]

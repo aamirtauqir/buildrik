@@ -36,13 +36,13 @@ export function useSyncStatus(composer: Composer | null): UseSyncStatusResult {
 
   // Subscribe to sync manager state changes
   React.useEffect(() => {
-    if (!composer?.sync) return;
+    if (!composer?.collab.sync) return;
 
     // Get initial state
-    setManagerState(composer.sync.getState());
+    setManagerState(composer.collab.sync.getState());
 
     // Subscribe to state changes
-    const unsubscribe = composer.sync.onStateChange((state) => {
+    const unsubscribe = composer.collab.sync.onStateChange((state) => {
       setManagerState(state);
     });
 
@@ -53,11 +53,11 @@ export function useSyncStatus(composer: Composer | null): UseSyncStatusResult {
 
   // Poll sync status periodically (status comes from cloud service)
   React.useEffect(() => {
-    if (!composer?.sync) return;
+    if (!composer?.collab.sync) return;
 
     const updateStatus = () => {
       try {
-        const syncStatus = composer.sync.getSyncStatus();
+        const syncStatus = composer.collab.sync.getSyncStatus();
         if (syncStatus) {
           setStatus(syncStatus);
         }
@@ -74,9 +74,9 @@ export function useSyncStatus(composer: Composer | null): UseSyncStatusResult {
 
   // Sync callback
   const sync = React.useCallback(async () => {
-    if (!composer?.sync) return;
+    if (!composer?.collab.sync) return;
     try {
-      await composer.sync.syncCurrentProject();
+      await composer.collab.sync.syncCurrentProject();
     } catch {
       // Sync failed - handled by status
     }

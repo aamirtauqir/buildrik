@@ -63,7 +63,7 @@ export function useDragSnapGuides({
 
   const calculate = React.useCallback(
     (e: React.DragEvent, now: number) => {
-      if (!composer?.canvasIndicators || !showGuides || !canvasRef.current || !draggingElementId) {
+      if (!composer?.canvas.indicators || !showGuides || !canvasRef.current || !draggingElementId) {
         onSnapLinesChangeRef.current([]);
         lastSnapCalcRef.current = now;
         return;
@@ -101,7 +101,7 @@ export function useDragSnapGuides({
           );
           if (snapResult.snapLines) lines.push(...snapResult.snapLines);
         } else {
-          const smartGuides = composer.canvasIndicators.calculateSmartGuides(
+          const smartGuides = composer.canvas.indicators.calculateSmartGuides(
             draggingElementId,
             draggedBounds,
           );
@@ -116,7 +116,7 @@ export function useDragSnapGuides({
         }
       }
 
-      const snapPoints = composer.canvasIndicators.calculateSnapPoints(draggingElementId) || [];
+      const snapPoints = composer.canvas.indicators.calculateSnapPoints(draggingElementId) || [];
       snapPoints.forEach((pt: SnapPoint) => {
         if (pt.axis === "vertical" && Math.abs(localX - pt.position) <= SNAP_THRESHOLD) {
           if (

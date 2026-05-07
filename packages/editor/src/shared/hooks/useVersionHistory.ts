@@ -35,17 +35,17 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
   const [versions, setVersions] = React.useState<NamedVersion[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
-  const isAvailable = composer?.versionHistory?.isAvailable() ?? false;
+  const isAvailable = composer?.versions?.isAvailable() ?? false;
 
   React.useEffect(() => {
-    if (!composer?.versionHistory) {
+    if (!composer?.versions) {
       setVersions([]);
       setIsLoading(false);
       return;
     }
 
     const loadVersions = () => {
-      setVersions(composer.versionHistory.getVersions());
+      setVersions(composer.versions.getVersions());
       setIsLoading(false);
     };
 
@@ -62,24 +62,24 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
 
   const createVersion = React.useCallback(
     async (name: string, description?: string) => {
-      if (!composer?.versionHistory) return;
-      await composer.versionHistory.createVersion(name, description);
+      if (!composer?.versions) return;
+      await composer.versions.createVersion(name, description);
     },
     [composer]
   );
 
   const restoreVersion = React.useCallback(
     async (id: string) => {
-      if (!composer?.versionHistory) return;
-      await composer.versionHistory.restoreVersion(id);
+      if (!composer?.versions) return;
+      await composer.versions.restoreVersion(id);
     },
     [composer]
   );
 
   const deleteVersion = React.useCallback(
     async (id: string) => {
-      if (!composer?.versionHistory) return;
-      await composer.versionHistory.deleteVersion(id);
+      if (!composer?.versions) return;
+      await composer.versions.deleteVersion(id);
     },
     [composer]
   );
@@ -93,16 +93,16 @@ export function useVersionHistory(composer: Composer | null): UseVersionHistoryR
 
   const compareVersions = React.useCallback(
     async (currentId: string, targetId: string): Promise<CompareResult | null> => {
-      if (!composer?.versionHistory) return null;
-      return composer.versionHistory.compareVersions(currentId, targetId);
+      if (!composer?.versions) return null;
+      return composer.versions.compareVersions(currentId, targetId);
     },
     [composer]
   );
 
   const updateAiSummary = React.useCallback(
     async (versionId: string, summary: string) => {
-      if (!composer?.versionHistory) return;
-      await composer.versionHistory.updateVersion(versionId, { aiSummary: summary });
+      if (!composer?.versions) return;
+      await composer.versions.updateVersion(versionId, { aiSummary: summary });
     },
     [composer]
   );

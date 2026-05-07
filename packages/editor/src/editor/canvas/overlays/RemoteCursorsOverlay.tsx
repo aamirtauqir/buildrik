@@ -113,9 +113,9 @@ export const RemoteCursorsOverlay: React.FC<RemoteCursorsOverlayProps> = ({
   const [cursors, setCursors] = useState<RemoteCursor[]>([]);
 
   useEffect(() => {
-    if (!composer?.collaboration) return;
+    if (!composer?.collab.manager) return;
 
-    const collab = composer.collaboration;
+    const collab = composer.collab.manager;
     const currentUserId = collab.getCurrentUser()?.id;
 
     const handleCursorUpdate = ({

@@ -295,8 +295,8 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         Boolean: "boolean",
       };
 
-      if (composer?.cmsManager?.createCollection) {
-        const collection = await composer.cmsManager.createCollection(
+      if (composer?.cms.collections?.createCollection) {
+        const collection = await composer.cms.collections.createCollection(
           name.trim(),
           undefined,
           description.trim() || undefined
@@ -305,7 +305,7 @@ export const CMSCollectionSetupModal: React.FC<CMSCollectionSetupModalProps> = (
         // Add fields (skip title which may be auto-created)
         for (const field of fields) {
           if (!field.name.trim()) continue;
-          await composer.cmsManager.addField(collection.id, {
+          await composer.cms.collections.addField(collection.id, {
             name: field.name.trim(),
             slug: field.name.trim().toLowerCase().replace(/\s+/g, "_"),
             type: typeMap[field.type] as import("../../../shared/types/cms").CMSFieldType,

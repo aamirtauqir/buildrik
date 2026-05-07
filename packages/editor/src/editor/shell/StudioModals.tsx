@@ -176,14 +176,14 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
   const [activeConflict, setActiveConflict] = React.useState<SyncConflict | null>(null);
 
   React.useEffect(() => {
-    if (!composer?.sync) return;
+    if (!composer?.collab.sync) return;
 
     // Set initial state
-    const state = composer.sync.getState();
+    const state = composer.collab.sync.getState();
     setActiveConflict(state.activeConflict);
 
     // Subscribe to state changes
-    const unsubscribe = composer.sync.onStateChange((newState: SyncManagerState) => {
+    const unsubscribe = composer.collab.sync.onStateChange((newState: SyncManagerState) => {
       setActiveConflict(newState.activeConflict);
     });
 
@@ -193,8 +193,8 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
   // Handle conflict resolution
   const handleResolveConflict = React.useCallback(
     (resolution: ConflictResolution) => {
-      if (!composer?.sync || !activeConflict) return;
-      composer.sync.resolveConflict(resolution);
+      if (!composer?.collab.sync || !activeConflict) return;
+      composer.collab.sync.resolveConflict(resolution);
       setActiveConflict(null);
     },
     [composer, activeConflict]

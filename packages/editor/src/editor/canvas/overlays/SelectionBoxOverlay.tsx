@@ -71,8 +71,8 @@ const SelectionBoxOverlayComponent: React.FC<SelectionBoxOverlayProps> = ({
 
   // Check if element has CMS bindings
   const hasCMSBindings = React.useMemo(() => {
-    if (!composer?.cmsBindings || !elementId) return false;
-    return composer.cmsBindings.getBindings(elementId).length > 0;
+    if (!composer?.cms.bindings || !elementId) return false;
+    return composer.cms.bindings.getBindings(elementId).length > 0;
   }, [composer, elementId]);
 
   // Check if element is locked — subscribes to element:updated to stay reactive

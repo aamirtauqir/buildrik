@@ -47,7 +47,7 @@ export class CMSExportResolver {
    * Resolve with actual CMS content values (static mode)
    */
   private async resolveStatic(html: string): Promise<string> {
-    if (!this.composer.cmsBindings) return html;
+    if (!this.composer.cms.bindings) return html;
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
@@ -58,9 +58,9 @@ export class CMSExportResolver {
       const elementId = el.getAttribute("data-buildrick-id");
       if (!elementId) return;
 
-      const bindings = this.composer.cmsBindings.getBindings(elementId);
+      const bindings = this.composer.cms.bindings.getBindings(elementId);
       bindings.forEach((binding) => {
-        const promise = this.composer.cmsBindings.resolveBinding(binding).then((value) => {
+        const promise = this.composer.cms.bindings.resolveBinding(binding).then((value) => {
           if (!value) return;
           this.applyValue(el as HTMLElement, binding.property, value);
         });
@@ -84,7 +84,7 @@ export class CMSExportResolver {
    * Convert to template syntax (template mode)
    */
   private resolveTemplate(html: string, syntax: TemplateSyntax): string {
-    if (!this.composer.cmsBindings) return html;
+    if (!this.composer.cms.bindings) return html;
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
@@ -94,14 +94,14 @@ export class CMSExportResolver {
       const elementId = el.getAttribute("data-buildrick-id");
       if (!elementId) return;
 
-      const bindings = this.composer.cmsBindings.getBindings(elementId);
+      const bindings = this.composer.cms.bindings.getBindings(elementId);
       bindings.forEach((binding) => {
         const templateVar = this.createTemplateVar(binding.collectionId, binding.fieldSlug, syntax);
         this.applyValue(el as HTMLElement, binding.property, templateVar);
       });
 
       // Handle collection bindings (repeaters)
-      const collectionBinding = this.composer.cmsBindings.getCollectionBinding(elementId);
+      const collectionBinding = this.composer.cms.bindings.getCollectionBinding(elementId);
       if (collectionBinding) {
         this.wrapInLoop(el as HTMLElement, collectionBinding, syntax, doc);
       }
@@ -164,7 +164,7 @@ export class CMSExportResolver {
    */
   private wrapInLoop(
     el: HTMLElement,
-    binding: ReturnType<typeof this.composer.cmsBindings.getCollectionBinding>,
+    binding: ReturnType<typeof this.composer.cms.bindings.getCollectionBinding>,
     syntax: TemplateSyntax,
     doc: Document
   ): void {
@@ -190,7 +190,7 @@ export class CMSExportResolver {
    * Check if document has any CMS bindings
    */
   hasBindings(): boolean {
-    if (!this.composer.cmsBindings) return false;
+    if (!this.composer.cms.bindings) return false;
     // Check if there are any bindings registered
     const page = this.composer.elements.getActivePage?.();
     if (!page?.root) return false;
@@ -201,10 +201,10 @@ export class CMSExportResolver {
    * Recursively check element and children for bindings
    */
   private checkElementBindings(elementId: string): boolean {
-    const bindings = this.composer.cmsBindings?.getBindings(elementId) || [];
+    const bindings = this.composer.cms.bindings?.getBindings(elementId) || [];
     if (bindings.length > 0) return true;
 
-    const collectionBinding = this.composer.cmsBindings?.getCollectionBinding(elementId);
+    const collectionBinding = this.composer.cms.bindings?.getCollectionBinding(elementId);
     if (collectionBinding) return true;
 
     const element = this.composer.elements.getElement(elementId);

@@ -404,7 +404,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
                 </span>
                 <Button
                   style={previewExitBtnStyle}
-                  onClick={() => composer?.versionHistory?.clearPreview()}
+                  onClick={() => composer?.versions?.clearPreview()}
                 >
                   Exit
                 </Button>

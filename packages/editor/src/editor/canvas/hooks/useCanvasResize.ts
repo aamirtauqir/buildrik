@@ -44,9 +44,9 @@ export function useCanvasResize(
 
   // Subscribe to resize events
   React.useEffect(() => {
-    if (!composer?.resizeHandler) return;
+    if (!composer?.canvas.resize) return;
 
-    const handler = composer.resizeHandler;
+    const handler = composer.canvas.resize;
 
     const handleStart = () => {
       setIsResizing(true);
@@ -88,10 +88,10 @@ export function useCanvasResize(
   const startResize = React.useCallback(
     (handle: HandlePosition, e: React.MouseEvent) => {
       devLog("useCanvasResize", `startResize hook triggered for ${elementId}`);
-      if (!composer?.resizeHandler || !elementId) {
+      if (!composer?.canvas.resize || !elementId) {
         devError("useCanvasResize", "❌ Missing composer or resizeHandler!", {
           composer: !!composer,
-          handler: !!composer?.resizeHandler,
+          handler: !!composer?.canvas.resize,
           elementId,
         });
         return;
@@ -101,7 +101,7 @@ export function useCanvasResize(
       e.stopPropagation();
 
       devLog("useCanvasResize", "Calling engine resizeHandler.startResize...");
-      composer.resizeHandler.startResize(elementId, handle, e.clientX, e.clientY, {
+      composer.canvas.resize.startResize(elementId, handle, e.clientX, e.clientY, {
         useTransaction: true,
         initialModifiers: {
           shift: e.shiftKey,
@@ -117,13 +117,13 @@ export function useCanvasResize(
   // Start rotation function
   const startRotation = React.useCallback(
     (e: React.MouseEvent) => {
-      if (!composer?.resizeHandler || !elementId) return;
+      if (!composer?.canvas.resize || !elementId) return;
 
       e.preventDefault();
       e.stopPropagation();
 
       setIsRotating(true);
-      composer.resizeHandler.startRotation(elementId, e.clientX, e.clientY, {
+      composer.canvas.resize.startRotation(elementId, e.clientX, e.clientY, {
         useTransaction: true,
         initialModifiers: {
           shift: e.shiftKey,

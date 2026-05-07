@@ -117,7 +117,7 @@ function MediaTabWithComposer({
     if (!onOpenIconPicker) return;
     onOpenIconPicker(undefined, (icon) => {
       try {
-        const result = composer.mediaCommands.insertMedia(icon.name, "icon");
+        const result = composer.mediaOps.insertMedia(icon.name, "icon");
         if (result) {
           showToast(`${icon.name} icon added ✓`, "success");
         }

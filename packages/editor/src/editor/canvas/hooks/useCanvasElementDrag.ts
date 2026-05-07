@@ -362,7 +362,7 @@ export function useCanvasElementDrag({
             elementId,
             elementType: (sourceEl?.getType?.() || "default") as ElementType,
           };
-      composer.drag?.start(dragData, "canvas", startPos);
+      composer.canvas.drag?.start(dragData, "canvas", startPos);
     };
 
     // Handle dragend using event delegation
@@ -429,7 +429,7 @@ export function useCanvasElementDrag({
       updateDropTarget(e.clientX, e.clientY, elementId);
 
       // Smart guides (only if enabled and canvasIndicators available)
-      if (showGuides && composer?.canvasIndicators) {
+      if (showGuides && composer?.canvas.indicators) {
         // Get element's current bounds relative to canvas
         const canvasRect = canvas.getBoundingClientRect();
         const elementRect = draggableEl.getBoundingClientRect();
@@ -458,7 +458,7 @@ export function useCanvasElementDrag({
           }
         } else {
           // Calculate smart guides
-          const smartGuides = composer.canvasIndicators.calculateSmartGuides(
+          const smartGuides = composer.canvas.indicators.calculateSmartGuides(
             elementId,
             draggedBounds
           );

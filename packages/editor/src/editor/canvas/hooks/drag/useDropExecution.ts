@@ -105,7 +105,7 @@ export function useDropExecution({
                 : (rawType as "image" | "video" | "icon" | "svg" | "audio" | "lottie" | "font");
 
       try {
-        const result = composer.mediaCommands.insertMediaAt(src, insertType, {
+        const result = composer.mediaOps.insertMediaAt(src, insertType, {
           x,
           y,
           targetElementId: targetId ?? undefined,
@@ -263,7 +263,7 @@ export function useDropExecution({
         dropSucceeded = true;
       }
 
-      composer.drag?.end(dropSucceeded);
+      composer.canvas.drag?.end(dropSucceeded);
     },
     [
       composer,

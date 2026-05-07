@@ -113,16 +113,20 @@ function makeStubComposer(opts: { hasDragManager?: boolean } = {}) {
       getElement: vi.fn(),
     },
     media: { uploadFile: vi.fn() },
-    drag: opts.hasDragManager === false ? undefined : {
-      move: vi.fn(),
-      cancel: vi.fn(),
-      end: vi.fn(),
+    // D3 facades — composer.canvas.{drag, indicators, ...} +
+    // composer.mediaOps replace the old flat fields.
+    canvas: {
+      drag: opts.hasDragManager === false ? undefined : {
+        move: vi.fn(),
+        cancel: vi.fn(),
+        end: vi.fn(),
+      },
+      indicators: {
+        calculateSmartGuides: vi.fn(() => []),
+        calculateSnapPoints: vi.fn(() => []),
+      },
     },
-    canvasIndicators: {
-      calculateSmartGuides: vi.fn(() => []),
-      calculateSnapPoints: vi.fn(() => []),
-    },
-    mediaCommands: { insertMediaAt: vi.fn(() => true) },
+    mediaOps: { insertMediaAt: vi.fn(() => true) },
   } as any;
 }
 
@@ -291,7 +295,7 @@ describe("useCanvasDragDrop — handleDragOver", () => {
     expect(sessionMock.setDropTargetId).toHaveBeenCalledWith("el-x");
     expect(visualsMock.showDropTarget).toHaveBeenCalled();
     expect(sessionMock.setIsValidDrop).toHaveBeenCalledWith(true);
-    expect(composer.drag.move).toHaveBeenCalled();
+    expect(composer.canvas.drag.move).toHaveBeenCalled();
   });
 
   it("shows invalid-target visuals when validateDropOperation returns invalid", async () => {
@@ -364,8 +368,8 @@ describe("useCanvasDragDrop — handleDragOver", () => {
 
     act(() => result.current.handleDragOver(e));
 
-    expect(composer.canvasIndicators.calculateSmartGuides).toHaveBeenCalled();
-    expect(composer.canvasIndicators.calculateSnapPoints).toHaveBeenCalled();
+    expect(composer.canvas.indicators.calculateSmartGuides).toHaveBeenCalled();
+    expect(composer.canvas.indicators.calculateSnapPoints).toHaveBeenCalled();
   });
 
   it("includes snap-point lines when calculateSnapPoints returns matches", () => {
@@ -390,7 +394,7 @@ describe("useCanvasDragDrop — handleDragOver", () => {
 
     const composer = makeStubComposer();
     // Snap points within threshold of cursor (clientX/clientY = 100, threshold ~10px).
-    composer.canvasIndicators.calculateSnapPoints = vi.fn(() => [
+    composer.canvas.indicators.calculateSnapPoints = vi.fn(() => [
       { axis: "vertical", position: 100 },
       { axis: "horizontal", position: 100 },
     ]) as any;
@@ -459,7 +463,7 @@ describe("useCanvasDragDrop — handleDragLeave", () => {
     expect(sessionMock.resetSession).toHaveBeenCalled();
     expect(visualsMock.clearAllIndicators).toHaveBeenCalled();
     expect(autoScrollMock.stopCurrentAutoScroll).toHaveBeenCalled();
-    expect(composer.drag.cancel).toHaveBeenCalledWith("Left canvas");
+    expect(composer.canvas.drag.cancel).toHaveBeenCalledWith("Left canvas");
   });
 });
 
@@ -504,7 +508,7 @@ describe("useCanvasDragDrop — handleDrop", () => {
 
     expect(handleMultiElementDrop).toHaveBeenCalled();
     expect(handleElementDrop).not.toHaveBeenCalled();
-    expect(composer.drag.end).toHaveBeenCalledWith(true);
+    expect(composer.canvas.drag.end).toHaveBeenCalledWith(true);
   });
 
   it("falls through to handleElementDrop when multi-drop returns false", async () => {
@@ -580,12 +584,12 @@ describe("useCanvasDragDrop — handleDrop", () => {
 
     // Empty src → handleInternalMediaDrop early-returns; the dispatch chain
     // proceeds normally (no internal-media short-circuit).
-    expect(composer.mediaCommands.insertMediaAt).not.toHaveBeenCalled();
+    expect(composer.mediaOps.insertMediaAt).not.toHaveBeenCalled();
   });
 
   it("emits INSERT_FAILED when internal-media insertMediaAt returns null", async () => {
     const composer = makeStubComposer();
-    composer.mediaCommands.insertMediaAt = vi.fn(() => null) as any;
+    composer.mediaOps.insertMediaAt = vi.fn(() => null) as any;
     composer.elements.getElement = vi.fn(() => ({} as any));
 
     const { result, onDropError } = renderDragDrop({ composer });
@@ -606,7 +610,7 @@ describe("useCanvasDragDrop — handleDrop", () => {
 
   it("emits INSERT_FAILED when internal-media insertMediaAt throws", async () => {
     const composer = makeStubComposer();
-    composer.mediaCommands.insertMediaAt = vi.fn(() => {
+    composer.mediaOps.insertMediaAt = vi.fn(() => {
       throw new Error("media kaboom");
     }) as any;
 
@@ -641,7 +645,7 @@ describe("useCanvasDragDrop — handleDrop", () => {
       await result.current.handleDrop(e);
     });
 
-    expect(composer.mediaCommands.insertMediaAt).toHaveBeenCalledWith(
+    expect(composer.mediaOps.insertMediaAt).toHaveBeenCalledWith(
       "https://example.com/img.png",
       "image",
       expect.objectContaining({ targetElementId: "r1", path: "drag" }),
@@ -676,7 +680,7 @@ describe("useCanvasDragDrop — global dragend listener", () => {
     expect(visualsMock.clearAllIndicators).toHaveBeenCalled();
     expect(autoScrollMock.stopCurrentAutoScroll).toHaveBeenCalled();
     expect(sessionMock.resetSession).toHaveBeenCalled();
-    expect(composer.drag.cancel).toHaveBeenCalledWith("Global dragend");
+    expect(composer.canvas.drag.cancel).toHaveBeenCalledWith("Global dragend");
   });
 
   it("removes the dragend listener on unmount", () => {

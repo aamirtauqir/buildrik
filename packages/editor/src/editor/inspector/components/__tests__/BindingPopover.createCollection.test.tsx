@@ -10,6 +10,9 @@ function makeComposer() {
     elements: { getElement: () => null },
     styles: {},
     // No collections service — popover will render with empty state.
+    // Post-D3: provide the cms facade shape so optional chaining doesn't
+    // explode on partial mocks. `collections` field absent = empty state.
+    cms: {},
   } as any;
 }
 

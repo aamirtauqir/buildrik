@@ -47,14 +47,14 @@ export function ReplaceAcrossDialog({
 }: ReplaceAcrossDialogProps) {
   const [state, setState] = React.useState<DialogState>(() => ({
     phase: "preview",
-    usageCount: composer.mediaCommands.getUsages(oldSrc).count,
+    usageCount: composer.mediaOps.getUsages(oldSrc).count,
   }));
 
   const handleCommit = React.useCallback(() => {
     setState({ phase: "committing" });
     // Run on next tick so the UI repaints to the committing state.
     Promise.resolve().then(() => {
-      const result = composer.mediaCommands.replaceAcross(oldSrc, newSrc);
+      const result = composer.mediaOps.replaceAcross(oldSrc, newSrc);
       setState({ phase: "result", result });
       onComplete?.(result);
     });
@@ -67,7 +67,7 @@ export function ReplaceAcrossDialog({
     // already have newSrc and will be filtered out by findByMediaSrc(oldSrc).
     setState({ phase: "committing" });
     Promise.resolve().then(() => {
-      const result = composer.mediaCommands.replaceAcross(oldSrc, newSrc);
+      const result = composer.mediaOps.replaceAcross(oldSrc, newSrc);
       setState({ phase: "result", result });
       onComplete?.(result);
     });

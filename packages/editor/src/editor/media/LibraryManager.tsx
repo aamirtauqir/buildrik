@@ -96,7 +96,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
   const usageMap = React.useMemo(() => {
     const map = new Map<string, number>();
     for (const item of state.libraryItems) {
-      const count = composer.mediaCommands.getUsages(item.src).count;
+      const count = composer.mediaOps.getUsages(item.src).count;
       if (count > 0) map.set(item.key, count);
     }
     return map;
@@ -137,7 +137,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
 
   const usageCount = React.useMemo(() => {
     if (!selectedItem) return 0;
-    return composer.mediaCommands.getUsages(selectedItem.src).count;
+    return composer.mediaOps.getUsages(selectedItem.src).count;
   }, [selectedItem, composer]);
 
   // Version history: group _v1234 files by base name
@@ -199,7 +199,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
     if (!onOpenIconPicker) return;
     onOpenIconPicker(undefined, (icon) => {
       try {
-        composer.mediaCommands.insertMedia(icon.name, "icon");
+        composer.mediaOps.insertMedia(icon.name, "icon");
         addToast({ description: `${icon.name} icon added`, tone: "success" });
       } catch {
         addToast({ description: "Could not add icon", tone: "error" });
@@ -810,7 +810,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                               e.stopPropagation();
                               // Revert: replace all usages of current version with this one
                               if (versions[0]) {
-                                composer.mediaCommands.replaceAcross(versions[0].src, v.src);
+                                composer.mediaOps.replaceAcross(versions[0].src, v.src);
                                 addToast({ description: `Reverted to ${v.name}`, tone: "success" });
                               }
                             }}
@@ -994,7 +994,7 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
                       key={i.key}
                       className="med-img-card"
                       onClick={() => {
-                        const result = composer.mediaCommands.replaceAcross(selectedItem.src, i.src);
+                        const result = composer.mediaOps.replaceAcross(selectedItem.src, i.src);
                         if (result.replaced.length > 0) {
                           addToast({
                             description: `Replaced in ${result.replaced.length} element${result.replaced.length > 1 ? "s" : ""}`,

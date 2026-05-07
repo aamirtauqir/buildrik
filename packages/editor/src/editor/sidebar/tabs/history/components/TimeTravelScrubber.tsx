@@ -77,7 +77,7 @@ export const TimeTravelScrubber: React.FC<TimeTravelScrubberProps> = ({
   // Cache cached versions once — .getVersions() is sync and returns a copy.
   const versionsRef = React.useRef<NamedVersion[]>([]);
   React.useEffect(() => {
-    versionsRef.current = composer?.versionHistory?.getVersions() ?? [];
+    versionsRef.current = composer?.versions?.getVersions() ?? [];
   }, [composer]);
 
   // ── 30fps scrub debounce ──────────────────────────────────────────────────

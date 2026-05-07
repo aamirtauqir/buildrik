@@ -167,7 +167,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
   // Load collections when popover opens
   React.useEffect(() => {
     if (!open) return;
-    const all = composer?.cmsManager?.getAllCollections?.() ?? [];
+    const all = composer?.cms.collections?.getAllCollections?.() ?? [];
     setCollections(all);
   }, [open, composer]);
 
@@ -195,7 +195,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
     (collectionId: string, fieldId: string, fieldName: string) => {
       if (!elementId) return;
       // Bind element to field using the CMS bindings manager
-      composer?.cmsBindings?.bindToField?.(elementId, collectionId, undefined, fieldId, "content");
+      composer?.cms.bindings?.bindToField?.(elementId, collectionId, undefined, fieldId, "content");
       setBoundLabel(`${selectedCollection?.name ?? ""} › ${fieldName}`);
       setIsBound(true);
       setOpen(false);
@@ -206,7 +206,7 @@ export const BindingPopover: React.FC<BindingPopoverProps> = ({
 
   const handleUnbind = React.useCallback(() => {
     if (!elementId) return;
-    composer?.cmsBindings?.unbindAll?.(elementId);
+    composer?.cms.bindings?.unbindAll?.(elementId);
     setIsBound(false);
     setBoundLabel(null);
   }, [elementId, composer]);

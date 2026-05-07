@@ -87,10 +87,10 @@ function useCMSPreview(composer: Composer | null) {
 
   // Check whether there are bound collections with records on mount and when composer changes
   React.useEffect(() => {
-    if (!composer?.cmsManager) return;
+    if (!composer?.cms.collections) return;
 
     const checkCollections = () => {
-      const all = composer.cmsManager.getAllCollections?.() ?? [];
+      const all = composer.cms.collections.getAllCollections?.() ?? [];
       if (all.length > 0) {
         setTotal(all.length);
         setActive(true);
@@ -105,11 +105,11 @@ function useCMSPreview(composer: Composer | null) {
     // Re-check when collections change
     const onCreated = () => checkCollections();
     const onDeleted = () => checkCollections();
-    composer.cmsManager.on?.("collection:created", onCreated);
-    composer.cmsManager.on?.("collection:deleted", onDeleted);
+    composer.cms.collections.on?.("collection:created", onCreated);
+    composer.cms.collections.on?.("collection:deleted", onDeleted);
     return () => {
-      composer.cmsManager.off?.("collection:created", onCreated);
-      composer.cmsManager.off?.("collection:deleted", onDeleted);
+      composer.cms.collections.off?.("collection:created", onCreated);
+      composer.cms.collections.off?.("collection:deleted", onDeleted);
     };
   }, [composer]);
 

@@ -150,7 +150,7 @@ export function useDropTargetResolver({
           session.setDropTargetPath(buildBreadcrumbPath(composer, targetId));
 
           // Update DragManager SSOT (fires throttled DRAG_MOVE event)
-          composer.drag?.move(
+          composer.canvas.drag?.move(
             { x: e.clientX, y: e.clientY },
             targetId,
             position,

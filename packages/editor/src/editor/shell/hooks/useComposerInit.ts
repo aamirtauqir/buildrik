@@ -290,7 +290,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       if (hasPromptedForCollectionRef.current) return;
 
       // Check if Products collection already exists
-      const service = new ProductCollectionService(composer.cmsManager);
+      const service = new ProductCollectionService(composer.cms.collections);
       const hasCollection = await service.hasProductsCollection();
       if (hasCollection) return;
 
@@ -298,7 +298,7 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
 
       // Open the collection setup modal
       openCollectionSetup(async (includeSampleData: boolean) => {
-        const svc = new ProductCollectionService(composer.cmsManager);
+        const svc = new ProductCollectionService(composer.cms.collections);
         await svc.createProductsCollection(includeSampleData);
         addToast({
           title: "Collection Created",

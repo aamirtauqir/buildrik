@@ -14,10 +14,11 @@ import {
 } from "../useEditorEventListeners";
 import { EVENTS } from "../../../../shared/constants/events";
 
-// Lightweight composer mock with on/off/emit + canvasIndicators.
+// Lightweight composer mock with on/off/emit + canvas facade. Post-D3,
+// indicators live under composer.canvas.indicators.
 type MockComposer = {
   elements: { getAllElements: ReturnType<typeof vi.fn> };
-  canvasIndicators: { getOverlay: ReturnType<typeof vi.fn> } | undefined;
+  canvas: { indicators: { getOverlay: ReturnType<typeof vi.fn> } | undefined } | undefined;
   on: ReturnType<typeof vi.fn>;
   off: ReturnType<typeof vi.fn>;
   emit: ReturnType<typeof vi.fn>;
@@ -30,13 +31,15 @@ function makeComposer(elements: { id: string }[] = []): MockComposer {
     elements: {
       getAllElements: vi.fn(() => elements),
     },
-    canvasIndicators: {
-      getOverlay: vi.fn(() => ({
-        showSpacing: true,
-        showBadges: true,
-        showGuides: true,
-        showGrid: true,
-      })),
+    canvas: {
+      indicators: {
+        getOverlay: vi.fn(() => ({
+          showSpacing: true,
+          showBadges: true,
+          showGuides: true,
+          showGrid: true,
+        })),
+      },
     },
     on: vi.fn((evt: string, h: (payload?: unknown) => void) => {
       let bag = handlers.get(evt);
@@ -227,7 +230,7 @@ describe("useEditorEventListeners", () => {
 
   // 4) OVERLAY DEFAULTS --------------------------------------------------------
   describe("Overlay defaults init", () => {
-    it("seeds all four overlay setters from composer.canvasIndicators.getOverlay()", () => {
+    it("seeds all four overlay setters from composer.canvas.indicators.getOverlay()", () => {
       mount(opts);
       expect(opts.state.setShowSpacingIndicators).toHaveBeenCalledWith(true);
       expect(opts.state.setShowBadges).toHaveBeenCalledWith(true);
@@ -237,7 +240,7 @@ describe("useEditorEventListeners", () => {
 
     it("applies defaults (false/true) when overlay fields are undefined", () => {
       const composer = makeComposer();
-      composer.canvasIndicators!.getOverlay.mockReturnValueOnce({} as Record<string, never>);
+      composer.canvas!.indicators!.getOverlay.mockReturnValueOnce({} as Record<string, never>);
       const o = makeOpts({ composer });
       mount(o);
       // hasManuallyToggledSpacingRef.current is false → spacing default = true
@@ -249,7 +252,7 @@ describe("useEditorEventListeners", () => {
 
     it("respects manual-toggle ref when overlay.showSpacing is undefined", () => {
       const composer = makeComposer();
-      composer.canvasIndicators!.getOverlay.mockReturnValueOnce({} as Record<string, never>);
+      composer.canvas!.indicators!.getOverlay.mockReturnValueOnce({} as Record<string, never>);
       const o = makeOpts({
         composer,
         hasManuallyToggledSpacingRef: { current: true },
@@ -259,9 +262,9 @@ describe("useEditorEventListeners", () => {
       expect(o.state.setShowSpacingIndicators).toHaveBeenCalledWith(false);
     });
 
-    it("does not touch overlay setters when canvasIndicators is missing", () => {
+    it("does not touch overlay setters when canvas.indicators is missing", () => {
       const composer = makeComposer();
-      composer.canvasIndicators = undefined;
+      composer.canvas!.indicators = undefined;
       const o = makeOpts({ composer });
       mount(o);
       expect(o.state.setShowSpacingIndicators).not.toHaveBeenCalled();

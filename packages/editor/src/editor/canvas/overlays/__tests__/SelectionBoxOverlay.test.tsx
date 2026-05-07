@@ -30,10 +30,11 @@ vi.mock("../SelectionHandles", () => ({
   SelectionHandles: () => null,
 }));
 
-// Minimal mock composer — only the methods the component touches
+// Minimal mock composer — only the methods the component touches.
+// Post-D3: cmsBindings moved under composer.cms.bindings facade.
 const makeComposer = () =>
   ({
-    cmsBindings: { getBindings: vi.fn(() => []) },
+    cms: { bindings: { getBindings: vi.fn(() => []) } },
     elements: {
       getElement: vi.fn(() => ({ isLocked: () => false })),
     },

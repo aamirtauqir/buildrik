@@ -541,8 +541,8 @@ export function VersionHistoryPanel({
 
   // Capture current canvas visual snapshot on mount
   React.useEffect(() => {
-    if (composer?.versionHistory) {
-      setCurrentVisualSnapshot(composer.versionHistory.captureVisualSnapshot());
+    if (composer?.versions) {
+      setCurrentVisualSnapshot(composer.versions.captureVisualSnapshot());
     }
   }, [composer]);
 

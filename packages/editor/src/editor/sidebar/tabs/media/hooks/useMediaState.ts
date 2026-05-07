@@ -141,7 +141,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
       try {
         if (selectionContext) {
           // SELECTION MODE: Replace existing element's media via command layer
-          const result = composer.mediaCommands.replaceMedia(
+          const result = composer.mediaOps.replaceMedia(
             selectionContext.elementId,
             asset.src
           );
@@ -163,7 +163,7 @@ export function useMediaState(composer: Composer): MediaStateResult {
             fnt: "font", font: "font",
           };
           const mediaType = typeMap[asset.type] || "image";
-          const result = composer.mediaCommands.insertMediaAt(asset.src, mediaType, {
+          const result = composer.mediaOps.insertMediaAt(asset.src, mediaType, {
             path: "click",
           });
           if (result) {

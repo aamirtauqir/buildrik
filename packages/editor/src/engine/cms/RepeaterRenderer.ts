@@ -42,7 +42,7 @@ export class RepeaterRenderer {
    * Expand all repeater elements in the given HTML
    */
   async expandRepeaters(rootHtml: string): Promise<string> {
-    if (!rootHtml || !this.composer.cmsBindings) {
+    if (!rootHtml || !this.composer.cms.bindings) {
       return rootHtml;
     }
 
@@ -57,7 +57,7 @@ export class RepeaterRenderer {
       const elementId = el.getAttribute("data-buildrick-id");
       if (!elementId) return;
 
-      const binding = this.composer.cmsBindings.getCollectionBinding(elementId);
+      const binding = this.composer.cms.bindings.getCollectionBinding(elementId);
       if (!binding) return;
 
       // Queue expansion for this repeater
@@ -76,11 +76,11 @@ export class RepeaterRenderer {
     binding: CMSCollectionBinding,
     doc: Document
   ): Promise<void> {
-    if (!this.composer.cmsManager) return;
+    if (!this.composer.cms.collections) return;
 
     // Fetch items from collection
     // Note: status 'all' means no filter, so we only pass status if it's not 'all'
-    const result = await this.composer.cmsManager.queryContent({
+    const result = await this.composer.cms.collections.queryContent({
       collectionId: binding.collectionId,
       status: binding.status === "all" ? undefined : binding.status,
       limit: binding.limit,
@@ -211,16 +211,16 @@ export class RepeaterRenderer {
    * Check if an element is a repeater template
    */
   isRepeaterTemplate(elementId: string): boolean {
-    if (!this.composer.cmsBindings) return false;
-    return this.composer.cmsBindings.getCollectionBinding(elementId) !== null;
+    if (!this.composer.cms.bindings) return false;
+    return this.composer.cms.bindings.getCollectionBinding(elementId) !== null;
   }
 
   /**
    * Get the collection binding for a repeater
    */
   getRepeaterBinding(elementId: string): CMSCollectionBinding | null {
-    if (!this.composer.cmsBindings) return null;
-    return this.composer.cmsBindings.getCollectionBinding(elementId);
+    if (!this.composer.cms.bindings) return null;
+    return this.composer.cms.bindings.getCollectionBinding(elementId);
   }
 }
 

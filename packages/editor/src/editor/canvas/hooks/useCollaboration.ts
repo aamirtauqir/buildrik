@@ -63,9 +63,9 @@ export function useCollaboration(composer: Composer | null): UseCollaborationRes
 
   // Subscribe to collaboration events
   useEffect(() => {
-    if (!composer?.collaboration) return;
+    if (!composer?.collab.manager) return;
 
-    const collab = composer.collaboration;
+    const collab = composer.collab.manager;
 
     const handleUserJoin = (user: CollaborationUser) => {
       setUsers((prev) => {
@@ -116,13 +116,13 @@ export function useCollaboration(composer: Composer | null): UseCollaborationRes
 
   // Poll connection stats periodically when connected
   useEffect(() => {
-    if (!composer?.collaboration || state !== "connected") {
+    if (!composer?.collab.manager || state !== "connected") {
       setConnectionStats(DEFAULT_STATS);
       return;
     }
 
     const updateStats = () => {
-      const otEngine = composer.collaboration.getOTEngine();
+      const otEngine = composer.collab.manager.getOTEngine();
       const stats = otEngine.getAckStats();
       setConnectionStats(stats);
     };
@@ -139,14 +139,14 @@ export function useCollaboration(composer: Composer | null): UseCollaborationRes
   // Create a new room
   const createRoom = useCallback(
     async (projectId: string, userName: string): Promise<string> => {
-      if (!composer?.collaboration) {
+      if (!composer?.collab.manager) {
         throw new Error("Collaboration not available");
       }
 
-      const newRoom = await composer.collaboration.createRoom(projectId, userName);
+      const newRoom = await composer.collab.manager.createRoom(projectId, userName);
       setRoom(newRoom);
-      setCurrentUser(composer.collaboration.getCurrentUser());
-      setUsers(composer.collaboration.getUsers());
+      setCurrentUser(composer.collab.manager.getCurrentUser());
+      setUsers(composer.collab.manager.getUsers());
 
       return newRoom.id;
     },
@@ -156,23 +156,23 @@ export function useCollaboration(composer: Composer | null): UseCollaborationRes
   // Join an existing room
   const joinRoom = useCallback(
     async (roomId: string, userName: string): Promise<void> => {
-      if (!composer?.collaboration) {
+      if (!composer?.collab.manager) {
         throw new Error("Collaboration not available");
       }
 
-      await composer.collaboration.joinRoom(roomId, userName);
-      setCurrentUser(composer.collaboration.getCurrentUser());
-      setUsers(composer.collaboration.getUsers());
-      setRoom(composer.collaboration.getRoom());
+      await composer.collab.manager.joinRoom(roomId, userName);
+      setCurrentUser(composer.collab.manager.getCurrentUser());
+      setUsers(composer.collab.manager.getUsers());
+      setRoom(composer.collab.manager.getRoom());
     },
     [composer]
   );
 
   // Leave the current room
   const leaveRoom = useCallback(async (): Promise<void> => {
-    if (!composer?.collaboration) return;
+    if (!composer?.collab.manager) return;
 
-    await composer.collaboration.leaveRoom();
+    await composer.collab.manager.leaveRoom();
     setUsers([]);
     setCurrentUser(null);
     setRoom(null);

@@ -77,7 +77,7 @@ export function useCursorSync({
    */
   const updateCursor = useCallback(
     (x: number, y: number, elementId: string | null) => {
-      if (!composer?.collaboration?.isConnected()) return;
+      if (!composer?.collab.manager?.isConnected()) return;
 
       const now = Date.now();
       if (now - lastUpdateRef.current < throttleMs) return;
@@ -89,7 +89,7 @@ export function useCursorSync({
         y,
       };
 
-      composer.collaboration.updateCursor(position);
+      composer.collab.manager.updateCursor(position);
     },
     [composer, throttleMs]
   );
@@ -122,8 +122,8 @@ export function useCursorSync({
    */
   useEffect(() => {
     return () => {
-      if (composer?.collaboration?.isConnected()) {
-        composer.collaboration.updateCursor({ elementId: null, x: -1, y: -1 });
+      if (composer?.collab.manager?.isConnected()) {
+        composer.collab.manager.updateCursor({ elementId: null, x: -1, y: -1 });
       }
     };
   }, [composer]);

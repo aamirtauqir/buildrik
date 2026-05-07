@@ -43,14 +43,14 @@ export function useCanvasIndicators({
 
   // Unified canvas indicators effect - handles spacing & badges
   React.useEffect(() => {
-    if (!composer || !composer.canvasIndicators) {
+    if (!composer || !composer.canvas.indicators) {
       setSpacingIndicators([]);
       setBadges([]);
       setGuides([]);
       return;
     }
 
-    const indicators = composer.canvasIndicators;
+    const indicators = composer.canvas.indicators;
     indicators.toggleSpacing(showSpacing);
     indicators.toggleGuides(showGuides);
     indicators.toggleGrid(showGrid);

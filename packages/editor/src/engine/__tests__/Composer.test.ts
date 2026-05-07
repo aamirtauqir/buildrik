@@ -116,7 +116,7 @@ describe("Composer listener hygiene", () => {
   it("removes individually tracked handlers on destroy", async () => {
     const composer = new Composer({} as any);
     const offSpy = vi.spyOn(composer, "off");
-    const collabOffSpy = vi.spyOn((composer as any).collaboration, "off");
+    const collabOffSpy = vi.spyOn((composer as any).collab.manager, "off");
     await composer.destroy();
     expect(offSpy).toHaveBeenCalledWith("element:selected", expect.any(Function));
     expect(offSpy).toHaveBeenCalledWith("selection:multiple", expect.any(Function));

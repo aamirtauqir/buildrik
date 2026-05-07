@@ -104,8 +104,8 @@ export function useEditorEventListeners({
   // 4) Overlay defaults init.
   const { setShowSpacingIndicators, setShowBadges, setShowGuides, setShowGrid } = state;
   React.useEffect(() => {
-    if (!composer?.canvasIndicators) return;
-    const overlay = composer.canvasIndicators.getOverlay();
+    if (!composer?.canvas.indicators) return;
+    const overlay = composer.canvas.indicators.getOverlay();
     setShowSpacingIndicators(
       overlay.showSpacing ?? !hasManuallyToggledSpacingRef.current,
     );

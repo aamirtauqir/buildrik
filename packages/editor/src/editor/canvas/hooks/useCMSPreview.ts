@@ -26,7 +26,7 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
   const [isResolving, setIsResolving] = React.useState(false);
 
   React.useEffect(() => {
-    if (!content || !composer?.cmsBindings) {
+    if (!content || !composer?.cms.bindings) {
       setResolvedContent(content);
       return;
     }
@@ -47,12 +47,12 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
           if (!elementId) return;
 
           // Get bindings for this element
-          const bindings = composer.cmsBindings.getBindings(elementId);
+          const bindings = composer.cms.bindings.getBindings(elementId);
           if (bindings.length === 0) return;
 
           // Resolve each binding
           bindings.forEach((binding) => {
-            const promise = composer.cmsBindings.resolveBinding(binding).then((value) => {
+            const promise = composer.cms.bindings.resolveBinding(binding).then((value) => {
               if (!value) return;
 
               switch (binding.property) {
@@ -100,19 +100,19 @@ export function useCMSPreview({ composer, content }: UseCMSPreviewOptions): UseC
 
   // Listen for CMS content changes
   React.useEffect(() => {
-    if (!composer?.cmsManager) return;
+    if (!composer?.cms.collections) return;
 
     const handleContentChange = () => {
       // Trigger re-resolution by updating content dependency
       setResolvedContent((prev) => prev); // Force re-run of above effect
     };
 
-    composer.cmsManager.on("content:updated", handleContentChange);
-    composer.cmsManager.on("content:created", handleContentChange);
+    composer.cms.collections.on("content:updated", handleContentChange);
+    composer.cms.collections.on("content:created", handleContentChange);
 
     return () => {
-      composer.cmsManager.off("content:updated", handleContentChange);
-      composer.cmsManager.off("content:created", handleContentChange);
+      composer.cms.collections.off("content:updated", handleContentChange);
+      composer.cms.collections.off("content:created", handleContentChange);
     };
   }, [composer]);
 

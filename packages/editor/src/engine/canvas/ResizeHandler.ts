@@ -238,7 +238,7 @@ export class ResizeHandler extends EventEmitter {
 
     applyBoundsToModel(elementId, newBounds, this.composer);
     applyBoundsToDOM(elementId, newBounds);
-    this.composer.canvasIndicators?.createSelectionBox(elementId);
+    this.composer.canvas.indicators?.createSelectionBox(elementId);
 
     return true;
   }
@@ -262,7 +262,7 @@ export class ResizeHandler extends EventEmitter {
         /* ignore */
       }
     }
-    this.composer.canvasIndicators?.createSelectionBox(state.elementId);
+    this.composer.canvas.indicators?.createSelectionBox(state.elementId);
     this.emit(EVENTS.RESIZE_CANCEL, { elementId: state.elementId });
     this.composer.emit?.(EVENTS.RESIZE_CANCEL, { elementId: state.elementId });
 
@@ -370,7 +370,7 @@ export class ResizeHandler extends EventEmitter {
   }
 
   private updateIndicators(elementId: string): void {
-    const indicators = this.composer.canvasIndicators;
+    const indicators = this.composer.canvas.indicators;
     if (!indicators) return;
 
     indicators.createSelectionBox?.(elementId);

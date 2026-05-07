@@ -219,7 +219,7 @@ export class HistoryManager {
     this.trimHistory();
     this.composer.emit(EVENTS.HISTORY_RECORDED, { label });
 
-    const collab = this.composer.collaboration;
+    const collab = this.composer.collab.manager;
     if (collab?.isConnected()) {
       const otEngine = collab.getOTEngine();
       return otEngine.createOperation(patch, reversePatchData, label);
