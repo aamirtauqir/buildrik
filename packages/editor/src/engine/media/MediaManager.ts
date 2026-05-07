@@ -30,7 +30,7 @@ import {
 } from "./MediaHelpers";
 import { MediaStorage } from "./MediaStorage";
 import { MediaOptimizer } from "./MediaOptimizer";
-import { stockService } from "../../editor/sidebar/tabs/media/api/StockService";
+import { stockService } from "../../services/stock/StockService";
 
 // --- Discovery stub types ---
 

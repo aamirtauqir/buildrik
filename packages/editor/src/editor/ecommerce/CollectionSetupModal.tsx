@@ -20,7 +20,14 @@ import {
 export interface CollectionSetupModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (includeSampleData: boolean) => void;
+  /**
+   * Confirm handler. May be sync or async. If it rejects, the error
+   * surfaces via `onError` (or console.error in dev) and the modal stays
+   * open so the user can retry.
+   */
+  onConfirm: (includeSampleData: boolean) => void | Promise<void>;
+  /** Surface async rejections from `onConfirm` (e.g., wire to toast). */
+  onError?: (err: unknown) => void;
   onSkip?: () => void;
 }
 
@@ -32,6 +39,7 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
+  onError,
   onSkip,
 }) => {
   const [includeSample, setIncludeSample] = useState(true);
@@ -42,6 +50,11 @@ export const CollectionSetupModal: React.FC<CollectionSetupModalProps> = ({
     try {
       await onConfirm(includeSample);
       onClose();
+    } catch (err) {
+      if (onError) onError(err);
+      // eslint-disable-next-line no-console
+      else console.error("[CollectionSetupModal] confirm failed (no onError handler)", err);
+      // Modal stays open so user can retry.
     } finally {
       setIsCreating(false);
     }

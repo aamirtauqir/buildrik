@@ -16,8 +16,15 @@ import type { SyncConflict, ConflictResolution } from "../../services/CloudSyncS
 export interface ConflictModalProps {
   /** The sync conflict to display */
   conflict: SyncConflict;
-  /** Callback when user resolves the conflict */
-  onResolve: (resolution: ConflictResolution) => void;
+  /**
+   * Callback when user resolves the conflict. May be sync or async; if the
+   * parent handler returns a Promise that rejects, the error surfaces via
+   * `onError` (or console.error in dev). Modal stays open on error so the
+   * user can retry or pick the other resolution.
+   */
+  onResolve: (resolution: ConflictResolution) => void | Promise<void>;
+  /** Surface async rejections from `onResolve` (e.g., wire to toast). */
+  onError?: (err: unknown) => void;
   /** Callback when user cancels */
   onCancel?: () => void;
 }
@@ -26,7 +33,23 @@ export interface ConflictModalProps {
 // COMPONENT
 // ============================================================================
 
-export const ConflictModal: React.FC<ConflictModalProps> = ({ conflict, onResolve, onCancel }) => {
+export const ConflictModal: React.FC<ConflictModalProps> = ({
+  conflict,
+  onResolve,
+  onError,
+  onCancel,
+}) => {
+  const handleResolve = async (resolution: ConflictResolution) => {
+    try {
+      await onResolve(resolution);
+    } catch (err) {
+      if (onError) onError(err);
+      // eslint-disable-next-line no-console
+      else console.error("[ConflictModal] resolve failed (no onError handler)", err);
+      // Modal stays open so user can retry or pick the other resolution.
+    }
+  };
+
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleString();
   };
@@ -61,7 +84,7 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({ conflict, onResolv
               <div style={timeAgoStyles}>{formatTimeDiff(conflict.localModifiedAt)}</div>
             </div>
             <Button
-              onClick={() => onResolve("keep-local")}
+              onClick={() => void handleResolve("keep-local")}
               style={{ ...buttonStyles, ...primaryButtonStyles }}
             >
               Keep Local
@@ -80,7 +103,7 @@ export const ConflictModal: React.FC<ConflictModalProps> = ({ conflict, onResolv
               <div style={timeAgoStyles}>{formatTimeDiff(conflict.remoteModifiedAt)}</div>
             </div>
             <Button
-              onClick={() => onResolve("keep-remote")}
+              onClick={() => void handleResolve("keep-remote")}
               style={{ ...buttonStyles, ...secondaryButtonStyles }}
             >
               Keep Cloud

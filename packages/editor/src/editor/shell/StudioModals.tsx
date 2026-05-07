@@ -20,6 +20,7 @@ import { CollectionSetupModal } from "../ecommerce";
 import { ExportModal } from "../export";
 import { MediaLibraryPanel, ImageEditorModal, IconPickerModal } from "../media";
 import { KeyboardShortcutsPanel } from "../panels/KeyboardShortcutsPanel";
+import { useToast } from "@/editor/shared/vibcoder";
 import { ConflictModal } from "../sync/ConflictModal";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
 import { CommandPalette } from "./modals/CommandPalette";
@@ -159,6 +160,22 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
   showCommandPalette,
   onCloseCommandPalette,
 }) => {
+  const { addToast } = useToast();
+
+  // Modal-error handler factory. Each async modal gets a labeled error sink
+  // that surfaces failures via toast — replaces silent catch-and-log pattern.
+  const makeModalErrorHandler = React.useCallback(
+    (label: string) =>
+      (err: unknown) => {
+        addToast({
+          tone: "error",
+          title: `${label} failed`,
+          description: err instanceof Error ? err.message : String(err),
+        });
+      },
+    [addToast]
+  );
+
   // Handle element selection from AI assistant
   const handleSelectElement = React.useCallback(
     (elementId: string) => {
@@ -273,8 +290,13 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
           onClose={onCloseImageEditor}
           imageSrc={imageEditorContext.imageSrc}
           onSave={(editedSrc) => {
-            imageEditorContext.onSave(editedSrc);
-            onCloseImageEditor();
+            try {
+              imageEditorContext.onSave(editedSrc);
+              onCloseImageEditor();
+            } catch (err) {
+              makeModalErrorHandler("Save edited image")(err);
+              // Modal stays open so user can retry.
+            }
           }}
         />
       )}
@@ -300,8 +322,8 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
           if (collectionSetupContext?.onConfirm) {
             await collectionSetupContext.onConfirm(includeSampleData);
           }
-          onCloseCollectionSetup();
         }}
+        onError={makeModalErrorHandler("Collection setup")}
         onSkip={onCloseCollectionSetup}
       />
 
@@ -310,6 +332,7 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
         <ConflictModal
           conflict={activeConflict}
           onResolve={handleResolveConflict}
+          onError={makeModalErrorHandler("Resolve sync conflict")}
           onCancel={handleCancelConflict}
         />
       )}

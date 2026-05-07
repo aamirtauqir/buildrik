@@ -12,10 +12,7 @@
  * @license BSD-3-Clause
  */
 
-import type {
-  StockPhoto,
-  StockVideo,
-} from "../../../../../engine/media/MediaManager";
+import type { StockPhoto, StockVideo } from "../../engine/media/MediaManager";
 
 export type StockOrientation = "landscape" | "portrait" | "squarish" | undefined;
 export type StockColor = string | undefined;
