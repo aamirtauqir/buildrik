@@ -28,6 +28,7 @@ import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { PageWizard } from "../wizard/PageWizard";
 import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useComposerInit } from "./hooks/useComposerInit";
+import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
 import { usePublishJob } from "./hooks/usePublishJob";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
@@ -234,54 +235,8 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
       });
   }, [addToast, composer, state]);
 
-  // Keyboard shortcuts
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target instanceof HTMLElement ? e.target : null;
-      if (
-        target?.closest("input, textarea, select, [contenteditable='true']") ||
-        target?.isContentEditable
-      )
-        return;
-      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-        e.preventDefault();
-        saveProject();
-      }
-      if (!composer) return;
-      const isRedo =
-        (e.ctrlKey || e.metaKey) &&
-        ((e.shiftKey && e.key.toLowerCase() === "z") || e.key.toLowerCase() === "y");
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z" && !e.shiftKey) {
-        e.preventDefault();
-        composer.history.undo();
-      } else if (isRedo) {
-        e.preventDefault();
-        composer.history.redo();
-      }
-      if ((e.ctrlKey || e.metaKey) && e.key === "/") {
-        e.preventDefault();
-        modals.setShowShortcuts(true);
-      }
-      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
-        e.preventDefault();
-        canvasRef.current?.openCommandPalette();
-      }
-      if ((e.ctrlKey || e.metaKey) && e.key === "j") {
-        e.preventDefault();
-        modals.setShowAI((prev) => !prev);
-      }
-      if (e.key === "Escape") {
-        modals.setShowShortcuts(false);
-        modals.setShowAI(false);
-      }
-      if (e.key === "?" && !e.ctrlKey && !e.metaKey) {
-        e.preventDefault();
-        modals.setShowShortcuts(true);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [saveProject, composer, modals]);
+  // Keyboard shortcuts (extracted into useEditorShortcuts — D2 stage 1)
+  useEditorShortcuts({ composer, canvasRef, modals, saveProject });
 
   // Export HTML as zip download
   const handleExportHTML = React.useCallback(async () => {
