@@ -15,7 +15,6 @@ import * as React from "react";
 import { AIAssistantBar } from "../../ai/AIAssistantBar";
 import { getBlockDefinitions } from "../../blocks/blockRegistry";
 import type { Composer } from "../../engine";
-import { ExportEngine } from "../../engine/export";
 import { useElementFlash } from "../../shared/hooks";
 import type { ComposerConfig, ProjectData, BlockData } from "../../shared/types";
 import { TooltipProvider, ToastProvider, useToast } from "@/editor/shared/vibcoder";
@@ -25,12 +24,11 @@ import { migrateStorageKeys, migrateAqbKeys } from "../../shared/utils/storageMi
 import type { CanvasRef } from "../canvas/Canvas";
 import { useComposerSelection } from "../canvas/hooks/useComposerSelection";
 import { PageWizard } from "../wizard/PageWizard";
-import { getSiteIdFromUrl } from "@/services/BuildrikSyncProvider";
 import { useComposerInit } from "./hooks/useComposerInit";
 import { useEditorEventListeners } from "./hooks/useEditorEventListeners";
 import { useEditorShortcuts } from "./hooks/useEditorShortcuts";
+import { useExportHandlers } from "./hooks/useExportHandlers";
 import { useHistoryFeedback } from "./hooks/useHistoryFeedback";
-import { usePublishJob } from "./hooks/usePublishJob";
 import { useSaveCallback } from "./hooks/useSaveCallback";
 import { useStudioHandlers } from "./hooks/useStudioHandlers";
 import { useStudioModals } from "./hooks/useStudioModals";
@@ -211,96 +209,20 @@ const AquibraStudioShell: React.FC<AquibraStudioProps> = ({
   // Keyboard shortcuts (extracted into useEditorShortcuts — D2 stage 1)
   useEditorShortcuts({ composer, canvasRef, modals, saveProject });
 
-  // Export HTML as zip download
-  const handleExportHTML = React.useCallback(async () => {
-    if (!composer) return;
-    modals.setExportLoading(true);
-    try {
-      const exportEngine = new ExportEngine(composer);
-      await exportEngine.downloadZip("site-export.zip");
-      addToast({
-        title: "Export complete",
-        description: "Your site has been downloaded as a zip file.",
-        tone: "success",
-        duration: 3000,
-      });
-    } catch (err) {
-      addToast({
-        title: "Export failed",
-        description: err instanceof Error ? err.message : "Could not export your site.",
-        tone: "error",
-      });
-    } finally {
-      modals.setExportLoading(false);
-    }
-  }, [composer, addToast, modals]);
-
-  // Export handler for Vercel deployment
-  const handleExportForDeploy = React.useCallback(async () => {
-    if (!composer) throw new Error("Composer not ready");
-    const exportEngine = new ExportEngine(composer);
-    const result = await exportEngine.exportAllPages({ format: "html", minify: true });
-    const settings = composer.getProjectSettings?.();
-    const projectName = settings?.seo?.siteName || "aquibra-site";
-    return {
-      files: result.files.map((f) => ({ path: f.name, content: f.content })),
-      projectName,
-    };
-  }, [composer]);
-
-  // Vercel publish flow — exports pages, sends to dashboard, polls status.
-  // Hidden behind VITE_FEATURE_PUBLISH; falls back to Export HTML otherwise.
-  const publishJob = usePublishJob();
-  const handleVercelPublish = React.useCallback(async () => {
-    const siteId = getSiteIdFromUrl();
-    if (!siteId) {
-      addToast({
-        title: "Cannot publish",
-        description: "Open this editor from a site URL with ?siteId=… to publish.",
-        tone: "error",
-      });
-      return;
-    }
-    try {
-      const exported = await handleExportForDeploy();
-      const pages = exported.files
-        .filter((f) => f.path.endsWith(".html"))
-        .map((f) => ({ path: f.path, html: f.content }));
-      if (pages.length === 0) {
-        addToast({
-          title: "Nothing to publish",
-          description: "Add at least one page before publishing.",
-          tone: "warning",
-        });
-        return;
-      }
-      await publishJob.publish(siteId, pages);
-    } catch (err) {
-      addToast({
-        title: "Publish failed",
-        description: err instanceof Error ? err.message : "Could not start publish.",
-        tone: "error",
-      });
-    }
-  }, [handleExportForDeploy, publishJob, addToast]);
-
-  // Surface publish completion / failure as toasts.
-  React.useEffect(() => {
-    if (publishJob.uiState === "published" && publishJob.publishedUrl) {
-      addToast({
-        title: "Site published",
-        description: publishJob.publishedUrl,
-        tone: "success",
-        duration: 6000,
-      });
-    } else if (publishJob.uiState === "failed" && publishJob.error) {
-      addToast({
-        title: "Publish failed",
-        description: publishJob.error,
-        tone: "error",
-      });
-    }
-  }, [publishJob.uiState, publishJob.publishedUrl, publishJob.error, addToast]);
+  // Export + publish lifecycle (HTML zip, Vercel deploy, publish-toast effect,
+  // usePublishJob) extracted into useExportHandlers — D2 stage 4. The hook
+  // owns its own publishJob instance and surfaces it back so the orchestrator
+  // can wire it into Topbar / PublishDropdown without re-instantiating.
+  const {
+    handleExportHTML,
+    handleExportForDeploy,
+    handleVercelPublish,
+    publishJob,
+  } = useExportHandlers({
+    composer,
+    addToast,
+    setExportLoading: modals.setExportLoading,
+  });
 
   // Auto-enable spacing on first selection
   React.useEffect(() => {
