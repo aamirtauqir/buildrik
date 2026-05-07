@@ -11,6 +11,7 @@ import { Crosshair, CornerLeftUp } from "lucide-react";
 import * as React from "react";
 import { BindingPopover } from "./components/BindingPopover";
 import { BreakpointPill } from "./components/BreakpointPill";
+import { InspectorTabs } from "./components/InspectorTabs";
 import { StatePills } from "./components/StatePills";
 import type { Composer } from "../../engine";
 import { BREAKPOINTS, isValidBreakpoint } from "../../shared/constants/breakpoints";
@@ -364,48 +365,9 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           elementLabel={elementLabel}
         />
       </div>
-      {/* Tabs — no count badges; dot reserved for future "has changes" state */}
-      <div
-        className="bdi-tabs"
-        role="tablist"
-        aria-label="Inspector sections"
-        onKeyDown={(e) => {
-          const tabIds = ["style", "element", "effects"] as const;
-          const tabButtons = (e.currentTarget as HTMLDivElement).querySelectorAll('[role="tab"]');
-          const focusedIndex = Array.from(tabButtons).indexOf(e.target as HTMLButtonElement);
-          if (focusedIndex === -1) return;
-          if (e.key === "ArrowRight") {
-            e.preventDefault();
-            const nextIndex = (focusedIndex + 1) % tabIds.length;
-            setActiveTab(tabIds[nextIndex]);
-            (tabButtons[nextIndex] as HTMLButtonElement)?.focus();
-          } else if (e.key === "ArrowLeft") {
-            e.preventDefault();
-            const prevIndex = (focusedIndex - 1 + tabIds.length) % tabIds.length;
-            setActiveTab(tabIds[prevIndex]);
-            (tabButtons[prevIndex] as HTMLButtonElement)?.focus();
-          }
-        }}
-      >
-        {(["style", "element", "effects"] as const).map((tab) => {
-          const tabLabels = { style: "Style", element: "Element", effects: "Effects" };
-          return (
-            <Button
-              key={tab}
-              role="tab"
-              id={`inspector-tab-${tab}`}
-              aria-selected={activeTab === tab}
-              aria-controls={`inspector-tabpanel-${tab}`}
-              tabIndex={activeTab === tab ? 0 : -1}
-              className={`bdi-tab${activeTab === tab ? " on" : ""}`}
-              onClick={() => setActiveTab(tab)}
-              type="button"
-            >
-              {tabLabels[tab]}
-            </Button>
-          );
-        })}
-      </div>
+      {/* Tabs — D6 Stage 2 (audit-remediation 2026-05-08): tablist +
+          arrow-key navigation live in ./components/InspectorTabs.tsx. */}
+      <InspectorTabs activeTab={activeTab} onChange={setActiveTab} />
       {/* Breakpoint + state strip (mock pattern: pill + states + size right) */}
       <div className="bdi-bpr">
         <BreakpointPill
