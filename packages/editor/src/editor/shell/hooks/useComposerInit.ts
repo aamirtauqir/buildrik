@@ -12,7 +12,12 @@ import { ProductCollectionService } from "../../../engine/cms";
 import type { Element } from "../../../engine/elements/Element";
 import { THRESHOLDS } from "../../../shared/constants/config";
 import type { ComposerConfig, ProjectData, DeviceType, ElementType } from "../../../shared/types";
-import { getSiteIdFromUrl, loadProject, saveProject } from "@/services/BuildrikSyncProvider";
+import {
+  getSiteIdFromUrl,
+  loadProject,
+  loadServerMedia,
+  saveProject,
+} from "@/services/BuildrikSyncProvider";
 import { createRemoteAssetSync } from "@/services/AssetUploadService";
 import type { ToastInput } from "@/editor/shared/vibcoder";
 
@@ -92,8 +97,15 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
 
       if (siteId) {
         loadProject(siteId)
-          .then((data) => {
+          .then(async (data) => {
             instance.importProject(data);
+            // Phase B3: hydrate media library from server. Additive — never
+            // throws. Returns null on offline/auth/unconfigured; we just
+            // keep going with engine-only state in that case.
+            const remote = await loadServerMedia(siteId);
+            if (remote) {
+              await instance.media.importServerAssets(remote.assets, remote.folders);
+            }
             addToast({
               title: "Project loaded",
               description: "Loaded from dashboard.",

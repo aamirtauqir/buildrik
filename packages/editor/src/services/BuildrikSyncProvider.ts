@@ -101,6 +101,76 @@ export async function saveProject(
   return getClient().sites.saveProject.mutate({ siteId, projectData });
 }
 
+/**
+ * Phase B3: fetch server assets + folders for hydration into MediaManager.
+ *
+ * Returns null on auth fail, offline, dashboard unconfigured, or any RPC
+ * error — caller (useComposerInit) skips the import step and falls back
+ * to engine-only state. We DO NOT throw because asset hydration is
+ * additive; missing it should not block project load.
+ */
+export async function loadServerMedia(
+  siteId: string,
+): Promise<{
+  assets: ReadonlyArray<{
+    id: string;
+    url: string;
+    bytes: number;
+    type: "image" | "video" | "icon" | "font";
+    mimeType: string;
+    filename: string;
+    altText: string | null;
+    folderId: string | null;
+    createdAt: string | Date;
+    updatedAt: string | Date;
+  }>;
+  folders: ReadonlyArray<{
+    id: string;
+    name: string;
+    parentId: string | null;
+    createdAt: string | Date;
+    updatedAt: string | Date;
+  }>;
+} | null> {
+  try {
+    const client = getClient();
+    // Cap initial pull at 200 — UI can paginate via media.listAssets cursor
+    // once user opens MediaTab. Per spec: B3 pulls a working set, not
+    // unbounded history.
+    const [assetsResult, foldersResult] = await Promise.all([
+      client.media.listAssets.query({ siteId, limit: 200 }),
+      client.media.listFolders.query({ siteId }),
+    ]);
+    // tRPC's inferred return shape includes Prisma scalars + extras
+    // (_count for folders, nextCursor for paginated assets). The engine's
+    // importServerAssets only reads the fields below, so we narrow via
+    // `unknown` to satisfy TS without re-stating every Prisma column.
+    const items = (assetsResult as { items: unknown }).items as ReadonlyArray<{
+      id: string;
+      url: string;
+      bytes: number;
+      type: "image" | "video" | "icon" | "font";
+      mimeType: string;
+      filename: string;
+      altText: string | null;
+      folderId: string | null;
+      createdAt: string | Date;
+      updatedAt: string | Date;
+    }>;
+    const folders = foldersResult as unknown as ReadonlyArray<{
+      id: string;
+      name: string;
+      parentId: string | null;
+      createdAt: string | Date;
+      updatedAt: string | Date;
+    }>;
+    return { assets: items, folders };
+  } catch {
+    // Auth fail / offline / unconfigured — caller continues with engine state.
+    return null;
+  }
+}
+
 export function getSiteIdFromUrl(): string | null {
   const params = new URLSearchParams(window.location.search);
   return params.get("siteId");

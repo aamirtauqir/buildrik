@@ -221,6 +221,91 @@ export class MediaManager extends MediaEventEmitter {
   }
 
   /**
+   * Phase B3: merge server-side assets + folders into the engine on project
+   * load. Server is authoritative for shared identity (the CUID). Local-only
+   * assets (uploaded but not yet mirrored) are preserved and continue to
+   * retry. Server assets new to this device get metadata-only IndexedDB
+   * rows pointing at the public URL — blobs are lazy-fetched on first
+   * render need.
+   *
+   * Cross-device divergence policy: server wins for assets that exist
+   * server-side; local copies that disagree get the server's metadata.
+   * Asset deleted on another device → still in IndexedDB until the local
+   * editor explicitly deletes (no GC pass yet; safe to defer).
+   */
+  async importServerAssets(
+    serverAssets: ReadonlyArray<{
+      id: string;
+      url: string;
+      bytes: number;
+      type: "image" | "video" | "icon" | "font";
+      mimeType: string;
+      filename: string;
+      altText: string | null;
+      folderId: string | null;
+      createdAt: string | Date;
+      updatedAt: string | Date;
+    }>,
+    serverFolders: ReadonlyArray<{
+      id: string;
+      name: string;
+      parentId: string | null;
+      createdAt: string | Date;
+      updatedAt: string | Date;
+    }>,
+  ): Promise<void> {
+    // Folders first so asset folder refs resolve.
+    const existingFolderIds = new Set(this.state.folders.map((f) => f.id));
+    for (const sf of serverFolders) {
+      if (existingFolderIds.has(sf.id)) continue;
+      const folder: MediaFolder = {
+        id: sf.id,
+        name: sf.name,
+        parentId: sf.parentId, // MediaFolder.parentId is `string | null`
+        createdAt: typeof sf.createdAt === "string" ? sf.createdAt : sf.createdAt.toISOString(),
+        updatedAt: typeof sf.updatedAt === "string" ? sf.updatedAt : sf.updatedAt.toISOString(),
+      };
+      await this.storage.saveFolder(folder);
+      this.state.folders.push(folder);
+      this.emit(MEDIA_EVENTS.FOLDER_CREATED, folder);
+    }
+
+    // Assets — skip duplicates (engine already has matching CUID, e.g.
+    // uploaded earlier this session). Map server enum back to engine
+    // MediaAssetType. SVG-as-image: discriminate via mimeType.
+    const existingAssetIds = new Set(this.state.assets.map((a) => a.id));
+    for (const sa of serverAssets) {
+      if (existingAssetIds.has(sa.id)) continue;
+      const engineType: MediaAssetType =
+        sa.type === "image" && sa.mimeType === "image/svg+xml" ? "svg" : sa.type;
+      const asset: MediaAsset = {
+        id: sa.id,
+        serverId: sa.id,
+        type: engineType,
+        name: sa.filename.replace(/\.[^/.]+$/, ""),
+        originalName: sa.filename,
+        // Server URL is the canonical src; UI renders straight from it
+        // without needing a local blob fetch.
+        src: sa.url,
+        mimeType: sa.mimeType,
+        size: sa.bytes,
+        altText: sa.altText ?? undefined,
+        folderId: sa.folderId ?? undefined,
+        tags: [],
+        createdAt: typeof sa.createdAt === "string" ? sa.createdAt : sa.createdAt.toISOString(),
+        updatedAt: typeof sa.updatedAt === "string" ? sa.updatedAt : sa.updatedAt.toISOString(),
+        assetSource: "uploaded",
+      };
+      // Metadata-only IndexedDB write. Blob arg omitted — first render
+      // request fetches the public URL into a Blob via the existing
+      // getAssetSrc lazy path.
+      await this.storage.saveAsset(asset);
+      this.state.assets.push(asset);
+      this.emit(MEDIA_EVENTS.MEDIA_ADDED, asset);
+    }
+  }
+
+  /**
    * Phase B2: rewrite an asset's ID from the engine-generated local UUID
    * to the server CUID. Updates state, IndexedDB, blob URL map, and emits
    * MEDIA_UPDATED so the UI re-keys.
