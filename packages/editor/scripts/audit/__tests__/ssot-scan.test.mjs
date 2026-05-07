@@ -130,6 +130,18 @@ describe('scanSelectorDuplicates', () => {
     expect(cat4.violations).toHaveLength(0);
     rmSync(dir, { recursive: true, force: true });
   });
+
+  it('flags simple head + ignores wrapped head in same comma-list', () => {
+    const dir = makeFixture({
+      'src/themes/atoms/x.css': '.bd-helper-text { color: gray; }',
+      'src/themes/molecules/y.css': '.bd-helper-text, .bd-form-field--inline > .bd-other { color: red; }',
+    });
+    const results = run(dir, ['--category=4']);
+    const cat4 = results.find((r) => r.category === 'selectorDuplicates');
+    expect(cat4.violations).toHaveLength(1);
+    expect(cat4.violations[0].message).toMatch(/bd-helper-text/);
+    rmSync(dir, { recursive: true, force: true });
+  });
 });
 
 describe('scanHomeContractViolations', () => {
