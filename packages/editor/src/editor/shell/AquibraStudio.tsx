@@ -79,23 +79,25 @@ class StudioErrorBoundary extends React.Component<
         <Stack
           style={{
             padding: 24,
-            color: "#cdd6f4",
-            background: "#11111b",
+            color: "var(--buildrick-text-primary)",
+            background: "var(--buildrick-bg-panel)",
             height: "100vh",
           }}
         >
           <h2 style={{ margin: 0 }}>Something went wrong</h2>
-          <div style={{ color: "#f38ba8" }}>{this.state.message}</div>
-          <div style={{ fontSize: 13, color: "#a6adc8" }}>Please reload the editor.</div>
+          <div style={{ color: "var(--buildrick-error)" }}>{this.state.message}</div>
+          <div style={{ fontSize: 13, color: "var(--buildrick-text-secondary)" }}>
+            Please reload the editor.
+          </div>
           <Button
             onClick={() => window.location.reload()}
             style={{
               alignSelf: "flex-start",
               padding: "8px 14px",
-              background: "linear-gradient(135deg, #89b4fa 0%, #74c7ec 100%)",
+              background: "var(--buildrick-accent)",
               border: "none",
               borderRadius: 6,
-              color: "#1e1e2e",
+              color: "var(--buildrick-text-on-accent)",
               fontWeight: 600,
               cursor: "pointer",
             }}
