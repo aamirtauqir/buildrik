@@ -68,7 +68,10 @@ export interface StudioPanelsProps {
     onSelect: (icon: IconConfig) => void
   ) => void;
   onOpenCreateCollection?: () => void;
-  onOpenImageEditor?: (imageSrc: string, onSave: (editedSrc: string) => void) => void;
+  onOpenImageEditor?: (
+    imageSrc: string,
+    onSave: (editedSrc: string) => void | Promise<void>,
+  ) => void;
   onExportForDeploy?: () => Promise<{
     files: Array<{ path: string; content: string }>;
     projectName?: string;

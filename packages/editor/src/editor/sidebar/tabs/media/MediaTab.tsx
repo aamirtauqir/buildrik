@@ -32,7 +32,10 @@ interface MediaTabProps {
   onPinToggle?: () => void;
   onHelpClick?: () => void;
   onClose?: () => void;
-  onOpenImageEditor?: (imageSrc: string, onSave: (editedSrc: string) => void) => void;
+  onOpenImageEditor?: (
+    imageSrc: string,
+    onSave: (editedSrc: string) => void | Promise<void>,
+  ) => void;
   onOpenIconPicker?: (
     currentIcon: IconConfig | undefined,
     onSelect: (icon: IconConfig) => void

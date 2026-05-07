@@ -78,7 +78,8 @@ export interface StudioModalsProps {
   onCloseImageEditor: () => void;
   imageEditorContext: {
     imageSrc: string;
-    onSave: (editedSrc: string) => void;
+    /** Audit-remediation PR1 [ModalSubmit]: sync OR async accepted. */
+    onSave: (editedSrc: string) => void | Promise<void>;
   } | null;
   showIconPicker: boolean;
   onCloseIconPicker: () => void;
@@ -289,15 +290,17 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
           isOpen={showImageEditor}
           onClose={onCloseImageEditor}
           imageSrc={imageEditorContext.imageSrc}
-          onSave={(editedSrc) => {
-            try {
-              imageEditorContext.onSave(editedSrc);
-              onCloseImageEditor();
-            } catch (err) {
-              makeModalErrorHandler("Save edited image")(err);
-              // Modal stays open so user can retry.
-            }
-          }}
+          /*
+           * Audit-remediation PR1 [ModalSubmit]: forward the promise.
+           * Pre-fix the bridge wrapped a sync try/catch around an async
+           * onSave call, which couldn't catch rejected promises from
+           * MediaTab's actual handler (fetch → blob → upload). Now
+           * ImageEditorModal's handleSave awaits this and routes any
+           * thrown error through onError to the toast adapter, keeping
+           * the modal open for retry.
+           */
+          onSave={imageEditorContext.onSave}
+          onError={makeModalErrorHandler("Save edited image")}
         />
       )}
 

@@ -27,7 +27,17 @@ export interface ImageEditorModalProps {
   isOpen: boolean;
   onClose: () => void;
   imageSrc: string;
-  onSave: (editedSrc: string) => void;
+  /**
+   * Audit-remediation PR1 [ModalSubmit]: accepts sync OR async handler.
+   * MediaTab's real onSave is `async` (fetches the data URL, converts to
+   * Blob, uploads). Pre-fix the contract was `void`, so a thrown promise
+   * from the parent would silently bubble out of React as an unhandled
+   * rejection. Now we await it inside handleSave and surface errors via
+   * onError (or console.error in dev) without dismissing the modal.
+   */
+  onSave: (editedSrc: string) => void | Promise<void>;
+  /** Surface async rejections from onSave. Recommended: wire to toast. */
+  onError?: (err: unknown) => void;
 }
 
 type EditorTab = "crop" | "adjust" | "resize";
@@ -164,6 +174,7 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
   onClose,
   imageSrc,
   onSave,
+  onError,
 }) => {
   const [tab, setTab] = React.useState<EditorTab>("crop");
   const [saving, setSaving] = React.useState(false);
@@ -239,14 +250,24 @@ export const ImageEditorModal: React.FC<ImageEditorModalProps> = ({
         resizeW,
         resizeH,
       );
-      onSave(dataUrl);
+      // Audit-remediation PR1 [ModalSubmit]: await the parent handler so
+      // its rejection surfaces here as a typed error instead of escaping
+      // as an unhandled promise. onSave may be sync (returns void) or
+      // async (returns Promise<void>); both are awaitable.
+      await onSave(dataUrl);
       onClose();
     } catch (err) {
-      console.error("Image save failed:", err);
+      if (onError) {
+        onError(err);
+      } else {
+        console.error("Image save failed:", err);
+      }
+      // Modal stays open on error so the user can retry without
+      // re-opening + re-cropping.
     } finally {
       setSaving(false);
     }
-  }, [imageSrc, croppedArea, rotation, flipH, flipV, adjustments, resizeW, resizeH, onSave, onClose]);
+  }, [imageSrc, croppedArea, rotation, flipH, flipV, adjustments, resizeW, resizeH, onSave, onClose, onError]);
 
   const handleReset = React.useCallback(() => {
     setCrop({ x: 0, y: 0 });

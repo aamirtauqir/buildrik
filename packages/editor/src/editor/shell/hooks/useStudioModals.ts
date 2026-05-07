@@ -29,7 +29,13 @@ export interface MediaLibraryContext {
 /** Image editor context for editing images */
 export interface ImageEditorContext {
   imageSrc: string;
-  onSave: (editedSrc: string) => void;
+  /**
+   * Audit-remediation PR1 [ModalSubmit]: accept sync OR async handler.
+   * MediaTab's actual onSave is async (fetch → blob → upload). Pre-fix
+   * the contract was sync `void`, so a thrown promise from the parent
+   * escaped as an unhandled rejection.
+   */
+  onSave: (editedSrc: string) => void | Promise<void>;
 }
 
 /** Icon picker context for icon selection */
@@ -95,7 +101,10 @@ export interface UseStudioModalsReturn {
   // Image Editor modal
   showImageEditor: boolean;
   imageEditorContext: ImageEditorContext | null;
-  openImageEditor: (imageSrc: string, onSave: (editedSrc: string) => void) => void;
+  openImageEditor: (
+    imageSrc: string,
+    onSave: (editedSrc: string) => void | Promise<void>,
+  ) => void;
   closeImageEditor: () => void;
 
   // Icon Picker modal
@@ -249,7 +258,7 @@ export function useStudioModals(): UseStudioModalsReturn {
 
   // Image Editor handlers
   const openImageEditor = React.useCallback(
-    (imageSrc: string, onSave: (editedSrc: string) => void) => {
+    (imageSrc: string, onSave: (editedSrc: string) => void | Promise<void>) => {
       setImageEditorContext({ imageSrc, onSave });
       setShowImageEditor(true);
     },
