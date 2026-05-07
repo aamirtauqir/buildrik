@@ -112,7 +112,7 @@ describe('scanSelectorDuplicates', () => {
   it('strips /* ... */ comments before matching selectors', () => {
     const dir = makeFixture({
       'src/themes/components.css': '.bd-btn { color: red; }',
-      'src/themes/_layer.css': '/* mentions .bd-btn in JSDoc */\n@layer { /* ok */ }',
+      'src/themes/_layer.css': '/* example: .bd-btn { padding: 9px 16px } */\n@layer { /* ok */ }',
     });
     const results = run(dir, ['--category=4']);
     const cat4 = results.find((r) => r.category === 'selectorDuplicates');
