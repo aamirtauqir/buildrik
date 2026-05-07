@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import { checkSiteRole, PermissionError } from "@/server/services/permission.service";
+import { assertSiteAccess, checkSiteRole, PermissionError } from "@/server/services/permission.service";
 import {
   listSites,
   createSite,
@@ -69,7 +69,13 @@ export const sitesRouter = router({
 
   get: protectedProcedure
     .input(z.object({ id: z.string() }))
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.id);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       const site = await getSite(input.id);
       if (!site) throw new TRPCError({ code: "NOT_FOUND" });
       return site;
@@ -372,7 +378,13 @@ export const sitesRouter = router({
 
   saveProjectData: protectedProcedure
     .input(saveProjectDataSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       try {
         return await saveProjectData(input);
       } catch (e: unknown) {
@@ -384,7 +396,13 @@ export const sitesRouter = router({
 
   getProjectData: protectedProcedure
     .input(getProjectDataSchema)
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
+      try {
+        await assertSiteAccess(ctx.prisma, ctx.session.user.id, input.siteId);
+      } catch (e) {
+        if (e instanceof PermissionError) throw new TRPCError({ code: e.code, message: e.message });
+        throw e;
+      }
       try {
         return await getProjectData(input.siteId);
       } catch (e: unknown) {

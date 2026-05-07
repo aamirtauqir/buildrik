@@ -4,6 +4,21 @@ import { decode } from "next-auth/jwt";
 
 const authenticatedAuthRoutes = ["/auth/workspace-select", "/auth/success", "/auth/redirect"];
 
+/**
+ * Cross-origin auth model (P0.4 — settings industrial plan)
+ *
+ * Editor (editor.buildrik.com) and dashboard (app.buildrik.com) are SAME-SITE
+ * under buildrik.com. Existing NextAuth `SameSite=lax` cookie + `credentials: "include"`
+ * on the editor's tRPC client handles cross-origin auth without SameSite=None.
+ *
+ * Dev: editor at localhost:5050 hits dashboard at localhost:3000 via Vite's
+ * `/api` proxy (see packages/editor/vite.config.ts) — same-origin from browser POV.
+ * Prod: editor.buildrik.com calls app.buildrik.com directly. Browser sends the
+ * `__Secure-next-auth.session-token` cookie because both share the eTLD+1.
+ *
+ * EDITOR_ORIGIN env var pins the allowed origin for CORS preflight responses.
+ * Set to the editor's prod URL in Vercel env. No wildcard — explicit allowlist only.
+ */
 const EDITOR_ORIGIN = process.env.EDITOR_ORIGIN || "http://localhost:5050";
 
 export async function middleware(req: NextRequest) {

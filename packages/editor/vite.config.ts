@@ -32,6 +32,11 @@ export default defineConfig({
   server: {
     port: 5050,
     host: "0.0.0.0",
+    // Dev cross-origin auth: editor proxies /api → dashboard (localhost:3000)
+    // so the browser sees same-origin requests and sends the NextAuth cookie.
+    // Prod is same-site under buildrik.com (editor.buildrik.com → app.buildrik.com)
+    // so SameSite=lax + credentials:include works without proxying. See
+    // packages/dashboard/middleware.ts for prod CORS allowlist via EDITOR_ORIGIN.
     proxy: {
       "/api": {
         target: "http://localhost:3000",
