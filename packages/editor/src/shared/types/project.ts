@@ -90,6 +90,29 @@ export interface AnalyticsConfig {
   };
 }
 
+/**
+ * Forward-compatible per-page metadata. Persisted as Page.meta JSONB column.
+ *
+ * Phase -1 wiring: editor includes this in `composer.exportProject()` output;
+ * sites.saveProject persists via `Page.meta`; BuildrikSyncProvider.loadProject
+ * restores it on next load. REGRESSION-1: applied-template state survives reload.
+ *
+ * Forward-compat: extra unknown keys are preserved through save/load. Newer
+ * editor builds can write fields older builds don't recognize without losing data.
+ */
+export interface PageMeta {
+  /** Templates applied to this page (latest at end). Drives applied-template badge. */
+  appliedTemplates?: Array<{
+    templateId: string;
+    /** Optional semver — populated once Phase B template versions ship. */
+    version?: string;
+    /** ISO8601 apply timestamp. */
+    appliedAt: string;
+  }>;
+  /** Forward-compat catch-all — unknown keys preserved through round-trip. */
+  [key: string]: unknown;
+}
+
 export interface PageData {
   /** Page ID */
   id: string;
@@ -105,6 +128,11 @@ export interface PageData {
   styles?: StyleData[];
   /** Page settings */
   settings?: PageSettings;
+  /**
+   * Per-page metadata (applied templates, forward-compat keys).
+   * Phase -1: persisted via Page.meta JSONB column.
+   */
+  meta?: PageMeta;
   /** ISO8601 timestamp of the most recent meaningful mutation (name, slug, settings, content) */
   updatedAt?: string;
   /**

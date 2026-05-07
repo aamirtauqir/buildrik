@@ -81,12 +81,23 @@ export class ElementManager {
     return this.pageManager.getActivePage();
   }
 
-  /** Update page metadata (name/slug/settings/slugManuallySet) */
+  /** Update page metadata (name/slug/settings/slugManuallySet/meta) */
   updatePage(
     id: string,
-    data: Partial<Pick<PageData, "name" | "slug" | "settings" | "slugManuallySet">>
+    data: Partial<Pick<PageData, "name" | "slug" | "settings" | "slugManuallySet" | "meta">>
   ): void {
     this.pageManager.updatePage(id, data);
+  }
+
+  /**
+   * Phase -1: record an applied-template entry on a page's meta stack.
+   * Used by TemplatesTab after successful apply. Persists via Page.meta JSONB.
+   */
+  recordAppliedTemplate(
+    pageId: string,
+    entry: { templateId: string; version?: string; appliedAt?: string }
+  ): void {
+    this.pageManager.recordAppliedTemplate(pageId, entry);
   }
 
   /** Set active page */

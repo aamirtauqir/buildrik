@@ -16,6 +16,8 @@ export type PlanLimitKey =
   | "analyticsRetentionDays"
   | "shareLinkExpiryMaxDays"
   | "shareLinkPasswords"
+  | "assetVersionsCap"
+  | "templateVersionsCap"
   | "priceMonthly"
   | "priceYearly";
 
@@ -38,6 +40,8 @@ export const PLAN_LIMITS: Record<PlanName, PlanLimits> = {
     analyticsRetentionDays: 7,
     shareLinkExpiryMaxDays: 7,
     shareLinkPasswords: false,
+    assetVersionsCap: 5,
+    templateVersionsCap: -1,
     priceMonthly: 0,
     priceYearly: 0,
   },
@@ -57,6 +61,8 @@ export const PLAN_LIMITS: Record<PlanName, PlanLimits> = {
     analyticsRetentionDays: 30,
     shareLinkExpiryMaxDays: 30,
     shareLinkPasswords: true,
+    assetVersionsCap: 25,
+    templateVersionsCap: -1,
     priceMonthly: 29,
     priceYearly: 23,
   },
@@ -76,6 +82,8 @@ export const PLAN_LIMITS: Record<PlanName, PlanLimits> = {
     analyticsRetentionDays: 90,
     shareLinkExpiryMaxDays: 90,
     shareLinkPasswords: true,
+    assetVersionsCap: 100,
+    templateVersionsCap: -1,
     priceMonthly: 79,
     priceYearly: 63,
   },

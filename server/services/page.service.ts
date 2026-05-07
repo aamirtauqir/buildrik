@@ -13,6 +13,9 @@ function slugify(name: string): string {
 }
 
 export async function listPages(siteId: string) {
+  // Phase -1: full page hydration. BuildrikSyncProvider.loadProject expects
+  // blocks/settings/slugHistory/meta/slugManuallySet for applied-template
+  // state + slug-redirect history to survive reload.
   return prisma.page.findMany({
     where: { siteId },
     select: {
@@ -24,6 +27,11 @@ export async function listPages(siteId: string) {
       isHomePage: true,
       seoTitle: true,
       seoDescription: true,
+      blocks: true,
+      meta: true,
+      settings: true,
+      slugHistory: true,
+      slugManuallySet: true,
       updatedAt: true,
       createdAt: true,
     },

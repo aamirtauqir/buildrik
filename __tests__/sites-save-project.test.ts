@@ -10,6 +10,10 @@ vi.mock("@/lib/prisma", () => ({
       findMany: vi.fn(),
       deleteMany: vi.fn(),
       upsert: vi.fn(),
+      update: vi.fn(),
+    },
+    formBlock: {
+      deleteMany: vi.fn(),
     },
     $transaction: vi.fn((fn: any) =>
       fn({
@@ -17,9 +21,13 @@ vi.mock("@/lib/prisma", () => ({
           findMany: vi.fn().mockResolvedValue([]),
           deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
           upsert: vi.fn().mockResolvedValue({}),
+          update: vi.fn().mockResolvedValue({}),
         },
         site: {
           update: vi.fn().mockResolvedValue({}),
+        },
+        formBlock: {
+          deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
         },
       })
     ),
@@ -31,9 +39,28 @@ vi.mock("@/server/services/email.service", () => ({
 }));
 
 import { prisma } from "@/lib/prisma";
-import { saveProjectData } from "@/server/services/sites.service";
+import {
+  saveProjectFromEditor,
+  saveProjectData,
+} from "@/server/services/sites.service";
 
-describe("saveProjectData", () => {
+function makeTx() {
+  const txPage = {
+    findMany: vi.fn().mockResolvedValue([]),
+    deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
+    upsert: vi.fn().mockResolvedValue({}),
+    update: vi.fn().mockResolvedValue({}),
+  };
+  const txSite = {
+    update: vi.fn().mockResolvedValue({}),
+  };
+  const txFormBlock = {
+    deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
+  };
+  return { txPage, txSite, txFormBlock };
+}
+
+describe("saveProjectFromEditor — editor save path (positional args)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -44,19 +71,12 @@ describe("saveProjectData", () => {
       name: "Test Site",
     } as any);
 
-    const txPage = {
-      findMany: vi.fn().mockResolvedValue([]),
-      deleteMany: vi.fn(),
-      upsert: vi.fn().mockResolvedValue({}),
-    };
-    const txSite = {
-      update: vi.fn().mockResolvedValue({}),
-    };
+    const { txPage, txSite, txFormBlock } = makeTx();
     vi.mocked(prisma.$transaction).mockImplementation((fn: any) =>
-      fn({ page: txPage, site: txSite })
+      fn({ page: txPage, site: txSite, formBlock: txFormBlock })
     );
 
-    const result = await saveProjectData("site-1", {
+    const result = await saveProjectFromEditor("site-1", {
       version: "1.0",
       pages: [
         {
@@ -80,7 +100,6 @@ describe("saveProjectData", () => {
 
     expect(result.success).toBe(true);
     expect(result.savedAt).toBeInstanceOf(Date);
-
     expect(txPage.upsert).toHaveBeenCalledTimes(2);
     expect(txPage.upsert).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -95,7 +114,6 @@ describe("saveProjectData", () => {
         }),
       })
     );
-
     expect(txSite.update).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: "site-1" },
@@ -109,9 +127,8 @@ describe("saveProjectData", () => {
 
   it("throws SITE_NOT_FOUND when site does not exist", async () => {
     vi.mocked(prisma.site.findUnique).mockResolvedValue(null);
-
     await expect(
-      saveProjectData("nonexistent", {
+      saveProjectFromEditor("nonexistent", {
         version: "1.0",
         pages: [],
         styles: [],
@@ -126,19 +143,12 @@ describe("saveProjectData", () => {
       name: "Test Site",
     } as any);
 
-    const txPage = {
-      findMany: vi.fn().mockResolvedValue([]),
-      deleteMany: vi.fn(),
-      upsert: vi.fn(),
-    };
-    const txSite = {
-      update: vi.fn().mockResolvedValue({}),
-    };
+    const { txPage, txSite, txFormBlock } = makeTx();
     vi.mocked(prisma.$transaction).mockImplementation((fn: any) =>
-      fn({ page: txPage, site: txSite })
+      fn({ page: txPage, site: txSite, formBlock: txFormBlock })
     );
 
-    const result = await saveProjectData("site-1", {
+    const result = await saveProjectFromEditor("site-1", {
       version: "1.0",
       pages: [],
       styles: [],
@@ -147,7 +157,7 @@ describe("saveProjectData", () => {
 
     expect(result.success).toBe(true);
     expect(txPage.upsert).not.toHaveBeenCalled();
-    expect(txPage.deleteMany).not.toHaveBeenCalled();
+    expect(txPage.update).not.toHaveBeenCalled();
     expect(txSite.update).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ pages: 0 }),
@@ -161,23 +171,19 @@ describe("saveProjectData", () => {
       name: "Test Site",
     } as any);
 
-    const txPage = {
-      findMany: vi.fn().mockResolvedValue([
-        { id: "page-1" },
-        { id: "page-2" },
-        { id: "page-3" },
-      ]),
-      deleteMany: vi.fn().mockResolvedValue({ count: 2 }),
-      upsert: vi.fn().mockResolvedValue({}),
-    };
-    const txSite = {
-      update: vi.fn().mockResolvedValue({}),
-    };
+    const { txPage, txSite, txFormBlock } = makeTx();
+    txPage.findMany.mockResolvedValue([
+      { id: "page-1" },
+      { id: "page-2" },
+      { id: "page-3" },
+    ]);
+    txPage.deleteMany.mockResolvedValue({ count: 2 });
+
     vi.mocked(prisma.$transaction).mockImplementation((fn: any) =>
-      fn({ page: txPage, site: txSite })
+      fn({ page: txPage, site: txSite, formBlock: txFormBlock })
     );
 
-    const result = await saveProjectData("site-1", {
+    const result = await saveProjectFromEditor("site-1", {
       version: "1.0",
       pages: [
         {
@@ -193,6 +199,9 @@ describe("saveProjectData", () => {
     });
 
     expect(result.success).toBe(true);
+    expect(txFormBlock.deleteMany).toHaveBeenCalledWith({
+      where: { pageId: { in: ["page-2", "page-3"] } },
+    });
     expect(txPage.deleteMany).toHaveBeenCalledWith({
       where: { id: { in: ["page-2", "page-3"] } },
     });
@@ -202,5 +211,179 @@ describe("saveProjectData", () => {
         data: expect.objectContaining({ pages: 1 }),
       })
     );
+  });
+});
+
+describe("REGRESSION-1: pages[].meta round-trip persistence", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("persists pages[].meta on saveProjectFromEditor (codex finding C23)", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({
+      id: "site-1",
+      name: "Test Site",
+    } as any);
+
+    const { txPage, txSite, txFormBlock } = makeTx();
+    vi.mocked(prisma.$transaction).mockImplementation((fn: any) =>
+      fn({ page: txPage, site: txSite, formBlock: txFormBlock })
+    );
+
+    const appliedTemplates = [
+      {
+        templateId: "lumen-hero",
+        version: "2.0",
+        appliedAt: "2026-05-07T17:00:00.000Z",
+      },
+    ];
+
+    await saveProjectFromEditor("site-1", {
+      version: "1.0",
+      pages: [
+        {
+          id: "page-1",
+          name: "Home",
+          slug: "home",
+          isHome: true,
+          root: { type: "div", children: [] },
+          meta: { appliedTemplates },
+        },
+      ],
+      styles: [],
+      assets: [],
+    });
+
+    // Verify meta passes through to upsert.create
+    expect(txPage.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "page-1" },
+        create: expect.objectContaining({
+          meta: { appliedTemplates },
+        }),
+      })
+    );
+  });
+
+  it("persists pages[].settings + slugHistory + slugManuallySet", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({
+      id: "site-1",
+      name: "Test Site",
+    } as any);
+
+    const { txPage, txSite, txFormBlock } = makeTx();
+    vi.mocked(prisma.$transaction).mockImplementation((fn: any) =>
+      fn({ page: txPage, site: txSite, formBlock: txFormBlock })
+    );
+
+    await saveProjectFromEditor("site-1", {
+      version: "1.0",
+      pages: [
+        {
+          id: "page-1",
+          name: "Home",
+          slug: "home-v2",
+          isHome: true,
+          root: { type: "div", children: [] },
+          settings: { theme: "dark" },
+          slugHistory: [
+            { slug: "home", changedAt: "2026-05-01T00:00:00.000Z" },
+          ],
+          slugManuallySet: true,
+        },
+      ],
+      styles: [],
+      assets: [],
+    });
+
+    expect(txPage.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({
+          settings: { theme: "dark" },
+          slugHistory: expect.arrayContaining([
+            expect.objectContaining({ slug: "home", changedAt: "2026-05-01T00:00:00.000Z" }),
+          ]),
+          slugManuallySet: true,
+        }),
+      })
+    );
+  });
+
+  it("treats undefined meta as no-op (forward-compat for older clients)", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({
+      id: "site-1",
+      name: "Test Site",
+    } as any);
+
+    const { txPage, txSite, txFormBlock } = makeTx();
+    vi.mocked(prisma.$transaction).mockImplementation((fn: any) =>
+      fn({ page: txPage, site: txSite, formBlock: txFormBlock })
+    );
+
+    await saveProjectFromEditor("site-1", {
+      version: "1.0",
+      pages: [
+        {
+          id: "page-1",
+          name: "Home",
+          slug: "home",
+          isHome: true,
+          root: { type: "div", children: [] },
+          // No meta field — older client.
+        },
+      ],
+      styles: [],
+      assets: [],
+    });
+
+    // Should not include meta key in create payload (Prisma default = null).
+    const upsertCall = (txPage.upsert as any).mock.calls[0][0];
+    expect(upsertCall.create.meta).toBeUndefined();
+  });
+});
+
+describe("saveProjectData — canonical input-object signature", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("accepts SaveProjectDataInput shape directly", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({
+      id: "site-1",
+      name: "Test Site",
+    } as any);
+
+    const { txPage, txSite, txFormBlock } = makeTx();
+    vi.mocked(prisma.$transaction).mockImplementation((fn: any) =>
+      fn({ page: txPage, site: txSite, formBlock: txFormBlock })
+    );
+
+    const result = await saveProjectData({
+      siteId: "site-1",
+      pages: [
+        {
+          id: "page-1",
+          blocks: { type: "div" },
+          // Partial update — no name/slug/position.
+        },
+      ],
+    });
+
+    expect(result.success).toBe(true);
+    // Partial-snapshot path: uses update, not upsert.
+    expect(txPage.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "page-1" },
+        data: expect.objectContaining({ blocks: { type: "div" } }),
+      })
+    );
+    expect(txPage.upsert).not.toHaveBeenCalled();
+  });
+
+  it("throws SITE_NOT_FOUND when site missing", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue(null);
+    await expect(
+      saveProjectData({ siteId: "nope", pages: [] })
+    ).rejects.toThrow("SITE_NOT_FOUND");
   });
 });

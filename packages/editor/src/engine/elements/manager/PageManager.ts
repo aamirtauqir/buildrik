@@ -115,7 +115,7 @@ export class PageManager {
    */
   updatePage(
     id: string,
-    data: Partial<Pick<PageData, "name" | "slug" | "settings" | "slugManuallySet">>
+    data: Partial<Pick<PageData, "name" | "slug" | "settings" | "slugManuallySet" | "meta">>
   ): void {
     const page = this.ctx.pages.get(id);
     if (!page) return;
@@ -157,11 +157,38 @@ export class PageManager {
       mutated = true;
     }
 
+    if (data.meta !== undefined) {
+      // Phase -1: meta is forward-compat JSON. Merge top-level keys so
+      // appliedTemplates updates don't clobber other meta keys (and vice versa).
+      page.meta = { ...page.meta, ...data.meta };
+      mutated = true;
+    }
+
     if (mutated) {
       page.updatedAt = new Date().toISOString();
       this.ctx.pages.set(id, page);
       this.ctx.composer.emit(EVENTS.PROJECT_CHANGED, { type: "page:updated", page });
     }
+  }
+
+  /**
+   * Phase -1: record a template apply on the active page's meta.appliedTemplates
+   * stack. Called by TemplatesTab apply path. Persists via Page.meta JSONB.
+   *
+   * Latest apply lands at the END of the array. Bounded at 25 entries (cheapest
+   * cap; templates apply rarely enough that 25 is decades of edits).
+   */
+  recordAppliedTemplate(pageId: string, entry: { templateId: string; version?: string; appliedAt?: string }): void {
+    const page = this.ctx.pages.get(pageId);
+    if (!page) return;
+    const stack = (page.meta?.appliedTemplates ?? []).slice();
+    stack.push({
+      templateId: entry.templateId,
+      version: entry.version,
+      appliedAt: entry.appliedAt ?? new Date().toISOString(),
+    });
+    if (stack.length > 25) stack.splice(0, stack.length - 25);
+    this.updatePage(pageId, { meta: { appliedTemplates: stack } });
   }
 
   /** Set active page */

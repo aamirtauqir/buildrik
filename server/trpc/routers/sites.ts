@@ -15,6 +15,7 @@ import {
   checkSlugAvailability,
   transferSite,
   saveProjectData,
+  saveProjectFromEditor,
   getProjectData,
 } from "@/server/services/sites.service";
 import {
@@ -248,6 +249,12 @@ export const sitesRouter = router({
               root: z.any(),
               styles: z.any().optional(),
               settings: z.any().optional(),
+              // Phase -1: full page persistence — applied-template state, slug history, etc.
+              meta: z.any().optional(),
+              slugHistory: z.any().optional(),
+              slugManuallySet: z.boolean().optional(),
+              seoTitle: z.string().nullable().optional(),
+              seoDescription: z.string().nullable().optional(),
             })
           ),
           styles: z.array(z.any()),
@@ -278,7 +285,7 @@ export const sitesRouter = router({
         });
 
       try {
-        return await saveProjectData(input.siteId, input.projectData);
+        return await saveProjectFromEditor(input.siteId, input.projectData);
       } catch (e: unknown) {
         if (e instanceof Error && e.message === "SITE_NOT_FOUND")
           throw new TRPCError({

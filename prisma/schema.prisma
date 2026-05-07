@@ -206,17 +206,21 @@ model Site {
 }
 
 model Page {
-  id             String   @id @default(cuid())
-  siteId         String
-  name           String   @db.VarChar(100)
-  slug           String   @db.VarChar(100)
-  position       Int
-  blocks         Json     @default("[]")
-  isHomePage     Boolean  @default(false)
-  seoTitle       String?  @db.VarChar(60)
-  seoDescription String?  @db.VarChar(160)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id               String   @id @default(cuid())
+  siteId           String
+  name             String   @db.VarChar(100)
+  slug             String   @db.VarChar(100)
+  position         Int
+  blocks           Json     @default("[]")
+  isHomePage       Boolean  @default(false)
+  seoTitle         String?  @db.VarChar(60)
+  seoDescription   String?  @db.VarChar(160)
+  meta             Json?
+  settings         Json?
+  slugHistory      Json?
+  slugManuallySet  Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
 

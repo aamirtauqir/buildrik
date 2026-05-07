@@ -57,12 +57,66 @@ export const checkSlugSchema = z.object({
     ),
 });
 
+/**
+ * Page meta — forward-compatible Json column on Page.
+ *
+ * Currently models:
+ *   - appliedTemplates: stack of templates ever applied to this page (latest at end)
+ *
+ * Persisted via sites.service.ts:saveProjectData → Page.meta column (Phase -1).
+ * Editor reads via BuildrikSyncProvider.loadProject and surfaces in TemplatesTab
+ * applied-template badge + future where-used drawer.
+ *
+ * Forward-compat: unknown keys passed through unchanged so older clients don't strip
+ * fields written by newer clients.
+ */
+export const pageMetaSchema = z
+  .object({
+    appliedTemplates: z
+      .array(
+        z.object({
+          templateId: z.string(),
+          version: z.string().optional(),
+          appliedAt: z.string(), // ISO date
+        })
+      )
+      .optional(),
+  })
+  .passthrough();
+
+export const pageSettingsSchema = z.unknown(); // shape owned by editor; forward-compat
+
+/**
+ * Slug-change history entry. Matches editor's `SlugChange` interface in
+ * packages/editor/src/shared/types/project.ts. Each entry stores the prior
+ * slug (the value being redirected FROM); the current slug is implicit
+ * (`Page.slug`). Used to generate 301 redirects on publish.
+ */
+export const slugHistorySchema = z.array(
+  z.object({
+    slug: z.string(), // prior slug
+    changedAt: z.string(), // ISO date
+  })
+);
+
 export const saveProjectDataSchema = z.object({
   siteId: z.string(),
   pages: z.array(
     z.object({
       id: z.string(),
       blocks: z.unknown(),
+      // Phase -1 additions: full page persistence for round-trip integrity.
+      // All optional so older editor builds keep working.
+      name: z.string().optional(),
+      slug: z.string().optional(),
+      isHomePage: z.boolean().optional(),
+      position: z.number().optional(),
+      seoTitle: z.string().optional().nullable(),
+      seoDescription: z.string().optional().nullable(),
+      meta: pageMetaSchema.optional().nullable(),
+      settings: pageSettingsSchema.optional(),
+      slugHistory: slugHistorySchema.optional().nullable(),
+      slugManuallySet: z.boolean().optional(),
     })
   ),
   styles: z.unknown().optional(),

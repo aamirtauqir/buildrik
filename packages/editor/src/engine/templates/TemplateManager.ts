@@ -6,6 +6,24 @@
  *
  * @module engine/templates/TemplateManager
  * @license BSD-3-Clause
+ *
+ * @deprecated SOFT-DEPRECATION 2026-05-07 (sidebar-templates-media-engine arc, decision #3).
+ *
+ * Two parallel template-apply models exist in the editor:
+ *   1. ProjectData path: composer.templates.loadTemplate() / mergeTemplate() / saveAsTemplate()
+ *      — used by useTemplateManager hook → src/templates/TemplateLibrary.tsx (and StudioModals)
+ *   2. Raw HTML path: composer.elements.importHTMLToActivePage(t.html)
+ *      — used by editor/sidebar/tabs/templates/TemplatesTab.tsx
+ *
+ * The new arc consolidates ALL template work onto path (2) for token-binding compatibility.
+ * Path (1) is retained because TemplateLibrary + StudioModals still consume it; reconciliation
+ * lives in a follow-up arc tracked as `template-apply-unification`.
+ *
+ * DO NOT extend this class with new functionality. New template features land on the
+ * importHTMLToActivePage path or in editor/sidebar/tabs/templates/. When the unification
+ * arc lands, this class is deleted in one PR.
+ *
+ * Reference: ~/.gstack/projects/aamirtauqir-buildrik/ceo-plans/2026-05-07-sidebar-templates-media-engine.md
  */
 
 import type { ProjectData } from "../../shared/types";

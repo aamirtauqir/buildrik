@@ -414,7 +414,17 @@ export async function deleteSite(siteId: string, confirmName: string) {
   return { success: true };
 }
 
-export async function saveProjectData(
+/**
+ * Editor's `sites.saveProject` router shape — what `composer.exportProject()`
+ * produces and what BuildrikSyncProvider.saveProject sends. Translated to
+ * SaveProjectDataInput shape and forwarded to consolidated saveProjectData.
+ *
+ * Phase -1 consolidation: previously this function and saveProjectData(input)
+ * coexisted as a duplicate-export TS2323/TS2393 error. Build pipeline
+ * silently dropped the conflict; runtime hoisting picked one. Now this is
+ * a thin adapter that maps the editor shape → canonical input shape.
+ */
+export async function saveProjectFromEditor(
   siteId: string,
   projectData: {
     version: string;
@@ -423,7 +433,13 @@ export async function saveProjectData(
       name: string;
       slug?: string;
       isHome?: boolean;
-      root: unknown;
+      root?: unknown;
+      settings?: unknown;
+      meta?: unknown;
+      slugHistory?: unknown;
+      slugManuallySet?: boolean;
+      seoTitle?: string | null;
+      seoDescription?: string | null;
     }>;
     styles: unknown[];
     assets: unknown[];
@@ -431,57 +447,26 @@ export async function saveProjectData(
     settings?: unknown;
   }
 ) {
-  const site = await prisma.site.findUnique({ where: { id: siteId } });
-  if (!site) throw new Error("SITE_NOT_FOUND");
-
-  const savedAt = new Date();
-
-  await prisma.$transaction(async (tx) => {
-    const existingPages = await tx.page.findMany({
-      where: { siteId },
-      select: { id: true },
-    });
-
-    const incomingPageIds = new Set(projectData.pages.map((p) => p.id));
-    const pagesToDelete = existingPages.filter((p) => !incomingPageIds.has(p.id));
-
-    if (pagesToDelete.length > 0) {
-      await tx.page.deleteMany({
-        where: { id: { in: pagesToDelete.map((p) => p.id) } },
-      });
-    }
-
-    for (const [index, page] of projectData.pages.entries()) {
-      await tx.page.upsert({
-        where: { id: page.id },
-        create: {
-          id: page.id,
-          siteId,
-          name: page.name,
-          slug: page.slug || page.name.toLowerCase().replace(/\s+/g, "-"),
-          position: index,
-          isHomePage: page.isHome || false,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          blocks: page.root as any,
-        },
-        update: {
-          name: page.name,
-          slug: page.slug || page.name.toLowerCase().replace(/\s+/g, "-"),
-          position: index,
-          isHomePage: page.isHome || false,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          blocks: page.root as any,
-        },
-      });
-    }
-
-    await tx.site.update({
-      where: { id: siteId },
-      data: { lastEditedAt: savedAt, pages: projectData.pages.length },
-    });
+  return saveProjectData({
+    siteId,
+    pages: projectData.pages.map((p, index) => ({
+      id: p.id,
+      blocks: p.root,
+      name: p.name,
+      slug: p.slug,
+      isHomePage: p.isHome,
+      position: index,
+      seoTitle: p.seoTitle ?? undefined,
+      seoDescription: p.seoDescription ?? undefined,
+      meta: p.meta as Record<string, unknown> | undefined,
+      settings: p.settings,
+      slugHistory: p.slugHistory as Array<{ fromSlug: string; toSlug: string; changedAt: string }> | undefined,
+      slugManuallySet: p.slugManuallySet,
+    })),
+    styles: projectData.styles,
+    assets: projectData.assets,
+    settings: projectData.settings,
   });
-
-  return { success: true, savedAt };
 }
 
 export async function bulkAction(
@@ -531,32 +516,145 @@ export async function bulkAction(
   }
 }
 
+/**
+ * Phase -1: canonical project-data persistence path.
+ *
+ * Writes:
+ *   - Per page: blocks, name, slug, position, isHomePage, seoTitle, seoDescription,
+ *     meta (Json?), settings (Json?), slugHistory (Json?), slugManuallySet (Boolean).
+ *   - Upserts incoming pages by id, deletes pages no longer present.
+ *   - Site-level: projectStyles, projectAssets, projectSettings, lastEditedAt.
+ *
+ * REGRESSION-1 (codex finding C23): `pages[].meta` was previously dropped on
+ * save, breaking applied-template state across reload. Persisting meta is
+ * load-bearing for P2 + P9 (template version pinning + applied-template badge).
+ */
 export async function saveProjectData(input: SaveProjectDataInput) {
   const site = await prisma.site.findUnique({ where: { id: input.siteId } });
   if (!site) throw new Error("SITE_NOT_FOUND");
 
+  const savedAt = new Date();
+
   await prisma.$transaction(async (tx) => {
-    // Update each page's blocks
-    for (const page of input.pages) {
-      await tx.page.update({
-        where: { id: page.id },
-        data: { blocks: page.blocks as Prisma.InputJsonValue },
+    // Delete pages not in incoming set (only when caller supplies position
+    // for every page — that's how we infer the editor sent a full project
+    // snapshot, not a partial blocks update).
+    const isFullSnapshot = input.pages.every((p: { position?: number }) => p.position !== undefined);
+    if (isFullSnapshot) {
+      const existingPages = await tx.page.findMany({
+        where: { siteId: input.siteId },
+        select: { id: true },
       });
+      const incomingPageIds = new Set(input.pages.map((p: { id: string }) => p.id));
+      const pagesToDelete = existingPages.filter((p) => !incomingPageIds.has(p.id));
+      if (pagesToDelete.length > 0) {
+        await tx.formBlock.deleteMany({
+          where: { pageId: { in: pagesToDelete.map((p) => p.id) } },
+        });
+        await tx.page.deleteMany({
+          where: { id: { in: pagesToDelete.map((p) => p.id) } },
+        });
+      }
     }
 
-    // Save project-level styles, assets, and settings on the site
+    // Upsert each incoming page.
+    for (const [index, page] of input.pages.entries()) {
+      const slug =
+        page.slug ?? (page.name ? page.name.toLowerCase().replace(/\s+/g, "-") : undefined);
+
+      // Phase -1: persist meta + settings + slugHistory + slugManuallySet
+      // (previously silently dropped, breaking applied-template reload).
+      const metaJson =
+        page.meta === undefined
+          ? undefined
+          : page.meta === null
+            ? Prisma.JsonNull
+            : (page.meta as Prisma.InputJsonValue);
+      const settingsJson =
+        page.settings === undefined
+          ? undefined
+          : (page.settings as Prisma.InputJsonValue);
+      const slugHistoryJson =
+        page.slugHistory === undefined
+          ? undefined
+          : page.slugHistory === null
+            ? Prisma.JsonNull
+            : (page.slugHistory as Prisma.InputJsonValue);
+
+      const updateData: Prisma.PageUpdateInput = {
+        blocks: page.blocks as Prisma.InputJsonValue,
+      };
+      if (page.name !== undefined) updateData.name = page.name;
+      if (slug !== undefined) updateData.slug = slug;
+      if (page.position !== undefined) updateData.position = page.position ?? index;
+      if (page.isHomePage !== undefined) updateData.isHomePage = page.isHomePage;
+      if (page.seoTitle !== undefined) updateData.seoTitle = page.seoTitle;
+      if (page.seoDescription !== undefined) updateData.seoDescription = page.seoDescription;
+      if (metaJson !== undefined) updateData.meta = metaJson;
+      if (settingsJson !== undefined) updateData.settings = settingsJson;
+      if (slugHistoryJson !== undefined) updateData.slugHistory = slugHistoryJson;
+      if (page.slugManuallySet !== undefined) updateData.slugManuallySet = page.slugManuallySet;
+
+      // Upsert path used when full snapshot (covers new pages); plain update otherwise.
+      if (isFullSnapshot && page.name !== undefined && slug !== undefined) {
+        await tx.page.upsert({
+          where: { id: page.id },
+          create: {
+            id: page.id,
+            siteId: input.siteId,
+            name: page.name,
+            slug,
+            position: page.position ?? index,
+            isHomePage: page.isHomePage ?? false,
+            blocks: page.blocks as Prisma.InputJsonValue,
+            ...(metaJson !== undefined && metaJson !== Prisma.JsonNull
+              ? { meta: metaJson }
+              : {}),
+            ...(settingsJson !== undefined ? { settings: settingsJson } : {}),
+            ...(slugHistoryJson !== undefined && slugHistoryJson !== Prisma.JsonNull
+              ? { slugHistory: slugHistoryJson }
+              : {}),
+            ...(page.slugManuallySet !== undefined
+              ? { slugManuallySet: page.slugManuallySet }
+              : {}),
+            ...(page.seoTitle !== undefined ? { seoTitle: page.seoTitle } : {}),
+            ...(page.seoDescription !== undefined
+              ? { seoDescription: page.seoDescription }
+              : {}),
+          },
+          update: updateData,
+        });
+      } else {
+        await tx.page.update({
+          where: { id: page.id },
+          data: updateData,
+        });
+      }
+    }
+
+    // Site-level project artifacts.
     await tx.site.update({
       where: { id: input.siteId },
       data: {
-        projectStyles: (input.styles as Prisma.InputJsonValue) ?? Prisma.DbNull,
-        projectAssets: (input.assets as Prisma.InputJsonValue) ?? Prisma.DbNull,
-        projectSettings: (input.settings as Prisma.InputJsonValue) ?? Prisma.DbNull,
-        lastEditedAt: new Date(),
+        projectStyles:
+          input.styles === undefined
+            ? undefined
+            : ((input.styles as Prisma.InputJsonValue) ?? Prisma.DbNull),
+        projectAssets:
+          input.assets === undefined
+            ? undefined
+            : ((input.assets as Prisma.InputJsonValue) ?? Prisma.DbNull),
+        projectSettings:
+          input.settings === undefined
+            ? undefined
+            : ((input.settings as Prisma.InputJsonValue) ?? Prisma.DbNull),
+        lastEditedAt: savedAt,
+        ...(isFullSnapshot ? { pages: input.pages.length } : {}),
       },
     });
   });
 
-  return { success: true };
+  return { success: true, savedAt };
 }
 
 export async function getProjectData(siteId: string) {
@@ -578,6 +676,11 @@ export async function getProjectData(siteId: string) {
           isHomePage: true,
           seoTitle: true,
           seoDescription: true,
+          // Phase -1: round-trip applied-template state + slug-redirect history.
+          meta: true,
+          settings: true,
+          slugHistory: true,
+          slugManuallySet: true,
         },
         orderBy: { position: "asc" },
       },

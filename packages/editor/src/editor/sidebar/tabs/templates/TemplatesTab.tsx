@@ -51,6 +51,24 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   // ── Hooks ──
   const { appliedId, setAppliedId } = useTemplatePersistence();
 
+  // Phase -1: hydrate appliedId from active page's meta.appliedTemplates on
+  // mount + page-switch. Page meta is the durable source (survives reload +
+  // cross-device); sessionStorage is the in-tab fallback the hook reads.
+  React.useEffect(() => {
+    if (!composer) return;
+    const syncFromPageMeta = () => {
+      const active = composer.elements.getActivePage();
+      const stack = active?.meta?.appliedTemplates;
+      const latest = stack && stack.length > 0 ? stack[stack.length - 1] : null;
+      if (latest?.templateId) setAppliedId(latest.templateId);
+    };
+    syncFromPageMeta();
+    composer.on("project:changed", syncFromPageMeta);
+    return () => {
+      composer.off("project:changed", syncFromPageMeta);
+    };
+  }, [composer, setAppliedId]);
+
   const {
     showProgress, setShowProgress,
     applyError, setApplyError,
@@ -133,6 +151,16 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       addToast({ description: `"${t.name}" applied successfully`, tone: "success" });
       recordTemplateApplied(t);
       saveAppliedId(id);
+      // Phase -1: persist applied-template state on Page.meta so it survives reload
+      // + cross-device. sessionStorage path is the legacy fallback for offline.
+      const activePage = composer?.elements.getActivePage();
+      if (activePage) {
+        composer!.elements.recordAppliedTemplate(activePage.id, {
+          templateId: id,
+          // Template version pinning lands in Phase B; sentinel for now.
+          version: undefined,
+        });
+      }
       onTemplateUsed?.();
     });
   }

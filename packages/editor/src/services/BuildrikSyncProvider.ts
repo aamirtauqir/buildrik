@@ -9,7 +9,7 @@
  */
 
 import { createBuildrikApiClient } from "@buildrik/shared";
-import type { PageSettings, ProjectData, SlugChange } from "@/shared/types/project";
+import type { PageMeta, PageSettings, ProjectData, SlugChange } from "@/shared/types/project";
 import type { ElementData } from "@/shared/types/element";
 
 /**
@@ -27,6 +27,8 @@ interface DashboardPageRow {
   blocks?: ElementData;
   position: number;
   settings?: PageSettings;
+  /** Phase -1: applied-template state + forward-compat metadata. */
+  meta?: PageMeta;
   updatedAt?: string;
   slugManuallySet?: boolean;
   slugHistory?: SlugChange[];
@@ -70,6 +72,9 @@ export async function loadProject(siteId: string): Promise<ProjectData> {
         isHome: p.isHomePage,
         root: p.blocks ?? DEFAULT_ROOT,
         settings: p.settings,
+        // Phase -1: meta carries applied-template state + forward-compat keys.
+        // Server returns null for un-set; coerce to undefined so editor uses spread-undefined semantics.
+        meta: p.meta ?? undefined,
         updatedAt: p.updatedAt,
         slugManuallySet: p.slugManuallySet ?? false,
         slugHistory: p.slugHistory ?? [],
