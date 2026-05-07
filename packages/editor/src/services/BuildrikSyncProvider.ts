@@ -122,7 +122,11 @@ function mergeSiteColumnsIntoSettings(
   if (siteCols.socialLinks != null) seo.socialLinks = siteCols.socialLinks as SiteSEO["socialLinks"];
   if (siteCols.headCode != null) customCode.headScripts = siteCols.headCode;
   if (siteCols.bodyCode != null) customCode.bodyScripts = siteCols.bodyCode;
-  if (siteCols.publishedPassword !== undefined) publishing.publishedPassword = siteCols.publishedPassword;
+  // publishedPassword: server redacts the hash on read (returns null if redacted
+  // OR not set). We can't distinguish those here, so we never round-trip null —
+  // user must explicitly type a new value to change it. The hasPublishedPassword
+  // boolean (from server) is the authoritative "is a password set" indicator.
+  if (siteCols.publishedPassword) publishing.publishedPassword = siteCols.publishedPassword;
 
   settings.seo = seo;
   settings.customCode = customCode;
