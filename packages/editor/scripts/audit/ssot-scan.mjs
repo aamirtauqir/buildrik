@@ -111,6 +111,11 @@ export function scanTokenAliasSSOT(root) {
 }
 
 export function scanSelectorDuplicates(root) {
+  // Map<selector, Map<filePath, firstLine>> — anchor is the rule's right-most
+  // simple selector after combinators (whitespace, >, +, ~). Audit Appendix
+  // fix #2: only count rules whose head is a SINGLE simple selector. Context-
+  // wrapped rules like `.parent > .bd-X` are intentionally scoped overrides,
+  // NOT competing base definitions, so they don't enter the duplicate map.
   const byName = new Map();
   let cssFiles = [];
   try { cssFiles = walk(resolve(root, 'src'), ['.css']); } catch { return { category: 'selectorDuplicates', violations: [] }; }
@@ -121,24 +126,36 @@ export function scanSelectorDuplicates(root) {
     content = content.replace(/\/\*[\s\S]*?\*\//g, (match) => match.replace(/[^\n]/g, ' '));
     const lines = content.split('\n');
     lines.forEach((line, i) => {
-      const m = line.match(/\.(bd-[a-z][a-z0-9-]*)\s*\{/);
-      if (!m) return;
       if (PSEUDO_STATES.some((p) => line.includes(p))) return;
-      const name = m[1];
-      if (!byName.has(name)) byName.set(name, []);
-      byName.get(name).push({ path: relative(root, f), line: i + 1 });
+      // Match opening of rule (text before {). Extract every comma-separated head.
+      const ruleHeadMatch = line.match(/^(.+?)\{/);
+      if (!ruleHeadMatch) return;
+      const heads = ruleHeadMatch[1].split(',');
+      for (const head of heads) {
+        const segments = head.trim().split(/\s+|\s*[>+~]\s*/).filter(Boolean);
+        if (segments.length !== 1) continue;
+        // [\w-]* covers BEM modifiers (--), elements (__), digits, hyphens.
+        const m = segments[0].match(/^\.(bd-[a-z][\w-]*)/);
+        if (!m) continue;
+        const selector = m[1];
+        if (!byName.has(selector)) byName.set(selector, new Map());
+        const fileMap = byName.get(selector);
+        const filePath = relative(root, f);
+        if (!fileMap.has(filePath)) fileMap.set(filePath, i + 1);
+      }
     });
   }
   const violations = [];
-  for (const [name, locs] of byName) {
-    const distinctFiles = new Set(locs.map((l) => l.path));
-    if (distinctFiles.size > 1) {
+  for (const [selector, fileMap] of byName) {
+    if (fileMap.size > 1) {
+      const locs = [...fileMap].map(([path, line]) => `${path}:${line}`);
+      const [firstPath, firstLine] = [...fileMap][0];
       violations.push({
-        path: locs[0].path,
-        line: locs[0].line,
+        path: firstPath,
+        line: firstLine,
         severity: 'important',
-        message: `Selector ".${name}" defined in ${distinctFiles.size} files: ${[...distinctFiles].join(', ')}`,
-        suggestion: 'Pick canonical tier CSS; merge or rename if intentional namespace difference.',
+        message: `Selector ".${selector}" defined in ${fileMap.size} files: ${locs.join(', ')}`,
+        suggestion: 'Consolidate to single tier CSS file or document layered override.',
       });
     }
   }

@@ -119,6 +119,17 @@ describe('scanSelectorDuplicates', () => {
     expect(cat4.violations).toHaveLength(0);
     rmSync(dir, { recursive: true, force: true });
   });
+
+  it('does not flag child-combinator wrapped selectors as duplicates', () => {
+    const dir = makeFixture({
+      'src/themes/atoms/helper.css': '.bd-helper-text { color: gray; }',
+      'src/themes/molecules/form.css': '.bd-form-field--inline > .bd-helper-text { font-size: 11px; }',
+    });
+    const results = run(dir, ['--category=4']);
+    const cat4 = results.find((r) => r.category === 'selectorDuplicates');
+    expect(cat4.violations).toHaveLength(0);
+    rmSync(dir, { recursive: true, force: true });
+  });
 });
 
 describe('scanHomeContractViolations', () => {
