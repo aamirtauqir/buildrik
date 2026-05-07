@@ -321,7 +321,7 @@ Memory: 4 prior architecture attempts (V1 spec, V2 spec, axioms draft, editor-v2
 ### Cleanup history (live record)
 
 - **2026-05-09 — SSOT scanner hardening shipped**:
-  - Per audit Appendix #1-#4. Stripped /* */ comments before selector matching, anchored selectorDuplicates on right-most simple selector, added basename-symbol validation to componentDuplicates, walked barrel re-export chains in dead-export check.
+  - Per audit Appendix #1-#4. Stripped /* */ comments before selector matching, anchored selectorDuplicates on single-simple-selector heads (skip wrapped rules), added basename-symbol validation to componentDuplicates, walked barrel re-export chains in dead-export check.
   - selectorDuplicates baseline ratchet: 11 → 4 (real concerns only — `bd-dragging`, `bd-depth-badge`, `bd-topbar`, `bd-topbar__brand` canonical chrome residuals).
   - antiPatterns dead-export: ~3186 → 510 (~84% drop) after barrel-chain reachability.
   - Gate retains ERROR-mode locks on cats 1, 2, 3. Cat 4 stays WARN with new lower baseline.
