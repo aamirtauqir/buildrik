@@ -26,34 +26,91 @@ import {
   DesignSystemIcon,
   SiteSettingsScreen,
   LockedScreen,
-  BillingScreen,
+  AnalyticsScreen,
+  AdvancedScreen,
   SeoScreen,
   IntegrationsHub,
-  PublishingHub,
+  ComingSoonScreen,
   SettingsNavGuard,
 } from "./index";
-import { PublishingIcon } from "./icons";
 import "./settings.css";
 
 // ─── Nav definition ──────────────────────────────────────────────────────────
+//
+// A1 day-1: nav reshuffle to 10 in-tab sections + 8 workspace deep-links,
+// per locked prototype at:
+//   ~/.gstack/projects/aamirtauqir-buildrik/designs/settings-industrial-20260507/prototype.html
+//
+// In-tab sections live in 3 groups (SITE / DISTRIBUTION / PLUMBING). The 4th
+// group (WORKSPACE) is deep-link only — clicking opens the dashboard URL.
+//
+// Existing screens reused: General/Branding/SEO/Analytics/Custom code (Advanced)/Integrations.
+// Stubs: Localization/Redirects/Headers/Forms — render ComingSoonScreen until Phase B ships.
 
-type NavId = "general" | "branding" | "seo" | "integrations" | "publishing" | "billing";
+type InTabNavId =
+  | "general" | "branding" | "seo"
+  | "analytics" | "localization"
+  | "custom-code" | "redirects" | "headers" | "forms" | "integrations";
+
+type NavGroupId = "site" | "distribution" | "plumbing";
 
 interface NavDef {
-  id: NavId;
+  id: InTabNavId;
   title: string;
   subtitle?: string;
+  group: NavGroupId;
   icon: React.FC;
 }
 
 const NAV: NavDef[] = [
-  { id: "general", title: "General", subtitle: "Project metadata", icon: SiteSettingsIcon },
-  { id: "branding", title: "Branding", subtitle: "Colors, type, favicon", icon: DesignSystemIcon },
-  { id: "seo", title: "SEO", subtitle: "Search & social preview", icon: SeoIcon },
-  { id: "integrations", title: "Integrations", subtitle: "Analytics, plugins, custom code", icon: IntegrationsIcon },
-  { id: "publishing", title: "Publishing", subtitle: "Domains, export, deploy", icon: PublishingIcon },
-  { id: "billing", title: "Billing", subtitle: "Plan and usage", icon: BillingIcon },
+  // SITE
+  { id: "general", title: "General", subtitle: "Project metadata", group: "site", icon: SiteSettingsIcon },
+  { id: "branding", title: "Branding", subtitle: "Colors, type, favicon", group: "site", icon: DesignSystemIcon },
+  { id: "seo", title: "SEO", subtitle: "Search & social preview", group: "site", icon: SeoIcon },
+  // DISTRIBUTION
+  { id: "analytics", title: "Analytics", subtitle: "GA4, Plausible, PostHog, Pixel", group: "distribution", icon: IntegrationsIcon },
+  { id: "localization", title: "Localization", subtitle: "Locale claim and preview", group: "distribution", icon: IntegrationsIcon },
+  // PLUMBING
+  { id: "custom-code", title: "Custom code", subtitle: "Head, body, CSS injections", group: "plumbing", icon: IntegrationsIcon },
+  { id: "redirects", title: "Redirects", subtitle: "301 / 302 + 404 suggester", group: "plumbing", icon: IntegrationsIcon },
+  { id: "headers", title: "Headers", subtitle: "CSP, HSTS, security policy", group: "plumbing", icon: IntegrationsIcon },
+  { id: "forms", title: "Forms", subtitle: "Submissions inbox + config", group: "plumbing", icon: IntegrationsIcon },
+  { id: "integrations", title: "Integrations", subtitle: "Third-party OAuth", group: "plumbing", icon: IntegrationsIcon },
 ];
+
+const GROUP_LABELS: Record<NavGroupId, string> = {
+  site: "SITE",
+  distribution: "DISTRIBUTION",
+  plumbing: "PLUMBING",
+};
+
+// Workspace deep-links — open dashboard URLs in new tab. Not in-tab screens.
+const DASHBOARD_URL = (import.meta as { env?: { VITE_DASHBOARD_URL?: string } }).env?.VITE_DASHBOARD_URL || "http://localhost:3000";
+
+interface WorkspaceLink {
+  id: string;
+  title: string;
+  /** path appended to ${DASHBOARD_URL}/sites/${siteId}/ — or workspace-scoped if siteId omitted */
+  path: string;
+  scope: "site" | "workspace";
+}
+
+const WORKSPACE_LINKS: WorkspaceLink[] = [
+  { id: "domains", title: "Domains", path: "domains", scope: "site" },
+  { id: "members", title: "Members", path: "/workspace/members", scope: "workspace" },
+  { id: "billing", title: "Billing", path: "/workspace/billing", scope: "workspace" },
+  { id: "api-tokens", title: "API tokens", path: "/workspace/api-tokens", scope: "workspace" },
+  { id: "webhooks", title: "Webhooks", path: "/workspace/webhooks", scope: "workspace" },
+  { id: "environments", title: "Environments", path: "/workspace/environments", scope: "workspace" },
+  { id: "audit-log", title: "Audit log", path: "/workspace/audit-log", scope: "workspace" },
+  { id: "versions", title: "Versions", path: "versions", scope: "site" },
+];
+
+function buildWorkspaceUrl(link: WorkspaceLink, siteId: string | null): string {
+  if (link.scope === "workspace") return `${DASHBOARD_URL}${link.path}`;
+  if (!siteId) return `${DASHBOARD_URL}/dashboard`; // graceful fallback when siteId unknown
+  return `${DASHBOARD_URL}/dashboard/sites/${siteId}/${link.path}`;
+}
 
 const SETTINGS_SCREENS = NAV.map(({ id, title }) => ({ id, title }));
 
@@ -125,7 +182,7 @@ export const SettingsTab: React.FC<
   const [screenIsDirty, setScreenIsDirty] = React.useState(false);
   const [dirtyCount, setDirtyCount] = React.useState(0);
   const [guardOpen, setGuardOpen] = React.useState(false);
-  const pendingNavRef = React.useRef<NavId | null>(null);
+  const pendingNavRef = React.useRef<InTabNavId | null>(null);
   const [resetKey, setResetKey] = React.useState(0);
 
   React.useEffect(() => {
@@ -144,7 +201,7 @@ export const SettingsTab: React.FC<
   }, []);
 
   const handleNav = React.useCallback(
-    (nextId: NavId) => {
+    (nextId: InTabNavId) => {
       if (nextId === currentScreen) return;
       if (screenIsDirty) {
         pendingNavRef.current = nextId;
@@ -195,12 +252,21 @@ export const SettingsTab: React.FC<
         return <BrandingPlaceholder onOpenPalette={onOpenDesignTab} />;
       case "seo":
         return <SeoScreen composer={composer} onDirtyChange={handleScreenDirty} />;
+      case "analytics":
+        return <AnalyticsScreen composer={composer} onDirtyChange={handleScreenDirty} />;
+      case "custom-code":
+        return <AdvancedScreen composer={composer} onDirtyChange={handleScreenDirty} />;
       case "integrations":
         return <IntegrationsHub composer={composer} onDirtyChange={handleScreenDirty} />;
-      case "publishing":
-        return <PublishingHub composer={composer} />;
-      case "billing":
-        return <BillingScreen userPlan={userPlan} />;
+      // A1 day-1 stubs — Phase B work
+      case "localization":
+        return <ComingSoonScreen title="Localization" phase="Phase B" description="Locale claim with hierarchical fallback (e.g. fr-FR → fr → site default) and per-locale preview switcher." />;
+      case "redirects":
+        return <ComingSoonScreen title="Redirects" phase="Phase B" description="301 (permanent) and 302 (temporary) redirects with 404-suggester surfacing broken inbound links." />;
+      case "headers":
+        return <ComingSoonScreen title="Headers / Security" phase="Phase B" description="CSP, HSTS, X-Frame-Options, password gate config. Headers applied at published-site middleware layer." />;
+      case "forms":
+        return <ComingSoonScreen title="Forms" phase="Phase B" description="Form submissions inbox with cursor pagination, spam scoring, bulk actions, mail handoff for replies." />;
       default:
         return null;
     }
@@ -226,6 +292,26 @@ export const SettingsTab: React.FC<
       </Button>
     );
   };
+
+  // Workspace deep-links: open dashboard URL in new tab.
+  // Only renders when projectId is known (siteId equivalent) for site-scoped links.
+  const renderWorkspaceLink = (link: WorkspaceLink) => (
+    <a
+      key={link.id}
+      href={buildWorkspaceUrl(link, projectId ?? null)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="bd-set-snav-row bd-set-snav-row-external"
+    >
+      <span className="bd-set-snav-icon" aria-hidden>↗</span>
+      <span className="bd-set-snav-label">{link.title}</span>
+      <span className="bd-set-snav-arrow" aria-hidden>open</span>
+    </a>
+  );
+
+  // Group rows by group id for rendering, preserving NAV array order within each group.
+  const navByGroup: Record<NavGroupId, NavDef[]> = { site: [], distribution: [], plumbing: [] };
+  NAV.forEach((n) => navByGroup[n.group].push(n));
 
   return (
     <PanelShell>
@@ -269,7 +355,16 @@ export const SettingsTab: React.FC<
           <nav className="bd-set-snav" aria-label="Settings sections">
             <div className="bd-set-snav-h">Settings</div>
             <div className="bd-set-snav-list">
-              {NAV.map(renderRow)}
+              {(Object.keys(navByGroup) as NavGroupId[]).map((groupId) => (
+                <React.Fragment key={groupId}>
+                  <div className="bd-set-snav-group">{GROUP_LABELS[groupId]}</div>
+                  {navByGroup[groupId].map(renderRow)}
+                </React.Fragment>
+              ))}
+              <div className="bd-set-snav-group">
+                WORKSPACE <span className="bd-set-snav-group-hint">opens dashboard ↗</span>
+              </div>
+              {WORKSPACE_LINKS.map(renderWorkspaceLink)}
               {onReplayTour ? (
                 <Button
                   type="button"

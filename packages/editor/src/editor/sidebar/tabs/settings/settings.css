@@ -66,6 +66,56 @@
   border-top: 1px solid var(--bd-border);
   padding-top: 10px;
 }
+
+/* A1 day-1: group headers in 4-group nav structure */
+.bd-set-snav-group {
+  font: 600 10px/1.2 var(--bd-ui);
+  color: var(--bd-fg-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 12px 10px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.bd-set-snav-group-hint {
+  font-weight: 500;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--bd-fg-muted);
+}
+
+/* External (workspace) deep-links visually distinct from in-tab nav */
+.bd-set-snav-row.bd-set-snav-row-external {
+  background: var(--bd-bg-panel);
+  border: 1px dashed var(--bd-border-default);
+  color: var(--bd-fg-muted);
+  margin: 0 0 2px 0;
+  text-decoration: none;
+}
+.bd-set-snav-row.bd-set-snav-row-external:hover {
+  border-style: solid;
+  border-color: var(--bd-accent);
+  background: var(--bd-accent-soft);
+  color: var(--bd-accent);
+}
+.bd-set-snav-row.bd-set-snav-row-external .bd-set-snav-icon {
+  color: var(--bd-fg-subtle);
+}
+.bd-set-snav-row.bd-set-snav-row-external:hover .bd-set-snav-icon {
+  color: var(--bd-accent);
+}
+.bd-set-snav-arrow {
+  margin-left: auto;
+  font: 500 10px/1 var(--bd-mono);
+  color: var(--bd-fg-subtle);
+  letter-spacing: 0.04em;
+}
+.bd-set-snav-row.bd-set-snav-row-external:hover .bd-set-snav-arrow {
+  color: var(--bd-accent);
+  font-weight: 600;
+}
 .bd-set-snav-icon {
   display: inline-flex;
   align-items: center;
