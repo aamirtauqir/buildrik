@@ -41,12 +41,12 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
     >
       <div
         style={{
-          background: "var(--buildrick-surface-elevated, #1a1b1e)",
+          background: "var(--buildrick-bg-elevated)",
           borderRadius: 16,
           padding: 40,
           maxWidth: 640,
           width: "90%",
-          color: "var(--buildrick-text, #fff)",
+          color: "var(--buildrick-text-primary)",
         }}
       >
         <h1
@@ -55,7 +55,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
         >
           Welcome to Buildrik
         </h1>
-        <p style={{ color: "var(--buildrick-text-muted, #9ca3af)", marginBottom: 32, marginTop: 8 }}>
+        <p style={{ color: "var(--buildrick-text-muted)", marginBottom: 32, marginTop: 8 }}>
           Start with a template — or build from scratch.
         </p>
 
@@ -72,8 +72,8 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
               key={t.id}
               onClick={() => onSelectTemplate(t.id)}
               style={{
-                background: "var(--buildrick-surface-2, #2a2b2e)",
-                border: "1px solid var(--buildrick-border, rgba(255,255,255,0.1))",
+                background: "var(--buildrick-bg-card)",
+                border: "1px solid var(--buildrick-border-light)",
                 borderRadius: 10,
                 padding: "16px 12px",
                 cursor: "pointer",
@@ -84,13 +84,13 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
               <div
                 style={{
                   height: 80,
-                  background: "var(--buildrick-surface-3, #3a3b3e)",
+                  background: "var(--buildrick-bg-subtle)",
                   borderRadius: 6,
                   marginBottom: 10,
                 }}
               />
               <div style={{ fontSize: 13, fontWeight: 600 }}>{t.name}</div>
-              <div style={{ fontSize: 11, color: "var(--buildrick-text-muted, #9ca3af)" }}>
+              <div style={{ fontSize: 11, color: "var(--buildrick-text-muted)" }}>
                 {t.tag}
               </div>
             </Button>

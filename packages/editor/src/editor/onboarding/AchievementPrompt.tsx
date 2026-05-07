@@ -89,8 +89,8 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
           zIndex: 10001,
           width: 380,
           maxWidth: "calc(100vw - 48px)",
-          background: "var(--buildrick-bg-panel, #1c1e24)",
-          border: "1px solid var(--buildrick-border, rgba(255,255,255,0.1))",
+          background: "var(--buildrick-bg-panel)",
+          border: "1px solid var(--buildrick-border-light)",
           borderRadius: 16,
           boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
           overflow: "hidden",
@@ -102,7 +102,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
           style={{
             height: 3,
             background: isLastStep
-              ? "var(--buildrick-success, #10b981)"
+              ? "var(--buildrick-success)"
               : "var(--buildrick-accent)",
             width: `${progress}%`,
             transition: "width 50ms linear",
@@ -141,7 +141,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                   fontWeight: 600,
                   textTransform: "uppercase",
                   letterSpacing: 0.8,
-                  color: "var(--buildrick-success, #10b981)",
+                  color: "var(--buildrick-success)",
                 }}
               >
                 {isLastStep ? "All done!" : "Step complete"}
@@ -152,7 +152,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
                   margin: 0,
                   fontSize: 16,
                   fontWeight: 700,
-                  color: "var(--buildrick-text-primary, #fff)",
+                  color: "var(--buildrick-text-primary)",
                 }}
               >
                 {isLastStep ? "You're all set!" : completedStep.label}
@@ -242,7 +242,7 @@ export const AchievementPrompt: React.FC<AchievementPromptProps> = ({
               width: "100%",
               padding: "11px 20px",
               background: isLastStep
-                ? "var(--buildrick-success, #10b981)"
+                ? "var(--buildrick-success)"
                 : "var(--buildrick-accent)",
               border: "none",
               borderRadius: 10,

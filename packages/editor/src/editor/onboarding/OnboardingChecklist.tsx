@@ -148,7 +148,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
           style={{
             ...progressFillStyles,
             width: `${progress}%`,
-            background: allDone ? "#10b981" : "var(--bd-accent)",
+            background: allDone ? "var(--buildrick-success)" : "var(--bd-accent)",
           }}
         />
       </div>
@@ -181,8 +181,8 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
                 <span
                   style={{
                     ...circleStyles,
-                    background: isCompleted ? "#10b981" : isActive ? "var(--bd-accent)" : "transparent",
-                    borderColor: isCompleted ? "#10b981" : isActive ? "var(--bd-accent)" : "rgba(255,255,255,0.2)",
+                    background: isCompleted ? "var(--buildrick-success)" : isActive ? "var(--bd-accent)" : "transparent",
+                    borderColor: isCompleted ? "var(--buildrick-success)" : isActive ? "var(--bd-accent)" : "rgba(255,255,255,0.2)",
                   }}
                   aria-hidden="true"
                 >
@@ -286,7 +286,7 @@ const pillDotStyles = (done: boolean): React.CSSProperties => ({
   width: 8,
   height: 8,
   borderRadius: "50%",
-  background: done ? "#10b981" : "var(--bd-accent)",
+  background: done ? "var(--buildrick-success)" : "var(--bd-accent)",
   flexShrink: 0,
 });
 
