@@ -122,6 +122,7 @@ export const saveProjectDataSchema = z.object({
   styles: z.unknown().optional(),
   assets: z.unknown().optional(),
   settings: z.unknown().optional(),
+  dsSchemaVersion: z.number().int().min(0).optional(),
 });
 
 export const getProjectDataSchema = z.object({
