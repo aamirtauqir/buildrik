@@ -247,7 +247,6 @@ describe('scanAntiPatterns', () => {
     const dir = makeFixture({
       'src/feature/Foo.ts': 'export const Foo = 1;',
       'src/feature/index.ts': 'export { Foo } from "./Foo";',
-      'src/consumer.ts': 'import { Foo } from "./feature";\nconsole.log(Foo);',
       'tsconfig.json': '{"compilerOptions":{"target":"es2020","module":"esnext","moduleResolution":"node"},"include":["src/**/*"]}',
     });
     const results = run(dir, ['--category=6']);
@@ -261,7 +260,6 @@ describe('scanAntiPatterns', () => {
     const dir = makeFixture({
       'src/feature/Bar.ts': 'export const Bar = 2;',
       'src/feature/index.ts': 'export * from "./Bar";',
-      'src/consumer.ts': 'import { Bar } from "./feature";\nconsole.log(Bar);',
       'tsconfig.json': '{"compilerOptions":{"target":"es2020","module":"esnext","moduleResolution":"node"},"include":["src/**/*"]}',
     });
     const results = run(dir, ['--category=6']);
