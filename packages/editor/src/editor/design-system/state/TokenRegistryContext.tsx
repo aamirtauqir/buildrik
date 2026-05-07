@@ -183,40 +183,44 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
 
   const config = React.useMemo<RegistryConfig>(() => ({ persistAll }), [persistAll]);
 
-  return (
-    <ColorRegistryContext.Provider value={colorState}>
-      <SpacingRegistryContext.Provider value={spacingState}>
-        <TypeRegistryContext.Provider value={typeState}>
-          <RadiusRegistryContext.Provider value={radiusState}>
-            <ShadowRegistryContext.Provider value={shadowState}>
-              <MotionRegistryContext.Provider value={motionState}>
-                <BorderRegistryContext.Provider value={borderState}>
-                  <OpacityRegistryContext.Provider value={opacityState}>
-                    <ZindexRegistryContext.Provider value={zindexState}>
-                      <BreakpointRegistryContext.Provider value={breakpointState}>
-                        <GridRegistryContext.Provider value={gridState}>
-                          <SizingRegistryContext.Provider value={sizingState}>
-                            <IconRegistryContext.Provider value={iconState}>
-                              <ImageryRegistryContext.Provider value={imageryState}>
-                                <RegistryConfigContext.Provider value={config}>
-                                  {children}
-                                </RegistryConfigContext.Provider>
-                              </ImageryRegistryContext.Provider>
-                            </IconRegistryContext.Provider>
-                          </SizingRegistryContext.Provider>
-                        </GridRegistryContext.Provider>
-                      </BreakpointRegistryContext.Provider>
-                    </ZindexRegistryContext.Provider>
-                  </OpacityRegistryContext.Provider>
-                </BorderRegistryContext.Provider>
-              </MotionRegistryContext.Provider>
-            </ShadowRegistryContext.Provider>
-          </RadiusRegistryContext.Provider>
-        </TypeRegistryContext.Provider>
-      </SpacingRegistryContext.Provider>
-    </ColorRegistryContext.Provider>
-  );
+  // Flat list of (Context, value) pairs that wrap children, outermost first.
+  // composeProviders below reduces this into the equivalent nested JSX tree.
+  // Adding a 15th kind = add one row, no indentation pyramid.
+  const providers: Array<{ Context: React.Context<unknown>; value: unknown }> = [
+    { Context: ColorRegistryContext      as React.Context<unknown>, value: colorState      },
+    { Context: SpacingRegistryContext    as React.Context<unknown>, value: spacingState    },
+    { Context: TypeRegistryContext       as React.Context<unknown>, value: typeState       },
+    { Context: RadiusRegistryContext     as React.Context<unknown>, value: radiusState     },
+    { Context: ShadowRegistryContext     as React.Context<unknown>, value: shadowState     },
+    { Context: MotionRegistryContext     as React.Context<unknown>, value: motionState     },
+    { Context: BorderRegistryContext     as React.Context<unknown>, value: borderState     },
+    { Context: OpacityRegistryContext    as React.Context<unknown>, value: opacityState    },
+    { Context: ZindexRegistryContext     as React.Context<unknown>, value: zindexState     },
+    { Context: BreakpointRegistryContext as React.Context<unknown>, value: breakpointState },
+    { Context: GridRegistryContext       as React.Context<unknown>, value: gridState       },
+    { Context: SizingRegistryContext     as React.Context<unknown>, value: sizingState     },
+    { Context: IconRegistryContext       as React.Context<unknown>, value: iconState       },
+    { Context: ImageryRegistryContext    as React.Context<unknown>, value: imageryState    },
+    { Context: RegistryConfigContext     as React.Context<unknown>, value: config          },
+  ];
+
+  return <>{composeProviders(providers, children)}</>;
 };
+
+/**
+ * Reduce a flat list of (Context, value) pairs into a nested provider tree.
+ * Earlier entries wrap later entries (so list[0] is outermost). Replaces a
+ * 15-level nested JSX pyramid with a single array.
+ */
+function composeProviders(
+  providers: Array<{ Context: React.Context<unknown>; value: unknown }>,
+  children: React.ReactNode
+): React.ReactNode {
+  return providers.reduceRight<React.ReactNode>(
+    (acc, { Context, value }) => <Context.Provider value={value}>{acc}</Context.Provider>,
+    children
+  );
+}
 
 // ============================================================================
 // HOOKS
