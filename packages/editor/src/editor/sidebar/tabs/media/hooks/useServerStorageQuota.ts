@@ -4,8 +4,15 @@
  * Wraps `media.checkStorageQuota` tRPC. Returns null when offline, dashboard URL
  * unconfigured, or auth fails — caller falls back to local IndexedDB sum.
  *
- * Re-fetches when MEDIA_ADDED / MEDIA_DELETED fire so the UploadZone state
- * machine (idle / near-limit / full) reflects post-upload reality.
+ * Refetch policy: only on MEDIA_DELETED + UPLOAD_COMPLETE. MEDIA_ADDED is
+ * intentionally NOT subscribed because every upload emits both MEDIA_ADDED
+ * and UPLOAD_COMPLETE — listening to both would double-fire the RPC and
+ * race two responses into the same setQuota (stale-wins risk). Per codex
+ * review of 3bdafc6f finding [P2A].
+ *
+ * Stale-response guard: a generation counter snapshots the request; an older
+ * response that resolves after a newer one is dropped instead of overwriting
+ * fresh state.
  *
  * @license BSD-3-Clause
  */
@@ -45,20 +52,24 @@ export function useServerStorageQuota(composer: Composer): UseServerStorageQuota
   const [isLoading, setIsLoading] = React.useState(true);
   const [isAvailable, setIsAvailable] = React.useState(false);
   const aliveRef = React.useRef(true);
+  // Generation counter: each fetch increments; only the LATEST fetch commits state.
+  // Earlier requests resolving after a newer one are silently dropped.
+  const fetchGenRef = React.useRef(0);
 
   const fetchQuota = React.useCallback(async () => {
+    const myGen = ++fetchGenRef.current;
     try {
       const result = (await getClient().media.checkStorageQuota.query({})) as ServerStorageQuota;
-      if (!aliveRef.current) return;
+      if (!aliveRef.current || myGen !== fetchGenRef.current) return;
       setQuota(result);
       setIsAvailable(true);
     } catch {
-      if (!aliveRef.current) return;
+      if (!aliveRef.current || myGen !== fetchGenRef.current) return;
       // Auth fail / offline / unconfigured — caller falls back to local sum.
       setQuota(null);
       setIsAvailable(false);
     } finally {
-      if (aliveRef.current) setIsLoading(false);
+      if (aliveRef.current && myGen === fetchGenRef.current) setIsLoading(false);
     }
   }, []);
 
@@ -67,13 +78,14 @@ export function useServerStorageQuota(composer: Composer): UseServerStorageQuota
     fetchQuota();
 
     const onChange = () => fetchQuota();
-    composer.media.on(MEDIA_EVENTS.MEDIA_ADDED, onChange);
+    // Subscribe to MEDIA_DELETED (decrements usage) and UPLOAD_COMPLETE
+    // (increments usage). Skip MEDIA_ADDED — UPLOAD_COMPLETE fires for the
+    // same event and avoids double-RPC + race per [P2A].
     composer.media.on(MEDIA_EVENTS.MEDIA_DELETED, onChange);
     composer.media.on(MEDIA_EVENTS.UPLOAD_COMPLETE, onChange);
 
     return () => {
       aliveRef.current = false;
-      composer.media.off(MEDIA_EVENTS.MEDIA_ADDED, onChange);
       composer.media.off(MEDIA_EVENTS.MEDIA_DELETED, onChange);
       composer.media.off(MEDIA_EVENTS.UPLOAD_COMPLETE, onChange);
     };

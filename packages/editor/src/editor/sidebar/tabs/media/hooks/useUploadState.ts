@@ -95,11 +95,18 @@ export function useUploadState(
     };
   }, [composer, recalcStorage, showToast]);
 
-  // Phase C: prefer server quota when present. -1 totalBytes = unlimited (never cap).
+  // Phase C: server provides tier-aware quota CAP (totalBytes), but used-bytes
+  // must stay local until Phase B (asset upload-to-server) lands. Reason:
+  // composer.media.uploadFile() persists to local IndexedDB only — server's
+  // usedBytes does not see editor uploads, so reading it would understate
+  // usage and let the user overfill local storage. Per codex review of
+  // 3bdafc6f finding [P1A]. Re-wire usedBytes to server in the Phase B PR.
   const isUnlimited = serverQuota?.totalBytes === -1;
-  const storageUsed = serverQuota?.usedBytes ?? localStorageUsed;
+  const storageUsed = localStorageUsed;
   const storageTotal =
-    serverQuota && !isUnlimited ? serverQuota.totalBytes : STORAGE_QUOTA_BYTES;
+    serverQuota && !isUnlimited && serverQuota.totalBytes > 0
+      ? serverQuota.totalBytes
+      : STORAGE_QUOTA_BYTES;
 
   const upload = useCallback(
     (files: File[]) => {
