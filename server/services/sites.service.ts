@@ -445,6 +445,7 @@ export async function saveProjectFromEditor(
     assets: unknown[];
     metadata?: unknown;
     settings?: unknown;
+    dsSchemaVersion?: number;
   }
 ) {
   return saveProjectData({
@@ -466,6 +467,7 @@ export async function saveProjectFromEditor(
     styles: projectData.styles,
     assets: projectData.assets,
     settings: projectData.settings,
+    dsSchemaVersion: projectData.dsSchemaVersion,
   });
 }
 
@@ -648,6 +650,8 @@ export async function saveProjectData(input: SaveProjectDataInput) {
           input.settings === undefined
             ? undefined
             : ((input.settings as Prisma.InputJsonValue) ?? Prisma.DbNull),
+        dsSchemaVersion:
+          input.dsSchemaVersion === undefined ? undefined : input.dsSchemaVersion,
         lastEditedAt: savedAt,
         ...(isFullSnapshot ? { pages: input.pages.length } : {}),
       },

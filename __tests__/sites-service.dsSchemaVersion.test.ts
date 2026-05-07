@@ -5,6 +5,7 @@ vi.mock("@/lib/prisma", () => ({
     site: {
       findUnique: vi.fn(),
     },
+    $transaction: vi.fn(),
   },
 }));
 
@@ -13,7 +14,7 @@ vi.mock("@/server/services/email.service", () => ({
 }));
 
 import { prisma } from "@/lib/prisma";
-import { getProjectData } from "@/server/services/sites.service";
+import { getProjectData, saveProjectData } from "@/server/services/sites.service";
 
 describe("getProjectData · dsSchemaVersion exposure", () => {
   beforeEach(() => {
@@ -64,5 +65,79 @@ describe("getProjectData · dsSchemaVersion exposure", () => {
     await getProjectData("site-1");
     const callArg = vi.mocked(prisma.site.findUnique).mock.calls[0][0] as any;
     expect(callArg.select.dsSchemaVersion).toBe(true);
+  });
+});
+
+describe("saveProjectData · dsSchemaVersion write", () => {
+  let capturedSiteUpdate: any;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    capturedSiteUpdate = null;
+  });
+
+  it("persists dsSchemaVersion when supplied", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ id: "site-1" } as any);
+    vi.mocked(prisma.$transaction).mockImplementation(async (cb: any) => {
+      const tx = {
+        page: {
+          findMany: vi.fn().mockResolvedValue([]),
+          upsert: vi.fn(),
+          update: vi.fn(),
+          deleteMany: vi.fn(),
+        },
+        formBlock: { deleteMany: vi.fn() },
+        site: {
+          update: vi.fn(async (args: any) => {
+            capturedSiteUpdate = args;
+            return {};
+          }),
+        },
+      };
+      await cb(tx);
+    });
+
+    await saveProjectData({
+      siteId: "site-1",
+      pages: [],
+      styles: [],
+      assets: [],
+      settings: {},
+      dsSchemaVersion: 1,
+    });
+
+    expect(capturedSiteUpdate?.data?.dsSchemaVersion).toBe(1);
+  });
+
+  it("leaves dsSchemaVersion untouched when omitted (passes undefined to Prisma)", async () => {
+    vi.mocked(prisma.site.findUnique).mockResolvedValue({ id: "site-1" } as any);
+    vi.mocked(prisma.$transaction).mockImplementation(async (cb: any) => {
+      const tx = {
+        page: {
+          findMany: vi.fn().mockResolvedValue([]),
+          upsert: vi.fn(),
+          update: vi.fn(),
+          deleteMany: vi.fn(),
+        },
+        formBlock: { deleteMany: vi.fn() },
+        site: {
+          update: vi.fn(async (args: any) => {
+            capturedSiteUpdate = args;
+            return {};
+          }),
+        },
+      };
+      await cb(tx);
+    });
+
+    await saveProjectData({
+      siteId: "site-1",
+      pages: [],
+      styles: [],
+      assets: [],
+      settings: {},
+    });
+
+    expect(capturedSiteUpdate?.data?.dsSchemaVersion).toBeUndefined();
   });
 });
