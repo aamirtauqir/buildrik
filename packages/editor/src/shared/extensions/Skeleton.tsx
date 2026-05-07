@@ -75,7 +75,7 @@ function useReducedMotion(): boolean {
 
 export const StudioSkeleton: FC = () => {
   const prefersReduced = useReducedMotion();
-  const spinStyle = prefersReduced ? {} : { animation: "buildrick-spin 1s linear infinite" };
+  const spinStyle = prefersReduced ? {} : { animation: "bd-skeleton-spin 1s linear infinite" };
 
   return (
     <div
@@ -188,7 +188,7 @@ export const StudioSkeleton: FC = () => {
         </div>
       </div>
       <style>{`
-        @keyframes buildrick-spin {
+        @keyframes bd-skeleton-spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }

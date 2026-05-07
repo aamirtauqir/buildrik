@@ -347,7 +347,7 @@ pass "Gate 15: --bd-* defs only in bd-aliases.css"
 # This gate prevents the next ghost from slipping through.
 #
 # Scope mirrors Gate 15 chrome boundaries: shared/ui, editor, shared/forms, ai,
-# features/design-system/ui, themes/components.css, themes/ux-fixes.css.
+# features/design-system/ui, themes/legacy-components.css, themes/ux-fixes.css.
 #
 # Ordering: must run AFTER Gate 15. If Gate 15 fails (extra --bd-* defs outside
 # canonical file), the DEFINED set below is intentionally limited to the
@@ -360,7 +360,7 @@ GHOST_USED=$(grep -rohE -- 'var\(--bd-[a-z0-9-]+' \
   packages/editor/src/shared/forms \
   packages/editor/src/ai \
   packages/editor/src/features/design-system/ui \
-  packages/editor/src/themes/components.css \
+  packages/editor/src/themes/legacy-components.css \
   packages/editor/src/themes/ux-fixes.css \
   2>/dev/null | sed 's/var(//' | sort -u)
 GHOSTS=$(comm -23 <(printf '%s\n' "$GHOST_USED") <(printf '%s\n' "$GHOST_DEFINED") | sed '/^$/d')
@@ -375,7 +375,7 @@ if [ -n "$GHOSTS" ]; then
       packages/editor/src/shared/forms \
       packages/editor/src/ai \
       packages/editor/src/features/design-system/ui \
-      packages/editor/src/themes/components.css \
+      packages/editor/src/themes/legacy-components.css \
       packages/editor/src/themes/ux-fixes.css \
       2>/dev/null | head -3 | sed 's/^/    /'
   done

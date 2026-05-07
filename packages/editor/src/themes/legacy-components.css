@@ -1,45 +1,11 @@
 /**
- * components.css — LEGACY FILE, retirement in progress.
+ * legacy-components.css — final residual rules from original components.css.
+ * Phase Final lock 2026-05-07. Contents: canonical engine selectors, 1
+ * single-consumer chrome class, generic input element styling, shared
+ * bare-name keyframes, and 1 cross-folder element-flash keyframe.
  *
- * Grab-bag of class rules for legacy components. Per v3 plan Week 3,
- * target is <=300 lines or renamed to legacy-components.css after
- * per-component extraction.
- *
- * Cleanup history:
- *   2026-04-25: deleted dead .buildrick-layer-* family (~92 lines)
- *               after LayersTab rewrite to .bdc-* namespace.
- *   2026-05-03: deleted 45 dead selectors + 1 orphan @keyframes
- *               (-620 lines, 1728 -> 1108).
- *               Audit method: className= attr scan + classList op scan
- *               + standalone-class strict re-check across src/**.tsx.
- *               Removed: brand, brandName, navBar, pCard, ico, pill,
- *               zoom, all .tb* except .tbOfflineTooltip (still used by
- *               Topbar.tsx), buildrick-action-disabled, buildrick-btn-
- *               group-{full,lg,sm}, buildrick-drop-indicator, buildrick-
- *               empty-state-compact, buildrick-focusable, buildrick-form-
- *               field*, buildrick-icon-btn, buildrick-input-group,
- *               buildrick-layers, buildrick-layers-{count,panel,tree},
- *               buildrick-left-tab, buildrick-quick-action-btn,
- *               @keyframes tbSpin (orphan after .tb* deletion).
- *
- * REMAINING (THIN bucket — 1-3 consumers each, migrate to per-component
- * Emotion or fold into vibcoder primitive):
- *   form atoms: btn, btn-group*, color-*, input*, number-*, select,
- *               slider*, switch*, textarea, field*, sr-only, skip-link
- *   chrome: viewport-frame, dragging, layers-tree, empty-state-*
- *
- * REMAINING (THICK bucket — 4+ consumers, blocks full retirement):
- *   - .buildrick-field         (8 consumers)
- *   - .buildrick-canvas        (7 consumers)
- *   - .buildrick-field-label   (7 consumers)
- *   - .buildrick-empty-state   (4 consumers)
- *   - .buildrick-field-error   (4 consumers)
- *
- * Full retirement is blocked on per-component migration to primitives
- * (Button, FormInput, NumericStepper from Week 1, plus not-yet-built
- * Switch, Slider, ColorSwatch primitives). Tracked as Week 4+ work.
- *
- * DO NOT add new rules here. Put them on the consuming component.
+ * DO NOT add new rules here. Add them to the consuming component or to a
+ * tier file under themes/components/{atoms,molecules,organisms,layouts}/.
  */
 
 .buildrick-canvas {
@@ -55,220 +21,52 @@
   overflow: auto;
   padding: 32px;
 }
-
-.buildrick-viewport-frame {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
+.buildrick-viewport-frame { width: 100%; height: 100%; border: none; }
 
 .tbOfflineTooltip {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
+  position: absolute; top: calc(100% + 6px); right: 0;
   white-space: nowrap;
   background: var(--buildrick-bg-card);
   border: 1px solid var(--buildrick-error);
   border-radius: var(--buildrick-radius-md);
-  padding: 4px 10px;
-  font-size: 11px;
-  font-weight: 500;
+  padding: 4px 10px; font-size: 11px; font-weight: 500;
   color: var(--buildrick-error);
   pointer-events: none;
   z-index: var(--buildrick-z-tooltip);
 }
 
-@keyframes pulse {
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes spin  { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes buildrick-flash { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
 
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-to {
-    transform: rotate(360deg);
-  }
-}
-
-.buildrick-slider {
-  appearance: none;
-  width: 100%;
-  height: 6px;
-  background: var(--buildrick-bg-panel-secondary);
-  border-radius: var(--buildrick-radius-full);
-  outline: none;
-  cursor: pointer;
-}
-
-.buildrick-slider::-webkit-slider-thumb {
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--buildrick-accent);
-  border: 3px solid white;
-  box-shadow: var(--buildrick-shadow-md);
-  cursor: pointer;
-  transition: transform var(--buildrick-transition-fast);
-}
-
-.buildrick-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
-}
-
-.buildrick-slider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--buildrick-accent);
-  border: 3px solid white;
-  box-shadow: var(--buildrick-shadow-md);
-  cursor: pointer;
-}
-
-.buildrick-slider:focus-visible::-webkit-slider-thumb {
-  box-shadow: var(--buildrick-shadow-md), 0 0 0 3px var(--buildrick-accent-subtle);
-}
-
-.bd-layers-tree {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 10px 8px 12px;
-  overflow-y: auto;
-}
-
-/* .buildrick-layer-* (node/row/toggle/bullet/icon/meta/name) — DELETED
- * 2026-04-25. Zero consumers remaining. LayersTab rewrite (commits
- * 0ed8d40 + 1f02f4d + 34189df) replaced this class family with
- * .bdc-* namespace under editor/sidebar/tabs/layers/.
- *
- * .buildrick-layer-id (below) retained pending consumer audit. */@keyframes buildrick-spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes bd-modal-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-
-to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes buildrick-pulse {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.5;
-  }
-}
-
-input[type="range"]::-webkit-slider-thumb {
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--buildrick-accent);
-  cursor: pointer;
-  border: 2px solid var(--buildrick-bg-card);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
+input[type="range"]::-webkit-slider-thumb,
 input[type="range"]::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
+  appearance: none; width: 16px; height: 16px;
+  border-radius: 50%; cursor: pointer;
   background: var(--buildrick-accent);
-  cursor: pointer;
   border: 2px solid var(--buildrick-bg-card);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+input[type="color"] { cursor: pointer; }
+input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+input[type="color"]::-webkit-color-swatch { border-radius: 4px; border: none; }
 
-input[type="color"] {
-  cursor: pointer;
-}
-
-input[type="color"]::-webkit-color-swatch-wrapper {
-  padding: 2px;
-}
-
-input[type="color"]::-webkit-color-swatch {
-  border-radius: 4px;
-  border: none;
-}
-
-.bd-dragging {
-  cursor: grabbing !important;
-}
-
-.bd-dragging * {
-  cursor: grabbing !important;
-}
-
-
-@media (max-width: 640px) {.pill {
-    padding: 0 10px;
-    font-size: 12px;
-  }
-}
+.bd-dragging, .bd-dragging * { cursor: grabbing !important; }
 
 [data-buildrick-id][data-selected="true"] {
   outline: 2px solid var(--buildrick-accent) !important;
   outline-offset: 1px;
-  box-shadow: 0 0 0 4px rgba(0, 212, 170, 0.15),
-    0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 0 0 4px rgba(0, 212, 170, 0.15), 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
-
 [data-buildrick-id]:hover:not([data-selected="true"]) {
   outline: 1px dashed rgba(45, 109, 255, 0.6) !important;
   outline-offset: 0px;
 }
 
-input:disabled,
-select:disabled,
-textarea:disabled {
+input:disabled, select:disabled, textarea:disabled {
   background: var(--buildrick-surface-2) !important;
   color: var(--buildrick-text-muted) !important;
   border-color: var(--buildrick-border-subtle) !important;
   cursor: not-allowed !important;
   opacity: 0.5;
 }
-
-@keyframes buildrick-flash {
-  0% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.04);
-  }
-
-  100% {
-    transform: scale(1);
-  }
-}
-

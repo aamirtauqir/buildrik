@@ -169,7 +169,7 @@ const SaveStatusIndicator: React.FC<SaveStatusProps> = ({ status, lastSavedAt, o
                 justifyContent: "center",
                 width: 14,
                 height: 14,
-                animation: "buildrick-spin 1s linear infinite",
+                animation: "bd-spin 1s linear infinite",
               }}
             >
               <SvgSync />
@@ -317,7 +317,7 @@ const SyncDot: React.FC<SyncDotProps> = ({ status }) => {
             borderRadius: "50%",
             background: config.color,
             flexShrink: 0,
-            animation: config.pulse ? "buildrick-pulse 1s ease-in-out infinite" : "none",
+            animation: config.pulse ? "bd-status-pulse 1s ease-in-out infinite" : "none",
             transition: `background var(--buildrick-duration-normal, 200ms) ease`,
           }}
         />
@@ -388,7 +388,7 @@ const SyncIndicator: React.FC<SyncIndicatorProps> = ({ status }) => {
               justifyContent: "center",
               width: 14,
               height: 14,
-              animation: config.animate ? "buildrick-spin 1.5s linear infinite" : "none",
+              animation: config.animate ? "bd-spin 1.5s linear infinite" : "none",
             }}
           >
             <SvgSync />

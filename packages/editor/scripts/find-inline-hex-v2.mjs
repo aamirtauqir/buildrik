@@ -46,7 +46,7 @@ const EDITOR_EXCLUDE_DIRS = ["inspector"]; // mid-flight port; re-include later
 const CHROME_ROOTS = EDITOR_ONLY ? EDITOR_ONLY_ROOTS : FULL_CHROME_ROOTS;
 const EXTRA_FILES = EDITOR_ONLY
   ? []
-  : ["src/themes/components.css", "src/themes/ux-fixes.css"];
+  : ["src/themes/legacy-components.css", "src/themes/ux-fixes.css"];
 
 const HEX_RE = /#[0-9A-Fa-f]{3,8}\b/g;
 // Match hex inside var(--name, #HEX) fallback position.

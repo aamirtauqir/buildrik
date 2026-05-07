@@ -1,10 +1,10 @@
 {
-  "count": 69,
+  "count": 65,
   "mode": "WARN",
   "perPanel": {
     "animation": 0,
     "canvas": 17,
-    "collaboration": 1,
+    "collaboration": 0,
     "design-system": 24,
     "export": 0,
     "inspector": 6,
@@ -12,7 +12,7 @@
     "onboarding": 0,
     "panels": 5,
     "rail": 0,
-    "shell": 5,
+    "shell": 2,
     "sidebar": 10
   }
 }

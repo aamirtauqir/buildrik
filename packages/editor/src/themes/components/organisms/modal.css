@@ -101,3 +101,11 @@
   font-weight: var(--buildrick-font-weight-medium);
   color: var(--buildrick-text-muted);
 }
+
+/* bd-modal-in — modal entrance animation. Consumed inline by
+ * editor/canvas/controls/BlockPickerModal.tsx (animation: "bd-modal-in 0.2s ease").
+ * Moved here from legacy components.css 2026-05-07 (vibcoder-finish Phase Final). */
+@keyframes bd-modal-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}

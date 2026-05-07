@@ -288,7 +288,7 @@ Ek concept = ek canonical home. Duplicate allowed nahi. Violation = auto-reject.
 | Compositions on vibcoder primitives | `src/shared/extensions/` | CANONICAL — PanelHeader, ConfirmDialog, etc. |
 | Buildrik non-vibcoder primitives | `src/shared/ui/` | AUDIT COMPLETE 2026-05-02 — 4 files (Badge/ErrorState/HelpTooltip/Icons) + `panel/PanelShell` retained, 12 dead files + ds/ + broken index.tsx deleted |
 | Site-builder tokens (user output, not chrome) | `src/editor/design-system/` | CANONICAL — different domain, never merge with chrome DS. Moved from `src/features/design-system/` 2026-05-03. |
-| Legacy class rules | `src/themes/components.css` | RETIRING → drain to <300 lines, then rename `legacy-components.css` |
+| Final residual class rules | `src/themes/legacy-components.css` | DRAINED 2026-05-07 (Phase Final) — 72 LOC, renamed from components.css. DO NOT add new rules. |
 | ~~Legacy chrome components~~ | ~~`src/components/`~~ | DELETED 2026-05-02 — graveyard fully drained |
 
 ### SSOT decision tree (before writing any DS / UI code)
@@ -302,13 +302,13 @@ Ek concept = ek canonical home. Duplicate allowed nahi. Violation = auto-reject.
 ### Forbidden moves
 
 - New file in `src/components/` → REJECT.
-- New `.buildrick-*` class anywhere → REJECT. Use vibcoder `.bd-*` or canonical.
+- New `.buildrick-*` className in editor JSX (`src/editor/`) → REJECT — gate `scripts/check-buildrick-baseline.mjs` per-panel growth lock catches.
 - Component duplicating vibcoder primitive in `shared/ui/` → REJECT (audit-driven deletion).
 - Hex literal in chrome CSS → blocked by Gate 24 (zero-tolerance).
 
 ### Retirement targets (deletion mandates)
 
-- `themes/components.css`: <300 lines target, then rename to `legacy-components.css`. Per-component drain via Week 4+ work.
+- ~~`themes/components.css`: <300 lines target, then rename to `legacy-components.css`~~ DONE 2026-05-07 (Phase Final): 274 → 72 LOC, renamed `legacy-components.css`. Contains only canonical engine selectors + 1 single-consumer chrome class + generic input element styling.
 - `src/components/` (371 files): file count must DECREASE per PR touching it. Touch a legacy file? → migrate to `editor/`.
 - `shared/ui/` overlap audit: every primitive checked against `editor/shared/vibcoder/`. Duplicate = delete + redirect imports.
 
@@ -318,6 +318,15 @@ Memory: 4 prior architecture attempts (V1 spec, V2 spec, axioms draft, editor-v2
 
 ### Cleanup history (live record)
 
+- **2026-05-07 — Vibcoder-finish arc CLOSED** (commits `9f6a2e86`..Phase Final):
+  - Original spec target was "drain 1622 .buildrick-* refs to 0." After Phase 0 audit + Task 1 gate-regex tightening, real chrome scope was 202 (vs 1622 broad-match overcount including 1291 `--buildrick-*` tokens + 159 `data-buildrick-*` DOM attrs). 7 drain PRs landed against the real scope.
+  - Drained 137 refs (202 → 65). Final baseline 65 reflects legitimate residuals: 24 site-builder DS (out-of-scope domain), 13-14 canonical engine `.buildrick-canvas` refs, ~27 storage keys (Decision 1A — user data risk), 1 cssPrefix config.
+  - Phase Final lock 2026-05-07: drained 4 cross-folder animation refs (StatusIndicators + PresenceIndicators `buildrick-spin`/`buildrick-pulse` → `bd-spin`/`bd-status-pulse`; Skeleton internal `buildrick-spin` → `bd-skeleton-spin`).
+  - `themes/components.css` drained 274 → 72 LOC (-74%) and renamed `legacy-components.css`. Dead rules deleted: `.bd-layers-tree` (used as `id`, never as className), `@keyframes buildrick-spin`/`buildrick-pulse` (drained), `@keyframes bd-modal-in` (moved to `themes/components/organisms/modal.css`), legacy `.pill` mobile media query, redundant `.buildrick-slider` thumb rules.
+  - CI gate (`scripts/check-buildrick-baseline.mjs`) extended: ALL panels locked at current count (not just 0-locks). Any growth = build failure.
+  - Spec §1 done #4 amendment: "ERROR-at-0" replaced with "WARN-at-baseline + per-panel growth lock" because original 0 target was based on overcounted scope. The lock semantics deliver equivalent regression protection.
+  - 5 panels at 0: animation, collaboration, export, onboarding, rail.
+  - 5th SSOT-cleanup arc this quarter.
 - **2026-05-02 — Folder structure cleanup (Approach A surgical)**:
   - Deleted `src/project/` (467 files) — was byte-identical duplicate of `docs/reference/`. Canonical was already at `docs/reference/vibcoder/` per `check-vibcoder-port.sh` + `vibcoder-bundle-pin.mjs`.
   - Deleted `src/react/` (1 file) — dead L0 stub (`export {};`), 0 consumers.

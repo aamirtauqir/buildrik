@@ -74,7 +74,7 @@ describe('check-buildrick-baseline', () => {
     expect(r.out).toMatch(/zero-tolerance/i);
   });
 
-  it('fails when per-panel lock violated', () => {
+  it('fails when per-panel lock violated (zero lock)', () => {
     writeFileSync(`${TMP}/src/editor/footer/Foo.tsx`,
       `export const F = () => <div className="buildrick-row">x</div>;`);
     writeFileSync(`${TMP}/scripts/baselines/buildrick.json`,
@@ -82,6 +82,27 @@ describe('check-buildrick-baseline', () => {
     const r = run();
     expect(r.code).not.toBe(0);
     expect(r.out).toMatch(/footer/);
+    expect(r.out).toMatch(/exceeds locked count/);
+  });
+
+  it('fails when per-panel lock violated (non-zero lock — Phase Final growth gate)', () => {
+    writeFileSync(`${TMP}/src/editor/footer/Foo.tsx`,
+      `export const F = () => <div className="buildrick-a buildrick-b buildrick-c">x</div>;`);
+    writeFileSync(`${TMP}/scripts/baselines/buildrick.json`,
+      JSON.stringify({ count: 3, mode: 'WARN', perPanel: { footer: 2 } }, null, 2));
+    const r = run();
+    expect(r.code).not.toBe(0);
+    expect(r.out).toMatch(/footer/);
+    expect(r.out).toMatch(/was 2, now 3/);
+  });
+
+  it('passes when per-panel count equals non-zero lock', () => {
+    writeFileSync(`${TMP}/src/editor/footer/Foo.tsx`,
+      `export const F = () => <div className="buildrick-a buildrick-b">x</div>;`);
+    writeFileSync(`${TMP}/scripts/baselines/buildrick.json`,
+      JSON.stringify({ count: 2, mode: 'WARN', perPanel: { footer: 2 } }, null, 2));
+    const r = run();
+    expect(r.code).toBe(0);
   });
 
   it('preserves per-panel locks when auto-ratcheting baseline', () => {

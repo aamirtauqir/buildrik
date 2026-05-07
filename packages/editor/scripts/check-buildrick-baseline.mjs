@@ -4,7 +4,7 @@
  * Counts .buildrick-* className refs in src/editor/.
  * WARN mode: blocks regressions, auto-ratchets baseline on shrink.
  * ERROR mode: zero-tolerance — any ref fails the build.
- * Per-panel locks: panels at 0 must stay at 0.
+ * Per-panel locks: every panel locked at current count; any growth fails.
  */
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { resolve, relative, sep } from 'node:path';
@@ -74,9 +74,14 @@ if (total > baseline.count) {
   fail(`Baseline regression: was ${baseline.count}, now ${total} (+${total - baseline.count}). Drain or remove.`);
 }
 
+// Per-panel growth lock — Phase Final 2026-05-07: ANY panel exceeding its
+// locked count fails the gate, regardless of whether the lock is 0 or non-zero.
+// This delivers ERROR-on-increase semantics per panel without flipping mode to
+// literal ERROR (which would require count: 0 — unreachable post-audit).
 for (const [panel, lockCount] of Object.entries(baseline.perPanel ?? {})) {
-  if (lockCount === 0 && (perPanel[panel] ?? 0) > 0) {
-    fail(`Panel ${panel} drained, no new .buildrick-* allowed (found ${perPanel[panel]})`);
+  const currentInPanel = perPanel[panel] ?? 0;
+  if (currentInPanel > lockCount) {
+    fail(`Panel ${panel} exceeds locked count: was ${lockCount}, now ${currentInPanel}`);
   }
 }
 

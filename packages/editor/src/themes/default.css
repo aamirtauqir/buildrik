@@ -7,8 +7,9 @@
  * Imports:
  *   design-system/index.css — canonical DS (color, typography, spacing, radius,
  *     shadow, motion, z-index, layout, design, a11y)
- *   components.css — legacy .buildrick-* class rules + responsive @media
- *     (transitional home; gradually migrated into per-component files)
+ *   legacy-components.css — final residual rules (canonical engine selectors,
+ *     1 single-consumer chrome class, generic input element styling). Renamed
+ *     from components.css 2026-05-07 (Phase Final lock).
  *
  * Phase 4 complete: compat.css deleted, no alias layer remaining.
  *
@@ -100,4 +101,4 @@
 @import "./components/organisms/templates-drawer.css" layer(components);
 @import "./components/organisms/topbar.css" layer(components);
 
-@import "./components.css";
+@import "./legacy-components.css";

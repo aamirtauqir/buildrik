@@ -242,7 +242,7 @@ const ConnectionIndicator: React.FC<ConnectionIndicatorProps> = ({ status }) => 
     border: "2px solid var(--buildrick-border)",
     borderTopColor: "var(--buildrick-accent)",
     borderRadius: "50%",
-    animation: "buildrick-spin 1s linear infinite",
+    animation: "bd-spin 1s linear infinite",
     flexShrink: 0,
   };
 
