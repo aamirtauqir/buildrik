@@ -21,6 +21,7 @@
 import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import type { CompareResult, NamedVersion } from "../../../shared/types/versions";
+import { AIResultText, AIControls } from "./AIPanel";
 
 // ─── Style constants ──────────────────────────────────────────────────
 
@@ -92,13 +93,6 @@ export function CompareView({
     if (!hasVisual && mode === "visual") setMode("semantic");
   }, [hasVisual, mode]);
 
-  const aiDisabled = aiSummaryState.loading || aiCooldownSeconds > 0;
-  const aiButtonLabel = aiSummaryState.loading
-    ? "Generating..."
-    : aiCooldownSeconds > 0
-    ? `Get AI Summary (${aiCooldownSeconds}s)`
-    : "Get AI Summary";
-
   return (
     <div className="compare-view">
       {/* Visual / Semantic toggle */}
@@ -130,12 +124,9 @@ export function CompareView({
           Semantic
         </Button>
       </div>
-      {/* AI Summary text */}
-      {(version.aiSummary || aiSummaryState.result) && (
-        <div className="ai-summary">
-          {aiSummaryState.result ?? version.aiSummary}
-        </div>
-      )}
+      {/* AI Summary text — shown ABOVE the diff body when a result
+          (cached or fresh) exists. Component lives in ./AIPanel.tsx. */}
+      <AIResultText cachedSummary={version.aiSummary} state={aiSummaryState} />
       {/* Visual mode — screenshots side-by-side */}
       {mode === "visual" && hasVisual && (
         <div className="compare-screenshots">
@@ -219,34 +210,13 @@ export function CompareView({
           )}
         </div>
       )}
-      {/* AI Summary button — visible in both modes */}
-      <Button
-        className={`ai-summary-btn${aiSummaryState.loading ? " loading" : ""}`}
-        onClick={onGetAiSummary}
-        disabled={aiDisabled}
-      >
-        {aiSummaryState.loading ? (
-          "Generating..."
-        ) : (
-          <>
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M12 2a10 10 0 1 0 10 10H12V2z" />
-              <path d="M12 2a10 10 0 0 1 10 10" />
-            </svg>
-            {aiButtonLabel}
-          </>
-        )}
-      </Button>
-      {aiSummaryState.error && (
-        <p className="ai-summary-error">{aiSummaryState.error}</p>
-      )}
+      {/* AI Summary controls — button + cooldown countdown + error.
+          Component lives in ./AIPanel.tsx. */}
+      <AIControls
+        state={aiSummaryState}
+        onGetSummary={onGetAiSummary}
+        cooldownSeconds={aiCooldownSeconds}
+      />
     </div>
   );
 }
