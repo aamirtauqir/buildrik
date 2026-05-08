@@ -245,6 +245,121 @@ export class MediaCommandLayer {
     return this.composer.elements.findByMediaSrc(src).length > 0;
   }
 
+  /**
+   * S21 — Group asset usage by page.
+   *
+   * Walks each page's element tree (root + descendants) so the result
+   * keys cleanly by pageId. Returns an empty map when src is empty or
+   * no element matches. Used by ReplaceAcrossModal to build the
+   * per-page checkbox list.
+   *
+   * O(P × N) where P = pages, N = avg elements/page. Cheap given typical
+   * project sizes; UI memoizes per-asset.
+   */
+  getUsagesByPage(src: string): Map<string, Element[]> {
+    const out = new Map<string, Element[]>();
+    if (!src) return out;
+    const pages = this.composer.elements.getAllPages?.() ?? [];
+    for (const page of pages) {
+      const root = this.composer.elements.getElement?.(page.root.id);
+      if (!root) continue;
+      const tree: Element[] = [root, ...root.getDescendants()];
+      const matches = tree.filter((el) => {
+        const elSrc = el.getAttribute?.("src");
+        if (elSrc === src) return true;
+        const bg = el.getStyle?.("background-image");
+        return Boolean(bg && bg.includes(src));
+      });
+      if (matches.length > 0) out.set(page.id, matches);
+    }
+    return out;
+  }
+
+  /**
+   * S21 — Selective per-page variant of replaceAcross.
+   *
+   * Same transactional + partial-success semantics as replaceAcross;
+   * only touches elements on pages whose id is in `pageIds`. Pages not
+   * in the set are skipped silently.
+   *
+   * Returns the same ReplaceAcrossResult shape so callers can render
+   * partial-success UI uniformly.
+   */
+  replaceAcrossSelective(
+    oldSrc: string,
+    newSrc: string,
+    pageIds: ReadonlyArray<string>,
+  ): ReplaceAcrossResult {
+    const byPage = this.getUsagesByPage(oldSrc);
+    const targetSet = new Set(pageIds);
+    const elements: Element[] = [];
+    for (const [pageId, pageElements] of byPage) {
+      if (targetSet.has(pageId)) elements.push(...pageElements);
+    }
+
+    this.composer.media.emitEvent(MEDIA_EVENTS.REPLACE_OPENED, {
+      oldSrc,
+      usageCount: elements.length,
+    });
+
+    const replaced: ReplaceResult[] = [];
+    const failed: Array<{ elementId: string; error: string }> = [];
+
+    this.composer.beginTransaction("Replace across selected pages");
+    try {
+      for (const element of elements) {
+        const elementId = element.getId();
+        try {
+          const previousSrc = this.getElementSrc(element);
+          this.setElementSrc(element, oldSrc, newSrc);
+          replaced.push({ elementId, previousSrc });
+        } catch (err) {
+          failed.push({
+            elementId,
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
+      }
+
+      if (elements.length > 0 && replaced.length === 0) {
+        this.composer.rollbackTransaction();
+        this.composer.media.emitEvent(MEDIA_EVENTS.REPLACE_ROLLED_BACK, {
+          oldSrc,
+          reason: "all-failed",
+        });
+        return { replaced, failed, clean: false };
+      }
+
+      this.composer.endTransaction();
+
+      const clean = failed.length === 0;
+      if (clean) {
+        this.composer.media.emitEvent(MEDIA_EVENTS.REPLACE_COMMITTED, {
+          oldSrc,
+          newSrc,
+          count: replaced.length,
+        });
+      } else {
+        this.composer.media.emitEvent(MEDIA_EVENTS.REPLACE_PARTIAL, {
+          oldSrc,
+          newSrc,
+          succeeded: replaced.length,
+          failed,
+        });
+        void new MediaReplacePartialError(failed, replaced.length);
+      }
+
+      return { replaced, failed, clean };
+    } catch (err) {
+      this.composer.rollbackTransaction();
+      this.composer.media.emitEvent(MEDIA_EVENTS.REPLACE_ROLLED_BACK, {
+        oldSrc,
+        reason: err instanceof Error ? err.message : String(err),
+      });
+      throw err;
+    }
+  }
+
   // ============================================
   // Internals
   // ============================================
