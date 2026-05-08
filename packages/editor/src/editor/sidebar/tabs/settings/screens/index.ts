@@ -17,7 +17,6 @@ export { BillingScreen } from "./BillingScreen";
 export { SeoScreen } from "./SeoScreen";
 export { IntegrationsHub } from "./IntegrationsHub";
 export { PublishingHub } from "./PublishingHub";
-export { ComingSoonScreen } from "./ComingSoonScreen";
 export { RedirectsScreen } from "./RedirectsScreen";
 export { FormsScreen } from "./FormsScreen";
 export { HeadersScreen } from "./HeadersScreen";
