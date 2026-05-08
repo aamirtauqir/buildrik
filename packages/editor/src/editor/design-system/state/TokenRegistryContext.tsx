@@ -96,11 +96,19 @@ const RegistryConfigContext = React.createContext<RegistryConfig | null>(null);
 
 export interface TokenRegistryProviderProps {
   projectId?: string | null;
+  /** Phase B.1: when present, dark-mode applier subscribes to composer.colorMode. */
+  composer?: {
+    on: (evt: string, cb: (payload: unknown) => void) => void;
+    off: (evt: string, cb: (payload: unknown) => void) => void;
+    colorMode: { resolved: () => "light" | "dark" };
+    darkResolver: { resolve: (token: DesignToken, resolved: "light" | "dark") => string };
+  };
   children: React.ReactNode;
 }
 
 export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
   projectId,
+  composer,
   children,
 }) => {
   const storageKey = `buildrick-design-tokens-${projectId ?? "default"}-v1`;
@@ -160,6 +168,26 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
   const sizingState     = useSizingTokens(initialTokens);
   const iconState       = useIconTokens(initialTokens);
   const imageryState    = useImageryTokens(initialTokens);
+
+  // Phase B.1: dark-mode applier. When composer is wired, subscribe to
+  // colorMode:changed and re-apply each color token via darkResolver.
+  // The effect also runs on mount (and whenever colorState.tokens changes)
+  // so live edits in dark mode don't leave the LIGHT value flashed by
+  // useColorTokens' internal applyToRoot.
+  React.useEffect(() => {
+    if (!composer) return;
+    const apply = () => {
+      const resolved = composer.colorMode.resolved();
+      colorState.tokens.forEach((t) => {
+        const value = composer.darkResolver.resolve(t, resolved);
+        document.documentElement.style.setProperty(t.cssVar, value);
+      });
+    };
+    apply();
+    const handler = () => apply();
+    composer.on("colorMode:changed", handler);
+    return () => composer.off("colorMode:changed", handler);
+  }, [composer, colorState.tokens]);
 
   // Save all tokens to localStorage in versioned format. Call this after apply.
   // Versioned format is {schemaVersion, tokens} — the loader accepts both
