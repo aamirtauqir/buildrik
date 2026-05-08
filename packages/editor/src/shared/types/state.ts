@@ -15,9 +15,9 @@ export interface ComposerState {
   ready: boolean;
   /** Project has unsaved changes */
   dirty: boolean;
-  /** Current device preview. Mirror of `viewport.currentDevice` — kept
-   *  in sync by `Composer.setDevice`. Read-only for external code; mutate
-   *  via `composer.setDevice(...)` so viewport stays authoritative. */
+  /** Current device preview. Computed from `viewport.getDevice()` at
+   *  `getState()` time (E-004 SSOT — viewport is authoritative; this field
+   *  is not stored on the internal state). Mutate via `composer.setDevice(...)`. */
   device: DeviceType;
   /** Current zoom level */
   zoom: number;

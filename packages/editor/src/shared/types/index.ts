@@ -13,6 +13,9 @@ import type { Composer } from "../../engine/Composer";
 import type { ProjectData } from "./project";
 // ElementData is defined in element.ts (canonical) — imported here for use in BlockData & ComposerEventMap
 import type { ElementData } from "./element";
+// DeviceType is defined in state.ts (canonical) — re-exported via `export * from "./state"`,
+// but also imported locally here for the ComposerEventMap "device:changed" payload.
+import type { DeviceType } from "./state";
 
 // ============================================
 // Configuration Types
@@ -121,43 +124,10 @@ export interface I18nConfig {
 }
 
 // ============================================
-// State Types
+// State Types (canonical source: ./state.ts)
 // ============================================
 
-export interface ComposerState {
-  /** Editor is ready */
-  ready: boolean;
-  /** Project has unsaved changes */
-  dirty: boolean;
-  /** Current device preview */
-  device: DeviceType;
-  /** Current zoom level */
-  zoom: number;
-  /** Active page ID */
-  activePageId: string | null;
-  /** Snap to grid enabled */
-  snapToGrid: boolean;
-  /** Grid size in pixels */
-  gridSize: number;
-  /** Is composer in preview mode */
-  isPreviewMode: boolean;
-}
-
-export type DeviceType = "desktop" | "tablet" | "mobile" | "watch" | "wide";
-
-/**
- * Device configuration for viewport preview
- */
-export interface DeviceConfig {
-  /** Device display name */
-  name: string;
-  /** Viewport width in pixels */
-  width: number;
-  /** Viewport height in pixels (optional for desktop) */
-  height?: number;
-  /** Device icon */
-  icon?: string;
-}
+export * from "./state";
 
 // ============================================
 // Element Types (canonical source: ./element.ts)
