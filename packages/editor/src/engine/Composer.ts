@@ -54,6 +54,7 @@ import { DarkResolver } from "./darkResolver";
 import { ColorMode } from "./colorMode";
 import { CSSBundler } from "../editor/design-system/bundler";
 import { DSLinter } from "../editor/design-system/linter";
+import { AIAssistService } from "../editor/design-system/services";
 import { VersionTimelineManager } from "./VersionTimelineManager";
 import { Viewport } from "./Viewport";
 
@@ -118,6 +119,7 @@ export class Composer extends EventEmitter {
   readonly colorMode!: ColorMode;
   readonly cssBundler!: CSSBundler;
   readonly dsLinter!: DSLinter;
+  readonly aiAssistService!: AIAssistService;
 
   // Facade groupings — D3 Stage 1 (Option B-tight). Three clusters where
   // ≥2 managers share a domain:
@@ -177,6 +179,7 @@ export class Composer extends EventEmitter {
     this.colorMode = new ColorMode(this);
     this.cssBundler = new CSSBundler();
     this.dsLinter = new DSLinter();
+    this.aiAssistService = new AIAssistService(this);
 
     // Facade groupings — D3 Stage 1.
     const cmsCollections = new CollectionManager();
