@@ -44,13 +44,11 @@ export interface ColorTokensActions {
   deleteToken: (id: string) => void;
 }
 
-// ─── Side effect: apply a CSS var to :root ───────────────────────────────────
-
-function applyToRoot(cssVar: string, value: string) {
-  document.documentElement.style.setProperty(cssVar, value);
-}
-
 // ─── Hook ─────────────────────────────────────────────────────────────────────
+//
+// Phase B.2: applyToRoot removed. CSS-var application is centralized in
+// TokenRegistryProvider's effect, which re-resolves through composer.darkResolver
+// on every colorState.tokens change AND on colorMode:changed events.
 
 export function useColorTokens(
   initialTokens: DesignToken[]
@@ -97,8 +95,6 @@ export function useColorTokens(
       setRedoStack((prevRedo) => ({ ...prevRedo, [id]: [] }));
 
       const next = prev.map((t, i) => (i === idx ? { ...t, value } : t));
-      // Apply to :root for live preview
-      applyToRoot(next[idx].cssVar, value);
       return next;
     });
   }, []);
@@ -126,7 +122,6 @@ export function useColorTokens(
         });
 
         const next = prevTokens.map((t, i) => (i === idx ? { ...t, value: entry.snapshot } : t));
-        applyToRoot(next[idx].cssVar, entry.snapshot);
         return next;
       });
 
@@ -157,7 +152,6 @@ export function useColorTokens(
         });
 
         const next = prevTokens.map((t, i) => (i === idx ? { ...t, value: entry.snapshot } : t));
-        applyToRoot(next[idx].cssVar, entry.snapshot);
         return next;
       });
 
@@ -183,7 +177,6 @@ export function useColorTokens(
       const reverted = prev.map((token, i) => {
         const saved = savedTokens[i];
         if (saved && token.value !== saved.value) {
-          applyToRoot(token.cssVar, saved.value);
           return { ...token, value: saved.value };
         }
         return token;
@@ -200,14 +193,12 @@ export function useColorTokens(
     setSavedTokens(colorOnly2);
     setUndoStack({});
     setRedoStack({});
-    colorOnly2.forEach((t) => applyToRoot(t.cssVar, t.value));
   }, []);
 
   const addToken = useCallback((token: DesignToken) => {
     setTokens((prev) => [...prev, token]);
     setUndoStack((s) => ({ ...s, [token.id]: [] }));
     setRedoStack((s) => ({ ...s, [token.id]: [] }));
-    applyToRoot(token.cssVar, token.value);
   }, []);
 
   const deleteToken = useCallback((id: string) => {
