@@ -100,7 +100,7 @@ afterEach(() => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("SettingsTab", () => {
-  it("renders the A1 day-1 nav: 10 in-tab sections + 8 workspace deep-links", () => {
+  it("renders the A1 nav: 10 in-tab sections + 3 verified workspace deep-links", () => {
     render(<SettingsTab composer={buildMockComposer() as never} />);
     const labels = snavRows()
       .map((r) => r.querySelector(".bd-set-snav-label")?.textContent?.trim())
@@ -113,13 +113,13 @@ describe("SettingsTab", () => {
         "Custom code", "Redirects", "Headers", "Forms", "Integrations",
       ])
     );
-    // Workspace deep-links (open dashboard URLs in new tab).
-    expect(labels).toEqual(
-      expect.arrayContaining([
-        "Domains", "Members", "Billing", "API tokens",
-        "Webhooks", "Environments", "Audit log", "Versions",
-      ])
-    );
+    // Workspace deep-links — only those backed by an actual dashboard page.
+    // 5 originally-shipped links (API tokens/Webhooks/Environments/Audit log/
+    // Versions) were removed pending their dashboard pages.
+    expect(labels).toEqual(expect.arrayContaining(["Domains", "Members", "Billing"]));
+    expect(labels).not.toEqual(expect.arrayContaining(["API tokens"]));
+    expect(labels).not.toEqual(expect.arrayContaining(["Webhooks"]));
+    expect(labels).not.toEqual(expect.arrayContaining(["Versions"]));
   });
 
   it("General row is active (.on class) by default", () => {

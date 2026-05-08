@@ -88,25 +88,31 @@ const GROUP_LABELS: Record<NavGroupId, string> = {
 };
 
 // Workspace deep-links — open dashboard URLs in new tab. Not in-tab screens.
+//
+// Only links to dashboard pages that actually exist ship here. A1 day-1
+// shipped 8 links optimistically; subsequent verification revealed only
+// 3 had real backing pages (Domains + Members under /dashboard/team +
+// Billing under /dashboard/billing). API tokens / Webhooks / Environments /
+// Audit log / Versions are deferred until their dashboard pages exist —
+// linking to 404s silently is worse than not linking at all.
 const DASHBOARD_URL = (import.meta as { env?: { VITE_DASHBOARD_URL?: string } }).env?.VITE_DASHBOARD_URL || "http://localhost:3000";
 
 interface WorkspaceLink {
   id: string;
   title: string;
-  /** path appended to ${DASHBOARD_URL}/sites/${siteId}/ — or workspace-scoped if siteId omitted */
+  /**
+   * Site-scoped: path appended to `${DASHBOARD_URL}/dashboard/sites/${siteId}/`.
+   * Workspace-scoped: full path appended to `${DASHBOARD_URL}` (must include
+   * the leading `/dashboard/...` segment — see Members / Billing below).
+   */
   path: string;
   scope: "site" | "workspace";
 }
 
 const WORKSPACE_LINKS: WorkspaceLink[] = [
   { id: "domains", title: "Domains", path: "domains", scope: "site" },
-  { id: "members", title: "Members", path: "/workspace/members", scope: "workspace" },
-  { id: "billing", title: "Billing", path: "/workspace/billing", scope: "workspace" },
-  { id: "api-tokens", title: "API tokens", path: "/workspace/api-tokens", scope: "workspace" },
-  { id: "webhooks", title: "Webhooks", path: "/workspace/webhooks", scope: "workspace" },
-  { id: "environments", title: "Environments", path: "/workspace/environments", scope: "workspace" },
-  { id: "audit-log", title: "Audit log", path: "/workspace/audit-log", scope: "workspace" },
-  { id: "versions", title: "Versions", path: "versions", scope: "site" },
+  { id: "members", title: "Members", path: "/dashboard/team", scope: "workspace" },
+  { id: "billing", title: "Billing", path: "/dashboard/billing", scope: "workspace" },
 ];
 
 function buildWorkspaceUrl(link: WorkspaceLink, siteId: string | null): string {
