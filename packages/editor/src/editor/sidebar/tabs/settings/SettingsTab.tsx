@@ -158,9 +158,9 @@ function isScreenLocked(screenId: string, userPlan: PlanTier): boolean {
 export const SettingsTab: React.FC<
   SettingsTabProps & {
     /**
-     * Optional: switch to the Palette (`design`) tab. When absent, the Branding
-     * section's "Open Palette →" button renders disabled. TODO: thread from
-     * FullPageRouter once a tab-switch handle exists there.
+     * Switch to the Palette (`design`) tab. Threaded from
+     * LeftSidebar → TabRouter → SettingsTab so the Branding section's
+     * "Open Palette →" button can navigate cross-tab.
      */
     onOpenDesignTab?: () => void;
   }

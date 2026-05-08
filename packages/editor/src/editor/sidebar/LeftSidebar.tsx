@@ -337,6 +337,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   canvasHoveredId={canvasHoveredId}
                   onSwitchToAdd={() => safeTabChange("add")}
                   onSwitchToTemplates={() => safeTabChange("templates")}
+                  onSwitchToDesign={() => safeTabChange("design")}
                   onCreateComponent={handleCreateComponent}
                   onReplayTour={onReplayTour}
                   projectId={projectId}

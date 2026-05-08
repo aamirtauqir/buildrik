@@ -55,6 +55,7 @@ export interface TabRouterProps {
   canvasHoveredId?: string | null;
   onSwitchToAdd: () => void;
   onSwitchToTemplates?: () => void;
+  onSwitchToDesign?: () => void;
   onCreateComponent: () => void;
   onReplayTour?: () => void;
   projectId?: string | null;
@@ -73,6 +74,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   canvasHoveredId,
   onSwitchToAdd,
   onSwitchToTemplates,
+  onSwitchToDesign,
   onCreateComponent,
   projectId,
   onPublish,
@@ -136,6 +138,7 @@ export const TabRouter: React.FC<TabRouterProps> = ({
           projectId={projectId}
           onReplayTour={onReplayTour}
           onDirtyChange={onSettingsDirtyChange}
+          onOpenDesignTab={onSwitchToDesign}
           {...commonTabProps}
         />
       );
