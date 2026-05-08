@@ -352,7 +352,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   );
 
   return (
-    <TokenRegistryProvider projectId={projectId}>
+    <TokenRegistryProvider projectId={projectId} composer={composer ?? undefined}>
       <LayoutShell
         drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
         drawerPinned={panelPinned}
