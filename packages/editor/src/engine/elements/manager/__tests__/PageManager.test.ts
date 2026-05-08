@@ -19,6 +19,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { PageManager } from "../PageManager";
 import type { ElementManagerContext } from "../types";
 import type { ElementData, PageData } from "../../../../shared/types";
+import { EVENTS } from "../../../../shared/constants/events";
 
 // ── Harness ────────────────────────────────────────────────────────────────
 
@@ -325,5 +326,79 @@ describe("PageManager.importPage — legacy normalization", () => {
     expect(imported.updatedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
     expect(imported.slugManuallySet).toBe(false);
     expect(imported.slugHistory).toEqual([]);
+  });
+});
+
+describe("PageManager.recordAppliedTemplate (S9 — emits TEMPLATE_APPLIED)", () => {
+  it("appends to meta.appliedTemplates and emits TEMPLATE_APPLIED", () => {
+    const { pm, ctx, composer } = makeHarness();
+    const page = pm.createPage("Home");
+    composer.emit.mockClear();
+
+    pm.recordAppliedTemplate(page.id, { templateId: "hero-1", version: "1.0.0" });
+
+    const stored = ctx.pages.get(page.id)!.meta?.appliedTemplates ?? [];
+    expect(stored).toHaveLength(1);
+    expect(stored[0].templateId).toBe("hero-1");
+    expect(stored[0].version).toBe("1.0.0");
+    expect(stored[0].appliedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+
+    const templateEmits = composer.emit.mock.calls.filter(
+      (c) => c[0] === EVENTS.TEMPLATE_APPLIED
+    );
+    expect(templateEmits).toHaveLength(1);
+    expect(templateEmits[0][1]).toEqual({
+      templateId: "hero-1",
+      pageId: page.id,
+      version: "1.0.0",
+    });
+  });
+
+  it("caps the appliedTemplates stack at 25 entries", () => {
+    const { pm, ctx } = makeHarness();
+    const page = pm.createPage("Home");
+    for (let i = 0; i < 30; i++) {
+      pm.recordAppliedTemplate(page.id, { templateId: `tpl-${i}` });
+    }
+    const stored = ctx.pages.get(page.id)!.meta?.appliedTemplates ?? [];
+    expect(stored).toHaveLength(25);
+    expect(stored[0].templateId).toBe("tpl-5");
+    expect(stored[24].templateId).toBe("tpl-29");
+  });
+});
+
+describe("PageManager.removeAppliedTemplate (S9 — emits TEMPLATE_REMOVED)", () => {
+  it("removes the most recent matching template + emits TEMPLATE_REMOVED", () => {
+    const { pm, ctx, composer } = makeHarness();
+    const page = pm.createPage("Home");
+    pm.recordAppliedTemplate(page.id, { templateId: "tpl-a" });
+    pm.recordAppliedTemplate(page.id, { templateId: "tpl-b" });
+    pm.recordAppliedTemplate(page.id, { templateId: "tpl-a" });
+    composer.emit.mockClear();
+
+    pm.removeAppliedTemplate(page.id, "tpl-a");
+
+    const stored = ctx.pages.get(page.id)!.meta?.appliedTemplates ?? [];
+    // Most-recent tpl-a removed; first tpl-a + tpl-b remain.
+    expect(stored.map((s) => s.templateId)).toEqual(["tpl-a", "tpl-b"]);
+
+    const removedEmits = composer.emit.mock.calls.filter(
+      (c) => c[0] === EVENTS.TEMPLATE_REMOVED
+    );
+    expect(removedEmits).toHaveLength(1);
+    expect(removedEmits[0][1]).toEqual({ templateId: "tpl-a", pageId: page.id });
+  });
+
+  it("is a no-op when the template was not applied", () => {
+    const { pm, composer } = makeHarness();
+    const page = pm.createPage("Home");
+    composer.emit.mockClear();
+
+    pm.removeAppliedTemplate(page.id, "never-applied");
+
+    const removedEmits = composer.emit.mock.calls.filter(
+      (c) => c[0] === EVENTS.TEMPLATE_REMOVED
+    );
+    expect(removedEmits).toHaveLength(0);
   });
 });

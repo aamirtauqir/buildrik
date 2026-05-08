@@ -189,6 +189,33 @@ export class PageManager {
     });
     if (stack.length > 25) stack.splice(0, stack.length - 25);
     this.updatePage(pageId, { meta: { appliedTemplates: stack } });
+    this.ctx.composer.emit(EVENTS.TEMPLATE_APPLIED, {
+      templateId: entry.templateId,
+      pageId,
+      version: entry.version,
+    });
+  }
+
+  /**
+   * Phase S9: remove the most recent application of templateId from this
+   * page's meta stack and emit TEMPLATE_REMOVED. Used by detach / replace-
+   * across flows. No-op if the template was not applied.
+   */
+  removeAppliedTemplate(pageId: string, templateId: string): void {
+    const page = this.ctx.pages.get(pageId);
+    if (!page) return;
+    const stack = (page.meta?.appliedTemplates ?? []).slice();
+    let found = false;
+    for (let i = stack.length - 1; i >= 0; i--) {
+      if (stack[i].templateId === templateId) {
+        stack.splice(i, 1);
+        found = true;
+        break;
+      }
+    }
+    if (!found) return;
+    this.updatePage(pageId, { meta: { appliedTemplates: stack } });
+    this.ctx.composer.emit(EVENTS.TEMPLATE_REMOVED, { templateId, pageId });
   }
 
   /** Set active page */

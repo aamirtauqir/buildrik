@@ -749,6 +749,10 @@ export interface EventPayloads {
   // Page Template Attach / Detach (P9)
   [EVENTS.PAGE_TEMPLATE_ATTACHED]: { pageId: string; templateId: string; version?: string };
   [EVENTS.PAGE_TEMPLATE_DETACHED]: { pageId: string; templateId: string };
+
+  // Template apply / remove (S9 — emitted by PageManager.recordAppliedTemplate / removeAppliedTemplate)
+  [EVENTS.TEMPLATE_APPLIED]: { templateId: string; pageId: string; version?: string };
+  [EVENTS.TEMPLATE_REMOVED]: { templateId: string; pageId: string };
 }
 
 /**

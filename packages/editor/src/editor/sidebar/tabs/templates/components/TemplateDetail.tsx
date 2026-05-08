@@ -16,6 +16,10 @@ interface TemplateDetailProps {
   onCancel: () => void;
   previewState?: "loading" | "error" | "ready";
   onPreviewRetry?: () => void;
+  /** S9: count of pages this template is applied to (drives "Used in" link). */
+  usageCount?: number;
+  /** S9: open the Used in / Versions drawer. */
+  onShowUsage?: () => void;
 }
 
 export const TemplateDetail: React.FC<TemplateDetailProps> = ({
@@ -26,6 +30,8 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
   onCancel,
   previewState = "ready",
   onPreviewRetry,
+  usageCount,
+  onShowUsage,
 }) => {
   return (
     <div className="tpl-detail">
@@ -71,6 +77,24 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
             {template.pageCount ? ` with ${template.pageCount} pages` : ""}.
             {template.status === "premium" ? " Pro plan required." : ""}
           </p>
+        )}
+        {usageCount !== undefined && usageCount > 0 && onShowUsage && (
+          <button
+            type="button"
+            className="tpl-detail-usage-link"
+            onClick={onShowUsage}
+            style={{
+              all: "unset",
+              cursor: "pointer",
+              marginTop: 8,
+              fontSize: 12,
+              color: "var(--bd-accent, #2D6DFF)",
+              textDecoration: "underline dotted",
+              textUnderlineOffset: 2,
+            }}
+          >
+            Used in {usageCount} {usageCount === 1 ? "page" : "pages"} →
+          </button>
         )}
       </div>
       <div className="tpl-detail-buttons">

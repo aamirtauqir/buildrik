@@ -21,6 +21,8 @@ import { useTemplateSelection } from "./hooks/useTemplateSelection";
 import { TemplateCard } from "./components/TemplateCard";
 import { TemplateDetail } from "./components/TemplateDetail";
 import { TemplatePagination } from "./components/TemplatePagination";
+import { TemplateUsageDrawer } from "./components/TemplateUsageDrawer";
+import { useTemplateUsageMap } from "./hooks/useTemplateUsageMap";
 import { ApplyProgressOverlay } from "./ApplyProgressOverlay";
 import "./TemplatesTab.css";
 
@@ -91,6 +93,19 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   const detailTemplate = sel.detailId
     ? SITE_TEMPLATES.find((t) => t.id === sel.detailId) ?? null
     : null;
+
+  // S9: aggregate usage across pages from page.meta.appliedTemplates.
+  const usageMap = useTemplateUsageMap(composer);
+  const [usageDrawerOpen, setUsageDrawerOpen] = React.useState(false);
+  const detailUsage = detailTemplate ? usageMap.get(detailTemplate.id) : [];
+
+  const handleJumpToPage = React.useCallback(
+    (pageId: string) => {
+      composer?.elements.setActivePage?.(pageId);
+      setUsageDrawerOpen(false);
+    },
+    [composer]
+  );
 
   // Track whether apply is "add as new page" mode
   const addAsNewPageRef = React.useRef(false);
@@ -347,6 +362,18 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
                 onAddAsNewPage={handleAddAsNewPage}
                 onPreview={(id) => sel.setPreviewId(id)}
                 onCancel={() => sel.setDetailId(null)}
+                usageCount={detailUsage.length}
+                onShowUsage={() => setUsageDrawerOpen(true)}
+              />
+            )}
+            {detailTemplate && (
+              <TemplateUsageDrawer
+                open={usageDrawerOpen}
+                onOpenChange={setUsageDrawerOpen}
+                templateId={detailTemplate.id}
+                templateName={detailTemplate.name}
+                usage={detailUsage}
+                onJumpToPage={handleJumpToPage}
               />
             )}
           </div>
