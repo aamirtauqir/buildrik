@@ -16,6 +16,7 @@
     "gate:buildrick": "node scripts/check-buildrick-baseline.mjs",
     "gate:ds-ssot": "node scripts/check-ds-ssot.mjs",
     "gate:ds-migrations": "node scripts/check-ds-migrations.mjs",
+    "gate:ds-alias": "node scripts/check-alias-fixtures.mjs",
     "lint": "eslint . --ext .ts,.tsx",
     "phase5:inventory": "node scripts/phase5-shim-inventory.mjs",
     "phase5:inventory:pretty": "node scripts/phase5-shim-inventory.mjs --pretty",
