@@ -11,6 +11,8 @@ const mocks = {
   sitesGetQuery: vi.fn(),
   pagesListQuery: vi.fn(),
   saveProjectMutate: vi.fn(),
+  siteDetailSettingsGetQuery: vi.fn().mockResolvedValue(null),
+  siteDetailSettingsUpdateMutate: vi.fn().mockResolvedValue({ success: true }),
 };
 
 vi.mock("@buildrik/shared", () => ({
@@ -21,6 +23,12 @@ vi.mock("@buildrik/shared", () => ({
     },
     pages: {
       list: { query: (...args: any[]) => mocks.pagesListQuery(...args) },
+    },
+    siteDetail: {
+      settings: {
+        get: { query: (...args: any[]) => mocks.siteDetailSettingsGetQuery(...args) },
+        update: { mutate: (...args: any[]) => mocks.siteDetailSettingsUpdateMutate(...args) },
+      },
     },
   }),
 }));

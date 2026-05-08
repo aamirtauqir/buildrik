@@ -5,6 +5,8 @@ const mocks = vi.hoisted(() => ({
   sitesGetQuery: vi.fn(),
   sitesSaveProjectMutate: vi.fn(),
   pagesListQuery: vi.fn(),
+  siteDetailSettingsGetQuery: vi.fn().mockResolvedValue(null),
+  siteDetailSettingsUpdateMutate: vi.fn().mockResolvedValue({ success: true }),
 }));
 
 vi.mock("@buildrik/shared", () => ({
@@ -20,6 +22,12 @@ vi.mock("@buildrik/shared", () => ({
     pages: {
       list: {
         query: mocks.pagesListQuery,
+      },
+    },
+    siteDetail: {
+      settings: {
+        get: { query: mocks.siteDetailSettingsGetQuery },
+        update: { mutate: mocks.siteDetailSettingsUpdateMutate },
       },
     },
   })),
