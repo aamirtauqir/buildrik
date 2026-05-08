@@ -119,6 +119,9 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
                   dsSchemaVersion: result.newVersion,
                 };
               }
+              instance.aliasResolver.validate(
+                (toImport.styles ?? []) as unknown as DesignToken[]
+              );
             } catch (err) {
               console.error("[BuildrikSync] DS migration failed:", err);
               addToast({

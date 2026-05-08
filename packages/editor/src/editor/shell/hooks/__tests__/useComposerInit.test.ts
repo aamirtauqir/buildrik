@@ -46,6 +46,11 @@ const mockComposer = {
       newVersion: currentVersion,
     })),
   },
+  aliasResolver: {
+    validate: vi.fn(),
+    resolve: vi.fn(),
+    getChain: vi.fn(),
+  },
   destroy: vi.fn(),
 };
 
@@ -420,5 +425,180 @@ describe("useComposerInit — DS migration runs at project load (A.1)", () => {
     };
     expect(imported.dsSchemaVersion).toBe(0);
     consoleSpy.mockRestore();
+  });
+});
+
+describe("useComposerInit — alias validation runs at load (A.2)", () => {
+  beforeEach(() => {
+    vi.useRealTimers();
+    Object.keys(eventHandlers).forEach((k) => {
+      delete eventHandlers[k];
+    });
+    vi.clearAllMocks();
+    mockComposer.on.mockImplementation((event: string, handler: EventHandler) => {
+      if (!eventHandlers[event]) eventHandlers[event] = [];
+      eventHandlers[event].push(handler);
+    });
+    mockComposer.emit.mockImplementation((event: string, ...args: unknown[]) => {
+      (eventHandlers[event] ?? []).forEach((h) => h(...args));
+    });
+    mockComposer.elements.getAllPages.mockReturnValue([{ id: "page-1" }]);
+    mockComposer.history.canUndo.mockReturnValue(false);
+    mockComposer.history.canRedo.mockReturnValue(false);
+    mockComposer.migration.run.mockReset();
+    mockComposer.aliasResolver.validate.mockReset();
+  });
+
+  async function flushMicrotasks() {
+    await new Promise((r) => setTimeout(r, 0));
+    await new Promise((r) => setTimeout(r, 0));
+  }
+
+  it("calls aliasResolver.validate on migrated tokens AFTER migration.run", async () => {
+    const { getSiteIdFromUrl, loadProject } = await import("@/services/BuildrikSyncProvider");
+    (getSiteIdFromUrl as ReturnType<typeof vi.fn>).mockReturnValue("site-A2");
+    (loadProject as ReturnType<typeof vi.fn>).mockResolvedValue({
+      version: "1.0",
+      pages: [],
+      styles: [],
+      assets: [],
+      dsSchemaVersion: 0,
+    });
+    mockComposer.migration.run.mockReturnValue({
+      project: { tokens: [{ id: "color-primary", aliasOf: "color-blue-500" }, { id: "color-blue-500" }] },
+      newVersion: 1,
+    });
+
+    renderHook(() =>
+      useComposerInit({
+        containerRef: makeContainerRef(),
+        addToast: vi.fn(),
+        setCanUndo: vi.fn(),
+        setCanRedo: vi.fn(),
+        setDevice: vi.fn(),
+        setZoom: vi.fn(),
+        setShowTemplates: vi.fn(),
+        setShowExporter: vi.fn(),
+        setShowAI: vi.fn(),
+        setShowComponentView: vi.fn(),
+        setIsDirty: vi.fn(),
+        setSaveState: vi.fn(),
+      })
+    );
+
+    act(() => {
+      mockComposer.emit("composer:ready");
+    });
+    await flushMicrotasks();
+
+    expect(mockComposer.aliasResolver.validate).toHaveBeenCalledTimes(1);
+    const validateArgs = mockComposer.aliasResolver.validate.mock.calls[0][0];
+    expect(validateArgs).toEqual([
+      { id: "color-primary", aliasOf: "color-blue-500" },
+      { id: "color-blue-500" },
+    ]);
+
+    const migOrder = mockComposer.migration.run.mock.invocationCallOrder[0];
+    const valOrder = mockComposer.aliasResolver.validate.mock.invocationCallOrder[0];
+    const impOrder = mockComposer.importProject.mock.invocationCallOrder[0];
+    expect(migOrder).toBeLessThan(valOrder);
+    expect(valOrder).toBeLessThan(impOrder);
+  });
+
+  it("alias cycle throw → warning toast + still imports unmigrated data", async () => {
+    const { getSiteIdFromUrl, loadProject } = await import("@/services/BuildrikSyncProvider");
+    (getSiteIdFromUrl as ReturnType<typeof vi.fn>).mockReturnValue("site-A2-cycle");
+    (loadProject as ReturnType<typeof vi.fn>).mockResolvedValue({
+      version: "1.0",
+      pages: [],
+      styles: [{ id: "a", aliasOf: "b" }, { id: "b", aliasOf: "a" }],
+      assets: [],
+      dsSchemaVersion: 1,
+    });
+    mockComposer.migration.run.mockReturnValue({
+      project: { tokens: [{ id: "a", aliasOf: "b" }, { id: "b", aliasOf: "a" }] },
+      newVersion: 1,
+    });
+    mockComposer.aliasResolver.validate.mockImplementation(() => {
+      const err = new Error("[alias-resolver] cycle detected: a → b → a");
+      err.name = "AliasCycleError";
+      throw err;
+    });
+    const addToast = vi.fn();
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    renderHook(() =>
+      useComposerInit({
+        containerRef: makeContainerRef(),
+        addToast,
+        setCanUndo: vi.fn(),
+        setCanRedo: vi.fn(),
+        setDevice: vi.fn(),
+        setZoom: vi.fn(),
+        setShowTemplates: vi.fn(),
+        setShowExporter: vi.fn(),
+        setShowAI: vi.fn(),
+        setShowComponentView: vi.fn(),
+        setIsDirty: vi.fn(),
+        setSaveState: vi.fn(),
+      })
+    );
+
+    act(() => {
+      mockComposer.emit("composer:ready");
+    });
+    await flushMicrotasks();
+
+    expect(addToast).toHaveBeenCalledWith(
+      expect.objectContaining({ tone: "warning", title: "Project update failed" })
+    );
+    expect(mockComposer.importProject).toHaveBeenCalledTimes(1);
+    consoleSpy.mockRestore();
+  });
+
+  it("validate success → no toast, importProject runs as normal", async () => {
+    const { getSiteIdFromUrl, loadProject } = await import("@/services/BuildrikSyncProvider");
+    (getSiteIdFromUrl as ReturnType<typeof vi.fn>).mockReturnValue("site-A2-ok");
+    (loadProject as ReturnType<typeof vi.fn>).mockResolvedValue({
+      version: "1.0",
+      pages: [],
+      styles: [{ id: "a" }],
+      assets: [],
+      dsSchemaVersion: 1,
+    });
+    mockComposer.migration.run.mockReturnValue({
+      project: { tokens: [{ id: "a" }] },
+      newVersion: 1,
+    });
+    mockComposer.aliasResolver.validate.mockImplementation(() => { /* no throw */ });
+    const addToast = vi.fn();
+
+    renderHook(() =>
+      useComposerInit({
+        containerRef: makeContainerRef(),
+        addToast,
+        setCanUndo: vi.fn(),
+        setCanRedo: vi.fn(),
+        setDevice: vi.fn(),
+        setZoom: vi.fn(),
+        setShowTemplates: vi.fn(),
+        setShowExporter: vi.fn(),
+        setShowAI: vi.fn(),
+        setShowComponentView: vi.fn(),
+        setIsDirty: vi.fn(),
+        setSaveState: vi.fn(),
+      })
+    );
+
+    act(() => {
+      mockComposer.emit("composer:ready");
+    });
+    await flushMicrotasks();
+
+    expect(mockComposer.aliasResolver.validate).toHaveBeenCalledTimes(1);
+    expect(addToast).not.toHaveBeenCalledWith(
+      expect.objectContaining({ tone: "warning", title: "Project update failed" })
+    );
+    expect(mockComposer.importProject).toHaveBeenCalledTimes(1);
   });
 });
