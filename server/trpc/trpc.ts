@@ -17,20 +17,31 @@ export const createTRPCContext = async (opts?: { headers?: Headers }) => {
   // exists. If both are present we treat the request as bearer-auth: the
   // protectedProcedure deny-by-default + scope enforcement must apply, or
   // the token's restrictions silently evaporate. Codex pass-3 P2.
+  //
+  // Fail-closed on invalid bearer: if the header is supplied but the token
+  // is expired/revoked/malformed, we reject the entire request rather than
+  // silently falling back to the cookie session. Otherwise an attacker with
+  // a stale token and a hijacked session cookie could still reach
+  // protectedProcedure as if no Authorization header had been sent.
+  // Codex pass-4 P2.
   let bearerSession: BearerSession | null = null;
   const bearerToken = extractBearer(opts?.headers);
   if (bearerToken) {
     const verified = await verifyApiToken(bearerToken);
-    if (verified) {
-      bearerSession = {
-        user: { id: verified.userId },
-        apiToken: {
-          workspaceId: verified.workspaceId,
-          scopes: verified.scopes,
-          tokenId: verified.tokenId,
-        },
-      };
+    if (!verified) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Invalid or expired API token.",
+      });
     }
+    bearerSession = {
+      user: { id: verified.userId },
+      apiToken: {
+        workspaceId: verified.workspaceId,
+        scopes: verified.scopes,
+        tokenId: verified.tokenId,
+      },
+    };
   }
 
   // Effective identity: bearer wins when present (more restrictive). Cookie

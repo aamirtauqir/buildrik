@@ -161,3 +161,33 @@ describe("api-tokens.assertWorkspaceMember source predicate", () => {
     expect(src).toMatch(pattern);
   });
 });
+
+// Stale-bearer fail-closed (codex pass-4 P2) — context creation throws when an
+// Authorization header is supplied but verification fails. Behavior lives in
+// `createTRPCContext` which depends on Prisma + NextAuth at module load; pin
+// the shape via source inspection to catch silent regressions.
+describe("createTRPCContext: stale bearer fails closed", () => {
+  it("throws UNAUTHORIZED when extractBearer returns a token but verifyApiToken does not", async () => {
+    const fs = await import("fs/promises");
+    const path = await import("path");
+    const root = path.resolve(import.meta.dirname, "..");
+    const src = await fs.readFile(path.join(root, "server/trpc/trpc.ts"), "utf-8");
+    // Pin: the verified===null branch throws TRPCError UNAUTHORIZED rather
+    // than falling through. Match through whitespace/comments tolerantly.
+    const pattern =
+      /if\s*\(\s*!verified\s*\)\s*\{[\s\S]*?throw\s+new\s+TRPCError\([\s\S]*?code:\s*"UNAUTHORIZED"/;
+    expect(src).toMatch(pattern);
+  });
+
+  it("extracts bearer token regardless of cookie session presence", async () => {
+    const fs = await import("fs/promises");
+    const path = await import("path");
+    const root = path.resolve(import.meta.dirname, "..");
+    const src = await fs.readFile(path.join(root, "server/trpc/trpc.ts"), "utf-8");
+    // Pin: extractBearer is called unconditionally. The original bug had it
+    // gated on `if (!session?.user)`. Make sure that gate is gone.
+    expect(src).not.toMatch(/if\s*\(!session\?\.\s*user\s*\)\s*\{\s*const\s+bearer\s*=\s*extractBearer/);
+    // And that extractBearer is called at the top level of the function body.
+    expect(src).toMatch(/const\s+bearerToken\s*=\s*extractBearer\(opts\?\.headers\)/);
+  });
+});
