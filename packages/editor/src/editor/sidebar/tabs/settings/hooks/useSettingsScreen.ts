@@ -6,7 +6,7 @@
  * @license BSD-3-Clause
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Composer } from "../../../../../engine/Composer";
 import { EVENTS } from "../../../../../shared/constants/events";
 import type { ProjectSettings } from "../../../../../shared/types/project";
@@ -32,13 +32,22 @@ export function useSettingsScreen<T>(
   const [value, setValue] = useState<T>(defaultValue);
   const [isDirty, setIsDirty] = useState(false);
 
+  // Callers pass an inline `selector` arrow function. If we put `selector` in
+  // `reload`'s useCallback deps, every parent render busts the memo, the
+  // effect re-runs, calls `reload()`, which calls `setValue(...)` with a new
+  // object reference (the selector returns a fresh `{...}`), which triggers
+  // another render — infinite loop. Snapshot the latest selector via a ref
+  // so `reload` stays stable per `composer`.
+  const selectorRef = useRef(selector);
+  selectorRef.current = selector;
+
   const reload = useCallback(() => {
     if (!composer) return;
-    setValue(selector(composer.getProjectSettings()));
+    setValue(selectorRef.current(composer.getProjectSettings()));
     // NOTE: intentionally does NOT reset isDirty.
     // Only handleSave (via markClean) should reset dirty state.
     // If SETTINGS_CHANGE fires while user has unsaved edits, we preserve their work.
-  }, [composer, selector]);
+  }, [composer]);
 
   useEffect(() => {
     reload();
