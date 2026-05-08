@@ -62,9 +62,11 @@ import { Viewport } from "./Viewport";
  * Main Aquibra Composer class
  * Central orchestrator for the visual editing experience
  */
+type InternalComposerState = Omit<ComposerState, "device">;
+
 export class Composer extends EventEmitter {
   private config: ComposerConfig;
-  private state: ComposerState;
+  private state: InternalComposerState;
 
   private collaborationHandlers: Set<(...args: any[]) => void> = new Set();
   private selectionHandlers: Set<(...args: any[]) => void> = new Set();
@@ -281,11 +283,10 @@ export class Composer extends EventEmitter {
   /**
    * Create initial state
    */
-  private createInitialState(): ComposerState {
+  private createInitialState(): InternalComposerState {
     return {
       ready: false,
       dirty: false,
-      device: "desktop",
       zoom: 100,
       activePageId: null,
       snapToGrid: false,
@@ -527,17 +528,20 @@ ${html}
   // ============================================
 
   /**
-   * Get current state
+   * Get current state. Device is computed from viewport (E-004 SSOT — viewport is authoritative).
    */
   getState(): ComposerState {
-    return { ...this.state };
+    return { ...this.state, device: this.viewport.getDevice() };
   }
 
   /**
-   * Patch state properties directly (for load/save operations)
+   * Patch state properties directly (for load/save operations).
+   * Device patches are forwarded to setDevice so viewport stays SSOT (E-004).
    */
   patchState(patch: Partial<ComposerState>): void {
-    this.state = { ...this.state, ...patch };
+    const { device, ...rest } = patch;
+    this.state = { ...this.state, ...rest };
+    if (device !== undefined) this.setDevice(device);
   }
 
   /**
@@ -651,16 +655,22 @@ ${html}
   /**
    * Set active device for responsive preview.
    *
-   * Source of truth is `viewport.currentDevice`. `state.device` is a
-   * read-only mirror kept in sync for `getState()` serialization. The
-   * `BREAKPOINT_CHANGED` event is emitted once by `viewport.setDevice`
-   * (Viewport.ts:70) — do not emit again here.
+   * E-004: viewport is the single source of truth. State no longer mirrors
+   * device — `getState()` reads from `viewport.currentDevice` at serialization
+   * time. `BREAKPOINT_CHANGED` is emitted once by `viewport.setDevice`
+   * (Viewport.ts:70).
    */
   setDevice(device: import("../shared/types").DeviceType): void {
-    if (this.state.device !== device) {
-      this.state.device = device;
+    if (this.viewport.getDevice() !== device) {
       this.viewport.setDevice(device);
     }
+  }
+
+  /**
+   * Active device for responsive preview. Reads from viewport (SSOT).
+   */
+  get device(): import("../shared/types").DeviceType {
+    return this.viewport.getDevice();
   }
 
   /**
