@@ -24,6 +24,7 @@ import { LayoutShell } from "../rail/LayoutShell";
 import { LeftSidebar } from "../sidebar/LeftSidebar";
 import { FullPageView } from "../sidebar/FullPageView";
 import { TokenRegistryProvider } from "@/editor/design-system";
+import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { PageTabBar } from "./PageTabBar";
 
@@ -353,6 +354,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 
   return (
     <TokenRegistryProvider projectId={projectId} composer={composer ?? undefined}>
+      <MigrationProgressMount composer={composer} />
       <LayoutShell
         drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
         drawerPinned={panelPinned}
