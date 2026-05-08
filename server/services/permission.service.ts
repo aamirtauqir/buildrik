@@ -15,13 +15,28 @@ export class PermissionError extends Error {
   }
 }
 
+/**
+ * Bearer-auth context propagated from `createTRPCContext`. When present, the
+ * request authenticated via an API token; the resource being accessed must be
+ * in the token's workspace. Cookie-session requests pass `undefined`/`null`.
+ */
+interface BearerScope {
+  workspaceId: string;
+}
+
 export async function assertSiteAccess(
   db: PrismaClient,
   userId: string,
-  siteId: string
+  siteId: string,
+  bearer?: BearerScope | null,
 ): Promise<void> {
   const site = await db.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
   if (!site) throw new PermissionError("NOT_FOUND");
+  // API tokens are workspace-scoped: a token issued for workspace A must never
+  // touch workspace B's resources, even if the underlying user belongs to both.
+  if (bearer && site.workspaceId !== bearer.workspaceId) {
+    throw new PermissionError("FORBIDDEN", "Token is not scoped to this workspace.");
+  }
   const member = await db.workspaceMember.findFirst({
     where: { userId, workspaceId: site.workspaceId, status: "ACTIVE" },
     select: { id: true },
@@ -33,10 +48,14 @@ export async function checkSiteRole(
   db: PrismaClient,
   userId: string,
   siteId: string,
-  minRole: Exclude<UserRoleType, "VIEWER">
+  minRole: Exclude<UserRoleType, "VIEWER">,
+  bearer?: BearerScope | null,
 ): Promise<void> {
   const site = await db.site.findUnique({ where: { id: siteId }, select: { workspaceId: true } });
   if (!site) throw new PermissionError("NOT_FOUND");
+  if (bearer && site.workspaceId !== bearer.workspaceId) {
+    throw new PermissionError("FORBIDDEN", "Token is not scoped to this workspace.");
+  }
 
   const member = await db.workspaceMember.findFirst({
     where: { userId, workspaceId: site.workspaceId, status: "ACTIVE" },

@@ -53,12 +53,52 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 
 export const router = t.router;
 export const publicProcedure = t.procedure;
+
+/**
+ * Cookie-session-only protected procedure. Denies bearer tokens by default —
+ * API tokens must use `scopedProcedure(scope)` so the requested capability is
+ * declared against the token's allowlist. This prevents tokens issued with a
+ * narrow scope (e.g. `redirects:read`) from reaching unrelated mutations
+ * (`siteDetail.settings.update`, billing routes) that share the same procedure.
+ */
 export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
   if (!ctx.session?.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+  if (ctx.bearer) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message:
+        "API tokens cannot use this endpoint. Use a session-authenticated request, " +
+        "or call a scope-tagged endpoint that matches your token's scopes.",
+    });
+  }
   return next({ ctx: { ...ctx, session: { ...ctx.session, user: ctx.session.user } } });
 });
+
+/**
+ * Procedure that accepts either a cookie session (full access) OR a bearer
+ * token whose scope list includes `requiredScope`. Use for endpoints intended
+ * to be reachable from API tokens. Downstream handlers should still pass
+ * `ctx.bearer` to `assertSiteAccess`/`checkSiteRole` so the resource's
+ * workspaceId is cross-checked against the token's workspaceId.
+ */
+export function scopedProcedure(requiredScope: Scope) {
+  return t.procedure.use(async ({ ctx, next }) => {
+    if (!ctx.session?.user) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+    if (ctx.bearer && !ctx.bearer.apiToken.scopes.includes(requiredScope)) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: `API token is missing required scope: ${requiredScope}`,
+      });
+    }
+    return next({
+      ctx: { ...ctx, session: { ...ctx.session, user: ctx.session.user } },
+    });
+  });
+}
 
 export function createRateLimitedProcedure(maxAttempts: number, windowMs: number) {
   return publicProcedure.use(async ({ ctx, path, next }) => {

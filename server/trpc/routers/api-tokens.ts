@@ -17,8 +17,11 @@ async function assertWorkspaceMember(
   userId: string,
   workspaceId: string,
 ): Promise<void> {
+  // Mirror permission.service: only ACTIVE members may manage API tokens.
+  // Suspended / pending members keep their workspace_member row but lose
+  // access to other workspace operations — token management must follow.
   const member = await prisma.workspaceMember.findFirst({
-    where: { userId, workspaceId },
+    where: { userId, workspaceId, status: "ACTIVE" },
     select: { id: true },
   });
   if (!member) {
