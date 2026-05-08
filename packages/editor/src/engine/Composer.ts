@@ -49,6 +49,7 @@ import { SyncManager } from "./sync/SyncManager";
 import { TemplateManager } from "./templates/TemplateManager";
 import type { Patch } from "./utils/JsonPatch";
 import { MigrationManager } from "./migration/MigrationManager";
+import { AliasResolver } from "./aliasResolver";
 import { VersionTimelineManager } from "./VersionTimelineManager";
 import { Viewport } from "./Viewport";
 
@@ -108,6 +109,7 @@ export class Composer extends EventEmitter {
   readonly router!: PageRouter;
   readonly recovery!: RecoveryManager;
   readonly migration!: MigrationManager;
+  readonly aliasResolver!: AliasResolver;
 
   // Facade groupings — D3 Stage 1 (Option B-tight). Three clusters where
   // ≥2 managers share a domain:
@@ -162,6 +164,7 @@ export class Composer extends EventEmitter {
     this.router = new PageRouter();
     this.recovery = new RecoveryManager(this);
     this.migration = new MigrationManager(this);
+    this.aliasResolver = new AliasResolver(this);
 
     // Facade groupings — D3 Stage 1.
     const cmsCollections = new CollectionManager();
