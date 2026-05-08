@@ -18,11 +18,11 @@ describe("MigrationManager", () => {
       siteId: "site-1",
     });
 
-    expect(result.newVersion).toBe(1);
+    expect(result.newVersion).toBe(2);
     expect(onComplete).toHaveBeenCalledWith({
       siteId: "site-1",
       fromVersion: 0,
-      toVersion: 1,
+      toVersion: 2,
     });
   });
 
@@ -32,9 +32,9 @@ describe("MigrationManager", () => {
     emitter.on("migration:skipped", onSkipped);
     const mgr = new MigrationManager(emitter);
 
-    mgr.run({ project: { tokens: [] }, currentVersion: 1, siteId: "site-1" });
+    mgr.run({ project: { tokens: [] }, currentVersion: 2, siteId: "site-1" });
 
-    expect(onSkipped).toHaveBeenCalledWith({ siteId: "site-1", currentVersion: 1 });
+    expect(onSkipped).toHaveBeenCalledWith({ siteId: "site-1", currentVersion: 2 });
   });
 
   it("emits migration:started before migration:complete", () => {
