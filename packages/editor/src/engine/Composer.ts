@@ -50,6 +50,8 @@ import { TemplateManager } from "./templates/TemplateManager";
 import type { Patch } from "./utils/JsonPatch";
 import { MigrationManager } from "./migration/MigrationManager";
 import { AliasResolver } from "./aliasResolver";
+import { DarkResolver } from "./darkResolver";
+import { ColorMode } from "./colorMode";
 import { VersionTimelineManager } from "./VersionTimelineManager";
 import { Viewport } from "./Viewport";
 
@@ -110,6 +112,8 @@ export class Composer extends EventEmitter {
   readonly recovery!: RecoveryManager;
   readonly migration!: MigrationManager;
   readonly aliasResolver!: AliasResolver;
+  readonly darkResolver!: DarkResolver;
+  readonly colorMode!: ColorMode;
 
   // Facade groupings — D3 Stage 1 (Option B-tight). Three clusters where
   // ≥2 managers share a domain:
@@ -165,6 +169,8 @@ export class Composer extends EventEmitter {
     this.recovery = new RecoveryManager(this);
     this.migration = new MigrationManager(this);
     this.aliasResolver = new AliasResolver(this);
+    this.darkResolver = new DarkResolver(this);
+    this.colorMode = new ColorMode(this);
 
     // Facade groupings — D3 Stage 1.
     const cmsCollections = new CollectionManager();
