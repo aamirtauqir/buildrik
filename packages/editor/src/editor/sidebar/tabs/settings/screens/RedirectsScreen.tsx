@@ -27,7 +27,11 @@ function getClient() {
   return _client;
 }
 
-export const RedirectsScreen: React.FC<ScreenProps> = ({ projectId }) => {
+export const RedirectsScreen: React.FC<ScreenProps> = ({
+  projectId,
+  onDirtyChange,
+  registerSaveHandler,
+}) => {
   const [rows, setRows] = React.useState<Redirect[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [loadError, setLoadError] = React.useState<string | null>(null);
@@ -37,6 +41,14 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({ projectId }) => {
   const [type, setType] = React.useState<"301" | "302">("301");
   const [submitting, setSubmitting] = React.useState(false);
   const [submitError, setSubmitError] = React.useState<string | null>(null);
+
+  // Form is dirty whenever the user has typed *anything* into either input.
+  // Type defaulting to "301" doesn't count — it only means "redirect kind."
+  const dirty = fromPath.trim().length > 0 || toUrl.trim().length > 0;
+
+  React.useEffect(() => {
+    onDirtyChange?.(dirty);
+  }, [dirty, onDirtyChange]);
 
   const reload = React.useCallback(async () => {
     if (!projectId) {
@@ -50,6 +62,9 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({ projectId }) => {
       const list = await getClient().siteDetail.redirects.list.query({ siteId: projectId });
       setRows(list as Redirect[]);
     } catch (e) {
+      // Drop stale rows on reload failure — showing outdated data alongside an
+      // error banner lets users act on rows that may no longer exist server-side.
+      setRows([]);
       setLoadError(e instanceof Error ? e.message : "Failed to load redirects.");
     } finally {
       setLoading(false);
@@ -60,20 +75,21 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({ projectId }) => {
     void reload();
   }, [reload]);
 
-  const handleAdd = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitDraft = React.useCallback(async () => {
     if (!projectId) return;
     setSubmitError(null);
 
     const trimmedFrom = fromPath.trim();
     const trimmedTo = toUrl.trim();
     if (!trimmedFrom.startsWith("/")) {
-      setSubmitError("From path must start with / (e.g. /old-page)");
-      return;
+      const msg = "From path must start with / (e.g. /old-page)";
+      setSubmitError(msg);
+      throw new Error(msg);
     }
     if (!trimmedTo) {
-      setSubmitError("To URL is required.");
-      return;
+      const msg = "To URL is required.";
+      setSubmitError(msg);
+      throw new Error(msg);
     }
 
     setSubmitting(true);
@@ -89,11 +105,29 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({ projectId }) => {
       setType("301");
       await reload();
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Failed to add redirect.");
+      const msg = err instanceof Error ? err.message : "Failed to add redirect.";
+      setSubmitError(msg);
+      throw err;
     } finally {
       setSubmitting(false);
     }
+  }, [projectId, fromPath, toUrl, type, reload]);
+
+  const handleAdd = (e: React.FormEvent) => {
+    e.preventDefault();
+    void submitDraft().catch(() => {
+      /* error already surfaced via submitError state */
+    });
   };
+
+  // Register submitDraft as the central savebar's save handler whenever the
+  // form has draft content. Lets visitors submit either via the inline
+  // "Add redirect" button or via the shared savebar without losing the draft.
+  React.useEffect(() => {
+    if (!registerSaveHandler) return;
+    registerSaveHandler(dirty ? submitDraft : null);
+    return () => registerSaveHandler(null);
+  }, [registerSaveHandler, dirty, submitDraft]);
 
   const handleDelete = async (id: string) => {
     if (!projectId) return;

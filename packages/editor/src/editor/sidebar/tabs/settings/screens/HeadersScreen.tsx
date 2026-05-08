@@ -41,7 +41,11 @@ const HSTS_PRESETS: { label: string; seconds: number | null }[] = [
   { label: "2 years (recommended)", seconds: 63072000 },
 ];
 
-export const HeadersScreen: React.FC<ScreenProps> = ({ projectId, onDirtyChange }) => {
+export const HeadersScreen: React.FC<ScreenProps> = ({
+  projectId,
+  onDirtyChange,
+  registerSaveHandler,
+}) => {
   const [csp, setCsp] = React.useState("");
   const [hstsMaxAge, setHstsMaxAge] = React.useState<number | null>(null);
   const [xFrame, setXFrame] = React.useState<XFrameValue>("");
@@ -88,7 +92,7 @@ export const HeadersScreen: React.FC<ScreenProps> = ({ projectId, onDirtyChange 
 
   const markDirty = () => setDirty(true);
 
-  const handleSave = async () => {
+  const handleSave = React.useCallback(async () => {
     if (!projectId || !dirty) return;
     setSaving(true);
     setSaveError(null);
@@ -103,11 +107,23 @@ export const HeadersScreen: React.FC<ScreenProps> = ({ projectId, onDirtyChange 
       });
       setDirty(false);
     } catch (e) {
-      setSaveError(e instanceof Error ? e.message : "Failed to save headers.");
+      const msg = e instanceof Error ? e.message : "Failed to save headers.";
+      setSaveError(msg);
+      // Re-throw so SettingsTab.handleSave catch path keeps savebar visible.
+      throw e;
     } finally {
       setSaving(false);
     }
-  };
+  }, [projectId, dirty, csp, hstsMaxAge, xFrame, referrer, permissions]);
+
+  // Register screen save handler with the central savebar so the
+  // "Save" button writes Headers fields rather than calling
+  // composer.saveProject() (which doesn't serialize them).
+  React.useEffect(() => {
+    if (!registerSaveHandler) return;
+    registerSaveHandler(dirty ? handleSave : null);
+    return () => registerSaveHandler(null);
+  }, [registerSaveHandler, dirty, handleSave]);
 
   if (!projectId) {
     return (

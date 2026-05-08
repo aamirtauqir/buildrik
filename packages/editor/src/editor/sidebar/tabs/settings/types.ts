@@ -32,6 +32,13 @@ export interface ScreenProps {
   onDirtyChange?: (isDirty: boolean) => void;
   /** Site/project ID — required by screens that read server-side rows (Redirects, Forms, etc.) */
   projectId?: string | null;
+  /**
+   * Called by screens that own server-side persistence (Redirects/Headers/Localization
+   * write to Site columns directly, not into composer state). Registered handler
+   * runs in place of `composer.saveProject()` when the central savebar fires.
+   * Pass `null` to clear (e.g. when screen becomes clean or unmounts).
+   */
+  registerSaveHandler?: (handler: (() => Promise<void>) | null) => void;
 }
 
 export interface BillingScreenProps {

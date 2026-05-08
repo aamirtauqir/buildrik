@@ -65,6 +65,13 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
   const [subsError, setSubsError] = React.useState<string | null>(null);
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
 
+  // Reset form selection when the site changes — keeping a stale formBlockId
+  // from the previous site sends `{ siteId: new, formBlockId: oldSiteForm }`
+  // and silently returns an empty inbox.
+  React.useEffect(() => {
+    setSelectedFormId("");
+  }, [projectId]);
+
   // Initial form-blocks load.
   React.useEffect(() => {
     if (!projectId) {
@@ -79,11 +86,17 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
       .then((list) => {
         const rows = list as FormBlockRow[];
         setForms(rows);
-        if (rows.length > 0 && !selectedFormId) setSelectedFormId(rows[0].id);
+        // Reconcile selection: pick first form when nothing is selected, OR when
+        // the previous selection isn't valid for this site (post-projectId reset).
+        if (rows.length > 0) {
+          setSelectedFormId((prev) =>
+            prev && rows.some((r) => r.id === prev) ? prev : rows[0].id,
+          );
+        }
       })
       .catch((e) => setFormsError(e instanceof Error ? e.message : "Failed to load forms."))
       .finally(() => setFormsLoading(false));
-  }, [projectId, selectedFormId]);
+  }, [projectId]);
 
   // Submissions load whenever form/filter/page changes.
   const loadSubs = React.useCallback(async () => {
@@ -125,10 +138,11 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
   const handleUpdate = async (id: string, patch: { isRead?: boolean; isSpam?: boolean; isArchived?: boolean }) => {
     try {
       await getClient().forms.updateSubmission.mutate({ id, ...patch });
-      // Local optimistic update — avoid full refetch.
-      setSubmissions((prev) =>
-        prev ? { ...prev, data: prev.data.map((r) => (r.id === id ? { ...r, ...patch } : r)) } : prev,
-      );
+      // Filtering is server-side — patching a row in place leaves stale entries in
+      // the list (e.g. an "unread" tab still shows a row that was just marked read,
+      // a "spam" toggle keeps the row visible in the inbox until next refresh).
+      // Refetch keeps the visible set honest with the current filter.
+      await loadSubs();
     } catch (e) {
       setSubsError(e instanceof Error ? e.message : "Failed to update submission.");
     }
@@ -137,11 +151,16 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
   const handleDelete = async (id: string) => {
     try {
       await getClient().forms.deleteSubmission.mutate({ id });
-      setSubmissions((prev) =>
-        prev
-          ? { ...prev, data: prev.data.filter((r) => r.id !== id), total: Math.max(0, prev.total - 1) }
-          : prev,
-      );
+      // After deleting the last row of the current page, page index can exceed
+      // the new totalPages. Step back one page in that case so the user lands
+      // somewhere with content. Otherwise refetch the current page.
+      const remainingTotal = Math.max(0, (submissions?.total ?? 0) - 1);
+      const newTotalPages = Math.max(1, Math.ceil(remainingTotal / PER_PAGE));
+      if (page > newTotalPages) {
+        setPage(newTotalPages);
+      } else {
+        await loadSubs();
+      }
     } catch (e) {
       setSubsError(e instanceof Error ? e.message : "Failed to delete submission.");
     }

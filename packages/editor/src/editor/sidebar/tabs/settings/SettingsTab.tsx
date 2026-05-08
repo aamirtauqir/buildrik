@@ -188,10 +188,25 @@ export const SettingsTab: React.FC<
   const pendingNavRef = React.useRef<InTabNavId | null>(null);
   const [resetKey, setResetKey] = React.useState(0);
 
+  // Server-side screens (Redirects/Headers/Localization) write directly via
+  // tRPC, not through composer state. They register their own save handler so
+  // the central savebar's Save invokes the right write path instead of a
+  // composer.saveProject() that silently no-ops their fields.
+  const screenSaveHandlerRef = React.useRef<(() => Promise<void>) | null>(null);
+  const registerSaveHandler = React.useCallback(
+    (handler: (() => Promise<void>) | null) => {
+      screenSaveHandlerRef.current = handler;
+    },
+    []
+  );
+
   React.useEffect(() => {
     setScreenIsDirty(false);
     setDirtyCount(0);
     setGuardOpen(false);
+    // Clear stale handler on screen change — old screen unmounts, new screen
+    // re-registers if applicable.
+    screenSaveHandlerRef.current = null;
   }, [currentScreen]);
 
   React.useEffect(() => {
@@ -223,6 +238,21 @@ export const SettingsTab: React.FC<
   }, []);
 
   const handleSave = React.useCallback(() => {
+    const screenHandler = screenSaveHandlerRef.current;
+    if (screenHandler) {
+      // Server-side screen owns persistence. Skip composer.saveProject() —
+      // it would silently drop Redirects/Headers/Localization fields.
+      screenHandler()
+        .then(() => {
+          setScreenIsDirty(false);
+          setDirtyCount(0);
+        })
+        .catch((err) => {
+          console.error("[settings] screen save failed", err);
+          // Screen renders its own error banner; keep dirty so savebar stays visible.
+        });
+      return;
+    }
     if (!composer) return;
     const maybePromise = composer.saveProject?.();
     if (!maybePromise) {
@@ -237,7 +267,6 @@ export const SettingsTab: React.FC<
       })
       .catch((err) => {
         console.error("[settings] save failed", err);
-        // Leave dirty state so savebar stays visible
       });
   }, [composer]);
 
@@ -262,12 +291,32 @@ export const SettingsTab: React.FC<
       case "integrations":
         return <IntegrationsHub composer={composer} onDirtyChange={handleScreenDirty} />;
       // A1 day-3 complete: all 4 stubs drained (Redirects, Forms, Headers, Localization).
+      // Redirects/Headers/Localization own server-side save — register handler so
+      // the savebar's Save calls their write path instead of composer.saveProject().
       case "localization":
-        return <LocalizationScreen projectId={projectId} onDirtyChange={handleScreenDirty} />;
+        return (
+          <LocalizationScreen
+            projectId={projectId}
+            onDirtyChange={handleScreenDirty}
+            registerSaveHandler={registerSaveHandler}
+          />
+        );
       case "redirects":
-        return <RedirectsScreen projectId={projectId} onDirtyChange={handleScreenDirty} />;
+        return (
+          <RedirectsScreen
+            projectId={projectId}
+            onDirtyChange={handleScreenDirty}
+            registerSaveHandler={registerSaveHandler}
+          />
+        );
       case "headers":
-        return <HeadersScreen projectId={projectId} onDirtyChange={handleScreenDirty} />;
+        return (
+          <HeadersScreen
+            projectId={projectId}
+            onDirtyChange={handleScreenDirty}
+            registerSaveHandler={registerSaveHandler}
+          />
+        );
       case "forms":
         return <FormsScreen projectId={projectId} onDirtyChange={handleScreenDirty} />;
       default:

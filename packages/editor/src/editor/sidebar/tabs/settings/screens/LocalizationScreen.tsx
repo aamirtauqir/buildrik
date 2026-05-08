@@ -64,7 +64,11 @@ function labelFor(code: string): string {
   return COMMON_LOCALES.find((l) => l.code === code)?.label ?? code.toUpperCase();
 }
 
-export const LocalizationScreen: React.FC<ScreenProps> = ({ projectId, onDirtyChange }) => {
+export const LocalizationScreen: React.FC<ScreenProps> = ({
+  projectId,
+  onDirtyChange,
+  registerSaveHandler,
+}) => {
   const [defaultLocale, setDefaultLocale] = React.useState("en");
   const [enabledLocales, setEnabledLocales] = React.useState<string[]>(["en"]);
   const [pickedAdd, setPickedAdd] = React.useState("");
@@ -121,7 +125,7 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({ projectId, onDirtyCh
     markDirty();
   };
 
-  const handleSave = async () => {
+  const handleSave = React.useCallback(async () => {
     if (!projectId || !dirty) return;
     setSaving(true);
     setSaveError(null);
@@ -133,11 +137,22 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({ projectId, onDirtyCh
       });
       setDirty(false);
     } catch (e) {
-      setSaveError(e instanceof Error ? e.message : "Failed to save locales.");
+      const msg = e instanceof Error ? e.message : "Failed to save locales.";
+      setSaveError(msg);
+      // Re-throw so SettingsTab.handleSave keeps savebar visible.
+      throw e;
     } finally {
       setSaving(false);
     }
-  };
+  }, [projectId, dirty, defaultLocale, enabledLocales]);
+
+  // Register with central savebar so its Save button writes locale fields
+  // instead of falling back to composer.saveProject() (which omits them).
+  React.useEffect(() => {
+    if (!registerSaveHandler) return;
+    registerSaveHandler(dirty ? handleSave : null);
+    return () => registerSaveHandler(null);
+  }, [registerSaveHandler, dirty, handleSave]);
 
   if (!projectId) {
     return (
@@ -213,8 +228,8 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({ projectId, onDirtyCh
                 <button
                   type="button"
                   onClick={() => handleRemove(code)}
-                  disabled={isDefault || enabledLocales.length <= 1}
-                  style={isDefault ? removeDisabledStyles : removeBtnStyles}
+                  disabled={isDefault || enabledLocales.length <= 1 || saving}
+                  style={isDefault || saving ? removeDisabledStyles : removeBtnStyles}
                   aria-label={`Remove ${labelFor(code)}`}
                 >
                   Remove
@@ -243,8 +258,8 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({ projectId, onDirtyCh
             <button
               type="button"
               onClick={handleAdd}
-              disabled={!pickedAdd}
-              style={pickedAdd ? addButtonActiveStyles : addButtonStyles}
+              disabled={!pickedAdd || saving}
+              style={pickedAdd && !saving ? addButtonActiveStyles : addButtonStyles}
             >
               Add
             </button>

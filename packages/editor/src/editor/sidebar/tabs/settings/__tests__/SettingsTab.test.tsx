@@ -100,13 +100,25 @@ afterEach(() => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("SettingsTab", () => {
-  it("renders all 6 snav rows in order: General, Branding, SEO, Integrations, Publishing, Billing", () => {
+  it("renders the A1 day-1 nav: 10 in-tab sections + 8 workspace deep-links", () => {
     render(<SettingsTab composer={buildMockComposer() as never} />);
     const labels = snavRows()
       .map((r) => r.querySelector(".bd-set-snav-label")?.textContent?.trim())
       .filter(Boolean);
+    // In-tab sections (3 groups: SITE / DISTRIBUTION / PLUMBING).
     expect(labels).toEqual(
-      expect.arrayContaining(["General", "Branding", "SEO", "Integrations", "Publishing", "Billing"])
+      expect.arrayContaining([
+        "General", "Branding", "SEO",
+        "Analytics", "Localization",
+        "Custom code", "Redirects", "Headers", "Forms", "Integrations",
+      ])
+    );
+    // Workspace deep-links (open dashboard URLs in new tab).
+    expect(labels).toEqual(
+      expect.arrayContaining([
+        "Domains", "Members", "Billing", "API tokens",
+        "Webhooks", "Environments", "Audit log", "Versions",
+      ])
     );
   });
 
