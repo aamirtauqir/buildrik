@@ -1,0 +1,1 @@
+export { DarkResolver } from "./DarkResolver";
