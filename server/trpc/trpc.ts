@@ -13,28 +13,29 @@ interface BearerSession {
 export const createTRPCContext = async (opts?: { headers?: Headers }) => {
   const session = await auth();
 
-  // Bearer fallback: if no cookie session and an Authorization header is
-  // present, try to verify it as an API token. Bearer-auth shapes the same
-  // session.user.id contract so downstream protectedProcedure stays unchanged.
+  // Always look at the Authorization header — even when a cookie session
+  // exists. If both are present we treat the request as bearer-auth: the
+  // protectedProcedure deny-by-default + scope enforcement must apply, or
+  // the token's restrictions silently evaporate. Codex pass-3 P2.
   let bearerSession: BearerSession | null = null;
-  if (!session?.user) {
-    const bearer = extractBearer(opts?.headers);
-    if (bearer) {
-      const verified = await verifyApiToken(bearer);
-      if (verified) {
-        bearerSession = {
-          user: { id: verified.userId },
-          apiToken: {
-            workspaceId: verified.workspaceId,
-            scopes: verified.scopes,
-            tokenId: verified.tokenId,
-          },
-        };
-      }
+  const bearerToken = extractBearer(opts?.headers);
+  if (bearerToken) {
+    const verified = await verifyApiToken(bearerToken);
+    if (verified) {
+      bearerSession = {
+        user: { id: verified.userId },
+        apiToken: {
+          workspaceId: verified.workspaceId,
+          scopes: verified.scopes,
+          tokenId: verified.tokenId,
+        },
+      };
     }
   }
 
-  const effectiveSession = session ?? bearerSession;
+  // Effective identity: bearer wins when present (more restrictive). Cookie
+  // session falls through only when no Authorization header was supplied.
+  const effectiveSession = bearerSession ?? session;
   return { prisma, session: effectiveSession, bearer: bearerSession, headers: opts?.headers };
 };
 

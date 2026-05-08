@@ -94,6 +94,28 @@ describe("protectedProcedure: cookie session only", () => {
   });
 });
 
+describe("protectedProcedure: mixed-auth (cookie + bearer header) is treated as bearer", () => {
+  // The mixed-auth request shape: caller has a valid session cookie AND
+  // an Authorization header. createTRPCContext promotes bearer when present
+  // so protectedProcedure's deny-by-default still fires. Codex pass-3 P2.
+  it("rejects mixed-auth requests at protectedProcedure (bearer takes precedence)", async () => {
+    const mixed = bearerCtx({ workspaceId: "ws-A", scopes: ["redirects:read"] });
+    // Mixed simulates the caller; createTRPCContext output: bearer non-null,
+    // session resolves to bearer's user. Both fields populated.
+    const caller = appRouter.createCaller(mixed);
+    await expect(caller.protectedEcho()).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+
+  it("scopedProcedure on mixed-auth still requires the scope to be on the token", async () => {
+    const caller = appRouter.createCaller(
+      bearerCtx({ workspaceId: "ws-A", scopes: ["redirects:read"] }),
+    );
+    // Token has read but not write — write must still be denied even if a
+    // session cookie was also present at request time.
+    await expect(caller.scopedWrite()).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+});
+
 describe("scopedProcedure: cookie OR bearer-with-scope", () => {
   it("accepts cookie-session for any scope-tagged endpoint (full session perms)", async () => {
     const caller = appRouter.createCaller(cookieCtx());
