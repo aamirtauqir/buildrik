@@ -16,22 +16,22 @@ describe("runProjectMigrations", () => {
   it("returns same payload + same version when fromVersion >= TARGET_PROJECT_VERSION", () => {
     const result = runProjectMigrations({
       project: v0Payload,
-      currentVersion: 1,
+      currentVersion: 2,
       siteId: SITE_ID,
     });
     expect(result.project).toBe(v0Payload);
-    expect(result.newVersion).toBe(1);
+    expect(result.newVersion).toBe(2);
     expect(localStorage.getItem(SNAPSHOT_KEY)).toBeNull();
     expect(localStorage.getItem(MARKER_KEY)).toBeNull();
   });
 
-  it("applies 0001 and returns v=1 when fromVersion=0", () => {
+  it("applies 0001+0002 and returns v=2 when fromVersion=0", () => {
     const result = runProjectMigrations({
       project: v0Payload,
       currentVersion: 0,
       siteId: SITE_ID,
     });
-    expect(result.newVersion).toBe(1);
+    expect(result.newVersion).toBe(2);
     expect(result.project.tokens.length).toBeGreaterThanOrEqual(18);
   });
 
@@ -89,7 +89,7 @@ describe("runProjectMigrations", () => {
       currentVersion: 0,
       siteId: SITE_ID,
     });
-    expect(result.newVersion).toBe(1);
+    expect(result.newVersion).toBe(2);
     expect(localStorage.getItem(MARKER_KEY)).toBeNull();
     expect(localStorage.getItem(SNAPSHOT_KEY)).toBeNull();
   });
