@@ -21,6 +21,7 @@ import { ExportModal } from "../export";
 import { MediaLibraryPanel, ImageEditorModal, IconPickerModal } from "../media";
 import { KeyboardShortcutsPanel } from "../panels/KeyboardShortcutsPanel";
 import { useToast } from "@/editor/shared/vibcoder";
+import { FEATURES } from "../../shared/utils/featureFlags";
 import { ConflictModal } from "../sync/ConflictModal";
 import { CMSCollectionSetupModal } from "./modals/CMSCollectionSetupModal";
 import { CommandPalette } from "./modals/CommandPalette";
@@ -190,10 +191,14 @@ export const StudioModals: React.FC<StudioModalsProps> = ({
     [composer]
   );
 
-  // Track sync conflicts
+  // Track sync conflicts. E-010: gated on FEATURES.sync — SyncManager is
+  // SCAFFOLD until cloudSyncService.configure() is wired (see SyncManager.ts
+  // header). Without the gate, the subscription would fire on every Composer
+  // change while resolving to a perpetually inert state.
   const [activeConflict, setActiveConflict] = React.useState<SyncConflict | null>(null);
 
   React.useEffect(() => {
+    if (!FEATURES.sync) return;
     if (!composer?.collab.sync) return;
 
     // Set initial state

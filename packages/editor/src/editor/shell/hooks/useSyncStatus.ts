@@ -8,6 +8,7 @@ import * as React from "react";
 import type { Composer } from "../../../engine";
 import type { SyncManagerState } from "../../../engine/sync/SyncManager";
 import type { SyncStatus } from "../../../services/CloudSyncService";
+import { FEATURES } from "../../../shared/utils/featureFlags";
 
 export interface UseSyncStatusResult {
   status: SyncStatus;
@@ -34,8 +35,11 @@ export function useSyncStatus(composer: Composer | null): UseSyncStatusResult {
   const [managerState, setManagerState] = React.useState<SyncManagerState>(DEFAULT_STATE);
   const [status, setStatus] = React.useState<SyncStatus>(DEFAULT_STATUS);
 
-  // Subscribe to sync manager state changes
+  // E-010: SCAFFOLD gate. SyncManager + CloudSyncService are wired but inert
+  // (configure() never called). When the flag is off we skip subscriptions
+  // entirely so the 5-second poll interval doesn't run in production.
   React.useEffect(() => {
+    if (!FEATURES.sync) return;
     if (!composer?.collab.sync) return;
 
     // Get initial state
@@ -51,8 +55,11 @@ export function useSyncStatus(composer: Composer | null): UseSyncStatusResult {
     };
   }, [composer]);
 
-  // Poll sync status periodically (status comes from cloud service)
+  // Poll sync status periodically (status comes from cloud service).
+  // E-010: gated on FEATURES.sync to avoid an always-on 5s setInterval in
+  // production where the underlying service is intentionally inert.
   React.useEffect(() => {
+    if (!FEATURES.sync) return;
     if (!composer?.collab.sync) return;
 
     const updateStatus = () => {
@@ -72,8 +79,9 @@ export function useSyncStatus(composer: Composer | null): UseSyncStatusResult {
     return () => clearInterval(interval);
   }, [composer]);
 
-  // Sync callback
+  // Sync callback. E-010: gated on FEATURES.sync.
   const sync = React.useCallback(async () => {
+    if (!FEATURES.sync) return;
     if (!composer?.collab.sync) return;
     try {
       await composer.collab.sync.syncCurrentProject();
