@@ -1,19 +1,12 @@
 /**
- * Settings tab constants — feature flags and static data
+ * Settings tab constants — static data
  * @license BSD-3-Clause
+ *
+ * Project-wide feature flags live in `src/shared/utils/featureFlags.ts`.
+ * The settings-tab-local FEATURE_FLAGS object was removed after A1 day-3:
+ * domains/integrations/export gates moved to nav inclusion (workspace
+ * deep-links + Topbar export) and the local flags had zero consumers.
  */
-
-/**
- * Feature flags — set to false for features not yet implemented.
- * Change to true when the feature ships.
- */
-export const FEATURE_FLAGS = {
-  domains: false,
-  export: true,
-  integrations: false,
-} as const;
-
-export type FeatureFlag = keyof typeof FEATURE_FLAGS;
 
 /**
  * Integration catalog — metadata for third-party service cards.
