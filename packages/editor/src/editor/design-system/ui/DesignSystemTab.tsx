@@ -32,6 +32,7 @@ import type { ExportFormat } from "../utils/exportUtils";
 import { ColorTokenList } from "./colors/ColorTokenList";
 import { DesignTabFooter } from "./DesignTabFooter";
 import { DraftChip } from "./DraftChip";
+import { DSLintMount } from "./DSLintMount";
 import { ExportDropdown } from "./ExportDropdown";
 import { AddTokenModal } from "./modals/AddTokenModal";
 import { ReviewModal } from "./modals/ReviewModal";
@@ -399,6 +400,10 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           onSaveFirst={() => setShowReview(true)}
         />
       </PanelHeader>
+
+      {/* Lint banner — surfaces DS rule violations across all token registries.
+          Hidden when no issues; debounced 500ms per spec D21. */}
+      <DSLintMount composer={composer} />
 
       {/* Tab switcher */}
       <div
