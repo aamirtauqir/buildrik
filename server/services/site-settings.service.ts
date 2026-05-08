@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -128,17 +129,34 @@ export async function updateSiteSettings(
   }
 
   // Localization invariant: defaultLocale MUST be in enabledLocales.
-  // If either side is changing, validate against the post-update state.
-  if (data.defaultLocale !== undefined || data.enabledLocales !== undefined) {
-    const current = await prisma.site.findUnique({
-      where: { id: siteId },
-      select: { defaultLocale: true, enabledLocales: true },
+  // The naive read-then-write isn't atomic — two concurrent updates can each
+  // read the current row, validate against their own snapshot, and commit
+  // back-to-back, leaving `defaultLocale ∉ enabledLocales`. Phase D routing
+  // depends on this invariant, so we serialize via a SELECT … FOR UPDATE
+  // row lock inside an interactive transaction. Codex pass-1 P2-L2.
+  const needsLocaleGuard =
+    data.defaultLocale !== undefined || data.enabledLocales !== undefined;
+
+  if (needsLocaleGuard) {
+    return prisma.$transaction(async (tx) => {
+      // Pessimistic lock — concurrent updates of locale fields on the same
+      // site block here until the holder commits. Postgres-only syntax;
+      // the editor stack is Postgres per CLAUDE.md.
+      await tx.$executeRaw(Prisma.sql`SELECT id FROM "Site" WHERE id = ${siteId} FOR UPDATE`);
+      const current = await tx.site.findUnique({
+        where: { id: siteId },
+        select: { defaultLocale: true, enabledLocales: true },
+      });
+      const nextDefault = data.defaultLocale ?? current?.defaultLocale ?? "en";
+      const nextEnabled = data.enabledLocales ?? current?.enabledLocales ?? ["en"];
+      if (!nextEnabled.includes(nextDefault)) {
+        throw new Error("DEFAULT_LOCALE_NOT_ENABLED");
+      }
+      return tx.site.update({
+        where: { id: siteId },
+        data: persistData,
+      });
     });
-    const nextDefault = data.defaultLocale ?? current?.defaultLocale ?? "en";
-    const nextEnabled = data.enabledLocales ?? current?.enabledLocales ?? ["en"];
-    if (!nextEnabled.includes(nextDefault)) {
-      throw new Error("DEFAULT_LOCALE_NOT_ENABLED");
-    }
   }
 
   return prisma.site.update({
