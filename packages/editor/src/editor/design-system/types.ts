@@ -103,6 +103,11 @@ export interface DesignToken {
   friendlyName?: string;         // spec §5.3 — beginner-mode label.
                                  // RESOLUTION RULE: render sites should use `friendlyName ?? name`.
   aliasOf?: string;              // Phase A.2 — populated then; declared here so type compiles
+  darkValue?: string;            // Phase B.0 — color-only dark variant.
+                                 // Resolution: mode==="dark" && darkValue → use darkValue;
+                                 // missing darkValue under mode==="dark" → fall back to `value`
+                                 // and emit `tokens:dark-missing` (D16 spec).
+                                 // darkValue === "" is treated as explicit empty, NOT missing.
   typedValue?: TokenValue;       // Structured value for the 11 NEW kinds (radius/shadow/motion/
                                  // border/opacity/zindex/breakpoint/grid/sizing/icon/imagery).
                                  // The 3 LEGACY kinds (color/type/spacing) keep using `value: string`
