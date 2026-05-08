@@ -15,3 +15,6 @@ export {
 } from "./state/TokenRegistryContext";
 export type { ColorRegistry, SpacingRegistry, TypeRegistry } from "./state/TokenRegistryContext";
 export { useTokenUsageMap } from "./state/useTokenUsageMap";
+export { DSModeProvider, useDSMode, useDSModeOptional } from "./state/DSModeContext";
+export type { DSMode } from "./state/DSModeContext";
+export { DSModeToggle } from "./ui/DSModeToggle";
