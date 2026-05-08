@@ -40,6 +40,12 @@ const mockComposer = {
     canRedo: vi.fn(() => false),
   },
   cmsManager: {},
+  migration: {
+    run: vi.fn(({ project, currentVersion }) => ({
+      project,
+      newVersion: currentVersion,
+    })),
+  },
   destroy: vi.fn(),
 };
 
@@ -52,6 +58,18 @@ vi.mock("../../../../engine/cms", () => ({
   ProductCollectionService: vi.fn(() => ({
     hasProductsCollection: vi.fn(() => Promise.resolve(false)),
   })),
+}));
+
+// Default mocks; migration tests below override per-case.
+vi.mock("@/services/BuildrikSyncProvider", () => ({
+  getSiteIdFromUrl: vi.fn(() => null),
+  loadProject: vi.fn(() => Promise.resolve({})),
+  loadServerMedia: vi.fn(() => Promise.resolve(null)),
+  saveProject: vi.fn(() => Promise.resolve({ success: true, savedAt: new Date() })),
+}));
+
+vi.mock("@/services/AssetUploadService", () => ({
+  createRemoteAssetSync: vi.fn(() => ({})),
 }));
 
 // ---------------------------------------------------------------------------
@@ -222,5 +240,185 @@ describe("useComposerInit — autosave debounce SSOT", () => {
 
     // Despite 5 events, saveProject should have been called exactly once
     expect(mockComposer.saveProject).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("useComposerInit — DS migration runs at project load (A.1)", () => {
+  beforeEach(() => {
+    vi.useRealTimers();
+    Object.keys(eventHandlers).forEach((k) => {
+      delete eventHandlers[k];
+    });
+    vi.clearAllMocks();
+    mockComposer.on.mockImplementation((event: string, handler: EventHandler) => {
+      if (!eventHandlers[event]) eventHandlers[event] = [];
+      eventHandlers[event].push(handler);
+    });
+    mockComposer.emit.mockImplementation((event: string, ...args: unknown[]) => {
+      (eventHandlers[event] ?? []).forEach((h) => h(...args));
+    });
+    mockComposer.elements.getAllPages.mockReturnValue([{ id: "page-1" }]);
+    mockComposer.history.canUndo.mockReturnValue(false);
+    mockComposer.history.canRedo.mockReturnValue(false);
+    mockComposer.migration.run.mockReset();
+  });
+
+  async function flushMicrotasks() {
+    await new Promise((r) => setTimeout(r, 0));
+    await new Promise((r) => setTimeout(r, 0));
+  }
+
+  it("runs migration with loaded dsSchemaVersion + styles before importProject", async () => {
+    const { getSiteIdFromUrl, loadProject } = await import("@/services/BuildrikSyncProvider");
+    (getSiteIdFromUrl as ReturnType<typeof vi.fn>).mockReturnValue("site-A");
+    (loadProject as ReturnType<typeof vi.fn>).mockResolvedValue({
+      version: "1.0",
+      pages: [],
+      styles: [],
+      assets: [],
+      dsSchemaVersion: 0,
+    });
+    mockComposer.migration.run.mockReturnValue({
+      project: { tokens: [{ id: "radius-sm", kind: "radius" }] },
+      newVersion: 1,
+    });
+
+    renderHook(() =>
+      useComposerInit({
+        containerRef: makeContainerRef(),
+        addToast: vi.fn(),
+        setCanUndo: vi.fn(),
+        setCanRedo: vi.fn(),
+        setDevice: vi.fn(),
+        setZoom: vi.fn(),
+        setShowTemplates: vi.fn(),
+        setShowExporter: vi.fn(),
+        setShowAI: vi.fn(),
+        setShowComponentView: vi.fn(),
+        setIsDirty: vi.fn(),
+        setSaveState: vi.fn(),
+      })
+    );
+
+    act(() => {
+      mockComposer.emit("composer:ready");
+    });
+    await flushMicrotasks();
+
+    expect(mockComposer.migration.run).toHaveBeenCalledTimes(1);
+    expect(mockComposer.migration.run).toHaveBeenCalledWith({
+      project: { tokens: [] },
+      currentVersion: 0,
+      siteId: "site-A",
+    });
+
+    // importProject called once with bumped dsSchemaVersion + migrated tokens.
+    expect(mockComposer.importProject).toHaveBeenCalledTimes(1);
+    const imported = mockComposer.importProject.mock.calls[0][0] as {
+      dsSchemaVersion: number;
+      styles: unknown[];
+    };
+    expect(imported.dsSchemaVersion).toBe(1);
+    expect(imported.styles).toEqual([{ id: "radius-sm", kind: "radius" }]);
+
+    // Migration must run BEFORE importProject (load order invariant).
+    const runOrder = mockComposer.migration.run.mock.invocationCallOrder[0];
+    const importOrder = mockComposer.importProject.mock.invocationCallOrder[0];
+    expect(runOrder).toBeLessThan(importOrder);
+  });
+
+  it("v=1 already-current project: no version bump, importProject gets unchanged data", async () => {
+    const { getSiteIdFromUrl, loadProject } = await import("@/services/BuildrikSyncProvider");
+    (getSiteIdFromUrl as ReturnType<typeof vi.fn>).mockReturnValue("site-B");
+    (loadProject as ReturnType<typeof vi.fn>).mockResolvedValue({
+      version: "1.0",
+      pages: [],
+      styles: [{ id: "radius-sm", kind: "radius" }],
+      assets: [],
+      dsSchemaVersion: 1,
+    });
+    mockComposer.migration.run.mockReturnValue({
+      project: { tokens: [{ id: "radius-sm", kind: "radius" }] },
+      newVersion: 1,
+    });
+
+    renderHook(() =>
+      useComposerInit({
+        containerRef: makeContainerRef(),
+        addToast: vi.fn(),
+        setCanUndo: vi.fn(),
+        setCanRedo: vi.fn(),
+        setDevice: vi.fn(),
+        setZoom: vi.fn(),
+        setShowTemplates: vi.fn(),
+        setShowExporter: vi.fn(),
+        setShowAI: vi.fn(),
+        setShowComponentView: vi.fn(),
+        setIsDirty: vi.fn(),
+        setSaveState: vi.fn(),
+      })
+    );
+
+    act(() => {
+      mockComposer.emit("composer:ready");
+    });
+    await flushMicrotasks();
+
+    expect(mockComposer.migration.run).toHaveBeenCalledTimes(1);
+    const imported = mockComposer.importProject.mock.calls[0][0] as {
+      dsSchemaVersion: number;
+    };
+    // No-op: dsSchemaVersion stays at 1 (not re-bumped, not stripped).
+    expect(imported.dsSchemaVersion).toBe(1);
+  });
+
+  it("migration throw → warning toast + still imports unmigrated data", async () => {
+    const { getSiteIdFromUrl, loadProject } = await import("@/services/BuildrikSyncProvider");
+    (getSiteIdFromUrl as ReturnType<typeof vi.fn>).mockReturnValue("site-C");
+    (loadProject as ReturnType<typeof vi.fn>).mockResolvedValue({
+      version: "1.0",
+      pages: [],
+      styles: [],
+      assets: [],
+      dsSchemaVersion: 0,
+    });
+    mockComposer.migration.run.mockImplementation(() => {
+      throw new Error("boom");
+    });
+    const addToast = vi.fn();
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    renderHook(() =>
+      useComposerInit({
+        containerRef: makeContainerRef(),
+        addToast,
+        setCanUndo: vi.fn(),
+        setCanRedo: vi.fn(),
+        setDevice: vi.fn(),
+        setZoom: vi.fn(),
+        setShowTemplates: vi.fn(),
+        setShowExporter: vi.fn(),
+        setShowAI: vi.fn(),
+        setShowComponentView: vi.fn(),
+        setIsDirty: vi.fn(),
+        setSaveState: vi.fn(),
+      })
+    );
+
+    act(() => {
+      mockComposer.emit("composer:ready");
+    });
+    await flushMicrotasks();
+
+    expect(addToast).toHaveBeenCalledWith(
+      expect.objectContaining({ tone: "warning", title: "Project update failed" })
+    );
+    expect(mockComposer.importProject).toHaveBeenCalledTimes(1);
+    // Imported the un-migrated data (dsSchemaVersion still 0).
+    const imported = mockComposer.importProject.mock.calls[0][0] as {
+      dsSchemaVersion: number;
+    };
+    expect(imported.dsSchemaVersion).toBe(0);
+    consoleSpy.mockRestore();
   });
 });

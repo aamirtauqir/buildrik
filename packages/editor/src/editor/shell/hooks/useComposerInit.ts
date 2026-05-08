@@ -12,6 +12,7 @@ import { ProductCollectionService } from "../../../engine/cms";
 import type { Element } from "../../../engine/elements/Element";
 import { THRESHOLDS } from "../../../shared/constants/config";
 import type { ComposerConfig, ProjectData, DeviceType, ElementType } from "../../../shared/types";
+import type { DesignToken } from "@/editor/design-system";
 import {
   getSiteIdFromUrl,
   loadProject,
@@ -98,7 +99,35 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
       if (siteId) {
         loadProject(siteId)
           .then(async (data) => {
-            instance.importProject(data);
+            // A.1 integration: run DS schema migrations on the loaded payload
+            // before importing into the engine. Runner is pure w.r.t. DOM and
+            // writes a localStorage snapshot/marker for crash-resume. Failure
+            // surfaces a toast and falls through with un-migrated data so the
+            // editor still loads — DS migrations are forward-fix, not load-gating.
+            const fromVersion = data.dsSchemaVersion ?? 0;
+            let toImport: ProjectData = data;
+            try {
+              const result = instance.migration.run({
+                project: { tokens: (data.styles ?? []) as unknown as DesignToken[] },
+                currentVersion: fromVersion,
+                siteId,
+              });
+              if (result.newVersion !== fromVersion) {
+                toImport = {
+                  ...data,
+                  styles: result.project.tokens as unknown as ProjectData["styles"],
+                  dsSchemaVersion: result.newVersion,
+                };
+              }
+            } catch (err) {
+              console.error("[BuildrikSync] DS migration failed:", err);
+              addToast({
+                title: "Project update failed",
+                description: "Could not update design system schema. Loaded as-is.",
+                tone: "warning",
+              });
+            }
+            instance.importProject(toImport);
             // Phase B3: hydrate media library from server. Additive — never
             // throws. Returns null on offline/auth/unconfigured; we just
             // keep going with engine-only state in that case.
