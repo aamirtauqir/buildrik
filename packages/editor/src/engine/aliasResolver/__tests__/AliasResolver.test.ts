@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { AliasResolver } from "../AliasResolver";
 import { AliasCycleError, AliasDepthError } from "../errors";
 import type { DesignToken } from "../../../editor/design-system";
@@ -133,5 +133,25 @@ describe("AliasResolver.getChain", () => {
     const chain = resolver.getChain("a", tokens);
     expect(chain[0]).toBe("a");
     expect(chain[chain.length - 1]).toBe("a");
+  });
+});
+
+describe("AliasResolver.validateAndEmit", () => {
+  it("emits tokens:alias-changed on success", () => {
+    const emit = vi.fn();
+    const events = { emit, on: () => {}, off: () => {} } as unknown as EventEmitter;
+    const resolver = new AliasResolver(events);
+    const tokens = validFixture.tokens as DesignToken[];
+    resolver.validateAndEmit(tokens);
+    expect(emit).toHaveBeenCalledWith("tokens:alias-changed", { count: 1 });
+  });
+
+  it("does NOT emit on validation failure", () => {
+    const emit = vi.fn();
+    const events = { emit, on: () => {}, off: () => {} } as unknown as EventEmitter;
+    const resolver = new AliasResolver(events);
+    const tokens = cycle2Fixture.tokens as DesignToken[];
+    expect(() => resolver.validateAndEmit(tokens)).toThrow(AliasCycleError);
+    expect(emit).not.toHaveBeenCalled();
   });
 });

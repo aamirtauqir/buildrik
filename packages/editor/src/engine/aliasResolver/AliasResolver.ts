@@ -77,6 +77,18 @@ export class AliasResolver {
    * Return the alias chain for diagnostics: [tokenId, ...intermediate, leafId].
    * Returns [tokenId] if the token has no aliasOf. Empty array if id unknown.
    */
+  /**
+   * Run validate() and, on success, emit `tokens:alias-changed` so downstream
+   * listeners (Design tab editor, future preset/component recomputation) can
+   * react. Failure throws — caller decides whether to surface UX.
+   *
+   * Phase A.2 ships the emission; UI listeners attach in a later DS arc phase.
+   */
+  validateAndEmit(tokens: readonly DesignToken[]): void {
+    this.validate(tokens);
+    this.events.emit("tokens:alias-changed", { count: tokens.filter((t) => t.aliasOf).length });
+  }
+
   getChain(tokenId: string, tokens: readonly DesignToken[]): readonly string[] {
     const byId = new Map<string, DesignToken>();
     for (const t of tokens) byId.set(t.id, t);
