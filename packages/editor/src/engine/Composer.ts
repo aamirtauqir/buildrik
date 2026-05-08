@@ -52,6 +52,7 @@ import { MigrationManager } from "./migration/MigrationManager";
 import { AliasResolver } from "./aliasResolver";
 import { DarkResolver } from "./darkResolver";
 import { ColorMode } from "./colorMode";
+import { CSSBundler } from "../editor/design-system/bundler";
 import { VersionTimelineManager } from "./VersionTimelineManager";
 import { Viewport } from "./Viewport";
 
@@ -114,6 +115,7 @@ export class Composer extends EventEmitter {
   readonly aliasResolver!: AliasResolver;
   readonly darkResolver!: DarkResolver;
   readonly colorMode!: ColorMode;
+  readonly cssBundler!: CSSBundler;
 
   // Facade groupings — D3 Stage 1 (Option B-tight). Three clusters where
   // ≥2 managers share a domain:
@@ -171,6 +173,7 @@ export class Composer extends EventEmitter {
     this.aliasResolver = new AliasResolver(this);
     this.darkResolver = new DarkResolver(this);
     this.colorMode = new ColorMode(this);
+    this.cssBundler = new CSSBundler();
 
     // Facade groupings — D3 Stage 1.
     const cmsCollections = new CollectionManager();
