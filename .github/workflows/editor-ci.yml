@@ -118,6 +118,10 @@ jobs:
         working-directory: packages/editor
         run: pnpm run gate:ds-migrations
 
+      - name: DS alias fixture-coverage gate
+        working-directory: packages/editor
+        run: pnpm run gate:ds-alias
+
       # Vocab sign-off gate: any commit that introduces a NEW --buildrick-*
       # token under themes/design-system/*.css must include a vocab-add: line
       # in its commit body (rule defined in TODOS.md "Vibcoder DS Bridge —
