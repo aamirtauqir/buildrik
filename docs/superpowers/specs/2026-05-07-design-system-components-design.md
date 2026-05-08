@@ -876,16 +876,429 @@ Phase 3+: Switch, Radio, Drawer, Pagination, Breadcrumb, Table, FAQ, Header, Nav
 | 1. Summary | ✓ |
 | 2. Goals | ✓ |
 | 3. Non-goals | ✓ |
-| 4. Locked decisions | ✓ |
-| 5. Architecture | ✓ |
+| 4. Locked decisions | ✓ (extended in §16) |
+| 5. Architecture | ✓ (extended in §16) |
 | 6. UI components | ✓ |
-| 7. Data flow | ✓ |
-| 8. Error handling | ✓ |
-| 9. Testing strategy | ✓ |
-| 10. Migration plan | ✓ |
-| 11. Release sequencing | ✓ |
-| 12. Open questions | ✓ |
+| 7. Data flow | ✓ (extended in §16) |
+| 8. Error handling | ✓ (extended in §16) |
+| 9. Testing strategy | ✓ (extended in §16) |
+| 10. Migration plan | ✓ (extended in §16) |
+| 11. Release sequencing | ✓ (replaced by §16) |
+| 12. Open questions | ✓ (resolved in §16) |
 | 13. Catalog appendix | ✓ |
 | 14. Memory references | ✓ |
+| 16. CEO Review Addendum | ✓ |
 
 Implementation plan to be drafted via `superpowers:writing-plans` skill once user approves spec.
+
+---
+
+## 16. CEO Review Addendum (2026-05-07 · `/plan-ceo-review`)
+
+This section captures decisions D1–D25 from the SELECTIVE EXPANSION review of the v1 spec. Treat addendum as authoritative where it conflicts with v1 body. Implementation plan must reflect addendum, not v1 alone.
+
+### 16.1 Foundation Prereqs (NEW · Week 0 · 1-3 weeks pre-arc)
+
+Per D10, the DS arc cannot start until these gaps are closed. Each is currently a TODO item or unwritten doc:
+
+| Prereq | Source | Effort | Acceptance |
+|---|---|---|---|
+| **jsdom test env fixed** | TODOS.md P2 | ~1 day CC | `render()` and `renderHook()` succeed; existing test suite passes |
+| **Component swap override preservation MVP** | TODOS.md P2 | ~2 weeks human / ~3 hr CC | Master patches preserve instance-level overrides via JSON-patch path remapping; spec §7.6 claim becomes true |
+| **DESIGN.md ships** (focused, ~1 day) | D25, TODOS.md P2 | ~1 day | Doc covers cobalt accent, Inter Tight body, 4px base, density rules, ban list. Memory `project_editor_chrome_ds.md` has ~80% pre-drafted content. |
+| **Vibcoder Stage 2/3 explicitly deferred** | D12 | doc-only | Spec note: "Components panel = 280px; Stage 2 chrome-ssot deferred indefinitely" |
+
+Total prereq budget: **~3 weeks (Week 0)**. Phase A starts only after all four prereqs land.
+
+### 16.2 Approach Locked · Implementation strategy
+
+**D1 = Approach A · Full DS arc as specced.** Despite audit findings flagging in-flight work, broken jsdom, and ~50-file scope as risk, user committed to ambition. Compression levers (factory hooks D19, deferrable surface) noted but not pre-applied.
+
+**D2 = SELECTIVE EXPANSION review mode.** Hold spec scope as baseline + cherry-pick expansions. 6 expansions accepted:
+
+| Cherry-pick | Effort (human/CC) | Phase |
+|---|---|---|
+| D3 · AI-assist component schema generation | 1 wk / 2 hr | C |
+| D4 · Token aliasing (semantic layer, depth-1) | 2 days / 30 min | A |
+| D5 · DS export → publishable CSS bundle | 1 day / 30 min | G |
+| D6 · Starter DS gallery (6-8 themed) | 2 wks / 3 hr | F |
+| D7 · DS lint warnings (debounce 500ms per D21) | 3 days / 1 hr | H |
+| D8 · Dark mode infrastructure (color-only) | 1 wk / 1.5 hr | B |
+
+Lower-priority cherry-picks (12 total proposals; 6 deferred) live in TODOS.md per D27.
+
+### 16.3 Token shape extended (D4 + D11)
+
+```typescript
+interface DesignToken {
+  id: string;                           // "color-blue-500"
+  friendlyName: string;                 // "Brand color"
+  kind: TokenKind;
+  
+  // Either raw value...
+  value?: TokenValue | {                 // D11: dual-mode for color kind
+    light: TokenValue;
+    dark?: TokenValue;                   // optional; D16 fallback to light
+  };
+  
+  // OR alias pointer to another token
+  aliasOf?: string;                     // D4: depth-1 only Phase 1
+  
+  cssVar: string;                       // "--bd-color-blue-500"
+  category?: string;
+}
+```
+
+Validation rules:
+- D15: alias cycle detection runs at import + at every alias edit (DFS visit-set, throws `AliasCycleError` with chain)
+- D16: dark-mode missing pair → fall back to light + show yellow warn chip in Inspector
+
+### 16.4 Catalog instance + version migration (D18)
+
+`ComponentInstance` extended:
+
+```typescript
+type ComponentInstance =
+  | {
+      source: "catalog";
+      componentTypeId: string;           // e.g. "button"
+      variant: string;                   // e.g. "primary"
+      size?: string;
+      props: Record<string, unknown>;
+      overrides?: PartialBindings;
+    }
+  | { source: "user"; userComponentId: string; overrides?: PartialBindings; detached?: true };
+```
+
+Catalog version migration map (NEW concept):
+
+```typescript
+// editor/components-catalog/migrations.ts
+export const CATALOG_MIGRATIONS = [
+  { from: "button.outline", to: "button.stroke" },         // Phase 2 example
+  { deprecated: "badge.legacy", fallback: "badge.neutral" },
+];
+```
+
+Runs on project load; auto-rewrites instances with deprecated typeId/variant. Includes chaos test in spec §9.
+
+### 16.5 Architecture additions (D3, D5, D7, D14, D17, D22)
+
+Composer surface extended:
+
+```
+composer
+  .tokens                  (existing, extended for 14 kinds)
+  .presets                 (NEW · 11 categories)
+  .components.catalog      (NEW · read-only)
+  .components.userSaved    (existing, gains dsBound + detach)
+  .aliasResolver           (NEW · D4 · cycle-validated)
+  .darkResolver            (NEW · D8 · light/dark resolve with D16 fallback)
+  .aiAssistService         (NEW · D3 · stubbed in tests per D20)
+  .dsLinter                (NEW · D7 · debounce 500ms per D21)
+  .cssBundler              (NEW · D5 · publish-time injection)
+  .auditLogger             (NEW · D22 · AI prompt audit log)
+```
+
+Catalog importer security (D17): Tailwind config parsed via **AST only** (`@babel/parser` walking the literal `theme.*` tree). The importer must NOT execute or evaluate user-supplied JavaScript via any runtime evaluation primitive. Allowlist extracts theme literals; reject configs requiring JS execution (functions, dynamic plugin calls, conditional logic).
+
+AI error class hierarchy (D14):
+```typescript
+class AITimeoutError       extends DSError {}
+class AIRateLimitError     extends DSError {}
+class AIInvalidSchemaError extends DSError {}
+class AIPromptRejectedError extends DSError {}
+class AIPartialOutputError  extends DSError {}
+```
+Each maps to specific UX (toast / modal / retry). AI quota uses existing `AIUsage` service (memory `project_ai_tab_phase_1_2_20260426.md`).
+
+### 16.6 SSOT contract additions
+
+Extend §5.7 SSOT table with:
+
+| Concept | Canonical Home |
+|---|---|
+| Alias chain | `editor/design-system/state/AliasResolver.ts` (NEW) |
+| Dark mode resolver | `editor/design-system/state/DarkResolver.ts` (NEW) |
+| AI-assist service | `editor/design-system/services/AIAssistService.ts` (NEW) |
+| AI audit log | `dashboard` Prisma table `DSAIAudit` (NEW · D22) |
+| DS lint rules | `editor/design-system/lint/rules/*.ts` (NEW · D7) |
+| CSS bundler | `editor/design-system/bundler/CSSBundler.ts` (NEW · D5) |
+| Starter DS catalog | `editor/sidebar/tabs/starters/dsStarterCatalog.ts` (NEW · D6) |
+| Catalog version migrations | `editor/components-catalog/migrations.ts` (NEW · D18) |
+| Migration in-progress marker | `project.dsMigrationInProgress` field (NEW · D13) |
+| Per-phase feature flags | `VITE_FEATURE_DS_*` env vars (NEW · D23) |
+
+### 16.7 DRY refactor: factory pattern (D19)
+
+Replace 11 separate `useXTokens.ts` files with single factory:
+
+```typescript
+// editor/design-system/state/createTokenHook.ts
+export function createTokenHook(kind: TokenKind, defaults: TokenValue[], validators: Validator[]) {
+  return function useKindTokens() { /* shared implementation */ };
+}
+
+// per-kind file becomes:
+// editor/design-system/state/useRadiusTokens.ts
+export const useRadiusTokens = createTokenHook("radius", DEFAULT_RADIUS, RADIUS_VALIDATORS);
+```
+
+Same pattern for 11 preset editors via `<PresetEditor category={...} schema={...} />`. Saves ~1300 LOC.
+
+Migration boilerplate via `defineMigration({ fromVersion, toVersion, up, validate })` helper (~200 LOC saved).
+
+### 16.8 Test strategy additions
+
+Per D20: AI-assist tests use stub `AIClient` interface in unit/integration; live API smoke runs only on release tags. ~10 prompt fixtures with snapshot expected schemas.
+
+Per D14 + D15 + D16 + D18: dedicated test suites for each error class, alias cycle detection, dark-mode fallback, catalog version chaos.
+
+Per D6 + D7: starter DS gallery axe tests per starter; DS lint corpus of known-bad fixtures (delta-E violations, contrast failures, spacing duplicates).
+
+D8 dark mode parity: every catalog component test runs both light + dark assertions. Test count grows ~2× for catalog visual tests but ~1.3× total.
+
+### 16.9 Observability (D22)
+
+New Prisma table `DSAIAudit`:
+
+```prisma
+model DSAIAudit {
+  id          String   @id @default(cuid())
+  projectId   String
+  userId      String
+  timestamp   DateTime @default(now())
+  prompt      String   @db.Text
+  schemaJSON  Json
+  accepted    Boolean
+  // indices on userId+timestamp, projectId+timestamp
+}
+```
+
+Used for:
+- Adversarial prompt detection (security)
+- Prompt quality analytics (product)
+- Future fine-tuning data (Phase 2+)
+
+Mode toggle telemetry via existing analytics (low-effort). Metrics + alerts dashboards deferred Phase 2 (TODOS).
+
+### 16.10 Deployment (D23)
+
+Per-phase `VITE_FEATURE_DS_*` flags:
+
+| Flag | Phase | Default |
+|---|---|---|
+| `VITE_FEATURE_DS_TOKENS` | A | false |
+| `VITE_FEATURE_DS_PRESETS` | B | false |
+| `VITE_FEATURE_DS_CATALOG` | C | false |
+| `VITE_FEATURE_DS_AI_ASSIST` | C (after stable) | false |
+| `VITE_FEATURE_DS_PANEL_V2` | D | false |
+| `VITE_FEATURE_DS_STARTERS` | F | false |
+| `VITE_FEATURE_DS_PUBLISH_BUNDLE` | G | false |
+| `VITE_FEATURE_DS_IMPORT_EXPORT` | G | false |
+| `VITE_FEATURE_DS_LINT` | H | false |
+
+Each flips on after staging validation per phase. Flag-gate ALL new surface.
+
+Backward-compat (Section 9 finding): old editor session reads new schema → version mismatch detected via `dsSchemaVersion > KNOWN_VERSION` → "editor outdated, refresh" toast. Forward-fix-only policy: migrations forward-only; rollback only via point-in-time DB restore documented in 1-page runbook.
+
+### 16.11 First-time UX (D24)
+
+New project + first Design tab open → **Starter DS gallery (D6) auto-shows**. User picks Stripe-blue / Notion-warm / Apple-minimal / Linear-dark / Vercel-mono / +1-3 themed OR clicks "Skip — build from blank." Once any token edited, gallery dismissed forever for that project.
+
+### 16.12 Release sequencing — REPLACES v1 §11
+
+Original 12-week plan + 6 expansions + 3-week prereq sprint = **~16 weeks of in-arc work + Week 0 prereqs**.
+
+| Phase | Weeks | Includes (relative to v1 + expansions) |
+|---|---|---|
+| **Week 0 · Prereq sprint** | 1-3 | jsdom fix, override preservation MVP, DESIGN.md focused doc, Vibcoder Stage 2/3 deferral note |
+| A · Token foundation + aliasing | 4-6 | v1 Phase A + D4 alias layer + D11 dark shape on color kind + D17 AST Tailwind importer |
+| B · Style preset infra + dark mode color pairs | 7-8 | v1 Phase B + D8 dual-value resolver |
+| C · Catalog + AI-assist + audit log | 9-11 | v1 Phase C + D3 AI service + D22 audit table + D14 AI errors + D20 stub strategy |
+| D · Components panel + Inspector chips | 12 | v1 Phase D unchanged |
+| E · User-saved DS-binding + detach | 13 | v1 Phase E (depends on Week 0 override preservation) |
+| F · Templates → Starters + Starter DS gallery | 14-15 | v1 Phase F + D6 starter library + D24 first-time UX |
+| G · Beginner/Pro + Import/Export + CSS bundle | 16 | v1 Phase G + D5 publish bundler |
+| H · DS lint + AI audit + smoke checklists | 17 | D7 lint + alerts ground-laid (deferred) |
+| I · Polish + E2E + buffer | 18-19 | full polish + 2-week buffer |
+
+**Total: 19 weeks elapsed** (3-week prereq + 16-week arc). Per-phase feature flags isolate risk.
+
+### 16.13 Risk register — REPLACES v1 §10.6
+
+| Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|
+| jsdom blocks 280 unit tests | Resolved | n/a | Week 0 prereq sprint |
+| Override preservation TODO unbuilt | Resolved | n/a | Week 0 prereq sprint MVP ships |
+| 19-week elapsed budget vs in-flight features | High | Schedule slip | Per-phase feature flags · parallelizable Phase F · Week 18-19 buffer |
+| Catalog content quality bottleneck | Medium | "junior" tool comparison | Pre-design 10 schemas in Week 4 · D3 AI-assist eases Phase 2 growth |
+| Starter DS gallery quality vs Stripe et al | Medium | AI-slop perception | Each starter = dedicated design pass · 2 weeks budget · memory shows you've fought slop before |
+| AI-assist generates broken schemas | Medium | Catalog corruption | Zod gate · preview-before-commit · D14 error classes · D22 audit |
+| Dark mode catalog binding complexity | Medium | Components must mode-fit | Bind via aliases (D4) · per-component dark fitness review |
+| Tailwind config import code execution | Resolved | n/a | D17 AST-only parser |
+| Token alias cycle injection via import | Resolved | n/a | D15 cycle detection at every entry |
+| Catalog version drift breaks existing instances | Resolved | n/a | D18 catalog migration map |
+
+### 16.14 Phase scope cuts available if Week 18 falls behind
+
+In strict order of "least painful to cut":
+
+1. Drop 3 of 4 import formats (keep Tokens Studio only) — saves ~3 days
+2. Drop 3 of 4 export formats (keep Buildrik bundle only) — saves ~2 days
+3. Defer beginner/pro tiered UX → ship pro-only Phase 1, beginner Phase 2 — saves ~1 week (D24 UX still works for beginners since pre-built Starters cover most)
+4. Drop 3 starter DSes (ship 3 instead of 6-8) — saves ~1 week
+5. Defer Templates → Starters rename (keep MyTemplates, defer rename Phase 2) — saves ~3 days
+6. Drop dark mode (D8) entirely — saves ~1 week, big UX cost
+
+Cut order minimizes user-visible impact. **Ship-or-cut decision point: Week 17 retro.**
+
+### 16.15 Decisions index
+
+| ID | Topic | Resolution |
+|---|---|---|
+| D1 | Implementation approach | Full A as specced |
+| D2 | Review mode | SELECTIVE EXPANSION |
+| D3 | AI-assist component generation | ACCEPTED |
+| D4 | Token aliasing | ACCEPTED |
+| D5 | DS publish CSS bundle | ACCEPTED |
+| D6 | Starter DS gallery | ACCEPTED |
+| D7 | DS lint warnings | ACCEPTED |
+| D8 | Dark mode (color) | ACCEPTED |
+| D9 | Continue review | Proceed to sections |
+| D10 | Foundation prereqs | Week 0 sprint |
+| D11 | Dark token shape | Option A (`{light, dark}` per token) |
+| D12 | Vibcoder Stage 2/3 | Document 280px override |
+| D13 | Migration in-progress marker | Add per migration |
+| D14 | AI-assist error classes | Full enumeration |
+| D15 | Alias cycle detection | At import + at every edit |
+| D16 | Dark-mode missing pair | Fall back to light + warn chip |
+| D17 | Tailwind import strategy | AST parse + allowlist |
+| D18 | Catalog version migration | Per-version migration map + auto-rewrite |
+| D19 | DRY refactor pattern | Factory for hooks + editors |
+| D20 | AI-assist test strategy | Stub + snapshot + release-tag smoke |
+| D21 | Lint scan timing | Debounce 500ms |
+| D22 | AI audit log scope | Full audit log (Prisma table) |
+| D23 | Feature flag strategy | Per-phase flags |
+| D24 | First-time IA | Starter gallery first |
+| D25 | DESIGN.md prerequisite | Ship Phase A0 (~1 day) |
+| D26 | Outside voice | Skipped |
+| D27 | TODOS batch | All 15 added |
+| D28 | Spec update strategy | This addendum |
+
+### 16.16 Memory references added
+
+- `feedback_audit_phase_specs_against_engine_apis.md` — applied here (audit caught jsdom + override preservation gaps before Phase A)
+- `project_phase_1c_editor_publish_20260507.md` — relevant for D5 publish CSS bundle
+- `project_ai_tab_phase_1_2_20260426.md` — relevant for D22 audit log + AIUsage quota service
+- `project_q2_day3_4_shipped_20260507.md` — relevant for understanding existing component-library churn (override preservation MVP partial work)
+
+### 16.17 Design Review Addendum (2026-05-07 · `/plan-design-review`)
+
+Design review surfaced 7-pass audit. Initial overall 5/10 → 8.7/10 after 5 decisions.
+
+**Critical correction to §16.1:** DESIGN.md (`/Users/shahg/Desktop/pencil/buildrik/DESIGN.md`, 356 lines) **EXISTS** — confirmed at design-review time. The TODOS.md "DESIGN.md not yet created" entry was stale. **D25 (Phase A0 DESIGN.md ship) is OBSOLETE** — already shipped. Week 0 prereq sprint reduces to 3 items: jsdom fix, override preservation MVP, `dsSchemaVersion` field.
+
+**DESIGN.md direction (calibration baseline for Phase 1):**
+- Industrial / utilitarian / light chrome ("Webflow meets Linear, daylight edition")
+- Audience: solo pro designers / Webflow-Framer migrants (NOT beginners — affects D24 first-time UX framing)
+- NO BLACK rule: no `#000`, no near-black surfaces; max dark = `#334155`
+- Cobalt accent (`#2D6DFF`); no purple/violet/indigo
+- No system font fallbacks (no `system-ui`, `-apple-system`, Arial, Roboto)
+- General Sans (display, marketing only) / Inter Tight (UI body) / Geist Mono (data)
+- 4px base spacing, compact density
+- Minimal motion, no spring physics, no scroll choreography
+
+**Design decisions D1-D5 (re-numbered DD1-DD5 to avoid collision with prior CEO/Eng D-numbering):**
+
+| ID | Topic | Resolution |
+|---|---|---|
+| DD1 | Review focus | All 7 passes condensed |
+| DD2 | Catalog visual discipline | CI gate + linter + per-starter design pass requirement |
+| DD3 | a11y baseline scope | Full Phase 1 (Inspector chip ARIA, modal focus traps, Design workspace keyboard nav, catalog ARIA defaults) |
+| DD4 | Lint chip placement + colors | Hybrid: per-property Inspector chip + Design tab banner; chip colors map to DESIGN.md status tokens (NO raw green/blue/yellow) |
+| DD5 | Design TODOs batch | 3 added (per-starter design pass, catalog mockups, DESIGN.md AI-assist UI extension) |
+
+**Pass scores (initial → final):**
+
+| Pass | Initial | Final | Resolution |
+|---|---|---|---|
+| 1 IA | 7 | 8 | Storyboard added (10-step user journey) |
+| 2 States | 5 | 9 | Full state coverage table for 10 features |
+| 3 Journey | 3 | 9 | Emotional arc storyboard with magic moments (D8 alias rebrand, save-your-gap symbol) |
+| 4 AI Slop | 5 | 8 | DD2 CI gate enforces slop blacklist + per-starter design pass |
+| 5 DESIGN.md | 7 | 9 | DD2 enforces NO-BLACK + no-system-fallback in catalog + presets |
+| 6 a11y | 4 | 9 | DD3 full baseline (Inspector chip ARIA, modal traps, keyboard nav, axe per catalog component) |
+| 7 Decisions | 6 | 9 | DD4 lint placement + chip color tokens resolved |
+| **Overall** | **5** | **8.7** | — |
+
+**User journey storyboard (Pass 3 deliverable, 10 steps):**
+
+1. Open editor for new project → Starter DS gallery auto-shows (per D24)
+2. Pick "Stripe-blue" starter → Tokens populate, catalog Buttons restyle in <500ms, "Your DS is ready" toast
+3. Drag Button onto canvas → Catalog instance renders, Inspector shows binding chips
+4. Notices brand color is wrong → Click chip → jumps to Design > Tokens > brand-500, edit, all instances restyle live
+5. Saves Hero composition as user-saved Component → "Pre-fill from DS" toggle, DS-bound chip "✓ uses 6 tokens"
+6. Reopens project next day → Editor loads with DS intact, components in Yours section, no friction
+7. Publishes site → "Live at <url>" toast, DS bundle injected (D5)
+8. Client asks rebrand → Edit alias `primary → color-purple-700`, all pages restyle (D4 magic moment)
+9. Stuck without "Stepper" component → Build from primitives + save as Yours symbol (C-model rescue)
+10. Ships work to client → DS export to Tokens Studio JSON for handoff
+
+**Interaction state coverage table (Pass 2 deliverable):**
+
+| Feature | Loading | Empty | Error | Success | Partial |
+|---|---|---|---|---|---|
+| Tokens section | skeleton 3-5 rows | "No {kind} yet · + Add" | red banner + retry | inline edit feedback | n/a |
+| Components panel · DS catalog | static (compile-time) | n/a (always >10) | broken-type placeholder | drop ghost on canvas | n/a |
+| Components panel · Yours | skeleton 2-3 rows | "No saved components · select element + Save" | broken master toast | row appears with ●N badge | "1 of 5 instances failed" toast |
+| AI-assist generate | streaming-tokens skeleton OR 2-8s spinner with cancel | n/a | toast per error class (D14) | preview modal Accept/Discard | "Got partial result, retry?" |
+| Import DS modal | progress bar | n/a | error inline with field paths | "Added 47 / Replaced 12" | "Import valid 47, skipped 3" |
+| Lint warnings | (debounce indicator) | "All good — no warnings" | scan failed badge | n/a | "10 of 50 scanned" indeterminate |
+| Starter DS gallery | thumbnail skeleton | n/a (always >5) | thumbnail load fail | apply success toast | "Applying tokens..." progress |
+| Detach instance | instant | n/a | concurrent-edit error toast | "Detached" badge on instance | n/a |
+| Migration runner | "Updating project..." spinner >100ms | n/a | blocking modal "Couldn't update" | silent (editor loads) | "Migration v9 incomplete, restore?" modal |
+| Mode toggle | instant | n/a | localStorage fail toast | preference applied silently | "5 off-DS values exist" non-blocking banner |
+
+**a11y baseline (Pass 6 deliverable, DD3):**
+
+- Inspector chips: `role="button"`, `aria-label="Jump to {token-id} in Design tab"`, Enter to activate, focus ring per DESIGN.md
+- Modal focus traps: ImportDSModal, ExportDSModal, AI-assist preview, Starter gallery, AddTokenModal — all use vibcoder Modal/OverlayMount focus trap
+- Keyboard nav: arrow keys between Tokens/Styles/Components/Export tabs in Design workspace; Tab into section; Esc closes modals
+- Color contrast: D7 lint flags WCAG AA failures; catalog default bindings + starter DSes must NOT trigger lint out-of-box
+- Catalog component a11y baseline: every `ComponentType.schema` includes `behaviors: ["focus-ring"]` minimum + ARIA attrs in structure
+
+**AI-slop blacklist enforcement (Pass 4 + DD2):**
+
+- ❌ Purple/violet/indigo gradients (DESIGN.md cobalt-only)
+- ❌ 3-column feature grid as default Hero (most-AI pattern)
+- ❌ Icons-in-colored-circles section decoration
+- ❌ Uniform bubbly border-radius (use DESIGN.md radius scale)
+- ❌ Decorative blobs / floating circles / wavy SVG
+- ❌ Emoji as design elements
+- ❌ Colored left-border on cards
+- ❌ Generic hero copy ("Welcome to...", "Unlock the power of...")
+- ❌ `system-ui` / Arial / Roboto fallback in catalog CSS
+- ❌ Pure black (`#000`) or near-black surfaces in any catalog component
+
+CI gate `scripts/check-catalog-slop.sh` (extends existing pattern) catches above at PR.
+
+**Per-starter design pass requirement:** Each of 6-8 starter DSes (Stripe-blue, Notion-warm, Apple-minimal, Linear-dark, Vercel-mono, +1-3) gets dedicated ~2-day visual design treatment by you (NOT AI-templated). Phase F Week 14-15 budget honors this.
+
+---
+
+## GSTACK REVIEW REPORT
+
+| Review | Trigger | Why | Runs | Status | Findings |
+|--------|---------|-----|------|--------|----------|
+| CEO Review | `/plan-ceo-review` | Scope & strategy | 1 | CLEAR | 12 proposals, 6 accepted, 15 deferred, 25 decisions |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | CLEAR | 15 issues found, 0 critical gaps, 7 eng decisions |
+| Design Review | `/plan-design-review` | UI/UX gaps | 1 | CLEAR | score 5/10 → 9/10, 5 design decisions, 3 design TODOs |
+| Codex Review | `/codex review` | Independent 2nd opinion | 0 | — | not run |
+| DX Review | `/plan-devex-review` | Developer experience gaps | 0 | — | n/a (visual builder, not API/CLI/SDK) |
+
+- **UNRESOLVED:** 0 unresolved decisions across CEO + Eng + Design reviews.
+- **TODOS deferred:** 22 items (15 CEO + 4 Eng + 3 Design) added to repo TODOS.md.
+- **TEST PLAN:** persisted at `~/.gstack/projects/aamirtauqir-buildrik/saqib-main-eng-review-test-plan-20260507.md`.
+- **DESIGN.md confirmed:** exists at `/DESIGN.md` (356 lines) — D25 prereq from CEO addendum is NOT NEEDED, mark as resolved.
+- **VERDICT:** CEO + ENG + DESIGN all CLEARED — ready to implement. Begin Week 0 prereq sprint (jsdom + override preservation MVP + dsSchemaVersion field; DESIGN.md skipped per existing file).
