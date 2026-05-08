@@ -175,15 +175,17 @@ export const TokenRegistryProvider: React.FC<TokenRegistryProviderProps> = ({
   // so live edits in dark mode don't leave the LIGHT value flashed by
   // useColorTokens' internal applyToRoot.
   React.useEffect(() => {
-    if (!composer) return;
     const apply = () => {
-      const resolved = composer.colorMode.resolved();
+      const resolved = composer?.colorMode.resolved() ?? "light";
       colorState.tokens.forEach((t) => {
-        const value = composer.darkResolver.resolve(t, resolved);
+        const value = composer
+          ? composer.darkResolver.resolve(t, resolved)
+          : t.value;
         document.documentElement.style.setProperty(t.cssVar, value);
       });
     };
     apply();
+    if (!composer) return;
     const handler = () => apply();
     composer.on("colorMode:changed", handler);
     return () => composer.off("colorMode:changed", handler);

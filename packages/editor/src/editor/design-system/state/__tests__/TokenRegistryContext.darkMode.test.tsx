@@ -105,7 +105,7 @@ describe("TokenRegistryProvider · dark-mode applier", () => {
     expect(setPropertySpy).toHaveBeenCalledWith("--bd-color-primary", "#fff");
   });
 
-  it("when composer prop is omitted: no-op (legacy behavior preserved)", () => {
+  it("when composer prop is omitted: still applies raw token.value (legacy fallback)", () => {
     localStorage.setItem(
       "buildrick-design-tokens-test-v1",
       JSON.stringify({
@@ -125,6 +125,7 @@ describe("TokenRegistryProvider · dark-mode applier", () => {
         <div />
       </TokenRegistryProvider>
     );
+    expect(setPropertySpy).toHaveBeenCalledWith("--bd-color-primary", "#fff");
     expect(setPropertySpy).not.toHaveBeenCalledWith("--bd-color-primary", "#000");
   });
 
