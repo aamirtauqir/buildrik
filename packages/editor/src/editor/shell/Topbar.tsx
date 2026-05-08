@@ -34,6 +34,7 @@ import { CommandPalette } from "./modals/CommandPalette";
 import { InviteModal } from "./InviteModal";
 import { PublishDropdown, type PublishState } from "./PublishDropdown";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
+import { ColorModeToggle } from "@/editor/design-system/ui/ColorModeToggle";
 
 import "./chrome.css";
 
@@ -497,6 +498,24 @@ export const Topbar: React.FC<TopbarProps> = ({
               </TooltipTrigger>
               <TooltipPortal>
                 <TooltipContent>Export HTML — publish to web coming soon</TooltipContent>
+              </TooltipPortal>
+            </Tooltip>
+          )}
+
+          {composer && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ColorModeToggle
+                  composer={composer}
+                  renderTrigger={({ onClick, ariaLabel, children }) => (
+                    <IconButton onClick={onClick} aria-label={ariaLabel}>
+                      {children as React.ReactNode}
+                    </IconButton>
+                  )}
+                />
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent>Color mode (light · dark · system)</TooltipContent>
               </TooltipPortal>
             </Tooltip>
           )}
