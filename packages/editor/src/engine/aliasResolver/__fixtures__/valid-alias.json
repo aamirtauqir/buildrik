@@ -1,0 +1,25 @@
+{
+  "tokens": [
+    {
+      "id": "color-primary",
+      "name": "Primary",
+      "value": "",
+      "category": "colors",
+      "cssVar": "--bd-color-primary",
+      "type": "color",
+      "kind": "color",
+      "friendlyName": "Primary",
+      "aliasOf": "color-blue-500"
+    },
+    {
+      "id": "color-blue-500",
+      "name": "Blue 500",
+      "value": "#2D6DFF",
+      "category": "colors",
+      "cssVar": "--bd-color-blue-500",
+      "type": "color",
+      "kind": "color",
+      "friendlyName": "Blue 500"
+    }
+  ]
+}

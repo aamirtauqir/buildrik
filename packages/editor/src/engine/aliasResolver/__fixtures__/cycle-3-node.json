@@ -1,0 +1,37 @@
+{
+  "tokens": [
+    {
+      "id": "a",
+      "name": "A",
+      "value": "",
+      "category": "colors",
+      "cssVar": "--bd-a",
+      "type": "color",
+      "kind": "color",
+      "friendlyName": "A",
+      "aliasOf": "b"
+    },
+    {
+      "id": "b",
+      "name": "B",
+      "value": "",
+      "category": "colors",
+      "cssVar": "--bd-b",
+      "type": "color",
+      "kind": "color",
+      "friendlyName": "B",
+      "aliasOf": "c"
+    },
+    {
+      "id": "c",
+      "name": "C",
+      "value": "",
+      "category": "colors",
+      "cssVar": "--bd-c",
+      "type": "color",
+      "kind": "color",
+      "friendlyName": "C",
+      "aliasOf": "a"
+    }
+  ]
+}
