@@ -8,13 +8,23 @@
 
 import * as React from "react";
 import type { Composer } from "../../../engine";
+import type { DesignToken } from "../../design-system/types";
+
+function applyColorTokens(composer: Composer): void {
+  const project = composer.exportProject();
+  const tokens = (project.settings?.designTokens ?? []) as unknown as DesignToken[];
+  const colorTokens = tokens.filter((t) => t.category === "colors");
+  const mode = composer.colorMode.resolved();
+  for (const token of colorTokens) {
+    const effective = composer.darkResolver.resolve(token, mode);
+    document.documentElement.style.setProperty(token.cssVar, effective);
+  }
+}
 
 export function useDarkModeApplication(composer: Composer | null): void {
   React.useEffect(() => {
     if (!composer) return;
-    const handler = () => {
-      // Step 2.x — implementation lands in Task 2.
-    };
+    const handler = () => applyColorTokens(composer);
     composer.on("colorMode:changed", handler);
     return () => {
       composer.off("colorMode:changed", handler);

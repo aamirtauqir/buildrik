@@ -37,4 +37,42 @@ describe("useDarkModeApplication", () => {
     renderHook(() => useDarkModeApplication(composer as never));
     expect(composer.on).toHaveBeenCalledWith("colorMode:changed", expect.any(Function));
   });
+
+  it("writes CSS vars on :root when colorMode flips to dark", () => {
+    const composer = makeMockComposer();
+    composer.exportProject.mockReturnValue({
+      settings: {
+        designTokens: [
+          { id: "primary", name: "Primary", value: "#fff", category: "colors", cssVar: "--bd-primary", type: "color", darkValue: "#000" },
+        ],
+      },
+    });
+    composer.darkResolver.resolve.mockImplementation((t: { value: string; darkValue?: string }, mode: string) =>
+      mode === "dark" && t.darkValue !== undefined ? t.darkValue : t.value
+    );
+    composer.colorMode.resolved.mockReturnValue("dark");
+
+    renderHook(() => useDarkModeApplication(composer as never));
+    composer.emit("colorMode:changed", { mode: "dark", resolved: "dark" });
+
+    expect(document.documentElement.style.getPropertyValue("--bd-primary")).toBe("#000");
+  });
+
+  it("ignores non-color tokens (passthrough)", () => {
+    const composer = makeMockComposer();
+    composer.exportProject.mockReturnValue({
+      settings: {
+        designTokens: [
+          { id: "space-md", name: "Medium", value: "16px", category: "spacing", cssVar: "--bd-space-md", type: "length" },
+        ],
+      },
+    });
+    composer.colorMode.resolved.mockReturnValue("dark");
+
+    renderHook(() => useDarkModeApplication(composer as never));
+    composer.emit("colorMode:changed", { mode: "dark", resolved: "dark" });
+
+    expect(composer.darkResolver.resolve).not.toHaveBeenCalled();
+    expect(document.documentElement.style.getPropertyValue("--bd-space-md")).toBe("");
+  });
 });
