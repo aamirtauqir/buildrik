@@ -123,32 +123,87 @@ function buildWorkspaceUrl(link: WorkspaceLink, siteId: string | null): string {
 
 const SETTINGS_SCREENS = NAV.map(({ id, title }) => ({ id, title }));
 
-// ─── Branding placeholder (V1 — replaces DesignSystemTab delegate) ───────────
+// ─── Branding section ─────────────────────────────────────────────────────────
+//
+// Branding spans two canonical homes: the Palette tab owns design tokens
+// (colors, type, spacing) and the General section owns site identity
+// (favicon, social links). Rather than duplicate either as a fake passthrough
+// here, the section is a navigation map with deep-jumps to the real fields.
 
-interface BrandingPlaceholderProps {
-  onOpenPalette?: () => void;
+interface BrandingFieldRow {
+  label: string;
+  /** Where the field actually lives. Rendered as a muted secondary line. */
+  location: string;
+  /** Optional in-tab nav target for sibling screens (general / seo). */
+  jumpTo?: "general" | "seo";
 }
-const BrandingPlaceholder: React.FC<BrandingPlaceholderProps> = ({ onOpenPalette }) => (
-  <div className="bd-set-section">
-    <h3 className="bd-set-section-h">Design tokens</h3>
-    <div className="bd-set-section-d">
-      Colors, typography, spacing, and other brand tokens live in the Palette tab.
-    </div>
-    <div className="bd-set-branding-placeholder">
-      <div className="bd-set-branding-placeholder-t">Open Palette to edit tokens</div>
-      <div className="bd-set-branding-placeholder-d">
-        Palette owns the design system for this project. Changes there apply to every page.
+
+const BRANDING_FIELD_MAP: BrandingFieldRow[] = [
+  { label: "Brand color", location: "Palette → Colors" },
+  { label: "Brand font", location: "Palette → Type" },
+  { label: "Favicon", location: "General → Site Identity", jumpTo: "general" },
+  { label: "Social card image", location: "SEO → Default OG Image", jumpTo: "seo" },
+  { label: "Social handles", location: "General → Social Links", jumpTo: "general" },
+];
+
+interface BrandingSectionProps {
+  onOpenPalette?: () => void;
+  onJumpTo?: (screenId: "general" | "seo") => void;
+}
+
+const BrandingSection: React.FC<BrandingSectionProps> = ({ onOpenPalette, onJumpTo }) => (
+  <>
+    <div className="bd-set-section">
+      <h3 className="bd-set-section-h">Where Branding lives</h3>
+      <div className="bd-set-section-d">
+        Branding splits across Palette (design tokens) and the General + SEO
+        sections (site identity). Each row below jumps to the canonical home
+        for that field.
       </div>
-      <Button
-        type="button"
-        className="bd-set-btn pri"
-        onClick={onOpenPalette}
-        disabled={!onOpenPalette}
-      >
-        Open Palette →
-      </Button>
+      <ul className="bd-set-branding-map" aria-label="Branding field map">
+        {BRANDING_FIELD_MAP.map((row) => {
+          const handleJump =
+            row.jumpTo && onJumpTo ? () => onJumpTo(row.jumpTo!) : undefined;
+          return (
+            <li key={row.label} className="bd-set-branding-map-row">
+              <div className="bd-set-branding-map-text">
+                <div className="bd-set-branding-map-label">{row.label}</div>
+                <div className="bd-set-branding-map-loc">{row.location}</div>
+              </div>
+              {handleJump ? (
+                <Button
+                  type="button"
+                  className="bd-set-btn sec"
+                  onClick={handleJump}
+                  aria-label={`Jump to ${row.location}`}
+                >
+                  Open →
+                </Button>
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
     </div>
-  </div>
+
+    <div className="bd-set-section">
+      <h3 className="bd-set-section-h">Design tokens</h3>
+      <div className="bd-set-section-d">
+        Colors, typography, spacing, and other brand tokens live in the Palette tab.
+        Changes there apply to every page on the site.
+      </div>
+      <div className="bd-set-branding-placeholder">
+        <Button
+          type="button"
+          className="bd-set-btn pri"
+          onClick={onOpenPalette}
+          disabled={!onOpenPalette}
+        >
+          Open Palette →
+        </Button>
+      </div>
+    </div>
+  </>
 );
 
 // ─── Module-scope helpers ─────────────────────────────────────────────────────
@@ -287,7 +342,12 @@ export const SettingsTab: React.FC<
       case "general":
         return <SiteSettingsScreen composer={composer} onDirtyChange={handleScreenDirty} />;
       case "branding":
-        return <BrandingPlaceholder onOpenPalette={onOpenDesignTab} />;
+        return (
+          <BrandingSection
+            onOpenPalette={onOpenDesignTab}
+            onJumpTo={(screenId) => navigateTo(screenId)}
+          />
+        );
       case "seo":
         return <SeoScreen composer={composer} onDirtyChange={handleScreenDirty} />;
       case "analytics":

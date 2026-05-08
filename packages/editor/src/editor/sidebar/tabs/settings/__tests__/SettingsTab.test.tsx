@@ -145,10 +145,18 @@ describe("SettingsTab", () => {
     expect(integrations?.getAttribute("aria-current")).toBe("page");
   });
 
-  it("renders Branding placeholder with 'Design tokens' heading when Branding row is selected", () => {
+  it("renders Branding section with field-map and Design tokens headings", () => {
     render(<SettingsTab composer={buildMockComposer() as never} />);
     fireEvent.click(snavRow("Branding")!);
-    expect(screen.getByText(/Design tokens/i)).toBeInTheDocument();
+    // The Branding pane has 2 h3 sections — "Where Branding lives" + "Design tokens".
+    expect(
+      screen.getByRole("heading", { name: /Where Branding lives/i }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("heading", { name: /Design tokens/i }),
+    ).toBeTruthy();
+    // Field map renders 5 rows (brand color, brand font, favicon, og image, social).
+    expect(screen.getByLabelText(/Branding field map/i)).toBeTruthy();
   });
 
   it("Open Palette button calls onOpenDesignTab when provided", () => {
