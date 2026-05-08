@@ -41,12 +41,6 @@ export interface ScreenProps {
   registerSaveHandler?: (handler: (() => Promise<void>) | null) => void;
 }
 
-export interface BillingScreenProps {
-  userPlan?: PlanTier;
-  /** Called when user clicks upgrade button */
-  onUpgrade?: () => void;
-}
-
 // ============================================
 // Constants
 // ============================================
