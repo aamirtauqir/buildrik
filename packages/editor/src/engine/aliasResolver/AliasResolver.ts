@@ -34,8 +34,7 @@ export class AliasResolver {
     for (const start of tokens) {
       if (!start.aliasOf) continue;
 
-      const visited = new Set<string>();
-      visited.add(start.id);
+      const visited = new Set<string>([start.id]);
       const chain: string[] = [start.id];
 
       let cursor: DesignToken | undefined = byId.get(start.aliasOf);
@@ -45,11 +44,12 @@ export class AliasResolver {
           throw new AliasCycleError(chain);
         }
         visited.add(cursor.id);
+        if (!cursor.aliasOf) break;
+        cursor = byId.get(cursor.aliasOf);
+      }
 
-        if (cursor.aliasOf) {
-          throw new AliasDepthError(start.id, cursor.id);
-        }
-        cursor = undefined;
+      if (chain.length > 2) {
+        throw new AliasDepthError(chain[0], chain[1]);
       }
     }
   }
