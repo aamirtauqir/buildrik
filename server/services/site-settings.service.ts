@@ -142,7 +142,10 @@ export async function updateSiteSettings(
       // Pessimistic lock — concurrent updates of locale fields on the same
       // site block here until the holder commits. Postgres-only syntax;
       // the editor stack is Postgres per CLAUDE.md.
-      await tx.$executeRaw(Prisma.sql`SELECT id FROM "Site" WHERE id = ${siteId} FOR UPDATE`);
+      // Physical table name is "sites" — Site model carries `@@map("sites")`
+      // in prisma/schema.prisma. Using the model name in raw SQL would raise
+      // `relation "Site" does not exist` on Postgres.
+      await tx.$executeRaw(Prisma.sql`SELECT id FROM "sites" WHERE id = ${siteId} FOR UPDATE`);
       const current = await tx.site.findUnique({
         where: { id: siteId },
         select: { defaultLocale: true, enabledLocales: true },

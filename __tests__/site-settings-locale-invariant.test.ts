@@ -30,8 +30,11 @@ describe("updateSiteSettings: locale invariant atomicity", () => {
     // Pin: the locale-guarded branch wraps the validate+update in $transaction.
     expect(src).toMatch(/needsLocaleGuard\b[\s\S]*?prisma\.\$transaction/);
 
-    // Pin: a SELECT … FOR UPDATE statement targets the Site row inside the tx.
-    expect(src).toMatch(/SELECT id FROM "Site" WHERE id = \$\{siteId\} FOR UPDATE/);
+    // Pin: a SELECT … FOR UPDATE statement targets the physical "sites" table
+    // (model Site is mapped via @@map("sites") in schema.prisma). PascalCase
+    // "Site" would raise `relation "Site" does not exist` at runtime.
+    expect(src).toMatch(/SELECT id FROM "sites" WHERE id = \$\{siteId\} FOR UPDATE/);
+    expect(src).not.toMatch(/SELECT id FROM "Site" WHERE/);
 
     // Pin: the validation throw still fires inside the transaction (NOT outside).
     expect(src).toMatch(
