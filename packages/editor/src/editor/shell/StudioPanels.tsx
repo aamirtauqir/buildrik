@@ -25,6 +25,7 @@ import { LeftSidebar } from "../sidebar/LeftSidebar";
 import { FullPageView } from "../sidebar/FullPageView";
 import { TokenRegistryProvider } from "@/editor/design-system";
 import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
+import { StarterGalleryMount } from "@/editor/design-system/ui/StarterGalleryMount";
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
 import { PageTabBar } from "./PageTabBar";
 
@@ -355,6 +356,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   return (
     <TokenRegistryProvider projectId={projectId} composer={composer ?? undefined}>
       <MigrationProgressMount composer={composer} />
+      <StarterGalleryMount projectId={projectId} />
       <LayoutShell
         drawerOpen={isLeftPanelOpen && !effectiveFullPageMode}
         drawerPinned={panelPinned}
