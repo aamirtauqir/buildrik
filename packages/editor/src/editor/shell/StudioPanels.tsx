@@ -27,6 +27,7 @@ import { TokenRegistryProvider, DSModeProvider } from "@/editor/design-system";
 import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
 import { StarterGalleryMount } from "@/editor/design-system/ui/StarterGalleryMount";
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
+import { useAltTextAutoTrigger } from "./hooks/useAltTextAutoTrigger";
 import { PageTabBar } from "./PageTabBar";
 
 // ============================================================================
@@ -195,6 +196,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
 }) => {
   const { addToast } = useToast();
   const { handleBlockClick } = useBlockInsertion(composer);
+  useAltTextAutoTrigger(composer);
 
   const [canvasHoveredId, setCanvasHoveredId] = React.useState<string | null>(null);
   const [isVersionPreview, setIsVersionPreview] = React.useState(false);
