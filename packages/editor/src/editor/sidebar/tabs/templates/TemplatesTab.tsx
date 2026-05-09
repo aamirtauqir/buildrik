@@ -23,6 +23,9 @@ import { TemplateDetail } from "./components/TemplateDetail";
 import { TemplatePagination } from "./components/TemplatePagination";
 import { TemplateUsageDrawer } from "./components/TemplateUsageDrawer";
 import { useTemplateUsageMap } from "./hooks/useTemplateUsageMap";
+import { resolveTokens } from "./utils/resolveTemplateTokens";
+import { snapshotFromComputedStyle } from "./utils/tokenSnapshot";
+import { DEFAULT_TOKENS } from "../../../design-system/constants";
 import { ApplyProgressOverlay } from "./ApplyProgressOverlay";
 import "./TemplatesTab.css";
 
@@ -160,7 +163,13 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         composer.elements.createPage(t.name);
       }
       if (resetStyles) composer.styles.clear();
-      composer.elements.importHTMLToActivePage(t.html);
+      // P3 phase 2: resolve `{{token.kind.name}}` placeholders against the
+      // current Design System (read from :root computed style) before
+      // sanitize+import. Templates without placeholders pass through
+      // unchanged — regex misses leave content verbatim.
+      const snapshot = snapshotFromComputedStyle(document.documentElement, DEFAULT_TOKENS);
+      const resolvedHtml = resolveTokens(t.html, snapshot);
+      composer.elements.importHTMLToActivePage(resolvedHtml);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to apply";
       setCanRetry(true);
