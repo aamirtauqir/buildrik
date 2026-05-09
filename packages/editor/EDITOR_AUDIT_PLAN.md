@@ -320,7 +320,7 @@ No deep wrapper-over-wrapper chains found. Editor has been through prior wrapper
 
 ## 8. Cleanup Roadmap
 
-> **Status as of 2026-05-09:** ~85% drained. 13 items shipped this week (5 from Phase 0 honesty pass + 8 from follow-up work across multiple sessions). 2 items marked NOT-RECOMMENDED with rationale below. 3 items remain genuinely open.
+> **Status as of 2026-05-09:** ~90% drained. 14 items shipped this week (5 from Phase 0 honesty pass + 9 from follow-up work across multiple sessions). 2 items marked NOT-RECOMMENDED with rationale below. 2 items remain genuinely open: E-005 (events codemod, deferred) and E-014 (Composer facade, collision-blocked).
 > See `~/.claude/projects/-Users-shahg-Desktop-pencil-buildrik/memory/project_editor_audit_progress_20260509.md` for the live status memory.
 
 ### Phase 1 — Critical editor bugs, fake UI, broken flows ✅ ALL CLOSED
@@ -351,7 +351,7 @@ No deep wrapper-over-wrapper chains found. Editor has been through prior wrapper
 ### Phase 6 — Component / design-system consolidation ⏸ COLLISION-BLOCKED
 - (Vibcoder migration: see `MEMORY.md` for separate cleanup-history record.)
 - ⏸ E-014: Composer 30-manager facade pattern — DEFERRED. D3 shipped 3 facades (`cms`/`collab`/`canvas`); 27+ managers still flat. Composer.ts has 6+ commits in 24 hours from sibling DS-arc work (cssBundler/dsLinter/aiAssist/colorMode/aliasResolver/darkResolver added). Touching the manager-fields region right now = high merge-conflict risk. Park until DS arc velocity drops.
-- ⏸ E-017: 5 binding managers documentation/merge — count drift (audit said 5; only 4 present: `styleBindings`, `traitBindings`, `textBindings`, `cms.bindings`). Documentation/merge work would still be valuable but should re-read audit context first.
+- ✅ E-017: 5 binding managers documentation/merge — shipped 2026-05-09 (`68f84eab`). Audit was correct: 5 binding files exist (`BaseBindingManager` + 4 subclasses). 4 already had SCOPE/Why-split headers; this commit added the matching canonical header to `BaseBindingManager.ts` plus inline interface docs. Merge decision: NO — each subclass owns a distinct DOM application path (CSS / HTML attr / text content / CMS field); base class already removes registry/persistence duplication.
 
 ### Phase 7 — Dead editor code removal ✅ ALL CLOSED
 - ✅ E-010: SyncManager + CloudSyncService — shipped 2026-05-08 (`1bc50cd8`). Gated `useSyncStatus` + `StudioModals` on `FEATURES.sync`. SCAFFOLD comments on both files were already in tree from sibling work. The 5-second `setInterval` poll in `useSyncStatus` no longer runs in production. When real cloud sync ships: configure() at bootstrap + flip flag + drop SCAFFOLD markers in same PR.
