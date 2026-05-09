@@ -1,11 +1,6 @@
 /**
- * DesignSystemTab v11 — Colors / Type / Spacing
- * 3-tab shell + state controller. The only component that reads/writes Composer.
- *
- * Data flow:
- *   Composer load → reset*Tokens hooks → child lists render
- *   Child change  → hook updates local state + live preview on :root
- *   Apply         → Composer.setProjectSettings → markSaved in hooks
+ * DesignSystemTab v12 — Tokens / Styles / Components / Export
+ * 4-section workspace. Aggregates dirty state across all 14 token registries.
  *
  * @license BSD-3-Clause
  */
@@ -18,7 +13,24 @@ import { EVENTS } from "../../../shared/constants/events";
 import type { DesignTokenRecord } from "../../../shared/types/project";
 import { useToast } from "@/editor/shared/vibcoder";
 import { DEFAULT_TOKENS } from "../constants";
-import { useColorRegistry, useSpacingRegistry, useTypeRegistry, useRegistryConfig } from "../state/TokenRegistryContext";
+import {
+  useColorRegistry,
+  useTypeRegistry,
+  useSpacingRegistry,
+  useRadiusRegistry,
+  useShadowRegistry,
+  useMotionRegistry,
+  useBorderRegistry,
+  useOpacityRegistry,
+  useZindexRegistry,
+  useBreakpointRegistry,
+  useGridRegistry,
+  useSizingRegistry,
+  useIconRegistry,
+  useImageryRegistry,
+  useRegistryConfig,
+  useResetAllKinds,
+} from "../state/TokenRegistryContext";
 import { useTokenUsageMap } from "../state/useTokenUsageMap";
 import type { DesignToken } from "../types";
 import { CURRENT_SCHEMA_VERSION, migrateDesignTokens } from "../migrations";
@@ -29,7 +41,6 @@ import {
   generateColorCssVar,
 } from "../utils/exportUtils";
 import type { ExportFormat } from "../utils/exportUtils";
-import { ColorTokenList } from "./colors/ColorTokenList";
 import { DesignTabFooter } from "./DesignTabFooter";
 import { DraftChip } from "./DraftChip";
 import { DSLintMount } from "./DSLintMount";
@@ -38,10 +49,12 @@ import { ExportDropdown } from "./ExportDropdown";
 import { AddTokenModal } from "./modals/AddTokenModal";
 import { ReviewModal } from "./modals/ReviewModal";
 import { TabGuardModal } from "./modals/TabGuardModal";
-import { SpacingTokenList } from "./spacing/SpacingTokenList";
-import { TypeTokenList } from "./type/TypeTokenList";
+import { TokensSection } from "./sections/TokensSection";
+import { StylesSection } from "./sections/StylesSection";
+import { ComponentsSection } from "./sections/ComponentsSection";
+import { ExportSection } from "./sections/ExportSection";
 
-// ─── Layout styles ────────────────────────────────────────────────────────────
+// ─── Layout ───────────────────────────────────────────────────────────────────
 
 const containerStyles: React.CSSProperties = {
   display: "flex",
@@ -50,23 +63,43 @@ const containerStyles: React.CSSProperties = {
   background: "var(--bd-bg-subtle)",
 };
 
-const tokenListStyles: React.CSSProperties = {
+const sectionBodyStyles: React.CSSProperties = {
   flex: 1,
   overflow: "auto",
   padding: 12,
 };
 
-// ─── Tab types ────────────────────────────────────────────────────────────────
+// ─── Section types ────────────────────────────────────────────────────────────
 
-type DesignTab = "colors" | "type" | "spacing";
+type DesignSection = "tokens" | "styles" | "components" | "export";
 
-const TABS: Array<{ id: DesignTab; label: string }> = [
-  { id: "colors", label: "Colors" },
-  { id: "type", label: "Type" },
-  { id: "spacing", label: "Spacing" },
+const SECTIONS: Array<{ id: DesignSection; label: string }> = [
+  { id: "tokens",     label: "Tokens" },
+  { id: "styles",     label: "Styles" },
+  { id: "components", label: "Components" },
+  { id: "export",     label: "Export" },
 ];
 
-const SAVEABLE_CATEGORIES: DesignTokenRecord["category"][] = ["colors", "typography", "spacing"];
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+// Only the truly-shared subset across all 14 registries. Color/Type/Spacing
+// expose richer types (TypeRegistry has no pendingDiff field; ColorRegistry's
+// pendingDiff is Record<string, TokenDiff>, not Record<string, string>). Stick
+// to value-vs-savedTokens for a uniform dirty calculation that works for all 14.
+interface KindRegistryLike {
+  tokens: DesignToken[];
+  savedTokens: DesignToken[];
+  updateToken: (id: string, value: string) => void;
+  markSaved: () => void;
+  discardAll: () => void;
+}
+
+function dirtyCount(reg: KindRegistryLike): number {
+  return reg.tokens.filter((t) => {
+    const saved = reg.savedTokens.find((s) => s.id === t.id);
+    return saved !== undefined && t.value !== saved.value;
+  }).length;
+}
 
 // ─── DesignSystemTab ──────────────────────────────────────────────────────────
 
@@ -86,9 +119,9 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   onClose,
 }) => {
   const { addToast } = useToast();
-  const [activeTab, setActiveTab] = React.useState<DesignTab>("colors");
-  const [pendingTab, setPendingTab] = React.useState<DesignTab | null>(null);
-  const [showTabGuard, setShowTabGuard] = React.useState(false);
+  const [activeSection, setActiveSection] = React.useState<DesignSection>("tokens");
+  const [pendingSection, setPendingSection] = React.useState<DesignSection | null>(null);
+  const [showSectionGuard, setShowSectionGuard] = React.useState(false);
   const [showReview, setShowReview] = React.useState(false);
   const [showAddToken, setShowAddToken] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -96,7 +129,6 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
 
   const hasLoadedRef = React.useRef(false);
 
-  // ─ Token usage scan — bumps on element/style mutations, recomputes Map<tokenId, Set<elementId>> ─
   const [usageVersion, setUsageVersion] = React.useState(0);
   const usageMap = useTokenUsageMap(composer, usageVersion);
   const totalUsageCount = React.useMemo(() => {
@@ -105,37 +137,33 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     return n;
   }, [usageMap]);
 
-  // ─ Per-tab state hooks — from shared registry (not isolated instances) ─
-  const colorState = useColorRegistry();
-  const typeState = useTypeRegistry();
-  const spacingState = useSpacingRegistry();
+  const color      = useColorRegistry();
+  const type       = useTypeRegistry();
+  const spacing    = useSpacingRegistry();
+  const radius     = useRadiusRegistry();
+  const shadow     = useShadowRegistry();
+  const motion     = useMotionRegistry();
+  const border     = useBorderRegistry();
+  const opacity    = useOpacityRegistry();
+  const zindex     = useZindexRegistry();
+  const breakpoint = useBreakpointRegistry();
+  const grid       = useGridRegistry();
+  const sizing     = useSizingRegistry();
+  const icon       = useIconRegistry();
+  const imagery    = useImageryRegistry();
   const { persistAll } = useRegistryConfig();
+  const resetAllKinds = useResetAllKinds();
 
-  // Accurate per-token dirty counts (not "1 per dirty hook")
-  const colorDirtyCount = Object.keys(colorState.pendingDiff).length;
-  const typeDirtyCount = typeState.tokens.filter((t) => {
-    const saved = typeState.savedTokens.find((s) => s.id === t.id);
-    return saved !== undefined && t.value !== saved.value;
-  }).length;
-  const spacingDirtyCount = spacingState.tokens.filter((t) => {
-    const saved = spacingState.savedTokens.find((s) => s.id === t.id);
-    return saved !== undefined && t.value !== saved.value;
-  }).length;
-  const totalDirty = colorDirtyCount + typeDirtyCount + spacingDirtyCount;
+  const allRegistries: KindRegistryLike[] = [
+    color, type, spacing, radius, shadow, motion, border,
+    opacity, zindex, breakpoint, grid, sizing, icon, imagery,
+  ];
+
+  const totalDirty = allRegistries.reduce((n, r) => n + dirtyCount(r), 0);
   const isDirty = totalDirty > 0;
 
-  // Track isDirty in a ref so event handlers don't capture stale closures
   const isDirtyRef = React.useRef(isDirty);
-  React.useEffect(() => {
-    isDirtyRef.current = isDirty;
-  }, [isDirty]);
-
-  // Which tabs have unsaved changes
-  const changedTabs = [
-    colorDirtyCount > 0 ? "Colors" : null,
-    typeDirtyCount > 0 ? "Type" : null,
-    spacingDirtyCount > 0 ? "Spacing" : null,
-  ].filter(Boolean) as string[];
+  React.useEffect(() => { isDirtyRef.current = isDirty; }, [isDirty]);
 
   // ─ Load from Composer ─
   const loadFromComposer = React.useCallback(() => {
@@ -152,20 +180,21 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
       }
 
       if (settings.designTokens && settings.designTokens.length > 0) {
-        let incoming = settings.designTokens;
+        // DesignTokenRecord is structurally compatible with DesignToken at runtime
+        // (id/name/value/cssVar/category/type/group are shared); cast to silence
+        // a pre-existing TS narrowing gap in the migration signature.
+        let incoming = settings.designTokens as unknown as DesignToken[];
         if (storedVersion < CURRENT_SCHEMA_VERSION) {
           incoming = migrateDesignTokens(incoming, storedVersion, CURRENT_SCHEMA_VERSION);
         }
         const merged = DEFAULT_TOKENS.map((def) => {
-          // Look up by id first (new format), fall back to name (legacy records)
-          const saved = incoming.find((t) =>
-            t.id ? t.id === def.id : t.name === def.name
-          );
+          const saved = incoming.find((t) => (t.id ? t.id === def.id : t.name === def.name));
           return saved ? { ...def, value: saved.value } : def;
         });
-        colorState.resetFromSaved(merged);
-        typeState.resetFromSaved(merged);
-        spacingState.resetFromSaved(merged);
+        // C1 fix: single fan-out resets all 14 kinds atomically. Internally:
+        // color/type/spacing get resetFromSaved(merged), the 11 new kinds get
+        // hydrateFromExternal(merged) (filters by kind, replaces tokens+saved).
+        resetAllKinds(merged);
         hasLoadedRef.current = true;
         setIsFirstLoad(false);
       } else {
@@ -176,17 +205,13 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
       setError(e instanceof Error ? e.message : "Failed to load design tokens");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [composer]);
+  }, [composer, resetAllKinds]);
 
   React.useEffect(() => {
     if (!composer) return;
     loadFromComposer();
 
-    const handleProjectLoaded = () => {
-      if (!hasLoadedRef.current) loadFromComposer();
-    };
-
-    // Multi-tab conflict: warn if dirty, reload if clean
+    const handleProjectLoaded = () => { if (!hasLoadedRef.current) loadFromComposer(); };
     const handleSettingsChange = () => {
       if (isDirtyRef.current) {
         addToast({
@@ -197,11 +222,7 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         loadFromComposer();
       }
     };
-
-    // Resync after undo/redo operations
     const handleUndoRedo = () => loadFromComposer();
-
-    // Bump usageVersion when elements or styles change so useTokenUsageMap rescans
     const bumpUsage = () => setUsageVersion((v) => v + 1);
 
     composer.on(EVENTS.PROJECT_LOADED, handleProjectLoaded);
@@ -226,53 +247,45 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     };
   }, [composer, loadFromComposer, addToast]);
 
-  // ─ Tab switching with guard ─
-  const handleTabClick = (tab: DesignTab) => {
-    if (tab === activeTab) return;
+  // ─ Section switching with guard ─
+  const handleSectionClick = (s: DesignSection) => {
+    if (s === activeSection) return;
     if (isDirty) {
-      setPendingTab(tab);
-      setShowTabGuard(true);
+      setPendingSection(s);
+      setShowSectionGuard(true);
     } else {
-      setActiveTab(tab);
+      setActiveSection(s);
     }
   };
 
-  const handleTabGuardDiscard = () => {
-    colorState.discardAll();
-    typeState.discardAll();
-    spacingState.discardAll();
-    setShowTabGuard(false);
-    if (pendingTab) {
-      setActiveTab(pendingTab);
-      setPendingTab(null);
-    }
+  const handleGuardDiscard = () => {
+    allRegistries.forEach((r) => r.discardAll());
+    setShowSectionGuard(false);
+    if (pendingSection) { setActiveSection(pendingSection); setPendingSection(null); }
   };
 
-  const handleTabGuardKeep = () => {
-    setShowTabGuard(false);
-    setPendingTab(null);
+  const handleGuardKeep = () => {
+    setShowSectionGuard(false);
+    setPendingSection(null);
   };
 
-  const handleTabGuardSaveAndSwitch = () => {
+  const handleGuardSaveAndSwitch = () => {
     handleApply();
-    setShowTabGuard(false);
-    if (pendingTab) {
-      setActiveTab(pendingTab);
-      setPendingTab(null);
-    }
+    setShowSectionGuard(false);
+    if (pendingSection) { setActiveSection(pendingSection); setPendingSection(null); }
   };
 
   // ─ Apply ─
   const handleApply = () => {
     if (!composer) return;
-    const allTokens: DesignToken[] = [
-      ...colorState.tokens,
-      ...typeState.tokens,
-      ...spacingState.tokens,
+    const allTokens: DesignToken[] = allRegistries.flatMap((r) => r.tokens);
+    const validCategories: DesignTokenRecord["category"][] = [
+      "colors", "typography", "spacing", "effects",
+      "layout", "icons", "buttons", "forms", "theme",
     ];
     const tokenRecords: DesignTokenRecord[] = allTokens
       .filter((t): t is DesignToken & { category: DesignTokenRecord["category"] } =>
-        (SAVEABLE_CATEGORIES as string[]).includes(t.category)
+        validCategories.includes(t.category as DesignTokenRecord["category"])
       )
       .map((t) => ({
         id: t.id,
@@ -291,12 +304,9 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         designTokens: tokenRecords,
         designTokensSchemaVersion: CURRENT_SCHEMA_VERSION,
       });
-      // CP2: persist to localStorage so tokens survive page reload
       persistAll();
-      colorState.markSaved();
-      typeState.markSaved();
-      spacingState.markSaved();
-      setShowReview(false); // close modal on success
+      allRegistries.forEach((r) => r.markSaved());
+      setShowReview(false);
       setIsFirstLoad(false);
       addToast({ description: "Design tokens applied successfully", tone: "success" });
     } catch {
@@ -304,23 +314,19 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     }
   };
 
-  // ─ Discard with undo-able toast ─
+  // ─ Discard ─
   const handleDiscard = () => {
-    // Capture unsaved values before discard so they can be restored
-    const unsavedColors = colorState.tokens.filter((t) => colorState.pendingDiff[t.id]);
-    const unsavedType = typeState.tokens.filter((t) => {
-      const saved = typeState.savedTokens.find((s) => s.id === t.id);
-      return saved !== undefined && t.value !== saved.value;
-    });
-    const unsavedSpacing = spacingState.tokens.filter((t) => {
-      const saved = spacingState.savedTokens.find((s) => s.id === t.id);
-      return saved !== undefined && t.value !== saved.value;
-    });
+    const flat = allRegistries.flatMap((r) =>
+      r.tokens
+        .filter((t) => {
+          const saved = r.savedTokens.find((s) => s.id === t.id);
+          return saved !== undefined && t.value !== saved.value;
+        })
+        .map((t) => ({ id: t.id, value: t.value, registry: r }))
+    );
     const count = totalDirty;
 
-    colorState.discardAll();
-    typeState.discardAll();
-    spacingState.discardAll();
+    allRegistries.forEach((r) => r.discardAll());
 
     addToast({
       description: `${count} change${count !== 1 ? "s" : ""} discarded`,
@@ -328,34 +334,25 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
       action: {
         label: "Undo",
         onClick: () => {
-          // Restore tokens only — savedTokens remain unchanged
-          unsavedColors.forEach((t) => colorState.updateToken(t.id, t.value));
-          unsavedType.forEach((t) => typeState.updateToken(t.id, t.value));
-          unsavedSpacing.forEach((t) => spacingState.updateToken(t.id, t.value));
+          flat.forEach(({ id, value, registry }) => registry.updateToken(id, value));
         },
       },
     });
   };
 
-  // ─ Reset spacing to factory defaults ─
-  const handleResetSpacingToDefaults = () => {
-    spacingState.stageDefaults(DEFAULT_TOKENS);
-    addToast({ description: "Spacing reset to defaults — review and Apply to save.", tone: "info" });
-  };
-
-  // ─ Export ─
   const handleExport = (format: ExportFormat) => {
-    const allTokens: DesignToken[] = [
-      ...colorState.tokens,
-      ...typeState.tokens,
-      ...spacingState.tokens,
-    ];
+    const allTokens: DesignToken[] = allRegistries.flatMap((r) => r.tokens);
     const { content, filename } = buildExport(allTokens, format);
     downloadFile(content, filename);
     addToast({ description: `Exported ${filename}`, tone: "success" });
   };
 
-  // ─ Add token ─
+  // C3 fix: factory-reset spacing (stages defaults for Review/Apply, not discardAll).
+  const handleResetSpacingToDefaults = () => {
+    spacing.stageDefaults(DEFAULT_TOKENS);
+    addToast({ description: "Spacing reset to defaults — review and Apply to save.", tone: "info" });
+  };
+
   const handleAddToken = (name: string, hex: string) => {
     const newToken: DesignToken = {
       id: generateColorTokenId(name),
@@ -366,27 +363,23 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
       type: "color",
       group: "brand",
     };
-    colorState.addToken(newToken);
+    color.addToken(newToken);
     setShowAddToken(false);
     addToast({ description: `Token "${name}" added`, tone: "success" });
   };
 
-  const handleColorChange = (id: string, hex: string) => {
-    colorState.updateToken(id, hex);
-  };
+  const headerTitle =
+    activeSection === "tokens"     ? "Design · Tokens"
+  : activeSection === "styles"     ? "Design · Styles"
+  : activeSection === "components" ? "Design · Components"
+  :                                  "Design · Export";
 
-  const tabTitle =
-    activeTab === "colors"
-      ? "Design · Colors"
-      : activeTab === "type"
-        ? "Design · Type"
-        : "Design · Spacing";
+  const changedSectionLabels = isDirty ? ["Tokens"] : [];
 
   return (
     <div style={{ ...containerStyles, position: "relative" }}>
-      {/* Header */}
       <PanelHeader
-        title={tabTitle}
+        title={headerTitle}
         isPinned={isPinned}
         onPinToggle={onPinToggle}
         onHelpClick={onHelpClick}
@@ -403,11 +396,9 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         />
       </PanelHeader>
 
-      {/* Lint banner — surfaces DS rule violations across all token registries.
-          Hidden when no issues; debounced 500ms per spec D21. */}
       <DSLintMount composer={composer} />
 
-      {/* Tab switcher */}
+      {/* Section switcher */}
       <div
         style={{
           display: "flex",
@@ -418,32 +409,32 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           flexShrink: 0,
         }}
       >
-        {TABS.map((tab) => {
-          const isDirtyTab = changedTabs.includes(tab.label);
+        {SECTIONS.map((s) => {
+          const dirtyHere = s.id === "tokens" && isDirty;
           return (
             <button
-              key={tab.id}
-              onClick={() => handleTabClick(tab.id)}
+              key={s.id}
+              onClick={() => handleSectionClick(s.id)}
               style={{
                 height: 36,
                 padding: "0 12px",
                 borderRadius: "6px 6px 0 0",
                 border: "none",
                 background: "transparent",
-                color: activeTab === tab.id ? "var(--bd-fg-primary)" : "var(--bd-fg-muted)",
+                color: activeSection === s.id ? "var(--bd-fg-primary)" : "var(--bd-fg-muted)",
                 fontSize: 13,
-                fontWeight: activeTab === tab.id ? 500 : 400,
+                fontWeight: activeSection === s.id ? 500 : 400,
                 cursor: "pointer",
                 borderBottom:
-                  activeTab === tab.id ? "2px solid var(--bd-accent)" : "2px solid transparent",
+                  activeSection === s.id ? "2px solid var(--bd-accent)" : "2px solid transparent",
                 transition: "color 0.15s",
                 display: "flex",
                 alignItems: "center",
                 gap: 5,
               }}
             >
-              {tab.label}
-              {isDirtyTab && (
+              {s.label}
+              {dirtyHere && (
                 <span
                   style={{
                     width: 5,
@@ -460,7 +451,6 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         })}
       </div>
 
-      {/* Global scope reminder */}
       <div
         style={{
           padding: "5px 12px",
@@ -473,84 +463,48 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
       >
         Changes here apply to every page on your site
         {totalUsageCount > 0 && (
-          <span style={{ marginLeft: 6, color: "var(--bd-fg-muted, var(--bd-fg-muted))" }}>
+          <span style={{ marginLeft: 6 }}>
             · {totalUsageCount} token binding{totalUsageCount === 1 ? "" : "s"} in use
           </span>
         )}
       </div>
 
-      {/* Content */}
       {error ? (
         <PanelErrorState
           message={error}
-          onRetry={() => {
-            setError(null);
-            loadFromComposer();
-          }}
+          onRetry={() => { setError(null); loadFromComposer(); }}
         />
       ) : (
-        <div style={{ ...tokenListStyles, flex: 1, overflowY: "auto" }}>
-          {/* First-load onboarding banner */}
-          {isFirstLoad && activeTab === "colors" && (
+        <div style={sectionBodyStyles}>
+          {isFirstLoad && activeSection === "tokens" && (
             <div
               style={{
                 margin: "10px 10px 0",
                 padding: "8px 12px",
-                background: "rgba(124,109,250,0.07)",
-                border: "1px solid rgba(124,109,250,0.2)",
+                background: "var(--bd-info-bg, rgba(45,109,255,0.07))",
+                border: "1px solid var(--bd-info-border, rgba(45,109,255,0.2))",
                 borderRadius: 8,
               }}
             >
-              <span style={{ fontSize: 12, color: "rgba(124,109,250,0.9)", lineHeight: 1.6 }}>
+              <span style={{ fontSize: 12, color: "var(--bd-fg-primary)", lineHeight: 1.6 }}>
                 These are your site's default design tokens. Customize them and click{" "}
                 <strong>Review &amp; Apply</strong> to go live.
               </span>
             </div>
           )}
 
-          {activeTab === "colors" && (
-            <ColorTokenList
-              tokens={colorState.tokens}
-              pendingDiff={colorState.pendingDiff}
-              onColorChange={handleColorChange}
-              onUndo={colorState.undoToken}
-              onRedo={colorState.redoToken}
-              canUndo={colorState.canUndo}
-              canRedo={colorState.canRedo}
-              onAddToken={() => setShowAddToken(true)}
+          {activeSection === "tokens" && (
+            <TokensSection
+              onAddTokenClick={() => setShowAddToken(true)}
+              onResetSpacingToDefaults={handleResetSpacingToDefaults}
             />
           )}
-          {activeTab === "type" && (
-            <TypeTokenList
-              tokens={typeState.tokens}
-              responsiveMode={typeState.responsiveMode}
-              onTokenChange={typeState.updateToken}
-              onResponsiveModeChange={typeState.setResponsiveMode}
-              onUndo={typeState.undoToken}
-              canUndo={typeState.canUndo}
-              onRedo={typeState.redoToken}
-              canRedo={typeState.canRedo}
-            />
-          )}
-          {activeTab === "spacing" && (
-            <SpacingTokenList
-              tokens={spacingState.tokens}
-              activePreset={spacingState.activePreset}
-              savedPreset={spacingState.savedPreset}
-              isDirty={spacingState.isDirty}
-              onTokenChange={spacingState.updateToken}
-              onPresetApply={spacingState.applyPreset}
-              onResetToDefaults={handleResetSpacingToDefaults}
-              onUndo={spacingState.undoToken}
-              canUndo={spacingState.canUndo}
-              onRedo={spacingState.redoToken}
-              canRedo={spacingState.canRedo}
-            />
-          )}
+          {activeSection === "styles"     && <StylesSection />}
+          {activeSection === "components" && <ComponentsSection />}
+          {activeSection === "export"     && <ExportSection />}
         </div>
       )}
 
-      {/* Footer */}
       <DesignTabFooter
         isDirty={isDirty}
         dirtyCount={totalDirty}
@@ -558,30 +512,29 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         onReview={() => setShowReview(true)}
       />
 
-      {/* Modals */}
-      {showTabGuard && (
+      {showSectionGuard && (
         <TabGuardModal
-          changedTabs={changedTabs}
-          onDiscard={handleTabGuardDiscard}
-          onKeep={handleTabGuardKeep}
-          onSaveAndSwitch={handleTabGuardSaveAndSwitch}
+          changedTabs={changedSectionLabels}
+          onDiscard={handleGuardDiscard}
+          onKeep={handleGuardKeep}
+          onSaveAndSwitch={handleGuardSaveAndSwitch}
         />
       )}
       {showReview && (
         <ReviewModal
-          colorTokens={colorState.tokens}
-          colorDiff={colorState.pendingDiff}
-          typeTokens={typeState.tokens}
-          typeSavedTokens={typeState.savedTokens}
-          spacingTokens={spacingState.tokens}
-          spacingSavedTokens={spacingState.savedTokens}
+          colorTokens={color.tokens}
+          colorDiff={color.pendingDiff}
+          typeTokens={type.tokens}
+          typeSavedTokens={type.savedTokens}
+          spacingTokens={spacing.tokens}
+          spacingSavedTokens={spacing.savedTokens}
           onConfirm={handleApply}
           onClose={() => setShowReview(false)}
         />
       )}
       {showAddToken && (
         <AddTokenModal
-          existingIds={colorState.tokens.map((t) => t.id)}
+          existingIds={color.tokens.map((t) => t.id)}
           onAdd={handleAddToken}
           onClose={() => setShowAddToken(false)}
         />
