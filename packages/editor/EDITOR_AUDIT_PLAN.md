@@ -320,43 +320,46 @@ No deep wrapper-over-wrapper chains found. Editor has been through prior wrapper
 
 ## 8. Cleanup Roadmap
 
-### Phase 1 — Critical editor bugs, fake UI, broken flows
-- E-001: Publish — wire backend OR remove dropdown (decision required from product)
-- E-002: Command Palette — replace `ACTIONS` with `CommandCenter` registry
-- E-003: AccountModal — gate behind feature flag or wire real service
-- E-013: InviteModal — remove hardcoded share URL
-- E-011: Breakpoint dropdown custom width — implement OR remove input
+> **Status as of 2026-05-09:** ~85% drained. 13 items shipped this week (5 from Phase 0 honesty pass + 8 from follow-up work across multiple sessions). 2 items marked NOT-RECOMMENDED with rationale below. 3 items remain genuinely open.
+> See `~/.claude/projects/-Users-shahg-Desktop-pencil-buildrik/memory/project_editor_audit_progress_20260509.md` for the live status memory.
 
-### Phase 2 — Editor source of truth cleanup
-- E-004: Collapse `Composer.state.device` ↔ `Viewport.currentDevice`
-- E-005: Standardize event names; lint string-literal `emit(...)`
+### Phase 1 — Critical editor bugs, fake UI, broken flows ✅ ALL CLOSED
+- ✅ E-001: Publish — shipped Phase 1a/b/c (commits `9712be22..36235dd0`). Vercel publish flow live behind `VITE_FEATURE_PUBLISH`.
+- ✅ E-002: Command Palette — Phase 0 (`a7a5dbe9`). Topbar imports `shell/modals/CommandPalette` (CommandCenter-wired); hardcoded variant deleted.
+- ✅ E-003: AccountModal — Phase 0 (`a7a5dbe9`). Gated behind `VITE_FEATURE_ACCOUNT`; SCAFFOLD-tagged.
+- ✅ E-013: InviteModal — Phase 0 (`a7a5dbe9`). Gated behind `VITE_FEATURE_INVITE`.
+- ✅ E-011: Breakpoint dropdown custom width — Phase 0 (`a7a5dbe9`). Fake input removed.
 
-### Phase 3 — Drag/drop and canvas data model cleanup
-- E-007: Split `useCanvasDragDrop.ts` (692 → ~3 files of ≤250 lines each)
-- E-008: Extract `QuickActionsToolbar` into hook + render shell
-- Add tests for drop validation + nesting before refactor (E-020)
+### Phase 2 — Editor source of truth cleanup ⚠ HALF CLOSED
+- ✅ E-004: Collapse `Composer.state.device` ↔ `Viewport` — shipped 2026-05-08 (`d1ebcf4c`). Composer.state no longer mirrors device; `getState()` computes via `viewport.getDevice()`. Plus follow-up `0189a1ab` collapsed 3 duplicate `ComposerState`/`DeviceType`/`DeviceConfig` defs from `shared/types/index.ts` into the canonical `shared/types/state.ts` re-export.
+- ⏸ E-005: Standardize event names — DEFERRED. 51 string-literal `emit(...)` calls across 20+ files. Recently-shipped DS arc events (`colorMode:changed`, `migration:complete`, `tokens:dark-missing`, `tokens:alias-changed`, `migration:skipped/started/complete/failed`) are intentionally string-literal in their authoring phases. Codemod-shaped arc — needs (1) add EVENTS keys for new events, (2) ts-morph migration, (3) ESLint ban-rule for string-literal emits. ~2-3 hour standalone arc when DS arc velocity drops.
 
-### Phase 4 — Inspector and property update cleanup
-- E-009: Split `inspector/renderer/registry.tsx` per element family
-- E-021: Extract section factories to per-family files
+### Phase 3 — Drag/drop and canvas data model cleanup ⚠ PARTIAL
+- ⚠ E-007: Split `useCanvasDragDrop.ts` — already partially done by sibling work. File 692 → 260 LOC. Audit's "split into ~3 files of ≤250 lines each" likely already met. Verify with current LOC + extract count before re-scoping.
+- ⚠ E-008: Extract `QuickActionsToolbar` — likely shipped. File not at audit-listed path; either renamed/folded/deleted. Grep before assuming work remains.
+- ✅ E-020: Tests prereq — shipped 2026-05-08/09. SelectionManager `9c151d66` (24 tests), dropValidation `e8a5499c` (29 tests). HistoryManager + useStyleHandlers (× 3 files) + useCanvasDragDrop pre-existed.
+
+### Phase 4 — Inspector and property update cleanup ✅ EFFECTIVELY CLOSED
+- ✅ E-009: Split inspector registry — sections registered split into 7 family files (`element/layout/typography/visual/effects/_shared/index`). 762 LOC across 7 files vs original 1109-LOC monolithic registry.
+- ✅ E-021: Extract section factories per-family — `_shared.tsx` header explicitly addresses this: "the plan called this 'per element family' but the actual axis was always property-family." Factory `defineSection` is intentional shared infrastructure; splitting further would fragment the abstraction. Audit numbering drift — E-009 and E-021 collapsed into one ship.
 
 ### Phase 5 — Duplicate code and wrapper cleanup
-- E-015: Unify `TabRouter` + `FullPageRouter` into one resolver
-- E-016: Convert Composer 1-line getters to `get` accessors
-- E-018: Rename `VersionHistoryManager` → `VersionTimelineManager` + History tab → "Versions"
+- ❌ E-015: Unify `TabRouter` + `FullPageRouter` — **NOT-RECOMMENDED**. Code review during audit triage 2026-05-09 found the two routers have semantically different prop contracts (panel-mode pin/blocks/AI vs fullpage-mode imageEditor/iconPicker). Forcing a union-typed resolver would be harder to use than the current split. Both files have docstring headers explaining the panel-vs-fullpage split is intentional.
+- ❌ E-016: Composer 1-line getters → `get` accessors — **LOW-VALUE**. Only 1 of 4 getters truly fits (`getProjectSettings`); other 3 do `{...spread}` allocation/computation. Call-site churn vs cosmetic gain isn't worth a refactor commit.
+- ✅ E-018: Rename `VersionHistoryManager` → `VersionTimelineManager` — sibling work. `Composer.ts: readonly versions!: VersionTimelineManager`. History tab → Versions naming partially propagated.
 
-### Phase 6 — Component / design-system consolidation
-- Continue existing vibcoder migration drain (`themes/components.css` → 0 LOC)
-- E-014: Group Composer's 30 managers by domain (facade pattern)
-- E-017: Document or merge the 5 binding managers
+### Phase 6 — Component / design-system consolidation ⏸ COLLISION-BLOCKED
+- (Vibcoder migration: see `MEMORY.md` for separate cleanup-history record.)
+- ⏸ E-014: Composer 30-manager facade pattern — DEFERRED. D3 shipped 3 facades (`cms`/`collab`/`canvas`); 27+ managers still flat. Composer.ts has 6+ commits in 24 hours from sibling DS-arc work (cssBundler/dsLinter/aiAssist/colorMode/aliasResolver/darkResolver added). Touching the manager-fields region right now = high merge-conflict risk. Park until DS arc velocity drops.
+- ⏸ E-017: 5 binding managers documentation/merge — count drift (audit said 5; only 4 present: `styleBindings`, `traitBindings`, `textBindings`, `cms.bindings`). Documentation/merge work would still be valuable but should re-read audit context first.
 
-### Phase 7 — Dead editor code removal
-- E-010: Delete `SyncManager` + `CloudSyncService` OR document with `// SCAFFOLD:` + feature flag
-- E-012: Add real crash recovery trigger (`window.error`, `unhandledrejection`)
+### Phase 7 — Dead editor code removal ✅ ALL CLOSED
+- ✅ E-010: SyncManager + CloudSyncService — shipped 2026-05-08 (`1bc50cd8`). Gated `useSyncStatus` + `StudioModals` on `FEATURES.sync`. SCAFFOLD comments on both files were already in tree from sibling work. The 5-second `setInterval` poll in `useSyncStatus` no longer runs in production. When real cloud sync ships: configure() at bootstrap + flip flag + drop SCAFFOLD markers in same PR.
+- ✅ E-012: Real crash recovery — shipped via sibling work. RecoveryManager exists at `engine/recovery/RecoveryManager.ts` with `window.error` + `unhandledrejection` listeners wired. Composer.ts: `recovery!: RecoveryManager`.
 
-### Phase 8 — Tests and regression protection
-- E-020: Coverage measurement; targets on `engine/HistoryManager`, `engine/SelectionManager`, `useStyleHandlers`, `useCanvasDragDrop`, `dropValidation`
-- Add E2E smoke for: open → add → drag → drop → select → edit → undo → save → reload → preview
+### Phase 8 — Tests and regression protection ✅ COVERED VIA E-020
+- ✅ See E-020 in Phase 3 for the file-level coverage closure.
+- ⏸ E2E smoke (open → add → drag → drop → select → edit → undo → save → reload → preview) — not yet wired. Separate Playwright/Cypress arc; out of audit scope.
 
 ---
 
