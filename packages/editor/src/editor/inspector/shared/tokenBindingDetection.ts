@@ -6,13 +6,15 @@
  * style payload) and recovering the token id. Mirrors the forward conversion
  * `tokenToCssVar(id)` in `editor/design-system/types.ts`.
  *
- * Used by `ColorInput`, `SpacingControls`, and any future inspector control
- * that participates in token binding (spec §6.4).
+ * Used by Inspector controls participating in token binding (spec §6.4).
+ * Today's planned consumers: ColorInput, FourSideInput (margin/padding axes).
+ * Existing inline duplicates that should adopt this util: SizeSection.tsx,
+ * typography/FontControls.tsx.
  *
  * @license BSD-3-Clause
  */
 
-const TOKEN_VAR_PATTERN = /^var\((--buildrick-design-[^)]+)\)$/;
+const TOKEN_VAR_PATTERN = /^var\((--buildrick-design-[A-Za-z0-9_-]+)\)$/;
 const TOKEN_VAR_PREFIX = "--buildrick-design-";
 
 /** True when the value is a `var(--buildrick-design-...)` reference. */

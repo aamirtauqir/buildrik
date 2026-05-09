@@ -17,6 +17,7 @@ describe("isTokenVar", () => {
     expect(isTokenVar("var(--bd-accent)")).toBe(false);
     expect(isTokenVar("var(--something-else)")).toBe(false);
     expect(isTokenVar("")).toBe(false);
+    expect(isTokenVar("var(--buildrick-design-color-primary, #FF0000)")).toBe(false);
   });
 });
 
@@ -31,6 +32,8 @@ describe("extractVarName", () => {
     expect(extractVarName("#FF0000")).toBeNull();
     expect(extractVarName("var(--bd-accent)")).toBeNull();
     expect(extractVarName("")).toBeNull();
+    expect(extractVarName("var(--buildrick-design-color-primary, #FF0000)")).toBeNull();
+    expect(extractVarName("var(--something-else)")).toBeNull();
   });
 });
 
