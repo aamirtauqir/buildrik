@@ -14,6 +14,10 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import { Link, Unlink } from "lucide-react";
 import * as React from "react";
 import { Stack } from "@/editor/shared/vibcoder";
+import type { Composer } from "../../../../engine";
+import { EVENTS } from "../../../../shared/constants/events";
+import { DSBindingChip } from "../../sections/DSBindingChip";
+import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
 
 // ============================================================================
 // AXIS INPUT — absolutely positioned input inside a box edge
@@ -43,9 +47,10 @@ interface AxisInputProps {
   onChange: (value: string) => void;
   accent?: "margin" | "padding";
   disabled?: boolean;
+  composer?: Composer | null;
 }
 
-const AxisInput: React.FC<AxisInputProps> = ({ side, value, onChange, disabled }) => {
+const AxisInput: React.FC<AxisInputProps> = ({ side, value, onChange, disabled, composer }) => {
   const [local, setLocal] = React.useState(() => parseValue(value));
 
   React.useEffect(() => {
@@ -68,25 +73,42 @@ const AxisInput: React.FC<AxisInputProps> = ({ side, value, onChange, disabled }
 
   const display = local.isKeyword ? local.num : local.num;
 
+  const tokenId = isTokenVar(value)
+    ? cssVarToTokenId(extractVarName(value) ?? "")
+    : null;
+
+  const handleChipClick = React.useCallback(() => {
+    composer?.emit(EVENTS.UI_OPEN_DESIGN_PANEL, {});
+  }, [composer]);
+
   return (
-    <Input
-      type="text"
-      className={`bdi-ax ${SIDE_POS[side]}${local.isKeyword ? " muted" : ""}`}
-      value={display}
-      disabled={disabled}
-      aria-label={`${side}`}
-      onChange={(e) => {
-        const next = e.target.value;
-        setLocal({ num: next, unit: local.unit, isKeyword: /^[a-z]+$/i.test(next) });
-        if (next === "" || /^-?[\d.]+$/.test(next) || next === "auto" || next === "inherit") {
-          commit(next);
-        }
-      }}
-      onBlur={() => {
-        if (display !== local.num) setLocal(parseValue(value));
-      }}
-      placeholder="0"
-    />
+    <>
+      <Input
+        type="text"
+        className={`bdi-ax ${SIDE_POS[side]}${local.isKeyword ? " muted" : ""}`}
+        value={display}
+        disabled={disabled}
+        aria-label={`${side}`}
+        onChange={(e) => {
+          const next = e.target.value;
+          setLocal({ num: next, unit: local.unit, isKeyword: /^[a-z]+$/i.test(next) });
+          if (next === "" || /^-?[\d.]+$/.test(next) || next === "auto" || next === "inherit") {
+            commit(next);
+          }
+        }}
+        onBlur={() => {
+          if (display !== local.num) setLocal(parseValue(value));
+        }}
+        placeholder="0"
+      />
+      {tokenId ? (
+        <DSBindingChip
+          state="token"
+          label={tokenId}
+          onClick={composer ? handleChipClick : undefined}
+        />
+      ) : null}
+    </>
   );
 };
 
@@ -101,6 +123,7 @@ export interface SpacingBoxProps {
   onPaddingChange: (side: Side, value: string) => void;
   disabledMargin?: Partial<Record<Side, boolean | undefined>>;
   disabledPadding?: Partial<Record<Side, boolean | undefined>>;
+  composer?: Composer | null;
 }
 
 export const SpacingBox: React.FC<SpacingBoxProps> = ({
@@ -110,21 +133,22 @@ export const SpacingBox: React.FC<SpacingBoxProps> = ({
   onPaddingChange,
   disabledMargin,
   disabledPadding,
+  composer,
 }) => (
   <div className="bdi-box">
     <div className="bdi-mbox">
       <span className="bdi-tag">Margin</span>
-      <AxisInput side="top" value={margin.top} onChange={(v) => onMarginChange("top", v)} accent="margin" disabled={disabledMargin?.top} />
-      <AxisInput side="right" value={margin.right} onChange={(v) => onMarginChange("right", v)} accent="margin" disabled={disabledMargin?.right} />
-      <AxisInput side="bottom" value={margin.bottom} onChange={(v) => onMarginChange("bottom", v)} accent="margin" disabled={disabledMargin?.bottom} />
-      <AxisInput side="left" value={margin.left} onChange={(v) => onMarginChange("left", v)} accent="margin" disabled={disabledMargin?.left} />
+      <AxisInput side="top" value={margin.top} onChange={(v) => onMarginChange("top", v)} accent="margin" disabled={disabledMargin?.top} composer={composer} />
+      <AxisInput side="right" value={margin.right} onChange={(v) => onMarginChange("right", v)} accent="margin" disabled={disabledMargin?.right} composer={composer} />
+      <AxisInput side="bottom" value={margin.bottom} onChange={(v) => onMarginChange("bottom", v)} accent="margin" disabled={disabledMargin?.bottom} composer={composer} />
+      <AxisInput side="left" value={margin.left} onChange={(v) => onMarginChange("left", v)} accent="margin" disabled={disabledMargin?.left} composer={composer} />
 
       <div className="bdi-pbox">
         <span className="bdi-tag">Padding</span>
-        <AxisInput side="top" value={padding.top} onChange={(v) => onPaddingChange("top", v)} accent="padding" disabled={disabledPadding?.top} />
-        <AxisInput side="right" value={padding.right} onChange={(v) => onPaddingChange("right", v)} accent="padding" disabled={disabledPadding?.right} />
-        <AxisInput side="bottom" value={padding.bottom} onChange={(v) => onPaddingChange("bottom", v)} accent="padding" disabled={disabledPadding?.bottom} />
-        <AxisInput side="left" value={padding.left} onChange={(v) => onPaddingChange("left", v)} accent="padding" disabled={disabledPadding?.left} />
+        <AxisInput side="top" value={padding.top} onChange={(v) => onPaddingChange("top", v)} accent="padding" disabled={disabledPadding?.top} composer={composer} />
+        <AxisInput side="right" value={padding.right} onChange={(v) => onPaddingChange("right", v)} accent="padding" disabled={disabledPadding?.right} composer={composer} />
+        <AxisInput side="bottom" value={padding.bottom} onChange={(v) => onPaddingChange("bottom", v)} accent="padding" disabled={disabledPadding?.bottom} composer={composer} />
+        <AxisInput side="left" value={padding.left} onChange={(v) => onPaddingChange("left", v)} accent="padding" disabled={disabledPadding?.left} composer={composer} />
         <div className="bdi-center-rect">Content</div>
       </div>
     </div>
@@ -144,6 +168,8 @@ export interface FourSideInputProps {
   linked?: boolean;
   disabledSides?: Partial<Record<Side, boolean | undefined>>;
   disabledReason?: string;
+  // TODO(ds-phase-d1): chip integration deferred — FourSideInput has 0 production callers as of D.1. SpacingBox (canonical) gains the chip.
+  composer?: Composer | null;
 }
 
 export const FourSideInput: React.FC<FourSideInputProps> = ({
