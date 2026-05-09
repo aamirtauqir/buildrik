@@ -402,3 +402,47 @@ export function useRegistryConfig(): RegistryConfig {
   if (!ctx) throw new Error("useRegistryConfig must be used within TokenRegistryProvider");
   return ctx;
 }
+
+/**
+ * Replaces both `tokens` and `savedTokens` for ALL 14 kinds atomically from a
+ * single external source (typically `composer.getProjectSettings().designTokens`
+ * after migration merge). Closes the C1 persistence gap from S1: without this,
+ * the 11 new-kind hooks silently revert to DEFAULT_TOKENS on project reload
+ * because their `resetFromSaved` is no-arg.
+ *
+ * Color/Type/Spacing keep their bespoke `resetFromSaved(merged)` API; the 11
+ * new kinds use `hydrateFromExternal(merged)` from `useTokensForKind`.
+ */
+export function useResetAllKinds(): (allTokens: DesignToken[]) => void {
+  const color      = useColorRegistry();
+  const type       = useTypeRegistry();
+  const spacing    = useSpacingRegistry();
+  const radius     = useRadiusRegistry();
+  const shadow     = useShadowRegistry();
+  const motion     = useMotionRegistry();
+  const border     = useBorderRegistry();
+  const opacity    = useOpacityRegistry();
+  const zindex     = useZindexRegistry();
+  const breakpoint = useBreakpointRegistry();
+  const grid       = useGridRegistry();
+  const sizing     = useSizingRegistry();
+  const icon       = useIconRegistry();
+  const imagery    = useImageryRegistry();
+
+  return React.useCallback((allTokens: DesignToken[]) => {
+    color.resetFromSaved(allTokens);
+    type.resetFromSaved(allTokens);
+    spacing.resetFromSaved(allTokens);
+    radius.hydrateFromExternal(allTokens);
+    shadow.hydrateFromExternal(allTokens);
+    motion.hydrateFromExternal(allTokens);
+    border.hydrateFromExternal(allTokens);
+    opacity.hydrateFromExternal(allTokens);
+    zindex.hydrateFromExternal(allTokens);
+    breakpoint.hydrateFromExternal(allTokens);
+    grid.hydrateFromExternal(allTokens);
+    sizing.hydrateFromExternal(allTokens);
+    icon.hydrateFromExternal(allTokens);
+    imagery.hydrateFromExternal(allTokens);
+  }, [color, type, spacing, radius, shadow, motion, border, opacity, zindex, breakpoint, grid, sizing, icon, imagery]);
+}
