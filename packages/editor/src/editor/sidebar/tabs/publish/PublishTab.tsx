@@ -13,7 +13,7 @@ import type { Composer } from "../../../../engine";
 import { usePublish, type PublishResult } from "../../../../shared/hooks/usePublish";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import { useToast } from "@/editor/shared/vibcoder";
-import { PanelHeader } from "@/shared/extensions/PanelHeader";
+import { TabFrame } from "@/shared/extensions/TabFrame";
 import { Stack } from "@/editor/shared/vibcoder";
 
 // ============================================
@@ -325,8 +325,8 @@ export const PublishTab: React.FC<PublishTabProps> = ({
   }, [_composer]);
 
   return (
-    <div style={containerStyles}>
-      <PanelHeader
+    <TabFrame>
+      <TabFrame.Header
         title="Publish"
         isPinned={isPinned}
         onPinToggle={onPinToggle}
@@ -494,7 +494,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
           Terms of service
         </a>
       </div>
-    </div>
+    </TabFrame>
   );
 };
 
@@ -523,13 +523,6 @@ const RocketIcon: React.FC = () => (
 // ============================================
 // Styles
 // ============================================
-
-const containerStyles: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  height: "100%",
-  background: "var(--bd-bg-panel)",
-};
 
 const contentStyles: React.CSSProperties = {
   flex: 1,
