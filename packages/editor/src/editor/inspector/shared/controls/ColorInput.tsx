@@ -16,6 +16,7 @@ import {
   PopoverContent,
 } from "@/editor/shared/vibcoder";
 import { useColorRegistry } from "../../../design-system/state/TokenRegistryContext";
+import { isTokenVar, extractVarName } from "../tokenBindingDetection";
 import { TokenPickerPopover } from "../TokenPickerPopover";
 
 // ============================================================================
@@ -24,8 +25,6 @@ import { TokenPickerPopover } from "../TokenPickerPopover";
 
 const isValidHexColor = (val: string): boolean =>
   /^#[0-9A-Fa-f]{6}$/.test(val) || /^#[0-9A-Fa-f]{3}$/.test(val);
-
-const isTokenVar = (val: string): boolean => /^var\(--buildrick-design-/.test(val);
 
 const isKeywordValue = (val: string): boolean =>
   !!val && !isValidHexColor(val) && !isTokenVar(val);
@@ -36,11 +35,6 @@ const resolveVar = (cssVar: string): string => {
     .getPropertyValue(varName)
     .trim();
   return resolved || "#000000";
-};
-
-const extractVarName = (v: string) => {
-  const m = v.match(/^var\((--buildrick-design-[^)]+)\)$/);
-  return m ? m[1] : null;
 };
 
 // Hex without "#" prefix — matches mock's "FFFFFF" display
