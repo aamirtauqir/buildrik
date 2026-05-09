@@ -13,6 +13,7 @@ import type {
   DiscoveryViewProps,
   DiscOrientation,
   DiscColor,
+  DiscSource,
   MediaTypeFilter,
 } from "../data/mediaTypes";
 import type { IconConfig } from "../../../../../shared/types/media";
@@ -48,6 +49,12 @@ const TABS = [
   { id: "fnt" as const, label: "Fonts" },
 ];
 
+const SOURCES: ReadonlyArray<{ id: DiscSource; label: string }> = [
+  { id: "unsplash", label: "Unsplash" },
+  { id: "pexels", label: "Pexels" },
+  { id: "pixabay", label: "Pixabay" },
+];
+
 export function StockSourceModal({
   open,
   onClose,
@@ -59,9 +66,12 @@ export function StockSourceModal({
   searchQuery,
   orientation,
   color,
+  source,
+  quota,
   onSearch,
   onSetOrientation,
   onSetColor,
+  onSetSource,
   onLoadMore,
   onSave,
   onInsert,
@@ -92,6 +102,36 @@ export function StockSourceModal({
           </Button>
         </div>
 
+        {/* S19 quota strip — hidden when prop absent */}
+        {quota && (
+          <div
+            data-testid="stock-quota-strip"
+            style={{
+              margin: "12px 20px 0",
+              padding: "8px 12px",
+              background: "var(--bd-cobalt-tint, #eaf1ff)",
+              borderRadius: 4,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontSize: 12,
+            }}
+          >
+            <span>
+              Stock searches:{" "}
+              <b>{quota.used}</b> / {quota.limit} this month
+            </span>
+            {quota.upgradeHref && (
+              <a
+                href={quota.upgradeHref}
+                style={{ color: "var(--bd-accent, #2D6DFF)", fontWeight: 500, textDecoration: "none" }}
+              >
+                Upgrade for unlimited →
+              </a>
+            )}
+          </div>
+        )}
+
         {/* Tab bar */}
         <div className="stock-modal-tabs">
           {TABS.map((tab) => (
@@ -106,13 +146,50 @@ export function StockSourceModal({
         </div>
 
         {/* Search */}
-        <div className="stock-modal-search">
-          <SearchBar
-            value={searchQuery}
-            onChange={(q) => onSearch(q, orientation, color)}
-            placeholder={`Search ${activeTab === "img" ? "photos" : activeTab === "vid" ? "videos" : activeTab === "ico" ? "icons" : "fonts"}...`}
-            debounceMs={400}
-          />
+        <div className="stock-modal-search" style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div style={{ flex: 1 }}>
+            <SearchBar
+              value={searchQuery}
+              onChange={(q) => onSearch(q, orientation, color)}
+              placeholder={`Search ${activeTab === "img" ? "photos" : activeTab === "vid" ? "videos" : activeTab === "ico" ? "icons" : "fonts"}...`}
+              debounceMs={400}
+            />
+          </div>
+
+          {/* S19 source pills — only meaningful for photos/videos */}
+          {showFilters && onSetSource && (
+            <div
+              role="radiogroup"
+              aria-label="Stock source"
+              data-testid="stock-source-pills"
+              style={{ display: "flex", gap: 2, padding: 2, background: "var(--bd-bg-subtle, #f1f5f9)", borderRadius: 6 }}
+            >
+              {SOURCES.map((s) => {
+                const active = source === s.id;
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    onClick={() => onSetSource(s.id)}
+                    style={{
+                      all: "unset",
+                      cursor: "pointer",
+                      padding: "4px 10px",
+                      borderRadius: 4,
+                      fontSize: 12,
+                      fontWeight: active ? 600 : 500,
+                      color: active ? "var(--bd-fg-on-accent, #fff)" : "var(--bd-fg-muted, #64748b)",
+                      background: active ? "var(--bd-accent, #2D6DFF)" : "transparent",
+                    }}
+                  >
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Filters (photos/videos only) */}

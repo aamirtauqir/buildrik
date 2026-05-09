@@ -9,6 +9,10 @@
  * implementations for fetch calls against the providers (both require API
  * keys set at the app layer, not committed here).
  *
+ * S19 (2026-05-09): added optional `signal` + `source` so consumers can
+ * (a) discard stale responses via AbortController per the prototype §25
+ * critical contract #4, and (b) switch between Unsplash / Pexels / Pixabay.
+ *
  * @license BSD-3-Clause
  */
 
@@ -16,6 +20,14 @@ import type { StockPhoto, StockVideo } from "../../engine/media/MediaManager";
 
 export type StockOrientation = "landscape" | "portrait" | "squarish" | undefined;
 export type StockColor = string | undefined;
+export type StockSource = "unsplash" | "pexels" | "pixabay";
+
+export interface StockSearchExtras {
+  /** AbortSignal — when aborted, the promise rejects with DOMException("AbortError"). */
+  signal?: AbortSignal;
+  /** Provider override; defaults to "unsplash" when unset. */
+  source?: StockSource;
+}
 
 export interface StockService {
   searchPhotos(
@@ -23,24 +35,36 @@ export interface StockService {
     page: number,
     orientation?: StockOrientation,
     color?: StockColor,
+    extras?: StockSearchExtras,
   ): Promise<StockPhoto[]>;
   searchVideos(
     query: string,
     page: number,
     orientation?: StockOrientation,
+    extras?: StockSearchExtras,
   ): Promise<StockVideo[]>;
 }
 
 /**
  * Empty stub. Returns `[]` for every query. Keeps the UI functional —
  * empty-state messaging is already designed ("No results, try stock search").
- * Real provider calls land as a follow-up when API keys are wired.
+ *
+ * Honors `extras.signal` so consumer-side AbortController contracts hold:
+ * an aborted call rejects with the standard AbortError so `try/catch +
+ * isAborted` patterns work in both stub and live providers.
  */
 export const stockService: StockService = {
-  async searchPhotos() {
+  async searchPhotos(_query, _page, _orientation, _color, extras) {
+    if (extras?.signal?.aborted) throw makeAbortError();
     return [];
   },
-  async searchVideos() {
+  async searchVideos(_query, _page, _orientation, extras) {
+    if (extras?.signal?.aborted) throw makeAbortError();
     return [];
   },
 };
+
+function makeAbortError(): DOMException {
+  // DOMException is the standard AbortError shape across modern browsers.
+  return new DOMException("Aborted", "AbortError");
+}

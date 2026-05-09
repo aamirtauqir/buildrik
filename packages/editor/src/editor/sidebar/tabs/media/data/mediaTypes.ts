@@ -137,6 +137,8 @@ export interface SelectionStateResult {
   cancelDelete(): void;
 }
 
+export type DiscSource = "unsplash" | "pexels" | "pixabay";
+
 export interface DiscoveryStateResult {
   stockPhotos: StockPhoto[];
   stockVideos: StockVideo[];
@@ -147,9 +149,11 @@ export interface DiscoveryStateResult {
   isDiscoveryEmpty: boolean;
   discOrientation: DiscOrientation;
   discColor: DiscColor;
+  discSource: DiscSource;
   discSearchAll(query: string, orientation?: DiscOrientation, color?: DiscColor): void;
   setDiscOrientation(o: DiscOrientation): void;
   setDiscColor(c: DiscColor): void;
+  setDiscSource(s: DiscSource): void;
   loadMoreDisc(type: "img" | "vid"): Promise<void>;
   saveToLibrary(type: "img" | "vid", item: StockPhoto | StockVideo): Promise<void>;
 }
@@ -299,9 +303,15 @@ export interface DiscoveryViewProps {
   searchQuery: string;
   orientation: DiscOrientation;
   color: DiscColor;
+  /** S19: current source provider (Unsplash / Pexels / Pixabay). */
+  source?: DiscSource;
+  /** S19: monthly stock-search quota strip; hidden when omitted. */
+  quota?: { used: number; limit: number; upgradeHref?: string };
   onSearch(q: string, orientation?: DiscOrientation, color?: DiscColor): void;
   onSetOrientation(o: DiscOrientation): void;
   onSetColor(c: DiscColor): void;
+  /** S19: switch the active stock provider; triggers a re-search. */
+  onSetSource?(s: DiscSource): void;
   onLoadMore(type: "img" | "vid"): void;
   onSave(type: "img" | "vid", item: StockPhoto | StockVideo): void;
   onInsert(filename: string): void;
