@@ -109,6 +109,22 @@ export type ListAssetVersionsInput = z.infer<typeof listAssetVersionsSchema>;
 export type CreateAssetVersionInput = z.infer<typeof createAssetVersionSchema>;
 export type RestoreAssetVersionInput = z.infer<typeof restoreAssetVersionSchema>;
 
+// ─── AI alt-text (P7) ─────────────────────────────────────────────────────
+
+export const generateAltTextSchema = z.object({
+  assetId: z.string(),
+});
+
+export const generateAltTextResultSchema = z.object({
+  altText: z.string(),
+  /** True when the existing user-typed alt text was preserved instead of overwritten. */
+  skipped: z.boolean(),
+  model: z.string().optional(),
+});
+
+export type GenerateAltTextInput = z.infer<typeof generateAltTextSchema>;
+export type GenerateAltTextResult = z.infer<typeof generateAltTextResultSchema>;
+
 // ─── Storage quota (Phase C) ──────────────────────────────────────────────
 
 export const checkStorageQuotaSchema = z.object({});

@@ -18,6 +18,7 @@ import {
   restoreAssetVersion,
   updateAsset,
 } from "@/server/services/media.service";
+import { applyAltTextToAsset } from "@/server/services/alt-text.service";
 import {
   checkStorageQuotaSchema,
   createAssetSchema,
@@ -25,6 +26,7 @@ import {
   createFolderSchema,
   deleteAssetSchema,
   deleteFolderSchema,
+  generateAltTextSchema,
   listAssetVersionsSchema,
   listAssetsSchema,
   listFoldersSchema,
@@ -249,6 +251,33 @@ export const mediaRouter = router({
           throw new TRPCError({
             code: "CONFLICT",
             message: "Asset version URL is owned by another user; cannot restore.",
+          });
+        }
+        throw e;
+      }
+    }),
+
+  // ─── AI alt-text (P7) ───────────────────────────────────────────────────
+
+  /**
+   * Generate alt text via Claude Haiku vision and persist it. Skips when
+   * the user has already typed alt text (pre-call + post-call TOCTOU
+   * guards). Returns { altText, skipped } so the editor can choose
+   * whether to display "AI-generated" provenance.
+   */
+  generateAltText: protectedProcedure
+    .input(generateAltTextSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        return await applyAltTextToAsset(ctx.session.user.id, input.assetId);
+      } catch (e: unknown) {
+        if (e instanceof Error && e.message === "ASSET_NOT_FOUND") {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Asset not found." });
+        }
+        if (e instanceof Error && e.message === "NOT_IMAGE") {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Alt text generation is only available for images.",
           });
         }
         throw e;
