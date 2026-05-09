@@ -100,6 +100,21 @@ export interface MediaAsset {
   /** Alt text for accessibility/SEO */
   altText?: string;
 
+  /**
+   * P7 — provenance for server-derived metadata. Currently only `altText`
+   * is populated; future generators (EXIF, dimensions classifier) write
+   * to sibling keys without colliding. Mirrors server's `MediaAsset.
+   * generatedMetadata` JSON column shape.
+   */
+  generatedMetadata?: {
+    altText?: {
+      /** ISO timestamp when the AI returned. */
+      generatedAt: string;
+      /** Provider model used (e.g., "claude-haiku-4-5"). */
+      model: string;
+    };
+  };
+
   /** Original file name */
   readonly originalName: string;
 

@@ -60,7 +60,16 @@ export function useAltTextAutoTrigger(composer: Composer | null): void {
       if (!fresh) return;
       if (typeof fresh.altText === "string" && fresh.altText.trim().length > 0) return;
 
-      await composer.media.updateAsset(asset.id, { altText: result.altText });
+      await composer.media.updateAsset(asset.id, {
+        altText: result.altText,
+        generatedMetadata: {
+          ...(fresh.generatedMetadata ?? {}),
+          altText: {
+            generatedAt: new Date().toISOString(),
+            model: result.model ?? "claude-haiku-4-5",
+          },
+        },
+      });
     };
 
     composer.media.on(MEDIA_EVENTS.UPLOAD_COMPLETE, handler);

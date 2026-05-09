@@ -63,6 +63,8 @@ export function toLibraryItem(asset: MediaAsset): LibraryItem {
     duration: asset.metadata?.duration,
     width: asset.width,
     height: asset.height,
+    altText: asset.altText,
+    generatedAltMeta: asset.generatedMetadata?.altText,
     createdAt: asset.createdAt,
     mimeType: asset.mimeType,
   };

@@ -128,9 +128,31 @@ describe("useAltTextAutoTrigger", () => {
     });
 
     expect(mocks.generateAltTextRemote).toHaveBeenCalledWith("cuid-server-1");
-    expect(media.updateAsset).toHaveBeenCalledWith("cuid-server-1", {
-      altText: "A red bicycle by a brick wall.",
+    const [updateId, updates] = media.updateAsset.mock.calls[0];
+    expect(updateId).toBe("cuid-server-1");
+    expect(updates.altText).toBe("A red bicycle by a brick wall.");
+    expect(updates.generatedMetadata?.altText?.model).toBe("claude-haiku-4-5");
+    expect(typeof updates.generatedMetadata?.altText?.generatedAt).toBe("string");
+  });
+
+  it("falls back to claude-haiku-4-5 when service result omits model", async () => {
+    const media = makeMediaMock();
+    const composer = { media } as any;
+    const asset = makeAsset();
+    media._setAsset(asset);
+    mocks.generateAltTextRemote.mockResolvedValueOnce({
+      altText: "Some alt text.",
+      skipped: false,
     });
+
+    renderHook(() => useAltTextAutoTrigger(composer));
+    await act(async () => {
+      fireUploadComplete(media, asset);
+      await flushMicrotasks();
+    });
+
+    const updates = media.updateAsset.mock.calls[0][1];
+    expect(updates.generatedMetadata?.altText?.model).toBe("claude-haiku-4-5");
   });
 
   it("skips when upload event signals failure", async () => {

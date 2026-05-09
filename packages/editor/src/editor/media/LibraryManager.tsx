@@ -29,6 +29,7 @@ import { FolderTree, type SmartFolder } from "./components/FolderTree";
 import { AssetDetailsPanel } from "./components/AssetDetailsPanel";
 import { AssetGrid } from "./components/AssetGrid";
 import { fmtBytes } from "./utils/fmtBytes";
+import { generateAltTextRemote } from "../../services/AltTextService";
 import "./LibraryManager.css";
 
 interface LibraryManagerProps {
@@ -359,6 +360,29 @@ export function LibraryManager({ composer, onClose, onOpenImageEditor, onOpenIco
           onRequestDelete={state.requestDelete}
           composer={composer}
           addToast={addToast}
+          onUpdateAltText={(key, altText) => {
+            // User-typed edit — clear AI provenance so the chip disappears.
+            // Empty user edit also counts as "no longer AI's text."
+            void composer.media.updateAsset(key, {
+              altText,
+              generatedMetadata: undefined,
+            });
+          }}
+          onRegenerateAltText={async (key) => {
+            const result = await generateAltTextRemote(key);
+            if (!result) return null;
+            if (result.skipped) return result;
+            await composer.media.updateAsset(key, {
+              altText: result.altText,
+              generatedMetadata: {
+                altText: {
+                  generatedAt: new Date().toISOString(),
+                  model: result.model ?? "claude-haiku-4-5",
+                },
+              },
+            });
+            return result;
+          }}
         />
       </div>
       {/* ═══ STATUS BAR ═══ */}

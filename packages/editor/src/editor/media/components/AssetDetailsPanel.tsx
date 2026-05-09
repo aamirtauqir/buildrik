@@ -18,11 +18,14 @@
  */
 
 import { Button } from "@/editor/shared/vibcoder/Button";
-import { Download, FolderOpen, Pencil, Replace, Trash2, X } from "lucide-react";
+import { Download, FolderOpen, Pencil, Replace, Sparkles, Trash2, X } from "lucide-react";
 import * as React from "react";
 import type { Composer } from "../../../engine/Composer";
 import type { LibraryItem } from "../../sidebar/tabs/media/data/mediaTypes";
 import { fmtBytes } from "../utils/fmtBytes";
+
+// P7 — alt-text upper bound matches the server prompt's "Under 125 characters" rule.
+const ALT_TEXT_MAX = 125;
 
 // ─── Toast contract (matches @/editor/shared/vibcoder useToast) ──────────
 
@@ -54,6 +57,19 @@ export interface AssetDetailsPanelProps {
   /** Composer for replaceAcross + (transitively) the version revert button. */
   composer: Composer;
   addToast(t: ToastInput): void;
+  /**
+   * P7 — write user-typed alt text back to the engine. Implementations
+   * should also clear `generatedMetadata.altText` so the provenance chip
+   * disappears once the user edits (the chip is misleading if the text
+   * is no longer the AI's output).
+   */
+  onUpdateAltText?(key: string, altText: string): void;
+  /**
+   * P7 — fire `media.generateAltText` for this asset. Returns the result
+   * so the panel can show a toast; null on failure or when the server
+   * preserved an existing user-typed alt text.
+   */
+  onRegenerateAltText?(key: string): Promise<{ altText: string; skipped: boolean } | null>;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────
@@ -70,9 +86,12 @@ export function AssetDetailsPanel({
   onRequestDelete,
   composer,
   addToast,
+  onUpdateAltText,
+  onRegenerateAltText,
 }: AssetDetailsPanelProps) {
   const [detailTab, setDetailTab] = React.useState<"details" | "versions" | "used">("details");
   const [replaceAllPickerOpen, setReplaceAllPickerOpen] = React.useState(false);
+  const [regenerating, setRegenerating] = React.useState(false);
 
   if (!selectedItem) {
     return (
@@ -149,26 +168,38 @@ export function AssetDetailsPanel({
         </div>
         <div className="mgr-det-body">
           {detailTab === "details" && (
-            <div className="mgr-kv">
-              <span className="mgr-kv-key">Type</span>
-              <span className="mgr-kv-val">{selectedItem.type.toUpperCase()}</span>
-              {selectedItem.width && selectedItem.height && (
-                <>
-                  <span className="mgr-kv-key">Dimensions</span>
-                  <span className="mgr-kv-val">
-                    {selectedItem.width} × {selectedItem.height} px
-                  </span>
-                </>
+            <>
+              <div className="mgr-kv">
+                <span className="mgr-kv-key">Type</span>
+                <span className="mgr-kv-val">{selectedItem.type.toUpperCase()}</span>
+                {selectedItem.width && selectedItem.height && (
+                  <>
+                    <span className="mgr-kv-key">Dimensions</span>
+                    <span className="mgr-kv-val">
+                      {selectedItem.width} × {selectedItem.height} px
+                    </span>
+                  </>
+                )}
+                <span className="mgr-kv-key">File size</span>
+                <span className="mgr-kv-val">{fmtBytes(selectedItem.size)}</span>
+                <span className="mgr-kv-key">MIME</span>
+                <span className="mgr-kv-val">{selectedItem.mimeType}</span>
+                <span className="mgr-kv-key">Added</span>
+                <span className="mgr-kv-val">
+                  {new Date(selectedItem.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+              {selectedItem.type === "img" && onUpdateAltText && (
+                <AltTextSection
+                  item={selectedItem}
+                  regenerating={regenerating}
+                  onUpdateAltText={onUpdateAltText}
+                  onRegenerateAltText={onRegenerateAltText}
+                  setRegenerating={setRegenerating}
+                  addToast={addToast}
+                />
               )}
-              <span className="mgr-kv-key">File size</span>
-              <span className="mgr-kv-val">{fmtBytes(selectedItem.size)}</span>
-              <span className="mgr-kv-key">MIME</span>
-              <span className="mgr-kv-val">{selectedItem.mimeType}</span>
-              <span className="mgr-kv-key">Added</span>
-              <span className="mgr-kv-val">
-                {new Date(selectedItem.createdAt).toLocaleDateString()}
-              </span>
-            </div>
+            </>
           )}
           {detailTab === "versions" && (
             <div className="mgr-version-list">
@@ -382,5 +413,111 @@ export function AssetDetailsPanel({
         </div>
       )}
     </>
+  );
+}
+
+// ─── AltTextSection (P7) ──────────────────────────────────────────────────
+
+interface AltTextSectionProps {
+  item: LibraryItem;
+  regenerating: boolean;
+  setRegenerating(v: boolean): void;
+  onUpdateAltText(key: string, altText: string): void;
+  onRegenerateAltText?(key: string): Promise<{ altText: string; skipped: boolean } | null>;
+  addToast(t: ToastInput): void;
+}
+
+function AltTextSection({
+  item,
+  regenerating,
+  setRegenerating,
+  onUpdateAltText,
+  onRegenerateAltText,
+  addToast,
+}: AltTextSectionProps) {
+  const provenance = item.generatedAltMeta;
+
+  const handleRegenerate = async () => {
+    if (!onRegenerateAltText) return;
+    setRegenerating(true);
+    try {
+      const result = await onRegenerateAltText(item.key);
+      if (!result) {
+        addToast({ description: "Couldn't generate alt text — try again later", tone: "error" });
+        return;
+      }
+      if (result.skipped) {
+        addToast({
+          description: "Kept your alt text instead of overwriting",
+          tone: "info",
+        });
+        return;
+      }
+      addToast({ description: "Alt text regenerated", tone: "success" });
+    } finally {
+      setRegenerating(false);
+    }
+  };
+
+  return (
+    <div data-testid="alt-text-section" style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 6 }}>
+      <label
+        htmlFor={`alt-text-${item.key}`}
+        style={{ fontSize: 11, fontWeight: 600, color: "var(--buildrick-text-secondary)" }}
+      >
+        Alt text
+      </label>
+      <textarea
+        id={`alt-text-${item.key}`}
+        value={item.altText ?? ""}
+        maxLength={ALT_TEXT_MAX}
+        rows={2}
+        placeholder="Describe this image for screen readers"
+        onChange={(e) => onUpdateAltText(item.key, e.target.value)}
+        style={{
+          width: "100%",
+          fontSize: 12,
+          padding: "6px 8px",
+          borderRadius: 4,
+          border: "1px solid var(--buildrick-border, #e2e8f0)",
+          background: "var(--buildrick-bg-input, #fff)",
+          color: "var(--buildrick-text-primary)",
+          resize: "vertical",
+          fontFamily: "inherit",
+        }}
+      />
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8,
+          fontSize: 10,
+          color: "var(--buildrick-text-disabled)",
+        }}
+      >
+        {provenance ? (
+          <span data-testid="alt-text-provenance" style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <Sparkles size={10} />
+            AI-generated by {provenance.model} on{" "}
+            {new Date(provenance.generatedAt).toLocaleDateString()}
+          </span>
+        ) : (
+          <span>{(item.altText ?? "").length} / {ALT_TEXT_MAX}</span>
+        )}
+        {onRegenerateAltText && (
+          <Button
+            data-testid="alt-text-regenerate"
+            className="mgr-btn"
+            style={{ height: 22, fontSize: 10, padding: "0 8px" }}
+            onClick={handleRegenerate}
+            disabled={regenerating}
+          >
+            <Sparkles size={10} />
+            {regenerating ? "Generating…" : provenance ? "Regenerate" : "Generate"}
+          </Button>
+        )}
+      </div>
+    </div>
   );
 }
