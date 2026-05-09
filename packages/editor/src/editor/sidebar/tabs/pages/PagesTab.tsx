@@ -16,7 +16,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import type { Composer } from "../../../../engine";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
-import { PanelShell } from "@shared/ui/panel";
+import { TabFrame } from "@/shared/extensions/TabFrame";
 import { PageCommandPalette } from "./components/PageCommandPalette";
 import { PageContextMenu } from "./components/PageContextMenu";
 import { PageList } from "./components/PageList";
@@ -165,9 +165,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
     // and absolute-positioned bulk toolbar (requires `position: relative`).
     // `.bulk-mode` toggle activates the row checkbox column when selection exists.
     // No width prop — Pages host (LeftSidebar drawer, width from tabsConfig.ts)
-    // controls sizing. PanelShell fills the host via width:100%.
-    <PanelShell className={`bd-pg-panel${bulk.hasSelection ? " bulk-mode" : ""}`}>
-      <PanelShell.Header
+    // controls sizing. TabFrame fills the host via width:100%.
+    <TabFrame className={`bd-pg-panel${bulk.hasSelection ? " bulk-mode" : ""}`}>
+      <TabFrame.Header
         title="Pages"
         isPinned={isPinned}
         onPinToggle={onPinToggle}
@@ -181,10 +181,10 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         >
           <span className="bd-pg-panel-kbd">⌘K</span>
         </Button>
-      </PanelShell.Header>
+      </TabFrame.Header>
       {/* Error state — takes priority over everything */}
       {p.loadError ? (
-        <PanelShell.Content>
+        <TabFrame.Body>
           <div className="bd-pg-error" role="alert" aria-live="assertive">
             <div className="bd-pg-error-msg">{p.loadError}</div>
             <div className="bd-pg-error-sub">Your connection dropped. Work is safe — nothing was lost.</div>
@@ -192,9 +192,9 @@ export const PagesTab: React.FC<PagesTabProps> = ({
               Try again
             </Button>
           </div>
-        </PanelShell.Content>
+        </TabFrame.Body>
       ) : (
-        <PanelShell.Content noScroll>
+        <TabFrame.Body noScroll>
           <PageList
             pages={p.pages}
             renamingPageId={p.renamingPageId}
@@ -226,7 +226,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
             onMovePageToFolder={f.movePageToFolder}
             onRemovePageFromFolder={f.removePageFromFolder}
           />
-        </PanelShell.Content>
+        </TabFrame.Body>
       )}
       {/* Context menu (portal) */}
       {p.contextMenu && (
@@ -276,7 +276,7 @@ export const PagesTab: React.FC<PagesTabProps> = ({
           />
         </SettingsErrorBoundary>
       )}
-    </PanelShell>
+    </TabFrame>
   );
 };
 

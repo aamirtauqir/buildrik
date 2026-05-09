@@ -9,7 +9,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import { Upload, Plus } from "lucide-react";
 import type { Composer } from "../../../../engine/Composer";
-import { PanelShell } from "@shared/ui/panel";
+import { TabFrame } from "@/shared/extensions/TabFrame";
 import { ROW_LG } from "@shared/constants/layout";
 import { SearchBar } from "../../shared/SearchBar";
 import { AssetDetailOverlay } from "./components/AssetDetailOverlay";
@@ -47,12 +47,12 @@ interface MediaTabProps {
 export function MediaTab(props: MediaTabProps) {
   if (!props.composer) {
     return (
-      <PanelShell className="med-tab">
-        <PanelShell.Header title="Media" {...props} />
-        <PanelShell.Content>
+      <TabFrame className="med-tab">
+        <TabFrame.Header title="Media" {...props} />
+        <TabFrame.Body>
           <div className="med-no-project">Open a project to manage media.</div>
-        </PanelShell.Content>
-      </PanelShell>
+        </TabFrame.Body>
+      </TabFrame>
     );
   }
   return <MediaTabWithComposer {...props} composer={props.composer} />;
@@ -131,7 +131,7 @@ function MediaTabWithComposer({
   }, [onOpenIconPicker, composer, showToast]);
 
   return (
-    <PanelShell
+    <TabFrame
       className="med-tab"
       onDragEnter={state.handlePanelDragEnter}
       onDragLeave={state.handlePanelDragLeave}
@@ -308,6 +308,6 @@ function MediaTabWithComposer({
         onInsert={state.insertToCanvas}
         onOpenIconPicker={handleOpenIconPicker}
       />
-    </PanelShell>
+    </TabFrame>
   );
 }
