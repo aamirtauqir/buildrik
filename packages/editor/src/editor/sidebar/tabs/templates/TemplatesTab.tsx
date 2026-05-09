@@ -10,7 +10,7 @@ import * as React from "react";
 import { Search, X } from "lucide-react";
 import type { Composer } from "../../../../engine";
 import { useToast } from "@/editor/shared/vibcoder";
-import { PanelShell } from "@shared/ui/panel";
+import { TabFrame } from "@/shared/extensions/TabFrame";
 import { type TemplateItem, SITE_CATEGORY_PILLS, SITE_TEMPLATES, TEMPLATE_TYPE_PILLS, SUB_CATEGORY_TAGS, type SiteCategory, type TemplateType } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
 import { ReplaceModal, ProModal, CreatePageConfirmModal, CreatePageSuccessModal, CreatePageErrorModal } from "./TemplatesTabModals";
@@ -219,7 +219,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     : "Template";
 
   return (
-    <PanelShell className="tpl-shell">
+    <TabFrame className="tpl-shell">
       {/* Header — tpl-header class controls height via tpl-header-title sizing. */}
       <div className="tpl-header">
         {detailTemplate ? (
@@ -491,7 +491,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
           />
         );
       })()}
-    </PanelShell>
+    </TabFrame>
   );
 };
 

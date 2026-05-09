@@ -14,7 +14,7 @@ import * as React from "react";
 import { useHistoryState } from "../../../../shared/hooks/useHistoryState";
 import { useAutoMilestone } from "../../../../shared/hooks/useAutoMilestone";
 import { VersionHistoryPanel } from "../../../panels/VersionHistoryPanel";
-import { PanelShell } from "@shared/ui/panel";
+import { TabFrame } from "@/shared/extensions/TabFrame";
 import { ActivityView } from "./components/ActivityView";
 import { TimeTravelScrubber } from "./components/TimeTravelScrubber";
 import { MilestoneSuggestionBanner } from "./components/MilestoneSuggestionBanner";
@@ -112,8 +112,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   }, []);
 
   return (
-    <PanelShell className="bd-history-container">
-      <PanelShell.Header
+    <TabFrame className="bd-history-container">
+      <TabFrame.Header
         title="Version History"
         isPinned={isPinned}
         onPinToggle={onPinToggle}
@@ -196,7 +196,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
           onExit={handleScrubberExit}
         />
       )}
-    </PanelShell>
+    </TabFrame>
   );
 };
 

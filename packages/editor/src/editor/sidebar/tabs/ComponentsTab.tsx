@@ -29,7 +29,7 @@ import {
 import { SkeletonListItem } from "@/shared/extensions/SkeletonCompounds";
 import { useToast } from "@/editor/shared/vibcoder";
 import { PanelErrorState } from "../shared/PanelErrorState";
-import { PanelShell } from "@shared/ui/panel";
+import { TabFrame } from "@/shared/extensions/TabFrame";
 import { SearchBar } from "../shared/SearchBar";
 import { ComponentDetailScreen } from "./component-library/ComponentDetailScreen";
 import { ComponentIcon } from "./component-library/ComponentIcon";
@@ -115,9 +115,9 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
 
   if (!composer?.components?.isAvailable()) {
     return (
-      <PanelShell>
+      <TabFrame>
         {state.isStandaloneMode && (
-          <PanelShell.Header
+          <TabFrame.Header
             title="Components"
             isPinned={isPinned}
             onPinToggle={onPinToggle}
@@ -125,7 +125,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onClose={onClose}
           >
             {headerAddBtn}
-          </PanelShell.Header>
+          </TabFrame.Header>
         )}
         <EmptyState>
           <EmptyStateSpot>
@@ -138,15 +138,15 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             Try opening in a regular browser window.
           </EmptyStateDesc>
         </EmptyState>
-      </PanelShell>
+      </TabFrame>
     );
   }
 
   if (state.error) {
     return (
-      <PanelShell>
+      <TabFrame>
         {state.isStandaloneMode && (
-          <PanelShell.Header
+          <TabFrame.Header
             title="Components"
             isPinned={isPinned}
             onPinToggle={onPinToggle}
@@ -154,10 +154,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onClose={onClose}
           >
             {headerAddBtn}
-          </PanelShell.Header>
+          </TabFrame.Header>
         )}
         <PanelErrorState message={state.error} onRetry={() => state.setError(null)} />
-      </PanelShell>
+      </TabFrame>
     );
   }
 
@@ -198,10 +198,10 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
       );
     }
     return (
-      <PanelShell>
+      <TabFrame>
         {state.isStandaloneMode && (
           <>
-            <PanelShell.Header
+            <TabFrame.Header
               title="Components"
               isPinned={isPinned}
               onPinToggle={onPinToggle}
@@ -209,7 +209,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
               onClose={onClose}
             >
               {headerAddBtn}
-            </PanelShell.Header>
+            </TabFrame.Header>
             <div style={searchContainerStyles}>
               <SearchBar
                 value={state.internalSearchQuery}
@@ -255,17 +255,17 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onSubmit={handleCreateComponent}
           />
         )}
-      </PanelShell>
+      </TabFrame>
     );
   }
 
   // ── Main list view ────────────────────────────────────────────────────────────
 
   return (
-    <PanelShell>
+    <TabFrame>
       {state.isStandaloneMode && (
         <>
-          <PanelShell.Header
+          <TabFrame.Header
             title="Components"
             isPinned={isPinned}
             onPinToggle={onPinToggle}
@@ -273,7 +273,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
             onClose={onClose}
           >
             {headerAddBtn}
-          </PanelShell.Header>
+          </TabFrame.Header>
           <div style={searchContainerStyles}>
             <SearchBar
               value={state.internalSearchQuery}
@@ -496,7 +496,7 @@ export const ComponentsTab: React.FC<ComponentsTabProps> = ({
           </ModalContent>
         </Modal>
       </OverlayMount>
-    </PanelShell>
+    </TabFrame>
   );
 };
 
