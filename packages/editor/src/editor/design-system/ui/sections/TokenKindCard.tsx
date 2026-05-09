@@ -91,7 +91,7 @@ export const TokenKindCard: React.FC<TokenKindCardProps> = ({
   };
 
   return (
-    <div style={cardStyle}>
+    <div style={cardStyle} data-token-kind-card={kindId}>
       <button type="button" onClick={toggle} style={headerStyle} aria-expanded={open}>
         <span>{title}</span>
         <span style={countStyle}>{count} tokens</span>
