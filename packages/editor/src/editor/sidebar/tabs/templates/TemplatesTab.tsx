@@ -11,7 +11,7 @@ import { Search, X } from "lucide-react";
 import type { Composer } from "../../../../engine";
 import { useToast } from "@/editor/shared/vibcoder";
 import { TabFrame } from "@/shared/extensions/TabFrame";
-import { type TemplateItem, SITE_CATEGORY_PILLS, SITE_TEMPLATES, TEMPLATE_TYPE_PILLS, SUB_CATEGORY_TAGS, type SiteCategory, type TemplateType } from "./templatesData";
+import { type TemplateItem, SITE_CATEGORY_PILLS, SITE_TEMPLATES, TEMPLATE_TYPE_PILLS, SUB_CATEGORY_TAGS, type SiteCategory, type TemplateType, DEFAULT_TEMPLATE_VERSION } from "./templatesData";
 import { clearAppliedId, recordTemplateApplied, saveAppliedId } from "./templatesStorage";
 import { ReplaceModal, ProModal, CreatePageConfirmModal, CreatePageSuccessModal, CreatePageErrorModal } from "./TemplatesTabModals";
 import { TemplatePreviewModal } from "./TemplatePreviewModal";
@@ -205,8 +205,10 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
       if (activePage) {
         composer!.elements.recordAppliedTemplate(activePage.id, {
           templateId: id,
-          // Template version pinning lands in Phase B; sentinel for now.
-          version: undefined,
+          // P9: capture the template's version at apply time. Future
+          // bumps surface "update available" via TemplateUsageDrawer's
+          // Versions tab.
+          version: t.version ?? DEFAULT_TEMPLATE_VERSION,
         });
       }
       onTemplateUsed?.();
@@ -383,6 +385,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
                 templateName={detailTemplate.name}
                 usage={detailUsage}
                 onJumpToPage={handleJumpToPage}
+                currentVersion={detailTemplate.version ?? DEFAULT_TEMPLATE_VERSION}
               />
             )}
           </div>

@@ -79,7 +79,7 @@ describe("TemplateUsageDrawer", () => {
     expect(onJumpToPage).toHaveBeenCalledWith("p1");
   });
 
-  it("Versions tab renders the P9-pending placeholder", () => {
+  it("Versions tab renders empty-state when usage list is empty", () => {
     const { getByText } = render(
       <TemplateUsageDrawer
         open
@@ -90,7 +90,78 @@ describe("TemplateUsageDrawer", () => {
       />
     );
     fireEvent.click(getByText("Versions"));
-    expect(getByText(/version pinning is coming/i)).toBeTruthy();
+    expect(getByText(/no applies yet/i)).toBeTruthy();
+  });
+
+  it("Versions tab renders 'Current version' chip when currentVersion provided", () => {
+    const { getByText, getByTestId } = render(
+      <TemplateUsageDrawer
+        open
+        onOpenChange={() => {}}
+        templateId="t1"
+        templateName="Hero"
+        usage={[]}
+        currentVersion="1.2.0"
+      />
+    );
+    fireEvent.click(getByText("Versions"));
+    const strip = getByTestId("versions-current");
+    expect(strip.textContent).toMatch(/v1\.2\.0/);
+  });
+
+  it("Versions tab renders timeline sorted by appliedAt DESC", () => {
+    const { getByText, getAllByRole } = render(
+      <TemplateUsageDrawer
+        open
+        onOpenChange={() => {}}
+        templateId="t1"
+        templateName="Hero"
+        usage={sampleUsage}
+        currentVersion="1.2.0"
+      />
+    );
+    fireEvent.click(getByText("Versions"));
+    const items = getAllByRole("listitem");
+    expect(items.length).toBeGreaterThanOrEqual(2);
+    // sampleUsage: Home(2026-05-08) before About(2026-05-07) when DESC.
+    // First two listitems belong to the Versions panel (no other lists in
+    // this view).
+    expect(items[0].textContent).toMatch(/Home/);
+    expect(items[1].textContent).toMatch(/About/);
+  });
+
+  it("Versions tab flags stale applications when applied version != current", () => {
+    const { getByText } = render(
+      <TemplateUsageDrawer
+        open
+        onOpenChange={() => {}}
+        templateId="t1"
+        templateName="Hero"
+        usage={[
+          { pageId: "p1", pageName: "Home", appliedAt: "2026-05-08T10:00:00Z", version: "1.0.0" },
+        ]}
+        currentVersion="1.2.0"
+      />
+    );
+    fireEvent.click(getByText("Versions"));
+    expect(getByText(/update available/i)).toBeTruthy();
+  });
+
+  it("Versions tab does NOT flag stale when versions match", () => {
+    const { getByText, queryByText } = render(
+      <TemplateUsageDrawer
+        open
+        onOpenChange={() => {}}
+        templateId="t1"
+        templateName="Hero"
+        usage={[
+          { pageId: "p1", pageName: "Home", appliedAt: "2026-05-08T10:00:00Z", version: "1.2.0" },
+        ]}
+        currentVersion="1.2.0"
+      />
+    );
+    fireEvent.click(getByText("Versions"));
+    expect(queryByText(/update available/i)).toBeNull();
   });
 
   it("close button calls onOpenChange(false)", () => {

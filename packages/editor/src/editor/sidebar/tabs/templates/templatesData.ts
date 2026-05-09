@@ -38,7 +38,17 @@ export interface TemplateItem {
   pageCount?: number;
   /** Sub-category tag for filtering (hero | features | pricing | testimonials | cta | footer | contact) */
   subCategory?: string;
+  /**
+   * P9: semver tag for the template definition. When a page applies a
+   * template, the version is captured into PageMeta.appliedTemplates;
+   * future bumps surface "Update available" against the captured version.
+   * Defaults to "1.0.0" via DEFAULT_TEMPLATE_VERSION when omitted.
+   */
+  version?: string;
 }
+
+/** P9: shared default until per-template versioning rolls out. */
+export const DEFAULT_TEMPLATE_VERSION = "1.0.0";
 
 // ============================================================================
 // HELPER FUNCTIONS
