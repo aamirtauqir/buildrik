@@ -16,8 +16,11 @@ import {
   PopoverContent,
 } from "@/editor/shared/vibcoder";
 import { useColorRegistry } from "../../../design-system/state/TokenRegistryContext";
-import { isTokenVar, extractVarName } from "../tokenBindingDetection";
+import { isTokenVar, extractVarName, cssVarToTokenId } from "../tokenBindingDetection";
 import { TokenPickerPopover } from "../TokenPickerPopover";
+import { DSBindingChip } from "../../sections/DSBindingChip";
+import type { Composer } from "../../../../engine";
+import { EVENTS } from "../../../../shared/constants/events";
 
 // ============================================================================
 // HELPERS
@@ -52,9 +55,11 @@ export interface ColorInputProps {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  /** Optional composer ref — when present, clicking a binding chip opens the Design panel. */
+  composer?: Composer | null;
 }
 
-export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }) => {
+export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange, composer }) => {
   const [hidden, setHidden] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -83,6 +88,29 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
       : "transparent";
 
   const display = isBound ? (boundToken?.name ?? value) : stripHash(value || "");
+
+  const tokenId = isBound
+    ? (cssVarToTokenId(extractVarName(value) ?? "") ?? null)
+    : null;
+
+  const handleChipClick = React.useCallback(() => {
+    composer?.emit(EVENTS.UI_OPEN_DESIGN_PANEL, {});
+  }, [composer]);
+
+  const chip =
+    isBound && tokenId ? (
+      <DSBindingChip
+        state="token"
+        label={tokenId}
+        onClick={composer ? handleChipClick : undefined}
+      />
+    ) : isValidHexColor(value) ? (
+      <DSBindingChip
+        state="off-ds"
+        label={value}
+        onClick={composer ? handleChipClick : undefined}
+      />
+    ) : null;
 
   return (
     <div className="bdi-row-ctrl">
@@ -179,6 +207,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({ label, value, onChange }
             </PopoverContent>
           </PopoverPortal>
         </Popover>
+        {chip}
       </div>
     </div>
   );
