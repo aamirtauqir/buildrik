@@ -1,17 +1,54 @@
+/**
+ * Base Binding Manager
+ * Abstract parent for the 4 concrete binding managers in this codebase:
+ * StyleDataBinding, TraitDataBinding, TextDataBinding (engine/data/) and
+ * CMSBindingManager (engine/cms/).
+ *
+ * SCOPE — what this owns:
+ *   - Element-id → binding[] registry with key-based de-dupe (`bind` / `unbind` /
+ *     `unbindAll` / `getBindings`)
+ *   - Persistence plumbing (`export` / `import`)
+ *   - Reactive re-apply on `data:source:updated` (subscribed in constructor;
+ *     unsubscribed in `destroy()`)
+ *   - Shared `resolveBindingValue` that resolves a binding against DataManager,
+ *     applies optional transform, and falls back to a default string
+ *
+ * NOT COVERED — concrete subclasses fill these in:
+ *   - `getBindingKey(binding)` — stable key per binding (so re-binding the same
+ *     CSS property or HTML attribute replaces rather than duplicates)
+ *   - `applyBinding(elementId, binding)` — the actual DOM/CSS write. Each
+ *     subclass owns one application path:
+ *       - StyleDataBinding   → element.style[propertyName]
+ *       - TraitDataBinding   → element.setAttribute(name, value)
+ *       - TextDataBinding    → element.content
+ *       - CMSBindingManager  → element property keyed by collection field
+ *
+ * Why this base exists: before extraction, the 4 subclasses each duplicated the
+ * registry + persistence + source-update wiring (~120 LOC × 4). Pulling those
+ * into an abstract parent left subclasses focused on their property semantics
+ * (transforms, validation, content rules). See `DataManager.ts` header for the
+ * full data-vs-application split rationale; this file is the application-side
+ * shared base.
+ *
+ * Why NOT merge with DataManager: DataManager resolves data → value (single
+ * lifecycle, per-source events). Binding managers apply value → DOM (per-element
+ * lifecycle, per-property events). Different shapes; merge would conflate.
+ *
+ * @module engine/data/BaseBindingManager
+ * @license BSD-3-Clause
+ */
+
 import type { DataBinding } from "../../shared/types/data";
 import type { Composer } from "../Composer";
 
-/**
- * Generic binding manager to remove duplication between style/trait bindings.
- * Handles element->binding registry, de-dupe, source change reactions, and
- * export/import plumbing; subclasses only implement apply logic + key selector.
- */
+/** Bindings stored in the registry — every concrete binding wraps a DataBinding. */
 export interface BindingWithData<TBinding = DataBinding> {
   binding: TBinding & DataBinding;
 }
 
 /**
- * Common binding interface for value resolution
+ * Resolution input for `resolveBindingValue`. The transform + fallback fields
+ * are subclass concerns (e.g., URL-encoding for trait href, formatter for text).
  */
 export interface ResolvableBinding {
   binding: DataBinding;
@@ -20,7 +57,9 @@ export interface ResolvableBinding {
 }
 
 /**
- * Result of resolving a binding value
+ * Resolution output. `success: false` means the fallback was used (data was
+ * absent or threw). Subclasses still apply the value — they just know it's the
+ * fallback shape, which can drive UI affordances like a placeholder style.
  */
 export interface ResolvedBindingValue {
   value: string;
