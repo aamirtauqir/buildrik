@@ -12,7 +12,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
-import { PanelShell } from "@shared/ui/panel";
+import { TabFrame } from "@/shared/extensions/TabFrame";
 import { usePanelNavigation } from "../../shared/usePanelNavigation";
 import {
   type SettingsTabProps,
@@ -432,7 +432,7 @@ export const SettingsTab: React.FC<
   NAV.forEach((n) => navByGroup[n.group].push(n));
 
   return (
-    <PanelShell>
+    <TabFrame>
       <div className="bd-set-panel-h">
         <div className="bd-set-panel-h-ttl">
           <h2>{current.title}</h2>
@@ -468,7 +468,7 @@ export const SettingsTab: React.FC<
           ) : null}
         </div>
       </div>
-      <PanelShell.Content noScroll>
+      <TabFrame.Body noScroll>
         <div className="bd-set-root">
           <nav className="bd-set-snav" aria-label="Settings sections">
             <div className="bd-set-snav-h">Settings</div>
@@ -521,7 +521,7 @@ export const SettingsTab: React.FC<
             </div>
           </div>
         </div>
-      </PanelShell.Content>
+      </TabFrame.Body>
       <SettingsNavGuard
         isOpen={guardOpen}
         onDiscard={() => {
@@ -537,7 +537,7 @@ export const SettingsTab: React.FC<
           setGuardOpen(false);
         }}
       />
-    </PanelShell>
+    </TabFrame>
   );
 };
 
