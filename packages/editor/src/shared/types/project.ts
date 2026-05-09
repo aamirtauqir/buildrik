@@ -251,7 +251,8 @@ export interface DesignTokenRecord {
     | "layout"
     | "icons"
     | "buttons"
-    | "forms";
+    | "forms"
+    | "theme";
   type?: string;
   group?: string;
 }
