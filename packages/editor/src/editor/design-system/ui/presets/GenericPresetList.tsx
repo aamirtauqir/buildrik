@@ -12,8 +12,9 @@
 
 import * as React from "react";
 import type { PresetsForCategoryRegistry } from "../../state/usePresetsForCategory";
-import type { PresetCategory, StylePreset } from "../../types";
+import type { PresetCategory, StylePreset, PresetBinding } from "../../types";
 import { useDSModeOptional } from "../../state/DSModeContext";
+import { BindingEditor } from "./BindingEditor";
 
 interface GenericPresetListProps {
   category: PresetCategory;
@@ -22,8 +23,9 @@ interface GenericPresetListProps {
 
 const rowStyle: React.CSSProperties = {
   display: "flex",
-  alignItems: "center",
-  gap: 8,
+  flexDirection: "column",
+  alignItems: "stretch",
+  gap: 4,
   padding: "6px 0",
   borderBottom: "1px solid var(--bd-border)",
 };
@@ -51,11 +53,16 @@ const variantChipStyle: React.CSSProperties = {
   flexShrink: 0,
 };
 
-const countChipStyle: React.CSSProperties = {
+const countChipBtnStyle = (open: boolean): React.CSSProperties => ({
   fontSize: 11,
-  color: "var(--bd-fg-muted)",
+  color: open ? "var(--bd-accent)" : "var(--bd-fg-muted)",
   flexShrink: 0,
-};
+  background: "transparent",
+  border: "1px solid var(--bd-border)",
+  borderRadius: 4,
+  padding: "2px 6px",
+  cursor: "pointer",
+});
 
 const ghostBtnStyle: React.CSSProperties = {
   padding: "3px 8px",
@@ -106,6 +113,7 @@ function generateNewPreset(category: PresetCategory, existing: StylePreset[]): S
 export const GenericPresetList: React.FC<GenericPresetListProps> = ({ category, registry }) => {
   const mode = useDSModeOptional()?.mode ?? "beginner";
   const isPro = mode === "pro";
+  const [expandedId, setExpandedId] = React.useState<string | null>(null);
 
   if (registry.presets.length === 0) {
     return (
@@ -126,27 +134,48 @@ export const GenericPresetList: React.FC<GenericPresetListProps> = ({ category, 
     <div>
       {registry.presets.map((p, i) => {
         const isLast = i === registry.presets.length - 1;
+        const isExpanded = expandedId === p.id;
         const bindingCount = Object.keys(p.bindings).length;
         return (
-          <div key={p.id} style={isLast ? lastRowStyle : rowStyle}>
-            <input
-              aria-label={`${category} preset ${p.id} friendly name`}
-              type="text"
-              value={p.friendlyName}
-              onChange={(e) => registry.updatePreset(p.id, { friendlyName: e.target.value })}
-              style={inputStyle}
-            />
-            <span style={variantChipStyle}>{p.variant}</span>
-            <span style={countChipStyle}>{bindingCount} binding{bindingCount === 1 ? "" : "s"}</span>
-            {isPro && <span style={idChipStyle}>{p.id}</span>}
-            <button
-              type="button"
-              aria-label={`Delete ${p.id}`}
-              onClick={() => registry.deletePreset(p.id)}
-              style={dangerBtnStyle}
-            >
-              Delete
-            </button>
+          <div key={p.id} style={isLast && !isExpanded ? lastRowStyle : rowStyle}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flex: "1 1 auto" }}>
+              <input
+                aria-label={`${category} preset ${p.id} friendly name`}
+                type="text"
+                value={p.friendlyName}
+                onChange={(e) => registry.updatePreset(p.id, { friendlyName: e.target.value })}
+                style={inputStyle}
+              />
+              <span style={variantChipStyle}>{p.variant}</span>
+              <button
+                type="button"
+                aria-label={`${isExpanded ? "Collapse" : "Edit"} bindings for ${p.id}`}
+                aria-expanded={isExpanded}
+                onClick={() => setExpandedId(isExpanded ? null : p.id)}
+                style={countChipBtnStyle(isExpanded)}
+              >
+                {bindingCount} binding{bindingCount === 1 ? "" : "s"}
+              </button>
+              {isPro && <span style={idChipStyle}>{p.id}</span>}
+              <button
+                type="button"
+                aria-label={`Delete ${p.id}`}
+                onClick={() => registry.deletePreset(p.id)}
+                style={dangerBtnStyle}
+              >
+                Delete
+              </button>
+            </div>
+            {isExpanded && (
+              <div style={{ width: "100%", marginTop: 4 }} data-binding-editor={p.id}>
+                <BindingEditor
+                  bindings={p.bindings}
+                  onChange={(next: Record<string, PresetBinding>) =>
+                    registry.updatePreset(p.id, { bindings: next })
+                  }
+                />
+              </div>
+            )}
           </div>
         );
       })}
