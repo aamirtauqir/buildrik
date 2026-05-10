@@ -272,39 +272,34 @@ describe("SettingsTab v2 — ConfirmDialog Discard / Cancel", () => {
 // Note: In v2, the snav root is `inert` + `aria-hidden=true` while drilled-in,
 // so a user CANNOT navigate between sections via the snav while in section
 // view. The only section→section path is the Branding signpost, which calls
-// `navigateBetweenSections` directly (no dialog branch). This means the
-// `pendingNavRef.current = nextId` code path in `navigate(...)` is unreachable
-// from real UX in v2, and the dialog's `next !== null` discard branch is
-// unreachable through the snav.
-//
-// The test below uses `fireEvent.click` (which bypasses jsdom `inert`) to
-// simulate a section→section snav click while dirty. Per the current code,
-// `navigate()` with `!isRoot` short-circuits to `navigateBetweenSections`
-// WITHOUT checking dirty, silently clearing dirty state and swapping content.
-// No dialog is opened. We assert this current behavior so the test ratchets
-// the contract — if `navigate()` ever gains a dirty-check before
-// `navigateBetweenSections`, this test will need to be updated.
-describe("SettingsTab v2 — pending-nav guard (current behavior)", () => {
-  it("section→section snav click (jsdom-only path, inert in real UX): swaps content without dialog", async () => {
+// `navigate()` (which delegates to `navigateBetweenSections` when clean, or
+// opens ConfirmDialog when dirty). jsdom's fireEvent.click bypasses inert, so
+// we can also exercise the snav-while-drilled-in path here to cover the dirty
+// guard for both entry points.
+describe("SettingsTab v2 — pending-nav guard", () => {
+  it("dirty + jump to another section → dialog opens; Discard swaps section in-place", async () => {
     const { container } = render(<SettingsTab composer={makeComposer() as never} />);
     await clickRowAndAwaitPush(/general/i);
     const siteNameInput = (await screen.findByPlaceholderText(/My Awesome Site/i)) as HTMLInputElement;
     await makeSectionDirty(siteNameInput);
-    // Find SEO snav row (in inert root, but jsdom click still fires handler).
+    // jsdom's fireEvent.click bypasses inert, so we can exercise the
+    // navigate(!isRoot) dirty path via a snav row click.
     const seoRow = Array.from(
       container.querySelectorAll<HTMLButtonElement>(".bd-set-snav-row"),
     ).find((b) => b.textContent?.toLowerCase().includes("seo"));
     expect(seoRow).toBeTruthy();
     fireEvent.click(seoRow!);
-    // navigateBetweenSections clears dirty + swaps content; no dialog.
-    expect(screen.queryByRole("dialog")).toBeNull();
+    // Dirty guard now fires for section→section nav: dialog opens.
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.click(within(dialog).getByRole("button", { name: /discard/i }));
+    // Codex P0 #3: navigateBetweenSections swaps content WITHOUT unmounting
+    // the section. Header title flips to SEO. Stack should NOT be
+    // .transitioning (no animation lock for in-section swap).
     await waitFor(() => {
       expect(document.querySelector(".bd-set-panel-h-ttl h2")?.textContent).toBe("SEO");
     });
     expect(container.querySelector(".bd-set-screen--section")).not.toBeNull();
     expect(container.querySelector(".bd-set-stack.transitioning")).toBeNull();
-    // Dirty was silently cleared by navigateBetweenSections.
-    expect(container.querySelector(".bd-set-savebar.on")).toBeNull();
   });
 });
 

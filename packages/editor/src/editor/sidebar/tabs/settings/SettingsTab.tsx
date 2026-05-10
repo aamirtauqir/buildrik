@@ -331,20 +331,29 @@ export const SettingsTab: React.FC<
   // Codex P0 #2: blur active element before flipping isRoot so focus does not
   // remain inside what becomes aria-hidden=true. DrillInHeader's mount effect
   // will then place focus on breadcrumb-current.
+  //
+  // Codex P0 #3 hardening (Task-7 follow-up): dirty check applies to BOTH
+  // push and section→section paths. Without this, a section-to-section jump
+  // (e.g., Branding's "Open General →" button) silently clears dirty edits
+  // instead of routing through ConfirmDialog. ConfirmDialog's onConfirm
+  // already handles all 4 (isRoot × pendingNav) quadrants — pass-2 wiring.
   const navigate = React.useCallback(
     (nextId: InTabNavId) => {
       if (transitioning) return;
       if (nextId === currentScreen && !isRoot) return;
-      // Section→section nav: caller is already drilled-in. Route through
-      // navigateBetweenSections to avoid the push state-machine deadlock
-      // (Codex P0 #3).
-      if (!isRoot) {
-        navigateBetweenSections(nextId);
-        return;
-      }
+      // Universal dirty check FIRST — applies to push + section→section.
+      // ConfirmDialog's onConfirm handles routing based on (isRoot, pendingNav)
+      // post-discard.
       if (screenIsDirtyRef.current) {
         pendingNavRef.current = nextId;
         setGuardOpen(true);
+        return;
+      }
+      // Section→section nav (clean): drilled-in user clicking another section
+      // (Branding's onJumpTo path). Routes through navigateBetweenSections to
+      // avoid the push state-machine deadlock + skip animation.
+      if (!isRoot) {
+        navigateBetweenSections(nextId);
         return;
       }
       // Codex P0 #2: blur the clicked snav row before root becomes aria-hidden.
@@ -528,10 +537,11 @@ export const SettingsTab: React.FC<
         return (
           <BrandingSection
             onOpenPalette={onOpenDesignTab}
-            // Codex P0 #3: section→section nav must go through navigateBetweenSections,
-            // not navigateTo. navigateTo would update currentScreen but skip the
-            // resetKey bump + dirty reset, leaving stale screen state visible.
-            onJumpTo={(screenId) => navigateBetweenSections(screenId)}
+            // Codex P0 #3 (post-Task-7 hardening): route through navigate() so
+            // the dirty guard applies. navigate detects !isRoot and delegates to
+            // navigateBetweenSections only when clean. When dirty, opens
+            // ConfirmDialog with pendingNav=screenId.
+            onJumpTo={(screenId) => navigate(screenId)}
           />
         );
       case "seo":
