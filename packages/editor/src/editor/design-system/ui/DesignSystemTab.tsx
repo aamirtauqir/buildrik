@@ -291,6 +291,29 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
     }
   };
 
+  // DD3 a11y baseline: WAI-ARIA tablist keyboard nav. Arrow keys cycle;
+  // Home/End jump to ends. Auto-activation on focus matches the spec
+  // pattern for tabsets where panel mounts are cheap.
+  const handleSectionKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    const idx = SECTIONS.findIndex((s) => s.id === activeSection);
+    if (idx < 0) return;
+    let nextIdx = idx;
+    switch (e.key) {
+      case "ArrowRight": nextIdx = (idx + 1) % SECTIONS.length; break;
+      case "ArrowLeft":  nextIdx = (idx - 1 + SECTIONS.length) % SECTIONS.length; break;
+      case "Home":       nextIdx = 0; break;
+      case "End":        nextIdx = SECTIONS.length - 1; break;
+      default: return;
+    }
+    e.preventDefault();
+    handleSectionClick(SECTIONS[nextIdx].id);
+    // Move focus to the newly-active tab so screen readers announce it.
+    const next = e.currentTarget.parentElement?.querySelector<HTMLButtonElement>(
+      `[data-section-id="${SECTIONS[nextIdx].id}"]`,
+    );
+    next?.focus();
+  };
+
   const handleGuardDiscard = () => {
     allRegistries.forEach((r) => r.discardAll());
     setShowSectionGuard(false);
@@ -441,8 +464,10 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
 
       <DSLintMount composer={composer} />
 
-      {/* Section switcher */}
+      {/* Section switcher — WAI-ARIA tablist (DD3 a11y baseline) */}
       <div
+        role="tablist"
+        aria-label="Design workspace sections"
         style={{
           display: "flex",
           padding: "8px 12px 0",
@@ -456,10 +481,18 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           const dirtyHere =
             (s.id === "tokens" && tokensDirty > 0) ||
             (s.id === "styles" && stylesDirty > 0);
+          const selected = activeSection === s.id;
           return (
             <button
               key={s.id}
+              role="tab"
+              id={`design-tab-${s.id}`}
+              aria-selected={selected}
+              aria-controls={`design-tabpanel-${s.id}`}
+              tabIndex={selected ? 0 : -1}
+              data-section-id={s.id}
               onClick={() => handleSectionClick(s.id)}
+              onKeyDown={handleSectionKeyDown}
               style={{
                 height: 36,
                 padding: "0 12px",
@@ -520,7 +553,12 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
           onRetry={() => { setError(null); loadFromComposer(); }}
         />
       ) : (
-        <div style={sectionBodyStyles}>
+        <div
+          role="tabpanel"
+          id={`design-tabpanel-${activeSection}`}
+          aria-labelledby={`design-tab-${activeSection}`}
+          style={sectionBodyStyles}
+        >
           {isFirstLoad && activeSection === "tokens" && (
             <div
               style={{
