@@ -710,3 +710,18 @@ None at design time. Surfaced during planning if any.
 
 - **Token system foundation layer** — single `:root` token block in `app/layout.tsx` that both Tailwind `@theme` and editor's `--buildrick-*` derive from. Blast radius too large during active DS Tier-2 arc. Effort CC ~4 hr. Priority P2. Revisit after DS Tier-2 lands.
 - **Editor-as-embed contract** — public-facing iframe API for third-party white-label. Long-term leverage. Effort CC ~1 day. Priority P3.
+
+## GSTACK REVIEW REPORT
+
+| Review | Trigger | Why | Runs | Status | Findings |
+|--------|---------|-----|------|--------|----------|
+| CEO Review | `/plan-ceo-review` | Scope & strategy | 1 | issues_open | 5 proposals, 4 accepted, 1 deferred |
+| Codex Review | `/codex review` | Independent 2nd opinion | 1 | issues_found | 12 findings (5 critical) — all addressed in spec |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | CLEAR | 4 issues, 0 critical gaps |
+| Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | — |
+| DX Review | `/plan-devex-review` | Developer experience gaps | 0 | — | — |
+
+- **CODEX:** 5 critical findings. All folded into spec via D10-D14 + flag-mechanism rewrite + security verdict revision.
+- **CROSS-MODEL:** 3 substantive tensions decided by user (Edge Config flag, Phase 0.5 spike, stay with Approach A accepting fault-isolation loss).
+- **UNRESOLVED:** 0
+- **VERDICT:** CEO + ENG CLEARED — ready to implement. Phase 0.5 build spike is the gating first step.
