@@ -8,6 +8,8 @@
 
 import * as React from "react";
 import { getBlockById, insertBlock } from "../../../../blocks/blockRegistry";
+import { CATALOG } from "../../../components-catalog/catalog";
+import { placeCatalogComponent } from "../../../components-catalog/placeCatalogComponent";
 import type { Composer } from "../../../../engine";
 import type { ElementType, GrapesElement } from "../../../../shared/types";
 import { devError } from "../../../../shared/utils/devLogger";
@@ -457,4 +459,54 @@ export function handleBlockDrop(e: React.DragEvent, ctx: DropContext): boolean {
     onDropError?.({ type: "INVALID_DATA", message: "Invalid block data" });
     return true;
   }
+}
+
+// ============================================================================
+// CATALOG DROP — places a Buildrik-shipped catalog ComponentType (S6)
+// ============================================================================
+
+/**
+ * Reads `application/x-buildrik-catalog-component` payload set by CatalogRow
+ * (S6 CU2). Looks up the ComponentType from the bundled catalog and inserts
+ * a placeholder element via placeCatalogComponent.
+ *
+ * v1 limitation: schema interpretation deferred — the inserted element
+ * carries data-buildrik-catalog-component + data-variant attrs so a future
+ * renderer arc can pick it up and render the full schema-driven tree.
+ */
+export function handleCatalogDrop(
+  e: React.DragEvent,
+  ctx: DropContext,
+  payloads?: { catalogComponentId?: string },
+): boolean {
+  // Prefer pre-snapshotted payload (dispatcher reads dataTransfer
+  // synchronously to dodge the post-await zero-out). Fall back to direct
+  // read for callers that haven't migrated yet.
+  const catalogId = payloads?.catalogComponentId
+    ?? e.dataTransfer.getData("application/x-buildrik-catalog-component");
+  if (!catalogId) return false;
+
+  const { composer, freshTargetId, onDropError, onDropSuccess } = ctx;
+
+  const component = CATALOG.find((c) => c.id === catalogId);
+  if (!component) {
+    onDropError?.({ type: "INVALID_DATA", message: `Unknown catalog component: ${catalogId}` });
+    return true;
+  }
+
+  const activePage = composer.elements.getActivePage();
+  if (!activePage) {
+    onDropError?.({ type: "NO_VALID_TARGET", message: "No active page for catalog drop" });
+    return true;
+  }
+  const parentId = freshTargetId ?? activePage.root.id;
+
+  const result = placeCatalogComponent(composer, component, parentId);
+
+  if (result.elementId) {
+    onDropSuccess?.({ elementLabel: component.name, elementType: "container" });
+  } else {
+    onDropError?.({ type: "INSERT_FAILED", message: `Could not place ${component.name}` });
+  }
+  return true;
 }

@@ -29,11 +29,22 @@ import {
   handleMultiElementDrop,
   handleElementDrop,
   handleComponentDrop,
+  handleCatalogDrop,
   handleTemplateDrop,
   handleBlockDrop,
   type DropContext,
-  type DropPayloads,
 } from "./dropOperations";
+
+// Inline payload shape — dropOperations doesn't (yet) export this; was a
+// dangling import before S6 catalog drop landed. Inlining keeps the type
+// in lockstep with the dispatcher's pre-snapshot sites.
+interface DropPayloads {
+  multiData: string;
+  elementData: string;
+  componentId: string;
+  templateData: string;
+  blockData: string;
+}
 import type { SnapLine } from "../useCanvasSnapping";
 import type { DropError, DropSuccess } from "../useCanvasDragDrop";
 
@@ -163,12 +174,13 @@ export function useDropExecution({
       // DataTransfer object is only reliably readable inside the synchronous
       // native drop handler — a single microtask boundary (e.g. `await`) zeros
       // it out. We pre-read once and pass the cached payloads down.
-      const payloads: DropPayloads = {
+      const payloads: DropPayloads & { catalogComponentId: string } = {
         multiData: e.dataTransfer.getData("application/x-aquibra-multi"),
         elementData: e.dataTransfer.getData("element"),
         componentId: e.dataTransfer.getData("application/x-aquibra-component"),
         templateData: e.dataTransfer.getData("application/aquibra-template"),
         blockData: e.dataTransfer.getData("block"),
+        catalogComponentId: e.dataTransfer.getData("application/x-buildrik-catalog-component"),
       };
 
       resetSession();
@@ -255,6 +267,10 @@ export function useDropExecution({
       } else if ((handleElementDrop as any)(e, ctx, dropTargetId, payloads)) {
         dropSucceeded = true;
       } else if (await (handleComponentDrop as any)(e, ctx, payloads)) {
+        dropSucceeded = true;
+      } else if (handleCatalogDrop(e, ctx, payloads)) {
+        // S6 catalog drop. Payload is pre-snapshotted into `payloads` above
+        // so the dataTransfer microtask zero-out doesn't bite this branch.
         dropSucceeded = true;
       } else if ((handleTemplateDrop as any)(e, ctx, payloads)) {
         dropSucceeded = true;
