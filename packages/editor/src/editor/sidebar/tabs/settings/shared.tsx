@@ -18,8 +18,6 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  * Preserved for LockedScreen (token-only migration):
  *   <LockedContainer> <LockedIcon> <LockedTitle> <LockedDesc> <LockedBtn>
  *
- * Refreshed skin: <SettingsNavGuard>
- *
  * @license BSD-3-Clause
  */
 
@@ -231,46 +229,3 @@ export const LockedBtn: React.FC<
     {children}
   </Button>
 );
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SettingsNavGuard — refreshed skin
-// ─────────────────────────────────────────────────────────────────────────────
-
-interface SettingsNavGuardProps {
-  isOpen: boolean;
-  onDiscard: () => void;
-  onCancel: () => void;
-}
-
-export const SettingsNavGuard: React.FC<SettingsNavGuardProps> = ({
-  isOpen,
-  onDiscard,
-  onCancel,
-}) => {
-  if (!isOpen) return null;
-  return (
-    <div
-      className="bd-set-guard-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="bd-set-guard-title"
-    >
-      <div className="bd-set-guard-modal">
-        <h4 id="bd-set-guard-title" className="bd-set-guard-title">
-          Discard unsaved changes?
-        </h4>
-        <p className="bd-set-guard-body">
-          You have unsaved edits in this section. Switching will discard them. Save first to keep your changes.
-        </p>
-        <div className="bd-set-guard-actions">
-          <Button type="button" className="bd-set-btn sec" onClick={onCancel}>
-            Keep editing
-          </Button>
-          <Button type="button" className="bd-set-btn pri" onClick={onDiscard}>
-            Discard & switch
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-};
