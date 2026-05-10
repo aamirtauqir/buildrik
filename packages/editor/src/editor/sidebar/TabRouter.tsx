@@ -118,7 +118,13 @@ export const TabRouter: React.FC<TabRouterProps> = ({
       // behind VITE_FEATURE_COMPONENTS_V2. Default OFF — legacy single-section
       // ComponentsTab keeps shipping until the new path passes browser smoke.
       if (isFeatureEnabled("componentsV2")) {
-        return <ComponentsPanelV2 composer={composer} {...commonTabProps} />;
+        return (
+          <ComponentsPanelV2
+            composer={composer}
+            onJumpToDesign={onSwitchToDesign}
+            {...commonTabProps}
+          />
+        );
       }
       return (
         <ComponentsTab composer={composer} onCreateNew={onCreateComponent} {...commonTabProps} />
