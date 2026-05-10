@@ -19,6 +19,8 @@ export const FEATURES = {
   invite: env.VITE_FEATURE_INVITE === "true",
   /** Cloud sync (CloudSyncService + SyncManager). SCAFFOLD — never wired. */
   sync: env.VITE_FEATURE_SYNC === "true",
+  /** S6 dual-section Components panel (Catalog + UserSaved + DSStatusChip). */
+  componentsV2: env.VITE_FEATURE_COMPONENTS_V2 === "true",
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURES;

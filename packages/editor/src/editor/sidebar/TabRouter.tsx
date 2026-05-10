@@ -25,12 +25,16 @@ import type { Composer } from "../../engine";
 import type { GroupedTabId } from "../rail/tabsConfig";
 import type { BlockData } from "../../shared/types";
 import type { PublishResult } from "../../shared/hooks/usePublish";
+import { isFeatureEnabled } from "../../shared/utils/featureFlags";
 
 // Lazy-loaded panel tab components (code splitting)
 const BuildTab = React.lazy(() => import("./tabs/build").then((m) => ({ default: m.BuildTab })));
 const LayersTab = React.lazy(() => import("./tabs/layers/LayersTab"));
 const PagesTab = React.lazy(() => import("./tabs/pages/PagesTab"));
 const ComponentsTab = React.lazy(() => import("./tabs/ComponentsTab"));
+const ComponentsPanelV2 = React.lazy(() =>
+  import("@/editor/components-catalog/ui/ComponentsPanelV2").then((m) => ({ default: m.ComponentsPanelV2 })),
+);
 const MediaTab = React.lazy(() =>
   import("./tabs/media/MediaTab").then((m) => ({ default: m.MediaTab }))
 );
@@ -110,6 +114,12 @@ export const TabRouter: React.FC<TabRouterProps> = ({
       );
 
     case "components":
+      // S6: dual-section panel (Catalog + UserSaved + DSStatusChip) gated
+      // behind VITE_FEATURE_COMPONENTS_V2. Default OFF — legacy single-section
+      // ComponentsTab keeps shipping until the new path passes browser smoke.
+      if (isFeatureEnabled("componentsV2")) {
+        return <ComponentsPanelV2 composer={composer} {...commonTabProps} />;
+      }
       return (
         <ComponentsTab composer={composer} onCreateNew={onCreateComponent} {...commonTabProps} />
       );
