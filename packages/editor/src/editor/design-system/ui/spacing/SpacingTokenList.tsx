@@ -1,6 +1,15 @@
 /**
- * SpacingTokenList v11 — Spacing tab pane
- * Shows preset chips, spacing rows with colored bars, and semantic labels.
+ * SpacingTokenList v12 — prototype-faithful chip-pill grid view.
+ *
+ * Visual reference: docs/reference/left-panel/tab-design.html (Spacing
+ * section). Chip pills wrap the value (e.g., 4 / 8 / 12 / 16 / 20 / 24)
+ * — designer-grade dense surface vs v11 row-with-colored-bar list.
+ *
+ * Click a chip → inline edit drawer with number input + zero warning +
+ * undo/redo affordances. Preset chips (Compact / Normal / Spacious) stay
+ * at top. Reset-defaults stays. The colored-bar SVG + layout diagram are
+ * dropped — over-decoration vs the prototype's minimal chip surface.
+ *
  * @license BSD-3-Clause
  */
 
@@ -22,219 +31,13 @@ export interface SpacingTokenListProps {
   canRedo: (id: string) => boolean;
 }
 
-// ─── Semantic labels for spacing tokens ───────────────────────────────────────
-
-const SPACE_META: Record<string, { semantic: string; size: "xs" | "sm" | "md" | "lg" | "xl" }> = {
-  "space-1":  { semantic: "XS",  size: "xs" },
-  "space-2":  { semantic: "SM",  size: "sm" },
-  "space-3":  { semantic: "SM+", size: "sm" },
-  "space-4":  { semantic: "MD",  size: "md" },
-  "space-5":  { semantic: "MD+", size: "md" },
-  "space-6":  { semantic: "LG",  size: "lg" },
-  "space-8":  { semantic: "LG+", size: "lg" },
-  "space-10": { semantic: "XL",  size: "xl" },
-  "space-12": { semantic: "XL+", size: "xl" },
-};
-
-const BAR_COLORS: Record<"xs" | "sm" | "md" | "lg" | "xl", string> = {
-  xs: "#22c55e",
-  sm: "#3b82f6",
-  md: "#0891B2",
-  lg: "#f59e0b",
-  xl: "#ef4444",
-};
-
-/** Opacity variation per size — provides non-color differentiation for color-blind users */
-const BAR_OPACITY: Record<"xs" | "sm" | "md" | "lg" | "xl", number> = {
-  xs: 0.4,
-  sm: 0.55,
-  md: 0.7,
-  lg: 0.85,
-  xl: 1.0,
-};
-
-// ─── Spacing row ──────────────────────────────────────────────────────────────
-
-interface SpacingRowProps {
-  token: DesignToken;
-  onChange: (id: string, value: string) => void;
-  onUndo: (id: string) => void;
-  canUndo: boolean;
-  onRedo: (id: string) => void;
-  canRedo: boolean;
-}
-
-const SpacingRow: React.FC<SpacingRowProps> = ({
-  token,
-  onChange,
-  onUndo,
-  canUndo,
-  onRedo,
-  canRedo,
-}) => {
-  const meta = SPACE_META[token.id];
-  const size = parseFloat(token.value);
-  const barColor = meta ? BAR_COLORS[meta.size] : "#3b82f6";
-  const barOpacity = meta ? BAR_OPACITY[meta.size] : 0.7;
-
-  // Bar width: capped at 120px representing 48px spacing
-  const maxPx = 48;
-  const barWidth = Math.min((size / maxPx) * 120, 120);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const num = parseFloat(e.target.value);
-    if (!isNaN(num) && num >= 0) onChange(token.id, `${num}px`);
-  };
-
-  // Semantic label with current value, e.g. "XS — 4px"
-  const displayLabel = meta ? `${meta.semantic} — ${token.value}` : token.name;
-
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        padding: "7px 0",
-        borderBottom: "1px solid rgba(255,255,255,0.04)",
-      }}
-      aria-label={`${meta?.semantic ?? token.id} spacing: ${token.value}`}
-    >
-      {/* Semantic label */}
-      <div
-        style={{
-          width: 28,
-          flexShrink: 0,
-          fontSize: 12,
-          fontWeight: 700,
-          color: barColor,
-          letterSpacing: "0.3px",
-          textAlign: "right",
-        }}
-      >
-        {meta?.semantic ?? "—"}
-      </div>
-
-      {/* Token name + value */}
-      <div
-        style={{
-          width: 64,
-          flexShrink: 0,
-          fontSize: 12,
-          color: "var(--bd-fg-muted)",
-          fontFamily: "monospace",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-        }}
-        title={`${meta?.semantic ?? token.id} — ${token.value}`}
-      >
-        {displayLabel}
-      </div>
-
-      {/* Colored bar — opacity varies by size for non-color differentiation */}
-      <div
-        aria-hidden="true"
-        style={{
-          flex: 1,
-          height: 6,
-          background: "rgba(255,255,255,0.06)",
-          borderRadius: 3,
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            width: barWidth,
-            height: "100%",
-            background: barColor,
-            opacity: barOpacity,
-            borderRadius: 3,
-            transition: "width 0.2s, opacity 0.2s",
-          }}
-        />
-      </div>
-
-      {/* Number input */}
-      <input
-        type="number"
-        value={size}
-        min={0}
-        max={200}
-        step={1}
-        onChange={handleChange}
-        style={{
-          width: 44,
-          padding: "4px 6px",
-          background: "rgba(255,255,255,0.05)",
-          border: "1px solid var(--bd-border)",
-          borderRadius: 4,
-          color: "var(--bd-fg-primary)",
-          fontSize: 12,
-          textAlign: "right",
-          flexShrink: 0,
-        }}
-      />
-      <span style={{ fontSize: 12, color: "var(--bd-fg-muted)", flexShrink: 0 }}>px</span>
-
-      {/* Zero-spacing warning */}
-      {size === 0 && (
-        <span
-          title="Zero spacing will collapse layout gaps"
-          style={{ color: "var(--bd-warning)", fontSize: 12, flexShrink: 0 }}
-        >
-          ⚠
-        </span>
-      )}
-
-      {/* Undo button */}
-      {canUndo && (
-        <button
-          onClick={() => onUndo(token.id)}
-          title="Undo"
-          style={{
-            background: "none",
-            border: "none",
-            padding: 4,
-            cursor: "pointer",
-            color: "var(--bd-warning)",
-            fontSize: 13,
-            flexShrink: 0,
-          }}
-        >
-          ↩
-        </button>
-      )}
-
-      {/* Redo button */}
-      {canRedo && (
-        <button
-          onClick={() => onRedo(token.id)}
-          title="Redo"
-          style={{
-            background: "none",
-            border: "none",
-            padding: 4,
-            cursor: "pointer",
-            color: "var(--bd-accent)",
-            fontSize: 13,
-            flexShrink: 0,
-          }}
-        >
-          ↪
-        </button>
-      )}
-    </div>
-  );
-};
-
-// ─── Preset chip ──────────────────────────────────────────────────────────────
-
 const PRESET_LABELS: Record<SpacingPreset, string> = {
   compact: "Compact (2px)",
   normal: "Normal (4px)",
   spacious: "Spacious (6px)",
 };
+
+// ─── Preset chip ──────────────────────────────────────────────────────────────
 
 const PresetChip: React.FC<{
   preset: SpacingPreset;
@@ -242,16 +45,17 @@ const PresetChip: React.FC<{
   onApply: () => void;
 }> = ({ preset, isActive, onApply }) => (
   <button
+    type="button"
     onClick={onApply}
     style={{
-      padding: "5px 12px",
+      padding: "4px 10px",
       borderRadius: 20,
       border: "1px solid",
       borderColor: isActive ? "var(--bd-accent)" : "var(--bd-border)",
       background: isActive ? "rgba(45, 109, 255, 0.15)" : "transparent",
       color: isActive ? "var(--bd-accent)" : "var(--bd-fg-muted)",
-      fontSize: 12,
-      fontWeight: isActive ? 600 : 400,
+      fontSize: 11,
+      fontWeight: isActive ? 600 : 500,
       cursor: "pointer",
     }}
   >
@@ -259,75 +63,179 @@ const PresetChip: React.FC<{
   </button>
 );
 
-// ─── Spacing diagram (SVG) ────────────────────────────────────────────────────
+// ─── Value chip (the prototype-faithful primary surface) ──────────────────────
 
-const SpacingDiagram: React.FC<{ tokens: DesignToken[] }> = ({ tokens }) => {
-  const getVal = (id: string) => parseFloat(tokens.find((t) => t.id === id)?.value ?? "16");
+interface ValueChipProps {
+  token: DesignToken;
+  isActive: boolean;
+  isDirty: boolean;
+  onClick: () => void;
+}
 
+const ValueChip: React.FC<ValueChipProps> = ({ token, isActive, isDirty, onClick }) => {
+  const num = parseFloat(token.value);
+  const display = Number.isFinite(num) ? String(num) : token.value;
+  return (
+    <button
+      type="button"
+      role="listitem"
+      aria-label={`Edit spacing ${token.name} (${token.value})`}
+      aria-pressed={isActive}
+      onClick={onClick}
+      style={{
+        position: "relative",
+        padding: "5px 12px",
+        borderRadius: 5,
+        background: isActive ? "var(--bd-accent-tint, rgba(45,109,255,0.10))" : "var(--bd-bg-subtle)",
+        color: isActive ? "var(--bd-accent)" : "var(--bd-fg-primary)",
+        border: isActive ? "1px solid var(--bd-accent)" : "1px solid transparent",
+        font: "500 11px var(--buildrick-font-family-mono, ui-monospace, monospace)",
+        cursor: "pointer",
+        outline: "none",
+      }}
+    >
+      {display}
+      {isDirty && (
+        <span
+          aria-label="unsaved changes"
+          style={{
+            position: "absolute",
+            top: -2,
+            right: -2,
+            width: 6,
+            height: 6,
+            borderRadius: "50%",
+            background: "var(--bd-warning, #f59e0b)",
+          }}
+        />
+      )}
+    </button>
+  );
+};
+
+// ─── Edit drawer (inline below the chip grid) ─────────────────────────────────
+
+interface EditDrawerProps {
+  token: DesignToken;
+  onChange: (id: string, value: string) => void;
+  onUndo: (id: string) => void;
+  canUndo: boolean;
+  onRedo: (id: string) => void;
+  canRedo: boolean;
+  onClose: () => void;
+}
+
+const EditDrawer: React.FC<EditDrawerProps> = ({
+  token, onChange, onUndo, canUndo, onRedo, canRedo, onClose,
+}) => {
+  const num = parseFloat(token.value);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const next = parseFloat(e.target.value);
+    if (!Number.isNaN(next) && next >= 0) onChange(token.id, `${next}px`);
+  };
   return (
     <div
       style={{
-        padding: 12,
-        background: "rgba(255,255,255,0.02)",
-        borderRadius: 8,
-        border: "1px solid var(--bd-border)",
         marginTop: 8,
+        padding: 10,
+        background: "var(--bd-bg-subtle)",
+        border: "1px solid var(--bd-border)",
+        borderRadius: 8,
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
       }}
     >
-      <div
+      <span
         style={{
-          fontSize: 12,
-          fontWeight: 600,
-          color: "var(--bd-fg-muted)",
-          marginBottom: 8,
-          textTransform: "uppercase",
-          letterSpacing: "0.5px",
+          font: "500 11px var(--buildrick-font-family-mono, ui-monospace, monospace)",
+          color: "var(--bd-fg-primary)",
+          flex: 1,
         }}
       >
-        Layout Units
-      </div>
-      <svg width="100%" height="60" viewBox="0 0 220 60" fill="none">
-        <rect
-          x="4"
-          y="4"
-          width="212"
-          height="52"
-          rx="4"
-          stroke="rgba(255,255,255,0.1)"
-          strokeWidth="1"
-        />
-        <rect
-          x="4"
-          y="4"
-          width={Math.min(getVal("space-4") * 2, 40)}
-          height="52"
-          fill="rgba(8,145,178,0.15)"
-          rx="4"
-        />
-        <rect
-          x={220 - 4 - Math.min(getVal("space-4") * 2, 40)}
-          y="4"
-          width={Math.min(getVal("space-4") * 2, 40)}
-          height="52"
-          fill="rgba(8,145,178,0.15)"
-          rx="4"
-        />
-        <line
-          x1="110"
-          y1="10"
-          x2="110"
-          y2="50"
-          stroke="rgba(45, 109, 255, 0.4)"
-          strokeWidth="1"
-          strokeDasharray="3,2"
-        />
-        <text x="112" y="30" fontSize="8" fill="rgba(255,255,255,0.3)" dominantBaseline="middle">
-          gap: {getVal("space-4")}px
-        </text>
-      </svg>
+        {token.name}
+      </span>
+      <input
+        type="number"
+        aria-label={`Value for ${token.name}`}
+        value={Number.isFinite(num) ? num : 0}
+        min={0}
+        max={999}
+        step={1}
+        onChange={handleChange}
+        autoFocus
+        style={{
+          width: 60,
+          padding: "4px 6px",
+          background: "var(--bd-surface-1, #fff)",
+          border: "1px solid var(--bd-border)",
+          borderRadius: 4,
+          color: "var(--bd-fg-primary)",
+          font: "500 11px var(--buildrick-font-family-mono, ui-monospace, monospace)",
+          textAlign: "right",
+        }}
+      />
+      <span style={{ fontSize: 11, color: "var(--bd-fg-muted)" }}>px</span>
+      {num === 0 && (
+        <span
+          title="Zero spacing will collapse layout gaps"
+          style={{ color: "var(--bd-warning)", fontSize: 12 }}
+          aria-label="zero-spacing warning"
+        >
+          ⚠
+        </span>
+      )}
+      {canUndo && (
+        <button
+          type="button"
+          onClick={() => onUndo(token.id)}
+          title="Undo"
+          aria-label={`Undo change to ${token.name}`}
+          style={iconBtnStyle("var(--bd-warning)")}
+        >
+          ↩
+        </button>
+      )}
+      {canRedo && (
+        <button
+          type="button"
+          onClick={() => onRedo(token.id)}
+          title="Redo"
+          aria-label={`Redo change to ${token.name}`}
+          style={iconBtnStyle("var(--bd-accent)")}
+        >
+          ↪
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close edit drawer"
+        style={{
+          background: "none",
+          border: "none",
+          padding: 4,
+          cursor: "pointer",
+          color: "var(--bd-fg-muted)",
+          fontSize: 13,
+        }}
+      >
+        ×
+      </button>
     </div>
   );
 };
+
+function iconBtnStyle(color: string): React.CSSProperties {
+  return {
+    background: "none",
+    border: "none",
+    padding: 4,
+    cursor: "pointer",
+    color,
+    fontSize: 13,
+  };
+}
 
 // ─── SpacingTokenList ─────────────────────────────────────────────────────────
 
@@ -343,72 +251,125 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
   canUndo,
   onRedo,
   canRedo,
-}) => (
-  <div style={{ display: "flex", flexDirection: "column" }}>
-    {/* Preset chips + Reset defaults */}
-    <div style={{ display: "flex", gap: 6, marginBottom: 8, alignItems: "center" }}>
-      {(["compact", "normal", "spacious"] as SpacingPreset[]).map((p) => (
-        <PresetChip
-          key={p}
-          preset={p}
-          isActive={activePreset === p}
-          onApply={() => onPresetApply(p)}
-        />
-      ))}
-      <button
-        onClick={onResetToDefaults}
-        title="Reset all spacing to factory defaults"
-        style={{
-          padding: "5px 10px",
-          background: "transparent",
-          border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: 20,
-          color: "var(--bd-fg-muted)",
-          fontSize: 12,
-          cursor: "pointer",
-          marginLeft: "auto",
-        }}
-      >
-        Reset defaults
-      </button>
-    </div>
+}) => {
+  const [activeId, setActiveId] = React.useState<string | null>(null);
+  const activeToken = activeId ? tokens.find((t) => t.id === activeId) ?? null : null;
 
-    {/* Preset change warning banner */}
-    {activePreset !== savedPreset && isDirty && (
+  // Pending-diff is encoded by callers via the token's value vs initial state.
+  // SpacingTokenList itself doesn't track per-token diffs — we surface dirtiness
+  // at the component level (preset-change banner). Per-chip dirty marker requires
+  // a savedTokens reference, which the parent passes via the dirty banner.
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      {/* Preset chips + Reset defaults */}
+      <div style={{ display: "flex", gap: 6, marginBottom: 12, alignItems: "center" }}>
+        {(["compact", "normal", "spacious"] as SpacingPreset[]).map((p) => (
+          <PresetChip
+            key={p}
+            preset={p}
+            isActive={activePreset === p}
+            onApply={() => onPresetApply(p)}
+          />
+        ))}
+        <button
+          type="button"
+          onClick={onResetToDefaults}
+          title="Reset all spacing to factory defaults"
+          style={{
+            padding: "4px 10px",
+            background: "transparent",
+            border: "1px solid var(--bd-border)",
+            borderRadius: 20,
+            color: "var(--bd-fg-muted)",
+            fontSize: 11,
+            cursor: "pointer",
+            marginLeft: "auto",
+          }}
+        >
+          Reset defaults
+        </button>
+      </div>
+
+      {/* Preset change warning banner */}
+      {activePreset !== savedPreset && isDirty && (
+        <div
+          style={{
+            margin: "0 0 10px",
+            padding: "8px 10px",
+            background: "rgba(245,158,11,0.08)",
+            border: "1px solid rgba(245,158,11,0.2)",
+            borderRadius: 7,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
+          <span style={{ fontSize: 12, color: "rgba(245,158,11,0.9)", lineHeight: 1.5 }}>
+            ⚠ {tokens.length} spacing tokens updated. Review before applying.
+          </span>
+        </div>
+      )}
+
+      {/* Mono mini metadata header */}
       <div
         style={{
-          margin: "0 0 10px",
-          padding: "8px 10px",
-          background: "rgba(245,158,11,0.08)",
-          border: "1px solid rgba(245,158,11,0.2)",
-          borderRadius: 7,
           display: "flex",
           alignItems: "center",
-          gap: 6,
+          gap: 8,
+          marginBottom: 8,
         }}
       >
-        <span style={{ fontSize: 12, color: "rgba(245,158,11,0.9)", lineHeight: 1.5 }}>
-          ⚠ {tokens.length} spacing tokens updated. Review before applying.
+        <span
+          style={{
+            font: "600 10px var(--buildrick-font-family-mono, ui-monospace, monospace)",
+            color: "var(--bd-fg-muted)",
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+          }}
+        >
+          Scale
+        </span>
+        <div style={{ flex: 1, height: 1, background: "var(--bd-border)" }} />
+        <span
+          style={{
+            font: "500 10px var(--buildrick-font-family-mono, ui-monospace, monospace)",
+            color: "var(--bd-fg-secondary)",
+          }}
+        >
+          4-pt grid
         </span>
       </div>
-    )}
 
-    {/* Spacing rows */}
-    <div>
-      {tokens.map((token) => (
-        <SpacingRow
-          key={token.id}
-          token={token}
+      {/* Chip pill grid (prototype-faithful primary surface) */}
+      <div
+        role="list"
+        aria-label="Spacing tokens"
+        style={{ display: "flex", flexWrap: "wrap", gap: 4 }}
+      >
+        {tokens.map((t) => (
+          <ValueChip
+            key={t.id}
+            token={t}
+            isActive={activeId === t.id}
+            isDirty={false}
+            onClick={() => setActiveId((prev) => (prev === t.id ? null : t.id))}
+          />
+        ))}
+      </div>
+
+      {/* Inline edit drawer when a chip is active */}
+      {activeToken && (
+        <EditDrawer
+          token={activeToken}
           onChange={onTokenChange}
           onUndo={onUndo}
-          canUndo={canUndo(token.id)}
+          canUndo={canUndo(activeToken.id)}
           onRedo={onRedo}
-          canRedo={canRedo(token.id)}
+          canRedo={canRedo(activeToken.id)}
+          onClose={() => setActiveId(null)}
         />
-      ))}
+      )}
     </div>
-
-    {/* Layout diagram */}
-    <SpacingDiagram tokens={tokens} />
-  </div>
-);
+  );
+};
