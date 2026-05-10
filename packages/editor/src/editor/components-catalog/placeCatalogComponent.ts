@@ -1,38 +1,52 @@
 /**
  * placeCatalogComponent — insert a catalog ComponentType into the page tree.
  *
- * v1 minimal: creates a single placeholder <div> tagged with
- * data-buildrik-catalog-component + data-variant so future schema
- * interpretation can find and re-render it. Default-variant bindings are
- * stored as data attributes too — when the renderer ships, it reads these
- * to compose the live element.
+ * v2: schema-driven. Runs interpretSchema → applyInterpretedTree to produce
+ * the full element subtree per the catalog component's structure (h3+slot
+ * for Card, button+text for Button, etc.). Variant default bindings then
+ * apply as inline styles via cssVar refs so the runtime CSS resolves to
+ * `var(--buildrick-design-color-primary)` not the raw value — token edits
+ * propagate without re-rendering the catalog component.
  *
- * No nesting validation in v1 — caller's drop target resolution is the
- * gate. Wraps the insertion in a Composer transaction so a failure rolls
- * back cleanly (matches insertBlock contract from blocks/blockRegistry.ts).
+ * applyInterpretedTree owns the transaction, so a failure in any nested
+ * createElement/addChild rolls back the whole insertion cleanly.
  *
  * @license BSD-3-Clause
  */
 
 import type { Composer } from "@/engine";
-import type { ElementType } from "@/shared/types/element";
-import type { ComponentType } from "./types";
+import type { ComponentType, VariantBindings } from "./types";
+import { interpretSchema } from "./schemaInterpreter";
+import { applyInterpretedTree } from "./applyInterpretedTree";
+import { tokenToCssVar } from "@/editor/design-system/types";
 
 interface PlaceCatalogResult {
   elementId: string | undefined;
   variant: string;
 }
 
-/** Map catalog id → existing ElementType. Unmapped → "container" (safe default). */
-function elementTypeForCatalog(id: string): ElementType {
-  switch (id) {
-    case "button":  return "button";
-    case "input":   return "input";
-    case "section": return "section";
-    case "card":    return "container";
-    case "modal":   return "container";
-    default:        return "container";
+interface PlaceOptions {
+  /** Caller can override the default first-variant pick. */
+  variant?: string;
+  /** Forwarded to interpretSchema for {props.X} substitution. */
+  props?: Record<string, unknown>;
+}
+
+/**
+ * Convert a variant's PartialBindings into a styles record consumable by
+ * Element.setStyles. Each binding becomes `cssProperty: var(--token-cssVar)`
+ * so propagation stays O(1) — token edits change the var, not the binding.
+ */
+function bindingsToStyles(
+  defaultBindings: VariantBindings,
+  variant: string,
+): Record<string, string> {
+  const variantBindings = defaultBindings[variant] ?? {};
+  const out: Record<string, string> = {};
+  for (const [css, b] of Object.entries(variantBindings)) {
+    out[css] = `var(${tokenToCssVar(b.tokenId)})`;
   }
+  return out;
 }
 
 export function placeCatalogComponent(
@@ -40,31 +54,27 @@ export function placeCatalogComponent(
   component: ComponentType,
   parentId: string,
   dropIndex?: number,
+  options: PlaceOptions = {},
 ): PlaceCatalogResult {
-  const variant = component.variants[0] ?? "default";
+  const variant = options.variant ?? component.variants[0] ?? "default";
 
-  composer.beginTransaction("place-catalog-component");
-  try {
-    const parent = composer.elements.getElement(parentId);
-    if (!parent) {
-      composer.rollbackTransaction();
-      return { elementId: undefined, variant };
-    }
+  const interpreted = interpretSchema(component, {
+    variant,
+    catalogId: component.id,
+    props: options.props,
+  });
 
-    const element = composer.elements.createElement(elementTypeForCatalog(component.id), {
-      content: component.name,
-      attributes: {
-        "data-buildrik-catalog-component": component.id,
-        "data-variant": variant,
-      },
-    } as Parameters<typeof composer.elements.createElement>[1]);
+  const { rootElementId } = applyInterpretedTree(composer, parentId, interpreted, dropIndex);
+  if (!rootElementId) return { elementId: undefined, variant };
 
-    parent.addChild(element, dropIndex);
-
-    composer.endTransaction();
-    return { elementId: element.getId(), variant };
-  } catch {
-    composer.rollbackTransaction();
-    return { elementId: undefined, variant };
+  // Apply variant default-bindings as inline styles on the root element.
+  // Done outside applyInterpretedTree so the applier stays generic — bindings
+  // are catalog-specific concern, not a schema concern.
+  const styles = bindingsToStyles(component.defaultBindings, variant);
+  if (Object.keys(styles).length > 0) {
+    const rootEl = composer.elements.getElement(rootElementId);
+    rootEl?.setStyles(styles);
   }
+
+  return { elementId: rootElementId, variant };
 }
