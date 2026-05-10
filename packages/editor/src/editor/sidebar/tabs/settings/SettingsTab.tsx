@@ -36,6 +36,8 @@ import {
   LocalizationScreen,
   SettingsNavGuard,
 } from "./index";
+import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
+import { useReducedMotion } from "@/shared/hooks/useReducedMotion";
 import "./settings.css";
 
 // ─── Nav definition ──────────────────────────────────────────────────────────
@@ -249,6 +251,53 @@ export const SettingsTab: React.FC<
   const pendingNavRef = React.useRef<InTabNavId | null>(null);
   const [resetKey, setResetKey] = React.useState(0);
 
+  const prefersReducedMotion = useReducedMotion();
+
+  // v2 layout state — see docs/designs/settings-v2.md §3.
+  //
+  // `isRoot=true` shows the snav root; `isRoot=false` shows the drilled-in
+  // section. `sectionMounted` is the lifecycle gate: section is mounted when
+  // user clicks a row (BEFORE isRoot flips, so CSS has a node to animate),
+  // unmounted only after pop transitionend completes. `transitioning` blocks
+  // re-entrant nav during the 180ms animation window (D20).
+  const [isRoot, setIsRoot] = React.useState(true);
+  const [sectionMounted, setSectionMounted] = React.useState(false);
+  const [transitioning, setTransitioning] = React.useState(false);
+  const sectionRef = React.useRef<HTMLDivElement | null>(null);
+
+  // Codex P0 #1: shadow screenIsDirty into a ref so click-handlers (navigate,
+  // Escape) read the LATEST value synchronously, not the post-render state.
+  // Screens push dirty via a post-render useEffect — without this ref, a click
+  // in the same gesture as an edit reads stale false.
+  //
+  // Codex pass-3 acknowledged limitation: BOTH the screen's onDirtyChange
+  // effect AND this ref-mirror effect are post-render. A truly synchronous
+  // edit+click within the SAME microtask (no event-loop boundary) could still
+  // see stale false. This is unreachable for human input — browser keystroke
+  // and click events are separated by paint cycles, so React commits the
+  // edit's effects before processing the click. Tests drive both via
+  // `fireEvent` + `waitFor` so the propagation chain has time to land.
+  //
+  // Architectural fix (deferred): change useSettingsScreen to publish dirty
+  // SYNCHRONOUSLY via a ref prop instead of via post-render onDirtyChange.
+  // Touches 4 screens (Site, Advanced, SEO, Analytics) + the hook contract.
+  // Out of v2 scope — separate arc when programmatic edit+nav becomes a real
+  // path (e.g., hotkey-driven save+navigate gesture).
+  const screenIsDirtyRef = React.useRef(false);
+  React.useEffect(() => {
+    screenIsDirtyRef.current = screenIsDirty;
+  }, [screenIsDirty]);
+
+  // Codex P0 #2: track last-focused snav row so pop can restore focus.
+  // Set in renderRow's onClick (Task 4); read in navigateToRoot transitionend.
+  const lastFocusedRowRef = React.useRef<HTMLButtonElement | null>(null);
+
+  // Forward-declare the breadcrumb-current focus target. Section assigns this
+  // ref via DrillInHeader's internals — but DrillInHeader's existing mount
+  // effect handles initial focus. We only need a ref here for re-focus after
+  // section→section nav (when section stays mounted).
+  const sectionFocusRef = React.useRef<HTMLElement | null>(null);
+
   // Server-side screens (Redirects/Headers/Localization) write directly via
   // tRPC, not through composer state. They register their own save handler so
   // the central savebar's Save invokes the right write path instead of a
@@ -279,6 +328,156 @@ export const SettingsTab: React.FC<
     setDirtyCount(dirty ? 1 : 0);
   }, []);
 
+  // Push: snav root → section. Mounts section first, then flips isRoot on next
+  // rAF tick so CSS transition has a starting state. Reduced-motion path skips
+  // both the animation AND the input lock — render is instant.
+  //
+  // Codex P0 #1: read screenIsDirtyRef.current (not state) — click in same
+  // gesture as edit must see latest dirty.
+  // Codex P0 #2: blur active element before flipping isRoot so focus does not
+  // remain inside what becomes aria-hidden=true. DrillInHeader's mount effect
+  // will then place focus on breadcrumb-current.
+  const navigate = React.useCallback(
+    (nextId: InTabNavId) => {
+      if (transitioning) return;
+      if (nextId === currentScreen && !isRoot) return;
+      // Section→section nav: caller is already drilled-in. Route through
+      // navigateBetweenSections to avoid the push state-machine deadlock
+      // (Codex P0 #3).
+      if (!isRoot) {
+        navigateBetweenSections(nextId);
+        return;
+      }
+      if (screenIsDirtyRef.current) {
+        pendingNavRef.current = nextId;
+        setGuardOpen(true);
+        return;
+      }
+      // Codex P0 #2: blur the clicked snav row before root becomes aria-hidden.
+      (document.activeElement as HTMLElement | null)?.blur?.();
+      navigateTo(nextId);
+      setSectionMounted(true);
+
+      if (prefersReducedMotion) {
+        setIsRoot(false);
+        return;
+      }
+      setTransitioning(true);
+      requestAnimationFrame(() => setIsRoot(false));
+    },
+    // navigateBetweenSections is hoisted via function-declaration below — not
+    // in deps array (function-decl identity is stable across renders).
+    [currentScreen, isRoot, navigateTo, transitioning, prefersReducedMotion],
+  );
+
+  // Pop: section → snav. Section stays mounted during animation; transitionend
+  // handler unmounts it AND restores focus to the originating snav row.
+  // Reduced-motion path unmounts immediately + restores focus inline.
+  //
+  // Codex P0 #1 pass-2 hardening: navigateToRoot also reads
+  // screenIsDirtyRef.current (NOT the prop chain through DrillInHeader's
+  // isDirty) so back-button + Escape + any other pop path are guarded.
+  // DrillInHeader's onBackAttempt prop fires on stale-but-positive isDirty
+  // reads; navigateToRoot fires on stale-and-negative isDirty reads. Both
+  // safety paths converge here.
+  //
+  // Codex P0 #2: blur active element so focus does not stay inside the
+  // section as it becomes aria-hidden=true.
+  const navigateToRoot = React.useCallback(() => {
+    if (transitioning) return;
+    // Codex P0 #1: dirty re-check at navigate-time, not just at click-time.
+    // A dirty edit landing in the same gesture as a back-click can leave
+    // DrillInHeader's prop view as isDirty=false; trust the ref.
+    if (screenIsDirtyRef.current) {
+      pendingNavRef.current = null; // null = back-attempt path (not pending-nav)
+      setGuardOpen(true);
+      return;
+    }
+    (document.activeElement as HTMLElement | null)?.blur?.();
+    if (prefersReducedMotion) {
+      setIsRoot(true);
+      setSectionMounted(false);
+      // Restore focus to the row that opened this section (best effort).
+      setTimeout(() => lastFocusedRowRef.current?.focus(), 0);
+      return;
+    }
+    setTransitioning(true);
+    setIsRoot(true);
+  }, [transitioning, prefersReducedMotion]);
+
+  // Section→section nav (in-section→in-section, no animation, no lock).
+  // Used by:
+  //   - Branding section's onJumpTo (jumps to general / seo)
+  //   - ConfirmDialog discard branch when pendingNav targets a different
+  //     section while user is already drilled-in
+  //
+  // Force-remounts the section content via resetKey so focus + screen-state
+  // fully reset; sectionMounted stays true; isRoot stays false.
+  //
+  // Function declaration (not useCallback) so navigate's deps array stays
+  // stable — function-decl identity does not change across renders.
+  function navigateBetweenSections(nextId: InTabNavId) {
+    if (nextId === currentScreen) return;
+    if (transitioning) return;
+    navigateTo(nextId);
+    setResetKey((k) => k + 1);
+    setScreenIsDirty(false);
+    setDirtyCount(0);
+    // DrillInHeader unmounts + remounts because of resetKey-keyed wrapper —
+    // its own mount effect will refire and focus breadcrumb-current.
+  }
+
+  const handleStackTransitionEnd = React.useCallback(
+    (e: React.TransitionEvent<HTMLDivElement>) => {
+      // Only act on transform completion (filter out opacity events).
+      if (e.propertyName !== "transform") return;
+      // Section's pop animation completed → unmount it + restore focus.
+      if (e.target === sectionRef.current && isRoot) {
+        setSectionMounted(false);
+        // Codex P0 #2: focus the row that opened this section so keyboard
+        // users land back in a meaningful place after the pop.
+        setTimeout(() => lastFocusedRowRef.current?.focus(), 0);
+      }
+      // Either screen finishing its transform clears the navigation block.
+      setTransitioning(false);
+    },
+    [isRoot],
+  );
+
+  // Settings v2 owns Escape. DrillInHeader is opted out via
+  // enableDocumentEscape={false}. ConfirmDialog handles its own Escape via
+  // onEscapeKeyDown preventDefault (Task 2).
+  //
+  // Codex P0 #1: read screenIsDirtyRef.current (sync), not state — Escape in
+  // the same tick as an edit must see the latest dirty value. The ref-shadow
+  // effect (Step 1) guarantees ref is at-most-one-render stale; for click +
+  // keydown handlers, that's already the latest value.
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (guardOpen) return; // ConfirmDialog will handle via onEscapeKeyDown
+      if (isRoot) return;    // already at root, nothing to pop
+      if (transitioning) return;
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) {
+        return; // input handles its own Escape (blur/clear)
+      }
+      e.preventDefault();
+      if (screenIsDirtyRef.current) {
+        setGuardOpen(true);
+      } else {
+        navigateToRoot();
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [guardOpen, isRoot, transitioning, navigateToRoot]);
+
+  // handleNav retained for the unchanged peer-layout JSX (Task 3 leaves
+  // render alone; Task 4 swaps the JSX to use `navigate` directly). Behavior
+  // here is byte-identical to the pre-Task-3 implementation so existing tests
+  // and rendered output stay unchanged through this commit.
   const handleNav = React.useCallback(
     (nextId: InTabNavId) => {
       if (nextId === currentScreen) return;
@@ -289,7 +488,7 @@ export const SettingsTab: React.FC<
       }
       navigateTo(nextId);
     },
-    [currentScreen, screenIsDirty, navigateTo]
+    [currentScreen, screenIsDirty, navigateTo],
   );
 
   const handleDiscard = React.useCallback(() => {
