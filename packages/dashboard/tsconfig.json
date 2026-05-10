@@ -25,7 +25,8 @@
     "paths": {
       "@/*": [
         "./*",
-        "../../*"
+        "../../*",
+        "../editor/src/*"
       ],
       "@server/*": [
         "../../server/*"
@@ -35,6 +36,15 @@
       ],
       "@buildrik/shared/*": [
         "../shared/*"
+      ],
+      "@shared/*": [
+        "../editor/src/shared/*"
+      ],
+      "@hooks/*": [
+        "../editor/src/hooks/*"
+      ],
+      "@utils/*": [
+        "../editor/src/utils/*"
       ]
     }
   },

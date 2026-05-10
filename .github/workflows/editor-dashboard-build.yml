@@ -1,0 +1,44 @@
+name: Editor to Dashboard build gate
+
+on:
+  pull_request:
+    paths:
+      - "packages/editor/**"
+      - "packages/shared/**"
+      - "packages/dashboard/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+  push:
+    branches: [main]
+
+jobs:
+  dashboard-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+        continue-on-error: true
+
+      - name: Build dashboard
+        working-directory: packages/dashboard
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_UNIFIED_EDITOR: "false"
+          NEXTAUTH_SECRET: "ci-build-only"
+          DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci"
