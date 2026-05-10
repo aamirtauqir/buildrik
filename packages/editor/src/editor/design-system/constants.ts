@@ -3,7 +3,7 @@
  * @license BSD-3-Clause
  */
 
-import type { DesignToken } from "./types";
+import type { DesignToken, StylePreset } from "./types";
 
 export const TOKEN_CATEGORIES = {
   COLORS: "colors",
@@ -642,3 +642,11 @@ export const DEFAULT_TOKENS: DesignToken[] = [
   { id: "icon-default", name: "Default icon size", value: "16px", category: "icons", cssVar: "--bd-icon-default", type: "length", kind: "icon", friendlyName: "Default icon size" },
   { id: "imagery-placeholder", name: "Placeholder image", value: "https://placehold.co/600x400", category: "theme", cssVar: "--bd-imagery-placeholder", type: "string", kind: "imagery", friendlyName: "Placeholder image" },
 ];
+
+/**
+ * Default style presets seeded into a fresh project. E4 populates this with
+ * a small starter set across the 11 categories — placeholder empty array for
+ * now so StylePresetRegistryProvider can boot without crashing while E2/E3
+ * land first. Don't add presets here; do it in E4 with the full audit pass.
+ */
+export const DEFAULT_PRESETS: StylePreset[] = [];
