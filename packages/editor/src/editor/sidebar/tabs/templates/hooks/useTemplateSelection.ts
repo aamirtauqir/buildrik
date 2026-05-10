@@ -55,7 +55,16 @@ export function useTemplateSelection(showProgress: boolean): UseTemplateSelectio
   const [subCategory, setSubCategory] = React.useState<string | null>(null);
   const [currentPage, setCurrentPage] = React.useState(1);
 
+  // Auto-set templateType when top-level pill changes.
+  React.useEffect(() => {
+    if (activeFilter === "site-pages") setTemplateType("page");
+    else if (activeFilter === "sections") setTemplateType("section");
+    else setTemplateType(null);
+  }, [activeFilter]);
+
   const filteredTemplates = React.useMemo(() => {
+    // "my-templates" is a placeholder — user-saved templates are a separate arc.
+    if (activeFilter === "my-templates") return [];
     const q = searchQ.toLowerCase().trim();
     return SITE_TEMPLATES.filter((t) => {
       const mq = !q || t.name.toLowerCase().includes(q);
