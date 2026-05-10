@@ -12,6 +12,7 @@ import * as React from "react";
 import { BindingPopover } from "./components/BindingPopover";
 import { BreakpointPill } from "./components/BreakpointPill";
 import { InspectorTabs } from "./components/InspectorTabs";
+import { DetachInstanceButton } from "@/editor/components-catalog/ui/DetachInstanceButton";
 import { StatePills } from "./components/StatePills";
 import type { Composer } from "../../engine";
 import { BREAKPOINTS, isValidBreakpoint } from "../../shared/constants/breakpoints";
@@ -395,6 +396,12 @@ export const ProInspector: React.FC<ProInspectorProps> = ({
           </Button>
         )}
         <span className="bdi-sz">{bpSizeLabel}</span>
+        {/* S6: detach catalog/user-saved instance — pro-mode only, hides
+            itself when selectedElement is not an instance. Self-gated. */}
+        <DetachInstanceButton
+          composer={composer ?? null}
+          selectedElementId={selectedElement?.id}
+        />
       </div>
       {/* Scrollable body */}
       <div
