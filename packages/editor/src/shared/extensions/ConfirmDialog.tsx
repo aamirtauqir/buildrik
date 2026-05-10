@@ -19,10 +19,18 @@ import {
 type ModalContentExtendedProps = React.ComponentProps<typeof ModalContent> & {
   /**
    * Radix.Dialog.Content forwards this prop at runtime even though
-   * ModalContent's TS type does not declare it. Settings v2 needs explicit
-   * preventDefault so SettingsTab's document-Escape listener (which moved
-   * out of DrillInHeader) does not also fire and pop the section while the
-   * dialog is dismissing.
+   * ModalContent's TS type does not declare it (Modal.tsx E2 rule: NO
+   * Radix types in public API). Settings v2 needs explicit preventDefault
+   * so SettingsTab's document-Escape listener (which Settings v2 will add
+   * in Task 3 of the v2 drill-in drawer arc, once DrillInHeader is
+   * opted-out via enableDocumentEscape=false) does not also fire and pop
+   * the section while the dialog is dismissing.
+   *
+   * If a second consumer needs this or another DismissableLayer prop
+   * (onPointerDownOutside, onInteractOutside), promote it to a
+   * vibcoder-owned escape hatch on ModalContentProps rather than copying
+   * this cast pattern. The wrapper should expose a vibcoder-shaped prop
+   * with a wrapper-owned signature, NOT leak the Radix type.
    */
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
 };
