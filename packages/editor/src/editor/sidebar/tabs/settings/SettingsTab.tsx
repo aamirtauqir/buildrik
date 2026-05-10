@@ -292,12 +292,6 @@ export const SettingsTab: React.FC<
   // Set in renderRow's onClick (Task 4); read in navigateToRoot transitionend.
   const lastFocusedRowRef = React.useRef<HTMLButtonElement | null>(null);
 
-  // Forward-declare the breadcrumb-current focus target. Section assigns this
-  // ref via DrillInHeader's internals — but DrillInHeader's existing mount
-  // effect handles initial focus. We only need a ref here for re-focus after
-  // section→section nav (when section stays mounted).
-  const sectionFocusRef = React.useRef<HTMLElement | null>(null);
-
   // Server-side screens (Redirects/Headers/Localization) write directly via
   // tRPC, not through composer state. They register their own save handler so
   // the central savebar's Save invokes the right write path instead of a
@@ -365,8 +359,13 @@ export const SettingsTab: React.FC<
       setTransitioning(true);
       requestAnimationFrame(() => setIsRoot(false));
     },
-    // navigateBetweenSections is hoisted via function-declaration below — not
-    // in deps array (function-decl identity is stable across renders).
+    // navigateBetweenSections is omitted from deps because it only closes over
+    // currentScreen / transitioning / navigateTo + stable setters — all
+    // non-setter deps are already listed below, so navigate is rebuilt
+    // whenever they change and the new closure picks up the latest
+    // navigateBetweenSections function. (Function declarations DO get
+    // re-instantiated every render; the safety comes from closure-over-deps,
+    // not declaration identity.)
     [currentScreen, isRoot, navigateTo, transitioning, prefersReducedMotion],
   );
 
@@ -414,8 +413,10 @@ export const SettingsTab: React.FC<
   // Force-remounts the section content via resetKey so focus + screen-state
   // fully reset; sectionMounted stays true; isRoot stays false.
   //
-  // Function declaration (not useCallback) so navigate's deps array stays
-  // stable — function-decl identity does not change across renders.
+  // Function declaration form (not useCallback). The render closure rebuilds
+  // it each time, but its callers (navigate, JSX onClick handlers in Task 4)
+  // are themselves rebuilt by React when their deps change, so they pick up
+  // the freshest navigateBetweenSections automatically.
   function navigateBetweenSections(nextId: InTabNavId) {
     if (nextId === currentScreen) return;
     if (transitioning) return;
