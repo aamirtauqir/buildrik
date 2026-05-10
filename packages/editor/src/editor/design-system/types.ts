@@ -138,3 +138,41 @@ export const CATEGORY_CHIPS = [
   { id: "icons", label: "Icons", icon: "◈" },
   { id: "theme", label: "Theme", icon: "◑" },
 ];
+
+// ============================================================================
+// PHASE B — STYLE PRESETS (spec §5.4)
+// ============================================================================
+
+/** Spec §5.4 preset categories — 11 total. */
+export type PresetCategory =
+  | "button" | "card" | "form" | "link"
+  | "badge" | "alert" | "tooltip" | "modal"
+  | "nav" | "table" | "layout";
+
+/**
+ * One preset binding maps a CSS property name to a token reference.
+ * The runtime CSS becomes `<property>: var(<tokenId.cssVar>)` so the
+ * user's :root token edits propagate without per-binding recomputation.
+ *
+ * Raw values are forbidden by design — every preset binding must reference
+ * an existing token id. Validation lives in the binding-editor UI (S2.1)
+ * and the eventual D7 DSLinter rule (preset-bindings-must-resolve).
+ */
+export interface PresetBinding {
+  tokenId: string;
+}
+
+/**
+ * Style preset record — one row in the StylesSection editor.
+ *
+ * Persistence: parallel to DesignToken. Loaded via Composer.getProjectSettings()
+ * .designPresets. Friendly name is the only beginner-mode editable field
+ * in v1; binding editor + variant rename land in S2.1.
+ */
+export interface StylePreset {
+  id: string;                       // e.g. "button-primary"
+  friendlyName: string;             // e.g. "Primary button"
+  category: PresetCategory;
+  variant: string;                  // e.g. "primary" | "secondary" | "ghost"
+  bindings: Record<string, PresetBinding>;
+}
