@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/react";
 import * as React from "react";
 import { CatalogSection } from "../CatalogSection";
+import { CATALOG } from "../../catalog";
 
 describe("CatalogSection", () => {
   it("renders three tier groups", () => {
@@ -13,8 +14,8 @@ describe("CatalogSection", () => {
 
   it("renders one CatalogRow per catalog component", () => {
     const { container } = render(<CatalogSection />);
-    // CE2 ships 5 components total.
-    expect(container.querySelectorAll("[data-catalog-row]").length).toBe(5);
+    // Lock to live CATALOG length so future expansions don't break this.
+    expect(container.querySelectorAll("[data-catalog-row]").length).toBe(CATALOG.length);
   });
 
   it("search query filters rows", () => {

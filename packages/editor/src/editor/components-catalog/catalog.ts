@@ -85,6 +85,155 @@ export const CATALOG: ComponentType[] = [
     },
   },
 
+  {
+    id: "select",
+    category: "atom",
+    name: "Select",
+    variants: ["default"],
+    sizes: ["md"],
+    schema: {
+      props: {
+        placeholder: { type: "string", default: "Select an option…" },
+        disabled: { type: "boolean", default: false },
+      },
+      structure: { type: "element", tag: "select" },
+    },
+    defaultBindings: {
+      default: {
+        "border":         { tokenId: "input-border" },
+        "border-radius":  { tokenId: "input-radius" },
+        "padding-inline": { tokenId: "input-padding-x" },
+        "height":         { tokenId: "input-height" },
+        "font-size":      { tokenId: "font-size-base" },
+        "background-color": { tokenId: "color-background" },
+        "color":          { tokenId: "color-text" },
+      },
+    },
+  },
+  {
+    id: "checkbox",
+    category: "atom",
+    name: "Checkbox",
+    variants: ["default"],
+    schema: {
+      props: {
+        checked: { type: "boolean", default: false },
+        disabled: { type: "boolean", default: false },
+      },
+      structure: {
+        type: "element",
+        tag: "input",
+        attrs: { type: "checkbox" },
+      },
+    },
+    defaultBindings: {
+      default: {
+        "border":        { tokenId: "input-border" },
+        "border-radius": { tokenId: "radius-sm" },
+        "color":         { tokenId: "color-primary" },
+      },
+    },
+  },
+  {
+    id: "radio",
+    category: "atom",
+    name: "Radio",
+    variants: ["default"],
+    schema: {
+      props: {
+        name: { type: "string", default: "group" },
+        checked: { type: "boolean", default: false },
+        disabled: { type: "boolean", default: false },
+      },
+      structure: {
+        type: "element",
+        tag: "input",
+        attrs: { type: "radio" },
+      },
+    },
+    defaultBindings: {
+      default: {
+        "border":        { tokenId: "input-border" },
+        "border-radius": { tokenId: "radius-full" },
+        "color":         { tokenId: "color-primary" },
+      },
+    },
+  },
+  {
+    id: "switch",
+    category: "atom",
+    name: "Switch",
+    variants: ["default"],
+    schema: {
+      props: {
+        checked: { type: "boolean", default: false },
+        disabled: { type: "boolean", default: false },
+      },
+      structure: {
+        type: "element",
+        tag: "button",
+        attrs: { type: "button", role: "switch" },
+      },
+    },
+    defaultBindings: {
+      default: {
+        "background-color":     { tokenId: "color-secondary" },
+        "border-radius":        { tokenId: "radius-full" },
+        "transition-duration":  { tokenId: "motion-fast" },
+        "height":               { tokenId: "btn-height-sm" },
+      },
+    },
+  },
+  {
+    id: "label",
+    category: "atom",
+    name: "Label",
+    variants: ["default"],
+    schema: {
+      props: {
+        text: { type: "string", default: "Label" },
+        for: { type: "string" },
+      },
+      structure: {
+        type: "element",
+        tag: "label",
+        children: [{ type: "text", source: "props.text" }],
+      },
+    },
+    defaultBindings: {
+      default: {
+        "font-size":   { tokenId: "label-font-size" },
+        "font-weight": { tokenId: "label-weight" },
+        "color":       { tokenId: "color-text" },
+      },
+    },
+  },
+  {
+    id: "spinner",
+    category: "atom",
+    name: "Spinner",
+    variants: ["default"],
+    sizes: ["sm", "md", "lg"],
+    schema: {
+      props: {
+        label: { type: "string", default: "Loading" },
+      },
+      structure: {
+        type: "element",
+        tag: "div",
+        attrs: { role: "status", "aria-live": "polite" },
+      },
+    },
+    defaultBindings: {
+      default: {
+        "color":               { tokenId: "color-primary" },
+        "border":              { tokenId: "border-default" },
+        "border-radius":       { tokenId: "radius-full" },
+        "transition-duration": { tokenId: "motion-slow" },
+      },
+    },
+  },
+
   // ─── Molecules ───────────────────────────────────────────────────────────
   {
     id: "card",
