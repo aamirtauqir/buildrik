@@ -20,6 +20,7 @@ import { CSSBundler } from "../../bundler";
 import { buildExport, downloadFile, type ExportFormat } from "../../utils/exportUtils";
 import type { DesignToken } from "../../types";
 import type { BundleOptions } from "../../bundler/CSSBundler";
+import { ImportCard } from "./ImportCard";
 
 const containerStyle: React.CSSProperties = {
   display: "flex",
@@ -217,6 +218,8 @@ export const ExportSection: React.FC = () => {
           {preview}
         </pre>
       </div>
+
+      <ImportCard />
     </div>
   );
 };

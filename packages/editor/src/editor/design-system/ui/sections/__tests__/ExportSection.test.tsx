@@ -39,9 +39,9 @@ beforeEach(() => {
 describe("ExportSection", () => {
   it("renders 3 format radio options", () => {
     const { getByLabelText } = render(wrap(<ExportSection />));
-    expect(getByLabelText(/CSS/i)).toBeTruthy();
-    expect(getByLabelText(/JSON/i)).toBeTruthy();
-    expect(getByLabelText(/Tailwind/i)).toBeTruthy();
+    expect(getByLabelText("CSS Variables")).toBeTruthy();
+    expect(getByLabelText("JSON")).toBeTruthy();
+    expect(getByLabelText("Tailwind Config")).toBeTruthy();
   });
 
   it("preview pane shows :root block by default (CSS format)", () => {
@@ -53,14 +53,14 @@ describe("ExportSection", () => {
 
   it("switching to JSON re-renders preview as JSON array", () => {
     const { getByLabelText, getByTestId } = render(wrap(<ExportSection />));
-    fireEvent.click(getByLabelText(/JSON/i));
+    fireEvent.click(getByLabelText("JSON"));
     const preview = getByTestId("export-preview");
     expect(preview.textContent?.trim().startsWith("[")).toBe(true);
   });
 
   it("switching to Tailwind re-renders preview as JS module", () => {
     const { getByLabelText, getByTestId } = render(wrap(<ExportSection />));
-    fireEvent.click(getByLabelText(/Tailwind/i));
+    fireEvent.click(getByLabelText("Tailwind Config"));
     const preview = getByTestId("export-preview");
     expect(preview.textContent).toContain("module.exports");
   });
