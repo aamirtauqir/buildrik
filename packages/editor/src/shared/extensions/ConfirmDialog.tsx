@@ -6,6 +6,7 @@
  *
  * @license BSD-3-Clause
  */
+import * as React from "react";
 import {
   Modal,
   ModalContent,
@@ -14,6 +15,17 @@ import {
   OverlayMount,
   Button,
 } from "@/editor/shared/vibcoder";
+
+type ModalContentExtendedProps = React.ComponentProps<typeof ModalContent> & {
+  /**
+   * Radix.Dialog.Content forwards this prop at runtime even though
+   * ModalContent's TS type does not declare it. Settings v2 needs explicit
+   * preventDefault so SettingsTab's document-Escape listener (which moved
+   * out of DrillInHeader) does not also fire and pop the section while the
+   * dialog is dismissing.
+   */
+  onEscapeKeyDown?: (event: KeyboardEvent) => void;
+};
 
 export interface ConfirmDialogProps {
   isOpen: boolean;
@@ -44,7 +56,15 @@ export function ConfirmDialog({
           if (!next) onClose();
         }}
       >
-        <ModalContent size="lg">
+        <ModalContent
+          size="lg"
+          {...({
+            onEscapeKeyDown: (event: KeyboardEvent) => {
+              event.preventDefault();
+              onClose();
+            },
+          } as ModalContentExtendedProps)}
+        >
           <ModalTitle>{title}</ModalTitle>
           <ModalClose aria-label="Close modal">
             <svg
