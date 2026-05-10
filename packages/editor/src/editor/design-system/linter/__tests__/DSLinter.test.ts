@@ -1,12 +1,25 @@
 import { describe, it, expect } from "vitest";
 import { DSLinter } from "../DSLinter";
-import type { DesignToken } from "../../types";
+import type { DesignToken, StylePreset, PresetBinding } from "../../types";
 
 function makeColor(id: string, value: string, darkValue?: string): DesignToken {
   return {
     id, name: id, value,
     category: "colors", cssVar: `--bd-${id}`, type: "color", kind: "color",
     ...(darkValue !== undefined ? { darkValue } : {}),
+  };
+}
+
+function bind(tokenId: string): PresetBinding {
+  return { tokenId };
+}
+
+function makePreset(
+  id: string,
+  bindings: Record<string, PresetBinding>,
+): StylePreset {
+  return {
+    id, friendlyName: id, category: "button", variant: "default", bindings,
   };
 }
 
@@ -108,6 +121,66 @@ describe("DSLinter.lint", () => {
     const issues = new DSLinter().lint(tokens);
     expect(issues[0].tokenId).toBe("a");
     expect(issues[1].tokenId).toBe("b");
+  });
+});
+
+describe("DSLinter.lintPresets", () => {
+  it("returns empty array when every binding resolves", () => {
+    const tokens = [
+      makeColor("color-primary", "#2D6DFF"),
+      makeColor("color-on-primary", "#FFFFFF"),
+    ];
+    const presets = [
+      makePreset("button-primary", {
+        backgroundColor: bind("color-primary"),
+        color: bind("color-on-primary"),
+      }),
+    ];
+    expect(new DSLinter().lintPresets(presets, tokens)).toEqual([]);
+  });
+
+  it("flags one issue per unresolved binding (error severity)", () => {
+    const tokens = [makeColor("color-primary", "#2D6DFF")];
+    const presets = [
+      makePreset("button-primary", {
+        backgroundColor: bind("color-primary"),
+        color: bind("color-ghost"),
+        borderColor: bind("color-vanished"),
+      }),
+    ];
+    const issues = new DSLinter().lintPresets(presets, tokens);
+    expect(issues).toHaveLength(2);
+    expect(issues.every((i) => i.rule === "unresolved-binding")).toBe(true);
+    expect(issues.every((i) => i.severity === "error")).toBe(true);
+  });
+
+  it("encodes preset.css in tokenId for UI row-scoping", () => {
+    const presets = [
+      makePreset("button-primary", { backgroundColor: bind("color-missing") }),
+    ];
+    const issues = new DSLinter().lintPresets(presets, []);
+    expect(issues[0].tokenId).toBe("button-primary.backgroundColor");
+    expect(issues[0].message).toContain("button-primary");
+    expect(issues[0].message).toContain("backgroundColor");
+    expect(issues[0].message).toContain("color-missing");
+  });
+
+  it("scans across multiple presets", () => {
+    const tokens = [makeColor("color-primary", "#2D6DFF")];
+    const presets = [
+      makePreset("button-primary", { backgroundColor: bind("color-primary") }),
+      makePreset("button-ghost", { borderColor: bind("color-orphaned") }),
+      makePreset("card-elevated", { backgroundColor: bind("color-also-gone") }),
+    ];
+    const issues = new DSLinter().lintPresets(presets, tokens);
+    expect(issues.map((i) => i.tokenId).sort()).toEqual([
+      "button-ghost.borderColor",
+      "card-elevated.backgroundColor",
+    ]);
+  });
+
+  it("returns empty when presets array is empty (no false positives)", () => {
+    expect(new DSLinter().lintPresets([], [])).toEqual([]);
   });
 });
 

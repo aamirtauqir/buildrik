@@ -1,4 +1,4 @@
-import type { DesignToken } from "../types";
+import type { DesignToken, StylePreset } from "../types";
 
 export type LintSeverity = "warning" | "error";
 
@@ -13,7 +13,8 @@ export type LintRuleId =
   | "banned-hue"
   | "pure-black"
   | "empty-value"
-  | "missing-dark";
+  | "missing-dark"
+  | "unresolved-binding";
 
 /**
  * Phase H.0: DSLinter — pure-function checker for design-token violations.
@@ -106,6 +107,36 @@ export class DSLinter {
   /** Filter helper — caller often wants only error-severity issues. */
   errors(tokens: readonly DesignToken[]): LintIssue[] {
     return this.lint(tokens).filter((i) => i.severity === "error");
+  }
+
+  /**
+   * Phase B/S2.1 follow-up: scan preset bindings, ensure every tokenId
+   * resolves against the live token registry. Per spec §5.4 raw values
+   * are forbidden; this catches the orthogonal failure — a binding that
+   * references an id which has been deleted or renamed.
+   *
+   * Returns issues with tokenId field set to "${presetId}.${cssProperty}"
+   * so UI consumers can render a row-scoped warning chip.
+   */
+  lintPresets(
+    presets: readonly StylePreset[],
+    tokens: readonly DesignToken[],
+  ): LintIssue[] {
+    const tokenIds = new Set(tokens.map((t) => t.id));
+    const issues: LintIssue[] = [];
+    for (const p of presets) {
+      for (const [css, b] of Object.entries(p.bindings)) {
+        if (!tokenIds.has(b.tokenId)) {
+          issues.push({
+            rule: "unresolved-binding",
+            severity: "error",
+            tokenId: `${p.id}.${css}`,
+            message: `Preset "${p.id}" binding ${css} → unknown token "${b.tokenId}".`,
+          });
+        }
+      }
+    }
+    return issues;
   }
 }
 
