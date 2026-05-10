@@ -95,9 +95,14 @@ interface KindRegistryLike {
 }
 
 function dirtyCount(reg: KindRegistryLike): number {
+  // Counts both modifications (id present in saved with different value) AND
+  // additions (id not in saved at all). Pre-fix this only counted modifications,
+  // so import-via-add and AddTokenModal both shipped tokens silently — no
+  // section-tab dot, no DraftChip count increment. Removals are not counted
+  // here; deleteToken UX is a separate concern.
   return reg.tokens.filter((t) => {
     const saved = reg.savedTokens.find((s) => s.id === t.id);
-    return saved !== undefined && t.value !== saved.value;
+    return saved === undefined || t.value !== saved.value;
   }).length;
 }
 

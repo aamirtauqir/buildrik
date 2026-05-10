@@ -124,4 +124,41 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
       expect(container.querySelector('[aria-label="unsaved changes"]')).toBeTruthy();
     });
   });
+
+  it("ADD via import lights the dirty marker (was silent before dirtyCount fix)", async () => {
+    const composer = makeFakeComposer();
+    const { getAllByRole, getByLabelText, getByText, getByRole, container, findByText } =
+      render(wrap(<DesignSystemTab composer={composer} />));
+
+    const buttons = getAllByRole("button");
+    const sectionExport = buttons.find(
+      (b) => b.textContent === "Export" && !b.hasAttribute("aria-haspopup"),
+    );
+    if (!sectionExport) throw new Error("Export section button missing");
+    fireEvent.click(sectionExport);
+
+    const payload = JSON.stringify([
+      {
+        id: "color-brand-new",
+        name: "Brand New",
+        value: "#00FF99",
+        category: "colors",
+        cssVar: "--buildrick-design-color-brand-new",
+        type: "color",
+        kind: "color",
+      },
+    ]);
+
+    fireEvent.change(getByLabelText("Paste JSON"), { target: { value: payload } });
+    fireEvent.click(getByRole("button", { name: "Preview" }));
+    await findByText(/1 added/i);
+    fireEvent.click(getByText(/Apply Import/i));
+
+    // Dirty marker MUST appear for adds, not just modifications. Pre-fix,
+    // dirtyCount() at DesignSystemTab.tsx:97 only counted saved !== undefined
+    // → adds passed silently and the user lost visual confirmation.
+    await waitFor(() => {
+      expect(container.querySelector('[aria-label="unsaved changes"]')).toBeTruthy();
+    });
+  });
 });
