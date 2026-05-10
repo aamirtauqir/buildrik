@@ -785,6 +785,12 @@ export const SettingsTab: React.FC<
           setGuardOpen(false);
           setScreenIsDirty(false);
           setDirtyCount(0);
+          // Codex C1 fix: prime screenIsDirtyRef synchronously so navigateToRoot's
+          // dirty-check (which reads the ref) sees the cleared value. Without
+          // this, the ref-mirror useEffect hasn't flushed yet (we're still
+          // inside the synchronous click handler), and navigateToRoot would
+          // re-open the guard instead of popping to root.
+          screenIsDirtyRef.current = false;
           if (!isRoot && next === null) {
             navigateToRoot();
             return;
