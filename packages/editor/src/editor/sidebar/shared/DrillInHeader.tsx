@@ -31,6 +31,21 @@ export interface DrillInHeaderProps {
   onHelpClick?: () => void;
   /** Callback when close button is clicked */
   onClose?: () => void;
+  /**
+   * Where to send focus on mount.
+   * "back" (default) preserves current behavior.
+   * "breadcrumb-current" focuses the breadcrumb's current-page span as a
+   *   heading-like landmark — used by settings v2 for screen-reader
+   *   announcement of "section, group" combined.
+   */
+  focusTarget?: "back" | "breadcrumb-current";
+  /**
+   * When false, DrillInHeader skips its document-level Escape listener.
+   * Settings v2 passes false so the parent SettingsTab can handle Escape
+   * with knowledge of modal state (guardOpen / isRoot / transitioning).
+   * Default true for backwards-compat with ComponentDetailScreen.
+   */
+  enableDocumentEscape?: boolean;
 }
 
 export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
@@ -44,6 +59,8 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
   onPinToggle,
   onHelpClick,
   onClose,
+  focusTarget = "back",
+  enableDocumentEscape = true,
 }) => {
   const handleBackClick = () => {
     if (isDirty && onBackAttempt) {
@@ -53,15 +70,30 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
     }
   };
 
-  // Focus back button on mount for keyboard accessibility
+  // Focus target on mount + on title change for keyboard accessibility.
+  // Codex pass-2 P1 (new): include `title` in deps so section→section
+  // navigation (which keeps DrillInHeader mounted) re-focuses the
+  // breadcrumb-current span when the title flips. Without this, focus
+  // stays on the prior section's heading and screen readers do not
+  // re-announce the new section.
   const backBtnRef = React.useRef<HTMLButtonElement>(null);
+  const breadcrumbCurrentRef = React.useRef<HTMLSpanElement>(null);
   React.useEffect(() => {
-    const timer = setTimeout(() => backBtnRef.current?.focus(), 50);
+    const timer = setTimeout(() => {
+      if (focusTarget === "breadcrumb-current") {
+        breadcrumbCurrentRef.current?.focus();
+      } else {
+        backBtnRef.current?.focus();
+      }
+    }, 50);
     return () => clearTimeout(timer);
-  }, []);
+  }, [focusTarget, title]);
 
-  // Handle keyboard navigation (Escape → go back, unless user is in an input)
+  // Handle keyboard navigation (Escape → go back, unless user is in an input).
+  // Opt-out via enableDocumentEscape=false; settings v2 owns Escape at parent
+  // because it must consult guardOpen / isRoot / transitioning.
   React.useEffect(() => {
+    if (!enableDocumentEscape) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !e.defaultPrevented) {
         const target = e.target as HTMLElement;
@@ -79,9 +111,14 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [onBack, isDirty, onBackAttempt]);
+  }, [onBack, isDirty, onBackAttempt, enableDocumentEscape]);
 
   const breadcrumbPath = breadcrumb || [parentName, title];
+  const groupLabel = breadcrumbPath[0];
+  const headingAriaLabel =
+    focusTarget === "breadcrumb-current" && groupLabel
+      ? `${title}, ${groupLabel}`
+      : undefined;
 
   return (
     <header style={drillInHeaderContainerStyles}>
@@ -90,7 +127,6 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
         <Button
           ref={backBtnRef}
           onClick={handleBackClick}
-         
           style={backButtonStyles}
           title={`Back to ${parentName}`}
           aria-label={`Back to ${parentName}`}
@@ -101,19 +137,37 @@ export const DrillInHeader: React.FC<DrillInHeaderProps> = ({
 
         {/* Breadcrumb (smaller, below back button) */}
         <nav style={breadcrumbStyles} aria-label="Breadcrumb">
-          {breadcrumbPath.map((item, index) => (
-            <React.Fragment key={index}>
-              {index > 0 && <span style={breadcrumbSeparatorStyles}>/</span>}
-              <span
-                style={{
-                  ...breadcrumbItemStyles,
-                  ...(index === breadcrumbPath.length - 1 ? breadcrumbCurrentStyles : {}),
-                }}
-              >
-                {item}
-              </span>
-            </React.Fragment>
-          ))}
+          {breadcrumbPath.map((item, index) => {
+            const isCurrent = index === breadcrumbPath.length - 1;
+            const isFocusableCurrent =
+              isCurrent && focusTarget === "breadcrumb-current";
+            return (
+              <React.Fragment key={index}>
+                {index > 0 && <span style={breadcrumbSeparatorStyles}>/</span>}
+                {isFocusableCurrent ? (
+                  <span
+                    ref={breadcrumbCurrentRef}
+                    role="heading"
+                    aria-level={2}
+                    aria-label={headingAriaLabel}
+                    tabIndex={-1}
+                    style={{ ...breadcrumbItemStyles, ...breadcrumbCurrentStyles }}
+                  >
+                    {item}
+                  </span>
+                ) : (
+                  <span
+                    style={{
+                      ...breadcrumbItemStyles,
+                      ...(isCurrent ? breadcrumbCurrentStyles : {}),
+                    }}
+                  >
+                    {item}
+                  </span>
+                )}
+              </React.Fragment>
+            );
+          })}
         </nav>
       </div>
       {/* Action buttons */}
