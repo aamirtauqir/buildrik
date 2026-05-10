@@ -31,6 +31,13 @@ import {
   useRegistryConfig,
   useResetAllKinds,
 } from "../state/TokenRegistryContext";
+import {
+  useButtonPresets, useCardPresets, useFormPresets, useLinkPresets,
+  useBadgePresets, useAlertPresets, useTooltipPresets, useModalPresets,
+  useNavPresets, useTablePresets, useLayoutPresets,
+  usePresetRegistryConfig,
+} from "../state/StylePresetRegistryContext";
+import type { StylePreset } from "../types";
 import { useTokenUsageMap } from "../state/useTokenUsageMap";
 import type { DesignToken } from "../types";
 import { CURRENT_SCHEMA_VERSION, migrateDesignTokens } from "../migrations";
@@ -50,7 +57,7 @@ import { AddTokenModal } from "./modals/AddTokenModal";
 import { ReviewModal } from "./modals/ReviewModal";
 import { TabGuardModal } from "./modals/TabGuardModal";
 import { TokensSection } from "./sections/TokensSection";
-import { StylesSection } from "./sections/StylesSection";
+import { StylesSection, useStylesSectionTotalDirty } from "./sections/StylesSection";
 import { ComponentsSection } from "./sections/ComponentsSection";
 import { ExportSection } from "./sections/ExportSection";
 
@@ -159,12 +166,33 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
   const { persistAll } = useRegistryConfig();
   const resetAllKinds = useResetAllKinds();
 
+  // S2: preset registries — fanned out so handleApply can persist + markSaved
+  // them in lockstep with tokens. Same pattern as the 14 token registries.
+  const buttonPresets   = useButtonPresets();
+  const cardPresets     = useCardPresets();
+  const formPresets     = useFormPresets();
+  const linkPresets     = useLinkPresets();
+  const badgePresets    = useBadgePresets();
+  const alertPresets    = useAlertPresets();
+  const tooltipPresets  = useTooltipPresets();
+  const modalPresets    = useModalPresets();
+  const navPresets      = useNavPresets();
+  const tablePresets    = useTablePresets();
+  const layoutPresets   = useLayoutPresets();
+  const { persistAll: persistAllPresets } = usePresetRegistryConfig();
+  const allPresetRegistries = [
+    buttonPresets, cardPresets, formPresets, linkPresets, badgePresets, alertPresets,
+    tooltipPresets, modalPresets, navPresets, tablePresets, layoutPresets,
+  ];
+
   const allRegistries: KindRegistryLike[] = [
     color, type, spacing, radius, shadow, motion, border,
     opacity, zindex, breakpoint, grid, sizing, icon, imagery,
   ];
 
-  const totalDirty = allRegistries.reduce((n, r) => n + dirtyCount(r), 0);
+  const tokensDirty = allRegistries.reduce((n, r) => n + dirtyCount(r), 0);
+  const stylesDirty = useStylesSectionTotalDirty();
+  const totalDirty = tokensDirty + stylesDirty;
   const isDirty = totalDirty > 0;
 
   const isDirtyRef = React.useRef(isDirty);
@@ -302,15 +330,25 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         group: t.group,
       }));
 
+    // S2: pull all 11 preset categories into a flat record array for persistence.
+    const allPresets: StylePreset[] = allPresetRegistries.flatMap((r) => r.presets);
+    const presetRecords = allPresets.map((p) => ({
+      id: p.id, friendlyName: p.friendlyName, category: p.category,
+      variant: p.variant, bindings: p.bindings,
+    }));
+
     try {
       const current = composer.getProjectSettings();
       composer.setProjectSettings({
         ...current,
         designTokens: tokenRecords,
         designTokensSchemaVersion: CURRENT_SCHEMA_VERSION,
+        designPresets: presetRecords,
       });
       persistAll();
+      persistAllPresets();
       allRegistries.forEach((r) => r.markSaved());
+      allPresetRegistries.forEach((r) => r.markSaved());
       setShowReview(false);
       setIsFirstLoad(false);
       addToast({ description: "Design tokens applied successfully", tone: "success" });
@@ -415,7 +453,9 @@ export const DesignSystemTab: React.FC<DesignSystemTabProps> = ({
         }}
       >
         {SECTIONS.map((s) => {
-          const dirtyHere = s.id === "tokens" && isDirty;
+          const dirtyHere =
+            (s.id === "tokens" && tokensDirty > 0) ||
+            (s.id === "styles" && stylesDirty > 0);
           return (
             <button
               key={s.id}

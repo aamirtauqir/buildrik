@@ -3,6 +3,7 @@ import { render, fireEvent, waitFor } from "@testing-library/react";
 import * as React from "react";
 import { DesignSystemTab } from "../DesignSystemTab";
 import { TokenRegistryProvider } from "../../state/TokenRegistryContext";
+import { StylePresetRegistryProvider } from "../../state/StylePresetRegistryContext";
 import { DSModeProvider } from "../../state/DSModeContext";
 import { ToastProvider } from "@/editor/shared/vibcoder";
 
@@ -31,7 +32,9 @@ function makeFakeComposer() {
 const wrap = (ui: React.ReactNode) => (
   <ToastProvider>
     <DSModeProvider initialMode="pro">
-      <TokenRegistryProvider projectId="export-section-int">{ui}</TokenRegistryProvider>
+      <TokenRegistryProvider projectId="export-section-int">
+        <StylePresetRegistryProvider projectId="export-section-int">{ui}</StylePresetRegistryProvider>
+      </TokenRegistryProvider>
     </DSModeProvider>
   </ToastProvider>
 );

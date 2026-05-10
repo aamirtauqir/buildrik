@@ -139,10 +139,26 @@ function composeProviders(
 // HOOKS
 // ============================================================================
 
-function useCategoryRegistry(category: PresetCategory, hookName: string): PresetsForCategoryRegistry {
+// Fallback so consumers rendered outside StylePresetRegistryProvider (isolated
+// tests, AI-modal previews) don't crash. Returns an empty registry with no-op
+// actions — mirrors the FALLBACK_COLOR/FALLBACK_SPACING/FALLBACK_TYPE pattern
+// in TokenRegistryContext for color/spacing/type. Mutations are silent no-ops.
+const noop = () => {};
+const FALLBACK_REGISTRY: PresetsForCategoryRegistry = {
+  presets: [],
+  savedPresets: [],
+  isDirty: false,
+  updatePreset: noop,
+  addPreset: noop,
+  deletePreset: noop,
+  markSaved: noop,
+  discardAll: noop,
+  hydrateFromExternal: noop,
+};
+
+function useCategoryRegistry(category: PresetCategory, _hookName: string): PresetsForCategoryRegistry {
   const ctx = React.useContext(CONTEXT_BY_CATEGORY[category]);
-  if (!ctx) throw new Error(`${hookName} must be used within StylePresetRegistryProvider`);
-  return ctx;
+  return ctx ?? FALLBACK_REGISTRY;
 }
 
 export const useButtonPresets   = (): PresetsForCategoryRegistry => useCategoryRegistry("button",   "useButtonPresets");

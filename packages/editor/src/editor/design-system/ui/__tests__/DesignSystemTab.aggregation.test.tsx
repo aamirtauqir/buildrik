@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as React from "react";
 import { DesignSystemTab } from "../DesignSystemTab";
 import { TokenRegistryProvider } from "../../state/TokenRegistryContext";
+import { StylePresetRegistryProvider } from "../../state/StylePresetRegistryContext";
 import { DSModeProvider } from "../../state/DSModeContext";
 import { ToastProvider } from "@/editor/shared/vibcoder";
 
@@ -32,7 +33,9 @@ const wrap = (ui: React.ReactNode) => (
   <ToastProvider>
     <DSModeProvider initialMode="pro">
       <TokenRegistryProvider projectId="agg-test">
-        {ui}
+        <StylePresetRegistryProvider projectId="agg-test">
+          {ui}
+        </StylePresetRegistryProvider>
       </TokenRegistryProvider>
     </DSModeProvider>
   </ToastProvider>

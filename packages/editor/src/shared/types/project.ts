@@ -233,8 +233,26 @@ export interface ProjectSettings {
   designTokensSchemaVersion?: number;
   /** Design tokens (CSS custom properties) */
   designTokens?: DesignTokenRecord[];
+  /** Style presets — Phase B preset infra, S2. */
+  designPresets?: DesignPresetRecord[];
   /** Custom code injection (head scripts, body scripts, global CSS) */
   customCode?: CustomCodeConfig;
+}
+
+/**
+ * Serializable style preset for project settings (Phase B / S2).
+ * Bindings are flat `cssProperty -> { tokenId }` pairs so the JSON stays
+ * self-describing without referencing the runtime DesignToken interface.
+ */
+export interface DesignPresetRecord {
+  id: string;
+  friendlyName: string;
+  category:
+    | "button" | "card" | "form" | "link"
+    | "badge" | "alert" | "tooltip" | "modal"
+    | "nav" | "table" | "layout";
+  variant: string;
+  bindings: Record<string, { tokenId: string }>;
 }
 
 /** Serializable design token for project settings */
