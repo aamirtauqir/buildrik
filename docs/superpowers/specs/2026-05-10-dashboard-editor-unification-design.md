@@ -163,21 +163,56 @@ Service layer (`server/services/*`) and tRPC routers untouched. Integration is a
 // components/editor-route/editor-link.ts
 import { get } from '@vercel/edge-config';
 
-// Server-side: source of truth
-export async function isUnifiedEditorEnabled(): Promise<boolean> {
+// Server-side: source of truth (called from app/layout.tsx server component)
+export async function readUnifiedEditorFlag(): Promise<boolean> {
   if (process.env.NODE_ENV !== 'production') return process.env.NEXT_PUBLIC_UNIFIED_EDITOR === 'true';
   return (await get<boolean>('unifiedEditor')) ?? false;
 }
 
-// Server component helper
-export async function getEditorHref(siteId: string): Promise<string> {
-  if (await isUnifiedEditorEnabled()) return `/edit/${siteId}`;
+// Sync client-side helper. Takes flag from context. Eng review D3 — avoids async ripple in 10 call sites.
+export function getEditorHref(siteId: string, unified: boolean): string {
+  if (unified) return `/edit/${siteId}`;
   const legacy = process.env.NEXT_PUBLIC_EDITOR_URL || 'http://localhost:5050';
   return `${legacy}/?siteId=${siteId}`;
 }
+
+// React Context — wraps app at root layout. Sync hook for client code.
+export const UnifiedEditorFlagContext = createContext(false);
+export function useUnifiedEditorFlag(): boolean {
+  return useContext(UnifiedEditorFlagContext);
+}
 ```
 
-For client-side React components (site cards, command palette items), the flag value is hydrated from a server component into a React Context provider once at app boot. Flipping the flag doesn't update the cached client value mid-session — but the next page load reads the new value (still <10s server propagation, then user-side on next navigation).
+```tsx
+// app/layout.tsx (server component)
+import { readUnifiedEditorFlag } from '@/components/editor-route/editor-link';
+
+export default async function RootLayout({ children }) {
+  const unified = await readUnifiedEditorFlag();
+  return (
+    <html lang="en">
+      <body>
+        <UnifiedEditorFlagContext.Provider value={unified}>
+          <TRPCProvider>{children}</TRPCProvider>
+        </UnifiedEditorFlagContext.Provider>
+      </body>
+    </html>
+  );
+}
+```
+
+```tsx
+// usage in any client component
+'use client';
+import { useUnifiedEditorFlag, getEditorHref } from '@/components/editor-route/editor-link';
+
+function SiteCard({ site }) {
+  const unified = useUnifiedEditorFlag();
+  return <a href={getEditorHref(site.id, unified)}>Edit</a>;
+}
+```
+
+Server reads Edge Config once per request. Client code reads sync from context — no async ripple, no stale-closure traps. Flipping the flag in Edge Config takes effect on next page nav (cached value lives for the session). Mitigation aligns with `feedback_setter_closure_stale_state.md` (3 setter-closure bugs this week — sync access pattern avoids the trap).
 
 **Three deployment phases:**
 
@@ -458,6 +493,7 @@ Before any actual integration, prove the Vite-built editor compiles inside Next/
 - [ ] Move font `<link>` from editor `index.html` → dashboard `app/layout.tsx`
 - [ ] Add `@buildrik/editor` workspace dep to `packages/dashboard/package.json`
 - [ ] Smoke test `/edit/<known-id>` directly (flag false; not yet user-visible). Verify: SSR skeleton paints in <50ms; chunk download starts; AquibraStudio replaces skeleton without flash
+- [ ] **CI gate (eng review D1):** add GitHub Actions workflow `.github/workflows/editor-dashboard-build.yml`. Trigger: PR touching `packages/editor/**`. Step: `pnpm --filter @buildrik/dashboard build`. Required check before merge. Catches editor changes that break dashboard build at PR time, not at Vercel deploy time. Mitigates fault-isolation loss accepted in CEO review tension #3
 - [ ] Codex review checkpoint #2
 
 ### Phase 2 — Call site migration (flag still OFF)
@@ -515,13 +551,23 @@ Before any actual integration, prove the Vite-built editor compiles inside Next/
 
 | Test | Asserts |
 |---|---|
-| `editor-link.test.ts` | flag true → `/edit/X`; flag false → `${legacy}/?siteId=X` |
-| `getSiteIdFromUrl.test.ts` | `/edit/abc` → `abc`; `?siteId=abc` → `abc`; `/edit/abc?foo=bar` → `abc`; root → null |
-| `userCanEditSite.test.ts` | member → true; non-member → false; missing site → false |
+| `editor-link.test.ts` | flag true → `/edit/X`; flag false → `${legacy}/?siteId=X`; mock @vercel/edge-config for prod path; verify dev fallback to `process.env.NEXT_PUBLIC_UNIFIED_EDITOR` returns identical shape (eng review D2) |
+| `editor-link-encoding.test.ts` | siteId with URL-special chars (`abc def`, `abc%20def`) returns properly-encoded href (eng review D4) |
+| `editor-link-context.test.tsx` | `useUnifiedEditorFlag()` returns context value when wrapped; returns false when called outside provider (no throw) (eng review D4) |
+| `readUnifiedEditorFlag.test.ts` | dev mode reads `NEXT_PUBLIC_*`; prod reads `@vercel/edge-config`; both return false on read error (no throw) (eng review D4) |
+| `getSiteIdFromUrl.test.ts` | `/edit/abc` → `abc`; `?siteId=abc` → `abc`; `/edit/abc?foo=bar` → `abc`; root → null; `/edit/abc%20def` → decoded `abc def` (eng review D4) |
+| `userCanEditSite.test.ts` | member → true; non-member → false; missing site → false; Prisma init error → throws (caught by page.tsx) (eng review D4) |
 | `EditorClient.test.tsx` | renders skeleton on load; renders AquibraStudio after mount |
+| `EditorErrorBoundary.test.tsx` | ChunkLoadError → onRetry calls window.location.reload; generic error → onRetry calls retry callback; renders fallback prop (eng review D4) |
+| `EditorClient-key-remount.test.tsx` | changing siteId prop forces full remount of AquibraStudio (no state leak between sites) (eng review D4 — cherry-pick #3 race) |
 | `editor-skeleton-hydration.test.tsx` | SSR skeleton dimensions match AquibraStudio first paint within ±2px (cherry-pick #2 drift guard) |
-| `command-registry.test.ts` | `registerCommand` returns working `unregister`; `getActiveCommands('/edit/X')` returns dashboard + editor; `getActiveCommands('/dashboard/sites')` returns dashboard only; no leaks between mounts (cherry-pick #4) |
+| `EditorSkeleton-tokens.test.tsx` | rendered skeleton uses `--buildrick-*` CSS vars (eng review D4 — D13 CSS isolation guard) |
+| `command-registry.test.ts` | `registerCommand` returns working `unregister`; `getActiveCommands('/edit/X')` returns dashboard + editor; `getActiveCommands('/dashboard/sites')` returns dashboard only; no leaks between mounts; `visibleWhen` returns false → command excluded (cherry-pick #4) |
+| `CommandPaletteRoot.test.tsx` | Cmd+K opens palette; Esc closes; click action calls then closes; binding suppressed when input focused (eng review D4) |
 | `editor-link-prefetch.test.tsx` | `<EditorLink>` triggers `userCanEditSite` query on `mouseenter`; debounced; cancelled on `mouseleave` (cherry-pick #1) |
+| `editor-link-prefetch-click.test.tsx` | hover then click within debounce window does NOT double-fire userCanEditSite (eng review D4) |
+| `unified-flag-context.test.tsx` | flipping flag value mid-session — cached context value persists; next-page nav reads new value (eng review D4) |
+| `EditPage-auth-throw.test.tsx` | auth() throws → page returns error page (not 500); user redirected to login with error toast (eng review D4) |
 
 ### Integration tests
 
@@ -530,6 +576,25 @@ Before any actual integration, prove the Vite-built editor compiles inside Next/
 | `app/edit/[siteId]/page.test.tsx` | unauthed → redirects to login; non-member → 404; member → renders EditorClient |
 | `editor-mount-smoke.test.tsx` | full mount in jsdom: AquibraStudio reaches `composer ready` |
 | `tRPC sameOrigin.test.ts` | mock fetch from editor route hits `/api/trpc/...` without `Origin`, no preflight |
+| `css-isolation.test.tsx` | render `<DashboardLayout>` in isolation: no `--buildrick-*` vars on root; render `<EditorClient>`: vars resolve only inside `.bd-studio` scope (eng review D4 — D13 verification) |
+| `cross-origin-inventory.test.ts` | static assertion: grep `packages/editor/src/` for `editor.buildrik.com`/`localhost:3000`/`credentials: 'include'` literals → expect zero hits after Phase 0 D14 cleanup |
+
+### E2E tests (Playwright)
+
+| Test | Asserts |
+|---|---|
+| `e2e/edit-flag-on.spec.ts` | flag ON → click Edit → /edit/[id] mounts; SSR skeleton paints first; canvas paints; autosave fires (eng review D4 cherry-pick #2/#3) |
+| `e2e/edit-flag-off.spec.ts` | flag OFF → click Edit → editor.buildrik.com (Vite legacy); flag flip mid-session, next nav goes to /edit/[id] (eng review D4) |
+| `e2e/soft-route-siteid-swap.spec.ts` | open /edit/A, edit canvas, soft-route to /edit/B, autosave for A flushes before unmount, B mounts fresh (eng review D4 — cherry-pick #3 race) |
+| `e2e/cmdk-context.spec.ts` | Cmd+K from /dashboard/sites shows dashboard cmds only; Cmd+K from /edit/[id] shows dash+editor; running editor cmd from dashboard not possible (eng review D4 — cherry-pick #4) |
+| `e2e/cmdk-action-soft-nav.spec.ts` | command running router.push transitions soft-routed; React tree persists; back-button returns instantly (eng review D4 — cherry-picks #3+#4) |
+| `e2e/auth-gate-edit.spec.ts` | logged-out → /edit/X → /auth/login?next=/edit/X redirect; non-member → /edit/X → 404; member → loads (eng review D4) |
+| `e2e/chunk-load-error.spec.ts` | Phase 1 deploy + force chunk URL miss → ChunkLoadError boundary fires + Reload button shown + reload recovers (eng review D4) |
+| `e2e/hover-prefetch.spec.ts` | hover Edit on site card → network panel shows userCanEditSite query fired; hover off mid-fetch → query cancelled; hover then click → instant nav (cached) (eng review D4 — cherry-pick #1) |
+| `e2e/observability.spec.ts` | flag flip on → editor.cold_load_ms beacon emitted; route_unified=true Sentry tag set; ChunkLoadError triggers alert (eng review D4 — Phase 3 obs) |
+| `e2e/strict-mode-double-mount.spec.ts` | dev-mode strict-mode wrap of EditorClient: composer init fires once, no orphan EventEmitter listeners (eng review D4 — D5 verification) |
+| `e2e/dashboard-no-editor-bleed.spec.ts` | navigate /dashboard/sites → /edit/[id] → back → no editor styles persist on dashboard (eng review D4 — D13) |
+| `e2e/multi-site-autosave.spec.ts` | open /edit/A, type, soft-route /edit/B before autosave debounce fires → A's pending save still flushes to A (not B) (eng review D4 — critical race) |
 
 ### Manual QA (Phase 1 smoke)
 

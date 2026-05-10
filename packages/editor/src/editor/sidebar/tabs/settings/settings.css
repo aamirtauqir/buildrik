@@ -3,30 +3,72 @@
  * Tokens: --bd-* only.
  */
 
-/* ── Shell ── */
-.bd-set-root {
-  display: grid;
-  grid-template-columns: 140px 1fr;
-  grid-template-rows: 1fr;
-  height: 100%;
-  min-height: 0;
-  background: var(--bd-bg-card, #fff);
+/* ── Shell (drill-in stack — replaces peer-layout grid) ──
+ * The Task-4 JSX wraps content in <TabFrame> directly, so the prior
+ * .bd-set-root grid wrapper is no longer rendered. Removed entirely
+ * per codex review P2 #8.
+ */
+
+/* Stack: dual-mount container for root + section screens */
+.bd-set-stack {
   position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.bd-set-stack.transitioning {
+  pointer-events: none; /* block input during 180ms animation window */
 }
 
-/* ── Snav (section navigation) ── */
+/* Screens: position absolutely so root + section stack on the same plane */
+.bd-set-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  transition: transform 180ms ease-out, opacity 180ms ease-out;
+  will-change: transform, opacity;
+  background: var(--bd-bg-card, #fff);
+  /* Allow inner snav / pane-body to scroll independently. */
+  min-height: 0;
+}
+.bd-set-stack.no-motion .bd-set-screen {
+  transition: none;
+}
+
+/* Root screen: visible at root state, slid off-left when drilled */
+.bd-set-screen--root.on  {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+.bd-set-screen--root.off {
+  transform: translateX(-12%);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* Section screen: animates in from right; departing on pop */
+.bd-set-screen--section {
+  transform: translateX(100%);
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.04);
+  pointer-events: auto;
+}
+.bd-set-screen--section.entered   { transform: translateX(0);    opacity: 1; }
+.bd-set-screen--section.departing { transform: translateX(100%); opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bd-set-screen { transition: none; }
+}
+
+/* ── Snav (root-screen content) ── */
 .bd-set-snav {
-  border-right: 1px solid var(--bd-border);
   background: var(--bd-bg-subtle);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-}
-.bd-set-snav-h {
-  padding: 11px var(--bd-space-3) var(--bd-space-2);
-  font: 600 11px var(--bd-font);
-  color: var(--bd-fg-heading);
-  border-bottom: 1px solid var(--bd-border);
+  flex: 1;
+  min-height: 0;
 }
 .bd-set-snav-list {
   display: flex;
@@ -145,14 +187,7 @@
   background: var(--bd-bg-card);
 }
 
-/* ── Pane ── */
-.bd-set-pane {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 0;
-  position: relative;
-}
+/* ── Section pane body (inside .bd-set-screen--section) ── */
 .bd-set-pane-body {
   flex: 1;
   min-height: 0;
@@ -457,38 +492,3 @@ textarea.bd-set-input {
   outline-offset: 2px;
 }
 
-/* ── Guard modal (refreshed skin) ── */
-.bd-set-guard-overlay {
-  position: fixed;
-  inset: 0;
-  background: var(--bd-overlay);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-.bd-set-guard-modal {
-  min-width: 320px;
-  max-width: 420px;
-  background: var(--bd-bg-card, #fff);
-  border: 1px solid var(--bd-border);
-  border-radius: 8px;
-  padding: var(--bd-space-4);
-  box-shadow: 0 16px 48px -12px rgba(15, 23, 42, 0.25);
-}
-.bd-set-guard-title {
-  font: 600 13px var(--bd-font);
-  color: var(--bd-fg-heading);
-  margin: 0 0 var(--bd-space-1);
-}
-.bd-set-guard-body {
-  font: 500 11.5px var(--bd-font);
-  color: var(--bd-fg-secondary);
-  line-height: 1.5;
-  margin-bottom: var(--bd-space-3);
-}
-.bd-set-guard-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 6px;
-}
