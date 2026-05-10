@@ -250,6 +250,30 @@ describe("SettingsTab v2 — ConfirmDialog Discard / Cancel", () => {
     });
   });
 
+  // B1 (systematic-QA finding): Discard must roll the composer's project
+  // settings back to the snapshot taken when the screen mounted. Without this,
+  // user edits flowed through composer.setProjectSettings live (per keystroke);
+  // clearing dirty on Discard left the composer holding the dirty values.
+  it("Discard restores composer projectSettings to mount-time snapshot", async () => {
+    const composer = makeComposer();
+    const { container } = render(<SettingsTab composer={composer as never} />);
+    await clickRowAndAwaitPush(/general/i);
+    const siteNameInput = (await screen.findByPlaceholderText(/My Awesome Site/i)) as HTMLInputElement;
+    await makeSectionDirty(siteNameInput);
+    // Capture mount-time snapshot for assertion (composer.getProjectSettings()
+    // is the source of the snapshot, so this matches what Discard should send).
+    const snapshot = composer.getProjectSettings();
+    composer.setProjectSettings.mockClear();
+    // Click savebar Discard.
+    fireEvent.click(within(container.querySelector(".bd-set-savebar") as HTMLElement)
+      .getByRole("button", { name: /discard/i }));
+    // setProjectSettings called with deep-cloned snapshot (not same reference).
+    expect(composer.setProjectSettings).toHaveBeenCalledTimes(1);
+    const arg = composer.setProjectSettings.mock.calls[0][0];
+    expect(arg).toEqual(snapshot);
+    expect(arg).not.toBe(snapshot); // structuredClone → fresh object identity
+  });
+
   it("Cancel: dialog closes + section stays + dirty preserved", async () => {
     const { container } = render(<SettingsTab composer={makeComposer() as never} />);
     await clickRowAndAwaitPush(/general/i);

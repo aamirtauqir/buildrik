@@ -38,6 +38,7 @@ import {
 } from "./index";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { useReducedMotion } from "@/shared/hooks/useReducedMotion";
+import type { ProjectSettings } from "@/shared/types/project";
 import "./settings.css";
 
 // ─── Nav definition ──────────────────────────────────────────────────────────
@@ -292,6 +293,19 @@ export const SettingsTab: React.FC<
   // Set in renderRow's onClick (Task 4); read in navigateToRoot transitionend.
   const lastFocusedRowRef = React.useRef<HTMLButtonElement | null>(null);
 
+  // B1 fix (systematic-QA finding): snapshot composer.projectSettings on every
+  // screen mount so Discard can restore the user's pre-edit state.
+  //
+  // Without this, screens (e.g., SiteSettingsScreen) push edits live into
+  // composer.setProjectSettings on every keystroke. Clicking Discard previously
+  // only bumped resetKey + cleared dirty — the composer mutations stayed live,
+  // so the canvas + savebar disagreed (savebar said "clean", composer held
+  // user's typed values, next dirty edit re-derived from the dirty baseline).
+  //
+  // Snapshot is taken via structuredClone — composer.getProjectSettings()
+  // returns a reference, so a shallow capture would mutate as the user types.
+  const screenSnapshotRef = React.useRef<ProjectSettings | null>(null);
+
   // Server-side screens (Redirects/Headers/Localization) write directly via
   // tRPC, not through composer state. They register their own save handler so
   // the central savebar's Save invokes the right write path instead of a
@@ -311,7 +325,17 @@ export const SettingsTab: React.FC<
     // Clear stale handler on screen change — old screen unmounts, new screen
     // re-registers if applicable.
     screenSaveHandlerRef.current = null;
-  }, [currentScreen]);
+    // B1: capture composer's current projectSettings so Discard can restore.
+    // Server-side screens (Redirects/Headers/Localization) own their own state
+    // and don't write through composer — null snapshot means restore is a no-op
+    // for them, which is correct (their handler refreshes on Discard via
+    // resetKey-driven remount).
+    if (composer) {
+      screenSnapshotRef.current = structuredClone(composer.getProjectSettings());
+    } else {
+      screenSnapshotRef.current = null;
+    }
+  }, [currentScreen, composer]);
 
   React.useEffect(() => {
     onDirtyChange?.(screenIsDirty);
@@ -485,10 +509,18 @@ export const SettingsTab: React.FC<
   }, [guardOpen, isRoot, transitioning, navigateToRoot]);
 
   const handleDiscard = React.useCallback(() => {
+    // B1: restore composer to pre-edit snapshot. setProjectSettings emits
+    // PROJECT_CHANGED, which triggers screen re-render with restored values.
+    // structuredClone on the way out so further composer mutations don't
+    // poison the snapshot we still hold (snapshot stays the discard baseline
+    // until next screen change or save).
+    if (composer && screenSnapshotRef.current) {
+      composer.setProjectSettings(structuredClone(screenSnapshotRef.current));
+    }
     setResetKey((k) => k + 1);
     setScreenIsDirty(false);
     setDirtyCount(0);
-  }, []);
+  }, [composer]);
 
   const handleSave = React.useCallback(() => {
     const screenHandler = screenSaveHandlerRef.current;
@@ -508,13 +540,21 @@ export const SettingsTab: React.FC<
     }
     if (!composer) return;
     const maybePromise = composer.saveProject?.();
+    // B1: refresh snapshot to the just-saved state. After Save, the user's
+    // edits ARE the new baseline — Discard from this point onwards should
+    // restore to the saved values, not the pre-Save values.
+    const refreshSnapshot = () => {
+      screenSnapshotRef.current = structuredClone(composer.getProjectSettings());
+    };
     if (!maybePromise) {
+      refreshSnapshot();
       setScreenIsDirty(false);
       setDirtyCount(0);
       return;
     }
     maybePromise
       .then(() => {
+        refreshSnapshot();
         setScreenIsDirty(false);
         setDirtyCount(0);
       })
@@ -795,6 +835,12 @@ export const SettingsTab: React.FC<
           setGuardOpen(false);
           setScreenIsDirty(false);
           setDirtyCount(0);
+          // B1: restore composer snapshot — Discard via dialog is the same
+          // semantic operation as Discard via savebar; both unwind composer
+          // mutations the user typed since this screen mounted (or last save).
+          if (composer && screenSnapshotRef.current) {
+            composer.setProjectSettings(structuredClone(screenSnapshotRef.current));
+          }
           // Codex C1 fix: prime screenIsDirtyRef synchronously so navigateToRoot's
           // dirty-check (which reads the ref) sees the cleared value. Without
           // this, the ref-mirror useEffect hasn't flushed yet (we're still
