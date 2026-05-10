@@ -37,7 +37,7 @@ describe("ColorInput · DSBindingChip integration", () => {
         composer={fakeComposer}
       />
     );
-    const chip = screen.getByRole("button", { name: /Bound to token color-primary/i });
+    const chip = screen.getByRole("button", { name: /Jump to token color-primary/i });
     expect(chip).toBeTruthy();
   });
 
@@ -50,7 +50,7 @@ describe("ColorInput · DSBindingChip integration", () => {
         composer={fakeComposer}
       />
     );
-    const chip = screen.getByRole("button", { name: /Off design system #FFAA22/i });
+    const chip = screen.getByRole("button", { name: /Off-design-system value #FFAA22/i });
     expect(chip).toBeTruthy();
   });
 
@@ -59,7 +59,7 @@ describe("ColorInput · DSBindingChip integration", () => {
       <ColorInput label="Color" value="" onChange={() => {}} composer={fakeComposer} />
     );
     const chipButtons = screen.queryAllByRole("button", {
-      name: /Bound to token|Off design system/i,
+      name: /Jump to token|Off-design-system value/i,
     });
     expect(chipButtons.length).toBe(0);
   });
@@ -73,7 +73,7 @@ describe("ColorInput · DSBindingChip integration", () => {
         composer={fakeComposer}
       />
     );
-    const chip = screen.getByRole("button", { name: /Bound to token color-primary/i });
+    const chip = screen.getByRole("button", { name: /Jump to token color-primary/i });
     fireEvent.click(chip);
     expect(mockEmit).toHaveBeenCalledWith(EVENTS.UI_OPEN_DESIGN_PANEL, {});
   });
@@ -84,11 +84,11 @@ describe("ColorInput · DSBindingChip integration", () => {
     );
     // DSBindingChip degrades to a non-interactive span when onClick is missing.
     // Confirm no button-role chip is rendered for this value.
-    const chipButtons = screen.queryAllByRole("button", { name: /Off design system/i });
+    const chipButtons = screen.queryAllByRole("button", { name: /Off-design-system value/i });
     expect(chipButtons.length).toBe(0);
     // But the chip should still render as a span with the appropriate aria-label.
     const chipSpan = container.querySelector(
-      'span[aria-label="Off design system #FFAA22"]'
+      'span[aria-label="Off-design-system value #FFAA22. Click to bind to a token."]'
     );
     expect(chipSpan).toBeTruthy();
   });

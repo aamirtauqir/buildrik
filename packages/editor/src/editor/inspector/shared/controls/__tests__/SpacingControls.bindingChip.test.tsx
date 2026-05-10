@@ -27,7 +27,7 @@ describe("SpacingBox · DSBindingChip integration", () => {
         composer={fakeComposer}
       />
     );
-    const chip = screen.getByRole("button", { name: /Bound to token spacing-md/i });
+    const chip = screen.getByRole("button", { name: /Jump to token spacing-md/i });
     expect(chip).toBeTruthy();
   });
 
@@ -41,7 +41,7 @@ describe("SpacingBox · DSBindingChip integration", () => {
         composer={fakeComposer}
       />
     );
-    const chips = screen.queryAllByRole("button", { name: /Bound to token/i });
+    const chips = screen.queryAllByRole("button", { name: /Jump to token/i });
     expect(chips.length).toBe(0);
   });
 
@@ -55,7 +55,7 @@ describe("SpacingBox · DSBindingChip integration", () => {
         composer={fakeComposer}
       />
     );
-    const chip = screen.getByRole("button", { name: /Bound to token spacing-lg/i });
+    const chip = screen.getByRole("button", { name: /Jump to token spacing-lg/i });
     fireEvent.click(chip);
     expect(mockEmit).toHaveBeenCalledWith(EVENTS.UI_OPEN_DESIGN_PANEL, {});
   });

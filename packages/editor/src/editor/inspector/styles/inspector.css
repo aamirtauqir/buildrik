@@ -1296,3 +1296,16 @@ textarea.bdi-text {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
 }
+
+/* DSBindingChip focus indicator (DD3 a11y baseline).
+ * Inline styles in the React component drop `all: "unset"`, so the global
+ * `*:focus-visible` rule in a11y.css would already fire — but the chip is
+ * dense (height 20, radius 10), so the default 2px outline + 2px offset
+ * collides with adjacent rows. Override with a tighter ring that matches
+ * the chip's pill geometry. */
+.bd-ds-binding-chip:focus-visible,
+.bd-ds-binding-chip__bind-hint:focus-visible {
+  outline: 2px solid var(--bd-accent, #2D6DFF);
+  outline-offset: 1px;
+  border-radius: 10px;
+}

@@ -46,30 +46,40 @@ export interface DSBindingChipProps {
   ariaLabel?: string;
 }
 
+/**
+ * Per-state visual + a11y metadata.
+ *
+ * `actionLabel` is action-oriented per spec §16.17 DD3:
+ *   "Jump to {token-id} in Design tab" / "Bind {value} to a design token"
+ * (was state-oriented "Bound to token X" — less useful for screen readers).
+ */
 const STATE_STYLE: Record<
   DSBindingState,
-  { bg: string; fg: string; border: string; prefix: string; longLabel: string }
+  {
+    bg: string; fg: string; border: string; prefix: string;
+    actionLabel: (label: string) => string;
+  }
 > = {
   token: {
     bg: "var(--bd-success-soft, #dcfce7)",
     fg: "var(--bd-success-strong, #166534)",
     border: "var(--bd-success-border, #86efac)",
     prefix: "",
-    longLabel: "Bound to token",
+    actionLabel: (l) => `Jump to token ${l} in Design tab`,
   },
   preset: {
     bg: "var(--bd-info-soft, #dbeafe)",
     fg: "var(--bd-info-strong, #1e40af)",
     border: "var(--bd-info-border, #93c5fd)",
     prefix: "",
-    longLabel: "Bound to preset",
+    actionLabel: (l) => `Jump to preset ${l} in Design tab`,
   },
   "off-ds": {
     bg: "var(--bd-warn-soft, #fef9c3)",
     fg: "var(--bd-warn-strong, #854d0e)",
     border: "var(--bd-warn-border, #fde68a)",
     prefix: "⚠ ",
-    longLabel: "Off design system",
+    actionLabel: (l) => `Off-design-system value ${l}. Click to bind to a token.`,
   },
 };
 
@@ -84,16 +94,21 @@ export const DSBindingChip: React.FC<DSBindingChipProps> = ({
   const isBeginner = dsMode?.isBeginner ?? true;
   const style = STATE_STYLE[state];
 
-  const accessibleName = ariaLabel ?? `${style.longLabel} ${label}`;
+  const accessibleName = ariaLabel ?? style.actionLabel(label);
   const Tag: "button" | "span" = onClick ? "button" : "span";
 
+  // Selective resets only — `all: "unset"` previously stripped the native
+  // focus indicator, defeating DD3 keyboard-a11y. The `bd-ds-binding-chip`
+  // className restores a `:focus-visible` outline via inspector.css.
   const chip = (
     <Tag
       type={onClick ? "button" : undefined}
       onClick={onClick}
       aria-label={accessibleName}
+      className="bd-ds-binding-chip"
       style={{
-        all: "unset",
+        margin: 0,
+        font: "inherit",
         cursor: onClick ? "pointer" : "default",
         display: "inline-flex",
         alignItems: "center",
@@ -129,8 +144,14 @@ export const DSBindingChip: React.FC<DSBindingChipProps> = ({
       <button
         type="button"
         onClick={onBindRequest}
+        aria-label={`Bind ${label} to a design token`}
+        className="bd-ds-binding-chip__bind-hint"
         style={{
-          all: "unset",
+          margin: 0,
+          padding: 0,
+          background: "transparent",
+          border: "none",
+          font: "inherit",
           cursor: "pointer",
           fontSize: 11,
           color: "var(--bd-accent, #2D6DFF)",
