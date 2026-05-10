@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, CheckCircle, XCircle } from "lucide-react";
+import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 
 export const GENERATION_STEPS = [
   { key: "QUEUED", label: "Queued" },
@@ -10,8 +11,6 @@ export const GENERATION_STEPS = [
   { key: "GENERATING_STYLES", label: "Applying styles" },
   { key: "COMPLETED", label: "Finalizing site" },
 ] as const;
-
-const editorUrl = process.env.NEXT_PUBLIC_EDITOR_URL || "http://localhost:5050";
 
 type StepKey = (typeof GENERATION_STEPS)[number]["key"];
 
@@ -58,6 +57,7 @@ export function GenerationProgress({
   onStartBlank,
 }: GenerationProgressProps) {
   const router = useRouter();
+  const unified = useUnifiedEditorFlag();
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showCreditsModal, setShowCreditsModal] = useState(false);
   const [failCount, setFailCount] = useState(0);
@@ -84,11 +84,13 @@ export function GenerationProgress({
   useEffect(() => {
     if (isComplete && siteId) {
       const timeout = setTimeout(() => {
-        window.location.href = `${editorUrl}/?siteId=${siteId}`;
+        const href = getEditorHref(siteId, unified);
+        if (unified) router.push(href);
+        else window.location.href = href;
       }, 1500);
       return () => clearTimeout(timeout);
     }
-  }, [isComplete, siteId, router]);
+  }, [isComplete, siteId, router, unified]);
 
   // Navigation guard: warn on page leave during generation
   const handleBeforeUnload = useCallback(

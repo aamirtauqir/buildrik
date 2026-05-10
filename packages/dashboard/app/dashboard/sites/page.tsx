@@ -16,12 +16,12 @@ import { useToast } from "@/components/dashboard/toast-provider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus, Search } from "lucide-react";
-
-const editorUrl = process.env.NEXT_PUBLIC_EDITOR_URL || "http://localhost:5050";
+import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 
 export default function SitesPage() {
   const { addToast } = useToast();
   const router = useRouter();
+  const unified = useUnifiedEditorFlag();
 
   // Preferences
   const prefs = trpc.account.preferences.get.useQuery();
@@ -226,11 +226,14 @@ export default function SitesPage() {
     (action: string, siteId: string) => {
       const site = sitesQuery.data?.data.find((s) => s.id === siteId);
       switch (action) {
-        case "edit":
-          window.location.href = `${editorUrl}/?siteId=${siteId}`;
+        case "edit": {
+          const href = getEditorHref(siteId, unified);
+          if (unified) router.push(href);
+          else window.location.href = href;
           break;
+        }
         case "manage":
-          window.location.href = `/dashboard/sites/${siteId}`;
+          router.push(`/dashboard/sites/${siteId}`);
           break;
         case "rename":
           if (site) setRenameTarget({ id: siteId, name: site.name });
@@ -258,7 +261,7 @@ export default function SitesPage() {
           break;
       }
     },
-    [sitesQuery.data, duplicateMutation, archiveMutation, addToast]
+    [sitesQuery.data, duplicateMutation, archiveMutation, addToast, unified, router]
   );
 
   // Bulk action handler

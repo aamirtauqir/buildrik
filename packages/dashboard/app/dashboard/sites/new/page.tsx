@@ -10,8 +10,7 @@ import { WizardProgress } from "@/components/ai-wizard/wizard-progress";
 import { StepType, BUSINESS_TYPES } from "@/components/ai-wizard/step-type";
 import { StepPages } from "@/components/ai-wizard/step-pages";
 import { GenerationProgress } from "@/components/ai-wizard/generation-progress";
-
-const editorUrl = process.env.NEXT_PUBLIC_EDITOR_URL || "http://localhost:5050";
+import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 
 type View = "choose" | "templates" | "preview" | "ai-type" | "ai-pages" | "ai-progress";
 
@@ -19,6 +18,7 @@ export default function NewSitePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { addToast } = useToast();
+  const unified = useUnifiedEditorFlag();
 
   const initialMethod = searchParams.get("method");
   const [view, setView] = useState<View>(
@@ -62,7 +62,9 @@ export default function NewSitePage() {
   const useTemplateMutation = trpc.templates.use.useMutation({
     onSuccess: (site) => {
       addToast("success", "Site created from template");
-      window.location.href = `${editorUrl}/?siteId=${site.id}`;
+      const href = getEditorHref(site.id, unified);
+      if (unified) router.push(href);
+      else window.location.href = href;
     },
     onError: (err) => addToast("error", "Failed", err.message),
   });
@@ -70,7 +72,9 @@ export default function NewSitePage() {
   const createSiteMutation = trpc.sites.create.useMutation({
     onSuccess: (site) => {
       addToast("success", "Blank site created");
-      window.location.href = `${editorUrl}/?siteId=${site.id}`;
+      const href = getEditorHref(site.id, unified);
+      if (unified) router.push(href);
+      else window.location.href = href;
     },
     onError: (err) => addToast("error", "Failed", err.message),
   });
@@ -247,7 +251,11 @@ export default function NewSitePage() {
             setJobId(null);
             setView("ai-pages");
           }}
-          onViewSite={(siteId) => { window.location.href = `${editorUrl}/?siteId=${siteId}`; }}
+          onViewSite={(siteId) => {
+            const href = getEditorHref(siteId, unified);
+            if (unified) router.push(href);
+            else window.location.href = href;
+          }}
         />
       </div>
     );

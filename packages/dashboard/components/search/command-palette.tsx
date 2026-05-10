@@ -14,8 +14,8 @@ import {
   Clock,
 } from "lucide-react";
 import { trpc } from "@lib/trpc/client";
+import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 
-const editorUrl = process.env.NEXT_PUBLIC_EDITOR_URL || "http://localhost:5050";
 const RECENT_ITEMS_KEY = "buildrik_recent_items";
 const MAX_RECENT = 5;
 
@@ -103,6 +103,7 @@ interface CommandPaletteProps {
 
 export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   const router = useRouter();
+  const unified = useUnifiedEditorFlag();
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [recentItems, setRecentItems] = useState<RecentItem[]>([]);
@@ -207,7 +208,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             id: `page-${s.id}`,
             label: `${s.name} — Pages`,
             description: "Open in editor",
-            href: `${editorUrl}/?siteId=${s.id}`,
+            href: getEditorHref(s.id, unified),
             scope: "pages",
           })),
         });
@@ -280,7 +281,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     }
 
     return groups;
-  }, [isSearching, term, scope, recentItems, shouldSearchSites, shouldSearchTeam, shouldSearchHelp, sitesQuery.data, teamQuery.data, helpQuery.data]);
+  }, [isSearching, term, scope, recentItems, shouldSearchSites, shouldSearchTeam, shouldSearchHelp, sitesQuery.data, teamQuery.data, helpQuery.data, unified]);
 
   const flatItems = useMemo(
     () => groupedResults.flatMap((g) => g.items),
@@ -296,7 +297,8 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   const selectItem = useCallback(
     (item: ResultItem) => {
       saveRecentItem({ label: item.label, href: item.href, type: item.scope });
-      router.push(item.href);
+      if (/^https?:\/\//i.test(item.href)) window.location.href = item.href;
+      else router.push(item.href);
       onClose();
     },
     [router, onClose],

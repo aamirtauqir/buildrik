@@ -3,13 +3,17 @@
 import { useRouter } from "next/navigation";
 import { OnboardingProjectSetup } from "@/components/onboarding/project-setup";
 import { trpc } from "@lib/trpc/client";
-
-const editorUrl = process.env.NEXT_PUBLIC_EDITOR_URL || "http://localhost:5050";
+import { getEditorHref, useUnifiedEditorFlag } from "@/components/editor-route/unified-flag";
 
 export default function OnboardingSetupPage() {
   const router = useRouter();
+  const unified = useUnifiedEditorFlag();
   const createSite = trpc.sites.create.useMutation({
-    onSuccess: (site) => { window.location.href = `${editorUrl}/?siteId=${site.id}`; },
+    onSuccess: (site) => {
+      const href = getEditorHref(site.id, unified);
+      if (unified) router.push(href);
+      else window.location.href = href;
+    },
   });
   const setupProject = trpc.onboarding.setupProject.useMutation({
     onSuccess: (_data, variables) => {
