@@ -18,3 +18,12 @@ export { useTokenUsageMap } from "./state/useTokenUsageMap";
 export { DSModeProvider, useDSMode, useDSModeOptional } from "./state/DSModeContext";
 export type { DSMode } from "./state/DSModeContext";
 export { DSModeToggle } from "./ui/DSModeToggle";
+export {
+  StylePresetRegistryProvider,
+  useButtonPresets, useCardPresets, useFormPresets, useLinkPresets,
+  useBadgePresets, useAlertPresets, useTooltipPresets, useModalPresets,
+  useNavPresets, useTablePresets, useLayoutPresets,
+  usePresetRegistryConfig, useResetAllPresets, PRESET_CATEGORIES,
+} from "./state/StylePresetRegistryContext";
+export type { PresetsForCategoryRegistry } from "./state/usePresetsForCategory";
+export type { PresetCategory, StylePreset, PresetBinding } from "./types";

@@ -23,7 +23,7 @@ import { ProInspector } from "../inspector/ProInspector";
 import { LayoutShell } from "../rail/LayoutShell";
 import { LeftSidebar } from "../sidebar/LeftSidebar";
 import { FullPageView } from "../sidebar/FullPageView";
-import { TokenRegistryProvider, DSModeProvider } from "@/editor/design-system";
+import { TokenRegistryProvider, DSModeProvider, StylePresetRegistryProvider } from "@/editor/design-system";
 import { MigrationProgressMount } from "@/editor/design-system/ui/MigrationProgressMount";
 import { StarterGalleryMount } from "@/editor/design-system/ui/StarterGalleryMount";
 import { useBlockInsertion } from "./hooks/useBlockInsertion";
@@ -358,6 +358,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
   return (
     <DSModeProvider>
     <TokenRegistryProvider projectId={projectId} composer={composer ?? undefined}>
+    <StylePresetRegistryProvider projectId={projectId}>
       <MigrationProgressMount composer={composer} />
       <StarterGalleryMount projectId={projectId} />
       <LayoutShell
@@ -451,6 +452,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           />
         </LayoutShell.FullPage>
       </LayoutShell>
+    </StylePresetRegistryProvider>
     </TokenRegistryProvider>
     </DSModeProvider>
   );
