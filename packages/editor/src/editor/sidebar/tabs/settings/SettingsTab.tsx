@@ -14,6 +14,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import * as React from "react";
 import { TabFrame } from "@/shared/extensions/TabFrame";
 import { usePanelNavigation } from "../../shared/usePanelNavigation";
+import { DrillInHeader } from "../../shared/DrillInHeader";
 import {
   type SettingsTabProps,
   type PlanTier,
@@ -34,7 +35,6 @@ import {
   FormsScreen,
   HeadersScreen,
   LocalizationScreen,
-  SettingsNavGuard,
 } from "./index";
 import { ConfirmDialog } from "@/shared/extensions/ConfirmDialog";
 import { useReducedMotion } from "@/shared/hooks/useReducedMotion";
@@ -475,23 +475,6 @@ export const SettingsTab: React.FC<
     return () => document.removeEventListener("keydown", handler);
   }, [guardOpen, isRoot, transitioning, navigateToRoot]);
 
-  // handleNav retained for the unchanged peer-layout JSX (Task 3 leaves
-  // render alone; Task 4 swaps the JSX to use `navigate` directly). Behavior
-  // here is byte-identical to the pre-Task-3 implementation so existing tests
-  // and rendered output stay unchanged through this commit.
-  const handleNav = React.useCallback(
-    (nextId: InTabNavId) => {
-      if (nextId === currentScreen) return;
-      if (screenIsDirty) {
-        pendingNavRef.current = nextId;
-        setGuardOpen(true);
-        return;
-      }
-      navigateTo(nextId);
-    },
-    [currentScreen, screenIsDirty, navigateTo],
-  );
-
   const handleDiscard = React.useCallback(() => {
     setResetKey((k) => k + 1);
     setScreenIsDirty(false);
@@ -545,7 +528,10 @@ export const SettingsTab: React.FC<
         return (
           <BrandingSection
             onOpenPalette={onOpenDesignTab}
-            onJumpTo={(screenId) => navigateTo(screenId)}
+            // Codex P0 #3: section→section nav must go through navigateBetweenSections,
+            // not navigateTo. navigateTo would update currentScreen but skip the
+            // resetKey bump + dirty reset, leaving stale screen state visible.
+            onJumpTo={(screenId) => navigateBetweenSections(screenId)}
           />
         );
       case "seo":
@@ -598,7 +584,12 @@ export const SettingsTab: React.FC<
       <Button
         key={n.id}
         type="button"
-        onClick={() => handleNav(n.id)}
+        onClick={(e) => {
+          // Codex P0 #2: capture clicked row so navigateToRoot's transitionend
+          // can restore focus when the user pops back.
+          lastFocusedRowRef.current = e.currentTarget as HTMLButtonElement;
+          navigate(n.id);
+        }}
         className={`bd-set-snav-row${active ? " on" : ""}`}
         aria-current={active ? "page" : undefined}
       >
@@ -635,8 +626,10 @@ export const SettingsTab: React.FC<
     <TabFrame>
       <div className="bd-set-panel-h">
         <div className="bd-set-panel-h-ttl">
-          <h2>{current.title}</h2>
-          {current.subtitle ? <span className="bd-set-panel-sub">{current.subtitle}</span> : null}
+          <h2>{isRoot ? "Settings" : current.title}</h2>
+          {!isRoot && current.subtitle ? (
+            <span className="bd-set-panel-sub">{current.subtitle}</span>
+          ) : null}
         </div>
         <div className="bd-set-panel-acts">
           {onHelpClick ? (
@@ -669,73 +662,147 @@ export const SettingsTab: React.FC<
         </div>
       </div>
       <TabFrame.Body noScroll>
-        <div className="bd-set-root">
-          <nav className="bd-set-snav" aria-label="Settings sections">
-            <div className="bd-set-snav-h">Settings</div>
-            <div className="bd-set-snav-list">
-              {(Object.keys(navByGroup) as NavGroupId[]).map((groupId) => (
-                <React.Fragment key={groupId}>
-                  <div className="bd-set-snav-group">{GROUP_LABELS[groupId]}</div>
-                  {navByGroup[groupId].map(renderRow)}
-                </React.Fragment>
-              ))}
-              <div className="bd-set-snav-group">
-                WORKSPACE <span className="bd-set-snav-group-hint">opens dashboard ↗</span>
+        <div
+          className={`bd-set-stack${transitioning ? " transitioning" : ""}${prefersReducedMotion ? " no-motion" : ""}`}
+          onTransitionEnd={handleStackTransitionEnd}
+        >
+          {/* Root screen — ALWAYS mounted (codex P2 #7 contract: aria-hidden flips, mount stays).
+              inert + aria-hidden={!isRoot} means assistive tech ignores it AND focus cannot land
+              inside it during the section animation. Codex P0 #2 focus contract relies on this. */}
+          <div
+            className={`bd-set-screen bd-set-screen--root${isRoot ? " on" : " off"}`}
+            aria-hidden={!isRoot}
+            inert={!isRoot}
+          >
+            <nav className="bd-set-snav" aria-label="Settings sections">
+              <div className="bd-set-snav-list">
+                {(Object.keys(navByGroup) as NavGroupId[]).map((groupId) => (
+                  <React.Fragment key={groupId}>
+                    <div className="bd-set-snav-group">{GROUP_LABELS[groupId]}</div>
+                    {navByGroup[groupId].map(renderRow)}
+                  </React.Fragment>
+                ))}
+                <div className="bd-set-snav-group">
+                  WORKSPACE <span className="bd-set-snav-group-hint">opens dashboard ↗</span>
+                </div>
+                {WORKSPACE_LINKS.map(renderWorkspaceLink)}
+                {onReplayTour ? (
+                  <Button
+                    type="button"
+                    onClick={onReplayTour}
+                    className="bd-set-snav-row bd-set-snav-row-sep"
+                  >
+                    <span className="bd-set-snav-icon">
+                      <TourIcon />
+                    </span>
+                    <span className="bd-set-snav-label">Tour</span>
+                  </Button>
+                ) : null}
               </div>
-              {WORKSPACE_LINKS.map(renderWorkspaceLink)}
-              {onReplayTour ? (
-                <Button
-                  type="button"
-                  onClick={onReplayTour}
-                  className="bd-set-snav-row bd-set-snav-row-sep"
-                >
-                  <span className="bd-set-snav-icon">
-                    <TourIcon />
-                  </span>
-                  <span className="bd-set-snav-label">Tour</span>
-                </Button>
-              ) : null}
-            </div>
-          </nav>
-          <div className="bd-set-pane">
-            <div className="bd-set-pane-body" key={resetKey}>
-              {renderContent()}
-            </div>
-            <div
-              className={`bd-set-savebar${screenIsDirty ? " on" : ""}`}
-              role="region"
-              aria-label="Unsaved changes"
-              aria-hidden={!screenIsDirty}
-            >
-              <span className="bd-set-savebar-note">
-                <span>{dirtyCount} unsaved</span>
-              </span>
-              <div className="bd-set-savebar-actions">
-                <Button type="button" className="bd-set-btn sec" onClick={handleDiscard}>
-                  Discard
-                </Button>
-                <Button type="button" className="bd-set-btn pri" onClick={handleSave}>
-                  Save
-                </Button>
-              </div>
-            </div>
+            </nav>
           </div>
+          {/* Section screen — mount-on-push, unmount-on-pop-transitionend.
+              inert + aria-hidden={isRoot} during the pop animation prevents focus retention
+              inside the departing subtree (codex P0 #2). */}
+          {sectionMounted && (
+            <div
+              ref={sectionRef}
+              className={`bd-set-screen bd-set-screen--section${isRoot ? " departing" : " entered"}`}
+              aria-hidden={isRoot}
+              inert={isRoot}
+            >
+              <DrillInHeader
+                title={current.title}
+                parentName="Settings"
+                breadcrumb={[GROUP_LABELS[current.group], current.title]}
+                focusTarget="breadcrumb-current"
+                enableDocumentEscape={false}
+                onBack={navigateToRoot}
+                isDirty={screenIsDirty}
+                onBackAttempt={() => setGuardOpen(true)}
+                onHelpClick={onHelpClick}
+                onClose={onClose}
+              />
+              <div className="bd-set-pane-body" key={resetKey}>
+                {renderContent()}
+              </div>
+              <div
+                className={`bd-set-savebar${screenIsDirty ? " on" : ""}`}
+                role="region"
+                aria-label="Unsaved changes"
+                aria-hidden={!screenIsDirty}
+              >
+                <span className="bd-set-savebar-note">
+                  <span>{dirtyCount} unsaved</span>
+                </span>
+                <div className="bd-set-savebar-actions">
+                  <Button type="button" className="bd-set-btn sec" onClick={handleDiscard}>
+                    Discard
+                  </Button>
+                  <Button type="button" className="bd-set-btn pri" onClick={handleSave}>
+                    Save
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </TabFrame.Body>
-      <SettingsNavGuard
+      <ConfirmDialog
         isOpen={guardOpen}
-        onDiscard={() => {
+        onClose={() => {
+          pendingNavRef.current = null;
+          setGuardOpen(false);
+        }}
+        onConfirm={() => {
           const next = pendingNavRef.current;
+          // Codex P1 #6 pass-3 hardening: warn FIRST (with full state snapshot)
+          // before any setters mutate the state we want to diagnose.
+          //
+          //   isRoot=false, next=null  → back-attempt while dirty → pop to root
+          //   isRoot=false, next=id    → pending-nav while dirty (in-section) →
+          //                              swap section content (no animation)
+          //   isRoot=true,  next=null  → UNREACHABLE: root view has no dirty
+          //                              state (section is unmounted; savebar
+          //                              never shows). Guard openable only from
+          //                              section-mounted view.
+          //   isRoot=true,  next=id    → UNREACHABLE: navigate() opens dialog
+          //                              when entering section while parent
+          //                              still has stale dirty (impossible —
+          //                              dirty resets on screen change).
+          if (isRoot) {
+            console.warn(
+              "[settings-v2] ConfirmDialog onConfirm reached unreachable branch — pre-mutation state:",
+              {
+                isRoot,
+                next,
+                screenIsDirty: screenIsDirtyRef.current,
+                guardOpen: true,
+              },
+            );
+          }
           pendingNavRef.current = null;
           setGuardOpen(false);
           setScreenIsDirty(false);
           setDirtyCount(0);
-          if (next) navigateTo(next);
+          if (!isRoot && next === null) {
+            navigateToRoot();
+            return;
+          }
+          if (!isRoot && next !== null) {
+            navigateBetweenSections(next);
+            return;
+          }
+          // Defensive — does NOT touch state past the mutations above. If we
+          // ever land here, the branch is genuinely impossible AND stateful
+          // operations have already been committed; log alone is sufficient.
+          if (next !== null) navigate(next);
         }}
-        onCancel={() => {
-          pendingNavRef.current = null;
-          setGuardOpen(false);
-        }}
+        title="Discard changes?"
+        message="You have unsaved changes. Switching will discard them."
+        confirmText="Discard"
+        cancelText="Keep editing"
+        variant="danger"
       />
     </TabFrame>
   );
