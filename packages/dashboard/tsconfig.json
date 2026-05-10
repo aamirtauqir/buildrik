@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ES2020",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -11,16 +15,38 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
-    "plugins": [{ "name": "next" }],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
-      "@/*": ["./*"],
-      "@server/*": ["../../server/*"],
-      "@lib/*": ["../../lib/*"],
-      "@buildrik/shared/*": ["../shared/*"]
+      "@/*": [
+        "./*",
+        "../../*"
+      ],
+      "@server/*": [
+        "../../server/*"
+      ],
+      "@lib/*": [
+        "../../lib/*"
+      ],
+      "@buildrik/shared/*": [
+        "../shared/*"
+      ]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "../../server/**/*.ts", "../../lib/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "../../server/**/*.ts",
+    "../../lib/**/*.ts",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

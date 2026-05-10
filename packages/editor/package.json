@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Aquibra Editor — L2 production-wired extraction",
+  "exports": {
+    ".": "./src/index.ts",
+    "./src/*": "./src/*",
+    "./themes/*": "./src/themes/*"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

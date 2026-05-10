@@ -703,3 +703,18 @@ export async function getProjectData(siteId: string) {
     dsSchemaVersion: site.dsSchemaVersion,
   };
 }
+
+export async function userCanEditSite(
+  userId: string,
+  siteId: string,
+): Promise<boolean> {
+  const site = await prisma.site.findFirst({
+    where: {
+      id: siteId,
+      deletedAt: null,
+      workspace: { members: { some: { userId } } },
+    },
+    select: { id: true },
+  });
+  return !!site;
+}

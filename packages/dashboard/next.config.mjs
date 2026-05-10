@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   serverExternalPackages: ["@prisma/client", "bcryptjs"],
+  transpilePackages: ["@buildrik/editor"],
+  compiler: { emotion: true },
   async headers() {
     return [
       {

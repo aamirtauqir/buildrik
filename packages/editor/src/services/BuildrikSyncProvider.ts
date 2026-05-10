@@ -285,8 +285,16 @@ export async function loadServerMedia(
 }
 
 export function getSiteIdFromUrl(): string | null {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("siteId");
+  if (typeof window === "undefined") return null;
+  const pathMatch = window.location.pathname.match(/^\/edit\/([^/?#]+)/);
+  if (pathMatch) {
+    try {
+      return decodeURIComponent(pathMatch[1]);
+    } catch {
+      return pathMatch[1];
+    }
+  }
+  return new URLSearchParams(window.location.search).get("siteId");
 }
 
 /**
