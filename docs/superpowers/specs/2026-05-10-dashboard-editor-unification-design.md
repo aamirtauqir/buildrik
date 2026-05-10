@@ -3,6 +3,7 @@
 **Date:** 2026-05-10
 **Scope:** Collapse `app.buildrik.com` (Next.js dashboard) + `editor.buildrik.com` (Vite editor) into a single Next.js app. Both designs preserved. Behind feature flag.
 **Predecessor:** [2026-04-01-editor-dashboard-integration-design.md](./2026-04-01-editor-dashboard-integration-design.md) — shipped two-domain topology with shared auth + persistence contract. This spec collapses the two-domain seam.
+**CEO review:** 2026-05-10. Mode: SELECTIVE EXPANSION. 4 cherry-picks accepted (hover prefetch, SSR skeleton, soft routing, unified Cmd+K). 9 defects folded into Phase 0. Token reconciliation deferred to TODOS. See `~/.gstack/projects/aamirtauqir-buildrik/ceo-plans/2026-05-10-dashboard-editor-unification.md` for full record.
 
 ---
 
@@ -79,6 +80,7 @@ Next.js App Router applies **only** layouts on the URL path. Visit `/dashboard/s
 'use client';
 import dynamic from 'next/dynamic';
 import { EditorSkeleton } from './EditorSkeleton';
+import { EditorErrorBoundary, EditorErrorScreen } from './EditorErrorBoundary';
 
 const AquibraStudio = dynamic(
   () => import('@buildrik/editor').then((m) => ({ default: m.AquibraStudio })),
@@ -86,9 +88,32 @@ const AquibraStudio = dynamic(
 );
 
 export function EditorClient({ siteId }: { siteId: string }) {
-  return <AquibraStudio style={{ height: '100vh' }} />;
+  return (
+    <EditorErrorBoundary
+      fallback={({ error, retry }) => (
+        <EditorErrorScreen
+          message={
+            error.name === 'ChunkLoadError'
+              ? 'Editor was updated. Reload to continue.'
+              : 'Editor crashed unexpectedly.'
+          }
+          // ChunkLoadError after deploy: same chunk URL is now 404. Retry must hard-reload, not local-remount.
+          onRetry={() => {
+            if (error.name === 'ChunkLoadError') window.location.reload();
+            else retry();
+          }}
+        />
+      )}
+    >
+      {/* key={siteId} forces full remount when soft-routing /edit/a → /edit/b.
+          Without this, Composer state from previous site can autosave into wrong site. */}
+      <AquibraStudio key={siteId} style={{ height: '100vh' }} />
+    </EditorErrorBoundary>
+  );
 }
 ```
+
+`ChunkLoadError` is the most common dynamic-import failure (network drop mid-fetch, stale chunk after deploy). User sees a Reload button, not a blank screen.
 
 Editor bundle (~2MB, 15 deps: emotion, gsap, cmdk, react-colorful, react-window, dompurify, jszip, html2canvas, etc.) downloaded only when `/edit/[siteId]` opens. Dashboard pages bundle unaffected.
 
@@ -128,24 +153,41 @@ After merge, editor and dashboard tRPC are on the same origin:
 
 Service layer (`server/services/*`) and tRPC routers untouched. Integration is at transport + page-mount only.
 
-### Flag behavior
+### Flag behavior — server-driven via Vercel Edge Config
+
+**Why not `NEXT_PUBLIC_*` env:** `NEXT_PUBLIC_*` values are baked into the JS bundle at build time. Flipping the env requires a full rebuild + redeploy (~3-5 min on Vercel). The "60-second rollback" needs a runtime flag that doesn't trigger a rebuild.
+
+**Mechanism:** `@vercel/edge-config`. Edge Config values propagate to all edge functions in <10s without rebuild. Read server-side in `app/edit/[siteId]/page.tsx` and in `editor-link.ts` (which becomes a server-or-client-aware module).
 
 ```ts
 // components/editor-route/editor-link.ts
-export function getEditorHref(siteId: string): string {
-  if (process.env.NEXT_PUBLIC_UNIFIED_EDITOR === 'true') return `/edit/${siteId}`;
+import { get } from '@vercel/edge-config';
+
+// Server-side: source of truth
+export async function isUnifiedEditorEnabled(): Promise<boolean> {
+  if (process.env.NODE_ENV !== 'production') return process.env.NEXT_PUBLIC_UNIFIED_EDITOR === 'true';
+  return (await get<boolean>('unifiedEditor')) ?? false;
+}
+
+// Server component helper
+export async function getEditorHref(siteId: string): Promise<string> {
+  if (await isUnifiedEditorEnabled()) return `/edit/${siteId}`;
   const legacy = process.env.NEXT_PUBLIC_EDITOR_URL || 'http://localhost:5050';
   return `${legacy}/?siteId=${siteId}`;
 }
 ```
 
-Three deployment phases:
+For client-side React components (site cards, command palette items), the flag value is hydrated from a server component into a React Context provider once at app boot. Flipping the flag doesn't update the cached client value mid-session — but the next page load reads the new value (still <10s server propagation, then user-side on next navigation).
+
+**Three deployment phases:**
 
 | Phase | Flag | What user sees | What's running |
 |---|---|---|---|
-| 1. Ship Next route | `false` | Click Edit → still goes to `editor.buildrik.com` (Vite) | Both Vite + Next route exist; Next route reachable for QA |
-| 2. Smoke / canary | manually flip `true` on Vercel preview | Click Edit → `/edit/[id]` (Next) | Both still running |
-| 3. Cutover green | `true` for everyone | Click Edit → `/edit/[id]` only | Vite shut down (or 301 redirect); CORS deleted |
+| 1. Ship Next route | `false` in Edge Config | Click Edit → still `editor.buildrik.com` (Vite) | Both exist; Next route reachable for QA |
+| 2. Smoke / canary | flip `true` on Vercel preview branch's Edge Config | Click Edit → `/edit/[id]` (Next) | Both still running |
+| 3. Cutover green | `true` in production Edge Config | Click Edit → `/edit/[id]` only | Vite shut down or 301 redirect |
+
+**Real rollback timing:** ~10s (Edge Config propagation) for users on next nav. Active sessions keep their cached flag value until next page load. No rebuild required.
 
 ---
 
@@ -300,7 +342,7 @@ USER clicks Publish
 | R4 | Sentry double-init | Audit `Sentry.init(` in editor; gate behind `window.__SENTRY_INITED__` or move to root |
 | R5 | Asset paths — fonts | Move `<link rel="preconnect" href="https://fonts.bunny.net">` from editor `index.html` → dashboard `app/layout.tsx`. Or migrate to `next/font` (optional) |
 | R6 | Strict-mode double-mount | Add `useRef` idempotence guard in `useComposerInit` if absent |
-| R7 | Browser back + dirty-state guard | Editor autosave covers most cases. Add `usePathname`-based flush on path change |
+| R7 | Browser back + dirty-state guard | Editor autosave covers most cases. Add `usePathname`-based flush on path change. With cherry-pick #3 soft routing this becomes mandatory: in-flight `fetch` to `sites.save` aborts on unmount → unsaved canvas state lost. `useComposerInit` cleanup must await pending save (or trigger sync save) before unmount resolves |
 | R8 | localStorage namespace post-domain-merge | Editor reads from server on mount; localStorage holds only ephemeral state. Verify with `grep localStorage packages/editor/src` |
 | R9 | Multi-package inventory drift (memory: inventory must cross packages) | Phase 0 audit across `packages/dashboard`, `packages/editor`, `server/`, `prisma/`, `scripts/` for hardcoded URLs |
 | R10 | CSP `'unsafe-eval'` | No change. Already permissive |
@@ -318,10 +360,21 @@ USER clicks Publish
 - `auth() + userCanEditSite` adds ~50-100ms server time on `/edit/[id]` cold load (acceptable)
 - Build time estimated to grow as Turbopack pulls editor source into dashboard build (Vercel build minutes ↑). Measure during Phase 1; record delta in project memory
 - Dev HMR slower for editor work under Turbopack vs dedicated Vite — **mitigated** by D6 (keep Vite dev harness)
+- **Fault isolation lost (codex finding):** today, broken editor PR cannot block dashboard deploy. After unification, an editor compile error or dependency break blocks the dashboard build, even with the unified flag OFF. Given editor's heavy active churn (DS Tier-2 mid-flight, vibcoder phases ongoing), this is a real ops cost. User accepted in CEO review tension #3.
+  - **Mitigation:** add a CI gate that runs `pnpm --filter @buildrik/dashboard build` on every editor-source PR. Catches dashboard-breaking changes at PR time, not at Vercel deploy time.
 
-### Security verdict
+### Security verdict (revised post codex review)
 
-Strict improvement: server-side auth before bundle download, CORS attack surface removed, no new attack surface introduced. Only new work: `userCanEditSite` helper.
+**Wins:** server-side auth before bundle download, CORS removal, simpler cookie story.
+
+**Losses:** the second origin was a blast-radius boundary. Today, an XSS or supply-chain compromise in editor code is contained to `editor.buildrik.com`; cookies for `app.buildrik.com` are unreachable. After unification, both apps share an origin — an editor-side compromise can read dashboard session cookies.
+
+**Mitigations:**
+- Editor needs `'unsafe-eval'` for emotion runtime + dompurify polyfills — that CSP relaxation now applies to dashboard pages too. Tighten where possible: per-route CSP via Next middleware, dashboard routes get strict CSP, only `/edit/*` gets the `'unsafe-eval'` relaxation
+- Dependency review pass on editor's 15+ deps (memory: gsap, html2canvas, jszip, dompurify, react-colorful, react-window, cmdk) — supply chain audit before unification
+- Sentry tag captures origin-merged errors specifically (R-tag ` origin_merge=true` on /edit/* errors for first 30 days)
+
+**Net:** still a net win for the average user (auth gate, less CORS misconfig risk) but NOT "strict improvement, no new attack surface" — there's a real blast-radius trade.
 
 ---
 
@@ -329,48 +382,128 @@ Strict improvement: server-side auth before bundle download, CORS attack surface
 
 ### Phase 0 — Prereqs (no user-visible change)
 
+CEO review on 2026-05-10 surfaced 9 defects in the original Phase 0 list. All 9 are now mandatory before Phase 1.
+
+**Original tasks (kept):**
 - [ ] Add `userCanEditSite()` to `sites.service.ts`
-- [ ] Add `exports` field to `packages/editor/package.json`
 - [ ] Add `AquibraStudio` named export to `packages/editor/src/index.ts`
 - [ ] Update `getSiteIdFromUrl()` regex (path + query fallback)
 - [ ] Add `compiler: { emotion: true }` to `next.config.mjs`
-- [ ] Audit `Sentry.init` — add idempotence guard if needed
-- [ ] Audit `useComposerInit` — verify strict-mode idempotence
-- [ ] Inventory pass across all 3 packages for hardcoded URLs (R9)
-- [ ] Codex review checkpoint #1
+
+**Defects added by CEO review:**
+- [ ] **D1: CSS path** — Decide CSS delivery strategy. Editor's Vite build bundles CSS into JS (`dist/themes/default.css` does NOT exist). Options: (a) import from source `@buildrik/editor/src/themes/default.css` and let Next bundle it; (b) add a CSS-only build step to editor's package; (c) emit a separate `dist/styles.css`. Pick (a) for smallest delta — Next/Turbopack handles raw CSS imports fine
+- [ ] **D2: `exports` field** — Use a wildcard exports map, not just `.`. Editor's own vitest, eslint, DS gates rely on internal `@/`, `@shared/` paths. Required shape:
+  ```json
+  "exports": {
+    ".": "./src/index.ts",
+    "./src/*": "./src/*",
+    "./themes/*": "./src/themes/*"
+  }
+  ```
+- [ ] **D3: Emotion JSX type-checking** — Set `"jsxImportSource": "@emotion/react"` in dashboard's `tsconfig.json` (or in a per-folder tsconfig that covers `app/edit/**` + `components/editor-route/**`). `compiler.emotion` only handles SWC build-time JSX rewrite, NOT `tsc --noEmit` type-checks. Verify with: `cd packages/dashboard && pnpm tsc --noEmit`
+- [ ] **D4: SSE/streaming** — Audit AI tab's `streamPrompt` path. Today: cross-origin fetch + ReadableStream. After unification, same-origin allows `EventSource` for simpler reconnect/retry. Decide: keep fetch+ReadableStream (least change) or migrate to EventSource (cleaner). Recommend keep (touch only if it breaks)
+- [ ] **D5: Strict-mode idempotence** — Read `useComposerInit.ts` end to end. Add `useRef` guard pattern if absent:
+  ```ts
+  const initedRef = useRef(false);
+  useEffect(() => { if (initedRef.current) return; initedRef.current = true; /* init */ }, []);
+  ```
+  Memory hits 3 setter-stale-state bugs this week — high odds this trips
+- [ ] **D6: Multi-package inventory** — Grep for hardcoded URLs across `server/`, `prisma/`, `scripts/`, AND `packages/editor/src/` (reverse direction). Commands:
+  ```bash
+  grep -rn 'editor\.buildrik\.com\|NEXT_PUBLIC_EDITOR_URL\|EDITOR_ORIGIN' server/ prisma/ scripts/ packages/editor/src/
+  ```
+  Add any sites found to Phase 2 replacement list
+- [ ] **D7: Vercel project topology confirmed** — Check Vercel dashboard. If `editor.buildrik.com` is a separate project, document its asset URL pattern. Phase 4 cleanup must explicitly delete the project, not just DNS
+- [ ] **D8: Stale stash cleared** — `git stash list` shows `stash@{0}: wip before media tab lane A` on main. Either pop+commit, drop, or note as out-of-scope before Phase 1 starts. Avoids mid-Phase-1 conflict
+- [ ] **D9: Audit `Sentry.init` for double-fire** — `grep -rn 'Sentry.init(' packages/editor/src/`. Gate behind `window.__SENTRY_INITED__` if present and dashboard also inits Sentry
+
+**Defects added by codex outside-voice review:**
+- [ ] **D10: `transpilePackages` config** — Add `transpilePackages: ['@buildrik/editor']` to `next.config.mjs`. Without it, Next won't compile editor's source TS through SWC; workspace package resolution silently fails or pulls untranspiled JS
+- [ ] **D11: Vite-isms audit** — Editor was authored under Vite. `grep -rn 'import\.meta\.env' packages/editor/src/` to find Vite-specific globals. Each hit needs a Next-compatible replacement (`process.env.NEXT_PUBLIC_*` or a runtime config object). Also check: web workers (Vite handles `new Worker(new URL('./foo.ts', import.meta.url))` differently), asset URLs (`new URL('./asset.png', import.meta.url)`), `?raw`/`?url` import suffixes (Vite-only)
+- [ ] **D12: Editor shell contract audit** — Read `packages/editor/demo/main.tsx` end to end. List every wrapper, provider, body class, hotkey, analytics init, error boundary, feature-flag check that the Vite entry sets up. Confirm `<AquibraStudio>` itself sets them, OR move them into `EditorClient.tsx`. Memory: `Agentation` dev-tool wrapper is one such — list everything else
+- [ ] **D13: CSS isolation strategy** — Decide between (a) **scope-prefixed editor CSS** — wrap editor's `default.css` rules under `:where(.bd-studio)` selector so tokens only apply inside editor mount; (b) **CSS layers + scoped layers** — `@layer editor { ... }` only in EditorClient, dashboard pages don't import; (c) **CSS Modules build step** for editor. Pick (a) for smallest delta. Required because spec's "load CSS in EditorClient" leaves SSR skeleton without tokens; "load at root" leaks editor styles onto dashboard
+- [ ] **D14: Editor cross-origin assumption inventory** — Beyond the 10 dashboard call sites, audit editor source for hardcoded cross-origin behavior: `fetch()` with absolute URL, `EventSource`/WebSocket creation, asset URL builders, `credentials: 'include'`. Each must be reviewed for same-origin compatibility. Commands:
+  ```bash
+  grep -rn 'fetch(\|new EventSource\|new WebSocket\|credentials.*include' packages/editor/src/
+  grep -rn 'NEXT_PUBLIC_APP_URL\|app\.buildrik\.com\|http://localhost:3000' packages/editor/src/
+  ```
+
+- [ ] Codex review checkpoint #1 (Phase 0 complete)
+
+### Phase 0.5 — Build proof spike (NEW, added by codex review)
+
+Before any actual integration, prove the Vite-built editor compiles inside Next/Turbopack. ~2-3 hours.
+
+- [ ] Add `transpilePackages: ['@buildrik/editor']` to `next.config.mjs` (D10)
+- [ ] Run all D11 grep audits on editor source. Inventory every Vite-ism. Replace each:
+  - `import.meta.env.X` → server-injected `process.env.NEXT_PUBLIC_X` or runtime config object
+  - `new URL('./asset', import.meta.url)` → static `/public` import or Next-compatible path
+  - `new Worker(new URL(...))` → `Worker` factory with bundled URL (Next supports via webpack plugin OR move worker to dashboard's `/workers/`)
+  - `?raw` / `?url` import suffixes → replace with explicit fetch or copy file to `/public/`
+- [ ] Create temporary `app/edit/_spike/page.tsx` that dynamic-imports AquibraStudio
+- [ ] Run `pnpm --filter @buildrik/dashboard build`. Catalog every build error
+- [ ] Categorize errors: (a) fixable in Phase 0.5 itself; (b) requires editor-source changes; (c) blocker (no Next path)
+- [ ] If category (c) errors exist: STOP. Write a status report; either fix in editor or revisit Approach C (cross-model tension #3 alternative)
+- [ ] If only (a) and (b): fix all (a) here, log all (b) as Phase 1 prerequisites
+- [ ] Delete `app/edit/_spike/` (it's a throwaway)
+- [ ] Codex review checkpoint #1.5 — spike result
 
 ### Phase 1 — Next route lands (flag OFF)
 
-- [ ] Create `app/edit/[siteId]/layout.tsx` (bare)
+- [ ] Create `app/edit/[siteId]/layout.tsx` — **SSR skeleton** (cherry-pick #2): server-renders chrome shape (topbar bar, sidebar rail, canvas placeholder, footer line) using static CSS reading editor's existing CSS variables. AquibraStudio dynamically swaps it once JS loads. Reuses `--buildrick-*` token vars
 - [ ] Create `app/edit/[siteId]/page.tsx` (auth + permission gate)
 - [ ] Create `components/editor-route/EditorClient.tsx`
-- [ ] Create `components/editor-route/editor-link.ts`
-- [ ] Create `components/editor-route/EditorSkeleton.tsx`
+- [ ] Create `components/editor-route/editor-link.ts` — exports `getEditorHref(siteId)` (string) AND `EditorLink` component (Next `Link` with `prefetch={true}`, plus `onMouseEnter` triggers `userCanEditSite` query — **cherry-pick #1 hover prefetch**)
+- [ ] Create `components/editor-route/EditorSkeleton.tsx` — client-side fallback for the dynamic-import loading state. Mirrors the SSR skeleton from layout.tsx so the swap is invisible
 - [ ] Move font `<link>` from editor `index.html` → dashboard `app/layout.tsx`
 - [ ] Add `@buildrik/editor` workspace dep to `packages/dashboard/package.json`
-- [ ] Smoke test `/edit/<known-id>` directly (flag false; not yet user-visible)
+- [ ] Smoke test `/edit/<known-id>` directly (flag false; not yet user-visible). Verify: SSR skeleton paints in <50ms; chunk download starts; AquibraStudio replaces skeleton without flash
 - [ ] Codex review checkpoint #2
 
 ### Phase 2 — Call site migration (flag still OFF)
 
-- [ ] Replace 10 `${editorUrl}/?siteId=${id}` sites with `getEditorHref(id)`
-- [ ] Verify all 10 still emit Vite URL (flag false)
+- [ ] Replace 10 `${editorUrl}/?siteId=${id}` sites with appropriate primitive (**cherry-pick #3 soft routing**):
+  - In React-component contexts (cards, links, buttons): use `<EditorLink siteId={id}>` (Next `<Link>` with prefetch + hover prefetch wired)
+  - In imperative handlers where soft nav makes sense (sites list create-then-open): use `router.push(getEditorHref(id))`
+  - In handlers where state-reset is intentional (AI wizard `generation-progress.tsx` redirect): keep `window.location.href = getEditorHref(id)` and add inline comment explaining why
+- [ ] Per-site classification matrix:
+  | File | Method | Reason |
+  |---|---|---|
+  | `app/dashboard/sites/page.tsx:230` | `router.push` | imperative handler |
+  | `app/dashboard/sites/new/page.tsx:65,73,250` | `router.push` | post-mutation nav |
+  | `app/onboarding/setup/page.tsx:12` | `window.location.href` | onboarding state reset |
+  | `components/site-detail/site-header.tsx:56` | `<EditorLink>` | anchor in JSX |
+  | `components/ai-wizard/generation-progress.tsx:87` | `window.location.href` | wizard state reset |
+  | `components/search/command-palette.tsx:210` | `router.push` | command action |
+  | `components/dashboard/site-card.tsx:64` | `<EditorLink>` | anchor in JSX |
+  | `components/sites/site-card-full.tsx:64` | `<EditorLink>` | anchor in JSX |
+- [ ] Plus any new sites discovered in D6 multi-package inventory
+- [ ] Verify all sites still emit Vite URL when flag false
 - [ ] Codex review checkpoint #3
 
 ### Phase 3 — Flag flip (canary)
 
+**Pre-flip observability (must ship before flag turns on):**
+- [ ] Confirm Vercel Web Vitals enabled for `/edit/[siteId]` route (check Vercel project Analytics tab)
+- [ ] Tag Sentry events from `/edit/[id]` with `route_unified=true` — set in `EditorErrorBoundary` and root error handler
+- [ ] Emit custom `editor.cold_load_ms` metric — measure from page nav start (`performance.timing.navigationStart`) to first canvas paint (`composer.on('canvas:first-paint', ...)`) via Web Vitals beacon
+- [ ] Sentry alert: `ChunkLoadError` rate > 0.5% over 5 min → page on-call
+
+**Flip sequence:**
 - [ ] Set `NEXT_PUBLIC_UNIFIED_EDITOR=true` on Vercel preview deploy
-- [ ] 24-hour internal smoke
+- [ ] 24-hour internal smoke (you + 1 user) on preview URL
+- [ ] Verify metrics flowing: `editor.cold_load_ms` p99, `route_unified=true` Sentry tag visible
 - [ ] Production prod-flip via Vercel env update (no code deploy)
-- [ ] Watch error rate, autosave success, publish success
+- [ ] Watch first hour: error rate, autosave success, publish success, `editor.cold_load_ms` delta vs Vite baseline
 - [ ] **Rollback = flip env false, redeploy 60s**
 
 ### Phase 4 — Cleanup
 
 - [ ] Add 301 redirect on `editor.buildrik.com` → `app.buildrik.com/edit/$1`
-- [ ] 30-day stragglers window
-- [ ] Delete `EDITOR_ORIGIN` env, CORS preflight branch, `/api/:path*` headers, DNS for `editor.buildrik.com`
-- [ ] Delete separate Vercel project (if exists)
+- [ ] **Metric-gated DNS removal:** wait for the LATER of (a) 30 calendar days OR (b) `editor.buildrik.com` traffic <1% of `app.buildrik.com/edit/*` traffic. Calendar-only triggers risk 404'ing live bookmarks
+- [ ] Delete `EDITOR_ORIGIN` env, CORS preflight branch, `/api/:path*` headers
+- [ ] Delete DNS for `editor.buildrik.com` AFTER metric gate
+- [ ] Delete separate Vercel project (D7 confirmed pre-Phase 1 whether one exists)
 - [ ] **Keep** `packages/editor/vite.config.ts` + `demo/` (dev-only harness)
 - [ ] Codex review checkpoint #4
 
@@ -386,6 +519,9 @@ Strict improvement: server-side auth before bundle download, CORS attack surface
 | `getSiteIdFromUrl.test.ts` | `/edit/abc` → `abc`; `?siteId=abc` → `abc`; `/edit/abc?foo=bar` → `abc`; root → null |
 | `userCanEditSite.test.ts` | member → true; non-member → false; missing site → false |
 | `EditorClient.test.tsx` | renders skeleton on load; renders AquibraStudio after mount |
+| `editor-skeleton-hydration.test.tsx` | SSR skeleton dimensions match AquibraStudio first paint within ±2px (cherry-pick #2 drift guard) |
+| `command-registry.test.ts` | `registerCommand` returns working `unregister`; `getActiveCommands('/edit/X')` returns dashboard + editor; `getActiveCommands('/dashboard/sites')` returns dashboard only; no leaks between mounts (cherry-pick #4) |
+| `editor-link-prefetch.test.tsx` | `<EditorLink>` triggers `userCanEditSite` query on `mouseenter`; debounced; cancelled on `mouseleave` (cherry-pick #1) |
 
 ### Integration tests
 
@@ -437,11 +573,75 @@ Strict improvement: server-side auth before bundle download, CORS attack surface
 | 0 | Service helper bug | Revert single commit |
 | 1 | Editor doesn't mount under Next | Revert PR; `/edit/[id]` page disappears, no users affected (flag OFF) |
 | 2 | Wrong helper output | Revert PR; URLs revert to inline literal |
-| 3 | Editor breaks for users | Flip `NEXT_PUBLIC_UNIFIED_EDITOR=false` in Vercel (~60s) |
+| 3 | Editor breaks for users | Flip `unifiedEditor=false` in Vercel Edge Config (~10s server-side propagation; users on next nav) |
 | 4 | Stale link still hitting `editor.buildrik.com` | Keep redirect, extend 30-day window |
 
 ---
 
+## CEO review additions (cherry-pick #4 — unified Cmd+K)
+
+Cherry-pick #4 from the 2026-05-10 CEO review. Architectural enough to warrant its own section.
+
+### Today
+
+- Dashboard owns command palette at `components/search/command-palette.tsx`. Bound to `Cmd+K`. Surfaces dashboard actions only (jump to sites, settings, team, billing).
+- Editor likely has its own internal command surface (probably `cmdk`-based given vibcoder Phase 3 organisms shipped a Radix.Dialog + cmdk overlay). Bound to `Cmd+K` within the editor's React tree.
+- Two `Cmd+K` bindings co-exist today only because they live on different domains. After unification, both bindings register on the same window — last-mounted wins, or both fire and conflict.
+
+### After unification
+
+- Lift command palette **definition** to root layout (`app/layout.tsx`).
+- Commands published via a registry pattern, not owned by any single component.
+- Dashboard registers its commands always (open site, jump to billing, etc).
+- Editor registers its commands when `/edit/[id]` route is active and `AquibraStudio` has mounted.
+- One global `Cmd+K` binding lives in the root layout's command palette host. It opens the palette which surfaces ALL currently-registered commands.
+
+### Contract
+
+**Dependency direction:** type definition lives in `@buildrik/shared`. Singleton implementation lives in dashboard. Editor consumes via React context — never imports dashboard directly. Preserves existing `editor → shared → dashboard` direction (never `editor → dashboard`).
+
+```ts
+// packages/shared/command-registry.ts (NEW)
+export type Command = {
+  id: string;
+  label: string;
+  group: 'navigation' | 'site' | 'editor' | 'ai' | 'settings';
+  icon?: ReactNode;
+  shortcut?: string;
+  action: (router: AppRouterInstance) => void | Promise<void>;
+  visibleWhen?: (route: string) => boolean;
+};
+
+// packages/dashboard/components/command-palette/registry.ts (singleton, dashboard-only)
+export function registerCommand(cmd: Command): () => void;  // returns unregister
+export function getActiveCommands(currentRoute: string): Command[];
+
+// Editor receives registerCommand via React context provider mounted at /edit/[id] route
+// Editor never imports from packages/dashboard/* directly
+```
+
+### Migration steps (folded into Phase 1)
+
+- [ ] Create `components/command-palette/registry.ts` (registry singleton)
+- [ ] Create `components/command-palette/CommandPaletteRoot.tsx` — `'use client'`, mounted in `app/layout.tsx`. Owns `Cmd+K` binding via `useHotkey`. Renders the palette from active registered commands
+- [ ] Migrate dashboard's existing `components/search/command-palette.tsx` actions to `registerCommand` calls in a single `dashboard-commands.ts` module that runs at app boot
+- [ ] In editor: locate the existing internal command surface. Refactor it to register editor commands into the registry instead of owning its own keypress
+- [ ] Editor commands gated `visibleWhen: (route) => route.startsWith('/edit/')`
+- [ ] Old `Cmd+K` keypress handlers in editor source — REMOVE (registry now owns it)
+- [ ] Test matrix: `Cmd+K` from `/dashboard/sites` shows dashboard commands only. From `/edit/[id]` shows dashboard + editor commands grouped
+- [ ] Codex review checkpoint inside Phase 1 — registry-pattern adoption is the highest-risk piece
+
+### Risks specific to this cherry-pick
+
+- Editor has heavy keyboard-shortcut wiring (memory: `useEditorShortcuts.ts`). `Cmd+K` may already be claimed for something other than command palette inside the editor — verify before lifting
+- Re-rendering the registry's hot path on every editor state change could cause palette lag; memoize the `getActiveCommands` selector
+- Agent-native parity: every registered command becomes addressable by an agent. Care needed that no command performs irreversible action without confirmation step
+
 ## Open questions deferred
 
 None at design time. Surfaced during planning if any.
+
+## TODOS.md candidates (deferred from 2026-05-10 CEO review)
+
+- **Token system foundation layer** — single `:root` token block in `app/layout.tsx` that both Tailwind `@theme` and editor's `--buildrick-*` derive from. Blast radius too large during active DS Tier-2 arc. Effort CC ~4 hr. Priority P2. Revisit after DS Tier-2 lands.
+- **Editor-as-embed contract** — public-facing iframe API for third-party white-label. Long-term leverage. Effort CC ~1 day. Priority P3.
