@@ -55,12 +55,13 @@ describe("DesignSystemTab — 14-kind aggregation", () => {
   it("renders all four sections in the section switcher", () => {
     const composer = makeFakeComposer();
     const { getAllByRole } = render(wrap(<DesignSystemTab composer={composer} />));
-    const buttons = getAllByRole("button").map((b) => b.textContent ?? "");
-    expect(buttons).toContain("Tokens");
-    expect(buttons).toContain("Styles");
-    expect(buttons).toContain("Components");
-    // "Export" appears twice (section tab + ExportDropdown trigger) — assert presence.
-    expect(buttons.filter((t) => t === "Export").length).toBeGreaterThanOrEqual(1);
+    // DD3: section switcher uses role="tab" (WAI-ARIA tablist), not implicit
+    // role="button". ExportDropdown trigger remains a plain <button>.
+    const tabLabels = getAllByRole("tab").map((t) => t.textContent ?? "");
+    expect(tabLabels).toContain("Tokens");
+    expect(tabLabels).toContain("Styles");
+    expect(tabLabels).toContain("Components");
+    expect(tabLabels).toContain("Export");
   });
 
   it("editing a radius token surfaces a dirty marker on the Tokens section", async () => {
