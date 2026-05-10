@@ -1,12 +1,13 @@
 "use client";
 
-import { Component, type ReactNode } from "react";
+import { Component, type ErrorInfo, type ReactNode } from "react";
 
 type FallbackProps = { error: Error; retry: () => void };
 
 interface Props {
   fallback: (props: FallbackProps) => ReactNode;
   children: ReactNode;
+  siteId?: string;
 }
 
 interface State {
@@ -18,6 +19,22 @@ export class EditorErrorBoundary extends Component<Props, State> {
 
   static getDerivedStateFromError(error: Error): State {
     return { error };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    // Phase 3 observability scaffold: structured log for aggregation/alerting.
+    // When Sentry is wired, captureException with tag route_unified=true here.
+    console.error(
+      JSON.stringify({
+        type: error.name === "ChunkLoadError" ? "chunk_load_error" : "editor_crash",
+        name: error.name,
+        message: error.message,
+        siteId: this.props.siteId,
+        route_unified: true,
+        componentStack: info.componentStack?.split("\n").slice(0, 5).join("\n"),
+        ts: Date.now(),
+      }),
+    );
   }
 
   retry = () => this.setState({ error: null });

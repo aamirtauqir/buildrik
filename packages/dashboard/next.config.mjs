@@ -3,6 +3,19 @@ const nextConfig = {
   serverExternalPackages: ["@prisma/client", "bcryptjs"],
   transpilePackages: ["@buildrik/editor"],
   compiler: { emotion: true },
+  // Legacy ?siteId= bookmark forwarding on dashboard origin only.
+  // Cross-origin editor.buildrik.com stale bookmarks need a Vercel-project
+  // redirect rule (Phase 4 cleanup checklist).
+  async redirects() {
+    return [
+      {
+        source: "/",
+        has: [{ type: "query", key: "siteId", value: "(?<id>.+)" }],
+        destination: "/edit/:id",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
