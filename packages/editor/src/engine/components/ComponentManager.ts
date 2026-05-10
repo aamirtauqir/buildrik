@@ -116,6 +116,8 @@ export class ComponentManager {
       category?: string;
       tags?: string[];
       variantProperties?: VariantProperty[];
+      /** Spec §6.3 / D7: persist user's "Pre-fill from DS styles" choice. */
+      prefillFromDs?: boolean;
     }
   ): Promise<ComponentDefinition | null> {
     const element = this.composer.elements.getElement(elementId);
@@ -136,6 +138,7 @@ export class ComponentManager {
       updatedAt: now,
       version: 1,
       variantProperties: options?.variantProperties,
+      prefillFromDs: options?.prefillFromDs,
     };
 
     await saveComponent(component, this.projectId);

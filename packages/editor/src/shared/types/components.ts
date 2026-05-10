@@ -43,6 +43,10 @@ export interface ComponentDefinition {
   variants?: ComponentVariant[];
   /** GAP-FIX: Default variant ID to use when instantiating */
   defaultVariantId?: string;
+  /** Spec D7/§6.3: created with "Pre-fill from DS styles" toggle on. When
+   *  true, future engine arc may convert raw style values into token/preset
+   *  bindings on save. UI today just records the user's intent. */
+  prefillFromDs?: boolean;
 }
 
 // ============================================

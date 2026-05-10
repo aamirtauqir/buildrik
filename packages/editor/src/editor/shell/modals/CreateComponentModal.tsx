@@ -52,6 +52,9 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
   const [isVariantSet, setIsVariantSet] = React.useState(false);
   const [selectedVariantProps, setSelectedVariantProps] = React.useState<string[]>([]);
 
+  // Spec §6.3 / D7: "Pre-fill from DS styles" toggle, default ON.
+  const [prefillFromDs, setPrefillFromDs] = React.useState(true);
+
   // Reset form when modal closes
   React.useEffect(() => {
     if (!isOpen) {
@@ -61,6 +64,7 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
       setTags("");
       setIsVariantSet(false);
       setSelectedVariantProps([]);
+      setPrefillFromDs(true);
     }
   }, [isOpen]);
 
@@ -102,6 +106,8 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
         tags: tags.trim() ? tags.split(",").map((t) => t.trim()) : undefined,
         // GAP-FIX: Include variant properties if defined
         variantProperties,
+        // Spec §6.3 / D7: persist user's "Pre-fill from DS styles" choice.
+        prefillFromDs,
       });
 
       if (component) {
@@ -227,6 +233,21 @@ export const CreateComponentModal: React.FC<CreateComponentModalProps> = ({
               <small style={hintStyles}>You can configure variant values after creation</small>
             </div>
           )}
+        </div>
+
+        {/* Spec §6.3 / D7: "Pre-fill from DS styles" toggle (default ON) */}
+        <div style={variantSectionStyles}>
+          <label style={checkboxLabelStyles}>
+            <Checkbox
+              checked={prefillFromDs}
+              onChange={(e) => setPrefillFromDs(e.target.checked)}
+              style={checkboxStyles}
+            />
+            <span>Pre-fill from DS styles</span>
+          </label>
+          <small style={hintStyles}>
+            Lift matching values into token / preset bindings on save. Recommended.
+          </small>
         </div>
       </Stack>
           </div>
