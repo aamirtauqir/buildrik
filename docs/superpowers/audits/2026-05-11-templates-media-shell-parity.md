@@ -79,5 +79,8 @@ Live capture: `task4c-media-slim-styled.png`.
 ## Open follow-ups (not in this arc)
 
 - **My Templates filter is empty** — user-saved templates persistence is a separate arc. IA pill is wired but list returns `[]`.
-- **Library fullpage CSS** — when SlimLauncher's Maximize2 fires `onOpenLibrary`, `mediaFullPage` flips true and the legacy fullpage Library mounts. That path still has missing CSS for `med-sec-hdr`, `med-empty`, `med-library-view`, `med-fmt-strip`, `med-sort-wrap`. Reachable from the editor UI today; should be styled or replaced before public release.
 - **Template "Add as New Page" + tail CTAs** — verify scroll-state of S2 detail panel captures all 3 CTAs.
+
+## Retracted follow-up
+
+- ~~Library fullpage CSS gap~~ — initial inventory flagged 123 unstyled `.med-*` classes in `MediaTab`'s fullpage internals. Browser-smoke after the SlimLauncher wiring landed proved this is a **non-issue**: `FullPageRouter.tsx:66-74` mounts `<LibraryManager>` (sibling 3-column manager with 972 LOC of `.mgr-*` CSS) when `mediaFullPage` flips true. The unstyled `MediaTab` fullpage path is unreachable in practice — the broken Library I screenshotted earlier was the panel-mode path before `onOpenLibrary` was wired. Capture: `task-followup-library-fullpage.png`.
