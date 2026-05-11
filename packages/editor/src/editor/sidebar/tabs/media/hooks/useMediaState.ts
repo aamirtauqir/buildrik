@@ -196,12 +196,12 @@ export function useMediaState(composer: Composer): MediaStateResult {
   );
 
   const copyUrl = useCallback(
-    (src: string) => {
+    (item: LibraryItem) => {
       if (!navigator.clipboard) {
         showToast("Clipboard not available in this browser", "error");
         return;
       }
-      navigator.clipboard.writeText(src).then(
+      navigator.clipboard.writeText(item.src).then(
         () => showToast("URL copied ✓", "success"),
         () => showToast("Could not copy URL", "error")
       );

@@ -73,7 +73,7 @@ describe("isSafeSrc — URL scheme allowlist", () => {
 
 describe("sniffMimeType — magic byte detection", () => {
   function fileFrom(content: Uint8Array | string, name: string, type: string): File {
-    const blob = new Blob([content], { type });
+    const blob = new Blob([content as BlobPart], { type });
     return new File([blob], name, { type });
   }
 

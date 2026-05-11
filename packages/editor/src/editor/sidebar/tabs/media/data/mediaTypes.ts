@@ -98,7 +98,8 @@ export interface LibraryStateResult {
   currentFolderId: string | null;
   setCurrentFolderId(id: string | null): void;
   createFolder(name: string): Promise<void>;
-  deleteFolder(id: string): Promise<void>;
+  inspectFolder(id: string): { assetCount: number; subFolderCount: number };
+  deleteFolder(id: string, options?: { force?: boolean }): Promise<void>;
   moveAsset(assetId: string, folderId: string | null): Promise<void>;
   bulkMoveAssets(assetIds: string[], folderId: string | null): Promise<void>;
   counts: TypeCounts;
@@ -237,7 +238,7 @@ export interface MediaStateResult {
   storage: { used: number; total: number };
 
   // Clipboard
-  copyUrl(src: string): void;
+  copyUrl(item: LibraryItem): void;
 
   // Overlays
   ctxMenu: CtxMenuState | null;
@@ -329,4 +330,6 @@ export interface UploadZoneProps {
   storage: { used: number; total: number };
   onUpload(files: File[]): void;
   disabled?: boolean;
+  /** Currently-uploading files; reserved for future queue UI. Accepted but unused today. */
+  uploadQueue?: UploadProgress[];
 }

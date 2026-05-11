@@ -26,7 +26,6 @@ import {
   getMediaDimensions,
   generateThumbnail,
   generateMediaId,
-  blobToDataURL,
   sniffMimeType,
 } from "./MediaHelpers";
 import { MediaStorage } from "./MediaStorage";

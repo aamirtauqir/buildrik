@@ -685,7 +685,7 @@ export interface UploadProgress {
   progress: number;
 
   /** Current status */
-  status: "pending" | "uploading" | "processing" | "complete" | "error";
+  status: "pending" | "uploading" | "optimizing" | "processing" | "complete" | "error";
 
   /** Error message if failed */
   error?: string;

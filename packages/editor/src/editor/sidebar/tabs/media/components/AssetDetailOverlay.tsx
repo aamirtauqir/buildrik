@@ -16,10 +16,12 @@ interface AssetDetailOverlayProps {
   item: LibraryItem;
   onInsert(key: string): void;
   onRename(key: string, name: string): Promise<void>;
+  onUpdate?(key: string, updates: Partial<LibraryItem>): Promise<void>;
   onDelete(key: string): void;
   onClose(): void;
   onPrev?: () => void;
   onNext?: () => void;
+  onEditImage?(item: LibraryItem): void | Promise<void>;
 }
 
 export function AssetDetailOverlay({

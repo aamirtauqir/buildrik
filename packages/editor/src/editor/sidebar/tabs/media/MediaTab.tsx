@@ -24,7 +24,7 @@ import { SlimLauncher } from "./components/SlimLauncher";
 import "./MediaTab.css";
 import { useToast } from "@/editor/shared/vibcoder";
 import type { LibraryItem } from "./data/mediaTypes";
-import type { IconConfig } from "../../../../../shared/types/media";
+import type { IconConfig } from "@shared/types/media";
 
 interface MediaTabProps {
   composer: Composer | null;
@@ -218,18 +218,6 @@ function MediaTabWithComposer({
           onInsert={state.insertToCanvas}
           onCtxMenu={state.openCtxMenu}
           onDetail={state.openDetail}
-          onSearchChange={state.setLibrarySearch}
-          folders={state.folders}
-          currentFolderId={state.currentFolderId}
-          setCurrentFolderId={state.setCurrentFolderId}
-          onCreateFolder={state.createFolder}
-          onDeleteFolder={state.deleteFolder}
-          onMoveAsset={state.moveAsset}
-          stockPhotos={state.stockPhotos}
-          stockVideos={state.stockVideos}
-          discLoading={state.discLoading}
-          onSaveToLibrary={state.saveToLibrary}
-          onEditImage={handleEditImage}
         />
       </div>
       {/* 5. Upload Zone (Library only) */}
