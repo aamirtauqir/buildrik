@@ -13,6 +13,7 @@
  */
 
 import * as React from "react";
+import { Input } from "@/editor/shared/vibcoder/Input";
 import { PanelHeader } from "@/shared/extensions/PanelHeader";
 import type { Composer } from "@/engine";
 import { CatalogSection } from "./CatalogSection";
@@ -135,7 +136,7 @@ export const ComponentsPanelV2: React.FC<ComponentsPanelV2Props> = ({
       </div>
 
       <div style={{ padding: "0 12px" }}>
-        <input
+        <Input
           type="search"
           placeholder="Search components…"
           value={search}

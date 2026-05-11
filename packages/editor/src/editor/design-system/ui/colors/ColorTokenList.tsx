@@ -517,7 +517,7 @@ export const ColorTokenList: React.FC<ColorTokenListProps> = ({
           // the first token's value — matches prototype's "current accent" feel.
           const mini = group.key === "brand" ? group.tokens[0]?.value : undefined;
           return (
-            <div key={group.key}>
+            <div key={group.key} style={{ maxWidth: 320 }}>
               <GroupHeader
                 label={group.key === "brand" ? "Brand colour" : group.label}
                 mini={mini}

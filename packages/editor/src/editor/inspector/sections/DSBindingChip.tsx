@@ -16,6 +16,7 @@
  */
 import * as React from "react";
 import { useDSModeOptional } from "../../design-system/state/DSModeContext";
+import { Button } from "@/editor/shared/vibcoder/Button";
 
 export type DSBindingState = "token" | "preset" | "off-ds";
 
@@ -141,18 +142,14 @@ export const DSBindingChip: React.FC<DSBindingChipProps> = ({
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
       {chip}
-      <button
+      <Button
+        variant="ghost"
+        size="sm"
         type="button"
         onClick={onBindRequest}
         aria-label={`Bind ${label} to a design token`}
-        className="bd-ds-binding-chip__bind-hint"
         style={{
-          margin: 0,
           padding: 0,
-          background: "transparent",
-          border: "none",
-          font: "inherit",
-          cursor: "pointer",
           fontSize: 11,
           color: "var(--bd-accent, #2D6DFF)",
           textDecoration: "underline dotted",
@@ -160,7 +157,7 @@ export const DSBindingChip: React.FC<DSBindingChipProps> = ({
         }}
       >
         Bind to token
-      </button>
+      </Button>
     </span>
   );
 };

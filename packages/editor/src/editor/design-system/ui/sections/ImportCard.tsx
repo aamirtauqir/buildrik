@@ -11,6 +11,8 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/shared/vibcoder/Button";
+import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { useToast } from "@/editor/shared/vibcoder";
 import { parseImportJSON, diffTokens, type DiffResult } from "../../utils/importUtils";
 import { useImportTokens } from "../../state/useImportTokens";

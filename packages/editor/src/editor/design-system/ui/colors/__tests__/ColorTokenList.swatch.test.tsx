@@ -88,8 +88,8 @@ describe("ColorTokenList — swatch grid (Visual-sync V1)", () => {
 
   it("shows a dirty marker on swatches whose token has a pending diff", () => {
     const tokens = [makeToken("color-primary", "Primary", "#2D6DFF", "brand")];
-    const pendingDiff = {
-      "color-primary": { previousValue: "#2D6DFF", newValue: "#FF0000" } as TokenDiff,
+    const pendingDiff: Record<string, TokenDiff> = {
+      "color-primary": { tokenId: "color-primary", previousValue: "#2D6DFF", currentValue: "#FF0000" },
     };
     const { container } = render(
       <ColorTokenList tokens={tokens} {...baseProps} pendingDiff={pendingDiff} />,

@@ -4,6 +4,7 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import type { DesignToken } from "../../types";
 
 export interface ReviewModalProps {
@@ -234,36 +235,21 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
         )}
 
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
-          <button
+          <Button
             ref={cancelRef}
+            variant="ghost"
+            size="sm"
             onClick={onClose}
-            style={{
-              padding: "7px 14px",
-              background: "transparent",
-              border: "1px solid var(--bd-border)",
-              borderRadius: 6,
-              color: "var(--bd-fg-secondary)",
-              fontSize: 12,
-              cursor: "pointer",
-            }}
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
             onClick={onConfirm}
-            style={{
-              padding: "7px 14px",
-              background: "var(--bd-accent)",
-              border: "none",
-              borderRadius: 6,
-              color: "var(--bd-fg-on-accent)",
-              fontSize: 12,
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
           >
             Save to site
-          </button>
+          </Button>
         </div>
       </div>
     </div>

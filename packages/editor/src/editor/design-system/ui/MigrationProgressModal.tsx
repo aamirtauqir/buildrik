@@ -20,6 +20,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import {
   Modal,
   ModalContent,
@@ -190,18 +191,19 @@ export const MigrationProgressModal: React.FC<MigrationProgressModalProps> = ({
 
               <div style={{ display: "flex", gap: 6, marginTop: 16 }}>
                 {onRestoreSnapshot && (
-                  <button
+                  <Button
+                    variant="primary"
+                    size="sm"
                     type="button"
-                    className="bd-btn bd-btn--primary"
                     onClick={onRestoreSnapshot}
                   >
                     Restore snapshot
-                  </button>
+                  </Button>
                 )}
                 {onRetry && stuckAt !== undefined && (
-                  <button type="button" className="bd-btn" onClick={onRetry}>
+                  <Button variant="secondary" size="sm" type="button" onClick={onRetry}>
                     Retry v{stuckAt}
-                  </button>
+                  </Button>
                 )}
               </div>
             </>

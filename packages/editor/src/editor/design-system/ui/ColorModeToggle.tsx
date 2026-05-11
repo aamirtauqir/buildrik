@@ -16,6 +16,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { IconButton } from "@/editor/shared/vibcoder/IconButton";
 import type { Composer } from "../../../engine";
 import type { ThemeMode } from "../types";
 
@@ -113,14 +114,15 @@ export const ColorModeToggle: React.FC<ColorModeToggleProps> = ({ composer, rend
   }
 
   return (
-    <button
+    <IconButton
+      variant="ghost"
+      size="sm"
       type="button"
-      className="bd-icon-btn"
       onClick={handleClick}
       aria-label={ariaLabel}
       title={ariaLabel + (missingDarkCount > 0 ? ` (${missingDarkCount} tokens missing dark variant)` : "")}
     >
       <Icon />
-    </button>
+    </IconButton>
   );
 };

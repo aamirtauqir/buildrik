@@ -311,7 +311,10 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
         </div>
       )}
 
-      {/* Mono mini metadata header */}
+      {/* Mono mini metadata header — wrapped with chip grid + drawer in a
+       * maxWidth column so the whole composition keeps prototype-sidebar
+       * density even in the live editor's fullpage Design drawer. */}
+      <div style={{ maxWidth: 320 }}>
       <div
         style={{
           display: "flex",
@@ -370,6 +373,7 @@ export const SpacingTokenList: React.FC<SpacingTokenListProps> = ({
           onClose={() => setActiveId(null)}
         />
       )}
+      </div> {/* maxWidth wrapper close */}
     </div>
   );
 };

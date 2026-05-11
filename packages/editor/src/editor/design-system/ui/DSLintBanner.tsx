@@ -19,6 +19,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import type { LintIssue, LintRuleId } from "../linter";
 
 export interface DSLintBannerProps {
@@ -33,6 +34,7 @@ const RULE_LABEL: Record<LintRuleId, string> = {
   "pure-black": "pure-black value",
   "empty-value": "empty token value",
   "missing-dark": "missing dark variant",
+  "unresolved-binding": "unresolved token binding",
 };
 
 export const DSLintBanner: React.FC<DSLintBannerProps> = ({
@@ -93,24 +95,26 @@ export const DSLintBanner: React.FC<DSLintBannerProps> = ({
       {(onReviewAll || onDismiss) && (
         <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
           {onReviewAll && (
-            <button
+            <Button
+              variant="primary"
+              size="sm"
               type="button"
-              className="bd-btn bd-btn--primary"
               onClick={onReviewAll}
               style={{ fontSize: 10 }}
             >
               Review all
-            </button>
+            </Button>
           )}
           {onDismiss && (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               type="button"
-              className="bd-btn bd-btn--ghost"
               onClick={onDismiss}
               style={{ fontSize: 10 }}
             >
               Dismiss
-            </button>
+            </Button>
           )}
         </div>
       )}

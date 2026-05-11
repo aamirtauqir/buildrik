@@ -4,6 +4,7 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/shared/vibcoder/Button";
 
 export interface FooterProps {
   isDirty: boolean;
@@ -33,38 +34,22 @@ export const DesignTabFooter: React.FC<FooterProps> = ({
     <div style={{ flex: 1, fontSize: 12, color: "var(--bd-fg-muted)" }}>
       {isDirty ? `${dirtyCount} previewing` : "All changes saved"}
     </div>
-    <button
+    <Button
+      variant="ghost"
+      size="sm"
       onClick={onDiscard}
       disabled={!isDirty}
-      style={{
-        padding: "6px 12px",
-        background: "transparent",
-        border: "1px solid var(--bd-border)",
-        borderRadius: 6,
-        color: isDirty ? "#ef4444" : "var(--bd-fg-muted)",
-        fontSize: 12,
-        cursor: isDirty ? "pointer" : "default",
-        opacity: isDirty ? 1 : 0.4,
-      }}
+      style={{ color: isDirty ? "#ef4444" : undefined }}
     >
       Discard
-    </button>
-    <button
+    </Button>
+    <Button
+      variant="primary"
+      size="sm"
       onClick={onReview}
       disabled={!isDirty}
-      style={{
-        padding: "6px 14px",
-        background: isDirty ? "var(--bd-accent)" : "var(--bd-accent-tint)",
-        border: "none",
-        borderRadius: 6,
-        color: isDirty ? "#fff" : "var(--bd-fg-muted)",
-        fontSize: 12,
-        fontWeight: 600,
-        cursor: isDirty ? "pointer" : "default",
-        opacity: isDirty ? 1 : 0.5,
-      }}
     >
       Apply Changes
-    </button>
+    </Button>
   </div>
 );

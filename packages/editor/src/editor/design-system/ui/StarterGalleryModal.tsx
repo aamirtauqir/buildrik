@@ -18,6 +18,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import {
   Modal,
   ModalContent,
@@ -92,17 +93,18 @@ export const StarterGalleryModal: React.FC<StarterGalleryModalProps> = ({
           <div style={{ fontSize: 11, color: "var(--bd-text-muted, #64748b)", marginRight: "auto" }}>
             Tip: applying a starter restyles tokens but keeps your elements.
           </div>
-          <button type="button" className="bd-btn bd-btn--ghost" onClick={handleSkip}>
+          <Button variant="ghost" size="sm" type="button" onClick={handleSkip}>
             Skip
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
             type="button"
-            className="bd-btn bd-btn--primary"
             onClick={handleApply}
             disabled={!selected}
           >
             Apply {selected?.name ?? ""}
-          </button>
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
@@ -126,7 +128,6 @@ function StarterCard({ starter, selected, onSelect }: StarterCardProps) {
       role="radio"
       aria-checked={selected}
       onClick={onSelect}
-      className="bd-starter-card"
       style={{
         all: "unset",
         cursor: "pointer",

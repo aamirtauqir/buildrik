@@ -129,7 +129,8 @@ describe("DSBindingChip", () => {
       </DSModeProvider>
     );
     const bindBtn = getByRole("button", { name: /Bind #FFAA22 to a design token/ });
-    expect(bindBtn.className).toContain("bd-ds-binding-chip__bind-hint");
+    expect(bindBtn).toBeDefined();
+    expect(bindBtn.textContent).toBe("Bind to token");
   });
 
   it("DD3: Enter activates the chip (native button keyboard behavior)", () => {

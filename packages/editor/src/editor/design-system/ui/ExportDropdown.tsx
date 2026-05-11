@@ -4,6 +4,7 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { useClickOutside } from "../../../shared/hooks/useClickOutside";
 import type { ExportFormat } from "../utils/exportUtils";
 
@@ -25,22 +26,13 @@ export const ExportDropdown: React.FC<{
 
   return (
     <div ref={ref} style={{ position: "relative" }}>
-      <button
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="true"
         aria-expanded={open}
-        style={{
-          padding: "4px 10px",
-          background: "rgba(255,255,255,0.05)",
-          border: "1px solid var(--bd-border)",
-          borderRadius: 6,
-          color: "var(--bd-fg-secondary)",
-          fontSize: 12,
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          gap: 4,
-        }}
+        style={{ display: "flex", alignItems: "center", gap: 4 }}
       >
         Export
         <svg
@@ -53,7 +45,7 @@ export const ExportDropdown: React.FC<{
         >
           <path d="M2 3.5l3 3 3-3" strokeLinecap="round" />
         </svg>
-      </button>
+      </Button>
       {open && (
         <div
           role="menu"
@@ -81,7 +73,9 @@ export const ExportDropdown: React.FC<{
               <div style={{ fontSize: 12, color: "var(--bd-warning)", marginBottom: 6, lineHeight: 1.5 }}>
                 ⚠ Exporting unsaved changes — not yet live on your site.
               </div>
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => {
                   setOpen(false);
                   onSaveFirst();
@@ -89,15 +83,12 @@ export const ExportDropdown: React.FC<{
                 style={{
                   fontSize: 12,
                   color: "var(--bd-accent)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
                   padding: 0,
                   textDecoration: "underline",
                 }}
               >
                 Save first →
-              </button>
+              </Button>
             </div>
           )}
           {EXPORT_OPTIONS.map(({ fmt, label, desc }) => (

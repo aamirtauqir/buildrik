@@ -20,6 +20,8 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Button } from "@/editor/shared/vibcoder/Button";
+import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import {
   Modal,
   ModalContent,
@@ -135,7 +137,7 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
         </div>
 
         <div style={{ padding: "20px 28px", display: "flex", flexDirection: "column", gap: 12 }}>
-          <textarea
+          <Textarea
             aria-label="Component description"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
@@ -195,43 +197,43 @@ export const AIPromptModal: React.FC<AIPromptModalProps> = ({
         <ModalFooter style={{ padding: "16px 28px", borderTop: "1px solid var(--bd-border, #e2e8f0)" }}>
           {state.kind === "idle" && (
             <>
-              <button type="button" className="bd-btn bd-btn--ghost" onClick={() => onOpenChange(false)}>
+              <Button variant="ghost" size="sm" type="button" onClick={() => onOpenChange(false)}>
                 Cancel
-              </button>
-              <button type="button" className="bd-btn bd-btn--primary" onClick={handleGenerate}>
+              </Button>
+              <Button variant="primary" size="sm" type="button" onClick={handleGenerate}>
                 Generate
-              </button>
+              </Button>
             </>
           )}
 
           {isGenerating && (
-            <button type="button" className="bd-btn bd-btn--ghost" onClick={handleCancelGeneration}>
+            <Button variant="ghost" size="sm" type="button" onClick={handleCancelGeneration}>
               Cancel generation
-            </button>
+            </Button>
           )}
 
           {showSuccess && (
             <>
-              <button type="button" className="bd-btn bd-btn--ghost" onClick={handleDiscard}>
+              <Button variant="ghost" size="sm" type="button" onClick={handleDiscard}>
                 Discard
-              </button>
-              <button type="button" className="bd-btn bd-btn--ghost" onClick={handleGenerate}>
+              </Button>
+              <Button variant="ghost" size="sm" type="button" onClick={handleGenerate}>
                 Retry
-              </button>
-              <button type="button" className="bd-btn bd-btn--primary" onClick={handleAccept}>
+              </Button>
+              <Button variant="primary" size="sm" type="button" onClick={handleAccept}>
                 Accept
-              </button>
+              </Button>
             </>
           )}
 
           {state.kind === "error" && (
             <>
-              <button type="button" className="bd-btn bd-btn--ghost" onClick={() => onOpenChange(false)}>
+              <Button variant="ghost" size="sm" type="button" onClick={() => onOpenChange(false)}>
                 Cancel
-              </button>
-              <button type="button" className="bd-btn bd-btn--primary" onClick={handleGenerate}>
+              </Button>
+              <Button variant="primary" size="sm" type="button" onClick={handleGenerate}>
                 Retry
-              </button>
+              </Button>
             </>
           )}
         </ModalFooter>

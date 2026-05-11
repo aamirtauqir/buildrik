@@ -4,6 +4,7 @@
  */
 
 import * as React from "react";
+import { Button } from "@/editor/shared/vibcoder/Button";
 
 export const TabGuardModal: React.FC<{
   changedTabs: string[];
@@ -61,51 +62,30 @@ export const TabGuardModal: React.FC<{
           {changedTabs.length > 1 ? "all of them" : "them"}.
         </div>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-          <button
+          <Button
             ref={firstButtonRef}
+            variant="ghost"
+            size="sm"
             onClick={onKeep}
-            style={{
-              padding: "7px 14px",
-              background: "transparent",
-              border: "1px solid var(--bd-border)",
-              borderRadius: 6,
-              color: "var(--bd-fg-secondary)",
-              fontSize: 12,
-              cursor: "pointer",
-            }}
           >
             Stay
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
             onClick={onSaveAndSwitch}
-            style={{
-              padding: "7px 14px",
-              background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
-              border: "none",
-              borderRadius: 6,
-              color: "var(--bd-fg-on-accent)",
-              fontSize: 12,
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
+            style={{ background: "linear-gradient(135deg, #7c3aed, #6d28d9)", border: "none" }}
           >
             Save and switch
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
             onClick={onDiscard}
-            style={{
-              padding: "7px 14px",
-              background: "var(--bd-error)",
-              border: "none",
-              borderRadius: 6,
-              color: "var(--bd-fg-on-accent)",
-              fontSize: 12,
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
+            style={{ background: "var(--bd-error)", border: "none" }}
           >
             Discard {tabList}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
