@@ -26,7 +26,7 @@ function makeFakeComposer() {
     elements: { getAll: () => [], getAllElements: () => [] },
     dsLinter: { lint: () => [] },
     settings,
-  } as unknown as Parameters<typeof DesignSystemTab>[0]["composer"];
+  } as unknown as NonNullable<Parameters<typeof DesignSystemTab>[0]["composer"]>;
 }
 
 const wrap = (ui: React.ReactNode) => (
@@ -104,7 +104,7 @@ describe("DesignSystemTab — 14-kind aggregation", () => {
     fireEvent.click(saveButton);
     await waitFor(() => {
       expect(setSpy).toHaveBeenCalled();
-      const arg = setSpy.mock.calls[0][0] as {
+      const arg = setSpy.mock.calls[0]?.[0] as unknown as {
         designTokens: Array<{ id: string; value: string }>;
       };
       const radiusRecord = arg.designTokens.find((t) => t.id === "radius-sm");

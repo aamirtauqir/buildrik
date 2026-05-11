@@ -12,7 +12,7 @@ function createFakeElement(id: string) {
   return {
     getId: () => id,
     getChildren: () => [],
-  } as import("../../../elements/Element").Element;
+  } as unknown as import("../../../elements/Element").Element;
 }
 
 function createFakeComposer(activePageId?: string) {

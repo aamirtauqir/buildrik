@@ -101,7 +101,6 @@ const TemplateItem: React.FC<TemplateItemProps> = ({
             onBlur={handleSaveRename}
             onKeyDown={handleKeyDown}
             autoFocus
-            size="sm"
           />
         ) : (
           <>
@@ -244,7 +243,6 @@ export const MyTemplates: React.FC<MyTemplatesProps> = ({
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         leftIcon={<span>🔍</span>}
-        size="sm"
       />
 
       {/* Count */}

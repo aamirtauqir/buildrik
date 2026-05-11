@@ -189,6 +189,7 @@ describe("initBuildrikSync", () => {
       importProject: vi.fn(),
       exportProject: vi.fn().mockReturnValue({ version: "1.0", pages: [], styles: [], assets: [] }),
       on: vi.fn(),
+      emit: vi.fn(),
     };
 
     await initBuildrikSync(mockComposer, "s1");

@@ -32,7 +32,7 @@ export const listSitesSchema = z.object({
   hasTraffic: z.enum(["none", "1-100", "100-1000", "1000+"]).optional(),
 });
 
-export const createFolderSchema = z.object({
+export const createSiteFolderSchema = z.object({
   name: z.string().min(1).max(50),
 });
 

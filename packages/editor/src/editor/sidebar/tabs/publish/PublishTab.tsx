@@ -317,7 +317,7 @@ export const PublishTab: React.FC<PublishTabProps> = ({
     const hasSocialImg = (() => {
       try {
         const settings = _composer?.getProjectSettings?.();
-        const img = settings?.seo?.ogImage;
+        const img = settings?.seo?.defaultOgImage;
         return typeof img === "string" && img.trim().length > 0;
       } catch { return false; }
     })();

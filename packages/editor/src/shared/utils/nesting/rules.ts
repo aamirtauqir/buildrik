@@ -398,6 +398,33 @@ export const ELEMENT_RULES: Record<ElementType, ElementRule> = {
     implicitRole: "listbox",
     description: "Dropdown select element",
   },
+  checkbox: {
+    categories: [ElementCategory.FORM, ElementCategory.INLINE, ElementCategory.PHRASING, ElementCategory.VOID],
+    allowChildren: false,
+    recommendedParent: ["form"],
+    implicitRole: "checkbox",
+    description: "Checkbox input element",
+  },
+  radio: {
+    categories: [ElementCategory.FORM, ElementCategory.INLINE, ElementCategory.PHRASING, ElementCategory.VOID],
+    allowChildren: false,
+    recommendedParent: ["form"],
+    implicitRole: "radio",
+    description: "Radio input element",
+  },
+  switch: {
+    categories: [ElementCategory.FORM, ElementCategory.INLINE, ElementCategory.PHRASING],
+    allowChildren: false,
+    recommendedParent: ["form"],
+    implicitRole: "switch",
+    description: "Toggle switch input element",
+  },
+  upload: {
+    categories: [ElementCategory.FORM, ElementCategory.INLINE, ElementCategory.PHRASING, ElementCategory.VOID],
+    allowChildren: false,
+    recommendedParent: ["form"],
+    description: "File upload input element",
+  },
 
   // List & Table Elements
   list: {

@@ -13,8 +13,7 @@ import type { ComponentDefinition } from "../../../../../shared/types/components
 const makeComponent = (overrides: Partial<ComponentDefinition> = {}): ComponentDefinition => ({
   id: "comp-1",
   name: "Hero Section",
-  elements: [],
-  rootId: "el-root",
+  masterTree: { id: "el-root", type: "container", styles: {} } as never,
   createdAt: Date.now(),
   updatedAt: Date.now(),
   version: 1,

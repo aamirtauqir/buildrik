@@ -7,7 +7,7 @@
 
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import superjson from "superjson";
-import type { AppRouter } from "../../../server/trpc/router";
+import type { AppRouter } from "../../../../../server/trpc/router";
 import { aiCache } from "./AICache";
 import { createAIError, type AIError } from "./AIErrors";
 
