@@ -193,7 +193,8 @@ beforeEach(() => {
   vi.mocked(canNestElement).mockReturnValue(true);
   vi.mocked(findValidDropTargetWithFallback).mockReturnValue({
     success: false,
-    result: null,
+    result: undefined,
+    elementsChecked: 0,
   });
   vi.mocked(findDropTargetElement).mockReturnValue(null);
 });
@@ -392,7 +393,8 @@ describe("handleBlockDrop", () => {
 
     vi.mocked(findValidDropTargetWithFallback).mockReturnValue({
       success: true,
-      result: { parent: resolvedParent as any, index: 3 },
+      result: { parent: resolvedParent as any, index: 3, position: "inside" },
+      elementsChecked: 1,
     });
 
     const composer = makeStubComposer({
@@ -438,7 +440,8 @@ describe("handleBlockDrop", () => {
 
     vi.mocked(findValidDropTargetWithFallback).mockReturnValue({
       success: true,
-      result: { parent: colParent as any, index: 0 },
+      result: { parent: colParent as any, index: 0, position: "inside" },
+      elementsChecked: 1,
     });
 
     const composer = makeStubComposer({
@@ -648,7 +651,8 @@ describe("handleElementDrop", () => {
     vi.mocked(findDropTargetElement).mockReturnValue(targetDom);
     vi.mocked(findValidDropTargetWithFallback).mockReturnValue({
       success: true,
-      result: { parent: newParent as any, index: 5 },
+      result: { parent: newParent as any, index: 5, position: "inside" },
+      elementsChecked: 1,
     });
 
     expect(handleElementDrop(e, ctx, null)).toBe(true);
@@ -692,7 +696,8 @@ describe("handleElementDrop", () => {
     vi.mocked(findDropTargetElement).mockReturnValue(dom);
     vi.mocked(findValidDropTargetWithFallback).mockReturnValue({
       success: false,
-      result: null,
+      result: undefined,
+      elementsChecked: 0,
     });
 
     expect(handleElementDrop(e, ctx, null)).toBe(true);
@@ -717,7 +722,8 @@ describe("handleElementDrop", () => {
     vi.mocked(findDropTargetElement).mockReturnValue(dom);
     vi.mocked(findValidDropTargetWithFallback).mockReturnValue({
       success: true,
-      result: { parent: newParent as any, index: 0 },
+      result: { parent: newParent as any, index: 0, position: "inside" },
+      elementsChecked: 1,
     });
 
     handleElementDrop(e, ctx, null);

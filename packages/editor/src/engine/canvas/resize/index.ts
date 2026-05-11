@@ -34,7 +34,7 @@ export {
   ROTATION_SNAP_THRESHOLD,
   SHIFT_ROTATION_SNAP_ANGLE,
 } from "./constants";
-export { DEFAULT_SNAP_CONFIG } from "../../shared/constants/canvas";
+export { DEFAULT_SNAP_CONFIG } from "../../../shared/constants/canvas";
 
 // Utilities
 export {

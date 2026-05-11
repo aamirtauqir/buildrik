@@ -190,7 +190,7 @@ export function CanvasOverlayGroup({
         position: "absolute",
         inset: 0,
         pointerEvents: "none",
-        zIndex: Z_LAYERS.overlays,
+        zIndex: Z_LAYERS.selectionOutline,
       }}
     >
       {/* Grid overlay */}
