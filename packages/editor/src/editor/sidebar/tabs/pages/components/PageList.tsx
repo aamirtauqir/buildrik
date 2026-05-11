@@ -1,5 +1,12 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { IconButton } from "@/editor/shared/vibcoder/IconButton";
+import {
+  EmptyState,
+  EmptyStateTitle,
+  EmptyStateDesc,
+  EmptyStateActions,
+} from "@/editor/shared/vibcoder";
 /**
  * PageList — search input + pages tree + bulk toolbar mount + footer + Add CTA.
  * Zero business logic. All state/actions received as props from usePages + useFolders.
@@ -113,26 +120,20 @@ export const PageList: React.FC<Props> = ({
     return (
       <div className="bd-pg-list-shell">
         <div className="bd-pg-list empty" role="tree" aria-label="Pages">
-          <div className="bd-pg-empty">
-            <div className="bd-pg-empty-title">No pages yet</div>
-            <div className="bd-pg-empty-body">
-              Add your first page to get started. Pages are the screens visitors see.
-            </div>
-            <div className="bd-pg-empty-action">
-              <Button className="bd-pg-add" type="button" onClick={onAddPage}>
+          <EmptyState size="compact">
+            <EmptyStateTitle>No pages yet</EmptyStateTitle>
+            <EmptyStateDesc>Add your first page to get started. Pages are the screens visitors see.</EmptyStateDesc>
+            <EmptyStateActions>
+              <Button variant="primary" size="sm" type="button" onClick={onAddPage}>
                 Create blank page
               </Button>
               {onRequestTemplates && (
-                <Button
-                  className="bd-pg-add bd-pg-add-ghost"
-                  type="button"
-                  onClick={onRequestTemplates}
-                >
+                <Button variant="ghost" size="sm" type="button" onClick={onRequestTemplates}>
                   From template
                 </Button>
               )}
-            </div>
-          </div>
+            </EmptyStateActions>
+          </EmptyState>
           <div className="bd-pg-drop-indicator" aria-hidden="true" />
         </div>
       </div>
@@ -163,14 +164,18 @@ export const PageList: React.FC<Props> = ({
               aria-label="Search pages"
             />
             {search && (
-              <Button
-                className="bd-pg-search-clear"
+              <IconButton
+                variant="ghost"
+                size="xs"
                 type="button"
                 onClick={() => setSearch("")}
                 aria-label="Clear search"
               >
-                ×
-              </Button>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" style={{ width: 14, height: 14 }}>
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </IconButton>
             )}
           </div>
         </div>
@@ -209,14 +214,14 @@ export const PageList: React.FC<Props> = ({
       )}
       <div className="bd-pg-list" role="tree" aria-label="Pages">
         {visible.length === 0 && search ? (
-          <div className="bd-pg-empty">
-            <div className="bd-pg-empty-title">No pages match &ldquo;{search}&rdquo;</div>
-            <div className="bd-pg-empty-action">
-              <Button className="bd-pg-add bd-pg-add-ghost" type="button" onClick={() => setSearch("")}>
+          <EmptyState size="compact">
+            <EmptyStateTitle>No pages match &ldquo;{search}&rdquo;</EmptyStateTitle>
+            <EmptyStateActions>
+              <Button variant="ghost" size="sm" type="button" onClick={() => setSearch("")}>
                 Clear search
               </Button>
-            </div>
-          </div>
+            </EmptyStateActions>
+          </EmptyState>
         ) : (
           <>
             {!search && folders.map((folder) => {

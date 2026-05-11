@@ -1,4 +1,10 @@
 import { Button } from "@/editor/shared/vibcoder/Button";
+import {
+  EmptyState,
+  EmptyStateTitle,
+  EmptyStateDesc,
+  EmptyStateActions,
+} from "@/editor/shared/vibcoder";
 /**
  * PagesTab — Shell component.
  *
@@ -175,23 +181,29 @@ export const PagesTab: React.FC<PagesTabProps> = ({
         onClose={onClose}
       >
         <Button
-          className="bd-pg-panel-kbd-btn"
+          variant="ghost"
+          size="sm"
+          style={{ display: "inline-grid", placeItems: "center", width: 26, height: 22, padding: 0 }}
           onClick={() => setPaletteOpen(true)}
           aria-label="Open command palette"
         >
-          <span className="bd-pg-panel-kbd">⌘K</span>
+          <span style={{ font: "500 10px var(--bd-mono)", padding: "1px 5px", borderRadius: 3, border: "1px solid var(--bd-border)", background: "var(--bd-bg-subtle)", color: "var(--bd-fg-muted)" }}>
+            ⌘K
+          </span>
         </Button>
       </TabFrame.Header>
       {/* Error state — takes priority over everything */}
       {p.loadError ? (
         <TabFrame.Body>
-          <div className="bd-pg-error" role="alert" aria-live="assertive">
-            <div className="bd-pg-error-msg">{p.loadError}</div>
-            <div className="bd-pg-error-sub">Your connection dropped. Work is safe — nothing was lost.</div>
-            <Button className="bd-pg-error-retry" onClick={p.retrySync}>
-              Try again
-            </Button>
-          </div>
+          <EmptyState size="compact" style={{ margin: "var(--bd-space-3)" }} role="alert" aria-live="assertive">
+            <EmptyStateTitle>{p.loadError}</EmptyStateTitle>
+            <EmptyStateDesc>Your connection dropped. Work is safe — nothing was lost.</EmptyStateDesc>
+            <EmptyStateActions>
+              <Button variant="secondary" size="sm" onClick={p.retrySync}>
+                Try again
+              </Button>
+            </EmptyStateActions>
+          </EmptyState>
         </TabFrame.Body>
       ) : (
         <TabFrame.Body noScroll>

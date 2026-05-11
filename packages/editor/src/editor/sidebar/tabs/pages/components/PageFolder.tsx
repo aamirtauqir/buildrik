@@ -1,5 +1,5 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
-import { Button } from "@/editor/shared/vibcoder/Button";
+import { IconButton } from "@/editor/shared/vibcoder/IconButton";
 /**
  * PageFolder — collapsible folder row + flat list of child PageRows.
  *
@@ -104,8 +104,8 @@ export const PageFolder: React.FC<Props> = ({
     .join(" ");
 
   return (
-    <div className="bd-pg-folder" role="group" aria-label={`Folder: ${folder.name}`}>
-      <div className="bd-pg-row-wrap">
+    <div role="group" aria-label={`Folder: ${folder.name}`}>
+      <div>
         <div
           className={folderRowClasses}
           role="treeitem"
@@ -121,22 +121,24 @@ export const PageFolder: React.FC<Props> = ({
             }
           }}
         >
-          <Button
-            className="bd-pg-row-disclosure"
+          <IconButton
+            variant="ghost"
+            size="xs"
             type="button"
             aria-label={isExpanded ? `Collapse ${folder.name}` : `Expand ${folder.name}`}
             onClick={(e) => {
               e.stopPropagation();
               onToggle();
             }}
+            style={{ width: 12, height: 12, display: "grid", placeItems: "center", color: "var(--bd-fg-muted)", flexShrink: 0 }}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true" style={{ width: 10, height: 10, transition: "transform 120ms", transform: isExpanded ? "rotate(90deg)" : undefined }}>
               <polyline points="9 6 15 12 9 18" />
             </svg>
-          </Button>
+          </IconButton>
 
-          <span className="bd-pg-row-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <span style={{ flexShrink: 0, color: "var(--bd-warning)", display: "grid", placeItems: "center" }} aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ width: 12, height: 12 }}>
               <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
             </svg>
           </span>
@@ -144,7 +146,6 @@ export const PageFolder: React.FC<Props> = ({
           {isRenamingFolder ? (
             <Input
               ref={renameInputRef}
-              className="bd-pg-row-rename"
               value={renameValue}
               onChange={(e) => setRenameValue(e.target.value)}
               onBlur={commitFolderRename}
@@ -163,7 +164,7 @@ export const PageFolder: React.FC<Props> = ({
             />
           ) : (
             <span
-              className="bd-pg-row-name"
+              style={{ flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", font: "400 13px var(--bd-font)" }}
               title={folder.name}
               onDoubleClick={(e) => {
                 e.stopPropagation();
@@ -174,15 +175,17 @@ export const PageFolder: React.FC<Props> = ({
             </span>
           )}
 
-          <span className="bd-pg-folder-count" aria-label={`${pages.length} pages in folder`}>
+          <span style={{ display: "inline-flex", alignItems: "center", height: 16, padding: "0 6px", marginLeft: "var(--bd-space-1)", borderRadius: 4, background: "rgba(15, 23, 42, 0.06)", color: "var(--bd-fg-muted)", font: "500 10.5px var(--bd-font)", fontVariantNumeric: "tabular-nums" }} aria-label={`${pages.length} pages in folder`}>
             {pages.length}
           </span>
 
           <span style={{ flex: 1 }} aria-hidden="true" />
 
           <div className="bd-pg-folder-actions">
-            <Button
+            <IconButton
               className="bd-pg-folder-act"
+              variant="ghost"
+              size="xs"
               type="button"
               title="Rename folder"
               aria-label={`Rename folder ${folder.name}`}
@@ -191,13 +194,15 @@ export const PageFolder: React.FC<Props> = ({
                 setIsRenamingFolder(true);
               }}
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" style={{ width: 12, height: 12 }}>
                 <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
                 <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
               </svg>
-            </Button>
-            <Button
+            </IconButton>
+            <IconButton
               className="bd-pg-folder-act danger"
+              variant="ghost"
+              size="xs"
               type="button"
               title="Delete folder (pages kept)"
               aria-label={`Delete folder ${folder.name}`}
@@ -206,31 +211,33 @@ export const PageFolder: React.FC<Props> = ({
                 onFolderDelete();
               }}
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" style={{ width: 12, height: 12 }}>
                 <polyline points="3 6 5 6 21 6" />
                 <path d="M19 6l-1 14H6L5 6" />
                 <path d="M10 11v6M14 11v6" />
               </svg>
-            </Button>
+            </IconButton>
           </div>
         </div>
       </div>
       {isExpanded && pages.length > 0 && (
-        <div className="bd-pg-folder-children">
+        <div>
           {pages.map((page) => (
             <div key={page.id} className="bd-pg-page-wrap">
-              <Button
+              <IconButton
                 className="bd-pg-page-eject"
+                variant="ghost"
+                size="xs"
                 type="button"
                 title="Remove from folder"
                 aria-label={`Remove ${page.name} from folder`}
                 onClick={() => onPageRemove(page.id)}
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true" style={{ width: 8, height: 8 }}>
                   <line x1="18" y1="6" x2="6" y2="18" />
                   <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
-              </Button>
+              </IconButton>
               <PageRow
                 page={page}
                 pages={allPages}

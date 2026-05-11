@@ -1,6 +1,11 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { IconButton } from "@/editor/shared/vibcoder/IconButton";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
+import { Cluster } from "@/editor/shared/vibcoder/Cluster";
+import { Label } from "@/editor/shared/vibcoder/Label";
+import { HelperText } from "@/editor/shared/vibcoder/HelperText";
 /**
  * SeoTab — Pure form renderer. No state. No logic.
  * All state via UsePageSettingsReturn (s prop).
@@ -47,26 +52,36 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
   const range = titleRange(s.seoTitle);
 
   return (
-    <div className="bd-pg-seo">
+    <Stack gap="lg">
       {/* ── 1. GOOGLE PREVIEW — TOP ────────────────────────────────────── */}
-      <div className="bd-pg-seo-section-label">How your page looks in Google Search</div>
+      <div style={{ font: "500 11px var(--bd-font)", color: "var(--bd-fg-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+        How your page looks in Google Search
+      </div>
       {/* Google preview — prototype .gpreview */}
-      <div className="bd-pg-seo-gp">
-        <div className="bd-pg-seo-gp-domain">
+      <div style={{ padding: 14, background: "var(--bd-bg-subtle)", border: "1px solid var(--bd-border)", borderRadius: 4 }}>
+        <div style={{ font: "500 10.5px var(--bd-mono)", color: "var(--bd-fg-secondary)" }}>
           {s.domain ?? "yoursite.aquibra.io"} › {page.slug?.replace(/^\//, "") || page.id}
         </div>
-        <div className="bd-pg-seo-gp-title">{s.seoTitle || page.name}</div>
-        <div className={`bd-pg-seo-gp-desc${!s.seoDesc ? " bd-pg-seo-gp-desc--missing" : ""}`}>
+        <div style={{ margin: "var(--bd-space-1) 0 2px", font: "500 16px var(--bd-font)", color: "var(--bd-accent)" }}>
+          {s.seoTitle || page.name}
+        </div>
+        <div style={{ font: "400 12.5px var(--bd-font)", color: s.seoDesc ? "var(--bd-fg-primary)" : "var(--bd-fg-muted)", fontStyle: s.seoDesc ? undefined : "italic", lineHeight: 1.4 }}>
           {s.seoDesc || "No description — add one below to improve ranking"}
         </div>
       </div>
       {/* ── 2. SEO SCORE ────────────────────────────────────────────────── */}
       {!s.allowIndex ? (
-        <div className="bd-pg-seo-noindex-warning" role="alert">
-          <div className="bd-pg-seo-noindex-msg">
-            <strong>noIndex is ON</strong> — search engines won't index this page regardless of your
+        <div style={{ padding: "10px var(--bd-space-3)", background: "var(--bd-warning-tint)", border: "1px solid var(--bd-warning-border)", borderRadius: 4, font: "400 12px var(--bd-font)", color: "var(--bd-warning)" }} role="alert">
+          <div>
+            <strong style={{ color: "var(--bd-fg-heading)" }}>noIndex is ON</strong> — search engines won&apos;t index this page regardless of your
             SEO settings.
-            <Button className="bd-pg-seo-noindex-fix" onClick={() => s.setAllowIndex(true)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              type="button"
+              style={{ marginLeft: 6, padding: "2px 6px", color: "var(--bd-accent)", font: "500 11.5px var(--bd-font)" }}
+              onClick={() => s.setAllowIndex(true)}
+            >
               Turn indexing on →
             </Button>
           </div>
@@ -74,55 +89,56 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
       ) : (
         <>
           {/* Score row + checks grid — prototype .seo-score-row + .seo-checks */}
-          <div className="bd-pg-seo-score-row">
-            <div className={`bd-pg-seo-score-num${s.seoScore >= 80 ? " bd-pg-seo-score-num--ok" : ""}`}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "var(--bd-space-3)", background: "var(--bd-bg-subtle)", border: "1px solid var(--bd-border)", borderRadius: 4 }}>
+            <div style={{ font: "500 28px var(--bd-mono)", color: s.seoScore >= 80 ? "var(--bd-success)" : "var(--bd-warning)", fontVariantNumeric: "tabular-nums", minWidth: 48 }}>
               {s.seoScore}
             </div>
-            <div className="bd-pg-seo-score-meta">
-              <div className="bd-pg-seo-score-label">
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ font: "500 11.5px var(--bd-font)", color: "var(--bd-fg-secondary)" }}>
                 {s.seoScore >= 80 ? "Looks good" : "Needs work"}
               </div>
-              <div className="bd-pg-seo-checks">
-                <div className={`bd-pg-seo-check${s.seoChecks.titleSet ? " bd-pg-seo-check--ok" : ""}`}>
-                  <span>Page title</span>
-                  <span className="bd-pg-seo-check-pts">+20 pts</span>
-                </div>
-                <div className={`bd-pg-seo-check${s.seoChecks.descSet ? " bd-pg-seo-check--ok" : ""}`}>
-                  <span>Meta description</span>
-                  <span className="bd-pg-seo-check-pts">+30 pts</span>
-                </div>
-                <div className={`bd-pg-seo-check${s.seoChecks.slugClean ? " bd-pg-seo-check--ok" : ""}`}>
-                  <span>Clean URL slug</span>
-                  <span className="bd-pg-seo-check-pts">+10 pts</span>
-                </div>
-                <div className={`bd-pg-seo-check${s.seoChecks.indexingOn ? " bd-pg-seo-check--ok" : ""}`}>
-                  <span>Allow indexing</span>
-                  <span className="bd-pg-seo-check-pts">+40 pts</span>
-                </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--bd-space-1) 10px", marginTop: "var(--bd-space-2)" }}>
+                {[
+                  { label: "Page title", ok: s.seoChecks.titleSet, pts: "+20 pts" },
+                  { label: "Meta description", ok: s.seoChecks.descSet, pts: "+30 pts" },
+                  { label: "Clean URL slug", ok: s.seoChecks.slugClean, pts: "+10 pts" },
+                  { label: "Allow indexing", ok: s.seoChecks.indexingOn, pts: "+40 pts" },
+                ].map((c) => (
+                  <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 6, font: "400 11px var(--bd-font)", color: c.ok ? "var(--bd-fg-primary)" : "var(--bd-fg-muted)" }}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: c.ok ? "var(--bd-success)" : "var(--bd-fg-muted)", flexShrink: 0 }} />
+                    <span>{c.label}</span>
+                    <span style={{ marginLeft: "auto", font: "500 10px var(--bd-mono)", color: "var(--bd-fg-muted)" }}>{c.pts}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
           {/* Reach 80+ banner — shown when score < 80 and indexing is on */}
           {s.seoScore < 80 && s.allowIndex && (
-            <div className="bd-pg-seo-banner-warn" role="note">
+            <div style={{ padding: "var(--bd-space-2) 10px", background: "var(--bd-warning-tint)", border: "1px solid var(--bd-warning-border)", borderRadius: 4, font: "400 11.5px var(--bd-font)", color: "var(--bd-warning)" }} role="note">
               Reach 80+ before publishing{s.seoChecks.descSet ? "" : " — add a meta description (+30 pts)"}
             </div>
           )}
         </>
       )}
       {/* ── 3. TITLE ────────────────────────────────────────────────────── */}
-      <div className="bd-pg-seo-field">
-        <div className="bd-pg-seo-field-header">
-          <label className="bd-pg-seo-label" htmlFor="seo-title">
-            Title
-          </label>
-          <span className={`bd-pg-seo-counter bd-pg-seo-counter--${range}`}>
+      <Stack gap="xs" style={{ gap: 6 }}>
+        <Cluster align="center" gap="xs" style={{ justifyContent: "space-between" }}>
+          <Label htmlFor="seo-title">Title</Label>
+          <span style={{ font: "500 10.5px var(--bd-mono)", color: range === "ok" || range === "ideal" ? "var(--bd-success)" : range === "short" ? "var(--bd-warning)" : "var(--bd-error)" }}>
             {s.seoTitle.length}/60{rangeLabel[range]}
           </span>
-        </div>
+        </Cluster>
         {s.seoTitle.length < 10 && (
-          <Button type="button" className="bd-pg-seo-ai-chip" aria-label="Suggest SEO title">
+          <Button
+            variant="ghost"
+            size="sm"
+            type="button"
+            style={{ alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: "var(--bd-space-1)", padding: "3px var(--bd-space-2)", border: "1px solid var(--bd-accent)", borderRadius: 9999, background: "var(--bd-accent-subtle)", color: "var(--bd-accent)", font: "500 10.5px var(--bd-font)", transition: "background 100ms" }}
+            aria-label="Suggest SEO title"
+            onClick={() => { /* TODO: AI suggestion */ }}
+          >
             <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
               <path d="M5 3l14 9-14 9V3z" />
             </svg>
@@ -131,53 +147,34 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
         )}
         <Input
           id="seo-title"
-          className="bd-pg-seo-input"
           value={s.seoTitle}
           onChange={(e) => s.setSeoTitle(e.target.value.slice(0, 80))}
           maxLength={80}
           aria-describedby="seo-title-hint"
         />
-        <div id="seo-title-hint" className="bd-pg-seo-hint">
-          Aim for 50–60 characters for best Google ranking
-        </div>
-      </div>
+        <HelperText>Aim for 50–60 characters for best Google ranking</HelperText>
+      </Stack>
       {/* ── 4. META DESCRIPTION ─────────────────────────────────────────── */}
-      <div className="bd-pg-seo-field">
-        <div className="bd-pg-seo-field-header">
+      <Stack gap="xs" style={{ gap: 6 }}>
+        <Cluster align="center" gap="xs" style={{ justifyContent: "space-between" }}>
           {/* label + info icon in a flex row — button must NOT be inside <label> (HTML spec) */}
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <label className="bd-pg-seo-label" htmlFor="seo-desc">
-              Meta Description
-            </label>
+          <Cluster align="center" gap="xs">
+            <Label htmlFor="seo-desc">Meta Description</Label>
             <Tooltip delayDuration={200}>
               <TooltipTrigger asChild>
-                <Button
+                <IconButton
+                  variant="ghost"
+                  size="sm"
                   type="button"
                   aria-label="About Meta Description"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: 2,
-                    color: "var(--bd-fg-muted)",
-                    display: "inline-flex",
-                    lineHeight: 0,
-                  }}
+                  style={{ padding: 2, color: "var(--bd-fg-muted)", display: "inline-flex", lineHeight: 0 }}
                 >
-                  <svg
-                    width="13"
-                    height="13"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    aria-hidden="true"
-                  >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                     <circle cx="12" cy="12" r="10" />
                     <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
                     <line x1="12" y1="17" x2="12.01" y2="17" />
                   </svg>
-                </Button>
+                </IconButton>
               </TooltipTrigger>
               <TooltipPortal>
                 <TooltipContent side="right">
@@ -188,63 +185,42 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
                 </TooltipContent>
               </TooltipPortal>
             </Tooltip>
-          </div>
-          <span
-            className={`bd-pg-seo-counter ${
-              s.seoDesc.length > 160
-                ? "bd-pg-seo-counter--long"
-                : s.seoDesc.length > 50
-                  ? "bd-pg-seo-counter--ideal"
-                  : ""
-            }`}
-          >
+          </Cluster>
+          <span style={{ font: "500 10.5px var(--bd-mono)", color: s.seoDesc.length > 160 ? "var(--bd-error)" : s.seoDesc.length > 50 ? "var(--bd-success)" : "var(--bd-fg-muted)" }}>
             {s.seoDesc.length}/160
           </span>
-        </div>
+        </Cluster>
         <Textarea
           id="seo-desc"
-          className="bd-pg-seo-textarea"
           rows={3}
           value={s.seoDesc}
           onChange={(e) => s.setSeoDesc(e.target.value.slice(0, 200))}
           placeholder='E.g. "We help small businesses build professional websites. Start free today."'
           aria-describedby="seo-desc-hint"
         />
-        <div id="seo-desc-hint" className="bd-pg-seo-hint">
-          Briefly describe this page (150–160 chars). Appears in Google results below your title.
-        </div>
-      </div>
+        <HelperText>Briefly describe this page (150–160 chars). Appears in Google results below your title.</HelperText>
+      </Stack>
       {/* ── 5. URL SLUG ─────────────────────────────────────────────────── */}
-      <div className="bd-pg-seo-field">
-        <label className="bd-pg-seo-label" htmlFor="seo-slug">
-          URL Slug
-        </label>
-        <div className="bd-pg-seo-slug-wrap">
-          <span className="bd-pg-seo-slug-prefix">{domain}/</span>
+      <Stack gap="xs" style={{ gap: 6 }}>
+        <Label htmlFor="seo-slug">URL Slug</Label>
+        <div style={{ display: "flex", alignItems: "stretch" }}>
+          <span style={{ display: "inline-flex", alignItems: "center", padding: "0 var(--bd-space-2)", border: "1px solid var(--bd-border)", borderRight: 0, borderRadius: "4px 0 0 4px", background: "var(--bd-bg-subtle)", color: "var(--bd-fg-secondary)", font: "500 11px var(--bd-mono)" }}>
+            {domain}/
+          </span>
           <Input
             id="seo-slug"
-            className={`bd-pg-seo-input bd-pg-seo-input--slug${s.slugError ? " bd-pg-seo-input--error" : ""}`}
+            error={!!s.slugError}
             value={s.slug}
             onChange={(e) => s.setSlug(e.target.value)}
             aria-describedby="seo-slug-hint"
             aria-invalid={!!s.slugError}
+            style={{ borderRadius: "0 4px 4px 0", fontFamily: "var(--bd-mono)", fontSize: "11.5px" }}
           />
         </div>
         {/* Slug destructive warning — shown when slug changes on a live page */}
         {s.slug !== page.slug && page.status === "live" && !s.slugError && (
-          <div className="bd-pg-seo-slug-warning" role="alert">
-            <svg
-              className="bd-pg-seo-slug-warning-icon"
-              viewBox="0 0 24 24"
-              width="14"
-              height="14"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
+          <div style={{ display: "flex", gap: "var(--bd-space-2)", padding: "var(--bd-space-2) 10px", background: "var(--bd-warning-tint)", border: "1px solid var(--bd-warning-border)", borderRadius: 4, font: "400 11.5px var(--bd-font)", color: "var(--bd-warning)" }} role="alert">
+            <svg style={{ flexShrink: 0, marginTop: 1 }} viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
               <line x1="12" y1="9" x2="12" y2="13" />
               <line x1="12" y1="17" x2="12.01" y2="17" />
@@ -256,15 +232,13 @@ export const SeoTab: React.FC<Props> = ({ s, page }) => {
           </div>
         )}
         {s.slugError ? (
-          <div className="bd-pg-seo-error" role="alert">
-            {s.slugError}
-          </div>
+          <HelperText tone="error">{s.slugError}</HelperText>
         ) : (
-          <div id="seo-slug-hint" className="bd-pg-seo-hint">
-            Lowercase letters, numbers, and hyphens only — auto-formatted as you type
-          </div>
+          <HelperText>Lowercase letters, numbers, and hyphens only — auto-formatted as you type</HelperText>
         )}
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   );
 };
+
+SeoTab.displayName = "SeoTab";

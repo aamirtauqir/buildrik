@@ -1,6 +1,12 @@
 import { Input } from "@/editor/shared/vibcoder/Input";
 import { Textarea } from "@/editor/shared/vibcoder/Textarea";
 import { Button } from "@/editor/shared/vibcoder/Button";
+import { Stack } from "@/editor/shared/vibcoder/Stack";
+import { Cluster } from "@/editor/shared/vibcoder/Cluster";
+import { Label } from "@/editor/shared/vibcoder/Label";
+import { HelperText } from "@/editor/shared/vibcoder/HelperText";
+import { Switch } from "@/editor/shared/vibcoder/Switch";
+import { ToggleRow } from "@/editor/shared/vibcoder/ToggleRow";
 /**
  * AdvancedTab — Visibility, schedule, password, indexing, head code.
  *
@@ -16,116 +22,95 @@ interface Props {
 
 export const AdvancedTab: React.FC<Props> = ({ s }) => {
   return (
-    <div className="bd-pg-adv">
+    <Stack gap="lg" style={{ gap: 18 }}>
       {/* Visibility */}
-      <div className="bd-pg-adv-section">
-        <div className="bd-pg-adv-section-label">Visibility</div>
-        <div className="bd-pg-adv-seg" role="radiogroup" aria-label="Page visibility">
-          <Button
-            type="button"
-            role="radio"
-            aria-checked={s.visibility === "live"}
-            className={`bd-pg-adv-seg-btn${s.visibility === "live" ? " bd-pg-adv-seg-btn--on" : ""}`}
-            onClick={() => s.setVisibility("live")}
-          >Live</Button>
-          <Button
-            type="button"
-            role="radio"
-            aria-checked={s.visibility === "hidden"}
-            className={`bd-pg-adv-seg-btn${s.visibility === "hidden" ? " bd-pg-adv-seg-btn--on" : ""}`}
-            onClick={() => s.setVisibility("hidden")}
-          >Hidden</Button>
-          <Button
-            type="button"
-            role="radio"
-            aria-checked={s.visibility === "password"}
-            className={`bd-pg-adv-seg-btn${s.visibility === "password" ? " bd-pg-adv-seg-btn--on" : ""}`}
-            onClick={() => s.setVisibility("password")}
-          >Password</Button>
+      <Stack gap="sm">
+        <div style={{ font: "600 11px var(--bd-font)", color: "var(--bd-fg-heading)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+          Visibility
         </div>
-        <div className="bd-pg-adv-hint">
+        <div style={{ display: "inline-flex", padding: 2, background: "var(--bd-bg-subtle)", border: "1px solid var(--bd-border)", borderRadius: 4 }} role="radiogroup" aria-label="Page visibility">
+          {(["live", "hidden", "password"] as const).map((v) => (
+            <button
+              key={v}
+              type="button"
+              role="radio"
+              aria-checked={s.visibility === v}
+              style={{
+                flex: 1,
+                padding: "5px 14px",
+                border: 0,
+                background: s.visibility === v ? "var(--bd-bg-card)" : "transparent",
+                color: s.visibility === v ? "var(--bd-fg-heading)" : "var(--bd-fg-secondary)",
+                font: "500 11.5px var(--bd-font)",
+                cursor: "pointer",
+                borderRadius: 3,
+                transition: "background 100ms, color 100ms",
+                boxShadow: s.visibility === v ? "var(--bd-shadow-xs)" : "none",
+              }}
+              onClick={() => s.setVisibility(v)}
+            >
+              {v.charAt(0).toUpperCase() + v.slice(1)}
+            </button>
+          ))}
+        </div>
+        <HelperText>
           {s.visibility === "live" && "Page is publicly accessible."}
           {s.visibility === "hidden" && "Page is not linked in menus but reachable via direct URL."}
           {s.visibility === "password" && "Visitors must enter a password to view this page."}
-        </div>
-      </div>
+        </HelperText>
+      </Stack>
       {/* Password input — only when visibility=password */}
       {s.visibility === "password" && (
-        <div className="bd-pg-adv-password">
-          <div className="bd-pg-adv-password-row">
+        <div style={{ padding: 10, background: "var(--bd-bg-subtle)", border: "1px solid var(--bd-border)", borderRadius: 4, display: "flex", flexDirection: "column", gap: "var(--bd-space-2)" }}>
+          <Cluster align="center" gap="xs">
             <Input
-              className="bd-pg-adv-password-input"
               type={s.showPassword ? "text" : "password"}
               value={s.password}
               onChange={(e) => s.setPassword(e.target.value)}
               placeholder="Enter password"
               aria-label="Page access password"
+              style={{ flex: 1 }}
             />
-            <Button
-              className="bd-pg-adv-password-btn"
-              onClick={() => s.setShowPassword(!s.showPassword)}
-              type="button"
-              aria-label={s.showPassword ? "Hide password" : "Show password"}
-            >{s.showPassword ? "Hide" : "Show"}</Button>
-            <Button
-              className="bd-pg-adv-password-btn"
-              onClick={() => s.copyPassword()}
-              type="button"
-              aria-label="Copy password"
-              disabled={!s.password}
-            >Copy</Button>
-          </div>
-          <div className="bd-pg-seo-hint">Share this password with visitors who need access.</div>
+            <Button variant="secondary" size="sm" onClick={() => s.setShowPassword(!s.showPassword)} type="button" aria-label={s.showPassword ? "Hide password" : "Show password"}>
+              {s.showPassword ? "Hide" : "Show"}
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => s.copyPassword()} type="button" aria-label="Copy password" disabled={!s.password}>
+              Copy
+            </Button>
+          </Cluster>
+          <HelperText>Share this password with visitors who need access.</HelperText>
         </div>
       )}
       {/* Indexing */}
-      <div className="bd-pg-adv-section">
-        <div className="bd-pg-adv-section-label">Search Engine Indexing</div>
-        <div className="bd-pg-adv-toggle-row">
-          <div className="bd-pg-adv-toggle-info">
-            <div className="bd-pg-adv-toggle-label">Allow indexing</div>
-            <div className="bd-pg-adv-toggle-hint">Let search engines list this page in results.</div>
-          </div>
-          <Button
-            type="button"
-            role="switch"
-            aria-checked={s.allowIndex}
-            className={`bd-pg-adv-toggle${s.allowIndex ? " bd-pg-adv-toggle--on" : ""}`}
-            onClick={() => s.setAllowIndex(!s.allowIndex)}
-            aria-label="Allow indexing"
-          />
+      <Stack gap="sm">
+        <div style={{ font: "600 11px var(--bd-font)", color: "var(--bd-fg-heading)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+          Search Engine Indexing
         </div>
-        <div className="bd-pg-adv-toggle-row">
-          <div className="bd-pg-adv-toggle-info">
-            <div className="bd-pg-adv-toggle-label">Follow links</div>
-            <div className="bd-pg-adv-toggle-hint">Let search engines follow outbound links on this page.</div>
-          </div>
-          <Button
-            type="button"
-            role="switch"
-            aria-checked={s.allowFollow}
-            className={`bd-pg-adv-toggle${s.allowFollow ? " bd-pg-adv-toggle--on" : ""}`}
-            onClick={() => s.setAllowFollow(!s.allowFollow)}
-            aria-label="Follow links"
-          />
-        </div>
-      </div>
+        <ToggleRow label="Allow indexing" helper="Let search engines list this page in results.">
+          <Switch checked={s.allowIndex} onCheckedChange={() => s.setAllowIndex(!s.allowIndex)} aria-label="Allow indexing" />
+        </ToggleRow>
+        <ToggleRow label="Follow links" helper="Let search engines follow outbound links on this page.">
+          <Switch checked={s.allowFollow} onCheckedChange={() => s.setAllowFollow(!s.allowFollow)} aria-label="Follow links" />
+        </ToggleRow>
+      </Stack>
       {/* Head code */}
-      <div className="bd-pg-adv-section">
-        <div className="bd-pg-adv-section-label">Custom &lt;head&gt; code</div>
+      <Stack gap="sm">
+        <div style={{ font: "600 11px var(--bd-font)", color: "var(--bd-fg-heading)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+          Custom &lt;head&gt; code
+        </div>
         <Textarea
-          className="bd-pg-seo-textarea bd-pg-adv-head"
           value={s.customHead}
           onChange={(e) => s.setCustomHead(e.target.value)}
           placeholder="<!-- analytics, meta tags, fonts -->"
           rows={6}
           spellCheck={false}
           aria-label="Custom head code"
+          style={{ minHeight: 100, fontFamily: "var(--bd-mono)", fontSize: "11.5px", lineHeight: 1.4 }}
         />
-        {s.headCodeError && <div className="bd-pg-seo-error">{s.headCodeError}</div>}
-        <div className="bd-pg-seo-hint">Injected into the &lt;head&gt; of this page only. Sanitized before save.</div>
-      </div>
-    </div>
+        {s.headCodeError && <HelperText tone="error">{s.headCodeError}</HelperText>}
+        <HelperText>Injected into the &lt;head&gt; of this page only. Sanitized before save.</HelperText>
+      </Stack>
+    </Stack>
   );
 };
 

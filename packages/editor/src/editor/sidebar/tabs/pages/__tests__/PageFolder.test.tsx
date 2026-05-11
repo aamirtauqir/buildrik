@@ -103,8 +103,8 @@ describe("PageFolder (flat model)", () => {
         onToggle={onToggle}
       />,
     );
-    const disclosure = container.querySelector(
-      ".bd-pg-row-disclosure",
+    const disclosure = screen.getByLabelText(
+      "Collapse Marketing",
     ) as HTMLElement;
     fireEvent.click(disclosure);
     expect(onToggle).toHaveBeenCalled();
@@ -115,7 +115,7 @@ describe("PageFolder (flat model)", () => {
       <PageFolder folder={folder} pages={pages} {...baseProps} />,
     );
     const nestedRows = container.querySelectorAll(
-      ".bd-pg-folder-children .bd-pg-row.nested",
+      ".bd-pg-row.nested",
     );
     expect(nestedRows.length).toBe(2);
   });
