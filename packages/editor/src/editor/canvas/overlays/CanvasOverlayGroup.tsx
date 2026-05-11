@@ -194,7 +194,7 @@ export function CanvasOverlayGroup({
       }}
     >
       {/* Grid overlay */}
-      {showGrid && <GridOverlay size={gridSize} zoom={zoom} />}
+      {showGrid && <GridOverlay gridSize={gridSize} />}
 
       {/* Hover highlight — only show when not dragging/resizing */}
       {shouldShowHover && hoveredElementId && canvasRef.current && (
@@ -266,6 +266,7 @@ export function CanvasOverlayGroup({
               composer={composer}
               elementId={selectedId}
               canvasRef={canvasRef as React.RefObject<HTMLDivElement | null>}
+              onSelectParent={onSelectParent}
             />
           )}
           {selectedIds.length === 1 && !isResizing && canvasRef.current && (
@@ -319,7 +320,7 @@ export function CanvasOverlayGroup({
 
       {/* Canvas breadcrumb (bottom center) */}
       {!isDragOver && selectedId && !isResizing && (
-        <CanvasBreadcrumb composer={composer} elementId={selectedId} onSelect={onSelectAncestor} />
+        <CanvasBreadcrumb composer={composer} selectedId={selectedId} onSelectElement={onSelectAncestor} />
       )}
 
       {/* Section reorder handles */}
