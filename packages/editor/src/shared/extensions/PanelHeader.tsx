@@ -158,6 +158,8 @@ export interface PanelHeaderProps {
   icon?: React.ReactNode;
   /** Panel title (e.g., "Build", "Layers", "Pages") */
   title: string;
+  /** Optional subtitle / meta line (e.g., "42 blocks · 6 categories") */
+  subtitle?: string;
   /** Whether the panel is pinned */
   isPinned?: boolean;
   /** Callback when pin button is clicked */
@@ -175,6 +177,7 @@ export interface PanelHeaderProps {
 export const PanelHeader: React.FC<PanelHeaderProps> = ({
   icon,
   title,
+  subtitle,
   isPinned = false,
   onPinToggle,
   onHelpClick,
@@ -187,6 +190,7 @@ export const PanelHeader: React.FC<PanelHeaderProps> = ({
   return (
     <VibcoderSurfaceHead
       title={title}
+      meta={subtitle}
       tag={icon}
       className={className}
     >

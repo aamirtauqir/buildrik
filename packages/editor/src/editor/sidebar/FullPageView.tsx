@@ -9,6 +9,7 @@
 import * as React from "react";
 import type { Composer } from "../../engine";
 import type { GroupedTabId } from "../rail/tabsConfig";
+import type { IconConfig } from "../../shared/types/media";
 import { InspectorErrorBoundary } from "../inspector/components/InspectorErrorBoundary";
 import { PanelSkeleton, SidebarErrorFallback } from "./SidebarFallbacks";
 import { FullPageRouter } from "./FullPageRouter";
@@ -22,6 +23,14 @@ export interface FullPageViewProps {
   projectId?: string | null;
   onSettingsDirtyChange?: (dirty: boolean) => void;
   onTemplatesSwitchTab?: (tab: string) => void;
+  onOpenImageEditor?: (
+    imageSrc: string,
+    onSave: (editedSrc: string) => void | Promise<void>,
+  ) => void;
+  onOpenIconPicker?: (
+    currentIcon: IconConfig | undefined,
+    onSelect: (icon: IconConfig) => void,
+  ) => void;
 }
 
 export const FullPageView: React.FC<FullPageViewProps> = ({
@@ -33,12 +42,16 @@ export const FullPageView: React.FC<FullPageViewProps> = ({
   projectId,
   onSettingsDirtyChange,
   onTemplatesSwitchTab,
+  onOpenImageEditor,
+  onOpenIconPicker,
 }) => {
   const [errorKey, setErrorKey] = React.useState(0);
 
   const commonTabProps = {
     onHelpClick: () => window.open("https://docs.aquibra.com", "_blank"),
     onClose,
+    onOpenImageEditor,
+    onOpenIconPicker,
   };
 
   return (

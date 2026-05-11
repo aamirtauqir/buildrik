@@ -8,6 +8,7 @@
 import * as React from "react";
 import type { Composer } from "../../engine";
 import type { GroupedTabId } from "../rail/tabsConfig";
+import type { IconConfig } from "../../shared/types/media";
 
 // Lazy-loaded fullpage tab components
 const TemplatesTab = React.lazy(() => import("./tabs/templates/TemplatesTab"));
@@ -39,6 +40,7 @@ export interface FullPageRouterProps {
   onReplayTour?: () => void;
   projectId?: string | null;
   onSettingsDirtyChange?: (dirty: boolean) => void;
+  onTemplatesSwitchTab?: (tab: string) => void;
 }
 
 export const FullPageRouter: React.FC<FullPageRouterProps> = ({

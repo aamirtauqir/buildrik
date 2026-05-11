@@ -71,6 +71,7 @@ export interface StudioPanelsProps {
     onSelect: (icon: IconConfig) => void
   ) => void;
   onOpenCreateCollection?: () => void;
+  onOpenTemplates?: () => void;
   onOpenImageEditor?: (
     imageSrc: string,
     onSave: (editedSrc: string) => void | Promise<void>,
@@ -79,8 +80,8 @@ export interface StudioPanelsProps {
     files: Array<{ path: string; content: string }>;
     projectName?: string;
   }>;
-  canvasRef?: React.RefObject<CanvasRef>;
-  composerContainerRef?: React.RefObject<HTMLDivElement>;
+  canvasRef?: React.RefObject<CanvasRef | null>;
+  composerContainerRef?: React.RefObject<HTMLDivElement | null>;
   /** Whether the active tab is in fullpage mode (derived from useStudioState) */
   isFullPageMode?: boolean;
   /** Drawer width in pixels for the active tab (derived from useStudioState) */
@@ -393,7 +394,7 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
           <div style={styles.canvasPattern} />
           <div ref={composerContainerRef} style={styles.canvasContent}>
             <Canvas
-              ref={canvasRef}
+              ref={canvasRef as React.Ref<CanvasRef>}
               composer={composer}
               device={device}
               zoom={zoom}
