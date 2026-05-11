@@ -24,9 +24,6 @@ export interface ComponentSchemaAIClientDeps {
  * mutation. Server returns `{ raw: string }` (the model output, fence-stripped);
  * AIAssistService consumes it through the existing JSON.parse + Zod-validation
  * pipeline, mapping malformed output to D14 AIInvalidSchemaError.
- *
- * Prefer this over StreamPromptAIClient for component-schema generation —
- * single-shot avoids prompt-engineering fragility around streamed text.
  */
 export class ComponentSchemaAIClient implements AIClient {
   constructor(private readonly deps: ComponentSchemaAIClientDeps) {}
