@@ -10,6 +10,7 @@ import {
   Modal,
   ModalContent,
   ModalClose,
+  ModalTitle,
   OverlayMount,
 } from "@/editor/shared/vibcoder";
 import { Button } from "@/editor/shared/vibcoder/Button";
@@ -166,7 +167,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{ fontSize: 24 }}>{template.thumbnail || "📄"}</span>
             <div>
-              <div style={{ fontWeight: 600, fontSize: 16 }}>{template.name}</div>
+              <ModalTitle style={{ fontWeight: 600, fontSize: 16, margin: 0 }}>{template.name}</ModalTitle>
               <div style={{ fontSize: 12, color: "var(--buildrick-text-muted)" }}>
                 {template.description}
               </div>

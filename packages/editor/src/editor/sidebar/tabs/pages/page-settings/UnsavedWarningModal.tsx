@@ -16,6 +16,7 @@ import * as React from "react";
 import {
   Modal,
   ModalContent as VibcoderModalContent,
+  ModalTitle,
   OverlayMount,
 } from "@/editor/shared/vibcoder";
 import { Stack } from "@/editor/shared/vibcoder/Stack";
@@ -67,17 +68,17 @@ export const UnsavedWarningModal: React.FC<Props> = ({
           <div className="bd-modal__body">
       <Stack gap="xs">
         {/* Title */}
-        <div
+        <ModalTitle
           style={{
             fontSize: 15,
             fontWeight: 600,
             color: "var(--bd-fg-heading)",
-            marginBottom: 8,
+            margin: "0 0 8px",
             letterSpacing: "-0.01em",
           }}
         >
           Unsaved changes
-        </div>
+        </ModalTitle>
 
         {/* Message */}
         <div

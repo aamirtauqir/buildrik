@@ -13,6 +13,7 @@ import {
   Modal,
   ModalContent,
   ModalClose,
+  ModalTitle,
   OverlayMount,
 } from "@/editor/shared/vibcoder";
 import { Button } from "@/editor/shared/vibcoder/Button";
@@ -339,10 +340,10 @@ export const AICopilot: React.FC<AICopilotProps> = ({
       <div style={styles.container}>
         {/* Header */}
         <div style={styles.header}>
-          <div style={styles.headerTitle}>
+          <ModalTitle style={{ ...styles.headerTitle, margin: 0 }}>
             <Sparkles size={20} style={{ color: "var(--buildrick-accent)" }} />
             <span>AI Copilot</span>
-          </div>
+          </ModalTitle>
           <div style={styles.headerRight}>
             {AI_AVAILABLE && <div style={styles.headerBadge}>Beta</div>}
             <button style={styles.closeBtn} onClick={onClose} aria-label="Close AI Copilot">
