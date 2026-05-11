@@ -21,6 +21,8 @@ export const FEATURES = {
   sync: env.VITE_FEATURE_SYNC === "true",
   /** S6 dual-section Components panel (Catalog + UserSaved + DSStatusChip). */
   componentsV2: env.VITE_FEATURE_COMPONENTS_V2 === "true",
+  /** DS AI production wire — AIAssistService → ai.streamPrompt tRPC. Phase C.1. */
+  dsAi: env.VITE_FEATURE_DS_AI === "true",
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURES;
