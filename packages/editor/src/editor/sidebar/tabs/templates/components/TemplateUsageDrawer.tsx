@@ -9,6 +9,7 @@
  * @license BSD-3-Clause
  */
 import * as React from "react";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { Modal, ModalContent, ModalDescription, ModalTitle } from "@/editor/shared/vibcoder";
 import type { TemplateUsageEntry } from "../utils/templateUsage";
 
@@ -176,14 +177,15 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
             borderTop: "1px solid var(--bd-border, #e2e8f0)",
           }}
         >
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             type="button"
             aria-label="Close drawer"
             onClick={() => onOpenChange(false)}
-            className="bd-btn bd-btn--ghost"
           >
             Close
-          </button>
+          </Button>
         </div>
       </ModalContent>
     </Modal>

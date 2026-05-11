@@ -94,15 +94,14 @@
 .tpl-pills {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--bd-space-2);
   padding: 10px var(--bd-space-6);
   flex-shrink: 0;
   background: var(--bd-bg-card, var(--bd-bg-card));
   border-bottom: 1px solid var(--bd-border-light, var(--bd-border));
-  overflow-x: auto;
-  scrollbar-width: none;
 }
-.tpl-pills::-webkit-scrollbar { display: none; }
+
 
 .tpl-pill {
   height: 28px;
@@ -133,6 +132,7 @@
 .tpl-tags {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--bd-space-2);
   padding: 10px var(--bd-space-6);
   flex-shrink: 0;
@@ -209,7 +209,7 @@
 
 .tpl-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: var(--bd-space-4);
 }
 
@@ -564,16 +564,8 @@
   opacity: 0.9;
 }
 
-/* ── Responsive: 3 columns on narrower screens ── */
-@media (max-width: 1200px) {
-  .tpl-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+/* ── Responsive: detail panel width clamp on very narrow viewports ── */
 @media (max-width: 900px) {
-  .tpl-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .tpl-detail {
     width: 360px;
   }

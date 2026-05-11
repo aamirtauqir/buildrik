@@ -79,13 +79,12 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
           </p>
         )}
         {usageCount !== undefined && usageCount > 0 && onShowUsage && (
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             type="button"
-            className="tpl-detail-usage-link"
             onClick={onShowUsage}
             style={{
-              all: "unset",
-              cursor: "pointer",
               marginTop: 8,
               fontSize: 12,
               color: "var(--bd-accent, #2D6DFF)",
@@ -94,7 +93,7 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
             }}
           >
             Used in {usageCount} {usageCount === 1 ? "page" : "pages"} →
-          </button>
+          </Button>
         )}
       </div>
       <div className="tpl-detail-buttons">
