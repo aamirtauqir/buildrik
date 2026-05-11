@@ -21,6 +21,12 @@ import {
 } from "@/services/BuildrikSyncProvider";
 import { createRemoteAssetSync } from "@/services/AssetUploadService";
 import type { ToastInput } from "@/editor/shared/vibcoder";
+import { isFeatureEnabled } from "@/shared/utils/featureFlags";
+import {
+  StreamPromptAIClient,
+  createStreamPromptOpener,
+} from "@/editor/design-system/services";
+import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
   project?: {
@@ -84,10 +90,23 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     // gracefully falls back to local-only on auth fail / offline / dashboard
     // unconfigured. siteId scopes asset rows when known.
     const remoteSync = createRemoteAssetSync({ siteId: getSiteIdFromUrl() });
+    // tRPC subscription typings infer strict enums for model/scope; opener uses
+    // looser hand-rolled types so the adapter stays test-injectable. Cast at the
+    // impedance boundary keeps both sides honest.
+    const aiClient = isFeatureEnabled("dsAi")
+      ? new StreamPromptAIClient(
+          createStreamPromptOpener({
+            subscribe: (args, callbacks) =>
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (getAiSubscriptionClient().ai.streamPrompt.subscribe as any)(args, callbacks),
+          }),
+        )
+      : null;
     const instance = createComposer({
       container: containerRef.current || document.createElement("div"),
       ...composerOptions,
       remoteSync,
+      aiClient,
     } as ComposerConfig);
 
     // Store event handlers for proper cleanup
