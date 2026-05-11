@@ -54,6 +54,15 @@ export interface ComposerConfig {
    * stay in sync until the duplication is collapsed.
    */
   remoteSync?: import("./media").RemoteAssetSync;
+  /**
+   * Optional AI client for AIAssistService production wire (Phase C.1).
+   * Concrete type is `AIClient` in `editor/design-system/services`; declared
+   * structurally here because `shared/` cannot import from `editor/` per the
+   * import-direction rule.
+   */
+  aiClient?: {
+    generate(input: { prompt: string; signal?: AbortSignal }): Promise<string>;
+  } | null;
 }
 
 export interface StorageConfig {

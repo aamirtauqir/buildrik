@@ -181,7 +181,7 @@ export class Composer extends EventEmitter {
     this.colorMode = new ColorMode(this);
     this.cssBundler = new CSSBundler();
     this.dsLinter = new DSLinter();
-    this.aiAssistService = new AIAssistService(this);
+    this.aiAssistService = new AIAssistService(this, config.aiClient ?? null);
 
     // Facade groupings — D3 Stage 1.
     const cmsCollections = new CollectionManager();
