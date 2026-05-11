@@ -70,6 +70,8 @@ export interface LeftSidebarProps {
     files: Array<{ path: string; content: string }>;
     projectName?: string;
   }>;
+  /** Switches the assets tab from slim launcher to fullpage library manager. */
+  onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
 }
 
 // ============================================
@@ -147,6 +149,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onPublish,
   onUnpublish,
   onExportForDeploy,
+  onOpenLibrary,
 }) => {
   const navRef = React.useRef<HTMLElement>(null);
   const panelContentRef = React.useRef<HTMLDivElement>(null);
@@ -345,6 +348,7 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onUnpublish={onUnpublish}
                   onSettingsDirtyChange={setSettingsDirty}
                   onTemplatesSwitchTab={(tab) => safeTabChange(tab as GroupedTabId)}
+                  onOpenLibrary={onOpenLibrary}
                 />
               </React.Suspense>
             </div>

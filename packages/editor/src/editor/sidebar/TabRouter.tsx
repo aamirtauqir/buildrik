@@ -31,6 +31,9 @@ import { isFeatureEnabled } from "../../shared/utils/featureFlags";
 const BuildTab = React.lazy(() => import("./tabs/build").then((m) => ({ default: m.BuildTab })));
 const LayersTab = React.lazy(() => import("./tabs/layers/LayersTab"));
 const PagesTab = React.lazy(() => import("./tabs/pages/PagesTab"));
+const TemplatesTab = React.lazy(() =>
+  import("./tabs/templates/TemplatesTab").then((m) => ({ default: m.TemplatesTab }))
+);
 const ComponentsTab = React.lazy(() => import("./tabs/ComponentsTab"));
 const ComponentsPanelV2 = React.lazy(() =>
   import("@/editor/components-catalog/ui/ComponentsPanelV2").then((m) => ({ default: m.ComponentsPanelV2 })),
@@ -67,6 +70,8 @@ export interface TabRouterProps {
   onUnpublish?: (projectId: string) => Promise<void>;
   onSettingsDirtyChange?: (dirty: boolean) => void;
   onTemplatesSwitchTab?: (tab: string) => void;
+  /** Switches the assets tab from slim launcher to fullpage library manager. */
+  onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
 }
 
 export const TabRouter: React.FC<TabRouterProps> = ({
@@ -85,10 +90,20 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   onUnpublish,
   onSettingsDirtyChange,
   onReplayTour,
+  onOpenLibrary,
 }) => {
   switch (activeTab) {
     case "add":
       return <BuildTab composer={composer} onBlockClick={onBlockClick} {...commonTabProps} />;
+
+    case "templates":
+      return (
+        <TemplatesTab
+          composer={composer}
+          onTemplateUsed={onSwitchToAdd}
+          onClose={commonTabProps.onClose}
+        />
+      );
 
     case "ai":
       return <AITab composer={composer} {...commonTabProps} />;
@@ -131,7 +146,9 @@ export const TabRouter: React.FC<TabRouterProps> = ({
       );
 
     case "assets":
-      return <MediaTab composer={composer} {...commonTabProps} />;
+      return (
+        <MediaTab composer={composer} onOpenLibrary={onOpenLibrary} {...commonTabProps} />
+      );
 
     case "publish":
       return (

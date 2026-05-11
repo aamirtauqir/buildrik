@@ -15,6 +15,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
  */
 
 import * as React from "react";
+import "./SlimLauncher.css";
 import { Upload, Search, Maximize2, X } from "lucide-react";
 import type { Composer } from "../../../../../engine/Composer";
 import type { LibraryItem } from "../data/mediaTypes";
