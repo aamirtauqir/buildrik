@@ -444,6 +444,7 @@ ${pageInfo}`,
 import { anthropicProvider } from "./anthropic.client";
 import {
   isClaudeModel,
+  DEFAULT_MODEL,
   type AIModel,
   type AIProvider,
   type TokenChunk,
@@ -492,4 +493,46 @@ export async function* streamContent(
   signal: AbortSignal,
 ): AsyncIterable<TokenChunk> {
   yield* getProvider(model).stream(prompt, model, signal);
+}
+
+// ─── DS component-schema generation (Phase C.2) ──────────────────────────
+//
+// Single-shot JSON generation for the Design System AIAssistService. Mirrors
+// the suggestMilestone JSON-only pattern: system prompt forces JSON; raw
+// output is stripped of markdown fences and JSON.parsed at the editor
+// AIAssistService layer (this server function returns the raw model string
+// so the editor's D14 error pipeline can classify malformed output).
+
+export interface ComponentSchemaGenerationInput {
+  prompt: string;
+  model?: AIModel;
+}
+
+const COMPONENT_SCHEMA_SYSTEM_PROMPT = `You design web component schemas for a visual editor.
+Given a natural-language description, return a JSON object with this shape:
+{
+  "componentTypeId": "<short kebab-case identifier, e.g. 'pricing-card', 'hero-banner'>",
+  "variants": [
+    { "name": "<variant name>", "bindings": { "<prop>": "<token-id or value>" } }
+  ],
+  "bindings": { "<prop>": "<token-id or value>" }
+}
+
+Respond with ONLY the JSON object. No markdown fences. No prose. No prefix or suffix.
+If the user prompt is too vague to generate a schema, still return valid JSON with empty variants and bindings.`;
+
+/**
+ * Generate a Design System component schema as raw JSON text. The editor's
+ * AIAssistService JSON.parses + Zod-validates this, so any model deviation
+ * surfaces through the existing D14 (AIInvalidSchemaError) pipeline.
+ */
+export async function generateComponentSchema(
+  input: ComponentSchemaGenerationInput,
+): Promise<string> {
+  const model = input.model ?? DEFAULT_MODEL;
+  const provider = getProvider(model);
+  const fullPrompt = `${COMPONENT_SCHEMA_SYSTEM_PROMPT}\n\nUser request: ${input.prompt}`;
+  const raw = await provider.generate(fullPrompt, model);
+  // Strip optional ```json fences before returning.
+  return raw.replace(/^```json\s*/i, "").replace(/\s*```$/i, "").trim();
 }

@@ -7,6 +7,11 @@ export type {
   CreateStreamPromptOpenerDeps,
   StreamPromptSubscribe,
 } from "./createStreamPromptOpener";
+export { ComponentSchemaAIClient } from "./ComponentSchemaAIClient";
+export type {
+  ComponentSchemaAIClientDeps,
+  ComponentSchemaMutate,
+} from "./ComponentSchemaAIClient";
 export {
   DSError,
   AITimeoutError,

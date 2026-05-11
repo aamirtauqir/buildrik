@@ -8,6 +8,7 @@ import {
   summarizeChanges,
   suggestMilestone,
   streamContent,
+  generateComponentSchema,
 } from "../../services/ai.service";
 import { checkQuota, recordUsage } from "../../services/quota.service";
 import { modelSchema, DEFAULT_MODEL } from "../../services/types";
@@ -83,6 +84,11 @@ const scopeSchema = z.discriminatedUnion("kind", [
 const streamPromptInputSchema = z.object({
   prompt: z.string().min(1).max(5000),
   scope: scopeSchema,
+  model: modelSchema.default(DEFAULT_MODEL),
+});
+
+const componentSchemaInputSchema = z.object({
+  prompt: z.string().min(1).max(5000),
   model: modelSchema.default(DEFAULT_MODEL),
 });
 
@@ -219,5 +225,38 @@ export const aiRouter = router({
         yield chunk;
       }
       await recordUsage(userId, input.model);
+    }),
+
+  componentSchema: protectedProcedure
+    .input(componentSchemaInputSchema)
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      const quota = await checkQuota(userId);
+      if (!quota.ok) {
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: `Daily limit reached (${quota.limit}). Resets at ${quota.resetsAt.toISOString()}.`,
+        });
+      }
+      try {
+        const raw = await generateComponentSchema({
+          prompt: input.prompt,
+          model: input.model,
+        });
+        await recordUsage(userId, input.model);
+        return { raw };
+      } catch (e: unknown) {
+        const err = e as { status?: number; message?: string };
+        if (err.status === 429) {
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: "AI rate limit exceeded. Please try again later.",
+          });
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: err.message ?? "Component schema generation failed",
+        });
+      }
     }),
 });

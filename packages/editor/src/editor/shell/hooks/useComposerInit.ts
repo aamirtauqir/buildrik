@@ -22,10 +22,7 @@ import {
 import { createRemoteAssetSync } from "@/services/AssetUploadService";
 import type { ToastInput } from "@/editor/shared/vibcoder";
 import { isFeatureEnabled } from "@/shared/utils/featureFlags";
-import {
-  StreamPromptAIClient,
-  createStreamPromptOpener,
-} from "@/editor/design-system/services";
+import { ComponentSchemaAIClient } from "@/editor/design-system/services";
 import { getAiSubscriptionClient } from "@/services/ai/subscriptionClient";
 
 export type ComposerOptions = Partial<ComposerConfig> & {
@@ -90,17 +87,16 @@ export function useComposerInit(params: UseComposerInitParams): Composer | null 
     // gracefully falls back to local-only on auth fail / offline / dashboard
     // unconfigured. siteId scopes asset rows when known.
     const remoteSync = createRemoteAssetSync({ siteId: getSiteIdFromUrl() });
-    // tRPC subscription typings infer strict enums for model/scope; opener uses
-    // looser hand-rolled types so the adapter stays test-injectable. Cast at the
-    // impedance boundary keeps both sides honest.
+    // Phase C.2: ai.componentSchema mutation returns single-shot JSON via
+    // ComponentSchemaAIClient. Adapter uses hand-rolled types so it stays
+    // test-injectable; cast at the impedance boundary preserves type-safety
+    // on both sides.
     const aiClient = isFeatureEnabled("dsAi")
-      ? new StreamPromptAIClient(
-          createStreamPromptOpener({
-            subscribe: (args, callbacks) =>
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (getAiSubscriptionClient().ai.streamPrompt.subscribe as any)(args, callbacks),
-          }),
-        )
+      ? new ComponentSchemaAIClient({
+          mutate: (args, options) =>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (getAiSubscriptionClient().ai.componentSchema.mutate as any)(args, options),
+        })
       : null;
     const instance = createComposer({
       container: containerRef.current || document.createElement("div"),
