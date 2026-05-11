@@ -11,6 +11,7 @@
 
 import * as React from "react";
 import { createBuildrikApiClient } from "@buildrik/shared";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { Field, Screen, Section, Select } from "../shared";
 import type { ScreenProps } from "../types";
 
@@ -279,28 +280,28 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
                       </dl>
                       <div style={actionsStyles}>
                         {!s.isSpam && (
-                          <button type="button" onClick={() => handleUpdate(s.id, { isSpam: true })} style={actionBtnStyles}>
+                          <Button variant="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isSpam: true })} style={actionBtnStyles}>
                             Mark spam
-                          </button>
+                          </Button>
                         )}
                         {s.isSpam && (
-                          <button type="button" onClick={() => handleUpdate(s.id, { isSpam: false })} style={actionBtnStyles}>
+                          <Button variant="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isSpam: false })} style={actionBtnStyles}>
                             Not spam
-                          </button>
+                          </Button>
                         )}
                         {!s.isArchived && (
-                          <button type="button" onClick={() => handleUpdate(s.id, { isArchived: true })} style={actionBtnStyles}>
+                          <Button variant="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isArchived: true })} style={actionBtnStyles}>
                             Archive
-                          </button>
+                          </Button>
                         )}
                         {s.isArchived && (
-                          <button type="button" onClick={() => handleUpdate(s.id, { isArchived: false })} style={actionBtnStyles}>
+                          <Button variant="ghost" size="sm" type="button" onClick={() => handleUpdate(s.id, { isArchived: false })} style={actionBtnStyles}>
                             Unarchive
-                          </button>
+                          </Button>
                         )}
-                        <button type="button" onClick={() => handleDelete(s.id)} style={deleteBtnStyles}>
+                        <Button variant="ghost" size="sm" type="button" onClick={() => handleDelete(s.id)} style={deleteBtnStyles}>
                           Delete
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   )}
@@ -311,25 +312,29 @@ export const FormsScreen: React.FC<ScreenProps> = ({ projectId }) => {
         )}
         {submissions && submissions.total > PER_PAGE && (
           <div style={paginationStyles}>
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1 || subsLoading}
               style={pageBtnStyles}
             >
               ← Prev
-            </button>
+            </Button>
             <span style={pageLabelStyles}>
               Page {page} of {totalPages}
             </span>
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               type="button"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages || subsLoading}
               style={pageBtnStyles}
             >
               Next →
-            </button>
+            </Button>
           </div>
         )}
       </Section>

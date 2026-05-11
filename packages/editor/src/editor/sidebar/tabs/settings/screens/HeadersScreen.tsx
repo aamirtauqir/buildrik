@@ -10,6 +10,7 @@
 
 import * as React from "react";
 import { createBuildrikApiClient } from "@buildrik/shared";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { Field, Input, Screen, Section, Select, Textarea } from "../shared";
 import type { ScreenProps } from "../types";
 
@@ -270,14 +271,15 @@ export const HeadersScreen: React.FC<ScreenProps> = ({
         {saveError && (
           <div role="alert" style={errorStyles}>{saveError}</div>
         )}
-        <button
+        <Button
+          variant="primary"
+          size="sm"
           type="button"
           onClick={handleSave}
           disabled={!dirty || saving}
-          style={dirty && !saving ? saveButtonActiveStyles : saveButtonStyles}
         >
           {saving ? "Saving…" : "Save headers"}
-        </button>
+        </Button>
       </Section>
     </Screen>
   );

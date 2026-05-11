@@ -7,6 +7,7 @@
 
 import * as React from "react";
 import { createBuildrikApiClient } from "@buildrik/shared";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { Field, Input, Screen, Section, Select } from "../shared";
 import type { ScreenProps } from "../types";
 
@@ -212,14 +213,16 @@ export const RedirectsScreen: React.FC<ScreenProps> = ({
                 </div>
                 <div style={metaColStyles}>
                   <span style={typeBadgeStyles}>{r.type}</span>
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     type="button"
                     onClick={() => handleDelete(r.id)}
-                    style={deleteBtnStyles}
                     aria-label={`Delete redirect from ${r.fromPath}`}
+                    style={{ color: "var(--bd-error)" }}
                   >
                     Delete
-                  </button>
+                  </Button>
                 </div>
               </li>
             ))}

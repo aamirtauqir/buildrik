@@ -17,6 +17,7 @@
 
 import * as React from "react";
 import { createBuildrikApiClient } from "@buildrik/shared";
+import { Button } from "@/editor/shared/vibcoder/Button";
 import { Field, Screen, Section, Select } from "../shared";
 import type { ScreenProps } from "../types";
 
@@ -225,15 +226,15 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
                   <span style={localeLabelStyles}>{labelFor(code)}</span>
                   {isDefault && <span style={defaultBadgeStyles}>Default</span>}
                 </div>
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   type="button"
                   onClick={() => handleRemove(code)}
                   disabled={isDefault || enabledLocales.length <= 1 || saving}
-                  style={isDefault || saving ? removeDisabledStyles : removeBtnStyles}
-                  aria-label={`Remove ${labelFor(code)}`}
                 >
                   Remove
-                </button>
+                </Button>
               </li>
             );
           })}
@@ -255,14 +256,15 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
                 </option>
               ))}
             </Select>
-            <button
+            <Button
+              variant="primary"
+              size="sm"
               type="button"
               onClick={handleAdd}
               disabled={!pickedAdd || saving}
-              style={pickedAdd && !saving ? addButtonActiveStyles : addButtonStyles}
             >
               Add
-            </button>
+            </Button>
           </div>
         </Section>
       )}
@@ -277,14 +279,15 @@ export const LocalizationScreen: React.FC<ScreenProps> = ({
         {saveError && (
           <div role="alert" style={errorStyles}>{saveError}</div>
         )}
-        <button
+        <Button
+          variant="primary"
+          size="sm"
           type="button"
           onClick={handleSave}
           disabled={!dirty || saving}
-          style={dirty && !saving ? saveButtonActiveStyles : saveButtonStyles}
         >
           {saving ? "Saving…" : "Save locales"}
-        </button>
+        </Button>
       </Section>
     </Screen>
   );
