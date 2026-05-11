@@ -20,11 +20,14 @@
     "types": ["vitest/globals", "@testing-library/jest-dom"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
+      "@/*": ["./src/*", "../../*", "../dashboard/*"],
       "@hooks/*": ["./src/hooks/*"],
       "@utils/*": ["./src/utils/*"],
       "@types/*": ["./src/types/*"],
-      "@shared/*": ["./src/shared/*"]
+      "@shared/*": ["./src/shared/*"],
+      "@server/*": ["../../server/*"],
+      "@lib/*": ["../../lib/*"],
+      "@buildrik/shared/*": ["../shared/*"]
     }
   },
   "include": ["src", "demo"],
