@@ -1,9 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { ComponentSchemaAIClient } from "../ComponentSchemaAIClient";
+import type { ComponentSchemaMutate } from "../ComponentSchemaAIClient";
 
 describe("ComponentSchemaAIClient", () => {
   it("returns the raw string from the mutate function", async () => {
-    const mutate = vi.fn(async () => ({ raw: '{"componentTypeId":"x","variants":[],"bindings":{}}' }));
+    const mutate = vi.fn<ComponentSchemaMutate>(async () => ({ raw: '{"componentTypeId":"x","variants":[],"bindings":{}}' }));
     const client = new ComponentSchemaAIClient({ mutate });
     const out = await client.generate({ prompt: "make a button" });
 
@@ -12,7 +13,7 @@ describe("ComponentSchemaAIClient", () => {
   });
 
   it("forwards the AbortSignal to mutate", async () => {
-    const mutate = vi.fn(async () => ({ raw: "{}" }));
+    const mutate = vi.fn<ComponentSchemaMutate>(async () => ({ raw: "{}" }));
     const ac = new AbortController();
     const client = new ComponentSchemaAIClient({ mutate });
     await client.generate({ prompt: "p", signal: ac.signal });
@@ -21,7 +22,7 @@ describe("ComponentSchemaAIClient", () => {
   });
 
   it("threads model option through", async () => {
-    const mutate = vi.fn(async () => ({ raw: "{}" }));
+    const mutate = vi.fn<ComponentSchemaMutate>(async () => ({ raw: "{}" }));
     const client = new ComponentSchemaAIClient({ mutate, model: "claude-opus-4-7" });
     await client.generate({ prompt: "p" });
 
