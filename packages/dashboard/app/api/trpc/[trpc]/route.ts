@@ -34,16 +34,38 @@ function isAllowedOrigin(req: Request): boolean {
   return ALLOWED_ORIGINS.has(origin);
 }
 
-const handler = (req: Request) => {
+function corsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get("origin") ?? "";
+  if (!ALLOWED_ORIGINS.has(origin)) return {};
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Allow-Headers": "content-type, authorization",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Vary": "Origin",
+  };
+}
+
+const handler = async (req: Request) => {
+  const cors = corsHeaders(req);
   if (!isAllowedOrigin(req)) {
-    return new Response("Forbidden: origin not allowed", { status: 403 });
+    return new Response("Forbidden: origin not allowed", {
+      status: 403,
+      headers: cors,
+    });
   }
-  return fetchRequestHandler({
+  const res = await fetchRequestHandler({
     endpoint: "/api/trpc",
     req,
     router: appRouter,
     createContext: () => createTRPCContext({ headers: req.headers }),
   });
+  for (const [k, v] of Object.entries(cors)) res.headers.set(k, v);
+  return res;
 };
+
+export async function OPTIONS(req: Request) {
+  return new Response(null, { status: 204, headers: corsHeaders(req) });
+}
 
 export { handler as GET, handler as POST };
