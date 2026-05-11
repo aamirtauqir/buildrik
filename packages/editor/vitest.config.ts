@@ -18,6 +18,9 @@ export default defineConfig({
       "scripts/audit/__tests__/*.mjs",
       "scripts/codemods/**/__tests__/*.{test,spec}.{ts,tsx}",
       "scripts/codemods/*.{test,spec}.{ts,tsx}",
+      // Dashboard unification tests (Phase 0-3 spec §550). Co-located in the
+      // dashboard package; run from here to reuse RTL + jsdom + setup.
+      "../dashboard/**/__tests__/*.{test,spec}.{ts,tsx}",
     ],
     setupFiles: ["./src/test-setup.ts"],
     testTimeout: 15000,
@@ -52,6 +55,14 @@ export default defineConfig({
       "@utils": resolve(__dirname, "./src/utils"),
       "@shared": resolve(__dirname, "./src/shared"),
       "@buildrik/shared": resolve(__dirname, "../shared"),
+      // Pin RTL/jest-dom to editor's installed copies so dashboard unification
+      // tests (run under this config) can resolve them. pnpm strict-resolves
+      // workspace deps; without these aliases the dashboard test files can't
+      // walk up into editor's node_modules.
+      "@testing-library/react": resolve(__dirname, "./node_modules/@testing-library/react"),
+      "@testing-library/dom": resolve(__dirname, "./node_modules/@testing-library/dom"),
+      "@testing-library/jest-dom": resolve(__dirname, "./node_modules/@testing-library/jest-dom"),
+      "@testing-library/user-event": resolve(__dirname, "./node_modules/@testing-library/user-event"),
     },
   },
 });
