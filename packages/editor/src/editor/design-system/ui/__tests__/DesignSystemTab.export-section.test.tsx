@@ -69,11 +69,8 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
     // Export label belongs to header dropdown trigger.
     // Two buttons read "Export" (header dropdown trigger + section switcher
     // tab). Section tab has no aria-haspopup; dropdown does.
-    const buttons = getAllByRole("button");
-    const sectionExport = buttons.find(
-      (b) => b.textContent === "Export" && !b.hasAttribute("aria-haspopup"),
-    );
-    if (!sectionExport) throw new Error("Export section button missing");
+    const sectionExport = getAllByRole("tab").find((t) => t.textContent === "Export");
+    if (!sectionExport) throw new Error("Export section tab missing");
     fireEvent.click(sectionExport);
 
     await waitFor(() => {
@@ -92,11 +89,8 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
 
     // Two buttons read "Export" (header dropdown trigger + section switcher
     // tab). Section tab has no aria-haspopup; dropdown does.
-    const buttons = getAllByRole("button");
-    const sectionExport = buttons.find(
-      (b) => b.textContent === "Export" && !b.hasAttribute("aria-haspopup"),
-    );
-    if (!sectionExport) throw new Error("Export section button missing");
+    const sectionExport = getAllByRole("tab").find((t) => t.textContent === "Export");
+    if (!sectionExport) throw new Error("Export section tab missing");
     fireEvent.click(sectionExport);
 
     // MODIFY existing color-primary instead of adding a new id. The
@@ -133,11 +127,8 @@ describe("DesignSystemTab → ExportSection (S5 integration)", () => {
     const { getAllByRole, getByLabelText, getByText, getByRole, container, findByText } =
       render(wrap(<DesignSystemTab composer={composer} />));
 
-    const buttons = getAllByRole("button");
-    const sectionExport = buttons.find(
-      (b) => b.textContent === "Export" && !b.hasAttribute("aria-haspopup"),
-    );
-    if (!sectionExport) throw new Error("Export section button missing");
+    const sectionExport = getAllByRole("tab").find((t) => t.textContent === "Export");
+    if (!sectionExport) throw new Error("Export section tab missing");
     fireEvent.click(sectionExport);
 
     const payload = JSON.stringify([

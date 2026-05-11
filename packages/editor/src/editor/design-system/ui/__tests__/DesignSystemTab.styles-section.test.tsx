@@ -58,7 +58,7 @@ describe("DesignSystemTab → StylesSection (S2 integration)", () => {
     const composer = makeFakeComposer();
     const { getAllByRole, container } = render(wrap(<DesignSystemTab composer={composer} />));
 
-    const stylesBtn = getAllByRole("button").find((b) => b.textContent === "Styles");
+    const stylesBtn = getAllByRole("tab").find((b) => b.textContent === "Styles");
     if (!stylesBtn) throw new Error("Styles section button missing");
     fireEvent.click(stylesBtn);
 
@@ -73,7 +73,7 @@ describe("DesignSystemTab → StylesSection (S2 integration)", () => {
       wrap(<DesignSystemTab composer={composer} />),
     );
 
-    const stylesBtn = getAllByRole("button").find((b) => b.textContent === "Styles");
+    const stylesBtn = getAllByRole("tab").find((b) => b.textContent === "Styles");
     if (!stylesBtn) throw new Error("Styles section button missing");
     fireEvent.click(stylesBtn);
 

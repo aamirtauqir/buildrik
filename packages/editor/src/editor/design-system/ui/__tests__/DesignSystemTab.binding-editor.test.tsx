@@ -60,7 +60,7 @@ describe("DesignSystemTab → BindingEditor (S2.1 integration)", () => {
       render(wrap(<DesignSystemTab composer={composer} />));
 
     // Switch to Styles section.
-    const stylesBtn = getAllByRole("button").find((b) => b.textContent === "Styles");
+    const stylesBtn = getAllByRole("tab").find((b) => b.textContent === "Styles");
     if (!stylesBtn) throw new Error("Styles section button missing");
     fireEvent.click(stylesBtn);
 
@@ -80,7 +80,7 @@ describe("DesignSystemTab → BindingEditor (S2.1 integration)", () => {
     const { getAllByRole, container, getAllByLabelText } =
       render(wrap(<DesignSystemTab composer={composer} />));
 
-    const stylesBtn = getAllByRole("button").find((b) => b.textContent === "Styles");
+    const stylesBtn = getAllByRole("tab").find((b) => b.textContent === "Styles");
     if (!stylesBtn) throw new Error("Styles section button missing");
     fireEvent.click(stylesBtn);
 
