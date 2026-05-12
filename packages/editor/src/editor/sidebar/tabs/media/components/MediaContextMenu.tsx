@@ -24,9 +24,6 @@ interface MediaContextMenuProps {
    *  Optional: callers without the wire (e.g., LibraryManager) omit it; the menu
    *  item is then hidden. */
   onReplaceAcross?(item: LibraryItem): void;
-  /** §18 — opens OptimizationOverlay for img-only items. Optional: omitted by
-   *  callers (e.g., legacy LibraryManager); menu item hidden when undefined. */
-  onOptimize?(item: LibraryItem): void;
   onClose(): void;
 }
 
@@ -44,7 +41,6 @@ export function MediaContextMenu({
   onCopyUrl,
   onEditImage,
   onReplaceAcross,
-  onOptimize,
   onClose,
 }: MediaContextMenuProps) {
   const [moveOpen, setMoveOpen] = React.useState(false);
@@ -77,11 +73,6 @@ export function MediaContextMenu({
         {item.type === "img" ? (
           <Button role="menuitem" className="med-ctx-item" onClick={act(() => onEditImage(item))}>
             Edit image
-          </Button>
-        ) : null}
-        {onOptimize && item.type === "img" ? (
-          <Button role="menuitem" className="med-ctx-item" onClick={act(() => onOptimize(item))}>
-            Optimize image…
           </Button>
         ) : null}
         <Button role="menuitem" className="med-ctx-item" onClick={act(() => onCopyUrl(item))}>

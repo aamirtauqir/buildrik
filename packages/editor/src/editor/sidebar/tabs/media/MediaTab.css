@@ -1161,88 +1161,243 @@
 }
 
 /* ──────────────────────────────────────────────────────────────────────
-   §18 OptimizationOverlay — body-portaled fixed backdrop + centered modal
+   §15 Tabbed drawer — Preview / Where used / Versions / Edit / Optimize
    ────────────────────────────────────────────────────────────────────── */
-.med-optim-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1100;
-  background: rgba(15, 23, 42, 0.55);
+.med-tab .med-detail-tabs,
+.exp-panel .med-detail-tabs {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-
-.med-optim-modal {
-  width: min(720px, 100%);
-  max-height: 88vh;
-  background: var(--bd-bg-panel, #FFFFFF);
-  border: 1px solid var(--bd-border, #CBD5E1);
-  border-radius: 8px;
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.med-optim-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 16px 20px;
+  align-items: stretch;
+  gap: 2px;
+  padding: 0 12px;
   border-bottom: 1px solid var(--bd-border-light, #E2E8F0);
   flex-shrink: 0;
+  overflow-x: auto;
+  background: var(--bd-bg-panel, #FFFFFF);
 }
 
-.med-optim-title-group {
-  flex: 1;
-  min-width: 0;
+.med-tab .med-detail-tab,
+.exp-panel .med-detail-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 10px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--bd-fg-muted, #64748B);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  margin-bottom: -1px;
+  transition: color 0.12s, border-color 0.12s;
 }
-
-.med-optim-title {
-  margin: 0;
-  font-family: var(--bd-font-display, inherit);
-  font-size: 15px;
-  font-weight: 600;
+.med-tab .med-detail-tab:hover,
+.exp-panel .med-detail-tab:hover {
   color: var(--bd-fg, #0F172A);
-  letter-spacing: -0.01em;
+}
+.med-tab .med-detail-tab.is-active,
+.exp-panel .med-detail-tab.is-active {
+  color: var(--bd-cobalt, #2D6DFF);
+  border-bottom-color: var(--bd-cobalt, #2D6DFF);
+  font-weight: 600;
+}
+
+.med-tab .med-detail-tab-count,
+.exp-panel .med-detail-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 9999px;
+  background: var(--bd-bg-soft, #F1F5F9);
+  color: var(--bd-fg-muted, #64748B);
+  font-size: 10px;
+  font-weight: 600;
+  font-feature-settings: "tnum";
+}
+.med-tab .med-detail-tab.is-active .med-detail-tab-count,
+.exp-panel .med-detail-tab.is-active .med-detail-tab-count {
+  background: rgba(45, 109, 255, 0.12);
+  color: var(--bd-cobalt, #2D6DFF);
+}
+
+.med-tab .med-detail-body,
+.exp-panel .med-detail-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  min-height: 0;
+}
+
+/* Where used / Versions lists */
+.med-tab .med-detail-list,
+.exp-panel .med-detail-list {
+  padding: 12px;
+}
+
+.med-tab .med-detail-empty,
+.exp-panel .med-detail-empty {
+  padding: 32px 12px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--bd-fg-muted, #64748B);
+}
+
+.med-tab .med-detail-used-list,
+.exp-panel .med-detail-used-list,
+.med-tab .med-detail-versions-list,
+.exp-panel .med-detail-versions-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.med-tab .med-detail-used-row,
+.exp-panel .med-detail-used-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  background: var(--bd-bg-soft, #F1F5F9);
+  font-size: 12px;
+}
+.med-tab .med-detail-used-tag,
+.exp-panel .med-detail-used-tag {
+  font-weight: 500;
+  color: var(--bd-fg, #0F172A);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 10px;
+  padding: 2px 6px;
+  background: var(--bd-bg, #FFFFFF);
+  border: 1px solid var(--bd-border-light, #E2E8F0);
+  border-radius: 3px;
+}
+.med-tab .med-detail-used-id,
+.exp-panel .med-detail-used-id {
+  flex: 1;
+  font-family: var(--bd-font-mono, monospace);
+  font-size: 11px;
+  color: var(--bd-fg-muted, #64748B);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.med-optim-sub {
-  margin: 2px 0 0;
+.med-tab .med-detail-version-row,
+.exp-panel .med-detail-version-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--bd-border-light, #E2E8F0);
+  background: var(--bd-bg, #FFFFFF);
+  color: var(--bd-fg, #0F172A);
   font-size: 12px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.med-tab .med-detail-version-row:hover:not(:disabled),
+.exp-panel .med-detail-version-row:hover:not(:disabled) {
+  background: var(--bd-bg-soft, #F1F5F9);
+  border-color: var(--bd-fg-muted, #64748B);
+}
+.med-tab .med-detail-version-row.is-current,
+.exp-panel .med-detail-version-row.is-current {
+  background: rgba(45, 109, 255, 0.06);
+  border-color: rgba(45, 109, 255, 0.30);
+}
+.med-tab .med-detail-version-row:disabled,
+.exp-panel .med-detail-version-row:disabled {
+  cursor: default;
+}
+.med-tab .med-detail-version-name,
+.exp-panel .med-detail-version-name {
+  flex: 1;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.med-tab .med-detail-version-meta,
+.exp-panel .med-detail-version-meta {
+  font-size: 11px;
   color: var(--bd-fg-muted, #64748B);
 }
+.med-tab .med-detail-version-badge,
+.exp-panel .med-detail-version-badge {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--bd-cobalt, #2D6DFF);
+  color: #FFFFFF;
+}
 
-.med-optim-backdrop .med-optim-close {
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--bd-fg-muted, #64748B);
-  border-radius: 4px;
-  display: inline-flex;
+/* Edit pane */
+.med-tab .med-detail-edit-pane,
+.exp-panel .med-detail-edit-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 0.12s, color 0.12s;
+  gap: 16px;
+  padding: 32px 24px;
+  text-align: center;
 }
-.med-optim-backdrop .med-optim-close:hover {
-  background: var(--bd-bg-soft, #F1F5F9);
-  color: var(--bd-fg, #0F172A);
+.med-tab .med-detail-edit-blurb,
+.exp-panel .med-detail-edit-blurb {
+  margin: 0;
+  font-size: 12px;
+  color: var(--bd-fg-muted, #64748B);
+  max-width: 360px;
+  line-height: 1.5;
+}
+.med-tab .med-detail-edit-cta,
+.exp-panel .med-detail-edit-cta {
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 4px;
+  background: var(--bd-cobalt, #2D6DFF);
+  color: #FFFFFF;
+  border: 1px solid var(--bd-cobalt, #2D6DFF);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.med-tab .med-detail-edit-cta:hover:not(:disabled),
+.exp-panel .med-detail-edit-cta:hover:not(:disabled) {
+  background: var(--bd-cobalt-dark, #1D5BE0);
+}
+.med-tab .med-detail-edit-cta:disabled,
+.exp-panel .med-detail-edit-cta:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.med-optim-body {
+/* Optimize pane — embeds OptimizationPanel */
+.med-tab .med-detail-optim-pane,
+.exp-panel .med-detail-optim-pane {
   flex: 1;
   overflow: auto;
-  padding: 4px;
 }
 
 /* ──────────────────────────────────────────────────────────────────────

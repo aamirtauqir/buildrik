@@ -38,10 +38,6 @@ export function useMediaState(composer: Composer): MediaStateResult {
     { oldSrc: string; newSrc: string; oldLabel: string; newLabel: string } | null
   >(null);
 
-  // §18 — optimization target. Set by context-menu / detail-overlay "Optimize"
-  // trigger. Both MediaTab and ExpandedMediaPanel mount <OptimizationOverlay>
-  // when set; clearing it dismisses the overlay.
-  const [optimizeItem, setOptimizeItem] = useState<LibraryItem | null>(null);
 
   // §12 — expanded panel mode (320 ↔ 560). Composer event fires on change so
   // LeftSidebar can re-read the live width without coupling to media state.
@@ -359,9 +355,5 @@ export function useMediaState(composer: Composer): MediaStateResult {
     // §21 replace-across pair
     replaceAcrossPair,
     setReplaceAcrossPair,
-
-    // §18 optimization target
-    optimizeItem,
-    setOptimizeItem,
   };
 }

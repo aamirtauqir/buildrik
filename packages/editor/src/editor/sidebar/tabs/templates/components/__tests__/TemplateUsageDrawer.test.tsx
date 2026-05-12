@@ -22,8 +22,8 @@ describe("TemplateUsageDrawer", () => {
     expect(container.querySelector('[role="dialog"]')).toBeNull();
   });
 
-  it("shows 'Used in' tab by default with the usage list", () => {
-    const { getByText } = render(
+  it("shows Preview tab by default + Used in tab exposes the usage list", () => {
+    const { getByText, getByRole } = render(
       <TemplateUsageDrawer
         open
         onOpenChange={() => {}}
@@ -32,13 +32,33 @@ describe("TemplateUsageDrawer", () => {
         usage={sampleUsage}
       />
     );
+    // §9 prototype-v3: Preview is the default tab (3-tab spec).
+    expect(getByRole("tab", { name: "Preview" }).getAttribute("aria-selected")).toBe("true");
     expect(getByText("Used in")).toBeTruthy();
+    // Switch to Used in tab → usage list renders.
+    fireEvent.click(getByRole("tab", { name: "Used in" }));
     expect(getByText("Home")).toBeTruthy();
     expect(getByText("About")).toBeTruthy();
   });
 
-  it("shows version chip when a usage has a version", () => {
+  it("Preview tab renders 'Open full preview' CTA when onOpenPreview provided", () => {
+    const onOpenPreview = vi.fn();
     const { getByText } = render(
+      <TemplateUsageDrawer
+        open
+        onOpenChange={() => {}}
+        templateId="t1"
+        templateName="Hero"
+        usage={sampleUsage}
+        onOpenPreview={onOpenPreview}
+      />
+    );
+    fireEvent.click(getByText(/Open full preview/));
+    expect(onOpenPreview).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows version chip when a usage has a version", () => {
+    const { getByText, getByRole } = render(
       <TemplateUsageDrawer
         open
         onOpenChange={() => {}}
@@ -47,11 +67,12 @@ describe("TemplateUsageDrawer", () => {
         usage={sampleUsage}
       />
     );
+    fireEvent.click(getByRole("tab", { name: "Used in" }));
     expect(getByText(/1\.2\.0/)).toBeTruthy();
   });
 
   it("shows empty state when usage list is empty", () => {
-    const { getByText } = render(
+    const { getByText, getByRole } = render(
       <TemplateUsageDrawer
         open
         onOpenChange={() => {}}
@@ -60,12 +81,13 @@ describe("TemplateUsageDrawer", () => {
         usage={[]}
       />
     );
+    fireEvent.click(getByRole("tab", { name: "Used in" }));
     expect(getByText(/not applied to any page/i)).toBeTruthy();
   });
 
   it("clicking a page row calls onJumpToPage with pageId", () => {
     const onJumpToPage = vi.fn();
-    const { getByText } = render(
+    const { getByText, getByRole } = render(
       <TemplateUsageDrawer
         open
         onOpenChange={() => {}}
@@ -75,6 +97,7 @@ describe("TemplateUsageDrawer", () => {
         onJumpToPage={onJumpToPage}
       />
     );
+    fireEvent.click(getByRole("tab", { name: "Used in" }));
     fireEvent.click(getByText("Home"));
     expect(onJumpToPage).toHaveBeenCalledWith("p1");
   });

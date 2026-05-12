@@ -26,7 +26,6 @@ import { MediaContextMenu } from "./MediaContextMenu";
 import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
 import { StockSourceModal } from "./StockSourceModal";
 import { ReplaceAcrossDialog } from "./ReplaceAcrossDialog";
-import { OptimizationOverlay } from "./OptimizationOverlay";
 import "../MediaTab.css";
 import "./ExpandedMediaPanel.css";
 
@@ -41,7 +40,8 @@ export interface ExpandedMediaPanelProps {
     onSave: (editedSrc: string) => void | Promise<void>,
   ) => void;
   onReplaceAcross?: (oldItem: LibraryItem) => void;
-  onOptimize?: (item: LibraryItem) => void;
+  /** §18 — uploads optimized output from inline Optimize tab as a new version. */
+  onOptimized?: (optimizedSrc: string) => void | Promise<void>;
   /** §20 — opens IconPickerModal; threaded into StockSourceModal "Add icon" button. */
   onOpenIconPicker?: (
     currentIcon: IconConfig | undefined,
@@ -57,7 +57,7 @@ export function ExpandedMediaPanel({
   onClose,
   onOpenImageEditor,
   onReplaceAcross,
-  onOptimize,
+  onOptimized,
   onOpenIconPicker,
 }: ExpandedMediaPanelProps) {
   const { addToast } = useToast();
@@ -88,14 +88,6 @@ export function ExpandedMediaPanel({
     [onOpenImageEditor, state, showToast]
   );
 
-  // §18 — fallback wiring when parent doesn't provide onOptimize (rare). Uses
-  // local state.setOptimizeItem so the overlay still mounts inside this panel.
-  const localOptimize = React.useCallback(
-    (item: LibraryItem) => state.setOptimizeItem(item),
-    [state]
-  );
-  const triggerOptimize = onOptimize ?? localOptimize;
-
   // §20 — smart wrapper. The raw `onOpenIconPicker` opens the modal but expects
   // the caller to supply an `onSelect` handler. StockSourceModal's "Browse full
   // icon library" button passes a no-op, so without this wrapper picking an
@@ -112,8 +104,10 @@ export function ExpandedMediaPanel({
     });
   }, [onOpenIconPicker, composer, showToast]);
 
-  const handleOptimized = React.useCallback(async (optimizedSrc: string) => {
-    const item = state.optimizeItem;
+  // §18 — fallback uploads optimized output to library when parent doesn't pass
+  // onOptimized (rare; mostly local-only test mount).
+  const localOptimized = React.useCallback(async (optimizedSrc: string) => {
+    const item = state.detailItem;
     if (!item) return;
     try {
       const res = await fetch(optimizedSrc);
@@ -130,6 +124,7 @@ export function ExpandedMediaPanel({
       showToast("Could not save optimized image", "error");
     }
   }, [state, showToast]);
+  const optimizedHandler = onOptimized ?? localOptimized;
   // Subscribe to folder list — keep it minimal; full FolderTree component
   // (used in fullpage LibraryManager) is too prop-heavy for this slim form.
   const [folders, setFolders] = React.useState<MediaFolder[]>([]);
@@ -301,7 +296,6 @@ export function ExpandedMediaPanel({
           onClose={state.closeCtxMenu}
           onEditImage={handleEditImage}
           onReplaceAcross={onReplaceAcross ?? (() => {})}
-          onOptimize={triggerOptimize}
         />
       )}
       {state.replaceAcrossPair && (
@@ -333,14 +327,10 @@ export function ExpandedMediaPanel({
           }}
           onClose={state.closeDetail}
           onEditImage={handleEditImage}
-          onOptimize={triggerOptimize}
-        />
-      )}
-      {state.optimizeItem && (
-        <OptimizationOverlay
-          item={state.optimizeItem}
-          onOptimized={handleOptimized}
-          onClose={() => state.setOptimizeItem(null)}
+          composer={composer}
+          libraryItems={state.libraryItems}
+          onOpenItem={state.openDetail}
+          onOptimized={optimizedHandler}
         />
       )}
       <StockSourceModal

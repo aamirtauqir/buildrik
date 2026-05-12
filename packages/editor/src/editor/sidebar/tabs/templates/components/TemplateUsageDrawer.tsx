@@ -1,7 +1,9 @@
 /**
  * TemplateUsageDrawer (S9 — Templates extended drawer)
  *
- * Two tabs: "Used in" lists every page that has the template applied;
+ * Three tabs: "Preview" shows the template's thumbnail with an
+ * "Open full preview" CTA (callback opens TemplatePreviewModal in the
+ * parent); "Used in" lists every page that has the template applied;
  * "Versions" is a P9-pending placeholder. Lives next to TemplateDetail
  * inline panel; opened when user clicks "Used in N pages →" affordance
  * inside the detail panel.
@@ -13,7 +15,7 @@ import { Button } from "@/editor/shared/vibcoder/Button";
 import { Modal, ModalContent, ModalDescription, ModalTitle } from "@/editor/shared/vibcoder";
 import type { TemplateUsageEntry } from "../utils/templateUsage";
 
-type Tab = "used" | "versions";
+type Tab = "preview" | "used" | "versions";
 
 export interface TemplateUsageDrawerProps {
   open: boolean;
@@ -29,6 +31,10 @@ export interface TemplateUsageDrawerProps {
    * hide the comparison (Versions tab still renders the timeline).
    */
   currentVersion?: string;
+  /** Optional: thumbnail URL for Preview tab (data-URL or HTTP). */
+  templateThumbnail?: string;
+  /** Optional: caller's hook to open the full TemplatePreviewModal. */
+  onOpenPreview?: () => void;
 }
 
 function formatRelative(iso: string): string {
@@ -45,8 +51,10 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
   usage,
   onJumpToPage,
   currentVersion,
+  templateThumbnail,
+  onOpenPreview,
 }) => {
-  const [tab, setTab] = React.useState<Tab>("used");
+  const [tab, setTab] = React.useState<Tab>("preview");
 
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
@@ -70,7 +78,7 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
             borderBottom: "1px solid var(--bd-border, #e2e8f0)",
           }}
         >
-          {(["used", "versions"] as const).map((t) => (
+          {(["preview", "used", "versions"] as const).map((t) => (
             <button
               key={t}
               type="button"
@@ -89,12 +97,68 @@ export const TemplateUsageDrawer: React.FC<TemplateUsageDrawerProps> = ({
                   tab === t ? "2px solid var(--bd-accent, #2D6DFF)" : "2px solid transparent",
               }}
             >
-              {t === "used" ? "Used in" : "Versions"}
+              {t === "preview" ? "Preview" : t === "used" ? "Used in" : "Versions"}
             </button>
           ))}
         </div>
 
         <div role="tabpanel" style={{ padding: "16px 24px", maxHeight: 360, overflow: "auto" }}>
+          {tab === "preview" && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 16,
+                padding: "8px 0",
+              }}
+            >
+              {templateThumbnail ? (
+                <img
+                  src={templateThumbnail}
+                  alt={`${templateName} preview`}
+                  style={{
+                    width: "100%",
+                    maxHeight: 240,
+                    objectFit: "contain",
+                    borderRadius: 4,
+                    border: "1px solid var(--bd-border, #e2e8f0)",
+                    background: "var(--bd-bg-subtle, #f1f5f9)",
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: "100%",
+                    height: 160,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: 4,
+                    border: "1px dashed var(--bd-border, #e2e8f0)",
+                    background: "var(--bd-bg-subtle, #f8fafc)",
+                    fontSize: 12,
+                    color: "var(--bd-fg-muted, #64748b)",
+                  }}
+                >
+                  No preview thumbnail
+                </div>
+              )}
+              <Button
+                type="button"
+                onClick={() => onOpenPreview?.()}
+                disabled={!onOpenPreview}
+                style={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                  padding: "8px 16px",
+                }}
+              >
+                Open full preview →
+              </Button>
+            </div>
+          )}
+
           {tab === "used" && (
             usage.length === 0 ? (
               <div

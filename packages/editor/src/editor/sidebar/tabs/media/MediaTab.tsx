@@ -18,7 +18,6 @@ import { LibraryView } from "./components/LibraryView";
 import { MediaContextMenu } from "./components/MediaContextMenu";
 import { StockSourceModal } from "./components/StockSourceModal";
 import { ReplaceAcrossDialog } from "./components/ReplaceAcrossDialog";
-import { OptimizationOverlay } from "./components/OptimizationOverlay";
 import { MEDIA_EVENTS } from "@/shared/constants/media";
 import { TypePills } from "./components/TypePills";
 import { UploadZone } from "./components/UploadZone";
@@ -105,15 +104,11 @@ function MediaTabWithComposer({
     [onOpenImageEditor, state, showToast]
   );
 
-  // §18 — opens OptimizationOverlay for img-only items via state.optimizeItem.
-  // The overlay's onOptimized handler uploads the result as a new version
-  // (mirrors handleEditImage pattern).
-  const handleOptimize = React.useCallback((item: LibraryItem) => {
-    state.setOptimizeItem(item);
-  }, [state]);
-
+  // §18 — Optimize is now a tab inside the §15 detail drawer. handleOptimized
+  // is passed to the drawer as onOptimized; OptimizationPanel inside the tab
+  // calls it with the new data-URL, which we upload as a versioned copy.
   const handleOptimized = React.useCallback(async (optimizedSrc: string) => {
-    const item = state.optimizeItem;
+    const item = state.detailItem;
     if (!item) return;
     try {
       const res = await fetch(optimizedSrc);
@@ -171,7 +166,7 @@ function MediaTabWithComposer({
           onClose={onClose}
           onOpenImageEditor={onOpenImageEditor}
           onReplaceAcross={handleReplaceAcross}
-          onOptimize={handleOptimize}
+          onOptimized={handleOptimized}
           onOpenIconPicker={onOpenIconPicker}
         />
       );
@@ -325,7 +320,6 @@ function MediaTabWithComposer({
           onClose={state.closeCtxMenu}
           onEditImage={handleEditImage}
           onReplaceAcross={handleReplaceAcross}
-          onOptimize={handleOptimize}
         />
       )}
       {state.replaceAcrossPair && (
@@ -357,14 +351,10 @@ function MediaTabWithComposer({
           }}
           onClose={state.closeDetail}
           onEditImage={handleEditImage}
-          onOptimize={handleOptimize}
-        />
-      )}
-      {state.optimizeItem && (
-        <OptimizationOverlay
-          item={state.optimizeItem}
+          composer={composer}
+          libraryItems={state.libraryItems}
+          onOpenItem={state.openDetail}
           onOptimized={handleOptimized}
-          onClose={() => state.setOptimizeItem(null)}
         />
       )}
       {/* Stock Source Modal — replaces old Discovery tab */}
