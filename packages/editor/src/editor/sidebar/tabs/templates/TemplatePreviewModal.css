@@ -22,7 +22,7 @@
   background: var(--bd-bg-panel);
   display: flex;
   flex-direction: column;
-  border-radius: var(--bd-radius-lg);
+  border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--bd-border);
   animation: tmpl-preview-in 0.15s ease;
@@ -188,7 +188,7 @@
   border: 1px solid var(--bd-border);
   background: var(--bd-bg-hover);
   color: var(--bd-fg-muted);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
@@ -208,7 +208,7 @@
   border: none;
   background: var(--bd-accent);
   color: var(--bd-fg-on-accent);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
