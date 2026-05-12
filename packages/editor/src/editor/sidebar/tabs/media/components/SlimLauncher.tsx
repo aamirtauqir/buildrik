@@ -31,6 +31,10 @@ interface SlimLauncherProps {
   onOpenLibrary(opts?: { searchQuery?: string; folderId?: string | null }): void;
   onUpload(files: File[]): void;
   onClose?(): void;
+  /** §11 — selection-context bar (snap-back mode). Shown above header when set. */
+  selectionContext?: { elementId: string; label?: string } | null;
+  /** Cancel selection — clears context, restores normal browse mode. */
+  onCancelSelection?(): void;
 }
 
 export function SlimLauncher({
@@ -40,6 +44,8 @@ export function SlimLauncher({
   onOpenLibrary,
   onUpload,
   onClose,
+  selectionContext,
+  onCancelSelection,
 }: SlimLauncherProps) {
   const [dragOver, setDragOver] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -101,6 +107,61 @@ export function SlimLauncher({
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
     >
+      {/* §11 — Selection bar (snap-back mode). Renders above header when set. */}
+      {selectionContext ? (
+        <div
+          className="med-selection-bar"
+          style={{
+            background: "var(--bd-cobalt, #2D6DFF)",
+            color: "#FFFFFF",
+            padding: "10px 14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            fontSize: 12,
+            fontWeight: 500,
+          }}
+          role="status"
+          aria-live="polite"
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: "rgba(255,255,255,0.7)",
+                animation: "bd-status-pulse 2s infinite",
+              }}
+              aria-hidden="true"
+            />
+            <div>
+              <div>Selecting image for:</div>
+              <div style={{ fontSize: 11, opacity: 0.85 }}>
+                {selectionContext.label ?? "Canvas element"}
+              </div>
+            </div>
+          </div>
+          {onCancelSelection ? (
+            <button
+              type="button"
+              onClick={onCancelSelection}
+              style={{
+                background: "rgba(255,255,255,0.15)",
+                border: "1px solid rgba(255,255,255,0.25)",
+                color: "#FFFFFF",
+                padding: "3px 8px",
+                borderRadius: 4,
+                fontSize: 11,
+                cursor: "pointer",
+              }}
+              aria-label="Cancel selection"
+            >
+              Cancel
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       <header className="sl-header">
         <h3 className="sl-title">Media</h3>
         <div className="sl-header-actions">

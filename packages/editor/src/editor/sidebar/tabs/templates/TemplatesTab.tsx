@@ -46,12 +46,29 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   onTemplateUsed,
   onSwitchTab,
   onClose,
-  newPageMode = false,
+  newPageMode: newPageModeProp = false,
 }) => {
   const { addToast } = useToast();
   const [showSearch, setShowSearch] = React.useState(false);
   const [showCreateConfirm, setShowCreateConfirm] = React.useState(false);
   const [createResult, setCreateResult] = React.useState<"success" | "error" | null>(null);
+
+  // §6 — newPageMode can be activated externally via composer event so any
+  // future caller (Pages tab "Add page from template", rail action, etc.)
+  // can flip the templates panel into "new page" mode without prop-drilling.
+  const [newPageModeInternal, setNewPageModeInternal] = React.useState(false);
+  const newPageMode = newPageModeProp || newPageModeInternal;
+  React.useEffect(() => {
+    if (!composer) return;
+    const enable = () => setNewPageModeInternal(true);
+    const disable = () => setNewPageModeInternal(false);
+    composer.on("ui:templates-newpage-on", enable);
+    composer.on("ui:templates-newpage-off", disable);
+    return () => {
+      composer.off("ui:templates-newpage-on", enable);
+      composer.off("ui:templates-newpage-off", disable);
+    };
+  }, [composer]);
 
   // ── Hooks ──
   const { appliedId, setAppliedId } = useTemplatePersistence();

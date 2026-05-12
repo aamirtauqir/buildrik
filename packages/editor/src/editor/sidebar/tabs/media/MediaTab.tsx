@@ -155,6 +155,8 @@ function MediaTabWithComposer({
         onOpenLibrary={onOpenLibrary}
         onUpload={state.upload}
         onClose={onClose}
+        selectionContext={state.selectionContext}
+        onCancelSelection={() => state.setSelectionContext(null)}
       />
     );
   }

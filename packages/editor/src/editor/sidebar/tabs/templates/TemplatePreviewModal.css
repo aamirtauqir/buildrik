@@ -63,9 +63,9 @@
 }
 
 .tmpl-preview__name {
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--bd-fg, #0F172A);
   letter-spacing: -0.01em;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -74,7 +74,7 @@
 
 .tmpl-preview__count {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--bd-fg-muted, #64748B);
   font-weight: 400;
   flex-shrink: 0;
 }
@@ -83,48 +83,59 @@
 .tmpl-preview__viewports {
   display: flex;
   gap: 2px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bd-bg-soft, #F1F5F9);
   border-radius: 5px;
   padding: 2px;
   flex-shrink: 0;
 }
 
-.tmpl-preview__vp-btn {
-  height: 20px;
-  padding: 0 7px;
+.tmpl-preview .tmpl-preview__vp-btn {
+  height: 24px;
+  padding: 0 10px;
   border-radius: 3px;
   border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--bd-fg-muted, #64748B);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   font-family: inherit;
   display: flex;
   align-items: center;
   gap: 3px;
-  transition: background 0.1s, color 0.1s;
+  transition: background 0.12s, color 0.12s;
 }
 
-.tmpl-preview__vp-btn--active {
-  background: rgba(45, 109, 255, 0.2);
-  color: var(--bd-accent-hover);
+.tmpl-preview .tmpl-preview__vp-btn:hover {
+  background: var(--bd-bg, #FFFFFF);
+  color: var(--bd-fg, #0F172A);
+}
+
+.tmpl-preview .tmpl-preview__vp-btn--active {
+  background: var(--bd-bg, #FFFFFF);
+  color: var(--bd-cobalt, #2D6DFF);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 /* Close button — top right X */
-.tmpl-preview__close {
-  width: 24px;
-  height: 24px;
-  border-radius: var(--bd-radius-sm);
+.tmpl-preview .tmpl-preview__close {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--bd-radius-sm, 4px);
   border: none;
-  background: var(--bd-bg-hover);
-  color: var(--bd-fg-muted);
+  background: transparent;
+  color: var(--bd-fg-muted, #64748B);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: background var(--bd-duration-fast, 100ms);
+  transition: background 0.12s, color 0.12s;
+}
+
+.tmpl-preview .tmpl-preview__close:hover {
+  background: var(--bd-bg-soft, #F1F5F9);
+  color: var(--bd-fg, #0F172A);
 }
 
 .tmpl-preview__close:hover {

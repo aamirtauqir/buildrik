@@ -85,9 +85,9 @@ const VIEWPORT_ICONS: Record<string, React.ReactElement> = {
 };
 
 const VIEWPORT_CONFIGS: ViewportConfig[] = [
-  { id: "desktop", label: "Desktop", shortLabel: "D", frameWidth: 220 },
-  { id: "tablet", label: "Tablet", shortLabel: "T", frameWidth: 140 },
-  { id: "mobile", label: "Mobile", shortLabel: "M", frameWidth: 90 },
+  { id: "desktop", label: "Desktop", shortLabel: "D", frameWidth: 1100 },
+  { id: "tablet", label: "Tablet", shortLabel: "T", frameWidth: 700 },
+  { id: "mobile", label: "Mobile", shortLabel: "M", frameWidth: 375 },
 ];
 
 function getSectionCount(html: string): number {
