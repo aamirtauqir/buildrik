@@ -261,6 +261,10 @@ export interface MediaStateResult {
   setReplaceAcrossPair(
     pair: { oldSrc: string; newSrc: string; oldLabel: string; newLabel: string } | null
   ): void;
+
+  // §18 optimization target (set by context-menu / detail "Optimize")
+  optimizeItem: LibraryItem | null;
+  setOptimizeItem(item: LibraryItem | null): void;
 }
 
 // --- Prop slices ---

@@ -17,7 +17,7 @@ import { Maximize2, Minimize2, Plus, Upload, X } from "lucide-react";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import type { Composer } from "../../../../../engine/Composer";
 import type { LibraryItem, MediaStateResult } from "../data/mediaTypes";
-import type { MediaFolder } from "@shared/types/media";
+import type { IconConfig, MediaFolder } from "@shared/types/media";
 import { useToast } from "@/editor/shared/vibcoder";
 import { TypePills } from "./TypePills";
 import { LibraryView } from "./LibraryView";
@@ -26,6 +26,7 @@ import { MediaContextMenu } from "./MediaContextMenu";
 import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
 import { StockSourceModal } from "./StockSourceModal";
 import { ReplaceAcrossDialog } from "./ReplaceAcrossDialog";
+import { OptimizationOverlay } from "./OptimizationOverlay";
 import "../MediaTab.css";
 import "./ExpandedMediaPanel.css";
 
@@ -40,6 +41,12 @@ export interface ExpandedMediaPanelProps {
     onSave: (editedSrc: string) => void | Promise<void>,
   ) => void;
   onReplaceAcross?: (oldItem: LibraryItem) => void;
+  onOptimize?: (item: LibraryItem) => void;
+  /** §20 — opens IconPickerModal; threaded into StockSourceModal "Add icon" button. */
+  onOpenIconPicker?: (
+    currentIcon: IconConfig | undefined,
+    onSelect: (icon: IconConfig) => void
+  ) => void;
 }
 
 export function ExpandedMediaPanel({
@@ -50,6 +57,8 @@ export function ExpandedMediaPanel({
   onClose,
   onOpenImageEditor,
   onReplaceAcross,
+  onOptimize,
+  onOpenIconPicker,
 }: ExpandedMediaPanelProps) {
   const { addToast } = useToast();
   const showToast = React.useCallback((msg: string, type: "success" | "error" | "info") => {
@@ -78,10 +87,57 @@ export function ExpandedMediaPanel({
     },
     [onOpenImageEditor, state, showToast]
   );
+
+  // §18 — fallback wiring when parent doesn't provide onOptimize (rare). Uses
+  // local state.setOptimizeItem so the overlay still mounts inside this panel.
+  const localOptimize = React.useCallback(
+    (item: LibraryItem) => state.setOptimizeItem(item),
+    [state]
+  );
+  const triggerOptimize = onOptimize ?? localOptimize;
+
+  // §20 — smart wrapper. The raw `onOpenIconPicker` opens the modal but expects
+  // the caller to supply an `onSelect` handler. StockSourceModal's "Browse full
+  // icon library" button passes a no-op, so without this wrapper picking an
+  // icon would do nothing in panel mode. Mirrors MediaTab's fullpage wrapper.
+  const triggerIconPicker = React.useCallback(() => {
+    if (!onOpenIconPicker) return;
+    onOpenIconPicker(undefined, (icon) => {
+      try {
+        composer.mediaOps.insertMedia(icon.name, "icon");
+        showToast(`${icon.name} icon added ✓`, "success");
+      } catch {
+        showToast("Could not add icon", "error");
+      }
+    });
+  }, [onOpenIconPicker, composer, showToast]);
+
+  const handleOptimized = React.useCallback(async (optimizedSrc: string) => {
+    const item = state.optimizeItem;
+    if (!item) return;
+    try {
+      const res = await fetch(optimizedSrc);
+      const blob = await res.blob();
+      const timestamp = new Date().getTime();
+      const cleanName = item.name.replace(/(_v\d+)?$/, "");
+      const ext = blob.type.split("/")[1] || "webp";
+      const fileName = `${cleanName}_opt_v${timestamp % 10000}`;
+      const file = new File([blob], `${fileName}.${ext}`, { type: blob.type });
+      state.upload([file]);
+      showToast(`Optimized ${item.name} ✓`, "success");
+    } catch (err) {
+      console.error("Failed to save optimized image:", err);
+      showToast("Could not save optimized image", "error");
+    }
+  }, [state, showToast]);
   // Subscribe to folder list — keep it minimal; full FolderTree component
   // (used in fullpage LibraryManager) is too prop-heavy for this slim form.
   const [folders, setFolders] = React.useState<MediaFolder[]>([]);
-  const [currentFolderId, setCurrentFolderId] = React.useState<string | null>(null);
+  // Use shared state from useLibraryState (via useMediaState) so clicking a
+  // folder here actually filters the grid. Previously a LOCAL state slice
+  // here didn't propagate to useLibraryState's filter loop.
+  const currentFolderId = state.currentFolderId;
+  const setCurrentFolderId = state.setCurrentFolderId;
 
   React.useEffect(() => {
     const refresh = () => {
@@ -105,7 +161,13 @@ export function ExpandedMediaPanel({
   const totalCount = state.libraryItems.length;
 
   return (
-    <div className="exp-panel">
+    <div
+      className="exp-panel"
+      onDragEnter={state.handlePanelDragEnter}
+      onDragLeave={state.handlePanelDragLeave}
+      onDragOver={state.handlePanelDragOver}
+      onDrop={state.handlePanelDrop}
+    >
       <header className="exp-panel__header">
         <div className="exp-panel__title-group">
           <h3 className="exp-panel__title">Media library</h3>
@@ -217,6 +279,14 @@ export function ExpandedMediaPanel({
         </div>
       </div>
 
+      {/* §22 — drag-over overlay (mirrors MediaTab fullpage path) */}
+      {state.panelDragOver && (
+        <div className="med-drag-overlay" role="status" aria-live="polite">
+          <Upload size={24} />
+          <div className="med-drag-label">Drop to upload to Library</div>
+        </div>
+      )}
+
       {/* Action overlays (mirror MediaTab.tsx fullpage path) */}
       {state.ctxMenu && (
         <MediaContextMenu
@@ -231,6 +301,7 @@ export function ExpandedMediaPanel({
           onClose={state.closeCtxMenu}
           onEditImage={handleEditImage}
           onReplaceAcross={onReplaceAcross ?? (() => {})}
+          onOptimize={triggerOptimize}
         />
       )}
       {state.replaceAcrossPair && (
@@ -262,6 +333,14 @@ export function ExpandedMediaPanel({
           }}
           onClose={state.closeDetail}
           onEditImage={handleEditImage}
+          onOptimize={triggerOptimize}
+        />
+      )}
+      {state.optimizeItem && (
+        <OptimizationOverlay
+          item={state.optimizeItem}
+          onOptimized={handleOptimized}
+          onClose={() => state.setOptimizeItem(null)}
         />
       )}
       <StockSourceModal
@@ -282,6 +361,7 @@ export function ExpandedMediaPanel({
         onLoadMore={state.loadMoreDisc}
         onSave={(type, item) => { state.saveToLibrary(type, item); }}
         onInsert={state.insertToCanvas}
+        onOpenIconPicker={onOpenIconPicker ? triggerIconPicker : undefined}
       />
     </div>
   );

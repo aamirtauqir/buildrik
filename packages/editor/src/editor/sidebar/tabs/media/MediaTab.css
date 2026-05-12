@@ -875,3 +875,411 @@
 .exp-panel .med-insert-btn:hover {
   background: var(--bd-cobalt-dark, #1D5BE0);
 }
+
+/* ──────────────────────────────────────────────────────────────────────
+   §15 AssetDetailOverlay — vSrqD spec
+   Mounted at root of .med-tab and .exp-panel; absolute overlay covering
+   library content. role="dialog" aria-modal="true".
+   ────────────────────────────────────────────────────────────────────── */
+.med-tab .med-detail-overlay,
+.exp-panel .med-detail-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  background: var(--bd-bg-panel, #FFFFFF);
+  overflow: auto;
+}
+
+/* Back nav row — h=30, padding [8,10] */
+.med-tab .med-detail-nav,
+.exp-panel .med-detail-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--bd-border-light, #E2E8F0);
+  flex-shrink: 0;
+  background: var(--bd-bg-panel, #FFFFFF);
+}
+
+.med-tab .med-detail-nav .med-detail-back,
+.exp-panel .med-detail-nav .med-detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--bd-fg-muted, #64748B);
+  font-size: 11.5px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.med-tab .med-detail-nav .med-detail-back:hover,
+.exp-panel .med-detail-nav .med-detail-back:hover {
+  background: var(--bd-bg-soft, #F1F5F9);
+  color: var(--bd-fg, #0F172A);
+}
+
+.med-tab .med-detail-nav .med-strip-spacer,
+.exp-panel .med-detail-nav .med-strip-spacer {
+  flex: 1;
+}
+
+.med-tab .med-detail-nav .med-detail-navbtn,
+.exp-panel .med-detail-nav .med-detail-navbtn {
+  height: 24px;
+  padding: 0 10px;
+  background: transparent;
+  border: 1px solid var(--bd-border, #CBD5E1);
+  color: var(--bd-fg, #0F172A);
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.med-tab .med-detail-nav .med-detail-navbtn:hover,
+.exp-panel .med-detail-nav .med-detail-navbtn:hover {
+  background: var(--bd-bg-soft, #F1F5F9);
+  border-color: var(--bd-fg-muted, #64748B);
+}
+
+/* Preview — h=140 (prototype) but allow grow on wide expand */
+.med-tab .med-detail-preview,
+.exp-panel .med-detail-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  max-height: 240px;
+  margin: 12px;
+  padding: 12px;
+  background: var(--bd-bg-card, #F8FAFC);
+  border: 1px solid var(--bd-border-light, #E2E8F0);
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Font specimen preview */
+.med-tab .med-font-specimen,
+.exp-panel .med-font-specimen {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+  color: var(--bd-fg, #0F172A);
+}
+.med-tab .med-font-specimen-lg,
+.exp-panel .med-font-specimen-lg {
+  font-size: 32px;
+  line-height: 1.1;
+  font-weight: 500;
+}
+.med-tab .med-font-specimen-sm,
+.exp-panel .med-font-specimen-sm {
+  font-size: 14px;
+  color: var(--bd-fg-muted, #64748B);
+}
+
+/* Metadata section — gap 8, padding [10,12] */
+.med-tab .med-detail-meta-section,
+.exp-panel .med-detail-meta-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 12px 10px;
+  flex-shrink: 0;
+}
+
+.med-tab .med-detail-name,
+.exp-panel .med-detail-name {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  background: var(--bd-bg, #FFFFFF);
+  border: 1px solid var(--bd-border, #CBD5E1);
+  border-radius: 4px;
+  color: var(--bd-fg, #0F172A);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.med-tab .med-detail-name:focus,
+.exp-panel .med-detail-name:focus {
+  outline: none;
+  border-color: var(--bd-cobalt, #2D6DFF);
+  box-shadow: 0 0 0 3px rgba(45, 109, 255, 0.12);
+}
+
+.med-tab .med-detail-meta,
+.exp-panel .med-detail-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+  border-top: 1px solid var(--bd-border-light, #E2E8F0);
+}
+
+.med-tab .med-detail-row,
+.exp-panel .med-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+
+.med-tab .med-detail-key,
+.exp-panel .med-detail-key {
+  color: var(--bd-fg-muted, #64748B);
+  font-weight: 400;
+}
+
+.med-tab .med-detail-val,
+.exp-panel .med-detail-val {
+  color: var(--bd-fg, #0F172A);
+  font-weight: 500;
+  font-feature-settings: "tnum";
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60%;
+}
+
+/* Actions — padding [4,12,12,12], gap 6 */
+.med-tab .med-detail-actions,
+.exp-panel .med-detail-actions {
+  display: flex;
+  gap: 6px;
+  padding: 4px 12px 12px;
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+.med-tab .med-detail-action-btn,
+.exp-panel .med-detail-action-btn {
+  flex: 1;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 4px;
+  border: 1px solid var(--bd-border, #CBD5E1);
+  background: var(--bd-bg, #FFFFFF);
+  color: var(--bd-fg, #0F172A);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, opacity 0.12s;
+}
+.med-tab .med-detail-action-btn:hover:not(:disabled),
+.exp-panel .med-detail-action-btn:hover:not(:disabled) {
+  background: var(--bd-bg-soft, #F1F5F9);
+}
+.med-tab .med-detail-action-btn:disabled,
+.exp-panel .med-detail-action-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.med-tab .med-detail-action-btn--primary,
+.exp-panel .med-detail-action-btn--primary {
+  background: var(--bd-cobalt, #2D6DFF);
+  border-color: var(--bd-cobalt, #2D6DFF);
+  color: #FFFFFF;
+}
+.med-tab .med-detail-action-btn--primary:hover:not(:disabled),
+.exp-panel .med-detail-action-btn--primary:hover:not(:disabled) {
+  background: var(--bd-cobalt-dark, #1D5BE0);
+  border-color: var(--bd-cobalt-dark, #1D5BE0);
+}
+
+.med-tab .med-detail-action-btn--danger,
+.exp-panel .med-detail-action-btn--danger {
+  background: transparent;
+  border-color: var(--bd-border, #CBD5E1);
+  color: var(--bd-danger, #DC2626);
+}
+.med-tab .med-detail-action-btn--danger:hover:not(:disabled),
+.exp-panel .med-detail-action-btn--danger:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: var(--bd-danger, #DC2626);
+}
+
+/* Error state (COb2m) */
+.med-tab .med-detail-error-body,
+.exp-panel .med-detail-error-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 24px;
+  text-align: center;
+  color: var(--bd-fg-muted, #64748B);
+}
+.med-tab .med-detail-error-title,
+.exp-panel .med-detail-error-title {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bd-fg, #0F172A);
+}
+.med-tab .med-detail-error-sub,
+.exp-panel .med-detail-error-sub {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--bd-fg-muted, #64748B);
+}
+.med-tab .med-detail-error-body .med-detail-retry,
+.exp-panel .med-detail-error-body .med-detail-retry {
+  margin-top: 8px;
+  height: 28px;
+  padding: 0 14px;
+  background: transparent;
+  border: 1px solid var(--bd-border, #CBD5E1);
+  color: var(--bd-fg, #0F172A);
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.med-tab .med-detail-error-body .med-detail-retry:hover,
+.exp-panel .med-detail-error-body .med-detail-retry:hover {
+  background: var(--bd-bg-soft, #F1F5F9);
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+   §18 OptimizationOverlay — body-portaled fixed backdrop + centered modal
+   ────────────────────────────────────────────────────────────────────── */
+.med-optim-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.med-optim-modal {
+  width: min(720px, 100%);
+  max-height: 88vh;
+  background: var(--bd-bg-panel, #FFFFFF);
+  border: 1px solid var(--bd-border, #CBD5E1);
+  border-radius: 8px;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.med-optim-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--bd-border-light, #E2E8F0);
+  flex-shrink: 0;
+}
+
+.med-optim-title-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.med-optim-title {
+  margin: 0;
+  font-family: var(--bd-font-display, inherit);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--bd-fg, #0F172A);
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.med-optim-sub {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--bd-fg-muted, #64748B);
+}
+
+.med-optim-backdrop .med-optim-close {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--bd-fg-muted, #64748B);
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s;
+}
+.med-optim-backdrop .med-optim-close:hover {
+  background: var(--bd-bg-soft, #F1F5F9);
+  color: var(--bd-fg, #0F172A);
+}
+
+.med-optim-body {
+  flex: 1;
+  overflow: auto;
+  padding: 4px;
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+   §22 Drag-over overlay — file drop affordance for full MediaTab + ExpandedMediaPanel
+   ────────────────────────────────────────────────────────────────────── */
+.med-tab .med-drag-overlay,
+.exp-panel .med-drag-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  pointer-events: none;
+  background: rgba(45, 109, 255, 0.10);
+  border: 2px dashed var(--bd-cobalt, #2D6DFF);
+  border-radius: 4px;
+  color: var(--bd-cobalt, #2D6DFF);
+  animation: med-drag-fade-in 0.12s ease-out;
+}
+
+.med-tab .med-drag-overlay svg,
+.exp-panel .med-drag-overlay svg {
+  color: var(--bd-cobalt, #2D6DFF);
+}
+
+.med-tab .med-drag-label,
+.exp-panel .med-drag-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bd-cobalt, #2D6DFF);
+  letter-spacing: -0.01em;
+}
+
+@keyframes med-drag-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

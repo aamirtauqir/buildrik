@@ -77,13 +77,28 @@ This is a **code-vs-design** audit (source reading), not a screenshot diff. Live
 
 ## Open follow-ups (NOT closed by this arc)
 
-### §13 per-folder filter + drag-to-folder
+### §13 per-folder filter — **FIXED 2026-05-12**
 
-ExpandedMediaPanel folder rail renders but clicking a folder doesn't filter the grid. `LibraryItem` (UI layer) lacks `folderId` — engine-side `MediaAsset.folderId` needs to be joined into `LibraryItem` shape via `useLibraryState`. Drag-to-folder requires drop-target wire in folder list items.
+ExpandedMediaPanel was maintaining LOCAL `currentFolderId` state — didn't propagate to `useLibraryState`'s filter loop. Fixed by switching to `state.currentFolderId` + `state.setCurrentFolderId` (already exposed via the library sub-hook). Folder click now filters the grid.
 
-### Other minor v2 enhancements
+### Drag-to-folder still open
+
+Folder rail items don't yet accept asset drops (`onDragOver`/`onDrop` not wired on `.exp-folder-item`). Requires `moveAsset(key, folderId)` to be called from a drop handler — engine-side already supports.
+
+### §15/§17/§18/§20/§22 sweep — **CLOSED 2026-05-12**
+
+- ✅ **§15 AssetDetailOverlay CSS** — ~250 LOC authored. Detail overlay now positioned absolute over LibraryView (both `.med-tab` and `.exp-panel`); back nav row, preview, meta key/val rows, primary/danger action buttons, font specimen, and error state all styled to spec.
+- ✅ **§17 image editor button** — `onEditImage` was declared in `AssetDetailOverlay` interface but never destructured. Fixed by adding to destructure + rendering an "Edit" action button img-only. Context-menu trigger (line 74) was already correct.
+- ✅ **§18 OptimizationPanel** — Existing `editor/media/OptimizationPanel.tsx` was only invoked from the legacy LibraryManager. Wrapped in new `OptimizationOverlay.tsx` (modal chrome) + threaded `onOptimize?` prop through `MediaContextMenu` (img-only "Optimize image…" item) and `AssetDetailOverlay` (img-only "Optimize" action) → `state.optimizeItem` slice on `useMediaState` → overlay mount in both `MediaTab` and `ExpandedMediaPanel`. New optimized output uploaded as `_opt_v{tag}` version.
+- ✅ **§20 IconPickerModal panel-mode** — `onOpenIconPicker` was wired only to fullpage `MediaTab` → `StockSourceModal`. `ExpandedMediaPanel` mounts its own `StockSourceModal` but never received the prop, so the "Browse full icon library" button hid in panel mode. Plumbed through + built a panel-local `triggerIconPicker` smart wrapper (mirrors fullpage pattern; ignores the no-op `onSelect` that `StockSourceModal` supplies and runs `composer.mediaOps.insertMedia` itself).
+- ✅ **§22 drag-over overlay** — `ExpandedMediaPanel` had zero drag handlers; `.med-drag-overlay` / `.med-drag-label` classes referenced in both `MediaTab` and (now) `ExpandedMediaPanel` had zero CSS rules anywhere. Wired root-div `onDrag*`/`onDrop` to `state.handlePanelDrag*`, rendered overlay when `panelDragOver`, authored CSS (cobalt-tinted dashed border + fade-in keyframe).
+
+### Repeated root cause: "orphan class" pattern
+
+Four bugs in this sweep traced to the same pattern: JSX references a className, no CSS rule exists, vibcoder `bd-btn` defaults paint solid cobalt (or the overlay is invisible). Hit list: TypePills toolbar (sweep #1), AssetDetailOverlay (this sweep), OptimizationOverlay chrome (preempted by authoring CSS alongside JSX), `med-drag-overlay` (this sweep). Mitigation idea: add a stylelint rule or CI gate that flags JSX class references with no matching `.X` selector in any `.css` file (or accept the cost as one-time cleanup per surface).
+
+### Other minor enhancements
 - Full `FolderTree` component (smart folders, drag-to-folder, delete) instead of the minimal folder rail. Composer-side already supports — UI just needs the prop wiring.
-- §15 AssetDetailOverlay internal CSS — Size/Dimensions/Type meta lines are plain text without proper styling. Internal layout polish.
 
 ---
 

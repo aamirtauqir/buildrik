@@ -22,6 +22,8 @@ interface AssetDetailOverlayProps {
   onPrev?: () => void;
   onNext?: () => void;
   onEditImage?(item: LibraryItem): void | Promise<void>;
+  /** §18 — open OptimizationOverlay for this asset (img only). */
+  onOptimize?(item: LibraryItem): void;
 }
 
 export function AssetDetailOverlay({
@@ -32,6 +34,8 @@ export function AssetDetailOverlay({
   onClose,
   onPrev,
   onNext,
+  onEditImage,
+  onOptimize,
 }: AssetDetailOverlayProps) {
   const [name, setName] = useState(item.name);
   const [inserted, setInserted] = useState(false);
@@ -192,6 +196,22 @@ export function AssetDetailOverlay({
             >
               {inserted ? "Added ✓" : "Add to page"}
             </Button>
+            {onEditImage && item.type === "img" ? (
+              <Button
+                className="med-detail-action-btn"
+                onClick={() => onEditImage(item)}
+              >
+                Edit
+              </Button>
+            ) : null}
+            {onOptimize && item.type === "img" ? (
+              <Button
+                className="med-detail-action-btn"
+                onClick={() => onOptimize(item)}
+              >
+                Optimize
+              </Button>
+            ) : null}
             <Button
               className="med-detail-action-btn med-detail-action-btn--danger"
               onClick={() => onDelete(item.key)}

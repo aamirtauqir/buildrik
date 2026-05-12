@@ -18,6 +18,7 @@ import { LibraryView } from "./components/LibraryView";
 import { MediaContextMenu } from "./components/MediaContextMenu";
 import { StockSourceModal } from "./components/StockSourceModal";
 import { ReplaceAcrossDialog } from "./components/ReplaceAcrossDialog";
+import { OptimizationOverlay } from "./components/OptimizationOverlay";
 import { MEDIA_EVENTS } from "@/shared/constants/media";
 import { TypePills } from "./components/TypePills";
 import { UploadZone } from "./components/UploadZone";
@@ -104,6 +105,32 @@ function MediaTabWithComposer({
     [onOpenImageEditor, state, showToast]
   );
 
+  // §18 — opens OptimizationOverlay for img-only items via state.optimizeItem.
+  // The overlay's onOptimized handler uploads the result as a new version
+  // (mirrors handleEditImage pattern).
+  const handleOptimize = React.useCallback((item: LibraryItem) => {
+    state.setOptimizeItem(item);
+  }, [state]);
+
+  const handleOptimized = React.useCallback(async (optimizedSrc: string) => {
+    const item = state.optimizeItem;
+    if (!item) return;
+    try {
+      const res = await fetch(optimizedSrc);
+      const blob = await res.blob();
+      const timestamp = new Date().getTime();
+      const cleanName = item.name.replace(/(_v\d+)?$/, "");
+      const ext = blob.type.split("/")[1] || "webp";
+      const fileName = `${cleanName}_opt_v${timestamp % 10000}`;
+      const file = new File([blob], `${fileName}.${ext}`, { type: blob.type });
+      state.upload([file]);
+      showToast(`Optimized ${item.name} ✓`, "success");
+    } catch (err) {
+      console.error("Failed to save optimized image:", err);
+      showToast("Could not save optimized image", "error");
+    }
+  }, [state, showToast]);
+
   // §21 — context-menu trigger. Opens file picker; on upload-complete,
   // sets replaceAcrossPair which mounts ReplaceAcrossDialog. Defined here
   // (before early return) so React hook order stays stable.
@@ -144,6 +171,8 @@ function MediaTabWithComposer({
           onClose={onClose}
           onOpenImageEditor={onOpenImageEditor}
           onReplaceAcross={handleReplaceAcross}
+          onOptimize={handleOptimize}
+          onOpenIconPicker={onOpenIconPicker}
         />
       );
     }
@@ -296,6 +325,7 @@ function MediaTabWithComposer({
           onClose={state.closeCtxMenu}
           onEditImage={handleEditImage}
           onReplaceAcross={handleReplaceAcross}
+          onOptimize={handleOptimize}
         />
       )}
       {state.replaceAcrossPair && (
@@ -327,6 +357,14 @@ function MediaTabWithComposer({
           }}
           onClose={state.closeDetail}
           onEditImage={handleEditImage}
+          onOptimize={handleOptimize}
+        />
+      )}
+      {state.optimizeItem && (
+        <OptimizationOverlay
+          item={state.optimizeItem}
+          onOptimized={handleOptimized}
+          onClose={() => state.setOptimizeItem(null)}
         />
       )}
       {/* Stock Source Modal — replaces old Discovery tab */}
