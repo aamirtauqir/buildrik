@@ -295,8 +295,29 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   React.useEffect(() => {
     if (activeTab !== "assets") setMediaPanelOverride(null);
   }, [activeTab]);
+  // prototype-v3 §2 — templates tab supports runtime width override
+  // (320 ↔ 700) via ui:templates-panel-width composer event when detail
+  // card opens. Other tabs ignore the event.
+  const [templatesPanelOverride, setTemplatesPanelOverride] = React.useState<number | null>(null);
+  React.useEffect(() => {
+    if (!composer) return;
+    const handler = (payload: unknown) => {
+      const p = payload as { width?: number };
+      if (typeof p?.width === "number") setTemplatesPanelOverride(p.width);
+    };
+    composer.on("ui:templates-panel-width", handler);
+    return () => {
+      composer.off("ui:templates-panel-width", handler);
+    };
+  }, [composer]);
+  // Reset override when leaving templates tab.
+  React.useEffect(() => {
+    if (activeTab !== "templates") setTemplatesPanelOverride(null);
+  }, [activeTab]);
   const panelWidth = activeTab === "assets" && mediaPanelOverride !== null
     ? mediaPanelOverride
+    : activeTab === "templates" && templatesPanelOverride !== null
+    ? templatesPanelOverride
     : configPanelWidth;
 
   const commonTabProps = {
