@@ -28,9 +28,9 @@ This is a **code-vs-design** audit (source reading), not a screenshot diff. Live
 | 2 | Templates inline detail panel | ship | `components/TemplateDetail.tsx` | per prior audit. Grid hide on detail open works. |
 | 3 | Templates preview modal (full-screen) | ship | `TemplatePreviewModal.tsx:155-235` | Desktop/Mobile viewport switcher, iframe srcDoc rendering, top + bottom bars. Live CTA is contextual ("Apply to Canvas" / "Replace Canvas with This" / "Upgrade to Use") — **richer than prototype's static "Use this template"**. Drift: meta line shows "{N} sections" instead of prototype's "Hero · Free · 1.2k sites" social proof — acceptable, prototype data is fictional. |
 | 4 | Templates replace modal | ship (fixed 2026-05-12) | `TemplatesTabModals.tsx:17-87` | Fixed in this arc: title rename, warning icon, page-name subtitle with element count, backup label includes page name, primary CTA "Replace content". Element count now sourced from active page descendants (was incorrectly total page count). |
-| 5 | Templates Pro upgrade gate | drift-fix | `TemplatesTabModals.tsx:84-109` | Functional (cancel / upgrade-to-Pro routes to `/dashboard/billing`). Missing: trophy icon in gradient circle, bullet list of Pro features ("80+ premium templates / Custom domain / Stock library / AI alt-text / Priority support"). 5-min cosmetic fix. |
+| 5 | Templates Pro upgrade gate | ship (fixed 2026-05-12) | `TemplatesTabModals.tsx:84-159` | Added trophy icon in amber gradient circle, 5-bullet Pro feature list, title rewrite, "Maybe later" secondary CTA. |
 | 6 | Templates add as new page flow | ship | `TemplatesTab.tsx` + `TemplatesTabModals.tsx` CreatePageConfirmModal / CreatePageSuccessModal / CreatePageErrorModal | All 3 modals shipped. Confirmed via grep. |
-| 7 | Templates search active | drift-cosmetic | `TemplatesTab.tsx:268-298 + 343-354` | Search toggle + clear + empty-state CTA all wired. Drift: prototype shows "3 results for 'X'" count + keyword highlight via `<mark>` in card names — neither in live. Low value to backfill. |
+| 7 | Templates search active | ship (fixed 2026-05-12) | `TemplatesTab.tsx:343-405` + `components/TemplateCard.tsx:31-62` | Search toggle + clear + empty-state CTA + "N results for 'X'" count + keyword highlight via `<mark>` in TemplateCard names. Multi-token query supported (space-split OR-match, regex-escaped). |
 | 8 | Templates apply progress + success toast | ship | `ApplyProgressOverlay.tsx` | 4-step sequence ("Importing template HTML → Resolving brand tokens → Rendering on canvas → Saving applied state") matches prototype exactly. Comment at line 5 explicitly references v3 §8. Success/error toasts via existing toast infra. |
 | 9 | Templates extended drawer (Used in / Versions) | ship | `components/TemplateUsageDrawer.tsx` (296 LOC) | Shipped 2026-05-08 via plan `2026-05-08-templates-extended-drawer-s9.md`. |
 
@@ -62,13 +62,13 @@ This is a **code-vs-design** audit (source reading), not a screenshot diff. Live
 
 | Verdict | Count | §s |
 |---|---|---|
-| ship | 18 | 1, 2, 3, 4, 6, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 |
-| drift-cosmetic | 1 | 7 |
-| drift-fix | 1 | 5 |
+| ship | 20 | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 |
 | build-deferred | 1 | 12 |
 
-### Phase A this arc closed
-- §4: drift-fix → ship (commit on this arc — title, icon, page-name subtitle, element count, primary CTA all corrected)
+### This arc closed
+- §4: drift-fix → ship (title, icon, page-name subtitle, element count, primary CTA all corrected)
+- §5: drift-fix → ship (trophy icon, Pro feature bullet list, title rewrite, "Maybe later" CTA)
+- §7: drift-cosmetic → ship (results count line + keyword highlight via `<mark>`)
 - §11: confirmed wire via 3 composer events; verdict promoted from "unverified" → ship
 - §12: confirmed architecture gap; classified build-deferred (fullpage escape covers the use case)
 
@@ -76,9 +76,7 @@ This is a **code-vs-design** audit (source reading), not a screenshot diff. Live
 
 ## Open follow-ups (NOT closed by this arc)
 
-1. **§5 Pro upgrade gate** — add trophy-in-circle icon + 5-bullet feature list. ~10 LOC change in `TemplatesTabModals.tsx:84-109`.
-2. **§7 search results count + keyword highlight** — `N results for "X"` line + `<mark>` wrap in matched card names. Low priority.
-3. **§12 expanded mode 560px** — if user demand emerges, requires:
+1. **§12 expanded mode 560px** — if user demand emerges, requires:
    - State-driven `panelWidth` (not config-driven) for `assets` tab
    - Upload-completion trigger → expand
    - "Compact" button → collapse
