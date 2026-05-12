@@ -40,7 +40,7 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
 }) =>
   createPortal(
     <div className="tpl-modal-overlay" onClick={onCancel}>
-      <div className="tpl-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="tpl-modal tpl-modal--replace" onClick={(e) => e.stopPropagation()}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
           <div style={{ width: 32, height: 32, background: "var(--bd-warn-soft, #FEF3C7)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--bd-warn, #B45309)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
