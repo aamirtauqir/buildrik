@@ -51,7 +51,7 @@ This is a **code-vs-design** audit (source reading), not a screenshot diff. Live
 | 18 | Media optimization panel | ship | `editor/media/OptimizationPanel.tsx` (331 LOC) | Shipped. |
 | 19 | Media stock source modal | ship (mount-fixed 2026-05-12) | `components/StockSourceModal.tsx` (355 LOC) + ExpandedMediaPanel mount + "Stock" header button | Shipped 2026-05-09 backend + modal. Mount in fullpage MediaTab path only. 2026-05-12 systematic-debug fix: added mount + "Stock" trigger button in ExpandedMediaPanel header. |
 | 20 | Media icon picker modal | ship | `editor/media/IconPickerModal.tsx` (533 LOC) | Shipped. Used by element-with-icon-trait flow. |
-| 21 | Media replace-across modal | **orphan** (NOT mounted) | `components/ReplaceAcrossDialog.tsx` (229 LOC) | Component authored 2026-05-08 (`f4acbb6f`) with engine + modal primitive, but **never imported / mounted anywhere in editor**. No UI trigger to launch it. Requires separate arc: (a) `state.replaceAcrossItem` state slice in useMediaState, (b) trigger from context-menu "Replace across pages" item or asset detail panel "Replace across" button. Logged as deferred. |
+| 21 | Media replace-across modal | ship (wire-fixed 2026-05-12) | `components/ReplaceAcrossDialog.tsx` (229 LOC) + state slice + context-menu trigger + file-picker handler + mount in both paths | Engine + modal shipped 2026-05-08; orphan because never integrated into UI. 2026-05-12 systematic-debug arc shipped 4-layer wire: state slice in useMediaState (`replaceAcrossPair: { oldSrc, newSrc, oldLabel, newLabel } \| null`), "Replace across pages…" item in MediaContextMenu (img/vid only, optional prop), `handleReplaceAcross` in MediaTab with native file picker + UPLOAD_COMPLETE listener, mount in both fullpage + ExpandedMediaPanel paths. 4 new vitest cases. |
 | 22 | Media upload zone states | ship | `components/UploadZone.tsx` (121 LOC) | Shipped. Idle / hover / dragging / uploading / error states all in component. |
 
 ---
@@ -62,32 +62,20 @@ This is a **code-vs-design** audit (source reading), not a screenshot diff. Live
 
 | Verdict | Count | §s |
 |---|---|---|
-| ship | 21 | 1–20, 22 |
-| orphan-deferred | 1 | 21 (ReplaceAcrossDialog never mounted) |
+| ship | 22 | 1–22 (full parity achieved 2026-05-12) |
 
-### This arc closed (5 commits)
+### This arc closed
 - §4: drift-fix → ship (title, icon, page-name subtitle, element count, primary CTA all corrected)
 - §5: drift-fix → ship visual (trophy + Pro feature bullets), then **gate-fix → ship reachable** (live verify exposed disabled button blocking ProModal)
 - §7: drift-cosmetic → ship (results count line + keyword highlight via `<mark>`)
 - §11: confirmed wire via 3 composer events; verdict promoted from "unverified" → ship
 - §12: build-deferred → ship (composer-event-driven runtime width override + new ExpandedMediaPanel component + 7 new vitest cases + CSS authoring for TypePills/LibraryView)
 - §15/§16/§19: ship-by-file → **mount-fix → ship** (live verify exposed ExpandedMediaPanel missing overlay mounts; 3 overlays + 1 trigger button added in systematic-debug arc)
-- §21: ship → **orphan-deferred** (live verify exposed orphan component — ReplaceAcrossDialog never mounted)
+- §21: orphan → **wire-fix → ship** (4-layer wire shipped: state slice + context-menu trigger + file-picker handler + mount in both paths + 4 vitest cases)
 
 ---
 
 ## Open follow-ups (NOT closed by this arc)
-
-### §21 ReplaceAcrossDialog wire (orphan-deferred)
-
-Component fully authored 2026-05-08 (229 LOC + engine wiring), but **never imported / mounted** anywhere in editor. Live verify confirmed: zero consumers via `grep -rn "<ReplaceAcrossDialog"`. Integration tasks:
-
-1. **State:** add `replaceAcrossItem: LibraryItem | null` + setter to `useMediaState`
-2. **Trigger A:** add "Replace across pages" item in `MediaContextMenu` (fires setter)
-3. **Trigger B (optional):** add "Replace across" button in `AssetDetailOverlay`
-4. **Mount:** `<ReplaceAcrossDialog>` in both `MediaTab.tsx` (fullpage) + `ExpandedMediaPanel.tsx` (panel) paths
-
-Estimated 2-3 hours. Defer until user demand or QA flag.
 
 ### §13 per-folder filter + drag-to-folder
 
