@@ -179,21 +179,6 @@
   border-radius: 2px;
 }
 
-.tpl-content-inner {
-  display: flex;
-  height: 100%;
-}
-.tpl-content-inner--with-detail {
-  padding: var(--bd-space-4);
-}
-.tpl-content-inner--with-detail .tpl-grid-area {
-  display: none;
-}
-.tpl-content-inner--with-detail .tpl-detail {
-  width: 100%;
-  max-width: 100%;
-}
-
 /* ── Detail layout: single-column default, 2-col in split mode (prototype-v3 §2) ── */
 .tpl-detail-layout {
   display: flex;
@@ -231,11 +216,6 @@
   min-width: 0;
   padding: var(--bd-space-6);
   transition: opacity 0.2s;
-}
-.tpl-grid-area--dimmed {
-  opacity: 0.4;
-  pointer-events: none;
-  padding: 0;
 }
 
 .tpl-grid {
