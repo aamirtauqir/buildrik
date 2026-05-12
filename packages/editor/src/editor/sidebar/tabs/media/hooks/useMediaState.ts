@@ -9,6 +9,7 @@ import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
 import type { Composer } from "../../../../../engine/Composer";
 import { useToast } from "@/editor/shared/vibcoder";
+import { MEDIA_EVENTS } from "@/shared/constants/media";
 import type { CtxMenuState, LibraryItem, MediaStateResult, MediaTypeFilter } from "../data/mediaTypes";
 import { useLibraryState } from "./useLibraryState";
 import { useSelectionState } from "./useSelectionState";
@@ -30,6 +31,32 @@ export function useMediaState(composer: Composer): MediaStateResult {
   const [detailItem, setDetailItem] = useState<LibraryItem | null>(null);
   const [ctxMenu, setCtxMenu] = useState<CtxMenuState | null>(null);
   const [selectionContext, setSelectionContext] = useState<{ elementId: string; label?: string } | null>(null);
+
+  // §12 — expanded panel mode (320 ↔ 560). Composer event fires on change so
+  // LeftSidebar can re-read the live width without coupling to media state.
+  const [panelExpanded, setPanelExpandedRaw] = useState(false);
+  // Tracks manual collapse so subsequent uploads don't fight user intent.
+  // Resets when user manually expands (explicit re-opt-in).
+  const userCollapsedRef = React.useRef(false);
+  const setPanelExpanded = useCallback((v: boolean) => {
+    setPanelExpandedRaw(v);
+    userCollapsedRef.current = !v;
+    composer.emit("ui:media-panel-width", { width: v ? 560 : 320, expanded: v });
+  }, [composer]);
+
+  // Auto-expand on upload completion when user hasn't manually collapsed.
+  // Suppressed during selection-context (§11 snap-back) — disruptive there.
+  useEffect(() => {
+    const onUploadComplete = () => {
+      if (userCollapsedRef.current) return;
+      if (selectionContext) return;
+      setPanelExpanded(true);
+    };
+    composer.media.on(MEDIA_EVENTS.UPLOAD_COMPLETE, onUploadComplete);
+    return () => {
+      composer.media.off(MEDIA_EVENTS.UPLOAD_COMPLETE, onUploadComplete);
+    };
+  }, [composer, selectionContext, setPanelExpanded]);
 
   // Sub-hooks
   const library = useLibraryState(composer);
@@ -313,5 +340,9 @@ export function useMediaState(composer: Composer): MediaStateResult {
     closeDetail,
     selectionContext,
     setSelectionContext,
+
+    // §12 expanded panel
+    panelExpanded,
+    setPanelExpanded,
   };
 }

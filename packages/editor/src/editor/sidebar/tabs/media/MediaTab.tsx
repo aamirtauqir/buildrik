@@ -21,6 +21,7 @@ import { TypePills } from "./components/TypePills";
 import { UploadZone } from "./components/UploadZone";
 import { useMediaState } from "./hooks/useMediaState";
 import { SlimLauncher } from "./components/SlimLauncher";
+import { ExpandedMediaPanel } from "./components/ExpandedMediaPanel";
 import "./MediaTab.css";
 import { useToast } from "@/editor/shared/vibcoder";
 import type { LibraryItem } from "./data/mediaTypes";
@@ -101,8 +102,19 @@ function MediaTabWithComposer({
     [onOpenImageEditor, state, showToast]
   );
 
-  // ─── Panel mode: render slim launcher ──────────────────────���──────
+  // ─── Panel mode: slim launcher (320px) or expanded panel (560px) ────
   if (onOpenLibrary) {
+    if (state.panelExpanded) {
+      return (
+        <ExpandedMediaPanel
+          composer={composer}
+          state={state}
+          onCompact={() => state.setPanelExpanded(false)}
+          onOpenLibrary={onOpenLibrary}
+          onClose={onClose}
+        />
+      );
+    }
     return (
       <SlimLauncher
         composer={composer}

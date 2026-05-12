@@ -261,8 +261,31 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
   // Panel header info
   const tabConfig = getTabConfig(activeTab);
-  const panelWidth = getTabWidth(activeTab);
+  const configPanelWidth = getTabWidth(activeTab);
   const panelTitle = tabConfig?.label ?? "Panel";
+
+  // §12 — assets tab supports runtime width override (320 ↔ 560) via
+  // ui:media-panel-width composer event. Other tabs ignore the event.
+  const [mediaPanelOverride, setMediaPanelOverride] = React.useState<number | null>(null);
+  React.useEffect(() => {
+    if (!composer) return;
+    const handler = (payload: unknown) => {
+      const p = payload as { width?: number };
+      if (typeof p?.width === "number") setMediaPanelOverride(p.width);
+    };
+    composer.on("ui:media-panel-width", handler);
+    return () => {
+      composer.off("ui:media-panel-width", handler);
+    };
+  }, [composer]);
+  // Reset override when leaving assets tab — prevents stale 560 leaking to
+  // next tab opened.
+  React.useEffect(() => {
+    if (activeTab !== "assets") setMediaPanelOverride(null);
+  }, [activeTab]);
+  const panelWidth = activeTab === "assets" && mediaPanelOverride !== null
+    ? mediaPanelOverride
+    : configPanelWidth;
 
   const commonTabProps = {
     isPinned,

@@ -251,6 +251,10 @@ export interface MediaStateResult {
   // Selection context (canvas → media replace flow)
   selectionContext: { elementId: string; label?: string } | null;
   setSelectionContext(ctx: { elementId: string; label?: string } | null): void;
+
+  // §12 expanded-panel mode (320 ↔ 560)
+  panelExpanded: boolean;
+  setPanelExpanded(v: boolean): void;
 }
 
 // --- Prop slices ---
