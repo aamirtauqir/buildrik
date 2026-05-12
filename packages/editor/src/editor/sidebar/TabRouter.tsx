@@ -72,6 +72,16 @@ export interface TabRouterProps {
   onTemplatesSwitchTab?: (tab: string) => void;
   /** Switches the assets tab from slim launcher to fullpage library manager. */
   onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
+  /** §17 — opens ImageEditorModal for asset crop/rotate/adjust in panel-mode MediaTab. */
+  onOpenImageEditor?: (
+    imageSrc: string,
+    onSave: (editedSrc: string) => void | Promise<void>,
+  ) => void;
+  /** §20 — opens IconPickerModal from StockSourceModal "Browse full icon library". */
+  onOpenIconPicker?: (
+    currentIcon: import("../../shared/types/media").IconConfig | undefined,
+    onSelect: (icon: import("../../shared/types/media").IconConfig) => void,
+  ) => void;
 }
 
 export const TabRouter: React.FC<TabRouterProps> = ({
@@ -91,6 +101,8 @@ export const TabRouter: React.FC<TabRouterProps> = ({
   onSettingsDirtyChange,
   onReplayTour,
   onOpenLibrary,
+  onOpenImageEditor,
+  onOpenIconPicker,
 }) => {
   switch (activeTab) {
     case "add":
@@ -147,7 +159,13 @@ export const TabRouter: React.FC<TabRouterProps> = ({
 
     case "assets":
       return (
-        <MediaTab composer={composer} onOpenLibrary={onOpenLibrary} {...commonTabProps} />
+        <MediaTab
+          composer={composer}
+          onOpenLibrary={onOpenLibrary}
+          onOpenImageEditor={onOpenImageEditor}
+          onOpenIconPicker={onOpenIconPicker}
+          {...commonTabProps}
+        />
       );
 
     case "publish":

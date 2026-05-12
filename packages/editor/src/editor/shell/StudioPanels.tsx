@@ -385,6 +385,8 @@ export const StudioPanels: React.FC<StudioPanelsProps> = ({
             canvasHoveredId={canvasHoveredId}
             projectId={projectId}
             onOpenLibrary={handleOpenLibrary}
+            onOpenImageEditor={onOpenImageEditor}
+            onOpenIconPicker={onOpenIconPicker}
           />
         </LayoutShell.Sidebar>
 

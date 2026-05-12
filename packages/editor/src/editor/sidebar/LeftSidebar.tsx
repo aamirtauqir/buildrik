@@ -72,6 +72,16 @@ export interface LeftSidebarProps {
   }>;
   /** Switches the assets tab from slim launcher to fullpage library manager. */
   onOpenLibrary?: (opts?: { searchQuery?: string; folderId?: string | null }) => void;
+  /** §17 — opens ImageEditorModal for asset crop/rotate/adjust in panel-mode MediaTab. */
+  onOpenImageEditor?: (
+    imageSrc: string,
+    onSave: (editedSrc: string) => void | Promise<void>,
+  ) => void;
+  /** §20 — opens IconPickerModal from StockSourceModal "Browse full icon library". */
+  onOpenIconPicker?: (
+    currentIcon: import("../../shared/types/media").IconConfig | undefined,
+    onSelect: (icon: import("../../shared/types/media").IconConfig) => void,
+  ) => void;
 }
 
 // ============================================
@@ -150,6 +160,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onUnpublish,
   onExportForDeploy,
   onOpenLibrary,
+  onOpenImageEditor,
+  onOpenIconPicker,
 }) => {
   const navRef = React.useRef<HTMLElement>(null);
   const panelContentRef = React.useRef<HTMLDivElement>(null);
@@ -372,6 +384,8 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
                   onSettingsDirtyChange={setSettingsDirty}
                   onTemplatesSwitchTab={(tab) => safeTabChange(tab as GroupedTabId)}
                   onOpenLibrary={onOpenLibrary}
+                  onOpenImageEditor={onOpenImageEditor}
+                  onOpenIconPicker={onOpenIconPicker}
                 />
               </React.Suspense>
             </div>
