@@ -421,10 +421,15 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         </div>
       )}
       {/* Modals */}
-      {sel.showReplace && (
+      {sel.showReplace && (() => {
+        const activePage = composer?.elements?.getActivePage?.();
+        const activePageElement = activePage ? composer?.elements?.getElement?.(activePage.root.id) : undefined;
+        const elementCount = activePageElement?.getDescendants?.()?.length ?? 0;
+        return (
         <ReplaceModal
           template={SITE_TEMPLATES.find((t) => t.id === pendingId.current) ?? SITE_TEMPLATES[0]}
-          currentPageCount={composer?.elements?.getAllPages?.()?.length ?? 1}
+          currentPageName={activePage?.name}
+          currentPageCount={elementCount}
           resetGlobalStyles={resetStyles}
           onResetChange={setResetStyles}
           backupCurrentPage={backupCurrentPage}
@@ -442,7 +447,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
             startApply();
           }}
         />
-      )}
+        );
+      })()}
       {sel.showUpgrade && (
         <ProModal
           templateName={SITE_TEMPLATES.find((t) => t.id === pendingId.current)?.name ?? "Pro Template"}

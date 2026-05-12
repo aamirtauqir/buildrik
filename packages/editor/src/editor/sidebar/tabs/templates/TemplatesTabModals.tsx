@@ -16,6 +16,7 @@ import type { TemplateItem } from "./templatesData";
 
 export interface ReplaceModalProps {
   template: TemplateItem;
+  currentPageName?: string;
   currentPageCount: number;
   resetGlobalStyles: boolean;
   onResetChange: (v: boolean) => void;
@@ -28,6 +29,8 @@ export interface ReplaceModalProps {
 
 export const ReplaceModal: React.FC<ReplaceModalProps> = ({
   template,
+  currentPageName,
+  currentPageCount,
   resetGlobalStyles,
   onResetChange,
   backupCurrentPage,
@@ -38,11 +41,21 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
   createPortal(
     <div className="tpl-modal-overlay" onClick={onCancel}>
       <div className="tpl-modal" onClick={(e) => e.stopPropagation()}>
-        <h3 className="tpl-modal-title">Apply Template?</h3>
-        <div className="tpl-modal-warning">
-          <p className="tpl-modal-warning-text">
-            This will replace your current page content with <strong>{template.name}</strong>. This action cannot be undone.
-          </p>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+          <div style={{ width: 32, height: 32, background: "var(--bd-warn-soft, #FEF3C7)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--bd-warn, #B45309)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 9v2m0 4h.01M5 21h14a2 2 0 0 0 1.84-2.75L13.74 4a2 2 0 0 0-3.48 0L3.16 18.25A2 2 0 0 0 5 21z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 className="tpl-modal-title" style={{ margin: 0 }}>Replace current page content?</h3>
+            <div style={{ fontSize: 12, color: "var(--bd-fg-muted)", marginTop: 2 }}>
+              {currentPageName ? `${currentPageName} page` : "Current page"} has {currentPageCount} element{currentPageCount === 1 ? "" : "s"} that will be replaced.
+            </div>
+          </div>
+        </div>
+        <div style={{ fontSize: 12, color: "var(--bd-fg-secondary)", marginBottom: 12 }}>
+          Applying <b style={{ color: "var(--bd-fg)" }}>{template.name}</b> will replace all elements on the current page. You can:
         </div>
         <label style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--bd-fg-muted, #475569)", cursor: "pointer", margin: "0 0 6px" }}>
           <Checkbox
@@ -50,8 +63,10 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
             onChange={(e) => onBackupChange(e.target.checked)}
             style={{ width: 14, height: 14, cursor: "pointer", marginTop: 2 }} />
           <span>
-            <span style={{ display: "block", fontWeight: 500, color: "var(--bd-fg)" }}>Backup current page first</span>
-            <span style={{ display: "block", fontSize: 11, marginTop: 1 }}>Saves current content as a new page before replacing.</span>
+            <span style={{ display: "block", fontWeight: 500, color: "var(--bd-fg)" }}>
+              Backup current page as &ldquo;{currentPageName || "Current"} (backup)&rdquo;
+            </span>
+            <span style={{ display: "block", fontSize: 11, marginTop: 1 }}>Preserves your work in a new page.</span>
           </span>
         </label>
         <label style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "var(--bd-fg-muted, #475569)", cursor: "pointer", margin: "0 0 4px" }}>
@@ -60,8 +75,8 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
             onChange={(e) => onResetChange(e.target.checked)}
             style={{ width: 14, height: 14, cursor: "pointer", marginTop: 2 }} />
           <span>
-            <span style={{ display: "block", fontWeight: 500, color: "var(--bd-fg)" }}>Reset global styles</span>
-            <span style={{ display: "block", fontSize: 11, marginTop: 1 }}>Override your brand tokens with template defaults.</span>
+            <span style={{ display: "block", fontWeight: 500, color: "var(--bd-fg)" }}>Reset global styles to template defaults</span>
+            <span style={{ display: "block", fontSize: 11, marginTop: 1 }}>Override your brand colors with template colors.</span>
           </span>
         </label>
         <div className="tpl-modal-btns">
@@ -69,7 +84,7 @@ export const ReplaceModal: React.FC<ReplaceModalProps> = ({
             Cancel
           </Button>
           <Button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onApply}>
-            Replace
+            Replace content
           </Button>
         </div>
       </div>
