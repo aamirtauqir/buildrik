@@ -20,6 +20,7 @@ import type { MediaStateResult } from "../data/mediaTypes";
 import type { MediaFolder } from "@shared/types/media";
 import { TypePills } from "./TypePills";
 import { LibraryView } from "./LibraryView";
+import "../MediaTab.css";
 import "./ExpandedMediaPanel.css";
 
 export interface ExpandedMediaPanelProps {

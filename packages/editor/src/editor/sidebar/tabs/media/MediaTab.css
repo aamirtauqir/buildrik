@@ -509,3 +509,369 @@
   background: var(--bd-accent-tint, rgba(45, 109, 255, 0.08));
   border-color: var(--bd-accent);
 }
+
+/* ─────────────────────────────────────────────────────────────────────
+ * Pill + toolbar button overrides
+ *
+ * These classes ride on the vibcoder `bd-btn bd-btn--primary` chain
+ * (TypePills, LibraryView toolbar use `<Button>` without variant prop,
+ * so they inherit primary fill). Higher specificity (`.med-tab .X`,
+ * `.exp-panel .X`) overrides the primary background so the pills /
+ * sort controls / grid toggle render as proper tabs.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* TypePills container */
+.med-type-pills,
+.exp-panel .med-type-pills {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  background: var(--bd-bg-soft, #F1F5F9);
+  border-radius: 6px;
+}
+
+/* TypePills — individual pill */
+.med-tab .med-type-pill,
+.exp-panel .med-type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  height: 24px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--bd-fg-muted, #64748B);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.med-tab .med-type-pill:hover,
+.exp-panel .med-type-pill:hover {
+  background: var(--bd-bg, #FFFFFF);
+  color: var(--bd-fg, #0F172A);
+}
+.med-tab .med-type-pill--active,
+.exp-panel .med-type-pill--active,
+.med-tab .med-type-pill[aria-selected="true"],
+.exp-panel .med-type-pill[aria-selected="true"] {
+  background: var(--bd-bg, #FFFFFF);
+  color: var(--bd-cobalt, #2D6DFF);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.med-tab .med-type-pill__count,
+.exp-panel .med-type-pill__count {
+  font-size: 10px;
+  color: var(--bd-fg-muted);
+  background: var(--bd-bg-soft);
+  padding: 0 4px;
+  border-radius: 8px;
+  min-width: 14px;
+  text-align: center;
+}
+.med-type-pill--active .med-type-pill__count,
+.med-type-pill[aria-selected="true"] .med-type-pill__count {
+  color: var(--bd-cobalt);
+  background: var(--bd-cobalt-soft, rgba(45, 109, 255, 0.12));
+}
+
+/* Sort label + direction button */
+.med-tab .med-sort-lbl,
+.exp-panel .med-sort-lbl {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  height: 24px;
+  border: 1px solid var(--bd-border-light, #E2E8F0);
+  border-radius: 4px;
+  background: var(--bd-bg, #FFFFFF);
+  color: var(--bd-fg-secondary, #475569);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.med-tab .med-sort-lbl:hover,
+.exp-panel .med-sort-lbl:hover {
+  border-color: var(--bd-border, #CBD5E1);
+  color: var(--bd-fg);
+}
+.med-tab .med-sort-dir,
+.exp-panel .med-sort-dir {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--bd-border-light);
+  border-radius: 4px;
+  background: var(--bd-bg);
+  color: var(--bd-fg-secondary);
+  font-size: 12px;
+  cursor: pointer;
+}
+.med-tab .med-sort-dir:hover,
+.exp-panel .med-sort-dir:hover {
+  border-color: var(--bd-border);
+  color: var(--bd-fg);
+}
+
+/* Grid-size toggle (2 / 3 / 4) */
+.med-tab .med-grid-tog,
+.exp-panel .med-grid-tog {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--bd-border-light);
+  border-radius: 4px;
+  background: var(--bd-bg);
+  color: var(--bd-fg-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.med-tab .med-grid-tog.active,
+.exp-panel .med-grid-tog.active {
+  background: var(--bd-cobalt, #2D6DFF);
+  color: #FFFFFF;
+  border-color: var(--bd-cobalt);
+}
+.med-tab .med-grid-tog:not(.active):hover,
+.exp-panel .med-grid-tog:not(.active):hover {
+  border-color: var(--bd-border);
+  color: var(--bd-fg);
+}
+
+/* Card mini-buttons (delete / select / insert) */
+.med-tab .med-del-btn,
+.exp-panel .med-del-btn,
+.med-tab .med-chk,
+.exp-panel .med-chk,
+.med-tab .med-insert-btn,
+.exp-panel .med-insert-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--bd-fg, #0F172A);
+  border: 1px solid var(--bd-border-light);
+  border-radius: 4px;
+  font-size: 11px;
+  padding: 0;
+  cursor: pointer;
+}
+.med-tab .med-del-btn,
+.exp-panel .med-del-btn {
+  width: 20px;
+  height: 20px;
+  color: var(--bd-fg-muted);
+}
+.med-tab .med-del-btn:hover,
+.exp-panel .med-del-btn:hover {
+  background: var(--bd-error-bg, #FEE2E2);
+  color: var(--bd-error, #DC2626);
+  border-color: var(--bd-error, #DC2626);
+}
+.med-tab .med-chk,
+.exp-panel .med-chk {
+  width: 18px;
+  height: 18px;
+  color: var(--bd-fg-muted);
+}
+.med-tab .med-insert-btn,
+.exp-panel .med-insert-btn {
+  padding: 4px 8px;
+  height: 24px;
+  font-weight: 500;
+}
+
+/* Sort-by inline group + selection bar wrap */
+.med-tab .med-sort-by,
+.exp-panel .med-sort-by {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ─── LibraryView toolbar + sections ─────────────────────────────────── */
+
+.med-library-view {
+  padding: 0 12px 12px;
+}
+
+.med-sec-hdr {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 0 6px;
+}
+.med-sec-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bd-fg-muted, #64748B);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.med-sec-count {
+  font-size: 10px;
+  color: var(--bd-fg-muted);
+  background: var(--bd-bg-soft, #F1F5F9);
+  padding: 1px 6px;
+  border-radius: 8px;
+  min-width: 16px;
+  text-align: center;
+}
+.med-sec-last-added {
+  font-size: 11px;
+  color: var(--bd-fg-muted);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.med-sec-spacer { flex: 1; }
+
+/* Format filter strip */
+.med-fmt-strip {
+  display: inline-flex;
+  gap: 4px;
+  margin-right: 8px;
+}
+.med-tab .med-fmt-btn,
+.exp-panel .med-fmt-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  height: 22px;
+  border: 1px solid var(--bd-border-light);
+  border-radius: 10px;
+  background: var(--bd-bg);
+  color: var(--bd-fg-secondary);
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.med-tab .med-fmt-btn.active,
+.exp-panel .med-fmt-btn.active {
+  background: var(--bd-cobalt-soft, rgba(45, 109, 255, 0.12));
+  color: var(--bd-cobalt);
+  border-color: var(--bd-cobalt);
+}
+
+/* Sort dropdown */
+.med-sort-wrap { display: inline-flex; gap: 4px; align-items: center; }
+.med-sort-dd {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 10;
+  min-width: 160px;
+  background: var(--bd-bg, #FFFFFF);
+  border: 1px solid var(--bd-border-light);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  padding: 4px;
+}
+.med-tab .med-sort-opt,
+.exp-panel .med-sort-opt {
+  display: flex;
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  background: transparent;
+  color: var(--bd-fg);
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  text-align: left;
+}
+.med-tab .med-sort-opt:hover,
+.exp-panel .med-sort-opt:hover { background: var(--bd-bg-soft); }
+.med-tab .med-sort-opt.active,
+.exp-panel .med-sort-opt.active { color: var(--bd-cobalt); font-weight: 500; }
+.med-sort-chk { margin-left: auto; }
+
+/* Empty state per type */
+.med-empty {
+  padding: 16px 0;
+  text-align: left;
+}
+.med-empty-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bd-fg-secondary);
+  margin-bottom: 4px;
+}
+.med-empty-sub {
+  font-size: 11px;
+  color: var(--bd-fg-muted);
+}
+
+/* Bulk action bar */
+.med-bulk-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bd-cobalt-soft, rgba(45, 109, 255, 0.08));
+  border: 1px solid var(--bd-cobalt-soft);
+  border-radius: 6px;
+  margin: 8px 0;
+}
+.med-bulk-count {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bd-cobalt);
+}
+
+/* Upload ghost cards */
+.med-upload-ghosts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 6px;
+  margin-top: 8px;
+}
+.med-upload-ghost {
+  position: relative;
+  aspect-ratio: 1;
+  background: var(--bd-bg-soft);
+  border: 1px dashed var(--bd-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.med-upload-ghost-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--bd-cobalt);
+  transition: width 0.2s;
+}
+.med-upload-ghost-pct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bd-fg-muted);
+}
+
+/* Insert button overlay on cards */
+.med-tab .med-insert-btn,
+.exp-panel .med-insert-btn {
+  background: var(--bd-cobalt, #2D6DFF);
+  color: #FFFFFF;
+  border-color: var(--bd-cobalt);
+}
+.med-tab .med-insert-btn:hover,
+.exp-panel .med-insert-btn:hover {
+  background: var(--bd-cobalt-dark, #1D5BE0);
+}
