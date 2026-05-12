@@ -194,6 +194,37 @@
   max-width: 100%;
 }
 
+/* ── Detail layout: single-column default, 2-col in split mode (prototype-v3 §2) ── */
+.tpl-detail-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.tpl-detail-layout > .tpl-grid-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.tpl-detail-layout--split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--bd-space-4);
+  padding: var(--bd-space-4);
+  overflow: hidden;
+}
+.tpl-detail-layout--split > .tpl-grid-area {
+  padding: 0;
+  overflow-y: auto;
+  min-height: 0;
+}
+.tpl-detail-layout--split > .tpl-detail {
+  overflow-y: auto;
+  min-height: 0;
+  align-self: stretch;
+}
+
 /* ── Grid area ── */
 .tpl-grid-area {
   flex: 1;
