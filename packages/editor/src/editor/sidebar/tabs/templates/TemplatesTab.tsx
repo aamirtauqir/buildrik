@@ -409,7 +409,6 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
                 usage={detailUsage}
                 onJumpToPage={handleJumpToPage}
                 currentVersion={detailTemplate.version ?? DEFAULT_TEMPLATE_VERSION}
-                templateThumbnail={detailTemplate.thumbnail}
                 onOpenPreview={() => {
                   setUsageDrawerOpen(false);
                   sel.setPreviewId(detailTemplate.id);

@@ -39,8 +39,8 @@
 
 .med-grid {
   display: grid;
-  gap: var(--bd-space-4);
-  padding: var(--bd-space-5);
+  gap: var(--bd-space-2);
+  padding: var(--bd-space-3);
 }
 
 .med-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
