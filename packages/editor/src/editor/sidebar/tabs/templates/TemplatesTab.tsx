@@ -357,38 +357,40 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
             </Button>
           </div>
         ) : (
-          <div className={`tpl-content-inner${sel.detailId ? " tpl-content-inner--with-detail" : ""}`}>
-            <div className={`tpl-grid-area${sel.detailId ? " tpl-grid-area--dimmed" : ""}`}>
-              {sel.searchQ.trim() && (
-                <div className="tpl-search-results-count" aria-live="polite">
-                  {sel.filteredTemplates.length} result{sel.filteredTemplates.length === 1 ? "" : "s"} for &ldquo;{sel.searchQ.trim()}&rdquo;
+          <>
+            <div className={`tpl-detail-layout${detailTemplate ? " tpl-detail-layout--split" : ""}`}>
+              <div className="tpl-grid-area">
+                {sel.searchQ.trim() && (
+                  <div className="tpl-search-results-count" aria-live="polite">
+                    {sel.filteredTemplates.length} result{sel.filteredTemplates.length === 1 ? "" : "s"} for &ldquo;{sel.searchQ.trim()}&rdquo;
+                  </div>
+                )}
+                <div className="tpl-grid" role="listbox" aria-label="Available templates">
+                  {sel.paginatedTemplates.map((tpl) => (
+                    <TemplateCard
+                      key={tpl.id}
+                      template={tpl}
+                      isSelected={sel.detailId === tpl.id}
+                      onClick={(id) => sel.setDetailId(sel.detailId === id ? null : id)}
+                      highlightQuery={sel.searchQ.trim() || undefined}
+                    />
+                  ))}
                 </div>
-              )}
-              <div className="tpl-grid" role="listbox" aria-label="Available templates">
-                {sel.paginatedTemplates.map((tpl) => (
-                  <TemplateCard
-                    key={tpl.id}
-                    template={tpl}
-                    isSelected={sel.detailId === tpl.id}
-                    onClick={(id) => sel.setDetailId(sel.detailId === id ? null : id)}
-                    highlightQuery={sel.searchQ.trim() || undefined}
-                  />
-                ))}
               </div>
+              {detailTemplate && (
+                <TemplateDetail
+                  template={detailTemplate}
+                  onApplyToCurrent={handleApplyToCurrent}
+                  onAddAsNewPage={handleAddAsNewPage}
+                  onPreview={(id) => sel.setPreviewId(id)}
+                  onCancel={() => sel.setDetailId(null)}
+                  usageCount={detailUsage.length}
+                  onShowUsage={() => setUsageDrawerOpen(true)}
+                  currentPageName={activePageInfo?.name}
+                  appliedToCurrentPage={detailAppliedToCurrent}
+                />
+              )}
             </div>
-            {detailTemplate && (
-              <TemplateDetail
-                template={detailTemplate}
-                onApplyToCurrent={handleApplyToCurrent}
-                onAddAsNewPage={handleAddAsNewPage}
-                onPreview={(id) => sel.setPreviewId(id)}
-                onCancel={() => sel.setDetailId(null)}
-                usageCount={detailUsage.length}
-                onShowUsage={() => setUsageDrawerOpen(true)}
-                currentPageName={activePageInfo?.name}
-                appliedToCurrentPage={detailAppliedToCurrent}
-              />
-            )}
             {detailTemplate && (
               <TemplateUsageDrawer
                 open={usageDrawerOpen}
@@ -404,7 +406,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
                 }}
               />
             )}
-          </div>
+          </>
         )}
       </div>
 
