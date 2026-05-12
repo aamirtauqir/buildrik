@@ -32,6 +32,12 @@ export function useMediaState(composer: Composer): MediaStateResult {
   const [ctxMenu, setCtxMenu] = useState<CtxMenuState | null>(null);
   const [selectionContext, setSelectionContext] = useState<{ elementId: string; label?: string } | null>(null);
 
+  // §21 — replace-across pair. Once set (after user uploads replacement),
+  // ExpandedMediaPanel / MediaTab mounts <ReplaceAcrossDialog>.
+  const [replaceAcrossPair, setReplaceAcrossPair] = useState<
+    { oldSrc: string; newSrc: string; oldLabel: string; newLabel: string } | null
+  >(null);
+
   // §12 — expanded panel mode (320 ↔ 560). Composer event fires on change so
   // LeftSidebar can re-read the live width without coupling to media state.
   const [panelExpanded, setPanelExpandedRaw] = useState(false);
@@ -344,5 +350,9 @@ export function useMediaState(composer: Composer): MediaStateResult {
     // §12 expanded panel
     panelExpanded,
     setPanelExpanded,
+
+    // §21 replace-across pair
+    replaceAcrossPair,
+    setReplaceAcrossPair,
   };
 }

@@ -17,6 +17,8 @@ import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
 import { LibraryView } from "./components/LibraryView";
 import { MediaContextMenu } from "./components/MediaContextMenu";
 import { StockSourceModal } from "./components/StockSourceModal";
+import { ReplaceAcrossDialog } from "./components/ReplaceAcrossDialog";
+import { MEDIA_EVENTS } from "@/shared/constants/media";
 import { TypePills } from "./components/TypePills";
 import { UploadZone } from "./components/UploadZone";
 import { useMediaState } from "./hooks/useMediaState";
@@ -102,6 +104,34 @@ function MediaTabWithComposer({
     [onOpenImageEditor, state, showToast]
   );
 
+  // §21 — context-menu trigger. Opens file picker; on upload-complete,
+  // sets replaceAcrossPair which mounts ReplaceAcrossDialog. Defined here
+  // (before early return) so React hook order stays stable.
+  const handleReplaceAcross = React.useCallback((oldItem: LibraryItem) => {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = oldItem.type === "vid" ? "video/*" : "image/*,.svg";
+    fileInput.onchange = () => {
+      const file = fileInput.files?.[0];
+      if (!file) return;
+      const onComplete = (payload: unknown) => {
+        const p = payload as { asset?: { src?: string }; fileName?: string };
+        composer.media.off(MEDIA_EVENTS.UPLOAD_COMPLETE, onComplete);
+        if (p?.asset?.src) {
+          state.setReplaceAcrossPair({
+            oldSrc: oldItem.src,
+            newSrc: p.asset.src,
+            oldLabel: oldItem.name,
+            newLabel: p.fileName ?? "New asset",
+          });
+        }
+      };
+      composer.media.on(MEDIA_EVENTS.UPLOAD_COMPLETE, onComplete);
+      state.upload([file]);
+    };
+    fileInput.click();
+  }, [composer, state]);
+
   // ─── Panel mode: slim launcher (320px) or expanded panel (560px) ────
   if (onOpenLibrary) {
     if (state.panelExpanded) {
@@ -113,6 +143,7 @@ function MediaTabWithComposer({
           onOpenLibrary={onOpenLibrary}
           onClose={onClose}
           onOpenImageEditor={onOpenImageEditor}
+          onReplaceAcross={handleReplaceAcross}
         />
       );
     }
@@ -262,6 +293,17 @@ function MediaTabWithComposer({
           onCopyUrl={state.copyUrl}
           onClose={state.closeCtxMenu}
           onEditImage={handleEditImage}
+          onReplaceAcross={handleReplaceAcross}
+        />
+      )}
+      {state.replaceAcrossPair && (
+        <ReplaceAcrossDialog
+          composer={composer}
+          oldSrc={state.replaceAcrossPair.oldSrc}
+          newSrc={state.replaceAcrossPair.newSrc}
+          oldLabel={state.replaceAcrossPair.oldLabel}
+          newLabel={state.replaceAcrossPair.newLabel}
+          onClose={() => state.setReplaceAcrossPair(null)}
         />
       )}
       {state.confirmDelete && (

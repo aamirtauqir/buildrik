@@ -25,6 +25,7 @@ import { AssetDetailOverlay } from "./AssetDetailOverlay";
 import { MediaContextMenu } from "./MediaContextMenu";
 import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
 import { StockSourceModal } from "./StockSourceModal";
+import { ReplaceAcrossDialog } from "./ReplaceAcrossDialog";
 import "../MediaTab.css";
 import "./ExpandedMediaPanel.css";
 
@@ -38,6 +39,7 @@ export interface ExpandedMediaPanelProps {
     imageSrc: string,
     onSave: (editedSrc: string) => void | Promise<void>,
   ) => void;
+  onReplaceAcross?: (oldItem: LibraryItem) => void;
 }
 
 export function ExpandedMediaPanel({
@@ -47,6 +49,7 @@ export function ExpandedMediaPanel({
   onOpenLibrary,
   onClose,
   onOpenImageEditor,
+  onReplaceAcross,
 }: ExpandedMediaPanelProps) {
   const { addToast } = useToast();
   const showToast = React.useCallback((msg: string, type: "success" | "error" | "info") => {
@@ -227,6 +230,17 @@ export function ExpandedMediaPanel({
           onCopyUrl={state.copyUrl}
           onClose={state.closeCtxMenu}
           onEditImage={handleEditImage}
+          onReplaceAcross={onReplaceAcross ?? (() => {})}
+        />
+      )}
+      {state.replaceAcrossPair && (
+        <ReplaceAcrossDialog
+          composer={composer}
+          oldSrc={state.replaceAcrossPair.oldSrc}
+          newSrc={state.replaceAcrossPair.newSrc}
+          oldLabel={state.replaceAcrossPair.oldLabel}
+          newLabel={state.replaceAcrossPair.newLabel}
+          onClose={() => state.setReplaceAcrossPair(null)}
         />
       )}
       {state.confirmDelete && (

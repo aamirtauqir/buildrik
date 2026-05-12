@@ -255,6 +255,12 @@ export interface MediaStateResult {
   // §12 expanded-panel mode (320 ↔ 560)
   panelExpanded: boolean;
   setPanelExpanded(v: boolean): void;
+
+  // §21 replace-across pair (old + new srcs flow into ReplaceAcrossDialog)
+  replaceAcrossPair: { oldSrc: string; newSrc: string; oldLabel: string; newLabel: string } | null;
+  setReplaceAcrossPair(
+    pair: { oldSrc: string; newSrc: string; oldLabel: string; newLabel: string } | null
+  ): void;
 }
 
 // --- Prop slices ---

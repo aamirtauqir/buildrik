@@ -190,3 +190,21 @@ describe("useMediaState — §12 panelExpanded", () => {
     expect(result.current.panelExpanded).toBe(false);
   });
 });
+
+describe("useMediaState — §21 replaceAcrossPair", () => {
+  it("starts null", () => {
+    const composer = makeFakeComposer();
+    const { result } = renderHook(() => useMediaState(composer as never));
+    expect(result.current.replaceAcrossPair).toBeNull();
+  });
+
+  it("setReplaceAcrossPair stores + clears", () => {
+    const composer = makeFakeComposer();
+    const { result } = renderHook(() => useMediaState(composer as never));
+    const pair = { oldSrc: "data:old", newSrc: "data:new", oldLabel: "logo-v1", newLabel: "logo-v2" };
+    act(() => result.current.setReplaceAcrossPair(pair));
+    expect(result.current.replaceAcrossPair).toEqual(pair);
+    act(() => result.current.setReplaceAcrossPair(null));
+    expect(result.current.replaceAcrossPair).toBeNull();
+  });
+});

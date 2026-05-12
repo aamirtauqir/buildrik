@@ -20,6 +20,10 @@ interface MediaContextMenuProps {
   onDelete(item: LibraryItem): void;
   onCopyUrl(item: LibraryItem): void;
   onEditImage(item: LibraryItem): void;
+  /** §21 — opens file picker; on upload-complete, mounts ReplaceAcrossDialog.
+   *  Optional: callers without the wire (e.g., LibraryManager) omit it; the menu
+   *  item is then hidden. */
+  onReplaceAcross?(item: LibraryItem): void;
   onClose(): void;
 }
 
@@ -36,6 +40,7 @@ export function MediaContextMenu({
   onDelete,
   onCopyUrl,
   onEditImage,
+  onReplaceAcross,
   onClose,
 }: MediaContextMenuProps) {
   const [moveOpen, setMoveOpen] = React.useState(false);
@@ -73,6 +78,15 @@ export function MediaContextMenu({
         <Button role="menuitem" className="med-ctx-item" onClick={act(() => onCopyUrl(item))}>
           Copy URL
         </Button>
+        {onReplaceAcross && (item.type === "img" || item.type === "vid") ? (
+          <Button
+            role="menuitem"
+            className="med-ctx-item"
+            onClick={act(() => onReplaceAcross(item))}
+          >
+            Replace across pages…
+          </Button>
+        ) : null}
         {item.type === "img" && item.altText ? (
           <Button
             role="menuitem"
