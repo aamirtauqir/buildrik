@@ -241,25 +241,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
     <TabFrame className="tpl-shell">
       {/* Header — tpl-header class controls height via tpl-header-title sizing. */}
       <div className="tpl-header">
-        {detailTemplate ? (
-          /* Breadcrumb (Screen cV3OT) */
-          (<div className="tpl-breadcrumb">
-            <Button
-              className="tpl-breadcrumb-back"
-              onClick={() => sel.setDetailId(null)}
-              aria-label="Back to grid"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-              <span>Back to grid</span>
-            </Button>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--bd-fg-secondary, var(--bd-fg-muted))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 18l6-6-6-6" />
-            </svg>
-            <span className="tpl-breadcrumb-cat">{detailTemplate.category ?? "All"}</span>
-          </div>)
-        ) : newPageMode ? (
+        {newPageMode ? (
           <div className="tpl-newpage-header">
             <h2 className="tpl-header-title tpl-header-title--sm">Choose a template for your new page</h2>
             <div className="tpl-newpage-chip">New Page</div>
