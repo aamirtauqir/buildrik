@@ -13,13 +13,18 @@
  */
 
 import * as React from "react";
-import { Maximize2, Minimize2, X } from "lucide-react";
+import { Maximize2, Minimize2, Plus, Upload, X } from "lucide-react";
 import { Button } from "@/editor/shared/vibcoder/Button";
 import type { Composer } from "../../../../../engine/Composer";
-import type { MediaStateResult } from "../data/mediaTypes";
+import type { LibraryItem, MediaStateResult } from "../data/mediaTypes";
 import type { MediaFolder } from "@shared/types/media";
+import { useToast } from "@/editor/shared/vibcoder";
 import { TypePills } from "./TypePills";
 import { LibraryView } from "./LibraryView";
+import { AssetDetailOverlay } from "./AssetDetailOverlay";
+import { MediaContextMenu } from "./MediaContextMenu";
+import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
+import { StockSourceModal } from "./StockSourceModal";
 import "../MediaTab.css";
 import "./ExpandedMediaPanel.css";
 
@@ -29,6 +34,10 @@ export interface ExpandedMediaPanelProps {
   onCompact(): void;
   onOpenLibrary(opts?: { searchQuery?: string; folderId?: string | null }): void;
   onClose?(): void;
+  onOpenImageEditor?: (
+    imageSrc: string,
+    onSave: (editedSrc: string) => void | Promise<void>,
+  ) => void;
 }
 
 export function ExpandedMediaPanel({
@@ -37,7 +46,35 @@ export function ExpandedMediaPanel({
   onCompact,
   onOpenLibrary,
   onClose,
+  onOpenImageEditor,
 }: ExpandedMediaPanelProps) {
+  const { addToast } = useToast();
+  const showToast = React.useCallback((msg: string, type: "success" | "error" | "info") => {
+    addToast({ description: msg, tone: type });
+  }, [addToast]);
+  const [stockModalOpen, setStockModalOpen] = React.useState(false);
+
+  const handleEditImage = React.useCallback(
+    (item: LibraryItem) => {
+      if (!onOpenImageEditor) return;
+      onOpenImageEditor(item.src, async (editedSrc) => {
+        try {
+          const res = await fetch(editedSrc);
+          const blob = await res.blob();
+          const timestamp = new Date().getTime();
+          const cleanName = item.name.replace(/(_v\d+)?$/, "");
+          const fileName = `${cleanName}_v${timestamp % 10000}`;
+          const file = new File([blob], `${fileName}.${blob.type.split("/")[1]}`, { type: blob.type });
+          state.upload([file]);
+          showToast(`New version of ${item.name} created ✓`, "success");
+        } catch (err) {
+          console.error("Edit failed:", err);
+          showToast("Could not save edited version", "error");
+        }
+      });
+    },
+    [onOpenImageEditor, state, showToast]
+  );
   // Subscribe to folder list — keep it minimal; full FolderTree component
   // (used in fullpage LibraryManager) is too prop-heavy for this slim form.
   const [folders, setFolders] = React.useState<MediaFolder[]>([]);
@@ -72,6 +109,15 @@ export function ExpandedMediaPanel({
           <span className="exp-panel__badge">EXPANDED</span>
         </div>
         <div className="exp-panel__actions">
+          <Button
+            type="button"
+            className="med-stock-btn"
+            onClick={() => setStockModalOpen(true)}
+            title="Browse stock photos, videos, icons, fonts"
+          >
+            <Plus size={12} />
+            Stock
+          </Button>
           <Button
             type="button"
             className="exp-panel__compact-btn"
@@ -167,6 +213,62 @@ export function ExpandedMediaPanel({
           />
         </div>
       </div>
+
+      {/* Action overlays (mirror MediaTab.tsx fullpage path) */}
+      {state.ctxMenu && (
+        <MediaContextMenu
+          x={state.ctxMenu.x}
+          y={state.ctxMenu.y}
+          item={state.ctxMenu.item}
+          folders={state.folders}
+          onRename={state.openDetail}
+          onMove={(item, fid) => state.moveAsset(item.key, fid)}
+          onDelete={(item) => state.requestDelete(item.key)}
+          onCopyUrl={state.copyUrl}
+          onClose={state.closeCtxMenu}
+          onEditImage={handleEditImage}
+        />
+      )}
+      {state.confirmDelete && (
+        <ConfirmDeleteModal
+          payload={state.confirmDelete}
+          onConfirm={state.executeDelete}
+          onCancel={state.cancelDelete}
+        />
+      )}
+      {state.detailItem && (
+        <AssetDetailOverlay
+          item={state.detailItem}
+          onInsert={state.insertToCanvas}
+          onRename={state.renameItem}
+          onUpdate={state.updateItem}
+          onDelete={(key) => {
+            state.requestDelete(key);
+            state.closeDetail();
+          }}
+          onClose={state.closeDetail}
+          onEditImage={handleEditImage}
+        />
+      )}
+      <StockSourceModal
+        open={stockModalOpen}
+        onClose={() => setStockModalOpen(false)}
+        activeType={state.activeType}
+        photos={state.stockPhotos}
+        videos={state.stockVideos}
+        icons={state.discIcons}
+        fonts={state.discFonts}
+        loading={state.discLoading}
+        searchQuery={state.discoverySearch}
+        orientation={state.discOrientation}
+        color={state.discColor}
+        onSearch={state.discSearchAll}
+        onSetOrientation={state.setDiscOrientation}
+        onSetColor={state.setDiscColor}
+        onLoadMore={state.loadMoreDisc}
+        onSave={(type, item) => { state.saveToLibrary(type, item); }}
+        onInsert={state.insertToCanvas}
+      />
     </div>
   );
 }

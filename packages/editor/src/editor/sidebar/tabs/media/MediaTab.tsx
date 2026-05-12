@@ -112,6 +112,7 @@ function MediaTabWithComposer({
           onCompact={() => state.setPanelExpanded(false)}
           onOpenLibrary={onOpenLibrary}
           onClose={onClose}
+          onOpenImageEditor={onOpenImageEditor}
         />
       );
     }

@@ -98,8 +98,11 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
       </div>
       <div className="tpl-detail-buttons">
         {template.status === "premium" ? (
-          <Button className="tpl-detail-btn tpl-detail-btn--primary" disabled>
-            Pro Plan Required
+          <Button
+            className="tpl-detail-btn tpl-detail-btn--primary"
+            onClick={() => onApplyToCurrent(template.id)}
+          >
+            🔒 Upgrade to Use
           </Button>
         ) : (
           <>
