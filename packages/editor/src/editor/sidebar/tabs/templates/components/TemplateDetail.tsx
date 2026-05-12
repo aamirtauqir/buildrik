@@ -1,7 +1,16 @@
 import { Button } from "@/editor/shared/vibcoder/Button";
 /**
- * TemplateDetail — 420px side panel matching .pen Screen 6 design.
- * Preview image, title, description, and 3 action buttons.
+ * TemplateDetail — inline detail panel (prototype-v3 §2).
+ *
+ * Layout (top → bottom):
+ *  - Breadcrumb row: "‹ Back  Category › Type" + close ✕
+ *  - Preview block (gradient bg) with optional APPLIED HERE badge
+ *  - Title + description
+ *  - 3 meta pills: TYPE · FREE/PRO · (Used in N pages — when usage present)
+ *  - APPLY TO section label
+ *  - Buttons: Apply to current page / Add as new page (outline) / Preview full-screen (ghost)
+ *  - Info note: replacing current page content
+ *
  * @license BSD-3-Clause
  */
 
@@ -20,6 +29,13 @@ interface TemplateDetailProps {
   usageCount?: number;
   /** S9: open the Used in / Versions drawer. */
   onShowUsage?: () => void;
+  /** Current page name — used in primary CTA label "Apply to current page (PageName)"
+   *  and info note "Replacing current PageName page content".
+   *  Falls back to "current page" if not provided. */
+  currentPageName?: string;
+  /** True when this template is currently applied to the active page (shows
+   *  APPLIED HERE badge on the preview). */
+  appliedToCurrentPage?: boolean;
 }
 
 export const TemplateDetail: React.FC<TemplateDetailProps> = ({
@@ -32,9 +48,42 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
   onPreviewRetry,
   usageCount,
   onShowUsage,
+  currentPageName,
+  appliedToCurrentPage,
 }) => {
+  const isPremium = template.status === "premium";
+  const typeLabel = (template.type || template.category || "TEMPLATE").toUpperCase();
+  const statusLabel = isPremium ? "PRO" : "FREE";
+  const breadcrumbCat = (template.category || "Templates").replace(/-/g, " ");
+  const pageName = currentPageName || "current page";
+
   return (
     <div className="tpl-detail">
+      {/* Breadcrumb row */}
+      <div className="tpl-detail-breadcrumb">
+        <Button
+          className="tpl-detail-breadcrumb-back"
+          onClick={onCancel}
+          aria-label="Back to templates"
+        >
+          ‹ Back
+        </Button>
+        <span className="tpl-detail-breadcrumb-path">
+          <span className="tpl-detail-breadcrumb-cat">{breadcrumbCat}</span>
+          <span className="tpl-detail-breadcrumb-sep">›</span>
+          <span className="tpl-detail-breadcrumb-current">{template.name}</span>
+        </span>
+        <Button
+          className="tpl-detail-breadcrumb-close"
+          onClick={onCancel}
+          aria-label="Close detail"
+          title="Close"
+        >
+          ✕
+        </Button>
+      </div>
+
+      {/* Preview block */}
       <div
         className="tpl-detail-preview"
         style={{
@@ -44,6 +93,9 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
               : "var(--bd-bg-subtle, var(--bd-bg-subtle))",
         }}
       >
+        {appliedToCurrentPage && previewState === "ready" && (
+          <span className="tpl-detail-applied-badge">APPLIED HERE</span>
+        )}
         {previewState === "loading" && (
           <div className="tpl-detail-preview-state">
             <div className="tpl-apply-spinner" />
@@ -66,6 +118,8 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
           </div>
         )}
       </div>
+
+      {/* Title + description */}
       <div className="tpl-detail-info">
         <h3 className="tpl-detail-title">{template.name}</h3>
         {template.description && (
@@ -74,35 +128,38 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
         {!template.description && (
           <p className="tpl-detail-desc">
             A {template.category?.replace("-", " ") ?? "page"} template
-            {template.pageCount ? ` with ${template.pageCount} pages` : ""}.
-            {template.status === "premium" ? " Pro plan required." : ""}
+            {template.pageCount ? ` with ${template.pageCount} pages` : ""}
+            {isPremium ? " — Pro plan required." : "."}
           </p>
         )}
+      </div>
+
+      {/* Meta pills */}
+      <div className="tpl-detail-meta">
+        <span className="tpl-detail-meta-pill tpl-detail-meta-pill--type">{typeLabel}</span>
+        <span className={`tpl-detail-meta-pill tpl-detail-meta-pill--${isPremium ? "pro" : "free"}`}>
+          {statusLabel}
+        </span>
         {usageCount !== undefined && usageCount > 0 && onShowUsage && (
           <Button
-            variant="ghost"
-            size="sm"
-            type="button"
+            className="tpl-detail-meta-pill tpl-detail-meta-pill--usage"
             onClick={onShowUsage}
-            style={{
-              marginTop: 8,
-              fontSize: 12,
-              color: "var(--bd-accent, #2D6DFF)",
-              textDecoration: "underline dotted",
-              textUnderlineOffset: 2,
-            }}
+            type="button"
           >
-            Used in {usageCount} {usageCount === 1 ? "page" : "pages"} →
+            USED IN {usageCount} {usageCount === 1 ? "PAGE" : "PAGES"} →
           </Button>
         )}
       </div>
+
+      {/* Apply-to section */}
+      <div className="tpl-detail-section-label">Apply to</div>
       <div className="tpl-detail-buttons">
-        {template.status === "premium" ? (
+        {isPremium ? (
           <Button
             className="tpl-detail-btn tpl-detail-btn--primary"
             onClick={() => onApplyToCurrent(template.id)}
           >
-            🔒 Upgrade to Use
+            🔒 Upgrade to use
           </Button>
         ) : (
           <>
@@ -110,13 +167,13 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
               className="tpl-detail-btn tpl-detail-btn--primary"
               onClick={() => onApplyToCurrent(template.id)}
             >
-              Apply to Current Page
+              Apply to current page ({pageName})
             </Button>
             <Button
               className="tpl-detail-btn tpl-detail-btn--outline"
               onClick={() => onAddAsNewPage(template.id)}
             >
-              Add as New Page
+              Add as new page
             </Button>
           </>
         )}
@@ -124,15 +181,29 @@ export const TemplateDetail: React.FC<TemplateDetailProps> = ({
           className="tpl-detail-btn tpl-detail-btn--ghost"
           onClick={() => onPreview(template.id)}
         >
-          Preview
-        </Button>
-        <Button
-          className="tpl-detail-btn tpl-detail-btn--ghost"
-          onClick={onCancel}
-        >
-          Cancel
+          Preview full-screen
         </Button>
       </div>
+
+      {/* Info note */}
+      {!isPremium && (
+        <div className="tpl-detail-info-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 16v-4M12 8h.01" />
+          </svg>
+          <span>
+            Replacing current {pageName} page content.{" "}
+            <button
+              type="button"
+              className="tpl-detail-info-note-link"
+              onClick={() => onAddAsNewPage(template.id)}
+            >
+              Add as new page instead?
+            </button>
+          </span>
+        </div>
+      )}
     </div>
   );
 };

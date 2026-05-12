@@ -366,6 +366,180 @@
   background: var(--bd-bg-subtle, var(--bd-bg-subtle));
 }
 
+/* ── Detail panel: breadcrumb row (prototype-v3 §2) ── */
+.tpl-detail-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--bd-space-2);
+  padding-bottom: var(--bd-space-2);
+  border-bottom: 1px solid var(--bd-border-light, var(--bd-border));
+}
+.tpl-detail-breadcrumb-back {
+  height: 24px;
+  padding: 0 6px;
+  background: transparent;
+  border: none;
+  color: var(--bd-fg-muted, #64748B);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+}
+.tpl-detail-breadcrumb-back:hover {
+  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
+  color: var(--bd-fg, var(--bd-fg-primary));
+}
+.tpl-detail-breadcrumb-path {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  flex: 1;
+  min-width: 0;
+}
+.tpl-detail-breadcrumb-cat {
+  color: var(--bd-fg-muted, #64748B);
+  text-transform: capitalize;
+  flex-shrink: 0;
+}
+.tpl-detail-breadcrumb-sep {
+  color: var(--bd-fg-muted, #94A3B8);
+  flex-shrink: 0;
+}
+.tpl-detail-breadcrumb-current {
+  color: var(--bd-fg, var(--bd-fg-primary));
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tpl-detail-breadcrumb-close {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--bd-fg-muted, #64748B);
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tpl-detail-breadcrumb-close:hover {
+  background: var(--bd-bg-subtle, var(--bd-bg-subtle));
+  color: var(--bd-fg, var(--bd-fg-primary));
+}
+
+/* ── Detail panel: APPLIED HERE badge on preview ── */
+.tpl-detail-applied-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 3px 6px;
+  background: var(--bd-accent, #2D6DFF);
+  color: var(--bd-bg-card, #FFFFFF);
+  font-family: var(--bd-font-mono, ui-monospace, "Geist Mono", monospace);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 3px;
+  line-height: 1.2;
+  z-index: 1;
+}
+
+/* ── Detail panel: meta pills row ── */
+.tpl-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.tpl-detail-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  font-family: var(--bd-font-mono, ui-monospace, "Geist Mono", monospace);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  line-height: 1.2;
+  border: none;
+  cursor: default;
+  font-family: inherit;
+}
+.tpl-detail-meta-pill--type {
+  background: var(--bd-bg-subtle, #F1F5F9);
+  color: var(--bd-fg-muted, #475569);
+}
+.tpl-detail-meta-pill--free {
+  background: var(--bd-success-bg, #DCFCE7);
+  color: var(--bd-success, #166534);
+}
+.tpl-detail-meta-pill--pro {
+  background: var(--bd-warn-soft, #FEF3C7);
+  color: var(--bd-warn, #B45309);
+}
+.tpl-detail-meta-pill--usage {
+  background: var(--bd-accent-tint, rgba(45, 109, 255, 0.1));
+  color: var(--bd-accent, #2D6DFF);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.tpl-detail-meta-pill--usage:hover {
+  background: var(--bd-accent-tint-hover, rgba(45, 109, 255, 0.18));
+}
+
+/* ── Detail panel: "Apply to" section label ── */
+.tpl-detail-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bd-fg-muted, #64748B);
+  margin-top: var(--bd-space-2);
+}
+
+/* ── Detail panel: info note ── */
+.tpl-detail-info-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bd-bg-subtle, #F8FAFC);
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--bd-fg-muted, #64748B);
+}
+.tpl-detail-info-note svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--bd-fg-muted, #94A3B8);
+}
+.tpl-detail-info-note-link {
+  display: inline;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--bd-accent, #2D6DFF);
+  font-family: inherit;
+  font-size: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.tpl-detail-info-note-link:hover {
+  text-decoration: none;
+}
+
 /* ── Pagination ── */
 .tpl-pagination {
   display: flex;

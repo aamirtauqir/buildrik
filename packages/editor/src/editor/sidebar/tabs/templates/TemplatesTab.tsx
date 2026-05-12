@@ -119,6 +119,11 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
   const [usageDrawerOpen, setUsageDrawerOpen] = React.useState(false);
   const detailUsage = detailTemplate ? usageMap.get(detailTemplate.id) : [];
 
+  // prototype-v3 §2: surface current page name + applied-here state to TemplateDetail.
+  const activePageInfo = composer?.elements?.getActivePage?.();
+  const detailAppliedToCurrent =
+    !!activePageInfo && !!detailUsage?.some((u) => u.pageId === activePageInfo.id);
+
   const handleJumpToPage = React.useCallback(
     (pageId: string) => {
       composer?.elements.setActivePage?.(pageId);
@@ -380,6 +385,8 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
                 onCancel={() => sel.setDetailId(null)}
                 usageCount={detailUsage.length}
                 onShowUsage={() => setUsageDrawerOpen(true)}
+                currentPageName={activePageInfo?.name}
+                appliedToCurrentPage={detailAppliedToCurrent}
               />
             )}
             {detailTemplate && (
