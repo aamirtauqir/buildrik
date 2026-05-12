@@ -259,6 +259,17 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.tpl-card-name-mark {
+  background: var(--bd-cobalt-soft, rgba(45, 109, 255, 0.16));
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+.tpl-search-results-count {
+  font-size: 11px;
+  color: var(--bd-fg-muted, var(--bd-fg-secondary));
+  padding: 0 var(--bd-space-3) 6px;
+}
 .tpl-card-category {
   font-size: 11px;
   color: var(--bd-fg-secondary, var(--bd-fg-muted));

@@ -355,6 +355,11 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
         ) : (
           <div className={`tpl-content-inner${sel.detailId ? " tpl-content-inner--with-detail" : ""}`}>
             <div className={`tpl-grid-area${sel.detailId ? " tpl-grid-area--dimmed" : ""}`}>
+              {sel.searchQ.trim() && (
+                <div className="tpl-search-results-count" aria-live="polite">
+                  {sel.filteredTemplates.length} result{sel.filteredTemplates.length === 1 ? "" : "s"} for &ldquo;{sel.searchQ.trim()}&rdquo;
+                </div>
+              )}
               <div className="tpl-grid" role="listbox" aria-label="Available templates">
                 {sel.paginatedTemplates.map((tpl) => (
                   <TemplateCard
@@ -362,6 +367,7 @@ export const TemplatesTab: React.FC<TemplatesTabProps> = ({
                     template={tpl}
                     isSelected={sel.detailId === tpl.id}
                     onClick={(id) => sel.setDetailId(sel.detailId === id ? null : id)}
+                    highlightQuery={sel.searchQ.trim() || undefined}
                   />
                 ))}
               </div>

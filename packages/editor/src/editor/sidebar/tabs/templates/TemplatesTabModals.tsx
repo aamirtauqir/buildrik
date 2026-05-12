@@ -102,19 +102,62 @@ export interface ProModalProps {
   onUpgrade: () => void;
 }
 
+const PRO_FEATURES: readonly string[] = [
+  "80+ premium templates",
+  "Custom domain",
+  "Stock library access",
+  "AI alt-text generation",
+  "Priority support",
+];
+
 export const ProModal: React.FC<ProModalProps> = ({ templateName, onCancel, onUpgrade }) =>
   createPortal(
     <div className="tpl-modal-overlay" onClick={onCancel}>
-      <div className="tpl-modal" onClick={(e) => e.stopPropagation()}>
-        <h3 className="tpl-modal-title">Pro Template</h3>
-        <p style={{ fontSize: 13, color: "var(--bd-fg-muted, var(--bd-fg-secondary))", lineHeight: 1.5, margin: "0 0 16px" }}>
-          <strong>{templateName}</strong> is available on the Pro plan. Upgrade to unlock 40+ premium templates.
+      <div className="tpl-modal" onClick={(e) => e.stopPropagation()} style={{ textAlign: "center" }}>
+        <div
+          style={{
+            width: 56,
+            height: 56,
+            margin: "4px auto 16px",
+            background: "linear-gradient(135deg, #fff7ed, #fed7aa)",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          aria-hidden="true"
+        >
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bd-warn, #B45309)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2l3 7h7l-5.5 5L18 22l-6-4-6 4 1.5-8L2 9h7z" />
+          </svg>
+        </div>
+        <h3 className="tpl-modal-title" style={{ margin: "0 0 6px" }}>
+          &ldquo;{templateName}&rdquo; is a Pro template
+        </h3>
+        <p style={{ fontSize: 13, color: "var(--bd-fg-muted, var(--bd-fg-secondary))", lineHeight: 1.5, margin: "0 0 20px" }}>
+          Unlock 80+ premium templates with conversion-tested layouts.
         </p>
+        <div
+          style={{
+            textAlign: "left",
+            background: "var(--bd-bg-soft, #F8FAFC)",
+            padding: "14px 16px",
+            borderRadius: 6,
+            margin: "0 0 20px",
+          }}
+        >
+          <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>Pro includes</div>
+          <div style={{ fontSize: 12, color: "var(--bd-fg-secondary)", display: "flex", flexDirection: "column", gap: 4 }}>
+            {PRO_FEATURES.map((feat) => (
+              <div key={feat}>✓ {feat}</div>
+            ))}
+          </div>
+        </div>
         <div className="tpl-modal-btns">
-          <Button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onCancel}>
-            Cancel
+          <Button className="tpl-modal-btn tpl-modal-btn--ghost" onClick={onCancel} style={{ flex: 1 }}>
+            Maybe later
           </Button>
-          <Button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onUpgrade}>
+          <Button className="tpl-modal-btn tpl-modal-btn--primary" onClick={onUpgrade} style={{ flex: 1 }}>
             Upgrade to Pro
           </Button>
         </div>
