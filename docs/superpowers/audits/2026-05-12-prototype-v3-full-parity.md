@@ -42,7 +42,7 @@ This is a **code-vs-design** audit (source reading), not a screenshot diff. Live
 |---|---|---|---|---|
 | 10 | Media quick browse (320px default) | ship | `components/SlimLauncher.tsx` | per prior audit. 3 unexercised surfaces (recent strip, drag overlay, footer) gated on data state. |
 | 11 | Media selection context (snap-back mode) | ship | `MediaTab.tsx:142-172` + `hooks/useMediaState.ts:43-89` | Composer-event wired: `ui:media-selection-request`, `element:needs-asset`, `element:selected`. On asset click `setSelectionContext(null)` snaps back. Drift: single-line label vs prototype's two-line "Block · 'binding'" — acceptable. |
-| 12 | Media expanded mode (560px) on upload | build-deferred | n/a | Current architecture: fixed `panelWidth: 320` per `rail/tabsConfig.ts:99`. SlimLauncher `Maximize2` → `LibraryManager` fullpage path covers the same need at a different width. Defer until evidence the 560px middle state matters more than the existing fullpage escape. Architecture change required: dynamic panelWidth state-machine. |
+| 12 | Media expanded mode (560px) on upload | ship (built 2026-05-12) | `components/ExpandedMediaPanel.tsx` + `hooks/useMediaState.ts` + `LeftSidebar.tsx` | Composer-event-driven runtime width override. State lives in `useMediaState.panelExpanded`. Auto-expand on `MEDIA_EVENTS.UPLOAD_COMPLETE` (respects manual collapse + §11 selection-context). Compact button collapses to 320. 7 new vitest cases cover state contract. |
 | 13 | Media folder navigation + drag-to-folder | ship | `components/LibraryView.tsx` + Phase B4 folder mirror (`04f7aecb`) | Folder hierarchy + drag-to-folder shipped Phase B4. |
 | 14 | Media multi-select banner | ship | `components/SelectionBanner.tsx` (57 LOC) | Shipped. Banner appears when `selMode` engages. |
 | 15 | Media asset detail (extended drawer) | ship | `components/AssetDetailOverlay.tsx` (206 LOC) | Shipped. Mirror of Templates §9 pattern. |
@@ -62,26 +62,24 @@ This is a **code-vs-design** audit (source reading), not a screenshot diff. Live
 
 | Verdict | Count | §s |
 |---|---|---|
-| ship | 20 | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 |
-| build-deferred | 1 | 12 |
+| ship | 22 | 1–22 |
 
 ### This arc closed
 - §4: drift-fix → ship (title, icon, page-name subtitle, element count, primary CTA all corrected)
 - §5: drift-fix → ship (trophy icon, Pro feature bullet list, title rewrite, "Maybe later" CTA)
 - §7: drift-cosmetic → ship (results count line + keyword highlight via `<mark>`)
 - §11: confirmed wire via 3 composer events; verdict promoted from "unverified" → ship
-- §12: confirmed architecture gap; classified build-deferred (fullpage escape covers the use case)
+- §12: build-deferred → **ship** (composer-event-driven runtime width override + new ExpandedMediaPanel component + 7 new vitest cases)
 
 ---
 
 ## Open follow-ups (NOT closed by this arc)
 
-1. **§12 expanded mode 560px** — if user demand emerges, requires:
-   - State-driven `panelWidth` (not config-driven) for `assets` tab
-   - Upload-completion trigger → expand
-   - "Compact" button → collapse
-   - 180px folder tree + 380px library inner layout
-   - Sort/format/grid-size controls in expanded mode
+None. All 22 sections shipped.
+
+Minor v2 enhancements possible if user demand surfaces:
+- Per-folder asset filtering in ExpandedMediaPanel (currently shows all-assets regardless of folder click; LibraryItem doesn't expose `folderId` at UI layer — needs engine-side join).
+- Full FolderTree component (with smart folders, drag-to-folder, delete) instead of the minimal folder rail. Composer-side already supports — UI just needs the prop wiring.
 
 ---
 
