@@ -24,6 +24,7 @@ import { UploadZone } from "./components/UploadZone";
 import { useMediaState } from "./hooks/useMediaState";
 import { SlimLauncher } from "./components/SlimLauncher";
 import { ExpandedMediaPanel } from "./components/ExpandedMediaPanel";
+import { SelectionContextBar } from "./components/SelectionContextBar";
 import "./MediaTab.css";
 import { useToast } from "@/editor/shared/vibcoder";
 import type { LibraryItem } from "./data/mediaTypes";
@@ -210,35 +211,10 @@ function MediaTabWithComposer({
     >
       {/* 0. Selection Mode Header (Snap-back context) */}
       {state.selectionContext && (
-        <div className="med-selection-bar" style={{
-          background: 'var(--bd-accent)',
-          color: 'white',
-          padding: '8px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          fontSize: 13,
-          fontWeight: 500
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 8, height: 8, borderRadius: 'var(--bd-radius-full)', background: 'rgba(255,255,255,0.6)', animation: 'bd-status-pulse 2s infinite' }} />
-            Selecting image for: <span style={{ opacity: 0.9 }}>{state.selectionContext.label || 'Canvas Element'}</span>
-          </div>
-          <Button 
-            onClick={() => state.setSelectionContext(null)}
-            style={{
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              color: 'white',
-              padding: '2px 10px',
-              borderRadius: 4,
-              fontSize: 11,
-              cursor: 'pointer'
-            }}
-          >
-            Cancel Selection
-          </Button>
-        </div>
+        <SelectionContextBar
+          label={state.selectionContext.label}
+          onCancel={() => state.setSelectionContext(null)}
+        />
       )}
       {/* 1. Header bar — type pills + stock button + close */}
       <div className="med-tabs-wrap" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: ROW_LG }}>
