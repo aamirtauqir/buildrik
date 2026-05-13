@@ -547,14 +547,13 @@
   text-decoration: none;
 }
 
-/* ── Pagination ── */
+/* ── Pagination (prototype-v3 §1) ── */
 .tpl-pagination {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  height: 48px;
-  padding: 0 var(--bd-space-6);
+  gap: 4px;
+  padding: 8px 16px 16px;
   flex-shrink: 0;
   background: var(--bd-bg-panel, var(--bd-bg-panel));
   border-top: 1px solid var(--bd-border-light, var(--bd-border));
@@ -564,17 +563,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 4px;
   border: 1px solid var(--bd-border-light, var(--bd-border));
   background: var(--bd-bg-card, var(--bd-bg-card));
   color: var(--bd-fg-muted, #475569);
-  font-size: 13px;
+  font-size: 12px;
   font-family: inherit;
   cursor: pointer;
   transition: all 0.12s;
-  padding: 0;
 }
 .tpl-pagination-btn:hover:not(:disabled) {
   border-color: var(--bd-accent);
@@ -584,11 +583,20 @@
   opacity: 0.35;
   cursor: default;
 }
-.tpl-pagination-page--active {
+.tpl-pagination-page--active,
+.tpl-pagination-page--active:hover {
   background: var(--bd-accent);
   border-color: var(--bd-accent);
-  color: var(--bd-bg-card, var(--bd-bg-card));
-  font-weight: 500;
+  color: var(--bd-bg-card, #fff);
+  font-weight: 600;
+}
+.tpl-pagination-gap {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 4px;
+  font-size: 11px;
+  color: var(--bd-fg-muted, #94A3B8);
+  user-select: none;
 }
 
 /* ── Empty state ── */

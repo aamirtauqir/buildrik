@@ -11,7 +11,7 @@ import {
   SITE_TEMPLATES,
 } from "../templatesData";
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 6;
 
 export interface UseTemplateSelectionReturn {
   previewId: string | null;

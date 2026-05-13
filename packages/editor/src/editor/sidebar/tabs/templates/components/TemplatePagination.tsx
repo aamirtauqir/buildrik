@@ -26,9 +26,23 @@ export const TemplatePagination: React.FC<TemplatePaginationProps> = ({
   const goPrev = () => onChange(Math.max(1, currentPage - 1));
   const goNext = () => onChange(Math.min(totalPages, currentPage + 1));
 
-  // For modest totals, list every page. Above ~8 pages we'd want windowing,
-  // but the templates catalog is small enough that this stays simple.
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  // Build windowed page list: always show 1 + last, current ± 1, ellipsis in gaps.
+  // Matches prototype-v3 §1 pattern: ‹ 1 2 3 … 7 ›
+  const windowed: (number | "…")[] = [];
+  const add = (p: number | "…") => {
+    if (p === "…" || !windowed.includes(p)) windowed.push(p);
+  };
+  if (totalPages <= 5) {
+    for (let p = 1; p <= totalPages; p++) add(p);
+  } else {
+    add(1);
+    if (currentPage > 3) add("…");
+    for (let p = Math.max(2, currentPage - 1); p <= Math.min(totalPages - 1, currentPage + 1); p++) {
+      add(p);
+    }
+    if (currentPage < totalPages - 2) add("…");
+    add(totalPages);
+  }
 
   return (
     <nav className="tpl-pagination" aria-label="Templates pagination">
@@ -41,7 +55,12 @@ export const TemplatePagination: React.FC<TemplatePaginationProps> = ({
       >
         ‹
       </Button>
-      {pages.map((p) => {
+      {windowed.map((p, i) => {
+        if (p === "…") {
+          return (
+            <span key={`gap-${i}`} className="tpl-pagination-gap" aria-hidden="true">…</span>
+          );
+        }
         const isActive = p === currentPage;
         return (
           <Button
